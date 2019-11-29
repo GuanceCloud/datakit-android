@@ -1,0 +1,22 @@
+apply plugin: 'groovy'
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+dependencies{
+    implementation gradleApi()
+    implementation localGroovy()
+    implementation 'com.android.tools.build:gradle:3.5.2'
+}
+
+apply plugin: 'maven'
+group='com.ft.plugin'
+version='1.0.3'
+uploadArchives{
+    repositories {
+        mavenDeployer{
+            repository(url:uri('../repo'))
+        }
+    }
+}
