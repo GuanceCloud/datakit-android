@@ -12,15 +12,19 @@ import java.util.List;
  */
 public class FTExtension {
     public RunVariant runVariant = RunVariant.ALWAYS;
+    public boolean lambdaEnabled = true;
+    public boolean showLog = false;
     public List<String> whitelist = new ArrayList<>();
     public List<String> blacklist = new ArrayList<>();
     public boolean duplcatedClassSafeMode = false;
 
     @Override
     public String toString() {
-        return "TimingHunterExtension{" +
+        return "FTExtension{" +
                 "runVariant=" + runVariant +
                 ", whitelist=" + whitelist +
+                ", showLog=" + showLog +
+                ", lambdaEnabled=" + lambdaEnabled +
                 ", blacklist=" + blacklist +
                 ", duplcatedClassSafeMode=" + duplcatedClassSafeMode +
                 '}';

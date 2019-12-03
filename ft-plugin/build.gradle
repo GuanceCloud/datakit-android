@@ -12,7 +12,7 @@ dependencies{
 
 apply plugin: 'maven'
 group='com.ft.plugin'
-version='1.0.3'
+version='1.0.17'
 uploadArchives{
     repositories {
         mavenDeployer{
