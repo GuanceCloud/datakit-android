@@ -1,5 +1,8 @@
 package com.ft.plugin.garble.asm;
 
+import com.ft.plugin.garble.ClassNameAnalytics;
+import com.ft.plugin.garble.FTTransformHelper;
+
 import org.apache.commons.io.FileUtils;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
@@ -103,13 +106,17 @@ public class BaseWeaver implements IWeaver{
 
     }
 
+    public void setFTTransformHelper(FTTransformHelper ftTransformHelper){
+
+    }
+
     protected ClassVisitor wrapClassWriter(ClassWriter classWriter) {
         return classWriter;
     }
 
     @Override
     public boolean isWeavableClass(String fullQualifiedClassName){
-        return fullQualifiedClassName.endsWith(".class") && !fullQualifiedClassName.contains("R$") && !fullQualifiedClassName.contains("R.class") && !fullQualifiedClassName.contains("BuildConfig.class");
+        return fullQualifiedClassName.endsWith(".class") && !ClassNameAnalytics.isAndroidGenerated(fullQualifiedClassName);
     }
 
 }
