@@ -12,11 +12,11 @@ import com.android.build.api.transform.TransformInput;
 import com.android.build.api.transform.TransformOutputProvider;
 import com.android.build.gradle.internal.pipeline.TransformManager;
 import com.android.ide.common.internal.WaitableExecutor;
+import com.ft.plugin.garble.Logger;
 import com.google.common.io.Files;
 
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.Project;
-import org.gradle.api.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,8 +32,6 @@ import java.util.Set;
  * Description:字节码转换基类
  */
 public class BaseTransform extends Transform {
-    private final Logger logger;
-
     private static final Set<QualifiedContent.Scope> SCOPES = new HashSet<>();
 
     static {
@@ -49,7 +47,6 @@ public class BaseTransform extends Transform {
 
     public BaseTransform(Project project) {
         this.project = project;
-        this.logger = project.getLogger();
         this.waitableExecutor = WaitableExecutor.useGlobalSharedThreadPool();
     }
 
@@ -87,7 +84,7 @@ public class BaseTransform extends Transform {
         } else if ("release".equals(context.getVariantName())) {
             emptyRun = runVariant == RunVariant.DEBUG || runVariant == RunVariant.NEVER;
         }
-        logger.warn(getName() + " isIncremental = " + isIncremental + ", runVariant = "
+        Logger.info(getName() + " isIncremental = " + isIncremental + ", runVariant = "
                 + runVariant + ", emptyRun = " + emptyRun + ", inDuplcatedClassSafeMode = " + inDuplcatedClassSafeMode());
         long startTime = System.currentTimeMillis();
         if (!isIncremental) {
@@ -98,7 +95,7 @@ public class BaseTransform extends Transform {
         boolean flagForCleanDexBuilderFolder = false;
         for (TransformInput input : inputs) {
             for (JarInput jarInput : input.getJarInputs()) {
-                logger.warn("jarInput.getFile().getAbsolutePath() = " + jarInput.getFile().getAbsolutePath());
+                //logger.warn("jarInput.getFile().getAbsolutePath() = " + jarInput.getFile().getAbsolutePath());
                 Status status = jarInput.getStatus();
                 File dest = outputProvider.getContentLocation(
                         jarInput.getFile().getAbsolutePath(),
@@ -174,7 +171,7 @@ public class BaseTransform extends Transform {
 
         waitableExecutor.waitForTasksWithQuickFail(true);
         long costTime = System.currentTimeMillis() - startTime;
-        logger.warn((getName() + " cost " + costTime + "ms"));
+        Logger.info((getName() + " cost " + costTime + "ms"));
     }
 
     private void transformSingleFile(final File inputFile, final File outputFile, final String srcBaseDir) {

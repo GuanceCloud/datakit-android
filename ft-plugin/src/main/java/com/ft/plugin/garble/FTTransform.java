@@ -21,6 +21,7 @@ import java.util.Collection;
 public class FTTransform extends BaseTransform {
     private Project project;
     private FTExtension ftExtension;
+    private FTTransformHelper ftTransformHelper;
 
     public FTTransform(Project project) {
         super(project);
@@ -32,7 +33,11 @@ public class FTTransform extends BaseTransform {
     @Override
     public void transform(Context context, Collection<TransformInput> inputs, Collection<TransformInput> referencedInputs, TransformOutputProvider outputProvider, boolean isIncremental) throws IOException, TransformException, InterruptedException {
         ftExtension = (FTExtension) project.getExtensions().getByName("FTExt");
+        Logger.setDebug(ftExtension.showLog);
+        ftTransformHelper = new FTTransformHelper(ftExtension);
+        ftTransformHelper.isHookOnMethodEnter = true;
         bytecodeWeaver.setExtension(ftExtension);
+        bytecodeWeaver.setFTTransformHelper(ftTransformHelper);
         super.transform(context, inputs, referencedInputs, outputProvider, isIncremental);
     }
 

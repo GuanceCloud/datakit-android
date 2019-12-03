@@ -26,7 +26,7 @@ public class ClassLoaderHelper {
                                                 Project project) throws MalformedURLException {
         ImmutableList.Builder<URL> urls = new ImmutableList.Builder<>();
         String androidJarPath = getAndroidJarPath(project);
-        System.out.println("=======androidJarPath========"+androidJarPath);
+        //System.out.println("=======androidJarPath========"+androidJarPath);
         File file = new File(androidJarPath);
         URL androidJarURL = file.toURI().toURL();
         urls.add(androidJarURL);
