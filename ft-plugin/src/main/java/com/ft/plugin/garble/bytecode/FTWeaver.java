@@ -1,6 +1,8 @@
 package com.ft.plugin.garble.bytecode;
 
+import com.ft.plugin.garble.ClassNameAnalytics;
 import com.ft.plugin.garble.FTExtension;
+import com.ft.plugin.garble.FTTransformHelper;
 import com.ft.plugin.garble.asm.BaseWeaver;
 
 import org.objectweb.asm.ClassVisitor;
@@ -12,10 +14,8 @@ import org.objectweb.asm.ClassWriter;
  * Description:
  */
 public final class FTWeaver extends BaseWeaver {
-
-    private static final String PLUGIN_LIBRARY = "com.ft.sdk";
-
     private FTExtension ftExtension;
+    private FTTransformHelper ftTransformHelper;
 
     @Override
     public void setExtension(Object extension) {
@@ -24,9 +24,14 @@ public final class FTWeaver extends BaseWeaver {
     }
 
     @Override
+    public void setFTTransformHelper(FTTransformHelper ftTransformHelper){
+        this.ftTransformHelper = ftTransformHelper;
+    }
+
+    @Override
     public boolean isWeavableClass(String fullQualifiedClassName) {
         boolean superResult = super.isWeavableClass(fullQualifiedClassName);
-        boolean isByteCodePlugin = fullQualifiedClassName.startsWith(PLUGIN_LIBRARY);
+        boolean isByteCodePlugin = ClassNameAnalytics.isFTSDKFile(fullQualifiedClassName);
         if(ftExtension != null) {
             //whitelist is prior to to blacklist
             if(!ftExtension.whitelist.isEmpty()) {
@@ -53,7 +58,7 @@ public final class FTWeaver extends BaseWeaver {
 
     @Override
     protected ClassVisitor wrapClassWriter(ClassWriter classWriter) {
-        return new FTClassAdapter(classWriter);
+        return new FTClassAdapter(classWriter,ftTransformHelper);
     }
 
 }
