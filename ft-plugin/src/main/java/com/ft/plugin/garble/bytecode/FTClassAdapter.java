@@ -49,25 +49,6 @@ public class FTClassAdapter extends ClassVisitor {
     @Override
     public void visitEnd() {
         super.visitEnd();
-        if (FTUtil.isInstanceOfFragment(superName)) {
-            MethodVisitor mv;
-            // 添加剩下的方法，确保super.onHiddenChanged(hidden);等先被调用
-            Iterator<Map.Entry<String, FTMethodCell>> iterator = FTHookConfig.FRAGMENT_METHODS.entrySet().iterator();
-            while (iterator.hasNext()) {
-                Map.Entry<String, FTMethodCell> entry = iterator.next();
-                String key = entry.getKey();
-                FTMethodCell methodCell = entry.getValue();
-                if (visitedFragMethods.contains(key)) {
-                    continue;
-                }
-                mv = classVisitor.visitMethod(Opcodes.ACC_PUBLIC, methodCell.name, methodCell.desc, null, null);
-                mv.visitCode();
-                // call super
-                visitMethodWithLoadedParams(mv, Opcodes.INVOKESPECIAL, superName, methodCell.name, methodCell.desc, methodCell.paramsStart, methodCell.paramsCount, methodCell.opcodes);
-                // call injected method
-                visitMethodWithLoadedParams(mv, Opcodes.INVOKESTATIC, FTHookConfig.FT_SDK_API, methodCell.agentName, methodCell.agentDesc, methodCell.paramsStart, methodCell.paramsCount, methodCell.opcodes);
-            }
-        }
 
         Logger.info(">>>> end scan class："+className+"<<<<");
     }
