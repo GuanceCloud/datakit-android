@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
     <TextView
+        android:onClick="clickText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Hello World!"
@@ -14,5 +16,20 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+    <Button
+        android:onClick="gotoFFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="跳转到第一个Fragment"/>
+    <Button
+        android:onClick="gotoSFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="跳转到第二个Fragment"/>
+    <FrameLayout
+        android:layout_width="200dp"
+        android:layout_height="100dp"
+        android:id="@+id/fragment"
+        android:background="@color/colorPrimary"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
