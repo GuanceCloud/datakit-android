@@ -12,6 +12,7 @@ import java.util.HashSet;
 public class FTUtil {
     public static final int ASM_VERSION = Opcodes.ASM6;
     private static final HashSet<String> targetFragmentClass = new HashSet<>();
+    private static final HashSet<String> targetXFragmentClass = new HashSet<>();
     private static final HashSet<String> targetActivityClass = new HashSet<>();
     private static final HashSet<String> targetMenuMethodDesc = new HashSet<>();
     private static final HashSet<String> specialClass = new HashSet<>();
@@ -41,9 +42,9 @@ public class FTUtil {
         /**
          * For AndroidX Fragment
          */
-        targetFragmentClass.add("androidx/fragment/app/Fragment");
-        targetFragmentClass.add("androidx/fragment/app/ListFragment");
-        targetFragmentClass.add("androidx/fragment/app/DialogFragment");
+        targetXFragmentClass.add("androidx/fragment/app/Fragment");
+        targetXFragmentClass.add("androidx/fragment/app/ListFragment");
+        targetXFragmentClass.add("androidx/fragment/app/DialogFragment");
 
         /**
          * For Android App Activity
@@ -77,6 +78,10 @@ public class FTUtil {
 
     public static boolean isInstanceOfFragment(String superName) {
         return targetFragmentClass.contains(superName);
+    }
+
+    public static boolean isInstanceOfXFragment(String superName) {
+        return targetXFragmentClass.contains(superName);
     }
 
     public static boolean isInstanceOfActivity(String superName) {
