@@ -31,6 +31,28 @@ import java.util.HashMap;
  * Description:
  */
 public class FTAutoTrack {
+    public static void activityOnCreate(String cName,String rName){
+        LogUtils.d(">>>activityOnCreate<<<:cName="+cName+",rName="+rName);
+    }
+
+    public static void activityOnDestroy(String cName,String rName){
+        LogUtils.d(">>>activityOnDestroy<<<:cName="+cName+",rName="+rName);
+
+    }
+
+    public static void fragmentOnCreateView(String cName,String rName){
+        LogUtils.d(">>>fragmentOnCreateView<<<:cName="+cName+",rName="+rName);
+    }
+
+    public static void fragmentOnDestroyView(String cName,String rName){
+        LogUtils.d(">>>fragmentOnDestroyView<<<:cName="+cName+",rName="+rName);
+    }
+
+    public static void fragmentOnHiddenChanged(String cName,String rName,boolean isHidden){
+        LogUtils.d(">>>fragmentOnHiddenChanged<<<:cName="+cName+",rName="+rName+",isHidden="+isHidden);
+    }
+
+
     private static HashMap<Integer, Long> eventTimestamp = new HashMap<>();
 
     private static boolean isDeBounceTrack(Object object) {
@@ -187,10 +209,6 @@ public class FTAutoTrack {
 
     public static void trackOnHiddenChanged(Object object, boolean hidden) {
         LogUtils.d(">>>trackOnHiddenChanged<<<:object="+object+",hidden="+hidden);
-    }
-
-    public static void activityOnCreate(Bundle bundle){
-        LogUtils.d(">>>activityOnCreate<<<:bundle="+bundle);
     }
 
     public static void trackExpandableListViewOnGroupClick(ExpandableListView expandableListView, View view,
