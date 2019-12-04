@@ -2,6 +2,8 @@ package com.ft.plugin.garble.bytecode;
 
 import com.ft.plugin.garble.FTHookConfig;
 import com.ft.plugin.garble.FTMethodCell;
+import com.ft.plugin.garble.FTMethodType;
+import com.ft.plugin.garble.FTSubMethodCell;
 import com.ft.plugin.garble.FTTransformHelper;
 import com.ft.plugin.garble.FTUtil;
 import com.ft.plugin.garble.Logger;
@@ -53,7 +55,7 @@ public class FTMethodAdapter extends AdviceAdapter {
         this.className = className;
         this.interfaces = interfaces;
         this.visitedFragMethods = visitedFragMethods;
-        Logger.info(">>>> start scan method:"+methodName+"<<<<");
+        Logger.info(">>>> 开始扫描类 <"+className+"> 的方法:"+methodName+"<<<<");
     }
 
     @Override
@@ -64,7 +66,7 @@ public class FTMethodAdapter extends AdviceAdapter {
             if (ftTransformHelper.extension.lambdaEnabled && mLambdaMethodCells.containsKey(nameDesc)) {
                 mLambdaMethodCells.remove(nameDesc);
             }
-            Logger.info("Hooked method: "+methodName+","+methodDesc);
+            Logger.info("Hooked Class<"+className+">的 method: "+methodName+","+methodDesc);
         }
     }
 
@@ -101,7 +103,7 @@ public class FTMethodAdapter extends AdviceAdapter {
             variableID = newLocal(Type.getObjectType("java/lang/Integer"));
             mv.visitVarInsn(ALOAD, 1);
             mv.visitVarInsn(ASTORE, variableID);
-        } else if (nameDesc == "setUserVisibleHint(Z)V" && pubAndNoStaticAccess) {
+        } /**else if (nameDesc == "setUserVisibleHint(Z)V" && pubAndNoStaticAccess) {
             isSetUserVisibleHint = true;
             variableID = newLocal(Type.getObjectType("java/lang/Integer"));
             mv.visitVarInsn(ILOAD, 1);
@@ -116,11 +118,7 @@ public class FTMethodAdapter extends AdviceAdapter {
             mv.visitVarInsn(ALOAD, 2);
             mv.visitVarInsn(ASTORE, localId);
             localIds.add(localId);
-        }else if(nameDesc.equals("onCreate(Landroid/os/Bundle;)V") && pubAndNoStaticAccess){
-            variableID = newLocal(Type.getObjectType("java/lang/Integer"));
-            mv.visitVarInsn(ALOAD, 1);
-            mv.visitVarInsn(ISTORE, variableID);
-        }
+        }*/
         if (ftTransformHelper.isHookOnMethodEnter) {
             handleCode();
         }
@@ -134,6 +132,23 @@ public class FTMethodAdapter extends AdviceAdapter {
         }
     }
 
+    void handleCode(FTMethodCell ftMethodCell){
+        if(ftMethodCell.subMethodCellList != null && !ftMethodCell.subMethodCellList.isEmpty()){
+            for (FTSubMethodCell f:ftMethodCell.subMethodCellList) {
+                if(f.type == FTMethodType.ALOAD){
+                    mv.visitVarInsn(ALOAD, f.value);
+                }else if(f.type == FTMethodType.ILOAD){
+                    mv.visitVarInsn(ILOAD, f.value);
+                }else if(f.type == FTMethodType.INVOKEVIRTUAL){
+                    mv.visitMethodInsn(INVOKEVIRTUAL,f.className,f.agentName,f.agentDesc,f.itf);
+                }else if(f.type == FTMethodType.INVOKESPECIAL){
+                    mv.visitMethodInsn(INVOKESPECIAL,f.className,f.agentName,f.agentDesc,f.itf);
+                }
+            }
+        }
+        mv.visitMethodInsn(INVOKESTATIC, FTHookConfig.FT_SDK_API, ftMethodCell.agentName, ftMethodCell.agentDesc, false);
+    }
+
     void handleCode(){
         /**
          * Fragment
@@ -142,10 +157,12 @@ public class FTMethodAdapter extends AdviceAdapter {
          * android/support/v4/app/Fragment，android/support/v4/app/ListFragment，android/support/v4/app/DialogFragment，
          * androidx/fragment/app/Fragment，androidx/fragment/app/ListFragment，androidx/fragment/app/DialogFragment
          */
-        if (FTUtil.isInstanceOfFragment(superName)) {
+        if (FTUtil.isInstanceOfXFragment(superName)) {
+            Logger.info("方法扫描>>>类是Fragment>>>方法是"+nameDesc);
             FTMethodCell ftMethodCell = FTHookConfig.FRAGMENT_METHODS.get(nameDesc);
             if (ftMethodCell != null) {
-                visitedFragMethods.add(nameDesc);
+                handleCode(ftMethodCell);
+                /**visitedFragMethods.add(nameDesc);
                 if (isSetUserVisibleHint) {
                     mv.visitVarInsn(ALOAD, 0);
                     mv.visitVarInsn(ILOAD, variableID);
@@ -158,7 +175,7 @@ public class FTMethodAdapter extends AdviceAdapter {
                     mv.visitMethodInsn(Opcodes.INVOKESTATIC, FTHookConfig.FT_SDK_API, ftMethodCell.agentName, ftMethodCell.agentDesc, false);
                 } else {
                     visitMethodWithLoadedParams(mv, Opcodes.INVOKESTATIC, FTHookConfig.FT_SDK_API, ftMethodCell.agentName, ftMethodCell.agentDesc, ftMethodCell.paramsStart, ftMethodCell.paramsCount, ftMethodCell.opcodes);
-                }
+                }*/
                 isHasTracked = true;
                 return;
             }
@@ -166,9 +183,9 @@ public class FTMethodAdapter extends AdviceAdapter {
 
         if(FTUtil.isInstanceOfActivity(superName)){
             FTMethodCell ftMethodCell = FTHookConfig.ACTIVITY_METHODS.get(nameDesc);
+            Logger.info("方法扫描>>>类是Activity>>>方法是"+nameDesc+" ftMethodCell="+ftMethodCell);
             if(ftMethodCell != null){
-                mv.visitVarInsn(ALOAD, 1);
-                mv.visitMethodInsn(INVOKESTATIC, FTHookConfig.FT_SDK_API, ftMethodCell.agentName, ftMethodCell.agentDesc, false);
+                handleCode(ftMethodCell);
                 isHasTracked = true;
                 return;
             }
@@ -179,6 +196,7 @@ public class FTMethodAdapter extends AdviceAdapter {
          */
         if (ftTransformHelper.extension.lambdaEnabled) {
             FTMethodCell lambdaMethodCell = mLambdaMethodCells.get(nameDesc);
+            Logger.info("方法扫描>>>类是"+className+" Lambda>>>方法是"+nameDesc+" lambdaMethodCell="+lambdaMethodCell);
             if (lambdaMethodCell != null) {
                 Type[] types = Type.getArgumentTypes(lambdaMethodCell.desc);
                 int length = types.length;
@@ -213,7 +231,16 @@ public class FTMethodAdapter extends AdviceAdapter {
             }
         }
 
+
         if (!pubAndNoStaticAccess) {
+            Logger.info("方法扫描>>>类是"+className+">>>方法是"+nameDesc+" 静态和非公共方法");
+            return;
+        }
+
+        if (methodDesc.equals("(Landroid/view/View;)V")) {
+            Logger.info("方法扫描>>>类是"+className+">>>方法是"+nameDesc+" 点击");
+            trackViewOnClick(mv, 1);
+            isHasTracked = true;
             return;
         }
 
@@ -272,12 +299,6 @@ public class FTMethodAdapter extends AdviceAdapter {
             mv.visitVarInsn(ALOAD, 2);
             mv.visitVarInsn(ILOAD, 3);
             mv.visitMethodInsn(INVOKESTATIC, FTHookConfig.FT_SDK_API, "trackListView", "(Landroid/widget/AdapterView;Landroid/view/View;I)V", false);
-            isHasTracked = true;
-            return;
-        }
-
-        if (methodDesc == "(Landroid/view/View;)V") {
-            trackViewOnClick(mv, 1);
             isHasTracked = true;
             return;
         }

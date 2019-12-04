@@ -41,10 +41,20 @@ public class FTMethodCell {
      */
     public List<Integer> opcodes;
 
+    public List<FTSubMethodCell> subMethodCellList;
+
     FTMethodCell(String name, String desc, String agentName) {
         this.name = name;
         this.desc = desc;
         this.agentName = agentName;
+    }
+
+    FTMethodCell(String name, String desc, String agentName, String agentDesc, List<FTSubMethodCell> subMethodCells) {
+        this.name = name;
+        this.desc = desc;
+        this.agentName = agentName;
+        this.agentDesc = agentDesc;
+        this.subMethodCellList = subMethodCells;
     }
 
     FTMethodCell(String name, String desc, String parent, String agentName, String agentDesc, int paramsStart, int paramsCount, List<Integer> opcodes) {
