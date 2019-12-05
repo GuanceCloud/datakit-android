@@ -16,6 +16,7 @@ public class FTUtil {
     private static final HashSet<String> targetV4FragmentClass = new HashSet<>();
     private static final HashSet<String> targetActivityClass = new HashSet<>();
     private static final HashSet<String> targetMenuMethodDesc = new HashSet<>();
+    private static final HashSet<String> targetApplicationClass = new HashSet<>();
     private static final HashSet<String> specialClass = new HashSet<>();
 
     static {
@@ -26,6 +27,12 @@ public class FTUtil {
         targetMenuMethodDesc.add("onOptionsItemSelected(Landroid/view/MenuItem;)Z");
         targetMenuMethodDesc.add("onNavigationItemSelected(Landroid/view/MenuItem;)Z");
 
+        /**
+         * For Android Application
+         */
+
+        targetApplicationClass.add("androidx.multidex.MultiDexApplication");
+        targetApplicationClass.add("android/app/Application");
         /**
          * For Android App Fragment
          */
@@ -71,6 +78,10 @@ public class FTUtil {
 
     public static boolean isStatic(int access) {
         return (access & Opcodes.ACC_STATIC) != 0;
+    }
+
+    public static boolean isInstanceOfApplication(String nameDesc) {
+        return targetApplicationClass.contains(nameDesc);
     }
 
     public static boolean isTargetMenuMethodDesc(String nameDesc) {
