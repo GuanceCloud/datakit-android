@@ -17,7 +17,7 @@ version = '1.0.0-alpha6152aff'
 uploadArchives {
     repositories {
         mavenDeployer {
-            def username = getDefaultProperties().get("LADP_ACCOUNT")
+            def username = getDefaultProperties().get("LDAP_ACCOUNT")
             def password = getDefaultProperties().get("LDAP_PWD")
             repository(
                     url: "$maven_publish_url/maven-releases") {
