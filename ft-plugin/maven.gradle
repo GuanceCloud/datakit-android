@@ -1,6 +1,6 @@
 apply plugin: 'maven'
 group = 'com.cloudcare.ft.mobile.sdk.traker.plugin'
-version = '1.0.0-alpha-b1dea26'
+version = '1.0.0-alpha2'
 
 uploadArchives {
     repositories {
@@ -23,16 +23,3 @@ uploadArchives {
     }
 }
 
-def getDefaultProperties() {
-    def userName = System.getProperty("LDAP_ACCOUNT")
-    def password = System.getProperty("LDAP_PWD")
-
-    Properties properties = new Properties()
-    if (userName != null && password != null) {
-        properties.setProperty("LDAP_ACCOUNT", userName)
-        properties.setProperty("LDAP_PWD", password)
-    }else {
-        properties.load(project.rootProject.file('local.properties').newDataInputStream())
-    }
-    return properties
-}
