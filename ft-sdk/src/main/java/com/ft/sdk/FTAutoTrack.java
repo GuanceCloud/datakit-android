@@ -7,11 +7,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,28 +30,44 @@ import java.util.HashMap;
 /**
  * BY huangDianHua
  * DATE:2019-12-02 16:43
- * Description:
+ * Description
  */
 public class FTAutoTrack {
     public static void activityOnCreate(String cName,String rName){
-        LogUtils.d(">>>activityOnCreate<<<:cName="+cName+",rName="+rName);
+        LogUtils.d("[打入方法名：activityOnCreate ]  ：参数 cName="+cName+",rName="+rName);
     }
 
     public static void activityOnDestroy(String cName,String rName){
-        LogUtils.d(">>>activityOnDestroy<<<:cName="+cName+",rName="+rName);
+        LogUtils.d("[打入方法名：activityOnDestroy ]  ：参数 cName="+cName+",rName="+rName);
 
     }
 
     public static void fragmentOnCreateView(String cName,String rName){
-        LogUtils.d(">>>fragmentOnCreateView<<<:cName="+cName+",rName="+rName);
+        LogUtils.d("[打入方法名：fragmentOnCreateView ]  ：参数 cName="+cName+",rName="+rName);
     }
 
     public static void fragmentOnDestroyView(String cName,String rName){
-        LogUtils.d(">>>fragmentOnDestroyView<<<:cName="+cName+",rName="+rName);
+        LogUtils.d("[打入方法名：fragmentOnDestroyView ]  ：参数 cName="+cName+",rName="+rName);
     }
 
     public static void fragmentOnHiddenChanged(String cName,String rName,boolean isHidden){
-        LogUtils.d(">>>fragmentOnHiddenChanged<<<:cName="+cName+",rName="+rName+",isHidden="+isHidden);
+        LogUtils.d("[打入方法名：fragmentOnHiddenChanged ]  ：参数 cName="+cName+",rName="+rName+",isHidden="+isHidden);
+    }
+
+    public static void trackViewOnClick(View view) {
+        if (view == null) {
+            return;
+        }
+
+        trackViewOnClick(view, view.isPressed());
+    }
+
+    public static void trackViewOnClick(View view, boolean isFromUser) {
+        String text="";
+        if(view instanceof TextView || view instanceof Button){
+            text = ((TextView) view).getText().toString();
+        }
+        LogUtils.d("[打入方法名：trackViewOnClick ]  ：参数 view.getID="+view.getId()+",view.text="+text+",view="+view+",isFromUser="+isFromUser);
     }
 
 
@@ -71,7 +89,7 @@ public class FTAutoTrack {
     }
 
     private static void traverseView(String fragmentName, ViewGroup root) {
-        LogUtils.d(">>>traverseView<<<:fragmentName="+fragmentName+", root="+root);
+        LogUtils.d("[打入方法名：traverseView ]  ：参数 fragmentName="+fragmentName+", root="+root);
         try {
             if (TextUtils.isEmpty(fragmentName)) {
                 return;
@@ -98,7 +116,7 @@ public class FTAutoTrack {
     }
 
     private static boolean isFragment(Object object) {
-        LogUtils.d(">>>isFragment<<<:object="+object);
+        LogUtils.d("[打入方法名：isFragment ]  ：参数 object="+object);
         try {
             if (object == null) {
                 return false;
@@ -139,7 +157,7 @@ public class FTAutoTrack {
     }
 
     public static void onFragmentViewCreated(Object object, View rootView, Bundle bundle) {
-        LogUtils.d(">>>onFragmentViewCreated<<<:object="+object+",view="+rootView+",bundle="+bundle);
+        LogUtils.d("[打入方法名：onFragmentViewCreated ]  ：参数 object="+object+",view="+rootView+",bundle="+bundle);
         try {
             if (!isFragment(object)) {
                 return;
@@ -161,11 +179,11 @@ public class FTAutoTrack {
 
 
     public static void trackFragmentResume(Object object) {
-        LogUtils.d(">>>trackFragmentResume<<<:object="+object);
+        LogUtils.d("[打入方法名：trackFragmentResume ]  ：参数 object="+object);
     }
 
     private static boolean fragmentGetUserVisibleHint(Object fragment) {
-        LogUtils.d(">>>fragmentGetUserVisibleHint<<<:object="+fragment);
+        LogUtils.d("[打入方法名：fragmentGetUserVisibleHint ]  ：参数 object="+fragment);
         try {
             Method getUserVisibleHintMethod = fragment.getClass().getMethod("getUserVisibleHint");
             if (getUserVisibleHintMethod != null) {
@@ -178,7 +196,7 @@ public class FTAutoTrack {
     }
 
     private static boolean fragmentIsHidden(Object fragment) {
-        LogUtils.d(">>>fragmentIsHidden<<<:object="+fragment);
+        LogUtils.d("[打入方法名：fragmentIsHidden ]  ：参数 object="+fragment);
         try {
             Method isHiddenMethod = fragment.getClass().getMethod("isHidden");
             if (isHiddenMethod != null) {
@@ -191,11 +209,11 @@ public class FTAutoTrack {
     }
 
     public static void trackFragmentSetUserVisibleHint(Object object, boolean isVisibleToUser) {
-        LogUtils.d(">>>trackFragmentSetUserVisibleHint<<<:object="+object+",isVisibleToUser="+isVisibleToUser);
+        LogUtils.d("[打入方法名：trackFragmentSetUserVisibleHint ]  ：参数 object="+object+",isVisibleToUser="+isVisibleToUser);
     }
 
     private static boolean fragmentIsResumed(Object fragment) {
-        LogUtils.d(">>>fragmentIsResumed<<<:object="+fragment);
+        LogUtils.d("[打入方法名：fragmentIsResumed ]  ：参数 object="+fragment);
         try {
             Method isResumedMethod = fragment.getClass().getMethod("isResumed");
             if (isResumedMethod != null) {
@@ -208,71 +226,58 @@ public class FTAutoTrack {
     }
 
     public static void trackOnHiddenChanged(Object object, boolean hidden) {
-        LogUtils.d(">>>trackOnHiddenChanged<<<:object="+object+",hidden="+hidden);
+        LogUtils.d("[打入方法名：trackOnHiddenChanged ]  ：参数 object="+object+",hidden="+hidden);
     }
 
     public static void trackExpandableListViewOnGroupClick(ExpandableListView expandableListView, View view,
                                                            int groupPosition) {
-        LogUtils.d(">>>trackExpandableListViewOnGroupClick<<<:ExpandableListView="+expandableListView+",view="+view+",groupPosition"+groupPosition);
+        LogUtils.d("[打入方法名：trackExpandableListViewOnGroupClick ]  ：参数 ExpandableListView="+expandableListView+",view="+view+",groupPosition"+groupPosition);
     }
 
     public static void trackExpandableListViewOnChildClick(ExpandableListView expandableListView, View view,
                                                            int groupPosition, int childPosition) {
-        LogUtils.d(">>>trackExpandableListViewOnChildClick<<<:ExpandableListView="+expandableListView+",view="+view+",groupPosition"+groupPosition+",childPosition"+childPosition);
+        LogUtils.d("[打入方法名：trackExpandableListViewOnChildClick ]  ：参数 ExpandableListView="+expandableListView+",view="+view+",groupPosition"+groupPosition+",childPosition"+childPosition);
     }
 
     public static void trackTabHost(String tabName) {
-        LogUtils.d(">>>trackTabHost<<<:tabName="+tabName);
+        LogUtils.d("[打入方法名：trackTabHost ]  ：参数 tabName="+tabName);
     }
 
     public static void trackTabLayoutSelected(Object object, Object tab) {
-        LogUtils.d(">>>trackTabLayoutSelected<<<:object="+object+",tab="+tab);
+        LogUtils.d("[打入方法名：trackTabLayoutSelected ]  ：参数 object="+object+",tab="+tab);
     }
 
     public static void trackMenuItem(MenuItem menuItem) {
-        LogUtils.d(">>>trackMenuItem<<<:MenuItem="+menuItem);
+        LogUtils.d("[打入方法名：trackMenuItem ]  ：参数 MenuItem="+menuItem);
         trackMenuItem(null, menuItem);
     }
 
     public static void trackMenuItem(Object object, MenuItem menuItem) {
-        LogUtils.d(">>>trackMenuItem<<<:MenuItem="+menuItem+",object="+object);
+        LogUtils.d("[打入方法名：trackMenuItem ]  ：参数 MenuItem="+menuItem+",object="+object);
     }
 
     public static void trackRadioGroup(RadioGroup view, int checkedId) {
-        LogUtils.d(">>>trackRadioGroup<<<:RadioGroup="+view+",checkedId="+checkedId);
+        LogUtils.d("[打入方法名：trackRadioGroup ]  ：参数 RadioGroup="+view+",checkedId="+checkedId);
     }
 
     public static void trackDialog(DialogInterface dialogInterface, int whichButton) {
-        LogUtils.d(">>>trackDialog<<<:dialogInterface="+dialogInterface+",whichButton="+whichButton);
+        LogUtils.d("[打入方法名：trackDialog ]  ：参数 dialogInterface="+dialogInterface+",whichButton="+whichButton);
     }
 
     public static void trackListView(AdapterView<?> adapterView, View view, int position) {
-        LogUtils.d(">>>trackListView<<<:adapterView="+adapterView+",view="+view+",position="+position);
+        LogUtils.d("[打入方法名：trackListView ]  ：参数 adapterView="+adapterView+",view="+view+",position="+position);
     }
 
     public static void trackDrawerOpened(View view) {
-        LogUtils.d(">>>trackDrawerOpened<<<:view="+view);
+        LogUtils.d("[打入方法名：trackDrawerOpened ]  ：参数 view="+view);
     }
 
     public static void trackDrawerClosed(View view) {
-        LogUtils.d(">>>trackDrawerClosed<<<:view="+view);
-    }
-
-    public static void trackViewOnClick(View view) {
-        LogUtils.d(">>>trackViewOnClick<<<:view="+view);
-        if (view == null) {
-            return;
-        }
-
-        trackViewOnClick(view, view.isPressed());
-    }
-
-    public static void trackViewOnClick(View view, boolean isFromUser) {
-        LogUtils.d(">>>trackViewOnClick<<<:view="+view+",isFromUser="+isFromUser);
+        LogUtils.d("[打入方法名：trackDrawerClosed ]  ：参数 view="+view);
     }
 
     public static void track(String eventName, String properties) {
-        LogUtils.d(">>>track<<<:eventName="+eventName+",properties="+properties);
+        LogUtils.d("[打入方法名：track ]  ：参数 eventName="+eventName+",properties="+properties);
     }
 
 
@@ -327,12 +332,12 @@ public class FTAutoTrack {
         RecordData.OpData opData = new RecordData().new OpData();
         opData.setVtp(vtp);
         recordData.setOpdata(opData);
-        System.out.println(">>>>>>>>>即将插入："+recordData.getJsonString());
+        System.out.println("即将插入："+recordData.getJsonString());
         ThreadPoolUtils.execute(new Runnable() {
             @Override
             public void run() {
                 FTDBManager.get().insertFTOperation(recordData);
-                System.out.println(">>>>>>>>>全部数据："+FTDBManager.get().queryFTOperation());
+                System.out.println("全部数据："+FTDBManager.get().queryFTOperation());
             }
         });
     }
