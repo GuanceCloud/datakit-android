@@ -4,19 +4,46 @@ repositories {
     mavenCentral()
     jcenter()
 }
-dependencies{
+dependencies {
     implementation gradleApi()
     implementation localGroovy()
     implementation 'com.android.tools.build:gradle:3.5.2'
 }
 
 apply plugin: 'maven'
-group='com.ft.plugin'
-version='1.0.18'
-uploadArchives{
+group = 'com.cloudcare.ft.mobile.sdk.traker.plugin'
+version = '1.0.0-alpha6152aff'
+uploadPluginArchives {
     repositories {
-        mavenDeployer{
-            repository(url:uri('../repo'))
+        mavenDeployer {
+            def username = getProperties().get("LADP_ACCOUNT")
+            def password = getProperties().get("LDAP_PWD")
+            repository(
+                    url: "$maven_publish_url/maven-releases") {
+                authentication(userName: username, password: password)
+            }
+            snapshotRepository(
+                    url: "$maven_publish_url/maven-snapshot") {
+                authentication(userName: username, password: password)
+            }
+
+
         }
+
+
     }
+}
+
+def getProperties() {
+    def userName = System.getProperty("LDAP_ACCOUNT")
+    def password = System.getProperty("LDAP_PWD")
+
+    Properties properties = new Properties()
+    if (userName != null && password != null) {
+        properties.setProperty("LDAP_ACCOUNT", userName)
+        properties.setProperty("LDAP_PWD", password)
+    }else {
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    }
+    return properties
 }
