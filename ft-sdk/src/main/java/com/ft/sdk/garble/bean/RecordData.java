@@ -85,7 +85,7 @@ public class RecordData {
                 recordData.put("op", op.value);
             }
 
-            if (opdata != null) {
+            if (opdata != null && !opdata.isEmpty()) {
                 recordData.put("opdata", opdata.getJson());
             }
         } catch (JSONException e) {
@@ -102,6 +102,7 @@ public class RecordData {
          * 视图树
          */
         private String vtp;
+        private String field;
 
         public String getVtp() {
             return vtp;
@@ -109,6 +110,18 @@ public class RecordData {
 
         public void setVtp(String vtp) {
             this.vtp = vtp;
+        }
+
+        public String getField() {
+            return field;
+        }
+
+        public void setField(String field) {
+            this.field = field;
+        }
+
+        public boolean isEmpty(){
+            return (vtp == null || vtp.isEmpty()) && (field == null || field.isEmpty());
         }
 
         public JSONObject getJson() throws JSONException {
