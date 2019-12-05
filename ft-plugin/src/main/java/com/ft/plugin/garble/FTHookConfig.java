@@ -1,5 +1,6 @@
 package com.ft.plugin.garble;
 
+
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -52,12 +53,12 @@ public class FTHookConfig {
     }
 
     /**
-     * Fragment中的方法
+     * FragmentX中的方法
      */
-    public final static HashMap<String, FTMethodCell> FRAGMENT_METHODS = new HashMap<>();
+    public final static HashMap<String, FTMethodCell> FRAGMENT_X_METHODS = new HashMap<>();
 
     static {
-        FRAGMENT_METHODS.put("onCreateView(Landroid/view/LayoutInflater;Landroid/view/ViewGroup;Landroid/os/Bundle;)Landroid/view/View;", new FTMethodCell(
+        FRAGMENT_X_METHODS.put("onCreateView(Landroid/view/LayoutInflater;Landroid/view/ViewGroup;Landroid/os/Bundle;)Landroid/view/View;", new FTMethodCell(
                 "onCreateView",
                 "(Landroid/view/LayoutInflater;Landroid/view/ViewGroup;Landroid/os/Bundle;)Landroid/view/View;",
                 "fragmentOnCreateView",
@@ -71,7 +72,7 @@ public class FTHookConfig {
                         new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"androidx/fragment/app/FragmentActivity","getLocalClassName","()Ljava/lang/String;",false)
 
                 )));
-        FRAGMENT_METHODS.put("onDestroy()V", new FTMethodCell(
+        FRAGMENT_X_METHODS.put("onDestroy()V", new FTMethodCell(
                 "onDestroy",
                 "()V",
                 "fragmentOnDestroyView",
@@ -85,7 +86,7 @@ public class FTHookConfig {
                         new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"androidx/fragment/app/FragmentActivity","getLocalClassName","()Ljava/lang/String;",false)
 
                 )));
-        FRAGMENT_METHODS.put("onHiddenChanged(Z)V", new FTMethodCell(
+        FRAGMENT_X_METHODS.put("onHiddenChanged(Z)V", new FTMethodCell(
                 "onHiddenChanged",
                 "(Z)V",
                 "fragmentOnHiddenChanged",
@@ -100,6 +101,117 @@ public class FTHookConfig {
                         new FTSubMethodCell(FTMethodType.ILOAD,1)
                 )));
     }
+
+
+    /**
+     * FragmentX中的方法
+     */
+    public final static HashMap<String, FTMethodCell> FRAGMENT_METHODS = new HashMap<>();
+
+    static {
+        FRAGMENT_METHODS.put("onCreateView(Landroid/view/LayoutInflater;Landroid/view/ViewGroup;Landroid/os/Bundle;)Landroid/view/View;", new FTMethodCell(
+                "onCreateView",
+                "(Landroid/view/LayoutInflater;Landroid/view/ViewGroup;Landroid/os/Bundle;)Landroid/view/View;",
+                "fragmentOnCreateView",
+                "(Ljava/lang/String;Ljava/lang/String;)V",
+                Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD,0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Object","getClass","()Ljava/lang/Class;",false),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Class","getSimpleName","()Ljava/lang/String;",false),
+                        new FTSubMethodCell(FTMethodType.ALOAD,0),
+                        new FTSubMethodCell(FTMethodType.INVOKESPECIAL,"android/app/Fragment","getActivity","()Landroid/app/Activity;",false),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"android/app/Activity","getLocalClassName","()Ljava/lang/String;",false)
+
+                )));
+        FRAGMENT_METHODS.put("onDestroy()V", new FTMethodCell(
+                "onDestroy",
+                "()V",
+                "fragmentOnDestroyView",
+                "(Ljava/lang/String;Ljava/lang/String;)V",
+                Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD,0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Object","getClass","()Ljava/lang/Class;",false),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Class","getSimpleName","()Ljava/lang/String;",false),
+                        new FTSubMethodCell(FTMethodType.ALOAD,0),
+                        new FTSubMethodCell(FTMethodType.INVOKESPECIAL,"android/app/Fragment","getActivity","()Landroid/app/Activity;",false),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"android/app/Activity","getLocalClassName","()Ljava/lang/String;",false)
+
+                )));
+        FRAGMENT_METHODS.put("onHiddenChanged(Z)V", new FTMethodCell(
+                "onHiddenChanged",
+                "(Z)V",
+                "fragmentOnHiddenChanged",
+                "(Ljava/lang/String;Ljava/lang/String;Z)V",
+                Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD,0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Object","getClass","()Ljava/lang/Class;",false),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Class","getSimpleName","()Ljava/lang/String;",false),
+                        new FTSubMethodCell(FTMethodType.ALOAD,0),
+                        new FTSubMethodCell(FTMethodType.INVOKESPECIAL,"android/app/Fragment","getActivity","()Landroid/app/Activity;",false),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"android/app/Activity","getLocalClassName","()Ljava/lang/String;",false),
+                        new FTSubMethodCell(FTMethodType.ILOAD,1)
+                )));
+    }
+
+    /**
+     * FragmentV4中的方法
+     */
+    public final static HashMap<String, FTMethodCell> FRAGMENT_V4_METHODS = new HashMap<>();
+
+    static {
+        FRAGMENT_V4_METHODS.put("onCreateView(Landroid/view/LayoutInflater;Landroid/view/ViewGroup;Landroid/os/Bundle;)Landroid/view/View;", new FTMethodCell(
+                "onCreateView",
+                "(Landroid/view/LayoutInflater;Landroid/view/ViewGroup;Landroid/os/Bundle;)Landroid/view/View;",
+                "fragmentOnCreateView",
+                "(Ljava/lang/String;Ljava/lang/String;)V",
+                Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD,0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Object","getClass","()Ljava/lang/Class;",false),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Class","getSimpleName","()Ljava/lang/String;",false),
+                        new FTSubMethodCell(FTMethodType.ALOAD,0),
+                        new FTSubMethodCell(FTMethodType.INVOKESPECIAL,"android/support/v4/app/Fragment","getActivity","()Landroid/support/v4/app/FragmentActivity;",false),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"android/support/v4/app/FragmentActivity","getLocalClassName","()Ljava/lang/String;",false)
+
+                )));
+        FRAGMENT_V4_METHODS.put("onDestroy()V", new FTMethodCell(
+                "onDestroy",
+                "()V",
+                "fragmentOnDestroyView",
+                "(Ljava/lang/String;Ljava/lang/String;)V",
+                Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD,0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Object","getClass","()Ljava/lang/Class;",false),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Class","getSimpleName","()Ljava/lang/String;",false),
+                        new FTSubMethodCell(FTMethodType.ALOAD,0),
+                        new FTSubMethodCell(FTMethodType.INVOKESPECIAL,"android/support/v4/app/Fragment","getActivity","()Landroid/support/v4/app/FragmentActivity;",false),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"android/support/v4/app/FragmentActivity","getLocalClassName","()Ljava/lang/String;",false)
+
+                )));
+        FRAGMENT_V4_METHODS.put("onHiddenChanged(Z)V", new FTMethodCell(
+                "onHiddenChanged",
+                "(Z)V",
+                "fragmentOnHiddenChanged",
+                "(Ljava/lang/String;Ljava/lang/String;Z)V",
+                Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD,0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Object","getClass","()Ljava/lang/Class;",false),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Class","getSimpleName","()Ljava/lang/String;",false),
+                        new FTSubMethodCell(FTMethodType.ALOAD,0),
+                        new FTSubMethodCell(FTMethodType.INVOKESPECIAL,"android/support/v4/app/Fragment","getActivity","()Landroid/support/v4/app/FragmentActivity;",false),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"android/support/v4/app/FragmentActivity","getLocalClassName","()Ljava/lang/String;",false),
+                        new FTSubMethodCell(FTMethodType.ILOAD,1)
+                )));
+    }
+
+    public final static FTMethodCell MENU_METHODS = new FTMethodCell(
+            "","","trackMenuItem","(Ljava/lang/Object;Landroid/view/MenuItem;)V",
+            Arrays.asList(
+                    new FTSubMethodCell(FTMethodType.ALOAD,0),
+                    new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
+                    new FTSubMethodCell(FTMethodType.ALOAD,0)
+            )
+    );
+
 
     public final static HashMap<String, FTMethodCell> INTERFACE_METHODS = new HashMap<>();
 /**
@@ -251,40 +363,6 @@ public class FTHookConfig {
         }
     }
 
-    static {
-        /**FRAGMENT_METHODS.put("onResume();V", new FTMethodCell(
-                "onResume",
-                "();V",
-                "",// parent省略，均为 android/app/Fragment 或 android/support/v4/app/Fragment
-                "trackFragmentResume",
-                "(Ljava/lang/Object;);V",
-                0, 1,Arrays.asList(Opcodes.ALOAD)));*/
-
-        /**FRAGMENT_METHODS.put("setUserVisibleHint(Z);V", new FTMethodCell(
-                "setUserVisibleHint",
-                "(Z);V",
-                "",// parent省略，均为 android/app/Fragment 或 android/support/v4/app/Fragment
-                "trackFragmentSetUserVisibleHint",
-                "(Ljava/lang/Object;Z);V",
-                0, 2,Arrays.asList(Opcodes.ALOAD,Opcodes.ILOAD)));
-
-        FRAGMENT_METHODS.put("onHiddenChanged(Z);V", new FTMethodCell(
-                "onHiddenChanged",
-                "(Z);V",
-                "",
-                "trackOnHiddenChanged",
-                "(Ljava/lang/Object;Z);V",
-                0, 2,Arrays.asList(Opcodes.ALOAD, Opcodes.ILOAD)));
-
-        FRAGMENT_METHODS.put("onViewCreated(Landroid/view/View;Landroid/os/Bundle;);V", new FTMethodCell(
-                "onViewCreated",
-                "(Landroid/view/View;Landroid/os/Bundle;);V",
-                "",
-                "onFragmentViewCreated",
-                "(Ljava/lang/Object;Landroid/view/View;Landroid/os/Bundle;);V",
-                0, 3,Arrays.asList(Opcodes.ALOAD,Opcodes.ALOAD,Opcodes.ALOAD)));*/
-
-    }
 
     /**
      * android.gradle 3.2.1 版本中，针对 Lambda 表达式处理

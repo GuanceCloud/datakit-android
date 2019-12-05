@@ -7,7 +7,6 @@ package com.ft.plugin.garble;
  */
 public class FTTransformHelper {
     public FTExtension extension;
-    public boolean isHookOnMethodEnter= true;
     public FTTransformHelper(FTExtension extension){
         this.extension = extension;
     }

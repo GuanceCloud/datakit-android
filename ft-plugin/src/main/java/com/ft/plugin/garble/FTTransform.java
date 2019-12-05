@@ -35,7 +35,6 @@ public class FTTransform extends BaseTransform {
         ftExtension = (FTExtension) project.getExtensions().getByName("FTExt");
         Logger.setDebug(ftExtension.showLog);
         ftTransformHelper = new FTTransformHelper(ftExtension);
-        ftTransformHelper.isHookOnMethodEnter = true;
         bytecodeWeaver.setExtension(ftExtension);
         bytecodeWeaver.setFTTransformHelper(ftTransformHelper);
         super.transform(context, inputs, referencedInputs, outputProvider, isIncremental);
