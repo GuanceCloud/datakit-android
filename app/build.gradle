@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 29
-    buildToolsVersion "29.0.1"
     defaultConfig {
         applicationId "com.ft"
         minSdkVersion 21
@@ -35,6 +34,10 @@ repositories {
     jcenter()
     google()
     mavenLocal()
+    maven {
+        url 'https://pmgmt.jiagouyun.com/repository/maven-releases'
+    }
+
 }
 
 buildscript {
@@ -43,11 +46,11 @@ buildscript {
         google()
         mavenLocal()
         maven {
-            url uri('../repo')
+            url 'https://pmgmt.jiagouyun.com/repository/maven-releases'
         }
     }
     dependencies {
-        classpath 'com.ft.plugin:ft-plugin:1.0.18'
+        classpath 'com.cloudcare.ft.mobile.sdk.traker.plugin:ft-plugin:1.0.0-alpha6152aff'
     }
 }
 
