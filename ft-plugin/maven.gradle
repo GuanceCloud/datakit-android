@@ -1,0 +1,10 @@
+apply plugin: 'maven'
+group='com.ft.plugin'
+version='1.0.24'
+uploadArchives{
+    repositories {
+        mavenDeployer{
+            repository(url:uri('../repo'))
+        }
+    }
+}
