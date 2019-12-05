@@ -1,10 +1,38 @@
 apply plugin: 'maven'
-group='com.ft.plugin'
-version='1.0.24'
-uploadArchives{
+group = 'com.cloudcare.ft.mobile.sdk.traker.plugin'
+version = '1.0.0-alpha-b1dea26'
+
+uploadArchives {
     repositories {
-        mavenDeployer{
-            repository(url:uri('../repo'))
+        mavenDeployer {
+            def username = getDefaultProperties().get("LDAP_ACCOUNT")
+            def password = getDefaultProperties().get("LDAP_PWD")
+            repository(
+                    url: "$maven_publish_url/maven-releases") {
+                authentication(userName: username, password: password)
+            }
+            snapshotRepository(
+                    url: "$maven_publish_url/maven-snapshot") {
+                authentication(userName: username, password: password)
+            }
+
+
         }
+
+
     }
+}
+
+def getDefaultProperties() {
+    def userName = System.getProperty("LDAP_ACCOUNT")
+    def password = System.getProperty("LDAP_PWD")
+
+    Properties properties = new Properties()
+    if (userName != null && password != null) {
+        properties.setProperty("LDAP_ACCOUNT", userName)
+        properties.setProperty("LDAP_PWD", password)
+    }else {
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    }
+    return properties
 }
