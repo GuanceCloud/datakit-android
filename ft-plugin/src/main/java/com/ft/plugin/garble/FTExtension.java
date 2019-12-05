@@ -14,6 +14,7 @@ public class FTExtension {
     public RunVariant runVariant = RunVariant.ALWAYS;
     public boolean lambdaEnabled = true;
     public boolean showLog = false;
+    public boolean canHookMethod= true;
     public List<String> whitelist = new ArrayList<>();
     public List<String> blacklist = new ArrayList<>();
     public boolean duplcatedClassSafeMode = false;
@@ -24,6 +25,7 @@ public class FTExtension {
                 "runVariant=" + runVariant +
                 ", whitelist=" + whitelist +
                 ", showLog=" + showLog +
+                ", canHookMethod=" + canHookMethod +
                 ", lambdaEnabled=" + lambdaEnabled +
                 ", blacklist=" + blacklist +
                 ", duplcatedClassSafeMode=" + duplcatedClassSafeMode +
