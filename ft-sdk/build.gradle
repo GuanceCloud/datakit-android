@@ -70,7 +70,7 @@ publishing {
 }
 
 task generateAarAndPublish{
-    dependsOn 'assemble'
+    dependsOn 'assembleRelease'
     dependsOn 'publish'
 }
 
