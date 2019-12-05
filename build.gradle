@@ -1,7 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.maven_publish_url = 'https://pmgmt.jiagouyun.com/repository'
+
     repositories {
         google()
         jcenter()
@@ -13,14 +13,37 @@ buildscript {
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
+    ext {
+        maven_publish_url = 'https://pmgmt.jiagouyun.com/repository'
+        getDefaultProperties = this.&getDefaultProperties
+    }
+
+
 }
 
 allprojects {
     repositories {
         google()
         jcenter()
-        
+
     }
+
+
+}
+
+
+def getDefaultProperties() {
+    def userName = System.getProperty("LDAP_ACCOUNT")
+    def password = System.getProperty("LDAP_PWD")
+
+    Properties properties = new Properties()
+    if (userName != null && password != null) {
+        properties.setProperty("LDAP_ACCOUNT", userName)
+        properties.setProperty("LDAP_PWD", password)
+    } else {
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    }
+    return properties
 }
 
 task clean(type: Delete) {

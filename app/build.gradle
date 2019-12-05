@@ -50,7 +50,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.cloudcare.ft.mobile.sdk.traker.plugin:ft-plugin:1.0.0-alpha6152aff'
+        classpath 'com.cloudcare.ft.mobile.sdk.traker.plugin:ft-plugin:1.0.0-alpha2'
     }
 }
 
