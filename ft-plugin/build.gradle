@@ -12,7 +12,7 @@ dependencies {
 
 apply plugin: 'maven'
 group = 'com.cloudcare.ft.mobile.sdk.traker.plugin'
-version = '1.0.0-alpha6152aff'
+version = '1.0.0-alpha-b1dea26'
 
 uploadArchives {
     repositories {
