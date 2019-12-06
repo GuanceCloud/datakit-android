@@ -1,5 +1,7 @@
 package com.ft.sdk.garble.bean;
 
+import androidx.annotation.NonNull;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -9,6 +11,7 @@ import org.json.JSONObject;
  * Description:操作记录类
  */
 public class RecordData {
+    private long id;
     /**
      * 操作时间
      */
@@ -29,6 +32,16 @@ public class RecordData {
      * 操作数据
      */
     private OpData opdata;
+
+    private String dbJson;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public long getTime() {
         return time;
@@ -70,7 +83,14 @@ public class RecordData {
         this.opdata = opdata;
     }
 
+    public void setDbJson(String dbJson) {
+        this.dbJson = dbJson;
+    }
+
     public String getJsonString() {
+        if(dbJson != null && !dbJson.isEmpty()){
+            return dbJson;
+        }
         JSONObject recordData = new JSONObject();
         try {
             if(cpn != null) {
@@ -92,6 +112,15 @@ public class RecordData {
             e.printStackTrace();
         }
         return recordData.toString();
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "RecordData[id="+id+
+                ",time="+time+
+                ",data="+(dbJson==null?getJsonString():dbJson)+
+                "]";
     }
 
     /**
@@ -127,6 +156,7 @@ public class RecordData {
         public JSONObject getJson() throws JSONException {
             JSONObject opdata = new JSONObject();
             opdata.put("vtp", vtp);
+            opdata.put("field",field);
             return opdata;
         }
     }
