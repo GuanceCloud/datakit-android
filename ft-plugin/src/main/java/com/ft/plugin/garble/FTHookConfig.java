@@ -224,7 +224,7 @@ public class FTHookConfig {
             Arrays.asList(
                     new FTSubMethodCell(FTMethodType.ALOAD,0),
                     new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
-                    new FTSubMethodCell(FTMethodType.ALOAD,0)
+                    new FTSubMethodCell(FTMethodType.ALOAD,1)
             )
     );
 
