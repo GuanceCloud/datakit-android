@@ -11,7 +11,7 @@ import androidx.annotation.Nullable;
 
 import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.RecordData;
-import com.ft.sdk.garble.db.FTDBManager;
+import com.ft.sdk.garble.manager.FTManager;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
 
@@ -22,31 +22,32 @@ import com.ft.sdk.garble.utils.ThreadPoolUtils;
  */
 public class FTAutoTrack {
     public static void startApp(Object object) {
-        LogUtils.d("[打入方法名：startApp ]  ：参数 Object=" + object);
+        //LogUtils.d("[打入方法名：startApp ]  ：参数 Object=" + object);
+        startApp();
     }
 
     public static void activityOnCreate(String cName, String rName) {
-        LogUtils.d("[打入方法名：activityOnCreate ]  ：参数 cName=" + cName + ",rName=" + rName);
+        //LogUtils.d("[打入方法名：activityOnCreate ]  ：参数 cName=" + cName + ",rName=" + rName);
         startPage(cName, rName);
     }
 
     public static void activityOnDestroy(String cName, String rName) {
-        LogUtils.d("[打入方法名：activityOnDestroy ]  ：参数 cName=" + cName + ",rName=" + rName);
+        //LogUtils.d("[打入方法名：activityOnDestroy ]  ：参数 cName=" + cName + ",rName=" + rName);
         destoryPage(cName, rName);
     }
 
     public static void fragmentOnCreateView(String cName, String rName) {
-        LogUtils.d("[打入方法名：fragmentOnCreateView ]  ：参数 cName=" + cName + ",rName=" + rName);
+        //LogUtils.d("[打入方法名：fragmentOnCreateView ]  ：参数 cName=" + cName + ",rName=" + rName);
         startPage(cName, rName);
     }
 
     public static void fragmentOnDestroyView(String cName, String rName) {
-        LogUtils.d("[打入方法名：fragmentOnDestroyView ]  ：参数 cName=" + cName + ",rName=" + rName);
+        //LogUtils.d("[打入方法名：fragmentOnDestroyView ]  ：参数 cName=" + cName + ",rName=" + rName);
         destoryPage(cName, rName);
     }
 
     public static void fragmentOnHiddenChanged(String cName, String rName, boolean isHidden) {
-        LogUtils.d("[打入方法名：fragmentOnHiddenChanged ]  ：参数 cName=" + cName + ",rName=" + rName + ",isHidden=" + isHidden);
+        //LogUtils.d("[打入方法名：fragmentOnHiddenChanged ]  ：参数 cName=" + cName + ",rName=" + rName + ",isHidden=" + isHidden);
         if (isHidden) {
             leavePage(cName, rName);
         } else {
@@ -67,17 +68,18 @@ public class FTAutoTrack {
         if (view instanceof TextView || view instanceof Button) {
             text = ((TextView) view).getText().toString();
         }
-        clickView("", "", getViewTree(view));
-        LogUtils.d("[打入方法名：trackViewOnClick ]  ：参数 object=" + object + ",view.getID=" + view.getId() + ",view.text=" + text + ",view=" + view + ",isFromUser=" + isFromUser);
+        clickView(object.toString(), object.toString(), getViewTree(view));
+        //LogUtils.d("[打入方法名：trackViewOnClick ]  ：参数 object=" + object + ",view.getID=" + view.getId() + ",view.text=" + text + ",view=" + view + ",isFromUser=" + isFromUser);
     }
 
     public static void trackMenuItem(MenuItem menuItem) {
-        LogUtils.d("[打入方法名：trackMenuItem ]  ：参数 MenuItem=" + menuItem);
+        //LogUtils.d("[打入方法名：trackMenuItem ]  ：参数 MenuItem=" + menuItem);
         trackMenuItem(null, menuItem);
     }
 
     public static void trackMenuItem(Object object, MenuItem menuItem) {
-        LogUtils.d("[打入方法名：trackMenuItem ]  ：参数 MenuItem=" + menuItem + ",object=" + object);
+        //LogUtils.d("[打入方法名：trackMenuItem ]  ：参数 MenuItem=" + menuItem + ",object=" + object);
+        clickView(object.toString(), object.toString(), "");
     }
 
 
@@ -119,12 +121,12 @@ public class FTAutoTrack {
         RecordData.OpData opData = new RecordData().new OpData();
         opData.setVtp(vtp);
         recordData.setOpdata(opData);
-        System.out.println("即将插入：" + recordData.getJsonString());
-        ThreadPoolUtils.execute(new Runnable() {
+        ThreadPoolUtils.get().execute(new Runnable() {
             @Override
             public void run() {
-                FTDBManager.get().insertFTOperation(recordData);
-                System.out.println("全部数据：" + FTDBManager.get().queryFTOperation());
+                LogUtils.d("存入数据库数据："+recordData.getJsonString());
+                FTManager.getFTDBManager().insertFTOperation(recordData);
+                FTManager.getSyncTaskManaget().executeSync();
             }
         });
     }
