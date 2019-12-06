@@ -34,7 +34,7 @@ public class SyncTaskManager {
     }
 
     /**
-     * 开启应用是自动开启轮询线程主动同步数据库数据
+     * 触发延迟轮询同步
      */
     public void executeSyncPoll() {
         if (running) {
@@ -48,6 +48,11 @@ public class SyncTaskManager {
         ThreadPoolUtils.get().execute(new Runnable() {
             @Override
             public void run() {
+                try {
+                    Thread.sleep(SLEEP_TIME);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 LogUtils.d(">>>同步轮询线程<<< 开始运行");
                 List<RecordData> recordDataList = queryFromData();
                 //当数据库中有数据是执行轮询同步操作
@@ -75,7 +80,7 @@ public class SyncTaskManager {
     }
 
     /**
-     * 点击触发延迟同步
+     * 触发延迟单次同步
      */
     public void executeSync() {
         if (running) {
@@ -110,6 +115,7 @@ public class SyncTaskManager {
             return;
         }
         LogUtils.d("同步的数据" + requestDatas);
+        //TODO 添加网络请求
         try {
             Thread.sleep(2000);//模拟网络请求
         } catch (InterruptedException e) {
