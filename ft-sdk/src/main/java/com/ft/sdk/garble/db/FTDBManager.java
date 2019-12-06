@@ -66,22 +66,40 @@ public class FTDBManager extends DBManager {
         });
     }
 
-    public List<String> queryFTOperation() {
-        final List<String> recordList = new ArrayList<>();
+    public List<RecordData> queryDataByDescLimit(final String limit) {
+        final List<RecordData> recordList = new ArrayList<>();
         getDB(false, new DataBaseCallBack() {
             @Override
             public void run(SQLiteDatabase db) {
 
-                Cursor cursor = db.query(FTSQL.FT_TABLE_NAME, null, null, null, null, null, null);
+                Cursor cursor = db.query(FTSQL.FT_TABLE_NAME, null, null, null, null, null, FTSQL.RECORD_COLUMN_ID+" desc",limit);
                 while (cursor.moveToNext()) {
                     long id = cursor.getLong(cursor.getColumnIndex(FTSQL.RECORD_COLUMN_ID));
                     long time = cursor.getLong(cursor.getColumnIndex(FTSQL.RECORD_COLUMN_TM));
                     String data = cursor.getString(cursor.getColumnIndex(FTSQL.RECORD_COLUMN_DATA));
-                    recordList.add("id=" + id + ", time=" + time + ", data=" + data+"\n");
+                    RecordData recordData = new RecordData();
+                    recordData.setId(id);
+                    recordData.setTime(time);
+                    recordData.setDbJson(data);
+                    recordList.add(recordData);
                 }
                 cursor.close();
             }
         });
         return recordList;
+    }
+
+    public void delete(final List<String> ids){
+        getDB(true, new DataBaseCallBack() {
+            @Override
+            public void run(SQLiteDatabase db) {
+                db.beginTransaction();
+                for (String id:ids) {
+                    db.delete(FTSQL.FT_TABLE_NAME, FTSQL.RECORD_COLUMN_ID+"=?",new String[]{id});
+                }
+                db.setTransactionSuccessful();
+                db.endTransaction();
+            }
+        });
     }
 }

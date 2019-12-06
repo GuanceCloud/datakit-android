@@ -14,17 +14,28 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Description:
  */
 public class ThreadPoolUtils {
-    private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
-    private static final int CORE_POOL_SIZE = CPU_COUNT;
-    private static final int MAXIMUM_POOL_SIZE = CPU_COUNT * 2;
-    private static final int KEEP_ALIVE = 5;
-    private static BlockingQueue workQueue = new ArrayBlockingQueue(10);
-    private static ThreadPoolExecutor executor;
+    private final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
+    private final int CORE_POOL_SIZE = CPU_COUNT;
+    private final int MAXIMUM_POOL_SIZE = CPU_COUNT * 2;
+    private final int KEEP_ALIVE = 5;
+    private BlockingQueue workQueue = new ArrayBlockingQueue(10);
+    private ThreadPoolExecutor executor;
+    private static ThreadPoolUtils threadPoolUtils;
 
     private ThreadPoolUtils() {
+        executor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE, TimeUnit.SECONDS, workQueue, threadFactory);
     }
 
-    private static ThreadFactory threadFactory = new ThreadFactory() {
+    public static ThreadPoolUtils get(){
+        synchronized (ThreadPoolUtils.class){
+            if(threadPoolUtils == null){
+                threadPoolUtils = new ThreadPoolUtils();
+            }
+            return threadPoolUtils;
+        }
+    }
+
+    private ThreadFactory threadFactory = new ThreadFactory() {
         private final AtomicInteger integer = new AtomicInteger();
 
         @Override
@@ -33,20 +44,36 @@ public class ThreadPoolUtils {
         }
     };
 
-    static {
-        executor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE, TimeUnit.SECONDS, workQueue, threadFactory);
+
+
+    public void execute(Runnable runnable) {
+        if(executor != null) {
+            executor.execute(runnable);
+        }
     }
 
-    public static void execute(Runnable runnable) {
-        executor.execute(runnable);
+    public void execute(FutureTask futureTask) {
+        if(executor != null) {
+            executor.execute(futureTask);
+        }
     }
 
-    public static void execute(FutureTask futureTask) {
-        executor.execute(futureTask);
-    }
-
-    public static void cancel(FutureTask futureTask) {
+    public void cancel(FutureTask futureTask) {
         futureTask.cancel(true);
     }
 
+    public boolean poolRunning(){
+        return executor != null && !executor.isShutdown();
+    }
+
+    public void shutDown(){
+        if(executor!=null && !executor.isShutdown()) {
+            executor.shutdown();
+            executor = null;
+        }
+    }
+
+    public void reStartPool(){
+        executor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE, TimeUnit.SECONDS, workQueue, threadFactory);
+    }
 }
