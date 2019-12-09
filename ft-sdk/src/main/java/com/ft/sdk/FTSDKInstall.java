@@ -1,10 +1,12 @@
 package com.ft.sdk;
 
 import android.app.Application;
-import android.content.Context;
 
 import com.ft.sdk.garble.FTActivityLifecycleCallbacks;
+import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.manager.FTManager;
+
+import java.util.UUID;
 
 /**
  * BY huangDianHua
@@ -13,21 +15,24 @@ import com.ft.sdk.garble.manager.FTManager;
  */
 public class FTSDKInstall {
     private static FTSDKInstall FTSDKInstall;
-    private Context mContext;
     private FTSDKConfig mFtSDKConfig;
-    private FTSDKInstall(Context context,FTSDKConfig ftsdkConfig){
-        mContext = context;
-        mFtSDKConfig = ftsdkConfig;
+    private FTSDKInstall(FTSDKConfig ftSDKConfig){
         FTActivityLifecycleCallbacks life = new FTActivityLifecycleCallbacks();
-        Application app = (Application) context.getApplicationContext();
+        Application app = FTApplication.getApplication();
         app.registerActivityLifecycleCallbacks(life);
-        FTManager.getSyncTaskManaget().executeSyncPoll();
+        this.mFtSDKConfig = ftSDKConfig;
+        initFTHttpConfig();
     }
-    public static synchronized FTSDKInstall install(Context context,FTSDKConfig ftsdkConfig){
+    public static synchronized FTSDKInstall getInstance(FTSDKConfig ftSDKConfig){
         if (FTSDKInstall == null) {
-            FTSDKInstall = new FTSDKInstall(context,ftsdkConfig);
+            FTSDKInstall = new FTSDKInstall(ftSDKConfig);
         }
         return FTSDKInstall;
     }
+
+    private void initFTHttpConfig(){
+        FTHttpConfig.get().initParams(mFtSDKConfig);
+    }
+
 
 }

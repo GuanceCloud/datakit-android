@@ -5,10 +5,18 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.Base64;
 
 import androidx.core.content.ContextCompat;
 
 import com.ft.sdk.FTApplication;
+
+import java.security.InvalidKeyException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 
 /**
  * BY huangDianHua
@@ -25,7 +33,7 @@ public class Utils {
         return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_DENIED;
     }
 
-    public boolean isNetworkAvailable() {
+    public static boolean isNetworkAvailable() {
         return isNetworkAvailable(FTApplication.getApplication());
     }
 
@@ -33,6 +41,35 @@ public class Utils {
         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetWork = manager.getActiveNetworkInfo();
         return activeNetWork != null && activeNetWork.isConnected();
+    }
+
+    public static String contentMD5Encode(String str){
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(str.getBytes());
+            byte[] b = md.digest();
+            return Base64.encodeToString(b,Base64.DEFAULT);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    public static String getHnacSha1(String accesskeySecret,String content){
+        SecretKeySpec signingKey = new SecretKeySpec(accesskeySecret.getBytes(),"HmacSHA1");
+        try {
+            Mac mac = Mac.getInstance("HmacSHA1");
+            mac.init(signingKey);
+            byte[] text = mac.doFinal(content.getBytes());
+            String result = Base64.encodeToString(text,Base64.DEFAULT);
+            return result.trim();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return "";
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 }
 
