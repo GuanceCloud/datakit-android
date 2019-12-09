@@ -2,6 +2,9 @@ package com.ft.sdk.garble.manager;
 
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.db.FTDBManager;
+import com.ft.sdk.garble.http.FTHttpClient;
+import com.ft.sdk.garble.http.HttpCallback;
+import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
 
@@ -116,6 +119,7 @@ public class SyncTaskManager {
         }
         LogUtils.d("同步的数据" + requestDatas);
         //TODO 添加网络请求
+        requestNet();
         try {
             Thread.sleep(2000);//模拟网络请求
         } catch (InterruptedException e) {
@@ -135,6 +139,15 @@ public class SyncTaskManager {
             ids.add(r.getId() + "");
         }
         FTDBManager.get().delete(ids);
+    }
+
+    private void requestNet(){
+        FTHttpClient.Builder().setMethod(RequestMethod.POST).addParams("mobile_tracker",null).execute(new HttpCallback() {
+            @Override
+            public void onComplete(String result) {
+
+            }
+        });
     }
 
 }
