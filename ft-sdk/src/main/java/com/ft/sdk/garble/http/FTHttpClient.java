@@ -4,8 +4,6 @@ import com.ft.sdk.garble.utils.Utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -30,30 +28,7 @@ public class FTHttpClient extends HttpClient {
 
     @Override
     protected String getBodyContent() {
-        StringBuffer sb = new StringBuffer();
-        if (mHttpBuilder.getMethod() == RequestMethod.POST) {
-            HashMap<String, Object> param = mHttpBuilder.getParams();
-            if (param != null) {
-                Iterator<String> keys = param.keySet().iterator();
-                while (keys.hasNext()) {
-                    String key = keys.next();
-                    if (keys.hasNext()) {
-                        if(param.get(key) != null) {
-                            sb.append(key + "=" +param.get(key) +",");
-                        }else{
-                            sb.append(key +",");
-                        }
-                    } else {
-                        if(param.get(key) != null) {
-                            sb.append(key + "=" +param.get(key));
-                        }else{
-                            sb.append(key);
-                        }
-                    }
-                }
-            }
-        }
-        return sb.toString();
+        return mHttpBuilder.getBodyString() == null ? "" : mHttpBuilder.getBodyString();
     }
 
     private void addAuthorizationHead() {
