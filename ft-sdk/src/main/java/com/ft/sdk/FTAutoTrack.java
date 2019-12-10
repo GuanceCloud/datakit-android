@@ -22,64 +22,91 @@ import com.ft.sdk.garble.utils.ThreadPoolUtils;
  */
 public class FTAutoTrack {
     public static void startApp(Object object) {
-        //LogUtils.d("[打入方法名：startApp ]  ：参数 Object=" + object);
-        startApp();
+        try {
+            startApp();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public static void activityOnCreate(String cName, String rName) {
-        //LogUtils.d("[打入方法名：activityOnCreate ]  ：参数 cName=" + cName + ",rName=" + rName);
-        startPage(cName, rName);
+        try {
+            startPage(cName, rName);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public static void activityOnDestroy(String cName, String rName) {
-        //LogUtils.d("[打入方法名：activityOnDestroy ]  ：参数 cName=" + cName + ",rName=" + rName);
-        destoryPage(cName, rName);
+        try {
+            destoryPage(cName, rName);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public static void fragmentOnCreateView(String cName, String rName) {
-        //LogUtils.d("[打入方法名：fragmentOnCreateView ]  ：参数 cName=" + cName + ",rName=" + rName);
-        startPage(cName, rName);
+        try {
+            startPage(cName, rName);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public static void fragmentOnDestroyView(String cName, String rName) {
-        //LogUtils.d("[打入方法名：fragmentOnDestroyView ]  ：参数 cName=" + cName + ",rName=" + rName);
-        destoryPage(cName, rName);
+        try {
+            destoryPage(cName, rName);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public static void fragmentOnHiddenChanged(String cName, String rName, boolean isHidden) {
-        //LogUtils.d("[打入方法名：fragmentOnHiddenChanged ]  ：参数 cName=" + cName + ",rName=" + rName + ",isHidden=" + isHidden);
-        if (isHidden) {
-            leavePage(cName, rName);
-        } else {
-            backPage(cName, rName);
+        try {
+            if (isHidden) {
+                leavePage(cName, rName);
+            } else {
+                backPage(cName, rName);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 
     public static void trackViewOnClick(Object object, View view) {
-        if (view == null) {
-            return;
-        }
+        try {
+            if (view == null) {
+                return;
+            }
 
-        trackViewOnClick(object, view, view.isPressed());
+            trackViewOnClick(object, view, view.isPressed());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public static void trackViewOnClick(Object object, View view, boolean isFromUser) {
-        String text = "";
-        if (view instanceof TextView || view instanceof Button) {
-            text = ((TextView) view).getText().toString();
+        try {
+            clickView(getClassName(object), getSupperClassName(object), getViewTree(view));
+        }catch (Exception e){
+            e.printStackTrace();
         }
-        clickView(object.toString(), object.toString(), getViewTree(view));
-        //LogUtils.d("[打入方法名：trackViewOnClick ]  ：参数 object=" + object + ",view.getID=" + view.getId() + ",view.text=" + text + ",view=" + view + ",isFromUser=" + isFromUser);
     }
 
     public static void trackMenuItem(MenuItem menuItem) {
-        //LogUtils.d("[打入方法名：trackMenuItem ]  ：参数 MenuItem=" + menuItem);
-        trackMenuItem(null, menuItem);
+        try {
+            trackMenuItem(null, menuItem);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public static void trackMenuItem(Object object, MenuItem menuItem) {
-        //LogUtils.d("[打入方法名：trackMenuItem ]  ：参数 MenuItem=" + menuItem + ",object=" + object);
-        clickView(object.toString(), object.toString(), "");
+        try {
+            clickView(getClassName(object),getSupperClassName(object), "");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
 
@@ -136,9 +163,38 @@ public class FTAutoTrack {
         stringBuffer.append(view.getClass().getSimpleName() + "/");
         ViewParent viewParent = view.getParent();
         while (viewParent != null) {
-            stringBuffer.append(viewParent.getClass().getSimpleName() + "/");
+            stringBuffer.insert(0,viewParent.getClass().getSimpleName() + "/");
             viewParent = viewParent.getParent();
         }
+        stringBuffer.append("#"+view.getId());
+        if(view instanceof TextView){
+            stringBuffer.append("_"+((TextView) view).getText());
+        }
         return stringBuffer.toString();
+    }
+
+    private static String getClassName(Object object){
+        if(object == null){
+            return "";
+        }
+        if(object instanceof Class){
+            return ((Class) object).getSimpleName();
+        }
+        return object.getClass().getSimpleName();
+    }
+
+    private static String getSupperClassName(Object object){
+        if(object == null){
+            return "";
+        }
+        if(object instanceof Class){
+            try {
+                Class clazz = Class.forName(((Class) object).getName());
+                return clazz.getSuperclass().getSimpleName();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        return object.getClass().getSuperclass().getSimpleName();
     }
 }
