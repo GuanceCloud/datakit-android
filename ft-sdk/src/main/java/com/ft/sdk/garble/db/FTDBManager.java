@@ -80,7 +80,7 @@ public class FTDBManager extends DBManager {
                     RecordData recordData = new RecordData();
                     recordData.setId(id);
                     recordData.setTime(time);
-                    recordData.setDbJson(data);
+                    recordData.parseJsonToObj(data);
                     recordList.add(recordData);
                 }
                 cursor.close();
