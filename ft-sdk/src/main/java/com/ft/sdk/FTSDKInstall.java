@@ -4,9 +4,7 @@ import android.app.Application;
 
 import com.ft.sdk.garble.FTActivityLifecycleCallbacks;
 import com.ft.sdk.garble.FTHttpConfig;
-import com.ft.sdk.garble.manager.FTManager;
 
-import java.util.UUID;
 
 /**
  * BY huangDianHua

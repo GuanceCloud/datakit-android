@@ -12,6 +12,7 @@ public class HttpBuilder {
     private String url;
     private String model;
     private RequestMethod method;
+    private String bodyString;
     private HashMap<String,Object> params = new HashMap<>();
     private int sendOutTime;
     private int readOutTime;
@@ -27,6 +28,10 @@ public class HttpBuilder {
             throw new InvalidParameterException("method 未初始化");
         }
         return method;
+    }
+
+    public String getBodyString(){
+        return bodyString;
     }
 
     public String getModel(){
@@ -56,6 +61,11 @@ public class HttpBuilder {
 
     public HttpBuilder setMethod(RequestMethod method) {
         this.method = method;
+        return this;
+    }
+
+    public HttpBuilder setBodyString(String bodyString){
+        this.bodyString = bodyString;
         return this;
     }
 

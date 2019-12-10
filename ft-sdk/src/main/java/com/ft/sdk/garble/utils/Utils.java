@@ -2,6 +2,7 @@ package com.ft.sdk.garble.utils;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -18,12 +19,18 @@ import java.security.NoSuchAlgorithmException;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+import static com.ft.sdk.garble.utils.Constants.FT_SHARE_PER_FILE;
+
 /**
  * BY huangDianHua
  * DATE:2019-11-29 17:54
  * Description:
  */
 public class Utils {
+
+    public static boolean isNullOrEmpty(String str){
+        return str == null || str.isEmpty();
+    }
     public static boolean hasNetPermission() {
         return hasPermission(FTApplication.getApplication(), Manifest.permission.ACCESS_NETWORK_STATE) &&
                 hasPermission(FTApplication.getApplication(), Manifest.permission.INTERNET);
@@ -41,6 +48,10 @@ public class Utils {
         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetWork = manager.getActiveNetworkInfo();
         return activeNetWork != null && activeNetWork.isConnected();
+    }
+
+    public static SharedPreferences getSharedPreferences(Context context) {
+        return context.getSharedPreferences(FT_SHARE_PER_FILE, Context.MODE_PRIVATE);
     }
 
     public static String contentMD5Encode(String str){
