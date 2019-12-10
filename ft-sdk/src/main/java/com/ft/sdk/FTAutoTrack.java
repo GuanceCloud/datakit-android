@@ -115,7 +115,7 @@ public class FTAutoTrack {
     public static void putRecord(long time, @NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String vtp) {
         final RecordData recordData = new RecordData();
         recordData.setTime(time);
-        recordData.setOp(op);
+        recordData.setOp(op.value);
         recordData.setCpn(currentPage);
         recordData.setRpn(rootPage);
         RecordData.OpData opData = new RecordData().new OpData();
