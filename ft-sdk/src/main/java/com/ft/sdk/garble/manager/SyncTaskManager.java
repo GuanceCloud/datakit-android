@@ -154,15 +154,22 @@ public class SyncTaskManager {
             Iterator<String> keys = param.keySet().iterator();
             while (keys.hasNext()) {
                 String key = keys.next();
+                Object value = param.get(key);
                 if (keys.hasNext()) {
-                    if (param.get(key) != null) {
-                        sb.append(key + "=" + param.get(key) + ",");
+                    if (value != null) {
+                        if(value instanceof String && ((String) value).isEmpty()){
+                            value = "null";
+                        }
+                        sb.append(key + "=" + value + ",");
                     } else {
                         sb.append(key + ",");
                     }
                 } else {
-                    if (param.get(key) != null) {
-                        sb.append(key + "=" + param.get(key));
+                    if (value != null) {
+                        if(value instanceof String && ((String) value).isEmpty()){
+                            value = "null";
+                        }
+                        sb.append(key + "=" + value);
                     } else {
                         sb.append(key);
                     }
