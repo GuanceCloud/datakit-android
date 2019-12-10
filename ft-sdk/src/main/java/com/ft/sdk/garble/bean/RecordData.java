@@ -2,6 +2,9 @@ package com.ft.sdk.garble.bean;
 
 import androidx.annotation.NonNull;
 
+import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.Utils;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -27,13 +30,11 @@ public class RecordData {
     /**
      * 操作类型
      */
-    private OP op;
+    private String op;
     /**
      * 操作数据
      */
     private OpData opdata;
-
-    private String dbJson;
 
     public long getId() {
         return id;
@@ -67,11 +68,11 @@ public class RecordData {
         this.rpn = rpn;
     }
 
-    public OP getOp() {
+    public String getOp() {
         return op;
     }
 
-    public void setOp(OP op) {
+    public void setOp(String op) {
         this.op = op;
     }
 
@@ -83,26 +84,20 @@ public class RecordData {
         this.opdata = opdata;
     }
 
-    public void setDbJson(String dbJson) {
-        this.dbJson = dbJson;
-    }
 
     public String getJsonString() {
-        if(dbJson != null && !dbJson.isEmpty()){
-            return dbJson;
-        }
         JSONObject recordData = new JSONObject();
         try {
-            if(cpn != null) {
-                recordData.put("cnp", cpn);
+            if(!Utils.isNullOrEmpty(cpn)) {
+                recordData.put("cpn", cpn);
             }
 
-            if(rpn != null) {
+            if(!Utils.isNullOrEmpty(rpn)) {
                 recordData.put("rpn", rpn);
             }
 
-            if(op.value != null) {
-                recordData.put("op", op.value);
+            if(!Utils.isNullOrEmpty(op)) {
+                recordData.put("op", op);
             }
 
             if (opdata != null && !opdata.isEmpty()) {
@@ -114,12 +109,60 @@ public class RecordData {
         return recordData.toString();
     }
 
+    public void parseJsonToObj(String json){
+        try{
+            JSONObject jsonObject = new JSONObject(json);
+            cpn = jsonObject.optString("cpn");
+            rpn = jsonObject.optString("rpn");
+            op = jsonObject.optString("op");
+            JSONObject opData = jsonObject.optJSONObject("opdata");
+            if(opData != null) {
+                OpData opData1 = new OpData();
+                opData1.vtp = opData.optString("vtp");
+                opData1.field = opData.optString("field");
+                opdata = opData1;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public String composeUpdateData(){
+        StringBuffer sb = new StringBuffer();
+        if(!Utils.isNullOrEmpty(cpn)){
+            sb.append("current_page_name="+cpn+",");
+        }
+        if(!Utils.isNullOrEmpty(rpn)){
+            sb.append("root_page_name="+rpn+",");
+        }
+        if(opdata != null){
+            if(!Utils.isNullOrEmpty(opdata.vtp)){
+                sb.append("vtp="+opdata.vtp+",");
+            }
+            if(!Utils.isNullOrEmpty(opdata.field)){
+                sb.append("field="+opdata.field+",");
+            }
+        }
+        int index = sb.lastIndexOf(",");
+        if (index > 0 && index == sb.length()-1) {
+            sb.deleteCharAt(sb.length()-1);
+        }
+        if(sb.length()>0){
+            sb.insert(0,",");
+        }
+        sb.append(" ");
+        sb.append("event=\""+op+"\"");
+        sb.append(" ");
+        sb.append(time*1000000);
+        return sb.toString();
+    }
+
     @NonNull
     @Override
     public String toString() {
         return "RecordData[id="+id+
                 ",time="+time+
-                ",data="+(dbJson==null?getJsonString():dbJson)+
+                ",data="+getJsonString()+
                 "]";
     }
 
@@ -155,8 +198,12 @@ public class RecordData {
 
         public JSONObject getJson() throws JSONException {
             JSONObject opdata = new JSONObject();
-            opdata.put("vtp", vtp);
-            opdata.put("field",field);
+            if(!Utils.isNullOrEmpty(vtp)) {
+                opdata.put("vtp", vtp);
+            }
+            if(!Utils.isNullOrEmpty(field)) {
+                opdata.put("field", field);
+            }
             return opdata;
         }
     }
