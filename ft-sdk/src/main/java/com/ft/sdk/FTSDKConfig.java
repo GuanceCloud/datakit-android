@@ -1,5 +1,7 @@
 package com.ft.sdk;
 
+import com.ft.sdk.garble.utils.DeviceUtils;
+
 import java.security.InvalidParameterException;
 
 import static com.ft.sdk.garble.FTHttpConfig.USER_AGENT;
@@ -18,9 +20,8 @@ public class FTSDKConfig {
     private String uuid;
     private String userAgent;
 
-    public FTSDKConfig(String metricsUrl,String uuid){
+    public FTSDKConfig(String metricsUrl){
         this.metricsUrl = metricsUrl;
-        this.uuid = uuid;
     }
 
     public String getMetricsUrl() {
@@ -69,7 +70,14 @@ public class FTSDKConfig {
         this.version = version;
     }
 
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
     public String getUuid() {
+        if(uuid == null){
+            uuid = DeviceUtils.getSDKUUid(FTApplication.getApplication());
+        }
         return uuid;
     }
 
