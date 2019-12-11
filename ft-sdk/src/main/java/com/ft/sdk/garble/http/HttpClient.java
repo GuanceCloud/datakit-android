@@ -102,7 +102,8 @@ public abstract class HttpClient {
         mConnection.addRequestProperty("X-Datakit-UUID", ftHttpConfig.uuid);
         mConnection.addRequestProperty("User-Agent", ftHttpConfig.userAgent);
         mConnection.addRequestProperty("Accept-Language", "zh-CN");
-        mConnection.addRequestProperty("Content-Type", CONTENT_TYPE + ";charset=" + CHARSET);
+        mConnection.addRequestProperty("Content-Type", CONTENT_TYPE);
+        mConnection.addRequestProperty("charset",CHARSET);
         HashMap<String, String> headMap = mHttpBuilder.getHeadParams();
         Iterator<String> keys = headMap.keySet().iterator();
         while (keys.hasNext()) {
