@@ -31,19 +31,35 @@ public class FTTrack {
         return instance;
     }
 
-    public void track(String field, JSONObject tags, JSONObject values) {
+    /**
+     * 主动埋点
+     * @param event 埋点事件名称
+     * @param tags 埋点数据
+     * @param values 埋点数据
+     */
+    public void track(String event, JSONObject tags, JSONObject values) {
         long time = System.currentTimeMillis();
-        track(OP.CSTM, time, field, tags, values);
+        track(OP.CSTM, time, event, tags, values);
     }
 
-    public void trackTags(String field, JSONObject tags) {
+    /**
+     * 主动埋点
+     * @param event 埋点事件名称
+     * @param tags 埋点数据
+     */
+    public void trackTags(String event, JSONObject tags) {
         long time = System.currentTimeMillis();
-        track(OP.CSTM, time, field, tags, null);
+        track(OP.CSTM, time, event, tags, null);
     }
 
-    public void trackValues(String field, JSONObject values) {
+    /**
+     * 主动埋点
+     * @param event 埋点事件名称
+     * @param values 埋点数据
+     */
+    public void trackValues(String event, JSONObject values) {
         long time = System.currentTimeMillis();
-        track(OP.CSTM, time, field, null, values);
+        track(OP.CSTM, time, event, null, values);
     }
 
     private void track(OP op, long time, String field, JSONObject tags, JSONObject values) {
