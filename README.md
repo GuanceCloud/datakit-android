@@ -19,7 +19,7 @@ metricsUrl|String|FT-GateWay metrics 写入地址|是
 enableRequestSigning|boolean|配置是否需要进行请求签名|是
 akId|String|access key ID|enableRequestSigning 为 true 时，必须要填
 akSecret|String|access key Secret|enableRequestSigning 为 true 时，必须要填
-useOAID|boolean|是否使用oaid字段[了解OAID](#about_oaid)|否
+useOAID|boolean|是否使用oaid字段[了解OAID](#1关于oaid)|否
 
 示例代码
 ```
