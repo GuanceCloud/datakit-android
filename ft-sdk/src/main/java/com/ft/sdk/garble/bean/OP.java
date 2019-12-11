@@ -6,7 +6,7 @@ package com.ft.sdk.garble.bean;
  * Description:
  */
 public enum OP {
-    LANC("launch"),CLS("close"),CLK("click"),OPEN("open"),LEAVE("leave"),BACK("back");
+    LANC("lanc"),CLS("cls"),CLK("clk"),OPEN("opn"),CSTM("cstm");
     public String value;
     OP(String value){
         this.value = value;

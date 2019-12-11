@@ -1,10 +1,6 @@
 package com.ft.sdk;
 
-import com.ft.sdk.garble.utils.DeviceUtils;
-
 import java.security.InvalidParameterException;
-
-import static com.ft.sdk.garble.FTHttpConfig.USER_AGENT;
 
 /**
  * BY huangDianHua
@@ -16,12 +12,21 @@ public class FTSDKConfig {
     private boolean enableRequestSigning;
     private String akId;
     private String akSecret;
-    private String version;
-    private String uuid;
-    private String userAgent;
+    private boolean useOAID;
 
-    public FTSDKConfig(String metricsUrl){
+    public FTSDKConfig(String metricsUrl,boolean enableRequestSigning,String akId,String akSecret){
         this.metricsUrl = metricsUrl;
+        this.enableRequestSigning = enableRequestSigning;
+        this.akId = akId;
+        this.akSecret = akSecret;
+        if(enableRequestSigning){
+            if(akId == null){
+                throw new InvalidParameterException("akId 未初始化");
+            }
+            if(akSecret == null){
+                throw new InvalidParameterException("akSecret 未初始化");
+            }
+        }
     }
 
     public String getMetricsUrl() {
@@ -33,63 +38,20 @@ public class FTSDKConfig {
         return enableRequestSigning;
     }
 
-    public void setEnableRequestSigning(boolean enableRequestSigning) {
-        this.enableRequestSigning = enableRequestSigning;
-    }
 
     public String getAkId() {
-        if(akId == null && enableRequestSigning){
-            throw new InvalidParameterException("akId 未初始化");
-        }
         return akId;
     }
 
-    public void setAkId(String akId) {
-        this.akId = akId;
-    }
-
     public String getAkSecret() {
-        if(akSecret == null && enableRequestSigning){
-            throw new InvalidParameterException("akSecret 未初始化");
-        }
         return akSecret;
     }
 
-    public void setAkSecret(String akSecret) {
-        this.akSecret = akSecret;
+    public boolean isUseOAID() {
+        return useOAID;
     }
 
-    public String getVersion() {
-        if(version == null){
-            version = BuildConfig.VERSION_NAME;
-        }
-        return version;
+    public void setUseOAID(boolean useOAID) {
+        this.useOAID = useOAID;
     }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public String getUuid() {
-        if(uuid == null){
-            uuid = DeviceUtils.getSDKUUid(FTApplication.getApplication());
-        }
-        return uuid;
-    }
-
-    public String getUserAgent() {
-        if(userAgent == null){
-            userAgent = USER_AGENT;
-        }
-        return userAgent;
-    }
-
-    public void setUserAgent(String userAgent) {
-        this.userAgent = userAgent;
-    }
-
 }

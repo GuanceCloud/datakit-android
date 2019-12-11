@@ -3,7 +3,6 @@ package com.ft.sdk;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewParent;
-import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,12 +14,14 @@ import com.ft.sdk.garble.manager.FTManager;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
 
+import org.json.JSONObject;
+
 /**
  * BY huangDianHua
  * DATE:2019-12-02 16:43
  * Description
  */
-public class FTAutoTrack {
+class FTAutoTrack {
     public static void startApp(Object object) {
         try {
             startApp();
@@ -56,18 +57,6 @@ public class FTAutoTrack {
     public static void fragmentOnDestroyView(String cName, String rName) {
         try {
             destroyPage(cName, rName);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    public static void fragmentOnHiddenChanged(String cName, String rName, boolean isHidden) {
-        try {
-            if (isHidden) {
-                leavePage(cName, rName);
-            } else {
-                backPage(cName, rName);
-            }
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -130,14 +119,6 @@ public class FTAutoTrack {
         putRecord(OP.CLS, currentPage, rootPage, null);
     }
 
-    public static void leavePage(String currentPage, String rootPage) {
-        putRecord(OP.LEAVE, currentPage, rootPage, null);
-    }
-
-    public static void backPage(String currentPage, String rootPage) {
-        putRecord(OP.BACK, currentPage, rootPage, null);
-    }
-
     public static void clickView(String currentPage, String rootPage, String vtp) {
         putRecord(OP.CLK, currentPage, rootPage, vtp);
     }
@@ -153,13 +134,15 @@ public class FTAutoTrack {
         recordData.setOp(op.value);
         recordData.setCpn(currentPage);
         recordData.setRpn(rootPage);
-        RecordData.OpData opData = new RecordData().new OpData();
-        opData.setVtp(vtp);
-        recordData.setOpdata(opData);
+        JSONObject opData = new JSONObject();
+        try {
+            opData.put("vtp", vtp);
+            recordData.setOpdata(opData.toString());
+        }catch (Exception e){ }
         ThreadPoolUtils.get().execute(new Runnable() {
             @Override
             public void run() {
-                LogUtils.d("存入数据库数据："+recordData.getJsonString());
+                LogUtils.d("FTAutoTrack数据进数据库："+recordData.getJsonString());
                 FTManager.getFTDBManager().insertFTOperation(recordData);
                 FTManager.getSyncTaskManaget().executeSyncPoll();
             }
