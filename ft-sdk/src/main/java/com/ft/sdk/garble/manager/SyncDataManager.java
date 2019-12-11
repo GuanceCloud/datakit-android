@@ -31,7 +31,7 @@ public class SyncDataManager {
         for (RecordData recordData : recordDatas) {
             sb.append(getMeasurement(recordData));
             sb.append(",");
-            sb.append(device.replaceAll(" ", ""));
+            sb.append(device.replaceAll(" ", "\\\\ "));
             sb.append(getUpdateData(recordData));
             sb.append("\n");
         }
@@ -98,7 +98,7 @@ public class SyncDataManager {
                 deleteLastComma(tagSb);
                 if (tagSb.length() > 0) {
                     sb.append(",");
-                    sb.append(tagSb.toString().replaceAll(" ", ""));
+                    sb.append(tagSb.toString().replaceAll(" ", "\\\\ "));
                 }
                 sb.append(" ");
                 deleteLastComma(valueSb);
@@ -177,7 +177,7 @@ public class SyncDataManager {
         deleteLastComma(sb);
         if (sb.length() > 0) {
             sb.insert(0, ",");
-            String temp = sb.toString().replaceAll(" ", "");
+            String temp = sb.toString().replaceAll(" ", "\\\\ ");
             sb.delete(0, sb.length() - 1);
             sb.append(temp);
         }
