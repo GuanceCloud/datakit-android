@@ -98,7 +98,7 @@ public void clickText(View view) {
 
 
 ## 常见问题
-#### 1.<span id="about_oaid">关于OAID</span>
+#### <span id="about_oaid">1.关于OAID</span>
 - 介绍
 在Android 10版本中，非系统应用将不能获取到系统的IMEI、MAC等信息。面对该问题移动安全联盟联合国内的手机厂商推出了
 补充设备标准体系方案，选择用OAID字段作为IMEI等系统信息的替代字段。OAID 字段是由中国信通院联合华为、小米、OPPO、
