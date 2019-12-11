@@ -13,7 +13,7 @@ dependencies {
 在程序的入口Application中添加关于FT SDK的初始化配置安装代码。
 关于配置项的说明
 参数|类型|含义|是否必须
---|:--:|:--:|--:
+:--:|:--:|:--:|:--:
 metricsUrl|String|FT-GateWay metrics 写入地址|是
 enableRequestSigning|boolean|配置是否需要进行请求签名|是
 akId|String|access key ID|enableRequestSigning 为 true 时，必须要填
@@ -46,17 +46,20 @@ public class DemoApplication extends Application {
 
 ## 方法
 1、FT SDK公开了3个埋点方法，用户通过这三个方法可以主动在需要的地方实现埋点，然后将数据上传到服务端。
+
 - 方法一：
+
 ```
-/**
- * 主动埋点
+/*** 主动埋点
  * @param event 埋点事件名称
  * @param tags 埋点数据
  * @param values 埋点数据
  */
  public void track(String event, JSONObject tags, JSONObject values)
 ```
+
 - 方法二：
+
 ```
 /**
  * 主动埋点
@@ -65,7 +68,9 @@ public class DemoApplication extends Application {
  */
  public void trackTags(String event, JSONObject tags)
 ```
+
 - 方法三：
+
 ```
 /**
  * 主动埋点
@@ -74,6 +79,7 @@ public class DemoApplication extends Application {
  */
  public void trackValues(String event, JSONObject values)
 ```
+
 2、方法使用示例
 ```
 public void clickText(View view) {
