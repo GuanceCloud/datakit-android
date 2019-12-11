@@ -20,6 +20,7 @@ enableRequestSigning|boolean|配置是否需要进行请求签名|是
 akId|String|access key ID|enableRequestSigning 为 true 时，必须要填
 akSecret|String|access key Secret|enableRequestSigning 为 true 时，必须要填
 useOAID|boolean|是否使用oaid字段[了解OAID](#1关于oaid)|否
+isDebug|boolean|是否需要显示日志|否
 
 示例代码
 ```
@@ -46,7 +47,7 @@ public class DemoApplication extends Application {
 ```
 
 ## 方法
-1、FT SDK公开了3个埋点方法，用户通过这三个方法可以主动在需要的地方实现埋点，然后将数据上传到服务端。
+1、FT SDK公开了2个埋点方法，用户通过这三个方法可以主动在需要的地方实现埋点，然后将数据上传到服务端。
 
 - 方法一：
 
@@ -65,23 +66,13 @@ public class DemoApplication extends Application {
 /**
  * 主动埋点
  * @param event 埋点事件名称
- * @param tags 埋点数据
- */
- public void trackTags(String event, JSONObject tags)
-```
-
-- 方法三：
-
-```
-/**
- * 主动埋点
- * @param event 埋点事件名称
  * @param values 埋点数据
  */
  public void trackValues(String event, JSONObject values)
 ```
 
 2、方法使用示例
+
 ```
 public void clickText(View view) {
     try {
@@ -93,6 +84,18 @@ public void clickText(View view) {
     } catch (JSONException e) {
         e.printStackTrace();
     }
+}
+
+@Override
+public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    try {
+        JSONObject values = new JSONObject();
+        values.put("userName","MenuItem");
+        FTTrack.getInstance().trackValues("ClickView",values);
+    } catch (JSONException e) {
+        e.printStackTrace();
+    }
+    return super.onOptionsItemSelected(item);
 }
 ```
 

@@ -45,16 +45,6 @@ public class FTTrack {
     /**
      * 主动埋点
      * @param event 埋点事件名称
-     * @param tags 埋点数据
-     */
-    public void trackTags(String event, JSONObject tags) {
-        long time = System.currentTimeMillis();
-        track(OP.CSTM, time, event, tags, null);
-    }
-
-    /**
-     * 主动埋点
-     * @param event 埋点事件名称
      * @param values 埋点数据
      */
     public void trackValues(String event, JSONObject values) {

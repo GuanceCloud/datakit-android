@@ -13,6 +13,7 @@ public class FTSDKConfig {
     private String akId;
     private String akSecret;
     private boolean useOAID;
+    private boolean isDebug;
 
     public FTSDKConfig(String metricsUrl,boolean enableRequestSigning,String akId,String akSecret){
         this.metricsUrl = metricsUrl;
@@ -53,5 +54,13 @@ public class FTSDKConfig {
 
     public void setUseOAID(boolean useOAID) {
         this.useOAID = useOAID;
+    }
+
+    public boolean isDebug() {
+        return isDebug;
+    }
+
+    public void setDebug(boolean debug) {
+        isDebug = debug;
     }
 }
