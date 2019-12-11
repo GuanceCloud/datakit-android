@@ -2,11 +2,17 @@ package com.ft.sdk.garble.bean;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Iterator;
+
+import static com.ft.sdk.garble.bean.OP.CSTM;
+import static com.ft.sdk.garble.utils.Constants.FT_DEFAULT_MEASUREMENT;
+import static com.ft.sdk.garble.utils.Constants.FT_KEY_VALUE_NULL;
 
 /**
  * BY huangDianHua
@@ -34,7 +40,7 @@ public class RecordData {
     /**
      * 操作数据
      */
-    private OpData opdata;
+    private String opdata;
 
     public long getId() {
         return id;
@@ -76,11 +82,11 @@ public class RecordData {
         this.op = op;
     }
 
-    public OpData getOpdata() {
+    public String getOpdata() {
         return opdata;
     }
 
-    public void setOpdata(OpData opdata) {
+    public void setOpdata(String opdata) {
         this.opdata = opdata;
     }
 
@@ -88,20 +94,20 @@ public class RecordData {
     public String getJsonString() {
         JSONObject recordData = new JSONObject();
         try {
-            if(!Utils.isNullOrEmpty(cpn)) {
+            if (!Utils.isNullOrEmpty(cpn)) {
                 recordData.put("cpn", cpn);
             }
 
-            if(!Utils.isNullOrEmpty(rpn)) {
+            if (!Utils.isNullOrEmpty(rpn)) {
                 recordData.put("rpn", rpn);
             }
 
-            if(!Utils.isNullOrEmpty(op)) {
+            if (!Utils.isNullOrEmpty(op)) {
                 recordData.put("op", op);
             }
 
-            if (opdata != null && !opdata.isEmpty()) {
-                recordData.put("opdata", opdata.getJson());
+            if (!Utils.isNullOrEmpty(opdata)) {
+                recordData.put("opdata", opdata);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -109,102 +115,25 @@ public class RecordData {
         return recordData.toString();
     }
 
-    public void parseJsonToObj(String json){
-        try{
+    public void parseJsonToObj(String json) {
+        try {
             JSONObject jsonObject = new JSONObject(json);
             cpn = jsonObject.optString("cpn");
             rpn = jsonObject.optString("rpn");
             op = jsonObject.optString("op");
-            JSONObject opData = jsonObject.optJSONObject("opdata");
-            if(opData != null) {
-                OpData opData1 = new OpData();
-                opData1.vtp = opData.optString("vtp");
-                opData1.field = opData.optString("field");
-                opdata = opData1;
-            }
-        }catch (Exception e){
+            opdata = jsonObject.optString("opdata");
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public String composeUpdateData(){
-        StringBuffer sb = new StringBuffer();
-        if(!Utils.isNullOrEmpty(cpn)){
-            sb.append("current_page_name="+cpn+",");
-        }
-        if(!Utils.isNullOrEmpty(rpn)){
-            sb.append("root_page_name="+rpn+",");
-        }
-        if(opdata != null){
-            if(!Utils.isNullOrEmpty(opdata.vtp)){
-                sb.append("vtp="+opdata.vtp+",");
-            }
-            if(!Utils.isNullOrEmpty(opdata.field)){
-                sb.append("field="+opdata.field+",");
-            }
-        }
-        int index = sb.lastIndexOf(",");
-        if (index > 0 && index == sb.length()-1) {
-            sb.deleteCharAt(sb.length()-1);
-        }
-        if(sb.length()>0){
-            sb.insert(0,",");
-        }
-        sb.append(" ");
-        sb.append("event=\""+op+"\"");
-        sb.append(" ");
-        sb.append(time*1000000);
-        return sb.toString();
     }
 
     @NonNull
     @Override
     public String toString() {
-        return "RecordData[id="+id+
-                ",time="+time+
-                ",data="+getJsonString()+
+        return "RecordData[id=" + id +
+                ",time=" + time +
+                ",data=" + getJsonString() +
                 "]";
-    }
-
-    /**
-     * 操作的数据类
-     */
-    public class OpData {
-        /**
-         * 视图树
-         */
-        private String vtp;
-        private String field;
-
-        public String getVtp() {
-            return vtp;
-        }
-
-        public void setVtp(String vtp) {
-            this.vtp = vtp;
-        }
-
-        public String getField() {
-            return field;
-        }
-
-        public void setField(String field) {
-            this.field = field;
-        }
-
-        public boolean isEmpty(){
-            return (vtp == null || vtp.isEmpty()) && (field == null || field.isEmpty());
-        }
-
-        public JSONObject getJson() throws JSONException {
-            JSONObject opdata = new JSONObject();
-            if(!Utils.isNullOrEmpty(vtp)) {
-                opdata.put("vtp", vtp);
-            }
-            if(!Utils.isNullOrEmpty(field)) {
-                opdata.put("field", field);
-            }
-            return opdata;
-        }
     }
 }
