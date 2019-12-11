@@ -12,6 +12,7 @@ dependencies {
 ## 配置
 在程序的入口Application中添加关于FT SDK的初始化配置安装代码。
 关于配置项的说明
+
 参数|类型|含义|是否必须
 :--:|:--:|:--:|:--:
 metricsUrl|String|FT-GateWay metrics 写入地址|是
