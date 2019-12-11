@@ -39,7 +39,7 @@ public class FTAutoTrack {
 
     public static void activityOnDestroy(String cName, String rName) {
         try {
-            destoryPage(cName, rName);
+            destroyPage(cName, rName);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -55,7 +55,7 @@ public class FTAutoTrack {
 
     public static void fragmentOnDestroyView(String cName, String rName) {
         try {
-            destoryPage(cName, rName);
+            destroyPage(cName, rName);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -71,6 +71,14 @@ public class FTAutoTrack {
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public static void trackViewOnClick( View view) {
+        if (view == null) {
+            return;
+        }
+
+//        trackViewOnClick(object, view, view.isPressed());
     }
 
     public static void trackViewOnClick(Object object, View view) {
@@ -118,7 +126,7 @@ public class FTAutoTrack {
         putRecord(OP.OPEN, currentPage, rootPage, null);
     }
 
-    public static void destoryPage(String currentPage, String rootPage) {
+    public static void destroyPage(String currentPage, String rootPage) {
         putRecord(OP.CLS, currentPage, rootPage, null);
     }
 
