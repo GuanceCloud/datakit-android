@@ -1,6 +1,11 @@
 package com.ft.sdk.garble;
 
+import com.ft.sdk.BuildConfig;
+import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTSDKConfig;
+import com.ft.sdk.garble.utils.DeviceUtils;
+
+import static com.ft.sdk.garble.utils.Constants.USER_AGENT;
 
 /**
  * BY huangDianHua
@@ -9,7 +14,6 @@ import com.ft.sdk.FTSDKConfig;
  */
 public class FTHttpConfig {
     private static volatile FTHttpConfig instance;
-    public static String USER_AGENT= "ft_mobile_sdk_android";
     public String metricsUrl;
     public boolean enableRequestSigning;
     public String akId;
@@ -17,6 +21,7 @@ public class FTHttpConfig {
     public String version;
     public String uuid;
     public String userAgent;
+    public boolean useOaid;
     private FTHttpConfig() {
 
     }
@@ -34,13 +39,12 @@ public class FTHttpConfig {
         }
         metricsUrl = ftsdkConfig.getMetricsUrl();
         enableRequestSigning = ftsdkConfig.isEnableRequestSigning();
-        if(enableRequestSigning) {
-            akId = ftsdkConfig.getAkId();
-            akSecret = ftsdkConfig.getAkSecret();
-        }
-        version = ftsdkConfig.getVersion();
-        uuid = ftsdkConfig.getUuid();
-        userAgent = ftsdkConfig.getUserAgent();
+        akId = ftsdkConfig.getAkId();
+        akSecret = ftsdkConfig.getAkSecret();
+        useOaid = ftsdkConfig.isUseOAID();
+        version = BuildConfig.VERSION_NAME;
+        uuid = DeviceUtils.getSDKUUid(FTApplication.getApplication());
+        userAgent = USER_AGENT;
     }
 
 

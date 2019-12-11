@@ -11,21 +11,21 @@ import com.ft.sdk.garble.FTHttpConfig;
  * DATE:2019-11-29 17:15
  * Description:
  */
-public class FTSDKInstall {
-    private static FTSDKInstall FTSDKInstall;
+public class FTSdk {
+    private static FTSdk FTSDK;
     private FTSDKConfig mFtSDKConfig;
-    private FTSDKInstall(FTSDKConfig ftSDKConfig){
+    private FTSdk(FTSDKConfig ftSDKConfig){
         FTActivityLifecycleCallbacks life = new FTActivityLifecycleCallbacks();
         Application app = FTApplication.getApplication();
         app.registerActivityLifecycleCallbacks(life);
         this.mFtSDKConfig = ftSDKConfig;
         initFTHttpConfig();
     }
-    public static synchronized FTSDKInstall getInstance(FTSDKConfig ftSDKConfig){
-        if (FTSDKInstall == null) {
-            FTSDKInstall = new FTSDKInstall(ftSDKConfig);
+    public static synchronized FTSdk install(FTSDKConfig ftSDKConfig){
+        if (FTSDK == null) {
+            FTSDK = new FTSdk(ftSDKConfig);
         }
-        return FTSDKInstall;
+        return FTSDK;
     }
 
     private void initFTHttpConfig(){
