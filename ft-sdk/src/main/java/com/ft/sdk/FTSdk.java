@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.ft.sdk.garble.FTActivityLifecycleCallbacks;
 import com.ft.sdk.garble.FTHttpConfig;
+import com.ft.sdk.garble.utils.LogUtils;
 
 
 /**
@@ -19,7 +20,7 @@ public class FTSdk {
         Application app = FTApplication.getApplication();
         app.registerActivityLifecycleCallbacks(life);
         this.mFtSDKConfig = ftSDKConfig;
-        initFTHttpConfig();
+        initFTConfig();
     }
     public static synchronized FTSdk install(FTSDKConfig ftSDKConfig){
         if (FTSDK == null) {
@@ -28,8 +29,12 @@ public class FTSdk {
         return FTSDK;
     }
 
-    private void initFTHttpConfig(){
-        FTHttpConfig.get().initParams(mFtSDKConfig);
+    private void initFTConfig(){
+        if(mFtSDKConfig != null) {
+            FTHttpConfig.get().initParams(mFtSDKConfig);
+            LogUtils.setDebug(mFtSDKConfig.isDebug());
+        }
+
     }
 
 
