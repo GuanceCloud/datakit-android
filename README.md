@@ -153,19 +153,16 @@ VIVO 等厂商共同推出的设备识别字段，具有一定的权威性。
 ![Alt](screenshot/use_learn_3.png/#pic_center)
 
 3. 设置依赖
-
 ``` groovy
 implementation files('libs/miit_mdid_x.x.x.arr')
 ```
 
 4. 混淆设置
-
 ```
  -keep class com.bun.miitmdid.core.**{*;}
 ```
 
 5. 设置gradle编译选项，这块可以根据自己的对平台的选择进行合理的配置
-
 ``` groovy
 ndk {
     abiFilters 'armeabi-v7a','x86','arm64-v8a','x86_64','armeabi'
