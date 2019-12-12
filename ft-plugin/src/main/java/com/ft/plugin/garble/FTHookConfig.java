@@ -16,19 +16,21 @@ public class FTHookConfig {
     /**
      * Application中的方法
      */
-    public static final HashMap<String,FTMethodCell> APPLICATION_METHODS = new HashMap<>();
+    public static final HashMap<String, FTMethodCell> APPLICATION_METHODS = new HashMap<>();
+
     static {
-        APPLICATION_METHODS.put("onCreate()V",new FTMethodCell(
+        APPLICATION_METHODS.put("onCreate()V", new FTMethodCell(
                 "onCreate",
                 "()V",
                 "startApp",
                 "(Ljava/lang/Object;)V",
                 Arrays.asList(
-                        new FTSubMethodCell(FTMethodType.ALOAD,0),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Object", "getClass", "()Ljava/lang/Class;", false)
+                        new FTSubMethodCell(FTMethodType.ALOAD, 0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false)
                 )
         ));
     }
+
     /**
      * Activity中的方法
      */
@@ -41,13 +43,13 @@ public class FTHookConfig {
                 "activityOnCreate",
                 "(Ljava/lang/String;Ljava/lang/String;)V",
                 Arrays.asList(
-                        new FTSubMethodCell(FTMethodType.ALOAD,0),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Object","getClass","()Ljava/lang/Class;",false),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Class","getSimpleName","()Ljava/lang/String;",false),
-                        new FTSubMethodCell(FTMethodType.ALOAD,0),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Object","getClass","()Ljava/lang/Class;",false),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Class","getSuperclass","()Ljava/lang/Class;",false),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Class","getSimpleName","()Ljava/lang/String;",false)
+                        new FTSubMethodCell(FTMethodType.ALOAD, 0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Class", "getSimpleName", "()Ljava/lang/String;", false),
+                        new FTSubMethodCell(FTMethodType.ALOAD, 0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Class", "getSuperclass", "()Ljava/lang/Class;", false),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Class", "getSimpleName", "()Ljava/lang/String;", false)
 
                 )));
         ACTIVITY_METHODS.put("onDestroy()V", new FTMethodCell(
@@ -56,13 +58,13 @@ public class FTHookConfig {
                 "activityOnDestroy",
                 "(Ljava/lang/String;Ljava/lang/String;)V",
                 Arrays.asList(
-                        new FTSubMethodCell(FTMethodType.ALOAD,0),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Object","getClass","()Ljava/lang/Class;",false),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Class","getSimpleName","()Ljava/lang/String;",false),
-                        new FTSubMethodCell(FTMethodType.ALOAD,0),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Object","getClass","()Ljava/lang/Class;",false),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Class","getSuperclass","()Ljava/lang/Class;",false),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Class","getSimpleName","()Ljava/lang/String;",false)
+                        new FTSubMethodCell(FTMethodType.ALOAD, 0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Class", "getSimpleName", "()Ljava/lang/String;", false),
+                        new FTSubMethodCell(FTMethodType.ALOAD, 0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Class", "getSuperclass", "()Ljava/lang/Class;", false),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Class", "getSimpleName", "()Ljava/lang/String;", false)
 
                 )));
 
@@ -74,47 +76,27 @@ public class FTHookConfig {
     public final static HashMap<String, FTMethodCell> FRAGMENT_X_METHODS = new HashMap<>();
 
     static {
-        FRAGMENT_X_METHODS.put("onCreateView(Landroid/view/LayoutInflater;Landroid/view/ViewGroup;Landroid/os/Bundle;)Landroid/view/View;", new FTMethodCell(
-                "onCreateView",
-                "(Landroid/view/LayoutInflater;Landroid/view/ViewGroup;Landroid/os/Bundle;)Landroid/view/View;",
+        FRAGMENT_X_METHODS.put("onCreate(Landroid/os/Bundle;)V", new FTMethodCell(
+                "onCreate",
+                "(Landroid/os/Bundle;)V",
                 "fragmentOnCreateView",
-                "(Ljava/lang/String;Ljava/lang/String;)V",
+                "(Ljava/lang/Object;Ljava/lang/Object;)V",
                 Arrays.asList(
-                        new FTSubMethodCell(FTMethodType.ALOAD,0),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Object","getClass","()Ljava/lang/Class;",false),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Class","getSimpleName","()Ljava/lang/String;",false),
-                        new FTSubMethodCell(FTMethodType.ALOAD,0),
-                        new FTSubMethodCell(FTMethodType.INVOKESPECIAL,"androidx/fragment/app/Fragment","getActivity","()Landroidx/fragment/app/FragmentActivity;",false),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"androidx/fragment/app/FragmentActivity","getLocalClassName","()Ljava/lang/String;",false)
-
+                        new FTSubMethodCell(FTMethodType.ALOAD, 0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
+                        new FTSubMethodCell(FTMethodType.ALOAD, 0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "androidx/fragment/app/Fragment", "getActivity", "()Landroidx/fragment/app/FragmentActivity;", false)
                 )));
         FRAGMENT_X_METHODS.put("onDestroy()V", new FTMethodCell(
                 "onDestroy",
                 "()V",
                 "fragmentOnDestroyView",
-                "(Ljava/lang/String;Ljava/lang/String;)V",
+                "(Ljava/lang/Object;Ljava/lang/Object;)V",
                 Arrays.asList(
-                        new FTSubMethodCell(FTMethodType.ALOAD,0),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Object","getClass","()Ljava/lang/Class;",false),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Class","getSimpleName","()Ljava/lang/String;",false),
-                        new FTSubMethodCell(FTMethodType.ALOAD,0),
-                        new FTSubMethodCell(FTMethodType.INVOKESPECIAL,"androidx/fragment/app/Fragment","getActivity","()Landroidx/fragment/app/FragmentActivity;",false),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"androidx/fragment/app/FragmentActivity","getLocalClassName","()Ljava/lang/String;",false)
-
-                )));
-        FRAGMENT_X_METHODS.put("onHiddenChanged(Z)V", new FTMethodCell(
-                "onHiddenChanged",
-                "(Z)V",
-                "fragmentOnHiddenChanged",
-                "(Ljava/lang/String;Ljava/lang/String;Z)V",
-                Arrays.asList(
-                        new FTSubMethodCell(FTMethodType.ALOAD,0),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Object","getClass","()Ljava/lang/Class;",false),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Class","getSimpleName","()Ljava/lang/String;",false),
-                        new FTSubMethodCell(FTMethodType.ALOAD,0),
-                        new FTSubMethodCell(FTMethodType.INVOKESPECIAL,"androidx/fragment/app/Fragment","getActivity","()Landroidx/fragment/app/FragmentActivity;",false),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"androidx/fragment/app/FragmentActivity","getLocalClassName","()Ljava/lang/String;",false),
-                        new FTSubMethodCell(FTMethodType.ILOAD,1)
+                        new FTSubMethodCell(FTMethodType.ALOAD, 0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
+                        new FTSubMethodCell(FTMethodType.ALOAD, 0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "androidx/fragment/app/Fragment", "getActivity", "()Landroidx/fragment/app/FragmentActivity;", false)
                 )));
     }
 
@@ -125,47 +107,27 @@ public class FTHookConfig {
     public final static HashMap<String, FTMethodCell> FRAGMENT_METHODS = new HashMap<>();
 
     static {
-        FRAGMENT_METHODS.put("onCreateView(Landroid/view/LayoutInflater;Landroid/view/ViewGroup;Landroid/os/Bundle;)Landroid/view/View;", new FTMethodCell(
-                "onCreateView",
-                "(Landroid/view/LayoutInflater;Landroid/view/ViewGroup;Landroid/os/Bundle;)Landroid/view/View;",
+        FRAGMENT_METHODS.put("onCreate(Landroid/os/Bundle;)V", new FTMethodCell(
+                "onCreate",
+                "(Landroid/os/Bundle;)V",
                 "fragmentOnCreateView",
-                "(Ljava/lang/String;Ljava/lang/String;)V",
+                "(Ljava/lang/Object;Ljava/lang/Object;)V",
                 Arrays.asList(
-                        new FTSubMethodCell(FTMethodType.ALOAD,0),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Object","getClass","()Ljava/lang/Class;",false),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Class","getSimpleName","()Ljava/lang/String;",false),
-                        new FTSubMethodCell(FTMethodType.ALOAD,0),
-                        new FTSubMethodCell(FTMethodType.INVOKESPECIAL,"android/app/Fragment","getActivity","()Landroid/app/Activity;",false),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"android/app/Activity","getLocalClassName","()Ljava/lang/String;",false)
-
+                        new FTSubMethodCell(FTMethodType.ALOAD, 0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
+                        new FTSubMethodCell(FTMethodType.ALOAD, 0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "android/app/Fragment", "getActivity", "()Landroid/app/Activity;", false)
                 )));
         FRAGMENT_METHODS.put("onDestroy()V", new FTMethodCell(
                 "onDestroy",
                 "()V",
                 "fragmentOnDestroyView",
-                "(Ljava/lang/String;Ljava/lang/String;)V",
+                "(Ljava/lang/Object;Ljava/lang/Object;)V",
                 Arrays.asList(
-                        new FTSubMethodCell(FTMethodType.ALOAD,0),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Object","getClass","()Ljava/lang/Class;",false),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Class","getSimpleName","()Ljava/lang/String;",false),
-                        new FTSubMethodCell(FTMethodType.ALOAD,0),
-                        new FTSubMethodCell(FTMethodType.INVOKESPECIAL,"android/app/Fragment","getActivity","()Landroid/app/Activity;",false),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"android/app/Activity","getLocalClassName","()Ljava/lang/String;",false)
-
-                )));
-        FRAGMENT_METHODS.put("onHiddenChanged(Z)V", new FTMethodCell(
-                "onHiddenChanged",
-                "(Z)V",
-                "fragmentOnHiddenChanged",
-                "(Ljava/lang/String;Ljava/lang/String;Z)V",
-                Arrays.asList(
-                        new FTSubMethodCell(FTMethodType.ALOAD,0),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Object","getClass","()Ljava/lang/Class;",false),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Class","getSimpleName","()Ljava/lang/String;",false),
-                        new FTSubMethodCell(FTMethodType.ALOAD,0),
-                        new FTSubMethodCell(FTMethodType.INVOKESPECIAL,"android/app/Fragment","getActivity","()Landroid/app/Activity;",false),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"android/app/Activity","getLocalClassName","()Ljava/lang/String;",false),
-                        new FTSubMethodCell(FTMethodType.ILOAD,1)
+                        new FTSubMethodCell(FTMethodType.ALOAD, 0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
+                        new FTSubMethodCell(FTMethodType.ALOAD, 0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "android/app/Fragment", "getActivity", "()Landroid/app/Activity;", false)
                 )));
     }
 
@@ -175,65 +137,46 @@ public class FTHookConfig {
     public final static HashMap<String, FTMethodCell> FRAGMENT_V4_METHODS = new HashMap<>();
 
     static {
-        FRAGMENT_V4_METHODS.put("onCreateView(Landroid/view/LayoutInflater;Landroid/view/ViewGroup;Landroid/os/Bundle;)Landroid/view/View;", new FTMethodCell(
-                "onCreateView",
-                "(Landroid/view/LayoutInflater;Landroid/view/ViewGroup;Landroid/os/Bundle;)Landroid/view/View;",
+        FRAGMENT_V4_METHODS.put("onCreate(Landroid/os/Bundle;)V", new FTMethodCell(
+                "onCreate",
+                "(Landroid/os/Bundle;)V",
                 "fragmentOnCreateView",
-                "(Ljava/lang/String;Ljava/lang/String;)V",
+                "(Ljava/lang/Object;Ljava/lang/Object;)V",
                 Arrays.asList(
-                        new FTSubMethodCell(FTMethodType.ALOAD,0),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Object","getClass","()Ljava/lang/Class;",false),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Class","getSimpleName","()Ljava/lang/String;",false),
-                        new FTSubMethodCell(FTMethodType.ALOAD,0),
-                        new FTSubMethodCell(FTMethodType.INVOKESPECIAL,"android/support/v4/app/Fragment","getActivity","()Landroid/support/v4/app/FragmentActivity;",false),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"android/support/v4/app/FragmentActivity","getLocalClassName","()Ljava/lang/String;",false)
-
+                        new FTSubMethodCell(FTMethodType.ALOAD, 0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
+                        new FTSubMethodCell(FTMethodType.ALOAD, 0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "android/support/v4/app/Fragment", "getActivity", "()Landroid/support/v4/app/FragmentActivity;", false)
                 )));
         FRAGMENT_V4_METHODS.put("onDestroy()V", new FTMethodCell(
                 "onDestroy",
                 "()V",
                 "fragmentOnDestroyView",
-                "(Ljava/lang/String;Ljava/lang/String;)V",
+                "(Ljava/lang/Object;Ljava/lang/Object;)V",
                 Arrays.asList(
-                        new FTSubMethodCell(FTMethodType.ALOAD,0),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Object","getClass","()Ljava/lang/Class;",false),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Class","getSimpleName","()Ljava/lang/String;",false),
-                        new FTSubMethodCell(FTMethodType.ALOAD,0),
-                        new FTSubMethodCell(FTMethodType.INVOKESPECIAL,"android/support/v4/app/Fragment","getActivity","()Landroid/support/v4/app/FragmentActivity;",false),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"android/support/v4/app/FragmentActivity","getLocalClassName","()Ljava/lang/String;",false)
+                        new FTSubMethodCell(FTMethodType.ALOAD, 0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
+                        new FTSubMethodCell(FTMethodType.ALOAD, 0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "android/support/v4/app/Fragment", "getActivity", "()Landroid/support/v4/app/FragmentActivity;", false)
+                )));
 
-                )));
-        FRAGMENT_V4_METHODS.put("onHiddenChanged(Z)V", new FTMethodCell(
-                "onHiddenChanged",
-                "(Z)V",
-                "fragmentOnHiddenChanged",
-                "(Ljava/lang/String;Ljava/lang/String;Z)V",
-                Arrays.asList(
-                        new FTSubMethodCell(FTMethodType.ALOAD,0),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Object","getClass","()Ljava/lang/Class;",false),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Class","getSimpleName","()Ljava/lang/String;",false),
-                        new FTSubMethodCell(FTMethodType.ALOAD,0),
-                        new FTSubMethodCell(FTMethodType.INVOKESPECIAL,"android/support/v4/app/Fragment","getActivity","()Landroid/support/v4/app/FragmentActivity;",false),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"android/support/v4/app/FragmentActivity","getLocalClassName","()Ljava/lang/String;",false),
-                        new FTSubMethodCell(FTMethodType.ILOAD,1)
-                )));
     }
 
     public final static FTMethodCell MENU_METHODS = new FTMethodCell(
-            "","","trackMenuItem","(Ljava/lang/Object;Landroid/view/MenuItem;)V",
+            "", "", "trackMenuItem", "(Ljava/lang/Object;Landroid/view/MenuItem;)V",
             Arrays.asList(
-                    new FTSubMethodCell(FTMethodType.ALOAD,0),
-                    new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
-                    new FTSubMethodCell(FTMethodType.ALOAD,1)
+                    new FTSubMethodCell(FTMethodType.ALOAD, 0),
+                    new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
+                    new FTSubMethodCell(FTMethodType.ALOAD, 1)
             )
     );
 
     public final static FTMethodCell CLICK_METHOD = new FTMethodCell(
-            "","","trackViewOnClick","(Ljava/lang/Object;Landroid/view/View;)V",
+            "", "", "trackViewOnClick", "(Ljava/lang/Object;Landroid/view/View;)V",
             Arrays.asList(
-                    new FTSubMethodCell(FTMethodType.ALOAD,0),
-                    new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL,"java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
-                    new FTSubMethodCell(FTMethodType.ALOAD,1)
+                    new FTSubMethodCell(FTMethodType.ALOAD, 0),
+                    new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
+                    new FTSubMethodCell(FTMethodType.ALOAD, 1)
             )
     );
 }
