@@ -21,7 +21,7 @@ dependencies {
 关于最新的版本号，请参考[更新文档](https://gitlab.jiagouyun.com/cma/ft-sdk-android/blob/master/README.md)
     
 ## 配置
-在程序的入口Application中添加关于FT SDK的初始化配置安装代码。
+1. 在程序的入口Application中添加关于FT SDK的初始化配置安装代码。
 关于配置项的说明
 
 参数|类型|含义|是否必须
@@ -57,6 +57,18 @@ public class DemoApplication extends Application {
     }
 }
 ```
+
+2. 关于权限的配置
+
+FT SDK用到了系统的四个权限，分别为INTERNET、ACCESS_NETWORK_STATE、READ_PHONE_STATE、WRITE_EXTERNAL_STORAGE
+权限使用说明
+
+名称|使用原因
+:--:|:--:
+READ_PHONE_STATE|用于获取手机的设备信息，便于精准分析数据信息
+WRITE_EXTERNAL_STORAGE|用户存储缓存数据
+
+关于如何申请动态权限，具体详情参考[Android Devloper](https://developer.android.google.cn/training/permissions/requesting?hl=en)
 
 ## 方法
 1、FT SDK公开了2个埋点方法，用户通过这三个方法可以主动在需要的地方实现埋点，然后将数据上传到服务端。
