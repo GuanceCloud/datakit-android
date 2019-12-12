@@ -21,6 +21,7 @@ dependencies {
 关于最新的版本号，请参考[更新文档](https://gitlab.jiagouyun.com/cma/ft-sdk-android/blob/master/README.md)
     
 ## 配置
+
 1. 在程序的入口Application中添加关于FT SDK的初始化配置安装代码。
 关于配置项的说明
 
@@ -60,7 +61,7 @@ public class DemoApplication extends Application {
 
 2. 关于权限的配置
 
-FT SDK用到了系统的四个权限，分别为INTERNET、ACCESS_NETWORK_STATE、READ_PHONE_STATE、WRITE_EXTERNAL_STORAGE
+FT SDK用到了系统的两个权限，分别为READ_PHONE_STATE、WRITE_EXTERNAL_STORAGE
 权限使用说明
 
 名称|使用原因
