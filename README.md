@@ -113,12 +113,55 @@ public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
 
 ## 常见问题
-#### <span id="about_oaid">1.关于OAID</span>
+#### 1.关于OAID
 - 介绍
-在Android 10版本中，非系统应用将不能获取到系统的IMEI、MAC等信息。面对该问题移动安全联盟联合国内的手机厂商推出了
+
+ 在Android 10版本中，非系统应用将不能获取到系统的IMEI、MAC等信息。面对该问题移动安全联盟联合国内的手机厂商推出了
 补充设备标准体系方案，选择用OAID字段作为IMEI等系统信息的替代字段。OAID 字段是由中国信通院联合华为、小米、OPPO、
 VIVO 等厂商共同推出的设备识别字段，具有一定的权威性。
 关于OAID可移步参考[移动安全联盟](http://www.msa-alliance.cn/col.jsp?id=120)
 - 使用
-使用方式和资源下载可参考[移动安全联盟的集成文档](http://www.msa-alliance.cn/col.jsp?id=120)
-集成了OAID SDK后便可以在初始化FT SDK时设置配置参数useOAID=true
+
+ 使用方式和资源下载可参考[移动安全联盟的集成文档](http://www.msa-alliance.cn/col.jsp?id=120)
+
+ 示例：
+
+-- 1.下载好资源文件后，将miit_mdid_x.x.x.arr拷贝到项目的libs目录下，并设置依赖，其中x.x.x代表版本号
+[获取最新版本](http://www.msa-alliance.cn/col.jsp?id=120)
+如图
+![Alt](..screenshot/use_learn_1.png/#pic_center)
+
+-- 2.将下载的资源中的supplierconfig.json文件拷贝到主项目的assets目录下，并修改里面对应的内容，特别是需要设置appid的部分。
+需要设置appid的部分需要去对应厂商的应用商店里注册自己的app。
+如图
+![Alt](..screenshot/use_learn_2.png/#pic_center)
+![Alt](..screenshot/use_learn_3.png/#pic_center)
+
+-- 3.设置依赖
+
+``` groovy
+implementation files('libs/miit_mdid_x.x.x.arr')
+```
+
+-- 4.混淆设置
+
+```
+ -keep class com.bun.miitmdid.core.**{*;}
+```
+
+-- 5.设置gradle编译选项，这块可以根据自己的对平台的选择进行合理的配置
+
+``` groovy
+ndk {
+    abiFilters 'armeabi-v7a','x86','arm64-v8a','x86_64','armeabi'
+}
+packagingOptions {
+    doNotStrip "*/armeabi-v7a/*.so"
+    doNotStrip "*/x86/*.so"
+    doNotStrip "*/arm64-v8a/*.so"
+    doNotStrip “*/x86_64/*.so"
+    doNotStrip "armeabi.so"
+}
+```
+
+-- 6.以上步骤配置完成后，在配置FT SDK时调用FTSDKConfig的setUseOAID(true)方法即可
