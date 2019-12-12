@@ -21,7 +21,7 @@ public class FTClassAdapter extends ClassVisitor {
     FTClassAdapter(final ClassVisitor cv, FTTransformHelper ftTransformHelper) {
         super(FTUtil.ASM_VERSION, cv);
         this.ftTransformHelper = ftTransformHelper;
-        Logger.info(">>>> goon scan class ");
+        //Logger.info(">>>> goon scan class ");
     }
 
     @Override
@@ -37,7 +37,7 @@ public class FTClassAdapter extends ClassVisitor {
     public void visitEnd() {
         super.visitEnd();
 
-        Logger.info(">>>> end scan class：" + className + "<<<<");
+        //Logger.info(">>>> end scan class：" + className + "<<<<");
     }
 
     @Override

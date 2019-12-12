@@ -62,7 +62,7 @@ public class FTUtil {
         /**
          * For AndroidX Activity
          */
-        targetActivityClass.add("androidx/appcompat/app/AppCompatActivity");
+        targetActivityClass.add("androidx/fragment/app/FragmentActivity");
 
         /** 将一些特例需要排除在外 */
         specialClass.add("android.support.design.widget.TabLayout$ViewPagerOnTabSelectedListener");
