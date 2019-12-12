@@ -35,7 +35,6 @@ useOAID|boolean|是否使用oaid字段[了解OAID](#1关于oaid)|否
 isDebug|boolean|是否需要显示日志|否
 
 示例代码
-
 ```java
 public class DemoApplication extends Application {
     private String accesskey_id = "xxxx";
@@ -60,7 +59,6 @@ public class DemoApplication extends Application {
 ```
 
 2. 关于权限的配置
-
 FT SDK用到了系统的两个权限，分别为READ_PHONE_STATE、WRITE_EXTERNAL_STORAGE
 权限使用说明
 
@@ -142,15 +140,11 @@ VIVO 等厂商共同推出的设备识别字段，具有一定的权威性。
 
 1. 下载好资源文件后，将miit_mdid_x.x.x.arr拷贝到项目的libs目录下，并设置依赖，其中x.x.x代表版本号
 [获取最新版本](http://www.msa-alliance.cn/col.jsp?id=120)
-如图
-![Alt](screenshot/use_learn_1.png/#pic_center)
+如图![Alt](screenshot/use_learn_1.png/#pic_center)
 
 2. 将下载的资源中的supplierconfig.json文件拷贝到主项目的assets目录下，并修改里面对应的内容，特别是需要设置appid的部分。
 需要设置appid的部分需要去对应厂商的应用商店里注册自己的app。
-如图
-![Alt](screenshot/use_learn_2.png/#pic_center)
-
-![Alt](screenshot/use_learn_3.png/#pic_center)
+如图![Alt](screenshot/use_learn_2.png/#pic_center)![Alt](screenshot/use_learn_3.png/#pic_center)
 
 3. 设置依赖
 ``` groovy
