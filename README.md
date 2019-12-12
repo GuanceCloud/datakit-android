@@ -24,7 +24,6 @@ dependencies {
 
 1. 在程序的入口Application中添加关于FT SDK的初始化配置安装代码。
 关于配置项的说明
-
 参数|类型|含义|是否必须
 :--:|:--:|:--:|:--:
 metricsUrl|String|FT-GateWay metrics 写入地址|是
@@ -33,7 +32,6 @@ akId|String|access key ID|enableRequestSigning 为 true 时，必须要填
 akSecret|String|access key Secret|enableRequestSigning 为 true 时，必须要填
 useOAID|boolean|是否使用oaid字段[了解OAID](#1关于oaid)|否
 isDebug|boolean|是否需要显示日志|否
-
 示例代码
 ```java
 public class DemoApplication extends Application {
@@ -61,7 +59,6 @@ public class DemoApplication extends Application {
 2. 关于权限的配置
 FT SDK用到了系统的两个权限，分别为READ_PHONE_STATE、WRITE_EXTERNAL_STORAGE
 权限使用说明
-
 名称|使用原因
 :--:|:--:
 READ_PHONE_STATE|用于获取手机的设备信息，便于精准分析数据信息
