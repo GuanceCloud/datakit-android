@@ -2,11 +2,22 @@
 
 ## 安装
 在项目的app模块(主模块)的build.gradle文件中添加FT SDK的依赖
-```
+
+``` groovy
+
+repositories {
+    //...
+    maven {
+        url 'https://pmgmt.jiagouyun.com/repository/maven-releases'
+    }
+
+}
+
 dependencies {
     implementation 'com.cloudcare.ft.mobile.sdk.traker.agent:ft-sdk:1.0.0'
 }
 ```
+
 关于最新的版本号，请参考[更新文档](https://gitlab.jiagouyun.com/cma/ft-sdk-android/blob/master/README.md)
     
 ## 配置
@@ -23,7 +34,8 @@ useOAID|boolean|是否使用oaid字段[了解OAID](#1关于oaid)|否
 isDebug|boolean|是否需要显示日志|否
 
 示例代码
-```
+
+```java
 public class DemoApplication extends Application {
     private String accesskey_id = "xxxx";
     private String accessKey_secret = "xxxxx";
@@ -38,7 +50,7 @@ public class DemoApplication extends Application {
 
         FTSDKConfig ftSDKConfig = new FTSDKConfig("http://xxxxx",
                 true,
-                accesskey_id,
+                accesskey_id,``
                 accessKey_secret);
         ftSDKConfig.setUseOAID(true);
         FTSdk.install(ftSDKConfig);
@@ -51,7 +63,7 @@ public class DemoApplication extends Application {
 
 - 方法一：
 
-```
+```java
 /*** 主动埋点
  * @param event 埋点事件名称
  * @param tags 埋点数据
@@ -62,7 +74,7 @@ public class DemoApplication extends Application {
 
 - 方法二：
 
-```
+```java
 /**
  * 主动埋点
  * @param event 埋点事件名称
@@ -73,7 +85,7 @@ public class DemoApplication extends Application {
 
 2、方法使用示例
 
-```
+```java
 public void clickText(View view) {
     try {
         JSONObject tags = new JSONObject();
