@@ -1,7 +1,7 @@
 # FT Mobile SDK Android
 
 ## 安装
-在项目的app模块(主模块)的build.gradle文件中添加FT SDK的依赖
+- 在项目的根目录的build.gradle文件中添加FT SDK的的远程仓库地址
 
 ``` groovy
 
@@ -12,7 +12,11 @@ repositories {
     }
 
 }
+```
 
+- 在项目的主模块的build.gradle文件中添加FT SDK的依赖
+
+``` groovy
 dependencies {
     implementation 'com.cloudcare.ft.mobile.sdk.traker.agent:ft-sdk:1.0.0'
 }
