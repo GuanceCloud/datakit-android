@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        //请求权限
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(storagePermission) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions = requestPermissions.plus(storagePermission)
@@ -33,6 +34,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         try_btn.setOnClickListener {
+            /*****************写入数据关键方法*******************/
             try {
                 val tags = JSONObject()
                 val values = JSONObject()
@@ -52,6 +54,7 @@ class MainActivity : AppCompatActivity() {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
+        //权限回调提示
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if(requestCode == REQUEST_CODE){
             var count = 0
