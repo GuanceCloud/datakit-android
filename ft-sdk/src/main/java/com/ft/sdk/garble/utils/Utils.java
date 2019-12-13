@@ -37,7 +37,7 @@ public class Utils {
     }
 
     public static boolean hasPermission(Context context, String permission) {
-        return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_DENIED;
+        return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
     }
 
     public static boolean isNetworkAvailable() {
