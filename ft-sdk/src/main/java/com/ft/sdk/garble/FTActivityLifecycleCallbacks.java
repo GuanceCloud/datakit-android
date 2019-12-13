@@ -29,7 +29,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     @Override
     public void onActivityResumed(@NonNull Activity activity) {
         FTManager.getFTActivityManager().putActivity(activity, Lifecycle.Event.ON_RESUME);
-        FTManager.getSyncTaskManaget().executeSyncPoll();
+        FTManager.getSyncTaskManager().executeSyncPoll();
     }
 
     @Override

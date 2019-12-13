@@ -6,8 +6,11 @@ import com.ft.sdk.garble.manager.FTManager;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Iterator;
 
 /**
  * BY huangDianHua
@@ -33,8 +36,9 @@ public class FTTrack {
 
     /**
      * 主动埋点
-     * @param event 埋点事件名称
-     * @param tags 埋点数据
+     *
+     * @param event  埋点事件名称
+     * @param tags   埋点数据
      * @param values 埋点数据
      */
     public void track(String event, JSONObject tags, JSONObject values) {
@@ -44,7 +48,8 @@ public class FTTrack {
 
     /**
      * 主动埋点
-     * @param event 埋点事件名称
+     *
+     * @param event  埋点事件名称
      * @param values 埋点数据
      */
     public void trackValues(String event, JSONObject values) {
@@ -53,11 +58,15 @@ public class FTTrack {
     }
 
     private void track(OP op, long time, String field, JSONObject tags, JSONObject values) {
-        final RecordData recordData = new RecordData();
-        recordData.setOp(op.value);
-        recordData.setTime(time);
-        JSONObject opData = new JSONObject();
         try {
+            if (!isLegalValues(values)) {
+                return;
+            }
+            final RecordData recordData = new RecordData();
+            recordData.setOp(op.value);
+            recordData.setTime(time);
+            JSONObject opData = new JSONObject();
+
             if (field != null) {
                 opData.put("field", field);
             }
@@ -67,19 +76,45 @@ public class FTTrack {
             if (values != null) {
                 opData.put("values", values);
             }
+            recordData.setOpdata(opData.toString());
+            ThreadPoolUtils.get().execute(new Runnable() {
+                @Override
+                public void run() {
+                    LogUtils.d("FTTrack数据进数据库：" + recordData.getJsonString());
+                    FTManager.getFTDBManager().insertFTOperation(recordData);
+                    FTManager.getSyncTaskManager().executeSyncPoll();
+                }
+            });
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        recordData.setOpdata(opData.toString());
-        ThreadPoolUtils.get().execute(new Runnable() {
-            @Override
-            public void run() {
-                LogUtils.d("FTTrack数据进数据库："+recordData.getJsonString());
-                FTManager.getFTDBManager().insertFTOperation(recordData);
-                FTManager.getSyncTaskManaget().executeSyncPoll();
-            }
-        });
-
     }
 
+    /**
+     * 判断是否是合法的Values
+     * @param jsonObject
+     * @return
+     * @throws JSONException
+     */
+    private boolean isLegalValues(JSONObject jsonObject) throws JSONException{
+        if(jsonObject == null){
+            LogUtils.e("参数 Values 不能为空");
+            return false;
+        }
+        if(jsonObject.keys().hasNext()){
+            Iterator<String> iterator = jsonObject.keys();
+            while (iterator.hasNext()){
+                String key = iterator.next();
+                Object obj = jsonObject.get(key);
+                if(obj instanceof JSONObject || obj instanceof JSONArray){
+                    LogUtils.e("参数 Values 中含有非法数据类型");
+                    return false;
+                }
+            }
+            return true;
+        }else{
+            LogUtils.e("参数 Values 不能为空");
+            return false;
+        }
+    }
 }
