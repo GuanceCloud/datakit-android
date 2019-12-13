@@ -37,7 +37,7 @@ public class FTMethodAdapter extends AdviceAdapter {
         this.ftTransformHelper = ftTransformHelper;
         this.className = className;
         this.interfaces = interfaces;
-        Logger.info(">>>> 开始扫描类 <" + className + "> 的方法:" + methodName + "<<<<");
+        //Logger.info(">>>> 开始扫描类 <" + className + "> 的方法:" + methodName + "<<<<");
     }
 
     @Override
@@ -100,7 +100,7 @@ public class FTMethodAdapter extends AdviceAdapter {
         /**
          * androidx/fragment/app/Fragment，androidx/fragment/app/ListFragment，androidx/fragment/app/DialogFragment
          */
-        if (FTUtil.isInstanceOfXFragment(superName)) {
+        if (FTUtil.isInstanceOfXFragment(className)) {
             //Logger.info("方法扫描>>>类是FragmentX>>>方法是"+nameDesc);
             FTMethodCell ftMethodCell = FTHookConfig.FRAGMENT_X_METHODS.get(nameDesc);
             if (ftMethodCell != null) {
@@ -113,7 +113,7 @@ public class FTMethodAdapter extends AdviceAdapter {
         /**
          * android/support/v4/app/Fragment，android/support/v4/app/ListFragment，android/support/v4/app/DialogFragment，
          */
-        if (FTUtil.isInstanceOfV4Fragment(superName)) {
+        if (FTUtil.isInstanceOfV4Fragment(className)) {
             //Logger.info("方法扫描>>>类是FragmentV4>>>方法是"+nameDesc);
             FTMethodCell ftMethodCell = FTHookConfig.FRAGMENT_V4_METHODS.get(nameDesc);
             if (ftMethodCell != null) {
@@ -126,7 +126,7 @@ public class FTMethodAdapter extends AdviceAdapter {
         /**
          * android/app/Fragment，android/app/ListFragment， android/app/DialogFragment，
          */
-        if (FTUtil.isInstanceOfFragment(superName)) {
+        if (FTUtil.isInstanceOfFragment(className)) {
             //Logger.info("方法扫描>>>类是Fragment>>>方法是"+nameDesc);
             FTMethodCell ftMethodCell = FTHookConfig.FRAGMENT_METHODS.get(nameDesc);
             if (ftMethodCell != null) {
@@ -147,7 +147,7 @@ public class FTMethodAdapter extends AdviceAdapter {
         }
 
         if (!pubAndNoStaticAccess) {
-            Logger.info("方法扫描>>>类是" + className + ">>>方法是" + nameDesc + " 静态和非公共方法");
+            //Logger.info("方法扫描>>>类是" + className + ">>>方法是" + nameDesc + " 静态和非公共方法");
             return;
         }
 
@@ -167,7 +167,7 @@ public class FTMethodAdapter extends AdviceAdapter {
         }
 
         if (methodDesc.equals("(Landroid/view/View;)V")) {
-            Logger.info("方法扫描>>>类是" + className + ">>>方法是" + nameDesc + " 点击");
+            //Logger.info("方法扫描>>>类是" + className + ">>>方法是" + nameDesc + " 点击");
             handleCode(FTHookConfig.CLICK_METHOD);
             isHasTracked = true;
             return;
