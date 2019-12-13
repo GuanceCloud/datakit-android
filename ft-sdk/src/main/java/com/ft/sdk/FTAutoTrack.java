@@ -25,7 +25,7 @@ class FTAutoTrack {
     public static void startApp(Object object) {
         try {
             startApp();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -33,7 +33,7 @@ class FTAutoTrack {
     public static void activityOnCreate(String cName, String rName) {
         try {
             startPage(cName, rName);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -41,28 +41,28 @@ class FTAutoTrack {
     public static void activityOnDestroy(String cName, String rName) {
         try {
             destroyPage(cName, rName);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static void fragmentOnCreateView(String cName, String rName) {
+    public static void fragmentOnCreateView(Object clazz, Object activity) {
         try {
-            startPage(cName, rName);
-        }catch (Exception e){
+            startPage(getClassName(clazz), getActivityName(activity));
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static void fragmentOnDestroyView(String cName, String rName) {
+    public static void fragmentOnDestroyView(Object clazz, Object activity) {
         try {
-            destroyPage(cName, rName);
-        }catch (Exception e){
+            destroyPage(getClassName(clazz), getActivityName(activity));
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static void trackViewOnClick( View view) {
+    public static void trackViewOnClick(View view) {
         if (view == null) {
             return;
         }
@@ -77,7 +77,7 @@ class FTAutoTrack {
             }
 
             trackViewOnClick(object, view, view.isPressed());
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -85,7 +85,7 @@ class FTAutoTrack {
     public static void trackViewOnClick(Object object, View view, boolean isFromUser) {
         try {
             clickView(getClassName(object), getSupperClassName(object), getViewTree(view));
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -93,15 +93,15 @@ class FTAutoTrack {
     public static void trackMenuItem(MenuItem menuItem) {
         try {
             trackMenuItem(null, menuItem);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public static void trackMenuItem(Object object, MenuItem menuItem) {
         try {
-            clickView(getClassName(object),getSupperClassName(object), "");
-        }catch (Exception e){
+            clickView(getClassName(object), getSupperClassName(object), "");
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -138,11 +138,12 @@ class FTAutoTrack {
         try {
             opData.put("vtp", vtp);
             recordData.setOpdata(opData.toString());
-        }catch (Exception e){ }
+        } catch (Exception e) {
+        }
         ThreadPoolUtils.get().execute(new Runnable() {
             @Override
             public void run() {
-                LogUtils.d("FTAutoTrack数据进数据库："+recordData.getJsonString());
+                LogUtils.d("FTAutoTrack数据进数据库：" + recordData.getJsonString());
                 FTManager.getFTDBManager().insertFTOperation(recordData);
                 FTManager.getSyncTaskManaget().executeSyncPoll();
             }
@@ -154,38 +155,56 @@ class FTAutoTrack {
         stringBuffer.append(view.getClass().getSimpleName() + "/");
         ViewParent viewParent = view.getParent();
         while (viewParent != null) {
-            stringBuffer.insert(0,viewParent.getClass().getSimpleName() + "/");
+            stringBuffer.insert(0, viewParent.getClass().getSimpleName() + "/");
             viewParent = viewParent.getParent();
         }
-        stringBuffer.append("#"+view.getId());
-        if(view instanceof TextView){
-            stringBuffer.append("_"+((TextView) view).getText());
+        stringBuffer.append("#" + view.getId());
+        if (view instanceof TextView) {
+            stringBuffer.append("_" + ((TextView) view).getText());
         }
         return stringBuffer.toString();
     }
 
-    private static String getClassName(Object object){
-        if(object == null){
+    /**
+     * 返回当前类的名称
+     *
+     * @param object
+     * @return
+     */
+    private static String getClassName(Object object) {
+        if (object == null) {
             return "";
         }
-        if(object instanceof Class){
+        if (object instanceof Class) {
             return ((Class) object).getSimpleName();
         }
         return object.getClass().getSimpleName();
     }
 
-    private static String getSupperClassName(Object object){
-        if(object == null){
+    /**
+     * 返回父类名称
+     *
+     * @param object
+     * @return
+     */
+    private static String getSupperClassName(Object object) {
+        if (object == null) {
             return "";
         }
-        if(object instanceof Class){
+        if (object instanceof Class) {
             try {
-                Class clazz = Class.forName(((Class) object).getName());
-                return clazz.getSuperclass().getSimpleName();
-            } catch (ClassNotFoundException e) {
+                return ((Class) object).getSuperclass().getSimpleName();
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
         return object.getClass().getSuperclass().getSimpleName();
+    }
+
+    private static String getActivityName(Object object) {
+        if (object == null) {
+            return "";
+        }
+        return object.getClass().getSimpleName();
     }
 }

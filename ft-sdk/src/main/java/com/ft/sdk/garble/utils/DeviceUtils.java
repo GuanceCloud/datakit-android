@@ -149,7 +149,9 @@ public class DeviceUtils {
                     imei = tm.getDeviceId();
                 }
             }
-        } catch (Exception e) {
+        } catch (SecurityException e){
+            LogUtils.e("未能获取到系统>>Manifest.permission.READ_PHONE_STATE<<权限");
+        }catch (Exception e) {
             e.printStackTrace();
         }
         return imei;
