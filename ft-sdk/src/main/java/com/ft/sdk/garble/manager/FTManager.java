@@ -9,7 +9,7 @@ import com.ft.sdk.garble.db.FTDBManager;
  */
 public class FTManager {
 
-    public static SyncTaskManager getSyncTaskManaget(){
+    public static SyncTaskManager getSyncTaskManager(){
         return SyncTaskManager.get();
     }
 
