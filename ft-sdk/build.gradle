@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 
 
-def versionNameStr="1.0.1-alpha1"
+def versionNameStr="1.0.0-alpha5"
 
 android {
     compileSdkVersion 29
@@ -11,7 +11,7 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 1
+        versionCode 2
         versionName versionNameStr
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -70,7 +70,7 @@ publishing {
 }
 
 task generateAarAndPublish{
-    dependsOn 'assembleRelease'
+    dependsOn 'assemble'
     dependsOn 'publish'
 }
 
