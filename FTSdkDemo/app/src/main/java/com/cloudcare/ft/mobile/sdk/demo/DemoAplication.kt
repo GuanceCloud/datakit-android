@@ -16,11 +16,13 @@ class DemoAplication : Application() {
         super.onCreate()
         val ftSDKConfig = FTSDKConfig(
             "http://10.100.64.106:19557/v1/write/metrics",//服务器地址
-            true,
-            accesskey_id,
-            accessKey_secret
+            true,//是否需要签名
+            accesskey_id,//access key ID
+            accessKey_secret//access key Secret
         )
+        //是否使用OAID
         ftSDKConfig.isUseOAID = true
+        //是否开启Debug模式（开启后能查看调试数据）
         ftSDKConfig.isDebug = true
         FTSdk.install(ftSDKConfig)
     }
