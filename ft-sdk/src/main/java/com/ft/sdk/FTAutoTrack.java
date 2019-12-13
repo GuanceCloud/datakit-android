@@ -145,7 +145,7 @@ class FTAutoTrack {
             public void run() {
                 LogUtils.d("FTAutoTrack数据进数据库：" + recordData.getJsonString());
                 FTManager.getFTDBManager().insertFTOperation(recordData);
-                FTManager.getSyncTaskManaget().executeSyncPoll();
+                FTManager.getSyncTaskManager().executeSyncPoll();
             }
         });
     }
