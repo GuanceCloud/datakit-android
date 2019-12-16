@@ -96,7 +96,7 @@ public class FTTrack {
      * @return
      * @throws JSONException
      */
-    private boolean isLegalValues(JSONObject jsonObject) throws JSONException{
+    public boolean isLegalValues(JSONObject jsonObject) throws JSONException{
         if(jsonObject == null){
             LogUtils.e("参数 Values 不能为空");
             return false;
