@@ -8,7 +8,7 @@
 repositories {
     //...
     maven {
-        url 'https://pmgmt.jiagouyun.com/repository/maven-releases'
+        url 'https://mvnrepo.jiagouyun.com/repository/maven-releases'
     }
 
 }
