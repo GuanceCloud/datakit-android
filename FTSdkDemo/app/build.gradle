@@ -35,7 +35,7 @@ dependencies {
 
     //================FT-SDK需要使用的引用=================//
     //FT-SDK引用
-    implementation 'com.cloudcare.ft.mobile.sdk.traker.agent:ft-sdk:1.0.1-alpha1'
+    implementation 'com.cloudcare.ft.mobile.sdk.traker.agent:ft-sdk:1.0.0-alpha5'
     //FT-SDK配置打开使用OAID（ftSDKConfig.isUseOAID = true）时需要的依赖
     implementation files('libs/miit_mdid_1.0.10.aar')
 }
