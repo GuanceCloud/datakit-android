@@ -1,18 +1,25 @@
 package com.ft.sdk.garble.http;
 
 import com.ft.sdk.garble.FTHttpConfig;
+import com.ft.sdk.garble.utils.GenericsUtils;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.Utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
+
+import static com.ft.sdk.garble.http.NetCodeStatus.NET_STATUS_UNCONNECT;
+import static com.ft.sdk.garble.http.NetCodeStatus.NET_STATUS_UNCONNECT_ERR;
+import static com.ft.sdk.garble.http.NetCodeStatus.NET_UNKNOWN_ERR;
 
 /**
  * BY huangDianHua
@@ -39,7 +46,6 @@ public abstract class HttpClient {
         this.mHttpBuilder = httpBuilder;
         if (openConnection()) {
             setCommonParams();
-            setHeadParams();
         }
     }
 
@@ -98,25 +104,22 @@ public abstract class HttpClient {
         mConnection.setReadTimeout(mHttpBuilder.getReadOutTime());
     }
 
-    private void setHeadParams() {
-        mConnection.addRequestProperty("X-Datakit-UUID", ftHttpConfig.uuid);
-        mConnection.addRequestProperty("User-Agent", ftHttpConfig.userAgent);
-        mConnection.addRequestProperty("Accept-Language", "zh-CN");
-        mConnection.addRequestProperty("Content-Type", CONTENT_TYPE);
-        mConnection.addRequestProperty("charset",CHARSET);
-        HashMap<String, String> headMap = mHttpBuilder.getHeadParams();
-        Iterator<String> keys = headMap.keySet().iterator();
-        while (keys.hasNext()) {
-            String key = keys.next();
-            mConnection.addRequestProperty(key, headMap.get(key));
+    public void execute(final HttpCallback httpCallback) {
+        try {
+            request(httpCallback);
+        } catch (Exception e) {
+            LogUtils.e(e.getMessage());
         }
     }
 
-    public void execute(final HttpCallback httpCallback) {
-        request(httpCallback);
-    }
-
     private void request(HttpCallback httpCallback) {
+        Class clazz = GenericsUtils.getInterfaceClassGenricType(httpCallback.getClass());
+        if (!Utils.isNetworkAvailable()) {
+            httpCallback.onComplete(getResponseData(clazz,
+                    NET_STATUS_UNCONNECT,
+                    NET_STATUS_UNCONNECT_ERR));
+            return;
+        }
         RequestMethod method = mHttpBuilder.getMethod();
         boolean isDoInput = method == RequestMethod.POST;
         OutputStream outputStream = null;
@@ -124,20 +127,21 @@ public abstract class HttpClient {
         InputStreamReader inputStreamReader = null;
         BufferedReader reader = null;
         String tempLine = null;
+        int responseCode = NET_UNKNOWN_ERR;
         StringBuffer resultBuffer = new StringBuffer();
-        if (isDoInput) {
-            mConnection.setDoOutput(true);
-        }
-        mConnection.setDoInput(true);
-        mConnection.setUseCaches(false);
         try {
+            if (isDoInput) {
+                mConnection.setDoOutput(true);
+            }
+            mConnection.setDoInput(true);
+            mConnection.setUseCaches(false);
             mConnection.connect();
             if (isDoInput) {
                 outputStream = mConnection.getOutputStream();
                 outputStream.write(getBodyContent().getBytes(CHARSET));
                 outputStream.flush();
             }
-            int responseCode = mConnection.getResponseCode();
+            responseCode = mConnection.getResponseCode();
             if (responseCode >= 300) {
                 inputStream = mConnection.getErrorStream();
                 inputStreamReader = new InputStreamReader(inputStream, CHARSET);
@@ -156,35 +160,69 @@ public abstract class HttpClient {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            try {
-                if (outputStream != null) {
-                    outputStream.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+            close(outputStream, reader, inputStreamReader, inputStream);
+        }
+        httpCallback.onComplete(getResponseData(clazz, responseCode, resultBuffer.toString()));
+    }
+
+    private void close(OutputStream outputStream,
+                       BufferedReader reader,
+                       InputStreamReader inputStreamReader,
+                       InputStream inputStream) {
+        try {
+            if (outputStream != null) {
+                outputStream.close();
             }
-            try {
-                if (reader != null) {
-                    reader.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            if (reader != null) {
+                reader.close();
             }
-            try {
-                if (inputStreamReader != null) {
-                    inputStreamReader.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            if (inputStreamReader != null) {
+                inputStreamReader.close();
             }
-            try {
-                if (inputStream != null) {
-                    inputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            if (inputStream != null) {
+                inputStream.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 构建网络请求返回对象
+     *
+     * @param tClass
+     * @param code
+     * @param message
+     * @param <T>
+     * @return
+     */
+    private <T extends ResponseData> T getResponseData(Class<T> tClass, int code, String message) {
+        Constructor[] constructor = tClass.getConstructors();
+        for (Constructor<T> con : constructor) {
+            Class[] classes = con.getParameterTypes();
+            if (classes.length == 2) {
+                if (classes[0].getName().equals(int.class.getName()) &&
+                        classes[1].getName().equals(String.class.getName())) {
+                    try {
+                        return con.newInstance(code, message);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
             }
         }
-        httpCallback.onComplete(new ResponseData(resultBuffer.toString()));
+        return null;
     }
 }
