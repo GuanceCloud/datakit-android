@@ -4,6 +4,8 @@ import com.ft.sdk.garble.utils.Utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -18,6 +20,7 @@ public class FTHttpClient extends HttpClient {
     public FTHttpClient(HttpBuilder httpBuilder) {
         super(httpBuilder);
         if (connSuccess) {
+            setHeadParams();
             calcuteDate();
             mConnection.addRequestProperty("Date", gmtString);
             if (ftHttpConfig.enableRequestSigning) {
@@ -52,5 +55,19 @@ public class FTHttpClient extends HttpClient {
         SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss z", Locale.UK);
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
         gmtString = sdf.format(currentTime);
+    }
+
+    private void setHeadParams() {
+        mConnection.addRequestProperty("X-Datakit-UUID", ftHttpConfig.uuid);
+        mConnection.addRequestProperty("User-Agent", ftHttpConfig.userAgent);
+        mConnection.addRequestProperty("Accept-Language", "zh-CN");
+        mConnection.addRequestProperty("Content-Type", CONTENT_TYPE);
+        mConnection.addRequestProperty("charset", CHARSET);
+        HashMap<String, String> headMap = mHttpBuilder.getHeadParams();
+        Iterator<String> keys = headMap.keySet().iterator();
+        while (keys.hasNext()) {
+            String key = keys.next();
+            mConnection.addRequestProperty(key, headMap.get(key));
+        }
     }
 }
