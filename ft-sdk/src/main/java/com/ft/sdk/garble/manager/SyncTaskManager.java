@@ -3,9 +3,9 @@ package com.ft.sdk.garble.manager;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.http.FTHttpClient;
+import com.ft.sdk.garble.http.FTResponseData;
 import com.ft.sdk.garble.http.HttpCallback;
 import com.ft.sdk.garble.http.RequestMethod;
-import com.ft.sdk.garble.http.ResponseData;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -128,9 +128,9 @@ public class SyncTaskManager {
         FTHttpClient.Builder()
                 .setMethod(RequestMethod.POST)
                 .setBodyString(body)
-                .execute(new HttpCallback<ResponseData>() {
+                .execute(new HttpCallback<FTResponseData>() {
                     @Override
-                    public void onComplete(ResponseData result) {
+                    public void onComplete(FTResponseData result) {
                         syncCallback.isSuccess(result.getCode() == HttpURLConnection.HTTP_OK);
                     }
                 });
