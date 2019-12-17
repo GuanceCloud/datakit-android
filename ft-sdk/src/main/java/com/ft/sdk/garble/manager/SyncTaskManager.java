@@ -130,7 +130,7 @@ public class SyncTaskManager {
         FTHttpClient.Builder()
                 .setMethod(RequestMethod.POST)
                 .setBodyString(body)
-                .execute(new HttpCallback<FTResponseData>() {
+                .execute(new HttpCallback() {
                     @Override
                     public void onComplete(FTResponseData result) {
                         syncCallback.isSuccess(result.getCode() == HttpURLConnection.HTTP_OK);

@@ -6,7 +6,6 @@ import com.ft.sdk.garble.http.FTHttpClient;
 import com.ft.sdk.garble.http.FTResponseData;
 import com.ft.sdk.garble.http.HttpCallback;
 import com.ft.sdk.garble.http.RequestMethod;
-import com.ft.sdk.garble.http.ResponseData;
 import com.ft.sdk.garble.manager.SyncDataManager;
 import com.ft.sdk.garble.utils.LogUtils;
 
@@ -55,7 +54,7 @@ public class HttpTest {
         FTHttpClient.Builder()
                 .setMethod(RequestMethod.POST)
                 .setBodyString(body)
-                .execute(new HttpCallback<FTResponseData>() {
+                .execute(new HttpCallback() {
                     @Override
                     public void onComplete(FTResponseData result) {
                         LogUtils.d(result);
@@ -69,23 +68,9 @@ public class HttpTest {
         FTHttpClient.Builder()
                 .setUrl("http://baidu.com?query=汉字")
                 .setMethod(RequestMethod.POST)
-                .execute(new HttpCallback<FTResponseData>() {
+                .execute(new HttpCallback() {
                     @Override
                     public void onComplete(FTResponseData result) {
-                        LogUtils.d(result);
-                        assertTrue(result!=null && result.getHttpCode() == HttpURLConnection.HTTP_OK);
-                    }
-                });
-    }
-
-    @Test
-    public void testRequest1(){
-        FTHttpClient.Builder()
-                .setUrl("http://baidu.com?query=汉字")
-                .setMethod(RequestMethod.POST)
-                .execute(new HttpCallback<ResponseData>() {
-                    @Override
-                    public void onComplete(ResponseData result) {
                         LogUtils.d(result);
                         assertTrue(result!=null && result.getHttpCode() == HttpURLConnection.HTTP_OK);
                     }
