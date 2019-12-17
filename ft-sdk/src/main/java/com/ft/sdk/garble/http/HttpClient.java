@@ -173,6 +173,7 @@ public abstract class HttpClient {
         } finally {
             close(outputStream, reader, inputStreamReader, inputStream);
         }
+        LogUtils.d("HTTP-response:"+resultBuffer.toString());
         httpCallback.onComplete(new FTResponseData(responseCode, resultBuffer.toString()));
     }
 
