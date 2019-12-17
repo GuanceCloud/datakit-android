@@ -17,6 +17,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import static com.ft.sdk.garble.http.NetCodeStatus.NET_STATUS_NOT_CONNECT_HOST;
+import static com.ft.sdk.garble.http.NetCodeStatus.NET_STATUS_NOT_CONNECT_HOST_ERR;
 import static com.ft.sdk.garble.http.NetCodeStatus.NET_STATUS_UNCONNECT;
 import static com.ft.sdk.garble.http.NetCodeStatus.NET_STATUS_UNCONNECT_ERR;
 import static com.ft.sdk.garble.http.NetCodeStatus.NET_UNKNOWN_ERR;
@@ -58,6 +60,11 @@ public abstract class HttpClient {
             String model = mHttpBuilder.getModel();
             if (model != null && !model.isEmpty()) {
                 urlStr = urlStr + "/" + model;
+            }
+            if(Utils.isNullOrEmpty(urlStr)){
+                connSuccess = false;
+                LogUtils.e("请求地址不能为空");
+                return false;
             }
             final URL url = new URL(urlStr + getQueryString());
             mConnection = (HttpURLConnection) url.openConnection();
@@ -113,10 +120,14 @@ public abstract class HttpClient {
     }
 
     private void request(HttpCallback httpCallback) {
-        Class clazz = GenericsUtils.getInterfaceClassGenricType(httpCallback.getClass());
+        //Class clazz = GenericsUtils.getInterfaceClassGenricType(httpCallback.getClass());
+        if(!connSuccess){
+            httpCallback.onComplete(new FTResponseData(NET_STATUS_NOT_CONNECT_HOST,
+                    NET_STATUS_NOT_CONNECT_HOST_ERR));
+            return;
+        }
         if (!Utils.isNetworkAvailable()) {
-            httpCallback.onComplete(getResponseData(clazz,
-                    NET_STATUS_UNCONNECT,
+            httpCallback.onComplete(new FTResponseData(NET_STATUS_UNCONNECT,
                     NET_STATUS_UNCONNECT_ERR));
             return;
         }
@@ -162,7 +173,7 @@ public abstract class HttpClient {
         } finally {
             close(outputStream, reader, inputStreamReader, inputStream);
         }
-        httpCallback.onComplete(getResponseData(clazz, responseCode, resultBuffer.toString()));
+        httpCallback.onComplete(new FTResponseData(responseCode, resultBuffer.toString()));
     }
 
     private void close(OutputStream outputStream,
