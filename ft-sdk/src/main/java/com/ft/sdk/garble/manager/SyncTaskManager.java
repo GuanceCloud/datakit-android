@@ -102,9 +102,11 @@ public class SyncTaskManager {
             @Override
             public void isSuccess(boolean isSuccess) {
                 if (isSuccess) {
+                    LogUtils.d("同步数据成功");
                     deleteLastQuery(requestDatas);
                     errorCount.set(0);
                 } else {
+                    LogUtils.d("同步数据失败");
                     errorCount.getAndIncrement();
                 }
             }
