@@ -26,4 +26,11 @@ public class NetCodeStatus {
      * 网络返回数据不是json
      */
     public static final String NET_STATUS_RESPONSE_NOT_JSON_ERR = "net.response.not.json";
+
+    /**
+     * 没有和主机建立连接
+     */
+    public static final int NET_STATUS_NOT_CONNECT_HOST = 3;
+    public static final String NET_STATUS_NOT_CONNECT_HOST_ERR = "net.connect.not.host";
+
 }
