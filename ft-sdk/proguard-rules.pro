@@ -19,6 +19,16 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+#保护代码中的Annotation不被混淆
+-keepattributes *Annotation
+
+##避免混淆泛型
+-keepattributes Signature
+
+#抛出异常时保留代码行号
+-keepattributes SourceFile,LineNumberTable
+
 -keep class com.ft.sdk.FTSdk{
    public *;
 }
@@ -28,3 +38,8 @@
 -keep class com.ft.sdk.FTTrack{
    public *;
 }
+
+-keep class * extends com.ft.sdk.garble.http.ResponseData{
+     *;
+}
+
