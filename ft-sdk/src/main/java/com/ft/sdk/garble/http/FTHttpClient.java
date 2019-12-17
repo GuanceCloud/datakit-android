@@ -43,7 +43,7 @@ public class FTHttpClient extends HttpClient {
         String aks = ftHttpConfig.akSecret;
         String method = mHttpBuilder.getMethod().method;
         String contentMD5 = getContentMD5();
-        return Utils.getHnacSha1(aks, method + "\n" + contentMD5 + "\n" + CONTENT_TYPE + "\n" + gmtString);
+        return Utils.getHMacSha1(aks, method + "\n" + contentMD5 + "\n" + CONTENT_TYPE + "\n" + gmtString);
     }
 
     private String getContentMD5() {
