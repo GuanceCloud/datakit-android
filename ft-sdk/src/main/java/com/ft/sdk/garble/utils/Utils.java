@@ -59,14 +59,14 @@ public class Utils {
             MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(str.getBytes());
             byte[] b = md.digest();
-            return Base64.encodeToString(b,Base64.DEFAULT);
+            return Base64.encodeToString(b,Base64.NO_WRAP);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
             return "";
         }
     }
 
-    public static String getHnacSha1(String accesskeySecret,String content){
+    public static String getHMacSha1(String accesskeySecret,String content){
         SecretKeySpec signingKey = new SecretKeySpec(accesskeySecret.getBytes(),"HmacSHA1");
         try {
             Mac mac = Mac.getInstance("HmacSHA1");
