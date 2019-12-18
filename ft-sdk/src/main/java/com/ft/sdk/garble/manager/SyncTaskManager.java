@@ -72,10 +72,10 @@ public class SyncTaskManager {
                         break;
                     }
                     //if (FTActivityManager.get().isForeground()) {//程序在前台执行
-                        //LogUtils.d(">>>同步轮询线程<<< 程序正在 前 台执行同步操作");
-                        LogUtils.d(">>>同步轮询线程<<< 程序正在执行同步操作");
-                        handleSyncOpt(recordDataList);
-                        recordDataList = queryFromData();
+                    //LogUtils.d(">>>同步轮询线程<<< 程序正在 前 台执行同步操作");
+                    LogUtils.d(">>>同步轮询线程<<< 程序正在执行同步操作");
+                    handleSyncOpt(recordDataList);
+                    recordDataList = queryFromData();
                     /*} else {//程序退到后台，关闭同步线程
                         recordDataList = null;
                         LogUtils.d(">>>同步轮询线程<<< 程序正在 后 台执行同步操作");
@@ -130,10 +130,17 @@ public class SyncTaskManager {
         FTHttpClient.Builder()
                 .setMethod(RequestMethod.POST)
                 .setBodyString(body)
-                .execute(new HttpCallback() {
+                .execute(new HttpCallback<FTResponseData>() {
                     @Override
                     public void onComplete(FTResponseData result) {
-                        syncCallback.isSuccess(result.getCode() == HttpURLConnection.HTTP_OK);
+                        try {
+                            syncCallback.isSuccess(result.getCode() == HttpURLConnection.HTTP_OK);
+                        } catch (Exception e) {
+                            syncCallback.isSuccess(false);
+                            LogUtils.e("请在混淆文件中添加 -keep class * extends com.ft.sdk.garble.http.ResponseData{\n" +
+                                    "     *;\n" +
+                                    "}");
+                        }
                     }
                 });
     }
