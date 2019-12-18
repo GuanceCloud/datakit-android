@@ -54,7 +54,7 @@ public class HttpTest {
         FTHttpClient.Builder()
                 .setMethod(RequestMethod.POST)
                 .setBodyString(body)
-                .execute(new HttpCallback() {
+                .execute(new HttpCallback<FTResponseData>() {
                     @Override
                     public void onComplete(FTResponseData result) {
                         LogUtils.d(result);
@@ -68,7 +68,7 @@ public class HttpTest {
         FTHttpClient.Builder()
                 .setUrl("http://baidu.com?query=汉字")
                 .setMethod(RequestMethod.POST)
-                .execute(new HttpCallback() {
+                .execute(new HttpCallback<FTResponseData>() {
                     @Override
                     public void onComplete(FTResponseData result) {
                         LogUtils.d(result);
