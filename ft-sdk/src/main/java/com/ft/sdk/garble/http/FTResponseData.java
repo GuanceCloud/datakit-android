@@ -10,16 +10,13 @@ import java.net.HttpURLConnection;
  * DATE:2019-12-16 16:15
  * Description:
  */
-public class FTResponseData {
-    private int httpCode;
-    private String data;
+public class FTResponseData extends ResponseData{
     private int code;
     private String errorCode;
     private String message;
 
     public FTResponseData(int httpCode, String data) {
-        this.httpCode = httpCode;
-        this.data = data;
+        super(httpCode,data);
         if(httpCode == HttpURLConnection.HTTP_OK) {
             try {
                 if (data != null) {
@@ -60,13 +57,5 @@ public class FTResponseData {
 
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    public int getHttpCode() {
-        return httpCode;
-    }
-
-    public String getData() {
-        return data;
     }
 }
