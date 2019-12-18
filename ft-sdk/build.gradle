@@ -71,6 +71,7 @@ publishing {
 }
 
 task generateAarAndPublish{
+    dependsOn 'clean'
     dependsOn 'assemble'
     dependsOn 'publish'
 }
