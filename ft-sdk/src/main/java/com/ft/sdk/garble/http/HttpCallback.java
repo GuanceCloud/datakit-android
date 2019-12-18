@@ -5,6 +5,6 @@ package com.ft.sdk.garble.http;
  * DATE:2019-12-09 16:43
  * Description:
  */
-public interface HttpCallback {
-    public void onComplete(FTResponseData result);
+public interface HttpCallback<T extends ResponseData> {
+    public void onComplete(T result);
 }

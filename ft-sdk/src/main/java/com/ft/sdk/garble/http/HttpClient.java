@@ -120,14 +120,14 @@ public abstract class HttpClient {
     }
 
     private void request(HttpCallback httpCallback) {
-        //Class clazz = GenericsUtils.getInterfaceClassGenricType(httpCallback.getClass());
+        Class clazz = GenericsUtils.getInterfaceClassGenricType(httpCallback.getClass());
         if(!connSuccess){
-            httpCallback.onComplete(new FTResponseData(NET_STATUS_NOT_CONNECT_HOST,
+            httpCallback.onComplete(getResponseData(clazz,NET_STATUS_NOT_CONNECT_HOST,
                     NET_STATUS_NOT_CONNECT_HOST_ERR));
             return;
         }
         if (!Utils.isNetworkAvailable()) {
-            httpCallback.onComplete(new FTResponseData(NET_STATUS_UNCONNECT,
+            httpCallback.onComplete(getResponseData(clazz,NET_STATUS_UNCONNECT,
                     NET_STATUS_UNCONNECT_ERR));
             return;
         }
@@ -174,7 +174,7 @@ public abstract class HttpClient {
             close(outputStream, reader, inputStreamReader, inputStream);
         }
         LogUtils.d("HTTP-response:"+resultBuffer.toString());
-        httpCallback.onComplete(new FTResponseData(responseCode, resultBuffer.toString()));
+        httpCallback.onComplete(getResponseData(clazz,responseCode, resultBuffer.toString()));
     }
 
     private void close(OutputStream outputStream,
