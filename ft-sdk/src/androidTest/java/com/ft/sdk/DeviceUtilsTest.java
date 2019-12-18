@@ -28,4 +28,9 @@ public class DeviceUtilsTest {
     public void getUuid(){
         assertNotEquals("",DeviceUtils.getUuid(getContext()));
     }
+
+    @Test
+    public void requestPermission(){
+        assertNotEquals("",DeviceUtils.getImei(getContext()));
+    }
 }
