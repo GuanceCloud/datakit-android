@@ -14,8 +14,12 @@ public class FTSDKConfig {
     private String akSecret;
     private boolean useOAID;
     private boolean isDebug;
+    private boolean autoTrack;
+    public static FTSDKConfig Builder(String metricsUrl,boolean enableRequestSigning,String akId,String akSecret){
+        return new FTSDKConfig(metricsUrl,enableRequestSigning,akId,akSecret);
+    }
 
-    public FTSDKConfig(String metricsUrl,boolean enableRequestSigning,String akId,String akSecret){
+    private FTSDKConfig(String metricsUrl,boolean enableRequestSigning,String akId,String akSecret){
         this.metricsUrl = metricsUrl;
         this.enableRequestSigning = enableRequestSigning;
         this.akId = akId;
@@ -52,15 +56,26 @@ public class FTSDKConfig {
         return useOAID;
     }
 
-    public void setUseOAID(boolean useOAID) {
-        this.useOAID = useOAID;
-    }
-
     public boolean isDebug() {
         return isDebug;
     }
 
-    public void setDebug(boolean debug) {
+    public boolean isAutoTrack() {
+        return autoTrack;
+    }
+
+    public FTSDKConfig setAutoTrack(boolean autoTrack) {
+        this.autoTrack = autoTrack;
+        return this;
+    }
+
+    public FTSDKConfig setUseOAID(boolean useOAID) {
+        this.useOAID = useOAID;
+        return this;
+    }
+
+    public FTSDKConfig setDebug(boolean debug) {
         isDebug = debug;
+        return this;
     }
 }
