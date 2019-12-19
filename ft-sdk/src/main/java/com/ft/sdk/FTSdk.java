@@ -3,6 +3,7 @@ package com.ft.sdk;
 import android.app.Application;
 
 import com.ft.sdk.garble.FTActivityLifecycleCallbacks;
+import com.ft.sdk.garble.FTAutoTrackConfig;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.utils.LogUtils;
 
@@ -32,6 +33,7 @@ public class FTSdk {
     private void initFTConfig(){
         if(mFtSDKConfig != null) {
             FTHttpConfig.get().initParams(mFtSDKConfig);
+            FTAutoTrackConfig.get().initParams(mFtSDKConfig);
             LogUtils.setDebug(mFtSDKConfig.isDebug());
         }
 
