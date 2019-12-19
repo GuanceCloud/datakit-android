@@ -210,33 +210,42 @@ public class FTMethodAdapter extends AdviceAdapter {
             return;
         }
 
+        if (!FTUtil.isTargetClassInSpecial(className)) {
+            if ((className.startsWith("android/") || className.startsWith("androidx/")) && !(className.startsWith("android/support/v17/leanback") || className.startsWith("androidx/leanback"))) {
+                return;
+            }
+        }
+
         /**
          * 系统控件点击事件
          */
-        if(FTHookConfig.CLICK_METHODS_SYSTEM.containsKey(nameDesc)){
-            Logger.info("============CLICK_METHODS_SYSTEM=="+nameDesc);
-            FTMethodCell ftMethodCell = FTHookConfig.CLICK_METHODS_SYSTEM.get(nameDesc);
-
-            Type[] types = Type.getArgumentTypes(ftMethodCell.desc);
-            int length = types.length;
-            Type[] clickTypes = Type.getArgumentTypes(methodDesc);
-            int paramStart = clickTypes.length - length;
-            if (paramStart < 0){
-                return;
-            }else{
-                for (int i = 0;i < length;i++){
-                    if(!clickTypes[paramStart + i].getDescriptor().equals(types[i].getDescriptor())){
+        if(interfaces != null && interfaces.length >0){
+            for(String inter :interfaces) {
+                Logger.info("============CLICK_METHODS_SYSTEM=="+inter+nameDesc);
+                FTMethodCell ftMethodCell = FTHookConfig.CLICK_METHODS_SYSTEM.get(inter+nameDesc);
+                if(ftMethodCell != null) {
+                    Type[] types = Type.getArgumentTypes(ftMethodCell.desc);
+                    int length = types.length;
+                    Type[] clickTypes = Type.getArgumentTypes(methodDesc);
+                    int paramStart = clickTypes.length - length;
+                    if (paramStart < 0) {
                         return;
+                    } else {
+                        for (int i = 0; i < length; i++) {
+                            if (!clickTypes[paramStart + i].getDescriptor().equals(types[i].getDescriptor())) {
+                                return;
+                            }
+                        }
                     }
+                    for (int i = paramStart; i < paramStart + ftMethodCell.paramsCount; i++) {
+                        mv.visitVarInsn(ftMethodCell.opcodes.get(i - paramStart), getVisitPosition(clickTypes, i, false));
+                    }
+
+                    mv.visitMethodInsn(Opcodes.INVOKESTATIC, FTHookConfig.FT_SDK_API, ftMethodCell.agentName, ftMethodCell.agentDesc, false);
+                    isHasTracked = true;
+                    return;
                 }
             }
-            for (int i = paramStart;i< paramStart+ftMethodCell.paramsCount;i++){
-                mv.visitVarInsn(ftMethodCell.opcodes.get(i-paramStart),getVisitPosition(clickTypes,i,false));
-            }
-
-            mv.visitMethodInsn(Opcodes.INVOKESTATIC,FTHookConfig.FT_SDK_API,ftMethodCell.agentName,ftMethodCell.agentDesc,false);
-            isHasTracked = true;
-            return;
         }
 
         /**
@@ -245,13 +254,6 @@ public class FTMethodAdapter extends AdviceAdapter {
         if (FTUtil.isTargetMenuMethodDesc(nameDesc)) {
             handleCode(FTHookConfig.MENU_METHODS);
             return;
-        }
-
-
-        if (!FTUtil.isTargetClassInSpecial(className)) {
-            if ((className.startsWith("android/") || className.startsWith("androidx/")) && !(className.startsWith("android/support/v17/leanback") || className.startsWith("androidx/leanback"))) {
-                return;
-            }
         }
 
         if (methodDesc.equals("(Landroid/view/View;)V")) {
