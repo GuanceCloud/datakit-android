@@ -43,31 +43,19 @@ public class FTHookConfig {
                 "onCreate",
                 "(Landroid/os/Bundle;)V",
                 "activityOnCreate",
-                "(Ljava/lang/String;Ljava/lang/String;)V",
+                "(Ljava/lang/Class;)V",
                 Arrays.asList(
                         new FTSubMethodCell(FTMethodType.ALOAD, 0),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Class", "getSimpleName", "()Ljava/lang/String;", false),
-                        new FTSubMethodCell(FTMethodType.ALOAD, 0),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Class", "getSuperclass", "()Ljava/lang/Class;", false),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Class", "getSimpleName", "()Ljava/lang/String;", false)
-
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false)
                 )));
         ACTIVITY_METHODS.put("onDestroy()V", new FTMethodCell(
                 "onDestroy",
                 "()V",
                 "activityOnDestroy",
-                "(Ljava/lang/String;Ljava/lang/String;)V",
+                "(Ljava/lang/Class;)V",
                 Arrays.asList(
                         new FTSubMethodCell(FTMethodType.ALOAD, 0),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Class", "getSimpleName", "()Ljava/lang/String;", false),
-                        new FTSubMethodCell(FTMethodType.ALOAD, 0),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Class", "getSuperclass", "()Ljava/lang/Class;", false),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Class", "getSimpleName", "()Ljava/lang/String;", false)
-
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false)
                 )));
 
     }
