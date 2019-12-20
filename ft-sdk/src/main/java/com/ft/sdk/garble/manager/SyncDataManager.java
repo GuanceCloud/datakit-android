@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.garble.FTHttpConfig;
+import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.OaidUtils;
@@ -182,10 +183,23 @@ public class SyncDataManager {
             sb.append(temp);
         }
         sb.append(" ");
-        sb.append("event=\"" + recordData.getOp() + "\"");
+        sb.append("event=\"" + getEventName(recordData.getOp()) + "\"");
         sb.append(" ");
         sb.append(recordData.getTime() * 1000000);
         return sb.toString();
+    }
+
+    private String getEventName(String op){
+        if(OP.LANC.value.equals(op)){
+            return "launch";
+        }else if(OP.CLK.value.equals(op)){
+            return "click";
+        }else if(OP.CLS.value.equals(op)){
+            return "close";
+        }else if(OP.OPEN.value.equals(op)){
+            return "open";
+        }
+        return op;
     }
 
     /**
