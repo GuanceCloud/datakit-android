@@ -59,7 +59,7 @@ public class SyncTaskManager {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                LogUtils.d(">>>同步轮询线程<<< 开始运行");
+                //LogUtils.d(">>>同步轮询线程<<< 开始运行");
                 List<RecordData> recordDataList = queryFromData();
                 //当数据库中有数据是执行轮询同步操作
                 while (recordDataList != null && !recordDataList.isEmpty()) {
@@ -82,7 +82,7 @@ public class SyncTaskManager {
                     }*/
                 }
                 running = false;
-                LogUtils.d(">>>同步轮询线程<<< 结束运行");
+                //LogUtils.d(">>>同步轮询线程<<< 结束运行");
             }
         });
     }
@@ -97,7 +97,7 @@ public class SyncTaskManager {
         }
         SyncDataManager syncDataManager = new SyncDataManager();
         String body = syncDataManager.getBodyContent(requestDatas);
-        LogUtils.d("同步的数据" + body);
+        printUpdateData(body);
         requestNet(body, new SyncCallback() {
             @Override
             public void isSuccess(boolean isSuccess) {
@@ -111,7 +111,7 @@ public class SyncTaskManager {
                 }
             }
         });
-        LogUtils.d("同步后查询" + queryFromData());
+        //LogUtils.d("同步后查询" + queryFromData());
     }
 
     private List<RecordData> queryFromData() {
@@ -147,5 +147,35 @@ public class SyncTaskManager {
 
     interface SyncCallback {
         void isSuccess(boolean isSuccess);
+    }
+
+    private void printUpdateData(String body){
+        try{
+            StringBuffer sb = new StringBuffer();
+            String[] counts = body.split("\n");
+            for(String str : counts) {
+                String[] strArr = str.split(" ");
+                sb.append("{\n ");
+                if (strArr.length == 3) {
+                    sb.append("field{\n\t");
+                    String str1 = strArr[0].replaceFirst(",", "\n },value{\n\t");
+                    str1 = str1.replaceAll(",", ",\n\t");
+                    str1 = str1.replaceFirst(",\n\t", ",\n ");
+                    sb.append(str1);
+                    sb.append("\n },\n ");
+                    sb.append("tag{\n\t");
+                    String str2 = strArr[1].replaceAll(",", ",\n\t");
+                    sb.append(str2);
+                    sb.append("\n },\n ");
+                    sb.append("time{\n\t");
+                    sb.append(strArr[2]);
+                    sb.append("\n }\n");
+                }
+                sb.append("},\n");
+            }
+            LogUtils.d("同步的数据\n"+sb.toString());
+        }catch (Exception e){
+            LogUtils.d("同步的数据\n"+body);
+        }
     }
 }

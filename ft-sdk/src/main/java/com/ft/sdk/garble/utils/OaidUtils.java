@@ -34,12 +34,12 @@ public class OaidUtils {
             try {
                 countDownLatch.await();
             } catch (InterruptedException e) {
-                LogUtils.d(e.getMessage());
+                //LogUtils.d(e.getMessage());
             }
-            LogUtils.d("CountDownLatch await");
+            //LogUtils.d("CountDownLatch await");
             return oaid;
         } catch (Exception e) {
-            LogUtils.d(e.getMessage());
+            //LogUtils.d(e.getMessage());
         }
         return "";
     }
@@ -76,7 +76,7 @@ public class OaidUtils {
             Method initSDK = midSDKHelper.getDeclaredMethod("InitSdk", Context.class, boolean.class, identifyListener);
             int errCode = (int) initSDK.invoke(null, context, true, iIdentifierListener);
             if (errCode != INIT_ERROR_RESULT_DELAY) {
-                LogUtils.d("get oaid failed : " + errCode);
+                //LogUtils.d("get oaid failed : " + errCode);
                 getOAIDReflect(context, --retryCount);
                 if (retryCount == 0) {
                     countDownLatch.countDown();
@@ -95,7 +95,7 @@ public class OaidUtils {
                 }
             }).start();
         } catch (Exception e) {
-            LogUtils.d(e.getMessage());
+            //LogUtils.d(e.getMessage());
             getOAIDReflect(context, --retryCount);
             if (retryCount == 0) {// 对于没有集成 jar 包，尝试后为 0
                 countDownLatch.countDown();
@@ -113,7 +113,7 @@ public class OaidUtils {
                         Class<?> idSupplier = Class.forName("com.bun.miitmdid.supplier.IdSupplier");
                         Method getOAID = idSupplier.getDeclaredMethod("getOAID");
                         oaid = (String) getOAID.invoke(args[1]);
-                        LogUtils.d("oaid:" + oaid);
+                        //LogUtils.d("oaid:" + oaid);
                     }
 
                     countDownLatch.countDown();
