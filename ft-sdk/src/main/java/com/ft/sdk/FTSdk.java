@@ -22,6 +22,7 @@ public class FTSdk {
         app.registerActivityLifecycleCallbacks(life);
         this.mFtSDKConfig = ftSDKConfig;
         initFTConfig();
+        trackStartApp();
     }
     public static synchronized FTSdk install(FTSDKConfig ftSDKConfig){
         if (FTSDK == null) {
@@ -36,8 +37,12 @@ public class FTSdk {
             FTAutoTrackConfig.get().initParams(mFtSDKConfig);
             LogUtils.setDebug(mFtSDKConfig.isDebug());
         }
-
     }
+
+    private void trackStartApp(){
+        FTAutoTrack.startApp();
+    }
+
 
 
 }
