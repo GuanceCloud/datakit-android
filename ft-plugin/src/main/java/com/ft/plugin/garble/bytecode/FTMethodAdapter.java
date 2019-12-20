@@ -108,14 +108,14 @@ public class FTMethodAdapter extends AdviceAdapter {
         /**
          * 写Application方法
          */
-        if (FTUtil.isInstanceOfApplication(superName)) {
+        /**if (FTUtil.isInstanceOfApplication(superName)) {
             FTMethodCell ftMethodCell = FTHookConfig.APPLICATION_METHODS.get(nameDesc);
             if (ftMethodCell != null) {
                 handleCode(ftMethodCell);
                 isHasTracked = true;
                 return;
             }
-        }
+        }**/
         /**
          * androidx/fragment/app/Fragment，androidx/fragment/app/ListFragment，androidx/fragment/app/DialogFragment
          */
