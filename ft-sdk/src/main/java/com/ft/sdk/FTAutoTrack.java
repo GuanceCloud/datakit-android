@@ -45,31 +45,22 @@ public class FTAutoTrack {
 
     /**
      * Activity 开启
-     * @param cName
-     * @param rName
      */
-    public static void activityOnCreate(String cName, String rName) {
-        if(!FTAutoTrackConfig.get().isAutoTrack()){
-            return;
-        }
+    public static void activityOnCreate(Class clazz) {
         try {
-            startPage(cName, rName);
+            startPage(clazz);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+
     /**
      * Activity 关闭
-     * @param cName
-     * @param rName
      */
-    public static void activityOnDestroy(String cName, String rName) {
-        if(!FTAutoTrackConfig.get().isAutoTrack()){
-            return;
-        }
+    public static void activityOnDestroy(Class clazz) {
         try {
-            destroyPage(cName, rName);
+            destroyPage(clazz);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -81,11 +72,8 @@ public class FTAutoTrack {
      * @param activity
      */
     public static void fragmentOnCreateView(Object clazz, Object activity) {
-        if(!FTAutoTrackConfig.get().isAutoTrack()){
-            return;
-        }
         try {
-            startPage(AopUtils.getClassName(clazz), AopUtils.getActivityName(activity));
+            startPage(clazz,activity);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -97,11 +85,8 @@ public class FTAutoTrack {
      * @param activity
      */
     public static void fragmentOnDestroyView(Object clazz, Object activity) {
-        if(!FTAutoTrackConfig.get().isAutoTrack()){
-            return;
-        }
         try {
-            destroyPage(AopUtils.getClassName(clazz), AopUtils.getActivityName(activity));
+            destroyPage(clazz,activity);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -194,15 +179,12 @@ public class FTAutoTrack {
      * @param isFromUser
      */
     public static void trackViewOnClick(Object object, View view, boolean isFromUser) {
-        if(!FTAutoTrackConfig.get().isAutoTrack()){
-            return;
-        }
         try {
             if(isFromUser) {
                 if(object == null){
                     object = AopUtils.getActivityFromContext(view.getContext());
                 }
-                clickView(AopUtils.getClassName(object), AopUtils.getSupperClassName(object), AopUtils.getViewTree(view));
+                clickView(view,object.getClass(),AopUtils.getClassName(object), AopUtils.getSupperClassName(object), AopUtils.getViewTree(view));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -218,20 +200,14 @@ public class FTAutoTrack {
     }
 
     public static void trackMenuItem(Object object, MenuItem menuItem) {
-        if(!FTAutoTrackConfig.get().isAutoTrack()){
-            return;
-        }
         try {
-            clickView(AopUtils.getClassName(object), AopUtils.getSupperClassName(object), "MenuItem/"+menuItem);
+            clickView((Class<?>) object,AopUtils.getClassName(object), AopUtils.getSupperClassName(object), "MenuItem/"+menuItem);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public static void trackDialog(DialogInterface dialogInterface, int whichButton) {
-        if(!FTAutoTrackConfig.get().isAutoTrack()){
-            return;
-        }
         try{
             Dialog dialog = null;
             if(dialogInterface instanceof Dialog){
@@ -247,26 +223,144 @@ public class FTAutoTrack {
                 activity = dialog.getOwnerActivity();
             }
 
-            clickView(AopUtils.getClassName(activity), AopUtils.getSupperClassName(activity), AopUtils.getDialogClickView(dialog,whichButton));
+            clickView(activity.getClass(),AopUtils.getClassName(activity), AopUtils.getSupperClassName(activity), AopUtils.getDialogClickView(dialog,whichButton));
         }catch (Exception e){
             e.printStackTrace();
         }
     }
 
 
+    /**
+     * APP 启动
+     */
     public static void startApp() {
+        if(!FTAutoTrackConfig.get().isAutoTrack()){
+            return;
+        }
+        if(!FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_SATRT)){
+            return;
+        }
         putRecord(OP.LANC, null, null, null);
     }
 
-    public static void startPage(String currentPage, String rootPage) {
-        putRecord(OP.OPEN, currentPage, rootPage, null);
+    /**
+     * 打开某个Fragment页面
+     * @param clazz
+     * @param activity
+     */
+    public static void startPage(Object clazz, Object activity) {
+        if(!FTAutoTrackConfig.get().isAutoTrack()){
+            return;
+        }
+        if(!FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_SATRT)) {
+            return;
+        }
+        if(FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(activity.getClass())){
+            return;
+        }
+
+        if(FTAutoTrackConfig.get().isIgnoreAutoTrackActivity((Class<?>)clazz)){
+            return;
+        }
+        putRecord(OP.OPEN, AopUtils.getClassName(clazz), AopUtils.getActivityName(activity), null);
     }
 
-    public static void destroyPage(String currentPage, String rootPage) {
-        putRecord(OP.CLS, currentPage, rootPage, null);
+    /**
+     * 关闭某个Fragment
+     * @param clazz
+     * @param activity
+     */
+    public static void destroyPage(Object clazz, Object activity) {
+        if(!FTAutoTrackConfig.get().isAutoTrack()){
+            return;
+        }
+        if(!FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_END)) {
+            return;
+        }
+        if(FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(activity.getClass())){
+            return;
+        }
+        if(FTAutoTrackConfig.get().isIgnoreAutoTrackActivity((Class<?>)clazz)){
+            return;
+        }
+        putRecord(OP.CLS, AopUtils.getClassName(clazz), AopUtils.getActivityName(activity), null);
     }
 
-    public static void clickView(String currentPage, String rootPage, String vtp) {
+    /**
+     * 打开某个Activity页面
+     * @param clazz
+     */
+    public static void startPage(Class<?> clazz) {
+        if(!FTAutoTrackConfig.get().isAutoTrack()){
+            return;
+        }
+        if(!FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_SATRT)) {
+            return;
+        }
+        if(FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)){
+            return;
+        }
+        putRecord(OP.OPEN, clazz.getSimpleName(), clazz.getSuperclass().getSimpleName(), null);
+    }
+
+    /**
+     * 关闭某个Activity
+     * @param clazz
+     */
+    public static void destroyPage(Class<?> clazz) {
+        if(!FTAutoTrackConfig.get().isAutoTrack()){
+            return;
+        }
+        if(!FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_END)) {
+            return;
+        }
+        if(FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)){
+            return;
+        }
+        putRecord(OP.CLS, clazz.getSimpleName(), clazz.getSuperclass().getSimpleName(), null);
+    }
+
+    /**
+     * 点击事件
+     * @param clazz
+     * @param currentPage
+     * @param rootPage
+     * @param vtp
+     */
+    public static void clickView(Class<?> clazz,String currentPage, String rootPage, String vtp) {
+        if(!FTAutoTrackConfig.get().isAutoTrack()){
+            return;
+        }
+        if(!FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_CLICK)) {
+            return;
+        }
+        if(FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)){
+            return;
+        }
+        putRecord(OP.CLK, currentPage, rootPage, vtp);
+    }
+
+    /**
+     * 点击事件
+     * @param view
+     * @param clazz
+     * @param currentPage
+     * @param rootPage
+     * @param vtp
+     */
+    public static void clickView(View view,Class<?> clazz,String currentPage, String rootPage, String vtp) {
+        if(!FTAutoTrackConfig.get().isAutoTrack()){
+            return;
+        }
+        if(!FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_CLICK)) {
+            return;
+        }
+        if(FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)){
+            return;
+        }
+        if(FTAutoTrackConfig.get().isViewIgnored(view)){
+            return;
+        }
         putRecord(OP.CLK, currentPage, rootPage, vtp);
     }
 
