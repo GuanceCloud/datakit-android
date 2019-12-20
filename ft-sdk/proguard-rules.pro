@@ -39,6 +39,14 @@
    public *;
 }
 
+-keep class com.ft.sdk.FTAutoTrack{
+     *;
+}
+
+-keep enum com.ft.sdk.FTAutoTrackType{
+     *;
+}
+
 -keep class com.ft.sdk.garble.http.ResponseData{
      *;
 }
@@ -46,4 +54,5 @@
 -keep class * extends com.ft.sdk.garble.http.ResponseData{
      *;
 }
+
 
