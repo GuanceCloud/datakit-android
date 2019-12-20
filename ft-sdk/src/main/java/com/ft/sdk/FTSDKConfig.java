@@ -1,6 +1,7 @@
 package com.ft.sdk;
 
 import java.security.InvalidParameterException;
+import java.util.List;
 
 /**
  * BY huangDianHua
@@ -15,20 +16,24 @@ public class FTSDKConfig {
     private boolean useOAID;
     private boolean isDebug;
     private boolean autoTrack;
-    public static FTSDKConfig Builder(String metricsUrl,boolean enableRequestSigning,String akId,String akSecret){
-        return new FTSDKConfig(metricsUrl,enableRequestSigning,akId,akSecret);
+    private int enableAutoTrackType;
+    private List<Class<?>> ignoreAutoTrackActivitys;
+    private List<Class<?>> ignoreAutoTrackViews;
+
+    public static FTSDKConfig Builder(String metricsUrl, boolean enableRequestSigning, String akId, String akSecret) {
+        return new FTSDKConfig(metricsUrl, enableRequestSigning, akId, akSecret);
     }
 
-    private FTSDKConfig(String metricsUrl,boolean enableRequestSigning,String akId,String akSecret){
+    private FTSDKConfig(String metricsUrl, boolean enableRequestSigning, String akId, String akSecret) {
         this.metricsUrl = metricsUrl;
         this.enableRequestSigning = enableRequestSigning;
         this.akId = akId;
         this.akSecret = akSecret;
-        if(enableRequestSigning){
-            if(akId == null){
+        if (enableRequestSigning) {
+            if (akId == null) {
                 throw new InvalidParameterException("akId 未初始化");
             }
-            if(akSecret == null){
+            if (akSecret == null) {
                 throw new InvalidParameterException("akSecret 未初始化");
             }
         }
@@ -64,6 +69,18 @@ public class FTSDKConfig {
         return autoTrack;
     }
 
+    public int getEnableAutoTrackType() {
+        return enableAutoTrackType;
+    }
+
+    public List<Class<?>> getIgnoreAutoTrackActivitys() {
+        return ignoreAutoTrackActivitys;
+    }
+
+    public List<Class<?>> getIgnoreAutoTrackViews() {
+        return ignoreAutoTrackViews;
+    }
+
     public FTSDKConfig setAutoTrack(boolean autoTrack) {
         this.autoTrack = autoTrack;
         return this;
@@ -78,4 +95,20 @@ public class FTSDKConfig {
         isDebug = debug;
         return this;
     }
+
+    public FTSDKConfig setEnableAutoTrackType(int type) {
+        enableAutoTrackType = type;
+        return this;
+    }
+
+    public FTSDKConfig setIgnoreAutoTrackActivitys(List<Class<?>> clazzes) {
+        ignoreAutoTrackActivitys = clazzes;
+        return this;
+    }
+
+    public FTSDKConfig setIgnoreAutoTrackViews(List<Class<?>> classes){
+        ignoreAutoTrackViews = classes;
+        return this;
+    }
+
 }
