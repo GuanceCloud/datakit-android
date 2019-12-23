@@ -15,9 +15,16 @@ import java.util.List;
  */
 public class FTAutoTrackConfig {
     private boolean autoTrack;
+
+    //以下三个为白名单
     private int enableAutoTrackType;
-    private ArrayList<Integer> ignoreAutoTrackActivitys;
-    private ArrayList<Class<?>> ignoreAutoTrackViews;
+    private List<Integer> onlyAutoTrackActivities;
+    private List<Class<?>> onlyAutoTrackViews;
+
+    //以下三个为设置黑名单
+    private int disableAutoTrackType;
+    private List<Integer> ignoreAutoTrackActivities;
+    private List<Class<?>> ignoreAutoTrackViews;
     private static FTAutoTrackConfig instance;
 
 
@@ -37,54 +44,73 @@ public class FTAutoTrackConfig {
         }
         autoTrack = ftsdkConfig.isAutoTrack();
         enableAutoTrackType = ftsdkConfig.getEnableAutoTrackType();
-        addIgnoreAutoTrackActivity(ftsdkConfig.getIgnoreAutoTrackActivitys());
+        addOnlyAutoTrackActivity(ftsdkConfig.getOnlyAutoTrackActivities());
+        addOnlyAutoTrackView(ftsdkConfig.getOnlyAutoTrackViews());
+
+        disableAutoTrackType = ftsdkConfig.getDisableAutoTrackType();
+        addIgnoreAutoTrackActivity(ftsdkConfig.getIgnoreAutoTrackActivities());
         addIgnoreAutoTrackView(ftsdkConfig.getIgnoreAutoTrackViews());
     }
 
-    private void addIgnoreAutoTrackActivity(List<Class<?>> classes){
-        if(classes != null && !classes.isEmpty()){
-            if(ignoreAutoTrackActivitys == null){
-                ignoreAutoTrackActivitys = new ArrayList<>();
+    private void addOnlyAutoTrackActivity(List<Class<?>> classes) {
+        if (classes != null && !classes.isEmpty()) {
+            if (onlyAutoTrackActivities == null) {
+                onlyAutoTrackActivities = new ArrayList<>();
             }
             int hashCode;
-            for (Class<?> activity:classes){
+            for (Class<?> activity : classes) {
                 hashCode = activity.hashCode();
-                if(!ignoreAutoTrackActivitys.contains(hashCode)){
-                    ignoreAutoTrackActivitys.add(hashCode);
+                if (!onlyAutoTrackActivities.contains(hashCode)) {
+                    onlyAutoTrackActivities.add(hashCode);
                 }
             }
         }
     }
 
-    private void addIgnoreAutoTrackView(List<Class<?>> classes){
-        if(classes != null && !classes.isEmpty()){
-            if(ignoreAutoTrackViews == null){
+    private void addOnlyAutoTrackView(List<Class<?>> classes) {
+        if (classes != null && !classes.isEmpty()) {
+            if (onlyAutoTrackViews == null) {
+                onlyAutoTrackViews = new ArrayList<>();
+            }
+            for (Class<?> view : classes) {
+                if (!onlyAutoTrackViews.contains(view)) {
+                    onlyAutoTrackViews.add(view);
+                }
+            }
+        }
+    }
+
+    private void addIgnoreAutoTrackActivity(List<Class<?>> classes) {
+        if (classes != null && !classes.isEmpty()) {
+            if (ignoreAutoTrackActivities == null) {
+                ignoreAutoTrackActivities = new ArrayList<>();
+            }
+            int hashCode;
+            for (Class<?> activity : classes) {
+                hashCode = activity.hashCode();
+                if (!ignoreAutoTrackActivities.contains(hashCode)) {
+                    ignoreAutoTrackActivities.add(hashCode);
+                }
+            }
+        }
+    }
+
+    private void addIgnoreAutoTrackView(List<Class<?>> classes) {
+        if (classes != null && !classes.isEmpty()) {
+            if (ignoreAutoTrackViews == null) {
                 ignoreAutoTrackViews = new ArrayList<>();
             }
-            for (Class<?> view:classes){
-                if(!ignoreAutoTrackViews.contains(view)){
+            for (Class<?> view : classes) {
+                if (!ignoreAutoTrackViews.contains(view)) {
                     ignoreAutoTrackViews.add(view);
                 }
             }
         }
     }
-    /**
-     * 是否忽略Activity
-     * @param activity
-     * @return
-     */
-    public boolean isIgnoreAutoTrackActivity(Class<?> activity){
-        if(activity == null){
-            return false;
-        }
-        if(ignoreAutoTrackActivitys != null && ignoreAutoTrackActivitys.contains(activity.hashCode())){
-            return true;
-        }
-        return false;
-    }
 
     /**
      * 是否开启自动埋点
+     *
      * @return
      */
     public boolean isAutoTrack() {
@@ -92,24 +118,106 @@ public class FTAutoTrackConfig {
     }
 
     /**
-     * 开启的自动埋点类型
+     * 自动埋点类型白名单
+     *
      * @param type
      * @return
      */
-    public boolean enableAutoTrackType(FTAutoTrackType type){
-        if((enableAutoTrackType|type.type) == enableAutoTrackType){
+    public boolean enableAutoTrackType(FTAutoTrackType type) {
+        if(enableAutoTrackType == 0){
+            return true;
+        }
+        if ((enableAutoTrackType | type.type) == enableAutoTrackType) {
             return true;
         }
         return false;
     }
 
     /**
-     * 判断 View 是否被忽略
+     * Activity 是否是白名单
+     *
+     * @param activity
+     * @return
+     */
+    public boolean isOnlyAutoTrackActivity(Class<?> activity) {
+        if (activity == null) {
+            return true;
+        }
+        if (onlyAutoTrackActivities == null || onlyAutoTrackActivities.isEmpty()) {
+            return true;
+        }
+        if (onlyAutoTrackActivities.contains(activity.hashCode())) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * View 是否在白名单里
+     *
+     * @param view
+     * @return
+     */
+    public boolean isOnlyView(View view) {
+        try {
+            if (view == null) {
+                return true;
+            }
+            if (onlyAutoTrackViews == null || onlyAutoTrackViews.isEmpty()) {
+                return true;
+            }
+
+            for (Class<?> clazz : onlyAutoTrackViews) {
+                if (clazz.isAssignableFrom(view.getClass())) {
+                    return true;
+                }
+            }
+
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * 自动埋点类型黑名单
+     *
+     * @param type
+     * @return
+     */
+    public boolean disableAutoTrackType(FTAutoTrackType type) {
+        if(disableAutoTrackType == 0){
+            return false;
+        }
+        if ((disableAutoTrackType | type.type) == disableAutoTrackType) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Activity 黑名单
+     *
+     * @param activity
+     * @return
+     */
+    public boolean isIgnoreAutoTrackActivity(Class<?> activity) {
+        if (activity == null) {
+            return false;
+        }
+        if (ignoreAutoTrackActivities != null && ignoreAutoTrackActivities.contains(activity.hashCode())) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * View 黑名单
      *
      * @param view View
      * @return 是否被忽略
      */
-    public boolean isViewIgnored(View view) {
+    public boolean isIgnoreView(View view) {
         try {
             if (view == null) {
                 return false;
