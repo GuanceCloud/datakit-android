@@ -179,7 +179,7 @@ public class SyncDataManager {
         if (sb.length() > 0) {
             sb.insert(0, ",");
             String temp = sb.toString().replaceAll(" ", "\\\\ ");
-            sb.delete(0, sb.length() - 1);
+            sb.delete(0, sb.length());
             sb.append(temp);
         }
         sb.append(" ");
