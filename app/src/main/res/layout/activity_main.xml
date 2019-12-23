@@ -1,35 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <TextView
-        android:onClick="clickText"
+    <Button
+        android:id="@+id/btn_lam"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="lamble" />
+
+    <Button
+        android:id="@+id/showKotlinActivity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="跳转到KotlinActivity" />
+
+    <CheckBox
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-    <Button
-        android:onClick="gotoFFragment"
+        android:id="@+id/checkbox"
+        android:text="文本选择框"/>
+    <RatingBar
+        android:id="@+id/ratingbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <SeekBar
+        android:id="@+id/seekbar"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"/>
+    <RadioGroup
+        android:id="@+id/radioGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="跳转到第一个Fragment"/>
+        android:orientation="horizontal">
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="正确"/>
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="错误"/>
+    </RadioGroup>
     <Button
-        android:onClick="gotoSFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="跳转到第二个Fragment"/>
-    <FrameLayout
-        android:layout_width="200dp"
-        android:layout_height="100dp"
-        android:id="@+id/fragment"
-        android:background="@color/colorPrimary"/>
+        android:id="@+id/showDialog"
+        android:text="弹框"/>
 
 </LinearLayout>

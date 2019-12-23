@@ -16,6 +16,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -27,31 +31,8 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-    implementation project(path: ':ft-sdk')
-}
-
-repositories {
-    jcenter()
-    google()
-    mavenLocal()
-    maven {
-        url 'https://mvnrepo.jiagouyun.com/repository/maven-releases'
-    }
-
-}
-
-buildscript {
-    repositories {
-        jcenter()
-        google()
-        mavenLocal()
-        maven {
-            url 'https://mvnrepo.jiagouyun.com/repository/maven-releases'
-        }
-    }
-    dependencies {
-        classpath 'com.cloudcare.ft.mobile.sdk.traker.plugin:ft-plugin:1.0.0-alpha3'
-    }
+    implementation files('libs/miit_mdid_1.0.10.aar')
+    implementation 'com.cloudcare.ft.mobile.sdk.traker.agent:ft-sdk:1.0.0-alpha9e'
 }
 
 
@@ -60,6 +41,4 @@ apply plugin: 'ft-plugin'
 FTExt {
     runVariant = 'DEBUG'
     showLog = true
-//    whitelist = ['com.quinn.hunter.timing.DataSource']
-//    blacklist = ['com.quinn.hunter.timing.black']
 }
