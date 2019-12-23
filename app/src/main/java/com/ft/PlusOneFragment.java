@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 
-import com.ft.sdk.FTAutoTrack;
 import com.google.android.gms.plus.PlusOneButton;
 
 /**
@@ -72,7 +71,6 @@ public class PlusOneFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        FTAutoTrack.fragmentOnCreateView(getClass().getSimpleName(),super.getActivity().getLocalClassName());
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_plus_one, container, false);
 
