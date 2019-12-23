@@ -1,70 +1,116 @@
 package com.ft;
 
-import android.net.Uri;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.RadioGroup;
+import android.widget.RatingBar;
+import android.widget.SeekBar;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 
 
-public class MainActivity extends AppCompatActivity implements PlusOneFragment.OnFragmentInteractionListener, BlankFragment.OnFragmentInteractionListener {
-    private FrameLayout fragmentFL;
-    FragmentManager fragmentManager;
-    Fragment fragment1;
-    Fragment fragment2;
+public class MainActivity extends AppCompatActivity {
+    private Button showKotlinActivity;
+    private Button btn_lam;
+    private CheckBox checkbox;
+    private RatingBar ratingbar;
+    private SeekBar seekbar;
+    private RadioGroup radioGroup;
+    private Button showDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        fragmentFL = findViewById(R.id.fragment);
-        fragmentManager = getSupportFragmentManager();
-        fragment1 = PlusOneFragment.newInstance("12","23");
-        fragment2 = BlankFragment.newInstance("12","23");
-        gotoFFragment(fragmentFL);
+        setTitle("FT-SDK使用Demo");
+        showKotlinActivity = findViewById(R.id.showKotlinActivity);
+        btn_lam = findViewById(R.id.btn_lam);
+        checkbox = findViewById(R.id.checkbox);
+        ratingbar = findViewById(R.id.ratingbar);
+        seekbar = findViewById(R.id.seekbar);
+        radioGroup = findViewById(R.id.radioGroup);
+        showDialog = findViewById(R.id.showDialog);
+        showKotlinActivity.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, Main2Activity.class)));
+        btn_lam.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+        checkbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+
+        });
+        ratingbar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
+
+        });
+        seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+
+        });
+        showDialog.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("这是一个弹框标题");
+            builder.setItems(new String[]{"hhh", "dddd", "iiiii", "oooooo"}, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+            builder.setNegativeButton("取消", (dialog, which) -> {
+
+            });
+            builder.setPositiveButton("确定", (dialog, which) -> {
+
+            });
+            builder.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        });
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-
-    public void clickText(View view) {
-
-    }
-
-    public void gotoFFragment(View view) {
-        if(!fragment1.isAdded()){
-            fragmentManager.beginTransaction().add(R.id.fragment,fragment1,"fragment1").commitAllowingStateLoss();
-        }else{
-            fragmentManager.beginTransaction().show(fragment1).commitAllowingStateLoss();
-        }
-        if(fragment2.isAdded()) {
-            fragmentManager.beginTransaction().hide(fragment2).commitAllowingStateLoss();
-        }
-    }
-
-    public void gotoSFragment(View view) {
-        if(!fragment2.isAdded()){
-            fragmentManager.beginTransaction().add(R.id.fragment,fragment2,"fragment2").commitAllowingStateLoss();
-        }else{
-            fragmentManager.beginTransaction().show(fragment2).commitAllowingStateLoss();
-        }
-        if(fragment1.isAdded()) {
-            fragmentManager.beginTransaction().hide(fragment1).commitAllowingStateLoss();
-        }
-    }
-
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        return super.onOptionsItemSelected(item);
     }
 }
