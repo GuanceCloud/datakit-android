@@ -16,8 +16,14 @@ public class FTSDKConfig {
     private boolean useOAID;
     private boolean isDebug;
     private boolean autoTrack;
+    //以下三个为白名单
     private int enableAutoTrackType;
-    private List<Class<?>> ignoreAutoTrackActivitys;
+    private List<Class<?>> onlyAutoTrackActivities;
+    private List<Class<?>> onlyAutoTrackViews;
+
+    //以下三个为设置黑名单
+    private int disableAutoTrackType;
+    private List<Class<?>> ignoreAutoTrackActivities;
     private List<Class<?>> ignoreAutoTrackViews;
 
     public static FTSDKConfig Builder(String metricsUrl, boolean enableRequestSigning, String akId, String akSecret) {
@@ -73,8 +79,20 @@ public class FTSDKConfig {
         return enableAutoTrackType;
     }
 
-    public List<Class<?>> getIgnoreAutoTrackActivitys() {
-        return ignoreAutoTrackActivitys;
+    public List<Class<?>> getOnlyAutoTrackActivities(){
+        return onlyAutoTrackActivities;
+    }
+
+    public List<Class<?>> getOnlyAutoTrackViews(){
+        return onlyAutoTrackViews;
+    }
+
+    public int getDisableAutoTrackType(){
+        return disableAutoTrackType;
+    }
+
+    public List<Class<?>> getIgnoreAutoTrackActivities() {
+        return ignoreAutoTrackActivities;
     }
 
     public List<Class<?>> getIgnoreAutoTrackViews() {
@@ -101,8 +119,23 @@ public class FTSDKConfig {
         return this;
     }
 
-    public FTSDKConfig setIgnoreAutoTrackActivitys(List<Class<?>> clazzes) {
-        ignoreAutoTrackActivitys = clazzes;
+    public FTSDKConfig setOnlyAutoTrackActivities(List<Class<?>> classes){
+        onlyAutoTrackActivities = classes;
+        return this;
+    }
+
+    public FTSDKConfig setOnlyAutoTrackViews(List<Class<?>> classes){
+        onlyAutoTrackViews = classes;
+        return this;
+    }
+
+    public FTSDKConfig setDisableAutoTrackType(int type){
+        disableAutoTrackType = type;
+        return this;
+    }
+
+    public FTSDKConfig setIgnoreAutoTrackActivities(List<Class<?>> classes) {
+        ignoreAutoTrackActivities = classes;
         return this;
     }
 

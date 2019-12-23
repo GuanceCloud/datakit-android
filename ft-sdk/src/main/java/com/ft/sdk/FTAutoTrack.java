@@ -237,7 +237,7 @@ public class FTAutoTrack {
         if(!FTAutoTrackConfig.get().isAutoTrack()){
             return;
         }
-        if(!FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_SATRT)){
+        if(!FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_START)){
             return;
         }
         putRecord(OP.LANC, null, null, null);
@@ -249,16 +249,32 @@ public class FTAutoTrack {
      * @param activity
      */
     public static void startPage(Object clazz, Object activity) {
+        /*没有开启自动埋点*/
         if(!FTAutoTrackConfig.get().isAutoTrack()){
             return;
         }
-        if(!FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_SATRT)) {
-            return;
-        }
-        if(FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(activity.getClass())){
+        /*设置了白名单，但当前事件不在其中*/
+        if(!FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_START)) {
             return;
         }
 
+        /*设置了白名单，但当前页面不在其中*/
+        if(!FTAutoTrackConfig.get().isOnlyAutoTrackActivity(activity.getClass())){
+            return;
+        }
+        /*设置了白名单，但当前页面不在其中*/
+        if(!FTAutoTrackConfig.get().isOnlyAutoTrackActivity((Class<?>) clazz)){
+            return;
+        }
+        /*设置了黑名单，且事件在其中*/
+        if(FTAutoTrackConfig.get().disableAutoTrackType(FTAutoTrackType.APP_START)){
+            return;
+        }
+        /*设置了黑名单，且页面在其中*/
+        if(FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(activity.getClass())){
+            return;
+        }
+        /*设置了黑名单，且页面在其中*/
         if(FTAutoTrackConfig.get().isIgnoreAutoTrackActivity((Class<?>)clazz)){
             return;
         }
@@ -271,15 +287,32 @@ public class FTAutoTrack {
      * @param activity
      */
     public static void destroyPage(Object clazz, Object activity) {
+        /*没有开启自动埋点*/
         if(!FTAutoTrackConfig.get().isAutoTrack()){
             return;
         }
+        /*设置了白名单，但当前事件不在其中*/
         if(!FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_END)) {
             return;
         }
+
+        /*设置了白名单，但当前页面不在其中*/
+        if(!FTAutoTrackConfig.get().isOnlyAutoTrackActivity(activity.getClass())){
+            return;
+        }
+        /*设置了白名单，但当前页面不在其中*/
+        if(!FTAutoTrackConfig.get().isOnlyAutoTrackActivity((Class<?>) clazz)){
+            return;
+        }
+        /*设置了黑名单，且事件在其中*/
+        if(FTAutoTrackConfig.get().disableAutoTrackType(FTAutoTrackType.APP_END)){
+            return;
+        }
+        /*设置了黑名单，且页面在其中*/
         if(FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(activity.getClass())){
             return;
         }
+        /*设置了黑名单，且页面在其中*/
         if(FTAutoTrackConfig.get().isIgnoreAutoTrackActivity((Class<?>)clazz)){
             return;
         }
@@ -291,12 +324,23 @@ public class FTAutoTrack {
      * @param clazz
      */
     public static void startPage(Class<?> clazz) {
+        /*没有开启自动埋点*/
         if(!FTAutoTrackConfig.get().isAutoTrack()){
             return;
         }
-        if(!FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_SATRT)) {
+        /*设置了白名单，但当前事件不在其中*/
+        if(!FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_START)) {
             return;
         }
+        /*设置了白名单，但当前页面不在其中*/
+        if(!FTAutoTrackConfig.get().isOnlyAutoTrackActivity(clazz)){
+            return;
+        }
+        /*设置了黑名单，且事件在其中*/
+        if(FTAutoTrackConfig.get().disableAutoTrackType(FTAutoTrackType.APP_START)){
+            return;
+        }
+        /*设置了黑名单，且页面在其中*/
         if(FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)){
             return;
         }
@@ -308,12 +352,23 @@ public class FTAutoTrack {
      * @param clazz
      */
     public static void destroyPage(Class<?> clazz) {
+        /*没有开启自动埋点*/
         if(!FTAutoTrackConfig.get().isAutoTrack()){
             return;
         }
+        /*设置了白名单，但当前事件不在其中*/
         if(!FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_END)) {
             return;
         }
+        /*设置了白名单，但当前页面不在其中*/
+        if(!FTAutoTrackConfig.get().isOnlyAutoTrackActivity(clazz)){
+            return;
+        }
+        /*设置了黑名单，且事件在其中*/
+        if(FTAutoTrackConfig.get().disableAutoTrackType(FTAutoTrackType.APP_END)){
+            return;
+        }
+        /*设置了黑名单，且页面在其中*/
         if(FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)){
             return;
         }
@@ -332,6 +387,14 @@ public class FTAutoTrack {
             return;
         }
         if(!FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_CLICK)) {
+            return;
+        }
+
+        if(!FTAutoTrackConfig.get().isOnlyAutoTrackActivity(clazz)){
+            return;
+        }
+
+        if(FTAutoTrackConfig.get().disableAutoTrackType(FTAutoTrackType.APP_CLICK)){
             return;
         }
         if(FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)){
@@ -355,10 +418,20 @@ public class FTAutoTrack {
         if(!FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_CLICK)) {
             return;
         }
+        if(!FTAutoTrackConfig.get().isOnlyAutoTrackActivity(clazz)){
+            return;
+        }
+        if(!FTAutoTrackConfig.get().isOnlyView(view)){
+            return;
+        }
+
+        if(FTAutoTrackConfig.get().disableAutoTrackType(FTAutoTrackType.APP_CLICK)){
+            return;
+        }
         if(FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)){
             return;
         }
-        if(FTAutoTrackConfig.get().isViewIgnored(view)){
+        if(FTAutoTrackConfig.get().isIgnoreView(view)){
             return;
         }
         putRecord(OP.CLK, currentPage, rootPage, vtp);
