@@ -16,7 +16,6 @@ public class FTUtil {
     private static final HashSet<String> targetV4FragmentClass = new HashSet<>();
     private static final HashSet<String> targetActivityClass = new HashSet<>();
     private static final HashSet<String> targetMenuMethodDesc = new HashSet<>();
-    private static final HashSet<String> targetApplicationClass = new HashSet<>();
     private static final HashSet<String> specialClass = new HashSet<>();
 
     static {
@@ -27,12 +26,6 @@ public class FTUtil {
         targetMenuMethodDesc.add("onOptionsItemSelected(Landroid/view/MenuItem;)Z");
         targetMenuMethodDesc.add("onNavigationItemSelected(Landroid/view/MenuItem;)Z");
 
-        /**
-         * For Android Application
-         */
-
-        targetApplicationClass.add("androidx.multidex.MultiDexApplication");
-        targetApplicationClass.add("android/app/Application");
         /**
          * For Android App Fragment
          */
@@ -65,10 +58,7 @@ public class FTUtil {
         targetActivityClass.add("androidx/fragment/app/FragmentActivity");
 
         /** 将一些特例需要排除在外 */
-        specialClass.add("android.support.design.widget.TabLayout$ViewPagerOnTabSelectedListener");
-        specialClass.add("com.google.android.material.tabs.TabLayout$ViewPagerOnTabSelectedListener");
-        specialClass.add("android.support.v7.app.ActionBarDrawerToggle");
-        specialClass.add("androidx.appcompat.app.ActionBarDrawerToggle");
+        specialClass.add("com.bumptech.glide.manager.SupportRequestManagerFragment");
 
     }
 
@@ -80,9 +70,6 @@ public class FTUtil {
         return (access & Opcodes.ACC_STATIC) != 0;
     }
 
-    public static boolean isInstanceOfApplication(String nameDesc) {
-        return targetApplicationClass.contains(nameDesc);
-    }
 
     public static boolean isTargetMenuMethodDesc(String nameDesc) {
         return targetMenuMethodDesc.contains(nameDesc);
