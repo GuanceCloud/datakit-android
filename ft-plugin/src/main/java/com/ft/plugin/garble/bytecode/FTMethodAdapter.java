@@ -105,17 +105,10 @@ public class FTMethodAdapter extends AdviceAdapter {
     }
 
     void handleCode() {
-        /**
-         * 写Application方法
-         */
-        /**if (FTUtil.isInstanceOfApplication(superName)) {
-            FTMethodCell ftMethodCell = FTHookConfig.APPLICATION_METHODS.get(nameDesc);
-            if (ftMethodCell != null) {
-                handleCode(ftMethodCell);
-                isHasTracked = true;
-                return;
-            }
-        }**/
+        if (FTUtil.isTargetClassInSpecial(className)) {
+            return;
+        }
+
         /**
          * androidx/fragment/app/Fragment，androidx/fragment/app/ListFragment，androidx/fragment/app/DialogFragment
          */
@@ -210,10 +203,8 @@ public class FTMethodAdapter extends AdviceAdapter {
             return;
         }
 
-        if (!FTUtil.isTargetClassInSpecial(className)) {
-            if ((className.startsWith("android/") || className.startsWith("androidx/")) && !(className.startsWith("android/support/v17/leanback") || className.startsWith("androidx/leanback"))) {
-                return;
-            }
+        if ((className.startsWith("android/") || className.startsWith("androidx/")) && !(className.startsWith("android/support/v17/leanback") || className.startsWith("androidx/leanback"))) {
+            return;
         }
 
         /**
