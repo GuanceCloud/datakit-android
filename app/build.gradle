@@ -30,7 +30,10 @@ dependencies {
     implementation 'com.google.android.gms:play-services-plus:16.0.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test:rules:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2-alpha03'
+
     implementation files('libs/miit_mdid_1.0.10.aar')
     implementation 'com.cloudcare.ft.mobile.sdk.traker.agent:ft-sdk:1.0.0-alpha9e'
 }

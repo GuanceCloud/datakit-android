@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.RatingBar;
 import android.widget.SeekBar;
@@ -16,6 +17,8 @@ import android.widget.SeekBar;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.bumptech.glide.Glide;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -26,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private SeekBar seekbar;
     private RadioGroup radioGroup;
     private Button showDialog;
+    private ImageView iv_glide;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         seekbar = findViewById(R.id.seekbar);
         radioGroup = findViewById(R.id.radioGroup);
         showDialog = findViewById(R.id.showDialog);
+        iv_glide = findViewById(R.id.iv_glide);
         showKotlinActivity.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, Main2Activity.class)));
         btn_lam.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,6 +106,9 @@ public class MainActivity extends AppCompatActivity {
             AlertDialog dialog = builder.create();
             dialog.show();
         });
+        Glide.with(this)
+                .load("https://github.com/bumptech/glide/raw/master/static/glide_logo.png")
+                .into(iv_glide);
     }
 
     @Override

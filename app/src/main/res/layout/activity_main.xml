@@ -10,7 +10,7 @@
         android:id="@+id/btn_lam"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="lamble" />
+        android:text="lambda" />
 
     <Button
         android:id="@+id/showKotlinActivity"
@@ -37,10 +37,12 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         <RadioButton
+            android:id="@+id/radio1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="正确"/>
         <RadioButton
+            android:id="@+id/radio2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="错误"/>
@@ -50,5 +52,9 @@
         android:layout_height="wrap_content"
         android:id="@+id/showDialog"
         android:text="弹框"/>
+    <ImageView
+        android:layout_width="200dp"
+        android:layout_height="40dp"
+        android:id="@+id/iv_glide"/>
 
 </LinearLayout>
