@@ -66,13 +66,21 @@ public class FTDBManager extends DBManager {
         });
     }
 
-    public List<RecordData> queryDataByDescLimit(final String limit) {
+    /**
+     * @param limit limit == 0 表示获取全部数据
+     * @return
+     */
+    public List<RecordData> queryDataByDescLimit(final int limit) {
         final List<RecordData> recordList = new ArrayList<>();
         getDB(false, new DataBaseCallBack() {
             @Override
             public void run(SQLiteDatabase db) {
-
-                Cursor cursor = db.query(FTSQL.FT_TABLE_NAME, null, null, null, null, null, FTSQL.RECORD_COLUMN_ID+" desc",limit);
+                Cursor cursor;
+                if(limit == 0) {
+                    cursor = db.query(FTSQL.FT_TABLE_NAME, null, null, null, null, null, FTSQL.RECORD_COLUMN_ID + " desc");
+                }else{
+                    cursor = db.query(FTSQL.FT_TABLE_NAME, null, null, null, null, null, FTSQL.RECORD_COLUMN_ID + " desc",""+limit);
+                }
                 while (cursor.moveToNext()) {
                     long id = cursor.getLong(cursor.getColumnIndex(FTSQL.RECORD_COLUMN_ID));
                     long time = cursor.getLong(cursor.getColumnIndex(FTSQL.RECORD_COLUMN_TM));
@@ -99,6 +107,18 @@ public class FTDBManager extends DBManager {
                 }
                 db.setTransactionSuccessful();
                 db.endTransaction();
+            }
+        });
+    }
+
+    /**
+     * 测试使用，用于删除数据库中的数据
+     */
+    public void delete(){
+        getDB(true, new DataBaseCallBack() {
+            @Override
+            public void run(SQLiteDatabase db) {
+                db.delete(FTSQL.FT_TABLE_NAME,null,null);
             }
         });
     }
