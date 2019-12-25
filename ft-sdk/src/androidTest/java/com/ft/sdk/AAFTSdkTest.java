@@ -12,7 +12,7 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({DeviceUtilsTest.class,
         FTTrackTest.class,
         GenericsUtilsTest.class,
-        HttpTest.class,
+        FTDBManagerTest.class,
         ThreadPoolutilsTest.class,
         UtilsTest.class})
 public class AAFTSdkTest {
