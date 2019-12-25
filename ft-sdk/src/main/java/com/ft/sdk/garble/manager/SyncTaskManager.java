@@ -2,9 +2,8 @@ package com.ft.sdk.garble.manager;
 
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.db.FTDBManager;
-import com.ft.sdk.garble.http.FTHttpClient;
 import com.ft.sdk.garble.http.FTResponseData;
-import com.ft.sdk.garble.http.HttpCallback;
+import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
@@ -127,33 +126,30 @@ public class SyncTaskManager {
     }
 
     private void requestNet(String body, final SyncCallback syncCallback) {
-        FTHttpClient.Builder()
+        FTResponseData result = HttpBuilder.Builder()
                 .setMethod(RequestMethod.POST)
-                .setBodyString(body)
-                .execute(new HttpCallback<FTResponseData>() {
-                    @Override
-                    public void onComplete(FTResponseData result) {
-                        try {
-                            syncCallback.isSuccess(result.getCode() == HttpURLConnection.HTTP_OK);
-                        } catch (Exception e) {
-                            syncCallback.isSuccess(false);
-                            LogUtils.e("请在混淆文件中添加 -keep class * extends com.ft.sdk.garble.http.ResponseData{\n" +
-                                    "     *;\n" +
-                                    "}");
-                        }
-                    }
-                });
+                .setBodyString(body).executeSync(FTResponseData.class);
+
+        try {
+            syncCallback.isSuccess(result.getCode() == HttpURLConnection.HTTP_OK);
+        } catch (Exception e) {
+            syncCallback.isSuccess(false);
+            LogUtils.e("请在混淆文件中添加 -keep class * extends com.ft.sdk.garble.http.ResponseData{\n" +
+                    "     *;\n" +
+                    "}");
+        }
+
     }
 
     interface SyncCallback {
         void isSuccess(boolean isSuccess);
     }
 
-    private void printUpdateData(String body){
-        try{
+    private void printUpdateData(String body) {
+        try {
             StringBuffer sb = new StringBuffer();
             String[] counts = body.split("\n");
-            for(String str : counts) {
+            for (String str : counts) {
                 String[] strArr = str.split(" ");
                 sb.append("{\n ");
                 if (strArr.length == 3) {
@@ -173,9 +169,9 @@ public class SyncTaskManager {
                 }
                 sb.append("},\n");
             }
-            LogUtils.d("同步的数据\n"+sb.toString());
-        }catch (Exception e){
-            LogUtils.d("同步的数据\n"+body);
+            LogUtils.d("同步的数据\n" + sb.toString());
+        } catch (Exception e) {
+            LogUtils.d("同步的数据\n" + body);
         }
     }
 }
