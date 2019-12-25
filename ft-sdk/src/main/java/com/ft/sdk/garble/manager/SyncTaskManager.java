@@ -27,6 +27,14 @@ public class SyncTaskManager {
     private volatile AtomicInteger errorCount = new AtomicInteger(0);
     private volatile boolean running;
 
+    /**
+     * 警告!!! 该方法仅用于测试使用!!!
+     * @param running
+     */
+    public void setRunning(boolean running) {
+        this.running = running;
+    }
+
     private SyncTaskManager() {
 
     }
@@ -114,7 +122,7 @@ public class SyncTaskManager {
     }
 
     private List<RecordData> queryFromData() {
-        return FTDBManager.get().queryDataByDescLimit("10");
+        return FTDBManager.get().queryDataByDescLimit(10);
     }
 
     private void deleteLastQuery(List<RecordData> list) {
