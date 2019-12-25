@@ -1,7 +1,6 @@
 package com.ft.sdk.garble.http;
 
 import com.ft.sdk.garble.FTHttpConfig;
-import com.ft.sdk.garble.utils.GenericsUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
@@ -38,9 +37,6 @@ public abstract class HttpClient {
     protected boolean connSuccess = false;
     protected FTHttpConfig ftHttpConfig = FTHttpConfig.get();
 
-    public static HttpBuilder Builder() {
-        return new HttpBuilder();
-    }
 
     protected abstract String getBodyContent();
 
@@ -111,25 +107,23 @@ public abstract class HttpClient {
         mConnection.setReadTimeout(mHttpBuilder.getReadOutTime());
     }
 
-    public void execute(final HttpCallback httpCallback) {
+    public <T extends ResponseData> T execute(Class<T> tClass) {
         try {
-            request(httpCallback);
+            return request(tClass);
         } catch (Exception e) {
             LogUtils.e(e.getMessage());
+            return getResponseData(tClass,NET_UNKNOWN_ERR,e.getMessage());
         }
     }
 
-    private void request(HttpCallback httpCallback) {
-        Class clazz = GenericsUtils.getInterfaceClassGenricType(httpCallback.getClass());
+    private <T extends ResponseData> T request(Class<T> tClass)  {
         if(!connSuccess){
-            httpCallback.onComplete(getResponseData(clazz,NET_STATUS_NOT_CONNECT_HOST,
-                    NET_STATUS_NOT_CONNECT_HOST_ERR));
-            return;
+            return getResponseData(tClass,NET_STATUS_NOT_CONNECT_HOST,
+                    NET_STATUS_NOT_CONNECT_HOST_ERR);
         }
         if (!Utils.isNetworkAvailable()) {
-            httpCallback.onComplete(getResponseData(clazz,NET_STATUS_UNCONNECT,
-                    NET_STATUS_UNCONNECT_ERR));
-            return;
+            return getResponseData(tClass,NET_STATUS_UNCONNECT,
+                    NET_STATUS_UNCONNECT_ERR);
         }
         RequestMethod method = mHttpBuilder.getMethod();
         boolean isDoInput = method == RequestMethod.POST;
@@ -160,7 +154,7 @@ public abstract class HttpClient {
                 while ((tempLine = reader.readLine()) != null) {
                     resultBuffer.append(tempLine);
                 }
-            } else if (responseCode == HttpURLConnection.HTTP_OK) {
+            } else{
                 inputStream = mConnection.getInputStream();
                 inputStreamReader = new InputStreamReader(inputStream, CHARSET);
                 reader = new BufferedReader(inputStreamReader);
@@ -168,13 +162,12 @@ public abstract class HttpClient {
                     resultBuffer.append(tempLine);
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
+        } catch (Exception e){
+        }finally {
             close(outputStream, reader, inputStreamReader, inputStream);
         }
         LogUtils.d("HTTP-response:"+resultBuffer.toString());
-        httpCallback.onComplete(getResponseData(clazz,responseCode, resultBuffer.toString()));
+        return getResponseData(tClass,responseCode, resultBuffer.toString());
     }
 
     private void close(OutputStream outputStream,

@@ -1,5 +1,7 @@
 package com.ft.sdk.garble.http;
 
+import com.ft.sdk.garble.utils.ThreadPoolUtils;
+
 import java.security.InvalidParameterException;
 import java.util.HashMap;
 
@@ -18,6 +20,9 @@ public class HttpBuilder {
     private int readOutTime;
     private HashMap<String,String> headParams = new HashMap<>();
 
+    public static HttpBuilder Builder() {
+        return new HttpBuilder();
+    }
 
     public String getUrl() {
         return url;
@@ -104,12 +109,10 @@ public class HttpBuilder {
         return this;
     }
 
-
-    public HttpClient executor(){
-        return new FTHttpClient(this);
+    public <T extends ResponseData> T executeSync(Class<T> tClass){
+        return new FTHttpClient(this).execute(tClass);
     }
-
-    public void execute(HttpCallback httpCallback){
-        new FTHttpClient(this).execute(httpCallback);
+    public <T extends ResponseData> void executeAsync(Class<T> tClass,HttpCallback<T> callback){
+        ThreadPoolUtils.get().execute(() -> callback.onComplete(new FTHttpClient(HttpBuilder.this).execute(tClass)));
     }
 }
