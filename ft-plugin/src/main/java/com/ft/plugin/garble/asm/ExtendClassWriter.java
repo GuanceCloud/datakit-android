@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * BY huangDianHua
+ * From https://github.com/Leaking/Hunter/blob/master/hunter-transform/src/main/java/com/quinn/hunter/transform/asm/ExtendClassWriter.java
  * DATE:2019-11-29 14:20
  * Description:
  */
