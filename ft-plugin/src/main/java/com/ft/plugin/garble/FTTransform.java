@@ -5,7 +5,6 @@ import com.android.build.api.transform.TransformException;
 import com.android.build.api.transform.TransformInput;
 import com.android.build.api.transform.TransformOutputProvider;
 import com.ft.plugin.garble.asm.BaseTransform;
-import com.ft.plugin.garble.asm.RunVariant;
 import com.ft.plugin.garble.bytecode.FTWeaver;
 
 import org.gradle.api.Project;
@@ -38,14 +37,5 @@ public class FTTransform extends BaseTransform {
         bytecodeWeaver.setExtension(ftExtension);
         bytecodeWeaver.setFTTransformHelper(ftTransformHelper);
         super.transform(context, inputs, referencedInputs, outputProvider, isIncremental);
-    }
-
-    protected RunVariant getRunVariant() {
-        return ftExtension.runVariant;
-    }
-
-    @Override
-    protected boolean inDuplcatedClassSafeMode() {
-        return ftExtension.duplcatedClassSafeMode;
     }
 }
