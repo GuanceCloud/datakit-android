@@ -23,7 +23,7 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 /**
- * BY huangDianHua
+ * From https://github.com/Leaking/Hunter/blob/master/hunter-transform/src/main/java/com/quinn/hunter/transform/asm/BaseWeaver.java
  * DATE:2019-11-29 13:57
  * Description:
  */

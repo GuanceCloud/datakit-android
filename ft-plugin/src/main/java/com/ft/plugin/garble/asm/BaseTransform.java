@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * BY huangDianHua
+ * From https://github.com/Leaking/Hunter/blob/master/hunter-transform/src/main/java/com/quinn/hunter/transform/HunterTransform.java
  * DATE:2019-11-29 13:33
  * Description:字节码转换基类
  */
