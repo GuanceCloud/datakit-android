@@ -16,7 +16,7 @@ import java.net.URLClassLoader;
 import java.util.Collection;
 
 /**
- * BY huangDianHua
+ * From https://github.com/Leaking/Hunter/blob/master/hunter-transform/src/main/java/com/quinn/hunter/transform/asm/ClassLoaderHelper.java
  * DATE:2019-11-29 14:28
  * Description:
  */
