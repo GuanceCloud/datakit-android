@@ -36,12 +36,12 @@ dependencies {
 
     implementation files('libs/miit_mdid_1.0.10.aar')
     implementation 'com.cloudcare.ft.mobile.sdk.traker.agent:ft-sdk:1.0.0-alpha9e'
+    implementation 'com.github.bumptech.glide:glide:4.10.0'
 }
 
 
 apply plugin: 'ft-plugin'
 
 FTExt {
-    runVariant = 'DEBUG'
     showLog = true
 }
