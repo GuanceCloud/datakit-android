@@ -43,7 +43,6 @@ public class BaseTransform extends Transform {
     private Project project;
     protected BaseWeaver bytecodeWeaver;
     private WaitableExecutor waitableExecutor;
-    private boolean emptyRun = false;
 
     public BaseTransform(Project project) {
         this.project = project;
@@ -78,14 +77,8 @@ public class BaseTransform extends Transform {
                           Collection<TransformInput> referencedInputs,
                           TransformOutputProvider outputProvider,
                           boolean isIncremental) throws IOException, TransformException, InterruptedException {
-        RunVariant runVariant = getRunVariant();
-        if ("debug".equals(context.getVariantName())) {
-            emptyRun = runVariant == RunVariant.RELEASE || runVariant == RunVariant.NEVER;
-        } else if ("release".equals(context.getVariantName())) {
-            emptyRun = runVariant == RunVariant.DEBUG || runVariant == RunVariant.NEVER;
-        }
-        Logger.info(getName() + " isIncremental = " + isIncremental + ", runVariant = "
-                + runVariant + ", emptyRun = " + emptyRun + ", inDuplcatedClassSafeMode = " + inDuplcatedClassSafeMode());
+
+        Logger.info(getName() + " isIncremental = " + isIncremental);
         long startTime = System.currentTimeMillis();
         if (!isIncremental) {
             outputProvider.deleteAll();
@@ -102,7 +95,7 @@ public class BaseTransform extends Transform {
                         jarInput.getContentTypes(),
                         jarInput.getScopes(),
                         Format.JAR);
-                if (isIncremental && !emptyRun) {
+                if (isIncremental) {
                     switch (status) {
                         case NOTCHANGED:
                             break;
@@ -117,8 +110,7 @@ public class BaseTransform extends Transform {
                             break;
                     }
                 } else {
-                    //Forgive me!, Some project will store 3rd-party aar for serveral copies in dexbuilder folder,,unknown issue.
-                    if (inDuplcatedClassSafeMode() & !isIncremental && !flagForCleanDexBuilderFolder) {
+                    if (!isIncremental && !flagForCleanDexBuilderFolder) {
                         cleanDexBuilderFolder(dest);
                         flagForCleanDexBuilderFolder = true;
                     }
@@ -131,7 +123,7 @@ public class BaseTransform extends Transform {
                         directoryInput.getContentTypes(), directoryInput.getScopes(),
                         Format.DIRECTORY);
                 FileUtils.forceMkdir(dest);
-                if (isIncremental && !emptyRun) {
+                if (isIncremental) {
                     String srcDirPath = directoryInput.getFile().getAbsolutePath();
                     String destDirPath = dest.getAbsolutePath();
                     Map<File, Status> fileStatusMap = directoryInput.getChangedFiles();
@@ -182,10 +174,6 @@ public class BaseTransform extends Transform {
     }
 
     private void transformDir(final File inputDir, final File outputDir) throws IOException {
-        if (emptyRun) {
-            FileUtils.copyDirectory(inputDir, outputDir);
-            return;
-        }
         final String inputDirPath = inputDir.getAbsolutePath();
         final String outputDirPath = outputDir.getAbsolutePath();
         if (inputDir.isDirectory()) {
@@ -202,10 +190,6 @@ public class BaseTransform extends Transform {
 
     private void transformJar(final File srcJar, final File destJar, Status status) {
         waitableExecutor.execute(() -> {
-            if (emptyRun) {
-                FileUtils.copyFile(srcJar, destJar);
-                return null;
-            }
             bytecodeWeaver.weaveJar(srcJar, destJar);
             return null;
         });
@@ -240,13 +224,5 @@ public class BaseTransform extends Transform {
     @Override
     public boolean isCacheable() {
         return true;
-    }
-
-    protected RunVariant getRunVariant() {
-        return RunVariant.ALWAYS;
-    }
-
-    protected boolean inDuplcatedClassSafeMode() {
-        return false;
     }
 }

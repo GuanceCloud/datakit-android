@@ -1,7 +1,5 @@
 package com.ft.plugin.garble;
 
-import com.ft.plugin.garble.asm.RunVariant;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,24 +9,18 @@ import java.util.List;
  * Description:
  */
 public class FTExtension {
-    public RunVariant runVariant = RunVariant.ALWAYS;
-    public boolean lambdaEnabled = true;
     public boolean showLog = false;
     public boolean canHookMethod= true;
     public List<String> whitelist = new ArrayList<>();
     public List<String> blacklist = new ArrayList<>();
-    public boolean duplcatedClassSafeMode = false;
 
     @Override
     public String toString() {
         return "FTExtension{" +
-                "runVariant=" + runVariant +
                 ", whitelist=" + whitelist +
                 ", showLog=" + showLog +
                 ", canHookMethod=" + canHookMethod +
-                ", lambdaEnabled=" + lambdaEnabled +
                 ", blacklist=" + blacklist +
-                ", duplcatedClassSafeMode=" + duplcatedClassSafeMode +
                 '}';
     }
 }
