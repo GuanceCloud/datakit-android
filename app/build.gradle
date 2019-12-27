@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 29
@@ -37,6 +39,8 @@ dependencies {
     implementation files('libs/miit_mdid_1.0.10.aar')
     implementation 'com.cloudcare.ft.mobile.sdk.traker.agent:ft-sdk:1.0.0-alpha9e'
     implementation 'com.github.bumptech.glide:glide:4.10.0'
+    implementation "androidx.core:core-ktx:+"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
 
@@ -44,4 +48,7 @@ apply plugin: 'ft-plugin'
 
 FTExt {
     showLog = true
+}
+repositories {
+    mavenCentral()
 }
