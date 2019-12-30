@@ -19,6 +19,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.security.InvalidParameterException;
 import java.util.List;
 
 import static androidx.test.espresso.Espresso.onView;
@@ -111,6 +112,9 @@ public class MainActivityTest {
      */
     @Test
     public void clickMoreBtnAndSyncTest() throws InterruptedException, JSONException {
+        if(BuildConfig.TEST_QUERY_URL == "null"){
+            throw new InvalidParameterException("请先配置 TEST_QUERY_URL 参数");
+        }
         //获取查询数据需要用到的token
         String token = getLoginToken();
         assertNotEquals("",token);
@@ -138,8 +142,7 @@ public class MainActivityTest {
         //等待2分钟查询服务器中的数据是否和上传的一致
         Thread.sleep(1000*60);
         ResponseData responseData = HttpBuilder.Builder()
-                .setUrl("http://testing.api-ft2x.cloudcare.cn:10531")
-                .setModel("api/v1/front/influx/query_data")
+                .setUrl(BuildConfig.TEST_QUERY_URL)
                 .setHeadParams(SyncDataTest.getQueryHead(token))
                 .setMethod(RequestMethod.POST)
                 .setBodyString(SyncDataTest.buildPostBody())
@@ -159,8 +162,11 @@ public class MainActivityTest {
      * @throws JSONException
      */
     private String getLoginToken() throws JSONException {
+        if(BuildConfig.TEST_LOGIN_URL == "null"){
+            throw new InvalidParameterException("请先配置 TEST_LOGIN_URL 参数");
+        }
         ResponseData responseData = HttpBuilder.Builder()
-                .setUrl("http://testing.api-ft2x.cloudcare.cn:10531/api/v1/front/auth-token/login")
+                .setUrl(BuildConfig.TEST_LOGIN_URL)
                 .setMethod(RequestMethod.POST)
                 .setHeadParams(SyncDataTest.getLoginHead())
                 .setBodyString(SyncDataTest.getLoginBody())
