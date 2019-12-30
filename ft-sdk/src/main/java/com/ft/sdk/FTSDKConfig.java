@@ -18,13 +18,13 @@ public class FTSDKConfig {
     private boolean autoTrack;
     //以下三个为白名单
     private int enableAutoTrackType;
-    private List<Class<?>> onlyAutoTrackActivities;
-    private List<Class<?>> onlyAutoTrackViews;
+    private List<Class<?>> whiteActivityClass;
+    private List<Class<?>> whiteViewClass;
 
     //以下三个为设置黑名单
     private int disableAutoTrackType;
-    private List<Class<?>> ignoreAutoTrackActivities;
-    private List<Class<?>> ignoreAutoTrackViews;
+    private List<Class<?>> blackActivityClass;
+    private List<Class<?>> blackViewClass;
 
     public static FTSDKConfig Builder(String metricsUrl, boolean enableRequestSigning, String akId, String akSecret) {
         return new FTSDKConfig(metricsUrl, enableRequestSigning, akId, akSecret);
@@ -79,27 +79,27 @@ public class FTSDKConfig {
         return enableAutoTrackType;
     }
 
-    public List<Class<?>> getOnlyAutoTrackActivities(){
-        return onlyAutoTrackActivities;
+    public List<Class<?>> getWhiteActivityClass(){
+        return whiteActivityClass;
     }
 
-    public List<Class<?>> getOnlyAutoTrackViews(){
-        return onlyAutoTrackViews;
+    public List<Class<?>> getWhiteViewClass(){
+        return whiteViewClass;
     }
 
     public int getDisableAutoTrackType(){
         return disableAutoTrackType;
     }
 
-    public List<Class<?>> getIgnoreAutoTrackActivities() {
-        return ignoreAutoTrackActivities;
+    public List<Class<?>> getBlackActivityClass() {
+        return blackActivityClass;
     }
 
-    public List<Class<?>> getIgnoreAutoTrackViews() {
-        return ignoreAutoTrackViews;
+    public List<Class<?>> getBlackViewClass() {
+        return blackViewClass;
     }
 
-    public FTSDKConfig setAutoTrack(boolean autoTrack) {
+    public FTSDKConfig enableAutoTrack(boolean autoTrack) {
         this.autoTrack = autoTrack;
         return this;
     }
@@ -119,13 +119,13 @@ public class FTSDKConfig {
         return this;
     }
 
-    public FTSDKConfig setOnlyAutoTrackActivities(List<Class<?>> classes){
-        onlyAutoTrackActivities = classes;
+    public FTSDKConfig setWhiteActivityClasses(List<Class<?>> classes){
+        whiteActivityClass = classes;
         return this;
     }
 
-    public FTSDKConfig setOnlyAutoTrackViews(List<Class<?>> classes){
-        onlyAutoTrackViews = classes;
+    public FTSDKConfig setWhiteViewClasses(List<Class<?>> classes){
+        whiteViewClass = classes;
         return this;
     }
 
@@ -134,13 +134,13 @@ public class FTSDKConfig {
         return this;
     }
 
-    public FTSDKConfig setIgnoreAutoTrackActivities(List<Class<?>> classes) {
-        ignoreAutoTrackActivities = classes;
+    public FTSDKConfig setBlackActivityClasses(List<Class<?>> classes) {
+        blackActivityClass = classes;
         return this;
     }
 
-    public FTSDKConfig setIgnoreAutoTrackViews(List<Class<?>> classes){
-        ignoreAutoTrackViews = classes;
+    public FTSDKConfig setBlackViewClasses(List<Class<?>> classes){
+        blackViewClass = classes;
         return this;
     }
 

@@ -44,12 +44,12 @@ public class FTAutoTrackConfig {
         }
         autoTrack = ftsdkConfig.isAutoTrack();
         enableAutoTrackType = ftsdkConfig.getEnableAutoTrackType();
-        addOnlyAutoTrackActivity(ftsdkConfig.getOnlyAutoTrackActivities());
-        addOnlyAutoTrackView(ftsdkConfig.getOnlyAutoTrackViews());
+        addOnlyAutoTrackActivity(ftsdkConfig.getWhiteActivityClass());
+        addOnlyAutoTrackView(ftsdkConfig.getWhiteViewClass());
 
         disableAutoTrackType = ftsdkConfig.getDisableAutoTrackType();
-        addIgnoreAutoTrackActivity(ftsdkConfig.getIgnoreAutoTrackActivities());
-        addIgnoreAutoTrackView(ftsdkConfig.getIgnoreAutoTrackViews());
+        addIgnoreAutoTrackActivity(ftsdkConfig.getBlackActivityClass());
+        addIgnoreAutoTrackView(ftsdkConfig.getBlackViewClass());
     }
 
     private void addOnlyAutoTrackActivity(List<Class<?>> classes) {
