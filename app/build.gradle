@@ -1,6 +1,6 @@
 apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 29
@@ -13,6 +13,16 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug {
+            //加载资源
+            Properties properties = new Properties()
+            InputStream inputStream = project.rootProject.file('local.properties').newDataInputStream() ;
+            properties.load(inputStream)
+            buildConfigField("String","TEST_ACCOUNT","\""+properties.getProperty('TEST_ACCOUNT')+"\"")
+            buildConfigField("String","TEST_PWD","\""+properties.getProperty('TEST_PWD')+"\"")
+            buildConfigField("String","TEST_LOGIN_URL","\""+properties.getProperty('TEST_LOGIN_URL')+"\"")
+            buildConfigField("String","TEST_QUERY_URL","\""+properties.getProperty('TEST_QUERY_URL')+"\"")
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
