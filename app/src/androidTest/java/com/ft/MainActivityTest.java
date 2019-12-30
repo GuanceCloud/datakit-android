@@ -165,7 +165,7 @@ public class MainActivityTest {
                 .setModel("api/v1/front/auth-token/login")
                 .setMethod(RequestMethod.POST)
                 .setHeadParams(SyncDataTest.getLoginHead())
-                .setBodyString(SyncDataTest.getLoginBody())
+                .setBodyString(SyncDataTest.getLoginBody(rule.getActivity()))
                 .executeSync(ResponseData.class);
         JSONObject jsonObject = new JSONObject(responseData.getData());
         JSONObject content = jsonObject.optJSONObject("content");
