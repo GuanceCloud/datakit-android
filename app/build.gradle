@@ -13,14 +13,6 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
-        debug {
-            //加载资源
-            Properties properties = new Properties()
-            InputStream inputStream = project.rootProject.file('local.properties').newDataInputStream() ;
-            properties.load(inputStream)
-            buildConfigField("String","TEST_ACCOUNT","\""+properties.getProperty('TEST_ACCOUNT')+"\"")
-            buildConfigField("String","TEST_PWD","\""+properties.getProperty('TEST_PWD')+"\"")
-        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
