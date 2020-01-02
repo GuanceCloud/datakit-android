@@ -38,6 +38,7 @@ dependencies {
 
     implementation files('libs/miit_mdid_1.0.10.aar')
     implementation 'com.cloudcare.ft.mobile.sdk.traker.agent:ft-sdk:1.0.0-alpha9g'
+    androidTestImplementation project(":ft-sdk")
     implementation 'com.github.bumptech.glide:glide:4.10.0'
     implementation "androidx.core:core-ktx:+"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
