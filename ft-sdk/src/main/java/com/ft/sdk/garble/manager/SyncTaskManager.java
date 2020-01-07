@@ -1,5 +1,6 @@
 package com.ft.sdk.garble.manager;
 
+import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.http.FTResponseData;
@@ -58,39 +59,44 @@ public class SyncTaskManager {
             ThreadPoolUtils.get().reStartPool();
         }
 
-        ThreadPoolUtils.get().execute(new Runnable() {
-            @Override
-            public void run() {
+        ThreadPoolUtils.get().execute(() -> {
+            int count = 0;
+            do{
+                if(count>=1) {
+                    LogUtils.e("正在等待用户数据绑定...");
+                }
                 try {
                     Thread.sleep(SLEEP_TIME);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                //LogUtils.d(">>>同步轮询线程<<< 开始运行");
-                List<RecordData> recordDataList = queryFromData();
-                //当数据库中有数据是执行轮询同步操作
-                while (recordDataList != null && !recordDataList.isEmpty()) {
-                    if (!Utils.isNetworkAvailable()) {
-                        LogUtils.d(">>>网络未连接<<<");
-                        break;
-                    }
-                    if (errorCount.get() >= CLOSE_TIME) {
-                        LogUtils.d(">>>连续同步失败5次，停止当前轮询同步<<<");
-                        break;
-                    }
-                    //if (FTActivityManager.get().isForeground()) {//程序在前台执行
-                    //LogUtils.d(">>>同步轮询线程<<< 程序正在 前 台执行同步操作");
-                    LogUtils.d(">>>同步轮询线程<<< 程序正在执行同步操作");
-                    handleSyncOpt(recordDataList);
-                    recordDataList = queryFromData();
-                    /*} else {//程序退到后台，关闭同步线程
-                        recordDataList = null;
-                        LogUtils.d(">>>同步轮询线程<<< 程序正在 后 台执行同步操作");
-                    }*/
+                count++;
+                //如果开启了用户数据绑定，就等待用户绑定数据完成
+            }while (FTUserConfig.get().isNeedBindUser() && !FTUserConfig.get().isUserDataBinded());
+            //LogUtils.d(">>>同步轮询线程<<< 开始运行");
+            List<RecordData> recordDataList = queryFromData();
+            //当数据库中有数据是执行轮询同步操作
+            while (recordDataList != null && !recordDataList.isEmpty()) {
+                if (!Utils.isNetworkAvailable()) {
+                    LogUtils.d(">>>网络未连接<<<");
+                    break;
                 }
-                running = false;
-                //LogUtils.d(">>>同步轮询线程<<< 结束运行");
+                if (errorCount.get() >= CLOSE_TIME) {
+                    LogUtils.d(">>>连续同步失败5次，停止当前轮询同步<<<");
+                    break;
+                }
+                //if (FTActivityManager.get().isForeground()) {//程序在前台执行
+                //LogUtils.d(">>>同步轮询线程<<< 程序正在 前 台执行同步操作");
+                LogUtils.d(">>>同步轮询线程<<< 程序正在执行同步操作");
+                handleSyncOpt(recordDataList);
+                recordDataList = queryFromData();
+                /*} else {//程序退到后台，关闭同步线程
+                    recordDataList = null;
+                    LogUtils.d(">>>同步轮询线程<<< 程序正在 后 台执行同步操作");
+                }*/
             }
+            running = false;
+            //LogUtils.d(">>>同步轮询线程<<< 结束运行");
         });
     }
 
@@ -105,17 +111,14 @@ public class SyncTaskManager {
         SyncDataManager syncDataManager = new SyncDataManager();
         String body = syncDataManager.getBodyContent(requestDatas);
         printUpdateData(body);
-        requestNet(body, new SyncCallback() {
-            @Override
-            public void isSuccess(boolean isSuccess) {
-                if (isSuccess) {
-                    LogUtils.d("同步数据成功");
-                    deleteLastQuery(requestDatas);
-                    errorCount.set(0);
-                } else {
-                    LogUtils.d("同步数据失败");
-                    errorCount.getAndIncrement();
-                }
+        requestNet(body, isSuccess -> {
+            if (isSuccess) {
+                LogUtils.d("同步数据成功");
+                deleteLastQuery(requestDatas);
+                errorCount.set(0);
+            } else {
+                LogUtils.d("同步数据失败");
+                errorCount.getAndIncrement();
             }
         });
         //LogUtils.d("同步后查询" + queryFromData());
