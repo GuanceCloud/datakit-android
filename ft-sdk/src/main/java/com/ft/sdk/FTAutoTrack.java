@@ -17,12 +17,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.ft.sdk.garble.FTAutoTrackConfig;
+import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.manager.FTManager;
 import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
+import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONObject;
 
@@ -454,13 +456,14 @@ public class FTAutoTrack {
             recordData.setOpdata(opData.toString());
         } catch (Exception e) {
         }
-        ThreadPoolUtils.get().execute(new Runnable() {
-            @Override
-            public void run() {
-                LogUtils.d("FTAutoTrack数据进数据库：" + recordData.getJsonString());
-                FTManager.getFTDBManager().insertFTOperation(recordData);
-                FTManager.getSyncTaskManager().executeSyncPoll();
-            }
+        String sessionId = FTUserConfig.get().getSessionId();
+        if(!Utils.isNullOrEmpty(sessionId)){
+            recordData.setSessionid(sessionId);
+        }
+        ThreadPoolUtils.get().execute(() -> {
+            LogUtils.d("FTAutoTrack数据进数据库：" + recordData.getJsonString());
+            FTManager.getFTDBManager().insertFTOperation(recordData);
+            FTManager.getSyncTaskManager().executeSyncPoll();
         });
     }
 }

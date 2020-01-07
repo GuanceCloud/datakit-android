@@ -34,10 +34,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+        createTable(db);
+        if(oldVersion == 1 && newVersion == 2){
+            db.execSQL("ALTER TABLE "+FTSQL.FT_TABLE_NAME+" ADD COLUMN "+FTSQL.RECORD_COLUMN_SESSION_ID);
+        }
     }
 
     private void createTable(SQLiteDatabase db) {
         db.execSQL(FTSQL.FT_TABLE_CREATE);
+        db.execSQL(FTSQL.FT_TABLE_USER_DATA_CREATE);
     }
 }
