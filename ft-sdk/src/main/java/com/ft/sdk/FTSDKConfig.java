@@ -9,13 +9,20 @@ import java.util.List;
  * Description:
  */
 public class FTSDKConfig {
+    //服务器地址
     private String metricsUrl;
+    //是否签名
     private boolean enableRequestSigning;
     private String akId;
     private String akSecret;
+    //是否使用OAID
     private boolean useOAID;
+    //是否是Debug
     private boolean isDebug;
+    //是否开启自动埋点
     private boolean autoTrack;
+    //是否需要绑定用户数据
+    private boolean needBindUser;
     //以下三个为白名单
     private int enableAutoTrackType;
     private List<Class<?>> whiteActivityClass;
@@ -75,19 +82,23 @@ public class FTSDKConfig {
         return autoTrack;
     }
 
+    public boolean isNeedBindUser(){
+        return needBindUser;
+    }
+
     public int getEnableAutoTrackType() {
         return enableAutoTrackType;
     }
 
-    public List<Class<?>> getWhiteActivityClass(){
+    public List<Class<?>> getWhiteActivityClass() {
         return whiteActivityClass;
     }
 
-    public List<Class<?>> getWhiteViewClass(){
+    public List<Class<?>> getWhiteViewClass() {
         return whiteViewClass;
     }
 
-    public int getDisableAutoTrackType(){
+    public int getDisableAutoTrackType() {
         return disableAutoTrackType;
     }
 
@@ -119,17 +130,22 @@ public class FTSDKConfig {
         return this;
     }
 
-    public FTSDKConfig setWhiteActivityClasses(List<Class<?>> classes){
+    public FTSDKConfig setNeedBindUser(boolean needBindUserVar){
+        needBindUser = needBindUserVar;
+        return this;
+    }
+
+    public FTSDKConfig setWhiteActivityClasses(List<Class<?>> classes) {
         whiteActivityClass = classes;
         return this;
     }
 
-    public FTSDKConfig setWhiteViewClasses(List<Class<?>> classes){
+    public FTSDKConfig setWhiteViewClasses(List<Class<?>> classes) {
         whiteViewClass = classes;
         return this;
     }
 
-    public FTSDKConfig setDisableAutoTrackType(int type){
+    public FTSDKConfig setDisableAutoTrackType(int type) {
         disableAutoTrackType = type;
         return this;
     }
@@ -139,7 +155,7 @@ public class FTSDKConfig {
         return this;
     }
 
-    public FTSDKConfig setBlackViewClasses(List<Class<?>> classes){
+    public FTSDKConfig setBlackViewClasses(List<Class<?>> classes) {
         blackViewClass = classes;
         return this;
     }
