@@ -7,5 +7,5 @@ package com.ft.sdk.garble.db;
  */
 public class FTDBConfig {
     public static final String DATABASE_NAME = "ft_database.db";
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
 }

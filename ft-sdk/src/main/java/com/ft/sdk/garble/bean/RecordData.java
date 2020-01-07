@@ -42,6 +42,11 @@ public class RecordData {
      */
     private String opdata;
 
+    /**
+     * 用户数据关联ID
+     */
+    private String sessionid;
+
     public long getId() {
         return id;
     }
@@ -90,6 +95,13 @@ public class RecordData {
         this.opdata = opdata;
     }
 
+    public String getSessionid() {
+        return sessionid;
+    }
+
+    public void setSessionid(String sessionid) {
+        this.sessionid = sessionid;
+    }
 
     public String getJsonString() {
         JSONObject recordData = new JSONObject();

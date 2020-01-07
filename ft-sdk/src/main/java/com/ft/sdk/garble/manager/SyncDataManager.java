@@ -4,12 +4,15 @@ import android.content.Context;
 
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.garble.FTHttpConfig;
+import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.RecordData;
+import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.OaidUtils;
 import com.ft.sdk.garble.utils.Utils;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -96,6 +99,7 @@ public class SyncDataManager {
                 JSONObject values = opJson.optJSONObject("values");
                 StringBuffer tagSb = getCustomHash(tags, true);
                 StringBuffer valueSb = getCustomHash(values, false);
+                addUserData(tagSb);
                 deleteLastComma(tagSb);
                 if (tagSb.length() > 0) {
                     sb.append(",");
@@ -175,6 +179,7 @@ public class SyncDataManager {
             } catch (Exception e) {
             }
         }
+        addUserData(sb);
         deleteLastComma(sb);
         if (sb.length() > 0) {
             sb.insert(0, ",");
@@ -187,6 +192,30 @@ public class SyncDataManager {
         sb.append(" ");
         sb.append(recordData.getTime() * 1000000);
         return sb.toString();
+    }
+
+    /**
+     * 添加用户信息
+     * @param sb
+     */
+    private void addUserData(StringBuffer sb){
+        if(FTUserConfig.get().isNeedBindUser() && FTUserConfig.get().isUserDataBinded()){
+            UserData userData = FTUserConfig.get().getUserData();
+            if(userData != null) {
+                sb.append("ud_name=").append(userData.getName()).append(",");
+                sb.append("ud_id=").append(userData.getId()).append(",");
+                JSONObject js = userData.getExts();
+                Iterator<String> iterator = js.keys();
+                while (iterator.hasNext()){
+                    String key = iterator.next();
+                    try {
+                        sb.append("ud_").append(key).append("=").append(js.getString(key)).append(",");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 
     private String getEventName(String op){
