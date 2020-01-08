@@ -1,5 +1,7 @@
 package com.ft.sdk.garble.bean;
 
+import androidx.annotation.Nullable;
+
 import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONException;
@@ -63,9 +65,9 @@ public class UserData {
     public void parseUserDataFromDBData(String data){
         try{
             JSONObject jsonObject = new JSONObject(data);
-            name = jsonObject.getString("name");
-            id = jsonObject.getString("id");
-            exts = jsonObject.getJSONObject("exts");
+            name = jsonObject.optString("name");
+            id = jsonObject.optString("id");
+            exts = jsonObject.optJSONObject("exts");
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -73,5 +75,38 @@ public class UserData {
 
     public boolean isEmpty(){
         return Utils.isNullOrEmpty(name) || Utils.isNullOrEmpty(id) || exts == null;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if(obj instanceof UserData){
+            UserData temp = (UserData) obj;
+            if(sessionId == null || temp.sessionId == null || !sessionId.equals(temp.sessionId)){
+                if(!(sessionId == null && temp.sessionId == null)) {
+                    return false;
+                }
+            }
+
+            if(id == null || temp.id == null || !id.equals(temp.id)){
+                if(!(id == null && temp.id == null)) {
+                    return false;
+                }
+            }
+
+            if(name == null || temp.name == null || !name.equals(temp.name)){
+                if(!(name == null && temp.name == null)) {
+                    return false;
+                }
+            }
+
+            if(exts == null || temp.exts == null || !exts.toString().equals(temp.exts.toString())){
+                if(!(exts == null && temp.exts == null)) {
+                    return false;
+                }
+            }
+            return true;
+        }else{
+            return false;
+        }
     }
 }
