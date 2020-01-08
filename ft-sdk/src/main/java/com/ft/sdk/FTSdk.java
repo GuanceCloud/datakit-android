@@ -2,6 +2,8 @@ package com.ft.sdk;
 
 import android.app.Application;
 
+import androidx.annotation.NonNull;
+
 import com.ft.sdk.garble.FTActivityLifecycleCallbacks;
 import com.ft.sdk.garble.FTAutoTrackConfig;
 import com.ft.sdk.garble.FTHttpConfig;
@@ -38,7 +40,7 @@ public class FTSdk {
 
     public static synchronized FTSdk get(){
         if(FTSDK == null){
-            throw new InvalidParameterException("请先安装SDK(在应用启动时调用FTSdk.install(FTSDKConfig))");
+            throw new InvalidParameterException("请先安装SDK(在应用启动时调用FTSdk.install(FTSDKConfig ftSdkConfig))");
         }
         return FTSDK;
     }
@@ -49,8 +51,12 @@ public class FTSdk {
     public void unbindUserData(){
         if(mFtSDKConfig != null){
             if (mFtSDKConfig.isNeedBindUser()) {
+                //解绑用户信息
                 FTUserConfig.get().unbindUserData();
+                //清除本地缓存的SessionId
                 FTUserConfig.get().clearSessionId();
+                //创建新的sessionId用于标记后续操作
+                FTUserConfig.get().createNewSessionId();
             }
         }
     }
@@ -61,15 +67,20 @@ public class FTSdk {
      * @param id
      * @param exts
      */
-    public void bindUserData(String name, String id, JSONObject exts){
+    public void bindUserData(@NonNull String name,@NonNull String id, JSONObject exts){
         if(mFtSDKConfig != null){
             if(mFtSDKConfig.isNeedBindUser()){
+                //初始化SessionId
                 FTUserConfig.get().initSessionId();
+                //绑定用户信息
                 FTUserConfig.get().bindUserData(name,id,exts);
             }
         }
     }
 
+    /**
+     * 初始化SDK本地配置数据
+     */
     private void initFTConfig(){
         if(mFtSDKConfig != null) {
             FTHttpConfig.get().initParams(mFtSDKConfig);
