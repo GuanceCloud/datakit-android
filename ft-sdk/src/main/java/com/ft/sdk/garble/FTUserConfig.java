@@ -11,6 +11,8 @@ import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -21,7 +23,7 @@ import java.util.UUID;
 public class FTUserConfig {
     private static volatile FTUserConfig instance;
     private volatile String sessionId;
-    private UserData userData;
+    private List<UserData> userDataList;
     private volatile boolean userDataBinded;
     private volatile boolean needBindUser;
 
@@ -38,6 +40,7 @@ public class FTUserConfig {
 
     /**
      * 用户数据是否已经绑定完成
+     *
      * @return
      */
     public boolean isUserDataBinded() {
@@ -46,6 +49,7 @@ public class FTUserConfig {
 
     /**
      * 是否需要绑定用户信息
+     *
      * @return
      */
     public boolean isNeedBindUser() {
@@ -68,7 +72,7 @@ public class FTUserConfig {
     /**
      * 创建一个新的用户SessionID
      */
-    private void createNewSessionId() {
+    public void createNewSessionId() {
         sessionId = UUID.randomUUID().toString();
         SharedPreferences sp = Utils.getSharedPreferences(FTApplication.getApplication());
         sp.edit().putString(Constants.FT_USER_SESSION_ID, sessionId).apply();
@@ -102,15 +106,22 @@ public class FTUserConfig {
      */
     public void initUserDataFromDB() {
         ThreadPoolUtils.get().execute(() -> {
-            userData = FTDBManager.get().queryFTUserData(sessionId);
-            if(userData != null && !userData.isEmpty()){
+            userDataList = FTDBManager.get().queryFTUserDataList();
+            if (getUserData(sessionId) != null) {
                 userDataBinded = true;
             }
         });
     }
 
-    public UserData getUserData() {
-        return userData;
+    public UserData getUserData(String sessionId) {
+        if (userDataList != null) {
+            for (UserData userData : userDataList) {
+                if (sessionId != null && sessionId.equals(userData.getSessionId())) {
+                    return userData;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -123,16 +134,29 @@ public class FTUserConfig {
     public void bindUserData(String name, String id, JSONObject exts) {
         ThreadPoolUtils.get().execute(() -> {
             try {
-                if (sessionId != null && userData == null || userData.isEmpty() || !(userData.getName().equals(name)
-                            && userData.getId().equals(id)
-                            && userData.getExts().toString().equals(exts.toString()))) {
-                    userData = new UserData();
-                    userData.setSessionId(sessionId);
-                    userData.setName(name);
-                    userData.setId(id);
-                    userData.setExts(exts);
+                UserData userData = new UserData();
+                userData.setSessionId(sessionId);
+                userData.setName(name);
+                userData.setId(id);
+                userData.setExts(exts);
+                if (userDataList == null || userDataList.isEmpty()) {
                     FTDBManager.get().insertFTUserData(userData);
+                    userDataList = new ArrayList<>();
+                    userDataList.add(userData);
+                } else{
+                    int i = 0;
+                    for (UserData temp:userDataList) {
+                        if(userData.equals(temp)){
+                            break;
+                        }
+                        i++;
+                    }
+                    if(i == userDataList.size()){
+                        FTDBManager.get().insertFTUserData(userData);
+                        userDataList.add(userData);
+                    }
                 }
+
                 userDataBinded = true;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -143,13 +167,9 @@ public class FTUserConfig {
     /**
      * 解绑用户信息
      */
-    public void unbindUserData(){
-        if(sessionId != null) {
-            ThreadPoolUtils.get().execute(() -> {
-                FTDBManager.get().deleteUserData(sessionId);
-                userData = null;
-                userDataBinded = false;
-            });
+    public void unbindUserData() {
+        if (sessionId != null) {
+            userDataBinded = false;
         }
     }
 

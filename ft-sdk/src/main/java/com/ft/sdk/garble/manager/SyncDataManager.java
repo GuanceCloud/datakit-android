@@ -99,7 +99,7 @@ public class SyncDataManager {
                 JSONObject values = opJson.optJSONObject("values");
                 StringBuffer tagSb = getCustomHash(tags, true);
                 StringBuffer valueSb = getCustomHash(values, false);
-                addUserData(tagSb);
+                addUserData(tagSb,recordData);
                 deleteLastComma(tagSb);
                 if (tagSb.length() > 0) {
                     sb.append(",");
@@ -179,7 +179,7 @@ public class SyncDataManager {
             } catch (Exception e) {
             }
         }
-        addUserData(sb);
+        addUserData(sb,recordData);
         deleteLastComma(sb);
         if (sb.length() > 0) {
             sb.insert(0, ",");
@@ -198,9 +198,9 @@ public class SyncDataManager {
      * 添加用户信息
      * @param sb
      */
-    private void addUserData(StringBuffer sb){
+    private void addUserData(StringBuffer sb,RecordData recordData){
         if(FTUserConfig.get().isNeedBindUser() && FTUserConfig.get().isUserDataBinded()){
-            UserData userData = FTUserConfig.get().getUserData();
+            UserData userData = FTUserConfig.get().getUserData(recordData.getSessionid());
             if(userData != null) {
                 sb.append("ud_name=").append(userData.getName()).append(",");
                 sb.append("ud_id=").append(userData.getId()).append(",");
