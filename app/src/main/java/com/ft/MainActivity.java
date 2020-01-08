@@ -18,6 +18,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.amitshekhar.DebugDB;
+import com.amitshekhar.debug.encrypt.sqlite.DebugDBEncryptFactory;
+import com.amitshekhar.debug.sqlite.DebugDBFactory;
 import com.bumptech.glide.Glide;
 import com.ft.sdk.FTSdk;
 
@@ -39,6 +42,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        if (!DebugDB.isServerRunning()) {
+            DebugDB.initialize(DemoApplication.getContext(), new DebugDBFactory());
+            DebugDB.initialize(DemoApplication.getContext(), new DebugDBEncryptFactory());
+        }
         setTitle("FT-SDK使用Demo");
         showKotlinActivity = findViewById(R.id.showKotlinActivity);
         btn_lam = findViewById(R.id.btn_lam);
@@ -122,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        FTSdk.get().bindUserData(name,"123456",jsonObject);
+        FTSdk.get().bindUserData(name,"123456",null);
     }
 
     @Override
