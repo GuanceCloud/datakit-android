@@ -41,6 +41,9 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.10.0'
     implementation "androidx.core:core-ktx:+"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
+    debugImplementation 'com.amitshekhar.android:debug-db-encrypt:1.0.6'
 }
 
 

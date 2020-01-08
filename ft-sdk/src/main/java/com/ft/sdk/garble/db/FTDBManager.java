@@ -168,6 +168,33 @@ public class FTDBManager extends DBManager {
     }
 
     /**
+     * 查询数据库中的所有用户信息
+     *
+     * @return
+     */
+    public List<UserData> queryFTUserDataList() {
+        try {
+            List<UserData> userDataList = new ArrayList<>();
+            getDB(false, db -> {
+                Cursor cursor = db.query(FTSQL.FT_TABLE_USER_DATA, null, null, null, null, null, null, null);
+                while (cursor.moveToNext()) {
+                    UserData userData = new UserData();
+                    String id = cursor.getString(cursor.getColumnIndex(FTSQL.USER_COLUMN_SESSION_ID));
+                    String data = cursor.getString(cursor.getColumnIndex(FTSQL.USER_COLUMN_DATA));
+                    userData.setSessionId(id);
+                    userData.parseUserDataFromDBData(data);
+                    userDataList.add(userData);
+                }
+                cursor.close();
+            });
+            return userDataList;
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
      * 根据用户的sessionId删除用户数据
      *
      * @param sessionId
