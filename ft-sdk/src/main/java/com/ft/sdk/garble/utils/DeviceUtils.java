@@ -2,11 +2,13 @@ package com.ft.sdk.garble.utils;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
+import android.os.BatteryManager;
 import android.os.Build;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
@@ -59,6 +61,7 @@ public class DeviceUtils {
 
         }
     };
+
     public static String getSDKUUid(Context context) {
         final SharedPreferences preferences = getSharedPreferences(context);
         String sdkUUid = preferences.getString(Constants.FT_SDK_INIT_UUID, null);
@@ -147,9 +150,9 @@ public class DeviceUtils {
                     imei = tm.getDeviceId();
                 }
             }
-        } catch (SecurityException e){
+        } catch (SecurityException e) {
             LogUtils.e("未能获取到系统>>Manifest.permission.READ_PHONE_STATE<<权限");
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return imei;
@@ -166,9 +169,10 @@ public class DeviceUtils {
 
     /**
      * 系统版本
+     *
      * @return
      */
-    public static String getOSVersion(){
+    public static String getOSVersion() {
         return Build.VERSION.RELEASE;
     }
 
@@ -208,7 +212,51 @@ public class DeviceUtils {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         int screenWidth = displayMetrics.widthPixels;
         int screenHeight = displayMetrics.heightPixels;
-        return screenWidth+"*"+screenHeight;
+        return screenWidth + "*" + screenHeight;
+    }
+
+    /**
+     * 获取运行内存容量和内存使用率
+     *
+     * @param context
+     * @return
+     */
+    public static String[] getRamData(Context context) {
+        try {
+            ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+            ActivityManager.MemoryInfo info = new ActivityManager.MemoryInfo();
+            manager.getMemoryInfo(info);
+            long[] data = new long[]{info.totalMem, info.availMem};
+            String[] strings = new String[2];
+            strings[0] = String.format("%.2f",data[0]/1024/1024/1024.0)+"GB";
+            strings[1] = String.format("%.2f",(data[0]-data[1])*100.0/data[0])+"%";
+            return strings;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new String[]{"N/A", "N/A"};
+        }
+    }
+
+    /**
+     * CPU平台信息
+     *
+     * @return
+     */
+    public static String getHardWare() {
+        String result = Build.HARDWARE;
+        return result;
+    }
+
+    /**
+     * 获得CPU使用率
+     * @return
+     */
+    public static float getCpuUseRate(){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            return PerformanceDataUtils.get().getCpuDataForO();
+        }else{
+            return PerformanceDataUtils.get().getCPUData();
+        }
     }
 
     /**
@@ -251,11 +299,12 @@ public class DeviceUtils {
         }
         return "";
     }
+
     /**
      * 根据 operator，获取本地化运营商信息
      *
-     * @param context context
-     * @param operator sim operator
+     * @param context         context
+     * @param operator        sim operator
      * @param alternativeName 备选名称
      * @return local carrier name
      */
