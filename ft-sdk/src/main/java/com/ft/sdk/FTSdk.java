@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import com.ft.sdk.garble.FTActivityLifecycleCallbacks;
 import com.ft.sdk.garble.FTAutoTrackConfig;
 import com.ft.sdk.garble.FTHttpConfig;
+import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.utils.LogUtils;
 
@@ -83,9 +84,10 @@ public class FTSdk {
      */
     private void initFTConfig(){
         if(mFtSDKConfig != null) {
+            LogUtils.setDebug(mFtSDKConfig.isDebug());
             FTHttpConfig.get().initParams(mFtSDKConfig);
             FTAutoTrackConfig.get().initParams(mFtSDKConfig);
-            LogUtils.setDebug(mFtSDKConfig.isDebug());
+            FTMonitorConfig.get().initParams(mFtSDKConfig);
             FTUserConfig.get().setNeedBindUser(mFtSDKConfig.isNeedBindUser());
             if(mFtSDKConfig.isNeedBindUser()){
                 FTUserConfig.get().initSessionId();
