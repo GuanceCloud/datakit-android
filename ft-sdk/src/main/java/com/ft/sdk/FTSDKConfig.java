@@ -23,6 +23,8 @@ public class FTSDKConfig {
     private boolean autoTrack;
     //是否需要绑定用户数据
     private boolean needBindUser;
+    //监控类别
+    private int monitorType;
     //以下三个为白名单
     private int enableAutoTrackType;
     private List<Class<?>> whiteActivityClass;
@@ -86,6 +88,10 @@ public class FTSDKConfig {
         return needBindUser;
     }
 
+    public int getMonitorType() {
+        return monitorType;
+    }
+
     public int getEnableAutoTrackType() {
         return enableAutoTrackType;
     }
@@ -127,6 +133,11 @@ public class FTSDKConfig {
 
     public FTSDKConfig setEnableAutoTrackType(int type) {
         enableAutoTrackType = type;
+        return this;
+    }
+
+    public FTSDKConfig setMonitorType(int monitorType) {
+        this.monitorType = monitorType;
         return this;
     }
 
