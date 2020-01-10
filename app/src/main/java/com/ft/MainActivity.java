@@ -69,11 +69,10 @@ public class MainActivity extends AppCompatActivity {
         btn_lam.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                bindUserData("FT-Demo");
             }
         });
         checkbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            bindUserData("FT-CheckBox");
+
         });
         ratingbar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
         });
@@ -130,16 +129,6 @@ public class MainActivity extends AppCompatActivity {
                 .into(iv_glide);
     }
 
-    private void bindUserData(String name) {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("sex", "man");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        FTSdk.get().bindUserData(name, "123456", null);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
@@ -148,7 +137,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        FTSdk.get().unbindUserData();
         return super.onOptionsItemSelected(item);
     }
 
