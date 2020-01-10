@@ -1,8 +1,8 @@
 package com.ft;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 
 public class Main2Activity extends AppCompatActivity {
