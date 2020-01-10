@@ -26,10 +26,8 @@ public class FTMonitorConfig {
         }
         if(isMonitorType(MonitorType.ALL)){
             NetUtils.get().listenerSignal(FTApplication.getApplication());
-            NetUtils.get().getNetSpeed();
         }else if(isMonitorType(MonitorType.NETWORK)){
             NetUtils.get().listenerSignal(FTApplication.getApplication());
-            NetUtils.get().getNetSpeed();
         }
     }
 
