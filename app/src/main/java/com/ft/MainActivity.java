@@ -26,18 +26,12 @@ import com.amitshekhar.debug.encrypt.sqlite.DebugDBEncryptFactory;
 import com.amitshekhar.debug.sqlite.DebugDBFactory;
 import com.bumptech.glide.Glide;
 import com.ft.sdk.FTSdk;
-import com.ft.sdk.garble.utils.BatteryUtils;
 import com.ft.sdk.garble.utils.CameraUtils;
-import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LocationUtils;
 import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.sdk.garble.utils.NetUtils;
-import com.ft.sdk.garble.utils.PerformanceDataUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.Arrays;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -60,21 +54,8 @@ public class MainActivity extends AppCompatActivity {
             DebugDB.initialize(DemoApplication.getContext(), new DebugDBEncryptFactory());
         }
         requestPermissions(new String[]{Manifest.permission.CAMERA
-                ,Manifest.permission.ACCESS_FINE_LOCATION
-                ,Manifest.permission.ACCESS_COARSE_LOCATION},1);
-        LogUtils.d("battery->total:"+ BatteryUtils.getBatteryTotal(this)+"Amh");
-        LogUtils.d("battery->current:"+BatteryUtils.getBatteryCurrent(this)+"%");
-        String[] ram = DeviceUtils.getRamData(this);
-        LogUtils.d("RAM->total:"+ram[0]+",available:"+ram[1]);
-        LogUtils.d("CPU->型号:"+DeviceUtils.getHardWare());
-        LogUtils.d("CPU->使用率:"+DeviceUtils.getCpuUseRate()+"%");
-        LogUtils.d("CPU->最大频率:"+ PerformanceDataUtils.get().getCPUMaxFreqKHz()+"Hz");
-        LogUtils.d("CPU->核数:"+ PerformanceDataUtils.get().getNumberOfCPUCores()+"个");
-        LogUtils.d("NETWORK->类型:"+ NetUtils.get().getNetworkState(this));
-        NetUtils.get().listenerSignal(this);
-        LogUtils.d("NETWORK->信号强度:"+ NetUtils.get().getSignalStrength());
-        LogUtils.d("NETWORK->网络速度:"+ NetUtils.get().getNetSpeed());
-
+                , Manifest.permission.ACCESS_FINE_LOCATION
+                , Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
         setTitle("FT-SDK使用Demo");
         showKotlinActivity = findViewById(R.id.showKotlinActivity);
         btn_lam = findViewById(R.id.btn_lam);
@@ -114,8 +95,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            LogUtils.d("NETWORK->信号强度:"+ NetUtils.get().getSignalStrength());
-            LogUtils.d("NETWORK->网络速度:"+ NetUtils.get().getNetSpeed());
         });
         showDialog.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -154,11 +133,11 @@ public class MainActivity extends AppCompatActivity {
     private void bindUserData(String name) {
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("sex","man");
+            jsonObject.put("sex", "man");
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        FTSdk.get().bindUserData(name,"123456",null);
+        FTSdk.get().bindUserData(name, "123456", null);
     }
 
     @Override
@@ -176,9 +155,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        String piexls = "\n前置摄像头: "+ CameraUtils.getCameraPixels(this,CameraUtils.HasFrontCamera())
-                +"\n后置摄像头: "+CameraUtils.getCameraPixels(this,CameraUtils.HasBackCamera());
-        LogUtils.d("Camera->像素："+piexls);
-        LogUtils.d("Location->城市："+LocationUtils.get().getCity());
+        String piexls = "\n前置摄像头: " + CameraUtils.getCameraPixels(this, CameraUtils.HasFrontCamera())
+                + "\n后置摄像头: " + CameraUtils.getCameraPixels(this, CameraUtils.HasBackCamera());
+        LogUtils.d("Camera->像素：" + piexls);
+        LogUtils.d("Location->城市：" + LocationUtils.get().getCity());
     }
 }

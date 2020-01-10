@@ -22,8 +22,7 @@ public class CameraUtils {
     public static final int CAMERA_FACING_FRONT = 1;
     public static final int CAMERA_NONE = -1;
 
-    public static int HasBackCamera()
-    {
+    public static int HasBackCamera() {
         int numberOfCameras = Camera.getNumberOfCameras();
         CameraInfo cameraInfo = new CameraInfo();
         for (int i = 0; i < numberOfCameras; i++) {
@@ -35,8 +34,7 @@ public class CameraUtils {
         return CAMERA_NONE;
     }
 
-    public static int HasFrontCamera()
-    {
+    public static int HasFrontCamera() {
         int numberOfCameras = Camera.getNumberOfCameras();
         CameraInfo cameraInfo = new CameraInfo();
         for (int i = 0; i < numberOfCameras; i++) {
@@ -51,7 +49,7 @@ public class CameraUtils {
     public static String getCameraPixels(Context context, int paramInt) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             int state = context.checkSelfPermission(Manifest.permission.CAMERA);
-            if(state != PERMISSION_GRANTED){
+            if (state != PERMISSION_GRANTED) {
                 LogUtils.e("请先申请相机权限");
                 return "N/A";
             }
@@ -62,33 +60,28 @@ public class CameraUtils {
         Camera.Parameters localParameters = localCamera.getParameters();
         localParameters.set("camera-id", 1);
         List<Size> localList = localParameters.getSupportedPictureSizes();
-        if (localList != null)
-        {
-            int heights[] = new int[localList.size()];
-            int widths[] = new int[localList.size()];
-            for (int i = 0; i < localList.size(); i++)
-            {
+        if (localList != null) {
+            int[] heights = new int[localList.size()];
+            int[] widths = new int[localList.size()];
+            for (int i = 0; i < localList.size(); i++) {
                 Size size = localList.get(i);
-                int sizehieght = size.height;
-                int sizewidth = size.width;
-                heights[i] = sizehieght;
-                widths[i] =sizewidth;
+                int sizeHeight = size.height;
+                int sizeWidth = size.width;
+                heights[i] = sizeHeight;
+                widths[i] = sizeWidth;
             }
             int pixels = getMaxNumber(heights) * getMaxNumber(widths);
             localCamera.release();
-            return (pixels / 10000) + "万";
+            return (pixels / 10000) + "万像素";
 
-        }
-        else return "N/A";
+        } else return "N/A";
 
     }
 
     public static int getMaxNumber(int[] paramArray) {
         int temp = paramArray[0];
-        for(int i = 0;i<paramArray.length;i++)
-        {
-            if(temp < paramArray[i])
-            {
+        for (int i = 0; i < paramArray.length; i++) {
+            if (temp < paramArray[i]) {
                 temp = paramArray[i];
             }
         }

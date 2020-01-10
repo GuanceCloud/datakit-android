@@ -58,7 +58,7 @@ public class SyncTaskManager {
         if (!ThreadPoolUtils.get().poolRunning()) {
             ThreadPoolUtils.get().reStartPool();
         }
-
+        errorCount.set(0);
         ThreadPoolUtils.get().execute(() -> {
             int count = 0;
             do{
@@ -161,6 +161,7 @@ public class SyncTaskManager {
             StringBuffer sb = new StringBuffer();
             String[] counts = body.split("\n");
             for (String str : counts) {
+                str = str.replaceAll("\\\\ ","_");
                 String[] strArr = str.split(" ");
                 sb.append("{\n ");
                 if (strArr.length == 3) {
