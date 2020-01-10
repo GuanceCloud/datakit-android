@@ -73,7 +73,6 @@ public class SyncTaskManager {
                 count++;
                 //如果开启了用户数据绑定，就等待用户绑定数据完成
             }while (FTUserConfig.get().isNeedBindUser() && !FTUserConfig.get().isUserDataBinded());
-            //LogUtils.d(">>>同步轮询线程<<< 开始运行");
             List<RecordData> recordDataList = queryFromData();
             //当数据库中有数据是执行轮询同步操作
             while (recordDataList != null && !recordDataList.isEmpty()) {
@@ -85,18 +84,11 @@ public class SyncTaskManager {
                     LogUtils.d(">>>连续同步失败5次，停止当前轮询同步<<<");
                     break;
                 }
-                //if (FTActivityManager.get().isForeground()) {//程序在前台执行
-                //LogUtils.d(">>>同步轮询线程<<< 程序正在 前 台执行同步操作");
                 LogUtils.d(">>>同步轮询线程<<< 程序正在执行同步操作");
                 handleSyncOpt(recordDataList);
                 recordDataList = queryFromData();
-                /*} else {//程序退到后台，关闭同步线程
-                    recordDataList = null;
-                    LogUtils.d(">>>同步轮询线程<<< 程序正在 后 台执行同步操作");
-                }*/
             }
             running = false;
-            //LogUtils.d(">>>同步轮询线程<<< 结束运行");
         });
     }
 
