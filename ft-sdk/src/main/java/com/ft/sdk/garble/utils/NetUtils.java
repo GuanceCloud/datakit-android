@@ -134,19 +134,26 @@ public class NetUtils {
         }
     }
 
-    private long rxtxTotal =0;
+    //private long rxtxTotal =0;
     private DecimalFormat showFloatFormat =new DecimalFormat("0.00");
 
     /**
-     * 获得网络速度
+     * 获得网络速度(阻塞方法)
      * @return
      */
     public String getNetSpeed() {
+        long rxtxTotal = TrafficStats.getTotalRxBytes()
+                + TrafficStats.getTotalTxBytes();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         long tempSum = TrafficStats.getTotalRxBytes()
                 + TrafficStats.getTotalTxBytes();
         long rxtxLast = tempSum -rxtxTotal;
         double totalSpeed= rxtxLast *1000 /2000d;
-        rxtxTotal = tempSum;
+        //rxtxTotal = tempSum;
         return showSpeed(totalSpeed);//设置显示当前网速
     }
 

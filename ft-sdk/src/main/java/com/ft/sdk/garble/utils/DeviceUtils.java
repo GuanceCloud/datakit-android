@@ -22,6 +22,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -222,14 +223,15 @@ public class DeviceUtils {
      * @return
      */
     public static String[] getRamData(Context context) {
+        DecimalFormat showFloatFormat =new DecimalFormat("0.00");
         try {
             ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
             ActivityManager.MemoryInfo info = new ActivityManager.MemoryInfo();
             manager.getMemoryInfo(info);
             long[] data = new long[]{info.totalMem, info.availMem};
             String[] strings = new String[2];
-            strings[0] = String.format("%.2f",data[0]/1024/1024/1024.0)+"GB";
-            strings[1] = String.format("%.2f",(data[0]-data[1])*100.0/data[0])+"%";
+            strings[0] = showFloatFormat.format(1.0*data[0]/1024/1024/1024)+"GB";
+            strings[1] = showFloatFormat.format((data[0]-data[1])*100.0/data[0])+"%";
             return strings;
         } catch (Exception e) {
             e.printStackTrace();
@@ -251,11 +253,16 @@ public class DeviceUtils {
      * 获得CPU使用率
      * @return
      */
-    public static float getCpuUseRate(){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            return PerformanceDataUtils.get().getCpuDataForO();
-        }else{
-            return PerformanceDataUtils.get().getCPUData();
+    public static String getCpuUseRate(){
+        try {
+            DecimalFormat showFloatFormat = new DecimalFormat("0.00");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                return showFloatFormat.format(PerformanceDataUtils.get().getCpuDataForO()) + "%";
+            } else {
+                return showFloatFormat.format(PerformanceDataUtils.get().getCPUData()) + "%";
+            }
+        }catch (Exception e){
+            return "N/A";
         }
     }
 

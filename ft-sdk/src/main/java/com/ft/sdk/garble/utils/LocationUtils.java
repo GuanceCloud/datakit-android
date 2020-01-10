@@ -1,7 +1,6 @@
 package com.ft.sdk.garble.utils;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
@@ -10,7 +9,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.ft.sdk.FTApplication;
 
@@ -30,7 +28,7 @@ public class LocationUtils {
     private LocationManager mLocationManager;
     private String mProvider;
     private String mCity;
-    private boolean queryed;
+    private volatile boolean queryed;
     private LocationUtils(){ }
     public static LocationUtils get(){
         if(locationUtils == null){
@@ -76,7 +74,9 @@ public class LocationUtils {
     };
 
     private void startLocation(Context context){
+        queryed = false;
         if(!Utils.isNullOrEmpty(mCity)){
+            queryed = true;
             return;
         }
 
@@ -84,11 +84,13 @@ public class LocationUtils {
             int state = context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
             if(state != PERMISSION_GRANTED){
                 LogUtils.e("请先申请位置权限");
+                queryed = true;
                 return;
             }
             state = context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION);
             if(state != PERMISSION_GRANTED){
                 LogUtils.e("请先申请位置权限");
+                queryed = true;
                 return;
             }
         }
