@@ -215,6 +215,9 @@ public class SyncDataManager {
                 sb.append("ud_name=").append(userData.getName()).append(",");
                 sb.append("ud_id=").append(userData.getId()).append(",");
                 JSONObject js = userData.getExts();
+                if(js == null){
+                    return;
+                }
                 Iterator<String> iterator = js.keys();
                 while (iterator.hasNext()){
                     String key = iterator.next();
@@ -253,12 +256,12 @@ public class SyncDataManager {
             }
             sb.append("network_strength=").append(NetUtils.get().getSignalStrength()).append(",");
             sb.append("network_speed=").append(NetUtils.get().getNetSpeed()).append(",");
-            sb.append("camera_front=").append(CameraUtils.getCameraPixels(context,CameraUtils.HasFrontCamera())).append(",");
-            sb.append("camera_back=").append(CameraUtils.getCameraPixels(context,CameraUtils.HasBackCamera())).append(",");
+            sb.append("camera_front_px=").append(CameraUtils.getCameraPixels(context,CameraUtils.HasFrontCamera())).append(",");
+            sb.append("camera_back_px=").append(CameraUtils.getCameraPixels(context,CameraUtils.HasBackCamera())).append(",");
             sb.append("location_city=").append(LocationUtils.get().getCity()).append(",");
         }else{
             if(FTMonitorConfig.get().isMonitorType(MonitorType.BATTERY)){
-                sb.append("battery_total=").append(BatteryUtils.getBatteryTotal(context)).append("Amh,");
+                sb.append("battery_total=").append(BatteryUtils.getBatteryTotal(context)).append("mAh,");
                 sb.append("battery_use=").append(100-BatteryUtils.getBatteryCurrent(context)).append("%,");
             }
             if(FTMonitorConfig.get().isMonitorType(MonitorType.MEMORY)){
@@ -287,8 +290,8 @@ public class SyncDataManager {
                 sb.append("network_speed=").append(NetUtils.get().getNetSpeed()).append(",");
             }
             if(FTMonitorConfig.get().isMonitorType(MonitorType.CAMERA)){
-                sb.append("camera_front=").append(CameraUtils.getCameraPixels(context,CameraUtils.HasFrontCamera())).append(",");
-                sb.append("camera_back=").append(CameraUtils.getCameraPixels(context,CameraUtils.HasBackCamera())).append(",");
+                sb.append("camera_front_px=").append(CameraUtils.getCameraPixels(context,CameraUtils.HasFrontCamera())).append(",");
+                sb.append("camera_back_px=").append(CameraUtils.getCameraPixels(context,CameraUtils.HasBackCamera())).append(",");
             }
             if(FTMonitorConfig.get().isMonitorType(MonitorType.LOCATION)){
                 sb.append("location_city=").append(LocationUtils.get().getCity()).append(",");
