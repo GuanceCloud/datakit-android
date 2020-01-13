@@ -8,6 +8,7 @@ import android.os.Build;
 import android.telephony.PhoneStateListener;
 import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 
 import java.text.DecimalFormat;
 
@@ -29,9 +30,12 @@ public class NetUtils {
     private boolean isListenering;
     private TelephonyManager telephonyManager;
     private PhoneStatListener phoneStatListener;
-    private NetUtils(){}
-    public synchronized static NetUtils get(){
-        if(netUtils == null){
+
+    private NetUtils() {
+    }
+
+    public synchronized static NetUtils get() {
+        if (netUtils == null) {
             netUtils = new NetUtils();
         }
         return netUtils;
@@ -93,40 +97,42 @@ public class NetUtils {
 
     /**
      * 监听网络强度
+     *
      * @param context
      */
-    public void listenerSignal(Context context){
-        if(isListenering){
+    public void listenerSignal(Context context) {
+        if (isListenering) {
             return;
         }
         isListenering = true;
-        if(telephonyManager == null){
+        if (telephonyManager == null) {
             telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
             if (phoneStatListener == null) {
                 phoneStatListener = new PhoneStatListener();
             }
-            telephonyManager.listen(phoneStatListener,PhoneStatListener.LISTEN_SIGNAL_STRENGTHS);
+            telephonyManager.listen(phoneStatListener, PhoneStatListener.LISTEN_SIGNAL_STRENGTHS);
         }
     }
 
     /**
      * 获得网络强度
+     *
      * @return
      */
-    public int getSignalStrength(){
-        if(phoneStatListener != null){
+    public int getSignalStrength() {
+        if (phoneStatListener != null) {
             return phoneStatListener.mSignalStrength;
         }
         return 0;
     }
 
-    private class PhoneStatListener extends PhoneStateListener{
+    private class PhoneStatListener extends PhoneStateListener {
         private int mSignalStrength;
 
         @Override
         public void onSignalStrengthsChanged(SignalStrength signalStrength) {
             super.onSignalStrengthsChanged(signalStrength);
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 mSignalStrength = signalStrength.getLevel();
                 return;
             }
@@ -135,10 +141,11 @@ public class NetUtils {
     }
 
     //private long rxtxTotal =0;
-    private DecimalFormat showFloatFormat =new DecimalFormat("0.00");
+    private DecimalFormat showFloatFormat = new DecimalFormat("0.00");
 
     /**
      * 获得网络速度(阻塞方法)
+     *
      * @return
      */
     public String getNetSpeed() {
@@ -151,20 +158,40 @@ public class NetUtils {
         }
         long tempSum = TrafficStats.getTotalRxBytes()
                 + TrafficStats.getTotalTxBytes();
-        long rxtxLast = tempSum -rxtxTotal;
-        double totalSpeed= rxtxLast *1000 /2000d;
+        long rxtxLast = tempSum - rxtxTotal;
+        double totalSpeed = rxtxLast * 1000 / 2000d;
         //rxtxTotal = tempSum;
         return showSpeed(totalSpeed);//设置显示当前网速
     }
 
     private String showSpeed(double speed) {
         String speedString;
-        if (speed >=1048576d) {
-            speedString =showFloatFormat.format(speed /1048576d) +"MB/s";
-        }else {
-            speedString =showFloatFormat.format(speed /1024d) +"KB/s";
+        if (speed >= 1048576d) {
+            speedString = showFloatFormat.format(speed / 1048576d) + "MB/s";
+        } else {
+            speedString = showFloatFormat.format(speed / 1024d) + "KB/s";
         }
         return speedString;
+
+    }
+
+
+    /**
+     * 判断设备 是否使用代理上网
+     */
+    public boolean isWifiProxy(Context context) {
+        final boolean IS_ICS_OR_LATER = Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH;
+        String proxyAddress;
+        int proxyPort;
+        if (IS_ICS_OR_LATER) {
+            proxyAddress = System.getProperty("http.proxyHost");
+            String portStr = System.getProperty("http.proxyPort");
+            proxyPort = Integer.parseInt((portStr != null ? portStr : "-1"));
+        } else {
+            proxyAddress = android.net.Proxy.getHost(context);
+            proxyPort = android.net.Proxy.getPort(context);
+        }
+        return (!TextUtils.isEmpty(proxyAddress)) && (proxyPort != -1);
 
     }
 }
