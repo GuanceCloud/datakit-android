@@ -124,6 +124,14 @@ public class FTUserConfig {
         return null;
     }
 
+    public boolean currentSessionHasUser(){
+        if(sessionId != null) {
+            return getUserData(sessionId) != null;
+        }else{
+            return false;
+        }
+    }
+
     /**
      * 绑定用户信息
      *

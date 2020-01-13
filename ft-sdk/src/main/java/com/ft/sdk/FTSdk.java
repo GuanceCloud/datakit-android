@@ -71,6 +71,10 @@ public class FTSdk {
     public void bindUserData(@NonNull String name,@NonNull String id, JSONObject exts){
         if(mFtSDKConfig != null){
             if(mFtSDKConfig.isNeedBindUser()){
+                //如果本地的SessionID已经绑定了用于就重新生成sessionId进行绑定
+                if(FTUserConfig.get().currentSessionHasUser()){
+                    FTUserConfig.get().clearSessionId();
+                }
                 //初始化SessionId
                 FTUserConfig.get().initSessionId();
                 //绑定用户信息
