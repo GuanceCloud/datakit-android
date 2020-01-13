@@ -55,4 +55,8 @@
      *;
 }
 
+-keep class com.ft.sdk.MonitorType{
+    *;
+}
+
 
