@@ -107,8 +107,8 @@ public class SyncDataManager {
                 JSONObject values = opJson.optJSONObject("values");
                 StringBuffer tagSb = getCustomHash(tags, true);
                 StringBuffer valueSb = getCustomHash(values, false);
-                addUserData(tagSb,recordData);
                 addMonitorData(tagSb);
+                addUserData(tagSb,recordData);
                 deleteLastComma(tagSb);
                 if (tagSb.length() > 0) {
                     sb.append(",");
@@ -188,8 +188,8 @@ public class SyncDataManager {
             } catch (Exception e) {
             }
         }
-        addUserData(sb,recordData);
         addMonitorData(sb);
+        addUserData(sb,recordData);
         deleteLastComma(sb);
         if (sb.length() > 0) {
             sb.insert(0, ",");
@@ -238,7 +238,7 @@ public class SyncDataManager {
     private void addMonitorData(StringBuffer sb){
         Context context = FTApplication.getApplication();
         if(FTMonitorConfig.get().isMonitorType(MonitorType.ALL)){
-            sb.append("battery_total=").append(BatteryUtils.getBatteryTotal(context)).append("Amh,");
+            sb.append("battery_total=").append(BatteryUtils.getBatteryTotal(context)).append("mAh,");
             sb.append("battery_use=").append(100-BatteryUtils.getBatteryCurrent(context)).append("%,");
             String[] memory = DeviceUtils.getRamData(context);
             sb.append("memory_total=").append(memory[0]).append(",");
@@ -256,6 +256,7 @@ public class SyncDataManager {
             }
             sb.append("network_strength=").append(NetUtils.get().getSignalStrength()).append(",");
             sb.append("network_speed=").append(NetUtils.get().getNetSpeed()).append(",");
+            sb.append("network_proxy=").append(NetUtils.get().isWifiProxy(context)).append(",");
             sb.append("camera_front_px=").append(CameraUtils.getCameraPixels(context,CameraUtils.HasFrontCamera())).append(",");
             sb.append("camera_back_px=").append(CameraUtils.getCameraPixels(context,CameraUtils.HasBackCamera())).append(",");
             sb.append("location_city=").append(LocationUtils.get().getCity()).append(",");
@@ -288,6 +289,7 @@ public class SyncDataManager {
                 }
                 sb.append("network_strength=").append(NetUtils.get().getSignalStrength()).append(",");
                 sb.append("network_speed=").append(NetUtils.get().getNetSpeed()).append(",");
+                sb.append("network_proxy=").append(NetUtils.get().isWifiProxy(context)).append(",");
             }
             if(FTMonitorConfig.get().isMonitorType(MonitorType.CAMERA)){
                 sb.append("camera_front_px=").append(CameraUtils.getCameraPixels(context,CameraUtils.HasFrontCamera())).append(",");
