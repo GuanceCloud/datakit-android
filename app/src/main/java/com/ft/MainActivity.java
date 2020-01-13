@@ -42,6 +42,9 @@ public class MainActivity extends AppCompatActivity {
     private SeekBar seekbar;
     private RadioGroup radioGroup;
     private Button showDialog;
+    private Button bindUser;
+    private Button unbindUser;
+    private Button changeUser;
     private ImageView iv_glide;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -65,10 +68,14 @@ public class MainActivity extends AppCompatActivity {
         radioGroup = findViewById(R.id.radioGroup);
         showDialog = findViewById(R.id.showDialog);
         iv_glide = findViewById(R.id.iv_glide);
+        bindUser = findViewById(R.id.bindUser);
+        unbindUser = findViewById(R.id.unbindUser);
+        changeUser = findViewById(R.id.changeUser);
         showKotlinActivity.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, Main2Activity.class)));
         btn_lam.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
             }
         });
         checkbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -127,6 +134,27 @@ public class MainActivity extends AppCompatActivity {
         Glide.with(this)
                 .load("https://github.com/bumptech/glide/raw/master/static/glide_logo.png")
                 .into(iv_glide);
+        bindUser.setOnClickListener(v -> {
+            JSONObject exts = new JSONObject();
+            try {
+                exts.put("sex","male");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            FTSdk.get().bindUserData("jack","007",exts);
+        });
+        unbindUser.setOnClickListener(v -> {
+            FTSdk.get().unbindUserData();
+        });
+        changeUser.setOnClickListener(v -> {
+            JSONObject exts = new JSONObject();
+            try {
+                exts.put("sex","female");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            FTSdk.get().bindUserData("Rose","000",exts);
+        });
     }
 
     @Override
