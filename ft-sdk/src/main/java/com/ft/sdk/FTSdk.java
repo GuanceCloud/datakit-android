@@ -32,6 +32,12 @@ public class FTSdk {
         initFTConfig();
         trackStartApp();
     }
+
+    /**
+     * SDK 配置项入口
+     * @param ftSDKConfig
+     * @return
+     */
     public static synchronized FTSdk install(FTSDKConfig ftSDKConfig){
         if (FTSDK == null) {
             FTSDK = new FTSdk(ftSDKConfig);
@@ -39,6 +45,10 @@ public class FTSdk {
         return FTSDK;
     }
 
+    /**
+     * SDK 初始化后，获得 SDK 对象
+     * @return
+     */
     public static synchronized FTSdk get(){
         if(FTSDK == null){
             throw new InvalidParameterException("请先安装SDK(在应用启动时调用FTSdk.install(FTSDKConfig ftSdkConfig))");
