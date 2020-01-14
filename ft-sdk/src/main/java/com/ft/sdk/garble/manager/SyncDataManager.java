@@ -7,6 +7,7 @@ import com.ft.sdk.MonitorType;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.FTUserConfig;
+import com.ft.sdk.garble.bean.CameraPx;
 import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.bean.UserData;
@@ -257,8 +258,10 @@ public class SyncDataManager {
             sb.append("network_strength=").append(NetUtils.get().getSignalStrength()).append(",");
             sb.append("network_speed=").append(NetUtils.get().getNetSpeed()).append(",");
             sb.append("network_proxy=").append(NetUtils.get().isWifiProxy(context)).append(",");
-            sb.append("camera_front_px=").append(CameraUtils.getCameraPixels(context,CameraUtils.HasFrontCamera())).append(",");
-            sb.append("camera_back_px=").append(CameraUtils.getCameraPixels(context,CameraUtils.HasBackCamera())).append(",");
+            List<CameraPx> cameraPxs = CameraUtils.getCameraPxList(context);
+            for (CameraPx cameraPx:cameraPxs){
+                sb.append(cameraPx.toString());
+            }
             sb.append("location_city=").append(LocationUtils.get().getCity()).append(",");
         }else{
             if(FTMonitorConfig.get().isMonitorType(MonitorType.BATTERY)){
@@ -292,9 +295,10 @@ public class SyncDataManager {
                 sb.append("network_proxy=").append(NetUtils.get().isWifiProxy(context)).append(",");
             }
             if(FTMonitorConfig.get().isMonitorType(MonitorType.CAMERA)){
-                sb.append("camera_front_px=").append(CameraUtils.getCameraPixels(context,CameraUtils.HasFrontCamera())).append(",");
-                sb.append("camera_back_px=").append(CameraUtils.getCameraPixels(context,CameraUtils.HasBackCamera())).append(",");
-            }
+                List<CameraPx> cameraPxs = CameraUtils.getCameraPxList(context);
+                for (CameraPx cameraPx:cameraPxs){
+                    sb.append(cameraPx.toString());
+                }}
             if(FTMonitorConfig.get().isMonitorType(MonitorType.LOCATION)){
                 sb.append("location_city=").append(LocationUtils.get().getCity()).append(",");
             }

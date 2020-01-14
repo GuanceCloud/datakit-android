@@ -171,9 +171,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        String piexls = "\n前置摄像头: " + CameraUtils.getCameraPixels(this, CameraUtils.HasFrontCamera())
-                + "\n后置摄像头: " + CameraUtils.getCameraPixels(this, CameraUtils.HasBackCamera());
-        LogUtils.d("Camera->像素：" + piexls);
+        LogUtils.d("Camera->像素：" + CameraUtils.getCameraPxList(this).toString());
         LogUtils.d("Location->城市：" + LocationUtils.get().getCity());
     }
 }
