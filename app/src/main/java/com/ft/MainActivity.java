@@ -171,7 +171,5 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        LogUtils.d("Camera->像素：" + CameraUtils.getCameraPxList(this).toString());
-        LogUtils.d("Location->城市：" + LocationUtils.get().getCity());
     }
 }
