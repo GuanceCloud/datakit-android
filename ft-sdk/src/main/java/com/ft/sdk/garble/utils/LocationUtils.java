@@ -9,6 +9,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 
 import com.ft.sdk.FTApplication;
 
@@ -43,7 +44,15 @@ public class LocationUtils {
      * @return
      */
     public String getCity(){
-        while (!queryed){ }
+        int count = 0;
+        while (!queryed && count < 5){
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            count++;
+        }
         return mCity;
     }
     private LocationListener locationListener = new LocationListener() {
@@ -56,8 +65,8 @@ public class LocationUtils {
                 if(!Utils.isNullOrEmpty(mCity)){
                     mLocationManager.removeUpdates(locationListener);
                 }
-                queryed = true;
             }
+            queryed = true;
         }
 
         @Override
@@ -87,25 +96,21 @@ public class LocationUtils {
                 queryed = true;
                 return;
             }
-            state = context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION);
-            if(state != PERMISSION_GRANTED){
-                LogUtils.e("请先申请位置权限");
-                queryed = true;
-                return;
-            }
         }
         mContext = context;
+        mProvider = null;
         //获取定位服务
         mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         //获取当前可用的位置控制器
         List<String> list = mLocationManager.getProviders(true);
         if (list.contains(LocationManager.GPS_PROVIDER)) {
             //是否为GPS位置控制器
-            mProvider = LocationManager.NETWORK_PROVIDER;//NETWORK_PROVIDER GPS_PROVIDER
-        }
-        else if (list.contains(LocationManager.NETWORK_PROVIDER)) {
+            mProvider = LocationManager.GPS_PROVIDER;
+        } else if (list.contains(LocationManager.NETWORK_PROVIDER)) {
             //是否为网络位置控制器
             mProvider = LocationManager.NETWORK_PROVIDER;
+        } else if (list.contains(LocationManager.PASSIVE_PROVIDER)) {
+            mProvider = LocationManager.PASSIVE_PROVIDER;
         }
         if(mProvider != null){
             Location location = mLocationManager.getLastKnownLocation(mProvider);
@@ -115,7 +120,13 @@ public class LocationUtils {
                 getAddress(context,location);
                 queryed = true;
             }else{
+                if(Looper.myLooper() != Looper.getMainLooper()) {
+                    Looper.prepare();
+                }
                 mLocationManager.requestLocationUpdates(mProvider, 3000, 1, locationListener);
+                if(Looper.myLooper() != Looper.getMainLooper()) {
+                    Looper.loop();
+                }
             }
         }
     }

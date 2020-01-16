@@ -140,7 +140,7 @@ public class MainActivityTest {
         Thread.sleep(1000*60);
         ResponseData responseData = HttpBuilder.Builder()
                 .setUrl("http://testing.api-ft2x.cloudcare.cn:10531")
-                .setModel("api/v1/front/influx/query_data")
+                .setModel("api/v1/influx/query_data")
                 .setHeadParams(SyncDataTest.getQueryHead(token))
                 .setMethod(RequestMethod.POST)
                 .setBodyString(SyncDataTest.buildPostBody())
@@ -162,7 +162,7 @@ public class MainActivityTest {
     private String getLoginToken() throws JSONException {
         ResponseData responseData = HttpBuilder.Builder()
                 .setUrl("http://testing.api-ft2x.cloudcare.cn:10531")
-                .setModel("api/v1/front/auth-token/login")
+                .setModel("api/v1/auth-token/login")
                 .setMethod(RequestMethod.POST)
                 .setHeadParams(SyncDataTest.getLoginHead())
                 .setBodyString(SyncDataTest.getLoginBody(rule.getActivity()))
