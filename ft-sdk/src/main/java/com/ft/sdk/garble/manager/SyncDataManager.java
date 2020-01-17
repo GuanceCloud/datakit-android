@@ -15,7 +15,6 @@ import com.ft.sdk.garble.utils.BatteryUtils;
 import com.ft.sdk.garble.utils.CameraUtils;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LocationUtils;
-import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.NetUtils;
 import com.ft.sdk.garble.utils.OaidUtils;
 import com.ft.sdk.garble.utils.PerformanceDataUtils;
@@ -38,9 +37,12 @@ import static com.ft.sdk.garble.utils.Constants.FT_KEY_VALUE_NULL;
  * Description:
  */
 public class SyncDataManager {
+    private StringBuffer monitorSb = null;
+
     public String getBodyContent(List<RecordData> recordDatas) {
         StringBuffer sb = new StringBuffer();
         String device = parseHashToString(getDeviceInfo());
+        monitorSb = getMonitorData();
         for (RecordData recordData : recordDatas) {
             sb.append(getMeasurement(recordData));
             sb.append(",");
@@ -108,8 +110,8 @@ public class SyncDataManager {
                 JSONObject values = opJson.optJSONObject("values");
                 StringBuffer tagSb = getCustomHash(tags, true);
                 StringBuffer valueSb = getCustomHash(values, false);
-                addMonitorData(tagSb);
-                addUserData(tagSb,recordData);
+                tagSb.append(monitorSb);
+                addUserData(tagSb, recordData);
                 deleteLastComma(tagSb);
                 if (tagSb.length() > 0) {
                     sb.append(",");
@@ -141,13 +143,13 @@ public class SyncDataManager {
             sb.append(key);
             sb.append("=");
             if (value == null) {
-                addQuotationMarks(sb,FT_KEY_VALUE_NULL,!isTag);
+                addQuotationMarks(sb, FT_KEY_VALUE_NULL, !isTag);
             } else {
                 if ("".equals(value)) {
-                    addQuotationMarks(sb,FT_KEY_VALUE_NULL,!isTag);
+                    addQuotationMarks(sb, FT_KEY_VALUE_NULL, !isTag);
                 } else {
                     if (value instanceof String) {
-                        addQuotationMarks(sb,(String) value,!isTag);
+                        addQuotationMarks(sb, (String) value, !isTag);
                     } else {
                         sb.append(value);
                     }
@@ -158,10 +160,10 @@ public class SyncDataManager {
         return sb;
     }
 
-    private void addQuotationMarks(StringBuffer sb, String value, boolean add){
-        if(add){
+    private void addQuotationMarks(StringBuffer sb, String value, boolean add) {
+        if (add) {
             sb.append("\"").append(value).append("\"");
-        }else{
+        } else {
             sb.append(value);
         }
     }
@@ -189,8 +191,8 @@ public class SyncDataManager {
             } catch (Exception e) {
             }
         }
-        addMonitorData(sb);
-        addUserData(sb,recordData);
+        sb.append(monitorSb);
+        addUserData(sb, recordData);
         deleteLastComma(sb);
         if (sb.length() > 0) {
             sb.insert(0, ",");
@@ -207,20 +209,21 @@ public class SyncDataManager {
 
     /**
      * 添加用户信息
+     *
      * @param sb
      */
-    private void addUserData(StringBuffer sb,RecordData recordData){
-        if(FTUserConfig.get().isNeedBindUser() && FTUserConfig.get().isUserDataBinded()){
+    private void addUserData(StringBuffer sb, RecordData recordData) {
+        if (FTUserConfig.get().isNeedBindUser() && FTUserConfig.get().isUserDataBinded()) {
             UserData userData = FTUserConfig.get().getUserData(recordData.getSessionid());
-            if(userData != null) {
+            if (userData != null) {
                 sb.append("ud_name=").append(userData.getName()).append(",");
                 sb.append("ud_id=").append(userData.getId()).append(",");
                 JSONObject js = userData.getExts();
-                if(js == null){
+                if (js == null) {
                     return;
                 }
                 Iterator<String> iterator = js.keys();
-                while (iterator.hasNext()){
+                while (iterator.hasNext()) {
                     String key = iterator.next();
                     try {
                         sb.append("ud_").append(key).append("=").append(js.getString(key)).append(",");
@@ -234,85 +237,91 @@ public class SyncDataManager {
 
     /**
      * 添加配置监控项数据
-     * @param sb
      */
-    private void addMonitorData(StringBuffer sb){
-        Context context = FTApplication.getApplication();
-        if(FTMonitorConfig.get().isMonitorType(MonitorType.ALL)){
-            sb.append("battery_total=").append(BatteryUtils.getBatteryTotal(context)).append("mAh,");
-            sb.append("battery_use=").append(100-BatteryUtils.getBatteryCurrent(context)).append("%,");
-            String[] memory = DeviceUtils.getRamData(context);
-            sb.append("memory_total=").append(memory[0]).append(",");
-            sb.append("memory_use=").append(memory[1]).append(",");
-            sb.append("cpu_no=").append(DeviceUtils.getHardWare()).append(",");
-            sb.append("cpu_use=").append(DeviceUtils.getCpuUseRate()).append(",");
-            sb.append("cpu_hz=").append(PerformanceDataUtils.get().getCPUMaxFreqKHz()).append("Hz").append(",");
-            int networkType = NetUtils.get().getNetworkState(context);
-            if(networkType == 1){
-                sb.append("network_type=").append("WIFI,");
-            }else if(networkType == 0){
-                sb.append("network_type=").append("N/A,");
-            }else{
-                sb.append("network_type=").append("蜂窝网络,");
-            }
-            sb.append("network_strength=").append(NetUtils.get().getSignalStrength()).append(",");
-            sb.append("network_speed=").append(NetUtils.get().getNetSpeed()).append(",");
-            sb.append("network_proxy=").append(NetUtils.get().isWifiProxy(context)).append(",");
-            List<CameraPx> cameraPxs = CameraUtils.getCameraPxList(context);
-            for (CameraPx cameraPx:cameraPxs){
-                sb.append(cameraPx.toString());
-            }
-            sb.append("location_city=").append(LocationUtils.get().getCity()).append(",");
-        }else{
-            if(FTMonitorConfig.get().isMonitorType(MonitorType.BATTERY)){
+    private StringBuffer getMonitorData() {
+        StringBuffer sb = new StringBuffer();
+        try {
+            Context context = FTApplication.getApplication();
+            if (FTMonitorConfig.get().isMonitorType(MonitorType.ALL)) {
                 sb.append("battery_total=").append(BatteryUtils.getBatteryTotal(context)).append("mAh,");
-                sb.append("battery_use=").append(100-BatteryUtils.getBatteryCurrent(context)).append("%,");
-            }
-            if(FTMonitorConfig.get().isMonitorType(MonitorType.MEMORY)){
+                sb.append("battery_use=").append(100 - BatteryUtils.getBatteryCurrent(context)).append("%,");
                 String[] memory = DeviceUtils.getRamData(context);
                 sb.append("memory_total=").append(memory[0]).append(",");
                 sb.append("memory_use=").append(memory[1]).append(",");
-            }
-            if(FTMonitorConfig.get().isMonitorType(MonitorType.CPU)){
                 sb.append("cpu_no=").append(DeviceUtils.getHardWare()).append(",");
                 sb.append("cpu_use=").append(DeviceUtils.getCpuUseRate()).append(",");
                 sb.append("cpu_hz=").append(PerformanceDataUtils.get().getCPUMaxFreqKHz()).append("Hz").append(",");
-            }
-            if(FTMonitorConfig.get().isMonitorType(MonitorType.GPU)){
-
-            }
-            if(FTMonitorConfig.get().isMonitorType(MonitorType.NETWORK)){
                 int networkType = NetUtils.get().getNetworkState(context);
-                if(networkType == 1){
+                if (networkType == 1) {
                     sb.append("network_type=").append("WIFI,");
-                }else if(networkType == 0){
+                } else if (networkType == 0) {
                     sb.append("network_type=").append("N/A,");
-                }else{
+                } else {
                     sb.append("network_type=").append("蜂窝网络,");
                 }
                 sb.append("network_strength=").append(NetUtils.get().getSignalStrength()).append(",");
                 sb.append("network_speed=").append(NetUtils.get().getNetSpeed()).append(",");
                 sb.append("network_proxy=").append(NetUtils.get().isWifiProxy(context)).append(",");
-            }
-            if(FTMonitorConfig.get().isMonitorType(MonitorType.CAMERA)){
                 List<CameraPx> cameraPxs = CameraUtils.getCameraPxList(context);
-                for (CameraPx cameraPx:cameraPxs){
+                for (CameraPx cameraPx : cameraPxs) {
                     sb.append(cameraPx.toString());
-                }}
-            if(FTMonitorConfig.get().isMonitorType(MonitorType.LOCATION)){
+                }
                 sb.append("location_city=").append(LocationUtils.get().getCity()).append(",");
+            } else {
+                if (FTMonitorConfig.get().isMonitorType(MonitorType.BATTERY)) {
+                    sb.append("battery_total=").append(BatteryUtils.getBatteryTotal(context)).append("mAh,");
+                    sb.append("battery_use=").append(100 - BatteryUtils.getBatteryCurrent(context)).append("%,");
+                }
+                if (FTMonitorConfig.get().isMonitorType(MonitorType.MEMORY)) {
+                    String[] memory = DeviceUtils.getRamData(context);
+                    sb.append("memory_total=").append(memory[0]).append(",");
+                    sb.append("memory_use=").append(memory[1]).append(",");
+                }
+                if (FTMonitorConfig.get().isMonitorType(MonitorType.CPU)) {
+                    sb.append("cpu_no=").append(DeviceUtils.getHardWare()).append(",");
+                    sb.append("cpu_use=").append(DeviceUtils.getCpuUseRate()).append(",");
+                    sb.append("cpu_hz=").append(PerformanceDataUtils.get().getCPUMaxFreqKHz()).append("Hz").append(",");
+                }
+                if (FTMonitorConfig.get().isMonitorType(MonitorType.GPU)) {
+
+                }
+                if (FTMonitorConfig.get().isMonitorType(MonitorType.NETWORK)) {
+                    int networkType = NetUtils.get().getNetworkState(context);
+                    if (networkType == 1) {
+                        sb.append("network_type=").append("WIFI,");
+                    } else if (networkType == 0) {
+                        sb.append("network_type=").append("N/A,");
+                    } else {
+                        sb.append("network_type=").append("蜂窝网络,");
+                    }
+                    sb.append("network_strength=").append(NetUtils.get().getSignalStrength()).append(",");
+                    sb.append("network_speed=").append(NetUtils.get().getNetSpeed()).append(",");
+                    sb.append("network_proxy=").append(NetUtils.get().isWifiProxy(context)).append(",");
+                }
+                if (FTMonitorConfig.get().isMonitorType(MonitorType.CAMERA)) {
+                    List<CameraPx> cameraPxs = CameraUtils.getCameraPxList(context);
+                    for (CameraPx cameraPx : cameraPxs) {
+                        sb.append(cameraPx.toString());
+                    }
+                }
+                if (FTMonitorConfig.get().isMonitorType(MonitorType.LOCATION)) {
+                    sb.append("location_city=").append(LocationUtils.get().getCity()).append(",");
+                }
             }
+        } catch (Exception e) {
+
         }
+        return sb;
     }
 
-    private String getEventName(String op){
-        if(OP.LANC.value.equals(op)){
+    private String getEventName(String op) {
+        if (OP.LANC.value.equals(op)) {
             return "launch";
-        }else if(OP.CLK.value.equals(op)){
+        } else if (OP.CLK.value.equals(op)) {
             return "click";
-        }else if(OP.CLS.value.equals(op)){
+        } else if (OP.CLS.value.equals(op)) {
             return "close";
-        }else if(OP.OPEN.value.equals(op)){
+        } else if (OP.OPEN.value.equals(op)) {
             return "open";
         }
         return op;
@@ -384,7 +393,7 @@ public class SyncDataManager {
         objectHashMap.put("device_model", DeviceUtils.getDeviceModel());
         objectHashMap.put("display", DeviceUtils.getDisplay(context));
         objectHashMap.put("carrier", DeviceUtils.getCarrier(context));
-        if(FTHttpConfig.get().useOaid){
+        if (FTHttpConfig.get().useOaid) {
             objectHashMap.put("oaid", OaidUtils.getOAID(context));
         }
         return objectHashMap;
