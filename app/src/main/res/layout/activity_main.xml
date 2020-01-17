@@ -5,75 +5,86 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".MainActivity">
+
     <LinearLayout
+        android:id="@+id/ll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+        <Button
+            android:id="@+id/btn_lam"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="lambda" />
 
-    <Button
-        android:id="@+id/btn_lam"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="lambda" />
+        <Button
+            android:id="@+id/showKotlinActivity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="跳转到KotlinActivity" />
 
-    <Button
-        android:id="@+id/showKotlinActivity"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="跳转到KotlinActivity" />
-
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/checkbox"
-        android:text="文本选择框"/>
-    <RatingBar
-        android:id="@+id/ratingbar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-    <SeekBar
-        android:id="@+id/seekbar"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"/>
-    <RadioGroup
-        android:id="@+id/radioGroup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <RadioButton
-            android:id="@+id/radio1"
+        <CheckBox
+            android:id="@+id/checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="正确"/>
-        <RadioButton
-            android:id="@+id/radio2"
+            android:text="文本选择框" />
+
+        <RatingBar
+            android:id="@+id/ratingbar"
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <SeekBar
+            android:id="@+id/seekbar"
+            android:layout_width="match_parent"
+            android:layout_height="40dp" />
+
+        <RadioGroup
+            android:id="@+id/radioGroup"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="错误"/>
-    </RadioGroup>
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/showDialog"
-        android:text="弹框"/>
-    <ImageView
-        android:layout_width="200dp"
-        android:layout_height="40dp"
-        android:id="@+id/iv_glide"/>
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/bindUser"
-        android:text="绑定用户信息"/>
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/unbindUser"
-        android:text="解绑用户信息"/>
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/changeUser"
-        android:text="切换用户信息"/>
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/radio1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="正确" />
+
+            <RadioButton
+                android:id="@+id/radio2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="错误" />
+        </RadioGroup>
+
+        <Button
+            android:id="@+id/showDialog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="弹框" />
+
+        <ImageView
+            android:id="@+id/iv_glide"
+            android:layout_width="200dp"
+            android:layout_height="40dp" />
+
+        <Button
+            android:id="@+id/bindUser"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="绑定用户信息" />
+
+        <Button
+            android:id="@+id/unbindUser"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="解绑用户信息" />
+
+        <Button
+            android:id="@+id/changeUser"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="切换用户信息" />
     </LinearLayout>
 </ScrollView>
