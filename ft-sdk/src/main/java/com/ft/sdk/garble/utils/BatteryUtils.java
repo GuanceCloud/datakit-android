@@ -10,7 +10,7 @@ import com.ft.sdk.garble.bean.BatteryBean;
 /**
  * BY huangDianHua
  * DATE:2020-01-09 17:47
- * Description:
+ * Description:参考开源项目地址 https://github.com/guxiaonian/MobileInfo
  */
 public class BatteryUtils {
     static double batteryCapacity = 0; //电池的容量mAh
