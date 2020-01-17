@@ -30,6 +30,8 @@ public class CpuUtils {
     private static CpuUtils cpuUtils;
 
     //常见获取 CPU 温度的系统文件路径,TODO 当获取不到温度时尝试扩展这个文件路径集合
+    //参考1：https://blog.csdn.net/willway_wang/article/details/87599122
+    //参考2：https://github.com/kamgurgul/cpu-info
     private final List<String> CPU_TEMP_FILE_PATHS = Arrays.asList(
             "/sys/devices/system/cpu/cpu0/cpufreq/cpu_temp",
             "/sys/devices/system/cpu/cpu0/cpufreq/FakeShmoo_cpu_temp",
@@ -306,7 +308,6 @@ public class CpuUtils {
                     break;
                 }
             } catch (Exception e) {
-                e.printStackTrace();
             }
         }
         return currentTemp;
@@ -324,7 +325,6 @@ public class CpuUtils {
             inputStreamReader.close();
             bufferedReader.close();
         } catch (Exception e) {
-            e.printStackTrace();
         }
         double result = 0;
         try {
