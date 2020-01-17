@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
-import android.os.BatteryManager;
 import android.os.Build;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
@@ -257,9 +256,9 @@ public class DeviceUtils {
         try {
             DecimalFormat showFloatFormat = new DecimalFormat("0.00");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                return showFloatFormat.format(PerformanceDataUtils.get().getCpuDataForO()) + "%";
+                return showFloatFormat.format(CpuUtils.get().getCpuDataForO()) + "%";
             } else {
-                return showFloatFormat.format(PerformanceDataUtils.get().getCPUData()) + "%";
+                return showFloatFormat.format(CpuUtils.get().getCPUData()) + "%";
             }
         }catch (Exception e){
             return "N/A";
