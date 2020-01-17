@@ -26,9 +26,6 @@ import com.amitshekhar.debug.encrypt.sqlite.DebugDBEncryptFactory;
 import com.amitshekhar.debug.sqlite.DebugDBFactory;
 import com.bumptech.glide.Glide;
 import com.ft.sdk.FTSdk;
-import com.ft.sdk.garble.utils.CameraUtils;
-import com.ft.sdk.garble.utils.LocationUtils;
-import com.ft.sdk.garble.utils.LogUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
