@@ -84,10 +84,10 @@ public class LocationUtils {
 
     private void startLocation(Context context){
         queryed = false;
-        if(!Utils.isNullOrEmpty(mCity)){
+        /**if(!Utils.isNullOrEmpty(mCity)){
             queryed = true;
             return;
-        }
+        }*/
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             int state = context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
@@ -141,11 +141,11 @@ public class LocationUtils {
                         location.getLongitude(), 1);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtils.e("地址解析异常,message="+e.getMessage());
         }
 
         if(result != null && !result.isEmpty() && result.get(0) != null){
-            mCity = result.get(0).getAdminArea();
+            mCity = result.get(0).getLocality();
         }
     }
 }

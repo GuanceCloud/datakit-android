@@ -11,27 +11,52 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * BY huangDianHua
  * DATE:2020-01-08 18:58
  * Description:
  */
-public class PerformanceDataUtils {
-    private PerformanceDataUtils() {
+public class CpuUtils {
+    private CpuUtils() {
     }
 
     private RandomAccessFile mProcStatFile;
     private RandomAccessFile mAppStatFile;
     private Long mLastCpuTime;
     private Long mLastAppCpuTime;
-    private static PerformanceDataUtils performanceDataUtils;
+    private static CpuUtils cpuUtils;
 
-    public synchronized static PerformanceDataUtils get() {
-        if (performanceDataUtils == null) {
-            performanceDataUtils = new PerformanceDataUtils();
+    //常见获取 CPU 温度的系统文件路径,TODO 当获取不到温度时尝试扩展这个文件路径集合
+    private final List<String> CPU_TEMP_FILE_PATHS = Arrays.asList(
+            "/sys/devices/system/cpu/cpu0/cpufreq/cpu_temp",
+            "/sys/devices/system/cpu/cpu0/cpufreq/FakeShmoo_cpu_temp",
+            "/sys/class/thermal/thermal_zone0/temp",
+            "/sys/class/i2c-adapter/i2c-4/4-004c/temperature",
+            "/sys/devices/platform/tegra-i2c.3/i2c-4/4-004c/temperature",
+            "/sys/devices/platform/omap/omap_temp_sensor.0/temperature",
+            "/sys/devices/platform/tegra_tmon/temp1_input",
+            "/sys/kernel/debug/tegra_thermal/temp_tj",
+            "/sys/devices/platform/s5p-tmu/temperature",
+            "/sys/class/thermal/thermal_zone1/temp",
+            "/sys/class/hwmon/hwmon0/device/temp1_input",
+            "/sys/devices/virtual/thermal/thermal_zone1/temp",
+            "/sys/devices/virtual/thermal/thermal_zone0/temp",
+            "/sys/class/thermal/thermal_zone3/temp",
+            "/sys/class/thermal/thermal_zone4/temp",
+            "/sys/class/hwmon/hwmonX/temp1_input",
+            "/sys/devices/platform/s5p-tmu/curr_temp"
+    );
+
+    public synchronized static CpuUtils get() {
+        if (cpuUtils == null) {
+            cpuUtils = new CpuUtils();
         }
-        return performanceDataUtils;
+        cpuUtils.mLastCpuTime = 0L;
+        cpuUtils.mLastAppCpuTime = 0L;
+        return cpuUtils;
     }
 
     public final int DEVICEINFO_UNKNOWN = -1;
@@ -39,6 +64,7 @@ public class PerformanceDataUtils {
     /**
      * 获取 CPU 核数
      * https://blog.csdn.net/gundumw100/article/details/69997479
+     *
      * @return
      */
     public int getNumberOfCPUCores() {
@@ -73,6 +99,7 @@ public class PerformanceDataUtils {
 
     /**
      * 获取 CPU 最大频率
+     *
      * @return
      */
     public int getCPUMaxFreqKHz() {
@@ -258,5 +285,56 @@ public class PerformanceDataUtils {
 
         }
         return value;
+    }
+
+    /**
+     * 获得 CPU 的温度
+     *
+     * @return
+     */
+    public double getCpuTemperature() {
+        double currentTemp = 0.0D;
+        for (String path : CPU_TEMP_FILE_PATHS) {
+            try {
+                Double temp = readOnLine(new File(path));
+                if (isTemperatureValid(temp)) {
+                    currentTemp = temp;
+                } else if (isTemperatureValid(temp / (double) 1000)) {
+                    currentTemp = temp / (double) 1000;
+                }
+                if (currentTemp != 0) {
+                    break;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return currentTemp;
+    }
+
+    private double readOnLine(File file) {
+        FileInputStream fileInputStream = null;
+        String s = "";
+        try {
+            fileInputStream = new FileInputStream(file);
+            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            s = bufferedReader.readLine();
+            fileInputStream.close();
+            inputStreamReader.close();
+            bufferedReader.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        double result = 0;
+        try {
+            result = Double.parseDouble(s);
+        } catch (NumberFormatException e) {
+        }
+        return result;
+    }
+
+    private boolean isTemperatureValid(double temp) {
+        return temp >= -30.0D && temp <= 250.0D;
     }
 }
