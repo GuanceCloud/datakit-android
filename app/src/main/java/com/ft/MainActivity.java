@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
                 , Manifest.permission.ACCESS_FINE_LOCATION
                 , Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
         setTitle("FT-SDK使用Demo");
+        FTSdk.get().setGpuRenderer(findViewById(R.id.ll));
         showKotlinActivity = findViewById(R.id.showKotlinActivity);
         btn_lam = findViewById(R.id.btn_lam);
         checkbox = findViewById(R.id.checkbox);
