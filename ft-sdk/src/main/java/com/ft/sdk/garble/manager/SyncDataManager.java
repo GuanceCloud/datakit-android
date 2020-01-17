@@ -14,6 +14,7 @@ import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.BatteryUtils;
 import com.ft.sdk.garble.utils.CameraUtils;
 import com.ft.sdk.garble.utils.DeviceUtils;
+import com.ft.sdk.garble.utils.GpuUtils;
 import com.ft.sdk.garble.utils.LocationUtils;
 import com.ft.sdk.garble.utils.NetUtils;
 import com.ft.sdk.garble.utils.OaidUtils;
@@ -252,6 +253,9 @@ public class SyncDataManager {
                 sb.append("cpu_use=").append(DeviceUtils.getCpuUseRate()).append(",");
                 sb.append("cpu_temperature=").append(CpuUtils.get().getCpuTemperature()).append("℃,");
                 sb.append("cpu_hz=").append(CpuUtils.get().getCPUMaxFreqKHz()).append("Hz").append(",");
+                sb.append("gpu_model=").append(GpuUtils.GPU_VENDOR_RENDERER).append(",");
+                sb.append("gpu_hz=").append(GpuUtils.getGpuMaxFreq()).append("Hz").append(",");
+                sb.append("gpu_rate=").append(GpuUtils.getGpuUseRate()).append("%").append(",");
                 int networkType = NetUtils.get().getNetworkState(context);
                 if (networkType == 1) {
                     sb.append("network_type=").append("WIFI,");
@@ -285,7 +289,9 @@ public class SyncDataManager {
                     sb.append("cpu_hz=").append(CpuUtils.get().getCPUMaxFreqKHz()).append("Hz").append(",");
                 }
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.GPU)) {
-
+                    sb.append("gpu_model=").append(GpuUtils.GPU_VENDOR_RENDERER).append(",");
+                    sb.append("gpu_hz=").append(GpuUtils.getGpuMaxFreq()).append("Hz").append(",");
+                    sb.append("gpu_rate=").append(GpuUtils.getGpuUseRate()).append("%").append(",");
                 }
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.NETWORK)) {
                     int networkType = NetUtils.get().getNetworkState(context);
