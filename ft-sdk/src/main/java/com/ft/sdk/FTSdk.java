@@ -1,6 +1,9 @@
 package com.ft.sdk;
 
 import android.app.Application;
+import android.content.Context;
+import android.opengl.GLSurfaceView;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 
@@ -9,7 +12,9 @@ import com.ft.sdk.garble.FTAutoTrackConfig;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.FTUserConfig;
+import com.ft.sdk.garble.utils.GpuUtils;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.RendererUtil;
 
 import org.json.JSONObject;
 
@@ -91,6 +96,31 @@ public class FTSdk {
                 FTUserConfig.get().bindUserData(name,id,exts);
             }
         }
+    }
+
+    /**
+     * 创建获取 GPU 信息的GLSurfaceView
+     * @param root
+     */
+    public void setGpuRenderer(ViewGroup root){
+        Context context =FTApplication.getApplication();
+        final RendererUtil mRendererUtil = new RendererUtil();
+        GLSurfaceView mGLSurfaceView = new GLSurfaceView(context);
+        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(1,1);
+        mGLSurfaceView.setLayoutParams(layoutParams);
+        root.addView(mGLSurfaceView);
+        mGLSurfaceView.setEGLContextClientVersion(1);
+        mGLSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 0, 0);
+        mGLSurfaceView.setRenderer(mRendererUtil);
+        mGLSurfaceView.post(() -> {
+            String gl_vendor = mRendererUtil.gl_vendor;
+            String gl_renderer = mRendererUtil.gl_renderer;
+            LogUtils.d("gl_vendor = "+gl_vendor+" ,gl_renderer = "+gl_renderer);
+            GpuUtils.GPU_VENDOR_RENDERER = gl_vendor+"_"+gl_renderer;
+            if(gl_renderer != null && gl_vendor != null){
+                mGLSurfaceView.surfaceDestroyed(mGLSurfaceView.getHolder());
+            }
+        });
     }
 
     /**
