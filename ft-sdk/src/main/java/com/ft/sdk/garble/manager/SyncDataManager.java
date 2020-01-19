@@ -139,7 +139,7 @@ public class SyncDataManager {
         StringBuffer sb = new StringBuffer();
         Iterator<String> keys = tags.keys();
         while (keys.hasNext()) {
-            String key = keys.next();
+            String key = Utils.replaceSpaceAndComma(keys.next());
             Object value = tags.opt(key);
             sb.append(key);
             sb.append("=");
@@ -150,7 +150,7 @@ public class SyncDataManager {
                     addQuotationMarks(sb, FT_KEY_VALUE_NULL, !isTag);
                 } else {
                     if (value instanceof String) {
-                        addQuotationMarks(sb, (String) value, !isTag);
+                        addQuotationMarks(sb, Utils.replaceSpaceAndComma((String) value), !isTag);
                     } else {
                         sb.append(value);
                     }
@@ -217,8 +217,8 @@ public class SyncDataManager {
         if (FTUserConfig.get().isNeedBindUser() && FTUserConfig.get().isUserDataBinded()) {
             UserData userData = FTUserConfig.get().getUserData(recordData.getSessionid());
             if (userData != null) {
-                sb.append("ud_name=").append(userData.getName()).append(",");
-                sb.append("ud_id=").append(userData.getId()).append(",");
+                sb.append("ud_name=").append(Utils.replaceComma(userData.getName())).append(",");
+                sb.append("ud_id=").append(Utils.replaceComma(userData.getId())).append(",");
                 JSONObject js = userData.getExts();
                 if (js == null) {
                     return;
@@ -227,7 +227,7 @@ public class SyncDataManager {
                 while (iterator.hasNext()) {
                     String key = iterator.next();
                     try {
-                        sb.append("ud_").append(key).append("=").append(js.getString(key)).append(",");
+                        sb.append("ud_").append(Utils.replaceComma(key)).append("=").append(Utils.replaceComma(js.getString(key))).append(",");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
