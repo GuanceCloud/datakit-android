@@ -116,7 +116,6 @@ public class LocationUtils {
             Location location = mLocationManager.getLastKnownLocation(mProvider);
             if(location!=null){
                 String string = "纬度为：" + location.getLatitude() + ",经度为："+ location.getLongitude();
-                LogUtils.d(string);
                 getAddress(context,location);
                 queryed = true;
             }else{

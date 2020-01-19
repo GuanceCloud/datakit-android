@@ -35,6 +35,7 @@ public class FTSdk {
         app.registerActivityLifecycleCallbacks(life);
         this.mFtSDKConfig = ftSDKConfig;
         initFTConfig();
+        LogUtils.d("FT SDK 初始化成功");
         trackStartApp();
     }
 
@@ -67,6 +68,7 @@ public class FTSdk {
     public void unbindUserData(){
         if(mFtSDKConfig != null){
             if (mFtSDKConfig.isNeedBindUser()) {
+                LogUtils.d("解绑用户信息");
                 //解绑用户信息
                 FTUserConfig.get().unbindUserData();
                 //清除本地缓存的SessionId
@@ -86,6 +88,7 @@ public class FTSdk {
     public void bindUserData(@NonNull String name,@NonNull String id, JSONObject exts){
         if(mFtSDKConfig != null){
             if(mFtSDKConfig.isNeedBindUser()){
+                LogUtils.d("绑定用户信息");
                 //如果本地的SessionID已经绑定了用于就重新生成sessionId进行绑定
                 if(FTUserConfig.get().currentSessionHasUser()){
                     FTUserConfig.get().clearSessionId();
@@ -103,24 +106,27 @@ public class FTSdk {
      * @param root
      */
     public void setGpuRenderer(ViewGroup root){
-        Context context =FTApplication.getApplication();
-        final RendererUtil mRendererUtil = new RendererUtil();
-        GLSurfaceView mGLSurfaceView = new GLSurfaceView(context);
-        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(1,1);
-        mGLSurfaceView.setLayoutParams(layoutParams);
-        root.addView(mGLSurfaceView);
-        mGLSurfaceView.setEGLContextClientVersion(1);
-        mGLSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 0, 0);
-        mGLSurfaceView.setRenderer(mRendererUtil);
-        mGLSurfaceView.post(() -> {
-            String gl_vendor = mRendererUtil.gl_vendor;
-            String gl_renderer = mRendererUtil.gl_renderer;
-            LogUtils.d("gl_vendor = "+gl_vendor+" ,gl_renderer = "+gl_renderer);
-            GpuUtils.GPU_VENDOR_RENDERER = gl_vendor+"_"+gl_renderer;
-            if(gl_renderer != null && gl_vendor != null){
-                mGLSurfaceView.surfaceDestroyed(mGLSurfaceView.getHolder());
-            }
-        });
+        LogUtils.d("绑定视图监听 GPU 信息");
+        try {
+            Context context = FTApplication.getApplication();
+            final RendererUtil mRendererUtil = new RendererUtil();
+            GLSurfaceView mGLSurfaceView = new GLSurfaceView(context);
+            ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(1, 1);
+            mGLSurfaceView.setLayoutParams(layoutParams);
+            root.addView(mGLSurfaceView);
+            mGLSurfaceView.setEGLContextClientVersion(1);
+            mGLSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 0, 0);
+            mGLSurfaceView.setRenderer(mRendererUtil);
+            mGLSurfaceView.post(() -> {
+                String gl_vendor = mRendererUtil.gl_vendor;
+                String gl_renderer = mRendererUtil.gl_renderer;
+                GpuUtils.GPU_VENDOR_RENDERER = gl_vendor + "_" + gl_renderer;
+                if (gl_renderer != null && gl_vendor != null) {
+                    mGLSurfaceView.surfaceDestroyed(mGLSurfaceView.getHolder());
+                }
+            });
+        }catch (Exception e){
+        }
     }
 
     /**
