@@ -23,13 +23,18 @@ public class CameraUtils {
     public static final int CAMERA_FACING_BACK = 0;
     public static final int CAMERA_FACING_FRONT = 1;
     public static final int CAMERA_NONE = -1;
+    public static List<CameraPx> cameraPxList = null;
 
     public static List<CameraPx> getCameraPxList(Context context){
-        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP){
-            return getCamera2IdList(context);
-        }else{
-            return getCameraIdList(context);
+        if(cameraPxList != null && !cameraPxList.isEmpty()){
+            return cameraPxList;
         }
+        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP){
+            cameraPxList = getCamera2IdList(context);
+        }else{
+            cameraPxList = getCameraIdList(context);
+        }
+        return cameraPxList;
     }
     /**
      * 通过 Camera2 获取相机的像素
