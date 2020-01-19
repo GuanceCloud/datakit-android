@@ -82,5 +82,46 @@ public class Utils {
             return "";
         }
     }
+
+    /**
+     * 替换逗号为下划线
+     * @param oldStr
+     * @return
+     */
+    public static String replaceComma(String oldStr){
+        if(isNullOrEmpty(oldStr)){
+            return "";
+        }
+        if(oldStr.contains(",")){
+            return oldStr.replaceAll(",","_");
+        }
+        return oldStr;
+    }
+
+    /**
+     * 转义空格
+     * @param oldStr
+     * @return
+     */
+    public static String replaceSpace(String oldStr){
+        if(isNullOrEmpty(oldStr)){
+            return "";
+        }
+        if(oldStr.contains(" ")){
+            return oldStr.replaceAll(" ","\\\\ ");
+        }
+        return oldStr;
+    }
+
+    /**
+     * 转义空格和替换逗号为下划线
+     * @param oldStr
+     * @return
+     */
+    public static String replaceSpaceAndComma(String oldStr){
+        oldStr = replaceSpace(oldStr);
+        oldStr = replaceComma(oldStr);
+        return oldStr;
+    }
 }
 
