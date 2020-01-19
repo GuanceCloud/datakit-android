@@ -22,12 +22,13 @@ import java.util.List;
 public class CpuUtils {
     private CpuUtils() {
     }
-
+    public final int DEVICEINFO_UNKNOWN = -1;
     private RandomAccessFile mProcStatFile;
     private RandomAccessFile mAppStatFile;
     private Long mLastCpuTime;
     private Long mLastAppCpuTime;
     private static CpuUtils cpuUtils;
+    private int maxFreq = DEVICEINFO_UNKNOWN;
 
     //常见获取 CPU 温度的系统文件路径,TODO 当获取不到温度时尝试扩展这个文件路径集合
     //参考1：https://blog.csdn.net/willway_wang/article/details/87599122
@@ -60,8 +61,6 @@ public class CpuUtils {
         cpuUtils.mLastAppCpuTime = 0L;
         return cpuUtils;
     }
-
-    public final int DEVICEINFO_UNKNOWN = -1;
 
     /**
      * 获取 CPU 核数
@@ -105,7 +104,9 @@ public class CpuUtils {
      * @return
      */
     public int getCPUMaxFreqKHz() {
-        int maxFreq = DEVICEINFO_UNKNOWN;
+        if(maxFreq != DEVICEINFO_UNKNOWN){
+            return maxFreq;
+        }
         try {
             for (int i = 0; i < getNumberOfCPUCores(); i++) {
                 String filename =
