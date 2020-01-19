@@ -11,6 +11,7 @@ import com.ft.sdk.garble.FTActivityLifecycleCallbacks;
 import com.ft.sdk.garble.FTAutoTrackConfig;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
+import com.ft.sdk.garble.FTNetworkListener;
 import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.utils.GpuUtils;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -37,6 +38,7 @@ public class FTSdk {
         initFTConfig();
         LogUtils.d("FT SDK 初始化成功");
         trackStartApp();
+        FTNetworkListener.get().monitor();
     }
 
     /**
