@@ -28,7 +28,7 @@ import static com.ft.sdk.garble.http.NetCodeStatus.NET_UNKNOWN_ERR;
  * Description:
  */
 public abstract class HttpClient {
-    protected final int SEND_OUT_TIME = 30 * 1000;
+    protected final int SEND_OUT_TIME = 10 * 1000;
     protected final int READ_OUT_TIME = 10 * 1000;
     protected final String CHARSET = "UTF-8";
     protected final String CONTENT_TYPE = "text/plain";
