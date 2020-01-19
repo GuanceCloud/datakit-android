@@ -82,7 +82,6 @@ public class GpuUtils {
             line = br.readLine();
             br.close();
         } catch (Exception e) {
-            e.printStackTrace();
         } finally {
             if (br != null) {
                 try {
@@ -112,7 +111,6 @@ public class GpuUtils {
             }
             br.close();
         } catch (IOException e) {
-            e.printStackTrace();
         }
 
         return result;
