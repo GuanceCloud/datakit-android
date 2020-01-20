@@ -28,8 +28,7 @@ public class LocationUtils {
     private static LocationUtils locationUtils;
     private LocationManager mLocationManager;
     private String mProvider;
-    private String mCity;
-    private volatile boolean queryed;
+    private String mCity = Constants.UNKNOWN;
     private LocationUtils(){ }
     public static LocationUtils get(){
         if(locationUtils == null){
@@ -40,19 +39,10 @@ public class LocationUtils {
     }
 
     /**
-     * 获取所在地址（方法为阻塞方法）
+     * 获取所在地址
      * @return
      */
     public String getCity(){
-        int count = 0;
-        while (!queryed && count < 5){
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            count++;
-        }
         return mCity;
     }
     private LocationListener locationListener = new LocationListener() {
@@ -66,7 +56,6 @@ public class LocationUtils {
                     mLocationManager.removeUpdates(locationListener);
                 }
             }
-            queryed = true;
         }
 
         @Override
@@ -83,17 +72,10 @@ public class LocationUtils {
     };
 
     private void startLocation(Context context){
-        queryed = false;
-        /**if(!Utils.isNullOrEmpty(mCity)){
-            queryed = true;
-            return;
-        }*/
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             int state = context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
             if(state != PERMISSION_GRANTED){
                 LogUtils.e("请先申请位置权限");
-                queryed = true;
                 return;
             }
         }
@@ -117,7 +99,6 @@ public class LocationUtils {
             if(location!=null){
                 String string = "纬度为：" + location.getLatitude() + ",经度为："+ location.getLongitude();
                 getAddress(context,location);
-                queryed = true;
             }else{
                 if(Looper.myLooper() != Looper.getMainLooper()) {
                     Looper.prepare();
