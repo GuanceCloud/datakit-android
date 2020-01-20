@@ -265,7 +265,7 @@ public class SyncDataManager {
                     sb.append("network_type=").append("蜂窝网络,");
                 }
                 sb.append("network_strength=").append(NetUtils.get().getSignalStrength()).append(",");
-                sb.append("network_speed=").append(NetUtils.get().getNetSpeed()).append(",");
+                sb.append("network_speed=").append(NetUtils.get().getNetRate()).append(",");
                 sb.append("network_proxy=").append(NetUtils.get().isWifiProxy(context)).append(",");
                 List<CameraPx> cameraPxs = CameraUtils.getCameraPxList(context);
                 for (CameraPx cameraPx : cameraPxs) {
@@ -303,7 +303,7 @@ public class SyncDataManager {
                         sb.append("network_type=").append("蜂窝网络,");
                     }
                     sb.append("network_strength=").append(NetUtils.get().getSignalStrength()).append(",");
-                    sb.append("network_speed=").append(NetUtils.get().getNetSpeed()).append(",");
+                    sb.append("network_speed=").append(NetUtils.get().getNetRate()).append(",");
                     sb.append("network_proxy=").append(NetUtils.get().isWifiProxy(context)).append(",");
                 }
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.CAMERA)) {

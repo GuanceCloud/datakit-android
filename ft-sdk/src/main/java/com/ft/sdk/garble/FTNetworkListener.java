@@ -49,7 +49,7 @@ public class FTNetworkListener {
         if (networkReceiver == null) {
             networkReceiver = new FTNetworkReceiver();
         }
-        if (connectivityManager == null){
+        if (connectivityManager == null) {
             connectivityManager = (ConnectivityManager) application.getSystemService(Context.CONNECTIVITY_SERVICE);
         }
         initMonitor();
@@ -58,14 +58,14 @@ public class FTNetworkListener {
     private void initMonitor() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             connectivityManager.registerDefaultNetworkCallback(networkCallback);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             NetworkRequest.Builder builder = new NetworkRequest.Builder();
             NetworkRequest request = builder.build();
-            connectivityManager.registerNetworkCallback(request,networkCallback);
+            connectivityManager.registerNetworkCallback(request, networkCallback);
         } else {
             IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
-            application.registerReceiver(networkReceiver,intentFilter);
+            application.registerReceiver(networkReceiver, intentFilter);
         }
     }
 
@@ -94,10 +94,12 @@ public class FTNetworkListener {
     /**
      * 判断网络是否可用
      */
-    private void judgeNetState(){
+    private void judgeNetState() {
         //大于 0 有网
-        if (NetUtils.get().getNetworkState(application) > 0){
-            LogUtils.d("Net->"+"网络已连接");
+        if (NetUtils.get().getNetworkState(application) > 0) {
+            //监听网络速度
+            NetUtils.get().startMonitorNetRate();
+            LogUtils.d("Net->" + "网络已连接");
             SyncTaskManager.get().executeSyncPoll();
         }
     }
