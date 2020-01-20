@@ -31,6 +31,10 @@ public class NetUtils {
     private TelephonyManager telephonyManager;
     private PhoneStatListener phoneStatListener;
 
+    private String netRate = Constants.UNKNOWN;
+    private long lastRxTx = 0;
+    private boolean isRunNetMonitor = false;
+
     private NetUtils() {
     }
 
@@ -140,28 +144,60 @@ public class NetUtils {
         }
     }
 
-    //private long rxtxTotal =0;
+    /**
+     * 得到网络速度
+     *
+     * @return
+     */
+    public String getNetRate() {
+        return netRate;
+    }
+
+    /**
+     * 开始监听网络速率
+     */
+    public void startMonitorNetRate(){
+        synchronized (this) {
+            try {
+                if(isRunNetMonitor){
+                    return;
+                }
+                ThreadPoolUtils.get().execute(() -> {
+                    try {
+                        while (true) {
+                            isRunNetMonitor = true;
+                            try {
+                                getNetSpeed();
+                                Thread.sleep(1000);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }catch (Exception e){}finally {
+                        isRunNetMonitor = false;
+                    }
+                });
+            }catch (Exception e){
+                isRunNetMonitor = false;
+            }
+        }
+    }
+
     private DecimalFormat showFloatFormat = new DecimalFormat("0.00");
 
     /**
-     * 获得网络速度(阻塞方法)
+     * 获得网络速度（外部获取网速应该直接调用{@link NetUtils#getNetRate()}）
      *
      * @return
      */
     public String getNetSpeed() {
-        long rxtxTotal = TrafficStats.getTotalRxBytes()
-                + TrafficStats.getTotalTxBytes();
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         long tempSum = TrafficStats.getTotalRxBytes()
                 + TrafficStats.getTotalTxBytes();
-        long rxtxLast = tempSum - rxtxTotal;
+        long rxtxLast = tempSum - lastRxTx;
         double totalSpeed = rxtxLast * 1000 / 2000d;
-        //rxtxTotal = tempSum;
-        return showSpeed(totalSpeed);//设置显示当前网速
+        lastRxTx = tempSum;
+        netRate = showSpeed(totalSpeed);//设置显示当前网速
+        return netRate;
     }
 
     private String showSpeed(double speed) {
