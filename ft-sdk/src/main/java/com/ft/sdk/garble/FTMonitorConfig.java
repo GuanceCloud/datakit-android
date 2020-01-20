@@ -3,6 +3,7 @@ package com.ft.sdk.garble;
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.MonitorType;
+import com.ft.sdk.garble.utils.LocationUtils;
 import com.ft.sdk.garble.utils.NetUtils;
 
 /**
@@ -26,8 +27,11 @@ public class FTMonitorConfig {
         }
         if(isMonitorType(MonitorType.ALL)){
             NetUtils.get().listenerSignal(FTApplication.getApplication());
+            LocationUtils.get().getCity();
         }else if(isMonitorType(MonitorType.NETWORK)){
             NetUtils.get().listenerSignal(FTApplication.getApplication());
+        } else if (isMonitorType(MonitorType.LOCATION)) {
+            LocationUtils.get().getCity();
         }
     }
 
