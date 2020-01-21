@@ -30,6 +30,7 @@ public class SyncTaskManager {
 
     /**
      * 警告!!! 该方法仅用于测试使用!!!
+     *
      * @param running
      */
     public void setRunning(boolean running) {
@@ -60,19 +61,7 @@ public class SyncTaskManager {
         }
         errorCount.set(0);
         ThreadPoolUtils.get().execute(() -> {
-            int count = 0;
-            do{
-                if(count>=1) {
-                    LogUtils.e("正在等待用户数据绑定...");
-                }
-                try {
-                    Thread.sleep(SLEEP_TIME);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                count++;
-                //如果开启了用户数据绑定，就等待用户绑定数据完成
-            }while (FTUserConfig.get().isNeedBindUser() && !FTUserConfig.get().isUserDataBinded());
+            waitUserBind();
             List<RecordData> recordDataList = queryFromData();
             //当数据库中有数据是执行轮询同步操作
             while (recordDataList != null && !recordDataList.isEmpty()) {
@@ -90,6 +79,25 @@ public class SyncTaskManager {
             }
             running = false;
         });
+    }
+
+    /**
+     * 等待用户绑定用户信息(阻塞方法)
+     */
+    private void waitUserBind() {
+        int count = 0;
+        do {
+            if (count >= 1) {
+                LogUtils.e("正在等待用户数据绑定...");
+            }
+            try {
+                Thread.sleep(SLEEP_TIME);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            count++;
+            //如果开启了用户数据绑定，就等待用户绑定数据完成
+        } while (FTUserConfig.get().isNeedBindUser() && !FTUserConfig.get().isUserDataBinded());
     }
 
 
@@ -148,12 +156,17 @@ public class SyncTaskManager {
         void isSuccess(boolean isSuccess);
     }
 
+    /**
+     * 将上传的数据格式化（供打印日志使用）
+     *
+     * @param body
+     */
     private void printUpdateData(String body) {
         try {
             StringBuffer sb = new StringBuffer();
             String[] counts = body.split("\n");
             for (String str : counts) {
-                str = str.replaceAll("\\\\ ","_");
+                str = str.replaceAll("\\\\ ", "_");
                 String[] strArr = str.split(" ");
                 sb.append("{\n ");
                 if (strArr.length == 3) {
