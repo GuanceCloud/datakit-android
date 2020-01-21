@@ -38,12 +38,10 @@ import static com.ft.sdk.garble.utils.Constants.FT_KEY_VALUE_NULL;
  * Description:
  */
 public class SyncDataManager {
-    private StringBuffer monitorSb = null;
 
     public String getBodyContent(List<RecordData> recordDatas) {
         StringBuffer sb = new StringBuffer();
         String device = parseHashToString(getDeviceInfo());
-        monitorSb = getMonitorData();
         for (RecordData recordData : recordDatas) {
             sb.append(getMeasurement(recordData));
             sb.append(",");
@@ -111,7 +109,6 @@ public class SyncDataManager {
                 JSONObject values = opJson.optJSONObject("values");
                 StringBuffer tagSb = getCustomHash(tags, true);
                 StringBuffer valueSb = getCustomHash(values, false);
-                tagSb.append(monitorSb);
                 addUserData(tagSb, recordData);
                 deleteLastComma(tagSb);
                 if (tagSb.length() > 0) {
@@ -189,10 +186,13 @@ public class SyncDataManager {
                 if (!Utils.isNullOrEmpty(vtp)) {
                     sb.append("vtp=" + vtp + ",");
                 }
+                JSONObject tags = opJson.optJSONObject("tags");
+                if(tags != null) {
+                    sb.append(getCustomHash(tags,true));
+                }
             } catch (Exception e) {
             }
         }
-        sb.append(monitorSb);
         addUserData(sb, recordData);
         deleteLastComma(sb);
         if (sb.length() > 0) {
@@ -239,87 +239,89 @@ public class SyncDataManager {
     /**
      * 添加配置监控项数据
      */
-    private StringBuffer getMonitorData() {
+    public static void addMonitorData(JSONObject tags) {
         StringBuffer sb = new StringBuffer();
         try {
             Context context = FTApplication.getApplication();
             if (FTMonitorConfig.get().isMonitorType(MonitorType.ALL)) {
-                sb.append("battery_total=").append(BatteryUtils.getBatteryTotal(context)).append("mAh,");
-                sb.append("battery_use=").append(100 - BatteryUtils.getBatteryCurrent(context)).append("%,");
+                tags.put("battery_total",BatteryUtils.getBatteryTotal(context)+"mAh");
+                tags.put("battery_use",(100 - BatteryUtils.getBatteryCurrent(context))+"%");
                 String[] memory = DeviceUtils.getRamData(context);
-                sb.append("memory_total=").append(memory[0]).append(",");
-                sb.append("memory_use=").append(memory[1]).append(",");
-                sb.append("cpu_no=").append(DeviceUtils.getHardWare()).append(",");
-                sb.append("cpu_use=").append(DeviceUtils.getCpuUseRate()).append(",");
-                sb.append("cpu_temperature=").append(CpuUtils.get().getCpuTemperature()).append("℃,");
-                sb.append("cpu_hz=").append(CpuUtils.get().getCPUMaxFreqKHz()).append("Hz").append(",");
-                sb.append("gpu_model=").append(GpuUtils.GPU_VENDOR_RENDERER).append(",");
-                sb.append("gpu_hz=").append(GpuUtils.getGpuMaxFreq()).append("Hz").append(",");
-                sb.append("gpu_rate=").append(GpuUtils.getGpuUseRate()).append("%").append(",");
+                tags.put("memory_total",memory[0]);
+                tags.put("memory_use",memory[1]);
+
+                tags.put("cpu_no",DeviceUtils.getHardWare());
+                tags.put("cpu_use",DeviceUtils.getCpuUseRate());
+                tags.put("cpu_temperature",CpuUtils.get().getCpuTemperature()+"℃");
+                tags.put("cpu_hz",CpuUtils.get().getCPUMaxFreqKHz()+"Hz");
+
+                tags.put("gpu_model",GpuUtils.GPU_VENDOR_RENDERER);
+                tags.put("gpu_hz",GpuUtils.getGpuMaxFreq()+"Hz");
+                tags.put("gpu_rate",GpuUtils.getGpuUseRate()+"%");
+
                 int networkType = NetUtils.get().getNetworkState(context);
                 if (networkType == 1) {
-                    sb.append("network_type=").append("WIFI,");
+                    tags.put("network_type","WIFI");
                 } else if (networkType == 0) {
-                    sb.append("network_type=").append("N/A,");
+                    tags.put("network_type","N/A");
                 } else {
-                    sb.append("network_type=").append("蜂窝网络,");
+                    tags.put("network_type","蜂窝网络");
                 }
-                sb.append("network_strength=").append(NetUtils.get().getSignalStrength()).append(",");
-                sb.append("network_speed=").append(NetUtils.get().getNetRate()).append(",");
-                sb.append("network_proxy=").append(NetUtils.get().isWifiProxy(context)).append(",");
+                tags.put("network_strength",NetUtils.get().getSignalStrength());
+                tags.put("network_speed",NetUtils.get().getNetRate());
+                tags.put("network_proxy",NetUtils.get().isWifiProxy(context));
                 List<CameraPx> cameraPxs = CameraUtils.getCameraPxList(context);
                 for (CameraPx cameraPx : cameraPxs) {
-                    sb.append(cameraPx.toString());
+                    tags.put(cameraPx.getPx()[0],cameraPx.getPx()[1]);
                 }
-                sb.append("location_city=").append(LocationUtils.get().getCity()).append(",");
+                tags.put("location_city",LocationUtils.get().getCity());
             } else {
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.BATTERY)) {
-                    sb.append("battery_total=").append(BatteryUtils.getBatteryTotal(context)).append("mAh,");
-                    sb.append("battery_use=").append(100 - BatteryUtils.getBatteryCurrent(context)).append("%,");
+                    tags.put("battery_total",BatteryUtils.getBatteryTotal(context)+"mAh");
+                    tags.put("battery_use",(100 - BatteryUtils.getBatteryCurrent(context))+"%");
                 }
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.MEMORY)) {
                     String[] memory = DeviceUtils.getRamData(context);
-                    sb.append("memory_total=").append(memory[0]).append(",");
-                    sb.append("memory_use=").append(memory[1]).append(",");
+                    tags.put("memory_total",memory[0]);
+                    tags.put("memory_use",memory[1]);
                 }
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.CPU)) {
-                    sb.append("cpu_no=").append(DeviceUtils.getHardWare()).append(",");
-                    sb.append("cpu_use=").append(DeviceUtils.getCpuUseRate()).append(",");
-                    sb.append("cpu_temperature=").append(CpuUtils.get().getCpuTemperature()).append("℃,");
-                    sb.append("cpu_hz=").append(CpuUtils.get().getCPUMaxFreqKHz()).append("Hz").append(",");
+                    tags.put("cpu_no", DeviceUtils.getHardWare());
+                    tags.put("cpu_use", DeviceUtils.getCpuUseRate());
+                    tags.put("cpu_temperature", CpuUtils.get().getCpuTemperature() + "℃");
+                    tags.put("cpu_hz", CpuUtils.get().getCPUMaxFreqKHz() + "Hz");
                 }
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.GPU)) {
-                    sb.append("gpu_model=").append(GpuUtils.GPU_VENDOR_RENDERER).append(",");
-                    sb.append("gpu_hz=").append(GpuUtils.getGpuMaxFreq()).append("Hz").append(",");
-                    sb.append("gpu_rate=").append(GpuUtils.getGpuUseRate()).append("%").append(",");
+                    tags.put("gpu_model",GpuUtils.GPU_VENDOR_RENDERER);
+                    tags.put("gpu_hz",GpuUtils.getGpuMaxFreq()+"Hz");
+                    tags.put("gpu_rate",GpuUtils.getGpuUseRate()+"%");
                 }
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.NETWORK)) {
                     int networkType = NetUtils.get().getNetworkState(context);
                     if (networkType == 1) {
-                        sb.append("network_type=").append("WIFI,");
+                        tags.put("network_type","WIFI");
                     } else if (networkType == 0) {
-                        sb.append("network_type=").append("N/A,");
+                        tags.put("network_type","N/A");
                     } else {
-                        sb.append("network_type=").append("蜂窝网络,");
+                        tags.put("network_type","蜂窝网络");
                     }
-                    sb.append("network_strength=").append(NetUtils.get().getSignalStrength()).append(",");
-                    sb.append("network_speed=").append(NetUtils.get().getNetRate()).append(",");
-                    sb.append("network_proxy=").append(NetUtils.get().isWifiProxy(context)).append(",");
+                    tags.put("network_strength",NetUtils.get().getSignalStrength());
+                    tags.put("network_speed",NetUtils.get().getNetRate());
+                    tags.put("network_proxy",NetUtils.get().isWifiProxy(context));
                 }
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.CAMERA)) {
                     List<CameraPx> cameraPxs = CameraUtils.getCameraPxList(context);
                     for (CameraPx cameraPx : cameraPxs) {
-                        sb.append(cameraPx.toString());
+                        tags.put(cameraPx.getPx()[0],cameraPx.getPx()[1]);
                     }
                 }
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.LOCATION)) {
-                    sb.append("location_city=").append(LocationUtils.get().getCity()).append(",");
+                    tags.put("location_city",LocationUtils.get().getCity());
                 }
             }
         } catch (Exception e) {
 
         }
-        return sb;
     }
 
     private String getEventName(String op) {
