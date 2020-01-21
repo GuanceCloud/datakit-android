@@ -14,14 +14,13 @@ public class CameraPx{
     public long px;
     public String id;
 
-    @NonNull
-    @Override
-    public String toString() {
+
+    public String[] getPx() {
         String pxStr = px==0?"N/A":""+px;
         if(face == CameraCharacteristics.LENS_FACING_FRONT){
-            return "camera_front"+id+"_px="+pxStr+"万像素,";
+            return new String[]{"camera_front"+id+"_px",pxStr+"万像素"};
         }else{
-            return "camera_back"+id+"_px="+pxStr+"万像素,";
+            return new String[]{"camera_back"+id+"_px",pxStr+"万像素"};
         }
     }
 }
