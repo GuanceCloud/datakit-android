@@ -21,6 +21,7 @@ import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.manager.FTManager;
+import com.ft.sdk.garble.manager.SyncDataManager;
 import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
@@ -453,6 +454,9 @@ public class FTAutoTrack {
         JSONObject opData = new JSONObject();
         try {
             opData.put("vtp", vtp);
+            JSONObject tags = new JSONObject();
+            SyncDataManager.addMonitorData(tags);
+            opData.put("tags",tags);
             recordData.setOpdata(opData.toString());
         } catch (Exception e) {
         }
