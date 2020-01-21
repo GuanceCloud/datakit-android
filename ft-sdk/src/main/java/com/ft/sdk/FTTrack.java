@@ -60,36 +60,40 @@ public class FTTrack {
         track(OP.CSTM, time, event, null, values);
     }
 
-    private void track(OP op, long time, String field, JSONObject tags, JSONObject values) {
+    private void track(OP op, long time, String field, final JSONObject tags, JSONObject values) {
         try {
             if (!isLegalValues(values)) {
                 return;
             }
-            final RecordData recordData = new RecordData();
-            recordData.setOp(op.value);
-            recordData.setTime(time);
-            JSONObject opData = new JSONObject();
-
-            if (field != null) {
-                opData.put("field", field);
-            }
-            if (tags == null) {
-                tags = new JSONObject();
-            }
-            SyncDataManager.addMonitorData(tags);
-            opData.put("tags", tags);
-            if (values != null) {
-                opData.put("values", values);
-            }
-            recordData.setOpdata(opData.toString());
-            String sessionId = FTUserConfig.get().getSessionId();
-            if(!Utils.isNullOrEmpty(sessionId)){
-                recordData.setSessionid(sessionId);
-            }
             ThreadPoolUtils.get().execute(() -> {
-                LogUtils.d("FTTrack数据进数据库：" + recordData.getJsonString());
-                FTManager.getFTDBManager().insertFTOperation(recordData);
-                FTManager.getSyncTaskManager().executeSyncPoll();
+                JSONObject tagsTemp = tags;
+                try {
+                    final RecordData recordData = new RecordData();
+                    recordData.setOp(op.value);
+                    recordData.setTime(time);
+                    JSONObject opData = new JSONObject();
+
+                    if (field != null) {
+                        opData.put("field", field);
+                    }
+                    if (tagsTemp == null) {
+                        tagsTemp = new JSONObject();
+                    }
+                    SyncDataManager.addMonitorData(tagsTemp);
+                    opData.put("tags", tagsTemp);
+                    if (values != null) {
+                        opData.put("values", values);
+                    }
+                    recordData.setOpdata(opData.toString());
+                    String sessionId = FTUserConfig.get().getSessionId();
+                    if (!Utils.isNullOrEmpty(sessionId)) {
+                        recordData.setSessionid(sessionId);
+                    }
+
+                    LogUtils.d("FTTrack数据进数据库：" + recordData.getJsonString());
+                    FTManager.getFTDBManager().insertFTOperation(recordData);
+                    FTManager.getSyncTaskManager().executeSyncPoll();
+                }catch (Exception e){}
             });
         } catch (JSONException e) {
             e.printStackTrace();
@@ -98,27 +102,28 @@ public class FTTrack {
 
     /**
      * 判断是否是合法的Values
+     *
      * @param jsonObject
      * @return
      * @throws JSONException
      */
-    public boolean isLegalValues(JSONObject jsonObject) throws JSONException{
-        if(jsonObject == null){
+    public boolean isLegalValues(JSONObject jsonObject) throws JSONException {
+        if (jsonObject == null) {
             LogUtils.e("参数 Values 不能为空");
             return false;
         }
-        if(jsonObject.keys().hasNext()){
+        if (jsonObject.keys().hasNext()) {
             Iterator<String> iterator = jsonObject.keys();
-            while (iterator.hasNext()){
+            while (iterator.hasNext()) {
                 String key = iterator.next();
                 Object obj = jsonObject.get(key);
-                if(obj instanceof JSONObject || obj instanceof JSONArray){
+                if (obj instanceof JSONObject || obj instanceof JSONArray) {
                     LogUtils.e("参数 Values 中含有非法数据类型");
                     return false;
                 }
             }
             return true;
-        }else{
+        } else {
             LogUtils.e("参数 Values 不能为空");
             return false;
         }
