@@ -180,6 +180,33 @@ public class FTAutoTrackConfig {
     }
 
     /**
+     * View 是否在白名单里
+     *
+     * @param viewClass
+     * @return
+     */
+    public boolean isOnlyView(Class viewClass) {
+        try {
+            if (viewClass == null) {
+                return true;
+            }
+            if (onlyAutoTrackViews == null || onlyAutoTrackViews.isEmpty()) {
+                return true;
+            }
+
+            for (Class<?> clazz : onlyAutoTrackViews) {
+                if (clazz.isAssignableFrom(viewClass.getClass())) {
+                    return true;
+                }
+            }
+
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
      * 自动埋点类型黑名单
      *
      * @param type
@@ -225,6 +252,30 @@ public class FTAutoTrackConfig {
             if (ignoreAutoTrackViews != null) {
                 for (Class<?> clazz : ignoreAutoTrackViews) {
                     if (clazz.isAssignableFrom(view.getClass())) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * View 黑名单
+     *
+     * @param viewClass View
+     * @return 是否被忽略
+     */
+    public boolean isIgnoreView(Class viewClass) {
+        try {
+            if (viewClass == null) {
+                return false;
+            }
+            if (ignoreAutoTrackViews != null) {
+                for (Class<?> clazz : ignoreAutoTrackViews) {
+                    if (clazz.isAssignableFrom(viewClass.getClass())) {
                         return true;
                     }
                 }

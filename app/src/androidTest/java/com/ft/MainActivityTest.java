@@ -1,10 +1,18 @@
 package com.ft;
 
 import android.content.Intent;
+import android.widget.Button;
+import android.widget.RadioGroup;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.ActivityTestRule;
 
+import com.ft.sdk.FTApplication;
+import com.ft.sdk.FTAutoTrackType;
+import com.ft.sdk.FTSDKConfig;
+import com.ft.sdk.FTSdk;
+import com.ft.sdk.MonitorType;
+import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.http.HttpBuilder;
@@ -19,7 +27,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.security.InvalidParameterException;
+import java.util.Arrays;
 import java.util.List;
 
 import static androidx.test.espresso.Espresso.onView;
@@ -46,6 +54,29 @@ public class MainActivityTest {
         FTDBManager.get().delete();
         //关闭数据自动同步操作
         SyncTaskManager.get().setRunning(true);
+    }
+
+    /**
+     * 初始化 SDK 参数
+     */
+    @Before
+    public void initSDK() {
+        FTMonitorConfig.get().clear();
+        FTSDKConfig ftSDKConfig = FTSDKConfig.Builder(Utils.serverUrl,
+                true,
+                Utils.accesskey_id,
+                Utils.accessKey_secret)
+                .setUseOAID(true)//设置 OAID 是否可用
+                .setDebug(true)//设置是否是 debug
+                .setNeedBindUser(true)//是否需要绑定用户信息
+                .enableAutoTrack(true)//设置是否开启自动埋点
+                .setEnableAutoTrackType(FTAutoTrackType.APP_CLICK.type |
+                        FTAutoTrackType.APP_END.type |
+                        FTAutoTrackType.APP_START.type)//设置埋点事件类型的白名单
+                .setWhiteActivityClasses(Arrays.asList(MainActivity.class, Main2Activity.class))//设置埋点页面的白名单
+                .setWhiteViewClasses(Arrays.asList(Button.class, RadioGroup.class))
+                .setMonitorType(MonitorType.BATTERY | MonitorType.NETWORK);//设置监控项
+        FTSdk.install(ftSDKConfig, FTApplication.getApplication());
     }
 
     /**
@@ -137,13 +168,13 @@ public class MainActivityTest {
         assertEquals(0, recordDataList1.size());
 
         //等待2分钟查询服务器中的数据是否和上传的一致
-        Thread.sleep(1000*60);
+        Thread.sleep(1000*60*2);
         ResponseData responseData = HttpBuilder.Builder()
                 .setUrl("http://testing.api-ft2x.cloudcare.cn:10531")
                 .setModel("api/v1/influx/query_data")
-                .setHeadParams(SyncDataTest.getQueryHead(token))
+                .setHeadParams(SyncDataUtils.getQueryHead(token))
                 .setMethod(RequestMethod.POST)
-                .setBodyString(SyncDataTest.buildPostBody())
+                .setBodyString(SyncDataUtils.buildPostBody())
                 .executeSync(ResponseData.class);
 
         JSONObject jsonObject = new JSONObject(responseData.getData());
@@ -164,8 +195,8 @@ public class MainActivityTest {
                 .setUrl("http://testing.api-ft2x.cloudcare.cn:10531")
                 .setModel("api/v1/auth-token/login")
                 .setMethod(RequestMethod.POST)
-                .setHeadParams(SyncDataTest.getLoginHead())
-                .setBodyString(SyncDataTest.getLoginBody(rule.getActivity()))
+                .setHeadParams(SyncDataUtils.getLoginHead())
+                .setBodyString(SyncDataUtils.getLoginBody(rule.getActivity()))
                 .executeSync(ResponseData.class);
         JSONObject jsonObject = new JSONObject(responseData.getData());
         JSONObject content = jsonObject.optJSONObject("content");

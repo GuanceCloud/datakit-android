@@ -240,7 +240,6 @@ public class SyncDataManager {
      * 添加配置监控项数据
      */
     public static void addMonitorData(JSONObject tags) {
-        StringBuffer sb = new StringBuffer();
         try {
             Context context = FTApplication.getApplication();
             if (FTMonitorConfig.get().isMonitorType(MonitorType.ALL)) {
@@ -320,7 +319,6 @@ public class SyncDataManager {
                 }
             }
         } catch (Exception e) {
-
         }
     }
 
