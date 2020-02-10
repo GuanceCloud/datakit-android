@@ -44,4 +44,8 @@ public class FTMonitorConfig {
         }
         return false;
     }
+
+    public void clear(){
+        ftMonitorConfig = null;
+    }
 }

@@ -64,13 +64,19 @@ public class DeviceUtils {
 
     public static String getSDKUUid(Context context) {
         final SharedPreferences preferences = getSharedPreferences(context);
-        String sdkUUid = preferences.getString(Constants.FT_SDK_INIT_UUID, null);
+        String sdkUUid = null;
+
+        if(preferences != null){
+            sdkUUid = preferences.getString(Constants.FT_SDK_INIT_UUID, null);
+        }
 
         if (sdkUUid == null) {
             sdkUUid = UUID.randomUUID().toString();
-            final SharedPreferences.Editor editor = preferences.edit();
-            editor.putString(Constants.FT_SDK_INIT_UUID, sdkUUid);
-            editor.apply();
+            if(preferences != null) {
+                final SharedPreferences.Editor editor = preferences.edit();
+                editor.putString(Constants.FT_SDK_INIT_UUID, sdkUUid);
+                editor.apply();
+            }
         }
 
         return sdkUUid;
