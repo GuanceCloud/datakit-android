@@ -37,8 +37,6 @@ public class FTSdk {
         this.mFtSDKConfig = ftSDKConfig;
         initFTConfig();
         LogUtils.d("FT SDK 初始化成功");
-        trackStartApp();
-        FTNetworkListener.get().monitor();
     }
 
     /**
@@ -46,7 +44,11 @@ public class FTSdk {
      * @param ftSDKConfig
      * @return
      */
-    public static synchronized FTSdk install(FTSDKConfig ftSDKConfig){
+    public static synchronized FTSdk install(FTSDKConfig ftSDKConfig,Application application){
+        if (application == null) {
+            throw new InvalidParameterException("Application 参数不能为 null");
+        }
+        FTApplication.setApplication(application);
         if (FTSDK == null) {
             FTSDK = new FTSdk(ftSDKConfig);
         }
@@ -144,6 +146,12 @@ public class FTSdk {
             if(mFtSDKConfig.isNeedBindUser()){
                 FTUserConfig.get().initSessionId();
                 FTUserConfig.get().initUserDataFromDB();
+            }
+            if(mFtSDKConfig.getMonitorType() != 0){
+                FTNetworkListener.get().monitor();
+            }
+            if(mFtSDKConfig.isAutoTrack()){
+                trackStartApp();
             }
         }
     }
