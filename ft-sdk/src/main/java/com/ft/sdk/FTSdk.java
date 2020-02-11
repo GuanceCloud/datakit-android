@@ -31,6 +31,7 @@ public class FTSdk {
     private static FTSdk FTSDK;
     private FTSDKConfig mFtSDKConfig;
     private FTSdk(FTSDKConfig ftSDKConfig){
+        //添加 Activity 生命周期监控
         FTActivityLifecycleCallbacks life = new FTActivityLifecycleCallbacks();
         Application app = FTApplication.getApplication();
         app.registerActivityLifecycleCallbacks(life);
