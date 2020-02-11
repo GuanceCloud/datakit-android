@@ -29,10 +29,6 @@ import static org.junit.Assert.assertEquals;
  * Description: 用户绑定与解绑测试类
  */
 public class BindUserTest {
-    private String accesskey_id = "accid";
-    private String accessKey_secret = "accsk";
-    private String serverUrl = "http://10.100.64.106:19457/v1/write/metrics";
-
     /**
      * 在测试用例执行之前需要删除数据库中已经存在的数据
      */
@@ -47,10 +43,10 @@ public class BindUserTest {
     @Before
     public void initSDK() {
         FTMonitorConfig.get().clear();
-        FTSDKConfig ftSDKConfig = FTSDKConfig.Builder(serverUrl,
+        FTSDKConfig ftSDKConfig = FTSDKConfig.Builder(Const.serverUrl,
                 true,
-                accesskey_id,
-                accessKey_secret)
+                Const.accesskey_id,
+                Const.accessKey_secret)
                 .setUseOAID(true)//设置 OAID 是否可用
                 .setDebug(true)//设置是否是 debug
                 .setNeedBindUser(true)//是否需要绑定用户信息
