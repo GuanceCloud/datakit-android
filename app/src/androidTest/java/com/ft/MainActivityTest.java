@@ -62,10 +62,10 @@ public class MainActivityTest {
     @Before
     public void initSDK() {
         FTMonitorConfig.get().clear();
-        FTSDKConfig ftSDKConfig = FTSDKConfig.Builder(Utils.serverUrl,
+        FTSDKConfig ftSDKConfig = FTSDKConfig.Builder(Const.serverUrl,
                 true,
-                Utils.accesskey_id,
-                Utils.accessKey_secret)
+                Const.accesskey_id,
+                Const.accessKey_secret)
                 .setUseOAID(true)//设置 OAID 是否可用
                 .setDebug(true)//设置是否是 debug
                 .setNeedBindUser(true)//是否需要绑定用户信息
