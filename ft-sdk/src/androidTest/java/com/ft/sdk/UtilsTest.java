@@ -1,5 +1,9 @@
 package com.ft.sdk;
 
+import android.content.Context;
+
+import androidx.test.platform.app.InstrumentationRegistry;
+
 import com.ft.sdk.garble.utils.Utils;
 
 import org.junit.Test;
@@ -13,10 +17,12 @@ import static org.junit.Assert.assertTrue;
  * Description:
  */
 public class UtilsTest {
-
+    private Context getContext(){
+        return InstrumentationRegistry.getInstrumentation().getTargetContext();
+    }
     @Test
     public void isNetworkAvailable() {
-        assertTrue(Utils.isNetworkAvailable());
+        assertTrue(Utils.isNetworkAvailable(getContext()));
     }
 
     @Test
