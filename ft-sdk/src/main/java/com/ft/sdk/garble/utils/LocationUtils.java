@@ -11,7 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 
-import com.ft.sdk.FTApplication;
+import com.ft.sdk.FTSdk;
 
 import java.util.List;
 import java.util.Locale;
@@ -34,7 +34,7 @@ public class LocationUtils {
         if(locationUtils == null){
             locationUtils = new LocationUtils();
         }
-        locationUtils.startLocation(FTApplication.getApplication());
+        locationUtils.startLocation(FTSdk.get().getApplication());
         return locationUtils;
     }
 
