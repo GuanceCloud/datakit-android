@@ -1,8 +1,8 @@
 package com.ft.sdk.garble;
 
 import com.ft.sdk.BuildConfig;
-import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTSDKConfig;
+import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.utils.DeviceUtils;
 
 import static com.ft.sdk.garble.utils.Constants.USER_AGENT;
@@ -43,7 +43,7 @@ public class FTHttpConfig {
         akSecret = ftsdkConfig.getAkSecret();
         useOaid = ftsdkConfig.isUseOAID();
         version = BuildConfig.VERSION_NAME;
-        uuid = DeviceUtils.getSDKUUid(FTApplication.getApplication());
+        uuid = DeviceUtils.getSDKUUid(FTSdk.get().getApplication());
         userAgent = USER_AGENT;
     }
 

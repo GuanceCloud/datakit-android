@@ -12,7 +12,7 @@ import android.os.Build;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.FTApplication;
+import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.manager.SyncTaskManager;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.NetUtils;
@@ -44,7 +44,7 @@ public class FTNetworkListener {
             networkCallback = new FTNetWorkCallback();
         }
         if (application == null) {
-            application = FTApplication.getApplication();
+            application = FTSdk.get().getApplication();
         }
         if (networkReceiver == null) {
             networkReceiver = new FTNetworkReceiver();
