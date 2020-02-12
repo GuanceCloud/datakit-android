@@ -1,7 +1,7 @@
 package com.ft.sdk.garble;
 
-import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTSDKConfig;
+import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.garble.utils.LocationUtils;
 import com.ft.sdk.garble.utils.NetUtils;
@@ -27,12 +27,12 @@ public class FTMonitorConfig {
         }
         if(isMonitorType(MonitorType.ALL)){
             //开启网络监听
-            NetUtils.get().listenerSignal(FTApplication.getApplication());
+            NetUtils.get().listenerSignal(FTSdk.get().getApplication());
             //开始获取地理位置
             LocationUtils.get().getCity();
         }else if(isMonitorType(MonitorType.NETWORK)){
             //开启网络监听
-            NetUtils.get().listenerSignal(FTApplication.getApplication());
+            NetUtils.get().listenerSignal(FTSdk.get().getApplication());
         } else if (isMonitorType(MonitorType.LOCATION)) {
             //获取地理位置
             LocationUtils.get().getCity();
