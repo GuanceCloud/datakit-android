@@ -28,15 +28,12 @@ import java.security.InvalidParameterException;
  * Description:
  */
 public class FTSdk {
-    private static FTSdk FTSDK;
+    private static FTSdk mFtSdk;
     private FTSDKConfig mFtSDKConfig;
-    private FTSdk(FTSDKConfig ftSDKConfig){
-        //添加 Activity 生命周期监控
-        FTActivityLifecycleCallbacks life = new FTActivityLifecycleCallbacks();
-        Application app = FTApplication.getApplication();
-        app.registerActivityLifecycleCallbacks(life);
+    private Application mApplication;
+    private FTSdk(@NonNull FTSDKConfig ftSDKConfig,@NonNull Application application){
         this.mFtSDKConfig = ftSDKConfig;
-        initFTConfig();
+        this.mApplication = application;
         LogUtils.d("FT SDK 初始化成功");
     }
 
@@ -45,15 +42,16 @@ public class FTSdk {
      * @param ftSDKConfig
      * @return
      */
-    public static synchronized FTSdk install(FTSDKConfig ftSDKConfig,Application application){
+    public static synchronized void install(@NonNull FTSDKConfig ftSDKConfig,@NonNull Application application){
+        if (ftSDKConfig == null){
+            throw new InvalidParameterException("ftSDKConfig 参数不能为 null");
+        }
         if (application == null) {
             throw new InvalidParameterException("Application 参数不能为 null");
         }
-        FTApplication.setApplication(application);
-        if (FTSDK == null) {
-            FTSDK = new FTSdk(ftSDKConfig);
-        }
-        return FTSDK;
+        mFtSdk = new FTSdk(ftSDKConfig,application);
+        mFtSdk.initFTConfig();
+        mFtSdk.registerActivityLifeCallback();
     }
 
     /**
@@ -61,10 +59,18 @@ public class FTSdk {
      * @return
      */
     public static synchronized FTSdk get(){
-        if(FTSDK == null){
-            throw new InvalidParameterException("请先安装SDK(在应用启动时调用FTSdk.install(FTSDKConfig ftSdkConfig))");
+        if(mFtSdk == null){
+            throw new InvalidParameterException("请先安装SDK(在应用启动时调用FTSdk.install(FTSDKConfig ftSdkConfig,Application application))");
         }
-        return FTSDK;
+        return mFtSdk;
+    }
+
+    /**
+     * 返回当前的 Application
+     * @return
+     */
+    public Application getApplication(){
+        return mApplication;
     }
 
     /**
@@ -113,7 +119,7 @@ public class FTSdk {
     public void setGpuRenderer(ViewGroup root){
         LogUtils.d("绑定视图监听 GPU 信息");
         try {
-            Context context = FTApplication.getApplication();
+            Context context = mApplication;
             final RendererUtil mRendererUtil = new RendererUtil();
             GLSurfaceView mGLSurfaceView = new GLSurfaceView(context);
             ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(1, 1);
@@ -155,6 +161,14 @@ public class FTSdk {
                 trackStartApp();
             }
         }
+    }
+
+    /**
+     * 添加 Activity 生命周期监控
+     */
+    private void registerActivityLifeCallback(){
+        FTActivityLifecycleCallbacks life = new FTActivityLifecycleCallbacks();
+        mApplication.registerActivityLifecycleCallbacks(life);
     }
 
     private void trackStartApp(){

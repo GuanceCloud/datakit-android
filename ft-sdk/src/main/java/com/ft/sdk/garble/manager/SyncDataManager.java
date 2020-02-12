@@ -2,7 +2,7 @@ package com.ft.sdk.garble.manager;
 
 import android.content.Context;
 
-import com.ft.sdk.FTApplication;
+import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
@@ -13,12 +13,12 @@ import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.BatteryUtils;
 import com.ft.sdk.garble.utils.CameraUtils;
+import com.ft.sdk.garble.utils.CpuUtils;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.GpuUtils;
 import com.ft.sdk.garble.utils.LocationUtils;
 import com.ft.sdk.garble.utils.NetUtils;
 import com.ft.sdk.garble.utils.OaidUtils;
-import com.ft.sdk.garble.utils.CpuUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONException;
@@ -241,7 +241,7 @@ public class SyncDataManager {
      */
     public static void addMonitorData(JSONObject tags) {
         try {
-            Context context = FTApplication.getApplication();
+            Context context = FTSdk.get().getApplication();
             if (FTMonitorConfig.get().isMonitorType(MonitorType.ALL)) {
                 tags.put("battery_total",BatteryUtils.getBatteryTotal(context)+"mAh");
                 tags.put("battery_use",(100 - BatteryUtils.getBatteryCurrent(context))+"%");
@@ -388,7 +388,7 @@ public class SyncDataManager {
      * @return
      */
     private HashMap<String, Object> getDeviceInfo() {
-        Context context = FTApplication.getApplication();
+        Context context = FTSdk.get().getApplication();
         HashMap<String, Object> objectHashMap = new HashMap<>();
         objectHashMap.put("device_uuid", DeviceUtils.getUuid(context));
         objectHashMap.put("application_identifier", DeviceUtils.getApplicationId(context));
