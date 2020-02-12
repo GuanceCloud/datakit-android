@@ -1,18 +1,10 @@
 package com.ft;
 
 import android.content.Intent;
-import android.widget.Button;
-import android.widget.RadioGroup;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.ActivityTestRule;
 
-import com.ft.sdk.FTApplication;
-import com.ft.sdk.FTAutoTrackType;
-import com.ft.sdk.FTSDKConfig;
-import com.ft.sdk.FTSdk;
-import com.ft.sdk.MonitorType;
-import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.http.HttpBuilder;
@@ -27,7 +19,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static androidx.test.espresso.Espresso.onView;
@@ -50,33 +41,10 @@ public class MainActivityTest {
      * 在运行测试用例前先删除之前数据库中存在的数据
      */
     @Before
-    public void deleteTableData() {
+    public void deleteTableData() throws InterruptedException {
         FTDBManager.get().delete();
         //关闭数据自动同步操作
         SyncTaskManager.get().setRunning(true);
-    }
-
-    /**
-     * 初始化 SDK 参数
-     */
-    @Before
-    public void initSDK() {
-        FTMonitorConfig.get().clear();
-        FTSDKConfig ftSDKConfig = FTSDKConfig.Builder(Const.serverUrl,
-                true,
-                Const.accesskey_id,
-                Const.accessKey_secret)
-                .setUseOAID(true)//设置 OAID 是否可用
-                .setDebug(true)//设置是否是 debug
-                .setNeedBindUser(true)//是否需要绑定用户信息
-                .enableAutoTrack(true)//设置是否开启自动埋点
-                .setEnableAutoTrackType(FTAutoTrackType.APP_CLICK.type |
-                        FTAutoTrackType.APP_END.type |
-                        FTAutoTrackType.APP_START.type)//设置埋点事件类型的白名单
-                .setWhiteActivityClasses(Arrays.asList(MainActivity.class, Main2Activity.class))//设置埋点页面的白名单
-                .setWhiteViewClasses(Arrays.asList(Button.class, RadioGroup.class))
-                .setMonitorType(MonitorType.BATTERY | MonitorType.NETWORK);//设置监控项
-        FTSdk.install(ftSDKConfig, FTApplication.getApplication());
     }
 
     /**
@@ -145,7 +113,7 @@ public class MainActivityTest {
     public void clickMoreBtnAndSyncTest() throws InterruptedException, JSONException {
         //获取查询数据需要用到的token
         String token = getLoginToken();
-        assertNotEquals("",token);
+        assertNotEquals("", token);
         SyncTaskManager.get().setRunning(false);
         onView(withId(R.id.btn_lam)).perform(click());
         Thread.sleep(100);
@@ -168,7 +136,7 @@ public class MainActivityTest {
         assertEquals(0, recordDataList1.size());
 
         //等待2分钟查询服务器中的数据是否和上传的一致
-        Thread.sleep(1000*60*2);
+        Thread.sleep(1000 * 60 * 2);
         ResponseData responseData = HttpBuilder.Builder()
                 .setUrl("http://testing.api-ft2x.cloudcare.cn:10531")
                 .setModel("api/v1/influx/query_data")
@@ -181,12 +149,13 @@ public class MainActivityTest {
         JSONObject content = jsonObject.optJSONObject("content");
         int length = content.optJSONArray("data").getJSONObject(0).optJSONArray("series")
                 .getJSONObject(0).optJSONArray("values").length();
-        assertEquals(length,6);
+        assertEquals(length, 6);
 
     }
 
     /**
      * 获取登录token
+     *
      * @return
      * @throws JSONException
      */
