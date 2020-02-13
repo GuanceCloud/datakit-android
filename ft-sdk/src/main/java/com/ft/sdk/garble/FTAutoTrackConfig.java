@@ -52,6 +52,10 @@ public class FTAutoTrackConfig {
         addIgnoreAutoTrackView(ftsdkConfig.getBlackViewClass());
     }
 
+    /**
+     * 添加 Activity 白名单
+     * @param classes
+     */
     private void addOnlyAutoTrackActivity(List<Class<?>> classes) {
         if (classes != null && !classes.isEmpty()) {
             if (onlyAutoTrackActivities == null) {
@@ -67,6 +71,10 @@ public class FTAutoTrackConfig {
         }
     }
 
+    /**
+     *  添加控件白名单
+     * @param classes
+     */
     private void addOnlyAutoTrackView(List<Class<?>> classes) {
         if (classes != null && !classes.isEmpty()) {
             if (onlyAutoTrackViews == null) {
@@ -80,6 +88,10 @@ public class FTAutoTrackConfig {
         }
     }
 
+    /**
+     * 添加 Activity 黑名单
+     * @param classes
+     */
     private void addIgnoreAutoTrackActivity(List<Class<?>> classes) {
         if (classes != null && !classes.isEmpty()) {
             if (ignoreAutoTrackActivities == null) {
@@ -95,6 +107,10 @@ public class FTAutoTrackConfig {
         }
     }
 
+    /**
+     * 添加控件黑名单
+     * @param classes
+     */
     private void addIgnoreAutoTrackView(List<Class<?>> classes) {
         if (classes != null && !classes.isEmpty()) {
             if (ignoreAutoTrackViews == null) {
