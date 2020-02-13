@@ -19,6 +19,11 @@ import java.lang.reflect.Method;
  * Description:
  */
 public class AopUtils {
+    /**
+     * 通过 View 的 ID 获取 View 上的字符串值
+     * @param view
+     * @return
+     */
     public static String getViewId(View view) {
         String idString = null;
         try {
@@ -31,6 +36,11 @@ public class AopUtils {
         return idString;
     }
 
+    /**
+     * 通过 Context 获取当前的 Activity
+     * @param context
+     * @return
+     */
     public static Activity getActivityFromContext(Context context) {
         Activity activity = null;
         try {
@@ -95,6 +105,11 @@ public class AopUtils {
         return object.getClass().getSimpleName();
     }
 
+    /**
+     * 获取 View 视图树
+     * @param view
+     * @return
+     */
     public static String getViewTree(View view) {
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append(view.getClass().getSimpleName() + "/");
@@ -107,6 +122,12 @@ public class AopUtils {
         return stringBuffer.toString();
     }
 
+    /**
+     *  获取 Dialog 上点击按钮上的字符
+     * @param dialog
+     * @param whichButton
+     * @return
+     */
     public static String getDialogClickView(Dialog dialog,int whichButton){
         Class<?> supportAlertDialogClass = null;
         Class<?> androidXAlertDialogClass = null;

@@ -13,7 +13,7 @@ import com.ft.sdk.garble.manager.FTManager;
 /**
  * BY huangDianHua
  * DATE:2019-12-06 11:18
- * Description:
+ * Description: Activity 生命周期回调类
  */
 public class FTActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
     @Override
