@@ -55,20 +55,29 @@ public class FTNetworkListener {
         initMonitor();
     }
 
+    /**
+     * 初始化网络状态监听
+     */
     private void initMonitor() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            //SDK 版本大于 26 时通过registerDefaultNetworkCallback 注册网络状态变化回调
             connectivityManager.registerDefaultNetworkCallback(networkCallback);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            //SDK 版本大于 21 小于 26 时通过 registerNetworkCallback 注册网络状态变化回调
             NetworkRequest.Builder builder = new NetworkRequest.Builder();
             NetworkRequest request = builder.build();
             connectivityManager.registerNetworkCallback(request, networkCallback);
         } else {
+            //SDK 版本小于 21 时，通过广播来获得网络状态变化
             IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
             application.registerReceiver(networkReceiver, intentFilter);
         }
     }
 
+    /**
+     * 网络状态变化回调类
+     */
     public class FTNetWorkCallback extends ConnectivityManager.NetworkCallback {
 
         @Override
@@ -83,6 +92,9 @@ public class FTNetworkListener {
         }
     }
 
+    /**
+     * 网络变化广播接受类
+     */
     public class FTNetworkReceiver extends BroadcastReceiver {
 
         @Override

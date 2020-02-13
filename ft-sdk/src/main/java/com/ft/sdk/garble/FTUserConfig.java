@@ -113,6 +113,11 @@ public class FTUserConfig {
         });
     }
 
+    /**
+     * 根据 sessionID 获取用户信息
+     * @param sessionId
+     * @return
+     */
     public UserData getUserData(String sessionId) {
         if (userDataList != null) {
             for (UserData userData : userDataList) {
@@ -124,6 +129,10 @@ public class FTUserConfig {
         return null;
     }
 
+    /**
+     * 判断当前缓存的 sessionId 是否有绑定用户信息
+     * @return
+     */
     public boolean currentSessionHasUser(){
         if(sessionId != null) {
             return getUserData(sessionId) != null;

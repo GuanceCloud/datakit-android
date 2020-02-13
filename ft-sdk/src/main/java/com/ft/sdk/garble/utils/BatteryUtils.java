@@ -89,6 +89,11 @@ public class BatteryUtils {
         return batteryBean;
     }
 
+    /**
+     * 获取电池的健康状态
+     * @param health
+     * @return
+     */
     private static String batteryHealth(int health) {
         String healthBat = Constants.UNKNOWN;
         switch (health) {
@@ -117,6 +122,11 @@ public class BatteryUtils {
         return healthBat;
     }
 
+    /**
+     * 获取电池的充电状态
+     * @param status
+     * @return
+     */
     private static String batteryStatus(int status) {
         String healthBat = Constants.UNKNOWN;
         switch (status) {
@@ -139,6 +149,11 @@ public class BatteryUtils {
         return healthBat;
     }
 
+    /**
+     * 获取电池的充电方式
+     * @param status
+     * @return
+     */
     private static String batteryPlugged(int status) {
         String healthBat = Constants.UNKNOWN;
         switch (status) {

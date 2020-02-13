@@ -21,7 +21,7 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 /**
  * BY huangDianHua
  * DATE:2020-01-09 16:09
- * Description:
+ * Description: 位置获取
  */
 public class LocationUtils {
     private Context mContext;
