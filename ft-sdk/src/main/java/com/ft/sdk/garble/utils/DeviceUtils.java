@@ -62,6 +62,11 @@ public class DeviceUtils {
         }
     };
 
+    /**
+     *  获取 SDK 的 UUID
+     * @param context
+     * @return
+     */
     public static String getSDKUUid(Context context) {
         final SharedPreferences preferences = getSharedPreferences(context);
         String sdkUUid = null;

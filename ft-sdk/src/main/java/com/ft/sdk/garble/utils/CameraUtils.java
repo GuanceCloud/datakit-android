@@ -25,10 +25,16 @@ public class CameraUtils {
     public static final int CAMERA_NONE = -1;
     public static List<CameraPx> cameraPxList = null;
 
+    /**
+     * 获取手机的相机像素信息（多个摄像头）
+     * @param context
+     * @return
+     */
     public static List<CameraPx> getCameraPxList(Context context){
         if(cameraPxList != null && !cameraPxList.isEmpty()){
             return cameraPxList;
         }
+        // 大于 21 版本使用 Camera2 的API
         if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP){
             cameraPxList = getCamera2IdList(context);
         }else{
@@ -70,6 +76,11 @@ public class CameraUtils {
         return cameraPxes;
     }
 
+    /**
+     *  通过 Camera API 获取相机像素
+     * @param context
+     * @return
+     */
     private static List<CameraPx> getCameraIdList(Context context){
         int numberOfCameras = Camera.getNumberOfCameras();
         CameraInfo cameraInfo = new CameraInfo();
@@ -89,6 +100,12 @@ public class CameraUtils {
         return cameraPxes;
     }
 
+    /**
+     * 获取某一个相机的像素
+     * @param context
+     * @param paramInt
+     * @return
+     */
     private static long getCameraPixels(Context context, int paramInt) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             int state = context.checkSelfPermission(Manifest.permission.CAMERA);
@@ -121,6 +138,11 @@ public class CameraUtils {
 
     }
 
+    /**
+     * 获取数组中的最大值
+     * @param paramArray
+     * @return
+     */
     private static int getMaxNumber(int[] paramArray) {
         int temp = paramArray[0];
         for (int i = 0; i < paramArray.length; i++) {
