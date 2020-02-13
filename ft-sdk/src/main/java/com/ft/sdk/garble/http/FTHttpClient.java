@@ -39,6 +39,10 @@ public class FTHttpClient extends HttpClient {
         mConnection.addRequestProperty("Authorization", "DWAY " + akId + ":" + getSignature());
     }
 
+    /**
+     * 获取签名
+     * @return
+     */
     private String getSignature() {
         String aks = ftHttpConfig.akSecret;
         String method = mHttpBuilder.getMethod().method;
@@ -46,10 +50,17 @@ public class FTHttpClient extends HttpClient {
         return Utils.getHMacSha1(aks, method + "\n" + contentMD5 + "\n" + CONTENT_TYPE + "\n" + gmtString);
     }
 
+    /**
+     * MD5 加密 请求内容
+     * @return
+     */
     private String getContentMD5() {
         return Utils.contentMD5Encode(getBodyContent());
     }
 
+    /**
+     * 转换时间格式
+     */
     private void calcuteDate() {
         Date currentTime = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss z", Locale.UK);
@@ -57,6 +68,9 @@ public class FTHttpClient extends HttpClient {
         gmtString = sdf.format(currentTime);
     }
 
+    /**
+     *  设置请求的 Head 参数
+     */
     private void setHeadParams() {
         mConnection.addRequestProperty("X-Datakit-UUID", ftHttpConfig.uuid);
         mConnection.addRequestProperty("User-Agent", ftHttpConfig.userAgent);

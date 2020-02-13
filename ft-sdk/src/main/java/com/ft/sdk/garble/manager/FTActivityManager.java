@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * BY huangDianHua
  * DATE:2019-12-06 13:36
- * Description:
+ * Description: Activity 管理类
  */
 public class FTActivityManager {
     private static volatile FTActivityManager instance;
