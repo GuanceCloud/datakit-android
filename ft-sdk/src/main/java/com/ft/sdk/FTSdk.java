@@ -34,7 +34,6 @@ public class FTSdk {
     private FTSdk(@NonNull FTSDKConfig ftSDKConfig,@NonNull Application application){
         this.mFtSDKConfig = ftSDKConfig;
         this.mApplication = application;
-        LogUtils.d("FT SDK 初始化成功");
     }
 
     /**

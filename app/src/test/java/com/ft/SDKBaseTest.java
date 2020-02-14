@@ -23,10 +23,10 @@ public abstract class SDKBaseTest {
     @Before
     public void initSDK() {
         MockitoAnnotations.initMocks(this);
-        FTSDKConfig ftSDKConfig = FTSDKConfig.Builder(Const.serverUrl,
+        FTSDKConfig ftSDKConfig = FTSDKConfig.Builder("",
                 true,
-                Const.accesskey_id,
-                Const.accessKey_secret)
+                "",
+                "")
                 .setUseOAID(true)//设置 OAID 是否可用
                 .setDebug(false);//设置是否是 debug
         customSDKPrams(ftSDKConfig);
