@@ -100,9 +100,9 @@ setGpuRenderer|设置 GPU 信息获取依赖的视图|否|当监控项 setMonito
 ``` kotlin
 
 class DemoAplication : Application() {
-    private val accesskey_id = "accid"
-    private val accessKey_secret = "accsk"
-    private val serverUrl = "http://10.100.64.106:19557/v1/write/metrics"
+    private val accesskey_id = "key_id"
+    private val accessKey_secret = "key_secret"
+    private val serverUrl = "serverUrl"
     override fun onCreate() {
         super.onCreate()
         val ftSDKConfig = FTSDKConfig.Builder(
