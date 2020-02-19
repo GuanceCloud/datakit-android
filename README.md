@@ -114,7 +114,7 @@ class DemoAplication : Application() {
             .setDebug(true)//是否开启Debug模式（开启后能查看调试数据）
             .setNeedBindUser(true)//是否绑定用户信息
             .setMonitorType(MonitorType.ALL)//设置监控项
-        FTSdk.install(ftSDKConfig)
+        FTSdk.install(ftSDKConfig,this)
     }
 }
 
