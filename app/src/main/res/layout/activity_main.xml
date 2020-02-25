@@ -15,13 +15,13 @@
             android:id="@+id/btn_lam"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="lambda" />
+            android:text="跳转到Main4Activity" />
 
         <Button
             android:id="@+id/showKotlinActivity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="跳转到KotlinActivity" />
+            android:text="跳转到Main2Activity" />
 
         <CheckBox
             android:id="@+id/checkbox"
@@ -86,5 +86,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="切换用户信息" />
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:id="@+id/fragment"/>
     </LinearLayout>
 </ScrollView>

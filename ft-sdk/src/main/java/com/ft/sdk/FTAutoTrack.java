@@ -14,9 +14,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.ft.sdk.garble.FTAutoTrackConfig;
+import com.ft.sdk.garble.FTFlowChartConfig;
 import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.RecordData;
+import com.ft.sdk.garble.manager.FTActivityManager;
 import com.ft.sdk.garble.manager.FTManager;
 import com.ft.sdk.garble.manager.SyncDataManager;
 import com.ft.sdk.garble.utils.AopUtils;
@@ -289,7 +291,7 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity((Class<?>) clazz)) {
             return;
         }
-        putRecord(OP.OPEN, AopUtils.getClassName(clazz), AopUtils.getActivityName(activity), null);
+        putRecord(OP.OPEN_FRA, AopUtils.getClassName(clazz), AopUtils.getActivityName(activity), null);
     }
 
     /**
@@ -328,7 +330,7 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity((Class<?>) clazz)) {
             return;
         }
-        putRecord(OP.CLS, AopUtils.getClassName(clazz), AopUtils.getActivityName(activity), null);
+        putRecord(OP.CLS_FRA, AopUtils.getClassName(clazz), AopUtils.getActivityName(activity), null);
     }
 
     /**
@@ -357,7 +359,7 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)) {
             return;
         }
-        putRecord(OP.OPEN, clazz.getSimpleName(), clazz.getSuperclass().getSimpleName(), null);
+        //putRecord(OP.OPEN_ACT, clazz.getSimpleName(), clazz.getSuperclass().getSimpleName(), null);
     }
 
     /**
@@ -386,7 +388,7 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)) {
             return;
         }
-        putRecord(OP.CLS, clazz.getSimpleName(), clazz.getSuperclass().getSimpleName(), null);
+        //putRecord(OP.CLS_ACT, clazz.getSimpleName(), clazz.getSuperclass().getSimpleName(), null);
     }
 
     /**
@@ -459,6 +461,7 @@ public class FTAutoTrack {
     }
 
     public static void putRecord(long time, @NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String vtp) {
+        String lastActivity = FTActivityManager.get().getLastActivity();
         ThreadPoolUtils.get().execute(() -> {
             try {
                 final RecordData recordData = new RecordData();
@@ -478,6 +481,16 @@ public class FTAutoTrack {
                 String sessionId = FTUserConfig.get().getSessionId();
                 if (!Utils.isNullOrEmpty(sessionId)) {
                     recordData.setSessionid(sessionId);
+                }
+                //开启流程图，获取流程图相关数据存入数据库中
+                if (FTFlowChartConfig.get().isOpenFlowChart()){
+                    if (op == OP.OPEN_ACT || op == OP.CLS_ACT){
+                        recordData.setPpn(lastActivity);
+                        recordData.setTraceId(FTFlowChartConfig.get().getFlowUUID());
+                        long currentTime = System.currentTimeMillis();
+                        recordData.setDuration(currentTime - FTFlowChartConfig.get().lastOpTime);
+                        FTFlowChartConfig.get().lastOpTime = currentTime;
+                    }
                 }
 
                 LogUtils.d("FTAutoTrack数据进数据库：" + recordData.getJsonString());

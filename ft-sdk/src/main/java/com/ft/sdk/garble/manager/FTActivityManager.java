@@ -19,8 +19,11 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class FTActivityManager {
     private static volatile FTActivityManager instance;
+    //栈顶 Activity
     private Activity topActivity;
+    //存在的 Activity
     private List<Activity> activityList;
+    //存储 Activity 的最后的状态
     private ConcurrentHashMap<String, Lifecycle.Event> activityEventMap;
     private FTActivityManager() {
         activityList = new ArrayList<>();
@@ -83,6 +86,15 @@ public class FTActivityManager {
         activityList.remove(activity);
         activityEventMap.remove(activity.toString());
         topActivity = (activityList == null || activityList.size()<=0)?null:activityList.get(activityList.size()-1);
+    }
+
+    public String getLastActivity(){
+        if(activityList != null && activityList.size()>1){
+            Activity activity = activityList.get(activityList.size()-2);
+            return activity.getLocalClassName();
+        }else{
+            return "root";
+        }
     }
 
     public void printTest(Activity activity){
