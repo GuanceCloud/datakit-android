@@ -20,6 +20,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.amitshekhar.DebugDB;
 import com.amitshekhar.debug.encrypt.sqlite.DebugDBEncryptFactory;
@@ -43,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
     private Button unbindUser;
     private Button changeUser;
     private ImageView iv_glide;
+    private BlankFragment blankFragment = new BlankFragment();
+    private PlusOneFragment plusOneFragment = new PlusOneFragment();
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -69,15 +73,16 @@ public class MainActivity extends AppCompatActivity {
         bindUser = findViewById(R.id.bindUser);
         unbindUser = findViewById(R.id.unbindUser);
         changeUser = findViewById(R.id.changeUser);
+        addFragment();
         showKotlinActivity.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, Main2Activity.class)));
         btn_lam.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                startActivity(new Intent(MainActivity.this,Main4Activity.class));
             }
         });
         checkbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-
+            changeFragment(isChecked);
         });
         ratingbar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
         });
@@ -153,6 +158,24 @@ public class MainActivity extends AppCompatActivity {
             }
             FTSdk.get().bindUserData("Rose","000",exts);
         });
+    }
+
+    public void addFragment(){
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.add(R.id.fragment,blankFragment);
+        fragmentTransaction.commit();
+    }
+
+    public void changeFragment(boolean change){
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        if(change) {
+            fragmentTransaction.replace(R.id.fragment, blankFragment);
+        }else {
+            fragmentTransaction.replace(R.id.fragment, plusOneFragment);
+        }
+        fragmentTransaction.commit();
     }
 
     @Override
