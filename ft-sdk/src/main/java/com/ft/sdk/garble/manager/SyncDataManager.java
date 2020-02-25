@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
+import com.ft.sdk.garble.FTFlowChartConfig;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.FTUserConfig;
@@ -48,6 +49,31 @@ public class SyncDataManager {
             sb.append(device.replaceAll(" ", "\\\\ "));
             sb.append(getUpdateData(recordData));
             sb.append("\n");
+            if(recordData.getOp().equals(OP.OPEN_ACT.value)){
+                sb.append("$flow_mobile_activity_").append(FTFlowChartConfig.get().getFlowProduct());
+                sb.append(",$traceId=").append(recordData.getTraceId());
+                sb.append(",$name=").append(recordData.getCpn());
+                if(!"root".equals(recordData.getPpn())){
+                    sb.append(",$parent=").append(recordData.getPpn());
+                }
+                sb.append(" ");
+                sb.append("$duration=").append(recordData.getDuration()).append("i");
+                sb.append(" ");
+                sb.append(recordData.getTime() * 1000 * 1000);
+                sb.append("\n");
+            } else if(recordData.getOp().equals(OP.CLS_ACT.value)){
+                sb.append("$flow_mobile_activity_").append(FTFlowChartConfig.get().getFlowProduct());
+                sb.append(",$traceId=").append(recordData.getTraceId());
+                if(!"root".equals(recordData.getPpn())){
+                    sb.append(",$name=").append(recordData.getPpn());
+                    sb.append(",$parent=").append(recordData.getCpn());
+                }
+                sb.append(" ");
+                sb.append("$duration=").append(recordData.getDuration()).append("i");
+                sb.append(" ");
+                sb.append(recordData.getTime() * 1000 * 1000);
+                sb.append("\n");
+            }
         }
         return sb.toString();
     }
@@ -327,9 +353,13 @@ public class SyncDataManager {
             return "launch";
         } else if (OP.CLK.value.equals(op)) {
             return "click";
-        } else if (OP.CLS.value.equals(op)) {
+        } else if (OP.CLS_FRA.value.equals(op)) {
             return "close";
-        } else if (OP.OPEN.value.equals(op)) {
+        } else if (OP.CLS_ACT.value.equals(op)){
+            return "close";
+        }else if (OP.OPEN_ACT.value.equals(op)) {
+            return "open";
+        }else if (OP.OPEN_FRA.value.equals(op)) {
             return "open";
         }
         return op;
