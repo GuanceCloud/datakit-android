@@ -42,8 +42,10 @@ public class DemoApplication extends Application {
                 .setEnableAutoTrackType(FTAutoTrackType.APP_CLICK.type |
                         FTAutoTrackType.APP_END.type |
                         FTAutoTrackType.APP_START.type)//设置埋点事件类型的白名单
-                .setWhiteActivityClasses(Arrays.asList(MainActivity.class, Main2Activity.class))//设置埋点页面的白名单
-                .setWhiteViewClasses(Arrays.asList(Button.class, RadioGroup.class));
+                //.setWhiteActivityClasses(Arrays.asList(MainActivity.class, Main2Activity.class))//设置埋点页面的白名单
+                //.setWhiteViewClasses(Arrays.asList(Button.class, RadioGroup.class))
+                .setOpenFlowChart(true)
+                .setFlowProduct("demo12");
         //.setMonitorType(MonitorType.ALL);//设置监控项
         FTSdk.install(ftSDKConfig, this);
     }
