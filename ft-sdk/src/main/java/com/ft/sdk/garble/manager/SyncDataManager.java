@@ -44,36 +44,40 @@ public class SyncDataManager {
         StringBuffer sb = new StringBuffer();
         String device = parseHashToString(getDeviceInfo());
         for (RecordData recordData : recordDatas) {
-            sb.append(getMeasurement(recordData));
-            sb.append(",");
-            sb.append(device.replaceAll(" ", "\\\\ "));
-            sb.append(getUpdateData(recordData));
-            sb.append("\n");
-            if(recordData.getOp().equals(OP.OPEN_ACT.value)){
+            if(OP.OPEN_ACT.value.equals(recordData.getOp())){
                 sb.append("$flow_mobile_activity_").append(FTFlowChartConfig.get().getFlowProduct());
                 sb.append(",$traceId=").append(recordData.getTraceId());
                 sb.append(",$name=").append(recordData.getCpn());
                 if(!"root".equals(recordData.getPpn())){
                     sb.append(",$parent=").append(recordData.getPpn());
                 }
+                sb.append(",").append(device.replaceAll(" ", "\\\\ "));
                 sb.append(" ");
                 sb.append("$duration=").append(recordData.getDuration()).append("i");
                 sb.append(" ");
                 sb.append(recordData.getTime() * 1000 * 1000);
                 sb.append("\n");
-            } else if(recordData.getOp().equals(OP.CLS_ACT.value)){
+            } else if(OP.CLS_ACT.value.equals(recordData.getOp())){
                 sb.append("$flow_mobile_activity_").append(FTFlowChartConfig.get().getFlowProduct());
                 sb.append(",$traceId=").append(recordData.getTraceId());
                 if(!"root".equals(recordData.getPpn())){
                     sb.append(",$name=").append(recordData.getPpn());
                     sb.append(",$parent=").append(recordData.getCpn());
                 }
+                sb.append(",").append(device.replaceAll(" ", "\\\\ "));
                 sb.append(" ");
                 sb.append("$duration=").append(recordData.getDuration()).append("i");
                 sb.append(" ");
                 sb.append(recordData.getTime() * 1000 * 1000);
                 sb.append("\n");
             }
+            sb.append(getMeasurement(recordData));
+            if(!CSTM.value.equals(recordData.getOp())) {
+                sb.append(",");
+                sb.append(device.replaceAll(" ", "\\\\ "));
+            }
+            sb.append(getUpdateData(recordData));
+            sb.append("\n");
         }
         return sb.toString();
     }
