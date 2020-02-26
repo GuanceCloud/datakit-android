@@ -50,7 +50,7 @@ public class FTAutoTrack {
      */
     public static void activityOnCreate(Class clazz) {
         try {
-            startPage(clazz);
+            //startPage(clazz);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -62,7 +62,7 @@ public class FTAutoTrack {
      */
     public static void activityOnDestroy(Class clazz) {
         try {
-            destroyPage(clazz);
+            //destroyPage(clazz);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -359,7 +359,7 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)) {
             return;
         }
-        //putRecord(OP.OPEN_ACT, clazz.getSimpleName(), clazz.getSuperclass().getSimpleName(), null);
+        putRecord(OP.OPEN_ACT, clazz.getSimpleName(), clazz.getSuperclass().getSimpleName(), null);
     }
 
     /**
@@ -388,7 +388,7 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)) {
             return;
         }
-        //putRecord(OP.CLS_ACT, clazz.getSimpleName(), clazz.getSuperclass().getSimpleName(), null);
+        putRecord(OP.CLS_ACT, clazz.getSimpleName(), clazz.getSuperclass().getSimpleName(), null);
     }
 
     /**

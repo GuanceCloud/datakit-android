@@ -4,11 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".Main2Activity">
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/jump"
+        android:text="跳转到 Main3Activity"
         />
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/jump2"
+        android:text="跳转到 Main4Activity"
+        />
 </LinearLayout>
