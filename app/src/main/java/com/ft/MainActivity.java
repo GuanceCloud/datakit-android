@@ -28,6 +28,7 @@ import com.amitshekhar.debug.encrypt.sqlite.DebugDBEncryptFactory;
 import com.amitshekhar.debug.sqlite.DebugDBFactory;
 import com.bumptech.glide.Glide;
 import com.ft.sdk.FTSdk;
+import com.ft.sdk.FTTrack;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -186,6 +187,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        FTTrack.getInstance().trackFlowChart("track_demo","custom_01","自定义流程图开始",null,0);
+        FTTrack.getInstance().trackFlowChart("track_demo","custom_01","步骤1","自定义流程图开始",1000);
+        FTTrack.getInstance().trackFlowChart("track_demo","custom_01","步骤2","步骤1",2000);
+        FTTrack.getInstance().trackFlowChart("track_demo","custom_01","步骤3","步骤2",2000);
+        FTTrack.getInstance().trackFlowChart("track_demo","custom_01","选择1","步骤2",3000);
+        FTTrack.getInstance().trackFlowChart("track_demo","custom_01","步骤4","选择1",3000);
+        FTTrack.getInstance().trackFlowChart("track_demo","custom_01","步骤4","步骤3",3000);
+        FTTrack.getInstance().trackFlowChart("track_demo","custom_01","结束","步骤4",3000);
         return super.onOptionsItemSelected(item);
     }
 
