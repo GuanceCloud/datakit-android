@@ -9,7 +9,6 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.Lifecycle;
 
 import com.ft.sdk.FTAutoTrack;
-import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.manager.FTManager;
 
 /**
@@ -21,7 +20,6 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     @Override
     public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
         FTManager.getFTActivityManager().putActivity(activity, Lifecycle.Event.ON_CREATE);
-        FTAutoTrack.putRecord(OP.OPEN_ACT, activity.getClass().getSimpleName(), activity.getClass().getSuperclass().getSimpleName(),null);
     }
 
     @Override
@@ -33,10 +31,12 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     public void onActivityResumed(@NonNull Activity activity) {
         FTManager.getFTActivityManager().putActivity(activity, Lifecycle.Event.ON_RESUME);
         FTManager.getSyncTaskManager().executeSyncPoll();
+        FTAutoTrack.startPage(activity.getClass());
     }
 
     @Override
     public void onActivityPaused(@NonNull Activity activity) {
+        FTAutoTrack.destroyPage(activity.getClass());
         FTManager.getFTActivityManager().putActivity(activity, Lifecycle.Event.ON_PAUSE);
     }
 
@@ -51,8 +51,6 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
 
     @Override
     public void onActivityDestroyed(@NonNull Activity activity) {
-        FTAutoTrack.putRecord(OP.CLS_ACT, activity.getClass().getSimpleName(), activity.getClass().getSuperclass().getSimpleName(), null);
         FTManager.getFTActivityManager().removeActivity(activity);
-
     }
 }

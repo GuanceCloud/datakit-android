@@ -8,6 +8,6 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="jump"
+        android:text="跳转到 Main5Activity"
         android:id="@+id/jump"/>
 </LinearLayout>

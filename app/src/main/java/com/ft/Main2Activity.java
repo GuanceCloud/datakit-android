@@ -14,5 +14,6 @@ public class Main2Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
         findViewById(R.id.jump).setOnClickListener(v -> startActivity(new Intent(Main2Activity.this,Main3Activity.class)));
+        findViewById(R.id.jump2).setOnClickListener(v -> startActivity(new Intent(Main2Activity.this,Main4Activity.class)));
     }
 }
