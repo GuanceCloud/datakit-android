@@ -2,28 +2,56 @@
 
 **agent**
 
-[![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Fmvnrepo.jiagouyun.com%2Frepository%2Fmaven-releases%2Fcom%2Fcloudcare%2Fft%2Fmobile%2Fsdk%2Ftraker%2Fagent%2Fft-sdk%2Fmaven-metadata.xml)](https://mvnrepo.jiagouyun.com/repository/maven-public/com/cloudcare/ft/mobile/sdk/traker/agent/ft-sdk/maven-metadata.xml)
+[![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Fmvnrepo.jiagouyun.com%2Frepository%2Fmaven-releases%2Fcom%2Fcloudcare%2Fft%2Fmobile%2Fsdk%2Ftraker%2Fagent%2Fft-sdk%2Fmaven-metadata.xml)](https://mvnrepo.jiagouyun.com/repository/maven-releases/com/cloudcare/ft/mobile/sdk/traker/agent/ft-sdk/maven-metadata.xml)
+
+**plugin**
+
+[![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Fmvnrepo.jiagouyun.com%2Frepository%2Fmaven-releases%2Fcom%2Fcloudcare%2Fft%2Fmobile%2Fsdk%2Ftraker%2Fplugin%2Fft-plugin%2Fmaven-metadata.xml)](https://mvnrepo.jiagouyun.com/repository/maven-releases/com/cloudcare/ft/mobile/sdk/traker/plugin/ft-plugin/maven-metadata.xml)
 
 ## 安装
 - 在项目的根目录的 build.gradle 文件中添加 FT SDK 的的远程仓库地址
 
 ``` groovy
 
-repositories {
+buildscript {
     //...
-    maven {
-        url 'https://mvnrepo.jiagouyun.com/repository/maven-releases'
+    repositories {
+        //...
+        //添加FT SDK的远程仓库地址
+        maven {
+            url 'https://mvnrepo.jiagouyun.com/repository/maven-releases'
+        }
     }
-
+    dependencies {
+        //...
+        //添加 FT Plugin 的插件依赖
+        classpath 'com.cloudcare.ft.mobile.sdk.traker.plugin:ft-plugin:1.0.0-alpha5'
+    }
+}
+allprojects {
+    repositories {
+        //...
+        //添加FT SDK的远程仓库地址
+        maven {
+            url 'https://mvnrepo.jiagouyun.com/repository/maven-releases'
+        }
+    }
 }
 ```
 
-- 在项目主模块( app 模块)的 build.gradle 文件中添加 FT SDK 的依赖
+- 在项目主模块( app 模块)的 build.gradle 文件中添加 FT SDK 的依赖及 FT Plugin 的使用
 
 ``` groovy
 dependencies {
     //添加 FT SDK 的依赖
     implementation 'com.cloudcare.ft.mobile.sdk.traker.agent:ft-sdk:1.0.0'
+}
+//应用插件
+apply plugin: 'ft-plugin'
+//配置插件使用参数
+FTExt {
+    //是否显示日志
+    showLog = true
 }
 ```
 
@@ -38,8 +66,9 @@ android{
 }
 ```
 
-关于最新的版本号，请参考[更新文档](https://mvnrepo.jiagouyun.com/repository/maven-public/com/cloudcare/ft/mobile/sdk/traker/agent/ft-sdk/maven-metadata.xml)
+关于 FT SDK 最新的版本号，请参考[更新文档](https://mvnrepo.jiagouyun.com/repository/maven-public/com/cloudcare/ft/mobile/sdk/traker/agent/ft-sdk/maven-metadata.xml)
 
+关于 FT Plugin 最新的版本号，请参考[更新文档](https://mvnrepo.jiagouyun.com/repository/maven-public/com/cloudcare/ft/mobile/sdk/traker/plugin/ft-plugin/maven-metadata.xml)
 ## 配置
 
 ### 一、添加混淆配置
@@ -72,9 +101,22 @@ setUseOAID|是否使用OAID作为设备唯一识别号的替代字段 |否|默�
 setDebug|是否开启调试模式|否|默认不开启，开启后方可打印 SDK 运行日志
 setMonitorType|设置监控项|否|默认不开启任何监控项,<br>[关于监控项说明](#四监控配置项类-monitortype),<br>[关于监控项参数获取问题]()
 setNeedBindUser|是否开启绑定用户数据|否|默认开启,<br>开启后必须要绑定用户数据[如何绑定用户数据](#一初始化类-ftsdk-提供的方法)
+enableAutoTrack|是否使用自动埋点|否|
+setEnableAutoTrackType|设置事件白名单|否|开启自动埋点后，不设置该值表示接受所有事件类型。埋点事件类型见表下说明
+setDisableAutoTrackType|设置事件黑名单|否|开启自动埋点后，不设置该值表示不设置事件黑名单
+setWhiteActivityClasses|页面白名单|否|包括 Activity、Fragment
+setWhiteViewClasses|控件白名单|否|包括基本控件
+setBlackActivityClasses|页面黑名单|否|
+setBlackViewClasses|控件黑名单|否|
 Builder|构建配置项对象方法|是|关于其参数可见下方参数表
 
-参数说明表
+    FTAutoTrackType 自动埋点事件说明：
+    事件总类目前支持3种
+    FTAutoTrackType.APP_START：页面的开始事件，Activity 依赖的是其 onResume 方法，Fragment 依赖的是其 onCreate 方法；
+    FTAutoTrackType.APP_END：页面的结束事件，Activity 依赖的是其 onPause 方法，Fragment 依赖的是其 onDestroy 方法；
+    FTAutoTrackType.APP_CLICK：控件的点击事件。
+
+FTSDKConfig.Builder(...) 方法必要参数说明表
 
 参数|类型|含义|是否必须
 :--:|:--:|:--:|:--:
@@ -114,6 +156,12 @@ class DemoAplication : Application() {
             .setDebug(true)//是否开启Debug模式（开启后能查看调试数据）
             .setNeedBindUser(true)//是否绑定用户信息
             .setMonitorType(MonitorType.ALL)//设置监控项
+            .enableAutoTrack(true)//是否开启自动埋点
+            .setEnableAutoTrackType(FTAutoTrackType.APP_START.type or
+                    FTAutoTrackType.APP_END.type or
+                    FTAutoTrackType.APP_CLICK.type)//自动埋点事件白名单
+            .setWhiteActivityClasses(listOf(MainActivity::class.java))//自动埋点页面白名单
+            .setWhiteViewClasses(listOf(Button::class.java))//自动埋点控件白名单
         FTSdk.install(ftSDKConfig,this)
     }
 }
