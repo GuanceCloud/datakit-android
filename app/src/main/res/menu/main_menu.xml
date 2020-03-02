@@ -3,5 +3,5 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/check"
         app:showAsAction="always"
-        android:title="自定义流程图"/>
+        android:title=""/>
 </menu>

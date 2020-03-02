@@ -86,6 +86,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="切换用户信息" />
+        <Button
+            android:id="@+id/flowChartTacker"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="主动流程图数据上报"/>
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="100dp"
