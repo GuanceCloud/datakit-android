@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private Button unbindUser;
     private Button changeUser;
     private ImageView iv_glide;
+    private Button flowChartTacker;
     private BlankFragment blankFragment = new BlankFragment();
     private PlusOneFragment plusOneFragment = new PlusOneFragment();
 
@@ -74,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
         bindUser = findViewById(R.id.bindUser);
         unbindUser = findViewById(R.id.unbindUser);
         changeUser = findViewById(R.id.changeUser);
+        flowChartTacker = findViewById(R.id.flowChartTacker);
         addFragment();
         showKotlinActivity.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, Main2Activity.class)));
         btn_lam.setOnClickListener(new View.OnClickListener() {
@@ -159,6 +161,10 @@ public class MainActivity extends AppCompatActivity {
             }
             FTSdk.get().bindUserData("Rose","000",exts);
         });
+        flowChartTacker.setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this,TrackerActivity.class));
+        });
+
     }
 
     public void addFragment(){
@@ -187,14 +193,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        FTTrack.getInstance().trackFlowChart("track_demo","custom_01","自定义流程图开始",null,0);
-        FTTrack.getInstance().trackFlowChart("track_demo","custom_01","步骤1","自定义流程图开始",1000);
-        FTTrack.getInstance().trackFlowChart("track_demo","custom_01","步骤2","步骤1",2000);
-        FTTrack.getInstance().trackFlowChart("track_demo","custom_01","步骤3","步骤2",2000);
-        FTTrack.getInstance().trackFlowChart("track_demo","custom_01","选择1","步骤2",3000);
-        FTTrack.getInstance().trackFlowChart("track_demo","custom_01","步骤4","选择1",3000);
-        FTTrack.getInstance().trackFlowChart("track_demo","custom_01","步骤4","步骤3",3000);
-        FTTrack.getInstance().trackFlowChart("track_demo","custom_01","结束","步骤4",3000);
         return super.onOptionsItemSelected(item);
     }
 
