@@ -13,6 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.security.InvalidParameterException;
 import java.util.Iterator;
 
 /**
@@ -62,28 +63,45 @@ public class FTTrack {
 
     /**
      * 流程图数据上报
+     *
      * @param product
      * @param traceId
      * @param name
      * @param parent
      * @param duration
      */
-    public void trackFlowChart(String product,String traceId,String name,String parent,long duration){
+    public void trackFlowChart(String product, String traceId, String name, String parent, long duration) {
+        if (Utils.isNullOrEmpty(product)) {
+            throw new InvalidParameterException("参数 product 不能为空");
+        }
+
+        if (!Utils.isLegalProduct(product)) {
+            throw new InvalidParameterException("参数 product 不合法，只能包含英文字母、数字、中划线和下划线，最长 40 个字符，区分大小写");
+        }
+
+        if (Utils.isNullOrEmpty(traceId)) {
+            throw new InvalidParameterException("参数 traceId 不能为空");
+        }
+
+        if (Utils.isNullOrEmpty(name)) {
+            throw new InvalidParameterException("参数 name 不能为空");
+        }
+
         long time = System.currentTimeMillis();
         JSONObject tags = new JSONObject();
         JSONObject values = new JSONObject();
         try {
-            tags.put("$traceId",traceId);
-            tags.put("$name",name);
-            if(!Utils.isNullOrEmpty(parent)) {
+            tags.put("$traceId", traceId);
+            tags.put("$name", name);
+            if (!Utils.isNullOrEmpty(parent)) {
                 tags.put("$parent", parent);
             }
-            values.put("$duration",duration);
+            values.put("$duration", duration);
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        track(OP.CSTM, time, "$flow_"+product, tags, values);
+        track(OP.CSTM, time, "$flow_" + product, tags, values);
     }
 
     private void track(OP op, long time, String field, final JSONObject tags, JSONObject values) {
@@ -119,7 +137,8 @@ public class FTTrack {
                     LogUtils.d("FTTrack数据进数据库：" + recordData.getJsonString());
                     FTManager.getFTDBManager().insertFTOperation(recordData);
                     FTManager.getSyncTaskManager().executeSyncPoll();
-                }catch (Exception e){}
+                } catch (Exception e) {
+                }
             });
         } catch (JSONException e) {
             e.printStackTrace();
