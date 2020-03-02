@@ -51,7 +51,9 @@ public class SyncDataManager {
                 if(!"root".equals(recordData.getPpn())){
                     sb.append(",$parent=").append(recordData.getPpn());
                 }
-                sb.append(",").append(device.replaceAll(" ", "\\\\ "));
+                sb.append(",").append(device.replaceAll(" ", "\\\\ ")).append(",");
+                addUserData(sb, recordData);
+                deleteLastComma(sb);
                 sb.append(" ");
                 sb.append("$duration=").append(recordData.getDuration()).append("i");
                 sb.append(" ");
@@ -64,7 +66,9 @@ public class SyncDataManager {
                     sb.append(",$name=").append(recordData.getPpn());
                     sb.append(",$parent=").append(recordData.getCpn());
                 }
-                sb.append(",").append(device.replaceAll(" ", "\\\\ "));
+                sb.append(",").append(device.replaceAll(" ", "\\\\ ")).append(",");
+                addUserData(sb, recordData);
+                deleteLastComma(sb);
                 sb.append(" ");
                 sb.append("$duration=").append(recordData.getDuration()).append("i");
                 sb.append(" ");
