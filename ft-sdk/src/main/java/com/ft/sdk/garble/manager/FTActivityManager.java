@@ -91,7 +91,11 @@ public class FTActivityManager {
     public String getLastActivity(){
         if(activityList != null && activityList.size()>1){
             Activity activity = activityList.get(activityList.size()-2);
-            return activity.getLocalClassName();
+            if(activity != null) {
+                return activity.getClass().getSimpleName();
+            }else{
+                return "root";
+            }
         }else{
             return "root";
         }
