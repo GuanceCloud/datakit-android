@@ -45,7 +45,17 @@ public class SyncDataManager {
         String device = parseHashToString(getDeviceInfo());
         for (RecordData recordData : recordDatas) {
             if(OP.OPEN_ACT.value.equals(recordData.getOp())){
-                sb.append("$flow_mobile_activity_").append(FTFlowChartConfig.get().getFlowProduct());
+                try {
+                    JSONObject opData = new JSONObject(recordData.getOpdata());
+                    if (opData.has("field")) {
+                        sb.append("$flow_mobile_activity_").append(opData.optString("field"));
+                    }else{
+                        sb.append("$flow_mobile_activity_").append(FTFlowChartConfig.get().getFlowProduct());
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
                 sb.append(",$traceId=").append(recordData.getTraceId());
                 sb.append(",$name=").append(recordData.getCpn());
                 if(!"root".equals(recordData.getPpn())){
@@ -60,7 +70,17 @@ public class SyncDataManager {
                 sb.append(recordData.getTime() * 1000 * 1000);
                 sb.append("\n");
             } else if(OP.CLS_ACT.value.equals(recordData.getOp())){
-                sb.append("$flow_mobile_activity_").append(FTFlowChartConfig.get().getFlowProduct());
+                try {
+                    JSONObject opData = new JSONObject(recordData.getOpdata());
+                    if (opData.has("field")) {
+                        sb.append("$flow_mobile_activity_").append(opData.optString("field"));
+                    }else{
+                        sb.append("$flow_mobile_activity_").append(FTFlowChartConfig.get().getFlowProduct());
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
                 sb.append(",$traceId=").append(recordData.getTraceId());
                 if(!"root".equals(recordData.getPpn())){
                     sb.append(",$name=").append(recordData.getPpn());
