@@ -2,14 +2,10 @@ package com.ft;
 
 import android.app.Application;
 import android.content.Context;
-import android.widget.Button;
-import android.widget.RadioGroup;
 
 import com.ft.sdk.FTAutoTrackType;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
-
-import java.util.Arrays;
 
 /**
  * BY huangDianHua
