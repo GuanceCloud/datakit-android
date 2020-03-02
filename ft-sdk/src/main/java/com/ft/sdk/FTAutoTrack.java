@@ -475,6 +475,12 @@ public class FTAutoTrack {
                     JSONObject tags = new JSONObject();
                     SyncDataManager.addMonitorData(tags);
                     opData.put("tags", tags);
+                    //开启流程图，获取流程图相关数据存入数据库中
+                    if (FTFlowChartConfig.get().isOpenFlowChart()) {
+                        if (op == OP.OPEN_ACT || op == OP.CLS_ACT) {
+                            opData.put("field", FTFlowChartConfig.get().getFlowProduct());
+                        }
+                    }
                     recordData.setOpdata(opData.toString());
                 } catch (Exception e) {
                 }
