@@ -15,6 +15,8 @@ import com.ft.sdk.FTSdk;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -122,6 +124,19 @@ public class Utils {
         oldStr = replaceSpace(oldStr);
         oldStr = replaceComma(oldStr);
         return oldStr;
+    }
+
+    /**
+     * 判断流程图的指标集是否合法
+     * @param product
+     * @return
+     */
+    public static boolean isLegalProduct(String product){
+        String pattern = "^[A-Za-z0-9_\\-]{1,40}";
+
+        Pattern r = Pattern.compile(pattern);
+        Matcher m = r.matcher(product);
+        return m.matches();
     }
 }
 
