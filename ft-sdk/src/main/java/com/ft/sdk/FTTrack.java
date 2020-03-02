@@ -64,13 +64,15 @@ public class FTTrack {
     /**
      * 流程图数据上报
      *
-     * @param product
-     * @param traceId
-     * @param name
-     * @param parent
-     * @param duration
+     * @param product 指标集，流程图以该值进行分类
+     * @param traceId 标示一个流程图的全程唯一ID
+     * @param name 流程节点名称
+     * @param parent 流程图当前流程节点的上一个流程节点名称，如果是第一个节点，该值应填null
+     * @param duration 流程图在该节点所耗费或持续时间，单位为毫秒
+     * @param tags 其他标签值（该值中不能含 traceId，name，parent 字段）
+     * @param values 其他指标（该值中不能含 duration 字段）
      */
-    public void trackFlowChart(String product, String traceId, String name, String parent, long duration) {
+    public void trackFlowChart(String product, String traceId, String name, String parent, long duration,JSONObject tags,JSONObject values) {
         if (Utils.isNullOrEmpty(product)) {
             throw new InvalidParameterException("参数 product 不能为空");
         }
@@ -88,8 +90,39 @@ public class FTTrack {
         }
 
         long time = System.currentTimeMillis();
-        JSONObject tags = new JSONObject();
-        JSONObject values = new JSONObject();
+        if(tags == null) {
+            tags = new JSONObject();
+        }
+        if(values == null) {
+            values = new JSONObject();
+        }
+        Iterator<String> iteTag = tags.keys();
+        while (iteTag.hasNext()){
+            if(iteTag.next().contains("$")){
+                throw new InvalidParameterException("参数 tags 中不能使用保留字段符号 $");
+            }
+        }
+
+        Iterator<String> iteValue = values.keys();
+        while (iteValue.hasNext()){
+            if(iteValue.next().contains("$")){
+                throw new InvalidParameterException("参数 values 中不能使用保留字段符号 $");
+            }
+        }
+
+        if (tags.has("traceId")) {
+            throw new InvalidParameterException("参数 tags 中不能包含保留字段 traceId");
+        }
+        if (tags.has("name")) {
+            throw new InvalidParameterException("参数 tags 中不能包含保留字段 name");
+        }
+        if (tags.has("parent")) {
+            throw new InvalidParameterException("参数 tags 中不能包含保留字段 parent");
+        }
+
+        if (tags.has("duration")) {
+            throw new InvalidParameterException("参数 values 中不能包含保留字段 duration");
+        }
         try {
             tags.put("$traceId", traceId);
             tags.put("$name", name);
