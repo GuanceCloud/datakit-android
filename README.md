@@ -101,6 +101,8 @@ setUseOAID|是否使用OAID作为设备唯一识别号的替代字段 |否|默�
 setDebug|是否开启调试模式|否|默认不开启，开启后方可打印 SDK 运行日志
 setMonitorType|设置监控项|否|默认不开启任何监控项,<br>[关于监控项说明](#四监控配置项类-monitortype),<br>[关于监控项参数获取问题]()
 setNeedBindUser|是否开启绑定用户数据|否|默认开启,<br>开启后必须要绑定用户数据[如何绑定用户数据](#一初始化类-ftsdk-提供的方法)
+setOpenFlowChart|是否开启自动埋点流程图数据上报|否|开启且开启了自动埋点，将根据 Activity 的 onResume 和 onPause 来上报流程
+setFlowProduct|设置流程的指标集|否|当开启了上报流程图一定要设置该值
 enableAutoTrack|是否使用自动埋点|否|
 setEnableAutoTrackType|设置事件白名单|否|开启自动埋点后，不设置该值表示接受所有事件类型。埋点事件类型见表下说明
 setDisableAutoTrackType|设置事件黑名单|否|开启自动埋点后，不设置该值表示不设置事件黑名单
@@ -156,6 +158,8 @@ class DemoAplication : Application() {
             .setDebug(true)//是否开启Debug模式（开启后能查看调试数据）
             .setNeedBindUser(true)//是否绑定用户信息
             .setMonitorType(MonitorType.ALL)//设置监控项
+            .setOpenFlowChart(true)
+            .setFlowProduct("demo12")
             .enableAutoTrack(true)//是否开启自动埋点
             .setEnableAutoTrackType(FTAutoTrackType.APP_START.type or
                     FTAutoTrackType.APP_END.type or
@@ -317,6 +321,23 @@ ACCESS_FINE_LOCATION|获取当前位置所属城市
  * @param values 埋点数据
  */
  public void trackValues(String event, JSONObject values)
+```
+
+方法 3
+
+``` java
+/**
+ * 流程图数据上报
+ *
+ * @param product 指标集，流程图以该值进行分类
+ * @param traceId 标示一个流程图的全程唯一ID
+ * @param name 流程节点名称
+ * @param parent 流程图当前流程节点的上一个流程节点名称，如果是第一个节点，该值应填null
+ * @param duration 流程图在该节点所耗费或持续时间，单位为毫秒
+ * @param tags 其他标签值（该值中不能含 traceId，name，parent 字段）
+ * @param values 其他指标（该值中不能含 duration 字段）
+ */
+ public void trackFlowChart(String product, String traceId, String name, String parent, long duration,JSONObject tags,JSONObject values)
 ```
 
 ### 四、监控配置项类 MonitorType

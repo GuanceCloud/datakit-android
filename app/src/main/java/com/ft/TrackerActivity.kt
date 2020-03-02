@@ -52,7 +52,7 @@ class TrackerActivity : AppCompatActivity() {
 
         flowChartTacker2.setOnClickListener { v ->
             FTTrack.getInstance().trackFlowChart("track_demo", "custom_03", "自定义流程图开始", null, 0, null, JSONObject().apply {
-                put("\$values","test")
+                put("values","test")
             })
             FTTrack.getInstance().trackFlowChart("track_demo", "custom_03", "步骤1", "自定义流程图开始", 1000, null, JSONObject().apply {
                 put("values","test")
