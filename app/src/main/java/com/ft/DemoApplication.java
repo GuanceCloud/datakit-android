@@ -27,7 +27,7 @@ public class DemoApplication extends Application {
     public void onCreate() {
         super.onCreate();
         instance = this;
-        FTSDKConfig ftSDKConfig = FTSDKConfig.Builder(AccountUtils.getProperty(this, AccountUtils.ACCESS_SERVER_URL),
+        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(this, AccountUtils.ACCESS_SERVER_URL),
                 true,
                 AccountUtils.getProperty(this, AccountUtils.ACCESS_KEY_ID),
                 AccountUtils.getProperty(this, AccountUtils.ACCESS_KEY_SECRET))
