@@ -39,10 +39,34 @@ public class FTSDKConfig {
     private List<Class<?>> blackActivityClass;
     private List<Class<?>> blackViewClass;
 
-    public static FTSDKConfig Builder(String metricsUrl, boolean enableRequestSigning, String akId, String akSecret) {
+    /**
+     * 构建 SDK 必要的配置参数
+     * @param metricsUrl 服务器地址
+     * @param enableRequestSigning 是否需要对请求进行签名
+     * @param akId 签名 id，当 enableRequestSigning 为 true 时必须设置
+     * @param akSecret 签名 Secret，当 enableRequestSigning 为 true 时必须设置
+     * @return
+     */
+    public static FTSDKConfig builder(String metricsUrl, boolean enableRequestSigning, String akId, String akSecret) {
         return new FTSDKConfig(metricsUrl, enableRequestSigning, akId, akSecret);
     }
 
+    /**
+     * 构建 SDK 必要的配置参数（当不需要签名时可以用此方法）
+     * @param metricsUrl 服务器地址
+     * @return
+     */
+    public static FTSDKConfig builder(String metricsUrl){
+        return new FTSDKConfig(metricsUrl, false, null, null);
+    }
+
+    /**
+     * SDK 配置项构造方法
+     * @param metricsUrl
+     * @param enableRequestSigning
+     * @param akId
+     * @param akSecret
+     */
     private FTSDKConfig(String metricsUrl, boolean enableRequestSigning, String akId, String akSecret) {
         this.metricsUrl = metricsUrl;
         this.enableRequestSigning = enableRequestSigning;
