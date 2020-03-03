@@ -32,27 +32,6 @@ public final class FTWeaver extends BaseWeaver {
     public boolean isWeavableClass(String fullQualifiedClassName) {
         boolean superResult = super.isWeavableClass(fullQualifiedClassName);
         boolean isByteCodePlugin = ClassNameAnalytics.isFTSDKFile(fullQualifiedClassName);
-        if(ftExtension != null) {
-            //whitelist is prior to to blacklist
-            if(!ftExtension.whitelist.isEmpty()) {
-                boolean inWhiteList = false;
-                for(String item : ftExtension.whitelist) {
-                    if(fullQualifiedClassName.startsWith(item)) {
-                        inWhiteList = true;
-                    }
-                }
-                return superResult && !isByteCodePlugin && inWhiteList;
-            }
-            if(!ftExtension.blacklist.isEmpty()) {
-                boolean inBlackList = false;
-                for(String item : ftExtension.blacklist) {
-                    if(fullQualifiedClassName.startsWith(item)) {
-                        inBlackList = true;
-                    }
-                }
-                return superResult && !isByteCodePlugin && !inBlackList;
-            }
-        }
         return superResult && !isByteCodePlugin;
     }
 
