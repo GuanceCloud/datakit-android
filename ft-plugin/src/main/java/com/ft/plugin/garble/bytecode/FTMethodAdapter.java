@@ -92,7 +92,7 @@ public class FTMethodAdapter extends AdviceAdapter {
         super.onMethodEnter();
         nameDesc = methodName + methodDesc;
         pubAndNoStaticAccess = FTUtil.isPublic(methodAccess) && !FTUtil.isStatic(methodAccess);
-        if (ftTransformHelper.extension.canHookMethod) {
+        if (ftTransformHelper.extension.openAutoTrack) {
             handleCode();
         }
     }
