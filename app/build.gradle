@@ -52,6 +52,7 @@ apply plugin: 'ft-plugin'
 
 FTExt {
     showLog = true
+    openAutoTrack = true
 }
 repositories {
     mavenCentral()
