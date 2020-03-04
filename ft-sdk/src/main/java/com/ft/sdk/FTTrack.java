@@ -167,7 +167,7 @@ public class FTTrack {
                     if (tagsTemp == null) {
                         tagsTemp = new JSONObject();
                     }
-                    //SyncDataManager.addMonitorData(tagsTemp);
+                    SyncDataManager.addMonitorData(tagsTemp);
                     opData.put("tags", tagsTemp);
                     if (values != null) {
                         opData.put("values", values);
@@ -183,6 +183,7 @@ public class FTTrack {
                         FTManager.getFTDBManager().insertFTOperation(recordData);
                         FTManager.getSyncTaskManager().executeSyncPoll();
                     }else{
+                        LogUtils.d("trackImmediate 数据：" + recordData.getJsonString());
                         updateRecordData(recordData,callback);
                     }
                 } catch (Exception e) {
@@ -219,7 +220,7 @@ public class FTTrack {
      * @return
      * @throws JSONException
      */
-    public boolean isLegalValues(JSONObject jsonObject) throws JSONException {
+    boolean isLegalValues(JSONObject jsonObject) throws JSONException {
         if (jsonObject == null) {
             LogUtils.e("参数 Values 不能为空");
             return false;
