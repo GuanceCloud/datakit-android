@@ -1,8 +1,12 @@
 package com.ft.sdk;
 
 import com.ft.sdk.garble.FTUserConfig;
+import com.ft.sdk.garble.SyncCallback;
 import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.RecordData;
+import com.ft.sdk.garble.http.FTResponseData;
+import com.ft.sdk.garble.http.HttpBuilder;
+import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.manager.FTManager;
 import com.ft.sdk.garble.manager.SyncDataManager;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -13,7 +17,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.HttpURLConnection;
 import java.security.InvalidParameterException;
+import java.util.Collections;
 import java.util.Iterator;
 
 /**
@@ -51,14 +57,16 @@ public class FTTrack {
     }
 
     /**
-     * 主动埋点
+     * 主动埋点，异步上传用户埋点数据并返回上传结果
      *
      * @param event  埋点事件名称
+     * @param tags   埋点数据
      * @param values 埋点数据
+     * @param callback 上传结果回调
      */
-    public void trackValues(String event, JSONObject values) {
+    public void trackImmediately(String event, JSONObject tags, JSONObject values,SyncCallback callback) {
         long time = System.currentTimeMillis();
-        track(OP.CSTM, time, event, null, values);
+        track(OP.CSTM, time, event, tags, values,false,callback);
     }
 
     /**
@@ -138,6 +146,9 @@ public class FTTrack {
     }
 
     private void track(OP op, long time, String field, final JSONObject tags, JSONObject values) {
+        track(op,time,field,tags,values,true, null);
+    }
+    private void track(OP op, long time, String field, final JSONObject tags, JSONObject values, boolean insertDB, SyncCallback callback) {
         try {
             if (!isLegalValues(values)) {
                 return;
@@ -156,7 +167,7 @@ public class FTTrack {
                     if (tagsTemp == null) {
                         tagsTemp = new JSONObject();
                     }
-                    SyncDataManager.addMonitorData(tagsTemp);
+                    //SyncDataManager.addMonitorData(tagsTemp);
                     opData.put("tags", tagsTemp);
                     if (values != null) {
                         opData.put("values", values);
@@ -167,14 +178,37 @@ public class FTTrack {
                         recordData.setSessionid(sessionId);
                     }
 
-                    LogUtils.d("FTTrack数据进数据库：" + recordData.getJsonString());
-                    FTManager.getFTDBManager().insertFTOperation(recordData);
-                    FTManager.getSyncTaskManager().executeSyncPoll();
+                    if(insertDB) {
+                        LogUtils.d("FTTrack数据进数据库：" + recordData.getJsonString());
+                        FTManager.getFTDBManager().insertFTOperation(recordData);
+                        FTManager.getSyncTaskManager().executeSyncPoll();
+                    }else{
+                        updateRecordData(recordData,callback);
+                    }
                 } catch (Exception e) {
                 }
             });
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * 异步上传用户埋点信息，并返回上传结果
+     * @param recordData
+     * @param callback
+     */
+    private void updateRecordData(RecordData recordData,SyncCallback callback){
+        SyncDataManager syncDataManager = new SyncDataManager();
+        String body = syncDataManager.getBodyContent(Collections.singletonList(recordData));
+        FTResponseData result = HttpBuilder.Builder()
+                .setMethod(RequestMethod.POST)
+                .setBodyString(body).executeSync(FTResponseData.class);
+
+        try {
+            callback.isSuccess(result.getCode() == HttpURLConnection.HTTP_OK);
+        } catch (Exception e) {
+            callback.isSuccess(false);
         }
     }
 

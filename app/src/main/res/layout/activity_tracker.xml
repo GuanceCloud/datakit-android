@@ -21,4 +21,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="主动流程图数据上报（含额外指标）"/>
+    <Button
+        android:id="@+id/flowChartTacker3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="直接上传埋点数据"/>
 </LinearLayout>
