@@ -1,5 +1,9 @@
 # Dataflux SDK Android
 
+**demo**
+
+地址：[https://github.com/CloudCare/dataflux-sdk-android-demo](https://github.com/CloudCare/dataflux-sdk-android-demo)
+
 **agent**
 
 [![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Fmvnrepo.jiagouyun.com%2Frepository%2Fmaven-releases%2Fcom%2Fcloudcare%2Fft%2Fmobile%2Fsdk%2Ftraker%2Fagent%2Fft-sdk%2Fmaven-metadata.xml)](https://mvnrepo.jiagouyun.com/repository/maven-releases/com/cloudcare/ft/mobile/sdk/traker/agent/ft-sdk/maven-metadata.xml)
@@ -9,7 +13,7 @@
 [![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Fmvnrepo.jiagouyun.com%2Frepository%2Fmaven-releases%2Fcom%2Fcloudcare%2Fft%2Fmobile%2Fsdk%2Ftraker%2Fplugin%2Fft-plugin%2Fmaven-metadata.xml)](https://mvnrepo.jiagouyun.com/repository/maven-releases/com/cloudcare/ft/mobile/sdk/traker/plugin/ft-plugin/maven-metadata.xml)
 
 ## 安装
-- 在项目的根目录的 build.gradle 文件中添加 FT SDK 的的远程仓库地址
+- 在项目的根目录的 build.gradle 文件中添加 FT SDK 的远程仓库地址
 
 ``` groovy
 
@@ -100,7 +104,7 @@ android{
 setUseOAID|是否使用OAID作为设备唯一识别号的替代字段 |否|默认不使用,<br>[了解 OAID](#1关于-oaid)
 setDebug|是否开启调试模式|否|默认不开启，开启后方可打印 SDK 运行日志
 setMonitorType|设置监控项|否|默认不开启任何监控项,<br>[关于监控项说明](#四监控配置项类-monitortype),<br>[关于监控项参数获取问题]()
-setNeedBindUser|是否开启绑定用户数据|否|默认开启,<br>开启后必须要绑定用户数据[如何绑定用户数据](#一初始化类-ftsdk-提供的方法)
+setNeedBindUser|是否开启绑定用户数据|否|默认不开启,<br>开启后必须要绑定用户数据[如何绑定用户数据](#一初始化类-ftsdk-提供的方法)
 setOpenFlowChart|是否开启自动埋点流程图数据上报|否|开启且开启了自动埋点，将根据 Activity 的 onResume 和 onPause 来上报流程
 setFlowProduct|设置流程的指标集|否|当开启了上报流程图一定要设置该值
 enableAutoTrack|是否使用自动埋点|否|
@@ -118,12 +122,12 @@ builder|构建配置项对象方法|是|关于其参数可见下方参数表
     FTAutoTrackType.APP_END：页面的结束事件，Activity 依赖的是其 onPause 方法，Fragment 依赖的是其 onDestroy 方法；
     FTAutoTrackType.APP_CLICK：控件的点击事件。
 
-FTSDKConfig.Builder(...) 方法必要参数说明表
+FTSDKConfig.builder(...) 方法必要参数说明表
 
 参数|类型|含义|是否必须
 :--:|:--:|:--:|:--:
 metricsUrl|String|FT-GateWay metrics 写入地址|是
-enableRequestSigning|boolean|配置是否需要进行请求签名|是
+enableRequestSigning|boolean|配置是否需要进行请求签名|否
 akId|String|access key ID|enableRequestSigning 为 true 时，必须要填
 akSecret|String|access key Secret|enableRequestSigning 为 true 时，必须要填
 
@@ -250,11 +254,54 @@ ACCESS_FINE_LOCATION|获取当前位置所属城市
  */
  public void bindUserData(@NonNull String name,@NonNull String id, JSONObject exts)
 ```
+方法 5
 
+```java
+/**
+ * 创建获取 GPU 信息的GLSurfaceView
+ * @param root
+ */
+public void setGpuRenderer(ViewGroup root)
+```
 
 ### 二、配置类 FTSDKConfig 提供的方法
 
 方法 1
+
+```java
+/**
+ * 构建 SDK 必要的配置参数（当不需要签名时可以用此方法）
+ * @param metricsUrl 服务器地址
+ * @return
+ */
+public static FTSDKConfig builder(String metricsUrl)
+```
+
+方法 2
+
+```java
+/**
+* 构建 SDK 必要的配置参数
+* @param metricsUrl 服务器地址
+* @param enableRequestSigning 是否需要对请求进行签名
+* @param akId 签名 id，当 enableRequestSigning 为 true 时必须设置
+* @param akSecret 签名 Secret，当 enableRequestSigning 为 true 时必须设置
+* @return
+*/
+public static FTSDKConfig builder(String metricsUrl, boolean enableRequestSigning, String akId, String akSecret)
+```
+
+方法 3
+
+```java
+/**
+ * 设置自动埋点的事件类别
+ * @param type
+ * @return
+ */
+public FTSDKConfig setEnableAutoTrackType(int type)
+```
+方法 4
 
 ``` java
 /**
@@ -265,7 +312,7 @@ ACCESS_FINE_LOCATION|获取当前位置所属城市
  public FTSDKConfig setUseOAID(boolean useOAID)
 ```
 
-方法 2
+方法 5
 
 ``` java
 /**
@@ -276,7 +323,7 @@ ACCESS_FINE_LOCATION|获取当前位置所属城市
  public FTSDKConfig setDebug(boolean debug)
 ```
 
-方法 3
+方法 6
 
 ``` java
 /**
@@ -287,7 +334,31 @@ ACCESS_FINE_LOCATION|获取当前位置所属城市
  public FTSDKConfig setNeedBindUser(boolean needBindUserVar)
 ```
 
-方法 4
+方法 7
+
+```java
+/**
+ * 设置是否开启流程图
+ *
+ * @param openFlowChart
+ * @return
+ */
+public FTSDKConfig setOpenFlowChart(boolean openFlowChart)
+```
+
+方法 8
+
+```java
+/**
+ * 图标类型代号
+ *
+ * @param flowProduct
+ * @return
+ */
+public FTSDKConfig setFlowProduct(String flowProduct)
+```
+
+方法 9
 
 ``` java
 /**
@@ -297,6 +368,66 @@ ACCESS_FINE_LOCATION|获取当前位置所属城市
  * @return
  */
  public FTSDKConfig setMonitorType(int monitorType)
+```
+
+方法 10
+
+```java
+/**
+ * 设置白名单（Activity，Fragment）
+ *
+ * @param classes
+ * @return
+ */
+public FTSDKConfig setWhiteActivityClasses(List<Class<?>> classes)
+```
+
+方法 11
+
+```java
+
+/**
+ * 设置控件白名单
+ *
+ * @param classes
+ * @return
+ */
+public FTSDKConfig setWhiteViewClasses(List<Class<?>> classes)
+```
+
+方法 12
+
+```java
+/**
+ * 设置关闭的自动埋点事件类别
+ *
+ * @param type
+ * @return
+ */
+public FTSDKConfig setDisableAutoTrackType(int type)
+```
+
+方法 13
+
+```java
+/**
+ * 设置黑名单（Acitivty，Fragment）
+ *
+ * @param classes
+ * @return
+ */
+public FTSDKConfig setBlackActivityClasses(List<Class<?>> classes)
+```
+
+方法 14
+```java
+/**
+ * 设置控件黑名单
+ *
+ * @param classes
+ * @return
+ */
+public FTSDKConfig setBlackViewClasses(List<Class<?>> classes)
 ```
 
 ### 三、手动埋点类 FTTrack
