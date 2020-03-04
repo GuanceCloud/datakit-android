@@ -1,6 +1,7 @@
 package com.ft.sdk.garble.manager;
 
 import com.ft.sdk.garble.FTUserConfig;
+import com.ft.sdk.garble.SyncCallback;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.http.FTResponseData;
@@ -150,10 +151,6 @@ public class SyncTaskManager {
                     "}");
         }
 
-    }
-
-    interface SyncCallback {
-        void isSuccess(boolean isSuccess);
     }
 
     /**
