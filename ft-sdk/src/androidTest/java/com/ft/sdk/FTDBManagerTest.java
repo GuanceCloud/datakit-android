@@ -41,7 +41,7 @@ public class FTDBManagerTest {
         JSONObject values = new JSONObject();
         values.put("value", "success");
         SyncTaskManager.get().setRunning(true);
-        FTTrack.getInstance().track("TestEvent", tags, values);
+        FTTrack.getInstance().trackBackground("TestEvent", tags, values);
     }
 
     /**
