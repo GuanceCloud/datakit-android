@@ -51,7 +51,7 @@ public class FTTrack {
      * @param tags   埋点数据
      * @param values 埋点数据
      */
-    public void track(String event, JSONObject tags, JSONObject values) {
+    public void trackBackground(String event, JSONObject tags, JSONObject values) {
         long time = System.currentTimeMillis();
         track(OP.CSTM, time, event, tags, values);
     }
@@ -64,7 +64,7 @@ public class FTTrack {
      * @param values 埋点数据
      * @param callback 上传结果回调
      */
-    public void trackImmediately(String event, JSONObject tags, JSONObject values,SyncCallback callback) {
+    public void trackImmediate(String event, JSONObject tags, JSONObject values,SyncCallback callback) {
         long time = System.currentTimeMillis();
         track(OP.CSTM, time, event, tags, values,false,callback);
     }
