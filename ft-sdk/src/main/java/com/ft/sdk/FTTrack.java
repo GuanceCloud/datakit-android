@@ -163,6 +163,8 @@ public class FTTrack {
 
                     if (field != null) {
                         opData.put("field", field);
+                    }else {
+                        throw new InvalidParameterException("指标集 field 不能为空");
                     }
                     if (tagsTemp == null) {
                         tagsTemp = new JSONObject();
@@ -171,6 +173,8 @@ public class FTTrack {
                     opData.put("tags", tagsTemp);
                     if (values != null) {
                         opData.put("values", values);
+                    }else {
+                        throw new InvalidParameterException("指标 values 不能为空");
                     }
                     recordData.setOpdata(opData.toString());
                     String sessionId = FTUserConfig.get().getSessionId();
