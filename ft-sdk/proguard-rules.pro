@@ -55,6 +55,10 @@
      *;
 }
 
+-keep class com.ft.sdk.garble.SyncCallback{
+    *;
+}
+
 -keep class com.ft.sdk.MonitorType{
     *;
 }
