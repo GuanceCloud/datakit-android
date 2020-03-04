@@ -110,7 +110,7 @@ setWhiteActivityClasses|页面白名单|否|包括 Activity、Fragment
 setWhiteViewClasses|控件白名单|否|包括基本控件
 setBlackActivityClasses|页面黑名单|否|
 setBlackViewClasses|控件黑名单|否|
-Builder|构建配置项对象方法|是|关于其参数可见下方参数表
+builder|构建配置项对象方法|是|关于其参数可见下方参数表
 
     FTAutoTrackType 自动埋点事件说明：
     事件总类目前支持3种
@@ -149,7 +149,7 @@ class DemoAplication : Application() {
     private val serverUrl = "serverUrl"
     override fun onCreate() {
         super.onCreate()
-        val ftSDKConfig = FTSDKConfig.Builder(
+        val ftSDKConfig = FTSDKConfig.builder(
             serverUrl,//服务器地址
             true,//是否需要签名
             accesskey_id,//access key ID
@@ -309,18 +309,21 @@ ACCESS_FINE_LOCATION|获取当前位置所属城市
  * @param tags 埋点数据
  * @param values 埋点数据
  */
- public void track(String event, JSONObject tags, JSONObject values)
+ public void trackBackground(String event, JSONObject tags, JSONObject values)
 ```
 
 方法 2
 
 ```java
 /**
- * 主动埋点
- * @param event 埋点事件名称
- * @param values 埋点数据
- */
- public void trackValues(String event, JSONObject values)
+     * 主动埋点，异步上传用户埋点数据并返回上传结果
+     *
+     * @param event  埋点事件名称
+     * @param tags   埋点数据
+     * @param values 埋点数据
+     * @param callback 上传结果回调
+     */
+    public void trackImmediate(String event, JSONObject tags, JSONObject values,SyncCallback callback)
 ```
 
 方法 3
