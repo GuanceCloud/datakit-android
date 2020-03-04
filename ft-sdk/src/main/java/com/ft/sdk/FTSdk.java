@@ -119,23 +119,25 @@ public class FTSdk {
     public void setGpuRenderer(ViewGroup root){
         LogUtils.d("绑定视图监听 GPU 信息");
         try {
-            Context context = mApplication;
-            final RendererUtil mRendererUtil = new RendererUtil();
-            GLSurfaceView mGLSurfaceView = new GLSurfaceView(context);
-            ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(1, 1);
-            mGLSurfaceView.setLayoutParams(layoutParams);
-            root.addView(mGLSurfaceView);
-            mGLSurfaceView.setEGLContextClientVersion(1);
-            mGLSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 0, 0);
-            mGLSurfaceView.setRenderer(mRendererUtil);
-            mGLSurfaceView.post(() -> {
-                String gl_vendor = mRendererUtil.gl_vendor;
-                String gl_renderer = mRendererUtil.gl_renderer;
-                GpuUtils.GPU_VENDOR_RENDERER = gl_vendor + "_" + gl_renderer;
-                if (gl_renderer != null && gl_vendor != null) {
-                    mGLSurfaceView.surfaceDestroyed(mGLSurfaceView.getHolder());
-                }
-            });
+            if (FTMonitorConfig.get().isMonitorType(MonitorType.GPU)) {
+                Context context = mApplication;
+                final RendererUtil mRendererUtil = new RendererUtil();
+                GLSurfaceView mGLSurfaceView = new GLSurfaceView(context);
+                ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(1, 1);
+                mGLSurfaceView.setLayoutParams(layoutParams);
+                root.addView(mGLSurfaceView);
+                mGLSurfaceView.setEGLContextClientVersion(1);
+                mGLSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 0, 0);
+                mGLSurfaceView.setRenderer(mRendererUtil);
+                mGLSurfaceView.post(() -> {
+                    String gl_vendor = mRendererUtil.gl_vendor;
+                    String gl_renderer = mRendererUtil.gl_renderer;
+                    GpuUtils.GPU_VENDOR_RENDERER = gl_vendor + "_" + gl_renderer;
+                    if (gl_renderer != null && gl_vendor != null) {
+                        mGLSurfaceView.surfaceDestroyed(mGLSurfaceView.getHolder());
+                    }
+                });
+            }
         }catch (Exception e){
         }
     }
