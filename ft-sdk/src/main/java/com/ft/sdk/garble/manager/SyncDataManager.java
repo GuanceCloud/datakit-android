@@ -40,13 +40,20 @@ import static com.ft.sdk.garble.utils.Constants.FT_KEY_VALUE_NULL;
  */
 public class SyncDataManager {
 
+    /**
+     * 将本地将要同步的数据封装
+     * @param recordDatas
+     * @return
+     */
     public String getBodyContent(List<RecordData> recordDatas) {
         StringBuffer sb = new StringBuffer();
         String device = parseHashToString(getDeviceInfo());
         for (RecordData recordData : recordDatas) {
             if(OP.OPEN_ACT.value.equals(recordData.getOp())){
+                //如果是页面打开操作，就在该条数据上添加一条表示流程图的数据
                 try {
                     JSONObject opData = new JSONObject(recordData.getOpdata());
+                    //获取指标名称
                     if (opData.has("field")) {
                         sb.append("$flow_mobile_activity_").append(opData.optString("field"));
                     }else{
@@ -58,11 +65,13 @@ public class SyncDataManager {
 
                 sb.append(",$traceId=").append(recordData.getTraceId());
                 sb.append(",$name=").append(recordData.getCpn());
+                //如果父页面是root表示其为起始节点，不添加父节点
                 if(!"root".equals(recordData.getPpn())){
                     sb.append(",$parent=").append(recordData.getPpn());
                 }
                 sb.append(",").append(device.replaceAll(" ", "\\\\ ")).append(",");
                 addUserData(sb, recordData);
+                //删除多余的逗号
                 deleteLastComma(sb);
                 sb.append(" ");
                 sb.append("$duration=").append(recordData.getDuration()).append("i");
@@ -70,7 +79,9 @@ public class SyncDataManager {
                 sb.append(recordData.getTime() * 1000 * 1000);
                 sb.append("\n");
             } else if(OP.CLS_ACT.value.equals(recordData.getOp())){
+                //如果是关闭页面，也要附加一条页面关闭的流程图数据
                 try {
+                    //获取指标
                     JSONObject opData = new JSONObject(recordData.getOpdata());
                     if (opData.has("field")) {
                         sb.append("$flow_mobile_activity_").append(opData.optString("field"));
@@ -82,7 +93,9 @@ public class SyncDataManager {
                 }
 
                 sb.append(",$traceId=").append(recordData.getTraceId());
+                //如果父页面不是root，表示其为子页面的关闭
                 if(!"root".equals(recordData.getPpn())){
+                    //交换当前页面和父页面
                     sb.append(",$name=").append(recordData.getPpn());
                     sb.append(",$parent=").append(recordData.getCpn());
                 }
@@ -95,11 +108,11 @@ public class SyncDataManager {
                 sb.append(recordData.getTime() * 1000 * 1000);
                 sb.append("\n");
             }
+            //获取这条事件的指标
             sb.append(getMeasurement(recordData));
-            if(!CSTM.value.equals(recordData.getOp())) {
-                sb.append(",");
-                sb.append(device.replaceAll(" ", "\\\\ "));
-            }
+            sb.append(",");
+            sb.append(device.replaceAll(" ", "\\\\ "));
+            //获取埋点事件数据
             sb.append(getUpdateData(recordData));
             sb.append("\n");
         }
@@ -163,7 +176,7 @@ public class SyncDataManager {
                 JSONObject values = opJson.optJSONObject("values");
                 StringBuffer tagSb = getCustomHash(tags, true);
                 StringBuffer valueSb = getCustomHash(values, false);
-                //addUserData(tagSb, recordData);
+                addUserData(tagSb, recordData);
                 deleteLastComma(tagSb);
                 if (tagSb.length() > 0) {
                     sb.append(",");
