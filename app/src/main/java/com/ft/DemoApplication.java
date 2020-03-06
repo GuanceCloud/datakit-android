@@ -43,6 +43,6 @@ public class DemoApplication extends Application {
                 .setOpenFlowChart(true)
                 .setFlowProduct("demo12");
         //.setMonitorType(MonitorType.ALL);//设置监控项
-        FTSdk.install(ftSDKConfig, this);
+        FTSdk.install(ftSDKConfig);
     }
 }

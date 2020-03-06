@@ -170,7 +170,7 @@ class DemoAplication : Application() {
                     FTAutoTrackType.APP_CLICK.type)//自动埋点事件白名单
             .setWhiteActivityClasses(listOf(MainActivity::class.java))//自动埋点页面白名单
             .setWhiteViewClasses(listOf(Button::class.java))//自动埋点控件白名单
-        FTSdk.install(ftSDKConfig,this)
+        FTSdk.install(ftSDKConfig)
     }
 }
 
