@@ -44,9 +44,7 @@ public class FTSdk {
         if (ftSDKConfig == null){
             throw new InvalidParameterException("ftSDKConfig 参数不能为 null");
         }
-        /**if (application == null) {
-            throw new InvalidParameterException("Application 参数不能为 null");
-        }*/
+
         mFtSdk = new FTSdk(ftSDKConfig);
         mFtSdk.initFTConfig();
         mFtSdk.registerActivityLifeCallback();
