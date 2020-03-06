@@ -31,10 +31,8 @@ import java.security.InvalidParameterException;
 public class FTSdk {
     private static FTSdk mFtSdk;
     private FTSDKConfig mFtSDKConfig;
-    private Application mApplication;
-    private FTSdk(@NonNull FTSDKConfig ftSDKConfig,@NonNull Application application){
+    private FTSdk(@NonNull FTSDKConfig ftSDKConfig){
         this.mFtSDKConfig = ftSDKConfig;
-        this.mApplication = application;
     }
 
     /**
@@ -42,14 +40,14 @@ public class FTSdk {
      * @param ftSDKConfig
      * @return
      */
-    public static synchronized void install(@NonNull FTSDKConfig ftSDKConfig,@NonNull Application application){
+    public static synchronized void install(@NonNull FTSDKConfig ftSDKConfig){
         if (ftSDKConfig == null){
             throw new InvalidParameterException("ftSDKConfig 参数不能为 null");
         }
-        if (application == null) {
+        /**if (application == null) {
             throw new InvalidParameterException("Application 参数不能为 null");
-        }
-        mFtSdk = new FTSdk(ftSDKConfig,application);
+        }*/
+        mFtSdk = new FTSdk(ftSDKConfig);
         mFtSdk.initFTConfig();
         mFtSdk.registerActivityLifeCallback();
     }
@@ -70,7 +68,7 @@ public class FTSdk {
      * @return
      */
     public Application getApplication(){
-        return mApplication;
+        return FTApplication.getApplication();
     }
 
     /**
@@ -120,7 +118,7 @@ public class FTSdk {
         LogUtils.d("绑定视图监听 GPU 信息");
         try {
             if (FTMonitorConfig.get().isMonitorType(MonitorType.GPU)) {
-                Context context = mApplication;
+                Context context = getApplication();
                 final RendererUtil mRendererUtil = new RendererUtil();
                 GLSurfaceView mGLSurfaceView = new GLSurfaceView(context);
                 ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(1, 1);
@@ -173,7 +171,7 @@ public class FTSdk {
      */
     private void registerActivityLifeCallback(){
         FTActivityLifecycleCallbacks life = new FTActivityLifecycleCallbacks();
-        mApplication.registerActivityLifecycleCallbacks(life);
+        getApplication().registerActivityLifecycleCallbacks(life);
     }
 
     private void trackStartApp(){
