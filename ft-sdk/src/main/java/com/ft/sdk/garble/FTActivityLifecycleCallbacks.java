@@ -20,6 +20,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     @Override
     public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
         FTManager.getFTActivityManager().putActivity(activity, Lifecycle.Event.ON_CREATE);
+        FTFragmentManager.getInstance().addFragmentLifecycle(activity);
     }
 
     @Override
@@ -51,6 +52,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
 
     @Override
     public void onActivityDestroyed(@NonNull Activity activity) {
+        FTFragmentManager.getInstance().removeFragmentLifecycle(activity);
         FTManager.getFTActivityManager().removeActivity(activity);
     }
 }
