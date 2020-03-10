@@ -5,6 +5,7 @@ import android.app.Activity;
 
 import androidx.lifecycle.Lifecycle;
 
+import com.ft.sdk.garble.bean.ActivityFromWay;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 
@@ -19,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Description: Activity 管理类
  */
 public class FTActivityManager {
+    private ActivityFromWay activityFromWay;
     private static volatile FTActivityManager instance;
     //栈顶 Activity
     private Activity topActivity;
@@ -36,6 +38,18 @@ public class FTActivityManager {
             instance = new FTActivityManager();
         }
         return instance;
+    }
+
+    /**
+     * 返回
+     * @return
+     */
+    public ActivityFromWay getActivityFromWay() {
+        return activityFromWay;
+    }
+
+    public void setActivityFromWay(ActivityFromWay activityFromWay) {
+        this.activityFromWay = activityFromWay;
     }
 
     /**
