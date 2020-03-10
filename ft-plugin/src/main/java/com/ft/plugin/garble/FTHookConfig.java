@@ -72,7 +72,14 @@ public class FTHookConfig {
                         new FTSubMethodCell(FTMethodType.ALOAD, 0),
                         new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false)
                 )));
-
+        ACTIVITY_METHODS.put("startActivityForResult(Landroid/content/Intent;ILandroid/os/Bundle;)V", new FTMethodCell(
+                "startActivityForResult",
+                "(Landroid/content/Intent;ILandroid/os/Bundle;)V",
+                "startActivityByWay",
+                "(Lcom/ft/sdk/garble/bean/ActivityFromWay;Landroid/content/Intent;)V",
+                Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD, 1)
+                )));
     }
 
     /**
