@@ -93,7 +93,7 @@
             android:text="主动流程图数据上报"/>
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="200dp"
             android:id="@+id/fragment"/>
     </LinearLayout>
 </ScrollView>
