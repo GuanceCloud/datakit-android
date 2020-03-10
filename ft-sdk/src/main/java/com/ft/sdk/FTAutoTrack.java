@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -16,6 +17,7 @@ import androidx.annotation.Nullable;
 import com.ft.sdk.garble.FTAutoTrackConfig;
 import com.ft.sdk.garble.FTFlowChartConfig;
 import com.ft.sdk.garble.FTUserConfig;
+import com.ft.sdk.garble.bean.ActivityFromWay;
 import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.manager.FTActivityManager;
@@ -34,6 +36,15 @@ import org.json.JSONObject;
  * Description
  */
 public class FTAutoTrack {
+
+    /**
+     * Activity 打开的方式（标记是从 Fragment 打开还是 Activity）
+     * @param activityFromWa
+     * @param intent
+     */
+    public static void startActivityByWay(ActivityFromWay activityFromWa, Intent intent){
+
+    }
     /**
      * 启动 APP
      */
@@ -76,7 +87,7 @@ public class FTAutoTrack {
      */
     public static void fragmentOnCreateView(Object clazz, Object activity) {
         try {
-            startPage(clazz, activity);
+            //startPage(clazz, activity);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -90,7 +101,7 @@ public class FTAutoTrack {
      */
     public static void fragmentOnDestroyView(Object clazz, Object activity) {
         try {
-            destroyPage(clazz, activity);
+            //destroyPage(clazz, activity);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -261,7 +272,7 @@ public class FTAutoTrack {
      * @param clazz
      * @param activity
      */
-    public static void startPage(Object clazz, Object activity) {
+    public static void startPage(Object clazz, Object activity,String parentPage) {
         /*没有开启自动埋点*/
         if (!FTAutoTrackConfig.get().isAutoTrack()) {
             return;
@@ -291,7 +302,7 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity((Class<?>) clazz)) {
             return;
         }
-        putRecord(OP.OPEN_FRA, AopUtils.getClassName(clazz), AopUtils.getActivityName(activity), null);
+        putRecord(OP.OPEN_FRA, AopUtils.getClassName(clazz), AopUtils.getActivityName(activity),parentPage, null);
     }
 
     /**
@@ -300,7 +311,7 @@ public class FTAutoTrack {
      * @param clazz
      * @param activity
      */
-    public static void destroyPage(Object clazz, Object activity) {
+    public static void destroyPage(Object clazz, Object activity,String parentPage) {
         /*没有开启自动埋点*/
         if (!FTAutoTrackConfig.get().isAutoTrack()) {
             return;
@@ -330,7 +341,7 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity((Class<?>) clazz)) {
             return;
         }
-        putRecord(OP.CLS_FRA, AopUtils.getClassName(clazz), AopUtils.getActivityName(activity), null);
+        putRecord(OP.CLS_FRA, AopUtils.getClassName(clazz), AopUtils.getActivityName(activity),parentPage, null);
     }
 
     /**
@@ -359,7 +370,8 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)) {
             return;
         }
-        putRecord(OP.OPEN_ACT, clazz.getSimpleName(), clazz.getSuperclass().getSimpleName(), null);
+        String parentPage = FTActivityManager.get().getLastActivity();
+        putRecord(OP.OPEN_ACT, clazz.getSimpleName(), clazz.getSuperclass().getSimpleName(),parentPage, null);
     }
 
     /**
@@ -388,7 +400,8 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)) {
             return;
         }
-        putRecord(OP.CLS_ACT, clazz.getSimpleName(), clazz.getSuperclass().getSimpleName(), null);
+        String parentPage = FTActivityManager.get().getLastActivity();
+        putRecord(OP.CLS_ACT, clazz.getSimpleName(), clazz.getSuperclass().getSimpleName(),parentPage, null);
     }
 
     /**
@@ -454,14 +467,16 @@ public class FTAutoTrack {
         }
         putRecord(OP.CLK, currentPage, rootPage, vtp);
     }
-
-    public static void putRecord(@NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String vtp) {
-        long time = System.currentTimeMillis();
-        putRecord(time, op, currentPage, rootPage, vtp);
+    public static void putRecord(@NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String vtp){
+        putRecord(op, currentPage, rootPage,null, vtp);
     }
 
-    public static void putRecord(long time, @NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String vtp) {
-        String lastActivity = FTActivityManager.get().getLastActivity();
+    public static void putRecord(@NonNull OP op, @Nullable String currentPage, @Nullable String rootPage,@Nullable String parentPage, @Nullable String vtp) {
+        long time = System.currentTimeMillis();
+        putRecord(time, op, currentPage, rootPage,parentPage, vtp);
+    }
+
+    public static void putRecord(long time, @NonNull OP op, @Nullable String currentPage, @Nullable String rootPage,@Nullable String parentPage, @Nullable String vtp) {
         ThreadPoolUtils.get().execute(() -> {
             try {
                 final RecordData recordData = new RecordData();
@@ -477,7 +492,7 @@ public class FTAutoTrack {
                     opData.put("tags", tags);
                     //开启流程图，获取流程图相关数据存入数据库中
                     if (FTFlowChartConfig.get().isOpenFlowChart()) {
-                        if (op == OP.OPEN_ACT || op == OP.CLS_ACT) {
+                        if (op == OP.OPEN_ACT || op == OP.CLS_ACT || op == OP.OPEN_FRA || op == OP.CLS_FRA) {
                             opData.put("field", FTFlowChartConfig.get().getFlowProduct());
                         }
                     }
@@ -490,8 +505,8 @@ public class FTAutoTrack {
                 }
                 //开启流程图，获取流程图相关数据存入数据库中
                 if (FTFlowChartConfig.get().isOpenFlowChart()){
-                    if (op == OP.OPEN_ACT || op == OP.CLS_ACT){
-                        recordData.setPpn(lastActivity);
+                    if (op == OP.OPEN_ACT || op == OP.CLS_ACT || op == OP.OPEN_FRA || op == OP.CLS_FRA){
+                        recordData.setPpn(parentPage);
                         recordData.setTraceId(FTFlowChartConfig.get().getFlowUUID());
                         long currentTime = System.currentTimeMillis();
                         recordData.setDuration(currentTime - FTFlowChartConfig.get().lastOpTime);

@@ -14,6 +14,7 @@ import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.BatteryUtils;
 import com.ft.sdk.garble.utils.CameraUtils;
+import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.CpuUtils;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.GpuUtils;
@@ -66,7 +67,7 @@ public class SyncDataManager {
                 sb.append(",$traceId=").append(recordData.getTraceId());
                 sb.append(",$name=").append(recordData.getCpn());
                 //如果父页面是root表示其为起始节点，不添加父节点
-                if(!"root".equals(recordData.getPpn())){
+                if(!Constants.FLOW_ROOT.equals(recordData.getPpn())){
                     sb.append(",$parent=").append(recordData.getPpn());
                 }
                 sb.append(",").append(device.replaceAll(" ", "\\\\ ")).append(",");
@@ -94,13 +95,44 @@ public class SyncDataManager {
 
                 sb.append(",$traceId=").append(recordData.getTraceId());
                 //如果父页面不是root，表示其为子页面的关闭
-                if(!"root".equals(recordData.getPpn())){
+                if(!Constants.FLOW_ROOT.equals(recordData.getPpn())){
                     //交换当前页面和父页面
                     sb.append(",$name=").append(recordData.getPpn());
                     sb.append(",$parent=").append(recordData.getCpn());
                 }
                 sb.append(",").append(device.replaceAll(" ", "\\\\ ")).append(",");
                 addUserData(sb, recordData);
+                deleteLastComma(sb);
+                sb.append(" ");
+                sb.append("$duration=").append(recordData.getDuration()).append("i");
+                sb.append(" ");
+                sb.append(recordData.getTime() * 1000 * 1000);
+                sb.append("\n");
+            }else if(OP.OPEN_FRA.value.equals(recordData.getOp())){
+                //如果是子页面打开操作，就在该条数据上添加一条表示流程图的数据
+                try {
+                    JSONObject opData = new JSONObject(recordData.getOpdata());
+                    //获取指标名称
+                    if (opData.has("field")) {
+                        sb.append("$flow_mobile_activity_").append(opData.optString("field"));
+                    }else{
+                        sb.append("$flow_mobile_activity_").append(FTFlowChartConfig.get().getFlowProduct());
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                sb.append(",$traceId=").append(recordData.getTraceId());
+                sb.append(",$name=").append(recordData.getRpn()).append(".").append(recordData.getCpn());
+                //如果父页面是root表示其为起始节点，不添加父节点
+                if(!Constants.FLOW_ROOT.equals(recordData.getPpn())){
+                    sb.append(",$parent=").append(recordData.getPpn());
+                }else{
+                    sb.append(",$parent=").append(recordData.getRpn());
+                }
+                sb.append(",").append(device.replaceAll(" ", "\\\\ ")).append(",");
+                addUserData(sb, recordData);
+                //删除多余的逗号
                 deleteLastComma(sb);
                 sb.append(" ");
                 sb.append("$duration=").append(recordData.getDuration()).append("i");
