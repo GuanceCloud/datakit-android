@@ -167,13 +167,13 @@ public class SyncTaskManager {
                 String[] strArr = str.split(" ");
                 sb.append("{\n ");
                 if (strArr.length == 3) {
-                    sb.append("field{\n\t");
-                    String str1 = strArr[0].replaceFirst(",", "\n },value{\n\t");
+                    sb.append("measurement{\n\t");
+                    String str1 = strArr[0].replaceFirst(",", "\n },tags{\n\t");
                     str1 = str1.replaceAll(",", ",\n\t");
                     str1 = str1.replaceFirst(",\n\t", ",\n ");
                     sb.append(str1);
                     sb.append("\n },\n ");
-                    sb.append("tag{\n\t");
+                    sb.append("fields{\n\t");
                     String str2 = strArr[1].replaceAll(",", ",\n\t");
                     sb.append(str2);
                     sb.append("\n },\n ");
