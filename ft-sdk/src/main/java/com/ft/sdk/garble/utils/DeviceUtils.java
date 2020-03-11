@@ -15,6 +15,7 @@ import android.text.TextUtils;
 import android.util.DisplayMetrics;
 
 import com.ft.sdk.BuildConfig;
+import com.ft.sdk.FTApplication;
 
 import org.json.JSONObject;
 
@@ -85,6 +86,19 @@ public class DeviceUtils {
         }
 
         return sdkUUid;
+    }
+
+    /**
+     * 设置 SDK uuid
+     * @param uuid
+     */
+    public static void setSDKUUid(String uuid){
+        final SharedPreferences preferences = getSharedPreferences(FTApplication.getApplication());
+        if(preferences != null) {
+            final SharedPreferences.Editor editor = preferences.edit();
+            editor.putString(Constants.FT_SDK_INIT_UUID, uuid);
+            editor.apply();
+        }
     }
 
     /**
