@@ -9,6 +9,7 @@ import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.manager.FTManager;
 import com.ft.sdk.garble.manager.SyncDataManager;
+import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -47,26 +48,26 @@ public class FTTrack {
     /**
      * 主动埋点
      *
-     * @param event  埋点事件名称
+     * @param measurement  埋点事件名称
      * @param tags   埋点数据
-     * @param values 埋点数据
+     * @param fields 埋点数据
      */
-    public void trackBackground(String event, JSONObject tags, JSONObject values) {
+    public void trackBackground(String measurement, JSONObject tags, JSONObject fields) {
         long time = System.currentTimeMillis();
-        track(OP.CSTM, time, event, tags, values);
+        track(OP.CSTM, time, measurement, tags, fields);
     }
 
     /**
      * 主动埋点，异步上传用户埋点数据并返回上传结果
      *
-     * @param event  埋点事件名称
+     * @param measurement  埋点事件名称
      * @param tags   埋点数据
-     * @param values 埋点数据
+     * @param fields 埋点数据
      * @param callback 上传结果回调
      */
-    public void trackImmediate(String event, JSONObject tags, JSONObject values,SyncCallback callback) {
+    public void trackImmediate(String measurement, JSONObject tags, JSONObject fields,SyncCallback callback) {
         long time = System.currentTimeMillis();
-        track(OP.CSTM, time, event, tags, values,false,callback);
+        track(OP.CSTM, time, measurement, tags, fields,false,callback);
     }
 
     /**
@@ -78,9 +79,9 @@ public class FTTrack {
      * @param parent 流程图当前流程节点的上一个流程节点名称，如果是第一个节点，该值应填null
      * @param duration 流程图在该节点所耗费或持续时间，单位为毫秒
      * @param tags 其他标签值（该值中不能含 traceId，name，parent 字段）
-     * @param values 其他指标（该值中不能含 duration 字段）
+     * @param fields 其他指标（该值中不能含 duration 字段）
      */
-    public void trackFlowChart(String product, String traceId, String name, String parent, long duration,JSONObject tags,JSONObject values) {
+    public void trackFlowChart(String product, String traceId, String name, String parent, long duration,JSONObject tags,JSONObject fields) {
         if (Utils.isNullOrEmpty(product)) {
             throw new InvalidParameterException("参数 product 不能为空");
         }
@@ -101,8 +102,8 @@ public class FTTrack {
         if(tags == null) {
             tags = new JSONObject();
         }
-        if(values == null) {
-            values = new JSONObject();
+        if(fields == null) {
+            fields = new JSONObject();
         }
         Iterator<String> iteTag = tags.keys();
         while (iteTag.hasNext()){
@@ -111,7 +112,7 @@ public class FTTrack {
             }
         }
 
-        Iterator<String> iteValue = values.keys();
+        Iterator<String> iteValue = fields.keys();
         while (iteValue.hasNext()){
             if(iteValue.next().contains("$")){
                 throw new InvalidParameterException("参数 values 中不能使用保留字段符号 $");
@@ -137,20 +138,20 @@ public class FTTrack {
             if (!Utils.isNullOrEmpty(parent)) {
                 tags.put("$parent", parent);
             }
-            values.put("$duration", duration);
+            fields.put("$duration", duration);
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        track(OP.CSTM, time, "$flow_" + product, tags, values);
+        track(OP.CSTM, time, "$flow_" + product, tags, fields);
     }
 
-    private void track(OP op, long time, String field, final JSONObject tags, JSONObject values) {
-        track(op,time,field,tags,values,true, null);
+    private void track(OP op, long time, String measurement, final JSONObject tags, JSONObject fields) {
+        track(op,time,measurement,tags,fields,true, null);
     }
-    private void track(OP op, long time, String field, final JSONObject tags, JSONObject values, boolean insertDB, SyncCallback callback) {
+    private void track(OP op, long time, String measurement, final JSONObject tags, JSONObject fields, boolean insertDB, SyncCallback callback) {
         try {
-            if (!isLegalValues(values)) {
+            if (!isLegalValues(fields)) {
                 return;
             }
             ThreadPoolUtils.get().execute(() -> {
@@ -161,20 +162,20 @@ public class FTTrack {
                     recordData.setTime(time);
                     JSONObject opData = new JSONObject();
 
-                    if (field != null) {
-                        opData.put("field", field);
+                    if (measurement != null) {
+                        opData.put(Constants.MEASUREMENT, measurement);
                     }else {
-                        throw new InvalidParameterException("指标集 field 不能为空");
+                        throw new InvalidParameterException("指标集 measurement 不能为空");
                     }
                     if (tagsTemp == null) {
                         tagsTemp = new JSONObject();
                     }
                     SyncDataManager.addMonitorData(tagsTemp);
                     opData.put("tags", tagsTemp);
-                    if (values != null) {
-                        opData.put("values", values);
+                    if (fields != null) {
+                        opData.put(Constants.FIELDS, fields);
                     }else {
-                        throw new InvalidParameterException("指标 values 不能为空");
+                        throw new InvalidParameterException("指标 fields 不能为空");
                     }
                     recordData.setOpdata(opData.toString());
                     String sessionId = FTUserConfig.get().getSessionId();
