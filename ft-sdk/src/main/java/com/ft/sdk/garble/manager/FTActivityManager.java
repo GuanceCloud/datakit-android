@@ -5,8 +5,6 @@ import android.app.Activity;
 
 import androidx.lifecycle.Lifecycle;
 
-import com.ft.sdk.garble.bean.ActivityFromWay;
-import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 
 import java.util.ArrayList;
