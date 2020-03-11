@@ -17,8 +17,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class FTFragmentManager {
     private static FTFragmentManager mFragmentManager;
-    private ConcurrentHashMap<String, FragmentManager.FragmentLifecycleCallbacks> fragmentLifecycleCall = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String, android.app.FragmentManager.FragmentLifecycleCallbacks> fragmentLifecycleCallDated = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, FTFragmentLifecycleCallback> fragmentLifecycleCall = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, FTFragmentLifecycleCallbackDated> fragmentLifecycleCallDated = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, Activity> activityConcurrentHashMap = new ConcurrentHashMap<>();
     //应该被忽略的Fragment
     public List<String> ignoreFragments = Arrays.asList("com.bumptech.glide.manager.SupportRequestManagerFragment");
@@ -35,6 +35,10 @@ public class FTFragmentManager {
         }
     }
 
+    /**
+     * 添加 Activity 的Fragment 的生命周期监听
+     * @param activity
+     */
     public void addFragmentLifecycle(Activity activity) {
         if (activity == null) {
             return;
@@ -44,12 +48,12 @@ public class FTFragmentManager {
             LogUtils.d("start Activity[" + activity.getClass().getName() + "] monitor Fragment Lifecycle");
             activityConcurrentHashMap.put(activity.getClass().getName(), activity);
             if (activity instanceof FragmentActivity) {
-                FragmentManager.FragmentLifecycleCallbacks callbacks = new FTFragmentLifecycleCallback(activity);
+                FTFragmentLifecycleCallback callbacks = new FTFragmentLifecycleCallback(activity);
                 fragmentLifecycleCall.put(activity.getClass().getName(), callbacks);
                 ((FragmentActivity) activity).getSupportFragmentManager().registerFragmentLifecycleCallbacks(callbacks, true);
             } else {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    android.app.FragmentManager.FragmentLifecycleCallbacks callbacks = new FTFragmentLifecycleCallbackDated(activity);
+                    FTFragmentLifecycleCallbackDated callbacks = new FTFragmentLifecycleCallbackDated(activity);
                     fragmentLifecycleCallDated.put(activity.getClass().getName(), callbacks);
                     activity.getFragmentManager().registerFragmentLifecycleCallbacks(callbacks, true);
                 }
@@ -57,6 +61,10 @@ public class FTFragmentManager {
         }
     }
 
+    /**
+     * 移除 Activity 的Fragment 的生命周期监听
+     * @param activity
+     */
     public void removeFragmentLifecycle(Activity activity) {
         if (activity == null) {
             return;
@@ -80,5 +88,27 @@ public class FTFragmentManager {
             }
             activityConcurrentHashMap.remove(activity.getClass().getName());
         }
+    }
+
+    /**
+     * 返回上一个Activity 中的Fragment 的类
+     * @param classActivity
+     * @return
+     */
+    public Class getLastFragmentName(String classActivity){
+        try {
+            if (fragmentLifecycleCall.containsKey(classActivity)) {
+                FTFragmentLifecycleCallback ft = fragmentLifecycleCall.get(classActivity);
+                return ft.fragmentQueue.peek().getClass();
+            } else if (fragmentLifecycleCallDated.containsKey(classActivity)) {
+                FTFragmentLifecycleCallbackDated ft = fragmentLifecycleCallDated.get(classActivity);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    return ft.fragmentQueue.peek().getClass();
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
     }
 }

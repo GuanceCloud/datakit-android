@@ -11,6 +11,10 @@
         android:layout_height="match_parent"
         android:text="这是 Tab1"
         android:textColor="#fff"/>
-
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/button_jump"
+        android:text="跳转"/>
 
 </FrameLayout>
