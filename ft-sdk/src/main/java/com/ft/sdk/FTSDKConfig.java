@@ -170,6 +170,11 @@ public class FTSDKConfig {
         return this;
     }
 
+    public FTSDKConfig setXDatakitUUID(String uuid){
+        DeviceUtils.setSDKUUid(uuid);
+        return this;
+    }
+
     /**
      * 设置数据采集端的名称
      * @param uuid
