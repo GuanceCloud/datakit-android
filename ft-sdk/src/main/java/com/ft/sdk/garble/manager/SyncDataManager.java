@@ -126,7 +126,7 @@ public class SyncDataManager {
                 sb.append(",$name=").append(recordData.getRpn()).append(".").append(recordData.getCpn());
                 //如果父页面是root表示其为起始节点，不添加父节点
                 if(!Constants.FLOW_ROOT.equals(recordData.getPpn())){
-                    sb.append(",$parent=").append(recordData.getPpn());
+                    sb.append(",$parent=").append(recordData.getRpn()).append(".").append(recordData.getPpn());
                 }else{
                     sb.append(",$parent=").append(recordData.getRpn());
                 }
