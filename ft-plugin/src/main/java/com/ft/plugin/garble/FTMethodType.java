@@ -6,5 +6,5 @@ package com.ft.plugin.garble;
  * Description:
  */
 public enum FTMethodType {
-    ALOAD,ILOAD, INVOKEVIRTUAL,INVOKESPECIAL
+    ALOAD,ILOAD, INVOKEVIRTUAL,INVOKESPECIAL,GETSTATIC,GETFIELD,INVOKESTATIC
 }

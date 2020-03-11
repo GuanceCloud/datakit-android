@@ -76,8 +76,11 @@ public class FTHookConfig {
                 "startActivityForResult",
                 "(Landroid/content/Intent;ILandroid/os/Bundle;)V",
                 "startActivityByWay",
-                "(Lcom/ft/sdk/garble/bean/ActivityFromWay;Landroid/content/Intent;)V",
+                "(Ljava/lang/Boolean;Landroid/content/Intent;)V",
                 Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD, 0),
+                        new FTSubMethodCell(FTMethodType.GETFIELD, "androidx/fragment/app/FragmentActivity","mStartedActivityFromFragment","Z",false),
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, "java/lang/Boolean","valueOf","(Z)Ljava/lang/Boolean;",false),
                         new FTSubMethodCell(FTMethodType.ALOAD, 1)
                 )));
     }
@@ -114,7 +117,7 @@ public class FTHookConfig {
 
 
     /**
-     * FragmentX中的方法
+     * Fragment中的方法
      */
     public final static HashMap<String, FTMethodCell> FRAGMENT_METHODS = new HashMap<>();
 

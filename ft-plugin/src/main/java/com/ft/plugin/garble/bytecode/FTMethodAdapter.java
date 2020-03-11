@@ -113,6 +113,12 @@ public class FTMethodAdapter extends AdviceAdapter {
                     mv.visitMethodInsn(INVOKEVIRTUAL, f.className, f.agentName, f.agentDesc, f.itf);
                 } else if (f.type == FTMethodType.INVOKESPECIAL) {
                     mv.visitMethodInsn(INVOKESPECIAL, f.className, f.agentName, f.agentDesc, f.itf);
+                }else if(f.type == FTMethodType.GETSTATIC){
+                    mv.visitFieldInsn(GETSTATIC,f.className,f.agentName,f.agentDesc);
+                }else if(f.type == FTMethodType.GETFIELD){
+                    mv.visitFieldInsn(GETFIELD,f.className,f.agentName,f.agentDesc);
+                } else if(f.type == FTMethodType.INVOKESTATIC){
+                    mv.visitMethodInsn(INVOKESTATIC,f.className,f.agentName,f.agentDesc,f.itf);
                 }
             }
         }
@@ -166,7 +172,7 @@ public class FTMethodAdapter extends AdviceAdapter {
         /**
          * Hook Activity
          */
-        if (FTUtil.isInstanceOfActivity(superName)) {
+        if (FTUtil.isInstanceOfActivity(className)) {
             FTMethodCell ftMethodCell = FTHookConfig.ACTIVITY_METHODS.get(nameDesc);
             //Logger.info("方法扫描>>>类是Activity>>>方法是"+nameDesc+" ftMethodCell="+ftMethodCell);
             if (ftMethodCell != null) {
