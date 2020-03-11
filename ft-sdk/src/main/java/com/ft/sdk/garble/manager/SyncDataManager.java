@@ -14,6 +14,7 @@ import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.BatteryUtils;
 import com.ft.sdk.garble.utils.CameraUtils;
+import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.CpuUtils;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.GpuUtils;
@@ -54,8 +55,8 @@ public class SyncDataManager {
                 try {
                     JSONObject opData = new JSONObject(recordData.getOpdata());
                     //获取指标名称
-                    if (opData.has("field")) {
-                        sb.append("$flow_mobile_activity_").append(opData.optString("field"));
+                    if (opData.has(Constants.MEASUREMENT)) {
+                        sb.append("$flow_mobile_activity_").append(opData.optString(Constants.MEASUREMENT));
                     }else{
                         sb.append("$flow_mobile_activity_").append(FTFlowChartConfig.get().getFlowProduct());
                     }
@@ -66,7 +67,7 @@ public class SyncDataManager {
                 sb.append(",$traceId=").append(recordData.getTraceId());
                 sb.append(",$name=").append(recordData.getCpn());
                 //如果父页面是root表示其为起始节点，不添加父节点
-                if(!"root".equals(recordData.getPpn())){
+                if(!Constants.FLOW_ROOT.equals(recordData.getPpn())){
                     sb.append(",$parent=").append(recordData.getPpn());
                 }
                 sb.append(",").append(device.replaceAll(" ", "\\\\ ")).append(",");
@@ -83,8 +84,8 @@ public class SyncDataManager {
                 try {
                     //获取指标
                     JSONObject opData = new JSONObject(recordData.getOpdata());
-                    if (opData.has("field")) {
-                        sb.append("$flow_mobile_activity_").append(opData.optString("field"));
+                    if (opData.has(Constants.MEASUREMENT)) {
+                        sb.append("$flow_mobile_activity_").append(opData.optString(Constants.MEASUREMENT));
                     }else{
                         sb.append("$flow_mobile_activity_").append(FTFlowChartConfig.get().getFlowProduct());
                     }
@@ -94,7 +95,7 @@ public class SyncDataManager {
 
                 sb.append(",$traceId=").append(recordData.getTraceId());
                 //如果父页面不是root，表示其为子页面的关闭
-                if(!"root".equals(recordData.getPpn())){
+                if(!Constants.FLOW_ROOT.equals(recordData.getPpn())){
                     //交换当前页面和父页面
                     sb.append(",$name=").append(recordData.getPpn());
                     sb.append(",$parent=").append(recordData.getCpn());
@@ -132,11 +133,11 @@ public class SyncDataManager {
         if (CSTM.value.equals(recordData.getOp())) {
             try {
                 JSONObject jsonObject = new JSONObject(recordData.getOpdata());
-                String field = jsonObject.optString("field");
-                if (Utils.isNullOrEmpty(field)) {
+                String measurementTemp = jsonObject.optString(Constants.MEASUREMENT);
+                if (Utils.isNullOrEmpty(measurementTemp)) {
                     measurement = FT_KEY_VALUE_NULL;
                 } else {
-                    measurement = field;
+                    measurement = measurementTemp;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -173,9 +174,9 @@ public class SyncDataManager {
             try {
                 JSONObject opJson = new JSONObject(recordData.getOpdata());
                 JSONObject tags = opJson.optJSONObject("tags");
-                JSONObject values = opJson.optJSONObject("values");
+                JSONObject fields = opJson.optJSONObject(Constants.FIELDS);
                 StringBuffer tagSb = getCustomHash(tags, true);
-                StringBuffer valueSb = getCustomHash(values, false);
+                StringBuffer valueSb = getCustomHash(fields, false);
                 addUserData(tagSb, recordData);
                 deleteLastComma(tagSb);
                 if (tagSb.length() > 0) {
