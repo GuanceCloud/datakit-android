@@ -10,7 +10,6 @@ import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -20,7 +19,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * Description: Activity 管理类
  */
 public class FTActivityManager {
-    private ActivityFromWay activityFromWay;
     private static volatile FTActivityManager instance;
     //栈顶 Activity
     private Activity topActivity;
@@ -28,9 +26,12 @@ public class FTActivityManager {
     private List<Activity> activityList;
     //存储 Activity 的最后的状态
     private ConcurrentHashMap<String, Lifecycle.Event> activityEventMap;
+    private ConcurrentHashMap<String, Boolean> activityOpenTypeMap;
+
     private FTActivityManager() {
         activityList = new ArrayList<>();
         activityEventMap = new ConcurrentHashMap<>();
+        activityOpenTypeMap = new ConcurrentHashMap<>();
     }
 
     public synchronized static FTActivityManager get() {
@@ -41,27 +42,17 @@ public class FTActivityManager {
     }
 
     /**
-     * 返回
-     * @return
-     */
-    public ActivityFromWay getActivityFromWay() {
-        return activityFromWay;
-    }
-
-    public void setActivityFromWay(ActivityFromWay activityFromWay) {
-        this.activityFromWay = activityFromWay;
-    }
-
-    /**
      * 获取当前存活的Activity
+     *
      * @return
      */
     public int getActiveCount() {
-        return activityList==null?0:activityList.size();
+        return activityList == null ? 0 : activityList.size();
     }
 
     /**
      * 获得栈顶Activity
+     *
      * @return
      */
     public Activity getTopActivity() {
@@ -70,10 +61,11 @@ public class FTActivityManager {
 
     /**
      * 判断程序是否在前台运行
+     *
      * @return
      */
-    public boolean isForeground(){
-        if(activityEventMap == null || activityEventMap.isEmpty()){
+    public boolean isForeground() {
+        if (activityEventMap == null || activityEventMap.isEmpty()) {
             return false;
         }
         if (activityEventMap.contains(Lifecycle.Event.ON_RESUME)) {
@@ -82,45 +74,83 @@ public class FTActivityManager {
         return false;
     }
 
-    public void putActivity(Activity activity, Lifecycle.Event event){
+    public void putActivity(Activity activity, Lifecycle.Event event) {
         topActivity = activity;
-        if(activityList == null){
+        if (activityList == null) {
             activityList = new ArrayList<>();
         }
-        if(activityEventMap == null){
+        if (activityEventMap == null) {
             activityEventMap = new ConcurrentHashMap<>();
         }
 
-        if(!activityList.contains(activity)) {
+        if (!activityList.contains(activity)) {
             activityList.add(activity);
         }
-        activityEventMap.put(activity.toString(),event);
+        activityEventMap.put(activity.toString(), event);
 
     }
+
     public void removeActivity(Activity activity) {
         activityList.remove(activity);
         activityEventMap.remove(activity.toString());
-        topActivity = (activityList == null || activityList.size()<=0)?null:activityList.get(activityList.size()-1);
+        topActivity = (activityList == null || activityList.size() <= 0) ? null : activityList.get(activityList.size() - 1);
     }
 
-    public String getLastActivity(){
-        if(activityList != null && activityList.size()>1){
-            Activity activity = activityList.get(activityList.size()-2);
-            if(activity != null) {
-                return activity.getClass().getSimpleName();
-            }else{
-                return Constants.FLOW_ROOT;
+    public Class getLastActivity() {
+        if (activityList != null && activityList.size() > 1) {
+            Activity activity = activityList.get(activityList.size() - 2);
+            if (activity != null) {
+                return activity.getClass();
+            } else {
+                return null;
             }
-        }else{
-            return Constants.FLOW_ROOT;
+        } else {
+            return null;
         }
     }
 
-    public void printTest(Activity activity){
-        LogUtils.d(FTActivityManager.class.getSimpleName()+"\n"+
-                "activeCount="+activityList.size()+"\n"+
-                "topActivity="+topActivity+"\n"+
-                "activityState="+activityEventMap.get(activity.toString()));
+    /**
+     * 存储每个 Activity 是由什么方式打开的
+     *
+     * @param className
+     * @param fromFragment
+     */
+    public void putActivityStatus(String className, boolean fromFragment) {
+        if (activityOpenTypeMap == null) {
+            activityOpenTypeMap = new ConcurrentHashMap<>();
+        }
+        activityOpenTypeMap.put(className, fromFragment);
+    }
+
+    /**
+     * 返回每个 Activity 是由什么方式打开的
+     *
+     * @param className
+     * @return
+     */
+    public boolean getActivityStatus(String className) {
+        if (activityOpenTypeMap != null && activityOpenTypeMap.containsKey(className)) {
+            return activityOpenTypeMap.get(className);
+        }
+        return false;
+    }
+
+    /**
+     * 删除对应 Activity 的打开状态
+     *
+     * @param className
+     */
+    public void removeActivityStatus(String className) {
+        if (activityOpenTypeMap != null) {
+            activityOpenTypeMap.remove(className);
+        }
+    }
+
+    public void printTest(Activity activity) {
+        LogUtils.d(FTActivityManager.class.getSimpleName() + "\n" +
+                "activeCount=" + activityList.size() + "\n" +
+                "topActivity=" + topActivity + "\n" +
+                "activityState=" + activityEventMap.get(activity.toString()));
     }
 
 }
