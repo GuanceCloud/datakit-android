@@ -16,14 +16,15 @@ import androidx.annotation.Nullable;
 
 import com.ft.sdk.garble.FTAutoTrackConfig;
 import com.ft.sdk.garble.FTFlowChartConfig;
+import com.ft.sdk.garble.FTFragmentManager;
 import com.ft.sdk.garble.FTUserConfig;
-import com.ft.sdk.garble.bean.ActivityFromWay;
 import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.manager.FTActivityManager;
 import com.ft.sdk.garble.manager.FTManager;
 import com.ft.sdk.garble.manager.SyncDataManager;
 import com.ft.sdk.garble.utils.AopUtils;
+import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -39,11 +40,14 @@ public class FTAutoTrack {
 
     /**
      * Activity 打开的方式（标记是从 Fragment 打开还是 Activity）
-     * @param activityFromWa
+     * @param fromFragment
      * @param intent
      */
-    public static void startActivityByWay(ActivityFromWay activityFromWa, Intent intent){
-
+    public static void startActivityByWay(Boolean fromFragment, Intent intent){
+        LogUtils.d("activityFromWay="+fromFragment+",,,intent="+intent);
+        if(intent != null && intent.getComponent() != null) {
+            FTActivityManager.get().putActivityStatus(intent.getComponent().getClassName(),fromFragment);
+        }
     }
     /**
      * 启动 APP
@@ -263,7 +267,7 @@ public class FTAutoTrack {
         if (!FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_START)) {
             return;
         }
-        putRecord(OP.LANC, null, null, null);
+        putRecordClick(OP.LANC, null, null, null);
     }
 
     /**
@@ -302,7 +306,7 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity((Class<?>) clazz)) {
             return;
         }
-        putRecord(OP.OPEN_FRA, AopUtils.getClassName(clazz), AopUtils.getActivityName(activity),parentPage, null);
+        putRecordFragment(OP.OPEN_FRA, AopUtils.getClassName(clazz), AopUtils.getActivityName(activity),parentPage);
     }
 
     /**
@@ -341,7 +345,7 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity((Class<?>) clazz)) {
             return;
         }
-        putRecord(OP.CLS_FRA, AopUtils.getClassName(clazz), AopUtils.getActivityName(activity),parentPage, null);
+        putRecordFragment(OP.CLS_FRA, AopUtils.getClassName(clazz), AopUtils.getActivityName(activity),parentPage);
     }
 
     /**
@@ -370,8 +374,7 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)) {
             return;
         }
-        String parentPage = FTActivityManager.get().getLastActivity();
-        putRecord(OP.OPEN_ACT, clazz.getSimpleName(), clazz.getSuperclass().getSimpleName(),parentPage, null);
+        putRecordActivity(OP.OPEN_ACT, clazz);
     }
 
     /**
@@ -400,8 +403,7 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)) {
             return;
         }
-        String parentPage = FTActivityManager.get().getLastActivity();
-        putRecord(OP.CLS_ACT, clazz.getSimpleName(), clazz.getSuperclass().getSimpleName(),parentPage, null);
+        putRecordActivity(OP.CLS_ACT, clazz);
     }
 
     /**
@@ -430,7 +432,7 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)) {
             return;
         }
-        putRecord(OP.CLK, currentPage, rootPage, vtp);
+        putRecordClick(OP.CLK, currentPage, rootPage, vtp);
     }
 
     /**
@@ -465,15 +467,55 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreView(view)) {
             return;
         }
-        putRecord(OP.CLK, currentPage, rootPage, vtp);
-    }
-    public static void putRecord(@NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String vtp){
-        putRecord(op, currentPage, rootPage,null, vtp);
+        putRecordClick(OP.CLK, currentPage, rootPage, vtp);
     }
 
-    public static void putRecord(@NonNull OP op, @Nullable String currentPage, @Nullable String rootPage,@Nullable String parentPage, @Nullable String vtp) {
+    /**
+     * 点击事件
+     * @param op
+     * @param currentPage
+     * @param rootPage
+     * @param vtp
+     */
+    public static void putRecordClick(@NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String vtp){
         long time = System.currentTimeMillis();
-        putRecord(time, op, currentPage, rootPage,parentPage, vtp);
+        putRecord(time,op, currentPage, rootPage,null, vtp);
+    }
+
+    /**
+     * Fragment 开关
+     * @param op
+     * @param currentPage
+     * @param rootPage
+     * @param parentPage
+     */
+    public static void putRecordFragment(@NonNull OP op, @Nullable String currentPage, @Nullable String rootPage,@Nullable String parentPage) {
+        long time = System.currentTimeMillis();
+        putRecord(time, op, currentPage, rootPage,parentPage, null);
+    }
+
+    /**
+     * Activity 开关
+     * @param op
+     * @param classCurrent
+     */
+    public static void putRecordActivity(@NonNull OP op,Class classCurrent) {
+        long time = System.currentTimeMillis();
+        Class parentClass = FTActivityManager.get().getLastActivity();
+        String parentPageName = Constants.FLOW_ROOT;
+        if(parentClass != null) {
+            boolean isFromFragment = FTActivityManager.get().getActivityStatus(classCurrent.getName());
+            if(isFromFragment){
+                Class c = FTFragmentManager.getInstance().getLastFragmentName(parentClass.getName());
+                if(c != null){
+                    parentPageName = parentClass.getSimpleName()+"."+c.getSimpleName();
+                }
+            }else{
+                parentPageName = parentClass.getSimpleName();
+            }
+
+        }
+        putRecord(time, op, classCurrent.getSimpleName(), classCurrent.getSimpleName(),parentPageName, null);
     }
 
     public static void putRecord(long time, @NonNull OP op, @Nullable String currentPage, @Nullable String rootPage,@Nullable String parentPage, @Nullable String vtp) {

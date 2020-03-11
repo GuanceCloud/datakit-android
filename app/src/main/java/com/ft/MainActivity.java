@@ -29,9 +29,7 @@ import com.amitshekhar.DebugDB;
 import com.amitshekhar.debug.encrypt.sqlite.DebugDBEncryptFactory;
 import com.amitshekhar.debug.sqlite.DebugDBFactory;
 import com.bumptech.glide.Glide;
-import com.ft.sdk.FTAutoTrack;
 import com.ft.sdk.FTSdk;
-import com.ft.sdk.garble.bean.ActivityFromWay;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -202,10 +200,5 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-
-    public void startActivityForResult(@RequiresPermission Intent intent, int requestCode,
-                                       @Nullable Bundle options) {
-        FTAutoTrack.startActivityByWay(ActivityFromWay.ACTIVITY,intent);
     }
 }
