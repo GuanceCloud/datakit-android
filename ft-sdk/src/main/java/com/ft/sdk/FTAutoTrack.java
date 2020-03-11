@@ -535,7 +535,7 @@ public class FTAutoTrack {
                     //开启流程图，获取流程图相关数据存入数据库中
                     if (FTFlowChartConfig.get().isOpenFlowChart()) {
                         if (op == OP.OPEN_ACT || op == OP.CLS_ACT || op == OP.OPEN_FRA || op == OP.CLS_FRA) {
-                            opData.put("field", FTFlowChartConfig.get().getFlowProduct());
+                            opData.put(Constants.MEASUREMENT, FTFlowChartConfig.get().getFlowProduct());
                         }
                     }
                     recordData.setOpdata(opData.toString());

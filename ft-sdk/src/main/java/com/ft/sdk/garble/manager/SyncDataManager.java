@@ -115,8 +115,8 @@ public class SyncDataManager {
                 try {
                     JSONObject opData = new JSONObject(recordData.getOpdata());
                     //获取指标名称
-                    if (opData.has("field")) {
-                        sb.append("$flow_mobile_activity_").append(opData.optString("field"));
+                    if (opData.has(Constants.MEASUREMENT)) {
+                        sb.append("$flow_mobile_activity_").append(opData.optString(Constants.MEASUREMENT));
                     }else{
                         sb.append("$flow_mobile_activity_").append(FTFlowChartConfig.get().getFlowProduct());
                     }
