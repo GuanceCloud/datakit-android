@@ -5,6 +5,7 @@ import android.app.Activity;
 
 import androidx.lifecycle.Lifecycle;
 
+import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 
 import java.util.ArrayList;
@@ -94,10 +95,10 @@ public class FTActivityManager {
             if(activity != null) {
                 return activity.getClass().getSimpleName();
             }else{
-                return "root";
+                return Constants.FLOW_ROOT;
             }
         }else{
-            return "root";
+            return Constants.FLOW_ROOT;
         }
     }
 
