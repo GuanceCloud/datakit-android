@@ -4,6 +4,7 @@ import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.SyncCallback;
 import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.RecordData;
+import com.ft.sdk.garble.bean.TrackBean;
 import com.ft.sdk.garble.http.FTResponseData;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.RequestMethod;
@@ -20,8 +21,11 @@ import org.json.JSONObject;
 
 import java.net.HttpURLConnection;
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * BY huangDianHua
@@ -58,7 +62,7 @@ public class FTTrack {
     }
 
     /**
-     * 主动埋点，异步上传用户埋点数据并返回上传结果
+     * 主动埋点一条数据，异步上传用户埋点数据并返回上传结果
      *
      * @param measurement  埋点事件名称
      * @param tags   埋点数据
@@ -67,7 +71,18 @@ public class FTTrack {
      */
     public void trackImmediate(String measurement, JSONObject tags, JSONObject fields,SyncCallback callback) {
         long time = System.currentTimeMillis();
-        track(OP.CSTM, time, measurement, tags, fields,false,callback);
+        TrackBean trackBean = new TrackBean(measurement,tags,fields,time);
+        track(Collections.singletonList(trackBean),callback);
+    }
+
+    /**
+     * 主动埋点多条数据，异步上传用户埋点数据并返回上传结果
+     *
+     * @param trackBeans  多条埋点数据
+     * @param callback 上传结果回调
+     */
+    public void trackImmediate(List<TrackBean> trackBeans, SyncCallback callback) {
+        track(trackBeans,callback);
     }
 
     /**
@@ -146,51 +161,25 @@ public class FTTrack {
         track(OP.CSTM, time, "$flow_" + product, tags, fields);
     }
 
+    /**
+     * 将埋点数据存入本地后通知同步
+     * @param op
+     * @param time
+     * @param measurement
+     * @param tags
+     * @param fields
+     */
     private void track(OP op, long time, String measurement, final JSONObject tags, JSONObject fields) {
-        track(op,time,measurement,tags,fields,true, null);
-    }
-    private void track(OP op, long time, String measurement, final JSONObject tags, JSONObject fields, boolean insertDB, SyncCallback callback) {
         try {
             if (!isLegalValues(fields)) {
                 return;
             }
             ThreadPoolUtils.get().execute(() -> {
-                JSONObject tagsTemp = tags;
                 try {
-                    final RecordData recordData = new RecordData();
-                    recordData.setOp(op.value);
-                    recordData.setTime(time);
-                    JSONObject opData = new JSONObject();
-
-                    if (measurement != null) {
-                        opData.put(Constants.MEASUREMENT, measurement);
-                    }else {
-                        throw new InvalidParameterException("指标集 measurement 不能为空");
-                    }
-                    if (tagsTemp == null) {
-                        tagsTemp = new JSONObject();
-                    }
-                    SyncDataManager.addMonitorData(tagsTemp);
-                    opData.put("tags", tagsTemp);
-                    if (fields != null) {
-                        opData.put(Constants.FIELDS, fields);
-                    }else {
-                        throw new InvalidParameterException("指标 fields 不能为空");
-                    }
-                    recordData.setOpdata(opData.toString());
-                    String sessionId = FTUserConfig.get().getSessionId();
-                    if (!Utils.isNullOrEmpty(sessionId)) {
-                        recordData.setSessionid(sessionId);
-                    }
-
-                    if(insertDB) {
-                        LogUtils.d("FTTrack数据进数据库：" + recordData.getJsonString());
-                        FTManager.getFTDBManager().insertFTOperation(recordData);
-                        FTManager.getSyncTaskManager().executeSyncPoll();
-                    }else{
-                        LogUtils.d("trackImmediate 数据：" + recordData.getJsonString());
-                        updateRecordData(recordData,callback);
-                    }
+                    RecordData recordData = transTrackBeanToRecordData(op,time,measurement,tags,fields);
+                    LogUtils.d("FTTrack数据进数据库：" + recordData.getJsonString());
+                    FTManager.getFTDBManager().insertFTOperation(recordData);
+                    FTManager.getSyncTaskManager().executeSyncPoll();
                 } catch (Exception e) {
                 }
             });
@@ -200,13 +189,85 @@ public class FTTrack {
     }
 
     /**
-     * 异步上传用户埋点信息，并返回上传结果
-     * @param recordData
+     * 直接将埋点数据同步
+     * @param trackBeans
      * @param callback
      */
-    private void updateRecordData(RecordData recordData,SyncCallback callback){
+    private void track(List<TrackBean> trackBeans, SyncCallback callback) {
+        try {
+            if(trackBeans == null){
+                return;
+            }
+
+            ThreadPoolUtils.get().execute(() -> {
+                try {
+                    List<RecordData> recordDataList = new ArrayList<>();
+                    for (TrackBean t:trackBeans) {
+                        if (!isLegalValues(t.getFields())) {
+                            continue;
+                        }
+                        recordDataList.add(transTrackBeanToRecordData(OP.CSTM,t.getTimeMillis(),t.getMeasurement(),t.getTags(),t.getFields()));
+                    }
+                    updateRecordData(recordDataList,callback);
+                } catch (Exception e) {
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 将用户埋点的数据转换成RecordData
+     * @param op
+     * @param time
+     * @param measurement
+     * @param tags
+     * @param fields
+     * @return
+     */
+    private RecordData transTrackBeanToRecordData(OP op, long time, String measurement, final JSONObject tags, JSONObject fields){
+        JSONObject tagsTemp = tags;
+        RecordData recordData = new RecordData();
+        try {
+            recordData.setOp(op.value);
+            recordData.setTime(time);
+            JSONObject opData = new JSONObject();
+
+            if (measurement != null) {
+                opData.put(Constants.MEASUREMENT, measurement);
+            }else {
+                throw new InvalidParameterException("指标集 measurement 不能为空");
+            }
+            if (tagsTemp == null) {
+                tagsTemp = new JSONObject();
+            }
+            SyncDataManager.addMonitorData(tagsTemp);
+            opData.put("tags", tagsTemp);
+            if (fields != null) {
+                opData.put(Constants.FIELDS, fields);
+            }else {
+                throw new InvalidParameterException("指标 fields 不能为空");
+            }
+            recordData.setOpdata(opData.toString());
+            String sessionId = FTUserConfig.get().getSessionId();
+            if (!Utils.isNullOrEmpty(sessionId)) {
+                recordData.setSessionid(sessionId);
+            }
+        } catch (Exception e) {
+        }
+        return recordData;
+    }
+
+    /**
+     * 异步上传用户埋点信息，并返回上传结果
+     * @param recordDataList
+     * @param callback
+     */
+    private void updateRecordData(List<RecordData> recordDataList,SyncCallback callback){
         SyncDataManager syncDataManager = new SyncDataManager();
-        String body = syncDataManager.getBodyContent(Collections.singletonList(recordData));
+        String body = syncDataManager.getBodyContent(recordDataList);
+        SyncDataManager.printUpdateData(body);
         FTResponseData result = HttpBuilder.Builder()
                 .setMethod(RequestMethod.POST)
                 .setBodyString(body).executeSync(FTResponseData.class);
