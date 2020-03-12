@@ -161,6 +161,7 @@ class DemoAplication : Application() {
             accessKey_secret//access key Secret
         ).setUseOAID(true)//是否使用OAID
             .setDebug(true)//是否开启Debug模式（开启后能查看调试数据）
+            .setXDataKitUUID("ft-dataKit-uuid-001")
             .setNeedBindUser(true)//是否绑定用户信息
             .setMonitorType(MonitorType.ALL)//设置监控项
             .setOpenFlowChart(true)
