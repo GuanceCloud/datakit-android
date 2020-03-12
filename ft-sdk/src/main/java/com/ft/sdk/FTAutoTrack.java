@@ -49,6 +49,10 @@ public class FTAutoTrack {
             FTActivityManager.get().putActivityStatus(intent.getComponent().getClassName(),fromFragment);
         }
     }
+
+    public static void notifyUserVisibleHint(Object clazz, Object activity,boolean isVisible){
+
+    }
     /**
      * 启动 APP
      */

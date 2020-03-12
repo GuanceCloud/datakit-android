@@ -113,6 +113,18 @@ public class FTHookConfig {
                         new FTSubMethodCell(FTMethodType.ALOAD, 0),
                         new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "androidx/fragment/app/Fragment", "getActivity", "()Landroidx/fragment/app/FragmentActivity;", false)
                 )));
+        FRAGMENT_X_METHODS.put("setUserVisibleHint(Z)V", new FTMethodCell(
+                "setUserVisibleHint",
+                "(Z)V",
+                "notifyUserVisibleHint",
+                "(Ljava/lang/Object;Ljava/lang/Object;Z)V",
+                Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD, 0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
+                        new FTSubMethodCell(FTMethodType.ALOAD, 0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "androidx/fragment/app/Fragment", "getActivity", "()Landroidx/fragment/app/FragmentActivity;", false),
+                        new FTSubMethodCell(FTMethodType.ILOAD, 1)
+                )));
     }
 
 
@@ -144,6 +156,18 @@ public class FTHookConfig {
                         new FTSubMethodCell(FTMethodType.ALOAD, 0),
                         new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "android/app/Fragment", "getActivity", "()Landroid/app/Activity;", false)
                 )));
+        FRAGMENT_METHODS.put("setUserVisibleHint(Z)V", new FTMethodCell(
+                "setUserVisibleHint",
+                "(Z)V",
+                "notifyUserVisibleHint",
+                "(Ljava/lang/Object;Ljava/lang/Object;Z)V",
+                Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD, 0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
+                        new FTSubMethodCell(FTMethodType.ALOAD, 0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "android/app/Fragment", "getActivity", "()Landroid/app/Activity;", false),
+                        new FTSubMethodCell(FTMethodType.ILOAD, 1)
+                )));
     }
 
     /**
@@ -173,6 +197,18 @@ public class FTHookConfig {
                         new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
                         new FTSubMethodCell(FTMethodType.ALOAD, 0),
                         new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "android/support/v4/app/Fragment", "getActivity", "()Landroid/support/v4/app/FragmentActivity;", false)
+                )));
+        FRAGMENT_V4_METHODS.put("setUserVisibleHint(Z)V", new FTMethodCell(
+                "setUserVisibleHint",
+                "(Z)V",
+                "notifyUserVisibleHint",
+                "(Ljava/lang/Object;Ljava/lang/Object;Z)V",
+                Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD, 0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
+                        new FTSubMethodCell(FTMethodType.ALOAD, 0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "android/support/v4/app/Fragment", "getActivity", "()Landroid/support/v4/app/FragmentActivity;", false),
+                        new FTSubMethodCell(FTMethodType.ILOAD, 1)
                 )));
 
     }
