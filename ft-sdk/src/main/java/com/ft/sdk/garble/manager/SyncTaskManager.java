@@ -111,7 +111,7 @@ public class SyncTaskManager {
         }
         SyncDataManager syncDataManager = new SyncDataManager();
         String body = syncDataManager.getBodyContent(requestDatas);
-        printUpdateData(body);
+        SyncDataManager.printUpdateData(body);
         requestNet(body, isSuccess -> {
             if (isSuccess) {
                 LogUtils.d("同步数据成功");
@@ -151,41 +151,5 @@ public class SyncTaskManager {
                     "}");
         }
 
-    }
-
-    /**
-     * 将上传的数据格式化（供打印日志使用）
-     *
-     * @param body
-     */
-    private void printUpdateData(String body) {
-        try {
-            StringBuffer sb = new StringBuffer();
-            String[] counts = body.split("\n");
-            for (String str : counts) {
-                str = str.replaceAll("\\\\ ", "_");
-                String[] strArr = str.split(" ");
-                sb.append("{\n ");
-                if (strArr.length == 3) {
-                    sb.append("measurement{\n\t");
-                    String str1 = strArr[0].replaceFirst(",", "\n },tags{\n\t");
-                    str1 = str1.replaceAll(",", ",\n\t");
-                    str1 = str1.replaceFirst(",\n\t", ",\n ");
-                    sb.append(str1);
-                    sb.append("\n },\n ");
-                    sb.append("fields{\n\t");
-                    String str2 = strArr[1].replaceAll(",", ",\n\t");
-                    sb.append(str2);
-                    sb.append("\n },\n ");
-                    sb.append("time{\n\t");
-                    sb.append(strArr[2]);
-                    sb.append("\n }\n");
-                }
-                sb.append("},\n");
-            }
-            LogUtils.d("同步的数据\n" + sb.toString());
-        } catch (Exception e) {
-            LogUtils.d("同步的数据\n" + body);
-        }
     }
 }
