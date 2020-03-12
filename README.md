@@ -102,7 +102,7 @@ android{
 方法名|含义|是否必须|注意
 :--:|:--:|:--:|:--:
 setUseOAID|是否使用OAID作为设备唯一识别号的替代字段 |否|默认不使用,<br>[了解 OAID](#1关于-oaid)
-setXDataKitUUID|设置数据采集端的名称|否|不设置的话，会生成一个默认的 uuid
+setXDataKitUUID|设置数据采集端的名称|否|不设置该值系统会生成一个默认的 uuid
 setDebug|是否开启调试模式|否|默认不开启，开启后方可打印 SDK 运行日志
 setMonitorType|设置监控项|否|默认不开启任何监控项,<br>[关于监控项说明](#四监控配置项类-monitortype),<br>[关于监控项参数获取问题]()
 setNeedBindUser|是否开启绑定用户数据|否|默认不开启,<br>开启后必须要绑定用户数据[如何绑定用户数据](#一初始化类-ftsdk-提供的方法)
