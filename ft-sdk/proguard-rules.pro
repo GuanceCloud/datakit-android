@@ -59,6 +59,10 @@
     *;
 }
 
+-keep class com.ft.sdk.garble.bean.TrackBean{
+    *;
+}
+
 -keep class com.ft.sdk.MonitorType{
     *;
 }
