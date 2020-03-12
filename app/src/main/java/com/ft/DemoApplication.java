@@ -31,7 +31,7 @@ public class DemoApplication extends Application {
                 true,
                 AccountUtils.getProperty(this, AccountUtils.ACCESS_KEY_ID),
                 AccountUtils.getProperty(this, AccountUtils.ACCESS_KEY_SECRET))
-                .setXDatakitUUID("ft-dataKit-uuid-001")
+                .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setUseOAID(true)//设置 OAID 是否可用
                 .setDebug(true)//设置是否是 debug
                 .setNeedBindUser(true)//是否需要绑定用户信息
