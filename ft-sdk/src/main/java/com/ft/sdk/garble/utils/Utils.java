@@ -138,5 +138,15 @@ public class Utils {
         Matcher m = r.matcher(product);
         return m.matches();
     }
+
+    /**
+     * 判断字符串是否包含逗号和空格
+     * @param string
+     * @return
+     */
+    public static boolean stringContainSpaceAndComma(String string){
+        return string.contains(",") || string.contains(" ");
+    }
+
 }
 
