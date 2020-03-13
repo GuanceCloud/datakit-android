@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 全局 Fragment 生命周期管理类
+ * 全局 Fragment 管理类
  */
 public class FTFragmentManager {
     private static FTFragmentManager mFragmentManager;
@@ -91,7 +91,7 @@ public class FTFragmentManager {
     }
 
     /**
-     * 返回上一个Activity 中的Fragment 的类
+     * 返回Activity 中的Fragment 的类
      * @param classActivity
      * @return
      */
@@ -110,5 +110,30 @@ public class FTFragmentManager {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * 设置 Fragment 的显示状态
+     * @param classActivity
+     * @return
+     */
+    public void setFragmentVisible(String classActivity,Class fragment,boolean isVisible){
+        try {
+            if (fragmentLifecycleCall.containsKey(classActivity)) {
+                FTFragmentLifecycleCallback ft = fragmentLifecycleCall.get(classActivity);
+                if(ft != null) {
+                    ft.setUserVisibleHint(fragment, isVisible);
+                }
+            } else if (fragmentLifecycleCallDated.containsKey(classActivity)) {
+                FTFragmentLifecycleCallbackDated ft = fragmentLifecycleCallDated.get(classActivity);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    if(ft != null) {
+                        ft.setUserVisibleHint(fragment, isVisible);
+                    }
+                }
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
