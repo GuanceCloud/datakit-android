@@ -14,7 +14,9 @@ import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
-
+/**
+ * 监听系统 Fragment 的生命周期回调
+ */
 @SuppressWarnings("deprecation")
 @RequiresApi(api = Build.VERSION_CODES.O)
 public class FTFragmentLifecycleCallbackDated extends FragmentManager.FragmentLifecycleCallbacks {
@@ -33,14 +35,18 @@ public class FTFragmentLifecycleCallbackDated extends FragmentManager.FragmentLi
         if(FTFragmentManager.getInstance().ignoreFragments.contains(f.getClass().getName())){
             return;
         }
-        LogUtils.d("Fragment["+f.getClass().getSimpleName()+"] Dated state Resume");
+        if(!f.getUserVisibleHint()){
+            return;
+        }
+        /**LogUtils.d("Fragment["+f.getClass().getSimpleName()+"] Dated state Resume");
         Fragment fragment = fragmentQueue.poll();
         String parent = Constants.FLOW_ROOT;
         if(fragment != null){
             parent = fragment.getClass().getSimpleName();
         }
         FTAutoTrack.startPage(f.getClass(), activity,parent);
-        fragmentQueue.add(f);
+        fragmentQueue.add(f);*/
+        FTFragmentLifecycleHandler.getInstance().fragmentShow(f.getClass(),activity.getClass());
     }
 
     @Override
@@ -48,8 +54,13 @@ public class FTFragmentLifecycleCallbackDated extends FragmentManager.FragmentLi
         if(FTFragmentManager.getInstance().ignoreFragments.contains(f.getClass().getName())){
             return;
         }
-        LogUtils.d("Fragment["+f.getClass().getSimpleName()+"] Dated state Pause");
-        FTAutoTrack.destroyPage(f.getClass(), activity,Constants.FLOW_ROOT);
+        if(!f.getUserVisibleHint()){
+            return;
+        }
+        //LogUtils.d("Fragment["+f.getClass().getSimpleName()+"] Dated state Pause");
+        //FTAutoTrack.destroyPage(f.getClass(), activity,Constants.FLOW_ROOT);
+
+        FTFragmentLifecycleHandler.getInstance().fragmentHidden(f.getClass(),activity.getClass());
     }
 
     @Override
@@ -59,5 +70,18 @@ public class FTFragmentLifecycleCallbackDated extends FragmentManager.FragmentLi
     @Override
     public void onFragmentDestroyed(FragmentManager fm, Fragment f) {
 
+    }
+
+    /**
+     * 设置 Fragment 是否可见
+     * @param fragment
+     * @param isVisible
+     */
+    public void setUserVisibleHint(Class fragment,boolean isVisible){
+        if(isVisible){
+            FTFragmentLifecycleHandler.getInstance().fragmentShow(fragment,activity.getClass());
+        }else{
+            FTFragmentLifecycleHandler.getInstance().fragmentHidden(fragment,activity.getClass());
+        }
     }
 }

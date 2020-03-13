@@ -1,6 +1,5 @@
 package com.ft;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,6 +9,9 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import com.ft.sdk.FTAutoTrack;
+import com.ft.sdk.garble.utils.LogUtils;
 
 
 public class Tab1Fragment extends Fragment {
@@ -33,5 +35,23 @@ public class Tab1Fragment extends Fragment {
                 startActivity(new Intent(getActivity(),Main2Activity.class));
             }
         });
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        LogUtils.d("Fragment[\nhidden="+hidden+"=====>fragment:"+getClass().getSimpleName());
+        super.onHiddenChanged(hidden);
+    }
+
+    @Override
+    public void onResume() {
+        LogUtils.d("Fragment[\nonResume=====>fragment:"+getClass().getSimpleName());
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        LogUtils.d("Fragment[\nonPause=====>fragment:"+getClass().getSimpleName());
+        super.onPause();
     }
 }
