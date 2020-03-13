@@ -36,22 +36,4 @@ public class Tab1Fragment extends Fragment {
             }
         });
     }
-
-    @Override
-    public void onHiddenChanged(boolean hidden) {
-        LogUtils.d("Fragment[\nhidden="+hidden+"=====>fragment:"+getClass().getSimpleName());
-        super.onHiddenChanged(hidden);
-    }
-
-    @Override
-    public void onResume() {
-        LogUtils.d("Fragment[\nonResume=====>fragment:"+getClass().getSimpleName());
-        super.onResume();
-    }
-
-    @Override
-    public void onPause() {
-        LogUtils.d("Fragment[\nonPause=====>fragment:"+getClass().getSimpleName());
-        super.onPause();
-    }
 }

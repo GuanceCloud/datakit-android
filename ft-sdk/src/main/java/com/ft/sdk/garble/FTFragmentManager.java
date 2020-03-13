@@ -22,6 +22,7 @@ public class FTFragmentManager {
     private ConcurrentHashMap<String, Activity> activityConcurrentHashMap = new ConcurrentHashMap<>();
     //应该被忽略的Fragment
     public List<String> ignoreFragments = Arrays.asList("com.bumptech.glide.manager.SupportRequestManagerFragment");
+
     private FTFragmentManager() {
 
     }
@@ -37,6 +38,7 @@ public class FTFragmentManager {
 
     /**
      * 添加 Activity 的Fragment 的生命周期监听
+     *
      * @param activity
      */
     public void addFragmentLifecycle(Activity activity) {
@@ -63,6 +65,7 @@ public class FTFragmentManager {
 
     /**
      * 移除 Activity 的Fragment 的生命周期监听
+     *
      * @param activity
      */
     public void removeFragmentLifecycle(Activity activity) {
@@ -92,21 +95,22 @@ public class FTFragmentManager {
 
     /**
      * 返回Activity 中的Fragment 的类
+     *
      * @param classActivity
      * @return
      */
-    public Class getLastFragmentName(String classActivity){
+    public Class getLastFragmentName(String classActivity) {
         try {
             if (fragmentLifecycleCall.containsKey(classActivity)) {
                 FTFragmentLifecycleCallback ft = fragmentLifecycleCall.get(classActivity);
-                return ft.fragmentQueue.peek().getClass();
+                return ft.fragmentLifecycleHandler.getLastFragment();
             } else if (fragmentLifecycleCallDated.containsKey(classActivity)) {
                 FTFragmentLifecycleCallbackDated ft = fragmentLifecycleCallDated.get(classActivity);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    return ft.fragmentQueue.peek().getClass();
+                    return ft.fragmentLifecycleHandler.getLastFragment();
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
@@ -114,25 +118,26 @@ public class FTFragmentManager {
 
     /**
      * 设置 Fragment 的显示状态
+     *
      * @param classActivity
      * @return
      */
-    public void setFragmentVisible(String classActivity,Class fragment,boolean isVisible){
+    public void setFragmentVisible(String classActivity, Class fragment, boolean isVisible) {
         try {
             if (fragmentLifecycleCall.containsKey(classActivity)) {
                 FTFragmentLifecycleCallback ft = fragmentLifecycleCall.get(classActivity);
-                if(ft != null) {
+                if (ft != null) {
                     ft.setUserVisibleHint(fragment, isVisible);
                 }
             } else if (fragmentLifecycleCallDated.containsKey(classActivity)) {
                 FTFragmentLifecycleCallbackDated ft = fragmentLifecycleCallDated.get(classActivity);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    if(ft != null) {
+                    if (ft != null) {
                         ft.setUserVisibleHint(fragment, isVisible);
                     }
                 }
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
