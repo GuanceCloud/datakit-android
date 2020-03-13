@@ -115,7 +115,7 @@ public class FTAutoTrack {
      * @param clazz
      * @param activity
      */
-    public static void fragmentOnCreateView(Object clazz, Object activity) {
+    public static void fragmentOnResume(Object clazz, Object activity) {
         try {
             LogUtils.d("Fragment[\nOnCreateView=====>fragment:"+((Class)clazz).getSimpleName());
             //startPage(clazz, activity);
@@ -130,7 +130,7 @@ public class FTAutoTrack {
      * @param clazz
      * @param activity
      */
-    public static void fragmentOnDestroyView(Object clazz, Object activity) {
+    public static void fragmentOnPause(Object clazz, Object activity) {
         try {
             LogUtils.d("Fragment[\nOnDestroyView=====>fragment:"+((Class)clazz).getSimpleName());
             //destroyPage(clazz, activity);
