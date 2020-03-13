@@ -37,22 +37,6 @@ import org.json.JSONObject;
  * Description
  */
 public class FTAutoTrack {
-
-    /**
-     * Activity 打开的方式（标记是从 Fragment 打开还是 Activity）
-     * @param fromFragment
-     * @param intent
-     */
-    public static void startActivityByWay(Boolean fromFragment, Intent intent){
-        LogUtils.d("activityFromWay="+fromFragment+",,,intent="+intent);
-        if(intent != null && intent.getComponent() != null) {
-            FTActivityManager.get().putActivityStatus(intent.getComponent().getClassName(),fromFragment);
-        }
-    }
-
-    public static void notifyUserVisibleHint(Object clazz, Object activity,boolean isVisible){
-
-    }
     /**
      * 启动 APP
      */
@@ -60,6 +44,22 @@ public class FTAutoTrack {
         try {
             startApp();
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Activity 打开的方式（标记是从 Fragment 打开还是 Activity）
+     * @param fromFragment
+     * @param intent
+     */
+    public static void startActivityByWay(Boolean fromFragment, Intent intent){
+        try {
+            LogUtils.d("activityFromWay=" + fromFragment + ",,,intent=" + intent);
+            if (intent != null && intent.getComponent() != null) {
+                FTActivityManager.get().putActivityStatus(intent.getComponent().getClassName(), fromFragment);
+            }
+        }catch (Exception e){
             e.printStackTrace();
         }
     }
@@ -88,6 +88,28 @@ public class FTAutoTrack {
     }
 
     /**
+     * 通知 Fragment 的显示隐藏状态
+     * @param clazz
+     * @param activity
+     * @param isVisible
+     */
+    public static void notifyUserVisibleHint(Object clazz, Object activity,boolean isVisible){
+        LogUtils.d("Fragment[\n"+isVisible+"=====>fragment:"+((Class)clazz).getSimpleName());
+        try {
+            String className;
+            if (activity == null) {
+                Activity activity1 = FTActivityManager.get().getTopActivity();
+                className = activity1.getClass().getName();
+            } else {
+                className = activity.getClass().getName();
+            }
+            FTFragmentManager.getInstance().setFragmentVisible(className, (Class) clazz, isVisible);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Fragment 打开
      *
      * @param clazz
@@ -95,6 +117,7 @@ public class FTAutoTrack {
      */
     public static void fragmentOnCreateView(Object clazz, Object activity) {
         try {
+            LogUtils.d("Fragment[\nOnCreateView=====>fragment:"+((Class)clazz).getSimpleName());
             //startPage(clazz, activity);
         } catch (Exception e) {
             e.printStackTrace();
@@ -109,6 +132,7 @@ public class FTAutoTrack {
      */
     public static void fragmentOnDestroyView(Object clazz, Object activity) {
         try {
+            LogUtils.d("Fragment[\nOnDestroyView=====>fragment:"+((Class)clazz).getSimpleName());
             //destroyPage(clazz, activity);
         } catch (Exception e) {
             e.printStackTrace();
