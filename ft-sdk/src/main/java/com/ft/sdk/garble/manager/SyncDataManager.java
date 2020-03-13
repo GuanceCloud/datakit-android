@@ -79,7 +79,7 @@ public class SyncDataManager {
                 sb.append(" ");
                 sb.append(recordData.getTime() * 1000 * 1000);
                 sb.append("\n");
-            } else if(OP.CLS_ACT.value.equals(recordData.getOp())){
+            } /**else if(OP.CLS_ACT.value.equals(recordData.getOp())){
                 //如果是关闭页面，也要附加一条页面关闭的流程图数据
                 try {
                     //获取指标
@@ -108,7 +108,7 @@ public class SyncDataManager {
                 sb.append(" ");
                 sb.append(recordData.getTime() * 1000 * 1000);
                 sb.append("\n");
-            }else if(OP.OPEN_FRA.value.equals(recordData.getOp())){
+            }*/else if(OP.OPEN_FRA.value.equals(recordData.getOp())){
                 //如果是子页面打开操作，就在该条数据上添加一条表示流程图的数据
                 try {
                     JSONObject opData = new JSONObject(recordData.getOpdata());
@@ -126,7 +126,11 @@ public class SyncDataManager {
                 sb.append(",$name=").append(recordData.getRpn()).append(".").append(recordData.getCpn());
                 //如果父页面是root表示其为起始节点，不添加父节点
                 if(!Constants.FLOW_ROOT.equals(recordData.getPpn())){
-                    sb.append(",$parent=").append(recordData.getRpn()).append(".").append(recordData.getPpn());
+                    if(recordData.getPpn().startsWith(Constants.PERFIX)){
+                        sb.append(",$parent=").append(recordData.getPpn().replace(Constants.PERFIX,""));
+                    }else {
+                        sb.append(",$parent=").append(recordData.getRpn()).append(".").append(recordData.getPpn());
+                    }
                 }else{
                     sb.append(",$parent=").append(recordData.getRpn());
                 }

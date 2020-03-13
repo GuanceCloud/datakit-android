@@ -141,4 +141,30 @@ public class FTFragmentManager {
             e.printStackTrace();
         }
     }
+
+    /**
+     * 设置 Fragment 的显示状态
+     *
+     * @param classActivity
+     * @return
+     */
+    public void clearFragmentList(String classActivity) {
+        try {
+            if (fragmentLifecycleCall.containsKey(classActivity)) {
+                FTFragmentLifecycleCallback ft = fragmentLifecycleCall.get(classActivity);
+                if (ft != null) {
+                    ft.fragmentLifecycleHandler.fragmentList.clear();
+                }
+            } else if (fragmentLifecycleCallDated.containsKey(classActivity)) {
+                FTFragmentLifecycleCallbackDated ft = fragmentLifecycleCallDated.get(classActivity);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    if (ft != null) {
+                        ft.fragmentLifecycleHandler.fragmentList.clear();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
