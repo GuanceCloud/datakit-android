@@ -50,16 +50,17 @@ public class FTAutoTrack {
 
     /**
      * Activity 打开的方式（标记是从 Fragment 打开还是 Activity）
+     *
      * @param fromFragment
      * @param intent
      */
-    public static void startActivityByWay(Boolean fromFragment, Intent intent){
+    public static void startActivityByWay(Boolean fromFragment, Intent intent) {
         try {
             LogUtils.d("activityFromWay=" + fromFragment + ",,,intent=" + intent);
             if (intent != null && intent.getComponent() != null) {
                 FTActivityManager.get().putActivityStatus(intent.getComponent().getClassName(), fromFragment);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -89,12 +90,13 @@ public class FTAutoTrack {
 
     /**
      * 通知 Fragment 的显示隐藏状态
+     *
      * @param clazz
      * @param activity
      * @param isVisible
      */
-    public static void notifyUserVisibleHint(Object clazz, Object activity,boolean isVisible){
-        LogUtils.d("Fragment[\n"+isVisible+"=====>fragment:"+((Class)clazz).getSimpleName());
+    public static void notifyUserVisibleHint(Object clazz, Object activity, boolean isVisible) {
+        //LogUtils.d("Fragment[\n"+isVisible+"=====>fragment:"+((Class)clazz).getSimpleName());
         try {
             String className;
             if (activity == null) {
@@ -104,7 +106,7 @@ public class FTAutoTrack {
                 className = activity.getClass().getName();
             }
             FTFragmentManager.getInstance().setFragmentVisible(className, (Class) clazz, isVisible);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -117,7 +119,7 @@ public class FTAutoTrack {
      */
     public static void fragmentOnResume(Object clazz, Object activity) {
         try {
-            LogUtils.d("Fragment[\nOnCreateView=====>fragment:"+((Class)clazz).getSimpleName());
+            //LogUtils.d("Fragment[\nOnCreateView=====>fragment:"+((Class)clazz).getSimpleName());
             //startPage(clazz, activity);
         } catch (Exception e) {
             e.printStackTrace();
@@ -132,7 +134,7 @@ public class FTAutoTrack {
      */
     public static void fragmentOnPause(Object clazz, Object activity) {
         try {
-            LogUtils.d("Fragment[\nOnDestroyView=====>fragment:"+((Class)clazz).getSimpleName());
+            //LogUtils.d("Fragment[\nOnDestroyView=====>fragment:"+((Class)clazz).getSimpleName());
             //destroyPage(clazz, activity);
         } catch (Exception e) {
             e.printStackTrace();
@@ -304,7 +306,7 @@ public class FTAutoTrack {
      * @param clazz
      * @param activity
      */
-    public static void startPage(Object clazz, Object activity,String parentPage) {
+    public static void startPage(Object clazz, Object activity, String parentPage) {
         /*没有开启自动埋点*/
         if (!FTAutoTrackConfig.get().isAutoTrack()) {
             return;
@@ -334,7 +336,7 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity((Class<?>) clazz)) {
             return;
         }
-        putRecordFragment(OP.OPEN_FRA, AopUtils.getClassName(clazz), AopUtils.getActivityName(activity),parentPage);
+        putRecordFragment(OP.OPEN_FRA, AopUtils.getClassName(clazz), AopUtils.getActivityName(activity), parentPage);
     }
 
     /**
@@ -343,7 +345,7 @@ public class FTAutoTrack {
      * @param clazz
      * @param activity
      */
-    public static void destroyPage(Object clazz, Object activity,String parentPage) {
+    public static void destroyPage(Object clazz, Object activity, String parentPage) {
         /*没有开启自动埋点*/
         if (!FTAutoTrackConfig.get().isAutoTrack()) {
             return;
@@ -373,7 +375,7 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity((Class<?>) clazz)) {
             return;
         }
-        putRecordFragment(OP.CLS_FRA, AopUtils.getClassName(clazz), AopUtils.getActivityName(activity),parentPage);
+        putRecordFragment(OP.CLS_FRA, AopUtils.getClassName(clazz), AopUtils.getActivityName(activity), parentPage);
     }
 
     /**
@@ -500,53 +502,56 @@ public class FTAutoTrack {
 
     /**
      * 点击事件
+     *
      * @param op
      * @param currentPage
      * @param rootPage
      * @param vtp
      */
-    public static void putRecordClick(@NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String vtp){
+    public static void putRecordClick(@NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String vtp) {
         long time = System.currentTimeMillis();
-        putRecord(time,op, currentPage, rootPage,null, vtp);
+        putRecord(time, op, currentPage, rootPage, null, vtp);
     }
 
     /**
      * Fragment 开关
+     *
      * @param op
      * @param currentPage
      * @param rootPage
      * @param parentPage
      */
-    public static void putRecordFragment(@NonNull OP op, @Nullable String currentPage, @Nullable String rootPage,@Nullable String parentPage) {
+    public static void putRecordFragment(@NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String parentPage) {
         long time = System.currentTimeMillis();
-        putRecord(time, op, currentPage, rootPage,parentPage, null);
+        putRecord(time, op, currentPage, rootPage, parentPage, null);
     }
 
     /**
      * Activity 开关
+     *
      * @param op
      * @param classCurrent
      */
-    public static void putRecordActivity(@NonNull OP op,Class classCurrent) {
+    public static void putRecordActivity(@NonNull OP op, Class classCurrent) {
         long time = System.currentTimeMillis();
         Class parentClass = FTActivityManager.get().getLastActivity();
         String parentPageName = Constants.FLOW_ROOT;
-        if(parentClass != null) {
+        if (parentClass != null) {
             boolean isFromFragment = FTActivityManager.get().getActivityStatus(classCurrent.getName());
-            if(isFromFragment){
+            if (isFromFragment) {
                 Class c = FTFragmentManager.getInstance().getLastFragmentName(parentClass.getName());
-                if(c != null){
-                    parentPageName = parentClass.getSimpleName()+"."+c.getSimpleName();
+                if (c != null) {
+                    parentPageName = parentClass.getSimpleName() + "." + c.getSimpleName();
                 }
-            }else{
+            } else {
                 parentPageName = parentClass.getSimpleName();
             }
 
         }
-        putRecord(time, op, classCurrent.getSimpleName(), classCurrent.getSimpleName(),parentPageName, null);
+        putRecord(time, op, classCurrent.getSimpleName(), classCurrent.getSimpleName(), parentPageName, null);
     }
 
-    public static void putRecord(long time, @NonNull OP op, @Nullable String currentPage, @Nullable String rootPage,@Nullable String parentPage, @Nullable String vtp) {
+    public static void putRecord(long time, @NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String parentPage, @Nullable String vtp) {
         ThreadPoolUtils.get().execute(() -> {
             try {
                 final RecordData recordData = new RecordData();
@@ -562,7 +567,7 @@ public class FTAutoTrack {
                     opData.put("tags", tags);
                     //开启流程图，获取流程图相关数据存入数据库中
                     if (FTFlowChartConfig.get().isOpenFlowChart()) {
-                        if (op == OP.OPEN_ACT || op == OP.CLS_ACT || op == OP.OPEN_FRA || op == OP.CLS_FRA) {
+                        if (op == OP.OPEN_ACT || op == OP.CLS_ACT || op == OP.OPEN_FRA) {
                             opData.put(Constants.MEASUREMENT, FTFlowChartConfig.get().getFlowProduct());
                         }
                     }
@@ -574,8 +579,8 @@ public class FTAutoTrack {
                     recordData.setSessionid(sessionId);
                 }
                 //开启流程图，获取流程图相关数据存入数据库中
-                if (FTFlowChartConfig.get().isOpenFlowChart()){
-                    if (op == OP.OPEN_ACT || op == OP.CLS_ACT || op == OP.OPEN_FRA || op == OP.CLS_FRA){
+                if (FTFlowChartConfig.get().isOpenFlowChart()) {
+                    if (op == OP.OPEN_ACT || op == OP.CLS_ACT || op == OP.OPEN_FRA) {
                         recordData.setPpn(parentPage);
                         recordData.setTraceId(FTFlowChartConfig.get().getFlowUUID());
                         long currentTime = System.currentTimeMillis();
