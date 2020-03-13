@@ -22,13 +22,11 @@ public class FTActivityManager {
     private Activity topActivity;
     //存在的 Activity
     private List<Activity> activityList;
-    //存储 Activity 的最后的状态
-    private ConcurrentHashMap<String, Lifecycle.Event> activityEventMap;
+
     private ConcurrentHashMap<String, Boolean> activityOpenTypeMap;
 
     private FTActivityManager() {
         activityList = new ArrayList<>();
-        activityEventMap = new ConcurrentHashMap<>();
         activityOpenTypeMap = new ConcurrentHashMap<>();
     }
 
@@ -57,40 +55,19 @@ public class FTActivityManager {
         return topActivity;
     }
 
-    /**
-     * 判断程序是否在前台运行
-     *
-     * @return
-     */
-    public boolean isForeground() {
-        if (activityEventMap == null || activityEventMap.isEmpty()) {
-            return false;
-        }
-        if (activityEventMap.contains(Lifecycle.Event.ON_RESUME)) {
-            return true;
-        }
-        return false;
-    }
 
     public void putActivity(Activity activity, Lifecycle.Event event) {
         topActivity = activity;
         if (activityList == null) {
             activityList = new ArrayList<>();
         }
-        if (activityEventMap == null) {
-            activityEventMap = new ConcurrentHashMap<>();
-        }
-
-        if (!activityList.contains(activity)) {
+        //if (!activityList.contains(activity)) {
             activityList.add(activity);
-        }
-        activityEventMap.put(activity.toString(), event);
-
+        //}
     }
 
     public void removeActivity(Activity activity) {
         activityList.remove(activity);
-        activityEventMap.remove(activity.toString());
         topActivity = (activityList == null || activityList.size() <= 0) ? null : activityList.get(activityList.size() - 1);
     }
 
@@ -147,8 +124,7 @@ public class FTActivityManager {
     public void printTest(Activity activity) {
         LogUtils.d(FTActivityManager.class.getSimpleName() + "\n" +
                 "activeCount=" + activityList.size() + "\n" +
-                "topActivity=" + topActivity + "\n" +
-                "activityState=" + activityEventMap.get(activity.toString()));
+                "topActivity=" + topActivity + "\n");
     }
 
 }
