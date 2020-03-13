@@ -177,6 +177,9 @@ public class FTTrack {
             ThreadPoolUtils.get().execute(() -> {
                 try {
                     RecordData recordData = transTrackBeanToRecordData(op,time,measurement,tags,fields);
+                    if(recordData == null){
+                        return;
+                    }
                     LogUtils.d("FTTrack数据进数据库：" + recordData.getJsonString());
                     FTManager.getFTDBManager().insertFTOperation(recordData);
                     FTManager.getSyncTaskManager().executeSyncPoll();
@@ -206,10 +209,14 @@ public class FTTrack {
                         if (!isLegalValues(t.getFields())) {
                             continue;
                         }
-                        recordDataList.add(transTrackBeanToRecordData(OP.CSTM,t.getTimeMillis(),t.getMeasurement(),t.getTags(),t.getFields()));
+                        RecordData recordData = transTrackBeanToRecordData(OP.CSTM,t.getTimeMillis(),t.getMeasurement(),t.getTags(),t.getFields());
+                        if(recordData != null) {
+                            recordDataList.add(recordData);
+                        }
                     }
                     updateRecordData(recordDataList,callback);
                 } catch (Exception e) {
+                    e.printStackTrace();
                 }
             });
         } catch (Exception e) {
@@ -235,9 +242,15 @@ public class FTTrack {
             JSONObject opData = new JSONObject();
 
             if (measurement != null) {
-                opData.put(Constants.MEASUREMENT, measurement);
+                if(Utils.stringContainSpaceAndComma(measurement)){
+                    LogUtils.e("指标集 measurement 中不能包含空格或者逗号");
+                    return null;
+                }else {
+                    opData.put(Constants.MEASUREMENT, measurement);
+                }
             }else {
-                throw new InvalidParameterException("指标集 measurement 不能为空");
+                LogUtils.e("指标集 measurement 不能为空");
+                return null;
             }
             if (tagsTemp == null) {
                 tagsTemp = new JSONObject();
@@ -247,7 +260,8 @@ public class FTTrack {
             if (fields != null) {
                 opData.put(Constants.FIELDS, fields);
             }else {
-                throw new InvalidParameterException("指标 fields 不能为空");
+                LogUtils.e("指标 fields 不能为空");
+                return null;
             }
             recordData.setOpdata(opData.toString());
             String sessionId = FTUserConfig.get().getSessionId();
@@ -255,6 +269,7 @@ public class FTTrack {
                 recordData.setSessionid(sessionId);
             }
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return recordData;
     }
@@ -288,7 +303,7 @@ public class FTTrack {
      */
     boolean isLegalValues(JSONObject jsonObject) throws JSONException {
         if (jsonObject == null) {
-            LogUtils.e("参数 Values 不能为空");
+            LogUtils.e("参数 fields 不能为空");
             return false;
         }
         if (jsonObject.keys().hasNext()) {
@@ -297,13 +312,13 @@ public class FTTrack {
                 String key = iterator.next();
                 Object obj = jsonObject.get(key);
                 if (obj instanceof JSONObject || obj instanceof JSONArray) {
-                    LogUtils.e("参数 Values 中含有非法数据类型");
+                    LogUtils.e("参数 fields 中含有非法数据类型");
                     return false;
                 }
             }
             return true;
         } else {
-            LogUtils.e("参数 Values 不能为空");
+            LogUtils.e("参数 fields 不能为空");
             return false;
         }
     }
