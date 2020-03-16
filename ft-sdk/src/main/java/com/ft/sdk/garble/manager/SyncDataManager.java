@@ -217,7 +217,7 @@ public class SyncDataManager {
                     addQuotationMarks(sb, FT_KEY_VALUE_NULL, !isTag);
                 } else {
                     if (value instanceof String) {
-                        addQuotationMarks(sb, Utils.translateTagKeyValueAndFieldKey((String) value), !isTag);
+                        addQuotationMarks(sb, (String) value, !isTag);
                     } else {
                         sb.append(value);
                     }
@@ -232,7 +232,7 @@ public class SyncDataManager {
         if (add) {
             sb.append("\"").append(Utils.translateFieldValue(value)).append("\"");
         } else {
-            sb.append(value);
+            sb.append(Utils.translateTagKeyValueAndFieldKey(value));
         }
     }
 
