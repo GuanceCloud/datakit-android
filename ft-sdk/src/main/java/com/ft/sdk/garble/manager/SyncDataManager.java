@@ -71,7 +71,7 @@ public class SyncDataManager {
                 if(!Constants.FLOW_ROOT.equals(recordData.getPpn())){
                     sb.append(",$parent=").append(recordData.getPpn());
                 }
-                sb.append(",").append(device.replaceAll(" ", "\\\\ ")).append(",");
+                sb.append(",").append(device).append(",");
                 addUserData(sb, recordData);
                 //删除多余的逗号
                 deleteLastComma(sb);
@@ -101,7 +101,7 @@ public class SyncDataManager {
                     sb.append(",$name=").append(recordData.getPpn());
                     sb.append(",$parent=").append(recordData.getCpn());
                 }
-                sb.append(",").append(device.replaceAll(" ", "\\\\ ")).append(",");
+                sb.append(",").append(device).append(",");
                 addUserData(sb, recordData);
                 deleteLastComma(sb);
                 sb.append(" ");
@@ -113,7 +113,7 @@ public class SyncDataManager {
             //获取这条事件的指标
             sb.append(getMeasurement(recordData));
             sb.append(",");
-            sb.append(device.replaceAll(" ", "\\\\ "));
+            sb.append(device);
             //获取埋点事件数据
             sb.append(getUpdateData(recordData));
             sb.append("\n");
@@ -138,7 +138,7 @@ public class SyncDataManager {
                 if (Utils.isNullOrEmpty(measurementTemp)) {
                     measurement = FT_KEY_VALUE_NULL;
                 } else {
-                    measurement = measurementTemp;
+                    measurement = Utils.translateMeasurements(measurementTemp);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -182,7 +182,7 @@ public class SyncDataManager {
                 deleteLastComma(tagSb);
                 if (tagSb.length() > 0) {
                     sb.append(",");
-                    sb.append(tagSb.toString().replaceAll(" ", "\\\\ "));
+                    sb.append(tagSb.toString());
                 }
                 sb.append(" ");
                 deleteLastComma(valueSb);
@@ -205,8 +205,9 @@ public class SyncDataManager {
         StringBuffer sb = new StringBuffer();
         Iterator<String> keys = tags.keys();
         while (keys.hasNext()) {
-            String key = Utils.replaceSpaceAndComma(keys.next());
-            Object value = tags.opt(key);
+            String keyTemp = keys.next();
+            Object value = tags.opt(keyTemp);
+            String key = Utils.translateTagKeyValueAndFieldKey(keyTemp);
             sb.append(key);
             sb.append("=");
             if (value == null) {
@@ -216,7 +217,7 @@ public class SyncDataManager {
                     addQuotationMarks(sb, FT_KEY_VALUE_NULL, !isTag);
                 } else {
                     if (value instanceof String) {
-                        addQuotationMarks(sb, Utils.replaceSpaceAndComma((String) value), !isTag);
+                        addQuotationMarks(sb, Utils.translateTagKeyValueAndFieldKey((String) value), !isTag);
                     } else {
                         sb.append(value);
                     }
@@ -229,7 +230,7 @@ public class SyncDataManager {
 
     private void addQuotationMarks(StringBuffer sb, String value, boolean add) {
         if (add) {
-            sb.append("\"").append(value).append("\"");
+            sb.append("\"").append(Utils.translateFieldValue(value)).append("\"");
         } else {
             sb.append(value);
         }
@@ -266,7 +267,7 @@ public class SyncDataManager {
         deleteLastComma(sb);
         if (sb.length() > 0) {
             sb.insert(0, ",");
-            String temp = sb.toString().replaceAll(" ", "\\\\ ");
+            String temp = sb.toString();
             sb.delete(0, sb.length());
             sb.append(temp);
         }
@@ -286,8 +287,8 @@ public class SyncDataManager {
         if (FTUserConfig.get().isNeedBindUser() && FTUserConfig.get().isUserDataBinded()) {
             UserData userData = FTUserConfig.get().getUserData(recordData.getSessionid());
             if (userData != null) {
-                sb.append("ud_name=").append(Utils.replaceComma(userData.getName())).append(",");
-                sb.append("ud_id=").append(Utils.replaceComma(userData.getId())).append(",");
+                sb.append("ud_name=").append(Utils.translateTagKeyValueAndFieldKey(userData.getName())).append(",");
+                sb.append("ud_id=").append(Utils.translateTagKeyValueAndFieldKey(userData.getId())).append(",");
                 JSONObject js = userData.getExts();
                 if (js == null) {
                     return;
@@ -296,7 +297,7 @@ public class SyncDataManager {
                 while (iterator.hasNext()) {
                     String key = iterator.next();
                     try {
-                        sb.append("ud_").append(Utils.replaceComma(key)).append("=").append(Utils.replaceComma(js.getString(key))).append(",");
+                        sb.append("ud_").append(Utils.translateTagKeyValueAndFieldKey(key)).append("=").append(Utils.translateTagKeyValueAndFieldKey(js.getString(key))).append(",");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -470,8 +471,8 @@ public class SyncDataManager {
         objectHashMap.put("imei", DeviceUtils.getImei(context));
         objectHashMap.put("os", DeviceUtils.getOSName());
         objectHashMap.put("os_version", DeviceUtils.getOSVersion());
-        objectHashMap.put("device_band", DeviceUtils.getDeviceBand());
-        objectHashMap.put("device_model", DeviceUtils.getDeviceModel());
+        objectHashMap.put("device_band", Utils.translateTagKeyValueAndFieldKey(DeviceUtils.getDeviceBand()));
+        objectHashMap.put("device_model", Utils.translateTagKeyValueAndFieldKey(DeviceUtils.getDeviceModel()));
         objectHashMap.put("display", DeviceUtils.getDisplay(context));
         objectHashMap.put("carrier", DeviceUtils.getCarrier(context));
         if (FTHttpConfig.get().useOaid) {
