@@ -242,12 +242,7 @@ public class FTTrack {
             JSONObject opData = new JSONObject();
 
             if (measurement != null) {
-                if(Utils.stringContainSpaceAndComma(measurement)){
-                    LogUtils.e("指标集 measurement 中不能包含空格或者逗号");
-                    return null;
-                }else {
-                    opData.put(Constants.MEASUREMENT, measurement);
-                }
+                opData.put(Constants.MEASUREMENT, measurement);
             }else {
                 LogUtils.e("指标集 measurement 不能为空");
                 return null;

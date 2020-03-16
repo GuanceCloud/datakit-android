@@ -13,13 +13,19 @@ class TrackerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tracker)
         flowChartTacker3.setOnClickListener {
-            FTTrack.getInstance().trackImmediate("android_no_db", JSONObject().apply {
+            FTTrack.getInstance().trackImmediate("android_no_db06", JSONObject().apply {
                 put("name", "tracker01")
             }, JSONObject().apply {
                 put("year", "2020")
             }) {
                 LogUtils.d("update-state:$it")
             }
+
+            FTTrack.getInstance().trackBackground("android_ no_db07", JSONObject().apply {
+                put("nam e", "tr acker01")
+            }, JSONObject().apply {
+                put("ye ar", "20 20")
+            })
         }
 
         flowChartTacker.setOnClickListener { v ->
