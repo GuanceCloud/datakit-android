@@ -113,9 +113,9 @@ public class FTSdk {
      * @param root
      */
     public void setGpuRenderer(ViewGroup root){
-        LogUtils.d("绑定视图监听 GPU 信息");
         try {
             if (FTMonitorConfig.get().isMonitorType(MonitorType.GPU)) {
+                LogUtils.d("绑定视图监听 GPU 信息");
                 Context context = getApplication();
                 final RendererUtil mRendererUtil = new RendererUtil();
                 GLSurfaceView mGLSurfaceView = new GLSurfaceView(context);

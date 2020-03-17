@@ -1,6 +1,7 @@
 package com.ft.sdk.garble.manager;
 
 import android.content.Context;
+import android.location.Address;
 
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
@@ -343,7 +344,15 @@ public class SyncDataManager {
                 for (CameraPx cameraPx : cameraPxs) {
                     tags.put(cameraPx.getPx()[0],cameraPx.getPx()[1]);
                 }
-                tags.put("location_city",LocationUtils.get().getCity());
+                Address address = LocationUtils.get().getCity();
+                if(address != null){
+                    tags.put("province",address.getAdminArea());
+                    tags.put("city",address.getLocality());
+                }else{
+                    tags.put("province",Constants.UNKNOWN);
+                    tags.put("city",Constants.UNKNOWN);
+                }
+
             } else {
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.BATTERY)) {
                     tags.put("battery_total",BatteryUtils.getBatteryTotal(context)+"mAh");
@@ -385,7 +394,14 @@ public class SyncDataManager {
                     }
                 }
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.LOCATION)) {
-                    tags.put("location_city",LocationUtils.get().getCity());
+                    Address address = LocationUtils.get().getCity();
+                    if(address != null){
+                        tags.put("province",address.getAdminArea());
+                        tags.put("city",address.getLocality());
+                    }else{
+                        tags.put("province",Constants.UNKNOWN);
+                        tags.put("city",Constants.UNKNOWN);
+                    }
                 }
             }
         } catch (Exception e) {
