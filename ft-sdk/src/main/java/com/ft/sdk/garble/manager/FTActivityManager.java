@@ -60,14 +60,19 @@ public class FTActivityManager {
         if (activityList == null) {
             activityList = new ArrayList<>();
         }
-        //if (!activityList.contains(activity)) {
-            activityList.add(activity);
-        //}
+        activityList.add(activity);
     }
 
-    public void removeActivity(Activity activity) {
-        activityList.remove(activity);
-        topActivity = (activityList == null || activityList.size() <= 0) ? null : activityList.get(activityList.size() - 1);
+    public void removeActivity() {
+        try {
+            if (activityList.size() > 3) {
+                Activity activity = activityList.remove(0);
+                removeActivityStatus(activity.getClass().getName());
+            }
+            topActivity = (activityList == null || activityList.size() <= 0) ? null : activityList.get(activityList.size() - 1);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     /**
