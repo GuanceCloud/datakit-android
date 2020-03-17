@@ -17,8 +17,17 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class FTFragmentManager {
     private static FTFragmentManager mFragmentManager;
+    /**
+     * 该map在{@link #removeFragmentLifecycle} 方法中回收
+     */
     private ConcurrentHashMap<String, FTFragmentLifecycleCallback> fragmentLifecycleCall = new ConcurrentHashMap<>();
+    /**
+     * 该map在{@link #removeFragmentLifecycle} 方法中回收
+     */
     private ConcurrentHashMap<String, FTFragmentLifecycleCallbackDated> fragmentLifecycleCallDated = new ConcurrentHashMap<>();
+    /**
+     * 该map在{@link #removeFragmentLifecycle} 方法中回收
+     */
     private ConcurrentHashMap<String, Activity> activityConcurrentHashMap = new ConcurrentHashMap<>();
     //应该被忽略的Fragment
     public List<String> ignoreFragments = Arrays.asList("com.bumptech.glide.manager.SupportRequestManagerFragment");

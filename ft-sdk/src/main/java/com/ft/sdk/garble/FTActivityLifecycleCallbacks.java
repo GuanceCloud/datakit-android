@@ -28,10 +28,8 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
 
     @Override
     public void onActivityResumed(@NonNull Activity activity) {
-        FTFragmentManager.getInstance().clearFragmentList(activity.getClass().getName());
         boolean isFirstLoad = true;
         if(FTActivityManager.get().isFirstResume.containsKey(activity.getClass().getName()) && FTActivityManager.get().isFirstResume.get(activity.getClass().getName())){
-            FTActivityManager.get().putActivityOpenFromFragment(activity.getClass().getName(),false);
             isFirstLoad = false;
         }
         //页面打开，将打开 Activity 放入管理栈中
@@ -65,8 +63,6 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
         //移除对 Fragment 的生命周期的监听
         FTFragmentManager.getInstance().removeFragmentLifecycle(activity);
         //从 Activity 的管理栈中移除 Activity
-        //FTManager.getFTActivityManager().removeActivity(activity);
-        //删除 Activity 打开方式的缓存
-        //FTActivityManager.get().removeActivityStatus(activity.getClass().getName());
+        FTManager.getFTActivityManager().removeActivity();
     }
 }

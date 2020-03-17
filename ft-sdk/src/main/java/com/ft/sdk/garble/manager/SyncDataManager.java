@@ -50,7 +50,7 @@ public class SyncDataManager {
         StringBuffer sb = new StringBuffer();
         String device = parseHashToString(getDeviceInfo());
         for (RecordData recordData : recordDatas) {
-            if(OP.OPEN_ACT.value.equals(recordData.getOp()) && !Constants.IGNORE_FLOW_CHART_DATA.equals(recordData.getPpn())){
+            if(OP.OPEN_ACT.value.equals(recordData.getOp())){
                 //如果是页面打开操作，就在该条数据上添加一条表示流程图的数据
                 try {
                     JSONObject opData = new JSONObject(recordData.getOpdata());
@@ -65,10 +65,25 @@ public class SyncDataManager {
                 }
 
                 sb.append(",$traceId=").append(recordData.getTraceId());
-                sb.append(",$name=").append(recordData.getCpn());
-                //如果父页面是root表示其为起始节点，不添加父节点
-                if(!Constants.FLOW_ROOT.equals(recordData.getPpn())){
-                    sb.append(",$parent=").append(recordData.getPpn());
+                if(recordData.getPpn() != null && recordData.getPpn().startsWith(Constants.MOCK_SON_PAGE_DATA)){
+                    String[] strArr = recordData.getPpn().split(":");
+                    String name = null;
+                    String parent = null;
+                    if(strArr.length == 3){
+                        name = recordData.getCpn()+"."+strArr[1];
+                        parent = strArr[2];
+                    }else if (strArr.length == 2){
+                        name = recordData.getCpn();
+                        parent = strArr[1];
+                    }
+                    sb.append(",$name=").append(name);
+                    sb.append(",$parent=").append(parent);
+                }else {
+                    sb.append(",$name=").append(recordData.getCpn());
+                    //如果父页面是root表示其为起始节点，不添加父节点
+                    if (!Constants.FLOW_ROOT.equals(recordData.getPpn())) {
+                        sb.append(",$parent=").append(recordData.getPpn());
+                    }
                 }
                 sb.append(",").append(device.replaceAll(" ", "\\\\ ")).append(",");
                 addUserData(sb, recordData);
