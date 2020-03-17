@@ -79,6 +79,13 @@ public class FTFragmentLifecycleHandler {
     }
 
     /**
+     * Fragment 页面显示
+     * Fragment（假如为 AF） 打开有四种方式，
+     * 1、首次在 Activity（假如 AA） 打开，这时候它的 Parent 为当前 AA ,                                 Fragment栈清空
+     * 2、当前 Activity 中有多个 Fragment，从其他 Fragment（假如为 BF）,这时候它的 Parent 为 AA.BF
+     * 3、当前 Activity 未关闭后重启，这时候它的 Parent 为 AA                                           Fragment栈清空
+     * 4、在当前Fragment（AF）中打开了 BA页面，然后BA页面关闭，回到 AF页面，这时候它的 Parent 为 BA           Fragment栈清空
+     *
      * @param fragment
      */
     private void show(Class fragment) {
@@ -88,8 +95,16 @@ public class FTFragmentLifecycleHandler {
             parent = clazz.getSimpleName();
         }else{
             Class lastActivity = FTActivityManager.get().getLastActivity();
-            if(lastActivity != null && FTActivityManager.get().getActivityStatus(lastActivity.getName())){
-                parent = Constants.PERFIX+lastActivity.getSimpleName();
+            //如果两个页面相同，表示页面的恢复
+            boolean lastTwoActivitySame = FTActivityManager.get().lastTwoActivitySame();
+            if(lastTwoActivitySame){
+                parent = fragment.getSimpleName();
+            }else {
+                if(FTActivityManager.get().isFirstResume.containsKey(activity.getClass().getName()) && FTActivityManager.get().isFirstResume.get(activity.getClass().getName())) {
+                    if (lastActivity != null && FTActivityManager.get().getActivityOpenFromFragment(lastActivity.getName())) {
+                        parent = Constants.PERFIX + lastActivity.getSimpleName();
+                    }
+                }
             }
         }
         FTAutoTrack.startPage(fragment, activity, parent);
@@ -97,6 +112,7 @@ public class FTFragmentLifecycleHandler {
     }
 
     /**
+     * Fragment 页面隐藏或者关闭
      * @param fragment
      */
     private void hidden(Class fragment) {
