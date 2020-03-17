@@ -8,8 +8,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.Lifecycle;
 
+import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTAutoTrack;
 import com.ft.sdk.garble.manager.FTManager;
+import com.ft.sdk.garble.utils.LocationUtils;
 
 /**
  * BY huangDianHua
@@ -29,6 +31,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
 
     @Override
     public void onActivityResumed(@NonNull Activity activity) {
+        LocationUtils.get().startLocation(FTApplication.getApplication());
         FTManager.getFTActivityManager().putActivity(activity, Lifecycle.Event.ON_RESUME);
         FTManager.getSyncTaskManager().executeSyncPoll();
         FTAutoTrack.startPage(activity.getClass());

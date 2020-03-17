@@ -28,7 +28,6 @@ import com.amitshekhar.debug.encrypt.sqlite.DebugDBEncryptFactory;
 import com.amitshekhar.debug.sqlite.DebugDBFactory;
 import com.bumptech.glide.Glide;
 import com.ft.sdk.FTSdk;
-import com.ft.sdk.FTTrack;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -61,7 +60,8 @@ public class MainActivity extends AppCompatActivity {
         }
         requestPermissions(new String[]{Manifest.permission.CAMERA
                 , Manifest.permission.ACCESS_FINE_LOCATION
-                , Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+                , Manifest.permission.ACCESS_COARSE_LOCATION
+        ,Manifest.permission.READ_PHONE_STATE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         setTitle("FT-SDK使用Demo");
         FTSdk.get().setGpuRenderer(findViewById(R.id.ll));
         showKotlinActivity = findViewById(R.id.showKotlinActivity);
