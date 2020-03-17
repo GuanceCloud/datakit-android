@@ -143,7 +143,7 @@ public class FTFragmentManager {
     }
 
     /**
-     * 设置 Fragment 的显示状态
+     * 清除 Fragment 栈
      *
      * @param classActivity
      * @return

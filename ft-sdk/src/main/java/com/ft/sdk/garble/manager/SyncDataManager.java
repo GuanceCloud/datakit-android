@@ -52,7 +52,7 @@ public class SyncDataManager {
         StringBuffer sb = new StringBuffer();
         String device = parseHashToString(getDeviceInfo());
         for (RecordData recordData : recordDatas) {
-            if(OP.OPEN_ACT.value.equals(recordData.getOp())){
+            if(OP.OPEN_ACT.value.equals(recordData.getOp()) && !Constants.IGNORE_FLOW_CHART_DATA.equals(recordData.getPpn())){
                 //如果是页面打开操作，就在该条数据上添加一条表示流程图的数据
                 try {
                     JSONObject opData = new JSONObject(recordData.getOpdata());

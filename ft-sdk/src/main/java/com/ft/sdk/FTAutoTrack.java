@@ -58,7 +58,7 @@ public class FTAutoTrack {
         try {
             LogUtils.d("activityFromWay=" + fromFragment + ",,,intent=" + intent);
             if (intent != null && intent.getComponent() != null) {
-                FTActivityManager.get().putActivityStatus(intent.getComponent().getClassName(), fromFragment);
+                FTActivityManager.get().putActivityOpenFromFragment(intent.getComponent().getClassName(), fromFragment);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -383,7 +383,7 @@ public class FTAutoTrack {
      *
      * @param clazz
      */
-    public static void startPage(Class<?> clazz) {
+    public static void startPage(Class<?> clazz,boolean isFirstLoad) {
         /*没有开启自动埋点*/
         if (!FTAutoTrackConfig.get().isAutoTrack()) {
             return;
@@ -404,7 +404,7 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)) {
             return;
         }
-        putRecordActivity(OP.OPEN_ACT, clazz);
+        putRecordActivity(OP.OPEN_ACT, clazz,isFirstLoad);
     }
 
     /**
@@ -433,7 +433,7 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)) {
             return;
         }
-        putRecordActivity(OP.CLS_ACT, clazz);
+        putRecordActivity(OP.CLS_ACT, clazz,false);
     }
 
     /**
@@ -532,21 +532,45 @@ public class FTAutoTrack {
      * @param op
      * @param classCurrent
      */
-    public static void putRecordActivity(@NonNull OP op, Class classCurrent) {
+    public static void putRecordActivity(@NonNull OP op, Class classCurrent,boolean isFirstLoad) {
         long time = System.currentTimeMillis();
         Class parentClass = FTActivityManager.get().getLastActivity();
         String parentPageName = Constants.FLOW_ROOT;
-        if (parentClass != null) {
-            boolean isFromFragment = FTActivityManager.get().getActivityStatus(classCurrent.getName());
-            if (isFromFragment) {
-                Class c = FTFragmentManager.getInstance().getLastFragmentName(parentClass.getName());
-                if (c != null) {
-                    parentPageName = parentClass.getSimpleName() + "." + c.getSimpleName();
+        if(op == OP.OPEN_ACT) {
+            //是第一次加载 Activity ，说明其为从其他Activity 中打开
+            if (isFirstLoad) {
+                //如果没有上一个 Activity 说明其为 根结点
+                if (parentClass != null) {
+                    //判断从 上一个 页面的Activity 还是 Fragment 中打开
+                    boolean isFromFragment = FTActivityManager.get().getActivityOpenFromFragment(classCurrent.getName());
+                    if (isFromFragment) {
+                        //从 Fragment 打开则找到上一个页面的 Fragment
+                        Class c = FTFragmentManager.getInstance().getLastFragmentName(parentClass.getName());
+                        if (c != null) {
+                            parentPageName = parentClass.getSimpleName() + "." + c.getSimpleName();
+                        }
+                    } else {
+                        //从Activity 中打开则找到上一个Activity
+                        parentPageName = parentClass.getSimpleName();
+                    }
                 }
             } else {
-                parentPageName = parentClass.getSimpleName();
+                //如果最后两个为同一个 Activity 说明 Activity 为 页面重启
+                if (FTActivityManager.get().lastTwoActivitySame()) {
+                    parentPageName = classCurrent.getSimpleName();
+                } else {
+                    if (parentClass != null) {
+                        //如果不相等，表示从其他返回过来
+                        boolean isFromFragment = FTActivityManager.get().getActivityOpenFromFragment(parentClass.getName());
+                        if (isFromFragment) {
+                            parentPageName = Constants.IGNORE_FLOW_CHART_DATA;
+                        } else {
+                            //从Activity 中打开则找到上一个Activity
+                            parentPageName = parentClass.getSimpleName();
+                        }
+                    }
+                }
             }
-
         }
         putRecord(time, op, classCurrent.getSimpleName(), classCurrent.getSimpleName(), parentPageName, null);
     }
