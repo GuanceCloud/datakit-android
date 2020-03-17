@@ -2,9 +2,6 @@ package com.ft.sdk.garble.manager;
 
 
 import android.app.Activity;
-
-import androidx.lifecycle.Lifecycle;
-
 import com.ft.sdk.garble.utils.LogUtils;
 
 import java.util.ArrayList;
@@ -17,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Description: Activity 管理类
  */
 public class FTActivityManager {
+    public ConcurrentHashMap<String,Boolean> isFirstResume;
     private static volatile FTActivityManager instance;
     //栈顶 Activity
     private Activity topActivity;
@@ -28,6 +26,7 @@ public class FTActivityManager {
     private FTActivityManager() {
         activityList = new ArrayList<>();
         activityOpenTypeMap = new ConcurrentHashMap<>();
+        isFirstResume = new ConcurrentHashMap<>();
     }
 
     public synchronized static FTActivityManager get() {
@@ -56,7 +55,7 @@ public class FTActivityManager {
     }
 
 
-    public void putActivity(Activity activity, Lifecycle.Event event) {
+    public void putActivity(Activity activity) {
         topActivity = activity;
         if (activityList == null) {
             activityList = new ArrayList<>();
@@ -71,6 +70,10 @@ public class FTActivityManager {
         topActivity = (activityList == null || activityList.size() <= 0) ? null : activityList.get(activityList.size() - 1);
     }
 
+    /**
+     *  得到上一个 Activity
+     * @return
+     */
     public Class getLastActivity() {
         if (activityList != null && activityList.size() > 1) {
             Activity activity = activityList.get(activityList.size() - 2);
@@ -85,12 +88,30 @@ public class FTActivityManager {
     }
 
     /**
+     * 判断最后两个Activity 是否为同一个 Activity
+     * @return
+     */
+    public boolean lastTwoActivitySame() {
+        if (activityList != null && activityList.size() > 1) {
+            Activity activity1 = activityList.get(activityList.size() - 2);
+            Activity activity2 = activityList.get(activityList.size() - 1);
+            if (activity1 != null && activity2 != null) {
+                return activity1.getClass().getName().equals(activity2.getClass().getName());
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * 存储每个 Activity 是由什么方式打开的
      *
      * @param className
      * @param fromFragment
      */
-    public void putActivityStatus(String className, boolean fromFragment) {
+    public void putActivityOpenFromFragment(String className, boolean fromFragment) {
         if (activityOpenTypeMap == null) {
             activityOpenTypeMap = new ConcurrentHashMap<>();
         }
@@ -103,7 +124,7 @@ public class FTActivityManager {
      * @param className
      * @return
      */
-    public boolean getActivityStatus(String className) {
+    public boolean getActivityOpenFromFragment(String className) {
         if (activityOpenTypeMap != null && activityOpenTypeMap.containsKey(className)) {
             return activityOpenTypeMap.get(className);
         }
