@@ -29,13 +29,13 @@ public class FTMonitorConfig {
             //开启网络监听
             NetUtils.get().listenerSignal(FTSdk.get().getApplication());
             //开始获取地理位置
-            LocationUtils.get().getCity();
+            LocationUtils.get().startLocation(FTSdk.get().getApplication());
         }else if(isMonitorType(MonitorType.NETWORK)){
             //开启网络监听
             NetUtils.get().listenerSignal(FTSdk.get().getApplication());
         } else if (isMonitorType(MonitorType.LOCATION)) {
             //获取地理位置
-            LocationUtils.get().getCity();
+            LocationUtils.get().startLocation(FTSdk.get().getApplication());
         }
     }
 
