@@ -548,6 +548,8 @@ public class FTAutoTrack {
                         Class c = FTFragmentManager.getInstance().getLastFragmentName(parentClass.getName());
                         if (c != null) {
                             parentPageName = parentClass.getSimpleName() + "." + c.getSimpleName();
+                        }else{
+                            parentPageName = parentClass.getSimpleName();
                         }
                     } else {
                         //从Activity 中打开则找到上一个Activity
@@ -559,11 +561,17 @@ public class FTAutoTrack {
                 if (FTActivityManager.get().lastTwoActivitySame()) {
                     parentPageName = classCurrent.getSimpleName();
                 } else {
+                    //如果不相等，表示从其他返回过来
                     if (parentClass != null) {
-                        //如果不相等，表示从其他返回过来
                         boolean isFromFragment = FTActivityManager.get().getActivityOpenFromFragment(parentClass.getName());
                         if (isFromFragment) {
-                            parentPageName = Constants.IGNORE_FLOW_CHART_DATA;
+                            //这部分需要创建一条子页面的数据
+                            Class lastFragment = FTFragmentManager.getInstance().getLastFragmentName(classCurrent.getName());
+                            if(lastFragment != null) {
+                                parentPageName = Constants.MOCK_SON_PAGE_DATA+":"+lastFragment.getSimpleName()+":"+parentClass.getSimpleName();
+                            }else{
+                                parentPageName = Constants.MOCK_SON_PAGE_DATA+":"+parentClass.getSimpleName();
+                            }
                         } else {
                             //从Activity 中打开则找到上一个Activity
                             parentPageName = parentClass.getSimpleName();

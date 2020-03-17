@@ -4,7 +4,6 @@ package com.ft.sdk.garble;
 import android.app.Activity;
 
 import com.ft.sdk.FTAutoTrack;
-import com.ft.sdk.garble.manager.FTActivityManager;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 
@@ -93,19 +92,6 @@ public class FTFragmentLifecycleHandler {
         String parent = Constants.FLOW_ROOT;
         if (clazz != null) {
             parent = clazz.getSimpleName();
-        }else{
-            Class lastActivity = FTActivityManager.get().getLastActivity();
-            //如果两个页面相同，表示页面的恢复
-            boolean lastTwoActivitySame = FTActivityManager.get().lastTwoActivitySame();
-            if(lastTwoActivitySame){
-                parent = fragment.getSimpleName();
-            }else {
-                if(FTActivityManager.get().isFirstResume.containsKey(activity.getClass().getName()) && FTActivityManager.get().isFirstResume.get(activity.getClass().getName())) {
-                    if (lastActivity != null && FTActivityManager.get().getActivityOpenFromFragment(lastActivity.getName())) {
-                        parent = Constants.PERFIX + lastActivity.getSimpleName();
-                    }
-                }
-            }
         }
         FTAutoTrack.startPage(fragment, activity, parent);
         fragmentList.add(fragment);
