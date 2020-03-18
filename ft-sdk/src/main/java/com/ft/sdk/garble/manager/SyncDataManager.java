@@ -67,10 +67,25 @@ public class SyncDataManager {
                 }
 
                 sb.append(",$traceId=").append(recordData.getTraceId());
-                sb.append(",$name=").append(recordData.getCpn());
-                //如果父页面是root表示其为起始节点，不添加父节点
-                if(!Constants.FLOW_ROOT.equals(recordData.getPpn())){
-                    sb.append(",$parent=").append(recordData.getPpn());
+                if(recordData.getPpn() != null && recordData.getPpn().startsWith(Constants.MOCK_SON_PAGE_DATA)){
+                    String[] strArr = recordData.getPpn().split(":");
+                    String name = null;
+                    String parent = null;
+                    if(strArr.length == 3){
+                        name = recordData.getCpn()+"."+strArr[1];
+                        parent = strArr[2];
+                    }else if (strArr.length == 2){
+                        name = recordData.getCpn();
+                        parent = strArr[1];
+                    }
+                    sb.append(",$name=").append(name);
+                    sb.append(",$parent=").append(parent);
+                }else {
+                    sb.append(",$name=").append(recordData.getCpn());
+                    //如果父页面是root表示其为起始节点，不添加父节点
+                    if (!Constants.FLOW_ROOT.equals(recordData.getPpn())) {
+                        sb.append(",$parent=").append(recordData.getPpn());
+                    }
                 }
                 sb.append(",").append(device).append(",");
                 addUserData(sb, recordData);
@@ -81,7 +96,7 @@ public class SyncDataManager {
                 sb.append(" ");
                 sb.append(recordData.getTime() * 1000 * 1000);
                 sb.append("\n");
-            } else if(OP.CLS_ACT.value.equals(recordData.getOp())){
+            } /**else if(OP.CLS_ACT.value.equals(recordData.getOp())){
                 //如果是关闭页面，也要附加一条页面关闭的流程图数据
                 try {
                     //获取指标
@@ -104,6 +119,41 @@ public class SyncDataManager {
                 }
                 sb.append(",").append(device).append(",");
                 addUserData(sb, recordData);
+                deleteLastComma(sb);
+                sb.append(" ");
+                sb.append("$duration=").append(recordData.getDuration()).append("i");
+                sb.append(" ");
+                sb.append(recordData.getTime() * 1000 * 1000);
+                sb.append("\n");
+            }*/else if(OP.OPEN_FRA.value.equals(recordData.getOp())){
+                //如果是子页面打开操作，就在该条数据上添加一条表示流程图的数据
+                try {
+                    JSONObject opData = new JSONObject(recordData.getOpdata());
+                    //获取指标名称
+                    if (opData.has(Constants.MEASUREMENT)) {
+                        sb.append("$flow_mobile_activity_").append(opData.optString(Constants.MEASUREMENT));
+                    }else{
+                        sb.append("$flow_mobile_activity_").append(FTFlowChartConfig.get().getFlowProduct());
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                sb.append(",$traceId=").append(recordData.getTraceId());
+                sb.append(",$name=").append(recordData.getRpn()).append(".").append(recordData.getCpn());
+                //如果父页面是root表示其为起始节点，不添加父节点
+                if(!Constants.FLOW_ROOT.equals(recordData.getPpn())){
+                    if(recordData.getPpn().startsWith(Constants.PERFIX)){
+                        sb.append(",$parent=").append(recordData.getPpn().replace(Constants.PERFIX,""));
+                    }else {
+                        sb.append(",$parent=").append(recordData.getRpn()).append(".").append(recordData.getPpn());
+                    }
+                }else{
+                    sb.append(",$parent=").append(recordData.getRpn());
+                }
+                sb.append(",").append(device.replaceAll(" ", "\\\\ ")).append(",");
+                addUserData(sb, recordData);
+                //删除多余的逗号
                 deleteLastComma(sb);
                 sb.append(" ");
                 sb.append("$duration=").append(recordData.getDuration()).append("i");
