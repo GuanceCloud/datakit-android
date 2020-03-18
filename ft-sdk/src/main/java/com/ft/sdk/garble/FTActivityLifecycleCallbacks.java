@@ -30,6 +30,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
 
     @Override
     public void onActivityResumed(@NonNull Activity activity) {
+        LocationUtils.get().startLocation(FTApplication.getApplication());
         boolean isFirstLoad = true;
         if(FTActivityManager.get().isFirstResume.containsKey(activity.getClass().getName()) && FTActivityManager.get().isFirstResume.get(activity.getClass().getName())){
             isFirstLoad = false;
