@@ -324,6 +324,8 @@ public class DeviceUtils {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+            }else{
+                LogUtils.e("没有获得到 READ_PHONE_STATE 权限无法获取运营商信息");
             }
         } catch (Exception e) {
             e.printStackTrace();
