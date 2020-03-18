@@ -10,10 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.ft.sdk.FTAutoTrack;
-import com.ft.sdk.garble.utils.LogUtils;
-
-
 public class Tab1Fragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
