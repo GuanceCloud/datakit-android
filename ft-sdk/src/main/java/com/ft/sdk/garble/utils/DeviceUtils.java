@@ -118,19 +118,6 @@ public class DeviceUtils {
     }
 
     /**
-     * 设置 SDK uuid
-     * @param uuid
-     */
-    public static void setSDKUUid(String uuid){
-        final SharedPreferences preferences = getSharedPreferences(FTApplication.getApplication());
-        if(preferences != null) {
-            final SharedPreferences.Editor editor = preferences.edit();
-            editor.putString(Constants.FT_SDK_INIT_UUID, uuid);
-            editor.apply();
-        }
-    }
-
-    /**
      * 获取应用ID
      *
      * @return

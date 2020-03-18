@@ -84,7 +84,6 @@ public class MainActivity extends AppCompatActivity {
         btn_lam.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this,Main4Activity.class));
             }
         });
         checkbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
