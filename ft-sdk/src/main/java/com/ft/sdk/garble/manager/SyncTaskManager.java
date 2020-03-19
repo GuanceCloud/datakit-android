@@ -6,6 +6,7 @@ import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.http.FTResponseData;
 import com.ft.sdk.garble.http.HttpBuilder;
+import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
@@ -112,8 +113,8 @@ public class SyncTaskManager {
         SyncDataManager syncDataManager = new SyncDataManager();
         String body = syncDataManager.getBodyContent(requestDatas);
         SyncDataManager.printUpdateData(body);
-        requestNet(body, isSuccess -> {
-            if (isSuccess) {
+        requestNet(body, (code,response) -> {
+            if (code == HttpURLConnection.HTTP_OK) {
                 LogUtils.d("同步数据成功");
                 deleteLastQuery(requestDatas);
                 errorCount.set(0);
@@ -143,9 +144,9 @@ public class SyncTaskManager {
                 .setBodyString(body).executeSync(FTResponseData.class);
 
         try {
-            syncCallback.isSuccess(result.getCode() == HttpURLConnection.HTTP_OK);
+            syncCallback.onResponse(result.getCode(),result.getMessage());
         } catch (Exception e) {
-            syncCallback.isSuccess(false);
+            syncCallback.onResponse(NetCodeStatus.UNKNOWN_EXCEPTION_CODE,"");
             LogUtils.e("请在混淆文件中添加 -keep class * extends com.ft.sdk.garble.http.ResponseData{\n" +
                     "     *;\n" +
                     "}");

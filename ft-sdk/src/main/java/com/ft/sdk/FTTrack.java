@@ -5,9 +5,10 @@ import com.ft.sdk.garble.SyncCallback;
 import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.bean.TrackBean;
-import com.ft.sdk.garble.http.FTResponseData;
 import com.ft.sdk.garble.http.HttpBuilder;
+import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.http.RequestMethod;
+import com.ft.sdk.garble.http.ResponseData;
 import com.ft.sdk.garble.manager.FTManager;
 import com.ft.sdk.garble.manager.SyncDataManager;
 import com.ft.sdk.garble.utils.Constants;
@@ -19,7 +20,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.HttpURLConnection;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,9 +51,9 @@ public class FTTrack {
     /**
      * 主动埋点
      *
-     * @param measurement  埋点事件名称
-     * @param tags   埋点数据
-     * @param fields 埋点数据
+     * @param measurement 埋点事件名称
+     * @param tags        埋点数据
+     * @param fields      埋点数据
      */
     public void trackBackground(String measurement, JSONObject tags, JSONObject fields) {
         long time = System.currentTimeMillis();
@@ -63,39 +63,39 @@ public class FTTrack {
     /**
      * 主动埋点一条数据，异步上传用户埋点数据并返回上传结果
      *
-     * @param measurement  埋点事件名称
-     * @param tags   埋点数据
-     * @param fields 埋点数据
-     * @param callback 上传结果回调
+     * @param measurement 埋点事件名称
+     * @param tags        埋点数据
+     * @param fields      埋点数据
+     * @param callback    上传结果回调
      */
-    public void trackImmediate(String measurement, JSONObject tags, JSONObject fields,SyncCallback callback) {
+    public void trackImmediate(String measurement, JSONObject tags, JSONObject fields, SyncCallback callback) {
         long time = System.currentTimeMillis();
-        TrackBean trackBean = new TrackBean(measurement,tags,fields,time);
-        track(Collections.singletonList(trackBean),callback);
+        TrackBean trackBean = new TrackBean(measurement, tags, fields, time);
+        track(Collections.singletonList(trackBean), callback);
     }
 
     /**
      * 主动埋点多条数据，异步上传用户埋点数据并返回上传结果
      *
-     * @param trackBeans  多条埋点数据
-     * @param callback 上传结果回调
+     * @param trackBeans 多条埋点数据
+     * @param callback   上传结果回调
      */
     public void trackImmediate(List<TrackBean> trackBeans, SyncCallback callback) {
-        track(trackBeans,callback);
+        track(trackBeans, callback);
     }
 
     /**
      * 流程图数据上报
      *
-     * @param product 指标集，流程图以该值进行分类
-     * @param traceId 标示一个流程图的全程唯一ID
-     * @param name 流程节点名称
-     * @param parent 流程图当前流程节点的上一个流程节点名称，如果是第一个节点，该值应填null
+     * @param product  指标集，流程图以该值进行分类
+     * @param traceId  标示一个流程图的全程唯一ID
+     * @param name     流程节点名称
+     * @param parent   流程图当前流程节点的上一个流程节点名称，如果是第一个节点，该值应填null
      * @param duration 流程图在该节点所耗费或持续时间，单位为毫秒
-     * @param tags 其他标签值（该值中不能含 traceId，name，parent 字段）
-     * @param fields 其他指标（该值中不能含 duration 字段）
+     * @param tags     其他标签值（该值中不能含 traceId，name，parent 字段）
+     * @param fields   其他指标（该值中不能含 duration 字段）
      */
-    public void trackFlowChart(String product, String traceId, String name, String parent, long duration,JSONObject tags,JSONObject fields) {
+    public void trackFlowChart(String product, String traceId, String name, String parent, long duration, JSONObject tags, JSONObject fields) {
         if (Utils.isNullOrEmpty(product)) {
             throw new InvalidParameterException("参数 product 不能为空");
         }
@@ -113,22 +113,22 @@ public class FTTrack {
         }
 
         long time = System.currentTimeMillis();
-        if(tags == null) {
+        if (tags == null) {
             tags = new JSONObject();
         }
-        if(fields == null) {
+        if (fields == null) {
             fields = new JSONObject();
         }
         Iterator<String> iteTag = tags.keys();
-        while (iteTag.hasNext()){
-            if(iteTag.next().contains("$")){
+        while (iteTag.hasNext()) {
+            if (iteTag.next().contains("$")) {
                 throw new InvalidParameterException("参数 tags 中不能使用保留字段符号 $");
             }
         }
 
         Iterator<String> iteValue = fields.keys();
-        while (iteValue.hasNext()){
-            if(iteValue.next().contains("$")){
+        while (iteValue.hasNext()) {
+            if (iteValue.next().contains("$")) {
                 throw new InvalidParameterException("参数 values 中不能使用保留字段符号 $");
             }
         }
@@ -162,6 +162,7 @@ public class FTTrack {
 
     /**
      * 将埋点数据存入本地后通知同步
+     *
      * @param op
      * @param time
      * @param measurement
@@ -175,8 +176,8 @@ public class FTTrack {
             }
             ThreadPoolUtils.get().execute(() -> {
                 try {
-                    RecordData recordData = transTrackBeanToRecordData(op,time,measurement,tags,fields);
-                    if(recordData == null){
+                    RecordData recordData = transTrackBeanToRecordData(op, time, measurement, tags, fields, null);
+                    if (recordData == null) {
                         return;
                     }
                     LogUtils.d("FTTrack数据进数据库：" + recordData.getJsonString());
@@ -192,28 +193,32 @@ public class FTTrack {
 
     /**
      * 直接将埋点数据同步
+     *
      * @param trackBeans
      * @param callback
      */
     private void track(List<TrackBean> trackBeans, SyncCallback callback) {
         try {
-            if(trackBeans == null){
+            if (trackBeans == null) {
                 return;
             }
 
             ThreadPoolUtils.get().execute(() -> {
                 try {
                     List<RecordData> recordDataList = new ArrayList<>();
-                    for (TrackBean t:trackBeans) {
+                    for (TrackBean t : trackBeans) {
                         if (!isLegalValues(t.getFields())) {
+                            if (callback != null) {
+                                callback.onResponse(NetCodeStatus.INVALID_PARAMS_EXCEPTION_CODE, "参数 fields 不能为空");
+                            }
                             continue;
                         }
-                        RecordData recordData = transTrackBeanToRecordData(OP.CSTM,t.getTimeMillis(),t.getMeasurement(),t.getTags(),t.getFields());
-                        if(recordData != null) {
+                        RecordData recordData = transTrackBeanToRecordData(OP.CSTM, t.getTimeMillis(), t.getMeasurement(), t.getTags(), t.getFields(), callback);
+                        if (recordData != null) {
                             recordDataList.add(recordData);
                         }
                     }
-                    updateRecordData(recordDataList,callback);
+                    updateRecordData(recordDataList, callback);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -225,14 +230,16 @@ public class FTTrack {
 
     /**
      * 将用户埋点的数据转换成RecordData
+     *
      * @param op
      * @param time
      * @param measurement
      * @param tags
      * @param fields
+     * @param callback
      * @return
      */
-    private RecordData transTrackBeanToRecordData(OP op, long time, String measurement, final JSONObject tags, JSONObject fields){
+    private RecordData transTrackBeanToRecordData(OP op, long time, String measurement, final JSONObject tags, JSONObject fields, SyncCallback callback) {
         JSONObject tagsTemp = tags;
         RecordData recordData = new RecordData();
         try {
@@ -242,8 +249,11 @@ public class FTTrack {
 
             if (measurement != null) {
                 opData.put(Constants.MEASUREMENT, measurement);
-            }else {
+            } else {
                 LogUtils.e("指标集 measurement 不能为空");
+                if (callback != null) {
+                    callback.onResponse(NetCodeStatus.INVALID_PARAMS_EXCEPTION_CODE, "指标集 measurement 不能为空");
+                }
                 return null;
             }
             if (tagsTemp == null) {
@@ -253,8 +263,11 @@ public class FTTrack {
             opData.put("tags", tagsTemp);
             if (fields != null) {
                 opData.put(Constants.FIELDS, fields);
-            }else {
+            } else {
                 LogUtils.e("指标 fields 不能为空");
+                if (callback != null) {
+                    callback.onResponse(NetCodeStatus.INVALID_PARAMS_EXCEPTION_CODE, "指标集 measurement 不能为空");
+                }
                 return null;
             }
             recordData.setOpdata(opData.toString());
@@ -270,22 +283,21 @@ public class FTTrack {
 
     /**
      * 异步上传用户埋点信息，并返回上传结果
+     *
      * @param recordDataList
      * @param callback
      */
-    private void updateRecordData(List<RecordData> recordDataList,SyncCallback callback){
+    private void updateRecordData(List<RecordData> recordDataList, SyncCallback callback) {
+        if (recordDataList == null || recordDataList.isEmpty()) {
+            return;
+        }
         SyncDataManager syncDataManager = new SyncDataManager();
         String body = syncDataManager.getBodyContent(recordDataList);
         SyncDataManager.printUpdateData(body);
-        FTResponseData result = HttpBuilder.Builder()
+        ResponseData result = HttpBuilder.Builder()
                 .setMethod(RequestMethod.POST)
-                .setBodyString(body).executeSync(FTResponseData.class);
-
-        try {
-            callback.isSuccess(result.getCode() == HttpURLConnection.HTTP_OK);
-        } catch (Exception e) {
-            callback.isSuccess(false);
-        }
+                .setBodyString(body).executeSync(ResponseData.class);
+        callback.onResponse(result.getHttpCode(), result.getData());
     }
 
     /**
