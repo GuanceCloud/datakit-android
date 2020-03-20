@@ -114,6 +114,11 @@ public class BaseWeaver implements IWeaver{
         return classWriter;
     }
 
+    /**
+     * 需要插桩的类
+     * @param fullQualifiedClassName
+     * @return
+     */
     @Override
     public boolean isWeavableClass(String fullQualifiedClassName){
         return fullQualifiedClassName.endsWith(".class") && !ClassNameAnalytics.isAndroidGenerated(fullQualifiedClassName);
