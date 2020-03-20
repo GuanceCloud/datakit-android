@@ -29,6 +29,8 @@ import java.security.InvalidParameterException;
  * Description:
  */
 public class FTSdk {
+    //该变量不能改动，其值由 Plugin 动态改写
+    public static String PLUGIN_VERSION = "";
     private static FTSdk mFtSdk;
     private FTSDKConfig mFtSDKConfig;
     private FTSdk(@NonNull FTSDKConfig ftSDKConfig){
