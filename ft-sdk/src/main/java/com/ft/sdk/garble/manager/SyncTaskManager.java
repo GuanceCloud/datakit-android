@@ -39,6 +39,11 @@ public class SyncTaskManager {
         this.running = running;
     }
 
+
+    public void shotDown(){
+        ThreadPoolUtils.get().shutDown();
+    }
+
     private SyncTaskManager() {
 
     }
@@ -58,9 +63,6 @@ public class SyncTaskManager {
             return;
         }
         running = true;
-        if (!ThreadPoolUtils.get().poolRunning()) {
-            ThreadPoolUtils.get().reStartPool();
-        }
         errorCount.set(0);
         ThreadPoolUtils.get().execute(() -> {
             waitUserBind();

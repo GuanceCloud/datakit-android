@@ -14,6 +14,7 @@ import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.FTNetworkListener;
 import com.ft.sdk.garble.FTUserConfig;
+import com.ft.sdk.garble.manager.SyncTaskManager;
 import com.ft.sdk.garble.utils.GpuUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.RendererUtil;
@@ -74,6 +75,12 @@ public class FTSdk {
         return FTApplication.getApplication();
     }
 
+    /**
+     * 关闭 SDK 正在做的操作
+     */
+    public void shutDown(){
+        SyncTaskManager.get().shotDown();
+    }
     /**
      * 注销用户信息
      */

@@ -47,6 +47,9 @@ public class ThreadPoolUtils {
 
 
     public void execute(Runnable runnable) {
+        if(!poolRunning()){
+            reStartPool();
+        }
         if(executor != null) {
             executor.execute(runnable);
         }

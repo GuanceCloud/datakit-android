@@ -5,6 +5,7 @@ import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTrack;
 import com.ft.sdk.garble.SyncCallback;
 
@@ -20,6 +21,7 @@ public class Main2Activity extends AppCompatActivity {
         setContentView(R.layout.activity_main2);
 
         findViewById(R.id.jump).setOnClickListener(v -> {
+            FTSdk.get().shutDown();
             trackImmediate();
         });
         findViewById(R.id.jump2).setOnClickListener(v -> {trackImmediateErr();});
