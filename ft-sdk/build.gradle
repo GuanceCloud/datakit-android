@@ -2,7 +2,8 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 
 
-def versionNameStr="1.0.1-alpha08"
+def versionNameStr="1.0.1-alpha09"
+def min_plugin_version ="1.0.1-alpha05"
 
 android {
     compileSdkVersion 29
@@ -11,7 +12,7 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 25
+        versionCode 26
         versionName versionNameStr
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -21,6 +22,13 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField("String", "FT_SDK_VERSION", "\"${versionNameStr}\"")
+            buildConfigField("String", "MIN_FT_PLUGIN_VERSION", "\"${min_plugin_version}\"")
+        }
+
+        debug {
+            buildConfigField("String", "FT_SDK_VERSION", "\"${versionNameStr}\"")
+            buildConfigField("String", "MIN_FT_PLUGIN_VERSION", "\"${min_plugin_version}\"")
         }
     }
     compileOptions {
