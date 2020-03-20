@@ -533,7 +533,8 @@ public class SyncDataManager {
         objectHashMap.put("device_uuid", DeviceUtils.getUuid(context));
         objectHashMap.put("application_identifier", DeviceUtils.getApplicationId(context));
         objectHashMap.put("application_name", DeviceUtils.getAppName(context));
-        objectHashMap.put("sdk_version", DeviceUtils.getSDKVersion());
+        objectHashMap.put("agent", DeviceUtils.getSDKVersion());
+        objectHashMap.put("autoTrack", FTSdk.PLUGIN_VERSION);
         objectHashMap.put("imei", DeviceUtils.getImei(context));
         objectHashMap.put("os", DeviceUtils.getOSName());
         objectHashMap.put("os_version", DeviceUtils.getOSVersion());

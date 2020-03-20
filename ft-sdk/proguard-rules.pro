@@ -30,10 +30,10 @@
 -keepattributes SourceFile,LineNumberTable
 
 -keep class com.ft.sdk.FTSdk{
-   public *;
+  *;
 }
 -keep class com.ft.sdk.FTSDKConfig{
-   public *;
+  *;
 }
 -keep class com.ft.sdk.FTTrack{
    public *;
