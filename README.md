@@ -91,6 +91,9 @@ android{
 -keep enum com.ft.sdk.FTAutoTrackType{
      *;
 }
+-keep enum com.ft.sdk.FTSdk{
+     *;
+}
 ```
 
 ### 二、关于 FT SDK 初始化的参数、方法等配置项的说明
@@ -106,7 +109,7 @@ setXDataKitUUID|设置数据采集端的名称|否|不设置该值系统会生�
 setDebug|是否开启调试模式|否|默认不开启，开启后方可打印 SDK 运行日志
 setMonitorType|设置监控项|否|默认不开启任何监控项,<br>[关于监控项说明](#四监控配置项类-monitortype),<br>[关于监控项参数获取问题]()
 setNeedBindUser|是否开启绑定用户数据|否|默认不开启,<br>开启后必须要绑定用户数据[如何绑定用户数据](#一初始化类-ftsdk-提供的方法)
-setOpenFlowChart|是否开启自动埋点流程图数据上报|否|开启且开启了自动埋点，将根据 Activity 的 onResume 和 onPause 来上报流程
+setOpenFlowChart|是否开启自动埋点流程图数据上报|否|[详细说明](#3关于自动埋点的页面路径流程图的说明)
 setFlowProduct|设置流程的指标集|否|当开启了上报流程图一定要设置该值
 enableAutoTrack|是否使用自动埋点|否|""
 setEnableAutoTrackType|设置事件白名单|否|开启自动埋点后，不设置该值表示接受所有事件类型。埋点事件类型见表下说明
@@ -119,8 +122,8 @@ builder|构建配置项对象方法|是|关于其参数可见下方参数表
 
     FTAutoTrackType 自动埋点事件说明：
     事件总类目前支持3种
-    FTAutoTrackType.APP_START：页面的开始事件，Activity 依赖的是其 onResume 方法，Fragment 依赖的是其 onCreate 方法；
-    FTAutoTrackType.APP_END：页面的结束事件，Activity 依赖的是其 onPause 方法，Fragment 依赖的是其 onDestroy 方法；
+    FTAutoTrackType.APP_START：页面的开始事件，Activity 依赖的是其 onResume 方法，Fragment 依赖的是其 onResume 方法；
+    FTAutoTrackType.APP_END：页面的结束事件，Activity 依赖的是其 onPause 方法，Fragment 依赖的是其 onPause 方法；
     FTAutoTrackType.APP_CLICK：控件的点击事件。
 
 FTSDKConfig.builder(...) 方法必要参数说明表
@@ -142,6 +145,7 @@ install|安装初始化配置项|是|在项目 application 中运行
 get|获得安装后创建的 FTSdk 对象|否|应该在 install 运行后调用
 unbindUserData|解绑用户信息|否|必须在 setNeedBindUser 方法设为 true 后才有效果
 bindUserData|绑定用户信息|否|必须在 setNeedBindUser 方法设为 true 后才有效果
+shutDown|关闭SDK中正在执行的操作|否|""
 setGpuRenderer|设置 GPU 信息获取依赖的视图|否|当监控项 setMonitorType 设置监控 GPU 后一定调用该方法
 
 #### 3、示例代码
@@ -264,6 +268,14 @@ ACCESS_FINE_LOCATION|获取当前位置所属城市
  * @param root
  */
 public void setGpuRenderer(ViewGroup root)
+```
+
+方法 6
+```java
+/**
+ * 关闭 SDK 正在做的操作
+ */
+public void shutDown()
 ```
 
 ### 二、配置类 FTSDKConfig 提供的方法
@@ -487,6 +499,12 @@ public FTSDKConfig setBlackViewClasses(List<Class<?>> classes)
  public void trackFlowChart(String product, String traceId, String name, String parent, long duration,JSONObject tags,JSONObject values)
 ```
 
+#### 关于主动埋点 trackImmediate 的结果回调 SyncCallback 的说明
+
+回调方法 onResponse(int code,String response) 中 code 表示网络请求返回的返回码，response 为服务端返回的信息。
+code 的值除了 HTTP 协议中规定的返回码，FT SDK 中额外规定了 4 种类型的错误码，他们是 101，102，103，104，他们分别
+代表的意思是网络问题、参数问题、IO异常和未知错误
+
 ### 四、监控配置项类 MonitorType
 
 ``` java
@@ -584,3 +602,15 @@ GPU 中的频率和使用率的值通过读取设备中配置文件获取，有�
 
 CPU 温度有些设备可能获取不到（每种手机可能 CPU 温度文件存储位置不同），如果你有这样的问题欢迎在 Issue
 中提出这问题，并把你的机型贴出来，以便我们完善 CPU 温度文件配置。
+
+### 3.关于自动埋点的页面路径流程图的说明
+当集成者通过 setOpenFlowChart 方法开启了页面路径流程图统计并设置了流程图的指标集后，我们将会通过无埋点技术
+将用户的使用页面路径上报并将其用流程图的形式显示。其中对于 Activity 我们监听的是 onResume 和 onPause 方法
+，对于 Fragment 我们监听的是 onResume 和 onPause。其中需要注意的是 Fragment 显示的方式有多种，我们
+统计如下。
+1、通过 add 和 replace 方法添加和替换 Fragment
+2、通过 hidden 和 show 方法显示和隐藏 Fragment
+3、通过 ViewPager 来控制 Fragment。
+由于这 3 种管理 Fragment 的方式，会使 Fragment 经历不同的生命周期，因此为了避免出现 Fragment 页面打开的路径
+流程图有问题，我们建议集成者使用 1 和 3 两种方式来管理 Fragment
+
