@@ -22,9 +22,15 @@ package com.ft.plugin.garble;
  */
 public class ClassNameAnalytics {
     public static final String FT_SDK_PACKAGE = "com.ft.sdk";
+    public static final String FT_SDK = "com.ft.sdk.FTSdk";
+
 
     public static boolean isFTSDKFile(String className){
-        return className.startsWith(FT_SDK_PACKAGE);
+        return className.startsWith(FT_SDK_PACKAGE) && !className.equals(FT_SDK+".class");
+    }
+
+    public static boolean isFTSdkApi(String className){
+        return className.equals(FT_SDK);
     }
     
     public static boolean isAndroidGenerated(String className){

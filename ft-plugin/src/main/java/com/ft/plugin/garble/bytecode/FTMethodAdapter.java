@@ -16,6 +16,7 @@
  */
 package com.ft.plugin.garble.bytecode;
 
+import com.ft.plugin.garble.ClassNameAnalytics;
 import com.ft.plugin.garble.FTHookConfig;
 import com.ft.plugin.garble.FTMethodCell;
 import com.ft.plugin.garble.FTMethodType;
@@ -23,6 +24,7 @@ import com.ft.plugin.garble.FTSubMethodCell;
 import com.ft.plugin.garble.FTTransformHelper;
 import com.ft.plugin.garble.FTUtil;
 import com.ft.plugin.garble.Logger;
+import com.ft.plugin.garble.VersionConfig;
 
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.MethodVisitor;
@@ -130,6 +132,15 @@ public class FTMethodAdapter extends AdviceAdapter {
             return;
         }
 
+        if(ClassNameAnalytics.isFTSdkApi(className.replaceAll("/","."))){
+            if(nameDesc.equals("install(Lcom/ft/sdk/FTSDKConfig;)V")){
+                mv.visitLdcInsn(VersionConfig.PLUGIN_VERSION);
+                mv.visitFieldInsn(PUTSTATIC, "com/ft/sdk/FTSdk", "PLUGIN_VERSION", "Ljava/lang/String;");
+                isHasTracked = true;
+                return;
+            }
+        }
+
         /**
          * androidx/fragment/app/Fragment，androidx/fragment/app/ListFragment，androidx/fragment/app/DialogFragment
          */
@@ -233,7 +244,7 @@ public class FTMethodAdapter extends AdviceAdapter {
          */
         if(interfaces != null && interfaces.length >0){
             for(String inter :interfaces) {
-                Logger.info("============CLICK_METHODS_SYSTEM=="+inter+nameDesc);
+                //Logger.info("============CLICK_METHODS_SYSTEM=="+inter+nameDesc);
                 FTMethodCell ftMethodCell = FTHookConfig.CLICK_METHODS_SYSTEM.get(inter+nameDesc);
                 if(ftMethodCell != null) {
                     Type[] types = Type.getArgumentTypes(ftMethodCell.desc);
