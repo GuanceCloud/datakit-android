@@ -17,11 +17,12 @@
 package com.ft.plugin.garble.bytecode;
 
 import com.ft.plugin.garble.FTTransformHelper;
-import com.ft.plugin.garble.FTUtil;
-import com.ft.plugin.garble.Logger;
 
 import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
+
+import static com.ft.plugin.garble.FTUtil.ASM_VERSION;
 
 /**
  * 本类借鉴修改了来自 Sensors Data 的项目 https://github.com/sensorsdata/sa-sdk-android-plugin2
@@ -32,9 +33,10 @@ public class FTClassAdapter extends ClassVisitor {
     private String superName;
     private String[] interfaces;
     private FTTransformHelper ftTransformHelper;
+    private boolean needChangeField;
 
     FTClassAdapter(final ClassVisitor cv, FTTransformHelper ftTransformHelper) {
-        super(FTUtil.ASM_VERSION, cv);
+        super(ASM_VERSION, cv);
         this.ftTransformHelper = ftTransformHelper;
         //Logger.info(">>>> goon scan class ");
     }
@@ -45,14 +47,12 @@ public class FTClassAdapter extends ClassVisitor {
         this.className = name;
         this.superName = superName;
         this.interfaces = interfaces;
-        Logger.info(">>>> start scan class ----> " + className + ", superName=" + superName);
+        //Logger.info(">>>> start scan class ----> " + className + ", superName=" + superName);
     }
 
     @Override
-    public void visitEnd() {
-        super.visitEnd();
-
-        //Logger.info(">>>> end scan class：" + className + "<<<<");
+    public FieldVisitor visitField(int access, String name, String desc, String signature, Object value) {
+        return super.visitField(access, name, desc, signature, value);
     }
 
     @Override
