@@ -13,4 +13,10 @@ public class Constants {
     public static final String FT_DEFAULT_MEASUREMENT = "mobile_tracker";
     public static final String USER_AGENT= "ft_mobile_sdk_android";
     public static final String UNKNOWN = "N/A";
+    public static final String FLOW_ROOT = "root";
+    public static final String MEASUREMENT= "measurement";
+    public static final String FIELDS= "fields";
+    public static final String PERFIX = "ft_parent_not_fragment";
+    public static final String MOCK_SON_PAGE_DATA = "mock_son_page_data";
+
 }

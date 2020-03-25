@@ -6,17 +6,6 @@ package com.ft.sdk.garble.http;
  * Description:
  */
 public class NetCodeStatus {
-    public static final int NET_UNKNOWN_ERR = 0;
-    /**
-     * 网络未连接
-     */
-    public static final int NET_STATUS_UNCONNECT = 1;
-
-    /**
-     * 网络未链接错误
-     */
-    public static final String NET_STATUS_UNCONNECT_ERR = "net.connect.not.code";
-
     /**
      * 网络返回数据不是json
      */
@@ -27,10 +16,25 @@ public class NetCodeStatus {
      */
     public static final String NET_STATUS_RESPONSE_NOT_JSON_ERR = "net.response.not.json";
 
+
     /**
-     * 没有和主机建立连接
+     * 网络问题
      */
-    public static final int NET_STATUS_NOT_CONNECT_HOST = 3;
-    public static final String NET_STATUS_NOT_CONNECT_HOST_ERR = "net.connect.not.host";
+    public static final int NETWORK_EXCEPTION_CODE = 101;
+
+    /**
+     * 参数问题
+     */
+    public static final int INVALID_PARAMS_EXCEPTION_CODE = 102;
+
+    /**
+     * 文件 IO 问题
+     */
+    public static final int FILE_IO_EXCEPTION_CODE = 103;
+
+    /**
+     * 未知问题
+     */
+    public static final int UNKNOWN_EXCEPTION_CODE = 104;
 
 }

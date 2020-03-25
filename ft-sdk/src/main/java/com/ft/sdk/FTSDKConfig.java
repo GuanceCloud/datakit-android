@@ -1,5 +1,7 @@
 package com.ft.sdk;
 
+import com.ft.sdk.garble.utils.DeviceUtils;
+
 import java.security.InvalidParameterException;
 import java.util.List;
 
@@ -165,6 +167,26 @@ public class FTSDKConfig {
      */
     public FTSDKConfig setUseOAID(boolean useOAID) {
         this.useOAID = useOAID;
+        return this;
+    }
+
+    /**
+     * 设置数据采集端的名称
+     * @param uuid
+     * @return
+     */
+    public FTSDKConfig setXDataKitUUID(String uuid){
+        DeviceUtils.setSDKUUid(uuid);
+        return this;
+    }
+
+    /**
+     * 设置数据采集端的名称
+     * @param uuid
+     * @return
+     */
+    public FTSDKConfig setXDataKitUUID(String uuid){
+        DeviceUtils.setSDKUUid(uuid);
         return this;
     }
 

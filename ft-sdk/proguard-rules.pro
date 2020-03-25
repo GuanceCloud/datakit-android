@@ -30,10 +30,10 @@
 -keepattributes SourceFile,LineNumberTable
 
 -keep class com.ft.sdk.FTSdk{
-   public *;
+  *;
 }
 -keep class com.ft.sdk.FTSDKConfig{
-   public *;
+  *;
 }
 -keep class com.ft.sdk.FTTrack{
    public *;
@@ -56,6 +56,10 @@
 }
 
 -keep class com.ft.sdk.garble.SyncCallback{
+    *;
+}
+
+-keep class com.ft.sdk.garble.bean.TrackBean{
     *;
 }
 

@@ -14,6 +14,7 @@ import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.FTNetworkListener;
 import com.ft.sdk.garble.FTUserConfig;
+import com.ft.sdk.garble.manager.SyncTaskManager;
 import com.ft.sdk.garble.utils.GpuUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.RendererUtil;
@@ -29,12 +30,15 @@ import java.security.InvalidParameterException;
  * Description:
  */
 public class FTSdk {
+    //该变量不能改动，其值由 Plugin 动态改写
+    public static String PLUGIN_VERSION = "";
+    //下面两个变量也不能随便改动，改动请同时更改 plugin 中对应的值
+    public static final String AGENT_VERSION = BuildConfig.FT_SDK_VERSION;//当前SDK 版本
+    public static final String PLUGIN_MIN_VERSION  = BuildConfig.MIN_FT_PLUGIN_VERSION; //当前 SDK 支持的最小 Plugin 版本
     private static FTSdk mFtSdk;
     private FTSDKConfig mFtSDKConfig;
-    private Application mApplication;
-    private FTSdk(@NonNull FTSDKConfig ftSDKConfig,@NonNull Application application){
+    private FTSdk(@NonNull FTSDKConfig ftSDKConfig){
         this.mFtSDKConfig = ftSDKConfig;
-        this.mApplication = application;
     }
 
     /**
@@ -42,14 +46,12 @@ public class FTSdk {
      * @param ftSDKConfig
      * @return
      */
-    public static synchronized void install(@NonNull FTSDKConfig ftSDKConfig,@NonNull Application application){
+    public static synchronized void install(@NonNull FTSDKConfig ftSDKConfig){
         if (ftSDKConfig == null){
             throw new InvalidParameterException("ftSDKConfig 参数不能为 null");
         }
-        if (application == null) {
-            throw new InvalidParameterException("Application 参数不能为 null");
-        }
-        mFtSdk = new FTSdk(ftSDKConfig,application);
+
+        mFtSdk = new FTSdk(ftSDKConfig);
         mFtSdk.initFTConfig();
         mFtSdk.registerActivityLifeCallback();
     }
@@ -70,9 +72,15 @@ public class FTSdk {
      * @return
      */
     public Application getApplication(){
-        return mApplication;
+        return FTApplication.getApplication();
     }
 
+    /**
+     * 关闭 SDK 正在做的操作
+     */
+    public void shutDown(){
+        SyncTaskManager.get().shotDown();
+    }
     /**
      * 注销用户信息
      */
@@ -117,10 +125,10 @@ public class FTSdk {
      * @param root
      */
     public void setGpuRenderer(ViewGroup root){
-        LogUtils.d("绑定视图监听 GPU 信息");
         try {
             if (FTMonitorConfig.get().isMonitorType(MonitorType.GPU)) {
-                Context context = mApplication;
+                LogUtils.d("绑定视图监听 GPU 信息");
+                Context context = getApplication();
                 final RendererUtil mRendererUtil = new RendererUtil();
                 GLSurfaceView mGLSurfaceView = new GLSurfaceView(context);
                 ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(1, 1);
@@ -173,7 +181,7 @@ public class FTSdk {
      */
     private void registerActivityLifeCallback(){
         FTActivityLifecycleCallbacks life = new FTActivityLifecycleCallbacks();
-        mApplication.registerActivityLifecycleCallbacks(life);
+        getApplication().registerActivityLifecycleCallbacks(life);
     }
 
     private void trackStartApp(){
