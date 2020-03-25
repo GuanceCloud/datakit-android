@@ -25,45 +25,65 @@ import static com.ft.sdk.garble.http.NetCodeStatus.UNKNOWN_EXCEPTION_CODE;
  * Description:
  */
 public abstract class HttpClient {
-    protected final int SEND_OUT_TIME = 10 * 1000;
-    protected final int READ_OUT_TIME = 10 * 1000;
-    protected final String CHARSET = "UTF-8";
-    protected final String CONTENT_TYPE = "text/plain";
-    protected HttpBuilder mHttpBuilder;
-    protected HttpURLConnection mConnection;
-    protected boolean connSuccess = false;
-    protected FTHttpConfig ftHttpConfig = FTHttpConfig.get();
+    //字符编码
+    final String CHARSET = "UTF-8";
+    //内容类型
+    final String CONTENT_TYPE = "text/plain";
+    //参数包装类
+    HttpBuilder mHttpBuilder;
+    //网络连接
+    HttpURLConnection mConnection;
+    //连接状态（true - 成功，false - 失败）
+    boolean connSuccess = false;
+    //SDK 中网络的配置
+    FTHttpConfig ftHttpConfig = FTHttpConfig.get();
+    //网络请求的回复码
     private int responseCode = NetCodeStatus.UNKNOWN_EXCEPTION_CODE;
 
-
+    /**
+     * 请求参数中的 body 部分
+     * @return
+     */
     protected abstract String getBodyContent();
 
     public HttpClient(HttpBuilder httpBuilder) {
         this.mHttpBuilder = httpBuilder;
+        //打开连接
         if (openConnection()) {
+            //连接打开后设置公共参数
             setCommonParams();
         }
     }
 
-    protected boolean openConnection() {
+    /**
+     * 打开连接
+     * @return
+     */
+    private boolean openConnection() {
         try {
+            //默认使用 SDK 中配置的全局 URL
             String urlStr = ftHttpConfig.metricsUrl;
             if (mHttpBuilder.getUrl() != null) {
+                //用当前请求的 URL
                 urlStr = mHttpBuilder.getUrl();
             }
             String model = mHttpBuilder.getModel();
             if (model != null && !model.isEmpty()) {
+                //在 url 后添加请求的某个模块
                 urlStr = urlStr + "/" + model;
             }
             if(Utils.isNullOrEmpty(urlStr)){
+                //请求地址为空是提示错误
                 connSuccess = false;
                 responseCode = HttpURLConnection.HTTP_NOT_FOUND;
                 LogUtils.e("请求地址不能为空");
                 return false;
             }
             final URL url = new URL(urlStr + getQueryString());
+            //打开连接
             mConnection = (HttpURLConnection) url.openConnection();
             if (mConnection == null) {
+                //连接打开失败提示
                 responseCode = NetCodeStatus.NETWORK_EXCEPTION_CODE;
                 LogUtils.e(String.format("connect %s feature", url.toString()));
             } else {
@@ -75,6 +95,10 @@ public abstract class HttpClient {
         return connSuccess;
     }
 
+    /**
+     * 封装 get 请求参数
+     * @return
+     */
     private String getQueryString() {
         StringBuffer sb = new StringBuffer();
         if (mHttpBuilder.getMethod() == RequestMethod.GET) {
@@ -90,19 +114,25 @@ public abstract class HttpClient {
         return sb.toString();
     }
 
+    /**
+     * 设置一些公共属性
+     */
     private void setCommonParams() {
+        //如果没有设置超时时间就给个10秒默认值
         if (mHttpBuilder.getSendOutTime() == 0) {
-            mHttpBuilder.setSendOutTime(SEND_OUT_TIME);
+            mHttpBuilder.setSendOutTime(10 * 1000);
         }
         if (mHttpBuilder.getReadOutTime() == 0) {
-            mHttpBuilder.setReadOutTime(READ_OUT_TIME);
+            mHttpBuilder.setReadOutTime(10 * 1000);
         }
 
         try {
+            //设置连接方式
             mConnection.setRequestMethod(mHttpBuilder.getMethod().method);
         } catch (ProtocolException e) {
             e.printStackTrace();
         }
+        //设置连接和读取超时时间
         mConnection.setConnectTimeout(mHttpBuilder.getSendOutTime());
         mConnection.setReadTimeout(mHttpBuilder.getReadOutTime());
     }
@@ -118,10 +148,12 @@ public abstract class HttpClient {
 
     private <T extends ResponseData> T request(Class<T> tClass)  {
         if(!connSuccess){
+            //如果连接失败，直接返回相应提示
             return getResponseData(tClass,responseCode,
                     "");
         }
         if (!Utils.isNetworkAvailable()) {
+            //无网络连接返回无网络提示
             return getResponseData(tClass,NetCodeStatus.NETWORK_EXCEPTION_CODE,
                     "");
         }
@@ -162,10 +194,13 @@ public abstract class HttpClient {
                 }
             }
         } catch (SocketTimeoutException e){
+            //连接超时提示
             responseCode = HttpURLConnection.HTTP_CLIENT_TIMEOUT;
         } catch (IOException e){
+            //IO异常提示
             responseCode = NetCodeStatus.FILE_IO_EXCEPTION_CODE;
         }catch (Exception e){
+            //其他异常未知错误
             e.printStackTrace();
         }finally {
             close(outputStream, reader, inputStreamReader, inputStream);

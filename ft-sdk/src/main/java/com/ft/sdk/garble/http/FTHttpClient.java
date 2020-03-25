@@ -20,9 +20,13 @@ public class FTHttpClient extends HttpClient {
     public FTHttpClient(HttpBuilder httpBuilder) {
         super(httpBuilder);
         if (connSuccess) {
+            //设置 DataFlux 请求特有的请求头
             setHeadParams();
-            calcuteDate();
+            //计算日期
+            calculateDate();
+            //添加日期请求头
             mConnection.addRequestProperty("Date", gmtString);
+            //如果开启了签名，添加签名信息
             if (ftHttpConfig.enableRequestSigning) {
                 addAuthorizationHead();
             }
@@ -61,7 +65,7 @@ public class FTHttpClient extends HttpClient {
     /**
      * 转换时间格式
      */
-    private void calcuteDate() {
+    private void calculateDate() {
         Date currentTime = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss 'GMT'", Locale.UK);
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
