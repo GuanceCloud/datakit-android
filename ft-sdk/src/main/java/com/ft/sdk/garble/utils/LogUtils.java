@@ -21,23 +21,60 @@ public class LogUtils {
 
     public static void i(Object message){
         if(mDebug){
-            Log.i(TAG,""+message);
+            showFullLog(""+message,LogType.I);
         }
     }
 
     public static void d(Object message){
         if(mDebug){
-            Log.d(TAG,""+message);
+            showFullLog(""+message,LogType.D);
         }
     }
     public static void e(Object message){
         if(mDebug){
-            Log.e(TAG,""+message);
+            showFullLog(""+message,LogType.E);
         }
     }
     public static void v(Object message){
         if(mDebug){
-            Log.v(TAG,""+message);
+            showFullLog(""+message,LogType.V);
         }
+    }
+
+    private static void showFullLog(String message,LogType logType){
+        int segmentSize = 3 * 1024;
+        long length = message.length();
+        if(length <= segmentSize){
+            showLog(TAG,message,logType);
+        }else{
+            boolean isFirst = true;
+            while (message.length() > segmentSize){
+                String logContent = message.substring(0,segmentSize);
+                message = message.replace(logContent,"");
+                if(isFirst) {
+                    showLog(TAG, logContent, logType);
+                }else{
+                    showLog(null, logContent, logType);
+                }
+                isFirst = false;
+            }
+            showLog(null,message,logType);
+        }
+    }
+
+    private static void showLog(String tag,String message,LogType logType){
+        switch (logType){
+            case D:Log.println(Log.DEBUG,tag,message);
+            break;
+            case E:Log.println(Log.ERROR,tag,message);
+            break;
+            case I:Log.println(Log.INFO,tag,message);
+            break;
+            case V:Log.println(Log.VERBOSE,tag,message);
+        }
+    }
+
+    enum LogType{
+        I,D,E,V
     }
 }

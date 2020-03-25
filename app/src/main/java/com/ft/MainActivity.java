@@ -17,7 +17,9 @@ import android.widget.RatingBar;
 import android.widget.SeekBar;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.annotation.RequiresPermission;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
@@ -28,7 +30,6 @@ import com.amitshekhar.debug.encrypt.sqlite.DebugDBEncryptFactory;
 import com.amitshekhar.debug.sqlite.DebugDBFactory;
 import com.bumptech.glide.Glide;
 import com.ft.sdk.FTSdk;
-import com.ft.sdk.FTTrack;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,8 +48,8 @@ public class MainActivity extends AppCompatActivity {
     private Button changeUser;
     private ImageView iv_glide;
     private Button flowChartTacker;
-    private BlankFragment blankFragment = new BlankFragment();
-    private PlusOneFragment plusOneFragment = new PlusOneFragment();
+    private Tab1Fragment tab1Fragment = new Tab1Fragment();
+    private Tab2Fragment tab2Fragment = new Tab2Fragment();
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -61,7 +62,8 @@ public class MainActivity extends AppCompatActivity {
         }
         requestPermissions(new String[]{Manifest.permission.CAMERA
                 , Manifest.permission.ACCESS_FINE_LOCATION
-                , Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+                , Manifest.permission.ACCESS_COARSE_LOCATION
+        ,Manifest.permission.READ_PHONE_STATE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         setTitle("FT-SDK使用Demo");
         FTSdk.get().setGpuRenderer(findViewById(R.id.ll));
         showKotlinActivity = findViewById(R.id.showKotlinActivity);
@@ -81,7 +83,6 @@ public class MainActivity extends AppCompatActivity {
         btn_lam.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this,Main4Activity.class));
             }
         });
         checkbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -143,11 +144,11 @@ public class MainActivity extends AppCompatActivity {
         bindUser.setOnClickListener(v -> {
             JSONObject exts = new JSONObject();
             try {
-                exts.put("sex","male");
+                exts.put("sex", "male");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            FTSdk.get().bindUserData("jack","007",exts);
+            FTSdk.get().bindUserData("jack", "007", exts);
         });
         unbindUser.setOnClickListener(v -> {
             FTSdk.get().unbindUserData();
@@ -155,32 +156,32 @@ public class MainActivity extends AppCompatActivity {
         changeUser.setOnClickListener(v -> {
             JSONObject exts = new JSONObject();
             try {
-                exts.put("sex","female");
+                exts.put("sex", "female");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            FTSdk.get().bindUserData("Rose","000",exts);
+            FTSdk.get().bindUserData("Rose", "000", exts);
         });
         flowChartTacker.setOnClickListener(v -> {
-            startActivity(new Intent(MainActivity.this,TrackerActivity.class));
+
         });
 
     }
 
-    public void addFragment(){
+    public void addFragment() {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.add(R.id.fragment,blankFragment);
+        fragmentTransaction.add(R.id.fragment, tab1Fragment);
         fragmentTransaction.commit();
     }
 
-    public void changeFragment(boolean change){
+    public void changeFragment(boolean change) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        if(change) {
-            fragmentTransaction.replace(R.id.fragment, blankFragment);
-        }else {
-            fragmentTransaction.replace(R.id.fragment, plusOneFragment);
+        if (change) {
+            fragmentTransaction.replace(R.id.fragment, tab1Fragment);
+        } else {
+            fragmentTransaction.replace(R.id.fragment, tab2Fragment);
         }
         fragmentTransaction.commit();
     }

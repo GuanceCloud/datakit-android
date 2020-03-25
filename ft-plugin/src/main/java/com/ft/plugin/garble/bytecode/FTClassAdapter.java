@@ -16,12 +16,15 @@
  */
 package com.ft.plugin.garble.bytecode;
 
+import com.ft.plugin.garble.ClassNameAnalytics;
 import com.ft.plugin.garble.FTTransformHelper;
-import com.ft.plugin.garble.FTUtil;
-import com.ft.plugin.garble.Logger;
+import com.ft.plugin.garble.VersionConfig;
 
 import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
+
+import static com.ft.plugin.garble.FTUtil.ASM_VERSION;
 
 /**
  * 本类借鉴修改了来自 Sensors Data 的项目 https://github.com/sensorsdata/sa-sdk-android-plugin2
@@ -32,9 +35,10 @@ public class FTClassAdapter extends ClassVisitor {
     private String superName;
     private String[] interfaces;
     private FTTransformHelper ftTransformHelper;
+    private boolean needChangeField;
 
     FTClassAdapter(final ClassVisitor cv, FTTransformHelper ftTransformHelper) {
-        super(FTUtil.ASM_VERSION, cv);
+        super(ASM_VERSION, cv);
         this.ftTransformHelper = ftTransformHelper;
         //Logger.info(">>>> goon scan class ");
     }
@@ -45,14 +49,30 @@ public class FTClassAdapter extends ClassVisitor {
         this.className = name;
         this.superName = superName;
         this.interfaces = interfaces;
-        Logger.info(">>>> start scan class ----> " + className + ", superName=" + superName);
+        //Logger.info(">>>> start scan class ----> " + className + ", superName=" + superName);
     }
 
     @Override
-    public void visitEnd() {
-        super.visitEnd();
-
-        //Logger.info(">>>> end scan class：" + className + "<<<<");
+    public FieldVisitor visitField(int access, String name, String desc, String signature, Object value) {
+        if(ClassNameAnalytics.isFTSdkApi(className.replaceAll("/","."))){
+            if(name.equals("AGENT_VERSION")){
+                String agentVersion = (String) value;
+                if(!VersionConfig.firstVerGreaterEqual(agentVersion,VersionConfig.MIN_SDK_VERSION)){
+                   String errorTip = "你目前集成的 FT SDK 的版本为 "+agentVersion +",当前插件支持 SDK 的最低版本为 "+VersionConfig.MIN_SDK_VERSION
+                           +",详细信息请参考：https://github.com/CloudCare/dataflux-sdk-android";
+                   throw new Error(errorTip);
+                }
+            }
+            if(name.equals("PLUGIN_MIN_VERSION")){
+                String pluginMinVersion = (String) value;
+                if(!VersionConfig.firstVerGreaterEqual(VersionConfig.PLUGIN_VERSION,pluginMinVersion)){
+                   String errorTip = "你目前集成的 FT Plugin 的版本为 "+VersionConfig.PLUGIN_VERSION +",当前 SDK 支持的插件的最低版本为 "+pluginMinVersion
+                           +",详细信息请参考：https://github.com/CloudCare/dataflux-sdk-android";
+                   throw new Error(errorTip);
+                }
+            }
+        }
+        return super.visitField(access, name, desc, signature, value);
     }
 
     @Override

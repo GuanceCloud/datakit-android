@@ -12,15 +12,12 @@ import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import static com.ft.sdk.garble.http.NetCodeStatus.NET_STATUS_NOT_CONNECT_HOST;
-import static com.ft.sdk.garble.http.NetCodeStatus.NET_STATUS_NOT_CONNECT_HOST_ERR;
-import static com.ft.sdk.garble.http.NetCodeStatus.NET_STATUS_UNCONNECT;
-import static com.ft.sdk.garble.http.NetCodeStatus.NET_STATUS_UNCONNECT_ERR;
-import static com.ft.sdk.garble.http.NetCodeStatus.NET_UNKNOWN_ERR;
+import static com.ft.sdk.garble.http.NetCodeStatus.UNKNOWN_EXCEPTION_CODE;
 
 /**
  * BY huangDianHua
@@ -36,6 +33,7 @@ public abstract class HttpClient {
     protected HttpURLConnection mConnection;
     protected boolean connSuccess = false;
     protected FTHttpConfig ftHttpConfig = FTHttpConfig.get();
+    private int responseCode = NetCodeStatus.UNKNOWN_EXCEPTION_CODE;
 
 
     protected abstract String getBodyContent();
@@ -59,12 +57,14 @@ public abstract class HttpClient {
             }
             if(Utils.isNullOrEmpty(urlStr)){
                 connSuccess = false;
+                responseCode = HttpURLConnection.HTTP_NOT_FOUND;
                 LogUtils.e("请求地址不能为空");
                 return false;
             }
             final URL url = new URL(urlStr + getQueryString());
             mConnection = (HttpURLConnection) url.openConnection();
             if (mConnection == null) {
+                responseCode = NetCodeStatus.NETWORK_EXCEPTION_CODE;
                 LogUtils.e(String.format("connect %s feature", url.toString()));
             } else {
                 connSuccess = true;
@@ -112,18 +112,18 @@ public abstract class HttpClient {
             return request(tClass);
         } catch (Exception e) {
             LogUtils.e(e.getMessage());
-            return getResponseData(tClass,NET_UNKNOWN_ERR,e.getMessage());
+            return getResponseData(tClass,UNKNOWN_EXCEPTION_CODE,e.getMessage());
         }
     }
 
     private <T extends ResponseData> T request(Class<T> tClass)  {
         if(!connSuccess){
-            return getResponseData(tClass,NET_STATUS_NOT_CONNECT_HOST,
-                    NET_STATUS_NOT_CONNECT_HOST_ERR);
+            return getResponseData(tClass,responseCode,
+                    "");
         }
         if (!Utils.isNetworkAvailable()) {
-            return getResponseData(tClass,NET_STATUS_UNCONNECT,
-                    NET_STATUS_UNCONNECT_ERR);
+            return getResponseData(tClass,NetCodeStatus.NETWORK_EXCEPTION_CODE,
+                    "");
         }
         RequestMethod method = mHttpBuilder.getMethod();
         boolean isDoInput = method == RequestMethod.POST;
@@ -132,8 +132,7 @@ public abstract class HttpClient {
         InputStreamReader inputStreamReader = null;
         BufferedReader reader = null;
         String tempLine = null;
-        int responseCode = NET_UNKNOWN_ERR;
-        StringBuffer resultBuffer = new StringBuffer();
+        StringBuilder resultBuffer = new StringBuilder();
         try {
             if (isDoInput) {
                 mConnection.setDoOutput(true);
@@ -162,11 +161,16 @@ public abstract class HttpClient {
                     resultBuffer.append(tempLine);
                 }
             }
-        } catch (Exception e){
+        } catch (SocketTimeoutException e){
+            responseCode = HttpURLConnection.HTTP_CLIENT_TIMEOUT;
+        } catch (IOException e){
+            responseCode = NetCodeStatus.FILE_IO_EXCEPTION_CODE;
+        }catch (Exception e){
+            e.printStackTrace();
         }finally {
             close(outputStream, reader, inputStreamReader, inputStream);
         }
-        LogUtils.d("HTTP-response:"+resultBuffer.toString());
+        LogUtils.d("HTTP-response:[code:"+responseCode+",response:"+resultBuffer.toString()+"]");
         return getResponseData(tClass,responseCode, resultBuffer.toString());
     }
 

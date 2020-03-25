@@ -9,9 +9,9 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Looper;
 
-import com.ft.sdk.FTSdk;
+import com.ft.sdk.MonitorType;
+import com.ft.sdk.garble.FTMonitorConfig;
 
 import java.util.List;
 import java.util.Locale;
@@ -28,13 +28,12 @@ public class LocationUtils {
     private static LocationUtils locationUtils;
     private LocationManager mLocationManager;
     private String mProvider;
-    private String mCity = Constants.UNKNOWN;
+    private Address address;
     private LocationUtils(){ }
     public static LocationUtils get(){
         if(locationUtils == null){
             locationUtils = new LocationUtils();
         }
-        locationUtils.startLocation(FTSdk.get().getApplication());
         return locationUtils;
     }
 
@@ -42,8 +41,8 @@ public class LocationUtils {
      * 获取所在地址
      * @return
      */
-    public String getCity(){
-        return mCity;
+    public Address getCity(){
+        return address;
     }
     private LocationListener locationListener = new LocationListener() {
         @Override
@@ -52,7 +51,7 @@ public class LocationUtils {
                 String string = "纬度为：" + location.getLatitude() + ",经度为："+ location.getLongitude();
                 LogUtils.d(string);
                 getAddress(mContext,location);
-                if(!Utils.isNullOrEmpty(mCity)){
+                if(address != null){
                     mLocationManager.removeUpdates(locationListener);
                 }
             }
@@ -71,10 +70,17 @@ public class LocationUtils {
         }
     };
 
-    private void startLocation(Context context){
+    public void startLocation(Context context){
+        if(!FTMonitorConfig.get().isMonitorType(MonitorType.ALL) && !FTMonitorConfig.get().isMonitorType(MonitorType.LOCATION)){
+            return;
+        }
+        if(address != null){
+            return;
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             int state = context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
-            if(state != PERMISSION_GRANTED){
+            int state2 = context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION);
+            if(state != PERMISSION_GRANTED || state2 != PERMISSION_GRANTED){
                 LogUtils.e("请先申请位置权限");
                 return;
             }
@@ -85,12 +91,12 @@ public class LocationUtils {
         mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         //获取当前可用的位置控制器
         List<String> list = mLocationManager.getProviders(true);
-        if (list.contains(LocationManager.GPS_PROVIDER)) {
-            //是否为GPS位置控制器
-            mProvider = LocationManager.GPS_PROVIDER;
-        } else if (list.contains(LocationManager.NETWORK_PROVIDER)) {
+        if (list.contains(LocationManager.NETWORK_PROVIDER)) {
             //是否为网络位置控制器
             mProvider = LocationManager.NETWORK_PROVIDER;
+        } else if (list.contains(LocationManager.GPS_PROVIDER)) {
+            //是否为GPS位置控制器
+            mProvider = LocationManager.GPS_PROVIDER;
         } else if (list.contains(LocationManager.PASSIVE_PROVIDER)) {
             mProvider = LocationManager.PASSIVE_PROVIDER;
         }
@@ -100,13 +106,7 @@ public class LocationUtils {
                 String string = "纬度为：" + location.getLatitude() + ",经度为："+ location.getLongitude();
                 getAddress(context,location);
             }else{
-                if(Looper.myLooper() != Looper.getMainLooper()) {
-                    Looper.prepare();
-                }
                 mLocationManager.requestLocationUpdates(mProvider, 3000, 1, locationListener);
-                if(Looper.myLooper() != Looper.getMainLooper()) {
-                    Looper.loop();
-                }
             }
         }
     }
@@ -125,7 +125,8 @@ public class LocationUtils {
         }
 
         if(result != null && !result.isEmpty() && result.get(0) != null){
-            mCity = result.get(0).getLocality();
+            address = result.get(0);
+            LogUtils.d("地址[province:"+address.getAdminArea()+",city:"+address.getLocality());
         }
     }
 }

@@ -6,6 +6,7 @@ import android.content.Context;
 import com.ft.sdk.FTAutoTrackType;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
+import com.ft.sdk.MonitorType;
 
 /**
  * BY huangDianHua
@@ -32,6 +33,7 @@ public class DemoApplication extends Application {
                 AccountUtils.getProperty(this, AccountUtils.ACCESS_KEY_ID),
                 AccountUtils.getProperty(this, AccountUtils.ACCESS_KEY_SECRET))
                 .setUseOAID(true)//设置 OAID 是否可用
+                .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setDebug(true)//设置是否是 debug
                 .setNeedBindUser(true)//是否需要绑定用户信息
                 .enableAutoTrack(true)//设置是否开启自动埋点
@@ -41,8 +43,8 @@ public class DemoApplication extends Application {
                 //.setWhiteActivityClasses(Arrays.asList(MainActivity.class, Main2Activity.class))//设置埋点页面的白名单
                 //.setWhiteViewClasses(Arrays.asList(Button.class, RadioGroup.class))
                 .setOpenFlowChart(true)
-                .setFlowProduct("demo12");
-        //.setMonitorType(MonitorType.ALL);//设置监控项
-        FTSdk.install(ftSDKConfig, this);
+                .setFlowProduct("demo12")
+                .setMonitorType(MonitorType.ALL);//设置监控项
+        FTSdk.install(ftSDKConfig);
     }
 }

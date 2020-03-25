@@ -138,5 +138,44 @@ public class Utils {
         Matcher m = r.matcher(product);
         return m.matches();
     }
+
+    /**
+     * For tag keys, tag values, and field keys always use a backslash character \ to escape:
+     * @return
+     */
+    public static String translateTagKeyValueAndFieldKey(String oldStr){
+        oldStr = translateSpecialCharacters(",",oldStr);
+        oldStr = translateSpecialCharacters("=",oldStr);
+        return translateSpecialCharacters(" ",oldStr);
+    }
+
+    /**
+     * For measurements always use a backslash character \ to escape:
+     * @return
+     */
+    public static String translateMeasurements(String oldStr){
+        oldStr = translateSpecialCharacters(",",oldStr);
+        return translateSpecialCharacters(" ",oldStr);
+    }
+
+    /**
+     * For string field values use a backslash character \ to escape:
+     */
+    public static String translateFieldValue(String oldStr){
+        return translateSpecialCharacters("\"",oldStr);
+    }
+
+    /**
+     * 转译特殊字符
+     * @param special
+     * @param oldStr
+     */
+    public static String translateSpecialCharacters(String special,String oldStr){
+        if(oldStr.contains(special)){
+            return oldStr.replaceAll(special,"\\\\"+special);
+        }
+        return oldStr;
+    }
+
 }
 

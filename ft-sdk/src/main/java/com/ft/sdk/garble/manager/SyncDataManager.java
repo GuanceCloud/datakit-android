@@ -1,6 +1,7 @@
 package com.ft.sdk.garble.manager;
 
 import android.content.Context;
+import android.location.Address;
 
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
@@ -14,10 +15,12 @@ import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.BatteryUtils;
 import com.ft.sdk.garble.utils.CameraUtils;
+import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.CpuUtils;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.GpuUtils;
 import com.ft.sdk.garble.utils.LocationUtils;
+import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.NetUtils;
 import com.ft.sdk.garble.utils.OaidUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -54,8 +57,8 @@ public class SyncDataManager {
                 try {
                     JSONObject opData = new JSONObject(recordData.getOpdata());
                     //获取指标名称
-                    if (opData.has("field")) {
-                        sb.append("$flow_mobile_activity_").append(opData.optString("field"));
+                    if (opData.has(Constants.MEASUREMENT)) {
+                        sb.append("$flow_mobile_activity_").append(opData.optString(Constants.MEASUREMENT));
                     }else{
                         sb.append("$flow_mobile_activity_").append(FTFlowChartConfig.get().getFlowProduct());
                     }
@@ -64,10 +67,89 @@ public class SyncDataManager {
                 }
 
                 sb.append(",$traceId=").append(recordData.getTraceId());
-                sb.append(",$name=").append(recordData.getCpn());
+                if(recordData.getPpn() != null && recordData.getPpn().startsWith(Constants.MOCK_SON_PAGE_DATA)){
+                    String[] strArr = recordData.getPpn().split(":");
+                    String name = null;
+                    String parent = null;
+                    if(strArr.length == 3){
+                        name = recordData.getCpn()+"."+strArr[1];
+                        parent = strArr[2];
+                    }else if (strArr.length == 2){
+                        name = recordData.getCpn();
+                        parent = strArr[1];
+                    }
+                    sb.append(",$name=").append(name);
+                    sb.append(",$parent=").append(parent);
+                }else {
+                    sb.append(",$name=").append(recordData.getCpn());
+                    //如果父页面是root表示其为起始节点，不添加父节点
+                    if (!Constants.FLOW_ROOT.equals(recordData.getPpn())) {
+                        sb.append(",$parent=").append(recordData.getPpn());
+                    }
+                }
+                sb.append(",").append(device).append(",");
+                addUserData(sb, recordData);
+                //删除多余的逗号
+                deleteLastComma(sb);
+                sb.append(" ");
+                sb.append("$duration=").append(recordData.getDuration()).append("i");
+                sb.append(" ");
+                sb.append(recordData.getTime() * 1000 * 1000);
+                sb.append("\n");
+            } /**else if(OP.CLS_ACT.value.equals(recordData.getOp())){
+                //如果是关闭页面，也要附加一条页面关闭的流程图数据
+                try {
+                    //获取指标
+                    JSONObject opData = new JSONObject(recordData.getOpdata());
+                    if (opData.has(Constants.MEASUREMENT)) {
+                        sb.append("$flow_mobile_activity_").append(opData.optString(Constants.MEASUREMENT));
+                    }else{
+                        sb.append("$flow_mobile_activity_").append(FTFlowChartConfig.get().getFlowProduct());
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                sb.append(",$traceId=").append(recordData.getTraceId());
+                //如果父页面不是root，表示其为子页面的关闭
+                if(!Constants.FLOW_ROOT.equals(recordData.getPpn())){
+                    //交换当前页面和父页面
+                    sb.append(",$name=").append(recordData.getPpn());
+                    sb.append(",$parent=").append(recordData.getCpn());
+                }
+                sb.append(",").append(device).append(",");
+                addUserData(sb, recordData);
+                deleteLastComma(sb);
+                sb.append(" ");
+                sb.append("$duration=").append(recordData.getDuration()).append("i");
+                sb.append(" ");
+                sb.append(recordData.getTime() * 1000 * 1000);
+                sb.append("\n");
+            }*/else if(OP.OPEN_FRA.value.equals(recordData.getOp())){
+                //如果是子页面打开操作，就在该条数据上添加一条表示流程图的数据
+                try {
+                    JSONObject opData = new JSONObject(recordData.getOpdata());
+                    //获取指标名称
+                    if (opData.has(Constants.MEASUREMENT)) {
+                        sb.append("$flow_mobile_activity_").append(opData.optString(Constants.MEASUREMENT));
+                    }else{
+                        sb.append("$flow_mobile_activity_").append(FTFlowChartConfig.get().getFlowProduct());
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                sb.append(",$traceId=").append(recordData.getTraceId());
+                sb.append(",$name=").append(recordData.getRpn()).append(".").append(recordData.getCpn());
                 //如果父页面是root表示其为起始节点，不添加父节点
-                if(!"root".equals(recordData.getPpn())){
-                    sb.append(",$parent=").append(recordData.getPpn());
+                if(!Constants.FLOW_ROOT.equals(recordData.getPpn())){
+                    if(recordData.getPpn().startsWith(Constants.PERFIX)){
+                        sb.append(",$parent=").append(recordData.getPpn().replace(Constants.PERFIX,""));
+                    }else {
+                        sb.append(",$parent=").append(recordData.getRpn()).append(".").append(recordData.getPpn());
+                    }
+                }else{
+                    sb.append(",$parent=").append(recordData.getRpn());
                 }
                 sb.append(",").append(device.replaceAll(" ", "\\\\ ")).append(",");
                 addUserData(sb, recordData);
@@ -78,40 +160,11 @@ public class SyncDataManager {
                 sb.append(" ");
                 sb.append(recordData.getTime() * 1000 * 1000);
                 sb.append("\n");
-            } else if(OP.CLS_ACT.value.equals(recordData.getOp())){
-                //如果是关闭页面，也要附加一条页面关闭的流程图数据
-                try {
-                    //获取指标
-                    JSONObject opData = new JSONObject(recordData.getOpdata());
-                    if (opData.has("field")) {
-                        sb.append("$flow_mobile_activity_").append(opData.optString("field"));
-                    }else{
-                        sb.append("$flow_mobile_activity_").append(FTFlowChartConfig.get().getFlowProduct());
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                sb.append(",$traceId=").append(recordData.getTraceId());
-                //如果父页面不是root，表示其为子页面的关闭
-                if(!"root".equals(recordData.getPpn())){
-                    //交换当前页面和父页面
-                    sb.append(",$name=").append(recordData.getPpn());
-                    sb.append(",$parent=").append(recordData.getCpn());
-                }
-                sb.append(",").append(device.replaceAll(" ", "\\\\ ")).append(",");
-                addUserData(sb, recordData);
-                deleteLastComma(sb);
-                sb.append(" ");
-                sb.append("$duration=").append(recordData.getDuration()).append("i");
-                sb.append(" ");
-                sb.append(recordData.getTime() * 1000 * 1000);
-                sb.append("\n");
             }
             //获取这条事件的指标
             sb.append(getMeasurement(recordData));
             sb.append(",");
-            sb.append(device.replaceAll(" ", "\\\\ "));
+            sb.append(device);
             //获取埋点事件数据
             sb.append(getUpdateData(recordData));
             sb.append("\n");
@@ -132,11 +185,11 @@ public class SyncDataManager {
         if (CSTM.value.equals(recordData.getOp())) {
             try {
                 JSONObject jsonObject = new JSONObject(recordData.getOpdata());
-                String field = jsonObject.optString("field");
-                if (Utils.isNullOrEmpty(field)) {
+                String measurementTemp = jsonObject.optString(Constants.MEASUREMENT);
+                if (Utils.isNullOrEmpty(measurementTemp)) {
                     measurement = FT_KEY_VALUE_NULL;
                 } else {
-                    measurement = field;
+                    measurement = Utils.translateMeasurements(measurementTemp);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -173,14 +226,14 @@ public class SyncDataManager {
             try {
                 JSONObject opJson = new JSONObject(recordData.getOpdata());
                 JSONObject tags = opJson.optJSONObject("tags");
-                JSONObject values = opJson.optJSONObject("values");
+                JSONObject fields = opJson.optJSONObject(Constants.FIELDS);
                 StringBuffer tagSb = getCustomHash(tags, true);
-                StringBuffer valueSb = getCustomHash(values, false);
+                StringBuffer valueSb = getCustomHash(fields, false);
                 addUserData(tagSb, recordData);
                 deleteLastComma(tagSb);
                 if (tagSb.length() > 0) {
                     sb.append(",");
-                    sb.append(tagSb.toString().replaceAll(" ", "\\\\ "));
+                    sb.append(tagSb.toString());
                 }
                 sb.append(" ");
                 deleteLastComma(valueSb);
@@ -203,8 +256,9 @@ public class SyncDataManager {
         StringBuffer sb = new StringBuffer();
         Iterator<String> keys = tags.keys();
         while (keys.hasNext()) {
-            String key = Utils.replaceSpaceAndComma(keys.next());
-            Object value = tags.opt(key);
+            String keyTemp = keys.next();
+            Object value = tags.opt(keyTemp);
+            String key = Utils.translateTagKeyValueAndFieldKey(keyTemp);
             sb.append(key);
             sb.append("=");
             if (value == null) {
@@ -214,7 +268,7 @@ public class SyncDataManager {
                     addQuotationMarks(sb, FT_KEY_VALUE_NULL, !isTag);
                 } else {
                     if (value instanceof String) {
-                        addQuotationMarks(sb, Utils.replaceSpaceAndComma((String) value), !isTag);
+                        addQuotationMarks(sb, (String) value, !isTag);
                     } else {
                         sb.append(value);
                     }
@@ -227,9 +281,9 @@ public class SyncDataManager {
 
     private void addQuotationMarks(StringBuffer sb, String value, boolean add) {
         if (add) {
-            sb.append("\"").append(value).append("\"");
+            sb.append("\"").append(Utils.translateFieldValue(value)).append("\"");
         } else {
-            sb.append(value);
+            sb.append(Utils.translateTagKeyValueAndFieldKey(value));
         }
     }
 
@@ -264,7 +318,7 @@ public class SyncDataManager {
         deleteLastComma(sb);
         if (sb.length() > 0) {
             sb.insert(0, ",");
-            String temp = sb.toString().replaceAll(" ", "\\\\ ");
+            String temp = sb.toString();
             sb.delete(0, sb.length());
             sb.append(temp);
         }
@@ -284,8 +338,8 @@ public class SyncDataManager {
         if (FTUserConfig.get().isNeedBindUser() && FTUserConfig.get().isUserDataBinded()) {
             UserData userData = FTUserConfig.get().getUserData(recordData.getSessionid());
             if (userData != null) {
-                sb.append("ud_name=").append(Utils.replaceComma(userData.getName())).append(",");
-                sb.append("ud_id=").append(Utils.replaceComma(userData.getId())).append(",");
+                sb.append("ud_name=").append(Utils.translateTagKeyValueAndFieldKey(userData.getName())).append(",");
+                sb.append("ud_id=").append(Utils.translateTagKeyValueAndFieldKey(userData.getId())).append(",");
                 JSONObject js = userData.getExts();
                 if (js == null) {
                     return;
@@ -294,7 +348,7 @@ public class SyncDataManager {
                 while (iterator.hasNext()) {
                     String key = iterator.next();
                     try {
-                        sb.append("ud_").append(Utils.replaceComma(key)).append("=").append(Utils.replaceComma(js.getString(key))).append(",");
+                        sb.append("ud_").append(Utils.translateTagKeyValueAndFieldKey(key)).append("=").append(Utils.translateTagKeyValueAndFieldKey(js.getString(key))).append(",");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -340,7 +394,15 @@ public class SyncDataManager {
                 for (CameraPx cameraPx : cameraPxs) {
                     tags.put(cameraPx.getPx()[0],cameraPx.getPx()[1]);
                 }
-                tags.put("location_city",LocationUtils.get().getCity());
+                Address address = LocationUtils.get().getCity();
+                if(address != null){
+                    tags.put("province",address.getAdminArea());
+                    tags.put("city",address.getLocality());
+                }else{
+                    tags.put("province",Constants.UNKNOWN);
+                    tags.put("city",Constants.UNKNOWN);
+                }
+
             } else {
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.BATTERY)) {
                     tags.put("battery_total",BatteryUtils.getBatteryTotal(context)+"mAh");
@@ -382,7 +444,14 @@ public class SyncDataManager {
                     }
                 }
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.LOCATION)) {
-                    tags.put("location_city",LocationUtils.get().getCity());
+                    Address address = LocationUtils.get().getCity();
+                    if(address != null){
+                        tags.put("province",address.getAdminArea());
+                        tags.put("city",address.getLocality());
+                    }else{
+                        tags.put("province",Constants.UNKNOWN);
+                        tags.put("city",Constants.UNKNOWN);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -464,17 +533,60 @@ public class SyncDataManager {
         objectHashMap.put("device_uuid", DeviceUtils.getUuid(context));
         objectHashMap.put("application_identifier", DeviceUtils.getApplicationId(context));
         objectHashMap.put("application_name", DeviceUtils.getAppName(context));
-        objectHashMap.put("sdk_version", DeviceUtils.getSDKVersion());
+        objectHashMap.put("agent", DeviceUtils.getSDKVersion());
+        objectHashMap.put("autoTrack", FTSdk.PLUGIN_VERSION);
         objectHashMap.put("imei", DeviceUtils.getImei(context));
         objectHashMap.put("os", DeviceUtils.getOSName());
         objectHashMap.put("os_version", DeviceUtils.getOSVersion());
-        objectHashMap.put("device_band", DeviceUtils.getDeviceBand());
-        objectHashMap.put("device_model", DeviceUtils.getDeviceModel());
+        objectHashMap.put("device_band", Utils.translateTagKeyValueAndFieldKey(DeviceUtils.getDeviceBand()));
+        objectHashMap.put("device_model", Utils.translateTagKeyValueAndFieldKey(DeviceUtils.getDeviceModel()));
         objectHashMap.put("display", DeviceUtils.getDisplay(context));
         objectHashMap.put("carrier", DeviceUtils.getCarrier(context));
         if (FTHttpConfig.get().useOaid) {
             objectHashMap.put("oaid", OaidUtils.getOAID(context));
         }
         return objectHashMap;
+    }
+
+    /**
+     * 将上传的数据格式化（供打印日志使用）
+     *
+     * @param body
+     */
+    public static void printUpdateData(String body) {
+        try {
+            StringBuffer sb = new StringBuffer();
+            String[] counts = body.split("\n");
+            sb.append("-----------------------------------------------------------\n");
+            sb.append("----------------------同步数据--开始-------------------------\n");
+            sb.append("----------------------总共 ").append(counts.length).append(" 条数据------------------------\n");
+            for (int i = 0;i<counts.length;i++) {
+                String str = counts[i];
+                str = str.replaceAll("\\\\ ", "_");
+                String[] strArr = str.split(" ");
+                sb.append("---------------------第 ").append(i).append(" 条数据---开始----------------------\n");
+                sb.append("{\n ");
+                if (strArr.length == 3) {
+                    sb.append("measurement{\n\t");
+                    String str1 = strArr[0].replaceFirst(",", "\n },tags{\n\t");
+                    str1 = str1.replaceAll(",", ",\n\t");
+                    str1 = str1.replaceFirst(",\n\t", ",\n ");
+                    sb.append(str1);
+                    sb.append("\n },\n ");
+                    sb.append("fields{\n\t");
+                    String str2 = strArr[1].replaceAll(",", ",\n\t");
+                    sb.append(str2);
+                    sb.append("\n },\n ");
+                    sb.append("time{\n\t");
+                    sb.append(strArr[2]);
+                    sb.append("\n }\n");
+                }
+                sb.append("},\n");
+            }
+            sb.append("----------------------同步数据--结束----------------------\n");
+            LogUtils.d("同步的数据\n" + sb.toString());
+        } catch (Exception e) {
+            LogUtils.d("同步的数据\n" + body);
+        }
     }
 }

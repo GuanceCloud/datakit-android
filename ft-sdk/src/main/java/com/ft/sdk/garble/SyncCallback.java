@@ -1,5 +1,5 @@
 package com.ft.sdk.garble;
 
 public interface SyncCallback {
-    void isSuccess(boolean isSuccess);
+    void onResponse(int code,String response);
 }

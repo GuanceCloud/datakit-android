@@ -6,6 +6,7 @@ import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.http.FTResponseData;
 import com.ft.sdk.garble.http.HttpBuilder;
+import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
@@ -38,6 +39,11 @@ public class SyncTaskManager {
         this.running = running;
     }
 
+
+    public void shotDown(){
+        ThreadPoolUtils.get().shutDown();
+    }
+
     private SyncTaskManager() {
 
     }
@@ -57,9 +63,6 @@ public class SyncTaskManager {
             return;
         }
         running = true;
-        if (!ThreadPoolUtils.get().poolRunning()) {
-            ThreadPoolUtils.get().reStartPool();
-        }
         errorCount.set(0);
         ThreadPoolUtils.get().execute(() -> {
             waitUserBind();
@@ -111,9 +114,9 @@ public class SyncTaskManager {
         }
         SyncDataManager syncDataManager = new SyncDataManager();
         String body = syncDataManager.getBodyContent(requestDatas);
-        printUpdateData(body);
-        requestNet(body, isSuccess -> {
-            if (isSuccess) {
+        SyncDataManager.printUpdateData(body);
+        requestNet(body, (code,response) -> {
+            if (code == HttpURLConnection.HTTP_OK) {
                 LogUtils.d("同步数据成功");
                 deleteLastQuery(requestDatas);
                 errorCount.set(0);
@@ -143,49 +146,13 @@ public class SyncTaskManager {
                 .setBodyString(body).executeSync(FTResponseData.class);
 
         try {
-            syncCallback.isSuccess(result.getCode() == HttpURLConnection.HTTP_OK);
+            syncCallback.onResponse(result.getCode(),result.getMessage());
         } catch (Exception e) {
-            syncCallback.isSuccess(false);
+            syncCallback.onResponse(NetCodeStatus.UNKNOWN_EXCEPTION_CODE,"");
             LogUtils.e("请在混淆文件中添加 -keep class * extends com.ft.sdk.garble.http.ResponseData{\n" +
                     "     *;\n" +
                     "}");
         }
 
-    }
-
-    /**
-     * 将上传的数据格式化（供打印日志使用）
-     *
-     * @param body
-     */
-    private void printUpdateData(String body) {
-        try {
-            StringBuffer sb = new StringBuffer();
-            String[] counts = body.split("\n");
-            for (String str : counts) {
-                str = str.replaceAll("\\\\ ", "_");
-                String[] strArr = str.split(" ");
-                sb.append("{\n ");
-                if (strArr.length == 3) {
-                    sb.append("field{\n\t");
-                    String str1 = strArr[0].replaceFirst(",", "\n },value{\n\t");
-                    str1 = str1.replaceAll(",", ",\n\t");
-                    str1 = str1.replaceFirst(",\n\t", ",\n ");
-                    sb.append(str1);
-                    sb.append("\n },\n ");
-                    sb.append("tag{\n\t");
-                    String str2 = strArr[1].replaceAll(",", ",\n\t");
-                    sb.append(str2);
-                    sb.append("\n },\n ");
-                    sb.append("time{\n\t");
-                    sb.append(strArr[2]);
-                    sb.append("\n }\n");
-                }
-                sb.append("},\n");
-            }
-            LogUtils.d("同步的数据\n" + sb.toString());
-        } catch (Exception e) {
-            LogUtils.d("同步的数据\n" + body);
-        }
     }
 }

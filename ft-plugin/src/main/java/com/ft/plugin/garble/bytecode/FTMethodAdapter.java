@@ -16,6 +16,7 @@
  */
 package com.ft.plugin.garble.bytecode;
 
+import com.ft.plugin.garble.ClassNameAnalytics;
 import com.ft.plugin.garble.FTHookConfig;
 import com.ft.plugin.garble.FTMethodCell;
 import com.ft.plugin.garble.FTMethodType;
@@ -23,6 +24,7 @@ import com.ft.plugin.garble.FTSubMethodCell;
 import com.ft.plugin.garble.FTTransformHelper;
 import com.ft.plugin.garble.FTUtil;
 import com.ft.plugin.garble.Logger;
+import com.ft.plugin.garble.VersionConfig;
 
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.MethodVisitor;
@@ -113,6 +115,12 @@ public class FTMethodAdapter extends AdviceAdapter {
                     mv.visitMethodInsn(INVOKEVIRTUAL, f.className, f.agentName, f.agentDesc, f.itf);
                 } else if (f.type == FTMethodType.INVOKESPECIAL) {
                     mv.visitMethodInsn(INVOKESPECIAL, f.className, f.agentName, f.agentDesc, f.itf);
+                }else if(f.type == FTMethodType.GETSTATIC){
+                    mv.visitFieldInsn(GETSTATIC,f.className,f.agentName,f.agentDesc);
+                }else if(f.type == FTMethodType.GETFIELD){
+                    mv.visitFieldInsn(GETFIELD,f.className,f.agentName,f.agentDesc);
+                } else if(f.type == FTMethodType.INVOKESTATIC){
+                    mv.visitMethodInsn(INVOKESTATIC,f.className,f.agentName,f.agentDesc,f.itf);
                 }
             }
         }
@@ -122,6 +130,15 @@ public class FTMethodAdapter extends AdviceAdapter {
     void handleCode() {
         if (FTUtil.isTargetClassInSpecial(className)) {
             return;
+        }
+
+        if(ClassNameAnalytics.isFTSdkApi(className.replaceAll("/","."))){
+            if(nameDesc.equals("install(Lcom/ft/sdk/FTSDKConfig;)V")){
+                mv.visitLdcInsn(VersionConfig.PLUGIN_VERSION);
+                mv.visitFieldInsn(PUTSTATIC, "com/ft/sdk/FTSdk", "PLUGIN_VERSION", "Ljava/lang/String;");
+                isHasTracked = true;
+                return;
+            }
         }
 
         /**
@@ -166,7 +183,7 @@ public class FTMethodAdapter extends AdviceAdapter {
         /**
          * Hook Activity
          */
-        if (FTUtil.isInstanceOfActivity(superName)) {
+        if (FTUtil.isInstanceOfActivity(className)) {
             FTMethodCell ftMethodCell = FTHookConfig.ACTIVITY_METHODS.get(nameDesc);
             //Logger.info("方法扫描>>>类是Activity>>>方法是"+nameDesc+" ftMethodCell="+ftMethodCell);
             if (ftMethodCell != null) {
@@ -227,7 +244,7 @@ public class FTMethodAdapter extends AdviceAdapter {
          */
         if(interfaces != null && interfaces.length >0){
             for(String inter :interfaces) {
-                Logger.info("============CLICK_METHODS_SYSTEM=="+inter+nameDesc);
+                //Logger.info("============CLICK_METHODS_SYSTEM=="+inter+nameDesc);
                 FTMethodCell ftMethodCell = FTHookConfig.CLICK_METHODS_SYSTEM.get(inter+nameDesc);
                 if(ftMethodCell != null) {
                     Type[] types = Type.getArgumentTypes(ftMethodCell.desc);
