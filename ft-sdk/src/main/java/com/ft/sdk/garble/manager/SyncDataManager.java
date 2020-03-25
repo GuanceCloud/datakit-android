@@ -557,9 +557,14 @@ public class SyncDataManager {
         try {
             StringBuffer sb = new StringBuffer();
             String[] counts = body.split("\n");
-            for (String str : counts) {
+            sb.append("-----------------------------------------------------------\n");
+            sb.append("----------------------同步数据--开始-------------------------\n");
+            sb.append("----------------------总共 ").append(counts.length).append(" 条数据------------------------\n");
+            for (int i = 0;i<counts.length;i++) {
+                String str = counts[i];
                 str = str.replaceAll("\\\\ ", "_");
                 String[] strArr = str.split(" ");
+                sb.append("---------------------第 ").append(i).append(" 条数据---开始----------------------\n");
                 sb.append("{\n ");
                 if (strArr.length == 3) {
                     sb.append("measurement{\n\t");
@@ -578,6 +583,7 @@ public class SyncDataManager {
                 }
                 sb.append("},\n");
             }
+            sb.append("----------------------同步数据--结束----------------------\n");
             LogUtils.d("同步的数据\n" + sb.toString());
         } catch (Exception e) {
             LogUtils.d("同步的数据\n" + body);
