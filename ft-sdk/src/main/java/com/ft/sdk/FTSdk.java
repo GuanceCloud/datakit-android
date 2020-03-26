@@ -164,9 +164,7 @@ public class FTSdk {
                 FTUserConfig.get().initSessionId();
                 FTUserConfig.get().initUserDataFromDB();
             }
-            if(mFtSDKConfig.getMonitorType() != 0){
-                FTNetworkListener.get().monitor();
-            }
+            FTNetworkListener.get().monitor();
             if(mFtSDKConfig.isAutoTrack()){
                 trackStartApp();
             }

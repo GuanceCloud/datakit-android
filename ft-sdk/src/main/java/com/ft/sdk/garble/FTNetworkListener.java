@@ -109,8 +109,6 @@ public class FTNetworkListener {
     private void judgeNetState() {
         //大于 0 有网
         if (NetUtils.get().getNetworkState(application) > 0) {
-            //监听网络速度
-            NetUtils.get().startMonitorNetRate();
             LogUtils.d("Net->" + "网络已连接");
             SyncTaskManager.get().executeSyncPoll();
         }
