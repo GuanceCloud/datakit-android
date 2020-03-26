@@ -186,6 +186,14 @@ public class NetUtils {
     private DecimalFormat showFloatFormat = new DecimalFormat("0.00");
 
     /**
+     * 应用启动时获取一次网速
+     */
+    public void initSpeed(){
+        lastRxTx = TrafficStats.getTotalRxBytes()
+                + TrafficStats.getTotalTxBytes();
+        getNetSpeed();
+    }
+    /**
      * 获得网络速度（外部获取网速应该直接调用{@link NetUtils#getNetRate()}）
      *
      * @return

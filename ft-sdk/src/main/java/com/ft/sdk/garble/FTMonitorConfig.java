@@ -30,12 +30,21 @@ public class FTMonitorConfig {
             NetUtils.get().listenerSignal(FTSdk.get().getApplication());
             //开始获取地理位置
             LocationUtils.get().startLocation(FTSdk.get().getApplication());
-        }else if(isMonitorType(MonitorType.NETWORK)){
-            //开启网络监听
-            NetUtils.get().listenerSignal(FTSdk.get().getApplication());
-        } else if (isMonitorType(MonitorType.LOCATION)) {
-            //获取地理位置
-            LocationUtils.get().startLocation(FTSdk.get().getApplication());
+            //监听网络速度
+            NetUtils.get().startMonitorNetRate();
+            NetUtils.get().initSpeed();
+        } else {
+            if (isMonitorType(MonitorType.NETWORK)) {
+                //开启网络监听
+                NetUtils.get().listenerSignal(FTSdk.get().getApplication());
+                //监听网络速度
+                NetUtils.get().startMonitorNetRate();
+                NetUtils.get().initSpeed();
+            }
+            if (isMonitorType(MonitorType.LOCATION)) {
+                //获取地理位置
+                LocationUtils.get().startLocation(FTSdk.get().getApplication());
+            }
         }
     }
 
