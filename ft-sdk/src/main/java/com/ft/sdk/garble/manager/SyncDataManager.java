@@ -398,9 +398,11 @@ public class SyncDataManager {
                 if(address != null){
                     tags.put("province",address.getAdminArea());
                     tags.put("city",address.getLocality());
+                    tags.put("country","中国");
                 }else{
                     tags.put("province",Constants.UNKNOWN);
                     tags.put("city",Constants.UNKNOWN);
+                    tags.put("country","中国");
                 }
 
             } else {
@@ -448,9 +450,11 @@ public class SyncDataManager {
                     if(address != null){
                         tags.put("province",address.getAdminArea());
                         tags.put("city",address.getLocality());
+                        tags.put("country","中国");
                     }else{
                         tags.put("province",Constants.UNKNOWN);
                         tags.put("city",Constants.UNKNOWN);
+                        tags.put("country","中国");
                     }
                 }
             }
