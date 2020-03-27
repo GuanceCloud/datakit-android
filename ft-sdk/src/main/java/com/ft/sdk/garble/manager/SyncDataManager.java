@@ -364,20 +364,20 @@ public class SyncDataManager {
         try {
             Context context = FTSdk.get().getApplication();
             if (FTMonitorConfig.get().isMonitorType(MonitorType.ALL)) {
-                tags.put("battery_total",BatteryUtils.getBatteryTotal(context)+"mAh");
-                tags.put("battery_use",(100 - BatteryUtils.getBatteryCurrent(context))+"%");
+                tags.put("battery_total",BatteryUtils.getBatteryTotal(context));
+                tags.put("battery_use",BatteryUtils.getBatteryCurrent(context));
                 String[] memory = DeviceUtils.getRamData(context);
                 tags.put("memory_total",memory[0]);
                 tags.put("memory_use",memory[1]);
 
                 tags.put("cpu_no",DeviceUtils.getHardWare());
                 tags.put("cpu_use",DeviceUtils.getCpuUseRate());
-                tags.put("cpu_temperature",CpuUtils.get().getCpuTemperature()+"℃");
-                tags.put("cpu_hz",CpuUtils.get().getCPUMaxFreqKHz()+"Hz");
+                tags.put("cpu_temperature",CpuUtils.get().getCpuTemperature());
+                tags.put("cpu_hz",CpuUtils.get().getCPUMaxFreqKHz());
 
                 tags.put("gpu_model",GpuUtils.GPU_VENDOR_RENDERER);
-                tags.put("gpu_hz",GpuUtils.getGpuMaxFreq()+"Hz");
-                tags.put("gpu_rate",GpuUtils.getGpuUseRate()+"%");
+                tags.put("gpu_hz",GpuUtils.getGpuMaxFreq());
+                tags.put("gpu_rate",GpuUtils.getGpuUseRate());
 
                 int networkType = NetUtils.get().getNetworkState(context);
                 if (networkType == 1) {
@@ -387,7 +387,7 @@ public class SyncDataManager {
                 } else {
                     tags.put("network_type","蜂窝网络");
                 }
-                tags.put("network_strength",NetUtils.get().getSignalStrength());
+                tags.put("network_strength",NetUtils.get().getSignalStrength(context));
                 tags.put("network_speed",NetUtils.get().getNetRate());
                 tags.put("network_proxy",NetUtils.get().isWifiProxy(context));
                 List<CameraPx> cameraPxs = CameraUtils.getCameraPxList(context);
@@ -407,8 +407,8 @@ public class SyncDataManager {
 
             } else {
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.BATTERY)) {
-                    tags.put("battery_total",BatteryUtils.getBatteryTotal(context)+"mAh");
-                    tags.put("battery_use",(100 - BatteryUtils.getBatteryCurrent(context))+"%");
+                    tags.put("battery_total",BatteryUtils.getBatteryTotal(context));
+                    tags.put("battery_use",BatteryUtils.getBatteryCurrent(context));
                 }
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.MEMORY)) {
                     String[] memory = DeviceUtils.getRamData(context);
@@ -418,13 +418,13 @@ public class SyncDataManager {
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.CPU)) {
                     tags.put("cpu_no", DeviceUtils.getHardWare());
                     tags.put("cpu_use", DeviceUtils.getCpuUseRate());
-                    tags.put("cpu_temperature", CpuUtils.get().getCpuTemperature() + "℃");
-                    tags.put("cpu_hz", CpuUtils.get().getCPUMaxFreqKHz() + "Hz");
+                    tags.put("cpu_temperature", CpuUtils.get().getCpuTemperature());
+                    tags.put("cpu_hz", CpuUtils.get().getCPUMaxFreqKHz());
                 }
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.GPU)) {
                     tags.put("gpu_model",GpuUtils.GPU_VENDOR_RENDERER);
-                    tags.put("gpu_hz",GpuUtils.getGpuMaxFreq()+"Hz");
-                    tags.put("gpu_rate",GpuUtils.getGpuUseRate()+"%");
+                    tags.put("gpu_hz",GpuUtils.getGpuMaxFreq());
+                    tags.put("gpu_rate",GpuUtils.getGpuUseRate());
                 }
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.NETWORK)) {
                     int networkType = NetUtils.get().getNetworkState(context);
@@ -435,7 +435,7 @@ public class SyncDataManager {
                     } else {
                         tags.put("network_type","蜂窝网络");
                     }
-                    tags.put("network_strength",NetUtils.get().getSignalStrength());
+                    tags.put("network_strength",NetUtils.get().getSignalStrength(context));
                     tags.put("network_speed",NetUtils.get().getNetRate());
                     tags.put("network_proxy",NetUtils.get().isWifiProxy(context));
                 }
