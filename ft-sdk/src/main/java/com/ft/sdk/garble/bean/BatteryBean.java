@@ -9,7 +9,7 @@ public class BatteryBean {
     /**
      * 电量使用量
      */
-    private String br;
+    private int br;
     /**
      * 电池状态
      */
@@ -48,11 +48,11 @@ public class BatteryBean {
      */
     private String power;
 
-    public String getBr() {
+    public int getBr() {
         return br;
     }
 
-    public void setBr(String br) {
+    public void setBr(int br) {
         this.br = br;
     }
 

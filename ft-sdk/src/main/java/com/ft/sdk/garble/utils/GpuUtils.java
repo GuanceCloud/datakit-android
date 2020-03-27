@@ -34,16 +34,19 @@ public class GpuUtils {
      *
      * @return
      */
-    public static String getGpuUseRate() {
+    public static double getGpuUseRate() {
         String rate = readOneLineFile(GPU_USE_QUALCOMM);
         if (rate == null) {
             rate = readOneLineFile(GPU_USE_MTK);
         }
-        if (Utils.isNullOrEmpty(rate)) {
-            return Constants.UNKNOWN;
+        try{
+            double value = Double.parseDouble(rate);
+            return Utils.formatDouble(value);
+        }catch (Exception e){
+            e.printStackTrace();
         }
 
-        return rate+"%";
+        return 0.00;
     }
 
     /**
