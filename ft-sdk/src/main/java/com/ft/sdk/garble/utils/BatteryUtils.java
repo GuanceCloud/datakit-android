@@ -21,12 +21,12 @@ public class BatteryUtils {
      * @param context
      * @return
      */
-    public static String getBatteryCurrent(Context context) {
-        String capacity = Constants.UNKNOWN;
+    public static int getBatteryCurrent(Context context) {
+        int capacity = 0;
         try {
             BatteryManager manager = (BatteryManager) context.getSystemService(Context.BATTERY_SERVICE);
             int value = manager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);//当前电量剩余百分比
-            capacity = (100-value)+"%";
+            capacity = (100-value);
         } catch (Exception e) {
 
         }

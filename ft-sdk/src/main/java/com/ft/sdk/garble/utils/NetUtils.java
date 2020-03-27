@@ -33,7 +33,7 @@ public class NetUtils {
     private TelephonyManager telephonyManager;
     private PhoneStatListener phoneStatListener;
 
-    private String netRate = Constants.UNKNOWN;
+    private double netRate = 0.00;
     private long lastRxTx = 0;
     private boolean isRunNetMonitor = false;
 
@@ -132,10 +132,8 @@ public class NetUtils {
             WifiInfo wifiInfo = mWifiManager.getConnectionInfo();
             int wifi = wifiInfo.getRssi();
             if(wifi > -50 && wifi < 0){
-                return 4;
-            }else if(wifi > -70 && wifi < -50){
                 return 3;
-            }else if(wifi > -80 && wifi <-70){
+            }else if(wifi > -80 && wifi < -50){
                 return 2;
             }else if(wifi > -100 && wifi <-80){
                 return 1;
@@ -169,7 +167,7 @@ public class NetUtils {
      *
      * @return
      */
-    public String getNetRate() {
+    public double getNetRate() {
         return netRate;
     }
 
@@ -218,14 +216,14 @@ public class NetUtils {
      *
      * @return
      */
-    public String getNetSpeed() {
+    public void getNetSpeed() {
         long tempSum = TrafficStats.getTotalRxBytes()
                 + TrafficStats.getTotalTxBytes();
         long rxtxLast = tempSum - lastRxTx;
         double totalSpeed = rxtxLast * 1000 / 2000d;
         lastRxTx = tempSum;
-        netRate = showSpeed(totalSpeed);//设置显示当前网速
-        return netRate;
+        //netRate = showSpeed(totalSpeed);//设置显示当前网速
+        netRate = Utils.formatDouble(totalSpeed);
     }
 
     private String showSpeed(double speed) {
@@ -243,7 +241,7 @@ public class NetUtils {
     /**
      * 判断设备 是否使用代理上网
      */
-    public boolean isWifiProxy(Context context) {
+    public String isWifiProxy(Context context) {
         final boolean IS_ICS_OR_LATER = Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH;
         String proxyAddress;
         int proxyPort;
@@ -255,7 +253,11 @@ public class NetUtils {
             proxyAddress = android.net.Proxy.getHost(context);
             proxyPort = android.net.Proxy.getPort(context);
         }
-        return (!TextUtils.isEmpty(proxyAddress)) && (proxyPort != -1);
+        if (!TextUtils.isEmpty(proxyAddress) && (proxyPort != -1)){
+            return proxyAddress+":"+proxyPort;
+        }else{
+            return Constants.UNKNOWN;
+        }
 
     }
 }

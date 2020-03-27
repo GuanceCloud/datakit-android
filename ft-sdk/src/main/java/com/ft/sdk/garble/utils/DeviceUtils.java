@@ -246,20 +246,20 @@ public class DeviceUtils {
      * @param context
      * @return
      */
-    public static String[] getRamData(Context context) {
+    public static double[] getRamData(Context context) {
         DecimalFormat showFloatFormat =new DecimalFormat("0.00");
         try {
             ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
             ActivityManager.MemoryInfo info = new ActivityManager.MemoryInfo();
             manager.getMemoryInfo(info);
             long[] data = new long[]{info.totalMem, info.availMem};
-            String[] strings = new String[2];
-            strings[0] = showFloatFormat.format(1.0*data[0]/1024/1024/1024)+"GB";
-            strings[1] = showFloatFormat.format((data[0]-data[1])*100.0/data[0])+"%";
+            double[] strings = new double[2];
+            strings[0] = Utils.formatDouble(1.0*data[0]/1024/1024/1024);
+            strings[1] = Utils.formatDouble((data[0]-data[1])*100.0/data[0]);
             return strings;
         } catch (Exception e) {
             e.printStackTrace();
-            return new String[]{"N/A", "N/A"};
+            return new double[]{0.00, 0.00};
         }
     }
 
@@ -280,16 +280,15 @@ public class DeviceUtils {
      * 获得CPU使用率
      * @return
      */
-    public static String getCpuUseRate(){
+    public static double getCpuUseRate(){
         try {
-            DecimalFormat showFloatFormat = new DecimalFormat("0.00");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                return showFloatFormat.format(CpuUtils.get().getCpuDataForO()) + "%";
+                return Utils.formatDouble(CpuUtils.get().getCpuDataForO());
             } else {
-                return showFloatFormat.format(CpuUtils.get().getCPUData()) + "%";
+                return Utils.formatDouble(CpuUtils.get().getCPUData());
             }
         }catch (Exception e){
-            return "N/A";
+            return 0.00;
         }
     }
 

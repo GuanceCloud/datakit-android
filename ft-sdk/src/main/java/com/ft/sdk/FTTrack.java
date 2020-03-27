@@ -259,7 +259,6 @@ public class FTTrack {
             if (tagsTemp == null) {
                 tagsTemp = new JSONObject();
             }
-            SyncDataManager.addMonitorData(tagsTemp);
             opData.put("tags", tagsTemp);
             if (fields != null) {
                 opData.put(Constants.FIELDS, fields);
@@ -270,6 +269,7 @@ public class FTTrack {
                 }
                 return null;
             }
+            SyncDataManager.addMonitorData(tagsTemp,fields);
             recordData.setOpdata(opData.toString());
             String sessionId = FTUserConfig.get().getSessionId();
             if (!Utils.isNullOrEmpty(sessionId)) {
