@@ -16,16 +16,17 @@ public class BatteryUtils {
     static double batteryCapacity = 0; //电池的容量mAh
 
     /**
-     * 获取当前电量百分比
+     * 获取当前电量使用百分比
      *
      * @param context
      * @return
      */
-    public static int getBatteryCurrent(Context context) {
-        int capacity = 0;
+    public static String getBatteryCurrent(Context context) {
+        String capacity = Constants.UNKNOWN;
         try {
             BatteryManager manager = (BatteryManager) context.getSystemService(Context.BATTERY_SERVICE);
-            capacity = manager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);//当前电量剩余百分比
+            int value = manager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);//当前电量剩余百分比
+            capacity = (100-value)+"%";
         } catch (Exception e) {
 
         }
@@ -38,9 +39,9 @@ public class BatteryUtils {
      * @param context
      * @return
      */
-    public static double getBatteryTotal(Context context) {
+    public static String getBatteryTotal(Context context) {
         if (batteryCapacity > 0) {
-            return batteryCapacity;
+            return batteryCapacity+"mAh";
         }
         Object mPowerProfile;
         final String POWER_PROFILE_CLASS = "com.android.internal.os.PowerProfile";
@@ -50,7 +51,10 @@ public class BatteryUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return batteryCapacity;
+        if(batteryCapacity == 0){
+            return Constants.UNKNOWN;
+        }
+        return batteryCapacity+"mAh";
     }
 
     /**

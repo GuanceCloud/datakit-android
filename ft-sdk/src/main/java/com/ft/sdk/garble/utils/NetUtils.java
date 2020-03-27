@@ -4,6 +4,8 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.TrafficStats;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.telephony.PhoneStateListener;
 import android.telephony.SignalStrength;
@@ -123,9 +125,27 @@ public class NetUtils {
      *
      * @return
      */
-    public int getSignalStrength() {
-        if (phoneStatListener != null) {
-            return phoneStatListener.mSignalStrength;
+    public int getSignalStrength(Context context) {
+        int state = getNetworkState(context);
+        if(state == NETWORK_WIFI){
+            WifiManager mWifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+            WifiInfo wifiInfo = mWifiManager.getConnectionInfo();
+            int wifi = wifiInfo.getRssi();
+            if(wifi > -50 && wifi < 0){
+                return 4;
+            }else if(wifi > -70 && wifi < -50){
+                return 3;
+            }else if(wifi > -80 && wifi <-70){
+                return 2;
+            }else if(wifi > -100 && wifi <-80){
+                return 1;
+            }else{
+                return 0;
+            }
+        }else if(state != NETWORK_NONE) {
+            if (phoneStatListener != null) {
+                return phoneStatListener.mSignalStrength;
+            }
         }
         return 0;
     }

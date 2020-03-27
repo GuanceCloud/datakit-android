@@ -39,11 +39,11 @@ public class GpuUtils {
         if (rate == null) {
             rate = readOneLineFile(GPU_USE_MTK);
         }
-        if (rate == null) {
-            rate = Constants.UNKNOWN;
+        if (Utils.isNullOrEmpty(rate)) {
+            return Constants.UNKNOWN;
         }
 
-        return rate;
+        return rate+"%";
     }
 
     /**
@@ -62,10 +62,10 @@ public class GpuUtils {
                 maxFreq = datas.get(0);
             }
         }
-        if (maxFreq == null) {
-            maxFreq = Constants.UNKNOWN;
+        if (Utils.isNullOrEmpty(maxFreq)) {
+            return Constants.UNKNOWN;
         }
-        return maxFreq;
+        return maxFreq+"Hz";
     }
 
     /**
