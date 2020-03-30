@@ -379,32 +379,32 @@ public class SyncDataManager {
         try {
             Context context = FTSdk.get().getApplication();
             if (FTMonitorConfig.get().isMonitorType(MonitorType.ALL)) {
-                fields.put("battery_total",BatteryUtils.getBatteryTotal(context));
+                tags.put("battery_total",BatteryUtils.getBatteryTotal(context));
                 fields.put("battery_use",BatteryUtils.getBatteryCurrent(context));
                 double[] memory = DeviceUtils.getRamData(context);
-                fields.put("memory_total",memory[0]+"GB");
+                tags.put("memory_total",memory[0]+"GB");
                 fields.put("memory_use",memory[1]);
 
-                fields.put("cpu_no",DeviceUtils.getHardWare());
+                tags.put("cpu_no",DeviceUtils.getHardWare());
                 fields.put("cpu_use",DeviceUtils.getCpuUseRate());
                 tags.put("cpu_temperature",CpuUtils.get().getCpuTemperature());
                 tags.put("cpu_hz",CpuUtils.get().getCPUMaxFreqKHz());
 
-                fields.put("gpu_model",GpuUtils.GPU_VENDOR_RENDERER);
+                tags.put("gpu_model",GpuUtils.GPU_VENDOR_RENDERER);
                 tags.put("gpu_hz",GpuUtils.getGpuMaxFreq());
                 fields.put("gpu_rate",GpuUtils.getGpuUseRate());
 
                 int networkType = NetUtils.get().getNetworkState(context);
                 if (networkType == 1) {
-                    fields.put("network_type","WIFI");
+                    tags.put("network_type","WIFI");
                 } else if (networkType == 0) {
-                    fields.put("network_type","N/A");
+                    tags.put("network_type","N/A");
                 } else {
-                    fields.put("network_type","蜂窝网络");
+                    tags.put("network_type","蜂窝网络");
                 }
                 fields.put("network_strength",NetUtils.get().getSignalStrength(context));
                 fields.put("network_speed",NetUtils.get().getNetRate());
-                fields.put("network_proxy",NetUtils.get().isWifiProxy(context));
+                tags.put("network_proxy",NetUtils.get().isWifiProxy(context));
                 List<CameraPx> cameraPxs = CameraUtils.getCameraPxList(context);
                 for (CameraPx cameraPx : cameraPxs) {
                     tags.put(cameraPx.getPx()[0],cameraPx.getPx()[1]);
@@ -422,37 +422,37 @@ public class SyncDataManager {
 
             } else {
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.BATTERY)) {
-                    fields.put("battery_total",BatteryUtils.getBatteryTotal(context));
+                    tags.put("battery_total",BatteryUtils.getBatteryTotal(context));
                     fields.put("battery_use",BatteryUtils.getBatteryCurrent(context));
                 }
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.MEMORY)) {
                     double[] memory = DeviceUtils.getRamData(context);
-                    fields.put("memory_total",memory[0]+"GB");
+                    tags.put("memory_total",memory[0]+"GB");
                     fields.put("memory_use",memory[1]);
                 }
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.CPU)) {
-                    fields.put("cpu_no", DeviceUtils.getHardWare());
+                    tags.put("cpu_no", DeviceUtils.getHardWare());
                     fields.put("cpu_use", DeviceUtils.getCpuUseRate());
                     tags.put("cpu_temperature", CpuUtils.get().getCpuTemperature());
                     tags.put("cpu_hz", CpuUtils.get().getCPUMaxFreqKHz());
                 }
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.GPU)) {
-                    fields.put("gpu_model",GpuUtils.GPU_VENDOR_RENDERER);
+                    tags.put("gpu_model",GpuUtils.GPU_VENDOR_RENDERER);
                     tags.put("gpu_hz",GpuUtils.getGpuMaxFreq());
                     fields.put("gpu_rate",GpuUtils.getGpuUseRate());
                 }
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.NETWORK)) {
                     int networkType = NetUtils.get().getNetworkState(context);
                     if (networkType == 1) {
-                        fields.put("network_type","WIFI");
+                        tags.put("network_type","WIFI");
                     } else if (networkType == 0) {
-                        fields.put("network_type","N/A");
+                        tags.put("network_type","N/A");
                     } else {
-                        fields.put("network_type","蜂窝网络");
+                        tags.put("network_type","蜂窝网络");
                     }
                     fields.put("network_strength",NetUtils.get().getSignalStrength(context));
                     fields.put("network_speed",NetUtils.get().getNetRate());
-                    fields.put("network_proxy",NetUtils.get().isWifiProxy(context));
+                    tags.put("network_proxy",NetUtils.get().isWifiProxy(context));
                 }
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.CAMERA)) {
                     List<CameraPx> cameraPxs = CameraUtils.getCameraPxList(context);
