@@ -1,54 +1,51 @@
 # Dataflux SDK Android
 
-**demo**
+**Demo**
 
 地址：[https://github.com/CloudCare/dataflux-sdk-android-demo](https://github.com/CloudCare/dataflux-sdk-android-demo)
 
-**agent**
+**Agent**
 
 [![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Fmvnrepo.jiagouyun.com%2Frepository%2Fmaven-releases%2Fcom%2Fcloudcare%2Fft%2Fmobile%2Fsdk%2Ftraker%2Fagent%2Fft-sdk%2Fmaven-metadata.xml)](https://mvnrepo.jiagouyun.com/repository/maven-releases/com/cloudcare/ft/mobile/sdk/traker/agent/ft-sdk/maven-metadata.xml)
 
-**plugin**
+**Plugin**
 
 [![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Fmvnrepo.jiagouyun.com%2Frepository%2Fmaven-releases%2Fcom%2Fcloudcare%2Fft%2Fmobile%2Fsdk%2Ftraker%2Fplugin%2Fft-plugin%2Fmaven-metadata.xml)](https://mvnrepo.jiagouyun.com/repository/maven-releases/com/cloudcare/ft/mobile/sdk/traker/plugin/ft-plugin/maven-metadata.xml)
 
 ## 安装
-- 在项目的根目录的 build.gradle 文件中添加 FT SDK 的远程仓库地址
-
+### 1. 在项目的根目录的 build.gradle 文件中添加 DataFlux SDK 的远程仓库地址
 ``` groovy
-
 buildscript {
-    //...
+    //...省略部分代码
     repositories {
-        //...
-        //添加FT SDK的远程仓库地址
+        //...省略部分代码
+        //添加 DataFlux SDK 的远程仓库地址
         maven {
             url 'https://mvnrepo.jiagouyun.com/repository/maven-releases'
         }
     }
     dependencies {
-        //...
-        //添加 FT Plugin 的插件依赖
+        //...省略部分代码
+        //添加 DataFlux Plugin 的插件依赖
         classpath 'com.cloudcare.ft.mobile.sdk.traker.plugin:ft-plugin:1.0.0-alpha5'
     }
 }
 allprojects {
     repositories {
-        //...
-        //添加FT SDK的远程仓库地址
+        //...省略部分代码
+        //添加 DataFlux SDK 的远程仓库地址
         maven {
             url 'https://mvnrepo.jiagouyun.com/repository/maven-releases'
         }
     }
 }
 ```
-
-- 在项目主模块( app 模块)的 build.gradle 文件中添加 FT SDK 的依赖及 FT Plugin 的使用
+### 2. 在项目主模块( app 模块)的 build.gradle 文件中添加 DataFlux SDK 的依赖及 DataFlux Plugin 的使用 和 Java 8 的支持
 
 ``` groovy
 dependencies {
-    //添加 FT SDK 的依赖
-    implementation 'com.cloudcare.ft.mobile.sdk.traker.agent:ft-sdk:1.0.0'
+    //添加 DataFlux SDK 的依赖
+    implementation 'com.cloudcare.ft.mobile.sdk.traker.agent:ft-sdk:$last_version'
 }
 //应用插件
 apply plugin: 'ft-plugin'
@@ -57,12 +54,8 @@ FTExt {
     //是否显示日志
     showLog = true
 }
-```
-
-- 在项目主模块( app 模块)的 build.gradle 文件中添加 Java 8 的支持
-
-``` groovy
 android{
+	//...省略部分代码
     compileOptions {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
@@ -70,72 +63,53 @@ android{
 }
 ```
 
-关于 FT SDK 最新的版本号，请参考[更新文档](https://mvnrepo.jiagouyun.com/repository/maven-public/com/cloudcare/ft/mobile/sdk/traker/agent/ft-sdk/maven-metadata.xml)
+>最新的版本请看上方的 Agent 和 Plugin 的版本名
 
-关于 FT Plugin 最新的版本号，请参考[更新文档](https://mvnrepo.jiagouyun.com/repository/maven-public/com/cloudcare/ft/mobile/sdk/traker/plugin/ft-plugin/maven-metadata.xml)
+### 3. 添加混淆
+
+如果你的项目开启了混淆，那么在你的 proguard-rules.pro 文件中添加如下配置
+
+```
+-keep class * extends com.ft.sdk.garble.http.ResponseData{ *;}
+-keep class com.ft.sdk.FTAutoTrack{*;}
+-keep enum com.ft.sdk.FTAutoTrackType{*;}
+-keep enum com.ft.sdk.FTSdk{*;}
+```
+
 ## 配置
 
-### 一、添加混淆配置
+### 一、 DataFlux SDK 功能配置项说明
 
-如果你的项目开启了混淆，那请在您的 proguard-rules.pro 文件中添加如下配置
-
-```
--keep class * extends com.ft.sdk.garble.http.ResponseData{
-     *;
-}
-
--keep class com.ft.sdk.FTAutoTrack{
-     *;
-}
-
--keep enum com.ft.sdk.FTAutoTrackType{
-     *;
-}
--keep enum com.ft.sdk.FTSdk{
-     *;
-}
-```
-
-### 二、关于 FT SDK 初始化的参数、方法等配置项的说明
-
-#### 1、通过 FTSDKConfig 构建 SDK 配置项的参数方法
-
-方法说明表
+#### 1. DataFlux SDK 包含的功能说明
 
 方法名|含义|是否必须|注意
 :--:|:--:|:--:|:--:
-setUseOAID|是否使用OAID作为设备唯一识别号的替代字段 |否|默认不使用,<br>[了解 OAID](#1关于-oaid)
+setUseOAID|是否使用OAID作为设备唯一识别号的替代字段 |否|默认不使用,开启后全埋点数据里将会添加一个 oaid 字段<br>[了解 OAID](#1关于-oaid)
 setXDataKitUUID|设置数据采集端的名称|否|不设置该值系统会生成一个默认的 uuid
 setDebug|是否开启调试模式|否|默认不开启，开启后方可打印 SDK 运行日志
 setMonitorType|设置监控项|否|默认不开启任何监控项,<br>[关于监控项说明](#四监控配置项类-monitortype),<br>[关于监控项参数获取问题]()
 setNeedBindUser|是否开启绑定用户数据|否|默认不开启,<br>开启后必须要绑定用户数据[如何绑定用户数据](#一初始化类-ftsdk-提供的方法)
 setOpenFlowChart|是否开启自动埋点流程图数据上报|否|[详细说明](#3关于自动埋点的页面路径流程图的说明)
 setFlowProduct|设置流程的指标集|否|当开启了上报流程图一定要设置该值
-enableAutoTrack|是否使用自动埋点|否|""
+enableAutoTrack|是否使用自动埋点|否|不开启将不会上报流程图和埋点事件
 setEnableAutoTrackType|设置事件白名单|否|开启自动埋点后，不设置该值表示接受所有事件类型。埋点事件类型见表下说明
 setDisableAutoTrackType|设置事件黑名单|否|开启自动埋点后，不设置该值表示不设置事件黑名单
 setWhiteActivityClasses|页面白名单|否|包括 Activity、Fragment
 setWhiteViewClasses|控件白名单|否|包括基本控件
-setBlackActivityClasses|页面黑名单|否|""
-setBlackViewClasses|控件黑名单|否|""
-builder|构建配置项对象方法|是|关于其参数可见下方参数表
+setBlackActivityClasses|页面黑名单|否|包括 Activity、Fragment
+setBlackViewClasses|控件黑名单|否|包括基本控件
+metricsUrl|FT-GateWay metrics 写入地址|是|必须配置，配置后才能上报
+enableRequestSigning|配置是否需要进行请求签名|否|
+akId|access key ID|否|enableRequestSigning 为 true 时，必须要填
+akSecret|access key Secret|否|enableRequestSigning 为 true 时，必须要填
 
-    FTAutoTrackType 自动埋点事件说明：
-    事件总类目前支持3种
+> FTAutoTrackType 自动埋点事件说明，事件总类目前支持3种：
     FTAutoTrackType.APP_START：页面的开始事件，Activity 依赖的是其 onResume 方法，Fragment 依赖的是其 onResume 方法；
     FTAutoTrackType.APP_END：页面的结束事件，Activity 依赖的是其 onPause 方法，Fragment 依赖的是其 onPause 方法；
     FTAutoTrackType.APP_CLICK：控件的点击事件。
 
-FTSDKConfig.builder(...) 方法必要参数说明表
 
-参数|类型|含义|是否必须
-:--:|:--:|:--:|:--:
-metricsUrl|String|FT-GateWay metrics 写入地址|是
-enableRequestSigning|boolean|配置是否需要进行请求签名|否
-akId|String|access key ID|enableRequestSigning 为 true 时，必须要填
-akSecret|String|access key Secret|enableRequestSigning 为 true 时，必须要填
-
-#### 2、通过 FTSdk 安装配置项和绑定用户信息
+#### 2. 通过 FTSdk 安装配置项和绑定用户信息
 
 方法说明表
 
@@ -148,10 +122,9 @@ bindUserData|绑定用户信息|否|必须在 setNeedBindUser 方法设为 true 
 shutDown|关闭SDK中正在执行的操作|否|""
 setGpuRenderer|设置 GPU 信息获取依赖的视图|否|当监控项 setMonitorType 设置监控 GPU 后一定调用该方法
 
-#### 3、示例代码
+#### 3. 示例代码
 
 ``` kotlin
-
 class DemoAplication : Application() {
     private val accesskey_id = "key_id"
     private val accessKey_secret = "key_secret"
@@ -168,8 +141,8 @@ class DemoAplication : Application() {
             .setXDataKitUUID("ft-dataKit-uuid-001")
             .setNeedBindUser(true)//是否绑定用户信息
             .setMonitorType(MonitorType.ALL)//设置监控项
-            .setOpenFlowChart(true)
-            .setFlowProduct("demo12")
+            .setOpenFlowChart(true)//开启流程图
+            .setFlowProduct("demo12")//流程图唯一识别号
             .enableAutoTrack(true)//是否开启自动埋点
             .setEnableAutoTrackType(FTAutoTrackType.APP_START.type or
                     FTAutoTrackType.APP_END.type or
@@ -183,27 +156,27 @@ class DemoAplication : Application() {
 ```
 
 ``` kotlin
-//绑定用户
+//可以在用户登录成功后调用此方法用来绑定用户信息
 bind_user.setOnClickListener {
    val exts = JSONObject()
    exts.put("sex","male")
    FTSdk.get().bindUserData("jack","001",exts)
 }
 
-//解绑用户
+//可以在用户退出登录后调用此方法来解绑用户信息
 unbind_user.setOnClickListener {
    FTSdk.get().unbindUserData()
 }
 ```
 
-***注意：<br>
+>注意
 1、当 setNeedBindUser 设置为 true 时，一定要绑定用户信息才能将埋点数据
 上传到服务器，否者会一直等待用户绑定。
-<br> 2、当监控项配置了 CAMERA 时，需要申请相机权限<br>
-3、当监控项配置了 LOCATION 时，需要申请定位权限***
+2、当监控项配置了 CAMERA 时，需要申请相机权限
+3、当监控项配置了 LOCATION 时，需要申请定位权限
 
-### 三、关于权限的配置
-FT SDK 用到了系统的四个权限，分别为 READ_PHONE_STATE、WRITE_EXTERNAL_STORAGE、CAMERA、ACCESS_FINE_LOCATION
+### 二、关于权限的配置
+DataFlux SDK 用到了系统的四个权限，分别为 READ_PHONE_STATE、WRITE_EXTERNAL_STORAGE、CAMERA、ACCESS_FINE_LOCATION
 权限使用说明
 
 名称|使用原因
@@ -537,45 +510,44 @@ public class MonitorType {
 
 
 ## 常见问题
-### 1.关于 OAID
-- 介绍
+### 一、关于 OAID
+#### 1. 介绍
 
  在 Android 10 版本中，非系统应用将不能获取到系统的 IMEI、MAC 等信息。面对该问题移动安全联盟联合国内的手机厂商推出了
 补充设备标准体系方案，选择用 OAID 字段作为IMEI等系统信息的替代字段。OAID 字段是由中国信通院联合华为、小米、OPPO、
 VIVO 等厂商共同推出的设备识别字段，具有一定的权威性。
 关于 OAID 可移步参考[移动安全联盟](http://www.msa-alliance.cn/col.jsp?id=120)
 
-- 使用
+#### 2. 使用
 
  使用方式和资源下载可参考[移动安全联盟的集成文档](http://www.msa-alliance.cn/col.jsp?id=120)
 
- 示例：
+#### 3. 示例
 
-1. 下载好资源文件后，将 miit_mdid_x.x.x.arr 拷贝到项目的 libs 目录下，并设置依赖，其中 x.x.x 代表版本号
+##### 1. 下载好资源文件后，将 miit_mdid_x.x.x.arr 拷贝到项目的 libs 目录下，并设置依赖，其中 x.x.x 代表版本号
 [获取最新版本](http://www.msa-alliance.cn/col.jsp?id=120)
 
-    ![Alt](http://zhuyun-static-files-production.oss-cn-hangzhou.aliyuncs.com/helps/markdown-screentshot/ft-sdk-android/use_learn_1.png#pic_center)
+![Alt](http://zhuyun-static-files-production.oss-cn-hangzhou.aliyuncs.com/helps/markdown-screentshot/ft-sdk-android/use_learn_1.png#pic_center)
 
-2. 将下载的资源中的 supplierconfig.json 文件拷贝到主项目的 assets 目录下，并修改里面对应的内容，特别是需要设置 appid 的部分。
-需要设置 appid 的部分需要去对应厂商的应用商店里注册自己的 app。
+##### 2. 将下载的资源中的 supplierconfig.json 文件拷贝到主项目的 assets 目录下，并修改里面对应的内容，特别是需要设置 appid 的部分。需要设置 appid 的部分需要去对应厂商的应用商店里注册自己的 app。
 
-    ![Alt](http://zhuyun-static-files-production.oss-cn-hangzhou.aliyuncs.com/helps/markdown-screentshot/ft-sdk-android/use_learn_2.png#pic_center)
+![Alt](http://zhuyun-static-files-production.oss-cn-hangzhou.aliyuncs.com/helps/markdown-screentshot/ft-sdk-android/use_learn_2.png#pic_center)
 
-    ![Alt](http://zhuyun-static-files-production.oss-cn-hangzhou.aliyuncs.com/helps/markdown-screentshot/ft-sdk-android/use_learn_3.png#pic_center)
+ ![Alt](http://zhuyun-static-files-production.oss-cn-hangzhou.aliyuncs.com/helps/markdown-screentshot/ft-sdk-android/use_learn_3.png#pic_center)
 
-3. 设置依赖
+##### 3. 设置依赖
 
 ``` groovy
 implementation files('libs/miit_mdid_x.x.x.arr')
 ```
 
-4. 混淆设置
+##### 4. 混淆设置
 
 ```
  -keep class com.bun.miitmdid.core.**{*;}
 ```
 
-5. 设置 gradle 编译选项，这块可以根据自己的对平台的选择进行合理的配置
+##### 5. 设置 gradle 编译选项，这块可以根据自己的对平台的选择进行合理的配置
 
 ``` groovy
 ndk {
@@ -590,20 +562,20 @@ packagingOptions {
 }
 ```
 
-6. 以上步骤配置完成后，在配置 FT SDK 时调用 FTSDKConfig 的 setUseOAID(true) 方法即可
+##### 6. 以上步骤配置完成后，在配置 FT SDK 时调用 FTSDKConfig 的 setUseOAID(true) 方法即可
 
-### 2.关于监控项中有些参数获取不到问题说明
+### 二、关于监控项中有些参数获取不到问题说明
 
-- GPU
+#### GPU
 
 GPU 中的频率和使用率的值通过读取设备中配置文件获取，有些设备可能获取不到或只能在 root 下获取
 
-- CPU
+#### CPU
 
 CPU 温度有些设备可能获取不到（每种手机可能 CPU 温度文件存储位置不同），如果你有这样的问题欢迎在 Issue
 中提出这问题，并把你的机型贴出来，以便我们完善 CPU 温度文件配置。
 
-### 3.关于自动埋点的页面路径流程图的说明
+### 三、关于自动埋点的页面路径流程图的说明
 当集成者通过 setOpenFlowChart 方法开启了页面路径流程图统计并设置了流程图的指标集后，我们将会通过无埋点技术
 将用户的使用页面路径上报并将其用流程图的形式显示。其中对于 Activity 我们监听的是 onResume 和 onPause 方法
 ，对于 Fragment 我们监听的是 onResume 和 onPause。其中需要注意的是 Fragment 显示的方式有多种，我们
