@@ -43,7 +43,6 @@ public class GpuUtils {
             double value = Double.parseDouble(rate);
             return Utils.formatDouble(value);
         }catch (Exception e){
-            e.printStackTrace();
         }
 
         return 0.00;
