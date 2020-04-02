@@ -102,9 +102,9 @@ public class FTSdk {
      * 绑定用户信息
      * @param name
      * @param id
-     * @param exts
+     * @param extras
      */
-    public void bindUserData(@NonNull String name,@NonNull String id, JSONObject exts){
+    public void bindUserData(@NonNull String name,@NonNull String id, JSONObject extras){
         if(mFtSDKConfig != null){
             if(mFtSDKConfig.isNeedBindUser()){
                 LogUtils.d("绑定用户信息");
@@ -115,7 +115,7 @@ public class FTSdk {
                 //初始化SessionId
                 FTUserConfig.get().initSessionId();
                 //绑定用户信息
-                FTUserConfig.get().bindUserData(name,id,exts);
+                FTUserConfig.get().bindUserData(name,id,extras);
             }
         }
     }

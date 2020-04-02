@@ -82,26 +82,26 @@ android{
 
 #### 1. DataFlux SDK 包含的功能说明
 
-方法名|含义|是否必须|注意
-:--:|:--:|:--:|:--:
-setUseOAID|是否使用OAID作为设备唯一识别号的替代字段 |否|默认不使用,开启后全埋点数据里将会添加一个 oaid 字段<br>[了解 OAID](#一关于-oaid)
-setXDataKitUUID|设置数据采集端的名称|否|不设置该值系统会生成一个默认的 uuid
-setDebug|是否开启调试模式|否|默认不开启，开启后方可打印 SDK 运行日志
-setMonitorType|设置监控项|否|默认不开启任何监控项,<br>[关于监控项说明](#四监控配置项类-monitortype),<br>[关于监控项参数获取问题](#二关于监控项中有些参数获取不到问题说明)
-setNeedBindUser|是否开启绑定用户数据|否|默认不开启,<br>开启后必须要绑定用户数据[如何绑定用户数据](#一初始化类-ftsdk-提供的方法)
-setOpenFlowChart|是否开启自动埋点流程图数据上报|否|[详细说明](#三关于自动埋点的页面路径流程图的说明)
-setFlowProduct|设置流程的指标集|否|当开启了上报流程图一定要设置该值
-enableAutoTrack|是否使用自动埋点|否|不开启将不会上报流程图和埋点事件
-setEnableAutoTrackType|设置事件白名单|否|开启自动埋点后，不设置该值表示接受所有事件类型。埋点事件类型见表下说明
-setDisableAutoTrackType|设置事件黑名单|否|开启自动埋点后，不设置该值表示不设置事件黑名单
-setWhiteActivityClasses|页面白名单|否|包括 Activity、Fragment
-setWhiteViewClasses|控件白名单|否|包括基本控件
-setBlackActivityClasses|页面黑名单|否|包括 Activity、Fragment
-setBlackViewClasses|控件黑名单|否|包括基本控件
-metricsUrl|FT-GateWay metrics 写入地址|是|必须配置，配置后才能上报
-enableRequestSigning|配置是否需要进行请求签名|否|
-akId|access key ID|否|enableRequestSigning 为 true 时，必须要填
-akSecret|access key Secret|否|enableRequestSigning 为 true 时，必须要填
+|          方法名          |                含义                |       是否必须        |                                                          注意                                                           |
+|:-----------------------:|:---------------------------------:|:-------------------:|:----------------------------------------------------------------------------------------------------------------------:|
+|       setUseOAID        | 是否使用OAID作为设备唯一识别号的替代字段 |          否          |                         默认不使用,开启后全埋点数据里将会添加一个 oaid 字段<br>[了解 OAID](#一关于-oaid)                          |
+|     setXDataKitUUID     |         设置数据采集端的名称          |         否          |                                              不设置该值系统会生成一个默认的 uuid                                              |
+|        setDebug         |           是否开启调试模式           |          否          |                                            默认不开启，开启后方可打印 SDK 运行日志                                            |
+|     setMonitorType      |             设置监控项              |         否          | 默认不开启任何监控项,<br>[关于监控项说明](#四监控配置项类-monitortype),<br>[关于监控项参数获取问题](#二关于监控项中有些参数获取不到问题说明) |
+|     setNeedBindUser     |         是否开启绑定用户数据          |         否          |                        默认不开启,<br>开启后必须要绑定用户数据[如何绑定用户数据](#一初始化类-ftsdk-提供的方法)                        |
+|    setOpenFlowChart     |     是否开启自动埋点流程图数据上报      |         否          |                                        [详细说明](#三关于自动埋点的页面路径流程图的说明)                                         |
+|     setFlowProduct      |           设置流程的指标集           |          否          |                                               当开启了上报流程图一定要设置该值                                               |
+|     enableAutoTrack     |           是否使用自动埋点           |          否          |                                               不开启将不会上报流程图和埋点事件                                               |
+| setEnableAutoTrackType  |            设置事件白名单            |         否          |                                开启自动埋点后，不设置该值表示接受所有事件类型。埋点事件类型见表下说明                                 |
+| setDisableAutoTrackType |            设置事件黑名单            |         否          |                                          开启自动埋点后，不设置该值表示不设置事件黑名单                                          |
+| setWhiteActivityClasses |             页面白名单              |         否          |                                                 包括 Activity、Fragment                                                  |
+|   setWhiteViewClasses   |             控件白名单              |         否          |                                                       包括基本控件                                                        |
+| setBlackActivityClasses |             页面黑名单              |         否          |                                                 包括 Activity、Fragment                                                  |
+|   setBlackViewClasses   |             控件黑名单              |         否          |                                                       包括基本控件                                                        |
+|       metricsUrl        |    FT-GateWay metrics 写入地址     |          是          |                                                  必须配置，配置后才能上报                                                   |
+|                         |       enableRequestSigning        | 配置是否需要进行请求签名 |                                                           否                                                            |
+|          akId           |           access key ID           |         否          |                                         enableRequestSigning 为 true 时，必须要填                                          |
+|        akSecret         |         access key Secret         |         否          |                                         enableRequestSigning 为 true 时，必须要填                                          |
 
 > FTAutoTrackType 自动埋点事件说明，事件总类目前支持3种：
     FTAutoTrackType.APP_START：页面的开始事件，Activity 依赖的是其 onResume 方法，Fragment 依赖的是其 onResume 方法；
