@@ -31,6 +31,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import static com.ft.sdk.garble.bean.OP.CSTM;
 import static com.ft.sdk.garble.utils.Constants.FT_DEFAULT_MEASUREMENT;
@@ -151,7 +152,7 @@ public class SyncDataManager {
                 }else{
                     sb.append(",$parent=").append(recordData.getRpn());
                 }
-                sb.append(",").append(device.replaceAll(" ", "\\\\ ")).append(",");
+                sb.append(",").append(device).append(",");
                 addUserData(sb, recordData);
                 //删除多余的逗号
                 deleteLastComma(sb);
@@ -557,14 +558,24 @@ public class SyncDataManager {
         objectHashMap.put("imei", DeviceUtils.getImei(context));
         objectHashMap.put("os", DeviceUtils.getOSName());
         objectHashMap.put("os_version", DeviceUtils.getOSVersion());
-        objectHashMap.put("device_band", Utils.translateTagKeyValueAndFieldKey(DeviceUtils.getDeviceBand()));
-        objectHashMap.put("device_model", Utils.translateTagKeyValueAndFieldKey(DeviceUtils.getDeviceModel()));
+        objectHashMap.put("device_band", DeviceUtils.getDeviceBand());
+        objectHashMap.put("device_model", DeviceUtils.getDeviceModel());
         objectHashMap.put("display", DeviceUtils.getDisplay(context));
         objectHashMap.put("carrier", DeviceUtils.getCarrier(context));
         if (FTHttpConfig.get().useOaid) {
             objectHashMap.put("oaid", OaidUtils.getOAID(context));
         }
-        return objectHashMap;
+        HashMap<String, Object> temp = new HashMap<>();
+        for(Map.Entry<String, Object> entry : objectHashMap.entrySet()){
+            String mapKey = entry.getKey();
+            Object mapValue = entry.getValue();
+            if(mapValue instanceof String){
+                temp.put(mapKey,Utils.translateTagKeyValueAndFieldKey((String)mapValue));
+            }else{
+                temp.put(mapKey,mapValue);
+            }
+        }
+        return temp;
     }
 
     /**
