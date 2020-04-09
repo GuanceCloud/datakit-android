@@ -99,9 +99,11 @@ android{
 | setBlackActivityClasses |             页面黑名单              |         否          |                                                 包括 Activity、Fragment                                                  |
 |   setBlackViewClasses   |             控件黑名单              |         否          |                                                       包括基本控件                                                        |
 |       metricsUrl        |    FT-GateWay metrics 写入地址     |          是          |                                                  必须配置，配置后才能上报                                                   |
-|                         |       enableRequestSigning        | 配置是否需要进行请求签名 |                                                           否                                                            |
+|  enableRequestSigning   |       配置是否需要进行请求签名        |          否          |                                                      默认不开启                                                           |
 |          akId           |           access key ID           |         否          |                                         enableRequestSigning 为 true 时，必须要填                                          |
 |        akSecret         |         access key Secret         |         否          |                                         enableRequestSigning 为 true 时，必须要填                                          |
+|        setGeoKey        |  设置是否使用高德作为地址解析器和key     |         否          |                                         如何申请高德的 key？[点我快速了解](https://lbs.amap.com/api/webservice/guide/api/georegeo)                                          |
+
 
 > FTAutoTrackType 自动埋点事件说明，事件总类目前支持3种：
     FTAutoTrackType.APP_START：页面的开始事件，Activity 依赖的是其 onResume 方法，Fragment 依赖的是其 onResume 方法；
