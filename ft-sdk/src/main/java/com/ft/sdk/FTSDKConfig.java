@@ -21,6 +21,10 @@ public class FTSDKConfig {
     private boolean useOAID;
     //是否是Debug
     private boolean isDebug;
+    //高德逆向解析API 的 key
+    private String geoKey;
+    //是否使用高德作为逆向地址解析
+    private boolean useGeoKey;
     //是否开启自动埋点
     private boolean autoTrack;
     //是否需要绑定用户数据
@@ -152,6 +156,14 @@ public class FTSDKConfig {
 
     public List<Class<?>> getBlackViewClass() {
         return blackViewClass;
+    }
+
+    public String getGeoKey() {
+        return geoKey;
+    }
+
+    public boolean isUseGeoKey() {
+        return useGeoKey;
     }
 
     public FTSDKConfig enableAutoTrack(boolean autoTrack) {
@@ -298,6 +310,18 @@ public class FTSDKConfig {
      */
     public FTSDKConfig setBlackViewClasses(List<Class<?>> classes) {
         blackViewClass = classes;
+        return this;
+    }
+
+    /**
+     * 设置使用高德作为逆向地址解析
+     * @param useGeoKey
+     * @param geoKey
+     * @return
+     */
+    public FTSDKConfig setGeoKey(boolean useGeoKey,String geoKey){
+        this.useGeoKey = useGeoKey;
+        this.geoKey = geoKey;
         return this;
     }
 

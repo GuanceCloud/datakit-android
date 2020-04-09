@@ -79,7 +79,7 @@ public abstract class HttpClient {
                 LogUtils.e("请求地址不能为空");
                 return false;
             }
-            final URL url = new URL(urlStr + getQueryString());
+            final URL url = new URL(urlStr +"?"+ getQueryString());
             //打开连接
             mConnection = (HttpURLConnection) url.openConnection();
             if (mConnection == null) {
@@ -205,7 +205,9 @@ public abstract class HttpClient {
         }finally {
             close(outputStream, reader, inputStreamReader, inputStream);
         }
-        LogUtils.d("HTTP-response:[code:"+responseCode+",response:"+resultBuffer.toString()+"]");
+        if(mHttpBuilder.isShowLog()) {
+            LogUtils.d("HTTP-response:[code:" + responseCode + ",response:" + resultBuffer.toString() + "]");
+        }
         return getResponseData(tClass,responseCode, resultBuffer.toString());
     }
 

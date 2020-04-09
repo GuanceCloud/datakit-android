@@ -9,6 +9,13 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/sync_data_background"
+        android:text="同步数据后台上传"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:id="@+id/jump"
         android:text="模拟正确的主动上传埋点数据"
         />

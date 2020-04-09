@@ -18,6 +18,8 @@ public class HttpBuilder {
     private HashMap<String,Object> params = new HashMap<>();
     private int sendOutTime;
     private int readOutTime;
+    private boolean useDefaultHead = true;
+    private boolean showLog = true;
     private HashMap<String,String> headParams = new HashMap<>();
 
     public static HttpBuilder Builder() {
@@ -57,6 +59,14 @@ public class HttpBuilder {
 
     public HashMap<String,Object> getParams(){
         return params;
+    }
+
+    public boolean isShowLog() {
+        return showLog;
+    }
+
+    public boolean isUseDefaultHead() {
+        return useDefaultHead;
     }
 
     public HttpBuilder setUrl(String url) {
@@ -99,6 +109,11 @@ public class HttpBuilder {
         return this;
     }
 
+    public HttpBuilder useDefaultHead(boolean useDefault){
+        this.useDefaultHead = useDefault;
+        return this;
+    }
+
     public HttpBuilder setHeadParams(HashMap<String,String> hashMap){
         this.headParams.putAll(hashMap);
         return this;
@@ -106,6 +121,11 @@ public class HttpBuilder {
 
     public HttpBuilder addHeadParam(String key,String value){
         this.headParams.put(key,value);
+        return this;
+    }
+
+    public HttpBuilder setShowLog(boolean show){
+        this.showLog = show;
         return this;
     }
 

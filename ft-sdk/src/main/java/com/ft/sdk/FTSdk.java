@@ -16,6 +16,7 @@ import com.ft.sdk.garble.FTNetworkListener;
 import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.manager.SyncTaskManager;
 import com.ft.sdk.garble.utils.GpuUtils;
+import com.ft.sdk.garble.utils.LocationUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.RendererUtil;
 
@@ -118,6 +119,17 @@ public class FTSdk {
                 FTUserConfig.get().bindUserData(name,id,extras);
             }
         }
+    }
+
+    /**
+     * 设置使用高德作为逆向地址解析
+     * @param useGeoKey
+     * @param geoKey
+     * @return
+     */
+    public void setGeoKey(boolean useGeoKey,String geoKey){
+        LocationUtils.get().setUseGeoKey(useGeoKey);
+        LocationUtils.get().setGeoKey(geoKey);
     }
 
     /**
