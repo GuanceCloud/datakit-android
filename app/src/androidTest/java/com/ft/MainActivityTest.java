@@ -147,7 +147,7 @@ public class MainActivityTest {
 
         JSONObject jsonObject = new JSONObject(responseData.getData());
         JSONObject content = jsonObject.optJSONObject("content");
-        int length = content.optJSONArray("data").getJSONObject(0).optJSONArray("series")
+        int length = content.optJSONArray("data").getJSONObject(0).optJSONArray("Series")
                 .getJSONObject(0).optJSONArray("values").length();
         assertEquals(length, 6);
 
