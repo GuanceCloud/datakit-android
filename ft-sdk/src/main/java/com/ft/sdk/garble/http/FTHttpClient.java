@@ -19,7 +19,7 @@ public class FTHttpClient extends HttpClient {
 
     public FTHttpClient(HttpBuilder httpBuilder) {
         super(httpBuilder);
-        if (connSuccess) {
+        if (connSuccess && httpBuilder.isUseDefaultHead()) {
             //设置 DataFlux 请求特有的请求头
             setHeadParams();
             //计算日期

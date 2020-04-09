@@ -24,6 +24,16 @@ public class Main2Activity extends AppCompatActivity {
             FTSdk.get().shutDown();
             trackImmediate();
         });
+        findViewById(R.id.sync_data_background).setOnClickListener(v -> {
+            JSONObject field = new JSONObject();
+            try {
+                field.put("login","yes");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            FTTrack.getInstance().trackBackground("mobile_tracker_artificial", null, field);
+            FTSdk.get().shutDown();
+        });
         findViewById(R.id.jump2).setOnClickListener(v -> {trackImmediateErr();});
     }
     public void trackImmediate(){
