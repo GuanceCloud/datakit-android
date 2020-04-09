@@ -67,7 +67,7 @@ public class FTHttpClient extends HttpClient {
      */
     private void calculateDate() {
         Date currentTime = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss 'GMT'", Locale.UK);
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss 'GMT'", Locale.UK);
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
         gmtString = sdf.format(currentTime);
     }
