@@ -180,7 +180,7 @@ public class NetUtils {
                 if(isRunNetMonitor){
                     return;
                 }
-                ThreadPoolUtils.get().execute(() -> {
+                new Thread(() -> {
                     try {
                         while (true) {
                             isRunNetMonitor = true;
@@ -194,7 +194,7 @@ public class NetUtils {
                     }catch (Exception e){}finally {
                         isRunNetMonitor = false;
                     }
-                });
+                },"网速监听").start();
             }catch (Exception e){
                 isRunNetMonitor = false;
             }
