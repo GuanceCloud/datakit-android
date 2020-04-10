@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.ft.sdk.garble.bean.OP.CSTM;
+import static com.ft.sdk.garble.bean.OP.FLOW_CHAT;
 import static com.ft.sdk.garble.utils.Constants.FT_DEFAULT_MEASUREMENT;
 import static com.ft.sdk.garble.utils.Constants.FT_KEY_VALUE_NULL;
 
@@ -97,36 +98,7 @@ public class SyncDataManager {
                 sb.append(" ");
                 sb.append(recordData.getTime() * 1000 * 1000);
                 sb.append("\n");
-            } /**else if(OP.CLS_ACT.value.equals(recordData.getOp())){
-                //如果是关闭页面，也要附加一条页面关闭的流程图数据
-                try {
-                    //获取指标
-                    JSONObject opData = new JSONObject(recordData.getOpdata());
-                    if (opData.has(Constants.MEASUREMENT)) {
-                        sb.append("$flow_mobile_activity_").append(opData.optString(Constants.MEASUREMENT));
-                    }else{
-                        sb.append("$flow_mobile_activity_").append(FTFlowChartConfig.get().getFlowProduct());
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                sb.append(",$traceId=").append(recordData.getTraceId());
-                //如果父页面不是root，表示其为子页面的关闭
-                if(!Constants.FLOW_ROOT.equals(recordData.getPpn())){
-                    //交换当前页面和父页面
-                    sb.append(",$name=").append(recordData.getPpn());
-                    sb.append(",$parent=").append(recordData.getCpn());
-                }
-                sb.append(",").append(device).append(",");
-                addUserData(sb, recordData);
-                deleteLastComma(sb);
-                sb.append(" ");
-                sb.append("$duration=").append(recordData.getDuration()).append("i");
-                sb.append(" ");
-                sb.append(recordData.getTime() * 1000 * 1000);
-                sb.append("\n");
-            }*/else if(OP.OPEN_FRA.value.equals(recordData.getOp())){
+            } else if(OP.OPEN_FRA.value.equals(recordData.getOp())){
                 //如果是子页面打开操作，就在该条数据上添加一条表示流程图的数据
                 try {
                     JSONObject opData = new JSONObject(recordData.getOpdata());
@@ -176,14 +148,14 @@ public class SyncDataManager {
     /**
      * 获得数据头
      * (当{@link RecordData#getOp()}等于
-     * {@link com.ft.sdk.garble.bean.OP#CSTM}时用field字段，其他情况用
+     * {@link com.ft.sdk.garble.bean.OP#CSTM},{@link com.ft.sdk.garble.bean.OP#FLOW_CHAT}时用field字段，其他情况用
      * {@link com.ft.sdk.garble.utils.Constants#FT_DEFAULT_MEASUREMENT}
      *
      * @return
      */
     private String getMeasurement(RecordData recordData) {
         String measurement;
-        if (CSTM.value.equals(recordData.getOp())) {
+        if (CSTM.value.equals(recordData.getOp()) || FLOW_CHAT.value.equals(recordData.getOp())) {
             try {
                 JSONObject jsonObject = new JSONObject(recordData.getOpdata());
                 String measurementTemp = jsonObject.optString(Constants.MEASUREMENT);
@@ -209,7 +181,7 @@ public class SyncDataManager {
      * @return
      */
     private String getUpdateData(RecordData recordData) {
-        if (CSTM.value.equals(recordData.getOp())) {
+        if (CSTM.value.equals(recordData.getOp()) || FLOW_CHAT.value.equals(recordData.getOp())) {
             return composeCustomUpdateData(recordData);
         } else {
             return composeAutoUpdateData(recordData);

@@ -157,7 +157,7 @@ public class FTTrack {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        track(OP.CSTM, time, "$flow_" + product, tags, fields);
+        track(OP.FLOW_CHAT, time, "$flow_" + product, tags, fields);
     }
 
     /**
@@ -269,7 +269,9 @@ public class FTTrack {
                 }
                 return null;
             }
-            SyncDataManager.addMonitorData(tagsTemp,fields);
+            if(op == OP.CSTM) {
+                SyncDataManager.addMonitorData(tagsTemp, fields);
+            }
             recordData.setOpdata(opData.toString());
             String sessionId = FTUserConfig.get().getSessionId();
             if (!Utils.isNullOrEmpty(sessionId)) {

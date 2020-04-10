@@ -35,6 +35,10 @@ public class Main2Activity extends AppCompatActivity {
             FTSdk.get().shutDown();
         });
         findViewById(R.id.jump2).setOnClickListener(v -> {trackImmediateErr();});
+
+        findViewById(R.id.jump3).setOnClickListener(v->{
+            FTTrack.getInstance().trackFlowChart("ft_sdk_android","001","开始",null,1000,null,null);
+        });
     }
     public void trackImmediate(){
         JSONObject field = new JSONObject();
