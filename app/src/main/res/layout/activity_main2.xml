@@ -26,4 +26,10 @@
         android:id="@+id/jump2"
         android:text="模拟错误的主动埋点数据"
         />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/jump3"
+        android:text="上传流程图"
+        />
 </LinearLayout>
