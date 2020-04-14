@@ -71,7 +71,7 @@ public class ThreadPoolUtils {
 
     public void shutDown(){
         if(executor!=null && !executor.isShutdown()) {
-            executor.shutdown();
+            executor.shutdownNow();
             executor = null;
         }
     }

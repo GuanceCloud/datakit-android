@@ -39,4 +39,10 @@
         android:id="@+id/jump4"
         android:text="停止 SDK"
         />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/jump5"
+        android:text="重新配置"
+        />
 </LinearLayout>

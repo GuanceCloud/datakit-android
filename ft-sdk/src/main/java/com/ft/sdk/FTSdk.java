@@ -39,6 +39,7 @@ public class FTSdk {
     public static final String PLUGIN_MIN_VERSION = BuildConfig.MIN_FT_PLUGIN_VERSION; //当前 SDK 支持的最小 Plugin 版本
     private static FTSdk mFtSdk;
     private FTSDKConfig mFtSDKConfig;
+    private FTActivityLifecycleCallbacks life;
 
     private FTSdk(@NonNull FTSDKConfig ftSDKConfig) {
         this.mFtSDKConfig = ftSDKConfig;
@@ -73,19 +74,26 @@ public class FTSdk {
     }
 
     /**
+     * 关闭 SDK 正在做的操作
+     */
+    public void shutDown() {
+        SyncTaskManager.get().release();
+        FTUserConfig.get().release();
+        FTMonitorConfig.get().release();
+        FTAutoTrackConfig.get().release();
+        FTHttpConfig.get().release();
+        FTNetworkListener.get().release();
+        FTFlowChartConfig.get().release();
+        LogUtils.i("FT SDK 已经被关闭");
+    }
+
+    /**
      * 返回当前的 Application
      *
      * @return
      */
     public Application getApplication() {
         return FTApplication.getApplication();
-    }
-
-    /**
-     * 关闭 SDK 正在做的操作
-     */
-    public void shutDown() {
-        SyncTaskManager.get().shotDown();
     }
 
     /**
@@ -211,8 +219,18 @@ public class FTSdk {
      * 添加 Activity 生命周期监控
      */
     private void registerActivityLifeCallback() {
-        FTActivityLifecycleCallbacks life = new FTActivityLifecycleCallbacks();
+        life = new FTActivityLifecycleCallbacks();
         getApplication().registerActivityLifecycleCallbacks(life);
+    }
+
+    /**
+     * 解绑 Activity 生命周期监控
+     */
+    private void unregisterActivityLifeCallback() {
+        if(life != null) {
+            getApplication().unregisterActivityLifecycleCallbacks(life);
+            life = null;
+        }
     }
 
     private void trackStartApp() {

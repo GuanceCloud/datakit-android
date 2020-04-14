@@ -113,4 +113,18 @@ public class FTNetworkListener {
             SyncTaskManager.get().executeSyncPoll();
         }
     }
+
+    public void release(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            //SDK 版本大于 26 时通过registerDefaultNetworkCallback 注册网络状态变化回调
+            connectivityManager.unregisterNetworkCallback(networkCallback);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            //SDK 版本大于 21 小于 26 时通过 registerNetworkCallback 注册网络状态变化回调
+            connectivityManager.unregisterNetworkCallback(networkCallback);
+        } else {
+            //SDK 版本小于 21 时，通过广播来获得网络状态变化
+            application.unregisterReceiver(networkReceiver);
+        }
+        instance = null;
+    }
 }

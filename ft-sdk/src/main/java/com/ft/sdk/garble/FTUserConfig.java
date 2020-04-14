@@ -190,5 +190,8 @@ public class FTUserConfig {
         }
     }
 
+    public void release(){
+        instance = null;
+    }
 
 }

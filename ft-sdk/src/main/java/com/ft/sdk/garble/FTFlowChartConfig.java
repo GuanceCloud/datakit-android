@@ -52,4 +52,8 @@ public class FTFlowChartConfig {
     public String getFlowProduct() {
         return flowProduct;
     }
+
+    public void release(){
+        ftFlowChartConfig = null;
+    }
 }
