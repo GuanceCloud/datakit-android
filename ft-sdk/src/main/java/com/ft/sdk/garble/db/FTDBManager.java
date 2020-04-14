@@ -4,7 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.ft.sdk.FTSdk;
+import com.ft.sdk.FTApplication;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.db.base.DBManager;
@@ -33,7 +33,7 @@ public class FTDBManager extends DBManager {
 
     @Override
     public SQLiteOpenHelper initDataBaseHelper() {
-        return DatabaseHelper.getInstance(FTSdk.get().getApplication(), FTDBConfig.DATABASE_NAME, FTDBConfig.DATABASE_VERSION);
+        return DatabaseHelper.getInstance(FTApplication.getApplication(), FTDBConfig.DATABASE_NAME, FTDBConfig.DATABASE_VERSION);
     }
 
     /**

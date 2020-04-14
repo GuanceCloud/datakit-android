@@ -3,6 +3,7 @@ package com.ft.sdk.garble.manager;
 import android.content.Context;
 import android.location.Address;
 
+import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.garble.FTFlowChartConfig;
@@ -350,7 +351,7 @@ public class SyncDataManager {
      */
     public static void addMonitorData(JSONObject tags,JSONObject fields) {
         try {
-            Context context = FTSdk.get().getApplication();
+            Context context = FTApplication.getApplication();
             if (FTMonitorConfig.get().isMonitorType(MonitorType.ALL)) {
                 tags.put("battery_total",BatteryUtils.getBatteryTotal(context));
                 fields.put("battery_use",BatteryUtils.getBatteryCurrent(context));
@@ -520,7 +521,7 @@ public class SyncDataManager {
      * @return
      */
     private HashMap<String, Object> getDeviceInfo() {
-        Context context = FTSdk.get().getApplication();
+        Context context = FTApplication.getApplication();
         HashMap<String, Object> objectHashMap = new HashMap<>();
         objectHashMap.put("device_uuid", DeviceUtils.getUuid(context));
         objectHashMap.put("application_identifier", DeviceUtils.getApplicationId(context));
