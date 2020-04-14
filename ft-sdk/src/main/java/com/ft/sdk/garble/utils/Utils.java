@@ -11,7 +11,6 @@ import android.util.Base64;
 import androidx.core.content.ContextCompat;
 
 import com.ft.sdk.FTApplication;
-import com.ft.sdk.FTSdk;
 
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
@@ -36,8 +35,8 @@ public class Utils {
     }
 
     public static boolean hasNetPermission() {
-        return hasPermission(FTSdk.get().getApplication(), Manifest.permission.ACCESS_NETWORK_STATE) &&
-                hasPermission(FTSdk.get().getApplication(), Manifest.permission.INTERNET);
+        return hasPermission(FTApplication.getApplication(), Manifest.permission.ACCESS_NETWORK_STATE) &&
+                hasPermission(FTApplication.getApplication(), Manifest.permission.INTERNET);
     }
 
     public static boolean hasPermission(Context context, String permission) {
