@@ -77,7 +77,7 @@ public class FTMonitorConfig {
     /**
      * 清楚当前监控配置项
      */
-    public void clear(){
+    public void release(){
         ftMonitorConfig = null;
     }
 }

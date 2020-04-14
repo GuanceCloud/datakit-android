@@ -301,4 +301,8 @@ public class FTAutoTrackConfig {
             return false;
         }
     }
+
+    public void release(){
+        instance = null;
+    }
 }

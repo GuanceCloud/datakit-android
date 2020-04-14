@@ -47,5 +47,7 @@ public class FTHttpConfig {
         userAgent = USER_AGENT;
     }
 
-
+    public void release(){
+        instance = null;
+    }
 }

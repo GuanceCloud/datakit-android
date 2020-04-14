@@ -39,11 +39,6 @@ public class SyncTaskManager {
         this.running = running;
     }
 
-
-    public void shotDown(){
-        ThreadPoolUtils.get().shutDown();
-    }
-
     private SyncTaskManager() {
 
     }
@@ -159,5 +154,10 @@ public class SyncTaskManager {
                     "}");
         }
 
+    }
+
+    public void release(){
+        ThreadPoolUtils.get().shutDown();
+        instance = null;
     }
 }
