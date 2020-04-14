@@ -10,6 +10,7 @@ import android.util.Base64;
 
 import androidx.core.content.ContextCompat;
 
+import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTSdk;
 
 import java.security.InvalidKeyException;
@@ -44,7 +45,7 @@ public class Utils {
     }
 
     public static boolean isNetworkAvailable() {
-        return isNetworkAvailable(FTSdk.get().getApplication());
+        return isNetworkAvailable(FTApplication.getApplication());
     }
 
     public static boolean isNetworkAvailable(Context context) {
