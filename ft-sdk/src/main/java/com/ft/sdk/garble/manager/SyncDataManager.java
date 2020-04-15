@@ -2,6 +2,7 @@ package com.ft.sdk.garble.manager;
 
 import android.content.Context;
 import android.location.Address;
+import android.location.Location;
 
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTSdk;
@@ -10,6 +11,7 @@ import com.ft.sdk.garble.FTFlowChartConfig;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.FTUserConfig;
+import com.ft.sdk.garble.bean.BatteryBean;
 import com.ft.sdk.garble.bean.CameraPx;
 import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.RecordData;
@@ -48,6 +50,7 @@ public class SyncDataManager {
 
     /**
      * 将本地将要同步的数据封装
+     *
      * @param recordDatas
      * @return
      */
@@ -55,14 +58,14 @@ public class SyncDataManager {
         StringBuffer sb = new StringBuffer();
         String device = parseHashToString(getDeviceInfo());
         for (RecordData recordData : recordDatas) {
-            if(OP.OPEN_ACT.value.equals(recordData.getOp())){
+            if (OP.OPEN_ACT.value.equals(recordData.getOp())) {
                 //如果是页面打开操作，就在该条数据上添加一条表示流程图的数据
                 try {
                     JSONObject opData = new JSONObject(recordData.getOpdata());
                     //获取指标名称
                     if (opData.has(Constants.MEASUREMENT)) {
                         sb.append("$flow_mobile_activity_").append(opData.optString(Constants.MEASUREMENT));
-                    }else{
+                    } else {
                         sb.append("$flow_mobile_activity_").append(FTFlowChartConfig.get().getFlowProduct());
                     }
                 } catch (JSONException e) {
@@ -70,20 +73,20 @@ public class SyncDataManager {
                 }
 
                 sb.append(",$traceId=").append(recordData.getTraceId());
-                if(recordData.getPpn() != null && recordData.getPpn().startsWith(Constants.MOCK_SON_PAGE_DATA)){
+                if (recordData.getPpn() != null && recordData.getPpn().startsWith(Constants.MOCK_SON_PAGE_DATA)) {
                     String[] strArr = recordData.getPpn().split(":");
                     String name = null;
                     String parent = null;
-                    if(strArr.length == 3){
-                        name = recordData.getCpn()+"."+strArr[1];
+                    if (strArr.length == 3) {
+                        name = recordData.getCpn() + "." + strArr[1];
                         parent = strArr[2];
-                    }else if (strArr.length == 2){
+                    } else if (strArr.length == 2) {
                         name = recordData.getCpn();
                         parent = strArr[1];
                     }
                     sb.append(",$name=").append(name);
                     sb.append(",$parent=").append(parent);
-                }else {
+                } else {
                     sb.append(",$name=").append(recordData.getCpn());
                     //如果父页面是root表示其为起始节点，不添加父节点
                     if (!Constants.FLOW_ROOT.equals(recordData.getPpn())) {
@@ -99,14 +102,14 @@ public class SyncDataManager {
                 sb.append(" ");
                 sb.append(recordData.getTime() * 1000 * 1000);
                 sb.append("\n");
-            } else if(OP.OPEN_FRA.value.equals(recordData.getOp())){
+            } else if (OP.OPEN_FRA.value.equals(recordData.getOp())) {
                 //如果是子页面打开操作，就在该条数据上添加一条表示流程图的数据
                 try {
                     JSONObject opData = new JSONObject(recordData.getOpdata());
                     //获取指标名称
                     if (opData.has(Constants.MEASUREMENT)) {
                         sb.append("$flow_mobile_activity_").append(opData.optString(Constants.MEASUREMENT));
-                    }else{
+                    } else {
                         sb.append("$flow_mobile_activity_").append(FTFlowChartConfig.get().getFlowProduct());
                     }
                 } catch (JSONException e) {
@@ -116,13 +119,13 @@ public class SyncDataManager {
                 sb.append(",$traceId=").append(recordData.getTraceId());
                 sb.append(",$name=").append(recordData.getRpn()).append(".").append(recordData.getCpn());
                 //如果父页面是root表示其为起始节点，不添加父节点
-                if(!Constants.FLOW_ROOT.equals(recordData.getPpn())){
-                    if(recordData.getPpn().startsWith(Constants.PERFIX)){
-                        sb.append(",$parent=").append(recordData.getPpn().replace(Constants.PERFIX,""));
-                    }else {
+                if (!Constants.FLOW_ROOT.equals(recordData.getPpn())) {
+                    if (recordData.getPpn().startsWith(Constants.PERFIX)) {
+                        sb.append(",$parent=").append(recordData.getPpn().replace(Constants.PERFIX, ""));
+                    } else {
                         sb.append(",$parent=").append(recordData.getRpn()).append(".").append(recordData.getPpn());
                     }
-                }else{
+                } else {
                     sb.append(",$parent=").append(recordData.getRpn());
                 }
                 sb.append(",").append(device).append(",");
@@ -283,8 +286,8 @@ public class SyncDataManager {
                     sb.append("vtp=" + vtp + ",");
                 }
                 JSONObject tags = opJson.optJSONObject("tags");
-                if(tags != null) {
-                    sb.append(getCustomHash(tags,true));
+                if (tags != null) {
+                    sb.append(getCustomHash(tags, true));
                 }
 
                 fields = opJson.optJSONObject(Constants.FIELDS);
@@ -303,14 +306,14 @@ public class SyncDataManager {
 
         if (fields != null) {
             try {
-                fields.put("event",getEventName(recordData.getOp()));
+                fields.put("event", getEventName(recordData.getOp()));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
             StringBuffer valueSb = getCustomHash(fields, false);
             deleteLastComma(valueSb);
             sb.append(valueSb);
-        }else {
+        } else {
             sb.append("event=\"" + getEventName(recordData.getOp()) + "\"");
         }
         sb.append(" ");
@@ -349,105 +352,201 @@ public class SyncDataManager {
     /**
      * 添加配置监控项数据
      */
-    public static void addMonitorData(JSONObject tags,JSONObject fields) {
+    public static void addMonitorData(JSONObject tags, JSONObject fields) {
         try {
-            Context context = FTApplication.getApplication();
             if (FTMonitorConfig.get().isMonitorType(MonitorType.ALL)) {
-                tags.put("battery_total",BatteryUtils.getBatteryTotal(context));
-                fields.put("battery_use",BatteryUtils.getBatteryCurrent(context));
-                double[] memory = DeviceUtils.getRamData(context);
-                tags.put("memory_total",memory[0]+"GB");
-                fields.put("memory_use",memory[1]);
-
-                tags.put("cpu_no",DeviceUtils.getHardWare());
-                fields.put("cpu_use",DeviceUtils.getCpuUseRate());
-                tags.put("cpu_temperature",CpuUtils.get().getCpuTemperature());
-                tags.put("cpu_hz",CpuUtils.get().getCPUMaxFreqKHz());
-
-                tags.put("gpu_model",GpuUtils.GPU_VENDOR_RENDERER);
-                tags.put("gpu_hz",GpuUtils.getGpuMaxFreq());
-                fields.put("gpu_rate",GpuUtils.getGpuUseRate());
-
-                int networkType = NetUtils.get().getNetworkState(context);
-                if (networkType == 1) {
-                    tags.put("network_type","WIFI");
-                } else if (networkType == 0) {
-                    tags.put("network_type","N/A");
-                } else {
-                    tags.put("network_type","蜂窝网络");
-                }
-                fields.put("network_strength",NetUtils.get().getSignalStrength(context));
-                fields.put("network_speed",NetUtils.get().getNetRate());
-                tags.put("network_proxy",NetUtils.get().isWifiProxy(context));
-                List<CameraPx> cameraPxs = CameraUtils.getCameraPxList(context);
-                for (CameraPx cameraPx : cameraPxs) {
-                    tags.put(cameraPx.getPx()[0],cameraPx.getPx()[1]);
-                }
-                Address address = LocationUtils.get().getCity();
-                if(address != null){
-                    tags.put("province",address.getAdminArea());
-                    tags.put("city",address.getLocality());
-                    tags.put("country","中国");
-                }else{
-                    tags.put("province",Constants.UNKNOWN);
-                    tags.put("city",Constants.UNKNOWN);
-                    tags.put("country","中国");
-                }
+                //电池
+                createBattery(tags, fields);
+                //内存
+                createMemory(tags, fields);
+                //CPU
+                createCPU(tags, fields);
+                //GPU
+                createGPU(tags, fields);
+                //网络
+                createNetWork(tags, fields);
+                //相机
+                createCamera(tags, fields);
+                //位置
+                createLocation(tags, fields);
 
             } else {
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.BATTERY)) {
-                    tags.put("battery_total",BatteryUtils.getBatteryTotal(context));
-                    fields.put("battery_use",BatteryUtils.getBatteryCurrent(context));
+                    //电池
+                    createBattery(tags, fields);
                 }
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.MEMORY)) {
-                    double[] memory = DeviceUtils.getRamData(context);
-                    tags.put("memory_total",memory[0]+"GB");
-                    fields.put("memory_use",memory[1]);
+                    //内存
+                    createMemory(tags, fields);
                 }
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.CPU)) {
-                    tags.put("cpu_no", DeviceUtils.getHardWare());
-                    fields.put("cpu_use", DeviceUtils.getCpuUseRate());
-                    tags.put("cpu_temperature", CpuUtils.get().getCpuTemperature());
-                    tags.put("cpu_hz", CpuUtils.get().getCPUMaxFreqKHz());
+                    //CPU
+                    createCPU(tags, fields);
                 }
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.GPU)) {
-                    tags.put("gpu_model",GpuUtils.GPU_VENDOR_RENDERER);
-                    tags.put("gpu_hz",GpuUtils.getGpuMaxFreq());
-                    fields.put("gpu_rate",GpuUtils.getGpuUseRate());
+                    //GPU
+                    createGPU(tags, fields);
                 }
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.NETWORK)) {
-                    int networkType = NetUtils.get().getNetworkState(context);
-                    if (networkType == 1) {
-                        tags.put("network_type","WIFI");
-                    } else if (networkType == 0) {
-                        tags.put("network_type","N/A");
-                    } else {
-                        tags.put("network_type","蜂窝网络");
-                    }
-                    fields.put("network_strength",NetUtils.get().getSignalStrength(context));
-                    fields.put("network_speed",NetUtils.get().getNetRate());
-                    tags.put("network_proxy",NetUtils.get().isWifiProxy(context));
+                    //网络
+                    createNetWork(tags, fields);
                 }
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.CAMERA)) {
-                    List<CameraPx> cameraPxs = CameraUtils.getCameraPxList(context);
-                    for (CameraPx cameraPx : cameraPxs) {
-                        tags.put(cameraPx.getPx()[0],cameraPx.getPx()[1]);
-                    }
+                    createCamera(tags, fields);
                 }
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.LOCATION)) {
-                    Address address = LocationUtils.get().getCity();
-                    if(address != null){
-                        tags.put("province",address.getAdminArea());
-                        tags.put("city",address.getLocality());
-                        tags.put("country","中国");
-                    }else{
-                        tags.put("province",Constants.UNKNOWN);
-                        tags.put("city",Constants.UNKNOWN);
-                        tags.put("country","中国");
-                    }
+                    createLocation(tags, fields);
                 }
             }
         } catch (Exception e) {
+        }
+    }
+
+    /**
+     * 添加电池监控数据
+     *
+     * @param tags
+     * @param fields
+     */
+    private static void createBattery(JSONObject tags, JSONObject fields) {
+        try {
+            BatteryBean batteryBean = BatteryUtils.getBatteryInfo(FTApplication.getApplication());
+            tags.put("battery_total", batteryBean.getPower());
+            tags.put("battery_change", batteryBean.getPlugState());
+            tags.put("battery_status", batteryBean.getStatus());
+            fields.put("battery_use", batteryBean.getBr());
+        } catch (Exception e) {
+            LogUtils.e("电池数据获取异常:" + e.getMessage());
+        }
+    }
+
+    /**
+     * 添加内存监控数据
+     *
+     * @param tags
+     * @param fields
+     */
+    private static void createMemory(JSONObject tags, JSONObject fields) {
+        try {
+            double[] memory = DeviceUtils.getRamData(FTApplication.getApplication());
+            tags.put("memory_total", memory[0] + "GB");
+            fields.put("memory_use", memory[1]);
+        }catch (Exception e){
+            LogUtils.e("内存数据获取异常:" + e.getMessage());
+        }
+    }
+
+    /**
+     * 添加CPU监控数据
+     *
+     * @param tags
+     * @param fields
+     */
+    private static void createCPU(JSONObject tags, JSONObject fields) {
+        try {
+            tags.put("cpu_no", DeviceUtils.getHardWare());
+            fields.put("cpu_use", DeviceUtils.getCpuUseRate());
+            tags.put("cpu_temperature", CpuUtils.get().getCpuTemperature());
+            tags.put("cpu_hz", CpuUtils.get().getCPUMaxFreqKHz());
+        }catch (Exception e){
+            LogUtils.e("CPU数据获取异常:" + e.getMessage());
+        }
+    }
+
+    /**
+     * 添加GPU监控数据
+     *
+     * @param tags
+     * @param fields
+     */
+    private static void createGPU(JSONObject tags, JSONObject fields) {
+        try {
+            tags.put("gpu_model", GpuUtils.GPU_VENDOR_RENDERER);
+            tags.put("gpu_hz", GpuUtils.getGpuMaxFreq());
+            fields.put("gpu_rate", GpuUtils.getGpuUseRate());
+        }catch (Exception e){
+            LogUtils.e("GPU数据获取异常:" + e.getMessage());
+        }
+    }
+
+    /**
+     * 添加网络监控数据
+     *
+     * @param tags
+     * @param fields
+     */
+    private static void createNetWork(JSONObject tags, JSONObject fields) {
+        try {
+            int networkType = NetUtils.get().getNetworkState(FTApplication.getApplication());
+            if (networkType == 1) {
+                tags.put("network_type", "WIFI");
+            } else if (networkType == 0) {
+                tags.put("network_type", "N/A");
+            } else {
+                tags.put("network_type", "蜂窝网络");
+            }
+            fields.put("network_strength", NetUtils.get().getSignalStrength(FTApplication.getApplication()));
+            fields.put("network_speed", NetUtils.get().getNetRate());
+            tags.put("network_proxy", NetUtils.get().isWifiProxy(FTApplication.getApplication()));
+            String[] dns = NetUtils.get().getDnsFromConnectionManager(FTApplication.getApplication());
+            for (int i = 0;i<dns.length; i++) {
+                tags.put("dns"+(i+1),dns[i]);
+            }
+            tags.put("roam",NetUtils.get().getRoamState());
+            tags.put("wifi_ssid",NetUtils.get().getSSId());
+            tags.put("wifi_ip",NetUtils.get().getWifiIp());
+        }catch (Exception e){
+            LogUtils.e("网络数据获取异常:" + e.getMessage());
+        }
+    }
+
+    /**
+     * 添加相机监控数据
+     *
+     * @param tags
+     * @param fields
+     */
+    private static void createCamera(JSONObject tags, JSONObject fields) {
+        try {
+            List<CameraPx> cameraPxs = CameraUtils.getCameraPxList(FTApplication.getApplication());
+            for (CameraPx cameraPx : cameraPxs) {
+                tags.put(cameraPx.getPx()[0], cameraPx.getPx()[1]);
+            }
+        }catch (Exception e){
+            LogUtils.e("相机数据获取异常:" + e.getMessage());
+        }
+    }
+
+    /**
+     * 添加位置监控数据
+     *
+     * @param tags
+     * @param fields
+     */
+    private static void createLocation(JSONObject tags, JSONObject fields) {
+        try {
+            Address address = LocationUtils.get().getCity();
+            Location location = LocationUtils.get().getLocation();
+            if (address != null) {
+                tags.put("province", address.getAdminArea());
+                tags.put("city", address.getLocality());
+                tags.put("country", "中国");
+            } else {
+                tags.put("province", Constants.UNKNOWN);
+                tags.put("city", Constants.UNKNOWN);
+                tags.put("country", "中国");
+            }
+
+            if(location != null){
+                fields.put("latitude",location.getLatitude());
+                fields.put("longitude",location.getLongitude());
+            }else{
+                fields.put("latitude",0);
+                fields.put("longitude",0);
+            }
+            tags.put("gps_open",LocationUtils.get().isOpenGps());
+        }catch (Exception e){
+            LogUtils.e("位置数据获取异常:" + e.getMessage());
         }
     }
 
@@ -458,11 +557,11 @@ public class SyncDataManager {
             return "click";
         } else if (OP.CLS_FRA.value.equals(op)) {
             return "close";
-        } else if (OP.CLS_ACT.value.equals(op)){
+        } else if (OP.CLS_ACT.value.equals(op)) {
             return "close";
-        }else if (OP.OPEN_ACT.value.equals(op)) {
+        } else if (OP.OPEN_ACT.value.equals(op)) {
             return "open";
-        }else if (OP.OPEN_FRA.value.equals(op)) {
+        } else if (OP.OPEN_FRA.value.equals(op)) {
             return "open";
         }
         return op;
@@ -539,13 +638,13 @@ public class SyncDataManager {
             objectHashMap.put("oaid", OaidUtils.getOAID(context));
         }
         HashMap<String, Object> temp = new HashMap<>();
-        for(Map.Entry<String, Object> entry : objectHashMap.entrySet()){
+        for (Map.Entry<String, Object> entry : objectHashMap.entrySet()) {
             String mapKey = entry.getKey();
             Object mapValue = entry.getValue();
-            if(mapValue instanceof String){
-                temp.put(mapKey,Utils.translateTagKeyValueAndFieldKey((String)mapValue));
-            }else{
-                temp.put(mapKey,mapValue);
+            if (mapValue instanceof String) {
+                temp.put(mapKey, Utils.translateTagKeyValueAndFieldKey((String) mapValue));
+            } else {
+                temp.put(mapKey, mapValue);
             }
         }
         return temp;
@@ -563,7 +662,7 @@ public class SyncDataManager {
             sb.append("-----------------------------------------------------------\n");
             sb.append("----------------------同步数据--开始-------------------------\n");
             sb.append("----------------------总共 ").append(counts.length).append(" 条数据------------------------\n");
-            for (int i = 0;i<counts.length;i++) {
+            for (int i = 0; i < counts.length; i++) {
                 String str = counts[i];
                 str = str.replaceAll("\\\\ ", "_");
                 String[] strArr = str.split(" ");
