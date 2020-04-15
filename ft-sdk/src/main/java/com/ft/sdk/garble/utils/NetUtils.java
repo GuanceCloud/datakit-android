@@ -2,6 +2,8 @@ package com.ft.sdk.garble.utils;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
+import android.net.LinkProperties;
+import android.net.Network;
 import android.net.NetworkInfo;
 import android.net.TrafficStats;
 import android.net.wifi.WifiInfo;
@@ -12,7 +14,9 @@ import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
+import java.net.InetAddress;
 import java.text.DecimalFormat;
+import java.util.LinkedList;
 
 
 /**
@@ -127,20 +131,20 @@ public class NetUtils {
      */
     public int getSignalStrength(Context context) {
         int state = getNetworkState(context);
-        if(state == NETWORK_WIFI){
+        if (state == NETWORK_WIFI) {
             WifiManager mWifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
             WifiInfo wifiInfo = mWifiManager.getConnectionInfo();
             int wifi = wifiInfo.getRssi();
-            if(wifi > -50 && wifi < 0){
+            if (wifi > -50 && wifi < 0) {
                 return 3;
-            }else if(wifi > -80 && wifi < -50){
+            } else if (wifi > -80 && wifi < -50) {
                 return 2;
-            }else if(wifi > -100 && wifi <-80){
+            } else if (wifi > -100 && wifi < -80) {
                 return 1;
-            }else{
+            } else {
                 return 0;
             }
-        }else if(state != NETWORK_NONE) {
+        } else if (state != NETWORK_NONE) {
             if (phoneStatListener != null) {
                 return phoneStatListener.mSignalStrength;
             }
@@ -174,10 +178,10 @@ public class NetUtils {
     /**
      * 开始监听网络速率
      */
-    public void startMonitorNetRate(){
+    public void startMonitorNetRate() {
         synchronized (this) {
             try {
-                if(isRunNetMonitor){
+                if (isRunNetMonitor) {
                     return;
                 }
                 new Thread(() -> {
@@ -191,11 +195,12 @@ public class NetUtils {
                                 e.printStackTrace();
                             }
                         }
-                    }catch (Exception e){}finally {
+                    } catch (Exception e) {
+                    } finally {
                         isRunNetMonitor = false;
                     }
-                },"网速监听").start();
-            }catch (Exception e){
+                }, "网速监听").start();
+            } catch (Exception e) {
                 isRunNetMonitor = false;
             }
         }
@@ -206,11 +211,12 @@ public class NetUtils {
     /**
      * 应用启动时获取一次网速
      */
-    public void initSpeed(){
+    public void initSpeed() {
         lastRxTx = TrafficStats.getTotalRxBytes()
                 + TrafficStats.getTotalTxBytes();
         getNetSpeed();
     }
+
     /**
      * 获得网络速度（外部获取网速应该直接调用{@link NetUtils#getNetRate()}）
      *
@@ -253,11 +259,35 @@ public class NetUtils {
             proxyAddress = android.net.Proxy.getHost(context);
             proxyPort = android.net.Proxy.getPort(context);
         }
-        if (!TextUtils.isEmpty(proxyAddress) && (proxyPort != -1)){
-            return proxyAddress+":"+proxyPort;
-        }else{
+        if (!TextUtils.isEmpty(proxyAddress) && (proxyPort != -1)) {
+            return proxyAddress + ":" + proxyPort;
+        } else {
             return Constants.UNKNOWN;
         }
+    }
 
+    /**
+     * 获取 DNS 地址
+     * @param context
+     * @return
+     */
+    public String[] getDnsFromConnectionManager(Context context) {
+        LinkedList<String> dnsServers = new LinkedList<>();
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager != null) {
+            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+            if (activeNetworkInfo != null) {
+                for (Network network : connectivityManager.getAllNetworks()) {
+                    NetworkInfo networkInfo = connectivityManager.getNetworkInfo(network);
+                    if (networkInfo != null && networkInfo.getType() == activeNetworkInfo.getType()) {
+                        LinkProperties lp = connectivityManager.getLinkProperties(network);
+                        for (InetAddress address : lp.getDnsServers()) {
+                            dnsServers.add(address.getHostAddress());
+                        }
+                    }
+                }
+            }
+        }
+        return dnsServers.isEmpty() ? new String[0] : dnsServers.toArray(new String[dnsServers.size()]);
     }
 }
