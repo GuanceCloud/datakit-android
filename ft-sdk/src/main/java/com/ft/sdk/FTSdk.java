@@ -137,19 +137,6 @@ public class FTSdk {
     }
 
     /**
-     * 设置使用高德作为逆向地址解析
-     *
-     * @param useGeoKey
-     * @param geoKey
-     * @return
-     */
-    public void setGeoKey(boolean useGeoKey, String geoKey) {
-        LocationUtils.get().setUseGeoKey(useGeoKey);
-        LocationUtils.get().setGeoKey(geoKey);
-        startLocation(null, null);
-    }
-
-    /**
      * 开启定，并且获取定位结果
      */
     public static void startLocation(String geoKey, SyncCallback syncCallback) {

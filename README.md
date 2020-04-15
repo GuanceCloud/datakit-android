@@ -115,14 +115,15 @@ android{
 
 方法说明表
 
-方法名|含义|是否必须|注意
-:--:|:--:|:--:|:--:
-install|安装初始化配置项|是|在项目 application 中运行
-get|获得安装后创建的 FTSdk 对象|否|应该在 install 运行后调用
-unbindUserData|解绑用户信息|否|必须在 setNeedBindUser 方法设为 true 后才有效果
-bindUserData|绑定用户信息|否|必须在 setNeedBindUser 方法设为 true 后才有效果
-shutDown|关闭SDK中正在执行的操作|否|
-setGpuRenderer|设置 GPU 信息获取依赖的视图|否|当监控项 setMonitorType 设置监控 GPU 后一定调用该方法
+|      方法名       |        含义         | 是否必须 |                  注意                   |
+|:--------------:|:-----------------:|:----:|:-------------------------------------:|
+|    install     |     安装初始化配置项      |  是   |          在项目 application 中运行          |
+|      get       | 获得安装后创建的 FTSdk 对象 |  否   |           应该在 install 运行后调用           |
+| unbindUserData |      解绑用户信息       |  否   |  必须在 setNeedBindUser 方法设为 true 后才有效果  |
+|  bindUserData  |      绑定用户信息       |  否   |  必须在 setNeedBindUser 方法设为 true 后才有效果  |
+|    shutDown    |   关闭SDK中正在执行的操作   |  否   |                                       |
+| setGpuRenderer | 设置 GPU 信息获取依赖的视图  |  否   | 当监控项 setMonitorType 设置监控 GPU 后一定调用该方法 |
+|startLocation|开启定位获取，并异步回调定位结果|否|该方法为静态方法，可以在SDK初始化前调用|
 
 #### 3. 示例代码
 
@@ -188,7 +189,7 @@ WRITE_EXTERNAL_STORAGE|用户存储缓存数据
 CAMERA|用户获取相机的配置参数
 ACCESS_FINE_LOCATION|获取当前位置所属城市
 
-关于如何申请动态权限，具体详情参考[Android Devloper](https://developer.android.google.cn/training/permissions/requesting?hl=en)
+关于如何申请动态权限，具体详情参考[Android Developer](https://developer.android.google.cn/training/permissions/requesting?hl=en)
 
 ## 方法
 
@@ -251,6 +252,13 @@ public void setGpuRenderer(ViewGroup root)
  * 关闭 SDK 正在做的操作
  */
 public void shutDown()
+```
+
+```java
+/**
+ * 开启定，并且获取定位结果
+ */
+public static void startLocation(String geoKey, SyncCallback syncCallback)
 ```
 
 ### 二、配置类 FTSDKConfig 提供的方法
