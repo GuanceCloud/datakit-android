@@ -2,6 +2,7 @@ package com.ft;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -64,6 +65,15 @@ public class Main2Activity extends AppCompatActivity {
                     .setFlowProduct("demo13")
                     .setMonitorType(MonitorType.ALL);//设置监控项
             FTSdk.install(ftSDKConfig);
+        });
+
+        findViewById(R.id.jump6).setOnClickListener(v -> {
+            FTSdk.startLocation("", new SyncCallback() {
+                @Override
+                public void onResponse(int code, String response) {
+                    Toast.makeText(Main2Activity.this,"code="+code+",response="+response,Toast.LENGTH_LONG).show();
+                }
+            });
         });
     }
     public void trackImmediate(){
