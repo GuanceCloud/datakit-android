@@ -84,6 +84,7 @@ public class FTSdk {
         FTHttpConfig.get().release();
         FTNetworkListener.get().release();
         FTFlowChartConfig.get().release();
+        LocationUtils.get().stopListener();
         LogUtils.i("FT SDK 已经被关闭");
     }
 
@@ -157,7 +158,7 @@ public class FTSdk {
             LocationUtils.get().setGeoKey(geoKey);
             LocationUtils.get().setUseGeoKey(true);
         }
-        LocationUtils.get().startLocationCallBack(FTApplication.getApplication(), syncCallback);
+        LocationUtils.get().startLocationCallBack(syncCallback);
     }
 
     /**

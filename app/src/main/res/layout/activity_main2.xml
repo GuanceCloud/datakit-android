@@ -43,6 +43,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/jump5"
-        android:text="重新配置"
+        android:text="重新配置SDK"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/jump6"
+        android:text="即时获取位置信息"
         />
 </LinearLayout>
