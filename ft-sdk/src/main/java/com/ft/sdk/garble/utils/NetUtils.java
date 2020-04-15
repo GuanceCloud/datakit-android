@@ -14,6 +14,8 @@ import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
+import com.ft.sdk.FTApplication;
+
 import java.net.InetAddress;
 import java.text.DecimalFormat;
 import java.util.LinkedList;
@@ -267,13 +269,28 @@ public class NetUtils {
     }
 
     /**
+     * 判断网络是否在漫游
+     *
+     * @return
+     */
+    public boolean getRoamState() {
+        ConnectivityManager manager = getConnectivityManager();
+        NetworkInfo info = manager.getActiveNetworkInfo();
+        if (info != null && info.isConnected()) {
+            return info.isRoaming();
+        }
+        return false;
+    }
+
+    /**
      * 获取 DNS 地址
+     *
      * @param context
      * @return
      */
     public String[] getDnsFromConnectionManager(Context context) {
         LinkedList<String> dnsServers = new LinkedList<>();
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager = getConnectivityManager();
         if (connectivityManager != null) {
             NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
             if (activeNetworkInfo != null) {
@@ -289,5 +306,48 @@ public class NetUtils {
             }
         }
         return dnsServers.isEmpty() ? new String[0] : dnsServers.toArray(new String[dnsServers.size()]);
+    }
+
+    /**
+     * 获取 WI-FI 的ssID
+     *
+     * @return
+     */
+    public String getSSId() {
+        String ssId = Constants.UNKNOWN;
+        WifiManager manager = (WifiManager) FTApplication.getApplication().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if (manager != null) {
+            WifiInfo wifiInfo = manager.getConnectionInfo();
+            if (wifiInfo != null) {
+                ssId = wifiInfo.getSSID();
+                if (ssId.length() > 2 && ssId.charAt(0) == '"' && ssId.charAt(ssId.length() - 1) == '"') {
+                    return ssId.substring(1, ssId.length() - 1);
+                }
+            }
+        }
+        return ssId;
+    }
+
+    /**
+     * 获得 WI-FI 的IP地址
+     * @return
+     */
+    public String getWifiIp() {
+        String ip = Constants.UNKNOWN;
+        WifiManager manager = (WifiManager) FTApplication.getApplication().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if (manager != null) {
+            WifiInfo wifiInfo = manager.getConnectionInfo();
+            if (wifiInfo != null) {
+                int ipAsInt = wifiInfo.getIpAddress();
+                if (ipAsInt != 0) {
+                    ip = (ipAsInt & 0xFF) + "." + ((ipAsInt >> 8) & 0xFF) + "." + ((ipAsInt >> 16) & 0xFF) + "." + ((ipAsInt >> 24) & 0xFF);
+                }
+            }
+        }
+        return ip;
+    }
+
+    private ConnectivityManager getConnectivityManager() {
+        return (ConnectivityManager) FTApplication.getApplication().getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 }

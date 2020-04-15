@@ -1,6 +1,7 @@
 package com.ft.sdk.garble.utils;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
@@ -10,7 +11,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-
+import com.ft.sdk.FTApplication;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.SyncCallback;
@@ -36,15 +37,27 @@ public class LocationUtils {
     private Context mContext;
     private static LocationUtils locationUtils;
     private LocationManager mLocationManager;
-    private String mProvider;
     private Address address;
+    private Location mLocation;
     //高德逆向解析API 的 key
     private String geoKey;
     //是否使用高德作为逆向地址解析
     private boolean useGeoKey;
     private Handler mHandler;
+    //是否在监听位置变化
+    private boolean listenerIng;
+
+    public void setGeoKey(String geoKey) { this.geoKey = geoKey; }
+    public void setUseGeoKey(boolean useGeoKey) {
+        this.useGeoKey = useGeoKey;
+    }
+    public Location getLocation() { return mLocation; }
+    public Address getCity() { return address; }
 
     private LocationUtils() {
+        //获取定位服务
+        mLocationManager = (LocationManager) FTApplication.getApplication().getSystemService(Context.LOCATION_SERVICE);
+        mContext = FTApplication.getApplication();
     }
 
     public static LocationUtils get() {
@@ -54,40 +67,57 @@ public class LocationUtils {
         return locationUtils;
     }
 
-    public String getGeoKey() {
-        return geoKey;
-    }
-
-    public void setGeoKey(String geoKey) {
-        this.geoKey = geoKey;
-    }
-
-    public boolean isUseGeoKey() {
-        return useGeoKey;
-    }
-
-    public void setUseGeoKey(boolean useGeoKey) {
-        this.useGeoKey = useGeoKey;
+    /**
+     * 开始监听位置信息
+     */
+    public void startListener(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            int state = mContext.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
+            int state2 = mContext.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION);
+            if (state != PERMISSION_GRANTED || state2 != PERMISSION_GRANTED) {
+                LogUtils.e("请先申请位置权限");
+                return;
+            }
+        }
+        if(listenerIng){
+            return;
+        }
+        List<String> providers =  getProviderList();
+        if(providers != null){
+            if (providers.contains(LocationManager.NETWORK_PROVIDER)) {
+                listenerIng = true;
+                LogUtils.d("NETWORK_PROVIDER 方式监听位置信息变化");
+                mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 2000, 10, locationListener);
+            }else if (providers.contains(LocationManager.GPS_PROVIDER)) {
+                listenerIng = true;
+                LogUtils.d("GPS_PROVIDER 方式监听位置信息变化");
+                mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, locationListener);
+            }
+        }
     }
 
     /**
-     * 获取所在地址
-     *
-     * @return
+     * 停止监听位置信息
      */
-    public Address getCity() {
-        return address;
+    public void stopListener(){
+        listenerIng = false;
+        mLocationManager.removeUpdates(locationListener);
+        LogUtils.d("停止监听位置信息变化");
     }
 
+    /**
+     * 位置信息变化回调
+     */
     private LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
-            if (location != null) {
-                String string = "纬度为：" + location.getLatitude() + ",经度为：" + location.getLongitude();
+            if(location != null){
+                mLocation = location;
+                String string = "onLocationChanged 方式 纬度为：" + location.getLatitude() + ",经度为：" + location.getLongitude();
                 LogUtils.d(string);
-                getAddress(mContext, location, null);
-                if (address != null) {
-                    mLocationManager.removeUpdates(locationListener);
+                getAddress(location, null);
+                if(mLocation != null){
+                    stopListener();
                 }
             }
         }
@@ -105,14 +135,14 @@ public class LocationUtils {
         }
     };
 
-    public void startLocation(Context context) {
+    public void startLocation() {
         if (!FTMonitorConfig.get().isMonitorType(MonitorType.ALL) && !FTMonitorConfig.get().isMonitorType(MonitorType.LOCATION)) {
             return;
         }
-        startLocationCallBack(context, null);
+        startLocationCallBack( null);
     }
 
-    public void startLocationCallBack(Context context, SyncCallback syncCallback) {
+    public void startLocationCallBack(SyncCallback syncCallback) {
         if (address != null) {
             callback(syncCallback, 0, "");
             return;
@@ -121,42 +151,67 @@ public class LocationUtils {
             mHandler = new Handler();
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            int state = context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
-            int state2 = context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION);
+            int state = mContext.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
+            int state2 = mContext.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION);
             if (state != PERMISSION_GRANTED || state2 != PERMISSION_GRANTED) {
                 LogUtils.e("请先申请位置权限");
                 callback(syncCallback, NetCodeStatus.UNKNOWN_EXCEPTION_CODE, "未能获取到位置权限");
                 return;
             }
         }
-        mContext = context;
-        mProvider = null;
-        //获取定位服务
-        mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        //获取当前可用的位置控制器
-        List<String> list = mLocationManager.getProviders(true);
-        if (list.contains(LocationManager.NETWORK_PROVIDER)) {
-            //是否为网络位置控制器
-            mProvider = LocationManager.NETWORK_PROVIDER;
-        } else if (list.contains(LocationManager.GPS_PROVIDER)) {
-            //是否为GPS位置控制器
-            mProvider = LocationManager.GPS_PROVIDER;
-        } else if (list.contains(LocationManager.PASSIVE_PROVIDER)) {
-            mProvider = LocationManager.PASSIVE_PROVIDER;
-        }
-        if (mProvider != null) {
-            Location location = mLocationManager.getLastKnownLocation(mProvider);
-            if (location != null) {
-                String string = "纬度为：" + location.getLatitude() + ",经度为：" + location.getLongitude();
-                LogUtils.d(string);
-                getAddress(context, location, syncCallback);
-            } else {
-                mLocationManager.requestLocationUpdates(mProvider, 3000, 1, locationListener);
-            }
+        LogUtils.d(">>>>>>>>>>>>>>正在请求定位");
+        Location location = getLastLocation();
+        if(location != null){
+            mLocation = location;
+            String string = "getLastLocation 方式 纬度为：" + location.getLatitude() + ",经度为：" + location.getLongitude();
+            LogUtils.d(string);
+            getAddress(location, syncCallback);
+        }else{
+            callback(syncCallback, NetCodeStatus.UNKNOWN_EXCEPTION_CODE, "未能获取到位置信息");
+            LogUtils.d(">>>>>>>>>>>>>>地址请求失败");
         }
     }
 
-    private void getAddress(Context context, Location location, SyncCallback syncCallback) {
+    private Location getLastLocation(){
+        List<String> providers = getProviderList();
+        if(providers != null){
+            for (String provider : providers) {
+                @SuppressLint("MissingPermission")
+                Location location = mLocationManager.getLastKnownLocation(provider);
+                if(location != null){
+                    return location;
+                }
+            }
+        }
+        return null;
+    }
+
+    private List<String> getProviderList(){
+        if(mLocationManager == null){
+            mLocationManager = (LocationManager) FTApplication.getApplication().getSystemService(Context.LOCATION_SERVICE);
+        }
+        //获取当前可用的位置控制器
+        if(mLocationManager != null) {
+            return mLocationManager.getProviders(true);
+        }
+        return null;
+    }
+
+    public boolean isOpenGps() {
+        boolean openGps = false;
+        //获取定位服务
+        if (mLocationManager == null) {
+            mLocationManager = (LocationManager) FTApplication.getApplication().getSystemService(Context.LOCATION_SERVICE);
+        }
+        //获取当前可用的位置控制器
+        List<String> list = mLocationManager.getProviders(true);
+        if (list.contains(LocationManager.GPS_PROVIDER)) {
+            openGps = true;
+        }
+        return openGps;
+    }
+
+    private void getAddress(Location location, SyncCallback syncCallback) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -168,7 +223,12 @@ public class LocationUtils {
                         requestGeoAddress(location, syncCallback);
                     }
                 } else {
-                    requestNative(context, location, syncCallback);
+                    requestNative(location, syncCallback);
+                }
+                if(address != null) {
+                    LogUtils.d(">>>>>>>>>>>>>>地址[province:" + address.getAdminArea() + ",city:" + address.getLocality()+"]");
+                }else{
+                    LogUtils.d(">>>>>>>>>>>>>>地址请求失败");
                 }
             }
         }).start();
@@ -180,17 +240,15 @@ public class LocationUtils {
 
     /**
      * 使用系统自身API进行地址逆向解析
-     *
-     * @param context
-     * @param location
+     ** @param location
      */
-    private int requestNative(Context context, Location location, SyncCallback syncCallback) {
+    private int requestNative(Location location, SyncCallback syncCallback) {
         String errorMessage = "";
         int code = 0;
         List<Address> result = null;
         try {
             if (location != null) {
-                Geocoder gc = new Geocoder(context, Locale.getDefault());
+                Geocoder gc = new Geocoder(mContext, Locale.getDefault());
                 result = gc.getFromLocation(location.getLatitude(),
                         location.getLongitude(), 1);
             }
@@ -202,7 +260,6 @@ public class LocationUtils {
             address = result.get(0);
             code = 0;
             errorMessage = "";
-            LogUtils.d("地址[province:" + address.getAdminArea() + ",city:" + address.getLocality());
         } else {
             code = NetCodeStatus.UNKNOWN_EXCEPTION_CODE;
             errorMessage = "地址解析异常";
@@ -244,7 +301,7 @@ public class LocationUtils {
                     .useDefaultHead(false)
                     .setShowLog(false)
                     .executeSync(ResponseData.class);
-            LogUtils.d("高德逆向解析地址返回数据：\n" + responseData.getData());
+            //LogUtils.d("高德逆向解析地址返回数据：\n" + responseData.getData());
             try {
                 JSONObject geo = new JSONObject(responseData.getData());
                 if (geo.has("regeocode")) {
@@ -265,11 +322,12 @@ public class LocationUtils {
                             Address address = new Address(Locale.CHINA);
                             address.setAdminArea(province);
                             address.setLocality(city);
+                            address.setLatitude(location.getLatitude());
+                            address.setLongitude(location.getLongitude());
                             this.address = address;
                         }
                     }
                 }
-                LogUtils.d("Address:" + address.toString());
                 if (address == null) {
                     code = NetCodeStatus.UNKNOWN_EXCEPTION_CODE;
                     errorMessage = "解析数据异常";
