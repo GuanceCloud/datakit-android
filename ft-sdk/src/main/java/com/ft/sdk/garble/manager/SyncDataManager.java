@@ -17,6 +17,7 @@ import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.BatteryUtils;
+import com.ft.sdk.garble.utils.BluetoothUtils;
 import com.ft.sdk.garble.utils.CameraUtils;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.CpuUtils;
@@ -369,6 +370,8 @@ public class SyncDataManager {
                 createCamera(tags, fields);
                 //位置
                 createLocation(tags, fields);
+                //蓝牙
+                createBluetooth(tags,fields);
 
             } else {
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.BATTERY)) {
@@ -396,6 +399,9 @@ public class SyncDataManager {
                 }
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.LOCATION)) {
                     createLocation(tags, fields);
+                }
+                if (FTMonitorConfig.get().isMonitorType(MonitorType.BLUETOOTH)) {
+                    createBluetooth(tags, fields);
                 }
             }
         } catch (Exception e) {
@@ -488,13 +494,13 @@ public class SyncDataManager {
             fields.put("network_strength", NetUtils.get().getSignalStrength(FTApplication.getApplication()));
             fields.put("network_speed", NetUtils.get().getNetRate());
             tags.put("network_proxy", NetUtils.get().isWifiProxy(FTApplication.getApplication()));
-            /**String[] dns = NetUtils.get().getDnsFromConnectionManager(FTApplication.getApplication());
+            String[] dns = NetUtils.get().getDnsFromConnectionManager(FTApplication.getApplication());
             for (int i = 0;i<dns.length; i++) {
                 tags.put("dns"+(i+1),dns[i]);
             }
             tags.put("roam",NetUtils.get().getRoamState());
             tags.put("wifi_ssid",NetUtils.get().getSSId());
-            tags.put("wifi_ip",NetUtils.get().getWifiIp());*/
+            tags.put("wifi_ip",NetUtils.get().getWifiIp());
         }catch (Exception e){
             LogUtils.e("网络数据获取异常:" + e.getMessage());
         }
@@ -526,7 +532,7 @@ public class SyncDataManager {
     private static void createLocation(JSONObject tags, JSONObject fields) {
         try {
             Address address = LocationUtils.get().getCity();
-            //double[] location = LocationUtils.get().getLocation();
+            double[] location = LocationUtils.get().getLocation();
             if (address != null) {
                 tags.put("province", address.getAdminArea());
                 tags.put("city", address.getLocality());
@@ -537,16 +543,24 @@ public class SyncDataManager {
                 tags.put("country", "中国");
             }
 
-            /**if(location != null){
+            if(location != null){
                 fields.put("latitude",location[0]);
                 fields.put("longitude",location[1]);
             }else{
                 fields.put("latitude",0);
                 fields.put("longitude",0);
-            }*/
-            //tags.put("gps_open",LocationUtils.get().isOpenGps());
+            }
+            tags.put("gps_open",LocationUtils.get().isOpenGps());
         }catch (Exception e){
             LogUtils.e("位置数据获取异常:" + e.getMessage());
+        }
+    }
+
+    private static void createBluetooth(JSONObject tags, JSONObject fields){
+        try {
+            tags.put("bluetooth_mac", BluetoothUtils.get().getBluetoothMacAddress());
+        }catch (Exception e){
+            LogUtils.e("蓝牙数据获取异常:" + e.getMessage());
         }
     }
 
@@ -632,8 +646,10 @@ public class SyncDataManager {
         objectHashMap.put("os_version", DeviceUtils.getOSVersion());
         objectHashMap.put("device_band", DeviceUtils.getDeviceBand());
         objectHashMap.put("device_model", DeviceUtils.getDeviceModel());
+        objectHashMap.put("device_name", BluetoothUtils.get().getDeviceName());
         objectHashMap.put("display", DeviceUtils.getDisplay(context));
         objectHashMap.put("carrier", DeviceUtils.getCarrier(context));
+        objectHashMap.put("runtime", DeviceUtils.getSystemOpenTime());
         if (FTHttpConfig.get().useOaid) {
             objectHashMap.put("oaid", OaidUtils.getOAID(context));
         }
