@@ -30,6 +30,7 @@ import com.amitshekhar.debug.encrypt.sqlite.DebugDBEncryptFactory;
 import com.amitshekhar.debug.sqlite.DebugDBFactory;
 import com.bumptech.glide.Glide;
 import com.ft.sdk.FTSdk;
+import com.ft.sdk.garble.utils.BluetoothUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -65,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
                 , Manifest.permission.ACCESS_COARSE_LOCATION
         ,Manifest.permission.READ_PHONE_STATE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         setTitle("FT-SDK使用Demo");
+        BluetoothUtils.get();
         FTSdk.get().setGpuRenderer(findViewById(R.id.ll));
         showKotlinActivity = findViewById(R.id.showKotlinActivity);
         btn_lam = findViewById(R.id.btn_lam);
