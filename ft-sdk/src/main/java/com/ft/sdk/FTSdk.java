@@ -20,6 +20,7 @@ import com.ft.sdk.garble.utils.GpuUtils;
 import com.ft.sdk.garble.utils.LocationUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.RendererUtil;
+import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONObject;
 
@@ -141,7 +142,7 @@ public class FTSdk {
      * 开启定，并且获取定位结果
      */
     public static void startLocation(String geoKey, SyncCallback syncCallback) {
-        if (geoKey != null) {
+        if (!Utils.isNullOrEmpty(geoKey)) {
             LocationUtils.get().setGeoKey(geoKey);
             LocationUtils.get().setUseGeoKey(true);
         }
