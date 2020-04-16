@@ -9,6 +9,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.Build;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
@@ -238,6 +239,18 @@ public class DeviceUtils {
         int screenWidth = displayMetrics.widthPixels;
         int screenHeight = displayMetrics.heightPixels;
         return screenWidth + "*" + screenHeight;
+    }
+
+    /**
+     * 返回系统运行时间(小时)
+     * @return
+     */
+    public static double getSystemOpenTime(){
+        //小时数
+        double time = SystemClock.elapsedRealtime()/1000.0/60/60;
+        double hours = Math.floor(time);
+        double xiaoshu = Math.floor((time-hours)*100)/100.0;
+        return hours+xiaoshu;
     }
 
     /**

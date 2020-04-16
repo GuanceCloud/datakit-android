@@ -66,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
                 , Manifest.permission.ACCESS_COARSE_LOCATION
         ,Manifest.permission.READ_PHONE_STATE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         setTitle("FT-SDK使用Demo");
-        BluetoothUtils.get();
         FTSdk.get().setGpuRenderer(findViewById(R.id.ll));
         showKotlinActivity = findViewById(R.id.showKotlinActivity);
         btn_lam = findViewById(R.id.btn_lam);
