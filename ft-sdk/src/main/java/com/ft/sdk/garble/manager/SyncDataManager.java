@@ -488,13 +488,13 @@ public class SyncDataManager {
             fields.put("network_strength", NetUtils.get().getSignalStrength(FTApplication.getApplication()));
             fields.put("network_speed", NetUtils.get().getNetRate());
             tags.put("network_proxy", NetUtils.get().isWifiProxy(FTApplication.getApplication()));
-            String[] dns = NetUtils.get().getDnsFromConnectionManager(FTApplication.getApplication());
+            /**String[] dns = NetUtils.get().getDnsFromConnectionManager(FTApplication.getApplication());
             for (int i = 0;i<dns.length; i++) {
                 tags.put("dns"+(i+1),dns[i]);
             }
             tags.put("roam",NetUtils.get().getRoamState());
             tags.put("wifi_ssid",NetUtils.get().getSSId());
-            tags.put("wifi_ip",NetUtils.get().getWifiIp());
+            tags.put("wifi_ip",NetUtils.get().getWifiIp());*/
         }catch (Exception e){
             LogUtils.e("网络数据获取异常:" + e.getMessage());
         }
@@ -526,7 +526,7 @@ public class SyncDataManager {
     private static void createLocation(JSONObject tags, JSONObject fields) {
         try {
             Address address = LocationUtils.get().getCity();
-            Location location = LocationUtils.get().getLocation();
+            //double[] location = LocationUtils.get().getLocation();
             if (address != null) {
                 tags.put("province", address.getAdminArea());
                 tags.put("city", address.getLocality());
@@ -537,14 +537,14 @@ public class SyncDataManager {
                 tags.put("country", "中国");
             }
 
-            if(location != null){
-                fields.put("latitude",location.getLatitude());
-                fields.put("longitude",location.getLongitude());
+            /**if(location != null){
+                fields.put("latitude",location[0]);
+                fields.put("longitude",location[1]);
             }else{
                 fields.put("latitude",0);
                 fields.put("longitude",0);
-            }
-            tags.put("gps_open",LocationUtils.get().isOpenGps());
+            }*/
+            //tags.put("gps_open",LocationUtils.get().isOpenGps());
         }catch (Exception e){
             LogUtils.e("位置数据获取异常:" + e.getMessage());
         }

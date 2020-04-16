@@ -31,7 +31,7 @@ public class FTMonitorConfig {
             //开始获取地理位置
             LocationUtils.get().setGeoKey(ftsdkConfig.getGeoKey());
             LocationUtils.get().setUseGeoKey(ftsdkConfig.isUseGeoKey());
-            LocationUtils.get().startLocation();
+            LocationUtils.get().startListener();
             //监听网络速度
             NetUtils.get().startMonitorNetRate();
             NetUtils.get().initSpeed();
@@ -47,7 +47,7 @@ public class FTMonitorConfig {
                 //获取地理位置
                 LocationUtils.get().setGeoKey(ftsdkConfig.getGeoKey());
                 LocationUtils.get().setUseGeoKey(ftsdkConfig.isUseGeoKey());
-                LocationUtils.get().startLocation();
+                LocationUtils.get().startListener();
             }
         }
     }
