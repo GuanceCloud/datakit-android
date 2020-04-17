@@ -230,7 +230,7 @@ public class SyncDataManager {
      * @param tags
      * @return
      */
-    private StringBuffer getCustomHash(JSONObject tags, boolean isTag) {
+    private static StringBuffer getCustomHash(JSONObject tags, boolean isTag) {
         StringBuffer sb = new StringBuffer();
         Iterator<String> keys = tags.keys();
         while (keys.hasNext()) {
@@ -257,7 +257,7 @@ public class SyncDataManager {
         return sb;
     }
 
-    private void addQuotationMarks(StringBuffer sb, String value, boolean add) {
+    private static void addQuotationMarks(StringBuffer sb, String value, boolean add) {
         if (add) {
             sb.append("\"").append(Utils.translateFieldValue(value)).append("\"");
         } else {
@@ -348,6 +348,28 @@ public class SyncDataManager {
                 }
             }
         }
+    }
+
+    public static String getMonitorUploadData(String measurement){
+        JSONObject tags = new JSONObject();
+        JSONObject fields = new JSONObject();
+        addMonitorData(tags,fields);
+        StringBuffer sb = new StringBuffer();
+        //获取这条事件的指标
+        sb.append(measurement);
+        StringBuffer tagSb = getCustomHash(tags, true);
+        StringBuffer fieldSb = getCustomHash(fields, false);
+        deleteLastComma(tagSb);
+        if (tagSb.length() > 0) {
+            sb.append(",");
+            sb.append(tagSb.toString());
+        }
+        sb.append(" ");
+        deleteLastComma(fieldSb);
+        sb.append(fieldSb);
+        sb.append(" ");
+        sb.append(System.currentTimeMillis() * 1000 * 1000);
+        return sb.toString();
     }
 
     /**
@@ -586,7 +608,7 @@ public class SyncDataManager {
      *
      * @param sb
      */
-    private void deleteLastComma(StringBuffer sb) {
+    private static void deleteLastComma(StringBuffer sb) {
         if (sb == null) {
             return;
         }
