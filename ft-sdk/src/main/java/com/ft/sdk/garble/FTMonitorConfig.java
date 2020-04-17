@@ -13,7 +13,22 @@ import com.ft.sdk.garble.utils.NetUtils;
  */
 public class FTMonitorConfig {
     private static FTMonitorConfig ftMonitorConfig;
-    private int mMonitorType;
+    private int monitorType;
+    private String geoKey;
+    private boolean useGeoKey;
+
+    public void setMonitorType(int monitorType) {
+        this.monitorType = monitorType;
+    }
+
+    public void setGeoKey(String geoKey) {
+        this.geoKey = geoKey;
+    }
+
+    public void setUseGeoKey(boolean useGeoKey) {
+        this.useGeoKey = useGeoKey;
+    }
+
     private FTMonitorConfig(){ }
     public static FTMonitorConfig get(){
         if(ftMonitorConfig == null){
@@ -22,15 +37,22 @@ public class FTMonitorConfig {
         return ftMonitorConfig;
     }
     public void initParams(FTSDKConfig ftsdkConfig){
-        if(ftsdkConfig != null) {
-            mMonitorType = ftsdkConfig.getMonitorType();
+        if(ftsdkConfig == null){
+            return;
         }
+        monitorType = ftsdkConfig.getMonitorType();
+        geoKey = ftsdkConfig.getGeoKey();
+        useGeoKey = ftsdkConfig.isUseGeoKey();
+        initParams();
+    }
+
+    public void initParams(){
         if(isMonitorType(MonitorType.ALL)){
             //开启网络监听
             NetUtils.get().listenerSignal(FTApplication.getApplication());
             //开始获取地理位置
-            LocationUtils.get().setGeoKey(ftsdkConfig.getGeoKey());
-            LocationUtils.get().setUseGeoKey(ftsdkConfig.isUseGeoKey());
+            LocationUtils.get().setGeoKey(geoKey);
+            LocationUtils.get().setUseGeoKey(useGeoKey);
             LocationUtils.get().startListener();
             //监听网络速度
             NetUtils.get().startMonitorNetRate();
@@ -45,8 +67,8 @@ public class FTMonitorConfig {
             }
             if (isMonitorType(MonitorType.LOCATION)) {
                 //获取地理位置
-                LocationUtils.get().setGeoKey(ftsdkConfig.getGeoKey());
-                LocationUtils.get().setUseGeoKey(ftsdkConfig.isUseGeoKey());
+                LocationUtils.get().setGeoKey(geoKey);
+                LocationUtils.get().setUseGeoKey(useGeoKey);
                 LocationUtils.get().startListener();
             }
         }
@@ -59,16 +81,16 @@ public class FTMonitorConfig {
      */
     public boolean isMonitorType(int monitorType){
         //未开启监控项
-        if(mMonitorType == 0){
+        if(monitorType == 0){
             return false;
         }
         //开启全部监控项
-        if(mMonitorType == 1){
+        if(monitorType == 1){
             return true;
         }
 
         //判断某一种监控项是否开启
-        if((mMonitorType | monitorType) == mMonitorType){
+        if((this.monitorType | monitorType) == this.monitorType){
             return true;
         }
         return false;
