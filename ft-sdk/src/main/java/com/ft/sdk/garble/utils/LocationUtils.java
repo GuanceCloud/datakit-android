@@ -344,7 +344,6 @@ public class LocationUtils {
                         }
                     }
                 }
-                LogUtils.d("Address:" + address.toString());
                 if (address == null) {
                     code = NetCodeStatus.UNKNOWN_EXCEPTION_CODE;
                     errorMessage = "解析数据异常";
