@@ -26,8 +26,9 @@ public class FTMonitor {
 
     private FTMonitor() {
     }
-    public static FTMonitor get(){
-        if(instance == null){
+
+    public static FTMonitor get() {
+        if (instance == null) {
             instance = new FTMonitor();
         }
         return instance;
@@ -44,32 +45,32 @@ public class FTMonitor {
         return this;
     }
 
-    public FTMonitor setUseGeoKey(boolean useGeoKey){
+    public FTMonitor setUseGeoKey(boolean useGeoKey) {
         FTMonitorConfig.get().setUseGeoKey(useGeoKey);
         this.useGeoKey = useGeoKey;
         return this;
     }
 
-    public FTMonitor setGeoKey(String geoKey){
+    public FTMonitor setGeoKey(String geoKey) {
         FTMonitorConfig.get().setGeoKey(geoKey);
         this.geoKey = geoKey;
         return this;
     }
 
-    public FTMonitor setMeasurement(String measurement){
+    public FTMonitor setMeasurement(String measurement) {
         this.measurement = measurement;
         return this;
     }
 
-    public void start(){
+    public void start() {
         FTMonitorConfig.get().initParams();
-        FTMonitorManager.install(period,measurement);
+        FTMonitorManager.install(period, measurement);
     }
 
-    public void release(){
+    public void release() {
         FTMonitorConfig.get().release();
         FTMonitorManager ftMonitorManager = FTMonitorManager.get();
-        if(ftMonitorManager != null){
+        if (ftMonitorManager != null) {
             ftMonitorManager.release();
         }
         instance = null;
@@ -86,7 +87,7 @@ class FTMonitorManager {
     private FTMonitorManager() {
     }
 
-    public static FTMonitorManager install(int period,String measurement) {
+    public static FTMonitorManager install(int period, String measurement) {
         if (instance == null) {
             instance = new FTMonitorManager();
         }
@@ -97,7 +98,7 @@ class FTMonitorManager {
         return instance;
     }
 
-    public static FTMonitorManager get(){
+    public static FTMonitorManager get() {
         return instance;
     }
 
@@ -105,7 +106,7 @@ class FTMonitorManager {
      * 开启监控
      */
     public void startMonitor() {
-        mThread = new MonitorThread("监控轮训", period,measurement);
+        mThread = new MonitorThread("监控轮训", period, measurement);
         mThread.start();
         LogUtils.d("监控轮训线程启动...");
     }
@@ -114,14 +115,14 @@ class FTMonitorManager {
      * 停止监控
      */
     private void stopMonitor() {
-        LogUtils.d("关闭监控轮训线程");
         if (mThread != null && mThread.isAlive()) {
+            LogUtils.d("关闭监控轮训线程");
             mThread.interrupt();
             mThread = null;
         }
     }
 
-    public void release(){
+    public void release() {
         stopMonitor();
         instance = null;
     }
@@ -131,7 +132,7 @@ class FTMonitorManager {
         private int period;
         private String measurement;
 
-        public MonitorThread(String name, int period,String measurement) {
+        public MonitorThread(String name, int period, String measurement) {
             setName(name);
             this.period = period;
             this.measurement = measurement;
@@ -143,17 +144,17 @@ class FTMonitorManager {
             try {
                 while (true) {
                     Thread.sleep(period * 1000);
-                    try{
+                    try {
                         String body = SyncDataManager.getMonitorUploadData(measurement);
                         SyncDataManager.printUpdateData(body);
                         ResponseData result = HttpBuilder.Builder()
                                 .setMethod(RequestMethod.POST)
                                 .setBodyString(body).executeSync(ResponseData.class);
-                        if(result.getHttpCode()!= HttpURLConnection.HTTP_OK){
-                            LogUtils.d("监控轮训线程上传数据出错(message："+result.getData()+")");
+                        if (result.getHttpCode() != HttpURLConnection.HTTP_OK) {
+                            LogUtils.d("监控轮训线程上传数据出错(message：" + result.getData() + ")");
                         }
-                    }catch (Exception e){
-                        LogUtils.d("监控轮训线程执行错误(message："+e.getMessage()+")");
+                    } catch (Exception e) {
+                        LogUtils.d("监控轮训线程执行错误(message：" + e.getMessage() + ")");
                     }
                 }
             } catch (InterruptedException e) {
