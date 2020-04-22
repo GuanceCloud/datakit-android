@@ -138,7 +138,7 @@ public class MainActivityTest {
         //等待2分钟查询服务器中的数据是否和上传的一致
         Thread.sleep(1000 * 60 * 2);
         ResponseData responseData = HttpBuilder.Builder()
-                .setUrl("http://testing.api-ft2x.cloudcare.cn:10531")
+                .setHost("http://testing.api-ft2x.cloudcare.cn:10531")
                 .setModel("api/v1/influx/query_data")
                 .setHeadParams(SyncDataUtils.getQueryHead(token))
                 .setMethod(RequestMethod.POST)
@@ -161,7 +161,7 @@ public class MainActivityTest {
      */
     private String getLoginToken() throws JSONException {
         ResponseData responseData = HttpBuilder.Builder()
-                .setUrl("http://testing.api-ft2x.cloudcare.cn:10531")
+                .setHost("http://testing.api-ft2x.cloudcare.cn:10531")
                 .setModel("api/v1/auth-token/login")
                 .setMethod(RequestMethod.POST)
                 .setHeadParams(SyncDataUtils.getLoginHead())

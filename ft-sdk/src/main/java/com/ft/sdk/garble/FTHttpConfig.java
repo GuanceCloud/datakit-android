@@ -3,6 +3,7 @@ package com.ft.sdk.garble;
 import com.ft.sdk.BuildConfig;
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTSDKConfig;
+import com.ft.sdk.garble.http.EngineFactory;
 import com.ft.sdk.garble.utils.DeviceUtils;
 
 import static com.ft.sdk.garble.utils.Constants.USER_AGENT;
@@ -22,6 +23,8 @@ public class FTHttpConfig {
     public String uuid;
     public String userAgent;
     public boolean useOaid;
+    public int sendOutTime = 10 * 1000;
+    public int readOutTime = 10 * 1000;
     private FTHttpConfig() {
 
     }
@@ -45,6 +48,7 @@ public class FTHttpConfig {
         version = BuildConfig.VERSION_NAME;
         uuid = DeviceUtils.getSDKUUid(FTApplication.getApplication());
         userAgent = USER_AGENT;
+        EngineFactory.setEngineClass(ftsdkConfig.getINetEngineClass());
     }
 
     public void release(){

@@ -313,7 +313,7 @@ public class LocationUtils {
             params.put("key", geoKey);
             params.put("radius", 1000);
             ResponseData responseData = HttpBuilder.Builder()
-                    .setUrl("https://restapi.amap.com/v3/geocode/regeo")
+                    .setHost("https://restapi.amap.com/v3/geocode/regeo")
                     .setMethod(RequestMethod.GET)
                     .setParams(params)
                     .useDefaultHead(false)
@@ -374,7 +374,7 @@ public class LocationUtils {
         HashMap<String, Object> params = new HashMap<String, Object>();
         params.put("key", geoKey);
         ResponseData responseData = HttpBuilder.Builder()
-                .setUrl("https://restapi.amap.com/v3/ip")
+                .setHost("https://restapi.amap.com/v3/ip")
                 .setMethod(RequestMethod.GET)
                 .setParams(params)
                 .useDefaultHead(false)
