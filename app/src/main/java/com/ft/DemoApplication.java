@@ -46,7 +46,8 @@ public class DemoApplication extends Application {
                 //.setWhiteViewClasses(Arrays.asList(Button.class, RadioGroup.class))
                 .setOpenFlowChart(true)
                 .setFlowProduct("demo12")
-                .setMonitorType(MonitorType.ALL);//设置监控项
+                .setMonitorType(MonitorType.ALL)//设置监控项
+                .setINetEngineClass(OkHttpEngine.class);
         FTSdk.install(ftSDKConfig);
 
         FTMonitor.get()

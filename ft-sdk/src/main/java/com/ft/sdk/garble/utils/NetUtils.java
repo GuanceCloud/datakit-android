@@ -43,6 +43,69 @@ public class NetUtils {
     private long lastRxTx = 0;
     private boolean isRunNetMonitor = false;
 
+    public long tcpStartTime;
+    public long tcpEndTime;
+    public long dnsStartTime;
+    public long dnsEndTime;
+    public long responseStartTime;
+    public long responseEndTime;
+    public long startTime;
+    public long endTime;
+    public int requestCount;
+    public int requestErrCount;
+
+    public long getTcpTime(){
+        if(tcpEndTime>=tcpStartTime){
+            long time = tcpEndTime - tcpStartTime;
+            if(time > 10*1000){
+                return 0;
+            }
+            return time;
+        }
+        return 0;
+    }
+
+    public long getDNSTime(){
+        if(dnsEndTime>=dnsStartTime){
+            long time = dnsEndTime - dnsStartTime;
+            if(time > 10*1000){
+                return 0;
+            }
+            return time;
+        }
+        return 0;
+    }
+
+    public long getCountTime(){
+        if(endTime>=startTime){
+            long time = endTime - startTime;
+            if(time > 10*1000){
+                return 0;
+            }
+            return time;
+        }
+        return 0;
+    }
+
+    public long getConnectTime(){
+        if(responseEndTime>=responseStartTime){
+            long time = responseEndTime - responseStartTime;
+            if(time > 10*1000){
+                return 0;
+            }
+            return time;
+        }
+        return 0;
+    }
+
+    public double getErrorRate(){
+        if(requestCount > 0){
+            double rate = requestErrCount/requestCount;
+            return Math.floor(rate*100)/100.0;
+        }
+        return 0;
+    }
+
     private NetUtils() {
     }
 

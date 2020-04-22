@@ -1,5 +1,6 @@
 package com.ft.sdk;
 
+import com.ft.sdk.garble.http.INetEngine;
 import com.ft.sdk.garble.utils.DeviceUtils;
 
 import java.security.InvalidParameterException;
@@ -44,6 +45,7 @@ public class FTSDKConfig {
     private int disableAutoTrackType;
     private List<Class<?>> blackActivityClass;
     private List<Class<?>> blackViewClass;
+    private Class<? extends INetEngine> iNetEngineClass;
 
     /**
      * 构建 SDK 必要的配置参数
@@ -169,6 +171,9 @@ public class FTSDKConfig {
     public FTSDKConfig enableAutoTrack(boolean autoTrack) {
         this.autoTrack = autoTrack;
         return this;
+    }
+    public Class<? extends INetEngine> getINetEngineClass() {
+        return iNetEngineClass;
     }
 
     /**
@@ -325,4 +330,8 @@ public class FTSDKConfig {
         return this;
     }
 
+    public FTSDKConfig setINetEngineClass(Class<? extends INetEngine> iNetEngineClass) {
+        this.iNetEngineClass = iNetEngineClass;
+        return this;
+    }
 }

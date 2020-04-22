@@ -55,7 +55,7 @@ public class HttpTest {
         mMockWebServer.play();
 
         FTResponseData result = HttpBuilder.Builder()
-                .setUrl(mMockWebServer.getUrl("/").toString())
+                .setHost(mMockWebServer.getUrl("/").toString())
                 .setMethod(RequestMethod.POST)
                 .setBodyString("")
                 .executeSync(FTResponseData.class);
@@ -75,7 +75,7 @@ public class HttpTest {
         mMockWebServer.play();
 
         FTResponseData result = HttpBuilder.Builder()
-                .setUrl(mMockWebServer.getUrl("/").toString())
+                .setHost(mMockWebServer.getUrl("/").toString())
                 .setMethod(RequestMethod.POST)
                 .setBodyString("")
                 .executeSync(FTResponseData.class);
@@ -95,7 +95,7 @@ public class HttpTest {
         mMockWebServer.play();
 
         FTResponseData result = HttpBuilder.Builder()
-                .setUrl(mMockWebServer.getUrl("/").toString())
+                .setHost(mMockWebServer.getUrl("/").toString())
                 .setMethod(RequestMethod.POST)
                 .setBodyString("")
                 .executeSync(FTResponseData.class);

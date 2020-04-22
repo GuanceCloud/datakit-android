@@ -1,11 +1,14 @@
 package com.ft.sdk;
 
+import android.os.SystemClock;
+
 import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.http.ResponseData;
 import com.ft.sdk.garble.manager.SyncDataManager;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.NetUtils;
 
 import java.net.HttpURLConnection;
 
@@ -32,6 +35,46 @@ public class FTMonitor {
             instance = new FTMonitor();
         }
         return instance;
+    }
+
+    public void setTcpStartTime() {
+        NetUtils.get().tcpStartTime = System.currentTimeMillis();
+    }
+
+    public void setTcpEndTime() {
+        NetUtils.get().tcpEndTime = System.currentTimeMillis();
+    }
+
+    public void setDnsStartTime() {
+        NetUtils.get().dnsStartTime = System.currentTimeMillis();
+    }
+
+    public void setDnsEndTime() {
+        NetUtils.get().dnsEndTime = System.currentTimeMillis();
+    }
+
+    public void setResponseStartTime() {
+        NetUtils.get().responseStartTime = System.currentTimeMillis();
+    }
+
+    public void setResponseEndTime() {
+        NetUtils.get().responseEndTime = System.currentTimeMillis();
+    }
+
+    public void setStartTime() {
+        NetUtils.get().startTime = System.currentTimeMillis();
+    }
+
+    public void setEndTime() {
+        NetUtils.get().endTime = System.currentTimeMillis();
+    }
+
+    public void setRequestCount() {
+        NetUtils.get().requestCount += 1;
+    }
+
+    public void setRequestErrCount() {
+        NetUtils.get().requestErrCount += 1;
     }
 
     public FTMonitor setPeriod(int period) {
