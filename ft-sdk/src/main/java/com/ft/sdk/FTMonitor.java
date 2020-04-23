@@ -61,14 +61,6 @@ public class FTMonitor {
         NetUtils.get().responseEndTime = System.currentTimeMillis();
     }
 
-    public void setStartTime() {
-        NetUtils.get().startTime = System.currentTimeMillis();
-    }
-
-    public void setEndTime() {
-        NetUtils.get().endTime = System.currentTimeMillis();
-    }
-
     public void setRequestCount() {
         NetUtils.get().requestCount += 1;
     }

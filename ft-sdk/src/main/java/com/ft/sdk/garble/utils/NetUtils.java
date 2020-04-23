@@ -49,15 +49,13 @@ public class NetUtils {
     public long dnsEndTime;
     public long responseStartTime;
     public long responseEndTime;
-    public long startTime;
-    public long endTime;
     public int requestCount;
     public int requestErrCount;
 
     public long getTcpTime(){
         if(tcpEndTime>=tcpStartTime){
             long time = tcpEndTime - tcpStartTime;
-            if(time > 10*1000){
+            if(time > 10*1000 || time >= getResponseTime()){
                 return 0;
             }
             return time;
@@ -68,7 +66,7 @@ public class NetUtils {
     public long getDNSTime(){
         if(dnsEndTime>=dnsStartTime){
             long time = dnsEndTime - dnsStartTime;
-            if(time > 10*1000){
+            if(time > 10*1000 || time >= getResponseTime()){
                 return 0;
             }
             return time;
@@ -76,18 +74,7 @@ public class NetUtils {
         return 0;
     }
 
-    public long getCountTime(){
-        if(endTime>=startTime){
-            long time = endTime - startTime;
-            if(time > 10*1000){
-                return 0;
-            }
-            return time;
-        }
-        return 0;
-    }
-
-    public long getConnectTime(){
+    public long getResponseTime(){
         if(responseEndTime>=responseStartTime){
             long time = responseEndTime - responseStartTime;
             if(time > 10*1000){
@@ -100,7 +87,7 @@ public class NetUtils {
 
     public double getErrorRate(){
         if(requestCount > 0){
-            double rate = requestErrCount/requestCount;
+            double rate = requestErrCount*1.0/requestCount;
             return Math.floor(rate*100)/100.0;
         }
         return 0;
