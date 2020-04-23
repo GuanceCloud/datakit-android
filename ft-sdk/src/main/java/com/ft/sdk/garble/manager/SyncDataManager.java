@@ -514,7 +514,8 @@ public class SyncDataManager {
                 tags.put("network_type", "蜂窝网络");
             }
             fields.put("network_strength", NetUtils.get().getSignalStrength(FTApplication.getApplication()));
-            fields.put("network_speed", NetUtils.get().getNetRate());
+            fields.put("network_in_rate", NetUtils.get().getNetDownRate());
+            fields.put("network_out_rate", NetUtils.get().getNetUpRate());
             tags.put("network_proxy", NetUtils.get().isWifiProxy(FTApplication.getApplication()));
             String[] dns = NetUtils.get().getDnsFromConnectionManager(FTApplication.getApplication());
             for (int i = 0;i<dns.length; i++) {

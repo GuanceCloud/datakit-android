@@ -39,8 +39,12 @@ public class NetUtils {
     private TelephonyManager telephonyManager;
     private PhoneStatListener phoneStatListener;
 
-    private double netRate = 0.00;
-    private long lastRxTx = 0;
+    private double netUpRate = 0.00;
+    private double netDownRate = 0.00;
+    //上一次收到的总的字节数
+    private long lastRx = 0;
+    //上一次发送的总的字节数
+    private long lastTx = 0;
     private boolean isRunNetMonitor = false;
 
     public long tcpStartTime;
@@ -219,12 +223,20 @@ public class NetUtils {
     }
 
     /**
-     * 得到网络速度
+     * 得到网络上行速度
      *
      * @return
      */
-    public double getNetRate() {
-        return netRate;
+    public double getNetUpRate() {
+        return netUpRate;
+    }
+    /**
+     * 得到网络下行速度
+     *
+     * @return
+     */
+    public double getNetDownRate() {
+        return netDownRate;
     }
 
     /**
@@ -242,7 +254,7 @@ public class NetUtils {
                             isRunNetMonitor = true;
                             try {
                                 getNetSpeed();
-                                Thread.sleep(1000);
+                                Thread.sleep(2000);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -264,37 +276,27 @@ public class NetUtils {
      * 应用启动时获取一次网速
      */
     public void initSpeed() {
-        lastRxTx = TrafficStats.getTotalRxBytes()
-                + TrafficStats.getTotalTxBytes();
+        lastRx = TrafficStats.getTotalRxBytes();
+        lastTx = TrafficStats.getTotalTxBytes();
         getNetSpeed();
     }
 
     /**
-     * 获得网络速度（外部获取网速应该直接调用{@link NetUtils#getNetRate()}）
-     *
+     * 获得网络速度（外部获取网速应该直接调用{@link NetUtils}）
+     * 单位 字节
      * @return
      */
     public void getNetSpeed() {
-        long tempSum = TrafficStats.getTotalRxBytes()
-                + TrafficStats.getTotalTxBytes();
-        long rxtxLast = tempSum - lastRxTx;
-        double totalSpeed = rxtxLast * 1000 / 2000d;
-        lastRxTx = tempSum;
-        //netRate = showSpeed(totalSpeed);//设置显示当前网速
-        netRate = Utils.formatDouble(totalSpeed);
+        long tempRx = TrafficStats.getTotalRxBytes();
+        long tempTx = TrafficStats.getTotalTxBytes();
+        long rxLast = tempRx - lastRx;
+        long txLast = tempTx - lastTx;
+
+        lastRx = tempRx;
+        lastTx = tempTx;
+        netDownRate = Utils.formatDouble(rxLast/2d);
+        netUpRate = Utils.formatDouble(txLast/2d);
     }
-
-    private String showSpeed(double speed) {
-        String speedString;
-        if (speed >= 1048576d) {
-            speedString = showFloatFormat.format(speed / 1048576d) + "MB/s";
-        } else {
-            speedString = showFloatFormat.format(speed / 1024d) + "KB/s";
-        }
-        return speedString;
-
-    }
-
 
     /**
      * 判断设备 是否使用代理上网
