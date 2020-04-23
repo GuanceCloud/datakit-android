@@ -5,15 +5,12 @@ import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.INetEngine;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.http.ResponseData;
-import com.ft.sdk.garble.utils.LogUtils;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,8 +45,7 @@ public class OkHttpEngine implements INetEngine {
                         @Override
                         public void callEnd(@NotNull Call call) {
                             super.callEnd(call);
-                            FTMonitor.get().setEndTime();
-                            FTMonitor.get().setRequestCount();
+                            FTMonitor.get().setResponseEndTime();
                         }
 
                         @Override
@@ -61,7 +57,8 @@ public class OkHttpEngine implements INetEngine {
                         @Override
                         public void callStart(@NotNull Call call) {
                             super.callStart(call);
-                            FTMonitor.get().setStartTime();
+                            FTMonitor.get().setRequestCount();
+                            FTMonitor.get().setResponseStartTime();
                         }
 
                         @Override
@@ -86,18 +83,6 @@ public class OkHttpEngine implements INetEngine {
                         public void secureConnectStart(@NotNull Call call) {
                             super.secureConnectStart(call);
                             FTMonitor.get().setTcpStartTime();
-                        }
-
-                        @Override
-                        public void responseBodyEnd(@NotNull Call call, long byteCount) {
-                            super.responseBodyEnd(call, byteCount);
-                            FTMonitor.get().setResponseEndTime();
-                        }
-
-                        @Override
-                        public void responseHeadersStart(@NotNull Call call) {
-                            super.responseHeadersStart(call);
-                            FTMonitor.get().setResponseStartTime();
                         }
                     })
                     .build();
