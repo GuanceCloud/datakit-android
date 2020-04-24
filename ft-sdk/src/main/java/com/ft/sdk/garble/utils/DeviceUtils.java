@@ -24,6 +24,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -242,15 +244,15 @@ public class DeviceUtils {
     }
 
     /**
-     * 返回系统运行时间(小时)
+     * 返回系统开机时间
      * @return
      */
-    public static double getSystemOpenTime(){
-        //小时数
-        double time = SystemClock.elapsedRealtime()/1000.0/60/60;
-        double hours = Math.floor(time);
-        double xiaoshu = Math.floor((time-hours)*100)/100.0;
-        return hours+xiaoshu;
+    public static String getSystemOpenTime(){
+        //毫秒数
+        long time = SystemClock.elapsedRealtime();
+        long startTime = System.currentTimeMillis() - time;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",Locale.getDefault());
+        return dateFormat.format(new Date(startTime));
     }
 
     /**
