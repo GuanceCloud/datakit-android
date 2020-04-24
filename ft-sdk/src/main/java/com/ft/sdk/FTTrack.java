@@ -296,6 +296,7 @@ public class FTTrack {
         SyncDataManager syncDataManager = new SyncDataManager();
         String body = syncDataManager.getBodyContent(recordDataList);
         SyncDataManager.printUpdateData(body);
+        body = body.replaceAll(Constants.SEPARATION_PRINT,Constants.SEPARATION);
         ResponseData result = HttpBuilder.Builder()
                 .setMethod(RequestMethod.POST)
                 .setBodyString(body).executeSync(ResponseData.class);

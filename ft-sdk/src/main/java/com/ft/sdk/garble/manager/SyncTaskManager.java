@@ -8,6 +8,7 @@ import com.ft.sdk.garble.http.FTResponseData;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.http.RequestMethod;
+import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -115,6 +116,7 @@ public class SyncTaskManager {
         SyncDataManager syncDataManager = new SyncDataManager();
         String body = syncDataManager.getBodyContent(requestDatas);
         SyncDataManager.printUpdateData(body);
+        body = body.replaceAll(Constants.SEPARATION_PRINT,Constants.SEPARATION);
         requestNet(body, (code,response) -> {
             if (code == HttpURLConnection.HTTP_OK) {
                 LogUtils.d("同步数据成功");
