@@ -394,6 +394,8 @@ public class SyncDataManager {
                 createLocation(tags, fields);
                 //蓝牙
                 createBluetooth(tags,fields);
+                //系统
+                createSystem(tags,fields);
 
             } else {
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.BATTERY)) {
@@ -424,6 +426,10 @@ public class SyncDataManager {
                 }
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.BLUETOOTH)) {
                     createBluetooth(tags, fields);
+                }
+                if (FTMonitorConfig.get().isMonitorType(MonitorType.SYSTEM)) {
+                    //系统
+                    createSystem(tags,fields);
                 }
             }
         } catch (Exception e) {
@@ -583,6 +589,15 @@ public class SyncDataManager {
         }
     }
 
+    private static void createSystem(JSONObject tags, JSONObject fields){
+        try{
+            fields.put("system_open_date",Utils.replaceSpace(DeviceUtils.getSystemOpenTime()));
+            tags.put("device_name",BluetoothUtils.get().getDeviceName());
+        }catch (Exception e){
+            LogUtils.e("系统数据获取异常:" + e.getMessage());
+        }
+    }
+
     private static void createBluetooth(JSONObject tags, JSONObject fields){
         try {
             tags.put("bluetooth_mac", BluetoothUtils.get().getBluetoothMacAddress());
@@ -673,10 +688,8 @@ public class SyncDataManager {
         objectHashMap.put("os_version", DeviceUtils.getOSVersion());
         objectHashMap.put("device_band", DeviceUtils.getDeviceBand());
         objectHashMap.put("device_model", DeviceUtils.getDeviceModel());
-        objectHashMap.put("device_name", BluetoothUtils.get().getDeviceName());
         objectHashMap.put("display", DeviceUtils.getDisplay(context));
         objectHashMap.put("carrier", DeviceUtils.getCarrier(context));
-        objectHashMap.put("runtime", DeviceUtils.getSystemOpenTime());
         if (FTHttpConfig.get().useOaid) {
             objectHashMap.put("oaid", OaidUtils.getOAID(context));
         }
