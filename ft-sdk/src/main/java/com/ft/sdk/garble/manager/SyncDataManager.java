@@ -41,6 +41,7 @@ import static com.ft.sdk.garble.bean.OP.CSTM;
 import static com.ft.sdk.garble.bean.OP.FLOW_CHAT;
 import static com.ft.sdk.garble.utils.Constants.FT_DEFAULT_MEASUREMENT;
 import static com.ft.sdk.garble.utils.Constants.FT_KEY_VALUE_NULL;
+import static com.ft.sdk.garble.utils.Constants.UNKNOWN;
 
 /**
  * BY huangDianHua
@@ -203,7 +204,7 @@ public class SyncDataManager {
         if (recordData.getOpdata() != null) {
             try {
                 JSONObject opJson = new JSONObject(recordData.getOpdata());
-                JSONObject tags = opJson.optJSONObject("tags");
+                JSONObject tags = opJson.optJSONObject(Constants.TAGS);
                 JSONObject fields = opJson.optJSONObject(Constants.FIELDS);
                 StringBuffer tagSb = getCustomHash(tags, true);
                 StringBuffer valueSb = getCustomHash(fields, false);
@@ -240,10 +241,10 @@ public class SyncDataManager {
             sb.append(key);
             sb.append("=");
             if (value == null) {
-                addQuotationMarks(sb, FT_KEY_VALUE_NULL, !isTag);
+                addQuotationMarks(sb, UNKNOWN, !isTag);
             } else {
                 if ("".equals(value)) {
-                    addQuotationMarks(sb, FT_KEY_VALUE_NULL, !isTag);
+                    addQuotationMarks(sb, UNKNOWN, !isTag);
                 } else {
                     if (value instanceof String) {
                         addQuotationMarks(sb, (String) value, !isTag);
@@ -286,7 +287,7 @@ public class SyncDataManager {
                 if (!Utils.isNullOrEmpty(vtp)) {
                     sb.append("vtp=" + vtp + ",");
                 }
-                JSONObject tags = opJson.optJSONObject("tags");
+                JSONObject tags = opJson.optJSONObject(Constants.TAGS);
                 if (tags != null) {
                     sb.append(getCustomHash(tags, true));
                 }
@@ -648,20 +649,20 @@ public class SyncDataManager {
                 if (keys.hasNext()) {
                     if (value != null) {
                         if (value instanceof String && ((String) value).isEmpty()) {
-                            value = FT_KEY_VALUE_NULL;
+                            value = UNKNOWN;
                         }
                         sb.append(key).append("=").append(value).append(",");
                     } else {
-                        sb.append(key + "=" + FT_KEY_VALUE_NULL + ",");
+                        sb.append(key + "=" + UNKNOWN + ",");
                     }
                 } else {
                     if (value != null) {
                         if (value instanceof String && ((String) value).isEmpty()) {
-                            value = FT_KEY_VALUE_NULL;
+                            value = UNKNOWN;
                         }
                         sb.append(key + "=" + value);
                     } else {
-                        sb.append(key + "=" + FT_KEY_VALUE_NULL);
+                        sb.append(key + "=" + UNKNOWN);
                     }
                 }
             }
