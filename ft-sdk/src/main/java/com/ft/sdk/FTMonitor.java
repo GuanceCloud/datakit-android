@@ -7,6 +7,7 @@ import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.http.ResponseData;
 import com.ft.sdk.garble.manager.SyncDataManager;
+import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.NetUtils;
 
@@ -182,6 +183,7 @@ class FTMonitorManager {
                     try {
                         String body = SyncDataManager.getMonitorUploadData(measurement);
                         SyncDataManager.printUpdateData(body);
+                        body = body.replaceAll(Constants.SEPARATION_PRINT,Constants.SEPARATION);
                         ResponseData result = HttpBuilder.Builder()
                                 .setMethod(RequestMethod.POST)
                                 .setBodyString(body).executeSync(ResponseData.class);

@@ -99,9 +99,9 @@ public class SyncDataManager {
                 addUserData(sb, recordData);
                 //删除多余的逗号
                 deleteLastComma(sb);
-                sb.append(" ");
+                sb.append(Constants.SEPARATION_PRINT);
                 sb.append("$duration=").append(recordData.getDuration()).append("i");
-                sb.append(" ");
+                sb.append(Constants.SEPARATION_PRINT);
                 sb.append(recordData.getTime() * 1000 * 1000);
                 sb.append("\n");
             } else if (OP.OPEN_FRA.value.equals(recordData.getOp())) {
@@ -134,9 +134,9 @@ public class SyncDataManager {
                 addUserData(sb, recordData);
                 //删除多余的逗号
                 deleteLastComma(sb);
-                sb.append(" ");
+                sb.append(Constants.SEPARATION_PRINT);
                 sb.append("$duration=").append(recordData.getDuration()).append("i");
-                sb.append(" ");
+                sb.append(Constants.SEPARATION_PRINT);
                 sb.append(recordData.getTime() * 1000 * 1000);
                 sb.append("\n");
             }
@@ -214,10 +214,10 @@ public class SyncDataManager {
                     sb.append(",");
                     sb.append(tagSb.toString());
                 }
-                sb.append(" ");
+                sb.append(Constants.SEPARATION_PRINT);
                 deleteLastComma(valueSb);
                 sb.append(valueSb);
-                sb.append(" ");
+                sb.append(Constants.SEPARATION_PRINT);
                 sb.append(recordData.getTime() * 1000 * 1000);
             } catch (Exception e) {
             }
@@ -304,7 +304,7 @@ public class SyncDataManager {
             sb.delete(0, sb.length());
             sb.append(temp);
         }
-        sb.append(" ");
+        sb.append(Constants.SEPARATION_PRINT);
 
         if (fields != null) {
             try {
@@ -318,7 +318,7 @@ public class SyncDataManager {
         } else {
             sb.append("event=\"" + getEventName(recordData.getOp()) + "\"");
         }
-        sb.append(" ");
+        sb.append(Constants.SEPARATION_PRINT);
         sb.append(recordData.getTime() * 1000000);
         return sb.toString();
     }
@@ -365,10 +365,10 @@ public class SyncDataManager {
             sb.append(",");
             sb.append(tagSb.toString());
         }
-        sb.append(" ");
+        sb.append(Constants.SEPARATION_PRINT);
         deleteLastComma(fieldSb);
         sb.append(fieldSb);
-        sb.append(" ");
+        sb.append(Constants.SEPARATION_PRINT);
         sb.append(System.currentTimeMillis() * 1000 * 1000);
         return sb.toString();
     }
@@ -592,7 +592,7 @@ public class SyncDataManager {
 
     private static void createSystem(JSONObject tags, JSONObject fields){
         try{
-            fields.put("system_open_date",Utils.replaceSpace(DeviceUtils.getSystemOpenTime()));
+            fields.put("system_open_date",DeviceUtils.getSystemOpenTime());
             tags.put("device_name",BluetoothUtils.get().getDeviceName());
         }catch (Exception e){
             LogUtils.e("系统数据获取异常:" + e.getMessage());
@@ -721,8 +721,7 @@ public class SyncDataManager {
             sb.append("----------------------总共 ").append(counts.length).append(" 条数据------------------------\n");
             for (int i = 0; i < counts.length; i++) {
                 String str = counts[i];
-                str = str.replaceAll("\\\\ ", "_");
-                String[] strArr = str.split(" ");
+                String[] strArr = str.split(Constants.SEPARATION_PRINT);
                 sb.append("---------------------第 ").append(i).append(" 条数据---开始----------------------\n");
                 sb.append("{\n ");
                 if (strArr.length == 3) {
