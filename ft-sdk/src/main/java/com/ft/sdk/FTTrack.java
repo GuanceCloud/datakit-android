@@ -259,7 +259,7 @@ public class FTTrack {
             if (tagsTemp == null) {
                 tagsTemp = new JSONObject();
             }
-            opData.put("tags", tagsTemp);
+            opData.put(Constants.TAGS, tagsTemp);
             if (fields != null) {
                 opData.put(Constants.FIELDS, fields);
             } else {
