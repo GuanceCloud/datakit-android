@@ -22,8 +22,9 @@ import static com.ft.sdk.garble.http.NetCodeStatus.UNKNOWN_EXCEPTION_CODE;
 /**
  * BY huangDianHua
  * DATE:2019-11-29 18:40
- * Description:
+ * Description:该类过期已不再使用
  */
+@Deprecated
 public abstract class HttpClient {
     //字符编码
     final String CHARSET = "UTF-8";
