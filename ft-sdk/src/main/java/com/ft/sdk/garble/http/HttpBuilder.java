@@ -50,7 +50,11 @@ public class HttpBuilder {
         }
         String query = getQueryString();
         if (!Utils.isNullOrEmpty(query)) {
-            url += "?" + query;
+            if(url.contains("?")){
+                url+=query;
+            }else {
+                url += "?" + query;
+            }
         }
         return url;
     }

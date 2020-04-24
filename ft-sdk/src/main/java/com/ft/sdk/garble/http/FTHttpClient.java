@@ -12,8 +12,9 @@ import java.util.TimeZone;
 /**
  * BY huangDianHua
  * DATE:2019-12-09 16:58
- * Description:
+ * Description:该类过期已不再使用
  */
+@Deprecated
 public class FTHttpClient extends HttpClient {
     private String gmtString;
 
