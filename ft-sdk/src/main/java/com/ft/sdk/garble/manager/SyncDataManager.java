@@ -397,6 +397,8 @@ public class SyncDataManager {
                 createBluetooth(tags,fields);
                 //系统
                 createSystem(tags,fields);
+                //传感器
+                createSensor(tags,fields);
 
             } else {
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.BATTERY)) {
@@ -431,6 +433,10 @@ public class SyncDataManager {
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.SYSTEM)) {
                     //系统
                     createSystem(tags,fields);
+                }
+                if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR)) {
+                    //传感器
+                    createSensor(tags,fields);
                 }
             }
         } catch (Exception e) {
@@ -604,6 +610,14 @@ public class SyncDataManager {
             tags.put("bluetooth_mac", BluetoothUtils.get().getBluetoothMacAddress());
         }catch (Exception e){
             LogUtils.e("蓝牙数据获取异常:" + e.getMessage());
+        }
+    }
+
+    private static void createSensor(JSONObject tags, JSONObject fields){
+        try {
+            fields.put("sensor_screen_brightness",DeviceUtils.getSystemScreenBrightnessValue());
+        }catch (Exception e){
+            LogUtils.e("传感器数据获取异常:" + e.getMessage());
         }
     }
 

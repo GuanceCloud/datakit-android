@@ -3,6 +3,7 @@ package com.ft.sdk.garble.utils;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
@@ -417,5 +418,15 @@ public class DeviceUtils {
             }
         }
         return stringBuilder.toString();
+    }
+
+    /**
+     * 获取系统的亮度(值范围在0-255)
+     * @return
+     */
+    public static int getSystemScreenBrightnessValue(){
+        ContentResolver contentResolver = FTApplication.getApplication().getContentResolver();
+        int defVal = 125;
+        return Settings.System.getInt(contentResolver,Settings.System.SCREEN_BRIGHTNESS,defVal);
     }
 }

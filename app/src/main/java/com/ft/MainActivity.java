@@ -23,9 +23,7 @@ import android.widget.RatingBar;
 import android.widget.SeekBar;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.annotation.RequiresPermission;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
@@ -36,8 +34,6 @@ import com.amitshekhar.debug.encrypt.sqlite.DebugDBEncryptFactory;
 import com.amitshekhar.debug.sqlite.DebugDBFactory;
 import com.bumptech.glide.Glide;
 import com.ft.sdk.FTSdk;
-import com.ft.sdk.garble.utils.BluetoothUtils;
-import com.ft.sdk.garble.utils.LogUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -86,9 +82,7 @@ public class MainActivity extends AppCompatActivity {
         requestPermissions(new String[]{Manifest.permission.CAMERA
                 , Manifest.permission.ACCESS_FINE_LOCATION
                 , Manifest.permission.ACCESS_COARSE_LOCATION
-        ,Manifest.permission.READ_PHONE_STATE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-        LogUtils.d("WIFI-MAC:"+getAdresseMAC(this));
-        LogUtils.d("Bluetooth-Mac:"+getBluetoothAddressSdk23(BluetoothAdapter.getDefaultAdapter()));
+                , Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         setTitle("FT-SDK使用Demo");
         FTSdk.get().setGpuRenderer(findViewById(R.id.ll));
         showKotlinActivity = findViewById(R.id.showKotlinActivity);
@@ -231,14 +225,14 @@ public class MainActivity extends AppCompatActivity {
     private static final String fileAddressMac = "/sys/class/net/wlan0/address";
 
     public static String getAdresseMAC(Context context) {
-        WifiManager wifiMan = (WifiManager)context.getSystemService(Context.WIFI_SERVICE) ;
+        WifiManager wifiMan = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         WifiInfo wifiInf = wifiMan.getConnectionInfo();
 
-        if(wifiInf !=null && marshmallowMacAddress.equals(wifiInf.getMacAddress())){
+        if (wifiInf != null && marshmallowMacAddress.equals(wifiInf.getMacAddress())) {
             String result = null;
             try {
-                result= getAdressMacByInterface();
-                if (result != null){
+                result = getAdressMacByInterface();
+                if (result != null) {
                     return result;
                 } else {
                     result = getAddressMacByFile(wifiMan);
@@ -249,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
             } catch (Exception e) {
                 Log.e("MobileAcces", "Erreur lecture propriete Adresse MAC ");
             }
-        } else{
+        } else {
             if (wifiInf != null && wifiInf.getMacAddress() != null) {
                 return wifiInf.getMacAddress();
             } else {
@@ -259,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
         return marshmallowMacAddress;
     }
 
-    private static String getAdressMacByInterface(){
+    private static String getAdressMacByInterface() {
         try {
             List<NetworkInterface> all = Collections.list(NetworkInterface.getNetworkInterfaces());
             for (NetworkInterface nif : all) {
@@ -271,7 +265,7 @@ public class MainActivity extends AppCompatActivity {
 
                     StringBuilder res1 = new StringBuilder();
                     for (byte b : macBytes) {
-                        res1.append(String.format("%02X:",b));
+                        res1.append(String.format("%02X:", b));
                     }
 
                     if (res1.length() > 0) {
