@@ -599,12 +599,7 @@ public class FTAutoTrack {
                     SyncDataManager.addMonitorData(tags,fields);
                     opData.put("tags", tags);
                     opData.put(Constants.FIELDS, fields);
-                    //开启流程图，获取流程图相关数据存入数据库中
-                    if (FTFlowChartConfig.get().isOpenFlowChart()) {
-                        if (op == OP.OPEN_ACT || op == OP.OPEN_FRA) {
-                            opData.put(Constants.MEASUREMENT, FTFlowChartConfig.get().getFlowProduct());
-                        }
-                    }
+                    opData.put(Constants.MEASUREMENT, FTAutoTrackConfig.get().getProduct());
                     recordData.setOpdata(opData.toString());
                 } catch (Exception e) {
                 }
