@@ -34,8 +34,8 @@ public class FTSDKConfig {
     private int monitorType;
     //是否打开流程图
     private boolean openFlowChart;
-    //图标类型，产品代号
-    private String flowProduct;
+    //产品代号
+    private String product;
     //以下三个为白名单
     private int enableAutoTrackType;
     private List<Class<?>> whiteActivityClass;
@@ -132,8 +132,8 @@ public class FTSDKConfig {
         return openFlowChart;
     }
 
-    public String getFlowProduct() {
-        return flowProduct;
+    public String getProduct() {
+        return product;
     }
 
     public int getEnableAutoTrackType() {
@@ -242,13 +242,13 @@ public class FTSDKConfig {
     }
 
     /**
-     * 图标类型代号
+     * 类型代号
      *
-     * @param flowProduct
+     * @param product
      * @return
      */
-    public FTSDKConfig setFlowProduct(String flowProduct) {
-        this.flowProduct = flowProduct;
+    public FTSDKConfig setProduct(String product) {
+        this.product = product;
         return this;
     }
 

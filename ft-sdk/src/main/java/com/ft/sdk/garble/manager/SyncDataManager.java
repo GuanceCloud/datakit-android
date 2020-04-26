@@ -7,6 +7,7 @@ import android.location.Location;
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
+import com.ft.sdk.garble.FTAutoTrackConfig;
 import com.ft.sdk.garble.FTFlowChartConfig;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
@@ -65,10 +66,16 @@ public class SyncDataManager {
                 try {
                     JSONObject opData = new JSONObject(recordData.getOpdata());
                     //获取指标名称
+                    String measurement;
                     if (opData.has(Constants.MEASUREMENT)) {
-                        sb.append("$flow_mobile_activity_").append(opData.optString(Constants.MEASUREMENT));
+                        measurement = opData.optString(Constants.MEASUREMENT);
                     } else {
-                        sb.append("$flow_mobile_activity_").append(FTFlowChartConfig.get().getFlowProduct());
+                        measurement = FTAutoTrackConfig.get().getProduct();
+                    }
+                    if(Utils.isNullOrEmpty(measurement)){
+                        sb.append("$flow_mobile_activity");
+                    }else {
+                        sb.append("$flow_mobile_activity_").append(measurement);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -109,10 +116,16 @@ public class SyncDataManager {
                 try {
                     JSONObject opData = new JSONObject(recordData.getOpdata());
                     //获取指标名称
+                    String measurement;
                     if (opData.has(Constants.MEASUREMENT)) {
-                        sb.append("$flow_mobile_activity_").append(opData.optString(Constants.MEASUREMENT));
+                        measurement = opData.optString(Constants.MEASUREMENT);
                     } else {
-                        sb.append("$flow_mobile_activity_").append(FTFlowChartConfig.get().getFlowProduct());
+                        measurement = FTAutoTrackConfig.get().getProduct();
+                    }
+                    if(Utils.isNullOrEmpty(measurement)){
+                        sb.append("$flow_mobile_activity");
+                    }else {
+                        sb.append("$flow_mobile_activity_").append(measurement);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -161,22 +174,31 @@ public class SyncDataManager {
      */
     private String getMeasurement(RecordData recordData) {
         String measurement;
-        if (CSTM.value.equals(recordData.getOp()) || FLOW_CHAT.value.equals(recordData.getOp())) {
             try {
                 JSONObject jsonObject = new JSONObject(recordData.getOpdata());
                 String measurementTemp = jsonObject.optString(Constants.MEASUREMENT);
-                if (Utils.isNullOrEmpty(measurementTemp)) {
-                    measurement = FT_KEY_VALUE_NULL;
-                } else {
-                    measurement = Utils.translateMeasurements(measurementTemp);
+                if (CSTM.value.equals(recordData.getOp()) || FLOW_CHAT.value.equals(recordData.getOp())) {
+                    if (Utils.isNullOrEmpty(measurementTemp)) {
+                        measurement = FT_KEY_VALUE_NULL;
+                    } else {
+                        measurement = Utils.translateMeasurements(measurementTemp);
+                    }
+                }else {
+                    if(!Utils.isNullOrEmpty(measurementTemp)) {
+                        measurement = measurementTemp;
+                    }else {
+                        measurement = FTAutoTrackConfig.get().getProduct();
+                    }
+                    if (!Utils.isNullOrEmpty(measurement)) {
+                        measurement = FT_DEFAULT_MEASUREMENT+"_"+measurement;
+                    }else {
+                        measurement = FT_DEFAULT_MEASUREMENT;
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 measurement = FT_KEY_VALUE_NULL;
             }
-        } else {
-            measurement = FT_DEFAULT_MEASUREMENT;
-        }
         return measurement;
     }
 
