@@ -62,7 +62,7 @@ public class Main2Activity extends AppCompatActivity {
                     //.setWhiteActivityClasses(Arrays.asList(MainActivity.class, Main2Activity.class))//设置埋点页面的白名单
                     //.setWhiteViewClasses(Arrays.asList(Button.class, RadioGroup.class))
                     .setOpenFlowChart(true)
-                    .setFlowProduct("demo13")
+                    //.setProduct("demo13")
                     .setMonitorType(MonitorType.ALL);//设置监控项
             FTSdk.install(ftSDKConfig);
         });
