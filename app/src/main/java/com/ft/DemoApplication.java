@@ -51,7 +51,6 @@ public class DemoApplication extends Application {
         FTSdk.install(ftSDKConfig);
 
         FTMonitor.get()
-                .setMeasurement("android_device_monitor")
                 //.setMonitorType(MonitorType.ALL)
                 .setPeriod(10)
                 .start();

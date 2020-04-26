@@ -25,7 +25,6 @@ public class FTMonitor {
     private int monitorType = 0;
     private boolean useGeoKey;
     private String geoKey;
-    private String measurement;
     private static FTMonitor instance;
 
     private FTMonitor() {
@@ -93,14 +92,9 @@ public class FTMonitor {
         return this;
     }
 
-    public FTMonitor setMeasurement(String measurement) {
-        this.measurement = measurement;
-        return this;
-    }
-
     public void start() {
         FTMonitorConfig.get().initParams();
-        FTMonitorManager.install(period, measurement);
+        FTMonitorManager.install(period);
     }
 
     public void release() {
@@ -116,19 +110,17 @@ public class FTMonitor {
 class FTMonitorManager {
     //轮训周期
     private int period = 0;
-    private String measurement;
     private static FTMonitorManager instance;
     private MonitorThread mThread;
 
     private FTMonitorManager() {
     }
 
-    public static FTMonitorManager install(int period, String measurement) {
+    public static FTMonitorManager install(int period) {
         if (instance == null) {
             instance = new FTMonitorManager();
         }
         instance.period = period;
-        instance.measurement = measurement;
         instance.stopMonitor();
         instance.startMonitor();
         return instance;
@@ -142,7 +134,7 @@ class FTMonitorManager {
      * 开启监控
      */
     public void startMonitor() {
-        mThread = new MonitorThread("监控轮训", period, measurement);
+        mThread = new MonitorThread("监控轮训", period);
         mThread.start();
         LogUtils.d("监控轮训线程启动...");
     }
@@ -166,12 +158,10 @@ class FTMonitorManager {
     static class MonitorThread extends Thread {
         //轮训周期
         private int period;
-        private String measurement;
 
-        public MonitorThread(String name, int period, String measurement) {
+        public MonitorThread(String name, int period) {
             setName(name);
             this.period = period;
-            this.measurement = measurement;
         }
 
         @Override
@@ -181,7 +171,7 @@ class FTMonitorManager {
                 while (true) {
                     Thread.sleep(period * 1000);
                     try {
-                        String body = SyncDataManager.getMonitorUploadData(measurement);
+                        String body = SyncDataManager.getMonitorUploadData();
                         SyncDataManager.printUpdateData(body);
                         body = body.replaceAll(Constants.SEPARATION_PRINT,Constants.SEPARATION);
                         ResponseData result = HttpBuilder.Builder()

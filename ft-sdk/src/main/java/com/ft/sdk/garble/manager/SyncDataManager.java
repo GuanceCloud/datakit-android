@@ -373,12 +373,18 @@ public class SyncDataManager {
         }
     }
 
-    public static String getMonitorUploadData(String measurement){
+    public static String getMonitorUploadData(){
         JSONObject tags = new JSONObject();
         JSONObject fields = new JSONObject();
         addMonitorData(tags,fields);
         StringBuffer sb = new StringBuffer();
         //获取这条事件的指标
+        String measurement = FTAutoTrackConfig.get().getProduct();
+        if(!Utils.isNullOrEmpty(measurement)){
+            measurement = Constants.FT_MONITOR_MEASUREMENT+"_"+measurement;
+        }else{
+            measurement = Constants.FT_MONITOR_MEASUREMENT;
+        }
         sb.append(measurement);
         StringBuffer tagSb = getCustomHash(tags, true);
         StringBuffer fieldSb = getCustomHash(fields, false);
