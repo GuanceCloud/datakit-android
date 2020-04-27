@@ -28,6 +28,7 @@ import com.ft.sdk.garble.utils.LocationUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.NetUtils;
 import com.ft.sdk.garble.utils.OaidUtils;
+import com.ft.sdk.garble.utils.SensorUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONException;
@@ -270,7 +271,11 @@ public class SyncDataManager {
                 } else {
                     if (value instanceof String) {
                         addQuotationMarks(sb, (String) value, !isTag);
-                    } else {
+                    } else if(value instanceof Float){
+                        sb.append(Utils.formatDouble((float)value));
+                    }else if(value instanceof Double){
+                        sb.append(Utils.formatDouble((double)value));
+                    }else {
                         sb.append(value);
                     }
                 }
@@ -425,9 +430,6 @@ public class SyncDataManager {
                 createBluetooth(tags,fields);
                 //系统
                 createSystem(tags,fields);
-                //传感器
-                createSensor(tags,fields);
-
             } else {
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.BATTERY)) {
                     //电池
@@ -462,11 +464,9 @@ public class SyncDataManager {
                     //系统
                     createSystem(tags,fields);
                 }
-                if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR)) {
-                    //传感器
-                    createSensor(tags,fields);
-                }
             }
+            //传感器
+            createSensor(tags,fields);
         } catch (Exception e) {
         }
     }
@@ -635,15 +635,74 @@ public class SyncDataManager {
 
     private static void createBluetooth(JSONObject tags, JSONObject fields){
         try {
-            tags.put("bluetooth_mac", BluetoothUtils.get().getBluetoothMacAddress());
+            //tags.put("bluetooth_mac", BluetoothUtils.get().getBluetoothMacAddress());
         }catch (Exception e){
             LogUtils.e("蓝牙数据获取异常:" + e.getMessage());
         }
     }
 
     private static void createSensor(JSONObject tags, JSONObject fields){
+        //TODO 根据类型判断是否需要
         try {
-            fields.put("sensor_screen_brightness",DeviceUtils.getSystemScreenBrightnessValue());
+            if(FTMonitorConfig.get().isMonitorType(MonitorType.ALL) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR)) {
+                fields.put("screen_brightness", SensorUtils.get().getSensorLight());
+                fields.put("proximity", SensorUtils.get().getDistance());
+                fields.put("steps", SensorUtils.get().getTodayStep());
+                float[] rotation = SensorUtils.get().getGyroscope();
+                if (rotation != null && rotation.length == 3) {
+                    fields.put("rotation_x", rotation[0]);
+                    fields.put("rotation_y", rotation[1]);
+                    fields.put("rotation_z", rotation[2]);
+                }
+
+                float[] acceleration = SensorUtils.get().getAcceleration();
+                if (acceleration != null && acceleration.length == 3) {
+                    fields.put("acceleration_x", acceleration[0]);
+                    fields.put("acceleration_y", acceleration[1]);
+                    fields.put("acceleration_z", acceleration[2]);
+                }
+
+                float[] magnetic = SensorUtils.get().getMagnetic();
+                if (magnetic != null && magnetic.length == 3) {
+                    fields.put("magnetic_x", magnetic[0]);
+                    fields.put("magnetic_y", magnetic[1]);
+                    fields.put("magnetic_z", magnetic[2]);
+                }
+            }else{
+                if(FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_BRIGHTNESS)){
+                    fields.put("screen_brightness", SensorUtils.get().getSensorLight());
+                }
+                if(FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_PROXIMITY)){
+                    fields.put("proximity", SensorUtils.get().getDistance());
+                }
+                if(FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_STEP)){
+                    fields.put("steps", SensorUtils.get().getTodayStep());
+                }
+                if(FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_ROTATION)){
+                    float[] rotation = SensorUtils.get().getGyroscope();
+                    if (rotation != null && rotation.length == 3) {
+                        fields.put("rotation_x", rotation[0]);
+                        fields.put("rotation_y", rotation[1]);
+                        fields.put("rotation_z", rotation[2]);
+                    }
+                }
+                if(FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_ACCELERATION)){
+                    float[] acceleration = SensorUtils.get().getAcceleration();
+                    if (acceleration != null && acceleration.length == 3) {
+                        fields.put("acceleration_x", acceleration[0]);
+                        fields.put("acceleration_y", acceleration[1]);
+                        fields.put("acceleration_z", acceleration[2]);
+                    }
+                }
+                if(FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_MAGNETIC)){
+                    float[] magnetic = SensorUtils.get().getMagnetic();
+                    if (magnetic != null && magnetic.length == 3) {
+                        fields.put("magnetic_x", magnetic[0]);
+                        fields.put("magnetic_y", magnetic[1]);
+                        fields.put("magnetic_z", magnetic[2]);
+                    }
+                }
+            }
         }catch (Exception e){
             LogUtils.e("传感器数据获取异常:" + e.getMessage());
         }
