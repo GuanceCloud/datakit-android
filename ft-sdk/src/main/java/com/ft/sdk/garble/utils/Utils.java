@@ -15,6 +15,7 @@ import com.ft.sdk.FTApplication;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,6 +56,54 @@ public class Utils {
 
     public static SharedPreferences getSharedPreferences(Context context) {
         return context.getSharedPreferences(FT_SHARE_PER_FILE, Context.MODE_PRIVATE);
+    }
+
+    /**
+     * 保存数据
+     *
+     * @param key
+     * @param value
+     */
+    public static <T> void saveSharePreference(String key, T value) {
+        SharedPreferences sp = getSharedPreferences(FTApplication.getApplication());
+        if (sp != null) {
+            final SharedPreferences.Editor editor = sp.edit();
+            if (value instanceof String) {
+                editor.putString(key, (String) value);
+            } else if (value instanceof Integer) {
+                editor.putInt(key, (Integer) value);
+            } else if (value instanceof Float) {
+                editor.putFloat(key, (Float) value);
+            } else if (value instanceof Boolean) {
+                editor.putBoolean(key, (Boolean) value);
+            } else if (value instanceof Long) {
+                editor.putLong(key, (Long) value);
+            }
+            editor.apply();
+        }
+    }
+
+    /**
+     * 获取保存的数据
+     *
+     * @param key
+     */
+    public static <T> T querySharePreference(String key, Class<T> tClass, T defaultVar) {
+        SharedPreferences sp = getSharedPreferences(FTApplication.getApplication());
+        if (sp != null) {
+            if (defaultVar instanceof String) {
+                return tClass.cast(sp.getString(key, (String) defaultVar));
+            } else if (defaultVar instanceof Integer) {
+                return tClass.cast(sp.getInt(key, (Integer) defaultVar));
+            } else if (defaultVar instanceof Float) {
+                return tClass.cast(sp.getFloat(key, (Float) defaultVar));
+            } else if (defaultVar instanceof Boolean) {
+                return tClass.cast(sp.getBoolean(key, (Boolean) defaultVar));
+            } else if (defaultVar instanceof Long) {
+                return tClass.cast(sp.getLong(key, (Long) defaultVar));
+            }
+        }
+        return tClass.cast(null);
     }
 
     public static String contentMD5Encode(String str) {
@@ -194,6 +243,19 @@ public class Utils {
     public static double formatDouble(double value) {
         return (double) Math.round(value * 100) / 100;
     }
+
+    /**
+     * 得到当前日期的字符串
+     *
+     * @return
+     */
+    public static String getDateString() {
+        Calendar calendar = Calendar.getInstance();
+        return calendar.get(Calendar.YEAR) + "-" +
+                calendar.get(Calendar.MONTH) + "-" +
+                calendar.get(Calendar.DAY_OF_MONTH);
+    }
+
 
 }
 

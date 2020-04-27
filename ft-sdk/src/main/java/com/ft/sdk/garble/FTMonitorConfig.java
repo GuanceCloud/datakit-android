@@ -5,6 +5,7 @@ import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.garble.utils.LocationUtils;
 import com.ft.sdk.garble.utils.NetUtils;
+import com.ft.sdk.garble.utils.SensorUtils;
 
 /**
  * BY huangDianHua
@@ -29,15 +30,18 @@ public class FTMonitorConfig {
         this.useGeoKey = useGeoKey;
     }
 
-    private FTMonitorConfig(){ }
-    public static FTMonitorConfig get(){
-        if(ftMonitorConfig == null){
+    private FTMonitorConfig() {
+    }
+
+    public static FTMonitorConfig get() {
+        if (ftMonitorConfig == null) {
             ftMonitorConfig = new FTMonitorConfig();
         }
         return ftMonitorConfig;
     }
-    public void initParams(FTSDKConfig ftsdkConfig){
-        if(ftsdkConfig == null){
+
+    public void initParams(FTSDKConfig ftsdkConfig) {
+        if (ftsdkConfig == null) {
             return;
         }
         monitorType = ftsdkConfig.getMonitorType();
@@ -46,8 +50,10 @@ public class FTMonitorConfig {
         initParams();
     }
 
-    public void initParams(){
-        if(isMonitorType(MonitorType.ALL)){
+    public void initParams() {
+        //注册传感器监听
+        SensorUtils.get().register();
+        if (isMonitorType(MonitorType.ALL)) {
             //开启网络监听
             NetUtils.get().listenerSignal(FTApplication.getApplication());
             //开始获取地理位置
@@ -76,21 +82,22 @@ public class FTMonitorConfig {
 
     /**
      * 判断某种类型的监控是否开启
+     *
      * @param monitorType
      * @return
      */
-    public boolean isMonitorType(int monitorType){
+    public boolean isMonitorType(int monitorType) {
         //未开启监控项
-        if(monitorType == 0){
+        if (this.monitorType == 0) {
             return false;
         }
         //开启全部监控项
-        if(monitorType == 1){
+        if (this.monitorType == 1) {
             return true;
         }
 
         //判断某一种监控项是否开启
-        if((this.monitorType | monitorType) == this.monitorType){
+        if ((this.monitorType | monitorType) == this.monitorType) {
             return true;
         }
         return false;
@@ -99,7 +106,8 @@ public class FTMonitorConfig {
     /**
      * 清楚当前监控配置项
      */
-    public void release(){
+    public void release() {
+        SensorUtils.get().release();
         ftMonitorConfig = null;
     }
 }

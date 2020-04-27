@@ -17,4 +17,10 @@ public class MonitorType {
     public static int SYSTEM = 1<<8;
     public static int SENSOR = 1<<9;
     public static int BLUETOOTH = 1<<10;
+    public static int SENSOR_BRIGHTNESS = 1 << 11;
+    public static int SENSOR_STEP = 1 << 12;
+    public static int SENSOR_PROXIMITY = 1 << 13;
+    public static int SENSOR_ROTATION = 1 << 14;
+    public static int SENSOR_ACCELERATION = 1 << 15;
+    public static int SENSOR_MAGNETIC = 1 << 16;
 }
