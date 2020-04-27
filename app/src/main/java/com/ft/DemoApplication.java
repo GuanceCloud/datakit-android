@@ -51,7 +51,7 @@ public class DemoApplication extends Application {
         FTSdk.install(ftSDKConfig);
 
         FTMonitor.get()
-                //.setMonitorType(MonitorType.ALL)
+                .setMonitorType(MonitorType.ALL)
                 .setPeriod(10)
                 .start();
     }
