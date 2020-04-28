@@ -47,7 +47,9 @@ public class LocationUtils {
     private boolean useGeoKey;
     private Handler mHandler;
     //是否在监听位置变化
-    private boolean listenerIng;
+    private volatile boolean listenerIng;
+    //是否正在请求地址
+    private volatile boolean isRequest;
 
     public void setGeoKey(String geoKey) {
         this.geoKey = geoKey;
@@ -95,7 +97,7 @@ public class LocationUtils {
                 return;
             }
         }
-        if (listenerIng) {
+        if (listenerIng && address != null) {
             return;
         }
         List<String> providers = getProviderList();
@@ -159,6 +161,10 @@ public class LocationUtils {
         if (syncCallback != null) {
             mHandler = new Handler();
         }
+
+        if(isRequest){
+            return;
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             int state = mContext.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
             int state2 = mContext.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION);
@@ -167,6 +173,7 @@ public class LocationUtils {
                 callback(syncCallback, NetCodeStatus.UNKNOWN_EXCEPTION_CODE, "未能获取到位置权限");
                 if (useGeoKey && !Utils.isNullOrEmpty(geoKey)) {
                     new Thread(() -> {
+                        isRequest = true;
                         requestGeoIPAddress(syncCallback);
                     }).start();
                 }
@@ -182,7 +189,9 @@ public class LocationUtils {
             getAddress(location, syncCallback);
         } else if (useGeoKey && !Utils.isNullOrEmpty(geoKey)) {
             new Thread(() -> {
+                isRequest = true;
                 requestGeoIPAddress(syncCallback);
+                isRequest = false;
             }).start();
         } else {
             callback(syncCallback, NetCodeStatus.UNKNOWN_EXCEPTION_CODE, "未能获取到位置信息");
@@ -233,6 +242,7 @@ public class LocationUtils {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                isRequest = true;
                 //用来接收位置的详细信息
                 if (useGeoKey) {
                     if (geoKey == null || geoKey.isEmpty()) {
@@ -248,6 +258,7 @@ public class LocationUtils {
                 } else {
                     LogUtils.d(">>>>>>>>>>>>>>地址请求失败");
                 }
+                isRequest = false;
             }
         }).start();
     }
