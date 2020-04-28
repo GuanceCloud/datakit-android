@@ -626,7 +626,7 @@ public class SyncDataManager {
 
     private static void createSystem(JSONObject tags, JSONObject fields){
         try{
-            fields.put("system_open_date",DeviceUtils.getSystemOpenTime());
+            fields.put("device_open_time",DeviceUtils.getSystemOpenTime());
             tags.put("device_name",BluetoothUtils.get().getDeviceName());
         }catch (Exception e){
             LogUtils.e("系统数据获取异常:" + e.getMessage());
