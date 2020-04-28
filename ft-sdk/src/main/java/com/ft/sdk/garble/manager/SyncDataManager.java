@@ -1,14 +1,13 @@
 package com.ft.sdk.garble.manager;
 
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.location.Address;
-import android.location.Location;
 
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.garble.FTAutoTrackConfig;
-import com.ft.sdk.garble.FTFlowChartConfig;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.FTUserConfig;
@@ -38,6 +37,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.ft.sdk.garble.bean.OP.CSTM;
 import static com.ft.sdk.garble.bean.OP.FLOW_CHAT;
@@ -73,9 +73,9 @@ public class SyncDataManager {
                     } else {
                         measurement = FTAutoTrackConfig.get().getProduct();
                     }
-                    if(Utils.isNullOrEmpty(measurement)){
+                    if (Utils.isNullOrEmpty(measurement)) {
                         sb.append("$flow_mobile_activity");
-                    }else {
+                    } else {
                         sb.append("$flow_mobile_activity_").append(measurement);
                     }
                 } catch (JSONException e) {
@@ -123,9 +123,9 @@ public class SyncDataManager {
                     } else {
                         measurement = FTAutoTrackConfig.get().getProduct();
                     }
-                    if(Utils.isNullOrEmpty(measurement)){
+                    if (Utils.isNullOrEmpty(measurement)) {
                         sb.append("$flow_mobile_activity");
-                    }else {
+                    } else {
                         sb.append("$flow_mobile_activity_").append(measurement);
                     }
                 } catch (JSONException e) {
@@ -175,31 +175,31 @@ public class SyncDataManager {
      */
     private String getMeasurement(RecordData recordData) {
         String measurement;
-            try {
-                JSONObject jsonObject = new JSONObject(recordData.getOpdata());
-                String measurementTemp = jsonObject.optString(Constants.MEASUREMENT);
-                if (CSTM.value.equals(recordData.getOp()) || FLOW_CHAT.value.equals(recordData.getOp())) {
-                    if (Utils.isNullOrEmpty(measurementTemp)) {
-                        measurement = FT_KEY_VALUE_NULL;
-                    } else {
-                        measurement = Utils.translateMeasurements(measurementTemp);
-                    }
-                }else {
-                    if(!Utils.isNullOrEmpty(measurementTemp)) {
-                        measurement = measurementTemp;
-                    }else {
-                        measurement = FTAutoTrackConfig.get().getProduct();
-                    }
-                    if (!Utils.isNullOrEmpty(measurement)) {
-                        measurement = FT_DEFAULT_MEASUREMENT+"_"+measurement;
-                    }else {
-                        measurement = FT_DEFAULT_MEASUREMENT;
-                    }
+        try {
+            JSONObject jsonObject = new JSONObject(recordData.getOpdata());
+            String measurementTemp = jsonObject.optString(Constants.MEASUREMENT);
+            if (CSTM.value.equals(recordData.getOp()) || FLOW_CHAT.value.equals(recordData.getOp())) {
+                if (Utils.isNullOrEmpty(measurementTemp)) {
+                    measurement = FT_KEY_VALUE_NULL;
+                } else {
+                    measurement = Utils.translateMeasurements(measurementTemp);
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-                measurement = FT_KEY_VALUE_NULL;
+            } else {
+                if (!Utils.isNullOrEmpty(measurementTemp)) {
+                    measurement = measurementTemp;
+                } else {
+                    measurement = FTAutoTrackConfig.get().getProduct();
+                }
+                if (!Utils.isNullOrEmpty(measurement)) {
+                    measurement = FT_DEFAULT_MEASUREMENT + "_" + measurement;
+                } else {
+                    measurement = FT_DEFAULT_MEASUREMENT;
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            measurement = FT_KEY_VALUE_NULL;
+        }
         return measurement;
     }
 
@@ -271,11 +271,11 @@ public class SyncDataManager {
                 } else {
                     if (value instanceof String) {
                         addQuotationMarks(sb, (String) value, !isTag);
-                    } else if(value instanceof Float){
-                        sb.append(Utils.formatDouble((float)value));
-                    }else if(value instanceof Double){
-                        sb.append(Utils.formatDouble((double)value));
-                    }else {
+                    } else if (value instanceof Float) {
+                        sb.append(Utils.formatDouble((float) value));
+                    } else if (value instanceof Double) {
+                        sb.append(Utils.formatDouble((double) value));
+                    } else {
                         sb.append(value);
                     }
                 }
@@ -378,16 +378,16 @@ public class SyncDataManager {
         }
     }
 
-    public static String getMonitorUploadData(){
+    public static String getMonitorUploadData() {
         JSONObject tags = new JSONObject();
         JSONObject fields = new JSONObject();
-        addMonitorData(tags,fields);
+        addMonitorData(tags, fields);
         StringBuffer sb = new StringBuffer();
         //获取这条事件的指标
         String measurement = FTAutoTrackConfig.get().getProduct();
-        if(!Utils.isNullOrEmpty(measurement)){
-            measurement = Constants.FT_MONITOR_MEASUREMENT+"_"+measurement;
-        }else{
+        if (!Utils.isNullOrEmpty(measurement)) {
+            measurement = Constants.FT_MONITOR_MEASUREMENT + "_" + measurement;
+        } else {
             measurement = Constants.FT_MONITOR_MEASUREMENT;
         }
         sb.append(measurement);
@@ -427,9 +427,9 @@ public class SyncDataManager {
                 //位置
                 createLocation(tags, fields);
                 //蓝牙
-                createBluetooth(tags,fields);
+                createBluetooth(tags, fields);
                 //系统
-                createSystem(tags,fields);
+                createSystem(tags, fields);
             } else {
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.BATTERY)) {
                     //电池
@@ -462,11 +462,11 @@ public class SyncDataManager {
                 }
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.SYSTEM)) {
                     //系统
-                    createSystem(tags,fields);
+                    createSystem(tags, fields);
                 }
             }
             //传感器
-            createSensor(tags,fields);
+            createSensor(tags, fields);
         } catch (Exception e) {
         }
     }
@@ -500,7 +500,7 @@ public class SyncDataManager {
             double[] memory = DeviceUtils.getRamData(FTApplication.getApplication());
             tags.put("memory_total", memory[0] + "GB");
             fields.put("memory_use", memory[1]);
-        }catch (Exception e){
+        } catch (Exception e) {
             LogUtils.e("内存数据获取异常:" + e.getMessage());
         }
     }
@@ -517,7 +517,7 @@ public class SyncDataManager {
             fields.put("cpu_use", DeviceUtils.getCpuUseRate());
             tags.put("cpu_temperature", CpuUtils.get().getCpuTemperature());
             tags.put("cpu_hz", CpuUtils.get().getCPUMaxFreqKHz());
-        }catch (Exception e){
+        } catch (Exception e) {
             LogUtils.e("CPU数据获取异常:" + e.getMessage());
         }
     }
@@ -533,7 +533,7 @@ public class SyncDataManager {
             tags.put("gpu_model", GpuUtils.GPU_VENDOR_RENDERER);
             tags.put("gpu_hz", GpuUtils.getGpuMaxFreq());
             fields.put("gpu_rate", GpuUtils.getGpuUseRate());
-        }catch (Exception e){
+        } catch (Exception e) {
             LogUtils.e("GPU数据获取异常:" + e.getMessage());
         }
     }
@@ -559,17 +559,17 @@ public class SyncDataManager {
             fields.put("network_out_rate", NetUtils.get().getNetUpRate());
             tags.put("network_proxy", NetUtils.get().isWifiProxy(FTApplication.getApplication()));
             String[] dns = NetUtils.get().getDnsFromConnectionManager(FTApplication.getApplication());
-            for (int i = 0;i<dns.length; i++) {
-                tags.put("dns"+(i+1),dns[i]);
+            for (int i = 0; i < dns.length; i++) {
+                tags.put("dns" + (i + 1), dns[i]);
             }
-            tags.put("roam",NetUtils.get().getRoamState());
-            tags.put("wifi_ssid",NetUtils.get().getSSId());
-            tags.put("wifi_ip",NetUtils.get().getWifiIp());
-            fields.put("network_tcp_time",NetUtils.get().getTcpTime());
-            fields.put("network_dns_time",NetUtils.get().getDNSTime());
-            fields.put("network_response_time",NetUtils.get().getResponseTime());
-            fields.put("network_error_rate",NetUtils.get().getErrorRate());
-        }catch (Exception e){
+            tags.put("roam", NetUtils.get().getRoamState());
+            fields.put("wifi_ssid", NetUtils.get().getSSId());
+            fields.put("wifi_ip", NetUtils.get().getWifiIp());
+            fields.put("network_tcp_time", NetUtils.get().getTcpTime());
+            fields.put("network_dns_time", NetUtils.get().getDNSTime());
+            fields.put("network_response_time", NetUtils.get().getResponseTime());
+            fields.put("network_error_rate", NetUtils.get().getErrorRate());
+        } catch (Exception e) {
             LogUtils.e("网络数据获取异常:" + e.getMessage());
         }
     }
@@ -586,7 +586,7 @@ public class SyncDataManager {
             for (CameraPx cameraPx : cameraPxs) {
                 tags.put(cameraPx.getPx()[0], cameraPx.getPx()[1]);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             LogUtils.e("相机数据获取异常:" + e.getMessage());
         }
     }
@@ -611,41 +611,50 @@ public class SyncDataManager {
                 tags.put("country", "中国");
             }
 
-            if(location != null){
-                fields.put("latitude",location[0]);
-                fields.put("longitude",location[1]);
-            }else{
-                fields.put("latitude",0);
-                fields.put("longitude",0);
+            if (location != null) {
+                fields.put("latitude", location[0]);
+                fields.put("longitude", location[1]);
+            } else {
+                fields.put("latitude", 0);
+                fields.put("longitude", 0);
             }
-            tags.put("gps_open",LocationUtils.get().isOpenGps());
-        }catch (Exception e){
+            tags.put("gps_open", LocationUtils.get().isOpenGps());
+        } catch (Exception e) {
             LogUtils.e("位置数据获取异常:" + e.getMessage());
         }
     }
 
-    private static void createSystem(JSONObject tags, JSONObject fields){
-        try{
-            fields.put("device_open_time",DeviceUtils.getSystemOpenTime());
-            tags.put("device_name",BluetoothUtils.get().getDeviceName());
-        }catch (Exception e){
+    private static void createSystem(JSONObject tags, JSONObject fields) {
+        try {
+            fields.put("device_open_time", DeviceUtils.getSystemOpenTime());
+            tags.put("device_name", BluetoothUtils.get().getDeviceName());
+        } catch (Exception e) {
             LogUtils.e("系统数据获取异常:" + e.getMessage());
         }
     }
 
-    private static void createBluetooth(JSONObject tags, JSONObject fields){
+    private static void createBluetooth(JSONObject tags, JSONObject fields) {
         try {
-            //tags.put("bluetooth_mac", BluetoothUtils.get().getBluetoothMacAddress());
-        }catch (Exception e){
+            Set<BluetoothDevice> set = BluetoothUtils.get().getBondedDevices();
+            if (set != null) {
+                int i = 0;
+                for (BluetoothDevice device : set) {
+                    tags.put("bt_device_" + (i++), device.getAddress());
+                }
+            }
+            tags.put("bt_open", BluetoothUtils.get().isOpen());
+
+        } catch (Exception e) {
             LogUtils.e("蓝牙数据获取异常:" + e.getMessage());
         }
     }
 
-    private static void createSensor(JSONObject tags, JSONObject fields){
+    private static void createSensor(JSONObject tags, JSONObject fields) {
         //TODO 根据类型判断是否需要
         try {
-            if(FTMonitorConfig.get().isMonitorType(MonitorType.ALL) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR)) {
-                fields.put("screen_brightness", SensorUtils.get().getSensorLight());
+            if (FTMonitorConfig.get().isMonitorType(MonitorType.ALL) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR)) {
+                fields.put("screen_brightness", DeviceUtils.getSystemScreenBrightnessValue());
+                fields.put("light", SensorUtils.get().getSensorLight());
                 fields.put("proximity", SensorUtils.get().getDistance());
                 fields.put("steps", SensorUtils.get().getTodayStep());
                 float[] rotation = SensorUtils.get().getGyroscope();
@@ -668,17 +677,17 @@ public class SyncDataManager {
                     fields.put("magnetic_y", magnetic[1]);
                     fields.put("magnetic_z", magnetic[2]);
                 }
-            }else{
-                if(FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_BRIGHTNESS)){
+            } else {
+                if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_BRIGHTNESS)) {
                     fields.put("screen_brightness", SensorUtils.get().getSensorLight());
                 }
-                if(FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_PROXIMITY)){
+                if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_PROXIMITY)) {
                     fields.put("proximity", SensorUtils.get().getDistance());
                 }
-                if(FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_STEP)){
+                if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_STEP)) {
                     fields.put("steps", SensorUtils.get().getTodayStep());
                 }
-                if(FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_ROTATION)){
+                if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_ROTATION)) {
                     float[] rotation = SensorUtils.get().getGyroscope();
                     if (rotation != null && rotation.length == 3) {
                         fields.put("rotation_x", rotation[0]);
@@ -686,7 +695,7 @@ public class SyncDataManager {
                         fields.put("rotation_z", rotation[2]);
                     }
                 }
-                if(FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_ACCELERATION)){
+                if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_ACCELERATION)) {
                     float[] acceleration = SensorUtils.get().getAcceleration();
                     if (acceleration != null && acceleration.length == 3) {
                         fields.put("acceleration_x", acceleration[0]);
@@ -694,7 +703,7 @@ public class SyncDataManager {
                         fields.put("acceleration_z", acceleration[2]);
                     }
                 }
-                if(FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_MAGNETIC)){
+                if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_MAGNETIC)) {
                     float[] magnetic = SensorUtils.get().getMagnetic();
                     if (magnetic != null && magnetic.length == 3) {
                         fields.put("magnetic_x", magnetic[0]);
@@ -703,7 +712,7 @@ public class SyncDataManager {
                     }
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             LogUtils.e("传感器数据获取异常:" + e.getMessage());
         }
     }
