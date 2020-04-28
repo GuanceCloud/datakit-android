@@ -30,6 +30,10 @@ public class FTMonitorConfig {
         this.useGeoKey = useGeoKey;
     }
 
+    public int getMonitorType() {
+        return monitorType;
+    }
+
     private FTMonitorConfig() {
     }
 

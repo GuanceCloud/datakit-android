@@ -13,4 +13,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.location.gps" />
     <uses-feature android:name="android.hardware.location.network" />
+    <application>
+        <service android:name=".garble.service.MonitorService"/>
+    </application>
 </manifest>
