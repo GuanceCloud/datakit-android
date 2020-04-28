@@ -58,6 +58,10 @@
     *;
 }
 
+-keep enum com.ft.sdk.garble.http.RequestMethod{
+    *;
+}
+
 -keep class com.ft.sdk.garble.http.INetEngine{
     *;
 }
