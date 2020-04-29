@@ -488,6 +488,15 @@ public class MonitorType {
     
     //三轴地磁强度
     public static int SENSOR_MAGNETIC = 1 << 16;
+    
+    //光线传感器
+    public static int SENSOR_LIGHT = 1 << 17;
+    
+    //闪光灯
+    public static int SENSOR_TORCH = 1 << 18;
+    
+    //屏幕帧率
+    public static int FPS = 1 << 19;
 }
 ```
 
