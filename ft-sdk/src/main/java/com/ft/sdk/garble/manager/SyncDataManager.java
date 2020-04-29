@@ -466,7 +466,7 @@ public class SyncDataManager {
                     //系统
                     createSystem(tags, fields);
                 }
-                if (FTMonitorConfig.get().isMonitorType(MonitorType.FPS)){
+                if (FTMonitorConfig.get().isMonitorType(MonitorType.FPS)) {
                     createFps(tags, fields);
                 }
             }
@@ -683,7 +683,10 @@ public class SyncDataManager {
                 }
             } else {
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_BRIGHTNESS)) {
-                    fields.put("screen_brightness", SensorUtils.get().getSensorLight());
+                    fields.put("screen_brightness", DeviceUtils.getSystemScreenBrightnessValue());
+                }
+                if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_LIGHT)) {
+                    fields.put("light", SensorUtils.get().getSensorLight());
                 }
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_PROXIMITY)) {
                     fields.put("proximity", SensorUtils.get().getDistance());
@@ -721,7 +724,7 @@ public class SyncDataManager {
         }
     }
 
-    private static void createFps(JSONObject tags, JSONObject fields){
+    private static void createFps(JSONObject tags, JSONObject fields) {
         try {
             fields.put("fps", FpsUtils.get().getFps());
         } catch (JSONException e) {
