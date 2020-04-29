@@ -3,6 +3,7 @@ package com.ft.sdk.garble;
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.MonitorType;
+import com.ft.sdk.garble.utils.CameraUtils;
 import com.ft.sdk.garble.utils.FpsUtils;
 import com.ft.sdk.garble.utils.LocationUtils;
 import com.ft.sdk.garble.utils.NetUtils;
@@ -69,6 +70,7 @@ public class FTMonitorConfig {
             NetUtils.get().startMonitorNetRate();
             NetUtils.get().initSpeed();
             FpsUtils.get().start();
+            CameraUtils.get().start();
         } else {
             if (isMonitorType(MonitorType.NETWORK)) {
                 //开启网络监听
@@ -85,6 +87,9 @@ public class FTMonitorConfig {
             }
             if(isMonitorType(MonitorType.FPS)){
                 FpsUtils.get().start();
+            }
+            if(isMonitorType(MonitorType.SENSOR_TORCH)){
+                CameraUtils.get().start();
             }
         }
     }
@@ -118,6 +123,7 @@ public class FTMonitorConfig {
     public void release() {
         SensorUtils.get().release();
         FpsUtils.get().release();
+        CameraUtils.get().release();
         ftMonitorConfig = null;
     }
 }
