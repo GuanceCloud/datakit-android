@@ -3,6 +3,7 @@ package com.ft.sdk.garble;
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.MonitorType;
+import com.ft.sdk.garble.utils.FpsUtils;
 import com.ft.sdk.garble.utils.LocationUtils;
 import com.ft.sdk.garble.utils.NetUtils;
 import com.ft.sdk.garble.utils.SensorUtils;
@@ -67,6 +68,7 @@ public class FTMonitorConfig {
             //监听网络速度
             NetUtils.get().startMonitorNetRate();
             NetUtils.get().initSpeed();
+            FpsUtils.get().start();
         } else {
             if (isMonitorType(MonitorType.NETWORK)) {
                 //开启网络监听
@@ -80,6 +82,9 @@ public class FTMonitorConfig {
                 LocationUtils.get().setGeoKey(geoKey);
                 LocationUtils.get().setUseGeoKey(useGeoKey);
                 LocationUtils.get().startListener();
+            }
+            if(isMonitorType(MonitorType.FPS)){
+                FpsUtils.get().start();
             }
         }
     }
@@ -112,6 +117,7 @@ public class FTMonitorConfig {
      */
     public void release() {
         SensorUtils.get().release();
+        FpsUtils.get().release();
         ftMonitorConfig = null;
     }
 }
