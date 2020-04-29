@@ -23,4 +23,7 @@ public class MonitorType {
     public static int SENSOR_ROTATION = 1 << 14;
     public static int SENSOR_ACCELERATION = 1 << 15;
     public static int SENSOR_MAGNETIC = 1 << 16;
+    public static int FPS = 1 << 17;
+    public static int TORCH = 1 << 18;
+
 }

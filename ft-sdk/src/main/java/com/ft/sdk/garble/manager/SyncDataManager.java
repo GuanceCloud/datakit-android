@@ -22,6 +22,7 @@ import com.ft.sdk.garble.utils.CameraUtils;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.CpuUtils;
 import com.ft.sdk.garble.utils.DeviceUtils;
+import com.ft.sdk.garble.utils.FpsUtils;
 import com.ft.sdk.garble.utils.GpuUtils;
 import com.ft.sdk.garble.utils.LocationUtils;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -430,6 +431,7 @@ public class SyncDataManager {
                 createBluetooth(tags, fields);
                 //系统
                 createSystem(tags, fields);
+                createFps(tags, fields);
             } else {
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.BATTERY)) {
                     //电池
@@ -463,6 +465,9 @@ public class SyncDataManager {
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.SYSTEM)) {
                     //系统
                     createSystem(tags, fields);
+                }
+                if (FTMonitorConfig.get().isMonitorType(MonitorType.FPS)){
+                    createFps(tags, fields);
                 }
             }
             //传感器
@@ -637,7 +642,7 @@ public class SyncDataManager {
         try {
             Set<BluetoothDevice> set = BluetoothUtils.get().getBondedDevices();
             if (set != null) {
-                int i = 0;
+                int i = 1;
                 for (BluetoothDevice device : set) {
                     tags.put("bt_device_" + (i++), device.getAddress());
                 }
@@ -650,7 +655,6 @@ public class SyncDataManager {
     }
 
     private static void createSensor(JSONObject tags, JSONObject fields) {
-        //TODO 根据类型判断是否需要
         try {
             if (FTMonitorConfig.get().isMonitorType(MonitorType.ALL) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR)) {
                 fields.put("screen_brightness", DeviceUtils.getSystemScreenBrightnessValue());
@@ -714,6 +718,14 @@ public class SyncDataManager {
             }
         } catch (Exception e) {
             LogUtils.e("传感器数据获取异常:" + e.getMessage());
+        }
+    }
+
+    private static void createFps(JSONObject tags, JSONObject fields){
+        try {
+            fields.put("fps", FpsUtils.get().getFps());
+        } catch (JSONException e) {
+            LogUtils.e("FPS数据获取异常:" + e.getMessage());
         }
     }
 
