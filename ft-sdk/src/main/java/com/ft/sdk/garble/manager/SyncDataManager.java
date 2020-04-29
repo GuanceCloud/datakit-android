@@ -587,7 +587,7 @@ public class SyncDataManager {
      */
     private static void createCamera(JSONObject tags, JSONObject fields) {
         try {
-            List<CameraPx> cameraPxs = CameraUtils.getCameraPxList(FTApplication.getApplication());
+            List<CameraPx> cameraPxs = CameraUtils.get().getCameraPxList(FTApplication.getApplication());
             for (CameraPx cameraPx : cameraPxs) {
                 tags.put(cameraPx.getPx()[0], cameraPx.getPx()[1]);
             }
@@ -681,6 +681,7 @@ public class SyncDataManager {
                     fields.put("magnetic_y", magnetic[1]);
                     fields.put("magnetic_z", magnetic[2]);
                 }
+                createTorch(tags, fields);
             } else {
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_BRIGHTNESS)) {
                     fields.put("screen_brightness", DeviceUtils.getSystemScreenBrightnessValue());
@@ -718,6 +719,9 @@ public class SyncDataManager {
                         fields.put("magnetic_z", magnetic[2]);
                     }
                 }
+                if(FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_TORCH)){
+                    createTorch(tags, fields);
+                }
             }
         } catch (Exception e) {
             LogUtils.e("传感器数据获取异常:" + e.getMessage());
@@ -727,6 +731,17 @@ public class SyncDataManager {
     private static void createFps(JSONObject tags, JSONObject fields) {
         try {
             fields.put("fps", FpsUtils.get().getFps());
+        } catch (JSONException e) {
+            LogUtils.e("FPS数据获取异常:" + e.getMessage());
+        }
+    }
+
+    /**
+     * 闪光灯数据
+     */
+    private static void createTorch(JSONObject tags, JSONObject fields){
+        try {
+            tags.put("torch", CameraUtils.get().isTorchState());
         } catch (JSONException e) {
             LogUtils.e("FPS数据获取异常:" + e.getMessage());
         }
