@@ -311,10 +311,6 @@ public class SyncDataManager {
         if (recordData.getOpdata() != null) {
             try {
                 JSONObject opJson = new JSONObject(recordData.getOpdata());
-                String vtp = opJson.optString("vtp");
-                if (!Utils.isNullOrEmpty(vtp)) {
-                    sb.append("vtp=" + vtp + ",");
-                }
                 JSONObject tags = opJson.optJSONObject(Constants.TAGS);
                 if (tags != null) {
                     sb.append(getCustomHash(tags, true));
@@ -337,6 +333,7 @@ public class SyncDataManager {
         if (fields != null) {
             try {
                 fields.put("event", getEventName(recordData.getOp()));
+                fields.put("event_id", Utils.MD5(getEventName(recordData.getOp())));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -345,6 +342,7 @@ public class SyncDataManager {
             sb.append(valueSb);
         } else {
             sb.append("event=\"" + getEventName(recordData.getOp()) + "\"");
+            sb.append("event_id=\"" + Utils.MD5(getEventName(recordData.getOp())) + "\"");
         }
         sb.append(Constants.SEPARATION_PRINT);
         sb.append(recordData.getTime() * 1000000);
@@ -719,7 +717,7 @@ public class SyncDataManager {
                         fields.put("magnetic_z", magnetic[2]);
                     }
                 }
-                if(FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_TORCH)){
+                if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_TORCH)) {
                     createTorch(tags, fields);
                 }
             }
@@ -739,7 +737,7 @@ public class SyncDataManager {
     /**
      * 闪光灯数据
      */
-    private static void createTorch(JSONObject tags, JSONObject fields){
+    private static void createTorch(JSONObject tags, JSONObject fields) {
         try {
             tags.put("torch", CameraUtils.get().isTorchState());
         } catch (JSONException e) {
@@ -753,13 +751,13 @@ public class SyncDataManager {
         } else if (OP.CLK.value.equals(op)) {
             return "click";
         } else if (OP.CLS_FRA.value.equals(op)) {
-            return "close";
+            return "leave";
         } else if (OP.CLS_ACT.value.equals(op)) {
-            return "close";
+            return "leave";
         } else if (OP.OPEN_ACT.value.equals(op)) {
-            return "open";
+            return "enter";
         } else if (OP.OPEN_FRA.value.equals(op)) {
-            return "open";
+            return "enter";
         }
         return op;
     }

@@ -118,6 +118,28 @@ public class Utils {
         }
     }
 
+    public static String MD5(String str) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(str.getBytes());
+            byte[] digest = md.digest();
+            int i;
+            StringBuilder sb = new StringBuilder();
+            for (int offset = 0; offset < digest.length; offset++) {
+                i = digest[offset];
+                if (i < 0)
+                    i += 256;
+                if (i < 16)
+                    sb.append(0);
+                sb.append(Integer.toHexString(i));//通过Integer.toHexString方法把值变为16进制
+            }
+            return sb.toString().toUpperCase();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
     public static String getHMacSha1(String accesskeySecret, String content) {
         SecretKeySpec signingKey = new SecretKeySpec(accesskeySecret.getBytes(), "HmacSHA1");
         try {
