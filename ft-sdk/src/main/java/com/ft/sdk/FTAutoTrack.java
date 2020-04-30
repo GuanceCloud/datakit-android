@@ -593,9 +593,9 @@ public class FTAutoTrack {
                 recordData.setRpn(rootPage);
                 JSONObject opData = new JSONObject();
                 try {
-                    opData.put("vtp", vtp);
                     JSONObject tags = new JSONObject();
                     JSONObject fields = new JSONObject();
+                    fields.put("vtp",vtp);
                     SyncDataManager.addMonitorData(tags,fields);
                     opData.put(Constants.TAGS, tags);
                     opData.put(Constants.FIELDS, fields);
