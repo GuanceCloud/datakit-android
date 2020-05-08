@@ -34,16 +34,18 @@ public class GpuUtils {
      *
      * @return
      */
-    public static String getGpuUseRate() {
+    public static double getGpuUseRate() {
         String rate = readOneLineFile(GPU_USE_QUALCOMM);
         if (rate == null) {
             rate = readOneLineFile(GPU_USE_MTK);
         }
-        if (rate == null) {
-            rate = Constants.UNKNOWN;
+        try{
+            double value = Double.parseDouble(rate);
+            return Utils.formatDouble(value);
+        }catch (Exception e){
         }
 
-        return rate;
+        return 0.00;
     }
 
     /**
@@ -62,10 +64,10 @@ public class GpuUtils {
                 maxFreq = datas.get(0);
             }
         }
-        if (maxFreq == null) {
-            maxFreq = Constants.UNKNOWN;
+        if (Utils.isNullOrEmpty(maxFreq)) {
+            return Constants.UNKNOWN;
         }
-        return maxFreq;
+        return maxFreq+"Hz";
     }
 
     /**

@@ -19,10 +19,8 @@ public class FTFlowChartConfig {
     private String flowUUID;
     //是否打开流程图
     private boolean openFlowChart;
-    //图标类型，产品代号
-    private String flowProduct;
     //上一次操作的时间
-    public long lastOpTime;
+    public volatile long lastOpTime;
     private FTFlowChartConfig(){ }
     public static FTFlowChartConfig get(){
         if(ftFlowChartConfig == null){
@@ -31,8 +29,8 @@ public class FTFlowChartConfig {
         return ftFlowChartConfig;
     }
     public void initParams(FTSDKConfig ftsdkConfig){
+        lastOpTime = System.currentTimeMillis();
         openFlowChart = ftsdkConfig.isOpenFlowChart();
-        flowProduct = ftsdkConfig.getFlowProduct();
         createNewFlowUUid();
     }
 
@@ -48,7 +46,7 @@ public class FTFlowChartConfig {
         return openFlowChart;
     }
 
-    public String getFlowProduct() {
-        return flowProduct;
+    public void release(){
+        ftFlowChartConfig = null;
     }
 }

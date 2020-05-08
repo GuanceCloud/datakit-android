@@ -12,7 +12,7 @@ import android.os.Build;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.FTSdk;
+import com.ft.sdk.FTApplication;
 import com.ft.sdk.garble.manager.SyncTaskManager;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.NetUtils;
@@ -44,7 +44,7 @@ public class FTNetworkListener {
             networkCallback = new FTNetWorkCallback();
         }
         if (application == null) {
-            application = FTSdk.get().getApplication();
+            application = FTApplication.getApplication();
         }
         if (networkReceiver == null) {
             networkReceiver = new FTNetworkReceiver();
@@ -109,10 +109,22 @@ public class FTNetworkListener {
     private void judgeNetState() {
         //大于 0 有网
         if (NetUtils.get().getNetworkState(application) > 0) {
-            //监听网络速度
-            NetUtils.get().startMonitorNetRate();
             LogUtils.d("Net->" + "网络已连接");
             SyncTaskManager.get().executeSyncPoll();
         }
+    }
+
+    public void release(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            //SDK 版本大于 26 时通过registerDefaultNetworkCallback 注册网络状态变化回调
+            connectivityManager.unregisterNetworkCallback(networkCallback);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            //SDK 版本大于 21 小于 26 时通过 registerNetworkCallback 注册网络状态变化回调
+            connectivityManager.unregisterNetworkCallback(networkCallback);
+        } else {
+            //SDK 版本小于 21 时，通过广播来获得网络状态变化
+            application.unregisterReceiver(networkReceiver);
+        }
+        instance = null;
     }
 }

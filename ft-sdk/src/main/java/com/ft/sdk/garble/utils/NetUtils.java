@@ -2,15 +2,23 @@ package com.ft.sdk.garble.utils;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
+import android.net.LinkProperties;
+import android.net.Network;
 import android.net.NetworkInfo;
 import android.net.TrafficStats;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.telephony.PhoneStateListener;
 import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
+import com.ft.sdk.FTApplication;
+
+import java.net.InetAddress;
 import java.text.DecimalFormat;
+import java.util.LinkedList;
 
 
 /**
@@ -31,9 +39,63 @@ public class NetUtils {
     private TelephonyManager telephonyManager;
     private PhoneStatListener phoneStatListener;
 
-    private String netRate = Constants.UNKNOWN;
-    private long lastRxTx = 0;
+    private double netUpRate = 0.00;
+    private double netDownRate = 0.00;
+    //上一次收到的总的字节数
+    private long lastRx = 0;
+    //上一次发送的总的字节数
+    private long lastTx = 0;
     private boolean isRunNetMonitor = false;
+
+    public long tcpStartTime;
+    public long tcpEndTime;
+    public long dnsStartTime;
+    public long dnsEndTime;
+    public long responseStartTime;
+    public long responseEndTime;
+    public int requestCount;
+    public int requestErrCount;
+
+    public long getTcpTime(){
+        if(tcpEndTime>=tcpStartTime){
+            long time = tcpEndTime - tcpStartTime;
+            if(time > 10*1000 || time >= getResponseTime()){
+                return 0;
+            }
+            return time;
+        }
+        return 0;
+    }
+
+    public long getDNSTime(){
+        if(dnsEndTime>=dnsStartTime){
+            long time = dnsEndTime - dnsStartTime;
+            if(time > 10*1000 || time >= getResponseTime()){
+                return 0;
+            }
+            return time;
+        }
+        return 0;
+    }
+
+    public long getResponseTime(){
+        if(responseEndTime>=responseStartTime){
+            long time = responseEndTime - responseStartTime;
+            if(time > 10*1000){
+                return 0;
+            }
+            return time;
+        }
+        return 0;
+    }
+
+    public double getErrorRate(){
+        if(requestCount > 0){
+            double rate = requestErrCount*1.0/requestCount;
+            return Math.floor(rate*100)/100.0;
+        }
+        return 0;
+    }
 
     private NetUtils() {
     }
@@ -123,9 +185,25 @@ public class NetUtils {
      *
      * @return
      */
-    public int getSignalStrength() {
-        if (phoneStatListener != null) {
-            return phoneStatListener.mSignalStrength;
+    public int getSignalStrength(Context context) {
+        int state = getNetworkState(context);
+        if (state == NETWORK_WIFI) {
+            WifiManager mWifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+            WifiInfo wifiInfo = mWifiManager.getConnectionInfo();
+            int wifi = wifiInfo.getRssi();
+            if (wifi > -50 && wifi < 0) {
+                return 3;
+            } else if (wifi > -80 && wifi < -50) {
+                return 2;
+            } else if (wifi > -100 && wifi < -80) {
+                return 1;
+            } else {
+                return 0;
+            }
+        } else if (state != NETWORK_NONE) {
+            if (phoneStatListener != null) {
+                return phoneStatListener.mSignalStrength;
+            }
         }
         return 0;
     }
@@ -145,39 +223,48 @@ public class NetUtils {
     }
 
     /**
-     * 得到网络速度
+     * 得到网络上行速度
      *
      * @return
      */
-    public String getNetRate() {
-        return netRate;
+    public double getNetUpRate() {
+        return netUpRate;
+    }
+    /**
+     * 得到网络下行速度
+     *
+     * @return
+     */
+    public double getNetDownRate() {
+        return netDownRate;
     }
 
     /**
      * 开始监听网络速率
      */
-    public void startMonitorNetRate(){
+    public void startMonitorNetRate() {
         synchronized (this) {
             try {
-                if(isRunNetMonitor){
+                if (isRunNetMonitor) {
                     return;
                 }
-                ThreadPoolUtils.get().execute(() -> {
+                new Thread(() -> {
                     try {
                         while (true) {
                             isRunNetMonitor = true;
                             try {
                                 getNetSpeed();
-                                Thread.sleep(1000);
+                                Thread.sleep(2000);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
                         }
-                    }catch (Exception e){}finally {
+                    } catch (Exception e) {
+                    } finally {
                         isRunNetMonitor = false;
                     }
-                });
-            }catch (Exception e){
+                }, "网速监听").start();
+            } catch (Exception e) {
                 isRunNetMonitor = false;
             }
         }
@@ -186,36 +273,35 @@ public class NetUtils {
     private DecimalFormat showFloatFormat = new DecimalFormat("0.00");
 
     /**
-     * 获得网络速度（外部获取网速应该直接调用{@link NetUtils#getNetRate()}）
-     *
+     * 应用启动时获取一次网速
+     */
+    public void initSpeed() {
+        lastRx = TrafficStats.getTotalRxBytes();
+        lastTx = TrafficStats.getTotalTxBytes();
+        getNetSpeed();
+    }
+
+    /**
+     * 获得网络速度（外部获取网速应该直接调用{@link NetUtils}）
+     * 单位 字节
      * @return
      */
-    public String getNetSpeed() {
-        long tempSum = TrafficStats.getTotalRxBytes()
-                + TrafficStats.getTotalTxBytes();
-        long rxtxLast = tempSum - lastRxTx;
-        double totalSpeed = rxtxLast * 1000 / 2000d;
-        lastRxTx = tempSum;
-        netRate = showSpeed(totalSpeed);//设置显示当前网速
-        return netRate;
+    public void getNetSpeed() {
+        long tempRx = TrafficStats.getTotalRxBytes();
+        long tempTx = TrafficStats.getTotalTxBytes();
+        long rxLast = tempRx - lastRx;
+        long txLast = tempTx - lastTx;
+
+        lastRx = tempRx;
+        lastTx = tempTx;
+        netDownRate = Utils.formatDouble(rxLast/2d);
+        netUpRate = Utils.formatDouble(txLast/2d);
     }
-
-    private String showSpeed(double speed) {
-        String speedString;
-        if (speed >= 1048576d) {
-            speedString = showFloatFormat.format(speed / 1048576d) + "MB/s";
-        } else {
-            speedString = showFloatFormat.format(speed / 1024d) + "KB/s";
-        }
-        return speedString;
-
-    }
-
 
     /**
      * 判断设备 是否使用代理上网
      */
-    public boolean isWifiProxy(Context context) {
+    public String isWifiProxy(Context context) {
         final boolean IS_ICS_OR_LATER = Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH;
         String proxyAddress;
         int proxyPort;
@@ -227,7 +313,93 @@ public class NetUtils {
             proxyAddress = android.net.Proxy.getHost(context);
             proxyPort = android.net.Proxy.getPort(context);
         }
-        return (!TextUtils.isEmpty(proxyAddress)) && (proxyPort != -1);
+        if (!TextUtils.isEmpty(proxyAddress) && (proxyPort != -1)) {
+            return proxyAddress + ":" + proxyPort;
+        } else {
+            return Constants.UNKNOWN;
+        }
+    }
 
+    /**
+     * 判断网络是否在漫游
+     *
+     * @return
+     */
+    public boolean getRoamState() {
+        ConnectivityManager manager = getConnectivityManager();
+        NetworkInfo info = manager.getActiveNetworkInfo();
+        if (info != null && info.isConnected()) {
+            return info.isRoaming();
+        }
+        return false;
+    }
+
+    /**
+     * 获取 DNS 地址
+     *
+     * @param context
+     * @return
+     */
+    public String[] getDnsFromConnectionManager(Context context) {
+        LinkedList<String> dnsServers = new LinkedList<>();
+        ConnectivityManager connectivityManager = getConnectivityManager();
+        if (connectivityManager != null) {
+            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+            if (activeNetworkInfo != null) {
+                for (Network network : connectivityManager.getAllNetworks()) {
+                    NetworkInfo networkInfo = connectivityManager.getNetworkInfo(network);
+                    if (networkInfo != null && networkInfo.getType() == activeNetworkInfo.getType()) {
+                        LinkProperties lp = connectivityManager.getLinkProperties(network);
+                        for (InetAddress address : lp.getDnsServers()) {
+                            dnsServers.add(address.getHostAddress());
+                        }
+                    }
+                }
+            }
+        }
+        return dnsServers.isEmpty() ? new String[0] : dnsServers.toArray(new String[dnsServers.size()]);
+    }
+
+    /**
+     * 获取 WI-FI 的ssID
+     *
+     * @return
+     */
+    public String getSSId() {
+        String ssId = Constants.UNKNOWN;
+        WifiManager manager = (WifiManager) FTApplication.getApplication().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if (manager != null) {
+            WifiInfo wifiInfo = manager.getConnectionInfo();
+            if (wifiInfo != null) {
+                ssId = wifiInfo.getSSID();
+                if (ssId.length() > 2 && ssId.charAt(0) == '"' && ssId.charAt(ssId.length() - 1) == '"') {
+                    return ssId.substring(1, ssId.length() - 1);
+                }
+            }
+        }
+        return ssId;
+    }
+
+    /**
+     * 获得 WI-FI 的IP地址
+     * @return
+     */
+    public String getWifiIp() {
+        String ip = Constants.UNKNOWN;
+        WifiManager manager = (WifiManager) FTApplication.getApplication().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if (manager != null) {
+            WifiInfo wifiInfo = manager.getConnectionInfo();
+            if (wifiInfo != null) {
+                int ipAsInt = wifiInfo.getIpAddress();
+                if (ipAsInt != 0) {
+                    ip = (ipAsInt & 0xFF) + "." + ((ipAsInt >> 8) & 0xFF) + "." + ((ipAsInt >> 16) & 0xFF) + "." + ((ipAsInt >> 24) & 0xFF);
+                }
+            }
+        }
+        return ip;
+    }
+
+    private ConnectivityManager getConnectivityManager() {
+        return (ConnectivityManager) FTApplication.getApplication().getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 }

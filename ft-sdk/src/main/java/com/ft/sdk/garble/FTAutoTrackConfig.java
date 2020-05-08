@@ -4,6 +4,9 @@ import android.view.View;
 
 import com.ft.sdk.FTAutoTrackType;
 import com.ft.sdk.FTSDKConfig;
+import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +18,7 @@ import java.util.List;
  */
 public class FTAutoTrackConfig {
     private boolean autoTrack;
+    private String product;
 
     //以下三个为白名单
     private int enableAutoTrackType;
@@ -50,6 +54,11 @@ public class FTAutoTrackConfig {
         disableAutoTrackType = ftsdkConfig.getDisableAutoTrackType();
         addIgnoreAutoTrackActivity(ftsdkConfig.getBlackActivityClass());
         addIgnoreAutoTrackView(ftsdkConfig.getBlackViewClass());
+        if(Utils.isNullOrEmpty(ftsdkConfig.getProduct())){
+            LogUtils.e("请先设置产品名");
+        }else {
+            product = ftsdkConfig.getProduct();
+        }
     }
 
     /**
@@ -300,5 +309,13 @@ public class FTAutoTrackConfig {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public String getProduct() {
+        return product;
+    }
+
+    public void release(){
+        instance = null;
     }
 }
