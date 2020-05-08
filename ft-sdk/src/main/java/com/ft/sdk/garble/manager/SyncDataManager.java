@@ -313,9 +313,12 @@ public class SyncDataManager {
                 JSONObject opJson = new JSONObject(recordData.getOpdata());
                 JSONObject tags = opJson.optJSONObject(Constants.TAGS);
                 if (tags != null) {
-                    sb.append(getCustomHash(tags, true));
+                    tags.put("event_id", Utils.MD5(getEventName(recordData.getOp())));
+                }else{
+                    tags = new JSONObject();
+                    tags.put("event_id", Utils.MD5(getEventName(recordData.getOp())));
                 }
-
+                sb.append(getCustomHash(tags, true));
                 fields = opJson.optJSONObject(Constants.FIELDS);
             } catch (Exception e) {
             }
@@ -333,7 +336,6 @@ public class SyncDataManager {
         if (fields != null) {
             try {
                 fields.put("event", getEventName(recordData.getOp()));
-                fields.put("event_id", Utils.MD5(getEventName(recordData.getOp())));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -342,7 +344,6 @@ public class SyncDataManager {
             sb.append(valueSb);
         } else {
             sb.append("event=\"" + getEventName(recordData.getOp()) + "\"");
-            sb.append("event_id=\"" + Utils.MD5(getEventName(recordData.getOp())) + "\"");
         }
         sb.append(Constants.SEPARATION_PRINT);
         sb.append(recordData.getTime() * 1000000);

@@ -18,7 +18,6 @@ import java.util.List;
  */
 public class FTAutoTrackConfig {
     private boolean autoTrack;
-    private String product;
 
     //以下三个为白名单
     private int enableAutoTrackType;
@@ -54,11 +53,6 @@ public class FTAutoTrackConfig {
         disableAutoTrackType = ftsdkConfig.getDisableAutoTrackType();
         addIgnoreAutoTrackActivity(ftsdkConfig.getBlackActivityClass());
         addIgnoreAutoTrackView(ftsdkConfig.getBlackViewClass());
-        if(Utils.isNullOrEmpty(ftsdkConfig.getProduct())){
-            LogUtils.e("请先设置产品名");
-        }else {
-            product = ftsdkConfig.getProduct();
-        }
     }
 
     /**
@@ -311,8 +305,13 @@ public class FTAutoTrackConfig {
         }
     }
 
+    /**
+     * 该属性在 agent_1.0.2-alpha04 后将不再有用。
+     * @return
+     */
+    @Deprecated
     public String getProduct() {
-        return product;
+        return "";
     }
 
     public void release(){
