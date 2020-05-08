@@ -26,7 +26,7 @@ public class BatteryUtils {
         try {
             BatteryManager manager = (BatteryManager) context.getSystemService(Context.BATTERY_SERVICE);
             int value = manager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);//当前电量剩余百分比
-            capacity = (100-value);
+            capacity = (100 - value);
         } catch (Exception e) {
 
         }
@@ -41,7 +41,7 @@ public class BatteryUtils {
      */
     public static String getBatteryTotal(Context context) {
         if (batteryCapacity > 0) {
-            return batteryCapacity+"mAh";
+            return batteryCapacity + "mAh";
         }
         Object mPowerProfile;
         final String POWER_PROFILE_CLASS = "com.android.internal.os.PowerProfile";
@@ -51,10 +51,10 @@ public class BatteryUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if(batteryCapacity == 0){
+        if (batteryCapacity == 0) {
             return Constants.UNKNOWN;
         }
-        return batteryCapacity+"mAh";
+        return batteryCapacity + "mAh";
     }
 
     /**
@@ -95,6 +95,7 @@ public class BatteryUtils {
 
     /**
      * 获取电池的健康状态
+     *
      * @param health
      * @return
      */
@@ -128,6 +129,7 @@ public class BatteryUtils {
 
     /**
      * 获取电池的充电状态
+     *
      * @param status
      * @return
      */
@@ -138,13 +140,11 @@ public class BatteryUtils {
                 healthBat = "charging";
                 break;
             case BatteryManager.BATTERY_STATUS_DISCHARGING:
-                healthBat = "disCharging";
+            case BatteryManager.BATTERY_STATUS_NOT_CHARGING:
+                healthBat = "unplugged";
                 break;
             case BatteryManager.BATTERY_STATUS_FULL:
                 healthBat = "full";
-                break;
-            case BatteryManager.BATTERY_STATUS_NOT_CHARGING:
-                healthBat = "notCharging";
                 break;
             case BatteryManager.BATTERY_STATUS_UNKNOWN:
                 healthBat = "unknown";
@@ -155,6 +155,7 @@ public class BatteryUtils {
 
     /**
      * 获取电池的充电方式
+     *
      * @param status
      * @return
      */
