@@ -32,6 +32,9 @@
 -keep class com.ft.sdk.FTSdk{
   *;
 }
+-keep class com.ft.sdk.FTMonitor{
+  *;
+}
 -keep class com.ft.sdk.FTSDKConfig{
   *;
 }
@@ -49,6 +52,18 @@
 
 -keep class com.ft.sdk.garble.http.ResponseData{
      *;
+}
+
+-keep class com.ft.sdk.garble.http.HttpBuilder{
+    *;
+}
+
+-keep enum com.ft.sdk.garble.http.RequestMethod{
+    *;
+}
+
+-keep class com.ft.sdk.garble.http.INetEngine{
+    *;
 }
 
 -keep class * extends com.ft.sdk.garble.http.ResponseData{

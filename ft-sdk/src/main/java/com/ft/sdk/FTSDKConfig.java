@@ -1,5 +1,6 @@
 package com.ft.sdk;
 
+import com.ft.sdk.garble.http.INetEngine;
 import com.ft.sdk.garble.utils.DeviceUtils;
 
 import java.security.InvalidParameterException;
@@ -21,6 +22,10 @@ public class FTSDKConfig {
     private boolean useOAID;
     //是否是Debug
     private boolean isDebug;
+    //高德逆向解析API 的 key
+    private String geoKey;
+    //是否使用高德作为逆向地址解析
+    private boolean useGeoKey;
     //是否开启自动埋点
     private boolean autoTrack;
     //是否需要绑定用户数据
@@ -29,8 +34,8 @@ public class FTSDKConfig {
     private int monitorType;
     //是否打开流程图
     private boolean openFlowChart;
-    //图标类型，产品代号
-    private String flowProduct;
+    //产品代号
+    private String product;
     //以下三个为白名单
     private int enableAutoTrackType;
     private List<Class<?>> whiteActivityClass;
@@ -40,6 +45,7 @@ public class FTSDKConfig {
     private int disableAutoTrackType;
     private List<Class<?>> blackActivityClass;
     private List<Class<?>> blackViewClass;
+    private Class<? extends INetEngine> iNetEngineClass;
 
     /**
      * 构建 SDK 必要的配置参数
@@ -126,8 +132,8 @@ public class FTSDKConfig {
         return openFlowChart;
     }
 
-    public String getFlowProduct() {
-        return flowProduct;
+    public String getProduct() {
+        return product;
     }
 
     public int getEnableAutoTrackType() {
@@ -154,9 +160,20 @@ public class FTSDKConfig {
         return blackViewClass;
     }
 
+    public String getGeoKey() {
+        return geoKey;
+    }
+
+    public boolean isUseGeoKey() {
+        return useGeoKey;
+    }
+
     public FTSDKConfig enableAutoTrack(boolean autoTrack) {
         this.autoTrack = autoTrack;
         return this;
+    }
+    public Class<? extends INetEngine> getINetEngineClass() {
+        return iNetEngineClass;
     }
 
     /**
@@ -179,8 +196,6 @@ public class FTSDKConfig {
         DeviceUtils.setSDKUUid(uuid);
         return this;
     }
-
-
 
     /**
      * 是否开启Debug，开启后将显示 SDK 运行日志
@@ -227,13 +242,13 @@ public class FTSDKConfig {
     }
 
     /**
-     * 图标类型代号
+     * 类型代号
      *
-     * @param flowProduct
+     * @param product
      * @return
      */
-    public FTSDKConfig setFlowProduct(String flowProduct) {
-        this.flowProduct = flowProduct;
+    public FTSDKConfig setProduct(String product) {
+        this.product = product;
         return this;
     }
 
@@ -303,4 +318,20 @@ public class FTSDKConfig {
         return this;
     }
 
+    /**
+     * 设置使用高德作为逆向地址解析
+     * @param useGeoKey
+     * @param geoKey
+     * @return
+     */
+    public FTSDKConfig setGeoKey(boolean useGeoKey,String geoKey){
+        this.useGeoKey = useGeoKey;
+        this.geoKey = geoKey;
+        return this;
+    }
+
+    public FTSDKConfig setINetEngineClass(Class<? extends INetEngine> iNetEngineClass) {
+        this.iNetEngineClass = iNetEngineClass;
+        return this;
+    }
 }

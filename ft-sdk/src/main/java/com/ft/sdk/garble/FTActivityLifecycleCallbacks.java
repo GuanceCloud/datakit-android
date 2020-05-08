@@ -9,9 +9,11 @@ import androidx.annotation.Nullable;
 
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTAutoTrack;
+import com.ft.sdk.MonitorType;
 import com.ft.sdk.garble.manager.FTActivityManager;
 import com.ft.sdk.garble.manager.FTManager;
 import com.ft.sdk.garble.utils.LocationUtils;
+import com.ft.sdk.garble.utils.NetUtils;
 
 /**
  * BY huangDianHua
@@ -21,6 +23,10 @@ import com.ft.sdk.garble.utils.LocationUtils;
 public class FTActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
     @Override
     public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
+        //防止监听网速的线程挂掉，在页面打开时判断线程是够挂了，挂了重启
+        if (FTMonitorConfig.get().isMonitorType(MonitorType.ALL) || FTMonitorConfig.get().isMonitorType(MonitorType.NETWORK)) {
+            NetUtils.get().startMonitorNetRate();
+        }
         FTFragmentManager.getInstance().addFragmentLifecycle(activity);
     }
 
@@ -30,7 +36,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
 
     @Override
     public void onActivityResumed(@NonNull Activity activity) {
-        LocationUtils.get().startLocation(FTApplication.getApplication());
+        LocationUtils.get().startListener();
         boolean isFirstLoad = true;
         if(FTActivityManager.get().isFirstResume.containsKey(activity.getClass().getName()) && FTActivityManager.get().isFirstResume.get(activity.getClass().getName())){
             isFirstLoad = false;

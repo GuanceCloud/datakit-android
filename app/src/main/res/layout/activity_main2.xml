@@ -9,6 +9,13 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/sync_data_background"
+        android:text="同步数据后台上传"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:id="@+id/jump"
         android:text="模拟正确的主动上传埋点数据"
         />
@@ -18,5 +25,31 @@
         android:layout_height="wrap_content"
         android:id="@+id/jump2"
         android:text="模拟错误的主动埋点数据"
+        />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/jump3"
+        android:text="上传流程图"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/jump4"
+        android:text="停止 SDK"
+        />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/jump5"
+        android:text="重新配置SDK"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/jump6"
+        android:text="即时获取位置信息"
         />
 </LinearLayout>

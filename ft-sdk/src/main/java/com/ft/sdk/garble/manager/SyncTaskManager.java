@@ -8,6 +8,7 @@ import com.ft.sdk.garble.http.FTResponseData;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.http.RequestMethod;
+import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -39,11 +40,6 @@ public class SyncTaskManager {
         this.running = running;
     }
 
-
-    public void shotDown(){
-        ThreadPoolUtils.get().shutDown();
-    }
-
     private SyncTaskManager() {
 
     }
@@ -65,23 +61,28 @@ public class SyncTaskManager {
         running = true;
         errorCount.set(0);
         ThreadPoolUtils.get().execute(() -> {
-            waitUserBind();
-            List<RecordData> recordDataList = queryFromData();
-            //当数据库中有数据是执行轮询同步操作
-            while (recordDataList != null && !recordDataList.isEmpty()) {
-                if (!Utils.isNetworkAvailable()) {
-                    LogUtils.d(">>>网络未连接<<<");
-                    break;
+            try {
+                waitUserBind();
+                List<RecordData> recordDataList = queryFromData();
+                //当数据库中有数据是执行轮询同步操作
+                while (recordDataList != null && !recordDataList.isEmpty()) {
+                    if (!Utils.isNetworkAvailable()) {
+                        LogUtils.d(">>>网络未连接<<<");
+                        break;
+                    }
+                    if (errorCount.get() >= CLOSE_TIME) {
+                        LogUtils.d(">>>连续同步失败5次，停止当前轮询同步<<<");
+                        break;
+                    }
+                    LogUtils.d(">>>同步轮询线程<<< 程序正在执行同步操作");
+                    handleSyncOpt(recordDataList);
+                    recordDataList = queryFromData();
                 }
-                if (errorCount.get() >= CLOSE_TIME) {
-                    LogUtils.d(">>>连续同步失败5次，停止当前轮询同步<<<");
-                    break;
-                }
-                LogUtils.d(">>>同步轮询线程<<< 程序正在执行同步操作");
-                handleSyncOpt(recordDataList);
-                recordDataList = queryFromData();
+                running = false;
+            }catch (Exception e){
+                e.printStackTrace();
+                running = false;
             }
-            running = false;
         });
     }
 
@@ -115,6 +116,7 @@ public class SyncTaskManager {
         SyncDataManager syncDataManager = new SyncDataManager();
         String body = syncDataManager.getBodyContent(requestDatas);
         SyncDataManager.printUpdateData(body);
+        body = body.replaceAll(Constants.SEPARATION_PRINT,Constants.SEPARATION);
         requestNet(body, (code,response) -> {
             if (code == HttpURLConnection.HTTP_OK) {
                 LogUtils.d("同步数据成功");
@@ -154,5 +156,10 @@ public class SyncTaskManager {
                     "}");
         }
 
+    }
+
+    public void release(){
+        ThreadPoolUtils.get().shutDown();
+        instance = null;
     }
 }

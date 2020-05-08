@@ -2,7 +2,7 @@ package com.ft.sdk.garble;
 
 import android.content.SharedPreferences;
 
-import com.ft.sdk.FTSdk;
+import com.ft.sdk.FTApplication;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.utils.Constants;
@@ -74,7 +74,7 @@ public class FTUserConfig {
      */
     public void createNewSessionId() {
         sessionId = UUID.randomUUID().toString();
-        SharedPreferences sp = Utils.getSharedPreferences(FTSdk.get().getApplication());
+        SharedPreferences sp = Utils.getSharedPreferences(FTApplication.getApplication());
         sp.edit().putString(Constants.FT_USER_SESSION_ID, sessionId).apply();
     }
 
@@ -87,7 +87,7 @@ public class FTUserConfig {
         if (!Utils.isNullOrEmpty(sessionId)) {
             return sessionId;
         }
-        SharedPreferences sp = Utils.getSharedPreferences(FTSdk.get().getApplication());
+        SharedPreferences sp = Utils.getSharedPreferences(FTApplication.getApplication());
         sessionId = sp.getString(Constants.FT_USER_SESSION_ID, null);
         return sessionId;
     }
@@ -96,7 +96,7 @@ public class FTUserConfig {
      * 清除用户的SessionId
      */
     public void clearSessionId() {
-        SharedPreferences sp = Utils.getSharedPreferences(FTSdk.get().getApplication());
+        SharedPreferences sp = Utils.getSharedPreferences(FTApplication.getApplication());
         sp.edit().remove(Constants.FT_USER_SESSION_ID).apply();
         sessionId = null;
     }
@@ -190,5 +190,8 @@ public class FTUserConfig {
         }
     }
 
+    public void release(){
+        instance = null;
+    }
 
 }

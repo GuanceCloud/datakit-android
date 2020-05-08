@@ -9,23 +9,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.lang.reflect.Constructor;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 import static com.ft.sdk.garble.http.NetCodeStatus.UNKNOWN_EXCEPTION_CODE;
+
 
 /**
  * BY huangDianHua
  * DATE:2019-11-29 18:40
- * Description:该类过期已不再使用
+ * Description: 原生 HttpUrlConnection 网络请求引擎
  */
-@Deprecated
-public abstract class HttpClient {
+public class NativeNetEngine implements INetEngine {
     //字符编码
     final String CHARSET = "UTF-8";
     //内容类型
@@ -36,25 +36,24 @@ public abstract class HttpClient {
     HttpURLConnection mConnection;
     //连接状态（true - 成功，false - 失败）
     boolean connSuccess = false;
-    //SDK 中网络的配置
-    FTHttpConfig ftHttpConfig = FTHttpConfig.get();
     //网络请求的回复码
     private int responseCode = NetCodeStatus.UNKNOWN_EXCEPTION_CODE;
 
-    /**
-     * 请求参数中的 body 部分
-     * @return
-     */
-    protected abstract String getBodyContent();
-
-    public HttpClient(HttpBuilder httpBuilder) {
+    @Override
+    public void defaultConfig(HttpBuilder httpBuilder) {
         this.mHttpBuilder = httpBuilder;
-        //打开连接
-        if (openConnection()) {
-            //连接打开后设置公共参数
+
+    }
+
+    @Override
+    public void createRequest(HttpBuilder httpBuilder) {
+        openConnection();
+        if(connSuccess){
             setCommonParams();
+            setHeadParams();
         }
     }
+
 
     /**
      * 打开连接
@@ -62,25 +61,7 @@ public abstract class HttpClient {
      */
     private boolean openConnection() {
         try {
-            //默认使用 SDK 中配置的全局 URL
-            String urlStr = ftHttpConfig.metricsUrl;
-            if (mHttpBuilder.getUrl() != null) {
-                //用当前请求的 URL
-                urlStr = mHttpBuilder.getUrl();
-            }
-            String model = mHttpBuilder.getModel();
-            if (model != null && !model.isEmpty()) {
-                //在 url 后添加请求的某个模块
-                urlStr = urlStr + "/" + model;
-            }
-            if(Utils.isNullOrEmpty(urlStr)){
-                //请求地址为空是提示错误
-                connSuccess = false;
-                responseCode = HttpURLConnection.HTTP_NOT_FOUND;
-                LogUtils.e("请求地址不能为空");
-                return false;
-            }
-            final URL url = new URL(urlStr +"?"+ getQueryString());
+            final URL url = new URL(mHttpBuilder.getUrl());
             //打开连接
             mConnection = (HttpURLConnection) url.openConnection();
             if (mConnection == null) {
@@ -97,36 +78,9 @@ public abstract class HttpClient {
     }
 
     /**
-     * 封装 get 请求参数
-     * @return
-     */
-    private String getQueryString() {
-        StringBuffer sb = new StringBuffer();
-        if (mHttpBuilder.getMethod() == RequestMethod.GET) {
-            HashMap<String, Object> param = mHttpBuilder.getParams();
-            if (param != null) {
-                Iterator<String> keys = param.keySet().iterator();
-                while (keys.hasNext()) {
-                    String key = keys.next();
-                    sb.append("&" + key + "=" + param.get(key));
-                }
-            }
-        }
-        return sb.toString();
-    }
-
-    /**
      * 设置一些公共属性
      */
     private void setCommonParams() {
-        //如果没有设置超时时间就给个10秒默认值
-        if (mHttpBuilder.getSendOutTime() == 0) {
-            mHttpBuilder.setSendOutTime(10 * 1000);
-        }
-        if (mHttpBuilder.getReadOutTime() == 0) {
-            mHttpBuilder.setReadOutTime(10 * 1000);
-        }
-
         try {
             //设置连接方式
             mConnection.setRequestMethod(mHttpBuilder.getMethod().method);
@@ -134,28 +88,39 @@ public abstract class HttpClient {
             e.printStackTrace();
         }
         //设置连接和读取超时时间
-        mConnection.setConnectTimeout(mHttpBuilder.getSendOutTime());
-        mConnection.setReadTimeout(mHttpBuilder.getReadOutTime());
+        mConnection.setConnectTimeout(FTHttpConfig.get().sendOutTime);
+        mConnection.setReadTimeout(FTHttpConfig.get().readOutTime);
     }
 
-    public <T extends ResponseData> T execute(Class<T> tClass) {
-        try {
-            return request(tClass);
-        } catch (Exception e) {
-            LogUtils.e(e.getMessage());
-            return getResponseData(tClass,UNKNOWN_EXCEPTION_CODE,e.getMessage());
+    private void setHeadParams(){
+        if(mHttpBuilder != null && connSuccess){
+            HashMap head = mHttpBuilder.getHeadParams();
+            Set<Map.Entry<String,String>> entries = head.entrySet();
+            for (Map.Entry<String, String> entry : entries) {
+                mConnection.addRequestProperty(entry.getKey(), entry.getValue());
+            }
         }
     }
 
-    private <T extends ResponseData> T request(Class<T> tClass)  {
+    @Override
+    public ResponseData execute() {
+        try {
+            return request();
+        } catch (Exception e) {
+            LogUtils.e(e.getMessage());
+            return getResponseData(UNKNOWN_EXCEPTION_CODE,e.getMessage());
+        }
+    }
+
+    private ResponseData request()  {
         if(!connSuccess){
             //如果连接失败，直接返回相应提示
-            return getResponseData(tClass,responseCode,
+            return getResponseData(responseCode,
                     "");
         }
         if (!Utils.isNetworkAvailable()) {
             //无网络连接返回无网络提示
-            return getResponseData(tClass,NetCodeStatus.NETWORK_EXCEPTION_CODE,
+            return getResponseData(NetCodeStatus.NETWORK_EXCEPTION_CODE,
                     "");
         }
         RequestMethod method = mHttpBuilder.getMethod();
@@ -173,9 +138,9 @@ public abstract class HttpClient {
             mConnection.setDoInput(true);
             mConnection.setUseCaches(false);
             mConnection.connect();
-            if (isDoInput) {
+            if (isDoInput && !Utils.isNullOrEmpty(mHttpBuilder.getBodyString())) {
                 outputStream = mConnection.getOutputStream();
-                outputStream.write(getBodyContent().getBytes(CHARSET));
+                outputStream.write(mHttpBuilder.getBodyString().getBytes(CHARSET));
                 outputStream.flush();
             }
             responseCode = mConnection.getResponseCode();
@@ -206,10 +171,7 @@ public abstract class HttpClient {
         }finally {
             close(outputStream, reader, inputStreamReader, inputStream);
         }
-        if(mHttpBuilder.isShowLog()) {
-            LogUtils.d("HTTP-response:[code:" + responseCode + ",response:" + resultBuffer.toString() + "]");
-        }
-        return getResponseData(tClass,responseCode, resultBuffer.toString());
+        return getResponseData(responseCode, resultBuffer.toString());
     }
 
     private void close(OutputStream outputStream,
@@ -249,27 +211,12 @@ public abstract class HttpClient {
     /**
      * 构建网络请求返回对象
      *
-     * @param tClass
      * @param code
      * @param message
-     * @param <T>
      * @return
      */
-    private <T extends ResponseData> T getResponseData(Class<T> tClass, int code, String message) {
-        Constructor[] constructor = tClass.getConstructors();
-        for (Constructor<T> con : constructor) {
-            Class[] classes = con.getParameterTypes();
-            if (classes.length == 2) {
-                if (classes[0].getName().equals(int.class.getName()) &&
-                        classes[1].getName().equals(String.class.getName())) {
-                    try {
-                        return con.newInstance(code, message);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-        return null;
+    private ResponseData getResponseData(int code, String message) {
+        return new ResponseData(code,message);
     }
 }
+

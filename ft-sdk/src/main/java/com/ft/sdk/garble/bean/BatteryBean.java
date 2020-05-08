@@ -7,9 +7,9 @@ package com.ft.sdk.garble.bean;
  */
 public class BatteryBean {
     /**
-     * 电量
+     * 电量使用量
      */
-    private double br;
+    private int br;
     /**
      * 电池状态
      */
@@ -46,13 +46,13 @@ public class BatteryBean {
     /**
      * 电池电总量
      */
-    private double power;
+    private String power;
 
-    public double getBr() {
+    public int getBr() {
         return br;
     }
 
-    public void setBr(double br) {
+    public void setBr(int br) {
         this.br = br;
     }
 
@@ -112,11 +112,11 @@ public class BatteryBean {
         this.voltage = voltage;
     }
 
-    public double getPower() {
+    public String getPower() {
         return power;
     }
 
-    public void setPower(double power) {
+    public void setPower(String power) {
         this.power = power;
     }
 }

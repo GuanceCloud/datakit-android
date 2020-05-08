@@ -593,16 +593,13 @@ public class FTAutoTrack {
                 recordData.setRpn(rootPage);
                 JSONObject opData = new JSONObject();
                 try {
-                    opData.put("vtp", vtp);
                     JSONObject tags = new JSONObject();
-                    SyncDataManager.addMonitorData(tags);
-                    opData.put("tags", tags);
-                    //开启流程图，获取流程图相关数据存入数据库中
-                    if (FTFlowChartConfig.get().isOpenFlowChart()) {
-                        if (op == OP.OPEN_ACT || op == OP.OPEN_FRA) {
-                            opData.put(Constants.MEASUREMENT, FTFlowChartConfig.get().getFlowProduct());
-                        }
-                    }
+                    JSONObject fields = new JSONObject();
+                    fields.put("vtp",vtp);
+                    SyncDataManager.addMonitorData(tags,fields);
+                    opData.put(Constants.TAGS, tags);
+                    opData.put(Constants.FIELDS, fields);
+                    opData.put(Constants.MEASUREMENT, FTAutoTrackConfig.get().getProduct());
                     recordData.setOpdata(opData.toString());
                 } catch (Exception e) {
                 }

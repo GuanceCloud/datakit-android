@@ -12,6 +12,9 @@ import android.hardware.camera2.params.StreamConfigurationMap;
 import android.os.Build;
 import android.util.Size;
 
+import androidx.annotation.NonNull;
+
+import com.ft.sdk.FTApplication;
 import com.ft.sdk.garble.bean.CameraPx;
 
 import java.util.ArrayList;
@@ -23,14 +26,56 @@ public class CameraUtils {
     public static final int CAMERA_FACING_BACK = 0;
     public static final int CAMERA_FACING_FRONT = 1;
     public static final int CAMERA_NONE = -1;
-    public static List<CameraPx> cameraPxList = null;
+
+    private List<CameraPx> cameraPxList = null;
+    private CameraManager.TorchCallback torchCallback;
+    private CameraManager cameraManager;
+
+    private boolean torchState;
+    private static CameraUtils cameraUtils;
+
+    public boolean isTorchState() {
+        return torchState;
+    }
+
+    private CameraUtils(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            torchCallback = new CameraManager.TorchCallback() {
+                @Override
+                public void onTorchModeUnavailable(@NonNull String cameraId) {
+                    super.onTorchModeUnavailable(cameraId);
+                }
+
+                @Override
+                public void onTorchModeChanged(@NonNull String cameraId, boolean enabled) {
+                    super.onTorchModeChanged(cameraId, enabled);
+                    torchState = enabled;
+                }
+            };
+        }
+    }
+    public static CameraUtils get(){
+        if(cameraUtils == null){
+            cameraUtils = new CameraUtils();
+        }
+        return cameraUtils;
+    }
+
+    public void release(){
+        if (cameraManager != null && torchCallback != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                cameraManager.unregisterTorchCallback(torchCallback);
+            }
+        }
+        cameraUtils = null;
+    }
 
     /**
      * 获取手机的相机像素信息（多个摄像头）
      * @param context
      * @return
      */
-    public static List<CameraPx> getCameraPxList(Context context){
+    public List<CameraPx> getCameraPxList(Context context){
         if(cameraPxList != null && !cameraPxList.isEmpty()){
             return cameraPxList;
         }
@@ -47,7 +92,7 @@ public class CameraUtils {
      * @param context
      * @return
      */
-    private static List<CameraPx> getCamera2IdList(Context context){
+    private List<CameraPx> getCamera2IdList(Context context){
         CameraManager cameraManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
         List<CameraPx> cameraPxes = new ArrayList<>();
         try {
@@ -81,7 +126,7 @@ public class CameraUtils {
      * @param context
      * @return
      */
-    private static List<CameraPx> getCameraIdList(Context context){
+    private List<CameraPx> getCameraIdList(Context context){
         int numberOfCameras = Camera.getNumberOfCameras();
         CameraInfo cameraInfo = new CameraInfo();
         List<CameraPx> cameraPxes = new ArrayList<>();
@@ -106,7 +151,7 @@ public class CameraUtils {
      * @param paramInt
      * @return
      */
-    private static long getCameraPixels(Context context, int paramInt) {
+    private long getCameraPixels(Context context, int paramInt) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             int state = context.checkSelfPermission(Manifest.permission.CAMERA);
             if (state != PERMISSION_GRANTED) {
@@ -143,7 +188,7 @@ public class CameraUtils {
      * @param paramArray
      * @return
      */
-    private static int getMaxNumber(int[] paramArray) {
+    private int getMaxNumber(int[] paramArray) {
         int temp = paramArray[0];
         for (int i = 0; i < paramArray.length; i++) {
             if (temp < paramArray[i]) {
@@ -151,5 +196,31 @@ public class CameraUtils {
             }
         }
         return temp;
+    }
+
+    /**
+     * 获得闪光灯状态
+     * @return
+     */
+    public void start(){
+        if(cameraManager == null){
+            cameraManager = (CameraManager) FTApplication.getApplication().getSystemService(Context.CAMERA_SERVICE);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && torchCallback != null && cameraManager != null) {
+            cameraManager.registerTorchCallback(torchCallback,null);
+
+        }else {
+            Camera camera = Camera.open();
+            Camera.Parameters p = camera.getParameters();
+            String state = p.getFlashMode();
+            camera.release();
+            if ("null".equals(state)) {
+                torchState =  false;
+            } else if ("off".equals(state)) {
+                torchState = false;
+            } else {
+                torchState = true;
+            }
+        }
     }
 }

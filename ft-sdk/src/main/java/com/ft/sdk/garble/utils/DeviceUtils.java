@@ -3,12 +3,14 @@ package com.ft.sdk.garble.utils;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.Build;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
@@ -23,6 +25,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -156,7 +160,7 @@ public class DeviceUtils {
      */
     @SuppressLint("MissingPermission")
     public static String getImei(Context context) {
-        String imei = "";
+        String imei = Constants.UNKNOWN;
         try {
             if (!Utils.hasPermission(context, Manifest.permission.READ_PHONE_STATE)) {
                 return imei;
@@ -241,25 +245,37 @@ public class DeviceUtils {
     }
 
     /**
+     * 返回系统开机时间
+     * @return
+     */
+    public static String getSystemOpenTime(){
+        //毫秒数
+        long time = SystemClock.elapsedRealtime();
+        long startTime = System.currentTimeMillis() - time;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",Locale.getDefault());
+        return dateFormat.format(new Date(startTime));
+    }
+
+    /**
      * 获取运行内存容量和内存使用率
      *
      * @param context
      * @return
      */
-    public static String[] getRamData(Context context) {
+    public static double[] getRamData(Context context) {
         DecimalFormat showFloatFormat =new DecimalFormat("0.00");
         try {
             ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
             ActivityManager.MemoryInfo info = new ActivityManager.MemoryInfo();
             manager.getMemoryInfo(info);
             long[] data = new long[]{info.totalMem, info.availMem};
-            String[] strings = new String[2];
-            strings[0] = showFloatFormat.format(1.0*data[0]/1024/1024/1024)+"GB";
-            strings[1] = showFloatFormat.format((data[0]-data[1])*100.0/data[0])+"%";
+            double[] strings = new double[2];
+            strings[0] = Utils.formatDouble(1.0*data[0]/1024/1024/1024);
+            strings[1] = Utils.formatDouble((data[0]-data[1])*100.0/data[0]);
             return strings;
         } catch (Exception e) {
             e.printStackTrace();
-            return new String[]{"N/A", "N/A"};
+            return new double[]{0.00, 0.00};
         }
     }
 
@@ -270,6 +286,9 @@ public class DeviceUtils {
      */
     public static String getHardWare() {
         String result = Build.HARDWARE;
+        if(Utils.isNullOrEmpty(result)){
+            return Constants.UNKNOWN;
+        }
         return result;
     }
 
@@ -277,16 +296,15 @@ public class DeviceUtils {
      * 获得CPU使用率
      * @return
      */
-    public static String getCpuUseRate(){
+    public static double getCpuUseRate(){
         try {
-            DecimalFormat showFloatFormat = new DecimalFormat("0.00");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                return showFloatFormat.format(CpuUtils.get().getCpuDataForO()) + "%";
+                return Utils.formatDouble(CpuUtils.get().getCpuDataForO());
             } else {
-                return showFloatFormat.format(CpuUtils.get().getCPUData()) + "%";
+                return Utils.formatDouble(CpuUtils.get().getCPUData());
             }
         }catch (Exception e){
-            return "N/A";
+            return 0.00;
         }
     }
 
@@ -314,7 +332,7 @@ public class DeviceUtils {
                             if (telephonyManager.getSimState() == TelephonyManager.SIM_STATE_READY) {
                                 alternativeName = telephonyManager.getSimOperatorName();
                             } else {
-                                alternativeName = "未知";
+                                alternativeName = Constants.UNKNOWN;
                             }
                         }
                         if (!TextUtils.isEmpty(operator)) {
@@ -330,7 +348,7 @@ public class DeviceUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return "";
+        return Constants.UNKNOWN;
     }
 
     /**
@@ -400,5 +418,15 @@ public class DeviceUtils {
             }
         }
         return stringBuilder.toString();
+    }
+
+    /**
+     * 获取系统的亮度(值范围在0-255)
+     * @return
+     */
+    public static int getSystemScreenBrightnessValue(){
+        ContentResolver contentResolver = FTApplication.getApplication().getContentResolver();
+        int defVal = 125;
+        return Settings.System.getInt(contentResolver,Settings.System.SCREEN_BRIGHTNESS,defVal);
     }
 }

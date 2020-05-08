@@ -157,7 +157,7 @@ public class FTTrack {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        track(OP.CSTM, time, "$flow_" + product, tags, fields);
+        track(OP.FLOW_CHAT, time, "$flow_" + product, tags, fields);
     }
 
     /**
@@ -259,8 +259,7 @@ public class FTTrack {
             if (tagsTemp == null) {
                 tagsTemp = new JSONObject();
             }
-            SyncDataManager.addMonitorData(tagsTemp);
-            opData.put("tags", tagsTemp);
+            opData.put(Constants.TAGS, tagsTemp);
             if (fields != null) {
                 opData.put(Constants.FIELDS, fields);
             } else {
@@ -269,6 +268,9 @@ public class FTTrack {
                     callback.onResponse(NetCodeStatus.INVALID_PARAMS_EXCEPTION_CODE, "指标集 measurement 不能为空");
                 }
                 return null;
+            }
+            if(op == OP.CSTM) {
+                SyncDataManager.addMonitorData(tagsTemp, fields);
             }
             recordData.setOpdata(opData.toString());
             String sessionId = FTUserConfig.get().getSessionId();
@@ -294,6 +296,7 @@ public class FTTrack {
         SyncDataManager syncDataManager = new SyncDataManager();
         String body = syncDataManager.getBodyContent(recordDataList);
         SyncDataManager.printUpdateData(body);
+        body = body.replaceAll(Constants.SEPARATION_PRINT,Constants.SEPARATION);
         ResponseData result = HttpBuilder.Builder()
                 .setMethod(RequestMethod.POST)
                 .setBodyString(body).executeSync(ResponseData.class);
