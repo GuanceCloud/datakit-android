@@ -398,6 +398,12 @@ public class SyncDataManager {
             sb.append(",");
             sb.append(tagSb.toString());
         }
+
+        String device = parseHashToString(getDeviceInfo());
+        sb.append(",").append(device);
+        //删除多余的逗号
+        deleteLastComma(sb);
+
         sb.append(Constants.SEPARATION_PRINT);
         deleteLastComma(fieldSb);
         sb.append(fieldSb);
@@ -519,8 +525,8 @@ public class SyncDataManager {
         try {
             tags.put("cpu_no", DeviceUtils.getHardWare());
             fields.put("cpu_use", DeviceUtils.getCpuUseRate());
-            tags.put("cpu_temperature", CpuUtils.get().getCpuTemperature());
-            tags.put("cpu_hz", CpuUtils.get().getCPUMaxFreqKHz());
+            fields.put("cpu_temperature", CpuUtils.get().getCpuTemperature());
+            fields.put("cpu_hz", CpuUtils.get().getCPUMaxFreqKHz());
         } catch (Exception e) {
             LogUtils.e("CPU数据获取异常:" + e.getMessage());
         }
@@ -564,7 +570,7 @@ public class SyncDataManager {
             tags.put("network_proxy", NetUtils.get().isWifiProxy(FTApplication.getApplication()));
             String[] dns = NetUtils.get().getDnsFromConnectionManager(FTApplication.getApplication());
             for (int i = 0; i < dns.length; i++) {
-                tags.put("dns" + (i + 1), dns[i]);
+                fields.put("dns" + (i + 1), dns[i]);
             }
             tags.put("roam", NetUtils.get().getRoamState());
             fields.put("wifi_ssid", NetUtils.get().getSSId());
@@ -778,7 +784,7 @@ public class SyncDataManager {
         }
     }
 
-    private String parseHashToString(HashMap<String, Object> param) {
+    private static String parseHashToString(HashMap<String, Object> param) {
         StringBuffer sb = new StringBuffer();
         if (param != null) {
             Iterator<String> keys = param.keySet().iterator();
@@ -815,7 +821,7 @@ public class SyncDataManager {
      *
      * @return
      */
-    private HashMap<String, Object> getDeviceInfo() {
+    private static HashMap<String, Object> getDeviceInfo() {
         Context context = FTApplication.getApplication();
         HashMap<String, Object> objectHashMap = new HashMap<>();
         objectHashMap.put("device_uuid", DeviceUtils.getUuid(context));

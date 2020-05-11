@@ -373,7 +373,9 @@ public class NetUtils {
             if (wifiInfo != null) {
                 ssId = wifiInfo.getSSID();
                 if (ssId.length() > 2 && ssId.charAt(0) == '"' && ssId.charAt(ssId.length() - 1) == '"') {
-                    return ssId.substring(1, ssId.length() - 1);
+                    if(!"\"<unknown ssid>\"".equals(ssId)){
+                        return ssId.substring(1, ssId.length() - 1);
+                    }
                 }
             }
         }
