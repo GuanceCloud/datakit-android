@@ -30,7 +30,11 @@ public class NetProxy {
     public NetProxy(HttpBuilder httpBuilder) {
         this.httpBuilder = httpBuilder;
         engine = EngineFactory.createEngine();
-        engine.defaultConfig(httpBuilder);
+        try {
+            engine.defaultConfig(httpBuilder);
+        }catch (Exception e){
+            LogUtils.e(e.getLocalizedMessage());
+        }
     }
 
     public <T extends ResponseData> T execute(Class<T> tClass){

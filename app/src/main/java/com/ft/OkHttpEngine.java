@@ -5,11 +5,13 @@ import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.INetEngine;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.http.ResponseData;
+import com.ft.sdk.garble.utils.LogUtils;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.List;
@@ -117,7 +119,9 @@ public class OkHttpEngine implements INetEngine {
                 string = responseBody.string();
             }
             return new ResponseData(response.code(), string);
-        } catch (IOException e) {
+        } catch (ConnectException e){
+            LogUtils.e(e.getLocalizedMessage());
+        }catch (IOException e) {
             e.printStackTrace();
         }
         return null;
