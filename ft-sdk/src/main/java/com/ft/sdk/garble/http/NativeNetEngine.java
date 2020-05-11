@@ -48,7 +48,7 @@ public class NativeNetEngine implements INetEngine {
     @Override
     public void createRequest(HttpBuilder httpBuilder) {
         openConnection();
-        if(connSuccess){
+        if (connSuccess) {
             setCommonParams();
             setHeadParams();
         }
@@ -57,6 +57,7 @@ public class NativeNetEngine implements INetEngine {
 
     /**
      * 打开连接
+     *
      * @return
      */
     private boolean openConnection() {
@@ -92,10 +93,10 @@ public class NativeNetEngine implements INetEngine {
         mConnection.setReadTimeout(FTHttpConfig.get().readOutTime);
     }
 
-    private void setHeadParams(){
-        if(mHttpBuilder != null && connSuccess){
+    private void setHeadParams() {
+        if (mHttpBuilder != null && connSuccess) {
             HashMap head = mHttpBuilder.getHeadParams();
-            Set<Map.Entry<String,String>> entries = head.entrySet();
+            Set<Map.Entry<String, String>> entries = head.entrySet();
             for (Map.Entry<String, String> entry : entries) {
                 mConnection.addRequestProperty(entry.getKey(), entry.getValue());
             }
@@ -108,12 +109,12 @@ public class NativeNetEngine implements INetEngine {
             return request();
         } catch (Exception e) {
             LogUtils.e(e.getMessage());
-            return getResponseData(UNKNOWN_EXCEPTION_CODE,e.getMessage());
+            return getResponseData(UNKNOWN_EXCEPTION_CODE, e.getMessage());
         }
     }
 
-    private ResponseData request()  {
-        if(!connSuccess){
+    private ResponseData request() {
+        if (!connSuccess) {
             //如果连接失败，直接返回相应提示
             return getResponseData(responseCode,
                     "");
@@ -151,7 +152,7 @@ public class NativeNetEngine implements INetEngine {
                 while ((tempLine = reader.readLine()) != null) {
                     resultBuffer.append(tempLine);
                 }
-            } else{
+            } else {
                 inputStream = mConnection.getInputStream();
                 inputStreamReader = new InputStreamReader(inputStream, CHARSET);
                 reader = new BufferedReader(inputStreamReader);
@@ -159,25 +160,30 @@ public class NativeNetEngine implements INetEngine {
                     resultBuffer.append(tempLine);
                 }
             }
-        } catch (SocketTimeoutException e){
+        } catch (SocketTimeoutException e) {
             //连接超时提示
             responseCode = HttpURLConnection.HTTP_CLIENT_TIMEOUT;
-        } catch (IOException e){
+        } catch (IOException e) {
             //IO异常提示
             responseCode = NetCodeStatus.FILE_IO_EXCEPTION_CODE;
-        }catch (Exception e){
+        } catch (Exception e) {
             //其他异常未知错误
             e.printStackTrace();
-        }finally {
-            close(outputStream, reader, inputStreamReader, inputStream);
+        } finally {
+            close(mConnection, outputStream, reader, inputStreamReader, inputStream);
         }
         return getResponseData(responseCode, resultBuffer.toString());
     }
 
-    private void close(OutputStream outputStream,
-                       BufferedReader reader,
-                       InputStreamReader inputStreamReader,
-                       InputStream inputStream) {
+    private void close(
+            HttpURLConnection connection,
+            OutputStream outputStream,
+            BufferedReader reader,
+            InputStreamReader inputStreamReader,
+            InputStream inputStream) {
+        if (connection != null) {
+            connection.disconnect();
+        }
         try {
             if (outputStream != null) {
                 outputStream.close();
@@ -216,7 +222,7 @@ public class NativeNetEngine implements INetEngine {
      * @return
      */
     private ResponseData getResponseData(int code, String message) {
-        return new ResponseData(code,message);
+        return new ResponseData(code, message);
     }
 }
 
