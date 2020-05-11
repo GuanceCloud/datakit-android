@@ -374,7 +374,9 @@ public class NetUtils {
             WifiInfo wifiInfo = manager.getConnectionInfo();
             if (wifiInfo != null) {
                 ssId = wifiInfo.getSSID();
-                if ("<unknown ssid>".equals(ssId)) {
+                if (ssId.length() > 2 && ssId.charAt(0) == '"' && ssId.charAt(ssId.length() - 1) == '"') {
+                    return ssId.substring(1, ssId.length() - 1);
+                }else if(ssId.contains("<unknown ssid>")){
                     ssId = Constants.UNKNOWN;
                 }
             }
