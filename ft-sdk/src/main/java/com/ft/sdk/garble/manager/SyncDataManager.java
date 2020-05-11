@@ -37,6 +37,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -836,6 +837,7 @@ public class SyncDataManager {
         objectHashMap.put("device_model", DeviceUtils.getDeviceModel());
         objectHashMap.put("display", DeviceUtils.getDisplay(context));
         objectHashMap.put("carrier", DeviceUtils.getCarrier(context));
+        objectHashMap.put("locale", Locale.getDefault());
         if (FTHttpConfig.get().useOaid) {
             objectHashMap.put("oaid", OaidUtils.getOAID(context));
         }
