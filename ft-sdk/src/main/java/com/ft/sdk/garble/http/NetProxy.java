@@ -38,6 +38,9 @@ public class NetProxy {
     }
 
     public <T extends ResponseData> T execute(Class<T> tClass){
+        if(!Utils.isNetworkAvailable()){
+            return getResponseData(tClass, NetCodeStatus.NETWORK_EXCEPTION_CODE, "网络未连接");
+        }
         if(!httpBuilder.getUrl().startsWith("http://") && !httpBuilder.getUrl().startsWith("https://")){
             //请求地址为空是提示错误
             return getResponseData(tClass, NetCodeStatus.UNKNOWN_EXCEPTION_CODE, "请求地址错误");
