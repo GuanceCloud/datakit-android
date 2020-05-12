@@ -150,10 +150,9 @@ public class SyncTaskManager {
         try {
             syncCallback.onResponse(result.getCode(),result.getMessage());
         } catch (Exception e) {
-            syncCallback.onResponse(NetCodeStatus.UNKNOWN_EXCEPTION_CODE,"");
-            LogUtils.e("请在混淆文件中添加 -keep class * extends com.ft.sdk.garble.http.ResponseData{\n" +
-                    "     *;\n" +
-                    "}");
+            e.printStackTrace();
+            syncCallback.onResponse(NetCodeStatus.UNKNOWN_EXCEPTION_CODE,e.getLocalizedMessage());
+            LogUtils.e("同步上传错误："+e.getLocalizedMessage());
         }
 
     }

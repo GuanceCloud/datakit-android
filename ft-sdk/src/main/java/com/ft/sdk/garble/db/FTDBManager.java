@@ -9,6 +9,7 @@ import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.db.base.DBManager;
 import com.ft.sdk.garble.db.base.DatabaseHelper;
+import com.ft.sdk.garble.utils.LogUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +48,13 @@ public class FTDBManager extends DBManager {
             contentValues.put(FTSQL.RECORD_COLUMN_TM, data.getTime());
             contentValues.put(FTSQL.RECORD_COLUMN_DATA, data.getJsonString());
             contentValues.put(FTSQL.RECORD_COLUMN_SESSION_ID, data.getSessionid());
-            db.insert(FTSQL.FT_TABLE_NAME, null, contentValues);
+            try {
+                long value = db.insert(FTSQL.FT_TABLE_NAME, null, contentValues);
+                LogUtils.d("insert value:"+value);
+            }catch (Exception e){
+                e.printStackTrace();
+                LogUtils.e("insert error message:"+e.getLocalizedMessage());
+            }
         });
     }
 

@@ -1,12 +1,12 @@
 package com.ft;
 
+import android.util.Log;
+
 import com.ft.sdk.FTMonitor;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.INetEngine;
-import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.http.ResponseData;
-import com.ft.sdk.garble.utils.LogUtils;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -121,10 +121,10 @@ public class OkHttpEngine implements INetEngine {
             }
             return new ResponseData(response.code(), string);
         }catch (IOException e) {
-            LogUtils.e(e.getLocalizedMessage()+",检查本地网络连接是否正常");
-            return new ResponseData(NetCodeStatus.FILE_IO_EXCEPTION_CODE, e.getLocalizedMessage()+",检查本地网络连接是否正常");
+            Log.e("FT-SDK",e.getLocalizedMessage()+",检查本地网络连接是否正常");
+            return new ResponseData(103, e.getLocalizedMessage()+",检查本地网络连接是否正常");
         }catch (Exception e) {
-            return new ResponseData(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, e.getLocalizedMessage());
+            return new ResponseData(104, e.getLocalizedMessage());
         }
     }
 }
