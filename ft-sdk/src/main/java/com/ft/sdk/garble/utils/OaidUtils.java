@@ -66,7 +66,7 @@ public class OaidUtils {
             Method initEntry = jLibrary.getDeclaredMethod("InitEntry", Context.class);
             initEntry.invoke(null, context);
 
-            Class identifyListener = Class.forName("com.bun.miitmdid.core.IIdentifierListener");
+            Class identifyListener = Class.forName("com.bun.supplier.IIdentifierListener");
             // 创建 OAID 获取实例
             IdentifyListenerHandler handler = new IdentifyListenerHandler();
             Object iIdentifierListener = Proxy.newProxyInstance(context.getClassLoader(), new Class[]{identifyListener}, handler);
@@ -110,10 +110,12 @@ public class OaidUtils {
             try {
                 if ("OnSupport".equals(method.getName())) {
                     if ((Boolean) args[0]) {
-                        Class<?> idSupplier = Class.forName("com.bun.miitmdid.supplier.IdSupplier");
+                        Class<?> idSupplier = Class.forName("com.bun.supplier.IdSupplier");
                         Method getOAID = idSupplier.getDeclaredMethod("getOAID");
                         oaid = (String) getOAID.invoke(args[1]);
                         //LogUtils.d("oaid:" + oaid);
+                    }else{
+                        LogUtils.e("当前设备不支持 OAID");
                     }
 
                     countDownLatch.countDown();
