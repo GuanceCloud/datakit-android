@@ -3,6 +3,7 @@ package com.ft;
 import com.ft.sdk.FTMonitor;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.INetEngine;
+import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.http.ResponseData;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -119,11 +120,11 @@ public class OkHttpEngine implements INetEngine {
                 string = responseBody.string();
             }
             return new ResponseData(response.code(), string);
-        } catch (ConnectException e){
-            LogUtils.e(e.getLocalizedMessage());
         }catch (IOException e) {
-            e.printStackTrace();
+            LogUtils.e(e.getLocalizedMessage()+",检查本地网络连接是否正常");
+            return new ResponseData(NetCodeStatus.FILE_IO_EXCEPTION_CODE, e.getLocalizedMessage()+",检查本地网络连接是否正常");
+        }catch (Exception e) {
+            return new ResponseData(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, e.getLocalizedMessage());
         }
-        return null;
     }
 }
