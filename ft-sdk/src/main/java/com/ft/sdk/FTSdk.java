@@ -190,8 +190,8 @@ public class FTSdk {
             FTAutoTrackConfig.get().initParams(mFtSDKConfig);
             FTMonitorConfig.get().initParams(mFtSDKConfig);
             FTUserConfig.get().setNeedBindUser(mFtSDKConfig.isNeedBindUser());
+            FTUserConfig.get().initSessionId();
             if (mFtSDKConfig.isNeedBindUser()) {
-                FTUserConfig.get().initSessionId();
                 FTUserConfig.get().initUserDataFromDB();
             }
             FTNetworkListener.get().monitor();
@@ -216,7 +216,7 @@ public class FTSdk {
      * 解绑 Activity 生命周期监控
      */
     private void unregisterActivityLifeCallback() {
-        if(life != null) {
+        if (life != null) {
             getApplication().unregisterActivityLifecycleCallbacks(life);
             life = null;
         }
