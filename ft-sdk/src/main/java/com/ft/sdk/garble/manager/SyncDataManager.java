@@ -749,7 +749,7 @@ public class SyncDataManager {
         try {
             tags.put("torch", CameraUtils.get().isTorchState());
         } catch (JSONException e) {
-            LogUtils.e("FPS数据获取异常:" + e.getMessage());
+            LogUtils.e("闪光灯数据获取异常:" + e.getMessage());
         }
     }
 

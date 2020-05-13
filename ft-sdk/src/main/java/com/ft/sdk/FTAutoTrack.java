@@ -383,7 +383,7 @@ public class FTAutoTrack {
      *
      * @param clazz
      */
-    public static void startPage(Class<?> clazz,boolean isFirstLoad) {
+    public static void startPage(Class<?> clazz, boolean isFirstLoad) {
         /*没有开启自动埋点*/
         if (!FTAutoTrackConfig.get().isAutoTrack()) {
             return;
@@ -404,7 +404,7 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)) {
             return;
         }
-        putRecordActivity(OP.OPEN_ACT, clazz,isFirstLoad);
+        putRecordActivity(OP.OPEN_ACT, clazz, isFirstLoad);
     }
 
     /**
@@ -433,7 +433,7 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)) {
             return;
         }
-        putRecordActivity(OP.CLS_ACT, clazz,false);
+        putRecordActivity(OP.CLS_ACT, clazz, false);
     }
 
     /**
@@ -532,11 +532,11 @@ public class FTAutoTrack {
      * @param op
      * @param classCurrent
      */
-    public static void putRecordActivity(@NonNull OP op, Class classCurrent,boolean isFirstLoad) {
+    public static void putRecordActivity(@NonNull OP op, Class classCurrent, boolean isFirstLoad) {
         long time = System.currentTimeMillis();
         Class parentClass = FTActivityManager.get().getLastActivity();
         String parentPageName = Constants.FLOW_ROOT;
-        if(op == OP.OPEN_ACT) {
+        if (op == OP.OPEN_ACT) {
             //是第一次加载 Activity ，说明其为从其他Activity 中打开
             if (isFirstLoad) {
                 //如果没有上一个 Activity 说明其为 根结点
@@ -548,7 +548,7 @@ public class FTAutoTrack {
                         Class c = FTFragmentManager.getInstance().getLastFragmentName(parentClass.getName());
                         if (c != null) {
                             parentPageName = parentClass.getSimpleName() + "." + c.getSimpleName();
-                        }else{
+                        } else {
                             parentPageName = parentClass.getSimpleName();
                         }
                     } else {
@@ -567,10 +567,10 @@ public class FTAutoTrack {
                         if (isFromFragment) {
                             //这部分需要创建一条子页面的数据
                             Class lastFragment = FTFragmentManager.getInstance().getLastFragmentName(classCurrent.getName());
-                            if(lastFragment != null) {
-                                parentPageName = Constants.MOCK_SON_PAGE_DATA+":"+lastFragment.getSimpleName()+":"+parentClass.getSimpleName();
-                            }else{
-                                parentPageName = Constants.MOCK_SON_PAGE_DATA+":"+parentClass.getSimpleName();
+                            if (lastFragment != null) {
+                                parentPageName = Constants.MOCK_SON_PAGE_DATA + ":" + lastFragment.getSimpleName() + ":" + parentClass.getSimpleName();
+                            } else {
+                                parentPageName = Constants.MOCK_SON_PAGE_DATA + ":" + parentClass.getSimpleName();
                             }
                         } else {
                             //从Activity 中打开则找到上一个Activity
