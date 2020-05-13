@@ -7,7 +7,6 @@ import android.location.Address;
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
-import com.ft.sdk.garble.FTAutoTrackConfig;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.FTUserConfig;
@@ -66,24 +65,7 @@ public class SyncDataManager {
         for (RecordData recordData : recordDatas) {
             if (OP.OPEN_ACT.value.equals(recordData.getOp())) {
                 //如果是页面打开操作，就在该条数据上添加一条表示流程图的数据
-                try {
-                    JSONObject opData = new JSONObject(recordData.getOpdata());
-                    //获取指标名称
-                    String measurement;
-                    if (opData.has(Constants.MEASUREMENT)) {
-                        measurement = opData.optString(Constants.MEASUREMENT);
-                    } else {
-                        measurement = FTAutoTrackConfig.get().getProduct();
-                    }
-                    if (Utils.isNullOrEmpty(measurement)) {
-                        sb.append("$flow_mobile_activity");
-                    } else {
-                        sb.append("$flow_mobile_activity_").append(measurement);
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
+                sb.append("$flow_mobile_activity");
                 sb.append(",$traceId=").append(recordData.getTraceId());
                 if (recordData.getPpn() != null && recordData.getPpn().startsWith(Constants.MOCK_SON_PAGE_DATA)) {
                     String[] strArr = recordData.getPpn().split(":");
@@ -116,24 +98,7 @@ public class SyncDataManager {
                 sb.append("\n");
             } else if (OP.OPEN_FRA.value.equals(recordData.getOp())) {
                 //如果是子页面打开操作，就在该条数据上添加一条表示流程图的数据
-                try {
-                    JSONObject opData = new JSONObject(recordData.getOpdata());
-                    //获取指标名称
-                    String measurement;
-                    if (opData.has(Constants.MEASUREMENT)) {
-                        measurement = opData.optString(Constants.MEASUREMENT);
-                    } else {
-                        measurement = FTAutoTrackConfig.get().getProduct();
-                    }
-                    if (Utils.isNullOrEmpty(measurement)) {
-                        sb.append("$flow_mobile_activity");
-                    } else {
-                        sb.append("$flow_mobile_activity_").append(measurement);
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
+                sb.append("$flow_mobile_activity");
                 sb.append(",$traceId=").append(recordData.getTraceId());
                 sb.append(",$name=").append(recordData.getRpn()).append(".").append(recordData.getCpn());
                 //如果父页面是root表示其为起始节点，不添加父节点
@@ -179,24 +144,15 @@ public class SyncDataManager {
         String measurement;
         try {
             JSONObject jsonObject = new JSONObject(recordData.getOpdata());
-            String measurementTemp = jsonObject.optString(Constants.MEASUREMENT);
             if (CSTM.value.equals(recordData.getOp()) || FLOW_CHAT.value.equals(recordData.getOp())) {
+                String measurementTemp = jsonObject.optString(Constants.MEASUREMENT);
                 if (Utils.isNullOrEmpty(measurementTemp)) {
                     measurement = FT_KEY_VALUE_NULL;
                 } else {
                     measurement = Utils.translateMeasurements(measurementTemp);
                 }
             } else {
-                if (!Utils.isNullOrEmpty(measurementTemp)) {
-                    measurement = measurementTemp;
-                } else {
-                    measurement = FTAutoTrackConfig.get().getProduct();
-                }
-                if (!Utils.isNullOrEmpty(measurement)) {
-                    measurement = FT_DEFAULT_MEASUREMENT + "_" + measurement;
-                } else {
-                    measurement = FT_DEFAULT_MEASUREMENT;
-                }
+                measurement = FT_DEFAULT_MEASUREMENT;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -315,7 +271,7 @@ public class SyncDataManager {
                 JSONObject tags = opJson.optJSONObject(Constants.TAGS);
                 if (tags != null) {
                     tags.put("event_id", Utils.MD5(getEventName(recordData.getOp())));
-                }else{
+                } else {
                     tags = new JSONObject();
                     tags.put("event_id", Utils.MD5(getEventName(recordData.getOp())));
                 }
@@ -385,13 +341,7 @@ public class SyncDataManager {
         addMonitorData(tags, fields);
         StringBuffer sb = new StringBuffer();
         //获取这条事件的指标
-        String measurement = FTAutoTrackConfig.get().getProduct();
-        if (!Utils.isNullOrEmpty(measurement)) {
-            measurement = Constants.FT_MONITOR_MEASUREMENT + "_" + measurement;
-        } else {
-            measurement = Constants.FT_MONITOR_MEASUREMENT;
-        }
-        sb.append(measurement);
+        sb.append(Constants.FT_MONITOR_MEASUREMENT);
         StringBuffer tagSb = getCustomHash(tags, true);
         StringBuffer fieldSb = getCustomHash(fields, false);
         deleteLastComma(tagSb);

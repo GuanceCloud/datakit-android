@@ -595,11 +595,13 @@ public class FTAutoTrack {
                 try {
                     JSONObject tags = new JSONObject();
                     JSONObject fields = new JSONObject();
-                    fields.put("vtp",vtp);
+                    if(vtp != null) {
+                        fields.put("vtp", vtp);
+                        tags.put("vtp_id",Utils.MD5(vtp));
+                    }
                     SyncDataManager.addMonitorData(tags,fields);
                     opData.put(Constants.TAGS, tags);
                     opData.put(Constants.FIELDS, fields);
-                    opData.put(Constants.MEASUREMENT, FTAutoTrackConfig.get().getProduct());
                     recordData.setOpdata(opData.toString());
                 } catch (Exception e) {
                 }
