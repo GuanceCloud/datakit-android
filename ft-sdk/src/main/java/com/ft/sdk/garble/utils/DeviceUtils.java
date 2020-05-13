@@ -424,9 +424,9 @@ public class DeviceUtils {
      * 获取系统的亮度(值范围在0-255)
      * @return
      */
-    public static int getSystemScreenBrightnessValue(){
+    public static double getSystemScreenBrightnessValue(){
         ContentResolver contentResolver = FTApplication.getApplication().getContentResolver();
         int defVal = 125;
-        return Settings.System.getInt(contentResolver,Settings.System.SCREEN_BRIGHTNESS,defVal);
+        return Settings.System.getInt(contentResolver,Settings.System.SCREEN_BRIGHTNESS,defVal)/255d;
     }
 }
