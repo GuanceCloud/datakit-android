@@ -39,7 +39,10 @@ import org.json.JSONObject;
 public class FTAutoTrack {
     /**
      * 启动 APP
+     * 警告！！！该方法不能删除
+     * @deprecated 该方法原来被 FT Plugin 插件调用，目前不再使用。目前监控应用的启动使用{@link #startApp()}方法
      */
+    @Deprecated
     public static void startApp(Object object) {
         try {
             startApp();
@@ -50,7 +53,8 @@ public class FTAutoTrack {
 
     /**
      * Activity 打开的方式（标记是从 Fragment 打开还是 Activity）
-     *
+     * 警告！！！该方法不能删除
+     * 该方法原来被 FT Plugin 插件调用
      * @param fromFragment
      * @param intent
      */
@@ -67,7 +71,10 @@ public class FTAutoTrack {
 
     /**
      * Activity 开启
+     * 警告！！！该方法不能删除
+     * @deprecated 该方法原来被 FT Plugin 插件调用，目前不再使用。目前监控应用的启动使用{@link #startPage(Class, boolean)}方法
      */
+    @Deprecated
     public static void activityOnCreate(Class clazz) {
         try {
             //startPage(clazz);
@@ -79,7 +86,10 @@ public class FTAutoTrack {
 
     /**
      * Activity 关闭
+     * 警告！！！该方法不能删除
+     * @deprecated 该方法原来被 FT Plugin 插件调用，目前不再使用。目前监控应用的启动使用{@link #destroyPage(Class)}方法
      */
+    @Deprecated
     public static void activityOnDestroy(Class clazz) {
         try {
             //destroyPage(clazz);
@@ -90,7 +100,7 @@ public class FTAutoTrack {
 
     /**
      * 通知 Fragment 的显示隐藏状态
-     *
+     * 警告！！！该方法不能删除
      * @param clazz
      * @param activity
      * @param isVisible
@@ -113,10 +123,12 @@ public class FTAutoTrack {
 
     /**
      * Fragment 打开
-     *
+     * 警告！！！该方法不能删除
+     * @deprecated 该方法原来被 FT Plugin 插件调用，目前不再使用。目前监控应用的启动使用{@link #startPage(Object, Object, String)}方法
      * @param clazz
      * @param activity
      */
+    @Deprecated
     public static void fragmentOnResume(Object clazz, Object activity) {
         try {
             //LogUtils.d("Fragment[\nOnCreateView=====>fragment:"+((Class)clazz).getSimpleName());
@@ -128,10 +140,12 @@ public class FTAutoTrack {
 
     /**
      * Fragment 关闭
-     *
+     * 警告！！！该方法不能删除
+     * @deprecated 该方法原来被 FT Plugin 插件调用，目前不再使用。目前监控应用的启动使用{@link #destroyPage(Object, Object, String)}方法
      * @param clazz
      * @param activity
      */
+    @Deprecated
     public static void fragmentOnPause(Object clazz, Object activity) {
         try {
             //LogUtils.d("Fragment[\nOnDestroyView=====>fragment:"+((Class)clazz).getSimpleName());
