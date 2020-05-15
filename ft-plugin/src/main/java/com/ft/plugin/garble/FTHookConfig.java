@@ -385,13 +385,13 @@ public class FTHookConfig {
                 "(Landroid/view/MenuItem;)V",
                 1, 1,Arrays.asList(Opcodes.ALOAD)));
 
-        addInterfaceMethod(new FTMethodCell(
+        /**addInterfaceMethod(new FTMethodCell(
                 "onTouch",
                 "(Landroid/view/View;Landroid/view/MotionEvent;)Z",
                 "android/view/View$OnTouchListener",
                 "trackViewOnTouch",
                 "(Landroid/view/View;Landroid/view/MotionEvent;)V",
-                1, 2,Arrays.asList(Opcodes.ALOAD,Opcodes.ILOAD)));//
+                1, 2,Arrays.asList(Opcodes.ALOAD,Opcodes.ILOAD)));//*/
 
     }
 
@@ -545,13 +545,13 @@ public class FTHookConfig {
                 "(Landroid/view/MenuItem;)V",
                 1, 1,Arrays.asList(Opcodes.ALOAD)));
 
-        addLambdaMethod1(new FTMethodCell(
+        /**addLambdaMethod1(new FTMethodCell(
                 "onTouch",
                 "(Landroid/view/View;Landroid/view/MotionEvent;)Z",
                 "Landroid/view/View$OnTouchListener;",
                 "trackViewOnTouch",
                 "(Landroid/view/View;Landroid/view/MotionEvent;)V",
-                1, 2,Arrays.asList(Opcodes.ALOAD,Opcodes.ILOAD)));
+                1, 2,Arrays.asList(Opcodes.ALOAD,Opcodes.ILOAD)));*/
 
     }
 
