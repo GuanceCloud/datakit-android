@@ -7,7 +7,7 @@ package com.ft.plugin.garble;
  */
 public class VersionConfig {
     //当前插件的版本
-    public final static String PLUGIN_VERSION = "1.0.1-alpha06";
+    public final static String PLUGIN_VERSION = "1.0.1-alpha07";
     //当前插件支持的最小 SDK 版本
     public final static String MIN_SDK_VERSION = "1.0.1-alpha09";
 
