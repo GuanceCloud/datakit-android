@@ -9,6 +9,9 @@ import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * BY huangDianHua
  * DATE:2019-12-02 15:15
@@ -42,8 +45,8 @@ public class DemoApplication extends Application {
                 .setEnableAutoTrackType(FTAutoTrackType.APP_CLICK.type |
                         FTAutoTrackType.APP_END.type |
                         FTAutoTrackType.APP_START.type)//设置埋点事件类型的白名单
-                //.setWhiteActivityClasses(Arrays.asList(MainActivity.class, Main2Activity.class))//设置埋点页面的白名单
-                //.setWhiteViewClasses(Arrays.asList(Button.class, RadioGroup.class))
+                .addPageDesc(pageAliasMap())
+                .addVtpDesc(eventAliasMap())
                 .setOpenFlowChart(true)
                 .setMonitorType(MonitorType.ALL)//设置监控项
                 .setINetEngineClass(OkHttpEngine.class);
@@ -53,5 +56,24 @@ public class DemoApplication extends Application {
                 .setMonitorType(MonitorType.ALL)
                 .setPeriod(10)
                 .start();
+    }
+
+    private Map<String,String> pageAliasMap(){
+        Map<String,String> aliasMap =  new HashMap<String,String>();
+        aliasMap.put("MainActivity","主页面");
+        aliasMap.put("Tab1Fragment","子页面1");
+        aliasMap.put("Main2Activity","第二个页面");
+        return aliasMap;
+    }
+
+    private Map<String,String> eventAliasMap(){
+        Map<String,String> aliasMap =  new HashMap<String,String>();
+        aliasMap.put("ViewRootImpl/DecorView/LinearLayout/FrameLayout/ActionBarOverlayLayout/ContentFrameLayout/ScrollView/LinearLayout/AppCompatButton/#showKotlinActivity",
+                "跳转到第二个页面");
+        aliasMap.put("ViewRootImpl/DecorView/LinearLayout/FrameLayout/ActionBarOverlayLayout/ContentFrameLayout/ScrollView/LinearLayout/AppCompatButton/#btn_lam",
+                "页面第一个按钮");
+        aliasMap.put("ViewRootImpl/DecorView/LinearLayout/FrameLayout/ActionBarOverlayLayout/ContentFrameLayout/ScrollView/LinearLayout/AppCompatButton/#showDialog",
+                "弹出弹框");
+        return aliasMap;
     }
 }

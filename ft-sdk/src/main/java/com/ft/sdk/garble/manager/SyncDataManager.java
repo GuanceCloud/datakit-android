@@ -7,6 +7,7 @@ import android.location.Address;
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
+import com.ft.sdk.garble.FTAliasConfig;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.FTUserConfig;
@@ -258,23 +259,21 @@ public class SyncDataManager {
      */
     private String composeAutoUpdateData(RecordData recordData) {
         StringBuffer sb = new StringBuffer();
-        if (!Utils.isNullOrEmpty(recordData.getCpn())) {
-            sb.append("current_page_name=" + recordData.getCpn() + ",");
-        }
-        if (!Utils.isNullOrEmpty(recordData.getRpn())) {
-            sb.append("root_page_name=" + recordData.getRpn() + ",");
-        }
         JSONObject fields = null;
         if (recordData.getOpdata() != null) {
             try {
                 JSONObject opJson = new JSONObject(recordData.getOpdata());
                 JSONObject tags = opJson.optJSONObject(Constants.TAGS);
-                if (tags != null) {
-                    tags.put("event_id", Utils.MD5(getEventName(recordData.getOp())));
-                } else {
+                if (tags == null) {
                     tags = new JSONObject();
-                    tags.put("event_id", Utils.MD5(getEventName(recordData.getOp())));
                 }
+                if (!Utils.isNullOrEmpty(recordData.getCpn())) {
+                    tags.put("current_page_name",recordData.getCpn());
+                }
+                if (!Utils.isNullOrEmpty(recordData.getRpn())) {
+                    tags.put("root_page_name", recordData.getRpn());
+                }
+                tags.put("event_id", Utils.MD5(getEventName(recordData.getOp())));
                 sb.append(getCustomHash(tags, true));
                 fields = opJson.optJSONObject(Constants.FIELDS);
             } catch (Exception e) {
@@ -293,6 +292,9 @@ public class SyncDataManager {
         if (fields != null) {
             try {
                 fields.put("event", getEventName(recordData.getOp()));
+                if (!Utils.isNullOrEmpty(recordData.getCpn())) {
+                    fields.put("page_desc",FTAliasConfig.get().getPageAlias(recordData.getCpn()));
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }

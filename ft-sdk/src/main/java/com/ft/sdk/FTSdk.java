@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.FTActivityLifecycleCallbacks;
+import com.ft.sdk.garble.FTAliasConfig;
 import com.ft.sdk.garble.FTAutoTrackConfig;
 import com.ft.sdk.garble.FTFlowChartConfig;
 import com.ft.sdk.garble.FTHttpConfig;
@@ -186,6 +187,7 @@ public class FTSdk {
     private void initFTConfig() {
         if (mFtSDKConfig != null) {
             LogUtils.setDebug(mFtSDKConfig.isDebug());
+            FTAliasConfig.get().initParams(mFtSDKConfig);
             FTHttpConfig.get().initParams(mFtSDKConfig);
             FTAutoTrackConfig.get().initParams(mFtSDKConfig);
             FTMonitorConfig.get().initParams(mFtSDKConfig);

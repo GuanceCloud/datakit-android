@@ -15,6 +15,7 @@ import android.widget.RadioGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.ft.sdk.garble.FTAliasConfig;
 import com.ft.sdk.garble.FTAutoTrackConfig;
 import com.ft.sdk.garble.FTFlowChartConfig;
 import com.ft.sdk.garble.FTFragmentManager;
@@ -280,7 +281,7 @@ public class FTAutoTrack {
 
     public static void trackMenuItem(Object object, MenuItem menuItem) {
         try {
-            clickView((Class<?>) object, AopUtils.getClassName(object), AopUtils.getSupperClassName(object), menuItem.getClass().getName()+"/"+menuItem.getItemId());
+            clickView((Class<?>) object, AopUtils.getClassName(object), AopUtils.getSupperClassName(object), menuItem.getClass().getName() + "/" + menuItem.getItemId());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -460,10 +461,11 @@ public class FTAutoTrack {
 
     /**
      * 监听触摸事件
+     *
      * @param view
      * @param motionEvent
      */
-    public static void trackViewOnTouch(View view, MotionEvent motionEvent){
+    public static void trackViewOnTouch(View view, MotionEvent motionEvent) {
 
     }
 
@@ -506,6 +508,7 @@ public class FTAutoTrack {
      * @param vtp
      */
     public static void clickView(View view, Class<?> clazz, String currentPage, String rootPage, String vtp) {
+        LogUtils.showAlias("当前点击事件的 vtp 值为:" + vtp);
         if (!FTAutoTrackConfig.get().isAutoTrack()) {
             return;
         }
@@ -554,6 +557,11 @@ public class FTAutoTrack {
      */
     public static void putRecordFragment(@NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String parentPage) {
         long time = System.currentTimeMillis();
+        try {
+            LogUtils.showAlias("当前页面的 name 值为:" + currentPage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         putRecord(time, op, currentPage, rootPage, parentPage, null);
     }
 
@@ -611,6 +619,11 @@ public class FTAutoTrack {
                 }
             }
         }
+        try {
+            LogUtils.showAlias("当前页面的 name 值为:" + classCurrent.getSimpleName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         putRecord(time, op, classCurrent.getSimpleName(), classCurrent.getSimpleName(), parentPageName, null);
     }
 
@@ -628,6 +641,7 @@ public class FTAutoTrack {
                     JSONObject fields = new JSONObject();
                     if (vtp != null) {
                         tags.put("vtp", vtp);
+                        fields.put("vtp_desc", FTAliasConfig.get().getEventAlias(vtp));
                         fields.put("vtp_id", Utils.MD5(vtp));
                     }
                     SyncDataManager.addMonitorData(tags, fields);
