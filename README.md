@@ -583,9 +583,75 @@ CPU 温度有些设备可能获取不到（每种手机可能 CPU 温度文件�
 ### 四、如何监控网络请求的相关时长
 DataFlux SDK 中网络请求基于 HttpUrlConnection 实现，其无法显示对于标题中数据项的监控。研究发现若想监控上面的数据
 需要使用 OKHttp 网络框架。OKHttp 中的 OkHttpClient 提供 eventListener(EventListener e) 来监听网络请求的
-全路径。因此若需要监控上面数据需要自行切换网络引擎。DataFlux SDK 中提供 INetEngine 接口，接入方只需要实现接口，并且在
-初始化 SDK 时，将实现的接口类通过 FTSDKConfig.setINetEngineClass(OkHttpEngine.class) 来使其生效。
-下面提供一种实现引擎的方式以供参考
+全路径。因此若需要监控上面数据需要自行切换网络引擎。
+
+#### 1、如果只需要监控自己应用中的网络请求全路径信息。只需要实现 EventListener 类然后在 OkHttpClient 中注册监听器。
+
+> 步骤1:实现 OkHttp 中的 EventListener 类
+```java
+public class OKHttpEventListener extends EventListener {
+    @Override
+    public void callEnd(@NotNull Call call) {
+        super.callEnd(call);
+        FTMonitor.get().setResponseEndTime();
+    }
+
+    @Override
+    public void callFailed(@NotNull Call call, @NotNull IOException ioe) {
+        super.callFailed(call, ioe);
+        FTMonitor.get().setRequestErrCount();
+    }
+
+    @Override
+    public void callStart(@NotNull Call call) {
+        super.callStart(call);
+        FTMonitor.get().setRequestCount();
+        FTMonitor.get().setResponseStartTime();
+    }
+
+    @Override
+    public void dnsEnd(@NotNull Call call, @NotNull String domainName, @NotNull List<InetAddress> inetAddressList) {
+        super.dnsEnd(call, domainName, inetAddressList);
+        FTMonitor.get().setDnsEndTime();
+    }
+
+    @Override
+    public void dnsStart(@NotNull Call call, @NotNull String domainName) {
+        super.dnsStart(call, domainName);
+        FTMonitor.get().setDnsStartTime();
+    }
+
+    @Override
+    public void secureConnectEnd(@NotNull Call call, @Nullable Handshake handshake) {
+        super.secureConnectEnd(call, handshake);
+        FTMonitor.get().setTcpEndTime();
+    }
+
+    @Override
+    public void secureConnectStart(@NotNull Call call) {
+        super.secureConnectStart(call);
+        FTMonitor.get().setTcpStartTime();
+    }
+}
+```
+
+> 步骤2:在 OkHttpClient 中注册网络请求监听器
+```java
+class 自己的网络请求类 {
+    public void 初始化OKHttp(){
+        new OkHttpClient.Builder()
+                    .connectTimeout(httpBuilder.getSendOutTime(), TimeUnit.MILLISECONDS)
+                    .readTimeout(httpBuilder.getReadOutTime(), TimeUnit.MILLISECONDS)
+                    .eventListener(new OKHttpEventListener())
+                    .build();
+    }
+}
+```
+> 步骤3:在初始化 SDK 时，将实现的接口类通过 FTSDKConfig.setINetEngineClass(OkHttpEngine.class) 来使其生效。
+
+#### 2、如果需要监控 DataFlux 中的网络请求全路径信息，需要按照以下步骤去实现（可以将下面代码直接复制到项目中使用）
+
+> 步骤1:实现 DataFlux SDK 中提供 INetEngine 接口
 ```java
 public class OkHttpEngine implements INetEngine {
     private static OkHttpClient client;
@@ -597,50 +663,7 @@ public class OkHttpEngine implements INetEngine {
             client = new OkHttpClient.Builder()
                     .connectTimeout(httpBuilder.getSendOutTime(), TimeUnit.MILLISECONDS)
                     .readTimeout(httpBuilder.getReadOutTime(), TimeUnit.MILLISECONDS)
-                    .eventListener(new EventListener() {
-                        @Override
-                        public void callEnd(@NotNull Call call) {
-                            super.callEnd(call);
-                            FTMonitor.get().setResponseEndTime();
-                        }
-
-                        @Override
-                        public void callFailed(@NotNull Call call, @NotNull IOException ioe) {
-                            super.callFailed(call, ioe);
-                            FTMonitor.get().setRequestErrCount();
-                        }
-
-                        @Override
-                        public void callStart(@NotNull Call call) {
-                            super.callStart(call);
-                            FTMonitor.get().setRequestCount();
-                            FTMonitor.get().setResponseStartTime();
-                        }
-
-                        @Override
-                        public void dnsEnd(@NotNull Call call, @NotNull String domainName, @NotNull List<InetAddress> inetAddressList) {
-                            super.dnsEnd(call, domainName, inetAddressList);
-                            FTMonitor.get().setDnsEndTime();
-                        }
-
-                        @Override
-                        public void dnsStart(@NotNull Call call, @NotNull String domainName) {
-                            super.dnsStart(call, domainName);
-                            FTMonitor.get().setDnsStartTime();
-                        }
-
-                        @Override
-                        public void secureConnectEnd(@NotNull Call call, @Nullable Handshake handshake) {
-                            super.secureConnectEnd(call, handshake);
-                            FTMonitor.get().setTcpEndTime();
-                        }
-
-                        @Override
-                        public void secureConnectStart(@NotNull Call call) {
-                            super.secureConnectStart(call);
-                            FTMonitor.get().setTcpStartTime();
-                        }
-                    })
+                    .eventListener(new OKHttpEventListener())
                     .build();
         }
     }
@@ -681,3 +704,52 @@ public class OkHttpEngine implements INetEngine {
 }
 
 ```
+> 步骤2:实现 OkHttp 中的 EventListener
+```java
+public class OKHttpEventListener extends EventListener {
+    @Override
+    public void callEnd(@NotNull Call call) {
+        super.callEnd(call);
+        FTMonitor.get().setResponseEndTime();
+    }
+
+    @Override
+    public void callFailed(@NotNull Call call, @NotNull IOException ioe) {
+        super.callFailed(call, ioe);
+        FTMonitor.get().setRequestErrCount();
+    }
+
+    @Override
+    public void callStart(@NotNull Call call) {
+        super.callStart(call);
+        FTMonitor.get().setRequestCount();
+        FTMonitor.get().setResponseStartTime();
+    }
+
+    @Override
+    public void dnsEnd(@NotNull Call call, @NotNull String domainName, @NotNull List<InetAddress> inetAddressList) {
+        super.dnsEnd(call, domainName, inetAddressList);
+        FTMonitor.get().setDnsEndTime();
+    }
+
+    @Override
+    public void dnsStart(@NotNull Call call, @NotNull String domainName) {
+        super.dnsStart(call, domainName);
+        FTMonitor.get().setDnsStartTime();
+    }
+
+    @Override
+    public void secureConnectEnd(@NotNull Call call, @Nullable Handshake handshake) {
+        super.secureConnectEnd(call, handshake);
+        FTMonitor.get().setTcpEndTime();
+    }
+
+    @Override
+    public void secureConnectStart(@NotNull Call call) {
+        super.secureConnectStart(call);
+        FTMonitor.get().setTcpStartTime();
+    }
+}
+
+```
+> 步骤3:在初始化 SDK 时，将实现的接口类通过 FTSDKConfig.setINetEngineClass(OkHttpEngine.class) 来使其生效。
