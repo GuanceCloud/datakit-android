@@ -5,6 +5,7 @@ import com.ft.sdk.garble.utils.DeviceUtils;
 
 import java.security.InvalidParameterException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * BY huangDianHua
@@ -44,6 +45,11 @@ public class FTSDKConfig {
     private List<Class<?>> blackActivityClass;
     private List<Class<?>> blackViewClass;
     private Class<? extends INetEngine> iNetEngineClass;
+
+    //页面别名对应 map
+    private Map<String,String> pageDescMap;
+    //事件别名对应 map
+    private Map<String,String> vtpDescMap;
 
     /**
      * 构建 SDK 必要的配置参数
@@ -168,6 +174,14 @@ public class FTSDKConfig {
     }
     public Class<? extends INetEngine> getINetEngineClass() {
         return iNetEngineClass;
+    }
+
+    public Map<String, String> getPageDescMap() {
+        return pageDescMap;
+    }
+
+    public Map<String, String> getVtpDescMap() {
+        return vtpDescMap;
     }
 
     /**
@@ -315,6 +329,26 @@ public class FTSDKConfig {
 
     public FTSDKConfig setINetEngineClass(Class<? extends INetEngine> iNetEngineClass) {
         this.iNetEngineClass = iNetEngineClass;
+        return this;
+    }
+
+    /**
+     * 页面别名对应 map
+     * @param pageDescMap
+     * @return
+     */
+    public FTSDKConfig addPageDesc(Map<String, String> pageDescMap) {
+        this.pageDescMap = pageDescMap;
+        return this;
+    }
+
+    /**
+     * 事件别名对应 map
+     * @param vtpDescMap
+     * @return
+     */
+    public FTSDKConfig addVtpDesc(Map<String, String> vtpDescMap) {
+        this.vtpDescMap = vtpDescMap;
         return this;
     }
 }
