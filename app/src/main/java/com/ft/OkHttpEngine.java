@@ -2,26 +2,16 @@ package com.ft;
 
 import android.util.Log;
 
-import com.ft.sdk.FTMonitor;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.INetEngine;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.http.ResponseData;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.io.IOException;
-import java.net.ConnectException;
-import java.net.InetAddress;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import okhttp3.Call;
-import okhttp3.EventListener;
-import okhttp3.Handshake;
 import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -44,50 +34,7 @@ public class OkHttpEngine implements INetEngine {
             client = new OkHttpClient.Builder()
                     .connectTimeout(httpBuilder.getSendOutTime(), TimeUnit.MILLISECONDS)
                     .readTimeout(httpBuilder.getReadOutTime(), TimeUnit.MILLISECONDS)
-                    .eventListener(new EventListener() {
-                        @Override
-                        public void callEnd(@NotNull Call call) {
-                            super.callEnd(call);
-                            FTMonitor.get().setResponseEndTime();
-                        }
-
-                        @Override
-                        public void callFailed(@NotNull Call call, @NotNull IOException ioe) {
-                            super.callFailed(call, ioe);
-                            FTMonitor.get().setRequestErrCount();
-                        }
-
-                        @Override
-                        public void callStart(@NotNull Call call) {
-                            super.callStart(call);
-                            FTMonitor.get().setRequestCount();
-                            FTMonitor.get().setResponseStartTime();
-                        }
-
-                        @Override
-                        public void dnsEnd(@NotNull Call call, @NotNull String domainName, @NotNull List<InetAddress> inetAddressList) {
-                            super.dnsEnd(call, domainName, inetAddressList);
-                            FTMonitor.get().setDnsEndTime();
-                        }
-
-                        @Override
-                        public void dnsStart(@NotNull Call call, @NotNull String domainName) {
-                            super.dnsStart(call, domainName);
-                            FTMonitor.get().setDnsStartTime();
-                        }
-
-                        @Override
-                        public void secureConnectEnd(@NotNull Call call, @Nullable Handshake handshake) {
-                            super.secureConnectEnd(call, handshake);
-                            FTMonitor.get().setTcpEndTime();
-                        }
-
-                        @Override
-                        public void secureConnectStart(@NotNull Call call) {
-                            super.secureConnectStart(call);
-                            FTMonitor.get().setTcpStartTime();
-                        }
-                    })
+                    .eventListener(new OKHttpEventListener())
                     .build();
         }
     }
@@ -120,10 +67,10 @@ public class OkHttpEngine implements INetEngine {
                 string = responseBody.string();
             }
             return new ResponseData(response.code(), string);
-        }catch (IOException e) {
-            Log.e("FT-SDK",e.getLocalizedMessage()+",检查本地网络连接是否正常");
-            return new ResponseData(103, e.getLocalizedMessage()+",检查本地网络连接是否正常");
-        }catch (Exception e) {
+        } catch (IOException e) {
+            Log.e("FT-SDK", e.getLocalizedMessage() + ",检查本地网络连接是否正常");
+            return new ResponseData(103, e.getLocalizedMessage() + ",检查本地网络连接是否正常");
+        } catch (Exception e) {
             return new ResponseData(104, e.getLocalizedMessage());
         }
     }
