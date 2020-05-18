@@ -478,6 +478,7 @@ public class FTAutoTrack {
      * @param vtp
      */
     public static void clickView(Class<?> clazz, String currentPage, String rootPage, String vtp) {
+        LogUtils.showAlias("当前点击事件的 vtp 值为:" + vtp);
         if (!FTAutoTrackConfig.get().isAutoTrack()) {
             return;
         }
