@@ -1,7 +1,6 @@
 package com.ft.sdk.garble;
 
 import com.ft.sdk.FTSDKConfig;
-import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.util.Map;
@@ -17,6 +16,8 @@ public class FTAliasConfig {
     private Map<String,String> pageAliasMap;
     //事件别名对应 map
     private Map<String,String> eventAliasMap;
+
+    private boolean flowChartAlias = true;
     private FTAliasConfig(){}
 
     public static FTAliasConfig get(){
@@ -39,25 +40,29 @@ public class FTAliasConfig {
 
     public String getPageAlias(String page){
         if(pageAliasMap == null){
-            return Constants.UNKNOWN;
-        }
-        page = pageAliasMap.get(page);
-        if(Utils.isNullOrEmpty(page)){
-            return Constants.UNKNOWN;
-        }else{
             return page;
+        }
+        String pageDesc = pageAliasMap.get(page);
+        if(Utils.isNullOrEmpty(pageDesc)){
+            return page;
+        }else{
+            return pageDesc;
         }
     }
 
     public String getEventAlias(String vtp){
         if(eventAliasMap == null){
-            return Constants.UNKNOWN;
-        }
-        vtp = eventAliasMap.get(vtp);
-        if(Utils.isNullOrEmpty(vtp)){
-            return Constants.UNKNOWN;
-        }else{
             return vtp;
         }
+        String vtpDesc = eventAliasMap.get(vtp);
+        if(Utils.isNullOrEmpty(vtpDesc)){
+            return vtp;
+        }else{
+            return vtpDesc;
+        }
+    }
+
+    public boolean isFlowChartAlias() {
+        return flowChartAlias;
     }
 }
