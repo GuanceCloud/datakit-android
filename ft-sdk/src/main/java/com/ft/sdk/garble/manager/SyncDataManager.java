@@ -494,7 +494,7 @@ public class SyncDataManager {
         try {
             BatteryBean batteryBean = BatteryUtils.getBatteryInfo(FTApplication.getApplication());
             tags.put("battery_total", batteryBean.getPower());
-            tags.put("battery_change", batteryBean.getPlugState());
+            tags.put("battery_charge_type", batteryBean.getPlugState());
             tags.put("battery_status", batteryBean.getStatus());
             fields.put("battery_use", batteryBean.getBr());
         } catch (Exception e) {
@@ -529,7 +529,7 @@ public class SyncDataManager {
             tags.put("cpu_no", DeviceUtils.getHardWare());
             fields.put("cpu_use", DeviceUtils.getCpuUseRate());
             fields.put("cpu_temperature", CpuUtils.get().getCpuTemperature());
-            fields.put("cpu_hz", CpuUtils.get().getCPUMaxFreqKHz());
+            tags.put("cpu_hz", CpuUtils.get().getCPUMaxFreqKHz());
         } catch (Exception e) {
             LogUtils.e("CPU数据获取异常:" + e.getMessage());
         }
@@ -652,7 +652,7 @@ public class SyncDataManager {
             if (set != null) {
                 int i = 1;
                 for (BluetoothDevice device : set) {
-                    tags.put("bt_device_" + (i++), device.getAddress());
+                    fields.put("bt_device" + (i++), device.getAddress());
                 }
             }
             tags.put("bt_open", BluetoothUtils.get().isOpen());
