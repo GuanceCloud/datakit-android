@@ -39,6 +39,7 @@ public class DemoApplication extends Application {
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setUseOAID(true)//设置 OAID 是否可用
                 .setDebug(true)//设置是否是 debug
+                .setDescLog(true)
                 .setGeoKey(true, AccountUtils.getProperty(this, AccountUtils.GEO_KEY))
                 .setNeedBindUser(false)//是否需要绑定用户信息
                 .enableAutoTrack(true)//设置是否开启自动埋点
@@ -48,6 +49,7 @@ public class DemoApplication extends Application {
                 .addPageDesc(pageAliasMap())
                 .addVtpDesc(eventAliasMap())
                 .setOpenFlowChart(true)
+                .flowChartShowDesc(true)
                 .setMonitorType(MonitorType.ALL)//设置监控项
                 .setINetEngineClass(OkHttpEngine.class);
         FTSdk.install(ftSDKConfig);
@@ -74,6 +76,8 @@ public class DemoApplication extends Application {
                 "页面第一个按钮");
         aliasMap.put("ViewRootImpl/DecorView/LinearLayout/FrameLayout/ActionBarOverlayLayout/ContentFrameLayout/ScrollView/LinearLayout/AppCompatButton/#showDialog",
                 "弹出弹框");
+        aliasMap.put("androidx.appcompat.view.menu.MenuItemImpl/2131165265",
+                "首页菜单栏");
         return aliasMap;
     }
 }

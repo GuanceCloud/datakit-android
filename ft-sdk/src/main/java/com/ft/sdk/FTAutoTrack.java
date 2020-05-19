@@ -559,7 +559,9 @@ public class FTAutoTrack {
     public static void putRecordFragment(@NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String parentPage) {
         long time = System.currentTimeMillis();
         try {
-            LogUtils.showAlias("当前页面的 name 值为:" + currentPage);
+            if(op == OP.OPEN_FRA) {
+                LogUtils.showAlias("当前页面的 name 值为:" + currentPage);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -621,7 +623,9 @@ public class FTAutoTrack {
             }
         }
         try {
-            LogUtils.showAlias("当前页面的 name 值为:" + classCurrent.getSimpleName());
+            if(op == OP.OPEN_ACT) {
+                LogUtils.showAlias("当前页面的 name 值为:" + classCurrent.getSimpleName());
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

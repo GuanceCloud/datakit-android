@@ -187,6 +187,7 @@ public class FTSdk {
     private void initFTConfig() {
         if (mFtSDKConfig != null) {
             LogUtils.setDebug(mFtSDKConfig.isDebug());
+            LogUtils.setDescLogShow(mFtSDKConfig.isDescLog());
             FTAliasConfig.get().initParams(mFtSDKConfig);
             FTHttpConfig.get().initParams(mFtSDKConfig);
             FTAutoTrackConfig.get().initParams(mFtSDKConfig);

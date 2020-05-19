@@ -20,7 +20,7 @@ public class LogUtils {
         mDebug = debug;
     }
 
-    public static void setAliasLogShow(boolean aliasLogShow) {
+    public static void setDescLogShow(boolean aliasLogShow) {
         LogUtils.aliasLogShow = aliasLogShow;
     }
 
