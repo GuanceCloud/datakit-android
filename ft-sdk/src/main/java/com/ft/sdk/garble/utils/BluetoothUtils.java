@@ -11,6 +11,8 @@ import android.os.Build;
 import com.ft.sdk.FTApplication;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -46,8 +48,24 @@ public class BluetoothUtils {
     }
 
     public Set<BluetoothDevice> getBondedDevices(){
+        Set<BluetoothDevice> result = new HashSet<>();
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        return bluetoothAdapter.getBondedDevices();
+        Set<BluetoothDevice> deviceSet = bluetoothAdapter.getBondedDevices();
+        Iterator<BluetoothDevice> iterator = deviceSet.iterator();
+        while (iterator.hasNext()) {
+            BluetoothDevice device = iterator.next();
+            try {
+                Method isConnectedMethod = BluetoothDevice.class.getDeclaredMethod("isConnected", (Class[]) null);
+                isConnectedMethod.setAccessible(true);
+                boolean isConnected = (boolean) isConnectedMethod.invoke(device, (Object[]) null);
+                if(isConnected) {
+                    result.add(device);
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        return result;
     }
 
     public void getBluetooth(){

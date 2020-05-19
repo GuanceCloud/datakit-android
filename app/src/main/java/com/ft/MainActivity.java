@@ -61,7 +61,10 @@ public class MainActivity extends AppCompatActivity {
         requestPermissions(new String[]{Manifest.permission.CAMERA
                 , Manifest.permission.ACCESS_FINE_LOCATION
                 , Manifest.permission.ACCESS_COARSE_LOCATION
-                , Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                , Manifest.permission.READ_PHONE_STATE
+                , Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ,Manifest.permission.BLUETOOTH
+                ,Manifest.permission.BLUETOOTH_ADMIN}, 1);
         setTitle("FT-SDK使用Demo");
         FTSdk.get().setGpuRenderer(findViewById(R.id.ll));
         showKotlinActivity = findViewById(R.id.showKotlinActivity);
