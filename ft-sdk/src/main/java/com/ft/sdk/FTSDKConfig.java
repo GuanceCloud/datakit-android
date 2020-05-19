@@ -23,6 +23,8 @@ public class FTSDKConfig {
     private boolean useOAID;
     //是否是Debug
     private boolean isDebug;
+    //是否显示别名日志
+    private boolean descLog;
     //高德逆向解析API 的 key
     private String geoKey;
     //是否使用高德作为逆向地址解析
@@ -50,6 +52,8 @@ public class FTSDKConfig {
     private Map<String,String> pageDescMap;
     //事件别名对应 map
     private Map<String,String> vtpDescMap;
+    //流程图是否显示别名
+    private boolean flowShowDesc;
 
     /**
      * 构建 SDK 必要的配置参数
@@ -120,6 +124,10 @@ public class FTSDKConfig {
         return isDebug;
     }
 
+    public boolean isDescLog() {
+        return descLog;
+    }
+
     public boolean isAutoTrack() {
         return autoTrack;
     }
@@ -184,6 +192,10 @@ public class FTSDKConfig {
         return vtpDescMap;
     }
 
+    public boolean isFlowShowDesc() {
+        return flowShowDesc;
+    }
+
     /**
      * 是否使用 UseOAID 作为设备唯一识别号的替代字段
      *
@@ -213,6 +225,11 @@ public class FTSDKConfig {
      */
     public FTSDKConfig setDebug(boolean debug) {
         isDebug = debug;
+        return this;
+    }
+
+    public FTSDKConfig setDescLog(boolean descLog) {
+        this.descLog = descLog;
         return this;
     }
 
@@ -349,6 +366,16 @@ public class FTSDKConfig {
      */
     public FTSDKConfig addVtpDesc(Map<String, String> vtpDescMap) {
         this.vtpDescMap = vtpDescMap;
+        return this;
+    }
+
+    /**
+     * 设置流程图是否显示别名
+     * @param flowShowDesc
+     * @return
+     */
+    public FTSDKConfig flowChartShowDesc(boolean flowShowDesc){
+        this.flowShowDesc = flowShowDesc;
         return this;
     }
 }

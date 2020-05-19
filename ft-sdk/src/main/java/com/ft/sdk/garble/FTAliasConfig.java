@@ -17,7 +17,7 @@ public class FTAliasConfig {
     //事件别名对应 map
     private Map<String,String> eventAliasMap;
 
-    private boolean flowChartAlias = true;
+    private boolean flowChartAlias = false;
     private FTAliasConfig(){}
 
     public static FTAliasConfig get(){
@@ -36,6 +36,7 @@ public class FTAliasConfig {
     public void initParams(FTSDKConfig ftsdkConfig){
         this.pageAliasMap = ftsdkConfig.getPageDescMap();
         this.eventAliasMap = ftsdkConfig.getVtpDescMap();
+        this.flowChartAlias = ftsdkConfig.isFlowShowDesc();
     }
 
     public String getPageAlias(String page){
