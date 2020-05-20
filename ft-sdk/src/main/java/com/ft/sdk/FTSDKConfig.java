@@ -52,8 +52,10 @@ public class FTSDKConfig {
     private Map<String,String> pageDescMap;
     //事件别名对应 map
     private Map<String,String> vtpDescMap;
-    //流程图是否显示别名
-    private boolean flowShowDesc;
+    //页面和视图树是否显示描述
+    private boolean pageVtpDescEnabled;
+    //流程图是否显示描述
+    private boolean flowChartDescEnabled;
 
     /**
      * 构建 SDK 必要的配置参数
@@ -192,8 +194,12 @@ public class FTSDKConfig {
         return vtpDescMap;
     }
 
-    public boolean isFlowShowDesc() {
-        return flowShowDesc;
+    public boolean isPageVtpDescEnabled() {
+        return pageVtpDescEnabled;
+    }
+
+    public boolean isFlowChartDescEnabled() {
+        return flowChartDescEnabled;
     }
 
     /**
@@ -369,13 +375,13 @@ public class FTSDKConfig {
         return this;
     }
 
-    /**
-     * 设置流程图是否显示别名
-     * @param flowShowDesc
-     * @return
-     */
-    public FTSDKConfig flowChartShowDesc(boolean flowShowDesc){
-        this.flowShowDesc = flowShowDesc;
+    public FTSDKConfig setPageVtpDescEnabled(boolean pageVtpDescEnabled) {
+        this.pageVtpDescEnabled = pageVtpDescEnabled;
+        return this;
+    }
+
+    public FTSDKConfig setFlowChartDescEnabled(boolean flowChartDescEnabled) {
+        this.flowChartDescEnabled = flowChartDescEnabled;
         return this;
     }
 }

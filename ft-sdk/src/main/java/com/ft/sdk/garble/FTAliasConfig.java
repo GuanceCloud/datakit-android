@@ -19,6 +19,7 @@ public class FTAliasConfig {
     private Map<String,String> eventAliasMap;
 
     private boolean flowChartAlias = false;
+    private boolean pageVtpAlias = false;
     private FTAliasConfig(){}
 
     public static FTAliasConfig get(){
@@ -37,10 +38,19 @@ public class FTAliasConfig {
     public void initParams(FTSDKConfig ftsdkConfig){
         this.pageAliasMap = ftsdkConfig.getPageDescMap();
         this.eventAliasMap = ftsdkConfig.getVtpDescMap();
-        this.flowChartAlias = ftsdkConfig.isFlowShowDesc();
+        this.flowChartAlias = ftsdkConfig.isFlowChartDescEnabled();
+        this.pageVtpAlias = ftsdkConfig.isPageVtpDescEnabled();
     }
 
-    public String getPageAlias(String page){
+    /**
+     * 返回流程图描述
+     * @param page
+     * @return
+     */
+    public String getFlowChartDesc(String page){
+        if(!flowChartAlias){
+            return page;
+        }
         if(pageAliasMap == null){
             return page;
         }
@@ -52,7 +62,15 @@ public class FTAliasConfig {
         }
     }
 
-    public String getEventAlias(String vtp){
+    /**
+     * 返回视图树描述
+     * @param vtp
+     * @return
+     */
+    public String getVtpDesc(String vtp){
+        if(!pageVtpAlias){
+            return Constants.UNKNOWN;
+        }
         if(eventAliasMap == null){
             return Constants.UNKNOWN;
         }
@@ -64,7 +82,23 @@ public class FTAliasConfig {
         }
     }
 
-    public boolean isFlowChartAlias() {
-        return flowChartAlias;
+    /**
+     * 返回页面描述
+     * @param page
+     * @return
+     */
+    public String getPageDesc(String page){
+        if(!pageVtpAlias){
+            return Constants.UNKNOWN;
+        }
+        if(pageAliasMap == null){
+            return Constants.UNKNOWN;
+        }
+        String pageDesc = pageAliasMap.get(page);
+        if(Utils.isNullOrEmpty(pageDesc)){
+            return Constants.UNKNOWN;
+        }else{
+            return pageDesc;
+        }
     }
 }

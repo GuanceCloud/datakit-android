@@ -560,7 +560,8 @@ public class FTAutoTrack {
         long time = System.currentTimeMillis();
         try {
             if(op == OP.OPEN_FRA) {
-                LogUtils.showAlias("当前页面的 name 值为:" + currentPage);
+                //显示Fragment的页面名称为 Activity.Fragment
+                LogUtils.showAlias("当前页面的 name 值为:" + rootPage+"."+currentPage);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -646,7 +647,7 @@ public class FTAutoTrack {
                     JSONObject fields = new JSONObject();
                     if (vtp != null) {
                         tags.put("vtp", vtp);
-                        fields.put("vtp_desc", FTAliasConfig.get().getEventAlias(vtp));
+                        fields.put("vtp_desc", FTAliasConfig.get().getVtpDesc(vtp));
                         fields.put("vtp_id", Utils.MD5(vtp));
                     }
                     SyncDataManager.addMonitorData(tags, fields);
