@@ -49,7 +49,8 @@ public class DemoApplication extends Application {
                 .addPageDesc(pageAliasMap())
                 .addVtpDesc(eventAliasMap())
                 .setOpenFlowChart(true)
-                .flowChartShowDesc(true)
+                .setFlowChartDescEnabled(true)
+                .setPageVtpDescEnabled(true)
                 .setMonitorType(MonitorType.ALL)//设置监控项
                 .setINetEngineClass(OkHttpEngine.class);
         FTSdk.install(ftSDKConfig);
@@ -63,18 +64,19 @@ public class DemoApplication extends Application {
     private Map<String,String> pageAliasMap(){
         Map<String,String> aliasMap =  new HashMap<String,String>();
         aliasMap.put("MainActivity","主页面");
-        aliasMap.put("Tab1Fragment","子页面1");
+        aliasMap.put("MainActivity.Tab1Fragment","子页面1");
+        aliasMap.put("MainActivity.Tab2Fragment","子页面2");
         aliasMap.put("Main2Activity","第二个页面");
         return aliasMap;
     }
 
     private Map<String,String> eventAliasMap(){
         Map<String,String> aliasMap =  new HashMap<String,String>();
-        aliasMap.put("ViewRootImpl/DecorView/LinearLayout/FrameLayout/ActionBarOverlayLayout/ContentFrameLayout/ScrollView/LinearLayout/AppCompatButton/#showKotlinActivity",
+        aliasMap.put("MainActivity/ViewRootImpl/DecorView/LinearLayout/FrameLayout/ActionBarOverlayLayout/ContentFrameLayout/ScrollView/LinearLayout/AppCompatButton/#showKotlinActivity",
                 "跳转到第二个页面");
-        aliasMap.put("ViewRootImpl/DecorView/LinearLayout/FrameLayout/ActionBarOverlayLayout/ContentFrameLayout/ScrollView/LinearLayout/AppCompatButton/#btn_lam",
+        aliasMap.put("MainActivity/ViewRootImpl/DecorView/LinearLayout/FrameLayout/ActionBarOverlayLayout/ContentFrameLayout/ScrollView/LinearLayout/AppCompatButton/#btn_lam",
                 "页面第一个按钮");
-        aliasMap.put("ViewRootImpl/DecorView/LinearLayout/FrameLayout/ActionBarOverlayLayout/ContentFrameLayout/ScrollView/LinearLayout/AppCompatButton/#showDialog",
+        aliasMap.put("MainActivity/ViewRootImpl/DecorView/LinearLayout/FrameLayout/ActionBarOverlayLayout/ContentFrameLayout/ScrollView/LinearLayout/AppCompatButton/#showDialog",
                 "弹出弹框");
         aliasMap.put("androidx.appcompat.view.menu.MenuItemImpl/2131165265",
                 "首页菜单栏");

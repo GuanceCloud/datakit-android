@@ -72,52 +72,23 @@ public class SyncDataManager {
                     String[] strArr = recordData.getPpn().split(":");
                     String name = null;
                     String parent = null;
+                    //数组长度等于 3 表示当前页面是一个 Fragment
                     if (strArr.length == 3) {
-                        if(FTAliasConfig.get().isFlowChartAlias()) {
-                            name = FTAliasConfig.get().getPageAlias(strArr[1]);
-                            parent = FTAliasConfig.get().getPageAlias(strArr[2]);
-                        }else{
-                            name = recordData.getCpn() + "." + strArr[1];
-                            parent = strArr[2];
-                        }
+                        name = FTAliasConfig.get().getFlowChartDesc(recordData.getCpn() + "." + strArr[1]);
+                        parent = FTAliasConfig.get().getFlowChartDesc(strArr[2]);
+                        //数组长度等于 2 表示当前页面是一个 Activity
                     } else if (strArr.length == 2) {
-                        if(FTAliasConfig.get().isFlowChartAlias()) {
-                            name = FTAliasConfig.get().getPageAlias(recordData.getCpn());
-                            parent = FTAliasConfig.get().getPageAlias(strArr[1]);
-                        }else {
-                            name = recordData.getCpn();
-                            parent = strArr[1];
-                        }
+                        name = FTAliasConfig.get().getFlowChartDesc(recordData.getCpn());
+                        parent = FTAliasConfig.get().getFlowChartDesc(strArr[1]);
                     }
                     sb.append(",$name=").append(name);
                     sb.append(",$parent=").append(parent);
                 } else {
-                    if(FTAliasConfig.get().isFlowChartAlias()) {
-                        sb.append(",$name=").append(FTAliasConfig.get().getPageAlias(recordData.getCpn()));
-                        //如果父页面是root表示其为起始节点，不添加父节点
-                        if (!Constants.FLOW_ROOT.equals(recordData.getPpn())) {
-                            String ppn = recordData.getPpn();
-                            String parent;
-                            //如果当前的这个 Activity 是从 Fragment 中打开的，那么他的 ppn 将是 LastActivity.LastFragment,这时需要将
-                            //他的 LastFragment 截取出来获取他的别名
-                            if(ppn != null && ppn.contains(".")){
-                                String[] pageName = ppn.split("\\.");
-                                if(pageName.length > 1){
-                                    parent = pageName[1];
-                                }else{
-                                    parent = ppn;
-                                }
-                            }else{
-                                parent = ppn;
-                            }
-                            sb.append(",$parent=").append(FTAliasConfig.get().getPageAlias(parent));
-                        }
-                    }else {
-                        sb.append(",$name=").append(recordData.getCpn());
-                        //如果父页面是root表示其为起始节点，不添加父节点
-                        if (!Constants.FLOW_ROOT.equals(recordData.getPpn())) {
-                            sb.append(",$parent=").append(recordData.getPpn());
-                        }
+                    sb.append(",$name=").append(FTAliasConfig.get().getFlowChartDesc(recordData.getCpn()));
+                    //如果父页面是root表示其为起始节点，不添加父节点
+                    if (!Constants.FLOW_ROOT.equals(recordData.getPpn())) {
+                        String ppn = recordData.getPpn();
+                        sb.append(",$parent=").append(FTAliasConfig.get().getFlowChartDesc(ppn));
                     }
                 }
                 sb.append(",").append(device).append(",");
@@ -133,33 +104,16 @@ public class SyncDataManager {
                 //如果是子页面打开操作，就在该条数据上添加一条表示流程图的数据
                 sb.append("$flow_mobile_activity");
                 sb.append(",$traceId=").append(recordData.getTraceId());
-                if(FTAliasConfig.get().isFlowChartAlias()) {
-                    sb.append(",$name=").append(FTAliasConfig.get().getPageAlias(recordData.getCpn()));
-                }else {
-                    sb.append(",$name=").append(recordData.getRpn()).append(".").append(recordData.getCpn());
-                }
-
+                sb.append(",$name=").append(FTAliasConfig.get().getFlowChartDesc(recordData.getRpn() + "." + recordData.getCpn()));
                 String parent;
                 if (!Constants.FLOW_ROOT.equals(recordData.getPpn())) {
                     if (recordData.getPpn().startsWith(Constants.PERFIX)) {
-                        if(FTAliasConfig.get().isFlowChartAlias()){
-                            parent = FTAliasConfig.get().getPageAlias(recordData.getPpn().replace(Constants.PERFIX, ""));
-                        }else{
-                            parent = recordData.getPpn().replace(Constants.PERFIX, "");
-                        }
+                        parent = FTAliasConfig.get().getFlowChartDesc(recordData.getPpn().replace(Constants.PERFIX, ""));
                     } else {
-                        if(FTAliasConfig.get().isFlowChartAlias()){
-                            parent = FTAliasConfig.get().getPageAlias(recordData.getPpn());
-                        }else {
-                            parent = recordData.getRpn() + "." + recordData.getPpn();
-                        }
+                        parent = FTAliasConfig.get().getFlowChartDesc(recordData.getRpn() + "." + recordData.getPpn());
                     }
                 } else {
-                    if(FTAliasConfig.get().isFlowChartAlias()){
-                        parent = FTAliasConfig.get().getPageAlias(recordData.getRpn());
-                    }else {
-                        parent = recordData.getRpn();
-                    }
+                    parent = FTAliasConfig.get().getFlowChartDesc(recordData.getRpn());
                 }
                 sb.append(",$parent=").append(parent);
                 sb.append(",").append(device).append(",");
@@ -318,7 +272,12 @@ public class SyncDataManager {
                     tags = new JSONObject();
                 }
                 if (!Utils.isNullOrEmpty(recordData.getCpn())) {
-                    tags.put("current_page_name",recordData.getCpn());
+                    //如果是 Fragment 就把Activity 的名称也添加上去
+                    if (recordData.getOp().equals(OP.OPEN_FRA.value) || recordData.getOp().equals(OP.CLS_FRA.value)) {
+                        tags.put("current_page_name", recordData.getRpn() + "." + recordData.getCpn());
+                    } else {
+                        tags.put("current_page_name", recordData.getCpn());
+                    }
                 }
                 if (!Utils.isNullOrEmpty(recordData.getRpn())) {
                     tags.put("root_page_name", recordData.getRpn());
@@ -343,7 +302,11 @@ public class SyncDataManager {
             try {
                 fields.put("event", getEventName(recordData.getOp()));
                 if (!Utils.isNullOrEmpty(recordData.getCpn())) {
-                    fields.put("page_desc",FTAliasConfig.get().getPageAlias(recordData.getCpn()));
+                    if (recordData.getOp().equals(OP.OPEN_FRA.value) || recordData.getOp().equals(OP.CLS_FRA.value)) {
+                        fields.put("page_desc", FTAliasConfig.get().getPageDesc(recordData.getRpn() + "." + recordData.getCpn()));
+                    } else {
+                        fields.put("page_desc", FTAliasConfig.get().getPageDesc(recordData.getCpn()));
+                    }
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
