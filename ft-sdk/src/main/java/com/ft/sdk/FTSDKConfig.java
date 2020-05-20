@@ -375,11 +375,21 @@ public class FTSDKConfig {
         return this;
     }
 
+    /**
+     * 设置页面和视图树是否使用别名
+     * @param pageVtpDescEnabled
+     * @return
+     */
     public FTSDKConfig setPageVtpDescEnabled(boolean pageVtpDescEnabled) {
         this.pageVtpDescEnabled = pageVtpDescEnabled;
         return this;
     }
 
+    /**
+     * 设置流程图是否使用别名显示
+     * @param flowChartDescEnabled
+     * @return
+     */
     public FTSDKConfig setFlowChartDescEnabled(boolean flowChartDescEnabled) {
         this.flowChartDescEnabled = flowChartDescEnabled;
         return this;
