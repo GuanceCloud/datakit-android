@@ -1,6 +1,7 @@
 package com.ft.sdk.garble;
 
 import com.ft.sdk.FTSDKConfig;
+import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.util.Map;
@@ -53,11 +54,11 @@ public class FTAliasConfig {
 
     public String getEventAlias(String vtp){
         if(eventAliasMap == null){
-            return vtp;
+            return Constants.UNKNOWN;
         }
         String vtpDesc = eventAliasMap.get(vtp);
         if(Utils.isNullOrEmpty(vtpDesc)){
-            return vtp;
+            return Constants.UNKNOWN;
         }else{
             return vtpDesc;
         }
