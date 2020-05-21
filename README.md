@@ -813,6 +813,9 @@ public class OKHttpEventListener extends EventListener {
 
 ### 五、关于页面和视图树及流程图的描述使用
 
+> 重要提示：对于需要埋点的点击事件，你需要对点击的控件设置 ID，如果不设置 ID 那么视图树结尾处的控件 ID 将显示为null，这样不利于
+> 区分视图树，因此需要对每个可以点击的控件设置一个 ID
+
 #### 1、首先在配置 SDK 的时候打开描述日志的开关 setDescLog(true)
 
 ```kotlin
