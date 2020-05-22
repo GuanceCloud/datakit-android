@@ -140,6 +140,24 @@ public class AopUtils {
     }
 
     /**
+     * 获取 View 视图树
+     *
+     * @param view
+     * @return
+     */
+    public static String getParentViewTree(View view) {
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append(view.getClass().getSimpleName() + "/");
+        ViewParent viewParent = view.getParent();
+        while (viewParent != null) {
+            stringBuffer.insert(0, viewParent.getClass().getSimpleName() + "/");
+            viewParent = viewParent.getParent();
+        }
+        stringBuffer.insert(0, view.getContext().getClass().getSimpleName() + "/");
+        return stringBuffer.toString();
+    }
+
+    /**
      * 获取 Dialog 上点击按钮上的字符
      *
      * @param dialog

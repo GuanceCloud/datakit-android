@@ -30,6 +30,7 @@ import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
 import com.ft.sdk.garble.utils.Utils;
+import com.google.android.material.tabs.TabLayout;
 
 import org.json.JSONObject;
 
@@ -219,6 +220,28 @@ public class FTAutoTrack {
      */
     public static void trackTabHost(String tabName) {
         //trackViewOnClick(null, v, true);
+    }
+
+    /**
+     * TabLayout
+     * @param tab
+     */
+    public static void trackTabLayoutSelected(TabLayout.Tab tab){
+        try {
+            Object object = tab.view.getContext();
+            clickView(tab.view, object.getClass(), AopUtils.getClassName(object), AopUtils.getSupperClassName(object), AopUtils.getParentViewTree(tab.view)+"#"+tab.getPosition());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * ViewPager 的页面切换
+     * @param object
+     * @param position
+     */
+    public static void trackViewPagerChange(Object object,int position){
+
     }
 
     /**
@@ -466,7 +489,12 @@ public class FTAutoTrack {
      * @param motionEvent
      */
     public static void trackViewOnTouch(View view, MotionEvent motionEvent) {
-
+        try{
+            Object object = view.getContext();
+            clickView(view, object.getClass(), AopUtils.getClassName(object), AopUtils.getSupperClassName(object), AopUtils.getViewTree(view));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     /**
