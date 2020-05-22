@@ -1,7 +1,7 @@
 apply plugin: 'maven'
 group = 'com.cloudcare.ft.mobile.sdk.traker.plugin'
 //版本修改时一定要同时更新 com.ft.plugin.garble.VersionConfig 类中的 PLUGIN_VERSION 常量
-version = '1.0.1-alpha09'
+version = '1.0.1-alpha10'
 
 uploadArchives {
     repositories {
