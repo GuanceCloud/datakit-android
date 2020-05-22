@@ -49,6 +49,7 @@ dependencies {
     testImplementation 'org.robolectric:robolectric:3.3.2'
     testImplementation 'org.robolectric:shadows-httpclient:3.3.2'
     testImplementation 'com.google.mockwebserver:mockwebserver:20130706'
+    implementation 'com.google.android.material:material:1.1.0'
 }
 
 
