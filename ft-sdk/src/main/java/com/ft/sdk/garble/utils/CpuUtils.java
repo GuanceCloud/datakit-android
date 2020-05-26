@@ -103,9 +103,9 @@ public class CpuUtils {
      *
      * @return
      */
-    public String getCPUMaxFreqKHz() {
+    public double getCPUMaxFreqKHz() {
         if(maxFreq != DEVICEINFO_UNKNOWN){
-            return maxFreq+"Hz";
+            return maxFreq;
         }
         try {
             for (int i = 0; i < getNumberOfCPUCores(); i++) {
@@ -145,9 +145,9 @@ public class CpuUtils {
             maxFreq = DEVICEINFO_UNKNOWN; //Fall through and return unknown.
         }
         if(maxFreq >0){
-            return maxFreq+"Hz";
+            return maxFreq;
         }
-        return Constants.UNKNOWN;
+        return 0;
     }
 
     private int parseFileForValue(String textToMatch, FileInputStream stream) {
@@ -298,7 +298,7 @@ public class CpuUtils {
      *
      * @return
      */
-    public String getCpuTemperature() {
+    public double getCpuTemperature() {
         double currentTemp = 0.0D;
         for (String path : CPU_TEMP_FILE_PATHS) {
             try {
@@ -315,9 +315,9 @@ public class CpuUtils {
             }
         }
         if(currentTemp == 0){
-            return Constants.UNKNOWN;
+            return 0;
         }
-        return currentTemp+"℃";
+        return currentTemp;
     }
 
     private double readOnLine(File file) {

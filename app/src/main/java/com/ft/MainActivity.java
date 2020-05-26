@@ -20,8 +20,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
 import com.amitshekhar.DebugDB;
 import com.amitshekhar.debug.encrypt.sqlite.DebugDBEncryptFactory;
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     private Button changeUser;
     private ImageView iv_glide;
     private Button flowChartTacker;
+    private ViewPager viewPager;
     private Tab1Fragment tab1Fragment = new Tab1Fragment();
     private Tab2Fragment tab2Fragment = new Tab2Fragment();
 
@@ -61,7 +63,10 @@ public class MainActivity extends AppCompatActivity {
         requestPermissions(new String[]{Manifest.permission.CAMERA
                 , Manifest.permission.ACCESS_FINE_LOCATION
                 , Manifest.permission.ACCESS_COARSE_LOCATION
-                , Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                , Manifest.permission.READ_PHONE_STATE
+                , Manifest.permission.WRITE_EXTERNAL_STORAGE
+                , Manifest.permission.BLUETOOTH
+                , Manifest.permission.BLUETOOTH_ADMIN}, 1);
         setTitle("FT-SDK使用Demo");
         FTSdk.get().setGpuRenderer(findViewById(R.id.ll));
         showKotlinActivity = findViewById(R.id.showKotlinActivity);
@@ -76,15 +81,11 @@ public class MainActivity extends AppCompatActivity {
         unbindUser = findViewById(R.id.unbindUser);
         changeUser = findViewById(R.id.changeUser);
         flowChartTacker = findViewById(R.id.flowChartTacker);
-        addFragment();
+        viewPager = findViewById(R.id.viewPager);
+        //addFragment();
         showKotlinActivity.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, Main2Activity.class)));
-        btn_lam.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            }
-        });
         checkbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            changeFragment(isChecked);
+            //changeFragment(isChecked);
         });
         ratingbar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
         });
@@ -163,26 +164,60 @@ public class MainActivity extends AppCompatActivity {
         flowChartTacker.setOnClickListener(v -> {
 
         });
+        viewPager.setOffscreenPageLimit(1);
+        viewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
+            @NonNull
+            @Override
+            public Fragment getItem(int position) {
+                if (position == 0) {
+                    return tab1Fragment;
+                } else {
+                    return tab2Fragment;
+                }
+            }
 
+            @Override
+            public int getCount() {
+                return 2;
+            }
+        });
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
-    public void addFragment() {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.add(R.id.fragment, tab1Fragment);
-        fragmentTransaction.commit();
-    }
-
-    public void changeFragment(boolean change) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        if (change) {
-            fragmentTransaction.replace(R.id.fragment, tab1Fragment);
-        } else {
-            fragmentTransaction.replace(R.id.fragment, tab2Fragment);
-        }
-        fragmentTransaction.commit();
-    }
+    /**
+     * public void addFragment() {
+     * FragmentManager fragmentManager = getSupportFragmentManager();
+     * FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+     * fragmentTransaction.add(R.id.fragment, tab1Fragment);
+     * fragmentTransaction.commit();
+     * }
+     * <p>
+     * public void changeFragment(boolean change) {
+     * FragmentManager fragmentManager = getSupportFragmentManager();
+     * FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+     * if (change) {
+     * fragmentTransaction.replace(R.id.fragment, tab1Fragment);
+     * } else {
+     * fragmentTransaction.replace(R.id.fragment, tab2Fragment);
+     * }
+     * fragmentTransaction.commit();
+     * }
+     */
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

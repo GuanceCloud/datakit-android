@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.FTActivityLifecycleCallbacks;
+import com.ft.sdk.garble.FTAliasConfig;
 import com.ft.sdk.garble.FTAutoTrackConfig;
 import com.ft.sdk.garble.FTFlowChartConfig;
 import com.ft.sdk.garble.FTHttpConfig;
@@ -186,12 +187,14 @@ public class FTSdk {
     private void initFTConfig() {
         if (mFtSDKConfig != null) {
             LogUtils.setDebug(mFtSDKConfig.isDebug());
+            LogUtils.setDescLogShow(mFtSDKConfig.isDescLog());
+            FTAliasConfig.get().initParams(mFtSDKConfig);
             FTHttpConfig.get().initParams(mFtSDKConfig);
             FTAutoTrackConfig.get().initParams(mFtSDKConfig);
             FTMonitorConfig.get().initParams(mFtSDKConfig);
             FTUserConfig.get().setNeedBindUser(mFtSDKConfig.isNeedBindUser());
+            FTUserConfig.get().initSessionId();
             if (mFtSDKConfig.isNeedBindUser()) {
-                FTUserConfig.get().initSessionId();
                 FTUserConfig.get().initUserDataFromDB();
             }
             FTNetworkListener.get().monitor();
@@ -216,7 +219,7 @@ public class FTSdk {
      * 解绑 Activity 生命周期监控
      */
     private void unregisterActivityLifeCallback() {
-        if(life != null) {
+        if (life != null) {
             getApplication().unregisterActivityLifecycleCallbacks(life);
             life = null;
         }

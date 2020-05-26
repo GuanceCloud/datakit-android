@@ -28,6 +28,7 @@ public abstract class DBManager {
                 db = helper.getReadableDatabase();
             if(db.isOpen()){
                 callBack.run(db);
+                db.close();
             }
         }
     }

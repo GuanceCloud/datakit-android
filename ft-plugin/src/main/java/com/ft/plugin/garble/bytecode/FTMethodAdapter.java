@@ -246,25 +246,8 @@ public class FTMethodAdapter extends AdviceAdapter {
             for(String inter :interfaces) {
                 //Logger.info("============CLICK_METHODS_SYSTEM=="+inter+nameDesc);
                 FTMethodCell ftMethodCell = FTHookConfig.CLICK_METHODS_SYSTEM.get(inter+nameDesc);
-                if(ftMethodCell != null) {
-                    Type[] types = Type.getArgumentTypes(ftMethodCell.desc);
-                    int length = types.length;
-                    Type[] clickTypes = Type.getArgumentTypes(methodDesc);
-                    int paramStart = clickTypes.length - length;
-                    if (paramStart < 0) {
-                        return;
-                    } else {
-                        for (int i = 0; i < length; i++) {
-                            if (!clickTypes[paramStart + i].getDescriptor().equals(types[i].getDescriptor())) {
-                                return;
-                            }
-                        }
-                    }
-                    for (int i = paramStart; i < paramStart + ftMethodCell.paramsCount; i++) {
-                        mv.visitVarInsn(ftMethodCell.opcodes.get(i - paramStart), getVisitPosition(clickTypes, i, false));
-                    }
-
-                    mv.visitMethodInsn(Opcodes.INVOKESTATIC, FTHookConfig.FT_SDK_API, ftMethodCell.agentName, ftMethodCell.agentDesc, false);
+                if (ftMethodCell != null) {
+                    handleCode(ftMethodCell);
                     isHasTracked = true;
                     return;
                 }

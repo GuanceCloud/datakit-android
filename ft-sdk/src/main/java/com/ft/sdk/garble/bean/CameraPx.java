@@ -18,9 +18,9 @@ public class CameraPx{
     public String[] getPx() {
         String pxStr = px==0?"N/A":""+px;
         if(face == CameraCharacteristics.LENS_FACING_FRONT){
-            return new String[]{"camera_front"+id+"_px",pxStr+"万像素"};
+            return new String[]{"camera_front_px",pxStr+"万像素"};
         }else{
-            return new String[]{"camera_back"+id+"_px",pxStr+"万像素"};
+            return new String[]{"camera_back_px",pxStr+"万像素"};
         }
     }
 }
