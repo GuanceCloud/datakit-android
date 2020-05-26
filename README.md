@@ -139,14 +139,6 @@ android{
 |方法名|含义|是否必须|注意|
 |:--:|:--:|:--:|:--:|
 |setMonitorType|设置监控类型|否|设置具体值后才会同步相关数据，[详情参考](#四监控配置项类-monitortype)|
-|setTcpStartTime|设置网络请求握手开始时间|否|需要在实现的网络框架中调用。[点我查看如何使用](#四如何监控网络请求的相关时长)|
-|setTcpEndTime|设置网络请求握手结束时间|否|需要在实现的网络框架中调用|
-|setDnsStartTime|设置网络请求DNS解析开始时间|否|需要在实现的网络框架中调用|
-|setDnsEndTime|设置网络请求DNS解析结束时间|否|需要在实现的网络框架中调用|
-|setResponseStartTime|设置网络请求开始时间|否|需要在实现的网络框架中调用|
-|setResponseEndTime|设置网络请求结束时间|否|需要在实现的网络框架中调用|
-|setRequestCount|设置网路请求次数|否|需要在实现的网络框架中调用|
-|setRequestErrCount|设置网路请求错误次数|否|需要在实现的网络框架中调用|
 |setPeriod|设置周期|否|单位秒，默认为10秒|
 |setUseGeoKey|设置是否使用高德作为地址解析器|否|设置高德的 Key 后，如果不开启就不会使用|
 |setGeoKey|设置高德解析器的 key|否|如何申请高德的 key？[点我快速了解](https://lbs.amap.com/api/webservice/guide/api/georegeo)|
