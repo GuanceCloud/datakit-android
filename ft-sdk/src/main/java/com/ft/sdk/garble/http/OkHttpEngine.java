@@ -1,11 +1,6 @@
-package com.ft;
+package com.ft.sdk.garble.http;
 
 import android.util.Log;
-
-import com.ft.sdk.garble.http.HttpBuilder;
-import com.ft.sdk.garble.http.INetEngine;
-import com.ft.sdk.garble.http.RequestMethod;
-import com.ft.sdk.garble.http.ResponseData;
 
 import java.io.IOException;
 import java.util.HashMap;

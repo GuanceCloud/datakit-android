@@ -46,7 +46,7 @@ public class FTSDKConfig {
     private int disableAutoTrackType;
     private List<Class<?>> blackActivityClass;
     private List<Class<?>> blackViewClass;
-    private Class<? extends INetEngine> iNetEngineClass;
+    private boolean trackNetTime;
 
     //页面别名对应 map
     private Map<String,String> pageDescMap;
@@ -182,8 +182,8 @@ public class FTSDKConfig {
         this.autoTrack = autoTrack;
         return this;
     }
-    public Class<? extends INetEngine> getINetEngineClass() {
-        return iNetEngineClass;
+    public boolean getTrackNetTime() {
+        return trackNetTime;
     }
 
     public Map<String, String> getPageDescMap() {
@@ -350,8 +350,8 @@ public class FTSDKConfig {
         return this;
     }
 
-    public FTSDKConfig setINetEngineClass(Class<? extends INetEngine> iNetEngineClass) {
-        this.iNetEngineClass = iNetEngineClass;
+    public FTSDKConfig openNetTime(boolean value) {
+        this.trackNetTime = value;
         return this;
     }
 

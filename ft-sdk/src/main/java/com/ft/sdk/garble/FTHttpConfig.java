@@ -48,7 +48,7 @@ public class FTHttpConfig {
         version = BuildConfig.VERSION_NAME;
         uuid = DeviceUtils.getSDKUUid(FTApplication.getApplication());
         userAgent = USER_AGENT;
-        EngineFactory.setEngineClass(ftsdkConfig.getINetEngineClass());
+        EngineFactory.setTrackNetTime(ftsdkConfig.getTrackNetTime());
     }
 
     public void release(){
