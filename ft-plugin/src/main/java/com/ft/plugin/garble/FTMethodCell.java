@@ -65,6 +65,14 @@ public class FTMethodCell {
         this.agentName = agentName;
     }
 
+    /**
+     * 当知道被插桩的类时用该方法
+     * @param name
+     * @param desc
+     * @param agentName
+     * @param agentDesc
+     * @param subMethodCells
+     */
     FTMethodCell(String name, String desc, String agentName, String agentDesc, List<FTSubMethodCell> subMethodCells) {
         this.name = name;
         this.desc = desc;
@@ -73,6 +81,35 @@ public class FTMethodCell {
         this.subMethodCellList = subMethodCells;
     }
 
+    /**
+     * 当知道不知道被插桩的类时用该方法
+     * @param name
+     * @param desc
+     * @param agentName
+     * @param agentDesc
+     * @param subMethodCells
+     */
+    FTMethodCell(String name, String desc,String parent, String agentName, String agentDesc, List<FTSubMethodCell> subMethodCells) {
+        this.name = name;
+        this.desc = desc;
+        this.parent = parent;
+        this.agentName = agentName;
+        this.agentDesc = agentDesc;
+        this.subMethodCellList = subMethodCells;
+    }
+
+
+    /**
+     * 当插桩的函数参数和被插桩的函数参数一致时用该构造函数
+     * @param name
+     * @param desc
+     * @param parent
+     * @param agentName
+     * @param agentDesc
+     * @param paramsStart
+     * @param paramsCount
+     * @param opcodes
+     */
     FTMethodCell(String name, String desc, String parent, String agentName, String agentDesc, int paramsStart, int paramsCount, List<Integer> opcodes) {
         this.name = name;
         this.desc = desc;

@@ -56,10 +56,10 @@ public class NetUtils {
     public int requestCount;
     public int requestErrCount;
 
-    public long getTcpTime(){
-        if(tcpEndTime>=tcpStartTime){
+    public long getTcpTime() {
+        if (tcpEndTime >= tcpStartTime) {
             long time = tcpEndTime - tcpStartTime;
-            if(time > 10*1000 || time >= getResponseTime()){
+            if (time > 10 * 1000 || time >= getResponseTime()) {
                 return 0;
             }
             return time;
@@ -67,10 +67,10 @@ public class NetUtils {
         return 0;
     }
 
-    public long getDNSTime(){
-        if(dnsEndTime>=dnsStartTime){
+    public long getDNSTime() {
+        if (dnsEndTime >= dnsStartTime) {
             long time = dnsEndTime - dnsStartTime;
-            if(time > 10*1000 || time >= getResponseTime()){
+            if (time > 10 * 1000 || time >= getResponseTime()) {
                 return 0;
             }
             return time;
@@ -78,10 +78,10 @@ public class NetUtils {
         return 0;
     }
 
-    public long getResponseTime(){
-        if(responseEndTime>=responseStartTime){
+    public long getResponseTime() {
+        if (responseEndTime >= responseStartTime) {
             long time = responseEndTime - responseStartTime;
-            if(time > 10*1000){
+            if (time > 10 * 1000) {
                 return 0;
             }
             return time;
@@ -89,10 +89,10 @@ public class NetUtils {
         return 0;
     }
 
-    public double getErrorRate(){
-        if(requestCount > 0){
-            double rate = requestErrCount*1.0/requestCount;
-            return Math.floor(rate*100)/100.0;
+    public double getErrorRate() {
+        if (requestCount > 0) {
+            double rate = requestErrCount * 1.0 / requestCount;
+            return Math.floor(rate * 100) / 100.0;
         }
         return 0;
     }
@@ -230,6 +230,7 @@ public class NetUtils {
     public double getNetUpRate() {
         return netUpRate;
     }
+
     /**
      * 得到网络下行速度
      *
@@ -284,6 +285,7 @@ public class NetUtils {
     /**
      * 获得网络速度（外部获取网速应该直接调用{@link NetUtils}）
      * 单位 字节
+     *
      * @return
      */
     public void getNetSpeed() {
@@ -294,8 +296,8 @@ public class NetUtils {
 
         lastRx = tempRx;
         lastTx = tempTx;
-        netDownRate = Utils.formatDouble(rxLast/2d);
-        netUpRate = Utils.formatDouble(txLast/2d);
+        netDownRate = Utils.formatDouble(rxLast / 2d);
+        netUpRate = Utils.formatDouble(txLast / 2d);
     }
 
     /**
@@ -374,6 +376,8 @@ public class NetUtils {
                 ssId = wifiInfo.getSSID();
                 if (ssId.length() > 2 && ssId.charAt(0) == '"' && ssId.charAt(ssId.length() - 1) == '"') {
                     return ssId.substring(1, ssId.length() - 1);
+                }else if(ssId.contains("<unknown ssid>")){
+                    ssId = Constants.UNKNOWN;
                 }
             }
         }
@@ -382,6 +386,7 @@ public class NetUtils {
 
     /**
      * 获得 WI-FI 的IP地址
+     *
      * @return
      */
     public String getWifiIp() {

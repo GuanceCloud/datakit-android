@@ -7,7 +7,7 @@ import android.location.Address;
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
-import com.ft.sdk.garble.FTAutoTrackConfig;
+import com.ft.sdk.garble.FTAliasConfig;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.FTUserConfig;
@@ -37,6 +37,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -65,43 +66,29 @@ public class SyncDataManager {
         for (RecordData recordData : recordDatas) {
             if (OP.OPEN_ACT.value.equals(recordData.getOp())) {
                 //如果是页面打开操作，就在该条数据上添加一条表示流程图的数据
-                try {
-                    JSONObject opData = new JSONObject(recordData.getOpdata());
-                    //获取指标名称
-                    String measurement;
-                    if (opData.has(Constants.MEASUREMENT)) {
-                        measurement = opData.optString(Constants.MEASUREMENT);
-                    } else {
-                        measurement = FTAutoTrackConfig.get().getProduct();
-                    }
-                    if (Utils.isNullOrEmpty(measurement)) {
-                        sb.append("$flow_mobile_activity");
-                    } else {
-                        sb.append("$flow_mobile_activity_").append(measurement);
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
+                sb.append("$flow_mobile_activity");
                 sb.append(",$traceId=").append(recordData.getTraceId());
                 if (recordData.getPpn() != null && recordData.getPpn().startsWith(Constants.MOCK_SON_PAGE_DATA)) {
                     String[] strArr = recordData.getPpn().split(":");
                     String name = null;
                     String parent = null;
+                    //数组长度等于 3 表示当前页面是一个 Fragment
                     if (strArr.length == 3) {
-                        name = recordData.getCpn() + "." + strArr[1];
-                        parent = strArr[2];
+                        name = FTAliasConfig.get().getFlowChartDesc(recordData.getCpn() + "." + strArr[1]);
+                        parent = FTAliasConfig.get().getFlowChartDesc(strArr[2]);
+                        //数组长度等于 2 表示当前页面是一个 Activity
                     } else if (strArr.length == 2) {
-                        name = recordData.getCpn();
-                        parent = strArr[1];
+                        name = FTAliasConfig.get().getFlowChartDesc(recordData.getCpn());
+                        parent = FTAliasConfig.get().getFlowChartDesc(strArr[1]);
                     }
                     sb.append(",$name=").append(name);
                     sb.append(",$parent=").append(parent);
                 } else {
-                    sb.append(",$name=").append(recordData.getCpn());
+                    sb.append(",$name=").append(FTAliasConfig.get().getFlowChartDesc(recordData.getCpn()));
                     //如果父页面是root表示其为起始节点，不添加父节点
                     if (!Constants.FLOW_ROOT.equals(recordData.getPpn())) {
-                        sb.append(",$parent=").append(recordData.getPpn());
+                        String ppn = recordData.getPpn();
+                        sb.append(",$parent=").append(FTAliasConfig.get().getFlowChartDesc(ppn));
                     }
                 }
                 sb.append(",").append(device).append(",");
@@ -115,36 +102,20 @@ public class SyncDataManager {
                 sb.append("\n");
             } else if (OP.OPEN_FRA.value.equals(recordData.getOp())) {
                 //如果是子页面打开操作，就在该条数据上添加一条表示流程图的数据
-                try {
-                    JSONObject opData = new JSONObject(recordData.getOpdata());
-                    //获取指标名称
-                    String measurement;
-                    if (opData.has(Constants.MEASUREMENT)) {
-                        measurement = opData.optString(Constants.MEASUREMENT);
-                    } else {
-                        measurement = FTAutoTrackConfig.get().getProduct();
-                    }
-                    if (Utils.isNullOrEmpty(measurement)) {
-                        sb.append("$flow_mobile_activity");
-                    } else {
-                        sb.append("$flow_mobile_activity_").append(measurement);
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
+                sb.append("$flow_mobile_activity");
                 sb.append(",$traceId=").append(recordData.getTraceId());
-                sb.append(",$name=").append(recordData.getRpn()).append(".").append(recordData.getCpn());
-                //如果父页面是root表示其为起始节点，不添加父节点
+                sb.append(",$name=").append(FTAliasConfig.get().getFlowChartDesc(recordData.getRpn() + "." + recordData.getCpn()));
+                String parent;
                 if (!Constants.FLOW_ROOT.equals(recordData.getPpn())) {
                     if (recordData.getPpn().startsWith(Constants.PERFIX)) {
-                        sb.append(",$parent=").append(recordData.getPpn().replace(Constants.PERFIX, ""));
+                        parent = FTAliasConfig.get().getFlowChartDesc(recordData.getPpn().replace(Constants.PERFIX, ""));
                     } else {
-                        sb.append(",$parent=").append(recordData.getRpn()).append(".").append(recordData.getPpn());
+                        parent = FTAliasConfig.get().getFlowChartDesc(recordData.getRpn() + "." + recordData.getPpn());
                     }
                 } else {
-                    sb.append(",$parent=").append(recordData.getRpn());
+                    parent = FTAliasConfig.get().getFlowChartDesc(recordData.getRpn());
                 }
+                sb.append(",$parent=").append(parent);
                 sb.append(",").append(device).append(",");
                 addUserData(sb, recordData);
                 //删除多余的逗号
@@ -178,24 +149,15 @@ public class SyncDataManager {
         String measurement;
         try {
             JSONObject jsonObject = new JSONObject(recordData.getOpdata());
-            String measurementTemp = jsonObject.optString(Constants.MEASUREMENT);
             if (CSTM.value.equals(recordData.getOp()) || FLOW_CHAT.value.equals(recordData.getOp())) {
+                String measurementTemp = jsonObject.optString(Constants.MEASUREMENT);
                 if (Utils.isNullOrEmpty(measurementTemp)) {
                     measurement = FT_KEY_VALUE_NULL;
                 } else {
                     measurement = Utils.translateMeasurements(measurementTemp);
                 }
             } else {
-                if (!Utils.isNullOrEmpty(measurementTemp)) {
-                    measurement = measurementTemp;
-                } else {
-                    measurement = FTAutoTrackConfig.get().getProduct();
-                }
-                if (!Utils.isNullOrEmpty(measurement)) {
-                    measurement = FT_DEFAULT_MEASUREMENT + "_" + measurement;
-                } else {
-                    measurement = FT_DEFAULT_MEASUREMENT;
-                }
+                measurement = FT_DEFAULT_MEASUREMENT;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -301,21 +263,27 @@ public class SyncDataManager {
      */
     private String composeAutoUpdateData(RecordData recordData) {
         StringBuffer sb = new StringBuffer();
-        if (!Utils.isNullOrEmpty(recordData.getCpn())) {
-            sb.append("current_page_name=" + recordData.getCpn() + ",");
-        }
-        if (!Utils.isNullOrEmpty(recordData.getRpn())) {
-            sb.append("root_page_name=" + recordData.getRpn() + ",");
-        }
         JSONObject fields = null;
         if (recordData.getOpdata() != null) {
             try {
                 JSONObject opJson = new JSONObject(recordData.getOpdata());
                 JSONObject tags = opJson.optJSONObject(Constants.TAGS);
-                if (tags != null) {
-                    sb.append(getCustomHash(tags, true));
+                if (tags == null) {
+                    tags = new JSONObject();
                 }
-
+                if (!Utils.isNullOrEmpty(recordData.getCpn())) {
+                    //如果是 Fragment 就把Activity 的名称也添加上去
+                    if (recordData.getOp().equals(OP.OPEN_FRA.value) || recordData.getOp().equals(OP.CLS_FRA.value)) {
+                        tags.put("current_page_name", recordData.getRpn() + "." + recordData.getCpn());
+                    } else {
+                        tags.put("current_page_name", recordData.getCpn());
+                    }
+                }
+                if (!Utils.isNullOrEmpty(recordData.getRpn())) {
+                    tags.put("root_page_name", recordData.getRpn());
+                }
+                tags.put("event_id", Utils.MD5(getEventName(recordData.getOp())));
+                sb.append(getCustomHash(tags, true));
                 fields = opJson.optJSONObject(Constants.FIELDS);
             } catch (Exception e) {
             }
@@ -333,7 +301,13 @@ public class SyncDataManager {
         if (fields != null) {
             try {
                 fields.put("event", getEventName(recordData.getOp()));
-                fields.put("event_id", Utils.MD5(getEventName(recordData.getOp())));
+                if (!Utils.isNullOrEmpty(recordData.getCpn())) {
+                    if (recordData.getOp().equals(OP.OPEN_FRA.value) || recordData.getOp().equals(OP.CLS_FRA.value)) {
+                        fields.put("page_desc", FTAliasConfig.get().getPageDesc(recordData.getRpn() + "." + recordData.getCpn()));
+                    } else {
+                        fields.put("page_desc", FTAliasConfig.get().getPageDesc(recordData.getCpn()));
+                    }
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -342,7 +316,6 @@ public class SyncDataManager {
             sb.append(valueSb);
         } else {
             sb.append("event=\"" + getEventName(recordData.getOp()) + "\"");
-            sb.append("event_id=\"" + Utils.MD5(getEventName(recordData.getOp())) + "\"");
         }
         sb.append(Constants.SEPARATION_PRINT);
         sb.append(recordData.getTime() * 1000000);
@@ -383,13 +356,7 @@ public class SyncDataManager {
         addMonitorData(tags, fields);
         StringBuffer sb = new StringBuffer();
         //获取这条事件的指标
-        String measurement = FTAutoTrackConfig.get().getProduct();
-        if (!Utils.isNullOrEmpty(measurement)) {
-            measurement = Constants.FT_MONITOR_MEASUREMENT + "_" + measurement;
-        } else {
-            measurement = Constants.FT_MONITOR_MEASUREMENT;
-        }
-        sb.append(measurement);
+        sb.append(Constants.FT_MONITOR_MEASUREMENT);
         StringBuffer tagSb = getCustomHash(tags, true);
         StringBuffer fieldSb = getCustomHash(fields, false);
         deleteLastComma(tagSb);
@@ -397,6 +364,12 @@ public class SyncDataManager {
             sb.append(",");
             sb.append(tagSb.toString());
         }
+
+        String device = parseHashToString(getDeviceInfo());
+        sb.append(",").append(device);
+        //删除多余的逗号
+        deleteLastComma(sb);
+
         sb.append(Constants.SEPARATION_PRINT);
         deleteLastComma(fieldSb);
         sb.append(fieldSb);
@@ -484,7 +457,7 @@ public class SyncDataManager {
         try {
             BatteryBean batteryBean = BatteryUtils.getBatteryInfo(FTApplication.getApplication());
             tags.put("battery_total", batteryBean.getPower());
-            tags.put("battery_change", batteryBean.getPlugState());
+            tags.put("battery_charge_type", batteryBean.getPlugState());
             tags.put("battery_status", batteryBean.getStatus());
             fields.put("battery_use", batteryBean.getBr());
         } catch (Exception e) {
@@ -518,7 +491,7 @@ public class SyncDataManager {
         try {
             tags.put("cpu_no", DeviceUtils.getHardWare());
             fields.put("cpu_use", DeviceUtils.getCpuUseRate());
-            tags.put("cpu_temperature", CpuUtils.get().getCpuTemperature());
+            fields.put("cpu_temperature", CpuUtils.get().getCpuTemperature());
             tags.put("cpu_hz", CpuUtils.get().getCPUMaxFreqKHz());
         } catch (Exception e) {
             LogUtils.e("CPU数据获取异常:" + e.getMessage());
@@ -563,7 +536,7 @@ public class SyncDataManager {
             tags.put("network_proxy", NetUtils.get().isWifiProxy(FTApplication.getApplication()));
             String[] dns = NetUtils.get().getDnsFromConnectionManager(FTApplication.getApplication());
             for (int i = 0; i < dns.length; i++) {
-                tags.put("dns" + (i + 1), dns[i]);
+                fields.put("dns" + (i + 1), dns[i]);
             }
             tags.put("roam", NetUtils.get().getRoamState());
             fields.put("wifi_ssid", NetUtils.get().getSSId());
@@ -642,7 +615,7 @@ public class SyncDataManager {
             if (set != null) {
                 int i = 1;
                 for (BluetoothDevice device : set) {
-                    tags.put("bt_device_" + (i++), device.getAddress());
+                    fields.put("bt_device" + (i++), device.getAddress());
                 }
             }
             tags.put("bt_open", BluetoothUtils.get().isOpen());
@@ -741,7 +714,7 @@ public class SyncDataManager {
         try {
             tags.put("torch", CameraUtils.get().isTorchState());
         } catch (JSONException e) {
-            LogUtils.e("FPS数据获取异常:" + e.getMessage());
+            LogUtils.e("闪光灯数据获取异常:" + e.getMessage());
         }
     }
 
@@ -777,7 +750,7 @@ public class SyncDataManager {
         }
     }
 
-    private String parseHashToString(HashMap<String, Object> param) {
+    private static String parseHashToString(HashMap<String, Object> param) {
         StringBuffer sb = new StringBuffer();
         if (param != null) {
             Iterator<String> keys = param.keySet().iterator();
@@ -814,7 +787,7 @@ public class SyncDataManager {
      *
      * @return
      */
-    private HashMap<String, Object> getDeviceInfo() {
+    private static HashMap<String, Object> getDeviceInfo() {
         Context context = FTApplication.getApplication();
         HashMap<String, Object> objectHashMap = new HashMap<>();
         objectHashMap.put("device_uuid", DeviceUtils.getUuid(context));
@@ -829,6 +802,7 @@ public class SyncDataManager {
         objectHashMap.put("device_model", DeviceUtils.getDeviceModel());
         objectHashMap.put("display", DeviceUtils.getDisplay(context));
         objectHashMap.put("carrier", DeviceUtils.getCarrier(context));
+        objectHashMap.put("locale", Locale.getDefault());
         if (FTHttpConfig.get().useOaid) {
             objectHashMap.put("oaid", OaidUtils.getOAID(context));
         }

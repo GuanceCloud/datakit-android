@@ -10,6 +10,7 @@ import android.util.Log;
 public class LogUtils {
     private static String TAG = "[FT-SDK]:";
     private static boolean mDebug = true;
+    private static boolean aliasLogShow = true;
 
     public static boolean isDebug() {
         return mDebug;
@@ -17,6 +18,10 @@ public class LogUtils {
 
     public static void setDebug(boolean debug) {
         mDebug = debug;
+    }
+
+    public static void setDescLogShow(boolean aliasLogShow) {
+        LogUtils.aliasLogShow = aliasLogShow;
     }
 
     public static void i(Object message){
@@ -40,6 +45,14 @@ public class LogUtils {
             showFullLog(""+message,LogType.V);
         }
     }
+
+    public static void showAlias(Object message){
+        if(aliasLogShow){
+            showFullLog(""+message,LogType.D);
+        }
+    }
+
+
 
     private static void showFullLog(String message,LogType logType){
         int segmentSize = 3 * 1024;

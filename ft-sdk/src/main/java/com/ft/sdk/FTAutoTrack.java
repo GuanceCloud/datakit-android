@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ExpandableListView;
@@ -14,6 +15,7 @@ import android.widget.RadioGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.ft.sdk.garble.FTAliasConfig;
 import com.ft.sdk.garble.FTAutoTrackConfig;
 import com.ft.sdk.garble.FTFlowChartConfig;
 import com.ft.sdk.garble.FTFragmentManager;
@@ -28,6 +30,7 @@ import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
 import com.ft.sdk.garble.utils.Utils;
+import com.google.android.material.tabs.TabLayout;
 
 import org.json.JSONObject;
 
@@ -39,7 +42,11 @@ import org.json.JSONObject;
 public class FTAutoTrack {
     /**
      * 启动 APP
+     * 警告！！！该方法不能删除
+     *
+     * @deprecated 该方法原来被 FT Plugin 插件调用，目前不再使用。目前监控应用的启动使用{@link #startApp()}方法
      */
+    @Deprecated
     public static void startApp(Object object) {
         try {
             startApp();
@@ -50,6 +57,8 @@ public class FTAutoTrack {
 
     /**
      * Activity 打开的方式（标记是从 Fragment 打开还是 Activity）
+     * 警告！！！该方法不能删除
+     * 该方法原来被 FT Plugin 插件调用
      *
      * @param fromFragment
      * @param intent
@@ -67,7 +76,11 @@ public class FTAutoTrack {
 
     /**
      * Activity 开启
+     * 警告！！！该方法不能删除
+     *
+     * @deprecated 该方法原来被 FT Plugin 插件调用，目前不再使用。目前监控应用的启动使用{@link #startPage(Class, boolean)}方法
      */
+    @Deprecated
     public static void activityOnCreate(Class clazz) {
         try {
             //startPage(clazz);
@@ -79,7 +92,11 @@ public class FTAutoTrack {
 
     /**
      * Activity 关闭
+     * 警告！！！该方法不能删除
+     *
+     * @deprecated 该方法原来被 FT Plugin 插件调用，目前不再使用。目前监控应用的启动使用{@link #destroyPage(Class)}方法
      */
+    @Deprecated
     public static void activityOnDestroy(Class clazz) {
         try {
             //destroyPage(clazz);
@@ -90,6 +107,7 @@ public class FTAutoTrack {
 
     /**
      * 通知 Fragment 的显示隐藏状态
+     * 警告！！！该方法不能删除
      *
      * @param clazz
      * @param activity
@@ -113,10 +131,13 @@ public class FTAutoTrack {
 
     /**
      * Fragment 打开
+     * 警告！！！该方法不能删除
      *
      * @param clazz
      * @param activity
+     * @deprecated 该方法原来被 FT Plugin 插件调用，目前不再使用。目前监控应用的启动使用{@link #startPage(Object, Object, String)}方法
      */
+    @Deprecated
     public static void fragmentOnResume(Object clazz, Object activity) {
         try {
             //LogUtils.d("Fragment[\nOnCreateView=====>fragment:"+((Class)clazz).getSimpleName());
@@ -128,10 +149,13 @@ public class FTAutoTrack {
 
     /**
      * Fragment 关闭
+     * 警告！！！该方法不能删除
      *
      * @param clazz
      * @param activity
+     * @deprecated 该方法原来被 FT Plugin 插件调用，目前不再使用。目前监控应用的启动使用{@link #destroyPage(Object, Object, String)}方法
      */
+    @Deprecated
     public static void fragmentOnPause(Object clazz, Object activity) {
         try {
             //LogUtils.d("Fragment[\nOnDestroyView=====>fragment:"+((Class)clazz).getSimpleName());
@@ -199,6 +223,28 @@ public class FTAutoTrack {
     }
 
     /**
+     * TabLayout
+     * @param tab
+     */
+    public static void trackTabLayoutSelected(TabLayout.Tab tab){
+        try {
+            Object object = tab.view.getContext();
+            clickView(tab.view, object.getClass(), AopUtils.getClassName(object), AopUtils.getSupperClassName(object), AopUtils.getParentViewTree(tab.view)+"#"+tab.getPosition());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * ViewPager 的页面切换
+     * @param object
+     * @param position
+     */
+    public static void trackViewPagerChange(Object object,int position){
+
+    }
+
+    /**
      * ExpandableList 子点击事件
      *
      * @param parent
@@ -258,7 +304,7 @@ public class FTAutoTrack {
 
     public static void trackMenuItem(Object object, MenuItem menuItem) {
         try {
-            clickView((Class<?>) object, AopUtils.getClassName(object), AopUtils.getSupperClassName(object), "MenuItem/" + menuItem);
+            clickView((Class<?>) object, AopUtils.getClassName(object), AopUtils.getSupperClassName(object), menuItem.getClass().getName() + "/" + menuItem.getItemId());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -383,7 +429,7 @@ public class FTAutoTrack {
      *
      * @param clazz
      */
-    public static void startPage(Class<?> clazz,boolean isFirstLoad) {
+    public static void startPage(Class<?> clazz, boolean isFirstLoad) {
         /*没有开启自动埋点*/
         if (!FTAutoTrackConfig.get().isAutoTrack()) {
             return;
@@ -404,7 +450,7 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)) {
             return;
         }
-        putRecordActivity(OP.OPEN_ACT, clazz,isFirstLoad);
+        putRecordActivity(OP.OPEN_ACT, clazz, isFirstLoad);
     }
 
     /**
@@ -433,7 +479,22 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)) {
             return;
         }
-        putRecordActivity(OP.CLS_ACT, clazz,false);
+        putRecordActivity(OP.CLS_ACT, clazz, false);
+    }
+
+    /**
+     * 监听触摸事件
+     *
+     * @param view
+     * @param motionEvent
+     */
+    public static void trackViewOnTouch(View view, MotionEvent motionEvent) {
+        try{
+            Object object = view.getContext();
+            clickView(view, object.getClass(), AopUtils.getClassName(object), AopUtils.getSupperClassName(object), AopUtils.getViewTree(view));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -445,6 +506,7 @@ public class FTAutoTrack {
      * @param vtp
      */
     public static void clickView(Class<?> clazz, String currentPage, String rootPage, String vtp) {
+        LogUtils.showAlias("当前点击事件的 vtp 值为:" + vtp);
         if (!FTAutoTrackConfig.get().isAutoTrack()) {
             return;
         }
@@ -475,6 +537,7 @@ public class FTAutoTrack {
      * @param vtp
      */
     public static void clickView(View view, Class<?> clazz, String currentPage, String rootPage, String vtp) {
+        LogUtils.showAlias("当前点击事件的 vtp 值为:" + vtp);
         if (!FTAutoTrackConfig.get().isAutoTrack()) {
             return;
         }
@@ -523,6 +586,14 @@ public class FTAutoTrack {
      */
     public static void putRecordFragment(@NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String parentPage) {
         long time = System.currentTimeMillis();
+        try {
+            if(op == OP.OPEN_FRA) {
+                //显示Fragment的页面名称为 Activity.Fragment
+                LogUtils.showAlias("当前页面的 name 值为:" + rootPage+"."+currentPage);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         putRecord(time, op, currentPage, rootPage, parentPage, null);
     }
 
@@ -532,11 +603,11 @@ public class FTAutoTrack {
      * @param op
      * @param classCurrent
      */
-    public static void putRecordActivity(@NonNull OP op, Class classCurrent,boolean isFirstLoad) {
+    public static void putRecordActivity(@NonNull OP op, Class classCurrent, boolean isFirstLoad) {
         long time = System.currentTimeMillis();
         Class parentClass = FTActivityManager.get().getLastActivity();
         String parentPageName = Constants.FLOW_ROOT;
-        if(op == OP.OPEN_ACT) {
+        if (op == OP.OPEN_ACT) {
             //是第一次加载 Activity ，说明其为从其他Activity 中打开
             if (isFirstLoad) {
                 //如果没有上一个 Activity 说明其为 根结点
@@ -548,7 +619,7 @@ public class FTAutoTrack {
                         Class c = FTFragmentManager.getInstance().getLastFragmentName(parentClass.getName());
                         if (c != null) {
                             parentPageName = parentClass.getSimpleName() + "." + c.getSimpleName();
-                        }else{
+                        } else {
                             parentPageName = parentClass.getSimpleName();
                         }
                     } else {
@@ -567,10 +638,10 @@ public class FTAutoTrack {
                         if (isFromFragment) {
                             //这部分需要创建一条子页面的数据
                             Class lastFragment = FTFragmentManager.getInstance().getLastFragmentName(classCurrent.getName());
-                            if(lastFragment != null) {
-                                parentPageName = Constants.MOCK_SON_PAGE_DATA+":"+lastFragment.getSimpleName()+":"+parentClass.getSimpleName();
-                            }else{
-                                parentPageName = Constants.MOCK_SON_PAGE_DATA+":"+parentClass.getSimpleName();
+                            if (lastFragment != null) {
+                                parentPageName = Constants.MOCK_SON_PAGE_DATA + ":" + lastFragment.getSimpleName() + ":" + parentClass.getSimpleName();
+                            } else {
+                                parentPageName = Constants.MOCK_SON_PAGE_DATA + ":" + parentClass.getSimpleName();
                             }
                         } else {
                             //从Activity 中打开则找到上一个Activity
@@ -579,6 +650,13 @@ public class FTAutoTrack {
                     }
                 }
             }
+        }
+        try {
+            if(op == OP.OPEN_ACT) {
+                LogUtils.showAlias("当前页面的 name 值为:" + classCurrent.getSimpleName());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         putRecord(time, op, classCurrent.getSimpleName(), classCurrent.getSimpleName(), parentPageName, null);
     }
@@ -595,11 +673,14 @@ public class FTAutoTrack {
                 try {
                     JSONObject tags = new JSONObject();
                     JSONObject fields = new JSONObject();
-                    fields.put("vtp",vtp);
-                    SyncDataManager.addMonitorData(tags,fields);
+                    if (vtp != null) {
+                        tags.put("vtp", vtp);
+                        fields.put("vtp_desc", FTAliasConfig.get().getVtpDesc(vtp));
+                        fields.put("vtp_id", Utils.MD5(vtp));
+                    }
+                    SyncDataManager.addMonitorData(tags, fields);
                     opData.put(Constants.TAGS, tags);
                     opData.put(Constants.FIELDS, fields);
-                    opData.put(Constants.MEASUREMENT, FTAutoTrackConfig.get().getProduct());
                     recordData.setOpdata(opData.toString());
                 } catch (Exception e) {
                 }

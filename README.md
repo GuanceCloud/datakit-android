@@ -75,6 +75,8 @@ android{
 -keep enum com.ft.sdk.FTAutoTrackType{*;}
 -keep enum com.ft.sdk.FTSdk{*;}
 ```
+> 注意：如果你的项目中开启了全埋点和流程图，那么需要将你的 Fragment 和 Activity 保持不被混淆，这样流程图中
+> 就会显示页面的真实名称，而不是混淆后的名称
 
 ## 配置
 
@@ -82,29 +84,33 @@ android{
 
 #### 1. DataFlux SDK 包含的功能说明
 
-|          方法名          |                含义                |       是否必须        |                                                          注意                                                           |
-|:-----------------------:|:---------------------------------:|:-------------------:|:----------------------------------------------------------------------------------------------------------------------:|
-|       setUseOAID        | 是否使用OAID作为设备唯一识别号的替代字段 |          否          |                         默认不使用,开启后全埋点数据里将会添加一个 oaid 字段<br>[了解 OAID](#一关于-oaid)                          |
-|     setXDataKitUUID     |         设置数据采集端的名称          |         否          |                                              不设置该值系统会生成一个默认的 uuid                                              |
-|        setDebug         |           是否开启调试模式           |          否          |                                            默认不开启，开启后方可打印 SDK 运行日志                                            |
-|     setMonitorType      |             设置监控项              |         否          | 默认不开启任何监控项,<br>[关于监控项说明](#四监控配置项类-monitortype),<br>[关于监控项参数获取问题](#二关于监控项中有些参数获取不到问题说明) |
-|     setNeedBindUser     |         是否开启绑定用户数据          |         否          |                        默认不开启,<br>开启后必须要绑定用户数据[如何绑定用户数据](#一初始化类-ftsdk-提供的方法)                        |
-|    setOpenFlowChart     |     是否开启自动埋点流程图数据上报      |         否          |                                        [详细说明](#三关于自动埋点的页面路径流程图的说明)                                         |
-|     setFlowProduct      |           设置流程的指标集           |          否          |                                               当开启了上报流程图一定要设置该值                                               |
-|     enableAutoTrack     |           是否使用自动埋点           |          否          |                                               不开启将不会上报流程图和埋点事件                                               |
-| setEnableAutoTrackType  |            设置事件白名单            |         否          |                                开启自动埋点后，不设置该值表示接受所有事件类型。埋点事件类型见表下说明                                 |
-| setDisableAutoTrackType |            设置事件黑名单            |         否          |                                          开启自动埋点后，不设置该值表示不设置事件黑名单                                          |
-| setWhiteActivityClasses |             页面白名单              |         否          |                                                 包括 Activity、Fragment                                                  |
-|   setWhiteViewClasses   |             控件白名单              |         否          |                                                       包括基本控件                                                        |
-| setBlackActivityClasses |             页面黑名单              |         否          |                                                 包括 Activity、Fragment                                                  |
-|   setBlackViewClasses   |             控件黑名单              |         否          |                                                       包括基本控件                                                        |
-|       metricsUrl        |    FT-GateWay metrics 写入地址     |          是          |                                                  必须配置，配置后才能上报                                                   |
-|  enableRequestSigning   |       配置是否需要进行请求签名        |          否          |                                                      默认不开启                                                           |
-|          akId           |           access key ID           |         否          |                                         enableRequestSigning 为 true 时，必须要填                                          |
-|        akSecret         |         access key Secret         |         否          |                                         enableRequestSigning 为 true 时，必须要填                                          |
-|        setGeoKey        |  设置是否使用高德作为地址解析器和key     |         否          |              如何申请高德的 key？[点我快速了解](https://lbs.amap.com/api/webservice/guide/api/georegeo)                      |
-|        setINetEngineClass        |  设置网络请求框架的引擎实现类     |         否          |               [点我快速了解如何实现网络引擎](#四如何监控网络请求的相关时长)                                    |
-
+|           方法名           |           含义            | 是否必须 |                                           注意                                           |
+|:-----------------------:|:-----------------------:|:----:|:--------------------------------------------------------------------------------------:|
+|       setUseOAID        | 是否使用OAID作为设备唯一识别号的替代字段  |  否   |                 默认不使用,开启后全埋点数据里将会添加一个 oaid 字段<br>[了解 OAID](#一关于-oaid)                  |
+|     setXDataKitUUID     |       设置数据采集端的名称        |  否   |                                  不设置该值系统会生成一个默认的 uuid                                  |
+|        setDebug         |        是否开启调试模式         |  否   |                                 默认不开启，开启后方可打印 SDK 运行日志                                 |
+|     setMonitorType      |          设置监控项          |  否   | 默认不开启任何监控项,<br>[关于监控项说明](#四监控配置项类-monitortype),<br>[关于监控项参数获取问题](#二关于监控项中有些参数获取不到问题说明) |
+|     setNeedBindUser     |       是否开启绑定用户数据        |  否   |                  默认不开启,<br>开启后必须要绑定用户数据[如何绑定用户数据](#一初始化类-ftsdk-提供的方法)                  |
+|    setOpenFlowChart     |     是否开启自动埋点流程图数据上报     |  否   |                              [详细说明](#三关于自动埋点的页面路径流程图的说明)                               |
+|     setFlowProduct      |        设置流程的指标集         |  否   |                                    当开启了上报流程图一定要设置该值                                    |
+|     enableAutoTrack     |        是否使用自动埋点         |  否   |                                    不开启将不会上报流程图和埋点事件                                    |
+| setEnableAutoTrackType  |         设置事件白名单         |  否   |                          开启自动埋点后，不设置该值表示接受所有事件类型。埋点事件类型见表下说明                           |
+| setDisableAutoTrackType |         设置事件黑名单         |  否   |                                开启自动埋点后，不设置该值表示不设置事件黑名单                                 |
+| setWhiteActivityClasses |          页面白名单          |  否   |                                  包括 Activity、Fragment                                  |
+|   setWhiteViewClasses   |          控件白名单          |  否   |                                         包括基本控件                                         |
+| setBlackActivityClasses |          页面黑名单          |  否   |                                  包括 Activity、Fragment                                  |
+|   setBlackViewClasses   |          控件黑名单          |  否   |                                         包括基本控件                                         |
+|       metricsUrl        | FT-GateWay metrics 写入地址 |  是   |                                      必须配置，配置后才能上报                                      |
+|  enableRequestSigning   |      配置是否需要进行请求签名       |  否   |                                         默认不开启                                          |
+|          akId           |      access key ID      |  否   |                           enableRequestSigning 为 true 时，必须要填                           |
+|        akSecret         |    access key Secret    |  否   |                           enableRequestSigning 为 true 时，必须要填                           |
+|        setGeoKey        |   设置是否使用高德作为地址解析器和key   |  否   |      如何申请高德的 key？[点我快速了解](https://lbs.amap.com/api/webservice/guide/api/georegeo)      |
+|       openNetTime       |     设置是否开启网络请求时长的监控      |  否   |                           [点我快速了解如何监控网络请求时长](#四如何监控网络请求的相关时长)                            |
+| setFlowChartDescEnabled |      设置流程图是否使用描述显示      |  否   |                                       默认使用类名进行显示 [关于页面和视图树的描述的使用方法](#五关于页面和视图树及流程图的描述使用)                                      |
+|  setPageVtpDescEnabled  |    设置页面和视图树是否使用描述显示     |  否   |                                       默认使用类名和视图树                                       |
+|       addPageDesc       |        设置页面描述配置         |  否   |             Map 数据集，开启本地的描述日志显示，获取页面类名作为 Key，然后添加描述性文字作为 value 去创建 Map 数据集             |
+|       addVtpDesc        |        设置视图树描述配置        |  否   |             Map 数据集，开启本地的描述日志显示，获取视图树作为 Key，然后添加描述性文字作为 value 去创建 Map 数据集              |
+|       setDescLog        |    是否开启本地视图树和类名日志显示     |  否   |                           不开启将不会显示视图树和类名日志，该方法独立于  setDebug                            |
 
 > FTAutoTrackType 自动埋点事件说明，事件总类目前支持3种：
     FTAutoTrackType.APP_START：页面的开始事件，Activity 依赖的是其 onResume 方法，Fragment 依赖的是其 onResume 方法；
@@ -162,12 +168,17 @@ class DemoAplication : Application() {
             accessKey_secret//access key Secret
         ).setUseOAID(true)//是否使用OAID
             .setDebug(true)//是否开启Debug模式（开启后能查看调试数据）
+            .setDescLog(true)//开启显示页面和描述日志的显示
             .setXDataKitUUID("ft-dataKit-uuid-001")
             .setNeedBindUser(true)//是否绑定用户信息
             .setMonitorType(MonitorType.ALL)//设置监控项
             .setOpenFlowChart(true)//开启流程图
-            .setProduct("demo12")//流程图唯一识别号
             .enableAutoTrack(true)//是否开启自动埋点
+            .addPageDesc(pageAliasMap())
+            .addVtpDesc(eventAliasMap())
+            .setFlowChartDescEnabled(true)
+            .setPageVtpDescEnabled(true)
+            .openNetTime(true)
             .setEnableAutoTrackType(FTAutoTrackType.APP_START.type or
                     FTAutoTrackType.APP_END.type or
                     FTAutoTrackType.APP_CLICK.type)//自动埋点事件白名单
@@ -380,6 +391,47 @@ class FTSDKConfig{
      * @return
      */
     public FTSDKConfig setBlackViewClasses(List<Class<?>> classes);
+    
+    
+    /**
+     * 页面别名对应 map
+     * @param pageDescMap
+     * @return
+     */
+    public FTSDKConfig addPageDesc(Map<String, String> pageDescMap) {
+        this.pageDescMap = pageDescMap;
+        return this;
+    }
+
+    /**
+     * 事件别名对应 map
+     * @param vtpDescMap
+     * @return
+     */
+    public FTSDKConfig addVtpDesc(Map<String, String> vtpDescMap) {
+        this.vtpDescMap = vtpDescMap;
+        return this;
+    }
+
+    /**
+     * 设置页面和视图树是否使用别名
+     * @param pageVtpDescEnabled
+     * @return
+     */
+    public FTSDKConfig setPageVtpDescEnabled(boolean pageVtpDescEnabled) {
+        this.pageVtpDescEnabled = pageVtpDescEnabled;
+        return this;
+    }
+
+    /**
+     * 设置流程图是否使用别名显示
+     * @param flowChartDescEnabled
+     * @return
+     */
+    public FTSDKConfig setFlowChartDescEnabled(boolean flowChartDescEnabled) {
+        this.flowChartDescEnabled = flowChartDescEnabled;
+        return this;
+    }
 }
 ```
 
@@ -579,103 +631,120 @@ CPU 温度有些设备可能获取不到（每种手机可能 CPU 温度文件�
 流程图有问题，我们建议集成者使用 1 和 3 两种方式来管理 Fragment
 
 ### 四、如何监控网络请求的相关时长
-DataFlux SDK 中网络请求基于 HttpUrlConnection 实现，其无法显示对于标题中数据项的监控。研究发现若想监控上面的数据
-需要使用 OKHttp 网络框架。OKHttp 中的 OkHttpClient 提供 eventListener(EventListener e) 来监听网络请求的
-全路径。因此若需要监控上面数据需要自行切换网络引擎。DataFlux SDK 中提供 INetEngine 接口，接入方只需要实现接口，并且在
-初始化 SDK 时，将实现的接口类通过 FTSDKConfig.setINetEngineClass(OkHttpEngine.class) 来使其生效。
-下面提供一种实现引擎的方式以供参考
-```java
-public class OkHttpEngine implements INetEngine {
-    private static OkHttpClient client;
-    private Request request;
+DataFlux SDK 中对于网络请求的全路径时长统计，是基于 OkHttp 网络请求引擎来实现的。如果你想要只想要监控 DataFlux SDK 中的相关网络
+请求的时长，你只需要在配置 SDK 时调用 openNetTime(true) 方法即可。如果你需要监控当前应用的所有网络请求，你需要按以下步骤来实现。
 
-    @Override
-    public void defaultConfig(HttpBuilder httpBuilder) {
-        if (client == null) {
-            client = new OkHttpClient.Builder()
-                    .connectTimeout(httpBuilder.getSendOutTime(), TimeUnit.MILLISECONDS)
-                    .readTimeout(httpBuilder.getReadOutTime(), TimeUnit.MILLISECONDS)
-                    .eventListener(new EventListener() {
-                        @Override
-                        public void callEnd(@NotNull Call call) {
-                            super.callEnd(call);
-                            FTMonitor.get().setResponseEndTime();
-                        }
+> 步骤1:开启 SDK 中的网络时长监控开关
 
-                        @Override
-                        public void callFailed(@NotNull Call call, @NotNull IOException ioe) {
-                            super.callFailed(call, ioe);
-                            FTMonitor.get().setRequestErrCount();
-                        }
+```kotlin
 
-                        @Override
-                        public void callStart(@NotNull Call call) {
-                            super.callStart(call);
-                            FTMonitor.get().setRequestCount();
-                            FTMonitor.get().setResponseStartTime();
-                        }
-
-                        @Override
-                        public void dnsEnd(@NotNull Call call, @NotNull String domainName, @NotNull List<InetAddress> inetAddressList) {
-                            super.dnsEnd(call, domainName, inetAddressList);
-                            FTMonitor.get().setDnsEndTime();
-                        }
-
-                        @Override
-                        public void dnsStart(@NotNull Call call, @NotNull String domainName) {
-                            super.dnsStart(call, domainName);
-                            FTMonitor.get().setDnsStartTime();
-                        }
-
-                        @Override
-                        public void secureConnectEnd(@NotNull Call call, @Nullable Handshake handshake) {
-                            super.secureConnectEnd(call, handshake);
-                            FTMonitor.get().setTcpEndTime();
-                        }
-
-                        @Override
-                        public void secureConnectStart(@NotNull Call call) {
-                            super.secureConnectStart(call);
-                            FTMonitor.get().setTcpStartTime();
-                        }
-                    })
-                    .build();
-        }
-    }
-
-    @Override
-    public void createRequest(HttpBuilder httpBuilder) {
-        RequestBody requestBody = null;
-        if (httpBuilder.getMethod() == RequestMethod.POST) {
-            requestBody = RequestBody.create(null, httpBuilder.getBodyString());
-        }
-        Headers.Builder builder = new Headers.Builder();
-        HashMap<String, String> hashMap = httpBuilder.getHeadParams();
-        for (Map.Entry<String, String> entry : hashMap.entrySet()) {
-            builder.add(entry.getKey(), entry.getValue());
-        }
-        request = new Request.Builder()
-                .url(httpBuilder.getUrl())
-                .method(httpBuilder.getMethod().name(), requestBody)
-                .headers(builder.build())
-                .build();
-    }
-
-    @Override
-    public ResponseData execute() {
-        try {
-            Response response = client.newCall(request).execute();
-            ResponseBody responseBody = response.body();
-            String string = "";
-            if (responseBody != null) {
-                string = responseBody.string();
-            }
-            return new ResponseData(response.code(), string);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+class DemoAplication : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        val ftSDKConfig = FTSDKConfig.builder(
+            "serverUrl",//服务器地址
+            true,//是否需要签名
+            "accesskey_id",//access key ID
+            "accessKey_secret"//access key Secret
+        ).openNetTime(true)
+            
+        FTSdk.install(ftSDKConfig)
     }
 }
 
+```
+
+> 步骤2:在 OkHttpClient 中注册网络请求监听器
+
+```kotlin
+class CustomOkHttp {
+    fun initOKHttp(){
+        OkHttpClient.Builder()
+                .eventListener(OKHttpEventListener())
+                .build()
+    }
+}
+```
+
+### 五、关于页面和视图树及流程图的描述使用
+
+> 重要提示：对于需要埋点的点击事件，你需要对点击的控件设置 ID，如果不设置 ID 那么视图树结尾处的控件 ID 将显示为null，这样不利于
+> 区分视图树，因此需要对每个可以点击的控件设置一个 ID
+
+#### 1、首先在配置 SDK 的时候打开描述日志的开关 setDescLog(true)
+
+```kotlin
+class MyApplication{
+    override fun onCreate() {
+        super.onCreate()
+        val ftSDKConfig = FTSDKConfig.builder(
+            "serverUrl",//服务器地址
+            true,//是否需要签名
+            "accesskey_id",//access key ID
+            "accessKey_secret"//access key Secret
+        ).setDebug(false)//是否开启Debug模式（开启后能查看调试数据）
+            .setDescLog(true)//开启显示页面和描述日志的显示
+            .setXDataKitUUID("ft-dataKit-uuid-001")
+            .setOpenFlowChart(true)//开启流程图
+            .setProduct("demo12")//流程图唯一识别号
+            .enableAutoTrack(true)//是否开启自动埋点
+            .setFlowChartDescEnabled(true)
+            .setPageVtpDescEnabled(true)
+            .setEnableAutoTrackType(FTAutoTrackType.APP_START.type or
+                    FTAutoTrackType.APP_END.type or
+                    FTAutoTrackType.APP_CLICK.type)//自动埋点事件白名单
+        FTSdk.install(ftSDKConfig)
+       }
+}
+```
+
+#### 2、运行程序，打开你需要设置描述的页面，点击你需要设置描述的按钮等控件，然后找到控制台输出的对应日志
+
+例如：
+
+```
+2020-05-20 18:25:28.235 12123-12123/com.ft D/[FT-SDK]:: 当前页面的 name 值为:MainActivity
+2020-05-20 18:25:28.236 12123-12123/com.ft D/[FT-SDK]:: 当前页面的 name 值为:MainActivity.Tab1Fragment
+2020-05-20 18:26:36.029 12123-12123/com.ft D/[FT-SDK]:: 当前点击事件的 vtp 值为:MainActivity/ViewRootImpl/DecorView/LinearLayout/FrameLayout/ActionBarOverlayLayout/ContentFrameLayout/ScrollView/LinearLayout/AppCompatCheckBox/#checkbox
+```
+
+#### 3、建立两个 Map 数据集，将步骤2中输出的日志放入 Map 中,并且将数据集加入到 SDK 的配置中
+
+例如：
+
+```kotlin
+class MyApplication{
+    private fun pageDescMap(): Map<String, String>? {
+        return mutableMapOf(
+                Pair("MainActivity", "首页面"),
+                Pair("MainActivity.Tab1Fragment", "首页面中的片段1"))
+    }
+    
+    private fun vtpDescMap(): Map<String, String>? {
+        return mutableMapOf(
+                Pair("MainActivity/ViewRootImpl/DecorView/LinearLayout/FrameLayout/ActionBarOverlayLayout/ContentFrameLayout/ScrollView/LinearLayout/AppCompatCheckBox/#checkbox", "点击选中复选框"))
+    }
+    
+    override fun onCreate() {
+        super.onCreate()
+        val ftSDKConfig = FTSDKConfig.builder(
+            "serverUrl",//服务器地址
+            true,//是否需要签名
+            "accesskey_id",//access key ID
+            "accessKey_secret"//access key Secret
+        ).setDebug(true)//是否开启Debug模式（开启后能查看调试数据）
+            .setDescLog(true)//开启显示页面和描述日志的显示
+            .setXDataKitUUID("ft-dataKit-uuid-001")
+            .setOpenFlowChart(true)//开启流程图
+            .enableAutoTrack(true)//是否开启自动埋点
+            .addPageDesc(pageDescMap())
+            .addVtpDesc(vtpDescMap())
+            .setFlowChartDescEnabled(true)
+            .setPageVtpDescEnabled(true)
+            .setEnableAutoTrackType(FTAutoTrackType.APP_START.type or
+                    FTAutoTrackType.APP_END.type or
+                    FTAutoTrackType.APP_CLICK.type)//自动埋点事件白名单
+        FTSdk.install(ftSDKConfig)
+       }
+}
 ```

@@ -91,9 +91,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="主动流程图数据上报"/>
-        <FrameLayout
+        <androidx.viewpager.widget.ViewPager
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:id="@+id/fragment"/>
+            android:id="@+id/viewPager"/>
     </LinearLayout>
 </ScrollView>

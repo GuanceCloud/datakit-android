@@ -20,11 +20,9 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewParent;
 import android.widget.Button;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import java.lang.reflect.Method;
@@ -36,6 +34,7 @@ import java.lang.reflect.Method;
 public class AopUtils {
     /**
      * 通过 View 的 ID 获取 View 上的字符串值
+     *
      * @param view
      * @return
      */
@@ -53,6 +52,7 @@ public class AopUtils {
 
     /**
      * 通过 Context 获取当前的 Activity
+     *
      * @param context
      * @return
      */
@@ -122,6 +122,7 @@ public class AopUtils {
 
     /**
      * 获取 View 视图树
+     *
      * @param view
      * @return
      */
@@ -133,17 +134,37 @@ public class AopUtils {
             stringBuffer.insert(0, viewParent.getClass().getSimpleName() + "/");
             viewParent = viewParent.getParent();
         }
+        stringBuffer.insert(0, view.getContext().getClass().getSimpleName() + "/");
         stringBuffer.append("#" + AopUtils.getViewId(view));
         return stringBuffer.toString();
     }
 
     /**
-     *  获取 Dialog 上点击按钮上的字符
+     * 获取 View 视图树
+     *
+     * @param view
+     * @return
+     */
+    public static String getParentViewTree(View view) {
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append(view.getClass().getSimpleName() + "/");
+        ViewParent viewParent = view.getParent();
+        while (viewParent != null) {
+            stringBuffer.insert(0, viewParent.getClass().getSimpleName() + "/");
+            viewParent = viewParent.getParent();
+        }
+        stringBuffer.insert(0, view.getContext().getClass().getSimpleName() + "/");
+        return stringBuffer.toString();
+    }
+
+    /**
+     * 获取 Dialog 上点击按钮上的字符
+     *
      * @param dialog
      * @param whichButton
      * @return
      */
-    public static String getDialogClickView(Dialog dialog,int whichButton){
+    public static String getDialogClickView(Dialog dialog, int whichButton) {
         Class<?> supportAlertDialogClass = null;
         Class<?> androidXAlertDialogClass = null;
         Class<?> currentAlertDialogClass;
@@ -177,13 +198,7 @@ public class AopUtils {
             } else {
                 ListView listView = alertDialog.getListView();
                 if (listView != null) {
-                    ListAdapter listAdapter = listView.getAdapter();
-                    Object object = listAdapter.getItem(whichButton);
-                    if (object instanceof String) {
-                        return getViewTree(listView)+"#value-"+object+"#postion-"+whichButton;
-                    }else{
-                        return getViewTree(listView)+"#postion-"+whichButton;
-                    }
+                    return getViewTree(listView);
                 }
             }
 
@@ -206,13 +221,7 @@ public class AopUtils {
                     if (getListViewMethod != null) {
                         ListView listView = (ListView) getListViewMethod.invoke(dialog);
                         if (listView != null) {
-                            ListAdapter listAdapter = listView.getAdapter();
-                            Object object = listAdapter.getItem(whichButton);
-                            if (object instanceof String) {
-                                return getViewTree(listView)+"#value-"+object+"#postion-"+whichButton;
-                            }else{
-                                return getViewTree(listView)+"#postion-"+whichButton;
-                            }
+                            return getViewTree(listView);
                         }
                     }
                 } catch (Exception e) {

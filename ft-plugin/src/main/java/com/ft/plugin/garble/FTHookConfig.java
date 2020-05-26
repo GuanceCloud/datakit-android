@@ -80,8 +80,8 @@ public class FTHookConfig {
                 "(Ljava/lang/Boolean;Landroid/content/Intent;)V",
                 Arrays.asList(
                         new FTSubMethodCell(FTMethodType.ALOAD, 0),
-                        new FTSubMethodCell(FTMethodType.GETFIELD, "androidx/fragment/app/FragmentActivity","mStartedActivityFromFragment","Z",false),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, "java/lang/Boolean","valueOf","(Z)Ljava/lang/Boolean;",false),
+                        new FTSubMethodCell(FTMethodType.GETFIELD, "androidx/fragment/app/FragmentActivity", "mStartedActivityFromFragment", "Z", false),
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;", false),
                         new FTSubMethodCell(FTMethodType.ALOAD, 1)
                 )));
     }
@@ -241,7 +241,7 @@ public class FTHookConfig {
                 "android/view/View$OnClickListener",
                 "trackViewOnClick",
                 "(Landroid/view/View;)V",
-                1, 1,Arrays.asList(Opcodes.ALOAD)));//
+                Arrays.asList(new FTSubMethodCell(FTMethodType.ALOAD, 1))));//
 
         addInterfaceMethod(new FTMethodCell(
                 "onCheckedChanged",
@@ -249,14 +249,14 @@ public class FTHookConfig {
                 "android/widget/CompoundButton$OnCheckedChangeListener",
                 "trackViewOnClick",
                 "(Landroid/view/View;)V",
-                1, 1,Arrays.asList(Opcodes.ALOAD)));//
+                Arrays.asList(new FTSubMethodCell(FTMethodType.ALOAD, 1))));//
         addInterfaceMethod(new FTMethodCell(
                 "onRatingChanged",
                 "(Landroid/widget/RatingBar;FZ)V",
                 "android/widget/RatingBar$OnRatingBarChangeListener",
                 "trackViewOnClick",
                 "(Landroid/view/View;)V",
-                1, 1,Arrays.asList(Opcodes.ALOAD)));//
+                Arrays.asList(new FTSubMethodCell(FTMethodType.ALOAD, 1))));//
 
         addInterfaceMethod(new FTMethodCell(
                 "onStopTrackingTouch",
@@ -264,7 +264,7 @@ public class FTHookConfig {
                 "android/widget/SeekBar$OnSeekBarChangeListener",
                 "trackViewOnClick",
                 "(Landroid/view/View;)V",
-                1, 1,Arrays.asList(Opcodes.ALOAD)));//
+                Arrays.asList(new FTSubMethodCell(FTMethodType.ALOAD, 1))));//
 
         addInterfaceMethod(new FTMethodCell(
                 "onCheckedChanged",
@@ -272,7 +272,10 @@ public class FTHookConfig {
                 "android/widget/RadioGroup$OnCheckedChangeListener",
                 "trackRadioGroup",
                 "(Landroid/widget/RadioGroup;I)V",
-                1, 2,Arrays.asList(Opcodes.ALOAD,Opcodes.ILOAD)));//
+                Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD, 1),
+                        new FTSubMethodCell(FTMethodType.ILOAD, 2)
+                )));//
 
         addInterfaceMethod(new FTMethodCell(
                 "onItemClick",
@@ -280,7 +283,12 @@ public class FTHookConfig {
                 "android/widget/AdapterView$OnItemClickListener",
                 "trackListView",
                 "(Landroid/widget/AdapterView;Landroid/view/View;I)V",
-                1, 3,Arrays.asList(Opcodes.ALOAD,Opcodes.ALOAD,Opcodes.ILOAD)));//
+                Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD, 1),
+                        new FTSubMethodCell(FTMethodType.ALOAD, 2),
+                        new FTSubMethodCell(FTMethodType.ILOAD, 3)
+                )));
+
 
         addInterfaceMethod(new FTMethodCell(
                 "onItemSelected",
@@ -288,7 +296,12 @@ public class FTHookConfig {
                 "android/widget/AdapterView$OnItemSelectedListener",
                 "trackListView",
                 "(Landroid/widget/AdapterView;Landroid/view/View;I)V",
-                1, 3,Arrays.asList(Opcodes.ALOAD,Opcodes.ALOAD,Opcodes.ILOAD)));//
+                Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD, 1),
+                        new FTSubMethodCell(FTMethodType.ALOAD, 2),
+                        new FTSubMethodCell(FTMethodType.ILOAD, 3)
+                )));
+
 
 
         addInterfaceMethod(new FTMethodCell(
@@ -297,14 +310,23 @@ public class FTHookConfig {
                 "android/widget/ExpandableListView$OnGroupClickListener",
                 "trackExpandableListViewOnGroupClick",
                 "(Landroid/widget/ExpandableListView;Landroid/view/View;I)V",
-                1, 3,Arrays.asList(Opcodes.ALOAD,Opcodes.ALOAD,Opcodes.ILOAD)));//
+                Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD, 1),
+                        new FTSubMethodCell(FTMethodType.ALOAD, 2),
+                        new FTSubMethodCell(FTMethodType.ILOAD, 3)
+                )));
         addInterfaceMethod(new FTMethodCell(
                 "onChildClick",
                 "(Landroid/widget/ExpandableListView;Landroid/view/View;IIJ)Z",
                 "android/widget/ExpandableListView$OnChildClickListener",
                 "trackExpandableListViewOnChildClick",
                 "(Landroid/widget/ExpandableListView;Landroid/view/View;II)V",
-                1, 4,Arrays.asList(Opcodes.ALOAD, Opcodes.ALOAD, Opcodes.ILOAD, Opcodes.ILOAD)));//
+                Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD, 1),
+                        new FTSubMethodCell(FTMethodType.ALOAD, 2),
+                        new FTSubMethodCell(FTMethodType.ILOAD, 3),
+                        new FTSubMethodCell(FTMethodType.ILOAD, 4)
+                )));
 
         addInterfaceMethod(new FTMethodCell(
                 "onTabChanged",
@@ -312,7 +334,9 @@ public class FTHookConfig {
                 "android/widget/TabHost$OnTabChangeListener",
                 "trackTabHost",
                 "(Ljava/lang/String;)V",
-                1, 1,Arrays.asList(Opcodes.ALOAD)));//
+                Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD, 1)
+                )));
 
         addInterfaceMethod(new FTMethodCell(
                 "onNavigationItemSelected",
@@ -320,7 +344,9 @@ public class FTHookConfig {
                 "android/support/design/widget/NavigationView$OnNavigationItemSelectedListener",
                 "trackMenuItem",
                 "(Landroid/view/MenuItem;)V",
-                1, 1,Arrays.asList(Opcodes.ALOAD)));//
+                Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD, 1)
+                )));
 
         addInterfaceMethod(new FTMethodCell(
                 "onMenuItemClick",
@@ -328,7 +354,9 @@ public class FTHookConfig {
                 "android/widget/Toolbar$OnMenuItemClickListener",
                 "trackMenuItem",
                 "(Landroid/view/MenuItem;)V",
-                1, 1,Arrays.asList(Opcodes.ALOAD)));//
+                Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD, 1)
+                )));
 
         addInterfaceMethod(new FTMethodCell(
                 "onMenuItemClick",
@@ -336,7 +364,9 @@ public class FTHookConfig {
                 "android/support/v7/widget/Toolbar$OnMenuItemClickListener",
                 "trackMenuItem",
                 "(Landroid/view/MenuItem;)V",
-                1, 1,Arrays.asList(Opcodes.ALOAD)));//
+                Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD, 1)
+                )));
 
         addInterfaceMethod(new FTMethodCell(
                 "onMenuItemClick",
@@ -344,7 +374,9 @@ public class FTHookConfig {
                 "androidx/appcompat/widget/Toolbar$OnMenuItemClickListener",
                 "trackMenuItem",
                 "(Landroid/view/MenuItem;)V",
-                1, 1,Arrays.asList(Opcodes.ALOAD)));//
+                Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD, 1)
+                )));
 
         addInterfaceMethod(new FTMethodCell(
                 "onClick",
@@ -352,14 +384,20 @@ public class FTHookConfig {
                 "android/content/DialogInterface$OnMultiChoiceClickListener",
                 "trackDialog",
                 "(Landroid/content/DialogInterface;I)V",
-                1, 2,Arrays.asList(Opcodes.ALOAD,Opcodes.ILOAD)));//
+                Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD, 1),
+                        new FTSubMethodCell(FTMethodType.ILOAD, 2)
+                )));
         addInterfaceMethod(new FTMethodCell(
                 "onClick",
                 "(Landroid/content/DialogInterface;I)V",
                 "android/content/DialogInterface$OnClickListener",
                 "trackDialog",
                 "(Landroid/content/DialogInterface;I)V",
-                1, 2,Arrays.asList(Opcodes.ALOAD,Opcodes.ILOAD)));//
+                Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD, 1),
+                        new FTSubMethodCell(FTMethodType.ILOAD, 2)
+                )));
 
         addInterfaceMethod(new FTMethodCell(
                 "onMenuItemClick",
@@ -367,7 +405,9 @@ public class FTHookConfig {
                 "android/widget/PopupMenu$OnMenuItemClickListener",
                 "trackMenuItem",
                 "(Landroid/view/MenuItem;)V",
-                1, 1,Arrays.asList(Opcodes.ALOAD)));
+                Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD, 1)
+                )));
 
         addInterfaceMethod(new FTMethodCell(
                 "onMenuItemClick",
@@ -375,7 +415,9 @@ public class FTHookConfig {
                 "androidx/appcompat/widget/PopupMenu$OnMenuItemClickListener",
                 "trackMenuItem",
                 "(Landroid/view/MenuItem;)V",
-                1, 1,Arrays.asList(Opcodes.ALOAD)));
+                Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD, 1)
+                )));
 
         addInterfaceMethod(new FTMethodCell(
                 "onMenuItemClick",
@@ -383,18 +425,77 @@ public class FTHookConfig {
                 "android/support/v7/widget/PopupMenu$OnMenuItemClickListener",
                 "trackMenuItem",
                 "(Landroid/view/MenuItem;)V",
-                1, 1,Arrays.asList(Opcodes.ALOAD)));
+                Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD, 1)
+                )));
 
+        addInterfaceMethod(new FTMethodCell(
+         "onTouch",
+         "(Landroid/view/View;Landroid/view/MotionEvent;)Z",
+         "android/view/View$OnTouchListener",
+         "trackViewOnTouch",
+         "(Landroid/view/View;Landroid/view/MotionEvent;)V",
+                Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD, 1),
+                        new FTSubMethodCell(FTMethodType.ALOAD, 2)
+                )));
+        addInterfaceMethod(new FTMethodCell(
+                "onPageSelected",
+                "(I)V",
+                "androidx/viewpager/widget/ViewPager$OnPageChangeListener",
+                "trackViewPagerChange",
+                "(Ljava/lang/Object;I)V",
+                Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD, 0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
+                        new FTSubMethodCell(FTMethodType.ILOAD, 1)
+                )
+        ));//androidx/viewpager/widget/ViewPager
+        addInterfaceMethod(new FTMethodCell(
+                "onPageSelected",
+                "(I)V",
+                "com/android/internal/widget/ViewPager$OnPageChangeListener",
+                "trackViewPagerChange",
+                "(Ljava/lang/Object;I)V",
+                Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD, 0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
+                        new FTSubMethodCell(FTMethodType.ILOAD, 1)
+                )
+        ));//com/android/internal/widget/ViewPager
+        addInterfaceMethod(new FTMethodCell(
+                "onPageSelected",
+                "(I)V",
+                "android/support/v4/view/ViewPager$OnPageChangeListener",
+                "trackViewPagerChange",
+                "(Ljava/lang/Object;I)V",
+                Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD, 0),
+                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
+                        new FTSubMethodCell(FTMethodType.ILOAD, 1)
+                )
+        ));//android/support/v4/view/ViewPager
+        addInterfaceMethod(new FTMethodCell(
+                "onTabSelected",
+                "(Lcom/google/android/material/tabs/TabLayout$Tab;)V",
+                "com/google/android/material/tabs/TabLayout$OnTabSelectedListener",
+                "trackTabLayoutSelected",
+                "(Lcom/google/android/material/tabs/TabLayout$Tab;)V",
+                Arrays.asList(
+                        new FTSubMethodCell(FTMethodType.ALOAD, 1)
+                )
+        ));
     }
 
     static void addInterfaceMethod(FTMethodCell ftMethodCell) {
         if (ftMethodCell != null) {
-            CLICK_METHODS_SYSTEM.put(ftMethodCell.parent+ftMethodCell.name + ftMethodCell.desc, ftMethodCell);
+            CLICK_METHODS_SYSTEM.put(ftMethodCell.parent + ftMethodCell.name + ftMethodCell.desc, ftMethodCell);
         }
     }
 
     public final static HashMap<String, FTMethodCell> LAMBDA_METHODS = new HashMap<>();
     public final static HashMap<String, FTMethodCell> mLambdaMethodCells = new HashMap<>();
+
     static {
         addLambdaMethod1(new FTMethodCell(
                 "onClick",
@@ -402,7 +503,7 @@ public class FTHookConfig {
                 "Landroid/view/View$OnClickListener;",
                 "trackViewOnClick",
                 "(Landroid/view/View;)V",
-                1, 1,Arrays.asList(Opcodes.ALOAD)));//
+                1, 1, Arrays.asList(Opcodes.ALOAD)));//
 
         addLambdaMethod1(new FTMethodCell(
                 "onCheckedChanged",
@@ -410,14 +511,14 @@ public class FTHookConfig {
                 "Landroid/widget/CompoundButton$OnCheckedChangeListener;",
                 "trackViewOnClick",
                 "(Landroid/view/View;)V",
-                1, 1,Arrays.asList(Opcodes.ALOAD)));//
+                1, 1, Arrays.asList(Opcodes.ALOAD)));//
         addLambdaMethod1(new FTMethodCell(
                 "onRatingChanged",
                 "(Landroid/widget/RatingBar;FZ)V",
                 "Landroid/widget/RatingBar$OnRatingBarChangeListener;",
                 "trackViewOnClick",
                 "(Landroid/view/View;)V",
-                1, 1,Arrays.asList(Opcodes.ALOAD)));//
+                1, 1, Arrays.asList(Opcodes.ALOAD)));//
 
         addLambdaMethod1(new FTMethodCell(
                 "onStopTrackingTouch",
@@ -425,7 +526,7 @@ public class FTHookConfig {
                 "Landroid/widget/SeekBar$OnSeekBarChangeListener;",
                 "trackViewOnClick",
                 "(Landroid/view/View;)V",
-                1, 1,Arrays.asList(Opcodes.ALOAD)));//
+                1, 1, Arrays.asList(Opcodes.ALOAD)));//
 
         addLambdaMethod1(new FTMethodCell(
                 "onCheckedChanged",
@@ -433,7 +534,7 @@ public class FTHookConfig {
                 "Landroid/widget/RadioGroup$OnCheckedChangeListener;",
                 "trackRadioGroup",
                 "(Landroid/widget/RadioGroup;I)V",
-                1, 2,Arrays.asList(Opcodes.ALOAD,Opcodes.ILOAD)));//
+                1, 2, Arrays.asList(Opcodes.ALOAD, Opcodes.ILOAD)));//
 
         addLambdaMethod1(new FTMethodCell(
                 "onItemClick",
@@ -441,7 +542,7 @@ public class FTHookConfig {
                 "Landroid/widget/AdapterView$OnItemClickListener;",
                 "trackListView",
                 "(Landroid/widget/AdapterView;Landroid/view/View;I)V",
-                1, 3,Arrays.asList(Opcodes.ALOAD,Opcodes.ALOAD,Opcodes.ILOAD)));//
+                1, 3, Arrays.asList(Opcodes.ALOAD, Opcodes.ALOAD, Opcodes.ILOAD)));//
 
         addLambdaMethod1(new FTMethodCell(
                 "onGroupClick",
@@ -449,14 +550,14 @@ public class FTHookConfig {
                 "Landroid/widget/ExpandableListView$OnGroupClickListener;",
                 "trackExpandableListViewOnGroupClick",
                 "(Landroid/widget/ExpandableListView;Landroid/view/View;I)V",
-                1, 3,Arrays.asList(Opcodes.ALOAD,Opcodes.ALOAD,Opcodes.ILOAD)));//
+                1, 3, Arrays.asList(Opcodes.ALOAD, Opcodes.ALOAD, Opcodes.ILOAD)));//
         addLambdaMethod1(new FTMethodCell(
                 "onChildClick",
                 "(Landroid/widget/ExpandableListView;Landroid/view/View;IIJ)Z",
                 "Landroid/widget/ExpandableListView$OnChildClickListener;",
                 "trackExpandableListViewOnChildClick",
                 "(Landroid/widget/ExpandableListView;Landroid/view/View;II)V",
-                1, 4,Arrays.asList(Opcodes.ALOAD, Opcodes.ALOAD, Opcodes.ILOAD, Opcodes.ILOAD)));//
+                1, 4, Arrays.asList(Opcodes.ALOAD, Opcodes.ALOAD, Opcodes.ILOAD, Opcodes.ILOAD)));//
 
         addLambdaMethod1(new FTMethodCell(
                 "onTabChanged",
@@ -464,7 +565,7 @@ public class FTHookConfig {
                 "Landroid/widget/TabHost$OnTabChangeListener;",
                 "trackTabHost",
                 "(Ljava/lang/String;)V",
-                1, 1,Arrays.asList(Opcodes.ALOAD)));//
+                1, 1, Arrays.asList(Opcodes.ALOAD)));//
 
         addLambdaMethod1(new FTMethodCell(
                 "onNavigationItemSelected",
@@ -472,7 +573,7 @@ public class FTHookConfig {
                 "Landroid/support/design/widget/NavigationView$OnNavigationItemSelectedListener;",
                 "trackMenuItem",
                 "(Landroid/view/MenuItem;)V",
-                1, 1,Arrays.asList(Opcodes.ALOAD)));//
+                1, 1, Arrays.asList(Opcodes.ALOAD)));//
 
         addLambdaMethod1(new FTMethodCell(
                 "onMenuItemClick",
@@ -480,7 +581,7 @@ public class FTHookConfig {
                 "Landroid/widget/Toolbar$OnMenuItemClickListener;",
                 "trackMenuItem",
                 "(Landroid/view/MenuItem;)V",
-                1, 1,Arrays.asList(Opcodes.ALOAD)));//
+                1, 1, Arrays.asList(Opcodes.ALOAD)));//
 
         addLambdaMethod1(new FTMethodCell(
                 "onMenuItemClick",
@@ -488,7 +589,7 @@ public class FTHookConfig {
                 "Landroid/support/v7/widget/Toolbar$OnMenuItemClickListener;",
                 "trackMenuItem",
                 "(Landroid/view/MenuItem;)V",
-                1, 1,Arrays.asList(Opcodes.ALOAD)));//
+                1, 1, Arrays.asList(Opcodes.ALOAD)));//
 
         addLambdaMethod1(new FTMethodCell(
                 "onMenuItemClick",
@@ -496,7 +597,7 @@ public class FTHookConfig {
                 "Landroidx/appcompat/widget/Toolbar$OnMenuItemClickListener;",
                 "trackMenuItem",
                 "(Landroid/view/MenuItem;)V",
-                1, 1,Arrays.asList(Opcodes.ALOAD)));//
+                1, 1, Arrays.asList(Opcodes.ALOAD)));//
 
         addLambdaMethod1(new FTMethodCell(
                 "onClick",
@@ -504,14 +605,14 @@ public class FTHookConfig {
                 "Landroid/content/DialogInterface$OnMultiChoiceClickListener;",
                 "trackDialog",
                 "(Landroid/content/DialogInterface;I)V",
-                1, 2,Arrays.asList(Opcodes.ALOAD,Opcodes.ILOAD)));//
+                1, 2, Arrays.asList(Opcodes.ALOAD, Opcodes.ILOAD)));//
         addLambdaMethod1(new FTMethodCell(
                 "onClick",
                 "(Landroid/content/DialogInterface;I)V",
                 "Landroid/content/DialogInterface$OnClickListener;",
                 "trackDialog",
                 "(Landroid/content/DialogInterface;I)V",
-                1, 2,Arrays.asList(Opcodes.ALOAD,Opcodes.ILOAD)));//
+                1, 2, Arrays.asList(Opcodes.ALOAD, Opcodes.ILOAD)));//
 
         addLambdaMethod1(new FTMethodCell(
                 "onMenuItemClick",
@@ -519,7 +620,7 @@ public class FTHookConfig {
                 "Landroid/widget/PopupMenu$OnMenuItemClickListener;",
                 "trackMenuItem",
                 "(Landroid/view/MenuItem;)V",
-                1, 1,Arrays.asList(Opcodes.ALOAD)));
+                1, 1, Arrays.asList(Opcodes.ALOAD)));
 
         addLambdaMethod1(new FTMethodCell(
                 "onMenuItemClick",
@@ -527,7 +628,7 @@ public class FTHookConfig {
                 "Landroidx/appcompat/widget/PopupMenu$OnMenuItemClickListener;",
                 "trackMenuItem",
                 "(Landroid/view/MenuItem;)V",
-                1, 1,Arrays.asList(Opcodes.ALOAD)));
+                1, 1, Arrays.asList(Opcodes.ALOAD)));
 
         addLambdaMethod1(new FTMethodCell(
                 "onMenuItemClick",
@@ -535,7 +636,15 @@ public class FTHookConfig {
                 "Landroid/support/v7/widget/PopupMenu$OnMenuItemClickListener;",
                 "trackMenuItem",
                 "(Landroid/view/MenuItem;)V",
-                1, 1,Arrays.asList(Opcodes.ALOAD)));
+                1, 1, Arrays.asList(Opcodes.ALOAD)));
+
+        addLambdaMethod1(new FTMethodCell(
+         "onTouch",
+         "(Landroid/view/View;Landroid/view/MotionEvent;)Z",
+         "Landroid/view/View$OnTouchListener;",
+         "trackViewOnTouch",
+         "(Landroid/view/View;Landroid/view/MotionEvent;)V",
+         1, 2,Arrays.asList(Opcodes.ALOAD,Opcodes.ALOAD)));
 
     }
 

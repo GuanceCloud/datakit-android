@@ -5,6 +5,7 @@ import com.ft.sdk.garble.utils.DeviceUtils;
 
 import java.security.InvalidParameterException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * BY huangDianHua
@@ -22,6 +23,8 @@ public class FTSDKConfig {
     private boolean useOAID;
     //是否是Debug
     private boolean isDebug;
+    //是否显示别名日志
+    private boolean descLog;
     //高德逆向解析API 的 key
     private String geoKey;
     //是否使用高德作为逆向地址解析
@@ -34,8 +37,6 @@ public class FTSDKConfig {
     private int monitorType;
     //是否打开流程图
     private boolean openFlowChart;
-    //产品代号
-    private String product;
     //以下三个为白名单
     private int enableAutoTrackType;
     private List<Class<?>> whiteActivityClass;
@@ -45,7 +46,16 @@ public class FTSDKConfig {
     private int disableAutoTrackType;
     private List<Class<?>> blackActivityClass;
     private List<Class<?>> blackViewClass;
-    private Class<? extends INetEngine> iNetEngineClass;
+    private boolean trackNetTime;
+
+    //页面别名对应 map
+    private Map<String,String> pageDescMap;
+    //事件别名对应 map
+    private Map<String,String> vtpDescMap;
+    //页面和视图树是否显示描述
+    private boolean pageVtpDescEnabled;
+    //流程图是否显示描述
+    private boolean flowChartDescEnabled;
 
     /**
      * 构建 SDK 必要的配置参数
@@ -116,6 +126,10 @@ public class FTSDKConfig {
         return isDebug;
     }
 
+    public boolean isDescLog() {
+        return descLog;
+    }
+
     public boolean isAutoTrack() {
         return autoTrack;
     }
@@ -130,10 +144,6 @@ public class FTSDKConfig {
 
     public boolean isOpenFlowChart() {
         return openFlowChart;
-    }
-
-    public String getProduct() {
-        return product;
     }
 
     public int getEnableAutoTrackType() {
@@ -172,8 +182,24 @@ public class FTSDKConfig {
         this.autoTrack = autoTrack;
         return this;
     }
-    public Class<? extends INetEngine> getINetEngineClass() {
-        return iNetEngineClass;
+    public boolean getTrackNetTime() {
+        return trackNetTime;
+    }
+
+    public Map<String, String> getPageDescMap() {
+        return pageDescMap;
+    }
+
+    public Map<String, String> getVtpDescMap() {
+        return vtpDescMap;
+    }
+
+    public boolean isPageVtpDescEnabled() {
+        return pageVtpDescEnabled;
+    }
+
+    public boolean isFlowChartDescEnabled() {
+        return flowChartDescEnabled;
     }
 
     /**
@@ -208,6 +234,11 @@ public class FTSDKConfig {
         return this;
     }
 
+    public FTSDKConfig setDescLog(boolean descLog) {
+        this.descLog = descLog;
+        return this;
+    }
+
     /**
      * 设置自动埋点的事件类别
      *
@@ -238,17 +269,6 @@ public class FTSDKConfig {
      */
     public FTSDKConfig setOpenFlowChart(boolean openFlowChart) {
         this.openFlowChart = openFlowChart;
-        return this;
-    }
-
-    /**
-     * 类型代号
-     *
-     * @param product
-     * @return
-     */
-    public FTSDKConfig setProduct(String product) {
-        this.product = product;
         return this;
     }
 
@@ -330,8 +350,48 @@ public class FTSDKConfig {
         return this;
     }
 
-    public FTSDKConfig setINetEngineClass(Class<? extends INetEngine> iNetEngineClass) {
-        this.iNetEngineClass = iNetEngineClass;
+    public FTSDKConfig openNetTime(boolean value) {
+        this.trackNetTime = value;
+        return this;
+    }
+
+    /**
+     * 页面别名对应 map
+     * @param pageDescMap
+     * @return
+     */
+    public FTSDKConfig addPageDesc(Map<String, String> pageDescMap) {
+        this.pageDescMap = pageDescMap;
+        return this;
+    }
+
+    /**
+     * 事件别名对应 map
+     * @param vtpDescMap
+     * @return
+     */
+    public FTSDKConfig addVtpDesc(Map<String, String> vtpDescMap) {
+        this.vtpDescMap = vtpDescMap;
+        return this;
+    }
+
+    /**
+     * 设置页面和视图树是否使用别名
+     * @param pageVtpDescEnabled
+     * @return
+     */
+    public FTSDKConfig setPageVtpDescEnabled(boolean pageVtpDescEnabled) {
+        this.pageVtpDescEnabled = pageVtpDescEnabled;
+        return this;
+    }
+
+    /**
+     * 设置流程图是否使用别名显示
+     * @param flowChartDescEnabled
+     * @return
+     */
+    public FTSDKConfig setFlowChartDescEnabled(boolean flowChartDescEnabled) {
+        this.flowChartDescEnabled = flowChartDescEnabled;
         return this;
     }
 }
