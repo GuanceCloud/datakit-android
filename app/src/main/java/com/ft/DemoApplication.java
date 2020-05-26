@@ -52,7 +52,7 @@ public class DemoApplication extends Application {
                 .setFlowChartDescEnabled(true)
                 .setPageVtpDescEnabled(true)
                 .setMonitorType(MonitorType.ALL)//设置监控项
-                .setINetEngineClass(OkHttpEngine.class);
+                .openNetTime(true);
         FTSdk.install(ftSDKConfig);
 
         FTMonitor.get()
@@ -61,17 +61,17 @@ public class DemoApplication extends Application {
                 .start();
     }
 
-    private Map<String,String> pageAliasMap(){
-        Map<String,String> aliasMap =  new HashMap<String,String>();
-        aliasMap.put("MainActivity","主页面");
-        aliasMap.put("MainActivity.Tab1Fragment","子页面1");
-        aliasMap.put("MainActivity.Tab2Fragment","子页面2");
-        aliasMap.put("Main2Activity","第二个页面");
+    private Map<String, String> pageAliasMap() {
+        Map<String, String> aliasMap = new HashMap<String, String>();
+        aliasMap.put("MainActivity", "主页面");
+        aliasMap.put("MainActivity.Tab1Fragment", "子页面1");
+        aliasMap.put("MainActivity.Tab2Fragment", "子页面2");
+        aliasMap.put("Main2Activity", "第二个页面");
         return aliasMap;
     }
 
-    private Map<String,String> eventAliasMap(){
-        Map<String,String> aliasMap =  new HashMap<String,String>();
+    private Map<String, String> eventAliasMap() {
+        Map<String, String> aliasMap = new HashMap<String, String>();
         aliasMap.put("MainActivity/ViewRootImpl/DecorView/LinearLayout/FrameLayout/ActionBarOverlayLayout/ContentFrameLayout/ScrollView/LinearLayout/AppCompatButton/#showKotlinActivity",
                 "跳转到第二个页面");
         aliasMap.put("MainActivity/ViewRootImpl/DecorView/LinearLayout/FrameLayout/ActionBarOverlayLayout/ContentFrameLayout/ScrollView/LinearLayout/AppCompatButton/#btn_lam",
