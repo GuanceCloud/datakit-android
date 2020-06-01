@@ -59,6 +59,7 @@ public class DemoApplication extends Application {
                 .setMonitorType(MonitorType.ALL)
                 .setPeriod(10)
                 .start();
+        FTSdk.get().trackAppCrash();
     }
 
     private Map<String, String> pageAliasMap() {
