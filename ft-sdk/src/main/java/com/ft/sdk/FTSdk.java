@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import com.ft.sdk.garble.FTActivityLifecycleCallbacks;
 import com.ft.sdk.garble.FTAliasConfig;
 import com.ft.sdk.garble.FTAutoTrackConfig;
+import com.ft.sdk.garble.FTExceptionHandler;
 import com.ft.sdk.garble.FTFlowChartConfig;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
@@ -179,6 +180,13 @@ public class FTSdk {
             }
         } catch (Exception e) {
         }
+    }
+
+    /**
+     * 捕获系统异常
+     */
+    public void trackAppCrash() {
+        FTExceptionHandler.get().enableTrackCrash();
     }
 
     /**
