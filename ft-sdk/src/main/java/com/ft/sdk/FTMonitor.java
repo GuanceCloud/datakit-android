@@ -32,38 +32,6 @@ public class FTMonitor {
         return instance;
     }
 
-    public void setTcpStartTime() {
-        NetUtils.get().tcpStartTime = System.currentTimeMillis();
-    }
-
-    public void setTcpEndTime() {
-        NetUtils.get().tcpEndTime = System.currentTimeMillis();
-    }
-
-    public void setDnsStartTime() {
-        NetUtils.get().dnsStartTime = System.currentTimeMillis();
-    }
-
-    public void setDnsEndTime() {
-        NetUtils.get().dnsEndTime = System.currentTimeMillis();
-    }
-
-    public void setResponseStartTime() {
-        NetUtils.get().responseStartTime = System.currentTimeMillis();
-    }
-
-    public void setResponseEndTime() {
-        NetUtils.get().responseEndTime = System.currentTimeMillis();
-    }
-
-    public void setRequestCount() {
-        NetUtils.get().requestCount += 1;
-    }
-
-    public void setRequestErrCount() {
-        NetUtils.get().requestErrCount += 1;
-    }
-
     public FTMonitor setPeriod(int period) {
         this.period = period;
         return this;
