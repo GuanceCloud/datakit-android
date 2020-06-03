@@ -34,6 +34,9 @@ import com.google.android.material.tabs.TabLayout;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * BY huangDianHua
  * DATE:2019-12-02 16:43
@@ -692,9 +695,14 @@ public class FTAutoTrack {
                 if (!Utils.isNullOrEmpty(sessionId)) {
                     recordData.setSessionid(sessionId);
                 }
+                List<RecordData> recordDataList = new ArrayList<>();
+                recordDataList.add(recordData);
                 //开启流程图，获取流程图相关数据存入数据库中
                 if (FTFlowChartConfig.get().isOpenFlowChart()) {
                     if (op == OP.OPEN_ACT || op == OP.OPEN_FRA) {
+                        //如果是打开关闭页面就拷贝一条记录存入数据库，一条作为流程图数据
+                        RecordData recordDataClone = recordData.clone();
+                        recordDataList.add(recordDataClone);
                         recordData.setPpn(parentPage);
                         recordData.setTraceId(FTFlowChartConfig.get().getFlowUUID());
                         long currentTime = System.currentTimeMillis();
@@ -703,8 +711,9 @@ public class FTAutoTrack {
                     }
                 }
 
+
                 LogUtils.d("FTAutoTrack数据进数据库：" + recordData.getJsonString());
-                FTManager.getFTDBManager().insertFTOperation(recordData);
+                FTManager.getFTDBManager().insertFtOptList(recordDataList);
                 FTManager.getSyncTaskManager().executeSyncPoll();
             } catch (Exception e) {
             }

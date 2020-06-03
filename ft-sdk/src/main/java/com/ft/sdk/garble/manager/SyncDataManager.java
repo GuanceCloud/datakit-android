@@ -64,75 +64,78 @@ public class SyncDataManager {
         StringBuffer sb = new StringBuffer();
         String device = parseHashToString(getDeviceInfo());
         for (RecordData recordData : recordDatas) {
-            if (OP.OPEN_ACT.value.equals(recordData.getOp())) {
-                //如果是页面打开操作，就在该条数据上添加一条表示流程图的数据
-                sb.append("$flow_mobile_activity");
-                sb.append(",$traceId=").append(recordData.getTraceId());
-                if (recordData.getPpn() != null && recordData.getPpn().startsWith(Constants.MOCK_SON_PAGE_DATA)) {
-                    String[] strArr = recordData.getPpn().split(":");
-                    String name = null;
-                    String parent = null;
-                    //数组长度等于 3 表示当前页面是一个 Fragment
-                    if (strArr.length == 3) {
-                        name = FTAliasConfig.get().getFlowChartDesc(recordData.getCpn() + "." + strArr[1]);
-                        parent = FTAliasConfig.get().getFlowChartDesc(strArr[2]);
-                        //数组长度等于 2 表示当前页面是一个 Activity
-                    } else if (strArr.length == 2) {
-                        name = FTAliasConfig.get().getFlowChartDesc(recordData.getCpn());
-                        parent = FTAliasConfig.get().getFlowChartDesc(strArr[1]);
-                    }
-                    sb.append(",$name=").append(name);
-                    sb.append(",$parent=").append(parent);
-                } else {
-                    sb.append(",$name=").append(FTAliasConfig.get().getFlowChartDesc(recordData.getCpn()));
-                    //如果父页面是root表示其为起始节点，不添加父节点
-                    if (!Constants.FLOW_ROOT.equals(recordData.getPpn())) {
-                        String ppn = recordData.getPpn();
-                        sb.append(",$parent=").append(FTAliasConfig.get().getFlowChartDesc(ppn));
-                    }
-                }
-                sb.append(",").append(device).append(",");
-                addUserData(sb, recordData);
-                //删除多余的逗号
-                deleteLastComma(sb);
-                sb.append(Constants.SEPARATION_PRINT);
-                sb.append("$duration=").append(recordData.getDuration()).append("i");
-                sb.append(Constants.SEPARATION_PRINT);
-                sb.append(recordData.getTime() * 1000 * 1000);
-                sb.append("\n");
-            } else if (OP.OPEN_FRA.value.equals(recordData.getOp())) {
-                //如果是子页面打开操作，就在该条数据上添加一条表示流程图的数据
-                sb.append("$flow_mobile_activity");
-                sb.append(",$traceId=").append(recordData.getTraceId());
-                sb.append(",$name=").append(FTAliasConfig.get().getFlowChartDesc(recordData.getRpn() + "." + recordData.getCpn()));
-                String parent;
-                if (!Constants.FLOW_ROOT.equals(recordData.getPpn())) {
-                    if (recordData.getPpn().startsWith(Constants.PERFIX)) {
-                        parent = FTAliasConfig.get().getFlowChartDesc(recordData.getPpn().replace(Constants.PERFIX, ""));
+            //流程图ID
+            String traceId = recordData.getTraceId();
+            if(!Utils.isNullOrEmpty(traceId)) {
+                if (OP.OPEN_ACT.value.equals(recordData.getOp())) {
+                    sb.append("$flow_mobile_activity");
+                    sb.append(",$traceId=").append(recordData.getTraceId());
+                    if (recordData.getPpn() != null && recordData.getPpn().startsWith(Constants.MOCK_SON_PAGE_DATA)) {
+                        String[] strArr = recordData.getPpn().split(":");
+                        String name = null;
+                        String parent = null;
+                        //数组长度等于 3 表示当前页面是一个 Fragment
+                        if (strArr.length == 3) {
+                            name = FTAliasConfig.get().getFlowChartDesc(recordData.getCpn() + "." + strArr[1]);
+                            parent = FTAliasConfig.get().getFlowChartDesc(strArr[2]);
+                            //数组长度等于 2 表示当前页面是一个 Activity
+                        } else if (strArr.length == 2) {
+                            name = FTAliasConfig.get().getFlowChartDesc(recordData.getCpn());
+                            parent = FTAliasConfig.get().getFlowChartDesc(strArr[1]);
+                        }
+                        sb.append(",$name=").append(name);
+                        sb.append(",$parent=").append(parent);
                     } else {
-                        parent = FTAliasConfig.get().getFlowChartDesc(recordData.getRpn() + "." + recordData.getPpn());
+                        sb.append(",$name=").append(FTAliasConfig.get().getFlowChartDesc(recordData.getCpn()));
+                        //如果父页面是root表示其为起始节点，不添加父节点
+                        if (!Constants.FLOW_ROOT.equals(recordData.getPpn())) {
+                            String ppn = recordData.getPpn();
+                            sb.append(",$parent=").append(FTAliasConfig.get().getFlowChartDesc(ppn));
+                        }
                     }
-                } else {
-                    parent = FTAliasConfig.get().getFlowChartDesc(recordData.getRpn());
+                    sb.append(",").append(device).append(",");
+                    addUserData(sb, recordData);
+                    //删除多余的逗号
+                    deleteLastComma(sb);
+                    sb.append(Constants.SEPARATION_PRINT);
+                    sb.append("$duration=").append(recordData.getDuration()).append("i");
+                    sb.append(Constants.SEPARATION_PRINT);
+                    sb.append(recordData.getTime() * 1000 * 1000);
+                    sb.append("\n");
+                } else if (OP.OPEN_FRA.value.equals(recordData.getOp())) {
+                    sb.append("$flow_mobile_activity");
+                    sb.append(",$traceId=").append(recordData.getTraceId());
+                    sb.append(",$name=").append(FTAliasConfig.get().getFlowChartDesc(recordData.getRpn() + "." + recordData.getCpn()));
+                    String parent;
+                    if (!Constants.FLOW_ROOT.equals(recordData.getPpn())) {
+                        if (recordData.getPpn().startsWith(Constants.PERFIX)) {
+                            parent = FTAliasConfig.get().getFlowChartDesc(recordData.getPpn().replace(Constants.PERFIX, ""));
+                        } else {
+                            parent = FTAliasConfig.get().getFlowChartDesc(recordData.getRpn() + "." + recordData.getPpn());
+                        }
+                    } else {
+                        parent = FTAliasConfig.get().getFlowChartDesc(recordData.getRpn());
+                    }
+                    sb.append(",$parent=").append(parent);
+                    sb.append(",").append(device).append(",");
+                    addUserData(sb, recordData);
+                    //删除多余的逗号
+                    deleteLastComma(sb);
+                    sb.append(Constants.SEPARATION_PRINT);
+                    sb.append("$duration=").append(recordData.getDuration()).append("i");
+                    sb.append(Constants.SEPARATION_PRINT);
+                    sb.append(recordData.getTime() * 1000 * 1000);
+                    sb.append("\n");
                 }
-                sb.append(",$parent=").append(parent);
-                sb.append(",").append(device).append(",");
-                addUserData(sb, recordData);
-                //删除多余的逗号
-                deleteLastComma(sb);
-                sb.append(Constants.SEPARATION_PRINT);
-                sb.append("$duration=").append(recordData.getDuration()).append("i");
-                sb.append(Constants.SEPARATION_PRINT);
-                sb.append(recordData.getTime() * 1000 * 1000);
+            }else {
+                //获取这条事件的指标
+                sb.append(getMeasurement(recordData));
+                sb.append(",");
+                sb.append(device);
+                //获取埋点事件数据
+                sb.append(getUpdateData(recordData));
                 sb.append("\n");
             }
-            //获取这条事件的指标
-            sb.append(getMeasurement(recordData));
-            sb.append(",");
-            sb.append(device);
-            //获取埋点事件数据
-            sb.append(getUpdateData(recordData));
-            sb.append("\n");
         }
         return sb.toString();
     }
