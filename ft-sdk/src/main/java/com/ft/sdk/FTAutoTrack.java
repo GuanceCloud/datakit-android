@@ -665,10 +665,6 @@ public class FTAutoTrack {
     }
 
     public static void putRecord(long time, @NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String parentPage, @Nullable String vtp) {
-        if(!Utils.enableTrackUnderRate()){
-            LogUtils.d("不在采样范围内");
-            return;
-        }
         ThreadPoolUtils.get().execute(() -> {
             try {
                 final RecordData recordData = new RecordData();
@@ -696,7 +692,10 @@ public class FTAutoTrack {
                     recordData.setSessionid(sessionId);
                 }
                 List<RecordData> recordDataList = new ArrayList<>();
-                recordDataList.add(recordData);
+                if(Utils.enableTrackUnderRate()) {
+                    //在采样范围内就把该条数据添加到数据库
+                    recordDataList.add(recordData);
+                }
                 //开启流程图，获取流程图相关数据存入数据库中
                 if (FTFlowChartConfig.get().isOpenFlowChart()) {
                     if (op == OP.OPEN_ACT || op == OP.OPEN_FRA) {

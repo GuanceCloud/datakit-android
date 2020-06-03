@@ -170,10 +170,6 @@ public class FTTrack {
      * @param fields
      */
     private void track(OP op, long time, String measurement, final JSONObject tags, JSONObject fields) {
-        if(!Utils.enableTrackUnderRate()){
-            LogUtils.d("不在采样范围内");
-            return;
-        }
         try {
             if (!isLegalValues(fields)) {
                 return;
