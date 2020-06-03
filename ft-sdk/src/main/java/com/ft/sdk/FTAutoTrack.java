@@ -662,6 +662,10 @@ public class FTAutoTrack {
     }
 
     public static void putRecord(long time, @NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String parentPage, @Nullable String vtp) {
+        if(!Utils.enableTrackUnderRate()){
+            LogUtils.d("不在采样范围内");
+            return;
+        }
         ThreadPoolUtils.get().execute(() -> {
             try {
                 final RecordData recordData = new RecordData();
