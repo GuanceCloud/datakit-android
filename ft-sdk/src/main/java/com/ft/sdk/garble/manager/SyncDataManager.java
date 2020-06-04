@@ -544,9 +544,15 @@ public class SyncDataManager {
             tags.put("roam", NetUtils.get().getRoamState());
             fields.put("wifi_ssid", NetUtils.get().getSSId());
             fields.put("wifi_ip", NetUtils.get().getWifiIp());
-            fields.put("network_tcp_time", NetUtils.get().getTcpTime());
-            fields.put("network_dns_time", NetUtils.get().getDNSTime());
-            fields.put("network_response_time", NetUtils.get().getResponseTime());
+            if(NetUtils.get().isInnerRequest()){
+                fields.put("_network_tcp_time", NetUtils.get().getTcpTime());
+                fields.put("_network_dns_time", NetUtils.get().getDNSTime());
+                fields.put("_network_response_time", NetUtils.get().getResponseTime());
+            }else {
+                fields.put("network_tcp_time", NetUtils.get().getTcpTime());
+                fields.put("network_dns_time", NetUtils.get().getDNSTime());
+                fields.put("network_response_time", NetUtils.get().getResponseTime());
+            }
             fields.put("network_error_rate", NetUtils.get().getErrorRate());
         } catch (Exception e) {
             LogUtils.e("网络数据获取异常:" + e.getMessage());
