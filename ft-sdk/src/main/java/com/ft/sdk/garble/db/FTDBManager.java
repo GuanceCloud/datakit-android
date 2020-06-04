@@ -48,6 +48,7 @@ public class FTDBManager extends DBManager {
             contentValues.put(FTSQL.RECORD_COLUMN_TM, data.getTime());
             contentValues.put(FTSQL.RECORD_COLUMN_DATA, data.getJsonString());
             contentValues.put(FTSQL.RECORD_COLUMN_SESSION_ID, data.getSessionid());
+            contentValues.put(FTSQL.RECORD_COLUMN_OPTION, data.getOp());
             try {
                 long value = db.insert(FTSQL.FT_TABLE_NAME, null, contentValues);
                 LogUtils.d("insert value:"+value);
@@ -71,6 +72,7 @@ public class FTDBManager extends DBManager {
                 contentValues.put(FTSQL.RECORD_COLUMN_TM, data.getTime());
                 contentValues.put(FTSQL.RECORD_COLUMN_DATA, data.getJsonString());
                 contentValues.put(FTSQL.RECORD_COLUMN_SESSION_ID, data.getSessionid());
+                contentValues.put(FTSQL.RECORD_COLUMN_OPTION, data.getOp());
                 db.insert(FTSQL.FT_TABLE_NAME, null, contentValues);
             }
             db.setTransactionSuccessful();
