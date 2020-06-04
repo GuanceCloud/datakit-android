@@ -62,6 +62,7 @@ public class OKHttpEventListener extends EventListener {
     @Override
     public void callStart(@NotNull Call call) {
         super.callStart(call);
+        NetUtils.get().requestHost = call.request().url().host();
         NetUtils.get().requestCount += 1;
         NetUtils.get().responseStartTime = System.currentTimeMillis();
     }
