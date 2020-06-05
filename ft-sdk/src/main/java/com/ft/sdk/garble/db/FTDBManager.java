@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.ft.sdk.FTApplication;
+import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.db.base.DBManager;
@@ -81,19 +82,66 @@ public class FTDBManager extends DBManager {
     }
 
     /**
-     * 查询埋点数据
+     * 查询log数据
+     * @param limit
+     * @return
+     */
+    public List<RecordData> queryDataByDescLimitLog(final int limit){
+        return queryDataByDescLimit(limit,"option=?",new String[]{OP.LOG.value});
+    }
+
+    /**
+     * 查询 KeyEvent 数据
+     * @param limit
+     * @return
+     */
+    public List<RecordData> queryDataByDescLimitKeyEvent(final int limit){
+        return queryDataByDescLimit(limit,"option=?",new String[]{OP.KEYEVENT.value});
+    }
+
+    /**
+     * 查询 Object 数据
+     * @param limit
+     * @return
+     */
+    public List<RecordData> queryDataByDescLimitObject(final int limit){
+        return queryDataByDescLimit(limit,"option=?",new String[]{OP.OBJECT.value});
+    }
+
+    /**
+     * 查询埋点事件数据
+     * @param limit
+     * @return
+     */
+    public List<RecordData> queryDataByDescLimitTrack(final int limit){
+        return queryDataByDescLimit(limit,"option!=? AND option!=? AND option!=? ",new String[]{OP.LOG.value,OP.KEYEVENT.value,OP.OBJECT.value});
+    }
+
+    /**
+     * 查询所有数据
      *
      * @param limit limit == 0 表示获取全部数据
      * @return
      */
     public List<RecordData> queryDataByDescLimit(final int limit) {
+        return queryDataByDescLimit(limit,null,null);
+    }
+
+    /**
+     * 根据条件查询数据
+     * @param limit
+     * @param selection
+     * @param selectionArgs
+     * @return
+     */
+    public List<RecordData> queryDataByDescLimit(final int limit,String selection,String[] selectionArgs) {
         final List<RecordData> recordList = new ArrayList<>();
         getDB(false, db -> {
             Cursor cursor;
             if (limit == 0) {
-                cursor = db.query(FTSQL.FT_TABLE_NAME, null, null, null, null, null, FTSQL.RECORD_COLUMN_ID + " desc");
+                cursor = db.query(FTSQL.FT_TABLE_NAME, null, selection, selectionArgs, null, null, FTSQL.RECORD_COLUMN_ID + " desc");
             } else {
-                cursor = db.query(FTSQL.FT_TABLE_NAME, null, null, null, null, null, FTSQL.RECORD_COLUMN_ID + " desc", "" + limit);
+                cursor = db.query(FTSQL.FT_TABLE_NAME, null, selection, selectionArgs, null, null, FTSQL.RECORD_COLUMN_ID + " desc", "" + limit);
             }
             while (cursor.moveToNext()) {
                 long id = cursor.getLong(cursor.getColumnIndex(FTSQL.RECORD_COLUMN_ID));
