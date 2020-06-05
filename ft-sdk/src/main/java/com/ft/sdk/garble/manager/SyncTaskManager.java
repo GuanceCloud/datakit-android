@@ -131,7 +131,7 @@ public class SyncTaskManager {
     }
 
     private List<RecordData> queryFromData() {
-        return FTDBManager.get().queryDataByDescLimit(10);
+        return FTDBManager.get().queryDataByDescLimitTrack(10);
     }
 
     private void deleteLastQuery(List<RecordData> list) {
