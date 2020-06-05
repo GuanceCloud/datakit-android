@@ -2,7 +2,11 @@ package com.ft.sdk.garble;
 
 import androidx.annotation.NonNull;
 
+import com.ft.sdk.FTTrack;
+import com.ft.sdk.garble.bean.LogBean;
+import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.Utils;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -45,6 +49,11 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
             printWriter.close();
             String result = writer.toString();
             LogUtils.e("crash-1:" + result);
+            LogBean logBean = new LogBean(Constants.USER_AGENT,Utils.translateFieldValue(result),System.currentTimeMillis()*1000);
+            logBean.setStatus("critical");
+            logBean.setEnv("dev");
+            logBean.setServiceName("dataflux sdk");
+            FTTrack.getInstance().logBackground(logBean);
         }
 
         try {

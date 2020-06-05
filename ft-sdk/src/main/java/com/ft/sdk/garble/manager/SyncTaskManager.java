@@ -137,7 +137,7 @@ public class SyncTaskManager {
         SyncDataManager syncDataManager = new SyncDataManager();
         String body = syncDataManager.getBodyContent(dataType, requestDatas);
         SyncDataManager.printUpdateData(body);
-        body = body.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION);
+        body = body.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION).replaceAll(Constants.SEPARATION_LINE_BREAK,Constants.SEPARATION_REALLY_LINE_BREAK);
         requestNet(dataType, body, (code, response) -> {
             if (code == HttpURLConnection.HTTP_OK) {
                 LogUtils.d("同步数据成功");
