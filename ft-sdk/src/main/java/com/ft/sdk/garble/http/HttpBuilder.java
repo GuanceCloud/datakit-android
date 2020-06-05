@@ -24,7 +24,7 @@ public class HttpBuilder {
     private boolean useDefaultHead = true;
     private boolean showLog = true;
     private HashMap<String, String> headParams = new HashMap<>();
-
+    private boolean enableToken = true;
     public static HttpBuilder Builder() {
         return new HttpBuilder();
     }
@@ -153,6 +153,11 @@ public class HttpBuilder {
         return this;
     }
 
+    public HttpBuilder enableToken(boolean enableToken){
+        this.enableToken = enableToken;
+        return this;
+    }
+
     public <T extends ResponseData> T executeSync(Class<T> tClass) {
         return new NetProxy(this).execute(tClass);
     }
@@ -168,8 +173,11 @@ public class HttpBuilder {
      */
     private String getQueryString() {
         StringBuffer sb = new StringBuffer();
-        if (method == RequestMethod.GET) {
+        //if (method == RequestMethod.GET) {
             HashMap<String, Object> param = params;
+            if(FTHttpConfig.get().dataWayToken != null && enableToken){
+                param.put("token",FTHttpConfig.get().dataWayToken);
+            }
             if (param != null) {
                 Iterator<String> keys = param.keySet().iterator();
                 while (keys.hasNext()) {
@@ -177,7 +185,7 @@ public class HttpBuilder {
                     sb.append("&" + key + "=" + param.get(key));
                 }
             }
-        }
+        //}
         return sb.toString();
     }
 }
