@@ -13,6 +13,7 @@ import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.bean.BatteryBean;
 import com.ft.sdk.garble.bean.CameraPx;
+import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.bean.UserData;
@@ -55,12 +56,57 @@ import static com.ft.sdk.garble.utils.Constants.UNKNOWN;
 public class SyncDataManager {
 
     /**
-     * 将本地将要同步的数据封装
+     * 封装同步上传的数据
+     * @param dataType
+     * @param recordDatas
+     * @return
+     */
+    public String getBodyContent(DataType dataType,List<RecordData> recordDatas){
+        switch (dataType){
+            case OBJECT:
+                return getObjectBodyContent(recordDatas);
+            case LOG:
+                return getLogBodyContent(recordDatas);
+            case KEY_EVENT:
+                return getKeyEventBodyContent(recordDatas);
+            default:
+                return getTrackBodyContent(recordDatas);
+        }
+    }
+
+    /**
+     * 封装本地对象数据
+     * @param recordDataList
+     * @return
+     */
+    public String getObjectBodyContent(List<RecordData> recordDataList){
+        return "";
+    }
+
+    /**
+     * 封装本地事件数据
+     * @param recordDataList
+     * @return
+     */
+    public String getKeyEventBodyContent(List<RecordData> recordDataList){
+        return "";
+    }
+
+    /**
+     * 封装本地日志数据
+     * @param recordDataList
+     * @return
+     */
+    public String getLogBodyContent(List<RecordData> recordDataList){
+        return "";
+    }
+    /**
+     * 封装本地埋点数据
      *
      * @param recordDatas
      * @return
      */
-    public String getBodyContent(List<RecordData> recordDatas) {
+    public String getTrackBodyContent(List<RecordData> recordDatas) {
         StringBuffer sb = new StringBuffer();
         String device = parseHashToString(getDeviceInfo());
         for (RecordData recordData : recordDatas) {

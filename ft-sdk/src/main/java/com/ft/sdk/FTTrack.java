@@ -2,6 +2,7 @@ package com.ft.sdk;
 
 import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.SyncCallback;
+import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.bean.TrackBean;
@@ -294,7 +295,7 @@ public class FTTrack {
             return;
         }
         SyncDataManager syncDataManager = new SyncDataManager();
-        String body = syncDataManager.getBodyContent(recordDataList);
+        String body = syncDataManager.getBodyContent(DataType.TRACK,recordDataList);
         SyncDataManager.printUpdateData(body);
         body = body.replaceAll(Constants.SEPARATION_PRINT,Constants.SEPARATION);
         ResponseData result = HttpBuilder.Builder()

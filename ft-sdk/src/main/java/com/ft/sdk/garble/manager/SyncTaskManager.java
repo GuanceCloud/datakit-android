@@ -2,6 +2,7 @@ package com.ft.sdk.garble.manager;
 
 import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.SyncCallback;
+import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.http.FTResponseData;
@@ -63,7 +64,7 @@ public class SyncTaskManager {
         ThreadPoolUtils.get().execute(() -> {
             try {
                 waitUserBind();
-                List<RecordData> recordDataList = queryFromData();
+                List<RecordData> recordDataList = queryFromData(DataType.TRACK);
                 //当数据库中有数据是执行轮询同步操作
                 while (recordDataList != null && !recordDataList.isEmpty()) {
                     if (!Utils.isNetworkAvailable()) {
@@ -75,11 +76,11 @@ public class SyncTaskManager {
                         break;
                     }
                     LogUtils.d(">>>同步轮询线程<<< 程序正在执行同步操作");
-                    handleSyncOpt(recordDataList);
-                    recordDataList = queryFromData();
+                    handleSyncOpt(DataType.TRACK,recordDataList);
+                    recordDataList = queryFromData(DataType.TRACK);
                 }
                 running = false;
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
                 running = false;
             }
@@ -109,15 +110,15 @@ public class SyncTaskManager {
     /**
      * 执行同步操作
      */
-    private void handleSyncOpt(final List<RecordData> requestDatas) {
+    private void handleSyncOpt(final DataType dataType,final List<RecordData> requestDatas) {
         if (requestDatas == null || requestDatas.isEmpty()) {
             return;
         }
         SyncDataManager syncDataManager = new SyncDataManager();
-        String body = syncDataManager.getBodyContent(requestDatas);
+        String body = syncDataManager.getBodyContent(dataType,requestDatas);
         SyncDataManager.printUpdateData(body);
-        body = body.replaceAll(Constants.SEPARATION_PRINT,Constants.SEPARATION);
-        requestNet(body, (code,response) -> {
+        body = body.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION);
+        requestNet(dataType,body, (code, response) -> {
             if (code == HttpURLConnection.HTTP_OK) {
                 LogUtils.d("同步数据成功");
                 deleteLastQuery(requestDatas);
@@ -130,10 +131,24 @@ public class SyncTaskManager {
         //LogUtils.d("同步后查询" + queryFromData());
     }
 
-    private List<RecordData> queryFromData() {
-        return FTDBManager.get().queryDataByDescLimitTrack(10);
+    private List<RecordData> queryFromData(DataType dataType) {
+        switch (dataType) {
+            case LOG:
+                return FTDBManager.get().queryDataByDescLimitLog(10);
+            case KEY_EVENT:
+                return FTDBManager.get().queryDataByDescLimitKeyEvent(10);
+            case OBJECT:
+                return FTDBManager.get().queryDataByDescLimitObject(10);
+            default:
+                return FTDBManager.get().queryDataByDescLimitTrack(10);
+        }
     }
 
+    /**
+     * 删除已经上传的数据
+     *
+     * @param list
+     */
     private void deleteLastQuery(List<RecordData> list) {
         List<String> ids = new ArrayList<>();
         for (RecordData r : list) {
@@ -142,23 +157,42 @@ public class SyncTaskManager {
         FTDBManager.get().delete(ids);
     }
 
-    private void requestNet(String body, final SyncCallback syncCallback) {
+    /**
+     * 上传数据
+     *
+     * @param dataType
+     * @param body
+     * @param syncCallback
+     */
+    private void requestNet(DataType dataType,String body, final SyncCallback syncCallback) {
+        String model = Constants.URL_MODEL_TRACK;
+        switch (dataType){
+            case KEY_EVENT:
+                model = Constants.URL_MODEL_KEY_EVENT;
+                break;
+            case LOG:
+                model = Constants.URL_MODEL_LOG;
+                break;
+            case OBJECT:
+            case TRACK:
+                model = Constants.URL_MODEL_TRACK;
+        }
         FTResponseData result = HttpBuilder.Builder()
-                .setModel(Constants.URL_MODEL_TRACK)
+                .setModel(model)
                 .setMethod(RequestMethod.POST)
                 .setBodyString(body).executeSync(FTResponseData.class);
 
         try {
-            syncCallback.onResponse(result.getCode(),result.getMessage());
+            syncCallback.onResponse(result.getCode(), result.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            syncCallback.onResponse(NetCodeStatus.UNKNOWN_EXCEPTION_CODE,e.getLocalizedMessage());
-            LogUtils.e("同步上传错误："+e.getLocalizedMessage());
+            syncCallback.onResponse(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, e.getLocalizedMessage());
+            LogUtils.e("同步上传错误：" + e.getLocalizedMessage());
         }
 
     }
 
-    public void release(){
+    public void release() {
         ThreadPoolUtils.get().shutDown();
         instance = null;
     }
