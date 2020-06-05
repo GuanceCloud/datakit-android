@@ -64,7 +64,7 @@ public class NetUtils {
      */
     public boolean isInnerRequest(){
         String innerUrl = FTHttpConfig.get().metricsUrl;
-        if(innerUrl != null && innerUrl.contains(requestHost)){
+        if(innerUrl != null && requestHost!= null && innerUrl.contains(requestHost)){
             return true;
         }
         return false;

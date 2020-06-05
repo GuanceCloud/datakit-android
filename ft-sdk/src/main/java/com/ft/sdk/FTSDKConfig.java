@@ -19,6 +19,7 @@ public class FTSDKConfig {
     private boolean enableRequestSigning;
     private String akId;
     private String akSecret;
+    private String dataWayToken;//非必须参数，Sass 版本
     //是否使用OAID
     private boolean useOAID;
     //是否是Debug
@@ -118,6 +119,8 @@ public class FTSDKConfig {
         return akSecret;
     }
 
+    public String getDataWayToken(){return dataWayToken;}
+
     public boolean isUseOAID() {
         return useOAID;
     }
@@ -202,6 +205,15 @@ public class FTSDKConfig {
         return flowChartDescEnabled;
     }
 
+    /**
+     * 设置上传数据的 token 验证
+     * @param dataWayToken
+     * @return
+     */
+    public FTSDKConfig setDataWayToken(String dataWayToken){
+        this.dataWayToken = dataWayToken;
+        return this;
+    }
     /**
      * 是否使用 UseOAID 作为设备唯一识别号的替代字段
      *

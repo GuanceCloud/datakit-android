@@ -144,6 +144,7 @@ public class SyncTaskManager {
 
     private void requestNet(String body, final SyncCallback syncCallback) {
         FTResponseData result = HttpBuilder.Builder()
+                .setModel(Constants.URL_MODEL_TRACK)
                 .setMethod(RequestMethod.POST)
                 .setBodyString(body).executeSync(FTResponseData.class);
 

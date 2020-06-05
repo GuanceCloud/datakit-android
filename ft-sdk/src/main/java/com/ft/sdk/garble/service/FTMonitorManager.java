@@ -87,6 +87,7 @@ public class FTMonitorManager {
                         SyncDataManager.printUpdateData(body);
                         body = body.replaceAll(Constants.SEPARATION_PRINT,Constants.SEPARATION);
                         ResponseData result = HttpBuilder.Builder()
+                                .setModel(Constants.URL_MODEL_TRACK)
                                 .setMethod(RequestMethod.POST)
                                 .setBodyString(body).executeSync(ResponseData.class);
                         if (result.getHttpCode() != HttpURLConnection.HTTP_OK) {
