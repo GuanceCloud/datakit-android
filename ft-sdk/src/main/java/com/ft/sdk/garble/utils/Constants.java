@@ -20,7 +20,8 @@ public class Constants {
     public static final String TAGS= "tags";
     public static final String SEPARATION_PRINT = "--temp_separation--";
     public static final String SEPARATION = " ";
-    public static final String LINE_BREAK = "\n";
+    public static final String SEPARATION_LINE_BREAK = "--line_break_temp--";//换行标志符，用于日志显示
+    public static final String SEPARATION_REALLY_LINE_BREAK = "\n";//换行标志符，用于日志显示
     public static final String PERFIX = "ft_parent_not_fragment";
     public static final String MOCK_SON_PAGE_DATA = "mock_son_page_data";
     public static final String SHARE_PRE_STEP_DATE = "share_pre_step_date";

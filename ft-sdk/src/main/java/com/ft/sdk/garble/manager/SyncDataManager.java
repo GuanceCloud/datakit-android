@@ -44,6 +44,9 @@ import java.util.Set;
 
 import static com.ft.sdk.garble.bean.OP.CSTM;
 import static com.ft.sdk.garble.bean.OP.FLOW_CHAT;
+import static com.ft.sdk.garble.bean.OP.KEYEVENT;
+import static com.ft.sdk.garble.bean.OP.LOG;
+import static com.ft.sdk.garble.bean.OP.OBJECT;
 import static com.ft.sdk.garble.utils.Constants.FT_DEFAULT_MEASUREMENT;
 import static com.ft.sdk.garble.utils.Constants.FT_KEY_VALUE_NULL;
 import static com.ft.sdk.garble.utils.Constants.UNKNOWN;
@@ -57,16 +60,15 @@ public class SyncDataManager {
 
     /**
      * 封装同步上传的数据
+     *
      * @param dataType
      * @param recordDatas
      * @return
      */
-    public String getBodyContent(DataType dataType,List<RecordData> recordDatas){
-        switch (dataType){
+    public String getBodyContent(DataType dataType, List<RecordData> recordDatas) {
+        switch (dataType) {
             case OBJECT:
                 return getObjectBodyContent(recordDatas);
-            case LOG:
-                return getLogBodyContent(recordDatas);
             case KEY_EVENT:
                 return getKeyEventBodyContent(recordDatas);
             default:
@@ -76,30 +78,24 @@ public class SyncDataManager {
 
     /**
      * 封装本地对象数据
+     *
      * @param recordDataList
      * @return
      */
-    public String getObjectBodyContent(List<RecordData> recordDataList){
+    public String getObjectBodyContent(List<RecordData> recordDataList) {
         return "";
     }
 
     /**
      * 封装本地事件数据
+     *
      * @param recordDataList
      * @return
      */
-    public String getKeyEventBodyContent(List<RecordData> recordDataList){
+    public String getKeyEventBodyContent(List<RecordData> recordDataList) {
         return "";
     }
 
-    /**
-     * 封装本地日志数据
-     * @param recordDataList
-     * @return
-     */
-    public String getLogBodyContent(List<RecordData> recordDataList){
-        return "";
-    }
     /**
      * 封装本地埋点数据
      *
@@ -112,7 +108,8 @@ public class SyncDataManager {
         for (RecordData recordData : recordDatas) {
             //流程图ID
             String traceId = recordData.getTraceId();
-            if(!Utils.isNullOrEmpty(traceId)) {
+            //流程图数据
+            if (!Utils.isNullOrEmpty(traceId)) {
                 if (OP.OPEN_ACT.value.equals(recordData.getOp())) {
                     sb.append("$flow_mobile_activity");
                     sb.append(",$traceId=").append(recordData.getTraceId());
@@ -147,7 +144,7 @@ public class SyncDataManager {
                     sb.append("$duration=").append(recordData.getDuration()).append("i");
                     sb.append(Constants.SEPARATION_PRINT);
                     sb.append(recordData.getTime() * 1000 * 1000);
-                    sb.append("\n");
+                    sb.append(Constants.SEPARATION_LINE_BREAK);
                 } else if (OP.OPEN_FRA.value.equals(recordData.getOp())) {
                     sb.append("$flow_mobile_activity");
                     sb.append(",$traceId=").append(recordData.getTraceId());
@@ -171,16 +168,24 @@ public class SyncDataManager {
                     sb.append("$duration=").append(recordData.getDuration()).append("i");
                     sb.append(Constants.SEPARATION_PRINT);
                     sb.append(recordData.getTime() * 1000 * 1000);
-                    sb.append("\n");
+                    sb.append(Constants.SEPARATION_LINE_BREAK);
                 }
-            }else {
+                //非流程图数据
+            } else if (OP.LOG.value.equals(recordData.getOp()) || OP.KEYEVENT.value.equals(recordData.getOp())
+                    || OP.OBJECT.value.equals(recordData.getOp())) {
+                //获取这条事件的指标
+                sb.append(getMeasurement(recordData));
+                //获取埋点事件数据
+                sb.append(getUpdateData(recordData));
+                sb.append(Constants.SEPARATION_LINE_BREAK);
+            } else {//埋点数据
                 //获取这条事件的指标
                 sb.append(getMeasurement(recordData));
                 sb.append(",");
                 sb.append(device);
                 //获取埋点事件数据
                 sb.append(getUpdateData(recordData));
-                sb.append("\n");
+                sb.append(Constants.SEPARATION_LINE_BREAK);
             }
         }
         return sb.toString();
@@ -198,7 +203,9 @@ public class SyncDataManager {
         String measurement;
         try {
             JSONObject jsonObject = new JSONObject(recordData.getOpdata());
-            if (CSTM.value.equals(recordData.getOp()) || FLOW_CHAT.value.equals(recordData.getOp())) {
+            if (CSTM.value.equals(recordData.getOp()) || FLOW_CHAT.value.equals(recordData.getOp()) ||
+                    OBJECT.value.equals(recordData.getOp()) || KEYEVENT.value.equals(recordData.getOp()) ||
+                    LOG.value.equals(recordData.getOp())) {
                 String measurementTemp = jsonObject.optString(Constants.MEASUREMENT);
                 if (Utils.isNullOrEmpty(measurementTemp)) {
                     measurement = FT_KEY_VALUE_NULL;
@@ -223,8 +230,11 @@ public class SyncDataManager {
      */
     private String getUpdateData(RecordData recordData) {
         if (CSTM.value.equals(recordData.getOp()) || FLOW_CHAT.value.equals(recordData.getOp())) {
-            return composeCustomUpdateData(recordData);
-        } else {
+            return composeCustomUpdateData(true,recordData);
+        } else if (LOG.value.equals(recordData.getOp()) || KEYEVENT.value.equals(recordData.getOp()) ||
+                OBJECT.value.equals(recordData.getOp())) {
+            return composeCustomUpdateData(false, recordData);
+        }else {
             return composeAutoUpdateData(recordData);
         }
     }
@@ -234,7 +244,7 @@ public class SyncDataManager {
      *
      * @return
      */
-    private String composeCustomUpdateData(RecordData recordData) {
+    private String composeCustomUpdateData(boolean addUser,RecordData recordData) {
         StringBuffer sb = new StringBuffer();
         if (recordData.getOpdata() != null) {
             try {
@@ -243,7 +253,9 @@ public class SyncDataManager {
                 JSONObject fields = opJson.optJSONObject(Constants.FIELDS);
                 StringBuffer tagSb = getCustomHash(tags, true);
                 StringBuffer valueSb = getCustomHash(fields, false);
-                addUserData(tagSb, recordData);
+                if(addUser) {
+                    addUserData(tagSb, recordData);
+                }
                 deleteLastComma(tagSb);
                 if (tagSb.length() > 0) {
                     sb.append(",");
@@ -590,11 +602,11 @@ public class SyncDataManager {
             tags.put("roam", NetUtils.get().getRoamState());
             fields.put("wifi_ssid", NetUtils.get().getSSId());
             fields.put("wifi_ip", NetUtils.get().getWifiIp());
-            if(NetUtils.get().isInnerRequest()){
+            if (NetUtils.get().isInnerRequest()) {
                 fields.put("_network_tcp_time", NetUtils.get().getTcpTime());
                 fields.put("_network_dns_time", NetUtils.get().getDNSTime());
                 fields.put("_network_response_time", NetUtils.get().getResponseTime());
-            }else {
+            } else {
                 fields.put("network_tcp_time", NetUtils.get().getTcpTime());
                 fields.put("network_dns_time", NetUtils.get().getDNSTime());
                 fields.put("network_response_time", NetUtils.get().getResponseTime());
@@ -882,7 +894,7 @@ public class SyncDataManager {
     public static void printUpdateData(String body) {
         try {
             StringBuffer sb = new StringBuffer();
-            String[] counts = body.split("\n");
+            String[] counts = body.split(Constants.SEPARATION_LINE_BREAK);
             sb.append("-----------------------------------------------------------\n");
             sb.append("----------------------同步数据--开始-------------------------\n");
             sb.append("----------------------总共 ").append(counts.length).append(" 条数据------------------------\n");

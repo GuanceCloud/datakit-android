@@ -29,7 +29,7 @@ public class OKHttpEventListener extends EventListener {
         super.requestHeadersEnd(call, request);
         StringBuilder sb = new StringBuilder();
         sb.append(request.headers().toString());
-        LogUtils.d("request-header:\n" + sb.toString());
+
     }
 
     @Override
@@ -44,7 +44,6 @@ public class OKHttpEventListener extends EventListener {
                 e.printStackTrace();
             }
         }
-        LogUtils.d("response-header:\n" + sb.toString());
     }
 
     @Override

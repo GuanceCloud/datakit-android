@@ -3,6 +3,7 @@ package com.ft.sdk;
 import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.SyncCallback;
 import com.ft.sdk.garble.bean.DataType;
+import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.bean.TrackBean;
@@ -161,6 +162,13 @@ public class FTTrack {
         track(OP.FLOW_CHAT, time, "$flow_" + product, tags, fields);
     }
 
+    public void logBackground(LogBean logBean) {
+        if(logBean == null){
+            throw new NullPointerException("LogBean 不能为空");
+        }
+        track(OP.LOG,logBean.getTime(),logBean.getMeasurement(),logBean.getAllTags(),logBean.getAllFields());
+    }
+
     /**
      * 将埋点数据存入本地后通知同步
      *
@@ -297,7 +305,7 @@ public class FTTrack {
         SyncDataManager syncDataManager = new SyncDataManager();
         String body = syncDataManager.getBodyContent(DataType.TRACK,recordDataList);
         SyncDataManager.printUpdateData(body);
-        body = body.replaceAll(Constants.SEPARATION_PRINT,Constants.SEPARATION);
+        body = body.replaceAll(Constants.SEPARATION_PRINT,Constants.SEPARATION).replaceAll(Constants.SEPARATION_LINE_BREAK,Constants.SEPARATION_REALLY_LINE_BREAK);
         ResponseData result = HttpBuilder.Builder()
                 .setModel(Constants.URL_MODEL_TRACK)
                 .setMethod(RequestMethod.POST)
