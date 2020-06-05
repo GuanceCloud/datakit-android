@@ -63,10 +63,17 @@ public class SyncTaskManager {
         errorCount.set(0);
         ThreadPoolUtils.get().execute(() -> {
             try {
-                waitUserBind();
-                List<RecordData> recordDataList = queryFromData(DataType.TRACK);
-                //当数据库中有数据是执行轮询同步操作
-                while (recordDataList != null && !recordDataList.isEmpty()) {
+                List<RecordData> trackDataList = queryFromData(DataType.TRACK);
+                List<RecordData> objectDataList = queryFromData(DataType.OBJECT);
+                List<RecordData> logDataList = queryFromData(DataType.LOG);
+                List<RecordData> keyEventDataList = queryFromData(DataType.KEY_EVENT);
+                //如果打开绑定用户开关，但是没有绑定用户信息，那么就不上传用户数据，直到绑了
+                if(FTUserConfig.get().isNeedBindUser() && !FTUserConfig.get().isUserDataBinded()){
+                    trackDataList.clear();
+                    LogUtils.e("请先绑定用户信息");
+                }
+                while (!trackDataList.isEmpty() || !objectDataList.isEmpty() ||
+                        !logDataList.isEmpty() || !keyEventDataList.isEmpty()) {
                     if (!Utils.isNetworkAvailable()) {
                         LogUtils.d(">>>网络未连接<<<");
                         break;
@@ -75,9 +82,22 @@ public class SyncTaskManager {
                         LogUtils.d(">>>连续同步失败5次，停止当前轮询同步<<<");
                         break;
                     }
-                    LogUtils.d(">>>同步轮询线程<<< 程序正在执行同步操作");
-                    handleSyncOpt(DataType.TRACK,recordDataList);
-                    recordDataList = queryFromData(DataType.TRACK);
+                    if(!trackDataList.isEmpty()) {
+                        handleSyncOpt(DataType.TRACK,trackDataList);
+                        trackDataList = queryFromData(DataType.TRACK);
+                    }
+                    if(!objectDataList.isEmpty()) {
+                        handleSyncOpt(DataType.OBJECT,objectDataList);
+                        objectDataList = queryFromData(DataType.OBJECT);
+                    }
+                    if(!logDataList.isEmpty()) {
+                        handleSyncOpt(DataType.LOG,logDataList);
+                        logDataList = queryFromData(DataType.LOG);
+                    }
+                    if(!keyEventDataList.isEmpty()) {
+                        handleSyncOpt(DataType.KEY_EVENT,keyEventDataList);
+                        keyEventDataList = queryFromData(DataType.KEY_EVENT);
+                    }
                 }
                 running = false;
             } catch (Exception e) {
@@ -110,15 +130,15 @@ public class SyncTaskManager {
     /**
      * 执行同步操作
      */
-    private void handleSyncOpt(final DataType dataType,final List<RecordData> requestDatas) {
+    private void handleSyncOpt(final DataType dataType, final List<RecordData> requestDatas) {
         if (requestDatas == null || requestDatas.isEmpty()) {
             return;
         }
         SyncDataManager syncDataManager = new SyncDataManager();
-        String body = syncDataManager.getBodyContent(dataType,requestDatas);
+        String body = syncDataManager.getBodyContent(dataType, requestDatas);
         SyncDataManager.printUpdateData(body);
         body = body.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION);
-        requestNet(dataType,body, (code, response) -> {
+        requestNet(dataType, body, (code, response) -> {
             if (code == HttpURLConnection.HTTP_OK) {
                 LogUtils.d("同步数据成功");
                 deleteLastQuery(requestDatas);
@@ -164,9 +184,9 @@ public class SyncTaskManager {
      * @param body
      * @param syncCallback
      */
-    private void requestNet(DataType dataType,String body, final SyncCallback syncCallback) {
+    private void requestNet(DataType dataType, String body, final SyncCallback syncCallback) {
         String model = Constants.URL_MODEL_TRACK;
-        switch (dataType){
+        switch (dataType) {
             case KEY_EVENT:
                 model = Constants.URL_MODEL_KEY_EVENT;
                 break;
