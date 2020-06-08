@@ -12,9 +12,13 @@ import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTrack;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.garble.SyncCallback;
+import com.ft.sdk.garble.bean.LogBean;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Main2Activity extends AppCompatActivity {
@@ -74,6 +78,27 @@ public class Main2Activity extends AppCompatActivity {
                     Toast.makeText(Main2Activity.this,"code="+code+",response="+response,Toast.LENGTH_LONG).show();
                 }
             });
+        });
+
+        findViewById(R.id.jump7).setOnClickListener(v -> {
+            List<LogBean> logBeans = new ArrayList<>();
+            LogBean logBean = new LogBean("android_custom_log","这是一条多行日志\n 这是第二行日志\n 日志结束",System.currentTimeMillis());
+            logBeans.add(logBean);
+            FTTrack.getInstance().logImmediate(logBeans, new SyncCallback() {
+                @Override
+                public void onResponse(int code, String response) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(Main2Activity.this,"code:"+code+" response:"+response,Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+            });
+            List<LogBean> logBeans1 = new ArrayList<>();
+            LogBean logBean1 = new LogBean("android_custom_log","后台同步事件",System.currentTimeMillis());
+            logBeans1.add(logBean1);
+            FTTrack.getInstance().logBackground(logBeans1);
         });
     }
     public void trackImmediate(){

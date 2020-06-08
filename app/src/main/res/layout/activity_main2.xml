@@ -52,4 +52,10 @@
         android:id="@+id/jump6"
         android:text="即时获取位置信息"
         />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/jump7"
+        android:text="上传日志数据"
+        />
 </LinearLayout>
