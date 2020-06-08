@@ -58,4 +58,16 @@
         android:id="@+id/jump7"
         android:text="上传日志数据"
         />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/jump8"
+        android:text="上传事件数据"
+        />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/jump9"
+        android:text="上传对象数据"
+        />
 </LinearLayout>

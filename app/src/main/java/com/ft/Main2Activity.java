@@ -12,12 +12,15 @@ import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTrack;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.garble.SyncCallback;
+import com.ft.sdk.garble.bean.KeyEventBean;
 import com.ft.sdk.garble.bean.LogBean;
+import com.ft.sdk.garble.bean.ObjectBean;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -99,6 +102,35 @@ public class Main2Activity extends AppCompatActivity {
             LogBean logBean1 = new LogBean("android_custom_log","后台同步事件",System.currentTimeMillis());
             logBeans1.add(logBean1);
             FTTrack.getInstance().logBackground(logBeans1);
+        });
+        findViewById(R.id.jump8).setOnClickListener(v ->{
+            KeyEventBean keyEventBean = new KeyEventBean("这是一个独特的事件",System.currentTimeMillis());
+            keyEventBean.setContent("这是这个独特事件的内容");
+            FTTrack.getInstance().keyEventImmediate(Collections.singletonList(keyEventBean), new SyncCallback() {
+                @Override
+                public void onResponse(int code, String response) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(Main2Activity.this,"code:"+code+" response:"+response,Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+            });
+        });
+        findViewById(R.id.jump9).setOnClickListener(v->{
+            ObjectBean objectBean = new ObjectBean("这是对象的名称","这是对象的分类");
+            FTTrack.getInstance().objectImmediate(Collections.singletonList(objectBean), new SyncCallback() {
+                @Override
+                public void onResponse(int code, String response) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(Main2Activity.this,"code:"+code+" response:"+response,Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+            });
         });
     }
     public void trackImmediate(){
