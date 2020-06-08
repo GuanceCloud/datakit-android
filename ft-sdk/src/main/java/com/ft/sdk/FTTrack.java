@@ -73,7 +73,7 @@ public class FTTrack {
     public void trackImmediate(String measurement, JSONObject tags, JSONObject fields, SyncCallback callback) {
         long time = System.currentTimeMillis();
         TrackBean trackBean = new TrackBean(measurement, tags, fields, time);
-        track(Collections.singletonList(trackBean), callback);
+        track(OP.CSTM,Collections.singletonList(trackBean), callback);
     }
 
     /**
@@ -83,7 +83,7 @@ public class FTTrack {
      * @param callback   上传结果回调
      */
     public void trackImmediate(List<TrackBean> trackBeans, SyncCallback callback) {
-        track(trackBeans, callback);
+        track(OP.CSTM,trackBeans, callback);
     }
 
     /**
@@ -162,11 +162,57 @@ public class FTTrack {
         track(OP.FLOW_CHAT, time, "$flow_" + product, tags, fields);
     }
 
+    /**
+     * 将单条日志数据存入本地同步
+     * @param logBean
+     */
     public void logBackground(LogBean logBean) {
         if(logBean == null){
-            throw new NullPointerException("LogBean 不能为空");
+            return;
         }
         track(OP.LOG,logBean.getTime(),logBean.getMeasurement(),logBean.getAllTags(),logBean.getAllFields());
+    }
+
+    /**
+     * 将多条日志数据存入本地同步
+     * @param logBeans
+     */
+    public void logBackground(List<LogBean> logBeans) {
+        if(logBeans == null){
+            return;
+        }
+        List<TrackBean> trackBeans = new ArrayList<>();
+        for (LogBean logBean : logBeans) {
+            trackBeans.add(new TrackBean(logBean.getMeasurement(),logBean.getAllTags(),logBean.getAllFields(),logBean.getTime()));
+        }
+        track(OP.LOG,trackBeans);
+    }
+
+    /**
+     * 将单条日志数据及时上传并回调结果
+     * @param logBean
+     */
+    public void logImmediate(LogBean logBean,SyncCallback syncCallback){
+        if(logBean == null){
+            return;
+        }
+        TrackBean trackBean = new TrackBean(logBean.getMeasurement(),logBean.getAllTags(),logBean.getAllFields(),logBean.getTime());
+        track(OP.LOG,Collections.singletonList(trackBean),syncCallback);
+    }
+
+    /**
+     * 将多条日志数据存入本地同步
+     * @param logBeans
+     */
+    public void logImmediate(List<LogBean> logBeans,SyncCallback syncCallback) {
+        if(logBeans == null){
+            return;
+        }
+        List<TrackBean> trackBeans = new ArrayList<>();
+        for (LogBean logBean : logBeans) {
+            trackBeans.add(new TrackBean(logBean.getMeasurement(),logBean.getAllTags(),logBean.getAllFields(),logBean.getTime()));
+        }
+        track(OP.LOG,trackBeans,syncCallback);
     }
 
     /**
@@ -201,12 +247,46 @@ public class FTTrack {
     }
 
     /**
+     * 直接将埋点数据存入本地等待同步
+     *
+     * @param trackBeans
+     */
+    private void track(OP op,List<TrackBean> trackBeans) {
+        try {
+            if (trackBeans == null) {
+                return;
+            }
+
+            ThreadPoolUtils.get().execute(() -> {
+                try {
+                    List<RecordData> recordDataList = new ArrayList<>();
+                    for (TrackBean t : trackBeans) {
+                        if (!isLegalValues(t.getFields())) {
+                            continue;
+                        }
+                        RecordData recordData = transTrackBeanToRecordData(op, t.getTimeMillis(), t.getMeasurement(), t.getTags(), t.getFields(), null);
+                        if (recordData != null) {
+                            recordDataList.add(recordData);
+                        }
+                    }
+                    FTManager.getFTDBManager().insertFtOptList(recordDataList);
+                    FTManager.getSyncTaskManager().executeSyncPoll();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * 直接将埋点数据同步
      *
      * @param trackBeans
      * @param callback
      */
-    private void track(List<TrackBean> trackBeans, SyncCallback callback) {
+    private void track(OP op,List<TrackBean> trackBeans, SyncCallback callback) {
         try {
             if (trackBeans == null) {
                 return;
@@ -222,12 +302,23 @@ public class FTTrack {
                             }
                             continue;
                         }
-                        RecordData recordData = transTrackBeanToRecordData(OP.CSTM, t.getTimeMillis(), t.getMeasurement(), t.getTags(), t.getFields(), callback);
+                        RecordData recordData = transTrackBeanToRecordData(op, t.getTimeMillis(), t.getMeasurement(), t.getTags(), t.getFields(), callback);
                         if (recordData != null) {
                             recordDataList.add(recordData);
                         }
                     }
-                    updateRecordData(recordDataList, callback);
+                    DataType dataType;
+                    switch (op) {
+                        case LOG:
+                            dataType = DataType.LOG;
+                            break;
+                        case KEYEVENT:
+                            dataType = DataType.KEY_EVENT;
+                            break;
+                        default:
+                            dataType = DataType.TRACK;
+                    }
+                    updateRecordData(dataType,recordDataList, callback);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -298,16 +389,28 @@ public class FTTrack {
      * @param recordDataList
      * @param callback
      */
-    private void updateRecordData(List<RecordData> recordDataList, SyncCallback callback) {
+    private void updateRecordData(DataType dataType,List<RecordData> recordDataList, SyncCallback callback) {
         if (recordDataList == null || recordDataList.isEmpty()) {
             return;
         }
         SyncDataManager syncDataManager = new SyncDataManager();
-        String body = syncDataManager.getBodyContent(DataType.TRACK,recordDataList);
+        String body = syncDataManager.getBodyContent(dataType,recordDataList);
         SyncDataManager.printUpdateData(body);
         body = body.replaceAll(Constants.SEPARATION_PRINT,Constants.SEPARATION).replaceAll(Constants.SEPARATION_LINE_BREAK,Constants.SEPARATION_REALLY_LINE_BREAK);
+        String model = Constants.URL_MODEL_TRACK;
+        switch (dataType) {
+            case KEY_EVENT:
+                model = Constants.URL_MODEL_KEY_EVENT;
+                break;
+            case LOG:
+                model = Constants.URL_MODEL_LOG;
+                break;
+            case OBJECT:
+            case TRACK:
+                model = Constants.URL_MODEL_TRACK;
+        }
         ResponseData result = HttpBuilder.Builder()
-                .setModel(Constants.URL_MODEL_TRACK)
+                .setModel(model)
                 .setMethod(RequestMethod.POST)
                 .setBodyString(body).executeSync(ResponseData.class);
         callback.onResponse(result.getHttpCode(), result.getData());

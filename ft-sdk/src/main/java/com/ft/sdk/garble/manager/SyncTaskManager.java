@@ -63,6 +63,7 @@ public class SyncTaskManager {
         errorCount.set(0);
         ThreadPoolUtils.get().execute(() -> {
             try {
+                Thread.sleep(10*1000);
                 List<RecordData> trackDataList = queryFromData(DataType.TRACK);
                 List<RecordData> objectDataList = queryFromData(DataType.OBJECT);
                 List<RecordData> logDataList = queryFromData(DataType.LOG);

@@ -69,8 +69,6 @@ public class SyncDataManager {
         switch (dataType) {
             case OBJECT:
                 return getObjectBodyContent(recordDatas);
-            case KEY_EVENT:
-                return getKeyEventBodyContent(recordDatas);
             default:
                 return getTrackBodyContent(recordDatas);
         }
@@ -83,16 +81,6 @@ public class SyncDataManager {
      * @return
      */
     public String getObjectBodyContent(List<RecordData> recordDataList) {
-        return "";
-    }
-
-    /**
-     * 封装本地事件数据
-     *
-     * @param recordDataList
-     * @return
-     */
-    public String getKeyEventBodyContent(List<RecordData> recordDataList) {
         return "";
     }
 
