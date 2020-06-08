@@ -57,6 +57,12 @@ public class FTSDKConfig {
     private boolean pageVtpDescEnabled;
     //流程图是否显示描述
     private boolean flowChartDescEnabled;
+    //设置是否需要采集崩溃日志
+    private boolean enableTrackAppCrash;
+    //设置采样率
+    private float collectRate = 1;
+    //崩溃日志的环境
+    private String env = BuildConfig.BUILD_TYPE;
 
     /**
      * 构建 SDK 必要的配置参数
@@ -203,6 +209,18 @@ public class FTSDKConfig {
 
     public boolean isFlowChartDescEnabled() {
         return flowChartDescEnabled;
+    }
+
+    public boolean isEnableTrackAppCrash() {
+        return enableTrackAppCrash;
+    }
+
+    public float getCollectRate() {
+        return collectRate;
+    }
+
+    public String getEnv() {
+        return env;
     }
 
     /**
@@ -362,7 +380,12 @@ public class FTSDKConfig {
         return this;
     }
 
-    public FTSDKConfig openNetTime(boolean value) {
+    /**
+     * 是否开启网络全路径请求时长监控
+     * @param value
+     * @return
+     */
+    public FTSDKConfig trackNetRequestTime(boolean value) {
         this.trackNetTime = value;
         return this;
     }
@@ -404,6 +427,36 @@ public class FTSDKConfig {
      */
     public FTSDKConfig setFlowChartDescEnabled(boolean flowChartDescEnabled) {
         this.flowChartDescEnabled = flowChartDescEnabled;
+        return this;
+    }
+
+    /**
+     * 设置是否需要采集崩溃日志
+     * @param enableTrackAppCrash
+     * @return
+     */
+    public FTSDKConfig setEnableTrackAppCrash(boolean enableTrackAppCrash) {
+        this.enableTrackAppCrash = enableTrackAppCrash;
+        return this;
+    }
+
+    /**
+     * 设置采样率
+     * @param collectRate
+     * @return
+     */
+    public FTSDKConfig setCollectRate(float collectRate) {
+        this.collectRate = collectRate;
+        return this;
+    }
+
+    /**
+     * 设置崩溃日志的环境
+     * @param env
+     * @return
+     */
+    public FTSDKConfig setEnv(String env) {
+        this.env = env;
         return this;
     }
 }

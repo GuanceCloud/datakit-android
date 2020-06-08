@@ -53,14 +53,16 @@ public class DemoApplication extends Application {
                 .setFlowChartDescEnabled(true)
                 .setPageVtpDescEnabled(true)
                 .setMonitorType(MonitorType.ALL)//设置监控项
-                .openNetTime(true);
+                .trackNetRequestTime(true)
+                .setEnableTrackAppCrash(true)
+                .setEnv("dev")
+                .setCollectRate(0.5f);
         FTSdk.install(ftSDKConfig);
 
         FTMonitor.get()
                 .setMonitorType(MonitorType.ALL)
                 .setPeriod(10)
                 .start();
-        FTSdk.get().trackAppCrash();
     }
 
     private Map<String, String> pageAliasMap() {

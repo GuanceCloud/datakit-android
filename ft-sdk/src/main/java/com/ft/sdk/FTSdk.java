@@ -183,24 +183,6 @@ public class FTSdk {
     }
 
     /**
-     * 捕获系统异常
-     */
-    public void trackAppCrash() {
-        FTExceptionHandler.get().enableTrackCrash();
-    }
-
-    /**
-     * 设置日志采集率
-     * @param rate 取值范围在[0,1]
-     */
-    public void setTrackCollectRate(double rate){
-        if(rate>1 || rate<0){
-            throw new IllegalArgumentException("rate 值的范围应在[0,1]");
-        }
-        Utils.trackerCollectRate = rate;
-    }
-
-    /**
      * 初始化SDK本地配置数据
      */
     private void initFTConfig() {
@@ -223,6 +205,13 @@ public class FTSdk {
             if (mFtSDKConfig.isOpenFlowChart()) {
                 FTFlowChartConfig.get().initParams(mFtSDKConfig);
             }
+            FTExceptionHandler.get().enableTrackCrash(mFtSDKConfig.isEnableTrackAppCrash());
+            float rate = mFtSDKConfig.getCollectRate();
+            if(rate>1 || rate<0){
+                throw new IllegalArgumentException("rate 值的范围应在[0,1]");
+            }
+            Utils.trackerCollectRate = rate;
+            FTExceptionHandler.get().crashEvn(mFtSDKConfig.getEnv());
         }
     }
 

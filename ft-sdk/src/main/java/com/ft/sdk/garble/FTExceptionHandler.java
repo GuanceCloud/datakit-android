@@ -2,6 +2,7 @@ package com.ft.sdk.garble;
 
 import androidx.annotation.NonNull;
 
+import com.ft.sdk.BuildConfig;
 import com.ft.sdk.FTTrack;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.utils.Constants;
@@ -19,6 +20,7 @@ import java.io.Writer;
  */
 public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
     private boolean canTrackCrash;
+    private String env = BuildConfig.BUILD_TYPE;
     private static FTExceptionHandler instance;
     private Thread.UncaughtExceptionHandler mDefaultExceptionHandler;
     private FTExceptionHandler(){
@@ -32,8 +34,20 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
         return instance;
     }
 
-    public void enableTrackCrash(){
-        this.canTrackCrash = true;
+    /**
+     * 设置是否开启崩溃日志捕获
+     * @param enable
+     */
+    public void enableTrackCrash(boolean enable){
+        this.canTrackCrash = enable;
+    }
+
+    /**
+     * 设置崩溃日志的环境
+     * @param env
+     */
+    public void crashEvn(String env){
+        this.env = env;
     }
     @Override
     public void uncaughtException(@NonNull Thread t, @NonNull Throwable e) {
@@ -48,10 +62,9 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
             }
             printWriter.close();
             String result = writer.toString();
-            LogUtils.e("crash-1:" + result);
-            LogBean logBean = new LogBean(Constants.USER_AGENT,Utils.translateFieldValue(result),System.currentTimeMillis()*1000);
+            LogBean logBean = new LogBean(Constants.USER_AGENT,Utils.translateFieldValue(result),System.currentTimeMillis());
             logBean.setStatus("critical");
-            logBean.setEnv("dev");
+            logBean.setEnv(env);
             logBean.setServiceName("dataflux sdk");
             FTTrack.getInstance().logBackground(logBean);
         }
