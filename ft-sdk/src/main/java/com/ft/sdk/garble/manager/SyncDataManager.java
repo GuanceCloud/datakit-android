@@ -159,8 +159,7 @@ public class SyncDataManager {
                     sb.append(Constants.SEPARATION_LINE_BREAK);
                 }
                 //非流程图数据
-            } else if (OP.LOG.value.equals(recordData.getOp()) || OP.KEYEVENT.value.equals(recordData.getOp())
-                    || OP.OBJECT.value.equals(recordData.getOp())) {
+            } else if (OP.LOG.value.equals(recordData.getOp()) || OP.KEYEVENT.value.equals(recordData.getOp())) {
                 //获取这条事件的指标
                 sb.append(getMeasurement(recordData));
                 //获取埋点事件数据
@@ -219,8 +218,7 @@ public class SyncDataManager {
     private String getUpdateData(RecordData recordData) {
         if (CSTM.value.equals(recordData.getOp()) || FLOW_CHAT.value.equals(recordData.getOp())) {
             return composeCustomUpdateData(true,recordData);
-        } else if (LOG.value.equals(recordData.getOp()) || KEYEVENT.value.equals(recordData.getOp()) ||
-                OBJECT.value.equals(recordData.getOp())) {
+        } else if (LOG.value.equals(recordData.getOp()) || KEYEVENT.value.equals(recordData.getOp())) {
             return composeCustomUpdateData(false, recordData);
         }else {
             return composeAutoUpdateData(recordData);

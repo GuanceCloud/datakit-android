@@ -195,6 +195,8 @@ public class SyncTaskManager {
                 model = Constants.URL_MODEL_LOG;
                 break;
             case OBJECT:
+                model = Constants.URL_MODEL_OBJECT;
+                break;
             case TRACK:
                 model = Constants.URL_MODEL_TRACK;
         }

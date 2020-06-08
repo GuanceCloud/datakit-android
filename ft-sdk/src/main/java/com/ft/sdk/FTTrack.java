@@ -3,8 +3,10 @@ package com.ft.sdk;
 import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.SyncCallback;
 import com.ft.sdk.garble.bean.DataType;
+import com.ft.sdk.garble.bean.KeyEventBean;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.OP;
+import com.ft.sdk.garble.bean.ObjectBean;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.bean.TrackBean;
 import com.ft.sdk.garble.http.HttpBuilder;
@@ -216,6 +218,85 @@ public class FTTrack {
     }
 
     /**
+     * 将单条事件数据存入本地同步
+     * @param keyEventBean
+     */
+    public void keyEventBackground(KeyEventBean keyEventBean) {
+        if(keyEventBean == null){
+            return;
+        }
+        track(OP.KEYEVENT,keyEventBean.getTime(),keyEventBean.getMeasurement(),keyEventBean.getAllTags(),keyEventBean.getAllFields());
+    }
+
+    /**
+     * 将多条事件数据存入本地同步
+     * @param keyEventBeans
+     */
+    public void keyEventBackground(List<KeyEventBean> keyEventBeans) {
+        if(keyEventBeans == null){
+            return;
+        }
+        List<TrackBean> trackBeans = new ArrayList<>();
+        for (KeyEventBean keyEventBean : keyEventBeans) {
+            trackBeans.add(new TrackBean(keyEventBean.getMeasurement(),keyEventBean.getAllTags(),keyEventBean.getAllFields(),keyEventBean.getTime()));
+        }
+        track(OP.KEYEVENT,trackBeans);
+    }
+
+    /**
+     * 将单条事件数据及时上传并回调结果
+     * @param keyEventBean
+     */
+    public void keyEventImmediate(KeyEventBean keyEventBean,SyncCallback syncCallback){
+        if(keyEventBean == null){
+            return;
+        }
+        TrackBean trackBean = new TrackBean(keyEventBean.getMeasurement(),keyEventBean.getAllTags(),keyEventBean.getAllFields(),keyEventBean.getTime());
+        track(OP.KEYEVENT,Collections.singletonList(trackBean),syncCallback);
+    }
+
+    /**
+     * 将多条事件数据存入本地同步
+     * @param keyEventBeans
+     */
+    public void keyEventImmediate(List<KeyEventBean> keyEventBeans,SyncCallback syncCallback) {
+        if(keyEventBeans == null){
+            return;
+        }
+        List<TrackBean> trackBeans = new ArrayList<>();
+        for (KeyEventBean keyEventBean : keyEventBeans) {
+            trackBeans.add(new TrackBean(keyEventBean.getMeasurement(),keyEventBean.getAllTags(),keyEventBean.getAllFields(),keyEventBean.getTime()));
+        }
+        track(OP.KEYEVENT,trackBeans,syncCallback);
+    }
+
+    /**
+     * 将多条对象数据直接同步
+     * @param objectBeans
+     */
+    public void objectImmediate(List<ObjectBean> objectBeans, SyncCallback syncCallback) {
+        if(objectBeans == null){
+            return;
+        }
+        JSONArray jsonArray = new JSONArray();
+        for (ObjectBean objectBean : objectBeans) {
+            jsonArray.put(objectBean.getJSONData());
+        }
+
+        ThreadPoolUtils.get().execute(() -> {
+            try {
+                ResponseData result = HttpBuilder.Builder()
+                        .setModel(Constants.URL_MODEL_OBJECT)
+                        .addHeadParam("Content-Type","application/json")
+                        .setMethod(RequestMethod.POST)
+                        .setBodyString(jsonArray.toString()).executeSync(ResponseData.class);
+                syncCallback.onResponse(result.getHttpCode(), result.getData());
+            } catch (Exception e) {
+            }
+        });
+    }
+
+    /**
      * 将埋点数据存入本地后通知同步
      *
      * @param op
@@ -406,6 +487,8 @@ public class FTTrack {
                 model = Constants.URL_MODEL_LOG;
                 break;
             case OBJECT:
+                model = Constants.URL_MODEL_OBJECT;
+                break;
             case TRACK:
                 model = Constants.URL_MODEL_TRACK;
         }
