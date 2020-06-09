@@ -137,7 +137,7 @@ public class SyncTaskManager {
         }
         SyncDataManager syncDataManager = new SyncDataManager();
         String body = syncDataManager.getBodyContent(dataType, requestDatas);
-        SyncDataManager.printUpdateData(body);
+        SyncDataManager.printUpdateData(dataType == DataType.OBJECT,body);
         body = body.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION).replaceAll(Constants.SEPARATION_LINE_BREAK,Constants.SEPARATION_REALLY_LINE_BREAK);
         requestNet(dataType, body, (code, response) -> {
             if (code == HttpURLConnection.HTTP_OK) {
@@ -200,7 +200,12 @@ public class SyncTaskManager {
             case TRACK:
                 model = Constants.URL_MODEL_TRACK;
         }
+        String content_type = "text/plain";
+        if(DataType.OBJECT == dataType){
+            content_type = "application/json";
+        }
         FTResponseData result = HttpBuilder.Builder()
+                .addHeadParam("Content-Type", content_type)
                 .setModel(model)
                 .setMethod(RequestMethod.POST)
                 .setBodyString(body).executeSync(FTResponseData.class);

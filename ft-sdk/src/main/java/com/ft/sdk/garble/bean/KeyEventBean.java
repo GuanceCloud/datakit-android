@@ -1,5 +1,7 @@
 package com.ft.sdk.garble.bean;
 
+import com.ft.sdk.FTApplication;
+import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONArray;
@@ -14,7 +16,7 @@ public class KeyEventBean {
     private String measurement = "__keyevent";
     private String eventId;
     private String source;
-    private String status;
+    private Status status = Status.INFO;
     private String ruleId;
     private String ruleName;
     private String type;
@@ -44,9 +46,7 @@ public class KeyEventBean {
             if(!Utils.isNullOrEmpty(source)){
                 tags.put("__source",source);
             }
-            if(!Utils.isNullOrEmpty(status)){
-                tags.put("__status",status);
-            }
+            tags.put("__status",status.name);
             if(!Utils.isNullOrEmpty(ruleId)){
                 tags.put("__ruleName",ruleName);
             }
@@ -55,6 +55,9 @@ public class KeyEventBean {
             }
             if(!Utils.isNullOrEmpty(actionType)){
                 tags.put("__actionType",actionType);
+            }
+            if(!tags.has("device_uuid")){
+                tags.put("device_uuid", DeviceUtils.getUuid(FTApplication.getApplication()));
             }
         }catch (Exception e){
 
@@ -103,11 +106,11 @@ public class KeyEventBean {
         this.source = source;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
