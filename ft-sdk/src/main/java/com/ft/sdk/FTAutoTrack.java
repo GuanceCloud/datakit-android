@@ -695,6 +695,7 @@ public class FTAutoTrack {
                 if(Utils.enableTrackUnderRate()) {
                     //在采样范围内就把该条数据添加到数据库
                     recordDataList.add(recordData);
+                    LogUtils.d("FTAutoTrack数据进数据库：" + recordData.getJsonString());
                 }
                 //开启流程图，获取流程图相关数据存入数据库中
                 if (FTFlowChartConfig.get().isOpenFlowChart()) {
@@ -702,16 +703,14 @@ public class FTAutoTrack {
                         //如果是打开关闭页面就拷贝一条记录存入数据库，一条作为流程图数据
                         RecordData recordDataClone = recordData.clone();
                         recordDataList.add(recordDataClone);
-                        recordData.setPpn(parentPage);
-                        recordData.setTraceId(FTFlowChartConfig.get().getFlowUUID());
+                        recordDataClone.setPpn(parentPage);
+                        recordDataClone.setTraceId(FTFlowChartConfig.get().getFlowUUID());
                         long currentTime = System.currentTimeMillis();
-                        recordData.setDuration(currentTime - FTFlowChartConfig.get().lastOpTime);
+                        recordDataClone.setDuration(currentTime - FTFlowChartConfig.get().lastOpTime);
                         FTFlowChartConfig.get().lastOpTime = currentTime;
                     }
                 }
 
-
-                LogUtils.d("FTAutoTrack数据进数据库：" + recordData.getJsonString());
                 FTManager.getFTDBManager().insertFtOptList(recordDataList);
                 FTManager.getSyncTaskManager().executeSyncPoll();
             } catch (Exception e) {

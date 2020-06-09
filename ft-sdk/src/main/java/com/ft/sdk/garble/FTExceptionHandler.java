@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import com.ft.sdk.BuildConfig;
 import com.ft.sdk.FTTrack;
 import com.ft.sdk.garble.bean.LogBean;
+import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -63,7 +64,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
             printWriter.close();
             String result = writer.toString();
             LogBean logBean = new LogBean(Constants.USER_AGENT,Utils.translateFieldValue(result),System.currentTimeMillis());
-            logBean.setStatus("critical");
+            logBean.setStatus(Status.CRITICAL);
             logBean.setEnv(env);
             logBean.setServiceName("dataflux sdk");
             FTTrack.getInstance().logBackground(logBean);

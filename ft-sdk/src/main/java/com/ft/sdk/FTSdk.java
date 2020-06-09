@@ -210,7 +210,10 @@ public class FTSdk {
             if(rate>1 || rate<0){
                 throw new IllegalArgumentException("rate 值的范围应在[0,1]");
             }
+            //设置采样率
             Utils.trackerCollectRate = rate;
+            //生成随机采样数，用来判断是否对该设备的行为进行采样
+            Utils.generateRandomNumber();
             FTExceptionHandler.get().crashEvn(mFtSDKConfig.getEnv());
         }
     }
