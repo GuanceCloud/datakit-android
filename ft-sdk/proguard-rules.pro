@@ -94,6 +94,11 @@
     *;
 }
 
+-keep class com.ft.sdk.garble.bean.ObjectBean{
+    *;
+}
+
+
 -keep class com.ft.sdk.garble.bean.Status{
     *;
 }
