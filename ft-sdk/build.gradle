@@ -63,7 +63,7 @@ task sourceJar(type: Jar) {
 publishing {
     publications {
         mavenAar(MavenPublication) {
-            groupId 'com.cloudcare.ft.mobile.sdk.traker.agent'
+            groupId 'com.cloudcare.ft.mobile.sdk.tracker.agent'
             artifactId 'ft-sdk'
             version versionNameStr
             artifact(sourceJar)
