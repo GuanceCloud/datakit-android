@@ -13,6 +13,7 @@ import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.bean.BatteryBean;
 import com.ft.sdk.garble.bean.CameraPx;
+import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.bean.UserData;
@@ -31,6 +32,7 @@ import com.ft.sdk.garble.utils.OaidUtils;
 import com.ft.sdk.garble.utils.SensorUtils;
 import com.ft.sdk.garble.utils.Utils;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -43,6 +45,9 @@ import java.util.Set;
 
 import static com.ft.sdk.garble.bean.OP.CSTM;
 import static com.ft.sdk.garble.bean.OP.FLOW_CHAT;
+import static com.ft.sdk.garble.bean.OP.KEYEVENT;
+import static com.ft.sdk.garble.bean.OP.LOG;
+import static com.ft.sdk.garble.bean.OP.OBJECT;
 import static com.ft.sdk.garble.utils.Constants.FT_DEFAULT_MEASUREMENT;
 import static com.ft.sdk.garble.utils.Constants.FT_KEY_VALUE_NULL;
 import static com.ft.sdk.garble.utils.Constants.UNKNOWN;
@@ -55,84 +60,132 @@ import static com.ft.sdk.garble.utils.Constants.UNKNOWN;
 public class SyncDataManager {
 
     /**
-     * 将本地将要同步的数据封装
+     * 封装同步上传的数据
+     *
+     * @param dataType
+     * @param recordDatas
+     * @return
+     */
+    public String getBodyContent(DataType dataType, List<RecordData> recordDatas) {
+        switch (dataType) {
+            case OBJECT:
+                return getObjectBodyContent(recordDatas);
+            default:
+                return getTrackBodyContent(recordDatas);
+        }
+    }
+
+    /**
+     * 封装本地对象数据
+     *
+     * @param recordDataList
+     * @return
+     */
+    public String getObjectBodyContent(List<RecordData> recordDataList) {
+        JSONArray jsonArray = new JSONArray();
+        try {
+            for (RecordData recordData : recordDataList) {
+                JSONObject jsonObject = new JSONObject(recordData.getOpdata());
+                if (jsonObject.has(Constants.FIELDS)) {
+                    jsonArray.put(jsonObject.getJSONObject(Constants.FIELDS));
+                }
+            }
+        }catch (Exception e){
+
+        }
+        return jsonArray.toString();
+    }
+
+    /**
+     * 封装本地埋点数据
      *
      * @param recordDatas
      * @return
      */
-    public String getBodyContent(List<RecordData> recordDatas) {
+    public String getTrackBodyContent(List<RecordData> recordDatas) {
         StringBuffer sb = new StringBuffer();
         String device = parseHashToString(getDeviceInfo());
         for (RecordData recordData : recordDatas) {
-            if (OP.OPEN_ACT.value.equals(recordData.getOp())) {
-                //如果是页面打开操作，就在该条数据上添加一条表示流程图的数据
-                sb.append("$flow_mobile_activity");
-                sb.append(",$traceId=").append(recordData.getTraceId());
-                if (recordData.getPpn() != null && recordData.getPpn().startsWith(Constants.MOCK_SON_PAGE_DATA)) {
-                    String[] strArr = recordData.getPpn().split(":");
-                    String name = null;
-                    String parent = null;
-                    //数组长度等于 3 表示当前页面是一个 Fragment
-                    if (strArr.length == 3) {
-                        name = FTAliasConfig.get().getFlowChartDesc(recordData.getCpn() + "." + strArr[1]);
-                        parent = FTAliasConfig.get().getFlowChartDesc(strArr[2]);
-                        //数组长度等于 2 表示当前页面是一个 Activity
-                    } else if (strArr.length == 2) {
-                        name = FTAliasConfig.get().getFlowChartDesc(recordData.getCpn());
-                        parent = FTAliasConfig.get().getFlowChartDesc(strArr[1]);
-                    }
-                    sb.append(",$name=").append(name);
-                    sb.append(",$parent=").append(parent);
-                } else {
-                    sb.append(",$name=").append(FTAliasConfig.get().getFlowChartDesc(recordData.getCpn()));
-                    //如果父页面是root表示其为起始节点，不添加父节点
-                    if (!Constants.FLOW_ROOT.equals(recordData.getPpn())) {
-                        String ppn = recordData.getPpn();
-                        sb.append(",$parent=").append(FTAliasConfig.get().getFlowChartDesc(ppn));
-                    }
-                }
-                sb.append(",").append(device).append(",");
-                addUserData(sb, recordData);
-                //删除多余的逗号
-                deleteLastComma(sb);
-                sb.append(Constants.SEPARATION_PRINT);
-                sb.append("$duration=").append(recordData.getDuration()).append("i");
-                sb.append(Constants.SEPARATION_PRINT);
-                sb.append(recordData.getTime() * 1000 * 1000);
-                sb.append("\n");
-            } else if (OP.OPEN_FRA.value.equals(recordData.getOp())) {
-                //如果是子页面打开操作，就在该条数据上添加一条表示流程图的数据
-                sb.append("$flow_mobile_activity");
-                sb.append(",$traceId=").append(recordData.getTraceId());
-                sb.append(",$name=").append(FTAliasConfig.get().getFlowChartDesc(recordData.getRpn() + "." + recordData.getCpn()));
-                String parent;
-                if (!Constants.FLOW_ROOT.equals(recordData.getPpn())) {
-                    if (recordData.getPpn().startsWith(Constants.PERFIX)) {
-                        parent = FTAliasConfig.get().getFlowChartDesc(recordData.getPpn().replace(Constants.PERFIX, ""));
+            //流程图ID
+            String traceId = recordData.getTraceId();
+            //流程图数据
+            if (!Utils.isNullOrEmpty(traceId)) {
+                if (OP.OPEN_ACT.value.equals(recordData.getOp())) {
+                    sb.append("$flow_mobile_activity");
+                    sb.append(",$traceId=").append(recordData.getTraceId());
+                    if (recordData.getPpn() != null && recordData.getPpn().startsWith(Constants.MOCK_SON_PAGE_DATA)) {
+                        String[] strArr = recordData.getPpn().split(":");
+                        String name = null;
+                        String parent = null;
+                        //数组长度等于 3 表示当前页面是一个 Fragment
+                        if (strArr.length == 3) {
+                            name = FTAliasConfig.get().getFlowChartDesc(recordData.getCpn() + "." + strArr[1]);
+                            parent = FTAliasConfig.get().getFlowChartDesc(strArr[2]);
+                            //数组长度等于 2 表示当前页面是一个 Activity
+                        } else if (strArr.length == 2) {
+                            name = FTAliasConfig.get().getFlowChartDesc(recordData.getCpn());
+                            parent = FTAliasConfig.get().getFlowChartDesc(strArr[1]);
+                        }
+                        sb.append(",$name=").append(name);
+                        sb.append(",$parent=").append(parent);
                     } else {
-                        parent = FTAliasConfig.get().getFlowChartDesc(recordData.getRpn() + "." + recordData.getPpn());
+                        sb.append(",$name=").append(FTAliasConfig.get().getFlowChartDesc(recordData.getCpn()));
+                        //如果父页面是root表示其为起始节点，不添加父节点
+                        if (!Constants.FLOW_ROOT.equals(recordData.getPpn())) {
+                            String ppn = recordData.getPpn();
+                            sb.append(",$parent=").append(FTAliasConfig.get().getFlowChartDesc(ppn));
+                        }
                     }
-                } else {
-                    parent = FTAliasConfig.get().getFlowChartDesc(recordData.getRpn());
+                    sb.append(",").append(device).append(",");
+                    addUserData(sb, recordData);
+                    //删除多余的逗号
+                    deleteLastComma(sb);
+                    sb.append(Constants.SEPARATION_PRINT);
+                    sb.append("$duration=").append(recordData.getDuration()).append("i");
+                    sb.append(Constants.SEPARATION_PRINT);
+                    sb.append(recordData.getTime() * 1000 * 1000);
+                    sb.append(Constants.SEPARATION_LINE_BREAK);
+                } else if (OP.OPEN_FRA.value.equals(recordData.getOp())) {
+                    sb.append("$flow_mobile_activity");
+                    sb.append(",$traceId=").append(recordData.getTraceId());
+                    sb.append(",$name=").append(FTAliasConfig.get().getFlowChartDesc(recordData.getRpn() + "." + recordData.getCpn()));
+                    String parent;
+                    if (!Constants.FLOW_ROOT.equals(recordData.getPpn())) {
+                        if (recordData.getPpn().startsWith(Constants.PERFIX)) {
+                            parent = FTAliasConfig.get().getFlowChartDesc(recordData.getPpn().replace(Constants.PERFIX, ""));
+                        } else {
+                            parent = FTAliasConfig.get().getFlowChartDesc(recordData.getRpn() + "." + recordData.getPpn());
+                        }
+                    } else {
+                        parent = FTAliasConfig.get().getFlowChartDesc(recordData.getRpn());
+                    }
+                    sb.append(",$parent=").append(parent);
+                    sb.append(",").append(device).append(",");
+                    addUserData(sb, recordData);
+                    //删除多余的逗号
+                    deleteLastComma(sb);
+                    sb.append(Constants.SEPARATION_PRINT);
+                    sb.append("$duration=").append(recordData.getDuration()).append("i");
+                    sb.append(Constants.SEPARATION_PRINT);
+                    sb.append(recordData.getTime() * 1000 * 1000);
+                    sb.append(Constants.SEPARATION_LINE_BREAK);
                 }
-                sb.append(",$parent=").append(parent);
-                sb.append(",").append(device).append(",");
-                addUserData(sb, recordData);
-                //删除多余的逗号
-                deleteLastComma(sb);
-                sb.append(Constants.SEPARATION_PRINT);
-                sb.append("$duration=").append(recordData.getDuration()).append("i");
-                sb.append(Constants.SEPARATION_PRINT);
-                sb.append(recordData.getTime() * 1000 * 1000);
-                sb.append("\n");
+                //非流程图数据
+            } else if (OP.LOG.value.equals(recordData.getOp()) || OP.KEYEVENT.value.equals(recordData.getOp())) {
+                //获取这条事件的指标
+                sb.append(getMeasurement(recordData));
+                //获取埋点事件数据
+                sb.append(getUpdateData(recordData));
+                sb.append(Constants.SEPARATION_LINE_BREAK);
+            } else {//埋点数据
+                //获取这条事件的指标
+                sb.append(getMeasurement(recordData));
+                sb.append(",");
+                sb.append(device);
+                //获取埋点事件数据
+                sb.append(getUpdateData(recordData));
+                sb.append(Constants.SEPARATION_LINE_BREAK);
             }
-            //获取这条事件的指标
-            sb.append(getMeasurement(recordData));
-            sb.append(",");
-            sb.append(device);
-            //获取埋点事件数据
-            sb.append(getUpdateData(recordData));
-            sb.append("\n");
         }
         return sb.toString();
     }
@@ -149,7 +202,9 @@ public class SyncDataManager {
         String measurement;
         try {
             JSONObject jsonObject = new JSONObject(recordData.getOpdata());
-            if (CSTM.value.equals(recordData.getOp()) || FLOW_CHAT.value.equals(recordData.getOp())) {
+            if (CSTM.value.equals(recordData.getOp()) || FLOW_CHAT.value.equals(recordData.getOp()) ||
+                    OBJECT.value.equals(recordData.getOp()) || KEYEVENT.value.equals(recordData.getOp()) ||
+                    LOG.value.equals(recordData.getOp())) {
                 String measurementTemp = jsonObject.optString(Constants.MEASUREMENT);
                 if (Utils.isNullOrEmpty(measurementTemp)) {
                     measurement = FT_KEY_VALUE_NULL;
@@ -174,8 +229,10 @@ public class SyncDataManager {
      */
     private String getUpdateData(RecordData recordData) {
         if (CSTM.value.equals(recordData.getOp()) || FLOW_CHAT.value.equals(recordData.getOp())) {
-            return composeCustomUpdateData(recordData);
-        } else {
+            return composeCustomUpdateData(true,recordData);
+        } else if (LOG.value.equals(recordData.getOp()) || KEYEVENT.value.equals(recordData.getOp())) {
+            return composeCustomUpdateData(false, recordData);
+        }else {
             return composeAutoUpdateData(recordData);
         }
     }
@@ -185,7 +242,7 @@ public class SyncDataManager {
      *
      * @return
      */
-    private String composeCustomUpdateData(RecordData recordData) {
+    private String composeCustomUpdateData(boolean addUser,RecordData recordData) {
         StringBuffer sb = new StringBuffer();
         if (recordData.getOpdata() != null) {
             try {
@@ -194,7 +251,9 @@ public class SyncDataManager {
                 JSONObject fields = opJson.optJSONObject(Constants.FIELDS);
                 StringBuffer tagSb = getCustomHash(tags, true);
                 StringBuffer valueSb = getCustomHash(fields, false);
-                addUserData(tagSb, recordData);
+                if(addUser) {
+                    addUserData(tagSb, recordData);
+                }
                 deleteLastComma(tagSb);
                 if (tagSb.length() > 0) {
                     sb.append(",");
@@ -541,9 +600,15 @@ public class SyncDataManager {
             tags.put("roam", NetUtils.get().getRoamState());
             fields.put("wifi_ssid", NetUtils.get().getSSId());
             fields.put("wifi_ip", NetUtils.get().getWifiIp());
-            fields.put("network_tcp_time", NetUtils.get().getTcpTime());
-            fields.put("network_dns_time", NetUtils.get().getDNSTime());
-            fields.put("network_response_time", NetUtils.get().getResponseTime());
+            if (NetUtils.get().isInnerRequest()) {
+                fields.put("_network_tcp_time", NetUtils.get().getTcpTime());
+                fields.put("_network_dns_time", NetUtils.get().getDNSTime());
+                fields.put("_network_response_time", NetUtils.get().getResponseTime());
+            } else {
+                fields.put("network_tcp_time", NetUtils.get().getTcpTime());
+                fields.put("network_dns_time", NetUtils.get().getDNSTime());
+                fields.put("network_response_time", NetUtils.get().getResponseTime());
+            }
             fields.put("network_error_rate", NetUtils.get().getErrorRate());
         } catch (Exception e) {
             LogUtils.e("网络数据获取异常:" + e.getMessage());
@@ -824,10 +889,19 @@ public class SyncDataManager {
      *
      * @param body
      */
-    public static void printUpdateData(String body) {
+    public static void printUpdateData(boolean noTran,String body) {
+        if(noTran){
+            StringBuffer sb = new StringBuffer();
+            sb.append("-----------------------------------------------------------\n");
+            sb.append("----------------------同步数据--开始-------------------------\n");
+            sb.append(body);
+            LogUtils.d(sb.toString());
+            sb.append("----------------------同步数据--结束----------------------\n");
+            return;
+        }
         try {
             StringBuffer sb = new StringBuffer();
-            String[] counts = body.split("\n");
+            String[] counts = body.split(Constants.SEPARATION_LINE_BREAK);
             sb.append("-----------------------------------------------------------\n");
             sb.append("----------------------同步数据--开始-------------------------\n");
             sb.append("----------------------总共 ").append(counts.length).append(" 条数据------------------------\n");

@@ -38,6 +38,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if(oldVersion == 1 && newVersion == 2){
             db.execSQL("ALTER TABLE "+FTSQL.FT_TABLE_NAME+" ADD COLUMN "+FTSQL.RECORD_COLUMN_SESSION_ID);
         }
+        if(oldVersion == 2 && newVersion == 3){
+            db.execSQL("ALTER TABLE "+FTSQL.FT_TABLE_NAME+" ADD COLUMN "+FTSQL.RECORD_COLUMN_OPTION);
+        }
+        if(oldVersion == 1 && newVersion == 3){
+            db.execSQL("ALTER TABLE "+FTSQL.FT_TABLE_NAME+" ADD COLUMN "+FTSQL.RECORD_COLUMN_SESSION_ID);
+            db.execSQL("ALTER TABLE "+FTSQL.FT_TABLE_NAME+" ADD COLUMN "+FTSQL.RECORD_COLUMN_OPTION);
+        }
     }
 
     private void createTable(SQLiteDatabase db) {

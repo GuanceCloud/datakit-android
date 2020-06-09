@@ -20,10 +20,18 @@ public class Constants {
     public static final String TAGS= "tags";
     public static final String SEPARATION_PRINT = "--temp_separation--";
     public static final String SEPARATION = " ";
-    public static final String LINE_BREAK = "\n";
+    public static final String SEPARATION_LINE_BREAK = "--line_break_temp--";//换行标志符，用于日志显示
+    public static final String SEPARATION_REALLY_LINE_BREAK = "\n";//换行标志符，用于日志显示
     public static final String PERFIX = "ft_parent_not_fragment";
     public static final String MOCK_SON_PAGE_DATA = "mock_son_page_data";
     public static final String SHARE_PRE_STEP_DATE = "share_pre_step_date";
     public static final String SHARE_PRE_STEP_HISTORY = "share_pre_step_history";
+
+    public static final String URL_MODEL_TRACK = "v1/write/metrics";//指标数据上传路径
+    public static final String URL_MODEL_LOG = "v1/write/logging";//日志数据上传路径
+    public static final String URL_MODEL_KEY_EVENT = "v1/write/keyevent";//事件数据上传路径
+    public static final String URL_MODEL_OBJECT = "v1/write/object";//对象数据上传路径
+
+    public static final String DEFAULT_OBJECT_CLASS = "Dataflux Android SDK";//默认的对象名
 
 }

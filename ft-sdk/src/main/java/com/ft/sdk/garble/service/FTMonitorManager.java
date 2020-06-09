@@ -84,9 +84,10 @@ public class FTMonitorManager {
                     Thread.sleep(period * 1000);
                     try {
                         String body = SyncDataManager.getMonitorUploadData();
-                        SyncDataManager.printUpdateData(body);
-                        body = body.replaceAll(Constants.SEPARATION_PRINT,Constants.SEPARATION);
+                        SyncDataManager.printUpdateData(false,body);
+                        body = body.replaceAll(Constants.SEPARATION_PRINT,Constants.SEPARATION).replaceAll(Constants.SEPARATION_LINE_BREAK,Constants.SEPARATION_REALLY_LINE_BREAK);
                         ResponseData result = HttpBuilder.Builder()
+                                .setModel(Constants.URL_MODEL_TRACK)
                                 .setMethod(RequestMethod.POST)
                                 .setBodyString(body).executeSync(ResponseData.class);
                         if (result.getHttpCode() != HttpURLConnection.HTTP_OK) {

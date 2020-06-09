@@ -15,6 +15,7 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
 import com.ft.sdk.FTApplication;
+import com.ft.sdk.garble.FTHttpConfig;
 
 import java.net.InetAddress;
 import java.text.DecimalFormat;
@@ -55,6 +56,19 @@ public class NetUtils {
     public long responseEndTime;
     public int requestCount;
     public int requestErrCount;
+    public String requestHost;
+
+    /**
+     * 判断是否是 SDK 内部发出的请求
+     * @return
+     */
+    public boolean isInnerRequest(){
+        String innerUrl = FTHttpConfig.get().metricsUrl;
+        if(innerUrl != null && requestHost!= null && innerUrl.contains(requestHost)){
+            return true;
+        }
+        return false;
+    }
 
     public long getTcpTime() {
         if (tcpEndTime >= tcpStartTime) {

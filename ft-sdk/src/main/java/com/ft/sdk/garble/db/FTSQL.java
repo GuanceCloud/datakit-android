@@ -11,13 +11,15 @@ public class FTSQL {
     public static final String RECORD_COLUMN_TM = "tm";
     public static final String RECORD_COLUMN_DATA = "data";
     public static final String RECORD_COLUMN_SESSION_ID = "session_id";
+    public static final String RECORD_COLUMN_OPTION = "option";
 
     public static final String FT_TABLE_CREATE = "CREATE TABLE if not exists " + FT_TABLE_NAME +
             " (" +
             RECORD_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
             RECORD_COLUMN_TM + " INTEGER," +
             RECORD_COLUMN_DATA + " TEXT," +
-            RECORD_COLUMN_SESSION_ID + " TEXT"+
+            RECORD_COLUMN_SESSION_ID + " TEXT,"+
+            RECORD_COLUMN_OPTION + " TEXT"+
             ")";
 
     public static final String FT_TABLE_USER_DATA = "user_session_data";

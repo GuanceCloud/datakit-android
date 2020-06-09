@@ -18,6 +18,8 @@ public class AccountUtils {
     public final static String ACCESS_KEY_SECRET = "ACCESS_KEY_SECRET";
     //上传数据地址
     public final static String ACCESS_SERVER_URL = "ACCESS_SERVER_URL";
+    //上传数据的地址验证 token
+    public final static String ACCESS_SERVER_TOKEN = "ACCESS_SERVER_TOKEN";
     //高德地址逆向解析 key
     public final static String GEO_KEY = "GEO_KEY";
     /**

@@ -129,7 +129,9 @@ public class NetProxy {
         head.put("X-Datakit-UUID", ftHttpConfig.uuid);
         head.put("User-Agent", ftHttpConfig.userAgent);
         head.put("Accept-Language", "zh-CN");
-        head.put("Content-Type", CONTENT_TYPE);
+        if(!head.containsKey("Content-Type")) {
+            head.put("Content-Type", CONTENT_TYPE);
+        }
         head.put("charset", CHARSET);
         //计算日期
         calculateDate();
