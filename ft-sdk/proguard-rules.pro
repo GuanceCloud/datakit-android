@@ -94,6 +94,10 @@
     *;
 }
 
+-keep class com.ft.sdk.garble.bean.Status{
+    *;
+}
+
 -keep class com.ft.sdk.MonitorType{
     *;
 }

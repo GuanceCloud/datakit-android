@@ -1,5 +1,7 @@
 package com.ft.sdk.garble.bean;
 
+import com.ft.sdk.FTApplication;
+import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONException;
@@ -16,7 +18,7 @@ public class LogBean {
     String source;
     String serviceName;
     String env;
-    String status;
+    Status status = Status.INFO;
     String parentID;
     String operationName;
     String spanID;
@@ -65,9 +67,8 @@ public class LogBean {
             if(!Utils.isNullOrEmpty(env)){
                 tags.put("__env",env);
             }
-            if(!Utils.isNullOrEmpty(status)){
-                tags.put("__status",status);
-            }
+            tags.put("__status",status.name);
+
             if(!Utils.isNullOrEmpty(parentID)){
                 tags.put("__parentID",parentID);
             }
@@ -83,7 +84,9 @@ public class LogBean {
             if(!Utils.isNullOrEmpty(errorCode)){
                 tags.put("__errorCode",errorCode);
             }
-
+            if(!tags.has("device_uuid")){
+                tags.put("device_uuid", DeviceUtils.getUuid(FTApplication.getApplication()));
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -135,11 +138,11 @@ public class LogBean {
         this.env = env;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 

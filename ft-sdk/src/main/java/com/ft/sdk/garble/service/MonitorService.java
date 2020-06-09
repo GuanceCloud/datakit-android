@@ -23,6 +23,9 @@ public class MonitorService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent == null) {
+            return START_STICKY;
+        }
         Bundle bundle = intent.getExtras();
         int command = bundle != null ? bundle.getInt("command") : 0;
         switch (command){

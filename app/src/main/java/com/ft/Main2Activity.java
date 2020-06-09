@@ -119,8 +119,10 @@ public class Main2Activity extends AppCompatActivity {
             });
         });
         findViewById(R.id.jump9).setOnClickListener(v->{
-            ObjectBean objectBean = new ObjectBean("这是对象的名称","这是对象的分类");
-            FTTrack.getInstance().objectImmediate(Collections.singletonList(objectBean), new SyncCallback() {
+            ObjectBean objectBean = new ObjectBean("custom_data","objectBackground");
+            List<ObjectBean> list = new ArrayList<>();
+            list.add(objectBean);
+            /**FTTrack.getInstance().objectImmediate(list, new SyncCallback() {
                 @Override
                 public void onResponse(int code, String response) {
                     runOnUiThread(new Runnable() {
@@ -130,7 +132,9 @@ public class Main2Activity extends AppCompatActivity {
                         }
                     });
                 }
-            });
+            });*/
+
+            FTTrack.getInstance().objectBackground(list);
         });
     }
     public void trackImmediate(){

@@ -32,6 +32,7 @@ import com.ft.sdk.garble.utils.OaidUtils;
 import com.ft.sdk.garble.utils.SensorUtils;
 import com.ft.sdk.garble.utils.Utils;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -81,7 +82,18 @@ public class SyncDataManager {
      * @return
      */
     public String getObjectBodyContent(List<RecordData> recordDataList) {
-        return "";
+        JSONArray jsonArray = new JSONArray();
+        try {
+            for (RecordData recordData : recordDataList) {
+                JSONObject jsonObject = new JSONObject(recordData.getOpdata());
+                if (jsonObject.has(Constants.FIELDS)) {
+                    jsonArray.put(jsonObject.getJSONObject(Constants.FIELDS));
+                }
+            }
+        }catch (Exception e){
+
+        }
+        return jsonArray.toString();
     }
 
     /**
@@ -877,7 +889,16 @@ public class SyncDataManager {
      *
      * @param body
      */
-    public static void printUpdateData(String body) {
+    public static void printUpdateData(boolean noTran,String body) {
+        if(noTran){
+            StringBuffer sb = new StringBuffer();
+            sb.append("-----------------------------------------------------------\n");
+            sb.append("----------------------同步数据--开始-------------------------\n");
+            sb.append(body);
+            LogUtils.d(sb.toString());
+            sb.append("----------------------同步数据--结束----------------------\n");
+            return;
+        }
         try {
             StringBuffer sb = new StringBuffer();
             String[] counts = body.split(Constants.SEPARATION_LINE_BREAK);
