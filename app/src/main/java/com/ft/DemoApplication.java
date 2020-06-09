@@ -36,6 +36,7 @@ public class DemoApplication extends Application {
                 true,
                 AccountUtils.getProperty(this, AccountUtils.ACCESS_KEY_ID),
                 AccountUtils.getProperty(this, AccountUtils.ACCESS_KEY_SECRET))
+                .setDataWayToken(AccountUtils.getProperty(this, AccountUtils.ACCESS_SERVER_TOKEN))
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setUseOAID(true)//设置 OAID 是否可用
                 .setDebug(true)//设置是否是 debug
@@ -52,7 +53,10 @@ public class DemoApplication extends Application {
                 .setFlowChartDescEnabled(true)
                 .setPageVtpDescEnabled(true)
                 .setMonitorType(MonitorType.ALL)//设置监控项
-                .openNetTime(true);
+                .trackNetRequestTime(true)
+                .setEnableTrackAppCrash(true)
+                .setEnv("dev")
+                .setCollectRate(0.5f);
         FTSdk.install(ftSDKConfig);
 
         FTMonitor.get()

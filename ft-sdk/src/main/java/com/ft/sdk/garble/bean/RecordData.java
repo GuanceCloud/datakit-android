@@ -3,24 +3,18 @@ package com.ft.sdk.garble.bean;
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.FTFlowChartConfig;
-import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.Iterator;
-
-import static com.ft.sdk.garble.bean.OP.CSTM;
-import static com.ft.sdk.garble.utils.Constants.FT_DEFAULT_MEASUREMENT;
-import static com.ft.sdk.garble.utils.Constants.FT_KEY_VALUE_NULL;
 
 /**
  * BY huangDianHua
  * DATE:2019-12-02 13:56
  * Description:操作记录类
  */
-public class RecordData {
+public class RecordData implements Cloneable {
+
     private long id;
     /**
      * 操作时间
@@ -158,14 +152,14 @@ public class RecordData {
                 recordData.put("op", op);
             }
 
-            if (FTFlowChartConfig.get().isOpenFlowChart()){
-                if(!Utils.isNullOrEmpty(ppn)){
-                    recordData.put("ppn",ppn);
+            if (FTFlowChartConfig.get().isOpenFlowChart()) {
+                if (!Utils.isNullOrEmpty(ppn)) {
+                    recordData.put("ppn", ppn);
                 }
-                if(!Utils.isNullOrEmpty(traceId)){
-                    recordData.put("traceId",traceId);
+                if (!Utils.isNullOrEmpty(traceId)) {
+                    recordData.put("traceId", traceId);
                 }
-                recordData.put("duration",duration);
+                recordData.put("duration", duration);
             }
             if (!Utils.isNullOrEmpty(opdata)) {
                 recordData.put("opdata", opdata);
@@ -199,5 +193,11 @@ public class RecordData {
                 ",time=" + time +
                 ",data=" + getJsonString() +
                 "]";
+    }
+
+    @NonNull
+    @Override
+    public RecordData clone() throws CloneNotSupportedException {
+        return (RecordData) super.clone();
     }
 }

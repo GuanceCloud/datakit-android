@@ -86,6 +86,18 @@
     *;
 }
 
+-keep class com.ft.sdk.garble.bean.LogBean{
+    *;
+}
+
+-keep class com.ft.sdk.garble.bean.KeyEventBean{
+    *;
+}
+
+-keep class com.ft.sdk.garble.bean.Status{
+    *;
+}
+
 -keep class com.ft.sdk.MonitorType{
     *;
 }

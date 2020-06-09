@@ -6,11 +6,11 @@
 
 **Agent**
 
-[![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Fmvnrepo.jiagouyun.com%2Frepository%2Fmaven-releases%2Fcom%2Fcloudcare%2Fft%2Fmobile%2Fsdk%2Ftraker%2Fagent%2Fft-sdk%2Fmaven-metadata.xml)](https://mvnrepo.jiagouyun.com/repository/maven-releases/com/cloudcare/ft/mobile/sdk/traker/agent/ft-sdk/maven-metadata.xml)
+[![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Fmvnrepo.jiagouyun.com%2Frepository%2Fmaven-releases%2Fcom%2Fcloudcare%2Fft%2Fmobile%2Fsdk%2Ftracker%2Fagent%2Fft-sdk%2Fmaven-metadata.xml)](https://mvnrepo.jiagouyun.com/repository/maven-releases/com/cloudcare/ft/mobile/sdk/tracker/agent/ft-sdk/maven-metadata.xml)
 
 **Plugin**
 
-[![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Fmvnrepo.jiagouyun.com%2Frepository%2Fmaven-releases%2Fcom%2Fcloudcare%2Fft%2Fmobile%2Fsdk%2Ftraker%2Fplugin%2Fft-plugin%2Fmaven-metadata.xml)](https://mvnrepo.jiagouyun.com/repository/maven-releases/com/cloudcare/ft/mobile/sdk/traker/plugin/ft-plugin/maven-metadata.xml)
+[![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Fmvnrepo.jiagouyun.com%2Frepository%2Fmaven-releases%2Fcom%2Fcloudcare%2Fft%2Fmobile%2Fsdk%2Ftracker%2Fplugin%2Fft-plugin%2Fmaven-metadata.xml)](https://mvnrepo.jiagouyun.com/repository/maven-releases/com/cloudcare/ft/mobile/sdk/tracker/plugin/ft-plugin/maven-metadata.xml)
 
 ## 安装
 ### 1. 在项目的根目录的 build.gradle 文件中添加 DataFlux SDK 的远程仓库地址
@@ -27,7 +27,7 @@ buildscript {
     dependencies {
         //...省略部分代码
         //添加 DataFlux Plugin 的插件依赖
-        classpath 'com.cloudcare.ft.mobile.sdk.traker.plugin:ft-plugin:1.0.0-alpha5'
+        classpath 'com.cloudcare.ft.mobile.sdk.tracker.plugin:ft-plugin:1.0.0-alpha5'
     }
 }
 allprojects {
@@ -45,7 +45,7 @@ allprojects {
 ``` groovy
 dependencies {
     //添加 DataFlux SDK 的依赖
-    implementation 'com.cloudcare.ft.mobile.sdk.traker.agent:ft-sdk:$last_version'
+    implementation 'com.cloudcare.ft.mobile.sdk.tracker.agent:ft-sdk:$last_version'
 }
 //应用插件
 apply plugin: 'ft-plugin'
@@ -111,6 +111,9 @@ android{
 |       addPageDesc       |        设置页面描述配置         |  否   |             Map 数据集，开启本地的描述日志显示，获取页面类名作为 Key，然后添加描述性文字作为 value 去创建 Map 数据集             |
 |       addVtpDesc        |        设置视图树描述配置        |  否   |             Map 数据集，开启本地的描述日志显示，获取视图树作为 Key，然后添加描述性文字作为 value 去创建 Map 数据集              |
 |       setDescLog        |    是否开启本地视图树和类名日志显示     |  否   |                           不开启将不会显示视图树和类名日志，该方法独立于  setDebug                            |
+| setEnableTrackAppCrash | 是否开启 App 崩溃日志上报功能 | 否 | 默认不开启 |
+| setEnv | 设置崩溃日志中显示的应用的环境 | 否 | 默认情况下会获取应用当前的环境。如：debug、release |
+| setCollectRate | 设置采集率 | 否 | 采集率的值范围为>=0、<=1。默认值为1 |
 
 > FTAutoTrackType 自动埋点事件说明，事件总类目前支持3种：
     FTAutoTrackType.APP_START：页面的开始事件，Activity 依赖的是其 onResume 方法，Fragment 依赖的是其 onResume 方法；
@@ -144,7 +147,11 @@ android{
 |setGeoKey|设置高德解析器的 key|否|如何申请高德的 key？[点我快速了解](https://lbs.amap.com/api/webservice/guide/api/georegeo)|
 |start|开启监控同步|是|只有调用该方法后才会执行同步监控|
 
-#### 4. 示例代码
+#### 4. 通过 FTTrack 类实现主动上报埋点、日志、事件、对象数据
+
+具体方法及说明参考 [三、手动埋点类 FTTrack](#三手动埋点类-fttrack)
+
+#### 5. 示例代码
 
 ``` kotlin
 class DemoAplication : Application() {
@@ -170,12 +177,15 @@ class DemoAplication : Application() {
             .addVtpDesc(eventAliasMap())
             .setFlowChartDescEnabled(true)
             .setPageVtpDescEnabled(true)
-            .openNetTime(true)
+            .trackNetRequestTime(true)
+            .setEnableTrackAppCrash(true)
+            .setEnv("dev")
+            .setCollectRate(0.5f)
             .setEnableAutoTrackType(FTAutoTrackType.APP_START.type or
                     FTAutoTrackType.APP_END.type or
                     FTAutoTrackType.APP_CLICK.type)//自动埋点事件白名单
             .setWhiteActivityClasses(listOf(MainActivity::class.java))//自动埋点页面白名单
-            .setWhiteViewClasses(listOf(Button::class.java))//自动埋点控件白名单
+            .setWhiteViewClasses(listOf(Button::class.java));//自动埋点控件白名单
         FTSdk.install(ftSDKConfig)
         
         //独立执行周期监控数据上报
@@ -469,6 +479,91 @@ class FTTrack{
      * @param values 其他指标（该值中不能含 duration 字段）
      */
     public void trackFlowChart(String product, String traceId, String name, String parent, long duration,JSONObject tags,JSONObject values);
+  
+  /**
+     * 将单条日志数据存入本地同步
+     *
+     * @param logBean
+     */
+    public void logBackground(LogBean logBean);
+  
+  /**
+     * 将多条日志数据存入本地同步
+     *
+     * @param logBeans
+     */
+    public void logBackground(List<LogBean> logBeans);
+  
+  /**
+     * 将单条日志数据及时上传并回调结果
+     *
+     * @param logBean
+     */
+    public void logImmediate(LogBean logBean, SyncCallback syncCallback);
+  
+  /**
+     * 将多条日志数据存入本地同步
+     *
+     * @param logBeans
+     */
+    public void logImmediate(List<LogBean> logBeans, SyncCallback syncCallback);
+  
+  /**
+     * 将单条事件数据存入本地同步
+     *
+     * @param keyEventBean
+     */
+    public void keyEventBackground(KeyEventBean keyEventBean);
+  
+  /**
+     * 将多条事件数据存入本地同步
+     *
+     * @param keyEventBeans
+     */
+    public void keyEventBackground(List<KeyEventBean> keyEventBeans);
+  
+  /**
+     * 将单条事件数据及时上传并回调结果
+     *
+     * @param keyEventBean
+     */
+    public void keyEventImmediate(KeyEventBean keyEventBean, SyncCallback syncCallback);
+  
+  /**
+     * 将多条事件数据存入本地同步
+     *
+     * @param keyEventBeans
+     */
+    public void keyEventImmediate(List<KeyEventBean> keyEventBeans, SyncCallback syncCallback);
+  
+  /**
+     * 将多条对象数据直接同步
+     *
+     * @param objectBeans
+     */
+    public void objectImmediate(List<ObjectBean> objectBeans, SyncCallback syncCallback);
+  
+  /**
+     * 将单条对象数据直接同步
+     *
+     * @param objectBean
+     */
+    public void objectImmediate(ObjectBean objectBean, SyncCallback syncCallback);
+  
+  /**
+     * 将多条对象数据直接同步
+     *
+     * @param objectBeans
+     */
+    public void objectBackground(List<ObjectBean> objectBeans);
+  
+  /**
+     * 将单条对象数据直接同步
+     *
+     * @param objectBean
+     */
+    public void objectBackground(ObjectBean objectBean);
+      
 }
 ```
 

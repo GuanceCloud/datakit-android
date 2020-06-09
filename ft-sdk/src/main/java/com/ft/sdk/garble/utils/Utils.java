@@ -16,6 +16,7 @@ import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,6 +31,8 @@ import static com.ft.sdk.garble.utils.Constants.FT_SHARE_PER_FILE;
  * Description:
  */
 public class Utils {
+    public static double trackerCollectRate = 1;//采样率
+    public static double randomCollectNum = 0;
 
     public static boolean isNullOrEmpty(String str) {
         return str == null || str.isEmpty();
@@ -278,6 +281,22 @@ public class Utils {
                 calendar.get(Calendar.DAY_OF_MONTH);
     }
 
+    /**
+     * 随机数小于采样率，可以采样
+     * @return
+     */
+    public static boolean enableTrackUnderRate(){
+        return randomCollectNum < trackerCollectRate*100;
+    }
+
+    /**
+     * 生成采集随机数
+     * @return
+     */
+    public static void generateRandomNumber(){
+        Random random = new Random();
+        randomCollectNum = Math.floor(random.nextDouble()*100);
+    }
 
 }
 
