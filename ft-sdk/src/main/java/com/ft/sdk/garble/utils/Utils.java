@@ -32,6 +32,7 @@ import static com.ft.sdk.garble.utils.Constants.FT_SHARE_PER_FILE;
  */
 public class Utils {
     public static double trackerCollectRate = 1;//采样率
+    public static double randomCollectNum = 0;
 
     public static boolean isNullOrEmpty(String str) {
         return str == null || str.isEmpty();
@@ -285,16 +286,16 @@ public class Utils {
      * @return
      */
     public static boolean enableTrackUnderRate(){
-        return generateRandomNumber()<trackerCollectRate*100;
+        return randomCollectNum < trackerCollectRate*100;
     }
 
     /**
      * 生成采集随机数
      * @return
      */
-    public static double generateRandomNumber(){
+    public static void generateRandomNumber(){
         Random random = new Random();
-        return Math.floor(random.nextDouble()*100);
+        randomCollectNum = Math.floor(random.nextDouble()*100);
     }
 
 }
