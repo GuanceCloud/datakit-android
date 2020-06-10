@@ -6,7 +6,11 @@ package com.ft.sdk.garble.bean;
  * description:
  */
 public enum Status {
-    INFO("info"),WARNING("warning"),ERROR("error"),CRITICAL("critical"),OK("ok");
+    INFO("info"),//提示
+    WARNING("warning"),//警告
+    ERROR("error"),//错误
+    CRITICAL("critical"),//严重
+    OK("ok");//恢复
     public String name;
     Status(String name){
         this.name = name;

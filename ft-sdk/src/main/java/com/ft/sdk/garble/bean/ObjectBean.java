@@ -21,9 +21,9 @@ import java.util.Map;
  * description:
  */
 public class ObjectBean {
-    private String name;
-    private HashMap<String,Object> tags;
-    private String clazz;
+    private String name;//当前对象的名称，同一个分类下，对象名称如果重复，会覆盖原有数据
+    private HashMap<String,Object> tags;//当前对象的标签，key-value 对，其中存在保留标签
+    private String clazz;//当前对象的分类，分类值用户可自定义
 
     public ObjectBean(String name,String clazz){
         this.name = name;
