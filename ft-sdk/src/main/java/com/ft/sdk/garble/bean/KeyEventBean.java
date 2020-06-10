@@ -14,18 +14,18 @@ import org.json.JSONObject;
  */
 public class KeyEventBean {
     private String measurement = "__keyevent";
-    private String eventId;
-    private String source;
-    private Status status = Status.INFO;
-    private String ruleId;
-    private String ruleName;
-    private String type;
-    private String actionType;
-    private String title;
-    private String content;
-    private String suggestion;
-    private long duration;
-    private JSONArray dimensions;
+    private String eventId;//相关事件，__eventID 需相同
+    private String source;//事件的来源，保留值 datafluxTrigger 表示来自触发器
+    private Status status = Status.INFO;//事件等级和状态
+    private String ruleId;//触发器对应的触发规则id
+    private String ruleName;//触发器对应的触发规则名
+    private String type;//保留值 noData 表示无数据告警
+    private String actionType;//触发动作
+    private String title;//关键事件标题
+    private String content;//事件内容
+    private String suggestion;//事件处理建议
+    private long duration;//事件的持续时间
+    private JSONArray dimensions;//触发维度
     private JSONObject tags;
     private JSONObject fields;
     private long time;
@@ -41,19 +41,25 @@ public class KeyEventBean {
         }
         try {
             if (!Utils.isNullOrEmpty(eventId)) {
+                if(tags.has("__eventId")) tags.remove("__eventId");
                 tags.put("__eventId", eventId);
             }
             if(!Utils.isNullOrEmpty(source)){
+                if(tags.has("__source")) tags.remove("__source");
                 tags.put("__source",source);
             }
+            if(tags.has("__status")) tags.remove("__status");
             tags.put("__status",status.name);
             if(!Utils.isNullOrEmpty(ruleId)){
+                if(tags.has("__ruleName")) tags.remove("__ruleName");
                 tags.put("__ruleName",ruleName);
             }
             if(!Utils.isNullOrEmpty(type)){
+                if(tags.has("__type")) tags.remove("__type");
                 tags.put("__type",type);
             }
             if(!Utils.isNullOrEmpty(actionType)){
+                if(tags.has("__actionType")) tags.remove("__actionType");
                 tags.put("__actionType",actionType);
             }
             if(!tags.has("device_uuid")){
