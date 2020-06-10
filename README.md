@@ -91,8 +91,7 @@ android{
 |        setDebug         |        是否开启调试模式         |  否   |                                 默认不开启，开启后方可打印 SDK 运行日志                                 |
 |     setMonitorType      |          设置监控项          |  否   | 默认不开启任何监控项,<br>[关于监控项说明](#四监控配置项类-monitortype),<br>[关于监控项参数获取问题](#二关于监控项中有些参数获取不到问题说明) |
 |     setNeedBindUser     |       是否开启绑定用户数据        |  否   |                  默认不开启,<br>开启后必须要绑定用户数据[如何绑定用户数据](#一初始化类-ftsdk-提供的方法)                  |
-|    setOpenFlowChart     |     是否开启自动埋点流程图数据上报     |  否   |                              [详细说明](#三关于自动埋点的页面路径流程图的说明)                               |
-|     setFlowProduct      |        设置流程的指标集         |  否   |                                    当开启了上报流程图一定要设置该值                                    |
+|    setOpenFlowChart     |     是否开启自动埋点流程图数据上报     |  否   |                   [详细说明](#三关于自动埋点的页面路径流程图的说明)<br />流程图的使用必须在 enableAutoTrack 为 true 的情况下                   |
 |     enableAutoTrack     |        是否使用自动埋点         |  否   |                                    不开启将不会上报流程图和埋点事件                                    |
 | setEnableAutoTrackType  |         设置事件白名单         |  否   |                          开启自动埋点后，不设置该值表示接受所有事件类型。埋点事件类型见表下说明                           |
 | setDisableAutoTrackType |         设置事件黑名单         |  否   |                                开启自动埋点后，不设置该值表示不设置事件黑名单                                 |
@@ -105,15 +104,15 @@ android{
 |          akId           |      access key ID      |  否   |                           enableRequestSigning 为 true 时，必须要填                           |
 |        akSecret         |    access key Secret    |  否   |                           enableRequestSigning 为 true 时，必须要填                           |
 |        setGeoKey        |   设置是否使用高德作为地址解析器和key   |  否   |      如何申请高德的 key？[点我快速了解](https://lbs.amap.com/api/webservice/guide/api/georegeo)      |
-|       openNetTime       |     设置是否开启网络请求时长的监控      |  否   |                           [点我快速了解如何监控网络请求时长](#四如何监控网络请求的相关时长)                            |
+|       trackNetRequestTime       |     设置是否开启网络请求时长的监控      |  否   |                           [点我快速了解如何监控网络请求时长](#四如何监控网络请求的相关时长)                            |
 | setFlowChartDescEnabled |      设置流程图是否使用描述显示      |  否   |                                       默认使用类名进行显示 [关于页面和视图树的描述的使用方法](#五关于页面和视图树及流程图的描述使用)                                      |
 |  setPageVtpDescEnabled  |    设置页面和视图树是否使用描述显示     |  否   |                                       默认使用类名和视图树                                       |
 |       addPageDesc       |        设置页面描述配置         |  否   |             Map 数据集，开启本地的描述日志显示，获取页面类名作为 Key，然后添加描述性文字作为 value 去创建 Map 数据集             |
 |       addVtpDesc        |        设置视图树描述配置        |  否   |             Map 数据集，开启本地的描述日志显示，获取视图树作为 Key，然后添加描述性文字作为 value 去创建 Map 数据集              |
 |       setDescLog        |    是否开启本地视图树和类名日志显示     |  否   |                           不开启将不会显示视图树和类名日志，该方法独立于  setDebug                            |
-| setEnableTrackAppCrash | 是否开启 App 崩溃日志上报功能 | 否 | 默认不开启 |
+| setEnableTrackAppCrash | 是否开启 App 崩溃日志上报功能 | 否 | 默认不开启，开启后将上报当前应用的崩溃日志。上报成功后，可以在后台的日志模块查看对应的日志 |
 | setEnv | 设置崩溃日志中显示的应用的环境 | 否 | 默认情况下会获取应用当前的环境。如：debug、release |
-| setCollectRate | 设置采集率 | 否 | 采集率的值范围为>=0、<=1。默认值为1 |
+| setCollectRate | 设置采集率 | 否 | 采集率的值范围为>=0、<=1，默认值为1。<br />说明：SDK 初始化是会随机生成一个0-1之间的随机数，当这个随机数小于你设置的采集率时，那么会上报当前设备的行为相关的埋点数据，否则就不会上报当前设备的行为埋点数据 |
 
 > FTAutoTrackType 自动埋点事件说明，事件总类目前支持3种：
     FTAutoTrackType.APP_START：页面的开始事件，Activity 依赖的是其 onResume 方法，Fragment 依赖的是其 onResume 方法；

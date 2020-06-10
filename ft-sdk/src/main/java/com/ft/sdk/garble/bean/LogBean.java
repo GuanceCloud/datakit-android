@@ -13,18 +13,32 @@ import org.json.JSONObject;
  * description:日志对象
  */
 public class LogBean {
+    //指定当前日志的来源，比如如果来源于 Ngnix，可指定为 Nginx，
+    // 同一应用产生的日志 source 应该一样，这样在 DataFlux 中方便针对该来源的日志配置同一的提取规则
     String measurement;
+    //日志的子分类，目前仅支持：tracing：表示该日志是链路追踪日志
     String clazz;
+    //日志来源，日志上报后，会自动将指定的指标集名作为该标签附加到该条日志上
     String source;
+    //日志所属业务或服务的名称，建议用户通过该标签指定产生该日志业务系统的名称
     String serviceName;
+    //日志所属环境，比如可用 dev 表示开发环境，prod 表示生产环境，用户可自定义
     String env;
+    //日志等级
     Status status = Status.INFO;
+    //用于链路日志，表示当前 span 的上一个 span的 ID
     String parentID;
+    //用于链路日志，表示当前 span 操作名，也可理解为 span 名称
     String operationName;
+    //用于链路日志，表示当前 span 的 ID
     String spanID;
+    //用于链路日志，表示当前链路的 ID
     String traceID;
+    //用于链路日志，请求的响应代码，例如 200 表示请求成功
     String errorCode;
+    //日志内容，纯文本或 JSONString 都可以
     String content;
+    //用于链路日志，当前链路的请求响应时间，微秒为单位
     String duration;
     long time;
     JSONObject tags;
