@@ -41,19 +41,25 @@ public class KeyEventBean {
         }
         try {
             if (!Utils.isNullOrEmpty(eventId)) {
+                if(tags.has("__eventId")) tags.remove("__eventId");
                 tags.put("__eventId", eventId);
             }
             if(!Utils.isNullOrEmpty(source)){
+                if(tags.has("__source")) tags.remove("__source");
                 tags.put("__source",source);
             }
+            if(tags.has("__status")) tags.remove("__status");
             tags.put("__status",status.name);
             if(!Utils.isNullOrEmpty(ruleId)){
+                if(tags.has("__ruleName")) tags.remove("__ruleName");
                 tags.put("__ruleName",ruleName);
             }
             if(!Utils.isNullOrEmpty(type)){
+                if(tags.has("__type")) tags.remove("__type");
                 tags.put("__type",type);
             }
             if(!Utils.isNullOrEmpty(actionType)){
+                if(tags.has("__actionType")) tags.remove("__actionType");
                 tags.put("__actionType",actionType);
             }
             if(!tags.has("device_uuid")){
