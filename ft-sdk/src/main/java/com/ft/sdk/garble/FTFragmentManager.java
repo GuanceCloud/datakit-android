@@ -24,10 +24,6 @@ public class FTFragmentManager {
     /**
      * 该map在{@link #removeFragmentLifecycle} 方法中回收
      */
-    private ConcurrentHashMap<String, FTFragmentLifecycleCallbackDated> fragmentLifecycleCallDated = new ConcurrentHashMap<>();
-    /**
-     * 该map在{@link #removeFragmentLifecycle} 方法中回收
-     */
     private ConcurrentHashMap<String, Activity> activityConcurrentHashMap = new ConcurrentHashMap<>();
     //应该被忽略的Fragment
     public List<String> ignoreFragments = Arrays.asList("com.bumptech.glide.manager.SupportRequestManagerFragment");
@@ -62,12 +58,6 @@ public class FTFragmentManager {
                 FTFragmentLifecycleCallback callbacks = new FTFragmentLifecycleCallback(activity);
                 fragmentLifecycleCall.put(activity.getClass().getName(), callbacks);
                 ((FragmentActivity) activity).getSupportFragmentManager().registerFragmentLifecycleCallbacks(callbacks, true);
-            } else {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    FTFragmentLifecycleCallbackDated callbacks = new FTFragmentLifecycleCallbackDated(activity);
-                    fragmentLifecycleCallDated.put(activity.getClass().getName(), callbacks);
-                    activity.getFragmentManager().registerFragmentLifecycleCallbacks(callbacks, true);
-                }
             }
         }
     }
@@ -89,14 +79,6 @@ public class FTFragmentManager {
                     ((FragmentActivity) activity).getSupportFragmentManager().unregisterFragmentLifecycleCallbacks(callbacks);
                 }
                 fragmentLifecycleCall.remove(activity.getClass().getName());
-            } else {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    android.app.FragmentManager.FragmentLifecycleCallbacks callbacks = fragmentLifecycleCallDated.get(activity.getClass().getName());
-                    if (callbacks != null) {
-                        activity.getFragmentManager().unregisterFragmentLifecycleCallbacks(callbacks);
-                    }
-                    fragmentLifecycleCallDated.remove(activity.getClass().getName());
-                }
             }
             activityConcurrentHashMap.remove(activity.getClass().getName());
         }
@@ -113,11 +95,6 @@ public class FTFragmentManager {
             if (fragmentLifecycleCall.containsKey(classActivity)) {
                 FTFragmentLifecycleCallback ft = fragmentLifecycleCall.get(classActivity);
                 return ft.fragmentLifecycleHandler.getLastFragment();
-            } else if (fragmentLifecycleCallDated.containsKey(classActivity)) {
-                FTFragmentLifecycleCallbackDated ft = fragmentLifecycleCallDated.get(classActivity);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    return ft.fragmentLifecycleHandler.getLastFragment();
-                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -138,13 +115,6 @@ public class FTFragmentManager {
                 if (ft != null) {
                     ft.setUserVisibleHint(fragment, isVisible);
                 }
-            } else if (fragmentLifecycleCallDated.containsKey(classActivity)) {
-                FTFragmentLifecycleCallbackDated ft = fragmentLifecycleCallDated.get(classActivity);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    if (ft != null) {
-                        ft.setUserVisibleHint(fragment, isVisible);
-                    }
-                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -163,13 +133,6 @@ public class FTFragmentManager {
                 FTFragmentLifecycleCallback ft = fragmentLifecycleCall.get(classActivity);
                 if (ft != null) {
                     ft.fragmentLifecycleHandler.fragmentList.clear();
-                }
-            } else if (fragmentLifecycleCallDated.containsKey(classActivity)) {
-                FTFragmentLifecycleCallbackDated ft = fragmentLifecycleCallDated.get(classActivity);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    if (ft != null) {
-                        ft.fragmentLifecycleHandler.fragmentList.clear();
-                    }
                 }
             }
         } catch (Exception e) {
