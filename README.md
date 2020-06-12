@@ -100,6 +100,7 @@ android{
 | setBlackActivityClasses |          页面黑名单          |  否   |                                  包括 Activity、Fragment                                  |
 |   setBlackViewClasses   |          控件黑名单          |  否   |                                         包括基本控件                                         |
 |       metricsUrl        | FT-GateWay metrics 写入地址 |  是   |                                      必须配置，配置后才能上报                                      |
+|setDataWayToken|上传数据需要的身份认证|否|SaaS 版本需要传入该参数，PaaS 版本不需要传入|
 |  enableRequestSigning   |      配置是否需要进行请求签名       |  否   |                                         默认不开启                                          |
 |          akId           |      access key ID      |  否   |                           enableRequestSigning 为 true 时，必须要填                           |
 |        akSecret         |    access key Secret    |  否   |                           enableRequestSigning 为 true 时，必须要填                           |
