@@ -1,21 +1,32 @@
 package com.ft.sdk.garble.http;
 
-import com.ft.sdk.FTMonitor;
+import com.ft.sdk.FTApplication;
+import com.ft.sdk.FTTrack;
+import com.ft.sdk.garble.FTHttpConfig;
+import com.ft.sdk.garble.bean.LogBean;
+import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.NetUtils;
+import com.ft.sdk.garble.utils.Utils;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.UUID;
 
 import okhttp3.Call;
 import okhttp3.EventListener;
 import okhttp3.Handshake;
 import okhttp3.Request;
 import okhttp3.Response;
+import okio.Buffer;
 
 /**
  * create: by huangDianHua
@@ -23,26 +34,52 @@ import okhttp3.Response;
  * description:
  */
 public class OKHttpEventListener extends EventListener {
+    private String requestRaw;
+    private String responseRaw;
+    private long duration;
+    private String operationName;
 
     @Override
     public void requestHeadersEnd(@NotNull Call call, @NotNull Request request) {
         super.requestHeadersEnd(call, request);
-        StringBuilder sb = new StringBuilder();
-        sb.append(request.headers().toString());
-
+        try {
+            if(FTHttpConfig.get().metricsUrl.contains(request.url().host())){
+                return;
+            }
+            StringBuilder sb = new StringBuilder();
+            sb.append(request.method()).append("\n");
+            sb.append(request.headers().toString()).append("\n\n");
+            if(request.body() != null) {
+                Buffer sink = new Buffer();
+                request.body().writeTo(sink);
+                String body = sink.readString(StandardCharsets.UTF_8);
+                sb.append(body).append("\n");
+            }
+            requestRaw = sb.toString();
+            String protocol = "Http";
+            if(request.isHttps()){
+                protocol = "Https";
+            }
+            operationName = request.method()+"/"+protocol;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void responseHeadersEnd(@NotNull Call call, @NotNull Response response) {
         super.responseHeadersEnd(call, response);
-        StringBuilder sb = new StringBuilder();
-        sb.append(response.headers().toString());
-        if(response.body() != null){
-            try {
-                sb.append(response.body().string()).append("\n");
-            } catch (Exception e) {
-                e.printStackTrace();
+        try {
+            if(FTHttpConfig.get().metricsUrl.contains(response.request().url().host())){
+                return;
             }
+            StringBuilder sb = new StringBuilder();
+            sb.append(response.protocol().toString()).append("\n");
+            sb.append(response.headers().toString());
+            duration = response.receivedResponseAtMillis() - response.sentRequestAtMillis();
+            responseRaw = sb.toString();
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -50,6 +87,22 @@ public class OKHttpEventListener extends EventListener {
     public void callEnd(@NotNull Call call) {
         super.callEnd(call);
         NetUtils.get().responseEndTime = System.currentTimeMillis();
+        if(FTHttpConfig.get().metricsUrl.contains(call.request().url().host())){
+            return;
+        }
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("requestContent",requestRaw);
+            jsonObject.put("responseContent",responseRaw);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        LogBean logBean = new LogBean(Constants.USER_AGENT,jsonObject.toString(),System.currentTimeMillis());
+        logBean.setOperationName(operationName);
+        logBean.setDuration(duration*1000);
+        logBean.setSpanID(Utils.MD5(DeviceUtils.getUuid(FTApplication.getApplication())));
+        logBean.setTraceID(UUID.randomUUID().toString());
+        FTTrack.getInstance().logBackground(logBean);
     }
 
     @Override
