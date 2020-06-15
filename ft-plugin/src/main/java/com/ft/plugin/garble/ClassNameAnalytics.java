@@ -25,6 +25,11 @@ public class ClassNameAnalytics {
     public static final String FT_SDK = "com.ft.sdk.FTSdk";
 
 
+    /**
+     * 配置需要排除的类
+     * @param className
+     * @return
+     */
     public static boolean isFTSDKFile(String className){
         return className.startsWith(FT_SDK_PACKAGE) && !className.equals(FT_SDK+".class");
     }
