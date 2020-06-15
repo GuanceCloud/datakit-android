@@ -30,6 +30,7 @@ public class OkHttpEngine implements INetEngine {
                     .connectTimeout(httpBuilder.getSendOutTime(), TimeUnit.MILLISECONDS)
                     .readTimeout(httpBuilder.getReadOutTime(), TimeUnit.MILLISECONDS)
                     .eventListener(new OKHttpEventListener())
+                    .addInterceptor(new OKHttpEventListener())
                     .build();
         }
     }

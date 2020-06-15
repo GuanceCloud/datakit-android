@@ -63,7 +63,8 @@ public class FTSDKConfig {
     private float collectRate = 1;
     //崩溃日志的环境
     private String env = BuildConfig.BUILD_TYPE;
-
+    //是否开启网络日志上报
+    private boolean networkTrace;
     /**
      * 构建 SDK 必要的配置参数
      * @param metricsUrl 服务器地址
@@ -221,6 +222,10 @@ public class FTSDKConfig {
 
     public String getEnv() {
         return env;
+    }
+
+    public boolean isNetworkTrace() {
+        return networkTrace;
     }
 
     /**
@@ -457,6 +462,16 @@ public class FTSDKConfig {
      */
     public FTSDKConfig setEnv(String env) {
         this.env = env;
+        return this;
+    }
+
+    /**
+     * 是否开启网络日志上报
+     * @param networkTrace
+     * @return
+     */
+    public FTSDKConfig setNetworkTrace(boolean networkTrace) {
+        this.networkTrace = networkTrace;
         return this;
     }
 }
