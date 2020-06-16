@@ -20,6 +20,7 @@ import com.ft.sdk.garble.FTAutoTrackConfig;
 import com.ft.sdk.garble.FTFlowChartConfig;
 import com.ft.sdk.garble.FTFragmentManager;
 import com.ft.sdk.garble.FTUserConfig;
+import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.manager.FTActivityManager;
@@ -710,11 +711,34 @@ public class FTAutoTrack {
                         FTFlowChartConfig.get().lastOpTime = currentTime;
                     }
                 }
-
+                addLogging(currentPage, op);
                 FTManager.getFTDBManager().insertFtOptList(recordDataList);
                 FTManager.getSyncTaskManager().executeSyncPoll();
             } catch (Exception e) {
             }
         });
+    }
+
+    private static void addLogging(String currentPage,OP op){
+        String operationName = "";
+        switch (op){
+            case CLK:
+                operationName = "click/event";
+                break;
+            case LANC:
+                operationName = "launch/event";
+                break;
+            case OPEN_ACT:
+            case OPEN_FRA:
+                operationName = "enter/event";
+                break;
+            case CLS_ACT:
+            case CLS_FRA:
+                operationName = "leave/event";
+                break;
+        }
+        LogBean logBean = new LogBean(Constants.USER_AGENT,"{\"current_page_name\":\""+currentPage+"\"}",System.currentTimeMillis());
+        logBean.setOperationName(operationName);
+        FTTrack.getInstance().logBackground(logBean);
     }
 }
