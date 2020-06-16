@@ -74,6 +74,7 @@ android{
 -keep class com.ft.sdk.FTAutoTrack{*;}
 -keep enum com.ft.sdk.FTAutoTrackType{*;}
 -keep enum com.ft.sdk.FTSdk{*;}
+-keep class com.ft.sdk.garble.utils.TrackLog{*;}
 ```
 > 注意：如果你的项目中开启了全埋点和流程图，那么需要将你的 Fragment 和 Activity 保持不被混淆，这样流程图中
 > 就会显示页面的真实名称，而不是混淆后的名称

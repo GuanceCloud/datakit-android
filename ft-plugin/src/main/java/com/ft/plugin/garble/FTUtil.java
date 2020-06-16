@@ -70,7 +70,7 @@ public class FTUtil {
         /**
          * For Android App Activity
          */
-        targetActivityClass.add("android/app/activity");
+        targetActivityClass.add("android/app/Activity");
 
         /**
          * For AndroidX Activity

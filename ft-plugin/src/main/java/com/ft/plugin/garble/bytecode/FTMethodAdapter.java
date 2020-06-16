@@ -32,8 +32,6 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.AdviceAdapter;
 
-import java.util.HashMap;
-
 /**
  * 本类借鉴修改了来自 Sensors Data 的项目 https://github.com/sensorsdata/sa-sdk-android-plugin2
  * 中的 SensorsAnalyticsClassVisitor.groovy 类
@@ -51,6 +49,8 @@ public class FTMethodAdapter extends AdviceAdapter {
     //访问权限是public并且非静态
     private boolean pubAndNoStaticAccess;
 
+    private int startVarIndex;
+
     public FTMethodAdapter(MethodVisitor mv, int access, String name, String desc, String className, String[] interfaces, String supperName, FTTransformHelper ftTransformHelper) {
         super(FTUtil.ASM_VERSION, mv, access, name, desc);
         this.methodName = name;
@@ -59,6 +59,44 @@ public class FTMethodAdapter extends AdviceAdapter {
         this.className = className;
         this.interfaces = interfaces;
         //Logger.info(">>>> 开始扫描类 <" + className + "> 的方法:" + methodName + "<<<<");
+    }
+
+    /**
+     * 判断当前的类中的方法是否需要统计时长（如果后期需要统计更多的方法可以扩展该方法）
+     * @return
+     */
+    private boolean needTrackTime(){
+        if((superName.equals("androidx/appcompat/app/AppCompatActivity") ||
+                superName.equals("android/app/Activity")) && !className.startsWith("android/") && !className.startsWith("androidx/") && (methodName+methodDesc).equals("onCreate(Landroid/os/Bundle;)V")){
+            return true;
+        }
+        return false;
+    }
+    @Override
+    public void visitCode() {
+        super.visitCode();
+        if(needTrackTime()) {
+            mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/System", "currentTimeMillis", "()J", false);
+            startVarIndex = newLocal(Type.LONG_TYPE);
+            mv.visitVarInsn(Opcodes.LSTORE, startVarIndex);
+        }
+    }
+
+    @Override
+    public void visitInsn(int opcode) {
+        if(needTrackTime()) {
+            if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
+                mv.visitMethodInsn(INVOKESTATIC, "java/lang/System", "currentTimeMillis", "()J", false);
+                mv.visitVarInsn(LLOAD, startVarIndex);
+                mv.visitInsn(LSUB);
+                int index = newLocal(Type.LONG_TYPE);
+                mv.visitVarInsn(LSTORE, index);
+                mv.visitLdcInsn(className + "|" + methodName + "|" + methodDesc);
+                mv.visitVarInsn(LLOAD, index);
+                mv.visitMethodInsn(INVOKESTATIC, "com/ft/sdk/FTAutoTrack", "timingMethod", "(Ljava/lang/String;J)V", false);
+            }
+        }
+        super.visitInsn(opcode);
     }
 
     @Override
@@ -91,6 +129,7 @@ public class FTMethodAdapter extends AdviceAdapter {
 
     @Override
     public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
+        //这部分为替换使用的系统Log
         if("android/util/Log".equals(owner)) {
             if("i".equals(name)) {
                 if("(Ljava/lang/String;Ljava/lang/String;)I".equals(desc)) {
