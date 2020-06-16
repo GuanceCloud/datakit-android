@@ -6,8 +6,8 @@ package com.ft.sdk.garble.bean;
  * Description:
  */
 public enum OP {
-    LANC("lanc"),CLK("clk"),CSTM("cstm"),FLOW_CHAT("flow_chat")
-    ,CLS_ACT("cls_act"),OPEN_ACT("opn_act"),
+    LANC("lanc"),CLK("clk"),CSTM("cstm"),FLOW_CHAT("flow_chat"),OPEN("open"),
+    CLS_ACT("cls_act"),OPEN_ACT("opn_act"),
     CLS_FRA("cls_fra"),OPEN_FRA("open_fra"),LOG("log"),
     KEYEVENT("keyevent"),OBJECT("object");
     public String value;
