@@ -90,6 +90,75 @@ public class FTMethodAdapter extends AdviceAdapter {
     }
 
     @Override
+    public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
+        if("android/util/Log".equals(owner)) {
+            if("i".equals(name)) {
+                if("(Ljava/lang/String;Ljava/lang/String;)I".equals(desc)) {
+                    mv.visitMethodInsn(INVOKESTATIC, "com/ft/sdk/garble/utils/TrackLog", "i", "(Ljava/lang/String;Ljava/lang/String;)I", false);
+                } else if("(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I".equals(desc)) {
+                    mv.visitMethodInsn(INVOKESTATIC, "com/ft/sdk/garble/utils/TrackLog", "i", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I", false);
+                } else {
+                    super.visitMethodInsn(opcode, owner, name, desc, itf);
+                }
+            } else if("d".equals(name)) {
+                if("(Ljava/lang/String;Ljava/lang/String;)I".equals(desc)) {
+                    
+                    mv.visitMethodInsn(INVOKESTATIC, "com/ft/sdk/garble/utils/TrackLog", "d", "(Ljava/lang/String;Ljava/lang/String;)I", false);
+                } else if("(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I".equals(desc)) {
+                    
+                    mv.visitMethodInsn(INVOKESTATIC, "com/ft/sdk/garble/utils/TrackLog", "d", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I", false);
+                } else {
+                    super.visitMethodInsn(opcode, owner, name, desc, itf);
+                }
+            } else if("v".equals(name)) {
+                if("(Ljava/lang/String;Ljava/lang/String;)I".equals(desc)) {
+                    
+                    mv.visitMethodInsn(INVOKESTATIC, "com/ft/sdk/garble/utils/TrackLog", "v", "(Ljava/lang/String;Ljava/lang/String;)I", false);
+                } else if("(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I".equals(desc)) {
+                    
+                    mv.visitMethodInsn(INVOKESTATIC, "com/ft/sdk/garble/utils/TrackLog", "v", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I", false);
+                } else {
+                    super.visitMethodInsn(opcode, owner, name, desc, itf);
+                }
+            } else if("e".equals(name)) {
+                if("(Ljava/lang/String;Ljava/lang/String;)I".equals(desc)) {
+                    
+                    mv.visitMethodInsn(INVOKESTATIC, "com/ft/sdk/garble/utils/TrackLog", "e", "(Ljava/lang/String;Ljava/lang/String;)I", false);
+                } else if("(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I".equals(desc)) {
+                    
+                    mv.visitMethodInsn(INVOKESTATIC, "com/ft/sdk/garble/utils/TrackLog", "e", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I", false);
+                } else {
+                    super.visitMethodInsn(opcode, owner, name, desc, itf);
+                }
+            } else if("w".equals(name)) {
+                if("(Ljava/lang/String;Ljava/lang/String;)I".equals(desc)) {
+                    
+                    mv.visitMethodInsn(INVOKESTATIC, "com/ft/sdk/garble/utils/TrackLog", "w", "(Ljava/lang/String;Ljava/lang/String;)I", false);
+                } else if("(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I".equals(desc)) {
+                    
+                    mv.visitMethodInsn(INVOKESTATIC, "com/ft/sdk/garble/utils/TrackLog", "w", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I", false);
+                } else if("(Ljava/lang/String;Ljava/lang/Throwable;)I".equals(desc)) {
+                    
+                    mv.visitMethodInsn(INVOKESTATIC, "com/ft/sdk/garble/utils/TrackLog", "w", "(Ljava/lang/String;Ljava/lang/Throwable;)I", false);
+                } else {
+                    super.visitMethodInsn(opcode, owner, name, desc, itf);
+                }
+            } else if("println".equals(name)) {
+                if("(ILjava/lang/String;Ljava/lang/String;)I".equals(desc)) {
+                    
+                    mv.visitMethodInsn(INVOKESTATIC, "com/ft/sdk/garble/utils/TrackLog", "println", "(ILjava/lang/String;Ljava/lang/String;)I", false);
+                } else {
+                    super.visitMethodInsn(opcode, owner, name, desc, itf);
+                }
+            } else {
+                super.visitMethodInsn(opcode, owner, name, desc, itf);
+            }
+        } else {
+            super.visitMethodInsn(opcode, owner, name, desc, itf);
+        }
+    }
+
+    @Override
     protected void onMethodEnter() {
         super.onMethodEnter();
         nameDesc = methodName + methodDesc;

@@ -39,7 +39,7 @@ public class LogBean {
     //日志内容，纯文本或 JSONString 都可以
     String content;
     //用于链路日志，当前链路的请求响应时间，微秒为单位
-    String duration;
+    long duration;
     long time;
     JSONObject tags;
     JSONObject fields;
@@ -55,9 +55,7 @@ public class LogBean {
         }
         try {
             fields.put("__content",content);
-            if(!Utils.isNullOrEmpty(duration)){
-                fields.put("__duration",duration);
-            }
+            fields.put("__duration",duration);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -200,11 +198,11 @@ public class LogBean {
         this.errorCode = errorCode;
     }
 
-    public String getDuration() {
+    public long getDuration() {
         return duration;
     }
 
-    public void setDuration(String duration) {
+    public void setDuration(long duration) {
         this.duration = duration;
     }
 

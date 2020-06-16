@@ -7,8 +7,9 @@ import android.util.Log;
  * DATE:2019-12-03 15:56
  * Description:
  */
-public class LogUtils {
-    private static String TAG = "[FT-SDK]:";
+public class LogUtils extends TrackLog{
+    protected static String TAG = "[FT-LOG]:";
+
     private static boolean mDebug = true;
     private static boolean aliasLogShow = true;
 
@@ -24,70 +25,41 @@ public class LogUtils {
         LogUtils.aliasLogShow = aliasLogShow;
     }
 
-    public static void i(Object message){
+    public static void i(String message){
         if(mDebug){
-            showFullLog(""+message,LogType.I);
+            showFullLog(TAG,message, TrackLog.LogType.I);
         }
     }
 
-    public static void d(Object message){
+    public static void d(String message){
         if(mDebug){
-            showFullLog(""+message,LogType.D);
+            showFullLog(TAG,message, TrackLog.LogType.D);
         }
     }
-    public static void e(Object message){
+    public static void e(String message){
         if(mDebug){
-            showFullLog(""+message,LogType.E);
+            showFullLog(TAG,message, TrackLog.LogType.E);
         }
     }
-    public static void v(Object message){
+    public static void v(String message){
         if(mDebug){
-            showFullLog(""+message,LogType.V);
+            showFullLog(TAG,message, TrackLog.LogType.V);
         }
     }
 
-    public static void showAlias(Object message){
+    public static void w(String message){
+        if(mDebug){
+            showFullLog(TAG,message, TrackLog.LogType.W);
+        }
+    }
+
+    public static void showAlias(String message){
         if(aliasLogShow){
-            showFullLog(""+message,LogType.D);
+            showFullLog(TAG,message, TrackLog.LogType.D);
         }
     }
 
 
 
-    private static void showFullLog(String message,LogType logType){
-        int segmentSize = 3 * 1024;
-        long length = message.length();
-        if(length <= segmentSize){
-            showLog(TAG,message,logType);
-        }else{
-            boolean isFirst = true;
-            while (message.length() > segmentSize){
-                String logContent = message.substring(0,segmentSize);
-                message = message.replace(logContent,"");
-                if(isFirst) {
-                    showLog(TAG, logContent, logType);
-                }else{
-                    showLog(null, logContent, logType);
-                }
-                isFirst = false;
-            }
-            showLog(null,message,logType);
-        }
-    }
 
-    private static void showLog(String tag,String message,LogType logType){
-        switch (logType){
-            case D:Log.println(Log.DEBUG,tag,message);
-            break;
-            case E:Log.println(Log.ERROR,tag,message);
-            break;
-            case I:Log.println(Log.INFO,tag,message);
-            break;
-            case V:Log.println(Log.VERBOSE,tag,message);
-        }
-    }
-
-    enum LogType{
-        I,D,E,V
-    }
 }

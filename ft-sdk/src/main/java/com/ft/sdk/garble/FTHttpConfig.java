@@ -26,6 +26,8 @@ public class FTHttpConfig {
     public boolean useOaid;
     public int sendOutTime = 10 * 1000;
     public int readOutTime = 10 * 1000;
+    //是否开启网络日志上报
+    public boolean networkTrace;
     private FTHttpConfig() {
 
     }
@@ -51,6 +53,7 @@ public class FTHttpConfig {
         uuid = DeviceUtils.getSDKUUid(FTApplication.getApplication());
         userAgent = USER_AGENT;
         EngineFactory.setTrackNetTime(ftsdkConfig.getTrackNetTime());
+        networkTrace = ftsdkConfig.isNetworkTrace();
     }
 
     public void release(){
