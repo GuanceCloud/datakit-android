@@ -558,15 +558,6 @@ public class FTTrack {
             return false;
         }
         if (jsonObject.keys().hasNext()) {
-            Iterator<String> iterator = jsonObject.keys();
-            while (iterator.hasNext()) {
-                String key = iterator.next();
-                Object obj = jsonObject.get(key);
-                if (obj instanceof JSONObject || obj instanceof JSONArray) {
-                    LogUtils.e("参数 fields 中含有非法数据类型");
-                    return false;
-                }
-            }
             return true;
         } else {
             LogUtils.e("参数 fields 不能为空");
