@@ -65,6 +65,8 @@ public class FTSDKConfig {
     private String env = BuildConfig.BUILD_TYPE;
     //是否开启网络日志上报
     private boolean networkTrace;
+    //崩溃日志的 __serviceName
+    private String traceServiceName;
     /**
      * 构建 SDK 必要的配置参数
      * @param metricsUrl 服务器地址
@@ -226,6 +228,10 @@ public class FTSDKConfig {
 
     public boolean isNetworkTrace() {
         return networkTrace;
+    }
+
+    public String getTraceServiceName() {
+        return traceServiceName;
     }
 
     /**
@@ -472,6 +478,16 @@ public class FTSDKConfig {
      */
     public FTSDKConfig setNetworkTrace(boolean networkTrace) {
         this.networkTrace = networkTrace;
+        return this;
+    }
+
+    /**
+     * 设置崩溃日志的 serviceName
+     * @param traceServiceName
+     * @return
+     */
+    public FTSDKConfig setTraceServiceName(String traceServiceName) {
+        this.traceServiceName = traceServiceName;
         return this;
     }
 }

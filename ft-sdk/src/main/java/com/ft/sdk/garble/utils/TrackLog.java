@@ -6,6 +6,8 @@ import com.ft.sdk.FTTrack;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.Status;
 
+import static com.ft.sdk.garble.utils.Constants.DEFAULT_LOG_SERVICE_NAME;
+
 /**
  * create: by huangDianHua
  * time: 2020/6/15 18:17:25
@@ -55,7 +57,7 @@ public class TrackLog {
     public static int println(boolean upload,int priority, String tag, String msg) {
         if(upload) {
             LogBean logBean = new LogBean(Constants.USER_AGENT, Utils.translateFieldValue(msg), System.currentTimeMillis());
-            logBean.setServiceName("dataflux sdk");
+            logBean.setServiceName(DEFAULT_LOG_SERVICE_NAME);
             logBean.setStatus(getStatus(priority));
             FTTrack.getInstance().logBackground(logBean);
         }
