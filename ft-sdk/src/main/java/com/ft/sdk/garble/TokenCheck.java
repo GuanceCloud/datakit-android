@@ -17,7 +17,7 @@ import org.json.JSONObject;
 public class TokenCheck {
     private static TokenCheck tokenCheck;
     private volatile boolean tokenAllowable;
-
+    public volatile String message = "";
     private TokenCheck() {
     }
 
@@ -54,16 +54,19 @@ public class TokenCheck {
                     } else {
                         LogUtils.w("Dataflux SDK 未能验证通过您配置的 token");
                         tokenAllowable = false;
+                        message = data;
                         return false;
                     }
                 } catch (Exception e) {
                     LogUtils.w("Dataflux SDK 未能验证通过您配置的 token,message:" + e.getLocalizedMessage());
+                    message = e.getLocalizedMessage();
                     tokenAllowable = false;
                     return false;
                 }
             } else {
                 LogUtils.w("Dataflux SDK 未能验证通过您配置的 token");
                 tokenAllowable = false;
+                message = result.getData();
                 return false;
             }
         } else {
