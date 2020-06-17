@@ -329,6 +329,7 @@ public class LocationUtils {
                     .setParams(params)
                     .useDefaultHead(false)
                     .setShowLog(false)
+                    .enableToken(false)
                     .executeSync(ResponseData.class);
             //LogUtils.d("高德逆向解析地址返回数据：\n" + responseData.getData());
             try {
@@ -390,6 +391,7 @@ public class LocationUtils {
                 .setParams(params)
                 .useDefaultHead(false)
                 .setShowLog(false)
+                .enableToken(false)
                 .executeSync(ResponseData.class);
         LogUtils.d("高德IP地址返回数据：\n" + responseData.getData());
         try {

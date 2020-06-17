@@ -129,7 +129,6 @@ public class FTAutoTrack {
             }
             FTFragmentManager.getInstance().setFragmentVisible(className, (Class) clazz, isVisible);
         } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 

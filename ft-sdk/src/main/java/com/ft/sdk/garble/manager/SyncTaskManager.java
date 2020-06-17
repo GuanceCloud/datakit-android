@@ -2,6 +2,7 @@ package com.ft.sdk.garble.manager;
 
 import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.SyncCallback;
+import com.ft.sdk.garble.TokenCheck;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.db.FTDBManager;
@@ -31,6 +32,7 @@ public class SyncTaskManager {
     private final int SLEEP_TIME = 10 * 1000;
     private volatile AtomicInteger errorCount = new AtomicInteger(0);
     private volatile boolean running;
+    private volatile boolean tokenAllowable;//记录token是否合法
 
     /**
      * 警告!!! 该方法仅用于测试使用!!!
@@ -63,6 +65,10 @@ public class SyncTaskManager {
         errorCount.set(0);
         ThreadPoolUtils.get().execute(() -> {
             try {
+                if(!TokenCheck.get().checkToken()){
+                    running = false;
+                    return;
+                }
                 Thread.sleep(10*1000);
                 List<RecordData> trackDataList = queryFromData(DataType.TRACK);
                 List<RecordData> objectDataList = queryFromData(DataType.OBJECT);
@@ -107,26 +113,6 @@ public class SyncTaskManager {
             }
         });
     }
-
-    /**
-     * 等待用户绑定用户信息(阻塞方法)
-     */
-    private void waitUserBind() {
-        int count = 0;
-        do {
-            if (count >= 1) {
-                LogUtils.e("正在等待用户数据绑定...");
-            }
-            try {
-                Thread.sleep(SLEEP_TIME);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            count++;
-            //如果开启了用户数据绑定，就等待用户绑定数据完成
-        } while (FTUserConfig.get().isNeedBindUser() && !FTUserConfig.get().isUserDataBinded());
-    }
-
 
     /**
      * 执行同步操作
