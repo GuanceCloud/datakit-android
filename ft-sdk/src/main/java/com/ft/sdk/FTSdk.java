@@ -192,7 +192,6 @@ public class FTSdk {
             FTAliasConfig.get().initParams(mFtSDKConfig);
             FTHttpConfig.get().initParams(mFtSDKConfig);
             FTAutoTrackConfig.get().initParams(mFtSDKConfig);
-            FTMonitorConfig.get().initParams(mFtSDKConfig);
             FTUserConfig.get().setNeedBindUser(mFtSDKConfig.isNeedBindUser());
             FTUserConfig.get().initSessionId();
             if (mFtSDKConfig.isNeedBindUser()) {
@@ -215,6 +214,7 @@ public class FTSdk {
             //生成随机采样数，用来判断是否对该设备的行为进行采样
             Utils.generateRandomNumber();
             FTExceptionHandler.get().crashEvn(mFtSDKConfig.getEnv());
+            FTMonitorConfig.get().initParams(mFtSDKConfig);
         }
     }
 

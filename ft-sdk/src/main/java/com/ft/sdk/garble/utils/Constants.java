@@ -31,6 +31,7 @@ public class Constants {
     public static final String URL_MODEL_LOG = "v1/write/logging";//日志数据上传路径
     public static final String URL_MODEL_KEY_EVENT = "v1/write/keyevent";//事件数据上传路径
     public static final String URL_MODEL_OBJECT = "v1/write/object";//对象数据上传路径
+    public static final String URL_MODEL_TOKEN_CHECK = "v1/check/token";//验证token是否合法
 
     public static final String DEFAULT_OBJECT_CLASS = "Dataflux Android SDK";//默认的对象名
 
