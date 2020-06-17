@@ -126,7 +126,7 @@ public class SyncTaskManager {
         SyncDataManager.printUpdateData(dataType == DataType.OBJECT,body);
         body = body.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION).replaceAll(Constants.SEPARATION_LINE_BREAK,Constants.SEPARATION_REALLY_LINE_BREAK);
         requestNet(dataType, body, (code, response) -> {
-            if (code == HttpURLConnection.HTTP_OK) {
+            if (code >= HttpURLConnection.HTTP_OK && code < HttpURLConnection.HTTP_BAD_REQUEST) {
                 LogUtils.d("同步数据成功");
                 deleteLastQuery(requestDatas);
                 errorCount.set(0);
