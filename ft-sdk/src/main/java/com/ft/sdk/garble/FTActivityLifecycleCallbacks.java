@@ -7,7 +7,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTAutoTrack;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.garble.manager.FTActivityManager;
@@ -21,6 +20,7 @@ import com.ft.sdk.garble.utils.NetUtils;
  * Description: Activity 生命周期回调类
  */
 public class FTActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
+    private AppRestartCallback appRestartCallback = new AppRestartCallback();
     @Override
     public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
         //防止监听网速的线程挂掉，在页面打开时判断线程是够挂了，挂了重启
@@ -32,6 +32,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
 
     @Override
     public void onActivityStarted(@NonNull Activity activity) {
+        appRestartCallback.onStart();
     }
 
     @Override
@@ -59,6 +60,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
 
     @Override
     public void onActivityStopped(@NonNull Activity activity) {
+        appRestartCallback.onStop();
     }
 
     @Override
