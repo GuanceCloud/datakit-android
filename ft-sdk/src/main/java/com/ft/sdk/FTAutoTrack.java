@@ -744,6 +744,7 @@ public class FTAutoTrack {
             case OPEN:
                 operationName = "open/event";
         }
+        if(currentPage == null){currentPage = Constants.UNKNOWN;}
         LogBean logBean = new LogBean(Constants.USER_AGENT,"{\"current_page_name\":\""+currentPage+"\"}",System.currentTimeMillis());
         logBean.setOperationName(operationName);
         logBean.setDuration(duration);
