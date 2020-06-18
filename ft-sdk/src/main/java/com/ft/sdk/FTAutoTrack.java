@@ -722,6 +722,9 @@ public class FTAutoTrack {
     }
 
     private static void addLogging(String currentPage,OP op,long duration){
+        if(!FTFlowChartConfig.get().isEventFlowLog()){
+            return;
+        }
         String operationName = "";
         switch (op){
             case CLK:

@@ -8,7 +8,6 @@ import com.ft.sdk.FTTrack;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.utils.Constants;
-import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.io.PrintWriter;
@@ -28,6 +27,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
     private String trackServiceName = DEFAULT_LOG_SERVICE_NAME;
     private static FTExceptionHandler instance;
     private Thread.UncaughtExceptionHandler mDefaultExceptionHandler;
+    private boolean trackConsoleLog;
     private FTExceptionHandler(){
         mDefaultExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler(this);
@@ -44,7 +44,20 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
             this.canTrackCrash = ftsdkConfig.isEnableTrackAppCrash();
             this.env = ftsdkConfig.getEnv();
             this.trackServiceName = ftsdkConfig.getTraceServiceName();
+            this.trackConsoleLog = ftsdkConfig.isTraceConsoleLog();
         }
+    }
+
+    public String getEnv() {
+        return env;
+    }
+
+    public String getTrackServiceName() {
+        return trackServiceName;
+    }
+
+    public boolean isTrackConsoleLog() {
+        return trackConsoleLog;
     }
 
     @Override
