@@ -2,6 +2,10 @@ package com.ft.sdk.garble.manager;
 
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.Context;
+
+import com.ft.sdk.FTApplication;
 import com.ft.sdk.garble.utils.LogUtils;
 
 import java.util.ArrayList;
@@ -145,6 +149,21 @@ public class FTActivityManager {
         if (activityOpenTypeMap != null) {
             activityOpenTypeMap.remove(className);
         }
+    }
+
+    public boolean isAppForeground() {
+        ActivityManager am = (ActivityManager) FTApplication.getApplication().getSystemService(Context.ACTIVITY_SERVICE);
+        if (am == null) return false;
+        List<ActivityManager.RunningAppProcessInfo> info = am.getRunningAppProcesses();
+        if (info == null || info.size() == 0) return false;
+        for (ActivityManager.RunningAppProcessInfo aInfo : info) {
+            if (aInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                if (aInfo.processName.equals(FTApplication.getApplication().getPackageName())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public void printTest(Activity activity) {

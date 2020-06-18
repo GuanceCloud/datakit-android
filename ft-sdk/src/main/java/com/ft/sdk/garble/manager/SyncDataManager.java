@@ -298,7 +298,7 @@ public class SyncDataManager {
                     } else if (value instanceof Double) {
                         sb.append(Utils.formatDouble((double) value));
                     } else {
-                        sb.append(value);
+                        sb.append("\""+Utils.translateFieldValue(value.toString()).replaceAll("\\\\\\\\\"","\\\\\\\\\\\\\"")+"\"");
                     }
                 }
             }

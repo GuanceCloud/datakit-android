@@ -11,6 +11,7 @@ import com.ft.sdk.garble.utils.Utils;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -94,16 +95,23 @@ public class OKHttpEventListener extends EventListener implements Interceptor {
     @Override
     public void callEnd(@NotNull Call call) {
         super.callEnd(call);
-        NetUtils.get().responseEndTime = System.currentTimeMillis();
-        if (!FTHttpConfig.get().networkTrace || FTHttpConfig.get().metricsUrl.contains(call.request().url().host())) {
-            return;
+        try {
+            NetUtils.get().responseEndTime = System.currentTimeMillis();
+            if (!FTHttpConfig.get().networkTrace || FTHttpConfig.get().metricsUrl.contains(call.request().url().host())) {
+                return;
+            }
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("requestContent",requestRaw);
+            jsonObject.put("responseContent",responseRaw + queue.poll());
+            LogBean logBean = new LogBean(Constants.USER_AGENT, jsonObject, System.currentTimeMillis());
+            logBean.setOperationName(operationName);
+            logBean.setDuration(duration * 1000);
+            logBean.setSpanID(Utils.MD5(DeviceUtils.getUuid(FTApplication.getApplication())));
+            logBean.setTraceID(UUID.randomUUID().toString());
+            FTTrack.getInstance().logBackground(logBean);
+        }catch (Exception e){
+            e.printStackTrace();
         }
-        LogBean logBean = new LogBean(Constants.USER_AGENT, "{\"requestContent\":\"" + requestRaw + "\",\n\"responseContent\":\"" + responseRaw + queue.poll() + "\"}", System.currentTimeMillis());
-        logBean.setOperationName(operationName);
-        logBean.setDuration(duration * 1000);
-        logBean.setSpanID(Utils.MD5(DeviceUtils.getUuid(FTApplication.getApplication())));
-        logBean.setTraceID(UUID.randomUUID().toString());
-        FTTrack.getInstance().logBackground(logBean);
     }
 
     @Override

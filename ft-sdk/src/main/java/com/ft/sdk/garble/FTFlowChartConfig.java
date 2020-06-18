@@ -21,6 +21,8 @@ public class FTFlowChartConfig {
     private boolean openFlowChart;
     //上一次操作的时间
     public volatile long lastOpTime;
+    //流程图日志上报功能
+    private boolean eventFlowLog;
     private FTFlowChartConfig(){ }
     public static FTFlowChartConfig get(){
         if(ftFlowChartConfig == null){
@@ -31,6 +33,7 @@ public class FTFlowChartConfig {
     public void initParams(FTSDKConfig ftsdkConfig){
         lastOpTime = System.currentTimeMillis();
         openFlowChart = ftsdkConfig.isOpenFlowChart();
+        eventFlowLog = ftsdkConfig.isEventFlowLog();
         createNewFlowUUid();
     }
 
@@ -44,6 +47,10 @@ public class FTFlowChartConfig {
 
     public boolean isOpenFlowChart() {
         return openFlowChart;
+    }
+
+    public boolean isEventFlowLog() {
+        return eventFlowLog;
     }
 
     public void release(){

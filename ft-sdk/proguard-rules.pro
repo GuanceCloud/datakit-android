@@ -107,4 +107,8 @@
     *;
 }
 
+-keep class com.ft.sdk.garble.utils.TrackLog{
+    *;
+}
+
 

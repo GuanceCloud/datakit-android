@@ -37,13 +37,18 @@ public class LogBean {
     //用于链路日志，请求的响应代码，例如 200 表示请求成功
     String errorCode;
     //日志内容，纯文本或 JSONString 都可以
-    String content;
+    Object content;
     //用于链路日志，当前链路的请求响应时间，微秒为单位
     long duration;
     long time;
     JSONObject tags;
     JSONObject fields;
     public LogBean(String measurement,String content,long time){
+        this.measurement = measurement;
+        this.content = content;
+        this.time = time;
+    }
+    public LogBean(String measurement,JSONObject content,long time){
         this.measurement = measurement;
         this.content = content;
         this.time = time;
@@ -110,7 +115,7 @@ public class LogBean {
         return measurement;
     }
 
-    public String getContent() {
+    public Object getContent() {
         return content;
     }
 
