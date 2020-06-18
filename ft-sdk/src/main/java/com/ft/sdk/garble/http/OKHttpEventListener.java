@@ -106,6 +106,7 @@ public class OKHttpEventListener extends EventListener implements Interceptor {
             LogBean logBean = new LogBean(Constants.USER_AGENT, jsonObject, System.currentTimeMillis());
             logBean.setOperationName(operationName);
             logBean.setDuration(duration * 1000);
+            logBean.setClazz("tracing");
             logBean.setServiceName(Constants.DEFAULT_LOG_SERVICE_NAME);
             logBean.setSpanID(Utils.MD5(DeviceUtils.getUuid(FTApplication.getApplication())));
             logBean.setTraceID(UUID.randomUUID().toString());
