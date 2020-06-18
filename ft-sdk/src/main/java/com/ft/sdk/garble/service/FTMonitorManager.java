@@ -1,6 +1,7 @@
 package com.ft.sdk.garble.service;
 
 import com.ft.sdk.garble.FTMonitorConfig;
+import com.ft.sdk.garble.TokenCheck;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.http.ResponseData;
@@ -82,6 +83,9 @@ public class FTMonitorManager {
             try {
                 while (true) {
                     Thread.sleep(period * 1000);
+                    if(!TokenCheck.get().checkToken()){
+                        continue;
+                    }
                     try {
                         String body = SyncDataManager.getMonitorUploadData();
                         SyncDataManager.printUpdateData(false,body);

@@ -2,6 +2,7 @@ package com.ft.sdk;
 
 import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.SyncCallback;
+import com.ft.sdk.garble.TokenCheck;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.KeyEventBean;
 import com.ft.sdk.garble.bean.LogBean;
@@ -25,6 +26,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.HttpURLConnection;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -512,6 +514,12 @@ public class FTTrack {
      * @param callback
      */
     private void updateRecordData(DataType dataType, List<RecordData> recordDataList, SyncCallback callback) {
+        if(!TokenCheck.get().checkToken()){
+            if(callback != null){
+                callback.onResponse(HttpURLConnection.HTTP_OK,TokenCheck.get().message);
+                return;
+            }
+        }
         if (recordDataList == null || recordDataList.isEmpty()) {
             return;
         }
@@ -558,15 +566,6 @@ public class FTTrack {
             return false;
         }
         if (jsonObject.keys().hasNext()) {
-            Iterator<String> iterator = jsonObject.keys();
-            while (iterator.hasNext()) {
-                String key = iterator.next();
-                Object obj = jsonObject.get(key);
-                if (obj instanceof JSONObject || obj instanceof JSONArray) {
-                    LogUtils.e("参数 fields 中含有非法数据类型");
-                    return false;
-                }
-            }
             return true;
         } else {
             LogUtils.e("参数 fields 不能为空");

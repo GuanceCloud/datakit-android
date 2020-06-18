@@ -129,7 +129,6 @@ public class FTAutoTrack {
             }
             FTFragmentManager.getInstance().setFragmentVisible(className, (Class) clazz, isVisible);
         } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -718,8 +717,14 @@ public class FTAutoTrack {
             }
         });
     }
-
     private static void addLogging(String currentPage,OP op){
+        addLogging(currentPage,op,0);
+    }
+
+    private static void addLogging(String currentPage,OP op,long duration){
+        if(!FTFlowChartConfig.get().isEventFlowLog()){
+            return;
+        }
         String operationName = "";
         switch (op){
             case CLK:
@@ -736,9 +741,29 @@ public class FTAutoTrack {
             case CLS_FRA:
                 operationName = "leave/event";
                 break;
+            case OPEN:
+                operationName = "open/event";
         }
         LogBean logBean = new LogBean(Constants.USER_AGENT,"{\"current_page_name\":\""+currentPage+"\"}",System.currentTimeMillis());
         logBean.setOperationName(operationName);
+        logBean.setDuration(duration);
         FTTrack.getInstance().logBackground(logBean);
+    }
+
+    /**
+     * 获取相应埋点方法（Activity）所执行的时间
+     * @param desc className + "|" + methodName + "|" + methodDesc
+     * @param cost
+     */
+    public static void timingMethod(String desc,long cost){
+        LogUtils.d(desc);
+        try{
+            String[] arr = desc.split("\\|");
+            String[] names = arr[0].split("/");
+            String pageName = names[names.length-1];
+            addLogging(pageName,OP.OPEN,cost*1000);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }

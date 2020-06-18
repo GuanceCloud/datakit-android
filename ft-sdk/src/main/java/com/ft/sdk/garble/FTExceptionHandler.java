@@ -3,16 +3,18 @@ package com.ft.sdk.garble;
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.BuildConfig;
+import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTTrack;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.utils.Constants;
-import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+
+import static com.ft.sdk.garble.utils.Constants.DEFAULT_LOG_SERVICE_NAME;
 
 /**
  * create: by huangDianHua
@@ -22,8 +24,10 @@ import java.io.Writer;
 public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
     private boolean canTrackCrash;
     private String env = BuildConfig.BUILD_TYPE;
+    private String trackServiceName = DEFAULT_LOG_SERVICE_NAME;
     private static FTExceptionHandler instance;
     private Thread.UncaughtExceptionHandler mDefaultExceptionHandler;
+    private boolean trackConsoleLog;
     private FTExceptionHandler(){
         mDefaultExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler(this);
@@ -35,21 +39,27 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
         return instance;
     }
 
-    /**
-     * 设置是否开启崩溃日志捕获
-     * @param enable
-     */
-    public void enableTrackCrash(boolean enable){
-        this.canTrackCrash = enable;
+    public void initParams(FTSDKConfig ftsdkConfig){
+        if(ftsdkConfig != null){
+            this.canTrackCrash = ftsdkConfig.isEnableTrackAppCrash();
+            this.env = ftsdkConfig.getEnv();
+            this.trackServiceName = ftsdkConfig.getTraceServiceName();
+            this.trackConsoleLog = ftsdkConfig.isTraceConsoleLog();
+        }
     }
 
-    /**
-     * 设置崩溃日志的环境
-     * @param env
-     */
-    public void crashEvn(String env){
-        this.env = env;
+    public String getEnv() {
+        return env;
     }
+
+    public String getTrackServiceName() {
+        return trackServiceName;
+    }
+
+    public boolean isTrackConsoleLog() {
+        return trackConsoleLog;
+    }
+
     @Override
     public void uncaughtException(@NonNull Thread t, @NonNull Throwable e) {
         if(canTrackCrash) {
@@ -66,7 +76,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
             LogBean logBean = new LogBean(Constants.USER_AGENT,Utils.translateFieldValue(result),System.currentTimeMillis());
             logBean.setStatus(Status.CRITICAL);
             logBean.setEnv(env);
-            logBean.setServiceName("dataflux sdk");
+            logBean.setServiceName(trackServiceName);
             FTTrack.getInstance().logBackground(logBean);
         }
 

@@ -74,6 +74,7 @@ android{
 -keep class com.ft.sdk.FTAutoTrack{*;}
 -keep enum com.ft.sdk.FTAutoTrackType{*;}
 -keep enum com.ft.sdk.FTSdk{*;}
+-keep class com.ft.sdk.garble.utils.TrackLog{*;}
 ```
 > 注意：如果你的项目中开启了全埋点和流程图，那么需要将你的 Fragment 和 Activity 保持不被混淆，这样流程图中
 > 就会显示页面的真实名称，而不是混淆后的名称
@@ -111,9 +112,12 @@ android{
 |       addPageDesc       |        设置页面描述配置         |  否   |             Map 数据集，开启本地的描述日志显示，获取页面类名作为 Key，然后添加描述性文字作为 value 去创建 Map 数据集             |
 |       addVtpDesc        |        设置视图树描述配置        |  否   |             Map 数据集，开启本地的描述日志显示，获取视图树作为 Key，然后添加描述性文字作为 value 去创建 Map 数据集              |
 |       setDescLog        |    是否开启本地视图树和类名日志显示     |  否   |                           不开启将不会显示视图树和类名日志，该方法独立于  setDebug                            |
-| setEnableTrackAppCrash | 是否开启 App 崩溃日志上报功能 | 否 | 默认不开启，开启后将上报当前应用的崩溃日志。上报成功后，可以在后台的日志模块查看对应的日志 |
+| setEnableTrackAppCrash | 是否开启 App 崩溃日志上报功能 | 否 | 默认不开启，开启后将上报当前应用的崩溃日志。上报成功后，可以在后台的日志模块查看对应的日志。<br /> [关于崩溃日志中混淆内容转换的问题](#六关于崩溃日志中混淆内容转换的问题)|
+| setTraceServiceName | 设置崩溃日志的名称 | 否 | 默认为 dataflux sdk。你可以将你的应用名称设置给该字段，用来区分不同的日志 |
 | setEnv | 设置崩溃日志中显示的应用的环境 | 否 | 默认情况下会获取应用当前的环境。如：debug、release |
-| setCollectRate | 设置采集率 | 否 | 采集率的值范围为>=0、<=1，默认值为1。<br />说明：SDK 初始化是会随机生成一个0-1之间的随机数，当这个随机数小于你设置的采集率时，那么会上报当前设备的行为相关的埋点数据，否则就不会上报当前设备的行为埋点数据 |
+| setCollectRate | 设置采集率 | 否 | 采集率的值范围为>=0、<=1，默认值为1。<br />说明：SDK 初始化是会随机生成一个0-1之间的随机数，当这个随机数小于你设置的采集率时，那么会上报当前设备的行为相关的埋点数据，否则就不会上报当前设备的行为埋点数据<br /> |
+| setEventFlowLog | 是否开启流程图日志 | 否 | 开启后将会在后台日志模块显示应用中每个页面的打开关闭操作或者页面渲染时长 |
+| setTraceConsoleLog | 是否开启本地打印日志上报功能 | 否 | 当开启后会将应用中打印的日志上报到后台，日志等级对应关系<br />Log.v->ok;Log.i、Log.d->info;Log.e->error;Log.w->warning |
 
 > FTAutoTrackType 自动埋点事件说明，事件总类目前支持3种：
     FTAutoTrackType.APP_START：页面的开始事件，Activity 依赖的是其 onResume 方法，Fragment 依赖的是其 onResume 方法；
@@ -835,3 +839,25 @@ class MyApplication{
        }
 }
 ```
+
+### 六、关于崩溃日志中混淆内容转换的问题
+
+#### 1、问题描述
+
+当你的应用发生崩溃且你已经接入 DataFlux SDK 同时你也开启了崩溃日志上报的开关时，你可以到 DataFlux 后台你的工作空间下的日志模块找到相应
+的崩溃日志。如果你的应用开启了混淆，此时你会发现崩溃日志的堆栈信息也被混淆，无法直接定位具体的崩溃位置，因此你需要按以下方式来解决该问题。
+
+#### 2、解决方式
+
+* 找到 mapping 文件。如果你开启了混淆，那么在打包的时候会在该目录下（<moudle-name>->build->outputs->mapping）生成一个混淆文件映射表（mapping.txt）,该文件就是源代码与混淆后的类、方法和属性名称之间的映射。因此每次发包后应该管理好该文件，以备转换该版本混淆后的日志。
+
+* 下载崩溃日志文件。到 DataFlux 的后台中把崩溃日志下载到本地，这里假设下载到本地的文件名为 crash_log.txt
+
+* 运行 retrace 命令转换崩溃日志。Android SDK 中自带 retrace 工具（该工具在目录 <sdk-root>/tools/proguard 下，windows 版本是 retrace.bat,Mac/Linux 版本是 retrace.sh），通过该工具可以恢复崩溃日志的堆栈信息。命令示例
+
+  ```
+  retrace.bat -verbose mapping.txt crash_log.txt
+  ```
+
+* 上一步是通过 retrace 命令行来执行，当然也可以通过 GUI 工具。在 <sdk-root>/tools/proguard/bin 目录下有个 proguardgui.bat GUI 工具。运行 proguardgui.bat->从左侧的菜单中选择“ReTrace”->在上面的 Mapping file 中选择你的 mapping 文件，在下面输入框输入要还原的代码 ->点击右下方的“ReTrace!”
+

@@ -1,6 +1,5 @@
 package com.ft.sdk;
 
-import com.ft.sdk.garble.http.INetEngine;
 import com.ft.sdk.garble.utils.DeviceUtils;
 
 import java.security.InvalidParameterException;
@@ -50,9 +49,9 @@ public class FTSDKConfig {
     private boolean trackNetTime;
 
     //页面别名对应 map
-    private Map<String,String> pageDescMap;
+    private Map<String, String> pageDescMap;
     //事件别名对应 map
-    private Map<String,String> vtpDescMap;
+    private Map<String, String> vtpDescMap;
     //页面和视图树是否显示描述
     private boolean pageVtpDescEnabled;
     //流程图是否显示描述
@@ -65,12 +64,20 @@ public class FTSDKConfig {
     private String env = BuildConfig.BUILD_TYPE;
     //是否开启网络日志上报
     private boolean networkTrace;
+    //崩溃日志的 __serviceName
+    private String traceServiceName;
+    //是否开启流程图日志显示
+    private boolean eventFlowLog;
+    //是否开启系统日志的上报功能
+    private boolean traceConsoleLog;
+
     /**
      * 构建 SDK 必要的配置参数
-     * @param metricsUrl 服务器地址
+     *
+     * @param metricsUrl           服务器地址
      * @param enableRequestSigning 是否需要对请求进行签名
-     * @param akId 签名 id，当 enableRequestSigning 为 true 时必须设置
-     * @param akSecret 签名 Secret，当 enableRequestSigning 为 true 时必须设置
+     * @param akId                 签名 id，当 enableRequestSigning 为 true 时必须设置
+     * @param akSecret             签名 Secret，当 enableRequestSigning 为 true 时必须设置
      * @return
      */
     public static FTSDKConfig builder(String metricsUrl, boolean enableRequestSigning, String akId, String akSecret) {
@@ -79,15 +86,17 @@ public class FTSDKConfig {
 
     /**
      * 构建 SDK 必要的配置参数（当不需要签名时可以用此方法）
+     *
      * @param metricsUrl 服务器地址
      * @return
      */
-    public static FTSDKConfig builder(String metricsUrl){
+    public static FTSDKConfig builder(String metricsUrl) {
         return new FTSDKConfig(metricsUrl, false, null, null);
     }
 
     /**
      * SDK 配置项构造方法
+     *
      * @param metricsUrl
      * @param enableRequestSigning
      * @param akId
@@ -126,7 +135,9 @@ public class FTSDKConfig {
         return akSecret;
     }
 
-    public String getDataWayToken(){return dataWayToken;}
+    public String getDataWayToken() {
+        return dataWayToken;
+    }
 
     public boolean isUseOAID() {
         return useOAID;
@@ -192,6 +203,7 @@ public class FTSDKConfig {
         this.autoTrack = autoTrack;
         return this;
     }
+
     public boolean getTrackNetTime() {
         return trackNetTime;
     }
@@ -228,15 +240,29 @@ public class FTSDKConfig {
         return networkTrace;
     }
 
+    public String getTraceServiceName() {
+        return traceServiceName;
+    }
+
+    public boolean isEventFlowLog() {
+        return eventFlowLog;
+    }
+
+    public boolean isTraceConsoleLog() {
+        return traceConsoleLog;
+    }
+
     /**
      * 设置上传数据的 token 验证
+     *
      * @param dataWayToken
      * @return
      */
-    public FTSDKConfig setDataWayToken(String dataWayToken){
+    public FTSDKConfig setDataWayToken(String dataWayToken) {
         this.dataWayToken = dataWayToken;
         return this;
     }
+
     /**
      * 是否使用 UseOAID 作为设备唯一识别号的替代字段
      *
@@ -250,10 +276,11 @@ public class FTSDKConfig {
 
     /**
      * 设置数据采集端的名称
+     *
      * @param uuid
      * @return
      */
-    public FTSDKConfig setXDataKitUUID(String uuid){
+    public FTSDKConfig setXDataKitUUID(String uuid) {
         DeviceUtils.setSDKUUid(uuid);
         return this;
     }
@@ -375,11 +402,12 @@ public class FTSDKConfig {
 
     /**
      * 设置使用高德作为逆向地址解析
+     *
      * @param useGeoKey
      * @param geoKey
      * @return
      */
-    public FTSDKConfig setGeoKey(boolean useGeoKey,String geoKey){
+    public FTSDKConfig setGeoKey(boolean useGeoKey, String geoKey) {
         this.useGeoKey = useGeoKey;
         this.geoKey = geoKey;
         return this;
@@ -387,6 +415,7 @@ public class FTSDKConfig {
 
     /**
      * 是否开启网络全路径请求时长监控
+     *
      * @param value
      * @return
      */
@@ -397,6 +426,7 @@ public class FTSDKConfig {
 
     /**
      * 页面别名对应 map
+     *
      * @param pageDescMap
      * @return
      */
@@ -407,6 +437,7 @@ public class FTSDKConfig {
 
     /**
      * 事件别名对应 map
+     *
      * @param vtpDescMap
      * @return
      */
@@ -417,6 +448,7 @@ public class FTSDKConfig {
 
     /**
      * 设置页面和视图树是否使用别名
+     *
      * @param pageVtpDescEnabled
      * @return
      */
@@ -427,6 +459,7 @@ public class FTSDKConfig {
 
     /**
      * 设置流程图是否使用别名显示
+     *
      * @param flowChartDescEnabled
      * @return
      */
@@ -437,6 +470,7 @@ public class FTSDKConfig {
 
     /**
      * 设置是否需要采集崩溃日志
+     *
      * @param enableTrackAppCrash
      * @return
      */
@@ -447,6 +481,7 @@ public class FTSDKConfig {
 
     /**
      * 设置采样率
+     *
      * @param collectRate
      * @return
      */
@@ -457,6 +492,7 @@ public class FTSDKConfig {
 
     /**
      * 设置崩溃日志的环境
+     *
      * @param env
      * @return
      */
@@ -467,11 +503,43 @@ public class FTSDKConfig {
 
     /**
      * 是否开启网络日志上报
+     *
      * @param networkTrace
      * @return
      */
     public FTSDKConfig setNetworkTrace(boolean networkTrace) {
         this.networkTrace = networkTrace;
+        return this;
+    }
+
+    /**
+     * 设置崩溃日志的 serviceName
+     *
+     * @param traceServiceName
+     * @return
+     */
+    public FTSDKConfig setTraceServiceName(String traceServiceName) {
+        this.traceServiceName = traceServiceName;
+        return this;
+    }
+
+    /**
+     * 是否开启流程图日志
+     *
+     * @param eventFlowLog
+     */
+    public FTSDKConfig setEventFlowLog(boolean eventFlowLog) {
+        this.eventFlowLog = eventFlowLog;
+        return this;
+    }
+
+    /**
+     * 是否开启系统日志上报功能
+     * @param traceConsoleLog
+     * @return
+     */
+    public FTSDKConfig setTraceConsoleLog(boolean traceConsoleLog) {
+        this.traceConsoleLog = traceConsoleLog;
         return this;
     }
 }
