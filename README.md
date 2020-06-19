@@ -849,15 +849,15 @@ class MyApplication{
 
 #### 2、解决方式
 
-* 找到 mapping 文件。如果你开启了混淆，那么在打包的时候会在该目录下（<moudle-name>->build->outputs->mapping）生成一个混淆文件映射表（mapping.txt）,该文件就是源代码与混淆后的类、方法和属性名称之间的映射。因此每次发包后应该管理好该文件，以备转换该版本混淆后的日志。
+* 找到 mapping 文件。如果你开启了混淆，那么在打包的时候会在该目录下（module-name->build->outputs->mapping）生成一个混淆文件映射表（mapping.txt）,该文件就是源代码与混淆后的类、方法和属性名称之间的映射。因此每次发包后应该根据应用的版本号保存好对应 mapping.txt 文件，以备根据后台日志 tag 中的版本名字段（app_version_name）来找到对应 mapping.txt 文件。
 
 * 下载崩溃日志文件。到 DataFlux 的后台中把崩溃日志下载到本地，这里假设下载到本地的文件名为 crash_log.txt
 
-* 运行 retrace 命令转换崩溃日志。Android SDK 中自带 retrace 工具（该工具在目录 <sdk-root>/tools/proguard 下，windows 版本是 retrace.bat,Mac/Linux 版本是 retrace.sh），通过该工具可以恢复崩溃日志的堆栈信息。命令示例
+* 运行 retrace 命令转换崩溃日志。Android SDK 中自带 retrace 工具（该工具在目录 sdk-root/tools/proguard 下，windows 版本是 retrace.bat,Mac/Linux 版本是 retrace.sh），通过该工具可以恢复崩溃日志的堆栈信息。命令示例
 
   ```
   retrace.bat -verbose mapping.txt crash_log.txt
   ```
 
-* 上一步是通过 retrace 命令行来执行，当然也可以通过 GUI 工具。在 <sdk-root>/tools/proguard/bin 目录下有个 proguardgui.bat GUI 工具。运行 proguardgui.bat->从左侧的菜单中选择“ReTrace”->在上面的 Mapping file 中选择你的 mapping 文件，在下面输入框输入要还原的代码 ->点击右下方的“ReTrace!”
+* 上一步是通过 retrace 命令行来执行，当然也可以通过 GUI 工具。在 <sdk-root>/tools/proguard/bin 目录下有个 proguardgui.bat 或 proguardgui.sh GUI 工具。运行 proguardgui.bat 或者 ./proguardgui.sh ->从左侧的菜单中选择“ReTrace”->在上面的 Mapping file 中选择你的 mapping 文件，在下面输入框输入要还原的代码 ->点击右下方的“ReTrace!”
 
