@@ -57,7 +57,8 @@ public class DemoApplication extends Application {
                 .setEnableTrackAppCrash(true)
                 .setEnv("dev")
                 .setCollectRate(0.5f)
-                .setNetworkTrace(true);
+                .setNetworkTrace(true)
+                .setEventFlowLog(true);
         FTSdk.install(ftSDKConfig);
 
         FTMonitor.get()
