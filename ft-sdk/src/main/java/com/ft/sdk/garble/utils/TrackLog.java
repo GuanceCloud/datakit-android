@@ -67,7 +67,7 @@ public class TrackLog {
     }
 
     protected static int showFullLog(String TAG, String message, LogType logType) {
-        return showLog(false, TAG, message, logType);
+        return showFullLog(false, TAG, message, logType);
     }
 
     protected static int showFullLog(boolean upload, String TAG, String message, LogType logType) {
