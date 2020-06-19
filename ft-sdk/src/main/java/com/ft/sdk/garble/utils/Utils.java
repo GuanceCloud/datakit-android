@@ -3,6 +3,7 @@ package com.ft.sdk.garble.utils;
 import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -55,6 +56,18 @@ public class Utils {
         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetWork = manager.getActiveNetworkInfo();
         return activeNetWork != null && activeNetWork.isConnected();
+    }
+
+    public static String getAppVersionName(){
+        PackageManager manager = FTApplication.getApplication().getPackageManager();
+        PackageInfo info = null;
+        try {
+            info = manager.getPackageInfo(FTApplication.getApplication().getPackageName(), 0);
+            return info.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 
     public static SharedPreferences getSharedPreferences(Context context) {

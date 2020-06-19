@@ -115,6 +115,7 @@ public class ObjectBean {
         objectHashMap.put("display", DeviceUtils.getDisplay(context));
         objectHashMap.put("carrier", DeviceUtils.getCarrier(context));
         objectHashMap.put("locale", Locale.getDefault());
+        objectHashMap.put("app_version_name",Utils.getAppVersionName());
         return objectHashMap;
     }
 }
