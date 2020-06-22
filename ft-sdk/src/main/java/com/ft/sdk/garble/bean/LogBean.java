@@ -60,7 +60,9 @@ public class LogBean {
         }
         try {
             fields.put("__content",content);
-            fields.put("__duration",duration);
+            if(duration > 0) {
+                fields.put("__duration", duration);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
