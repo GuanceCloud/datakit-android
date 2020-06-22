@@ -33,6 +33,7 @@ import com.ft.sdk.garble.utils.ThreadPoolUtils;
 import com.ft.sdk.garble.utils.Utils;
 import com.google.android.material.tabs.TabLayout;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -726,33 +727,46 @@ public class FTAutoTrack {
             return;
         }
         String operationName = "";
+        String event = "";
         switch (op){
             case CLK:
                 operationName = "click/event";
+                event = "click";
                 break;
             case LANC:
                 operationName = "launch/event";
+                event = "launch";
                 break;
             case OPEN_ACT:
             case OPEN_FRA:
                 operationName = "enter/event";
+                event = "enter";
                 break;
             case CLS_ACT:
             case CLS_FRA:
                 operationName = "leave/event";
+                event = "leave";
                 break;
             case OPEN:
                 operationName = "open/event";
+                event = "open";
         }
         if(currentPage == null){currentPage = Constants.UNKNOWN;}
-        LogBean logBean = new LogBean(Constants.USER_AGENT,"{\"current_page_name\":\""+currentPage+"\"}",System.currentTimeMillis());
+        JSONObject content = new JSONObject();
+        try {
+            content.put("current_page_name",currentPage);
+            content.put("event",event);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        LogBean logBean = new LogBean(Constants.USER_AGENT,content.toString(),System.currentTimeMillis());
         logBean.setOperationName(operationName);
         logBean.setDuration(duration);
         FTTrack.getInstance().logBackground(logBean);
     }
 
     /**
-     * 获取相应埋点方法（Activity）所执行的时间
+     * 获取相应埋点方法（Activity）所执行的时间(该方法会在所有的继承了 AppCompatActivity 的 Activity 中的 onCreate 中调用)
      * @param desc className + "|" + methodName + "|" + methodDesc
      * @param cost
      */
