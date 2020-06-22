@@ -92,9 +92,7 @@ public class OKHttpEventListener extends EventListener implements Interceptor {
         }
     }
 
-    @Override
-    public void callEnd(@NotNull Call call) {
-        super.callEnd(call);
+    private void uploadNetTrace(Call call,String isError){
         try {
             NetUtils.get().responseEndTime = System.currentTimeMillis();
             if (!FTHttpConfig.get().networkTrace || FTHttpConfig.get().metricsUrl.contains(call.request().url().host())) {
@@ -107,6 +105,7 @@ public class OKHttpEventListener extends EventListener implements Interceptor {
             logBean.setOperationName(operationName);
             logBean.setDuration(duration * 1000);
             logBean.setClazz("tracing");
+            logBean.setIsError(isError);
             logBean.setServiceName(Constants.DEFAULT_LOG_SERVICE_NAME);
             logBean.setSpanID(Utils.MD5(DeviceUtils.getUuid(FTApplication.getApplication())));
             logBean.setTraceID(UUID.randomUUID().toString());
@@ -117,9 +116,16 @@ public class OKHttpEventListener extends EventListener implements Interceptor {
     }
 
     @Override
+    public void callEnd(@NotNull Call call) {
+        super.callEnd(call);
+        uploadNetTrace(call,"false");
+    }
+
+    @Override
     public void callFailed(@NotNull Call call, @NotNull IOException ioe) {
         super.callFailed(call, ioe);
         NetUtils.get().requestErrCount += 1;
+        uploadNetTrace(call,"true");
     }
 
     @Override

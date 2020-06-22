@@ -34,8 +34,8 @@ public class LogBean {
     String spanID;
     //用于链路日志，表示当前链路的 ID
     String traceID;
-    //用于链路日志，请求的响应代码，例如 200 表示请求成功
-    String errorCode;
+    //字符串类型，true 表示该 span 的请求响应是错误,false 或者无该标签，表示该 span 的响应是正常的请求
+    String isError;
     //日志内容，纯文本或 JSONString 都可以
     Object content;
     //用于链路日志，当前链路的请求响应时间，微秒为单位
@@ -100,8 +100,8 @@ public class LogBean {
             if(!Utils.isNullOrEmpty(traceID)){
                 tags.put("__traceID",traceID);
             }
-            if(!Utils.isNullOrEmpty(errorCode)){
-                tags.put("__errorCode",errorCode);
+            if(!Utils.isNullOrEmpty(isError)){
+                tags.put("__isError",isError);
             }
             if(!tags.has("device_uuid")){
                 tags.put("device_uuid", DeviceUtils.getUuid(FTApplication.getApplication()));
@@ -198,12 +198,16 @@ public class LogBean {
         this.traceID = traceID;
     }
 
-    public String getErrorCode() {
-        return errorCode;
+    public String getIsError() {
+        return isError;
     }
 
-    public void setErrorCode(String errorCode) {
-        this.errorCode = errorCode;
+    /**
+     *
+     * @param isError 字符串类型，true 表示该 span 的请求响应是错误,false 或者无该标签，表示该 span 的响应是正常的请求
+     */
+    public void setIsError(String isError) {
+        this.isError = isError;
     }
 
     public long getDuration() {
