@@ -65,11 +65,7 @@ public class OKHttpEventListener extends EventListener implements Interceptor {
                 sb.append(body).append("\n");
             }
             requestRaw = sb.toString();
-            String protocol = "Http";
-            if (request.isHttps()) {
-                protocol = "Https";
-            }
-            operationName = request.method() + "/" + protocol;
+            operationName = request.method() + "/http";
         } catch (Exception e) {
             e.printStackTrace();
         }
