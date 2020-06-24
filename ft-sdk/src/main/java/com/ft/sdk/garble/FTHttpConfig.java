@@ -15,7 +15,7 @@ import static com.ft.sdk.garble.utils.Constants.USER_AGENT;
  */
 public class FTHttpConfig {
     private static volatile FTHttpConfig instance;
-    public String metricsUrl;
+    public String serverUrl;
     public boolean enableRequestSigning;
     public String akId;
     public String akSecret;
@@ -28,6 +28,8 @@ public class FTHttpConfig {
     public int readOutTime = 10 * 1000;
     //是否开启网络日志上报
     public boolean networkTrace;
+    public int traceType;
+
     private FTHttpConfig() {
 
     }
@@ -39,11 +41,11 @@ public class FTHttpConfig {
         return instance;
     }
 
-    public void initParams(FTSDKConfig ftsdkConfig){
-        if(ftsdkConfig == null){
+    public void initParams(FTSDKConfig ftsdkConfig) {
+        if (ftsdkConfig == null) {
             return;
         }
-        metricsUrl = ftsdkConfig.getMetricsUrl();
+        serverUrl = ftsdkConfig.getServerUrl();
         dataWayToken = ftsdkConfig.getDataWayToken();
         enableRequestSigning = ftsdkConfig.isEnableRequestSigning();
         akId = ftsdkConfig.getAkId();
@@ -54,9 +56,10 @@ public class FTHttpConfig {
         userAgent = USER_AGENT;
         EngineFactory.setTrackNetTime(ftsdkConfig.getTrackNetTime());
         networkTrace = ftsdkConfig.isNetworkTrace();
+        traceType = ftsdkConfig.getTraceType();
     }
 
-    public void release(){
+    public void release() {
         instance = null;
     }
 }

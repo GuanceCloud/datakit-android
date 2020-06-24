@@ -38,7 +38,7 @@ public class TokenCheck {
         String token = FTHttpConfig.get().dataWayToken;
         if (!Utils.isNullOrEmpty(token)) {
             ResponseData result = HttpBuilder.Builder()
-                    .setHost(FTHttpConfig.get().metricsUrl)
+                    .setHost(FTHttpConfig.get().serverUrl)
                     .setModel(Constants.URL_MODEL_TOKEN_CHECK + "/" + token)
                     .setMethod(RequestMethod.GET)
                     .enableToken(false)

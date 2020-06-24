@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public class FTSDKConfig {
     //服务器地址
-    private String metricsUrl;
+    private String serverUrl;
     //是否签名
     private boolean enableRequestSigning;
     private String akId;
@@ -70,6 +70,8 @@ public class FTSDKConfig {
     private boolean eventFlowLog;
     //是否开启系统日志的上报功能
     private boolean traceConsoleLog;
+    // openTrace 使用类型
+    private int traceType;
 
     /**
      * 构建 SDK 必要的配置参数
@@ -97,13 +99,13 @@ public class FTSDKConfig {
     /**
      * SDK 配置项构造方法
      *
-     * @param metricsUrl
+     * @param serverUrl
      * @param enableRequestSigning
      * @param akId
      * @param akSecret
      */
-    private FTSDKConfig(String metricsUrl, boolean enableRequestSigning, String akId, String akSecret) {
-        this.metricsUrl = metricsUrl;
+    private FTSDKConfig(String serverUrl, boolean enableRequestSigning, String akId, String akSecret) {
+        this.serverUrl = serverUrl;
         this.enableRequestSigning = enableRequestSigning;
         this.akId = akId;
         this.akSecret = akSecret;
@@ -117,8 +119,8 @@ public class FTSDKConfig {
         }
     }
 
-    public String getMetricsUrl() {
-        return metricsUrl;
+    public String getServerUrl() {
+        return serverUrl;
     }
 
 
@@ -535,11 +537,31 @@ public class FTSDKConfig {
 
     /**
      * 是否开启系统日志上报功能
+     *
      * @param traceConsoleLog
      * @return
      */
     public FTSDKConfig setTraceConsoleLog(boolean traceConsoleLog) {
         this.traceConsoleLog = traceConsoleLog;
         return this;
+    }
+
+    /**
+     * trace 类型
+     *
+     * @param traceType
+     * @return
+     */
+    public FTSDKConfig setTraceType(int traceType) {
+        this.traceType = traceType;
+        return this;
+    }
+
+    /**
+     * 获取 trace 类型
+     * @return
+     */
+    public int getTraceType() {
+        return traceType;
     }
 }

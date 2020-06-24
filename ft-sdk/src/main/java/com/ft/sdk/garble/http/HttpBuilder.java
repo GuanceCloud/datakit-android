@@ -31,7 +31,7 @@ public class HttpBuilder {
 
     public String getHost() {
         if (host == null) {
-            host = FTHttpConfig.get().metricsUrl;
+            host = FTHttpConfig.get().serverUrl;
         }
         return host;
     }
