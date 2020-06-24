@@ -2,6 +2,7 @@ package com.ft.sdk.garble.http;
 
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTTrack;
+import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.utils.Constants;
@@ -21,7 +22,6 @@ import java.net.InetAddress;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import okhttp3.Call;
@@ -42,17 +42,24 @@ import okio.Buffer;
  * description:
  */
 public class OKHttpEventListener extends EventListener implements Interceptor {
+    public static final String ZIPKIN_TRACE_ID = "X-B3-TraceId";
+    public static final String ZIPKIN_SPAN_ID = "X-B3-TraceId";
+    public static final String ZIPKIN_SAMPLED = "X-B3-Sampled";
+    public static final String JAEGER_KEY = "uber-trace-id";
+
     private String requestRaw;
     private String responseRaw;
     private long duration;
     private String operationName;
+    private String traceID;
+    private String spanID;
     private static LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<>();
 
     @Override
     public void requestHeadersEnd(@NotNull Call call, @NotNull Request request) {
         super.requestHeadersEnd(call, request);
         try {
-            if (!FTHttpConfig.get().networkTrace || FTHttpConfig.get().metricsUrl.contains(request.url().host())) {
+            if (!FTHttpConfig.get().networkTrace || FTHttpConfig.get().serverUrl.contains(request.url().host())) {
                 return;
             }
             StringBuilder sb = new StringBuilder();
@@ -65,6 +72,17 @@ public class OKHttpEventListener extends EventListener implements Interceptor {
                 sb.append(body).append("\n");
             }
             requestRaw = sb.toString();
+            if (FTHttpConfig.get().traceType == TraceType.ZIPKIN) {
+                traceID = request.header(ZIPKIN_TRACE_ID);
+                spanID = request.header(ZIPKIN_TRACE_ID);
+            } else if (FTHttpConfig.get().traceType == TraceType.JAEGER) {
+                String key = request.header(JAEGER_KEY);
+                if (key != null) {
+                    String[] arr = key.split(":");
+                    traceID = arr[0];
+                    spanID = arr[1];
+                }
+            }
             operationName = request.method() + "/http";
         } catch (Exception e) {
             e.printStackTrace();
@@ -75,7 +93,7 @@ public class OKHttpEventListener extends EventListener implements Interceptor {
     public void responseHeadersEnd(@NotNull Call call, @NotNull Response response) {
         super.responseHeadersEnd(call, response);
         try {
-            if (!FTHttpConfig.get().networkTrace || FTHttpConfig.get().metricsUrl.contains(response.request().url().host())) {
+            if (!FTHttpConfig.get().networkTrace || FTHttpConfig.get().serverUrl.contains(response.request().url().host())) {
                 return;
             }
             StringBuilder sb = new StringBuilder();
@@ -88,25 +106,26 @@ public class OKHttpEventListener extends EventListener implements Interceptor {
         }
     }
 
-    private void uploadNetTrace(Call call,String isError){
+    private void uploadNetTrace(Call call, String isError) {
+
         try {
             NetUtils.get().responseEndTime = System.currentTimeMillis();
-            if (!FTHttpConfig.get().networkTrace || FTHttpConfig.get().metricsUrl.contains(call.request().url().host())) {
+            if (!FTHttpConfig.get().networkTrace || FTHttpConfig.get().serverUrl.contains(call.request().url().host())) {
                 return;
             }
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("requestContent",requestRaw);
-            jsonObject.put("responseContent",responseRaw + queue.poll());
+            jsonObject.put("requestContent", requestRaw);
+            jsonObject.put("responseContent", responseRaw + queue.poll());
             LogBean logBean = new LogBean(Constants.USER_AGENT, jsonObject, System.currentTimeMillis());
             logBean.setOperationName(operationName);
             logBean.setDuration(duration * 1000);
             logBean.setClazz("tracing");
             logBean.setIsError(isError);
             logBean.setServiceName(Constants.DEFAULT_LOG_SERVICE_NAME);
-            logBean.setSpanID(Utils.MD5(DeviceUtils.getUuid(FTApplication.getApplication())));
-            logBean.setTraceID(UUID.randomUUID().toString());
+            logBean.setSpanID(spanID);
+            logBean.setTraceID(traceID);
             FTTrack.getInstance().logBackground(logBean);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -114,14 +133,14 @@ public class OKHttpEventListener extends EventListener implements Interceptor {
     @Override
     public void callEnd(@NotNull Call call) {
         super.callEnd(call);
-        uploadNetTrace(call,"false");
+        uploadNetTrace(call, "false");
     }
 
     @Override
     public void callFailed(@NotNull Call call, @NotNull IOException ioe) {
         super.callFailed(call, ioe);
         NetUtils.get().requestErrCount += 1;
-        uploadNetTrace(call,"true");
+        uploadNetTrace(call, "true");
     }
 
     @Override
@@ -160,12 +179,27 @@ public class OKHttpEventListener extends EventListener implements Interceptor {
     @Override
     public Response intercept(@NotNull Chain chain) throws IOException {
         Request request = chain.request();
-        if (!FTHttpConfig.get().networkTrace || FTHttpConfig.get().metricsUrl.contains(request.url().host())) {
+
+        if (!FTHttpConfig.get().networkTrace || FTHttpConfig.get().serverUrl.contains(request.url().host())) {
             return chain.proceed(request);
         }
         Response response = null;
         try {
-            response = chain.proceed(request);
+
+            Request.Builder builder = request.newBuilder();
+
+            String traceId = Utils.MD5(DeviceUtils.getUuid(FTApplication.getApplication()));
+            String spanId = Utils.MD5(DeviceUtils.getUuid(FTApplication.getApplication()));
+            String sampled = "1";
+            if (FTHttpConfig.get().traceType == TraceType.ZIPKIN) {
+                builder.addHeader(ZIPKIN_SPAN_ID, spanId);
+                builder.addHeader(ZIPKIN_TRACE_ID, traceId);
+                builder.addHeader(ZIPKIN_SAMPLED, sampled);
+            } else if (FTHttpConfig.get().traceType == TraceType.JAEGER) {
+                builder.addHeader(JAEGER_KEY, traceId + ":" + spanId + ":0:1");
+            }
+
+            response = chain.proceed(builder.build());
         } catch (Exception e) {
             ResponseBody responseBody = ResponseBody.create(MediaType.parse("text/plain;charset=utf-8"), "" + e.getMessage());
             response = new Response.Builder()
