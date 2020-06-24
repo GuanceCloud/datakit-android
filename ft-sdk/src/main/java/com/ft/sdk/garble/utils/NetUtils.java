@@ -60,11 +60,12 @@ public class NetUtils {
 
     /**
      * 判断是否是 SDK 内部发出的请求
+     *
      * @return
      */
-    public boolean isInnerRequest(){
+    public boolean isInnerRequest() {
         String innerUrl = FTHttpConfig.get().metricsUrl;
-        if(innerUrl != null && requestHost!= null && innerUrl.contains(requestHost)){
+        if (innerUrl != null && requestHost != null && innerUrl.contains(requestHost)) {
             return true;
         }
         return false;
@@ -148,6 +149,9 @@ public class NetUtils {
         }
 
         TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        if (telephonyManager == null) {
+            return NETWORK_NONE;
+        }
         int networkType = telephonyManager.getNetworkType();
         switch (networkType) {
             case TelephonyManager.NETWORK_TYPE_GPRS:
@@ -390,7 +394,7 @@ public class NetUtils {
                 ssId = wifiInfo.getSSID();
                 if (ssId.length() > 2 && ssId.charAt(0) == '"' && ssId.charAt(ssId.length() - 1) == '"') {
                     return ssId.substring(1, ssId.length() - 1);
-                }else if(ssId.contains("<unknown ssid>")){
+                } else if (ssId.contains("<unknown ssid>")) {
                     ssId = Constants.UNKNOWN;
                 }
             }
