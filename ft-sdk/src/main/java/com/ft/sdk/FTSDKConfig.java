@@ -71,7 +71,7 @@ public class FTSDKConfig {
     //是否开启系统日志的上报功能
     private boolean traceConsoleLog;
     // openTrace 使用类型
-    private int traceType;
+    private int traceType = TraceType.ZIPKIN;
 
     /**
      * 构建 SDK 必要的配置参数
@@ -559,6 +559,7 @@ public class FTSDKConfig {
 
     /**
      * 获取 trace 类型
+     *
      * @return
      */
     public int getTraceType() {

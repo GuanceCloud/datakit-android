@@ -106,7 +106,7 @@ public class LogBean {
             if(!tags.has("device_uuid")){
                 tags.put("device_uuid", DeviceUtils.getUuid(FTApplication.getApplication()));
             }
-            if(tags.has("application_identifier")){
+            if(!tags.has("application_identifier")){
                 tags.put("application_identifier",  DeviceUtils.getApplicationId(FTApplication.getApplication()));
             }
             tags.put("app_version_name",Utils.getAppVersionName());
