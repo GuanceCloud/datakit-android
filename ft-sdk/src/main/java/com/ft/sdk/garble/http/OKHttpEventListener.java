@@ -191,12 +191,14 @@ public class OKHttpEventListener extends EventListener implements Interceptor {
             String traceId = Utils.MD5(DeviceUtils.getUuid(FTApplication.getApplication()));
             String spanId = Utils.MD5(DeviceUtils.getUuid(FTApplication.getApplication()));
             String sampled = "1";
+            String parentSpanID = "0";
+
             if (FTHttpConfig.get().traceType == TraceType.ZIPKIN) {
                 builder.addHeader(ZIPKIN_SPAN_ID, spanId);
                 builder.addHeader(ZIPKIN_TRACE_ID, traceId);
                 builder.addHeader(ZIPKIN_SAMPLED, sampled);
             } else if (FTHttpConfig.get().traceType == TraceType.JAEGER) {
-                builder.addHeader(JAEGER_KEY, traceId + ":" + spanId + ":0:1");
+                builder.addHeader(JAEGER_KEY, traceId + ":" + spanId + ":" + parentSpanID + ":" + sampled);
             }
 
             response = chain.proceed(builder.build());
