@@ -26,12 +26,11 @@ public class OkHttpEngine implements INetEngine {
     @Override
     public void defaultConfig(HttpBuilder httpBuilder) {
         if (client == null) {
-            OKHttpEventListener listener = new OKHttpEventListener();
+            NetStatusMonitor listener = new NetStatusMonitor();
             client = new OkHttpClient.Builder()
                     .connectTimeout(httpBuilder.getSendOutTime(), TimeUnit.MILLISECONDS)
                     .readTimeout(httpBuilder.getReadOutTime(), TimeUnit.MILLISECONDS)
                     .eventListener(listener)
-                    .addInterceptor(listener)
                     .build();
         }
     }

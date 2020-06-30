@@ -37,30 +37,32 @@ public class LogBean {
     //字符串类型，true 表示该 span 的请求响应是错误,false 或者无该标签，表示该 span 的响应是正常的请求
     String isError;
     //日志内容，纯文本或 JSONString 都可以
-    Object content;
+    String content;
     //用于链路日志，当前链路的请求响应时间，微秒为单位
     long duration;
     long time;
     JSONObject tags;
     JSONObject fields;
-    public LogBean(String measurement,String content,long time){
-        this.measurement = measurement;
-        this.content = content;
-        this.time = time;
-    }
-    public LogBean(String measurement,JSONObject content,long time){
+
+    public LogBean(String measurement, String content, long time) {
         this.measurement = measurement;
         this.content = content;
         this.time = time;
     }
 
-    public JSONObject getAllFields(){
-        if(fields == null){
+    public LogBean(String measurement, JSONObject json, long time) {
+        this.measurement = measurement;
+        this.content = json.toString();
+        this.time = time;
+    }
+
+    public JSONObject getAllFields() {
+        if (fields == null) {
             fields = new JSONObject();
         }
         try {
-            fields.put("__content",content);
-            if(duration > 0) {
+            fields.put("__content", content);
+            if (duration > 0) {
                 fields.put("__duration", duration);
             }
         } catch (JSONException e) {
@@ -69,47 +71,47 @@ public class LogBean {
         return fields;
     }
 
-    public JSONObject getAllTags(){
-        if(tags == null){
+    public JSONObject getAllTags() {
+        if (tags == null) {
             tags = new JSONObject();
         }
         try {
-            if(!Utils.isNullOrEmpty(clazz)) {//目前只支持tracing
+            if (!Utils.isNullOrEmpty(clazz)) {//目前只支持tracing
                 tags.put("__class", "tracing");
             }
-            if(!Utils.isNullOrEmpty(source)) {
-                tags.put("__source",source);
+            if (!Utils.isNullOrEmpty(source)) {
+                tags.put("__source", source);
             }
-            if(!Utils.isNullOrEmpty(serviceName)){
-                tags.put("__serviceName",serviceName);
+            if (!Utils.isNullOrEmpty(serviceName)) {
+                tags.put("__serviceName", serviceName);
             }
-            if(!Utils.isNullOrEmpty(env)){
-                tags.put("__env",env);
+            if (!Utils.isNullOrEmpty(env)) {
+                tags.put("__env", env);
             }
-            tags.put("__status",status.name);
+            tags.put("__status", status.name);
 
-            if(!Utils.isNullOrEmpty(parentID)){
-                tags.put("__parentID",parentID);
+            if (!Utils.isNullOrEmpty(parentID)) {
+                tags.put("__parentID", parentID);
             }
-            if(!Utils.isNullOrEmpty(operationName)){
-                tags.put("__operationName",operationName);
+            if (!Utils.isNullOrEmpty(operationName)) {
+                tags.put("__operationName", operationName);
             }
-            if(!Utils.isNullOrEmpty(spanID)){
-                tags.put("__spanID",spanID);
+            if (!Utils.isNullOrEmpty(spanID)) {
+                tags.put("__spanID", spanID);
             }
-            if(!Utils.isNullOrEmpty(traceID)){
-                tags.put("__traceID",traceID);
+            if (!Utils.isNullOrEmpty(traceID)) {
+                tags.put("__traceID", traceID);
             }
-            if(!Utils.isNullOrEmpty(isError)){
-                tags.put("__isError",isError);
+            if (!Utils.isNullOrEmpty(isError)) {
+                tags.put("__isError", isError);
             }
-            if(!tags.has("device_uuid")){
+            if (!tags.has("device_uuid")) {
                 tags.put("device_uuid", DeviceUtils.getUuid(FTApplication.getApplication()));
             }
-            if(!tags.has("application_identifier")){
-                tags.put("application_identifier",  DeviceUtils.getApplicationId(FTApplication.getApplication()));
+            if (!tags.has("application_identifier")) {
+                tags.put("application_identifier", DeviceUtils.getApplicationId(FTApplication.getApplication()));
             }
-            tags.put("app_version_name",Utils.getAppVersionName());
+            tags.put("app_version_name", Utils.getAppVersionName());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -121,7 +123,7 @@ public class LogBean {
         return measurement;
     }
 
-    public Object getContent() {
+    public String getContent() {
         return content;
     }
 
@@ -206,7 +208,6 @@ public class LogBean {
     }
 
     /**
-     *
      * @param isError 字符串类型，true 表示该 span 的请求响应是错误,false 或者无该标签，表示该 span 的响应是正常的请求
      */
     public void setIsError(String isError) {

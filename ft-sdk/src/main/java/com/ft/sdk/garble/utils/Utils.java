@@ -58,7 +58,7 @@ public class Utils {
         return activeNetWork != null && activeNetWork.isConnected();
     }
 
-    public static String getAppVersionName(){
+    public static String getAppVersionName() {
         PackageManager manager = FTApplication.getApplication().getPackageManager();
         PackageInfo info = null;
         try {
@@ -154,6 +154,10 @@ public class Utils {
             e.printStackTrace();
             return "";
         }
+    }
+
+    public static String MD5_16(String str) {
+        return MD5(str).substring(8, 24);
     }
 
     public static String getHMacSha1(String accesskeySecret, String content) {
@@ -296,19 +300,21 @@ public class Utils {
 
     /**
      * 随机数小于采样率，可以采样
+     *
      * @return
      */
-    public static boolean enableTrackUnderRate(){
-        return randomCollectNum < trackerCollectRate*100;
+    public static boolean enableTrackUnderRate() {
+        return randomCollectNum < trackerCollectRate * 100;
     }
 
     /**
      * 生成采集随机数
+     *
      * @return
      */
-    public static void generateRandomNumber(){
+    public static void generateRandomNumber() {
         Random random = new Random();
-        randomCollectNum = Math.floor(random.nextDouble()*100);
+        randomCollectNum = Math.floor(random.nextDouble() * 100);
     }
 
 }

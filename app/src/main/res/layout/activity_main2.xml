@@ -70,4 +70,10 @@
         android:id="@+id/jump9"
         android:text="上传对象数据"
         />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/jump10"
+        android:text="链路数据尝试"
+        />
 </LinearLayout>
