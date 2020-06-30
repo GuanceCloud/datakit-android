@@ -62,10 +62,6 @@ public class Main2Activity extends AppCompatActivity {
             trackImmediateErr();
         });
 
-        findViewById(R.id.jump3).setOnClickListener(v -> {
-            FTTrack.getInstance().trackFlowChart("ft_sdk_android", "001", "开始", null, 1000, null, null);
-        });
-
         findViewById(R.id.jump4).setOnClickListener(v -> {
             FTSdk.get().shutDown();
         });
@@ -85,8 +81,6 @@ public class Main2Activity extends AppCompatActivity {
                             FTAutoTrackType.APP_START.type)//设置埋点事件类型的白名单
                     //.setWhiteActivityClasses(Arrays.asList(MainActivity.class, Main2Activity.class))//设置埋点页面的白名单
                     //.setWhiteViewClasses(Arrays.asList(Button.class, RadioGroup.class))
-                    .setOpenFlowChart(true)
-                    //.setProduct("demo13")
                     .setMonitorType(MonitorType.ALL);//设置监控项
             FTSdk.install(ftSDKConfig);
         });

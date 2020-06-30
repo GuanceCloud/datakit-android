@@ -36,6 +36,7 @@ public class FTSDKConfig {
     //监控类别
     private int monitorType;
     //是否打开流程图
+    @Deprecated
     private boolean openFlowChart;
     //以下三个为白名单
     private int enableAutoTrackType;
@@ -55,6 +56,7 @@ public class FTSDKConfig {
     //页面和视图树是否显示描述
     private boolean pageVtpDescEnabled;
     //流程图是否显示描述
+    @Deprecated
     private boolean flowChartDescEnabled;
     //设置是否需要采集崩溃日志
     private boolean enableTrackAppCrash;
@@ -165,6 +167,7 @@ public class FTSDKConfig {
         return monitorType;
     }
 
+    @Deprecated
     public boolean isOpenFlowChart() {
         return openFlowChart;
     }
@@ -222,6 +225,7 @@ public class FTSDKConfig {
         return pageVtpDescEnabled;
     }
 
+    @Deprecated
     public boolean isFlowChartDescEnabled() {
         return flowChartDescEnabled;
     }
@@ -322,17 +326,6 @@ public class FTSDKConfig {
      */
     public FTSDKConfig setMonitorType(int monitorType) {
         this.monitorType = monitorType;
-        return this;
-    }
-
-    /**
-     * 设置是否开启流程图
-     *
-     * @param openFlowChart
-     * @return
-     */
-    public FTSDKConfig setOpenFlowChart(boolean openFlowChart) {
-        this.openFlowChart = openFlowChart;
         return this;
     }
 
@@ -465,6 +458,8 @@ public class FTSDKConfig {
      * @param flowChartDescEnabled
      * @return
      */
+
+    @Deprecated
     public FTSDKConfig setFlowChartDescEnabled(boolean flowChartDescEnabled) {
         this.flowChartDescEnabled = flowChartDescEnabled;
         return this;

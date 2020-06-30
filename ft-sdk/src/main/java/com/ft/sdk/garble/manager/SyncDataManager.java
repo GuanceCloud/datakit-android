@@ -14,6 +14,7 @@ import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.bean.BatteryBean;
 import com.ft.sdk.garble.bean.CameraPx;
 import com.ft.sdk.garble.bean.DataType;
+import com.ft.sdk.garble.bean.NetStatusBean;
 import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.bean.UserData;
@@ -302,12 +303,15 @@ public class SyncDataManager {
                         if (!isJson) {
                             addQuotationMarks(sb, (String) value, !isTag);
                         } else {
+                            //这里作用于 field，理论上也不会 json 在 tag 中使用
                             sb.append(JSONObject.quote((String) value));
                         }
                     } else if (value instanceof Float) {
                         sb.append(Utils.formatDouble((float) value));
                     } else if (value instanceof Double) {
                         sb.append(Utils.formatDouble((double) value));
+                    } else if (value instanceof Long || value instanceof Integer || value instanceof Boolean) {
+                        sb.append(value);
                     } else {
                         sb.append("\"" + Utils.translateFieldValue(value.toString()).replaceAll("\\\\\\\\\"", "\\\\\\\\\\\\\"") + "\"");
                     }
@@ -611,16 +615,17 @@ public class SyncDataManager {
             tags.put("roam", NetUtils.get().getRoamState());
             fields.put("wifi_ssid", NetUtils.get().getSSId());
             fields.put("wifi_ip", NetUtils.get().getWifiIp());
-            if (NetUtils.get().isInnerRequest()) {
-                fields.put("_network_tcp_time", NetUtils.get().getTcpTime());
-                fields.put("_network_dns_time", NetUtils.get().getDNSTime());
-                fields.put("_network_response_time", NetUtils.get().getResponseTime());
+            NetStatusBean lastStatus = NetUtils.get().getLastMonitorStatus();
+            if (lastStatus.isInnerRequest()) {
+                fields.put("_network_tcp_time", lastStatus.getTcpTime());
+                fields.put("_network_dns_time", lastStatus.getDNSTime());
+                fields.put("_network_response_time", lastStatus.getResponseTime());
             } else {
-                fields.put("network_tcp_time", NetUtils.get().getTcpTime());
-                fields.put("network_dns_time", NetUtils.get().getDNSTime());
-                fields.put("network_response_time", NetUtils.get().getResponseTime());
+                fields.put("network_tcp_time", lastStatus.getTcpTime());
+                fields.put("network_dns_time", lastStatus.getDNSTime());
+                fields.put("network_response_time", lastStatus.getResponseTime());
             }
-            fields.put("network_error_rate", NetUtils.get().getErrorRate());
+            fields.put("network_error_rate", lastStatus.getErrorRate());
         } catch (Exception e) {
             LogUtils.e("网络数据获取异常:" + e.getMessage());
         }

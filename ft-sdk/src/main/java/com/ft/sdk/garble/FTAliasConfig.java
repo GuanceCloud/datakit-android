@@ -18,6 +18,7 @@ public class FTAliasConfig {
     //事件别名对应 map
     private Map<String,String> eventAliasMap;
 
+    @Deprecated
     private boolean flowChartAlias = false;
     private boolean pageVtpAlias = false;
     private FTAliasConfig(){}
