@@ -10,6 +10,7 @@ import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -24,7 +25,6 @@ import java.util.UUID;
 
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
-import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
@@ -42,17 +42,18 @@ public class NetWorkTracingListener implements Interceptor {
     public static final String ZIPKIN_SAMPLED = "X-B3-Sampled";
     public static final String JAEGER_KEY = "uber-trace-id";
 
-    private void uploadNetTrace(Request request, Response response, String traceID, String spanID, String body) {
-
+    private void uploadNetTrace(Request request, @Nullable Response response, String traceID,
+                                String spanID, String responseBody, long duration) {
         try {
             if (!FTHttpConfig.get().networkTrace) {
                 return;
             }
+
             String operationName = request.method() + "/http";
 
             JSONObject requestContent = buildRequestJsonContent(request);
-            JSONObject responseContent = buildResponseJsonContent(response, body);
-            long duration = response.receivedResponseAtMillis() - response.sentRequestAtMillis();
+            JSONObject responseContent = buildResponseJsonContent(response, responseBody);
+            boolean isError = response == null || response.code() != HttpURLConnection.HTTP_OK;
 
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("requestContent", requestContent);
@@ -61,7 +62,7 @@ public class NetWorkTracingListener implements Interceptor {
             logBean.setOperationName(operationName);
             logBean.setDuration(duration * 1000);
             logBean.setClazz("tracing");
-            logBean.setIsError(String.valueOf(response.code() != HttpURLConnection.HTTP_OK));
+            logBean.setIsError(String.valueOf(isError));
             logBean.setServiceName(Constants.DEFAULT_LOG_SERVICE_NAME);
             logBean.setSpanID(spanID);
             logBean.setTraceID(traceID);
@@ -84,6 +85,10 @@ public class NetWorkTracingListener implements Interceptor {
         Request.Builder requestBuilder = request.newBuilder();
         String traceID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
         String spanID = Utils.MD5_16(DeviceUtils.getUuid(FTApplication.getApplication())).toLowerCase();
+        Exception exception = null;
+
+        //请求开始时间
+        long requestTime = System.currentTimeMillis();
 
         try {
             //抓取数据内容
@@ -98,42 +103,45 @@ public class NetWorkTracingListener implements Interceptor {
             } else if (FTHttpConfig.get().traceType == TraceType.JAEGER) {
                 requestBuilder.addHeader(JAEGER_KEY, traceID + ":" + spanID + ":" + parentSpanID + ":" + sampled);
             }
+
             response = chain.proceed(requestBuilder.build());
 
-        } catch (Exception e) {
-            ResponseBody responseBody = ResponseBody.create(MediaType.parse("text/plain;charset=utf-8"), "" + e.getMessage());
-            response = new Response.Builder()
-                    .code(404)
-                    .message(e.getMessage() + "")
-                    .request(request)
-                    .body(responseBody)
-                    .protocol(Protocol.HTTP_1_1)
-                    .build();
+        } catch (IOException e) {
+            exception = e;
         }
 
-        String bodyContent = "";
+        //请求结束时间
+        long responseTime = System.currentTimeMillis();
 
-
-        Response.Builder responseBuilder = response.newBuilder();
-        Response clone = responseBuilder.build();
-        ResponseBody responseBody1 = clone.body();
-        if (HttpHeaders.promisesBody(clone)) {
-            if (responseBody1 != null) {
-                if (isPlaintext(responseBody1.contentType())) {
-                    byte[] bytes = toByteArray(responseBody1.byteStream());
-                    MediaType contentType = responseBody1.contentType();
-                    bodyContent = new String(bytes, getCharset(contentType));
-                    responseBody1 = ResponseBody.create(responseBody1.contentType(), bytes);
-                    response = response.newBuilder().body(responseBody1).build();
+        if (exception != null) {
+            uploadNetTrace(request, null, traceID, spanID, exception.getMessage(), responseTime - requestTime);
+            throw new IOException(exception);
+        } else {
+            String responseBody = "";
+            Response.Builder responseBuilder = response.newBuilder();
+            Response clone = responseBuilder.build();
+            ResponseBody responseBody1 = clone.body();
+            if (HttpHeaders.promisesBody(clone)) {
+                if (responseBody1 != null) {
+                    if (isPlaintext(responseBody1.contentType())) {
+                        byte[] bytes = toByteArray(responseBody1.byteStream());
+                        MediaType contentType = responseBody1.contentType();
+                        responseBody = new String(bytes, getCharset(contentType));
+                        responseBody1 = ResponseBody.create(responseBody1.contentType(), bytes);
+                        response = response.newBuilder().body(responseBody1).build();
+                    }
                 }
             }
+            uploadNetTrace(request, response, traceID, spanID, responseBody, responseTime - requestTime);
         }
-
-
-        uploadNetTrace(request, response, traceID, spanID, bodyContent);
         return response;
     }
 
+    /**
+     * @param request
+     * @return
+     * @throws IOException
+     */
     JSONObject buildRequestJsonContent(Request request) throws IOException {
         JSONObject json = new JSONObject();
         JSONObject headers = new JSONObject(request.headers().toMultimap());
@@ -153,9 +161,14 @@ public class NetWorkTracingListener implements Interceptor {
         return json;
     }
 
-    JSONObject buildResponseJsonContent(Response response, String body) {
+    /**
+     * @param response
+     * @param body
+     * @return
+     */
+    JSONObject buildResponseJsonContent(@Nullable Response response, String body) {
         JSONObject json = new JSONObject();
-        JSONObject headers = new JSONObject(response.headers().toMultimap());
+        JSONObject headers = response != null ? new JSONObject(response.headers().toMultimap()) : new JSONObject();
 
         try {
             json.put("headers", headers);

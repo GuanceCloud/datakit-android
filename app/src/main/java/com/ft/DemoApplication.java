@@ -50,8 +50,6 @@ public class DemoApplication extends Application {
                         FTAutoTrackType.APP_START.type)//设置埋点事件类型的白名单
                 .addPageDesc(pageAliasMap())
                 .addVtpDesc(eventAliasMap())
-                .setOpenFlowChart(true)
-                .setFlowChartDescEnabled(true)
                 .setPageVtpDescEnabled(true)
                 .setMonitorType(MonitorType.ALL)//设置监控项
                 .trackNetRequestTime(true)
