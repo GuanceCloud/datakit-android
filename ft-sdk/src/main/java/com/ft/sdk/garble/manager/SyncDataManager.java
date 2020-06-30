@@ -90,7 +90,7 @@ public class SyncDataManager {
                     jsonArray.put(jsonObject.getJSONObject(Constants.FIELDS));
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
 
         }
         return jsonArray.toString();
@@ -229,10 +229,10 @@ public class SyncDataManager {
      */
     private String getUpdateData(RecordData recordData) {
         if (CSTM.value.equals(recordData.getOp()) || FLOW_CHAT.value.equals(recordData.getOp())) {
-            return composeCustomUpdateData(true,recordData);
+            return composeCustomUpdateData(true, recordData);
         } else if (LOG.value.equals(recordData.getOp()) || KEYEVENT.value.equals(recordData.getOp())) {
             return composeCustomUpdateData(false, recordData);
-        }else {
+        } else {
             return composeAutoUpdateData(recordData);
         }
     }
@@ -242,7 +242,7 @@ public class SyncDataManager {
      *
      * @return
      */
-    private String composeCustomUpdateData(boolean addUser,RecordData recordData) {
+    private String composeCustomUpdateData(boolean addUser, RecordData recordData) {
         StringBuffer sb = new StringBuffer();
         if (recordData.getOpdata() != null) {
             try {
@@ -251,7 +251,7 @@ public class SyncDataManager {
                 JSONObject fields = opJson.optJSONObject(Constants.FIELDS);
                 StringBuffer tagSb = getCustomHash(tags, true);
                 StringBuffer valueSb = getCustomHash(fields, false);
-                if(addUser) {
+                if (addUser) {
                     addUserData(tagSb, recordData);
                 }
                 deleteLastComma(tagSb);
@@ -292,13 +292,24 @@ public class SyncDataManager {
                     addQuotationMarks(sb, UNKNOWN, !isTag);
                 } else {
                     if (value instanceof String) {
-                        addQuotationMarks(sb, (String) value, !isTag);
+                        boolean isJson = false;
+                        try {
+                            new JSONObject(value.toString());
+                            isJson = true;
+                        } catch (JSONException e) {
+                        }
+
+                        if (!isJson) {
+                            addQuotationMarks(sb, (String) value, !isTag);
+                        } else {
+                            sb.append(JSONObject.quote((String) value));
+                        }
                     } else if (value instanceof Float) {
                         sb.append(Utils.formatDouble((float) value));
                     } else if (value instanceof Double) {
                         sb.append(Utils.formatDouble((double) value));
                     } else {
-                        sb.append("\""+Utils.translateFieldValue(value.toString()).replaceAll("\\\\\\\\\"","\\\\\\\\\\\\\"")+"\"");
+                        sb.append("\"" + Utils.translateFieldValue(value.toString()).replaceAll("\\\\\\\\\"", "\\\\\\\\\\\\\"") + "\"");
                     }
                 }
             }
@@ -889,8 +900,8 @@ public class SyncDataManager {
      *
      * @param body
      */
-    public static void printUpdateData(boolean noTran,String body) {
-        if(noTran){
+    public static void printUpdateData(boolean noTran, String body) {
+        if (noTran) {
             StringBuffer sb = new StringBuffer();
             sb.append("-----------------------------------------------------------\n");
             sb.append("----------------------同步数据--开始-------------------------\n");

@@ -66,7 +66,7 @@
     *;
 }
 
--keep class com.ft.sdk.garble.http.OKHttpEventListener{
+-keep class com.ft.sdk.garble.http.NetWorkTracingListener{
     *;
 }
 
