@@ -2,7 +2,7 @@ package com.ft.sdk.garble.bean;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.garble.FTFlowChartConfig;
+import com.ft.sdk.garble.FTFlowConfig;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONException;
@@ -152,7 +152,7 @@ public class RecordData implements Cloneable {
                 recordData.put("op", op);
             }
 
-            if (FTFlowChartConfig.get().isOpenFlowChart()) {
+            if (FTFlowConfig.get().isOpenFlowChart()) {
                 if (!Utils.isNullOrEmpty(ppn)) {
                     recordData.put("ppn", ppn);
                 }

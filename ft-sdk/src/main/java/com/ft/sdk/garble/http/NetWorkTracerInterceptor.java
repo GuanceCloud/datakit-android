@@ -25,6 +25,7 @@ import java.util.UUID;
 
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
@@ -36,7 +37,7 @@ import okio.Buffer;
  * time: 2020/5/18 10:06:37
  * description:
  */
-public class NetWorkTracingListener implements Interceptor {
+public class NetWorkTracerInterceptor implements Interceptor {
     public static final String ZIPKIN_TRACE_ID = "X-B3-TraceId";
     public static final String ZIPKIN_SPAN_ID = "X-B3-SpanId";
     public static final String ZIPKIN_SAMPLED = "X-B3-Sampled";
@@ -142,7 +143,7 @@ public class NetWorkTracingListener implements Interceptor {
      * @return
      * @throws IOException
      */
-    JSONObject buildRequestJsonContent(Request request) throws IOException {
+    private JSONObject buildRequestJsonContent(Request request) throws IOException {
         JSONObject json = new JSONObject();
         JSONObject headers = new JSONObject(request.headers().toMultimap());
 
@@ -166,7 +167,7 @@ public class NetWorkTracingListener implements Interceptor {
      * @param body
      * @return
      */
-    JSONObject buildResponseJsonContent(@Nullable Response response, String body) {
+    private JSONObject buildResponseJsonContent(@Nullable Response response, String body) {
         JSONObject json = new JSONObject();
         JSONObject headers = response != null ? new JSONObject(response.headers().toMultimap()) : new JSONObject();
 
@@ -187,14 +188,14 @@ public class NetWorkTracingListener implements Interceptor {
         return charset;
     }
 
-    public static byte[] toByteArray(InputStream input) throws IOException {
+    private static byte[] toByteArray(InputStream input) throws IOException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         write(input, output);
         output.close();
         return output.toByteArray();
     }
 
-    public static void write(InputStream inputStream, OutputStream outputStream) throws IOException {
+    private static void write(InputStream inputStream, OutputStream outputStream) throws IOException {
         int len;
         byte[] buffer = new byte[4096];
         while ((len = inputStream.read(buffer)) != -1) outputStream.write(buffer, 0, len);

@@ -9,8 +9,8 @@ import java.util.UUID;
  * DATE:2020-01-09 17:26
  * Description:流程图配置类
  */
-public class FTFlowChartConfig {
-    private static FTFlowChartConfig ftFlowChartConfig;
+public class FTFlowConfig {
+    private static FTFlowConfig ftFlowChartConfig;
     //标记流程图的唯一id
     private String flowUUID;
     //是否打开流程图
@@ -21,12 +21,12 @@ public class FTFlowChartConfig {
     //流程图日志上报功能
     private boolean eventFlowLog;
 
-    private FTFlowChartConfig() {
+    private FTFlowConfig() {
     }
 
-    public static FTFlowChartConfig get() {
+    public static FTFlowConfig get() {
         if (ftFlowChartConfig == null) {
-            ftFlowChartConfig = new FTFlowChartConfig();
+            ftFlowChartConfig = new FTFlowConfig();
         }
         return ftFlowChartConfig;
     }

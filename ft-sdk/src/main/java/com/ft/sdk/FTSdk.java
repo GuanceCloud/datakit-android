@@ -11,7 +11,7 @@ import com.ft.sdk.garble.FTActivityLifecycleCallbacks;
 import com.ft.sdk.garble.FTAliasConfig;
 import com.ft.sdk.garble.FTAutoTrackConfig;
 import com.ft.sdk.garble.FTExceptionHandler;
-import com.ft.sdk.garble.FTFlowChartConfig;
+import com.ft.sdk.garble.FTFlowConfig;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.FTNetworkListener;
@@ -86,7 +86,7 @@ public class FTSdk {
         FTAutoTrackConfig.get().release();
         FTHttpConfig.get().release();
         FTNetworkListener.get().release();
-        FTFlowChartConfig.get().release();
+        FTFlowConfig.get().release();
         LocationUtils.get().stopListener();
         LogUtils.i("FT SDK 已经被关闭");
     }
@@ -201,11 +201,11 @@ public class FTSdk {
             if (mFtSDKConfig.isAutoTrack()) {
                 trackStartApp();
             }
-            if (mFtSDKConfig.isOpenFlowChart()) {
-                FTFlowChartConfig.get().initParams(mFtSDKConfig);
+            if (mFtSDKConfig.isEventFlowLog()) {
+                FTFlowConfig.get().initParams(mFtSDKConfig);
             }
             float rate = mFtSDKConfig.getCollectRate();
-            if(rate>1 || rate<0){
+            if (rate > 1 || rate < 0) {
                 throw new IllegalArgumentException("rate 值的范围应在[0,1]");
             }
             //设置采样率

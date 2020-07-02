@@ -15,7 +15,7 @@ import com.ft.sdk.garble.SyncCallback;
 import com.ft.sdk.garble.bean.KeyEventBean;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.ObjectBean;
-import com.ft.sdk.garble.http.NetWorkTracingListener;
+import com.ft.sdk.garble.http.NetWorkTracerInterceptor;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -76,6 +76,7 @@ public class Main2Activity extends AppCompatActivity {
                     .setGeoKey(true, AccountUtils.getProperty(this, AccountUtils.GEO_KEY))
                     .setNeedBindUser(false)//是否需要绑定用户信息
                     .enableAutoTrack(true)//设置是否开启自动埋点
+                    .setEventFlowLog(true)
                     .setEnableAutoTrackType(FTAutoTrackType.APP_CLICK.type |
                             FTAutoTrackType.APP_END.type |
                             FTAutoTrackType.APP_START.type)//设置埋点事件类型的白名单
@@ -160,9 +161,9 @@ public class Main2Activity extends AppCompatActivity {
                     String gmtString = sdf.format(currentTime);
 
 
-                    NetWorkTracingListener listener = new NetWorkTracingListener();
+                    NetWorkTracerInterceptor interceptor = new NetWorkTracerInterceptor();
                     OkHttpClient client = new OkHttpClient.Builder()
-                            .addInterceptor(listener)
+                            .addInterceptor(interceptor)
                             .build();
 
 
