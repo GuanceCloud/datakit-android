@@ -92,7 +92,6 @@ android{
 |        setDebug         |        是否开启调试模式         |  否   |                                 默认不开启，开启后方可打印 SDK 运行日志                                 |
 |     setMonitorType      |          设置监控项          |  否   | 默认不开启任何监控项,<br>[关于监控项说明](#四监控配置项类-monitortype),<br>[关于监控项参数获取问题](#二关于监控项中有些参数获取不到问题说明) |
 |     setNeedBindUser     |       是否开启绑定用户数据        |  否   |                  默认不开启,<br>开启后必须要绑定用户数据[如何绑定用户数据](#一初始化类-ftsdk-提供的方法)                  |
-|    setOpenFlowChart     |     是否开启自动埋点流程图数据上报     |  否   |                   [详细说明](#三关于自动埋点的页面路径流程图的说明)<br />流程图的使用必须在 enableAutoTrack 为 true 的情况下                   |
 |     enableAutoTrack     |        是否使用自动埋点         |  否   |                                    不开启将不会上报流程图和埋点事件                                    |
 | setEnableAutoTrackType  |         设置事件白名单         |  否   |                          开启自动埋点后，不设置该值表示接受所有事件类型。埋点事件类型见表下说明                           |
 | setDisableAutoTrackType |         设置事件黑名单         |  否   |                                开启自动埋点后，不设置该值表示不设置事件黑名单                                 |
@@ -107,7 +106,6 @@ android{
 |        akSecret         |    access key Secret    |  否   |                           enableRequestSigning 为 true 时，必须要填                           |
 |        setGeoKey        |   设置是否使用高德作为地址解析器和key   |  否   |      如何申请高德的 key？[点我快速了解](https://lbs.amap.com/api/webservice/guide/api/georegeo)      |
 |       trackNetRequestTime       |     设置是否开启网络请求时长的监控      |  否   |                           [点我快速了解如何监控网络请求时长](#四如何监控网络请求的相关时长)                            |
-| setFlowChartDescEnabled |      设置流程图是否使用描述显示      |  否   |                                       默认使用类名进行显示 [关于页面和视图树的描述的使用方法](#五关于页面和视图树及流程图的描述使用)                                      |
 |  setPageVtpDescEnabled  |    设置页面和视图树是否使用描述显示     |  否   |                                       默认使用类名和视图树                                       |
 |       addPageDesc       |        设置页面描述配置         |  否   |             Map 数据集，开启本地的描述日志显示，获取页面类名作为 Key，然后添加描述性文字作为 value 去创建 Map 数据集             |
 |       addVtpDesc        |        设置视图树描述配置        |  否   |             Map 数据集，开启本地的描述日志显示，获取视图树作为 Key，然后添加描述性文字作为 value 去创建 Map 数据集              |
@@ -116,8 +114,9 @@ android{
 | setTraceServiceName | 设置崩溃日志的名称 | 否 | 默认为 dataflux sdk。你可以将你的应用名称设置给该字段，用来区分不同的日志 |
 | setEnv | 设置崩溃日志中显示的应用的环境 | 否 | 默认情况下会获取应用当前的环境。如：debug、release |
 | setCollectRate | 设置采集率 | 否 | 采集率的值范围为>=0、<=1，默认值为1。<br />说明：SDK 初始化是会随机生成一个0-1之间的随机数，当这个随机数小于你设置的采集率时，那么会上报当前设备的行为相关的埋点数据，否则就不会上报当前设备的行为埋点数据<br /> |
-| setEventFlowLog | 是否开启流程图日志 | 否 | 开启后将会在后台日志模块显示应用中每个页面的打开关闭操作或者页面渲染时长 |
 | setTraceConsoleLog | 是否开启本地打印日志上报功能 | 否 | 当开启后会将应用中打印的日志上报到后台，日志等级对应关系<br />Log.v->ok;Log.i、Log.d->info;Log.e->error;Log.w->warning |
+| setTraceType | 设置链路追踪所使用的类型，目前支持 Zipkin 和 Jaeger 两种 | 否 | |
+| setEventFlowLog | 设置是否开启页面事件的日志 | 否 |  |
 
 > FTAutoTrackType 自动埋点事件说明，事件总类目前支持3种：
     FTAutoTrackType.APP_START：页面的开始事件，Activity 依赖的是其 onResume 方法，Fragment 依赖的是其 onResume 方法；
@@ -175,11 +174,9 @@ class DemoAplication : Application() {
             .setXDataKitUUID("ft-dataKit-uuid-001")
             .setNeedBindUser(true)//是否绑定用户信息
             .setMonitorType(MonitorType.ALL)//设置监控项
-            .setOpenFlowChart(true)//开启流程图
             .enableAutoTrack(true)//是否开启自动埋点
             .addPageDesc(pageAliasMap())
             .addVtpDesc(eventAliasMap())
-            .setFlowChartDescEnabled(true)
             .setPageVtpDescEnabled(true)
             .trackNetRequestTime(true)
             .setEnableTrackAppCrash(true)
@@ -334,22 +331,6 @@ class FTSDKConfig{
     public FTSDKConfig setNeedBindUser(boolean needBindUserVar);
 
     /**
-     * 设置是否开启流程图
-     *
-     * @param openFlowChart
-     * @return
-     */
-    public FTSDKConfig setOpenFlowChart(boolean openFlowChart);
-
-    /**
-     * 图标类型代号
-     *
-     * @param flowProduct
-     * @return
-     */
-    public FTSDKConfig setFlowProduct(String flowProduct);
-
-    /**
      * 设置监控类别
      * @param monitorType 支持一项或者几项取或值
      * 例如：MonitorType.BATTERY or MonitorType.MEMORY
@@ -429,15 +410,6 @@ class FTSDKConfig{
         return this;
     }
 
-    /**
-     * 设置流程图是否使用别名显示
-     * @param flowChartDescEnabled
-     * @return
-     */
-    public FTSDKConfig setFlowChartDescEnabled(boolean flowChartDescEnabled) {
-        this.flowChartDescEnabled = flowChartDescEnabled;
-        return this;
-    }
 }
 ```
 
@@ -471,19 +443,6 @@ class FTTrack{
      */
     public void trackImmediate(List<TrackBean> trackBeans, SyncCallback callback);
 
-    /**
-     * 流程图数据上报
-     *
-     * @param product 指标集，流程图以该值进行分类
-     * @param traceId 标示一个流程图的全程唯一ID
-     * @param name 流程节点名称
-     * @param parent 流程图当前流程节点的上一个流程节点名称，如果是第一个节点，该值应填null
-     * @param duration 流程图在该节点所耗费或持续时间，单位为毫秒
-     * @param tags 其他标签值（该值中不能含 traceId，name，parent 字段）
-     * @param values 其他指标（该值中不能含 duration 字段）
-     */
-    public void trackFlowChart(String product, String traceId, String name, String parent, long duration,JSONObject tags,JSONObject values);
-  
   /**
      * 将单条日志数据存入本地同步
      *
@@ -710,18 +669,7 @@ GPU 中的频率和使用率的值通过读取设备中配置文件获取，有�
 CPU 温度有些设备可能获取不到（每种手机可能 CPU 温度文件存储位置不同），如果你有这样的问题欢迎在 Issue
 中提出这问题，并把你的机型贴出来，以便我们完善 CPU 温度文件配置。
 
-### 三、关于自动埋点的页面路径流程图的说明
-当集成者通过 setOpenFlowChart 方法开启了页面路径流程图统计并设置了流程图的指标集后，我们将会通过无埋点技术
-将用户的使用页面路径上报并将其用流程图的形式显示。其中对于 Activity 我们监听的是 onResume 和 onPause 方法
-，对于 Fragment 我们监听的是 onResume 和 onPause。其中需要注意的是 Fragment 显示的方式有多种，我们
-统计如下。
-1、通过 add 和 replace 方法添加和替换 Fragment
-2、通过 hidden 和 show 方法显示和隐藏 Fragment
-3、通过 ViewPager 来控制 Fragment。
-由于这 3 种管理 Fragment 的方式，会使 Fragment 经历不同的生命周期，因此为了避免出现 Fragment 页面打开的路径
-流程图有问题，我们建议集成者使用 1 和 3 两种方式来管理 Fragment
-
-### 四、如何监控网络请求的相关时长
+### 三、如何监控网络请求的相关时长
 DataFlux SDK 中对于网络请求的全路径时长统计，是基于 OkHttp 网络请求引擎来实现的。如果你想要只想要监控 DataFlux SDK 中的相关网络
 请求的时长，你只需要在配置 SDK 时调用 openNetTime(true) 方法即可。如果你需要监控当前应用的所有网络请求，你需要按以下步骤来实现。
 
@@ -757,7 +705,7 @@ class CustomOkHttp {
 }
 ```
 
-### 五、关于页面和视图树及流程图的描述使用
+### 四、关于页面和视图树及流程图的描述使用
 
 > 重要提示：对于需要埋点的点击事件，你需要对点击的控件设置 ID，如果不设置 ID 那么视图树结尾处的控件 ID 将显示为null，这样不利于
 > 区分视图树，因此需要对每个可以点击的控件设置一个 ID
@@ -776,10 +724,8 @@ class MyApplication{
         ).setDebug(false)//是否开启Debug模式（开启后能查看调试数据）
             .setDescLog(true)//开启显示页面和描述日志的显示
             .setXDataKitUUID("ft-dataKit-uuid-001")
-            .setOpenFlowChart(true)//开启流程图
             .setProduct("demo12")//流程图唯一识别号
             .enableAutoTrack(true)//是否开启自动埋点
-            .setFlowChartDescEnabled(true)
             .setPageVtpDescEnabled(true)
             .setEnableAutoTrackType(FTAutoTrackType.APP_START.type or
                     FTAutoTrackType.APP_END.type or
@@ -826,11 +772,9 @@ class MyApplication{
         ).setDebug(true)//是否开启Debug模式（开启后能查看调试数据）
             .setDescLog(true)//开启显示页面和描述日志的显示
             .setXDataKitUUID("ft-dataKit-uuid-001")
-            .setOpenFlowChart(true)//开启流程图
             .enableAutoTrack(true)//是否开启自动埋点
             .addPageDesc(pageDescMap())
             .addVtpDesc(vtpDescMap())
-            .setFlowChartDescEnabled(true)
             .setPageVtpDescEnabled(true)
             .setEnableAutoTrackType(FTAutoTrackType.APP_START.type or
                     FTAutoTrackType.APP_END.type or
@@ -840,7 +784,7 @@ class MyApplication{
 }
 ```
 
-### 六、关于崩溃日志中混淆内容转换的问题
+### 五、关于崩溃日志中混淆内容转换的问题
 
 #### 1、问题描述
 

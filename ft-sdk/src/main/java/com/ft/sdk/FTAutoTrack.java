@@ -17,7 +17,7 @@ import androidx.annotation.Nullable;
 
 import com.ft.sdk.garble.FTAliasConfig;
 import com.ft.sdk.garble.FTAutoTrackConfig;
-import com.ft.sdk.garble.FTFlowChartConfig;
+import com.ft.sdk.garble.FTFlowConfig;
 import com.ft.sdk.garble.FTFragmentManager;
 import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.bean.LogBean;
@@ -228,23 +228,25 @@ public class FTAutoTrack {
 
     /**
      * TabLayout
+     *
      * @param tab
      */
-    public static void trackTabLayoutSelected(TabLayout.Tab tab){
+    public static void trackTabLayoutSelected(TabLayout.Tab tab) {
         try {
             Object object = tab.view.getContext();
-            clickView(tab.view, object.getClass(), AopUtils.getClassName(object), AopUtils.getSupperClassName(object), AopUtils.getParentViewTree(tab.view)+"#"+tab.getPosition());
-        }catch (Exception e){
+            clickView(tab.view, object.getClass(), AopUtils.getClassName(object), AopUtils.getSupperClassName(object), AopUtils.getParentViewTree(tab.view) + "#" + tab.getPosition());
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     /**
      * ViewPager 的页面切换
+     *
      * @param object
      * @param position
      */
-    public static void trackViewPagerChange(Object object,int position){
+    public static void trackViewPagerChange(Object object, int position) {
 
     }
 
@@ -493,10 +495,10 @@ public class FTAutoTrack {
      * @param motionEvent
      */
     public static void trackViewOnTouch(View view, MotionEvent motionEvent) {
-        try{
+        try {
             Object object = view.getContext();
             clickView(view, object.getClass(), AopUtils.getClassName(object), AopUtils.getSupperClassName(object), AopUtils.getViewTree(view));
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -591,9 +593,9 @@ public class FTAutoTrack {
     public static void putRecordFragment(@NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String parentPage) {
         long time = System.currentTimeMillis();
         try {
-            if(op == OP.OPEN_FRA) {
+            if (op == OP.OPEN_FRA) {
                 //显示Fragment的页面名称为 Activity.Fragment
-                LogUtils.showAlias("当前页面的 name 值为:" + rootPage+"."+currentPage);
+                LogUtils.showAlias("当前页面的 name 值为:" + rootPage + "." + currentPage);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -656,7 +658,7 @@ public class FTAutoTrack {
             }
         }
         try {
-            if(op == OP.OPEN_ACT) {
+            if (op == OP.OPEN_ACT) {
                 LogUtils.showAlias("当前页面的 name 值为:" + classCurrent.getSimpleName());
             }
         } catch (Exception e) {
@@ -693,73 +695,75 @@ public class FTAutoTrack {
                     recordData.setSessionid(sessionId);
                 }
                 List<RecordData> recordDataList = new ArrayList<>();
-                if(Utils.enableTrackUnderRate()) {
+                if (Utils.enableTrackUnderRate()) {
                     //在采样范围内就把该条数据添加到数据库
                     recordDataList.add(recordData);
                     LogUtils.d("FTAutoTrack数据进数据库：" + recordData.getJsonString());
                 }
                 //开启流程图，获取流程图相关数据存入数据库中
-                if (FTFlowChartConfig.get().isOpenFlowChart()) {
+                if (FTFlowConfig.get().isOpenFlowChart()) {
                     if (op == OP.OPEN_ACT || op == OP.OPEN_FRA) {
                         //如果是打开关闭页面就拷贝一条记录存入数据库，一条作为流程图数据
                         RecordData recordDataClone = recordData.clone();
                         recordDataList.add(recordDataClone);
                         recordDataClone.setPpn(parentPage);
-                        recordDataClone.setTraceId(FTFlowChartConfig.get().getFlowUUID());
+                        recordDataClone.setTraceId(FTFlowConfig.get().getFlowUUID());
                         long currentTime = System.currentTimeMillis();
-                        recordDataClone.setDuration(currentTime - FTFlowChartConfig.get().lastOpTime);
-                        FTFlowChartConfig.get().lastOpTime = currentTime;
+                        recordDataClone.setDuration(currentTime - FTFlowConfig.get().lastOpTime);
+                        FTFlowConfig.get().lastOpTime = currentTime;
                     }
                 }
-                addLogging(currentPage, op);
+                addLogging(currentPage, op, vtp);
                 FTManager.getFTDBManager().insertFtOptList(recordDataList);
                 FTManager.getSyncTaskManager().executeSyncPoll();
             } catch (Exception e) {
             }
         });
     }
-    private static void addLogging(String currentPage,OP op){
-        addLogging(currentPage,op,0);
+
+    private static void addLogging(String currentPage, OP op, @Nullable String vtp) {
+        addLogging(currentPage, op, 0, vtp);
     }
 
-    private static void addLogging(String currentPage,OP op,long duration){
-        if(!FTFlowChartConfig.get().isEventFlowLog()){
+    private static void addLogging(String currentPage, OP op, long duration, @Nullable String vtp) {
+        if (!FTFlowConfig.get().isEventFlowLog()) {
             return;
         }
         String operationName = "";
         String event = "";
-        switch (op){
+        switch (op) {
             case CLK:
-                operationName = "click/event";
                 event = "click";
                 break;
             case LANC:
-                operationName = "launch/event";
                 event = "launch";
                 break;
             case OPEN_ACT:
             case OPEN_FRA:
-                operationName = "enter/event";
                 event = "enter";
                 break;
             case CLS_ACT:
             case CLS_FRA:
-                operationName = "leave/event";
                 event = "leave";
                 break;
             case OPEN:
-                operationName = "open/event";
                 event = "open";
         }
-        if(currentPage == null){currentPage = Constants.UNKNOWN;}
+        operationName = event + "/event";
         JSONObject content = new JSONObject();
         try {
-            content.put("current_page_name",currentPage);
-            content.put("event",event);
+            if (currentPage != null) {
+                content.put("current_page_name", currentPage);
+            }
+            content.put("event", event);
+            if (vtp != null) {
+                content.put("view_tree_path", vtp);
+
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        LogBean logBean = new LogBean(Constants.USER_AGENT,content.toString(),System.currentTimeMillis());
+        LogBean logBean = new LogBean(Constants.USER_AGENT, content.toString(), System.currentTimeMillis());
         logBean.setOperationName(operationName);
         logBean.setDuration(duration);
         FTTrack.getInstance().logBackground(logBean);
@@ -767,17 +771,18 @@ public class FTAutoTrack {
 
     /**
      * 获取相应埋点方法（Activity）所执行的时间(该方法会在所有的继承了 AppCompatActivity 的 Activity 中的 onCreate 中调用)
+     *
      * @param desc className + "|" + methodName + "|" + methodDesc
      * @param cost
      */
-    public static void timingMethod(String desc,long cost){
+    public static void timingMethod(String desc, long cost) {
         LogUtils.d(desc);
-        try{
+        try {
             String[] arr = desc.split("\\|");
             String[] names = arr[0].split("/");
-            String pageName = names[names.length-1];
-            addLogging(pageName,OP.OPEN,cost*1000);
-        }catch (Exception e){
+            String pageName = names[names.length - 1];
+            addLogging(pageName, OP.OPEN, cost * 1000, null);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
