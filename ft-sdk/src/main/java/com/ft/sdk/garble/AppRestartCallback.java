@@ -1,6 +1,7 @@
 package com.ft.sdk.garble;
 
 import com.ft.sdk.FTAutoTrack;
+import com.ft.sdk.FTMonitor;
 import com.ft.sdk.garble.manager.FTActivityManager;
 
 /**
@@ -17,6 +18,7 @@ class AppRestartCallback {
             long currentTime = System.currentTimeMillis();
             if ((currentTime - lastLeaveTime) / 1000 >= 10) {
                 FTAutoTrack.startApp();
+                FTMonitor.get().checkForReStart();
             }
         }
     }

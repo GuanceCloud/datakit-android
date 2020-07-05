@@ -616,16 +616,19 @@ public class SyncDataManager {
             fields.put("wifi_ssid", NetUtils.get().getSSId());
             fields.put("wifi_ip", NetUtils.get().getWifiIp());
             NetStatusBean lastStatus = NetUtils.get().getLastMonitorStatus();
-            if (lastStatus.isInnerRequest()) {
-                fields.put("_network_tcp_time", lastStatus.getTcpTime());
-                fields.put("_network_dns_time", lastStatus.getDNSTime());
-                fields.put("_network_response_time", lastStatus.getResponseTime());
-            } else {
-                fields.put("network_tcp_time", lastStatus.getTcpTime());
-                fields.put("network_dns_time", lastStatus.getDNSTime());
-                fields.put("network_response_time", lastStatus.getResponseTime());
+
+            if (lastStatus != null) {
+                if (lastStatus.isInnerRequest()) {
+                    fields.put("_network_tcp_time", lastStatus.getTcpTime());
+                    fields.put("_network_dns_time", lastStatus.getDNSTime());
+                    fields.put("_network_response_time", lastStatus.getResponseTime());
+                } else {
+                    fields.put("network_tcp_time", lastStatus.getTcpTime());
+                    fields.put("network_dns_time", lastStatus.getDNSTime());
+                    fields.put("network_response_time", lastStatus.getResponseTime());
+                }
+                fields.put("network_error_rate", lastStatus.getErrorRate());
             }
-            fields.put("network_error_rate", lastStatus.getErrorRate());
         } catch (Exception e) {
             LogUtils.e("网络数据获取异常:" + e.getMessage());
         }

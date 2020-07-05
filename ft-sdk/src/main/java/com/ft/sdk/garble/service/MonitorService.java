@@ -7,6 +7,8 @@ import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 
+import com.ft.sdk.garble.utils.LogUtils;
+
 /**
  * create: by huangDianHua
  * time: 2020/4/28 14:31:34
@@ -15,6 +17,7 @@ import androidx.annotation.Nullable;
 public class MonitorService extends Service {
     public static final int START_CMD = 1;
     public static final int STOP_CMD = 2;
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -23,12 +26,13 @@ public class MonitorService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        LogUtils.i("MonitorService 启动");
         if (intent == null) {
             return START_STICKY;
         }
         Bundle bundle = intent.getExtras();
         int command = bundle != null ? bundle.getInt("command") : 0;
-        switch (command){
+        switch (command) {
             case START_CMD:
                 int period = bundle.getInt("period");
                 FTMonitorManager.install(period);

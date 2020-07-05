@@ -8,9 +8,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.ft.sdk.FTAutoTrack;
+import com.ft.sdk.FTMonitor;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.garble.manager.FTActivityManager;
 import com.ft.sdk.garble.manager.FTManager;
+import com.ft.sdk.garble.service.FTMonitorManager;
 import com.ft.sdk.garble.utils.LocationUtils;
 import com.ft.sdk.garble.utils.NetUtils;
 
@@ -39,7 +41,8 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     public void onActivityResumed(@NonNull Activity activity) {
         LocationUtils.get().startListener();
         boolean isFirstLoad = true;
-        if(FTActivityManager.get().isFirstResume.containsKey(activity.getClass().getName()) && FTActivityManager.get().isFirstResume.get(activity.getClass().getName())){
+        if(FTActivityManager.get().isFirstResume.containsKey(activity.getClass().getName())
+                && FTActivityManager.get().isFirstResume.get(activity.getClass().getName())){
             isFirstLoad = false;
         }
         //页面打开，将打开 Activity 放入管理栈中
