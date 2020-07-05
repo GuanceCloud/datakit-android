@@ -14,6 +14,8 @@ import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
+import androidx.annotation.Nullable;
+
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.garble.bean.NetStatusBean;
 
@@ -56,9 +58,13 @@ public class NetUtils {
 
     private final Object lock = new Object();
 
-    //取保多个 OKHttp 监听的时候，线程安全
+    /**
+     * 获取上一次请求之后，网络状态的一些数据
+     * @return
+     */
+    @Nullable
     public NetStatusBean getLastMonitorStatus() {
-        synchronized (lock) {
+        synchronized (lock) {//取保多个 OKHttp 监听的时候，线程安全
             return lastNetStatus;
         }
 
