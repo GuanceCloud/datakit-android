@@ -1,72 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".Main2Activity">
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/sync_data_background"
-        android:text="同步数据后台上传"
-        />
 
-    <Button
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/jump"
-        android:text="模拟正确的主动上传埋点数据"
-        />
+        android:orientation="vertical">
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/jump2"
-        android:text="模拟错误的主动埋点数据"
-        />
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/jump4"
-        android:text="停止 SDK"
-        />
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/jump5"
-        android:text="重新配置SDK"
-        />
+        <Button
+            android:id="@+id/sync_data_background"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="同步数据后台上传" />
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/jump6"
-        android:text="即时获取位置信息"
-        />
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/jump7"
-        android:text="上传日志数据"
-        />
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/jump8"
-        android:text="上传事件数据"
-        />
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/jump9"
-        android:text="上传对象数据"
-        />
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/jump10"
-        android:text="链路数据尝试"
-        />
-</LinearLayout>
+        <Button
+            android:id="@+id/jump"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="模拟正确的主动上传埋点数据" />
+
+        <Button
+            android:id="@+id/jump2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="模拟错误的主动埋点数据" />
+
+        <Button
+            android:id="@+id/jump4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="停止 SDK" />
+
+        <Button
+            android:id="@+id/jump5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="重新配置SDK" />
+
+        <Button
+            android:id="@+id/jump6"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="即时获取位置信息" />
+
+        <Button
+            android:id="@+id/jump7"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="上传日志数据" />
+
+        <Button
+            android:id="@+id/jump8"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="上传事件数据" />
+
+        <Button
+            android:id="@+id/jump9"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="上传对象数据" />
+
+        <Button
+            android:id="@+id/jump10"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="链路上报（正常返回）" />
+
+        <Button
+            android:id="@+id/jump11"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="链路上报(错误返回)" />
+
+        <Button
+            android:id="@+id/jump12"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="链路上报(超时)" />
+
+        <Button
+            android:id="@+id/jump13"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="链路上报(跨线程)" />
+    </LinearLayout>
+
+
+</ScrollView>
