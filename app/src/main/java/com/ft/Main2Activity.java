@@ -16,7 +16,7 @@ import com.ft.sdk.garble.SyncCallback;
 import com.ft.sdk.garble.bean.KeyEventBean;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.ObjectBean;
-import com.ft.sdk.garble.http.NetWorkTracerInterceptor;
+import com.ft.sdk.garble.http.FTNetWorkTracerInterceptor;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -175,7 +175,7 @@ public class Main2Activity extends AppCompatActivity {
             public void run() {
                 super.run();
                 OkHttpClient client = new OkHttpClient.Builder()
-                        .addInterceptor(new NetWorkTracerInterceptor())
+                        .addInterceptor(new FTNetWorkTracerInterceptor())
                         .build();
 
                 Request.Builder builder = new Request.Builder().url(url)
@@ -203,7 +203,7 @@ public class Main2Activity extends AppCompatActivity {
                 String gmtString = sdf.format(currentTime);
 
 
-                NetWorkTracerInterceptor interceptor = new NetWorkTracerInterceptor();
+                FTNetWorkTracerInterceptor interceptor = new FTNetWorkTracerInterceptor();
                 OkHttpClient client = new OkHttpClient.Builder()
                         .addInterceptor(interceptor)
                         .build();

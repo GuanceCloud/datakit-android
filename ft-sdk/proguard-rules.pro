@@ -66,7 +66,7 @@
     *;
 }
 
--keep class com.ft.sdk.garble.http.NetWorkTracerInterceptor{
+-keep class com.ft.sdk.garble.http.FTNetWorkTracerInterceptor{
     *;
 }
 
