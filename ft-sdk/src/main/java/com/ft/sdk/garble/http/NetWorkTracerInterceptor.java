@@ -25,7 +25,6 @@ import java.util.UUID;
 
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
@@ -44,7 +43,7 @@ public class NetWorkTracerInterceptor implements Interceptor {
     public static final String JAEGER_KEY = "uber-trace-id";
 
     private void uploadNetTrace(Request request, @Nullable Response response, String traceID,
-                                String spanID, String responseBody, long duration) {
+                                String spanID, String responseBody, String error, long duration) {
         try {
             if (!FTHttpConfig.get().networkTrace) {
                 return;
@@ -53,7 +52,7 @@ public class NetWorkTracerInterceptor implements Interceptor {
             String operationName = request.method() + "/http";
 
             JSONObject requestContent = buildRequestJsonContent(request);
-            JSONObject responseContent = buildResponseJsonContent(response, responseBody);
+            JSONObject responseContent = buildResponseJsonContent(response, responseBody, error);
             boolean isError = response == null || response.code() != HttpURLConnection.HTTP_OK;
 
             JSONObject jsonObject = new JSONObject();
@@ -115,7 +114,7 @@ public class NetWorkTracerInterceptor implements Interceptor {
         long responseTime = System.currentTimeMillis();
 
         if (exception != null) {
-            uploadNetTrace(request, null, traceID, spanID, exception.getMessage(), responseTime - requestTime);
+            uploadNetTrace(request, null, traceID, spanID, "", exception.getMessage(), responseTime - requestTime);
             throw new IOException(exception);
         } else {
             String responseBody = "";
@@ -133,7 +132,7 @@ public class NetWorkTracerInterceptor implements Interceptor {
                     }
                 }
             }
-            uploadNetTrace(request, response, traceID, spanID, responseBody, responseTime - requestTime);
+            uploadNetTrace(request, response, traceID, spanID, responseBody, "", responseTime - requestTime);
         }
         return response;
     }
@@ -149,6 +148,7 @@ public class NetWorkTracerInterceptor implements Interceptor {
 
         try {
             json.put("method", request.method());
+            json.put("url", request.url());
             json.put("headers", headers);
             if (request.body() != null) {
                 Buffer sink = new Buffer();
@@ -167,13 +167,17 @@ public class NetWorkTracerInterceptor implements Interceptor {
      * @param body
      * @return
      */
-    private JSONObject buildResponseJsonContent(@Nullable Response response, String body) {
+    private JSONObject buildResponseJsonContent(@Nullable Response response, String body, String error) {
         JSONObject json = new JSONObject();
         JSONObject headers = response != null ? new JSONObject(response.headers().toMultimap()) : new JSONObject();
 
         try {
+            json.put("code", response != null ? response.code() : 0);
             json.put("headers", headers);
             json.put("body", body);
+            if (error != null && !error.isEmpty()) {
+                json.put("error", error);
+            }
 
         } catch (JSONException e) {
             e.printStackTrace();
