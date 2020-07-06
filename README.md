@@ -115,8 +115,9 @@ android{
 | setEnv | 设置崩溃日志中显示的应用的环境 | 否 | 默认情况下会获取应用当前的环境。如：debug、release |
 | setCollectRate | 设置采集率 | 否 | 采集率的值范围为>=0、<=1，默认值为1。<br />说明：SDK 初始化是会随机生成一个0-1之间的随机数，当这个随机数小于你设置的采集率时，那么会上报当前设备的行为相关的埋点数据，否则就不会上报当前设备的行为埋点数据<br /> |
 | setTraceConsoleLog | 是否开启本地打印日志上报功能 | 否 | 当开启后会将应用中打印的日志上报到后台，日志等级对应关系<br />Log.v->ok;Log.i、Log.d->info;Log.e->error;Log.w->warning |
-| setTraceType | 设置链路追踪所使用的类型，目前支持 Zipkin 和 Jaeger 两种 | 否 | |
-| setEventFlowLog | 设置是否开启页面事件的日志 | 否 |  |
+| setNetworkTrace | 是否开启网络追踪功能| 否 | 开启后，可以在 web 中“日志”查看到对应日志的同时也可以在“链路追踪”中查找到对应的链路信息 |
+| setTraceType | 设置链路追踪所使用的类型。 | 否 |目前支持 Zipkin 和 Jaeger 两种，默认为 Zipkin |
+| setEventFlowLog | 设置是否开启页面事件的日志 | 否 | 可以在 web 版本日志中，查看到对应上报的日志，事件支持启动应用，进入页面，离开页面，事件点击等等 |
 
 > FTAutoTrackType 自动埋点事件说明，事件总类目前支持3种：
     FTAutoTrackType.APP_START：页面的开始事件，Activity 依赖的是其 onResume 方法，Fragment 依赖的是其 onResume 方法；
@@ -181,6 +182,7 @@ class DemoAplication : Application() {
             .trackNetRequestTime(true)
             .setEnableTrackAppCrash(true)
             .setEnv("dev")
+            .setTraceType(TraceType.ZIPKIN)
             .setCollectRate(0.5f)
             .setEnableAutoTrackType(FTAutoTrackType.APP_START.type or
                     FTAutoTrackType.APP_END.type or
@@ -724,7 +726,6 @@ class MyApplication{
         ).setDebug(false)//是否开启Debug模式（开启后能查看调试数据）
             .setDescLog(true)//开启显示页面和描述日志的显示
             .setXDataKitUUID("ft-dataKit-uuid-001")
-            .setProduct("demo12")//流程图唯一识别号
             .enableAutoTrack(true)//是否开启自动埋点
             .setPageVtpDescEnabled(true)
             .setEnableAutoTrackType(FTAutoTrackType.APP_START.type or
@@ -793,7 +794,7 @@ class MyApplication{
 
 #### 2、解决方式
 
-* 找到 mapping 文件。如果你开启了混淆，那么在打包的时候会在该目录下（module-name->build->outputs->mapping）生成一个混淆文件映射表（mapping.txt）,该文件就是源代码与混淆后的类、方法和属性名称之间的映射。因此每次发包后应该根据应用的版本号保存好对应 mapping.txt 文件，以备根据后台日志 tag 中的版本名字段（app_version_name）来找到对应 mapping.txt 文件。
+* 找到 mapping 文件。如果你开启了混淆，那么在打包的时候会在该目录下（module-name -> build -> outputs -> mapping）生成一个混淆文件映射表（mapping.txt）,该文件就是源代码与混淆后的类、方法和属性名称之间的映射。因此每次发包后应该根据应用的版本号保存好对应 mapping.txt 文件，以备根据后台日志 tag 中的版本名字段（app_version_name）来找到对应 mapping.txt 文件。
 
 * 下载崩溃日志文件。到 DataFlux 的后台中把崩溃日志下载到本地，这里假设下载到本地的文件名为 crash_log.txt
 
@@ -803,5 +804,5 @@ class MyApplication{
   retrace.bat -verbose mapping.txt crash_log.txt
   ```
 
-* 上一步是通过 retrace 命令行来执行，当然也可以通过 GUI 工具。在 <sdk-root>/tools/proguard/bin 目录下有个 proguardgui.bat 或 proguardgui.sh GUI 工具。运行 proguardgui.bat 或者 ./proguardgui.sh ->从左侧的菜单中选择“ReTrace”->在上面的 Mapping file 中选择你的 mapping 文件，在下面输入框输入要还原的代码 ->点击右下方的“ReTrace!”
+* 上一步是通过 retrace 命令行来执行，当然也可以通过 GUI 工具。在 <sdk-root>/tools/proguard/bin 目录下有个 proguardgui.bat 或 proguardgui.sh GUI 工具。运行 proguardgui.bat 或者 ./proguardgui.sh -> 从左侧的菜单中选择“ReTrace” -> 在上面的 Mapping file 中选择你的 mapping 文件，在下面输入框输入要还原的代码 ->点击右下方的“ReTrace!”
 
