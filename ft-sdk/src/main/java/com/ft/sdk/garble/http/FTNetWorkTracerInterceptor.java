@@ -36,7 +36,7 @@ import okio.Buffer;
  * time: 2020/5/18 10:06:37
  * description:
  */
-public class NetWorkTracerInterceptor implements Interceptor {
+public class FTNetWorkTracerInterceptor implements Interceptor {
     public static final String ZIPKIN_TRACE_ID = "X-B3-TraceId";
     public static final String ZIPKIN_SPAN_ID = "X-B3-SpanId";
     public static final String ZIPKIN_SAMPLED = "X-B3-Sampled";

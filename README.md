@@ -604,6 +604,26 @@ public class MonitorType {
 }
 ```
 
+### 五、添加网络追踪
+目前只支持 OKHttp 网络请求追踪
+
+```java
+FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(this, [server url]),
+                true,
+                [ACCESS_KEY]
+                [ACCESS_SECRET])
+//...
+                .setNetworkTrace(true)
+                .setTraceType(TraceType.JAEGER);//默认为 ZIPKIN
+        FTSdk.install(ftSDKConfig);
+
+//建议使用全局 OkHttpClient,支持多个 OkHttpClient 且线程安全
+OkHttpClient client = new OkHttpClient.Builder()
+                        .addInterceptor(new FTNetWorkTracerInterceptor())
+                        .build();
+
+
+```
 
 ## 常见问题
 ### 一、关于 OAID
