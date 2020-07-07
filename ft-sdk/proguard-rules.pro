@@ -107,6 +107,10 @@
     *;
 }
 
+-keep class com.ft.sdk.TraceType{
+    *;
+}
+
 -keep class com.ft.sdk.garble.utils.TrackLog{
     *;
 }

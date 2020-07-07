@@ -27,7 +27,7 @@ buildscript {
     dependencies {
         //...省略部分代码
         //添加 DataFlux Plugin 的插件依赖
-        classpath 'com.cloudcare.ft.mobile.sdk.tracker.plugin:ft-plugin:1.0.0-alpha5'
+        classpath 'com.cloudcare.ft.mobile.sdk.tracker.plugin:ft-plugin:[ latest version ]'
     }
 }
 allprojects {
