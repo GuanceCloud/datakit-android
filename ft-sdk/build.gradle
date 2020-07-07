@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 
 
-def versionNameStr="1.0.3-alpha02"
+def versionNameStr="1.0.3-alpha03"
 def min_plugin_version ="1.0.1-alpha05"
 
 android {
