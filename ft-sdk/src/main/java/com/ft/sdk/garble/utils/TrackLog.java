@@ -55,6 +55,9 @@ public class TrackLog {
         return showFullLog(true, tag, msg + "\n" + Log.getStackTraceString(e), LogType.W);
     }
 
+    public static int println(String tag, String msg) {
+        return println(true,Log.INFO,tag,msg);
+    }
     public static int println(boolean upload, int priority, String tag, String msg) {
         if (upload && FTExceptionHandler.get().isTrackConsoleLog()) {
             LogBean logBean = new LogBean(Constants.USER_AGENT, Utils.translateFieldValue(msg), System.currentTimeMillis());
