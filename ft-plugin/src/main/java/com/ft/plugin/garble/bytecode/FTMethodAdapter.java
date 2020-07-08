@@ -183,9 +183,9 @@ public class FTMethodAdapter extends AdviceAdapter {
                     super.visitMethodInsn(opcode, owner, name, desc, itf);
                 }
             } else if("println".equals(name)) {
-                if("(ILjava/lang/String;Ljava/lang/String;)I".equals(desc)) {
+                if("(Ljava/lang/String;Ljava/lang/String;)I".equals(desc)) {
                     
-                    mv.visitMethodInsn(INVOKESTATIC, "com/ft/sdk/garble/utils/TrackLog", "println", "(ILjava/lang/String;Ljava/lang/String;)I", false);
+                    mv.visitMethodInsn(INVOKESTATIC, "com/ft/sdk/garble/utils/TrackLog", "println", "(Ljava/lang/String;Ljava/lang/String;)I", false);
                 } else {
                     super.visitMethodInsn(opcode, owner, name, desc, itf);
                 }
