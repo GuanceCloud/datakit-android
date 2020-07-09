@@ -16,7 +16,7 @@ import com.ft.sdk.garble.SyncCallback;
 import com.ft.sdk.garble.bean.KeyEventBean;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.ObjectBean;
-import com.ft.sdk.garble.http.FTNetWorkTracerInterceptor;
+import com.ft.sdk.FTNetWorkTracerInterceptor;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
