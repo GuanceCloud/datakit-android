@@ -4,7 +4,6 @@ import com.ft.sdk.garble.FTExceptionHandler;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.utils.Constants;
-import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.jetbrains.annotations.NotNull;
@@ -82,7 +81,7 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
         Response response = null;
         Request.Builder requestBuilder = request.newBuilder();
         String traceID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
-        String spanID = Utils.MD5_16(DeviceUtils.getUuid(FTApplication.getApplication())).toLowerCase();
+        String spanID = Utils.getGUID_16();
         Exception exception = null;
 
         //请求开始时间
