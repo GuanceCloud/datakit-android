@@ -57,7 +57,6 @@ public class DemoApplication extends Application {
                 .setEnv("dev")
                 .setCollectRate(0.5f)
                 .setNetworkTrace(true)
-                .setTraceType(TraceType.JAEGER)
                 .setEventFlowLog(true);
         FTSdk.install(ftSDKConfig);
 

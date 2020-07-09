@@ -2,7 +2,6 @@ package com.ft.sdk.garble;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.BuildConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTTrack;
 import com.ft.sdk.garble.bean.LogBean;
@@ -14,8 +13,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import static com.ft.sdk.garble.utils.Constants.DEFAULT_LOG_SERVICE_NAME;
-
 /**
  * create: by huangDianHua
  * time: 2020/6/1 13:56:26
@@ -23,24 +20,26 @@ import static com.ft.sdk.garble.utils.Constants.DEFAULT_LOG_SERVICE_NAME;
  */
 public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
     private boolean canTrackCrash;
-    private String env = BuildConfig.BUILD_TYPE;
-    private String trackServiceName = DEFAULT_LOG_SERVICE_NAME;
+    private String env;
+    private String trackServiceName;
     private static FTExceptionHandler instance;
     private Thread.UncaughtExceptionHandler mDefaultExceptionHandler;
     private boolean trackConsoleLog;
-    private FTExceptionHandler(){
+
+    private FTExceptionHandler() {
         mDefaultExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler(this);
     }
-    public static FTExceptionHandler get(){
-        if(instance == null){
+
+    public static FTExceptionHandler get() {
+        if (instance == null) {
             instance = new FTExceptionHandler();
         }
         return instance;
     }
 
-    public void initParams(FTSDKConfig ftsdkConfig){
-        if(ftsdkConfig != null){
+    public void initParams(FTSDKConfig ftsdkConfig) {
+        if (ftsdkConfig != null) {
             this.canTrackCrash = ftsdkConfig.isEnableTrackAppCrash();
             this.env = ftsdkConfig.getEnv();
             this.trackServiceName = ftsdkConfig.getTraceServiceName();
@@ -62,7 +61,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     @Override
     public void uncaughtException(@NonNull Thread t, @NonNull Throwable e) {
-        if(canTrackCrash) {
+        if (canTrackCrash) {
             Writer writer = new StringWriter();
             PrintWriter printWriter = new PrintWriter(writer);
             e.printStackTrace(printWriter);
@@ -73,7 +72,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
             }
             printWriter.close();
             String result = writer.toString();
-            LogBean logBean = new LogBean(Constants.USER_AGENT,Utils.translateFieldValue(result),System.currentTimeMillis());
+            LogBean logBean = new LogBean(Constants.USER_AGENT, Utils.translateFieldValue(result), System.currentTimeMillis());
             logBean.setStatus(Status.CRITICAL);
             logBean.setEnv(env);
             logBean.setServiceName(trackServiceName);
@@ -85,15 +84,16 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
         } catch (InterruptedException ex) {
             ex.printStackTrace();
         }
-        if(mDefaultExceptionHandler != null){
-            try{
-                mDefaultExceptionHandler.uncaughtException(t,e);
-            }catch (Exception ex){}
-        }else {
+        if (mDefaultExceptionHandler != null) {
+            try {
+                mDefaultExceptionHandler.uncaughtException(t, e);
+            } catch (Exception ex) {
+            }
+        } else {
             try {
                 android.os.Process.killProcess(android.os.Process.myPid());
                 System.exit(10);
-            }catch (Exception ex2){
+            } catch (Exception ex2) {
 
             }
         }
