@@ -16,6 +16,7 @@
  */
 package com.ft.plugin.garble.bytecode;
 
+import com.ft.plugin.BuildConfig;
 import com.ft.plugin.garble.ClassNameAnalytics;
 import com.ft.plugin.garble.FTHookConfig;
 import com.ft.plugin.garble.FTMethodCell;
@@ -24,7 +25,7 @@ import com.ft.plugin.garble.FTSubMethodCell;
 import com.ft.plugin.garble.FTTransformHelper;
 import com.ft.plugin.garble.FTUtil;
 import com.ft.plugin.garble.Logger;
-import com.ft.plugin.garble.VersionConfig;
+import com.ft.plugin.garble.VersionUtils;
 
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.MethodVisitor;
@@ -242,7 +243,7 @@ public class FTMethodAdapter extends AdviceAdapter {
 
         if(ClassNameAnalytics.isFTSdkApi(className.replaceAll("/","."))){
             if(nameDesc.equals("install(Lcom/ft/sdk/FTSDKConfig;)V")){
-                mv.visitLdcInsn(VersionConfig.PLUGIN_VERSION);
+                mv.visitLdcInsn(BuildConfig.PLUGIN_VERSION);
                 mv.visitFieldInsn(PUTSTATIC, "com/ft/sdk/FTSdk", "PLUGIN_VERSION", "Ljava/lang/String;");
                 isHasTracked = true;
                 return;
