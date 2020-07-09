@@ -6,6 +6,8 @@ import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.Map;
 
+import static com.ft.sdk.garble.utils.Constants.DEFAULT_LOG_SERVICE_NAME;
+
 /**
  * BY huangDianHua
  * DATE:2019-12-06 11:40
@@ -67,7 +69,7 @@ public class FTSDKConfig {
     //是否开启网络日志上报
     private boolean networkTrace;
     //崩溃日志的 __serviceName
-    private String traceServiceName;
+    private String traceServiceName = DEFAULT_LOG_SERVICE_NAME;
     //是否开启流程图日志显示
     private boolean eventFlowLog;
     //是否开启系统日志的上报功能

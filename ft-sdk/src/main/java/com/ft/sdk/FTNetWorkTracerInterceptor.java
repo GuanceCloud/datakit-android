@@ -87,7 +87,7 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
 
         //请求开始时间
         long requestTime = System.currentTimeMillis();
-
+        Request newRequest = null;
         try {
             //抓取数据内容
             String sampled = "1";
@@ -101,7 +101,7 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
             } else if (FTHttpConfig.get().traceType == TraceType.JAEGER) {
                 requestBuilder.addHeader(JAEGER_KEY, traceID + ":" + spanID + ":" + parentSpanID + ":" + sampled);
             }
-
+            newRequest = requestBuilder.build();
             response = chain.proceed(requestBuilder.build());
 
         } catch (IOException e) {
@@ -112,7 +112,7 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
         long responseTime = System.currentTimeMillis();
 
         if (exception != null) {
-            uploadNetTrace(request, null, traceID, spanID, "", exception.getMessage(), responseTime - requestTime);
+            uploadNetTrace(newRequest, null, traceID, spanID, "", exception.getMessage(), responseTime - requestTime);
             throw new IOException(exception);
         } else {
             String responseBody = "";
@@ -130,7 +130,7 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
                     }
                 }
             }
-            uploadNetTrace(request, response, traceID, spanID, responseBody, "", responseTime - requestTime);
+            uploadNetTrace(newRequest, response, traceID, spanID, responseBody, "", responseTime - requestTime);
         }
         return response;
     }
