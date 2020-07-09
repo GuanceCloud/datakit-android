@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ThreadPoolUtils {
     private final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
     private final int CORE_POOL_SIZE = CPU_COUNT;
-    private final int MAXIMUM_POOL_SIZE = CPU_COUNT * 2;
+    private final int MAXIMUM_POOL_SIZE = 128;
     private final int KEEP_ALIVE = 5;
     private BlockingQueue workQueue = new ArrayBlockingQueue(10);
     private ThreadPoolExecutor executor;
