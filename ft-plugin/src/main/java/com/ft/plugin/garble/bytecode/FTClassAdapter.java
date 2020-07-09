@@ -16,9 +16,10 @@
  */
 package com.ft.plugin.garble.bytecode;
 
+import com.ft.plugin.BuildConfig;
 import com.ft.plugin.garble.ClassNameAnalytics;
 import com.ft.plugin.garble.FTTransformHelper;
-import com.ft.plugin.garble.VersionConfig;
+import com.ft.plugin.garble.VersionUtils;
 
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
@@ -54,21 +55,21 @@ public class FTClassAdapter extends ClassVisitor {
 
     @Override
     public FieldVisitor visitField(int access, String name, String desc, String signature, Object value) {
-        if(ClassNameAnalytics.isFTSdkApi(className.replaceAll("/","."))){
-            if(name.equals("AGENT_VERSION")){
+        if (ClassNameAnalytics.isFTSdkApi(className.replaceAll("/", "."))) {
+            if (name.equals("AGENT_VERSION")) {
                 String agentVersion = (String) value;
-                if(!VersionConfig.firstVerGreaterEqual(agentVersion,VersionConfig.MIN_SDK_VERSION)){
-                   String errorTip = "你目前集成的 FT SDK 的版本为 "+agentVersion +",当前插件支持 SDK 的最低版本为 "+VersionConfig.MIN_SDK_VERSION
-                           +",详细信息请参考：https://github.com/CloudCare/dataflux-sdk-android";
-                   throw new Error(errorTip);
+                if (!VersionUtils.firstVerGreaterEqual(agentVersion, BuildConfig.MIN_SDK_VERSION)) {
+                    String errorTip = "你目前集成的 FT SDK 的版本为 " + agentVersion + ",当前插件支持 SDK 的最低版本为 " + BuildConfig.MIN_SDK_VERSION
+                            + ",详细信息请参考：https://github.com/CloudCare/dataflux-sdk-android";
+                    throw new Error(errorTip);
                 }
             }
-            if(name.equals("PLUGIN_MIN_VERSION")){
+            if (name.equals("PLUGIN_MIN_VERSION")) {
                 String pluginMinVersion = (String) value;
-                if(!VersionConfig.firstVerGreaterEqual(VersionConfig.PLUGIN_VERSION,pluginMinVersion)){
-                   String errorTip = "你目前集成的 FT Plugin 的版本为 "+VersionConfig.PLUGIN_VERSION +",当前 SDK 支持的插件的最低版本为 "+pluginMinVersion
-                           +",详细信息请参考：https://github.com/CloudCare/dataflux-sdk-android";
-                   throw new Error(errorTip);
+                if (!VersionUtils.firstVerGreaterEqual(BuildConfig.PLUGIN_VERSION, pluginMinVersion)) {
+                    String errorTip = "你目前集成的 FT Plugin 的版本为 " + BuildConfig.PLUGIN_VERSION + ",当前 SDK 支持的插件的最低版本为 " + pluginMinVersion
+                            + ",详细信息请参考：https://github.com/CloudCare/dataflux-sdk-android";
+                    throw new Error(errorTip);
                 }
             }
         }

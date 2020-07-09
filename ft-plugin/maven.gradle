@@ -1,7 +1,18 @@
 apply plugin: 'maven'
 group = 'com.cloudcare.ft.mobile.sdk.tracker.plugin'
-//版本修改时一定要同时更新 com.ft.plugin.garble.VersionConfig 类中的 PLUGIN_VERSION 常量
-version = '1.0.1-alpha13'
+
+version = '1.0.1-alpha14'//当前版本号
+def minVersion = '1.0.2-alpha21' //最低支持的 SDK 版本
+
+apply plugin: "com.github.gmazzo.buildconfig"//https://github.com/gmazzo/gradle-buildconfig-plugin
+
+buildConfig {
+    forClass(packageName = "com.ft.plugin", className = "BuildConfig"){
+        buildConfigField("String", "PLUGIN_VERSION", "\"$version\"")
+        buildConfigField("String", "MIN_SDK_VERSION", "\"$minVersion\"")
+    }
+
+}
 
 uploadArchives {
     repositories {
@@ -23,6 +34,7 @@ uploadArchives {
 
     }
 }
+
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
