@@ -1,8 +1,6 @@
-package com.ft.sdk.garble.http;
+package com.ft.sdk;
 
-import com.ft.sdk.FTApplication;
-import com.ft.sdk.FTTrack;
-import com.ft.sdk.TraceType;
+import com.ft.sdk.garble.FTExceptionHandler;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.utils.Constants;
@@ -63,7 +61,7 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
             logBean.setDuration(duration * 1000);
             logBean.setClazz("tracing");
             logBean.setIsError(String.valueOf(isError));
-            logBean.setServiceName(Constants.DEFAULT_LOG_SERVICE_NAME);
+            logBean.setServiceName(FTExceptionHandler.get().getTrackServiceName());
             logBean.setSpanID(spanID);
             logBean.setTraceID(traceID);
             FTTrack.getInstance().logBackground(logBean);
