@@ -15,7 +15,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
@@ -50,7 +49,7 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
 
             JSONObject requestContent = buildRequestJsonContent(request);
             JSONObject responseContent = buildResponseJsonContent(response, responseBody, error);
-            boolean isError = response == null || response.code() != HttpURLConnection.HTTP_OK;
+            boolean isError = response == null || response.code() > 400;
 
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("requestContent", requestContent);
@@ -120,7 +119,7 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
             ResponseBody responseBody1 = clone.body();
             if (HttpHeaders.promisesBody(clone)) {
                 if (responseBody1 != null) {
-                    if (isPlaintext(responseBody1.contentType())) {
+                    if (isSupportFormat(responseBody1.contentType())) {
                         byte[] bytes = toByteArray(responseBody1.byteStream());
                         MediaType contentType = responseBody1.contentType();
                         responseBody = new String(bytes, getCharset(contentType));
@@ -202,7 +201,12 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
         while ((len = inputStream.read(buffer)) != -1) outputStream.write(buffer, 0, len);
     }
 
-    private static boolean isPlaintext(MediaType mediaType) {
+    /**
+     * 支持内容抓取的
+     * @param mediaType
+     * @return
+     */
+    private static boolean isSupportFormat(MediaType mediaType) {
         if (mediaType == null) return false;
         if (mediaType.type() != null && mediaType.type().equals("text")) {
             return true;
@@ -210,8 +214,11 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
         String subtype = mediaType.subtype();
         if (subtype != null) {
             subtype = subtype.toLowerCase();
-            if (subtype.contains("x-www-form-urlencoded") || subtype.contains("json") || subtype.contains("xml") || subtype.contains("html")) //
+            if (subtype.contains("x-www-form-urlencoded") || subtype.contains("json")
+                    || subtype.contains("xml") || subtype.contains("html")) {
                 return true;
+
+            }
         }
         return false;
     }

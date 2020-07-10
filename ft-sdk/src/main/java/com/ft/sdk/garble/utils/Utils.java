@@ -13,6 +13,8 @@ import androidx.core.content.ContextCompat;
 
 import com.ft.sdk.FTApplication;
 
+import org.json.JSONObject;
+
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -268,7 +270,7 @@ public class Utils {
      *
      * @return
      */
-    public static String translateTagKeyValueAndFieldKey(String oldStr) {
+    public static String translateTagKeyValue(String oldStr) {
         oldStr = translateSpecialCharacters(",", oldStr);
         oldStr = translateSpecialCharacters("=", oldStr);
         return translateSpecialCharacters(" ", oldStr);
@@ -288,7 +290,7 @@ public class Utils {
      * For string field values use a backslash character \ to escape:
      */
     public static String translateFieldValue(String oldStr) {
-        return translateSpecialCharacters("\"", oldStr);
+        return JSONObject.quote(oldStr);//应对 json 字符
     }
 
     /**
