@@ -281,6 +281,12 @@ class FTSDK{
      * 开启定，并且获取定位结果
      */
     public static void startLocation(String geoKey, SyncCallback syncCallback);
+    
+    /**
+     * 设置开启网络请求追踪
+     * @param networkTrace
+     */
+    public void setNetworkTrace(boolean networkTrace)
 }
 ```
 
@@ -621,6 +627,9 @@ FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(this, [se
 OkHttpClient client = new OkHttpClient.Builder()
                         .addInterceptor(new FTNetWorkTracerInterceptor())
                         .build();
+
+//可以通过方法动态改变                      
+FTSdk.get().setNetworkTrace(true)
 
 
 ```

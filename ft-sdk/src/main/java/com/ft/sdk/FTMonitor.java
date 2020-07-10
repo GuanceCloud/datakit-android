@@ -21,7 +21,6 @@ public class FTMonitor {
     //轮训周期，默认10秒
     private int period = 10;
     //监控类型
-    private int monitorType = 0;
     private boolean useGeoKey;
     private String geoKey;
     private static FTMonitor instance;
@@ -61,7 +60,6 @@ public class FTMonitor {
 
     public FTMonitor setMonitorType(int monitorType) {
         FTMonitorConfig.get().setMonitorType(monitorType);
-        this.monitorType = monitorType;
         return this;
     }
 
