@@ -283,7 +283,7 @@ public class SyncDataManager {
         while (keys.hasNext()) {
             String keyTemp = keys.next();
             Object value = tags.opt(keyTemp);
-            String key = Utils.translateTagKeyValueAndFieldKey(keyTemp);
+            String key = Utils.translateTagKeyValue(keyTemp);
             sb.append(key);
             sb.append("=");
             if (value == null) {
@@ -293,19 +293,7 @@ public class SyncDataManager {
                     addQuotationMarks(sb, UNKNOWN, !isTag);
                 } else {
                     if (value instanceof String) {
-                        boolean isJson = false;
-                        try {
-                            new JSONObject(value.toString());
-                            isJson = true;
-                        } catch (JSONException e) {
-                        }
-
-                        if (!isJson) {
-                            addQuotationMarks(sb, (String) value, !isTag);
-                        } else {
-                            //这里作用于 field，理论上也不会 json 在 tag 中使用
-                            sb.append(JSONObject.quote((String) value));
-                        }
+                        addQuotationMarks(sb, (String) value, !isTag);
                     } else if (value instanceof Float) {
                         sb.append(Utils.formatDouble((float) value));
                     } else if (value instanceof Double) {
@@ -326,7 +314,7 @@ public class SyncDataManager {
         if (add) {
             sb.append("\"").append(Utils.translateFieldValue(value)).append("\"");
         } else {
-            sb.append(Utils.translateTagKeyValueAndFieldKey(value));
+            sb.append(Utils.translateTagKeyValue(value));
         }
     }
 
@@ -405,8 +393,8 @@ public class SyncDataManager {
         if (FTUserConfig.get().isNeedBindUser() && FTUserConfig.get().isUserDataBinded()) {
             UserData userData = FTUserConfig.get().getUserData(recordData.getSessionid());
             if (userData != null) {
-                sb.append("ud_name=").append(Utils.translateTagKeyValueAndFieldKey(userData.getName())).append(",");
-                sb.append("ud_id=").append(Utils.translateTagKeyValueAndFieldKey(userData.getId())).append(",");
+                sb.append("ud_name=").append(Utils.translateTagKeyValue(userData.getName())).append(",");
+                sb.append("ud_id=").append(Utils.translateTagKeyValue(userData.getId())).append(",");
                 JSONObject js = userData.getExts();
                 if (js == null) {
                     return;
@@ -415,7 +403,7 @@ public class SyncDataManager {
                 while (iterator.hasNext()) {
                     String key = iterator.next();
                     try {
-                        sb.append("ud_").append(Utils.translateTagKeyValueAndFieldKey(key)).append("=").append(Utils.translateTagKeyValueAndFieldKey(js.getString(key))).append(",");
+                        sb.append("ud_").append(Utils.translateTagKeyValue(key)).append("=").append(Utils.translateTagKeyValue(js.getString(key))).append(",");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -895,7 +883,7 @@ public class SyncDataManager {
             String mapKey = entry.getKey();
             Object mapValue = entry.getValue();
             if (mapValue instanceof String) {
-                temp.put(mapKey, Utils.translateTagKeyValueAndFieldKey((String) mapValue));
+                temp.put(mapKey, Utils.translateTagKeyValue((String) mapValue));
             } else {
                 temp.put(mapKey, mapValue);
             }
