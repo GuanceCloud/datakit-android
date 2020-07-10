@@ -239,5 +239,17 @@ public class FTSdk {
         FTAutoTrack.startApp();
     }
 
+    /**
+     * 设置开启网络请求追踪
+     * @param networkTrace
+     */
+    public void setNetworkTrace(boolean networkTrace) {
+        if (mFtSDKConfig == null) {
+            throw new InvalidParameterException("需要预先调用 install ");
+        }
+        mFtSDKConfig.setNetworkTrace(networkTrace);
+        FTHttpConfig.get().networkTrace = networkTrace;
+    }
+
 
 }
