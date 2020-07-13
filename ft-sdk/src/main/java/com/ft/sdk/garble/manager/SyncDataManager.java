@@ -892,6 +892,29 @@ public class SyncDataManager {
     }
 
     /**
+     * 构建一个默认的 ObjectBean
+     * @return
+     */
+    public static HashMap<String, Object> getDefaultObjectBean(){
+        Context context = FTApplication.getApplication();
+        HashMap<String, Object> objectHashMap = new HashMap<>();
+        objectHashMap.put("device_uuid", DeviceUtils.getUuid(context));
+        objectHashMap.put("application_identifier", DeviceUtils.getApplicationId(context));
+        objectHashMap.put("application_name", DeviceUtils.getAppName(context));
+        objectHashMap.put("agent", DeviceUtils.getSDKVersion());
+        objectHashMap.put("autoTrack", FTSdk.PLUGIN_VERSION);
+        objectHashMap.put("os", DeviceUtils.getOSName());
+        objectHashMap.put("os_version", DeviceUtils.getOSVersion());
+        objectHashMap.put("device_band", DeviceUtils.getDeviceBand());
+        objectHashMap.put("device_model", DeviceUtils.getDeviceModel());
+        objectHashMap.put("display", DeviceUtils.getDisplay(context));
+        objectHashMap.put("carrier", DeviceUtils.getCarrier(context));
+        objectHashMap.put("locale", Locale.getDefault());
+        objectHashMap.put("app_version_name",Utils.getAppVersionName());
+        return objectHashMap;
+    }
+
+    /**
      * 将上传的数据格式化（供打印日志使用）
      *
      * @param body
