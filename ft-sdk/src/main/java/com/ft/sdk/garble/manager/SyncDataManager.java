@@ -292,16 +292,14 @@ public class SyncDataManager {
                 if ("".equals(value)) {
                     addQuotationMarks(sb, UNKNOWN, !isTag);
                 } else {
-                    if (value instanceof String) {
-                        addQuotationMarks(sb, (String) value, !isTag);
-                    } else if (value instanceof Float) {
+                    if (value instanceof Float) {
                         sb.append(Utils.formatDouble((float) value));
                     } else if (value instanceof Double) {
                         sb.append(Utils.formatDouble((double) value));
                     } else if (value instanceof Long || value instanceof Integer || value instanceof Boolean) {
                         sb.append(value);
-                    } else {
-                        sb.append("\"" + Utils.translateFieldValue(value.toString()).replaceAll("\\\\\\\\\"", "\\\\\\\\\\\\\"") + "\"");
+                    } else {// String or Others
+                        addQuotationMarks(sb, (String) value, !isTag);
                     }
                 }
             }
@@ -312,7 +310,7 @@ public class SyncDataManager {
 
     private static void addQuotationMarks(StringBuffer sb, String value, boolean add) {
         if (add) {
-            sb.append("\"").append(Utils.translateFieldValue(value)).append("\"");
+            sb.append(Utils.translateFieldValue(value));
         } else {
             sb.append(Utils.translateTagKeyValue(value));
         }
