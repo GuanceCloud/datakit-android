@@ -22,12 +22,14 @@ import com.ft.sdk.garble.FTFragmentManager;
 import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.OP;
+import com.ft.sdk.garble.bean.ObjectBean;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.manager.FTActivityManager;
 import com.ft.sdk.garble.manager.FTManager;
 import com.ft.sdk.garble.manager.SyncDataManager;
 import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -714,12 +716,23 @@ public class FTAutoTrack {
                     }
                 }
                 addLogging(currentPage, op, vtp);
+                addObject(op);
                 FTManager.getFTDBManager().insertFtOptList(recordDataList);
                 FTManager.getSyncTaskManager().executeSyncPoll();
             } catch (Exception e) {
             }
         });
     }
+
+    private static void addObject(OP op) {
+        if(op != OP.LANC){
+            return;
+        }
+        Context context = FTApplication.getApplication();
+        ObjectBean objectBean = new ObjectBean(DeviceUtils.getUuid(context),Constants.DEFAULT_OBJECT_CLASS,SyncDataManager.getDefaultObjectBean());
+        FTTrack.getInstance().objectBackground(objectBean);
+    }
+
 
     private static void addLogging(String currentPage, OP op, @Nullable String vtp) {
         addLogging(currentPage, op, 0, vtp);
