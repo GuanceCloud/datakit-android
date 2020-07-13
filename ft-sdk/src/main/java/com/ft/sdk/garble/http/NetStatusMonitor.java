@@ -36,29 +36,6 @@ public class NetStatusMonitor extends EventListener {
     private String requestHost;
 
     @Override
-    public void requestHeadersEnd(@NotNull Call call, @NotNull Request request) {
-        super.requestHeadersEnd(call, request);
-        StringBuilder sb = new StringBuilder();
-        sb.append(request.headers().toString());
-        LogUtils.d("request-header:\n" + sb.toString());
-    }
-
-    @Override
-    public void responseHeadersEnd(@NotNull Call call, @NotNull Response response) {
-        super.responseHeadersEnd(call, response);
-        StringBuilder sb = new StringBuilder();
-        sb.append(response.headers().toString());
-        if (response.body() != null) {
-            try {
-                sb.append(response.body().string()).append("\n");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        LogUtils.d("response-header:\n" + sb.toString());
-    }
-
-    @Override
     public void callEnd(@NotNull Call call) {
         super.callEnd(call);
         responseEndTime = System.currentTimeMillis();
