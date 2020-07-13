@@ -290,7 +290,7 @@ public class Utils {
      * For string field values use a backslash character \ to escape:
      */
     public static String translateFieldValue(String oldStr) {
-        return JSONObject.quote(oldStr);//应对 json 字符
+        return JSONObject.quote(oldStr);//应对 json 字符且支持转化 influx field 引号转化
     }
 
     /**
