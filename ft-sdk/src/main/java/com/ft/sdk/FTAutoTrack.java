@@ -729,7 +729,7 @@ public class FTAutoTrack {
             return;
         }
         Context context = FTApplication.getApplication();
-        String name = DeviceUtils.getUuid(context)+"_"+Utils.MD5_16(DeviceUtils.getApplicationId(context));
+        String name = DeviceUtils.getUuid(context);
         ObjectBean objectBean = new ObjectBean(name,Constants.DEFAULT_OBJECT_CLASS,SyncDataManager.getDefaultObjectBean());
         FTTrack.getInstance().objectBackground(objectBean);
     }
