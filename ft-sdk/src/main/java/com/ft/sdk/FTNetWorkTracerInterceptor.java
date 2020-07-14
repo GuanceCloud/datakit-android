@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.UUID;
 
 import okhttp3.Interceptor;
@@ -54,6 +55,9 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("requestContent", requestContent);
             jsonObject.put("responseContent", responseContent);
+            if (isOverMaxLength(jsonObject.toString())) {
+                return;
+            }
             LogBean logBean = new LogBean(Constants.USER_AGENT, jsonObject, System.currentTimeMillis());
             logBean.setOperationName(operationName);
             logBean.setDuration(duration * 1000);
@@ -203,23 +207,32 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
 
     /**
      * 支持内容抓取的
+     *
      * @param mediaType
      * @return
      */
     private static boolean isSupportFormat(MediaType mediaType) {
         if (mediaType == null) return false;
-        if (mediaType.type() != null && mediaType.type().equals("text")) {
-            return true;
+        String contentType = mediaType.type() + "/" + mediaType.subtype();
+        List<String> supportContentType = FTHttpConfig.get().traceContentType;
+        if (supportContentType == null) {
+            return false;
         }
-        String subtype = mediaType.subtype();
-        if (subtype != null) {
-            subtype = subtype.toLowerCase();
-            if (subtype.contains("x-www-form-urlencoded") || subtype.contains("json")
-                    || subtype.contains("xml") || subtype.contains("html")) {
-                return true;
-
-            }
+        if (supportContentType.contains(contentType)) {
+            return true;
         }
         return false;
     }
+
+    /**
+     * 是否超过 30Kb
+     *
+     * @param content
+     * @return
+     */
+    private static boolean isOverMaxLength(String content) {
+        byte[] b = content.getBytes(StandardCharsets.UTF_8);
+        return b.length > 30 * 1024;
+    }
+
 }

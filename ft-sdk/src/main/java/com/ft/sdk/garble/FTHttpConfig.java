@@ -6,6 +6,9 @@ import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.garble.http.EngineFactory;
 import com.ft.sdk.garble.utils.DeviceUtils;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static com.ft.sdk.garble.utils.Constants.USER_AGENT;
 
 /**
@@ -29,6 +32,12 @@ public class FTHttpConfig {
     //是否开启网络日志上报
     public boolean networkTrace;
     public int traceType;
+    //支持的采集类型
+    public List<String> traceContentType = Arrays.asList("application/json",
+            "application/javascript","application/xml","application/x-www-form-urlencoded",
+            "text/html","text/xml","text/plain",
+            "multipart/form-data"
+            );
 
     private FTHttpConfig() {
 
@@ -57,6 +66,9 @@ public class FTHttpConfig {
         EngineFactory.setTrackNetTime(ftsdkConfig.getTrackNetTime());
         networkTrace = ftsdkConfig.isNetworkTrace();
         traceType = ftsdkConfig.getTraceType();
+        if(ftsdkConfig.getTraceContentType() != null){
+            traceContentType = ftsdkConfig.getTraceContentType();
+        }
     }
 
     public void release() {
