@@ -76,6 +76,8 @@ public class FTSDKConfig {
     private boolean traceConsoleLog;
     // openTrace 使用类型
     private int traceType = TraceType.ZIPKIN;
+    //支持的采集类型
+    private List<String> traceContentType;
 
     /**
      * 构建 SDK 必要的配置参数
@@ -258,6 +260,10 @@ public class FTSDKConfig {
 
     public boolean isTraceConsoleLog() {
         return traceConsoleLog;
+    }
+
+    public List<String> getTraceContentType() {
+        return traceContentType;
     }
 
     /**
@@ -561,5 +567,15 @@ public class FTSDKConfig {
      */
     public int getTraceType() {
         return traceType;
+    }
+
+    /**
+     * 设置支持的采集类型
+     * @param traceContentType
+     * @return
+     */
+    public FTSDKConfig setTraceContentType(List<String> traceContentType) {
+        this.traceContentType = traceContentType;
+        return this;
     }
 }
