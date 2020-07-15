@@ -1,7 +1,7 @@
 apply plugin: 'maven'
 group = 'com.cloudcare.ft.mobile.sdk.tracker.plugin'
 
-version = '1.0.1-alpha14'//当前版本号
+version = '1.0.1-alpha15'//当前版本号
 def minVersion = '1.0.2-alpha21' //最低支持的 SDK 版本
 
 apply plugin: "com.github.gmazzo.buildconfig"//https://github.com/gmazzo/gradle-buildconfig-plugin
