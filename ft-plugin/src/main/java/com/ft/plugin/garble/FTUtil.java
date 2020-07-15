@@ -30,7 +30,7 @@ import java.util.HashSet;
  * Description:
  */
 public class FTUtil {
-    public static final int ASM_VERSION = Opcodes.ASM6;
+    public static final int ASM_VERSION = Opcodes.ASM7;
     private static final HashSet<String> targetFragmentClass = new HashSet<>();
     private static final HashSet<String> targetXFragmentClass = new HashSet<>();
     private static final HashSet<String> targetV4FragmentClass = new HashSet<>();
