@@ -1,16 +1,13 @@
 package com.ft.plugin.garble;
 
-import com.android.build.api.transform.Context;
 import com.android.build.api.transform.TransformException;
-import com.android.build.api.transform.TransformInput;
-import com.android.build.api.transform.TransformOutputProvider;
+import com.android.build.api.transform.TransformInvocation;
 import com.ft.plugin.garble.asm.BaseTransform;
 import com.ft.plugin.garble.bytecode.FTWeaver;
 
 import org.gradle.api.Project;
 
 import java.io.IOException;
-import java.util.Collection;
 
 /**
  * BY huangDianHua
@@ -30,12 +27,12 @@ public class FTTransform extends BaseTransform {
     }
 
     @Override
-    public void transform(Context context, Collection<TransformInput> inputs, Collection<TransformInput> referencedInputs, TransformOutputProvider outputProvider, boolean isIncremental) throws IOException, TransformException, InterruptedException {
+    public void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
         ftExtension = (FTExtension) project.getExtensions().getByName("FTExt");
         Logger.setDebug(ftExtension.showLog);
         ftTransformHelper = new FTTransformHelper(ftExtension);
         bytecodeWeaver.setExtension(ftExtension);
         bytecodeWeaver.setFTTransformHelper(ftTransformHelper);
-        super.transform(context, inputs, referencedInputs, outputProvider, isIncremental);
+        super.transform(transformInvocation);
     }
 }

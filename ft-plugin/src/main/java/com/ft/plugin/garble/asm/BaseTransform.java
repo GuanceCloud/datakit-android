@@ -9,6 +9,7 @@ import com.android.build.api.transform.Status;
 import com.android.build.api.transform.Transform;
 import com.android.build.api.transform.TransformException;
 import com.android.build.api.transform.TransformInput;
+import com.android.build.api.transform.TransformInvocation;
 import com.android.build.api.transform.TransformOutputProvider;
 import com.android.build.gradle.internal.pipeline.TransformManager;
 import com.android.ide.common.internal.WaitableExecutor;
@@ -22,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLClassLoader;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,14 +32,6 @@ import java.util.Set;
  * Description:字节码转换基类
  */
 public class BaseTransform extends Transform {
-    private static final Set<QualifiedContent.Scope> SCOPES = new HashSet<>();
-
-    static {
-        SCOPES.add(QualifiedContent.Scope.PROJECT);
-        SCOPES.add(QualifiedContent.Scope.SUB_PROJECTS);
-        SCOPES.add(QualifiedContent.Scope.EXTERNAL_LIBRARIES);
-    }
-
     private Project project;
     protected BaseWeaver bytecodeWeaver;
     private WaitableExecutor waitableExecutor;
@@ -60,8 +52,8 @@ public class BaseTransform extends Transform {
     }
 
     @Override
-    public Set<QualifiedContent.Scope> getScopes() {
-        return SCOPES;
+    public Set<QualifiedContent.ScopeType> getScopes() {
+        return TransformManager.SCOPE_FULL_PROJECT;
     }
 
     @Override
@@ -69,14 +61,20 @@ public class BaseTransform extends Transform {
         return true;
     }
 
-
-    @SuppressWarnings("deprecation")
     @Override
-    public void transform(Context context,
-                          Collection<TransformInput> inputs,
-                          Collection<TransformInput> referencedInputs,
-                          TransformOutputProvider outputProvider,
-                          boolean isIncremental) throws IOException, TransformException, InterruptedException {
+    public void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
+        transformFun(transformInvocation.getContext(),
+                transformInvocation.getInputs(),
+                transformInvocation.getReferencedInputs(),
+                transformInvocation.getOutputProvider(),
+                transformInvocation.isIncremental());
+    }
+
+    private void transformFun(Context context,
+                              Collection<TransformInput> inputs,
+                              Collection<TransformInput> referencedInputs,
+                              TransformOutputProvider outputProvider,
+                              boolean isIncremental) throws IOException, TransformException, InterruptedException {
 
         Logger.info(getName() + " isIncremental = " + isIncremental);
         long startTime = System.currentTimeMillis();
@@ -181,7 +179,12 @@ public class BaseTransform extends Transform {
                 waitableExecutor.execute(() -> {
                     String filePath = file.getAbsolutePath();
                     File outputFile = new File(filePath.replace(inputDirPath, outputDirPath));
-                    bytecodeWeaver.weaveSingleClassToFile(file, outputFile, inputDirPath);
+                    try {
+                        bytecodeWeaver.weaveSingleClassToFile(file, outputFile, inputDirPath);
+                    }catch (Exception e){
+                        Logger.info("修改类异常-文件名："+filePath+"----异常原因："+e);
+                        throw e.getClass().newInstance();
+                    }
                     return null;
                 });
             }
