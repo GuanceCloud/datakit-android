@@ -225,14 +225,14 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
     }
 
     /**
-     * 是否超过 30Kb
+     * 是否超过 30KB
      *
      * @param content
      * @return
      */
     private static boolean isOverMaxLength(String content) {
         byte[] b = content.getBytes(StandardCharsets.UTF_8);
-        return b.length > 30 * 1024;
+        return b.length > 30720;
     }
 
 }
