@@ -58,10 +58,13 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
             if (isOverMaxLength(jsonObject.toString())) {
                 return;
             }
+            String endPoint = request.url().host()+":"+request.url().port();
             LogBean logBean = new LogBean(Constants.USER_AGENT, jsonObject, System.currentTimeMillis());
             logBean.setOperationName(operationName);
             logBean.setDuration(duration * 1000);
             logBean.setClazz("tracing");
+            logBean.setSpanType("entry");
+            logBean.setEndpoint(endPoint);
             logBean.setIsError(String.valueOf(isError));
             logBean.setServiceName(FTExceptionHandler.get().getTrackServiceName());
             logBean.setSpanID(spanID);
