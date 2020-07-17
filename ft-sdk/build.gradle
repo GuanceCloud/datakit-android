@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 
 
-def versionNameStr="1.0.3-alpha14"
+def versionNameStr="1.0.3-alpha15"
 def min_plugin_version ="1.0.1-alpha05"
 
 android {
@@ -12,7 +12,7 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 59
+        versionCode 60
         versionName versionNameStr
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
