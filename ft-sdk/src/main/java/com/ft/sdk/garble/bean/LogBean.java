@@ -38,6 +38,13 @@ public class LogBean {
     String isError;
     //日志内容，纯文本或 JSONString 都可以
     String content;
+    //span 的类型，目前支持 2 个值：entry 和 local，entry span 表示该 span 的调用的是服务的入口，
+    // 即该服务的对其他服务提供调用请求的端点，几乎所有服务和消息队列消费者都是 entry span，
+    // 因此只有 span 是 entry 类型的调用才是一个独立的请求。 local span 表示该 span 和远程调用没有任何关系，
+    // 只是程序内部的函数调用，例如一个普通的 Java 方法，默认值 entry
+    String spanType;
+    //请求的目标地址，客户端用于访问目标服务的网络地址(但不一定是 IP + 端口)，例如 127.0.0.1:8080 ,默认：null
+    String endpoint;
     //用于链路日志，当前链路的请求响应时间，微秒为单位
     long duration;
     long time;
@@ -104,6 +111,12 @@ public class LogBean {
             }
             if (!Utils.isNullOrEmpty(isError)) {
                 tags.put("__isError", isError);
+            }
+            if (!Utils.isNullOrEmpty(spanType)){
+                tags.put("__spanType",spanType);
+            }
+            if (!Utils.isNullOrEmpty(endpoint)){
+                tags.put("__endpoint",endpoint);
             }
             if (!tags.has("device_uuid")) {
                 tags.put("device_uuid", DeviceUtils.getUuid(FTApplication.getApplication()));
@@ -236,5 +249,21 @@ public class LogBean {
 
     public void setFields(JSONObject fields) {
         this.fields = fields;
+    }
+
+    public String getSpanType() {
+        return spanType;
+    }
+
+    public void setSpanType(String spanType) {
+        this.spanType = spanType;
+    }
+
+    public String getEndpoint() {
+        return endpoint;
+    }
+
+    public void setEndpoint(String endpoint) {
+        this.endpoint = endpoint;
     }
 }
