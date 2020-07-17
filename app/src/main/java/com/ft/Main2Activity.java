@@ -150,8 +150,8 @@ public class Main2Activity extends AppCompatActivity {
         });
 
         findViewById(R.id.jump10).setOnClickListener(v -> {
+            requestUrl("http://www.weather.com.cn/data/sk/101010100.html");
             requestUrl("https://www.baidu.com");
-
         });
 
         findViewById(R.id.jump11).setOnClickListener(v -> {
