@@ -65,17 +65,17 @@ public class SyncTaskManager {
         errorCount.set(0);
         ThreadPoolUtils.get().execute(() -> {
             try {
-                if(!TokenCheck.get().checkToken()){
+                if (!TokenCheck.get().checkToken()) {
                     running = false;
                     return;
                 }
-                Thread.sleep(10*1000);
+                Thread.sleep(10 * 1000);
                 List<RecordData> trackDataList = queryFromData(DataType.TRACK);
                 List<RecordData> objectDataList = queryFromData(DataType.OBJECT);
                 List<RecordData> logDataList = queryFromData(DataType.LOG);
                 List<RecordData> keyEventDataList = queryFromData(DataType.KEY_EVENT);
                 //如果打开绑定用户开关，但是没有绑定用户信息，那么就不上传用户数据，直到绑了
-                if(FTUserConfig.get().isNeedBindUser() && !FTUserConfig.get().isUserDataBinded()){
+                if (FTUserConfig.get().isNeedBindUser() && !FTUserConfig.get().isUserDataBinded()) {
                     trackDataList.clear();
                     LogUtils.e("请先绑定用户信息");
                 }
@@ -89,20 +89,20 @@ public class SyncTaskManager {
                         LogUtils.d(">>>连续同步失败5次，停止当前轮询同步<<<");
                         break;
                     }
-                    if(!trackDataList.isEmpty()) {
-                        handleSyncOpt(DataType.TRACK,trackDataList);
+                    if (!trackDataList.isEmpty()) {
+                        handleSyncOpt(DataType.TRACK, trackDataList);
                         trackDataList = queryFromData(DataType.TRACK);
                     }
-                    if(!objectDataList.isEmpty()) {
-                        handleSyncOpt(DataType.OBJECT,objectDataList);
+                    if (!objectDataList.isEmpty()) {
+                        handleSyncOpt(DataType.OBJECT, objectDataList);
                         objectDataList = queryFromData(DataType.OBJECT);
                     }
-                    if(!logDataList.isEmpty()) {
-                        handleSyncOpt(DataType.LOG,logDataList);
+                    if (!logDataList.isEmpty()) {
+                        handleSyncOpt(DataType.LOG, logDataList);
                         logDataList = queryFromData(DataType.LOG);
                     }
-                    if(!keyEventDataList.isEmpty()) {
-                        handleSyncOpt(DataType.KEY_EVENT,keyEventDataList);
+                    if (!keyEventDataList.isEmpty()) {
+                        handleSyncOpt(DataType.KEY_EVENT, keyEventDataList);
                         keyEventDataList = queryFromData(DataType.KEY_EVENT);
                     }
                 }
@@ -123,19 +123,21 @@ public class SyncTaskManager {
         }
         SyncDataManager syncDataManager = new SyncDataManager();
         String body = syncDataManager.getBodyContent(dataType, requestDatas);
-        SyncDataManager.printUpdateData(dataType == DataType.OBJECT,body);
-        body = body.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION).replaceAll(Constants.SEPARATION_LINE_BREAK,Constants.SEPARATION_REALLY_LINE_BREAK);
+        SyncDataManager.printUpdateData(dataType == DataType.OBJECT, body);
+        body = body.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION).replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK);
         requestNet(dataType, body, (code, response) -> {
             if (code >= 200 && code < 500) {
                 LogUtils.d("同步数据成功");
                 deleteLastQuery(requestDatas);
                 errorCount.set(0);
+                if (code > 200) {
+                    LogUtils.d("同步数据出错(忽略)-[code:" + code + ",response:" + response + "]");
+                }
             } else {
-                LogUtils.d("同步数据失败");
+                LogUtils.d("同步数据失败-[code:" + code + ",response:" + response + "]");
                 errorCount.getAndIncrement();
             }
         });
-        //LogUtils.d("同步后查询" + queryFromData());
     }
 
     private List<RecordData> queryFromData(DataType dataType) {
@@ -187,7 +189,7 @@ public class SyncTaskManager {
                 model = Constants.URL_MODEL_TRACK;
         }
         String content_type = "text/plain";
-        if(DataType.OBJECT == dataType){
+        if (DataType.OBJECT == dataType) {
             content_type = "application/json";
         }
         FTResponseData result = HttpBuilder.Builder()
