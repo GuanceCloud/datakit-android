@@ -2,6 +2,8 @@ package com.ft.sdk.garble;
 
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.DescXmlParse;
+import com.ft.sdk.garble.utils.ThreadPoolUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.util.Map;
@@ -41,6 +43,23 @@ public class FTAliasConfig {
         this.eventAliasMap = ftsdkConfig.getVtpDescMap();
         this.flowChartAlias = ftsdkConfig.isFlowChartDescEnabled();
         this.pageVtpAlias = ftsdkConfig.isPageVtpDescEnabled();
+        if(pageVtpAlias){
+            ThreadPoolUtils.get().execute(() -> {
+                Map<String,String>[] maps = DescXmlParse.readXmlBySAX();
+                if(maps != null && maps.length == 2){
+                    if (pageAliasMap != null) {
+                        pageAliasMap.putAll(maps[0]);
+                    }else{
+                        pageAliasMap = maps[0];
+                    }
+                    if (eventAliasMap != null) {
+                        eventAliasMap.putAll(maps[1]);
+                    }else{
+                        eventAliasMap = maps[1];
+                    }
+                }
+            });
+        }
     }
 
     /**
