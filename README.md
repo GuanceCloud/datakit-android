@@ -105,12 +105,12 @@ android{
 |          akId           |      access key ID      |  否   |                           enableRequestSigning 为 true 时，必须要填                           |
 |        akSecret         |    access key Secret    |  否   |                           enableRequestSigning 为 true 时，必须要填                           |
 |        setGeoKey        |   设置是否使用高德作为地址解析器和key   |  否   |      如何申请高德的 key？[点我快速了解](https://lbs.amap.com/api/webservice/guide/api/georegeo)      |
-|       trackNetRequestTime       |     设置是否开启网络请求时长的监控      |  否   |                           [点我快速了解如何监控网络请求时长](#四如何监控网络请求的相关时长)                            |
+|       trackNetRequestTime       |     设置是否开启网络请求时长的监控      |  否   |                           [点我快速了解如何监控网络请求时长](#三如何监控网络请求的相关时长)                            |
 |  setPageVtpDescEnabled  |    设置页面和视图树是否使用描述显示     |  否   |                                       默认使用类名和视图树                                       |
 |       addPageDesc       |        设置页面描述配置         |  否   |             Map 数据集，开启本地的描述日志显示，获取页面类名作为 Key，然后添加描述性文字作为 value 去创建 Map 数据集             |
 |       addVtpDesc        |        设置视图树描述配置        |  否   |             Map 数据集，开启本地的描述日志显示，获取视图树作为 Key，然后添加描述性文字作为 value 去创建 Map 数据集              |
 |       setDescLog        |    是否开启本地视图树和类名日志显示     |  否   |                           不开启将不会显示视图树和类名日志，该方法独立于  setDebug                            |
-| setEnableTrackAppCrash | 是否开启 App 崩溃日志上报功能 | 否 | 默认不开启，开启后将上报当前应用的崩溃日志。上报成功后，可以在后台的日志模块查看对应的日志。<br /> [关于崩溃日志中混淆内容转换的问题](#六关于崩溃日志中混淆内容转换的问题)|
+| setEnableTrackAppCrash | 是否开启 App 崩溃日志上报功能 | 否 | 默认不开启，开启后将上报当前应用的崩溃日志。上报成功后，可以在后台的日志模块查看对应的日志。<br /> [关于崩溃日志中混淆内容转换的问题](#五关于崩溃日志中混淆内容转换的问题)|
 | setTraceServiceName | 设置崩溃日志的名称 | 否 | 默认为 dataflux sdk。你可以将你的应用名称设置给该字段，用来区分不同的日志 |
 | setEnv | 设置崩溃日志中显示的应用的环境 | 否 | 默认情况下会获取应用当前的环境。如：debug、release |
 | setCollectRate | 设置采集率 | 否 | 采集率的值范围为>=0、<=1，默认值为1。<br />说明：SDK 初始化是会随机生成一个0-1之间的随机数，当这个随机数小于你设置的采集率时，那么会上报当前设备的行为相关的埋点数据，否则就不会上报当前设备的行为埋点数据<br /> |
@@ -286,7 +286,7 @@ class FTSDK{
      * 设置开启网络请求追踪
      * @param networkTrace
      */
-    public void setNetworkTrace(boolean networkTrace)
+    public void setNetworkTrace(boolean networkTrace);
 }
 ```
 
@@ -812,6 +812,33 @@ class MyApplication{
         FTSdk.install(ftSDKConfig)
        }
 }
+```
+
+#### 4、除了上面第3步添加两个 Map 方式外,也可以通过添加名为 ft_page_vtp_desc 的配置文件来实现
+
+具体方法如下：
+在 raw 文件夹下面建立一个名为 ft_page_vtp_desc 的 xml 文件，严格按照示例中的标签名来组织文件，文件格式如下
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <pagedesc>
+        <page
+            name="页面类名1"
+            desc="页面别名1" />
+        <page
+            name="页面类名2"
+            desc="页面别名2" />
+    </pagedesc>
+    <vtpdesc>
+        <vtp
+            desc="事件别名1"
+            path="事件视图树1" />
+        <vtp
+            desc="事件别名2"
+            path="事件视图树2" />
+    </vtpdesc>
+</root>
 ```
 
 ### 五、关于崩溃日志中混淆内容转换的问题
