@@ -48,8 +48,8 @@ public class DemoApplication extends Application {
                 .setEnableAutoTrackType(FTAutoTrackType.APP_CLICK.type |
                         FTAutoTrackType.APP_END.type |
                         FTAutoTrackType.APP_START.type)//设置埋点事件类型的白名单
-                .addPageDesc(pageAliasMap())
-                .addVtpDesc(eventAliasMap())
+                //.addPageDesc(pageAliasMap())
+                //.addVtpDesc(eventAliasMap())
                 .setPageVtpDescEnabled(true)
                 .setMonitorType(MonitorType.ALL)//设置监控项
                 .trackNetRequestTime(true)
