@@ -45,6 +45,9 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
     private void uploadNetTrace(Request request, @Nullable Response response, String traceID,
                                 String spanID, String responseBody, String error, long duration) {
         try {
+            if (!enableTrace) {
+                return;
+            }
             String operationName = request.method() + "/http";
 
             JSONObject requestContent = buildRequestJsonContent(request);
@@ -52,10 +55,8 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
             boolean isError = response == null || response.code() > 400;
 
             JSONObject jsonObject = new JSONObject();
-            if (enableTrace) {
-                jsonObject.put("requestContent", requestContent);
-                jsonObject.put("responseContent", responseContent);
-            }
+            jsonObject.put("requestContent", requestContent);
+            jsonObject.put("responseContent", responseContent);
             if (isOverMaxLength(jsonObject.toString())) {
                 return;
             }
