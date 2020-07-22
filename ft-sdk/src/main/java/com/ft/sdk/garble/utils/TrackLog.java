@@ -2,12 +2,10 @@ package com.ft.sdk.garble.utils;
 
 import android.util.Log;
 
-import com.ft.sdk.FTTrack;
 import com.ft.sdk.garble.FTExceptionHandler;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.Status;
-
-import static com.ft.sdk.garble.utils.Constants.DEFAULT_LOG_SERVICE_NAME;
+import com.ft.sdk.garble.manager.TrackLogManager;
 
 /**
  * create: by huangDianHua
@@ -64,7 +62,7 @@ public class TrackLog {
             logBean.setServiceName(FTExceptionHandler.get().getTrackServiceName());
             logBean.setStatus(getStatus(priority));
             logBean.setEnv(FTExceptionHandler.get().getEnv());
-            FTTrack.getInstance().logBackground(logBean);
+            TrackLogManager.get().trackLog(logBean);
         }
         return Log.println(priority, tag, msg);
     }

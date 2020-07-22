@@ -17,20 +17,16 @@ import com.ft.sdk.garble.http.ResponseData;
 import com.ft.sdk.garble.manager.FTManager;
 import com.ft.sdk.garble.manager.SyncDataManager;
 import com.ft.sdk.garble.utils.Constants;
-import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
 import com.ft.sdk.garble.utils.Utils;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.HttpURLConnection;
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -105,11 +101,27 @@ public class FTTrack {
     }
 
     /**
-     * 将多条日志数据存入本地同步
+     * 将多条日志数据存入本地同步(异步)
      *
      * @param logBeans
      */
     public void logBackground(List<LogBean> logBeans) {
+        if (logBeans == null) {
+            return;
+        }
+        List<TrackBean> trackBeans = new ArrayList<>();
+        for (LogBean logBean : logBeans) {
+            trackBeans.add(new TrackBean(logBean.getMeasurement(), logBean.getAllTags(), logBean.getAllFields(), logBean.getTime()));
+        }
+        trackAsync(OP.LOG, trackBeans);
+    }
+
+    /**
+     * 将多条日志数据存入本地同步（同步）
+     *
+     * @param logBeans
+     */
+    public void logBackgroundSync(List<LogBean> logBeans) {
         if (logBeans == null) {
             return;
         }
@@ -174,7 +186,7 @@ public class FTTrack {
         for (KeyEventBean keyEventBean : keyEventBeans) {
             trackBeans.add(new TrackBean(keyEventBean.getMeasurement(), keyEventBean.getAllTags(), keyEventBean.getAllFields(), keyEventBean.getTime()));
         }
-        track(OP.KEYEVENT, trackBeans);
+        trackAsync(OP.KEYEVENT, trackBeans);
     }
 
     /**
@@ -216,23 +228,24 @@ public class FTTrack {
             return;
         }
         List<TrackBean> trackBeans = new ArrayList<>();
-        for (ObjectBean objectBean:objectBeans){
-            trackBeans.add(new TrackBean("",null,objectBean.getJSONData(),0));
+        for (ObjectBean objectBean : objectBeans) {
+            trackBeans.add(new TrackBean("", null, objectBean.getJSONData(), 0));
         }
-        track(OP.OBJECT,trackBeans,syncCallback);
+        track(OP.OBJECT, trackBeans, syncCallback);
     }
+
     /**
      * 将单条对象数据直接同步
      *
      * @param objectBean
      */
     public void objectImmediate(ObjectBean objectBean, SyncCallback syncCallback) {
-        if(objectBean == null){
+        if (objectBean == null) {
             return;
         }
         List<TrackBean> trackBeans = new ArrayList<>();
-        trackBeans.add(new TrackBean("",null,objectBean.getJSONData(),0));
-        track(OP.OBJECT,trackBeans,syncCallback);
+        trackBeans.add(new TrackBean("", null, objectBean.getJSONData(), 0));
+        track(OP.OBJECT, trackBeans, syncCallback);
     }
 
     /**
@@ -245,11 +258,12 @@ public class FTTrack {
             return;
         }
         List<TrackBean> trackBeans = new ArrayList<>();
-        for (ObjectBean objectBean:objectBeans){
-            trackBeans.add(new TrackBean("",null,objectBean.getJSONData(),0));
+        for (ObjectBean objectBean : objectBeans) {
+            trackBeans.add(new TrackBean("", null, objectBean.getJSONData(), 0));
         }
-        track(OP.OBJECT,trackBeans);
+        trackAsync(OP.OBJECT, trackBeans);
     }
+
     /**
      * 将单条对象数据直接同步
      *
@@ -257,8 +271,8 @@ public class FTTrack {
      */
     public void objectBackground(ObjectBean objectBean) {
         List<TrackBean> trackBeans = new ArrayList<>();
-        trackBeans.add(new TrackBean("",null,objectBean.getJSONData(),0));
-        track(OP.OBJECT,trackBeans);
+        trackBeans.add(new TrackBean("", null, objectBean.getJSONData(), 0));
+        trackAsync(OP.OBJECT, trackBeans);
     }
 
     /**
@@ -297,30 +311,41 @@ public class FTTrack {
      *
      * @param trackBeans
      */
-    private void track(OP op, List<TrackBean> trackBeans) {
+    private void trackAsync(OP op, List<TrackBean> trackBeans) {
         try {
             if (trackBeans == null) {
                 return;
             }
-
             ThreadPoolUtils.get().execute(() -> {
-                try {
-                    List<RecordData> recordDataList = new ArrayList<>();
-                    for (TrackBean t : trackBeans) {
-                        if (op != OP.OBJECT && !isLegalValues(t.getFields())) {
-                            continue;
-                        }
-                        RecordData recordData = transTrackBeanToRecordData(op, t.getTimeMillis(), t.getMeasurement(), t.getTags(), t.getFields(), null);
-                        if (recordData != null) {
-                            recordDataList.add(recordData);
-                        }
-                    }
-                    FTManager.getFTDBManager().insertFtOptList(recordDataList);
-                    FTManager.getSyncTaskManager().executeSyncPoll();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                track(op, trackBeans);
             });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 直接将埋点数据存入本地等待同步
+     *
+     * @param trackBeans
+     */
+    private void track(OP op, List<TrackBean> trackBeans) {
+        if (trackBeans == null) {
+            return;
+        }
+        try {
+            List<RecordData> recordDataList = new ArrayList<>();
+            for (TrackBean t : trackBeans) {
+                if (op != OP.OBJECT && !isLegalValues(t.getFields())) {
+                    continue;
+                }
+                RecordData recordData = transTrackBeanToRecordData(op, t.getTimeMillis(), t.getMeasurement(), t.getTags(), t.getFields(), null);
+                if (recordData != null) {
+                    recordDataList.add(recordData);
+                }
+            }
+            FTManager.getFTDBManager().insertFtOptList(recordDataList);
+            FTManager.getSyncTaskManager().executeSyncPoll();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -439,9 +464,9 @@ public class FTTrack {
      * @param callback
      */
     private void updateRecordData(DataType dataType, List<RecordData> recordDataList, SyncCallback callback) {
-        if(!TokenCheck.get().checkToken()){
-            if(callback != null){
-                callback.onResponse(HttpURLConnection.HTTP_OK,TokenCheck.get().message);
+        if (!TokenCheck.get().checkToken()) {
+            if (callback != null) {
+                callback.onResponse(HttpURLConnection.HTTP_OK, TokenCheck.get().message);
                 return;
             }
         }
@@ -450,7 +475,7 @@ public class FTTrack {
         }
         SyncDataManager syncDataManager = new SyncDataManager();
         String body = syncDataManager.getBodyContent(dataType, recordDataList);
-        SyncDataManager.printUpdateData(dataType == DataType.OBJECT,body);
+        SyncDataManager.printUpdateData(dataType == DataType.OBJECT, body);
         body = body.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION).replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK);
         String model = Constants.URL_MODEL_TRACK;
         switch (dataType) {
@@ -467,7 +492,7 @@ public class FTTrack {
                 model = Constants.URL_MODEL_TRACK;
         }
         String content_type = "text/plain";
-        if(DataType.OBJECT == dataType){
+        if (DataType.OBJECT == dataType) {
             content_type = "application/json";
         }
         ResponseData result = HttpBuilder.Builder()
