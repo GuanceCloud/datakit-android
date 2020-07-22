@@ -57,6 +57,7 @@ public class DemoApplication extends Application {
                 .setEnv("dev")
                 .setTraceSamplingRate(0.5f)
                 .setNetworkTrace(true)
+                .setTraceConsoleLog(true)
                 .setEventFlowLog(true);
         FTSdk.install(ftSDKConfig);
 

@@ -19,8 +19,12 @@ import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Random;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -325,6 +329,15 @@ public class Utils {
         return calendar.get(Calendar.YEAR) + "-" +
                 calendar.get(Calendar.MONTH) + "-" +
                 calendar.get(Calendar.DAY_OF_MONTH);
+    }
+
+    /**
+     * 转换时间格式
+     */
+    public static String getCurrentTimeStamp() {
+        Date currentTime = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",Locale.getDefault());
+        return sdf.format(currentTime);
     }
 
     /**

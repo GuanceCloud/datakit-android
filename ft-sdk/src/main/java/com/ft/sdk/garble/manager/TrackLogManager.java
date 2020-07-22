@@ -45,13 +45,18 @@ public class TrackLogManager {
         isRunning = true;
         FutureTask<Boolean> futureTask = new FutureTask(() -> {
             try {
+                //当队列中有数据时，不断执行取数据操作
                 while (logQueue.peek() != null) {
                     isRunning = true;
-                    logBeanList.add(logQueue.poll());
-                    if (logBeanList.size() >= 20) {
+                    logBeanList.add(logQueue.poll());//取出数据放到集合中
+                    if (logBeanList.size() >= 20) {//当取出的数据大于等于20条时执行插入数据库操作
                         FTTrack.getInstance().logBackgroundSync(logBeanList);
-                        logBeanList.clear();
+                        logBeanList.clear();//插入完成后执行清除集合操作
                     }
+                }
+                if (logBeanList.size() > 0) {//当队列中数据都取完后，且集合中没有20条数据
+                    FTTrack.getInstance().logBackgroundSync(logBeanList);
+                    logBeanList.clear();
                 }
             } finally {
                 isRunning = false;
