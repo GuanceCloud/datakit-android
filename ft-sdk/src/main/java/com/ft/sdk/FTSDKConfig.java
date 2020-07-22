@@ -63,7 +63,7 @@ public class FTSDKConfig {
     //设置是否需要采集崩溃日志
     private boolean enableTrackAppCrash;
     //设置采样率
-    private float collectRate = 1;
+    private float traceSamplingRate = 1;
     //崩溃日志的环境
     private String env = BuildConfig.BUILD_TYPE;
     //是否开启网络日志上报
@@ -238,8 +238,8 @@ public class FTSDKConfig {
         return enableTrackAppCrash;
     }
 
-    public float getCollectRate() {
-        return collectRate;
+    public float getTraceSamplingRate() {
+        return traceSamplingRate;
     }
 
     public String getEnv() {
@@ -487,11 +487,11 @@ public class FTSDKConfig {
     /**
      * 设置采样率
      *
-     * @param collectRate
+     * @param traceSamplingRate
      * @return
      */
-    public FTSDKConfig setCollectRate(float collectRate) {
-        this.collectRate = collectRate;
+    public FTSDKConfig setTraceSamplingRate(float traceSamplingRate) {
+        this.traceSamplingRate = traceSamplingRate;
         return this;
     }
 

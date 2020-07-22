@@ -82,11 +82,11 @@ public class SyncTaskManager {
                 while (!trackDataList.isEmpty() || !objectDataList.isEmpty() ||
                         !logDataList.isEmpty() || !keyEventDataList.isEmpty()) {
                     if (!Utils.isNetworkAvailable()) {
-                        LogUtils.d(">>>网络未连接<<<");
+                        LogUtils.e(">>>网络未连接<<<");
                         break;
                     }
                     if (errorCount.get() >= CLOSE_TIME) {
-                        LogUtils.d(">>>连续同步失败5次，停止当前轮询同步<<<");
+                        LogUtils.e(">>>连续同步失败5次，停止当前轮询同步<<<");
                         break;
                     }
                     if (!trackDataList.isEmpty()) {
@@ -131,10 +131,10 @@ public class SyncTaskManager {
                 deleteLastQuery(requestDatas);
                 errorCount.set(0);
                 if (code > 200) {
-                    LogUtils.d("同步数据出错(忽略)-[code:" + code + ",response:" + response + "]");
+                    LogUtils.e("同步数据出错(忽略)-[code:" + code + ",response:" + response + "]");
                 }
             } else {
-                LogUtils.d("同步数据失败-[code:" + code + ",response:" + response + "]");
+                LogUtils.e("同步数据失败-[code:" + code + ",response:" + response + "]");
                 errorCount.getAndIncrement();
             }
         });

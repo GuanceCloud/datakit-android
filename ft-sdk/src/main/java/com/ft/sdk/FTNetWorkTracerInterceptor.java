@@ -39,14 +39,12 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
     public static final String ZIPKIN_SPAN_ID = "X-B3-SpanId";
     public static final String ZIPKIN_SAMPLED = "X-B3-Sampled";
     public static final String JAEGER_KEY = "uber-trace-id";
+    //是否可以采样
+    boolean enableTrace;
 
     private void uploadNetTrace(Request request, @Nullable Response response, String traceID,
                                 String spanID, String responseBody, String error, long duration) {
         try {
-            if (!FTHttpConfig.get().networkTrace) {
-                return;
-            }
-
             String operationName = request.method() + "/http";
 
             JSONObject requestContent = buildRequestJsonContent(request);
@@ -54,11 +52,14 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
             boolean isError = response == null || response.code() > 400;
 
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("requestContent", requestContent);
-            jsonObject.put("responseContent", responseContent);
+            if (enableTrace) {
+                jsonObject.put("requestContent", requestContent);
+                jsonObject.put("responseContent", responseContent);
+            }
             if (isOverMaxLength(jsonObject.toString())) {
                 return;
             }
+
             String endPoint = request.url().host()+":"+request.url().port();
             LogBean logBean = new LogBean(Constants.USER_AGENT, jsonObject, System.currentTimeMillis());
             logBean.setOperationName(operationName);
@@ -81,6 +82,7 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
     @Override
     public Response intercept(@NotNull Chain chain) throws IOException {
         Request request = chain.request();
+        enableTrace = Utils.enableTraceSamplingRate();
 
         if (!FTHttpConfig.get().networkTrace) {
             return chain.proceed(request);
@@ -95,8 +97,13 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
         long requestTime = System.currentTimeMillis();
         Request newRequest = null;
         try {
+            String sampled;
             //抓取数据内容
-            String sampled = "1";
+            if(enableTrace) {
+                sampled = "1";
+            }else{
+                sampled = "0";
+            }
             String parentSpanID = "0000000000000000";
 
             //在数据中添加标记
