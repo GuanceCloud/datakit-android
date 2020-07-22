@@ -58,7 +58,7 @@ public class TrackLog {
     }
     public static int println(boolean upload, int priority, String tag, String msg) {
         if (upload && FTExceptionHandler.get().isTrackConsoleLog()) {
-            LogBean logBean = new LogBean(Constants.USER_AGENT, Utils.translateFieldValue(msg), System.currentTimeMillis());
+            LogBean logBean = new LogBean(Constants.USER_AGENT, Utils.translateFieldValue(Utils.getCurrentTimeStamp()+ " " +tag+"\n"+msg), System.currentTimeMillis());
             logBean.setServiceName(FTExceptionHandler.get().getTrackServiceName());
             logBean.setStatus(getStatus(priority));
             logBean.setEnv(FTExceptionHandler.get().getEnv());
