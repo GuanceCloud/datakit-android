@@ -697,11 +697,8 @@ public class FTAutoTrack {
                     recordData.setSessionid(sessionId);
                 }
                 List<RecordData> recordDataList = new ArrayList<>();
-                if (Utils.enableTrackUnderRate()) {
-                    //在采样范围内就把该条数据添加到数据库
-                    recordDataList.add(recordData);
-                    LogUtils.d("FTAutoTrack数据进数据库：" + recordData.getJsonString());
-                }
+                recordDataList.add(recordData);
+                LogUtils.d("FTAutoTrack数据进数据库：" + recordData.getJsonString());
                 //开启流程图，获取流程图相关数据存入数据库中
                 if (FTFlowConfig.get().isOpenFlowChart()) {
                     if (op == OP.OPEN_ACT || op == OP.OPEN_FRA) {
