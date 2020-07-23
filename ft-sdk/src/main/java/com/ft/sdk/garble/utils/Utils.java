@@ -184,7 +184,7 @@ public class Utils {
 //                    break;
                 case 1:
                     //ASCII在97-122之间为小写，获取小写随机
-                    uid.append((char) (rd.nextInt(25) + 97));
+                    uid.append((char) (rd.nextInt(5) + 97));
                     break;
                 default:
                     break;
