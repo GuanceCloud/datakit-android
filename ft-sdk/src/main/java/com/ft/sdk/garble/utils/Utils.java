@@ -336,7 +336,7 @@ public class Utils {
      */
     public static String getCurrentTimeStamp() {
         Date currentTime = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS",Locale.getDefault());
         return sdf.format(currentTime);
     }
 

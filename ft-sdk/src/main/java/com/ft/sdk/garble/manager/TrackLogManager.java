@@ -3,6 +3,7 @@ package com.ft.sdk.garble.manager;
 
 import com.ft.sdk.FTTrack;
 import com.ft.sdk.garble.bean.LogBean;
+import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
 
 import java.util.List;
@@ -53,12 +54,13 @@ public class TrackLogManager {
                         FTTrack.getInstance().logBackgroundSync(logBeanList);
                         logBeanList.clear();//插入完成后执行清除集合操作
                     }
+                    Thread.sleep(100);
                 }
                 if (logBeanList.size() > 0) {//当队列中数据都取完后，且集合中没有20条数据
                     FTTrack.getInstance().logBackgroundSync(logBeanList);
                     logBeanList.clear();
                 }
-            } finally {
+            } catch (Exception e){}finally {
                 isRunning = false;
             }
             return true;
