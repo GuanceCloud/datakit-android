@@ -8,7 +8,6 @@ import com.ft.sdk.FTMonitor;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
-import com.ft.sdk.TraceType;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,6 +34,8 @@ import com.ft.sdk.FTSdk;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 
 public class MainActivity extends AppCompatActivity {
     private Button showKotlinActivity;
@@ -50,23 +53,12 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager viewPager;
     private Tab1Fragment tab1Fragment = new Tab1Fragment();
     private Tab2Fragment tab2Fragment = new Tab2Fragment();
-
+    boolean run = true;
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        if (!DebugDB.isServerRunning()) {
-            DebugDB.initialize(DemoApplication.getContext(), new DebugDBFactory());
-            DebugDB.initialize(DemoApplication.getContext(), new DebugDBEncryptFactory());
-        }
-        requestPermissions(new String[]{Manifest.permission.CAMERA
-                , Manifest.permission.ACCESS_FINE_LOCATION
-                , Manifest.permission.ACCESS_COARSE_LOCATION
-                , Manifest.permission.READ_PHONE_STATE
-                , Manifest.permission.WRITE_EXTERNAL_STORAGE
-                , Manifest.permission.BLUETOOTH
-                , Manifest.permission.BLUETOOTH_ADMIN}, 1);
         setTitle("FT-SDK使用Demo");
         FTSdk.get().setGpuRenderer(findViewById(R.id.ll));
         showKotlinActivity = findViewById(R.id.showKotlinActivity);
@@ -86,8 +78,23 @@ public class MainActivity extends AppCompatActivity {
         showKotlinActivity.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, Main2Activity.class)));
         checkbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             //changeFragment(isChecked);
+            AtomicLong atomicLong = new AtomicLong(1497);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (run){
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        Log.d("LogData","data=========="+atomicLong.decrementAndGet());
+                    }
+                }
+            }).start();
         });
         ratingbar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
+            run = false;
         });
         seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -140,27 +147,6 @@ public class MainActivity extends AppCompatActivity {
         Glide.with(this)
                 .load("https://github.com/bumptech/glide/raw/master/static/glide_logo.png")
                 .into(iv_glide);
-        bindUser.setOnClickListener(v -> {
-            JSONObject exts = new JSONObject();
-            try {
-                exts.put("sex", "male");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            FTSdk.get().bindUserData("jack", "007", exts);
-        });
-        unbindUser.setOnClickListener(v -> {
-            FTSdk.get().unbindUserData();
-        });
-        changeUser.setOnClickListener(v -> {
-            JSONObject exts = new JSONObject();
-            try {
-                exts.put("sex", "female");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            FTSdk.get().bindUserData("Rose", "000", exts);
-        });
         flowChartTacker.setOnClickListener(v -> {
 
         });
@@ -230,9 +216,6 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
+
 
 }

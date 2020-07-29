@@ -1,5 +1,7 @@
 package com.ft;
 
+import android.Manifest;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -7,6 +9,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.amitshekhar.DebugDB;
+import com.amitshekhar.debug.encrypt.sqlite.DebugDBEncryptFactory;
+import com.amitshekhar.debug.sqlite.DebugDBFactory;
 import com.ft.sdk.FTAutoTrackType;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
@@ -40,6 +45,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static android.content.pm.PackageManager.PERMISSION_DENIED;
+
 
 public class Main2Activity extends AppCompatActivity {
 
@@ -47,7 +54,40 @@ public class Main2Activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
-
+        if (!DebugDB.isServerRunning()) {
+            DebugDB.initialize(DemoApplication.getContext(), new DebugDBFactory());
+            DebugDB.initialize(DemoApplication.getContext(), new DebugDBEncryptFactory());
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(new String[]{Manifest.permission.CAMERA
+                    , Manifest.permission.ACCESS_FINE_LOCATION
+                    , Manifest.permission.ACCESS_COARSE_LOCATION
+                    , Manifest.permission.READ_PHONE_STATE
+                    , Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    , Manifest.permission.BLUETOOTH
+                    , Manifest.permission.BLUETOOTH_ADMIN}, 1);
+        }
+        findViewById(R.id.bindUser).setOnClickListener(v -> {
+            JSONObject exts = new JSONObject();
+            try {
+                exts.put("sex", "male");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            FTSdk.get().bindUserData("jack", "007", exts);
+        });
+        findViewById(R.id.unbindUser).setOnClickListener(v -> {
+            FTSdk.get().unbindUserData();
+        });
+        findViewById(R.id.changeUser).setOnClickListener(v -> {
+            JSONObject exts = new JSONObject();
+            try {
+                exts.put("sex", "female");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            FTSdk.get().bindUserData("Rose", "000", exts);
+        });
         findViewById(R.id.jump).setOnClickListener(v -> {
             trackImmediate();
         });
@@ -276,5 +316,17 @@ public class Main2Activity extends AppCompatActivity {
                 Log.d("onResponse", "code=" + code + ",response=" + response);
             }
         });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode == 1){
+            for (int grantResult : grantResults) {
+                if(grantResult == PERMISSION_DENIED){
+                    finish();
+                }
+            }
+        }
     }
 }
