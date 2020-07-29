@@ -10,6 +10,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+        <Button
+            android:id="@+id/bindUser"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="绑定用户信息" />
+
+        <Button
+            android:id="@+id/unbindUser"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="解绑用户信息" />
+
+        <Button
+            android:id="@+id/changeUser"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="切换用户信息" />
 
         <Button
             android:id="@+id/sync_data_background"
