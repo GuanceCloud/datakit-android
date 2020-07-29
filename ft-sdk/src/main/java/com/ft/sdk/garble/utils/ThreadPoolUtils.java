@@ -3,6 +3,8 @@ package com.ft.sdk.garble.utils;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -14,28 +16,46 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Description:
  */
 public class ThreadPoolUtils {
-    private final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
-    private final int CORE_POOL_SIZE = CPU_COUNT;
-    private final int MAXIMUM_POOL_SIZE = 128;
-    private final int KEEP_ALIVE = 5;
-    private BlockingQueue workQueue = new ArrayBlockingQueue(10);
+    private final static int CPU_COUNT = Runtime.getRuntime().availableProcessors();
+    private final static int CORE_POOL_SIZE = CPU_COUNT;
+    private final static int MAXIMUM_POOL_SIZE = 128;
+    private final static int KEEP_ALIVE = 5;
+    private BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>();
     private ThreadPoolExecutor executor;
     private static ThreadPoolUtils threadPoolUtils;
 
     private ThreadPoolUtils() {
         executor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE, TimeUnit.SECONDS, workQueue, threadFactory);
+        executor.setRejectedExecutionHandler(sRunOnSerialPolicy);
     }
 
-    public static ThreadPoolUtils get(){
-        synchronized (ThreadPoolUtils.class){
-            if(threadPoolUtils == null){
+    private final RejectedExecutionHandler sRunOnSerialPolicy =
+            new RejectedExecutionHandler() {
+                public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+                    LogUtils.w("Exceeded ThreadPoolExecutor pool size");
+                    // As a last ditch fallback, run it on an executor with an unbounded queue.
+                    // Create this executor lazily, hopefully almost never.
+                    synchronized (this) {
+                        if (executor == null) {
+                            workQueue = new LinkedBlockingQueue<Runnable>();
+                            executor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE, TimeUnit.SECONDS, workQueue, threadFactory);
+                            executor.allowCoreThreadTimeOut(true);
+                        }
+                    }
+                    executor.execute(r);
+                }
+            };
+
+    public static ThreadPoolUtils get() {
+        synchronized (ThreadPoolUtils.class) {
+            if (threadPoolUtils == null) {
                 threadPoolUtils = new ThreadPoolUtils();
             }
             return threadPoolUtils;
         }
     }
 
-    private ThreadFactory threadFactory = new ThreadFactory() {
+    private static ThreadFactory threadFactory = new ThreadFactory() {
         private final AtomicInteger integer = new AtomicInteger();
 
         @Override
@@ -45,18 +65,17 @@ public class ThreadPoolUtils {
     };
 
 
-
     public void execute(Runnable runnable) {
-        if(!poolRunning()){
+        if (!poolRunning()) {
             reStartPool();
         }
-        if(executor != null) {
+        if (executor != null) {
             executor.execute(runnable);
         }
     }
 
     public void execute(FutureTask futureTask) {
-        if(executor != null) {
+        if (executor != null) {
             executor.execute(futureTask);
         }
     }
@@ -65,18 +84,18 @@ public class ThreadPoolUtils {
         futureTask.cancel(true);
     }
 
-    public boolean poolRunning(){
+    public boolean poolRunning() {
         return executor != null && !executor.isShutdown();
     }
 
-    public void shutDown(){
-        if(executor!=null && !executor.isShutdown()) {
+    public void shutDown() {
+        if (executor != null && !executor.isShutdown()) {
             executor.shutdownNow();
             executor = null;
         }
     }
 
-    public void reStartPool(){
+    public void reStartPool() {
         executor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE, TimeUnit.SECONDS, workQueue, threadFactory);
     }
 }
