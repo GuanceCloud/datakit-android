@@ -43,7 +43,7 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
     boolean enableTrace;
 
     private void uploadNetTrace(Request request, @Nullable Response response, String traceID,
-                                String spanID, String responseBody, String error, long duration) {
+                                String spanID, String responseBody, String error, long duration, long dateline) {
         try {
             if (!enableTrace) {
                 return;
@@ -62,7 +62,7 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
             }
 
             String endPoint = request.url().host()+":"+request.url().port();
-            LogBean logBean = new LogBean(Constants.USER_AGENT, jsonObject, System.currentTimeMillis());
+            LogBean logBean = new LogBean(Constants.USER_AGENT, jsonObject, dateline);
             logBean.setOperationName(operationName);
             logBean.setDuration(duration * 1000);
             logBean.setClazz("tracing");
@@ -126,7 +126,8 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
         long responseTime = System.currentTimeMillis();
 
         if (exception != null) {
-            uploadNetTrace(newRequest, null, traceID, spanID, "", exception.getMessage(), responseTime - requestTime);
+            uploadNetTrace(newRequest, null, traceID, spanID, "", exception.getMessage(),
+                    responseTime - requestTime, requestTime);
             throw new IOException(exception);
         } else {
             String responseBody = "";
@@ -144,7 +145,7 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
                     }
                 }
             }
-            uploadNetTrace(newRequest, response, traceID, spanID, responseBody, "", responseTime - requestTime);
+            uploadNetTrace(newRequest, response, traceID, spanID, responseBody, "", responseTime - requestTime, requestTime);
         }
         return response;
     }
@@ -188,18 +189,19 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
             json.put("headers", headers);
             JSONObject jbBody = null;
             JSONArray jaBody = null;
-            try{
+            try {
                 jbBody = new JSONObject(body);
-                json.put("body",jbBody);
-            }catch (JSONException e){}
-            if(jbBody == null){
-                try{
+                json.put("body", jbBody);
+            } catch (JSONException e) {
+            }
+            if (jbBody == null) {
+                try {
                     jaBody = new JSONArray(body);
-                    json.put("body",jaBody);
-                }catch (JSONException e){
+                    json.put("body", jaBody);
+                } catch (JSONException e) {
                 }
             }
-            if(jaBody == null && jbBody == null) {
+            if (jaBody == null && jbBody == null) {
                 json.put("body", body);
             }
             if (error != null && !error.isEmpty()) {
