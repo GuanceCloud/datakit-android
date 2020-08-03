@@ -15,7 +15,6 @@ import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
 import com.ft.sdk.garble.utils.Utils;
 
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -54,70 +53,73 @@ public class SyncTaskManager {
         return instance;
     }
 
+
     /**
      * 触发延迟轮询同步
      */
     public void executeSyncPoll() {
-        if (running) {
-            return;
-        }
-        running = true;
-        errorCount.set(0);
-        ThreadPoolUtils.get().execute(() -> {
-            try {
-                if (!TokenCheck.get().checkToken()) {
-                    running = false;
-                    return;
-                }
-                Thread.sleep(10 * 1000);
-                List<RecordData> trackDataList = queryFromData(DataType.TRACK);
-                List<RecordData> objectDataList = queryFromData(DataType.OBJECT);
-                List<RecordData> logDataList = queryFromData(DataType.LOG);
-                List<RecordData> keyEventDataList = queryFromData(DataType.KEY_EVENT);
-                //如果打开绑定用户开关，但是没有绑定用户信息，那么就不上传用户数据，直到绑了
-                if (FTUserConfig.get().isNeedBindUser() && !FTUserConfig.get().isUserDataBinded()) {
-                    trackDataList.clear();
-                    LogUtils.e("请先绑定用户信息");
-                }
-                while (!trackDataList.isEmpty() || !objectDataList.isEmpty() ||
-                        !logDataList.isEmpty() || !keyEventDataList.isEmpty()) {
-                    if (!Utils.isNetworkAvailable()) {
-                        LogUtils.e(">>>网络未连接<<<");
-                        break;
-                    }
-                    if (errorCount.get() >= CLOSE_TIME) {
-                        LogUtils.e(">>>连续同步失败5次，停止当前轮询同步<<<");
-                        break;
-                    }
-                    if (!trackDataList.isEmpty()) {
-                        handleSyncOpt(DataType.TRACK, trackDataList);
-                        trackDataList = queryFromData(DataType.TRACK);
-                    }
-                    if (!objectDataList.isEmpty()) {
-                        handleSyncOpt(DataType.OBJECT, objectDataList);
-                        objectDataList = queryFromData(DataType.OBJECT);
-                    }
-                    if (!logDataList.isEmpty()) {
-                        handleSyncOpt(DataType.LOG, logDataList);
-                        logDataList = queryFromData(DataType.LOG);
-                    }
-                    if (!keyEventDataList.isEmpty()) {
-                        handleSyncOpt(DataType.KEY_EVENT, keyEventDataList);
-                        keyEventDataList = queryFromData(DataType.KEY_EVENT);
-                    }
-                }
-                running = false;
-            } catch (Exception e) {
-                e.printStackTrace();
-                running = false;
+        synchronized (this) {
+            if (running) {
+                return;
             }
-        });
+            running = true;
+            errorCount.set(0);
+            ThreadPoolUtils.get().execute(() -> {
+                try {
+                    if (!TokenCheck.get().checkToken()) {
+                        running = false;
+                        return;
+                    }
+                    Thread.sleep(10 * 1000);
+                    List<RecordData> trackDataList = queryFromData(DataType.TRACK);
+                    List<RecordData> objectDataList = queryFromData(DataType.OBJECT);
+                    List<RecordData> logDataList = queryFromData(DataType.LOG);
+                    List<RecordData> keyEventDataList = queryFromData(DataType.KEY_EVENT);
+                    //如果打开绑定用户开关，但是没有绑定用户信息，那么就不上传用户数据，直到绑了
+                    if (FTUserConfig.get().isNeedBindUser() && !FTUserConfig.get().isUserDataBinded()) {
+                        trackDataList.clear();
+                        LogUtils.e("请先绑定用户信息");
+                    }
+                    while (!trackDataList.isEmpty() || !objectDataList.isEmpty() ||
+                            !logDataList.isEmpty() || !keyEventDataList.isEmpty()) {
+                        if (!Utils.isNetworkAvailable()) {
+                            LogUtils.e(">>>网络未连接<<<");
+                            break;
+                        }
+                        if (errorCount.get() >= CLOSE_TIME) {
+                            LogUtils.e(">>>连续同步失败5次，停止当前轮询同步<<<");
+                            break;
+                        }
+                        if (!trackDataList.isEmpty()) {
+                            handleSyncOpt(DataType.TRACK, trackDataList);
+                            trackDataList = queryFromData(DataType.TRACK);
+                        }
+                        if (!objectDataList.isEmpty()) {
+                            handleSyncOpt(DataType.OBJECT, objectDataList);
+                            objectDataList = queryFromData(DataType.OBJECT);
+                        }
+                        if (!logDataList.isEmpty()) {
+                            handleSyncOpt(DataType.LOG, logDataList);
+                            logDataList = queryFromData(DataType.LOG);
+                        }
+                        if (!keyEventDataList.isEmpty()) {
+                            handleSyncOpt(DataType.KEY_EVENT, keyEventDataList);
+                            keyEventDataList = queryFromData(DataType.KEY_EVENT);
+                        }
+                    }
+                    running = false;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    running = false;
+                }
+            });
+        }
     }
 
     /**
      * 执行同步操作
      */
-    private void handleSyncOpt(final DataType dataType, final List<RecordData> requestDatas) {
+    private synchronized void handleSyncOpt(final DataType dataType, final List<RecordData> requestDatas) {
         if (requestDatas == null || requestDatas.isEmpty()) {
             return;
         }
@@ -173,7 +175,7 @@ public class SyncTaskManager {
      * @param body
      * @param syncCallback
      */
-    private void requestNet(DataType dataType, String body, final SyncCallback syncCallback) {
+    private synchronized void requestNet(DataType dataType, String body, final SyncCallback syncCallback) {
         String model = Constants.URL_MODEL_TRACK;
         switch (dataType) {
             case KEY_EVENT:

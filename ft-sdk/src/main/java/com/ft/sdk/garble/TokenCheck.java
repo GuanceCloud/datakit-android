@@ -15,13 +15,15 @@ import org.json.JSONObject;
  * description:验证 token 是否合法
  */
 public class TokenCheck {
-    private static TokenCheck tokenCheck;
+    private volatile static TokenCheck tokenCheck;
     private volatile boolean tokenAllowable;
+    private volatile boolean isRunning;
     public volatile String message = "";
+
     private TokenCheck() {
     }
 
-    public static TokenCheck get() {
+    public synchronized static TokenCheck get() {
         if (tokenCheck == null) {
             tokenCheck = new TokenCheck();
         }
@@ -35,6 +37,10 @@ public class TokenCheck {
         if (tokenAllowable) {
             return true;
         }
+        if (isRunning) {
+            return false;
+        }
+        isRunning = true;
         String token = FTHttpConfig.get().dataWayToken;
         if (!Utils.isNullOrEmpty(token)) {
             ResponseData result = HttpBuilder.Builder()
@@ -50,28 +56,25 @@ public class TokenCheck {
                     int code = js.optInt("code");
                     if (code == 200) {
                         tokenAllowable = true;
-                        return true;
                     } else {
                         LogUtils.w("Dataflux SDK 未能验证通过您配置的 token");
                         tokenAllowable = false;
                         message = data;
-                        return false;
                     }
                 } catch (Exception e) {
                     LogUtils.w("Dataflux SDK 未能验证通过您配置的 token,message:" + e.getLocalizedMessage());
                     message = e.getLocalizedMessage();
                     tokenAllowable = false;
-                    return false;
                 }
             } else {
                 LogUtils.w("Dataflux SDK 未能验证通过您配置的 token");
                 tokenAllowable = false;
                 message = result.getData();
-                return false;
             }
         } else {
             tokenAllowable = true;
-            return true;
         }
+        isRunning = false;
+        return tokenAllowable;
     }
 }

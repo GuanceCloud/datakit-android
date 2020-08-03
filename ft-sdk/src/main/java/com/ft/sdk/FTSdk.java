@@ -41,7 +41,7 @@ public class FTSdk {
     public static final String AGENT_VERSION = BuildConfig.FT_SDK_VERSION;//当前SDK 版本
     public static final String PLUGIN_MIN_VERSION = BuildConfig.MIN_FT_PLUGIN_VERSION; //当前 SDK 支持的最小 Plugin 版本
     private static FTSdk mFtSdk;
-    private FTSDKConfig mFtSDKConfig;
+    public FTSDKConfig mFtSDKConfig;
     private FTActivityLifecycleCallbacks life;
 
     private FTSdk(@NonNull FTSDKConfig ftSDKConfig) {
@@ -57,9 +57,13 @@ public class FTSdk {
     public static synchronized void install(@NonNull FTSDKConfig ftSDKConfig) {
         if (ftSDKConfig == null) {
             throw new InvalidParameterException("ftSDKConfig 参数不能为 null");
+        }else{
+            mFtSdk = new FTSdk(ftSDKConfig);
+            boolean onlyMain = ftSDKConfig.isOnlySupportMainProcess();
+            if (onlyMain && !Utils.isMainProcess()){
+                throw new InitSDKProcessException("当前 SDK 只能在主进程中运行，如果想要在非主进程中运行可以设置 FTSDKConfig.setOnlySupportMainProcess(false)");
+            }
         }
-
-        mFtSdk = new FTSdk(ftSDKConfig);
         mFtSdk.initFTConfig();
         mFtSdk.registerActivityLifeCallback();
     }
@@ -69,7 +73,7 @@ public class FTSdk {
      *
      * @return
      */
-    public static synchronized FTSdk get() {
+    public static synchronized FTSdk get() throws InvalidParameterException{
         if (mFtSdk == null) {
             throw new InvalidParameterException("请先安装SDK(在应用启动时调用FTSdk.install(FTSDKConfig ftSdkConfig,Application application))");
         }

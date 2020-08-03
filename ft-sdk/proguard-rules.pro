@@ -114,5 +114,8 @@
 -keep class com.ft.sdk.garble.utils.TrackLog{
     *;
 }
+-keep class com.ft.sdk.InitSDKProcessException{
+    *;
+}
 
 

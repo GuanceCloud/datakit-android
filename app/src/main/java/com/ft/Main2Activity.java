@@ -13,6 +13,7 @@ import com.amitshekhar.DebugDB;
 import com.amitshekhar.debug.encrypt.sqlite.DebugDBEncryptFactory;
 import com.amitshekhar.debug.sqlite.DebugDBFactory;
 import com.ft.sdk.FTAutoTrackType;
+import com.ft.sdk.FTNetWorkTracerInterceptor;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTrack;
@@ -21,7 +22,6 @@ import com.ft.sdk.garble.SyncCallback;
 import com.ft.sdk.garble.bean.KeyEventBean;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.ObjectBean;
-import com.ft.sdk.FTNetWorkTracerInterceptor;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -208,16 +208,15 @@ public class Main2Activity extends AppCompatActivity {
         });
     }
 
+    OkHttpClient client = new OkHttpClient.Builder()
+            .addInterceptor(new FTNetWorkTracerInterceptor())
+            .build();
 
     private void requestUrl(@NonNull String url) {
         new Thread() {
             @Override
             public void run() {
                 super.run();
-                OkHttpClient client = new OkHttpClient.Builder()
-                        .addInterceptor(new FTNetWorkTracerInterceptor())
-                        .build();
-
                 Request.Builder builder = new Request.Builder().url(url)
                         .method(RequestMethod.GET.name(), null);
                 try {
@@ -321,9 +320,9 @@ public class Main2Activity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(requestCode == 1){
+        if (requestCode == 1) {
             for (int grantResult : grantResults) {
-                if(grantResult == PERMISSION_DENIED){
+                if (grantResult == PERMISSION_DENIED) {
                     finish();
                 }
             }
