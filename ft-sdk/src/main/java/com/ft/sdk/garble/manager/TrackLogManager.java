@@ -3,13 +3,13 @@ package com.ft.sdk.garble.manager;
 
 import com.ft.sdk.FTTrack;
 import com.ft.sdk.garble.bean.LogBean;
-import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
 
 import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * author: huangDianHua
@@ -19,10 +19,16 @@ import java.util.concurrent.FutureTask;
 public class TrackLogManager {
     private static TrackLogManager instance;
     private List<LogBean> logBeanList = new CopyOnWriteArrayList<>();
-    private ConcurrentLinkedQueue<LogBean> logQueue = new ConcurrentLinkedQueue<>();
+    private LinkedBlockingQueue<LogBean> logQueue = new LinkedBlockingQueue<>();
     private volatile boolean isRunning;
+    private volatile int count = 0;
+
+    public synchronized void optCount(int optCount) {
+        count += optCount;
+    }
 
     private TrackLogManager() {
+        count = FTDBManager.get().queryCountLog();
     }
 
     public static TrackLogManager get() {
@@ -39,7 +45,7 @@ public class TrackLogManager {
         rotationSync();
     }
 
-    private synchronized void rotationSync() {
+    private void rotationSync() {
         if (isRunning) {
             return;
         }
@@ -47,20 +53,17 @@ public class TrackLogManager {
         FutureTask<Boolean> futureTask = new FutureTask(() -> {
             try {
                 //当队列中有数据时，不断执行取数据操作
-                while (logQueue.peek() != null) {
+                LogBean logBean;
+                while ((logBean = logQueue.take()) != null) {
                     isRunning = true;
-                    logBeanList.add(logQueue.poll());//取出数据放到集合中
-                    if (logBeanList.size() >= 20) {//当取出的数据大于等于20条时执行插入数据库操作
+                    logBeanList.add(logBean);//取出数据放到集合中
+                    if (logBeanList.size() >= 5) {//当取出的数据大于等于5条时执行插入数据库操作
                         FTTrack.getInstance().logBackgroundSync(logBeanList);
                         logBeanList.clear();//插入完成后执行清除集合操作
                     }
-                    Thread.sleep(100);
                 }
-                if (logBeanList.size() > 0) {//当队列中数据都取完后，且集合中没有20条数据
-                    FTTrack.getInstance().logBackgroundSync(logBeanList);
-                    logBeanList.clear();
-                }
-            } catch (Exception e){}finally {
+            } catch (Exception e) {
+            } finally {
                 isRunning = false;
             }
             return true;

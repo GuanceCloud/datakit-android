@@ -127,6 +127,18 @@ public class FTDBManager extends DBManager {
         return queryDataByDescLimit(limit,null,null);
     }
 
+    public int queryCountLog(){
+        final int[] count = new int[1];
+        getDB(false,db ->{
+            Cursor cursor = db.query(FTSQL.FT_TABLE_NAME,new String[]{"count(*)"},null,null,null,null,null);
+            while (cursor.moveToNext()){
+                 count[0] = cursor.getInt(0);
+            }
+            cursor.close();
+        });
+        return count[0];
+    }
+
     /**
      * 根据条件查询数据
      * @param limit
