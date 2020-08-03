@@ -78,6 +78,8 @@ public class FTSDKConfig {
     private int traceType = TraceType.ZIPKIN;
     //支持的采集类型
     private List<String> traceContentType;
+    // SDK 是否只支持在主进程中初始化
+    private boolean onlySupportMainProcess = true;
 
     /**
      * 构建 SDK 必要的配置参数
@@ -264,6 +266,10 @@ public class FTSDKConfig {
 
     public List<String> getTraceContentType() {
         return traceContentType;
+    }
+
+    public boolean isOnlySupportMainProcess() {
+        return onlySupportMainProcess;
     }
 
     /**
@@ -576,6 +582,16 @@ public class FTSDKConfig {
      */
     public FTSDKConfig setTraceContentType(List<String> traceContentType) {
         this.traceContentType = traceContentType;
+        return this;
+    }
+
+    /**
+     * 是否只支持在主进程中初始化 SDK
+     * @param onlySupportMainProcess
+     * @return
+     */
+    public FTSDKConfig setOnlySupportMainProcess(boolean onlySupportMainProcess) {
+        this.onlySupportMainProcess = onlySupportMainProcess;
         return this;
     }
 }

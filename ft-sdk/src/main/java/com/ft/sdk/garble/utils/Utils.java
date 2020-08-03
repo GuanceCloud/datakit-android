@@ -1,12 +1,15 @@
 package com.ft.sdk.garble.utils;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Process;
+import android.text.TextUtils;
 import android.util.Base64;
 
 import androidx.core.content.ContextCompat;
@@ -22,6 +25,7 @@ import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.TimeZone;
@@ -359,5 +363,32 @@ public class Utils {
         return Math.floor(random.nextDouble() * 100);
     }
 
+    /**
+     * 判断当前进程是否是主进程
+     * @return
+     */
+    public static boolean isMainProcess(){
+        Context context = FTApplication.getApplication();
+        String currentProcessName = getCurrentProcessName();
+        String packageName = context.getPackageName();
+        return !TextUtils.isEmpty(packageName) && TextUtils.equals(packageName,currentProcessName);
+    }
+
+    /**
+     * 获取当前进程名称
+     * @return
+     */
+    public static String getCurrentProcessName(){
+        Context context = FTApplication.getApplication();
+        int myPid = Process.myPid();
+        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningAppProcessInfo> processes = manager.getRunningAppProcesses();
+        for(ActivityManager.RunningAppProcessInfo info : processes){
+            if(myPid == info.pid) {
+                return info.processName;
+            }
+        }
+        return null;
+    }
 }
 

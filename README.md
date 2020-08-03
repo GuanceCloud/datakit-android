@@ -118,6 +118,7 @@ android{
 | setNetworkTrace | 是否开启网络追踪功能| 否 | 开启后，可以在 web 中“日志”查看到对应日志的同时也可以在“链路追踪”中查找到对应的链路信息 |
 | setTraceType | 设置链路追踪所使用的类型。 | 否 |目前支持 Zipkin 和 Jaeger 两种，默认为 Zipkin |
 | setEventFlowLog | 设置是否开启页面事件的日志 | 否 | 可以在 web 版本日志中，查看到对应上报的日志，事件支持启动应用，进入页面，离开页面，事件点击等等 |
+| setOnlySupportMainProcess|设置是否只支持在主进程中初始化|否|默认是 true ，默认情况下 SDK 只能在主进程中运行。如果应用中存在多个进程，那么其他进程中将不会执行。如果需要在其他进程中执行需要将该字段设置为 true
 
 > FTAutoTrackType 自动埋点事件说明，事件总类目前支持3种：
     FTAutoTrackType.APP_START：页面的开始事件，Activity 依赖的是其 onResume 方法，Fragment 依赖的是其 onResume 方法；

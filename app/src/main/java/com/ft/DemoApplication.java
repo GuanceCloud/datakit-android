@@ -57,7 +57,8 @@ public class DemoApplication extends Application {
                 .setTraceSamplingRate(0.5f)
                 .setNetworkTrace(true)
                 .setTraceConsoleLog(true)
-                .setEventFlowLog(true);
+                .setEventFlowLog(true)
+                .setOnlySupportMainProcess(true);
         FTSdk.install(ftSDKConfig);
 
         FTMonitor.get()

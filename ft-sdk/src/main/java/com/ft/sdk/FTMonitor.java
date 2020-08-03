@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.service.MonitorService;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.Utils;
 
 
 /**
@@ -76,6 +77,13 @@ public class FTMonitor {
     }
 
     public void start() {
+        boolean onlyMain = true;
+        try {
+            onlyMain = FTSdk.get().mFtSDKConfig.isOnlySupportMainProcess();
+        }catch (Exception e){ }
+        if (onlyMain && !Utils.isMainProcess()){
+            throw new InitSDKProcessException("当前 SDK 只能在主进程中运行，如果想要在非主进程中运行可以设置 FTSDKConfig.setOnlySupportMainProcess(false)");
+        }
         FTMonitorConfig.get().initParams();
         if (intent == null) {
             intent = new Intent(FTApplication.getApplication(), MonitorService.class);
