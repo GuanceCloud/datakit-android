@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicLong;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -205,6 +206,22 @@ public class Main2Activity extends AppCompatActivity {
         findViewById(R.id.jump13).setOnClickListener(v -> {
             requestUrl("https://www.baidu.com");
             requestUrl("https://www.google.com");
+        });
+        findViewById(R.id.jump14).setOnClickListener(v -> {
+            AtomicLong atomicLong = new AtomicLong(0);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (true) {
+                        Log.d("LogManager", "data=======" + atomicLong.getAndIncrement());
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }).start();
         });
     }
 

@@ -105,6 +105,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="链路上报(跨线程)" />
+        <Button
+            android:id="@+id/jump14"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="周期产生日志数据" />
     </LinearLayout>
 
 

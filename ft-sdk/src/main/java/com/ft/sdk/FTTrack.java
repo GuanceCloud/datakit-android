@@ -16,6 +16,7 @@ import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.http.ResponseData;
 import com.ft.sdk.garble.manager.FTManager;
 import com.ft.sdk.garble.manager.SyncDataManager;
+import com.ft.sdk.garble.manager.TrackLogManager;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
@@ -296,6 +297,9 @@ public class FTTrack {
                         return;
                     }
                     LogUtils.d("FTTrack数据进数据库：" + recordData.getJsonString());
+                    if(op == OP.LOG){//如果是日志数据添加计数
+                        TrackLogManager.get().optCount(1);
+                    }
                     FTManager.getFTDBManager().insertFTOperation(recordData);
                     FTManager.getSyncTaskManager().executeSyncPoll();
                 } catch (Exception e) {
@@ -343,6 +347,9 @@ public class FTTrack {
                 if (recordData != null) {
                     recordDataList.add(recordData);
                 }
+            }
+            if(op == OP.LOG){//如果是日志数据添加计数
+                TrackLogManager.get().optCount(trackBeans.size());
             }
             FTManager.getFTDBManager().insertFtOptList(recordDataList);
             FTManager.getSyncTaskManager().executeSyncPoll();

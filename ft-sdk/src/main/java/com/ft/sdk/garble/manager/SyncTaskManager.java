@@ -131,6 +131,9 @@ public class SyncTaskManager {
             if (code >= 200 && code < 500) {
                 LogUtils.d("同步数据成功");
                 deleteLastQuery(requestDatas);
+                if(dataType == DataType.LOG){
+                    TrackLogManager.get().optCount(-requestDatas.size());
+                }
                 errorCount.set(0);
                 if (code > 200) {
                     LogUtils.e("同步数据出错(忽略)-[code:" + code + ",response:" + response + "]");
