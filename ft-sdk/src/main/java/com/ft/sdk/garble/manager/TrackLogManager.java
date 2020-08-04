@@ -3,7 +3,6 @@ package com.ft.sdk.garble.manager;
 
 import com.ft.sdk.FTTrack;
 import com.ft.sdk.garble.bean.LogBean;
-import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
 
 import java.util.List;
@@ -21,14 +20,8 @@ public class TrackLogManager {
     private List<LogBean> logBeanList = new CopyOnWriteArrayList<>();
     private LinkedBlockingQueue<LogBean> logQueue = new LinkedBlockingQueue<>();
     private volatile boolean isRunning;
-    private volatile int count = 0;
-
-    public synchronized void optCount(int optCount) {
-        count += optCount;
-    }
 
     private TrackLogManager() {
-        count = FTDBManager.get().queryCountLog();
     }
 
     public static TrackLogManager get() {

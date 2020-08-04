@@ -1,5 +1,6 @@
 package com.ft.sdk.garble.manager;
 
+import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.SyncCallback;
 import com.ft.sdk.garble.TokenCheck;
@@ -132,7 +133,7 @@ public class SyncTaskManager {
                 LogUtils.d("同步数据成功");
                 deleteLastQuery(requestDatas);
                 if(dataType == DataType.LOG){
-                    TrackLogManager.get().optCount(-requestDatas.size());
+                    FTDBCachePolicy.get().optCount(-requestDatas.size());
                 }
                 errorCount.set(0);
                 if (code > 200) {

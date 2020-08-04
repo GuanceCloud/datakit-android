@@ -35,5 +35,6 @@ public class Constants {
 
     public static final String DEFAULT_OBJECT_CLASS = "Dataflux Android SDK";//默认的对象名
     public static final String DEFAULT_LOG_SERVICE_NAME = "dataflux sdk";
+    public static final int MAX_DB_CACHE_NUM = 5000;//数据库最大缓存容量
 
 }
