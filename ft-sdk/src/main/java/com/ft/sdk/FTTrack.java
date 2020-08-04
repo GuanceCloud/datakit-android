@@ -1,5 +1,6 @@
 package com.ft.sdk;
 
+import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.SyncCallback;
 import com.ft.sdk.garble.TokenCheck;
@@ -277,7 +278,7 @@ public class FTTrack {
     }
 
     /**
-     * 将埋点数据存入本地后通知同步
+     * 在子线程中将埋点数据同步（经过数据库）
      *
      * @param op
      * @param time
@@ -297,11 +298,7 @@ public class FTTrack {
                         return;
                     }
                     LogUtils.d("FTTrack数据进数据库：" + recordData.getJsonString());
-                    if(op == OP.LOG){//如果是日志数据添加计数
-                        TrackLogManager.get().optCount(1);
-                    }
-                    FTManager.getFTDBManager().insertFTOperation(recordData);
-                    FTManager.getSyncTaskManager().executeSyncPoll();
+                    judgeNeedOptCachePolicy(op,null,recordData);
                 } catch (Exception e) {
                 }
             });
@@ -311,7 +308,7 @@ public class FTTrack {
     }
 
     /**
-     * 直接将埋点数据存入本地等待同步
+     * 在子线程中将埋点数据同步（经过数据库）
      *
      * @param trackBeans
      */
@@ -329,7 +326,7 @@ public class FTTrack {
     }
 
     /**
-     * 直接将埋点数据存入本地等待同步
+     * 在当前线程中将埋点数据同步（经过数据库）
      *
      * @param trackBeans
      */
@@ -348,18 +345,33 @@ public class FTTrack {
                     recordDataList.add(recordData);
                 }
             }
-            if(op == OP.LOG){//如果是日志数据添加计数
-                TrackLogManager.get().optCount(trackBeans.size());
-            }
-            FTManager.getFTDBManager().insertFtOptList(recordDataList);
-            FTManager.getSyncTaskManager().executeSyncPoll();
+            judgeNeedOptCachePolicy(op,recordDataList,null);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     /**
-     * 直接将埋点数据同步
+     * 判断是否需要执行同步策略
+     * @param op
+     * @param recordDataList
+     * @param recordData
+     */
+    private void judgeNeedOptCachePolicy(OP op,List<RecordData> recordDataList,RecordData recordData){
+        //如果 OP 类型不等于 LOG 则直接进行数据库操作；否则执行同步策略，根据同步策略返回结果判断是否需要执行数据库操作
+        if(op != OP.LOG || FTDBCachePolicy.get().optLogCachePolicy(recordDataList.size())){//执行同步策略
+            if(recordDataList != null) {
+                FTManager.getFTDBManager().insertFtOptList(recordDataList);
+            }
+            if(recordData != null){
+                FTManager.getFTDBManager().insertFTOperation(recordData);
+            }
+            FTManager.getSyncTaskManager().executeSyncPoll();
+        }
+    }
+
+    /**
+     * 在子线程中将埋点数据同步(不经过数据库)
      *
      * @param trackBeans
      * @param callback

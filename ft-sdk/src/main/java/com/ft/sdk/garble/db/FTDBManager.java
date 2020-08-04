@@ -2,6 +2,7 @@ package com.ft.sdk.garble.db;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.ft.sdk.FTApplication;
@@ -9,6 +10,7 @@ import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.db.base.DBManager;
+import com.ft.sdk.garble.db.base.DataBaseCallBack;
 import com.ft.sdk.garble.db.base.DatabaseHelper;
 import com.ft.sdk.garble.utils.LogUtils;
 
@@ -127,16 +129,42 @@ public class FTDBManager extends DBManager {
         return queryDataByDescLimit(limit,null,null);
     }
 
-    public int queryCountLog(){
+    /**
+     * 查询数据库中数据的总数
+     * @return
+     */
+    public int queryTotalCount(OP op){
         final int[] count = new int[1];
         getDB(false,db ->{
-            Cursor cursor = db.query(FTSQL.FT_TABLE_NAME,new String[]{"count(*)"},null,null,null,null,null);
-            while (cursor.moveToNext()){
-                 count[0] = cursor.getInt(0);
+            try {
+                Cursor cursor = db.rawQuery("select count(*) from " + FTSQL.FT_TABLE_NAME + " where option='" + op.value+"'", null);
+                cursor.moveToFirst();
+                count[0] = cursor.getInt(0);
+                cursor.close();
+            }catch (Exception e){
+                e.printStackTrace();
             }
-            cursor.close();
         });
         return count[0];
+    }
+
+    /**
+     * 删除数据表中的前 limit 行数的数据
+     * @param op
+     * @param limit
+     * @return
+     */
+    public void deleteOldestData(OP op,int limit){
+        getDB(true, new DataBaseCallBack() {
+            @Override
+            public void run(SQLiteDatabase db) {
+                try {
+                    db.execSQL("DELETE FROM ft_operation_record where _id in (SELECT _id from ft_operation_record where option='"+op.value+"' ORDER by tm ASC LIMIT "+limit+")");
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     /**

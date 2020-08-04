@@ -80,6 +80,8 @@ public class FTSDKConfig {
     private List<String> traceContentType;
     // SDK 是否只支持在主进程中初始化
     private boolean onlySupportMainProcess = true;
+    //日志数据数据库存储策略
+    private LogCacheDiscard logCacheDiscardStrategy = LogCacheDiscard.DISCARD;
 
     /**
      * 构建 SDK 必要的配置参数
@@ -577,6 +579,7 @@ public class FTSDKConfig {
 
     /**
      * 设置支持的采集类型
+     *
      * @param traceContentType
      * @return
      */
@@ -587,11 +590,27 @@ public class FTSDKConfig {
 
     /**
      * 是否只支持在主进程中初始化 SDK
+     *
      * @param onlySupportMainProcess
      * @return
      */
     public FTSDKConfig setOnlySupportMainProcess(boolean onlySupportMainProcess) {
         this.onlySupportMainProcess = onlySupportMainProcess;
+        return this;
+    }
+
+    public LogCacheDiscard getLogCacheDiscardStrategy() {
+        return logCacheDiscardStrategy;
+    }
+
+    /**
+     * 设置数据库数据存储策略
+     *
+     * @param logCacheDiscardStrategy
+     * @return
+     */
+    public FTSDKConfig setLogCacheDiscardStrategy(LogCacheDiscard logCacheDiscardStrategy) {
+        this.logCacheDiscardStrategy = logCacheDiscardStrategy;
         return this;
     }
 }

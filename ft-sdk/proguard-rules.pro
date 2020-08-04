@@ -117,5 +117,8 @@
 -keep class com.ft.sdk.InitSDKProcessException{
     *;
 }
+-keep enum com.ft.sdk.LogCacheDiscard {
+    *;
+}
 
 
