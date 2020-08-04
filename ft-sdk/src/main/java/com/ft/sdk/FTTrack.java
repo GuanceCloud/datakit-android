@@ -300,6 +300,7 @@ public class FTTrack {
                     LogUtils.d("FTTrack数据进数据库：" + recordData.getJsonString());
                     judgeNeedOptCachePolicy(op,null,recordData);
                 } catch (Exception e) {
+                    e.printStackTrace();
                 }
             });
         } catch (JSONException e) {
@@ -359,7 +360,7 @@ public class FTTrack {
      */
     private void judgeNeedOptCachePolicy(OP op,List<RecordData> recordDataList,RecordData recordData){
         //如果 OP 类型不等于 LOG 则直接进行数据库操作；否则执行同步策略，根据同步策略返回结果判断是否需要执行数据库操作
-        if(op != OP.LOG || FTDBCachePolicy.get().optLogCachePolicy(recordDataList.size())){//执行同步策略
+        if(op != OP.LOG || FTDBCachePolicy.get().optLogCachePolicy(recordDataList==null?1:recordDataList.size())){//执行同步策略
             if(recordDataList != null) {
                 FTManager.getFTDBManager().insertFtOptList(recordDataList);
             }
