@@ -36,6 +36,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import static com.ft.sdk.garble.utils.Constants.FT_SHARE_PER_FILE;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * BY huangDianHua
@@ -195,6 +196,15 @@ public class Utils {
             }
         }
         return uid.toString();
+    }
+
+    /**
+     * base64 加密字符串
+     * @param origin
+     * @return
+     */
+    public static String encodeStringToBase64(String origin){
+        return Base64.encodeToString(origin.getBytes(UTF_8),Base64.NO_WRAP);
     }
 
     public static String getHMacSha1(String accesskeySecret, String content) {

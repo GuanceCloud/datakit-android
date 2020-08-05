@@ -4,6 +4,7 @@ import com.ft.sdk.garble.FTExceptionHandler;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.NetUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.jetbrains.annotations.NotNull;
@@ -19,6 +20,7 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import okhttp3.Interceptor;
@@ -39,6 +41,9 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
     public static final String ZIPKIN_SPAN_ID = "X-B3-SpanId";
     public static final String ZIPKIN_SAMPLED = "X-B3-Sampled";
     public static final String JAEGER_KEY = "uber-trace-id";
+    public static final String SKYWALKING_V3_SW_X = "sw8-x";
+    private static int increasingNumber = 0;
+
     //是否可以采样
     boolean enableTrace;
 
@@ -61,7 +66,7 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
                 return;
             }
 
-            String endPoint = request.url().host()+":"+request.url().port();
+            String endPoint = request.url().host() + ":" + request.url().port();
             LogBean logBean = new LogBean(Constants.USER_AGENT, jsonObject, dateline);
             logBean.setOperationName(operationName);
             logBean.setDuration(duration * 1000);
@@ -84,7 +89,7 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
     public Response intercept(@NotNull Chain chain) throws IOException {
         Request request = chain.request();
         enableTrace = Utils.enableTraceSamplingRate();
-
+        increasingNumber++;
         if (!FTHttpConfig.get().networkTrace) {
             return chain.proceed(request);
         }
@@ -100,9 +105,9 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
         try {
             String sampled;
             //抓取数据内容
-            if(enableTrace) {
+            if (enableTrace) {
                 sampled = "1";
-            }else{
+            } else {
                 sampled = "0";
             }
             String parentSpanID = "0000000000000000";
@@ -114,6 +119,18 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
                 requestBuilder.addHeader(ZIPKIN_SAMPLED, sampled);
             } else if (FTHttpConfig.get().traceType == TraceType.JAEGER) {
                 requestBuilder.addHeader(JAEGER_KEY, traceID + ":" + spanID + ":" + parentSpanID + ":" + sampled);
+            } else if (FTHttpConfig.get().traceType == TraceType.SKYWALKING_V3) {
+                String parentTraceID = traceID + "." + Thread.currentThread().getId() + "." + requestTime + String.format(Locale.getDefault(), "%04d", increasingNumber - 1);
+                traceID = traceID + "." + Thread.currentThread().getId() + "." + requestTime + String.format(Locale.getDefault(), "%04d", increasingNumber);
+                String sw_x = sampled + "-" +
+                        Utils.encodeStringToBase64(traceID) + "-" +
+                        Utils.encodeStringToBase64(parentTraceID) + "-0-" +
+                        Utils.encodeStringToBase64(FTExceptionHandler.get().getTrackServiceName()) + "-" +
+                        Utils.encodeStringToBase64(UUID.randomUUID().toString().replace("-", "").toLowerCase() + "@" + NetUtils.get().getMobileIpAddress()) + "-" +
+                        Utils.encodeStringToBase64(request.url().encodedPath()) + "-" +
+                        Utils.encodeStringToBase64(request.url().host() + ":" + request.url().port());
+                requestBuilder.addHeader(SKYWALKING_V3_SW_X, sw_x);
+
             }
             newRequest = requestBuilder.build();
             response = chain.proceed(requestBuilder.build());
