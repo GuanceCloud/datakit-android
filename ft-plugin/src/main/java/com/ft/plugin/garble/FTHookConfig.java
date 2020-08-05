@@ -27,10 +27,6 @@ import java.util.HashMap;
  * 中的 SensorsAnalyticsHookConfig.groovy 类
  */
 public class FTHookConfig {
-
-    public static final String FT_SDK_API = "com/ft/sdk/FTAutoTrack";
-
-
     /**
      * Application中的方法
      */

@@ -18,6 +18,7 @@ package com.ft.plugin.garble.bytecode;
 
 import com.ft.plugin.BuildConfig;
 import com.ft.plugin.garble.ClassNameAnalytics;
+import com.ft.plugin.garble.Constants;
 import com.ft.plugin.garble.FTHookConfig;
 import com.ft.plugin.garble.FTMethodCell;
 import com.ft.plugin.garble.FTMethodType;
@@ -77,7 +78,7 @@ public class FTMethodAdapter extends AdviceAdapter {
     public void visitCode() {
         super.visitCode();
         if(needTrackTime()) {
-            mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/System", "currentTimeMillis", "()J", false);
+            mv.visitMethodInsn(Opcodes.INVOKESTATIC, Constants.CLASS_NAME_SYSTEM, "currentTimeMillis", "()J", false);
             startVarIndex = newLocal(Type.LONG_TYPE);
             mv.visitVarInsn(Opcodes.LSTORE, startVarIndex);
         }
@@ -87,14 +88,14 @@ public class FTMethodAdapter extends AdviceAdapter {
     public void visitInsn(int opcode) {
         if(needTrackTime()) {
             if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
-                mv.visitMethodInsn(INVOKESTATIC, "java/lang/System", "currentTimeMillis", "()J", false);
+                mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_SYSTEM, "currentTimeMillis", "()J", false);
                 mv.visitVarInsn(LLOAD, startVarIndex);
                 mv.visitInsn(LSUB);
                 int index = newLocal(Type.LONG_TYPE);
                 mv.visitVarInsn(LSTORE, index);
                 mv.visitLdcInsn(className + "|" + methodName + "|" + methodDesc);
                 mv.visitVarInsn(LLOAD, index);
-                mv.visitMethodInsn(INVOKESTATIC, "com/ft/sdk/FTAutoTrack", "timingMethod", "(Ljava/lang/String;J)V", false);
+                mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_API, "timingMethod", "(Ljava/lang/String;J)V", false);
             }
         }
         super.visitInsn(opcode);
@@ -131,62 +132,52 @@ public class FTMethodAdapter extends AdviceAdapter {
     @Override
     public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
         //这部分为替换使用的系统Log
-        if("android/util/Log".equals(owner)) {
+        if(Constants.CLASS_NAME_LOG.equals(owner)) {
             if("i".equals(name)) {
-                if("(Ljava/lang/String;Ljava/lang/String;)I".equals(desc)) {
-                    mv.visitMethodInsn(INVOKESTATIC, "com/ft/sdk/garble/utils/TrackLog", "i", "(Ljava/lang/String;Ljava/lang/String;)I", false);
-                } else if("(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I".equals(desc)) {
-                    mv.visitMethodInsn(INVOKESTATIC, "com/ft/sdk/garble/utils/TrackLog", "i", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I", false);
+                if(Constants.METHOD_DESC_S_S_I.equals(desc)) {
+                    mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "i", Constants.METHOD_DESC_S_S_I, false);
+                } else if(Constants.METHOD_DESC_S_S_T_I.equals(desc)) {
+                    mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "i", Constants.METHOD_DESC_S_S_T_I, false);
                 } else {
                     super.visitMethodInsn(opcode, owner, name, desc, itf);
                 }
             } else if("d".equals(name)) {
-                if("(Ljava/lang/String;Ljava/lang/String;)I".equals(desc)) {
-                    
-                    mv.visitMethodInsn(INVOKESTATIC, "com/ft/sdk/garble/utils/TrackLog", "d", "(Ljava/lang/String;Ljava/lang/String;)I", false);
-                } else if("(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I".equals(desc)) {
-                    
-                    mv.visitMethodInsn(INVOKESTATIC, "com/ft/sdk/garble/utils/TrackLog", "d", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I", false);
+                if(Constants.METHOD_DESC_S_S_I.equals(desc)) {
+                    mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "d", Constants.METHOD_DESC_S_S_I, false);
+                } else if(Constants.METHOD_DESC_S_S_T_I.equals(desc)) {
+                    mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "d", Constants.METHOD_DESC_S_S_T_I, false);
                 } else {
                     super.visitMethodInsn(opcode, owner, name, desc, itf);
                 }
             } else if("v".equals(name)) {
-                if("(Ljava/lang/String;Ljava/lang/String;)I".equals(desc)) {
-                    
-                    mv.visitMethodInsn(INVOKESTATIC, "com/ft/sdk/garble/utils/TrackLog", "v", "(Ljava/lang/String;Ljava/lang/String;)I", false);
-                } else if("(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I".equals(desc)) {
-                    
-                    mv.visitMethodInsn(INVOKESTATIC, "com/ft/sdk/garble/utils/TrackLog", "v", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I", false);
+                if(Constants.METHOD_DESC_S_S_I.equals(desc)) {
+                    mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "v", Constants.METHOD_DESC_S_S_I, false);
+                } else if(Constants.METHOD_DESC_S_S_T_I.equals(desc)) {
+                    mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "v", Constants.METHOD_DESC_S_S_T_I, false);
                 } else {
                     super.visitMethodInsn(opcode, owner, name, desc, itf);
                 }
             } else if("e".equals(name)) {
-                if("(Ljava/lang/String;Ljava/lang/String;)I".equals(desc)) {
-                    
-                    mv.visitMethodInsn(INVOKESTATIC, "com/ft/sdk/garble/utils/TrackLog", "e", "(Ljava/lang/String;Ljava/lang/String;)I", false);
-                } else if("(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I".equals(desc)) {
-                    
-                    mv.visitMethodInsn(INVOKESTATIC, "com/ft/sdk/garble/utils/TrackLog", "e", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I", false);
+                if(Constants.METHOD_DESC_S_S_I.equals(desc)) {
+                    mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "e", Constants.METHOD_DESC_S_S_I, false);
+                } else if(Constants.METHOD_DESC_S_S_T_I.equals(desc)) {
+                    mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "e", Constants.METHOD_DESC_S_S_T_I, false);
                 } else {
                     super.visitMethodInsn(opcode, owner, name, desc, itf);
                 }
             } else if("w".equals(name)) {
-                if("(Ljava/lang/String;Ljava/lang/String;)I".equals(desc)) {
-                    
-                    mv.visitMethodInsn(INVOKESTATIC, "com/ft/sdk/garble/utils/TrackLog", "w", "(Ljava/lang/String;Ljava/lang/String;)I", false);
-                } else if("(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I".equals(desc)) {
-                    
-                    mv.visitMethodInsn(INVOKESTATIC, "com/ft/sdk/garble/utils/TrackLog", "w", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I", false);
-                } else if("(Ljava/lang/String;Ljava/lang/Throwable;)I".equals(desc)) {
-                    
-                    mv.visitMethodInsn(INVOKESTATIC, "com/ft/sdk/garble/utils/TrackLog", "w", "(Ljava/lang/String;Ljava/lang/Throwable;)I", false);
+                if(Constants.METHOD_DESC_S_S_I.equals(desc)) {
+                    mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "w", Constants.METHOD_DESC_S_S_I, false);
+                } else if(Constants.METHOD_DESC_S_S_T_I.equals(desc)) {
+                    mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "w", Constants.METHOD_DESC_S_S_T_I, false);
+                } else if(Constants.METHOD_DESC_S_T_I.equals(desc)) {
+                    mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "w", Constants.METHOD_DESC_S_T_I, false);
                 } else {
                     super.visitMethodInsn(opcode, owner, name, desc, itf);
                 }
             } else if("println".equals(name)) {
-                if("(Ljava/lang/String;Ljava/lang/String;)I".equals(desc)) {
-                    
-                    mv.visitMethodInsn(INVOKESTATIC, "com/ft/sdk/garble/utils/TrackLog", "println", "(Ljava/lang/String;Ljava/lang/String;)I", false);
+                if(Constants.METHOD_DESC_S_S_I.equals(desc)) {
+                    mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "println", Constants.METHOD_DESC_S_S_I, false);
                 } else {
                     super.visitMethodInsn(opcode, owner, name, desc, itf);
                 }
@@ -233,7 +224,7 @@ public class FTMethodAdapter extends AdviceAdapter {
                 }
             }
         }
-        mv.visitMethodInsn(INVOKESTATIC, FTHookConfig.FT_SDK_API, ftMethodCell.agentName, ftMethodCell.agentDesc, false);
+        mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_API, ftMethodCell.agentName, ftMethodCell.agentDesc, false);
     }
 
     void handleCode() {
@@ -325,7 +316,7 @@ public class FTMethodAdapter extends AdviceAdapter {
                 if("(Landroid/view/MenuItem;)Z".equals(lambdaMethodCell.desc)){
                     mv.visitVarInsn(Opcodes.ALOAD,0);
                     mv.visitVarInsn(Opcodes.ALOAD,getVisitPosition(lambdaTypes,paramStart,isStaticMethod));
-                    mv.visitMethodInsn(Opcodes.INVOKESTATIC,FTHookConfig.FT_SDK_API,lambdaMethodCell.agentName,"(Ljava/lang/Object;Landroid/view/MenuItem;)V", false);
+                    mv.visitMethodInsn(Opcodes.INVOKESTATIC,Constants.FT_SDK_API,lambdaMethodCell.agentName,"(Ljava/lang/Object;Landroid/view/MenuItem;)V", false);
                     isHasTracked = true;
                     return;
                 }
@@ -334,7 +325,7 @@ public class FTMethodAdapter extends AdviceAdapter {
                 mv.visitVarInsn(lambdaMethodCell.opcodes.get(i-paramStart),getVisitPosition(lambdaTypes,i,isStaticMethod));
             }
 
-            mv.visitMethodInsn(Opcodes.INVOKESTATIC,FTHookConfig.FT_SDK_API,lambdaMethodCell.agentName,lambdaMethodCell.agentDesc,false);
+            mv.visitMethodInsn(Opcodes.INVOKESTATIC,Constants.FT_SDK_API,lambdaMethodCell.agentName,lambdaMethodCell.agentDesc,false);
             isHasTracked = true;
             return;
         }
