@@ -19,8 +19,11 @@ import androidx.annotation.Nullable;
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.garble.bean.NetStatusBean;
 
+import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.text.DecimalFormat;
+import java.util.Enumeration;
 import java.util.LinkedList;
 
 
@@ -60,6 +63,7 @@ public class NetUtils {
 
     /**
      * 获取上一次请求之后，网络状态的一些数据
+     *
      * @return
      */
     @Nullable
@@ -383,6 +387,38 @@ public class NetUtils {
         }
         return ip;
     }
+
+    /**
+     * 获取当前设备的IP
+     *
+     * @return
+     */
+    public String getMobileIpAddress() {
+        NetworkInfo networkInfo = ((ConnectivityManager) FTApplication.getApplication().getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            if (networkInfo.getType() == ConnectivityManager.TYPE_MOBILE) {
+                try {
+                    for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
+                        NetworkInterface intf = en.nextElement();
+                        for (Enumeration<InetAddress> enumeration = intf.getInetAddresses(); enumeration.hasMoreElements(); ) {
+                            InetAddress inetAddress = enumeration.nextElement();
+                            if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
+                                return inetAddress.getHostAddress();
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+                return getWifiIp();
+            } else {
+
+            }
+        }
+        return null;
+    }
+
 
     private ConnectivityManager getConnectivityManager() {
         return (ConnectivityManager) FTApplication.getApplication().getSystemService(Context.CONNECTIVITY_SERVICE);

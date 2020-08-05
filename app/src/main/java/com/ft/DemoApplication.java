@@ -8,6 +8,7 @@ import com.ft.sdk.FTMonitor;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
+import com.ft.sdk.TraceType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -58,6 +59,7 @@ public class DemoApplication extends Application {
                 .setNetworkTrace(true)
                 .setTraceConsoleLog(true)
                 .setEventFlowLog(true)
+                .setTraceType(TraceType.SKYWALKING_V3)
                 .setOnlySupportMainProcess(true);
         FTSdk.install(ftSDKConfig);
 
