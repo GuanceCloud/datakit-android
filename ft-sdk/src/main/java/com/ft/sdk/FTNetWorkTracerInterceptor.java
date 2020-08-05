@@ -5,6 +5,7 @@ import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.NetUtils;
+import com.ft.sdk.garble.utils.SkyWalkingUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.jetbrains.annotations.NotNull;
@@ -41,8 +42,8 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
     public static final String ZIPKIN_SPAN_ID = "X-B3-SpanId";
     public static final String ZIPKIN_SAMPLED = "X-B3-Sampled";
     public static final String JAEGER_KEY = "uber-trace-id";
-    public static final String SKYWALKING_V3_SW_X = "sw8-x";
-    private static int increasingNumber = 0;
+    public static final String SKYWALKING_V3_SW_X = "sw8";
+
 
     //是否可以采样
     boolean enableTrace;
@@ -89,7 +90,6 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
     public Response intercept(@NotNull Chain chain) throws IOException {
         Request request = chain.request();
         enableTrace = Utils.enableTraceSamplingRate();
-        increasingNumber++;
         if (!FTHttpConfig.get().networkTrace) {
             return chain.proceed(request);
         }
@@ -120,16 +120,9 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
             } else if (FTHttpConfig.get().traceType == TraceType.JAEGER) {
                 requestBuilder.addHeader(JAEGER_KEY, traceID + ":" + spanID + ":" + parentSpanID + ":" + sampled);
             } else if (FTHttpConfig.get().traceType == TraceType.SKYWALKING_V3) {
-                String parentTraceID = traceID + "." + Thread.currentThread().getId() + "." + requestTime + String.format(Locale.getDefault(), "%04d", increasingNumber - 1);
-                traceID = traceID + "." + Thread.currentThread().getId() + "." + requestTime + String.format(Locale.getDefault(), "%04d", increasingNumber);
-                String sw_x = sampled + "-" +
-                        Utils.encodeStringToBase64(traceID) + "-" +
-                        Utils.encodeStringToBase64(parentTraceID) + "-0-" +
-                        Utils.encodeStringToBase64(FTExceptionHandler.get().getTrackServiceName()) + "-" +
-                        Utils.encodeStringToBase64(UUID.randomUUID().toString().replace("-", "").toLowerCase() + "@" + NetUtils.get().getMobileIpAddress()) + "-" +
-                        Utils.encodeStringToBase64(request.url().encodedPath()) + "-" +
-                        Utils.encodeStringToBase64(request.url().host() + ":" + request.url().port());
-                requestBuilder.addHeader(SKYWALKING_V3_SW_X, sw_x);
+                SkyWalkingUtils skyWalkingUtils = new SkyWalkingUtils(traceID,sampled,requestTime,request.url());
+                traceID = skyWalkingUtils.getNewTraceId();
+                requestBuilder.addHeader(SKYWALKING_V3_SW_X, skyWalkingUtils.getSw8());
 
             }
             newRequest = requestBuilder.build();
