@@ -455,87 +455,17 @@ class FTTrack{
   /**
      * 将单条日志数据存入本地同步
      *
-     * @param logBean
+     * @param content
+     * @param status
      */
-    public void logBackground(LogBean logBean);
+    public void logBackground(String content, Status status);
   
   /**
      * 将多条日志数据存入本地同步
      *
-     * @param logBeans
+     * @param logDataList
      */
-    public void logBackground(List<LogBean> logBeans);
-  
-  /**
-     * 将单条日志数据及时上传并回调结果
-     *
-     * @param logBean
-     */
-    public void logImmediate(LogBean logBean, SyncCallback syncCallback);
-  
-  /**
-     * 将多条日志数据存入本地同步
-     *
-     * @param logBeans
-     */
-    public void logImmediate(List<LogBean> logBeans, SyncCallback syncCallback);
-  
-  /**
-     * 将单条事件数据存入本地同步
-     *
-     * @param keyEventBean
-     */
-    public void keyEventBackground(KeyEventBean keyEventBean);
-  
-  /**
-     * 将多条事件数据存入本地同步
-     *
-     * @param keyEventBeans
-     */
-    public void keyEventBackground(List<KeyEventBean> keyEventBeans);
-  
-  /**
-     * 将单条事件数据及时上传并回调结果
-     *
-     * @param keyEventBean
-     */
-    public void keyEventImmediate(KeyEventBean keyEventBean, SyncCallback syncCallback);
-  
-  /**
-     * 将多条事件数据存入本地同步
-     *
-     * @param keyEventBeans
-     */
-    public void keyEventImmediate(List<KeyEventBean> keyEventBeans, SyncCallback syncCallback);
-  
-  /**
-     * 将多条对象数据直接同步
-     *
-     * @param objectBeans
-     */
-    public void objectImmediate(List<ObjectBean> objectBeans, SyncCallback syncCallback);
-  
-  /**
-     * 将单条对象数据直接同步
-     *
-     * @param objectBean
-     */
-    public void objectImmediate(ObjectBean objectBean, SyncCallback syncCallback);
-  
-  /**
-     * 将多条对象数据直接同步
-     *
-     * @param objectBeans
-     */
-    public void objectBackground(List<ObjectBean> objectBeans);
-  
-  /**
-     * 将单条对象数据直接同步
-     *
-     * @param objectBean
-     */
-    public void objectBackground(ObjectBean objectBean);
-      
+    public void logBackground(List<LogData> logDataList);
 }
 ```
 

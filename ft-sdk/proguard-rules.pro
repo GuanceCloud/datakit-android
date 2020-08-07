@@ -86,7 +86,7 @@
     *;
 }
 
--keep class com.ft.sdk.garble.bean.LogBean{
+-keep class com.ft.sdk.garble.bean.LogData{
     *;
 }
 

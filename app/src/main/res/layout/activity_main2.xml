@@ -63,25 +63,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="即时获取位置信息" />
-
         <Button
             android:id="@+id/jump7"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="上传日志数据" />
-
         <Button
             android:id="@+id/jump8"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="上传事件数据" />
-
-        <Button
-            android:id="@+id/jump9"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="上传对象数据" />
-
+            android:text="上传一组日志数据" />
         <Button
             android:id="@+id/jump10"
             android:layout_width="match_parent"
