@@ -4,7 +4,6 @@ import com.ft.sdk.garble.FTExceptionHandler;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.utils.Constants;
-import com.ft.sdk.garble.utils.NetUtils;
 import com.ft.sdk.garble.utils.SkyWalkingUtils;
 import com.ft.sdk.garble.utils.Utils;
 
@@ -120,8 +119,9 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
             } else if (FTHttpConfig.get().traceType == TraceType.JAEGER) {
                 requestBuilder.addHeader(JAEGER_KEY, traceID + ":" + spanID + ":" + parentSpanID + ":" + sampled);
             } else if (FTHttpConfig.get().traceType == TraceType.SKYWALKING_V3) {
-                SkyWalkingUtils skyWalkingUtils = new SkyWalkingUtils(traceID,sampled,requestTime,request.url());
+                SkyWalkingUtils skyWalkingUtils = new SkyWalkingUtils(sampled,requestTime,request.url());
                 traceID = skyWalkingUtils.getNewTraceId();
+                spanID = skyWalkingUtils.getNewSpanId();
                 requestBuilder.addHeader(SKYWALKING_V3_SW_X, skyWalkingUtils.getSw8());
 
             }
