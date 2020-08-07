@@ -10,7 +10,7 @@ import org.json.JSONObject;
 /**
  * create: by huangDianHua
  * time: 2020/6/5 15:08:45
- * description:日志对象
+ * description:日志对象(SDK内部使用)
  */
 public class LogBean {
     //指定当前日志的来源，比如如果来源于 Ngnix，可指定为 Nginx，

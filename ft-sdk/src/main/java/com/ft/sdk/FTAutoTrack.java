@@ -19,6 +19,7 @@ import com.ft.sdk.garble.FTAliasConfig;
 import com.ft.sdk.garble.FTAutoTrackConfig;
 import com.ft.sdk.garble.FTFlowConfig;
 import com.ft.sdk.garble.FTFragmentManager;
+import com.ft.sdk.garble.FTTrackInner;
 import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.OP;
@@ -728,7 +729,7 @@ public class FTAutoTrack {
         Context context = FTApplication.getApplication();
         String name = DeviceUtils.getUuid(context);
         ObjectBean objectBean = new ObjectBean(name,Constants.DEFAULT_OBJECT_CLASS,SyncDataManager.getDefaultObjectBean());
-        FTTrack.getInstance().objectBackground(objectBean);
+        FTTrackInner.getInstance().objectBackground(objectBean);
     }
 
 
@@ -777,7 +778,7 @@ public class FTAutoTrack {
         LogBean logBean = new LogBean(Constants.USER_AGENT, content.toString(), System.currentTimeMillis());
         logBean.setOperationName(operationName);
         logBean.setDuration(duration);
-        FTTrack.getInstance().logBackground(logBean);
+        FTTrackInner.getInstance().logBackground(logBean);
     }
 
     /**

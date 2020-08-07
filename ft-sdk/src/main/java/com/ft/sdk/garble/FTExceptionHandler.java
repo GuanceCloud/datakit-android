@@ -76,7 +76,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
             logBean.setStatus(Status.CRITICAL);
             logBean.setEnv(env);
             logBean.setServiceName(trackServiceName);
-            FTTrack.getInstance().logBackground(logBean);
+            FTTrackInner.getInstance().logBackground(logBean);
         }
 
         try {

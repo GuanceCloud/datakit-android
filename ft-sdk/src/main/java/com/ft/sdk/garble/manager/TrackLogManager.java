@@ -1,7 +1,7 @@
 
 package com.ft.sdk.garble.manager;
 
-import com.ft.sdk.FTTrack;
+import com.ft.sdk.garble.FTTrackInner;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
 
@@ -51,7 +51,7 @@ public class TrackLogManager {
                     isRunning = true;
                     logBeanList.add(logBean);//取出数据放到集合中
                     if (logBeanList.size() >= 5) {//当取出的数据大于等于5条时执行插入数据库操作
-                        FTTrack.getInstance().logBackgroundSync(logBeanList);
+                        FTTrackInner.getInstance().logBackgroundSync(logBeanList);
                         logBeanList.clear();//插入完成后执行清除集合操作
                     }
                 }

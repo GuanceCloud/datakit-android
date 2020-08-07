@@ -19,9 +19,8 @@ import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTrack;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.garble.SyncCallback;
-import com.ft.sdk.garble.bean.KeyEventBean;
-import com.ft.sdk.garble.bean.LogBean;
-import com.ft.sdk.garble.bean.ObjectBean;
+import com.ft.sdk.garble.bean.LogData;
+import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -33,7 +32,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -137,59 +135,17 @@ public class Main2Activity extends AppCompatActivity {
                 }
             });
         });
-
         findViewById(R.id.jump7).setOnClickListener(v -> {
-            List<LogBean> logBeans = new ArrayList<>();
-            LogBean logBean = new LogBean("android_custom_log", "这是一条多行日志\n 这是第二行日志\n 日志结束", System.currentTimeMillis());
-            logBeans.add(logBean);
-            FTTrack.getInstance().logImmediate(logBeans, new SyncCallback() {
-                @Override
-                public void onResponse(int code, String response) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(Main2Activity.this, "code:" + code + " response:" + response, Toast.LENGTH_LONG).show();
-                        }
-                    });
-                }
-            });
-            List<LogBean> logBeans1 = new ArrayList<>();
-            LogBean logBean1 = new LogBean("android_custom_log", "后台同步事件", System.currentTimeMillis());
-            logBeans1.add(logBean1);
-            FTTrack.getInstance().logBackground(logBeans1);
+            FTTrack.getInstance().logBackground(Thread.currentThread().getName() + ":" + Main2Activity.class.getName(), Status.CRITICAL);
         });
         findViewById(R.id.jump8).setOnClickListener(v -> {
-            KeyEventBean keyEventBean = new KeyEventBean("这是一个独特的事件", System.currentTimeMillis());
-            keyEventBean.setContent("这是这个独特事件的内容");
-            FTTrack.getInstance().keyEventImmediate(Collections.singletonList(keyEventBean), new SyncCallback() {
-                @Override
-                public void onResponse(int code, String response) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(Main2Activity.this, "code:" + code + " response:" + response, Toast.LENGTH_LONG).show();
-                        }
-                    });
-                }
-            });
+            List<LogData> logDataList = new ArrayList<>();
+            logDataList.add(new LogData(Thread.currentThread().getName() + ":" + System.currentTimeMillis() + ":" + Main2Activity.class.getName(), Status.CRITICAL));
+            logDataList.add(new LogData(Thread.currentThread().getName() + ":" + System.currentTimeMillis() + ":" + Main2Activity.class.getName(), Status.CRITICAL));
+            logDataList.add(new LogData(Thread.currentThread().getName() + ":" + System.currentTimeMillis() + ":" + Main2Activity.class.getName(), Status.CRITICAL));
+            logDataList.add(new LogData(Thread.currentThread().getName() + ":" + System.currentTimeMillis() + ":" + Main2Activity.class.getName(), Status.CRITICAL));
+            FTTrack.getInstance().logBackground(logDataList);
         });
-        findViewById(R.id.jump9).setOnClickListener(v -> {
-            ObjectBean objectBean = new ObjectBean("custom_data", "objectBackground");
-            List<ObjectBean> list = new ArrayList<>();
-            list.add(objectBean);
-            /**FTTrack.getInstance().objectImmediate(list, new SyncCallback() {
-            @Override public void onResponse(int code, String response) {
-            runOnUiThread(new Runnable() {
-            @Override public void run() {
-            Toast.makeText(Main2Activity.this,"code:"+code+" response:"+response,Toast.LENGTH_LONG).show();
-            }
-            });
-            }
-            });*/
-
-            FTTrack.getInstance().objectBackground(list);
-        });
-
         findViewById(R.id.jump10).setOnClickListener(v -> {
             requestUrl("http://www.weather.com.cn/data/sk/101010100.html");
             requestUrl("https://www.baidu.com");

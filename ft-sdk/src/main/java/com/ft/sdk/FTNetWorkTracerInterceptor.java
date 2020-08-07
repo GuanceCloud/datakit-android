@@ -2,6 +2,7 @@ package com.ft.sdk;
 
 import com.ft.sdk.garble.FTExceptionHandler;
 import com.ft.sdk.garble.FTHttpConfig;
+import com.ft.sdk.garble.FTTrackInner;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.SkyWalkingUtils;
@@ -20,7 +21,6 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 import okhttp3.Interceptor;
@@ -77,7 +77,7 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
             logBean.setServiceName(FTExceptionHandler.get().getTrackServiceName());
             logBean.setSpanID(spanID);
             logBean.setTraceID(traceID);
-            FTTrack.getInstance().logBackground(logBean);
+            FTTrackInner.getInstance().logBackground(logBean);
         } catch (Exception e) {
             e.printStackTrace();
         }
