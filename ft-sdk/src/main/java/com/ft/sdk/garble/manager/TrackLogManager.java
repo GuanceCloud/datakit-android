@@ -1,8 +1,10 @@
 
 package com.ft.sdk.garble.manager;
 
+import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.FTTrackInner;
 import com.ft.sdk.garble.bean.LogBean;
+import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
 
 import java.util.List;
@@ -34,7 +36,21 @@ public class TrackLogManager {
     }
 
     public synchronized void trackLog(LogBean logBean) {
-        logQueue.add(logBean);
+        //防止内存中队列容量超过一定限制，这里同样使用同步丢弃策略
+        if(logQueue.size() >= Constants.MAX_DB_CACHE_NUM){
+            switch (FTDBCachePolicy.get().getLogCacheDiscardStrategy()){
+                case DISCARD:
+                    break;
+                case DISCARD_OLDEST:
+                    logQueue.poll();
+                    logQueue.add(logBean);
+                    break;
+                default:
+                    logQueue.add(logBean);
+            }
+        }else{
+            logQueue.add(logBean);
+        }
         rotationSync();
     }
 

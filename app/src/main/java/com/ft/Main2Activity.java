@@ -4,6 +4,7 @@ import android.Manifest;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -48,7 +49,7 @@ import static android.content.pm.PackageManager.PERMISSION_DENIED;
 
 
 public class Main2Activity extends AppCompatActivity {
-
+    boolean logThreadRun = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -163,21 +164,30 @@ public class Main2Activity extends AppCompatActivity {
             requestUrl("https://www.baidu.com");
             requestUrl("https://www.google.com");
         });
-        findViewById(R.id.jump14).setOnClickListener(v -> {
+        Button logThread = findViewById(R.id.jump14);
+        logThread.setOnClickListener(v -> {
+            logThreadRun = !logThreadRun;
             AtomicLong atomicLong = new AtomicLong(0);
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while (true) {
-                        Log.d("LogManager", "data=======" + atomicLong.getAndIncrement());
-                        try {
-                            Thread.sleep(100);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
+            if(logThreadRun){
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        while (logThreadRun) {
+                            Log.d("LogManager", "data=======" + atomicLong.getAndIncrement());
+                            try {
+                                Thread.sleep(100);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
-                }
-            }).start();
+                }).start();
+            }
+            if(logThreadRun){
+                logThread.setText("周期产生日志数据--运行");
+            }else{
+                logThread.setText("周期产生日志数据--结束");
+            }
         });
     }
 

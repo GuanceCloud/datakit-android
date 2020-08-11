@@ -31,6 +31,10 @@ public class FTDBCachePolicy {
         this.logCacheDiscardStrategy = ftsdkConfig.getLogCacheDiscardStrategy();
     }
 
+    public LogCacheDiscard getLogCacheDiscardStrategy() {
+        return logCacheDiscardStrategy;
+    }
+
     /**
      * 操作 Log 日志计数
      * @param optCount
