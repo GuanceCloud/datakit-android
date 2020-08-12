@@ -6,7 +6,7 @@ package com.ft.sdk;
  * Description:
  */
 public class MonitorType {
-    public static int ALL = 1;
+    public static int ALL = 0xFFFFFFFF;
     public static int BATTERY = 1<<1;
     public static int MEMORY = 1<<2;
     public static int CPU = 1<<3;

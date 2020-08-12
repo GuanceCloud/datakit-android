@@ -355,7 +355,7 @@ public class FTTrackInner {
      * @return
      * @throws JSONException
      */
-    boolean isLegalValues(JSONObject jsonObject) throws JSONException {
+    public boolean isLegalValues(JSONObject jsonObject) throws JSONException {
         if (jsonObject == null) {
             LogUtils.e(TAG,"参数 fields 不能为空");
             return false;
