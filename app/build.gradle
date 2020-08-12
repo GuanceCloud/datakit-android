@@ -42,7 +42,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2-alpha03'
 
-    implementation files('libs/msa_mdid_1.0.13.aar')
+    implementation files('libs/oaid_sdk_1.0.22.aar')
     implementation project(":ft-sdk")
     //implementation 'com.cloudcare.ft.mobile.sdk.traker.agent:ft-sdk:1.0.2-alpha13'
     implementation 'com.github.bumptech.glide:glide:4.10.0'

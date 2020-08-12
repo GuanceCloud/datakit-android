@@ -571,7 +571,7 @@ FTSdk.get().setNetworkTrace(true)
 
  在 Android 10 版本中，非系统应用将不能获取到系统的 IMEI、MAC 等信息。面对该问题移动安全联盟联合国内的手机厂商推出了
 补充设备标准体系方案，选择用 OAID 字段作为IMEI等系统信息的替代字段。OAID 字段是由中国信通院联合华为、小米、OPPO、
-VIVO 等厂商共同推出的设备识别字段，具有一定的权威性。
+VIVO 等厂商共同推出的设备识别字段，具有一定的权威性。目前 DataFlux SDK 使用的是 oaid_sdk_1.0.22.aar
 关于 OAID 可移步参考[移动安全联盟](http://www.msa-alliance.cn/col.jsp?id=120)
 
 #### 2. 使用
@@ -580,7 +580,7 @@ VIVO 等厂商共同推出的设备识别字段，具有一定的权威性。
 
 #### 3. 示例
 
-##### 1. 下载好资源文件后，将 miit_mdid_x.x.x.arr 拷贝到项目的 libs 目录下，并设置依赖，其中 x.x.x 代表版本号
+##### 1. 下载好资源文件后，将 oaid_sdk_1.0.22.aar 拷贝到项目的 libs 目录下，并设置依赖
 [获取最新版本](http://www.msa-alliance.cn/col.jsp?id=120)
 
 ![Alt](http://zhuyun-static-files-production.oss-cn-hangzhou.aliyuncs.com/helps/markdown-screentshot/ft-sdk-android/use_learn_1.png#pic_center)
@@ -594,7 +594,7 @@ VIVO 等厂商共同推出的设备识别字段，具有一定的权威性。
 ##### 3. 设置依赖
 
 ``` groovy
-implementation files('libs/miit_mdid_x.x.x.arr')
+implementation files('libs/oaid_sdk_1.0.22.arr')
 ```
 
 ##### 4. 混淆设置

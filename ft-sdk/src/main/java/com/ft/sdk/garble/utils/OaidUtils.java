@@ -62,12 +62,7 @@ public class OaidUtils {
                 return;
             }
             final int INIT_ERROR_RESULT_DELAY = 1008614;            //获取接口是异步的，结果会在回调中返回，回调执行的回调可能在工作线程
-            // 初始化 Library
-            Class<?> jLibrary = Class.forName("com.bun.miitmdid.core.JLibrary");
-            Method initEntry = jLibrary.getDeclaredMethod("InitEntry", Context.class);
-            initEntry.invoke(null, context);
-
-            Class identifyListener = Class.forName("com.bun.supplier.IIdentifierListener");
+            Class identifyListener = Class.forName("com.bun.miitmdid.interfaces.IIdentifierListener");
             // 创建 OAID 获取实例
             IdentifyListenerHandler handler = new IdentifyListenerHandler();
             Object iIdentifierListener = Proxy.newProxyInstance(context.getClassLoader(), new Class[]{identifyListener}, handler);
@@ -110,7 +105,7 @@ public class OaidUtils {
             try {
                 if ("OnSupport".equals(method.getName())) {
                     if ((Boolean) args[0]) {
-                        Class<?> idSupplier = Class.forName("com.bun.supplier.IdSupplier");
+                        Class<?> idSupplier = Class.forName("com.bun.miitmdid.interfaces.IdSupplier");
                         Method getOAID = idSupplier.getDeclaredMethod("getOAID");
                         oaid = (String) getOAID.invoke(args[1]);
                         //LogUtils.d("oaid:" + oaid);
