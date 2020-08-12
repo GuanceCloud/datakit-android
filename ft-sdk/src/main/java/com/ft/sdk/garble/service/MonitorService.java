@@ -15,6 +15,7 @@ import com.ft.sdk.garble.utils.LogUtils;
  * description:监控服务
  */
 public class MonitorService extends Service {
+    public final static String TAG = MonitorService.class.getSimpleName();
     public static final int START_CMD = 1;
     public static final int STOP_CMD = 2;
 
@@ -26,7 +27,7 @@ public class MonitorService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        LogUtils.i("MonitorService 启动");
+        LogUtils.w(TAG,"MonitorService 启动");
         if (intent == null) {
             return START_STICKY;
         }

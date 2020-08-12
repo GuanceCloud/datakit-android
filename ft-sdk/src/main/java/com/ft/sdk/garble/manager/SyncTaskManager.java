@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Description:同步
  */
 public class SyncTaskManager {
+    public final static String TAG = "SyncTaskManager";
     private static volatile SyncTaskManager instance;
     private final int CLOSE_TIME = 5;
     private final int SLEEP_TIME = 10 * 1000;
@@ -78,16 +79,16 @@ public class SyncTaskManager {
                     //如果打开绑定用户开关，但是没有绑定用户信息，那么就不上传用户数据，直到绑了
                     if (FTUserConfig.get().isNeedBindUser() && !FTUserConfig.get().isUserDataBinded()) {
                         trackDataList.clear();
-                        LogUtils.e("请先绑定用户信息");
+                        LogUtils.e(TAG,"请先绑定用户信息");
                     }
                     while (!trackDataList.isEmpty() || !objectDataList.isEmpty() ||
                             !logDataList.isEmpty() || !keyEventDataList.isEmpty()) {
                         if (!Utils.isNetworkAvailable()) {
-                            LogUtils.e(">>>网络未连接<<<");
+                            LogUtils.e(TAG,">>>网络未连接<<<");
                             break;
                         }
                         if (errorCount.get() >= CLOSE_TIME) {
-                            LogUtils.e(">>>连续同步失败5次，停止当前轮询同步<<<");
+                            LogUtils.e(TAG,">>>连续同步失败5次，停止当前轮询同步<<<");
                             break;
                         }
                         if (!trackDataList.isEmpty()) {
@@ -129,17 +130,17 @@ public class SyncTaskManager {
         body = body.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION).replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK);
         requestNet(dataType, body, (code, response) -> {
             if (code >= 200 && code < 500) {
-                LogUtils.d("同步数据成功");
+                LogUtils.d(TAG,"同步数据成功");
                 deleteLastQuery(requestDatas);
                 if(dataType == DataType.LOG){
                     FTDBCachePolicy.get().optCount(-requestDatas.size());
                 }
                 errorCount.set(0);
                 if (code > 200) {
-                    LogUtils.e("同步数据出错(忽略)-[code:" + code + ",response:" + response + "]");
+                    LogUtils.e(TAG,"同步数据出错(忽略)-[code:" + code + ",response:" + response + "]");
                 }
             } else {
-                LogUtils.e("同步数据失败-[code:" + code + ",response:" + response + "]");
+                LogUtils.e(TAG,"同步数据失败-[code:" + code + ",response:" + response + "]");
                 errorCount.getAndIncrement();
             }
         });
@@ -208,7 +209,7 @@ public class SyncTaskManager {
         } catch (Exception e) {
             e.printStackTrace();
             syncCallback.onResponse(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, e.getLocalizedMessage());
-            LogUtils.e("同步上传错误：" + e.getLocalizedMessage());
+            LogUtils.e(TAG,"同步上传错误：" + e.getLocalizedMessage());
         }
 
     }

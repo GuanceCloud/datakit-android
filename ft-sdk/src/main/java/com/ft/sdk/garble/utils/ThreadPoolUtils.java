@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Description:
  */
 public class ThreadPoolUtils {
+    public static final String TAG = "ThreadPoolUtils";
     private final static int CPU_COUNT = Runtime.getRuntime().availableProcessors();
     private final static int CORE_POOL_SIZE = CPU_COUNT;
     private final static int MAXIMUM_POOL_SIZE = 128;
@@ -32,7 +33,7 @@ public class ThreadPoolUtils {
     private final RejectedExecutionHandler sRunOnSerialPolicy =
             new RejectedExecutionHandler() {
                 public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
-                    LogUtils.w("Exceeded ThreadPoolExecutor pool size");
+                    LogUtils.w(TAG,"Exceeded ThreadPoolExecutor pool size");
                     // As a last ditch fallback, run it on an executor with an unbounded queue.
                     // Create this executor lazily, hopefully almost never.
                     synchronized (this) {

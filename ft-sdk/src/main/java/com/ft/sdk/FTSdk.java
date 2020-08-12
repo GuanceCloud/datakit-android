@@ -36,6 +36,7 @@ import java.security.InvalidParameterException;
  * Description:
  */
 public class FTSdk {
+    public final static String TAG = "FTSdk";
     //该变量不能改动，其值由 Plugin 动态改写
     public static String PLUGIN_VERSION = "";
     //下面两个变量也不能随便改动，改动请同时更改 plugin 中对应的值
@@ -93,7 +94,7 @@ public class FTSdk {
         FTNetworkListener.get().release();
         FTFlowConfig.get().release();
         LocationUtils.get().stopListener();
-        LogUtils.i("FT SDK 已经被关闭");
+        LogUtils.w(TAG,"FT SDK 已经被关闭");
     }
 
     /**
@@ -111,7 +112,7 @@ public class FTSdk {
     public void unbindUserData() {
         if (mFtSDKConfig != null) {
             if (mFtSDKConfig.isNeedBindUser()) {
-                LogUtils.d("解绑用户信息");
+                LogUtils.d(TAG,"解绑用户信息");
                 //解绑用户信息
                 FTUserConfig.get().unbindUserData();
                 //清除本地缓存的SessionId
@@ -132,7 +133,7 @@ public class FTSdk {
     public void bindUserData(@NonNull String name, @NonNull String id, JSONObject extras) {
         if (mFtSDKConfig != null) {
             if (mFtSDKConfig.isNeedBindUser()) {
-                LogUtils.d("绑定用户信息");
+                LogUtils.d(TAG,"绑定用户信息");
                 //如果本地的SessionID已经绑定了用于就重新生成sessionId进行绑定
                 if (FTUserConfig.get().currentSessionHasUser()) {
                     FTUserConfig.get().clearSessionId();
@@ -164,7 +165,7 @@ public class FTSdk {
     public void setGpuRenderer(ViewGroup root) {
         try {
             if (FTMonitorConfig.get().isMonitorType(MonitorType.GPU)) {
-                LogUtils.d("绑定视图监听 GPU 信息");
+                LogUtils.d(TAG,"绑定视图监听 GPU 信息");
                 Context context = getApplication();
                 final RendererUtil mRendererUtil = new RendererUtil();
                 GLSurfaceView mGLSurfaceView = new GLSurfaceView(context);

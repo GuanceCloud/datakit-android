@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Description: Activity 管理类
  */
 public class FTActivityManager {
+    public final static String TAG = "FTActivityManager";
     public ConcurrentHashMap<String,Boolean> isFirstResume;
     private static volatile FTActivityManager instance;
     //栈顶 Activity
@@ -167,7 +168,7 @@ public class FTActivityManager {
     }
 
     public void printTest(Activity activity) {
-        LogUtils.d(FTActivityManager.class.getSimpleName() + "\n" +
+        LogUtils.d(TAG,FTActivityManager.class.getSimpleName() + "\n" +
                 "activeCount=" + activityList.size() + "\n" +
                 "topActivity=" + topActivity + "\n");
     }

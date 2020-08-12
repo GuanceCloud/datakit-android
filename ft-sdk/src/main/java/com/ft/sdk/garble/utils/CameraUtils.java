@@ -23,6 +23,7 @@ import java.util.List;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 public class CameraUtils {
+    public static final String TAG = "CameraUtils";
     public static final int CAMERA_FACING_BACK = 0;
     public static final int CAMERA_FACING_FRONT = 1;
     public static final int CAMERA_NONE = -1;
@@ -155,7 +156,7 @@ public class CameraUtils {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             int state = context.checkSelfPermission(Manifest.permission.CAMERA);
             if (state != PERMISSION_GRANTED) {
-                LogUtils.e("请先申请相机权限");
+                LogUtils.e(TAG,"请先申请相机权限");
                 return 0;
             }
         }

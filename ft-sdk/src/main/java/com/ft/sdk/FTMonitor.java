@@ -19,6 +19,7 @@ import com.ft.sdk.garble.utils.Utils;
  * description: 监控入口
  */
 public class FTMonitor {
+    public static final String TAG = "FTMonitor";
     //轮训周期，默认10秒
     private int period = 10;
     //监控类型
@@ -106,12 +107,12 @@ public class FTMonitor {
         handler.removeMessages(MSG_RETRY);
         if (errorCount < MAX_COUNT) {
             errorCount++;
-            LogUtils.e("MonitorService 启动失败，10 秒后重新尝试 ==> " + errorCount);
+            LogUtils.e(TAG,"MonitorService 启动失败，10 秒后重新尝试 ==> " + errorCount);
             handler.sendEmptyMessageDelayed(MSG_RETRY, 10000);
 
         } else {
             isTrying = false;
-            LogUtils.e("MonitorService 停止尝试");
+            LogUtils.e(TAG,"MonitorService 停止尝试");
         }
     }
 

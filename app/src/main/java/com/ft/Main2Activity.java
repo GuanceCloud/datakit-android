@@ -25,6 +25,7 @@ import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.OaidUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONException;
@@ -54,6 +55,7 @@ public class Main2Activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
+        OaidUtils.getOAID(this);
         if (!DebugDB.isServerRunning()) {
             DebugDB.initialize(DemoApplication.getContext(), new DebugDBFactory());
             DebugDB.initialize(DemoApplication.getContext(), new DebugDBEncryptFactory());

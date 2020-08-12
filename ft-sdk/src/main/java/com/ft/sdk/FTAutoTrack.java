@@ -48,6 +48,7 @@ import java.util.List;
  * Description
  */
 public class FTAutoTrack {
+    public final static String TAG = "FTAutoTrack";
     /**
      * 启动 APP
      * 警告！！！该方法不能删除
@@ -73,7 +74,7 @@ public class FTAutoTrack {
      */
     public static void startActivityByWay(Boolean fromFragment, Intent intent) {
         try {
-            LogUtils.d("activityFromWay=" + fromFragment + ",,,intent=" + intent);
+            LogUtils.d(TAG,"activityFromWay=" + fromFragment + ",,,intent=" + intent);
             if (intent != null && intent.getComponent() != null) {
                 FTActivityManager.get().putActivityOpenFromFragment(intent.getComponent().getClassName(), fromFragment);
             }
@@ -699,7 +700,7 @@ public class FTAutoTrack {
                 }
                 List<RecordData> recordDataList = new ArrayList<>();
                 recordDataList.add(recordData);
-                LogUtils.d("FTAutoTrack数据进数据库：" + recordData.getJsonString());
+                LogUtils.d(TAG,"FTAutoTrack数据进数据库：" + recordData.getJsonString());
                 //开启流程图，获取流程图相关数据存入数据库中
                 if (FTFlowConfig.get().isOpenFlowChart()) {
                     if (op == OP.OPEN_ACT || op == OP.OPEN_FRA) {
@@ -788,7 +789,7 @@ public class FTAutoTrack {
      * @param cost
      */
     public static void timingMethod(String desc, long cost) {
-        LogUtils.d(desc);
+        LogUtils.d(TAG,desc);
         try {
             String[] arr = desc.split("\\|");
             String[] names = arr[0].split("/");

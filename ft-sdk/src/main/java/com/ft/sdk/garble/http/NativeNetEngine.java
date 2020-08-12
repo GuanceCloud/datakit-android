@@ -26,6 +26,7 @@ import static com.ft.sdk.garble.http.NetCodeStatus.UNKNOWN_EXCEPTION_CODE;
  * Description: 原生 HttpUrlConnection 网络请求引擎
  */
 public class NativeNetEngine implements INetEngine {
+    public static final String TAG = "NativeNetEngine";
     //字符编码
     final String CHARSET = "UTF-8";
     //内容类型
@@ -68,7 +69,7 @@ public class NativeNetEngine implements INetEngine {
             if (mConnection == null) {
                 //连接打开失败提示
                 responseCode = NetCodeStatus.NETWORK_EXCEPTION_CODE;
-                LogUtils.e(String.format("connect %s feature", url.toString()));
+                LogUtils.e(TAG,String.format("connect %s feature", url.toString()));
             } else {
                 connSuccess = true;
             }
@@ -108,7 +109,7 @@ public class NativeNetEngine implements INetEngine {
         try {
             return request();
         } catch (Exception e) {
-            LogUtils.e(e.getMessage());
+            LogUtils.e(TAG,e.getMessage());
             return getResponseData(UNKNOWN_EXCEPTION_CODE, e.getMessage());
         }
     }

@@ -40,6 +40,7 @@ import static com.ft.sdk.garble.utils.Utils.getSharedPreferences;
  * Description:
  */
 public class DeviceUtils {
+    public static final String TAG = "DeviceUtils";
     private static final Map<String, String> sCarrierMap = new HashMap<String, String>() {
         {
             //中国移动
@@ -171,7 +172,7 @@ public class DeviceUtils {
                     if (tm.hasCarrierPrivileges()) {
                         imei = tm.getImei();
                     } else {
-                        LogUtils.d("未能获取到设备的IMEI信息");
+                        LogUtils.d(TAG,"未能获取到设备的IMEI信息");
                     }
                 } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     imei = tm.getImei();
@@ -180,7 +181,7 @@ public class DeviceUtils {
                 }
             }
         } catch (SecurityException e) {
-            LogUtils.e("未能获取到系统>>Manifest.permission.READ_PHONE_STATE<<权限");
+            LogUtils.e(TAG,"未能获取到系统>>Manifest.permission.READ_PHONE_STATE<<权限");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -343,7 +344,7 @@ public class DeviceUtils {
                     e.printStackTrace();
                 }
             }else{
-                LogUtils.e("没有获得到 READ_PHONE_STATE 权限无法获取运营商信息");
+                LogUtils.e(TAG,"没有获得到 READ_PHONE_STATE 权限无法获取运营商信息");
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * description: Fragment 生命周期处理类
  */
 public class FTFragmentLifecycleHandler {
+    public final static String TAG = "FTFragmentLifecycleHandler";
     Activity activity;
     List<Class> fragmentList;
     ConcurrentHashMap<String, Boolean> fragmentUseVisibleHint;
@@ -37,7 +38,7 @@ public class FTFragmentLifecycleHandler {
         if (fragmentUseVisibleHint.containsKey(fragment.getName())) {
             return;
         }
-        LogUtils.d("Fragment[" + fragment.getSimpleName() + "] state Resume");
+        LogUtils.d(TAG,"Fragment[" + fragment.getSimpleName() + "] state Resume");
         show(fragment);
     }
 
@@ -48,7 +49,7 @@ public class FTFragmentLifecycleHandler {
         if (fragmentUseVisibleHint.containsKey(fragment.getName())) {
             return;
         }
-        LogUtils.d("Fragment[" + fragment.getSimpleName() + "] state Pause");
+        LogUtils.d(TAG,"Fragment[" + fragment.getSimpleName() + "] state Pause");
         hidden(fragment);
     }
 
@@ -66,7 +67,7 @@ public class FTFragmentLifecycleHandler {
      * @param isVisible
      */
     public void setUserVisibleHint(Class fragment, boolean isVisible) {
-        LogUtils.d("Fragment[" + fragment.getSimpleName() + "] isVisible=" + isVisible);
+        LogUtils.d(TAG,"Fragment[" + fragment.getSimpleName() + "] isVisible=" + isVisible);
         if (!fragmentUseVisibleHint.containsKey(fragment.getName())) {
             fragmentUseVisibleHint.put(fragment.getName(), true);
         }

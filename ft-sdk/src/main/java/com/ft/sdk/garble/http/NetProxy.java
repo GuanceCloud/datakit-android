@@ -17,6 +17,7 @@ import java.util.TimeZone;
  * description:
  */
 public class NetProxy {
+    public final static String TAG = "NetProxy";
     //SDK 中网络的配置
     FTHttpConfig ftHttpConfig = FTHttpConfig.get();
     //内容类型
@@ -33,7 +34,7 @@ public class NetProxy {
         try {
             engine.defaultConfig(httpBuilder);
         }catch (Exception e){
-            LogUtils.e(e.getLocalizedMessage());
+            LogUtils.e(TAG,e.getLocalizedMessage());
         }
     }
 
@@ -53,7 +54,7 @@ public class NetProxy {
         ResponseData responseData = engine.execute();
         if(responseData != null) {
             if(httpBuilder.isShowLog()) {
-                LogUtils.d("HTTP-response:[code:" + responseData.getHttpCode() + ",response:" + responseData.getData() + "]");
+                LogUtils.d(TAG,"HTTP-response:[code:" + responseData.getHttpCode() + ",response:" + responseData.getData() + "]");
             }
             return getResponseData(tClass, responseData.getHttpCode(), responseData.getData());
         }else{

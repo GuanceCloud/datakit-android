@@ -59,6 +59,7 @@ import static com.ft.sdk.garble.utils.Constants.UNKNOWN;
  * Description:
  */
 public class SyncDataManager {
+    public final static String TAG = "SyncDataManager";
 
     /**
      * 封装同步上传的数据
@@ -521,7 +522,7 @@ public class SyncDataManager {
             tags.put("battery_status", batteryBean.getStatus());
             fields.put("battery_use", batteryBean.getBr());
         } catch (Exception e) {
-            LogUtils.e("电池数据获取异常:" + e.getMessage());
+            LogUtils.e(TAG,"电池数据获取异常:" + e.getMessage());
         }
     }
 
@@ -537,7 +538,7 @@ public class SyncDataManager {
             tags.put("memory_total", memory[0] + "GB");
             fields.put("memory_use", memory[1]);
         } catch (Exception e) {
-            LogUtils.e("内存数据获取异常:" + e.getMessage());
+            LogUtils.e(TAG,"内存数据获取异常:" + e.getMessage());
         }
     }
 
@@ -554,7 +555,7 @@ public class SyncDataManager {
             fields.put("cpu_temperature", CpuUtils.get().getCpuTemperature());
             tags.put("cpu_hz", CpuUtils.get().getCPUMaxFreqKHz());
         } catch (Exception e) {
-            LogUtils.e("CPU数据获取异常:" + e.getMessage());
+            LogUtils.e(TAG,"CPU数据获取异常:" + e.getMessage());
         }
     }
 
@@ -570,7 +571,7 @@ public class SyncDataManager {
             tags.put("gpu_hz", GpuUtils.getGpuMaxFreq());
             fields.put("gpu_rate", GpuUtils.getGpuUseRate());
         } catch (Exception e) {
-            LogUtils.e("GPU数据获取异常:" + e.getMessage());
+            LogUtils.e(TAG,"GPU数据获取异常:" + e.getMessage());
         }
     }
 
@@ -616,7 +617,7 @@ public class SyncDataManager {
                 fields.put("network_error_rate", lastStatus.getErrorRate());
             }
         } catch (Exception e) {
-            LogUtils.e("网络数据获取异常:" + e.getMessage());
+            LogUtils.e(TAG,"网络数据获取异常:" + e.getMessage());
         }
     }
 
@@ -633,7 +634,7 @@ public class SyncDataManager {
                 tags.put(cameraPx.getPx()[0], cameraPx.getPx()[1]);
             }
         } catch (Exception e) {
-            LogUtils.e("相机数据获取异常:" + e.getMessage());
+            LogUtils.e(TAG,"相机数据获取异常:" + e.getMessage());
         }
     }
 
@@ -666,7 +667,7 @@ public class SyncDataManager {
             }
             tags.put("gps_open", LocationUtils.get().isOpenGps());
         } catch (Exception e) {
-            LogUtils.e("位置数据获取异常:" + e.getMessage());
+            LogUtils.e(TAG,"位置数据获取异常:" + e.getMessage());
         }
     }
 
@@ -675,7 +676,7 @@ public class SyncDataManager {
             fields.put("device_open_time", DeviceUtils.getSystemOpenTime());
             tags.put("device_name", BluetoothUtils.get().getDeviceName());
         } catch (Exception e) {
-            LogUtils.e("系统数据获取异常:" + e.getMessage());
+            LogUtils.e(TAG,"系统数据获取异常:" + e.getMessage());
         }
     }
 
@@ -691,7 +692,7 @@ public class SyncDataManager {
             tags.put("bt_open", BluetoothUtils.get().isOpen());
 
         } catch (Exception e) {
-            LogUtils.e("蓝牙数据获取异常:" + e.getMessage());
+            LogUtils.e(TAG,"蓝牙数据获取异常:" + e.getMessage());
         }
     }
 
@@ -765,7 +766,7 @@ public class SyncDataManager {
                 }
             }
         } catch (Exception e) {
-            LogUtils.e("传感器数据获取异常:" + e.getMessage());
+            LogUtils.e(TAG,"传感器数据获取异常:" + e.getMessage());
         }
     }
 
@@ -773,7 +774,7 @@ public class SyncDataManager {
         try {
             fields.put("fps", FpsUtils.get().getFps());
         } catch (JSONException e) {
-            LogUtils.e("FPS数据获取异常:" + e.getMessage());
+            LogUtils.e(TAG,"FPS数据获取异常:" + e.getMessage());
         }
     }
 
@@ -784,7 +785,7 @@ public class SyncDataManager {
         try {
             tags.put("torch", CameraUtils.get().isTorchState());
         } catch (JSONException e) {
-            LogUtils.e("闪光灯数据获取异常:" + e.getMessage());
+            LogUtils.e(TAG,"闪光灯数据获取异常:" + e.getMessage());
         }
     }
 
@@ -923,8 +924,8 @@ public class SyncDataManager {
             sb.append("-----------------------------------------------------------\n");
             sb.append("----------------------同步数据--开始-------------------------\n");
             sb.append(body);
-            LogUtils.d(sb.toString());
             sb.append("----------------------同步数据--结束----------------------\n");
+            LogUtils.d(TAG,sb.toString());
             return;
         }
         try {
@@ -956,9 +957,9 @@ public class SyncDataManager {
                 sb.append("},\n");
             }
             sb.append("----------------------同步数据--结束----------------------\n");
-            LogUtils.d("同步的数据\n" + sb.toString());
+            LogUtils.d(TAG,"同步的数据\n" + sb.toString());
         } catch (Exception e) {
-            LogUtils.d("同步的数据\n" + body);
+            LogUtils.d(TAG,"同步的数据\n" + body);
         }
     }
 }
