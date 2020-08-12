@@ -14,6 +14,7 @@ import java.util.concurrent.CountDownLatch;
  * Description:
  */
 public class OaidUtils {
+    public static final String TAG = "OaidUtils";
     // OAID
     private static String oaid = "";
     private static CountDownLatch countDownLatch;
@@ -70,7 +71,6 @@ public class OaidUtils {
             // 创建 OAID 获取实例
             IdentifyListenerHandler handler = new IdentifyListenerHandler();
             Object iIdentifierListener = Proxy.newProxyInstance(context.getClassLoader(), new Class[]{identifyListener}, handler);
-
             // 初始化 SDK
             Class<?> midSDKHelper = Class.forName("com.bun.miitmdid.core.MdidSdkHelper");
             Method initSDK = midSDKHelper.getDeclaredMethod("InitSdk", Context.class, boolean.class, identifyListener);
@@ -115,7 +115,7 @@ public class OaidUtils {
                         oaid = (String) getOAID.invoke(args[1]);
                         //LogUtils.d("oaid:" + oaid);
                     }else{
-                        LogUtils.e("当前设备不支持 OAID");
+                        LogUtils.e(TAG,"当前设备不支持 OAID");
                     }
 
                     countDownLatch.countDown();

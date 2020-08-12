@@ -10,49 +10,60 @@ import com.ft.sdk.garble.manager.TrackLogManager;
 /**
  * create: by huangDianHua
  * time: 2020/6/15 18:17:25
- * description:该类用于本地日志打印，同时供 AOP 方式插桩替换应用中的 android.util.Log 类
+ * description:该类仅供 AOP 方式插桩替换应用中的 android.util.Log 类
  */
 public class TrackLog {
+    /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
     public static int i(String tag, String msg) {
         return showFullLog(true, tag, msg, LogType.I);
     }
 
+    /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
     public static int i(String tag, String msg, Throwable e) {
         return showFullLog(true, tag, msg + "\n" + Log.getStackTraceString(e), LogType.I);
     }
 
+    /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
     public static int d(String tag, String msg) {
         return showFullLog(true, tag, msg, LogType.D);
     }
 
+    /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
     public static int d(String tag, String msg, Throwable e) {
         return showFullLog(true, tag, msg + "\n" + Log.getStackTraceString(e), LogType.D);
     }
 
+    /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
     public static int v(String tag, String msg) {
         return showFullLog(true, tag, msg, LogType.V);
     }
 
+    /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
     public static int v(String tag, String msg, Throwable e) {
         return showFullLog(true, tag, msg + "\n" + Log.getStackTraceString(e), LogType.V);
     }
 
+    /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
     public static int e(String tag, String msg) {
         return showFullLog(true, tag, msg, LogType.E);
     }
 
+    /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
     public static int e(String tag, String msg, Throwable e) {
         return showFullLog(true, tag, msg + "\n" + Log.getStackTraceString(e), LogType.E);
     }
 
+    /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
     public static int w(String tag, String msg) {
         return showFullLog(true, tag, msg, LogType.W);
     }
 
+    /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
     public static int w(String tag, String msg, Throwable e) {
         return showFullLog(true, tag, msg + "\n" + Log.getStackTraceString(e), LogType.W);
     }
 
+    /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
     public static int println(String tag, String msg) {
         return println(true,Log.INFO,tag,msg);
     }
@@ -67,7 +78,7 @@ public class TrackLog {
         return Log.println(priority, tag, msg);
     }
 
-    protected static int showFullLog(String TAG, String message, LogType logType) {
+    public static int showFullLog(String TAG, String message, LogType logType) {
         return showFullLog(false, TAG, message, logType);
     }
 

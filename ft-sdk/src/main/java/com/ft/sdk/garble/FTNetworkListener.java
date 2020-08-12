@@ -23,6 +23,7 @@ import com.ft.sdk.garble.utils.NetUtils;
  * Description: 监听网络连接状态
  */
 public class FTNetworkListener {
+    private final static String TAG = "FTNetworkListener";
     private static FTNetworkListener instance;
     private Application application;
     private FTNetWorkCallback networkCallback;
@@ -109,7 +110,7 @@ public class FTNetworkListener {
     private void judgeNetState() {
         //大于 0 有网
         if (NetUtils.get().getNetworkState(application) > 0) {
-            LogUtils.d("Net->" + "网络已连接");
+            LogUtils.d(TAG,"Net->" + "网络已连接");
             SyncTaskManager.get().executeSyncPoll();
         }
     }

@@ -23,6 +23,7 @@ import java.util.Set;
  * description:蓝牙相关信息获取类
  */
 public class BluetoothUtils {
+    public static final String TAG = "BluetoothUtils";
     private static BluetoothUtils instance;
     private Context mContext = FTApplication.getApplication();
     String bluetoothMacAddress;
@@ -91,7 +92,7 @@ public class BluetoothUtils {
                     BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);//获取此时找到的远程设备对象
                     if (device != null && !Utils.isNullOrEmpty(device.getName())) {
                         short rssi = intent.getExtras().getShort(BluetoothDevice.EXTRA_RSSI);//获取额外rssi值
-                        LogUtils.d("BluetoothDevice-info:\n" +
+                        LogUtils.d(TAG,"BluetoothDevice-info:\n" +
                                 "name:" + device.getName() + "\n" +
                                 "rssi:" + rssi+"\n" +
                                 "address:"+device.getAddress());

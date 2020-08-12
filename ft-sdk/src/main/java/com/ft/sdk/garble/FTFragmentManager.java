@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 全局 Fragment 管理类
  */
 public class FTFragmentManager {
+    public final static String TAG = "FTFragmentManager";
     private static FTFragmentManager mFragmentManager;
     /**
      * 该map在{@link #removeFragmentLifecycle} 方法中回收
@@ -52,7 +53,7 @@ public class FTFragmentManager {
         }
 
         if (!activityConcurrentHashMap.containsKey(activity.getClass().getName())) {
-            LogUtils.d("start Activity[" + activity.getClass().getName() + "] monitor Fragment Lifecycle");
+            LogUtils.d(TAG,"start Activity[" + activity.getClass().getName() + "] monitor Fragment Lifecycle");
             activityConcurrentHashMap.put(activity.getClass().getName(), activity);
             if (activity instanceof FragmentActivity) {
                 FTFragmentLifecycleCallback callbacks = new FTFragmentLifecycleCallback(activity);
@@ -72,7 +73,7 @@ public class FTFragmentManager {
             return;
         }
         if (activityConcurrentHashMap.containsKey(activity.getClass().getName())) {
-            LogUtils.d("stop Activity[" + activity.getClass().getName() + "] monitor Fragment Lifecycle");
+            LogUtils.d(TAG,"stop Activity[" + activity.getClass().getName() + "] monitor Fragment Lifecycle");
             if (activity instanceof FragmentActivity) {
                 FragmentManager.FragmentLifecycleCallbacks callbacks = fragmentLifecycleCall.get(activity.getClass().getName());
                 if (callbacks != null) {

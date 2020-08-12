@@ -30,6 +30,7 @@ import java.util.List;
  * description:内部使用的 Track 方法
  */
 public class FTTrackInner {
+    private final static String TAG = "FTTrackInner";
     private static FTTrackInner instance;
 
     private FTTrackInner() {
@@ -121,7 +122,7 @@ public class FTTrackInner {
                     if (recordData == null) {
                         return;
                     }
-                    LogUtils.d("FTTrack数据进数据库：" + recordData.getJsonString());
+                    LogUtils.d(TAG,"FTTrack数据进数据库：" + recordData.getJsonString());
                     judgeNeedOptCachePolicy(op,null,recordData);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -268,7 +269,7 @@ public class FTTrackInner {
             if (measurement != null) {
                 opData.put(Constants.MEASUREMENT, measurement);
             } else {
-                LogUtils.e("指标集 measurement 不能为空");
+                LogUtils.e(TAG,"指标集 measurement 不能为空");
                 if (callback != null) {
                     callback.onResponse(NetCodeStatus.INVALID_PARAMS_EXCEPTION_CODE, "指标集 measurement 不能为空");
                 }
@@ -281,7 +282,7 @@ public class FTTrackInner {
             if (fields != null) {
                 opData.put(Constants.FIELDS, fields);
             } else {
-                LogUtils.e("指标 fields 不能为空");
+                LogUtils.e(TAG,"指标 fields 不能为空");
                 if (callback != null) {
                     callback.onResponse(NetCodeStatus.INVALID_PARAMS_EXCEPTION_CODE, "指标集 measurement 不能为空");
                 }
@@ -356,13 +357,13 @@ public class FTTrackInner {
      */
     boolean isLegalValues(JSONObject jsonObject) throws JSONException {
         if (jsonObject == null) {
-            LogUtils.e("参数 fields 不能为空");
+            LogUtils.e(TAG,"参数 fields 不能为空");
             return false;
         }
         if (jsonObject.keys().hasNext()) {
             return true;
         } else {
-            LogUtils.e("参数 fields 不能为空");
+            LogUtils.e(TAG,"参数 fields 不能为空");
             return false;
         }
     }

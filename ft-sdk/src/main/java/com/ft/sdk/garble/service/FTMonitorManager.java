@@ -17,6 +17,7 @@ import java.net.HttpURLConnection;
  * description:
  */
 public class FTMonitorManager {
+    public static final String TAG = "FTMonitorManager";
     //轮训周期
     private int period = 10;
     private static FTMonitorManager instance;
@@ -44,11 +45,11 @@ public class FTMonitorManager {
      */
     public void startMonitor() {
         if(FTMonitorConfig.get().getMonitorType() == 0){
-            LogUtils.e("没有设置监控项，无法启用监控");
+            LogUtils.e(TAG,"没有设置监控项，无法启用监控");
         }else {
             mThread = new MonitorThread("监控轮训", period);
             mThread.start();
-            LogUtils.d("监控轮训线程启动...");
+            LogUtils.d(TAG,"监控轮训线程启动...");
         }
     }
 
@@ -57,7 +58,7 @@ public class FTMonitorManager {
      */
     private void stopMonitor() {
         if (mThread != null && mThread.isAlive()) {
-            LogUtils.d("关闭监控轮训线程");
+            LogUtils.d(TAG,"关闭监控轮训线程");
             mThread.interrupt();
             mThread = null;
         }
@@ -95,14 +96,14 @@ public class FTMonitorManager {
                                 .setMethod(RequestMethod.POST)
                                 .setBodyString(body).executeSync(ResponseData.class);
                         if (result.getHttpCode() != HttpURLConnection.HTTP_OK) {
-                            LogUtils.d("监控轮训线程上传数据出错(message：" + result.getData() + ")");
+                            LogUtils.d(TAG,"监控轮训线程上传数据出错(message：" + result.getData() + ")");
                         }
                     } catch (Exception e) {
-                        LogUtils.d("监控轮训线程执行错误(message：" + e.getMessage() + ")");
+                        LogUtils.d(TAG,"监控轮训线程执行错误(message：" + e.getMessage() + ")");
                     }
                 }
             } catch (InterruptedException e) {
-                LogUtils.d("监控轮训线程被关闭");
+                LogUtils.w(TAG,"监控轮训线程被关闭");
             }
         }
     }

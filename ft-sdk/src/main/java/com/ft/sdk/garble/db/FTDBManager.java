@@ -24,6 +24,7 @@ import java.util.List;
  */
 public class FTDBManager extends DBManager {
     private static FTDBManager ftdbManager;
+    public final static String TAG = "FTDBManager";
 
     private FTDBManager() {
     }
@@ -54,10 +55,10 @@ public class FTDBManager extends DBManager {
             contentValues.put(FTSQL.RECORD_COLUMN_OPTION, data.getOp());
             try {
                 long value = db.insert(FTSQL.FT_TABLE_NAME, null, contentValues);
-                LogUtils.d("insert value:"+value);
+                LogUtils.d(TAG,"insert value:"+value);
             }catch (Exception e){
                 e.printStackTrace();
-                LogUtils.e("insert error message:"+e.getLocalizedMessage());
+                LogUtils.e(TAG,"insert error message:"+e.getLocalizedMessage());
             }
         });
     }
