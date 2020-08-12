@@ -700,7 +700,7 @@ public class FTAutoTrack {
                 }
                 List<RecordData> recordDataList = new ArrayList<>();
                 recordDataList.add(recordData);
-                LogUtils.d(TAG,"FTAutoTrack数据进数据库：" + recordData.getJsonString());
+                LogUtils.d(TAG,"FTAutoTrack数据进数据库：" + recordData.printFormatRecordData());
                 //开启流程图，获取流程图相关数据存入数据库中
                 if (FTFlowConfig.get().isOpenFlowChart()) {
                     if (op == OP.OPEN_ACT || op == OP.OPEN_FRA) {

@@ -71,6 +71,9 @@ public class SyncTaskManager {
                         running = false;
                         return;
                     }
+                    LogUtils.e(TAG," \n*******************************************************\n" +
+                            "******************数据同步线程运行中*******************\n" +
+                            "*******************************************************\n");
                     Thread.sleep(SLEEP_TIME);
                     List<RecordData> trackDataList = queryFromData(DataType.TRACK);
                     List<RecordData> objectDataList = queryFromData(DataType.OBJECT);
@@ -79,16 +82,16 @@ public class SyncTaskManager {
                     //如果打开绑定用户开关，但是没有绑定用户信息，那么就不上传用户数据，直到绑了
                     if (FTUserConfig.get().isNeedBindUser() && !FTUserConfig.get().isUserDataBinded()) {
                         trackDataList.clear();
-                        LogUtils.e(TAG,"请先绑定用户信息");
+                        LogUtils.e(TAG," \n********************请先绑定用户信息********************");
                     }
                     while (!trackDataList.isEmpty() || !objectDataList.isEmpty() ||
                             !logDataList.isEmpty() || !keyEventDataList.isEmpty()) {
                         if (!Utils.isNetworkAvailable()) {
-                            LogUtils.e(TAG,">>>网络未连接<<<");
+                            LogUtils.e(TAG," \n**********************网络未连接************************");
                             break;
                         }
                         if (errorCount.get() >= CLOSE_TIME) {
-                            LogUtils.e(TAG,">>>连续同步失败5次，停止当前轮询同步<<<");
+                            LogUtils.e(TAG," \n************连续同步失败5次，停止当前轮询同步***********");
                             break;
                         }
                         if (!trackDataList.isEmpty()) {
@@ -112,6 +115,10 @@ public class SyncTaskManager {
                 } catch (Exception e) {
                     e.printStackTrace();
                     running = false;
+                }finally {
+                    LogUtils.e(TAG," \n********************************************************\n" +
+                            "******************数据同步线程已结束********************\n" +
+                            "********************************************************\n");
                 }
             });
         }
@@ -130,7 +137,7 @@ public class SyncTaskManager {
         body = body.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION).replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK);
         requestNet(dataType, body, (code, response) -> {
             if (code >= 200 && code < 500) {
-                LogUtils.d(TAG,"同步数据成功");
+                LogUtils.d(TAG,"\n**********************同步数据成功**********************");
                 deleteLastQuery(requestDatas);
                 if(dataType == DataType.LOG){
                     FTDBCachePolicy.get().optCount(-requestDatas.size());

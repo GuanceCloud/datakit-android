@@ -122,7 +122,7 @@ public class FTTrackInner {
                     if (recordData == null) {
                         return;
                     }
-                    LogUtils.d(TAG,"FTTrack数据进数据库：" + recordData.getJsonString());
+                    LogUtils.d(TAG,"FTTrack数据进数据库：" + recordData.printFormatRecordData());
                     judgeNeedOptCachePolicy(op,null,recordData);
                 } catch (Exception e) {
                     e.printStackTrace();
