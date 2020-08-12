@@ -200,4 +200,21 @@ public class RecordData implements Cloneable {
     public RecordData clone() throws CloneNotSupportedException {
         return (RecordData) super.clone();
     }
+
+    /**
+     * 获得格式化的打印内容
+     * @return
+     */
+    public String printFormatRecordData(){
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("\n{");
+        buffer.append("\n\t\"op\":\""+op+"\",");
+        buffer.append("\n\t\"cpn\":\""+cpn+"\",");
+        buffer.append("\n\t\"rpn\":\""+rpn+"\",");
+        buffer.append("\n\t\"ppn\":\""+ppn+"\",");
+        buffer.append("\n\t\"sessionId\":\""+sessionid+"\",");
+        buffer.append("\n\t\"opData\":\""+opdata+"\"");
+        buffer.append("\n}");
+        return buffer.toString();
+    }
 }
