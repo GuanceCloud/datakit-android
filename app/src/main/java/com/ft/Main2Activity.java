@@ -25,7 +25,6 @@ import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.sdk.garble.utils.OaidUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONException;
@@ -50,12 +49,13 @@ import static android.content.pm.PackageManager.PERMISSION_DENIED;
 
 
 public class Main2Activity extends AppCompatActivity {
+    public static final String TAG = "Main2Activity";
     boolean logThreadRun = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
-        OaidUtils.getOAID(this);
         if (!DebugDB.isServerRunning()) {
             DebugDB.initialize(DemoApplication.getContext(), new DebugDBFactory());
             DebugDB.initialize(DemoApplication.getContext(), new DebugDBEncryptFactory());
@@ -170,7 +170,7 @@ public class Main2Activity extends AppCompatActivity {
         logThread.setOnClickListener(v -> {
             logThreadRun = !logThreadRun;
             AtomicLong atomicLong = new AtomicLong(0);
-            if(logThreadRun){
+            if (logThreadRun) {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -185,9 +185,9 @@ public class Main2Activity extends AppCompatActivity {
                     }
                 }).start();
             }
-            if(logThreadRun){
+            if (logThreadRun) {
                 logThread.setText("周期产生日志数据--运行");
-            }else{
+            } else {
                 logThread.setText("周期产生日志数据--结束");
             }
         });
