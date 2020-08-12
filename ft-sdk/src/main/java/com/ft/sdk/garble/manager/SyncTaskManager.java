@@ -32,7 +32,6 @@ public class SyncTaskManager {
     private final int SLEEP_TIME = 10 * 1000;
     private volatile AtomicInteger errorCount = new AtomicInteger(0);
     private volatile boolean running;
-    private volatile boolean tokenAllowable;//记录token是否合法
 
     /**
      * 警告!!! 该方法仅用于测试使用!!!
@@ -71,7 +70,7 @@ public class SyncTaskManager {
                         running = false;
                         return;
                     }
-                    Thread.sleep(10 * 1000);
+                    Thread.sleep(SLEEP_TIME);
                     List<RecordData> trackDataList = queryFromData(DataType.TRACK);
                     List<RecordData> objectDataList = queryFromData(DataType.OBJECT);
                     List<RecordData> logDataList = queryFromData(DataType.LOG);

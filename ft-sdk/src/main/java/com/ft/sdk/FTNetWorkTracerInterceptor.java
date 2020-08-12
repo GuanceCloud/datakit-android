@@ -41,7 +41,8 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
     public static final String ZIPKIN_SPAN_ID = "X-B3-SpanId";
     public static final String ZIPKIN_SAMPLED = "X-B3-Sampled";
     public static final String JAEGER_KEY = "uber-trace-id";
-    public static final String SKYWALKING_V3_SW_X = "sw8";
+    public static final String SKYWALKING_V3_SW_8 = "sw8";
+    public static final String SKYWALKING_V3_SW_6 = "sw6";
 
 
     //是否可以采样
@@ -119,11 +120,15 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
             } else if (FTHttpConfig.get().traceType == TraceType.JAEGER) {
                 requestBuilder.addHeader(JAEGER_KEY, traceID + ":" + spanID + ":" + parentSpanID + ":" + sampled);
             } else if (FTHttpConfig.get().traceType == TraceType.SKYWALKING_V3) {
-                SkyWalkingUtils skyWalkingUtils = new SkyWalkingUtils(sampled,requestTime,request.url());
+                SkyWalkingUtils skyWalkingUtils = new SkyWalkingUtils(SkyWalkingUtils.SkyWalkingVersion.V3,sampled,requestTime,request.url());
                 traceID = skyWalkingUtils.getNewTraceId();
                 spanID = skyWalkingUtils.getNewSpanId();
-                requestBuilder.addHeader(SKYWALKING_V3_SW_X, skyWalkingUtils.getSw8());
-
+                requestBuilder.addHeader(SKYWALKING_V3_SW_8, skyWalkingUtils.getSw());
+            } else if (FTHttpConfig.get().traceType == TraceType.SKYWALKING_V2) {
+                SkyWalkingUtils skyWalkingUtils = new SkyWalkingUtils(SkyWalkingUtils.SkyWalkingVersion.V2,sampled,requestTime,request.url());
+                traceID = skyWalkingUtils.getNewTraceId();
+                spanID = skyWalkingUtils.getNewSpanId();
+                requestBuilder.addHeader(SKYWALKING_V3_SW_6, skyWalkingUtils.getSw());
             }
             newRequest = requestBuilder.build();
             response = chain.proceed(requestBuilder.build());
