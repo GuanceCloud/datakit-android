@@ -1,5 +1,7 @@
 package com.ft.sdk;
 
+import com.ft.sdk.garble.FTTrackInner;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -17,7 +19,7 @@ public class FTTrackTest {
     @Test
     public void isLegalValues() {
         try {
-            assertFalse(FTTrack.getInstance().isLegalValues(null));
+            assertFalse(FTTrackInner.getInstance().isLegalValues(null));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -28,7 +30,7 @@ public class FTTrackTest {
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("test", "1");
-            assertTrue(FTTrack.getInstance().isLegalValues(jsonObject));
+            assertTrue(FTTrackInner.getInstance().isLegalValues(jsonObject));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -39,7 +41,7 @@ public class FTTrackTest {
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("test", 2);
-            assertTrue(FTTrack.getInstance().isLegalValues(jsonObject));
+            assertTrue(FTTrackInner.getInstance().isLegalValues(jsonObject));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -50,7 +52,7 @@ public class FTTrackTest {
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("test", true);
-            assertTrue(FTTrack.getInstance().isLegalValues(jsonObject));
+            assertTrue(FTTrackInner.getInstance().isLegalValues(jsonObject));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -61,7 +63,7 @@ public class FTTrackTest {
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("test", new JSONObject());
-            assertFalse(FTTrack.getInstance().isLegalValues(jsonObject));
+            assertFalse(FTTrackInner.getInstance().isLegalValues(jsonObject));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -74,7 +76,7 @@ public class FTTrackTest {
             JSONObject jsonObject1 = new JSONObject();
             jsonObject1.put("subTest","jack");
             jsonObject.put("test", jsonObject1);
-            assertFalse(FTTrack.getInstance().isLegalValues(jsonObject));
+            assertFalse(FTTrackInner.getInstance().isLegalValues(jsonObject));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -86,7 +88,7 @@ public class FTTrackTest {
             JSONObject jsonObject = new JSONObject();
             JSONArray jsonArray = new JSONArray();
             jsonObject.put("test",jsonArray);
-            assertFalse(FTTrack.getInstance().isLegalValues(jsonObject));
+            assertFalse(FTTrackInner.getInstance().isLegalValues(jsonObject));
         } catch (Exception e) {
             e.printStackTrace();
         }

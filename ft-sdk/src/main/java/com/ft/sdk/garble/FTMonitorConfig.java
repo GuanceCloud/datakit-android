@@ -105,11 +105,6 @@ public class FTMonitorConfig {
         if (this.monitorType == 0) {
             return false;
         }
-        //开启全部监控项
-        if (this.monitorType == 1) {
-            return true;
-        }
-
         //判断某一种监控项是否开启
         if ((this.monitorType | monitorType) == this.monitorType) {
             return true;
