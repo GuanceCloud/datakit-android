@@ -69,7 +69,7 @@ public class TrackLog {
     }
     public static int println(boolean upload, int priority, String tag, String msg) {
         if (upload && FTExceptionHandler.get().isTrackConsoleLog()) {
-            LogBean logBean = new LogBean(Constants.USER_AGENT, Utils.translateFieldValue(Utils.getCurrentTimeStamp()+ " " +tag+" "+msg), System.currentTimeMillis());
+            LogBean logBean = new LogBean(Constants.USER_AGENT, Utils.translateFieldValue(Utils.getCurrentTimeStamp()+ " " +getLevelMark(priority)+"/"+tag+":"+msg), System.currentTimeMillis());
             logBean.setServiceName(FTExceptionHandler.get().getTrackServiceName());
             logBean.setStatus(getStatus(priority));
             logBean.setEnv(FTExceptionHandler.get().getEnv());
@@ -132,6 +132,21 @@ public class TrackLog {
                 return Status.WARNING;
             default:
                 return Status.CRITICAL;
+        }
+    }
+
+    private static String getLevelMark(int priority) {
+        switch (priority) {
+            case Log.VERBOSE:
+                return "V";
+            case Log.DEBUG:
+                return "D";
+            case Log.ERROR:
+                return "E";
+            case Log.WARN:
+                return "W";
+            default:
+                return "I";
         }
     }
 
