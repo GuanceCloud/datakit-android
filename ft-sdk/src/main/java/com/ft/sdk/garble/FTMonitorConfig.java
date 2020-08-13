@@ -101,15 +101,8 @@ public class FTMonitorConfig {
      * @return
      */
     public boolean isMonitorType(int monitorType) {
-        //未开启监控项
-        if (this.monitorType == 0) {
-            return false;
-        }
         //判断某一种监控项是否开启
-        if ((this.monitorType | monitorType) == this.monitorType) {
-            return true;
-        }
-        return false;
+        return (this.monitorType | monitorType) == this.monitorType;
     }
 
     /**
