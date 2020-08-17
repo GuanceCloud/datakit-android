@@ -122,12 +122,12 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
             } else if (FTHttpConfig.get().traceType == TraceType.SKYWALKING_V3) {
                 SkyWalkingUtils skyWalkingUtils = new SkyWalkingUtils(SkyWalkingUtils.SkyWalkingVersion.V3,sampled,requestTime,request.url());
                 traceID = skyWalkingUtils.getNewTraceId();
-                spanID = skyWalkingUtils.getNewSpanId();
+                spanID = traceID+"1";
                 requestBuilder.addHeader(SKYWALKING_V3_SW_8, skyWalkingUtils.getSw());
             } else if (FTHttpConfig.get().traceType == TraceType.SKYWALKING_V2) {
                 SkyWalkingUtils skyWalkingUtils = new SkyWalkingUtils(SkyWalkingUtils.SkyWalkingVersion.V2,sampled,requestTime,request.url());
                 traceID = skyWalkingUtils.getNewTraceId();
-                spanID = skyWalkingUtils.getNewSpanId();
+                spanID = traceID+"1";
                 requestBuilder.addHeader(SKYWALKING_V3_SW_6, skyWalkingUtils.getSw());
             }
             newRequest = requestBuilder.build();
