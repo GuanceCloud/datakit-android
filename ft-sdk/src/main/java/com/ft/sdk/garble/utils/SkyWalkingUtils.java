@@ -51,10 +51,6 @@ public class SkyWalkingUtils {
         return newTraceId;
     }
 
-    public String getNewSpanId() {
-        return newSpanId;
-    }
-
     private void createSw8Head(String sampled, long requestTime, HttpUrl url) {
         newSpanId = traceIDUUID + "." + Thread.currentThread().getId() + "." + requestTime + String.format(Locale.getDefault(), "%04d", increasingNumber.get() - 1);
         newTraceId = traceIDUUID + "." + Thread.currentThread().getId() + "." + requestTime + String.format(Locale.getDefault(), "%04d", increasingNumber.get());
@@ -74,7 +70,7 @@ public class SkyWalkingUtils {
                 Utils.encodeStringToBase64(newTraceId) + "-" +
                 Utils.encodeStringToBase64(newSpanId) + "-0-" +
                 increasingLong.get() + "-" + increasingLong.get() + "-" +
-                Utils.encodeStringToBase64("#" + url.host() + ":" + url.port()) +
+                Utils.encodeStringToBase64("#" + url.host() + ":" + url.port()) +"-"+
                 Utils.encodeStringToBase64("-1") + "-" + Utils.encodeStringToBase64("-1");
     }
 }
