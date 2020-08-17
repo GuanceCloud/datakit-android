@@ -19,7 +19,7 @@ public class SkyWalkingUtils {
         V2, V3
     }
 
-    private static AtomicInteger increasingNumber = new AtomicInteger(0);
+    private static AtomicInteger increasingNumber = new AtomicInteger(-1);
     private static AtomicLong increasingLong = new AtomicLong(0);
     private static String traceIDUUID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
     private static String parentServiceUUID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
@@ -30,9 +30,9 @@ public class SkyWalkingUtils {
     public SkyWalkingUtils(SkyWalkingVersion version, String sampled, long requestTime, HttpUrl url) {
         synchronized (SkyWalkingUtils.class) {//防止多线程 increasingNumber 不安顺序增加
             if (increasingNumber.get() < 9999) {
-                increasingNumber.getAndIncrement();
+                increasingNumber.getAndAdd(2);
             } else {
-                increasingNumber.set(1);
+                increasingNumber.set(-1);
             }
             if (version == SkyWalkingVersion.V3) {
                 createSw8Head(sampled, requestTime, url);
