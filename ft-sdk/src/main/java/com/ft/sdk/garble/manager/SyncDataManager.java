@@ -444,63 +444,41 @@ public class SyncDataManager {
      */
     public static void addMonitorData(JSONObject tags, JSONObject fields) {
         try {
-            if (FTMonitorConfig.get().isMonitorType(MonitorType.ALL)) {
+            if (FTMonitorConfig.get().isMonitorType(MonitorType.BATTERY)) {
                 //电池
                 createBattery(tags, fields);
+            }
+            if (FTMonitorConfig.get().isMonitorType(MonitorType.MEMORY)) {
                 //内存
                 createMemory(tags, fields);
+            }
+            if (FTMonitorConfig.get().isMonitorType(MonitorType.CPU)) {
                 //CPU
                 createCPU(tags, fields);
+            }
+            if (FTMonitorConfig.get().isMonitorType(MonitorType.GPU)) {
                 //GPU
                 createGPU(tags, fields);
+            }
+            if (FTMonitorConfig.get().isMonitorType(MonitorType.NETWORK)) {
                 //网络
                 createNetWork(tags, fields);
-                //相机
+            }
+            if (FTMonitorConfig.get().isMonitorType(MonitorType.CAMERA)) {
                 createCamera(tags, fields);
-                //位置
+            }
+            if (FTMonitorConfig.get().isMonitorType(MonitorType.LOCATION)) {
                 createLocation(tags, fields);
-                //蓝牙
+            }
+            if (FTMonitorConfig.get().isMonitorType(MonitorType.BLUETOOTH)) {
                 createBluetooth(tags, fields);
+            }
+            if (FTMonitorConfig.get().isMonitorType(MonitorType.SYSTEM)) {
                 //系统
                 createSystem(tags, fields);
+            }
+            if (FTMonitorConfig.get().isMonitorType(MonitorType.FPS)) {
                 createFps(tags, fields);
-            } else {
-                if (FTMonitorConfig.get().isMonitorType(MonitorType.BATTERY)) {
-                    //电池
-                    createBattery(tags, fields);
-                }
-                if (FTMonitorConfig.get().isMonitorType(MonitorType.MEMORY)) {
-                    //内存
-                    createMemory(tags, fields);
-                }
-                if (FTMonitorConfig.get().isMonitorType(MonitorType.CPU)) {
-                    //CPU
-                    createCPU(tags, fields);
-                }
-                if (FTMonitorConfig.get().isMonitorType(MonitorType.GPU)) {
-                    //GPU
-                    createGPU(tags, fields);
-                }
-                if (FTMonitorConfig.get().isMonitorType(MonitorType.NETWORK)) {
-                    //网络
-                    createNetWork(tags, fields);
-                }
-                if (FTMonitorConfig.get().isMonitorType(MonitorType.CAMERA)) {
-                    createCamera(tags, fields);
-                }
-                if (FTMonitorConfig.get().isMonitorType(MonitorType.LOCATION)) {
-                    createLocation(tags, fields);
-                }
-                if (FTMonitorConfig.get().isMonitorType(MonitorType.BLUETOOTH)) {
-                    createBluetooth(tags, fields);
-                }
-                if (FTMonitorConfig.get().isMonitorType(MonitorType.SYSTEM)) {
-                    //系统
-                    createSystem(tags, fields);
-                }
-                if (FTMonitorConfig.get().isMonitorType(MonitorType.FPS)) {
-                    createFps(tags, fields);
-                }
             }
             //传感器
             createSensor(tags, fields);
@@ -522,7 +500,7 @@ public class SyncDataManager {
             tags.put("battery_status", batteryBean.getStatus());
             fields.put("battery_use", batteryBean.getBr());
         } catch (Exception e) {
-            LogUtils.e(TAG,"电池数据获取异常:" + e.getMessage());
+            LogUtils.e(TAG, "电池数据获取异常:" + e.getMessage());
         }
     }
 
@@ -538,7 +516,7 @@ public class SyncDataManager {
             tags.put("memory_total", memory[0] + "GB");
             fields.put("memory_use", memory[1]);
         } catch (Exception e) {
-            LogUtils.e(TAG,"内存数据获取异常:" + e.getMessage());
+            LogUtils.e(TAG, "内存数据获取异常:" + e.getMessage());
         }
     }
 
@@ -555,7 +533,7 @@ public class SyncDataManager {
             fields.put("cpu_temperature", CpuUtils.get().getCpuTemperature());
             tags.put("cpu_hz", CpuUtils.get().getCPUMaxFreqKHz());
         } catch (Exception e) {
-            LogUtils.e(TAG,"CPU数据获取异常:" + e.getMessage());
+            LogUtils.e(TAG, "CPU数据获取异常:" + e.getMessage());
         }
     }
 
@@ -571,7 +549,7 @@ public class SyncDataManager {
             tags.put("gpu_hz", GpuUtils.getGpuMaxFreq());
             fields.put("gpu_rate", GpuUtils.getGpuUseRate());
         } catch (Exception e) {
-            LogUtils.e(TAG,"GPU数据获取异常:" + e.getMessage());
+            LogUtils.e(TAG, "GPU数据获取异常:" + e.getMessage());
         }
     }
 
@@ -617,7 +595,7 @@ public class SyncDataManager {
                 fields.put("network_error_rate", lastStatus.getErrorRate());
             }
         } catch (Exception e) {
-            LogUtils.e(TAG,"网络数据获取异常:" + e.getMessage());
+            LogUtils.e(TAG, "网络数据获取异常:" + e.getMessage());
         }
     }
 
@@ -634,7 +612,7 @@ public class SyncDataManager {
                 tags.put(cameraPx.getPx()[0], cameraPx.getPx()[1]);
             }
         } catch (Exception e) {
-            LogUtils.e(TAG,"相机数据获取异常:" + e.getMessage());
+            LogUtils.e(TAG, "相机数据获取异常:" + e.getMessage());
         }
     }
 
@@ -667,7 +645,7 @@ public class SyncDataManager {
             }
             tags.put("gps_open", LocationUtils.get().isOpenGps());
         } catch (Exception e) {
-            LogUtils.e(TAG,"位置数据获取异常:" + e.getMessage());
+            LogUtils.e(TAG, "位置数据获取异常:" + e.getMessage());
         }
     }
 
@@ -676,7 +654,7 @@ public class SyncDataManager {
             fields.put("device_open_time", DeviceUtils.getSystemOpenTime());
             tags.put("device_name", BluetoothUtils.get().getDeviceName());
         } catch (Exception e) {
-            LogUtils.e(TAG,"系统数据获取异常:" + e.getMessage());
+            LogUtils.e(TAG, "系统数据获取异常:" + e.getMessage());
         }
     }
 
@@ -692,81 +670,53 @@ public class SyncDataManager {
             tags.put("bt_open", BluetoothUtils.get().isOpen());
 
         } catch (Exception e) {
-            LogUtils.e(TAG,"蓝牙数据获取异常:" + e.getMessage());
+            LogUtils.e(TAG, "蓝牙数据获取异常:" + e.getMessage());
         }
     }
 
     private static void createSensor(JSONObject tags, JSONObject fields) {
         try {
-            if (FTMonitorConfig.get().isMonitorType(MonitorType.ALL) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR)) {
+            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_BRIGHTNESS)) {
                 fields.put("screen_brightness", DeviceUtils.getSystemScreenBrightnessValue());
+            }
+            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_LIGHT)) {
                 fields.put("light", SensorUtils.get().getSensorLight());
+            }
+            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_PROXIMITY)) {
                 fields.put("proximity", SensorUtils.get().getDistance());
+            }
+            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_STEP)) {
                 fields.put("steps", SensorUtils.get().getTodayStep());
+            }
+            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_ROTATION)) {
                 float[] rotation = SensorUtils.get().getGyroscope();
                 if (rotation != null && rotation.length == 3) {
                     fields.put("rotation_x", rotation[0]);
                     fields.put("rotation_y", rotation[1]);
                     fields.put("rotation_z", rotation[2]);
                 }
-
+            }
+            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_ACCELERATION)) {
                 float[] acceleration = SensorUtils.get().getAcceleration();
                 if (acceleration != null && acceleration.length == 3) {
                     fields.put("acceleration_x", acceleration[0]);
                     fields.put("acceleration_y", acceleration[1]);
                     fields.put("acceleration_z", acceleration[2]);
                 }
-
+            }
+            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_MAGNETIC)) {
                 float[] magnetic = SensorUtils.get().getMagnetic();
                 if (magnetic != null && magnetic.length == 3) {
                     fields.put("magnetic_x", magnetic[0]);
                     fields.put("magnetic_y", magnetic[1]);
                     fields.put("magnetic_z", magnetic[2]);
                 }
+            }
+            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_TORCH)) {
                 createTorch(tags, fields);
-            } else {
-                if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_BRIGHTNESS)) {
-                    fields.put("screen_brightness", DeviceUtils.getSystemScreenBrightnessValue());
-                }
-                if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_LIGHT)) {
-                    fields.put("light", SensorUtils.get().getSensorLight());
-                }
-                if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_PROXIMITY)) {
-                    fields.put("proximity", SensorUtils.get().getDistance());
-                }
-                if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_STEP)) {
-                    fields.put("steps", SensorUtils.get().getTodayStep());
-                }
-                if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_ROTATION)) {
-                    float[] rotation = SensorUtils.get().getGyroscope();
-                    if (rotation != null && rotation.length == 3) {
-                        fields.put("rotation_x", rotation[0]);
-                        fields.put("rotation_y", rotation[1]);
-                        fields.put("rotation_z", rotation[2]);
-                    }
-                }
-                if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_ACCELERATION)) {
-                    float[] acceleration = SensorUtils.get().getAcceleration();
-                    if (acceleration != null && acceleration.length == 3) {
-                        fields.put("acceleration_x", acceleration[0]);
-                        fields.put("acceleration_y", acceleration[1]);
-                        fields.put("acceleration_z", acceleration[2]);
-                    }
-                }
-                if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_MAGNETIC)) {
-                    float[] magnetic = SensorUtils.get().getMagnetic();
-                    if (magnetic != null && magnetic.length == 3) {
-                        fields.put("magnetic_x", magnetic[0]);
-                        fields.put("magnetic_y", magnetic[1]);
-                        fields.put("magnetic_z", magnetic[2]);
-                    }
-                }
-                if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_TORCH)) {
-                    createTorch(tags, fields);
-                }
             }
         } catch (Exception e) {
-            LogUtils.e(TAG,"传感器数据获取异常:" + e.getMessage());
+            LogUtils.e(TAG, "传感器数据获取异常:" + e.getMessage());
         }
     }
 
@@ -774,7 +724,7 @@ public class SyncDataManager {
         try {
             fields.put("fps", FpsUtils.get().getFps());
         } catch (JSONException e) {
-            LogUtils.e(TAG,"FPS数据获取异常:" + e.getMessage());
+            LogUtils.e(TAG, "FPS数据获取异常:" + e.getMessage());
         }
     }
 
@@ -785,7 +735,7 @@ public class SyncDataManager {
         try {
             tags.put("torch", CameraUtils.get().isTorchState());
         } catch (JSONException e) {
-            LogUtils.e(TAG,"闪光灯数据获取异常:" + e.getMessage());
+            LogUtils.e(TAG, "闪光灯数据获取异常:" + e.getMessage());
         }
     }
 
@@ -892,9 +842,10 @@ public class SyncDataManager {
 
     /**
      * 构建一个默认的 ObjectBean
+     *
      * @return
      */
-    public static HashMap<String, Object> getDefaultObjectBean(){
+    public static HashMap<String, Object> getDefaultObjectBean() {
         Context context = FTApplication.getApplication();
         HashMap<String, Object> objectHashMap = new HashMap<>();
         objectHashMap.put("device_uuid", DeviceUtils.getUuid(context));
@@ -909,7 +860,7 @@ public class SyncDataManager {
         objectHashMap.put("display", DeviceUtils.getDisplay(context));
         objectHashMap.put("carrier", DeviceUtils.getCarrier(context));
         objectHashMap.put("locale", Locale.getDefault());
-        objectHashMap.put("app_version_name",Utils.getAppVersionName());
+        objectHashMap.put("app_version_name", Utils.getAppVersionName());
         return objectHashMap;
     }
 
@@ -925,7 +876,7 @@ public class SyncDataManager {
             sb.append("----------------------同步数据--开始-------------------------\n");
             sb.append(body);
             sb.append("----------------------同步数据--结束----------------------\n");
-            LogUtils.d(TAG,sb.toString());
+            LogUtils.d(TAG, sb.toString());
             return;
         }
         try {
@@ -957,9 +908,9 @@ public class SyncDataManager {
                 sb.append("},\n");
             }
             sb.append("----------------------同步数据--结束----------------------\n");
-            LogUtils.d(TAG,"同步的数据\n" + sb.toString());
+            LogUtils.d(TAG, "同步的数据\n" + sb.toString());
         } catch (Exception e) {
-            LogUtils.d(TAG,"同步的数据\n" + body);
+            LogUtils.d(TAG, "同步的数据\n" + body);
         }
     }
 }
