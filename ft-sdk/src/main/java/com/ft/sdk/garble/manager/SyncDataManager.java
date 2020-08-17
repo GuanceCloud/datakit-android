@@ -113,8 +113,8 @@ public class SyncDataManager {
             //流程图数据
             if (!Utils.isNullOrEmpty(traceId)) {
                 if (OP.OPEN_ACT.value.equals(recordData.getOp())) {
-                    sb.append("$flow_mobile_activity");
-                    sb.append(",$traceId=").append(recordData.getTraceId());
+                    sb.append(Constants.KEEP_MEASUREMENT_FLOW);
+                    sb.append(",").append(Constants.KEEP_KEY_TRACE_ID).append("=").append(recordData.getTraceId());
                     if (recordData.getPpn() != null && recordData.getPpn().startsWith(Constants.MOCK_SON_PAGE_DATA)) {
                         String[] strArr = recordData.getPpn().split(":");
                         String name = null;
@@ -128,14 +128,14 @@ public class SyncDataManager {
                             name = FTAliasConfig.get().getFlowChartDesc(recordData.getCpn());
                             parent = FTAliasConfig.get().getFlowChartDesc(strArr[1]);
                         }
-                        sb.append(",$name=").append(name);
-                        sb.append(",$parent=").append(parent);
+                        sb.append(",").append(Constants.KEEP_KEY_NAME).append("=").append(name);
+                        sb.append(",").append(Constants.KEEP_KEY_PARENT).append("=").append(parent);
                     } else {
-                        sb.append(",$name=").append(FTAliasConfig.get().getFlowChartDesc(recordData.getCpn()));
+                        sb.append(",").append(Constants.KEEP_KEY_NAME).append("=").append(FTAliasConfig.get().getFlowChartDesc(recordData.getCpn()));
                         //如果父页面是root表示其为起始节点，不添加父节点
                         if (!Constants.FLOW_ROOT.equals(recordData.getPpn())) {
                             String ppn = recordData.getPpn();
-                            sb.append(",$parent=").append(FTAliasConfig.get().getFlowChartDesc(ppn));
+                            sb.append(",").append(Constants.KEEP_KEY_PARENT).append("=").append(FTAliasConfig.get().getFlowChartDesc(ppn));
                         }
                     }
                     sb.append(",").append(device).append(",");
@@ -143,14 +143,14 @@ public class SyncDataManager {
                     //删除多余的逗号
                     deleteLastComma(sb);
                     sb.append(Constants.SEPARATION_PRINT);
-                    sb.append("$duration=").append(recordData.getDuration()).append("i");
+                    sb.append(Constants.KEEP_KEY_DURATION).append("=").append(recordData.getDuration()).append("i");
                     sb.append(Constants.SEPARATION_PRINT);
                     sb.append(recordData.getTime() * 1000 * 1000);
                     sb.append(Constants.SEPARATION_LINE_BREAK);
                 } else if (OP.OPEN_FRA.value.equals(recordData.getOp())) {
-                    sb.append("$flow_mobile_activity");
-                    sb.append(",$traceId=").append(recordData.getTraceId());
-                    sb.append(",$name=").append(FTAliasConfig.get().getFlowChartDesc(recordData.getRpn() + "." + recordData.getCpn()));
+                    sb.append(Constants.KEEP_MEASUREMENT_FLOW);
+                    sb.append(",").append(Constants.KEEP_KEY_TRACE_ID).append("=").append(recordData.getTraceId());
+                    sb.append(",").append(Constants.KEEP_KEY_NAME).append("=").append(FTAliasConfig.get().getFlowChartDesc(recordData.getRpn() + "." + recordData.getCpn()));
                     String parent;
                     if (!Constants.FLOW_ROOT.equals(recordData.getPpn())) {
                         if (recordData.getPpn().startsWith(Constants.PERFIX)) {
@@ -161,13 +161,13 @@ public class SyncDataManager {
                     } else {
                         parent = FTAliasConfig.get().getFlowChartDesc(recordData.getRpn());
                     }
-                    sb.append(",$parent=").append(parent);
+                    sb.append(",").append(Constants.KEEP_KEY_PARENT).append("=").append(parent);
                     sb.append(",").append(device).append(",");
                     addUserData(sb, recordData);
                     //删除多余的逗号
                     deleteLastComma(sb);
                     sb.append(Constants.SEPARATION_PRINT);
-                    sb.append("$duration=").append(recordData.getDuration()).append("i");
+                    sb.append(Constants.KEEP_KEY_DURATION).append("=").append(recordData.getDuration()).append("i");
                     sb.append(Constants.SEPARATION_PRINT);
                     sb.append(recordData.getTime() * 1000 * 1000);
                     sb.append(Constants.SEPARATION_LINE_BREAK);
@@ -335,15 +335,15 @@ public class SyncDataManager {
                 if (!Utils.isNullOrEmpty(recordData.getCpn())) {
                     //如果是 Fragment 就把Activity 的名称也添加上去
                     if (recordData.getOp().equals(OP.OPEN_FRA.value) || recordData.getOp().equals(OP.CLS_FRA.value)) {
-                        tags.put("current_page_name", recordData.getRpn() + "." + recordData.getCpn());
+                        tags.put(Constants.KEY_CURRENT_PAGE_NAME, recordData.getRpn() + "." + recordData.getCpn());
                     } else {
-                        tags.put("current_page_name", recordData.getCpn());
+                        tags.put(Constants.KEY_CURRENT_PAGE_NAME, recordData.getCpn());
                     }
                 }
                 if (!Utils.isNullOrEmpty(recordData.getRpn())) {
-                    tags.put("root_page_name", recordData.getRpn());
+                    tags.put(Constants.KEY_ROOT_PAGE_NAME, recordData.getRpn());
                 }
-                tags.put("event_id", Utils.MD5(getEventName(recordData.getOp())));
+                tags.put(Constants.KEY_EVENT_ID, Utils.MD5(getEventName(recordData.getOp())));
                 sb.append(getCustomHash(tags, true));
                 fields = opJson.optJSONObject(Constants.FIELDS);
             } catch (Exception e) {
@@ -361,12 +361,12 @@ public class SyncDataManager {
 
         if (fields != null) {
             try {
-                fields.put("event", getEventName(recordData.getOp()));
+                fields.put(Constants.KEY_EVENT, getEventName(recordData.getOp()));
                 if (!Utils.isNullOrEmpty(recordData.getCpn())) {
                     if (recordData.getOp().equals(OP.OPEN_FRA.value) || recordData.getOp().equals(OP.CLS_FRA.value)) {
-                        fields.put("page_desc", FTAliasConfig.get().getPageDesc(recordData.getRpn() + "." + recordData.getCpn()));
+                        fields.put(Constants.KEY_PAGE_DESC, FTAliasConfig.get().getPageDesc(recordData.getRpn() + "." + recordData.getCpn()));
                     } else {
-                        fields.put("page_desc", FTAliasConfig.get().getPageDesc(recordData.getCpn()));
+                        fields.put(Constants.KEY_PAGE_DESC, FTAliasConfig.get().getPageDesc(recordData.getCpn()));
                     }
                 }
             } catch (JSONException e) {
@@ -376,7 +376,7 @@ public class SyncDataManager {
             deleteLastComma(valueSb);
             sb.append(valueSb);
         } else {
-            sb.append("event=\"" + getEventName(recordData.getOp()) + "\"");
+            sb.append(Constants.KEY_EVENT).append("=\"").append(getEventName(recordData.getOp())).append("\"");
         }
         sb.append(Constants.SEPARATION_PRINT);
         sb.append(recordData.getTime() * 1000000);
@@ -392,8 +392,8 @@ public class SyncDataManager {
         if (FTUserConfig.get().isNeedBindUser() && FTUserConfig.get().isUserDataBinded()) {
             UserData userData = FTUserConfig.get().getUserData(recordData.getSessionid());
             if (userData != null) {
-                sb.append("ud_name=").append(Utils.translateTagKeyValue(userData.getName())).append(",");
-                sb.append("ud_id=").append(Utils.translateTagKeyValue(userData.getId())).append(",");
+                sb.append(Constants.KEY_USER_NAME).append("=").append(Utils.translateTagKeyValue(userData.getName())).append(",");
+                sb.append(Constants.KEY_USER_ID).append("=").append(Utils.translateTagKeyValue(userData.getId())).append(",");
                 JSONObject js = userData.getExts();
                 if (js == null) {
                     return;
@@ -495,10 +495,10 @@ public class SyncDataManager {
     private static void createBattery(JSONObject tags, JSONObject fields) {
         try {
             BatteryBean batteryBean = BatteryUtils.getBatteryInfo(FTApplication.getApplication());
-            tags.put("battery_total", batteryBean.getPower());
-            tags.put("battery_charge_type", batteryBean.getPlugState());
-            tags.put("battery_status", batteryBean.getStatus());
-            fields.put("battery_use", batteryBean.getBr());
+            tags.put(Constants.KEY_BATTERY_TOTAL, batteryBean.getPower());
+            tags.put(Constants.KEY_BATTERY_CHARGE_TYPE, batteryBean.getPlugState());
+            tags.put(Constants.KEY_BATTERY_STATUS, batteryBean.getStatus());
+            fields.put(Constants.KEY_BATTERY_USE, batteryBean.getBr());
         } catch (Exception e) {
             LogUtils.e(TAG, "电池数据获取异常:" + e.getMessage());
         }
@@ -513,8 +513,8 @@ public class SyncDataManager {
     private static void createMemory(JSONObject tags, JSONObject fields) {
         try {
             double[] memory = DeviceUtils.getRamData(FTApplication.getApplication());
-            tags.put("memory_total", memory[0] + "GB");
-            fields.put("memory_use", memory[1]);
+            tags.put(Constants.KEY_MEMORY_TOTAL, memory[0] + "GB");
+            fields.put(Constants.KEY_MEMORY_USE, memory[1]);
         } catch (Exception e) {
             LogUtils.e(TAG, "内存数据获取异常:" + e.getMessage());
         }
@@ -528,10 +528,10 @@ public class SyncDataManager {
      */
     private static void createCPU(JSONObject tags, JSONObject fields) {
         try {
-            tags.put("cpu_no", DeviceUtils.getHardWare());
-            fields.put("cpu_use", DeviceUtils.getCpuUseRate());
-            fields.put("cpu_temperature", CpuUtils.get().getCpuTemperature());
-            tags.put("cpu_hz", CpuUtils.get().getCPUMaxFreqKHz());
+            tags.put(Constants.KEY_CPU_NO, DeviceUtils.getHardWare());
+            fields.put(Constants.KEY_CPU_USE, DeviceUtils.getCpuUseRate());
+            fields.put(Constants.KEY_CPU_TEMPERATURE, CpuUtils.get().getCpuTemperature());
+            tags.put(Constants.KEY_CPU_HZ, CpuUtils.get().getCPUMaxFreqKHz());
         } catch (Exception e) {
             LogUtils.e(TAG, "CPU数据获取异常:" + e.getMessage());
         }
@@ -545,9 +545,9 @@ public class SyncDataManager {
      */
     private static void createGPU(JSONObject tags, JSONObject fields) {
         try {
-            tags.put("gpu_model", GpuUtils.GPU_VENDOR_RENDERER);
-            tags.put("gpu_hz", GpuUtils.getGpuMaxFreq());
-            fields.put("gpu_rate", GpuUtils.getGpuUseRate());
+            tags.put(Constants.KEY_GPU_MODEL, GpuUtils.GPU_VENDOR_RENDERER);
+            tags.put(Constants.KEY_GPU_HZ, GpuUtils.getGpuMaxFreq());
+            fields.put(Constants.KEY_GPU_RATE, GpuUtils.getGpuUseRate());
         } catch (Exception e) {
             LogUtils.e(TAG, "GPU数据获取异常:" + e.getMessage());
         }
@@ -563,36 +563,36 @@ public class SyncDataManager {
         try {
             int networkType = NetUtils.get().getNetworkState(FTApplication.getApplication());
             if (networkType == 1) {
-                tags.put("network_type", "WIFI");
+                tags.put(Constants.KEY_NETWORK_TYPE, "WIFI");
             } else if (networkType == 0) {
-                tags.put("network_type", "N/A");
+                tags.put(Constants.KEY_NETWORK_TYPE, "N/A");
             } else {
-                tags.put("network_type", "蜂窝网络");
+                tags.put(Constants.KEY_NETWORK_TYPE, "蜂窝网络");
             }
-            fields.put("network_strength", NetUtils.get().getSignalStrength(FTApplication.getApplication()));
-            fields.put("network_in_rate", NetUtils.get().getNetDownRate());
-            fields.put("network_out_rate", NetUtils.get().getNetUpRate());
-            tags.put("network_proxy", NetUtils.get().isWifiProxy(FTApplication.getApplication()));
+            fields.put(Constants.KEY_NETWORK_STRENGTH, NetUtils.get().getSignalStrength(FTApplication.getApplication()));
+            fields.put(Constants.KEY_NETWORK_IN_RATE, NetUtils.get().getNetDownRate());
+            fields.put(Constants.KEY_NETWORK_OUT_RATE, NetUtils.get().getNetUpRate());
+            tags.put(Constants.KEY_NETWORK_PROXY, NetUtils.get().isWifiProxy(FTApplication.getApplication()));
             String[] dns = NetUtils.get().getDnsFromConnectionManager(FTApplication.getApplication());
             for (int i = 0; i < dns.length; i++) {
-                fields.put("dns" + (i + 1), dns[i]);
+                fields.put(Constants.KEY_NETWORK_DNS + (i + 1), dns[i]);
             }
-            tags.put("roam", NetUtils.get().getRoamState());
-            fields.put("wifi_ssid", NetUtils.get().getSSId());
-            fields.put("wifi_ip", NetUtils.get().getWifiIp());
+            tags.put(Constants.KEY_NETWORK_ROAM, NetUtils.get().getRoamState());
+            fields.put(Constants.KEY_NETWORK_WIFI_SSID, NetUtils.get().getSSId());
+            fields.put(Constants.KEY_NETWORK_WIFI_IP, NetUtils.get().getWifiIp());
             NetStatusBean lastStatus = NetUtils.get().getLastMonitorStatus();
 
             if (lastStatus != null) {
                 if (lastStatus.isInnerRequest()) {
-                    fields.put("_network_tcp_time", lastStatus.getTcpTime());
-                    fields.put("_network_dns_time", lastStatus.getDNSTime());
-                    fields.put("_network_response_time", lastStatus.getResponseTime());
+                    fields.put(Constants.KEY__NETWORK_TCP_TIME, lastStatus.getTcpTime());
+                    fields.put(Constants.KEY__NETWORK_DNS_TIME, lastStatus.getDNSTime());
+                    fields.put(Constants.KEY__NETWORK_RESPONSE_TIME, lastStatus.getResponseTime());
                 } else {
-                    fields.put("network_tcp_time", lastStatus.getTcpTime());
-                    fields.put("network_dns_time", lastStatus.getDNSTime());
-                    fields.put("network_response_time", lastStatus.getResponseTime());
+                    fields.put(Constants.KEY_NETWORK_TCP_TIME, lastStatus.getTcpTime());
+                    fields.put(Constants.KEY_NETWORK_DNS_TIME, lastStatus.getDNSTime());
+                    fields.put(Constants.KEY_NETWORK_RESPONSE_TIME, lastStatus.getResponseTime());
                 }
-                fields.put("network_error_rate", lastStatus.getErrorRate());
+                fields.put(Constants.KEY_NETWORK_ERROR_RATE, lastStatus.getErrorRate());
             }
         } catch (Exception e) {
             LogUtils.e(TAG, "网络数据获取异常:" + e.getMessage());
@@ -627,23 +627,23 @@ public class SyncDataManager {
             Address address = LocationUtils.get().getCity();
             double[] location = LocationUtils.get().getLocation();
             if (address != null) {
-                tags.put("province", address.getAdminArea());
-                tags.put("city", address.getLocality());
-                tags.put("country", "中国");
+                tags.put(Constants.KEY_LOCATION_PROVINCE, address.getAdminArea());
+                tags.put(Constants.KEY_LOCATION_CITY, address.getLocality());
+                tags.put(Constants.KEY_LOCATION_COUNTRY, "中国");
             } else {
-                tags.put("province", Constants.UNKNOWN);
-                tags.put("city", Constants.UNKNOWN);
-                tags.put("country", "中国");
+                tags.put(Constants.KEY_LOCATION_PROVINCE, Constants.UNKNOWN);
+                tags.put(Constants.KEY_LOCATION_CITY, Constants.UNKNOWN);
+                tags.put(Constants.KEY_LOCATION_COUNTRY, "中国");
             }
 
             if (location != null) {
-                fields.put("latitude", location[0]);
-                fields.put("longitude", location[1]);
+                fields.put(Constants.KEY_LOCATION_LATITUDE, location[0]);
+                fields.put(Constants.KEY_LOCATION_LONGITUDE, location[1]);
             } else {
-                fields.put("latitude", 0);
-                fields.put("longitude", 0);
+                fields.put(Constants.KEY_LOCATION_LATITUDE, 0);
+                fields.put(Constants.KEY_LOCATION_LONGITUDE, 0);
             }
-            tags.put("gps_open", LocationUtils.get().isOpenGps());
+            tags.put(Constants.KEY_LOCATION_GPS_OPEN, LocationUtils.get().isOpenGps());
         } catch (Exception e) {
             LogUtils.e(TAG, "位置数据获取异常:" + e.getMessage());
         }
@@ -651,8 +651,8 @@ public class SyncDataManager {
 
     private static void createSystem(JSONObject tags, JSONObject fields) {
         try {
-            fields.put("device_open_time", DeviceUtils.getSystemOpenTime());
-            tags.put("device_name", BluetoothUtils.get().getDeviceName());
+            fields.put(Constants.KEY_DEVICE_OPEN_TIME, DeviceUtils.getSystemOpenTime());
+            tags.put(Constants.KEY_DEVICE_NAME, BluetoothUtils.get().getDeviceName());
         } catch (Exception e) {
             LogUtils.e(TAG, "系统数据获取异常:" + e.getMessage());
         }
@@ -664,10 +664,10 @@ public class SyncDataManager {
             if (set != null) {
                 int i = 1;
                 for (BluetoothDevice device : set) {
-                    fields.put("bt_device" + (i++), device.getAddress());
+                    fields.put(Constants.KEY_BT_DEVICE + (i++), device.getAddress());
                 }
             }
-            tags.put("bt_open", BluetoothUtils.get().isOpen());
+            tags.put(Constants.KEY_BT_OPEN, BluetoothUtils.get().isOpen());
 
         } catch (Exception e) {
             LogUtils.e(TAG, "蓝牙数据获取异常:" + e.getMessage());
@@ -677,39 +677,39 @@ public class SyncDataManager {
     private static void createSensor(JSONObject tags, JSONObject fields) {
         try {
             if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_BRIGHTNESS)) {
-                fields.put("screen_brightness", DeviceUtils.getSystemScreenBrightnessValue());
+                fields.put(Constants.KEY_SENSOR_BRIGHTNESS, DeviceUtils.getSystemScreenBrightnessValue());
             }
             if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_LIGHT)) {
-                fields.put("light", SensorUtils.get().getSensorLight());
+                fields.put(Constants.KEY_SENSOR_LIGHT, SensorUtils.get().getSensorLight());
             }
             if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_PROXIMITY)) {
-                fields.put("proximity", SensorUtils.get().getDistance());
+                fields.put(Constants.KEY_SENSOR_PROXIMITY, SensorUtils.get().getDistance());
             }
             if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_STEP)) {
-                fields.put("steps", SensorUtils.get().getTodayStep());
+                fields.put(Constants.KEY_SENSOR_STEPS, SensorUtils.get().getTodayStep());
             }
             if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_ROTATION)) {
                 float[] rotation = SensorUtils.get().getGyroscope();
                 if (rotation != null && rotation.length == 3) {
-                    fields.put("rotation_x", rotation[0]);
-                    fields.put("rotation_y", rotation[1]);
-                    fields.put("rotation_z", rotation[2]);
+                    fields.put(Constants.KEY_SENSOR_ROTATION_X, rotation[0]);
+                    fields.put(Constants.KEY_SENSOR_ROTATION_Y, rotation[1]);
+                    fields.put(Constants.KEY_SENSOR_ROTATION_Z, rotation[2]);
                 }
             }
             if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_ACCELERATION)) {
                 float[] acceleration = SensorUtils.get().getAcceleration();
                 if (acceleration != null && acceleration.length == 3) {
-                    fields.put("acceleration_x", acceleration[0]);
-                    fields.put("acceleration_y", acceleration[1]);
-                    fields.put("acceleration_z", acceleration[2]);
+                    fields.put(Constants.KEY_SENSOR_ACCELERATION_X, acceleration[0]);
+                    fields.put(Constants.KEY_SENSOR_ACCELERATION_Y, acceleration[1]);
+                    fields.put(Constants.KEY_SENSOR_ACCELERATION_Z, acceleration[2]);
                 }
             }
             if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_MAGNETIC)) {
                 float[] magnetic = SensorUtils.get().getMagnetic();
                 if (magnetic != null && magnetic.length == 3) {
-                    fields.put("magnetic_x", magnetic[0]);
-                    fields.put("magnetic_y", magnetic[1]);
-                    fields.put("magnetic_z", magnetic[2]);
+                    fields.put(Constants.KEY_SENSOR_MAGNETIC_X, magnetic[0]);
+                    fields.put(Constants.KEY_SENSOR_MAGNETIC_Y, magnetic[1]);
+                    fields.put(Constants.KEY_SENSOR_MAGNETIC_Z, magnetic[2]);
                 }
             }
             if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_TORCH)) {
@@ -722,7 +722,7 @@ public class SyncDataManager {
 
     private static void createFps(JSONObject tags, JSONObject fields) {
         try {
-            fields.put("fps", FpsUtils.get().getFps());
+            fields.put(Constants.KEY_FPS, FpsUtils.get().getFps());
         } catch (JSONException e) {
             LogUtils.e(TAG, "FPS数据获取异常:" + e.getMessage());
         }
@@ -733,7 +733,7 @@ public class SyncDataManager {
      */
     private static void createTorch(JSONObject tags, JSONObject fields) {
         try {
-            tags.put("torch", CameraUtils.get().isTorchState());
+            tags.put(Constants.KEY_TORCH, CameraUtils.get().isTorchState());
         } catch (JSONException e) {
             LogUtils.e(TAG, "闪光灯数据获取异常:" + e.getMessage());
         }
@@ -741,17 +741,13 @@ public class SyncDataManager {
 
     private String getEventName(String op) {
         if (OP.LANC.value.equals(op)) {
-            return "launch";
+            return Constants.EVENT_NAME_LAUNCH;
         } else if (OP.CLK.value.equals(op)) {
-            return "click";
-        } else if (OP.CLS_FRA.value.equals(op)) {
-            return "leave";
-        } else if (OP.CLS_ACT.value.equals(op)) {
-            return "leave";
-        } else if (OP.OPEN_ACT.value.equals(op)) {
-            return "enter";
-        } else if (OP.OPEN_FRA.value.equals(op)) {
-            return "enter";
+            return Constants.EVENT_NAME_CLICK;
+        } else if (OP.CLS_FRA.value.equals(op) || OP.CLS_ACT.value.equals(op)) {
+            return Constants.EVENT_NAME_LEAVE;
+        } else if (OP.OPEN_ACT.value.equals(op) || OP.OPEN_FRA.value.equals(op)) {
+            return Constants.EVENT_NAME_ENTER;
         }
         return op;
     }
@@ -810,22 +806,9 @@ public class SyncDataManager {
      */
     private static HashMap<String, Object> getDeviceInfo() {
         Context context = FTApplication.getApplication();
-        HashMap<String, Object> objectHashMap = new HashMap<>();
-        objectHashMap.put("device_uuid", DeviceUtils.getUuid(context));
-        objectHashMap.put("application_identifier", DeviceUtils.getApplicationId(context));
-        objectHashMap.put("application_name", DeviceUtils.getAppName(context));
-        objectHashMap.put("agent", DeviceUtils.getSDKVersion());
-        objectHashMap.put("autoTrack", FTSdk.PLUGIN_VERSION);
-        objectHashMap.put("imei", DeviceUtils.getImei(context));
-        objectHashMap.put("os", DeviceUtils.getOSName());
-        objectHashMap.put("os_version", DeviceUtils.getOSVersion());
-        objectHashMap.put("device_band", DeviceUtils.getDeviceBand());
-        objectHashMap.put("device_model", DeviceUtils.getDeviceModel());
-        objectHashMap.put("display", DeviceUtils.getDisplay(context));
-        objectHashMap.put("carrier", DeviceUtils.getCarrier(context));
-        objectHashMap.put("locale", Locale.getDefault());
+        HashMap<String, Object> objectHashMap = getDefaultObjectBean();
         if (FTHttpConfig.get().useOaid) {
-            objectHashMap.put("oaid", OaidUtils.getOAID(context));
+            objectHashMap.put(Constants.KEY_DEVICE_OAID, OaidUtils.getOAID(context));
         }
         HashMap<String, Object> temp = new HashMap<>();
         for (Map.Entry<String, Object> entry : objectHashMap.entrySet()) {
@@ -848,19 +831,20 @@ public class SyncDataManager {
     public static HashMap<String, Object> getDefaultObjectBean() {
         Context context = FTApplication.getApplication();
         HashMap<String, Object> objectHashMap = new HashMap<>();
-        objectHashMap.put("device_uuid", DeviceUtils.getUuid(context));
-        objectHashMap.put("application_identifier", DeviceUtils.getApplicationId(context));
-        objectHashMap.put("application_name", DeviceUtils.getAppName(context));
-        objectHashMap.put("agent", DeviceUtils.getSDKVersion());
-        objectHashMap.put("autoTrack", FTSdk.PLUGIN_VERSION);
-        objectHashMap.put("os", DeviceUtils.getOSName());
-        objectHashMap.put("os_version", DeviceUtils.getOSVersion());
-        objectHashMap.put("device_band", DeviceUtils.getDeviceBand());
-        objectHashMap.put("device_model", DeviceUtils.getDeviceModel());
-        objectHashMap.put("display", DeviceUtils.getDisplay(context));
-        objectHashMap.put("carrier", DeviceUtils.getCarrier(context));
-        objectHashMap.put("locale", Locale.getDefault());
-        objectHashMap.put("app_version_name", Utils.getAppVersionName());
+        objectHashMap.put(Constants.KEY_DEVICE_UUID, DeviceUtils.getUuid(context));
+        objectHashMap.put(Constants.KEY_DEVICE_APPLICATION_ID, DeviceUtils.getApplicationId(context));
+        objectHashMap.put(Constants.KEY_DEVICE_APPLICATION_NAME, DeviceUtils.getAppName(context));
+        objectHashMap.put(Constants.KEY_DEVICE_AGENT, DeviceUtils.getSDKVersion());
+        objectHashMap.put(Constants.KEY_DEVICE_AUTO_TRACK, FTSdk.PLUGIN_VERSION);
+        objectHashMap.put(Constants.KEY_DEVICE_IMEI, DeviceUtils.getImei(context));
+        objectHashMap.put(Constants.KEY_DEVICE_OS, DeviceUtils.getOSName());
+        objectHashMap.put(Constants.KEY_DEVICE_OS_VERSION, DeviceUtils.getOSVersion());
+        objectHashMap.put(Constants.KEY_DEVICE_DEVICE_BAND, DeviceUtils.getDeviceBand());
+        objectHashMap.put(Constants.KEY_DEVICE_DEVICE_MODEL, DeviceUtils.getDeviceModel());
+        objectHashMap.put(Constants.KEY_DEVICE_DISPLAY, DeviceUtils.getDisplay(context));
+        objectHashMap.put(Constants.KEY_DEVICE_CARRIER, DeviceUtils.getCarrier(context));
+        objectHashMap.put(Constants.KEY_DEVICE_LOCALE, Locale.getDefault());
+        objectHashMap.put(Constants.KEY_APP_VERSION_NAME, Utils.getAppVersionName());
         return objectHashMap;
     }
 
