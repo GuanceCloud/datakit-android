@@ -13,7 +13,8 @@
 [![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Fmvnrepo.jiagouyun.com%2Frepository%2Fmaven-releases%2Fcom%2Fcloudcare%2Fft%2Fmobile%2Fsdk%2Ftracker%2Fplugin%2Fft-plugin%2Fmaven-metadata.xml)](https://mvnrepo.jiagouyun.com/repository/maven-releases/com/cloudcare/ft/mobile/sdk/tracker/plugin/ft-plugin/maven-metadata.xml)
 
 ## 安装
-### 1. 在项目的根目录的 build.gradle 文件中添加 DataFlux SDK 的远程仓库地址
+### 1. DataFlux SDK 支持 Android 的最低版本为 23（即 Android 6.0）
+### 2. 在项目的根目录的 build.gradle 文件中添加 DataFlux SDK 的远程仓库地址
 ``` groovy
 buildscript {
     //...省略部分代码
@@ -40,7 +41,7 @@ allprojects {
     }
 }
 ```
-### 2. 在项目主模块( app 模块)的 build.gradle 文件中添加 DataFlux SDK 的依赖及 DataFlux Plugin 的使用 和 Java 8 的支持
+### 3. 在项目主模块( app 模块)的 build.gradle 文件中添加 DataFlux SDK 的依赖及 DataFlux Plugin 的使用 和 Java 8 的支持
 
 ``` groovy
 dependencies {
@@ -65,7 +66,7 @@ android{
 
 >最新的版本请看上方的 Agent 和 Plugin 的版本名
 
-### 3. 添加混淆
+### 4. 添加混淆
 
 如果你的项目开启了混淆，那么在你的 proguard-rules.pro 文件中添加如下配置
 
