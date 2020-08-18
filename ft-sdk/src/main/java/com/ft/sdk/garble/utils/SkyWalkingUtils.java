@@ -25,7 +25,7 @@ public class SkyWalkingUtils {
     private static String parentServiceUUID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
     private String sw8;
     private String newTraceId;
-    private String newSpanId;
+    private String newParentTraceId;
 
     public SkyWalkingUtils(SkyWalkingVersion version, String sampled, long requestTime, HttpUrl url) {
         synchronized (SkyWalkingUtils.class) {//防止多线程 increasingNumber 不安顺序增加
@@ -51,12 +51,17 @@ public class SkyWalkingUtils {
         return newTraceId;
     }
 
+    public String getNewParentTraceId() {
+        return newParentTraceId;
+    }
+
     private void createSw8Head(String sampled, long requestTime, HttpUrl url) {
-        newSpanId = traceIDUUID + "." + Thread.currentThread().getId() + "." + requestTime + String.format(Locale.getDefault(), "%04d", increasingNumber.get() - 1);
+        newParentTraceId = traceIDUUID + "." + Thread.currentThread().getId() + "." + requestTime + String.format(Locale.getDefault(), "%04d", increasingNumber.get() - 1);
         newTraceId = traceIDUUID + "." + Thread.currentThread().getId() + "." + requestTime + String.format(Locale.getDefault(), "%04d", increasingNumber.get());
         sw8 = sampled + "-" +
                 Utils.encodeStringToBase64(newTraceId) + "-" +
-                Utils.encodeStringToBase64(newSpanId) + "-0-" +
+                Utils.encodeStringToBase64(newParentTraceId) + "-" +
+                "0-" +
                 Utils.encodeStringToBase64(FTExceptionHandler.get().getTrackServiceName()) + "-" +
                 Utils.encodeStringToBase64(parentServiceUUID + "@" + NetUtils.get().getMobileIpAddress()) + "-" +
                 Utils.encodeStringToBase64(url.encodedPath()) + "-" +
@@ -64,13 +69,14 @@ public class SkyWalkingUtils {
     }
 
     private void createSw6Head(String sampled, long requestTime, HttpUrl url) {
-        newSpanId = increasingLong.get() + "." + Thread.currentThread().getId() + "." + requestTime + String.format(Locale.getDefault(), "%04d", increasingNumber.get() - 1);
+        newParentTraceId = increasingLong.get() + "." + Thread.currentThread().getId() + "." + requestTime + String.format(Locale.getDefault(), "%04d", increasingNumber.get() - 1);
         newTraceId = increasingLong.get() + "." + Thread.currentThread().getId() + "." + requestTime + String.format(Locale.getDefault(), "%04d", increasingNumber.get());
         sw8 = sampled + "-" +
                 Utils.encodeStringToBase64(newTraceId) + "-" +
-                Utils.encodeStringToBase64(newSpanId) + "-0-" +
+                Utils.encodeStringToBase64(newParentTraceId) + "-" +
+                "0-" +
                 increasingLong.get() + "-" + increasingLong.get() + "-" +
-                Utils.encodeStringToBase64("#" + url.host() + ":" + url.port()) +"-"+
+                Utils.encodeStringToBase64("#" + url.host() + ":" + url.port()) + "-" +
                 Utils.encodeStringToBase64("-1") + "-" + Utils.encodeStringToBase64("-1");
     }
 }

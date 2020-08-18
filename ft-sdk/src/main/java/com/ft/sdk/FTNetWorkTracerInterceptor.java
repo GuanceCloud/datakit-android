@@ -120,14 +120,14 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
             } else if (FTHttpConfig.get().traceType == TraceType.JAEGER) {
                 requestBuilder.addHeader(JAEGER_KEY, traceID + ":" + spanID + ":" + parentSpanID + ":" + sampled);
             } else if (FTHttpConfig.get().traceType == TraceType.SKYWALKING_V3) {
-                SkyWalkingUtils skyWalkingUtils = new SkyWalkingUtils(SkyWalkingUtils.SkyWalkingVersion.V3,sampled,requestTime,request.url());
+                SkyWalkingUtils skyWalkingUtils = new SkyWalkingUtils(SkyWalkingUtils.SkyWalkingVersion.V3, sampled, requestTime, request.url());
                 traceID = skyWalkingUtils.getNewTraceId();
-                spanID = traceID+"1";
+                spanID = skyWalkingUtils.getNewParentTraceId() + "0";
                 requestBuilder.addHeader(SKYWALKING_V3_SW_8, skyWalkingUtils.getSw());
             } else if (FTHttpConfig.get().traceType == TraceType.SKYWALKING_V2) {
-                SkyWalkingUtils skyWalkingUtils = new SkyWalkingUtils(SkyWalkingUtils.SkyWalkingVersion.V2,sampled,requestTime,request.url());
+                SkyWalkingUtils skyWalkingUtils = new SkyWalkingUtils(SkyWalkingUtils.SkyWalkingVersion.V2, sampled, requestTime, request.url());
                 traceID = skyWalkingUtils.getNewTraceId();
-                spanID = traceID+"1";
+                spanID = skyWalkingUtils.getNewParentTraceId() + "0";
                 requestBuilder.addHeader(SKYWALKING_V3_SW_6, skyWalkingUtils.getSw());
             }
             newRequest = requestBuilder.build();
