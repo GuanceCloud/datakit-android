@@ -85,7 +85,7 @@ public class LocationUtils {
      * 开始监听位置信息
      */
     public void startListener() {
-        if (!FTMonitorConfig.get().isMonitorType(MonitorType.ALL) && !FTMonitorConfig.get().isMonitorType(MonitorType.LOCATION)) {
+        if (!FTMonitorConfig.get().isMonitorType(MonitorType.LOCATION)) {
             return;
         }
         startLocationCallBack(null);

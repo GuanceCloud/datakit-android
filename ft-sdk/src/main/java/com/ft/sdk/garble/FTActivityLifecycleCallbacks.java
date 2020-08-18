@@ -26,7 +26,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     @Override
     public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
         //防止监听网速的线程挂掉，在页面打开时判断线程是够挂了，挂了重启
-        if (FTMonitorConfig.get().isMonitorType(MonitorType.ALL) || FTMonitorConfig.get().isMonitorType(MonitorType.NETWORK)) {
+        if (FTMonitorConfig.get().isMonitorType(MonitorType.NETWORK)) {
             NetUtils.get().startMonitorNetRate();
         }
         FTFragmentManager.getInstance().addFragmentLifecycle(activity);

@@ -7,7 +7,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
 import com.ft.sdk.FTApplication;
-import com.ft.sdk.MonitorType;
 import com.ft.sdk.garble.FTMonitorConfig;
 
 import java.util.ArrayList;
@@ -61,32 +60,23 @@ public class SensorUtils {
         if (sensorList == null) {
             sensorList = new ArrayList<>();
         }
-        if(FTMonitorConfig.get().isMonitorType(MonitorType.ALL) || FTMonitorConfig.get().isMonitorType(SENSOR)) {
+        if (FTMonitorConfig.get().isMonitorType(SENSOR) || FTMonitorConfig.get().isMonitorType(SENSOR_BRIGHTNESS)) {
             sensorList.add(registerSensor(Sensor.TYPE_LIGHT));
+        }
+        if (FTMonitorConfig.get().isMonitorType(SENSOR) || FTMonitorConfig.get().isMonitorType(SENSOR_STEP)) {
             sensorList.add(registerSensor(Sensor.TYPE_STEP_COUNTER));
+        }
+        if (FTMonitorConfig.get().isMonitorType(SENSOR) || FTMonitorConfig.get().isMonitorType(SENSOR_PROXIMITY)) {
             sensorList.add(registerSensor(Sensor.TYPE_PROXIMITY));
+        }
+        if (FTMonitorConfig.get().isMonitorType(SENSOR) || FTMonitorConfig.get().isMonitorType(SENSOR_ACCELERATION)) {
             sensorList.add(registerSensor(Sensor.TYPE_LINEAR_ACCELERATION));
+        }
+        if (FTMonitorConfig.get().isMonitorType(SENSOR) || FTMonitorConfig.get().isMonitorType(SENSOR_ROTATION)) {
             sensorList.add(registerSensor(Sensor.TYPE_GYROSCOPE));
+        }
+        if (FTMonitorConfig.get().isMonitorType(SENSOR) || FTMonitorConfig.get().isMonitorType(SENSOR_MAGNETIC)) {
             sensorList.add(registerSensor(Sensor.TYPE_MAGNETIC_FIELD));
-        }else{
-            if(FTMonitorConfig.get().isMonitorType(SENSOR_BRIGHTNESS)){
-                sensorList.add(registerSensor(Sensor.TYPE_LIGHT));
-            }
-            if(FTMonitorConfig.get().isMonitorType(SENSOR_STEP)){
-                sensorList.add(registerSensor(Sensor.TYPE_STEP_COUNTER));
-            }
-            if(FTMonitorConfig.get().isMonitorType(SENSOR_PROXIMITY)){
-                sensorList.add(registerSensor(Sensor.TYPE_PROXIMITY));
-            }
-            if(FTMonitorConfig.get().isMonitorType(SENSOR_ACCELERATION)){
-                sensorList.add(registerSensor(Sensor.TYPE_LINEAR_ACCELERATION));
-            }
-            if(FTMonitorConfig.get().isMonitorType(SENSOR_ROTATION)){
-                sensorList.add(registerSensor(Sensor.TYPE_GYROSCOPE));
-            }
-            if(FTMonitorConfig.get().isMonitorType(SENSOR_MAGNETIC)){
-                sensorList.add(registerSensor(Sensor.TYPE_MAGNETIC_FIELD));
-            }
         }
     }
 
