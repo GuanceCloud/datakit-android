@@ -191,6 +191,10 @@ public class Main2Activity extends AppCompatActivity {
                 logThread.setText("周期产生日志数据--结束");
             }
         });
+
+        findViewById(R.id.jump15).setOnClickListener(v->{
+            Log.d("LogManager", "测试日志数据=======当前时间为" +System.currentTimeMillis());
+        });
     }
 
     OkHttpClient client = new OkHttpClient.Builder()
