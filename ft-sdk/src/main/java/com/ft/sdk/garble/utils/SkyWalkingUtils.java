@@ -32,7 +32,7 @@ public class SkyWalkingUtils {
             if (increasingNumber.get() < 9999) {
                 increasingNumber.getAndAdd(2);
             } else {
-                increasingNumber.set(-1);
+                increasingNumber.set(1);
             }
             if (version == SkyWalkingVersion.V3) {
                 createSw8Head(sampled, requestTime, url);
