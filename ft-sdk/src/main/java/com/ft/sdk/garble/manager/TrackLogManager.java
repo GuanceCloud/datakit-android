@@ -63,10 +63,11 @@ public class TrackLogManager {
             try {
                 //当队列中有数据时，不断执行取数据操作
                 LogBean logBean;
+                //take 为阻塞方法，所以该线程会一直在运行中
                 while ((logBean = logQueue.take()) != null) {
                     isRunning = true;
                     logBeanList.add(logBean);//取出数据放到集合中
-                    if (logBeanList.size() >= 5) {//当取出的数据大于等于5条时执行插入数据库操作
+                    if (logBeanList.size() >= 5 || logQueue.peek() == null) {//当取出的数据大于等于5条或者没有下一条数据时执行插入数据库操作
                         FTTrackInner.getInstance().logBackgroundSync(logBeanList);
                         logBeanList.clear();//插入完成后执行清除集合操作
                     }
