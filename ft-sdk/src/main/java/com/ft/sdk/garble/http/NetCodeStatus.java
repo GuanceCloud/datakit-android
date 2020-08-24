@@ -20,21 +20,26 @@ public class NetCodeStatus {
     /**
      * 网络问题
      */
-    public static final int NETWORK_EXCEPTION_CODE = 101;
+    public static final int NETWORK_EXCEPTION_CODE = 10001;
 
     /**
      * 参数问题
      */
-    public static final int INVALID_PARAMS_EXCEPTION_CODE = 102;
+    public static final int INVALID_PARAMS_EXCEPTION_CODE = 10002;
 
     /**
      * 文件 IO 问题
      */
-    public static final int FILE_IO_EXCEPTION_CODE = 103;
+    public static final int FILE_IO_EXCEPTION_CODE = 10003;
 
     /**
      * 未知问题
      */
-    public static final int UNKNOWN_EXCEPTION_CODE = 104;
+    public static final int UNKNOWN_EXCEPTION_CODE = 10004;
+
+    /**
+     * token 错误
+     */
+    public static final int TOKEN_ERROR = 10005;
 
 }
