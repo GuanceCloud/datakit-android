@@ -12,6 +12,16 @@ android {
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
+    flavorDimensions "environment"
+    productFlavors {
+        envProduct{
+            buildConfigField("boolean","isTestEnv","false")
+        }
+        envTest{
+            buildConfigField("boolean","isTestEnv","true")
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false

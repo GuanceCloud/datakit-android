@@ -33,6 +33,12 @@ public class DemoApplication extends Application {
     public void onCreate() {
         super.onCreate();
         instance = this;
+        if(!BuildConfig.isTestEnv){
+            initFTSDK();
+        }
+    }
+
+    private void initFTSDK(){
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(this, AccountUtils.ACCESS_SERVER_URL),
                 true,
                 AccountUtils.getProperty(this, AccountUtils.ACCESS_KEY_ID),
@@ -62,11 +68,6 @@ public class DemoApplication extends Application {
                 .setTraceType(TraceType.SKYWALKING_V2)
                 .setOnlySupportMainProcess(true);
         FTSdk.install(ftSDKConfig);
-
-        FTMonitor.get()
-                .setMonitorType(MonitorType.ALL)
-                .setPeriod(10)
-                .start();
     }
 
     private Map<String, String> pageAliasMap() {

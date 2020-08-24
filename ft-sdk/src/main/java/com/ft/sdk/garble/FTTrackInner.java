@@ -311,7 +311,7 @@ public class FTTrackInner {
     private void updateRecordData(DataType dataType, List<RecordData> recordDataList, SyncCallback callback) {
         if (!TokenCheck.get().checkToken()) {
             if (callback != null) {
-                callback.onResponse(HttpURLConnection.HTTP_OK, TokenCheck.get().message);
+                callback.onResponse(NetCodeStatus.TOKEN_ERROR, TokenCheck.get().message);
                 return;
             }
         }

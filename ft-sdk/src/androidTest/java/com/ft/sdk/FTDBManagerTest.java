@@ -1,6 +1,9 @@
 package com.ft.sdk;
 
+import android.database.sqlite.SQLiteOpenHelper;
+
 import com.ft.sdk.garble.bean.RecordData;
+import com.ft.sdk.garble.db.FTDBConfig;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.manager.SyncTaskManager;
 
@@ -17,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * BY huangDianHua
  * DATE:2019-12-25 16:38
- * Description:
+ * Description: 数据库创库,插入数据,删除数据测试
  */
 public class FTDBManagerTest {
     private int repeatTime = 100;
@@ -31,17 +34,15 @@ public class FTDBManagerTest {
     }
 
     /**
-     * 向数据库中插入一条数据
-     *
-     * @throws JSONException
+     * 测试创建数据库
      */
-    private void insertData() throws JSONException {
-        JSONObject tags = new JSONObject();
-        tags.put("name", "json");
-        JSONObject values = new JSONObject();
-        values.put("value", "success");
-        SyncTaskManager.get().setRunning(true);
-        FTTrack.getInstance().trackBackground("TestEvent", tags, values);
+    @Test
+    public void createDatabase() {
+        FTDBConfig.DATABASE_NAME = "test.db";
+        FTDBConfig.DATABASE_VERSION = 1;
+        SQLiteOpenHelper helper = FTDBManager.get().initDataBaseHelper();
+        assertEquals(FTDBConfig.DATABASE_NAME, helper.getDatabaseName());
+
     }
 
     /**
@@ -51,7 +52,7 @@ public class FTDBManagerTest {
      * @throws JSONException
      */
     @Test
-    public void TrackDataTest() throws InterruptedException, JSONException {
+    public void insertDataTest() throws InterruptedException, JSONException {
         insertData();
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
@@ -66,7 +67,7 @@ public class FTDBManagerTest {
      * @throws InterruptedException
      */
     @Test
-    public void TrackMoreDataTest() throws JSONException, InterruptedException {
+    public void insertMultiDataTest() throws JSONException, InterruptedException {
         int i = 0;
         while (i < repeatTime) {
             insertData();
@@ -86,7 +87,7 @@ public class FTDBManagerTest {
      * @throws InterruptedException
      */
     @Test
-    public void deleteByIdsTest() throws JSONException, InterruptedException {
+    public void deleteDataByIdsTest() throws JSONException, InterruptedException {
         insertData();
         insertData();
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
@@ -100,5 +101,19 @@ public class FTDBManagerTest {
         FTDBManager.get().delete(integers);
         List<RecordData> recordDataList1 = FTDBManager.get().queryDataByDescLimit(0);
         assertEquals(0, recordDataList1.size());
+    }
+
+    /**
+     * 向数据库中插入一条数据
+     *
+     * @throws JSONException
+     */
+    private void insertData() throws JSONException {
+        JSONObject tags = new JSONObject();
+        tags.put("name", "json");
+        JSONObject values = new JSONObject();
+        values.put("value", "success");
+        SyncTaskManager.get().setRunning(true);
+        FTTrack.getInstance().trackBackground("TestEvent", tags, values);
     }
 }
