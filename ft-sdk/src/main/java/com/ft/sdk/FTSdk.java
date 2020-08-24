@@ -58,7 +58,7 @@ public class FTSdk {
      */
     public static synchronized void install(@NonNull FTSDKConfig ftSDKConfig) {
         if (ftSDKConfig == null) {
-            throw new InvalidParameterException("ftSDKConfig 参数不能为 null");
+            throw new InvalidParameterException("参数 ftSDKConfig 不能为 null");
         }else{
             mFtSdk = new FTSdk(ftSDKConfig);
             boolean onlyMain = ftSDKConfig.isOnlySupportMainProcess();

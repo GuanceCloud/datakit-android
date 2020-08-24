@@ -18,7 +18,7 @@ public class TokenCheck {
     public static final String TAG = "TokenCheck";
     private volatile static TokenCheck tokenCheck;
     private volatile boolean tokenAllowable;
-    private volatile boolean isRunning;
+    private volatile boolean hasExecutor;
     public volatile String message = "";
 
     private TokenCheck() {
@@ -35,13 +35,9 @@ public class TokenCheck {
      * 检测 token 是否合法
      */
     public synchronized boolean checkToken() {
-        if (tokenAllowable) {
+        if (hasExecutor && tokenAllowable) {
             return true;
         }
-        if (isRunning) {
-            return false;
-        }
-        isRunning = true;
         String token = FTHttpConfig.get().dataWayToken;
         if (!Utils.isNullOrEmpty(token)) {
             ResponseData result = HttpBuilder.Builder()
@@ -75,7 +71,7 @@ public class TokenCheck {
         } else {
             tokenAllowable = true;
         }
-        isRunning = false;
+        hasExecutor = true;
         return tokenAllowable;
     }
 }

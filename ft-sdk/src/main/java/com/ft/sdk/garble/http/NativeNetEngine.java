@@ -148,17 +148,21 @@ public class NativeNetEngine implements INetEngine {
             responseCode = mConnection.getResponseCode();
             if (responseCode >= 300) {
                 inputStream = mConnection.getErrorStream();
-                inputStreamReader = new InputStreamReader(inputStream, CHARSET);
-                reader = new BufferedReader(inputStreamReader);
-                while ((tempLine = reader.readLine()) != null) {
-                    resultBuffer.append(tempLine);
+                if(inputStream != null) {
+                    inputStreamReader = new InputStreamReader(inputStream, CHARSET);
+                    reader = new BufferedReader(inputStreamReader);
+                    while ((tempLine = reader.readLine()) != null) {
+                        resultBuffer.append(tempLine);
+                    }
                 }
             } else {
                 inputStream = mConnection.getInputStream();
-                inputStreamReader = new InputStreamReader(inputStream, CHARSET);
-                reader = new BufferedReader(inputStreamReader);
-                while ((tempLine = reader.readLine()) != null) {
-                    resultBuffer.append(tempLine);
+                if(inputStream != null) {
+                    inputStreamReader = new InputStreamReader(inputStream, CHARSET);
+                    reader = new BufferedReader(inputStreamReader);
+                    while ((tempLine = reader.readLine()) != null) {
+                        resultBuffer.append(tempLine);
+                    }
                 }
             }
         } catch (SocketTimeoutException e) {

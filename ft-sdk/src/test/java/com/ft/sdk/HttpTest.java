@@ -21,7 +21,7 @@ import static org.junit.Assert.assertNotEquals;
 /**
  * BY huangDianHua
  * DATE:2019-12-16 13:29
- * Description:
+ * Description:模拟网络请求测试
  */
 
 @RunWith(RobolectricTestRunner.class)
