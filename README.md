@@ -473,8 +473,8 @@ class FTTrack{
 #### 关于主动埋点 trackImmediate 的结果回调 SyncCallback 的说明
 
 回调方法 onResponse(int code,String response) 中 code 表示网络请求返回的返回码，response 为服务端返回的信息。
-code 的值除了 HTTP 协议中规定的返回码，FT SDK 中额外规定了 4 种类型的错误码，他们是 101，102，103，104，他们分别
-代表的意思是网络问题、参数问题、IO异常和未知错误
+code 的值除了 HTTP 协议中规定的返回码，FT SDK 中额外规定了 5 种类型的错误码，他们是 10001，10002，10003，10004，10005 他们分别
+代表的意思是网络问题、参数问题、IO异常、未知错误、token 错误
 
 ### 四、监控配置项类 MonitorType
 
