@@ -1,8 +1,11 @@
 package com.ft;
 
+import android.content.Context;
+
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.ft.sdk.FTAutoTrack;
+import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.db.FTDBManager;
@@ -24,12 +27,19 @@ import static org.junit.Assert.assertEquals;
  */
 @RunWith(AndroidJUnit4.class)
 public class BindUserTest {
+    Context context = null;
 
-    /**
-     * 在测试用例执行之前需要删除数据库中已经存在的数据
-     */
     @Before
-    public void deleteTableData() {
+    public void setUp() {
+        context = DemoApplication.getContext();
+        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL),
+                true,
+                AccountUtils.getProperty(context, AccountUtils.ACCESS_KEY_ID),
+                AccountUtils.getProperty(context, AccountUtils.ACCESS_KEY_SECRET))
+                .setDataWayToken(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_TOKEN))
+                .setNeedBindUser(true)
+                .enableAutoTrack(true);
+        FTSdk.install(ftSDKConfig);
         FTDBManager.get().delete();
     }
 
@@ -42,8 +52,6 @@ public class BindUserTest {
     public void notBindUserDataSync() throws InterruptedException {
         //解绑用户
         FTSdk.get().unbindUserData();
-        //产生一个埋点事件
-        FTAutoTrack.startApp();
         //间隔15秒查询数据库数据，因为上传的逻辑最长可能要10秒后执行
         Thread.sleep(15000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimit(0);
@@ -72,11 +80,9 @@ public class BindUserTest {
     @Test
     public void unbindAndBindDataSync() throws InterruptedException {
         FTSdk.get().unbindUserData();
-        FTAutoTrack.startApp();
-        Thread.sleep(20000);
-        List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimit(0);
-        assertEquals(1, recordDataList.size());
+        Thread.sleep(5000);
         bindUserData("FT-TEST");
+        FTAutoTrack.startApp();
         Thread.sleep(20000);
         List<RecordData> recordDataList1 = FTDBManager.get().queryDataByDescLimit(0);
         assertEquals(0, recordDataList1.size());
