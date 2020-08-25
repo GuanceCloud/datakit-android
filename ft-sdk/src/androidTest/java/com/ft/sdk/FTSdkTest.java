@@ -15,5 +15,5 @@ import org.junit.runners.Suite;
         FTDBManagerTest.class,
         ThreadPoolutilsTest.class,
         UtilsTest.class})
-public class AAFTSdkTest {
+public class FTSdkTest {
 }

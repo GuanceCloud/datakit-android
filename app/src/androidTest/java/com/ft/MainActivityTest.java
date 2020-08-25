@@ -142,7 +142,7 @@ public class MainActivityTest {
                 .setModel("api/v1/influx/query_data")
                 .setHeadParams(SyncDataUtils.getQueryHead(token))
                 .setMethod(RequestMethod.POST)
-                .setBodyString(SyncDataUtils.buildPostBody())
+                .setBodyString(SyncDataUtils.buildLogBody())
                 .executeSync(ResponseData.class);
 
         JSONObject jsonObject = new JSONObject(responseData.getData());

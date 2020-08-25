@@ -25,8 +25,8 @@ class SyncDataUtils {
         @JvmStatic
         fun getLoginBody(context: Context): String {
             return JSONObject().apply {
-                val account = AccountUtils.getProperty(context,AccountUtils.TEST_ACCOUNT)
-                val pwd = AccountUtils.getProperty(context,AccountUtils.TEST_PWD)
+                val account = AccountUtils.getProperty(context, AccountUtils.TEST_ACCOUNT)
+                val pwd = AccountUtils.getProperty(context, AccountUtils.TEST_PWD)
                 if (account == "null") {
                     throw InvalidParameterException("请先设置测试账号")
                     return@apply
@@ -53,44 +53,93 @@ class SyncDataUtils {
         }
 
         /**
-         * 获取查询接口的 body 部分
+         * 获取 LOG 查询接口的 body 部分
          */
         @JvmStatic
-        fun buildPostBody(): String {
+        fun buildLogBody(): String {
             return JSONObject().apply {
-                put("qtype", "http")
-                put("query", JSONObject().apply {
-                    put("fields", JSONArray().apply {
-                        put(JSONObject().apply {
-                            put("name", "event")
+                put("queries", JSONArray().apply {
+                    put(JSONObject().apply {
+                        put("measurements", JSONArray().apply {
+                            put("logging")
                         })
-                    })
-                    put("filter", JSONObject().apply {
-                        put("tags", JSONArray().apply {
+                        put("fields", JSONArray())
+                        put("filter", JSONObject().apply {
+                            put("tags", JSONArray())
+                        })
+                        put("groupBy", JSONArray())
+                        put("orderBy", JSONArray().apply {
                             put(JSONObject().apply {
-                                put("condition", "")
-                                put("name", "application_identifier")
-                                put("operation", "=")
-                                put("value", "com.ft")
+                                put("name", "__timestampMs")
+                                put("method", "desc")
                             })
                         })
-                        put("time", JSONArray().apply {
-                            put(System.currentTimeMillis() - 1000 * 60 * 3)
+                        put("limit", 50)
+                        put("offset", 0)
+                        put("intervalTime", "1d")
+                        put("timeRange", JSONArray().apply {
+                            put(System.currentTimeMillis() - 1000 * 60 * 2)
                             put(System.currentTimeMillis())
                         })
                     })
-                    put("limit", 1000)
-                    put("measurements", JSONArray().apply {
-                        put("mobile_tracker")
-                    })
-                    put("offset", 0)
-                    put("orderBy", JSONArray().apply {
-                        put(JSONObject().apply {
-                            put("name", "time")
-                            put("method", "desc")
+                })
+            }.toString()
+        }
+
+        /**
+         * 获取 Object 查询接口的 body 部分
+         */
+        @JvmStatic
+        fun buildObjectBody(content:String): String {
+            return JSONObject().apply {
+                put("queries", JSONArray().apply {
+                    put(JSONObject().apply {
+                        put("index", "object")
+                        put("body", JSONObject().apply {
+                            put("aggs", JSONObject().apply {
+                                put("groupitem",JSONObject().apply {
+                                    put("terms",JSONObject().apply {
+                                        put("field","__tags.__class.keyword")
+                                        put("size",5000)
+                                    })
+                                    put("aggs",JSONObject().apply {
+                                        put("object_count",JSONObject().apply {
+                                            put("value_count",JSONObject().apply {
+                                                put("field","__name.keyword")
+                                            })
+                                        })
+                                    })
+                                })
+                            })
+                            put("sort",JSONArray().apply {
+                                put(JSONObject().apply {
+                                    put("__tags.__class.keyword", JSONObject().apply {
+                                        put("order", "asc")
+                                    })
+                                })
+                            })
+                            put("size",0)
+                            put("query",JSONObject().apply {
+                                put("regexp",JSONObject().apply {
+                                    put("__tags.__class.keyword",".*$content.*")
+                                })
+                            })
                         })
                     })
-                    put("tz", "Asia/Shanghai")
+                })
+            }.toString()
+        }
+
+        /**
+         * 获取 Track 查询接口的 body 部分
+         */
+        @JvmStatic
+        fun buildTrackBody(measurement:String):String{
+            return JSONObject().apply {
+                put("query",JSONObject().apply {
+                    put("measurements",JSONArray().apply {
+                        put(measurement)
+                    })
                 })
             }.toString()
         }
