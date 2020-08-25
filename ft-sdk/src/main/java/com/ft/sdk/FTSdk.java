@@ -94,6 +94,7 @@ public class FTSdk {
         FTNetworkListener.get().release();
         FTFlowConfig.get().release();
         LocationUtils.get().stopListener();
+        FTExceptionHandler.get().release();
         LogUtils.w(TAG,"FT SDK 已经被关闭");
     }
 

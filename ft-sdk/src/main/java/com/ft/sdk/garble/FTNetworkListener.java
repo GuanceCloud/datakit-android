@@ -116,6 +116,10 @@ public class FTNetworkListener {
     }
 
     public void release(){
+        if(connectivityManager == null){
+            instance = null;
+            return;
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             //SDK 版本大于 26 时通过registerDefaultNetworkCallback 注册网络状态变化回调
             connectivityManager.unregisterNetworkCallback(networkCallback);
