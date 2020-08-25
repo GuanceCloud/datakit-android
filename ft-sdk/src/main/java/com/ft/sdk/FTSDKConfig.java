@@ -510,7 +510,9 @@ public class FTSDKConfig {
      * @return
      */
     public FTSDKConfig setEnv(String env) {
-        this.env = env;
+        if(env != null) {
+            this.env = env;
+        }
         return this;
     }
 
@@ -532,7 +534,9 @@ public class FTSDKConfig {
      * @return
      */
     public FTSDKConfig setTraceServiceName(String traceServiceName) {
-        this.traceServiceName = traceServiceName;
+        if(traceServiceName != null) {
+            this.traceServiceName = traceServiceName;
+        }
         return this;
     }
 

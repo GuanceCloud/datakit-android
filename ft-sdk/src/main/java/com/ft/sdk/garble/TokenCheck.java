@@ -19,6 +19,7 @@ public class TokenCheck {
     private volatile static TokenCheck tokenCheck;
     private volatile boolean tokenAllowable;
     private volatile boolean hasExecutor;
+    private volatile String lastDataWayToken;
     public volatile String message = "";
 
     private TokenCheck() {
@@ -35,10 +36,13 @@ public class TokenCheck {
      * 检测 token 是否合法
      */
     public synchronized boolean checkToken() {
-        if (hasExecutor && tokenAllowable) {
-            return true;
+        if (lastDataWayToken != null && lastDataWayToken.equals(FTHttpConfig.get().dataWayToken)) {
+            if (hasExecutor && tokenAllowable) {
+                return true;
+            }
         }
         String token = FTHttpConfig.get().dataWayToken;
+        lastDataWayToken = token;
         if (!Utils.isNullOrEmpty(token)) {
             ResponseData result = HttpBuilder.Builder()
                     .setHost(FTHttpConfig.get().serverUrl)
@@ -54,17 +58,17 @@ public class TokenCheck {
                     if (code == 200) {
                         tokenAllowable = true;
                     } else {
-                        LogUtils.w(TAG,"Dataflux SDK 未能验证通过您配置的 token");
+                        LogUtils.w(TAG, "Dataflux SDK 未能验证通过您配置的 token");
                         tokenAllowable = false;
                         message = data;
                     }
                 } catch (Exception e) {
-                    LogUtils.w(TAG,"Dataflux SDK 未能验证通过您配置的 token,message:" + e.getLocalizedMessage());
+                    LogUtils.w(TAG, "Dataflux SDK 未能验证通过您配置的 token,message:" + e.getLocalizedMessage());
                     message = e.getLocalizedMessage();
                     tokenAllowable = false;
                 }
             } else {
-                LogUtils.w(TAG,"Dataflux SDK 未能验证通过您配置的 token");
+                LogUtils.w(TAG, "Dataflux SDK 未能验证通过您配置的 token");
                 tokenAllowable = false;
                 message = result.getData();
             }
