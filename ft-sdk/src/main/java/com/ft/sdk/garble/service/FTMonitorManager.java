@@ -97,6 +97,8 @@ public class FTMonitorManager {
                                 .setBodyString(body).executeSync(ResponseData.class);
                         if (result.getHttpCode() != HttpURLConnection.HTTP_OK) {
                             LogUtils.d(TAG,"监控轮训线程上传数据出错(message：" + result.getData() + ")");
+                        }else{
+                            System.out.println("轮训监控上报数据成功");
                         }
                     } catch (Exception e) {
                         LogUtils.d(TAG,"监控轮训线程执行错误(message：" + e.getMessage() + ")");
