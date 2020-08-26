@@ -55,52 +55,52 @@ public class MonitorTest {
 
     @Test
     public void monitorBatteryTest(){
-        monitorTest(MonitorType.BATTERY,Constants.KEY_BATTERY_USE);
+        monitorTest(MonitorType.BATTERY);
     }
 
     @Test
     public void monitorMemoryTest(){
-        monitorTest(MonitorType.MEMORY,Constants.KEY_MEMORY_USE);
+        monitorTest(MonitorType.MEMORY);
     }
 
     @Test
     public void monitorCPUTest(){
-        monitorTest(MonitorType.CPU,Constants.KEY_CPU_HZ);
+        monitorTest(MonitorType.CPU);
     }
 
     @Test
     public void monitorGPUTest(){
-        monitorTest(MonitorType.GPU,Constants.KEY_GPU_RATE);
+        monitorTest(MonitorType.GPU);
     }
 
     @Test
     public void monitorNetworkTest(){
-        monitorTest(MonitorType.NETWORK,Constants.KEY_NETWORK_PROXY);
+        monitorTest(MonitorType.NETWORK);
     }
 
     @Test
     public void monitorCameraTest(){
-        monitorTest(MonitorType.CAMERA,"camera_back_px");
+        monitorTest(MonitorType.CAMERA);
     }
 
     @Test
     public void monitorLocationTest(){
-        monitorTest(MonitorType.LOCATION,Constants.KEY_LOCATION_GPS_OPEN);
+        monitorTest(MonitorType.LOCATION);
     }
 
     @Test
     public void monitorBlueToothTest(){
-        monitorTest(MonitorType.BLUETOOTH,Constants.KEY_BT_OPEN);
+        monitorTest(MonitorType.BLUETOOTH);
     }
 
     @Test
     public void monitorSystemTest(){
-        monitorTest(MonitorType.SYSTEM,Constants.KEY_DEVICE_NAME);
+        monitorTest(MonitorType.SYSTEM);
     }
 
     @Test
     public void monitorFpsTest(){
-        monitorTest(MonitorType.FPS,Constants.KEY_FPS);
+        monitorTest(MonitorType.FPS);
     }
 
     /**
@@ -116,7 +116,7 @@ public class MonitorTest {
         Thread.sleep(30000);
     }
 
-    private void monitorTest(int monitorType,String expect) {
+    private void monitorTest(int monitorType) {
         ftSDKConfig.setMonitorType(monitorType);
         FTSdk.install(ftSDKConfig);
         SyncTaskManager.get().setRunning(true);
