@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * author: huangDianHua
  * time: 2020/8/26 15:21:02
- * description:
+ * description:控制台日志测试用例、丢弃策略测试
  */
 @RunWith(AndroidJUnit4.class)
 public class LogTest {
@@ -79,6 +79,5 @@ public class LogTest {
         Thread.sleep(40000);
         int size = FTDBManager.get().queryTotalCount(OP.LOG);
         Assert.assertTrue(5020 >= size && size >= 5000);
-
     }
 }

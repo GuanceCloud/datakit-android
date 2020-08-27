@@ -195,6 +195,14 @@ public class Main2Activity extends AppCompatActivity {
         findViewById(R.id.jump15).setOnClickListener(v->{
             Log.d("LogManager", "测试日志数据=======当前时间为" +System.currentTimeMillis());
         });
+        findViewById(R.id.jump16).setOnClickListener(v->{
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    int i = 1/0;
+                }
+            }).start();
+        });
     }
 
     OkHttpClient client = new OkHttpClient.Builder()

@@ -32,15 +32,16 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 /**
  * author: huangDianHua
  * time: 2020/8/26 18:36:58
- * description:
+ * description:事件日志，验证页面是否生成对应的事件数据
  */
 @RunWith(AndroidJUnit4.class)
-public class Main2ActivityTest {
+public class LogEventTest {
     @Rule
     public ActivityTestRule<Main2Activity> rule = new ActivityTestRule<>(Main2Activity.class);
 
     Context context;
     static boolean hasPrepare;
+    FTSDKConfig ftSDKConfig;
 
     @Before
     public void setUp() {
@@ -49,7 +50,7 @@ public class Main2ActivityTest {
             hasPrepare = true;
         }
         context = DemoApplication.getContext();
-        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL),
+        ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL),
                 true,
                 AccountUtils.getProperty(context, AccountUtils.ACCESS_KEY_ID),
                 AccountUtils.getProperty(context, AccountUtils.ACCESS_KEY_SECRET))
@@ -75,7 +76,6 @@ public class Main2ActivityTest {
                 .setEventFlowLog(true)
                 .setTraceType(TraceType.SKYWALKING_V2)
                 .setOnlySupportMainProcess(true);
-        FTSdk.install(ftSDKConfig);
         //关闭数据自动同步操作
         SyncTaskManager.get().setRunning(true);
     }
@@ -87,6 +87,7 @@ public class Main2ActivityTest {
      */
     @Test
     public void clickLambdaBtnTest() throws InterruptedException {
+        FTSdk.install(ftSDKConfig);
         onView(withId(R.id.jump12)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
@@ -103,6 +104,7 @@ public class Main2ActivityTest {
 
     @Test
     public void leaveTest() throws InterruptedException {
+        FTSdk.install(ftSDKConfig);
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);
@@ -118,6 +120,7 @@ public class Main2ActivityTest {
 
     @Test
     public void enterTest() throws InterruptedException {
+        FTSdk.install(ftSDKConfig);
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);
@@ -134,6 +137,7 @@ public class Main2ActivityTest {
 
     @Test
     public void launchTest() throws InterruptedException {
+        FTSdk.install(ftSDKConfig);
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);
