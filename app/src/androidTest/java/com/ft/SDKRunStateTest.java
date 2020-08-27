@@ -22,6 +22,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static com.ft.TestEntrance.hasPrepare;
+
 /**
  * author: huangDianHua
  * time: 2020/8/25 13:42:48
@@ -30,7 +32,6 @@ import org.junit.runner.RunWith;
 @RunWith(AndroidJUnit4.class)
 public class SDKRunStateTest {
     Context context;
-    static boolean hasPrepare;
 
     @Before
     public void setUp() {

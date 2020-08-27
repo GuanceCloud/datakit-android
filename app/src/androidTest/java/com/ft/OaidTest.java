@@ -16,6 +16,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static com.ft.TestEntrance.hasPrepare;
+
 /**
  * author: huangDianHua
  * time: 2020/8/27 13:42:32
@@ -24,7 +26,6 @@ import org.junit.runner.RunWith;
 @RunWith(AndroidJUnit4.class)
 public class OaidTest {
     Context context;
-    static boolean hasPrepare;
     FTSDKConfig ftSDKConfig;
 
     @Before
