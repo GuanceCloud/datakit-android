@@ -107,6 +107,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="周期产生一条日志数据" />
+        <Button
+            android:id="@+id/jump16"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="模拟崩溃" />
     </LinearLayout>
 
 
