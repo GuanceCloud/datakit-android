@@ -28,6 +28,8 @@ import org.junit.runner.RunWith;
 
 import java.util.HashMap;
 
+import static com.ft.TestEntrance.hasPrepare;
+
 /**
  * author: huangDianHua
  * time: 2020/8/25 15:24:06
@@ -36,7 +38,6 @@ import java.util.HashMap;
 @RunWith(AndroidJUnit4.class)
 public class LogTrackObjectTraceTest {
     Context context;
-    static boolean hasPrepare;
 
     @Before
     public void setUp() {

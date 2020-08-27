@@ -27,6 +27,7 @@ import java.util.List;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static com.ft.TestEntrance.hasPrepare;
 
 /**
  * author: huangDianHua
@@ -39,7 +40,6 @@ public class ExceptionTest {
     public ActivityTestRule<Main2Activity> rule = new ActivityTestRule<>(Main2Activity.class);
 
     Context context;
-    static boolean hasPrepare;
     FTSDKConfig ftSDKConfig;
 
     @Before

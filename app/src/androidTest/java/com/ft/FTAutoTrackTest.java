@@ -34,6 +34,7 @@ import java.util.Map;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static com.ft.TestEntrance.hasPrepare;
 
 /**
  * author: huangDianHua
@@ -43,7 +44,6 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 @RunWith(AndroidJUnit4.class)
 public class FTAutoTrackTest {
     Context context;
-    static boolean hasPrepare;
     @Rule
     public ActivityTestRule<Main2Activity> rule = new ActivityTestRule<>(Main2Activity.class);
     FTSDKConfig ftSDKConfig;

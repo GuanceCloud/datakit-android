@@ -22,6 +22,8 @@ import org.junit.runner.RunWith;
 
 import java.util.concurrent.CountDownLatch;
 
+import static com.ft.TestEntrance.hasPrepare;
+
 /**
  * author: huangDianHua
  * time: 2020/8/27 11:29:04
@@ -30,7 +32,6 @@ import java.util.concurrent.CountDownLatch;
 @RunWith(AndroidJUnit4.class)
 public class LocationTest {
     Context context;
-    static boolean hasPrepare;
     FTSDKConfig ftSDKConfig;
 
     @Before

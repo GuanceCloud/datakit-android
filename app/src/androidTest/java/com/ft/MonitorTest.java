@@ -25,6 +25,8 @@ import org.junit.runner.RunWith;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.ft.TestEntrance.hasPrepare;
+
 /**
  * author: huangDianHua
  * time: 2020/8/26 10:32:36
@@ -33,7 +35,6 @@ import java.util.List;
 @RunWith(AndroidJUnit4.class)
 public class MonitorTest {
     Context context;
-    static boolean hasPrepare;
     FTSDKConfig ftSDKConfig;
 
     @Before
