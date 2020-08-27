@@ -4,9 +4,20 @@ import android.content.Context;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 
+import com.ft.sdk.garble.bean.DataType;
+import com.ft.sdk.garble.bean.OP;
+import com.ft.sdk.garble.bean.RecordData;
+import com.ft.sdk.garble.manager.SyncDataManager;
+import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.Utils;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -17,9 +28,10 @@ import static org.junit.Assert.assertTrue;
  * Description:
  */
 public class UtilsTest {
-    private Context getContext(){
+    private Context getContext() {
         return InstrumentationRegistry.getInstrumentation().getTargetContext();
     }
+
     @Test
     public void isNetworkAvailable() {
         assertTrue(Utils.isNetworkAvailable(getContext()));
@@ -33,5 +45,37 @@ public class UtilsTest {
     @Test
     public void getHMacSha1() {
         assertEquals("4me5NXJallTGFmZiO3csizbWI90=", Utils.getHMacSha1("screct", "123456"));
+    }
+
+    private String expectData = "TestInfluxDBLine,tags1=tags1-value field1=\"field1-value\" 1598512145640000000\nTestInfluxDBLine,tags1=tags1-value field1=\"field1-value\" 1598512145640000000\nTestInfluxDBLine,tags1=tags1-value field1=\"field1-value\" 1598512145640000000\n";
+
+    /**
+     * 验证influx 行协议数据格式是否正确
+     * @throws JSONException
+     * @throws InterruptedException
+     */
+    @Test
+    public void influxDBTest() throws JSONException, InterruptedException {
+
+        RecordData recordData = new RecordData();
+        recordData.setOp(OP.LOG.value);
+        recordData.setTime(1598512145640L);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Constants.MEASUREMENT, "TestInfluxDBLine");
+        JSONObject tags = new JSONObject();
+        tags.put("tags1", "tags1-value");
+        JSONObject fields = new JSONObject();
+        fields.put("field1", "field1-value");
+        jsonObject.put(Constants.TAGS, tags);
+        jsonObject.put(Constants.FIELDS, fields);
+        recordData.setOpdata(jsonObject.toString());
+        List<RecordData> recordDataList = new ArrayList<>();
+        recordDataList.add(recordData);
+        recordDataList.add(recordData);
+        recordDataList.add(recordData);
+        String content = new SyncDataManager().getBodyContent(DataType.LOG, recordDataList);
+        String realData = content.replaceAll(Constants.SEPARATION_PRINT, " ");
+        realData = realData.replaceAll(Constants.SEPARATION_LINE_BREAK, "\n");
+        Assert.assertEquals(expectData, realData);
     }
 }
