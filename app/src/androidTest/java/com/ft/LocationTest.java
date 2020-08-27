@@ -47,25 +47,7 @@ public class LocationTest {
                 .setDataWayToken(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_TOKEN))
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setUseOAID(true)//设置 OAID 是否可用
-                .setDebug(true)//设置是否是 debug
-                .setDescLog(true)
-                .enableAutoTrack(true)//设置是否开启自动埋点
-                .setEnableAutoTrackType(FTAutoTrackType.APP_CLICK.type |
-                        FTAutoTrackType.APP_END.type |
-                        FTAutoTrackType.APP_START.type)//设置埋点事件类型的白名单
-                .setGeoKey(true, AccountUtils.getProperty(context, AccountUtils.GEO_KEY))
-                .setNeedBindUser(false)//是否需要绑定用户信息
-                .setPageVtpDescEnabled(true)
-                .setMonitorType(MonitorType.ALL)//设置监控项
-                .trackNetRequestTime(true)
-                .setEnableTrackAppCrash(true)
-                .setEnv("dev")
-                .setTraceSamplingRate(0.5f)
-                .setNetworkTrace(true)
-                .setTraceConsoleLog(true)
-                .setEventFlowLog(true)
-                .setTraceType(TraceType.SKYWALKING_V2)
-                .setOnlySupportMainProcess(true);
+                .setGeoKey(true, AccountUtils.getProperty(context, AccountUtils.GEO_KEY));
         //关闭数据自动同步操作
         SyncTaskManager.get().setRunning(true);
     }

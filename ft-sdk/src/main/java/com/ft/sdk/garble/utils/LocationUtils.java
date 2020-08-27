@@ -11,6 +11,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.MonitorType;
@@ -68,6 +69,10 @@ public class LocationUtils {
         return address;
     }
 
+    private Handler getHandler() {
+        return mHandler == null ? (mHandler = new Handler(Looper.getMainLooper())) : mHandler;
+    }
+
     private LocationUtils() {
         //获取定位服务
         mLocationManager = (LocationManager) FTApplication.getApplication().getSystemService(Context.LOCATION_SERVICE);
@@ -94,7 +99,7 @@ public class LocationUtils {
             int state = mContext.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
             int state2 = mContext.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION);
             if (state != PERMISSION_GRANTED || state2 != PERMISSION_GRANTED) {
-                LogUtils.e(TAG,"请先申请位置权限");
+                LogUtils.e(TAG, "请先申请位置权限");
                 return;
             }
         }
@@ -105,11 +110,11 @@ public class LocationUtils {
         if (providers != null) {
             if (providers.contains(LocationManager.NETWORK_PROVIDER)) {
                 listenerIng = true;
-                LogUtils.d(TAG,"NETWORK_PROVIDER 方式监听位置信息变化");
+                LogUtils.d(TAG, "NETWORK_PROVIDER 方式监听位置信息变化");
                 mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 2000, 10, locationListener);
             } else if (providers.contains(LocationManager.GPS_PROVIDER)) {
                 listenerIng = true;
-                LogUtils.d(TAG,"GPS_PROVIDER 方式监听位置信息变化");
+                LogUtils.d(TAG, "GPS_PROVIDER 方式监听位置信息变化");
                 mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, locationListener);
             }
         }
@@ -121,7 +126,7 @@ public class LocationUtils {
     public void stopListener() {
         listenerIng = false;
         mLocationManager.removeUpdates(locationListener);
-        LogUtils.d(TAG,"停止监听位置信息变化");
+        LogUtils.d(TAG, "停止监听位置信息变化");
     }
 
     /**
@@ -133,7 +138,7 @@ public class LocationUtils {
             if (location != null) {
                 mLocation = new double[]{location.getLatitude(), location.getLongitude()};
                 String string = "onLocationChanged 方式 纬度为：" + location.getLatitude() + ",经度为：" + location.getLongitude();
-                LogUtils.d(TAG,string);
+                LogUtils.d(TAG, string);
                 getAddress(location, null);
                 if (mLocation != null) {
                     stopListener();
@@ -159,18 +164,15 @@ public class LocationUtils {
             callback(syncCallback, 0, "");
             return;
         }
-        if (syncCallback != null) {
-            mHandler = new Handler();
-        }
 
-        if(isRequest){
+        if (isRequest) {
             return;
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             int state = mContext.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
             int state2 = mContext.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION);
             if (state != PERMISSION_GRANTED || state2 != PERMISSION_GRANTED) {
-                LogUtils.e(TAG,"请先申请位置权限");
+                LogUtils.e(TAG, "请先申请位置权限");
                 callback(syncCallback, NetCodeStatus.UNKNOWN_EXCEPTION_CODE, "未能获取到位置权限");
                 if (useGeoKey && !Utils.isNullOrEmpty(geoKey)) {
                     new Thread(() -> {
@@ -181,12 +183,12 @@ public class LocationUtils {
                 return;
             }
         }
-        LogUtils.d(TAG,">>>>>>>>>>>>>>正在请求定位");
+        LogUtils.d(TAG, ">>>>>>>>>>>>>>正在请求定位");
         Location location = getLastLocation();
         if (location != null) {
             mLocation = new double[]{location.getLatitude(), location.getLongitude()};
             String string = "getLastLocation 方式 纬度为：" + location.getLatitude() + ",经度为：" + location.getLongitude();
-            LogUtils.d(TAG,string);
+            LogUtils.d(TAG, string);
             getAddress(location, syncCallback);
         } else if (useGeoKey && !Utils.isNullOrEmpty(geoKey)) {
             new Thread(() -> {
@@ -196,7 +198,7 @@ public class LocationUtils {
             }).start();
         } else {
             callback(syncCallback, NetCodeStatus.UNKNOWN_EXCEPTION_CODE, "未能获取到位置信息");
-            LogUtils.d(TAG,">>>>>>>>>>>>>>地址请求失败");
+            LogUtils.d(TAG, ">>>>>>>>>>>>>>地址请求失败");
         }
     }
 
@@ -247,7 +249,7 @@ public class LocationUtils {
                 //用来接收位置的详细信息
                 if (useGeoKey) {
                     if (geoKey == null || geoKey.isEmpty()) {
-                        LogUtils.e(TAG,"使用高德进行地址逆向解析必须先设置 key");
+                        LogUtils.e(TAG, "使用高德进行地址逆向解析必须先设置 key");
                     } else {
                         requestGeoAddress(location, syncCallback);
                     }
@@ -255,9 +257,9 @@ public class LocationUtils {
                     requestNative(location, syncCallback);
                 }
                 if (address != null) {
-                    LogUtils.d(TAG,">>>>>>>>>>>>>>地址[province:" + address.getAdminArea() + ",city:" + address.getLocality() + "]");
+                    LogUtils.d(TAG, ">>>>>>>>>>>>>>地址[province:" + address.getAdminArea() + ",city:" + address.getLocality() + "]");
                 } else {
-                    LogUtils.d(TAG,">>>>>>>>>>>>>>地址请求失败");
+                    LogUtils.d(TAG, ">>>>>>>>>>>>>>地址请求失败");
                 }
                 isRequest = false;
             }
@@ -283,7 +285,7 @@ public class LocationUtils {
                         location.getLongitude(), 1);
             }
         } catch (Exception e) {
-            LogUtils.e(TAG,"地址解析异常,message=" + e.getMessage());
+            LogUtils.e(TAG, "地址解析异常,message=" + e.getMessage());
         }
 
         if (result != null && !result.isEmpty() && result.get(0) != null) {
@@ -295,10 +297,10 @@ public class LocationUtils {
             errorMessage = "地址解析异常";
         }
 
-        if (mHandler != null && address != null) {
+        if (address != null) {
             int finalCode = code;
             String finalErrorMessage = errorMessage;
-            mHandler.post(() -> {
+            getHandler().post(() -> {
                 callback(syncCallback, finalCode, finalErrorMessage);
             });
         }
@@ -368,13 +370,11 @@ public class LocationUtils {
                 e.printStackTrace();
             }
         }
-        if (mHandler != null) {
-            int finalCode = code;
-            String finalErrorMessage = errorMessage;
-            mHandler.post(() -> {
-                callback(syncCallback, finalCode, finalErrorMessage);
-            });
-        }
+        int finalCode = code;
+        String finalErrorMessage = errorMessage;
+        getHandler().post(() -> {
+            callback(syncCallback, finalCode, finalErrorMessage);
+        });
         return code;
     }
 
@@ -394,7 +394,7 @@ public class LocationUtils {
                 .setShowLog(false)
                 .enableToken(false)
                 .executeSync(ResponseData.class);
-        LogUtils.d(TAG,"高德IP地址返回数据：\n" + responseData.getData());
+        LogUtils.d(TAG, "高德IP地址返回数据：\n" + responseData.getData());
         try {
             if (responseData.getHttpCode() == HttpURLConnection.HTTP_OK) {
                 JSONObject geo = new JSONObject(responseData.getData());
@@ -405,7 +405,7 @@ public class LocationUtils {
                     address = new Address(Locale.CHINA);
                     address.setAdminArea(province);
                     address.setLocality(city);
-                }else{
+                } else {
                     code = NetCodeStatus.UNKNOWN_EXCEPTION_CODE;
                     errorMessage = responseData.getData();
                 }
@@ -427,17 +427,15 @@ public class LocationUtils {
             e.printStackTrace();
         }
         if (address != null) {
-            LogUtils.d(TAG,">>>>>>>>>>>>>>高德 IP 解析地址[province:" + address.getAdminArea() + ",city:" + address.getLocality() + "]");
+            LogUtils.d(TAG, ">>>>>>>>>>>>>>高德 IP 解析地址[province:" + address.getAdminArea() + ",city:" + address.getLocality() + "]");
         } else {
-            LogUtils.d(TAG,">>>>>>>>>>>>>>高德 IP 解析失败");
+            LogUtils.d(TAG, ">>>>>>>>>>>>>>高德 IP 解析失败");
         }
-        if (mHandler != null) {
-            int finalCode = code;
-            String finalErrorMessage = errorMessage;
-            mHandler.post(() -> {
-                callback(syncCallback, finalCode, finalErrorMessage);
-            });
-        }
+        int finalCode = code;
+        String finalErrorMessage = errorMessage;
+        getHandler().post(() -> {
+            callback(syncCallback, finalCode, finalErrorMessage);
+        });
         return code;
     }
 }
