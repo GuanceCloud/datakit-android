@@ -71,6 +71,22 @@ public class TraceTest {
     }
 
     @Test
+    public void traceZipKinHeaderSpanIdFormatTest() {
+        ftsdkConfig.setTraceType(TraceType.ZIPKIN);
+        FTSdk.install(ftsdkConfig);
+        Request request = requestUrl("http://www.weather.com.cn/data/sk/101010100.html");
+        String spanId = request.headers().get(ZIPKIN_SPAN_ID);
+        boolean spanIdResult = spanId.length() == 16;
+        System.out.println(spanId);
+        for (char c:spanId.toCharArray()) {
+            if((c>57 && c <'a') || c >'e'){
+                spanIdResult = false;
+            }
+        }
+        Assert.assertTrue(spanIdResult);
+    }
+
+    @Test
     public void traceJaegerHeaderTest() {
         ftsdkConfig.setTraceType(TraceType.JAEGER);
         FTSdk.install(ftsdkConfig);
