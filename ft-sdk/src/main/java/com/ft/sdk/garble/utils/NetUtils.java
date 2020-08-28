@@ -58,6 +58,14 @@ public class NetUtils {
     private NetUtils() {
     }
 
+    /**
+     * 仅测试用例可用
+     *
+     * @return
+     */
+    public boolean isRunNetMonitor() {
+        return isRunNetMonitor;
+    }
 
     private final Object lock = new Object();
 
