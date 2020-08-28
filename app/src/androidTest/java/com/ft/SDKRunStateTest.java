@@ -15,6 +15,7 @@ import com.ft.sdk.garble.FTExceptionHandler;
 import com.ft.sdk.garble.FTFlowConfig;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
+import com.ft.sdk.garble.utils.NetUtils;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -82,6 +83,14 @@ public class SDKRunStateTest {
     @Test
     public void enableAutoTrackTypeTest() {
         Assert.assertTrue(FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_CLICK));
+    }
+
+    /**
+     * SDK 启动且开启监控网速判断网络速度监听服务是否启动
+     */
+    @Test
+    public void monitorNetRateRunTest() {
+        Assert.assertTrue(NetUtils.get().isRunNetMonitor());
     }
 
     @Test
