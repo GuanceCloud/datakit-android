@@ -16,7 +16,7 @@ import java.util.concurrent.CountDownLatch;
 public class OaidUtils {
     public static final String TAG = "OaidUtils";
     // OAID
-    private static String oaid = "";
+    private static String oaid = Constants.UNKNOWN;
     private static CountDownLatch countDownLatch;
 
     /**
@@ -42,7 +42,7 @@ public class OaidUtils {
         } catch (Exception e) {
             //LogUtils.d(e.getMessage());
         }
-        return "";
+        return Constants.UNKNOWN;
     }
 
     /**
