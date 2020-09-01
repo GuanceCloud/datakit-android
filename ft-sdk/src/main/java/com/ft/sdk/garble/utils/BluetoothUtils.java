@@ -14,7 +14,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -40,42 +39,50 @@ public class BluetoothUtils {
 
     public String getDeviceName() {
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        return bluetoothAdapter.getName();
+        if(bluetoothAdapter != null)
+            return bluetoothAdapter.getName();
+        else
+            return Constants.UNKNOWN;
     }
 
-    public boolean isOpen(){
+    public boolean isOpen() {
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        return bluetoothAdapter.isEnabled();
+        if (bluetoothAdapter != null)
+            return bluetoothAdapter.isEnabled();
+        else return false;
     }
 
-    public Set<BluetoothDevice> getBondedDevices(){
+    public Set<BluetoothDevice> getBondedDevices() {
         Set<BluetoothDevice> result = new HashSet<>();
-        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        Set<BluetoothDevice> deviceSet = bluetoothAdapter.getBondedDevices();
-        Iterator<BluetoothDevice> iterator = deviceSet.iterator();
-        while (iterator.hasNext()) {
-            BluetoothDevice device = iterator.next();
-            try {
-                Method isConnectedMethod = BluetoothDevice.class.getDeclaredMethod("isConnected", (Class[]) null);
-                isConnectedMethod.setAccessible(true);
-                boolean isConnected = (boolean) isConnectedMethod.invoke(device, (Object[]) null);
-                if(isConnected) {
-                    result.add(device);
+        try {
+            BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            Set<BluetoothDevice> deviceSet = bluetoothAdapter.getBondedDevices();
+            Iterator<BluetoothDevice> iterator = deviceSet.iterator();
+            while (iterator.hasNext()) {
+                BluetoothDevice device = iterator.next();
+                try {
+                    Method isConnectedMethod = BluetoothDevice.class.getDeclaredMethod("isConnected", (Class[]) null);
+                    isConnectedMethod.setAccessible(true);
+                    boolean isConnected = (boolean) isConnectedMethod.invoke(device, (Object[]) null);
+                    if (isConnected) {
+                        result.add(device);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            }catch (Exception e){
-                e.printStackTrace();
             }
+        } catch (Exception e) {
         }
         return result;
     }
 
-    public void getBluetooth(){
+    public void getBluetooth() {
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter.isEnabled()) {
             bluetoothAdapter.enable();
         }
         //设置过滤器，过滤因远程蓝牙设备被找到而发送的广播 BluetoothDevice.ACTION_FOUND
-        IntentFilter iFilter=new IntentFilter();
+        IntentFilter iFilter = new IntentFilter();
         iFilter.addAction(BluetoothDevice.ACTION_FOUND);
         //设置广播接收器和安装过滤器
         FTApplication.getApplication().registerReceiver(new foundReceiver(), iFilter);
@@ -92,13 +99,13 @@ public class BluetoothUtils {
                     BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);//获取此时找到的远程设备对象
                     if (device != null && !Utils.isNullOrEmpty(device.getName())) {
                         short rssi = intent.getExtras().getShort(BluetoothDevice.EXTRA_RSSI);//获取额外rssi值
-                        LogUtils.d(TAG,"BluetoothDevice-info:\n" +
+                        LogUtils.d(TAG, "BluetoothDevice-info:\n" +
                                 "name:" + device.getName() + "\n" +
-                                "rssi:" + rssi+"\n" +
-                                "address:"+device.getAddress());
+                                "rssi:" + rssi + "\n" +
+                                "address:" + device.getAddress());
                     }
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
