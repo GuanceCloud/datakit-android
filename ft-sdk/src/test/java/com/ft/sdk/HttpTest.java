@@ -43,6 +43,26 @@ public class HttpTest {
     }
 
     /**
+     * 模拟网络 200 情况
+     * @throws Exception
+     */
+    @Test
+    public void mockedRequest200() throws Exception {
+        MockResponse mockResponse = new MockResponse();
+        mockResponse.setBody(failString);
+        mockResponse.setResponseCode(HttpURLConnection.HTTP_OK);
+        mMockWebServer.enqueue(mockResponse);
+        mMockWebServer.play();
+
+        FTResponseData result = HttpBuilder.Builder()
+                .setHost(mMockWebServer.getUrl("/").toString())
+                .setMethod(RequestMethod.POST)
+                .setBodyString("")
+                .executeSync(FTResponseData.class);
+        assertEquals(HttpURLConnection.HTTP_OK,result.getHttpCode());
+    }
+
+    /**
      * 模拟网络 400 情况
      * @throws Exception
      */
@@ -59,7 +79,7 @@ public class HttpTest {
                 .setMethod(RequestMethod.POST)
                 .setBodyString("")
                 .executeSync(FTResponseData.class);
-        assertEquals(result.getCode(), 0);
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST,result.getHttpCode());
     }
 
     /**
@@ -67,7 +87,7 @@ public class HttpTest {
      * @throws Exception
      */
     @Test
-    public void mockedRequest200() throws Exception {
+    public void mockedRequestJSON() throws Exception {
         MockResponse mockResponse = new MockResponse();
         mockResponse.setBody(successString1);
         mockResponse.setResponseCode(HttpURLConnection.HTTP_OK);
@@ -79,7 +99,7 @@ public class HttpTest {
                 .setMethod(RequestMethod.POST)
                 .setBodyString("")
                 .executeSync(FTResponseData.class);
-        assertEquals(result.getCode(), HttpURLConnection.HTTP_OK);
+        assertEquals( 200,result.getCode());
     }
 
     /**
@@ -99,6 +119,6 @@ public class HttpTest {
                 .setMethod(RequestMethod.POST)
                 .setBodyString("")
                 .executeSync(FTResponseData.class);
-        assertNotEquals(result.getCode(), HttpURLConnection.HTTP_OK);
+        assertNotEquals(200,result.getCode());
     }
 }
