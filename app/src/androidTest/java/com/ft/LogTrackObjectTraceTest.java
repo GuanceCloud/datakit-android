@@ -62,7 +62,7 @@ public class LogTrackObjectTraceTest {
                 .trackNetRequestTime(true)
                 .setEnableTrackAppCrash(true)
                 .setEnv("dev")
-                .setTraceSamplingRate(0.5f)
+                .setTraceSamplingRate(1f)
                 .setNetworkTrace(true)
                 .setTraceConsoleLog(true)
                 .setEventFlowLog(true)
@@ -72,6 +72,10 @@ public class LogTrackObjectTraceTest {
         FTDBManager.get().delete();
     }
 
+    /**
+     * 插入一条 log 数据测试
+     * @throws InterruptedException
+     */
     @Test
     public void logInsertDataTest() throws InterruptedException {
         SyncTaskManager.get().setRunning(true);
@@ -81,6 +85,11 @@ public class LogTrackObjectTraceTest {
         Assert.assertEquals(1, length);
     }
 
+    /**
+     * 上传一条 log 数据测试
+     * @throws InterruptedException
+     * @throws JSONException
+     */
     @Test
     public void logUploadTest() throws InterruptedException, JSONException {
         //设置时间间隔防止多个测试用例请求数据后无法准确的判断返回值
@@ -92,6 +101,11 @@ public class LogTrackObjectTraceTest {
         queryUploadDataLog(token, 1);
     }
 
+    /**
+     * 插入一条 track 数据测试
+     * @throws InterruptedException
+     * @throws JSONException
+     */
     @Test
     public void trackInsertDataTest() throws InterruptedException, JSONException {
         JSONObject tags = new JSONObject();
@@ -105,10 +119,15 @@ public class LogTrackObjectTraceTest {
         Assert.assertEquals(1, length);
     }
 
+    /**
+     * 上传一条 track 数据测试
+     * @throws InterruptedException
+     * @throws JSONException
+     */
     @Test
     public void trackUploadTest() throws InterruptedException, JSONException {
         String measurement = "TrackLog";
-        String field = "field-"+System.currentTimeMillis();
+        String field = "field-" + System.currentTimeMillis();
         //设置时间间隔防止多个测试用例请求数据后无法准确的判断返回值
         //Thread.sleep(1000 * 60);
         String token = getLoginToken();
@@ -119,9 +138,14 @@ public class LogTrackObjectTraceTest {
         fields.put(field, "testField");
         FTTrack.getInstance().trackBackground(measurement, tags, fields);
         Thread.sleep(1000 * 70);
-        queryUploadDataTrack(measurement,token,field);
+        queryUploadDataTrack(measurement, token, field);
     }
 
+    /**
+     * 插入一条 object 数据测试
+     * @throws InterruptedException
+     * @throws JSONException
+     */
     @Test
     public void objectInsertDataTest() throws InterruptedException, JSONException {
         SyncTaskManager.get().setRunning(true);
@@ -132,17 +156,63 @@ public class LogTrackObjectTraceTest {
         Assert.assertEquals(1, length);
     }
 
+    /**
+     * 上传一条 object 数据测试
+     * @throws InterruptedException
+     * @throws JSONException
+     */
     @Test
     public void objectUploadTest() throws InterruptedException, JSONException {
-        String clazz = "Test-"+System.currentTimeMillis();
+        String clazz = "Test-" + System.currentTimeMillis();
         String token = getLoginToken();
         SyncTaskManager.get().setRunning(false);
         ObjectBean objectBean = new ObjectBean("objectTest", clazz);
         FTTrackInner.getInstance().objectBackground(objectBean);
         Thread.sleep(1000 * 60);
-        queryUploadDataObject(clazz,token, 1);
+        queryUploadDataObject(clazz, token, 1);
     }
 
+    /**
+     * trace 一个正常的网络
+     * @throws JSONException
+     * @throws InterruptedException
+     */
+    @Test
+    public void traceUploadNormalTest() throws JSONException, InterruptedException {
+        traceDataTest("http://www.weather.com.cn/data/sk/101010100.html","www.weather.com.cn");
+    }
+
+    /**
+     * trace 网络超时
+     * @throws JSONException
+     * @throws InterruptedException
+     */
+    @Test
+    public void traceUploadTimeOutTest() throws JSONException, InterruptedException {
+        traceDataTest("https://www.google.com","www.google.com");
+    }
+
+    /**
+     * trace 网络错误
+     * @throws JSONException
+     * @throws InterruptedException
+     */
+    @Test
+    public void traceUploadErrorTest() throws JSONException, InterruptedException {
+        traceDataTest("https://error.url","error.url");
+    }
+    /**
+     * 上传一条正常的 trace 数据测试
+     * @throws JSONException
+     * @throws InterruptedException
+     */
+    private void traceDataTest(String url,String except) throws JSONException, InterruptedException {
+        RequestUtil.requestUrl(url);
+        String token = getLoginToken();
+        SyncTaskManager.get().setRunning(false);
+        Thread.sleep(1000 * 60);
+        queryUploadDataTrace(token, except);
+    }
 
     private void queryUploadDataLog(String token, int expect) throws JSONException {
         HashMap<String, Object> hashMap = new HashMap();
@@ -162,7 +232,7 @@ public class LogTrackObjectTraceTest {
         Assert.assertEquals(expect, length);
     }
 
-    private void queryUploadDataObject(String clazz,String token, int expect) throws JSONException {
+    private void queryUploadDataObject(String clazz, String token, int expect) throws JSONException {
         ResponseData responseData = HttpBuilder.Builder()
                 .setHost("http://testing.api-ft2x.cloudcare.cn:10531")
                 .setModel("api/v1/elasticsearch/msearch")
@@ -178,7 +248,7 @@ public class LogTrackObjectTraceTest {
         Assert.assertEquals(expect, length);
     }
 
-    private void queryUploadDataTrack(String measurement,String token, String field) throws JSONException {
+    private void queryUploadDataTrack(String measurement, String token, String field) throws JSONException {
         ResponseData responseData = HttpBuilder.Builder()
                 .setHost("http://testing.api-ft2x.cloudcare.cn:10531")
                 .setModel("api/v1/influx/query_field_keys")
@@ -187,6 +257,21 @@ public class LogTrackObjectTraceTest {
                 .setBodyString(SyncDataUtils.buildTrackBody(measurement))
                 .executeSync(ResponseData.class);
         boolean contain = responseData.getData().contains(field);
+        Assert.assertTrue(contain);
+    }
+
+    private void queryUploadDataTrace(String token, String expect) throws JSONException {
+        HashMap<String, Object> hashMap = new HashMap();
+        hashMap.put("body", SyncDataUtils.buildLogBody());
+        ResponseData responseData = HttpBuilder.Builder()
+                .setHost("http://testing.api-ft2x.cloudcare.cn:10531")
+                .setModel("api/v1/elasticsearch/query_data")
+                .setHeadParams(SyncDataUtils.getQueryHead(token))
+                .enableToken(false)
+                .setMethod(RequestMethod.GET)
+                .setParams(hashMap)
+                .executeSync(ResponseData.class);
+        boolean contain = responseData.getData().contains(expect);
         Assert.assertTrue(contain);
     }
 

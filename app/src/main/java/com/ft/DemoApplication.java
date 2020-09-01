@@ -61,7 +61,7 @@ public class DemoApplication extends Application {
                 .trackNetRequestTime(true)
                 .setEnableTrackAppCrash(true)
                 .setEnv("dev")
-                .setTraceSamplingRate(0.5f)
+                .setTraceSamplingRate(1f)
                 .setNetworkTrace(true)
                 .setTraceConsoleLog(true)
                 .setEventFlowLog(true)
