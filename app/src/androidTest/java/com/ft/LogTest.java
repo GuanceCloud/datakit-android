@@ -62,13 +62,13 @@ public class LogTest {
 
     @Test
     public void consoleLogTest() throws InterruptedException {
-        Log.d("TestLog", "控制台日志测试用例");
+        Log.d("TestLog", "控制台日志测试用例qaws");
         Thread.sleep(4000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(10);
         int except = 0;
         if (recordDataList != null) {
             for (RecordData data : recordDataList) {
-                if (data.getOpdata().contains("控制台日志测试用例")) {
+                if (data.getOpdata().contains("控制台日志测试用例qaws")) {
                     except++;
                 }
             }
