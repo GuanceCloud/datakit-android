@@ -19,6 +19,7 @@ import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.http.ResponseData;
 import com.ft.sdk.garble.manager.SyncTaskManager;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -96,9 +97,9 @@ public class LogTrackObjectTraceTest {
         Thread.sleep(1000 * 60);
         String token = getLoginToken();
         SyncTaskManager.get().setRunning(false);
-        FTTrack.getInstance().logBackground("TestLog", Status.CRITICAL);
+        FTTrack.getInstance().logBackground("TestLog11111", Status.CRITICAL);
         Thread.sleep(1000 * 70);
-        queryUploadDataLog(token, 1);
+        queryUploadDataLog(token, "TestLog11111");
     }
 
     /**
@@ -214,7 +215,7 @@ public class LogTrackObjectTraceTest {
         queryUploadDataTrace(token, except);
     }
 
-    private void queryUploadDataLog(String token, int expect) throws JSONException {
+    private void queryUploadDataLog(String token, String expect) throws JSONException {
         HashMap<String, Object> hashMap = new HashMap();
         hashMap.put("body", SyncDataUtils.buildLogBody());
         ResponseData responseData = HttpBuilder.Builder()
@@ -227,9 +228,16 @@ public class LogTrackObjectTraceTest {
 
         JSONObject jsonObject = new JSONObject(responseData.getData());
         JSONObject content = jsonObject.optJSONObject("content");
-        int length = content.optJSONArray("responses").optJSONObject(0).optJSONObject("hits")
-                .optJSONArray("hits").length();
-        Assert.assertEquals(expect, length);
+        JSONArray array = content.optJSONArray("responses").optJSONObject(0).optJSONObject("hits")
+                .optJSONArray("hits");
+        int count = 0;
+        for (int i = 0; i < array.length(); i++) {
+            String str = array.getString(i);
+            if(str.contains(expect)){
+                count++;
+            }
+        }
+        Assert.assertEquals(1, count);
     }
 
     private void queryUploadDataObject(String clazz, String token, int expect) throws JSONException {
