@@ -12,6 +12,7 @@ import com.ft.sdk.MonitorType;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.FTTrackInner;
 import com.ft.sdk.garble.bean.ObjectBean;
+import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.http.HttpBuilder;
@@ -22,12 +23,14 @@ import com.ft.sdk.garble.manager.SyncTaskManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.HashMap;
+import java.util.List;
 
 import static com.ft.TestEntrance.hasPrepare;
 
@@ -46,6 +49,7 @@ public class LogTrackObjectTraceTest {
             Looper.prepare();
             hasPrepare = true;
         }
+        SyncTaskManager.get().setRunning(true);
         context = DemoApplication.getContext();
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL),
                 true,
@@ -73,17 +77,29 @@ public class LogTrackObjectTraceTest {
         FTDBManager.get().delete();
     }
 
+    @After
+    public void tearDown(){
+        FTSdk.get().shutDown();
+    }
+
     /**
      * 插入一条 log 数据测试
      * @throws InterruptedException
      */
     @Test
     public void logInsertDataTest() throws InterruptedException {
-        SyncTaskManager.get().setRunning(true);
-        FTTrack.getInstance().logBackground("TestLog", Status.CRITICAL);
+        FTTrack.getInstance().logBackground("TestLog0o0o0", Status.CRITICAL);
         Thread.sleep(5000);
-        int length = FTDBManager.get().queryDataByDescLimitLog(10).size();
-        Assert.assertEquals(1, length);
+        List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(10);
+        int except = 0;
+        if (recordDataList != null) {
+            for (RecordData data : recordDataList) {
+                if (data.getOpdata().contains("TestLog0o0o0")) {
+                    except++;
+                }
+            }
+        }
+        Assert.assertEquals(1, except);
     }
 
     /**
@@ -113,7 +129,6 @@ public class LogTrackObjectTraceTest {
         tags.put("testTag", "tagTest");
         JSONObject fields = new JSONObject();
         fields.put("testField", "fieldTest");
-        SyncTaskManager.get().setRunning(true);
         FTTrack.getInstance().trackBackground("TestLog", tags, fields);
         Thread.sleep(5000);
         int length = FTDBManager.get().queryDataByDescLimitTrack(10).size();
@@ -149,7 +164,6 @@ public class LogTrackObjectTraceTest {
      */
     @Test
     public void objectInsertDataTest() throws InterruptedException, JSONException {
-        SyncTaskManager.get().setRunning(true);
         ObjectBean objectBean = new ObjectBean("objectTest", "Test");
         FTTrackInner.getInstance().objectBackground(objectBean);
         Thread.sleep(5000);
