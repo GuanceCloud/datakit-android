@@ -44,6 +44,7 @@ public class UtilsTest {
 
     @Test
     public void getHMacSha1() {
+        //String value = Utils.getHMacSha1("screct", "POST" + "\n" + "xrKOMvb4g+/lSVHoW8XcaA==" + "\n" + "application/json" + "\n" + "Wed, 02 Sep 2020 09:41:24 GMT");
         assertEquals("4me5NXJallTGFmZiO3csizbWI90=", Utils.getHMacSha1("screct", "123456"));
     }
 

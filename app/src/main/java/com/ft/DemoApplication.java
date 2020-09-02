@@ -33,9 +33,7 @@ public class DemoApplication extends Application {
     public void onCreate() {
         super.onCreate();
         instance = this;
-        if(!BuildConfig.isTestEnv){
-            initFTSDK();
-        }
+        initFTSDK();
     }
 
     private void initFTSDK(){

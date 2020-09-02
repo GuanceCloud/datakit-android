@@ -7,6 +7,7 @@ import android.util.Log;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.ft.application.MockApplication;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.FTDBCachePolicy;
@@ -42,7 +43,7 @@ public class LogTest {
             hasPrepare = true;
         }
         SyncTaskManager.get().setRunning(true);
-        context = DemoApplication.getContext();
+        context = MockApplication.getContext();
         ftsdkConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL),
                 true,
                 AccountUtils.getProperty(context, AccountUtils.ACCESS_KEY_ID),

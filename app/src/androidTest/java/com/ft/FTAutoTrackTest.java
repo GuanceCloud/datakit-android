@@ -8,6 +8,7 @@ import androidx.test.espresso.action.ViewActions;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.ActivityTestRule;
 
+import com.ft.application.MockApplication;
 import com.ft.sdk.FTAutoTrackType;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
@@ -60,7 +61,7 @@ public class FTAutoTrackTest {
             Looper.prepare();
             hasPrepare = true;
         }
-        context = DemoApplication.getContext();
+        context = MockApplication.getContext();
         SyncTaskManager.get().setRunning(true);
         try {
             FTSdk.get().shutDown();

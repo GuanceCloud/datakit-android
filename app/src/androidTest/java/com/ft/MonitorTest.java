@@ -5,6 +5,7 @@ import android.os.Looper;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.ft.application.MockApplication;
 import com.ft.sdk.FTMonitor;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
@@ -44,7 +45,7 @@ public class MonitorTest {
             hasPrepare = true;
         }
         FTDBManager.get().delete();
-        context = DemoApplication.getContext();
+        context = MockApplication.getContext();
         ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL),
                 true,
                 AccountUtils.getProperty(context, AccountUtils.ACCESS_KEY_ID),
