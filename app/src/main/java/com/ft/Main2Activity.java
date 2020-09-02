@@ -1,6 +1,7 @@
 package com.ft;
 
 import android.Manifest;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -204,6 +205,9 @@ public class Main2Activity extends AppCompatActivity {
                     int i = 1/0;
                 }
             }).start();
+        });
+        findViewById(R.id.jump17).setOnClickListener(v->{
+            startActivity(new Intent(this,MainActivity.class));
         });
     }
 
