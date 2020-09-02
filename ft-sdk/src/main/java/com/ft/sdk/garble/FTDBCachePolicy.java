@@ -31,6 +31,10 @@ public class FTDBCachePolicy {
         this.logCacheDiscardStrategy = ftsdkConfig.getLogCacheDiscardStrategy();
     }
 
+    public void release(){
+        instance = null;
+    }
+
     public LogCacheDiscard getLogCacheDiscardStrategy() {
         return logCacheDiscardStrategy;
     }
@@ -45,20 +49,27 @@ public class FTDBCachePolicy {
 
     /**
      * 执行 log 日志数据库缓存策略
-     * @return true-需要继续执行数据库数据插入；false-不需要再执行数据库数据插入
+     * @return -1-表示直接丢弃，0-表示可以插入数据，n>0 表示需要删除 n 条数据
      */
-    public boolean optLogCachePolicy(int limit){
+    public int optLogCachePolicy(int limit){
+        int status = 0;
         if(count >= Constants.MAX_DB_CACHE_NUM) {//当数据量大于配置的数据库最大存储量时，执行丢弃策略
             if(logCacheDiscardStrategy == LogCacheDiscard.DISCARD){//直接丢弃数据
-                return false;
+                status = -1;
             }else if(logCacheDiscardStrategy == LogCacheDiscard.DISCARD_OLDEST){//丢弃数据库中的前几条数据
                 FTDBManager.get().deleteOldestData(OP.LOG,limit);
                 count = FTDBManager.get().queryTotalCount(OP.LOG);
-                return true;
+                status = 0;
             }
         }else{
+            int needInsert = 0;
+            if (count+limit>= Constants.MAX_DB_CACHE_NUM) {
+                needInsert = Constants.MAX_DB_CACHE_NUM - count;
+                status = limit - needInsert;
+                limit = needInsert;
+            }
             optCount(limit);
         }
-        return true;
+        return status;
     }
 }

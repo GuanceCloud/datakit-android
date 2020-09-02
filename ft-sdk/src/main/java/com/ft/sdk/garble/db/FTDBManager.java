@@ -46,7 +46,8 @@ public class FTDBManager extends DBManager {
      *
      * @param data
      */
-    public void insertFTOperation(final RecordData data) {
+    public boolean insertFTOperation(final RecordData data) {
+        final boolean[] result = new boolean[1];
         getDB(true, db -> {
             ContentValues contentValues = new ContentValues();
             contentValues.put(FTSQL.RECORD_COLUMN_TM, data.getTime());
@@ -56,11 +57,18 @@ public class FTDBManager extends DBManager {
             try {
                 long value = db.insert(FTSQL.FT_TABLE_NAME, null, contentValues);
                 LogUtils.d(TAG,"insert value:"+value);
+                if(value>=0){
+                    result[0] = true;
+                }else{
+                    result[0] = false;
+                }
             }catch (Exception e){
                 e.printStackTrace();
                 LogUtils.e(TAG,"insert error message:"+e.getLocalizedMessage());
+                result[0] = false;
             }
         });
+        return result[0];
     }
 
     /**
@@ -68,20 +76,31 @@ public class FTDBManager extends DBManager {
      *
      * @param dataList
      */
-    public void insertFtOptList(final List<RecordData> dataList) {
+    public boolean insertFtOptList(final List<RecordData> dataList) {
+        final boolean[] result = new boolean[1];
         getDB(true, db -> {
             db.beginTransaction();
+            int count = 0;
             for (RecordData data : dataList) {
                 ContentValues contentValues = new ContentValues();
                 contentValues.put(FTSQL.RECORD_COLUMN_TM, data.getTime());
                 contentValues.put(FTSQL.RECORD_COLUMN_DATA, data.getJsonString());
                 contentValues.put(FTSQL.RECORD_COLUMN_SESSION_ID, data.getSessionid());
                 contentValues.put(FTSQL.RECORD_COLUMN_OPTION, data.getOp());
-                db.insert(FTSQL.FT_TABLE_NAME, null, contentValues);
+                long rowId = db.insert(FTSQL.FT_TABLE_NAME, null, contentValues);
+                if(rowId>=0){
+                    count++;
+                }
+            }
+            if(count == dataList.size()){
+                result[0] = true;
+            }else{
+                result[0] = false;
             }
             db.setTransactionSuccessful();
             db.endTransaction();
         });
+        return result[0];
     }
 
     /**
@@ -220,8 +239,17 @@ public class FTDBManager extends DBManager {
     /**
      * 测试使用，用于删除数据库中的数据
      */
-    public void delete() {
-        getDB(true, db -> db.delete(FTSQL.FT_TABLE_NAME, null, null));
+    public boolean delete() {
+        final boolean[] result = new boolean[1];
+        getDB(true, db -> {
+            int value = db.delete(FTSQL.FT_TABLE_NAME, null, null);
+            if(value > 0){
+                result[0] = true;
+            }else {
+                result[0] = false;
+            }
+        });
+        return result[0];
     }
 
     /**
