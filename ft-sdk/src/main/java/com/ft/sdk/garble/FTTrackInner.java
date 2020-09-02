@@ -20,7 +20,6 @@ import com.ft.sdk.garble.utils.Utils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -185,9 +184,19 @@ public class FTTrackInner {
      */
     private void judgeNeedOptCachePolicy(OP op,List<RecordData> recordDataList,RecordData recordData){
         //如果 OP 类型不等于 LOG 则直接进行数据库操作；否则执行同步策略，根据同步策略返回结果判断是否需要执行数据库操作
-        if(op != OP.LOG || FTDBCachePolicy.get().optLogCachePolicy(recordDataList==null?1:recordDataList.size())){//执行同步策略
+        int length = recordDataList==null?0:recordDataList.size();
+        int policyStatus = FTDBCachePolicy.get().optLogCachePolicy(length);
+        if(op != OP.LOG || policyStatus>=0){//执行同步策略
+            if(policyStatus>0){
+                if (recordDataList != null) {
+                    for (int i = 0; i < policyStatus && i<length; i++) {
+                        recordDataList.remove(0);
+                    }
+                }
+            }
             if(recordDataList != null) {
-                FTManager.getFTDBManager().insertFtOptList(recordDataList);
+                boolean result = FTManager.getFTDBManager().insertFtOptList(recordDataList);
+                System.out.println("insert-result="+result);
             }
             if(recordData != null){
                 FTManager.getFTDBManager().insertFTOperation(recordData);

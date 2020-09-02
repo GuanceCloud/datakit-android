@@ -14,6 +14,7 @@ import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.manager.SyncTaskManager;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,16 +51,28 @@ public class LogTest {
                 .setEnableTrackAppCrash(true);
     }
 
+    @After
+    public void tearDown(){
+        FTDBManager.get().delete();
+        FTSdk.get().shutDown();
+    }
+
     @Test
     public void consoleLogTest() throws InterruptedException {
         FTSdk.install(ftsdkConfig);
-        FTDBManager.get().delete();
         SyncTaskManager.get().setRunning(true);
         Log.d("TestLog", "控制台日志测试用例");
         Thread.sleep(4000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(10);
-        int length = recordDataList.size();
-        Assert.assertEquals(1, length);
+        int except = 0;
+        if (recordDataList != null) {
+            for (RecordData data : recordDataList) {
+                if (data.getOpdata().contains("控制台日志测试用例")) {
+                    except++;
+                }
+            }
+        }
+        Assert.assertEquals(1, except);
 
     }
 
@@ -72,13 +85,14 @@ public class LogTest {
     public void triggerPolicyTest() throws InterruptedException {
         SyncTaskManager.get().setRunning(true);
         FTSdk.install(ftsdkConfig);
-        FTDBManager.get().delete();
-        for (int i = 0; i < 5030; i++) {
+        for (int i = 0; i < 5020; i++) {
             Log.d("TestLog", i + "-控制台日志测试用例");
             Thread.sleep(10);
         }
         Thread.sleep(40000);
         int size = FTDBManager.get().queryTotalCount(OP.LOG);
-        Assert.assertTrue(5020 >= size && size >= 5000);
+        System.out.println("Size="+size);
+        //Thread.sleep(300000);
+        Assert.assertEquals(5000, size);
     }
 }
