@@ -66,8 +66,8 @@ public class FTSdk {
                 throw new InitSDKProcessException("当前 SDK 只能在主进程中运行，如果想要在非主进程中运行可以设置 FTSDKConfig.setOnlySupportMainProcess(false)");
             }
         }
-        mFtSdk.initFTConfig();
         mFtSdk.registerActivityLifeCallback();
+        mFtSdk.initFTConfig();
     }
 
     /**

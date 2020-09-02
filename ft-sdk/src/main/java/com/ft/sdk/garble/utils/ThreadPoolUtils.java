@@ -76,6 +76,9 @@ public class ThreadPoolUtils {
     }
 
     public void execute(FutureTask futureTask) {
+        if (!poolRunning()) {
+            reStartPool();
+        }
         if (executor != null) {
             executor.execute(futureTask);
         }

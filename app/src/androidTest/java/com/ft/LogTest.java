@@ -9,6 +9,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
+import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.db.FTDBManager;
@@ -40,6 +41,7 @@ public class LogTest {
             Looper.prepare();
             hasPrepare = true;
         }
+        SyncTaskManager.get().setRunning(true);
         context = DemoApplication.getContext();
         ftsdkConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL),
                 true,
@@ -49,6 +51,7 @@ public class LogTest {
                 .setTraceConsoleLog(true)
                 .setEventFlowLog(true)
                 .setEnableTrackAppCrash(true);
+        FTSdk.install(ftsdkConfig);
     }
 
     @After
@@ -59,15 +62,13 @@ public class LogTest {
 
     @Test
     public void consoleLogTest() throws InterruptedException {
-        FTSdk.install(ftsdkConfig);
-        SyncTaskManager.get().setRunning(true);
-        Log.d("TestLog", "控制台日志测试用例");
+        Log.d("TestLog", "控制台日志测试用例qaws");
         Thread.sleep(4000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(10);
         int except = 0;
         if (recordDataList != null) {
             for (RecordData data : recordDataList) {
-                if (data.getOpdata().contains("控制台日志测试用例")) {
+                if (data.getOpdata().contains("控制台日志测试用例qaws")) {
                     except++;
                 }
             }
@@ -83,16 +84,21 @@ public class LogTest {
      */
     @Test
     public void triggerPolicyTest() throws InterruptedException {
-        SyncTaskManager.get().setRunning(true);
-        FTSdk.install(ftsdkConfig);
-        for (int i = 0; i < 5020; i++) {
+        FTDBCachePolicy.get().optCount(4990);
+        for (int i = 0; i < 20; i++) {
             Log.d("TestLog", i + "-控制台日志测试用例");
             Thread.sleep(10);
         }
-        Thread.sleep(40000);
-        int size = FTDBManager.get().queryTotalCount(OP.LOG);
-        System.out.println("Size="+size);
+        Thread.sleep(2000);
+        List<RecordData> dataList = FTDBManager.get().queryDataByDescLimitLog(0);
+        int count = 0;
+        for (RecordData recordData : dataList) {
+            if(recordData.getOpdata().contains("控制台日志测试用例")){
+                count++;
+            }
+        }
+        System.out.println("count="+count);
         //Thread.sleep(300000);
-        Assert.assertEquals(5000, size);
+        Assert.assertTrue(10>=count);
     }
 }

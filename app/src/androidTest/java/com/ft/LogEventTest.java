@@ -58,26 +58,18 @@ public class LogEventTest {
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setUseOAID(true)//设置 OAID 是否可用
                 .setDebug(true)//设置是否是 debug
-                .setDescLog(true)
                 .enableAutoTrack(true)//设置是否开启自动埋点
                 .setEnableAutoTrackType(FTAutoTrackType.APP_CLICK.type |
                         FTAutoTrackType.APP_END.type |
                         FTAutoTrackType.APP_START.type)//设置埋点事件类型的白名单
                 .setGeoKey(true, AccountUtils.getProperty(context, AccountUtils.GEO_KEY))
                 .setNeedBindUser(false)//是否需要绑定用户信息
-                .setPageVtpDescEnabled(true)
-                .setMonitorType(MonitorType.ALL)//设置监控项
-                .trackNetRequestTime(true)
-                .setEnableTrackAppCrash(true)
-                .setEnv("dev")
                 .setTraceSamplingRate(0.5f)
                 .setNetworkTrace(true)
-                .setTraceConsoleLog(true)
-                .setEventFlowLog(true)
-                .setTraceType(TraceType.SKYWALKING_V2)
-                .setOnlySupportMainProcess(true);
+                .setEventFlowLog(true);
         //关闭数据自动同步操作
         SyncTaskManager.get().setRunning(true);
+        FTSdk.install(ftSDKConfig);
     }
 
     /**
@@ -87,7 +79,6 @@ public class LogEventTest {
      */
     @Test
     public void clickLambdaBtnTest() throws InterruptedException {
-        FTSdk.install(ftSDKConfig);
         onView(withId(R.id.jump12)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
@@ -104,7 +95,6 @@ public class LogEventTest {
 
     @Test
     public void leaveTest() throws InterruptedException {
-        FTSdk.install(ftSDKConfig);
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);
@@ -120,7 +110,7 @@ public class LogEventTest {
 
     @Test
     public void enterTest() throws InterruptedException {
-        FTSdk.install(ftSDKConfig);
+        onView(withId(R.id.jump17)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);
@@ -137,7 +127,6 @@ public class LogEventTest {
 
     @Test
     public void launchTest() throws InterruptedException {
-        FTSdk.install(ftSDKConfig);
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);

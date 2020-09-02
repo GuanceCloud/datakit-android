@@ -1,6 +1,5 @@
 package com.ft;
 
-import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
@@ -25,14 +24,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-import com.amitshekhar.DebugDB;
-import com.amitshekhar.debug.encrypt.sqlite.DebugDBEncryptFactory;
-import com.amitshekhar.debug.sqlite.DebugDBFactory;
 import com.bumptech.glide.Glide;
-import com.ft.sdk.FTSdk;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -54,13 +46,13 @@ public class MainActivity extends AppCompatActivity {
     private Tab1Fragment tab1Fragment = new Tab1Fragment();
     private Tab2Fragment tab2Fragment = new Tab2Fragment();
     boolean run = true;
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setTitle("FT-SDK使用Demo");
-        FTSdk.get().setGpuRenderer(findViewById(R.id.ll));
         showKotlinActivity = findViewById(R.id.showKotlinActivity);
         btn_lam = findViewById(R.id.btn_lam);
         checkbox = findViewById(R.id.checkbox);
@@ -82,13 +74,13 @@ public class MainActivity extends AppCompatActivity {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    while (run){
+                    while (run) {
                         try {
                             Thread.sleep(100);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        Log.d("LogData","data=========="+atomicLong.decrementAndGet());
+                        Log.d("LogData", "data==========" + atomicLong.decrementAndGet());
                     }
                 }
             }).start();
@@ -215,7 +207,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         return super.onOptionsItemSelected(item);
     }
-
 
 
 }
