@@ -4,6 +4,7 @@ import android.content.Context;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.ft.application.MockApplication;
 import com.ft.sdk.BuildConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
@@ -35,7 +36,7 @@ public class FTInitParamTest {
 
     @Before
     public void setUp() {
-        context = DemoApplication.getContext();
+        context = MockApplication.getContext();
     }
 
     @Test

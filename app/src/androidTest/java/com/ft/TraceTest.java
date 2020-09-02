@@ -5,6 +5,7 @@ import android.os.Looper;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.ft.application.MockApplication;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.TraceType;
@@ -41,7 +42,7 @@ public class TraceTest {
             Looper.prepare();
             hasPrepare = true;
         }
-        context = DemoApplication.getContext();
+        context = MockApplication.getContext();
         ftsdkConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL),
                 true,
                 AccountUtils.getProperty(context, AccountUtils.ACCESS_KEY_ID),
