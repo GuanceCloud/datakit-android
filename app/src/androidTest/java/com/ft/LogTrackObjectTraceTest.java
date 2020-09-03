@@ -12,16 +12,15 @@ import com.ft.sdk.FTTrack;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.FTTrackInner;
+import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.ObjectBean;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.db.FTDBManager;
-import com.ft.sdk.garble.http.HttpBuilder;
-import com.ft.sdk.garble.http.RequestMethod;
-import com.ft.sdk.garble.http.ResponseData;
+import com.ft.sdk.garble.manager.SyncDataManager;
 import com.ft.sdk.garble.manager.SyncTaskManager;
+import com.ft.sdk.garble.utils.Constants;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.After;
@@ -30,7 +29,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.HashMap;
 import java.util.List;
 
 import static com.ft.TestEntrance.hasPrepare;
@@ -79,48 +77,59 @@ public class LogTrackObjectTraceTest {
     }
 
     @After
-    public void tearDown(){
+    public void tearDown() {
         FTSdk.get().shutDown();
     }
 
     /**
      * 插入一条 log 数据测试
+     *
      * @throws InterruptedException
      */
     @Test
     public void logInsertDataTest() throws InterruptedException {
-        FTTrack.getInstance().logBackground("TestLog0o0o0", Status.CRITICAL);
+        //产生一条日志数据
+        FTTrack.getInstance().logBackground("----logInsertDataTest----", Status.CRITICAL);
+        //线程池中插入，有一定的时间延迟，这里设置5秒等待时间
         Thread.sleep(5000);
-        List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(10);
-        int except = 0;
-        if (recordDataList != null) {
-            for (RecordData data : recordDataList) {
-                if (data.getOpdata().contains("TestLog0o0o0")) {
-                    except++;
-                }
-            }
-        }
+        //从数据库中查询是否有插入的数据
+        int except = judgeDBContainTargetLog(DataType.LOG, "----logInsertDataTest----");
         Assert.assertEquals(1, except);
     }
 
     /**
      * 上传一条 log 数据测试
+     *
+     * @throws InterruptedException
+     */
+    @Test
+    public void logUpdateDataTest() throws InterruptedException {
+        //产生一条日志数据
+        FTTrack.getInstance().logBackground("----logUpdateDataTest----", Status.CRITICAL);
+        //线程池中插入，有一定的时间延迟，这里设置5秒等待时间
+        Thread.sleep(5000);
+        uploadData(DataType.LOG);
+    }
+
+
+    /**
+     * 同步删除测试
+     *
      * @throws InterruptedException
      * @throws JSONException
      */
     @Test
-    public void logUploadTest() throws InterruptedException, JSONException {
-        //设置时间间隔防止多个测试用例请求数据后无法准确的判断返回值
-        Thread.sleep(1000 * 60);
-        String token = getLoginToken();
+    public void logSyncTest() throws InterruptedException, JSONException {
         SyncTaskManager.get().setRunning(false);
-        FTTrack.getInstance().logBackground("TestLog11111", Status.CRITICAL);
-        Thread.sleep(1000 * 70);
-        queryUploadDataLog(token, "TestLog11111");
+        FTTrack.getInstance().logBackground("----logUploadTest----", Status.CRITICAL);
+        Thread.sleep(12000);
+        int except = judgeDBContainTargetLog(DataType.LOG, "----logUploadTest----");
+        Assert.assertEquals(0, except);
     }
 
     /**
      * 插入一条 track 数据测试
+     *
      * @throws InterruptedException
      * @throws JSONException
      */
@@ -129,191 +138,204 @@ public class LogTrackObjectTraceTest {
         JSONObject tags = new JSONObject();
         tags.put("testTag", "tagTest");
         JSONObject fields = new JSONObject();
-        fields.put("testField", "fieldTest");
+        fields.put("testField", "----trackInsertDataTest----");
         FTTrack.getInstance().trackBackground("TestLog", tags, fields);
         Thread.sleep(5000);
-        int length = FTDBManager.get().queryDataByDescLimitTrack(10).size();
-        Assert.assertEquals(1, length);
+        int except = judgeDBContainTargetLog(DataType.TRACK, "----trackInsertDataTest----");
+        Assert.assertEquals(1, except);
     }
 
     /**
      * 上传一条 track 数据测试
+     *
      * @throws InterruptedException
      * @throws JSONException
      */
     @Test
-    public void trackUploadTest() throws InterruptedException, JSONException {
-        String measurement = "TrackLog";
-        String field = "field-" + System.currentTimeMillis();
-        //设置时间间隔防止多个测试用例请求数据后无法准确的判断返回值
-        //Thread.sleep(1000 * 60);
-        String token = getLoginToken();
+    public void trackUploadDataTest() throws InterruptedException, JSONException {
+        JSONObject tags = new JSONObject();
+        tags.put("testTag", "tagTest");
+        JSONObject fields = new JSONObject();
+        fields.put("testField", "----trackUploadDataTest----");
+        FTTrack.getInstance().trackBackground("TestLog", tags, fields);
+        Thread.sleep(5000);
+        uploadData(DataType.TRACK);
+    }
+
+    /**
+     * 同步删除测试
+     *
+     * @throws InterruptedException
+     * @throws JSONException
+     */
+    @Test
+    public void trackSyncTest() throws InterruptedException, JSONException {
         SyncTaskManager.get().setRunning(false);
         JSONObject tags = new JSONObject();
         tags.put("testTag", "tagTest");
         JSONObject fields = new JSONObject();
-        fields.put(field, "testField");
-        FTTrack.getInstance().trackBackground(measurement, tags, fields);
-        Thread.sleep(1000 * 70);
-        queryUploadDataTrack(measurement, token, field);
+        fields.put("testField", "----trackUploadTest----");
+        FTTrack.getInstance().trackBackground("TestLog", tags, fields);
+        Thread.sleep(12000);
+        int except = judgeDBContainTargetLog(DataType.TRACK, "----trackUploadTest----");
+        Assert.assertEquals(0, except);
     }
 
     /**
      * 插入一条 object 数据测试
+     *
      * @throws InterruptedException
      * @throws JSONException
      */
     @Test
     public void objectInsertDataTest() throws InterruptedException, JSONException {
-        ObjectBean objectBean = new ObjectBean("objectTest", "Test");
+        ObjectBean objectBean = new ObjectBean("objectTest", "----objectInsertDataTest----");
         FTTrackInner.getInstance().objectBackground(objectBean);
         Thread.sleep(5000);
-        int length = FTDBManager.get().queryDataByDescLimitObject(10).size();
-        Assert.assertEquals(1, length);
+        int except = judgeDBContainTargetLog(DataType.OBJECT, "----objectInsertDataTest----");
+        Assert.assertEquals(1, except);
     }
 
     /**
      * 上传一条 object 数据测试
+     *
      * @throws InterruptedException
      * @throws JSONException
      */
     @Test
-    public void objectUploadTest() throws InterruptedException, JSONException {
-        String clazz = "Test-" + System.currentTimeMillis();
-        String token = getLoginToken();
-        SyncTaskManager.get().setRunning(false);
-        ObjectBean objectBean = new ObjectBean("objectTest", clazz);
+    public void objectUploadDataTest() throws InterruptedException, JSONException {
+        ObjectBean objectBean = new ObjectBean("objectTest", "----objectUploadDataTest----");
         FTTrackInner.getInstance().objectBackground(objectBean);
-        Thread.sleep(1000 * 60);
-        queryUploadDataObject(clazz, token, 1);
+        Thread.sleep(5000);
+        uploadData(DataType.OBJECT);
+    }
+
+    /**
+     * 同步删除测试
+     *
+     * @throws InterruptedException
+     * @throws JSONException
+     */
+    @Test
+    public void objectSyncTest() throws InterruptedException, JSONException {
+        SyncTaskManager.get().setRunning(false);
+        ObjectBean objectBean = new ObjectBean("objectTest", "----objectUploadTest----");
+        FTTrackInner.getInstance().objectBackground(objectBean);
+        Thread.sleep(12000);
+        int except = judgeDBContainTargetLog(DataType.OBJECT, "----objectUploadTest----");
+        Assert.assertEquals(0, except);
     }
 
     /**
      * trace 一个正常的网络
+     *
      * @throws JSONException
      * @throws InterruptedException
      */
     @Test
     public void traceUploadNormalTest() throws JSONException, InterruptedException {
-        traceDataTest("http://www.weather.com.cn/data/sk/101010100.html","www.weather.com.cn");
+        traceDataTest("http://www.weather.com.cn/data/sk/101010100.html", "www.weather.com.cn");
     }
 
     /**
      * trace 网络超时
+     *
      * @throws JSONException
      * @throws InterruptedException
      */
     @Test
     public void traceUploadTimeOutTest() throws JSONException, InterruptedException {
-        traceDataTest("https://www.google.com","www.google.com");
+        traceDataTest("https://www.google.com", "www.google.com");
     }
 
     /**
      * trace 网络错误
+     *
      * @throws JSONException
      * @throws InterruptedException
      */
     @Test
     public void traceUploadErrorTest() throws JSONException, InterruptedException {
-        traceDataTest("https://error.url","error.url");
+        traceDataTest("https://error.url", "error.url");
     }
+
     /**
      * 上传一条正常的 trace 数据测试
+     *
      * @throws JSONException
      * @throws InterruptedException
      */
-    private void traceDataTest(String url,String except) throws JSONException, InterruptedException {
+    private void traceDataTest(String url, String except) throws JSONException, InterruptedException {
         RequestUtil.requestUrl(url);
-        String token = getLoginToken();
+        Thread.sleep(5000);
+        int except1 = judgeDBContainTargetLog(DataType.LOG, except);
         SyncTaskManager.get().setRunning(false);
-        Thread.sleep(1000 * 60);
-        queryUploadDataTrace(token, except);
-    }
-
-    private void queryUploadDataLog(String token, String expect) throws JSONException {
-        HashMap<String, Object> hashMap = new HashMap();
-        hashMap.put("body", SyncDataUtils.buildLogBody());
-        ResponseData responseData = HttpBuilder.Builder()
-                .setHost("http://testing.api-ft2x.cloudcare.cn:10531")
-                .setModel("api/v1/elasticsearch/query_data")
-                .setHeadParams(SyncDataUtils.getQueryHead(token))
-                .setMethod(RequestMethod.GET)
-                .setParams(hashMap)
-                .executeSync(ResponseData.class);
-
-        JSONObject jsonObject = new JSONObject(responseData.getData());
-        JSONObject content = jsonObject.optJSONObject("content");
-        JSONArray array = content.optJSONArray("responses").optJSONObject(0).optJSONObject("hits")
-                .optJSONArray("hits");
-        int count = 0;
-        for (int i = 0; i < array.length(); i++) {
-            String str = array.getString(i);
-            if(str.contains(expect)){
-                count++;
-            }
-        }
-        Assert.assertEquals(1, count);
-    }
-
-    private void queryUploadDataObject(String clazz, String token, int expect) throws JSONException {
-        ResponseData responseData = HttpBuilder.Builder()
-                .setHost("http://testing.api-ft2x.cloudcare.cn:10531")
-                .setModel("api/v1/elasticsearch/msearch")
-                .setHeadParams(SyncDataUtils.getQueryHead(token))
-                .setMethod(RequestMethod.POST)
-                .setBodyString(SyncDataUtils.buildObjectBody(clazz))
-                .executeSync(ResponseData.class);
-
-        JSONObject jsonObject = new JSONObject(responseData.getData());
-        JSONObject content = jsonObject.optJSONObject("content");
-        int length = content.optJSONArray("responses").optJSONObject(0).optJSONObject("hits")
-                .optJSONObject("total").optInt("value");
-        Assert.assertEquals(expect, length);
-    }
-
-    private void queryUploadDataTrack(String measurement, String token, String field) throws JSONException {
-        ResponseData responseData = HttpBuilder.Builder()
-                .setHost("http://testing.api-ft2x.cloudcare.cn:10531")
-                .setModel("api/v1/influx/query_field_keys")
-                .setHeadParams(SyncDataUtils.getQueryHead(token))
-                .setMethod(RequestMethod.POST)
-                .setBodyString(SyncDataUtils.buildTrackBody(measurement))
-                .executeSync(ResponseData.class);
-        boolean contain = responseData.getData().contains(field);
-        Assert.assertTrue(contain);
-    }
-
-    private void queryUploadDataTrace(String token, String expect) throws JSONException {
-        HashMap<String, Object> hashMap = new HashMap();
-        hashMap.put("body", SyncDataUtils.buildLogBody());
-        ResponseData responseData = HttpBuilder.Builder()
-                .setHost("http://testing.api-ft2x.cloudcare.cn:10531")
-                .setModel("api/v1/elasticsearch/query_data")
-                .setHeadParams(SyncDataUtils.getQueryHead(token))
-                .enableToken(false)
-                .setMethod(RequestMethod.GET)
-                .setParams(hashMap)
-                .executeSync(ResponseData.class);
-        boolean contain = responseData.getData().contains(expect);
-        Assert.assertTrue(contain);
+        FTTrack.getInstance().logBackground("----traceDataTest----", Status.CRITICAL);
+        Thread.sleep(12000);
+        int except2 = judgeDBContainTargetLog(DataType.LOG, except);
+        Assert.assertEquals(1, except1);
+        Assert.assertEquals(0, except2);
     }
 
     /**
-     * 获取登录token
+     * 上传数据测试
      *
-     * @return
-     * @throws JSONException
+     * @param dataType
      */
-    private String getLoginToken() throws JSONException {
-        ResponseData responseData = HttpBuilder.Builder()
-                .setHost("http://testing.api-ft2x.cloudcare.cn:10531")
-                .setModel("api/v1/auth-token/login")
-                .setMethod(RequestMethod.POST)
-                .setHeadParams(SyncDataUtils.getLoginHead())
-                .setBodyString(SyncDataUtils.getLoginBody(context))
-                .executeSync(ResponseData.class);
-        JSONObject jsonObject = new JSONObject(responseData.getData());
-        JSONObject content = jsonObject.optJSONObject("content");
-        return content.optString("token");
+    private void uploadData(DataType dataType) {
+        List<RecordData> recordDataList = null;
+        switch (dataType) {
+            case OBJECT:
+                recordDataList = FTDBManager.get().queryDataByDescLimitObject(0);
+                break;
+            case LOG:
+                recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);
+                break;
+            case KEY_EVENT:
+                recordDataList = FTDBManager.get().queryDataByDescLimitKeyEvent(0);
+                break;
+            case TRACK:
+                recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
+                break;
+        }
+        SyncDataManager syncDataManager = new SyncDataManager();
+        String body = syncDataManager.getBodyContent(dataType, recordDataList);
+        body = body.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION).replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK);
+        SyncTaskManager.get().requestNet(dataType, body, (code, response) -> {
+            Assert.assertEquals(200, code);
+        });
+    }
+
+    /**
+     * 判断数据库中包含几条目标数据
+     *
+     * @param target
+     * @return
+     */
+    private int judgeDBContainTargetLog(DataType type, String target) {
+        List<RecordData> recordDataList = null;
+        switch (type) {
+            case OBJECT:
+                recordDataList = FTDBManager.get().queryDataByDescLimitObject(0);
+                break;
+            case LOG:
+                recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);
+                break;
+            case KEY_EVENT:
+                recordDataList = FTDBManager.get().queryDataByDescLimitKeyEvent(0);
+                break;
+            case TRACK:
+                recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
+                break;
+        }
+        int except = 0;
+        if (recordDataList != null) {
+            for (RecordData data : recordDataList) {
+                if (data.getOpdata().contains(target)) {
+                    except++;
+                }
+            }
+        }
+        return except;
     }
 }
