@@ -68,7 +68,7 @@ public class BindUserTest {
     public void bindUserDataSync() throws InterruptedException {
         bindUserData("FT-TEST");
         FTAutoTrack.startApp();
-        Thread.sleep(20000);
+        Thread.sleep(15000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimit(0);
         assertEquals(0, recordDataList.size());
     }
@@ -84,7 +84,7 @@ public class BindUserTest {
         Thread.sleep(5000);
         bindUserData("FT-TEST");
         FTAutoTrack.startApp();
-        Thread.sleep(20000);
+        Thread.sleep(15000);
         List<RecordData> recordDataList1 = FTDBManager.get().queryDataByDescLimit(0);
         assertEquals(0, recordDataList1.size());
     }
