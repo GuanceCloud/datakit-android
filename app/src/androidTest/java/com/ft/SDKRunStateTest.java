@@ -33,7 +33,7 @@ import static com.ft.TestEntrance.hasPrepare;
  * description:
  */
 @RunWith(AndroidJUnit4.class)
-public class SDKRunStateTest {
+public class SDKRunStateTest extends BaseTest{
     Context context;
 
     @Before
@@ -72,11 +72,6 @@ public class SDKRunStateTest {
         FTSdk.install(ftSDKConfig);
     }
 
-    @After
-    public void tearDown(){
-        FTDBManager.get().delete();
-        FTSdk.get().shutDown();
-    }
     @Test
     public void enableAutoTrackTest() {
         Assert.assertTrue(FTAutoTrackConfig.get().isAutoTrack());
