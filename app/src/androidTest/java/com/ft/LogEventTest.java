@@ -11,8 +11,6 @@ import com.ft.application.MockApplication;
 import com.ft.sdk.FTAutoTrackType;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
-import com.ft.sdk.MonitorType;
-import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.manager.SyncTaskManager;
@@ -37,7 +35,7 @@ import static com.ft.TestEntrance.hasPrepare;
  * description:事件日志，验证页面是否生成对应的事件数据
  */
 @RunWith(AndroidJUnit4.class)
-public class LogEventTest {
+public class LogEventTest extends BaseTest{
     @Rule
     public ActivityTestRule<Main2Activity> rule = new ActivityTestRule<>(Main2Activity.class);
 
@@ -71,12 +69,6 @@ public class LogEventTest {
         //关闭数据自动同步操作
         SyncTaskManager.get().setRunning(true);
         FTSdk.install(ftSDKConfig);
-    }
-
-    @After
-    public void tearDown(){
-        FTDBManager.get().delete();
-        FTSdk.get().shutDown();
     }
 
     /**

@@ -34,7 +34,7 @@ import static com.ft.TestEntrance.hasPrepare;
  * description:监控类数据测试
  */
 @RunWith(AndroidJUnit4.class)
-public class MonitorTest {
+public class MonitorTest extends BaseTest{
     Context context;
     FTSDKConfig ftSDKConfig;
 

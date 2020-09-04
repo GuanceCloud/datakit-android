@@ -32,7 +32,7 @@ import static com.ft.TestEntrance.hasPrepare;
  * description:控制台日志测试用例、丢弃策略测试
  */
 @RunWith(AndroidJUnit4.class)
-public class LogTest {
+public class LogTest extends BaseTest{
     Context context;
     FTSDKConfig ftsdkConfig;
 
@@ -53,12 +53,6 @@ public class LogTest {
                 .setEventFlowLog(true)
                 .setEnableTrackAppCrash(true);
         FTSdk.install(ftsdkConfig);
-    }
-
-    @After
-    public void tearDown(){
-        FTDBManager.get().delete();
-        FTSdk.get().shutDown();
     }
 
     @Test
