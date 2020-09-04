@@ -33,7 +33,7 @@ import static com.ft.TestEntrance.hasPrepare;
  * description:测试定位
  */
 @RunWith(AndroidJUnit4.class)
-public class LocationTest {
+public class LocationTest extends BaseTest{
     Context context;
     FTSDKConfig ftSDKConfig;
 
@@ -54,12 +54,6 @@ public class LocationTest {
                 .setGeoKey(true, AccountUtils.getProperty(context, AccountUtils.GEO_KEY));
         //关闭数据自动同步操作
         SyncTaskManager.get().setRunning(true);
-    }
-
-    @After
-    public void tearDown(){
-        FTDBManager.get().delete();
-        FTSdk.get().shutDown();
     }
 
     Address address;

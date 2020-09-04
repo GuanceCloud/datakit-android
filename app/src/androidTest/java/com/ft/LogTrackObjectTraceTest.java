@@ -39,7 +39,7 @@ import static com.ft.TestEntrance.hasPrepare;
  * description:
  */
 @RunWith(AndroidJUnit4.class)
-public class LogTrackObjectTraceTest {
+public class LogTrackObjectTraceTest extends BaseTest{
     Context context;
 
     @Before
@@ -76,11 +76,6 @@ public class LogTrackObjectTraceTest {
         FTDBManager.get().delete();
     }
 
-    @After
-    public void tearDown(){
-        FTDBManager.get().delete();
-        FTSdk.get().shutDown();
-    }
     /**
      * 插入一条 log 数据测试
      *

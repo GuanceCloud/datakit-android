@@ -37,7 +37,7 @@ import static com.ft.TestEntrance.hasPrepare;
  * description:
  */
 @RunWith(AndroidJUnit4.class)
-public class ExceptionTest {
+public class ExceptionTest extends BaseTest{
     @Rule
     public ActivityTestRule<Main2Activity> rule = new ActivityTestRule<>(Main2Activity.class);
 
@@ -79,12 +79,6 @@ public class ExceptionTest {
                 .setOnlySupportMainProcess(true);
         //关闭数据自动同步操作
         SyncTaskManager.get().setRunning(true);
-    }
-
-    @After
-    public void tearDown(){
-        FTDBManager.get().delete();
-        FTSdk.get().shutDown();
     }
 
     /**

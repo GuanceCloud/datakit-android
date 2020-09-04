@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
  * Description: 用户绑定与解绑测试类
  */
 @RunWith(AndroidJUnit4.class)
-public class BindUserTest {
+public class BindUserTest extends BaseTest{
     Context context = null;
 
     @Before
@@ -43,12 +43,6 @@ public class BindUserTest {
                 .enableAutoTrack(true);
         FTSdk.install(ftSDKConfig);
         FTDBManager.get().delete();
-    }
-
-    @After
-    public void tearDown(){
-        FTDBManager.get().delete();
-        FTSdk.get().shutDown();
     }
 
     /**

@@ -43,7 +43,7 @@ import static com.ft.TestEntrance.hasPrepare;
  * description:
  */
 @RunWith(AndroidJUnit4.class)
-public class FTAutoTrackTest {
+public class FTAutoTrackTest extends BaseTest{
     Context context;
     @Rule
     public ActivityTestRule<Main2Activity> rule = new ActivityTestRule<>(Main2Activity.class);
@@ -82,12 +82,6 @@ public class FTAutoTrackTest {
                 .setPageVtpDescEnabled(true)
                 .setMonitorType(MonitorType.ALL);
 
-    }
-
-    @After
-    public void tearDown(){
-        FTDBManager.get().delete();
-        FTSdk.get().shutDown();
     }
 
     @Test
