@@ -63,6 +63,7 @@ public class SyncTaskManager {
             if (running) {
                 return;
             }
+            System.out.println("=========executeSyncPoll===");
             running = true;
             errorCount.set(0);
             ThreadPoolUtils.get().execute(() -> {
@@ -223,6 +224,5 @@ public class SyncTaskManager {
 
     public void release() {
         ThreadPoolUtils.get().shutDown();
-        instance = null;
     }
 }
