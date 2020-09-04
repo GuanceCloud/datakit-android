@@ -17,6 +17,7 @@ import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.manager.SyncTaskManager;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -78,6 +79,12 @@ public class ExceptionTest {
                 .setOnlySupportMainProcess(true);
         //关闭数据自动同步操作
         SyncTaskManager.get().setRunning(true);
+    }
+
+    @After
+    public void tearDown(){
+        FTDBManager.get().delete();
+        FTSdk.get().shutDown();
     }
 
     /**

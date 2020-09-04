@@ -9,7 +9,9 @@ import com.ft.application.MockApplication;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.TraceType;
+import com.ft.sdk.garble.db.FTDBManager;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,6 +52,12 @@ public class TraceTest {
                 .setDataWayToken(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_TOKEN))
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setNetworkTrace(true);
+    }
+
+    @After
+    public void tearDown(){
+        FTDBManager.get().delete();
+        FTSdk.get().shutDown();
     }
 
     @Test

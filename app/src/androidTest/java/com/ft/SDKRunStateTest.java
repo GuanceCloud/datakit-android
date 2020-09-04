@@ -16,6 +16,7 @@ import com.ft.sdk.garble.FTExceptionHandler;
 import com.ft.sdk.garble.FTFlowConfig;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
+import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.utils.NetUtils;
 
 import org.junit.After;
@@ -72,10 +73,10 @@ public class SDKRunStateTest {
     }
 
     @After
-    public void end() {
+    public void tearDown(){
+        FTDBManager.get().delete();
         FTSdk.get().shutDown();
     }
-
     @Test
     public void enableAutoTrackTest() {
         Assert.assertTrue(FTAutoTrackConfig.get().isAutoTrack());
