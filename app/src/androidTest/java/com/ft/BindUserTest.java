@@ -13,6 +13,7 @@ import com.ft.sdk.garble.db.FTDBManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,6 +43,12 @@ public class BindUserTest {
                 .enableAutoTrack(true);
         FTSdk.install(ftSDKConfig);
         FTDBManager.get().delete();
+    }
+
+    @After
+    public void tearDown(){
+        FTDBManager.get().delete();
+        FTSdk.get().shutDown();
     }
 
     /**

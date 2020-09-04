@@ -112,10 +112,10 @@ public class MonitorTest {
     @Test
     public void monitorPeriodTest() throws InterruptedException {
         FTSdk.install(ftSDKConfig);
-        FTMonitor.get().setPeriod(5).start();
-        Thread.sleep(30000);
-        FTMonitor.get().setPeriod(10).start();
-        Thread.sleep(30000);
+        FTMonitor.get().setPeriod(2).start();
+        Thread.sleep(80000);
+        FTMonitor.get().setPeriod(4).start();
+        Thread.sleep(80000);
     }
 
     private void monitorTest(int monitorType) {
