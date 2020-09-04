@@ -63,10 +63,6 @@ public class FTAutoTrackTest extends BaseTest{
         }
         context = MockApplication.getContext();
         SyncTaskManager.get().setRunning(true);
-        try {
-            FTSdk.get().shutDown();
-        } catch (Exception e) {
-        }
         ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL),
                 true,
                 AccountUtils.getProperty(context, AccountUtils.ACCESS_KEY_ID),
