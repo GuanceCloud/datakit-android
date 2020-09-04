@@ -27,7 +27,7 @@ import static com.ft.TestEntrance.hasPrepare;
  * description:
  */
 @RunWith(AndroidJUnit4.class)
-public class OaidTest {
+public class OaidTest extends BaseTest{
     Context context;
     FTSDKConfig ftSDKConfig;
 
@@ -48,12 +48,6 @@ public class OaidTest {
                 .setGeoKey(true, AccountUtils.getProperty(context, AccountUtils.GEO_KEY));
         //关闭数据自动同步操作
         SyncTaskManager.get().setRunning(true);
-    }
-
-    @After
-    public void tearDown(){
-        FTDBManager.get().delete();
-        FTSdk.get().shutDown();
     }
 
     @Test

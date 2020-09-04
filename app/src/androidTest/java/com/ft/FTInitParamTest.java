@@ -32,18 +32,13 @@ import static org.junit.Assert.assertEquals;
  * Description: 用户绑定与解绑测试类
  */
 @RunWith(AndroidJUnit4.class)
-public class FTInitParamTest {
+public class FTInitParamTest extends BaseTest{
     Context context = null;
     int codeScope = 0;
 
     @Before
     public void setUp() {
         context = MockApplication.getContext();
-    }
-
-    @After
-    public void tearDown(){
-        FTDBManager.get().delete();
     }
 
     @Test

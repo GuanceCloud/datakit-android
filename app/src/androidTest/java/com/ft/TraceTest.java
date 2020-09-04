@@ -34,7 +34,7 @@ import static com.ft.sdk.FTNetWorkTracerInterceptor.ZIPKIN_TRACE_ID;
  * description:
  */
 @RunWith(AndroidJUnit4.class)
-public class TraceTest {
+public class TraceTest extends BaseTest{
     Context context;
     FTSDKConfig ftsdkConfig;
 
@@ -52,12 +52,6 @@ public class TraceTest {
                 .setDataWayToken(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_TOKEN))
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setNetworkTrace(true);
-    }
-
-    @After
-    public void tearDown(){
-        FTDBManager.get().delete();
-        FTSdk.get().shutDown();
     }
 
     @Test
