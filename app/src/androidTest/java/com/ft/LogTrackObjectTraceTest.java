@@ -77,10 +77,10 @@ public class LogTrackObjectTraceTest {
     }
 
     @After
-    public void tearDown() {
+    public void tearDown(){
+        FTDBManager.get().delete();
         FTSdk.get().shutDown();
     }
-
     /**
      * 插入一条 log 数据测试
      *

@@ -11,9 +11,11 @@ import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTrack;
 import com.ft.sdk.garble.FTExceptionHandler;
 import com.ft.sdk.garble.SyncCallback;
+import com.ft.sdk.garble.db.FTDBManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,6 +39,11 @@ public class FTInitParamTest {
     @Before
     public void setUp() {
         context = MockApplication.getContext();
+    }
+
+    @After
+    public void tearDown(){
+        FTDBManager.get().delete();
     }
 
     @Test
