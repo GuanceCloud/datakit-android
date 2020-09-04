@@ -84,6 +84,12 @@ public class FTAutoTrackTest {
 
     }
 
+    @After
+    public void tearDown(){
+        FTDBManager.get().delete();
+        FTSdk.get().shutDown();
+    }
+
     @Test
     public void vtpWhiteTest() throws InterruptedException, JSONException {
         ftSDKConfig.setEnableAutoTrackType(FTAutoTrackType.APP_CLICK.type |
@@ -258,11 +264,5 @@ public class FTAutoTrackTest {
             }
         }
         Assert.assertTrue(value);
-    }
-
-
-    @After
-    public void end() {
-        FTDBManager.get().delete();
     }
 }

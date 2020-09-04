@@ -73,6 +73,12 @@ public class LogEventTest {
         FTSdk.install(ftSDKConfig);
     }
 
+    @After
+    public void tearDown(){
+        FTDBManager.get().delete();
+        FTSdk.get().shutDown();
+    }
+
     /**
      * 测试点击某个按钮
      *
@@ -96,6 +102,7 @@ public class LogEventTest {
 
     @Test
     public void leaveTest() throws InterruptedException {
+        onView(withId(R.id.jump17)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);
@@ -139,10 +146,5 @@ public class LogEventTest {
             }
         }
         Assert.assertTrue(value);
-    }
-
-    @After
-    public void end(){
-        FTDBManager.get().delete();
     }
 }

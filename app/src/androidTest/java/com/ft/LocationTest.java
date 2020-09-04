@@ -13,9 +13,11 @@ import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.SyncCallback;
+import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.manager.SyncTaskManager;
 import com.ft.sdk.garble.utils.LocationUtils;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,6 +55,13 @@ public class LocationTest {
         //关闭数据自动同步操作
         SyncTaskManager.get().setRunning(true);
     }
+
+    @After
+    public void tearDown(){
+        FTDBManager.get().delete();
+        FTSdk.get().shutDown();
+    }
+
     Address address;
     @Test
     public void locationTest() throws InterruptedException {

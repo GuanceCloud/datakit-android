@@ -8,10 +8,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.ft.application.MockApplication;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
+import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.manager.SyncTaskManager;
 import com.ft.sdk.garble.utils.OaidUtils;
 import com.ft.sdk.garble.utils.Utils;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,6 +48,12 @@ public class OaidTest {
                 .setGeoKey(true, AccountUtils.getProperty(context, AccountUtils.GEO_KEY));
         //关闭数据自动同步操作
         SyncTaskManager.get().setRunning(true);
+    }
+
+    @After
+    public void tearDown(){
+        FTDBManager.get().delete();
+        FTSdk.get().shutDown();
     }
 
     @Test
