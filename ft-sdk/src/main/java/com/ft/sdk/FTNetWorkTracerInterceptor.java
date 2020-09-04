@@ -58,7 +58,7 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
 
             JSONObject requestContent = buildRequestJsonContent(request);
             JSONObject responseContent = buildResponseJsonContent(response, responseBody, error);
-            boolean isError = response == null || response.code() > 400;
+            boolean isError = response == null || response.code() >= 400;
 
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("requestContent", requestContent);
