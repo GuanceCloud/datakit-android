@@ -5,7 +5,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.db.FTDBConfig;
 import com.ft.sdk.garble.db.FTDBManager;
-import com.ft.sdk.garble.manager.SyncTaskManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;

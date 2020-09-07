@@ -11,41 +11,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-        <Button
-            android:id="@+id/bindUser"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="绑定用户信息" />
-
-        <Button
-            android:id="@+id/unbindUser"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="解绑用户信息" />
-
-        <Button
-            android:id="@+id/changeUser"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="切换用户信息" />
-
-        <Button
-            android:id="@+id/sync_data_background"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="同步数据后台上传" />
-
-        <Button
-            android:id="@+id/jump"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="模拟正确的主动上传埋点数据" />
-
-        <Button
-            android:id="@+id/jump2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="模拟错误的主动埋点数据" />
 
         <Button
             android:id="@+id/jump4"
@@ -75,29 +40,6 @@
             android:layout_height="wrap_content"
             android:text="上传一组日志数据" />
         <Button
-            android:id="@+id/jump10"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="链路上报（正常返回）" />
-
-        <Button
-            android:id="@+id/jump11"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="链路上报(错误返回)" />
-
-        <Button
-            android:id="@+id/jump12"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="链路上报(超时)" />
-
-        <Button
-            android:id="@+id/jump13"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="链路上报(跨线程)" />
-        <Button
             android:id="@+id/jump14"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -117,6 +59,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="页面跳转" />
+        <Button
+            android:id="@+id/jump18"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="仅用于测试用例测试点击产生的日志" />
     </LinearLayout>
 
 

@@ -70,42 +70,6 @@ public class Main2Activity extends AppCompatActivity {
                     , Manifest.permission.BLUETOOTH
                     , Manifest.permission.BLUETOOTH_ADMIN}, 1);
         }
-        findViewById(R.id.bindUser).setOnClickListener(v -> {
-            JSONObject exts = new JSONObject();
-            try {
-                exts.put("sex", "male");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            FTSdk.get().bindUserData("jack", "007", exts);
-        });
-        findViewById(R.id.unbindUser).setOnClickListener(v -> {
-            FTSdk.get().unbindUserData();
-        });
-        findViewById(R.id.changeUser).setOnClickListener(v -> {
-            JSONObject exts = new JSONObject();
-            try {
-                exts.put("sex", "female");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            FTSdk.get().bindUserData("Rose", "000", exts);
-        });
-        findViewById(R.id.jump).setOnClickListener(v -> {
-            trackImmediate();
-        });
-        findViewById(R.id.sync_data_background).setOnClickListener(v -> {
-            JSONObject field = new JSONObject();
-            try {
-                field.put("login", "yes");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            FTTrack.getInstance().trackBackground("mobile_tracker_artificial", null, field);
-        });
-        findViewById(R.id.jump2).setOnClickListener(v -> {
-            trackImmediateErr();
-        });
 
         findViewById(R.id.jump4).setOnClickListener(v -> {
             FTSdk.get().shutDown();
@@ -152,23 +116,6 @@ public class Main2Activity extends AppCompatActivity {
             logDataList.add(new LogData(Thread.currentThread().getName() + ":" + System.currentTimeMillis() + ":" + Main2Activity.class.getName(), Status.CRITICAL));
             FTTrack.getInstance().logBackground(logDataList);
         });
-        findViewById(R.id.jump10).setOnClickListener(v -> {
-            requestUrl("http://www.weather.com.cn/data/sk/101010100.html");
-            requestUrl("https://www.baidu.com");
-        });
-
-        findViewById(R.id.jump11).setOnClickListener(v -> {
-            requestUrl("https://error.url");
-        });
-
-        findViewById(R.id.jump12).setOnClickListener(v -> {
-            requestUrl("https://www.google.com");
-        });
-
-        findViewById(R.id.jump13).setOnClickListener(v -> {
-            requestUrl("https://www.baidu.com");
-            requestUrl("https://www.google.com");
-        });
         Button logThread = findViewById(R.id.jump14);
         logThread.setOnClickListener(v -> {
             logThreadRun = !logThreadRun;
@@ -195,19 +142,21 @@ public class Main2Activity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.jump15).setOnClickListener(v->{
-            Log.d("LogManager", "测试日志数据=======当前时间为" +System.currentTimeMillis());
+        findViewById(R.id.jump15).setOnClickListener(v -> {
+            Log.d("LogManager", "测试日志数据=======当前时间为" + System.currentTimeMillis());
         });
-        findViewById(R.id.jump16).setOnClickListener(v->{
+        findViewById(R.id.jump16).setOnClickListener(v -> {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    int i = 1/0;
+                    int i = 1 / 0;
                 }
             }).start();
         });
-        findViewById(R.id.jump17).setOnClickListener(v->{
-            startActivity(new Intent(this,MainActivity.class));
+        findViewById(R.id.jump17).setOnClickListener(v -> {
+            startActivity(new Intent(this, MainActivity.class));
+        });
+        findViewById(R.id.jump18).setOnClickListener(v -> {
         });
     }
 
