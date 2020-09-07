@@ -99,7 +99,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
         }
     }
 
-    public void release(){
+    public static void release(){
         instance = null;
     }
 }
