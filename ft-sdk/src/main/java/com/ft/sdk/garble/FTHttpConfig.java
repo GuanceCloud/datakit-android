@@ -71,7 +71,7 @@ public class FTHttpConfig {
         }
     }
 
-    public void release() {
+    public static void release() {
         instance = null;
     }
 }

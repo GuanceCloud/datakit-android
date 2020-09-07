@@ -314,7 +314,7 @@ public class FTAutoTrackConfig {
         return "";
     }
 
-    public void release(){
+    public static void release(){
         instance = null;
     }
 }

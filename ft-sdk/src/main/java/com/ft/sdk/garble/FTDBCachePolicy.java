@@ -31,7 +31,7 @@ public class FTDBCachePolicy {
         this.logCacheDiscardStrategy = ftsdkConfig.getLogCacheDiscardStrategy();
     }
 
-    public void release(){
+    public static void release(){
         instance = null;
     }
 

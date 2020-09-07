@@ -55,7 +55,7 @@ public class FTFlowConfig {
         return eventFlowLog;
     }
 
-    public void release() {
+    public static void release() {
         ftFlowChartConfig = null;
     }
 }
