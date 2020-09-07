@@ -121,7 +121,8 @@ public class MonitorTest extends BaseTest{
     private void monitorTest(int monitorType) {
         ftSDKConfig.setMonitorType(monitorType);
         FTSdk.install(ftSDKConfig);
-        SyncTaskManager.get().setRunning(true);
+//        SyncTaskManager.get().setRunning(true);
+        stopSyncTask();
         FTTrack.getInstance().trackBackground("TestMonitor",getJSONObject("tag","tagTest"),getJSONObject("field","fieldTest"));
         try {
             Thread.sleep(1000);

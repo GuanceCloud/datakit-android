@@ -1,6 +1,7 @@
 package com.ft;
 
 import android.content.Context;
+import android.os.Looper;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
@@ -20,6 +21,7 @@ import org.junit.runner.RunWith;
 
 import java.util.List;
 
+import static com.ft.TestEntrance.hasPrepare;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -33,6 +35,10 @@ public class BindUserTest extends BaseTest{
 
     @Before
     public void setUp() {
+        if (!hasPrepare) {
+            Looper.prepare();
+            hasPrepare = true;
+        }
         context = MockApplication.getContext();
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL),
                 true,

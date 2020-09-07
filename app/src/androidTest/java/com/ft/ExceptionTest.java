@@ -78,7 +78,8 @@ public class ExceptionTest extends BaseTest{
                 .setTraceType(TraceType.SKYWALKING_V2)
                 .setOnlySupportMainProcess(true);
         //关闭数据自动同步操作
-        SyncTaskManager.get().setRunning(true);
+//        SyncTaskManager.get().setRunning(true);
+        stopSyncTask();
     }
 
     /**

@@ -20,7 +20,6 @@ import com.ft.sdk.garble.utils.Constants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -62,7 +61,8 @@ public class FTAutoTrackTest extends BaseTest{
             hasPrepare = true;
         }
         context = MockApplication.getContext();
-        SyncTaskManager.get().setRunning(true);
+//        SyncTaskManager.get().setRunning(true);
+        stopSyncTask();
         ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL),
                 true,
                 AccountUtils.getProperty(context, AccountUtils.ACCESS_KEY_ID),
@@ -86,6 +86,8 @@ public class FTAutoTrackTest extends BaseTest{
                 FTAutoTrackType.APP_END.type |
                 FTAutoTrackType.APP_START.type);
         FTSdk.install(ftSDKConfig);
+        removeActivityLifeCycle();
+
         String expect = "Main2Activity/ViewRootImpl/DecorView/LinearLayout/FrameLayout/ActionBarOverlayLayout/ContentFrameLayout/ScrollView/LinearLayout/AppCompatButton/#jump10";
         onView(withId(R.id.jump10)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
@@ -109,6 +111,7 @@ public class FTAutoTrackTest extends BaseTest{
         ftSDKConfig.setEnableAutoTrackType(FTAutoTrackType.APP_END.type |
                 FTAutoTrackType.APP_START.type);
         FTSdk.install(ftSDKConfig);
+        removeActivityLifeCycle();
         String expect = "Main2Activity/ViewRootImpl/DecorView/LinearLayout/FrameLayout/ActionBarOverlayLayout/ContentFrameLayout/ScrollView/LinearLayout/AppCompatButton/#jump10";
         onView(withId(R.id.jump10)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
@@ -137,6 +140,7 @@ public class FTAutoTrackTest extends BaseTest{
                 FTAutoTrackType.APP_START.type)
                 .setBlackActivityClasses(Collections.singletonList(Main2Activity.class));
         FTSdk.install(ftSDKConfig);
+        removeActivityLifeCycle();
         onView(withId(R.id.jump10)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
@@ -161,6 +165,8 @@ public class FTAutoTrackTest extends BaseTest{
                 FTAutoTrackType.APP_START.type)
                 .setWhiteActivityClasses(Collections.singletonList(Main2Activity.class));
         FTSdk.install(ftSDKConfig);
+        removeActivityLifeCycle();
+
         onView(withId(R.id.jump10)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(2000);
@@ -186,6 +192,8 @@ public class FTAutoTrackTest extends BaseTest{
                 .setWhiteActivityClasses(Collections.singletonList(Main2Activity.class))
                 .setBlackViewClasses(Collections.singletonList(Button.class));
         FTSdk.install(ftSDKConfig);
+        removeActivityLifeCycle();
+
         onView(withId(R.id.jump10)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
@@ -211,6 +219,8 @@ public class FTAutoTrackTest extends BaseTest{
                 .setWhiteActivityClasses(Collections.singletonList(Main2Activity.class))
                 .setWhiteViewClasses(Collections.singletonList(Button.class));
         FTSdk.install(ftSDKConfig);
+        removeActivityLifeCycle();
+
         onView(withId(R.id.jump10)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(2000);
@@ -237,6 +247,8 @@ public class FTAutoTrackTest extends BaseTest{
         .setPageVtpDescEnabled(true)
         .addVtpDesc(eventAliasMap());
         FTSdk.install(ftSDKConfig);
+        removeActivityLifeCycle();
+
         Thread.sleep(1000);
         String expect = "链路上报（正常返回）";
         onView(withId(R.id.jump10)).perform(ViewActions.scrollTo()).perform(click());

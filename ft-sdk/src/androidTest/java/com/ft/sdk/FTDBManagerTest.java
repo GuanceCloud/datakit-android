@@ -11,6 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
+import org.powermock.reflect.Whitebox;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -113,7 +114,18 @@ public class FTDBManagerTest {
         tags.put("name", "json");
         JSONObject values = new JSONObject();
         values.put("value", "success");
-        SyncTaskManager.get().setRunning(true);
+//        SyncTaskManager.get().setRunning(true);
+        stopSyncTask();
         FTTrack.getInstance().trackBackground("TestEvent", tags, values);
+    }
+
+
+    private void stopSyncTask() {
+        try {
+            Whitebox.invokeMethod(FTSdk.get(), "setRunning", true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }
