@@ -86,16 +86,16 @@ public class FTSdk {
      * 关闭 SDK 正在做的操作
      */
     public void shutDown() {
-        SyncTaskManager.get().release();
-        FTUserConfig.get().release();
-        FTMonitorConfig.get().release();
-        FTAutoTrackConfig.get().release();
-        FTHttpConfig.get().release();
+        SyncTaskManager.release();
+        FTUserConfig.release();
+        FTMonitorConfig.release();
+        FTAutoTrackConfig.release();
+        FTHttpConfig.release();
         FTNetworkListener.get().release();
-        FTFlowConfig.get().release();
+        FTFlowConfig.release();
         LocationUtils.get().stopListener();
-        FTExceptionHandler.get().release();
-        FTDBCachePolicy.get().release();
+        FTExceptionHandler.release();
+        FTDBCachePolicy.release();
         LogUtils.w(TAG,"FT SDK 已经被关闭");
     }
 

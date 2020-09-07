@@ -222,7 +222,7 @@ public class SyncTaskManager {
 
     }
 
-    public void release() {
+    public static void release() {
         ThreadPoolUtils.get().shutDown();
     }
 }

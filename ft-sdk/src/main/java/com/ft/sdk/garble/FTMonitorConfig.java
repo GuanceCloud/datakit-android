@@ -94,7 +94,7 @@ public class FTMonitorConfig {
     /**
      * 清楚当前监控配置项
      */
-    public void release() {
+    public static void release() {
         SensorUtils.get().release();
         FpsUtils.get().release();
         CameraUtils.get().release();
