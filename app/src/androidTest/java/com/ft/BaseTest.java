@@ -41,4 +41,13 @@ public class BaseTest {
         }
 
     }
+
+    protected void startSyncTask() {
+        try {
+            Whitebox.invokeMethod(SyncTaskManager.get(), "setRunning", false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 }

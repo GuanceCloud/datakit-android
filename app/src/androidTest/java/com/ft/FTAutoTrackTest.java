@@ -15,7 +15,6 @@ import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.db.FTDBManager;
-import com.ft.sdk.garble.manager.SyncTaskManager;
 import com.ft.sdk.garble.utils.Constants;
 
 import org.json.JSONException;
@@ -50,8 +49,8 @@ public class FTAutoTrackTest extends BaseTest{
 
     private Map<String, String> eventAliasMap() {
         Map<String, String> aliasMap = new HashMap<String, String>();
-        aliasMap.put("Main2Activity/ViewRootImpl/DecorView/LinearLayout/FrameLayout/ActionBarOverlayLayout/ContentFrameLayout/ScrollView/LinearLayout/AppCompatButton/#jump10",
-                "链路上报（正常返回）");
+        aliasMap.put("Main2Activity/ViewRootImpl/DecorView/LinearLayout/FrameLayout/ActionBarOverlayLayout/ContentFrameLayout/ScrollView/LinearLayout/AppCompatButton/#jump18",
+                "仅用于测试用例测试点击产生的日志");
         return aliasMap;
     }
     @Before
@@ -88,8 +87,8 @@ public class FTAutoTrackTest extends BaseTest{
         FTSdk.install(ftSDKConfig);
         removeActivityLifeCycle();
 
-        String expect = "Main2Activity/ViewRootImpl/DecorView/LinearLayout/FrameLayout/ActionBarOverlayLayout/ContentFrameLayout/ScrollView/LinearLayout/AppCompatButton/#jump10";
-        onView(withId(R.id.jump10)).perform(ViewActions.scrollTo()).perform(click());
+        String expect = "Main2Activity/ViewRootImpl/DecorView/LinearLayout/FrameLayout/ActionBarOverlayLayout/ContentFrameLayout/ScrollView/LinearLayout/AppCompatButton/#jump18";
+        onView(withId(R.id.jump18)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
@@ -112,8 +111,8 @@ public class FTAutoTrackTest extends BaseTest{
                 FTAutoTrackType.APP_START.type);
         FTSdk.install(ftSDKConfig);
         removeActivityLifeCycle();
-        String expect = "Main2Activity/ViewRootImpl/DecorView/LinearLayout/FrameLayout/ActionBarOverlayLayout/ContentFrameLayout/ScrollView/LinearLayout/AppCompatButton/#jump10";
-        onView(withId(R.id.jump10)).perform(ViewActions.scrollTo()).perform(click());
+        String expect = "Main2Activity/ViewRootImpl/DecorView/LinearLayout/FrameLayout/ActionBarOverlayLayout/ContentFrameLayout/ScrollView/LinearLayout/AppCompatButton/#jump18";
+        onView(withId(R.id.jump18)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
@@ -141,7 +140,7 @@ public class FTAutoTrackTest extends BaseTest{
                 .setBlackActivityClasses(Collections.singletonList(Main2Activity.class));
         FTSdk.install(ftSDKConfig);
         removeActivityLifeCycle();
-        onView(withId(R.id.jump10)).perform(ViewActions.scrollTo()).perform(click());
+        onView(withId(R.id.jump18)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
@@ -167,7 +166,7 @@ public class FTAutoTrackTest extends BaseTest{
         FTSdk.install(ftSDKConfig);
         removeActivityLifeCycle();
 
-        onView(withId(R.id.jump10)).perform(ViewActions.scrollTo()).perform(click());
+        onView(withId(R.id.jump18)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(2000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
@@ -194,7 +193,7 @@ public class FTAutoTrackTest extends BaseTest{
         FTSdk.install(ftSDKConfig);
         removeActivityLifeCycle();
 
-        onView(withId(R.id.jump10)).perform(ViewActions.scrollTo()).perform(click());
+        onView(withId(R.id.jump18)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
@@ -221,7 +220,7 @@ public class FTAutoTrackTest extends BaseTest{
         FTSdk.install(ftSDKConfig);
         removeActivityLifeCycle();
 
-        onView(withId(R.id.jump10)).perform(ViewActions.scrollTo()).perform(click());
+        onView(withId(R.id.jump18)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(2000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
@@ -250,8 +249,8 @@ public class FTAutoTrackTest extends BaseTest{
         removeActivityLifeCycle();
 
         Thread.sleep(1000);
-        String expect = "链路上报（正常返回）";
-        onView(withId(R.id.jump10)).perform(ViewActions.scrollTo()).perform(click());
+        String expect = "仅用于测试用例测试点击产生的日志";
+        onView(withId(R.id.jump18)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);

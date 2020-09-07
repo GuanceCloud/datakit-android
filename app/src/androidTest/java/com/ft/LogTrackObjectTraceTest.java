@@ -48,7 +48,6 @@ public class LogTrackObjectTraceTest extends BaseTest{
             Looper.prepare();
             hasPrepare = true;
         }
-//        SyncTaskManager.get().setRunning(true);
         stopSyncTask();
 
         context = MockApplication.getContext();
@@ -117,6 +116,7 @@ public class LogTrackObjectTraceTest extends BaseTest{
      */
     @Test
     public void logSyncTest() throws InterruptedException, JSONException {
+        startSyncTask();
         FTTrack.getInstance().logBackground("----logUploadTest----", Status.CRITICAL);
         Thread.sleep(12000);
         int except = judgeDBContainTargetLog(DataType.LOG, "----logUploadTest----");
@@ -166,6 +166,7 @@ public class LogTrackObjectTraceTest extends BaseTest{
      */
     @Test
     public void trackSyncTest() throws InterruptedException, JSONException {
+        startSyncTask();
         JSONObject tags = new JSONObject();
         tags.put("testTag", "tagTest");
         JSONObject fields = new JSONObject();
@@ -213,6 +214,7 @@ public class LogTrackObjectTraceTest extends BaseTest{
      */
     @Test
     public void objectSyncTest() throws InterruptedException, JSONException {
+        startSyncTask();
         ObjectBean objectBean = new ObjectBean("objectTest", "----objectUploadTest----");
         FTTrackInner.getInstance().objectBackground(objectBean);
         Thread.sleep(12000);
@@ -263,6 +265,7 @@ public class LogTrackObjectTraceTest extends BaseTest{
         RequestUtil.requestUrl(url);
         Thread.sleep(5000);
         int except1 = judgeDBContainTargetLog(DataType.LOG, except);
+        startSyncTask();
         FTTrack.getInstance().logBackground("----traceDataTest----", Status.CRITICAL);
         Thread.sleep(12000);
         int except2 = judgeDBContainTargetLog(DataType.LOG, except);
