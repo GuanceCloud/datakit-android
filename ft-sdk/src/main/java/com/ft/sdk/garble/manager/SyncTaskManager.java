@@ -39,7 +39,7 @@ public class SyncTaskManager {
      *
      * @param running
      */
-    public void setRunning(boolean running) {
+    private void setRunning(boolean running) {
         this.running = running;
     }
 

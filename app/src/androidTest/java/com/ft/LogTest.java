@@ -42,7 +42,8 @@ public class LogTest extends BaseTest{
             Looper.prepare();
             hasPrepare = true;
         }
-        SyncTaskManager.get().setRunning(true);
+//        SyncTaskManager.get().setRunning(true);
+        stopSyncTask();
         context = MockApplication.getContext();
         ftsdkConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL),
                 true,

@@ -67,7 +67,8 @@ public class LogEventTest extends BaseTest{
                 .setNetworkTrace(true)
                 .setEventFlowLog(true);
         //关闭数据自动同步操作
-        SyncTaskManager.get().setRunning(true);
+//        SyncTaskManager.get().setRunning(true);
+        stopSyncTask();
         FTSdk.install(ftSDKConfig);
     }
 

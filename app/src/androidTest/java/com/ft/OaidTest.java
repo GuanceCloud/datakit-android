@@ -47,7 +47,9 @@ public class OaidTest extends BaseTest{
                 .setUseOAID(true)//设置 OAID 是否可用
                 .setGeoKey(true, AccountUtils.getProperty(context, AccountUtils.GEO_KEY));
         //关闭数据自动同步操作
-        SyncTaskManager.get().setRunning(true);
+//        SyncTaskManager.get().setRunning(true);
+        stopSyncTask();
+
     }
 
     @Test
