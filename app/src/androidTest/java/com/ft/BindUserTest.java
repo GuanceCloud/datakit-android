@@ -39,6 +39,7 @@ public class BindUserTest extends BaseTest{
             Looper.prepare();
             hasPrepare = true;
         }
+        startSyncTask();
         context = MockApplication.getContext();
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL),
                 true,
