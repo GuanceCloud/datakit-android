@@ -187,7 +187,7 @@ public class SyncTaskManager {
      * @param body
      * @param syncCallback
      */
-    public synchronized void requestNet(DataType dataType, String body, final SyncCallback syncCallback) {
+    private synchronized void requestNet(DataType dataType, String body, final SyncCallback syncCallback) {
         String model = Constants.URL_MODEL_TRACK;
         switch (dataType) {
             case KEY_EVENT:
