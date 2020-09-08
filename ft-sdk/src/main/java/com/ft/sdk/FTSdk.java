@@ -96,6 +96,7 @@ public class FTSdk {
         LocationUtils.get().stopListener();
         FTExceptionHandler.release();
         FTDBCachePolicy.release();
+        unregisterActivityLifeCallback();
         LogUtils.w(TAG,"FT SDK 已经被关闭");
     }
 
