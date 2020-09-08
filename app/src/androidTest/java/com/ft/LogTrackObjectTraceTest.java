@@ -12,6 +12,7 @@ import com.ft.sdk.FTTrack;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.FTTrackInner;
+import com.ft.sdk.garble.SyncCallback;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.ObjectBean;
 import com.ft.sdk.garble.bean.RecordData;
@@ -23,11 +24,11 @@ import com.ft.sdk.garble.utils.Constants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.powermock.reflect.Whitebox;
 
 import java.util.List;
 
@@ -297,9 +298,17 @@ public class LogTrackObjectTraceTest extends BaseTest{
         SyncDataManager syncDataManager = new SyncDataManager();
         String body = syncDataManager.getBodyContent(dataType, recordDataList);
         body = body.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION).replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK);
-        SyncTaskManager.get().requestNet(dataType, body, (code, response) -> {
-            Assert.assertEquals(200, code);
-        });
+
+        try {
+            Whitebox.invokeMethod(SyncTaskManager.get(), "requestNet", dataType, body, new SyncCallback() {
+                @Override
+                public void onResponse(int code, String response) {
+                    Assert.assertEquals(200, code);
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
