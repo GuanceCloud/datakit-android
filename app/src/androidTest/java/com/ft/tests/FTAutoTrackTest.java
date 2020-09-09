@@ -6,8 +6,8 @@ import android.widget.Button;
 
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.matcher.ViewMatchers;
+import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-import androidx.test.rule.ActivityTestRule;
 
 import com.ft.AccountUtils;
 import com.ft.BaseTest;
@@ -49,7 +49,8 @@ import static com.ft.AllTests.hasPrepare;
 public class FTAutoTrackTest extends BaseTest {
     Context context;
     @Rule
-    public ActivityTestRule<Main2Activity> rule = new ActivityTestRule<>(Main2Activity.class);
+    public ActivityScenarioRule<Main2Activity> rule = new ActivityScenarioRule<>(Main2Activity.class);
+
     FTSDKConfig ftSDKConfig;
 
     private Map<String, String> eventAliasMap() {
@@ -58,6 +59,7 @@ public class FTAutoTrackTest extends BaseTest {
                 "仅用于测试用例测试点击产生的日志");
         return aliasMap;
     }
+
     @Before
     public void setUp() {
         if (!hasPrepare) {
@@ -248,8 +250,8 @@ public class FTAutoTrackTest extends BaseTest {
         ftSDKConfig.setEnableAutoTrackType(FTAutoTrackType.APP_CLICK.type |
                 FTAutoTrackType.APP_END.type |
                 FTAutoTrackType.APP_START.type)
-        .setPageVtpDescEnabled(true)
-        .addVtpDesc(eventAliasMap());
+                .setPageVtpDescEnabled(true)
+                .addVtpDesc(eventAliasMap());
         FTSdk.install(ftSDKConfig);
         removeActivityLifeCycle();
 

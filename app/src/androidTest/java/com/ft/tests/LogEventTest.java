@@ -5,8 +5,8 @@ import android.os.Looper;
 
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.matcher.ViewMatchers;
+import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-import androidx.test.rule.ActivityTestRule;
 
 import com.ft.AccountUtils;
 import com.ft.BaseTest;
@@ -40,7 +40,8 @@ import static com.ft.AllTests.hasPrepare;
 @RunWith(AndroidJUnit4.class)
 public class LogEventTest extends BaseTest {
     @Rule
-    public ActivityTestRule<Main2Activity> rule = new ActivityTestRule<>(Main2Activity.class);
+    public ActivityScenarioRule<Main2Activity> rule = new ActivityScenarioRule<>(Main2Activity.class);
+
 
     Context context;
     FTSDKConfig ftSDKConfig;

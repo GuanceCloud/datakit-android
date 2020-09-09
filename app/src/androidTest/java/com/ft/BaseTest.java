@@ -1,10 +1,15 @@
 package com.ft;
 
+import android.Manifest;
+
+import androidx.test.rule.GrantPermissionRule;
+
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.manager.SyncTaskManager;
 
 import org.junit.After;
+import org.junit.Rule;
 import org.powermock.reflect.Whitebox;
 
 /**
@@ -13,6 +18,15 @@ import org.powermock.reflect.Whitebox;
  * description:
  */
 public class BaseTest {
+    @Rule
+    public GrantPermissionRule permissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA
+            , Manifest.permission.ACCESS_FINE_LOCATION
+            , Manifest.permission.ACCESS_COARSE_LOCATION
+            , Manifest.permission.READ_PHONE_STATE
+            , Manifest.permission.WRITE_EXTERNAL_STORAGE
+            , Manifest.permission.BLUETOOTH
+            , Manifest.permission.BLUETOOTH_ADMIN);
+
     @After
     public void tearDown() {
         FTDBManager.get().delete();
