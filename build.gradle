@@ -36,8 +36,11 @@ allprojects {
             url "${maven_publish_url}/maven-releases"
         }
     }
-
-
+    configurations.all {
+        resolutionStrategy {
+            force("org.objenesis:objenesis:2.6")
+        }
+    }
 }
 
 
