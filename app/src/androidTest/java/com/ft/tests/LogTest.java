@@ -1,4 +1,4 @@
-package com.ft;
+package com.ft.tests;
 
 
 import android.content.Context;
@@ -7,16 +7,15 @@ import android.util.Log;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.ft.AccountUtils;
+import com.ft.BaseTest;
 import com.ft.application.MockApplication;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.FTDBCachePolicy;
-import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.db.FTDBManager;
-import com.ft.sdk.garble.manager.SyncTaskManager;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,7 +23,7 @@ import org.junit.runner.RunWith;
 
 import java.util.List;
 
-import static com.ft.TestEntrance.hasPrepare;
+import static com.ft.AllTests.hasPrepare;
 
 /**
  * author: huangDianHua
@@ -32,7 +31,7 @@ import static com.ft.TestEntrance.hasPrepare;
  * description:控制台日志测试用例、丢弃策略测试
  */
 @RunWith(AndroidJUnit4.class)
-public class LogTest extends BaseTest{
+public class LogTest extends BaseTest {
     Context context;
     FTSDKConfig ftsdkConfig;
 

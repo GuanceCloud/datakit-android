@@ -1,39 +1,32 @@
-package com.ft;
+package com.ft.tests.base;
 
 import android.content.Context;
-import android.location.Address;
 import android.os.Looper;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.ft.AccountUtils;
+import com.ft.BaseTest;
 import com.ft.application.MockApplication;
-import com.ft.sdk.FTAutoTrackType;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
-import com.ft.sdk.MonitorType;
-import com.ft.sdk.TraceType;
-import com.ft.sdk.garble.SyncCallback;
-import com.ft.sdk.garble.db.FTDBManager;
-import com.ft.sdk.garble.manager.SyncTaskManager;
-import com.ft.sdk.garble.utils.LocationUtils;
+import com.ft.sdk.garble.utils.OaidUtils;
+import com.ft.sdk.garble.utils.Utils;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.concurrent.CountDownLatch;
-
-import static com.ft.TestEntrance.hasPrepare;
+import static com.ft.AllTests.hasPrepare;
 
 /**
  * author: huangDianHua
- * time: 2020/8/27 11:29:04
- * description:测试定位
+ * time: 2020/8/27 13:42:32
+ * description:
  */
 @RunWith(AndroidJUnit4.class)
-public class LocationTest extends BaseTest{
+public class OaidTest extends BaseTest {
     Context context;
     FTSDKConfig ftSDKConfig;
 
@@ -58,21 +51,10 @@ public class LocationTest extends BaseTest{
 
     }
 
-    Address address;
     @Test
-    public void locationTest() throws InterruptedException {
+    public void oaidTest(){
         FTSdk.install(ftSDKConfig);
-        Thread.sleep(2000);
-        CountDownLatch countDownLatch = new CountDownLatch(1);
-        address = null;
-        LocationUtils.get().startLocationCallBack(new SyncCallback() {
-            @Override
-            public void onResponse(int code, String response) {
-                address = LocationUtils.get().getCity();
-                countDownLatch.countDown();
-            }
-        });
-        countDownLatch.await();
-        Assert.assertNotNull(address);
+        String oaid = OaidUtils.getOAID(context);
+        Assert.assertFalse(Utils.isNullOrEmpty(oaid));
     }
 }

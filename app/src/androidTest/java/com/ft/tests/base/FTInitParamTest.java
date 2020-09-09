@@ -1,9 +1,11 @@
-package com.ft;
+package com.ft.tests.base;
 
 import android.content.Context;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.ft.AccountUtils;
+import com.ft.BaseTest;
 import com.ft.application.MockApplication;
 import com.ft.sdk.BuildConfig;
 import com.ft.sdk.FTSDKConfig;
@@ -11,11 +13,9 @@ import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTrack;
 import com.ft.sdk.garble.FTExceptionHandler;
 import com.ft.sdk.garble.SyncCallback;
-import com.ft.sdk.garble.db.FTDBManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +32,7 @@ import static org.junit.Assert.assertEquals;
  * Description: 用户绑定与解绑测试类
  */
 @RunWith(AndroidJUnit4.class)
-public class FTInitParamTest extends BaseTest{
+public class FTInitParamTest extends BaseTest {
     Context context = null;
     int codeScope = 0;
 

@@ -1,4 +1,4 @@
-package com.ft;
+package com.ft.utils;
 
 import androidx.annotation.NonNull;
 

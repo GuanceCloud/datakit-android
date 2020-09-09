@@ -1,10 +1,12 @@
-package com.ft;
+package com.ft.tests;
 
 import android.content.Context;
 import android.os.Looper;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.ft.AccountUtils;
+import com.ft.BaseTest;
 import com.ft.application.MockApplication;
 import com.ft.sdk.FTMonitor;
 import com.ft.sdk.FTSDKConfig;
@@ -13,7 +15,6 @@ import com.ft.sdk.FTTrack;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.db.FTDBManager;
-import com.ft.sdk.garble.manager.SyncTaskManager;
 import com.ft.sdk.garble.utils.Constants;
 
 import org.json.JSONException;
@@ -26,7 +27,7 @@ import org.junit.runner.RunWith;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.ft.TestEntrance.hasPrepare;
+import static com.ft.AllTests.hasPrepare;
 
 /**
  * author: huangDianHua
@@ -34,7 +35,7 @@ import static com.ft.TestEntrance.hasPrepare;
  * description:监控类数据测试
  */
 @RunWith(AndroidJUnit4.class)
-public class MonitorTest extends BaseTest{
+public class MonitorTest extends BaseTest {
     Context context;
     FTSDKConfig ftSDKConfig;
 

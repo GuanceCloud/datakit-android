@@ -1,6 +1,7 @@
-package com.ft
+package com.ft.utils
 
 import android.content.Context
+import com.ft.AccountUtils
 import org.json.JSONArray
 import org.json.JSONObject
 import java.security.InvalidParameterException

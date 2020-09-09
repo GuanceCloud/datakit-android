@@ -71,31 +71,6 @@ public class Main2Activity extends AppCompatActivity {
                     , Manifest.permission.BLUETOOTH_ADMIN}, 1);
         }
 
-        findViewById(R.id.jump4).setOnClickListener(v -> {
-            FTSdk.get().shutDown();
-        });
-        findViewById(R.id.jump5).setOnClickListener(v -> {
-            FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(this, AccountUtils.ACCESS_SERVER_URL),
-                    true,
-                    AccountUtils.getProperty(this, AccountUtils.ACCESS_KEY_ID),
-                    AccountUtils.getProperty(this, AccountUtils.ACCESS_KEY_SECRET))
-                    .setDataWayToken(AccountUtils.getProperty(this, AccountUtils.ACCESS_SERVER_TOKEN))
-                    .setXDataKitUUID("ft-dataKit-uuid-002")
-                    .setUseOAID(true)//设置 OAID 是否可用
-                    .setDebug(true)//设置是否是 debug
-                    .setGeoKey(true, AccountUtils.getProperty(this, AccountUtils.GEO_KEY))
-                    .setNeedBindUser(false)//是否需要绑定用户信息
-                    .enableAutoTrack(true)//设置是否开启自动埋点
-                    .setEventFlowLog(true)
-                    .setDescLog(true)
-                    .setEnableAutoTrackType(FTAutoTrackType.APP_CLICK.type |
-                            FTAutoTrackType.APP_END.type |
-                            FTAutoTrackType.APP_START.type)//设置埋点事件类型的白名单
-                    //.setWhiteActivityClasses(Arrays.asList(MainActivity.class, Main2Activity.class))//设置埋点页面的白名单
-                    //.setWhiteViewClasses(Arrays.asList(Button.class, RadioGroup.class))
-                    .setMonitorType(MonitorType.ALL);//设置监控项
-            FTSdk.install(ftSDKConfig);
-        });
 
         findViewById(R.id.jump6).setOnClickListener(v -> {
             FTSdk.startLocation("", new SyncCallback() {
@@ -104,17 +79,6 @@ public class Main2Activity extends AppCompatActivity {
                     Toast.makeText(Main2Activity.this, "code=" + code + ",response=" + response, Toast.LENGTH_LONG).show();
                 }
             });
-        });
-        findViewById(R.id.jump7).setOnClickListener(v -> {
-            FTTrack.getInstance().logBackground(Thread.currentThread().getName() + ":" + Main2Activity.class.getName(), Status.CRITICAL);
-        });
-        findViewById(R.id.jump8).setOnClickListener(v -> {
-            List<LogData> logDataList = new ArrayList<>();
-            logDataList.add(new LogData(Thread.currentThread().getName() + ":" + System.currentTimeMillis() + ":" + Main2Activity.class.getName(), Status.CRITICAL));
-            logDataList.add(new LogData(Thread.currentThread().getName() + ":" + System.currentTimeMillis() + ":" + Main2Activity.class.getName(), Status.CRITICAL));
-            logDataList.add(new LogData(Thread.currentThread().getName() + ":" + System.currentTimeMillis() + ":" + Main2Activity.class.getName(), Status.CRITICAL));
-            logDataList.add(new LogData(Thread.currentThread().getName() + ":" + System.currentTimeMillis() + ":" + Main2Activity.class.getName(), Status.CRITICAL));
-            FTTrack.getInstance().logBackground(logDataList);
         });
         Button logThread = findViewById(R.id.jump14);
         logThread.setOnClickListener(v -> {
@@ -157,115 +121,6 @@ public class Main2Activity extends AppCompatActivity {
             startActivity(new Intent(this, MainActivity.class));
         });
         findViewById(R.id.jump18).setOnClickListener(v -> {
-        });
-    }
-
-    OkHttpClient client = new OkHttpClient.Builder()
-            .addInterceptor(new FTNetWorkTracerInterceptor())
-            .build();
-
-    private void requestUrl(@NonNull String url) {
-        new Thread() {
-            @Override
-            public void run() {
-                super.run();
-                Request.Builder builder = new Request.Builder().url(url)
-                        .method(RequestMethod.GET.name(), null);
-                try {
-                    client.newCall(builder.build()).execute();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
-    }
-
-    private void traceWithWriteMetrics() {
-        new Thread() {
-            @Override
-            public void run() {
-                super.run();
-                String accessKey_id = "accid";
-                String accessKey_secret = "accsk";
-
-                Date currentTime = new Date();
-                SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss 'GMT'", Locale.UK);
-                sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-                String gmtString = sdf.format(currentTime);
-
-
-                FTNetWorkTracerInterceptor interceptor = new FTNetWorkTracerInterceptor();
-                OkHttpClient client = new OkHttpClient.Builder()
-                        .addInterceptor(interceptor)
-                        .build();
-
-
-                long currentTimeNm = System.currentTimeMillis() * 1000000L;
-                String body = "test_client," +
-                        "device_uuid=$deviceUUID," +
-                        "application_identifier=com.app.identifier," +
-                        "application_name=应用名称," +
-                        "sdk_version=1.0.0-alpha-6881c11," +
-                        "imei=123456789012347," +
-                        "os=Android," +
-                        "os_version=10," +
-                        "locale=zh_CN#Hans," +
-                        "device_band=Google," +
-                        "device_model=Pixel\\ 2," +
-                        "display=1980*1080," +
-                        "carrier=CDMA" +
-                        " event=\"launch\" " + currentTimeNm + "\n";
-
-                String contentType = "text/plain; charset=utf-8";
-
-                String sign = Utils.getHMacSha1(accessKey_secret, "POST" + "\n" + Utils.contentMD5Encode(body) + "\n" + contentType + "\n" + gmtString);
-                String authorization = "DWAY " + accessKey_id + ":" + sign;
-                Request.Builder builder = new Request.Builder().url("http://10.100.64.198:9528/v1/write/metrics?token=tkn_4c4f9f29f39c493199bb5abe7df6af21")
-                        .addHeader("Date", gmtString)
-                        .addHeader("Authorization", authorization)
-                        .addHeader("X-Datakit-UUID", DeviceUtils.getUuid(Main2Activity.this))
-                        .method(RequestMethod.POST.name(), RequestBody.create(null, body));
-
-
-                try {
-                    Response response = client.newCall(builder.build()).execute();
-                    LogUtils.i("test", Objects.requireNonNull(response.body()).string());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
-
-    }
-
-    public void trackImmediate() {
-        JSONObject field = new JSONObject();
-        try {
-            field.put("login", "yes");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        FTTrack.getInstance().trackImmediate("mobile_tracker_artificial", null, field, new SyncCallback() {
-            @Override
-            public void onResponse(int code, String response) {
-                Log.d("onResponse", "code=" + code + ",response=" + response);
-            }
-        });
-    }
-
-    public void trackImmediateErr() {
-        FTTrack.getInstance().trackImmediate("mobile_tracker_artificial", null, null, new SyncCallback() {
-            @Override
-            public void onResponse(int code, String response) {
-                Log.d("onResponse", "code=" + code + ",response=" + response);
-            }
-        });
-
-        FTTrack.getInstance().trackImmediate(null, null, null, new SyncCallback() {
-            @Override
-            public void onResponse(int code, String response) {
-                Log.d("onResponse", "code=" + code + ",response=" + response);
-            }
         });
     }
 

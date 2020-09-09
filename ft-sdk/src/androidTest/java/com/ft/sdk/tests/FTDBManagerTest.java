@@ -1,7 +1,9 @@
-package com.ft.sdk;
+package com.ft.sdk.tests;
 
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.ft.sdk.FTSdk;
+import com.ft.sdk.FTTrack;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.db.FTDBConfig;
 import com.ft.sdk.garble.db.FTDBManager;

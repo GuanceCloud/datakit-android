@@ -1,10 +1,12 @@
-package com.ft;
+package com.ft.tests;
 
 import android.content.Context;
 import android.os.Looper;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.ft.AccountUtils;
+import com.ft.BaseTest;
 import com.ft.application.MockApplication;
 import com.ft.sdk.FTAutoTrack;
 import com.ft.sdk.FTSDKConfig;
@@ -14,14 +16,13 @@ import com.ft.sdk.garble.db.FTDBManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.List;
 
-import static com.ft.TestEntrance.hasPrepare;
+import static com.ft.AllTests.hasPrepare;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -30,7 +31,7 @@ import static org.junit.Assert.assertEquals;
  * Description: 用户绑定与解绑测试类
  */
 @RunWith(AndroidJUnit4.class)
-public class BindUserTest extends BaseTest{
+public class BindUserTest extends BaseTest {
     Context context = null;
 
     @Before

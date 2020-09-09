@@ -1,21 +1,24 @@
-package com.ft;
+package com.ft.tests;
 
 import android.content.Context;
 import android.os.Looper;
 
 import androidx.test.espresso.action.ViewActions;
+import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.ActivityTestRule;
 
+import com.ft.AccountUtils;
+import com.ft.BaseTest;
+import com.ft.Main2Activity;
+import com.ft.R;
 import com.ft.application.MockApplication;
 import com.ft.sdk.FTAutoTrackType;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.db.FTDBManager;
-import com.ft.sdk.garble.manager.SyncTaskManager;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -27,7 +30,7 @@ import java.util.List;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static com.ft.TestEntrance.hasPrepare;
+import static com.ft.AllTests.hasPrepare;
 
 /**
  * author: huangDianHua
@@ -35,7 +38,7 @@ import static com.ft.TestEntrance.hasPrepare;
  * description:事件日志，验证页面是否生成对应的事件数据
  */
 @RunWith(AndroidJUnit4.class)
-public class LogEventTest extends BaseTest{
+public class LogEventTest extends BaseTest {
     @Rule
     public ActivityTestRule<Main2Activity> rule = new ActivityTestRule<>(Main2Activity.class);
 
@@ -79,7 +82,7 @@ public class LogEventTest extends BaseTest{
      */
     @Test
     public void clickLambdaBtnTest() throws InterruptedException {
-        onView(withId(R.id.jump18)).perform(ViewActions.scrollTo()).perform(click());
+        onView(ViewMatchers.withId(R.id.jump18)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);
