@@ -16,19 +16,19 @@ android {
         versionName versionNameStr
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "FT_SDK_VERSION", "\"${versionNameStr}\"")
+        buildConfigField("String", "MIN_FT_PLUGIN_VERSION", "\"${min_plugin_version}\"")
     }
 
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField("String", "FT_SDK_VERSION", "\"${versionNameStr}\"")
-            buildConfigField("String", "MIN_FT_PLUGIN_VERSION", "\"${min_plugin_version}\"")
         }
 
         debug {
-            buildConfigField("String", "FT_SDK_VERSION", "\"${versionNameStr}\"")
-            buildConfigField("String", "MIN_FT_PLUGIN_VERSION", "\"${min_plugin_version}\"")
+
         }
     }
     compileOptions {

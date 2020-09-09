@@ -1,17 +1,17 @@
-package com.ft;
+package com.ft.tests;
 
 import android.content.Context;
 import android.os.Looper;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.ft.AccountUtils;
+import com.ft.BaseTest;
 import com.ft.application.MockApplication;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.TraceType;
-import com.ft.sdk.garble.db.FTDBManager;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,8 +19,8 @@ import org.junit.runner.RunWith;
 
 import okhttp3.Request;
 
-import static com.ft.RequestUtil.requestUrl;
-import static com.ft.TestEntrance.hasPrepare;
+import static com.ft.utils.RequestUtil.requestUrl;
+import static com.ft.AllTests.hasPrepare;
 import static com.ft.sdk.FTNetWorkTracerInterceptor.JAEGER_KEY;
 import static com.ft.sdk.FTNetWorkTracerInterceptor.SKYWALKING_V3_SW_6;
 import static com.ft.sdk.FTNetWorkTracerInterceptor.SKYWALKING_V3_SW_8;
@@ -34,7 +34,7 @@ import static com.ft.sdk.FTNetWorkTracerInterceptor.ZIPKIN_TRACE_ID;
  * description:
  */
 @RunWith(AndroidJUnit4.class)
-public class TraceTest extends BaseTest{
+public class TraceTest extends BaseTest {
     Context context;
     FTSDKConfig ftsdkConfig;
 

@@ -12,33 +12,12 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <Button
-            android:id="@+id/jump4"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="停止 SDK" />
-
-        <Button
-            android:id="@+id/jump5"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="重新配置SDK" />
 
         <Button
             android:id="@+id/jump6"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="即时获取位置信息" />
-        <Button
-            android:id="@+id/jump7"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="上传日志数据" />
-        <Button
-            android:id="@+id/jump8"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="上传一组日志数据" />
         <Button
             android:id="@+id/jump14"
             android:layout_width="match_parent"

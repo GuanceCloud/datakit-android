@@ -1,33 +1,35 @@
-package com.ft;
+package com.ft.tests;
 
 import android.content.Context;
+import android.location.Address;
 import android.os.Looper;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.ft.AccountUtils;
+import com.ft.BaseTest;
 import com.ft.application.MockApplication;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
-import com.ft.sdk.garble.db.FTDBManager;
-import com.ft.sdk.garble.manager.SyncTaskManager;
-import com.ft.sdk.garble.utils.OaidUtils;
-import com.ft.sdk.garble.utils.Utils;
+import com.ft.sdk.garble.SyncCallback;
+import com.ft.sdk.garble.utils.LocationUtils;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static com.ft.TestEntrance.hasPrepare;
+import java.util.concurrent.CountDownLatch;
+
+import static com.ft.AllTests.hasPrepare;
 
 /**
  * author: huangDianHua
- * time: 2020/8/27 13:42:32
- * description:
+ * time: 2020/8/27 11:29:04
+ * description:测试定位
  */
 @RunWith(AndroidJUnit4.class)
-public class OaidTest extends BaseTest{
+public class LocationTest extends BaseTest {
     Context context;
     FTSDKConfig ftSDKConfig;
 
@@ -52,10 +54,21 @@ public class OaidTest extends BaseTest{
 
     }
 
+    Address address;
     @Test
-    public void oaidTest(){
+    public void locationTest() throws InterruptedException {
         FTSdk.install(ftSDKConfig);
-        String oaid = OaidUtils.getOAID(context);
-        Assert.assertFalse(Utils.isNullOrEmpty(oaid));
+        Thread.sleep(2000);
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        address = null;
+        LocationUtils.get().startLocationCallBack(new SyncCallback() {
+            @Override
+            public void onResponse(int code, String response) {
+                address = LocationUtils.get().getCity();
+                countDownLatch.countDown();
+            }
+        });
+        countDownLatch.await();
+        Assert.assertNotNull(address);
     }
 }

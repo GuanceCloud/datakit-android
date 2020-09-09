@@ -1,13 +1,18 @@
-package com.ft;
+package com.ft.tests;
 
 import android.content.Context;
 import android.os.Looper;
 import android.widget.Button;
 
 import androidx.test.espresso.action.ViewActions;
+import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.ActivityTestRule;
 
+import com.ft.AccountUtils;
+import com.ft.BaseTest;
+import com.ft.Main2Activity;
+import com.ft.R;
 import com.ft.application.MockApplication;
 import com.ft.sdk.FTAutoTrackType;
 import com.ft.sdk.FTSDKConfig;
@@ -33,7 +38,7 @@ import java.util.Map;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static com.ft.TestEntrance.hasPrepare;
+import static com.ft.AllTests.hasPrepare;
 
 /**
  * author: huangDianHua
@@ -41,7 +46,7 @@ import static com.ft.TestEntrance.hasPrepare;
  * description:
  */
 @RunWith(AndroidJUnit4.class)
-public class FTAutoTrackTest extends BaseTest{
+public class FTAutoTrackTest extends BaseTest {
     Context context;
     @Rule
     public ActivityTestRule<Main2Activity> rule = new ActivityTestRule<>(Main2Activity.class);
@@ -88,7 +93,7 @@ public class FTAutoTrackTest extends BaseTest{
         removeActivityLifeCycle();
 
         String expect = "Main2Activity/ViewRootImpl/DecorView/LinearLayout/FrameLayout/ActionBarOverlayLayout/ContentFrameLayout/ScrollView/LinearLayout/AppCompatButton/#jump18";
-        onView(withId(R.id.jump18)).perform(ViewActions.scrollTo()).perform(click());
+        onView(ViewMatchers.withId(R.id.jump18)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);

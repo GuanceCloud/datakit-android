@@ -1,10 +1,13 @@
-package com.ft;
+package com.ft.tests;
 
 import android.content.Context;
 import android.os.Looper;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.ft.AccountUtils;
+import com.ft.BaseTest;
+import com.ft.utils.RequestUtil;
 import com.ft.application.MockApplication;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
@@ -32,7 +35,7 @@ import org.powermock.reflect.Whitebox;
 
 import java.util.List;
 
-import static com.ft.TestEntrance.hasPrepare;
+import static com.ft.AllTests.hasPrepare;
 
 /**
  * author: huangDianHua
@@ -40,7 +43,7 @@ import static com.ft.TestEntrance.hasPrepare;
  * description:
  */
 @RunWith(AndroidJUnit4.class)
-public class LogTrackObjectTraceTest extends BaseTest{
+public class LogTrackObjectTraceTest extends BaseTest {
     Context context;
 
     @Before
