@@ -72,14 +72,6 @@ public class Main2Activity extends AppCompatActivity {
         }
 
 
-        findViewById(R.id.jump6).setOnClickListener(v -> {
-            FTSdk.startLocation("", new SyncCallback() {
-                @Override
-                public void onResponse(int code, String response) {
-                    Toast.makeText(Main2Activity.this, "code=" + code + ",response=" + response, Toast.LENGTH_LONG).show();
-                }
-            });
-        });
         Button logThread = findViewById(R.id.jump14);
         logThread.setOnClickListener(v -> {
             logThreadRun = !logThreadRun;
