@@ -6,12 +6,12 @@ def versionNameStr="1.0.3-alpha20"
 def min_plugin_version ="1.0.1-alpha05"
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 
 
     defaultConfig {
         minSdkVersion 23
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 65
         versionName versionNameStr
 
