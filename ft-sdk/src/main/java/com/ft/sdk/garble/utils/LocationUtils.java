@@ -38,6 +38,8 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
  */
 public class LocationUtils {
     public static final String TAG = "LocationUtils";
+    private static final String GEO_IP_ADDRESS_URL = "https://restapi.amap.com/v3/ip";
+    private static final String GEO_CODE_URL = "https://restapi.amap.com/v3/geocode/regeo";
     private Context mContext;
     private static LocationUtils locationUtils;
     private LocationManager mLocationManager;
@@ -87,23 +89,30 @@ public class LocationUtils {
     }
 
     /**
-     * 开始监听位置信息
+     * 检查当前是否有定位权限
+     * @return
      */
-    public void startListener() {
-        if (!FTMonitorConfig.get().isMonitorType(MonitorType.LOCATION)) {
-            return;
-        }
-        startLocationCallBack(null);
-
+    private boolean checkLocationPermission(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             int state = mContext.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
             int state2 = mContext.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION);
-            if (state != PERMISSION_GRANTED || state2 != PERMISSION_GRANTED) {
-                LogUtils.e(TAG, "请先申请位置权限");
-                return;
-            }
+            return state == PERMISSION_GRANTED && state2 == PERMISSION_GRANTED;
         }
-        if (listenerIng && address != null) {
+        return true;
+    }
+
+    /**
+     * 注册位置变化监听器
+     */
+    public synchronized void startListener() {
+        if (!FTMonitorConfig.get().isMonitorType(MonitorType.LOCATION)) {
+            return;
+        }
+        if(!checkLocationPermission()){
+            LogUtils.e(TAG, "请先申请位置权限");
+            return;
+        }
+        if (listenerIng) {
             return;
         }
         List<String> providers = getProviderList();
@@ -118,10 +127,11 @@ public class LocationUtils {
                 mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, locationListener);
             }
         }
+        startLocationCallBack(null);
     }
 
     /**
-     * 停止监听位置信息
+     * 移除位置变化监听器
      */
     public void stopListener() {
         listenerIng = false;
@@ -130,7 +140,7 @@ public class LocationUtils {
     }
 
     /**
-     * 位置信息变化回调
+     * 位置信息变化监听器
      */
     private LocationListener locationListener = new LocationListener() {
         @Override
@@ -140,9 +150,6 @@ public class LocationUtils {
                 String string = "onLocationChanged 方式 纬度为：" + location.getLatitude() + ",经度为：" + location.getLongitude();
                 LogUtils.d(TAG, string);
                 getAddress(location, null);
-                if (mLocation != null) {
-                    stopListener();
-                }
             }
         }
 
@@ -159,7 +166,7 @@ public class LocationUtils {
         }
     };
 
-    public void startLocationCallBack(SyncCallback syncCallback) {
+    public synchronized void startLocationCallBack(SyncCallback syncCallback) {
         if (address != null) {
             callback(syncCallback, 0, "");
             return;
@@ -168,37 +175,34 @@ public class LocationUtils {
         if (isRequest) {
             return;
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            int state = mContext.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
-            int state2 = mContext.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION);
-            if (state != PERMISSION_GRANTED || state2 != PERMISSION_GRANTED) {
-                LogUtils.e(TAG, "请先申请位置权限");
+        if(!checkLocationPermission()){//没有位置权限
+            LogUtils.e(TAG, "请先申请位置权限");
+            if (useGeoKey && !Utils.isNullOrEmpty(geoKey)) {//如果高德 KEY 不为空尝试用高德的基于 IP 的定位
+                new Thread(() -> {
+                    isRequest = true;
+                    requestGeoIPAddress(syncCallback);
+                    isRequest = false;
+                }).start();
+            }else{
                 callback(syncCallback, NetCodeStatus.UNKNOWN_EXCEPTION_CODE, "未能获取到位置权限");
-                if (useGeoKey && !Utils.isNullOrEmpty(geoKey)) {
-                    new Thread(() -> {
-                        isRequest = true;
-                        requestGeoIPAddress(syncCallback);
-                    }).start();
-                }
-                return;
             }
+            return;
         }
-        LogUtils.d(TAG, ">>>>>>>>>>>>>>正在请求定位");
-        Location location = getLastLocation();
+        Location location = getLastLocation();//获取最近一次的定位经纬度
         if (location != null) {
             mLocation = new double[]{location.getLatitude(), location.getLongitude()};
             String string = "getLastLocation 方式 纬度为：" + location.getLatitude() + ",经度为：" + location.getLongitude();
             LogUtils.d(TAG, string);
-            getAddress(location, syncCallback);
-        } else if (useGeoKey && !Utils.isNullOrEmpty(geoKey)) {
+            getAddress(location, syncCallback);//如果经纬度不为空，则调用地址解析 API
+        } else if (useGeoKey && !Utils.isNullOrEmpty(geoKey)) {//如果经纬度为空，且高德的 key 不为空，则尝试用高德 IP 定位
             new Thread(() -> {
                 isRequest = true;
                 requestGeoIPAddress(syncCallback);
                 isRequest = false;
             }).start();
-        } else {
+        } else {//否则提示定位失败
             callback(syncCallback, NetCodeStatus.UNKNOWN_EXCEPTION_CODE, "未能获取到位置信息");
-            LogUtils.d(TAG, ">>>>>>>>>>>>>>地址请求失败");
+            LogUtils.d(TAG, "地址请求失败");
         }
     }
 
@@ -246,20 +250,14 @@ public class LocationUtils {
             @Override
             public void run() {
                 isRequest = true;
-                //用来接收位置的详细信息
                 if (useGeoKey) {
-                    if (geoKey == null || geoKey.isEmpty()) {
+                    if (Utils.isNullOrEmpty(geoKey)) {
                         LogUtils.e(TAG, "使用高德进行地址逆向解析必须先设置 key");
                     } else {
                         requestGeoAddress(location, syncCallback);
                     }
                 } else {
                     requestNative(location, syncCallback);
-                }
-                if (address != null) {
-                    LogUtils.d(TAG, ">>>>>>>>>>>>>>地址[province:" + address.getAdminArea() + ",city:" + address.getLocality() + "]");
-                } else {
-                    LogUtils.d(TAG, ">>>>>>>>>>>>>>地址请求失败");
                 }
                 isRequest = false;
             }
@@ -274,7 +272,7 @@ public class LocationUtils {
      * 使用系统自身API进行地址逆向解析
      * * @param location
      */
-    private int requestNative(Location location, SyncCallback syncCallback) {
+    private void requestNative(Location location, SyncCallback syncCallback) {
         String errorMessage = "";
         int code = 0;
         List<Address> result = null;
@@ -304,15 +302,14 @@ public class LocationUtils {
                 callback(syncCallback, finalCode, finalErrorMessage);
             });
         }
-        return code;
     }
 
     /**
-     * 通过 高德 API 逆向解析地址
+     * 通过高德 API 逆向解析地址
      *
      * @param location
      */
-    private int requestGeoAddress(Location location, SyncCallback syncCallback) {
+    private void requestGeoAddress(Location location, SyncCallback syncCallback) {
         String errorMessage = "";
         int code = 0;
         if (location == null) {
@@ -327,14 +324,14 @@ public class LocationUtils {
             params.put("key", geoKey);
             params.put("radius", 1000);
             ResponseData responseData = HttpBuilder.Builder()
-                    .setHost("https://restapi.amap.com/v3/geocode/regeo")
+                    .setHost(GEO_CODE_URL)
                     .setMethod(RequestMethod.GET)
                     .setParams(params)
                     .useDefaultHead(false)
                     .setShowLog(false)
                     .enableToken(false)
                     .executeSync(ResponseData.class);
-            //LogUtils.d("高德逆向解析地址返回数据：\n" + responseData.getData());
+            //LogUtils.d(TAG,"高德逆向解析地址返回数据：\n" + responseData.getData());
             try {
                 JSONObject geo = new JSONObject(responseData.getData());
                 if (geo.has("regeocode")) {
@@ -375,26 +372,25 @@ public class LocationUtils {
         getHandler().post(() -> {
             callback(syncCallback, finalCode, finalErrorMessage);
         });
-        return code;
     }
 
     /**
-     * 通过 高德 API IP 解析地址
+     * 高德 API 通过 IP 解析地址
      */
-    private int requestGeoIPAddress(SyncCallback syncCallback) {
+    private void requestGeoIPAddress(SyncCallback syncCallback) {
         String errorMessage = "";
         int code = 0;
         HashMap<String, Object> params = new HashMap<String, Object>();
         params.put("key", geoKey);
         ResponseData responseData = HttpBuilder.Builder()
-                .setHost("https://restapi.amap.com/v3/ip")
+                .setHost(GEO_IP_ADDRESS_URL)
                 .setMethod(RequestMethod.GET)
                 .setParams(params)
                 .useDefaultHead(false)
                 .setShowLog(false)
                 .enableToken(false)
                 .executeSync(ResponseData.class);
-        LogUtils.d(TAG, "高德IP地址返回数据：\n" + responseData.getData());
+        //LogUtils.d(TAG, "高德IP地址返回数据：\n" + responseData.getData());
         try {
             if (responseData.getHttpCode() == HttpURLConnection.HTTP_OK) {
                 JSONObject geo = new JSONObject(responseData.getData());
@@ -426,16 +422,10 @@ public class LocationUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (address != null) {
-            LogUtils.d(TAG, ">>>>>>>>>>>>>>高德 IP 解析地址[province:" + address.getAdminArea() + ",city:" + address.getLocality() + "]");
-        } else {
-            LogUtils.d(TAG, ">>>>>>>>>>>>>>高德 IP 解析失败");
-        }
         int finalCode = code;
         String finalErrorMessage = errorMessage;
         getHandler().post(() -> {
             callback(syncCallback, finalCode, finalErrorMessage);
         });
-        return code;
     }
 }
