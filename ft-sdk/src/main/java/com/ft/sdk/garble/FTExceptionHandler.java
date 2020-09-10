@@ -3,10 +3,10 @@ package com.ft.sdk.garble;
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.FTSDKConfig;
-import com.ft.sdk.FTTrack;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.io.PrintWriter;
@@ -25,6 +25,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
     private static FTExceptionHandler instance;
     private Thread.UncaughtExceptionHandler mDefaultExceptionHandler;
     private boolean trackConsoleLog;
+    private boolean isAndroidTest = false;
 
     private FTExceptionHandler() {
         mDefaultExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
@@ -84,22 +85,30 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
         } catch (InterruptedException ex) {
             ex.printStackTrace();
         }
-        if (mDefaultExceptionHandler != null) {
-            try {
-                mDefaultExceptionHandler.uncaughtException(t, e);
-            } catch (Exception ex) {
-            }
-        } else {
-            try {
-                android.os.Process.killProcess(android.os.Process.myPid());
-                System.exit(10);
-            } catch (Exception ex2) {
 
+        if (isAndroidTest) {
+            e.printStackTrace();
+        } else {
+            if (mDefaultExceptionHandler != null) {
+                try {
+
+                    mDefaultExceptionHandler.uncaughtException(t, e);
+                } catch (Exception ex) {
+                }
+            } else {
+                try {
+                    LogUtils.e("BrandonTest", "Close here 2");
+                    android.os.Process.killProcess(android.os.Process.myPid());
+                    System.exit(10);
+                } catch (Exception ex2) {
+
+                }
             }
         }
+
     }
 
-    public static void release(){
+    public static void release() {
         instance = null;
     }
 }
