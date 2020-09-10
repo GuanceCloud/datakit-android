@@ -53,7 +53,10 @@ def getDefaultProperties() {
         properties.setProperty("LDAP_ACCOUNT", userName)
         properties.setProperty("LDAP_PWD", password)
     } else {
-        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        def file =project.rootProject.file('local.properties')
+        if (file.exists()) {
+            properties.load(file.newDataInputStream())
+        }
     }
     return properties
 }
