@@ -18,6 +18,7 @@ import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.TraceType;
+import com.ft.sdk.garble.FTExceptionHandler;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.db.FTDBManager;
 
@@ -26,6 +27,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.powermock.reflect.Whitebox;
 
 import java.util.List;
 
@@ -93,6 +95,7 @@ public class ExceptionTest extends BaseTest {
     @Test
     public void mockExceptionTest() throws InterruptedException {
         FTSdk.install(ftSDKConfig);
+        avoidCrash();
         //产生一个崩溃信息
         onView(ViewMatchers.withId(R.id.jump16)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
@@ -107,6 +110,14 @@ public class ExceptionTest extends BaseTest {
             }
         }
         Assert.assertTrue(value);
+    }
+
+    private void avoidCrash() {
+        try {
+            Whitebox.setInternalState(FTExceptionHandler.get(),"isAndroidTest", true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
