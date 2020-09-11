@@ -3,16 +3,10 @@
     <pagedesc>
         <page
             name="MainActivity"
-            desc="主页面" />
-        <page
-            name="MainActivity.Tab1Fragment"
-            desc="子页面1" />
-        <page
-            name="MainActivity.Tab2Fragment"
-            desc="子页面2" />
+            desc="第二个页面" />
         <page
             name="Main2Activity"
-            desc="第二个页面" />
+            desc="主页面" />
     </pagedesc>
     <vtpdesc>
         <vtp
@@ -27,5 +21,8 @@
         <vtp
             desc="首页菜单栏"
             path="androidx.appcompat.view.menu.MenuItemImpl/2131165265" />
+        <vtp
+            desc="仅用于测试用例测试点击产生的日志"
+            path="Main2Activity/ViewRootImpl/DecorView/LinearLayout/FrameLayout/ActionBarOverlayLayout/ContentFrameLayout/ScrollView/LinearLayout/AppCompatButton/#mock_click_btn"/>
     </vtpdesc>
 </root>

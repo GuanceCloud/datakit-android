@@ -18,8 +18,10 @@ import com.ft.sdk.FTAutoTrackType;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
+import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.db.FTDBManager;
+import com.ft.sdk.garble.manager.SyncDataManager;
 import com.ft.sdk.garble.utils.Constants;
 
 import org.json.JSONException;
@@ -55,8 +57,15 @@ public class FTAutoTrackTest extends BaseTest {
 
     private Map<String, String> eventAliasMap() {
         Map<String, String> aliasMap = new HashMap<String, String>();
-        aliasMap.put("Main2Activity/ViewRootImpl/DecorView/LinearLayout/FrameLayout/ActionBarOverlayLayout/ContentFrameLayout/ScrollView/LinearLayout/AppCompatButton/#jump18",
+        aliasMap.put("Main2Activity/ViewRootImpl/DecorView/LinearLayout/FrameLayout/ActionBarOverlayLayout/ContentFrameLayout/ScrollView/LinearLayout/AppCompatButton/#mock_click_btn",
                 "仅用于测试用例测试点击产生的日志");
+        return aliasMap;
+    }
+
+    private Map<String, String> pageAliasMap() {
+        Map<String, String> aliasMap = new HashMap<String, String>();
+        aliasMap.put("Main2Activity",
+                "主页面");
         return aliasMap;
     }
 
@@ -94,8 +103,8 @@ public class FTAutoTrackTest extends BaseTest {
         FTSdk.install(ftSDKConfig);
         removeActivityLifeCycle();
 
-        String expect = "Main2Activity/ViewRootImpl/DecorView/LinearLayout/FrameLayout/ActionBarOverlayLayout/ContentFrameLayout/ScrollView/LinearLayout/AppCompatButton/#jump18";
-        onView(ViewMatchers.withId(R.id.jump18)).perform(ViewActions.scrollTo()).perform(click());
+        String expect = "Main2Activity/ViewRootImpl/DecorView/LinearLayout/FrameLayout/ActionBarOverlayLayout/ContentFrameLayout/ScrollView/LinearLayout/AppCompatButton/#mock_click_btn";
+        onView(ViewMatchers.withId(R.id.mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
@@ -118,8 +127,8 @@ public class FTAutoTrackTest extends BaseTest {
                 FTAutoTrackType.APP_START.type);
         FTSdk.install(ftSDKConfig);
         removeActivityLifeCycle();
-        String expect = "Main2Activity/ViewRootImpl/DecorView/LinearLayout/FrameLayout/ActionBarOverlayLayout/ContentFrameLayout/ScrollView/LinearLayout/AppCompatButton/#jump18";
-        onView(withId(R.id.jump18)).perform(ViewActions.scrollTo()).perform(click());
+        String expect = "Main2Activity/ViewRootImpl/DecorView/LinearLayout/FrameLayout/ActionBarOverlayLayout/ContentFrameLayout/ScrollView/LinearLayout/AppCompatButton/#mock_click_btn";
+        onView(withId(R.id.mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
@@ -147,7 +156,7 @@ public class FTAutoTrackTest extends BaseTest {
                 .setBlackActivityClasses(Collections.singletonList(Main2Activity.class));
         FTSdk.install(ftSDKConfig);
         removeActivityLifeCycle();
-        onView(withId(R.id.jump18)).perform(ViewActions.scrollTo()).perform(click());
+        onView(withId(R.id.mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
@@ -173,7 +182,7 @@ public class FTAutoTrackTest extends BaseTest {
         FTSdk.install(ftSDKConfig);
         removeActivityLifeCycle();
 
-        onView(withId(R.id.jump18)).perform(ViewActions.scrollTo()).perform(click());
+        onView(withId(R.id.mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(2000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
@@ -200,7 +209,7 @@ public class FTAutoTrackTest extends BaseTest {
         FTSdk.install(ftSDKConfig);
         removeActivityLifeCycle();
 
-        onView(withId(R.id.jump18)).perform(ViewActions.scrollTo()).perform(click());
+        onView(withId(R.id.mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
@@ -227,7 +236,7 @@ public class FTAutoTrackTest extends BaseTest {
         FTSdk.install(ftSDKConfig);
         removeActivityLifeCycle();
 
-        onView(withId(R.id.jump18)).perform(ViewActions.scrollTo()).perform(click());
+        onView(withId(R.id.mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(2000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
@@ -257,7 +266,7 @@ public class FTAutoTrackTest extends BaseTest {
 
         Thread.sleep(1000);
         String expect = "仅用于测试用例测试点击产生的日志";
-        onView(withId(R.id.jump18)).perform(ViewActions.scrollTo()).perform(click());
+        onView(withId(R.id.mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
@@ -272,5 +281,70 @@ public class FTAutoTrackTest extends BaseTest {
             }
         }
         Assert.assertTrue(value);
+    }
+
+    @Test
+    public void vtpDescFromXmlTest() throws InterruptedException, JSONException {
+        ftSDKConfig.setEnableAutoTrackType(FTAutoTrackType.APP_CLICK.type |
+                FTAutoTrackType.APP_END.type |
+                FTAutoTrackType.APP_START.type)
+                .setPageVtpDescEnabled(true);
+        FTSdk.install(ftSDKConfig);
+        removeActivityLifeCycle();
+
+        Thread.sleep(1000);
+        String expect = "仅用于测试用例测试点击产生的日志";
+        onView(withId(R.id.mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
+        //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
+        Thread.sleep(1000);
+        List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
+        boolean value = false;
+        for (RecordData recordData : recordDataList) {
+            JSONObject jsonObject = new JSONObject(recordData.getOpdata());
+            JSONObject fields = jsonObject.getJSONObject(Constants.FIELDS);
+            String vtp = fields.optString("vtp_desc");
+            if (expect.equals(vtp)) {
+                value = true;
+                break;
+            }
+        }
+        Assert.assertTrue(value);
+    }
+
+    @Test
+    public void pageDescTest() throws InterruptedException, JSONException {
+        ftSDKConfig.setEnableAutoTrackType(FTAutoTrackType.APP_CLICK.type |
+                FTAutoTrackType.APP_END.type |
+                FTAutoTrackType.APP_START.type)
+                .setPageVtpDescEnabled(true)
+                .addPageDesc(pageAliasMap());
+        FTSdk.install(ftSDKConfig);
+        Thread.sleep(1000);
+        onView(withId(R.id.mock_page_jump_btn)).perform(ViewActions.scrollTo()).perform(click());
+        //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
+        Thread.sleep(1000);
+        removeActivityLifeCycle();
+        List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
+        SyncDataManager syncDataManager = new SyncDataManager();
+        String content = syncDataManager.getBodyContent(DataType.TRACK, recordDataList);
+        Assert.assertTrue(content.contains("page_desc") && content.contains("主页面"));
+    }
+
+    @Test
+    public void pageDescFromXmlTest() throws InterruptedException, JSONException {
+        ftSDKConfig.setEnableAutoTrackType(FTAutoTrackType.APP_CLICK.type |
+                FTAutoTrackType.APP_END.type |
+                FTAutoTrackType.APP_START.type)
+                .setPageVtpDescEnabled(true);
+        FTSdk.install(ftSDKConfig);
+        Thread.sleep(1000);
+        onView(withId(R.id.mock_page_jump_btn)).perform(ViewActions.scrollTo()).perform(click());
+        //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
+        Thread.sleep(1000);
+        removeActivityLifeCycle();
+        List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
+        SyncDataManager syncDataManager = new SyncDataManager();
+        String content = syncDataManager.getBodyContent(DataType.TRACK, recordDataList);
+        Assert.assertTrue(content.contains("page_desc") && content.contains("主页面"));
     }
 }

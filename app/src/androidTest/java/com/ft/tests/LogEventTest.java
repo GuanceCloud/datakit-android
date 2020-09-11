@@ -83,13 +83,13 @@ public class LogEventTest extends BaseTest {
      */
     @Test
     public void clickLambdaBtnTest() throws InterruptedException {
-        onView(ViewMatchers.withId(R.id.jump18)).perform(ViewActions.scrollTo()).perform(click());
+        onView(ViewMatchers.withId(R.id.mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);
         boolean value = false;
         for (RecordData recordData : recordDataList) {
-            if (recordData.toString().contains("jump18")) {
+            if (recordData.toString().contains("mock_click_btn")) {
                 value = true;
                 break;
             }
@@ -99,7 +99,7 @@ public class LogEventTest extends BaseTest {
 
     @Test
     public void leaveTest() throws InterruptedException {
-        onView(withId(R.id.jump17)).perform(ViewActions.scrollTo()).perform(click());
+        onView(withId(R.id.mock_page_jump_btn)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);
@@ -115,7 +115,7 @@ public class LogEventTest extends BaseTest {
 
     @Test
     public void enterTest() throws InterruptedException {
-        onView(withId(R.id.jump17)).perform(ViewActions.scrollTo()).perform(click());
+        onView(withId(R.id.mock_page_jump_btn)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
         List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);

@@ -72,7 +72,7 @@ public class Main2Activity extends AppCompatActivity {
         }
 
 
-        Button logThread = findViewById(R.id.jump14);
+        Button logThread = findViewById(R.id.mock_period_data_btn);
         logThread.setOnClickListener(v -> {
             logThreadRun = !logThreadRun;
             AtomicLong atomicLong = new AtomicLong(0);
@@ -98,10 +98,10 @@ public class Main2Activity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.jump15).setOnClickListener(v -> {
+        findViewById(R.id.mock_one_data_btn).setOnClickListener(v -> {
             Log.d("LogManager", "测试日志数据=======当前时间为" + System.currentTimeMillis());
         });
-        findViewById(R.id.jump16).setOnClickListener(v -> {
+        findViewById(R.id.mock_crash_btn).setOnClickListener(v -> {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -109,10 +109,10 @@ public class Main2Activity extends AppCompatActivity {
                 }
             }).start();
         });
-        findViewById(R.id.jump17).setOnClickListener(v -> {
+        findViewById(R.id.mock_page_jump_btn).setOnClickListener(v -> {
             startActivity(new Intent(this, MainActivity.class));
         });
-        findViewById(R.id.jump18).setOnClickListener(v -> {
+        findViewById(R.id.mock_click_btn).setOnClickListener(v -> {
         });
     }
 
