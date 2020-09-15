@@ -543,7 +543,7 @@ public class MonitorType {
 ```
 
 ### 五、添加网络追踪
-目前只支持 OKHttp 网络请求追踪
+目前只支持 OKHttp 网络请求追踪,其中支持的 OkHttp 最低版本为 4.0.0-RC1
 
 ```java
 FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(this, [server url]),
