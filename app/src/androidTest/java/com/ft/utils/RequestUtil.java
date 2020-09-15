@@ -26,7 +26,7 @@ public class RequestUtil {
     public static Request requestUrl(@NonNull String url) {
         Request.Builder builder = new Request.Builder().url(url)
                 .method(RequestMethod.GET.name(), null);
-        Request request =null;
+        Request request = null;
         try {
             Response response = client.newCall(builder.build()).execute();
             request = response.request();
@@ -40,7 +40,7 @@ public class RequestUtil {
     public static Response requestUrlResponse(@NonNull String url) {
         Request.Builder builder = new Request.Builder().url(url)
                 .method(RequestMethod.GET.name(), null);
-        Response response =null;
+        Response response = null;
         try {
             response = client.newCall(builder.build()).execute();
         } catch (IOException e) {

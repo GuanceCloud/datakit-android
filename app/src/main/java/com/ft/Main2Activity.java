@@ -6,7 +6,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,37 +13,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.amitshekhar.DebugDB;
 import com.amitshekhar.debug.encrypt.sqlite.DebugDBEncryptFactory;
 import com.amitshekhar.debug.sqlite.DebugDBFactory;
-import com.ft.sdk.FTAutoTrackType;
-import com.ft.sdk.FTNetWorkTracerInterceptor;
-import com.ft.sdk.FTSDKConfig;
-import com.ft.sdk.FTSdk;
-import com.ft.sdk.FTTrack;
-import com.ft.sdk.MonitorType;
-import com.ft.sdk.garble.SyncCallback;
-import com.ft.sdk.garble.bean.LogData;
-import com.ft.sdk.garble.bean.Status;
-import com.ft.sdk.garble.http.RequestMethod;
-import com.ft.sdk.garble.utils.DeviceUtils;
-import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.sdk.garble.utils.Utils;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicLong;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 import static android.content.pm.PackageManager.PERMISSION_DENIED;
 

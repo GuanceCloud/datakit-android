@@ -112,11 +112,10 @@ public class SyncTaskManager {
                             keyEventDataList = queryFromData(DataType.KEY_EVENT);
                         }
                     }
-                    running = false;
                 } catch (Exception e) {
                     e.printStackTrace();
-                    running = false;
                 }finally {
+                    running = false;
                     LogUtils.e(TAG," \n********************************************************\n" +
                             "******************数据同步线程已结束********************\n" +
                             "********************************************************\n");
