@@ -1,13 +1,12 @@
 package com.ft.sdk.garble.utils;
 
 import com.ft.sdk.garble.FTExceptionHandler;
+import com.ft.sdk.garble.http.HttpUrl;
 
 import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-
-import okhttp3.HttpUrl;
 
 /**
  * author: huangDianHua
@@ -64,8 +63,8 @@ public class SkyWalkingUtils {
                 "0-" +
                 Utils.encodeStringToBase64(FTExceptionHandler.get().getTrackServiceName()) + "-" +
                 Utils.encodeStringToBase64(parentServiceUUID + "@" + NetUtils.get().getMobileIpAddress()) + "-" +
-                Utils.encodeStringToBase64(url.encodedPath()) + "-" +
-                Utils.encodeStringToBase64(url.host() + ":" + url.port());
+                Utils.encodeStringToBase64(url.getPath()) + "-" +
+                Utils.encodeStringToBase64(url.getHost() + ":" + url.getPort());
     }
 
     private void createSw6Head(String sampled, long requestTime, HttpUrl url) {
@@ -76,7 +75,7 @@ public class SkyWalkingUtils {
                 Utils.encodeStringToBase64(newParentTraceId) + "-" +
                 "0-" +
                 increasingLong.get() + "-" + increasingLong.get() + "-" +
-                Utils.encodeStringToBase64("#" + url.host() + ":" + url.port()) + "-" +
+                Utils.encodeStringToBase64("#" + url.getHost() + ":" + url.getPort()) + "-" +
                 Utils.encodeStringToBase64("-1") + "-" + Utils.encodeStringToBase64("-1");
     }
 }

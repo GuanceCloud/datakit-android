@@ -8,18 +8,32 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.ft.AccountUtils;
 import com.ft.BaseTest;
 import com.ft.application.MockApplication;
+import com.ft.sdk.FTHttpClientInterceptor;
+import com.ft.sdk.FTHttpClientRequestInterceptor;
+import com.ft.sdk.FTHttpClientResponseInterceptor;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.TraceType;
 
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.EntityBuilder;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
 import okhttp3.Request;
 
-import static com.ft.utils.RequestUtil.requestUrl;
 import static com.ft.AllTests.hasPrepare;
 import static com.ft.sdk.FTNetWorkTracerInterceptor.JAEGER_KEY;
 import static com.ft.sdk.FTNetWorkTracerInterceptor.SKYWALKING_V3_SW_6;
@@ -27,6 +41,7 @@ import static com.ft.sdk.FTNetWorkTracerInterceptor.SKYWALKING_V3_SW_8;
 import static com.ft.sdk.FTNetWorkTracerInterceptor.ZIPKIN_SAMPLED;
 import static com.ft.sdk.FTNetWorkTracerInterceptor.ZIPKIN_SPAN_ID;
 import static com.ft.sdk.FTNetWorkTracerInterceptor.ZIPKIN_TRACE_ID;
+import static com.ft.utils.RequestUtil.requestUrl;
 
 /**
  * author: huangDianHua
@@ -51,6 +66,7 @@ public class TraceTest extends BaseTest {
                 AccountUtils.getProperty(context, AccountUtils.ACCESS_KEY_SECRET))
                 .setDataWayToken(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_TOKEN))
                 .setXDataKitUUID("ft-dataKit-uuid-001")
+                .setTraceSamplingRate(1)
                 .setNetworkTrace(true);
     }
 
@@ -106,5 +122,40 @@ public class TraceTest extends BaseTest {
         Request request = requestUrl("http://www.weather.com.cn/data/sk/101010100.html");
         boolean expect = request.headers().names().contains(SKYWALKING_V3_SW_6);
         Assert.assertTrue(expect);
+    }
+
+    @Test
+    public void traceHttpClientGetTest() throws IOException, InterruptedException, ParseException {
+        FTSdk.install(ftsdkConfig);
+        FTHttpClientInterceptor interceptor = new FTHttpClientInterceptor();
+        CloseableHttpClient httpClient = HttpClients.custom()
+                .addRequestInterceptorFirst(new FTHttpClientRequestInterceptor(interceptor))
+                .addResponseInterceptorLast(new FTHttpClientResponseInterceptor(interceptor))
+                .build();
+        HttpGet httpGet = new HttpGet("http://www.weather.com.cn/data/sk/101010100.html");
+        CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
+        System.out.println("response:" + EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8));
+        httpResponse.close();
+        Thread.sleep(15000);
+    }
+
+    @Test
+    public void traceHttpClientPostTest() throws IOException, InterruptedException, ParseException {
+        startSyncTask();
+        FTSdk.install(ftsdkConfig);
+        FTHttpClientInterceptor interceptor = new FTHttpClientInterceptor();
+        CloseableHttpClient httpClient = HttpClients.custom()
+                .addRequestInterceptorFirst(new FTHttpClientRequestInterceptor(interceptor))
+                .addResponseInterceptorLast(new FTHttpClientResponseInterceptor(interceptor))
+                .build();
+
+        HttpPost httpPost = new HttpPost("https://www.tutorialspoint.com");
+        EntityBuilder builder = EntityBuilder.create();
+        builder.setParameters(new BasicNameValuePair("what", "ouHa.."));
+        httpPost.setEntity(builder.build());
+        CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
+        System.out.println("response:" + EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8));
+        httpResponse.close();
+        Thread.sleep(15000);
     }
 }

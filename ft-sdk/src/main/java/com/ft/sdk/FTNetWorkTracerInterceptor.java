@@ -4,6 +4,7 @@ import com.ft.sdk.garble.FTExceptionHandler;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTTrackInner;
 import com.ft.sdk.garble.bean.LogBean;
+import com.ft.sdk.garble.http.HttpUrl;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.SkyWalkingUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -20,6 +21,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,16 +47,8 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
     public static final String SKYWALKING_V3_SW_8 = "sw8";
     public static final String SKYWALKING_V3_SW_6 = "sw6";
 
-
-    //是否可以采样
-    boolean enableTrace;
-
-    private void uploadNetTrace(Request request, @Nullable Response response, String traceID,
-                                String spanID, String responseBody, String error, long duration, long dateline) {
+    private void uploadNetTrace(FTTraceHandler handler, Request request, @Nullable Response response, String responseBody, String error) {
         try {
-            if (!enableTrace) {
-                return;
-            }
             String operationName = request.method() + "/http";
 
             JSONObject requestContent = buildRequestJsonContent(request);
@@ -63,22 +58,9 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("requestContent", requestContent);
             jsonObject.put("responseContent", responseContent);
-            if (isOverMaxLength(jsonObject.toString())) {
-                return;
-            }
 
             String endPoint = request.url().host() + ":" + request.url().port();
-            LogBean logBean = new LogBean(Constants.USER_AGENT, jsonObject, dateline);
-            logBean.setOperationName(operationName);
-            logBean.setDuration(duration * 1000);
-            logBean.setClazz("tracing");
-            logBean.setSpanType("entry");
-            logBean.setEndpoint(endPoint);
-            logBean.setIsError(String.valueOf(isError));
-            logBean.setServiceName(FTExceptionHandler.get().getTrackServiceName());
-            logBean.setSpanID(spanID);
-            logBean.setTraceID(traceID);
-            FTTrackInner.getInstance().logBackground(logBean);
+            handler.traceDataUpload(jsonObject, operationName, endPoint, isError);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -89,46 +71,22 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
     @Override
     public Response intercept(@NotNull Chain chain) throws IOException {
         Request request = chain.request();
-        enableTrace = Utils.enableTraceSamplingRate();
         if (!FTHttpConfig.get().networkTrace) {
             return chain.proceed(request);
         }
         Response response = null;
         Request.Builder requestBuilder = request.newBuilder();
-        String traceID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
-        String spanID = Utils.getGUID_16();
         Exception exception = null;
-
-        //请求开始时间
-        long requestTime = System.currentTimeMillis();
         Request newRequest = null;
+        FTTraceHandler handler = new FTTraceHandler();
         try {
-            String sampled;
-            //抓取数据内容
-            if (enableTrace) {
-                sampled = "1";
-            } else {
-                sampled = "0";
-            }
-            String parentSpanID = "0000000000000000";
-
-            //在数据中添加标记
-            if (FTHttpConfig.get().traceType == TraceType.ZIPKIN) {
-                requestBuilder.addHeader(ZIPKIN_SPAN_ID, spanID);
-                requestBuilder.addHeader(ZIPKIN_TRACE_ID, traceID);
-                requestBuilder.addHeader(ZIPKIN_SAMPLED, sampled);
-            } else if (FTHttpConfig.get().traceType == TraceType.JAEGER) {
-                requestBuilder.addHeader(JAEGER_KEY, traceID + ":" + spanID + ":" + parentSpanID + ":" + sampled);
-            } else if (FTHttpConfig.get().traceType == TraceType.SKYWALKING_V3) {
-                SkyWalkingUtils skyWalkingUtils = new SkyWalkingUtils(SkyWalkingUtils.SkyWalkingVersion.V3, sampled, requestTime, request.url());
-                traceID = skyWalkingUtils.getNewTraceId();
-                spanID = skyWalkingUtils.getNewParentTraceId() + "0";
-                requestBuilder.addHeader(SKYWALKING_V3_SW_8, skyWalkingUtils.getSw());
-            } else if (FTHttpConfig.get().traceType == TraceType.SKYWALKING_V2) {
-                SkyWalkingUtils skyWalkingUtils = new SkyWalkingUtils(SkyWalkingUtils.SkyWalkingVersion.V2, sampled, requestTime, request.url());
-                traceID = skyWalkingUtils.getNewTraceId();
-                spanID = skyWalkingUtils.getNewParentTraceId() + "0";
-                requestBuilder.addHeader(SKYWALKING_V3_SW_6, skyWalkingUtils.getSw());
+            okhttp3.HttpUrl url = request.url();
+            HttpUrl httpUrl = new HttpUrl(url.host(), url.encodedPath(), url.port());
+            HashMap<String, String> headers = handler.getTraceHeader(httpUrl);
+            Iterator<String> iterator = headers.keySet().iterator();
+            while (iterator.hasNext()) {
+                String key = iterator.next();
+                requestBuilder.addHeader(key, headers.get(key));
             }
             newRequest = requestBuilder.build();
             response = chain.proceed(requestBuilder.build());
@@ -137,12 +95,8 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
             exception = e;
         }
 
-        //请求结束时间
-        long responseTime = System.currentTimeMillis();
-
         if (exception != null) {
-            uploadNetTrace(newRequest, null, traceID, spanID, "", exception.getMessage(),
-                    responseTime - requestTime, requestTime);
+            uploadNetTrace(handler, newRequest, null, "", exception.getMessage());
             throw new IOException(exception);
         } else {
             String responseBody = "";
@@ -157,10 +111,10 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
                         responseBody = new String(bytes, getCharset(contentType));
                         responseBody1 = ResponseBody.create(responseBody1.contentType(), bytes);
                         response = response.newBuilder().body(responseBody1).build();
+                        uploadNetTrace(handler, newRequest, response, responseBody, "");
                     }
                 }
             }
-            uploadNetTrace(newRequest, response, traceID, spanID, responseBody, "", responseTime - requestTime, requestTime);
         }
         return response;
     }
@@ -267,16 +221,4 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
         }
         return false;
     }
-
-    /**
-     * 是否超过 30KB
-     *
-     * @param content
-     * @return
-     */
-    private static boolean isOverMaxLength(String content) {
-        byte[] b = content.getBytes(StandardCharsets.UTF_8);
-        return b.length > 30720;
-    }
-
 }
