@@ -12,6 +12,7 @@ import org.apache.hc.core5.http.HttpException;
 import org.apache.hc.core5.http.HttpRequest;
 import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.HttpEntityWrapper;
 import org.apache.hc.core5.http.message.BasicClassicHttpRequest;
 import org.apache.hc.core5.http.protocol.HttpContext;
 import org.json.JSONArray;
@@ -19,11 +20,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.zip.GZIPInputStream;
 
 /**
  * author: huangDianHua
@@ -51,7 +54,6 @@ public class FTHttpClientInterceptor {
             operationName = request.getMethod() + "/http";
             URI uri = request.getUri();
             endPoint = uri.getHost() + ":" + uri.getPort();
-            System.out.println("host:" + uri.getHost() + "," + "path:" + uri.getPath() + ",port:" + uri.getPort());
             HttpUrl httpUrl = new HttpUrl(uri.getHost(), uri.getPath(), uri.getPort());
             HashMap<String, String> headers = handler.getTraceHeader(httpUrl);
             Iterator<String> iterator = headers.keySet().iterator();
@@ -145,12 +147,27 @@ public class FTHttpClientInterceptor {
             if (response instanceof CloseableHttpResponse) {
                 CloseableHttpResponse httpResponse = (CloseableHttpResponse) response;
                 HttpEntity httpEntity = httpResponse.getEntity();
-                byte[] content = EntityUtils.toByteArray(httpEntity);
-                body = new String(content,StandardCharsets.ISO_8859_1);
+                byte[] content = EntityUtils.toByteArray(httpEntity);//解析出原数据
+
                 HttpEntity newHttpEntity = EntityBuilder.create()
                         .setContentEncoding(httpEntity.getContentEncoding())
-                        .setBinary(content).build();
-                httpResponse.setEntity(newHttpEntity);
+                        .setBinary(content).build();//构建一个供输出内容的HttpEntity
+                String encoding = newHttpEntity.getContentEncoding();
+                if (encoding != null && encoding.equalsIgnoreCase("gzip")) {
+                    HttpEntity tempHttpEntity = new HttpEntityWrapper(newHttpEntity) {
+                        @Override
+                        public InputStream getContent() throws IOException, IllegalStateException {
+                            return new GZIPInputStream(newHttpEntity.getContent());
+                        }
+                    };
+                    body = EntityUtils.toString(tempHttpEntity,StandardCharsets.UTF_8);
+                }else {
+                    body = EntityUtils.toString(newHttpEntity,StandardCharsets.UTF_8);
+                }
+                HttpEntity resultEntity = EntityBuilder.create()
+                        .setContentEncoding(httpEntity.getContentEncoding())
+                        .setBinary(content).build();//重新构建一个原数据范围给原链路
+                httpResponse.setEntity(resultEntity);
             }
 
             JSONObject jbBody = null;
