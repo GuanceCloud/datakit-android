@@ -19,6 +19,10 @@ public class Constants {
      * Android 系统日志类
      */
     public static final String CLASS_NAME_LOG = "android/util/Log";
+    /**
+     * Android WebView 类名
+     */
+    public static final String CLASS_NAME_WEBVIEW = "android/webkit/WebView";
 
     /**
      * SDK 中日志插桩类
@@ -37,4 +41,12 @@ public class Constants {
      * int w(String tag, Throwable tr)
      */
     public static final String METHOD_DESC_S_T_I = "(Ljava/lang/String;Ljava/lang/Throwable;)I";
+    /**
+     * void fun(String url)
+     */
+    public static final String METHOD_DESC_S_V = "(Ljava/lang/String;)V";
+    /**
+     * View
+     */
+    public static final String VIEW_DESC = "Landroid/view/View;";
 }

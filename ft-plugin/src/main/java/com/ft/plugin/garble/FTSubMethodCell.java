@@ -43,4 +43,11 @@ public class FTSubMethodCell {
         this.type = type;
         this.value = value;
     }
+    public FTSubMethodCell(FTMethodType type,String className) {
+        this.type = type;
+        this.className = className;
+    }
+    public FTSubMethodCell(FTMethodType type) {
+        this.type = type;
+    }
 }
