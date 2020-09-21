@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ExpandableListView;
 import android.widget.RadioGroup;
@@ -39,8 +40,10 @@ import com.google.android.material.tabs.TabLayout;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * BY huangDianHua
@@ -795,6 +798,69 @@ public class FTAutoTrack {
             String[] names = arr[0].split("/");
             String pageName = names[names.length - 1];
             addLogging(pageName, OP.OPEN, cost * 1000, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 替换调用系统中的WebView.loadUrl()
+     * @param webView
+     * @param url
+     */
+
+    public static void loadUrl(View webView, String url) {
+        if (webView == null) {
+            throw new NullPointerException("WebView has not initialized.");
+        }
+        setUpWebView(webView);
+        invokeWebViewLoad(webView, "loadUrl", new Object[]{url}, new Class[]{String.class});
+    }
+
+    public static void loadUrl(View webView, String url, Map<String, String> additionalHttpHeaders) {
+        if (webView == null) {
+            throw new NullPointerException("WebView has not initialized.");
+        }
+        setUpWebView(webView);
+        invokeWebViewLoad(webView, "loadUrl", new Object[]{url, additionalHttpHeaders}, new Class[]{String.class, Map.class});
+    }
+
+    public static void loadData(View webView, String data, String mimeType, String encoding) {
+        if (webView == null) {
+            throw new NullPointerException("WebView has not initialized.");
+        }
+        setUpWebView(webView);
+        invokeWebViewLoad(webView, "loadData", new Object[]{data, mimeType, encoding}, new Class[]{String.class, String.class, String.class});
+    }
+
+    public static void loadDataWithBaseURL(View webView, String baseUrl, String data, String mimeType, String encoding, String historyUrl) {
+        if (webView == null) {
+            throw new NullPointerException("WebView has not initialized.");
+        }
+        setUpWebView(webView);
+        invokeWebViewLoad(webView, "loadDataWithBaseURL", new Object[]{baseUrl, data, mimeType, encoding, historyUrl},
+                new Class[]{String.class, String.class, String.class, String.class, String.class});
+    }
+
+    public static void postUrl(View webView, String url, byte[] postData) {
+        if (webView == null) {
+            throw new NullPointerException("WebView has not initialized.");
+        }
+        setUpWebView(webView);
+        invokeWebViewLoad(webView, "postUrl", new Object[]{url, postData},
+                new Class[]{String.class, byte[].class});
+    }
+
+    private static void setUpWebView(View webView){
+        if (webView instanceof WebView) {
+            ((WebView) webView).setWebViewClient(new FTWebViewClient());
+        }
+    }
+    private static void invokeWebViewLoad(View webView, String methodName, Object[] params, Class[] paramTypes) {
+        try {
+            Class<?> clazz = webView.getClass();
+            Method loadMethod = clazz.getMethod(methodName, paramTypes);
+            loadMethod.invoke(webView, params);
         } catch (Exception e) {
             e.printStackTrace();
         }
