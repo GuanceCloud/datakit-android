@@ -23,6 +23,14 @@ public class Constants {
      * Android WebView 类名
      */
     public static final String CLASS_NAME_WEBVIEW = "android/webkit/WebView";
+    /**
+     * OkHttpClient$Builder
+     */
+    public static final String CLASS_NAME_OKHTTP_BUILDER = "okhttp3/OkHttpClient$Builder";
+    /**
+     * org/apache/hc/client5/http/impl/classic/HttpClientBuilder
+     */
+    public static final String CLASS_NAME_HTTP_CLIENT_BUILDER = "org/apache/hc/client5/http/impl/classic/HttpClientBuilder";
 
     /**
      * SDK 中日志插桩类
@@ -49,4 +57,8 @@ public class Constants {
      * View
      */
     public static final String VIEW_DESC = "Landroid/view/View;";
+    /**
+     * OKHttp-Builder
+     */
+    public static final String OKHTTP_BUILDER_DESC = "Lokhttp3/OkHttpClient$Builder;";
 }

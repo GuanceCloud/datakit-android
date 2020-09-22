@@ -37,6 +37,8 @@ import com.ft.sdk.garble.utils.ThreadPoolUtils;
 import com.ft.sdk.garble.utils.Utils;
 import com.google.android.material.tabs.TabLayout;
 
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -44,6 +46,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import okhttp3.OkHttpClient;
 
 /**
  * BY huangDianHua
@@ -804,9 +808,11 @@ public class FTAutoTrack {
     }
 
     /**
-     * 替换调用系统中的WebView.loadUrl()
+     * 插桩方法用来替换调用的 android/webkit/webView.loadUrl 方法，该方法结构谨慎修改，修该后请同步修改
+     * [com.ft.plugin.garble.bytecode.FTMethodAdapter] 类中的 visitMethodInsn 方法中关于该替换内容的部分
      * @param webView
      * @param url
+     * @return
      */
 
     public static void loadUrl(View webView, String url) {
@@ -817,6 +823,14 @@ public class FTAutoTrack {
         invokeWebViewLoad(webView, "loadUrl", new Object[]{url}, new Class[]{String.class});
     }
 
+    /**
+     * 插桩方法用来替换调用的 android/webkit/webView.loadUrl 方法，该方法结构谨慎修改，修该后请同步修改
+     * [com.ft.plugin.garble.bytecode.FTMethodAdapter] 类中的 visitMethodInsn 方法中关于该替换内容的部分
+     * @param webView
+     * @param url
+     * @param additionalHttpHeaders
+     * @return
+     */
     public static void loadUrl(View webView, String url, Map<String, String> additionalHttpHeaders) {
         if (webView == null) {
             throw new NullPointerException("WebView has not initialized.");
@@ -825,6 +839,15 @@ public class FTAutoTrack {
         invokeWebViewLoad(webView, "loadUrl", new Object[]{url, additionalHttpHeaders}, new Class[]{String.class, Map.class});
     }
 
+    /**
+     * 插桩方法用来替换调用的 android/webkit/webView.loadData 方法，该方法结构谨慎修改，修该后请同步修改
+     * [com.ft.plugin.garble.bytecode.FTMethodAdapter] 类中的 visitMethodInsn 方法中关于该替换内容的部分
+     * @param webView
+     * @param data
+     * @param encoding
+     * @param mimeType
+     * @return
+     */
     public static void loadData(View webView, String data, String mimeType, String encoding) {
         if (webView == null) {
             throw new NullPointerException("WebView has not initialized.");
@@ -833,6 +856,15 @@ public class FTAutoTrack {
         invokeWebViewLoad(webView, "loadData", new Object[]{data, mimeType, encoding}, new Class[]{String.class, String.class, String.class});
     }
 
+    /**
+     * 插桩方法用来替换调用的 android/webkit/webView.loadDataWithBaseURL 方法，该方法结构谨慎修改，修该后请同步修改
+     * [com.ft.plugin.garble.bytecode.FTMethodAdapter] 类中的 visitMethodInsn 方法中关于该替换内容的部分
+     * @param webView
+     * @param data
+     * @param encoding
+     * @param mimeType
+     * @return
+     */
     public static void loadDataWithBaseURL(View webView, String baseUrl, String data, String mimeType, String encoding, String historyUrl) {
         if (webView == null) {
             throw new NullPointerException("WebView has not initialized.");
@@ -842,6 +874,13 @@ public class FTAutoTrack {
                 new Class[]{String.class, String.class, String.class, String.class, String.class});
     }
 
+    /**
+     * 插桩方法用来替换调用的 android/webkit/webView.postUrl 方法，该方法结构谨慎修改，修该后请同步修改
+     * [com.ft.plugin.garble.bytecode.FTMethodAdapter] 类中的 visitMethodInsn 方法中关于该替换内容的部分
+     * @param webView
+     * @param url
+     * @return
+     */
     public static void postUrl(View webView, String url, byte[] postData) {
         if (webView == null) {
             throw new NullPointerException("WebView has not initialized.");
@@ -864,5 +903,29 @@ public class FTAutoTrack {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 插桩方法用来替换调用的 OkHttpClient.Builder.build() 方法，该方法结构谨慎修改，修该后请同步修改
+     * [com.ft.plugin.garble.bytecode.FTMethodAdapter] 类中的 visitMethodInsn 方法中关于该替换内容的部分
+     * @param builder
+     * @return
+     */
+    public static OkHttpClient trackOkHttpBuilder(OkHttpClient.Builder builder){
+        builder.addInterceptor(new FTNetWorkTracerInterceptor());
+        return builder.build();
+    }
+
+    /**
+     * 插桩方法用来替换调用的 org/apache/hc/client5/http/impl/classic/HttpClientBuilder.build() 方法，该方法结构谨慎修改，修该后请同步修改
+     * [com.ft.plugin.garble.bytecode.FTMethodAdapter] 类中的 visitMethodInsn 方法中关于该替换内容的部分
+     * @param builder
+     * @return
+     */
+    public static CloseableHttpClient trackHttpClientBuilder(HttpClientBuilder builder){
+        FTHttpClientInterceptor interceptor = new FTHttpClientInterceptor();
+        builder.addRequestInterceptorFirst(new FTHttpClientRequestInterceptor(interceptor));
+        builder.addResponseInterceptorLast(new FTHttpClientResponseInterceptor(interceptor));
+        return builder.build();
     }
 }
