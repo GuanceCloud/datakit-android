@@ -140,7 +140,19 @@ public class FTMethodAdapter extends AdviceAdapter {
 
     @Override
     public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
-        if (Constants.CLASS_NAME_WEBVIEW.equals(owner)) {//替换系统中调用 WebView 的加载链接方法
+        if (Constants.CLASS_NAME_HTTP_CLIENT_BUILDER.equals(owner)) {//替换调用 org/apache/hc/client5/http/impl/classic/HttpClientBuilder.build() 的方法
+            if ("build()Lorg/apache/hc/client5/http/impl/classic/CloseableHttpClient;".contains(name+desc)) {
+                mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_API, "trackHttpClientBuilder", "(Lorg/apache/hc/client5/http/impl/classic/HttpClientBuilder;)Lorg/apache/hc/client5/http/impl/classic/CloseableHttpClient;", false);
+            }else {
+                super.visitMethodInsn(opcode, owner, name, desc, itf);
+            }
+        } else if (Constants.CLASS_NAME_OKHTTP_BUILDER.equals(owner)) {//替换调用 OkHttpClient.Builder.build() 的方法
+            if ("build()Lokhttp3/OkHttpClient;".contains(name+desc)) {
+                mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_API, "trackOkHttpBuilder", "(Lokhttp3/OkHttpClient$Builder;)Lokhttp3/OkHttpClient;", false);
+            }else {
+                super.visitMethodInsn(opcode, owner, name, desc, itf);
+            }
+        } else if (Constants.CLASS_NAME_WEBVIEW.equals(owner)) {//替换系统中调用 WebView 的加载链接方法
             if (TARGET_WEBVIEW_METHOD.contains(name + desc) && !Constants.FT_SDK_API.equals(className)) {
                 mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_API, name, desc.replaceFirst("\\(", "(" + Constants.VIEW_DESC), itf);
             } else {

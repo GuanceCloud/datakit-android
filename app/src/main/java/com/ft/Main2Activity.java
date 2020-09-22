@@ -13,8 +13,23 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.amitshekhar.DebugDB;
 import com.amitshekhar.debug.encrypt.sqlite.DebugDBEncryptFactory;
 import com.amitshekhar.debug.sqlite.DebugDBFactory;
+import com.ft.sdk.garble.http.RequestMethod;
+import com.ft.sdk.garble.utils.LogUtils;
 
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 import static android.content.pm.PackageManager.PERMISSION_DENIED;
 
@@ -22,6 +37,23 @@ import static android.content.pm.PackageManager.PERMISSION_DENIED;
 public class Main2Activity extends AppCompatActivity {
     public static final String TAG = "Main2Activity";
     boolean logThreadRun = false;
+    static OkHttpClient client = new OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .build();
+
+    public static Request requestUrl(@NonNull String url) {
+        Request.Builder builder = new Request.Builder().url(url)
+                .method(RequestMethod.GET.name(), null);
+        Request request = null;
+        try {
+            Response response = client.newCall(builder.build()).execute();
+            request = response.request();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return request;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +115,35 @@ public class Main2Activity extends AppCompatActivity {
             startActivity(new Intent(this, MainActivity.class));
         });
         findViewById(R.id.mock_click_btn).setOnClickListener(v -> {
+        });
+
+        findViewById(R.id.mock_okhttp_btn).setOnClickListener(v -> {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    //通过查看请求头查看是否替换调用 OkHttpClient.Builder.build 方法成功
+                    Request request = requestUrl("http://www.weather.com.cn/data/sk/101010100.html");
+                    LogUtils.d("Main2Activity", "header=" + request.headers().toString());
+                }
+            }).start();
+        });
+
+        findViewById(R.id.mock_httpclient_btn).setOnClickListener(v -> {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        CloseableHttpClient httpClient = HttpClients.custom()
+                                .build();
+                        HttpGet httpGet = new HttpGet("http://www.weather.com.cn/data/sk/101010100.html");
+                        CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
+                        System.out.println("response:" + EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8));
+                        httpResponse.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
         });
     }
 

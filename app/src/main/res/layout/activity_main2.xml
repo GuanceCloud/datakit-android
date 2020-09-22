@@ -38,6 +38,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="仅用于测试用例测试点击产生的日志" />
+        <Button
+            android:id="@+id/mock_okhttp_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="测试 OkHttp 请求自动添加拦截器" />
+
+        <Button
+            android:id="@+id/mock_httpclient_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="测试 HttpClient5 请求自动添加拦截器" />
     </LinearLayout>
 
 
