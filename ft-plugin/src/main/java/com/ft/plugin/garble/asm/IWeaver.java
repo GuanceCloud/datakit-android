@@ -9,7 +9,19 @@ import java.io.InputStream;
  * Description:
  */
 public interface IWeaver {
+    /**
+     * 判断传入的类路径的类是否可以被修改
+     * @param filePath
+     * @return
+     * @throws IOException
+     */
     boolean isWeavableClass(String filePath) throws IOException;
 
+    /**
+     * 修改传入的类的流，然后输出新的类的字节流
+     * @param inputStream
+     * @return
+     * @throws IOException
+     */
     byte[] weaverSingleClassToByteArray(InputStream inputStream) throws IOException;
 }

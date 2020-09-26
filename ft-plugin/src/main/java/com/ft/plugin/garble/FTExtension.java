@@ -6,8 +6,8 @@ package com.ft.plugin.garble;
  * Description:
  */
 public class FTExtension {
-    public boolean showLog = false;
-    public boolean openAutoTrack = true;
+    public boolean showLog = false;//是否显示日志
+    public boolean openAutoTrack = true;//是否打开自动track
 
     @Override
     public String toString() {

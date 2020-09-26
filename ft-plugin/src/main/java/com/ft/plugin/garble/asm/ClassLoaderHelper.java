@@ -21,6 +21,14 @@ import java.util.Collection;
  * Description:
  */
 public class ClassLoaderHelper {
+    /**
+     * 获取包含所有 class 文件的 ClassLoader
+     * @param inputs
+     * @param referencedInputs
+     * @param project
+     * @return
+     * @throws MalformedURLException
+     */
     public static URLClassLoader getClassLoader(Collection<TransformInput> inputs,
                                                 Collection<TransformInput> referencedInputs,
                                                 Project project) throws MalformedURLException {

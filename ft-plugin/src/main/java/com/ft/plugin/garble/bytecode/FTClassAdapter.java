@@ -53,10 +53,19 @@ public class FTClassAdapter extends ClassVisitor {
         //Logger.info(">>>> start scan class ----> " + className + ", superName=" + superName);
     }
 
+    /**
+     * 访问类中定义的字段
+     * @param access
+     * @param name
+     * @param desc
+     * @param signature
+     * @param value
+     * @return
+     */
     @Override
     public FieldVisitor visitField(int access, String name, String desc, String signature, Object value) {
-        if (ClassNameAnalytics.isFTSdkApi(className.replaceAll("/", "."))) {
-            if (name.equals("AGENT_VERSION")) {
+        if (ClassNameAnalytics.isFTSdkApi(className.replaceAll("/", "."))) {//判断是否是 FTSdk 类
+            if (name.equals("AGENT_VERSION")) {//获得 AGENT_VERSION 判断是否高于最低版本
                 String agentVersion = (String) value;
                 if (!VersionUtils.firstVerGreaterEqual(agentVersion, BuildConfig.MIN_SDK_VERSION)) {
                     String errorTip = "你目前集成的 FT SDK 的版本为 " + agentVersion + ",当前插件支持 SDK 的最低版本为 " + BuildConfig.MIN_SDK_VERSION
@@ -64,7 +73,7 @@ public class FTClassAdapter extends ClassVisitor {
                     throw new Error(errorTip);
                 }
             }
-            if (name.equals("PLUGIN_MIN_VERSION")) {
+            if (name.equals("PLUGIN_MIN_VERSION")) {// 获取 PLUGIN_MIN_VERSION 判断是否高于支持的最低版本
                 String pluginMinVersion = (String) value;
                 if (!VersionUtils.firstVerGreaterEqual(BuildConfig.PLUGIN_VERSION, pluginMinVersion)) {
                     String errorTip = "你目前集成的 FT Plugin 的版本为 " + BuildConfig.PLUGIN_VERSION + ",当前 SDK 支持的插件的最低版本为 " + pluginMinVersion
@@ -76,6 +85,15 @@ public class FTClassAdapter extends ClassVisitor {
         return super.visitField(access, name, desc, signature, value);
     }
 
+    /**
+     * 访问类方法
+     * @param access
+     * @param name
+     * @param desc
+     * @param signature
+     * @param exceptions
+     * @return
+     */
     @Override
     public MethodVisitor visitMethod(final int access, final String name,
                                      final String desc, final String signature, final String[] exceptions) {

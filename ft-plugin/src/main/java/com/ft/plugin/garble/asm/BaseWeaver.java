@@ -93,6 +93,12 @@ public class BaseWeaver implements IWeaver{
         this.classLoader = classLoader;
     }
 
+    /**
+     * 读取类文件，对文件修改然后生成新的类文件
+     * @param inputStream
+     * @return
+     * @throws IOException
+     */
     @Override
     public byte[] weaverSingleClassToByteArray(InputStream inputStream) throws IOException {
         ClassReader classReader = new ClassReader(inputStream);
@@ -115,7 +121,7 @@ public class BaseWeaver implements IWeaver{
     }
 
     /**
-     * 需要插桩的类
+     * 排除 R 类和 BuildConfig 类
      * @param fullQualifiedClassName
      * @return
      */

@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * From https://github.com/Leaking/Hunter/blob/master/hunter-transform/src/main/java/com/quinn/hunter/transform/asm/ExtendClassWriter.java
  * DATE:2019-11-29 14:20
- * Description:
+ * Description: 用于创建一个新的 Class 文件
  */
 public class ExtendClassWriter extends ClassWriter {
     private static final String OBJECT = "java/lang/Object";
