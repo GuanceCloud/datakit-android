@@ -39,6 +39,7 @@ import java.util.List;
 /**
  * 本类借鉴修改了来自 Sensors Data 的项目 https://github.com/sensorsdata/sa-sdk-android-plugin2
  * 中的 SensorsAnalyticsClassVisitor.groovy 类
+ * 访问类方法结构
  */
 public class FTMethodAdapter extends AdviceAdapter {
     private FTTransformHelper ftTransformHelper;
@@ -133,6 +134,9 @@ public class FTMethodAdapter extends AdviceAdapter {
         }
     }
 
+    /**
+     * WebView 中包含的所有加载方式
+     */
     private static final List<String> TARGET_WEBVIEW_METHOD = Arrays.asList("loadUrl(Ljava/lang/String;)V", "loadUrl(Ljava/lang/String;Ljava/util/Map;)V",
             "loadData(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
             "loadDataWithBaseURL(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
@@ -230,6 +234,10 @@ public class FTMethodAdapter extends AdviceAdapter {
         super.onMethodExit(opcode);
     }
 
+    /**
+     * 修改方法内容的通用方式
+     * @param ftMethodCell
+     */
     void handleCode(FTMethodCell ftMethodCell) {
         if (ftMethodCell.subMethodCellList != null && !ftMethodCell.subMethodCellList.isEmpty()) {
             for (FTSubMethodCell f : ftMethodCell.subMethodCellList) {
