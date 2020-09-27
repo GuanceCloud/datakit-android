@@ -1,2 +1,2 @@
-include ':app', ':ft-plugin', ':ft-sdk'
+include ':app', ':ft-plugin', ':ft-sdk',':ft-native'
 rootProject.name='ft-sdk-android'
