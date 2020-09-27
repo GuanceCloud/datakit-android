@@ -86,9 +86,9 @@ static void uploadCrash(char *crash) {
     if (!env) {
         return;
     }
-    jclass ftExceptionHandler = env->FindClass("com/ft/sdk/garble/FTExceptionHandler");
+    jclass ftExceptionHandler = env->FindClass("com/ft/sdk/nativelib/ExceptionHandler");
     jmethodID getMid = env->GetStaticMethodID(ftExceptionHandler, "get",
-                                              "()Lcom/ft/sdk/garble/FTExceptionHandler;");
+                                              "()Lcom/ft/sdk/nativelib/ExceptionHandler;");
     jobject job = env->CallStaticObjectMethod(ftExceptionHandler, getMid);
     jmethodID uploadMid = env->GetMethodID(ftExceptionHandler, "uploadNativeCrashLog",
                                            "(Ljava/lang/String;)V");
@@ -255,7 +255,7 @@ static void initializeNativeCrashHandler() {
 /// Jni bindings
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_ft_sdk_garble_FTExceptionHandler_registerSignalHandler(
+Java_com_ft_sdk_nativelib_ExceptionHandler_registerSignalHandler(
         JNIEnv *env,
         jobject /* this */) {
 
@@ -263,7 +263,7 @@ Java_com_ft_sdk_garble_FTExceptionHandler_registerSignalHandler(
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_ft_sdk_garble_FTExceptionHandler_unRegisterSignalHandler(
+Java_com_ft_sdk_nativelib_ExceptionHandler_unRegisterSignalHandler(
         JNIEnv *env,
         jobject /* this */) {
     deinitializeNativeCrashHandler();
@@ -278,7 +278,7 @@ public:
 };
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_ft_sdk_garble_FTExceptionHandler_crashAndGetExceptionMessage(
+Java_com_ft_sdk_nativelib_ExceptionHandler_crashAndGetExceptionMessage(
         JNIEnv *env,
         jobject /* this */) {
     throw MyException(); // This can be replaced with any foreign function call that throws.

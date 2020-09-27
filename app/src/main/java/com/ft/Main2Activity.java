@@ -15,6 +15,7 @@ import com.amitshekhar.debug.encrypt.sqlite.DebugDBEncryptFactory;
 import com.amitshekhar.debug.sqlite.DebugDBFactory;
 import com.ft.sdk.garble.FTExceptionHandler;
 import com.ft.sdk.garble.http.RequestMethod;
+import com.ft.sdk.garble.reflect.ReflectUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 
 import org.apache.hc.client5.http.classic.methods.HttpGet;
@@ -113,7 +114,7 @@ public class Main2Activity extends AppCompatActivity {
             }).start();
         });
         findViewById(R.id.mock_crash_native_btn).setOnClickListener(v->{
-            FTExceptionHandler.get().crashAndGetExceptionMessage();
+            ReflectUtils.reflectCrashAndGetExceptionMessage();
         });
         findViewById(R.id.mock_page_jump_btn).setOnClickListener(v -> {
             startActivity(new Intent(this, MainActivity.class));
