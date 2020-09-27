@@ -20,11 +20,6 @@ android {
         buildConfigField("String", "FT_SDK_VERSION", "\"${versionNameStr}\"")
         buildConfigField("String", "MIN_FT_PLUGIN_VERSION", "\"${min_plugin_version}\"")
 
-        externalNativeBuild {
-            cmake {
-                cppFlags ""
-            }
-        }
     }
 
     buildTypes {
@@ -37,16 +32,14 @@ android {
 
         }
     }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+    }
     compileOptions {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
-    }
-
-    externalNativeBuild {
-        cmake {
-            path "src/main/cpp/CMakeLists.txt"
-            version "3.10.2"
-        }
     }
 }
 
