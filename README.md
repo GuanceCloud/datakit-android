@@ -6,11 +6,13 @@
 
 **Agent**
 
-[![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Fmvnrepo.jiagouyun.com%2Frepository%2Fmaven-releases%2Fcom%2Fcloudcare%2Fft%2Fmobile%2Fsdk%2Ftracker%2Fagent%2Fft-sdk%2Fmaven-metadata.xml)](https://mvnrepo.jiagouyun.com/repository/maven-releases/com/cloudcare/ft/mobile/sdk/tracker/agent/ft-sdk/maven-metadata.xml)
+[![Maven metadata URL](https://img.shields.io/maven-metadata/v?label=ft-sdk&metadataUrl=https%3A%2F%2Fmvnrepo.jiagouyun.com%2Frepository%2Fmaven-releases%2Fcom%2Fcloudcare%2Fft%2Fmobile%2Fsdk%2Ftracker%2Fagent%2Fft-sdk%2Fmaven-metadata.xml)](https://mvnrepo.jiagouyun.com/repository/maven-releases/com/cloudcare/ft/mobile/sdk/tracker/agent/ft-sdk/maven-metadata.xml)
+
+[![Maven metadata URL](https://img.shields.io/maven-metadata/v?label=ft-native&metadataUrl=https%3A%2F%2Fmvnrepo.jiagouyun.com%2Frepository%2Fmaven-releases%2Fcom%2Fcloudcare%2Fft%2Fmobile%2Fsdk%2Ftracker%2Fagent%2Fft-native%2Fmaven-metadata.xml)](https://mvnrepo.jiagouyun.com/repository/maven-releases/com/cloudcare/ft/mobile/sdk/tracker/agent/ft-native/maven-metadata.xml)
 
 **Plugin**
 
-[![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Fmvnrepo.jiagouyun.com%2Frepository%2Fmaven-releases%2Fcom%2Fcloudcare%2Fft%2Fmobile%2Fsdk%2Ftracker%2Fplugin%2Fft-plugin%2Fmaven-metadata.xml)](https://mvnrepo.jiagouyun.com/repository/maven-releases/com/cloudcare/ft/mobile/sdk/tracker/plugin/ft-plugin/maven-metadata.xml)
+[![Maven metadata URL](https://img.shields.io/maven-metadata/v?label=ft-plugin&metadataUrl=https%3A%2F%2Fmvnrepo.jiagouyun.com%2Frepository%2Fmaven-releases%2Fcom%2Fcloudcare%2Fft%2Fmobile%2Fsdk%2Ftracker%2Fplugin%2Fft-plugin%2Fmaven-metadata.xml)](https://mvnrepo.jiagouyun.com/repository/maven-releases/com/cloudcare/ft/mobile/sdk/tracker/plugin/ft-plugin/maven-metadata.xml)
 
 ## 安装
 ### 1. DataFlux SDK 支持 Android 的最低版本为 23（即 Android 6.0）
@@ -47,6 +49,8 @@ allprojects {
 dependencies {
     //添加 DataFlux SDK 的依赖
     implementation 'com.cloudcare.ft.mobile.sdk.tracker.agent:ft-sdk:$last_version'
+    //捕获 native 层崩溃信息的依赖，需要配合 ft-sdk 使用不能单独使用
+    implementation 'com.cloudcare.ft.mobile.sdk.tracker.agent:ft-native:$last_version'
 }
 //应用插件
 apply plugin: 'ft-plugin'
@@ -57,6 +61,15 @@ FTExt {
 }
 android{
 	//...省略部分代码
+	defaultConfig {
+        //...省略部分代码
+        ndk {
+            //当使用 ft-native 捕获 native 层的崩溃信息时，应该根据应用适配的不同的平台
+            //来选择支持的 abi 架构，目前 ft-native 中包含的 abi 架构有 'arm64-v8a',
+            // 'armeabi-v7a', 'x86', 'x86_64'
+            abiFilters 'armeabi-v7a'
+        }
+    }
     compileOptions {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
@@ -76,6 +89,8 @@ android{
 -keep enum com.ft.sdk.FTAutoTrackType{*;}
 -keep enum com.ft.sdk.FTSdk{*;}
 -keep class com.ft.sdk.garble.utils.TrackLog{*;}
+-keep class com.ft.sdk.nativelib.ExceptionHandler{*;}
+-keep class com.ft.sdk.garble.FTExceptionHandler{*;}
 ```
 > 注意：如果你的项目中开启了全埋点和流程图，那么需要将你的 Fragment 和 Activity 保持不被混淆，这样流程图中
 > 就会显示页面的真实名称，而不是混淆后的名称
