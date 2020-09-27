@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.Status;
+import com.ft.sdk.garble.reflect.ReflectUtils;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -19,6 +20,7 @@ import java.io.Writer;
  * description:崩溃日志处理
  */
 public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
+    public static final String TAG = "FTExceptionHandler";
     private boolean canTrackCrash;
     private String env;
     private String trackServiceName;
@@ -26,33 +28,6 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
     private Thread.UncaughtExceptionHandler mDefaultExceptionHandler;
     private boolean trackConsoleLog;
     private boolean isAndroidTest = false;
-
-    static {
-        System.loadLibrary("native_exception_lib");
-    }
-
-    /**
-     * 注册 native crash 捕获
-     */
-    public native void registerSignalHandler();
-
-    /**
-     * 取消注册 native crash
-     */
-    public native void unRegisterSignalHandler();
-
-    /**
-     * 模拟 native 代码崩溃
-     */
-    public native void crashAndGetExceptionMessage();
-
-    /**
-     * 该方法不能改动，该方法在 jni 中调用
-     * @param crash
-     */
-    public void uploadNativeCrashLog(String crash) {
-        uploadCrashLog(crash);
-    }
 
     public void uploadCrashLog(String crash) {
         LogUtils.d("FTExceptionHandler", "crash=" + crash);
@@ -82,7 +57,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
             this.trackServiceName = ftsdkConfig.getTraceServiceName();
             this.trackConsoleLog = ftsdkConfig.isTraceConsoleLog();
             if (this.canTrackCrash) {
-                registerSignalHandler();
+                ReflectUtils.reflectRegisterSignalHandler();
             }
         }
     }
@@ -145,7 +120,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     public static void release() {
         if (FTExceptionHandler.get().canTrackCrash) {
-            FTExceptionHandler.get().unRegisterSignalHandler();
+            ReflectUtils.reflectUnRegisterSignalHandler();
         }
         instance = null;
     }
