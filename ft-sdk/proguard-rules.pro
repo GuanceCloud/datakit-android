@@ -117,6 +117,9 @@
 -keep class com.ft.sdk.InitSDKProcessException{
     *;
 }
+-keep class com.ft.sdk.garble.FTExceptionHandler{
+    *;
+}
 -keep enum com.ft.sdk.LogCacheDiscard {
     *;
 }

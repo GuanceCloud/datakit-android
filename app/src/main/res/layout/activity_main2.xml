@@ -29,6 +29,11 @@
             android:layout_height="wrap_content"
             android:text="模拟崩溃" />
         <Button
+            android:id="@+id/mock_crash_native_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="模拟 native 崩溃" />
+        <Button
             android:id="@+id/mock_page_jump_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

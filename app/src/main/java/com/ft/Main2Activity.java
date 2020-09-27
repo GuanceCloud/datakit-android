@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.amitshekhar.DebugDB;
 import com.amitshekhar.debug.encrypt.sqlite.DebugDBEncryptFactory;
 import com.amitshekhar.debug.sqlite.DebugDBFactory;
+import com.ft.sdk.garble.FTExceptionHandler;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.utils.LogUtils;
 
@@ -110,6 +111,9 @@ public class Main2Activity extends AppCompatActivity {
                     int i = 1 / 0;
                 }
             }).start();
+        });
+        findViewById(R.id.mock_crash_native_btn).setOnClickListener(v->{
+            FTExceptionHandler.get().crashAndGetExceptionMessage();
         });
         findViewById(R.id.mock_page_jump_btn).setOnClickListener(v -> {
             startActivity(new Intent(this, MainActivity.class));

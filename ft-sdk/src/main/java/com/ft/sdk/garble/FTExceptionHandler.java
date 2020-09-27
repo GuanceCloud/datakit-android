@@ -27,6 +27,42 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
     private boolean trackConsoleLog;
     private boolean isAndroidTest = false;
 
+    static {
+        System.loadLibrary("native_exception_lib");
+    }
+
+    /**
+     * 注册 native crash 捕获
+     */
+    public native void registerSignalHandler();
+
+    /**
+     * 取消注册 native crash
+     */
+    public native void unRegisterSignalHandler();
+
+    /**
+     * 模拟 native 代码崩溃
+     */
+    public native void crashAndGetExceptionMessage();
+
+    /**
+     * 该方法不能改动，该方法在 jni 中调用
+     * @param crash
+     */
+    public void uploadNativeCrashLog(String crash) {
+        uploadCrashLog(crash);
+    }
+
+    public void uploadCrashLog(String crash) {
+        LogUtils.d("FTExceptionHandler", "crash=" + crash);
+        LogBean logBean = new LogBean(Constants.USER_AGENT, Utils.translateFieldValue(crash), System.currentTimeMillis());
+        logBean.setStatus(Status.CRITICAL);
+        logBean.setEnv(env);
+        logBean.setServiceName(trackServiceName);
+        FTTrackInner.getInstance().logBackground(logBean);
+    }
+
     private FTExceptionHandler() {
         mDefaultExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler(this);
@@ -45,6 +81,9 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
             this.env = ftsdkConfig.getEnv();
             this.trackServiceName = ftsdkConfig.getTraceServiceName();
             this.trackConsoleLog = ftsdkConfig.isTraceConsoleLog();
+            if (this.canTrackCrash) {
+                registerSignalHandler();
+            }
         }
     }
 
@@ -73,11 +112,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
             }
             printWriter.close();
             String result = writer.toString();
-            LogBean logBean = new LogBean(Constants.USER_AGENT, Utils.translateFieldValue(result), System.currentTimeMillis());
-            logBean.setStatus(Status.CRITICAL);
-            logBean.setEnv(env);
-            logBean.setServiceName(trackServiceName);
-            FTTrackInner.getInstance().logBackground(logBean);
+            uploadCrashLog(result);
         }
 
         try {
@@ -109,6 +144,9 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
     }
 
     public static void release() {
+        if (FTExceptionHandler.get().canTrackCrash) {
+            FTExceptionHandler.get().unRegisterSignalHandler();
+        }
         instance = null;
     }
 }
