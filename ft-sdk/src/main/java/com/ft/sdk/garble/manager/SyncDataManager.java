@@ -748,6 +748,12 @@ public class SyncDataManager {
             return Constants.EVENT_NAME_LEAVE;
         } else if (OP.OPEN_ACT.value.equals(op) || OP.OPEN_FRA.value.equals(op)) {
             return Constants.EVENT_NAME_ENTER;
+        } else if (OP.BLOCK.value.equals(op)){
+            return Constants.EVENT_NAME_BLOCK;
+        } else if (OP.CRASH.value.equals(op)){
+            return Constants.EVENT_NAME_CRASH;
+        } else if (OP.ANR.value.equals(op)){
+            return Constants.EVENT_NAME_ANR;
         }
         return op;
     }

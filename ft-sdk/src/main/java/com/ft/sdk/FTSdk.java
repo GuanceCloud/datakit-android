@@ -18,6 +18,7 @@ import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.FTNetworkListener;
 import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.SyncCallback;
+import com.ft.sdk.garble.manager.FTUICatonManager;
 import com.ft.sdk.garble.manager.SyncTaskManager;
 import com.ft.sdk.garble.utils.GpuUtils;
 import com.ft.sdk.garble.utils.LocationUtils;
@@ -59,10 +60,10 @@ public class FTSdk {
     public static synchronized void install(@NonNull FTSDKConfig ftSDKConfig) {
         if (ftSDKConfig == null) {
             throw new InvalidParameterException("参数 ftSDKConfig 不能为 null");
-        }else{
+        } else {
             mFtSdk = new FTSdk(ftSDKConfig);
             boolean onlyMain = ftSDKConfig.isOnlySupportMainProcess();
-            if (onlyMain && !Utils.isMainProcess()){
+            if (onlyMain && !Utils.isMainProcess()) {
                 throw new InitSDKProcessException("当前 SDK 只能在主进程中运行，如果想要在非主进程中运行可以设置 FTSDKConfig.setOnlySupportMainProcess(false)");
             }
         }
@@ -75,7 +76,7 @@ public class FTSdk {
      *
      * @return
      */
-    public static synchronized FTSdk get() throws InvalidParameterException{
+    public static synchronized FTSdk get() throws InvalidParameterException {
         if (mFtSdk == null) {
             throw new InvalidParameterException("请先安装SDK(在应用启动时调用FTSdk.install(FTSDKConfig ftSdkConfig,Application application))");
         }
@@ -96,8 +97,9 @@ public class FTSdk {
         LocationUtils.get().stopListener();
         FTExceptionHandler.release();
         FTDBCachePolicy.release();
+        FTUICatonManager.release();
         unregisterActivityLifeCallback();
-        LogUtils.w(TAG,"FT SDK 已经被关闭");
+        LogUtils.w(TAG, "FT SDK 已经被关闭");
     }
 
     /**
@@ -115,7 +117,7 @@ public class FTSdk {
     public void unbindUserData() {
         if (mFtSDKConfig != null) {
             if (mFtSDKConfig.isNeedBindUser()) {
-                LogUtils.d(TAG,"解绑用户信息");
+                LogUtils.d(TAG, "解绑用户信息");
                 //解绑用户信息
                 FTUserConfig.get().unbindUserData();
                 //清除本地缓存的SessionId
@@ -136,7 +138,7 @@ public class FTSdk {
     public void bindUserData(@NonNull String name, @NonNull String id, JSONObject extras) {
         if (mFtSDKConfig != null) {
             if (mFtSDKConfig.isNeedBindUser()) {
-                LogUtils.d(TAG,"绑定用户信息");
+                LogUtils.d(TAG, "绑定用户信息");
                 //如果本地的SessionID已经绑定了用于就重新生成sessionId进行绑定
                 if (FTUserConfig.get().currentSessionHasUser()) {
                     FTUserConfig.get().clearSessionId();
@@ -168,7 +170,7 @@ public class FTSdk {
     public void setGpuRenderer(ViewGroup root) {
         try {
             if (FTMonitorConfig.get().isMonitorType(MonitorType.GPU)) {
-                LogUtils.d(TAG,"绑定视图监听 GPU 信息");
+                LogUtils.d(TAG, "绑定视图监听 GPU 信息");
                 Context context = getApplication();
                 final RendererUtil mRendererUtil = new RendererUtil();
                 GLSurfaceView mGLSurfaceView = new GLSurfaceView(context);
@@ -222,6 +224,7 @@ public class FTSdk {
             Utils.traceSamplingRate = rate;
             FTExceptionHandler.get().initParams(mFtSDKConfig);
             FTMonitorConfig.get().initParams(mFtSDKConfig);
+            FTUICatonManager.getInstance().startMonitor();
         }
     }
 
@@ -249,6 +252,7 @@ public class FTSdk {
 
     /**
      * 设置开启网络请求追踪
+     *
      * @param networkTrace
      */
     public void setNetworkTrace(boolean networkTrace) {
