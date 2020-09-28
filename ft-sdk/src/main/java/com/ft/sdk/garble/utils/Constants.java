@@ -131,9 +131,13 @@ public class Constants {
     public static final String KEY_APP_VERSION_NAME = "app_version_name";
 
     public static final String EVENT_NAME_LAUNCH = "launch";
+    public static final String EVENT_NAME_OPEN = "open";
     public static final String EVENT_NAME_CLICK = "click";
     public static final String EVENT_NAME_LEAVE = "leave";
     public static final String EVENT_NAME_ENTER = "enter";
+    public static final String EVENT_NAME_BLOCK = "block";
+    public static final String EVENT_NAME_CRASH = "crash";
+    public static final String EVENT_NAME_ANR = "anr";
 
 
 }

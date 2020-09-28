@@ -2,6 +2,7 @@ package com.ft.sdk.garble;
 
 import androidx.annotation.NonNull;
 
+import com.ft.sdk.FTAutoTrack;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.Status;
@@ -30,6 +31,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
     private boolean isAndroidTest = false;
 
     public void uploadCrashLog(String crash) {
+        FTAutoTrack.appCrash();
         LogUtils.d("FTExceptionHandler", "crash=" + crash);
         LogBean logBean = new LogBean(Constants.USER_AGENT, Utils.translateFieldValue(crash), System.currentTimeMillis());
         logBean.setStatus(Status.CRITICAL);

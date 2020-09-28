@@ -150,6 +150,13 @@ public class Main2Activity extends AppCompatActivity {
                 }
             }).start();
         });
+        findViewById(R.id.mock_caton_btn).setOnClickListener(v ->{
+            try {
+                Thread.sleep(1200);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     @Override

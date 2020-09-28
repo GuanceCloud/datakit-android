@@ -364,6 +364,27 @@ public class FTAutoTrack {
     }
 
     /**
+     * 页面卡顿
+     */
+    public static void uiBlock() {
+        putRecordClick(OP.BLOCK, null, null, null);
+    }
+
+    /**
+     * 应用崩溃
+     */
+    public static void appCrash() {
+        putRecordClick(OP.CRASH, null, null, null);
+    }
+
+    /**
+     * 应用崩溃
+     */
+    public static void appAnr() {
+        putRecordClick(OP.ANR, null, null, null);
+    }
+
+    /**
      * 打开某个Fragment页面
      *
      * @param clazz
@@ -753,21 +774,31 @@ public class FTAutoTrack {
         String event = "";
         switch (op) {
             case CLK:
-                event = "click";
+                event = Constants.EVENT_NAME_CLICK;
                 break;
             case LANC:
-                event = "launch";
+                event = Constants.EVENT_NAME_LAUNCH;
                 break;
             case OPEN_ACT:
             case OPEN_FRA:
-                event = "enter";
+                event = Constants.EVENT_NAME_ENTER;
                 break;
             case CLS_ACT:
             case CLS_FRA:
-                event = "leave";
+                event = Constants.EVENT_NAME_LEAVE;
                 break;
             case OPEN:
-                event = "open";
+                event = Constants.EVENT_NAME_OPEN;
+                break;
+            case BLOCK:
+                event = Constants.EVENT_NAME_BLOCK;
+                break;
+            case CRASH:
+                event = Constants.EVENT_NAME_CRASH;
+                break;
+            case ANR:
+                event = Constants.EVENT_NAME_ANR;
+                break;
         }
         operationName = event + "/event";
         JSONObject content = new JSONObject();
