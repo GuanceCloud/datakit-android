@@ -18,6 +18,7 @@ import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.FTNetworkListener;
 import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.SyncCallback;
+import com.ft.sdk.garble.manager.FTAnrWatchManager;
 import com.ft.sdk.garble.manager.FTUICatonManager;
 import com.ft.sdk.garble.manager.SyncTaskManager;
 import com.ft.sdk.garble.utils.GpuUtils;
@@ -98,6 +99,7 @@ public class FTSdk {
         FTExceptionHandler.release();
         FTDBCachePolicy.release();
         FTUICatonManager.release();
+        FTAnrWatchManager.release();
         unregisterActivityLifeCallback();
         LogUtils.w(TAG, "FT SDK 已经被关闭");
     }
@@ -225,6 +227,7 @@ public class FTSdk {
             FTExceptionHandler.get().initParams(mFtSDKConfig);
             FTMonitorConfig.get().initParams(mFtSDKConfig);
             FTUICatonManager.getInstance().startMonitor();
+            FTAnrWatchManager.getInstance().startMonitorAnr();
         }
     }
 
