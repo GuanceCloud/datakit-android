@@ -5,7 +5,6 @@ import android.os.Looper;
 import com.ft.sdk.FTAutoTrack;
 import com.ft.sdk.garble.interfaces.LooperLogPrinterListener;
 import com.ft.sdk.garble.interfaces.UiPerfMonitorConfig;
-import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.LooperLogPrinter;
 
 /**

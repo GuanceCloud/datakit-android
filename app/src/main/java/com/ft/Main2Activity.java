@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.Button;
 
@@ -13,7 +14,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.amitshekhar.DebugDB;
 import com.amitshekhar.debug.encrypt.sqlite.DebugDBEncryptFactory;
 import com.amitshekhar.debug.sqlite.DebugDBFactory;
-import com.ft.sdk.garble.FTExceptionHandler;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.reflect.ReflectUtils;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -113,7 +113,7 @@ public class Main2Activity extends AppCompatActivity {
                 }
             }).start();
         });
-        findViewById(R.id.mock_crash_native_btn).setOnClickListener(v->{
+        findViewById(R.id.mock_crash_native_btn).setOnClickListener(v -> {
             ReflectUtils.reflectCrashAndGetExceptionMessage();
         });
         findViewById(R.id.mock_page_jump_btn).setOnClickListener(v -> {
@@ -150,12 +150,25 @@ public class Main2Activity extends AppCompatActivity {
                 }
             }).start();
         });
-        findViewById(R.id.mock_caton_btn).setOnClickListener(v ->{
+        findViewById(R.id.mock_caton_btn).setOnClickListener(v -> {
             try {
                 Thread.sleep(1200);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        });
+
+        findViewById(R.id.mock_anr_btn).setOnClickListener(v -> {
+            new Handler().post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(10000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
         });
     }
 

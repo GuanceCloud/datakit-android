@@ -38,6 +38,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="模拟卡顿" />
+
+        <Button
+            android:id="@+id/mock_anr_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="模拟 Anr" />
         <Button
             android:id="@+id/mock_page_jump_btn"
             android:layout_width="match_parent"
