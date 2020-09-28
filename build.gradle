@@ -19,7 +19,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.0.1'
-        classpath 'com.cloudcare.ft.mobile.sdk.tracker.plugin:ft-plugin:1.0.1-alpha14'
+        classpath 'com.cloudcare.ft.mobile.sdk.tracker.plugin:ft-plugin:1.0.1-beta02'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "com.github.gmazzo:gradle-buildconfig-plugin:2.0.2"
         // NOTE: Do not place your application dependencies here; they belong
