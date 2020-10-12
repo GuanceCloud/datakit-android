@@ -16,7 +16,7 @@ import com.ft.application.MockApplication;
 import com.ft.sdk.FTAutoTrackType;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
-import com.ft.sdk.garble.bean.RecordData;
+import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
 
 import org.junit.Assert;
@@ -86,9 +86,9 @@ public class LogEventTest extends BaseTest {
         onView(ViewMatchers.withId(R.id.mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
-        List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);
         boolean value = false;
-        for (RecordData recordData : recordDataList) {
+        for (SyncJsonData recordData : recordDataList) {
             if (recordData.toString().contains("mock_click_btn")) {
                 value = true;
                 break;
@@ -102,9 +102,9 @@ public class LogEventTest extends BaseTest {
         onView(withId(R.id.mock_page_jump_btn)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
-        List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);
         boolean value = false;
-        for (RecordData recordData : recordDataList) {
+        for (SyncJsonData recordData : recordDataList) {
             if (recordData.toString().contains("leave")) {
                 value = true;
                 break;
@@ -118,9 +118,9 @@ public class LogEventTest extends BaseTest {
         onView(withId(R.id.mock_page_jump_btn)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
-        List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);
         boolean value = false;
-        for (RecordData recordData : recordDataList) {
+        for (SyncJsonData recordData : recordDataList) {
             System.out.println(recordData.toString());
             if (recordData.toString().contains("enter")) {
                 value = true;
@@ -134,9 +134,9 @@ public class LogEventTest extends BaseTest {
     public void launchTest() throws InterruptedException {
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
-        List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);
         boolean value = false;
-        for (RecordData recordData : recordDataList) {
+        for (SyncJsonData recordData : recordDataList) {
             if (recordData.toString().contains("launch")) {
                 value = true;
                 break;

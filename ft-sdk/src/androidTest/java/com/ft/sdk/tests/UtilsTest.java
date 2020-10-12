@@ -6,8 +6,8 @@ import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.OP;
-import com.ft.sdk.garble.bean.RecordData;
-import com.ft.sdk.garble.manager.SyncDataManager;
+import com.ft.sdk.garble.bean.SyncJsonData;
+import com.ft.sdk.garble.manager.SyncDataHelper;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.Utils;
 
@@ -58,8 +58,7 @@ public class UtilsTest {
     @Test
     public void influxDBTest() throws JSONException, InterruptedException {
 
-        RecordData recordData = new RecordData();
-        recordData.setOp(OP.LOG.value);
+        SyncJsonData recordData = new SyncJsonData(DataType.LOG);
         recordData.setTime(1598512145640L);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(Constants.MEASUREMENT, "TestInfluxDBLine");
@@ -69,12 +68,12 @@ public class UtilsTest {
         fields.put("field1", "field1-value");
         jsonObject.put(Constants.TAGS, tags);
         jsonObject.put(Constants.FIELDS, fields);
-        recordData.setOpdata(jsonObject.toString());
-        List<RecordData> recordDataList = new ArrayList<>();
+        recordData.setDataString(jsonObject.toString());
+        List<SyncJsonData> recordDataList = new ArrayList<>();
         recordDataList.add(recordData);
         recordDataList.add(recordData);
         recordDataList.add(recordData);
-        String content = new SyncDataManager().getBodyContent(DataType.LOG, recordDataList);
+        String content = new SyncDataHelper().getBodyContent(DataType.LOG, recordDataList);
         String realData = content.replaceAll(Constants.SEPARATION_PRINT, " ");
         realData = realData.replaceAll(Constants.SEPARATION_LINE_BREAK, "\n");
         Assert.assertEquals(expectData, realData);

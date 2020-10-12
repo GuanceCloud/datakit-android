@@ -65,11 +65,12 @@ public class TrackLog {
 
     /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
     public static int println(String tag, String msg) {
-        return println(true,Log.INFO,tag,msg);
+        return println(true, Log.INFO, tag, msg);
     }
+
     public static int println(boolean upload, int priority, String tag, String msg) {
         if (upload && FTExceptionHandler.get().isTrackConsoleLog()) {
-            LogBean logBean = new LogBean(Constants.USER_AGENT, Utils.translateFieldValue(Utils.getCurrentTimeStamp()+ " " +getLevelMark(priority)+"/"+tag+":"+msg), System.currentTimeMillis());
+            LogBean logBean = new LogBean(Utils.translateFieldValue(Utils.getCurrentTimeStamp() + " " + getLevelMark(priority) + "/" + tag + ":" + msg), System.currentTimeMillis());
             logBean.setServiceName(FTExceptionHandler.get().getTrackServiceName());
             logBean.setStatus(getStatus(priority));
             logBean.setEnv(FTExceptionHandler.get().getEnv());

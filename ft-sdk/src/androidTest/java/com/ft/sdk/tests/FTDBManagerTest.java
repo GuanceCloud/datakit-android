@@ -4,7 +4,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTrack;
-import com.ft.sdk.garble.bean.RecordData;
+import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBConfig;
 import com.ft.sdk.garble.db.FTDBManager;
 
@@ -58,7 +58,7 @@ public class FTDBManagerTest {
         insertData();
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
-        List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimit(0);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimit(0);
         assertEquals(1, recordDataList.size());
     }
 
@@ -78,7 +78,7 @@ public class FTDBManagerTest {
         }
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
-        List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimit(0);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimit(0);
         assertEquals(repeatTime, recordDataList.size());
     }
 
@@ -94,14 +94,14 @@ public class FTDBManagerTest {
         insertData();
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
-        List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimit(0);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimit(0);
         assertEquals(2, recordDataList.size());
         List<String> integers = new ArrayList<>();
-        for (RecordData recordData : recordDataList) {
+        for (SyncJsonData recordData : recordDataList) {
             integers.add("" + recordData.getId());
         }
         FTDBManager.get().delete(integers);
-        List<RecordData> recordDataList1 = FTDBManager.get().queryDataByDescLimit(0);
+        List<SyncJsonData> recordDataList1 = FTDBManager.get().queryDataByDescLimit(0);
         assertEquals(0, recordDataList1.size());
     }
 

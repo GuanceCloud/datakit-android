@@ -1,11 +1,11 @@
 package com.ft.sdk.garble.manager;
 
+import com.ft.sdk.garble.AsyncCallback;
 import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.FTUserConfig;
-import com.ft.sdk.garble.SyncCallback;
 import com.ft.sdk.garble.TokenCheck;
 import com.ft.sdk.garble.bean.DataType;
-import com.ft.sdk.garble.bean.RecordData;
+import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.http.FTResponseData;
 import com.ft.sdk.garble.http.HttpBuilder;
@@ -72,27 +72,26 @@ public class SyncTaskManager {
                         running = false;
                         return;
                     }
-                    LogUtils.e(TAG," \n*******************************************************\n" +
+                    LogUtils.e(TAG, " \n*******************************************************\n" +
                             "******************数据同步线程运行中*******************\n" +
                             "*******************************************************\n");
                     Thread.sleep(SLEEP_TIME);
-                    List<RecordData> trackDataList = queryFromData(DataType.TRACK);
-                    List<RecordData> objectDataList = queryFromData(DataType.OBJECT);
-                    List<RecordData> logDataList = queryFromData(DataType.LOG);
-                    List<RecordData> keyEventDataList = queryFromData(DataType.KEY_EVENT);
+                    List<SyncJsonData> trackDataList = queryFromData(DataType.TRACK);
+                    List<SyncJsonData> objectDataList = queryFromData(DataType.OBJECT);
+                    List<SyncJsonData> logDataList = queryFromData(DataType.LOG);
                     //如果打开绑定用户开关，但是没有绑定用户信息，那么就不上传用户数据，直到绑了
                     if (FTUserConfig.get().isNeedBindUser() && !FTUserConfig.get().isUserDataBinded()) {
                         trackDataList.clear();
-                        LogUtils.e(TAG," \n********************请先绑定用户信息********************");
+                        LogUtils.e(TAG, " \n********************请先绑定用户信息********************");
                     }
                     while (!trackDataList.isEmpty() || !objectDataList.isEmpty() ||
-                            !logDataList.isEmpty() || !keyEventDataList.isEmpty()) {
+                            !logDataList.isEmpty()) {
                         if (!Utils.isNetworkAvailable()) {
-                            LogUtils.e(TAG," \n**********************网络未连接************************");
+                            LogUtils.e(TAG, " \n**********************网络未连接************************");
                             break;
                         }
                         if (errorCount.get() >= CLOSE_TIME) {
-                            LogUtils.e(TAG," \n************连续同步失败5次，停止当前轮询同步***********");
+                            LogUtils.e(TAG, " \n************连续同步失败5次，停止当前轮询同步***********");
                             break;
                         }
                         if (!trackDataList.isEmpty()) {
@@ -107,16 +106,12 @@ public class SyncTaskManager {
                             handleSyncOpt(DataType.LOG, logDataList);
                             logDataList = queryFromData(DataType.LOG);
                         }
-                        if (!keyEventDataList.isEmpty()) {
-                            handleSyncOpt(DataType.KEY_EVENT, keyEventDataList);
-                            keyEventDataList = queryFromData(DataType.KEY_EVENT);
-                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                }finally {
+                } finally {
                     running = false;
-                    LogUtils.e(TAG," \n********************************************************\n" +
+                    LogUtils.e(TAG, " \n********************************************************\n" +
                             "******************数据同步线程已结束********************\n" +
                             "********************************************************\n");
                 }
@@ -127,38 +122,36 @@ public class SyncTaskManager {
     /**
      * 执行同步操作
      */
-    private synchronized void handleSyncOpt(final DataType dataType, final List<RecordData> requestDatas) {
+    private synchronized void handleSyncOpt(final DataType dataType, final List<SyncJsonData> requestDatas) {
         if (requestDatas == null || requestDatas.isEmpty()) {
             return;
         }
-        SyncDataManager syncDataManager = new SyncDataManager();
+        SyncDataHelper syncDataManager = new SyncDataHelper();
         String body = syncDataManager.getBodyContent(dataType, requestDatas);
-        SyncDataManager.printUpdateData(dataType == DataType.OBJECT, body);
+        SyncDataHelper.printUpdateData(dataType == DataType.OBJECT, body);
         body = body.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION).replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK);
         requestNet(dataType, body, (code, response) -> {
             if (code >= 200 && code < 500) {
-                LogUtils.d(TAG,"\n**********************同步数据成功**********************");
+                LogUtils.d(TAG, "\n**********************同步数据成功**********************");
                 deleteLastQuery(requestDatas);
-                if(dataType == DataType.LOG){
+                if (dataType == DataType.LOG) {
                     FTDBCachePolicy.get().optCount(-requestDatas.size());
                 }
                 errorCount.set(0);
                 if (code > 200) {
-                    LogUtils.e(TAG,"同步数据出错(忽略)-[code:" + code + ",response:" + response + "]");
+                    LogUtils.e(TAG, "同步数据出错(忽略)-[code:" + code + ",response:" + response + "]");
                 }
             } else {
-                LogUtils.e(TAG,"同步数据失败-[code:" + code + ",response:" + response + "]");
+                LogUtils.e(TAG, "同步数据失败-[code:" + code + ",response:" + response + "]");
                 errorCount.getAndIncrement();
             }
         });
     }
 
-    private List<RecordData> queryFromData(DataType dataType) {
+    private List<SyncJsonData> queryFromData(DataType dataType) {
         switch (dataType) {
             case LOG:
                 return FTDBManager.get().queryDataByDescLimitLog(10);
-            case KEY_EVENT:
-                return FTDBManager.get().queryDataByDescLimitKeyEvent(10);
             case OBJECT:
                 return FTDBManager.get().queryDataByDescLimitObject(10);
             default:
@@ -171,9 +164,9 @@ public class SyncTaskManager {
      *
      * @param list
      */
-    private void deleteLastQuery(List<RecordData> list) {
+    private void deleteLastQuery(List<SyncJsonData> list) {
         List<String> ids = new ArrayList<>();
-        for (RecordData r : list) {
+        for (SyncJsonData r : list) {
             ids.add(r.getId() + "");
         }
         FTDBManager.get().delete(ids);
@@ -186,18 +179,16 @@ public class SyncTaskManager {
      * @param body
      * @param syncCallback
      */
-    private synchronized void requestNet(DataType dataType, String body, final SyncCallback syncCallback) {
-        String model = Constants.URL_MODEL_TRACK;
+    public synchronized void requestNet(DataType dataType, String body, final AsyncCallback syncCallback) {
+        String model;
         switch (dataType) {
-            case KEY_EVENT:
-                model = Constants.URL_MODEL_KEY_EVENT;
-                break;
             case LOG:
                 model = Constants.URL_MODEL_LOG;
                 break;
             case OBJECT:
                 model = Constants.URL_MODEL_OBJECT;
                 break;
+            default:
             case TRACK:
                 model = Constants.URL_MODEL_TRACK;
         }
@@ -216,7 +207,7 @@ public class SyncTaskManager {
         } catch (Exception e) {
             e.printStackTrace();
             syncCallback.onResponse(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, e.getLocalizedMessage());
-            LogUtils.e(TAG,"同步上传错误：" + e.getLocalizedMessage());
+            LogUtils.e(TAG, "上传错误：" + e.getLocalizedMessage());
         }
 
     }

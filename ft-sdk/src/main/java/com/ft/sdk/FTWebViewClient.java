@@ -1,5 +1,6 @@
 package com.ft.sdk;
 
+import android.graphics.Bitmap;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
@@ -7,6 +8,7 @@ import android.webkit.WebViewClient;
 
 import androidx.annotation.Nullable;
 
+import com.ft.sdk.garble.manager.FTWebViewEventTracker;
 import com.ft.sdk.garble.utils.LogUtils;
 
 import java.io.IOException;
@@ -25,36 +27,37 @@ import okhttp3.Response;
  * description: 拦截 WebView 中的网络请求
  */
 public class FTWebViewClient extends WebViewClient {
-    static OkHttpClient client = new OkHttpClient.Builder()
+    static OkHttpClient mClient = new OkHttpClient.Builder()
             .addInterceptor(new FTNetWorkTracerInterceptor())
             .connectTimeout(30, TimeUnit.SECONDS)
             .build();
-    private String originUrl;
+    private String mOriginUrl;
+
+    private FTWebViewEventTracker mHelper = new FTWebViewEventTracker();
 
     public FTWebViewClient() {
+
     }
 
 
-    CountDownLatch countDownLatch = new CountDownLatch(1);
+    private CountDownLatch mCountDownLatch = new CountDownLatch(1);
 
     @Nullable
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-        view.post(new Runnable() {
-            @Override
-            public void run() {
-                originUrl = view.getUrl();
-                countDownLatch.countDown();
-            }
+        mHelper.pageLoading();
+        view.post(() -> {
+            mOriginUrl = view.getUrl();
+            mCountDownLatch.countDown();
         });
         try {
-            countDownLatch.await(1L,TimeUnit.SECONDS);
+            mCountDownLatch.await(1L, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         try {
             String url = request.getUrl().toString();
-            if (url.equals(originUrl)) {
+            if (url.equals(mOriginUrl)) {
                 LogUtils.d("WebView", "URL= originUrl=" + request.getUrl().toString());
                 return getNetResponse(request.getUrl().toString(), request.getRequestHeaders());
             } else {
@@ -74,7 +77,7 @@ public class FTWebViewClient extends WebViewClient {
             builder.addHeader(key, headers.get(key));
         }
         Request request = builder.build();
-        Response response = client.newCall(request).execute();
+        Response response = mClient.newCall(request).execute();
         String contentType = response.header("Content-Type", response.body().contentType().type());
         String temp = contentType.toLowerCase();
         if (temp.contains("charset=utf-8")) {
@@ -86,4 +89,19 @@ public class FTWebViewClient extends WebViewClient {
         }
         return new WebResourceResponse(contentType, response.header("Content-Encoding", "utf-8"), response.body().byteStream());
     }
+
+    @Override
+    public void onPageStarted(WebView view, String url, Bitmap favicon) {
+        super.onPageStarted(view, url, favicon);
+        mHelper.pageStarted();
+    }
+
+    @Override
+    public void onPageFinished(WebView view, String url) {
+        super.onPageFinished(view, url);
+        mHelper.pageFinished();
+    }
+
+
+
 }

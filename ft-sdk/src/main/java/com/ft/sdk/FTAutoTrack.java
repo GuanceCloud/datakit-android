@@ -21,14 +21,14 @@ import com.ft.sdk.garble.FTAutoTrackConfig;
 import com.ft.sdk.garble.FTFlowConfig;
 import com.ft.sdk.garble.FTFragmentManager;
 import com.ft.sdk.garble.FTTrackInner;
-import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.ObjectBean;
-import com.ft.sdk.garble.bean.RecordData;
+import com.ft.sdk.garble.bean.SyncJsonData;
+import com.ft.sdk.garble.bean.TrackBean;
 import com.ft.sdk.garble.manager.FTActivityManager;
 import com.ft.sdk.garble.manager.FTManager;
-import com.ft.sdk.garble.manager.SyncDataManager;
+import com.ft.sdk.garble.manager.SyncDataHelper;
 import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
@@ -43,8 +43,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import okhttp3.OkHttpClient;
@@ -56,6 +54,7 @@ import okhttp3.OkHttpClient;
  */
 public class FTAutoTrack {
     public final static String TAG = "FTAutoTrack";
+
     /**
      * 启动 APP
      * 警告！！！该方法不能删除
@@ -81,7 +80,7 @@ public class FTAutoTrack {
      */
     public static void startActivityByWay(Boolean fromFragment, Intent intent) {
         try {
-            LogUtils.d(TAG,"activityFromWay=" + fromFragment + ",,,intent=" + intent);
+            LogUtils.d(TAG, "activityFromWay=" + fromFragment + ",,,intent=" + intent);
             if (intent != null && intent.getComponent() != null) {
                 FTActivityManager.get().putActivityOpenFromFragment(intent.getComponent().getClassName(), fromFragment);
             }
@@ -360,29 +359,30 @@ public class FTAutoTrack {
         if (!FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_START)) {
             return;
         }
-        putRecordClick(OP.LANC, null, null, null);
+        putSimpleEvent(OP.LANC);
     }
 
     /**
      * 页面卡顿
      */
     public static void uiBlock() {
-        putRecordClick(OP.BLOCK, null, null, null);
+        putSimpleEvent(OP.BLOCK);
     }
 
     /**
      * 应用崩溃
      */
     public static void appCrash() {
-        putRecordClick(OP.CRASH, null, null, null);
+        putSimpleEvent(OP.CRASH);
     }
 
     /**
-     * 应用崩溃
+     * 应用无响应
      */
     public static void appAnr() {
-        putRecordClick(OP.ANR, null, null, null);
+        putSimpleEvent(OP.ANR);
     }
+
 
     /**
      * 打开某个Fragment页面
@@ -420,7 +420,7 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity((Class<?>) clazz)) {
             return;
         }
-        putRecordFragment(OP.OPEN_FRA, AopUtils.getClassName(clazz), AopUtils.getActivityName(activity), parentPage);
+        putFragmentEvent(OP.OPEN_FRA, AopUtils.getClassName(clazz), AopUtils.getActivityName(activity), parentPage);
     }
 
     /**
@@ -459,7 +459,7 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity((Class<?>) clazz)) {
             return;
         }
-        putRecordFragment(OP.CLS_FRA, AopUtils.getClassName(clazz), AopUtils.getActivityName(activity), parentPage);
+        putFragmentEvent(OP.CLS_FRA, AopUtils.getClassName(clazz), AopUtils.getActivityName(activity), parentPage);
     }
 
     /**
@@ -488,7 +488,7 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)) {
             return;
         }
-        putRecordActivity(OP.OPEN_ACT, clazz, isFirstLoad);
+        putActivityEvent(OP.OPEN_ACT, clazz, isFirstLoad);
     }
 
     /**
@@ -517,7 +517,7 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)) {
             return;
         }
-        putRecordActivity(OP.CLS_ACT, clazz, false);
+        putActivityEvent(OP.CLS_ACT, clazz, false);
     }
 
     /**
@@ -562,7 +562,7 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)) {
             return;
         }
-        putRecordClick(OP.CLK, currentPage, rootPage, vtp);
+        putClickEvent(OP.CLK, currentPage, rootPage, vtp);
     }
 
     /**
@@ -598,20 +598,42 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreView(view)) {
             return;
         }
-        putRecordClick(OP.CLK, currentPage, rootPage, vtp);
+        putClickEvent(OP.CLK, currentPage, rootPage, vtp);
     }
 
     /**
-     * 点击事件
+     * 记录简单事件
+     *
+     * @param op
+     */
+    public static void putSimpleEvent(@NonNull OP op) {
+
+        ThreadPoolUtils.get().execute(() -> {
+            try {
+                JSONObject tags = new JSONObject();
+                JSONObject fields = new JSONObject();
+                SyncJsonData recordData = SyncJsonData.getFromTrackBean(new TrackBean(Constants.FT_MEASUREMENT_PAGE_EVENT, tags, fields), op);
+                LogUtils.d(TAG, "FTAutoTrack数据进数据库：putSimpleEvent:" + recordData.printFormatRecordData());
+
+                FTManager.getFTDBManager().insertFTOperation(recordData);
+                FTManager.getSyncTaskManager().executeSyncPoll();
+            } catch (Exception e) {
+                LogUtils.e(TAG, e.toString());
+            }
+        });
+    }
+
+    /**
+     * 记录点击事件
      *
      * @param op
      * @param currentPage
      * @param rootPage
      * @param vtp
      */
-    public static void putRecordClick(@NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String vtp) {
+    public static void putClickEvent(@NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String vtp) {
         long time = System.currentTimeMillis();
-        putRecord(time, op, currentPage, rootPage, null, vtp);
+        putPageEvent(time, op, currentPage, rootPage, null, vtp);
     }
 
     /**
@@ -622,7 +644,7 @@ public class FTAutoTrack {
      * @param rootPage
      * @param parentPage
      */
-    public static void putRecordFragment(@NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String parentPage) {
+    public static void putFragmentEvent(@NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String parentPage) {
         long time = System.currentTimeMillis();
         try {
             if (op == OP.OPEN_FRA) {
@@ -632,7 +654,7 @@ public class FTAutoTrack {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        putRecord(time, op, currentPage, rootPage, parentPage, null);
+        putPageEvent(time, op, currentPage, rootPage, parentPage, null);
     }
 
     /**
@@ -641,7 +663,7 @@ public class FTAutoTrack {
      * @param op
      * @param classCurrent
      */
-    public static void putRecordActivity(@NonNull OP op, Class classCurrent, boolean isFirstLoad) {
+    public static void putActivityEvent(@NonNull OP op, Class classCurrent, boolean isFirstLoad) {
         long time = System.currentTimeMillis();
         Class parentClass = FTActivityManager.get().getLastActivity();
         String parentPageName = Constants.FLOW_ROOT;
@@ -696,68 +718,53 @@ public class FTAutoTrack {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        putRecord(time, op, classCurrent.getSimpleName(), classCurrent.getSimpleName(), parentPageName, null);
+        putPageEvent(time, op, classCurrent.getSimpleName(), classCurrent.getSimpleName(), parentPageName, null);
     }
 
-    public static void putRecord(long time, @NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String parentPage, @Nullable String vtp) {
+    private static void putPageEvent(long time, @NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String parentPage, @Nullable String vtp) {
         ThreadPoolUtils.get().execute(() -> {
             try {
-                final RecordData recordData = new RecordData();
-                recordData.setTime(time);
-                recordData.setOp(op.value);
-                recordData.setCpn(currentPage);
-                recordData.setRpn(rootPage);
-                JSONObject opData = new JSONObject();
-                try {
-                    JSONObject tags = new JSONObject();
-                    JSONObject fields = new JSONObject();
-                    if (vtp != null) {
-                        tags.put("vtp", vtp);
-                        fields.put("vtp_desc", FTAliasConfig.get().getVtpDesc(vtp));
-                        fields.put("vtp_id", Utils.MD5(vtp));
-                    }
-                    SyncDataManager.addMonitorData(tags, fields);
-                    opData.put(Constants.TAGS, tags);
-                    opData.put(Constants.FIELDS, fields);
-                    recordData.setOpdata(opData.toString());
-                } catch (Exception e) {
+                JSONObject tags = new JSONObject();
+                JSONObject fields = new JSONObject();
+                tags.put(Constants.KEY_ROOT_PAGE_NAME, rootPage);
+                tags.put(Constants.KEY_CURRENT_PAGE_NAME, currentPage);
+                if (vtp != null) {
+                    tags.put("vtp", vtp);
+                    fields.put("vtp_desc", FTAliasConfig.get().getVtpDesc(vtp));
+                    fields.put("vtp_id", Utils.MD5(vtp));
                 }
-                String sessionId = FTUserConfig.get().getSessionId();
-                if (!Utils.isNullOrEmpty(sessionId)) {
-                    recordData.setSessionid(sessionId);
-                }
-                List<RecordData> recordDataList = new ArrayList<>();
-                recordDataList.add(recordData);
-                LogUtils.d(TAG,"FTAutoTrack数据进数据库：" + recordData.printFormatRecordData());
-                //开启流程图，获取流程图相关数据存入数据库中
-                if (FTFlowConfig.get().isOpenFlowChart()) {
-                    if (op == OP.OPEN_ACT || op == OP.OPEN_FRA) {
-                        //如果是打开关闭页面就拷贝一条记录存入数据库，一条作为流程图数据
-                        RecordData recordDataClone = recordData.clone();
-                        recordDataList.add(recordDataClone);
-                        recordDataClone.setPpn(parentPage);
-                        recordDataClone.setTraceId(FTFlowConfig.get().getFlowUUID());
-                        long currentTime = System.currentTimeMillis();
-                        recordDataClone.setDuration(currentTime - FTFlowConfig.get().lastOpTime);
-                        FTFlowConfig.get().lastOpTime = currentTime;
-                    }
-                }
+
+
+                SyncJsonData recordData = SyncJsonData.getFromTrackBean(new TrackBean(Constants.FT_MEASUREMENT_PAGE_EVENT, tags, fields), op);
+                LogUtils.d(TAG, "FTAutoTrack数据进数据库：" + recordData.printFormatRecordData());
+
                 addLogging(currentPage, op, vtp);
                 addObject(op);
-                FTManager.getFTDBManager().insertFtOptList(recordDataList);
+
+                FTManager.getFTDBManager().insertFTOperation(recordData);
                 FTManager.getSyncTaskManager().executeSyncPoll();
             } catch (Exception e) {
+                LogUtils.e(TAG, e.toString());
             }
         });
     }
 
+    public static void putOpData(long time, @NonNull OP op) {
+
+    }
+
+    /**
+     * 应用登陆状态，添加
+     *
+     * @param op
+     */
     private static void addObject(OP op) {
-        if(op != OP.LANC){
+        if (op != OP.LANC) {
             return;
         }
         Context context = FTApplication.getApplication();
         String name = DeviceUtils.getUuid(context);
-        ObjectBean objectBean = new ObjectBean(name,Constants.DEFAULT_OBJECT_CLASS,SyncDataManager.getDefaultObjectBean());
+        ObjectBean objectBean = new ObjectBean(name, Constants.DEFAULT_OBJECT_CLASS, SyncDataHelper.getDefaultObjectBean());
         FTTrackInner.getInstance().objectBackground(objectBean);
     }
 
@@ -768,6 +775,16 @@ public class FTAutoTrack {
 
     private static void addLogging(String currentPage, OP op, long duration, @Nullable String vtp) {
         if (!FTFlowConfig.get().isEventFlowLog()) {
+            return;
+        }
+
+        if (!op.equals(OP.CLK)
+                && !op.equals(OP.LANC)
+                && !op.equals(OP.OPEN_ACT)
+                && !op.equals(OP.OPEN_FRA)
+                && !op.equals(OP.CLS_ACT)
+                && !op.equals(OP.CLS_FRA)
+                && !op.equals(OP.OPEN)) {
             return;
         }
         String operationName = "";
@@ -790,15 +807,6 @@ public class FTAutoTrack {
             case OPEN:
                 event = Constants.EVENT_NAME_OPEN;
                 break;
-            case BLOCK:
-                event = Constants.EVENT_NAME_BLOCK;
-                break;
-            case CRASH:
-                event = Constants.EVENT_NAME_CRASH;
-                break;
-            case ANR:
-                event = Constants.EVENT_NAME_ANR;
-                break;
         }
         operationName = event + "/event";
         JSONObject content = new JSONObject();
@@ -814,7 +822,7 @@ public class FTAutoTrack {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        LogBean logBean = new LogBean(Constants.USER_AGENT, content.toString(), System.currentTimeMillis());
+        LogBean logBean = new LogBean(content.toString(), System.currentTimeMillis());
         logBean.setOperationName(operationName);
         logBean.setDuration(duration);
         FTTrackInner.getInstance().logBackground(logBean);
@@ -827,7 +835,7 @@ public class FTAutoTrack {
      * @param cost
      */
     public static void timingMethod(String desc, long cost) {
-        LogUtils.d(TAG,desc);
+        LogUtils.d(TAG, desc);
         try {
             String[] arr = desc.split("\\|");
             String[] names = arr[0].split("/");
@@ -841,6 +849,7 @@ public class FTAutoTrack {
     /**
      * 插桩方法用来替换调用的 android/webkit/webView.loadUrl 方法，该方法结构谨慎修改，修该后请同步修改
      * [com.ft.plugin.garble.bytecode.FTMethodAdapter] 类中的 visitMethodInsn 方法中关于该替换内容的部分
+     *
      * @param webView
      * @param url
      * @return
@@ -857,6 +866,7 @@ public class FTAutoTrack {
     /**
      * 插桩方法用来替换调用的 android/webkit/webView.loadUrl 方法，该方法结构谨慎修改，修该后请同步修改
      * [com.ft.plugin.garble.bytecode.FTMethodAdapter] 类中的 visitMethodInsn 方法中关于该替换内容的部分
+     *
      * @param webView
      * @param url
      * @param additionalHttpHeaders
@@ -873,6 +883,7 @@ public class FTAutoTrack {
     /**
      * 插桩方法用来替换调用的 android/webkit/webView.loadData 方法，该方法结构谨慎修改，修该后请同步修改
      * [com.ft.plugin.garble.bytecode.FTMethodAdapter] 类中的 visitMethodInsn 方法中关于该替换内容的部分
+     *
      * @param webView
      * @param data
      * @param encoding
@@ -890,6 +901,7 @@ public class FTAutoTrack {
     /**
      * 插桩方法用来替换调用的 android/webkit/webView.loadDataWithBaseURL 方法，该方法结构谨慎修改，修该后请同步修改
      * [com.ft.plugin.garble.bytecode.FTMethodAdapter] 类中的 visitMethodInsn 方法中关于该替换内容的部分
+     *
      * @param webView
      * @param data
      * @param encoding
@@ -908,6 +920,7 @@ public class FTAutoTrack {
     /**
      * 插桩方法用来替换调用的 android/webkit/webView.postUrl 方法，该方法结构谨慎修改，修该后请同步修改
      * [com.ft.plugin.garble.bytecode.FTMethodAdapter] 类中的 visitMethodInsn 方法中关于该替换内容的部分
+     *
      * @param webView
      * @param url
      * @return
@@ -921,11 +934,12 @@ public class FTAutoTrack {
                 new Class[]{String.class, byte[].class});
     }
 
-    private static void setUpWebView(View webView){
+    private static void setUpWebView(View webView) {
         if (webView instanceof WebView) {
             ((WebView) webView).setWebViewClient(new FTWebViewClient());
         }
     }
+
     private static void invokeWebViewLoad(View webView, String methodName, Object[] params, Class[] paramTypes) {
         try {
             Class<?> clazz = webView.getClass();
@@ -939,10 +953,11 @@ public class FTAutoTrack {
     /**
      * 插桩方法用来替换调用的 OkHttpClient.Builder.build() 方法，该方法结构谨慎修改，修该后请同步修改
      * [com.ft.plugin.garble.bytecode.FTMethodAdapter] 类中的 visitMethodInsn 方法中关于该替换内容的部分
+     *
      * @param builder
      * @return
      */
-    public static OkHttpClient trackOkHttpBuilder(OkHttpClient.Builder builder){
+    public static OkHttpClient trackOkHttpBuilder(OkHttpClient.Builder builder) {
         builder.addInterceptor(new FTNetWorkTracerInterceptor());
         return builder.build();
     }
@@ -950,10 +965,11 @@ public class FTAutoTrack {
     /**
      * 插桩方法用来替换调用的 org/apache/hc/client5/http/impl/classic/HttpClientBuilder.build() 方法，该方法结构谨慎修改，修该后请同步修改
      * [com.ft.plugin.garble.bytecode.FTMethodAdapter] 类中的 visitMethodInsn 方法中关于该替换内容的部分
+     *
      * @param builder
      * @return
      */
-    public static CloseableHttpClient trackHttpClientBuilder(HttpClientBuilder builder){
+    public static CloseableHttpClient trackHttpClientBuilder(HttpClientBuilder builder) {
         FTHttpClientInterceptor interceptor = new FTHttpClientInterceptor();
         builder.addRequestInterceptorFirst(new FTHttpClientRequestInterceptor(interceptor));
         builder.addResponseInterceptorLast(new FTHttpClientResponseInterceptor(interceptor));

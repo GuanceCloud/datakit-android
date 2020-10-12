@@ -5,6 +5,7 @@ import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.FTTrackInner;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * description: 本地打印日志同步管理类
  */
 public class TrackLogManager {
+    private static final String TAG = "TrackLogManager";
     private static TrackLogManager instance;
     private List<LogBean> logBeanList = new CopyOnWriteArrayList<>();
     private LinkedBlockingQueue<LogBean> logQueue = new LinkedBlockingQueue<>();
@@ -37,8 +39,8 @@ public class TrackLogManager {
 
     public synchronized void trackLog(LogBean logBean) {
         //防止内存中队列容量超过一定限制，这里同样使用同步丢弃策略
-        if(logQueue.size() >= Constants.MAX_DB_CACHE_NUM){
-            switch (FTDBCachePolicy.get().getLogCacheDiscardStrategy()){
+        if (logQueue.size() >= Constants.MAX_DB_CACHE_NUM) {
+            switch (FTDBCachePolicy.get().getLogCacheDiscardStrategy()) {
                 case DISCARD:
                     break;
                 case DISCARD_OLDEST:
@@ -48,7 +50,7 @@ public class TrackLogManager {
                 default:
                     logQueue.add(logBean);
             }
-        }else{
+        } else {
             logQueue.add(logBean);
         }
         rotationSync();
@@ -68,11 +70,12 @@ public class TrackLogManager {
                     isRunning = true;
                     logBeanList.add(logBean);//取出数据放到集合中
                     if (logBeanList.size() >= 20 || logQueue.peek() == null) {//当取出的数据大于等于20条或者没有下一条数据时执行插入数据库操作
-                        FTTrackInner.getInstance().logBackgroundSync(logBeanList);
+                        FTTrackInner.getInstance().logBackground(logBeanList);
                         logBeanList.clear();//插入完成后执行清除集合操作
                     }
                 }
             } catch (Exception e) {
+                LogUtils.e(TAG, e.getMessage());
             } finally {
                 isRunning = false;
             }

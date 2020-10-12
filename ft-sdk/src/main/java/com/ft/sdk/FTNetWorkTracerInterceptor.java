@@ -1,13 +1,7 @@
 package com.ft.sdk;
 
-import com.ft.sdk.garble.FTExceptionHandler;
 import com.ft.sdk.garble.FTHttpConfig;
-import com.ft.sdk.garble.FTTrackInner;
-import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.http.HttpUrl;
-import com.ft.sdk.garble.utils.Constants;
-import com.ft.sdk.garble.utils.SkyWalkingUtils;
-import com.ft.sdk.garble.utils.Utils;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,7 +18,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
 
 import okhttp3.Interceptor;
 import okhttp3.MediaType;

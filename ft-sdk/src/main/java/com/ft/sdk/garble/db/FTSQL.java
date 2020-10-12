@@ -6,12 +6,12 @@ package com.ft.sdk.garble.db;
  * Description:
  */
 public class FTSQL {
-    public static final String FT_TABLE_NAME = "ft_operation_record";
+    public static final String FT_TABLE_NAME = "sync_data";
     public static final String RECORD_COLUMN_ID = "_id";
     public static final String RECORD_COLUMN_TM = "tm";
     public static final String RECORD_COLUMN_DATA = "data";
     public static final String RECORD_COLUMN_SESSION_ID = "session_id";
-    public static final String RECORD_COLUMN_OPTION = "option";
+    public static final String RECORD_COLUMN_DATA_TYPE = "type";
 
     public static final String FT_TABLE_CREATE = "CREATE TABLE if not exists " + FT_TABLE_NAME +
             " (" +
@@ -19,7 +19,7 @@ public class FTSQL {
             RECORD_COLUMN_TM + " INTEGER," +
             RECORD_COLUMN_DATA + " TEXT," +
             RECORD_COLUMN_SESSION_ID + " TEXT,"+
-            RECORD_COLUMN_OPTION + " TEXT"+
+            RECORD_COLUMN_DATA_TYPE + " TEXT"+
             ")";
 
     public static final String FT_TABLE_USER_DATA = "user_session_data";

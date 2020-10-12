@@ -1,6 +1,7 @@
 package com.ft.sdk.garble.bean;
 
 import com.ft.sdk.FTApplication;
+import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.Utils;
 
@@ -12,7 +13,7 @@ import org.json.JSONObject;
  * time: 2020/6/5 15:08:45
  * description:日志对象(SDK内部使用)
  */
-public class LogBean {
+public class LogBean  {
     //指定当前日志的来源，比如如果来源于 Ngnix，可指定为 Nginx，
     // 同一应用产生的日志 source 应该一样，这样在 DataFlux 中方便针对该来源的日志配置同一的提取规则
     String measurement;
@@ -57,10 +58,16 @@ public class LogBean {
         this.time = time;
     }
 
+    public LogBean(String content, long time) {
+        this(Constants.FT_LOG_DEFAULT_MEASUREMENT, content, time);
+    }
+
     public LogBean(String measurement, JSONObject json, long time) {
-        this.measurement = measurement;
-        this.content = json.toString();
-        this.time = time;
+        this(measurement, json.toString(), time);
+    }
+
+    public LogBean(JSONObject json, long time) {
+        this(Constants.FT_LOG_DEFAULT_MEASUREMENT, json.toString(), time);
     }
 
     public JSONObject getAllFields() {
@@ -112,11 +119,11 @@ public class LogBean {
             if (!Utils.isNullOrEmpty(isError)) {
                 tags.put("__isError", isError);
             }
-            if (!Utils.isNullOrEmpty(spanType)){
-                tags.put("__spanType",spanType);
+            if (!Utils.isNullOrEmpty(spanType)) {
+                tags.put("__spanType", spanType);
             }
-            if (!Utils.isNullOrEmpty(endpoint)){
-                tags.put("__endpoint",endpoint);
+            if (!Utils.isNullOrEmpty(endpoint)) {
+                tags.put("__endpoint", endpoint);
             }
             if (!tags.has("device_uuid")) {
                 tags.put("device_uuid", DeviceUtils.getUuid(FTApplication.getApplication()));

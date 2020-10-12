@@ -19,7 +19,7 @@ import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.FTExceptionHandler;
-import com.ft.sdk.garble.bean.RecordData;
+import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
 
 import org.junit.Assert;
@@ -100,9 +100,9 @@ public class ExceptionTest extends BaseTest {
         onView(ViewMatchers.withId(R.id.mock_crash_btn)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
-        List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);
         boolean value = false;
-        for (RecordData recordData : recordDataList) {
+        for (SyncJsonData recordData : recordDataList) {
             //查看数据库中数据是否有该条崩溃异常
             if (recordData.toString().contains("ArithmeticException")) {
                 value = true;

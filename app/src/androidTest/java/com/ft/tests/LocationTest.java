@@ -14,7 +14,7 @@ import com.ft.application.MockApplication;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
-import com.ft.sdk.garble.SyncCallback;
+import com.ft.sdk.garble.AsyncCallback;
 import com.ft.sdk.garble.utils.LocationUtils;
 
 import org.junit.Assert;
@@ -72,7 +72,7 @@ public class LocationTest extends BaseTest {
         Thread.sleep(2000);
         CountDownLatch countDownLatch = new CountDownLatch(1);
         address = null;
-        LocationUtils.get().startLocationCallBack(new SyncCallback() {
+        LocationUtils.get().startLocationCallBack(new AsyncCallback() {
             @Override
             public void onResponse(int code, String response) {
                 address = LocationUtils.get().getCity();
@@ -85,7 +85,7 @@ public class LocationTest extends BaseTest {
 
     @Test
     public void geoIPAddressTest() throws Exception {
-        Whitebox.invokeMethod(LocationUtils.get(), "requestGeoIPAddress", new SyncCallback() {
+        Whitebox.invokeMethod(LocationUtils.get(), "requestGeoIPAddress", new AsyncCallback() {
             @Override
             public void onResponse(int code, String response) {
                 if (code == 0) {
@@ -101,7 +101,7 @@ public class LocationTest extends BaseTest {
         Location location = new Location(LocationManager.NETWORK_PROVIDER);
         location.setLatitude(31.20690892154558);
         location.setLongitude(121.58605522685095);
-        Whitebox.invokeMethod(LocationUtils.get(), "requestGeoAddress", location,new SyncCallback() {
+        Whitebox.invokeMethod(LocationUtils.get(), "requestGeoAddress", location,new AsyncCallback() {
             @Override
             public void onResponse(int code, String response) {
                 if (code == 0) {

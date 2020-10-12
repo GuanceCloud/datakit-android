@@ -78,7 +78,7 @@
      *;
 }
 
--keep class com.ft.sdk.garble.SyncCallback{
+-keep class com.ft.sdk.garble.AsyncCallback{
     *;
 }
 
@@ -87,10 +87,6 @@
 }
 
 -keep class com.ft.sdk.garble.bean.LogData{
-    *;
-}
-
--keep class com.ft.sdk.garble.bean.KeyEventBean{
     *;
 }
 

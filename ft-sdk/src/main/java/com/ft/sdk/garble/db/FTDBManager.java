@@ -5,14 +5,15 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import androidx.annotation.NonNull;
+
 import com.ft.sdk.FTApplication;
-import com.ft.sdk.garble.bean.OP;
-import com.ft.sdk.garble.bean.RecordData;
+import com.ft.sdk.garble.bean.DataType;
+import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.db.base.DBManager;
 import com.ft.sdk.garble.db.base.DataBaseCallBack;
 import com.ft.sdk.garble.db.base.DatabaseHelper;
-import com.ft.sdk.garble.utils.LogUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,29 +47,10 @@ public class FTDBManager extends DBManager {
      *
      * @param data
      */
-    public boolean insertFTOperation(final RecordData data) {
-        final boolean[] result = new boolean[1];
-        getDB(true, db -> {
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(FTSQL.RECORD_COLUMN_TM, data.getTime());
-            contentValues.put(FTSQL.RECORD_COLUMN_DATA, data.getJsonString());
-            contentValues.put(FTSQL.RECORD_COLUMN_SESSION_ID, data.getSessionid());
-            contentValues.put(FTSQL.RECORD_COLUMN_OPTION, data.getOp());
-            try {
-                long value = db.insert(FTSQL.FT_TABLE_NAME, null, contentValues);
-                LogUtils.d(TAG,"insert value:"+value);
-                if(value>=0){
-                    result[0] = true;
-                }else{
-                    result[0] = false;
-                }
-            }catch (Exception e){
-                e.printStackTrace();
-                LogUtils.e(TAG,"insert error message:"+e.getLocalizedMessage());
-                result[0] = false;
-            }
-        });
-        return result[0];
+    public boolean insertFTOperation(final SyncJsonData data) {
+        ArrayList<SyncJsonData> list = new ArrayList<>();
+        list.add(data);
+        return insertFtOptList(list);
     }
 
     /**
@@ -76,27 +58,23 @@ public class FTDBManager extends DBManager {
      *
      * @param dataList
      */
-    public boolean insertFtOptList(final List<RecordData> dataList) {
+    public boolean insertFtOptList(@NonNull final List<SyncJsonData> dataList) {
         final boolean[] result = new boolean[1];
         getDB(true, db -> {
             db.beginTransaction();
             int count = 0;
-            for (RecordData data : dataList) {
+            for (SyncJsonData data : dataList) {
                 ContentValues contentValues = new ContentValues();
                 contentValues.put(FTSQL.RECORD_COLUMN_TM, data.getTime());
                 contentValues.put(FTSQL.RECORD_COLUMN_DATA, data.getJsonString());
-                contentValues.put(FTSQL.RECORD_COLUMN_SESSION_ID, data.getSessionid());
-                contentValues.put(FTSQL.RECORD_COLUMN_OPTION, data.getOp());
+                contentValues.put(FTSQL.RECORD_COLUMN_SESSION_ID, data.getSessionId());
+                contentValues.put(FTSQL.RECORD_COLUMN_DATA_TYPE, data.getDataType().getValue());
                 long rowId = db.insert(FTSQL.FT_TABLE_NAME, null, contentValues);
-                if(rowId>=0){
+                if (rowId >= 0) {
                     count++;
                 }
             }
-            if(count == dataList.size()){
-                result[0] = true;
-            }else{
-                result[0] = false;
-            }
+            result[0] = count == dataList.size();
             db.setTransactionSuccessful();
             db.endTransaction();
         });
@@ -105,38 +83,33 @@ public class FTDBManager extends DBManager {
 
     /**
      * 查询log数据
+     *
      * @param limit
      * @return
      */
-    public List<RecordData> queryDataByDescLimitLog(final int limit){
-        return queryDataByDescLimit(limit,"option=?",new String[]{OP.LOG.value});
+    public List<SyncJsonData> queryDataByDescLimitLog(final int limit) {
+        return queryDataByDescLimit(limit, FTSQL.RECORD_COLUMN_DATA_TYPE + "=?", new String[]{DataType.LOG.getValue()});
     }
 
-    /**
-     * 查询 KeyEvent 数据
-     * @param limit
-     * @return
-     */
-    public List<RecordData> queryDataByDescLimitKeyEvent(final int limit){
-        return queryDataByDescLimit(limit,"option=?",new String[]{OP.KEYEVENT.value});
-    }
 
     /**
      * 查询 Object 数据
+     *
      * @param limit
      * @return
      */
-    public List<RecordData> queryDataByDescLimitObject(final int limit){
-        return queryDataByDescLimit(limit,"option=?",new String[]{OP.OBJECT.value});
+    public List<SyncJsonData> queryDataByDescLimitObject(final int limit) {
+        return queryDataByDescLimit(limit, FTSQL.RECORD_COLUMN_DATA_TYPE + "=?", new String[]{DataType.OBJECT.getValue()});
     }
 
     /**
      * 查询埋点事件数据
+     *
      * @param limit
      * @return
      */
-    public List<RecordData> queryDataByDescLimitTrack(final int limit){
-        return queryDataByDescLimit(limit,"option!=? AND option!=? AND option!=? ",new String[]{OP.LOG.value,OP.KEYEVENT.value,OP.OBJECT.value});
+    public List<SyncJsonData> queryDataByDescLimitTrack(final int limit) {
+        return queryDataByDescLimit(limit, FTSQL.RECORD_COLUMN_DATA_TYPE + "=? ", new String[]{DataType.TRACK.getValue()});
     }
 
     /**
@@ -145,23 +118,24 @@ public class FTDBManager extends DBManager {
      * @param limit limit == 0 表示获取全部数据
      * @return
      */
-    public List<RecordData> queryDataByDescLimit(final int limit) {
-        return queryDataByDescLimit(limit,null,null);
+    public List<SyncJsonData> queryDataByDescLimit(final int limit) {
+        return queryDataByDescLimit(limit, null, null);
     }
 
     /**
      * 查询数据库中数据的总数
+     *
      * @return
      */
-    public int queryTotalCount(OP op){
+    public int queryTotalCount(DataType dataType) {
         final int[] count = new int[1];
-        getDB(false,db ->{
+        getDB(false, db -> {
             try {
-                Cursor cursor = db.rawQuery("select count(*) from " + FTSQL.FT_TABLE_NAME + " where option='" + op.value+"'", null);
+                Cursor cursor = db.rawQuery("select count(*) from " + FTSQL.FT_TABLE_NAME + " where " + FTSQL.RECORD_COLUMN_DATA_TYPE + "='" + dataType.getValue() + "'", null);
                 cursor.moveToFirst();
                 count[0] = cursor.getInt(0);
                 cursor.close();
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         });
@@ -170,17 +144,18 @@ public class FTDBManager extends DBManager {
 
     /**
      * 删除数据表中的前 limit 行数的数据
-     * @param op
+     *
+     * @param type
      * @param limit
      * @return
      */
-    public void deleteOldestData(OP op,int limit){
+    public void deleteOldestData(DataType type, int limit) {
         getDB(true, new DataBaseCallBack() {
             @Override
             public void run(SQLiteDatabase db) {
                 try {
-                    db.execSQL("DELETE FROM ft_operation_record where _id in (SELECT _id from ft_operation_record where option='"+op.value+"' ORDER by tm ASC LIMIT "+limit+")");
-                }catch (Exception e){
+                    db.execSQL("DELETE FROM ft_operation_record where _id in (SELECT _id from ft_operation_record where " + FTSQL.RECORD_COLUMN_DATA_TYPE + "='" + type.getValue() + "' ORDER by tm ASC LIMIT " + limit + ")");
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -189,13 +164,14 @@ public class FTDBManager extends DBManager {
 
     /**
      * 根据条件查询数据
+     *
      * @param limit
      * @param selection
      * @param selectionArgs
      * @return
      */
-    public List<RecordData> queryDataByDescLimit(final int limit,String selection,String[] selectionArgs) {
-        final List<RecordData> recordList = new ArrayList<>();
+    public List<SyncJsonData> queryDataByDescLimit(final int limit, String selection, String[] selectionArgs) {
+        final List<SyncJsonData> recordList = new ArrayList<>();
         getDB(false, db -> {
             Cursor cursor;
             if (limit == 0) {
@@ -206,14 +182,28 @@ public class FTDBManager extends DBManager {
             while (cursor.moveToNext()) {
                 long id = cursor.getLong(cursor.getColumnIndex(FTSQL.RECORD_COLUMN_ID));
                 long time = cursor.getLong(cursor.getColumnIndex(FTSQL.RECORD_COLUMN_TM));
-                String sessionId = cursor.getString(cursor.getColumnIndex(FTSQL.RECORD_COLUMN_SESSION_ID));
                 String data = cursor.getString(cursor.getColumnIndex(FTSQL.RECORD_COLUMN_DATA));
-                RecordData recordData = new RecordData();
-                recordData.setId(id);
-                recordData.setTime(time);
-                recordData.setSessionid(sessionId);
-                recordData.parseJsonToObj(data);
-                recordList.add(recordData);
+                String sessionId = cursor.getString(cursor.getColumnIndex(FTSQL.RECORD_COLUMN_SESSION_ID));
+                String type = cursor.getString(cursor.getColumnIndex(FTSQL.RECORD_COLUMN_DATA_TYPE));
+
+
+                SyncJsonData recordData = null;
+
+                for (DataType dataType : DataType.values()) {
+                    if (dataType.getValue().equals(type)) {
+                        recordData = new SyncJsonData(dataType);
+                        break;
+                    }
+                }
+                if (recordData != null) {
+                    recordData.setId(id);
+                    recordData.setTime(time);
+                    recordData.setSessionId(sessionId);
+                    recordData.parseJsonToObj(data);
+                    recordList.add(recordData);
+                }
+
+
             }
             cursor.close();
         });
@@ -243,11 +233,7 @@ public class FTDBManager extends DBManager {
         final boolean[] result = new boolean[1];
         getDB(true, db -> {
             int value = db.delete(FTSQL.FT_TABLE_NAME, null, null);
-            if(value > 0){
-                result[0] = true;
-            }else {
-                result[0] = false;
-            }
+            result[0] = value > 0;
         });
         return result[0];
     }
@@ -287,7 +273,7 @@ public class FTDBManager extends DBManager {
                 cursor.close();
             });
             return userData.getName() == null ? null : userData;
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
@@ -314,7 +300,7 @@ public class FTDBManager extends DBManager {
                 cursor.close();
             });
             return userDataList;
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }

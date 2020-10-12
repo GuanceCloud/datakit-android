@@ -19,9 +19,9 @@ import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.garble.bean.DataType;
-import com.ft.sdk.garble.bean.RecordData;
+import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
-import com.ft.sdk.garble.manager.SyncDataManager;
+import com.ft.sdk.garble.manager.SyncDataHelper;
 import com.ft.sdk.garble.utils.Constants;
 
 import org.json.JSONException;
@@ -107,10 +107,10 @@ public class FTAutoTrackTest extends BaseTest {
         onView(ViewMatchers.withId(R.id.mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
-        List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
         boolean value = false;
-        for (RecordData recordData : recordDataList) {
-            JSONObject jsonObject = new JSONObject(recordData.getOpdata());
+        for (SyncJsonData recordData : recordDataList) {
+            JSONObject jsonObject = new JSONObject(recordData.getOpData().getContent());
             JSONObject tags = jsonObject.getJSONObject(Constants.TAGS);
             String vtp = tags.optString("vtp");
             if (expect.equals(vtp)) {
@@ -131,11 +131,11 @@ public class FTAutoTrackTest extends BaseTest {
         onView(withId(R.id.mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
-        List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
         boolean value = false;
         try {
-            for (RecordData recordData : recordDataList) {
-                JSONObject jsonObject = new JSONObject(recordData.getOpdata());
+            for (SyncJsonData recordData : recordDataList) {
+                JSONObject jsonObject = new JSONObject(recordData.getOpData().getContent());
                 JSONObject tags = jsonObject.getJSONObject(Constants.TAGS);
                 String vtp = tags.optString("vtp");
                 if (expect.equals(vtp)) {
@@ -159,11 +159,11 @@ public class FTAutoTrackTest extends BaseTest {
         onView(withId(R.id.mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
-        List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
         boolean value = false;
         try {
-            for (RecordData recordData : recordDataList) {
-                if (recordData.getOp().equals("clk")) {
+            for (SyncJsonData recordData : recordDataList) {
+                if (recordData.getOpData().getOp().equals("clk")) {
                     value = true;
                     break;
                 }
@@ -185,11 +185,11 @@ public class FTAutoTrackTest extends BaseTest {
         onView(withId(R.id.mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(2000);
-        List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
         boolean value = false;
         try {
-            for (RecordData recordData : recordDataList) {
-                if (recordData.getOp().equals("clk")) {
+            for (SyncJsonData recordData : recordDataList) {
+                if (recordData.getOpData().getOp().equals("clk")) {
                     value = true;
                     break;
                 }
@@ -212,11 +212,11 @@ public class FTAutoTrackTest extends BaseTest {
         onView(withId(R.id.mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
-        List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
         boolean value = false;
         try {
-            for (RecordData recordData : recordDataList) {
-                if (recordData.getOp().equals("clk")) {
+            for (SyncJsonData recordData : recordDataList) {
+                if (recordData.getOpData().getOp().equals("clk")) {
                     value = true;
                     break;
                 }
@@ -239,11 +239,11 @@ public class FTAutoTrackTest extends BaseTest {
         onView(withId(R.id.mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(2000);
-        List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
         boolean value = false;
         try {
-            for (RecordData recordData : recordDataList) {
-                if (recordData.getOp().equals("clk")) {
+            for (SyncJsonData recordData : recordDataList) {
+                if (recordData.getOpData().getOp().equals("clk")) {
                     value = true;
                     break;
                 }
@@ -269,10 +269,10 @@ public class FTAutoTrackTest extends BaseTest {
         onView(withId(R.id.mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
-        List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
         boolean value = false;
-        for (RecordData recordData : recordDataList) {
-            JSONObject jsonObject = new JSONObject(recordData.getOpdata());
+        for (SyncJsonData recordData : recordDataList) {
+            JSONObject jsonObject = new JSONObject(recordData.getOpData().getContent());
             JSONObject fields = jsonObject.getJSONObject(Constants.FIELDS);
             String vtp = fields.optString("vtp_desc");
             if (expect.equals(vtp)) {
@@ -297,10 +297,10 @@ public class FTAutoTrackTest extends BaseTest {
         onView(withId(R.id.mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
-        List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
         boolean value = false;
-        for (RecordData recordData : recordDataList) {
-            JSONObject jsonObject = new JSONObject(recordData.getOpdata());
+        for (SyncJsonData recordData : recordDataList) {
+            JSONObject jsonObject = new JSONObject(recordData.getOpData().getContent());
             JSONObject fields = jsonObject.getJSONObject(Constants.FIELDS);
             String vtp = fields.optString("vtp_desc");
             if (expect.equals(vtp)) {
@@ -324,8 +324,8 @@ public class FTAutoTrackTest extends BaseTest {
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
         removeActivityLifeCycle();
-        List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
-        SyncDataManager syncDataManager = new SyncDataManager();
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
+        SyncDataHelper syncDataManager = new SyncDataHelper();
         String content = syncDataManager.getBodyContent(DataType.TRACK, recordDataList);
         Assert.assertTrue(content.contains("page_desc") && content.contains("主页面"));
     }
@@ -342,8 +342,8 @@ public class FTAutoTrackTest extends BaseTest {
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
         removeActivityLifeCycle();
-        List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
-        SyncDataManager syncDataManager = new SyncDataManager();
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
+        SyncDataHelper syncDataManager = new SyncDataHelper();
         String content = syncDataManager.getBodyContent(DataType.TRACK, recordDataList);
         Assert.assertTrue(content.contains("page_desc") && content.contains("主页面"));
     }
