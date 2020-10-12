@@ -16,7 +16,7 @@ import android.os.Looper;
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.garble.FTMonitorConfig;
-import com.ft.sdk.garble.SyncCallback;
+import com.ft.sdk.garble.AsyncCallback;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.http.RequestMethod;
@@ -166,7 +166,7 @@ public class LocationUtils {
         }
     };
 
-    public synchronized void startLocationCallBack(SyncCallback syncCallback) {
+    public synchronized void startLocationCallBack(AsyncCallback syncCallback) {
         if (address != null) {
             callback(syncCallback, 0, "");
             return;
@@ -245,7 +245,7 @@ public class LocationUtils {
         return openGps;
     }
 
-    private void getAddress(Location location, SyncCallback syncCallback) {
+    private void getAddress(Location location, AsyncCallback syncCallback) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -264,7 +264,7 @@ public class LocationUtils {
         }).start();
     }
 
-    private void callback(SyncCallback syncCallback, int code, String message) {
+    private void callback(AsyncCallback syncCallback, int code, String message) {
         if (syncCallback != null) syncCallback.onResponse(code, message);
     }
 
@@ -272,7 +272,7 @@ public class LocationUtils {
      * 使用系统自身API进行地址逆向解析
      * * @param location
      */
-    private void requestNative(Location location, SyncCallback syncCallback) {
+    private void requestNative(Location location, AsyncCallback syncCallback) {
         String errorMessage = "";
         int code = 0;
         List<Address> result = null;
@@ -309,7 +309,7 @@ public class LocationUtils {
      *
      * @param location
      */
-    private void requestGeoAddress(Location location, SyncCallback syncCallback) {
+    private void requestGeoAddress(Location location, AsyncCallback syncCallback) {
         String errorMessage = "";
         int code = 0;
         if (location == null) {
@@ -377,7 +377,7 @@ public class LocationUtils {
     /**
      * 高德 API 通过 IP 解析地址
      */
-    private void requestGeoIPAddress(SyncCallback syncCallback) {
+    private void requestGeoIPAddress(AsyncCallback syncCallback) {
         String errorMessage = "";
         int code = 0;
         HashMap<String, Object> params = new HashMap<String, Object>();

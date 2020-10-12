@@ -11,7 +11,7 @@ import com.ft.application.MockApplication;
 import com.ft.sdk.FTAutoTrack;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
-import com.ft.sdk.garble.bean.RecordData;
+import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
 
 import org.json.JSONException;
@@ -64,7 +64,7 @@ public class BindUserTest extends BaseTest {
         FTSdk.get().unbindUserData();
         //间隔15秒查询数据库数据，因为上传的逻辑最长可能要10秒后执行
         Thread.sleep(15000);
-        List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimit(0);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimit(0);
         assertEquals(1, recordDataList.size());
     }
 
@@ -78,7 +78,7 @@ public class BindUserTest extends BaseTest {
         bindUserData("FT-TEST");
         FTAutoTrack.startApp();
         Thread.sleep(15000);
-        List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimit(0);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimit(0);
         assertEquals(0, recordDataList.size());
     }
 
@@ -94,7 +94,7 @@ public class BindUserTest extends BaseTest {
         bindUserData("FT-TEST");
         FTAutoTrack.startApp();
         Thread.sleep(15000);
-        List<RecordData> recordDataList1 = FTDBManager.get().queryDataByDescLimit(0);
+        List<SyncJsonData> recordDataList1 = FTDBManager.get().queryDataByDescLimit(0);
         assertEquals(0, recordDataList1.size());
     }
 

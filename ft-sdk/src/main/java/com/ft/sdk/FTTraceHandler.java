@@ -78,7 +78,7 @@ public class FTTraceHandler {
         //请求结束时间
         long responseTime = System.currentTimeMillis();
 
-        LogBean logBean = new LogBean(Constants.USER_AGENT, content, requestTime);
+        LogBean logBean = new LogBean(Constants.FT_LOG_DEFAULT_MEASUREMENT, content, requestTime);
         logBean.setOperationName(operationName);
         logBean.setDuration((responseTime-requestTime) * 1000);
         logBean.setClazz("tracing");

@@ -7,23 +7,23 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.ft.AccountUtils;
 import com.ft.BaseTest;
-import com.ft.utils.RequestUtil;
 import com.ft.application.MockApplication;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTrack;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.TraceType;
+import com.ft.sdk.garble.AsyncCallback;
 import com.ft.sdk.garble.FTTrackInner;
-import com.ft.sdk.garble.SyncCallback;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.ObjectBean;
-import com.ft.sdk.garble.bean.RecordData;
 import com.ft.sdk.garble.bean.Status;
+import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
-import com.ft.sdk.garble.manager.SyncDataManager;
+import com.ft.sdk.garble.manager.SyncDataHelper;
 import com.ft.sdk.garble.manager.SyncTaskManager;
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.utils.RequestUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -93,7 +93,7 @@ public class LogTrackObjectTraceTest extends BaseTest {
         //线程池中插入，有一定的时间延迟，这里设置5秒等待时间
         Thread.sleep(5000);
         //从数据库中查询是否有插入的数据
-        int except = judgeDBContainTargetLog(DataType.LOG, "----logInsertDataTest----");
+        int except = countInDB(DataType.LOG, "----logInsertDataTest----");
         Assert.assertEquals(1, except);
     }
 
@@ -123,7 +123,7 @@ public class LogTrackObjectTraceTest extends BaseTest {
         startSyncTask();
         FTTrack.getInstance().logBackground("----logUploadTest----", Status.CRITICAL);
         Thread.sleep(12000);
-        int except = judgeDBContainTargetLog(DataType.LOG, "----logUploadTest----");
+        int except = countInDB(DataType.LOG, "----logUploadTest----");
         Assert.assertEquals(0, except);
     }
 
@@ -141,7 +141,7 @@ public class LogTrackObjectTraceTest extends BaseTest {
         fields.put("testField", "----trackInsertDataTest----");
         FTTrack.getInstance().trackBackground("TestLog", tags, fields);
         Thread.sleep(5000);
-        int except = judgeDBContainTargetLog(DataType.TRACK, "----trackInsertDataTest----");
+        int except = countInDB(DataType.TRACK, "----trackInsertDataTest----");
         Assert.assertEquals(1, except);
     }
 
@@ -177,7 +177,7 @@ public class LogTrackObjectTraceTest extends BaseTest {
         fields.put("testField", "----trackUploadTest----");
         FTTrack.getInstance().trackBackground("TestLog", tags, fields);
         Thread.sleep(12000);
-        int except = judgeDBContainTargetLog(DataType.TRACK, "----trackUploadTest----");
+        int except = countInDB(DataType.TRACK, "----trackUploadTest----");
         Assert.assertEquals(0, except);
     }
 
@@ -192,7 +192,7 @@ public class LogTrackObjectTraceTest extends BaseTest {
         ObjectBean objectBean = new ObjectBean("objectTest", "----objectInsertDataTest----");
         FTTrackInner.getInstance().objectBackground(objectBean);
         Thread.sleep(5000);
-        int except = judgeDBContainTargetLog(DataType.OBJECT, "----objectInsertDataTest----");
+        int except = countInDB(DataType.OBJECT, "----objectInsertDataTest----");
         Assert.assertEquals(1, except);
     }
 
@@ -222,7 +222,7 @@ public class LogTrackObjectTraceTest extends BaseTest {
         ObjectBean objectBean = new ObjectBean("objectTest", "----objectUploadTest----");
         FTTrackInner.getInstance().objectBackground(objectBean);
         Thread.sleep(12000);
-        int except = judgeDBContainTargetLog(DataType.OBJECT, "----objectUploadTest----");
+        int except = countInDB(DataType.OBJECT, "----objectUploadTest----");
         Assert.assertEquals(0, except);
     }
 
@@ -268,11 +268,11 @@ public class LogTrackObjectTraceTest extends BaseTest {
     private void traceDataTest(String url, String except) throws JSONException, InterruptedException {
         RequestUtil.requestUrl(url);
         Thread.sleep(5000);
-        int except1 = judgeDBContainTargetLog(DataType.LOG, except);
+        int except1 = countInDB(DataType.LOG, except);
         startSyncTask();
         FTTrack.getInstance().logBackground("----traceDataTest----", Status.CRITICAL);
         Thread.sleep(12000);
-        int except2 = judgeDBContainTargetLog(DataType.LOG, except);
+        int except2 = countInDB(DataType.LOG, except);
         Assert.assertEquals(1, except1);
         Assert.assertEquals(0, except2);
     }
@@ -283,7 +283,7 @@ public class LogTrackObjectTraceTest extends BaseTest {
      * @param dataType
      */
     private void uploadData(DataType dataType) {
-        List<RecordData> recordDataList = null;
+        List<SyncJsonData> recordDataList = null;
         switch (dataType) {
             case OBJECT:
                 recordDataList = FTDBManager.get().queryDataByDescLimitObject(0);
@@ -291,19 +291,16 @@ public class LogTrackObjectTraceTest extends BaseTest {
             case LOG:
                 recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);
                 break;
-            case KEY_EVENT:
-                recordDataList = FTDBManager.get().queryDataByDescLimitKeyEvent(0);
-                break;
             case TRACK:
                 recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
                 break;
         }
-        SyncDataManager syncDataManager = new SyncDataManager();
+        SyncDataHelper syncDataManager = new SyncDataHelper();
         String body = syncDataManager.getBodyContent(dataType, recordDataList);
         body = body.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION).replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK);
 
         try {
-            Whitebox.invokeMethod(SyncTaskManager.get(), "requestNet", dataType, body, new SyncCallback() {
+            Whitebox.invokeMethod(SyncTaskManager.get(), "requestNet", dataType, body, new AsyncCallback() {
                 @Override
                 public void onResponse(int code, String response) {
                     Assert.assertEquals(200, code);
@@ -320,8 +317,8 @@ public class LogTrackObjectTraceTest extends BaseTest {
      * @param target
      * @return
      */
-    private int judgeDBContainTargetLog(DataType type, String target) {
-        List<RecordData> recordDataList = null;
+    private int countInDB(DataType type, String target) {
+        List<SyncJsonData> recordDataList = null;
         switch (type) {
             case OBJECT:
                 recordDataList = FTDBManager.get().queryDataByDescLimitObject(0);
@@ -329,17 +326,14 @@ public class LogTrackObjectTraceTest extends BaseTest {
             case LOG:
                 recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);
                 break;
-            case KEY_EVENT:
-                recordDataList = FTDBManager.get().queryDataByDescLimitKeyEvent(0);
-                break;
             case TRACK:
                 recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
                 break;
         }
         int except = 0;
         if (recordDataList != null) {
-            for (RecordData data : recordDataList) {
-                if (data.getOpdata().contains(target)) {
+            for (SyncJsonData data : recordDataList) {
+                if (data.getOpData().getContent().contains(target)) {
                     except++;
                 }
             }

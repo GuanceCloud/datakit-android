@@ -13,7 +13,7 @@ import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTrack;
 import com.ft.sdk.MonitorType;
-import com.ft.sdk.garble.bean.RecordData;
+import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.utils.Constants;
 
@@ -57,57 +57,58 @@ public class MonitorTest extends BaseTest {
     }
 
     @Test
-    public void monitorBatteryTest(){
+    public void monitorBatteryTest() {
         monitorTest(MonitorType.BATTERY);
     }
 
     @Test
-    public void monitorMemoryTest(){
+    public void monitorMemoryTest() {
         monitorTest(MonitorType.MEMORY);
     }
 
     @Test
-    public void monitorCPUTest(){
+    public void monitorCPUTest() {
         monitorTest(MonitorType.CPU);
     }
 
     @Test
-    public void monitorGPUTest(){
+    public void monitorGPUTest() {
         monitorTest(MonitorType.GPU);
     }
 
     @Test
-    public void monitorNetworkTest(){
+    public void monitorNetworkTest() {
         monitorTest(MonitorType.NETWORK);
     }
 
     @Test
-    public void monitorCameraTest(){
+    public void monitorCameraTest() {
         monitorTest(MonitorType.CAMERA);
     }
 
     @Test
-    public void monitorLocationTest(){
+    public void monitorLocationTest() {
         monitorTest(MonitorType.LOCATION);
     }
 
     @Test
-    public void monitorBlueToothTest(){
+    public void monitorBlueToothTest() {
         monitorTest(MonitorType.BLUETOOTH);
     }
 
     @Test
-    public void monitorSystemTest(){
+    public void monitorSystemTest() {
         monitorTest(MonitorType.SYSTEM);
     }
 
     @Test
-    public void monitorFpsTest(){
+    public void monitorFpsTest() {
         monitorTest(MonitorType.FPS);
     }
 
     /**
      * 测试监控周期切换是否正常，该测试用例需要观察控制台的输出日志《轮训监控上报数据成功》来观察
+     *
      * @throws InterruptedException
      */
     @Test
@@ -124,15 +125,15 @@ public class MonitorTest extends BaseTest {
         FTSdk.install(ftSDKConfig);
 //        SyncTaskManager.get().setRunning(true);
         stopSyncTask();
-        FTTrack.getInstance().trackBackground("TestMonitor",getJSONObject("tag","tagTest"),getJSONObject("field","fieldTest"));
+        FTTrack.getInstance().trackBackground("TestMonitor", getJSONObject("tag", "tagTest"), getJSONObject("field", "fieldTest"));
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(1);
-        String data = recordDataList.get(0).getOpdata();
-        judge(data,monitorType);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(1);
+        String data = recordDataList.get(0).getOpData().getContent();
+        judge(data, monitorType);
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -140,45 +141,47 @@ public class MonitorTest extends BaseTest {
         }
     }
 
-    private void judge(String content,int monitorType){
-        HashMap<Integer,String> expects = createMonitorMap();
+    private void judge(String content, int monitorType) {
+        HashMap<Integer, String> expects = createMonitorMap();
         boolean containExpect = content.contains(expects.get(monitorType));
         for (String value : expects.values()) {
-            if(!value.equals(expects.get(monitorType))){
+            if (!value.equals(expects.get(monitorType))) {
                 boolean noContainOther = !content.contains(value);
                 containExpect = containExpect && noContainOther;
             }
         }
         Assert.assertTrue(containExpect);
     }
+
     /**
      * 构建一个监控类型-期望值的 map
      */
-    private HashMap<Integer,String> createMonitorMap(){
-        HashMap<Integer,String> expects = new HashMap<>();
-        expects.put(MonitorType.BATTERY,Constants.KEY_BATTERY_USE);
-        expects.put(MonitorType.MEMORY,Constants.KEY_MEMORY_USE);
-        expects.put(MonitorType.CPU,Constants.KEY_CPU_HZ);
-        expects.put(MonitorType.GPU,Constants.KEY_GPU_RATE);
-        expects.put(MonitorType.NETWORK,Constants.KEY_NETWORK_PROXY);
-        expects.put(MonitorType.CAMERA,"camera_back_px");
-        expects.put(MonitorType.LOCATION,Constants.KEY_LOCATION_GPS_OPEN);
-        expects.put(MonitorType.BLUETOOTH,Constants.KEY_BT_OPEN);
-        expects.put(MonitorType.SYSTEM,Constants.KEY_DEVICE_NAME);
-        expects.put(MonitorType.FPS,Constants.KEY_FPS);
+    private HashMap<Integer, String> createMonitorMap() {
+        HashMap<Integer, String> expects = new HashMap<>();
+        expects.put(MonitorType.BATTERY, Constants.KEY_BATTERY_USE);
+        expects.put(MonitorType.MEMORY, Constants.KEY_MEMORY_USE);
+        expects.put(MonitorType.CPU, Constants.KEY_CPU_HZ);
+        expects.put(MonitorType.GPU, Constants.KEY_GPU_RATE);
+        expects.put(MonitorType.NETWORK, Constants.KEY_NETWORK_PROXY);
+        expects.put(MonitorType.CAMERA, "camera_back_px");
+        expects.put(MonitorType.LOCATION, Constants.KEY_LOCATION_GPS_OPEN);
+        expects.put(MonitorType.BLUETOOTH, Constants.KEY_BT_OPEN);
+        expects.put(MonitorType.SYSTEM, Constants.KEY_DEVICE_NAME);
+        expects.put(MonitorType.FPS, Constants.KEY_FPS);
         return expects;
     }
 
     /**
      * 构建一个 JSONObject 用于 tag or field
+     *
      * @param key
      * @param value
      * @return
      */
-    private JSONObject getJSONObject(String key,String value) {
+    private JSONObject getJSONObject(String key, String value) {
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put(key,value);
+            jsonObject.put(key, value);
         } catch (JSONException e) {
             e.printStackTrace();
         }

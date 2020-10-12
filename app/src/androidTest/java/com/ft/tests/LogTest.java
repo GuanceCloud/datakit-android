@@ -13,7 +13,7 @@ import com.ft.application.MockApplication;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.FTDBCachePolicy;
-import com.ft.sdk.garble.bean.RecordData;
+import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
 
 import org.junit.Assert;
@@ -59,11 +59,11 @@ public class LogTest extends BaseTest {
     public void consoleLogTest() throws InterruptedException {
         Log.d("TestLog", "控制台日志测试用例qaws");
         Thread.sleep(4000);
-        List<RecordData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(10);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(10);
         int except = 0;
         if (recordDataList != null) {
-            for (RecordData data : recordDataList) {
-                if (data.getOpdata().contains("控制台日志测试用例qaws")) {
+            for (SyncJsonData data : recordDataList) {
+                if (data.getOpData().getContent().contains("控制台日志测试用例qaws")) {
                     except++;
                 }
             }
@@ -85,15 +85,15 @@ public class LogTest extends BaseTest {
             Thread.sleep(10);
         }
         Thread.sleep(2000);
-        List<RecordData> dataList = FTDBManager.get().queryDataByDescLimitLog(0);
+        List<SyncJsonData> dataList = FTDBManager.get().queryDataByDescLimitLog(0);
         int count = 0;
-        for (RecordData recordData : dataList) {
-            if(recordData.getOpdata().contains("控制台日志测试用例")){
+        for (SyncJsonData recordData : dataList) {
+            if (recordData.getOpData().getContent().contains("控制台日志测试用例")) {
                 count++;
             }
         }
-        System.out.println("count="+count);
+        System.out.println("count=" + count);
         //Thread.sleep(300000);
-        Assert.assertTrue(10>=count);
+        Assert.assertTrue(10 >= count);
     }
 }

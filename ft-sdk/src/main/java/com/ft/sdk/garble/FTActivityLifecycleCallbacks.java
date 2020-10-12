@@ -38,7 +38,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
 
     @Override
     public void onActivityResumed(@NonNull Activity activity) {
-        LocationUtils.get().startLocationCallBack(new SyncCallback() {
+        LocationUtils.get().startLocationCallBack(new AsyncCallback() {
             @Override
             public void onResponse(int code, String response) {
                 LogUtils.d("LocationUtil","code="+code+",response="+response);

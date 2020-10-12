@@ -2,13 +2,12 @@ package com.ft.sdk;
 
 import com.ft.sdk.garble.FTExceptionHandler;
 import com.ft.sdk.garble.FTTrackInner;
-import com.ft.sdk.garble.SyncCallback;
+import com.ft.sdk.garble.AsyncCallback;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.LogData;
 import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.bean.TrackBean;
-import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONObject;
@@ -48,7 +47,7 @@ public class FTTrack {
      */
     public void trackBackground(String measurement, JSONObject tags, JSONObject fields) {
         long time = System.currentTimeMillis();
-        FTTrackInner.getInstance().track(OP.CSTM, time, measurement, tags, fields);
+        FTTrackInner.getInstance().trackBackground(OP.CSTM, time, measurement, tags, fields);
     }
 
     /**
@@ -59,10 +58,10 @@ public class FTTrack {
      * @param fields      埋点数据
      * @param callback    上传结果回调
      */
-    public void trackImmediate(String measurement, JSONObject tags, JSONObject fields, SyncCallback callback) {
+    public void trackImmediate(String measurement, JSONObject tags, JSONObject fields, AsyncCallback callback) {
         long time = System.currentTimeMillis();
         TrackBean trackBean = new TrackBean(measurement, tags, fields, time);
-        FTTrackInner.getInstance().track(OP.CSTM, Collections.singletonList(trackBean), callback);
+        FTTrackInner.getInstance().trackAsync(OP.CSTM, Collections.singletonList(trackBean), callback);
     }
 
     /**
@@ -71,8 +70,8 @@ public class FTTrack {
      * @param trackBeans 多条埋点数据
      * @param callback   上传结果回调
      */
-    public void trackImmediate(List<TrackBean> trackBeans, SyncCallback callback) {
-        FTTrackInner.getInstance().track(OP.CSTM, trackBeans, callback);
+    public void trackImmediate(List<TrackBean> trackBeans, AsyncCallback callback) {
+        FTTrackInner.getInstance().trackAsync(OP.CSTM, trackBeans, callback);
     }
 
 
@@ -83,7 +82,7 @@ public class FTTrack {
      * @param status
      */
     public void logBackground(String content, Status status) {
-        LogBean logBean = new LogBean(Constants.USER_AGENT, Utils.translateFieldValue(content), System.currentTimeMillis());
+        LogBean logBean = new LogBean(Utils.translateFieldValue(content), System.currentTimeMillis());
         logBean.setServiceName(FTExceptionHandler.get().getTrackServiceName());
         logBean.setStatus(status);
         logBean.setEnv(FTExceptionHandler.get().getEnv());
@@ -101,7 +100,7 @@ public class FTTrack {
         }
         List<LogBean> logBeans = new ArrayList<>();
         for (LogData logData : logDataList) {
-            LogBean logBean = new LogBean(Constants.USER_AGENT, Utils.translateFieldValue(logData.getContent()), System.currentTimeMillis());
+            LogBean logBean = new LogBean(Utils.translateFieldValue(logData.getContent()), System.currentTimeMillis());
             logBean.setServiceName(FTExceptionHandler.get().getTrackServiceName());
             logBean.setStatus(logData.getStatus());
             logBean.setEnv(FTExceptionHandler.get().getEnv());

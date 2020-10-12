@@ -6,10 +6,38 @@ package com.ft.sdk.garble.bean;
  * Description:
  */
 public enum OP {
-    LANC("lanc"), CLK("clk"), CSTM("cstm"), FLOW_CHAT("flow_chat"), OPEN("open"),
-    CLS_ACT("cls_act"), OPEN_ACT("opn_act"),
-    CLS_FRA("cls_fra"), OPEN_FRA("open_fra"), LOG("log"),
-    KEYEVENT("keyevent"), OBJECT("object"), BLOCK("block"),CRASH("crash"),ANR("anr");
+    //页面事件
+    LANC("lanc"),
+    CLK("clk"),
+    CSTM("cstm"),
+//    FLOW_CHART("flow_chart"),
+    OPEN("open"),
+    OPEN_ACT("opn_act"),
+    OPEN_FRA("open_fra"),
+    CLS_ACT("cls_act"),
+    CLS_FRA("cls_fra"),
+
+    //错误事件
+    BLOCK("block"),
+    CRASH("crash"),
+    ANR("anr"),
+
+
+    //webview 事件
+    WEBVIEW_LOADING("webview_loading"),
+    WEBVIEW_LOAD_COMPLETED("webview_load_completed"),
+
+    //客户端使用事件
+    CLIENT_ACTIVATED_TIME("client_activated_time"),
+
+    //网络情况事件
+    HTTP_CLIENT("http_client"),
+    HTTP_WEBVIEW("http_webview");
+
+    //ES 记录事件
+//    LOG("log"),
+//    OBJECT("object");
+
     public String value;
 
     OP(String value) {

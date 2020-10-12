@@ -12,7 +12,7 @@ import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTrack;
 import com.ft.sdk.garble.FTExceptionHandler;
-import com.ft.sdk.garble.SyncCallback;
+import com.ft.sdk.garble.AsyncCallback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -214,7 +214,7 @@ public class FTInitParamTest extends BaseTest {
         tags.put("testTag", "111");
         JSONObject fields = new JSONObject();
         fields.put("testFields", "222");
-        FTTrack.getInstance().trackImmediate("TestMeasurement", tags, fields, new SyncCallback() {
+        FTTrack.getInstance().trackImmediate("TestMeasurement", tags, fields, new AsyncCallback() {
             @Override
             public void onResponse(int code, String response) {
                 codeScope = code;

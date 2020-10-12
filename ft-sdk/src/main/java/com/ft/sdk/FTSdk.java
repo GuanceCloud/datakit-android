@@ -17,7 +17,7 @@ import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.FTNetworkListener;
 import com.ft.sdk.garble.FTUserConfig;
-import com.ft.sdk.garble.SyncCallback;
+import com.ft.sdk.garble.AsyncCallback;
 import com.ft.sdk.garble.manager.FTAnrWatchManager;
 import com.ft.sdk.garble.manager.FTUICatonManager;
 import com.ft.sdk.garble.manager.SyncTaskManager;
@@ -156,7 +156,7 @@ public class FTSdk {
     /**
      * 开启定，并且获取定位结果
      */
-    public static void startLocation(String geoKey, SyncCallback syncCallback) {
+    public static void startLocation(String geoKey, AsyncCallback syncCallback) {
         if (!Utils.isNullOrEmpty(geoKey)) {
             LocationUtils.get().setGeoKey(geoKey);
             LocationUtils.get().setUseGeoKey(true);

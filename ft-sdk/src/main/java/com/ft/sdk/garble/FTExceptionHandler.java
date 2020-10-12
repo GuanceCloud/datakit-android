@@ -7,7 +7,6 @@ import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.reflect.ReflectUtils;
-import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
@@ -33,7 +32,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
     public void uploadCrashLog(String crash) {
         FTAutoTrack.appCrash();
         LogUtils.d("FTExceptionHandler", "crash=" + crash);
-        LogBean logBean = new LogBean(Constants.USER_AGENT, Utils.translateFieldValue(crash), System.currentTimeMillis());
+        LogBean logBean = new LogBean(Utils.translateFieldValue(crash), System.currentTimeMillis());
         logBean.setStatus(Status.CRITICAL);
         logBean.setEnv(env);
         logBean.setServiceName(trackServiceName);

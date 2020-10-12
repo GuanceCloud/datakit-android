@@ -16,7 +16,8 @@ import com.ft.sdk.garble.bean.CameraPx;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.NetStatusBean;
 import com.ft.sdk.garble.bean.OP;
-import com.ft.sdk.garble.bean.RecordData;
+import com.ft.sdk.garble.bean.OPData;
+import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.BatteryUtils;
 import com.ft.sdk.garble.utils.BluetoothUtils;
@@ -37,6 +38,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.security.InvalidParameterException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -44,13 +46,18 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import static com.ft.sdk.garble.bean.OP.CLIENT_ACTIVATED_TIME;
 import static com.ft.sdk.garble.bean.OP.CSTM;
-import static com.ft.sdk.garble.bean.OP.FLOW_CHAT;
-import static com.ft.sdk.garble.bean.OP.KEYEVENT;
-import static com.ft.sdk.garble.bean.OP.LOG;
-import static com.ft.sdk.garble.bean.OP.OBJECT;
-import static com.ft.sdk.garble.utils.Constants.FT_DEFAULT_MEASUREMENT;
+import static com.ft.sdk.garble.bean.OP.HTTP_CLIENT;
+import static com.ft.sdk.garble.bean.OP.HTTP_WEBVIEW;
+import static com.ft.sdk.garble.bean.OP.WEBVIEW_LOADING;
+import static com.ft.sdk.garble.bean.OP.WEBVIEW_LOAD_COMPLETED;
 import static com.ft.sdk.garble.utils.Constants.FT_KEY_VALUE_NULL;
+import static com.ft.sdk.garble.utils.Constants.FT_MEASUREMENT_HTTP_CLIENT;
+import static com.ft.sdk.garble.utils.Constants.FT_MEASUREMENT_HTTP_WEBVIEW;
+import static com.ft.sdk.garble.utils.Constants.FT_MEASUREMENT_PAGE_EVENT;
+import static com.ft.sdk.garble.utils.Constants.FT_MEASUREMENT_TIME_COST_CLIENT;
+import static com.ft.sdk.garble.utils.Constants.FT_MEASUREMENT_TIME_COST_WEBVIEW;
 import static com.ft.sdk.garble.utils.Constants.UNKNOWN;
 
 /**
@@ -58,8 +65,8 @@ import static com.ft.sdk.garble.utils.Constants.UNKNOWN;
  * DATE:2019-12-11 14:48
  * Description:
  */
-public class SyncDataManager {
-    public final static String TAG = "SyncDataManager";
+public class SyncDataHelper {
+    public final static String TAG = "SyncDataHelper";
 
     /**
      * 封装同步上传的数据
@@ -68,13 +75,14 @@ public class SyncDataManager {
      * @param recordDatas
      * @return
      */
-    public String getBodyContent(DataType dataType, List<RecordData> recordDatas) {
-        switch (dataType) {
-            case OBJECT:
-                return getObjectBodyContent(recordDatas);
-            default:
-                return getTrackBodyContent(recordDatas);
+    public String getBodyContent(DataType dataType, List<SyncJsonData> recordDatas) {
+        if (dataType == DataType.OBJECT) {
+            return getObjectBodyContent(recordDatas);
+        } else if (dataType == DataType.LOG) {
+            return getLogBodyContent(recordDatas);
+
         }
+        return getTrackBodyContent(recordDatas);
     }
 
     /**
@@ -83,14 +91,12 @@ public class SyncDataManager {
      * @param recordDataList
      * @return
      */
-    public String getObjectBodyContent(List<RecordData> recordDataList) {
+    public String getObjectBodyContent(List<SyncJsonData> recordDataList) {
         JSONArray jsonArray = new JSONArray();
         try {
-            for (RecordData recordData : recordDataList) {
-                JSONObject jsonObject = new JSONObject(recordData.getOpdata());
-                if (jsonObject.has(Constants.FIELDS)) {
-                    jsonArray.put(jsonObject.getJSONObject(Constants.FIELDS));
-                }
+            for (SyncJsonData recordData : recordDataList) {
+                JSONObject jsonObject = new JSONObject(recordData.getDataString());
+                jsonArray.put(jsonObject);
             }
         } catch (Exception e) {
 
@@ -101,120 +107,73 @@ public class SyncDataManager {
     /**
      * 封装本地埋点数据
      *
-     * @param recordDatas
+     * @param datas
      * @return
      */
-    public String getTrackBodyContent(List<RecordData> recordDatas) {
-        StringBuffer sb = new StringBuffer();
+    public String getTrackBodyContent(List<SyncJsonData> datas) {
+        StringBuilder sb = new StringBuilder();
         String device = parseHashToString(getDeviceInfo());
-        for (RecordData recordData : recordDatas) {
-            //流程图ID
-            String traceId = recordData.getTraceId();
-            //流程图数据
-            if (!Utils.isNullOrEmpty(traceId)) {
-                if (OP.OPEN_ACT.value.equals(recordData.getOp())) {
-                    sb.append(Constants.KEEP_MEASUREMENT_FLOW);
-                    sb.append(",").append(Constants.KEEP_KEY_TRACE_ID).append("=").append(recordData.getTraceId());
-                    if (recordData.getPpn() != null && recordData.getPpn().startsWith(Constants.MOCK_SON_PAGE_DATA)) {
-                        String[] strArr = recordData.getPpn().split(":");
-                        String name = null;
-                        String parent = null;
-                        //数组长度等于 3 表示当前页面是一个 Fragment
-                        if (strArr.length == 3) {
-                            name = FTAliasConfig.get().getFlowChartDesc(recordData.getCpn() + "." + strArr[1]);
-                            parent = FTAliasConfig.get().getFlowChartDesc(strArr[2]);
-                            //数组长度等于 2 表示当前页面是一个 Activity
-                        } else if (strArr.length == 2) {
-                            name = FTAliasConfig.get().getFlowChartDesc(recordData.getCpn());
-                            parent = FTAliasConfig.get().getFlowChartDesc(strArr[1]);
-                        }
-                        sb.append(",").append(Constants.KEEP_KEY_NAME).append("=").append(name);
-                        sb.append(",").append(Constants.KEEP_KEY_PARENT).append("=").append(parent);
-                    } else {
-                        sb.append(",").append(Constants.KEEP_KEY_NAME).append("=").append(FTAliasConfig.get().getFlowChartDesc(recordData.getCpn()));
-                        //如果父页面是root表示其为起始节点，不添加父节点
-                        if (!Constants.FLOW_ROOT.equals(recordData.getPpn())) {
-                            String ppn = recordData.getPpn();
-                            sb.append(",").append(Constants.KEEP_KEY_PARENT).append("=").append(FTAliasConfig.get().getFlowChartDesc(ppn));
-                        }
-                    }
-                    sb.append(",").append(device).append(",");
-                    addUserData(sb, recordData);
-                    //删除多余的逗号
-                    deleteLastComma(sb);
-                    sb.append(Constants.SEPARATION_PRINT);
-                    sb.append(Constants.KEEP_KEY_DURATION).append("=").append(recordData.getDuration()).append("i");
-                    sb.append(Constants.SEPARATION_PRINT);
-                    sb.append(recordData.getTime() * 1000 * 1000);
-                    sb.append(Constants.SEPARATION_LINE_BREAK);
-                } else if (OP.OPEN_FRA.value.equals(recordData.getOp())) {
-                    sb.append(Constants.KEEP_MEASUREMENT_FLOW);
-                    sb.append(",").append(Constants.KEEP_KEY_TRACE_ID).append("=").append(recordData.getTraceId());
-                    sb.append(",").append(Constants.KEEP_KEY_NAME).append("=").append(FTAliasConfig.get().getFlowChartDesc(recordData.getRpn() + "." + recordData.getCpn()));
-                    String parent;
-                    if (!Constants.FLOW_ROOT.equals(recordData.getPpn())) {
-                        if (recordData.getPpn().startsWith(Constants.PERFIX)) {
-                            parent = FTAliasConfig.get().getFlowChartDesc(recordData.getPpn().replace(Constants.PERFIX, ""));
-                        } else {
-                            parent = FTAliasConfig.get().getFlowChartDesc(recordData.getRpn() + "." + recordData.getPpn());
-                        }
-                    } else {
-                        parent = FTAliasConfig.get().getFlowChartDesc(recordData.getRpn());
-                    }
-                    sb.append(",").append(Constants.KEEP_KEY_PARENT).append("=").append(parent);
-                    sb.append(",").append(device).append(",");
-                    addUserData(sb, recordData);
-                    //删除多余的逗号
-                    deleteLastComma(sb);
-                    sb.append(Constants.SEPARATION_PRINT);
-                    sb.append(Constants.KEEP_KEY_DURATION).append("=").append(recordData.getDuration()).append("i");
-                    sb.append(Constants.SEPARATION_PRINT);
-                    sb.append(recordData.getTime() * 1000 * 1000);
-                    sb.append(Constants.SEPARATION_LINE_BREAK);
-                }
-                //非流程图数据
-            } else if (OP.LOG.value.equals(recordData.getOp()) || OP.KEYEVENT.value.equals(recordData.getOp())) {
-                //获取这条事件的指标
-                sb.append(getMeasurement(recordData));
-                //获取埋点事件数据
-                sb.append(getUpdateData(recordData));
-                sb.append(Constants.SEPARATION_LINE_BREAK);
-            } else {//埋点数据
-                //获取这条事件的指标
-                sb.append(getMeasurement(recordData));
+        for (SyncJsonData recordData : datas) {
+            //获取这条事件的指标
+            sb.append(getMeasurement(recordData));
+            //获取埋点事件数据
+            if (!CLIENT_ACTIVATED_TIME.value.equals(recordData.getOpData().getOp())
+                    && !HTTP_CLIENT.value.equals(recordData.getOpData().getOp())
+                    && !HTTP_CLIENT.value.equals(recordData.getOpData().getOp())
+                    && !WEBVIEW_LOAD_COMPLETED.value.equals(recordData.getOpData().getOp())
+                    && !WEBVIEW_LOADING.value.equals(recordData.getOpData().getOp())) {
                 sb.append(",");
                 sb.append(device);
-                //获取埋点事件数据
-                sb.append(getUpdateData(recordData));
-                sb.append(Constants.SEPARATION_LINE_BREAK);
             }
+            //获取埋点事件数据
+            sb.append(getUpdateData(recordData));
+            sb.append(Constants.SEPARATION_LINE_BREAK);
+        }
+        return sb.toString();
+    }
+
+    public String getLogBodyContent(List<SyncJsonData> datas) {
+        StringBuilder sb = new StringBuilder();
+        for (SyncJsonData recordData : datas) {
+            //获取这条事件的指标
+            sb.append(getMeasurement(recordData));
+            //获取埋点事件数据
+            sb.append(getUpdateData(recordData));
+            sb.append(Constants.SEPARATION_LINE_BREAK);
         }
         return sb.toString();
     }
 
     /**
      * 获得数据头
-     * (当{@link RecordData#getOp()}等于
-     * {@link com.ft.sdk.garble.bean.OP#CSTM},{@link com.ft.sdk.garble.bean.OP#FLOW_CHAT}时用field字段，其他情况用
-     * {@link com.ft.sdk.garble.utils.Constants#FT_DEFAULT_MEASUREMENT}
+     * (当{@link SyncJsonData#getOpData()#getOp()}等于
+     * {@link com.ft.sdk.garble.bean.OP#CSTM} 时用field字段，其他情况用
+     * {@link com.ft.sdk.garble.utils.Constants#FT_MEASUREMENT_PAGE_EVENT}
      *
      * @return
      */
-    private String getMeasurement(RecordData recordData) {
+    private String getMeasurement(SyncJsonData data) {
         String measurement;
         try {
-            JSONObject jsonObject = new JSONObject(recordData.getOpdata());
-            if (CSTM.value.equals(recordData.getOp()) || FLOW_CHAT.value.equals(recordData.getOp()) ||
-                    OBJECT.value.equals(recordData.getOp()) || KEYEVENT.value.equals(recordData.getOp()) ||
-                    LOG.value.equals(recordData.getOp())) {
+            JSONObject jsonObject = new JSONObject(data.getDataString());
+            if (CSTM.value.equals(data.getOpData().getOp()) || data.getDataType() == DataType.LOG) {
                 String measurementTemp = jsonObject.optString(Constants.MEASUREMENT);
                 if (Utils.isNullOrEmpty(measurementTemp)) {
                     measurement = FT_KEY_VALUE_NULL;
                 } else {
                     measurement = Utils.translateMeasurements(measurementTemp);
                 }
+            } else if (WEBVIEW_LOAD_COMPLETED.value.equals(data.getOpData().getOp())
+                    || WEBVIEW_LOADING.value.equals(data.getOpData().getOp())) {
+                measurement = FT_MEASUREMENT_TIME_COST_WEBVIEW;
+            } else if (CLIENT_ACTIVATED_TIME.value.equals(data.getOpData().getOp())) {
+                measurement = FT_MEASUREMENT_TIME_COST_CLIENT;
+            } else if (HTTP_CLIENT.value.equals(data.getOpData().getOp())) {
+                measurement = FT_MEASUREMENT_HTTP_CLIENT;
+            } else if (HTTP_WEBVIEW.value.equals(data.getOpData().getOp())) {
+                measurement = FT_MEASUREMENT_HTTP_WEBVIEW;
             } else {
-                measurement = FT_DEFAULT_MEASUREMENT;
+                measurement = FT_MEASUREMENT_PAGE_EVENT;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -226,16 +185,16 @@ public class SyncDataManager {
     /**
      * 获取同步数据
      *
-     * @param recordData
+     * @param data
      * @return
      */
-    private String getUpdateData(RecordData recordData) {
-        if (CSTM.value.equals(recordData.getOp()) || FLOW_CHAT.value.equals(recordData.getOp())) {
-            return composeCustomUpdateData(true, recordData);
-        } else if (LOG.value.equals(recordData.getOp()) || KEYEVENT.value.equals(recordData.getOp())) {
-            return composeCustomUpdateData(false, recordData);
+    private String getUpdateData(SyncJsonData data) {
+        if (CSTM.value.equals(data.getOpData().getOp())) {
+            return composeCustomUpdateData(true, data);
+        } else if (data.getDataType() == DataType.LOG) {
+            return composeCustomUpdateData(false, data);
         } else {
-            return composeAutoUpdateData(recordData);
+            return composeAutoUpdateData(data);
         }
     }
 
@@ -244,17 +203,17 @@ public class SyncDataManager {
      *
      * @return
      */
-    private String composeCustomUpdateData(boolean addUser, RecordData recordData) {
+    private String composeCustomUpdateData(boolean addUser, SyncJsonData data) {
         StringBuffer sb = new StringBuffer();
-        if (recordData.getOpdata() != null) {
+        if (data.getOpData() != null) {
             try {
-                JSONObject opJson = new JSONObject(recordData.getOpdata());
+                JSONObject opJson = new JSONObject(data.getOpData().getContent());
                 JSONObject tags = opJson.optJSONObject(Constants.TAGS);
                 JSONObject fields = opJson.optJSONObject(Constants.FIELDS);
                 StringBuffer tagSb = getCustomHash(tags, true);
                 StringBuffer valueSb = getCustomHash(fields, false);
                 if (addUser) {
-                    addUserData(tagSb, recordData);
+                    addUserData(tagSb, data);
                 }
                 deleteLastComma(tagSb);
                 if (tagSb.length() > 0) {
@@ -265,7 +224,7 @@ public class SyncDataManager {
                 deleteLastComma(valueSb);
                 sb.append(valueSb);
                 sb.append(Constants.SEPARATION_PRINT);
-                sb.append(recordData.getTime() * 1000 * 1000);
+                sb.append(data.getTime() * 1000 * 1000);
             } catch (Exception e) {
             }
         }
@@ -322,34 +281,36 @@ public class SyncDataManager {
      *
      * @return
      */
-    private String composeAutoUpdateData(RecordData recordData) {
+    private String composeAutoUpdateData(SyncJsonData data) {
         StringBuffer sb = new StringBuffer();
         JSONObject fields = null;
-        if (recordData.getOpdata() != null) {
+        JSONObject tags = null;
+        if (data.getOpData() != null) {
             try {
-                JSONObject opJson = new JSONObject(recordData.getOpdata());
-                JSONObject tags = opJson.optJSONObject(Constants.TAGS);
+                JSONObject opJson = new JSONObject(data.getOpData().getContent());
+                tags = opJson.optJSONObject(Constants.TAGS);
                 if (tags == null) {
                     tags = new JSONObject();
                 }
-                if (!Utils.isNullOrEmpty(recordData.getCpn())) {
-                    //如果是 Fragment 就把Activity 的名称也添加上去
-                    if (recordData.getOp().equals(OP.OPEN_FRA.value) || recordData.getOp().equals(OP.CLS_FRA.value)) {
-                        tags.put(Constants.KEY_CURRENT_PAGE_NAME, recordData.getRpn() + "." + recordData.getCpn());
-                    } else {
-                        tags.put(Constants.KEY_CURRENT_PAGE_NAME, recordData.getCpn());
-                    }
-                }
-                if (!Utils.isNullOrEmpty(recordData.getRpn())) {
-                    tags.put(Constants.KEY_ROOT_PAGE_NAME, recordData.getRpn());
-                }
-                tags.put(Constants.KEY_EVENT_ID, Utils.MD5(getEventName(recordData.getOp())));
+
+//                if (!Utils.isNullOrEmpty(data.getCpn())) {
+//                    //如果是 Fragment 就把Activity 的名称也添加上去
+//                    if (data.getOpData().getOp().equals(OP.OPEN_FRA.value) || data.getOpData().getOp().equals(OP.CLS_FRA.value)) {
+//                        tags.put(Constants.KEY_CURRENT_PAGE_NAME, data.getRpn() + "." + data.getCpn());
+//                    } else {
+//                        tags.put(Constants.KEY_CURRENT_PAGE_NAME, data.getCpn());
+//                    }
+//                }
+//                if (!Utils.isNullOrEmpty(data.getRpn())) {
+//                    tags.put(Constants.KEY_ROOT_PAGE_NAME, data.getRpn());
+//                }
+                tags.put(Constants.KEY_EVENT_ID, Utils.MD5(getEventName(data.getOpData().getOp())));
                 sb.append(getCustomHash(tags, true));
                 fields = opJson.optJSONObject(Constants.FIELDS);
             } catch (Exception e) {
             }
         }
-        addUserData(sb, recordData);
+        addUserData(sb, data);
         deleteLastComma(sb);
         if (sb.length() > 0) {
             sb.insert(0, ",");
@@ -361,14 +322,20 @@ public class SyncDataManager {
 
         if (fields != null) {
             try {
-                fields.put(Constants.KEY_EVENT, getEventName(recordData.getOp()));
-                if (!Utils.isNullOrEmpty(recordData.getCpn())) {
-                    if (recordData.getOp().equals(OP.OPEN_FRA.value) || recordData.getOp().equals(OP.CLS_FRA.value)) {
-                        fields.put(Constants.KEY_PAGE_DESC, FTAliasConfig.get().getPageDesc(recordData.getRpn() + "." + recordData.getCpn()));
+                fields.put(Constants.KEY_EVENT, getEventName(data.getOpData().getOp()));
+
+                String cpn = tags.optString(Constants.KEY_CURRENT_PAGE_NAME, "");
+                String rpn = tags.optString(Constants.KEY_ROOT_PAGE_NAME, "");
+
+                if (!cpn.isEmpty()) {
+                    if (data.getOpData().getOp().equals(OP.OPEN_FRA.value) || data.getOpData().getOp().equals(OP.CLS_FRA.value)) {
+                        fields.put(Constants.KEY_PAGE_DESC, FTAliasConfig.get().getPageDesc(rpn + "." + cpn));
                     } else {
-                        fields.put(Constants.KEY_PAGE_DESC, FTAliasConfig.get().getPageDesc(recordData.getCpn()));
+                        fields.put(Constants.KEY_PAGE_DESC, FTAliasConfig.get().getPageDesc(cpn));
                     }
                 }
+
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -376,10 +343,10 @@ public class SyncDataManager {
             deleteLastComma(valueSb);
             sb.append(valueSb);
         } else {
-            sb.append(Constants.KEY_EVENT).append("=\"").append(getEventName(recordData.getOp())).append("\"");
+            sb.append(Constants.KEY_EVENT).append("=\"").append(getEventName(data.getOpData().getOp())).append("\"");
         }
         sb.append(Constants.SEPARATION_PRINT);
-        sb.append(recordData.getTime() * 1000000);
+        sb.append(data.getTime() * 1000000);
         return sb.toString();
     }
 
@@ -388,9 +355,9 @@ public class SyncDataManager {
      *
      * @param sb
      */
-    private void addUserData(StringBuffer sb, RecordData recordData) {
+    private void addUserData(StringBuffer sb, SyncJsonData opData) {
         if (FTUserConfig.get().isNeedBindUser() && FTUserConfig.get().isUserDataBinded()) {
-            UserData userData = FTUserConfig.get().getUserData(recordData.getSessionid());
+            UserData userData = FTUserConfig.get().getUserData(opData.getSessionId());
             if (userData != null) {
                 sb.append(Constants.KEY_USER_NAME).append("=").append(Utils.translateTagKeyValue(userData.getName())).append(",");
                 sb.append(Constants.KEY_USER_ID).append("=").append(Utils.translateTagKeyValue(userData.getId())).append(",");
@@ -563,9 +530,9 @@ public class SyncDataManager {
         try {
             int networkType = NetUtils.get().getNetworkState(FTApplication.getApplication());
             if (networkType == 1) {
-                tags.put(Constants.KEY_NETWORK_TYPE, "WIFI");
+                tags.put(Constants.KEY_NETWORK_TYPE, "Wi-Fi");
             } else if (networkType == 0) {
-                tags.put(Constants.KEY_NETWORK_TYPE, "N/A");
+                tags.put(Constants.KEY_NETWORK_TYPE, UNKNOWN);
             } else {
                 tags.put(Constants.KEY_NETWORK_TYPE, "蜂窝网络");
             }
@@ -629,11 +596,11 @@ public class SyncDataManager {
             if (address != null) {
                 tags.put(Constants.KEY_LOCATION_PROVINCE, address.getAdminArea());
                 tags.put(Constants.KEY_LOCATION_CITY, address.getLocality());
-                tags.put(Constants.KEY_LOCATION_COUNTRY, "中国");
+                tags.put(Constants.KEY_LOCATION_COUNTRY, address.getCountryName());
             } else {
                 tags.put(Constants.KEY_LOCATION_PROVINCE, Constants.UNKNOWN);
                 tags.put(Constants.KEY_LOCATION_CITY, Constants.UNKNOWN);
-                tags.put(Constants.KEY_LOCATION_COUNTRY, "中国");
+                tags.put(Constants.KEY_LOCATION_COUNTRY, Constants.UNKNOWN);
             }
 
             if (location != null) {
@@ -676,19 +643,24 @@ public class SyncDataManager {
 
     private static void createSensor(JSONObject tags, JSONObject fields) {
         try {
-            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_BRIGHTNESS)) {
+            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR)
+                    || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_BRIGHTNESS)) {
                 fields.put(Constants.KEY_SENSOR_BRIGHTNESS, DeviceUtils.getSystemScreenBrightnessValue());
             }
-            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_LIGHT)) {
+            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR)
+                    || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_LIGHT)) {
                 fields.put(Constants.KEY_SENSOR_LIGHT, SensorUtils.get().getSensorLight());
             }
-            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_PROXIMITY)) {
+            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR)
+                    || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_PROXIMITY)) {
                 fields.put(Constants.KEY_SENSOR_PROXIMITY, SensorUtils.get().getDistance());
             }
-            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_STEP)) {
+            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR)
+                    || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_STEP)) {
                 fields.put(Constants.KEY_SENSOR_STEPS, SensorUtils.get().getTodayStep());
             }
-            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_ROTATION)) {
+            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR)
+                    || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_ROTATION)) {
                 float[] rotation = SensorUtils.get().getGyroscope();
                 if (rotation != null && rotation.length == 3) {
                     fields.put(Constants.KEY_SENSOR_ROTATION_X, rotation[0]);
@@ -748,11 +720,11 @@ public class SyncDataManager {
             return Constants.EVENT_NAME_LEAVE;
         } else if (OP.OPEN_ACT.value.equals(op) || OP.OPEN_FRA.value.equals(op)) {
             return Constants.EVENT_NAME_ENTER;
-        } else if (OP.BLOCK.value.equals(op)){
+        } else if (OP.BLOCK.value.equals(op)) {
             return Constants.EVENT_NAME_BLOCK;
-        } else if (OP.CRASH.value.equals(op)){
+        } else if (OP.CRASH.value.equals(op)) {
             return Constants.EVENT_NAME_CRASH;
-        } else if (OP.ANR.value.equals(op)){
+        } else if (OP.ANR.value.equals(op)) {
             return Constants.EVENT_NAME_ANR;
         }
         return op;
@@ -773,8 +745,14 @@ public class SyncDataManager {
         }
     }
 
+    /**
+     * map 转化 String
+     *
+     * @param param
+     * @return
+     */
     private static String parseHashToString(HashMap<String, Object> param) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (param != null) {
             Iterator<String> keys = param.keySet().iterator();
             while (keys.hasNext()) {

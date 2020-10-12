@@ -5,7 +5,7 @@ import com.ft.sdk.garble.TokenCheck;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.http.ResponseData;
-import com.ft.sdk.garble.manager.SyncDataManager;
+import com.ft.sdk.garble.manager.SyncDataHelper;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 
@@ -88,8 +88,8 @@ public class FTMonitorManager {
                         continue;
                     }
                     try {
-                        String body = SyncDataManager.getMonitorUploadData();
-                        SyncDataManager.printUpdateData(false,body);
+                        String body = SyncDataHelper.getMonitorUploadData();
+                        SyncDataHelper.printUpdateData(false,body);
                         body = body.replaceAll(Constants.SEPARATION_PRINT,Constants.SEPARATION).replaceAll(Constants.SEPARATION_LINE_BREAK,Constants.SEPARATION_REALLY_LINE_BREAK);
                         ResponseData result = HttpBuilder.Builder()
                                 .setModel(Constants.URL_MODEL_TRACK)

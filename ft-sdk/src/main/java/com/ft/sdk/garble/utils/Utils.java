@@ -28,7 +28,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
-import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -200,11 +199,12 @@ public class Utils {
 
     /**
      * base64 加密字符串
+     *
      * @param origin
      * @return
      */
-    public static String encodeStringToBase64(String origin){
-        return Base64.encodeToString(origin.getBytes(UTF_8),Base64.NO_WRAP);
+    public static String encodeStringToBase64(String origin) {
+        return Base64.encodeToString(origin.getBytes(UTF_8), Base64.NO_WRAP);
     }
 
     public static String getHMacSha1(String accesskeySecret, String content) {
@@ -307,6 +307,9 @@ public class Utils {
      * For string field values use a backslash character \ to escape:
      */
     public static String translateFieldValue(String oldStr) {
+        if (oldStr.equals(Constants.UNKNOWN)) {
+            return oldStr;
+        }
         return JSONObject.quote(oldStr);//应对 json 字符且支持转化 influx field 引号转化
     }
 
@@ -350,7 +353,7 @@ public class Utils {
      */
     public static String getCurrentTimeStamp() {
         Date currentTime = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS",Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS", Locale.getDefault());
         return sdf.format(currentTime);
     }
 
@@ -375,26 +378,28 @@ public class Utils {
 
     /**
      * 判断当前进程是否是主进程
+     *
      * @return
      */
-    public static boolean isMainProcess(){
+    public static boolean isMainProcess() {
         Context context = FTApplication.getApplication();
         String currentProcessName = getCurrentProcessName();
         String packageName = context.getPackageName();
-        return !TextUtils.isEmpty(packageName) && TextUtils.equals(packageName,currentProcessName);
+        return !TextUtils.isEmpty(packageName) && TextUtils.equals(packageName, currentProcessName);
     }
 
     /**
      * 获取当前进程名称
+     *
      * @return
      */
-    public static String getCurrentProcessName(){
+    public static String getCurrentProcessName() {
         Context context = FTApplication.getApplication();
         int myPid = Process.myPid();
         ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningAppProcessInfo> processes = manager.getRunningAppProcesses();
-        for(ActivityManager.RunningAppProcessInfo info : processes){
-            if(myPid == info.pid) {
+        for (ActivityManager.RunningAppProcessInfo info : processes) {
+            if (myPid == info.pid) {
                 return info.processName;
             }
         }
