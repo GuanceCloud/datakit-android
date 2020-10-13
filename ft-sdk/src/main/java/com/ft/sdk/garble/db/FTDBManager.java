@@ -66,7 +66,7 @@ public class FTDBManager extends DBManager {
             for (SyncJsonData data : dataList) {
                 ContentValues contentValues = new ContentValues();
                 contentValues.put(FTSQL.RECORD_COLUMN_TM, data.getTime());
-                contentValues.put(FTSQL.RECORD_COLUMN_DATA, data.getJsonString());
+                contentValues.put(FTSQL.RECORD_COLUMN_DATA, data.getDataString());
                 contentValues.put(FTSQL.RECORD_COLUMN_SESSION_ID, data.getSessionId());
                 contentValues.put(FTSQL.RECORD_COLUMN_DATA_TYPE, data.getDataType().getValue());
                 long rowId = db.insert(FTSQL.FT_TABLE_NAME, null, contentValues);

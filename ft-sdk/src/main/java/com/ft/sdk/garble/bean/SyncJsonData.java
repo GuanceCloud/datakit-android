@@ -91,17 +91,6 @@ public class SyncJsonData implements Cloneable {
         this.sessionid = sessionid;
     }
 
-    public String getJsonString() {
-        JSONObject recordData = new JSONObject();
-        try {
-            if (opData != null && opData.getContent() != null) {
-                recordData.put("opdata", opData.getContent());
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return recordData.toString();
-    }
 
     public void parseJsonToObj(String json) {
         try {
@@ -110,9 +99,8 @@ public class SyncJsonData implements Cloneable {
                 opData = new OPData();
                 opData.setOp(jsonObject.optString("op"));
                 opData.setContent(jsonObject.optString("opdata"));
-            } else {
-                dataString = json;
             }
+            dataString = json;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -124,7 +112,7 @@ public class SyncJsonData implements Cloneable {
     public String toString() {
         return "RecordData[id=" + id +
                 ",time=" + time +
-                ",data=" + getJsonString() +
+                ",data=" + dataString +
                 "]";
     }
 
@@ -218,7 +206,7 @@ public class SyncJsonData implements Cloneable {
      */
     public static SyncJsonData getFromLogBean(LogBean bean)
             throws JSONException, InvalidParameterException {
-        SyncJsonData recordData = new SyncJsonData(DataType.TRACK);
+        SyncJsonData recordData = new SyncJsonData(DataType.LOG);
         recordData.setTime(bean.getTime());
         JSONObject opDataJson = getLinProtocolJson(bean.getMeasurement(), bean.getAllTags(), bean.getAllFields());
         recordData.setDataString(opDataJson.toString());
@@ -226,6 +214,16 @@ public class SyncJsonData implements Cloneable {
         return recordData;
     }
 
+    /**
+     * 获取行协议对应的 指标，标签，数值对应的 Json 对象
+     *
+     * @param measurement
+     * @param tags
+     * @param fields
+     * @return
+     * @throws JSONException
+     * @throws InvalidParameterException
+     */
     private static JSONObject getLinProtocolJson(String measurement,
                                                  JSONObject tags, JSONObject fields)
             throws JSONException, InvalidParameterException {

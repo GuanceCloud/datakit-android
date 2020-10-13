@@ -16,7 +16,6 @@ import com.ft.sdk.garble.bean.CameraPx;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.NetStatusBean;
 import com.ft.sdk.garble.bean.OP;
-import com.ft.sdk.garble.bean.OPData;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.BatteryUtils;
@@ -38,7 +37,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.security.InvalidParameterException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -49,15 +47,9 @@ import java.util.Set;
 import static com.ft.sdk.garble.bean.OP.CLIENT_ACTIVATED_TIME;
 import static com.ft.sdk.garble.bean.OP.CSTM;
 import static com.ft.sdk.garble.bean.OP.HTTP_CLIENT;
-import static com.ft.sdk.garble.bean.OP.HTTP_WEBVIEW;
 import static com.ft.sdk.garble.bean.OP.WEBVIEW_LOADING;
 import static com.ft.sdk.garble.bean.OP.WEBVIEW_LOAD_COMPLETED;
 import static com.ft.sdk.garble.utils.Constants.FT_KEY_VALUE_NULL;
-import static com.ft.sdk.garble.utils.Constants.FT_MEASUREMENT_HTTP_CLIENT;
-import static com.ft.sdk.garble.utils.Constants.FT_MEASUREMENT_HTTP_WEBVIEW;
-import static com.ft.sdk.garble.utils.Constants.FT_MEASUREMENT_PAGE_EVENT;
-import static com.ft.sdk.garble.utils.Constants.FT_MEASUREMENT_TIME_COST_CLIENT;
-import static com.ft.sdk.garble.utils.Constants.FT_MEASUREMENT_TIME_COST_WEBVIEW;
 import static com.ft.sdk.garble.utils.Constants.UNKNOWN;
 
 /**
@@ -155,28 +147,23 @@ public class SyncDataHelper {
     private String getMeasurement(SyncJsonData data) {
         String measurement;
         try {
-            JSONObject jsonObject = new JSONObject(data.getDataString());
-            if (CSTM.value.equals(data.getOpData().getOp()) || data.getDataType() == DataType.LOG) {
-                String measurementTemp = jsonObject.optString(Constants.MEASUREMENT);
-                if (Utils.isNullOrEmpty(measurementTemp)) {
-                    measurement = FT_KEY_VALUE_NULL;
-                } else {
-                    measurement = Utils.translateMeasurements(measurementTemp);
-                }
-            } else if (WEBVIEW_LOAD_COMPLETED.value.equals(data.getOpData().getOp())
-                    || WEBVIEW_LOADING.value.equals(data.getOpData().getOp())) {
-                measurement = FT_MEASUREMENT_TIME_COST_WEBVIEW;
-            } else if (CLIENT_ACTIVATED_TIME.value.equals(data.getOpData().getOp())) {
-                measurement = FT_MEASUREMENT_TIME_COST_CLIENT;
-            } else if (HTTP_CLIENT.value.equals(data.getOpData().getOp())) {
-                measurement = FT_MEASUREMENT_HTTP_CLIENT;
-            } else if (HTTP_WEBVIEW.value.equals(data.getOpData().getOp())) {
-                measurement = FT_MEASUREMENT_HTTP_WEBVIEW;
+
+            String jsonString;
+            if (data.getDataType().equals(DataType.TRACK)) {
+                jsonString = data.getOpData().getContent();
             } else {
-                measurement = FT_MEASUREMENT_PAGE_EVENT;
+                jsonString = data.getDataString();
+            }
+
+            JSONObject jsonObject = new JSONObject(jsonString);
+            String measurementTemp = jsonObject.optString(Constants.MEASUREMENT);
+            if (Utils.isNullOrEmpty(measurementTemp)) {
+                measurement = FT_KEY_VALUE_NULL;
+            } else {
+                measurement = Utils.translateMeasurements(measurementTemp);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, e.getMessage());
             measurement = FT_KEY_VALUE_NULL;
         }
         return measurement;
@@ -189,13 +176,16 @@ public class SyncDataHelper {
      * @return
      */
     private String getUpdateData(SyncJsonData data) {
-        if (CSTM.value.equals(data.getOpData().getOp())) {
-            return composeCustomUpdateData(true, data);
+        if (data.getDataType().equals(DataType.TRACK)) {
+            if (CSTM.value.equals(data.getOpData().getOp())) {
+                return composeCustomUpdateData(true, data);
+            } else {
+                return composeAutoUpdateData(data);
+            }
         } else if (data.getDataType() == DataType.LOG) {
             return composeCustomUpdateData(false, data);
-        } else {
-            return composeAutoUpdateData(data);
         }
+        return "";
     }
 
     /**
@@ -205,9 +195,16 @@ public class SyncDataHelper {
      */
     private String composeCustomUpdateData(boolean addUser, SyncJsonData data) {
         StringBuffer sb = new StringBuffer();
-        if (data.getOpData() != null) {
+        String jsonString;
+        if (data.getDataType().equals(DataType.TRACK)) {
+            jsonString = data.getOpData().getContent();
+        } else {
+            jsonString = data.getDataString();
+        }
+
+        if (jsonString != null) {
             try {
-                JSONObject opJson = new JSONObject(data.getOpData().getContent());
+                JSONObject opJson = new JSONObject(jsonString);
                 JSONObject tags = opJson.optJSONObject(Constants.TAGS);
                 JSONObject fields = opJson.optJSONObject(Constants.FIELDS);
                 StringBuffer tagSb = getCustomHash(tags, true);
@@ -226,6 +223,7 @@ public class SyncDataHelper {
                 sb.append(Constants.SEPARATION_PRINT);
                 sb.append(data.getTime() * 1000 * 1000);
             } catch (Exception e) {
+                LogUtils.e(TAG, e.getMessage());
             }
         }
         return sb.toString();
@@ -293,21 +291,23 @@ public class SyncDataHelper {
                     tags = new JSONObject();
                 }
 
-//                if (!Utils.isNullOrEmpty(data.getCpn())) {
-//                    //如果是 Fragment 就把Activity 的名称也添加上去
-//                    if (data.getOpData().getOp().equals(OP.OPEN_FRA.value) || data.getOpData().getOp().equals(OP.CLS_FRA.value)) {
-//                        tags.put(Constants.KEY_CURRENT_PAGE_NAME, data.getRpn() + "." + data.getCpn());
-//                    } else {
-//                        tags.put(Constants.KEY_CURRENT_PAGE_NAME, data.getCpn());
-//                    }
-//                }
-//                if (!Utils.isNullOrEmpty(data.getRpn())) {
-//                    tags.put(Constants.KEY_ROOT_PAGE_NAME, data.getRpn());
-//                }
-                tags.put(Constants.KEY_EVENT_ID, Utils.MD5(getEventName(data.getOpData().getOp())));
+                String cpn = tags.optString(Constants.KEY_PAGE_EVENT_CURRENT_PAGE_NAME, "");
+                String rpn = tags.optString(Constants.KEY_PAGE_EVENT_ROOT_PAGE_NAME, "");
+
+                if (!Utils.isNullOrEmpty(cpn)) {
+                    //如果是 Fragment 就把Activity 的名称也添加上去
+                    if (data.getOpData().getOp().equals(OP.OPEN_FRA.value) || data.getOpData().getOp().equals(OP.CLS_FRA.value)) {
+                        tags.put(Constants.KEY_PAGE_EVENT_CURRENT_PAGE_NAME, rpn + "." + cpn);
+                    } else {
+                        tags.put(Constants.KEY_PAGE_EVENT_CURRENT_PAGE_NAME, cpn);
+                    }
+                }
+
+                tags.put(Constants.KEY_PAGE_EVENT_EVENT_ID, Utils.MD5(getEventName(data.getOpData().getOp())));
                 sb.append(getCustomHash(tags, true));
                 fields = opJson.optJSONObject(Constants.FIELDS);
             } catch (Exception e) {
+                LogUtils.e(TAG, e.getMessage());
             }
         }
         addUserData(sb, data);
@@ -322,28 +322,28 @@ public class SyncDataHelper {
 
         if (fields != null) {
             try {
-                fields.put(Constants.KEY_EVENT, getEventName(data.getOpData().getOp()));
+                fields.put(Constants.KEY_PAGE_EVENT_EVENT, getEventName(data.getOpData().getOp()));
 
-                String cpn = tags.optString(Constants.KEY_CURRENT_PAGE_NAME, "");
-                String rpn = tags.optString(Constants.KEY_ROOT_PAGE_NAME, "");
+                String cpn = tags.optString(Constants.KEY_PAGE_EVENT_CURRENT_PAGE_NAME, "");
+                String rpn = tags.optString(Constants.KEY_PAGE_EVENT_ROOT_PAGE_NAME, "");
 
                 if (!cpn.isEmpty()) {
                     if (data.getOpData().getOp().equals(OP.OPEN_FRA.value) || data.getOpData().getOp().equals(OP.CLS_FRA.value)) {
-                        fields.put(Constants.KEY_PAGE_DESC, FTAliasConfig.get().getPageDesc(rpn + "." + cpn));
+                        fields.put(Constants.KEY_PAGE_EVENT_PAGE_DESC, FTAliasConfig.get().getPageDesc(rpn + "." + cpn));
                     } else {
-                        fields.put(Constants.KEY_PAGE_DESC, FTAliasConfig.get().getPageDesc(cpn));
+                        fields.put(Constants.KEY_PAGE_EVENT_PAGE_DESC, FTAliasConfig.get().getPageDesc(cpn));
                     }
                 }
 
 
             } catch (JSONException e) {
-                e.printStackTrace();
+                LogUtils.e(TAG, e.getMessage());
             }
             StringBuffer valueSb = getCustomHash(fields, false);
             deleteLastComma(valueSb);
             sb.append(valueSb);
         } else {
-            sb.append(Constants.KEY_EVENT).append("=\"").append(getEventName(data.getOpData().getOp())).append("\"");
+            sb.append(Constants.KEY_PAGE_EVENT_EVENT).append("=\"").append(getEventName(data.getOpData().getOp())).append("\"");
         }
         sb.append(Constants.SEPARATION_PRINT);
         sb.append(data.getTime() * 1000000);
@@ -359,8 +359,8 @@ public class SyncDataHelper {
         if (FTUserConfig.get().isNeedBindUser() && FTUserConfig.get().isUserDataBinded()) {
             UserData userData = FTUserConfig.get().getUserData(opData.getSessionId());
             if (userData != null) {
-                sb.append(Constants.KEY_USER_NAME).append("=").append(Utils.translateTagKeyValue(userData.getName())).append(",");
-                sb.append(Constants.KEY_USER_ID).append("=").append(Utils.translateTagKeyValue(userData.getId())).append(",");
+                sb.append(Constants.KEY_PAGE_EVENT_USER_NAME).append("=").append(Utils.translateTagKeyValue(userData.getName())).append(",");
+                sb.append(Constants.KEY_PAGE_EVENT_USER_ID).append("=").append(Utils.translateTagKeyValue(userData.getId())).append(",");
                 JSONObject js = userData.getExts();
                 if (js == null) {
                     return;
@@ -551,9 +551,9 @@ public class SyncDataHelper {
 
             if (lastStatus != null) {
                 if (lastStatus.isInnerRequest()) {
-                    fields.put(Constants.KEY__NETWORK_TCP_TIME, lastStatus.getTcpTime());
-                    fields.put(Constants.KEY__NETWORK_DNS_TIME, lastStatus.getDNSTime());
-                    fields.put(Constants.KEY__NETWORK_RESPONSE_TIME, lastStatus.getResponseTime());
+                    fields.put(Constants.KEY_INNER_NETWORK_TCP_TIME, lastStatus.getTcpTime());
+                    fields.put(Constants.KEY_INNER_NETWORK_DNS_TIME, lastStatus.getDNSTime());
+                    fields.put(Constants.KEY_INNER_NETWORK_RESPONSE_TIME, lastStatus.getResponseTime());
                 } else {
                     fields.put(Constants.KEY_NETWORK_TCP_TIME, lastStatus.getTcpTime());
                     fields.put(Constants.KEY_NETWORK_DNS_TIME, lastStatus.getDNSTime());
@@ -794,6 +794,8 @@ public class SyncDataHelper {
         if (FTHttpConfig.get().useOaid) {
             objectHashMap.put(Constants.KEY_DEVICE_OAID, OaidUtils.getOAID(context));
         }
+        objectHashMap.put(Constants.KEY_APP_VERSION_NAME, Utils.getAppVersionName());
+
         HashMap<String, Object> temp = new HashMap<>();
         for (Map.Entry<String, Object> entry : objectHashMap.entrySet()) {
             String mapKey = entry.getKey();

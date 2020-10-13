@@ -34,10 +34,6 @@ public enum OP {
     HTTP_CLIENT("http_client"),
     HTTP_WEBVIEW("http_webview");
 
-    //ES 记录事件
-//    LOG("log"),
-//    OBJECT("object");
-
     public String value;
 
     OP(String value) {

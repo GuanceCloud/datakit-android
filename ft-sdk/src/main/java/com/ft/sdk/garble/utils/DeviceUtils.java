@@ -7,6 +7,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.Build;
@@ -69,7 +70,8 @@ public class DeviceUtils {
     };
 
     /**
-     *  获取 SDK 的 UUID
+     * 获取 SDK 的 UUID
+     *
      * @param context
      * @return
      */
@@ -77,13 +79,13 @@ public class DeviceUtils {
         final SharedPreferences preferences = getSharedPreferences(context);
         String sdkUUid = null;
 
-        if(preferences != null){
+        if (preferences != null) {
             sdkUUid = preferences.getString(Constants.FT_SDK_INIT_UUID, null);
         }
 
         if (sdkUUid == null) {
             sdkUUid = UUID.randomUUID().toString();
-            if(preferences != null) {
+            if (preferences != null) {
                 final SharedPreferences.Editor editor = preferences.edit();
                 editor.putString(Constants.FT_SDK_INIT_UUID, sdkUUid);
                 editor.apply();
@@ -95,11 +97,12 @@ public class DeviceUtils {
 
     /**
      * 设置 SDK uuid
+     *
      * @param uuid
      */
-    public static void setSDKUUid(String uuid){
+    public static void setSDKUUid(String uuid) {
         final SharedPreferences preferences = getSharedPreferences(FTApplication.getApplication());
-        if(preferences != null) {
+        if (preferences != null) {
             final SharedPreferences.Editor editor = preferences.edit();
             editor.putString(Constants.FT_SDK_INIT_UUID, uuid);
             editor.apply();
@@ -117,7 +120,8 @@ public class DeviceUtils {
         try {
             androidID = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, e.getMessage());
+
         }
         return androidID;
     }
@@ -142,7 +146,8 @@ public class DeviceUtils {
             ApplicationInfo info = manager.getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
             return info.loadLabel(manager).toString();
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, e.getMessage());
+
         }
         return "";
     }
@@ -172,7 +177,7 @@ public class DeviceUtils {
                     if (tm.hasCarrierPrivileges()) {
                         imei = tm.getImei();
                     } else {
-                        LogUtils.d(TAG,"未能获取到设备的IMEI信息");
+                        LogUtils.d(TAG, "未能获取到设备的IMEI信息");
                     }
                 } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     imei = tm.getImei();
@@ -181,7 +186,7 @@ public class DeviceUtils {
                 }
             }
         } catch (SecurityException e) {
-            LogUtils.e(TAG,"未能获取到系统>>Manifest.permission.READ_PHONE_STATE<<权限");
+            LogUtils.e(TAG, "未能获取到系统>>Manifest.permission.READ_PHONE_STATE<<权限");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -247,13 +252,14 @@ public class DeviceUtils {
 
     /**
      * 返回系统开机时间
+     *
      * @return
      */
-    public static String getSystemOpenTime(){
+    public static String getSystemOpenTime() {
         //毫秒数
         long time = SystemClock.elapsedRealtime();
         long startTime = System.currentTimeMillis() - time;
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",Locale.getDefault());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         return dateFormat.format(new Date(startTime));
     }
 
@@ -264,15 +270,15 @@ public class DeviceUtils {
      * @return
      */
     public static double[] getRamData(Context context) {
-        DecimalFormat showFloatFormat =new DecimalFormat("0.00");
+        DecimalFormat showFloatFormat = new DecimalFormat("0.00");
         try {
             ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
             ActivityManager.MemoryInfo info = new ActivityManager.MemoryInfo();
             manager.getMemoryInfo(info);
             long[] data = new long[]{info.totalMem, info.availMem};
             double[] strings = new double[2];
-            strings[0] = Utils.formatDouble(1.0*data[0]/1024/1024/1024);
-            strings[1] = Utils.formatDouble((data[0]-data[1])*100.0/data[0]);
+            strings[0] = Utils.formatDouble(1.0 * data[0] / 1024 / 1024 / 1024);
+            strings[1] = Utils.formatDouble((data[0] - data[1]) * 100.0 / data[0]);
             return strings;
         } catch (Exception e) {
             e.printStackTrace();
@@ -287,7 +293,7 @@ public class DeviceUtils {
      */
     public static String getHardWare() {
         String result = Build.HARDWARE;
-        if(Utils.isNullOrEmpty(result)){
+        if (Utils.isNullOrEmpty(result)) {
             return Constants.UNKNOWN;
         }
         return result;
@@ -295,16 +301,17 @@ public class DeviceUtils {
 
     /**
      * 获得CPU使用率
+     *
      * @return
      */
-    public static double getCpuUseRate(){
+    public static double getCpuUseRate() {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 return Utils.formatDouble(CpuUtils.get().getCpuDataForO());
             } else {
                 return Utils.formatDouble(CpuUtils.get().getCPUData());
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             return 0.00;
         }
     }
@@ -343,8 +350,8 @@ public class DeviceUtils {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }else{
-                LogUtils.e(TAG,"没有获得到 READ_PHONE_STATE 权限无法获取运营商信息");
+            } else {
+                LogUtils.e(TAG, "没有获得到 READ_PHONE_STATE 权限无法获取运营商信息");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -423,11 +430,12 @@ public class DeviceUtils {
 
     /**
      * 获取系统的亮度(值范围在0-255)
+     *
      * @return
      */
-    public static double getSystemScreenBrightnessValue(){
+    public static double getSystemScreenBrightnessValue() {
         ContentResolver contentResolver = FTApplication.getApplication().getContentResolver();
         int defVal = 125;
-        return Settings.System.getInt(contentResolver,Settings.System.SCREEN_BRIGHTNESS,defVal)/255d;
+        return Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, defVal) / 255d;
     }
 }
