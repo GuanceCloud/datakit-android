@@ -1,6 +1,9 @@
 package com.ft.sdk;
 
 import android.graphics.Bitmap;
+import android.net.http.SslError;
+import android.webkit.SslErrorHandler;
+import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
@@ -9,6 +12,7 @@ import android.webkit.WebViewClient;
 import androidx.annotation.Nullable;
 
 import com.ft.sdk.garble.manager.FTWebViewEventTracker;
+import com.ft.sdk.garble.manager.FTWebViewTraceHelper;
 import com.ft.sdk.garble.utils.LogUtils;
 
 import java.io.IOException;
@@ -27,25 +31,25 @@ import okhttp3.Response;
  * description: 拦截 WebView 中的网络请求
  */
 public class FTWebViewClient extends WebViewClient {
+
+    private static final String TAG = "FTWebViewClient";
     static OkHttpClient mClient = new OkHttpClient.Builder()
             .addInterceptor(new FTNetWorkTracerInterceptor())
             .connectTimeout(30, TimeUnit.SECONDS)
             .build();
     private String mOriginUrl;
 
-    private FTWebViewEventTracker mHelper = new FTWebViewEventTracker();
+    private FTWebViewEventTracker mEventHelper = new FTWebViewEventTracker();
 
-    public FTWebViewClient() {
-
-    }
-
+    private FTWebViewTraceHelper mTraceHelper = new FTWebViewTraceHelper();
 
     private CountDownLatch mCountDownLatch = new CountDownLatch(1);
 
     @Nullable
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-        mHelper.pageLoading();
+        mEventHelper.pageLoading(request.getUrl().toString());
+
         view.post(() -> {
             mOriginUrl = view.getUrl();
             mCountDownLatch.countDown();
@@ -70,6 +74,7 @@ public class FTWebViewClient extends WebViewClient {
     }
 
     private WebResourceResponse getNetResponse(String url, Map<String, String> headers) throws IOException {
+
         Request.Builder builder = new Request.Builder()
                 .url(url.trim());
         Set<String> keySet = headers.keySet();
@@ -92,16 +97,39 @@ public class FTWebViewClient extends WebViewClient {
 
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
+        LogUtils.d(TAG, "onPageStarted:" + url);
+
         super.onPageStarted(view, url, favicon);
-        mHelper.pageStarted();
+        mEventHelper.pageStarted(url);
     }
 
     @Override
     public void onPageFinished(WebView view, String url) {
+        LogUtils.d(TAG, "onPageFinished:" + url);
+
         super.onPageFinished(view, url);
-        mHelper.pageFinished();
+        mEventHelper.pageFinished(url);
+
+    }
+
+    @Override
+    public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
+        LogUtils.d(TAG, "onReceivedHttpError:" + request.getUrl().toString());
+        super.onReceivedHttpError(view, request, errorResponse);
     }
 
 
+    @Override
+    public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+        LogUtils.d(TAG, "onReceivedError:" + request.getUrl().toString());
 
+        super.onReceivedError(view, request, error);
+    }
+
+    @Override
+    public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+        LogUtils.d(TAG, "onReceivedError:" + failingUrl);
+
+        super.onReceivedError(view, errorCode, description, failingUrl);
+    }
 }

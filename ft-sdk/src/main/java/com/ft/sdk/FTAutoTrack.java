@@ -349,17 +349,28 @@ public class FTAutoTrack {
     }
 
 
+    private static long startTimeline;
+
     /**
      * APP 启动
      */
     public static void startApp() {
+        long now = System.currentTimeMillis();
+        startTimeline = now;
         if (!FTAutoTrackConfig.get().isAutoTrack()) {
             return;
         }
         if (!FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_START)) {
             return;
         }
-        putSimpleEvent(OP.LANC);
+        putPageEvent(System.currentTimeMillis(), OP.LANC, null, null, null, null);
+    }
+
+
+    public static void sleepApp() {
+        long now = System.currentTimeMillis();
+        putClientTimeCost(now, OP.CLIENT_ACTIVATED_TIME, now - startTimeline);
+
     }
 
     /**
@@ -615,6 +626,7 @@ public class FTAutoTrack {
                 SyncJsonData recordData = SyncJsonData.getFromTrackBean(new TrackBean(Constants.FT_MEASUREMENT_PAGE_EVENT, tags, fields), op);
                 LogUtils.d(TAG, "FTAutoTrack数据进数据库：putSimpleEvent:" + recordData.printFormatRecordData());
 
+
                 FTManager.getFTDBManager().insertFTOperation(recordData);
                 FTManager.getSyncTaskManager().executeSyncPoll();
             } catch (Exception e) {
@@ -786,7 +798,7 @@ public class FTAutoTrack {
      * @param op
      * @param duration
      */
-    public static void putClientTimeCost(long time, OP op, long duration) {
+    private static void putClientTimeCost(long time, OP op, long duration) {
         try {
             JSONObject tags = new JSONObject();
             JSONObject fields = new JSONObject();
@@ -795,7 +807,7 @@ public class FTAutoTrack {
                 tags.put(Constants.KEY_TIME_COST_EVENT, Constants.EVENT_NAME_ACTIVATED);
             }
 
-            tags.put(Constants.KEY_TIME_COST_DURATION, duration);
+            fields.put(Constants.KEY_TIME_COST_DURATION, duration);
 
             FTTrackInner.getInstance().trackBackground(op, time, Constants.FT_MEASUREMENT_TIME_COST_CLIENT, tags, fields);
         } catch (Exception e) {

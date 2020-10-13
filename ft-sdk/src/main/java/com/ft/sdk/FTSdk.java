@@ -212,12 +212,13 @@ public class FTSdk {
                 FTUserConfig.get().initUserDataFromDB();
             }
             FTNetworkListener.get().monitor();
-            if (mFtSDKConfig.isAutoTrack()) {
-                trackStartApp();
-            }
             if (mFtSDKConfig.isEventFlowLog()) {
                 FTFlowConfig.get().initParams(mFtSDKConfig);
             }
+            if (mFtSDKConfig.isAutoTrack()) {
+                trackStartApp();
+            }
+
             float rate = mFtSDKConfig.getTraceSamplingRate();
             if (rate > 1 || rate < 0) {
                 throw new IllegalArgumentException("rate 值的范围应在[0,1]");

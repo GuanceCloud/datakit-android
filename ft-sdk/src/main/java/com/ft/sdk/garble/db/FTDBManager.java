@@ -199,7 +199,7 @@ public class FTDBManager extends DBManager {
                     recordData.setId(id);
                     recordData.setTime(time);
                     recordData.setSessionId(sessionId);
-                    recordData.parseJsonToObj(data);
+                    recordData.setDataString(data);
                     recordList.add(recordData);
                 }
 

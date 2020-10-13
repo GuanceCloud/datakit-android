@@ -63,7 +63,7 @@ public class LogTest extends BaseTest {
         int except = 0;
         if (recordDataList != null) {
             for (SyncJsonData data : recordDataList) {
-                if (data.getOpData().getContent().contains("控制台日志测试用例qaws")) {
+                if (data.getDataString().contains("控制台日志测试用例qaws")) {
                     except++;
                 }
             }
@@ -88,7 +88,7 @@ public class LogTest extends BaseTest {
         List<SyncJsonData> dataList = FTDBManager.get().queryDataByDescLimitLog(0);
         int count = 0;
         for (SyncJsonData recordData : dataList) {
-            if (recordData.getOpData().getContent().contains("控制台日志测试用例")) {
+            if (recordData.getDataString().contains("控制台日志测试用例")) {
                 count++;
             }
         }

@@ -46,7 +46,18 @@ public class SyncJsonData implements Cloneable {
     }
 
     public void setDataString(String dataString) {
-        this.dataString = dataString;
+        try {
+            if (dataType == DataType.TRACK) {
+                JSONObject jsonObject = new JSONObject(dataString);
+                opData = new OPData();
+                opData.setOp(jsonObject.optString("op"));
+                opData.setContent(jsonObject.optString("opdata"));
+            }
+            this.dataString = dataString;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -91,21 +102,6 @@ public class SyncJsonData implements Cloneable {
         this.sessionid = sessionid;
     }
 
-
-    public void parseJsonToObj(String json) {
-        try {
-            if (dataType == DataType.TRACK) {
-                JSONObject jsonObject = new JSONObject(json);
-                opData = new OPData();
-                opData.setOp(jsonObject.optString("op"));
-                opData.setContent(jsonObject.optString("opdata"));
-            }
-            dataString = json;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     @NonNull
     @Override

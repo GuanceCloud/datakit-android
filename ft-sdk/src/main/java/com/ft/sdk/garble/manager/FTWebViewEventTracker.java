@@ -1,6 +1,6 @@
 package com.ft.sdk.garble.manager;
 
-import com.ft.sdk.garble.FTTrackInner;
+import com.ft.sdk.FTAutoTrack;
 import com.ft.sdk.garble.bean.OP;
 
 public class FTWebViewEventTracker {
@@ -13,23 +13,27 @@ public class FTWebViewEventTracker {
     private long loadingTimeLine;
 
 
-    public void pageStarted() {
+    public void pageStarted(String url) {
         startTimeline = System.currentTimeMillis();
     }
 
 
-    public void pageLoading() {
+    public void pageLoading(String url) {
         loadingTimeLine = System.currentTimeMillis();
         long now = loadingTimeLine;
         whitePageDuration = loadingTimeLine - startTimeline;
+        FTAutoTrack.putWebViewTimeCost(now, OP.WEBVIEW_LOADING, url, whitePageDuration);
     }
 
 
-    public void pageFinished() {
+    public void pageFinished(String url) {
         finishTimeLine = System.currentTimeMillis();
 
         finishDuration = finishTimeLine - startTimeline;
         reset();
+
+        long now = finishTimeLine;
+        FTAutoTrack.putWebViewTimeCost(now, OP.WEBVIEW_LOAD_COMPLETED, url, finishDuration);
 
     }
 
