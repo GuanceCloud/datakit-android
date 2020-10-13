@@ -4,6 +4,7 @@ import com.ft.sdk.garble.FTExceptionHandler;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTTrackInner;
 import com.ft.sdk.garble.bean.LogBean;
+import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.http.HttpUrl;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.SkyWalkingUtils;
@@ -33,11 +34,13 @@ public class FTTraceHandler {
     private long requestTime = System.currentTimeMillis();
     private String traceID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
     private String spanID = Utils.getGUID_16();
-    public FTTraceHandler(){
+
+    public FTTraceHandler() {
         enableTrace = Utils.enableTraceSamplingRate();
     }
-    public HashMap<String,String> getTraceHeader(HttpUrl httpUrl){
-        HashMap<String,String> headers = new HashMap<>();
+
+    public HashMap<String, String> getTraceHeader(HttpUrl httpUrl) {
+        HashMap<String, String> headers = new HashMap<>();
         String sampled;
         //抓取数据内容
         if (enableTrace) {
@@ -68,7 +71,7 @@ public class FTTraceHandler {
         return headers;
     }
 
-    public void traceDataUpload(JSONObject content,String operationName,String endPoint,boolean isError){
+    public void traceDataUpload(JSONObject content, String operationName, String endPoint, boolean isError) {
         if (!enableTrace) {
             return;
         }
@@ -80,7 +83,7 @@ public class FTTraceHandler {
 
         LogBean logBean = new LogBean(Constants.FT_LOG_DEFAULT_MEASUREMENT, content, requestTime);
         logBean.setOperationName(operationName);
-        logBean.setDuration((responseTime-requestTime) * 1000);
+        logBean.setDuration((responseTime - requestTime) * 1000);
         logBean.setClazz("tracing");
         logBean.setSpanType("entry");
         logBean.setEndpoint(endPoint);
@@ -89,6 +92,8 @@ public class FTTraceHandler {
         logBean.setSpanID(spanID);
         logBean.setTraceID(traceID);
         FTTrackInner.getInstance().logBackground(logBean);
+
+        FTAutoTrack.putHttpError(requestTime, OP.HTTP_CLIENT, endPoint, isError);
     }
 
     /**

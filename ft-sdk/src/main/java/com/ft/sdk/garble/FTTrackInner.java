@@ -171,6 +171,8 @@ public class FTTrackInner {
                     if (callback != null) {
                         if (e instanceof InvalidParameterException) {
                             callback.onResponse(NetCodeStatus.INVALID_PARAMS_EXCEPTION_CODE, e.getMessage());
+                        } else {
+                            callback.onResponse(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, e.getMessage());
                         }
                     }
                     LogUtils.e(TAG, e.getMessage());
@@ -232,55 +234,4 @@ public class FTTrackInner {
     }
 
 
-    /**
-     * 将用户埋点的数据转换成RecordData
-     *
-     * @param time
-     * @param measurement
-     * @param tags
-     * @param fields
-     * @return
-     */
-    private static SyncJsonData transBeanDataToSyncJsonData(DataType dataType, OP op, long time, String measurement,
-                                                            final JSONObject tags, JSONObject fields)
-            throws JSONException, InvalidParameterException {
-        JSONObject tagsTemp = tags;
-        SyncJsonData recordData = new SyncJsonData(dataType);
-        recordData.setTime(time);
-        JSONObject opDataJson = new JSONObject();
-
-        if (measurement != null) {
-            opDataJson.put(Constants.MEASUREMENT, measurement);
-        } else {
-            throw new InvalidParameterException("指标集 measurement 不能为空");
-        }
-        if (tagsTemp == null) {
-            tagsTemp = new JSONObject();
-        }
-        opDataJson.put(Constants.TAGS, tagsTemp);
-        if (fields != null) {
-            opDataJson.put(Constants.FIELDS, fields);
-        } else {
-            throw new InvalidParameterException("指标集 fields 不能为空");
-        }
-        if (dataType == DataType.TRACK) {
-            addMonitorData(tagsTemp, fields);
-        }
-
-        if (dataType == DataType.TRACK) {
-            OPData opData = new OPData();
-            opData.setOp(op.value);
-            opData.setContent(opDataJson.toString());
-            recordData.setDataString(opData.toJsonString());
-        } else {
-            recordData.setDataString(opDataJson.toString());
-
-        }
-        String sessionId = FTUserConfig.get().getSessionId();
-        if (!Utils.isNullOrEmpty(sessionId)) {
-            recordData.setSessionId(sessionId);
-        }
-
-        return recordData;
-    }
 }

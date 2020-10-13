@@ -2,6 +2,8 @@ package com.ft.sdk;
 
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.http.HttpUrl;
+import com.ft.sdk.garble.manager.FTWebViewTraceHelper;
+import com.ft.sdk.garble.utils.LogUtils;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,12 +35,15 @@ import okio.Buffer;
  * description:
  */
 public class FTNetWorkTracerInterceptor implements Interceptor {
+
+    private static final String TAG = "FTNetWorkTracerInterceptor";
     public static final String ZIPKIN_TRACE_ID = "X-B3-TraceId";
     public static final String ZIPKIN_SPAN_ID = "X-B3-SpanId";
     public static final String ZIPKIN_SAMPLED = "X-B3-Sampled";
     public static final String JAEGER_KEY = "uber-trace-id";
     public static final String SKYWALKING_V3_SW_8 = "sw8";
     public static final String SKYWALKING_V3_SW_6 = "sw6";
+
 
     private void uploadNetTrace(FTTraceHandler handler, Request request, @Nullable Response response, String responseBody, String error) {
         try {
@@ -54,6 +59,7 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
 
             String endPoint = request.url().host() + ":" + request.url().port();
             handler.traceDataUpload(jsonObject, operationName, endPoint, isError);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -132,7 +138,7 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
                 json.put("body", body);
             }
         } catch (JSONException e) {
-            e.printStackTrace();
+            LogUtils.e(TAG,e.getMessage());
         }
         return json;
     }

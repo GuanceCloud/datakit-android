@@ -41,6 +41,8 @@ public class BindUserTest extends BaseTest {
             hasPrepare = true;
         }
         startSyncTask();
+        FTDBManager.get().delete();
+
         context = MockApplication.getContext();
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL),
                 true,
@@ -50,7 +52,6 @@ public class BindUserTest extends BaseTest {
                 .setNeedBindUser(true)
                 .enableAutoTrack(true);
         FTSdk.install(ftSDKConfig);
-        FTDBManager.get().delete();
     }
 
     /**

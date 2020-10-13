@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
                 "https://www.tmall.com/",
                 "https://www.jd.com/",
                 "https://www.toutiao.com/",
-                "https://www.baidu.com/",
+                "https://www.baidu111.com/test",
                 "https://www.csdn.net/"};
         spinner.setAdapter(new ArrayAdapter(this, R.layout.spinner_item, R.id.textView, data));
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
