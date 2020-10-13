@@ -308,7 +308,7 @@ public class Utils {
      */
     public static String translateFieldValue(String oldStr) {
         if (oldStr.equals(Constants.UNKNOWN)) {
-            return oldStr;
+            return "\"" + oldStr + "\"";
         }
         return JSONObject.quote(oldStr);//应对 json 字符且支持转化 influx field 引号转化
     }

@@ -721,36 +721,118 @@ public class FTAutoTrack {
         putPageEvent(time, op, classCurrent.getSimpleName(), classCurrent.getSimpleName(), parentPageName, null);
     }
 
-    private static void putPageEvent(long time, @NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String parentPage, @Nullable String vtp) {
-        ThreadPoolUtils.get().execute(() -> {
-            try {
-                JSONObject tags = new JSONObject();
-                JSONObject fields = new JSONObject();
-                tags.put(Constants.KEY_ROOT_PAGE_NAME, rootPage);
-                tags.put(Constants.KEY_CURRENT_PAGE_NAME, currentPage);
-                if (vtp != null) {
-                    tags.put("vtp", vtp);
-                    fields.put("vtp_desc", FTAliasConfig.get().getVtpDesc(vtp));
-                    fields.put("vtp_id", Utils.MD5(vtp));
-                }
+    private static void putPageEvent(long time, @NonNull OP op, @Nullable String currentPage,
+                                     @Nullable String rootPage, @Nullable String parentPage, @Nullable String vtp) {
+        try {
 
-
-                SyncJsonData recordData = SyncJsonData.getFromTrackBean(new TrackBean(Constants.FT_MEASUREMENT_PAGE_EVENT, tags, fields), op);
-                LogUtils.d(TAG, "FTAutoTrack数据进数据库：" + recordData.printFormatRecordData());
-
-                addLogging(currentPage, op, vtp);
-                addObject(op);
-
-                FTManager.getFTDBManager().insertFTOperation(recordData);
-                FTManager.getSyncTaskManager().executeSyncPoll();
-            } catch (Exception e) {
-                LogUtils.e(TAG, e.toString());
+            JSONObject tags = new JSONObject();
+            JSONObject fields = new JSONObject();
+            if (rootPage != null) {
+                tags.put(Constants.KEY_PAGE_EVENT_ROOT_PAGE_NAME, rootPage);
             }
-        });
+            if (currentPage != null) {
+
+                tags.put(Constants.KEY_PAGE_EVENT_CURRENT_PAGE_NAME, currentPage);
+            }
+            if (vtp != null) {
+                tags.put("vtp", vtp);
+                fields.put("vtp_desc", FTAliasConfig.get().getVtpDesc(vtp));
+                fields.put("vtp_id", Utils.MD5(vtp));
+            }
+            FTTrackInner.getInstance().trackBackground(op, time, Constants.FT_MEASUREMENT_PAGE_EVENT, tags, fields);
+
+            addLogging(currentPage, op, vtp);
+            addObject(op);
+
+        } catch (Exception e) {
+            LogUtils.e(TAG, e.toString());
+        }
     }
 
-    public static void putOpData(long time, @NonNull OP op) {
+    /**
+     * WebView 数据加载收集
+     *
+     * @param time
+     * @param op
+     * @param url
+     * @param duration
+     */
+    public static void putWebViewTimeCost(long time, OP op, String url, long duration) {
+        try {
+            JSONObject tags = new JSONObject();
+            JSONObject fields = new JSONObject();
 
+            if (op.equals(OP.WEBVIEW_LOAD_COMPLETED)) {
+                tags.put(Constants.KEY_TIME_COST_EVENT, Constants.EVENT_NAME_WEBVIEW_LOAD_COMPLETED);
+
+            } else if (op.equals(OP.WEBVIEW_LOADING)) {
+                tags.put(Constants.KEY_TIME_COST_EVENT, Constants.EVENT_NAME_WEBVIEW_LOADING);
+            }
+
+            tags.put(Constants.KEY_TIME_COST_WEBVIEW_URL, url);
+            tags.put(Constants.KEY_TIME_COST_DURATION, duration);
+
+            FTTrackInner.getInstance().trackBackground(op, time, Constants.FT_MEASUREMENT_TIME_COST_WEBVIEW, tags, fields);
+
+        } catch (Exception e) {
+            LogUtils.e(TAG, e.toString());
+        }
+    }
+
+    /**
+     * 记录应用消耗时间
+     *
+     * @param time
+     * @param op
+     * @param duration
+     */
+    public static void putClientTimeCost(long time, OP op, long duration) {
+        try {
+            JSONObject tags = new JSONObject();
+            JSONObject fields = new JSONObject();
+
+            if (op.equals(OP.CLIENT_ACTIVATED_TIME)) {
+                tags.put(Constants.KEY_TIME_COST_EVENT, Constants.EVENT_NAME_ACTIVATED);
+            }
+
+            tags.put(Constants.KEY_TIME_COST_DURATION, duration);
+
+            FTTrackInner.getInstance().trackBackground(op, time, Constants.FT_MEASUREMENT_TIME_COST_CLIENT, tags, fields);
+        } catch (Exception e) {
+            LogUtils.e(TAG, e.toString());
+        }
+    }
+
+    /**
+     * http 请求统计
+     *
+     * @param time
+     * @param op
+     * @param url
+     */
+    public static void putHttpError(long time, OP op, String url, boolean isError) {
+
+        try {
+            JSONObject tags = new JSONObject();
+            JSONObject fields = new JSONObject();
+
+            tags.put(Constants.KEY_DEVICE_APPLICATION_NAME, DeviceUtils.getAppName(FTApplication.getApplication()));
+            tags.put(Constants.KEY_APP_VERSION_NAME, Utils.getAppVersionName());
+
+            fields.put(Constants.KEY_HTTP_URL, url);
+            fields.put(Constants.KEY_HTTP_IS_ERROR, isError ? 1 : 0);
+
+            String measurement = "";
+            if (op.equals(OP.HTTP_WEBVIEW)) {
+                measurement = Constants.FT_MEASUREMENT_HTTP_WEBVIEW;
+            } else if (op.equals(OP.HTTP_CLIENT)) {
+                measurement = Constants.FT_MEASUREMENT_HTTP_CLIENT;
+            }
+
+            FTTrackInner.getInstance().trackBackground(op, time, measurement, tags, fields);
+        } catch (Exception e) {
+            LogUtils.e(TAG, e.toString());
+        }
     }
 
     /**

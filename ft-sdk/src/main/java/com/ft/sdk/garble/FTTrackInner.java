@@ -74,8 +74,8 @@ public class FTTrackInner {
         ) {
             try {
                 datas.add(SyncJsonData.getFromLogBean(logBean));
-            } catch (JSONException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                LogUtils.e(TAG, e.getMessage());
             }
 
         }

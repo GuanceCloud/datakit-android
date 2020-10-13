@@ -273,7 +273,7 @@ public class LogTrackObjectTraceTest extends BaseTest {
         FTTrack.getInstance().logBackground("----traceDataTest----", Status.CRITICAL);
         Thread.sleep(12000);
         int except2 = countInDB(DataType.LOG, except);
-        Assert.assertEquals(1, except1);
+        Assert.assertTrue(except1 > 0);
         Assert.assertEquals(0, except2);
     }
 
@@ -333,8 +333,16 @@ public class LogTrackObjectTraceTest extends BaseTest {
         int except = 0;
         if (recordDataList != null) {
             for (SyncJsonData data : recordDataList) {
-                if (data.getOpData().getContent().contains(target)) {
-                    except++;
+                if (type.equals(DataType.TRACK)) {
+                    if (data.getOpData().getContent().contains(target)) {
+                        except++;
+                    }
+
+                } else {
+                    if (data.getDataString().contains(target)) {
+                        except++;
+                    }
+
                 }
             }
         }

@@ -45,13 +45,23 @@ public class Constants {
     public static final String DEFAULT_LOG_SERVICE_NAME = "dataflux sdk";
     public static final int MAX_DB_CACHE_NUM = 5000;//数据库最大缓存容量
 
-    public static final String KEY_CURRENT_PAGE_NAME = "current_page_name";
-    public static final String KEY_ROOT_PAGE_NAME = "root_page_name";
-    public static final String KEY_EVENT_ID = "event_id";
-    public static final String KEY_EVENT = "event";
-    public static final String KEY_PAGE_DESC = "page_desc";
-    public static final String KEY_USER_NAME = "ud_name";
-    public static final String KEY_USER_ID = "ud_id";
+    public static final String KEY_PAGE_EVENT_CURRENT_PAGE_NAME = "current_page_name";
+    public static final String KEY_PAGE_EVENT_ROOT_PAGE_NAME = "root_page_name";
+    public static final String KEY_PAGE_EVENT_EVENT_ID = "event_id";
+    public static final String KEY_PAGE_EVENT_EVENT = "event";
+    public static final String KEY_PAGE_EVENT_PAGE_DESC = "page_desc";
+    public static final String KEY_PAGE_EVENT_USER_NAME = "ud_name";
+    public static final String KEY_PAGE_EVENT_USER_ID = "ud_id";
+
+    public static final String KEY_TIME_COST_DURATION = "duration";
+    public static final String KEY_TIME_COST_EVENT = "event";
+    public static final String KEY_TIME_COST_WEBVIEW_URL = "url";
+
+    public static final String KEY_HTTP_URL = "url";
+    public static final String KEY_HTTP_IS_ERROR = "isError";
+    public static final String KEY_HTTP_APPLICATION_NAME = "application_name";
+    public static final String KEY_HTTP_APP_VERSION_NAME = "app_version_name";
+
 
     public static final String KEY_BATTERY_TOTAL = "battery_total";
     public static final String KEY_BATTERY_CHARGE_TYPE = "battery_charge_type";
@@ -78,9 +88,9 @@ public class Constants {
     public static final String KEY_NETWORK_ROAM = "roam";
     public static final String KEY_NETWORK_WIFI_SSID = "wifi_ssid";
     public static final String KEY_NETWORK_WIFI_IP = "wifi_ip";
-    public static final String KEY__NETWORK_TCP_TIME = "_network_tcp_time";
-    public static final String KEY__NETWORK_DNS_TIME = "_network_dns_time";
-    public static final String KEY__NETWORK_RESPONSE_TIME = "_network_response_time";
+    public static final String KEY_INNER_NETWORK_TCP_TIME = "_network_tcp_time";
+    public static final String KEY_INNER_NETWORK_DNS_TIME = "_network_dns_time";
+    public static final String KEY_INNER_NETWORK_RESPONSE_TIME = "_network_response_time";
     public static final String KEY_NETWORK_TCP_TIME = "network_tcp_time";
     public static final String KEY_NETWORK_DNS_TIME = "network_dns_time";
     public static final String KEY_NETWORK_RESPONSE_TIME = "network_response_time";
@@ -140,7 +150,9 @@ public class Constants {
     public static final String EVENT_NAME_BLOCK = "block";
     public static final String EVENT_NAME_CRASH = "crash";
     public static final String EVENT_NAME_ANR = "anr";
-    public static final String EVENT_NAME_ACTIVATED= "activated";
+    public static final String EVENT_NAME_WEBVIEW_LOADING = "loading";
+    public static final String EVENT_NAME_WEBVIEW_LOAD_COMPLETED = "loadCompleted";
+    public static final String EVENT_NAME_ACTIVATED = "activated";
 
 
 }
