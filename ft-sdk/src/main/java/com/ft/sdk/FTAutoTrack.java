@@ -366,6 +366,11 @@ public class FTAutoTrack {
     }
 
 
+    /**
+     * 应用休眠
+     *
+     * @param timeDelay
+     */
     public static void sleepApp(long timeDelay) {
         long now = System.currentTimeMillis() - timeDelay;
         putClientTimeCost(now, OP.CLIENT_ACTIVATED_TIME, now - startTimeline);
@@ -620,8 +625,14 @@ public class FTAutoTrack {
 
         ThreadPoolUtils.get().execute(() -> {
             try {
+
+
                 JSONObject tags = new JSONObject();
                 JSONObject fields = new JSONObject();
+                Class activity = FTActivityManager.get().getLastActivity();
+                if (activity != null) {
+                    tags.put(Constants.KEY_PAGE_EVENT_CURRENT_PAGE_NAME, activity.getSimpleName());
+                }
                 SyncJsonData recordData = SyncJsonData.getFromTrackBean(new TrackBean(Constants.FT_MEASUREMENT_PAGE_EVENT, tags, fields), op);
                 LogUtils.d(TAG, "FTAutoTrack数据进数据库：putSimpleEvent:" + recordData.printFormatRecordData());
 

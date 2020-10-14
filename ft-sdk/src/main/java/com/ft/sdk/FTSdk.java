@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 
+import com.ft.sdk.garble.AsyncCallback;
 import com.ft.sdk.garble.FTActivityLifecycleCallbacks;
 import com.ft.sdk.garble.FTAliasConfig;
 import com.ft.sdk.garble.FTAutoTrackConfig;
@@ -17,7 +18,6 @@ import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.FTNetworkListener;
 import com.ft.sdk.garble.FTUserConfig;
-import com.ft.sdk.garble.AsyncCallback;
 import com.ft.sdk.garble.manager.FTAnrWatchManager;
 import com.ft.sdk.garble.manager.FTUICatonManager;
 import com.ft.sdk.garble.manager.SyncTaskManager;
@@ -227,8 +227,8 @@ public class FTSdk {
             Utils.traceSamplingRate = rate;
             FTExceptionHandler.get().initParams(mFtSDKConfig);
             FTMonitorConfig.get().initParams(mFtSDKConfig);
-            FTUICatonManager.getInstance().startMonitor();
-            FTAnrWatchManager.getInstance().startMonitorAnr();
+            FTUICatonManager.getInstance().startMonitor(mFtSDKConfig);
+            FTAnrWatchManager.getInstance().startMonitorAnr(mFtSDKConfig);
         }
     }
 

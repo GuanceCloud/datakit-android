@@ -82,6 +82,7 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
             okhttp3.HttpUrl url = request.url();
             HttpUrl httpUrl = new HttpUrl(url.host(), url.encodedPath(), url.port());
             HashMap<String, String> headers = handler.getTraceHeader(httpUrl);
+            handler.setHttpUrl(url.toString());
             Iterator<String> iterator = headers.keySet().iterator();
             while (iterator.hasNext()) {
                 String key = iterator.next();

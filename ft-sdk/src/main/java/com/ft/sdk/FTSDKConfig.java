@@ -62,6 +62,11 @@ public class FTSDKConfig {
     private boolean flowChartDescEnabled;
     //设置是否需要采集崩溃日志
     private boolean enableTrackAppCrash;
+    //设置是否检测 UI 卡顿
+    private boolean enableTrackAppUIBlock;
+    //设置是否检测 ANR
+    private boolean enableTrackAppANR;
+
     //设置采样率
     private float traceSamplingRate = 1;
     //崩溃日志的环境
@@ -510,7 +515,7 @@ public class FTSDKConfig {
      * @return
      */
     public FTSDKConfig setEnv(String env) {
-        if(env != null) {
+        if (env != null) {
             this.env = env;
         }
         return this;
@@ -534,7 +539,7 @@ public class FTSDKConfig {
      * @return
      */
     public FTSDKConfig setTraceServiceName(String traceServiceName) {
-        if(traceServiceName != null) {
+        if (traceServiceName != null) {
             this.traceServiceName = traceServiceName;
         }
         return this;
@@ -615,6 +620,24 @@ public class FTSDKConfig {
      */
     public FTSDKConfig setLogCacheDiscardStrategy(LogCacheDiscard logCacheDiscardStrategy) {
         this.logCacheDiscardStrategy = logCacheDiscardStrategy;
+        return this;
+    }
+
+    public boolean isEnableTrackAppUIBlock() {
+        return enableTrackAppUIBlock;
+    }
+
+    public FTSDKConfig setEnableTrackAppUIBlock(boolean enableTrackAppUIBlock) {
+        this.enableTrackAppUIBlock = enableTrackAppUIBlock;
+        return this;
+    }
+
+    public boolean isEnableTrackAppANR() {
+        return enableTrackAppANR;
+    }
+
+    public FTSDKConfig setEnableTrackAppANR(boolean enableTrackAppANR) {
+        this.enableTrackAppANR = enableTrackAppANR;
         return this;
     }
 }

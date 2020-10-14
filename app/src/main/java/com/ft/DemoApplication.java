@@ -4,7 +4,6 @@ import android.app.Application;
 import android.content.Context;
 
 import com.ft.sdk.FTAutoTrackType;
-import com.ft.sdk.FTMonitor;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
@@ -58,6 +57,8 @@ public class DemoApplication extends Application {
                 .setMonitorType(MonitorType.ALL)//设置监控项
                 .trackNetRequestTime(true)
                 .setEnableTrackAppCrash(true)
+                .setEnableTrackAppANR(true)
+                .setEnableTrackAppUIBlock(true)
                 .setEnv("dev")
                 .setTraceSamplingRate(1f)
                 .setNetworkTrace(true)
