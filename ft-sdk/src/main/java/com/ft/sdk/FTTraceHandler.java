@@ -34,12 +34,18 @@ public class FTTraceHandler {
     private long requestTime = System.currentTimeMillis();
     private String traceID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
     private String spanID = Utils.getGUID_16();
+    private String httpUrl = "";
 
     public FTTraceHandler() {
         enableTrace = Utils.enableTraceSamplingRate();
     }
 
+    public void setHttpUrl(String url) {
+        this.httpUrl = url;
+    }
+
     public HashMap<String, String> getTraceHeader(HttpUrl httpUrl) {
+        this.httpUrl = httpUrl.toString();
         HashMap<String, String> headers = new HashMap<>();
         String sampled;
         //抓取数据内容

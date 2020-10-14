@@ -5,7 +5,6 @@ import androidx.annotation.NonNull;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.OP;
-import com.ft.sdk.garble.bean.OPData;
 import com.ft.sdk.garble.bean.ObjectBean;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.bean.TrackBean;
@@ -18,16 +17,12 @@ import com.ft.sdk.garble.manager.SyncDataHelper;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
-import com.ft.sdk.garble.utils.Utils;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.ft.sdk.garble.manager.SyncDataHelper.addMonitorData;
 
 /**
  * author: huangDianHua

@@ -1,8 +1,6 @@
 package com.ft.sdk;
 
 import android.graphics.Bitmap;
-import android.net.http.SslError;
-import android.webkit.SslErrorHandler;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -11,6 +9,7 @@ import android.webkit.WebViewClient;
 
 import androidx.annotation.Nullable;
 
+import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.manager.FTWebViewEventTracker;
 import com.ft.sdk.garble.manager.FTWebViewTraceHelper;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -48,7 +47,6 @@ public class FTWebViewClient extends WebViewClient {
     @Nullable
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-        mEventHelper.pageLoading(request.getUrl().toString());
 
         view.post(() -> {
             mOriginUrl = view.getUrl();
@@ -95,18 +93,15 @@ public class FTWebViewClient extends WebViewClient {
         return new WebResourceResponse(contentType, response.header("Content-Encoding", "utf-8"), response.body().byteStream());
     }
 
+
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
-        LogUtils.d(TAG, "onPageStarted:" + url);
-
         super.onPageStarted(view, url, favicon);
         mEventHelper.pageStarted(url);
     }
 
     @Override
     public void onPageFinished(WebView view, String url) {
-        LogUtils.d(TAG, "onPageFinished:" + url);
-
         super.onPageFinished(view, url);
         mEventHelper.pageFinished(url);
 
@@ -114,22 +109,24 @@ public class FTWebViewClient extends WebViewClient {
 
     @Override
     public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
-        LogUtils.d(TAG, "onReceivedHttpError:" + request.getUrl().toString());
         super.onReceivedHttpError(view, request, errorResponse);
+        FTAutoTrack.putHttpError(System.currentTimeMillis(), OP.HTTP_WEBVIEW, request.getUrl().toString(), true);
     }
 
 
     @Override
     public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-        LogUtils.d(TAG, "onReceivedError:" + request.getUrl().toString());
-
         super.onReceivedError(view, request, error);
+
+        FTAutoTrack.putHttpError(System.currentTimeMillis(), OP.HTTP_WEBVIEW, request.getUrl().toString(), true);
+
     }
 
     @Override
-    public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-        LogUtils.d(TAG, "onReceivedError:" + failingUrl);
+    public void onPageCommitVisible(WebView view, String url) {
+        super.onPageCommitVisible(view, url);
+        mEventHelper.pageLoading(url);
+        LogUtils.d(TAG, "onPageCommitVisible:" + url);
 
-        super.onReceivedError(view, errorCode, description, failingUrl);
     }
 }

@@ -3,6 +3,10 @@ package com.ft.sdk.garble.manager;
 import android.os.Looper;
 
 import com.ft.sdk.FTAutoTrack;
+import com.ft.sdk.FTSDKConfig;
+import com.ft.sdk.garble.FTTrackInner;
+import com.ft.sdk.garble.bean.LogBean;
+import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.interfaces.LooperLogPrinterListener;
 import com.ft.sdk.garble.interfaces.UiPerfMonitorConfig;
 import com.ft.sdk.garble.utils.LooperLogPrinter;
@@ -17,6 +21,7 @@ public class FTUICatonManager implements LooperLogPrinterListener, UiPerfMonitor
     private static FTUICatonManager mInstance;
     private LooperLogPrinter mLooperLogPrinter;
     private int monitorState = UI_PERF_MONITOR_STOP;
+    private FTSDKConfig mConfig;
 
     private FTUICatonManager() {
         mLooperLogPrinter = new LooperLogPrinter(this);
@@ -29,9 +34,13 @@ public class FTUICatonManager implements LooperLogPrinterListener, UiPerfMonitor
         return mInstance;
     }
 
-    public void startMonitor() {
+    public void startMonitor(FTSDKConfig config) {
+        if (!config.isEnableTrackAppUIBlock()) {
+            return;
+        }
         Looper.getMainLooper().setMessageLogging(mLooperLogPrinter);
         monitorState = UI_PERF_MONITOR_START;
+        mConfig = config;
     }
 
     public void stopMonitor() {
@@ -53,16 +62,21 @@ public class FTUICatonManager implements LooperLogPrinterListener, UiPerfMonitor
         //卡顿等级可以自己定义
         switch (level) {
             case UI_PERF_LEVEL_1://处理超过 1 秒的卡顿
-                FTAutoTrack.uiBlock();
-                break;
             case UI_PERF_LEVEL_2://处理超过 1.5 秒的卡顿
+                FTAutoTrack.uiBlock();
+
+                LogBean logBean = new LogBean("------ UIBlock  ------, " + logInfo, System.currentTimeMillis());
+                logBean.setStatus(Status.CRITICAL);
+                logBean.setEnv(mConfig.getEnv());
+                logBean.setServiceName(mConfig.getTraceServiceName());
+                FTTrackInner.getInstance().logBackground(logBean);
                 break;
 
         }
     }
 
-    public static void release(){
-        if(mInstance != null) {
+    public static void release() {
+        if (mInstance != null) {
             mInstance.stopMonitor();
             mInstance = null;
         }

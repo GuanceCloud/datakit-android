@@ -2,7 +2,9 @@ package com.ft;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -14,7 +16,7 @@ import android.widget.Spinner;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.ft.sdk.FTWebViewClient;
+import com.ft.sdk.garble.utils.LogUtils;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -35,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
                 "https://www.tmall.com/",
                 "https://www.jd.com/",
                 "https://www.toutiao.com/",
-                "https://www.baidu111.com/test",
+                "https://www.baidu.com/test",
                 "https://www.csdn.net/"};
         spinner.setAdapter(new ArrayAdapter(this, R.layout.spinner_item, R.id.textView, data));
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

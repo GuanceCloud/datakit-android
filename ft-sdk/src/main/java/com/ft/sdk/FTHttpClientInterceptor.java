@@ -54,6 +54,7 @@ public class FTHttpClientInterceptor {
             operationName = request.getMethod() + "/http";
             URI uri = request.getUri();
             endPoint = uri.getHost() + ":" + uri.getPort();
+            handler.setHttpUrl(uri.toString());
             HttpUrl httpUrl = new HttpUrl(uri.getHost(), uri.getPath(), uri.getPort());
             HashMap<String, String> headers = handler.getTraceHeader(httpUrl);
             Iterator<String> iterator = headers.keySet().iterator();
@@ -160,9 +161,9 @@ public class FTHttpClientInterceptor {
                             return new GZIPInputStream(newHttpEntity.getContent());
                         }
                     };
-                    body = EntityUtils.toString(tempHttpEntity,StandardCharsets.UTF_8);
-                }else {
-                    body = EntityUtils.toString(newHttpEntity,StandardCharsets.UTF_8);
+                    body = EntityUtils.toString(tempHttpEntity, StandardCharsets.UTF_8);
+                } else {
+                    body = EntityUtils.toString(newHttpEntity, StandardCharsets.UTF_8);
                 }
                 HttpEntity resultEntity = EntityBuilder.create()
                         .setContentEncoding(httpEntity.getContentEncoding())
