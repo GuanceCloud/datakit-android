@@ -19,42 +19,40 @@ import com.ft.sdk.garble.manager.FTActivityManager;
 class AppRestartCallback {
     public static final int MSG_CHECK_SLEEP_STATUS = 1;
     public static final int DELAY_MILLIS = 10000;//10 秒
-    private boolean appForeground = true;
-    private long lastLeaveTime;
+    private boolean alreadySleep = false;
     private Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             if (msg.what == MSG_CHECK_SLEEP_STATUS) {
-                checkRealSleep();
+                checkLongTimeSleep();
             }
         }
     };
 
     public void onStart() {
-        if (!appForeground) {//表示从后台重新进入
-            long currentTime = System.currentTimeMillis();
-            if ((currentTime - lastLeaveTime) / 1000 >= 10) {
-                FTAutoTrack.startApp();
-                FTMonitor.get().checkForReStart();
-            }
+        if (alreadySleep) {//表示从后台重新进入
+            FTAutoTrack.startApp();
+            FTMonitor.get().checkForReStart();
         }
     }
 
     public void onStop() {
-        appForeground = FTActivityManager.get().isAppForeground();
-        lastLeaveTime = System.currentTimeMillis();
-
+        boolean appForeground = FTActivityManager.get().isAppForeground();
         if (!appForeground) {
             handler.removeMessages(MSG_CHECK_SLEEP_STATUS);
             handler.sendEmptyMessageDelayed(MSG_CHECK_SLEEP_STATUS, DELAY_MILLIS);
         }
     }
 
-    private void checkRealSleep() {
+    /**
+     * 检测是否长时间休眠
+     */
+    private void checkLongTimeSleep() {
         boolean appForeground = FTActivityManager.get().isAppForeground();
         if (!appForeground) {
-            FTAutoTrack.sleepApp();
+            FTAutoTrack.sleepApp(DELAY_MILLIS);
+            alreadySleep = true;
         }
     }
 
