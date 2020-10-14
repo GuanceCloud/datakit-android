@@ -355,8 +355,7 @@ public class FTAutoTrack {
      * APP 启动
      */
     public static void startApp() {
-        long now = System.currentTimeMillis();
-        startTimeline = now;
+        startTimeline = System.currentTimeMillis();
         if (!FTAutoTrackConfig.get().isAutoTrack()) {
             return;
         }
@@ -367,8 +366,8 @@ public class FTAutoTrack {
     }
 
 
-    public static void sleepApp() {
-        long now = System.currentTimeMillis();
+    public static void sleepApp(long timeDelay) {
+        long now = System.currentTimeMillis() - timeDelay;
         putClientTimeCost(now, OP.CLIENT_ACTIVATED_TIME, now - startTimeline);
 
     }
