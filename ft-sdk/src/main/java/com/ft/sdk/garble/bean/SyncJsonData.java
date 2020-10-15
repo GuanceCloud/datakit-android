@@ -24,7 +24,6 @@ import static com.ft.sdk.garble.manager.SyncDataHelper.addMonitorData;
 public class SyncJsonData implements Cloneable {
 
     private static final String TAG = "SyncJsonData";
-    private static final String OP_DATA_KEY_LOG = "content";
 
     long id;
     DataType dataType;
@@ -50,7 +49,7 @@ public class SyncJsonData implements Cloneable {
             if (dataType == DataType.TRACK) {
                 JSONObject jsonObject = new JSONObject(dataString);
                 opData = new OPData();
-                opData.setOp(jsonObject.optString("op"));
+                opData.setOpFromString(jsonObject.optString("op"));
                 opData.setContent(jsonObject.optString("opdata"));
             }
             this.dataString = dataString;
@@ -174,12 +173,15 @@ public class SyncJsonData implements Cloneable {
         SyncJsonData recordData = new SyncJsonData(DataType.TRACK);
         recordData.setTime(bean.getTimeMillis());
 
-        addMonitorData(tagsTemp, fields);
+
+        if (op.needMonitorData()) {
+            addMonitorData(tagsTemp, fields);
+        }
 
         JSONObject opDataJson = getLinProtocolJson(bean.getMeasurement(), tagsTemp, fields);
 
         OPData opData = new OPData();
-        opData.setOp(op.value);
+        opData.setOp(op);
         opData.setContent(opDataJson.toString());
         recordData.setDataString(opData.toJsonString());
 

@@ -1,5 +1,9 @@
 package com.ft.sdk.garble.utils;
 
+import com.ft.sdk.garble.bean.OP;
+
+import java.util.HashMap;
+
 /**
  * BY huangDianHua
  * DATE:2019-12-10 10:41
@@ -45,23 +49,22 @@ public class Constants {
     public static final String DEFAULT_LOG_SERVICE_NAME = "dataflux sdk";
     public static final int MAX_DB_CACHE_NUM = 5000;//数据库最大缓存容量
 
+    public static final String KEY_EVENT_ID = "event_id";
+    public static final String KEY_EVENT = "event";
+
+
     public static final String KEY_PAGE_EVENT_CURRENT_PAGE_NAME = "current_page_name";
     public static final String KEY_PAGE_EVENT_ROOT_PAGE_NAME = "root_page_name";
-    public static final String KEY_PAGE_EVENT_EVENT_ID = "event_id";
-    public static final String KEY_PAGE_EVENT_EVENT = "event";
+
     public static final String KEY_PAGE_EVENT_PAGE_DESC = "page_desc";
     public static final String KEY_PAGE_EVENT_USER_NAME = "ud_name";
     public static final String KEY_PAGE_EVENT_USER_ID = "ud_id";
 
     public static final String KEY_TIME_COST_DURATION = "duration";
-    public static final String KEY_TIME_COST_EVENT = "event";
     public static final String KEY_TIME_COST_WEBVIEW_URL = "url";
 
     public static final String KEY_HTTP_URL = "url";
     public static final String KEY_HTTP_IS_ERROR = "isError";
-    public static final String KEY_HTTP_APPLICATION_NAME = "application_name";
-    public static final String KEY_HTTP_APP_VERSION_NAME = "app_version_name";
-
 
     public static final String KEY_BATTERY_TOTAL = "battery_total";
     public static final String KEY_BATTERY_CHARGE_TYPE = "battery_charge_type";
@@ -129,8 +132,8 @@ public class Constants {
     public static final String KEY_DEVICE_UUID = "device_uuid";
     public static final String KEY_DEVICE_APPLICATION_ID = "application_identifier";
     public static final String KEY_DEVICE_APPLICATION_NAME = "application_name";
-    public static final String KEY_DEVICE_AGENT = "agent";
-    public static final String KEY_DEVICE_AUTO_TRACK = "autoTrack";
+    public static final String KEY_DEVICE_SDK_AGENT = "agent";
+    public static final String KEY_DEVICE_SDK_AUTO_TRACK = "autoTrack";
     public static final String KEY_DEVICE_IMEI = "imei";
     public static final String KEY_DEVICE_OS = "os";
     public static final String KEY_DEVICE_OS_VERSION = "os_version";
@@ -153,6 +156,61 @@ public class Constants {
     public static final String EVENT_NAME_WEBVIEW_LOADING = "loading";
     public static final String EVENT_NAME_WEBVIEW_LOAD_COMPLETED = "loadCompleted";
     public static final String EVENT_NAME_ACTIVATED = "activated";
+    public static final String EVENT_NAME_HTTP_CLIENT = "http_client";
+    public static final String EVENT_NAME_HTTP_WEBVIEW = "http_webview";
 
+    /**
+     * OP EVENT 数据对照
+     */
+    public final static HashMap<OP, String> OP_EVENT_MAPS = new HashMap<>();
+
+    static {
+        OP_EVENT_MAPS.put(OP.LANC, Constants.EVENT_NAME_LAUNCH);
+        OP_EVENT_MAPS.put(OP.CLK, Constants.EVENT_NAME_CLICK);
+        OP_EVENT_MAPS.put(OP.CLS_FRA, Constants.EVENT_NAME_LEAVE);
+        OP_EVENT_MAPS.put(OP.CLS_ACT, Constants.EVENT_NAME_LEAVE);
+        OP_EVENT_MAPS.put(OP.OPEN_ACT, Constants.EVENT_NAME_ENTER);
+        OP_EVENT_MAPS.put(OP.OPEN_FRA, Constants.EVENT_NAME_ENTER);
+
+        OP_EVENT_MAPS.put(OP.BLOCK, Constants.EVENT_NAME_BLOCK);
+        OP_EVENT_MAPS.put(OP.CRASH, Constants.EVENT_NAME_CRASH);
+        OP_EVENT_MAPS.put(OP.ANR, Constants.EVENT_NAME_ANR);
+
+        OP_EVENT_MAPS.put(OP.WEBVIEW_LOADING, Constants.EVENT_NAME_WEBVIEW_LOADING);
+        OP_EVENT_MAPS.put(OP.WEBVIEW_LOAD_COMPLETED, Constants.EVENT_NAME_WEBVIEW_LOAD_COMPLETED);
+
+        OP_EVENT_MAPS.put(OP.CLIENT_ACTIVATED_TIME, Constants.EVENT_NAME_ACTIVATED);
+
+        OP_EVENT_MAPS.put(OP.HTTP_CLIENT, Constants.EVENT_NAME_HTTP_CLIENT);
+        OP_EVENT_MAPS.put(OP.HTTP_WEBVIEW, Constants.EVENT_NAME_HTTP_WEBVIEW);
+    }
+
+
+    /**
+     * 需要监控数据的 OP 类型
+     */
+    public static final OP[] MERGE_MONITOR_EVENTS = new OP[]{
+            OP.LANC,
+            OP.CLK,
+            OP.CLS_FRA,
+            OP.CLS_ACT,
+            OP.OPEN_ACT,
+            OP.OPEN_FRA,
+            OP.BLOCK,
+            OP.CRASH,
+            OP.ANR,
+    };
+
+    /**
+     * 需要用户相关联的数据
+     */
+    public static final OP[] USER_ACTION_EVENTS = new OP[]{
+            OP.LANC,
+            OP.CLK,
+            OP.CLS_FRA,
+            OP.CLS_ACT,
+            OP.OPEN_ACT,
+            OP.OPEN_FRA,
+    };
 
 }

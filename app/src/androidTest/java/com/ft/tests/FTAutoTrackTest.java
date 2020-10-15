@@ -19,6 +19,7 @@ import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.garble.bean.DataType;
+import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.manager.SyncDataHelper;
@@ -163,7 +164,7 @@ public class FTAutoTrackTest extends BaseTest {
         boolean value = false;
         try {
             for (SyncJsonData recordData : recordDataList) {
-                if (recordData.getOpData().getOp().equals("clk")) {
+                if (recordData.getOpData().getOp().equals(OP.CLK)) {
                     value = true;
                     break;
                 }
@@ -189,7 +190,7 @@ public class FTAutoTrackTest extends BaseTest {
         boolean value = false;
         try {
             for (SyncJsonData recordData : recordDataList) {
-                if (recordData.getOpData().getOp().equals("clk")) {
+                if (recordData.getOpData().getOp().equals(OP.CLK)) {
                     value = true;
                     break;
                 }
@@ -216,7 +217,7 @@ public class FTAutoTrackTest extends BaseTest {
         boolean value = false;
         try {
             for (SyncJsonData recordData : recordDataList) {
-                if (recordData.getOpData().getOp().equals("clk")) {
+                if (recordData.getOpData().getOp().equals(OP.CLK)) {
                     value = true;
                     break;
                 }
@@ -243,7 +244,7 @@ public class FTAutoTrackTest extends BaseTest {
         boolean value = false;
         try {
             for (SyncJsonData recordData : recordDataList) {
-                if (recordData.getOpData().getOp().equals("clk")) {
+                if (recordData.getOpData().getOp().equals(OP.CLK)) {
                     value = true;
                     break;
                 }

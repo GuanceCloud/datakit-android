@@ -4,16 +4,20 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class OPData {
-    private String op;
+    private OP op;
     private String content;
 
 
-    public String getOp() {
+    public OP getOp() {
         return op;
     }
 
-    public void setOp(String op) {
+    public void setOp(OP op) {
         this.op = op;
+    }
+
+    public void setOpFromString(String op) {
+        this.op = OP.fromValue(op);
     }
 
     public String getContent() {

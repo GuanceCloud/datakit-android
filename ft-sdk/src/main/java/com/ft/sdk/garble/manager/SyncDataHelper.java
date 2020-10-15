@@ -104,19 +104,23 @@ public class SyncDataHelper {
      */
     public String getTrackBodyContent(List<SyncJsonData> datas) {
         StringBuilder sb = new StringBuilder();
-        String device = parseHashToString(getDeviceInfo());
+        String device = parseHashToString(getBaseDeviceInfoTagsMap());
+        String uuid = parseHashToString(getUniqueIdMap());
+
         for (SyncJsonData recordData : datas) {
             //获取这条事件的指标
             sb.append(getMeasurement(recordData));
             //获取埋点事件数据
-            if (!CLIENT_ACTIVATED_TIME.value.equals(recordData.getOpData().getOp())
-                    && !HTTP_CLIENT.value.equals(recordData.getOpData().getOp())
-                    && !HTTP_CLIENT.value.equals(recordData.getOpData().getOp())
-                    && !WEBVIEW_LOAD_COMPLETED.value.equals(recordData.getOpData().getOp())
-                    && !WEBVIEW_LOADING.value.equals(recordData.getOpData().getOp())) {
+            if (!CLIENT_ACTIVATED_TIME.equals(recordData.getOpData().getOp())
+                    && !HTTP_CLIENT.equals(recordData.getOpData().getOp())
+                    && !HTTP_CLIENT.equals(recordData.getOpData().getOp())
+                    && !WEBVIEW_LOAD_COMPLETED.equals(recordData.getOpData().getOp())
+                    && !WEBVIEW_LOADING.equals(recordData.getOpData().getOp())) {
                 sb.append(",");
-                sb.append(device);
+                sb.append(uuid);
             }
+            sb.append(",");
+            sb.append(device);
             //获取埋点事件数据
             sb.append(getUpdateData(recordData));
             sb.append(Constants.SEPARATION_LINE_BREAK);
@@ -177,13 +181,13 @@ public class SyncDataHelper {
      */
     private String getUpdateData(SyncJsonData data) {
         if (data.getDataType().equals(DataType.TRACK)) {
-            if (CSTM.value.equals(data.getOpData().getOp())) {
-                return composeCustomUpdateData(true, data);
+            if (CSTM.equals(data.getOpData().getOp())) {
+                return composeCustomUpdateData(data);
             } else {
                 return composeAutoUpdateData(data);
             }
         } else if (data.getDataType() == DataType.LOG) {
-            return composeCustomUpdateData(false, data);
+            return composeCustomUpdateData(data);
         }
         return "";
     }
@@ -193,7 +197,7 @@ public class SyncDataHelper {
      *
      * @return
      */
-    private String composeCustomUpdateData(boolean addUser, SyncJsonData data) {
+    private String composeCustomUpdateData(SyncJsonData data) {
         StringBuffer sb = new StringBuffer();
         String jsonString;
         if (data.getDataType().equals(DataType.TRACK)) {
@@ -209,7 +213,7 @@ public class SyncDataHelper {
                 JSONObject fields = opJson.optJSONObject(Constants.FIELDS);
                 StringBuffer tagSb = getCustomHash(tags, true);
                 StringBuffer valueSb = getCustomHash(fields, false);
-                if (addUser) {
+                if (!data.getDataType().equals(DataType.LOG) && data.getOpData().getOp().isUserRelativeOp()) {
                     addUserData(tagSb, data);
                 }
                 deleteLastComma(tagSb);
@@ -296,14 +300,14 @@ public class SyncDataHelper {
 
                 if (!Utils.isNullOrEmpty(cpn)) {
                     //如果是 Fragment 就把Activity 的名称也添加上去
-                    if (data.getOpData().getOp().equals(OP.OPEN_FRA.value) || data.getOpData().getOp().equals(OP.CLS_FRA.value)) {
+                    if (data.getOpData().getOp().equals(OP.OPEN_FRA) || data.getOpData().getOp().equals(OP.CLS_FRA)) {
                         tags.put(Constants.KEY_PAGE_EVENT_CURRENT_PAGE_NAME, rpn + "." + cpn);
                     } else {
                         tags.put(Constants.KEY_PAGE_EVENT_CURRENT_PAGE_NAME, cpn);
                     }
                 }
 
-                tags.put(Constants.KEY_PAGE_EVENT_EVENT_ID, Utils.MD5(getEventName(data.getOpData().getOp())));
+                tags.put(Constants.KEY_EVENT_ID, Utils.MD5(data.getOpData().getOp().toEventName()));
                 sb.append(getCustomHash(tags, true));
                 fields = opJson.optJSONObject(Constants.FIELDS);
             } catch (Exception e) {
@@ -322,13 +326,13 @@ public class SyncDataHelper {
 
         if (fields != null) {
             try {
-                fields.put(Constants.KEY_PAGE_EVENT_EVENT, getEventName(data.getOpData().getOp()));
+                fields.put(Constants.KEY_EVENT, data.getOpData().getOp().toEventName());
 
                 String cpn = tags.optString(Constants.KEY_PAGE_EVENT_CURRENT_PAGE_NAME, "");
                 String rpn = tags.optString(Constants.KEY_PAGE_EVENT_ROOT_PAGE_NAME, "");
 
                 if (!cpn.isEmpty()) {
-                    if (data.getOpData().getOp().equals(OP.OPEN_FRA.value) || data.getOpData().getOp().equals(OP.CLS_FRA.value)) {
+                    if (data.getOpData().getOp().equals(OP.OPEN_FRA) || data.getOpData().getOp().equals(OP.CLS_FRA)) {
                         fields.put(Constants.KEY_PAGE_EVENT_PAGE_DESC, FTAliasConfig.get().getPageDesc(rpn + "." + cpn));
                     } else {
                         fields.put(Constants.KEY_PAGE_EVENT_PAGE_DESC, FTAliasConfig.get().getPageDesc(cpn));
@@ -343,7 +347,7 @@ public class SyncDataHelper {
             deleteLastComma(valueSb);
             sb.append(valueSb);
         } else {
-            sb.append(Constants.KEY_PAGE_EVENT_EVENT).append("=\"").append(getEventName(data.getOpData().getOp())).append("\"");
+            sb.append(Constants.KEY_EVENT).append("=\"").append(data.getOpData().getOp().toEventName()).append("\"");
         }
         sb.append(Constants.SEPARATION_PRINT);
         sb.append(data.getTime() * 1000000);
@@ -393,8 +397,10 @@ public class SyncDataHelper {
             sb.append(tagSb.toString());
         }
 
-        String device = parseHashToString(getDeviceInfo());
-        sb.append(",").append(device);
+        String device = parseHashToString(getBaseDeviceInfoTagsMap());
+        String uuid = parseHashToString(getUniqueIdMap());
+
+        sb.append(",").append(uuid).append(",").append(device);
         //删除多余的逗号
         deleteLastComma(sb);
 
@@ -711,24 +717,6 @@ public class SyncDataHelper {
         }
     }
 
-    private String getEventName(String op) {
-        if (OP.LANC.value.equals(op)) {
-            return Constants.EVENT_NAME_LAUNCH;
-        } else if (OP.CLK.value.equals(op)) {
-            return Constants.EVENT_NAME_CLICK;
-        } else if (OP.CLS_FRA.value.equals(op) || OP.CLS_ACT.value.equals(op)) {
-            return Constants.EVENT_NAME_LEAVE;
-        } else if (OP.OPEN_ACT.value.equals(op) || OP.OPEN_FRA.value.equals(op)) {
-            return Constants.EVENT_NAME_ENTER;
-        } else if (OP.BLOCK.value.equals(op)) {
-            return Constants.EVENT_NAME_BLOCK;
-        } else if (OP.CRASH.value.equals(op)) {
-            return Constants.EVENT_NAME_CRASH;
-        } else if (OP.ANR.value.equals(op)) {
-            return Constants.EVENT_NAME_ANR;
-        }
-        return op;
-    }
 
     /**
      * 删除最后的逗号
@@ -788,13 +776,8 @@ public class SyncDataHelper {
      *
      * @return
      */
-    private static HashMap<String, Object> getDeviceInfo() {
-        Context context = FTApplication.getApplication();
-        HashMap<String, Object> objectHashMap = getDefaultObjectBean();
-        if (FTHttpConfig.get().useOaid) {
-            objectHashMap.put(Constants.KEY_DEVICE_OAID, OaidUtils.getOAID(context));
-        }
-        objectHashMap.put(Constants.KEY_APP_VERSION_NAME, Utils.getAppVersionName());
+    private static HashMap<String, Object> getBaseDeviceInfoTagsMap() {
+        HashMap<String, Object> objectHashMap = getBaseDeviceInfoHashMap();
 
         HashMap<String, Object> temp = new HashMap<>();
         for (Map.Entry<String, Object> entry : objectHashMap.entrySet()) {
@@ -815,14 +798,19 @@ public class SyncDataHelper {
      * @return
      */
     public static HashMap<String, Object> getDefaultObjectBean() {
+        HashMap<String, Object> objectHashMap = getBaseDeviceInfoHashMap();
+        objectHashMap.putAll(getUniqueIdMap());
+        return objectHashMap;
+
+    }
+
+    public static HashMap<String, Object> getBaseDeviceInfoHashMap() {
         Context context = FTApplication.getApplication();
         HashMap<String, Object> objectHashMap = new HashMap<>();
-        objectHashMap.put(Constants.KEY_DEVICE_UUID, DeviceUtils.getUuid(context));
         objectHashMap.put(Constants.KEY_DEVICE_APPLICATION_ID, DeviceUtils.getApplicationId(context));
         objectHashMap.put(Constants.KEY_DEVICE_APPLICATION_NAME, DeviceUtils.getAppName(context));
-        objectHashMap.put(Constants.KEY_DEVICE_AGENT, DeviceUtils.getSDKVersion());
-        objectHashMap.put(Constants.KEY_DEVICE_AUTO_TRACK, FTSdk.PLUGIN_VERSION);
-        objectHashMap.put(Constants.KEY_DEVICE_IMEI, DeviceUtils.getImei(context));
+        objectHashMap.put(Constants.KEY_DEVICE_SDK_AGENT, DeviceUtils.getSDKVersion());
+        objectHashMap.put(Constants.KEY_DEVICE_SDK_AUTO_TRACK, FTSdk.PLUGIN_VERSION);
         objectHashMap.put(Constants.KEY_DEVICE_OS, DeviceUtils.getOSName());
         objectHashMap.put(Constants.KEY_DEVICE_OS_VERSION, DeviceUtils.getOSVersion());
         objectHashMap.put(Constants.KEY_DEVICE_DEVICE_BAND, DeviceUtils.getDeviceBand());
@@ -831,6 +819,18 @@ public class SyncDataHelper {
         objectHashMap.put(Constants.KEY_DEVICE_CARRIER, DeviceUtils.getCarrier(context));
         objectHashMap.put(Constants.KEY_DEVICE_LOCALE, Locale.getDefault());
         objectHashMap.put(Constants.KEY_APP_VERSION_NAME, Utils.getAppVersionName());
+        return objectHashMap;
+    }
+
+
+    public static HashMap<String, Object> getUniqueIdMap() {
+        Context context = FTApplication.getApplication();
+        HashMap<String, Object> objectHashMap = new HashMap<>();
+        objectHashMap.put(Constants.KEY_DEVICE_UUID, DeviceUtils.getUuid(context));
+        objectHashMap.put(Constants.KEY_DEVICE_IMEI, DeviceUtils.getImei(context));
+        if (FTHttpConfig.get().useOaid) {
+            objectHashMap.put(Constants.KEY_DEVICE_OAID, OaidUtils.getOAID(context));
+        }
         return objectHashMap;
     }
 
