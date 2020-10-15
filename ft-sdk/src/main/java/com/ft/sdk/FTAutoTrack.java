@@ -784,13 +784,6 @@ public class FTAutoTrack {
             JSONObject tags = new JSONObject();
             JSONObject fields = new JSONObject();
 
-            if (op.equals(OP.WEBVIEW_LOAD_COMPLETED)) {
-                tags.put(Constants.KEY_TIME_COST_EVENT, Constants.EVENT_NAME_WEBVIEW_LOAD_COMPLETED);
-
-            } else if (op.equals(OP.WEBVIEW_LOADING)) {
-                tags.put(Constants.KEY_TIME_COST_EVENT, Constants.EVENT_NAME_WEBVIEW_LOADING);
-            }
-
             tags.put(Constants.KEY_TIME_COST_WEBVIEW_URL, url);
             tags.put(Constants.KEY_TIME_COST_DURATION, duration);
 
@@ -812,11 +805,6 @@ public class FTAutoTrack {
         try {
             JSONObject tags = new JSONObject();
             JSONObject fields = new JSONObject();
-
-            if (op.equals(OP.CLIENT_ACTIVATED_TIME)) {
-                tags.put(Constants.KEY_TIME_COST_EVENT, Constants.EVENT_NAME_ACTIVATED);
-            }
-
             fields.put(Constants.KEY_TIME_COST_DURATION, duration);
 
             FTTrackInner.getInstance().trackBackground(op, time, Constants.FT_MEASUREMENT_TIME_COST_CLIENT, tags, fields);
@@ -837,9 +825,6 @@ public class FTAutoTrack {
         try {
             JSONObject tags = new JSONObject();
             JSONObject fields = new JSONObject();
-
-            tags.put(Constants.KEY_DEVICE_APPLICATION_NAME, DeviceUtils.getAppName(FTApplication.getApplication()));
-            tags.put(Constants.KEY_APP_VERSION_NAME, Utils.getAppVersionName());
 
             fields.put(Constants.KEY_HTTP_URL, url);
             fields.put(Constants.KEY_HTTP_IS_ERROR, isError ? 1 : 0);
