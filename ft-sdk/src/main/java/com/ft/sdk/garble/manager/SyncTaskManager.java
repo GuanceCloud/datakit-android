@@ -130,7 +130,6 @@ public class SyncTaskManager {
         String body = syncDataManager.getBodyContent(dataType, requestDatas);
         SyncDataHelper.printUpdateData(dataType == DataType.OBJECT, body);
         body = body.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION).replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK);
-        LogUtils.e(TAG, body);
         requestNet(dataType, body, (code, response) -> {
             if (code >= 200 && code < 500) {
                 LogUtils.d(TAG, "\n**********************同步数据成功**********************");
