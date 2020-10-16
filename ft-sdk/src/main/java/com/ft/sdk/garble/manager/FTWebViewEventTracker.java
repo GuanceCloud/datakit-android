@@ -30,11 +30,11 @@ public class FTWebViewEventTracker {
         finishTimeLine = System.currentTimeMillis();
 
         finishDuration = finishTimeLine - startTimeline;
-        reset();
 
         long now = finishTimeLine;
         FTAutoTrack.putWebViewTimeCost(now, OP.WEBVIEW_LOAD_COMPLETED, url, finishDuration);
 
+        reset();
     }
 
     private void reset() {

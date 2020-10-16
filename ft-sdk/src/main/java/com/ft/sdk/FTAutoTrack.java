@@ -785,7 +785,7 @@ public class FTAutoTrack {
             JSONObject fields = new JSONObject();
 
             tags.put(Constants.KEY_TIME_COST_WEBVIEW_URL, url);
-            tags.put(Constants.KEY_TIME_COST_DURATION, duration);
+            tags.put(Constants.KEY_TIME_COST_DURATION, duration * 1000);
 
             FTTrackInner.getInstance().trackBackground(op, time, Constants.FT_MEASUREMENT_TIME_COST_WEBVIEW, tags, fields);
 
@@ -805,7 +805,7 @@ public class FTAutoTrack {
         try {
             JSONObject tags = new JSONObject();
             JSONObject fields = new JSONObject();
-            fields.put(Constants.KEY_TIME_COST_DURATION, duration);
+            fields.put(Constants.KEY_TIME_COST_DURATION, duration * 1000);
 
             FTTrackInner.getInstance().trackBackground(op, time, Constants.FT_MEASUREMENT_TIME_COST_CLIENT, tags, fields);
         } catch (Exception e) {
@@ -826,7 +826,7 @@ public class FTAutoTrack {
             JSONObject tags = new JSONObject();
             JSONObject fields = new JSONObject();
 
-            fields.put(Constants.KEY_HTTP_URL, url);
+            tags.put(Constants.KEY_HTTP_URL, url);
             fields.put(Constants.KEY_HTTP_IS_ERROR, isError ? 1 : 0);
 
             String measurement = "";
