@@ -64,6 +64,7 @@ public class Constants {
     public static final String KEY_TIME_COST_WEBVIEW_URL = "url";
 
     public static final String KEY_HTTP_URL = "url";
+    public static final String KEY_HTTP_HOST = "host";
     public static final String KEY_HTTP_IS_ERROR = "isError";
 
     public static final String KEY_BATTERY_TOTAL = "battery_total";

@@ -2,7 +2,6 @@ package com.ft.sdk;
 
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.http.HttpUrl;
-import com.ft.sdk.garble.manager.FTWebViewTraceHelper;
 import com.ft.sdk.garble.utils.LogUtils;
 
 import org.jetbrains.annotations.NotNull;
@@ -44,6 +43,17 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
     public static final String SKYWALKING_V3_SW_8 = "sw8";
     public static final String SKYWALKING_V3_SW_6 = "sw6";
 
+    private boolean webViewTrace;
+
+    public FTNetWorkTracerInterceptor() {
+        this(false);
+    }
+
+
+    public FTNetWorkTracerInterceptor(boolean webViewTrace) {
+        this.webViewTrace = webViewTrace;
+    }
+
 
     private void uploadNetTrace(FTTraceHandler handler, Request request, @Nullable Response response, String responseBody, String error) {
         try {
@@ -57,8 +67,7 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
             jsonObject.put("requestContent", requestContent);
             jsonObject.put("responseContent", responseContent);
 
-            String endPoint = request.url().host() + ":" + request.url().port();
-            handler.traceDataUpload(jsonObject, operationName, endPoint, isError);
+            handler.traceDataUpload(jsonObject, operationName, isError);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -80,9 +89,9 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
         FTTraceHandler handler = new FTTraceHandler();
         try {
             okhttp3.HttpUrl url = request.url();
-            HttpUrl httpUrl = new HttpUrl(url.host(), url.encodedPath(), url.port());
+            HttpUrl httpUrl = new HttpUrl(url.host(), url.encodedPath(), url.port(), url.toString());
             HashMap<String, String> headers = handler.getTraceHeader(httpUrl);
-            handler.setHttpUrl(url.toString());
+            handler.setIsWebViewTrace(webViewTrace);
             Iterator<String> iterator = headers.keySet().iterator();
             while (iterator.hasNext()) {
                 String key = iterator.next();
@@ -139,7 +148,7 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
                 json.put("body", body);
             }
         } catch (JSONException e) {
-            LogUtils.e(TAG,e.getMessage());
+            LogUtils.e(TAG, e.getMessage());
         }
         return json;
     }

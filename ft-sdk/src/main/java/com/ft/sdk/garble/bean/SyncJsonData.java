@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.FloatDoubleJsonUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONArray;
@@ -182,7 +183,7 @@ public class SyncJsonData implements Cloneable {
 
         OPData opData = new OPData();
         opData.setOp(op);
-        opData.setContent(opDataJson.toString());
+        opData.setContent(FloatDoubleJsonUtils.protectValueFormat(opDataJson));
         recordData.setDataString(opData.toJsonString());
 
         String sessionId = FTUserConfig.get().getSessionId();
@@ -207,7 +208,7 @@ public class SyncJsonData implements Cloneable {
         SyncJsonData recordData = new SyncJsonData(DataType.LOG);
         recordData.setTime(bean.getTime());
         JSONObject opDataJson = getLinProtocolJson(bean.getMeasurement(), bean.getAllTags(), bean.getAllFields());
-        recordData.setDataString(opDataJson.toString());
+        recordData.setDataString(FloatDoubleJsonUtils.protectValueFormat(opDataJson));
 
         return recordData;
     }

@@ -34,18 +34,15 @@ public class FTTraceHandler {
     private long requestTime = System.currentTimeMillis();
     private String traceID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
     private String spanID = Utils.getGUID_16();
-    private String httpUrl = "";
+    private boolean isWebViewTrace;
+    private HttpUrl httpUrl;
 
     public FTTraceHandler() {
         enableTrace = Utils.enableTraceSamplingRate();
     }
 
-    public void setHttpUrl(String url) {
-        this.httpUrl = url;
-    }
-
     public HashMap<String, String> getTraceHeader(HttpUrl httpUrl) {
-        this.httpUrl = httpUrl.toString();
+        this.httpUrl = httpUrl;
         HashMap<String, String> headers = new HashMap<>();
         String sampled;
         //抓取数据内容
@@ -77,7 +74,7 @@ public class FTTraceHandler {
         return headers;
     }
 
-    public void traceDataUpload(JSONObject content, String operationName, String endPoint, boolean isError) {
+    public void traceDataUpload(JSONObject content, String operationName, boolean isError) {
         if (!enableTrace) {
             return;
         }
@@ -86,10 +83,13 @@ public class FTTraceHandler {
         }
         //请求结束时间
         long responseTime = System.currentTimeMillis();
+        long duration = (responseTime - requestTime) * 1000;
+
+        String endPoint = httpUrl.getHost() + ":" + httpUrl.getPort();
 
         LogBean logBean = new LogBean(Constants.FT_LOG_DEFAULT_MEASUREMENT, content, requestTime);
         logBean.setOperationName(operationName);
-        logBean.setDuration((responseTime - requestTime) * 1000);
+        logBean.setDuration(duration);
         logBean.setClazz("tracing");
         logBean.setSpanType("entry");
         logBean.setEndpoint(endPoint);
@@ -99,7 +99,9 @@ public class FTTraceHandler {
         logBean.setTraceID(traceID);
         FTTrackInner.getInstance().logBackground(logBean);
 
-        FTAutoTrack.putHttpError(requestTime, OP.HTTP_CLIENT, endPoint, isError);
+
+        OP op = isWebViewTrace ? OP.HTTP_WEBVIEW : OP.HTTP_CLIENT;
+        FTAutoTrack.putHttpError(requestTime, op, httpUrl.getHoleUrl(), httpUrl.getHost(), isError, duration);
     }
 
     /**
@@ -111,5 +113,9 @@ public class FTTraceHandler {
     private static boolean isOverMaxLength(String content) {
         byte[] b = content.getBytes(StandardCharsets.UTF_8);
         return b.length > 30720;
+    }
+
+    public void setIsWebViewTrace(boolean isWebViewTrace) {
+        this.isWebViewTrace = isWebViewTrace;
     }
 }

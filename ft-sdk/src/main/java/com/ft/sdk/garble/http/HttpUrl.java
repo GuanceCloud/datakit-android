@@ -9,34 +9,31 @@ public class HttpUrl {
     private String host;
     private String path;
     private int port;
+    private String holeUrl;
 
-    public HttpUrl(String host, String path, int port) {
+    public HttpUrl(String host, String path, int port, String holeUrl) {
         this.host = host;
         this.path = path;
         this.port = port;
+        this.holeUrl = holeUrl;
     }
 
     public String getHost() {
         return host;
     }
 
-    public void setHost(String host) {
-        this.host = host;
-    }
 
     public String getPath() {
         return path;
     }
 
-    public void setPath(String path) {
-        this.path = path;
-    }
 
     public int getPort() {
         return port;
     }
 
-    public void setPort(int port) {
-        this.port = port;
+
+    public String getHoleUrl() {
+        return holeUrl;
     }
 }

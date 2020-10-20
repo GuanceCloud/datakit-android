@@ -1,5 +1,7 @@
 package com.ft.sdk.garble.bean;
 
+import com.ft.sdk.garble.utils.FloatDoubleJsonUtils;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -31,12 +33,12 @@ public class OPData {
     public String toJsonString() {
         JSONObject json = new JSONObject();
         try {
-            json.put("op", op);
+            json.put("op", op.value);
             json.put("opdata", content);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return json.toString();
+        return FloatDoubleJsonUtils.protectValueFormat(json);
 
     }
 

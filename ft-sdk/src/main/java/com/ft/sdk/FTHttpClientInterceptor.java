@@ -36,7 +36,6 @@ import java.util.zip.GZIPInputStream;
 public class FTHttpClientInterceptor {
     FTTraceHandler handler;
     String operationName = "";
-    String endPoint = "";
     JSONObject requestContent;
 
     /**
@@ -53,9 +52,7 @@ public class FTHttpClientInterceptor {
         try {
             operationName = request.getMethod() + "/http";
             URI uri = request.getUri();
-            endPoint = uri.getHost() + ":" + uri.getPort();
-            handler.setHttpUrl(uri.toString());
-            HttpUrl httpUrl = new HttpUrl(uri.getHost(), uri.getPath(), uri.getPort());
+            HttpUrl httpUrl = new HttpUrl(uri.getHost(), uri.getPath(), uri.getPort(),uri.toString());
             HashMap<String, String> headers = handler.getTraceHeader(httpUrl);
             Iterator<String> iterator = headers.keySet().iterator();
             while (iterator.hasNext()) {
@@ -84,7 +81,7 @@ public class FTHttpClientInterceptor {
             jsonObject.put("requestContent", requestContent);
             jsonObject.put("responseContent", buildResponseJsonContent(response, entity, response.getReasonPhrase()));
 
-            handler.traceDataUpload(jsonObject, operationName, endPoint, isError);
+            handler.traceDataUpload(jsonObject, operationName, isError);
         } catch (Exception e) {
             e.printStackTrace();
         }

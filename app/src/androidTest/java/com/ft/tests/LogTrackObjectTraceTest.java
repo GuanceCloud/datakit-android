@@ -116,10 +116,9 @@ public class LogTrackObjectTraceTest extends BaseTest {
      * 同步删除测试
      *
      * @throws InterruptedException
-     * @throws JSONException
      */
     @Test
-    public void logSyncTest() throws InterruptedException, JSONException {
+    public void logSyncTest() throws InterruptedException {
         startSyncTask();
         FTTrack.getInstance().logBackground("----logUploadTest----", Status.CRITICAL);
         Thread.sleep(12000);
@@ -143,6 +142,28 @@ public class LogTrackObjectTraceTest extends BaseTest {
         Thread.sleep(5000);
         int except = countInDB(DataType.TRACK, "----trackInsertDataTest----");
         Assert.assertEquals(1, except);
+    }
+
+    /**
+     * 数据存储过程中，浮点型是否会变为整型
+     * @throws JSONException
+     * @throws InterruptedException
+     */
+
+    @Test
+    public void trackFloatDoubleDataTest() throws JSONException, InterruptedException {
+        JSONObject fields = new JSONObject();
+        fields.put("floatValue", 0f);
+        fields.put("doubleValue", 0d);
+        FTTrack.getInstance().trackBackground("TestLog", null, fields);
+        Thread.sleep(5000);
+
+        List<SyncJsonData> list = FTDBManager.get().queryDataByDescLimitTrack(0);
+        Assert.assertTrue(list.size() > 0);
+        String content = list.get(0).getOpData().getContent();
+        JSONObject json = new JSONObject(content);
+        Assert.assertTrue(json.getJSONObject("fields").optString("floatValue").contains("."));
+        Assert.assertTrue(json.getJSONObject("fields").optString("doubleValue").contains("."));
     }
 
     /**
