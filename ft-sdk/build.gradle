@@ -2,8 +2,8 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 
 
-def versionNameStr="1.0.4-alpha01"
-def min_plugin_version ="1.0.1-alpha05"
+def versionNameStr = "1.0.4-alpha01"
+def min_plugin_version = "1.0.1-alpha05"
 
 android {
     compileSdkVersion 30
@@ -43,6 +43,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'com.google.code.gson:gson:2.8.5'
     testImplementation 'junit:junit:4.13'
     testImplementation 'org.robolectric:android-all:10-robolectric-5803371'
     testImplementation 'org.robolectric:robolectric:3.3.2'
@@ -71,7 +72,7 @@ afterEvaluate {
                 artifactId 'ft-sdk'
                 version versionNameStr
                 artifact(sourceJar)
-                artifact("$buildDir/outputs/aar/ft-sdk-release.aar"){
+                artifact("$buildDir/outputs/aar/ft-sdk-release.aar") {
                     builtBy assemble
                 }
             }
@@ -95,7 +96,7 @@ afterEvaluate {
 }
 
 
-task generateAarAndPublish{
+task generateAarAndPublish {
     dependsOn 'clean'
     dependsOn 'publish'
 }

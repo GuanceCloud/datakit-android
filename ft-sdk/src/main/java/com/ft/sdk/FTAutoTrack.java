@@ -43,6 +43,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.util.Map;
 
 import okhttp3.OkHttpClient;
@@ -784,8 +785,11 @@ public class FTAutoTrack {
             JSONObject tags = new JSONObject();
             JSONObject fields = new JSONObject();
 
-            tags.put(Constants.KEY_TIME_COST_WEBVIEW_URL, url);
-            tags.put(Constants.KEY_TIME_COST_DURATION, duration * 1000);
+            String host = URI.create(url).getHost();
+
+            tags.put(Constants.KEY_HTTP_HOST, host);
+            fields.put(Constants.KEY_TIME_COST_WEBVIEW_URL, url);
+            fields.put(Constants.KEY_TIME_COST_DURATION, duration * 1000);
 
             FTTrackInner.getInstance().trackBackground(op, time, Constants.FT_MEASUREMENT_TIME_COST_WEBVIEW, tags, fields);
 
@@ -819,14 +823,19 @@ public class FTAutoTrack {
      * @param time
      * @param op
      * @param url
+     * @param host
+     * @param networkResponseTime
      */
-    public static void putHttpError(long time, OP op, String url, boolean isError) {
+    public static void putHttpError(long time, OP op, String url, String host, boolean isError, long networkResponseTime) {
 
         try {
             JSONObject tags = new JSONObject();
             JSONObject fields = new JSONObject();
 
-            tags.put(Constants.KEY_HTTP_URL, url);
+            tags.put(Constants.KEY_HTTP_HOST, host);
+
+            fields.put(Constants.KEY_HTTP_URL, url);
+            fields.put(Constants.KEY_NETWORK_RESPONSE_TIME, networkResponseTime);
             fields.put(Constants.KEY_HTTP_IS_ERROR, isError ? 1 : 0);
 
             String measurement = "";

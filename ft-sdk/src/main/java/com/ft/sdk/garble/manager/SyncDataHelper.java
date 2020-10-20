@@ -236,15 +236,15 @@ public class SyncDataHelper {
     /**
      * 获取自定义数据
      *
-     * @param tags
+     * @param obj
      * @return
      */
-    private static StringBuffer getCustomHash(JSONObject tags, boolean isTag) {
+    private static StringBuffer getCustomHash(JSONObject obj, boolean isTag) {
         StringBuffer sb = new StringBuffer();
-        Iterator<String> keys = tags.keys();
+        Iterator<String> keys = obj.keys();
         while (keys.hasNext()) {
             String keyTemp = keys.next();
-            Object value = tags.opt(keyTemp);
+            Object value = obj.opt(keyTemp);
             String key = Utils.translateTagKeyValue(keyTemp);
             sb.append(key);
             sb.append("=");
@@ -258,8 +258,10 @@ public class SyncDataHelper {
                         sb.append(Utils.formatDouble((float) value));
                     } else if (value instanceof Double) {
                         sb.append(Utils.formatDouble((double) value));
-                    } else if (value instanceof Long || value instanceof Integer || value instanceof Boolean) {
+                    } else if (value instanceof Boolean) {
                         sb.append(value);
+                    } else if (value instanceof Long || value instanceof Integer) {
+                        sb.append(value).append(isTag ? "" : "i");
                     } else {// String or Others
                         addQuotationMarks(sb, (String) value, !isTag);
                     }
@@ -471,7 +473,7 @@ public class SyncDataHelper {
             tags.put(Constants.KEY_BATTERY_TOTAL, batteryBean.getPower());
             tags.put(Constants.KEY_BATTERY_CHARGE_TYPE, batteryBean.getPlugState());
             tags.put(Constants.KEY_BATTERY_STATUS, batteryBean.getStatus());
-            fields.put(Constants.KEY_BATTERY_USE, batteryBean.getBr());
+            fields.put(Constants.KEY_BATTERY_USE, (float) batteryBean.getBr());
         } catch (Exception e) {
             LogUtils.e(TAG, "电池数据获取异常:" + e.getMessage());
         }
@@ -663,7 +665,7 @@ public class SyncDataHelper {
             }
             if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR)
                     || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_STEP)) {
-                fields.put(Constants.KEY_SENSOR_STEPS, SensorUtils.get().getTodayStep());
+                fields.put(Constants.KEY_SENSOR_STEPS, (int)SensorUtils.get().getTodayStep());
             }
             if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR)
                     || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_ROTATION)) {

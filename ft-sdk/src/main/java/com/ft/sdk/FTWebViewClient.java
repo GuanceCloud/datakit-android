@@ -33,7 +33,7 @@ public class FTWebViewClient extends WebViewClient {
 
     private static final String TAG = "FTWebViewClient";
     static OkHttpClient mClient = new OkHttpClient.Builder()
-            .addInterceptor(new FTNetWorkTracerInterceptor())
+            .addInterceptor(new FTNetWorkTracerInterceptor(true))
             .connectTimeout(30, TimeUnit.SECONDS)
             .build();
     private String mOriginUrl;
@@ -110,7 +110,7 @@ public class FTWebViewClient extends WebViewClient {
     @Override
     public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
         super.onReceivedHttpError(view, request, errorResponse);
-        FTAutoTrack.putHttpError(System.currentTimeMillis(), OP.HTTP_WEBVIEW, request.getUrl().toString(), true);
+        FTAutoTrack.putHttpError(System.currentTimeMillis(), OP.HTTP_WEBVIEW, request.getUrl().toString(), request.getUrl().getHost(), true, -1);
     }
 
 
@@ -118,7 +118,7 @@ public class FTWebViewClient extends WebViewClient {
     public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
         super.onReceivedError(view, request, error);
 
-        FTAutoTrack.putHttpError(System.currentTimeMillis(), OP.HTTP_WEBVIEW, request.getUrl().toString(), true);
+        FTAutoTrack.putHttpError(System.currentTimeMillis(), OP.HTTP_WEBVIEW, request.getUrl().toString(), request.getUrl().getHost(), true, -1);
 
     }
 
