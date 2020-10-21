@@ -665,7 +665,7 @@ public class SyncDataHelper {
             }
             if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR)
                     || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_STEP)) {
-                fields.put(Constants.KEY_SENSOR_STEPS, (int)SensorUtils.get().getTodayStep());
+                fields.put(Constants.KEY_SENSOR_STEPS, (int) SensorUtils.get().getTodayStep());
             }
             if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR)
                     || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_ROTATION)) {
