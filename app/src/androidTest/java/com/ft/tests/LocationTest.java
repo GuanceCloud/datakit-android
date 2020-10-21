@@ -85,19 +85,24 @@ public class LocationTest extends BaseTest {
 
     @Test
     public void geoIPAddressTest() throws Exception {
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+
         Whitebox.invokeMethod(LocationUtils.get(), "requestGeoIPAddress", new AsyncCallback() {
             @Override
             public void onResponse(int code, String response) {
                 if (code == 0) {
                     address = LocationUtils.get().getCity();
                 }
-                Assert.assertNotNull(address);
+                countDownLatch.countDown();
             }
         });
+        countDownLatch.await();
+        Assert.assertNotNull(address);
     }
 
     @Test
     public void geoCodeAddressTest() throws Exception {
+        CountDownLatch countDownLatch = new CountDownLatch(1);
         Location location = new Location(LocationManager.NETWORK_PROVIDER);
         location.setLatitude(31.20690892154558);
         location.setLongitude(121.58605522685095);
@@ -107,8 +112,10 @@ public class LocationTest extends BaseTest {
                 if (code == 0) {
                     address = LocationUtils.get().getCity();
                 }
-                Assert.assertNotNull(address);
+                countDownLatch.countDown();
             }
         });
+        countDownLatch.await();
+        Assert.assertNotNull(address);
     }
 }

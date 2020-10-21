@@ -15,8 +15,8 @@ import android.os.Looper;
 
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.MonitorType;
-import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.AsyncCallback;
+import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.http.RequestMethod;
@@ -90,9 +90,10 @@ public class LocationUtils {
 
     /**
      * 检查当前是否有定位权限
+     *
      * @return
      */
-    private boolean checkLocationPermission(){
+    private boolean checkLocationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             int state = mContext.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
             int state2 = mContext.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION);
@@ -108,7 +109,7 @@ public class LocationUtils {
         if (!FTMonitorConfig.get().isMonitorType(MonitorType.LOCATION)) {
             return;
         }
-        if(!checkLocationPermission()){
+        if (!checkLocationPermission()) {
             LogUtils.e(TAG, "请先申请位置权限");
             return;
         }
@@ -175,7 +176,7 @@ public class LocationUtils {
         if (isRequest) {
             return;
         }
-        if(!checkLocationPermission()){//没有位置权限
+        if (!checkLocationPermission()) {//没有位置权限
             LogUtils.e(TAG, "请先申请位置权限");
             if (useGeoKey && !Utils.isNullOrEmpty(geoKey)) {//如果高德 KEY 不为空尝试用高德的基于 IP 的定位
                 new Thread(() -> {
@@ -183,7 +184,7 @@ public class LocationUtils {
                     requestGeoIPAddress(syncCallback);
                     isRequest = false;
                 }).start();
-            }else{
+            } else {
                 callback(syncCallback, NetCodeStatus.UNKNOWN_EXCEPTION_CODE, "未能获取到位置权限");
             }
             return;
@@ -340,9 +341,11 @@ public class LocationUtils {
                         JSONObject addressObj = regeCode.getJSONObject("addressComponent");
                         String province = null;
                         String city = null;
+                        String country = null;
                         try {
                             province = addressObj.getString("province");
                             city = addressObj.getString("city");
+                            country = addressObj.getString("country ");
                         } catch (Exception e) {
                         }
                         if (province != null && !"[]".equals(province)) {
@@ -352,6 +355,7 @@ public class LocationUtils {
                             Address address = new Address(Locale.CHINA);
                             address.setAdminArea(province);
                             address.setLocality(city);
+                            address.setCountryName(country);
                             this.address = address;
                         }
                     }
@@ -398,9 +402,11 @@ public class LocationUtils {
                 String city = geo.optString("city");
                 String rectangle = geo.optString("rectangle");
                 if (!Utils.isNullOrEmpty(province) && !Utils.isNullOrEmpty(city)) {
-                    address = new Address(Locale.CHINA);
+                    Locale locale = FTApplication.getApplication().getResources().getConfiguration().locale;
+                    address = new Address(locale);
                     address.setAdminArea(province);
                     address.setLocality(city);
+                    address.setCountryName(locale.getDisplayCountry());
                 } else {
                     code = NetCodeStatus.UNKNOWN_EXCEPTION_CODE;
                     errorMessage = responseData.getData();
