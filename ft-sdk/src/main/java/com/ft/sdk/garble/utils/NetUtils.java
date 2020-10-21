@@ -45,8 +45,8 @@ public class NetUtils {
     private TelephonyManager telephonyManager;
     private PhoneStatListener phoneStatListener;
 
-    private double netUpRate = 0.00;
-    private double netDownRate = 0.00;
+    private long netUpRate = 0;
+    private long netDownRate = 0;
     //上一次收到的总的字节数
     private long lastRx = 0;
     //上一次发送的总的字节数
@@ -219,7 +219,7 @@ public class NetUtils {
      *
      * @return
      */
-    public double getNetUpRate() {
+    public long getNetUpRate() {
         return netUpRate;
     }
 
@@ -228,7 +228,7 @@ public class NetUtils {
      *
      * @return
      */
-    public double getNetDownRate() {
+    public long getNetDownRate() {
         return netDownRate;
     }
 
@@ -288,8 +288,8 @@ public class NetUtils {
 
         lastRx = tempRx;
         lastTx = tempTx;
-        netDownRate = Utils.formatDouble(rxLast / 2d);
-        netUpRate = Utils.formatDouble(txLast / 2d);
+        netDownRate = rxLast ;
+        netUpRate = txLast ;
     }
 
     /**
