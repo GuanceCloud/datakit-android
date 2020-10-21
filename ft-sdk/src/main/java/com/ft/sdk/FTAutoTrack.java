@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Address;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -32,6 +33,7 @@ import com.ft.sdk.garble.manager.SyncDataHelper;
 import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
+import com.ft.sdk.garble.utils.LocationUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -833,6 +835,12 @@ public class FTAutoTrack {
             JSONObject fields = new JSONObject();
 
             tags.put(Constants.KEY_HTTP_HOST, host);
+            Address address = LocationUtils.get().getAddress();
+            if (address != null) {
+                tags.put(Constants.KEY_LOCATION_PROVINCE, address.getAdminArea());
+                tags.put(Constants.KEY_LOCATION_CITY, address.getLocality());
+                tags.put(Constants.KEY_LOCATION_COUNTRY, address.getCountryName());
+            }
 
             fields.put(Constants.KEY_HTTP_URL, url);
             fields.put(Constants.KEY_NETWORK_RESPONSE_TIME, networkResponseTime);

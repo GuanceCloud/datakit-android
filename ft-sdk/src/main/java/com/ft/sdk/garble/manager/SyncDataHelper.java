@@ -599,7 +599,7 @@ public class SyncDataHelper {
      */
     private static void createLocation(JSONObject tags, JSONObject fields) {
         try {
-            Address address = LocationUtils.get().getCity();
+            Address address = LocationUtils.get().getAddress();
             double[] location = LocationUtils.get().getLocation();
             if (address != null) {
                 tags.put(Constants.KEY_LOCATION_PROVINCE, address.getAdminArea());

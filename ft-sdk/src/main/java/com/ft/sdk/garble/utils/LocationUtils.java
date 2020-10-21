@@ -67,7 +67,7 @@ public class LocationUtils {
         return mLocation;
     }
 
-    public Address getCity() {
+    public Address getAddress() {
         return address;
     }
 
