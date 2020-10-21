@@ -75,7 +75,7 @@ public class LocationTest extends BaseTest {
         LocationUtils.get().startLocationCallBack(new AsyncCallback() {
             @Override
             public void onResponse(int code, String response) {
-                address = LocationUtils.get().getCity();
+                address = LocationUtils.get().getAddress();
                 countDownLatch.countDown();
             }
         });
@@ -91,7 +91,7 @@ public class LocationTest extends BaseTest {
             @Override
             public void onResponse(int code, String response) {
                 if (code == 0) {
-                    address = LocationUtils.get().getCity();
+                    address = LocationUtils.get().getAddress();
                 }
                 countDownLatch.countDown();
             }
@@ -110,7 +110,7 @@ public class LocationTest extends BaseTest {
             @Override
             public void onResponse(int code, String response) {
                 if (code == 0) {
-                    address = LocationUtils.get().getCity();
+                    address = LocationUtils.get().getAddress();
                 }
                 countDownLatch.countDown();
             }
