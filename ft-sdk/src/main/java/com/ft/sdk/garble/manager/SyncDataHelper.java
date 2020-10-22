@@ -7,7 +7,6 @@ import android.location.Address;
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
-import com.ft.sdk.garble.FTAliasConfig;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.FTUserConfig;
@@ -15,7 +14,6 @@ import com.ft.sdk.garble.bean.BatteryBean;
 import com.ft.sdk.garble.bean.CameraPx;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.NetStatusBean;
-import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.BatteryUtils;
@@ -45,7 +43,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.ft.sdk.garble.bean.OP.CLIENT_ACTIVATED_TIME;
-import static com.ft.sdk.garble.bean.OP.CSTM;
 import static com.ft.sdk.garble.bean.OP.HTTP_CLIENT;
 import static com.ft.sdk.garble.bean.OP.WEBVIEW_LOADING;
 import static com.ft.sdk.garble.bean.OP.WEBVIEW_LOAD_COMPLETED;
@@ -72,7 +69,6 @@ public class SyncDataHelper {
             return getObjectBodyContent(recordDatas);
         } else if (dataType == DataType.LOG) {
             return getLogBodyContent(recordDatas);
-
         }
         return getTrackBodyContent(recordDatas);
     }
@@ -122,7 +118,7 @@ public class SyncDataHelper {
             sb.append(",");
             sb.append(device);
             //获取埋点事件数据
-            sb.append(getUpdateData(recordData));
+            sb.append(composeUpdateData(recordData));
             sb.append(Constants.SEPARATION_LINE_BREAK);
         }
         return sb.toString();
@@ -134,7 +130,7 @@ public class SyncDataHelper {
             //获取这条事件的指标
             sb.append(getMeasurement(recordData));
             //获取埋点事件数据
-            sb.append(getUpdateData(recordData));
+            sb.append(composeUpdateData(recordData));
             sb.append(Constants.SEPARATION_LINE_BREAK);
         }
         return sb.toString();
@@ -171,66 +167,6 @@ public class SyncDataHelper {
             measurement = FT_KEY_VALUE_NULL;
         }
         return measurement;
-    }
-
-    /**
-     * 获取同步数据
-     *
-     * @param data
-     * @return
-     */
-    private String getUpdateData(SyncJsonData data) {
-        if (data.getDataType().equals(DataType.TRACK)) {
-            if (CSTM.equals(data.getOpData().getOp())) {
-                return composeCustomUpdateData(data);
-            } else {
-                return composeAutoUpdateData(data);
-            }
-        } else if (data.getDataType() == DataType.LOG) {
-            return composeCustomUpdateData(data);
-        }
-        return "";
-    }
-
-    /**
-     * 获取手动埋点的数据
-     *
-     * @return
-     */
-    private String composeCustomUpdateData(SyncJsonData data) {
-        StringBuffer sb = new StringBuffer();
-        String jsonString;
-        if (data.getDataType().equals(DataType.TRACK)) {
-            jsonString = data.getOpData().getContent();
-        } else {
-            jsonString = data.getDataString();
-        }
-
-        if (jsonString != null) {
-            try {
-                JSONObject opJson = new JSONObject(jsonString);
-                JSONObject tags = opJson.optJSONObject(Constants.TAGS);
-                JSONObject fields = opJson.optJSONObject(Constants.FIELDS);
-                StringBuffer tagSb = getCustomHash(tags, true);
-                StringBuffer valueSb = getCustomHash(fields, false);
-                if (!data.getDataType().equals(DataType.LOG) && data.getOpData().getOp().isUserRelativeOp()) {
-                    addUserData(tagSb, data);
-                }
-                deleteLastComma(tagSb);
-                if (tagSb.length() > 0) {
-                    sb.append(",");
-                    sb.append(tagSb.toString());
-                }
-                sb.append(Constants.SEPARATION_PRINT);
-                deleteLastComma(valueSb);
-                sb.append(valueSb);
-                sb.append(Constants.SEPARATION_PRINT);
-                sb.append(data.getTime() * 1000 * 1000);
-            } catch (Exception e) {
-                LogUtils.e(TAG, e.getMessage());
-            }
-        }
-        return sb.toString();
     }
 
     /**
@@ -281,80 +217,46 @@ public class SyncDataHelper {
     }
 
     /**
-     * 获得自动埋点的数据
+     * 拼装数据
      *
      * @return
      */
-    private String composeAutoUpdateData(SyncJsonData data) {
+    private String composeUpdateData(SyncJsonData data) {
         StringBuffer sb = new StringBuffer();
-        JSONObject fields = null;
-        JSONObject tags = null;
-        if (data.getOpData() != null) {
+        String jsonString;
+        if (data.getDataType().equals(DataType.TRACK)) {
+            jsonString = data.getOpData().getContent();
+        } else {
+            jsonString = data.getDataString();
+        }
+
+        if (jsonString != null) {
             try {
-                JSONObject opJson = new JSONObject(data.getOpData().getContent());
-                tags = opJson.optJSONObject(Constants.TAGS);
-                if (tags == null) {
-                    tags = new JSONObject();
+                JSONObject opJson = new JSONObject(jsonString);
+                JSONObject tags = opJson.optJSONObject(Constants.TAGS);
+                JSONObject fields = opJson.optJSONObject(Constants.FIELDS);
+                StringBuffer tagSb = getCustomHash(tags, true);
+                StringBuffer valueSb = getCustomHash(fields, false);
+                if (!data.getDataType().equals(DataType.LOG) && data.getOpData().getOp().isUserRelativeOp()) {
+                    addUserData(tagSb, data);
                 }
-
-                String cpn = tags.optString(Constants.KEY_PAGE_EVENT_CURRENT_PAGE_NAME, "");
-                String rpn = tags.optString(Constants.KEY_PAGE_EVENT_ROOT_PAGE_NAME, "");
-
-                if (!Utils.isNullOrEmpty(cpn)) {
-                    //如果是 Fragment 就把Activity 的名称也添加上去
-                    if (data.getOpData().getOp().equals(OP.OPEN_FRA) || data.getOpData().getOp().equals(OP.CLS_FRA)) {
-                        tags.put(Constants.KEY_PAGE_EVENT_CURRENT_PAGE_NAME, rpn + "." + cpn);
-                    } else {
-                        tags.put(Constants.KEY_PAGE_EVENT_CURRENT_PAGE_NAME, cpn);
-                    }
+                deleteLastComma(tagSb);
+                if (tagSb.length() > 0) {
+                    sb.append(",");
+                    sb.append(tagSb.toString());
                 }
-
-                tags.put(Constants.KEY_EVENT_ID, Utils.MD5(data.getOpData().getOp().toEventName()));
-                sb.append(getCustomHash(tags, true));
-                fields = opJson.optJSONObject(Constants.FIELDS);
+                sb.append(Constants.SEPARATION_PRINT);
+                deleteLastComma(valueSb);
+                sb.append(valueSb);
+                sb.append(Constants.SEPARATION_PRINT);
+                sb.append(data.getTime() * 1000 * 1000);
             } catch (Exception e) {
                 LogUtils.e(TAG, e.getMessage());
             }
         }
-        addUserData(sb, data);
-        deleteLastComma(sb);
-        if (sb.length() > 0) {
-            sb.insert(0, ",");
-            String temp = sb.toString();
-            sb.delete(0, sb.length());
-            sb.append(temp);
-        }
-        sb.append(Constants.SEPARATION_PRINT);
-
-        if (fields != null) {
-            try {
-                fields.put(Constants.KEY_EVENT, data.getOpData().getOp().toEventName());
-
-                String cpn = tags.optString(Constants.KEY_PAGE_EVENT_CURRENT_PAGE_NAME, "");
-                String rpn = tags.optString(Constants.KEY_PAGE_EVENT_ROOT_PAGE_NAME, "");
-
-                if (!cpn.isEmpty()) {
-                    if (data.getOpData().getOp().equals(OP.OPEN_FRA) || data.getOpData().getOp().equals(OP.CLS_FRA)) {
-                        fields.put(Constants.KEY_PAGE_EVENT_PAGE_DESC, FTAliasConfig.get().getPageDesc(rpn + "." + cpn));
-                    } else {
-                        fields.put(Constants.KEY_PAGE_EVENT_PAGE_DESC, FTAliasConfig.get().getPageDesc(cpn));
-                    }
-                }
-
-
-            } catch (JSONException e) {
-                LogUtils.e(TAG, e.getMessage());
-            }
-            StringBuffer valueSb = getCustomHash(fields, false);
-            deleteLastComma(valueSb);
-            sb.append(valueSb);
-        } else {
-            sb.append(Constants.KEY_EVENT).append("=\"").append(data.getOpData().getOp().toEventName()).append("\"");
-        }
-        sb.append(Constants.SEPARATION_PRINT);
-        sb.append(data.getTime() * 1000000);
         return sb.toString();
     }
+
 
     /**
      * 添加用户信息

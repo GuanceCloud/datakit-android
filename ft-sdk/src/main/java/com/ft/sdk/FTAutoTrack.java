@@ -634,11 +634,18 @@ public class FTAutoTrack {
                 JSONObject fields = new JSONObject();
                 Class activity = FTActivityManager.get().getLastActivity();
                 if (activity != null) {
-                    tags.put(Constants.KEY_PAGE_EVENT_CURRENT_PAGE_NAME, activity.getSimpleName());
+                    String currentPage = activity.getSimpleName();
+                    if (!Utils.isNullOrEmpty(currentPage)) {
+                        tags.put(Constants.KEY_PAGE_EVENT_CURRENT_PAGE_NAME, currentPage);
+                        fields.put(Constants.KEY_PAGE_EVENT_PAGE_DESC, FTAliasConfig.get().getPageDesc(currentPage));
+                    }
                 }
+                String eventName = op.toEventName();
+                fields.put(Constants.KEY_EVENT, eventName);
+                tags.put(Constants.KEY_EVENT_ID, Utils.MD5(eventName));
+
                 SyncJsonData recordData = SyncJsonData.getFromTrackBean(new TrackBean(Constants.FT_MEASUREMENT_PAGE_EVENT, tags, fields), op);
                 LogUtils.d(TAG, "FTAutoTrack数据进数据库：putSimpleEvent:" + recordData.printFormatRecordData());
-
 
                 FTManager.getFTDBManager().insertFTOperation(recordData);
                 FTManager.getSyncTaskManager().executeSyncPoll();
@@ -752,18 +759,28 @@ public class FTAutoTrack {
 
             JSONObject tags = new JSONObject();
             JSONObject fields = new JSONObject();
-            if (rootPage != null) {
-                tags.put(Constants.KEY_PAGE_EVENT_ROOT_PAGE_NAME, rootPage);
-            }
-            if (currentPage != null) {
-
-                tags.put(Constants.KEY_PAGE_EVENT_CURRENT_PAGE_NAME, currentPage);
-            }
             if (vtp != null) {
                 tags.put("vtp", vtp);
                 fields.put("vtp_desc", FTAliasConfig.get().getVtpDesc(vtp));
                 fields.put("vtp_id", Utils.MD5(vtp));
             }
+
+            if (!Utils.isNullOrEmpty(currentPage)) {
+                //如果是 Fragment 就把Activity 的名称也添加上去
+                if (op.equals(OP.OPEN_FRA) || op.equals(OP.CLS_FRA)) {
+                    tags.put(Constants.KEY_PAGE_EVENT_CURRENT_PAGE_NAME, rootPage + "." + currentPage);
+                    fields.put(Constants.KEY_PAGE_EVENT_PAGE_DESC, FTAliasConfig.get().getPageDesc(rootPage + "." + currentPage));
+
+                } else {
+                    tags.put(Constants.KEY_PAGE_EVENT_CURRENT_PAGE_NAME, currentPage);
+                    fields.put(Constants.KEY_PAGE_EVENT_PAGE_DESC, FTAliasConfig.get().getPageDesc(currentPage));
+                }
+            }
+
+            String eventName = op.toEventName();
+            fields.put(Constants.KEY_EVENT, eventName);
+            tags.put(Constants.KEY_EVENT_ID, Utils.MD5(eventName));
+
             FTTrackInner.getInstance().trackBackground(op, time, Constants.FT_MEASUREMENT_PAGE_EVENT, tags, fields);
 
             addLogging(currentPage, op, vtp);
@@ -790,8 +807,12 @@ public class FTAutoTrack {
             String host = URI.create(url).getHost();
 
             tags.put(Constants.KEY_HTTP_HOST, host);
-            fields.put(Constants.KEY_TIME_COST_WEBVIEW_URL, url);
+            tags.put(Constants.KEY_TIME_COST_WEBVIEW_URL, url);
             fields.put(Constants.KEY_TIME_COST_DURATION, duration * 1000);
+
+            String eventName = op.toEventName();
+            fields.put(Constants.KEY_EVENT, eventName);
+            tags.put(Constants.KEY_EVENT_ID, Utils.MD5(eventName));
 
             FTTrackInner.getInstance().trackBackground(op, time, Constants.FT_MEASUREMENT_TIME_COST_WEBVIEW, tags, fields);
 
