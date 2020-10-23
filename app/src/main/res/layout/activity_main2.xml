@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:text="模拟 native 崩溃" />
         <Button
-            android:id="@+id/mock_caton_btn"
+            android:id="@+id/mock_ui_block_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="模拟卡顿" />

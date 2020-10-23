@@ -170,7 +170,7 @@ static void nativeCrashSignalHandler(int signo, siginfo *siginfo, void *ctxvoid)
     if (siginfo->si_code <= 0 || signo == SIGABRT) {
         if (syscall(__NR_tgkill, getpid(), gettid(), signo) < 0) {
             sleep(3);
-            _exit(1);
+//            _exit(1);
         }
     }
 }
@@ -209,7 +209,7 @@ static void unregisterSignalHandler(struct sigaction old_handlers[NSIG]) {
 }
 
 /// like TestFairy.stop() but for crashes
-static bool deinitializeNativeCrashHandler() {
+static bool removeNativeCrashHandler() {
     // Check if already deinitialized
     if (!crashInContext) return false;
 
@@ -241,7 +241,7 @@ static void initializeNativeCrashHandler() {
 
     // Trying to register signal handler.
     if (!registerSignalHandler(&nativeCrashSignalHandler, crashInContext->old_handlers)) {
-        deinitializeNativeCrashHandler();
+        removeNativeCrashHandler();
         __android_log_print(ANDROID_LOG_ERROR, "NDK Playground", "%s",
                             "Native crash handler initialization failed.");
         return;
@@ -266,7 +266,7 @@ extern "C" JNIEXPORT void JNICALL
 Java_com_ft_sdk_nativelib_ExceptionHandler_unRegisterSignalHandler(
         JNIEnv *env,
         jobject /* this */) {
-    deinitializeNativeCrashHandler();
+    removeNativeCrashHandler();
 }
 
 /// Our custom test exception. Anything "publicly" inheriting std::exception will work
