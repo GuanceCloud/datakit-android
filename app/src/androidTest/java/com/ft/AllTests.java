@@ -3,7 +3,7 @@ package com.ft;
 import com.ft.tests.FTAutoTrackTest;
 import com.ft.tests.base.FTInitParamTest;
 import com.ft.tests.base.SDKRunStateTest;
-import com.ft.tests.ExceptionTest;
+import com.ft.tests.ErrorTraceTest;
 import com.ft.tests.LogEventTest;
 import com.ft.tests.LogTest;
 import com.ft.tests.LogTrackObjectTraceTest;
@@ -34,7 +34,7 @@ import org.junit.runners.Suite;
         OaidTest.class,//oaid 测试
         SDKRunStateTest.class,//SDK 生命周期测试
         TraceTest.class,//trace 测试
-        ExceptionTest.class//Log-崩溃日志测试
+        ErrorTraceTest.class//Log-崩溃日志测试
 })
 public class AllTests {
     public static boolean hasPrepare;
