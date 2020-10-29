@@ -156,7 +156,7 @@ public class DeviceUtils {
      * 获得SDK版本号
      */
     public static String getSDKVersion() {
-        return BuildConfig.VERSION_NAME;
+        return BuildConfig.FT_SDK_VERSION;
     }
 
     /**

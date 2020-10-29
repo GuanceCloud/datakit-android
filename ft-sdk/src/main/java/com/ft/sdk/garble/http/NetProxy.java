@@ -97,7 +97,7 @@ public class NetProxy {
     private String getSignature() {
         String aks = ftHttpConfig.akSecret;
         String method = httpBuilder.getMethod().method;
-        String contentMD5 = getContentMD5();
+        String contentMD5 = getContentMD5WithBase64();
         return Utils.getHMacSha1(aks, method + "\n" + contentMD5 + "\n" + CONTENT_TYPE + "\n" + gmtString);
     }
 
@@ -105,8 +105,8 @@ public class NetProxy {
      * MD5 加密 请求内容
      * @return
      */
-    private String getContentMD5() {
-        return Utils.contentMD5Encode(httpBuilder.getBodyString() == null ? "" : httpBuilder.getBodyString());
+    private String getContentMD5WithBase64() {
+        return Utils.contentMD5EncodeWithBase64(httpBuilder.getBodyString() == null ? "" : httpBuilder.getBodyString());
     }
 
     /**

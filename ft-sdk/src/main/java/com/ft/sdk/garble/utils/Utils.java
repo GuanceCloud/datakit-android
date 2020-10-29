@@ -132,7 +132,7 @@ public class Utils {
         return tClass.cast(null);
     }
 
-    public static String contentMD5Encode(String str) {
+    public static String contentMD5EncodeWithBase64(String str) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(str.getBytes());

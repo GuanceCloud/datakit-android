@@ -5,7 +5,6 @@ import android.content.Context;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.ft.sdk.garble.bean.DataType;
-import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.manager.SyncDataHelper;
 import com.ft.sdk.garble.utils.Constants;
@@ -39,7 +38,7 @@ public class UtilsTest {
 
     @Test
     public void contentMD5Encode() {
-        assertEquals("M1QEWjl2Ic2SQG8fmM3ikg==", Utils.contentMD5Encode("1122334455"));
+        assertEquals("M1QEWjl2Ic2SQG8fmM3ikg==", Utils.contentMD5EncodeWithBase64("1122334455"));
     }
 
     @Test
