@@ -19,18 +19,19 @@ import java.util.Map;
  * description:
  */
 public class ObjectBean {
+    public static final String INNER_NAME = "__name";
+    public static final String INNER_CLASS = "__class";
+    public static final String INNER_TAGS = "__tags";
     private String name;//当前对象的名称，同一个分类下，对象名称如果重复，会覆盖原有数据
     private HashMap<String, Object> tags;//当前对象的标签，key-value 对，其中存在保留标签
-    private String clazz;//当前对象的分类，分类值用户可自定义
+    private String clazz = Constants.DEFAULT_OBJECT_CLASS;
 
-    public ObjectBean(String name, String clazz) {
+    public ObjectBean(String name) {
         this.name = name;
-        this.clazz = clazz;
     }
 
-    public ObjectBean(String name, String clazz, HashMap<String, Object> tags) {
+    public ObjectBean(String name, HashMap<String, Object> tags) {
         this.name = name;
-        this.clazz = clazz;
         this.tags = tags;
     }
 
@@ -41,21 +42,21 @@ public class ObjectBean {
             if (Utils.isNullOrEmpty(name)) {
                 name = DeviceUtils.getUuid(context);
             }
-            js.put("__name", name);
+            js.put(INNER_NAME, name);
             if (tags == null) {
                 tags = new HashMap<>();
             }
             if (Utils.isNullOrEmpty(clazz)) {
                 clazz = Constants.DEFAULT_OBJECT_CLASS;
             }
-            tags.put("__class", clazz);
+            tags.put(INNER_CLASS, clazz);
             JSONObject jsonObject = new JSONObject();
             Iterator<Map.Entry<String, Object>> iterator = tags.entrySet().iterator();
             while (iterator.hasNext()) {
                 Map.Entry<String, Object> entry = iterator.next();
                 jsonObject.put(entry.getKey(), entry.getValue());
             }
-            js.put("__tags", jsonObject);
+            js.put(INNER_TAGS, jsonObject);
         } catch (Exception e) {
             e.printStackTrace();
         }

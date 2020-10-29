@@ -129,7 +129,6 @@ public class SyncTaskManager {
         SyncDataHelper syncDataManager = new SyncDataHelper();
         String body = syncDataManager.getBodyContent(dataType, requestDatas);
         SyncDataHelper.printUpdateData(dataType == DataType.OBJECT, body);
-        body = body.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION).replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK);
         LogUtils.d(TAG, body);
         requestNet(dataType, body, (code, response) -> {
             if (code >= 200 && code < 500) {

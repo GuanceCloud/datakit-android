@@ -210,10 +210,10 @@ public class LogTrackObjectTraceTest extends BaseTest {
      */
     @Test
     public void objectInsertDataTest() throws InterruptedException, JSONException {
-        ObjectBean objectBean = new ObjectBean("objectTest", "----objectInsertDataTest----");
+        ObjectBean objectBean = new ObjectBean("objectTest");
         FTTrackInner.getInstance().objectBackground(objectBean);
         Thread.sleep(5000);
-        int except = countInDB(DataType.OBJECT, "----objectInsertDataTest----");
+        int except = countInDB(DataType.OBJECT, "objectTest");
         Assert.assertEquals(1, except);
     }
 
@@ -225,7 +225,7 @@ public class LogTrackObjectTraceTest extends BaseTest {
      */
     @Test
     public void objectUploadDataTest() throws InterruptedException, JSONException {
-        ObjectBean objectBean = new ObjectBean("objectTest", "----objectUploadDataTest----");
+        ObjectBean objectBean = new ObjectBean("objectTest");
         FTTrackInner.getInstance().objectBackground(objectBean);
         Thread.sleep(5000);
         uploadData(DataType.OBJECT);
@@ -240,10 +240,10 @@ public class LogTrackObjectTraceTest extends BaseTest {
     @Test
     public void objectSyncTest() throws InterruptedException, JSONException {
         startSyncTask();
-        ObjectBean objectBean = new ObjectBean("objectTest", "----objectUploadTest----");
+        ObjectBean objectBean = new ObjectBean("objectTest");
         FTTrackInner.getInstance().objectBackground(objectBean);
         Thread.sleep(12000);
-        int except = countInDB(DataType.OBJECT, "----objectUploadTest----");
+        int except = countInDB(DataType.OBJECT, "objectTest");
         Assert.assertEquals(0, except);
     }
 
