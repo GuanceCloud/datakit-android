@@ -65,12 +65,18 @@ public class SyncDataHelper {
      * @return
      */
     public String getBodyContent(DataType dataType, List<SyncJsonData> recordDatas) {
+
+        String bodyContent;
         if (dataType == DataType.OBJECT) {
-            return getObjectBodyContent(recordDatas);
+            bodyContent = getObjectBodyContent(recordDatas);
         } else if (dataType == DataType.LOG) {
-            return getLogBodyContent(recordDatas);
+            bodyContent = getLogBodyContent(recordDatas);
+        } else {
+            bodyContent = getTrackBodyContent(recordDatas);
+
         }
-        return getTrackBodyContent(recordDatas);
+        return bodyContent.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION)
+                .replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK);
     }
 
     /**

@@ -195,8 +195,6 @@ public class FTTrackInner {
         }
         SyncDataHelper syncDataManager = new SyncDataHelper();
         String body = syncDataManager.getBodyContent(DataType.TRACK, recordDataList);
-        body = body.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION)
-                .replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK);
         String model = Constants.URL_MODEL_TRACK;
         String content_type = "text/plain";
         ResponseData result = HttpBuilder.Builder()

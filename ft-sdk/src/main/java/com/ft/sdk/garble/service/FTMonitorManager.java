@@ -90,7 +90,6 @@ public class FTMonitorManager {
                     try {
                         String body = SyncDataHelper.getMonitorUploadData();
                         SyncDataHelper.printUpdateData(false,body);
-                        body = body.replaceAll(Constants.SEPARATION_PRINT,Constants.SEPARATION).replaceAll(Constants.SEPARATION_LINE_BREAK,Constants.SEPARATION_REALLY_LINE_BREAK);
                         ResponseData result = HttpBuilder.Builder()
                                 .setModel(Constants.URL_MODEL_TRACK)
                                 .setMethod(RequestMethod.POST)
