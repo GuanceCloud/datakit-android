@@ -890,8 +890,8 @@ public class FTAutoTrack {
             return;
         }
         Context context = FTApplication.getApplication();
-        String name = DeviceUtils.getUuid(context);
-        ObjectBean objectBean = new ObjectBean(name, Constants.DEFAULT_OBJECT_CLASS, SyncDataHelper.getDefaultObjectBean());
+        String name = DeviceUtils.getUuid(context) + "_" + Utils.MD5_16(DeviceUtils.getApplicationId(context));
+        ObjectBean objectBean = new ObjectBean(name.toUpperCase(), Constants.DEFAULT_OBJECT_CLASS, SyncDataHelper.getDefaultObjectBean());
         FTTrackInner.getInstance().objectBackground(objectBean);
     }
 

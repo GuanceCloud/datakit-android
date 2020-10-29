@@ -60,7 +60,7 @@ public class FTHttpConfig {
         akId = ftsdkConfig.getAkId();
         akSecret = ftsdkConfig.getAkSecret();
         useOaid = ftsdkConfig.isUseOAID();
-        version = BuildConfig.VERSION_NAME;
+        version = BuildConfig.FT_SDK_VERSION;
         uuid = DeviceUtils.getSDKUUid(FTApplication.getApplication());
         userAgent = USER_AGENT;
         EngineFactory.setTrackNetTime(ftsdkConfig.getTrackNetTime());

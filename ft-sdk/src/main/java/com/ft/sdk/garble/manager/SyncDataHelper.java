@@ -83,11 +83,15 @@ public class SyncDataHelper {
         JSONArray jsonArray = new JSONArray();
         try {
             for (SyncJsonData recordData : recordDataList) {
-                JSONObject jsonObject = new JSONObject(recordData.getDataString());
-                jsonArray.put(jsonObject);
+                JSONArray array = new JSONArray(recordData.getDataString());
+                if (array != null) {
+                    for (int i = 0; i < array.length(); i++) {
+                        jsonArray.put(array.optJSONObject(i));
+                    }
+                }
             }
         } catch (Exception e) {
-
+            LogUtils.e(TAG, e.getMessage());
         }
         return jsonArray.toString();
     }
