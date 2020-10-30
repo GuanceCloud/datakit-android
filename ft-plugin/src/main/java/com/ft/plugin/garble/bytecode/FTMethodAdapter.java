@@ -145,15 +145,15 @@ public class FTMethodAdapter extends AdviceAdapter {
     @Override
     public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
         if (Constants.CLASS_NAME_HTTP_CLIENT_BUILDER.equals(owner)) {//替换调用 org/apache/hc/client5/http/impl/classic/HttpClientBuilder.build() 的方法
-            if ("build()Lorg/apache/hc/client5/http/impl/classic/CloseableHttpClient;".contains(name+desc)) {
+            if ("build()Lorg/apache/hc/client5/http/impl/classic/CloseableHttpClient;".contains(name + desc)) {
                 mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_API, "trackHttpClientBuilder", "(Lorg/apache/hc/client5/http/impl/classic/HttpClientBuilder;)Lorg/apache/hc/client5/http/impl/classic/CloseableHttpClient;", false);
-            }else {
+            } else {
                 super.visitMethodInsn(opcode, owner, name, desc, itf);
             }
         } else if (Constants.CLASS_NAME_OKHTTP_BUILDER.equals(owner)) {//替换调用 OkHttpClient.Builder.build() 的方法
-            if ("build()Lokhttp3/OkHttpClient;".contains(name+desc)) {
+            if ("build()Lokhttp3/OkHttpClient;".contains(name + desc)) {
                 mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_API, "trackOkHttpBuilder", "(Lokhttp3/OkHttpClient$Builder;)Lokhttp3/OkHttpClient;", false);
-            }else {
+            } else {
                 super.visitMethodInsn(opcode, owner, name, desc, itf);
             }
         } else if (Constants.CLASS_NAME_WEBVIEW.equals(owner)) {//替换系统中调用 WebView 的加载链接方法
@@ -236,6 +236,7 @@ public class FTMethodAdapter extends AdviceAdapter {
 
     /**
      * 修改方法内容的通用方式
+     *
      * @param ftMethodCell
      */
     void handleCode(FTMethodCell ftMethodCell) {
@@ -269,6 +270,10 @@ public class FTMethodAdapter extends AdviceAdapter {
             if (nameDesc.equals("install(Lcom/ft/sdk/FTSDKConfig;)V")) {
                 mv.visitLdcInsn(BuildConfig.PLUGIN_VERSION);
                 mv.visitFieldInsn(PUTSTATIC, "com/ft/sdk/FTSdk", "PLUGIN_VERSION", "Ljava/lang/String;");
+
+                mv.visitLdcInsn(Constants.PACKAGE_UUID);
+                mv.visitFieldInsn(PUTSTATIC, "com/ft/sdk/FTSdk", "PACKAGE_UUID", "Ljava/lang/String;");
+
                 isHasTracked = true;
                 return;
             }
