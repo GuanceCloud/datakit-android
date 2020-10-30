@@ -41,6 +41,7 @@ public class FTSdk {
     public final static String TAG = "FTSdk";
     //该变量不能改动，其值由 Plugin 动态改写
     public static String PLUGIN_VERSION = "";
+    public static String PACKAGE_UUID = "";
     //下面两个变量也不能随便改动，改动请同时更改 plugin 中对应的值
     public static final String AGENT_VERSION = BuildConfig.FT_SDK_VERSION;//当前SDK 版本
     public static final String PLUGIN_MIN_VERSION = BuildConfig.MIN_FT_PLUGIN_VERSION; //当前 SDK 支持的最小 Plugin 版本

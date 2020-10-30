@@ -1,6 +1,10 @@
 
 package com.ft.plugin.garble;
 
+import com.ft.plugin.BuildConfig;
+
+import java.util.UUID;
+
 /**
  * author: huangDianHua
  * time: 2020/8/5 13:37:00
@@ -61,4 +65,7 @@ public class Constants {
      * OKHttp-Builder
      */
     public static final String OKHTTP_BUILDER_DESC = "Lokhttp3/OkHttpClient$Builder;";
+
+
+    public static final String PACKAGE_UUID =  UUID.randomUUID().toString();
 }
