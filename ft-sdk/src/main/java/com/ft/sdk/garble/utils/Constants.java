@@ -131,6 +131,7 @@ public class Constants {
     public static final String KEY_TORCH = "torch";
 
     public static final String KEY_DEVICE_UUID = "device_uuid";
+    public static final String KEY_APPLICATION_UUID = "device_uuid";
     public static final String KEY_DEVICE_APPLICATION_ID = "application_identifier";
     public static final String KEY_DEVICE_APPLICATION_NAME = "application_name";
     public static final String KEY_DEVICE_SDK_AGENT = "agent";

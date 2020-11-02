@@ -41,6 +41,7 @@ public class FTSdk {
     public final static String TAG = "FTSdk";
     //该变量不能改动，其值由 Plugin 动态改写
     public static String PLUGIN_VERSION = "";
+    //变量由 Plugin 写入，同一个编译版本，UUID 相同
     public static String PACKAGE_UUID = "";
     //下面两个变量也不能随便改动，改动请同时更改 plugin 中对应的值
     public static final String AGENT_VERSION = BuildConfig.FT_SDK_VERSION;//当前SDK 版本

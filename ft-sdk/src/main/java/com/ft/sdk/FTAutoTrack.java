@@ -384,21 +384,21 @@ public class FTAutoTrack {
      * 页面卡顿
      */
     public static void uiBlock() {
-        putSimpleEvent(OP.BLOCK);
+        putErrorEvent(OP.BLOCK);
     }
 
     /**
      * 应用崩溃
      */
     public static void appCrash() {
-        putSimpleEvent(OP.CRASH);
+        putErrorEvent(OP.CRASH);
     }
 
     /**
      * 应用无响应
      */
     public static void appAnr() {
-        putSimpleEvent(OP.ANR);
+        putErrorEvent(OP.ANR);
     }
 
 
@@ -620,11 +620,11 @@ public class FTAutoTrack {
     }
 
     /**
-     * 记录简单事件
+     * 记录发生错误的事件
      *
      * @param op
      */
-    public static void putSimpleEvent(@NonNull OP op) {
+    public static void putErrorEvent(@NonNull OP op) {
 
         ThreadPoolUtils.get().execute(() -> {
             try {
