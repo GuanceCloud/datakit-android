@@ -1,7 +1,6 @@
 package com.ft.plugin.garble.asm;
 
 import com.ft.plugin.garble.ClassNameAnalytics;
-import com.ft.plugin.garble.FTTransformHelper;
 
 import org.apache.commons.io.FileUtils;
 import org.objectweb.asm.ClassReader;
@@ -27,7 +26,7 @@ import java.util.zip.ZipOutputStream;
  * DATE:2019-11-29 13:57
  * Description:
  */
-public class BaseWeaver implements IWeaver{
+public class BaseWeaver implements IWeaver {
 
     private static final FileTime ZERO = FileTime.fromMillis(0);
     private static final String FILE_SEP = File.separator;
@@ -72,8 +71,8 @@ public class BaseWeaver implements IWeaver{
     }
 
     public final void weaveSingleClassToFile(File inputFile, File outputFile, String inputBaseDir) throws IOException {
-        if(!inputBaseDir.endsWith(FILE_SEP)) inputBaseDir = inputBaseDir + FILE_SEP;
-        if(isWeavableClass(inputFile.getAbsolutePath().replace(inputBaseDir, "").replace(FILE_SEP, "."))) {
+        if (!inputBaseDir.endsWith(FILE_SEP)) inputBaseDir = inputBaseDir + FILE_SEP;
+        if (isWeavableClass(inputFile.getAbsolutePath().replace(inputBaseDir, "").replace(FILE_SEP, "."))) {
             FileUtils.touch(outputFile);
             InputStream inputStream = new FileInputStream(inputFile);
             byte[] bytes = weaverSingleClassToByteArray(inputStream);
@@ -95,6 +94,7 @@ public class BaseWeaver implements IWeaver{
 
     /**
      * 读取类文件，对文件修改然后生成新的类文件
+     *
      * @param inputStream
      * @return
      * @throws IOException
@@ -108,25 +108,18 @@ public class BaseWeaver implements IWeaver{
         return classWriter.toByteArray();
     }
 
-    public void setExtension(Object extension) {
-
-    }
-
-    public void setFTTransformHelper(FTTransformHelper ftTransformHelper){
-
-    }
-
     protected ClassVisitor wrapClassWriter(ClassWriter classWriter) {
         return classWriter;
     }
 
     /**
      * 排除 R 类和 BuildConfig 类
+     *
      * @param fullQualifiedClassName
      * @return
      */
     @Override
-    public boolean isWeavableClass(String fullQualifiedClassName){
+    public boolean isWeavableClass(String fullQualifiedClassName) {
         return fullQualifiedClassName.endsWith(".class") && !ClassNameAnalytics.isAndroidGenerated(fullQualifiedClassName);
     }
 

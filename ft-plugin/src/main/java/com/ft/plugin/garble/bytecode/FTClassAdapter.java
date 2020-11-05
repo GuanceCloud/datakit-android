@@ -18,7 +18,6 @@ package com.ft.plugin.garble.bytecode;
 
 import com.ft.plugin.BuildConfig;
 import com.ft.plugin.garble.ClassNameAnalytics;
-import com.ft.plugin.garble.FTTransformHelper;
 import com.ft.plugin.garble.VersionUtils;
 
 import org.objectweb.asm.ClassVisitor;
@@ -35,12 +34,10 @@ public class FTClassAdapter extends ClassVisitor {
     private String className;
     private String superName;
     private String[] interfaces;
-    private FTTransformHelper ftTransformHelper;
     private boolean needChangeField;
 
-    FTClassAdapter(final ClassVisitor cv, FTTransformHelper ftTransformHelper) {
+    FTClassAdapter(final ClassVisitor cv) {
         super(ASM_VERSION, cv);
-        this.ftTransformHelper = ftTransformHelper;
         //Logger.info(">>>> goon scan class ");
     }
 
@@ -98,7 +95,6 @@ public class FTClassAdapter extends ClassVisitor {
     public MethodVisitor visitMethod(final int access, final String name,
                                      final String desc, final String signature, final String[] exceptions) {
         MethodVisitor mv = cv.visitMethod(access, name, desc, signature, exceptions);
-        FTMethodAdapter ftMethodAdapter = new FTMethodAdapter(mv, access, name, desc, className, interfaces, superName, ftTransformHelper);
-        return ftMethodAdapter;
+        return new FTMethodAdapter(mv, access, name, desc, className, interfaces, superName);
     }
 }
