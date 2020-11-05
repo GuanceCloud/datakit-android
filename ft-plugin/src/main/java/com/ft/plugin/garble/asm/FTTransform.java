@@ -13,7 +13,9 @@ import com.android.build.api.transform.TransformInvocation;
 import com.android.build.api.transform.TransformOutputProvider;
 import com.android.build.gradle.internal.pipeline.TransformManager;
 import com.android.ide.common.internal.WaitableExecutor;
+import com.ft.plugin.garble.FTExtension;
 import com.ft.plugin.garble.Logger;
+import com.ft.plugin.garble.bytecode.FTWeaver;
 import com.google.common.io.Files;
 
 import org.apache.commons.io.FileUtils;
@@ -31,12 +33,12 @@ import java.util.Set;
  * DATE:2019-11-29 13:33
  * Description:字节码转换基类
  */
-public class BaseTransform extends Transform {
-    private Project project;
-    protected BaseWeaver bytecodeWeaver;
-    private WaitableExecutor waitableExecutor;
+public class FTTransform extends Transform {
+    private final Project project;
+    private final BaseWeaver bytecodeWeaver = new FTWeaver();
+    private final WaitableExecutor waitableExecutor;
 
-    public BaseTransform(Project project) {
+    public FTTransform(Project project) {
         this.project = project;
         this.waitableExecutor = WaitableExecutor.useGlobalSharedThreadPool();
     }
@@ -63,11 +65,15 @@ public class BaseTransform extends Transform {
 
     @Override
     public void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
-        transformFun(transformInvocation.getContext(),
-                transformInvocation.getInputs(),
-                transformInvocation.getReferencedInputs(),
-                transformInvocation.getOutputProvider(),
-                transformInvocation.isIncremental());
+        FTExtension ftExtension = (FTExtension) project.getExtensions().getByName("FTExt");
+
+        if (ftExtension.openAutoTrack) {
+            transformFun(transformInvocation.getContext(),
+                    transformInvocation.getInputs(),
+                    transformInvocation.getReferencedInputs(),
+                    transformInvocation.getOutputProvider(),
+                    transformInvocation.isIncremental());
+        }
     }
 
     private void transformFun(Context context,
@@ -76,7 +82,7 @@ public class BaseTransform extends Transform {
                               TransformOutputProvider outputProvider,
                               boolean isIncremental) throws IOException, TransformException, InterruptedException {
 
-        Logger.info(getName() + " isIncremental = " + isIncremental);
+        Logger.debug(getName() + " isIncremental = " + isIncremental);
         long startTime = System.currentTimeMillis();
         if (!isIncremental) {
             outputProvider.deleteAll();
@@ -161,7 +167,7 @@ public class BaseTransform extends Transform {
 
         waitableExecutor.waitForTasksWithQuickFail(true);
         long costTime = System.currentTimeMillis() - startTime;
-        Logger.info((getName() + " cost " + costTime + "ms"));
+        Logger.debug((getName() + " cost " + costTime + "ms"));
     }
 
     private void transformSingleFile(final File inputFile, final File outputFile, final String srcBaseDir) {
@@ -181,8 +187,8 @@ public class BaseTransform extends Transform {
                     File outputFile = new File(filePath.replace(inputDirPath, outputDirPath));
                     try {
                         bytecodeWeaver.weaveSingleClassToFile(file, outputFile, inputDirPath);
-                    }catch (Exception e){
-                        Logger.info("修改类异常-文件名："+filePath+"----异常原因："+e);
+                    } catch (Exception e) {
+                        Logger.debug("修改类异常-文件名：" + filePath + "----异常原因：" + e);
                         throw e.getClass().newInstance();
                     }
                     return null;

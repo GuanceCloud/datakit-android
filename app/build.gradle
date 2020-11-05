@@ -15,7 +15,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -68,6 +68,7 @@ apply plugin: 'ft-plugin'
 FTExt {
     showLog = true
     openAutoTrack = true
+    autoUploadProguardMap = true
 }
 repositories {
     mavenCentral()

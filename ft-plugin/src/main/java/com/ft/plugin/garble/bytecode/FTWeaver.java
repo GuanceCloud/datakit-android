@@ -1,8 +1,6 @@
 package com.ft.plugin.garble.bytecode;
 
 import com.ft.plugin.garble.ClassNameAnalytics;
-import com.ft.plugin.garble.FTExtension;
-import com.ft.plugin.garble.FTTransformHelper;
 import com.ft.plugin.garble.asm.BaseWeaver;
 
 import org.objectweb.asm.ClassVisitor;
@@ -14,19 +12,6 @@ import org.objectweb.asm.ClassWriter;
  * Description:
  */
 public final class FTWeaver extends BaseWeaver {
-    private FTExtension ftExtension;
-    private FTTransformHelper ftTransformHelper;
-
-    @Override
-    public void setExtension(Object extension) {
-        if(extension == null) return;
-        this.ftExtension = (FTExtension) extension;
-    }
-
-    @Override
-    public void setFTTransformHelper(FTTransformHelper ftTransformHelper){
-        this.ftTransformHelper = ftTransformHelper;
-    }
 
     @Override
     public boolean isWeavableClass(String fullQualifiedClassName) {
@@ -37,7 +22,7 @@ public final class FTWeaver extends BaseWeaver {
 
     @Override
     protected ClassVisitor wrapClassWriter(ClassWriter classWriter) {
-        return new FTClassAdapter(classWriter,ftTransformHelper);
+        return new FTClassAdapter(classWriter);
     }
 
 }

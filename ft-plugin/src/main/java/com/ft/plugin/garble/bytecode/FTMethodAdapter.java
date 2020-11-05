@@ -23,7 +23,6 @@ import com.ft.plugin.garble.FTHookConfig;
 import com.ft.plugin.garble.FTMethodCell;
 import com.ft.plugin.garble.FTMethodType;
 import com.ft.plugin.garble.FTSubMethodCell;
-import com.ft.plugin.garble.FTTransformHelper;
 import com.ft.plugin.garble.FTUtil;
 import com.ft.plugin.garble.Logger;
 
@@ -42,7 +41,6 @@ import java.util.List;
  * 访问类方法结构
  */
 public class FTMethodAdapter extends AdviceAdapter {
-    private FTTransformHelper ftTransformHelper;
     private String[] interfaces;
     private String className;
     private String superName;
@@ -56,11 +54,10 @@ public class FTMethodAdapter extends AdviceAdapter {
 
     private int startVarIndex;
 
-    public FTMethodAdapter(MethodVisitor mv, int access, String name, String desc, String className, String[] interfaces, String supperName, FTTransformHelper ftTransformHelper) {
+    public FTMethodAdapter(MethodVisitor mv, int access, String name, String desc, String className, String[] interfaces, String supperName) {
         super(FTUtil.ASM_VERSION, mv, access, name, desc);
         this.methodName = name;
         this.superName = supperName;
-        this.ftTransformHelper = ftTransformHelper;
         this.className = className;
         this.interfaces = interfaces;
         //Logger.info(">>>> 开始扫描类 <" + className + "> 的方法:" + methodName + "<<<<");
@@ -111,7 +108,7 @@ public class FTMethodAdapter extends AdviceAdapter {
         super.visitEnd();
         if (isHasTracked) {
             FTHookConfig.mLambdaMethodCells.remove(nameDesc);
-            Logger.info("Hooked Class<" + className + ">的 method: " + methodName + "," + methodDesc);
+            Logger.debug("Hooked Class<" + className + ">的 method: " + methodName + "," + methodDesc);
         }
     }
 
@@ -224,9 +221,7 @@ public class FTMethodAdapter extends AdviceAdapter {
         super.onMethodEnter();
         nameDesc = methodName + methodDesc;
         pubAndNoStaticAccess = FTUtil.isPublic(methodAccess) && !FTUtil.isStatic(methodAccess);
-        if (ftTransformHelper.extension.openAutoTrack) {
-            handleCode();
-        }
+        handleCode();
     }
 
     @Override
