@@ -1,6 +1,4 @@
-// -*- mode: C++ -*-
-
-// Copyright (c) 2013, Google Inc.
+// Copyright (c) 2019, Google Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -29,23 +27,38 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// Original author: Lei Zhang <thestig@google.com>
+// string_conversion_unittest.cc: Unit tests for google_breakpad::UTF* helpers.
 
-// elf_gnu_compat.h: #defines unique to glibc's elf.h.
+#include <string>
+#include <vector>
 
-#ifndef COMMON_LINUX_ELF_GNU_COMPAT_H_
-#define COMMON_LINUX_ELF_GNU_COMPAT_H_
+#include "breakpad_googletest_includes.h"
+#include "common/string_conversion.h"
 
-#include <elf.h>
+using google_breakpad::UTF8ToUTF16;
+using google_breakpad::UTF8ToUTF16Char;
+using google_breakpad::UTF16ToUTF8;
+using std::vector;
 
-// A note type on GNU systems corresponding to the .note.gnu.build-id section.
-#ifndef NT_GNU_BUILD_ID
-#define NT_GNU_BUILD_ID 3
-#endif
+TEST(StringConversionTest, UTF8ToUTF16) {
+  const char in[] = "aßc";
+  vector<uint16_t> out;
+  vector<uint16_t> exp{'a', 0xdf, 'c', 0};
+  UTF8ToUTF16(in, &out);
+  EXPECT_EQ(4u, out.size());
+  EXPECT_EQ(exp, out);
+}
 
-// Newer Linux systems offer this.
-#ifndef NT_SIGINFO
-#define NT_SIGINFO 0x53494749
-#endif
+TEST(StringConversionTest, UTF8ToUTF16Char) {
+  const char in[] = "a";
+  uint16_t out[3] = {0xff, 0xff, 0xff};
+  EXPECT_EQ(1, UTF8ToUTF16Char(in, 1, out));
+  EXPECT_EQ('a', out[0]);
+  EXPECT_EQ(0, out[1]);
+  EXPECT_EQ(0xff, out[2]);
+}
 
-#endif  // COMMON_LINUX_ELF_GNU_COMPAT_H_
+TEST(StringConversionTest, UTF16ToUTF8) {
+  vector<uint16_t> in{'a', 0xdf, 'c', 0};
+  EXPECT_EQ("aßc", UTF16ToUTF8(in, false));
+}
