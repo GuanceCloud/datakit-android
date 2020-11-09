@@ -1,6 +1,4 @@
-// -*- mode: C++ -*-
-
-// Copyright (c) 2013, Google Inc.
+// Copyright (c) 2019, Google Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -29,23 +27,19 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// Original author: Lei Zhang <thestig@google.com>
+#ifndef BREAKPAD_COMMON_MACROS_H_
+#define BREAKPAD_COMMON_MACROS_H_
 
-// elf_gnu_compat.h: #defines unique to glibc's elf.h.
-
-#ifndef COMMON_LINUX_ELF_GNU_COMPAT_H_
-#define COMMON_LINUX_ELF_GNU_COMPAT_H_
-
-#include <elf.h>
-
-// A note type on GNU systems corresponding to the .note.gnu.build-id section.
-#ifndef NT_GNU_BUILD_ID
-#define NT_GNU_BUILD_ID 3
+// Ensure that this macro definition stays in a private header file: clang
+// suggests the first macro expanding to [[clang::fallthrough]] in its
+// diagnostics, so if BP_FALLTHROUGH is visible in code depending on breakpad,
+// clang would suggest BP_FALLTHROUGH for code depending on breakpad, instead of
+// the client code's own fallthrough macro.
+// TODO(thakis): Once everyone uses C++17, use its [[fallthrough]] instead.
+#if defined(__clang__)
+#define BP_FALLTHROUGH [[clang::fallthrough]]
+#else
+#define BP_FALLTHROUGH
 #endif
 
-// Newer Linux systems offer this.
-#ifndef NT_SIGINFO
-#define NT_SIGINFO 0x53494749
-#endif
-
-#endif  // COMMON_LINUX_ELF_GNU_COMPAT_H_
+#endif // BREAKPAD_COMMON_MACROS_H_

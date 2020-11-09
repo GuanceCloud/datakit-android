@@ -17,7 +17,7 @@ file(GLOB BREAKPAD_SOURCES_COMMON
         ${BREAKPAD_ROOT}/src/client/linux/minidump_writer/linux_ptrace_dumper.cc
         ${BREAKPAD_ROOT}/src/client/linux/minidump_writer/minidump_writer.cc
         ${BREAKPAD_ROOT}/src/client/minidump_file_writer.cc
-        ${BREAKPAD_ROOT}/src/common/convert_UTF.c
+#        ${BREAKPAD_ROOT}/src/common/convert_UTF.c
         ${BREAKPAD_ROOT}/src/common/md5.cc
         ${BREAKPAD_ROOT}/src/common/string_conversion.cc
         ${BREAKPAD_ROOT}/src/common/linux/elfutils.cc
@@ -26,6 +26,7 @@ file(GLOB BREAKPAD_SOURCES_COMMON
         ${BREAKPAD_ROOT}/src/common/linux/linux_libc_support.cc
         ${BREAKPAD_ROOT}/src/common/linux/memory_mapped_file.cc
         ${BREAKPAD_ROOT}/src/common/linux/safe_readlink.cc
+        ${BREAKPAD_ROOT}/src/common/convert_UTF.cc
 
         )
 
