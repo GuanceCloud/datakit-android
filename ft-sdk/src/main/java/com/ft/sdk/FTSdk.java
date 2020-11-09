@@ -26,9 +26,11 @@ import com.ft.sdk.garble.utils.LocationUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.RendererUtil;
 import com.ft.sdk.garble.utils.Utils;
+import com.ft.sdk.nativelib.BreakpadInit;
 
 import org.json.JSONObject;
 
+import java.io.File;
 import java.security.InvalidParameterException;
 
 
@@ -39,6 +41,7 @@ import java.security.InvalidParameterException;
  */
 public class FTSdk {
     public final static String TAG = "FTSdk";
+    public static final String BREAKPAD_NATIVE_CLASS = "com.ft.sdk.nativelib.BreakpadInit";
     //该变量不能改动，其值由 Plugin 动态改写
     public static String PLUGIN_VERSION = "";
     //变量由 Plugin 写入，同一个编译版本，UUID 相同
@@ -223,7 +226,8 @@ public class FTSdk {
 
             float rate = mFtSDKConfig.getTraceSamplingRate();
             if (rate > 1 || rate < 0) {
-                throw new IllegalArgumentException("rate 值的范围应在[0,1]");
+                throw new
+                        IllegalArgumentException("rate 值的范围应在[0,1]");
             }
             //设置采样率
             Utils.traceSamplingRate = rate;
@@ -231,7 +235,33 @@ public class FTSdk {
             FTMonitorConfig.get().initParams(mFtSDKConfig);
             FTUICatonManager.getInstance().startMonitor(mFtSDKConfig);
             FTAnrWatchManager.getInstance().startMonitorAnr(mFtSDKConfig);
+
+            initNativeDumpPath();
+
         }
+    }
+
+    private void initNativeDumpPath() {
+
+        if (mFtSDKConfig.isEnableTrackAppCrash()) {
+            try {
+                Class.forName(BREAKPAD_NATIVE_CLASS);
+            } catch (ClassNotFoundException e) {
+                LogUtils.e(TAG, "未启动 native 崩溃收集");
+                return;
+            }
+
+            Application application = FTApplication.getApplication();
+            File crashFilePath = new File(application.getFilesDir(), "ftCrashDmp");
+            if (!crashFilePath.exists()) {
+                crashFilePath.mkdirs();
+            }
+
+            BreakpadInit.initBreakpad(crashFilePath.getAbsolutePath());
+
+
+        }
+
     }
 
     /**
