@@ -100,7 +100,7 @@ static const char *createCrashMessage(int signo, siginfo *siginfo) {
     void *current_exception = __cxxabiv1::__cxa_current_primary_exception();
     std::type_info *current_exception_type_info = __cxxabiv1::__cxa_current_exception_type();
 
-    size_t buffer_size = 1024;
+    size_t buffer_size = 8096;
     char *abort_message = static_cast<char *>(malloc(buffer_size));
 
     if (current_exception) {
@@ -281,5 +281,7 @@ extern "C" JNIEXPORT void JNICALL
 Java_com_ft_sdk_nativelib_ExceptionHandler_crashAndGetExceptionMessage(
         JNIEnv *env,
         jobject /* this */) {
-    throw MyException(); // This can be replaced with any foreign function call that throws.
+    int *p = NULL;
+    *p = 123;
+//    throw MyException(); // This can be replaced with any foreign function call that throws.
 }
