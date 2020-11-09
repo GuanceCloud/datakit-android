@@ -13,7 +13,7 @@ public class FTExtension {
     @Override
     public String toString() {
         return "FTExtension{" +
-                " showLog=" + showLog +
+                "showLog=" + showLog +
                 ", openAutoTrack=" + openAutoTrack +
                 ", autoUploadProguardMap=" + autoUploadProguardMap +
                 '}';

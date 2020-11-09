@@ -82,7 +82,31 @@ public class FTMapUploader {
     }
 
     private void uploadWithParams(SettingConfig settingConfig) throws IOException, InterruptedException {
+        String cmd = "curl -v http://www.baidu.com --fail";
+        ProcessBuilder builder = new ProcessBuilder(cmd.split(" "));
+        builder.redirectErrorStream(true);
 
+        Process process = builder.start();
+        InputStream ins = process.getInputStream();
+        BufferedReader read = new BufferedReader(new InputStreamReader(ins));
+
+        StringBuilder sb = new StringBuilder();
+        read.lines().forEach(s -> {
+            sb.append(s).append("\n");
+
+        });
+
+        process.waitFor();
+
+        Logger.debug("response:" + sb.toString());
+
+        int exitCode = process.exitValue();
+        if (exitCode != 0) {
+            Logger.error("map 文件上传失败");
+            Logger.error("exit code::" + exitCode);
+        }
+
+        process.destroy();
     }
 
 
