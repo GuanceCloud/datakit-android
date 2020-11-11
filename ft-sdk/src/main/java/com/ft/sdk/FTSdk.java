@@ -26,7 +26,7 @@ import com.ft.sdk.garble.utils.LocationUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.RendererUtil;
 import com.ft.sdk.garble.utils.Utils;
-import com.ft.sdk.nativelib.BreakpadInit;
+import com.ft.sdk.nativelib.NativeEngineInit;
 
 import org.json.JSONObject;
 
@@ -41,7 +41,7 @@ import java.security.InvalidParameterException;
  */
 public class FTSdk {
     public final static String TAG = "FTSdk";
-    public static final String BREAKPAD_NATIVE_CLASS = "com.ft.sdk.nativelib.BreakpadInit";
+    public static final String NATIVE_ENGINE_CLASS = "com.ft.sdk.nativelib.NativeEngineInit";
     //该变量不能改动，其值由 Plugin 动态改写
     public static String PLUGIN_VERSION = "";
     //变量由 Plugin 写入，同一个编译版本，UUID 相同
@@ -245,7 +245,7 @@ public class FTSdk {
 
         if (mFtSDKConfig.isEnableTrackAppCrash()) {
             try {
-                Class.forName(BREAKPAD_NATIVE_CLASS);
+                Class.forName(NATIVE_ENGINE_CLASS);
             } catch (ClassNotFoundException e) {
                 LogUtils.e(TAG, "未启动 native 崩溃收集");
                 return;
@@ -257,9 +257,7 @@ public class FTSdk {
                 crashFilePath.mkdirs();
             }
 
-            BreakpadInit.initBreakpad(crashFilePath.getAbsolutePath());
-
-
+            NativeEngineInit.init(application, crashFilePath.toString());
         }
 
     }

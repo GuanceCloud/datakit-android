@@ -11,14 +11,6 @@ import java.lang.reflect.Method;
 public class ReflectUtils {
     public static final String CLASS_NAME_EXCEPTION_HANDLER = "com.ft.sdk.nativelib.ExceptionHandler";
 
-    public static void reflectRegisterSignalHandler() {
-        reflectInvokeMethodV("registerSignalHandler");
-    }
-
-    public static void reflectUnRegisterSignalHandler() {
-        reflectInvokeMethodV("unRegisterSignalHandler");
-    }
-
     public static void reflectCrashAndGetExceptionMessage() {
         reflectInvokeMethodV("crashAndGetExceptionMessage");
     }

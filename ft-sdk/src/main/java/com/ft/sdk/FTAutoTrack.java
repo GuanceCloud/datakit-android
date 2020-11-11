@@ -384,21 +384,29 @@ public class FTAutoTrack {
      * 页面卡顿
      */
     public static void uiBlock() {
-        putErrorEvent(OP.BLOCK);
+        putErrorEvent(OP.BLOCK, System.currentTimeMillis());
     }
 
     /**
      * 应用崩溃
      */
     public static void appCrash() {
-        putErrorEvent(OP.CRASH);
+        putErrorEvent(OP.CRASH, System.currentTimeMillis());
+    }
+
+    /**
+     * 崩溃
+     * @param crashTimeLine
+     */
+    public static void appCrash(long crashTimeLine) {
+        putErrorEvent(OP.CRASH, crashTimeLine);
     }
 
     /**
      * 应用无响应
      */
     public static void appAnr() {
-        putErrorEvent(OP.ANR);
+        putErrorEvent(OP.ANR, System.currentTimeMillis());
     }
 
 
@@ -624,7 +632,7 @@ public class FTAutoTrack {
      *
      * @param op
      */
-    public static void putErrorEvent(@NonNull OP op) {
+    public static void putErrorEvent(@NonNull OP op, long timeMillis) {
 
         ThreadPoolUtils.get().execute(() -> {
             try {
@@ -644,7 +652,8 @@ public class FTAutoTrack {
                 fields.put(Constants.KEY_EVENT, eventName);
                 tags.put(Constants.KEY_EVENT_ID, Utils.MD5(eventName));
 
-                SyncJsonData recordData = SyncJsonData.getFromTrackBean(new TrackBean(Constants.FT_MEASUREMENT_PAGE_EVENT, tags, fields), op);
+                SyncJsonData recordData = SyncJsonData.getFromTrackBean(
+                        new TrackBean(Constants.FT_MEASUREMENT_PAGE_EVENT, tags, fields, timeMillis), op);
                 LogUtils.d(TAG, "FTAutoTrack数据进数据库：putSimpleEvent:" + recordData.printFormatRecordData());
 
                 FTManager.getFTDBManager().insertFTOperation(recordData);
