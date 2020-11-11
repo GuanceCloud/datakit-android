@@ -57,9 +57,6 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
             this.env = ftsdkConfig.getEnv();
             this.trackServiceName = ftsdkConfig.getTraceServiceName();
             this.trackConsoleLog = ftsdkConfig.isTraceConsoleLog();
-            if (this.canTrackCrash) {
-                ReflectUtils.reflectRegisterSignalHandler();
-            }
         }
     }
 
@@ -120,9 +117,6 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
     }
 
     public static void release() {
-        if (FTExceptionHandler.get().canTrackCrash) {
-            ReflectUtils.reflectUnRegisterSignalHandler();
-        }
         instance = null;
     }
 }
