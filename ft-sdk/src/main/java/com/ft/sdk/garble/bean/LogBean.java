@@ -15,6 +15,7 @@ import org.json.JSONObject;
  * description:日志对象(SDK内部使用)
  */
 public class LogBean {
+    private static final int LIMIT_SIZE = 30720;
     //指定当前日志的来源，比如如果来源于 Ngnix，可指定为 Nginx，
     // 同一应用产生的日志 source 应该一样，这样在 DataFlux 中方便针对该来源的日志配置同一的提取规则
     String measurement;
@@ -53,9 +54,26 @@ public class LogBean {
     JSONObject tags;
     JSONObject fields;
 
+
+    /**
+     * 是否超过 30KB
+     *
+     * @param content
+     * @return
+     */
+    private static boolean isOverMaxLength(String content) {
+        if (content == null) return false;
+        return content.length() > LIMIT_SIZE;
+    }
+
     public LogBean(String measurement, String content, long time) {
         this.measurement = measurement;
-        this.content = content;
+
+        if (isOverMaxLength(content)) {
+            this.content = content.substring(0, LIMIT_SIZE);
+        } else {
+            this.content = content;
+        }
         this.time = time;
     }
 

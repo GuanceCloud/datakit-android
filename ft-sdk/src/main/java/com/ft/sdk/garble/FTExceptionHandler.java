@@ -6,13 +6,16 @@ import com.ft.sdk.FTAutoTrack;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.Status;
-import com.ft.sdk.garble.reflect.ReflectUtils;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.ThreadPoolUtils;
 import com.ft.sdk.garble.utils.Utils;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.charset.Charset;
 
 /**
  * create: by huangDianHua
@@ -20,7 +23,9 @@ import java.io.Writer;
  * description:崩溃日志处理
  */
 public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
-    public static final String TAG = "FTExceptionHandler";
+    private static final String TAG = "FTExceptionHandler";
+    private static final String EXCEPTION_FILE_PREFIX_TOMBSTONE = "tombstone";
+
     private boolean canTrackCrash;
     private String env;
     private String trackServiceName;
@@ -30,13 +35,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
     private boolean isAndroidTest = false;
 
     public void uploadCrashLog(String crash) {
-        FTAutoTrack.appCrash();
-        LogUtils.d("FTExceptionHandler", "crash=" + crash);
-        LogBean logBean = new LogBean(Utils.translateFieldValue(crash), System.currentTimeMillis());
-        logBean.setStatus(Status.CRITICAL);
-        logBean.setEnv(env);
-        logBean.setServiceName(trackServiceName);
-        FTTrackInner.getInstance().logBackground(logBean);
+        uploadCrashLog(crash, System.currentTimeMillis());
     }
 
     private FTExceptionHandler() {
@@ -115,6 +114,47 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
         }
 
     }
+
+    private void uploadCrashLog(String crash, long timeLine) {
+        FTAutoTrack.appCrash();
+        LogUtils.d("FTExceptionHandler", "crash=" + crash);
+        LogBean logBean = new LogBean(Utils.translateFieldValue(crash), timeLine);
+        logBean.setStatus(Status.CRITICAL);
+        logBean.setEnv(env);
+        logBean.setServiceName(trackServiceName);
+        FTTrackInner.getInstance().logBackground(logBean);
+    }
+
+    /**
+     * 检测并上传 native dump 文件
+     *
+     * @param nativeDumpPath
+     */
+    public void checkAndSyncPreDump(String nativeDumpPath) {
+        ThreadPoolUtils.get().execute(() -> {
+            File file = new File(nativeDumpPath);
+            if (!file.exists()) {
+                return;
+            }
+            File[] list = file.listFiles();
+            if (list != null && list.length > 0) {
+                for (File item : list) {
+                    if (item.getName().startsWith(EXCEPTION_FILE_PREFIX_TOMBSTONE)) {
+                        try {
+                            String crashString = Utils.readFile(item.getAbsolutePath(), Charset.defaultCharset());
+                            long crashTime = file.lastModified();
+                            uploadCrashLog(crashString, crashTime);
+                            FTAutoTrack.appCrash(crashTime);
+                            Utils.deleteFile(item.getAbsolutePath());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        });
+    }
+
 
     public static void release() {
         instance = null;

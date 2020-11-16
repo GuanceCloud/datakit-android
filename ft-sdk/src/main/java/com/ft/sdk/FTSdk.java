@@ -42,6 +42,7 @@ import java.security.InvalidParameterException;
 public class FTSdk {
     public final static String TAG = "FTSdk";
     public static final String NATIVE_ENGINE_CLASS = "com.ft.sdk.nativelib.NativeEngineInit";
+    public static final String NATIVE_DUMP_PATH = "ftCrashDmp";
     //该变量不能改动，其值由 Plugin 动态改写
     public static String PLUGIN_VERSION = "";
     //变量由 Plugin 写入，同一个编译版本，UUID 相同
@@ -236,12 +237,15 @@ public class FTSdk {
             FTUICatonManager.getInstance().startMonitor(mFtSDKConfig);
             FTAnrWatchManager.getInstance().startMonitorAnr(mFtSDKConfig);
 
-            initNativeDumpPath();
+            initNativeDump();
 
         }
     }
 
-    private void initNativeDumpPath() {
+    /**
+     * 初始化 Native 路径
+     */
+    private void initNativeDump() {
 
         if (mFtSDKConfig.isEnableTrackAppCrash()) {
             try {
@@ -252,12 +256,14 @@ public class FTSdk {
             }
 
             Application application = FTApplication.getApplication();
-            File crashFilePath = new File(application.getFilesDir(), "ftCrashDmp");
+            File crashFilePath = new File(application.getFilesDir(), NATIVE_DUMP_PATH);
             if (!crashFilePath.exists()) {
                 crashFilePath.mkdirs();
             }
 
-            NativeEngineInit.init(application, crashFilePath.toString());
+            String filePath = crashFilePath.toString();
+            NativeEngineInit.init(application, filePath);
+            FTExceptionHandler.get().checkAndSyncPreDump(filePath);
         }
 
     }
