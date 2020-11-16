@@ -16,8 +16,14 @@ import androidx.core.content.ContextCompat;
 
 import com.ft.sdk.FTApplication;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -309,14 +315,15 @@ public class Utils {
     public static String translateFieldValue(String oldStr) {
         if (oldStr.equals(Constants.UNKNOWN)) {
             return "\"" + oldStr + "\"";
-        } else if (!oldStr.contains("{")) {
-            if (oldStr.startsWith("\"") && oldStr.endsWith("\"")) {
-                return oldStr;
+        } else {
+            if (Utils.isJSONValid(oldStr)) {
+                return JSONObject.quote(oldStr);
             } else {
+                oldStr = oldStr.replace("\\", "\\\\");
+                oldStr = translateSpecialCharacters("\"", oldStr);
                 return "\"" + oldStr + "\"";
             }
         }
-        return JSONObject.quote(oldStr);//应对 json 字符且支持转化 influx field 引号转化
     }
 
     /**
@@ -410,6 +417,54 @@ public class Utils {
             }
         }
         return null;
+    }
+
+
+    /**
+     * 文件读取
+     *
+     * @param path
+     * @param encoding
+     * @return
+     */
+    public static String readFile(String path, Charset encoding) throws IOException {
+        FileInputStream fis = null;
+        fis = new FileInputStream(path);
+        int length = fis.available();
+        byte[] bytes = new byte[length];
+        fis.read(bytes);
+        fis.close();
+        return new String(bytes, encoding);
+    }
+
+    public static boolean deleteFile(String path) {
+        File folder = new File(path);
+        if (folder.isDirectory()) {
+            for (File file : folder.listFiles()) {
+                file.delete();
+            }
+        }
+        return folder.delete();
+    }
+
+
+    /**
+     * 是否是 json
+     *
+     * @param test
+     * @return
+     */
+    public static boolean isJSONValid(String test) {
+        try {
+            new JSONObject(test);
+        } catch (JSONException ex) {
+            try {
+                new JSONArray(test);
+            } catch (JSONException ex1) {
+                return false;
+            }
+        }
+        return true;
     }
 }
 

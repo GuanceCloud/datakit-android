@@ -78,9 +78,6 @@ public class FTTraceHandler {
         if (!enableTrace) {
             return;
         }
-        if (isOverMaxLength(content.toString())) {
-            return;
-        }
         //请求结束时间
         long responseTime = System.currentTimeMillis();
         long duration = (responseTime - requestTime) * 1000;
@@ -104,16 +101,7 @@ public class FTTraceHandler {
         FTAutoTrack.putHttpError(requestTime, op, httpUrl.getHoleUrl(), httpUrl.getHost(), isError, duration);
     }
 
-    /**
-     * 是否超过 30KB
-     *
-     * @param content
-     * @return
-     */
-    private static boolean isOverMaxLength(String content) {
-        byte[] b = content.getBytes(StandardCharsets.UTF_8);
-        return b.length > 30720;
-    }
+
 
     public void setIsWebViewTrace(boolean isWebViewTrace) {
         this.isWebViewTrace = isWebViewTrace;
