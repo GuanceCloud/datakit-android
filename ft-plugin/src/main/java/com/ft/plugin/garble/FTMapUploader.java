@@ -4,27 +4,44 @@ import com.android.build.gradle.AppExtension;
 
 import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.artifacts.ProjectDependency;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 
 public class FTMapUploader {
 
     private final Project project;
+    private final static String CMAKE_DEBUG_SYMBOL_PATH = "/intermediates/cmake/debug/obj";
 
-    private final HashMap<String, SettingConfig> settingMap = new HashMap<>();
+    private final HashMap<String, ProguardSettingConfig> proguardSettingMap = new HashMap<>();
+
+    private final static String SYMBOL_MERGE_PATH = "/tmp/ft-mergeNativeSymbols";
+    private final static String SYMBOL_MERGE_ZIP_PATH = "/tmp/symbol.zip";
+
+    private final ArrayList<String> symbolPaths = new ArrayList<>();
+    private final String tmpBuildPath;
+    private final String zipBuildPath;
 
 
     public FTMapUploader(Project project) {
         this.project = project;
-
+        String buildPath = project.getBuildDir().getAbsolutePath();
+        tmpBuildPath = buildPath + SYMBOL_MERGE_PATH;
+        zipBuildPath = buildPath + SYMBOL_MERGE_ZIP_PATH;
     }
 
-    public void configUpload() {
+    /**
+     * 上传 proguard 符号文件
+     */
+    public void configProguardUpload() {
         AppExtension appExtension = (AppExtension) project.getProperties().get("android");
 
         appExtension.getApplicationVariants().all(applicationVariant -> {
@@ -39,9 +56,13 @@ public class FTMapUploader {
             }).doLast(task -> {
 
                 try {
-                    SettingConfig config = settingMap.get(assembleTaskName);
+                    ProguardSettingConfig config = proguardSettingMap.get(assembleTaskName);
                     Logger.debug("task:" + assembleTaskName + ",config:" + config + "");
                     if (config != null) {
+
+                        if (!symbolPaths.isEmpty()) {
+                            mergeFileAndZip(tmpBuildPath, symbolPaths.toArray(new String[0]));
+                        }
                         uploadWithParams(config);
                     }
 
@@ -62,17 +83,15 @@ public class FTMapUploader {
                 if (!task.getName().endsWith("Debug")) {
                     applicationVariant.getMappingFileProvider().get().getFiles().forEach(file -> {
                         if (file != null && file.exists()) {
-                            SettingConfig config = new SettingConfig();
+                            ProguardSettingConfig config = new ProguardSettingConfig();
                             config.applicationId = applicationVariant.getApplicationId();
                             config.versionName = applicationVariant.getVersionName();
                             config.versionCode = applicationVariant.getVersionCode();
-                            config.outMappingOutputPath = file.getAbsoluteFile().toString();
+                            config.mappingOutputPath = file.getAbsoluteFile().toString();
 
                             Logger.debug("Map Config:" + config + ",task:" + task.getName());
 
-                            settingMap.put(task.getName(), config);
-
-
+                            proguardSettingMap.put(task.getName(), config);
                         }
                     });
                 }
@@ -81,7 +100,54 @@ public class FTMapUploader {
 
     }
 
-    private void uploadWithParams(SettingConfig settingConfig) throws IOException, InterruptedException {
+    private void mergeFileAndZip(String tmpBuildPath, String... symbolPaths) throws IOException {
+        FTFileUtils.copyDifferentFolderFilesIntoOne(tmpBuildPath, symbolPaths);
+        FTFileUtils.zipDirectory(new File(tmpBuildPath), new File(zipBuildPath));
+    }
+
+
+    /**
+     * 上传 debug native symbol 文件
+     */
+    public void configNativeSymbolUpload() {
+        project.afterEvaluate(p -> {
+
+            p.getAllprojects().forEach(subProject -> {
+                String debugSymbolPath = subProject.getBuildDir().getAbsolutePath() + CMAKE_DEBUG_SYMBOL_PATH;
+
+                File file = new File(debugSymbolPath);
+                if (file.exists()) {
+                    symbolPaths.add(debugSymbolPath);
+                }
+
+            });
+
+            Configuration configuration = project.getConfigurations().findByName("releaseCompileClasspath");
+            if (configuration != null) {
+                String rootPath = p.getRootDir().getAbsolutePath();
+                configuration.getAllDependencies().forEach(dependency -> {
+                    if (dependency instanceof ProjectDependency) {
+                        String moduleName = dependency.getName();
+                        String debugSymbolPath = rootPath + "/" + moduleName + CMAKE_DEBUG_SYMBOL_PATH;
+                        File file = new File(debugSymbolPath);
+                        if (file.exists()) {
+                            symbolPaths.add(debugSymbolPath);
+                        }
+                    }
+                });
+                if (symbolPaths.isEmpty()) {
+                    Logger.error("native symbol not found");
+                } else {
+                    Logger.debug("paths:" + symbolPaths.toString());
+                }
+
+            }
+
+        });
+
+    }
+
+    private void uploadWithParams(ProguardSettingConfig settingConfig) throws IOException, InterruptedException {
         String cmd = "curl -v http://www.baidu.com --fail";
         ProcessBuilder builder = new ProcessBuilder(cmd.split(" "));
         builder.redirectErrorStream(true);
@@ -110,12 +176,12 @@ public class FTMapUploader {
     }
 
 
-    static class SettingConfig {
+    static class ProguardSettingConfig {
         String applicationId;
         String versionName;
         int versionCode;
-        boolean minifyEnable;
-        String outMappingOutputPath;
+        String mappingOutputPath;
+        String debugSymbolPath;
 
         @Override
         public String toString() {
@@ -123,8 +189,8 @@ public class FTMapUploader {
                     "applicationId='" + applicationId + '\'' +
                     ", versionName='" + versionName + '\'' +
                     ", versionCode=" + versionCode +
-                    ", minifyEnable=" + minifyEnable +
-                    ", outMappingOutputPath='" + outMappingOutputPath + '\'' +
+                    ", debugSymbolPath=" + debugSymbolPath +
+                    ", outMappingOutputPath='" + mappingOutputPath + '\'' +
                     '}';
         }
     }
