@@ -30,9 +30,17 @@ public class FTPlugin implements Plugin<Project> {
             Logger.setDebug(extension.showLog);
             Logger.debug(extension.toString());
 
+            FTMapUploader f = new FTMapUploader(p);
+
+
             if (extension.autoUploadProguardMap) {
-                new FTMapUploader(p).configUpload();
+                f.configProguardUpload();
             }
+
+//            if (extension.autoUploadNativeDebugSymbol) {
+//            }
+            f.configNativeSymbolUpload();
+
 
         });
 

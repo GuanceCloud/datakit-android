@@ -9,6 +9,7 @@ public class FTExtension {
     public boolean showLog = false;//是否显示日志
     public boolean openAutoTrack = true;//是否打开自动track
     public boolean autoUploadProguardMap = false; //是否自动上 map 文件
+    public boolean autoUploadNativeDebugSymbol = true;//是否上传 native debug symbol
 
     @Override
     public String toString() {
@@ -16,6 +17,7 @@ public class FTExtension {
                 "showLog=" + showLog +
                 ", openAutoTrack=" + openAutoTrack +
                 ", autoUploadProguardMap=" + autoUploadProguardMap +
+                ", autoUploadNativeDebugSymbol=" + autoUploadNativeDebugSymbol +
                 '}';
     }
 }
