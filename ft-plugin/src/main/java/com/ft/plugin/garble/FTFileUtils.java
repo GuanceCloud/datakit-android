@@ -12,6 +12,11 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 class FTFileUtils {
+    /**
+     * 复制合并文件
+     * @param mergedFolderStr
+     * @param foldersStr
+     */
     public static void copyDifferentFolderFilesIntoOne(String mergedFolderStr,
                                                        String... foldersStr) {
         final File mergedFolder = new File(mergedFolderStr);

@@ -100,6 +100,12 @@ public class FTMapUploader {
 
     }
 
+    /**
+     * 合并并生成 zip
+     * @param tmpBuildPath
+     * @param symbolPaths
+     * @throws IOException
+     */
     private void mergeFileAndZip(String tmpBuildPath, String... symbolPaths) throws IOException {
         FTFileUtils.copyDifferentFolderFilesIntoOne(tmpBuildPath, symbolPaths);
         FTFileUtils.zipDirectory(new File(tmpBuildPath), new File(zipBuildPath));
