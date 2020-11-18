@@ -793,7 +793,7 @@ public class FTAutoTrack {
             FTTrackInner.getInstance().trackBackground(op, time, Constants.FT_MEASUREMENT_PAGE_EVENT, tags, fields);
 
             addLogging(currentPage, op, vtp);
-            addObject(op);
+//            addObject(op);
 
         } catch (Exception e) {
             LogUtils.e(TAG, e.toString());
@@ -889,20 +889,20 @@ public class FTAutoTrack {
         }
     }
 
-    /**
-     * 应用登陆状态，添加
-     *
-     * @param op
-     */
-    private static void addObject(OP op) {
-        if (op != OP.LANC) {
-            return;
-        }
-        Context context = FTApplication.getApplication();
-        String name = DeviceUtils.getUuid(context) + "_" + Utils.MD5_16(DeviceUtils.getApplicationId(context));
-        ObjectBean objectBean = new ObjectBean(name.toUpperCase(), SyncDataHelper.getDefaultObjectBean());
-        FTTrackInner.getInstance().objectBackground(objectBean);
-    }
+//    /**
+//     * 应用登陆状态，添加
+//     *
+//     * @param op
+//     */
+//    private static void addObject(OP op) {
+//        if (op != OP.LANC) {
+//            return;
+//        }
+//        Context context = FTApplication.getApplication();
+//        String name = DeviceUtils.getUuid(context) + "_" + Utils.MD5_16(DeviceUtils.getApplicationId(context));
+//        ObjectBean objectBean = new ObjectBean(name.toUpperCase(), SyncDataHelper.getDefaultObjectBean());
+//        FTTrackInner.getInstance().objectBackground(objectBean);
+//    }
 
 
     private static void addLogging(String currentPage, OP op, @Nullable String vtp) {

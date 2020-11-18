@@ -11,7 +11,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.ft.AccountUtils;
 import com.ft.BaseTest;
-import com.ft.Main2Activity;
+import com.ft.DebugMainActivity;
 import com.ft.R;
 import com.ft.application.MockApplication;
 import com.ft.sdk.FTAutoTrackType;
@@ -52,7 +52,7 @@ import static com.ft.AllTests.hasPrepare;
 public class FTAutoTrackTest extends BaseTest {
     Context context;
     @Rule
-    public ActivityScenarioRule<Main2Activity> rule = new ActivityScenarioRule<>(Main2Activity.class);
+    public ActivityScenarioRule<DebugMainActivity> rule = new ActivityScenarioRule<>(DebugMainActivity.class);
 
     FTSDKConfig ftSDKConfig;
 
@@ -154,7 +154,7 @@ public class FTAutoTrackTest extends BaseTest {
     public void activityBlackTest() throws InterruptedException, JSONException {
         ftSDKConfig.setEnableAutoTrackType(FTAutoTrackType.APP_END.type |
                 FTAutoTrackType.APP_START.type)
-                .setBlackActivityClasses(Collections.singletonList(Main2Activity.class));
+                .setBlackActivityClasses(Collections.singletonList(DebugMainActivity.class));
         FTSdk.install(ftSDKConfig);
         removeActivityLifeCycle();
         onView(withId(R.id.mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
@@ -179,7 +179,7 @@ public class FTAutoTrackTest extends BaseTest {
     public void activityWhiteTest() throws InterruptedException, JSONException {
         ftSDKConfig.setEnableAutoTrackType(FTAutoTrackType.APP_CLICK.type | FTAutoTrackType.APP_END.type |
                 FTAutoTrackType.APP_START.type)
-                .setWhiteActivityClasses(Collections.singletonList(Main2Activity.class));
+                .setWhiteActivityClasses(Collections.singletonList(DebugMainActivity.class));
         FTSdk.install(ftSDKConfig);
         removeActivityLifeCycle();
 
@@ -205,7 +205,7 @@ public class FTAutoTrackTest extends BaseTest {
     public void viewBlackTest() throws InterruptedException, JSONException {
         ftSDKConfig.setEnableAutoTrackType(FTAutoTrackType.APP_CLICK.type | FTAutoTrackType.APP_END.type |
                 FTAutoTrackType.APP_START.type)
-                .setWhiteActivityClasses(Collections.singletonList(Main2Activity.class))
+                .setWhiteActivityClasses(Collections.singletonList(DebugMainActivity.class))
                 .setBlackViewClasses(Collections.singletonList(Button.class));
         FTSdk.install(ftSDKConfig);
         removeActivityLifeCycle();
@@ -232,7 +232,7 @@ public class FTAutoTrackTest extends BaseTest {
     public void viewWhiteTest() throws InterruptedException, JSONException {
         ftSDKConfig.setEnableAutoTrackType(FTAutoTrackType.APP_CLICK.type | FTAutoTrackType.APP_END.type |
                 FTAutoTrackType.APP_START.type)
-                .setWhiteActivityClasses(Collections.singletonList(Main2Activity.class))
+                .setWhiteActivityClasses(Collections.singletonList(DebugMainActivity.class))
                 .setWhiteViewClasses(Collections.singletonList(Button.class));
         FTSdk.install(ftSDKConfig);
         removeActivityLifeCycle();

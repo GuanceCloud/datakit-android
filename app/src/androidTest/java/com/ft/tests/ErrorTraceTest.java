@@ -10,7 +10,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.ft.AccountUtils;
 import com.ft.BaseTest;
-import com.ft.Main2Activity;
+import com.ft.DebugMainActivity;
 import com.ft.R;
 import com.ft.application.MockApplication;
 import com.ft.sdk.FTSDKConfig;
@@ -28,7 +28,6 @@ import org.junit.runner.RunWith;
 import org.powermock.reflect.Whitebox;
 
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -42,7 +41,7 @@ import static com.ft.AllTests.hasPrepare;
 @RunWith(AndroidJUnit4.class)
 public class ErrorTraceTest extends BaseTest {
     @Rule
-    public ActivityScenarioRule<Main2Activity> rule = new ActivityScenarioRule<>(Main2Activity.class);
+    public ActivityScenarioRule<DebugMainActivity> rule = new ActivityScenarioRule<>(DebugMainActivity.class);
 
 
     Context context;

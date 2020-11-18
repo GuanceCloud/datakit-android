@@ -56,8 +56,15 @@ dependencies {
 apply plugin: 'ft-plugin'
 //配置插件使用参数
 FTExt {
-    //是否显示日志
+    //是否显示日志，默认为 false
     showLog = true
+    //是否开启自动追踪，默认为 true
+    openAutoTrack = true
+    //是否自动上传 Proguard
+    autoUploadProguardMap = true
+    //是否自动上传 Native Debug Symbol
+    autoUploadNativeDebugSymbol = true
+
 }
 android{
 	//...省略部分代码
