@@ -16,20 +16,20 @@ import com.ft.sdk.garble.utils.LooperLogPrinter;
  * time: 2020/9/28 10:45:00
  * description: UI 卡顿管理类
  */
-public class FTUICatonManager implements LooperLogPrinterListener, UiPerfMonitorConfig {
-    public static final String TAG = "FTUICatonManager";
-    private static FTUICatonManager mInstance;
+public class FTUIBlockManager implements LooperLogPrinterListener, UiPerfMonitorConfig {
+    public static final String TAG = "FTUIBlockManager";
+    private static FTUIBlockManager mInstance;
     private LooperLogPrinter mLooperLogPrinter;
     private int monitorState = UI_PERF_MONITOR_STOP;
     private FTSDKConfig mConfig;
 
-    private FTUICatonManager() {
+    private FTUIBlockManager() {
         mLooperLogPrinter = new LooperLogPrinter(this);
     }
 
-    public synchronized static FTUICatonManager getInstance() {
+    public synchronized static FTUIBlockManager getInstance() {
         if (mInstance == null) {
-            mInstance = new FTUICatonManager();
+            mInstance = new FTUIBlockManager();
         }
         return mInstance;
     }
