@@ -409,6 +409,14 @@ public class FTAutoTrack {
         putErrorEvent(OP.ANR, System.currentTimeMillis());
     }
 
+    /**
+     * 应用无响应
+     * @param anrTime
+     */
+    public static void appAnr(long anrTime) {
+        putErrorEvent(OP.ANR, anrTime);
+    }
+
 
     /**
      * 打开某个Fragment页面

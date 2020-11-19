@@ -139,12 +139,17 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
             File[] list = file.listFiles();
             if (list != null && list.length > 0) {
                 for (File item : list) {
+
                     if (item.getName().startsWith(EXCEPTION_FILE_PREFIX_TOMBSTONE)) {
                         try {
                             String crashString = Utils.readFile(item.getAbsolutePath(), Charset.defaultCharset());
                             long crashTime = file.lastModified();
                             uploadCrashLog(crashString, crashTime);
-                            FTAutoTrack.appCrash(crashTime);
+                            if (item.getName().contains("anr")) {
+                                FTAutoTrack.appAnr(crashTime);
+                            } else if (item.getName().contains("native")) {
+                                FTAutoTrack.appCrash(crashTime);
+                            }
                             Utils.deleteFile(item.getAbsolutePath());
                         } catch (IOException e) {
                             e.printStackTrace();

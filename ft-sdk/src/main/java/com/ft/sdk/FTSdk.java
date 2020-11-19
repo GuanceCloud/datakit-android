@@ -19,7 +19,7 @@ import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.FTNetworkListener;
 import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.manager.FTAnrWatchManager;
-import com.ft.sdk.garble.manager.FTUICatonManager;
+import com.ft.sdk.garble.manager.FTUIBlockManager;
 import com.ft.sdk.garble.manager.SyncTaskManager;
 import com.ft.sdk.garble.utils.GpuUtils;
 import com.ft.sdk.garble.utils.LocationUtils;
@@ -104,7 +104,7 @@ public class FTSdk {
         LocationUtils.get().stopListener();
         FTExceptionHandler.release();
         FTDBCachePolicy.release();
-        FTUICatonManager.release();
+        FTUIBlockManager.release();
         FTAnrWatchManager.release();
         unregisterActivityLifeCallback();
         LogUtils.w(TAG, "FT SDK 已经被关闭");
@@ -234,9 +234,8 @@ public class FTSdk {
             Utils.traceSamplingRate = rate;
             FTExceptionHandler.get().initParams(mFtSDKConfig);
             FTMonitorConfig.get().initParams(mFtSDKConfig);
-            FTUICatonManager.getInstance().startMonitor(mFtSDKConfig);
-            FTAnrWatchManager.getInstance().startMonitorAnr(mFtSDKConfig);
-
+            FTUIBlockManager.getInstance().startMonitor(mFtSDKConfig);
+//            FTAnrWatchManager.getInstance().startMonitorAnr(mFtSDKConfig);
             initNativeDump();
 
         }
@@ -247,7 +246,9 @@ public class FTSdk {
      */
     private void initNativeDump() {
 
-        if (mFtSDKConfig.isEnableTrackAppCrash()) {
+        boolean enableTrackAppCrash = mFtSDKConfig.isEnableTrackAppCrash();
+        boolean enableTrackAppANR = mFtSDKConfig.isEnableTrackAppANR();
+        if (enableTrackAppCrash || enableTrackAppANR) {
             try {
                 Class.forName(NATIVE_ENGINE_CLASS);
             } catch (ClassNotFoundException e) {
@@ -262,7 +263,7 @@ public class FTSdk {
             }
 
             String filePath = crashFilePath.toString();
-            NativeEngineInit.init(application, filePath);
+            NativeEngineInit.init(application, filePath, enableTrackAppCrash, enableTrackAppANR);
             FTExceptionHandler.get().checkAndSyncPreDump(filePath);
         }
 
