@@ -28,7 +28,6 @@ public class FTPlugin implements Plugin<Project> {
             FTExtension extension = (FTExtension) p.getExtensions().getByName("FTExt");
 
             Logger.setDebug(extension.showLog);
-            Logger.debug(extension.toString());
 
             FTMapUploader f = new FTMapUploader(p);
 
@@ -37,9 +36,9 @@ public class FTPlugin implements Plugin<Project> {
                 f.configProguardUpload();
             }
 
-//            if (extension.autoUploadNativeDebugSymbol) {
-//            }
-            f.configNativeSymbolUpload();
+            if (extension.autoUploadNativeDebugSymbol) {
+                f.configNativeSymbolUpload();
+            }
 
 
         });

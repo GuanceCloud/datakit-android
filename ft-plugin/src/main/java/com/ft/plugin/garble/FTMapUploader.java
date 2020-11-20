@@ -153,6 +153,12 @@ public class FTMapUploader {
 
     }
 
+    /**
+     *  上传符号文件
+     * @param settingConfig
+     * @throws IOException
+     * @throws InterruptedException
+     */
     private void uploadWithParams(ProguardSettingConfig settingConfig) throws IOException, InterruptedException {
         String cmd = "curl -v http://www.baidu.com --fail";
         ProcessBuilder builder = new ProcessBuilder(cmd.split(" "));
