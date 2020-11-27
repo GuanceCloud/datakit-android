@@ -43,8 +43,7 @@ public class OaidTest extends BaseTest {
                 AccountUtils.getProperty(context, AccountUtils.ACCESS_KEY_SECRET))
                 .setDataWayToken(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_TOKEN))
                 .setXDataKitUUID("ft-dataKit-uuid-001")
-                .setUseOAID(true)//设置 OAID 是否可用
-                .setGeoKey(true, AccountUtils.getProperty(context, AccountUtils.GEO_KEY));
+                .setUseOAID(true);//设置 OAID 是否可用
         //关闭数据自动同步操作
 //        SyncTaskManager.get().setRunning(true);
         stopSyncTask();
@@ -52,7 +51,7 @@ public class OaidTest extends BaseTest {
     }
 
     @Test
-    public void oaidTest(){
+    public void oaidTest() {
         FTSdk.install(ftSDKConfig);
         String oaid = OaidUtils.getOAID(context);
         Assert.assertFalse(Utils.isNullOrEmpty(oaid));

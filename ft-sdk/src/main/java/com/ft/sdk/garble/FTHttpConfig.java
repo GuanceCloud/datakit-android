@@ -34,10 +34,10 @@ public class FTHttpConfig {
     public int traceType;
     //支持的采集类型
     public List<String> traceContentType = Arrays.asList("application/json",
-            "application/javascript","application/xml","application/x-www-form-urlencoded",
-            "text/html","text/xml","text/plain",
+            "application/javascript", "application/xml", "application/x-www-form-urlencoded",
+            "text/html", "text/xml", "text/plain",
             "multipart/form-data"
-            );
+    );
 
     private FTHttpConfig() {
 
@@ -63,10 +63,10 @@ public class FTHttpConfig {
         version = BuildConfig.FT_SDK_VERSION;
         uuid = DeviceUtils.getSDKUUid(FTApplication.getApplication());
         userAgent = USER_AGENT;
-        EngineFactory.setTrackNetTime(ftsdkConfig.getTrackNetTime());
+        EngineFactory.setNetWorkTrace(ftsdkConfig.isNetworkTrace());
         networkTrace = ftsdkConfig.isNetworkTrace();
         traceType = ftsdkConfig.getTraceType();
-        if(ftsdkConfig.getTraceContentType() != null){
+        if (ftsdkConfig.getTraceContentType() != null) {
             traceContentType = ftsdkConfig.getTraceContentType();
         }
     }

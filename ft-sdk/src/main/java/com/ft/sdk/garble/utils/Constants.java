@@ -22,6 +22,8 @@ public class Constants {
     public static final String FT_MEASUREMENT_HTTP_WEBVIEW = "mobile_webview_http";
     public static final String FT_MEASUREMENT_HTTP_CLIENT = "mobile_client_http";
     public static final String FT_MONITOR_MEASUREMENT = "mobile_monitor";
+    public static final String FT_MEASUREMENT_RUM_APP_START_UP="rum_app_startup";
+
 
     public static final String FT_LOG_DEFAULT_MEASUREMENT = USER_AGENT;
 
@@ -58,7 +60,7 @@ public class Constants {
 
     public static final String KEY_PAGE_EVENT_PAGE_DESC = "page_desc";
     public static final String KEY_PAGE_EVENT_USER_NAME = "ud_name";
-    public static final String KEY_PAGE_EVENT_USER_ID = "ud_id";
+    public static final String KEY_PAGE_EVENT_USER_ID = "origin_id";
 
     public static final String KEY_TIME_COST_DURATION = "duration";
     public static final String KEY_TIME_COST_WEBVIEW_URL = "url";
@@ -66,6 +68,9 @@ public class Constants {
     public static final String KEY_HTTP_URL = "url";
     public static final String KEY_HTTP_HOST = "host";
     public static final String KEY_HTTP_IS_ERROR = "isError";
+
+    public static final String KEY_APP_STARTUP="app_startup_type";
+    public static final String KEY_APP_STARTUP_DURATION="app_startup_duration";
 
     public static final String KEY_BATTERY_TOTAL = "battery_total";
     public static final String KEY_BATTERY_CHARGE_TYPE = "battery_charge_type";
@@ -98,7 +103,7 @@ public class Constants {
     public static final String KEY_NETWORK_TCP_TIME = "network_tcp_time";
     public static final String KEY_NETWORK_DNS_TIME = "network_dns_time";
     public static final String KEY_NETWORK_RESPONSE_TIME = "network_response_time";
-    public static final String KEY_NETWORK_ERROR_RATE = "network_error_rate";
+//    public static final String KEY_NETWORK_ERROR_RATE = "network_error_rate";
 
     public static final String KEY_LOCATION_PROVINCE = "province";
     public static final String KEY_LOCATION_CITY = "city";
@@ -136,16 +141,17 @@ public class Constants {
     public static final String KEY_DEVICE_APPLICATION_NAME = "application_name";
     public static final String KEY_DEVICE_SDK_AGENT = "agent";
     public static final String KEY_DEVICE_SDK_AUTO_TRACK = "autoTrack";
+    public static final String KEY_DEVICE_SDK_NATIVE = "native";
     public static final String KEY_DEVICE_IMEI = "imei";
     public static final String KEY_DEVICE_OS = "os";
     public static final String KEY_DEVICE_OS_VERSION = "os_version";
-    public static final String KEY_DEVICE_DEVICE_BAND = "device_band";
-    public static final String KEY_DEVICE_DEVICE_MODEL = "device_model";
-    public static final String KEY_DEVICE_DISPLAY = "display";
+    public static final String KEY_DEVICE_DEVICE_BAND = "device";
+    public static final String KEY_DEVICE_DEVICE_MODEL = "model";
+    public static final String KEY_DEVICE_DISPLAY = "screen_size";
     public static final String KEY_DEVICE_CARRIER = "carrier";
     public static final String KEY_DEVICE_LOCALE = "locale";
     public static final String KEY_DEVICE_OAID = "oaid";
-    public static final String KEY_APP_VERSION_NAME = "app_version_name";
+    public static final String KEY_APP_VERSION_NAME = "version";
 
     public static final String EVENT_NAME_LAUNCH = "launch";
     public static final String EVENT_NAME_OPEN = "open";
@@ -174,10 +180,6 @@ public class Constants {
         OP_EVENT_MAPS.put(OP.OPEN_ACT, Constants.EVENT_NAME_ENTER);
         OP_EVENT_MAPS.put(OP.OPEN_FRA, Constants.EVENT_NAME_ENTER);
 
-        OP_EVENT_MAPS.put(OP.BLOCK, Constants.EVENT_NAME_BLOCK);
-        OP_EVENT_MAPS.put(OP.CRASH, Constants.EVENT_NAME_CRASH);
-        OP_EVENT_MAPS.put(OP.ANR, Constants.EVENT_NAME_ANR);
-
         OP_EVENT_MAPS.put(OP.WEBVIEW_LOADING, Constants.EVENT_NAME_WEBVIEW_LOADING);
         OP_EVENT_MAPS.put(OP.WEBVIEW_LOAD_COMPLETED, Constants.EVENT_NAME_WEBVIEW_LOAD_COMPLETED);
 
@@ -198,9 +200,6 @@ public class Constants {
             OP.CLS_ACT,
             OP.OPEN_ACT,
             OP.OPEN_FRA,
-            OP.BLOCK,
-            OP.CRASH,
-            OP.ANR,
     };
 
     /**

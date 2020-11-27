@@ -174,7 +174,6 @@ public class SyncJsonData implements Cloneable {
         SyncJsonData recordData = new SyncJsonData(DataType.TRACK);
         recordData.setTime(bean.getTimeMillis());
 
-
         if (op.needMonitorData()) {
             addMonitorData(tagsTemp, fields);
         }

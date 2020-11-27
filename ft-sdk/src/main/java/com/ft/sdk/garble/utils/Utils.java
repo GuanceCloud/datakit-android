@@ -20,8 +20,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.security.InvalidKeyException;
@@ -41,6 +43,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import static com.ft.sdk.garble.utils.Constants.FT_SHARE_PER_FILE;
+import static com.ft.sdk.garble.utils.Constants.TAGS;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
@@ -465,6 +468,31 @@ public class Utils {
             }
         }
         return true;
+    }
+
+    /**
+     * 读取应用
+     * @param filePath
+     * @param key
+     * @return
+     */
+    public static String readSectionValueFromDump(String filePath, String key) {
+        File file = new File(filePath);
+        String value = "";
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (line.contains(key)) {
+                    value = br.readLine();
+
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            LogUtils.e(TAGS, e.getMessage());
+        }
+        return value;
     }
 }
 

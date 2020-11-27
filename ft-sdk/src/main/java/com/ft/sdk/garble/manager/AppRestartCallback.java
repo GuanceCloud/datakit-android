@@ -1,4 +1,4 @@
-package com.ft.sdk.garble;
+package com.ft.sdk.garble.manager;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -8,7 +8,6 @@ import androidx.annotation.NonNull;
 
 import com.ft.sdk.FTAutoTrack;
 import com.ft.sdk.FTMonitor;
-import com.ft.sdk.garble.manager.FTActivityManager;
 
 
 /**
@@ -20,7 +19,7 @@ class AppRestartCallback {
     public static final int MSG_CHECK_SLEEP_STATUS = 1;
     public static final int DELAY_MILLIS = 10000;//10 秒
     private boolean alreadySleep = false;
-    private Handler handler = new Handler(Looper.getMainLooper()) {
+    private final Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
@@ -34,6 +33,13 @@ class AppRestartCallback {
         if (alreadySleep) {//表示从后台重新进入
             FTAutoTrack.startApp();
             FTMonitor.get().checkForReStart();
+        }
+    }
+
+    public void onPostResume() {
+        if (alreadySleep) {
+            FTAutoTrack.putLaunchPerformance(false);
+            alreadySleep = false;
         }
     }
 
@@ -51,7 +57,7 @@ class AppRestartCallback {
     private void checkLongTimeSleep() {
         boolean appForeground = FTActivityManager.get().isAppForeground();
         if (!appForeground) {
-            FTAutoTrack.sleepApp(DELAY_MILLIS);
+//            FTAutoTrack.sleepApp(DELAY_MILLIS);
             alreadySleep = true;
         }
     }

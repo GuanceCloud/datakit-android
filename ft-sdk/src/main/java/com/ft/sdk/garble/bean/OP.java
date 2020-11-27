@@ -21,12 +21,6 @@ public enum OP {
     CLS_ACT("cls_act"),
     CLS_FRA("cls_fra"),
 
-    //错误事件
-    BLOCK("block"),
-    CRASH("crash"),
-    ANR("anr"),
-
-
     //webview 事件
     WEBVIEW_LOADING("webview_loading"),
     WEBVIEW_LOAD_COMPLETED("webview_load_completed"),
@@ -36,7 +30,10 @@ public enum OP {
 
     //网络情况事件
     HTTP_CLIENT("http_client"),
-    HTTP_WEBVIEW("http_webview");
+    HTTP_WEBVIEW("http_webview"),
+    RUM_LAUNCH_PERFORMANCE("rum_launch_performance"),
+    ;
+
 
     public String value;
 

@@ -62,9 +62,6 @@ public class LogEventTest extends BaseTest {
                 .setUseOAID(true)//设置 OAID 是否可用
                 .setDebug(true)//设置是否是 debug
                 .enableAutoTrack(true)//设置是否开启自动埋点
-                .setEnableAutoTrackType(FTAutoTrackType.APP_CLICK.type |
-                        FTAutoTrackType.APP_END.type |
-                        FTAutoTrackType.APP_START.type)//设置埋点事件类型的白名单
                 .setGeoKey(true, AccountUtils.getProperty(context, AccountUtils.GEO_KEY))
                 .setNeedBindUser(false)//是否需要绑定用户信息
                 .setTraceSamplingRate(0.5f)

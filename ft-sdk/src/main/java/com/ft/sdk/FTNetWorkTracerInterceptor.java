@@ -6,7 +6,6 @@ import com.ft.sdk.garble.utils.LogUtils;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -141,12 +140,12 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
             json.put("method", request.method());
             json.put("url", request.url());
             json.put("headers", headers);
-            if (request.body() != null) {
-                Buffer sink = new Buffer();
-                request.body().writeTo(sink);
-                String body = sink.readString(StandardCharsets.UTF_8);
-                json.put("body", body);
-            }
+//            if (request.body() != null) {
+//                Buffer sink = new Buffer();
+//                request.body().writeTo(sink);
+//                String body = sink.readString(StandardCharsets.UTF_8);
+//                json.put("body", body);
+//            }
         } catch (JSONException e) {
             LogUtils.e(TAG, e.getMessage());
         }
@@ -155,7 +154,6 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
 
     /**
      * @param response
-     * @param body
      * @return
      */
     private JSONObject buildResponseJsonContent(@Nullable Response response, String body, String error) {
@@ -165,23 +163,23 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
         try {
             json.put("code", response != null ? response.code() : 0);
             json.put("headers", headers);
-            JSONObject jbBody = null;
-            JSONArray jaBody = null;
-            try {
-                jbBody = new JSONObject(body);
-                json.put("body", jbBody);
-            } catch (JSONException e) {
-            }
-            if (jbBody == null) {
-                try {
-                    jaBody = new JSONArray(body);
-                    json.put("body", jaBody);
-                } catch (JSONException e) {
-                }
-            }
-            if (jaBody == null && jbBody == null) {
-                json.put("body", body);
-            }
+//            JSONObject jbBody = null;
+//            JSONArray jaBody = null;
+//            try {
+//                jbBody = new JSONObject(body);
+//                json.put("body", jbBody);
+//            } catch (JSONException e) {
+//            }
+//            if (jbBody == null) {
+//                try {
+//                    jaBody = new JSONArray(body);
+//                    json.put("body", jaBody);
+//                } catch (JSONException e) {
+//                }
+//            }
+//            if (jaBody == null && jbBody == null) {
+//                json.put("body", body);
+//            }
             if (error != null && !error.isEmpty()) {
                 json.put("error", error);
             }

@@ -1,6 +1,6 @@
 package com.ft.sdk.tests;
 
-import com.ft.sdk.garble.FTTrackInner;
+import com.ft.sdk.FTTrackInner;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

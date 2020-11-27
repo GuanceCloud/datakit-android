@@ -2,9 +2,8 @@ package com.ft.sdk.garble.manager;
 
 import android.view.Choreographer;
 
-import com.ft.sdk.FTAutoTrack;
 import com.ft.sdk.FTSDKConfig;
-import com.ft.sdk.garble.FTTrackInner;
+import com.ft.sdk.FTTrackInner;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.Status;
 
@@ -37,14 +36,11 @@ public class FTUIBlockManager {
         isStop = false;
 
         FTMainLoopLogMonitor.getInstance().setLogCallBack(log -> {
-            FTAutoTrack.uiBlock();
-
             LogBean logBean = new LogBean("------ UIBlock  ------\n " + log, System.currentTimeMillis());
             logBean.setStatus(Status.CRITICAL);
             logBean.setEnv(config.getEnv());
             logBean.setServiceName(config.getTraceServiceName());
             FTTrackInner.getInstance().logBackground(logBean);
-
         });
 
 

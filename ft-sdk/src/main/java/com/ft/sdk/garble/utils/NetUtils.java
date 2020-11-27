@@ -41,7 +41,7 @@ public class NetUtils {
     public static int NETWORK_MOBILE = 5;
 
     private static NetUtils netUtils;
-    private boolean isListenering;
+    private boolean isListening;
     private TelephonyManager telephonyManager;
     private PhoneStatListener phoneStatListener;
 
@@ -159,10 +159,10 @@ public class NetUtils {
      * @param context
      */
     public void listenerSignal(Context context) {
-        if (isListenering) {
+        if (isListening) {
             return;
         }
-        isListenering = true;
+        isListening = true;
         if (telephonyManager == null) {
             telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
             if (phoneStatListener == null) {

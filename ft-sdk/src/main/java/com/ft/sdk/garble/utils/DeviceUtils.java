@@ -7,7 +7,6 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.Build;
@@ -152,12 +151,6 @@ public class DeviceUtils {
         return "";
     }
 
-    /**
-     * 获得SDK版本号
-     */
-    public static String getSDKVersion() {
-        return BuildConfig.FT_SDK_VERSION;
-    }
 
     /**
      * 获得设备IMEI码

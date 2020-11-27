@@ -4,9 +4,6 @@ import android.view.View;
 
 import com.ft.sdk.FTAutoTrackType;
 import com.ft.sdk.FTSDKConfig;
-import com.ft.sdk.garble.utils.Constants;
-import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.sdk.garble.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,17 +43,18 @@ public class FTAutoTrackConfig {
             return;
         }
         autoTrack = ftsdkConfig.isAutoTrack();
-        enableAutoTrackType = ftsdkConfig.getEnableAutoTrackType();
-        addOnlyAutoTrackActivity(ftsdkConfig.getWhiteActivityClass());
-        addOnlyAutoTrackView(ftsdkConfig.getWhiteViewClass());
-
-        disableAutoTrackType = ftsdkConfig.getDisableAutoTrackType();
-        addIgnoreAutoTrackActivity(ftsdkConfig.getBlackActivityClass());
-        addIgnoreAutoTrackView(ftsdkConfig.getBlackViewClass());
+//        enableAutoTrackType = ftsdkConfig.getEnableAutoTrackType();
+//        addOnlyAutoTrackActivity(ftsdkConfig.getWhiteActivityClass());
+//        addOnlyAutoTrackView(ftsdkConfig.getWhiteViewClass());
+//
+//        disableAutoTrackType = ftsdkConfig.getDisableAutoTrackType();
+//        addIgnoreAutoTrackActivity(ftsdkConfig.getBlackActivityClass());
+//        addIgnoreAutoTrackView(ftsdkConfig.getBlackViewClass());
     }
 
     /**
      * 添加 Activity 白名单
+     *
      * @param classes
      */
     private void addOnlyAutoTrackActivity(List<Class<?>> classes) {
@@ -75,7 +73,8 @@ public class FTAutoTrackConfig {
     }
 
     /**
-     *  添加控件白名单
+     * 添加控件白名单
+     *
      * @param classes
      */
     private void addOnlyAutoTrackView(List<Class<?>> classes) {
@@ -93,6 +92,7 @@ public class FTAutoTrackConfig {
 
     /**
      * 添加 Activity 黑名单
+     *
      * @param classes
      */
     private void addIgnoreAutoTrackActivity(List<Class<?>> classes) {
@@ -112,6 +112,7 @@ public class FTAutoTrackConfig {
 
     /**
      * 添加控件黑名单
+     *
      * @param classes
      */
     private void addIgnoreAutoTrackView(List<Class<?>> classes) {
@@ -143,7 +144,7 @@ public class FTAutoTrackConfig {
      * @return
      */
     public boolean enableAutoTrackType(FTAutoTrackType type) {
-        if(enableAutoTrackType == 0){
+        if (enableAutoTrackType == 0) {
             return true;
         }
         if ((enableAutoTrackType | type.type) == enableAutoTrackType) {
@@ -232,7 +233,7 @@ public class FTAutoTrackConfig {
      * @return
      */
     public boolean disableAutoTrackType(FTAutoTrackType type) {
-        if(disableAutoTrackType == 0){
+        if (disableAutoTrackType == 0) {
             return false;
         }
         if ((disableAutoTrackType | type.type) == disableAutoTrackType) {
@@ -307,6 +308,7 @@ public class FTAutoTrackConfig {
 
     /**
      * 该属性在 agent_1.0.2-alpha04 后将不再有用。
+     *
      * @return
      */
     @Deprecated
@@ -314,7 +316,7 @@ public class FTAutoTrackConfig {
         return "";
     }
 
-    public static void release(){
+    public static void release() {
         instance = null;
     }
 }

@@ -12,13 +12,13 @@ import com.ft.sdk.garble.FTMonitorConfig;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.ft.sdk.MonitorType.SENSOR;
-import static com.ft.sdk.MonitorType.SENSOR_ACCELERATION;
-import static com.ft.sdk.MonitorType.SENSOR_BRIGHTNESS;
-import static com.ft.sdk.MonitorType.SENSOR_MAGNETIC;
-import static com.ft.sdk.MonitorType.SENSOR_PROXIMITY;
-import static com.ft.sdk.MonitorType.SENSOR_ROTATION;
-import static com.ft.sdk.MonitorType.SENSOR_STEP;
+//import static com.ft.sdk.MonitorType.SENSOR;
+//import static com.ft.sdk.MonitorType.SENSOR_ACCELERATION;
+//import static com.ft.sdk.MonitorType.SENSOR_BRIGHTNESS;
+//import static com.ft.sdk.MonitorType.SENSOR_MAGNETIC;
+//import static com.ft.sdk.MonitorType.SENSOR_PROXIMITY;
+//import static com.ft.sdk.MonitorType.SENSOR_ROTATION;
+//import static com.ft.sdk.MonitorType.SENSOR_STEP;
 
 /**
  * create: by huangDianHua
@@ -60,24 +60,24 @@ public class SensorUtils {
         if (sensorList == null) {
             sensorList = new ArrayList<>();
         }
-        if (FTMonitorConfig.get().isMonitorType(SENSOR) || FTMonitorConfig.get().isMonitorType(SENSOR_BRIGHTNESS)) {
-            sensorList.add(registerSensor(Sensor.TYPE_LIGHT));
-        }
-        if (FTMonitorConfig.get().isMonitorType(SENSOR) || FTMonitorConfig.get().isMonitorType(SENSOR_STEP)) {
-            sensorList.add(registerSensor(Sensor.TYPE_STEP_COUNTER));
-        }
-        if (FTMonitorConfig.get().isMonitorType(SENSOR) || FTMonitorConfig.get().isMonitorType(SENSOR_PROXIMITY)) {
-            sensorList.add(registerSensor(Sensor.TYPE_PROXIMITY));
-        }
-        if (FTMonitorConfig.get().isMonitorType(SENSOR) || FTMonitorConfig.get().isMonitorType(SENSOR_ACCELERATION)) {
-            sensorList.add(registerSensor(Sensor.TYPE_LINEAR_ACCELERATION));
-        }
-        if (FTMonitorConfig.get().isMonitorType(SENSOR) || FTMonitorConfig.get().isMonitorType(SENSOR_ROTATION)) {
-            sensorList.add(registerSensor(Sensor.TYPE_GYROSCOPE));
-        }
-        if (FTMonitorConfig.get().isMonitorType(SENSOR) || FTMonitorConfig.get().isMonitorType(SENSOR_MAGNETIC)) {
-            sensorList.add(registerSensor(Sensor.TYPE_MAGNETIC_FIELD));
-        }
+//        if (FTMonitorConfig.get().isMonitorType(SENSOR) || FTMonitorConfig.get().isMonitorType(SENSOR_BRIGHTNESS)) {
+//            sensorList.add(registerSensor(Sensor.TYPE_LIGHT));
+//        }
+//        if (FTMonitorConfig.get().isMonitorType(SENSOR) || FTMonitorConfig.get().isMonitorType(SENSOR_STEP)) {
+//            sensorList.add(registerSensor(Sensor.TYPE_STEP_COUNTER));
+//        }
+//        if (FTMonitorConfig.get().isMonitorType(SENSOR) || FTMonitorConfig.get().isMonitorType(SENSOR_PROXIMITY)) {
+//            sensorList.add(registerSensor(Sensor.TYPE_PROXIMITY));
+//        }
+//        if (FTMonitorConfig.get().isMonitorType(SENSOR) || FTMonitorConfig.get().isMonitorType(SENSOR_ACCELERATION)) {
+//            sensorList.add(registerSensor(Sensor.TYPE_LINEAR_ACCELERATION));
+//        }
+//        if (FTMonitorConfig.get().isMonitorType(SENSOR) || FTMonitorConfig.get().isMonitorType(SENSOR_ROTATION)) {
+//            sensorList.add(registerSensor(Sensor.TYPE_GYROSCOPE));
+//        }
+//        if (FTMonitorConfig.get().isMonitorType(SENSOR) || FTMonitorConfig.get().isMonitorType(SENSOR_MAGNETIC)) {
+//            sensorList.add(registerSensor(Sensor.TYPE_MAGNETIC_FIELD));
+//        }
     }
 
     private Sensor registerSensor(int type) {

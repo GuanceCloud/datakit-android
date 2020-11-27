@@ -14,10 +14,10 @@ import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.FTAutoTrackConfig;
-import com.ft.sdk.garble.FTExceptionHandler;
 import com.ft.sdk.garble.FTFlowConfig;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
+import com.ft.sdk.garble.manager.FTExceptionHandler;
 import com.ft.sdk.garble.utils.NetUtils;
 
 import org.junit.Assert;
@@ -51,16 +51,9 @@ public class SDKRunStateTest extends BaseTest {
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setUseOAID(true)//设置 OAID 是否可用
                 .setDebug(true)//设置是否是 debug
-                .setDescLog(true)
-                .setGeoKey(true, AccountUtils.getProperty(context, AccountUtils.GEO_KEY))
                 .setNeedBindUser(false)//是否需要绑定用户信息
                 .enableAutoTrack(true)//设置是否开启自动埋点
-                .setEnableAutoTrackType(FTAutoTrackType.APP_CLICK.type)//设置埋点事件类型的白名单
-                //.addPageDesc(pageAliasMap())
-                //.addVtpDesc(eventAliasMap())
-                .setPageVtpDescEnabled(true)
                 .setMonitorType(MonitorType.ALL)//设置监控项
-                .trackNetRequestTime(true)
                 .setEnableTrackAppCrash(true)
                 .setEnv("dev")
                 .setTraceSamplingRate(0.5f)

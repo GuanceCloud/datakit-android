@@ -56,40 +56,40 @@ public class MonitorTest extends BaseTest {
                 .setMonitorType(MonitorType.ALL);//设置监控项
     }
 
-    @Test
-    public void monitorBatteryTest() {
-        monitorTest(MonitorType.BATTERY);
-    }
+//    @Test
+//    public void monitorBatteryTest() {
+//        monitorTest(MonitorType.BATTERY);
+//    }
 
     @Test
     public void monitorMemoryTest() {
         monitorTest(MonitorType.MEMORY);
     }
 
-    @Test
-    public void monitorCPUTest() {
-        monitorTest(MonitorType.CPU);
-    }
+//    @Test
+//    public void monitorCPUTest() {
+//        monitorTest(MonitorType.CPU);
+//    }
+//
+//    @Test
+//    public void monitorGPUTest() {
+//        monitorTest(MonitorType.GPU);
+//    }
+//
+//    @Test
+//    public void monitorNetworkTest() {
+//        monitorTest(MonitorType.NETWORK);
+//    }
 
-    @Test
-    public void monitorGPUTest() {
-        monitorTest(MonitorType.GPU);
-    }
+//    @Test
+//    public void monitorCameraTest() {
+//        monitorTest(MonitorType.CAMERA);
+//    }
 
-    @Test
-    public void monitorNetworkTest() {
-        monitorTest(MonitorType.NETWORK);
-    }
-
-    @Test
-    public void monitorCameraTest() {
-        monitorTest(MonitorType.CAMERA);
-    }
-
-    @Test
-    public void monitorLocationTest() {
-        monitorTest(MonitorType.LOCATION);
-    }
+//    @Test
+//    public void monitorLocationTest() {
+//        monitorTest(MonitorType.LOCATION);
+//    }
 
     @Test
     public void monitorBlueToothTest() {
@@ -158,13 +158,13 @@ public class MonitorTest extends BaseTest {
      */
     private HashMap<Integer, String> createMonitorMap() {
         HashMap<Integer, String> expects = new HashMap<>();
-        expects.put(MonitorType.BATTERY, Constants.KEY_BATTERY_USE);
+//        expects.put(MonitorType.BATTERY, Constants.KEY_BATTERY_USE);
         expects.put(MonitorType.MEMORY, Constants.KEY_MEMORY_USE);
-        expects.put(MonitorType.CPU, Constants.KEY_CPU_HZ);
-        expects.put(MonitorType.GPU, Constants.KEY_GPU_RATE);
-        expects.put(MonitorType.NETWORK, Constants.KEY_NETWORK_PROXY);
-        expects.put(MonitorType.CAMERA, "camera_back_px");
-        expects.put(MonitorType.LOCATION, Constants.KEY_LOCATION_GPS_OPEN);
+//        expects.put(MonitorType.CPU, Constants.KEY_CPU_HZ);
+//        expects.put(MonitorType.GPU, Constants.KEY_GPU_RATE);
+//        expects.put(MonitorType.NETWORK, Constants.KEY_NETWORK_PROXY);
+//        expects.put(MonitorType.CAMERA, "camera_back_px");
+//        expects.put(MonitorType.LOCATION, Constants.KEY_LOCATION_GPS_OPEN);
         expects.put(MonitorType.BLUETOOTH, Constants.KEY_BT_OPEN);
         expects.put(MonitorType.SYSTEM, Constants.KEY_DEVICE_NAME);
         expects.put(MonitorType.FPS, Constants.KEY_FPS);

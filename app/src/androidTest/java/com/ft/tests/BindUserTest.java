@@ -106,6 +106,6 @@ public class BindUserTest extends BaseTest {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        FTSdk.get().bindUserData(name, "123456", jsonObject);
+        FTSdk.get().bindUserData("123456");
     }
 }

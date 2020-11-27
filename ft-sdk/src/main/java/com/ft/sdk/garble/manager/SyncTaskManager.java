@@ -1,6 +1,5 @@
 package com.ft.sdk.garble.manager;
 
-import com.ft.sdk.garble.AsyncCallback;
 import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.TokenCheck;

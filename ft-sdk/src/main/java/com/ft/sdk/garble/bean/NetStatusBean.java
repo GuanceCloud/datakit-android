@@ -3,14 +3,17 @@ package com.ft.sdk.garble.bean;
 import com.ft.sdk.garble.FTHttpConfig;
 
 public class NetStatusBean {
-    public long tcpStartTime;
-    public long tcpEndTime;
-    public long dnsStartTime;
-    public long dnsEndTime;
-    public long responseStartTime;
-    public long responseEndTime;
-    public int requestCount;
-    public int requestErrCount;
+
+    public long fetchStartTime = -1;
+    public long tcpStartTime = -1;
+    public long tcpEndTime = -1;
+    public long dnsStartTime = -1;
+    public long dnsEndTime = -1;
+    public long responseStartTime = -1;
+    public long responseEndTime = -1;
+    public long sslStartTime = -1;
+    public long sslEndTime = -1;
+
     public String requestHost;
 
     /**
@@ -27,43 +30,47 @@ public class NetStatusBean {
     }
 
     public long getTcpTime() {
-        if (tcpEndTime >= tcpStartTime) {
-            long time = tcpEndTime - tcpStartTime;
-            if (time > 10 * 1000 || time >= getResponseTime()) {
-                return 0;
-            }
-            return time;
+        if (tcpEndTime > tcpStartTime) {
+            return tcpEndTime - tcpStartTime;
         }
         return 0;
     }
 
     public long getDNSTime() {
-        if (dnsEndTime >= dnsStartTime) {
-            long time = dnsEndTime - dnsStartTime;
-            if (time > 10 * 1000 || time >= getResponseTime()) {
-                return 0;
-            }
-            return time;
+        if (dnsEndTime > dnsStartTime) {
+            return dnsEndTime - dnsStartTime;
         }
         return 0;
     }
 
     public long getResponseTime() {
-        if (responseEndTime >= responseStartTime) {
-            long time = responseEndTime - responseStartTime;
-            if (time > 10 * 1000) {
-                return 0;
-            }
-            return time;
+        return responseEndTime - responseStartTime;
+    }
+
+    public long getTTFB() {
+        if (responseStartTime > fetchStartTime) {
+            return responseStartTime - fetchStartTime;
         }
         return 0;
     }
 
-    public double getErrorRate() {
-        if (requestCount > 0) {
-            double rate = requestErrCount * 1.0 / requestCount;
-            return Math.floor(rate * 100) / 100.0;
+    public long getSSLTime() {
+        if (sslEndTime > sslStartTime) {
+            return sslEndTime - sslStartTime;
         }
         return 0;
+    }
+
+    public void reset() {
+        fetchStartTime = -1;
+        tcpStartTime = -1;
+        tcpEndTime = -1;
+        dnsStartTime = -1;
+        dnsEndTime = -1;
+        responseStartTime = -1;
+        responseEndTime = -1;
+        sslStartTime = -1;
+        sslEndTime = -1;
+        requestHost = null;
     }
 }

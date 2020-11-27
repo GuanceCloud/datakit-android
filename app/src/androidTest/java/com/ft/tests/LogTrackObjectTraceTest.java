@@ -8,18 +8,17 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.ft.AccountUtils;
 import com.ft.BaseTest;
 import com.ft.application.MockApplication;
+import com.ft.sdk.FTLogger;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTrack;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.TraceType;
-import com.ft.sdk.garble.AsyncCallback;
-import com.ft.sdk.garble.FTTrackInner;
 import com.ft.sdk.garble.bean.DataType;
-import com.ft.sdk.garble.bean.ObjectBean;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
+import com.ft.sdk.garble.manager.AsyncCallback;
 import com.ft.sdk.garble.manager.SyncDataHelper;
 import com.ft.sdk.garble.manager.SyncTaskManager;
 import com.ft.sdk.garble.utils.Constants;
@@ -63,12 +62,8 @@ public class LogTrackObjectTraceTest extends BaseTest {
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setUseOAID(true)//设置 OAID 是否可用
                 .setDebug(true)//设置是否是 debug
-                .setDescLog(true)
-                .setGeoKey(true, AccountUtils.getProperty(context, AccountUtils.GEO_KEY))
                 .setNeedBindUser(false)//是否需要绑定用户信息
-                .setPageVtpDescEnabled(true)
                 .setMonitorType(MonitorType.ALL)//设置监控项
-                .trackNetRequestTime(true)
                 .setEnableTrackAppCrash(true)
                 .setEnv("dev")
                 .setTraceSamplingRate(1f)
@@ -89,7 +84,7 @@ public class LogTrackObjectTraceTest extends BaseTest {
     @Test
     public void logInsertDataTest() throws InterruptedException {
         //产生一条日志数据
-        FTTrack.getInstance().logBackground("----logInsertDataTest----", Status.CRITICAL);
+        FTLogger.getInstance().logBackground("----logInsertDataTest----", Status.CRITICAL);
         //线程池中插入，有一定的时间延迟，这里设置5秒等待时间
         Thread.sleep(5000);
         //从数据库中查询是否有插入的数据
@@ -105,7 +100,7 @@ public class LogTrackObjectTraceTest extends BaseTest {
     @Test
     public void logUpdateDataTest() throws InterruptedException {
         //产生一条日志数据
-        FTTrack.getInstance().logBackground("----logUpdateDataTest----", Status.CRITICAL);
+        FTLogger.getInstance().logBackground("----logUpdateDataTest----", Status.CRITICAL);
         //线程池中插入，有一定的时间延迟，这里设置5秒等待时间
         Thread.sleep(5000);
         uploadData(DataType.LOG);
@@ -120,7 +115,7 @@ public class LogTrackObjectTraceTest extends BaseTest {
     @Test
     public void logSyncTest() throws InterruptedException {
         startSyncTask();
-        FTTrack.getInstance().logBackground("----logUploadTest----", Status.CRITICAL);
+        FTLogger.getInstance().logBackground("----logUploadTest----", Status.CRITICAL);
         Thread.sleep(12000);
         int except = countInDB(DataType.LOG, "----logUploadTest----");
         Assert.assertEquals(0, except);
@@ -146,6 +141,7 @@ public class LogTrackObjectTraceTest extends BaseTest {
 
     /**
      * 数据存储过程中，浮点型是否会变为整型
+     *
      * @throws JSONException
      * @throws InterruptedException
      */
@@ -202,50 +198,50 @@ public class LogTrackObjectTraceTest extends BaseTest {
         Assert.assertEquals(0, except);
     }
 
-    /**
-     * 插入一条 object 数据测试
-     *
-     * @throws InterruptedException
-     * @throws JSONException
-     */
-    @Test
-    public void objectInsertDataTest() throws InterruptedException, JSONException {
-        ObjectBean objectBean = new ObjectBean("objectTest");
-        FTTrackInner.getInstance().objectBackground(objectBean);
-        Thread.sleep(5000);
-        int except = countInDB(DataType.OBJECT, "objectTest");
-        Assert.assertEquals(1, except);
-    }
-
-    /**
-     * 上传一条 object 数据测试
-     *
-     * @throws InterruptedException
-     * @throws JSONException
-     */
-    @Test
-    public void objectUploadDataTest() throws InterruptedException, JSONException {
-        ObjectBean objectBean = new ObjectBean("objectTest");
-        FTTrackInner.getInstance().objectBackground(objectBean);
-        Thread.sleep(5000);
-        uploadData(DataType.OBJECT);
-    }
-
-    /**
-     * 同步删除测试
-     *
-     * @throws InterruptedException
-     * @throws JSONException
-     */
-    @Test
-    public void objectSyncTest() throws InterruptedException, JSONException {
-        startSyncTask();
-        ObjectBean objectBean = new ObjectBean("objectTest");
-        FTTrackInner.getInstance().objectBackground(objectBean);
-        Thread.sleep(12000);
-        int except = countInDB(DataType.OBJECT, "objectTest");
-        Assert.assertEquals(0, except);
-    }
+//    /**
+//     * 插入一条 object 数据测试
+//     *
+//     * @throws InterruptedException
+//     * @throws JSONException
+//     */
+//    @Test
+//    public void objectInsertDataTest() throws InterruptedException, JSONException {
+//        ObjectBean objectBean = new ObjectBean("objectTest");
+//        FTTrackInner.getInstance().objectBackground(objectBean);
+//        Thread.sleep(5000);
+//        int except = countInDB(DataType.OBJECT, "objectTest");
+//        Assert.assertEquals(1, except);
+//    }
+//
+//    /**
+//     * 上传一条 object 数据测试
+//     *
+//     * @throws InterruptedException
+//     * @throws JSONException
+//     */
+//    @Test
+//    public void objectUploadDataTest() throws InterruptedException, JSONException {
+//        ObjectBean objectBean = new ObjectBean("objectTest");
+//        FTTrackInner.getInstance().objectBackground(objectBean);
+//        Thread.sleep(5000);
+//        uploadData(DataType.OBJECT);
+//    }
+//
+//    /**
+//     * 同步删除测试
+//     *
+//     * @throws InterruptedException
+//     * @throws JSONException
+//     */
+//    @Test
+//    public void objectSyncTest() throws InterruptedException, JSONException {
+//        startSyncTask();
+//        ObjectBean objectBean = new ObjectBean("objectTest");
+//        FTTrackInner.getInstance().objectBackground(objectBean);
+//        Thread.sleep(12000);
+//        int except = countInDB(DataType.OBJECT, "objectTest");
+//        Assert.assertEquals(0, except);
+//    }
 
     /**
      * trace 一个正常的网络
@@ -291,7 +287,7 @@ public class LogTrackObjectTraceTest extends BaseTest {
         Thread.sleep(5000);
         int except1 = countInDB(DataType.LOG, except);
         startSyncTask();
-        FTTrack.getInstance().logBackground("----traceDataTest----", Status.CRITICAL);
+        FTLogger.getInstance().logBackground("----traceDataTest----", Status.CRITICAL);
         Thread.sleep(12000);
         int except2 = countInDB(DataType.LOG, except);
         Assert.assertTrue(except1 > 0);

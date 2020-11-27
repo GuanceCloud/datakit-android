@@ -1,5 +1,6 @@
 package com.ft.sdk.garble.http;
 
+import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -33,16 +34,16 @@ public class NetProxy {
         engine = EngineFactory.createEngine();
         try {
             engine.defaultConfig(httpBuilder);
-        }catch (Exception e){
-            LogUtils.e(TAG,e.getLocalizedMessage());
+        } catch (Exception e) {
+            LogUtils.e(TAG, e.getLocalizedMessage());
         }
     }
 
-    public <T extends ResponseData> T execute(Class<T> tClass){
-        if(!Utils.isNetworkAvailable()){
+    public <T extends ResponseData> T execute(Class<T> tClass) {
+        if (!Utils.isNetworkAvailable()) {
             return getResponseData(tClass, NetCodeStatus.NETWORK_EXCEPTION_CODE, "网络未连接");
         }
-        if(!httpBuilder.getUrl().startsWith("http://") && !httpBuilder.getUrl().startsWith("https://")){
+        if (!httpBuilder.getUrl().startsWith("http://") && !httpBuilder.getUrl().startsWith("https://")) {
             //请求地址为空是提示错误
             return getResponseData(tClass, NetCodeStatus.UNKNOWN_EXCEPTION_CODE, "请求地址错误");
         }
@@ -52,12 +53,12 @@ public class NetProxy {
         }
         engine.createRequest(httpBuilder);
         ResponseData responseData = engine.execute();
-        if(responseData != null) {
-            if(httpBuilder.isShowLog()) {
-                LogUtils.d(TAG,"HTTP-response:[code:" + responseData.getHttpCode() + ",response:" + responseData.getData() + "]");
+        if (responseData != null) {
+            if (httpBuilder.isShowLog()) {
+                LogUtils.d(TAG, "HTTP-response:[code:" + responseData.getHttpCode() + ",response:" + responseData.getData() + "]");
             }
             return getResponseData(tClass, responseData.getHttpCode(), responseData.getData());
-        }else{
+        } else {
             return getResponseData(tClass, NetCodeStatus.UNKNOWN_EXCEPTION_CODE, "");
         }
     }
@@ -92,6 +93,7 @@ public class NetProxy {
 
     /**
      * 获取签名
+     *
      * @return
      */
     private String getSignature() {
@@ -103,6 +105,7 @@ public class NetProxy {
 
     /**
      * MD5 加密 请求内容
+     *
      * @return
      */
     private String getContentMD5WithBase64() {
@@ -120,17 +123,21 @@ public class NetProxy {
     }
 
     /**
-     *  设置请求的 Head 参数
+     * 设置请求的 Head 参数
      */
     private void setHeadParams() {
-        HashMap<String,String> head = httpBuilder.getHeadParams();
-        if(head == null){
+        HashMap<String, String> head = httpBuilder.getHeadParams();
+        if (head == null) {
             head = new HashMap<>();
         }
         head.put("X-Datakit-UUID", ftHttpConfig.uuid);
-        head.put("User-Agent", ftHttpConfig.userAgent);
+        head.put("User-Agent", ftHttpConfig.userAgent +
+                ";agent_" + FTSdk.AGENT_VERSION +
+                ";autotrack_" + FTSdk.PLUGIN_VERSION+
+                ";native"
+        );
         head.put("Accept-Language", "zh-CN");
-        if(!head.containsKey("Content-Type")) {
+        if (!head.containsKey("Content-Type")) {
             head.put("Content-Type", CONTENT_TYPE);
         }
         head.put("charset", CHARSET);

@@ -16,108 +16,90 @@ import java.util.Map;
 public class FTAliasConfig {
     private static FTAliasConfig instance;
     //页面别名对应 map
-    private Map<String,String> pageAliasMap;
+    private Map<String, String> pageAliasMap;
     //事件别名对应 map
-    private Map<String,String> eventAliasMap;
+    private Map<String, String> eventAliasMap;
 
-    @Deprecated
-    private boolean flowChartAlias = false;
     private boolean pageVtpAlias = false;
-    private FTAliasConfig(){}
 
-    public static FTAliasConfig get(){
-        if(instance == null){
+    private FTAliasConfig() {
+    }
+
+    public static FTAliasConfig get() {
+        if (instance == null) {
             instance = new FTAliasConfig();
         }
         return instance;
     }
 
-    public void release(){
+    public void release() {
         pageAliasMap = null;
         eventAliasMap = null;
         instance = null;
     }
 
-    public void initParams(FTSDKConfig ftsdkConfig){
-        this.pageAliasMap = ftsdkConfig.getPageDescMap();
-        this.eventAliasMap = ftsdkConfig.getVtpDescMap();
-        this.flowChartAlias = ftsdkConfig.isFlowChartDescEnabled();
-        this.pageVtpAlias = ftsdkConfig.isPageVtpDescEnabled();
-        if(pageVtpAlias){
-            ThreadPoolUtils.get().execute(() -> {
-                Map<String,String>[] maps = DescXmlParse.readXmlBySAX();
-                if(maps != null && maps.length == 2){
-                    if (pageAliasMap != null) {
-                        pageAliasMap.putAll(maps[0]);
-                    }else{
-                        pageAliasMap = maps[0];
-                    }
-                    if (eventAliasMap != null) {
-                        eventAliasMap.putAll(maps[1]);
-                    }else{
-                        eventAliasMap = maps[1];
-                    }
-                }
-            });
-        }
+    public void initParams(FTSDKConfig ftsdkConfig) {
+//        this.pageAliasMap = ftsdkConfig.getPageDescMap();
+//        this.eventAliasMap = ftsdkConfig.getVtpDescMap();
+//        this.pageVtpAlias = ftsdkConfig.isPageVtpDescEnabled();
+//        if (pageVtpAlias) {
+//            ThreadPoolUtils.get().execute(() -> {
+//                Map<String, String>[] maps = DescXmlParse.readXmlBySAX();
+//                if (maps != null && maps.length == 2) {
+//                    if (pageAliasMap != null) {
+//                        pageAliasMap.putAll(maps[0]);
+//                    } else {
+//                        pageAliasMap = maps[0];
+//                    }
+//                    if (eventAliasMap != null) {
+//                        eventAliasMap.putAll(maps[1]);
+//                    } else {
+//                        eventAliasMap = maps[1];
+//                    }
+//                }
+//            });
+//        }
     }
 
-    /**
-     * 返回流程图描述
-     * @param page
-     * @return
-     */
-    public String getFlowChartDesc(String page){
-        if(!flowChartAlias){
-            return page;
-        }
-        if(pageAliasMap == null){
-            return page;
-        }
-        String pageDesc = pageAliasMap.get(page);
-        if(Utils.isNullOrEmpty(pageDesc)){
-            return page;
-        }else{
-            return pageDesc;
-        }
-    }
 
     /**
      * 返回视图树描述
+     *
      * @param vtp
      * @return
      */
-    public String getVtpDesc(String vtp){
-        if(!pageVtpAlias){
+    public String getVtpDesc(String vtp) {
+        if (!pageVtpAlias) {
             return Constants.UNKNOWN;
         }
-        if(eventAliasMap == null){
+        if (eventAliasMap == null) {
             return Constants.UNKNOWN;
         }
         String vtpDesc = eventAliasMap.get(vtp);
-        if(Utils.isNullOrEmpty(vtpDesc)){
+        if (Utils.isNullOrEmpty(vtpDesc)) {
             return Constants.UNKNOWN;
-        }else{
+        } else {
             return vtpDesc;
         }
     }
 
     /**
      * 返回页面描述
+     *
      * @param page
      * @return
      */
-    public String getPageDesc(String page){
-        if(!pageVtpAlias){
+    public String getPageDesc(String page) {
+        if (!pageVtpAlias) {
             return Constants.UNKNOWN;
         }
-        if(pageAliasMap == null){
+        if (pageAliasMap == null) {
             return Constants.UNKNOWN;
         }
         String pageDesc = pageAliasMap.get(page);
-        if(Utils.isNullOrEmpty(pageDesc)){
+        if (Utils.isNullOrEmpty(pageDesc)) {
             return Constants.UNKNOWN;
-        }else{
+        } else {
             return pageDesc;
         }
     }

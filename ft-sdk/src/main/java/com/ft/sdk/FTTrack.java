@@ -1,18 +1,11 @@
 package com.ft.sdk;
 
-import com.ft.sdk.garble.FTExceptionHandler;
-import com.ft.sdk.garble.FTTrackInner;
-import com.ft.sdk.garble.AsyncCallback;
-import com.ft.sdk.garble.bean.LogBean;
-import com.ft.sdk.garble.bean.LogData;
 import com.ft.sdk.garble.bean.OP;
-import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.bean.TrackBean;
-import com.ft.sdk.garble.utils.Utils;
+import com.ft.sdk.garble.manager.AsyncCallback;
 
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -75,37 +68,4 @@ public class FTTrack {
     }
 
 
-    /**
-     * 将单条日志数据存入本地同步
-     *
-     * @param content
-     * @param status
-     */
-    public void logBackground(String content, Status status) {
-        LogBean logBean = new LogBean(Utils.translateFieldValue(content), System.currentTimeMillis());
-        logBean.setServiceName(FTExceptionHandler.get().getTrackServiceName());
-        logBean.setStatus(status);
-        logBean.setEnv(FTExceptionHandler.get().getEnv());
-        FTTrackInner.getInstance().logBackground(logBean);
-    }
-
-    /**
-     * 将多条日志数据存入本地同步(异步)
-     *
-     * @param logDataList
-     */
-    public void logBackground(List<LogData> logDataList) {
-        if (logDataList == null) {
-            return;
-        }
-        List<LogBean> logBeans = new ArrayList<>();
-        for (LogData logData : logDataList) {
-            LogBean logBean = new LogBean(Utils.translateFieldValue(logData.getContent()), System.currentTimeMillis());
-            logBean.setServiceName(FTExceptionHandler.get().getTrackServiceName());
-            logBean.setStatus(logData.getStatus());
-            logBean.setEnv(FTExceptionHandler.get().getEnv());
-            logBeans.add(logBean);
-        }
-        FTTrackInner.getInstance().logBackground(logBeans);
-    }
 }

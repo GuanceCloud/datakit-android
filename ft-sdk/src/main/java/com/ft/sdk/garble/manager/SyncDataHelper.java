@@ -111,20 +111,11 @@ public class SyncDataHelper {
     public String getTrackBodyContent(List<SyncJsonData> datas) {
         StringBuilder sb = new StringBuilder();
         String device = parseHashToString(getBaseDeviceInfoTagsMap());
-        String uuid = parseHashToString(getUniqueIdMap());
 
         for (SyncJsonData recordData : datas) {
             //获取这条事件的指标
             sb.append(getMeasurement(recordData));
             //获取埋点事件数据
-            if (!CLIENT_ACTIVATED_TIME.equals(recordData.getOpData().getOp())
-                    && !HTTP_CLIENT.equals(recordData.getOpData().getOp())
-                    && !HTTP_CLIENT.equals(recordData.getOpData().getOp())
-                    && !WEBVIEW_LOAD_COMPLETED.equals(recordData.getOpData().getOp())
-                    && !WEBVIEW_LOADING.equals(recordData.getOpData().getOp())) {
-                sb.append(",");
-                sb.append(uuid);
-            }
             sb.append(",");
             sb.append(device);
             //获取埋点事件数据
@@ -136,9 +127,16 @@ public class SyncDataHelper {
 
     public String getLogBodyContent(List<SyncJsonData> datas) {
         StringBuilder sb = new StringBuilder();
+        String device = parseHashToString(getBaseDeviceInfoTagsMap());
+        String uuid = parseHashToString(getUniqueIdMap());
+
         for (SyncJsonData recordData : datas) {
             //获取这条事件的指标
             sb.append(getMeasurement(recordData));
+            sb.append(",");
+            sb.append(device);
+            sb.append(",");
+            sb.append(uuid);
             //获取埋点事件数据
             sb.append(composeUpdateData(recordData));
             sb.append(Constants.SEPARATION_LINE_BREAK);
@@ -277,7 +275,7 @@ public class SyncDataHelper {
         if (FTUserConfig.get().isNeedBindUser() && FTUserConfig.get().isUserDataBinded()) {
             UserData userData = FTUserConfig.get().getUserData(opData.getSessionId());
             if (userData != null) {
-                sb.append(Constants.KEY_PAGE_EVENT_USER_NAME).append("=").append(Utils.translateTagKeyValue(userData.getName())).append(",");
+//                sb.append(Constants.KEY_PAGE_EVENT_USER_NAME).append("=").append(Utils.translateTagKeyValue(userData.getName())).append(",");
                 sb.append(Constants.KEY_PAGE_EVENT_USER_ID).append("=").append(Utils.translateTagKeyValue(userData.getId())).append(",");
                 JSONObject js = userData.getExts();
                 if (js == null) {
@@ -331,32 +329,32 @@ public class SyncDataHelper {
      */
     public static void addMonitorData(JSONObject tags, JSONObject fields) {
         try {
-            if (FTMonitorConfig.get().isMonitorType(MonitorType.BATTERY)) {
-                //电池
-                createBattery(tags, fields);
-            }
+//            if (FTMonitorConfig.get().isMonitorType(MonitorType.BATTERY)) {
+//                //电池
+//                createBattery(tags, fields);
+//            }
             if (FTMonitorConfig.get().isMonitorType(MonitorType.MEMORY)) {
                 //内存
                 createMemory(tags, fields);
             }
-            if (FTMonitorConfig.get().isMonitorType(MonitorType.CPU)) {
-                //CPU
-                createCPU(tags, fields);
-            }
-            if (FTMonitorConfig.get().isMonitorType(MonitorType.GPU)) {
-                //GPU
-                createGPU(tags, fields);
-            }
-            if (FTMonitorConfig.get().isMonitorType(MonitorType.NETWORK)) {
-                //网络
-                createNetWork(tags, fields);
-            }
-            if (FTMonitorConfig.get().isMonitorType(MonitorType.CAMERA)) {
-                createCamera(tags, fields);
-            }
-            if (FTMonitorConfig.get().isMonitorType(MonitorType.LOCATION)) {
-                createLocation(tags, fields);
-            }
+//            if (FTMonitorConfig.get().isMonitorType(MonitorType.CPU)) {
+//                //CPU
+//                createCPU(tags, fields);
+//            }
+//            if (FTMonitorConfig.get().isMonitorType(MonitorType.GPU)) {
+//                //GPU
+//                createGPU(tags, fields);
+//            }
+//            if (FTMonitorConfig.get().isMonitorType(MonitorType.NETWORK)) {
+//                //网络
+//                createNetWork(tags, fields);
+//            }
+//            if (FTMonitorConfig.get().isMonitorType(MonitorType.CAMERA)) {
+//                createCamera(tags, fields);
+//            }
+//            if (FTMonitorConfig.get().isMonitorType(MonitorType.LOCATION)) {
+//                createLocation(tags, fields);
+//            }
             if (FTMonitorConfig.get().isMonitorType(MonitorType.BLUETOOTH)) {
                 createBluetooth(tags, fields);
             }
@@ -368,7 +366,7 @@ public class SyncDataHelper {
                 createFps(tags, fields);
             }
             //传感器
-            createSensor(tags, fields);
+//            createSensor(tags, fields);
         } catch (Exception e) {
         }
     }
@@ -479,7 +477,7 @@ public class SyncDataHelper {
                     fields.put(Constants.KEY_NETWORK_DNS_TIME, lastStatus.getDNSTime());
                     fields.put(Constants.KEY_NETWORK_RESPONSE_TIME, lastStatus.getResponseTime());
                 }
-                fields.put(Constants.KEY_NETWORK_ERROR_RATE, lastStatus.getErrorRate());
+//                fields.put(Constants.KEY_NETWORK_ERROR_RATE, lastStatus.getErrorRate());
             }
         } catch (Exception e) {
             LogUtils.e(TAG, "网络数据获取异常:" + e.getMessage());
@@ -561,56 +559,56 @@ public class SyncDataHelper {
         }
     }
 
-    private static void createSensor(JSONObject tags, JSONObject fields) {
-        try {
-            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR)
-                    || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_BRIGHTNESS)) {
-                fields.put(Constants.KEY_SENSOR_BRIGHTNESS, DeviceUtils.getSystemScreenBrightnessValue());
-            }
-            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR)
-                    || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_LIGHT)) {
-                fields.put(Constants.KEY_SENSOR_LIGHT, SensorUtils.get().getSensorLight());
-            }
-            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR)
-                    || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_PROXIMITY)) {
-                fields.put(Constants.KEY_SENSOR_PROXIMITY, SensorUtils.get().getDistance());
-            }
-            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR)
-                    || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_STEP)) {
-                fields.put(Constants.KEY_SENSOR_STEPS, (int) SensorUtils.get().getTodayStep());
-            }
-            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR)
-                    || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_ROTATION)) {
-                float[] rotation = SensorUtils.get().getGyroscope();
-                if (rotation != null && rotation.length == 3) {
-                    fields.put(Constants.KEY_SENSOR_ROTATION_X, rotation[0]);
-                    fields.put(Constants.KEY_SENSOR_ROTATION_Y, rotation[1]);
-                    fields.put(Constants.KEY_SENSOR_ROTATION_Z, rotation[2]);
-                }
-            }
-            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_ACCELERATION)) {
-                float[] acceleration = SensorUtils.get().getAcceleration();
-                if (acceleration != null && acceleration.length == 3) {
-                    fields.put(Constants.KEY_SENSOR_ACCELERATION_X, acceleration[0]);
-                    fields.put(Constants.KEY_SENSOR_ACCELERATION_Y, acceleration[1]);
-                    fields.put(Constants.KEY_SENSOR_ACCELERATION_Z, acceleration[2]);
-                }
-            }
-            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_MAGNETIC)) {
-                float[] magnetic = SensorUtils.get().getMagnetic();
-                if (magnetic != null && magnetic.length == 3) {
-                    fields.put(Constants.KEY_SENSOR_MAGNETIC_X, magnetic[0]);
-                    fields.put(Constants.KEY_SENSOR_MAGNETIC_Y, magnetic[1]);
-                    fields.put(Constants.KEY_SENSOR_MAGNETIC_Z, magnetic[2]);
-                }
-            }
-            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_TORCH)) {
-                createTorch(tags, fields);
-            }
-        } catch (Exception e) {
-            LogUtils.e(TAG, "传感器数据获取异常:" + e.getMessage());
-        }
-    }
+//    private static void createSensor(JSONObject tags, JSONObject fields) {
+//        try {
+//            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR)
+//                    || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_BRIGHTNESS)) {
+//                fields.put(Constants.KEY_SENSOR_BRIGHTNESS, DeviceUtils.getSystemScreenBrightnessValue());
+//            }
+//            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR)
+//                    || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_LIGHT)) {
+//                fields.put(Constants.KEY_SENSOR_LIGHT, SensorUtils.get().getSensorLight());
+//            }
+//            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR)
+//                    || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_PROXIMITY)) {
+//                fields.put(Constants.KEY_SENSOR_PROXIMITY, SensorUtils.get().getDistance());
+//            }
+//            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR)
+//                    || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_STEP)) {
+//                fields.put(Constants.KEY_SENSOR_STEPS, (int) SensorUtils.get().getTodayStep());
+//            }
+//            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR)
+//                    || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_ROTATION)) {
+//                float[] rotation = SensorUtils.get().getGyroscope();
+//                if (rotation != null && rotation.length == 3) {
+//                    fields.put(Constants.KEY_SENSOR_ROTATION_X, rotation[0]);
+//                    fields.put(Constants.KEY_SENSOR_ROTATION_Y, rotation[1]);
+//                    fields.put(Constants.KEY_SENSOR_ROTATION_Z, rotation[2]);
+//                }
+//            }
+//            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_ACCELERATION)) {
+//                float[] acceleration = SensorUtils.get().getAcceleration();
+//                if (acceleration != null && acceleration.length == 3) {
+//                    fields.put(Constants.KEY_SENSOR_ACCELERATION_X, acceleration[0]);
+//                    fields.put(Constants.KEY_SENSOR_ACCELERATION_Y, acceleration[1]);
+//                    fields.put(Constants.KEY_SENSOR_ACCELERATION_Z, acceleration[2]);
+//                }
+//            }
+//            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_MAGNETIC)) {
+//                float[] magnetic = SensorUtils.get().getMagnetic();
+//                if (magnetic != null && magnetic.length == 3) {
+//                    fields.put(Constants.KEY_SENSOR_MAGNETIC_X, magnetic[0]);
+//                    fields.put(Constants.KEY_SENSOR_MAGNETIC_Y, magnetic[1]);
+//                    fields.put(Constants.KEY_SENSOR_MAGNETIC_Z, magnetic[2]);
+//                }
+//            }
+//            if (FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR) || FTMonitorConfig.get().isMonitorType(MonitorType.SENSOR_TORCH)) {
+//                createTorch(tags, fields);
+//            }
+//        } catch (Exception e) {
+//            LogUtils.e(TAG, "传感器数据获取异常:" + e.getMessage());
+//        }
+//    }
 
     private static void createFps(JSONObject tags, JSONObject fields) {
         try {
@@ -722,16 +720,16 @@ public class SyncDataHelper {
         Context context = FTApplication.getApplication();
         HashMap<String, Object> objectHashMap = new HashMap<>();
         objectHashMap.put(Constants.KEY_DEVICE_APPLICATION_ID, DeviceUtils.getApplicationId(context));
-        objectHashMap.put(Constants.KEY_DEVICE_APPLICATION_NAME, DeviceUtils.getAppName(context));
-        objectHashMap.put(Constants.KEY_DEVICE_SDK_AGENT, DeviceUtils.getSDKVersion());
-        objectHashMap.put(Constants.KEY_DEVICE_SDK_AUTO_TRACK, FTSdk.PLUGIN_VERSION);
+//        objectHashMap.put(Constants.KEY_DEVICE_APPLICATION_NAME, DeviceUtils.getAppName(context));
+//        objectHashMap.put(Constants.KEY_DEVICE_SDK_AGENT, DeviceUtils.getSDKVersion());
+//        objectHashMap.put(Constants.KEY_DEVICE_SDK_AUTO_TRACK, FTSdk.PLUGIN_VERSION);
         objectHashMap.put(Constants.KEY_DEVICE_OS, DeviceUtils.getOSName());
         objectHashMap.put(Constants.KEY_DEVICE_OS_VERSION, DeviceUtils.getOSVersion());
         objectHashMap.put(Constants.KEY_DEVICE_DEVICE_BAND, DeviceUtils.getDeviceBand());
         objectHashMap.put(Constants.KEY_DEVICE_DEVICE_MODEL, DeviceUtils.getDeviceModel());
         objectHashMap.put(Constants.KEY_DEVICE_DISPLAY, DeviceUtils.getDisplay(context));
-        objectHashMap.put(Constants.KEY_DEVICE_CARRIER, DeviceUtils.getCarrier(context));
-        objectHashMap.put(Constants.KEY_DEVICE_LOCALE, Locale.getDefault());
+//        objectHashMap.put(Constants.KEY_DEVICE_CARRIER, DeviceUtils.getCarrier(context));
+//        objectHashMap.put(Constants.KEY_DEVICE_LOCALE, Locale.getDefault());
         objectHashMap.put(Constants.KEY_APP_VERSION_NAME, Utils.getAppVersionName());
         return objectHashMap;
     }
@@ -741,7 +739,7 @@ public class SyncDataHelper {
         Context context = FTApplication.getApplication();
         HashMap<String, Object> objectHashMap = new HashMap<>();
         objectHashMap.put(Constants.KEY_DEVICE_UUID, DeviceUtils.getUuid(context));
-        objectHashMap.put(Constants.KEY_DEVICE_IMEI, DeviceUtils.getImei(context));
+//        objectHashMap.put(Constants.KEY_DEVICE_IMEI, DeviceUtils.getImei(context));
         if (FTHttpConfig.get().useOaid) {
             objectHashMap.put(Constants.KEY_DEVICE_OAID, OaidUtils.getOAID(context));
         }

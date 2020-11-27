@@ -1,6 +1,7 @@
 package com.ft.sdk.garble.http;
 
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.PackageUtils;
 
 /**
  * create: by huangDianHua
@@ -9,19 +10,17 @@ import com.ft.sdk.garble.utils.LogUtils;
  */
 public class EngineFactory {
     public static final String TAG = "EngineFactory";
-    private static boolean trackNetTime;
+    private static boolean netWorkTrace;
 
-    public static void setTrackNetTime(boolean trackNetTime) {
-        EngineFactory.trackNetTime = trackNetTime;
+    public static void setNetWorkTrace(boolean netWorkTrace) {
+        EngineFactory.netWorkTrace = netWorkTrace;
     }
 
-    public static INetEngine createEngine(){
-        if(trackNetTime){
+    public static INetEngine createEngine() {
+        if (netWorkTrace) {
             try {
-                try {
-                    Class.forName("okhttp3.OkHttpClient");
-                } catch (ClassNotFoundException e) {
-                    LogUtils.e(TAG,"检测到你开启了网络请求时长监控，但是你没有依赖 okHttp。使用该功能请先在项目中依赖 okHttp");
+                if (!PackageUtils.isNativeLibrarySupport()) {
+                    LogUtils.e(TAG, "检测到你开启了网络链路追踪，但是你没有依赖 okHttp。使用该功能请先在项目中依赖 okHttp");
                     return new NativeNetEngine();
                 }
                 return new OkHttpEngine();
