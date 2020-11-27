@@ -1,7 +1,6 @@
 package com.ft.sdk.garble.http;
 
 import com.ft.sdk.garble.bean.NetStatusBean;
-import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.NetUtils;
 
 import org.jetbrains.annotations.NotNull;
@@ -17,90 +16,88 @@ import okhttp3.Call;
 import okhttp3.EventListener;
 import okhttp3.Handshake;
 import okhttp3.Protocol;
-import okhttp3.Request;
-import okhttp3.Response;
 
 /**
  *
  */
 public class NetStatusMonitor extends EventListener {
 
-    private long tcpStartTime;
-    private long tcpEndTime;
-    private long dnsStartTime;
-    private long dnsEndTime;
-    private long responseStartTime;
-    private long responseEndTime;
-    private int requestCount;
-    private int requestErrCount;
-    private String requestHost;
+    private final NetStatusBean netStatusBean = new NetStatusBean();
 
     @Override
     public void callEnd(@NotNull Call call) {
         super.callEnd(call);
-        responseEndTime = System.currentTimeMillis();
-
-        NetStatusBean netStatusBean = new NetStatusBean();
-        netStatusBean.dnsStartTime = dnsStartTime;
-        netStatusBean.dnsEndTime = dnsEndTime;
-        netStatusBean.responseStartTime = responseStartTime;
-        netStatusBean.responseEndTime = responseEndTime;
-        netStatusBean.requestHost = requestHost;
-        netStatusBean.requestCount = requestCount;
-        netStatusBean.tcpStartTime = tcpStartTime;
-        netStatusBean.tcpEndTime = tcpEndTime;
-        netStatusBean.requestErrCount = requestErrCount;
         NetUtils.get().setLastMonitorStatus(netStatusBean);
-
     }
 
     @Override
     public void callFailed(@NotNull Call call, @NotNull IOException ioe) {
         super.callFailed(call, ioe);
-        requestErrCount += 1;
     }
 
     @Override
     public void callStart(@NotNull Call call) {
         super.callStart(call);
-        requestHost = call.request().url().host();
-        requestCount += 1;
-        responseStartTime = System.currentTimeMillis();
+        netStatusBean.reset();
+        netStatusBean.requestHost = call.request().url().host();
+        netStatusBean.fetchStartTime = System.currentTimeMillis();
+
+    }
+
+    @Override
+    public void responseHeadersStart(@NotNull Call call) {
+        super.responseHeadersStart(call);
+        netStatusBean.responseStartTime = System.currentTimeMillis();
+
+    }
+
+    @Override
+    public void responseBodyEnd(@NotNull Call call, long byteCount) {
+        super.responseBodyEnd(call, byteCount);
+        netStatusBean.responseEndTime = System.currentTimeMillis();
+    }
+
+    @Override
+    public void responseFailed(@NotNull Call call, @NotNull IOException ioe) {
+        super.responseFailed(call, ioe);
     }
 
     @Override
     public void dnsEnd(@NotNull Call call, @NotNull String domainName, @NotNull List<InetAddress> inetAddressList) {
         super.dnsEnd(call, domainName, inetAddressList);
-        dnsEndTime = System.currentTimeMillis();
+        netStatusBean.dnsEndTime = System.currentTimeMillis();
     }
 
     @Override
     public void dnsStart(@NotNull Call call, @NotNull String domainName) {
         super.dnsStart(call, domainName);
-        dnsStartTime = System.currentTimeMillis();
+        netStatusBean.dnsStartTime = System.currentTimeMillis();
     }
 
     @Override
     public void secureConnectEnd(@NotNull Call call, @Nullable Handshake handshake) {
         super.secureConnectEnd(call, handshake);
+        netStatusBean.sslEndTime = System.currentTimeMillis();
+
     }
 
     @Override
     public void secureConnectStart(@NotNull Call call) {
         super.secureConnectStart(call);
+        netStatusBean.sslStartTime = System.currentTimeMillis();
     }
 
     @Override
     public void connectStart(@NotNull Call call, @NotNull InetSocketAddress inetSocketAddress, @NotNull Proxy proxy) {
         super.connectStart(call, inetSocketAddress, proxy);
-        tcpStartTime = System.currentTimeMillis();
+        netStatusBean.tcpStartTime = System.currentTimeMillis();
 
     }
 
     @Override
     public void connectEnd(@NotNull Call call, @NotNull InetSocketAddress inetSocketAddress, @NotNull Proxy proxy, @Nullable Protocol protocol) {
         super.connectEnd(call, inetSocketAddress, proxy, protocol);
-        tcpEndTime = System.currentTimeMillis();
+        netStatusBean.tcpEndTime = System.currentTimeMillis();
     }
 
 

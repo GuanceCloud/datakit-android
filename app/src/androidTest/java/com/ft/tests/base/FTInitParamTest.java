@@ -11,8 +11,8 @@ import com.ft.sdk.BuildConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTrack;
-import com.ft.sdk.garble.FTExceptionHandler;
-import com.ft.sdk.garble.AsyncCallback;
+import com.ft.sdk.garble.manager.FTExceptionHandler;
+import com.ft.sdk.garble.manager.AsyncCallback;
 
 import org.json.JSONException;
 import org.json.JSONObject;

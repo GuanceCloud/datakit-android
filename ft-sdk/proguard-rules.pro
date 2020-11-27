@@ -78,7 +78,7 @@
      *;
 }
 
--keep class com.ft.sdk.garble.AsyncCallback{
+-keep class com.ft.sdk.garble.manager.AsyncCallback{
     *;
 }
 
@@ -113,7 +113,7 @@
 -keep class com.ft.sdk.InitSDKProcessException{
     *;
 }
--keep class com.ft.sdk.garble.FTExceptionHandler{
+-keep class com.ft.sdk.garble.manager.FTExceptionHandler{
     *;
 }
 -keep enum com.ft.sdk.LogCacheDiscard {

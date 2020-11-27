@@ -58,26 +58,26 @@ public class FTMonitorConfig {
 
     public void initParams() {
         //注册传感器监听
-        SensorUtils.get().register();
-        if (isMonitorType(MonitorType.NETWORK)) {
-            //开启网络监听
-            NetUtils.get().listenerSignal(FTApplication.getApplication());
-            //监听网络速度
-            NetUtils.get().startMonitorNetRate();
-            NetUtils.get().initSpeed();
-        }
-        if (isMonitorType(MonitorType.LOCATION)) {
-            //获取地理位置
-            LocationUtils.get().setGeoKey(geoKey);
-            LocationUtils.get().setUseGeoKey(useGeoKey);
-            LocationUtils.get().startListener();
-        }
+//        SensorUtils.get().register();
+//        if (isMonitorType(MonitorType.NETWORK)) {
+//            //开启网络监听
+//            NetUtils.get().listenerSignal(FTApplication.getApplication());
+//            //监听网络速度
+//            NetUtils.get().startMonitorNetRate();
+//            NetUtils.get().initSpeed();
+//        }
+//        if (isMonitorType(MonitorType.LOCATION)) {
+//            //获取地理位置
+//            LocationUtils.get().setGeoKey(geoKey);
+//            LocationUtils.get().setUseGeoKey(useGeoKey);
+//            LocationUtils.get().startListener();
+//        }
         if (isMonitorType(MonitorType.FPS)) {
             FpsUtils.get().start();
         }
-        if (isMonitorType(MonitorType.SENSOR_TORCH)) {
-            CameraUtils.get().start();
-        }
+//        if (isMonitorType(MonitorType.SENSOR_TORCH)) {
+//            CameraUtils.get().start();
+//        }
     }
 
     /**

@@ -15,10 +15,9 @@ import com.ft.R;
 import com.ft.application.MockApplication;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
-import com.ft.sdk.garble.FTExceptionHandler;
-import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
+import com.ft.sdk.garble.manager.FTExceptionHandler;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -84,7 +83,6 @@ public class ErrorTraceTest extends BaseTest {
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
         Assert.assertTrue(checkLogContent("ArithmeticException"));
-        Assert.assertTrue(checkTrackWith(OP.CRASH));
 
     }
 
@@ -124,7 +122,6 @@ public class ErrorTraceTest extends BaseTest {
         Thread.sleep(2000);
 
         Assert.assertTrue(checkLogContent("ANR"));
-        Assert.assertTrue(checkTrackWith(OP.ANR));
     }
 
     @Test
@@ -137,7 +134,6 @@ public class ErrorTraceTest extends BaseTest {
         Thread.sleep(2000);
 
         Assert.assertTrue(checkLogContent("UIBlock"));
-        Assert.assertTrue(checkTrackWith(OP.BLOCK));
 
     }
 
@@ -158,25 +154,6 @@ public class ErrorTraceTest extends BaseTest {
         }
         return isContainLog;
     }
-
-    /**
-     * 检验存储的 OP 数据
-     *
-     * @param op
-     * @return
-     */
-    private boolean checkTrackWith(OP op) {
-        List<SyncJsonData> recordDataTrackList = FTDBManager.get().queryDataByDescLimitTrack(0);
-        boolean isContainOP = false;
-        for (SyncJsonData recordData : recordDataTrackList) {
-            if (recordData.getOpData().getOp().equals(op)) {
-                isContainOP = true;
-                break;
-            }
-        }
-        return isContainOP;
-    }
-
 
     private void avoidCrash() {
         try {

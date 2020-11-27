@@ -2,7 +2,7 @@
 package com.ft.sdk.garble.manager;
 
 import com.ft.sdk.garble.FTDBCachePolicy;
-import com.ft.sdk.garble.FTTrackInner;
+import com.ft.sdk.FTTrackInner;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;

@@ -1,33 +1,26 @@
 package com.ft.sdk;
 
 import android.app.Application;
-import android.content.Context;
-import android.opengl.GLSurfaceView;
-import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.garble.AsyncCallback;
-import com.ft.sdk.garble.FTActivityLifecycleCallbacks;
 import com.ft.sdk.garble.FTAliasConfig;
 import com.ft.sdk.garble.FTAutoTrackConfig;
 import com.ft.sdk.garble.FTDBCachePolicy;
-import com.ft.sdk.garble.FTExceptionHandler;
 import com.ft.sdk.garble.FTFlowConfig;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.FTNetworkListener;
 import com.ft.sdk.garble.FTUserConfig;
+import com.ft.sdk.garble.manager.FTActivityLifecycleCallbacks;
+import com.ft.sdk.garble.manager.FTExceptionHandler;
 import com.ft.sdk.garble.manager.FTUIBlockManager;
 import com.ft.sdk.garble.manager.SyncTaskManager;
-import com.ft.sdk.garble.utils.GpuUtils;
 import com.ft.sdk.garble.utils.LocationUtils;
 import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.sdk.garble.utils.RendererUtil;
+import com.ft.sdk.garble.utils.PackageUtils;
 import com.ft.sdk.garble.utils.Utils;
 import com.ft.sdk.nativelib.NativeEngineInit;
-
-import org.json.JSONObject;
 
 import java.io.File;
 import java.security.InvalidParameterException;
@@ -40,10 +33,10 @@ import java.security.InvalidParameterException;
  */
 public class FTSdk {
     public final static String TAG = "FTSdk";
-    public static final String NATIVE_ENGINE_CLASS = "com.ft.sdk.nativelib.NativeEngineInit";
     public static final String NATIVE_DUMP_PATH = "ftCrashDmp";
     //该变量不能改动，其值由 Plugin 动态改写
     public static String PLUGIN_VERSION = "";
+    public static String NATIVE_VERSION = "";
     //变量由 Plugin 写入，同一个编译版本，UUID 相同
     public static String PACKAGE_UUID = "";
     //下面两个变量也不能随便改动，改动请同时更改 plugin 中对应的值
@@ -137,11 +130,9 @@ public class FTSdk {
     /**
      * 绑定用户信息
      *
-     * @param name
      * @param id
-     * @param extras
      */
-    public void bindUserData(@NonNull String name, @NonNull String id, JSONObject extras) {
+    public void bindUserData(@NonNull String id) {
         if (mFtSDKConfig != null) {
             if (mFtSDKConfig.isNeedBindUser()) {
                 LogUtils.d(TAG, "绑定用户信息");
@@ -152,52 +143,53 @@ public class FTSdk {
                 //初始化SessionId
                 FTUserConfig.get().initSessionId();
                 //绑定用户信息
-                FTUserConfig.get().bindUserData(name, id, extras);
+                FTUserConfig.get().bindUserData("", id, null);
             }
         }
     }
 
-    /**
-     * 开启定，并且获取定位结果
-     */
-    public static void startLocation(String geoKey, AsyncCallback syncCallback) {
-        if (!Utils.isNullOrEmpty(geoKey)) {
-            LocationUtils.get().setGeoKey(geoKey);
-            LocationUtils.get().setUseGeoKey(true);
-        }
-        LocationUtils.get().startLocationCallBack(syncCallback);
-    }
+//    /**
+//     * 开启定，并且获取定位结果
+//     */
+//    public static void startLocation(String geoKey, AsyncCallback syncCallback) {
+//        if (!Utils.isNullOrEmpty(geoKey)) {
+//            LocationUtils.get().setGeoKey(geoKey);
+//            LocationUtils.get().setUseGeoKey(true);
+//        }
+//        LocationUtils.get().startLocationCallBack(syncCallback);
+//    }
 
-    /**
-     * 创建获取 GPU 信息的GLSurfaceView
-     *
-     * @param root
-     */
-    public void setGpuRenderer(ViewGroup root) {
-        try {
-            if (FTMonitorConfig.get().isMonitorType(MonitorType.GPU)) {
-                LogUtils.d(TAG, "绑定视图监听 GPU 信息");
-                Context context = getApplication();
-                final RendererUtil mRendererUtil = new RendererUtil();
-                GLSurfaceView mGLSurfaceView = new GLSurfaceView(context);
-                ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(1, 1);
-                mGLSurfaceView.setLayoutParams(layoutParams);
-                root.addView(mGLSurfaceView);
-                mGLSurfaceView.setEGLContextClientVersion(1);
-                mGLSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 0, 0);
-                mGLSurfaceView.setRenderer(mRendererUtil);
-                mGLSurfaceView.post(() -> {
-                    String gl_vendor = mRendererUtil.gl_vendor;
-                    String gl_renderer = mRendererUtil.gl_renderer;
-                    GpuUtils.GPU_VENDOR_RENDERER = gl_vendor + "_" + gl_renderer;
-                    if (gl_renderer != null && gl_vendor != null) {
-                        mGLSurfaceView.surfaceDestroyed(mGLSurfaceView.getHolder());
-                    }
-                });
-            }
-        } catch (Exception e) {
-        }
-    }
+//    /**
+//     * j
+//     * 创建获取 GPU 信息的GLSurfaceView
+//     *
+//     * @param root
+//     */
+//    public void setGpuRenderer(ViewGroup root) {
+//        try {
+//            if (FTMonitorConfig.get().isMonitorType(MonitorType.GPU)) {
+//                LogUtils.d(TAG, "绑定视图监听 GPU 信息");
+//                Context context = getApplication();
+//                final RendererUtil mRendererUtil = new RendererUtil();
+//                GLSurfaceView mGLSurfaceView = new GLSurfaceView(context);
+//                ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(1, 1);
+//                mGLSurfaceView.setLayoutParams(layoutParams);
+//                root.addView(mGLSurfaceView);
+//                mGLSurfaceView.setEGLContextClientVersion(1);
+//                mGLSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 0, 0);
+//                mGLSurfaceView.setRenderer(mRendererUtil);
+//                mGLSurfaceView.post(() -> {
+//                    String gl_vendor = mRendererUtil.gl_vendor;
+//                    String gl_renderer = mRendererUtil.gl_renderer;
+//                    GpuUtils.GPU_VENDOR_RENDERER = gl_vendor + "_" + gl_renderer;
+//                    if (gl_renderer != null && gl_vendor != null) {
+//                        mGLSurfaceView.surfaceDestroyed(mGLSurfaceView.getHolder());
+//                    }
+//                });
+//            }
+//        } catch (Exception e) {
+//        }
+//    }
 
     /**
      * 初始化SDK本地配置数据
@@ -205,7 +197,7 @@ public class FTSdk {
     private void initFTConfig() {
         if (mFtSDKConfig != null) {
             LogUtils.setDebug(mFtSDKConfig.isDebug());
-            LogUtils.setDescLogShow(mFtSDKConfig.isDescLog());
+//            LogUtils.setDescLogShow(mFtSDKConfig.isDescLog());
             FTAliasConfig.get().initParams(mFtSDKConfig);
             FTHttpConfig.get().initParams(mFtSDKConfig);
             FTAutoTrackConfig.get().initParams(mFtSDKConfig);
@@ -219,9 +211,7 @@ public class FTSdk {
             if (mFtSDKConfig.isEventFlowLog()) {
                 FTFlowConfig.get().initParams(mFtSDKConfig);
             }
-            if (mFtSDKConfig.isAutoTrack()) {
-                trackStartApp();
-            }
+            FTAutoTrack.startApp();
 
             float rate = mFtSDKConfig.getTraceSamplingRate();
             if (rate > 1 || rate < 0) {
@@ -242,13 +232,16 @@ public class FTSdk {
      * 初始化 Native 路径
      */
     private void initNativeDump() {
+        boolean isNativeLibSupport = PackageUtils.isNativeLibrarySupport();
+
+        if (isNativeLibSupport) {
+            NATIVE_VERSION = com.ft.sdk.nativelib.BuildConfig.VERSION_NAME;
+        }
 
         boolean enableTrackAppCrash = mFtSDKConfig.isEnableTrackAppCrash();
         boolean enableTrackAppANR = mFtSDKConfig.isEnableTrackAppANR();
         if (enableTrackAppCrash || enableTrackAppANR) {
-            try {
-                Class.forName(NATIVE_ENGINE_CLASS);
-            } catch (ClassNotFoundException e) {
+            if (!isNativeLibSupport) {
                 LogUtils.e(TAG, "未启动 native 崩溃收集");
                 return;
             }
@@ -282,10 +275,6 @@ public class FTSdk {
             getApplication().unregisterActivityLifecycleCallbacks(life);
             life = null;
         }
-    }
-
-    private void trackStartApp() {
-        FTAutoTrack.startApp();
     }
 
     /**

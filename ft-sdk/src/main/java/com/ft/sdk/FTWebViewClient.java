@@ -1,7 +1,6 @@
 package com.ft.sdk;
 
 import android.graphics.Bitmap;
-import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
@@ -9,9 +8,7 @@ import android.webkit.WebViewClient;
 
 import androidx.annotation.Nullable;
 
-import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.manager.FTWebViewEventTracker;
-import com.ft.sdk.garble.manager.FTWebViewTraceHelper;
 import com.ft.sdk.garble.utils.LogUtils;
 
 import java.io.IOException;
@@ -39,8 +36,6 @@ public class FTWebViewClient extends WebViewClient {
     private String mOriginUrl;
 
     private FTWebViewEventTracker mEventHelper = new FTWebViewEventTracker();
-
-    private FTWebViewTraceHelper mTraceHelper = new FTWebViewTraceHelper();
 
     private CountDownLatch mCountDownLatch = new CountDownLatch(1);
 
@@ -104,21 +99,6 @@ public class FTWebViewClient extends WebViewClient {
     public void onPageFinished(WebView view, String url) {
         super.onPageFinished(view, url);
         mEventHelper.pageFinished(url);
-
-    }
-
-    @Override
-    public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
-        super.onReceivedHttpError(view, request, errorResponse);
-        FTAutoTrack.putHttpError(System.currentTimeMillis(), OP.HTTP_WEBVIEW, request.getUrl().toString(), request.getUrl().getHost(), true, -1);
-    }
-
-
-    @Override
-    public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-        super.onReceivedError(view, request, error);
-
-        FTAutoTrack.putHttpError(System.currentTimeMillis(), OP.HTTP_WEBVIEW, request.getUrl().toString(), request.getUrl().getHost(), true, -1);
 
     }
 

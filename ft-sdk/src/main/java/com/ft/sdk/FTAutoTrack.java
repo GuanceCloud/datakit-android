@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.location.Address;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -17,26 +16,15 @@ import android.widget.RadioGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.ft.sdk.garble.FTAliasConfig;
 import com.ft.sdk.garble.FTAutoTrackConfig;
 import com.ft.sdk.garble.FTFlowConfig;
 import com.ft.sdk.garble.FTFragmentManager;
-import com.ft.sdk.garble.FTTrackInner;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.OP;
-import com.ft.sdk.garble.bean.ObjectBean;
-import com.ft.sdk.garble.bean.SyncJsonData;
-import com.ft.sdk.garble.bean.TrackBean;
 import com.ft.sdk.garble.manager.FTActivityManager;
-import com.ft.sdk.garble.manager.FTManager;
-import com.ft.sdk.garble.manager.SyncDataHelper;
 import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.Constants;
-import com.ft.sdk.garble.utils.DeviceUtils;
-import com.ft.sdk.garble.utils.LocationUtils;
 import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.sdk.garble.utils.ThreadPoolUtils;
-import com.ft.sdk.garble.utils.Utils;
 import com.google.android.material.tabs.TabLayout;
 
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -45,7 +33,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Method;
-import java.net.URI;
 import java.util.Map;
 
 import okhttp3.OkHttpClient;
@@ -380,43 +367,6 @@ public class FTAutoTrack {
 
     }
 
-    /**
-     * 页面卡顿
-     */
-    public static void uiBlock() {
-        putErrorEvent(OP.BLOCK, System.currentTimeMillis());
-    }
-
-    /**
-     * 应用崩溃
-     */
-    public static void appCrash() {
-        putErrorEvent(OP.CRASH, System.currentTimeMillis());
-    }
-
-    /**
-     * 崩溃
-     * @param crashTimeLine
-     */
-    public static void appCrash(long crashTimeLine) {
-        putErrorEvent(OP.CRASH, crashTimeLine);
-    }
-
-    /**
-     * 应用无响应
-     */
-    public static void appAnr() {
-        putErrorEvent(OP.ANR, System.currentTimeMillis());
-    }
-
-    /**
-     * 应用无响应
-     * @param anrTime
-     */
-    public static void appAnr(long anrTime) {
-        putErrorEvent(OP.ANR, anrTime);
-    }
-
 
     /**
      * 打开某个Fragment页面
@@ -635,42 +585,6 @@ public class FTAutoTrack {
         putClickEvent(OP.CLK, currentPage, rootPage, vtp);
     }
 
-    /**
-     * 记录发生错误的事件
-     *
-     * @param op
-     */
-    public static void putErrorEvent(@NonNull OP op, long timeMillis) {
-
-        ThreadPoolUtils.get().execute(() -> {
-            try {
-
-
-                JSONObject tags = new JSONObject();
-                JSONObject fields = new JSONObject();
-                Class activity = FTActivityManager.get().getLastActivity();
-                if (activity != null) {
-                    String currentPage = activity.getSimpleName();
-                    if (!Utils.isNullOrEmpty(currentPage)) {
-                        tags.put(Constants.KEY_PAGE_EVENT_CURRENT_PAGE_NAME, currentPage);
-                        fields.put(Constants.KEY_PAGE_EVENT_PAGE_DESC, FTAliasConfig.get().getPageDesc(currentPage));
-                    }
-                }
-                String eventName = op.toEventName();
-                fields.put(Constants.KEY_EVENT, eventName);
-                tags.put(Constants.KEY_EVENT_ID, Utils.MD5(eventName));
-
-                SyncJsonData recordData = SyncJsonData.getFromTrackBean(
-                        new TrackBean(Constants.FT_MEASUREMENT_PAGE_EVENT, tags, fields, timeMillis), op);
-                LogUtils.d(TAG, "FTAutoTrack数据进数据库：putSimpleEvent:" + recordData.printFormatRecordData());
-
-                FTManager.getFTDBManager().insertFTOperation(recordData);
-                FTManager.getSyncTaskManager().executeSyncPoll();
-            } catch (Exception e) {
-                LogUtils.e(TAG, e.toString());
-            }
-        });
-    }
 
     /**
      * 记录点击事件
@@ -773,32 +687,30 @@ public class FTAutoTrack {
     private static void putPageEvent(long time, @NonNull OP op, @Nullable String currentPage,
                                      @Nullable String rootPage, @Nullable String parentPage, @Nullable String vtp) {
         try {
-
-            JSONObject tags = new JSONObject();
-            JSONObject fields = new JSONObject();
-            if (vtp != null) {
-                tags.put("vtp", vtp);
-                fields.put("vtp_desc", FTAliasConfig.get().getVtpDesc(vtp));
-                fields.put("vtp_id", Utils.MD5(vtp));
-            }
-
-            if (!Utils.isNullOrEmpty(currentPage)) {
-                //如果是 Fragment 就把Activity 的名称也添加上去
-                if (op.equals(OP.OPEN_FRA) || op.equals(OP.CLS_FRA)) {
-                    tags.put(Constants.KEY_PAGE_EVENT_CURRENT_PAGE_NAME, rootPage + "." + currentPage);
-                    fields.put(Constants.KEY_PAGE_EVENT_PAGE_DESC, FTAliasConfig.get().getPageDesc(rootPage + "." + currentPage));
-
-                } else {
-                    tags.put(Constants.KEY_PAGE_EVENT_CURRENT_PAGE_NAME, currentPage);
-                    fields.put(Constants.KEY_PAGE_EVENT_PAGE_DESC, FTAliasConfig.get().getPageDesc(currentPage));
-                }
-            }
-
-            String eventName = op.toEventName();
-            fields.put(Constants.KEY_EVENT, eventName);
-            tags.put(Constants.KEY_EVENT_ID, Utils.MD5(eventName));
-
-            FTTrackInner.getInstance().trackBackground(op, time, Constants.FT_MEASUREMENT_PAGE_EVENT, tags, fields);
+//            JSONObject tags = new JSONObject();
+//            JSONObject fields = new JSONObject();
+//            if (vtp != null) {
+//                tags.put("vtp", vtp);
+//                fields.put("vtp_desc", FTAliasConfig.get().getVtpDesc(vtp));
+//                fields.put("vtp_id", Utils.MD5(vtp));
+//            }
+//
+//            if (!Utils.isNullOrEmpty(currentPage)) {
+//                //如果是 Fragment 就把Activity 的名称也添加上去
+//                if (op.equals(OP.OPEN_FRA) || op.equals(OP.CLS_FRA)) {
+//                    tags.put(Constants.KEY_PAGE_EVENT_CURRENT_PAGE_NAME, rootPage + "." + currentPage);
+//                    fields.put(Constants.KEY_PAGE_EVENT_PAGE_DESC, FTAliasConfig.get().getPageDesc(rootPage + "." + currentPage));
+//
+//                } else {
+//                    tags.put(Constants.KEY_PAGE_EVENT_CURRENT_PAGE_NAME, currentPage);
+//                    fields.put(Constants.KEY_PAGE_EVENT_PAGE_DESC, FTAliasConfig.get().getPageDesc(currentPage));
+//                }
+//            }
+//
+//            String eventName = op.toEventName();
+//            fields.put(Constants.KEY_EVENT, eventName);
+//            tags.put(Constants.KEY_EVENT_ID, Utils.MD5(eventName));
+//            FTTrackInner.getInstance().trackBackground(op, time, Constants.FT_MEASUREMENT_PAGE_EVENT, tags, fields);
 
             addLogging(currentPage, op, vtp);
 //            addObject(op);
@@ -809,30 +721,19 @@ public class FTAutoTrack {
     }
 
     /**
-     * WebView 数据加载收集
-     *
-     * @param time
-     * @param op
-     * @param url
-     * @param duration
+     * 记录
      */
-    public static void putWebViewTimeCost(long time, OP op, String url, long duration) {
+    public static void putLaunchPerformance(boolean isCold) {
+        long time = System.currentTimeMillis();
+        long duration = startTimeline - time;
+
         try {
             JSONObject tags = new JSONObject();
             JSONObject fields = new JSONObject();
-
-            String host = URI.create(url).getHost();
-
-            tags.put(Constants.KEY_HTTP_HOST, host);
-            tags.put(Constants.KEY_TIME_COST_WEBVIEW_URL, url);
-            fields.put(Constants.KEY_TIME_COST_DURATION, duration * 1000);
-
-            String eventName = op.toEventName();
-            fields.put(Constants.KEY_EVENT, eventName);
-            tags.put(Constants.KEY_EVENT_ID, Utils.MD5(eventName));
-
-            FTTrackInner.getInstance().trackBackground(op, time, Constants.FT_MEASUREMENT_TIME_COST_WEBVIEW, tags, fields);
-
+            tags.put("app_startup_type", isCold ? "cold" : "hot");
+            tags.put("app_startup_duration", duration);
+            FTTrackInner.getInstance().trackBackground(OP.RUM_LAUNCH_PERFORMANCE, time,
+                    Constants.FT_MEASUREMENT_RUM_APP_START_UP, tags, fields);
         } catch (Exception e) {
             LogUtils.e(TAG, e.toString());
         }
@@ -857,45 +758,6 @@ public class FTAutoTrack {
         }
     }
 
-    /**
-     * http 请求统计
-     *
-     * @param time
-     * @param op
-     * @param url
-     * @param host
-     * @param networkResponseTime
-     */
-    public static void putHttpError(long time, OP op, String url, String host, boolean isError, long networkResponseTime) {
-
-        try {
-            JSONObject tags = new JSONObject();
-            JSONObject fields = new JSONObject();
-
-            tags.put(Constants.KEY_HTTP_HOST, host);
-            Address address = LocationUtils.get().getAddress();
-            if (address != null) {
-                tags.put(Constants.KEY_LOCATION_PROVINCE, address.getAdminArea());
-                tags.put(Constants.KEY_LOCATION_CITY, address.getLocality());
-                tags.put(Constants.KEY_LOCATION_COUNTRY, address.getCountryName());
-            }
-
-            fields.put(Constants.KEY_HTTP_URL, url);
-            fields.put(Constants.KEY_NETWORK_RESPONSE_TIME, networkResponseTime);
-            fields.put(Constants.KEY_HTTP_IS_ERROR, isError ? 1 : 0);
-
-            String measurement = "";
-            if (op.equals(OP.HTTP_WEBVIEW)) {
-                measurement = Constants.FT_MEASUREMENT_HTTP_WEBVIEW;
-            } else if (op.equals(OP.HTTP_CLIENT)) {
-                measurement = Constants.FT_MEASUREMENT_HTTP_CLIENT;
-            }
-
-            FTTrackInner.getInstance().trackBackground(op, time, measurement, tags, fields);
-        } catch (Exception e) {
-            LogUtils.e(TAG, e.toString());
-        }
-    }
 
 //    /**
 //     * 应用登陆状态，添加

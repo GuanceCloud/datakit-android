@@ -15,7 +15,7 @@ import android.os.Looper;
 
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.MonitorType;
-import com.ft.sdk.garble.AsyncCallback;
+import com.ft.sdk.garble.manager.AsyncCallback;
 import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.NetCodeStatus;
@@ -102,34 +102,34 @@ public class LocationUtils {
         return true;
     }
 
-    /**
-     * 注册位置变化监听器
-     */
-    public synchronized void startListener() {
-        if (!FTMonitorConfig.get().isMonitorType(MonitorType.LOCATION)) {
-            return;
-        }
-        if (!checkLocationPermission()) {
-            LogUtils.e(TAG, "请先申请位置权限");
-            return;
-        }
-        if (listenerIng) {
-            return;
-        }
-        List<String> providers = getProviderList();
-        if (providers != null) {
-            if (providers.contains(LocationManager.NETWORK_PROVIDER)) {
-                listenerIng = true;
-                LogUtils.d(TAG, "NETWORK_PROVIDER 方式监听位置信息变化");
-                mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 2000, 10, locationListener);
-            } else if (providers.contains(LocationManager.GPS_PROVIDER)) {
-                listenerIng = true;
-                LogUtils.d(TAG, "GPS_PROVIDER 方式监听位置信息变化");
-                mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, locationListener);
-            }
-        }
-        startLocationCallBack(null);
-    }
+//    /**
+//     * 注册位置变化监听器
+//     */
+//    public synchronized void startListener() {
+//        if (!FTMonitorConfig.get().isMonitorType(MonitorType.LOCATION)) {
+//            return;
+//        }
+//        if (!checkLocationPermission()) {
+//            LogUtils.e(TAG, "请先申请位置权限");
+//            return;
+//        }
+//        if (listenerIng) {
+//            return;
+//        }
+//        List<String> providers = getProviderList();
+//        if (providers != null) {
+//            if (providers.contains(LocationManager.NETWORK_PROVIDER)) {
+//                listenerIng = true;
+//                LogUtils.d(TAG, "NETWORK_PROVIDER 方式监听位置信息变化");
+//                mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 2000, 10, locationListener);
+//            } else if (providers.contains(LocationManager.GPS_PROVIDER)) {
+//                listenerIng = true;
+//                LogUtils.d(TAG, "GPS_PROVIDER 方式监听位置信息变化");
+//                mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, locationListener);
+//            }
+//        }
+//        startLocationCallBack(null);
+//    }
 
     /**
      * 移除位置变化监听器

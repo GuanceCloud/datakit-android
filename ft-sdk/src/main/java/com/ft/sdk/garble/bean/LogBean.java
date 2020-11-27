@@ -51,6 +51,9 @@ public class LogBean {
     //用于链路日志，当前链路的请求响应时间，微秒为单位
     long duration;
     long time;
+
+    String appState;
+
     JSONObject tags;
     JSONObject fields;
 
@@ -155,12 +158,18 @@ public class LogBean {
             if (!tags.has("application_identifier")) {
                 tags.put("application_identifier", DeviceUtils.getApplicationId(FTApplication.getApplication()));
             }
-            tags.put("app_version_name", Utils.getAppVersionName());
+            tags.put("version", Utils.getAppVersionName());
+
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
         return tags;
+    }
+
+    public void setAppState(String appState) {
+        this.appState = appState;
     }
 
     public String getMeasurement() {
@@ -175,9 +184,6 @@ public class LogBean {
         return time;
     }
 
-    public String getClazz() {
-        return clazz;
-    }
 
     public void setClazz(String clazz) {
         this.clazz = clazz;
@@ -191,17 +197,11 @@ public class LogBean {
         this.source = source;
     }
 
-    public String getServiceName() {
-        return serviceName;
-    }
 
     public void setServiceName(String serviceName) {
         this.serviceName = serviceName;
     }
 
-    public String getEnv() {
-        return env;
-    }
 
     public void setEnv(String env) {
         this.env = env;
@@ -215,41 +215,25 @@ public class LogBean {
         this.status = status;
     }
 
-    public String getParentID() {
-        return parentID;
-    }
 
     public void setParentID(String parentID) {
         this.parentID = parentID;
     }
 
-    public String getOperationName() {
-        return operationName;
-    }
 
     public void setOperationName(String operationName) {
         this.operationName = operationName;
-    }
-
-    public String getSpanID() {
-        return spanID;
     }
 
     public void setSpanID(String spanID) {
         this.spanID = spanID;
     }
 
-    public String getTraceID() {
-        return traceID;
-    }
 
     public void setTraceID(String traceID) {
         this.traceID = traceID;
     }
 
-    public String getIsError() {
-        return isError;
-    }
 
     /**
      * @param isError 字符串类型，true 表示该 span 的请求响应是错误,false 或者无该标签，表示该 span 的响应是正常的请求
@@ -258,9 +242,6 @@ public class LogBean {
         this.isError = isError;
     }
 
-    public long getDuration() {
-        return duration;
-    }
 
     public void setDuration(long duration) {
         this.duration = duration;
@@ -282,17 +263,11 @@ public class LogBean {
         this.fields = fields;
     }
 
-    public String getSpanType() {
-        return spanType;
-    }
 
     public void setSpanType(String spanType) {
         this.spanType = spanType;
     }
 
-    public String getEndpoint() {
-        return endpoint;
-    }
 
     public void setEndpoint(String endpoint) {
         this.endpoint = endpoint;

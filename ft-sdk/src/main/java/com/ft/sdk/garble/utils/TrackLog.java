@@ -2,7 +2,7 @@ package com.ft.sdk.garble.utils;
 
 import android.util.Log;
 
-import com.ft.sdk.garble.FTExceptionHandler;
+import com.ft.sdk.garble.manager.FTExceptionHandler;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.manager.TrackLogManager;

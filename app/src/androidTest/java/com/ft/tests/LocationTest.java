@@ -13,8 +13,7 @@ import com.ft.BaseTest;
 import com.ft.application.MockApplication;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
-import com.ft.sdk.MonitorType;
-import com.ft.sdk.garble.AsyncCallback;
+import com.ft.sdk.garble.manager.AsyncCallback;
 import com.ft.sdk.garble.utils.LocationUtils;
 
 import org.junit.Assert;
@@ -50,9 +49,7 @@ public class LocationTest extends BaseTest {
                 AccountUtils.getProperty(context, AccountUtils.ACCESS_KEY_SECRET))
                 .setDataWayToken(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_TOKEN))
                 .setXDataKitUUID("ft-dataKit-uuid-001")
-                .setUseOAID(true)//设置 OAID 是否可用
-                .setMonitorType(MonitorType.LOCATION)
-                .setGeoKey(true, AccountUtils.getProperty(context, AccountUtils.GEO_KEY));
+                .setUseOAID(true);//设置 OAID 是否可用
         //关闭数据自动同步操作
         stopSyncTask();
         FTSdk.install(ftSDKConfig);
@@ -106,7 +103,7 @@ public class LocationTest extends BaseTest {
         Location location = new Location(LocationManager.NETWORK_PROVIDER);
         location.setLatitude(31.20690892154558);
         location.setLongitude(121.58605522685095);
-        Whitebox.invokeMethod(LocationUtils.get(), "requestGeoAddress", location,new AsyncCallback() {
+        Whitebox.invokeMethod(LocationUtils.get(), "requestGeoAddress", location, new AsyncCallback() {
             @Override
             public void onResponse(int code, String response) {
                 if (code == 0) {

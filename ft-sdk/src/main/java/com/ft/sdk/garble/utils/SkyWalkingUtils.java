@@ -1,6 +1,6 @@
 package com.ft.sdk.garble.utils;
 
-import com.ft.sdk.garble.FTExceptionHandler;
+import com.ft.sdk.garble.manager.FTExceptionHandler;
 import com.ft.sdk.garble.http.HttpUrl;
 
 import java.util.Locale;

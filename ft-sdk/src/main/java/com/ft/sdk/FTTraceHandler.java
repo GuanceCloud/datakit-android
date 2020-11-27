@@ -1,8 +1,7 @@
 package com.ft.sdk;
 
-import com.ft.sdk.garble.FTExceptionHandler;
+import com.ft.sdk.garble.manager.FTExceptionHandler;
 import com.ft.sdk.garble.FTHttpConfig;
-import com.ft.sdk.garble.FTTrackInner;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.http.HttpUrl;
@@ -12,7 +11,6 @@ import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONObject;
 
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -95,10 +93,6 @@ public class FTTraceHandler {
         logBean.setSpanID(spanID);
         logBean.setTraceID(traceID);
         FTTrackInner.getInstance().logBackground(logBean);
-
-
-        OP op = isWebViewTrace ? OP.HTTP_WEBVIEW : OP.HTTP_CLIENT;
-        FTAutoTrack.putHttpError(requestTime, op, httpUrl.getHoleUrl(), httpUrl.getHost(), isError, duration);
     }
 
 

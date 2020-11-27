@@ -6,7 +6,6 @@ import android.app.ActivityManager;
 import android.content.Context;
 
 import com.ft.sdk.FTApplication;
-import com.ft.sdk.garble.utils.LogUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class FTActivityManager {
     public final static String TAG = "FTActivityManager";
-    public ConcurrentHashMap<String,Boolean> isFirstResume;
+    public ConcurrentHashMap<String, Boolean> isFirstResume;
     private static volatile FTActivityManager instance;
     //栈顶 Activity
     private Activity topActivity;
@@ -27,6 +26,8 @@ public class FTActivityManager {
     private List<Activity> activityList;
 
     private ConcurrentHashMap<String, Boolean> activityOpenTypeMap;
+
+    private AppState appState;
 
     private FTActivityManager() {
         activityList = new ArrayList<>();
@@ -75,13 +76,14 @@ public class FTActivityManager {
                 removeActivityStatus(activity.getClass().getName());
             }
             topActivity = (activityList == null || activityList.size() <= 0) ? null : activityList.get(activityList.size() - 1);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     /**
-     *  得到上一个 Activity
+     * 得到上一个 Activity
+     *
      * @return
      */
     public Class getLastActivity() {
@@ -99,6 +101,7 @@ public class FTActivityManager {
 
     /**
      * 判断最后两个Activity 是否为同一个 Activity
+     *
      * @return
      */
     public boolean lastTwoActivitySame() {
@@ -146,13 +149,13 @@ public class FTActivityManager {
      *
      * @param className
      */
-    public void removeActivityStatus(String className) {
+    void removeActivityStatus(String className) {
         if (activityOpenTypeMap != null) {
             activityOpenTypeMap.remove(className);
         }
     }
 
-    public boolean isAppForeground() {
+    boolean isAppForeground() {
         ActivityManager am = (ActivityManager) FTApplication.getApplication().getSystemService(Context.ACTIVITY_SERVICE);
         if (am == null) return false;
         List<ActivityManager.RunningAppProcessInfo> info = am.getRunningAppProcesses();
@@ -167,10 +170,12 @@ public class FTActivityManager {
         return false;
     }
 
-    public void printTest(Activity activity) {
-        LogUtils.d(TAG,FTActivityManager.class.getSimpleName() + "\n" +
-                "activeCount=" + activityList.size() + "\n" +
-                "topActivity=" + topActivity + "\n");
+    void setAppState(AppState state) {
+        this.appState = state;
+    }
+
+    AppState getAppState() {
+        return appState;
     }
 
 }

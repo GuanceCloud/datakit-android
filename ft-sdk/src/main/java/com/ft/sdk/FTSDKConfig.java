@@ -4,7 +4,6 @@ import com.ft.sdk.garble.utils.DeviceUtils;
 
 import java.security.InvalidParameterException;
 import java.util.List;
-import java.util.Map;
 
 import static com.ft.sdk.garble.utils.Constants.DEFAULT_LOG_SERVICE_NAME;
 
@@ -25,41 +24,35 @@ public class FTSDKConfig {
     private boolean useOAID;
     //是否是Debug
     private boolean isDebug;
-    //是否显示别名日志
-    private boolean descLog;
+    //    //是否显示别名日志
+//    private boolean descLog;
     //高德逆向解析API 的 key
     private String geoKey;
     //是否使用高德作为逆向地址解析
     private boolean useGeoKey;
-    //是否开启自动埋点
-    private boolean autoTrack;
+    //    //是否开启自动埋点
+    private boolean autoTrack = true;
     //是否需要绑定用户数据
     private boolean needBindUser;
     //监控类别
     private int monitorType;
-    //是否打开流程图
-    @Deprecated
-    private boolean openFlowChart;
     //以下三个为白名单
-    private int enableAutoTrackType;
-    private List<Class<?>> whiteActivityClass;
-    private List<Class<?>> whiteViewClass;
+//    private int enableAutoTrackType;
+//    private List<Class<?>> whiteActivityClass;
+//    private List<Class<?>> whiteViewClass;
+//
+//    //以下三个为设置黑名单
+//    private int disableAutoTrackType;
+//    private List<Class<?>> blackActivityClass;
+//    private List<Class<?>> blackViewClass;
+//    private boolean trackNetTime;
 
-    //以下三个为设置黑名单
-    private int disableAutoTrackType;
-    private List<Class<?>> blackActivityClass;
-    private List<Class<?>> blackViewClass;
-    private boolean trackNetTime;
-
-    //页面别名对应 map
-    private Map<String, String> pageDescMap;
-    //事件别名对应 map
-    private Map<String, String> vtpDescMap;
-    //页面和视图树是否显示描述
-    private boolean pageVtpDescEnabled;
-    //流程图是否显示描述
-    @Deprecated
-    private boolean flowChartDescEnabled;
+    //    //页面别名对应 map
+//    private Map<String, String> pageDescMap;
+//    //事件别名对应 map
+//    private Map<String, String> vtpDescMap;
+//    //页面和视图树是否显示描述
+//    private boolean pageVtpDescEnabled;
     //设置是否需要采集崩溃日志
     private boolean enableTrackAppCrash;
     //设置是否检测 UI 卡顿
@@ -164,9 +157,9 @@ public class FTSDKConfig {
         return isDebug;
     }
 
-    public boolean isDescLog() {
-        return descLog;
-    }
+//    public boolean isDescLog() {
+//        return descLog;
+//    }
 
     public boolean isAutoTrack() {
         return autoTrack;
@@ -180,34 +173,29 @@ public class FTSDKConfig {
         return monitorType;
     }
 
-    @Deprecated
-    public boolean isOpenFlowChart() {
-        return openFlowChart;
-    }
-
-    public int getEnableAutoTrackType() {
-        return enableAutoTrackType;
-    }
-
-    public List<Class<?>> getWhiteActivityClass() {
-        return whiteActivityClass;
-    }
-
-    public List<Class<?>> getWhiteViewClass() {
-        return whiteViewClass;
-    }
-
-    public int getDisableAutoTrackType() {
-        return disableAutoTrackType;
-    }
-
-    public List<Class<?>> getBlackActivityClass() {
-        return blackActivityClass;
-    }
-
-    public List<Class<?>> getBlackViewClass() {
-        return blackViewClass;
-    }
+//    public int getEnableAutoTrackType() {
+//        return enableAutoTrackType;
+//    }
+//
+//    public List<Class<?>> getWhiteActivityClass() {
+//        return whiteActivityClass;
+//    }
+//
+//    public List<Class<?>> getWhiteViewClass() {
+//        return whiteViewClass;
+//    }
+//
+//    public int getDisableAutoTrackType() {
+//        return disableAutoTrackType;
+//    }
+//
+//    public List<Class<?>> getBlackActivityClass() {
+//        return blackActivityClass;
+//    }
+//
+//    public List<Class<?>> getBlackViewClass() {
+//        return blackViewClass;
+//    }
 
     public String getGeoKey() {
         return geoKey;
@@ -222,26 +210,21 @@ public class FTSDKConfig {
         return this;
     }
 
-    public boolean getTrackNetTime() {
-        return trackNetTime;
-    }
+//    public boolean getTrackNetTime() {
+//        return trackNetTime;
+//    }
 
-    public Map<String, String> getPageDescMap() {
-        return pageDescMap;
-    }
-
-    public Map<String, String> getVtpDescMap() {
-        return vtpDescMap;
-    }
-
-    public boolean isPageVtpDescEnabled() {
-        return pageVtpDescEnabled;
-    }
-
-    @Deprecated
-    public boolean isFlowChartDescEnabled() {
-        return flowChartDescEnabled;
-    }
+//    public Map<String, String> getPageDescMap() {
+//        return pageDescMap;
+//    }
+//
+//    public Map<String, String> getVtpDescMap() {
+//        return vtpDescMap;
+//    }
+//
+//    public boolean isPageVtpDescEnabled() {
+//        return pageVtpDescEnabled;
+//    }
 
     public boolean isEnableTrackAppCrash() {
         return enableTrackAppCrash;
@@ -323,21 +306,21 @@ public class FTSDKConfig {
         return this;
     }
 
-    public FTSDKConfig setDescLog(boolean descLog) {
-        this.descLog = descLog;
-        return this;
-    }
+//    public FTSDKConfig setDescLog(boolean descLog) {
+//        this.descLog = descLog;
+//        return this;
+//    }
 
-    /**
-     * 设置自动埋点的事件类别
-     *
-     * @param type
-     * @return
-     */
-    public FTSDKConfig setEnableAutoTrackType(int type) {
-        enableAutoTrackType = type;
-        return this;
-    }
+//    /**
+//     * 设置自动埋点的事件类别
+//     *
+//     * @param type
+//     * @return
+//     */
+//    private FTSDKConfig setEnableAutoTrackType(int type) {
+//        enableAutoTrackType = type;
+//        return this;
+//    }
 
     /**
      * 设置监控类别
@@ -361,130 +344,118 @@ public class FTSDKConfig {
         return this;
     }
 
-    /**
-     * 设置白名单（Activity，Fragment）
-     *
-     * @param classes
-     * @return
-     */
-    public FTSDKConfig setWhiteActivityClasses(List<Class<?>> classes) {
-        whiteActivityClass = classes;
-        return this;
-    }
+//    /**
+//     * 设置白名单（Activity，Fragment）
+//     *
+//     * @param classes
+//     * @return
+//     */
+//    public FTSDKConfig setWhiteActivityClasses(List<Class<?>> classes) {
+//        whiteActivityClass = classes;
+//        return this;
+//    }
+//
+//    /**
+//     * 设置控件白名单
+//     *
+//     * @param classes
+//     * @return
+//     */
+//    public FTSDKConfig setWhiteViewClasses(List<Class<?>> classes) {
+//        whiteViewClass = classes;
+//        return this;
+//    }
+//
+//    /**
+//     * 设置关闭的自动埋点事件类别
+//     *
+//     * @param type
+//     * @return
+//     */
+//    public FTSDKConfig setDisableAutoTrackType(int type) {
+//        disableAutoTrackType = type;
+//        return this;
+//    }
+//
+//    /**
+//     * 设置黑名单（Acitivty，Fragment）
+//     *
+//     * @param classes
+//     * @return
+//     */
+//    public FTSDKConfig setBlackActivityClasses(List<Class<?>> classes) {
+//        blackActivityClass = classes;
+//        return this;
+//    }
+//
+//    /**
+//     * 设置控件黑名单
+//     *
+//     * @param classes
+//     * @return
+//     */
+//    public FTSDKConfig setBlackViewClasses(List<Class<?>> classes) {
+//        blackViewClass = classes;
+//        return this;
+//    }
 
-    /**
-     * 设置控件白名单
-     *
-     * @param classes
-     * @return
-     */
-    public FTSDKConfig setWhiteViewClasses(List<Class<?>> classes) {
-        whiteViewClass = classes;
-        return this;
-    }
+//    /**
+//     * 设置使用高德作为逆向地址解析
+//     *
+//     * @param useGeoKey
+//     * @param geoKey
+//     * @return
+//     */
+//    public FTSDKConfig setGeoKey(boolean useGeoKey, String geoKey) {
+//        this.useGeoKey = useGeoKey;
+//        this.geoKey = geoKey;
+//        return this;
+//    }
 
-    /**
-     * 设置关闭的自动埋点事件类别
-     *
-     * @param type
-     * @return
-     */
-    public FTSDKConfig setDisableAutoTrackType(int type) {
-        disableAutoTrackType = type;
-        return this;
-    }
+//    /**
+//     * 是否开启网络全路径请求时长监控
+//     *
+//     * @param value
+//     * @return
+//     */
+//    public FTSDKConfig trackNetRequestTime(boolean value) {
+//        this.trackNetTime = value;
+//        return this;
+//    }
 
-    /**
-     * 设置黑名单（Acitivty，Fragment）
-     *
-     * @param classes
-     * @return
-     */
-    public FTSDKConfig setBlackActivityClasses(List<Class<?>> classes) {
-        blackActivityClass = classes;
-        return this;
-    }
+//    /**
+//     * 页面别名对应 map
+//     *
+//     * @param pageDescMap
+//     * @return
+//     */
+//    public FTSDKConfig addPageDesc(Map<String, String> pageDescMap) {
+//        this.pageDescMap = pageDescMap;
+//        return this;
+//    }
 
-    /**
-     * 设置控件黑名单
-     *
-     * @param classes
-     * @return
-     */
-    public FTSDKConfig setBlackViewClasses(List<Class<?>> classes) {
-        blackViewClass = classes;
-        return this;
-    }
+//    /**
+//     * 事件别名对应 map
+//     *
+//     * @param vtpDescMap
+//     * @return
+//     */
+//    public FTSDKConfig addVtpDesc(Map<String, String> vtpDescMap) {
+//        this.vtpDescMap = vtpDescMap;
+//        return this;
+//    }
+//
+//    /**
+//     * 设置页面和视图树是否使用别名
+//     *
+//     * @param pageVtpDescEnabled
+//     * @return
+//     */
+//    public FTSDKConfig setPageVtpDescEnabled(boolean pageVtpDescEnabled) {
+//        this.pageVtpDescEnabled = pageVtpDescEnabled;
+//        return this;
+//    }
 
-    /**
-     * 设置使用高德作为逆向地址解析
-     *
-     * @param useGeoKey
-     * @param geoKey
-     * @return
-     */
-    public FTSDKConfig setGeoKey(boolean useGeoKey, String geoKey) {
-        this.useGeoKey = useGeoKey;
-        this.geoKey = geoKey;
-        return this;
-    }
-
-    /**
-     * 是否开启网络全路径请求时长监控
-     *
-     * @param value
-     * @return
-     */
-    public FTSDKConfig trackNetRequestTime(boolean value) {
-        this.trackNetTime = value;
-        return this;
-    }
-
-    /**
-     * 页面别名对应 map
-     *
-     * @param pageDescMap
-     * @return
-     */
-    public FTSDKConfig addPageDesc(Map<String, String> pageDescMap) {
-        this.pageDescMap = pageDescMap;
-        return this;
-    }
-
-    /**
-     * 事件别名对应 map
-     *
-     * @param vtpDescMap
-     * @return
-     */
-    public FTSDKConfig addVtpDesc(Map<String, String> vtpDescMap) {
-        this.vtpDescMap = vtpDescMap;
-        return this;
-    }
-
-    /**
-     * 设置页面和视图树是否使用别名
-     *
-     * @param pageVtpDescEnabled
-     * @return
-     */
-    public FTSDKConfig setPageVtpDescEnabled(boolean pageVtpDescEnabled) {
-        this.pageVtpDescEnabled = pageVtpDescEnabled;
-        return this;
-    }
-
-    /**
-     * 设置流程图是否使用别名显示
-     *
-     * @param flowChartDescEnabled
-     * @return
-     */
-
-    @Deprecated
-    public FTSDKConfig setFlowChartDescEnabled(boolean flowChartDescEnabled) {
-        this.flowChartDescEnabled = flowChartDescEnabled;
-        return this;
-    }
 
     /**
      * 设置是否需要采集崩溃日志
