@@ -5,10 +5,9 @@ import androidx.annotation.NonNull;
 import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.TokenCheck;
 import com.ft.sdk.garble.bean.DataType;
+import com.ft.sdk.garble.bean.LineProtocolBean;
 import com.ft.sdk.garble.bean.LogBean;
-import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.SyncJsonData;
-import com.ft.sdk.garble.bean.TrackBean;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.http.RequestMethod;
@@ -49,20 +48,35 @@ public class FTTrackInner {
         return instance;
     }
 
+    void rumInflux(long time, String measurement, final JSONObject tags, JSONObject fields) {
+        syncDataBackground(DataType.RUM_INFLUX, time, measurement, tags, fields);
+
+    }
+
+    void rumES(long time, String measurement, final JSONObject tags, JSONObject fields) {
+        syncDataBackground(DataType.RUM_ES, time, measurement, tags, fields);
+    }
+
 
     /**
      * 在子线程中将埋点数据同步（经过数据库）
      *
-     * @param op
      * @param time
      * @param measurement
      * @param tags
      * @param fields
      */
-    void trackBackground(OP op, long time, String measurement, final JSONObject tags, JSONObject fields) {
+    void trackBackground(long time, String measurement, final JSONObject tags, JSONObject fields) {
+        SyncDataHelper.addMonitorData(tags, fields);
+        syncDataBackground(DataType.TRACK, time, measurement, tags, fields);
+    }
+
+    private void syncDataBackground(DataType dataType, long time,
+                                    String measurement, final JSONObject tags, JSONObject fields) {
         ThreadPoolUtils.get().execute(() -> {
             try {
-                SyncJsonData recordData = SyncJsonData.getFromTrackBean(new TrackBean(measurement, tags, fields, time), op);
+                SyncJsonData recordData = SyncJsonData.getSyncJsonData(dataType,
+                        new LineProtocolBean(measurement, tags, fields, time));
                 boolean result = FTManager.getFTDBManager().insertFTOperation(recordData);
                 LogUtils.d(TAG, "trackBackground:insert-result=" + result);
                 FTManager.getSyncTaskManager().executeSyncPoll();
@@ -81,13 +95,14 @@ public class FTTrackInner {
      * @param trackBeans
      * @param callback
      */
-    void trackAsync(OP op, @NonNull List<TrackBean> trackBeans, AsyncCallback callback) {
+    void trackAsync(@NonNull List<LineProtocolBean> trackBeans, AsyncCallback callback) {
         ThreadPoolUtils.get().execute(() -> {
             List<SyncJsonData> recordDataList = new ArrayList<>();
-            for (TrackBean t : trackBeans) {
+            for (LineProtocolBean t : trackBeans) {
                 try {
-                    SyncJsonData recordData = SyncJsonData.getFromTrackBean(new TrackBean(t.getMeasurement(),
-                            t.getTags(), t.getFields(), t.getTimeMillis()), op);
+                    SyncJsonData recordData = SyncJsonData.getSyncJsonData(DataType.TRACK,
+                            new LineProtocolBean(t.getMeasurement(), t.getTags(),
+                                    t.getFields(), t.getTimeMillis()));
                     recordDataList.add(recordData);
                     uploadTrackOPData(recordDataList, callback);
                 } catch (Exception e) {
@@ -123,7 +138,7 @@ public class FTTrackInner {
         }
         SyncDataHelper syncDataManager = new SyncDataHelper();
         String body = syncDataManager.getBodyContent(DataType.TRACK, recordDataList);
-        String model = Constants.URL_MODEL_TRACK;
+        String model = Constants.URL_MODEL_TRACK_INFLUX;
         String content_type = "text/plain";
         ResponseData result = HttpBuilder.Builder()
                 .setModel(model)

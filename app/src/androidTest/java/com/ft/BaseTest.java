@@ -5,9 +5,12 @@ import android.Manifest;
 import androidx.test.rule.GrantPermissionRule;
 
 import com.ft.sdk.FTSdk;
+import com.ft.sdk.FTTrack;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.manager.SyncTaskManager;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Rule;
 import org.powermock.reflect.Whitebox;
@@ -63,5 +66,13 @@ public class BaseTest {
             e.printStackTrace();
         }
 
+    }
+
+    protected void simpleTrackData() throws JSONException {
+        JSONObject tags = new JSONObject();
+        tags.put("testTag", "tagTest");
+        JSONObject fields = new JSONObject();
+        fields.put("testField", "----simpleTest----");
+        FTTrack.getInstance().trackBackground("testMeasurement", tags, fields);
     }
 }

@@ -1,5 +1,6 @@
 package com.ft.sdk.garble.utils;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.LinkProperties;
@@ -18,6 +19,10 @@ import androidx.annotation.Nullable;
 
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.garble.bean.NetStatusBean;
+import com.ft.sdk.garble.http.HttpBuilder;
+import com.ft.sdk.garble.http.RequestMethod;
+import com.ft.sdk.garble.http.ResponseData;
+import com.ft.sdk.garble.manager.AsyncCallback;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -33,12 +38,15 @@ import java.util.LinkedList;
  * Description:
  */
 public class NetUtils {
-    public static int NETWORK_NONE = 0;
-    public static int NETWORK_WIFI = 1;
-    public static int NETWORK_2G = 2;
-    public static int NETWORK_3G = 3;
-    public static int NETWORK_4G = 4;
-    public static int NETWORK_MOBILE = 5;
+    public final static int NETWORK_NONE = 0;
+    public final static int NETWORK_WIFI = 1;
+    public final static int NETWORK_2G = 2;
+    public final static int NETWORK_3G = 3;
+    public final static int NETWORK_4G = 4;
+    public final static int NETWORK_5G = 5;
+    public final static int NETWORK_MOBILE = NETWORK_5G + 1;
+
+    private static final String PUBLIC_IP_API = "http://ip-api.com/json";
 
     private static NetUtils netUtils;
     private boolean isListening;
@@ -56,15 +64,6 @@ public class NetUtils {
     private NetStatusBean lastNetStatus;
 
     private NetUtils() {
-    }
-
-    /**
-     * 仅测试用例可用
-     *
-     * @return
-     */
-    public boolean isRunNetMonitor() {
-        return isRunNetMonitor;
     }
 
     private final Object lock = new Object();
@@ -103,6 +102,7 @@ public class NetUtils {
      * @param context
      * @return
      */
+    @SuppressLint("MissingPermission")
     public int getNetworkState(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (null == cm) {
@@ -148,6 +148,8 @@ public class NetUtils {
             // 4G网络
             case TelephonyManager.NETWORK_TYPE_LTE:
                 return NETWORK_4G;
+            case TelephonyManager.NETWORK_TYPE_NR:
+                return NETWORK_5G;
             default:
                 return NETWORK_MOBILE;
         }
@@ -288,8 +290,8 @@ public class NetUtils {
 
         lastRx = tempRx;
         lastTx = tempTx;
-        netDownRate = rxLast ;
-        netUpRate = txLast ;
+        netDownRate = rxLast;
+        netUpRate = txLast;
     }
 
     /**
@@ -425,6 +427,22 @@ public class NetUtils {
             }
         }
         return null;
+    }
+
+    /**
+     * 获取外网 IP 地址
+     * @param callback
+     */
+    public void getPublicIp(AsyncCallback callback) {
+        ThreadPoolUtils.get().execute(() -> {
+            ResponseData result = HttpBuilder.Builder()
+                    .setUrl(PUBLIC_IP_API)
+                    .setMethod(RequestMethod.GET)
+                    .executeSync(ResponseData.class);
+            if (callback != null) {
+                callback.onResponse(result.getHttpCode(), result.getData());
+            }
+        });
     }
 
 

@@ -9,6 +9,12 @@ import androidx.annotation.Nullable;
 
 import com.ft.sdk.FTAutoTrack;
 import com.ft.sdk.garble.FTFragmentManager;
+import com.ft.sdk.garble.bean.AppState;
+import com.ft.sdk.garble.utils.AopUtils;
+import com.ft.sdk.garble.utils.FpsUtils;
+import com.ft.sdk.garble.utils.Utils;
+
+import java.util.HashMap;
 
 /**
  * BY huangDianHua
@@ -16,8 +22,10 @@ import com.ft.sdk.garble.FTFragmentManager;
  * Description: Activity 生命周期回调类
  */
 public class FTActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
-    private final AppRestartCallback appRestartCallback = new AppRestartCallback();
-    private boolean init = false;
+    private final AppRestartCallback mAppRestartCallback = new AppRestartCallback();
+    private boolean mInit = false;
+    private final HashMap<Activity, Long> mCreateMap = new HashMap<>();
+
 
     @Override
     public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
@@ -26,20 +34,32 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
 //            NetUtils.get().startMonitorNetRate();
 //        }
         FTFragmentManager.getInstance().addFragmentLifecycle(activity);
+        mCreateMap.put(activity, System.currentTimeMillis());
     }
 
     @Override
     public void onActivityStarted(@NonNull Activity activity) {
-        appRestartCallback.onStart();
+        mAppRestartCallback.onStart();
     }
 
     @Override
     public void onActivityPostCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
-        if (init) {
+        if (mInit) {
             FTActivityManager.get().setAppState(AppState.RUNNING);
             FTAutoTrack.putLaunchPerformance(true);
-            init = true;
+            mInit = true;
         }
+
+        Long startTime = mCreateMap.get(activity);
+        if (startTime != null) {
+            long duration = System.currentTimeMillis() - startTime;
+            String viewName = AopUtils.getClassName(activity);
+            String viewID = Utils.MD5_16(viewName).toLowerCase();
+            double fps = FpsUtils.get().getFps();
+            FTAutoTrack.putViewLoadPerformance(viewID, viewName, fps, duration);
+        }
+
+
 
     }
 
@@ -68,7 +88,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
 
     @Override
     public void onActivityPostResumed(@NonNull Activity activity) {
-        appRestartCallback.onPostResume();
+        mAppRestartCallback.onPostResume();
     }
 
     @Override
@@ -79,7 +99,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
 
     @Override
     public void onActivityStopped(@NonNull Activity activity) {
-        appRestartCallback.onStop();
+        mAppRestartCallback.onStop();
     }
 
     @Override
@@ -93,6 +113,6 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
         //移除对 Fragment 的生命周期的监听
         FTFragmentManager.getInstance().removeFragmentLifecycle(activity);
         //从 Activity 的管理栈中移除 Activity
-        FTManager.getFTActivityManager().removeActivity();
+        FTManager.getFTActivityManager().removeActivity(activity);
     }
 }

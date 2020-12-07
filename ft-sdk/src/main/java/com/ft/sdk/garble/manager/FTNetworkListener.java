@@ -1,4 +1,4 @@
-package com.ft.sdk.garble;
+package com.ft.sdk.garble.manager;
 
 import android.app.Application;
 import android.content.BroadcastReceiver;
@@ -13,7 +13,6 @@ import android.os.Build;
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.FTApplication;
-import com.ft.sdk.garble.manager.SyncTaskManager;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.NetUtils;
 
@@ -110,13 +109,15 @@ public class FTNetworkListener {
     private void judgeNetState() {
         //大于 0 有网
         if (NetUtils.get().getNetworkState(application) > 0) {
-            LogUtils.d(TAG,"Net->" + "网络已连接");
+            LogUtils.d(TAG, "Net->" + "网络已连接");
             SyncTaskManager.get().executeSyncPoll();
         }
+
+
     }
 
-    public void release(){
-        if(connectivityManager == null){
+    public void release() {
+        if (connectivityManager == null) {
             instance = null;
             return;
         }

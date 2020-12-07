@@ -63,7 +63,7 @@ public class FTSDKConfig {
     //设置采样率
     private float traceSamplingRate = 1;
     //崩溃日志的环境
-    private String env = BuildConfig.BUILD_TYPE;
+    private EnvType env = EnvType.PROD;
     //是否开启网络日志上报
     private boolean networkTrace;
     //崩溃日志的 __serviceName
@@ -234,7 +234,7 @@ public class FTSDKConfig {
         return traceSamplingRate;
     }
 
-    public String getEnv() {
+    public EnvType getEnv() {
         return env;
     }
 
@@ -480,12 +480,12 @@ public class FTSDKConfig {
     }
 
     /**
-     * 设置崩溃日志的环境
+     * 设置数据传输的环境
      *
      * @param env
      * @return
      */
-    public FTSDKConfig setEnv(String env) {
+    public FTSDKConfig setEnv(EnvType env) {
         if (env != null) {
             this.env = env;
         }

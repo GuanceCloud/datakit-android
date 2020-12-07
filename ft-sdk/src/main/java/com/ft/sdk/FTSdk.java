@@ -10,7 +10,7 @@ import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.FTFlowConfig;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
-import com.ft.sdk.garble.FTNetworkListener;
+import com.ft.sdk.garble.manager.FTNetworkListener;
 import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.manager.FTActivityLifecycleCallbacks;
 import com.ft.sdk.garble.manager.FTExceptionHandler;

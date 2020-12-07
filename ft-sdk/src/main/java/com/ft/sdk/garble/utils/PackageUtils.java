@@ -14,7 +14,7 @@ public class PackageUtils {
         return false;
     }
 
-    public boolean isOKHttp3Support() {
+    public static boolean isOKHttp3Support() {
         try {
             Class.forName(PACKAGE_OKHTTP3);
             return true;

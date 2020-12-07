@@ -8,6 +8,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.ft.AccountUtils;
 import com.ft.BaseTest;
 import com.ft.application.MockApplication;
+import com.ft.sdk.EnvType;
 import com.ft.sdk.FTLogger;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
@@ -65,7 +66,7 @@ public class LogTrackObjectTraceTest extends BaseTest {
                 .setNeedBindUser(false)//是否需要绑定用户信息
                 .setMonitorType(MonitorType.ALL)//设置监控项
                 .setEnableTrackAppCrash(true)
-                .setEnv("dev")
+                .setEnv(EnvType.GRAY)
                 .setTraceSamplingRate(1f)
                 .setNetworkTrace(true)
                 .setTraceConsoleLog(true)
@@ -154,9 +155,9 @@ public class LogTrackObjectTraceTest extends BaseTest {
         FTTrack.getInstance().trackBackground("TestLog", null, fields);
         Thread.sleep(5000);
 
-        List<SyncJsonData> list = FTDBManager.get().queryDataByDescLimitTrack(0);
+        List<SyncJsonData> list = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.LOG);
         Assert.assertTrue(list.size() > 0);
-        String content = list.get(0).getOpData().getContent();
+        String content = list.get(0).getDataString();
         JSONObject json = new JSONObject(content);
         Assert.assertTrue(json.getJSONObject("fields").optString("floatValue").contains("."));
         Assert.assertTrue(json.getJSONObject("fields").optString("doubleValue").contains("."));
@@ -170,11 +171,7 @@ public class LogTrackObjectTraceTest extends BaseTest {
      */
     @Test
     public void trackUploadDataTest() throws InterruptedException, JSONException {
-        JSONObject tags = new JSONObject();
-        tags.put("testTag", "tagTest");
-        JSONObject fields = new JSONObject();
-        fields.put("testField", "----trackUploadDataTest----");
-        FTTrack.getInstance().trackBackground("TestLog", tags, fields);
+        simpleTrackData();
         Thread.sleep(5000);
         uploadData(DataType.TRACK);
     }
@@ -303,13 +300,13 @@ public class LogTrackObjectTraceTest extends BaseTest {
         List<SyncJsonData> recordDataList = null;
         switch (dataType) {
             case OBJECT:
-                recordDataList = FTDBManager.get().queryDataByDescLimitObject(0);
+                recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.OBJECT);
                 break;
             case LOG:
-                recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);
+                recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.LOG);
                 break;
             case TRACK:
-                recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
+                recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.TRACK);
                 break;
         }
         SyncDataHelper syncDataManager = new SyncDataHelper();
@@ -338,20 +335,20 @@ public class LogTrackObjectTraceTest extends BaseTest {
         List<SyncJsonData> recordDataList = null;
         switch (type) {
             case OBJECT:
-                recordDataList = FTDBManager.get().queryDataByDescLimitObject(0);
+                recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.OBJECT);
                 break;
             case LOG:
-                recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);
+                recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.LOG);
                 break;
             case TRACK:
-                recordDataList = FTDBManager.get().queryDataByDescLimitTrack(0);
+                recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.TRACK);
                 break;
         }
         int except = 0;
         if (recordDataList != null) {
             for (SyncJsonData data : recordDataList) {
                 if (type.equals(DataType.TRACK)) {
-                    if (data.getOpData().getContent().contains(target)) {
+                    if (data.getDataString().contains(target)) {
                         except++;
                     }
 

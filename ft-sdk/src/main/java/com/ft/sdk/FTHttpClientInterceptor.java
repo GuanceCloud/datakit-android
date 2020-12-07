@@ -1,6 +1,7 @@
 package com.ft.sdk;
 
 import com.ft.sdk.garble.http.HttpUrl;
+import com.ft.sdk.garble.utils.LogUtils;
 
 import org.apache.hc.client5.http.entity.EntityBuilder;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
@@ -11,6 +12,7 @@ import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpException;
 import org.apache.hc.core5.http.HttpRequest;
 import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.impl.BasicEndpointDetails;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.HttpEntityWrapper;
 import org.apache.hc.core5.http.message.BasicClassicHttpRequest;
@@ -76,6 +78,9 @@ public class FTHttpClientInterceptor {
      */
     public void process(HttpResponse response, EntityDetails entity, HttpContext context) throws HttpException, IOException {
         boolean isError = response == null || response.getCode() >= 400;
+
+        BasicEndpointDetails object= (BasicEndpointDetails) context.getAttribute("http.connection-endpoint");
+        object.getRemoteAddress();
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("requestContent", requestContent);

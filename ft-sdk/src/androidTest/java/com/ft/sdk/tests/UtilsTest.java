@@ -5,10 +5,9 @@ import android.content.Context;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.ft.sdk.garble.bean.DataType;
-import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.ObjectBean;
 import com.ft.sdk.garble.bean.SyncJsonData;
-import com.ft.sdk.garble.bean.TrackBean;
+import com.ft.sdk.garble.bean.LineProtocolBean;
 import com.ft.sdk.garble.manager.SyncDataHelper;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.Utils;
@@ -104,8 +103,8 @@ public class UtilsTest {
         tags.put(KEY_TAGS, VALUE_TAGS);
         JSONObject fields = new JSONObject();
         fields.put(KEY_FIELD, VALUE_FIELD);
-        TrackBean trackBean = new TrackBean(TEST_MEASUREMENT_INFLUX_DB_LINE, tags, fields, VALUE_TIME);
-        SyncJsonData data = SyncJsonData.getFromTrackBean(trackBean, OP.HTTP_CLIENT);
+        LineProtocolBean trackBean = new LineProtocolBean(TEST_MEASUREMENT_INFLUX_DB_LINE, tags, fields, VALUE_TIME);
+        SyncJsonData data = SyncJsonData.getSyncJsonData(, trackBean);
 
         List<SyncJsonData> recordDataList = new ArrayList<>();
         recordDataList.add(data);

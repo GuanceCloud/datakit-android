@@ -2,6 +2,9 @@ package com.ft.sdk.garble.http;
 
 import android.util.Log;
 
+import com.ft.sdk.garble.bean.NetStatusBean;
+import com.ft.sdk.garble.utils.NetUtils;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +29,12 @@ public class OkHttpEngine implements INetEngine {
     @Override
     public void defaultConfig(HttpBuilder httpBuilder) {
         if (client == null) {
-            NetStatusMonitor listener = new NetStatusMonitor();
+            NetStatusMonitor listener = new NetStatusMonitor() {
+                @Override
+                public void getNetStatusInfoWhenCallEnd(NetStatusBean bean) {
+                    NetUtils.get().setLastMonitorStatus(bean);
+                }
+            };
             client = new OkHttpClient.Builder()
                     .connectTimeout(httpBuilder.getSendOutTime(), TimeUnit.MILLISECONDS)
                     .readTimeout(httpBuilder.getReadOutTime(), TimeUnit.MILLISECONDS)

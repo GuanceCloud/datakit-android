@@ -7,7 +7,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
 import com.ft.sdk.FTApplication;
-import com.ft.sdk.garble.FTMonitorConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -164,9 +163,11 @@ public class SensorUtils {
     }
 
     public void release() {
-        for (Sensor sensor : sensorList) {
-            if (sensorManager != null) {
-                sensorManager.unregisterListener(eventListener, sensor);
+        if (sensorList != null) {
+            for (Sensor sensor : sensorList) {
+                if (sensorManager != null) {
+                    sensorManager.unregisterListener(eventListener, sensor);
+                }
             }
         }
     }

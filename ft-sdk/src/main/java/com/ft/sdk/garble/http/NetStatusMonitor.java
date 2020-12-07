@@ -1,7 +1,6 @@
 package com.ft.sdk.garble.http;
 
 import com.ft.sdk.garble.bean.NetStatusBean;
-import com.ft.sdk.garble.utils.NetUtils;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,14 +19,16 @@ import okhttp3.Protocol;
 /**
  *
  */
-public class NetStatusMonitor extends EventListener {
+public abstract class NetStatusMonitor extends EventListener {
 
     private final NetStatusBean netStatusBean = new NetStatusBean();
+
+    protected abstract void getNetStatusInfoWhenCallEnd(NetStatusBean bean);
 
     @Override
     public void callEnd(@NotNull Call call) {
         super.callEnd(call);
-        NetUtils.get().setLastMonitorStatus(netStatusBean);
+        getNetStatusInfoWhenCallEnd(netStatusBean);
     }
 
     @Override

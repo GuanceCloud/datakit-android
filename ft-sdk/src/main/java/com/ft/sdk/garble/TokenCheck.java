@@ -45,7 +45,7 @@ public class TokenCheck {
         lastDataWayToken = token;
         if (!Utils.isNullOrEmpty(token)) {
             ResponseData result = HttpBuilder.Builder()
-                    .setHost(FTHttpConfig.get().serverUrl)
+                    .setUrl(FTHttpConfig.get().serverUrl)
                     .setModel(Constants.URL_MODEL_TOKEN_CHECK + "/" + token)
                     .setMethod(RequestMethod.GET)
                     .enableToken(false)

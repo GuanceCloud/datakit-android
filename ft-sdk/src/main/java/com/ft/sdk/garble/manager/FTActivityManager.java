@@ -6,6 +6,8 @@ import android.app.ActivityManager;
 import android.content.Context;
 
 import com.ft.sdk.FTApplication;
+import com.ft.sdk.garble.bean.AppState;
+import com.ft.sdk.garble.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,19 +68,16 @@ public class FTActivityManager {
         if (activityList == null) {
             activityList = new ArrayList<>();
         }
+
         activityList.add(activity);
+        if (activityList.size() > 2) {
+            Activity stackTop = activityList.remove(0);
+            removeActivityStatus(stackTop.getClass().getName());
+
+        }
     }
 
-    public void removeActivity() {
-        try {
-            if (activityList.size() > 3) {
-                Activity activity = activityList.remove(0);
-                removeActivityStatus(activity.getClass().getName());
-            }
-            topActivity = (activityList == null || activityList.size() <= 0) ? null : activityList.get(activityList.size() - 1);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void removeActivity(Activity activity) {
     }
 
     /**

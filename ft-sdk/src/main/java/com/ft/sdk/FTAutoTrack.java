@@ -19,12 +19,17 @@ import androidx.annotation.Nullable;
 import com.ft.sdk.garble.FTAutoTrackConfig;
 import com.ft.sdk.garble.FTFlowConfig;
 import com.ft.sdk.garble.FTFragmentManager;
+import com.ft.sdk.garble.bean.AppState;
+import com.ft.sdk.garble.bean.CrashType;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.OP;
+import com.ft.sdk.garble.bean.ResourceBean;
 import com.ft.sdk.garble.manager.FTActivityManager;
 import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.Utils;
 import com.google.android.material.tabs.TabLayout;
 
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -345,6 +350,7 @@ public class FTAutoTrack {
      * APP 启动
      */
     public static void startApp() {
+        globalParentPage = null;
         startTimeline = System.currentTimeMillis();
         if (!FTAutoTrackConfig.get().isAutoTrack()) {
             return;
@@ -363,9 +369,11 @@ public class FTAutoTrack {
      */
     public static void sleepApp(long timeDelay) {
         long now = System.currentTimeMillis() - timeDelay;
-        putClientTimeCost(now, OP.CLIENT_ACTIVATED_TIME, now - startTimeline);
+        putClientTimeCost(now, now - startTimeline);
 
     }
+
+    private static String globalParentPage;
 
 
     /**
@@ -686,9 +694,13 @@ public class FTAutoTrack {
 
     private static void putPageEvent(long time, @NonNull OP op, @Nullable String currentPage,
                                      @Nullable String rootPage, @Nullable String parentPage, @Nullable String vtp) {
+        if (op.equals(OP.OPEN_ACT)) {
+            globalParentPage = parentPage;
+        }
+
         try {
-//            JSONObject tags = new JSONObject();
-//            JSONObject fields = new JSONObject();
+            JSONObject tags = new JSONObject();
+            JSONObject fields = new JSONObject();
 //            if (vtp != null) {
 //                tags.put("vtp", vtp);
 //                fields.put("vtp_desc", FTAliasConfig.get().getVtpDesc(vtp));
@@ -710,6 +722,11 @@ public class FTAutoTrack {
 //            String eventName = op.toEventName();
 //            fields.put(Constants.KEY_EVENT, eventName);
 //            tags.put(Constants.KEY_EVENT_ID, Utils.MD5(eventName));
+
+//            if(op.needMonitorData()){
+//                SyncDataHelper.addMonitorData(tags,fields);
+//            }
+
 //            FTTrackInner.getInstance().trackBackground(op, time, Constants.FT_MEASUREMENT_PAGE_EVENT, tags, fields);
 
             addLogging(currentPage, op, vtp);
@@ -721,18 +738,19 @@ public class FTAutoTrack {
     }
 
     /**
-     * 记录
+     * 记录应用登陆时效
      */
     public static void putLaunchPerformance(boolean isCold) {
+        if (!Utils.enableTraceSamplingRate()) return;
         long time = System.currentTimeMillis();
-        long duration = startTimeline - time;
+        long duration = time - startTimeline;
 
         try {
-            JSONObject tags = new JSONObject();
+            JSONObject tags = getRUMPublicDynamicTags();
             JSONObject fields = new JSONObject();
             tags.put("app_startup_type", isCold ? "cold" : "hot");
-            tags.put("app_startup_duration", duration);
-            FTTrackInner.getInstance().trackBackground(OP.RUM_LAUNCH_PERFORMANCE, time,
+            fields.put("app_startup_duration", duration);
+            FTTrackInner.getInstance().rumInflux(time,
                     Constants.FT_MEASUREMENT_RUM_APP_START_UP, tags, fields);
         } catch (Exception e) {
             LogUtils.e(TAG, e.toString());
@@ -740,39 +758,191 @@ public class FTAutoTrack {
     }
 
     /**
-     * 记录应用消耗时间
-     *
-     * @param time
-     * @param op
-     * @param duration
+     * 记录页面加载性能
      */
-    private static void putClientTimeCost(long time, OP op, long duration) {
+    public static void putViewLoadPerformance(String viewId, String viewName, double fps, long loadTime) {
+        if (!Utils.enableTraceSamplingRate()) return;
+        long time = System.currentTimeMillis();
         try {
-            JSONObject tags = new JSONObject();
+            JSONObject tags = getRUMPublicDynamicTags();
             JSONObject fields = new JSONObject();
-            fields.put(Constants.KEY_TIME_COST_DURATION, duration * 1000);
+            tags.put("view_id", viewId);
+            tags.put("view_name", viewName);
+            if (globalParentPage != null) {
+                tags.put("view_parent", globalParentPage);
+            }
+            if (fps > 0) {
+                fields.put("view_fps", fps);
+            }
+            fields.put("view_load", loadTime);
+            FTTrackInner.getInstance().rumInflux(time,
+                    Constants.FT_MEASUREMENT_RUM_APP_VIEW, tags, fields);
+        } catch (Exception e) {
+            LogUtils.e(TAG, e.toString());
+        }
+    }
 
-            FTTrackInner.getInstance().trackBackground(op, time, Constants.FT_MEASUREMENT_TIME_COST_CLIENT, tags, fields);
+    /**
+     * 资源加载性能
+     */
+    public static void putResourcePerformance(ResourceBean bean) {
+        if (!Utils.enableTraceSamplingRate()) return;
+        long time = System.currentTimeMillis();
+        try {
+            JSONObject tags = getRUMPublicDynamicTags();
+            JSONObject fields = new JSONObject();
+
+            tags.put("resource_url_host", bean.urlHost);
+            if (!bean.urlPath.isEmpty()) {
+                tags.put("resource_url_path", bean.urlPath);
+            }
+            if (!bean.resourceType.isEmpty()) {
+                tags.put("resource_type", bean.resourceType);
+            }
+            tags.put("response_connection", bean.responseConnection);
+            tags.put("response_content_type", bean.responseContentType);
+            tags.put("response_content_encoding", bean.responseContentEncoding);
+            tags.put("resource_method", bean.resourceMethod);
+            tags.put("resource_status", bean.resourceStatus);
+
+            if (bean.resourceSize > 0) {
+                fields.put("resource_size", bean.resourceSize);
+            }
+            if (bean.resourceLoad > 0) {
+                fields.put("resource_load", bean.resourceLoad);
+            }
+
+            if (bean.resourceDNS > 0) {
+                fields.put("resource_dns", bean.resourceDNS);
+            }
+            if (bean.resourceTCP > 0) {
+                fields.put("resource_tcp", bean.resourceTCP);
+            }
+            if (bean.resourceSSL > 0) {
+                fields.put("resource_ssl", bean.resourceSSL);
+            }
+            if (bean.resourceTTFB > 0) {
+                fields.put("resource_ttfb", bean.resourceTTFB);
+            }
+
+            if (bean.resourceTrans > 0) {
+                fields.put("resource_trans", bean.resourceTrans);
+            }
+
+            FTTrackInner.getInstance().rumInflux(time,
+                    Constants.FT_MEASUREMENT_RUM_APP_RESOURCE_PERFORMANCE, tags, fields);
         } catch (Exception e) {
             LogUtils.e(TAG, e.toString());
         }
     }
 
 
-//    /**
-//     * 应用登陆状态，添加
-//     *
-//     * @param op
-//     */
-//    private static void addObject(OP op) {
-//        if (op != OP.LANC) {
-//            return;
-//        }
-//        Context context = FTApplication.getApplication();
-//        String name = DeviceUtils.getUuid(context) + "_" + Utils.MD5_16(DeviceUtils.getApplicationId(context));
-//        ObjectBean objectBean = new ObjectBean(name.toUpperCase(), SyncDataHelper.getDefaultObjectBean());
-//        FTTrackInner.getInstance().objectBackground(objectBean);
-//    }
+    /**
+     * 界面轻微卡顿
+     *
+     * @param log
+     */
+    public static void uiBlock(String log) {
+        if (!Utils.enableTraceSamplingRate()) return;
+        long time = System.currentTimeMillis();
+        putFreeze("Freeze", 1000L, time);
+    }
+
+    /**
+     * 界面无响应
+     *
+     * @param log
+     */
+    public static void anr(String log, long dateline) {
+        if (!Utils.enableTraceSamplingRate()) return;
+        putFreeze("ANR", 5000L, dateline);
+
+    }
+
+    /**
+     * 崩溃
+     *
+     * @param log
+     * @param message
+     * @param state
+     */
+    public static void crash(String log, String message, long dateline, CrashType crashType, AppState state) {
+        if (!Utils.enableTraceSamplingRate()) return;
+
+        try {
+            JSONObject tags = getRUMPublicDynamicTags();
+            JSONObject fields = new JSONObject();
+
+            tags.put("crash_type", crashType.toString());
+            tags.put("crash_situation", state.toString());
+            tags.put("type", "crash");
+            fields.put("crash_message", message);
+            fields.put("crash_stack", log);
+
+        } catch (Exception e) {
+            LogUtils.e(TAG, e.getMessage());
+        }
+
+    }
+
+    /**
+     * 卡顿
+     *
+     * @param freezeType ANR，Freeze 两种
+     * @param duration
+     * @param dateline
+     */
+    private static void putFreeze(String freezeType, long duration, long dateline) {
+        if (!Utils.enableTraceSamplingRate()) return;
+        try {
+            JSONObject tags = getRUMPublicDynamicTags();
+            JSONObject fields = new JSONObject();
+
+            tags.put("freeze_type", freezeType);
+            fields.put("freeze_duration", duration);
+
+            FTTrackInner.getInstance().rumInflux(dateline,
+                    Constants.FT_MEASUREMENT_RUM_APP_FREEZE, tags, fields);
+        } catch (Exception e) {
+            LogUtils.e(TAG, e.getMessage());
+        }
+    }
+
+    /**
+     * 记录应用消耗时间
+     *
+     * @param time
+     * @param duration
+     */
+    private static void putClientTimeCost(long time, long duration) {
+        if (!Utils.enableTraceSamplingRate()) return;
+        try {
+            JSONObject tags = new JSONObject();
+            JSONObject fields = new JSONObject();
+            fields.put(Constants.KEY_TIME_COST_DURATION, duration * 1000);
+
+            FTTrackInner.getInstance().trackBackground(time, Constants.FT_MEASUREMENT_TIME_COST_CLIENT, tags, fields);
+        } catch (Exception e) {
+            LogUtils.e(TAG, e.toString());
+        }
+    }
+
+    /**
+     * 获取变化的公用 tag
+     *
+     * @return
+     */
+    private static JSONObject getRUMPublicDynamicTags() {
+        JSONObject tags = new JSONObject();
+        try {
+            tags.put(Constants.KEY_DEVICE_OS_VERSION, DeviceUtils.getOSVersion());
+            tags.put(Constants.KEY_APP_VERSION_NAME, Utils.getAppVersionName());
+        } catch (JSONException e) {
+            LogUtils.e(TAG, e.getMessage());
+        }
+        return tags;
+
+    }
 
 
     private static void addLogging(String currentPage, OP op, @Nullable String vtp) {
@@ -964,7 +1134,9 @@ public class FTAutoTrack {
      * @return
      */
     public static OkHttpClient trackOkHttpBuilder(OkHttpClient.Builder builder) {
-        builder.addInterceptor(new FTNetWorkTracerInterceptor());
+        FTNetWorkInterceptor interceptor = new FTNetWorkInterceptor();
+        builder.addNetworkInterceptor(interceptor);
+        builder.eventListener(interceptor);
         return builder.build();
     }
 

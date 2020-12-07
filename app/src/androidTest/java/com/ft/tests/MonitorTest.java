@@ -11,14 +11,12 @@ import com.ft.application.MockApplication;
 import com.ft.sdk.FTMonitor;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
-import com.ft.sdk.FTTrack;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.utils.Constants;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -54,22 +52,23 @@ public class MonitorTest extends BaseTest {
                 .setDataWayToken(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_TOKEN))
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setMonitorType(MonitorType.ALL);//设置监控项
+
     }
 
-//    @Test
-//    public void monitorBatteryTest() {
-//        monitorTest(MonitorType.BATTERY);
-//    }
+    @Test
+    public void monitorBatteryTest() {
+        monitorTest(MonitorType.BATTERY);
+    }
 
     @Test
     public void monitorMemoryTest() {
         monitorTest(MonitorType.MEMORY);
     }
 
-//    @Test
-//    public void monitorCPUTest() {
-//        monitorTest(MonitorType.CPU);
-//    }
+    @Test
+    public void monitorCPUTest() {
+        monitorTest(MonitorType.CPU);
+    }
 //
 //    @Test
 //    public void monitorGPUTest() {
@@ -123,16 +122,20 @@ public class MonitorTest extends BaseTest {
     private void monitorTest(int monitorType) {
         ftSDKConfig.setMonitorType(monitorType);
         FTSdk.install(ftSDKConfig);
-//        SyncTaskManager.get().setRunning(true);
+
         stopSyncTask();
-        FTTrack.getInstance().trackBackground("TestMonitor", getJSONObject("tag", "tagTest"), getJSONObject("field", "fieldTest"));
+        try {
+            simpleTrackData();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(1);
-        String data = recordDataList.get(0).getOpData().getContent();
+        String data = recordDataList.get(0).getDataString();
         judge(data, monitorType);
         try {
             Thread.sleep(1000);
@@ -158,9 +161,9 @@ public class MonitorTest extends BaseTest {
      */
     private HashMap<Integer, String> createMonitorMap() {
         HashMap<Integer, String> expects = new HashMap<>();
-//        expects.put(MonitorType.BATTERY, Constants.KEY_BATTERY_USE);
+        expects.put(MonitorType.BATTERY, Constants.KEY_BATTERY_USE);
         expects.put(MonitorType.MEMORY, Constants.KEY_MEMORY_USE);
-//        expects.put(MonitorType.CPU, Constants.KEY_CPU_HZ);
+        expects.put(MonitorType.CPU, Constants.KEY_CPU_HZ);
 //        expects.put(MonitorType.GPU, Constants.KEY_GPU_RATE);
 //        expects.put(MonitorType.NETWORK, Constants.KEY_NETWORK_PROXY);
 //        expects.put(MonitorType.CAMERA, "camera_back_px");
@@ -171,22 +174,6 @@ public class MonitorTest extends BaseTest {
         return expects;
     }
 
-    /**
-     * 构建一个 JSONObject 用于 tag or field
-     *
-     * @param key
-     * @param value
-     * @return
-     */
-    private JSONObject getJSONObject(String key, String value) {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put(key, value);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return jsonObject;
-    }
 
 
 }

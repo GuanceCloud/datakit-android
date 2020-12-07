@@ -13,9 +13,9 @@ import com.ft.BaseTest;
 import com.ft.DebugMainActivity;
 import com.ft.R;
 import com.ft.application.MockApplication;
-import com.ft.sdk.FTAutoTrackType;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
+import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
 
@@ -62,7 +62,6 @@ public class LogEventTest extends BaseTest {
                 .setUseOAID(true)//设置 OAID 是否可用
                 .setDebug(true)//设置是否是 debug
                 .enableAutoTrack(true)//设置是否开启自动埋点
-                .setGeoKey(true, AccountUtils.getProperty(context, AccountUtils.GEO_KEY))
                 .setNeedBindUser(false)//是否需要绑定用户信息
                 .setTraceSamplingRate(0.5f)
                 .setNetworkTrace(true)
@@ -83,7 +82,7 @@ public class LogEventTest extends BaseTest {
         onView(ViewMatchers.withId(R.id.mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.LOG);
         boolean value = false;
         for (SyncJsonData recordData : recordDataList) {
             if (recordData.toString().contains("mock_click_btn")) {
@@ -99,7 +98,7 @@ public class LogEventTest extends BaseTest {
         onView(withId(R.id.mock_page_jump_btn)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.LOG);
         boolean value = false;
         for (SyncJsonData recordData : recordDataList) {
             if (recordData.toString().contains("leave")) {
@@ -115,7 +114,7 @@ public class LogEventTest extends BaseTest {
         onView(withId(R.id.mock_page_jump_btn)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.LOG);
         boolean value = false;
         for (SyncJsonData recordData : recordDataList) {
             System.out.println(recordData.toString());
@@ -131,7 +130,7 @@ public class LogEventTest extends BaseTest {
     public void launchTest() throws InterruptedException {
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(0);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.LOG);
         boolean value = false;
         for (SyncJsonData recordData : recordDataList) {
             if (recordData.toString().contains("launch")) {

@@ -31,28 +31,12 @@ public class SyncJsonData implements Cloneable {
 
     String dataString;
 
-    /**
-     * 操作数据
-     */
-    OPData opData;
-
     public SyncJsonData(DataType dataType) {
         this.dataType = dataType;
     }
 
-
-    public OPData getOpData() {
-        return opData;
-    }
-
     public void setDataString(String dataString) {
         try {
-            if (dataType == DataType.TRACK) {
-                JSONObject jsonObject = new JSONObject(dataString);
-                opData = new OPData();
-                opData.setOpFromString(jsonObject.optString("op"));
-                opData.setContent(jsonObject.optString("opdata"));
-            }
             this.dataString = dataString;
 
         } catch (Exception e) {
@@ -103,13 +87,15 @@ public class SyncJsonData implements Cloneable {
     }
 
 
-    @NonNull
     @Override
     public String toString() {
-        return "RecordData[id=" + id +
-                ",time=" + time +
-                ",data=" + dataString +
-                "]";
+        return "SyncJsonData{" +
+                "id=" + id +
+                ", dataType=" + dataType +
+                ", dataString='" + dataString + '\'' +
+                ", time=" + time +
+                ", sessionid='" + sessionid + '\'' +
+                '}';
     }
 
     @NonNull
@@ -161,29 +147,21 @@ public class SyncJsonData implements Cloneable {
     /**
      * 追踪数据转化
      *
+     * @param dataType
      * @param bean
-     * @param op
      * @return
      * @throws JSONException
      * @throws InvalidParameterException
      */
-    public static SyncJsonData getFromTrackBean(TrackBean bean, OP op) throws JSONException, InvalidParameterException {
+    public static SyncJsonData getSyncJsonData(DataType dataType, LineProtocolBean bean)
+            throws JSONException, InvalidParameterException {
         JSONObject tagsTemp = bean.getTags();
-
         JSONObject fields = bean.getFields();
-        SyncJsonData recordData = new SyncJsonData(DataType.TRACK);
+        SyncJsonData recordData = new SyncJsonData(dataType);
         recordData.setTime(bean.getTimeMillis());
-
-        if (op.needMonitorData()) {
-            addMonitorData(tagsTemp, fields);
-        }
-
         JSONObject opDataJson = getLinProtocolJson(bean.getMeasurement(), tagsTemp, fields);
 
-        OPData opData = new OPData();
-        opData.setOp(op);
-        opData.setContent(FloatDoubleJsonUtils.protectValueFormat(opDataJson));
-        recordData.setDataString(opData.toJsonString());
+        recordData.setDataString(FloatDoubleJsonUtils.protectValueFormat(opDataJson));
 
         String sessionId = FTUserConfig.get().getSessionId();
         if (!Utils.isNullOrEmpty(sessionId)) {
@@ -191,6 +169,19 @@ public class SyncJsonData implements Cloneable {
         }
 
         return recordData;
+    }
+
+    public static SyncJsonData getMonitorData() throws JSONException {
+        JSONObject tags = new JSONObject();
+        JSONObject fields = new JSONObject();
+        addMonitorData(tags, fields);
+        SyncJsonData recordData = new SyncJsonData(DataType.TRACK);
+
+        JSONObject opDataJson = getLinProtocolJson(Constants.FT_MONITOR_MEASUREMENT, tags, fields);
+        recordData.setDataString(FloatDoubleJsonUtils.protectValueFormat(opDataJson));
+        recordData.setTime(System.currentTimeMillis());
+        return recordData;
+
     }
 
 

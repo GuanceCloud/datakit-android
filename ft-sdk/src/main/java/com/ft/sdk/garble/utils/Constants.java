@@ -22,7 +22,10 @@ public class Constants {
     public static final String FT_MEASUREMENT_HTTP_WEBVIEW = "mobile_webview_http";
     public static final String FT_MEASUREMENT_HTTP_CLIENT = "mobile_client_http";
     public static final String FT_MONITOR_MEASUREMENT = "mobile_monitor";
-    public static final String FT_MEASUREMENT_RUM_APP_START_UP="rum_app_startup";
+    public static final String FT_MEASUREMENT_RUM_APP_START_UP = "rum_app_startup";
+    public static final String FT_MEASUREMENT_RUM_APP_VIEW = "rum_app_view";
+    public static final String FT_MEASUREMENT_RUM_APP_FREEZE = "rum_app_freeze";
+    public static final String FT_MEASUREMENT_RUM_APP_RESOURCE_PERFORMANCE = "rum_app_resource_performance";
 
 
     public static final String FT_LOG_DEFAULT_MEASUREMENT = USER_AGENT;
@@ -41,7 +44,8 @@ public class Constants {
     public static final String SHARE_PRE_STEP_DATE = "share_pre_step_date";
     public static final String SHARE_PRE_STEP_HISTORY = "share_pre_step_history";
 
-    public static final String URL_MODEL_TRACK = "v1/write/metrics";//指标数据上传路径
+    public static final String URL_MODEL_TRACK_INFLUX = "v1/write/metrics";//指标数据上传路径
+    public static final String URL_MODEL_RUM = "v1/write/metrics";//
     public static final String URL_MODEL_LOG = "v1/write/logging";//日志数据上传路径
     public static final String URL_MODEL_KEY_EVENT = "v1/write/keyevent";//事件数据上传路径
     public static final String URL_MODEL_OBJECT = "v1/write/object";//对象数据上传路径
@@ -60,7 +64,8 @@ public class Constants {
 
     public static final String KEY_PAGE_EVENT_PAGE_DESC = "page_desc";
     public static final String KEY_PAGE_EVENT_USER_NAME = "ud_name";
-    public static final String KEY_PAGE_EVENT_USER_ID = "origin_id";
+    public static final String KEY_PAGE_EVENT_USER_ID = "userid";
+    public static final String KEY_PAGE_EVENT_IS_SIGNIN = "is_signin";
 
     public static final String KEY_TIME_COST_DURATION = "duration";
     public static final String KEY_TIME_COST_WEBVIEW_URL = "url";
@@ -69,8 +74,8 @@ public class Constants {
     public static final String KEY_HTTP_HOST = "host";
     public static final String KEY_HTTP_IS_ERROR = "isError";
 
-    public static final String KEY_APP_STARTUP="app_startup_type";
-    public static final String KEY_APP_STARTUP_DURATION="app_startup_duration";
+    public static final String KEY_APP_STARTUP = "app_startup_type";
+    public static final String KEY_APP_STARTUP_DURATION = "app_startup_duration";
 
     public static final String KEY_BATTERY_TOTAL = "battery_total";
     public static final String KEY_BATTERY_CHARGE_TYPE = "battery_charge_type";
@@ -152,6 +157,7 @@ public class Constants {
     public static final String KEY_DEVICE_LOCALE = "locale";
     public static final String KEY_DEVICE_OAID = "oaid";
     public static final String KEY_APP_VERSION_NAME = "version";
+    public static final String KEY_IP = "ip";
 
     public static final String EVENT_NAME_LAUNCH = "launch";
     public static final String EVENT_NAME_OPEN = "open";
@@ -179,14 +185,6 @@ public class Constants {
         OP_EVENT_MAPS.put(OP.CLS_ACT, Constants.EVENT_NAME_LEAVE);
         OP_EVENT_MAPS.put(OP.OPEN_ACT, Constants.EVENT_NAME_ENTER);
         OP_EVENT_MAPS.put(OP.OPEN_FRA, Constants.EVENT_NAME_ENTER);
-
-        OP_EVENT_MAPS.put(OP.WEBVIEW_LOADING, Constants.EVENT_NAME_WEBVIEW_LOADING);
-        OP_EVENT_MAPS.put(OP.WEBVIEW_LOAD_COMPLETED, Constants.EVENT_NAME_WEBVIEW_LOAD_COMPLETED);
-
-        OP_EVENT_MAPS.put(OP.CLIENT_ACTIVATED_TIME, Constants.EVENT_NAME_ACTIVATED);
-
-        OP_EVENT_MAPS.put(OP.HTTP_CLIENT, Constants.EVENT_NAME_HTTP_CLIENT);
-        OP_EVENT_MAPS.put(OP.HTTP_WEBVIEW, Constants.EVENT_NAME_HTTP_WEBVIEW);
     }
 
 
@@ -202,16 +200,5 @@ public class Constants {
             OP.OPEN_FRA,
     };
 
-    /**
-     * 需要用户相关联的数据
-     */
-    public static final OP[] USER_ACTION_EVENTS = new OP[]{
-            OP.LANC,
-            OP.CLK,
-            OP.CLS_FRA,
-            OP.CLS_ACT,
-            OP.OPEN_ACT,
-            OP.OPEN_FRA,
-    };
 
 }

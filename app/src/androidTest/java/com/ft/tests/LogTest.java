@@ -13,6 +13,7 @@ import com.ft.application.MockApplication;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.FTDBCachePolicy;
+import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
 
@@ -59,7 +60,7 @@ public class LogTest extends BaseTest {
     public void consoleLogTest() throws InterruptedException {
         Log.d("TestLog", "控制台日志测试用例qaws");
         Thread.sleep(4000);
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimitLog(10);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(10, DataType.LOG);
         int except = 0;
         if (recordDataList != null) {
             for (SyncJsonData data : recordDataList) {
@@ -85,7 +86,7 @@ public class LogTest extends BaseTest {
             Thread.sleep(10);
         }
         Thread.sleep(2000);
-        List<SyncJsonData> dataList = FTDBManager.get().queryDataByDescLimitLog(0);
+        List<SyncJsonData> dataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.LOG);
         int count = 0;
         for (SyncJsonData recordData : dataList) {
             if (recordData.getDataString().contains("控制台日志测试用例")) {

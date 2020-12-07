@@ -44,12 +44,22 @@ public class NetStatusBean {
     }
 
     public long getResponseTime() {
-        return responseEndTime - responseStartTime;
+        if (responseEndTime > responseStartTime) {
+            return responseEndTime - responseStartTime;
+        }
+        return 0;
     }
 
     public long getTTFB() {
         if (responseStartTime > fetchStartTime) {
             return responseStartTime - fetchStartTime;
+        }
+        return 0;
+    }
+
+    public long getHoleRequestTime() {
+        if (responseEndTime > fetchStartTime) {
+            return responseEndTime - fetchStartTime;
         }
         return 0;
     }

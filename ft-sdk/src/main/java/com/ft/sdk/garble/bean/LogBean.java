@@ -1,5 +1,6 @@
 package com.ft.sdk.garble.bean;
 
+import com.ft.sdk.EnvType;
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.utils.Constants;
@@ -26,7 +27,7 @@ public class LogBean {
     //日志所属业务或服务的名称，建议用户通过该标签指定产生该日志业务系统的名称
     String serviceName;
     //日志所属环境，比如可用 dev 表示开发环境，prod 表示生产环境，用户可自定义
-    String env;
+    EnvType env;
     //日志等级
     Status status = Status.INFO;
     //用于链路日志，表示当前 span 的上一个 span的 ID
@@ -51,8 +52,6 @@ public class LogBean {
     //用于链路日志，当前链路的请求响应时间，微秒为单位
     long duration;
     long time;
-
-    String appState;
 
     JSONObject tags;
     JSONObject fields;
@@ -121,8 +120,8 @@ public class LogBean {
             if (!Utils.isNullOrEmpty(serviceName)) {
                 tags.put("__serviceName", serviceName);
             }
-            if (!Utils.isNullOrEmpty(env)) {
-                tags.put("__env", env);
+            if (env != null) {
+                tags.put("__env", env.toString());
             }
             tags.put("__status", status.name);
 
@@ -168,10 +167,6 @@ public class LogBean {
         return tags;
     }
 
-    public void setAppState(String appState) {
-        this.appState = appState;
-    }
-
     public String getMeasurement() {
         return measurement;
     }
@@ -203,7 +198,7 @@ public class LogBean {
     }
 
 
-    public void setEnv(String env) {
+    public void setEnv(EnvType env) {
         this.env = env;
     }
 

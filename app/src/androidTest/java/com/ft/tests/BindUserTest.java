@@ -8,7 +8,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.ft.AccountUtils;
 import com.ft.BaseTest;
 import com.ft.application.MockApplication;
-import com.ft.sdk.FTAutoTrack;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.bean.SyncJsonData;
@@ -24,6 +23,7 @@ import java.util.List;
 
 import static com.ft.AllTests.hasPrepare;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * BY huangDianHua
@@ -49,6 +49,7 @@ public class BindUserTest extends BaseTest {
                 AccountUtils.getProperty(context, AccountUtils.ACCESS_KEY_ID),
                 AccountUtils.getProperty(context, AccountUtils.ACCESS_KEY_SECRET))
                 .setDataWayToken(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_TOKEN))
+                .setDebug(true)
                 .setNeedBindUser(true)
                 .enableAutoTrack(true);
         FTSdk.install(ftSDKConfig);
@@ -60,13 +61,14 @@ public class BindUserTest extends BaseTest {
      * @throws InterruptedException
      */
     @Test
-    public void notBindUserDataSync() throws InterruptedException {
+    public void notBindUserDataSync() throws InterruptedException, JSONException {
         //解绑用户
         FTSdk.get().unbindUserData();
+        simpleTrackData();
         //间隔15秒查询数据库数据，因为上传的逻辑最长可能要10秒后执行
         Thread.sleep(15000);
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimit(0);
-        assertEquals(1, recordDataList.size());
+        assertTrue(recordDataList.size() > 0);
     }
 
     /**
@@ -75,9 +77,9 @@ public class BindUserTest extends BaseTest {
      * @throws InterruptedException
      */
     @Test
-    public void bindUserDataSync() throws InterruptedException {
+    public void bindUserDataSync() throws InterruptedException, JSONException {
         bindUserData("FT-TEST");
-        FTAutoTrack.startApp();
+        simpleTrackData();
         Thread.sleep(15000);
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimit(0);
         assertEquals(0, recordDataList.size());
@@ -89,11 +91,11 @@ public class BindUserTest extends BaseTest {
      * @throws InterruptedException
      */
     @Test
-    public void unbindAndBindDataSync() throws InterruptedException {
+    public void unbindAndBindDataSync() throws InterruptedException, JSONException {
         FTSdk.get().unbindUserData();
         Thread.sleep(5000);
         bindUserData("FT-TEST");
-        FTAutoTrack.startApp();
+        simpleTrackData();
         Thread.sleep(15000);
         List<SyncJsonData> recordDataList1 = FTDBManager.get().queryDataByDescLimit(0);
         assertEquals(0, recordDataList1.size());

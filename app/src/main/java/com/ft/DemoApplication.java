@@ -3,6 +3,7 @@ package com.ft;
 import android.app.Application;
 import android.content.Context;
 
+import com.ft.sdk.EnvType;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
@@ -45,7 +46,7 @@ public class DemoApplication extends Application {
                 .setEnableTrackAppCrash(true)
                 .setEnableTrackAppANR(true)
                 .setEnableTrackAppUIBlock(true)
-                .setEnv("dev")
+                .setEnv(EnvType.GRAY)
                 .setTraceSamplingRate(1f)
                 .setNetworkTrace(true)
                 .setTraceConsoleLog(true)

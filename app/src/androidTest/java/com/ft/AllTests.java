@@ -10,7 +10,7 @@ import com.ft.tests.LogTrackObjectTraceTest;
 import com.ft.tests.TraceTest;
 import com.ft.tests.MonitorTest;
 import com.ft.tests.BindUserTest;
-import com.ft.tests.LocationTest;
+//import com.ft.tests.LocationTest;
 import com.ft.tests.base.OaidTest;
 
 import org.junit.runner.RunWith;
@@ -29,7 +29,7 @@ import org.junit.runners.Suite;
         BindUserTest.class,//用户绑定测试
 //        FTAutoTrackTest.class,//AutoTrack 测试
         FTInitParamTest.class,//Base-Property 参数测试
-        LocationTest.class,//定位测试
+//        LocationTest.class,//定位测试
         MonitorTest.class,//监控测试
         OaidTest.class,//oaid 测试
         SDKRunStateTest.class,//SDK 生命周期测试
