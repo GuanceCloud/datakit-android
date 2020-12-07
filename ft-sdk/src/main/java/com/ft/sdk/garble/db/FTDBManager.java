@@ -81,35 +81,9 @@ public class FTDBManager extends DBManager {
         return result[0];
     }
 
-    /**
-     * 查询log数据
-     *
-     * @param limit
-     * @return
-     */
-    public List<SyncJsonData> queryDataByDescLimitLog(final int limit) {
-        return queryDataByDescLimit(limit, FTSQL.RECORD_COLUMN_DATA_TYPE + "=?", new String[]{DataType.LOG.getValue()});
-    }
 
-
-    /**
-     * 查询 Object 数据
-     *
-     * @param limit
-     * @return
-     */
-    public List<SyncJsonData> queryDataByDescLimitObject(final int limit) {
-        return queryDataByDescLimit(limit, FTSQL.RECORD_COLUMN_DATA_TYPE + "=?", new String[]{DataType.OBJECT.getValue()});
-    }
-
-    /**
-     * 查询埋点事件数据
-     *
-     * @param limit
-     * @return
-     */
-    public List<SyncJsonData> queryDataByDescLimitTrack(final int limit) {
-        return queryDataByDescLimit(limit, FTSQL.RECORD_COLUMN_DATA_TYPE + "=? ", new String[]{DataType.TRACK.getValue()});
+    public List<SyncJsonData> queryDataByDataByTypeLimit(int limit, DataType dataType) {
+        return queryDataByDescLimit(limit, FTSQL.RECORD_COLUMN_DATA_TYPE + "=? ", new String[]{dataType.getValue()});
     }
 
     /**

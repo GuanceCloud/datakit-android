@@ -91,7 +91,7 @@ public class HttpBuilder {
         return useDefaultHead;
     }
 
-    public HttpBuilder setHost(String host) {
+    public HttpBuilder setUrl(String host) {
         this.host = host;
         return this;
     }

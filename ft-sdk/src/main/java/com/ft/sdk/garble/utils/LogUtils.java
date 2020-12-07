@@ -12,7 +12,7 @@ public class LogUtils{
     protected static String TAG = "[FT-SDK]:";
 
     private static boolean mDebug = true;
-    private static boolean aliasLogShow = true;
+    private static boolean aliasLogShow = false;
 
     public static boolean isDebug() {
         return mDebug;

@@ -44,12 +44,12 @@ public class FTMonitorManager {
      * 开启监控
      */
     public void startMonitor() {
-        if(FTMonitorConfig.get().getMonitorType() == 0){
-            LogUtils.e(TAG,"没有设置监控项，无法启用监控");
-        }else {
+        if (FTMonitorConfig.get().getMonitorType() == 0) {
+            LogUtils.e(TAG, "没有设置监控项，无法启用监控");
+        } else {
             mThread = new MonitorThread("监控轮训", period);
             mThread.start();
-            LogUtils.d(TAG,"监控轮训线程启动...");
+            LogUtils.d(TAG, "监控轮训线程启动...");
         }
     }
 
@@ -58,7 +58,7 @@ public class FTMonitorManager {
      */
     private void stopMonitor() {
         if (mThread != null && mThread.isAlive()) {
-            LogUtils.d(TAG,"关闭监控轮训线程");
+            LogUtils.d(TAG, "关闭监控轮训线程");
             mThread.interrupt();
             mThread = null;
         }
@@ -84,27 +84,27 @@ public class FTMonitorManager {
             try {
                 while (true) {
                     Thread.sleep(period * 1000);
-                    if(!TokenCheck.get().checkToken()){
+                    if (!TokenCheck.get().checkToken()) {
                         continue;
                     }
                     try {
-                        String body = SyncDataHelper.getMonitorUploadData();
-                        SyncDataHelper.printUpdateData(false,body);
+                        String body = new SyncDataHelper().getMonitorUploadData();
+                        SyncDataHelper.printUpdateData(false, body);
                         ResponseData result = HttpBuilder.Builder()
-                                .setModel(Constants.URL_MODEL_TRACK)
+                                .setModel(Constants.URL_MODEL_TRACK_INFLUX)
                                 .setMethod(RequestMethod.POST)
                                 .setBodyString(body).executeSync(ResponseData.class);
                         if (result.getHttpCode() != HttpURLConnection.HTTP_OK) {
-                            LogUtils.d(TAG,"监控轮训线程上传数据出错(message：" + result.getData() + ")");
-                        }else{
+                            LogUtils.d(TAG, "监控轮训线程上传数据出错(message：" + result.getData() + ")");
+                        } else {
                             System.out.println("轮训监控上报数据成功");
                         }
                     } catch (Exception e) {
-                        LogUtils.d(TAG,"监控轮训线程执行错误(message：" + e.getMessage() + ")");
+                        LogUtils.d(TAG, "监控轮训线程执行错误(message：" + e.getMessage() + ")");
                     }
                 }
             } catch (InterruptedException e) {
-                LogUtils.w(TAG,"监控轮训线程被关闭");
+                LogUtils.w(TAG, "监控轮训线程被关闭");
             }
         }
     }

@@ -1,7 +1,6 @@
 package com.ft.sdk;
 
-import com.ft.sdk.garble.bean.OP;
-import com.ft.sdk.garble.bean.TrackBean;
+import com.ft.sdk.garble.bean.LineProtocolBean;
 import com.ft.sdk.garble.manager.AsyncCallback;
 
 import org.json.JSONObject;
@@ -40,7 +39,7 @@ public class FTTrack {
      */
     public void trackBackground(String measurement, JSONObject tags, JSONObject fields) {
         long time = System.currentTimeMillis();
-        FTTrackInner.getInstance().trackBackground(OP.CSTM, time, measurement, tags, fields);
+        FTTrackInner.getInstance().trackBackground(time, measurement, tags, fields);
     }
 
     /**
@@ -53,8 +52,8 @@ public class FTTrack {
      */
     public void trackImmediate(String measurement, JSONObject tags, JSONObject fields, AsyncCallback callback) {
         long time = System.currentTimeMillis();
-        TrackBean trackBean = new TrackBean(measurement, tags, fields, time);
-        FTTrackInner.getInstance().trackAsync(OP.CSTM, Collections.singletonList(trackBean), callback);
+        LineProtocolBean trackBean = new LineProtocolBean(measurement, tags, fields, time);
+        FTTrackInner.getInstance().trackAsync(Collections.singletonList(trackBean), callback);
     }
 
     /**
@@ -63,8 +62,8 @@ public class FTTrack {
      * @param trackBeans 多条埋点数据
      * @param callback   上传结果回调
      */
-    public void trackImmediate(List<TrackBean> trackBeans, AsyncCallback callback) {
-        FTTrackInner.getInstance().trackAsync(OP.CSTM, trackBeans, callback);
+    public void trackImmediate(List<LineProtocolBean> trackBeans, AsyncCallback callback) {
+        FTTrackInner.getInstance().trackAsync(trackBeans, callback);
     }
 
 

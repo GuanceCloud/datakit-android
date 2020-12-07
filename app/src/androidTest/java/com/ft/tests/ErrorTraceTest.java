@@ -13,8 +13,10 @@ import com.ft.BaseTest;
 import com.ft.DebugMainActivity;
 import com.ft.R;
 import com.ft.application.MockApplication;
+import com.ft.sdk.EnvType;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
+import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.manager.FTExceptionHandler;
@@ -35,7 +37,7 @@ import static com.ft.AllTests.hasPrepare;
 /**
  * author: huangDianHua
  * time: 2020/8/27 11:21:02
- * description:
+ * description: UIblock ANR nativeCrash 需要手动测试，测试用例无法模拟
  */
 @RunWith(AndroidJUnit4.class)
 public class ErrorTraceTest extends BaseTest {
@@ -60,7 +62,7 @@ public class ErrorTraceTest extends BaseTest {
                 .setDataWayToken(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_TOKEN))
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setDebug(true)//设置是否是 debug
-                .setEnv("dev")
+                .setEnv(EnvType.GRAY)
                 .setTraceSamplingRate(0.5f)
                 .setOnlySupportMainProcess(true);
         //关闭数据自动同步操作
@@ -113,29 +115,39 @@ public class ErrorTraceTest extends BaseTest {
 //
 //    }
 
-    @Test
-    public void mockANRTest() throws InterruptedException {
-        ftSDKConfig.setEnableTrackAppANR(true);
+//    @Test //
+//    public void mockANRTest() throws InterruptedException {
+//        ftSDKConfig.setEnableTrackAppANR(true);
+//
+//        FTSdk.install(ftSDKConfig);
+//        onView(ViewMatchers.withId(R.id.mock_anr_btn)).perform(ViewActions.scrollTo()).perform(click());
+//        Thread.sleep(2000);
+//
+//        Assert.assertTrue(checkLogContent("ANR"));
+//    }
 
-        FTSdk.install(ftSDKConfig);
-        onView(ViewMatchers.withId(R.id.mock_anr_btn)).perform(ViewActions.scrollTo()).perform(click());
-        Thread.sleep(2000);
-
-        Assert.assertTrue(checkLogContent("ANR"));
-    }
-
-    @Test
-    public void mockUIBlockTest() throws InterruptedException {
-        ftSDKConfig.setEnableTrackAppUIBlock(true);
-
-        FTSdk.install(ftSDKConfig);
-        onView(ViewMatchers.withId(R.id.mock_ui_block_btn)).perform(ViewActions.scrollTo()).perform(click());
-
-        Thread.sleep(2000);
-
-        Assert.assertTrue(checkLogContent("UIBlock"));
-
-    }
+//    @Test
+//    public void mockUIBlockTest() throws InterruptedException {
+//        ftSDKConfig.setEnableTrackAppUIBlock(true);
+//
+//        FTSdk.install(ftSDKConfig);
+//        onView(ViewMatchers.withId(R.id.mock_ui_block_btn)).perform(ViewActions.scrollTo()).perform(click());
+//
+//        CountDownLatch countDownLatch = new CountDownLatch(1);
+//        new Thread() {
+//            @Override
+//            public void run() {
+//                try {
+//                    Thread.sleep(10000);
+//                    countDownLatch.countDown();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }.start();
+//        countDownLatch.await();
+//        Assert.assertTrue(checkLogContent("UIBlock"));
+//    }
 
     /**
      * 检验 Log 包含的内容
@@ -144,7 +156,7 @@ public class ErrorTraceTest extends BaseTest {
      * @return
      */
     private boolean checkLogContent(String content) {
-        List<SyncJsonData> recordDataTrackList = FTDBManager.get().queryDataByDescLimitLog(0);
+        List<SyncJsonData> recordDataTrackList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.LOG);
         boolean isContainLog = false;
         for (SyncJsonData recordData : recordDataTrackList) {
             if (recordData.getDataString().contains(content)) {

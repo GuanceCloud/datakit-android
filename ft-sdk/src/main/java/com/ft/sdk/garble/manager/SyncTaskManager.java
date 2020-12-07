@@ -75,16 +75,21 @@ public class SyncTaskManager {
                             "******************数据同步线程运行中*******************\n" +
                             "*******************************************************\n");
                     Thread.sleep(SLEEP_TIME);
-                    List<SyncJsonData> trackDataList = queryFromData(DataType.TRACK);
-                    List<SyncJsonData> objectDataList = queryFromData(DataType.OBJECT);
-                    List<SyncJsonData> logDataList = queryFromData(DataType.LOG);
-                    //如果打开绑定用户开关，但是没有绑定用户信息，那么就不上传用户数据，直到绑了
-                    if (FTUserConfig.get().isNeedBindUser() && !FTUserConfig.get().isUserDataBinded()) {
-                        trackDataList.clear();
-                        LogUtils.e(TAG, " \n********************请先绑定用户信息********************");
-                    }
-                    while (!trackDataList.isEmpty() || !objectDataList.isEmpty() ||
-                            !logDataList.isEmpty()) {
+
+
+                    while (true) {
+                        List<SyncJsonData> trackDataList = queryFromData(DataType.TRACK);
+                        List<SyncJsonData> objectDataList = queryFromData(DataType.OBJECT);
+                        List<SyncJsonData> logDataList = queryFromData(DataType.LOG);
+                        List<SyncJsonData> rumEsList = queryFromData(DataType.RUM_ES);
+                        List<SyncJsonData> rumInfluxList = queryFromData(DataType.RUM_INFLUX);
+
+                        //如果打开绑定用户开关，但是没有绑定用户信息，那么就不上传用户数据，直到绑了
+                        if (FTUserConfig.get().isNeedBindUser() && !FTUserConfig.get().isUserDataBinded()) {
+                            trackDataList.clear();
+                            LogUtils.e(TAG, " \n********************请先绑定用户信息********************");
+                        }
+
                         if (!Utils.isNetworkAvailable()) {
                             LogUtils.e(TAG, " \n**********************网络未连接************************");
                             break;
@@ -93,17 +98,29 @@ public class SyncTaskManager {
                             LogUtils.e(TAG, " \n************连续同步失败5次，停止当前轮询同步***********");
                             break;
                         }
+
+                        if (trackDataList.isEmpty() && objectDataList.isEmpty()
+                                && logDataList.isEmpty() && rumEsList.isEmpty()
+                                && rumInfluxList.isEmpty()) {
+                            break;
+                        }
+
                         if (!trackDataList.isEmpty()) {
                             handleSyncOpt(DataType.TRACK, trackDataList);
-                            trackDataList = queryFromData(DataType.TRACK);
                         }
                         if (!objectDataList.isEmpty()) {
                             handleSyncOpt(DataType.OBJECT, objectDataList);
-                            objectDataList = queryFromData(DataType.OBJECT);
                         }
                         if (!logDataList.isEmpty()) {
                             handleSyncOpt(DataType.LOG, logDataList);
-                            logDataList = queryFromData(DataType.LOG);
+                        }
+
+                        if (!rumEsList.isEmpty()) {
+                            handleSyncOpt(DataType.RUM_ES, rumEsList);
+                        }
+
+                        if (!rumInfluxList.isEmpty()) {
+                            handleSyncOpt(DataType.RUM_INFLUX, rumInfluxList);
                         }
                     }
                 } catch (Exception e) {
@@ -148,14 +165,7 @@ public class SyncTaskManager {
     }
 
     private List<SyncJsonData> queryFromData(DataType dataType) {
-        switch (dataType) {
-            case LOG:
-                return FTDBManager.get().queryDataByDescLimitLog(10);
-            case OBJECT:
-                return FTDBManager.get().queryDataByDescLimitObject(10);
-            default:
-                return FTDBManager.get().queryDataByDescLimitTrack(10);
-        }
+        return FTDBManager.get().queryDataByDataByTypeLimit(10, dataType);
     }
 
     /**
@@ -187,9 +197,14 @@ public class SyncTaskManager {
             case OBJECT:
                 model = Constants.URL_MODEL_OBJECT;
                 break;
+            case RUM_INFLUX:
+            case RUM_ES:
+                model = Constants.URL_MODEL_RUM;
+                break;
             default:
             case TRACK:
-                model = Constants.URL_MODEL_TRACK;
+                model = Constants.URL_MODEL_TRACK_INFLUX;
+                break;
         }
         String content_type = "text/plain";
         if (DataType.OBJECT == dataType) {

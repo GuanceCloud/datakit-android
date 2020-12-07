@@ -28,24 +28,19 @@ import com.ft.sdk.garble.utils.LocationUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.NetUtils;
 import com.ft.sdk.garble.utils.OaidUtils;
-import com.ft.sdk.garble.utils.SensorUtils;
+import com.ft.sdk.garble.utils.StringUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
-import static com.ft.sdk.garble.bean.OP.CLIENT_ACTIVATED_TIME;
-import static com.ft.sdk.garble.bean.OP.HTTP_CLIENT;
-import static com.ft.sdk.garble.bean.OP.WEBVIEW_LOADING;
-import static com.ft.sdk.garble.bean.OP.WEBVIEW_LOAD_COMPLETED;
 import static com.ft.sdk.garble.utils.Constants.FT_KEY_VALUE_NULL;
 import static com.ft.sdk.garble.utils.Constants.UNKNOWN;
 
@@ -71,9 +66,12 @@ public class SyncDataHelper {
             bodyContent = getObjectBodyContent(recordDatas);
         } else if (dataType == DataType.LOG) {
             bodyContent = getLogBodyContent(recordDatas);
+        } else if (dataType == DataType.RUM_INFLUX) {
+            bodyContent = getRumInfluxBodyContent(recordDatas);
+        } else if (dataType == DataType.RUM_ES) {
+            bodyContent = getRumEsBodyContent(recordDatas);
         } else {
             bodyContent = getTrackBodyContent(recordDatas);
-
         }
         return bodyContent.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION)
                 .replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK);
@@ -103,50 +101,74 @@ public class SyncDataHelper {
     }
 
     /**
+     * 获取 日志类型数据
+     *
+     * @param datas
+     * @return
+     */
+    private String getLogBodyContent(List<SyncJsonData> datas) {
+        return convertToLineProtocolLines(datas);
+    }
+
+    /**
+     * 转化为行协议数据
+     *
+     * @param datas
+     * @return
+     */
+    private String convertToLineProtocolLines(List<SyncJsonData> datas) {
+        return convertToLineProtocolLines(datas, null);
+    }
+
+    /**
+     * 转化为行协议数据
+     *
+     * @param datas
+     * @param extraTags
+     * @return
+     */
+    private String convertToLineProtocolLines(List<SyncJsonData> datas, HashMap<String, Object> extraTags) {
+        StringBuilder sb = new StringBuilder();
+        String extraTagsString = parseHashToString(extraTags);
+        for (SyncJsonData recordData : datas) {
+            //获取这条事件的指标
+            sb.append(getMeasurement(recordData));
+            if (!extraTagsString.isEmpty()) {
+                sb.append(",");
+                sb.append(extraTagsString);
+                //将有 sessionId 的数据，附加用户数据
+                addUserData(sb, recordData);
+                deleteLastComma(sb);
+            }
+            //获取埋点事件数据
+            sb.append(composeUpdateData(recordData));
+            sb.append(Constants.SEPARATION_LINE_BREAK);
+        }
+        return sb.toString();
+    }
+
+    private String getRumInfluxBodyContent(List<SyncJsonData> datas) {
+        return convertToLineProtocolLines(datas);
+    }
+
+    private String getRumEsBodyContent(List<SyncJsonData> datas) {
+        HashMap<String, Object> hashMap = getRumEsPublicTags();
+        return convertToLineProtocolLines(datas, hashMap);
+    }
+
+    /**
      * 封装本地埋点数据
      *
      * @param datas
      * @return
      */
-    public String getTrackBodyContent(List<SyncJsonData> datas) {
-        StringBuilder sb = new StringBuilder();
-        String device = parseHashToString(getBaseDeviceInfoTagsMap());
-
-        for (SyncJsonData recordData : datas) {
-            //获取这条事件的指标
-            sb.append(getMeasurement(recordData));
-            //获取埋点事件数据
-            sb.append(",");
-            sb.append(device);
-            //获取埋点事件数据
-            sb.append(composeUpdateData(recordData));
-            sb.append(Constants.SEPARATION_LINE_BREAK);
-        }
-        return sb.toString();
-    }
-
-    public String getLogBodyContent(List<SyncJsonData> datas) {
-        StringBuilder sb = new StringBuilder();
-        String device = parseHashToString(getBaseDeviceInfoTagsMap());
-        String uuid = parseHashToString(getUniqueIdMap());
-
-        for (SyncJsonData recordData : datas) {
-            //获取这条事件的指标
-            sb.append(getMeasurement(recordData));
-            sb.append(",");
-            sb.append(device);
-            sb.append(",");
-            sb.append(uuid);
-            //获取埋点事件数据
-            sb.append(composeUpdateData(recordData));
-            sb.append(Constants.SEPARATION_LINE_BREAK);
-        }
-        return sb.toString();
+    private String getTrackBodyContent(List<SyncJsonData> datas) {
+        HashMap<String, Object> deviceTags = getBaseDeviceInfoTagsMap();
+        return convertToLineProtocolLines(datas, deviceTags);
     }
 
     /**
      * 获得数据头
-     * (当{@link SyncJsonData#getOpData()#getOp()}等于
      * {@link com.ft.sdk.garble.bean.OP#CSTM} 时用field字段，其他情况用
      * {@link com.ft.sdk.garble.utils.Constants#FT_MEASUREMENT_PAGE_EVENT}
      *
@@ -156,13 +178,7 @@ public class SyncDataHelper {
         String measurement;
         try {
 
-            String jsonString;
-            if (data.getDataType().equals(DataType.TRACK)) {
-                jsonString = data.getOpData().getContent();
-            } else {
-                jsonString = data.getDataString();
-            }
-
+            String jsonString = data.getDataString();
             JSONObject jsonObject = new JSONObject(jsonString);
             String measurementTemp = jsonObject.optString(Constants.MEASUREMENT);
             if (Utils.isNullOrEmpty(measurementTemp)) {
@@ -183,8 +199,8 @@ public class SyncDataHelper {
      * @param obj
      * @return
      */
-    private static StringBuffer getCustomHash(JSONObject obj, boolean isTag) {
-        StringBuffer sb = new StringBuffer();
+    private static StringBuilder getCustomHash(JSONObject obj, boolean isTag) {
+        StringBuilder sb = new StringBuilder();
         Iterator<String> keys = obj.keys();
         while (keys.hasNext()) {
             String keyTemp = keys.next();
@@ -216,7 +232,7 @@ public class SyncDataHelper {
         return sb;
     }
 
-    private static void addQuotationMarks(StringBuffer sb, String value, boolean add) {
+    private static void addQuotationMarks(StringBuilder sb, String value, boolean add) {
         if (add) {
             sb.append(Utils.translateFieldValue(value));
         } else {
@@ -230,24 +246,16 @@ public class SyncDataHelper {
      * @return
      */
     private String composeUpdateData(SyncJsonData data) {
-        StringBuffer sb = new StringBuffer();
-        String jsonString;
-        if (data.getDataType().equals(DataType.TRACK)) {
-            jsonString = data.getOpData().getContent();
-        } else {
-            jsonString = data.getDataString();
-        }
+        StringBuilder sb = new StringBuilder();
+        String jsonString = data.getDataString();;
 
         if (jsonString != null) {
             try {
                 JSONObject opJson = new JSONObject(jsonString);
                 JSONObject tags = opJson.optJSONObject(Constants.TAGS);
                 JSONObject fields = opJson.optJSONObject(Constants.FIELDS);
-                StringBuffer tagSb = getCustomHash(tags, true);
-                StringBuffer valueSb = getCustomHash(fields, false);
-                if (!data.getDataType().equals(DataType.LOG) && data.getOpData().getOp().isUserRelativeOp()) {
-                    addUserData(tagSb, data);
-                }
+                StringBuilder tagSb = getCustomHash(tags, true);
+                StringBuilder valueSb = getCustomHash(fields, false);
                 deleteLastComma(tagSb);
                 if (tagSb.length() > 0) {
                     sb.append(",");
@@ -257,7 +265,7 @@ public class SyncDataHelper {
                 deleteLastComma(valueSb);
                 sb.append(valueSb);
                 sb.append(Constants.SEPARATION_PRINT);
-                sb.append(data.getTime() * 1000 * 1000);
+                sb.append(data.getTime() * 1000000);
             } catch (Exception e) {
                 LogUtils.e(TAG, e.getMessage());
             }
@@ -271,57 +279,52 @@ public class SyncDataHelper {
      *
      * @param sb
      */
-    private void addUserData(StringBuffer sb, SyncJsonData opData) {
+    private void addUserData(StringBuilder sb, SyncJsonData opData) {
         if (FTUserConfig.get().isNeedBindUser() && FTUserConfig.get().isUserDataBinded()) {
             UserData userData = FTUserConfig.get().getUserData(opData.getSessionId());
             if (userData != null) {
-//                sb.append(Constants.KEY_PAGE_EVENT_USER_NAME).append("=").append(Utils.translateTagKeyValue(userData.getName())).append(",");
-                sb.append(Constants.KEY_PAGE_EVENT_USER_ID).append("=").append(Utils.translateTagKeyValue(userData.getId())).append(",");
-                JSONObject js = userData.getExts();
-                if (js == null) {
-                    return;
-                }
-                Iterator<String> iterator = js.keys();
-                while (iterator.hasNext()) {
-                    String key = iterator.next();
-                    try {
-                        sb.append("ud_").append(Utils.translateTagKeyValue(key)).append("=").append(Utils.translateTagKeyValue(js.getString(key))).append(",");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                sb.append(",");
+                sb.append(Constants.KEY_PAGE_EVENT_IS_SIGNIN).append("=").append(true).append(",");
+
+                if (opData.getDataType() == DataType.RUM_ES) {
+                    //                sb.append(Constants.KEY_PAGE_EVENT_USER_NAME).append("=").append(Utils.translateTagKeyValue(userData.getName())).append(",");
+                    sb.append(Constants.KEY_PAGE_EVENT_USER_ID).append("=").append(Utils.translateTagKeyValue(userData.getId())).append(",");
+                    JSONObject js = userData.getExts();
+                    if (js == null) {
+                        return;
+                    }
+                    Iterator<String> iterator = js.keys();
+                    while (iterator.hasNext()) {
+                        String key = iterator.next();
+                        try {
+                            sb.append("ud_").append(Utils.translateTagKeyValue(key)).append("=").append(Utils.translateTagKeyValue(js.getString(key))).append(",");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
         }
     }
 
-    public static String getMonitorUploadData() {
-        JSONObject tags = new JSONObject();
-        JSONObject fields = new JSONObject();
-        addMonitorData(tags, fields);
-        StringBuffer sb = new StringBuffer();
-        //获取这条事件的指标
-        sb.append(Constants.FT_MONITOR_MEASUREMENT);
-        StringBuffer tagSb = getCustomHash(tags, true);
-        StringBuffer fieldSb = getCustomHash(fields, false);
-        deleteLastComma(tagSb);
-        if (tagSb.length() > 0) {
-            sb.append(",");
-            sb.append(tagSb.toString());
+    /**
+     * 获取监控数据
+     *
+     * @return
+     */
+    public String getMonitorUploadData() {
+        try {
+            SyncJsonData data = SyncJsonData.getMonitorData();
+            ArrayList<SyncJsonData> dataArrayList = new ArrayList<>();
+            dataArrayList.add(data);
+
+            HashMap<String, Object> extrasMap = getBaseDeviceInfoTagsMap();
+            extrasMap.putAll(getUniqueIdMap());
+            convertToLineProtocolLines(dataArrayList, extrasMap);
+        } catch (JSONException e) {
+            LogUtils.e(TAG, e.getMessage());
         }
-
-        String device = parseHashToString(getBaseDeviceInfoTagsMap());
-        String uuid = parseHashToString(getUniqueIdMap());
-
-        sb.append(",").append(uuid).append(",").append(device);
-        //删除多余的逗号
-        deleteLastComma(sb);
-
-        sb.append(Constants.SEPARATION_PRINT);
-        deleteLastComma(fieldSb);
-        sb.append(fieldSb);
-        sb.append(Constants.SEPARATION_PRINT);
-        sb.append(System.currentTimeMillis() * 1000 * 1000);
-        return sb.toString();
+        return "";
     }
 
     /**
@@ -329,18 +332,18 @@ public class SyncDataHelper {
      */
     public static void addMonitorData(JSONObject tags, JSONObject fields) {
         try {
-//            if (FTMonitorConfig.get().isMonitorType(MonitorType.BATTERY)) {
-//                //电池
-//                createBattery(tags, fields);
-//            }
+            if (FTMonitorConfig.get().isMonitorType(MonitorType.BATTERY)) {
+                //电池
+                createBattery(tags, fields);
+            }
             if (FTMonitorConfig.get().isMonitorType(MonitorType.MEMORY)) {
                 //内存
                 createMemory(tags, fields);
             }
-//            if (FTMonitorConfig.get().isMonitorType(MonitorType.CPU)) {
-//                //CPU
-//                createCPU(tags, fields);
-//            }
+            if (FTMonitorConfig.get().isMonitorType(MonitorType.CPU)) {
+                //CPU
+                createCPU(tags, fields);
+            }
 //            if (FTMonitorConfig.get().isMonitorType(MonitorType.GPU)) {
 //                //GPU
 //                createGPU(tags, fields);
@@ -368,6 +371,7 @@ public class SyncDataHelper {
             //传感器
 //            createSensor(tags, fields);
         } catch (Exception e) {
+            LogUtils.e(TAG, e.getMessage());
         }
     }
 
@@ -635,14 +639,8 @@ public class SyncDataHelper {
      *
      * @param sb
      */
-    private static void deleteLastComma(StringBuffer sb) {
-        if (sb == null) {
-            return;
-        }
-        int index = sb.lastIndexOf(",");
-        if (index > 0 && index == sb.length() - 1) {
-            sb.deleteCharAt(sb.length() - 1);
-        }
+    private static void deleteLastComma(StringBuilder sb) {
+        StringUtils.deleteLastCharacter(sb,",");
     }
 
     /**
@@ -689,49 +687,27 @@ public class SyncDataHelper {
      * @return
      */
     private static HashMap<String, Object> getBaseDeviceInfoTagsMap() {
-        HashMap<String, Object> objectHashMap = getBaseDeviceInfoHashMap();
-
-        HashMap<String, Object> temp = new HashMap<>();
-        for (Map.Entry<String, Object> entry : objectHashMap.entrySet()) {
-            String mapKey = entry.getKey();
-            Object mapValue = entry.getValue();
-            if (mapValue instanceof String) {
-                temp.put(mapKey, Utils.translateTagKeyValue((String) mapValue));
-            } else {
-                temp.put(mapKey, mapValue);
-            }
-        }
-        return temp;
-    }
-
-    /**
-     * 构建一个默认的 ObjectBean
-     *
-     * @return
-     */
-    public static HashMap<String, Object> getDefaultObjectBean() {
-        HashMap<String, Object> objectHashMap = getBaseDeviceInfoHashMap();
-        objectHashMap.putAll(getUniqueIdMap());
-        return objectHashMap;
-
-    }
-
-    public static HashMap<String, Object> getBaseDeviceInfoHashMap() {
         Context context = FTApplication.getApplication();
-        HashMap<String, Object> objectHashMap = new HashMap<>();
-        objectHashMap.put(Constants.KEY_DEVICE_APPLICATION_ID, DeviceUtils.getApplicationId(context));
-//        objectHashMap.put(Constants.KEY_DEVICE_APPLICATION_NAME, DeviceUtils.getAppName(context));
-//        objectHashMap.put(Constants.KEY_DEVICE_SDK_AGENT, DeviceUtils.getSDKVersion());
-//        objectHashMap.put(Constants.KEY_DEVICE_SDK_AUTO_TRACK, FTSdk.PLUGIN_VERSION);
-        objectHashMap.put(Constants.KEY_DEVICE_OS, DeviceUtils.getOSName());
-        objectHashMap.put(Constants.KEY_DEVICE_OS_VERSION, DeviceUtils.getOSVersion());
-        objectHashMap.put(Constants.KEY_DEVICE_DEVICE_BAND, DeviceUtils.getDeviceBand());
-        objectHashMap.put(Constants.KEY_DEVICE_DEVICE_MODEL, DeviceUtils.getDeviceModel());
-        objectHashMap.put(Constants.KEY_DEVICE_DISPLAY, DeviceUtils.getDisplay(context));
-//        objectHashMap.put(Constants.KEY_DEVICE_CARRIER, DeviceUtils.getCarrier(context));
-//        objectHashMap.put(Constants.KEY_DEVICE_LOCALE, Locale.getDefault());
-        objectHashMap.put(Constants.KEY_APP_VERSION_NAME, Utils.getAppVersionName());
-        return objectHashMap;
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put(Constants.KEY_DEVICE_APPLICATION_ID, DeviceUtils.getApplicationId(context));
+        hashMap.put(Constants.KEY_DEVICE_OS, DeviceUtils.getOSName());
+        hashMap.put(Constants.KEY_DEVICE_DEVICE_BAND, Utils.translateTagKeyValue(DeviceUtils.getDeviceBand()));
+        hashMap.put(Constants.KEY_DEVICE_DEVICE_MODEL, Utils.translateTagKeyValue(DeviceUtils.getDeviceModel()));
+        hashMap.put(Constants.KEY_DEVICE_DISPLAY, DeviceUtils.getDisplay(context));
+        return hashMap;
+    }
+
+    private static HashMap<String, Object> getRumEsPublicTags() {
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("terminal", "app");
+        hashMap.put("sdk_package_agent", FTSdk.AGENT_VERSION);
+        if (!FTSdk.PLUGIN_VERSION.isEmpty()) {
+            hashMap.put("sdk_package_track", FTSdk.PLUGIN_VERSION);
+        }
+        if (!FTSdk.NATIVE_VERSION.isEmpty()) {
+            hashMap.put("sdk_package_native", FTSdk.NATIVE_VERSION);
+        }
+        return hashMap;
     }
 
 
@@ -739,7 +715,6 @@ public class SyncDataHelper {
         Context context = FTApplication.getApplication();
         HashMap<String, Object> objectHashMap = new HashMap<>();
         objectHashMap.put(Constants.KEY_DEVICE_UUID, DeviceUtils.getUuid(context));
-//        objectHashMap.put(Constants.KEY_DEVICE_IMEI, DeviceUtils.getImei(context));
         if (FTHttpConfig.get().useOaid) {
             objectHashMap.put(Constants.KEY_DEVICE_OAID, OaidUtils.getOAID(context));
         }

@@ -14,9 +14,7 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.ft.sdk.FTApplication;
-import com.ft.sdk.MonitorType;
 import com.ft.sdk.garble.manager.AsyncCallback;
-import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.http.RequestMethod;
@@ -325,7 +323,7 @@ public class LocationUtils {
             params.put("key", geoKey);
             params.put("radius", 1000);
             ResponseData responseData = HttpBuilder.Builder()
-                    .setHost(GEO_CODE_URL)
+                    .setUrl(GEO_CODE_URL)
                     .setMethod(RequestMethod.GET)
                     .setParams(params)
                     .useDefaultHead(false)
@@ -387,7 +385,7 @@ public class LocationUtils {
         HashMap<String, Object> params = new HashMap<String, Object>();
         params.put("key", geoKey);
         ResponseData responseData = HttpBuilder.Builder()
-                .setHost(GEO_IP_ADDRESS_URL)
+                .setUrl(GEO_IP_ADDRESS_URL)
                 .setMethod(RequestMethod.GET)
                 .setParams(params)
                 .useDefaultHead(false)

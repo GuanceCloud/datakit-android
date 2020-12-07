@@ -19,7 +19,7 @@ public class EngineFactory {
     public static INetEngine createEngine() {
         if (netWorkTrace) {
             try {
-                if (!PackageUtils.isNativeLibrarySupport()) {
+                if (!PackageUtils.isOKHttp3Support()) {
                     LogUtils.e(TAG, "检测到你开启了网络链路追踪，但是你没有依赖 okHttp。使用该功能请先在项目中依赖 okHttp");
                     return new NativeNetEngine();
                 }

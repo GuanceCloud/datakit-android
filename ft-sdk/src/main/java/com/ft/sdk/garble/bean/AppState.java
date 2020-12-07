@@ -1,8 +1,8 @@
-package com.ft.sdk.garble.manager;
+package com.ft.sdk.garble.bean;
 
 import androidx.annotation.NonNull;
 
-enum AppState {
+public enum AppState {
     UNKNOWN,
     START,
     RUNNING;

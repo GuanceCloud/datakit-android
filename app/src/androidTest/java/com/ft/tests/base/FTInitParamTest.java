@@ -7,12 +7,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.ft.AccountUtils;
 import com.ft.BaseTest;
 import com.ft.application.MockApplication;
-import com.ft.sdk.BuildConfig;
+import com.ft.sdk.EnvType;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTrack;
-import com.ft.sdk.garble.manager.FTExceptionHandler;
 import com.ft.sdk.garble.manager.AsyncCallback;
+import com.ft.sdk.garble.manager.FTExceptionHandler;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -78,12 +78,12 @@ public class FTInitParamTest extends BaseTest {
 
     @Test
     public void emptyEnv() {
-        envParamTest(null, BuildConfig.BUILD_TYPE);
+        envParamTest(null, EnvType.PROD);
     }
 
     @Test
     public void normalEnv() {
-        envParamTest("Test", "Test");
+        envParamTest(EnvType.GRAY, EnvType.GRAY);
     }
 
     @Test
@@ -170,7 +170,7 @@ public class FTInitParamTest extends BaseTest {
         Assert.assertEquals(expected, FTExceptionHandler.get().getTrackServiceName());
     }
 
-    private void envParamTest(String env, String expected) {
+    private void envParamTest(EnvType env, EnvType expected) {
         FTSDKConfig ftSDKConfig = getDefaultConfig()
                 .setEnv(env)
                 .setDataWayToken(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_TOKEN));

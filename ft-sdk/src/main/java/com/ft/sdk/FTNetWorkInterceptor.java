@@ -1,7 +1,11 @@
 package com.ft.sdk;
 
 import com.ft.sdk.garble.FTHttpConfig;
+import com.ft.sdk.garble.FTRUMConfig;
+import com.ft.sdk.garble.bean.NetStatusBean;
 import com.ft.sdk.garble.http.HttpUrl;
+import com.ft.sdk.garble.http.NetStatusMonitor;
+import com.ft.sdk.garble.manager.FTNetworkPerformanceHandler;
 import com.ft.sdk.garble.utils.LogUtils;
 
 import org.jetbrains.annotations.NotNull;
@@ -19,20 +23,21 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import okhttp3.Connection;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import okhttp3.Route;
 import okhttp3.internal.http.HttpHeaders;
-import okio.Buffer;
 
 /**
  * create: by huangDianHua
  * time: 2020/5/18 10:06:37
  * description:
  */
-public class FTNetWorkTracerInterceptor implements Interceptor {
+public class FTNetWorkInterceptor extends NetStatusMonitor implements Interceptor {
 
     private static final String TAG = "FTNetWorkTracerInterceptor";
     public static final String ZIPKIN_TRACE_ID = "X-B3-TraceId";
@@ -42,14 +47,16 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
     public static final String SKYWALKING_V3_SW_8 = "sw8";
     public static final String SKYWALKING_V3_SW_6 = "sw6";
 
-    private boolean webViewTrace;
+    private final boolean webViewTrace;
 
-    public FTNetWorkTracerInterceptor() {
+    private final FTNetworkPerformanceHandler mPerformanceHandler = new FTNetworkPerformanceHandler();
+
+    public FTNetWorkInterceptor() {
         this(false);
     }
 
 
-    public FTNetWorkTracerInterceptor(boolean webViewTrace) {
+    public FTNetWorkInterceptor(boolean webViewTrace) {
         this.webViewTrace = webViewTrace;
     }
 
@@ -69,8 +76,16 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
             handler.traceDataUpload(jsonObject, operationName, isError);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, e.getMessage());
         }
+    }
+
+    private void recordNetworkPerformance(Connection connection, Request request, Response response, String responseBody) {
+        if (connection != null) {
+            Route route = connection.route();
+//            String hostAddress = route.socketAddress().;
+        }
+
     }
 
 
@@ -78,7 +93,7 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
     @Override
     public Response intercept(@NotNull Chain chain) throws IOException {
         Request request = chain.request();
-        if (!FTHttpConfig.get().networkTrace) {
+        if (!FTHttpConfig.get().networkTrace && !FTRUMConfig.get().isRumEnable()) {
             return chain.proceed(request);
         }
         Response response = null;
@@ -103,8 +118,11 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
             exception = e;
         }
 
+        Connection connection = chain.connection();
         if (exception != null) {
             uploadNetTrace(handler, newRequest, null, "", exception.getMessage());
+            mPerformanceHandler.setTransformContent(newRequest, null, "", connection);
+
             throw new IOException(exception);
         } else {
             String responseBody = "";
@@ -120,10 +138,13 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
                         responseBody1 = ResponseBody.create(responseBody1.contentType(), bytes);
                         response = response.newBuilder().body(responseBody1).build();
                         uploadNetTrace(handler, newRequest, response, responseBody, "");
+                        mPerformanceHandler.setTransformContent(newRequest, response, responseBody, connection);
+
                     }
                 }
             }
         }
+
         return response;
     }
 
@@ -227,5 +248,12 @@ public class FTNetWorkTracerInterceptor implements Interceptor {
             return true;
         }
         return false;
+    }
+
+    @Override
+    protected void getNetStatusInfoWhenCallEnd(NetStatusBean bean) {
+        mPerformanceHandler.setTransformPerformance(bean);
+        mPerformanceHandler.handleUpload();
+
     }
 }

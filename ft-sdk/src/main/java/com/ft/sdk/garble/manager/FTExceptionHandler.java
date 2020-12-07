@@ -2,8 +2,12 @@ package com.ft.sdk.garble.manager;
 
 import androidx.annotation.NonNull;
 
+import com.ft.sdk.EnvType;
+import com.ft.sdk.FTAutoTrack;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTTrackInner;
+import com.ft.sdk.garble.bean.AppState;
+import com.ft.sdk.garble.bean.CrashType;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -31,15 +35,18 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
     private static final String DUMP_FILE_KEY_APP_STATE = "appState";
 
     private boolean canTrackCrash;
-    private String env;
+    private EnvType env;
     private String trackServiceName;
     private static FTExceptionHandler instance;
     private Thread.UncaughtExceptionHandler mDefaultExceptionHandler;
     private boolean trackConsoleLog;
     private boolean isAndroidTest = false;
 
-    public void uploadCrashLog(String crash, AppState state) {
-        uploadCrashLog(crash, System.currentTimeMillis(), state);
+    public void uploadCrashLog(String crash, String message, AppState state) {
+        long dateline = System.currentTimeMillis();
+        FTAutoTrack.crash(crash, message, dateline, CrashType.JAVA, state);
+        uploadCrashLog(crash, dateline);
+
     }
 
     private FTExceptionHandler() {
@@ -63,7 +70,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
         }
     }
 
-    public String getEnv() {
+    public EnvType getEnv() {
         return env;
     }
 
@@ -88,7 +95,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
             }
             printWriter.close();
             String result = writer.toString();
-            uploadCrashLog(result, FTActivityManager.get().getAppState());
+            uploadCrashLog(result, e.getMessage(), FTActivityManager.get().getAppState());
         }
 
         try {
@@ -118,13 +125,12 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     }
 
-    private void uploadCrashLog(String crash, long timeLine, AppState state) {
+    private void uploadCrashLog(String crash, long timeLine) {
         LogUtils.d("FTExceptionHandler", "crash=" + crash);
         LogBean logBean = new LogBean(Utils.translateFieldValue(crash), timeLine);
         logBean.setStatus(Status.CRITICAL);
         logBean.setEnv(env);
         logBean.setServiceName(trackServiceName);
-        logBean.setAppState(state.toString());
         FTTrackInner.getInstance().logBackground(logBean);
     }
 
@@ -149,7 +155,14 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
                             long crashTime = file.lastModified();
 
                             String value = Utils.readSectionValueFromDump(item.getAbsolutePath(), DUMP_FILE_KEY_APP_STATE);
-                            uploadCrashLog(crashString, crashTime, AppState.getValueFrom(value));
+
+                            if (item.getName().contains(ANR_FILE_NAME)) {
+                                FTAutoTrack.anr(crashString, crashTime);
+                            } else if (item.getName().contains(NATIVE_FILE_NAME)) {
+                                FTAutoTrack.crash(crashString,"Native Crash" , crashTime, CrashType.NATIVE, AppState.getValueFrom(value));
+                            }
+
+                            uploadCrashLog(crashString, crashTime);
 
                             Utils.deleteFile(item.getAbsolutePath());
                         } catch (IOException e) {

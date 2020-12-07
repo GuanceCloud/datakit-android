@@ -66,7 +66,7 @@
     *;
 }
 
--keep class com.ft.sdk.FTNetWorkTracerInterceptor{
+-keep class com.ft.sdk.FTNetWorkInterceptor{
     *;
 }
 
@@ -82,7 +82,7 @@
     *;
 }
 
--keep class com.ft.sdk.garble.bean.TrackBean{
+-keep class com.ft.sdk.garble.bean.LineProtocolBean{
     *;
 }
 
@@ -119,5 +119,6 @@
 -keep enum com.ft.sdk.LogCacheDiscard {
     *;
 }
+-keep enum com.ft.sdk.nativelib.*
 
 

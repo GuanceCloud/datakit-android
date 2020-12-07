@@ -19,20 +19,23 @@ public enum OP {
     OPEN_ACT("opn_act"),
     OPEN_FRA("open_fra"),
     CLS_ACT("cls_act"),
-    CLS_FRA("cls_fra"),
+    CLS_FRA("cls_fra");
 
-    //webview 事件
-    WEBVIEW_LOADING("webview_loading"),
-    WEBVIEW_LOAD_COMPLETED("webview_load_completed"),
-
-    //客户端使用事件
-    CLIENT_ACTIVATED_TIME("client_activated_time"),
-
-    //网络情况事件
-    HTTP_CLIENT("http_client"),
-    HTTP_WEBVIEW("http_webview"),
-    RUM_LAUNCH_PERFORMANCE("rum_launch_performance"),
-    ;
+//    //webview 事件
+//    WEBVIEW_LOADING("webview_loading"),
+//    WEBVIEW_LOAD_COMPLETED("webview_load_completed"),
+//
+//    //客户端使用事件
+//    CLIENT_ACTIVATED_TIME("client_activated_time"),
+//
+//    //网络情况事件
+//    HTTP_CLIENT("http_client"),
+//    HTTP_WEBVIEW("http_webview"),
+//
+//    RUM_APP_STARTUP("rum_app_startup"),
+//    RUM_APP_VIEW("rum_app_view"),
+//    RUM_APP_RESOURCE_PERFORMANCE("rum_app_resource_performance"),
+//    RUM_APP_FREEZE("rum_app_freeze");
 
 
     public String value;
@@ -64,7 +67,4 @@ public enum OP {
         return Arrays.asList(Constants.MERGE_MONITOR_EVENTS).contains(this);
     }
 
-    public boolean isUserRelativeOp() {
-        return Arrays.asList(Constants.USER_ACTION_EVENTS).contains(this);
-    }
 }

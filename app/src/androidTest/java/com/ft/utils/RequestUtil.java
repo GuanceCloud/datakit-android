@@ -2,7 +2,7 @@ package com.ft.utils;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.FTNetWorkTracerInterceptor;
+import com.ft.sdk.FTNetWorkInterceptor;
 import com.ft.sdk.garble.http.RequestMethod;
 
 import java.io.IOException;
@@ -19,7 +19,7 @@ import okhttp3.Response;
  */
 public class RequestUtil {
     static OkHttpClient client = new OkHttpClient.Builder()
-            .addInterceptor(new FTNetWorkTracerInterceptor())
+            .addInterceptor(new FTNetWorkInterceptor())
             .connectTimeout(10, TimeUnit.SECONDS)
             .build();
 

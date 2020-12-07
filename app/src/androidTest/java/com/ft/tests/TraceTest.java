@@ -35,12 +35,12 @@ import java.nio.charset.StandardCharsets;
 import okhttp3.Request;
 
 import static com.ft.AllTests.hasPrepare;
-import static com.ft.sdk.FTNetWorkTracerInterceptor.JAEGER_KEY;
-import static com.ft.sdk.FTNetWorkTracerInterceptor.SKYWALKING_V3_SW_6;
-import static com.ft.sdk.FTNetWorkTracerInterceptor.SKYWALKING_V3_SW_8;
-import static com.ft.sdk.FTNetWorkTracerInterceptor.ZIPKIN_SAMPLED;
-import static com.ft.sdk.FTNetWorkTracerInterceptor.ZIPKIN_SPAN_ID;
-import static com.ft.sdk.FTNetWorkTracerInterceptor.ZIPKIN_TRACE_ID;
+import static com.ft.sdk.FTNetWorkInterceptor.JAEGER_KEY;
+import static com.ft.sdk.FTNetWorkInterceptor.SKYWALKING_V3_SW_6;
+import static com.ft.sdk.FTNetWorkInterceptor.SKYWALKING_V3_SW_8;
+import static com.ft.sdk.FTNetWorkInterceptor.ZIPKIN_SAMPLED;
+import static com.ft.sdk.FTNetWorkInterceptor.ZIPKIN_SPAN_ID;
+import static com.ft.sdk.FTNetWorkInterceptor.ZIPKIN_TRACE_ID;
 import static com.ft.utils.RequestUtil.requestUrl;
 
 /**

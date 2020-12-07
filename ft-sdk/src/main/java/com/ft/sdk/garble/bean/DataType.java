@@ -22,6 +22,8 @@ package com.ft.sdk.garble.bean;
  */
 public enum DataType {
     TRACK,
+    RUM_INFLUX,
+    RUM_ES,
     LOG,
     //    KEY_EVENT,
     OBJECT

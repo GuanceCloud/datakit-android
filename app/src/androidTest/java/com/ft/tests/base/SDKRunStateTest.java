@@ -8,6 +8,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.ft.AccountUtils;
 import com.ft.BaseTest;
 import com.ft.application.MockApplication;
+import com.ft.sdk.EnvType;
 import com.ft.sdk.FTAutoTrackType;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
@@ -24,6 +25,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.powermock.reflect.Whitebox;
 
 import static com.ft.AllTests.hasPrepare;
 
@@ -55,7 +57,7 @@ public class SDKRunStateTest extends BaseTest {
                 .enableAutoTrack(true)//设置是否开启自动埋点
                 .setMonitorType(MonitorType.ALL)//设置监控项
                 .setEnableTrackAppCrash(true)
-                .setEnv("dev")
+                .setEnv(EnvType.GRAY)
                 .setTraceSamplingRate(0.5f)
                 .setNetworkTrace(true)
                 .setTraceConsoleLog(true)
@@ -80,7 +82,8 @@ public class SDKRunStateTest extends BaseTest {
      */
     @Test
     public void monitorNetRateRunTest() {
-        Assert.assertTrue(NetUtils.get().isRunNetMonitor());
+        NetUtils.get().startMonitorNetRate();
+        Assert.assertTrue(Whitebox.getInternalState(NetUtils.get(), "isRunNetMonitor"));
     }
 
     @Test
