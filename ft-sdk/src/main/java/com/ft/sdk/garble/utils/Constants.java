@@ -45,7 +45,7 @@ public class Constants {
     public static final String SHARE_PRE_STEP_HISTORY = "share_pre_step_history";
 
     public static final String URL_MODEL_TRACK_INFLUX = "v1/write/metrics";//指标数据上传路径
-    public static final String URL_MODEL_RUM = "v1/write/metrics";//
+    public static final String URL_MODEL_RUM = "/v1/write/rum";//
     public static final String URL_MODEL_LOG = "v1/write/logging";//日志数据上传路径
     public static final String URL_MODEL_KEY_EVENT = "v1/write/keyevent";//事件数据上传路径
     public static final String URL_MODEL_OBJECT = "v1/write/object";//对象数据上传路径
