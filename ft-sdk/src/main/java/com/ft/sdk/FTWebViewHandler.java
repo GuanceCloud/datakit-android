@@ -60,7 +60,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
             }
 
         } catch (JSONException e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, e.getMessage());
         }
 
 
