@@ -148,11 +148,13 @@ public class SyncDataHelper {
     }
 
     private String getRumInfluxBodyContent(List<SyncJsonData> datas) {
-        return convertToLineProtocolLines(datas);
+        HashMap<String, Object> hashMap = getBaseDeviceInfoTagsMap();
+        return convertToLineProtocolLines(datas, hashMap);
     }
 
     private String getRumEsBodyContent(List<SyncJsonData> datas) {
         HashMap<String, Object> hashMap = getRumEsPublicTags();
+        hashMap.putAll(getBaseDeviceInfoTagsMap());
         return convertToLineProtocolLines(datas, hashMap);
     }
 
@@ -247,7 +249,8 @@ public class SyncDataHelper {
      */
     private String composeUpdateData(SyncJsonData data) {
         StringBuilder sb = new StringBuilder();
-        String jsonString = data.getDataString();;
+        String jsonString = data.getDataString();
+        ;
 
         if (jsonString != null) {
             try {
@@ -640,7 +643,7 @@ public class SyncDataHelper {
      * @param sb
      */
     private static void deleteLastComma(StringBuilder sb) {
-        StringUtils.deleteLastCharacter(sb,",");
+        StringUtils.deleteLastCharacter(sb, ",");
     }
 
     /**
