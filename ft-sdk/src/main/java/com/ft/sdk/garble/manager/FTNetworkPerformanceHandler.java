@@ -6,6 +6,8 @@ import com.ft.sdk.garble.bean.ResourceBean;
 
 import java.net.InetAddress;
 
+import javax.net.ssl.HttpsURLConnection;
+
 import okhttp3.Connection;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -53,7 +55,9 @@ public final class FTNetworkPerformanceHandler {
     }
 
     public void handleUpload() {
-        FTAutoTrack.putResourcePerformance(bean);
+        if (bean.resourceStatus >= HttpsURLConnection.HTTP_OK) {
+            FTAutoTrack.putResourcePerformance(bean);
+        }
         bean.reset();
     }
 
