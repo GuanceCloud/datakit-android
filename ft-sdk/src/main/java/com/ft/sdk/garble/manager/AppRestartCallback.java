@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 
 import com.ft.sdk.FTAutoTrack;
 import com.ft.sdk.FTMonitor;
+import com.ft.sdk.garble.FTRUMConfig;
 
 
 /**
@@ -38,7 +39,9 @@ class AppRestartCallback {
 
     public void onPostResume() {
         if (alreadySleep) {
-            FTAutoTrack.putLaunchPerformance(false);
+            if (FTRUMConfig.get().isRumEnable()) {
+                FTAutoTrack.putRUMLaunchPerformance(false);
+            }
             alreadySleep = false;
         }
     }

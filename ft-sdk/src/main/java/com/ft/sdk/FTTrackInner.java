@@ -3,7 +3,7 @@ package com.ft.sdk;
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.FTDBCachePolicy;
-import com.ft.sdk.garble.TokenCheck;
+import com.ft.sdk.garble.FTRUMConfig;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.LineProtocolBean;
 import com.ft.sdk.garble.bean.LogBean;
@@ -127,12 +127,12 @@ public class FTTrackInner {
      * @param callback
      */
     private void uploadTrackOPData(List<SyncJsonData> recordDataList, AsyncCallback callback) {
-        if (!TokenCheck.get().checkToken()) {
-            if (callback != null) {
-                callback.onResponse(NetCodeStatus.TOKEN_ERROR, TokenCheck.get().message);
-                return;
-            }
-        }
+//        if (!TokenCheck.get().checkToken()) {
+//            if (callback != null) {
+//                callback.onResponse(NetCodeStatus.TOKEN_ERROR, TokenCheck.get().message);
+//                return;
+//            }
+//        }
         if (recordDataList == null || recordDataList.isEmpty()) {
             return;
         }

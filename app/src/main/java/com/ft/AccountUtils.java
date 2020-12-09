@@ -8,20 +8,10 @@ import java.util.Enumeration;
 import java.util.Properties;
 
 public class AccountUtils {
-    //上传数据查询的登录账号
-    public final static String TEST_ACCOUNT = "TEST_ACCOUNT";
-    //上传数据查询的登录密码
-    public final static String TEST_PWD = "TEST_PWD";
-    //上传数据加密key
-    public final static String ACCESS_KEY_ID = "ACCESS_KEY_ID";
-    //上传数据加密密钥
-    public final static String ACCESS_KEY_SECRET = "ACCESS_KEY_SECRET";
     //上传数据地址
     public final static String ACCESS_SERVER_URL = "ACCESS_SERVER_URL";
-    //上传数据的地址验证 token
-    public final static String ACCESS_SERVER_TOKEN = "ACCESS_SERVER_TOKEN";
-    //高德地址逆向解析 key
-    public final static String GEO_KEY = "GEO_KEY";
+    public final static String RUM_APP_ID = "RUM_APP_ID";
+
     /**
      * 本地配置文件中读取登录的账户数据
      */
@@ -37,9 +27,9 @@ public class AccountUtils {
             properties.load(inputStream);
             Enumeration en = properties.propertyNames();
             while (en.hasMoreElements()) {
-                String keyVar = (String)en.nextElement();
+                String keyVar = (String) en.nextElement();
                 if (key.contains(keyVar)) {
-                     return properties.getProperty(key);
+                    return properties.getProperty(key);
                 }
             }
         } catch (IOException e) {

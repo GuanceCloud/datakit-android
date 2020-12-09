@@ -45,11 +45,7 @@ public class LogTest extends BaseTest {
 //        SyncTaskManager.get().setRunning(true);
         stopSyncTask();
         context = MockApplication.getContext();
-        ftsdkConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL),
-                true,
-                AccountUtils.getProperty(context, AccountUtils.ACCESS_KEY_ID),
-                AccountUtils.getProperty(context, AccountUtils.ACCESS_KEY_SECRET))
-                .setDataWayToken(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_TOKEN))
+        ftsdkConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL))
                 .setTraceConsoleLog(true)
                 .setEventFlowLog(true)
                 .setEnableTrackAppCrash(true);

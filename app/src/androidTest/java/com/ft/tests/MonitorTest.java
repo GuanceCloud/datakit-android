@@ -12,6 +12,7 @@ import com.ft.sdk.FTMonitor;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
+import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.utils.Constants;
@@ -45,11 +46,8 @@ public class MonitorTest extends BaseTest {
         }
         FTDBManager.get().delete();
         context = MockApplication.getContext();
-        ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL),
-                true,
-                AccountUtils.getProperty(context, AccountUtils.ACCESS_KEY_ID),
-                AccountUtils.getProperty(context, AccountUtils.ACCESS_KEY_SECRET))
-                .setDataWayToken(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_TOKEN))
+        ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL)
+        )
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setMonitorType(MonitorType.ALL);//设置监控项
 
@@ -134,7 +132,7 @@ public class MonitorTest extends BaseTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimitTrack(1);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(1, DataType.TRACK);
         String data = recordDataList.get(0).getDataString();
         judge(data, monitorType);
         try {
@@ -173,7 +171,6 @@ public class MonitorTest extends BaseTest {
         expects.put(MonitorType.FPS, Constants.KEY_FPS);
         return expects;
     }
-
 
 
 }

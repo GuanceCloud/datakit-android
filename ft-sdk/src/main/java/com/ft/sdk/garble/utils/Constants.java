@@ -14,6 +14,9 @@ public class Constants {
 
     public static final String FT_SDK_INIT_UUID = "ft.sdk.init.uuid";
     public static final String FT_USER_SESSION_ID = "ft.user.session.id";
+    public static final String FT_USER_USER_ID= "ft.user.userid";
+    public static final String FT_USER_USER_NAME= "ft.user.username";
+    public static final String FT_USER_USER_EXT= "ft.user.extdata";
     public static final String FT_SHARE_PER_FILE = "ftSDKShareFile";
     public static final String FT_KEY_VALUE_NULL = "null";
     public static final String FT_MEASUREMENT_PAGE_EVENT = "mobile_tracker";
@@ -44,12 +47,10 @@ public class Constants {
     public static final String SHARE_PRE_STEP_DATE = "share_pre_step_date";
     public static final String SHARE_PRE_STEP_HISTORY = "share_pre_step_history";
 
-    public static final String URL_MODEL_TRACK_INFLUX = "v1/write/metrics";//指标数据上传路径
-    public static final String URL_MODEL_RUM = "/v1/write/rum";//
+    public static final String URL_MODEL_TRACK_INFLUX = "v1/write/metric";//指标数据上传路径
+    public static final String URL_MODEL_RUM = "v1/write/rum";//
     public static final String URL_MODEL_LOG = "v1/write/logging";//日志数据上传路径
-    public static final String URL_MODEL_KEY_EVENT = "v1/write/keyevent";//事件数据上传路径
     public static final String URL_MODEL_OBJECT = "v1/write/object";//对象数据上传路径
-    public static final String URL_MODEL_TOKEN_CHECK = "v1/check/token";//验证token是否合法
 
     public static final String DEFAULT_OBJECT_CLASS = "Mobile_Device";//默认的对象名
     public static final String DEFAULT_LOG_SERVICE_NAME = "dataflux sdk";
@@ -64,8 +65,11 @@ public class Constants {
 
     public static final String KEY_PAGE_EVENT_PAGE_DESC = "page_desc";
     public static final String KEY_PAGE_EVENT_USER_NAME = "ud_name";
-    public static final String KEY_PAGE_EVENT_USER_ID = "userid";
-    public static final String KEY_PAGE_EVENT_IS_SIGNIN = "is_signin";
+
+    public static final String KEY_RUM_USER_ID = "userid";
+    public static final String KEY_RUM_APP_ID = "appId";
+
+    public static final String KEY_RUM_IS_SIGNIN = "is_signin";
 
     public static final String KEY_TIME_COST_DURATION = "duration";
     public static final String KEY_TIME_COST_WEBVIEW_URL = "url";
@@ -123,31 +127,27 @@ public class Constants {
     public static final String KEY_BT_DEVICE = "bt_device";
     public static final String KEY_BT_OPEN = "bt_open";
 
-    public static final String KEY_SENSOR_BRIGHTNESS = "screen_brightness";
-    public static final String KEY_SENSOR_LIGHT = "light";
-    public static final String KEY_SENSOR_PROXIMITY = "proximity";
-    public static final String KEY_SENSOR_STEPS = "steps";
-    public static final String KEY_SENSOR_ROTATION_X = "rotation_x";
-    public static final String KEY_SENSOR_ROTATION_Y = "rotation_y";
-    public static final String KEY_SENSOR_ROTATION_Z = "rotation_z";
-    public static final String KEY_SENSOR_ACCELERATION_X = "acceleration_x";
-    public static final String KEY_SENSOR_ACCELERATION_Y = "acceleration_y";
-    public static final String KEY_SENSOR_ACCELERATION_Z = "acceleration_z";
-    public static final String KEY_SENSOR_MAGNETIC_X = "magnetic_x";
-    public static final String KEY_SENSOR_MAGNETIC_Y = "magnetic_y";
-    public static final String KEY_SENSOR_MAGNETIC_Z = "magnetic_z";
+//    public static final String KEY_SENSOR_BRIGHTNESS = "screen_brightness";
+//    public static final String KEY_SENSOR_LIGHT = "light";
+//    public static final String KEY_SENSOR_PROXIMITY = "proximity";
+//    public static final String KEY_SENSOR_STEPS = "steps";
+//    public static final String KEY_SENSOR_ROTATION_X = "rotation_x";
+//    public static final String KEY_SENSOR_ROTATION_Y = "rotation_y";
+//    public static final String KEY_SENSOR_ROTATION_Z = "rotation_z";
+//    public static final String KEY_SENSOR_ACCELERATION_X = "acceleration_x";
+//    public static final String KEY_SENSOR_ACCELERATION_Y = "acceleration_y";
+//    public static final String KEY_SENSOR_ACCELERATION_Z = "acceleration_z";
+//    public static final String KEY_SENSOR_MAGNETIC_X = "magnetic_x";
+//    public static final String KEY_SENSOR_MAGNETIC_Y = "magnetic_y";
+//    public static final String KEY_SENSOR_MAGNETIC_Z = "magnetic_z";
 
     public static final String KEY_FPS = "fps";
     public static final String KEY_TORCH = "torch";
 
     public static final String KEY_DEVICE_UUID = "device_uuid";
-    public static final String KEY_APPLICATION_UUID = "device_uuid";
-    public static final String KEY_DEVICE_APPLICATION_ID = "application_identifier";
-    public static final String KEY_DEVICE_APPLICATION_NAME = "application_name";
-    public static final String KEY_DEVICE_SDK_AGENT = "agent";
-    public static final String KEY_DEVICE_SDK_AUTO_TRACK = "autoTrack";
-    public static final String KEY_DEVICE_SDK_NATIVE = "native";
-    public static final String KEY_DEVICE_IMEI = "imei";
+    public static final String KEY_APPLICATION_UUID = "application_uuid";
+    public static final String KEY_DEVICE_APPLICATION_ID = "app_identifiedid";
+//    public static final String KEY_DEVICE_APPLICATION_NAME = "app_name";
     public static final String KEY_DEVICE_OS = "os";
     public static final String KEY_DEVICE_OS_VERSION = "os_version";
     public static final String KEY_DEVICE_DEVICE_BAND = "device";
@@ -164,14 +164,7 @@ public class Constants {
     public static final String EVENT_NAME_CLICK = "click";
     public static final String EVENT_NAME_LEAVE = "leave";
     public static final String EVENT_NAME_ENTER = "enter";
-    public static final String EVENT_NAME_BLOCK = "block";
-    public static final String EVENT_NAME_CRASH = "crash";
-    public static final String EVENT_NAME_ANR = "anr";
-    public static final String EVENT_NAME_WEBVIEW_LOADING = "loading";
-    public static final String EVENT_NAME_WEBVIEW_LOAD_COMPLETED = "loadCompleted";
-    public static final String EVENT_NAME_ACTIVATED = "activated";
-    public static final String EVENT_NAME_HTTP_CLIENT = "http_client";
-    public static final String EVENT_NAME_HTTP_WEBVIEW = "http_webview";
+
 
     /**
      * OP EVENT 数据对照

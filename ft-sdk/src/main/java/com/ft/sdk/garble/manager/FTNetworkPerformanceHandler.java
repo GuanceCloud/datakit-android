@@ -56,7 +56,7 @@ public final class FTNetworkPerformanceHandler {
 
     public void handleUpload() {
         if (bean.resourceStatus >= HttpsURLConnection.HTTP_OK) {
-            FTAutoTrack.putResourcePerformance(bean);
+            FTAutoTrack.putRUMResourcePerformance(bean);
         }
         bean.reset();
     }

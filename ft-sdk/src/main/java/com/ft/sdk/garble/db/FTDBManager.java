@@ -212,73 +212,73 @@ public class FTDBManager extends DBManager {
         return result[0];
     }
 
-    /**
-     * 插入用户数据进数据库
-     *
-     * @param userData
-     */
-    public void insertFTUserData(UserData userData) {
-        getDB(true, db -> {
-            ContentValues cv = new ContentValues();
-            cv.put(FTSQL.USER_COLUMN_SESSION_ID, userData.getSessionId());
-            cv.put(FTSQL.USER_COLUMN_DATA, userData.createDBDataString());
-            db.insert(FTSQL.FT_TABLE_USER_DATA, null, cv);
-        });
-    }
-
-    /**
-     * 查询数据库中的用户信息
-     *
-     * @param sessionId
-     * @return
-     */
-    public UserData queryFTUserData(String sessionId) {
-        try {
-            UserData userData = new UserData();
-            getDB(false, db -> {
-                Cursor cursor = db.query(FTSQL.FT_TABLE_USER_DATA, null, FTSQL.USER_COLUMN_SESSION_ID + "=?", new String[]{sessionId}, null, null, null, null);
-                while (cursor.moveToNext()) {
-                    String id = cursor.getString(cursor.getColumnIndex(FTSQL.USER_COLUMN_SESSION_ID));
-                    String data = cursor.getString(cursor.getColumnIndex(FTSQL.USER_COLUMN_DATA));
-                    userData.setSessionId(id);
-                    userData.parseUserDataFromDBData(data);
-                    break;
-                }
-                cursor.close();
-            });
-            return userData.getName() == null ? null : userData;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    /**
-     * 查询数据库中的所有用户信息
-     *
-     * @return
-     */
-    public List<UserData> queryFTUserDataList() {
-        try {
-            List<UserData> userDataList = new ArrayList<>();
-            getDB(false, db -> {
-                Cursor cursor = db.query(FTSQL.FT_TABLE_USER_DATA, null, null, null, null, null, null, null);
-                while (cursor.moveToNext()) {
-                    UserData userData = new UserData();
-                    String id = cursor.getString(cursor.getColumnIndex(FTSQL.USER_COLUMN_SESSION_ID));
-                    String data = cursor.getString(cursor.getColumnIndex(FTSQL.USER_COLUMN_DATA));
-                    userData.setSessionId(id);
-                    userData.parseUserDataFromDBData(data);
-                    userDataList.add(userData);
-                }
-                cursor.close();
-            });
-            return userDataList;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+//    /**
+//     * 插入用户数据进数据库
+//     *
+//     * @param userData
+//     */
+//    public void insertFTUserData(UserData userData) {
+//        getDB(true, db -> {
+//            ContentValues cv = new ContentValues();
+//            cv.put(FTSQL.USER_COLUMN_SESSION_ID, userData.getSessionId());
+//            cv.put(FTSQL.USER_COLUMN_DATA, userData.createDBDataString());
+//            db.insert(FTSQL.FT_TABLE_USER_DATA, null, cv);
+//        });
+//    }
+//
+//    /**
+//     * 查询数据库中的用户信息
+//     *
+//     * @param sessionId
+//     * @return
+//     */
+//    public UserData queryFTUserData(String sessionId) {
+//        try {
+//            UserData userData = new UserData();
+//            getDB(false, db -> {
+//                Cursor cursor = db.query(FTSQL.FT_TABLE_USER_DATA, null, FTSQL.USER_COLUMN_SESSION_ID + "=?", new String[]{sessionId}, null, null, null, null);
+//                while (cursor.moveToNext()) {
+//                    String id = cursor.getString(cursor.getColumnIndex(FTSQL.USER_COLUMN_SESSION_ID));
+//                    String data = cursor.getString(cursor.getColumnIndex(FTSQL.USER_COLUMN_DATA));
+//                    userData.setSessionId(id);
+//                    userData.setExtsWithJsonString(data);
+//                    break;
+//                }
+//                cursor.close();
+//            });
+//            return userData.getName() == null ? null : userData;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
+//
+//    /**
+//     * 查询数据库中的所有用户信息
+//     *
+//     * @return
+//     */
+//    public List<UserData> queryFTUserDataList() {
+//        try {
+//            List<UserData> userDataList = new ArrayList<>();
+//            getDB(false, db -> {
+//                Cursor cursor = db.query(FTSQL.FT_TABLE_USER_DATA, null, null, null, null, null, null, null);
+//                while (cursor.moveToNext()) {
+//                    UserData userData = new UserData();
+//                    String id = cursor.getString(cursor.getColumnIndex(FTSQL.USER_COLUMN_SESSION_ID));
+//                    String data = cursor.getString(cursor.getColumnIndex(FTSQL.USER_COLUMN_DATA));
+//                    userData.setSessionId(id);
+//                    userData.setExtsWithJsonString(data);
+//                    userDataList.add(userData);
+//                }
+//                cursor.close();
+//            });
+//            return userDataList;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
 
     /**
      * 根据用户的sessionId删除用户数据

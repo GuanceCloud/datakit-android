@@ -22,7 +22,7 @@ public class FTHttpConfig {
     public boolean enableRequestSigning;
     public String akId;
     public String akSecret;
-    public String dataWayToken;//非必须参数，Sass 版本
+//    public String dataWayToken;//非必须参数，Sass 版本
     public String version;
     public String uuid;
     public String userAgent;
@@ -55,10 +55,6 @@ public class FTHttpConfig {
             return;
         }
         serverUrl = ftsdkConfig.getServerUrl();
-        dataWayToken = ftsdkConfig.getDataWayToken();
-        enableRequestSigning = ftsdkConfig.isEnableRequestSigning();
-        akId = ftsdkConfig.getAkId();
-        akSecret = ftsdkConfig.getAkSecret();
         useOaid = ftsdkConfig.isUseOAID();
         version = BuildConfig.FT_SDK_VERSION;
         uuid = DeviceUtils.getSDKUUid(FTApplication.getApplication());

@@ -175,9 +175,9 @@ public class HttpBuilder {
         StringBuffer sb = new StringBuffer();
         //if (method == RequestMethod.GET) {
             HashMap<String, Object> param = params;
-            if(FTHttpConfig.get().dataWayToken != null && enableToken){
-                param.put("token",FTHttpConfig.get().dataWayToken);
-            }
+//            if(FTHttpConfig.get().dataWayToken != null && enableToken){
+//                param.put("token",FTHttpConfig.get().dataWayToken);
+//            }
             if (param != null) {
                 Iterator<String> keys = param.keySet().iterator();
                 while (keys.hasNext()) {
