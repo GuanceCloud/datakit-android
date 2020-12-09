@@ -97,7 +97,7 @@ public class FTInitParamTest extends BaseTest {
 
     private void serviceNameParamTest(String serviceName, String expected) {
         FTSDKConfig ftSDKConfig = getDefaultConfig()
-                .setTraceServiceName(serviceName);
+                .setServiceName(serviceName);
         FTSdk.install(ftSDKConfig);
         Assert.assertEquals(expected, FTExceptionHandler.get().getTrackServiceName());
     }

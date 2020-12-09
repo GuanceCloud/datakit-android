@@ -70,7 +70,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
         if (ftsdkConfig != null) {
             this.canTrackCrash = ftsdkConfig.isEnableTrackAppCrash();
             this.env = ftsdkConfig.getEnv();
-            this.trackServiceName = ftsdkConfig.getTraceServiceName();
+            this.trackServiceName = ftsdkConfig.getServiceName();
             this.trackConsoleLog = ftsdkConfig.isTraceConsoleLog();
         }
     }
