@@ -1,8 +1,6 @@
 package com.ft.sdk.garble.manager;
 
 import com.ft.sdk.garble.FTDBCachePolicy;
-import com.ft.sdk.garble.FTUserConfig;
-import com.ft.sdk.garble.TokenCheck;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
@@ -67,10 +65,10 @@ public class SyncTaskManager {
             errorCount.set(0);
             ThreadPoolUtils.get().execute(() -> {
                 try {
-                    if (!TokenCheck.get().checkToken()) {
-                        running = false;
-                        return;
-                    }
+//                    if (!TokenCheck.get().checkToken()) {
+//                        running = false;
+//                        return;
+//                    }
                     LogUtils.e(TAG, " \n*******************************************************\n" +
                             "******************数据同步线程运行中*******************\n" +
                             "*******************************************************\n");
@@ -84,11 +82,11 @@ public class SyncTaskManager {
                         List<SyncJsonData> rumEsList = queryFromData(DataType.RUM_ES);
                         List<SyncJsonData> rumInfluxList = queryFromData(DataType.RUM_INFLUX);
 
-                        //如果打开绑定用户开关，但是没有绑定用户信息，那么就不上传用户数据，直到绑了
-                        if (FTUserConfig.get().isNeedBindUser() && !FTUserConfig.get().isUserDataBinded()) {
-                            trackDataList.clear();
-                            LogUtils.e(TAG, " \n********************请先绑定用户信息********************");
-                        }
+//                        //如果打开绑定用户开关，但是没有绑定用户信息，那么就不上传用户数据，直到绑了
+//                        if (FTUserConfig.get().isNeedBindUser() && !FTUserConfig.get().isUserDataBinded()) {
+//                            trackDataList.clear();
+//                            LogUtils.e(TAG, " \n********************请先绑定用户信息********************");
+//                        }
 
                         if (!Utils.isNetworkAvailable()) {
                             LogUtils.e(TAG, " \n**********************网络未连接************************");

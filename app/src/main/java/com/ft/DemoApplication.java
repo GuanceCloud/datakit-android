@@ -33,15 +33,11 @@ public class DemoApplication extends Application {
     }
 
     private void initFTSDK() {
-        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(this, AccountUtils.ACCESS_SERVER_URL),
-                true,
-                AccountUtils.getProperty(this, AccountUtils.ACCESS_KEY_ID),
-                AccountUtils.getProperty(this, AccountUtils.ACCESS_KEY_SECRET))
-                .setDataWayToken(AccountUtils.getProperty(this, AccountUtils.ACCESS_SERVER_TOKEN))
+        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(this, AccountUtils.ACCESS_SERVER_URL))
+                .setRumAppId(AccountUtils.getProperty(this,AccountUtils.RUM_APP_ID))
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setUseOAID(true)//设置 OAID 是否可用
                 .setDebug(true)//设置是否是 debug
-                .setNeedBindUser(false)//是否需要绑定用户信息
                 .setMonitorType(MonitorType.ALL)//设置监控项
                 .setEnableTrackAppCrash(true)
                 .setEnableTrackAppANR(true)

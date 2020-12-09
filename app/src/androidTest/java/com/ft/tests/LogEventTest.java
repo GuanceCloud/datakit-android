@@ -53,16 +53,12 @@ public class LogEventTest extends BaseTest {
             hasPrepare = true;
         }
         context = MockApplication.getContext();
-        ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL),
-                true,
-                AccountUtils.getProperty(context, AccountUtils.ACCESS_KEY_ID),
-                AccountUtils.getProperty(context, AccountUtils.ACCESS_KEY_SECRET))
-                .setDataWayToken(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_TOKEN))
+        ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL)
+        )
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setUseOAID(true)//设置 OAID 是否可用
                 .setDebug(true)//设置是否是 debug
                 .enableAutoTrack(true)//设置是否开启自动埋点
-                .setNeedBindUser(false)//是否需要绑定用户信息
                 .setTraceSamplingRate(0.5f)
                 .setNetworkTrace(true)
                 .setEventFlowLog(true);

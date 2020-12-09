@@ -23,7 +23,6 @@ import java.util.List;
 
 import static com.ft.AllTests.hasPrepare;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * BY huangDianHua
@@ -44,20 +43,13 @@ public class BindUserTest extends BaseTest {
         FTDBManager.get().delete();
 
         context = MockApplication.getContext();
-        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL),
-                true,
-                AccountUtils.getProperty(context, AccountUtils.ACCESS_KEY_ID),
-                AccountUtils.getProperty(context, AccountUtils.ACCESS_KEY_SECRET))
-                .setDataWayToken(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_TOKEN))
+        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL))
                 .setDebug(true)
-                .setNeedBindUser(true)
                 .enableAutoTrack(true);
         FTSdk.install(ftSDKConfig);
     }
 
     /**
-     * 测试没有绑定用户的情况，埋点事件将不会上传到服务器，数据会一直保存在数据库中
-     *
      * @throws InterruptedException
      */
     @Test
@@ -68,17 +60,15 @@ public class BindUserTest extends BaseTest {
         //间隔15秒查询数据库数据，因为上传的逻辑最长可能要10秒后执行
         Thread.sleep(15000);
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimit(0);
-        assertTrue(recordDataList.size() > 0);
+        assertEquals(0, recordDataList.size());
     }
 
     /**
-     * 测试绑定用户情况下，数据应该上传，本地数据库应该清空
-     *
      * @throws InterruptedException
      */
     @Test
     public void bindUserDataSync() throws InterruptedException, JSONException {
-        bindUserData("FT-TEST");
+        bindUserData();
         simpleTrackData();
         Thread.sleep(15000);
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimit(0);
@@ -94,14 +84,14 @@ public class BindUserTest extends BaseTest {
     public void unbindAndBindDataSync() throws InterruptedException, JSONException {
         FTSdk.get().unbindUserData();
         Thread.sleep(5000);
-        bindUserData("FT-TEST");
+        bindUserData();
         simpleTrackData();
         Thread.sleep(15000);
         List<SyncJsonData> recordDataList1 = FTDBManager.get().queryDataByDescLimit(0);
         assertEquals(0, recordDataList1.size());
     }
 
-    private void bindUserData(String name) {
+    private void bindUserData() {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("sex", "man");

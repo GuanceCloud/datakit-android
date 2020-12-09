@@ -80,22 +80,11 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
         }
     }
 
-    private void recordNetworkPerformance(Connection connection, Request request, Response response, String responseBody) {
-        if (connection != null) {
-            Route route = connection.route();
-//            String hostAddress = route.socketAddress().;
-        }
-
-    }
-
 
     @NotNull
     @Override
     public Response intercept(@NotNull Chain chain) throws IOException {
         Request request = chain.request();
-        if (!FTHttpConfig.get().networkTrace && !FTRUMConfig.get().isRumEnable()) {
-            return chain.proceed(request);
-        }
         Response response = null;
         Request.Builder requestBuilder = request.newBuilder();
         Exception exception = null;

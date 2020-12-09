@@ -17,20 +17,20 @@ import com.ft.sdk.garble.utils.SensorUtils;
 public class FTMonitorConfig {
     private static FTMonitorConfig ftMonitorConfig;
     private int monitorType;
-    private String geoKey;
-    private boolean useGeoKey;
+//    private String geoKey;
+//    private boolean useGeoKey;
 
     public void setMonitorType(int monitorType) {
         this.monitorType = monitorType;
     }
 
-    public void setGeoKey(String geoKey) {
-        this.geoKey = geoKey;
-    }
-
-    public void setUseGeoKey(boolean useGeoKey) {
-        this.useGeoKey = useGeoKey;
-    }
+//    public void setGeoKey(String geoKey) {
+//        this.geoKey = geoKey;
+//    }
+//
+//    public void setUseGeoKey(boolean useGeoKey) {
+//        this.useGeoKey = useGeoKey;
+//    }
 
     public int getMonitorType() {
         return monitorType;
@@ -51,8 +51,8 @@ public class FTMonitorConfig {
             return;
         }
         monitorType = ftsdkConfig.getMonitorType();
-        geoKey = ftsdkConfig.getGeoKey();
-        useGeoKey = ftsdkConfig.isUseGeoKey();
+//        geoKey = ftsdkConfig.getGeoKey();
+//        useGeoKey = ftsdkConfig.isUseGeoKey();
         initParams();
     }
 

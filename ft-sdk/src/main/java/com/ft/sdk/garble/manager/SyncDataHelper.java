@@ -9,13 +9,11 @@ import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
-import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.bean.BatteryBean;
 import com.ft.sdk.garble.bean.CameraPx;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.NetStatusBean;
 import com.ft.sdk.garble.bean.SyncJsonData;
-import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.BatteryUtils;
 import com.ft.sdk.garble.utils.BluetoothUtils;
 import com.ft.sdk.garble.utils.CameraUtils;
@@ -136,8 +134,6 @@ public class SyncDataHelper {
             if (!extraTagsString.isEmpty()) {
                 sb.append(",");
                 sb.append(extraTagsString);
-                //将有 sessionId 的数据，附加用户数据
-                addUserData(sb, recordData);
                 deleteLastComma(sb);
             }
             //获取埋点事件数据
@@ -148,7 +144,8 @@ public class SyncDataHelper {
     }
 
     private String getRumInfluxBodyContent(List<SyncJsonData> datas) {
-        return convertToLineProtocolLines(datas);
+        HashMap<String, Object> hashMap = getBaseDeviceInfoTagsMap();
+        return convertToLineProtocolLines(datas, hashMap);
     }
 
     private String getRumEsBodyContent(List<SyncJsonData> datas) {
@@ -247,7 +244,8 @@ public class SyncDataHelper {
      */
     private String composeUpdateData(SyncJsonData data) {
         StringBuilder sb = new StringBuilder();
-        String jsonString = data.getDataString();;
+        String jsonString = data.getDataString();
+        ;
 
         if (jsonString != null) {
             try {
@@ -274,38 +272,38 @@ public class SyncDataHelper {
     }
 
 
-    /**
-     * 添加用户信息
-     *
-     * @param sb
-     */
-    private void addUserData(StringBuilder sb, SyncJsonData opData) {
-        if (FTUserConfig.get().isNeedBindUser() && FTUserConfig.get().isUserDataBinded()) {
-            UserData userData = FTUserConfig.get().getUserData(opData.getSessionId());
-            if (userData != null) {
-                sb.append(",");
-                sb.append(Constants.KEY_PAGE_EVENT_IS_SIGNIN).append("=").append(true).append(",");
-
-                if (opData.getDataType() == DataType.RUM_ES) {
-                    //                sb.append(Constants.KEY_PAGE_EVENT_USER_NAME).append("=").append(Utils.translateTagKeyValue(userData.getName())).append(",");
-                    sb.append(Constants.KEY_PAGE_EVENT_USER_ID).append("=").append(Utils.translateTagKeyValue(userData.getId())).append(",");
-                    JSONObject js = userData.getExts();
-                    if (js == null) {
-                        return;
-                    }
-                    Iterator<String> iterator = js.keys();
-                    while (iterator.hasNext()) {
-                        String key = iterator.next();
-                        try {
-                            sb.append("ud_").append(Utils.translateTagKeyValue(key)).append("=").append(Utils.translateTagKeyValue(js.getString(key))).append(",");
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
-        }
-    }
+//    /**
+//     * 添加用户信息
+//     *
+//     * @param sb
+//     */
+//    private void addUserData(StringBuilder sb, SyncJsonData opData) {
+//        if (FTUserConfig.get().isNeedBindUser() && FTUserConfig.get().isUserDataBinded()) {
+//            UserData userData = FTUserConfig.get().getUserData(opData.getSessionId());
+//            if (userData != null) {
+//                sb.append(",");
+//                sb.append(Constants.KEY_PAGE_EVENT_IS_SIGNIN).append("=").append(true).append(",");
+//
+//                if (opData.getDataType() == DataType.RUM_ES) {
+//                    //                sb.append(Constants.KEY_PAGE_EVENT_USER_NAME).append("=").append(Utils.translateTagKeyValue(userData.getName())).append(",");
+//                    sb.append(Constants.KEY_PAGE_EVENT_USER_ID).append("=").append(Utils.translateTagKeyValue(userData.getId())).append(",");
+//                    JSONObject js = userData.getExts();
+//                    if (js == null) {
+//                        return;
+//                    }
+//                    Iterator<String> iterator = js.keys();
+//                    while (iterator.hasNext()) {
+//                        String key = iterator.next();
+//                        try {
+//                            sb.append("ud_").append(Utils.translateTagKeyValue(key)).append("=").append(Utils.translateTagKeyValue(js.getString(key))).append(",");
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     /**
      * 获取监控数据
@@ -640,7 +638,7 @@ public class SyncDataHelper {
      * @param sb
      */
     private static void deleteLastComma(StringBuilder sb) {
-        StringUtils.deleteLastCharacter(sb,",");
+        StringUtils.deleteLastCharacter(sb, ",");
     }
 
     /**
@@ -689,6 +687,8 @@ public class SyncDataHelper {
     private static HashMap<String, Object> getBaseDeviceInfoTagsMap() {
         Context context = FTApplication.getApplication();
         HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put(Constants.KEY_DEVICE_OS_VERSION, DeviceUtils.getOSVersion());
+        hashMap.put(Constants.KEY_APP_VERSION_NAME, Utils.getAppVersionName());
         hashMap.put(Constants.KEY_DEVICE_APPLICATION_ID, DeviceUtils.getApplicationId(context));
         hashMap.put(Constants.KEY_DEVICE_OS, DeviceUtils.getOSName());
         hashMap.put(Constants.KEY_DEVICE_DEVICE_BAND, Utils.translateTagKeyValue(DeviceUtils.getDeviceBand()));
