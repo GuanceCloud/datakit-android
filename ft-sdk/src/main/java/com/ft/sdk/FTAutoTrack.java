@@ -32,6 +32,7 @@ import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.OaidUtils;
 import com.ft.sdk.garble.utils.Utils;
 import com.google.android.material.tabs.TabLayout;
 
@@ -988,7 +989,18 @@ public class FTAutoTrack {
         } else {
             jsonObject.put("user_id", FTUserConfig.get().getSessionId());
         }
-        jsonObject.put("origin_id", DeviceUtils.getUuid(FTApplication.getApplication()));
+
+        String uuid = "";
+        if (FTHttpConfig.get().useOaid) {
+            String oaid = OaidUtils.getOAID(FTApplication.getApplication());
+            if (oaid != null) {
+                uuid = "oaid_" + oaid;
+            }
+        } else {
+            uuid = DeviceUtils.getUuid(FTApplication.getApplication());
+        }
+        jsonObject.put("origin_id", uuid);
+        jsonObject.put("device_uuid", uuid);
 
     }
 

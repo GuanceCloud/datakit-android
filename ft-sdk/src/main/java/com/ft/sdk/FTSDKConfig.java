@@ -54,7 +54,7 @@ public class FTSDKConfig {
     //是否开启网络日志上报
     private boolean networkTrace;
     //崩溃日志的 __serviceName
-    private String traceServiceName = DEFAULT_LOG_SERVICE_NAME;
+    private String serviceName = DEFAULT_LOG_SERVICE_NAME;
     //是否开启流程图日志显示
     private boolean eventFlowLog;
     //是否开启系统日志的上报功能
@@ -217,8 +217,8 @@ public class FTSDKConfig {
         return networkTrace;
     }
 
-    public String getTraceServiceName() {
-        return traceServiceName;
+    public String getServiceName() {
+        return serviceName;
     }
 
     public boolean isEventFlowLog() {
@@ -471,12 +471,12 @@ public class FTSDKConfig {
     /**
      * 设置崩溃日志的 serviceName
      *
-     * @param traceServiceName
+     * @param serviceName
      * @return
      */
-    public FTSDKConfig setTraceServiceName(String traceServiceName) {
-        if (traceServiceName != null) {
-            this.traceServiceName = traceServiceName;
+    public FTSDKConfig setServiceName(String serviceName) {
+        if (serviceName != null) {
+            this.serviceName = serviceName;
         }
         return this;
     }

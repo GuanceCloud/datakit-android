@@ -46,7 +46,7 @@ public class FTUIBlockManager {
                 LogBean logBean = new LogBean("------ UIBlock  ------\n " + log, System.currentTimeMillis());
                 logBean.setStatus(Status.CRITICAL);
                 logBean.setEnv(config.getEnv());
-                logBean.setServiceName(config.getTraceServiceName());
+                logBean.setServiceName(config.getServiceName());
                 FTTrackInner.getInstance().logBackground(logBean);
             }
 
