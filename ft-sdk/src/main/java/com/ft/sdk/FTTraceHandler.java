@@ -1,10 +1,9 @@
 package com.ft.sdk;
 
-import com.ft.sdk.garble.manager.FTExceptionHandler;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.bean.LogBean;
-import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.http.HttpUrl;
+import com.ft.sdk.garble.manager.FTExceptionHandler;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.SkyWalkingUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -29,7 +28,7 @@ class FTTraceHandler {
     //是否可以采样
     private boolean enableTrace;
     //请求开始时间
-    private long requestTime = System.currentTimeMillis();
+    private long requestTime = Utils.getCurrentNanoTime();
     private String traceID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
     private String spanID = Utils.getGUID_16();
     private boolean isWebViewTrace;
@@ -77,7 +76,7 @@ class FTTraceHandler {
             return;
         }
         //请求结束时间
-        long responseTime = System.currentTimeMillis();
+        long responseTime = Utils.getCurrentNanoTime();
         long duration = (responseTime - requestTime) * 1000;
 
         String endPoint = httpUrl.getHost() + ":" + httpUrl.getPort();
@@ -94,7 +93,6 @@ class FTTraceHandler {
         logBean.setTraceID(traceID);
         FTTrackInner.getInstance().logBackground(logBean);
     }
-
 
 
     public void setIsWebViewTrace(boolean isWebViewTrace) {

@@ -67,7 +67,7 @@ public class Constants {
     public static final String KEY_PAGE_EVENT_USER_NAME = "ud_name";
 
     public static final String KEY_RUM_USER_ID = "userid";
-    public static final String KEY_RUM_APP_ID = "appId";
+    public static final String KEY_RUM_APP_ID = "app_id";
 
     public static final String KEY_RUM_IS_SIGNIN = "is_signin";
 

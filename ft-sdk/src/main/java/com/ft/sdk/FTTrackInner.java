@@ -3,7 +3,6 @@ package com.ft.sdk;
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.FTDBCachePolicy;
-import com.ft.sdk.garble.FTRUMConfig;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.LineProtocolBean;
 import com.ft.sdk.garble.bean.LogBean;
@@ -102,7 +101,7 @@ public class FTTrackInner {
                 try {
                     SyncJsonData recordData = SyncJsonData.getSyncJsonData(DataType.TRACK,
                             new LineProtocolBean(t.getMeasurement(), t.getTags(),
-                                    t.getFields(), t.getTimeMillis()));
+                                    t.getFields(), t.getTimeNano()));
                     recordDataList.add(recordData);
                     uploadTrackOPData(recordDataList, callback);
                 } catch (Exception e) {

@@ -263,7 +263,7 @@ public class SyncDataHelper {
                 deleteLastComma(valueSb);
                 sb.append(valueSb);
                 sb.append(Constants.SEPARATION_PRINT);
-                sb.append(data.getTime() * 1000000);
+                sb.append(data.getTime());
             } catch (Exception e) {
                 LogUtils.e(TAG, e.getMessage());
             }

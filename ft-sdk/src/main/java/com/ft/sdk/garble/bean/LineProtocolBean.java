@@ -1,5 +1,7 @@
 package com.ft.sdk.garble.bean;
 
+import com.ft.sdk.garble.utils.Utils;
+
 import org.json.JSONObject;
 
 /**
@@ -10,26 +12,26 @@ public class LineProtocolBean {
     private String measurement;
     private JSONObject tags;
     private JSONObject fields;
-    private long timeMillis;
+    private long timeNano;
 
     public LineProtocolBean(String measurement, JSONObject tags, JSONObject fields, long timeMillis) {
         this.measurement = measurement;
         this.tags = tags;
         this.fields = fields;
-        this.timeMillis = timeMillis;
+        this.timeNano = timeMillis;
     }
     public LineProtocolBean(String measurement, JSONObject tags, JSONObject fields) {
         this.measurement = measurement;
         this.tags = tags;
         this.fields = fields;
-        this.timeMillis = System.currentTimeMillis();
+        this.timeNano = Utils.getCurrentNanoTime();
     }
 
     public LineProtocolBean(String measurement, JSONObject fields) {
         this.measurement = measurement;
         this.tags = null;
         this.fields = fields;
-        this.timeMillis = System.currentTimeMillis();
+        this.timeNano = System.currentTimeMillis();
     }
 
     public String getMeasurement() {
@@ -44,7 +46,7 @@ public class LineProtocolBean {
         return fields;
     }
 
-    public long getTimeMillis() {
-        return timeMillis;
+    public long getTimeNano() {
+        return timeNano;
     }
 }

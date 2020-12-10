@@ -472,6 +472,7 @@ public class Utils {
 
     /**
      * 读取应用
+     *
      * @param filePath
      * @param key
      * @return
@@ -493,6 +494,14 @@ public class Utils {
             LogUtils.e(TAGS, e.getMessage());
         }
         return value;
+    }
+
+    /**
+     * 获取纳秒时间
+     * @return
+     */
+    public static long getCurrentNanoTime() {
+        return System.currentTimeMillis() * 1000000L + System.nanoTime() % 1000000L;
     }
 }
 

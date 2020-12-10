@@ -2,6 +2,7 @@ package com.ft.sdk;
 
 import com.ft.sdk.garble.bean.LineProtocolBean;
 import com.ft.sdk.garble.manager.AsyncCallback;
+import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONObject;
 
@@ -38,7 +39,7 @@ public class FTTrack {
      * @param fields      埋点数据
      */
     public void trackBackground(String measurement, JSONObject tags, JSONObject fields) {
-        long time = System.currentTimeMillis();
+        long time = Utils.getCurrentNanoTime();
         FTTrackInner.getInstance().trackBackground(time, measurement, tags, fields);
     }
 
@@ -51,7 +52,7 @@ public class FTTrack {
      * @param callback    上传结果回调
      */
     public void trackImmediate(String measurement, JSONObject tags, JSONObject fields, AsyncCallback callback) {
-        long time = System.currentTimeMillis();
+        long time = Utils.getCurrentNanoTime();
         LineProtocolBean trackBean = new LineProtocolBean(measurement, tags, fields, time);
         FTTrackInner.getInstance().trackAsync(Collections.singletonList(trackBean), callback);
     }
