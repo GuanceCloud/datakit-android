@@ -1,6 +1,7 @@
 package com.ft.sdk.garble.http;
 
 import com.ft.sdk.garble.bean.NetStatusBean;
+import com.ft.sdk.garble.utils.Utils;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,21 +42,21 @@ public abstract class NetStatusMonitor extends EventListener {
         super.callStart(call);
         netStatusBean.reset();
         netStatusBean.requestHost = call.request().url().host();
-        netStatusBean.fetchStartTime = System.currentTimeMillis();
+        netStatusBean.fetchStartTime = Utils.getCurrentNanoTime();
 
     }
 
     @Override
     public void responseHeadersStart(@NotNull Call call) {
         super.responseHeadersStart(call);
-        netStatusBean.responseStartTime = System.currentTimeMillis();
+        netStatusBean.responseStartTime = Utils.getCurrentNanoTime();
 
     }
 
     @Override
     public void responseBodyEnd(@NotNull Call call, long byteCount) {
         super.responseBodyEnd(call, byteCount);
-        netStatusBean.responseEndTime = System.currentTimeMillis();
+        netStatusBean.responseEndTime = Utils.getCurrentNanoTime();
     }
 
     @Override
@@ -66,39 +67,39 @@ public abstract class NetStatusMonitor extends EventListener {
     @Override
     public void dnsEnd(@NotNull Call call, @NotNull String domainName, @NotNull List<InetAddress> inetAddressList) {
         super.dnsEnd(call, domainName, inetAddressList);
-        netStatusBean.dnsEndTime = System.currentTimeMillis();
+        netStatusBean.dnsEndTime = Utils.getCurrentNanoTime();
     }
 
     @Override
     public void dnsStart(@NotNull Call call, @NotNull String domainName) {
         super.dnsStart(call, domainName);
-        netStatusBean.dnsStartTime = System.currentTimeMillis();
+        netStatusBean.dnsStartTime = Utils.getCurrentNanoTime();
     }
 
     @Override
     public void secureConnectEnd(@NotNull Call call, @Nullable Handshake handshake) {
         super.secureConnectEnd(call, handshake);
-        netStatusBean.sslEndTime = System.currentTimeMillis();
+        netStatusBean.sslEndTime = Utils.getCurrentNanoTime();
 
     }
 
     @Override
     public void secureConnectStart(@NotNull Call call) {
         super.secureConnectStart(call);
-        netStatusBean.sslStartTime = System.currentTimeMillis();
+        netStatusBean.sslStartTime = Utils.getCurrentNanoTime();
     }
 
     @Override
     public void connectStart(@NotNull Call call, @NotNull InetSocketAddress inetSocketAddress, @NotNull Proxy proxy) {
         super.connectStart(call, inetSocketAddress, proxy);
-        netStatusBean.tcpStartTime = System.currentTimeMillis();
+        netStatusBean.tcpStartTime = Utils.getCurrentNanoTime();
 
     }
 
     @Override
     public void connectEnd(@NotNull Call call, @NotNull InetSocketAddress inetSocketAddress, @NotNull Proxy proxy, @Nullable Protocol protocol) {
         super.connectEnd(call, inetSocketAddress, proxy, protocol);
-        netStatusBean.tcpEndTime = System.currentTimeMillis();
+        netStatusBean.tcpEndTime = Utils.getCurrentNanoTime();
     }
 
 

@@ -1,6 +1,7 @@
 package com.ft.sdk.garble;
 
 import com.ft.sdk.FTSDKConfig;
+import com.ft.sdk.garble.utils.Utils;
 
 import java.util.UUID;
 
@@ -27,7 +28,7 @@ public class FTFlowConfig {
     }
 
     public void initParams(FTSDKConfig ftsdkConfig) {
-        lastOpTime = System.currentTimeMillis();
+        lastOpTime = Utils.getCurrentNanoTime();
         eventFlowLog = ftsdkConfig.isEventFlowLog();
     }
 

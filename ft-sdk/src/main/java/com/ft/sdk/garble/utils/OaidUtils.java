@@ -42,7 +42,7 @@ public class OaidUtils {
         } catch (Exception e) {
             //LogUtils.d(e.getMessage());
         }
-        return Constants.UNKNOWN;
+        return null;
     }
 
     /**

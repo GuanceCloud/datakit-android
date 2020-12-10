@@ -355,14 +355,14 @@ public class FTAutoTrack {
      */
     public static void startApp() {
         globalParentPage = null;
-        startTimeline = System.currentTimeMillis();
+        startTimeline = Utils.getCurrentNanoTime();
         if (!FTAutoTrackConfig.get().isAutoTrack()) {
             return;
         }
         if (!FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_START)) {
             return;
         }
-        putPageEvent(System.currentTimeMillis(), OP.LANC, null, null, null, null);
+        putPageEvent(Utils.getCurrentNanoTime(), OP.LANC, null, null, null, null);
     }
 
 
@@ -372,7 +372,7 @@ public class FTAutoTrack {
      * @param timeDelay
      */
     public static void sleepApp(long timeDelay) {
-        long now = System.currentTimeMillis() - timeDelay;
+        long now = Utils.getCurrentNanoTime() - timeDelay;
         putClientTimeCost(now, now - startTimeline);
 
     }
@@ -607,7 +607,7 @@ public class FTAutoTrack {
      * @param vtp
      */
     public static void putClickEvent(@NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String vtp) {
-        long time = System.currentTimeMillis();
+        long time = Utils.getCurrentNanoTime();
         putPageEvent(time, op, currentPage, rootPage, null, vtp);
     }
 
@@ -620,7 +620,7 @@ public class FTAutoTrack {
      * @param parentPage
      */
     public static void putFragmentEvent(@NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String parentPage) {
-        long time = System.currentTimeMillis();
+        long time = Utils.getCurrentNanoTime();
         try {
             if (op == OP.OPEN_FRA) {
                 //显示Fragment的页面名称为 Activity.Fragment
@@ -639,7 +639,7 @@ public class FTAutoTrack {
      * @param classCurrent
      */
     public static void putActivityEvent(@NonNull OP op, Class classCurrent, boolean isFirstLoad) {
-        long time = System.currentTimeMillis();
+        long time = Utils.getCurrentNanoTime();
         Class parentClass = FTActivityManager.get().getLastActivity();
         String parentPageName = Constants.FLOW_ROOT;
         if (op == OP.OPEN_ACT) {
@@ -746,7 +746,7 @@ public class FTAutoTrack {
      */
     public static void putRUMLaunchPerformance(boolean isCold) {
         if (!Utils.enableTraceSamplingRate()) return;
-        long time = System.currentTimeMillis();
+        long time = Utils.getCurrentNanoTime();
         long duration = time - startTimeline;
 
         try {
@@ -773,7 +773,7 @@ public class FTAutoTrack {
      */
     public static void putRUMViewLoadPerformance(String viewId, String viewName, double fps, long loadTime) {
         if (!Utils.enableTraceSamplingRate()) return;
-        long time = System.currentTimeMillis();
+        long time = Utils.getCurrentNanoTime();
         try {
             JSONObject tags = getRUMPublicTags();
             JSONObject fields = new JSONObject();
@@ -801,7 +801,7 @@ public class FTAutoTrack {
      */
     public static void putRUMResourcePerformance(ResourceBean bean) {
         if (!Utils.enableTraceSamplingRate()) return;
-        long time = System.currentTimeMillis();
+        long time = Utils.getCurrentNanoTime();
         try {
             JSONObject tags = getRUMPublicTags();
             JSONObject fields = new JSONObject();
@@ -868,7 +868,7 @@ public class FTAutoTrack {
      */
     public static void PutRUMuiBlock(String log) {
         if (!Utils.enableTraceSamplingRate()) return;
-        long time = System.currentTimeMillis();
+        long time = Utils.getCurrentNanoTime();
         putFreeze("Freeze", time, log);
     }
 
@@ -1057,7 +1057,7 @@ public class FTAutoTrack {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        LogBean logBean = new LogBean(content.toString(), System.currentTimeMillis());
+        LogBean logBean = new LogBean(content.toString(), Utils.getCurrentNanoTime());
         logBean.setOperationName(operationName);
         logBean.setDuration(duration);
         FTTrackInner.getInstance().logBackground(logBean);

@@ -44,7 +44,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
     private boolean isAndroidTest = false;
 
     public void uploadCrashLog(String crash, String message, AppState state) {
-        long dateline = System.currentTimeMillis();
+        long dateline = Utils.getCurrentNanoTime();
 
         if (FTRUMConfig.get().isRumEnable()) {
             FTAutoTrack.putRUMCrash(crash, message, dateline, CrashType.JAVA, state);

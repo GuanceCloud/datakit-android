@@ -35,7 +35,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
 //            NetUtils.get().startMonitorNetRate();
 //        }
         FTFragmentManager.getInstance().addFragmentLifecycle(activity);
-        mCreateMap.put(activity, System.currentTimeMillis());
+        mCreateMap.put(activity, Utils.getCurrentNanoTime());
     }
 
     @Override
@@ -54,7 +54,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
 
             Long startTime = mCreateMap.get(activity);
             if (startTime != null) {
-                long duration = System.currentTimeMillis() - startTime;
+                long duration = Utils.getCurrentNanoTime() - startTime;
                 String viewName = AopUtils.getClassName(activity);
                 String viewID = Utils.MD5(viewName).toLowerCase();
                 double fps = FpsUtils.get().getFps();
