@@ -6,16 +6,14 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class SecondActivity extends AppCompatActivity {
+public class FirstActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_second);
-        findViewById(R.id.second_button).setOnClickListener(v -> {
-
-            startActivity(new Intent(SecondActivity.this, ThirdActivity.class));
-
+        setContentView(R.layout.activity_first);
+        findViewById(R.id.first_button).setOnClickListener(v -> {
+            startActivity(new Intent(FirstActivity.this, SecondActivity.class));
         });
     }
 }

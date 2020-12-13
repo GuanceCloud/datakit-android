@@ -150,6 +150,7 @@ public class SyncDataHelper {
 
     private String getRumEsBodyContent(List<SyncJsonData> datas) {
         HashMap<String, Object> hashMap = getRumEsPublicTags();
+        hashMap.putAll(getBaseDeviceInfoTagsMap());
         return convertToLineProtocolLines(datas, hashMap);
     }
 

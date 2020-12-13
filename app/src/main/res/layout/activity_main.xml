@@ -1,26 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".SecondActivity">
-    <Spinner
-        android:background="@color/colorAccent"
+    android:id="@+id/scrollView"
+    tools:context=".DebugMainActivity">
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:id="@+id/spinner"
-        android:popupBackground="@color/colorAccent"/>
-    <WebView
-        android:id="@+id/webView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="60dp">
-    </WebView>
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="60dp" />
-</FrameLayout>
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+
+        <Button
+            android:id="@+id/mock_period_data_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="周期产生日志数据" />
+        <Button
+            android:id="@+id/mock_one_data_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="周期产生一条日志数据" />
+        <Button
+            android:id="@+id/mock_crash_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="模拟崩溃" />
+        <Button
+            android:id="@+id/mock_crash_native_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="模拟 native 崩溃" />
+        <Button
+            android:id="@+id/mock_ui_block_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="模拟卡顿" />
+
+        <Button
+            android:id="@+id/mock_anr_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="模拟 Anr" />
+        <Button
+            android:id="@+id/mock_page_jump_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Web 测试" />
+        <Button
+            android:id="@+id/mock_click_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="仅用于测试用例测试点击产生的日志" />
+        <Button
+            android:id="@+id/mock_okhttp_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="测试 OkHttp 请求自动添加拦截器" />
+
+        <Button
+            android:id="@+id/mock_httpclient_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="测试 HttpClient5 请求自动添加拦截器" />
+
+
+        <Button
+            android:id="@+id/view_loop_test"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="页面跳转测试" />
+    </LinearLayout>
+
+
+</ScrollView>

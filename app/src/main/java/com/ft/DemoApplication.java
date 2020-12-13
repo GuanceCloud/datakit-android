@@ -50,6 +50,8 @@ public class DemoApplication extends Application {
                 .setTraceType(TraceType.SKYWALKING_V2)
                 .setOnlySupportMainProcess(true);
         FTSdk.install(ftSDKConfig);
+
+        FTSdk.get().bindUserData("brandon.test.userid");
     }
 
 }
