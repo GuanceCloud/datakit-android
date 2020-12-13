@@ -354,7 +354,6 @@ public class FTAutoTrack {
      * APP 启动
      */
     public static void startApp() {
-        globalParentPage = null;
         startTimeline = Utils.getCurrentNanoTime();
         if (!FTAutoTrackConfig.get().isAutoTrack()) {
             return;
@@ -376,8 +375,6 @@ public class FTAutoTrack {
         putClientTimeCost(now, now - startTimeline);
 
     }
-
-    private static String globalParentPage;
 
 
     /**
@@ -698,10 +695,6 @@ public class FTAutoTrack {
 
     private static void putPageEvent(long time, @NonNull OP op, @Nullable String currentPage,
                                      @Nullable String rootPage, @Nullable String parentPage, @Nullable String vtp) {
-        if (op.equals(OP.OPEN_ACT)) {
-            globalParentPage = parentPage;
-        }
-
         try {
             JSONObject tags = new JSONObject();
             JSONObject fields = new JSONObject();
@@ -754,7 +747,7 @@ public class FTAutoTrack {
             JSONObject fields = new JSONObject();
             tags.put("app_startup_type", isCold ? "cold" : "hot");
 
-            long appApdexLevel = duration / 1000;
+            long appApdexLevel = duration / 1000000000;
             if (appApdexLevel > 9) {
                 appApdexLevel = 9;
             }
@@ -771,7 +764,7 @@ public class FTAutoTrack {
     /**
      * 记录页面加载性能
      */
-    public static void putRUMViewLoadPerformance(String viewId, String viewName, double fps, long loadTime) {
+    public static void putRUMViewLoadPerformance(String viewId, String viewName, String parentView, double fps, long loadTime) {
         if (!Utils.enableTraceSamplingRate()) return;
         long time = Utils.getCurrentNanoTime();
         try {
@@ -779,8 +772,8 @@ public class FTAutoTrack {
             JSONObject fields = new JSONObject();
             tags.put("view_id", viewId);
             tags.put("view_name", viewName);
-            if (globalParentPage != null) {
-                tags.put("view_parent", globalParentPage);
+            if (parentView != null) {
+                tags.put("view_parent", parentView);
             }
             if (fps > 0) {
                 fields.put("view_fps", fps);
@@ -789,6 +782,7 @@ public class FTAutoTrack {
             FTTrackInner.getInstance().rumInflux(time,
                     Constants.FT_MEASUREMENT_RUM_APP_VIEW, tags, fields);
             appendRUMESPublicTags(tags);
+
             FTTrackInner.getInstance().rumES(time,
                     "view", tags, fields);
         } catch (Exception e) {
@@ -900,13 +894,12 @@ public class FTAutoTrack {
 
             tags.put("crash_type", crashType.toString());
             tags.put("crash_situation", state.toString());
-            tags.put("type", "crash");
             tags.put("application_uuid", FTSdk.PACKAGE_UUID);
             fields.put("crash_message", message);
             fields.put("crash_stack", log);
             appendRUMESPublicTags(tags);
             FTTrackInner.getInstance().rumES(dateline,
-                    Constants.FT_MEASUREMENT_RUM_APP_FREEZE, tags, fields);
+                    "crash", tags, fields);
         } catch (Exception e) {
             LogUtils.e(TAG, e.getMessage());
         }
@@ -969,7 +962,7 @@ public class FTAutoTrack {
         try {
             tags.put(Constants.KEY_RUM_APP_ID, FTRUMConfig.get().getAppId());
             tags.put("env", FTRUMConfig.get().getEnvType().toString());
-            tags.put(Constants.KEY_RUM_IS_SIGNIN, FTUserConfig.get().isUserDataBinded());
+            tags.put(Constants.KEY_RUM_IS_SIGNIN, FTUserConfig.get().isUserDataBinded() ? "T" : "F");
         } catch (JSONException e) {
             LogUtils.e(TAG, e.getMessage());
         }
@@ -996,7 +989,8 @@ public class FTAutoTrack {
             if (oaid != null) {
                 uuid = "oaid_" + oaid;
             }
-        } else {
+        }
+        if (uuid.isEmpty()) {
             uuid = DeviceUtils.getUuid(FTApplication.getApplication());
         }
         jsonObject.put("origin_id", uuid);

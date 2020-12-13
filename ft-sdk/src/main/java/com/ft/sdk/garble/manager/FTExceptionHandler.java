@@ -157,7 +157,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
                     if (item.getName().startsWith(EXCEPTION_FILE_PREFIX_TOMBSTONE)) {
                         try {
                             String crashString = Utils.readFile(item.getAbsolutePath(), Charset.defaultCharset());
-                            long crashTime = file.lastModified();
+                            long crashTime = file.lastModified() * 1000000L;
 
                             String value = Utils.readSectionValueFromDump(item.getAbsolutePath(), DUMP_FILE_KEY_APP_STATE);
 

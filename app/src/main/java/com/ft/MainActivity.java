@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main2);
+        setContentView(R.layout.activity_main);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(new String[]{Manifest.permission.CAMERA
                     , Manifest.permission.ACCESS_FINE_LOCATION
@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
             ReflectUtils.reflectCrashAndGetExceptionMessage();
         });
         findViewById(R.id.mock_page_jump_btn).setOnClickListener(v -> {
-            startActivity(new Intent(this, SecondActivity.class));
+            startActivity(new Intent(this, WebViewActivity.class));
         });
         findViewById(R.id.mock_click_btn).setOnClickListener(v -> {
         });
@@ -159,6 +159,10 @@ public class MainActivity extends AppCompatActivity {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
+        });
+        findViewById(R.id.view_loop_test).setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, FirstActivity.class));
 
         });
     }

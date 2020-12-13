@@ -4,14 +4,14 @@ import androidx.annotation.NonNull;
 
 public enum AppState {
     UNKNOWN,
-    START,
-    RUNNING;
+    STARTUP,
+    RUN;
 
     public static AppState getValueFrom(String value) {
         AppState[] states = AppState.values();
         for (int i = 0; i < AppState.values().length; i++) {
             AppState state = states[i];
-            if (state.toString().equals(value)) {
+            if (state.toString().toLowerCase().equals(value)) {
                 return state;
             }
         }
