@@ -107,6 +107,13 @@
 
 
 #SDK
+
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
+
 -keep class com.ft.sdk.FTSdk{
   *;
 }
@@ -124,19 +131,11 @@
      *;
 }
 
--keep enum com.ft.sdk.FTAutoTrackType{
-     *;
-}
-
 -keep class com.ft.sdk.garble.http.ResponseData{
      *;
 }
 
 -keep class com.ft.sdk.garble.http.HttpBuilder{
-    *;
-}
-
--keep enum com.ft.sdk.garble.http.RequestMethod{
     *;
 }
 
@@ -169,19 +168,6 @@
 }
 
 -keep class com.ft.sdk.garble.bean.ObjectBean{
-    *;
-}
-
-
--keep class com.ft.sdk.garble.bean.Status{
-    *;
-}
-
--keep class com.ft.sdk.MonitorType{
-    *;
-}
-
--keep class com.ft.sdk.TraceType{
     *;
 }
 

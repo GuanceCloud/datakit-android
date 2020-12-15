@@ -51,6 +51,9 @@ dependencies {
     implementation 'com.cloudcare.ft.mobile.sdk.tracker.agent:ft-sdk:$last_version'
     //捕获 native 层崩溃信息的依赖，需要配合 ft-sdk 使用不能单独使用
     implementation 'com.cloudcare.ft.mobile.sdk.tracker.agent:ft-native:$last_version'
+    //推荐使用这个版本，其他版本未做过充分兼容测试
+    implementation 'com.google.code.gson:gson:2.8.5'
+
 }
 //应用插件
 apply plugin: 'ft-plugin'
@@ -131,7 +134,6 @@ class DemoAplication : Application() {
         ).setUseOAID(true)//是否使用OAID
             .setDebug(true)//是否开启Debug模式（开启后能查看调试数据）
             .setXDataKitUUID("ft-dataKit-uuid-001")
-            .enableAutoTrack(true)//是否开启自动埋点
             .setEnableTrackAppCrash(true)
             .setEnv(EnvType.GRAY)
             .setTraceType(TraceType.ZIPKIN)

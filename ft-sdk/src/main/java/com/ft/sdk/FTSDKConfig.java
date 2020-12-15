@@ -180,10 +180,10 @@ public class FTSDKConfig {
 //    }
 
 
-    public FTSDKConfig enableAutoTrack(boolean autoTrack) {
-        this.autoTrack = autoTrack;
-        return this;
-    }
+//    public FTSDKConfig enableAutoTrack(boolean autoTrack) {
+//        this.autoTrack = autoTrack;
+//        return this;
+//    }
 
 //    public boolean getTrackNetTime() {
 //        return trackNetTime;
@@ -271,21 +271,6 @@ public class FTSDKConfig {
         return this;
     }
 
-//    public FTSDKConfig setDescLog(boolean descLog) {
-//        this.descLog = descLog;
-//        return this;
-//    }
-
-//    /**
-//     * 设置自动埋点的事件类别
-//     *
-//     * @param type
-//     * @return
-//     */
-//    private FTSDKConfig setEnableAutoTrackType(int type) {
-//        enableAutoTrackType = type;
-//        return this;
-//    }
 
     /**
      * 设置采集数据附加类型
@@ -298,128 +283,6 @@ public class FTSDKConfig {
         return this;
     }
 
-//    /**
-//     * 是否需要绑定用户信息
-//     *
-//     * @param needBindUserVar
-//     * @return
-//     */
-//    public FTSDKConfig setNeedBindUser(boolean needBindUserVar) {
-//        needBindUser = needBindUserVar;
-//        return this;
-//    }
-
-//    /**
-//     * 设置白名单（Activity，Fragment）
-//     *
-//     * @param classes
-//     * @return
-//     */
-//    public FTSDKConfig setWhiteActivityClasses(List<Class<?>> classes) {
-//        whiteActivityClass = classes;
-//        return this;
-//    }
-//
-//    /**
-//     * 设置控件白名单
-//     *
-//     * @param classes
-//     * @return
-//     */
-//    public FTSDKConfig setWhiteViewClasses(List<Class<?>> classes) {
-//        whiteViewClass = classes;
-//        return this;
-//    }
-//
-//    /**
-//     * 设置关闭的自动埋点事件类别
-//     *
-//     * @param type
-//     * @return
-//     */
-//    public FTSDKConfig setDisableAutoTrackType(int type) {
-//        disableAutoTrackType = type;
-//        return this;
-//    }
-//
-//    /**
-//     * 设置黑名单（Acitivty，Fragment）
-//     *
-//     * @param classes
-//     * @return
-//     */
-//    public FTSDKConfig setBlackActivityClasses(List<Class<?>> classes) {
-//        blackActivityClass = classes;
-//        return this;
-//    }
-//
-//    /**
-//     * 设置控件黑名单
-//     *
-//     * @param classes
-//     * @return
-//     */
-//    public FTSDKConfig setBlackViewClasses(List<Class<?>> classes) {
-//        blackViewClass = classes;
-//        return this;
-//    }
-
-//    /**
-//     * 设置使用高德作为逆向地址解析
-//     *
-//     * @param useGeoKey
-//     * @param geoKey
-//     * @return
-//     */
-//    public FTSDKConfig setGeoKey(boolean useGeoKey, String geoKey) {
-//        this.useGeoKey = useGeoKey;
-//        this.geoKey = geoKey;
-//        return this;
-//    }
-
-//    /**
-//     * 是否开启网络全路径请求时长监控
-//     *
-//     * @param value
-//     * @return
-//     */
-//    public FTSDKConfig trackNetRequestTime(boolean value) {
-//        this.trackNetTime = value;
-//        return this;
-//    }
-
-//    /**
-//     * 页面别名对应 map
-//     *
-//     * @param pageDescMap
-//     * @return
-//     */
-//    public FTSDKConfig addPageDesc(Map<String, String> pageDescMap) {
-//        this.pageDescMap = pageDescMap;
-//        return this;
-//    }
-
-//    /**
-//     * 事件别名对应 map
-//     *
-//     * @param vtpDescMap
-//     * @return
-//     */
-//    public FTSDKConfig addVtpDesc(Map<String, String> vtpDescMap) {
-//        this.vtpDescMap = vtpDescMap;
-//        return this;
-//    }
-//
-//    /**
-//     * 设置页面和视图树是否使用别名
-//     *
-//     * @param pageVtpDescEnabled
-//     * @return
-//     */
-//    public FTSDKConfig setPageVtpDescEnabled(boolean pageVtpDescEnabled) {
-//        this.pageVtpDescEnabled = pageVtpDescEnabled;
-//        return this;
-//    }
 
 
     /**
