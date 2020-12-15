@@ -48,7 +48,7 @@ public class FTSDKConfig {
     private boolean enableTrackAppANR;
 
     //设置采样率
-    private float traceSamplingRate = 1;
+    private float samplingRate = 1;
     //崩溃日志的环境
     private EnvType env = EnvType.PROD;
     //是否开启网络日志上报
@@ -205,8 +205,8 @@ public class FTSDKConfig {
         return enableTrackAppCrash;
     }
 
-    public float getTraceSamplingRate() {
-        return traceSamplingRate;
+    public float getSamplingRate() {
+        return samplingRate;
     }
 
     public EnvType getEnv() {
@@ -436,11 +436,11 @@ public class FTSDKConfig {
     /**
      * 设置采样率
      *
-     * @param traceSamplingRate
+     * @param samplingRate
      * @return
      */
-    public FTSDKConfig setTraceSamplingRate(float traceSamplingRate) {
-        this.traceSamplingRate = traceSamplingRate;
+    public FTSDKConfig setSamplingRate(float samplingRate) {
+        this.samplingRate = samplingRate;
         return this;
     }
 

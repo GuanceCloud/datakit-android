@@ -62,7 +62,7 @@ public class TraceTest extends BaseTest {
         context = MockApplication.getContext();
         ftsdkConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL))
                 .setXDataKitUUID("ft-dataKit-uuid-001")
-                .setTraceSamplingRate(1)
+                .setSamplingRate(1)
                 .setNetworkTrace(true);
     }
 

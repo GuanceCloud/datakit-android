@@ -62,7 +62,7 @@ public class LogTrackObjectTraceTest extends BaseTest {
                 .setMonitorType(MonitorType.ALL)//设置监控项
                 .setEnableTrackAppCrash(true)
                 .setEnv(EnvType.GRAY)
-                .setTraceSamplingRate(1f)
+                .setSamplingRate(1f)
                 .setNetworkTrace(true)
                 .setTraceConsoleLog(true)
                 .setEventFlowLog(true)

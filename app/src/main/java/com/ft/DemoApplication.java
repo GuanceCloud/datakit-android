@@ -43,7 +43,7 @@ public class DemoApplication extends Application {
                 .setEnableTrackAppANR(true)
                 .setEnableTrackAppUIBlock(true)
                 .setEnv(EnvType.GRAY)
-                .setTraceSamplingRate(1f)
+                .setSamplingRate(1f)
                 .setNetworkTrace(true)
                 .setTraceConsoleLog(true)
                 .setEventFlowLog(true)
