@@ -751,12 +751,8 @@ public class FTAutoTrack {
             JSONObject tags = getRUMPublicTags();
             JSONObject fields = new JSONObject();
             tags.put("app_startup_type", isCold ? "cold" : "hot");
+            tags.put("app_apdex_level", getAppApdexLevel(duration));
 
-            long appApdexLevel = duration / 1000000000;
-            if (appApdexLevel > 9) {
-                appApdexLevel = 9;
-            }
-            tags.put("app_apdex_level", appApdexLevel);
             fields.put("app_startup_duration", duration);
             FTTrackInner.getInstance().rumInflux(time,
                     Constants.FT_MEASUREMENT_RUM_APP_START_UP, tags, fields);
@@ -783,6 +779,8 @@ public class FTAutoTrack {
             if (fps > 0) {
                 fields.put("view_fps", fps);
             }
+
+            tags.put("app_apdex_level", getAppApdexLevel(loadTime));
             fields.put("view_load", loadTime);
             FTTrackInner.getInstance().rumInflux(time,
                     Constants.FT_MEASUREMENT_RUM_APP_VIEW, tags, fields);
@@ -793,6 +791,14 @@ public class FTAutoTrack {
         } catch (Exception e) {
             LogUtils.e(TAG, e.toString());
         }
+    }
+
+    private static long getAppApdexLevel(long duration) {
+        long appApdexLevel = duration / 1000000000;
+        if (appApdexLevel > 9) {
+            appApdexLevel = 9;
+        }
+        return appApdexLevel;
     }
 
     /**

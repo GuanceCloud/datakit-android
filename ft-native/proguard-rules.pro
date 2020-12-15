@@ -33,3 +33,9 @@
 -keep class ftnative.NativeCrash$InitParameters{
  *;
 }
+
+
+-keep class com.ft.sdk.nativelib.**{
+ *;
+}
+
