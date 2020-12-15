@@ -107,95 +107,10 @@
 
 
 #SDK
--keep class com.ft.sdk.FTSdk{
+-dontwarn com.ft.sdk.**
+-keep class com.ft.sdk.**{
   *;
 }
--keep class com.ft.sdk.FTMonitor{
-  *;
-}
--keep class com.ft.sdk.FTSDKConfig{
-  *;
-}
--keep class com.ft.sdk.FTTrack{
-   public *;
-}
 
--keep class com.ft.sdk.FTAutoTrack{
-     *;
-}
-
--keep class com.ft.sdk.garble.http.ResponseData{
-     *;
-}
-
--keep class com.ft.sdk.garble.http.HttpBuilder{
-    *;
-}
-
--keep enum com.ft.sdk.garble.http.RequestMethod{
-    *;
-}
-
--keep class com.ft.sdk.garble.http.INetEngine{
-    *;
-}
-
--keep class com.ft.sdk.FTNetWorkInterceptor{
-    *;
-}
-
--keep class com.ft.sdk.garble.http.OkHttpEngine{
-    *;
-}
-
--keep class * extends com.ft.sdk.garble.http.ResponseData{
-     *;
-}
-
--keep class com.ft.sdk.garble.manager.AsyncCallback{
-    *;
-}
-
--keep class com.ft.sdk.garble.bean.LineProtocolBean{
-    *;
-}
-
--keep class com.ft.sdk.garble.bean.LogData{
-    *;
-}
-
--keep class com.ft.sdk.garble.bean.ObjectBean{
-    *;
-}
-
-
--keep class com.ft.sdk.garble.bean.Status{
-    *;
-}
-
--keep class com.ft.sdk.MonitorType{
-    *;
-}
-
--keep class com.ft.sdk.TraceType{
-    *;
-}
-
--keep class com.ft.sdk.garble.utils.TrackLog{
-    *;
-}
--keep class com.ft.sdk.InitSDKProcessException{
-    *;
-}
--keep class com.ft.sdk.garble.manager.FTExceptionHandler{
-    *;
-}
--keep enum com.ft.sdk.LogCacheDiscard {
-    *;
-}
-
--keep class com.ft.sdk.FTLogger {
-    *;
-}
 
 
