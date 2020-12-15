@@ -209,7 +209,7 @@ public class FTSdk {
 
             FTAutoTrack.startApp();
 
-            float rate = mFtSDKConfig.getTraceSamplingRate();
+            float rate = mFtSDKConfig.getSamplingRate();
             if (rate > 1 || rate < 0) {
                 throw new
                         IllegalArgumentException("rate 值的范围应在[0,1]");

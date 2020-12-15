@@ -53,7 +53,7 @@ public class SDKRunStateTest extends BaseTest {
                 .setMonitorType(MonitorType.ALL)//设置监控项
                 .setEnableTrackAppCrash(true)
                 .setEnv(EnvType.GRAY)
-                .setTraceSamplingRate(0.5f)
+                .setSamplingRate(0.5f)
                 .setNetworkTrace(true)
                 .setTraceConsoleLog(true)
                 .setEventFlowLog(true)
