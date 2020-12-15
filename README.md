@@ -175,6 +175,27 @@ FTLogger.getInstance().logBackground(mutableListOf(LogData("test1",Status.INFO))
 
 ```
 
+### Proguard 混淆配置
+```
+-keep class ftnative.NativeHandler {
+    native <methods>;
+    void crashCallback(...);
+    void traceCallback(...);
+}
+-keep class ftnative.NativeCrash{
+ *;
+}
+
+-keep class ftnative.NativeCrash$InitParameters{
+ *;
+}
+
+-keep class com.bun.miitmdid.core.**{*;}
+-keep class * extends com.ft.sdk.garble.http.ResponseData{
+     *;
+}
+```
+
 ### 关于权限的配置
 DataFlux SDK 用到了系统的四个权限，分别为 READ_PHONE_STATE、WRITE_EXTERNAL_STORAGE、CAMERA、ACCESS_FINE_LOCATION
 权限使用说明
