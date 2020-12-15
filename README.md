@@ -56,7 +56,7 @@ dependencies {
 apply plugin: 'ft-plugin'
 //配置插件使用参数
 FTExt {
-    //是否显示日志，默认为 false
+    //是否显示 Plugin 日志，默认为 false
     showLog = true
 }
 android{
@@ -79,21 +79,6 @@ android{
 
 >最新的版本请看上方的 Agent 和 Plugin 的版本名
 
-### 添加混淆
-
-如果你的项目开启了混淆，那么在你的 proguard-rules.pro 文件中添加如下配置
-
-```
--keep class * extends com.ft.sdk.garble.http.ResponseData{ *;}
--keep class com.ft.sdk.FTAutoTrack{*;}
--keep enum com.ft.sdk.FTAutoTrackType{*;}
--keep enum com.ft.sdk.FTSdk{*;}
--keep class com.ft.sdk.garble.utils.TrackLog{*;}
--keep class com.ft.sdk.nativelib.ExceptionHandler{*;}
--keep class com.ft.sdk.garble.FTExceptionHandler{*;}
-```
-> 注意：如果你的项目中开启了全埋点和流程图，那么需要将你的 Fragment 和 Activity 保持不被混淆，这样流程图中
-> 就会显示页面的真实名称，而不是混淆后的名称
 
 ## 配置
 
@@ -106,8 +91,8 @@ android{
 |       setUseOAID        | 是否使用OAID作为设备唯一识别号的替代字段  |  否   |                 默认不使用,开启后全埋点数据里将会添加一个 oaid 字段<br>[了解 OAID](#一关于-oaid)                  |
 |     setXDataKitUUID     |       设置数据采集端的名称        |  否   |                                  不设置该值系统会生成一个默认的 uuid                                  |
 |        setDebug         |        是否开启调试模式         |  否   |                                 默认不开启，开启后方可打印 SDK 运行日志                                 |
-|     setMonitorType      |          设置监控项          |  否   | 默认不开启任何监控项,<br>[关于监控项说明](#四监控配置项类-monitortype),<br>[关于监控项参数获取问题](#二关于监控项中有些参数获取不到问题说明) |
-|       metricsUrl        | FT-GateWay metrics 写入地址 |  是   |                                      必须配置，配置后才能上报                                      |
+|     setMonitorType      |                    |  否   |  |
+|       metricsUrl        |  metrics 写入地址 |  是   |                                      必须配置，配置后才能上报                                      |
 | setEnableTrackAppCrash | 是否开启 App 崩溃日志上报功能 | 否 | 默认不开启，开启后将上报当前应用的崩溃日志。上报成功后，可以在后台的日志模块查看对应的日志。<br /> [关于崩溃日志中混淆内容转换的问题](#五关于崩溃日志中混淆内容转换的问题)|
 | setEnableTrackAppANR | 是否开启 App ANR 检测 | 否 | 默认不开启，开启后上报 ANR 数据信息|
 | setServiceName | 设置崩溃日志的名称 | 否 | 默认为 dataflux sdk。你可以将你的应用名称设置给该字段，用来区分不同的日志 |
@@ -118,11 +103,6 @@ android{
 | setTraceType | 设置链路追踪所使用的类型。 | 否 |目前支持 Zipkin 和 Jaeger 两种，默认为 Zipkin |
 | setEventFlowLog | 设置是否开启页面事件的日志 | 否 | 可以在 web 版本日志中，查看到对应上报的日志，事件支持启动应用，进入页面，离开页面，事件点击等等 |
 | setOnlySupportMainProcess|设置是否只支持在主进程中初始化|否|默认是 true ，默认情况下 SDK 只能在主进程中运行。如果应用中存在多个进程，那么其他进程中将不会执行。如果需要在其他进程中执行需要将该字段设置为 true
-
-> FTAutoTrackType 自动埋点事件说明，事件总类目前支持3种：
-    FTAutoTrackType.APP_START：页面的开始事件，Activity 依赖的是其 onResume 方法，Fragment 依赖的是其 onResume 方法；
-    FTAutoTrackType.APP_END：页面的结束事件，Activity 依赖的是其 onPause 方法，Fragment 依赖的是其 onPause 方法；
-    FTAutoTrackType.APP_CLICK：控件的点击事件。
 
 
 ####  通过 FTSdk 安装配置项和绑定用户信息
@@ -151,7 +131,6 @@ class DemoAplication : Application() {
         ).setUseOAID(true)//是否使用OAID
             .setDebug(true)//是否开启Debug模式（开启后能查看调试数据）
             .setXDataKitUUID("ft-dataKit-uuid-001")
-            .setMonitorType(MonitorType.ALL)//设置监控项
             .enableAutoTrack(true)//是否开启自动埋点
             .setEnableTrackAppCrash(true)
             .setEnv(EnvType.GRAY)
@@ -267,16 +246,6 @@ class FTSDKConfig{
      */
     public FTSDKConfig setDebug(boolean debug);
 
-
-    /**
-     * 设置监控类别
-     * @param monitorType 支持一项或者几项取或值
-     * 例如：MonitorType.BATTERY or MonitorType.MEMORY
-     * @return
-     */
-    public FTSDKConfig setMonitorType(int monitorType);
-
-
 }
 ```
 
@@ -292,14 +261,14 @@ public class MonitorType {
 
     //内存（内存总量、内存使用率）
     public static int MEMORY = 1<<2;
-
-    //CPU（CPU 型号、CPU 占用率、CPU 总频率、CPU 温度）
+	//CPU（CPU 占用率）
     public static int CPU = 1<<3;
+    //GPS 是否开启
+    public static int LOCATION = 1<<7;
     
     //蓝牙
     public static int BLUETOOTH = 1<<10;
-    
-    
+   
     //屏幕帧率
     public static int FPS = 1 << 19;
 }

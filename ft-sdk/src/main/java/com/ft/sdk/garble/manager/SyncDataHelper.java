@@ -347,10 +347,10 @@ public class SyncDataHelper {
 //                //GPU
 //                createGPU(tags, fields);
 //            }
-            if (FTMonitorConfig.get().isMonitorType(MonitorType.NETWORK)) {
-                //网络
-                createNetWork(tags, fields);
-            }
+//            if (FTMonitorConfig.get().isMonitorType(MonitorType.NETWORK)) {
+//                //网络
+//                createNetWork(tags, fields);
+//            }
 //            if (FTMonitorConfig.get().isMonitorType(MonitorType.CAMERA)) {
 //                createCamera(tags, fields);
 //            }
@@ -360,10 +360,10 @@ public class SyncDataHelper {
             if (FTMonitorConfig.get().isMonitorType(MonitorType.BLUETOOTH)) {
                 createBluetooth(tags, fields);
             }
-            if (FTMonitorConfig.get().isMonitorType(MonitorType.SYSTEM)) {
-                //系统
-                createSystem(tags, fields);
-            }
+//            if (FTMonitorConfig.get().isMonitorType(MonitorType.SYSTEM)) {
+//                //系统
+//                createSystem(tags, fields);
+//            }
             if (FTMonitorConfig.get().isMonitorType(MonitorType.FPS)) {
                 createFps(tags, fields);
             }

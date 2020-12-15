@@ -93,10 +93,10 @@ public class MonitorTest extends BaseTest {
         monitorTest(MonitorType.BLUETOOTH);
     }
 
-    @Test
-    public void monitorSystemTest() {
-        monitorTest(MonitorType.SYSTEM);
-    }
+//    @Test
+//    public void monitorSystemTest() {
+//        monitorTest(MonitorType.SYSTEM);
+//    }
 
     @Test
     public void monitorFpsTest() {
@@ -167,7 +167,7 @@ public class MonitorTest extends BaseTest {
 //        expects.put(MonitorType.CAMERA, "camera_back_px");
 //        expects.put(MonitorType.LOCATION, Constants.KEY_LOCATION_GPS_OPEN);
         expects.put(MonitorType.BLUETOOTH, Constants.KEY_BT_OPEN);
-        expects.put(MonitorType.SYSTEM, Constants.KEY_DEVICE_NAME);
+//        expects.put(MonitorType.SYSTEM, Constants.KEY_DEVICE_NAME);
         expects.put(MonitorType.FPS, Constants.KEY_FPS);
         return expects;
     }
