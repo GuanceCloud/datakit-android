@@ -21,7 +21,7 @@ public class FTSDKConfig {
     private boolean autoTrack = true;
     //是否需要绑定用户数据
 //    private boolean needBindUser;
-    //监控类别
+    //崩溃采集数据附加类型
     private int monitorType;
     //以下三个为白名单
 //    private int enableAutoTrackType;
@@ -288,7 +288,7 @@ public class FTSDKConfig {
 //    }
 
     /**
-     * 设置监控类别
+     * 设置采集数据附加类型
      *
      * @param monitorType
      * @return

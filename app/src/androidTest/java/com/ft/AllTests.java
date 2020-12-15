@@ -1,6 +1,7 @@
 package com.ft;
 
 //import com.ft.tests.FTAutoTrackTest;
+import com.ft.tests.MonitorTest;
 import com.ft.tests.base.FTInitParamTest;
 import com.ft.tests.base.SDKRunStateTest;
 import com.ft.tests.ErrorTraceTest;
@@ -8,7 +9,7 @@ import com.ft.tests.LogEventTest;
 import com.ft.tests.LogTest;
 import com.ft.tests.LogTrackObjectTraceTest;
 import com.ft.tests.TraceTest;
-import com.ft.tests.MonitorTest;
+//import com.ft.tests.MonitorTest;
 import com.ft.tests.BindUserTest;
 //import com.ft.tests.LocationTest;
 import com.ft.tests.base.OaidTest;
