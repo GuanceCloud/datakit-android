@@ -20,6 +20,7 @@ import com.ft.sdk.garble.FTAutoTrackConfig;
 import com.ft.sdk.garble.FTFlowConfig;
 import com.ft.sdk.garble.FTFragmentManager;
 import com.ft.sdk.garble.FTHttpConfig;
+import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.FTRUMConfig;
 import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.bean.AppState;
@@ -29,9 +30,12 @@ import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.ResourceBean;
 import com.ft.sdk.garble.manager.FTActivityManager;
 import com.ft.sdk.garble.utils.AopUtils;
+import com.ft.sdk.garble.utils.BluetoothUtils;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
+import com.ft.sdk.garble.utils.LocationUtils;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.NetUtils;
 import com.ft.sdk.garble.utils.OaidUtils;
 import com.ft.sdk.garble.utils.Utils;
 import com.google.android.material.tabs.TabLayout;
@@ -42,6 +46,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Method;
+import java.util.Locale;
 import java.util.Map;
 
 import okhttp3.OkHttpClient;
@@ -368,10 +373,10 @@ public class FTAutoTrack {
     /**
      * 应用休眠
      *
-     * @param timeDelay
+     * @param timeDelayMs
      */
-    public static void sleepApp(long timeDelay) {
-        long now = Utils.getCurrentNanoTime() - timeDelay;
+    public static void sleepApp(long timeDelayMs) {
+        long now = Utils.getCurrentNanoTime() - timeDelayMs * 1000000;
         putClientTimeCost(now, now - startTimeline);
 
     }
@@ -898,8 +903,35 @@ public class FTAutoTrack {
             fields.put("crash_message", message);
             fields.put("crash_stack", log);
             appendRUMESPublicTags(tags);
-            FTTrackInner.getInstance().rumES(dateline,
-                    "crash", tags, fields);
+
+            try {
+                if (FTMonitorConfig.get().isMonitorType(MonitorType.BLUETOOTH)) {
+                    tags.put("bt_open", BluetoothUtils.get().isOpen());
+                }
+
+                if (FTMonitorConfig.get().isMonitorType(MonitorType.LOCATION)) {
+                    tags.put("gps_open", LocationUtils.get().isOpenGps());
+                }
+
+                tags.put("carrier", DeviceUtils.getCarrier(FTApplication.getApplication()));
+                tags.put("locale", Locale.getDefault());
+
+                if (FTMonitorConfig.get().isMonitorType(MonitorType.MEMORY)) {
+                    double[] memory = DeviceUtils.getRamData(FTApplication.getApplication());
+                    tags.put(Constants.KEY_MEMORY_TOTAL, memory[0] + "GB");
+                    fields.put(Constants.KEY_MEMORY_USE, memory[1]);
+                }
+
+                if (FTMonitorConfig.get().isMonitorType(MonitorType.CPU)) {
+                    fields.put(Constants.KEY_CPU_USE, DeviceUtils.getCpuUseRate());
+                }
+
+
+            } catch (Exception e) {
+                LogUtils.e(TAG, e.getMessage());
+            }
+
+            FTTrackInner.getInstance().rumES(dateline, "crash", tags, fields);
         } catch (Exception e) {
             LogUtils.e(TAG, e.getMessage());
         }
@@ -962,6 +994,7 @@ public class FTAutoTrack {
         try {
             tags.put(Constants.KEY_RUM_APP_ID, FTRUMConfig.get().getAppId());
             tags.put("env", FTRUMConfig.get().getEnvType().toString());
+            tags.put("network_type", NetUtils.get().getNetWorkStateName());
             tags.put(Constants.KEY_RUM_IS_SIGNIN, FTUserConfig.get().isUserDataBinded() ? "T" : "F");
         } catch (JSONException e) {
             LogUtils.e(TAG, e.getMessage());
@@ -978,9 +1011,9 @@ public class FTAutoTrack {
      */
     private static void appendRUMESPublicTags(JSONObject jsonObject) throws JSONException {
         if (FTUserConfig.get().isUserDataBinded()) {
-            jsonObject.put("user_id", FTUserConfig.get().getUserData().getId());
+            jsonObject.put(Constants.KEY_RUM_USER_ID, FTUserConfig.get().getUserData().getId());
         } else {
-            jsonObject.put("user_id", FTUserConfig.get().getSessionId());
+            jsonObject.put(Constants.KEY_RUM_USER_ID, FTUserConfig.get().getSessionId());
         }
 
         String uuid = "";

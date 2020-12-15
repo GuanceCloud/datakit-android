@@ -347,10 +347,10 @@ public class SyncDataHelper {
 //                //GPU
 //                createGPU(tags, fields);
 //            }
-//            if (FTMonitorConfig.get().isMonitorType(MonitorType.NETWORK)) {
-//                //网络
-//                createNetWork(tags, fields);
-//            }
+            if (FTMonitorConfig.get().isMonitorType(MonitorType.NETWORK)) {
+                //网络
+                createNetWork(tags, fields);
+            }
 //            if (FTMonitorConfig.get().isMonitorType(MonitorType.CAMERA)) {
 //                createCamera(tags, fields);
 //            }
@@ -486,6 +486,9 @@ public class SyncDataHelper {
             LogUtils.e(TAG, "网络数据获取异常:" + e.getMessage());
         }
     }
+
+
+
 
     /**
      * 添加相机监控数据
