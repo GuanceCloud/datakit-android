@@ -88,17 +88,6 @@ public class FTSDKConfig {
      */
     private FTSDKConfig(String serverUrl) {
         this.serverUrl = serverUrl;
-//        this.enableRequestSigning = enableRequestSigning;
-//        this.akId = akId;
-//        this.akSecret = akSecret;
-//        if (enableRequestSigning) {
-//            if (akId == null) {
-//                throw new InvalidParameterException("akId 未初始化");
-//            }
-//            if (akSecret == null) {
-//                throw new InvalidParameterException("akSecret 未初始化");
-//            }
-//        }
     }
 
     public String getServerUrl() {
@@ -109,27 +98,16 @@ public class FTSDKConfig {
         return rumAppId;
     }
 
+    /**
+     * 设置 RUM AppId
+     * @param rumAppId
+     * @return
+     */
     public FTSDKConfig setRumAppId(String rumAppId) {
         this.rumAppId = rumAppId;
         return this;
     }
 
-    //    public boolean isEnableRequestSigning() {
-//        return enableRequestSigning;
-//    }
-//
-//
-//    public String getAkId() {
-//        return akId;
-//    }
-//
-//    public String getAkSecret() {
-//        return akSecret;
-//    }
-
-//    public String getDataWayToken() {
-//        return dataWayToken;
-//    }
 
     public boolean isUseOAID() {
         return useOAID;
@@ -139,67 +117,19 @@ public class FTSDKConfig {
         return isDebug;
     }
 
-//    public boolean isDescLog() {
-//        return descLog;
-//    }
+
 
     public boolean isAutoTrack() {
         return autoTrack;
     }
 
-//    public boolean isNeedBindUser() {
-//        return needBindUser;
-//    }
+
 
     public int getMonitorType() {
         return monitorType;
     }
 
-//    public int getEnableAutoTrackType() {
-//        return enableAutoTrackType;
-//    }
-//
-//    public List<Class<?>> getWhiteActivityClass() {
-//        return whiteActivityClass;
-//    }
-//
-//    public List<Class<?>> getWhiteViewClass() {
-//        return whiteViewClass;
-//    }
-//
-//    public int getDisableAutoTrackType() {
-//        return disableAutoTrackType;
-//    }
-//
-//    public List<Class<?>> getBlackActivityClass() {
-//        return blackActivityClass;
-//    }
-//
-//    public List<Class<?>> getBlackViewClass() {
-//        return blackViewClass;
-//    }
 
-
-//    public FTSDKConfig enableAutoTrack(boolean autoTrack) {
-//        this.autoTrack = autoTrack;
-//        return this;
-//    }
-
-//    public boolean getTrackNetTime() {
-//        return trackNetTime;
-//    }
-
-//    public Map<String, String> getPageDescMap() {
-//        return pageDescMap;
-//    }
-//
-//    public Map<String, String> getVtpDescMap() {
-//        return vtpDescMap;
-//    }
-//
-//    public boolean isPageVtpDescEnabled() {
-//        return pageVtpDescEnabled;
-//    }
 
     public boolean isEnableTrackAppCrash() {
         return enableTrackAppCrash;
