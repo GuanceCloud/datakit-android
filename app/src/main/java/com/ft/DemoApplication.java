@@ -47,7 +47,7 @@ public class DemoApplication extends Application {
                 .setNetworkTrace(true)
                 .setTraceConsoleLog(true)
                 .setEventFlowLog(true)
-                .setTraceType(TraceType.SKYWALKING_V2)
+                .setTraceType(TraceType.ZIPKIN)
                 .setOnlySupportMainProcess(true);
         FTSdk.install(ftSDKConfig);
 

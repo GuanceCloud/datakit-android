@@ -81,6 +81,7 @@ public class SyncTaskManager {
                         List<SyncJsonData> logDataList = queryFromData(DataType.LOG);
                         List<SyncJsonData> rumEsList = queryFromData(DataType.RUM_ES);
                         List<SyncJsonData> rumInfluxList = queryFromData(DataType.RUM_INFLUX);
+                        List<SyncJsonData> traceDataList = queryFromData(DataType.TRACE);
 
 //                        //如果打开绑定用户开关，但是没有绑定用户信息，那么就不上传用户数据，直到绑了
 //                        if (FTUserConfig.get().isNeedBindUser() && !FTUserConfig.get().isUserDataBinded()) {
@@ -119,6 +120,10 @@ public class SyncTaskManager {
 
                         if (!rumInfluxList.isEmpty()) {
                             handleSyncOpt(DataType.RUM_INFLUX, rumInfluxList);
+                        }
+
+                        if (!traceDataList.isEmpty()) {
+                            handleSyncOpt(DataType.TRACE, rumInfluxList);
                         }
                     }
                 } catch (Exception e) {
@@ -189,6 +194,9 @@ public class SyncTaskManager {
     public synchronized void requestNet(DataType dataType, String body, final AsyncCallback syncCallback) {
         String model;
         switch (dataType) {
+            case TRACE:
+                model = Constants.URL_MODEL_TRACING;
+                break;
             case LOG:
                 model = Constants.URL_MODEL_LOG;
                 break;

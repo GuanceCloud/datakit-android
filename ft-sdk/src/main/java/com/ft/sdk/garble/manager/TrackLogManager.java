@@ -1,8 +1,10 @@
 
 package com.ft.sdk.garble.manager;
 
-import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.FTTrackInner;
+import com.ft.sdk.garble.FTDBCachePolicy;
+import com.ft.sdk.garble.bean.BaseContentBean;
+import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -21,7 +23,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class TrackLogManager {
     private static final String TAG = "TrackLogManager";
     private static TrackLogManager instance;
-    private List<LogBean> logBeanList = new CopyOnWriteArrayList<>();
+    private List<BaseContentBean> logBeanList = new CopyOnWriteArrayList<>();
     private LinkedBlockingQueue<LogBean> logQueue = new LinkedBlockingQueue<>();
     private volatile boolean isRunning;
 
@@ -70,7 +72,7 @@ public class TrackLogManager {
                     isRunning = true;
                     logBeanList.add(logBean);//取出数据放到集合中
                     if (logBeanList.size() >= 20 || logQueue.peek() == null) {//当取出的数据大于等于20条或者没有下一条数据时执行插入数据库操作
-                        FTTrackInner.getInstance().logBackground(logBeanList);
+                        FTTrackInner.getInstance().batchLogBeanBackground(logBeanList, DataType.LOG);
                         logBeanList.clear();//插入完成后执行清除集合操作
                     }
                 }

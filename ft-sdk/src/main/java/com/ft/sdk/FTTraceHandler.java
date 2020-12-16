@@ -2,10 +2,10 @@ package com.ft.sdk;
 
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.bean.LogBean;
+import com.ft.sdk.garble.bean.TraceBean;
 import com.ft.sdk.garble.http.HttpUrl;
 import com.ft.sdk.garble.manager.FTExceptionHandler;
 import com.ft.sdk.garble.utils.Constants;
-import com.ft.sdk.garble.utils.SkyWalkingUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONObject;
@@ -19,19 +19,20 @@ import java.util.UUID;
  * description: trace 数据处理
  */
 class FTTraceHandler {
-    public static final String ZIPKIN_TRACE_ID = "X-B3-TraceId";
-    public static final String ZIPKIN_SPAN_ID = "X-B3-SpanId";
-    public static final String ZIPKIN_SAMPLED = "X-B3-Sampled";
-    public static final String JAEGER_KEY = "uber-trace-id";
-    public static final String SKYWALKING_V3_SW_8 = "sw8";
-    public static final String SKYWALKING_V3_SW_6 = "sw6";
+    private static final String ZIPKIN_TRACE_ID = "X-B3-TraceId";
+    private static final String ZIPKIN_SPAN_ID = "X-B3-SpanId";
+    private static final String ZIPKIN_SAMPLED = "X-B3-Sampled";
+    private static final String JAEGER_KEY = "uber-trace-id";
+    private static final String SKYWALKING_V3_SW_8 = "sw8";
+    private static final String SKYWALKING_V3_SW_6 = "sw6";
     //是否可以采样
-    private boolean enableTrace;
+    private final boolean enableTrace;
     //请求开始时间
-    private long requestTime = Utils.getCurrentNanoTime();
-    private String traceID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
-    private String spanID = Utils.getGUID_16();
+    private final long requestTime = Utils.getCurrentNanoTime();
+    private final String traceID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
+    private final String spanID = Utils.getGUID_16();
     private boolean isWebViewTrace;
+
     private HttpUrl httpUrl;
 
     public FTTraceHandler() {
@@ -57,17 +58,18 @@ class FTTraceHandler {
             headers.put(ZIPKIN_SAMPLED, sampled);
         } else if (FTHttpConfig.get().traceType == TraceType.JAEGER) {
             headers.put(JAEGER_KEY, traceID + ":" + spanID + ":" + parentSpanID + ":" + sampled);
-        } else if (FTHttpConfig.get().traceType == TraceType.SKYWALKING_V3) {
-            SkyWalkingUtils skyWalkingUtils = new SkyWalkingUtils(SkyWalkingUtils.SkyWalkingVersion.V3, sampled, requestTime, httpUrl);
-            traceID = skyWalkingUtils.getNewTraceId();
-            spanID = skyWalkingUtils.getNewParentTraceId() + "0";
-            headers.put(SKYWALKING_V3_SW_8, skyWalkingUtils.getSw());
-        } else if (FTHttpConfig.get().traceType == TraceType.SKYWALKING_V2) {
-            SkyWalkingUtils skyWalkingUtils = new SkyWalkingUtils(SkyWalkingUtils.SkyWalkingVersion.V2, sampled, requestTime, httpUrl);
-            traceID = skyWalkingUtils.getNewTraceId();
-            spanID = skyWalkingUtils.getNewParentTraceId() + "0";
-            headers.put(SKYWALKING_V3_SW_6, skyWalkingUtils.getSw());
         }
+//        else if (FTHttpConfig.get().traceType == TraceType.SKYWALKING_V3) {
+//            SkyWalkingUtils skyWalkingUtils = new SkyWalkingUtils(SkyWalkingUtils.SkyWalkingVersion.V3, sampled, requestTime, httpUrl);
+//            traceID = skyWalkingUtils.getNewTraceId();
+//            spanID = skyWalkingUtils.getNewParentTraceId() + "0";
+//            headers.put(SKYWALKING_V3_SW_8, skyWalkingUtils.getSw());
+//        } else if (FTHttpConfig.get().traceType == TraceType.SKYWALKING_V2) {
+//            SkyWalkingUtils skyWalkingUtils = new SkyWalkingUtils(SkyWalkingUtils.SkyWalkingVersion.V2, sampled, requestTime, httpUrl);
+//            traceID = skyWalkingUtils.getNewTraceId();
+//            spanID = skyWalkingUtils.getNewParentTraceId() + "0";
+//            headers.put(SKYWALKING_V3_SW_6, skyWalkingUtils.getSw());
+//        }
         return headers;
     }
 
@@ -81,17 +83,17 @@ class FTTraceHandler {
 
         String endPoint = httpUrl.getHost() + ":" + httpUrl.getPort();
 
-        LogBean logBean = new LogBean(Constants.FT_LOG_DEFAULT_MEASUREMENT, content, requestTime);
-        logBean.setOperationName(operationName);
-        logBean.setDuration(duration);
-        logBean.setClazz("tracing");
-        logBean.setSpanType("entry");
-        logBean.setEndpoint(endPoint);
-        logBean.setIsError(String.valueOf(isError));
-        logBean.setServiceName(FTExceptionHandler.get().getTrackServiceName());
-        logBean.setSpanID(spanID);
-        logBean.setTraceID(traceID);
-        FTTrackInner.getInstance().logBackground(logBean);
+        TraceBean traceBean = new TraceBean(FTHttpConfig.get().traceType.toString(), content, requestTime);
+        traceBean.setOperationName(operationName);
+        traceBean.setDuration(duration);
+        traceBean.setClazz("tracing");
+        traceBean.setSpanType("entry");
+        traceBean.setEndpoint(endPoint);
+        traceBean.setIsError(String.valueOf(isError));
+        traceBean.setServiceName(FTExceptionHandler.get().getTrackServiceName());
+        traceBean.setSpanID(spanID);
+        traceBean.setTraceID(traceID);
+        FTTrackInner.getInstance().traceBackground(traceBean);
     }
 
 

@@ -193,13 +193,12 @@ public class SyncJsonData implements Cloneable {
      * @throws JSONException
      * @throws InvalidParameterException
      */
-    public static SyncJsonData getFromLogBean(LogBean bean)
+    public static SyncJsonData getFromLogBean(BaseContentBean bean,DataType dataType)
             throws JSONException, InvalidParameterException {
-        SyncJsonData recordData = new SyncJsonData(DataType.LOG);
+        SyncJsonData recordData = new SyncJsonData(dataType);
         recordData.setTime(bean.getTime());
         JSONObject opDataJson = getLinProtocolJson(bean.getMeasurement(), bean.getAllTags(), bean.getAllFields());
         recordData.setDataString(FloatDoubleJsonUtils.protectValueFormat(opDataJson));
-
         return recordData;
     }
 

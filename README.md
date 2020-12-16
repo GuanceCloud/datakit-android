@@ -90,8 +90,8 @@ android{
 ####  DataFlux SDK 包含的功能说明
 
 |           方法名           |           含义            | 是否必须 |                                           注意                                           |
-|:-----------------------:|:-----------------------:|:----:|:--------------------------------------------------------------------------------------:|
-|       setUseOAID        | 是否使用OAID作为设备唯一识别号的替代字段  |  否   |                 默认不使用,开启后全会替代 deviceUUID 进行使用 <br>[了解 OAID](#一关于-oaid)                  |
+|:-----------------------:|:-----------------------|:----:|:--------------------------------------------------------------------------------------|
+|       setUseOAID        | 是否使用OAID作为设备唯一识别号的替代字段  |  否   |                 默认不使用,开启后全会替代 deviceUUID 进行使用 [了解 OAID](#一关于-oaid)                  |
 |     setXDataKitUUID     |       设置数据采集端的名称        |  否   |                                  不设置该值系统会生成一个默认的 uuid                                  |
 |        setDebug         |        是否开启调试模式         |  否   |                                 默认不开启，开启后方可打印 SDK 运行日志                                 |
 |     setMonitorType      |                    |  否   |  |
@@ -100,13 +100,14 @@ android{
 | setEnableTrackAppANR | 是否开启 App ANR 检测 | 否 | 默认不开启，开启后上报 ANR 数据信息|
 | setServiceName | 设置崩溃日志的名称 | 否 | 默认为 dataflux sdk。你可以将你的应用名称设置给该字段，用来区分不同的日志 |
 | setEnv | 设置崩溃日志中显示的应用的环境 | 否 | 默认情况下会获取应用当前的环境。如：debug、release |
-| setSampleRate | 设置采集率 | 否 | 采集率的值范围为>=0、<=1，默认值为1。<br />说明：SDK 初始化是会随机生成一个0-1之间的随机数，当这个随机数小于你设置的采集率时，那么会上报当前设备的行为相关的数据，否则就不会上报当前设备的行为数据<br /> |
-| setTraceConsoleLog | 是否开启本地打印日志上报功能 | 否 | 当开启后会将应用中打印的日志上报到后台，日志等级对应关系<br />Log.v->ok;Log.i、Log.d->info;Log.e->error;Log.w->warning |
+| setSampleRate | 设置采集率 | 否 | 采集率的值范围为>=0、<=1，默认值为1。说明：SDK 初始化是会随机生成一个0-1之间的随机数，当这个随机数小于你设置的采集率时，那么会上报当前设备的行为相关的数据，否则就不会上报当前设备的行为数据<br /> |
+| setTraceConsoleLog | 是否开启本地打印日志上报功能 | 否 | 当开启后会将应用中打印的日志上报到后台，日志等级对应关系<br />Log.v -> ok;<br />Log.i、Log.d -> info;<br />Log.e -> error;<br />Log.w -> warning |
 | setNetworkTrace | 是否开启网络追踪功能| 否 | 开启后，可以在 web 中“日志”查看到对应日志的同时也可以在“链路追踪”中查找到对应的链路信息 |
 | setTraceType | 设置链路追踪所使用的类型。 | 否 |目前支持 Zipkin 和 Jaeger 两种，默认为 Zipkin |
 | setEventFlowLog | 设置是否开启页面事件的日志 | 否 | 可以在 web 版本日志中，查看到对应上报的日志，事件支持启动应用，进入页面，离开页面，事件点击等等 |
-| setOnlySupportMainProcess|设置是否只支持在主进程中初始化|否|默认是 true ，默认情况下 SDK 只能在主进程中运行。如果应用中存在多个进程，那么其他进程中将不会执行。如果需要在其他进程中执行需要将该字段设置为 true ｜
-| setLogCacheDiscardStrategy|设置频繁日志抛弃规则|否|默认为 LogCacheDiscard.DISCARD ，抛弃往后追加的数据｜
+| setOnlySupportMainProcess|设置是否只支持在主进程中初始化|否|默认是 true ，默认情况下 SDK 只能在主进程中运行。如果应用中存在多个进程，那么其他进程中将不会执行。如果需要在其他进程中执行需要将该字段设置为 true |
+| setLogCacheDiscardStrategy|设置频繁日志抛弃规则|否|默认为 LogCacheDiscard.DISCARD ，抛弃往后追加的数据 |
+| setRumAppId|设置 Rum AppId|否|对应设置 RUM appid，才会开启 RUM的采集功能，appId 需要从 DataFlux "应用监测" 创建应用获取 |
 
 
 ####  通过 FTSdk 安装配置项和绑定用户信息
@@ -133,6 +134,7 @@ class DemoAplication : Application() {
         ).setUseOAID(true)//是否使用OAID
             .setDebug(true)//是否开启Debug模式（开启后能查看调试数据）
             .setXDataKitUUID("ft-dataKit-uuid-001")
+            .setRumAppId("appIdxxxxxx")
             .setEnableTrackAppCrash(true)
             .setEnv(EnvType.GRAY)
             .setTraceType(TraceType.ZIPKIN)

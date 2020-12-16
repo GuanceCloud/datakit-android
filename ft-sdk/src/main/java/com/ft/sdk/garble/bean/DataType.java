@@ -21,8 +21,8 @@ public enum DataType {
     RUM_ES,
     LOG,
     //    KEY_EVENT,
-    OBJECT
-//    TRACE
+    OBJECT,
+    TRACE
     ;
 
     public String getValue() {

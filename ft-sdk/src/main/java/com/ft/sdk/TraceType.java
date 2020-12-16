@@ -1,10 +1,15 @@
 package com.ft.sdk;
 
-public class TraceType {
+public enum TraceType {
 
-    public static int ZIPKIN = 0;
-    public static int JAEGER = 1;
-    public static int SKYWALKING_V3 = 2;
-    public static int SKYWALKING_V2 = 3;
+    ZIPKIN,
+    JAEGER;
+//    public static int SKYWALKING_V3 = 2;
+//    public static int SKYWALKING_V2 = 3;
 
+
+    @Override
+    public String toString() {
+        return super.toString().toLowerCase();
+    }
 }

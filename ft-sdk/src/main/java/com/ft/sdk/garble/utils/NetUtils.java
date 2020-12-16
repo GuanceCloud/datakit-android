@@ -133,6 +133,7 @@ public class NetUtils {
             case TelephonyManager.NETWORK_TYPE_EDGE:
             case TelephonyManager.NETWORK_TYPE_1xRTT:
             case TelephonyManager.NETWORK_TYPE_IDEN:
+            case TelephonyManager.NETWORK_TYPE_GSM:
                 return NETWORK_2G;
             // 3G网络
             case TelephonyManager.NETWORK_TYPE_EVDO_A:
@@ -144,17 +145,19 @@ public class NetUtils {
             case TelephonyManager.NETWORK_TYPE_EVDO_B:
             case TelephonyManager.NETWORK_TYPE_EHRPD:
             case TelephonyManager.NETWORK_TYPE_HSPAP:
+            case TelephonyManager.NETWORK_TYPE_TD_SCDMA:
                 return NETWORK_3G;
             // 4G网络
             case TelephonyManager.NETWORK_TYPE_LTE:
+            case TelephonyManager.NETWORK_TYPE_IWLAN:
                 return NETWORK_4G;
             case TelephonyManager.NETWORK_TYPE_NR:
                 return NETWORK_5G;
             default:
+            case TelephonyManager.NETWORK_TYPE_UNKNOWN:
                 return NETWORK_UNKNOWN;
         }
     }
-
 
     /**
      * 获取网络类型名称
