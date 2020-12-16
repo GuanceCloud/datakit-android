@@ -44,8 +44,7 @@ public class BindUserTest extends BaseTest {
 
         context = MockApplication.getContext();
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL))
-                .setDebug(true)
-                .enableAutoTrack(true);
+                .setDebug(true);
         FTSdk.install(ftSDKConfig);
     }
 

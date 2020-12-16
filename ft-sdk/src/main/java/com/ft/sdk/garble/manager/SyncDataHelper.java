@@ -62,8 +62,8 @@ public class SyncDataHelper {
         String bodyContent;
         if (dataType == DataType.OBJECT) {
             bodyContent = getObjectBodyContent(recordDatas);
-        } else if (dataType == DataType.LOG) {
-            bodyContent = getLogBodyContent(recordDatas);
+        } else if (dataType == DataType.LOG || dataType == DataType.TRACE) {
+            bodyContent = getLogAndTraceBodyContent(recordDatas);
         } else if (dataType == DataType.RUM_INFLUX) {
             bodyContent = getRumInfluxBodyContent(recordDatas);
         } else if (dataType == DataType.RUM_ES) {
@@ -104,9 +104,10 @@ public class SyncDataHelper {
      * @param datas
      * @return
      */
-    private String getLogBodyContent(List<SyncJsonData> datas) {
+    private String getLogAndTraceBodyContent(List<SyncJsonData> datas) {
         return convertToLineProtocolLines(datas);
     }
+
 
     /**
      * 转化为行协议数据
@@ -486,8 +487,6 @@ public class SyncDataHelper {
             LogUtils.e(TAG, "网络数据获取异常:" + e.getMessage());
         }
     }
-
-
 
 
     /**
