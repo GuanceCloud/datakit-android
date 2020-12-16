@@ -175,6 +175,8 @@ public class NetUtils {
                 return "4G";
             case NETWORK_5G:
                 return "5G";
+            case NETWORK_WIFI:
+                return "wifi";
             default:
                 return "unknown";
         }
