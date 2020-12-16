@@ -66,7 +66,7 @@ public class LogTrackObjectTraceTest extends BaseTest {
                 .setNetworkTrace(true)
                 .setTraceConsoleLog(true)
                 .setEventFlowLog(true)
-                .setTraceType(TraceType.SKYWALKING_V2)
+                .setTraceType(TraceType.ZIPKIN)
                 .setOnlySupportMainProcess(true);
         FTSdk.install(ftSDKConfig);
         FTDBManager.get().delete();
