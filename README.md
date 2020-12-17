@@ -106,7 +106,7 @@ android{
 | setTraceType | 设置链路追踪所使用的类型。 | 否 |目前支持 Zipkin 和 Jaeger 两种，默认为 Zipkin |
 | setEventFlowLog | 设置是否开启页面事件的日志 | 否 | 可以在 web 版本日志中，查看到对应上报的日志，事件支持启动应用，进入页面，离开页面，事件点击等等 |
 | setOnlySupportMainProcess|设置是否只支持在主进程中初始化|否|默认是 true ，默认情况下 SDK 只能在主进程中运行。如果应用中存在多个进程，那么其他进程中将不会执行。如果需要在其他进程中执行需要将该字段设置为 true |
-| setLogCacheDiscardStrategy|设置频繁日志抛弃规则|否|默认为 LogCacheDiscard.DISCARD ，抛弃往后追加的数据 |
+| setLogCacheDiscardStrategy|设置频繁日志丢弃规则|否|默认为 LogCacheDiscard.DISCARD ，丢弃往后追加的数据 |
 | setRumAppId|设置 Rum AppId|否|对应设置 RUM appid，才会开启 RUM的采集功能，appId 需要从 DataFlux "应用监测" 创建应用获取 |
 
 
@@ -164,7 +164,7 @@ unbind_user.setOnClickListener {
 
 |      方法名       |        含义         | 是否必须 |                  注意                   |
 |:--------------:|:-----------------:|:----:|:-------------------------------------:|
-|    logBackground     |     自定义日志      |  否   |          日志过快会触发抛弃机制       |
+|    logBackground     |     自定义日志      |  否   |          日志过快会触发丢弃机制       |
 
 
 #### 示例代码
