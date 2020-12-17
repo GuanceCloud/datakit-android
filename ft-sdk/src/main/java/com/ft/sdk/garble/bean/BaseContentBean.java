@@ -83,6 +83,14 @@ public class BaseContentBean {
         }
         try {
 
+            if (env != null) {
+                tags.put("__env", env.toString());
+            }
+
+            if (!Utils.isNullOrEmpty(serviceName)) {
+                tags.put("__serviceName", serviceName);
+            }
+
             if (!tags.has("device_uuid")) {
                 tags.put("device_uuid", DeviceUtils.getUuid(FTApplication.getApplication()));
             }
