@@ -372,6 +372,11 @@ packagingOptions {
 ##### 以上步骤配置完成后，在配置 FT SDK 时调用 FTSDKConfig 的 setUseOAID(true) 方法即可
 
 
+### HttpClient RUM 网络性能追踪问题
+
+目前 HttpClient 无法做到 RUM 网络请求的性能分析，目前只支持 okhttp3 做网络数据的追踪
+
+
 ### 关于崩溃日志中混淆内容转换的问题
 
 #### 问题描述
