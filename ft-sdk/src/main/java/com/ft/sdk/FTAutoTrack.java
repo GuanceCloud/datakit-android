@@ -1228,7 +1228,7 @@ public class FTAutoTrack {
     public static OkHttpClient trackOkHttpBuilder(OkHttpClient.Builder builder) {
         FTNetWorkInterceptor interceptor = new FTNetWorkInterceptor();
         if (FTHttpConfig.get().networkTrace || FTRUMConfig.get().isRumEnable()) {
-            builder.addNetworkInterceptor(interceptor);
+            builder.addInterceptor(interceptor);
         }
         if (FTRUMConfig.get().isRumEnable()) {
             builder.eventListener(interceptor);
