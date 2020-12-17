@@ -1229,6 +1229,7 @@ public class FTAutoTrack {
         FTNetWorkInterceptor interceptor = new FTNetWorkInterceptor();
         if (FTHttpConfig.get().networkTrace || FTRUMConfig.get().isRumEnable()) {
             builder.addInterceptor(interceptor);
+//            builder.addNetworkInterceptor(interceptor); //发现部分工程有兼容问题
         }
         if (FTRUMConfig.get().isRumEnable()) {
             builder.eventListener(interceptor);
