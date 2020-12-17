@@ -81,9 +81,7 @@ public class SyncTaskManager {
                         if (dataList.isEmpty()) {
                             continue;
                         }
-
                         handleSyncOpt(dataType, dataList);
-
                     }
 
                 } catch (Exception e) {

@@ -1,11 +1,9 @@
 package com.ft.sdk;
 
 import com.ft.sdk.garble.FTHttpConfig;
-import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.TraceBean;
 import com.ft.sdk.garble.http.HttpUrl;
 import com.ft.sdk.garble.manager.FTExceptionHandler;
-import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONObject;
@@ -79,7 +77,7 @@ class FTTraceHandler {
         }
         //请求结束时间
         long responseTime = Utils.getCurrentNanoTime();
-        long duration = (responseTime - requestTime) * 1000;
+        long duration = (responseTime - requestTime) / 1000;
 
         String endPoint = httpUrl.getHost() + ":" + httpUrl.getPort();
 
