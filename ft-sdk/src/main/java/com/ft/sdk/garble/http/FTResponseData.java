@@ -10,18 +10,20 @@ import java.net.HttpURLConnection;
  * DATE:2019-12-16 16:15
  * Description:
  */
-public class FTResponseData extends ResponseData{
+public class FTResponseData extends ResponseData {
     private int code;
     private String errorCode;
     private String message;
 
     public FTResponseData(int httpCode, String data) {
-        super(httpCode,data);
-        if(httpCode == HttpURLConnection.HTTP_OK) {
+        super(httpCode, data);
+        if (httpCode == HttpURLConnection.HTTP_OK) {
+            code = httpCode;
+        } else {
             try {
                 if (data != null) {
                     JSONObject jsonObject = new JSONObject(data);
-                    code = jsonObject.optInt("code");
+                    code = jsonObject.optInt("code", httpCode);
                     errorCode = jsonObject.optString("errorCode");
                     message = jsonObject.optString("message");
                 }
@@ -32,6 +34,7 @@ public class FTResponseData extends ResponseData{
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
         }
     }
 

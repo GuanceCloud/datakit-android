@@ -2,7 +2,6 @@ package com.ft.sdk;
 
 import com.ft.sdk.garble.utils.DeviceUtils;
 
-import java.security.InvalidParameterException;
 import java.util.List;
 
 import static com.ft.sdk.garble.utils.Constants.DEFAULT_LOG_SERVICE_NAME;
@@ -15,25 +14,13 @@ import static com.ft.sdk.garble.utils.Constants.DEFAULT_LOG_SERVICE_NAME;
 public class FTSDKConfig {
     //服务器地址
     private String serverUrl;
-    //是否签名
-    private boolean enableRequestSigning;
-    private String akId;
-    private String akSecret;
-    private String dataWayToken;//非必须参数，Sass 版本
-    //是否使用OAID
     private boolean useOAID;
     //是否是Debug
     private boolean isDebug;
-    //    //是否显示别名日志
-//    private boolean descLog;
-    //高德逆向解析API 的 key
-    private String geoKey;
-    //是否使用高德作为逆向地址解析
-    private boolean useGeoKey;
-    //    //是否开启自动埋点
+
     private boolean autoTrack = true;
     //是否需要绑定用户数据
-    private boolean needBindUser;
+//    private boolean needBindUser;
     //监控类别
     private int monitorType;
     //以下三个为白名单
@@ -67,7 +54,7 @@ public class FTSDKConfig {
     //是否开启网络日志上报
     private boolean networkTrace;
     //崩溃日志的 __serviceName
-    private String traceServiceName = DEFAULT_LOG_SERVICE_NAME;
+    private String serviceName = DEFAULT_LOG_SERVICE_NAME;
     //是否开启流程图日志显示
     private boolean eventFlowLog;
     //是否开启系统日志的上报功能
@@ -81,73 +68,68 @@ public class FTSDKConfig {
     //日志数据数据库存储策略
     private LogCacheDiscard logCacheDiscardStrategy = LogCacheDiscard.DISCARD;
 
-    /**
-     * 构建 SDK 必要的配置参数
-     *
-     * @param metricsUrl           服务器地址
-     * @param enableRequestSigning 是否需要对请求进行签名
-     * @param akId                 签名 id，当 enableRequestSigning 为 true 时必须设置
-     * @param akSecret             签名 Secret，当 enableRequestSigning 为 true 时必须设置
-     * @return
-     */
-    public static FTSDKConfig builder(String metricsUrl, boolean enableRequestSigning, String akId, String akSecret) {
-        return new FTSDKConfig(metricsUrl, enableRequestSigning, akId, akSecret);
-    }
+    private String rumAppId;
 
     /**
-     * 构建 SDK 必要的配置参数（当不需要签名时可以用此方法）
+     * 构建 SDK 必要的配置参数
      *
      * @param metricsUrl 服务器地址
      * @return
      */
     public static FTSDKConfig builder(String metricsUrl) {
-        return new FTSDKConfig(metricsUrl, false, null, null);
+        return new FTSDKConfig(metricsUrl);
     }
+
 
     /**
      * SDK 配置项构造方法
      *
      * @param serverUrl
-     * @param enableRequestSigning
-     * @param akId
-     * @param akSecret
      */
-    private FTSDKConfig(String serverUrl, boolean enableRequestSigning, String akId, String akSecret) {
+    private FTSDKConfig(String serverUrl) {
         this.serverUrl = serverUrl;
-        this.enableRequestSigning = enableRequestSigning;
-        this.akId = akId;
-        this.akSecret = akSecret;
-        if (enableRequestSigning) {
-            if (akId == null) {
-                throw new InvalidParameterException("akId 未初始化");
-            }
-            if (akSecret == null) {
-                throw new InvalidParameterException("akSecret 未初始化");
-            }
-        }
+//        this.enableRequestSigning = enableRequestSigning;
+//        this.akId = akId;
+//        this.akSecret = akSecret;
+//        if (enableRequestSigning) {
+//            if (akId == null) {
+//                throw new InvalidParameterException("akId 未初始化");
+//            }
+//            if (akSecret == null) {
+//                throw new InvalidParameterException("akSecret 未初始化");
+//            }
+//        }
     }
 
     public String getServerUrl() {
         return serverUrl;
     }
 
-
-    public boolean isEnableRequestSigning() {
-        return enableRequestSigning;
+    public String getRUMAppId() {
+        return rumAppId;
     }
 
-
-    public String getAkId() {
-        return akId;
+    public FTSDKConfig setRumAppId(String rumAppId) {
+        this.rumAppId = rumAppId;
+        return this;
     }
 
-    public String getAkSecret() {
-        return akSecret;
-    }
+    //    public boolean isEnableRequestSigning() {
+//        return enableRequestSigning;
+//    }
+//
+//
+//    public String getAkId() {
+//        return akId;
+//    }
+//
+//    public String getAkSecret() {
+//        return akSecret;
+//    }
 
-    public String getDataWayToken() {
-        return dataWayToken;
-    }
+//    public String getDataWayToken() {
+//        return dataWayToken;
+//    }
 
     public boolean isUseOAID() {
         return useOAID;
@@ -165,9 +147,9 @@ public class FTSDKConfig {
         return autoTrack;
     }
 
-    public boolean isNeedBindUser() {
-        return needBindUser;
-    }
+//    public boolean isNeedBindUser() {
+//        return needBindUser;
+//    }
 
     public int getMonitorType() {
         return monitorType;
@@ -197,13 +179,6 @@ public class FTSDKConfig {
 //        return blackViewClass;
 //    }
 
-    public String getGeoKey() {
-        return geoKey;
-    }
-
-    public boolean isUseGeoKey() {
-        return useGeoKey;
-    }
 
     public FTSDKConfig enableAutoTrack(boolean autoTrack) {
         this.autoTrack = autoTrack;
@@ -242,8 +217,8 @@ public class FTSDKConfig {
         return networkTrace;
     }
 
-    public String getTraceServiceName() {
-        return traceServiceName;
+    public String getServiceName() {
+        return serviceName;
     }
 
     public boolean isEventFlowLog() {
@@ -262,16 +237,6 @@ public class FTSDKConfig {
         return onlySupportMainProcess;
     }
 
-    /**
-     * 设置上传数据的 token 验证
-     *
-     * @param dataWayToken
-     * @return
-     */
-    public FTSDKConfig setDataWayToken(String dataWayToken) {
-        this.dataWayToken = dataWayToken;
-        return this;
-    }
 
     /**
      * 是否使用 UseOAID 作为设备唯一识别号的替代字段
@@ -333,16 +298,16 @@ public class FTSDKConfig {
         return this;
     }
 
-    /**
-     * 是否需要绑定用户信息
-     *
-     * @param needBindUserVar
-     * @return
-     */
-    public FTSDKConfig setNeedBindUser(boolean needBindUserVar) {
-        needBindUser = needBindUserVar;
-        return this;
-    }
+//    /**
+//     * 是否需要绑定用户信息
+//     *
+//     * @param needBindUserVar
+//     * @return
+//     */
+//    public FTSDKConfig setNeedBindUser(boolean needBindUserVar) {
+//        needBindUser = needBindUserVar;
+//        return this;
+//    }
 
 //    /**
 //     * 设置白名单（Activity，Fragment）
@@ -506,12 +471,12 @@ public class FTSDKConfig {
     /**
      * 设置崩溃日志的 serviceName
      *
-     * @param traceServiceName
+     * @param serviceName
      * @return
      */
-    public FTSDKConfig setTraceServiceName(String traceServiceName) {
-        if (traceServiceName != null) {
-            this.traceServiceName = traceServiceName;
+    public FTSDKConfig setServiceName(String serviceName) {
+        if (serviceName != null) {
+            this.serviceName = serviceName;
         }
         return this;
     }

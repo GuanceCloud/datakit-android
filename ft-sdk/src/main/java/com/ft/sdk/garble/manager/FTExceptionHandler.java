@@ -6,6 +6,7 @@ import com.ft.sdk.EnvType;
 import com.ft.sdk.FTAutoTrack;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTTrackInner;
+import com.ft.sdk.garble.FTRUMConfig;
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.CrashType;
 import com.ft.sdk.garble.bean.LogBean;
@@ -44,8 +45,12 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     public void uploadCrashLog(String crash, String message, AppState state) {
         long dateline = System.currentTimeMillis();
-        FTAutoTrack.crash(crash, message, dateline, CrashType.JAVA, state);
-        uploadCrashLog(crash, dateline);
+
+        if (FTRUMConfig.get().isRumEnable()) {
+            FTAutoTrack.putRUMCrash(crash, message, dateline, CrashType.JAVA, state);
+        } else {
+            uploadCrashLog(crash, dateline);
+        }
 
     }
 
@@ -65,7 +70,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
         if (ftsdkConfig != null) {
             this.canTrackCrash = ftsdkConfig.isEnableTrackAppCrash();
             this.env = ftsdkConfig.getEnv();
-            this.trackServiceName = ftsdkConfig.getTraceServiceName();
+            this.trackServiceName = ftsdkConfig.getServiceName();
             this.trackConsoleLog = ftsdkConfig.isTraceConsoleLog();
         }
     }
@@ -156,13 +161,16 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
 
                             String value = Utils.readSectionValueFromDump(item.getAbsolutePath(), DUMP_FILE_KEY_APP_STATE);
 
-                            if (item.getName().contains(ANR_FILE_NAME)) {
-                                FTAutoTrack.anr(crashString, crashTime);
-                            } else if (item.getName().contains(NATIVE_FILE_NAME)) {
-                                FTAutoTrack.crash(crashString,"Native Crash" , crashTime, CrashType.NATIVE, AppState.getValueFrom(value));
+                            if (FTRUMConfig.get().isRumEnable()) {
+                                if (item.getName().contains(ANR_FILE_NAME)) {
+                                    FTAutoTrack.putRUMAnr(crashString, crashTime);
+                                } else if (item.getName().contains(NATIVE_FILE_NAME)) {
+                                    FTAutoTrack.putRUMCrash(crashString, "Native Crash", crashTime, CrashType.NATIVE, AppState.getValueFrom(value));
+                                }
+                            } else {
+                                uploadCrashLog(crashString, crashTime);
                             }
 
-                            uploadCrashLog(crashString, crashTime);
 
                             Utils.deleteFile(item.getAbsolutePath());
                         } catch (IOException e) {

@@ -19,6 +19,9 @@ import androidx.annotation.Nullable;
 import com.ft.sdk.garble.FTAutoTrackConfig;
 import com.ft.sdk.garble.FTFlowConfig;
 import com.ft.sdk.garble.FTFragmentManager;
+import com.ft.sdk.garble.FTHttpConfig;
+import com.ft.sdk.garble.FTRUMConfig;
+import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.CrashType;
 import com.ft.sdk.garble.bean.LogBean;
@@ -29,6 +32,7 @@ import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.OaidUtils;
 import com.ft.sdk.garble.utils.Utils;
 import com.google.android.material.tabs.TabLayout;
 
@@ -741,18 +745,25 @@ public class FTAutoTrack {
     /**
      * 记录应用登陆时效
      */
-    public static void putLaunchPerformance(boolean isCold) {
+    public static void putRUMLaunchPerformance(boolean isCold) {
         if (!Utils.enableTraceSamplingRate()) return;
         long time = System.currentTimeMillis();
         long duration = time - startTimeline;
 
         try {
-            JSONObject tags = getRUMPublicDynamicTags();
+            JSONObject tags = getRUMPublicTags();
             JSONObject fields = new JSONObject();
             tags.put("app_startup_type", isCold ? "cold" : "hot");
+
+            long appApdexLevel = duration / 1000;
+            if (appApdexLevel > 9) {
+                appApdexLevel = 9;
+            }
+            tags.put("app_apdex_level", appApdexLevel);
             fields.put("app_startup_duration", duration);
             FTTrackInner.getInstance().rumInflux(time,
                     Constants.FT_MEASUREMENT_RUM_APP_START_UP, tags, fields);
+
         } catch (Exception e) {
             LogUtils.e(TAG, e.toString());
         }
@@ -761,11 +772,11 @@ public class FTAutoTrack {
     /**
      * 记录页面加载性能
      */
-    public static void putViewLoadPerformance(String viewId, String viewName, double fps, long loadTime) {
+    public static void putRUMViewLoadPerformance(String viewId, String viewName, double fps, long loadTime) {
         if (!Utils.enableTraceSamplingRate()) return;
         long time = System.currentTimeMillis();
         try {
-            JSONObject tags = getRUMPublicDynamicTags();
+            JSONObject tags = getRUMPublicTags();
             JSONObject fields = new JSONObject();
             tags.put("view_id", viewId);
             tags.put("view_name", viewName);
@@ -778,6 +789,9 @@ public class FTAutoTrack {
             fields.put("view_load", loadTime);
             FTTrackInner.getInstance().rumInflux(time,
                     Constants.FT_MEASUREMENT_RUM_APP_VIEW, tags, fields);
+            appendRUMESPublicTags(tags);
+            FTTrackInner.getInstance().rumES(time,
+                    "view", tags, fields);
         } catch (Exception e) {
             LogUtils.e(TAG, e.toString());
         }
@@ -786,11 +800,11 @@ public class FTAutoTrack {
     /**
      * 资源加载性能
      */
-    public static void putResourcePerformance(ResourceBean bean) {
+    public static void putRUMResourcePerformance(ResourceBean bean) {
         if (!Utils.enableTraceSamplingRate()) return;
         long time = System.currentTimeMillis();
         try {
-            JSONObject tags = getRUMPublicDynamicTags();
+            JSONObject tags = getRUMPublicTags();
             JSONObject fields = new JSONObject();
 
             tags.put("resource_url_host", bean.urlHost);
@@ -804,7 +818,12 @@ public class FTAutoTrack {
             tags.put("response_content_type", bean.responseContentType);
             tags.put("response_content_encoding", bean.responseContentEncoding);
             tags.put("resource_method", bean.resourceMethod);
-            tags.put("resource_status", bean.resourceStatus);
+
+            if (bean.resourceStatus > 0) {
+                tags.put("resource_status", bean.resourceStatus);
+                long statusGroupPrefix = bean.resourceStatus / 100;
+                tags.put("resource_status_group", statusGroupPrefix + "xx");
+            }
 
             if (bean.resourceSize > 0) {
                 fields.put("resource_size", bean.resourceSize);
@@ -830,8 +849,13 @@ public class FTAutoTrack {
                 fields.put("resource_trans", bean.resourceTrans);
             }
 
+
             FTTrackInner.getInstance().rumInflux(time,
                     Constants.FT_MEASUREMENT_RUM_APP_RESOURCE_PERFORMANCE, tags, fields);
+
+            appendRUMESPublicTags(tags);
+            FTTrackInner.getInstance().rumES(time,
+                    "resource", tags, fields);
         } catch (Exception e) {
             LogUtils.e(TAG, e.toString());
         }
@@ -843,10 +867,10 @@ public class FTAutoTrack {
      *
      * @param log
      */
-    public static void uiBlock(String log) {
+    public static void PutRUMuiBlock(String log) {
         if (!Utils.enableTraceSamplingRate()) return;
         long time = System.currentTimeMillis();
-        putFreeze("Freeze", 1000L, time);
+        putFreeze("Freeze", time, log);
     }
 
     /**
@@ -854,9 +878,9 @@ public class FTAutoTrack {
      *
      * @param log
      */
-    public static void anr(String log, long dateline) {
+    public static void putRUMAnr(String log, long dateline) {
         if (!Utils.enableTraceSamplingRate()) return;
-        putFreeze("ANR", 5000L, dateline);
+        putFreeze("ANR", dateline, log);
 
     }
 
@@ -867,19 +891,23 @@ public class FTAutoTrack {
      * @param message
      * @param state
      */
-    public static void crash(String log, String message, long dateline, CrashType crashType, AppState state) {
+    public static void putRUMCrash(String log, String message, long dateline, CrashType crashType, AppState state) {
+
         if (!Utils.enableTraceSamplingRate()) return;
 
         try {
-            JSONObject tags = getRUMPublicDynamicTags();
+            JSONObject tags = getRUMPublicTags();
             JSONObject fields = new JSONObject();
 
             tags.put("crash_type", crashType.toString());
             tags.put("crash_situation", state.toString());
             tags.put("type", "crash");
+            tags.put("application_uuid", FTSdk.PACKAGE_UUID);
             fields.put("crash_message", message);
             fields.put("crash_stack", log);
-
+            appendRUMESPublicTags(tags);
+            FTTrackInner.getInstance().rumES(dateline,
+                    Constants.FT_MEASUREMENT_RUM_APP_FREEZE, tags, fields);
         } catch (Exception e) {
             LogUtils.e(TAG, e.getMessage());
         }
@@ -890,20 +918,24 @@ public class FTAutoTrack {
      * 卡顿
      *
      * @param freezeType ANR，Freeze 两种
-     * @param duration
      * @param dateline
      */
-    private static void putFreeze(String freezeType, long duration, long dateline) {
+    private static void putFreeze(String freezeType, long dateline, String log) {
         if (!Utils.enableTraceSamplingRate()) return;
         try {
-            JSONObject tags = getRUMPublicDynamicTags();
+            JSONObject tags = getRUMPublicTags();
             JSONObject fields = new JSONObject();
 
             tags.put("freeze_type", freezeType);
-            fields.put("freeze_duration", duration);
+            fields.put("freeze_duration", -1);
 
             FTTrackInner.getInstance().rumInflux(dateline,
                     Constants.FT_MEASUREMENT_RUM_APP_FREEZE, tags, fields);
+
+            fields.put("freeze_stack", log);
+
+            appendRUMESPublicTags(tags);
+            FTTrackInner.getInstance().rumES(dateline, "freeze", tags, fields);
         } catch (Exception e) {
             LogUtils.e(TAG, e.getMessage());
         }
@@ -933,11 +965,12 @@ public class FTAutoTrack {
      *
      * @return
      */
-    private static JSONObject getRUMPublicDynamicTags() {
+    private static JSONObject getRUMPublicTags() {
         JSONObject tags = new JSONObject();
         try {
-            tags.put(Constants.KEY_DEVICE_OS_VERSION, DeviceUtils.getOSVersion());
-            tags.put(Constants.KEY_APP_VERSION_NAME, Utils.getAppVersionName());
+            tags.put(Constants.KEY_RUM_APP_ID, FTRUMConfig.get().getAppId());
+            tags.put("env", FTRUMConfig.get().getEnvType().toString());
+            tags.put(Constants.KEY_RUM_IS_SIGNIN, FTUserConfig.get().isUserDataBinded());
         } catch (JSONException e) {
             LogUtils.e(TAG, e.getMessage());
         }
@@ -945,6 +978,32 @@ public class FTAutoTrack {
 
     }
 
+    /**
+     * 添加 es
+     *
+     * @param jsonObject
+     * @throws JSONException
+     */
+    private static void appendRUMESPublicTags(JSONObject jsonObject) throws JSONException {
+        if (FTUserConfig.get().isUserDataBinded()) {
+            jsonObject.put("user_id", FTUserConfig.get().getUserData().getId());
+        } else {
+            jsonObject.put("user_id", FTUserConfig.get().getSessionId());
+        }
+
+        String uuid = "";
+        if (FTHttpConfig.get().useOaid) {
+            String oaid = OaidUtils.getOAID(FTApplication.getApplication());
+            if (oaid != null) {
+                uuid = "oaid_" + oaid;
+            }
+        } else {
+            uuid = DeviceUtils.getUuid(FTApplication.getApplication());
+        }
+        jsonObject.put("origin_id", uuid);
+        jsonObject.put("device_uuid", uuid);
+
+    }
 
     private static void addLogging(String currentPage, OP op, @Nullable String vtp) {
         addLogging(currentPage, op, 0, vtp);
@@ -1138,8 +1197,12 @@ public class FTAutoTrack {
      */
     public static OkHttpClient trackOkHttpBuilder(OkHttpClient.Builder builder) {
         FTNetWorkInterceptor interceptor = new FTNetWorkInterceptor();
-        builder.addNetworkInterceptor(interceptor);
-        builder.eventListener(interceptor);
+        if (FTHttpConfig.get().networkTrace || FTRUMConfig.get().isRumEnable()) {
+            builder.addNetworkInterceptor(interceptor);
+        }
+        if (FTRUMConfig.get().isRumEnable()) {
+            builder.eventListener(interceptor);
+        }
         return builder.build();
     }
 
@@ -1152,8 +1215,10 @@ public class FTAutoTrack {
      */
     public static CloseableHttpClient trackHttpClientBuilder(HttpClientBuilder builder) {
         FTHttpClientInterceptor interceptor = new FTHttpClientInterceptor();
-        builder.addRequestInterceptorFirst(new FTHttpClientRequestInterceptor(interceptor));
-        builder.addResponseInterceptorLast(new FTHttpClientResponseInterceptor(interceptor));
+        if (FTHttpConfig.get().networkTrace) {
+            builder.addRequestInterceptorFirst(new FTHttpClientRequestInterceptor(interceptor));
+            builder.addResponseInterceptorLast(new FTHttpClientResponseInterceptor(interceptor));
+        }
         return builder.build();
     }
 }

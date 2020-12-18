@@ -10,10 +10,11 @@ import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.FTFlowConfig;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
-import com.ft.sdk.garble.manager.FTNetworkListener;
+import com.ft.sdk.garble.FTRUMConfig;
 import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.manager.FTActivityLifecycleCallbacks;
 import com.ft.sdk.garble.manager.FTExceptionHandler;
+import com.ft.sdk.garble.manager.FTNetworkListener;
 import com.ft.sdk.garble.manager.FTUIBlockManager;
 import com.ft.sdk.garble.manager.SyncTaskManager;
 import com.ft.sdk.garble.utils.LocationUtils;
@@ -96,7 +97,6 @@ public class FTSdk {
         LocationUtils.get().stopListener();
         FTExceptionHandler.release();
         FTDBCachePolicy.release();
-//        FTUIBlockManager.release();
         unregisterActivityLifeCallback();
         LogUtils.w(TAG, "FT SDK 已经被关闭");
     }
@@ -115,15 +115,10 @@ public class FTSdk {
      */
     public void unbindUserData() {
         if (mFtSDKConfig != null) {
-            if (mFtSDKConfig.isNeedBindUser()) {
-                LogUtils.d(TAG, "解绑用户信息");
-                //解绑用户信息
-                FTUserConfig.get().unbindUserData();
-                //清除本地缓存的SessionId
-                FTUserConfig.get().clearSessionId();
-                //创建新的sessionId用于标记后续操作
-                FTUserConfig.get().createNewSessionId();
-            }
+            LogUtils.d(TAG, "解绑用户信息");
+            //解绑用户信息
+            FTUserConfig.get().unbindUserData();
+            //清除本地缓存的SessionId
         }
     }
 
@@ -134,17 +129,17 @@ public class FTSdk {
      */
     public void bindUserData(@NonNull String id) {
         if (mFtSDKConfig != null) {
-            if (mFtSDKConfig.isNeedBindUser()) {
-                LogUtils.d(TAG, "绑定用户信息");
-                //如果本地的SessionID已经绑定了用于就重新生成sessionId进行绑定
-                if (FTUserConfig.get().currentSessionHasUser()) {
-                    FTUserConfig.get().clearSessionId();
-                }
-                //初始化SessionId
-                FTUserConfig.get().initSessionId();
-                //绑定用户信息
-                FTUserConfig.get().bindUserData("", id, null);
-            }
+//            if (mFtSDKConfig.isNeedBindUser()) {
+            LogUtils.d(TAG, "绑定用户信息");
+//            //如果本地的SessionID已经绑定了用于就重新生成sessionId进行绑定
+//            if (FTUserConfig.get().currentSessionHasUser()) {
+//                FTUserConfig.get().clearSessionId();
+//            }
+//            //初始化SessionId
+            FTUserConfig.get().initSessionId();
+//            //绑定用户信息
+            FTUserConfig.get().bindUserData("", id, null);
+//            }
         }
     }
 
@@ -202,15 +197,16 @@ public class FTSdk {
             FTHttpConfig.get().initParams(mFtSDKConfig);
             FTAutoTrackConfig.get().initParams(mFtSDKConfig);
             FTDBCachePolicy.get().initParam(mFtSDKConfig);
-            FTUserConfig.get().setNeedBindUser(mFtSDKConfig.isNeedBindUser());
+            FTRUMConfig.get().initParam(mFtSDKConfig);
             FTUserConfig.get().initSessionId();
-            if (mFtSDKConfig.isNeedBindUser()) {
-                FTUserConfig.get().initUserDataFromDB();
-            }
+//            if (mFtSDKConfig.isNeedBindUser()) {
+//                FTUserConfig.get().initUserDataFromDB();
+//            }
             FTNetworkListener.get().monitor();
             if (mFtSDKConfig.isEventFlowLog()) {
                 FTFlowConfig.get().initParams(mFtSDKConfig);
             }
+
             FTAutoTrack.startApp();
 
             float rate = mFtSDKConfig.getTraceSamplingRate();

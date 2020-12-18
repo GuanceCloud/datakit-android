@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 
 import com.ft.sdk.FTAutoTrack;
 import com.ft.sdk.garble.FTFragmentManager;
+import com.ft.sdk.garble.FTRUMConfig;
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.FpsUtils;
@@ -44,23 +45,22 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
 
     @Override
     public void onActivityPostCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
-        if (mInit) {
-            FTActivityManager.get().setAppState(AppState.RUNNING);
-            FTAutoTrack.putLaunchPerformance(true);
-            mInit = true;
+        if (FTRUMConfig.get().isRumEnable()) {
+            if (!mInit) {
+                FTActivityManager.get().setAppState(AppState.RUNNING);
+                FTAutoTrack.putRUMLaunchPerformance(true);
+                mInit = true;
+            }
+
+            Long startTime = mCreateMap.get(activity);
+            if (startTime != null) {
+                long duration = System.currentTimeMillis() - startTime;
+                String viewName = AopUtils.getClassName(activity);
+                String viewID = Utils.MD5(viewName).toLowerCase();
+                double fps = FpsUtils.get().getFps();
+                FTAutoTrack.putRUMViewLoadPerformance(viewID, viewName, fps, duration);
+            }
         }
-
-        Long startTime = mCreateMap.get(activity);
-        if (startTime != null) {
-            long duration = System.currentTimeMillis() - startTime;
-            String viewName = AopUtils.getClassName(activity);
-            String viewID = Utils.MD5_16(viewName).toLowerCase();
-            double fps = FpsUtils.get().getFps();
-            FTAutoTrack.putViewLoadPerformance(viewID, viewName, fps, duration);
-        }
-
-
-
     }
 
     @Override
@@ -114,5 +114,6 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
         FTFragmentManager.getInstance().removeFragmentLifecycle(activity);
         //从 Activity 的管理栈中移除 Activity
         FTManager.getFTActivityManager().removeActivity(activity);
+        mCreateMap.remove(activity);
     }
 }

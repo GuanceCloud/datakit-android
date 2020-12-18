@@ -14,11 +14,6 @@ package com.ft.sdk.garble.bean;
  * {@link OP#OPEN_FRA}
  * {@link OP#CLS_ACT}
  * {@link OP#CLS_FRA}
- * {@link OP#WEBVIEW_LOADING}
- * {@link OP#WEBVIEW_LOAD_COMPLETED}
- * {@link OP#CLIENT_ACTIVATED_TIME}
- * {@link OP#HTTP_CLIENT}
- * {@link OP#HTTP_WEBVIEW}
  */
 public enum DataType {
     TRACK,

@@ -4,15 +4,11 @@ import android.content.SharedPreferences;
 
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.garble.bean.UserData;
-import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.utils.Constants;
-import com.ft.sdk.garble.utils.ThreadPoolUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -23,9 +19,9 @@ import java.util.UUID;
 public class FTUserConfig {
     private static volatile FTUserConfig instance;
     private volatile String sessionId;
-    private List<UserData> userDataList;
-    private volatile boolean userDataBinded;
-    private volatile boolean needBindUser;
+    private UserData mUserData;
+
+    private final Object mLock = new Object();
 
     private FTUserConfig() {
 
@@ -39,25 +35,13 @@ public class FTUserConfig {
     }
 
     /**
+     * userDataBinded
      * 用户数据是否已经绑定完成
      *
      * @return
      */
     public boolean isUserDataBinded() {
-        return userDataBinded;
-    }
-
-    /**
-     * 是否需要绑定用户信息
-     *
-     * @return
-     */
-    public boolean isNeedBindUser() {
-        return needBindUser;
-    }
-
-    public void setNeedBindUser(boolean needBindUser) {
-        this.needBindUser = needBindUser;
+        return getUserData() != null;
     }
 
     /**
@@ -73,7 +57,7 @@ public class FTUserConfig {
      * 创建一个新的用户SessionID
      */
     public void createNewSessionId() {
-        sessionId = UUID.randomUUID().toString();
+        sessionId = "ft.rd_"+UUID.randomUUID().toString();
         SharedPreferences sp = Utils.getSharedPreferences(FTApplication.getApplication());
         sp.edit().putString(Constants.FT_USER_SESSION_ID, sessionId).apply();
     }
@@ -92,52 +76,33 @@ public class FTUserConfig {
         return sessionId;
     }
 
-    /**
-     * 清除用户的SessionId
-     */
-    public void clearSessionId() {
-        SharedPreferences sp = Utils.getSharedPreferences(FTApplication.getApplication());
-        sp.edit().remove(Constants.FT_USER_SESSION_ID).apply();
-        sessionId = null;
-    }
-
-    /**
-     * 从数据库中查询用户信息
-     */
-    public void initUserDataFromDB() {
-        ThreadPoolUtils.get().execute(() -> {
-            userDataList = FTDBManager.get().queryFTUserDataList();
-            if (getUserData(sessionId) != null) {
-                userDataBinded = true;
-            }
-        });
-    }
 
     /**
      * 根据 sessionID 获取用户信息
-     * @param sessionId
+     *
      * @return
      */
-    public UserData getUserData(String sessionId) {
-        if (userDataList != null) {
-            for (UserData userData : userDataList) {
-                if (sessionId != null && sessionId.equals(userData.getSessionId())) {
-                    return userData;
-                }
+    public UserData getUserData() {
+        synchronized (mLock) {
+            if (mUserData != null) {
+                return mUserData;
             }
-        }
-        return null;
-    }
 
-    /**
-     * 判断当前缓存的 sessionId 是否有绑定用户信息
-     * @return
-     */
-    public boolean currentSessionHasUser(){
-        if(sessionId != null) {
-            return getUserData(sessionId) != null;
-        }else{
-            return false;
+            SharedPreferences sp = Utils.getSharedPreferences(FTApplication.getApplication());
+            String id = sp.getString(Constants.FT_USER_USER_ID, null);
+            String userName = sp.getString(Constants.FT_USER_USER_NAME, null);
+            String ext = sp.getString(Constants.FT_USER_USER_EXT, null);
+            if (id == null) {
+                return null;
+            } else {
+                UserData data = new UserData();
+                data.setId(id);
+                data.setName(userName);
+                if (ext != null) {
+                    data.setExtsWithJsonString(ext);
+                }
+                return data;
+            }
         }
     }
 
@@ -149,48 +114,32 @@ public class FTUserConfig {
      * @param exts
      */
     public void bindUserData(String name, String id, JSONObject exts) {
-        ThreadPoolUtils.get().execute(() -> {
-            try {
-                UserData userData = new UserData();
-                userData.setSessionId(sessionId);
-                userData.setName(name);
-                userData.setId(id);
-                userData.setExts(exts);
-                if (userDataList == null || userDataList.isEmpty()) {
-                    FTDBManager.get().insertFTUserData(userData);
-                    userDataList = new ArrayList<>();
-                    userDataList.add(userData);
-                } else{
-                    int i = 0;
-                    for (UserData temp:userDataList) {
-                        if(userData.equals(temp)){
-                            break;
-                        }
-                        i++;
-                    }
-                    if(i == userDataList.size()){
-                        FTDBManager.get().insertFTUserData(userData);
-                        userDataList.add(userData);
-                    }
-                }
-
-                userDataBinded = true;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+        synchronized (mLock) {
+            SharedPreferences sp = Utils.getSharedPreferences(FTApplication.getApplication());
+            sp.edit().putString(Constants.FT_USER_USER_ID, id).apply();
+            sp.edit().putString(Constants.FT_USER_USER_NAME, name).apply();
+            sp.edit().putString(Constants.FT_USER_USER_EXT, exts != null ? exts.toString() : null).apply();
+            UserData data = new UserData();
+            data.setId(id);
+            data.setName(name);
+            data.setExts(exts);
+            mUserData = data;
+        }
     }
 
     /**
      * 解绑用户信息
      */
     public void unbindUserData() {
-        if (sessionId != null) {
-            userDataBinded = false;
+        synchronized (mLock) {
+            SharedPreferences sp = Utils.getSharedPreferences(FTApplication.getApplication());
+            sp.edit().remove(Constants.FT_USER_USER_ID).apply();
+            sp.edit().remove(Constants.FT_USER_USER_NAME).apply();
+            sp.edit().remove(Constants.FT_USER_USER_EXT).apply();
         }
     }
 
-    public static void release(){
+    public static void release() {
         instance = null;
     }
 

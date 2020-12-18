@@ -55,15 +55,10 @@ public class LogTrackObjectTraceTest extends BaseTest {
         stopSyncTask();
 
         context = MockApplication.getContext();
-        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL),
-                true,
-                AccountUtils.getProperty(context, AccountUtils.ACCESS_KEY_ID),
-                AccountUtils.getProperty(context, AccountUtils.ACCESS_KEY_SECRET))
-                .setDataWayToken(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_TOKEN))
+        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL))
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setUseOAID(true)//设置 OAID 是否可用
                 .setDebug(true)//设置是否是 debug
-                .setNeedBindUser(false)//是否需要绑定用户信息
                 .setMonitorType(MonitorType.ALL)//设置监控项
                 .setEnableTrackAppCrash(true)
                 .setEnv(EnvType.GRAY)
@@ -155,7 +150,7 @@ public class LogTrackObjectTraceTest extends BaseTest {
         FTTrack.getInstance().trackBackground("TestLog", null, fields);
         Thread.sleep(5000);
 
-        List<SyncJsonData> list = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.LOG);
+        List<SyncJsonData> list = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.TRACK);
         Assert.assertTrue(list.size() > 0);
         String content = list.get(0).getDataString();
         JSONObject json = new JSONObject(content);
@@ -314,12 +309,8 @@ public class LogTrackObjectTraceTest extends BaseTest {
         body = body.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION).replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK);
 
         try {
-            Whitebox.invokeMethod(SyncTaskManager.get(), "requestNet", dataType, body, new AsyncCallback() {
-                @Override
-                public void onResponse(int code, String response) {
-                    Assert.assertEquals(200, code);
-                }
-            });
+            Whitebox.invokeMethod(SyncTaskManager.get(), "requestNet", dataType, body,
+                    (AsyncCallback) (code, response) -> Assert.assertEquals(200, code));
         } catch (Exception e) {
             e.printStackTrace();
         }

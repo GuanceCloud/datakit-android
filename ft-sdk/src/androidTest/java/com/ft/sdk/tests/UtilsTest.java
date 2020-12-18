@@ -5,9 +5,9 @@ import android.content.Context;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.ft.sdk.garble.bean.DataType;
+import com.ft.sdk.garble.bean.LineProtocolBean;
 import com.ft.sdk.garble.bean.ObjectBean;
 import com.ft.sdk.garble.bean.SyncJsonData;
-import com.ft.sdk.garble.bean.LineProtocolBean;
 import com.ft.sdk.garble.manager.SyncDataHelper;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.Utils;
@@ -92,7 +92,6 @@ public class UtilsTest {
     }
 
     /**
-     *
      * 事件数据内容校验
      *
      * @throws JSONException
@@ -104,7 +103,7 @@ public class UtilsTest {
         JSONObject fields = new JSONObject();
         fields.put(KEY_FIELD, VALUE_FIELD);
         LineProtocolBean trackBean = new LineProtocolBean(TEST_MEASUREMENT_INFLUX_DB_LINE, tags, fields, VALUE_TIME);
-        SyncJsonData data = SyncJsonData.getSyncJsonData(, trackBean);
+        SyncJsonData data = SyncJsonData.getSyncJsonData(DataType.TRACK, trackBean);
 
         List<SyncJsonData> recordDataList = new ArrayList<>();
         recordDataList.add(data);
@@ -115,11 +114,9 @@ public class UtilsTest {
     }
 
     /**
-     *
      * 对象数据内容校验
      *
      * @throws JSONException
-     *
      */
 
     @Test

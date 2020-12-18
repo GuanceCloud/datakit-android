@@ -65,17 +65,17 @@ public class FTMonitor {
         return this;
     }
 
-    public FTMonitor setUseGeoKey(boolean useGeoKey) {
-        FTMonitorConfig.get().setUseGeoKey(useGeoKey);
-        this.useGeoKey = useGeoKey;
-        return this;
-    }
-
-    public FTMonitor setGeoKey(String geoKey) {
-        FTMonitorConfig.get().setGeoKey(geoKey);
-        this.geoKey = geoKey;
-        return this;
-    }
+//    public FTMonitor setUseGeoKey(boolean useGeoKey) {
+//        FTMonitorConfig.get().setUseGeoKey(useGeoKey);
+//        this.useGeoKey = useGeoKey;
+//        return this;
+//    }
+//
+//    public FTMonitor setGeoKey(String geoKey) {
+//        FTMonitorConfig.get().setGeoKey(geoKey);
+//        this.geoKey = geoKey;
+//        return this;
+//    }
 
     public void start() {
         boolean onlyMain = true;
