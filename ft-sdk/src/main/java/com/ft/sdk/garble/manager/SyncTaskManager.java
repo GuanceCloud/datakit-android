@@ -27,9 +27,13 @@ public class SyncTaskManager {
     public final static String TAG = "SyncTaskManager";
     private static volatile SyncTaskManager instance;
     private final int CLOSE_TIME = 5;
+    private final int LIMIT_SIZE = 10;
     private final int SLEEP_TIME = 10 * 1000;
     private volatile AtomicInteger errorCount = new AtomicInteger(0);
     private volatile boolean running;
+
+
+    private final static DataType[] SYNC_MAP = DataType.values();
 
     /**
      * 警告!!! 该方法仅用于测试使用!!!
@@ -65,62 +69,21 @@ public class SyncTaskManager {
             errorCount.set(0);
             ThreadPoolUtils.get().execute(() -> {
                 try {
-//                    if (!TokenCheck.get().checkToken()) {
-//                        running = false;
-//                        return;
-//                    }
+
                     LogUtils.e(TAG, " \n*******************************************************\n" +
                             "******************数据同步线程运行中*******************\n" +
                             "*******************************************************\n");
                     Thread.sleep(SLEEP_TIME);
 
+                    for (DataType dataType : SYNC_MAP) {
+                        List<SyncJsonData> dataList = queryFromData(dataType);
 
-                    while (true) {
-                        List<SyncJsonData> trackDataList = queryFromData(DataType.TRACK);
-                        List<SyncJsonData> objectDataList = queryFromData(DataType.OBJECT);
-                        List<SyncJsonData> logDataList = queryFromData(DataType.LOG);
-                        List<SyncJsonData> rumEsList = queryFromData(DataType.RUM_ES);
-                        List<SyncJsonData> rumInfluxList = queryFromData(DataType.RUM_INFLUX);
-
-//                        //如果打开绑定用户开关，但是没有绑定用户信息，那么就不上传用户数据，直到绑了
-//                        if (FTUserConfig.get().isNeedBindUser() && !FTUserConfig.get().isUserDataBinded()) {
-//                            trackDataList.clear();
-//                            LogUtils.e(TAG, " \n********************请先绑定用户信息********************");
-//                        }
-
-                        if (!Utils.isNetworkAvailable()) {
-                            LogUtils.e(TAG, " \n**********************网络未连接************************");
-                            break;
+                        if (dataList.isEmpty()) {
+                            continue;
                         }
-                        if (errorCount.get() >= CLOSE_TIME) {
-                            LogUtils.e(TAG, " \n************连续同步失败5次，停止当前轮询同步***********");
-                            break;
-                        }
-
-                        if (trackDataList.isEmpty() && objectDataList.isEmpty()
-                                && logDataList.isEmpty() && rumEsList.isEmpty()
-                                && rumInfluxList.isEmpty()) {
-                            break;
-                        }
-
-                        if (!trackDataList.isEmpty()) {
-                            handleSyncOpt(DataType.TRACK, trackDataList);
-                        }
-                        if (!objectDataList.isEmpty()) {
-                            handleSyncOpt(DataType.OBJECT, objectDataList);
-                        }
-                        if (!logDataList.isEmpty()) {
-                            handleSyncOpt(DataType.LOG, logDataList);
-                        }
-
-                        if (!rumEsList.isEmpty()) {
-                            handleSyncOpt(DataType.RUM_ES, rumEsList);
-                        }
-
-                        if (!rumInfluxList.isEmpty()) {
-                            handleSyncOpt(DataType.RUM_INFLUX, rumInfluxList);
-                        }
+                        handleSyncOpt(dataType, dataList);
                     }
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
@@ -137,6 +100,17 @@ public class SyncTaskManager {
      * 执行同步操作
      */
     private synchronized void handleSyncOpt(final DataType dataType, final List<SyncJsonData> requestDatas) {
+
+        if (!Utils.isNetworkAvailable()) {
+            LogUtils.e(TAG, " \n**********************网络未连接************************");
+            return;
+        }
+
+        if (errorCount.get() >= CLOSE_TIME) {
+            LogUtils.e(TAG, " \n************连续同步失败5次，停止当前轮询同步***********");
+            return;
+        }
+
         if (requestDatas == null || requestDatas.isEmpty()) {
             return;
         }
@@ -160,10 +134,18 @@ public class SyncTaskManager {
                 errorCount.getAndIncrement();
             }
         });
+
+        if (requestDatas.size() < LIMIT_SIZE) {
+            //do nothing
+        } else {
+            List<SyncJsonData> nextList = queryFromData(dataType);
+            handleSyncOpt(dataType, nextList);
+
+        }
     }
 
     private List<SyncJsonData> queryFromData(DataType dataType) {
-        return FTDBManager.get().queryDataByDataByTypeLimit(10, dataType);
+        return FTDBManager.get().queryDataByDataByTypeLimit(LIMIT_SIZE, dataType);
     }
 
     /**
@@ -189,6 +171,9 @@ public class SyncTaskManager {
     public synchronized void requestNet(DataType dataType, String body, final AsyncCallback syncCallback) {
         String model;
         switch (dataType) {
+            case TRACE:
+                model = Constants.URL_MODEL_TRACING;
+                break;
             case LOG:
                 model = Constants.URL_MODEL_LOG;
                 break;

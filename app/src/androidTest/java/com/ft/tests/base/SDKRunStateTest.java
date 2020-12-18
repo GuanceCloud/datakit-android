@@ -49,15 +49,14 @@ public class SDKRunStateTest extends BaseTest {
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setUseOAID(true)//设置 OAID 是否可用
                 .setDebug(true)//设置是否是 debug
-                .enableAutoTrack(true)//设置是否开启自动埋点
                 .setMonitorType(MonitorType.ALL)//设置监控项
                 .setEnableTrackAppCrash(true)
                 .setEnv(EnvType.GRAY)
-                .setTraceSamplingRate(0.5f)
+                .setSamplingRate(0.5f)
                 .setNetworkTrace(true)
                 .setTraceConsoleLog(true)
                 .setEventFlowLog(true)
-                .setTraceType(TraceType.SKYWALKING_V2)
+                .setTraceType(TraceType.ZIPKIN)
                 .setOnlySupportMainProcess(true);
         FTSdk.install(ftSDKConfig);
     }

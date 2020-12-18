@@ -13,8 +13,8 @@ public class MonitorType {
 //    public static int GPU = 1<<4;·
 //    public static int NETWORK = 1<<5;
 //    public static int CAMERA = 1<<6;
-//    public static int LOCATION = 1<<7;
-    public static int SYSTEM = 1<<8;
+    public static int LOCATION = 1<<7;
+//    public static int SYSTEM = 1<<8;
 //    public static int SENSOR = 1<<9;
     public static int BLUETOOTH = 1<<10;
 //    public static int SENSOR_BRIGHTNESS = 1 << 11;

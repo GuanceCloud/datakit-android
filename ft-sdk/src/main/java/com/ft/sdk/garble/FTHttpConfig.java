@@ -3,6 +3,7 @@ package com.ft.sdk.garble;
 import com.ft.sdk.BuildConfig;
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTSDKConfig;
+import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.http.EngineFactory;
 import com.ft.sdk.garble.utils.DeviceUtils;
 
@@ -31,7 +32,7 @@ public class FTHttpConfig {
     public int readOutTime = 10 * 1000;
     //是否开启网络日志上报
     public boolean networkTrace;
-    public int traceType;
+    public TraceType traceType;
     //支持的采集类型
     public List<String> traceContentType = Arrays.asList("application/json",
             "application/javascript", "application/xml", "application/x-www-form-urlencoded",

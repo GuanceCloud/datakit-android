@@ -62,8 +62,8 @@ public class SyncDataHelper {
         String bodyContent;
         if (dataType == DataType.OBJECT) {
             bodyContent = getObjectBodyContent(recordDatas);
-        } else if (dataType == DataType.LOG) {
-            bodyContent = getLogBodyContent(recordDatas);
+        } else if (dataType == DataType.LOG || dataType == DataType.TRACE) {
+            bodyContent = getLogAndTraceBodyContent(recordDatas);
         } else if (dataType == DataType.RUM_INFLUX) {
             bodyContent = getRumInfluxBodyContent(recordDatas);
         } else if (dataType == DataType.RUM_ES) {
@@ -104,9 +104,10 @@ public class SyncDataHelper {
      * @param datas
      * @return
      */
-    private String getLogBodyContent(List<SyncJsonData> datas) {
+    private String getLogAndTraceBodyContent(List<SyncJsonData> datas) {
         return convertToLineProtocolLines(datas);
     }
+
 
     /**
      * 转化为行协议数据
@@ -264,7 +265,7 @@ public class SyncDataHelper {
                 deleteLastComma(valueSb);
                 sb.append(valueSb);
                 sb.append(Constants.SEPARATION_PRINT);
-                sb.append(data.getTime() * 1000000);
+                sb.append(data.getTime());
             } catch (Exception e) {
                 LogUtils.e(TAG, e.getMessage());
             }
@@ -360,10 +361,10 @@ public class SyncDataHelper {
             if (FTMonitorConfig.get().isMonitorType(MonitorType.BLUETOOTH)) {
                 createBluetooth(tags, fields);
             }
-            if (FTMonitorConfig.get().isMonitorType(MonitorType.SYSTEM)) {
-                //系统
-                createSystem(tags, fields);
-            }
+//            if (FTMonitorConfig.get().isMonitorType(MonitorType.SYSTEM)) {
+//                //系统
+//                createSystem(tags, fields);
+//            }
             if (FTMonitorConfig.get().isMonitorType(MonitorType.FPS)) {
                 createFps(tags, fields);
             }
@@ -486,6 +487,7 @@ public class SyncDataHelper {
             LogUtils.e(TAG, "网络数据获取异常:" + e.getMessage());
         }
     }
+
 
     /**
      * 添加相机监控数据

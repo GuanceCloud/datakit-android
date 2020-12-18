@@ -44,7 +44,7 @@ public class NetUtils {
     public final static int NETWORK_3G = 3;
     public final static int NETWORK_4G = 4;
     public final static int NETWORK_5G = 5;
-    public final static int NETWORK_MOBILE = NETWORK_5G + 1;
+    public final static int NETWORK_UNKNOWN = NETWORK_5G + 1;
 
     private static final String PUBLIC_IP_API = "http://ip-api.com/json";
 
@@ -133,6 +133,7 @@ public class NetUtils {
             case TelephonyManager.NETWORK_TYPE_EDGE:
             case TelephonyManager.NETWORK_TYPE_1xRTT:
             case TelephonyManager.NETWORK_TYPE_IDEN:
+            case TelephonyManager.NETWORK_TYPE_GSM:
                 return NETWORK_2G;
             // 3G网络
             case TelephonyManager.NETWORK_TYPE_EVDO_A:
@@ -144,15 +145,46 @@ public class NetUtils {
             case TelephonyManager.NETWORK_TYPE_EVDO_B:
             case TelephonyManager.NETWORK_TYPE_EHRPD:
             case TelephonyManager.NETWORK_TYPE_HSPAP:
+            case TelephonyManager.NETWORK_TYPE_TD_SCDMA:
                 return NETWORK_3G;
             // 4G网络
             case TelephonyManager.NETWORK_TYPE_LTE:
+            case TelephonyManager.NETWORK_TYPE_IWLAN:
                 return NETWORK_4G;
             case TelephonyManager.NETWORK_TYPE_NR:
                 return NETWORK_5G;
             default:
-                return NETWORK_MOBILE;
+            case TelephonyManager.NETWORK_TYPE_UNKNOWN:
+                return NETWORK_UNKNOWN;
         }
+    }
+
+    /**
+     * 获取网络类型名称
+     *
+     * @return
+     */
+    public String getNetWorkStateName() {
+
+        int type = getNetworkState(FTApplication.getApplication());
+        switch (type) {
+            case NETWORK_NONE:
+                return "unreachable";
+            case NETWORK_2G:
+                return "2G";
+            case NETWORK_3G:
+                return "3G";
+            case NETWORK_4G:
+                return "4G";
+            case NETWORK_5G:
+                return "5G";
+            case NETWORK_WIFI:
+                return "wifi";
+            default:
+                return "unknown";
+        }
+
+
     }
 
     /**
@@ -431,6 +463,7 @@ public class NetUtils {
 
     /**
      * 获取外网 IP 地址
+     *
      * @param callback
      */
     public void getPublicIp(AsyncCallback callback) {

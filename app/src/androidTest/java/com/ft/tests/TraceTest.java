@@ -36,8 +36,6 @@ import okhttp3.Request;
 
 import static com.ft.AllTests.hasPrepare;
 import static com.ft.sdk.FTNetWorkInterceptor.JAEGER_KEY;
-import static com.ft.sdk.FTNetWorkInterceptor.SKYWALKING_V3_SW_6;
-import static com.ft.sdk.FTNetWorkInterceptor.SKYWALKING_V3_SW_8;
 import static com.ft.sdk.FTNetWorkInterceptor.ZIPKIN_SAMPLED;
 import static com.ft.sdk.FTNetWorkInterceptor.ZIPKIN_SPAN_ID;
 import static com.ft.sdk.FTNetWorkInterceptor.ZIPKIN_TRACE_ID;
@@ -62,7 +60,7 @@ public class TraceTest extends BaseTest {
         context = MockApplication.getContext();
         ftsdkConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL))
                 .setXDataKitUUID("ft-dataKit-uuid-001")
-                .setTraceSamplingRate(1)
+                .setSamplingRate(1)
                 .setNetworkTrace(true);
     }
 
@@ -102,23 +100,23 @@ public class TraceTest extends BaseTest {
         Assert.assertTrue(expect);
     }
 
-    @Test
-    public void traceSkyWalkingV3HeaderTest() {
-        ftsdkConfig.setTraceType(TraceType.SKYWALKING_V3);
-        FTSdk.install(ftsdkConfig);
-        Request request = requestUrl("http://www.weather.com.cn/data/sk/101010100.html");
-        boolean expect = request.headers().names().contains(SKYWALKING_V3_SW_8);
-        Assert.assertTrue(expect);
-    }
-
-    @Test
-    public void traceSkyWalkingV2HeaderTest() {
-        ftsdkConfig.setTraceType(TraceType.SKYWALKING_V2);
-        FTSdk.install(ftsdkConfig);
-        Request request = requestUrl("http://www.weather.com.cn/data/sk/101010100.html");
-        boolean expect = request.headers().names().contains(SKYWALKING_V3_SW_6);
-        Assert.assertTrue(expect);
-    }
+//    @Test
+//    public void traceSkyWalkingV3HeaderTest() {
+//        ftsdkConfig.setTraceType(TraceType.SKYWALKING_V3);
+//        FTSdk.install(ftsdkConfig);
+//        Request request = requestUrl("http://www.weather.com.cn/data/sk/101010100.html");
+//        boolean expect = request.headers().names().contains(SKYWALKING_V3_SW_8);
+//        Assert.assertTrue(expect);
+//    }
+//
+//    @Test
+//    public void traceSkyWalkingV2HeaderTest() {
+//        ftsdkConfig.setTraceType(TraceType.SKYWALKING_V2);
+//        FTSdk.install(ftsdkConfig);
+//        Request request = requestUrl("http://www.weather.com.cn/data/sk/101010100.html");
+//        boolean expect = request.headers().names().contains(SKYWALKING_V3_SW_6);
+//        Assert.assertTrue(expect);
+//    }
 
     @Test
     public void traceHttpClientGetTest() throws IOException, InterruptedException, ParseException {

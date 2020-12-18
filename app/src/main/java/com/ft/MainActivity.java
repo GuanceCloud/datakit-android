@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.reflect.ReflectUtils;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.Utils;
 
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -58,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main2);
+        setContentView(R.layout.activity_main);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(new String[]{Manifest.permission.CAMERA
                     , Manifest.permission.ACCESS_FINE_LOCATION
@@ -97,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.mock_one_data_btn).setOnClickListener(v -> {
-            Log.d("LogManager", "测试日志数据=======当前时间为" + System.currentTimeMillis());
+            Log.d("LogManager", "测试日志数据=======当前时间为" + Utils.getCurrentNanoTime());
         });
         findViewById(R.id.mock_crash_btn).setOnClickListener(v -> {
             new Thread(new Runnable() {
@@ -111,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
             ReflectUtils.reflectCrashAndGetExceptionMessage();
         });
         findViewById(R.id.mock_page_jump_btn).setOnClickListener(v -> {
-            startActivity(new Intent(this, SecondActivity.class));
+            startActivity(new Intent(this, WebViewActivity.class));
         });
         findViewById(R.id.mock_click_btn).setOnClickListener(v -> {
         });
@@ -158,6 +159,10 @@ public class MainActivity extends AppCompatActivity {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
+        });
+        findViewById(R.id.view_loop_test).setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, FirstActivity.class));
 
         });
     }

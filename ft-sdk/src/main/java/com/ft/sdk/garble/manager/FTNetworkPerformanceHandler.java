@@ -27,6 +27,7 @@ public final class FTNetworkPerformanceHandler {
             bean.responseConnection = response.header("Connection");
             bean.resourceMethod = request.method();
             bean.responseContentEncoding = response.header("Content-Encoding");
+            bean.resourceType = bean.responseContentType;
             bean.resourceStatus = response.code();
         }
 

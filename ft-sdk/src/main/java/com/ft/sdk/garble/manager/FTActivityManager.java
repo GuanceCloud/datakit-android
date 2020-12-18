@@ -7,7 +7,7 @@ import android.content.Context;
 
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.garble.bean.AppState;
-import com.ft.sdk.garble.utils.StringUtils;
+import com.ft.sdk.garble.utils.LogUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ public class FTActivityManager {
 
     private ConcurrentHashMap<String, Boolean> activityOpenTypeMap;
 
-    private AppState appState;
+    private AppState appState = AppState.STARTUP;
 
     private FTActivityManager() {
         activityList = new ArrayList<>();
@@ -70,6 +70,7 @@ public class FTActivityManager {
         }
 
         activityList.add(activity);
+        //记录最近两个
         if (activityList.size() > 2) {
             Activity stackTop = activityList.remove(0);
             removeActivityStatus(stackTop.getClass().getName());
@@ -78,6 +79,20 @@ public class FTActivityManager {
     }
 
     public void removeActivity(Activity activity) {
+        if (activityList != null) {
+
+            try {
+                for (int i = activityList.size() - 1; i >= 0; i--) {
+                    if (activityList.get(i).equals(activity)) {
+                        activityList.remove(activity);
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                LogUtils.e(TAG, e.getMessage());
+            }
+
+        }
     }
 
     /**

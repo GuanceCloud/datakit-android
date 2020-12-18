@@ -67,8 +67,8 @@ apply plugin: 'ft-plugin'
 
 FTExt {
     showLog = true
-    openAutoTrack = true
-    autoUploadProguardMap = true
+//    openAutoTrack = true
+//    autoUploadProguardMap = true
 }
 repositories {
     mavenCentral()

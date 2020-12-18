@@ -21,7 +21,7 @@ public class FTSDKConfig {
     private boolean autoTrack = true;
     //是否需要绑定用户数据
 //    private boolean needBindUser;
-    //监控类别
+    //崩溃采集数据附加类型
     private int monitorType;
     //以下三个为白名单
 //    private int enableAutoTrackType;
@@ -48,7 +48,7 @@ public class FTSDKConfig {
     private boolean enableTrackAppANR;
 
     //设置采样率
-    private float traceSamplingRate = 1;
+    private float samplingRate = 1;
     //崩溃日志的环境
     private EnvType env = EnvType.PROD;
     //是否开启网络日志上报
@@ -60,7 +60,7 @@ public class FTSDKConfig {
     //是否开启系统日志的上报功能
     private boolean traceConsoleLog;
     // openTrace 使用类型
-    private int traceType = TraceType.ZIPKIN;
+    private TraceType traceType = TraceType.ZIPKIN;
     //支持的采集类型
     private List<String> traceContentType;
     // SDK 是否只支持在主进程中初始化
@@ -88,17 +88,6 @@ public class FTSDKConfig {
      */
     private FTSDKConfig(String serverUrl) {
         this.serverUrl = serverUrl;
-//        this.enableRequestSigning = enableRequestSigning;
-//        this.akId = akId;
-//        this.akSecret = akSecret;
-//        if (enableRequestSigning) {
-//            if (akId == null) {
-//                throw new InvalidParameterException("akId 未初始化");
-//            }
-//            if (akSecret == null) {
-//                throw new InvalidParameterException("akSecret 未初始化");
-//            }
-//        }
     }
 
     public String getServerUrl() {
@@ -109,27 +98,16 @@ public class FTSDKConfig {
         return rumAppId;
     }
 
+    /**
+     * 设置 RUM AppId
+     * @param rumAppId
+     * @return
+     */
     public FTSDKConfig setRumAppId(String rumAppId) {
         this.rumAppId = rumAppId;
         return this;
     }
 
-    //    public boolean isEnableRequestSigning() {
-//        return enableRequestSigning;
-//    }
-//
-//
-//    public String getAkId() {
-//        return akId;
-//    }
-//
-//    public String getAkSecret() {
-//        return akSecret;
-//    }
-
-//    public String getDataWayToken() {
-//        return dataWayToken;
-//    }
 
     public boolean isUseOAID() {
         return useOAID;
@@ -139,74 +117,26 @@ public class FTSDKConfig {
         return isDebug;
     }
 
-//    public boolean isDescLog() {
-//        return descLog;
-//    }
+
 
     public boolean isAutoTrack() {
         return autoTrack;
     }
 
-//    public boolean isNeedBindUser() {
-//        return needBindUser;
-//    }
+
 
     public int getMonitorType() {
         return monitorType;
     }
 
-//    public int getEnableAutoTrackType() {
-//        return enableAutoTrackType;
-//    }
-//
-//    public List<Class<?>> getWhiteActivityClass() {
-//        return whiteActivityClass;
-//    }
-//
-//    public List<Class<?>> getWhiteViewClass() {
-//        return whiteViewClass;
-//    }
-//
-//    public int getDisableAutoTrackType() {
-//        return disableAutoTrackType;
-//    }
-//
-//    public List<Class<?>> getBlackActivityClass() {
-//        return blackActivityClass;
-//    }
-//
-//    public List<Class<?>> getBlackViewClass() {
-//        return blackViewClass;
-//    }
 
-
-    public FTSDKConfig enableAutoTrack(boolean autoTrack) {
-        this.autoTrack = autoTrack;
-        return this;
-    }
-
-//    public boolean getTrackNetTime() {
-//        return trackNetTime;
-//    }
-
-//    public Map<String, String> getPageDescMap() {
-//        return pageDescMap;
-//    }
-//
-//    public Map<String, String> getVtpDescMap() {
-//        return vtpDescMap;
-//    }
-//
-//    public boolean isPageVtpDescEnabled() {
-//        return pageVtpDescEnabled;
-//    }
 
     public boolean isEnableTrackAppCrash() {
         return enableTrackAppCrash;
     }
 
-    public float getTraceSamplingRate() {
-        return traceSamplingRate;
+    public float getSamplingRate() {
+        return samplingRate;
     }
 
     public EnvType getEnv() {
@@ -271,24 +201,9 @@ public class FTSDKConfig {
         return this;
     }
 
-//    public FTSDKConfig setDescLog(boolean descLog) {
-//        this.descLog = descLog;
-//        return this;
-//    }
-
-//    /**
-//     * 设置自动埋点的事件类别
-//     *
-//     * @param type
-//     * @return
-//     */
-//    private FTSDKConfig setEnableAutoTrackType(int type) {
-//        enableAutoTrackType = type;
-//        return this;
-//    }
 
     /**
-     * 设置监控类别
+     * 设置采集数据附加类型
      *
      * @param monitorType
      * @return
@@ -298,128 +213,6 @@ public class FTSDKConfig {
         return this;
     }
 
-//    /**
-//     * 是否需要绑定用户信息
-//     *
-//     * @param needBindUserVar
-//     * @return
-//     */
-//    public FTSDKConfig setNeedBindUser(boolean needBindUserVar) {
-//        needBindUser = needBindUserVar;
-//        return this;
-//    }
-
-//    /**
-//     * 设置白名单（Activity，Fragment）
-//     *
-//     * @param classes
-//     * @return
-//     */
-//    public FTSDKConfig setWhiteActivityClasses(List<Class<?>> classes) {
-//        whiteActivityClass = classes;
-//        return this;
-//    }
-//
-//    /**
-//     * 设置控件白名单
-//     *
-//     * @param classes
-//     * @return
-//     */
-//    public FTSDKConfig setWhiteViewClasses(List<Class<?>> classes) {
-//        whiteViewClass = classes;
-//        return this;
-//    }
-//
-//    /**
-//     * 设置关闭的自动埋点事件类别
-//     *
-//     * @param type
-//     * @return
-//     */
-//    public FTSDKConfig setDisableAutoTrackType(int type) {
-//        disableAutoTrackType = type;
-//        return this;
-//    }
-//
-//    /**
-//     * 设置黑名单（Acitivty，Fragment）
-//     *
-//     * @param classes
-//     * @return
-//     */
-//    public FTSDKConfig setBlackActivityClasses(List<Class<?>> classes) {
-//        blackActivityClass = classes;
-//        return this;
-//    }
-//
-//    /**
-//     * 设置控件黑名单
-//     *
-//     * @param classes
-//     * @return
-//     */
-//    public FTSDKConfig setBlackViewClasses(List<Class<?>> classes) {
-//        blackViewClass = classes;
-//        return this;
-//    }
-
-//    /**
-//     * 设置使用高德作为逆向地址解析
-//     *
-//     * @param useGeoKey
-//     * @param geoKey
-//     * @return
-//     */
-//    public FTSDKConfig setGeoKey(boolean useGeoKey, String geoKey) {
-//        this.useGeoKey = useGeoKey;
-//        this.geoKey = geoKey;
-//        return this;
-//    }
-
-//    /**
-//     * 是否开启网络全路径请求时长监控
-//     *
-//     * @param value
-//     * @return
-//     */
-//    public FTSDKConfig trackNetRequestTime(boolean value) {
-//        this.trackNetTime = value;
-//        return this;
-//    }
-
-//    /**
-//     * 页面别名对应 map
-//     *
-//     * @param pageDescMap
-//     * @return
-//     */
-//    public FTSDKConfig addPageDesc(Map<String, String> pageDescMap) {
-//        this.pageDescMap = pageDescMap;
-//        return this;
-//    }
-
-//    /**
-//     * 事件别名对应 map
-//     *
-//     * @param vtpDescMap
-//     * @return
-//     */
-//    public FTSDKConfig addVtpDesc(Map<String, String> vtpDescMap) {
-//        this.vtpDescMap = vtpDescMap;
-//        return this;
-//    }
-//
-//    /**
-//     * 设置页面和视图树是否使用别名
-//     *
-//     * @param pageVtpDescEnabled
-//     * @return
-//     */
-//    public FTSDKConfig setPageVtpDescEnabled(boolean pageVtpDescEnabled) {
-//        this.pageVtpDescEnabled = pageVtpDescEnabled;
-//        return this;
-//    }
 
 
     /**
@@ -436,11 +229,11 @@ public class FTSDKConfig {
     /**
      * 设置采样率
      *
-     * @param traceSamplingRate
+     * @param samplingRate
      * @return
      */
-    public FTSDKConfig setTraceSamplingRate(float traceSamplingRate) {
-        this.traceSamplingRate = traceSamplingRate;
+    public FTSDKConfig setSamplingRate(float samplingRate) {
+        this.samplingRate = samplingRate;
         return this;
     }
 
@@ -508,7 +301,7 @@ public class FTSDKConfig {
      * @param traceType
      * @return
      */
-    public FTSDKConfig setTraceType(int traceType) {
+    public FTSDKConfig setTraceType(TraceType traceType) {
         this.traceType = traceType;
         return this;
     }
@@ -518,7 +311,7 @@ public class FTSDKConfig {
      *
      * @return
      */
-    public int getTraceType() {
+    public TraceType getTraceType() {
         return traceType;
     }
 

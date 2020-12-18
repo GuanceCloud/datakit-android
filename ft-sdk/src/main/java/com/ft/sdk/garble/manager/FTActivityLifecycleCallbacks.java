@@ -35,7 +35,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
 //            NetUtils.get().startMonitorNetRate();
 //        }
         FTFragmentManager.getInstance().addFragmentLifecycle(activity);
-        mCreateMap.put(activity, System.currentTimeMillis());
+        mCreateMap.put(activity, Utils.getCurrentNanoTime());
     }
 
     @Override
@@ -45,20 +45,22 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
 
     @Override
     public void onActivityPostCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
+        FTManager.getFTActivityManager().putActivity(activity);
         if (FTRUMConfig.get().isRumEnable()) {
             if (!mInit) {
-                FTActivityManager.get().setAppState(AppState.RUNNING);
+                FTActivityManager.get().setAppState(AppState.RUN);
                 FTAutoTrack.putRUMLaunchPerformance(true);
                 mInit = true;
             }
-
             Long startTime = mCreateMap.get(activity);
             if (startTime != null) {
-                long duration = System.currentTimeMillis() - startTime;
+                long duration = Utils.getCurrentNanoTime() - startTime;
                 String viewName = AopUtils.getClassName(activity);
                 String viewID = Utils.MD5(viewName).toLowerCase();
                 double fps = FpsUtils.get().getFps();
-                FTAutoTrack.putRUMViewLoadPerformance(viewID, viewName, fps, duration);
+                Class lastActivity = FTActivityManager.get().getLastActivity();
+                String parentViewName = lastActivity != null ? lastActivity.getSimpleName() : null;
+                FTAutoTrack.putRUMViewLoadPerformance(viewID, viewName, parentViewName, fps, duration);
             }
         }
     }
@@ -76,8 +78,6 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
                 && FTActivityManager.get().isFirstResume.get(activity.getClass().getName())) {
             isFirstLoad = false;
         }
-        //页面打开，将打开 Activity 放入管理栈中
-        FTManager.getFTActivityManager().putActivity(activity);
         //页面打开埋点数据插入
         FTAutoTrack.startPage(activity.getClass(), isFirstLoad);
         //开启同步

@@ -59,7 +59,7 @@ public class ErrorTraceTest extends BaseTest {
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setDebug(true)//设置是否是 debug
                 .setEnv(EnvType.GRAY)
-                .setTraceSamplingRate(0.5f)
+                .setSamplingRate(0.5f)
                 .setOnlySupportMainProcess(true);
         //关闭数据自动同步操作
 //        SyncTaskManager.get().setRunning(true);

@@ -158,7 +158,7 @@ public class SyncJsonData implements Cloneable {
         JSONObject tagsTemp = bean.getTags();
         JSONObject fields = bean.getFields();
         SyncJsonData recordData = new SyncJsonData(dataType);
-        recordData.setTime(bean.getTimeMillis());
+        recordData.setTime(bean.getTimeNano());
         JSONObject opDataJson = getLinProtocolJson(bean.getMeasurement(), tagsTemp, fields);
 
         recordData.setDataString(FloatDoubleJsonUtils.protectValueFormat(opDataJson));
@@ -179,7 +179,7 @@ public class SyncJsonData implements Cloneable {
 
         JSONObject opDataJson = getLinProtocolJson(Constants.FT_MONITOR_MEASUREMENT, tags, fields);
         recordData.setDataString(FloatDoubleJsonUtils.protectValueFormat(opDataJson));
-        recordData.setTime(System.currentTimeMillis());
+        recordData.setTime(Utils.getCurrentNanoTime());
         return recordData;
 
     }
@@ -193,13 +193,12 @@ public class SyncJsonData implements Cloneable {
      * @throws JSONException
      * @throws InvalidParameterException
      */
-    public static SyncJsonData getFromLogBean(LogBean bean)
+    public static SyncJsonData getFromLogBean(BaseContentBean bean,DataType dataType)
             throws JSONException, InvalidParameterException {
-        SyncJsonData recordData = new SyncJsonData(DataType.LOG);
+        SyncJsonData recordData = new SyncJsonData(dataType);
         recordData.setTime(bean.getTime());
         JSONObject opDataJson = getLinProtocolJson(bean.getMeasurement(), bean.getAllTags(), bean.getAllFields());
         recordData.setDataString(FloatDoubleJsonUtils.protectValueFormat(opDataJson));
-
         return recordData;
     }
 

@@ -3,11 +3,12 @@ package com.ft.sdk;
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.FTDBCachePolicy;
-import com.ft.sdk.garble.FTRUMConfig;
+import com.ft.sdk.garble.bean.BaseContentBean;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.LineProtocolBean;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.SyncJsonData;
+import com.ft.sdk.garble.bean.TraceBean;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.http.RequestMethod;
@@ -102,7 +103,7 @@ public class FTTrackInner {
                 try {
                     SyncJsonData recordData = SyncJsonData.getSyncJsonData(DataType.TRACK,
                             new LineProtocolBean(t.getMeasurement(), t.getTags(),
-                                    t.getFields(), t.getTimeMillis()));
+                                    t.getFields(), t.getTimeNano()));
                     recordDataList.add(recordData);
                     uploadTrackOPData(recordDataList, callback);
                 } catch (Exception e) {
@@ -169,6 +170,17 @@ public class FTTrackInner {
         }
     }
 
+    /**
+     * 将单条日志数据存入本地同步
+     *
+     * @param logBean
+     */
+    public void traceBackground(@NonNull BaseContentBean logBean) {
+        ArrayList<BaseContentBean> list = new ArrayList<>();
+        list.add(logBean);
+        batchLogBeanBackground(list, DataType.TRACE);
+    }
+
 
     /**
      * 将单条日志数据存入本地同步
@@ -176,9 +188,9 @@ public class FTTrackInner {
      * @param logBean
      */
     public void logBackground(@NonNull LogBean logBean) {
-        ArrayList<LogBean> list = new ArrayList<>();
+        ArrayList<BaseContentBean> list = new ArrayList<>();
         list.add(logBean);
-        logBackground(list);
+        batchLogBeanBackground(list, DataType.LOG);
     }
 
     /**
@@ -186,12 +198,11 @@ public class FTTrackInner {
      *
      * @param logBeans
      */
-    public void logBackground(@NonNull List<LogBean> logBeans) {
+    public void batchLogBeanBackground(@NonNull List<BaseContentBean> logBeans, DataType dataType) {
         ArrayList<SyncJsonData> datas = new ArrayList<>();
-        for (LogBean logBean : logBeans
-        ) {
+        for (BaseContentBean logBean : logBeans) {
             try {
-                datas.add(SyncJsonData.getFromLogBean(logBean));
+                datas.add(SyncJsonData.getFromLogBean(logBean, dataType));
             } catch (Exception e) {
                 LogUtils.e(TAG, e.getMessage());
             }

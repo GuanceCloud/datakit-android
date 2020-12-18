@@ -20,6 +20,7 @@ import com.ft.sdk.garble.FTAutoTrackConfig;
 import com.ft.sdk.garble.FTFlowConfig;
 import com.ft.sdk.garble.FTFragmentManager;
 import com.ft.sdk.garble.FTHttpConfig;
+import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.FTRUMConfig;
 import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.bean.AppState;
@@ -29,9 +30,12 @@ import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.ResourceBean;
 import com.ft.sdk.garble.manager.FTActivityManager;
 import com.ft.sdk.garble.utils.AopUtils;
+import com.ft.sdk.garble.utils.BluetoothUtils;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
+import com.ft.sdk.garble.utils.LocationUtils;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.NetUtils;
 import com.ft.sdk.garble.utils.OaidUtils;
 import com.ft.sdk.garble.utils.Utils;
 import com.google.android.material.tabs.TabLayout;
@@ -42,6 +46,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Method;
+import java.util.Locale;
 import java.util.Map;
 
 import okhttp3.OkHttpClient;
@@ -355,30 +360,27 @@ public class FTAutoTrack {
      * APP 启动
      */
     public static void startApp() {
-        globalParentPage = null;
-        startTimeline = System.currentTimeMillis();
+        startTimeline = Utils.getCurrentNanoTime();
         if (!FTAutoTrackConfig.get().isAutoTrack()) {
             return;
         }
         if (!FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_START)) {
             return;
         }
-        putPageEvent(System.currentTimeMillis(), OP.LANC, null, null, null, null);
+        putPageEvent(Utils.getCurrentNanoTime(), OP.LANC, null, null, null, null);
     }
 
 
     /**
      * 应用休眠
      *
-     * @param timeDelay
+     * @param timeDelayMs
      */
-    public static void sleepApp(long timeDelay) {
-        long now = System.currentTimeMillis() - timeDelay;
+    public static void sleepApp(long timeDelayMs) {
+        long now = Utils.getCurrentNanoTime() - timeDelayMs * 1000000;
         putClientTimeCost(now, now - startTimeline);
 
     }
-
-    private static String globalParentPage;
 
 
     /**
@@ -608,7 +610,7 @@ public class FTAutoTrack {
      * @param vtp
      */
     public static void putClickEvent(@NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String vtp) {
-        long time = System.currentTimeMillis();
+        long time = Utils.getCurrentNanoTime();
         putPageEvent(time, op, currentPage, rootPage, null, vtp);
     }
 
@@ -621,7 +623,7 @@ public class FTAutoTrack {
      * @param parentPage
      */
     public static void putFragmentEvent(@NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String parentPage) {
-        long time = System.currentTimeMillis();
+        long time = Utils.getCurrentNanoTime();
         try {
             if (op == OP.OPEN_FRA) {
                 //显示Fragment的页面名称为 Activity.Fragment
@@ -640,7 +642,7 @@ public class FTAutoTrack {
      * @param classCurrent
      */
     public static void putActivityEvent(@NonNull OP op, Class classCurrent, boolean isFirstLoad) {
-        long time = System.currentTimeMillis();
+        long time = Utils.getCurrentNanoTime();
         Class parentClass = FTActivityManager.get().getLastActivity();
         String parentPageName = Constants.FLOW_ROOT;
         if (op == OP.OPEN_ACT) {
@@ -699,10 +701,6 @@ public class FTAutoTrack {
 
     private static void putPageEvent(long time, @NonNull OP op, @Nullable String currentPage,
                                      @Nullable String rootPage, @Nullable String parentPage, @Nullable String vtp) {
-        if (op.equals(OP.OPEN_ACT)) {
-            globalParentPage = parentPage;
-        }
-
         try {
             JSONObject tags = new JSONObject();
             JSONObject fields = new JSONObject();
@@ -747,19 +745,15 @@ public class FTAutoTrack {
      */
     public static void putRUMLaunchPerformance(boolean isCold) {
         if (!Utils.enableTraceSamplingRate()) return;
-        long time = System.currentTimeMillis();
+        long time = Utils.getCurrentNanoTime();
         long duration = time - startTimeline;
 
         try {
             JSONObject tags = getRUMPublicTags();
             JSONObject fields = new JSONObject();
             tags.put("app_startup_type", isCold ? "cold" : "hot");
+            tags.put("app_apdex_level", getAppApdexLevel(duration));
 
-            long appApdexLevel = duration / 1000;
-            if (appApdexLevel > 9) {
-                appApdexLevel = 9;
-            }
-            tags.put("app_apdex_level", appApdexLevel);
             fields.put("app_startup_duration", duration);
             FTTrackInner.getInstance().rumInflux(time,
                     Constants.FT_MEASUREMENT_RUM_APP_START_UP, tags, fields);
@@ -772,24 +766,27 @@ public class FTAutoTrack {
     /**
      * 记录页面加载性能
      */
-    public static void putRUMViewLoadPerformance(String viewId, String viewName, double fps, long loadTime) {
+    public static void putRUMViewLoadPerformance(String viewId, String viewName, String parentView, double fps, long loadTime) {
         if (!Utils.enableTraceSamplingRate()) return;
-        long time = System.currentTimeMillis();
+        long time = Utils.getCurrentNanoTime();
         try {
             JSONObject tags = getRUMPublicTags();
             JSONObject fields = new JSONObject();
             tags.put("view_id", viewId);
             tags.put("view_name", viewName);
-            if (globalParentPage != null) {
-                tags.put("view_parent", globalParentPage);
+            if (parentView != null) {
+                tags.put("view_parent", parentView);
             }
             if (fps > 0) {
                 fields.put("view_fps", fps);
             }
+
+            tags.put("app_apdex_level", getAppApdexLevel(loadTime));
             fields.put("view_load", loadTime);
             FTTrackInner.getInstance().rumInflux(time,
                     Constants.FT_MEASUREMENT_RUM_APP_VIEW, tags, fields);
             appendRUMESPublicTags(tags);
+
             FTTrackInner.getInstance().rumES(time,
                     "view", tags, fields);
         } catch (Exception e) {
@@ -797,12 +794,20 @@ public class FTAutoTrack {
         }
     }
 
+    private static long getAppApdexLevel(long duration) {
+        long appApdexLevel = duration / 1000000000;
+        if (appApdexLevel > 9) {
+            appApdexLevel = 9;
+        }
+        return appApdexLevel;
+    }
+
     /**
      * 资源加载性能
      */
     public static void putRUMResourcePerformance(ResourceBean bean) {
         if (!Utils.enableTraceSamplingRate()) return;
-        long time = System.currentTimeMillis();
+        long time = Utils.getCurrentNanoTime();
         try {
             JSONObject tags = getRUMPublicTags();
             JSONObject fields = new JSONObject();
@@ -869,7 +874,7 @@ public class FTAutoTrack {
      */
     public static void PutRUMuiBlock(String log) {
         if (!Utils.enableTraceSamplingRate()) return;
-        long time = System.currentTimeMillis();
+        long time = Utils.getCurrentNanoTime();
         putFreeze("Freeze", time, log);
     }
 
@@ -901,13 +906,39 @@ public class FTAutoTrack {
 
             tags.put("crash_type", crashType.toString());
             tags.put("crash_situation", state.toString());
-            tags.put("type", "crash");
             tags.put("application_uuid", FTSdk.PACKAGE_UUID);
             fields.put("crash_message", message);
             fields.put("crash_stack", log);
             appendRUMESPublicTags(tags);
-            FTTrackInner.getInstance().rumES(dateline,
-                    Constants.FT_MEASUREMENT_RUM_APP_FREEZE, tags, fields);
+
+            try {
+                if (FTMonitorConfig.get().isMonitorType(MonitorType.BLUETOOTH)) {
+                    tags.put("bt_open", BluetoothUtils.get().isOpen());
+                }
+
+                if (FTMonitorConfig.get().isMonitorType(MonitorType.LOCATION)) {
+                    tags.put("gps_open", LocationUtils.get().isOpenGps());
+                }
+
+                tags.put("carrier", DeviceUtils.getCarrier(FTApplication.getApplication()));
+                tags.put("locale", Locale.getDefault());
+
+                if (FTMonitorConfig.get().isMonitorType(MonitorType.MEMORY)) {
+                    double[] memory = DeviceUtils.getRamData(FTApplication.getApplication());
+                    tags.put(Constants.KEY_MEMORY_TOTAL, memory[0] + "GB");
+                    fields.put(Constants.KEY_MEMORY_USE, memory[1]);
+                }
+
+                if (FTMonitorConfig.get().isMonitorType(MonitorType.CPU)) {
+                    fields.put(Constants.KEY_CPU_USE, DeviceUtils.getCpuUseRate());
+                }
+
+
+            } catch (Exception e) {
+                LogUtils.e(TAG, e.getMessage());
+            }
+
+            FTTrackInner.getInstance().rumES(dateline, "crash", tags, fields);
         } catch (Exception e) {
             LogUtils.e(TAG, e.getMessage());
         }
@@ -970,7 +1001,8 @@ public class FTAutoTrack {
         try {
             tags.put(Constants.KEY_RUM_APP_ID, FTRUMConfig.get().getAppId());
             tags.put("env", FTRUMConfig.get().getEnvType().toString());
-            tags.put(Constants.KEY_RUM_IS_SIGNIN, FTUserConfig.get().isUserDataBinded());
+            tags.put("network_type", NetUtils.get().getNetWorkStateName());
+            tags.put(Constants.KEY_RUM_IS_SIGNIN, FTUserConfig.get().isUserDataBinded() ? "T" : "F");
         } catch (JSONException e) {
             LogUtils.e(TAG, e.getMessage());
         }
@@ -986,9 +1018,9 @@ public class FTAutoTrack {
      */
     private static void appendRUMESPublicTags(JSONObject jsonObject) throws JSONException {
         if (FTUserConfig.get().isUserDataBinded()) {
-            jsonObject.put("user_id", FTUserConfig.get().getUserData().getId());
+            jsonObject.put(Constants.KEY_RUM_USER_ID, FTUserConfig.get().getUserData().getId());
         } else {
-            jsonObject.put("user_id", FTUserConfig.get().getSessionId());
+            jsonObject.put(Constants.KEY_RUM_USER_ID, FTUserConfig.get().getSessionId());
         }
 
         String uuid = "";
@@ -997,7 +1029,8 @@ public class FTAutoTrack {
             if (oaid != null) {
                 uuid = "oaid_" + oaid;
             }
-        } else {
+        }
+        if (uuid.isEmpty()) {
             uuid = DeviceUtils.getUuid(FTApplication.getApplication());
         }
         jsonObject.put("origin_id", uuid);
@@ -1058,7 +1091,7 @@ public class FTAutoTrack {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        LogBean logBean = new LogBean(content.toString(), System.currentTimeMillis());
+        LogBean logBean = new LogBean(content.toString(), Utils.getCurrentNanoTime());
         logBean.setOperationName(operationName);
         logBean.setDuration(duration);
         FTTrackInner.getInstance().logBackground(logBean);
@@ -1198,7 +1231,8 @@ public class FTAutoTrack {
     public static OkHttpClient trackOkHttpBuilder(OkHttpClient.Builder builder) {
         FTNetWorkInterceptor interceptor = new FTNetWorkInterceptor();
         if (FTHttpConfig.get().networkTrace || FTRUMConfig.get().isRumEnable()) {
-            builder.addNetworkInterceptor(interceptor);
+            builder.addInterceptor(interceptor);
+//            builder.addNetworkInterceptor(interceptor); //发现部分工程有兼容问题
         }
         if (FTRUMConfig.get().isRumEnable()) {
             builder.eventListener(interceptor);

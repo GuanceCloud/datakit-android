@@ -1,5 +1,7 @@
 package com.ft.sdk;
 
+import com.ft.sdk.garble.bean.BaseContentBean;
+import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.LogData;
 import com.ft.sdk.garble.bean.Status;
@@ -33,7 +35,7 @@ public class FTLogger {
      * @param status
      */
     public void logBackground(String content, Status status) {
-        LogBean logBean = new LogBean(Utils.translateFieldValue(content), System.currentTimeMillis());
+        LogBean logBean = new LogBean(Utils.translateFieldValue(content), Utils.getCurrentNanoTime());
         logBean.setServiceName(FTExceptionHandler.get().getTrackServiceName());
         logBean.setStatus(status);
         logBean.setEnv(FTExceptionHandler.get().getEnv());
@@ -49,15 +51,15 @@ public class FTLogger {
         if (logDataList == null) {
             return;
         }
-        List<LogBean> logBeans = new ArrayList<>();
+        List<BaseContentBean> logBeans = new ArrayList<>();
         for (LogData logData : logDataList) {
-            LogBean logBean = new LogBean(Utils.translateFieldValue(logData.getContent()), System.currentTimeMillis());
+            LogBean logBean = new LogBean(Utils.translateFieldValue(logData.getContent()), Utils.getCurrentNanoTime());
             logBean.setServiceName(FTExceptionHandler.get().getTrackServiceName());
             logBean.setStatus(logData.getStatus());
             logBean.setEnv(FTExceptionHandler.get().getEnv());
             logBeans.add(logBean);
         }
-        FTTrackInner.getInstance().logBackground(logBeans);
+        FTTrackInner.getInstance().batchLogBeanBackground(logBeans, DataType.LOG);
     }
 
 

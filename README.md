@@ -51,12 +51,15 @@ dependencies {
     implementation 'com.cloudcare.ft.mobile.sdk.tracker.agent:ft-sdk:$last_version'
     //捕获 native 层崩溃信息的依赖，需要配合 ft-sdk 使用不能单独使用
     implementation 'com.cloudcare.ft.mobile.sdk.tracker.agent:ft-native:$last_version'
+    //推荐使用这个版本，其他版本未做过充分兼容测试
+    implementation 'com.google.code.gson:gson:2.8.5'
+
 }
 //应用插件
 apply plugin: 'ft-plugin'
 //配置插件使用参数
 FTExt {
-    //是否显示日志，默认为 false
+    //是否显示 Plugin 日志，默认为 false
     showLog = true
 }
 android{
@@ -79,21 +82,6 @@ android{
 
 >最新的版本请看上方的 Agent 和 Plugin 的版本名
 
-### 添加混淆
-
-如果你的项目开启了混淆，那么在你的 proguard-rules.pro 文件中添加如下配置
-
-```
--keep class * extends com.ft.sdk.garble.http.ResponseData{ *;}
--keep class com.ft.sdk.FTAutoTrack{*;}
--keep enum com.ft.sdk.FTAutoTrackType{*;}
--keep enum com.ft.sdk.FTSdk{*;}
--keep class com.ft.sdk.garble.utils.TrackLog{*;}
--keep class com.ft.sdk.nativelib.ExceptionHandler{*;}
--keep class com.ft.sdk.garble.FTExceptionHandler{*;}
-```
-> 注意：如果你的项目中开启了全埋点和流程图，那么需要将你的 Fragment 和 Activity 保持不被混淆，这样流程图中
-> 就会显示页面的真实名称，而不是混淆后的名称
 
 ## 配置
 
@@ -102,27 +90,24 @@ android{
 ####  DataFlux SDK 包含的功能说明
 
 |           方法名           |           含义            | 是否必须 |                                           注意                                           |
-|:-----------------------:|:-----------------------:|:----:|:--------------------------------------------------------------------------------------:|
-|       setUseOAID        | 是否使用OAID作为设备唯一识别号的替代字段  |  否   |                 默认不使用,开启后全埋点数据里将会添加一个 oaid 字段<br>[了解 OAID](#一关于-oaid)                  |
+|:-----------------------:|:-----------------------|:----:|:--------------------------------------------------------------------------------------|
+|       setUseOAID        | 是否使用OAID作为设备唯一识别号的替代字段  |  否   |                 默认不使用,开启后全会替代 deviceUUID 进行使用 [了解 OAID](#一关于-oaid)                  |
 |     setXDataKitUUID     |       设置数据采集端的名称        |  否   |                                  不设置该值系统会生成一个默认的 uuid                                  |
 |        setDebug         |        是否开启调试模式         |  否   |                                 默认不开启，开启后方可打印 SDK 运行日志                                 |
-|     setMonitorType      |          设置监控项          |  否   | 默认不开启任何监控项,<br>[关于监控项说明](#四监控配置项类-monitortype),<br>[关于监控项参数获取问题](#二关于监控项中有些参数获取不到问题说明) |
-|       metricsUrl        | FT-GateWay metrics 写入地址 |  是   |                                      必须配置，配置后才能上报                                      |
+|     setMonitorType      |                    |  否   |  |
+|       metricsUrl        |  metrics 写入地址 |  是   |                                      必须配置，配置后才能上报                                      |
 | setEnableTrackAppCrash | 是否开启 App 崩溃日志上报功能 | 否 | 默认不开启，开启后将上报当前应用的崩溃日志。上报成功后，可以在后台的日志模块查看对应的日志。<br /> [关于崩溃日志中混淆内容转换的问题](#五关于崩溃日志中混淆内容转换的问题)|
 | setEnableTrackAppANR | 是否开启 App ANR 检测 | 否 | 默认不开启，开启后上报 ANR 数据信息|
 | setServiceName | 设置崩溃日志的名称 | 否 | 默认为 dataflux sdk。你可以将你的应用名称设置给该字段，用来区分不同的日志 |
 | setEnv | 设置崩溃日志中显示的应用的环境 | 否 | 默认情况下会获取应用当前的环境。如：debug、release |
-| setSampleRate | 设置采集率 | 否 | 采集率的值范围为>=0、<=1，默认值为1。<br />说明：SDK 初始化是会随机生成一个0-1之间的随机数，当这个随机数小于你设置的采集率时，那么会上报当前设备的行为相关的埋点数据，否则就不会上报当前设备的行为埋点数据<br /> |
-| setTraceConsoleLog | 是否开启本地打印日志上报功能 | 否 | 当开启后会将应用中打印的日志上报到后台，日志等级对应关系<br />Log.v->ok;Log.i、Log.d->info;Log.e->error;Log.w->warning |
+| setSampleRate | 设置采集率 | 否 | 采集率的值范围为>=0、<=1，默认值为1。说明：SDK 初始化是会随机生成一个0-1之间的随机数，当这个随机数小于你设置的采集率时，那么会上报当前设备的行为相关的数据，否则就不会上报当前设备的行为数据<br /> |
+| setTraceConsoleLog | 是否开启本地打印日志上报功能 | 否 | 当开启后会将应用中打印的日志上报到后台，日志等级对应关系<br />Log.v -> ok;<br />Log.i、Log.d -> info;<br />Log.e -> error;<br />Log.w -> warning |
 | setNetworkTrace | 是否开启网络追踪功能| 否 | 开启后，可以在 web 中“日志”查看到对应日志的同时也可以在“链路追踪”中查找到对应的链路信息 |
 | setTraceType | 设置链路追踪所使用的类型。 | 否 |目前支持 Zipkin 和 Jaeger 两种，默认为 Zipkin |
 | setEventFlowLog | 设置是否开启页面事件的日志 | 否 | 可以在 web 版本日志中，查看到对应上报的日志，事件支持启动应用，进入页面，离开页面，事件点击等等 |
-| setOnlySupportMainProcess|设置是否只支持在主进程中初始化|否|默认是 true ，默认情况下 SDK 只能在主进程中运行。如果应用中存在多个进程，那么其他进程中将不会执行。如果需要在其他进程中执行需要将该字段设置为 true
-
-> FTAutoTrackType 自动埋点事件说明，事件总类目前支持3种：
-    FTAutoTrackType.APP_START：页面的开始事件，Activity 依赖的是其 onResume 方法，Fragment 依赖的是其 onResume 方法；
-    FTAutoTrackType.APP_END：页面的结束事件，Activity 依赖的是其 onPause 方法，Fragment 依赖的是其 onPause 方法；
-    FTAutoTrackType.APP_CLICK：控件的点击事件。
+| setOnlySupportMainProcess|设置是否只支持在主进程中初始化|否|默认是 true ，默认情况下 SDK 只能在主进程中运行。如果应用中存在多个进程，那么其他进程中将不会执行。如果需要在其他进程中执行需要将该字段设置为 true |
+| setLogCacheDiscardStrategy|设置频繁日志丢弃规则|否|默认为 LogCacheDiscard.DISCARD ，丢弃往后追加的数据 |
+| setRumAppId|设置 Rum AppId|否|对应设置 RUM appid，才会开启 RUM的采集功能，appId 需要从 DataFlux "应用监测" 创建应用获取 |
 
 
 ####  通过 FTSdk 安装配置项和绑定用户信息
@@ -137,8 +122,6 @@ android{
 |  bindUserData  |      绑定用户信息       |  否   |    |
 |    shutDown    |   关闭SDK中正在执行的操作   |  否   |                                       |
 
-#### 通过 FTLogger 类实现主动上报日志
-
 #### 示例代码
 
 ``` kotlin
@@ -151,12 +134,11 @@ class DemoAplication : Application() {
         ).setUseOAID(true)//是否使用OAID
             .setDebug(true)//是否开启Debug模式（开启后能查看调试数据）
             .setXDataKitUUID("ft-dataKit-uuid-001")
-            .setMonitorType(MonitorType.ALL)//设置监控项
-            .enableAutoTrack(true)//是否开启自动埋点
+            .setRumAppId("appIdxxxxxx")
             .setEnableTrackAppCrash(true)
             .setEnv(EnvType.GRAY)
             .setTraceType(TraceType.ZIPKIN)
-            .setTraceSamplingRate(0.5f);//自动埋点控件白名单
+            .setTraceSamplingRate(0.5f);//设置采样率
         FTSdk.install(ftSDKConfig)
         
 
@@ -177,6 +159,44 @@ unbind_user.setOnClickListener {
 }
 ```
 
+#### 通过 FTLogger 类实现主动上报日志
+方法说明表
+
+|      方法名       |        含义         | 是否必须 |                  注意                   |
+|:--------------:|:-----------------:|:----:|:-------------------------------------:|
+|    logBackground     |     自定义日志      |  否   |          日志过快会触发丢弃机制       |
+
+
+#### 示例代码
+``` kotlin
+//上传单个日志
+FTLogger.getInstance().logBackground("test", Status.INFO)
+
+//批量上传日志
+FTLogger.getInstance().logBackground(mutableListOf(LogData("test1",Status.INFO)))
+
+```
+
+### Proguard 混淆配置
+```
+-keep class ftnative.NativeHandler {
+    native <methods>;
+    void crashCallback(...);
+    void traceCallback(...);
+}
+-keep class ftnative.NativeCrash{
+ *;
+}
+
+-keep class ftnative.NativeCrash$InitParameters{
+ *;
+}
+
+-keep class com.bun.miitmdid.core.**{*;}
+-keep class * extends com.ft.sdk.garble.http.ResponseData{
+     *;
+}
+```
 
 ### 关于权限的配置
 DataFlux SDK 用到了系统的四个权限，分别为 READ_PHONE_STATE、WRITE_EXTERNAL_STORAGE、CAMERA、ACCESS_FINE_LOCATION
@@ -267,16 +287,6 @@ class FTSDKConfig{
      */
     public FTSDKConfig setDebug(boolean debug);
 
-
-    /**
-     * 设置监控类别
-     * @param monitorType 支持一项或者几项取或值
-     * 例如：MonitorType.BATTERY or MonitorType.MEMORY
-     * @return
-     */
-    public FTSDKConfig setMonitorType(int monitorType);
-
-
 }
 ```
 
@@ -292,14 +302,14 @@ public class MonitorType {
 
     //内存（内存总量、内存使用率）
     public static int MEMORY = 1<<2;
-
-    //CPU（CPU 型号、CPU 占用率、CPU 总频率、CPU 温度）
+	//CPU（CPU 占用率）
     public static int CPU = 1<<3;
+    //GPS 是否开启
+    public static int LOCATION = 1<<7;
     
     //蓝牙
     public static int BLUETOOTH = 1<<10;
-    
-    
+   
     //屏幕帧率
     public static int FPS = 1 << 19;
 }
@@ -360,6 +370,11 @@ packagingOptions {
 ```
 
 ##### 以上步骤配置完成后，在配置 FT SDK 时调用 FTSDKConfig 的 setUseOAID(true) 方法即可
+
+
+### HttpClient RUM 网络性能追踪问题
+
+目前 HttpClient 无法做到 RUM 网络请求的性能分析，目前只支持 okhttp3 做网络数据的追踪
 
 
 ### 关于崩溃日志中混淆内容转换的问题

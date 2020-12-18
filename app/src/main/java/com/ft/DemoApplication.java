@@ -43,13 +43,15 @@ public class DemoApplication extends Application {
                 .setEnableTrackAppANR(true)
                 .setEnableTrackAppUIBlock(true)
                 .setEnv(EnvType.GRAY)
-                .setTraceSamplingRate(1f)
+                .setSamplingRate(1f)
                 .setNetworkTrace(true)
                 .setTraceConsoleLog(true)
                 .setEventFlowLog(true)
-                .setTraceType(TraceType.SKYWALKING_V2)
+                .setTraceType(TraceType.ZIPKIN)
                 .setOnlySupportMainProcess(true);
         FTSdk.install(ftSDKConfig);
+
+        FTSdk.get().bindUserData("brandon.test.userid");
     }
 
 }

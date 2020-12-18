@@ -8,6 +8,7 @@ import com.ft.sdk.FTTrackInner;
 import com.ft.sdk.garble.FTRUMConfig;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.Status;
+import com.ft.sdk.garble.utils.Utils;
 
 
 public class FTUIBlockManager {
@@ -43,7 +44,7 @@ public class FTUIBlockManager {
                 FTAutoTrack.PutRUMuiBlock(log);
 
             } else {
-                LogBean logBean = new LogBean("------ UIBlock  ------\n " + log, System.currentTimeMillis());
+                LogBean logBean = new LogBean("------ UIBlock  ------\n " + log, Utils.getCurrentNanoTime());
                 logBean.setStatus(Status.CRITICAL);
                 logBean.setEnv(config.getEnv());
                 logBean.setServiceName(config.getServiceName());

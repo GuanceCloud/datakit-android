@@ -50,6 +50,7 @@ public class Constants {
     public static final String URL_MODEL_TRACK_INFLUX = "v1/write/metric";//指标数据上传路径
     public static final String URL_MODEL_RUM = "v1/write/rum";//
     public static final String URL_MODEL_LOG = "v1/write/logging";//日志数据上传路径
+    public static final String URL_MODEL_TRACING = "v1/write/tracing";//链路上传
     public static final String URL_MODEL_OBJECT = "v1/write/object";//对象数据上传路径
 
     public static final String DEFAULT_OBJECT_CLASS = "Mobile_Device";//默认的对象名
@@ -67,7 +68,7 @@ public class Constants {
     public static final String KEY_PAGE_EVENT_USER_NAME = "ud_name";
 
     public static final String KEY_RUM_USER_ID = "userid";
-    public static final String KEY_RUM_APP_ID = "appId";
+    public static final String KEY_RUM_APP_ID = "app_id";
 
     public static final String KEY_RUM_IS_SIGNIN = "is_signin";
 

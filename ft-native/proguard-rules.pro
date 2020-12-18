@@ -19,3 +19,23 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+-keep class ftnative.NativeHandler {
+    native <methods>;
+    void crashCallback(...);
+    void traceCallback(...);
+}
+
+-keep class ftnative.NativeCrash{
+ *;
+}
+
+-keep class ftnative.NativeCrash$InitParameters{
+ *;
+}
+
+
+-keep class com.ft.sdk.nativelib.**{
+ *;
+}
+
