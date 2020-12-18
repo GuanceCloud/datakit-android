@@ -690,7 +690,6 @@ public class SyncDataHelper {
     private static HashMap<String, Object> getBaseDeviceInfoTagsMap() {
         Context context = FTApplication.getApplication();
         HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put(Constants.KEY_DEVICE_OS_VERSION, DeviceUtils.getOSVersion());
         hashMap.put(Constants.KEY_APP_VERSION_NAME, Utils.getAppVersionName());
         hashMap.put(Constants.KEY_DEVICE_APPLICATION_ID, DeviceUtils.getApplicationId(context));
         hashMap.put(Constants.KEY_DEVICE_OS, DeviceUtils.getOSName());
@@ -702,14 +701,15 @@ public class SyncDataHelper {
 
     private static HashMap<String, Object> getRumEsPublicTags() {
         HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("terminal", "app");
-        hashMap.put("sdk_package_agent", FTSdk.AGENT_VERSION);
+        hashMap.put(Constants.KEY_RUM_TERMINAL, "app");
+        hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_AGENT, FTSdk.AGENT_VERSION);
         if (!FTSdk.PLUGIN_VERSION.isEmpty()) {
-            hashMap.put("sdk_package_track", FTSdk.PLUGIN_VERSION);
+            hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_TRACK, FTSdk.PLUGIN_VERSION);
         }
         if (!FTSdk.NATIVE_VERSION.isEmpty()) {
-            hashMap.put("sdk_package_native", FTSdk.NATIVE_VERSION);
+            hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_NATIVE, FTSdk.NATIVE_VERSION);
         }
+        hashMap.put(Constants.KEY_DEVICE_OS_VERSION, DeviceUtils.getOSVersion());
         return hashMap;
     }
 
