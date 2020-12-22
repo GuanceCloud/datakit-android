@@ -52,7 +52,7 @@ public class OaidTest extends BaseTest {
     public void oaidTest() {
         FTSdk.install(ftSDKConfig);
         String oaid = OaidUtils.getOAID(context);
-        if (TestUtils.isEmulator()) {
+        if (!TestUtils.isEmulator()) {
             Assert.assertFalse(Utils.isNullOrEmpty(oaid));
         } else {
             Log.d(TAG,"OAID  unavailable in Emulator");
