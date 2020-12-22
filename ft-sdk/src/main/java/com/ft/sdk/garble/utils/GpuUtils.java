@@ -27,7 +27,7 @@ public class GpuUtils {
     /**
      * GPU 供应商，型号
      */
-    public static String GPU_VENDOR_RENDERER = null;
+    public static String GPU_VENDOR_RENDERER = "";
 
     /**
      * 获得GPU使用率

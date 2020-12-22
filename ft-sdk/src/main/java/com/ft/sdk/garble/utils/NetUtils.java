@@ -344,7 +344,7 @@ public class NetUtils {
         if (!TextUtils.isEmpty(proxyAddress) && (proxyPort != -1)) {
             return proxyAddress + ":" + proxyPort;
         } else {
-            return null;
+            return "";
         }
     }
 

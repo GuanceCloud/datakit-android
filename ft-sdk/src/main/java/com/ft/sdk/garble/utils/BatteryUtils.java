@@ -52,7 +52,7 @@ public class BatteryUtils {
             e.printStackTrace();
         }
         if (batteryCapacity == 0) {
-            return null;
+            return "";
         }
         return batteryCapacity + "mAh";
     }

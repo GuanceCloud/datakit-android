@@ -24,7 +24,7 @@ import java.util.Set;
 public class BluetoothUtils {
     public static final String TAG = "BluetoothUtils";
     private static BluetoothUtils instance;
-    private Context mContext = FTApplication.getApplication();
+    private final Context mContext = FTApplication.getApplication();
     String bluetoothMacAddress;
 
     private BluetoothUtils() {
@@ -42,7 +42,7 @@ public class BluetoothUtils {
         if(bluetoothAdapter != null)
             return bluetoothAdapter.getName();
         else
-            return null;
+            return "";
     }
 
     public boolean isOpen() {

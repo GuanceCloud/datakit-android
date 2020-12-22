@@ -159,7 +159,7 @@ public class DeviceUtils {
      */
     @SuppressLint("MissingPermission")
     public static String getImei(Context context) {
-        String imei = null;
+        String imei = "";
         try {
             if (!Utils.hasPermission(context, Manifest.permission.READ_PHONE_STATE)) {
                 return imei;

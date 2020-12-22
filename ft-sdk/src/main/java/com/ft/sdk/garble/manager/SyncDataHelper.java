@@ -207,23 +207,19 @@ public class SyncDataHelper {
             String key = Utils.translateTagKeyValue(keyTemp);
             sb.append(key);
             sb.append("=");
-            if (value == null) {
+            if (value == null || "".equals(value) || JSONObject.NULL.equals(value)) {
                 addQuotationMarks(sb, UNKNOWN, !isTag);
             } else {
-                if ("".equals(value)) {
-                    addQuotationMarks(sb, UNKNOWN, !isTag);
-                } else {
-                    if (value instanceof Float) {
-                        sb.append(Utils.formatDouble((float) value));
-                    } else if (value instanceof Double) {
-                        sb.append(Utils.formatDouble((double) value));
-                    } else if (value instanceof Boolean) {
-                        sb.append(value);
-                    } else if (value instanceof Long || value instanceof Integer) {
-                        sb.append(value).append(isTag ? "" : "i");
-                    } else {// String or Others
-                        addQuotationMarks(sb, (String) value, !isTag);
-                    }
+                if (value instanceof Float) {
+                    sb.append(Utils.formatDouble((float) value));
+                } else if (value instanceof Double) {
+                    sb.append(Utils.formatDouble((double) value));
+                } else if (value instanceof Boolean) {
+                    sb.append(value);
+                } else if (value instanceof Long || value instanceof Integer) {
+                    sb.append(value).append(isTag ? "" : "i");
+                } else {// String or Others
+                    addQuotationMarks(sb, String.valueOf(value), !isTag);
                 }
             }
             sb.append(",");

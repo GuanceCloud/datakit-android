@@ -70,14 +70,14 @@ public class FTAliasConfig {
      */
     public String getVtpDesc(String vtp) {
         if (!pageVtpAlias) {
-            return null;
+            return "";
         }
         if (eventAliasMap == null) {
-            return null;
+            return "";
         }
         String vtpDesc = eventAliasMap.get(vtp);
         if (Utils.isNullOrEmpty(vtpDesc)) {
-            return null;
+            return "";
         } else {
             return vtpDesc;
         }
@@ -91,14 +91,14 @@ public class FTAliasConfig {
      */
     public String getPageDesc(String page) {
         if (!pageVtpAlias) {
-            return null;
+            return "";
         }
         if (pageAliasMap == null) {
-            return null;
+            return "";
         }
         String pageDesc = pageAliasMap.get(page);
         if (Utils.isNullOrEmpty(pageDesc)) {
-            return null;
+            return "";
         } else {
             return pageDesc;
         }
