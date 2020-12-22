@@ -57,7 +57,7 @@ public class FTUserConfig {
      * 创建一个新的用户SessionID
      */
     public void createNewSessionId() {
-        sessionId = "ft.rd_"+UUID.randomUUID().toString();
+        sessionId = "ft.rd_" + UUID.randomUUID().toString();
         SharedPreferences sp = Utils.getSharedPreferences(FTApplication.getApplication());
         sp.edit().putString(Constants.FT_USER_SESSION_ID, sessionId).apply();
     }
@@ -136,6 +136,7 @@ public class FTUserConfig {
             sp.edit().remove(Constants.FT_USER_USER_ID).apply();
             sp.edit().remove(Constants.FT_USER_USER_NAME).apply();
             sp.edit().remove(Constants.FT_USER_USER_EXT).apply();
+            mUserData = null;
         }
     }
 

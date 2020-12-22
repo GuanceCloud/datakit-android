@@ -37,7 +37,7 @@ public class LogTest extends BaseTest {
     FTSDKConfig ftsdkConfig;
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         if (!hasPrepare) {
             Looper.prepare();
             hasPrepare = true;

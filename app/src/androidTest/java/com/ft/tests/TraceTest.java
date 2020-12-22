@@ -60,7 +60,6 @@ public class TraceTest extends BaseTest {
         context = MockApplication.getContext();
         ftsdkConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL))
                 .setXDataKitUUID("ft-dataKit-uuid-001")
-                .setSamplingRate(1)
                 .setNetworkTrace(true);
     }
 
@@ -134,8 +133,8 @@ public class TraceTest extends BaseTest {
     }
 
     @Test
-    public void traceHttpClientPostTest() throws IOException, InterruptedException, ParseException {
-        startSyncTask();
+    public void traceHttpClientPostTest() throws Exception {
+        resumeSyncTask();
         FTSdk.install(ftsdkConfig);
         FTHttpClientInterceptor interceptor = new FTHttpClientInterceptor();
         CloseableHttpClient httpClient = HttpClients.custom()

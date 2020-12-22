@@ -19,7 +19,7 @@ import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
-import com.ft.sdk.garble.manager.FTExceptionHandler;
+import com.ft.sdk.FTExceptionHandler;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -49,7 +49,7 @@ public class ErrorTraceTest extends BaseTest {
     FTSDKConfig ftSDKConfig;
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         if (!hasPrepare) {
             Looper.prepare();
             hasPrepare = true;
@@ -59,7 +59,6 @@ public class ErrorTraceTest extends BaseTest {
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setDebug(true)//设置是否是 debug
                 .setEnv(EnvType.GRAY)
-                .setSamplingRate(0.5f)
                 .setOnlySupportMainProcess(true);
         //关闭数据自动同步操作
 //        SyncTaskManager.get().setRunning(true);

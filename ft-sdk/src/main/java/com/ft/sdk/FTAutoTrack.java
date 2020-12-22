@@ -28,7 +28,6 @@ import com.ft.sdk.garble.bean.CrashType;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.ResourceBean;
-import com.ft.sdk.garble.manager.FTActivityManager;
 import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.BluetoothUtils;
 import com.ft.sdk.garble.utils.Constants;

@@ -47,7 +47,7 @@ public class LogEventTest extends BaseTest {
     FTSDKConfig ftSDKConfig;
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         if (!hasPrepare) {
             Looper.prepare();
             hasPrepare = true;
@@ -58,7 +58,6 @@ public class LogEventTest extends BaseTest {
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setUseOAID(true)//设置 OAID 是否可用
                 .setDebug(true)//设置是否是 debug
-                .setSamplingRate(0.5f)
                 .setNetworkTrace(true)
                 .setEventFlowLog(true);
         //关闭数据自动同步操作

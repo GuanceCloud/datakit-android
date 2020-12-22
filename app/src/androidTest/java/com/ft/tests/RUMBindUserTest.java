@@ -30,20 +30,21 @@ import static org.junit.Assert.assertEquals;
  * Description: 用户绑定与解绑测试类
  */
 @RunWith(AndroidJUnit4.class)
-public class BindUserTest extends BaseTest {
+public class RUMBindUserTest extends BaseTest {
     Context context = null;
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         if (!hasPrepare) {
             Looper.prepare();
             hasPrepare = true;
         }
-        startSyncTask();
+        resumeSyncTask();
         FTDBManager.get().delete();
 
         context = MockApplication.getContext();
-        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL))
+        FTSDKConfig ftSDKConfig = FTSDKConfig
+                .builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL))
                 .setDebug(true);
         FTSdk.install(ftSDKConfig);
     }
@@ -74,29 +75,8 @@ public class BindUserTest extends BaseTest {
         assertEquals(0, recordDataList.size());
     }
 
-    /**
-     * 先解绑用户，在绑定用户
-     *
-     * @throws InterruptedException
-     */
-    @Test
-    public void unbindAndBindDataSync() throws InterruptedException, JSONException {
-        FTSdk.get().unbindUserData();
-        Thread.sleep(5000);
-        bindUserData();
-        simpleTrackData();
-        Thread.sleep(15000);
-        List<SyncJsonData> recordDataList1 = FTDBManager.get().queryDataByDescLimit(0);
-        assertEquals(0, recordDataList1.size());
-    }
 
     private void bindUserData() {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("sex", "man");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
         FTSdk.get().bindUserData("123456");
     }
 }

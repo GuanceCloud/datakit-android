@@ -1,4 +1,4 @@
-package com.ft.sdk.garble.manager;
+package com.ft.sdk;
 
 import android.app.Activity;
 import android.app.Application;
@@ -7,7 +7,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.ft.sdk.FTAutoTrack;
 import com.ft.sdk.garble.FTFragmentManager;
 import com.ft.sdk.garble.FTRUMConfig;
 import com.ft.sdk.garble.bean.AppState;

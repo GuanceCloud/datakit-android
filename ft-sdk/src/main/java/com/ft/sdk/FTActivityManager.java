@@ -1,11 +1,10 @@
-package com.ft.sdk.garble.manager;
+package com.ft.sdk;
 
 
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 
-import com.ft.sdk.FTApplication;
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.utils.LogUtils;
 
@@ -18,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * DATE:2019-12-06 13:36
  * Description: Activity 管理类
  */
-public class FTActivityManager {
+public final class FTActivityManager {
     public final static String TAG = "FTActivityManager";
     public ConcurrentHashMap<String, Boolean> isFirstResume;
     private static volatile FTActivityManager instance;

@@ -1,7 +1,6 @@
 
-package com.ft.sdk.garble.manager;
+package com.ft.sdk;
 
-import com.ft.sdk.FTTrackInner;
 import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.bean.BaseContentBean;
 import com.ft.sdk.garble.bean.DataType;

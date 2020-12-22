@@ -42,7 +42,7 @@ public class BluetoothUtils {
         if(bluetoothAdapter != null)
             return bluetoothAdapter.getName();
         else
-            return Constants.UNKNOWN;
+            return null;
     }
 
     public boolean isOpen() {

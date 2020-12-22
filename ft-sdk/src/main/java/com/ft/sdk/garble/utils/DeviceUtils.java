@@ -159,7 +159,7 @@ public class DeviceUtils {
      */
     @SuppressLint("MissingPermission")
     public static String getImei(Context context) {
-        String imei = Constants.UNKNOWN;
+        String imei = null;
         try {
             if (!Utils.hasPermission(context, Manifest.permission.READ_PHONE_STATE)) {
                 return imei;
@@ -231,6 +231,7 @@ public class DeviceUtils {
         return Build.MODEL;
     }
 
+
     /**
      * 获得设备分辨率
      *
@@ -287,7 +288,7 @@ public class DeviceUtils {
     public static String getHardWare() {
         String result = Build.HARDWARE;
         if (Utils.isNullOrEmpty(result)) {
-            return Constants.UNKNOWN;
+            return null;
         }
         return result;
     }
@@ -333,7 +334,7 @@ public class DeviceUtils {
                             if (telephonyManager.getSimState() == TelephonyManager.SIM_STATE_READY) {
                                 alternativeName = telephonyManager.getSimOperatorName();
                             } else {
-                                alternativeName = Constants.UNKNOWN;
+                                alternativeName = null;
                             }
                         }
                         if (!TextUtils.isEmpty(operator)) {
@@ -349,7 +350,7 @@ public class DeviceUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return Constants.UNKNOWN;
+        return null;
     }
 
     /**

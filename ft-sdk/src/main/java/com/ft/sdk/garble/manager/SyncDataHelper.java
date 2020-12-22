@@ -247,8 +247,6 @@ public class SyncDataHelper {
     private String composeUpdateData(SyncJsonData data) {
         StringBuilder sb = new StringBuilder();
         String jsonString = data.getDataString();
-        ;
-
         if (jsonString != null) {
             try {
                 JSONObject opJson = new JSONObject(jsonString);
@@ -454,7 +452,7 @@ public class SyncDataHelper {
             if (networkType == 1) {
                 tags.put(Constants.KEY_NETWORK_TYPE, "Wi-Fi");
             } else if (networkType == 0) {
-                tags.put(Constants.KEY_NETWORK_TYPE, UNKNOWN);
+                tags.put(Constants.KEY_NETWORK_TYPE, null);
             } else {
                 tags.put(Constants.KEY_NETWORK_TYPE, "蜂窝网络");
             }
@@ -521,9 +519,9 @@ public class SyncDataHelper {
                 tags.put(Constants.KEY_LOCATION_CITY, address.getLocality());
                 tags.put(Constants.KEY_LOCATION_COUNTRY, address.getCountryName());
             } else {
-                tags.put(Constants.KEY_LOCATION_PROVINCE, Constants.UNKNOWN);
-                tags.put(Constants.KEY_LOCATION_CITY, Constants.UNKNOWN);
-                tags.put(Constants.KEY_LOCATION_COUNTRY, Constants.UNKNOWN);
+                tags.put(Constants.KEY_LOCATION_PROVINCE, null);
+                tags.put(Constants.KEY_LOCATION_CITY, null);
+                tags.put(Constants.KEY_LOCATION_COUNTRY, null);
             }
 
             if (location != null) {

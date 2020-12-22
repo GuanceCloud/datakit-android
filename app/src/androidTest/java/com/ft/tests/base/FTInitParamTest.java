@@ -11,8 +11,9 @@ import com.ft.sdk.EnvType;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTrack;
+import com.ft.sdk.garble.FTRUMConfig;
 import com.ft.sdk.garble.manager.AsyncCallback;
-import com.ft.sdk.garble.manager.FTExceptionHandler;
+import com.ft.sdk.FTExceptionHandler;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -87,6 +88,16 @@ public class FTInitParamTest extends BaseTest {
         urlParamTest(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL), 200);
     }
 
+    @Test
+    public void rumAppId() {
+        String appid = "appIdxxxxxx";
+        FTSDKConfig ftSDKConfig = getDefaultConfig()
+                .setRumAppId(appid);
+        FTSdk.install(ftSDKConfig);
+        Assert.assertEquals(appid, FTRUMConfig.get().getAppId());
+        Assert.assertTrue(FTRUMConfig.get().isRumEnable());
+    }
+
 
     private void uuidParamTest(String uuid, int expected) throws JSONException, InterruptedException {
         FTSDKConfig ftSDKConfig = getDefaultConfig()
@@ -134,8 +145,7 @@ public class FTInitParamTest extends BaseTest {
     }
 
     private FTSDKConfig getDefaultConfig() {
-        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL)
+        return FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL)
         );
-        return ftSDKConfig;
     }
 }

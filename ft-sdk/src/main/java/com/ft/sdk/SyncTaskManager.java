@@ -1,4 +1,4 @@
-package com.ft.sdk.garble.manager;
+package com.ft.sdk;
 
 import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.bean.DataType;
@@ -8,6 +8,8 @@ import com.ft.sdk.garble.http.FTResponseData;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.http.RequestMethod;
+import com.ft.sdk.garble.manager.AsyncCallback;
+import com.ft.sdk.garble.manager.SyncDataHelper;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
@@ -59,7 +61,7 @@ public class SyncTaskManager {
     /**
      * 触发延迟轮询同步
      */
-    public void executeSyncPoll() {
+    void executeSyncPoll() {
         synchronized (this) {
             if (running) {
                 return;

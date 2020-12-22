@@ -18,7 +18,7 @@ import com.ft.sdk.garble.FTAutoTrackConfig;
 import com.ft.sdk.garble.FTFlowConfig;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
-import com.ft.sdk.garble.manager.FTExceptionHandler;
+import com.ft.sdk.FTExceptionHandler;
 import com.ft.sdk.garble.utils.NetUtils;
 
 import org.junit.Assert;
@@ -52,7 +52,6 @@ public class SDKRunStateTest extends BaseTest {
                 .setMonitorType(MonitorType.ALL)//设置监控项
                 .setEnableTrackAppCrash(true)
                 .setEnv(EnvType.GRAY)
-                .setSamplingRate(0.5f)
                 .setNetworkTrace(true)
                 .setTraceConsoleLog(true)
                 .setEventFlowLog(true)

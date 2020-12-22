@@ -3,10 +3,15 @@ package com.ft.tests;
 import android.content.Context;
 import android.os.Looper;
 
+import androidx.test.espresso.action.ViewActions;
+import androidx.test.espresso.matcher.ViewMatchers;
+import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.ft.AccountUtils;
 import com.ft.BaseTest;
+import com.ft.DebugMainActivity;
+import com.ft.R;
 import com.ft.application.MockApplication;
 import com.ft.sdk.EnvType;
 import com.ft.sdk.FTLogger;
@@ -14,6 +19,7 @@ import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTrack;
 import com.ft.sdk.MonitorType;
+import com.ft.sdk.SyncTaskManager;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.Status;
@@ -21,7 +27,6 @@ import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.manager.AsyncCallback;
 import com.ft.sdk.garble.manager.SyncDataHelper;
-import com.ft.sdk.garble.manager.SyncTaskManager;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.utils.RequestUtil;
 
@@ -29,12 +34,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.reflect.Whitebox;
 
 import java.util.List;
 
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
 import static com.ft.AllTests.hasPrepare;
 
 /**
@@ -43,11 +51,15 @@ import static com.ft.AllTests.hasPrepare;
  * description:
  */
 @RunWith(AndroidJUnit4.class)
-public class LogTrackObjectTraceTest extends BaseTest {
+public class LogTrackObjectTraceRUMTest extends BaseTest {
     Context context;
 
+    @Rule
+    public ActivityScenarioRule<DebugMainActivity> rule = new ActivityScenarioRule<>(DebugMainActivity.class);
+
+
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         if (!hasPrepare) {
             Looper.prepare();
             hasPrepare = true;
@@ -62,8 +74,8 @@ public class LogTrackObjectTraceTest extends BaseTest {
                 .setMonitorType(MonitorType.ALL)//设置监控项
                 .setEnableTrackAppCrash(true)
                 .setEnv(EnvType.GRAY)
-                .setSamplingRate(1f)
                 .setNetworkTrace(true)
+                .setRumAppId(AccountUtils.getProperty(context, AccountUtils.RUM_APP_ID))
                 .setTraceConsoleLog(true)
                 .setEventFlowLog(true)
                 .setTraceType(TraceType.ZIPKIN)
@@ -109,31 +121,14 @@ public class LogTrackObjectTraceTest extends BaseTest {
      * @throws InterruptedException
      */
     @Test
-    public void logSyncTest() throws InterruptedException {
-        startSyncTask();
+    public void logSyncTest() throws Exception {
+        resumeSyncTask();
         FTLogger.getInstance().logBackground("----logUploadTest----", Status.CRITICAL);
         Thread.sleep(12000);
         int except = countInDB(DataType.LOG, "----logUploadTest----");
         Assert.assertEquals(0, except);
     }
 
-    /**
-     * 插入一条 track 数据测试
-     *
-     * @throws InterruptedException
-     * @throws JSONException
-     */
-    @Test
-    public void trackInsertDataTest() throws InterruptedException, JSONException {
-        JSONObject tags = new JSONObject();
-        tags.put("testTag", "tagTest");
-        JSONObject fields = new JSONObject();
-        fields.put("testField", "----trackInsertDataTest----");
-        FTTrack.getInstance().trackBackground("TestLog", tags, fields);
-        Thread.sleep(5000);
-        int except = countInDB(DataType.TRACK, "----trackInsertDataTest----");
-        Assert.assertEquals(1, except);
-    }
 
     /**
      * 数据存储过程中，浮点型是否会变为整型
@@ -178,62 +173,69 @@ public class LogTrackObjectTraceTest extends BaseTest {
      * @throws JSONException
      */
     @Test
-    public void trackSyncTest() throws InterruptedException, JSONException {
-        startSyncTask();
-        JSONObject tags = new JSONObject();
-        tags.put("testTag", "tagTest");
-        JSONObject fields = new JSONObject();
-        fields.put("testField", "----trackUploadTest----");
-        FTTrack.getInstance().trackBackground("TestLog", tags, fields);
+    public void trackSyncTest() throws Exception {
+        simpleTrackData();
+        Thread.sleep(5000);
+        int except1 = countInDB(DataType.TRACK, CONTENT_SIMPLE_TEST);
+        Assert.assertTrue(except1 > 0);
+        resumeSyncTask();
+        executeSyncTask();
         Thread.sleep(12000);
-        int except = countInDB(DataType.TRACK, "----trackUploadTest----");
-        Assert.assertEquals(0, except);
+        int except2 = countInDB(DataType.TRACK, CONTENT_SIMPLE_TEST);
+        Assert.assertEquals(0, except2);
     }
 
-//    /**
-//     * 插入一条 object 数据测试
-//     *
-//     * @throws InterruptedException
-//     * @throws JSONException
-//     */
-//    @Test
-//    public void objectInsertDataTest() throws InterruptedException, JSONException {
-//        ObjectBean objectBean = new ObjectBean("objectTest");
-//        FTTrackInner.getInstance().objectBackground(objectBean);
-//        Thread.sleep(5000);
-//        int except = countInDB(DataType.OBJECT, "objectTest");
-//        Assert.assertEquals(1, except);
-//    }
-//
-//    /**
-//     * 上传一条 object 数据测试
-//     *
-//     * @throws InterruptedException
-//     * @throws JSONException
-//     */
-//    @Test
-//    public void objectUploadDataTest() throws InterruptedException, JSONException {
-//        ObjectBean objectBean = new ObjectBean("objectTest");
-//        FTTrackInner.getInstance().objectBackground(objectBean);
-//        Thread.sleep(5000);
-//        uploadData(DataType.OBJECT);
-//    }
-//
-//    /**
-//     * 同步删除测试
-//     *
-//     * @throws InterruptedException
-//     * @throws JSONException
-//     */
-//    @Test
-//    public void objectSyncTest() throws InterruptedException, JSONException {
-//        startSyncTask();
-//        ObjectBean objectBean = new ObjectBean("objectTest");
-//        FTTrackInner.getInstance().objectBackground(objectBean);
-//        Thread.sleep(12000);
-//        int except = countInDB(DataType.OBJECT, "objectTest");
-//        Assert.assertEquals(0, except);
-//    }
+    @Test
+    public void rumEsTest() throws Exception {
+        onView(ViewMatchers.withId(R.id.view_loop_test)).perform(ViewActions.scrollTo()).perform(click());
+        Thread.sleep(5000);
+        int except1 = countInDB(DataType.RUM_ES, Constants.FT_MEASUREMENT_RUM_ES_VIEW);
+        Assert.assertTrue(except1 > 0);
+        resumeSyncTask();
+        executeSyncTask();
+        Thread.sleep(12000);
+        int except2 = countInDB(DataType.RUM_ES, Constants.FT_MEASUREMENT_RUM_ES_VIEW);
+        Assert.assertEquals(0, except2);
+    }
+
+    @Test
+    public void rumInfluxTestTest() throws Exception {
+        onView(ViewMatchers.withId(R.id.view_loop_test)).perform(ViewActions.scrollTo()).perform(click());
+        Thread.sleep(5000);
+        int except1 = countInDB(DataType.RUM_INFLUX, Constants.FT_MEASUREMENT_RUM_INFLUX_APP_VIEW);
+        Assert.assertTrue(except1 > 0);
+        resumeSyncTask();
+        executeSyncTask();
+        Thread.sleep(12000);
+        int except2 = countInDB(DataType.RUM_ES, Constants.FT_MEASUREMENT_RUM_INFLUX_APP_VIEW);
+        Assert.assertEquals(0, except2);
+
+    }
+
+    @Test
+    public void rumUserBindTest() throws InterruptedException {
+        FTSdk.get().bindUserData("123456");
+        onView(ViewMatchers.withId(R.id.view_loop_test)).perform(ViewActions.scrollTo()).perform(click());
+        Thread.sleep(5000);
+        int except1 = countInDB(DataType.RUM_INFLUX, "\"is_signin\":\"T\"");
+        int except2 = countInDB(DataType.RUM_ES, "\"is_signin\":\"T\"");
+        Assert.assertTrue(except1 > 0);
+        Assert.assertTrue(except2 > 0);
+
+
+    }
+
+    @Test
+    public void rumUserUnBindTest() throws InterruptedException {
+        FTSdk.get().bindUserData("123456");
+        FTSdk.get().unbindUserData();
+        onView(ViewMatchers.withId(R.id.view_loop_test)).perform(ViewActions.scrollTo()).perform(click());
+        Thread.sleep(5000);
+        int except3 = countInDB(DataType.RUM_INFLUX, "\"is_signin\":\"T\"");
+        int except4 = countInDB(DataType.RUM_ES, "\"is_signin\":\"T\"");
+        Assert.assertEquals(0, except3);
+        Assert.assertEquals(0, except4);
+    }
 
     /**
      * trace 一个正常的网络
@@ -242,7 +244,7 @@ public class LogTrackObjectTraceTest extends BaseTest {
      * @throws InterruptedException
      */
     @Test
-    public void traceUploadNormalTest() throws JSONException, InterruptedException {
+    public void traceUploadNormalTest() throws Exception {
         traceDataTest("http://www.weather.com.cn/data/sk/101010100.html", "www.weather.com.cn");
     }
 
@@ -253,7 +255,7 @@ public class LogTrackObjectTraceTest extends BaseTest {
      * @throws InterruptedException
      */
     @Test
-    public void traceUploadTimeOutTest() throws JSONException, InterruptedException {
+    public void traceUploadTimeOutTest() throws Exception {
         traceDataTest("https://www.google.com", "www.google.com");
     }
 
@@ -264,7 +266,7 @@ public class LogTrackObjectTraceTest extends BaseTest {
      * @throws InterruptedException
      */
     @Test
-    public void traceUploadErrorTest() throws JSONException, InterruptedException {
+    public void traceUploadErrorTest() throws Exception {
         traceDataTest("https://error.url", "error.url");
     }
 
@@ -274,14 +276,14 @@ public class LogTrackObjectTraceTest extends BaseTest {
      * @throws JSONException
      * @throws InterruptedException
      */
-    private void traceDataTest(String url, String except) throws JSONException, InterruptedException {
+    private void traceDataTest(String url, String except) throws Exception {
         RequestUtil.requestUrl(url);
         Thread.sleep(5000);
-        int except1 = countInDB(DataType.LOG, except);
-        startSyncTask();
-        FTLogger.getInstance().logBackground("----traceDataTest----", Status.CRITICAL);
+        resumeSyncTask();
+        executeSyncTask();
+        int except1 = countInDB(DataType.TRACE, except);
         Thread.sleep(12000);
-        int except2 = countInDB(DataType.LOG, except);
+        int except2 = countInDB(DataType.TRACE, except);
         Assert.assertTrue(except1 > 0);
         Assert.assertEquals(0, except2);
     }
@@ -292,18 +294,7 @@ public class LogTrackObjectTraceTest extends BaseTest {
      * @param dataType
      */
     private void uploadData(DataType dataType) {
-        List<SyncJsonData> recordDataList = null;
-        switch (dataType) {
-            case OBJECT:
-                recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.OBJECT);
-                break;
-            case LOG:
-                recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.LOG);
-                break;
-            case TRACK:
-                recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.TRACK);
-                break;
-        }
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, dataType);
         SyncDataHelper syncDataManager = new SyncDataHelper();
         String body = syncDataManager.getBodyContent(dataType, recordDataList);
         body = body.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION).replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK);
@@ -323,31 +314,12 @@ public class LogTrackObjectTraceTest extends BaseTest {
      * @return
      */
     private int countInDB(DataType type, String target) {
-        List<SyncJsonData> recordDataList = null;
-        switch (type) {
-            case OBJECT:
-                recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.OBJECT);
-                break;
-            case LOG:
-                recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.LOG);
-                break;
-            case TRACK:
-                recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.TRACK);
-                break;
-        }
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, type);
         int except = 0;
         if (recordDataList != null) {
             for (SyncJsonData data : recordDataList) {
-                if (type.equals(DataType.TRACK)) {
-                    if (data.getDataString().contains(target)) {
-                        except++;
-                    }
-
-                } else {
-                    if (data.getDataString().contains(target)) {
-                        except++;
-                    }
-
+                if (data.getDataString().contains(target)) {
+                    except++;
                 }
             }
         }
