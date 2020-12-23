@@ -207,23 +207,19 @@ public class SyncDataHelper {
             String key = Utils.translateTagKeyValue(keyTemp);
             sb.append(key);
             sb.append("=");
-            if (value == null) {
+            if (value == null || "".equals(value) || JSONObject.NULL.equals(value)) {
                 addQuotationMarks(sb, UNKNOWN, !isTag);
             } else {
-                if ("".equals(value)) {
-                    addQuotationMarks(sb, UNKNOWN, !isTag);
-                } else {
-                    if (value instanceof Float) {
-                        sb.append(Utils.formatDouble((float) value));
-                    } else if (value instanceof Double) {
-                        sb.append(Utils.formatDouble((double) value));
-                    } else if (value instanceof Boolean) {
-                        sb.append(value);
-                    } else if (value instanceof Long || value instanceof Integer) {
-                        sb.append(value).append(isTag ? "" : "i");
-                    } else {// String or Others
-                        addQuotationMarks(sb, (String) value, !isTag);
-                    }
+                if (value instanceof Float) {
+                    sb.append(Utils.formatDouble((float) value));
+                } else if (value instanceof Double) {
+                    sb.append(Utils.formatDouble((double) value));
+                } else if (value instanceof Boolean) {
+                    sb.append(value);
+                } else if (value instanceof Long || value instanceof Integer) {
+                    sb.append(value).append(isTag ? "" : "i");
+                } else {// String or Others
+                    addQuotationMarks(sb, String.valueOf(value), !isTag);
                 }
             }
             sb.append(",");
@@ -247,8 +243,6 @@ public class SyncDataHelper {
     private String composeUpdateData(SyncJsonData data) {
         StringBuilder sb = new StringBuilder();
         String jsonString = data.getDataString();
-        ;
-
         if (jsonString != null) {
             try {
                 JSONObject opJson = new JSONObject(jsonString);
@@ -454,7 +448,7 @@ public class SyncDataHelper {
             if (networkType == 1) {
                 tags.put(Constants.KEY_NETWORK_TYPE, "Wi-Fi");
             } else if (networkType == 0) {
-                tags.put(Constants.KEY_NETWORK_TYPE, UNKNOWN);
+                tags.put(Constants.KEY_NETWORK_TYPE, null);
             } else {
                 tags.put(Constants.KEY_NETWORK_TYPE, "蜂窝网络");
             }
@@ -521,9 +515,9 @@ public class SyncDataHelper {
                 tags.put(Constants.KEY_LOCATION_CITY, address.getLocality());
                 tags.put(Constants.KEY_LOCATION_COUNTRY, address.getCountryName());
             } else {
-                tags.put(Constants.KEY_LOCATION_PROVINCE, Constants.UNKNOWN);
-                tags.put(Constants.KEY_LOCATION_CITY, Constants.UNKNOWN);
-                tags.put(Constants.KEY_LOCATION_COUNTRY, Constants.UNKNOWN);
+                tags.put(Constants.KEY_LOCATION_PROVINCE, null);
+                tags.put(Constants.KEY_LOCATION_CITY, null);
+                tags.put(Constants.KEY_LOCATION_COUNTRY, null);
             }
 
             if (location != null) {
@@ -690,7 +684,6 @@ public class SyncDataHelper {
     private static HashMap<String, Object> getBaseDeviceInfoTagsMap() {
         Context context = FTApplication.getApplication();
         HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put(Constants.KEY_DEVICE_OS_VERSION, DeviceUtils.getOSVersion());
         hashMap.put(Constants.KEY_APP_VERSION_NAME, Utils.getAppVersionName());
         hashMap.put(Constants.KEY_DEVICE_APPLICATION_ID, DeviceUtils.getApplicationId(context));
         hashMap.put(Constants.KEY_DEVICE_OS, DeviceUtils.getOSName());
@@ -702,14 +695,15 @@ public class SyncDataHelper {
 
     private static HashMap<String, Object> getRumEsPublicTags() {
         HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("terminal", "app");
-        hashMap.put("sdk_package_agent", FTSdk.AGENT_VERSION);
+        hashMap.put(Constants.KEY_RUM_TERMINAL, "app");
+        hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_AGENT, FTSdk.AGENT_VERSION);
         if (!FTSdk.PLUGIN_VERSION.isEmpty()) {
-            hashMap.put("sdk_package_track", FTSdk.PLUGIN_VERSION);
+            hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_TRACK, FTSdk.PLUGIN_VERSION);
         }
         if (!FTSdk.NATIVE_VERSION.isEmpty()) {
-            hashMap.put("sdk_package_native", FTSdk.NATIVE_VERSION);
+            hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_NATIVE, FTSdk.NATIVE_VERSION);
         }
+        hashMap.put(Constants.KEY_DEVICE_OS_VERSION, DeviceUtils.getOSVersion());
         return hashMap;
     }
 

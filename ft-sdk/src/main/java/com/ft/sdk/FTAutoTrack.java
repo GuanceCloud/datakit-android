@@ -28,7 +28,6 @@ import com.ft.sdk.garble.bean.CrashType;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.ResourceBean;
-import com.ft.sdk.garble.manager.FTActivityManager;
 import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.BluetoothUtils;
 import com.ft.sdk.garble.utils.Constants;
@@ -751,12 +750,12 @@ public class FTAutoTrack {
         try {
             JSONObject tags = getRUMPublicTags();
             JSONObject fields = new JSONObject();
-            tags.put("app_startup_type", isCold ? "cold" : "hot");
-            tags.put("app_apdex_level", getAppApdexLevel(duration));
+            tags.put(Constants.KEY_RUM_APP_STARTUP_TYPE, isCold ? "cold" : "hot");
+            tags.put(Constants.KEY_RUM_APP_APDEX_LEVEL, getAppApdexLevel(duration));
 
-            fields.put("app_startup_duration", duration);
+            fields.put(Constants.KEY_RUM_APP_STARTUP_DURATION, duration);
             FTTrackInner.getInstance().rumInflux(time,
-                    Constants.FT_MEASUREMENT_RUM_APP_START_UP, tags, fields);
+                    Constants.FT_MEASUREMENT_RUM_INFLUX_APP_START_UP, tags, fields);
 
         } catch (Exception e) {
             LogUtils.e(TAG, e.toString());
@@ -772,23 +771,23 @@ public class FTAutoTrack {
         try {
             JSONObject tags = getRUMPublicTags();
             JSONObject fields = new JSONObject();
-            tags.put("view_id", viewId);
-            tags.put("view_name", viewName);
+            tags.put(Constants.KEY_RUM_VIEW_ID, viewId);
+            tags.put(Constants.KEY_RUM_VIEW_NAME, viewName);
             if (parentView != null) {
-                tags.put("view_parent", parentView);
+                tags.put(Constants.KEY_RUM_VIEW_PARENT, parentView);
             }
             if (fps > 0) {
-                fields.put("view_fps", fps);
+                fields.put(Constants.KEY_RUM_VIEW_FPS, fps);
             }
 
-            tags.put("app_apdex_level", getAppApdexLevel(loadTime));
-            fields.put("view_load", loadTime);
+            tags.put(Constants.KEY_RUM_APP_APDEX_LEVEL, getAppApdexLevel(loadTime));
+            fields.put(Constants.KEY_RUM_VIEW_LOAD, loadTime);
             FTTrackInner.getInstance().rumInflux(time,
-                    Constants.FT_MEASUREMENT_RUM_APP_VIEW, tags, fields);
+                    Constants.FT_MEASUREMENT_RUM_INFLUX_APP_VIEW, tags, fields);
             appendRUMESPublicTags(tags);
 
             FTTrackInner.getInstance().rumES(time,
-                    "view", tags, fields);
+                    Constants.FT_MEASUREMENT_RUM_ES_VIEW, tags, fields);
         } catch (Exception e) {
             LogUtils.e(TAG, e.toString());
         }
@@ -812,55 +811,58 @@ public class FTAutoTrack {
             JSONObject tags = getRUMPublicTags();
             JSONObject fields = new JSONObject();
 
-            tags.put("resource_url_host", bean.urlHost);
-            if (!bean.urlPath.isEmpty()) {
-                tags.put("resource_url_path", bean.urlPath);
-            }
+            tags.put(Constants.KEY_RUM_RESOURCE_URL_HOST, bean.urlHost);
+
             if (!bean.resourceType.isEmpty()) {
-                tags.put("resource_type", bean.resourceType);
+                tags.put(Constants.KEY_RUM_RESOURCE_TYPE, bean.resourceType);
             }
-            tags.put("response_connection", bean.responseConnection);
-            tags.put("response_content_type", bean.responseContentType);
-            tags.put("response_content_encoding", bean.responseContentEncoding);
-            tags.put("resource_method", bean.resourceMethod);
+            tags.put(Constants.KEY_RUM_RESPONSE_CONNECTION, bean.responseConnection);
+            tags.put(Constants.KEY_RUM_RESPONSE_CONTENT_TYPE, bean.responseContentType);
+            tags.put(Constants.KEY_RUM_RESPONSE_CONTENT_ENCODING, bean.responseContentEncoding);
+            tags.put(Constants.KEY_RUM_RESOURCE_METHOD, bean.resourceMethod);
 
             if (bean.resourceStatus > 0) {
-                tags.put("resource_status", bean.resourceStatus);
+                tags.put(Constants.KEY_RUM_RESOURCE_STATUS, bean.resourceStatus);
                 long statusGroupPrefix = bean.resourceStatus / 100;
-                tags.put("resource_status_group", statusGroupPrefix + "xx");
+                tags.put(Constants.KEY_RUM_RESOURCE_STATUS_GROUP, statusGroupPrefix + "xx");
             }
 
             if (bean.resourceSize > 0) {
-                fields.put("resource_size", bean.resourceSize);
+                fields.put(Constants.KEY_RUM_RESOURCE_SIZE, bean.resourceSize);
             }
             if (bean.resourceLoad > 0) {
-                fields.put("resource_load", bean.resourceLoad);
+                fields.put(Constants.KEY_RUM_RESOURCE_LOAD, bean.resourceLoad);
             }
 
             if (bean.resourceDNS > 0) {
-                fields.put("resource_dns", bean.resourceDNS);
+                fields.put(Constants.KEY_RUM_RESOURCE_DNS, bean.resourceDNS);
             }
             if (bean.resourceTCP > 0) {
-                fields.put("resource_tcp", bean.resourceTCP);
+                fields.put(Constants.KEY_RUM_RESOURCE_TCP, bean.resourceTCP);
             }
             if (bean.resourceSSL > 0) {
-                fields.put("resource_ssl", bean.resourceSSL);
+                fields.put(Constants.KEY_RUM_RESOURCE_SSL, bean.resourceSSL);
             }
             if (bean.resourceTTFB > 0) {
-                fields.put("resource_ttfb", bean.resourceTTFB);
+                fields.put(Constants.KEY_RUM_RESOURCE_TTFB, bean.resourceTTFB);
             }
 
             if (bean.resourceTrans > 0) {
-                fields.put("resource_trans", bean.resourceTrans);
+                fields.put(Constants.KEY_RUM_RESOURCE_TRANS, bean.resourceTrans);
             }
 
 
             FTTrackInner.getInstance().rumInflux(time,
-                    Constants.FT_MEASUREMENT_RUM_APP_RESOURCE_PERFORMANCE, tags, fields);
+                    Constants.FT_MEASUREMENT_RUM_INFLUX_APP_RESOURCE_PERFORMANCE, tags, fields);
 
             appendRUMESPublicTags(tags);
+
+            if (!bean.urlPath.isEmpty()) {
+                tags.put(Constants.KEY_RUM_RESOURCE_URL_PATH, bean.urlPath);
+            }
+
             FTTrackInner.getInstance().rumES(time,
-                    "resource", tags, fields);
+                    Constants.FT_MEASUREMENT_RUM_RESOURCE, tags, fields);
         } catch (Exception e) {
             LogUtils.e(TAG, e.toString());
         }
@@ -904,24 +906,24 @@ public class FTAutoTrack {
             JSONObject tags = getRUMPublicTags();
             JSONObject fields = new JSONObject();
 
-            tags.put("crash_type", crashType.toString());
-            tags.put("crash_situation", state.toString());
-            tags.put("application_uuid", FTSdk.PACKAGE_UUID);
-            fields.put("crash_message", message);
-            fields.put("crash_stack", log);
+            tags.put(Constants.KEY_RUM_CRASH_TYPE, crashType.toString());
+            tags.put(Constants.KEY_RUM_CRASH_SITUATION, state.toString());
+            tags.put(Constants.KEY_RUM_APPLICATION_UUID, FTSdk.PACKAGE_UUID);
+            fields.put(Constants.KEY_RUM_CRASH_MESSAGE, message);
+            fields.put(Constants.KEY_RUM_CRASH_STACK, log);
             appendRUMESPublicTags(tags);
 
             try {
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.BLUETOOTH)) {
-                    tags.put("bt_open", BluetoothUtils.get().isOpen());
+                    tags.put(Constants.KEY_BT_OPEN, BluetoothUtils.get().isOpen());
                 }
 
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.LOCATION)) {
-                    tags.put("gps_open", LocationUtils.get().isOpenGps());
+                    tags.put(Constants.KEY_LOCATION_GPS_OPEN, LocationUtils.get().isOpenGps());
                 }
 
-                tags.put("carrier", DeviceUtils.getCarrier(FTApplication.getApplication()));
-                tags.put("locale", Locale.getDefault());
+                tags.put(Constants.KEY_DEVICE_CARRIER, DeviceUtils.getCarrier(FTApplication.getApplication()));
+                tags.put(Constants.KEY_DEVICE_LOCALE, Locale.getDefault());
 
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.MEMORY)) {
                     double[] memory = DeviceUtils.getRamData(FTApplication.getApplication());
@@ -938,7 +940,7 @@ public class FTAutoTrack {
                 LogUtils.e(TAG, e.getMessage());
             }
 
-            FTTrackInner.getInstance().rumES(dateline, "crash", tags, fields);
+            FTTrackInner.getInstance().rumES(dateline, Constants.FT_MEASUREMENT_RUM_ES_CRASH, tags, fields);
         } catch (Exception e) {
             LogUtils.e(TAG, e.getMessage());
         }
@@ -957,16 +959,16 @@ public class FTAutoTrack {
             JSONObject tags = getRUMPublicTags();
             JSONObject fields = new JSONObject();
 
-            tags.put("freeze_type", freezeType);
-            fields.put("freeze_duration", -1);
+            tags.put(Constants.KEY_RUM_FREEZE_TYPE, freezeType);
+            fields.put(Constants.KEY_RUM_FREEZE_DURATION, -1);
 
             FTTrackInner.getInstance().rumInflux(dateline,
-                    Constants.FT_MEASUREMENT_RUM_APP_FREEZE, tags, fields);
+                    Constants.FT_MEASUREMENT_RUM_INFLUX_APP_FREEZE, tags, fields);
 
-            fields.put("freeze_stack", log);
+            fields.put(Constants.KEY_RUM_FREEZE_STACK, log);
 
             appendRUMESPublicTags(tags);
-            FTTrackInner.getInstance().rumES(dateline, "freeze", tags, fields);
+            FTTrackInner.getInstance().rumES(dateline, Constants.FT_MEASUREMENT_RUM_FREEZE, tags, fields);
         } catch (Exception e) {
             LogUtils.e(TAG, e.getMessage());
         }
@@ -1000,8 +1002,8 @@ public class FTAutoTrack {
         JSONObject tags = new JSONObject();
         try {
             tags.put(Constants.KEY_RUM_APP_ID, FTRUMConfig.get().getAppId());
-            tags.put("env", FTRUMConfig.get().getEnvType().toString());
-            tags.put("network_type", NetUtils.get().getNetWorkStateName());
+            tags.put(Constants.KEY_RUM_ENV, FTRUMConfig.get().getEnvType().toString());
+            tags.put(Constants.KEY_RUM_NETWORK_TYPE, NetUtils.get().getNetWorkStateName());
             tags.put(Constants.KEY_RUM_IS_SIGNIN, FTUserConfig.get().isUserDataBinded() ? "T" : "F");
         } catch (JSONException e) {
             LogUtils.e(TAG, e.getMessage());
@@ -1033,8 +1035,8 @@ public class FTAutoTrack {
         if (uuid.isEmpty()) {
             uuid = DeviceUtils.getUuid(FTApplication.getApplication());
         }
-        jsonObject.put("origin_id", uuid);
-        jsonObject.put("device_uuid", uuid);
+        jsonObject.put(Constants.KEY_RUM_ORIGIN_ID, uuid);
+        jsonObject.put(Constants.KEY_DEVICE_UUID, uuid);
 
     }
 

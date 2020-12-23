@@ -8,13 +8,11 @@ import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.LineProtocolBean;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.SyncJsonData;
-import com.ft.sdk.garble.bean.TraceBean;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.http.ResponseData;
 import com.ft.sdk.garble.manager.AsyncCallback;
-import com.ft.sdk.garble.manager.FTManager;
 import com.ft.sdk.garble.manager.SyncDataHelper;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -151,31 +149,14 @@ public class FTTrackInner {
         }
     }
 
-    /**
-     * 判断是否是合法的Values
-     *
-     * @param jsonObject
-     * @return
-     */
-    public boolean isLegalValues(JSONObject jsonObject) {
-        if (jsonObject == null) {
-            LogUtils.e(TAG, "参数 fields 不能为空");
-            return false;
-        }
-        if (jsonObject.keys().hasNext()) {
-            return true;
-        } else {
-            LogUtils.e(TAG, "参数 fields 不能为空");
-            return false;
-        }
-    }
+
 
     /**
      * 将单条日志数据存入本地同步
      *
      * @param logBean
      */
-    public void traceBackground(@NonNull BaseContentBean logBean) {
+    void traceBackground(@NonNull BaseContentBean logBean) {
         ArrayList<BaseContentBean> list = new ArrayList<>();
         list.add(logBean);
         batchLogBeanBackground(list, DataType.TRACE);
@@ -187,7 +168,7 @@ public class FTTrackInner {
      *
      * @param logBean
      */
-    public void logBackground(@NonNull LogBean logBean) {
+    void logBackground(@NonNull LogBean logBean) {
         ArrayList<BaseContentBean> list = new ArrayList<>();
         list.add(logBean);
         batchLogBeanBackground(list, DataType.LOG);
@@ -198,7 +179,7 @@ public class FTTrackInner {
      *
      * @param logBeans
      */
-    public void batchLogBeanBackground(@NonNull List<BaseContentBean> logBeans, DataType dataType) {
+    void batchLogBeanBackground(@NonNull List<BaseContentBean> logBeans, DataType dataType) {
         ArrayList<SyncJsonData> datas = new ArrayList<>();
         for (BaseContentBean logBean : logBeans) {
             try {

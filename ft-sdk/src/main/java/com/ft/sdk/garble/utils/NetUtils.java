@@ -344,7 +344,7 @@ public class NetUtils {
         if (!TextUtils.isEmpty(proxyAddress) && (proxyPort != -1)) {
             return proxyAddress + ":" + proxyPort;
         } else {
-            return Constants.UNKNOWN;
+            return "";
         }
     }
 
@@ -394,7 +394,7 @@ public class NetUtils {
      * @return
      */
     public String getSSId() {
-        String ssId = Constants.UNKNOWN;
+        String ssId = null  ;
         WifiManager manager = (WifiManager) FTApplication.getApplication().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         if (manager != null) {
             WifiInfo wifiInfo = manager.getConnectionInfo();
@@ -403,7 +403,7 @@ public class NetUtils {
                 if (ssId.length() > 2 && ssId.charAt(0) == '"' && ssId.charAt(ssId.length() - 1) == '"') {
                     return ssId.substring(1, ssId.length() - 1);
                 } else if (ssId.contains("<unknown ssid>")) {
-                    ssId = Constants.UNKNOWN;
+                    ssId =null;
                 }
             }
         }
@@ -416,7 +416,7 @@ public class NetUtils {
      * @return
      */
     public String getWifiIp() {
-        String ip = Constants.UNKNOWN;
+        String ip = null;
         WifiManager manager = (WifiManager) FTApplication.getApplication().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         if (manager != null) {
             WifiInfo wifiInfo = manager.getConnectionInfo();

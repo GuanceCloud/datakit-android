@@ -1,4 +1,4 @@
-package com.ft.sdk.garble.manager;
+package com.ft.sdk;
 
 import android.view.Choreographer;
 
@@ -8,6 +8,7 @@ import com.ft.sdk.FTTrackInner;
 import com.ft.sdk.garble.FTRUMConfig;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.Status;
+import com.ft.sdk.garble.manager.FTMainLoopLogMonitor;
 import com.ft.sdk.garble.utils.Utils;
 
 

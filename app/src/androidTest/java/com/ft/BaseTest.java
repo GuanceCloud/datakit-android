@@ -7,7 +7,7 @@ import androidx.test.rule.GrantPermissionRule;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTrack;
 import com.ft.sdk.garble.db.FTDBManager;
-import com.ft.sdk.garble.manager.SyncTaskManager;
+import com.ft.sdk.SyncTaskManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,6 +21,8 @@ import org.powermock.reflect.Whitebox;
  * description:
  */
 public class BaseTest {
+    protected static final String CONTENT_SIMPLE_TEST = "----simpleTest----";
+    protected static final String TEST_MEASUREMENT = "testMeasurement";
     @Rule
     public GrantPermissionRule permissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA
             , Manifest.permission.ACCESS_FINE_LOCATION
@@ -33,46 +35,49 @@ public class BaseTest {
     @After
     public void tearDown() {
         FTDBManager.get().delete();
-        try {
-            FTSdk.get().shutDown();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        FTSdk.get().shutDown();
     }
 
 
-    protected void removeActivityLifeCycle() {
-        try {
-            Whitebox.invokeMethod(FTSdk.get(), "unregisterActivityLifeCallback");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    protected void removeActivityLifeCycle() throws Exception {
+        Whitebox.invokeMethod(FTSdk.get(), "unregisterActivityLifeCallback");
 
     }
 
-    protected void stopSyncTask() {
-        try {
-            Whitebox.invokeMethod(SyncTaskManager.get(), "setRunning", true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    protected void stopSyncTask() throws Exception {
+        Whitebox.invokeMethod(SyncTaskManager.get(), "setRunning", true);
 
     }
 
-    protected void startSyncTask() {
-        try {
-            Whitebox.invokeMethod(SyncTaskManager.get(), "setRunning", false);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    protected void resumeSyncTask() throws Exception {
+        Whitebox.invokeMethod(SyncTaskManager.get(), "setRunning", false);
+    }
 
+    protected void executeSyncTask() throws Exception {
+        Whitebox.invokeMethod(SyncTaskManager.get(), "executeSyncPoll");
     }
 
     protected void simpleTrackData() throws JSONException {
         JSONObject tags = new JSONObject();
         tags.put("testTag", "tagTest");
         JSONObject fields = new JSONObject();
-        fields.put("testField", "----simpleTest----");
-        FTTrack.getInstance().trackBackground("testMeasurement", tags, fields);
+        fields.put("testField", CONTENT_SIMPLE_TEST);
+        FTTrack.getInstance().trackBackground(TEST_MEASUREMENT, tags, fields);
     }
+//
+//    protected void simpleRumEsData() throws Exception {
+//        JSONObject tags = new JSONObject();
+//        tags.put("testTag", "tagTest");
+//        JSONObject fields = new JSONObject();
+//        fields.put("testField", CONTENT_SIMPLE_TEST);
+//        Whitebox.invokeMethod(FTTrackInner.getInstance(), "rumEs", "testMeasurement", tags, fields);
+//    }
+//
+//    protected void simpleRumInfluxData() throws Exception {
+//        JSONObject tags = new JSONObject();
+//        tags.put("testTag", "tagTest");
+//        JSONObject fields = new JSONObject();
+//        fields.put("testField", CONTENT_SIMPLE_TEST);
+//        Whitebox.invokeMethod(FTTrackInner.getInstance(), "rumInflux", "testMeasurement", tags, fields);
+//    }
 }

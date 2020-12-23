@@ -54,17 +54,17 @@ public class MonitorTest extends BaseTest {
     }
 
     @Test
-    public void monitorBatteryTest() {
+    public void monitorBatteryTest() throws Exception {
         monitorTest(MonitorType.BATTERY);
     }
 
     @Test
-    public void monitorMemoryTest() {
+    public void monitorMemoryTest() throws Exception {
         monitorTest(MonitorType.MEMORY);
     }
 
     @Test
-    public void monitorCPUTest() {
+    public void monitorCPUTest() throws Exception {
         monitorTest(MonitorType.CPU);
     }
 //
@@ -89,7 +89,7 @@ public class MonitorTest extends BaseTest {
 //    }
 
     @Test
-    public void monitorBlueToothTest() {
+    public void monitorBlueToothTest() throws Exception {
         monitorTest(MonitorType.BLUETOOTH);
     }
 
@@ -99,7 +99,7 @@ public class MonitorTest extends BaseTest {
 //    }
 
     @Test
-    public void monitorFpsTest() {
+    public void monitorFpsTest() throws Exception {
         monitorTest(MonitorType.FPS);
     }
 
@@ -112,12 +112,12 @@ public class MonitorTest extends BaseTest {
     public void monitorPeriodTest() throws InterruptedException {
         FTSdk.install(ftSDKConfig);
         FTMonitor.get().setPeriod(2).start();
-        Thread.sleep(80000);
+        Thread.sleep(10000);
         FTMonitor.get().setPeriod(4).start();
-        Thread.sleep(80000);
+        Thread.sleep(20000);
     }
 
-    private void monitorTest(int monitorType) {
+    private void monitorTest(int monitorType) throws Exception {
         ftSDKConfig.setMonitorType(monitorType);
         FTSdk.install(ftSDKConfig);
 

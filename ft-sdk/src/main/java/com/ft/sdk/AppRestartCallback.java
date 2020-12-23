@@ -1,4 +1,4 @@
-package com.ft.sdk.garble.manager;
+package com.ft.sdk;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -6,6 +6,7 @@ import android.os.Message;
 
 import androidx.annotation.NonNull;
 
+import com.ft.sdk.FTActivityManager;
 import com.ft.sdk.FTAutoTrack;
 import com.ft.sdk.FTMonitor;
 import com.ft.sdk.garble.FTRUMConfig;
@@ -16,7 +17,7 @@ import com.ft.sdk.garble.FTRUMConfig;
  * time: 2020/6/17 17:50:45
  * description:处理当前应用退到后台10秒后重新进入
  */
-class AppRestartCallback {
+ class AppRestartCallback {
     public static final int MSG_CHECK_SLEEP_STATUS = 1;
     public static final int DELAY_MILLIS = 10000;//10 秒
     private boolean alreadySleep = false;

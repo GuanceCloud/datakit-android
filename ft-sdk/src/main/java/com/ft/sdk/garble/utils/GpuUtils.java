@@ -27,7 +27,7 @@ public class GpuUtils {
     /**
      * GPU 供应商，型号
      */
-    public static String GPU_VENDOR_RENDERER = Constants.UNKNOWN;
+    public static String GPU_VENDOR_RENDERER = "";
 
     /**
      * 获得GPU使用率
@@ -65,7 +65,7 @@ public class GpuUtils {
             }
         }
         if (Utils.isNullOrEmpty(maxFreq)) {
-            return Constants.UNKNOWN;
+            return null;
         }
         return maxFreq+"Hz";
     }

@@ -1,6 +1,7 @@
 package com.ft.sdk.garble.utils;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,7 +20,7 @@ public class FloatDoubleJsonUtils {
     public static String protectValueFormat(JSONObject json) {
 
         try {
-            return new Gson().toJson(toMap(json));
+            return new GsonBuilder().serializeNulls().create().toJson(toMap(json));
         } catch (JSONException e) {
             LogUtils.e(TAG, e.getMessage());
             return "{}";

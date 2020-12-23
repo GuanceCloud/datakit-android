@@ -177,7 +177,7 @@ public class SyncJsonData implements Cloneable {
         addMonitorData(tags, fields);
         SyncJsonData recordData = new SyncJsonData(DataType.TRACK);
 
-        JSONObject opDataJson = getLinProtocolJson(Constants.FT_MONITOR_MEASUREMENT, tags, fields);
+        JSONObject opDataJson = getLinProtocolJson(Constants.FT_MEASUREMENT_MONITOR, tags, fields);
         recordData.setDataString(FloatDoubleJsonUtils.protectValueFormat(opDataJson));
         recordData.setTime(Utils.getCurrentNanoTime());
         return recordData;

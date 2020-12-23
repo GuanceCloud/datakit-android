@@ -2,6 +2,7 @@ package com.ft.sdk;
 
 import com.ft.sdk.garble.http.FTResponseData;
 import com.ft.sdk.garble.http.HttpBuilder;
+import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.google.mockwebserver.MockResponse;
 import com.google.mockwebserver.MockWebServer;
@@ -99,7 +100,7 @@ public class HttpTest {
                 .setMethod(RequestMethod.POST)
                 .setBodyString("")
                 .executeSync(FTResponseData.class);
-        assertEquals( 200,result.getCode());
+        assertEquals( HttpURLConnection.HTTP_OK,result.getCode());
     }
 
     /**
@@ -107,10 +108,10 @@ public class HttpTest {
      * @throws Exception
      */
     @Test
-    public void mockedRequest200NotJson() throws Exception {
+    public void mockedRequest400NotJson() throws Exception {
         MockResponse mockResponse = new MockResponse();
         mockResponse.setBody(successString2);
-        mockResponse.setResponseCode(HttpURLConnection.HTTP_OK);
+        mockResponse.setResponseCode(HttpURLConnection.HTTP_BAD_REQUEST);
         mMockWebServer.enqueue(mockResponse);
         mMockWebServer.play();
 
@@ -119,6 +120,6 @@ public class HttpTest {
                 .setMethod(RequestMethod.POST)
                 .setBodyString("")
                 .executeSync(FTResponseData.class);
-        assertNotEquals(200,result.getCode());
+        assertEquals(NetCodeStatus.NET_STATUS_RESPONSE_NOT_JSON,result.getCode());
     }
 }

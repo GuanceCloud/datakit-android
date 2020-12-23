@@ -16,21 +16,18 @@ import static org.junit.Assert.assertNotEquals;
  * Description:
  */
 public class DeviceUtilsTest {
-    private Context getContext(){
+    private Context getContext() {
         return InstrumentationRegistry.getInstrumentation().getTargetContext();
     }
 
     @Test
-    public void getSDKUUid(){
-        assertNotEquals("",DeviceUtils.getSDKUUid(getContext()));
-    }
-    @Test
-    public void getUuid(){
-        assertNotEquals("",DeviceUtils.getUuid(getContext()));
+    public void getSDKUUid() {
+        assertNotEquals("", DeviceUtils.getSDKUUid(getContext()));
     }
 
     @Test
-    public void requestPermission(){
-        assertNotEquals("",DeviceUtils.getImei(getContext()));
+    public void getUuid() {
+        assertNotEquals("", DeviceUtils.getUuid(getContext()));
     }
+
 }

@@ -10,29 +10,7 @@ import java.util.HashMap;
  * Description:
  */
 public class Constants {
-    public static final String USER_AGENT = "ft_mobile_sdk_android";
-
-    public static final String FT_SDK_INIT_UUID = "ft.sdk.init.uuid";
-    public static final String FT_USER_SESSION_ID = "ft.user.session.id";
-    public static final String FT_USER_USER_ID= "ft.user.userid";
-    public static final String FT_USER_USER_NAME= "ft.user.username";
-    public static final String FT_USER_USER_EXT= "ft.user.extdata";
-    public static final String FT_SHARE_PER_FILE = "ftSDKShareFile";
     public static final String FT_KEY_VALUE_NULL = "null";
-    public static final String FT_MEASUREMENT_PAGE_EVENT = "mobile_tracker";
-    public static final String FT_MEASUREMENT_TIME_COST_WEBVIEW = "mobile_webview_time_cost";
-    public static final String FT_MEASUREMENT_TIME_COST_CLIENT = "mobile_client_time_cost";
-    public static final String FT_MEASUREMENT_HTTP_WEBVIEW = "mobile_webview_http";
-    public static final String FT_MEASUREMENT_HTTP_CLIENT = "mobile_client_http";
-    public static final String FT_MONITOR_MEASUREMENT = "mobile_monitor";
-    public static final String FT_MEASUREMENT_RUM_APP_START_UP = "rum_app_startup";
-    public static final String FT_MEASUREMENT_RUM_APP_VIEW = "rum_app_view";
-    public static final String FT_MEASUREMENT_RUM_APP_FREEZE = "rum_app_freeze";
-    public static final String FT_MEASUREMENT_RUM_APP_RESOURCE_PERFORMANCE = "rum_app_resource_performance";
-
-
-    public static final String FT_LOG_DEFAULT_MEASUREMENT = USER_AGENT;
-
     public static final String UNKNOWN = "N/A";
     public static final String FLOW_ROOT = "root";
     public static final String MEASUREMENT = "measurement";
@@ -42,7 +20,33 @@ public class Constants {
     public static final String SEPARATION = " ";
     public static final String SEPARATION_LINE_BREAK = "--line_break_temp--";//换行标志符，用于日志显示
     public static final String SEPARATION_REALLY_LINE_BREAK = "\n";//换行标志符，用于日志显示
+
+    public static final String USER_AGENT = "ft_mobile_sdk_android";
+    public static final String FT_LOG_DEFAULT_MEASUREMENT = USER_AGENT;
+
+    public static final String FT_SDK_INIT_UUID = "ft.sdk.init.uuid";
+    public static final String FT_USER_SESSION_ID = "ft.user.session.id";
+    public static final String FT_USER_USER_ID= "ft.user.userid";
+    public static final String FT_USER_USER_NAME= "ft.user.username";
+    public static final String FT_USER_USER_EXT= "ft.user.extdata";
+    public static final String FT_SHARE_PER_FILE = "ftSDKShareFile";
+
+    public static final String FT_MEASUREMENT_PAGE_EVENT = "mobile_tracker";
+    public static final String FT_MEASUREMENT_TIME_COST_CLIENT = "mobile_client_time_cost";
+    public static final String FT_MEASUREMENT_MONITOR = "mobile_monitor";
+
+    public static final String FT_MEASUREMENT_RUM_INFLUX_APP_START_UP = "rum_app_startup";
+    public static final String FT_MEASUREMENT_RUM_INFLUX_APP_VIEW = "rum_app_view";
+    public static final String FT_MEASUREMENT_RUM_INFLUX_APP_FREEZE = "rum_app_freeze";
+    public static final String FT_MEASUREMENT_RUM_INFLUX_APP_RESOURCE_PERFORMANCE = "rum_app_resource_performance";
+
+    public static final String FT_MEASUREMENT_RUM_ES_VIEW ="view";
+    public static final String FT_MEASUREMENT_RUM_ES_CRASH ="crash";
+    public static final String FT_MEASUREMENT_RUM_FREEZE="freeze";
+    public static final String FT_MEASUREMENT_RUM_RESOURCE="resource";
+
     public static final String PERFIX = "ft_parent_not_fragment";
+
     public static final String MOCK_SON_PAGE_DATA = "mock_son_page_data";
     public static final String SHARE_PRE_STEP_DATE = "share_pre_step_date";
     public static final String SHARE_PRE_STEP_HISTORY = "share_pre_step_history";
@@ -59,28 +63,14 @@ public class Constants {
 
     public static final String KEY_EVENT_ID = "event_id";
     public static final String KEY_EVENT = "event";
-
-
+    
     public static final String KEY_PAGE_EVENT_CURRENT_PAGE_NAME = "current_page_name";
     public static final String KEY_PAGE_EVENT_ROOT_PAGE_NAME = "root_page_name";
 
     public static final String KEY_PAGE_EVENT_PAGE_DESC = "page_desc";
     public static final String KEY_PAGE_EVENT_USER_NAME = "ud_name";
 
-    public static final String KEY_RUM_USER_ID = "userid";
-    public static final String KEY_RUM_APP_ID = "app_id";
-
-    public static final String KEY_RUM_IS_SIGNIN = "is_signin";
-
     public static final String KEY_TIME_COST_DURATION = "duration";
-    public static final String KEY_TIME_COST_WEBVIEW_URL = "url";
-
-    public static final String KEY_HTTP_URL = "url";
-    public static final String KEY_HTTP_HOST = "host";
-    public static final String KEY_HTTP_IS_ERROR = "isError";
-
-    public static final String KEY_APP_STARTUP = "app_startup_type";
-    public static final String KEY_APP_STARTUP_DURATION = "app_startup_duration";
 
     public static final String KEY_BATTERY_TOTAL = "battery_total";
     public static final String KEY_BATTERY_CHARGE_TYPE = "battery_charge_type";
@@ -148,7 +138,6 @@ public class Constants {
     public static final String KEY_DEVICE_UUID = "device_uuid";
     public static final String KEY_APPLICATION_UUID = "application_uuid";
     public static final String KEY_DEVICE_APPLICATION_ID = "app_identifiedid";
-//    public static final String KEY_DEVICE_APPLICATION_NAME = "app_name";
     public static final String KEY_DEVICE_OS = "os";
     public static final String KEY_DEVICE_OS_VERSION = "os_version";
     public static final String KEY_DEVICE_DEVICE_BAND = "device";
@@ -158,7 +147,6 @@ public class Constants {
     public static final String KEY_DEVICE_LOCALE = "locale";
     public static final String KEY_DEVICE_OAID = "oaid";
     public static final String KEY_APP_VERSION_NAME = "version";
-    public static final String KEY_IP = "ip";
 
     public static final String EVENT_NAME_LAUNCH = "launch";
     public static final String EVENT_NAME_OPEN = "open";
@@ -166,11 +154,58 @@ public class Constants {
     public static final String EVENT_NAME_LEAVE = "leave";
     public static final String EVENT_NAME_ENTER = "enter";
 
+    public static final String KEY_RUM_IS_SIGNIN = "is_signin";
+    public static final String KEY_RUM_USER_ID = "userid";
+    public static final String KEY_RUM_APP_ID = "app_id";
+
+    public static final String KEY_RUM_RESOURCE_URL_HOST = "resource_url_host";
+    public static final String KEY_RUM_RESOURCE_TYPE = "resource_type";
+    public static final String KEY_RUM_RESPONSE_CONNECTION = "response_connection";
+    public static final String KEY_RUM_RESPONSE_CONTENT_TYPE = "response_content_type";
+    public static final String KEY_RUM_RESPONSE_CONTENT_ENCODING = "response_content_encoding";
+    public static final String KEY_RUM_RESOURCE_METHOD = "resource_method";
+    public static final String KEY_RUM_TERMINAL = "terminal";
+    public static final String KEY_RUM_SDK_PACKAGE_AGENT = "sdk_package_agent";
+    public static final String KEY_RUM_SDK_PACKAGE_TRACK = "sdk_package_track";
+    public static final String KEY_RUM_SDK_PACKAGE_NATIVE = "sdk_package_native";
+    public static final String KEY_RUM_APP_STARTUP_TYPE = "app_startup_type";
+    public static final String KEY_RUM_APP_APDEX_LEVEL = "app_apdex_level";
+    public static final String KEY_RUM_APP_STARTUP_DURATION = "app_startup_duration";
+    public static final String KEY_RUM_VIEW_ID = "view_id";
+    public static final String KEY_RUM_VIEW_PARENT = "view_parent";
+    public static final String KEY_RUM_VIEW_NAME = "view_name";
+    public static final String KEY_RUM_VIEW_FPS = "view_fps";
+    public static final String KEY_RUM_VIEW_LOAD = "view_load";
+    public static final String KEY_RUM_RESOURCE_STATUS = "resource_status";
+    public static final String KEY_RUM_RESOURCE_STATUS_GROUP = "resource_status_group";
+    public static final String KEY_RUM_RESOURCE_SIZE = "resource_size";
+    public static final String KEY_RUM_RESOURCE_LOAD = "resource_load";
+    public static final String KEY_RUM_RESOURCE_DNS = "resource_dns";
+    public static final String KEY_RUM_RESOURCE_TCP = "resource_tcp";
+    public static final String KEY_RUM_RESOURCE_SSL = "resource_ssl";
+    public static final String KEY_RUM_RESOURCE_TTFB = "resource_ttfb";
+    public static final String KEY_RUM_RESOURCE_TRANS = "resource_trans";
+    public static final String KEY_RUM_RESOURCE_URL_PATH = "resource_url_path";
+    public static final String KEY_RUM_CRASH_TYPE = "crash_type";
+    public static final String KEY_RUM_CRASH_SITUATION = "crash_situation";
+    public static final String KEY_RUM_APPLICATION_UUID = "application_uuid";
+    public static final String KEY_RUM_CRASH_MESSAGE = "crash_message";
+    public static final String KEY_RUM_CRASH_STACK = "crash_stack";
+    public static final String KEY_RUM_FREEZE_TYPE = "freeze_type";
+    public static final String KEY_RUM_FREEZE_DURATION = "freeze_duration";
+    public static final String KEY_RUM_FREEZE_STACK = "freeze_stack";
+    public static final String KEY_RUM_ENV = "env";
+    public static final String KEY_RUM_NETWORK_TYPE = "network_type";
+    public static final String KEY_RUM_ORIGIN_ID = "origin_id";
+
+
 
     /**
      * OP EVENT 数据对照
      */
     public final static HashMap<OP, String> OP_EVENT_MAPS = new HashMap<>();
+    public static final String KEY_RUM_APPLICATION_IDENTIFIER = "application_identifier";
+
 
     static {
         OP_EVENT_MAPS.put(OP.LANC, Constants.EVENT_NAME_LAUNCH);

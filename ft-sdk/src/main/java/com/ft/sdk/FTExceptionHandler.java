@@ -1,11 +1,7 @@
-package com.ft.sdk.garble.manager;
+package com.ft.sdk;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.EnvType;
-import com.ft.sdk.FTAutoTrack;
-import com.ft.sdk.FTSDKConfig;
-import com.ft.sdk.FTTrackInner;
 import com.ft.sdk.garble.FTRUMConfig;
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.CrashType;

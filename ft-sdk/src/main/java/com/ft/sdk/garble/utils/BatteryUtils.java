@@ -52,7 +52,7 @@ public class BatteryUtils {
             e.printStackTrace();
         }
         if (batteryCapacity == 0) {
-            return Constants.UNKNOWN;
+            return "";
         }
         return batteryCapacity + "mAh";
     }
@@ -100,7 +100,7 @@ public class BatteryUtils {
      * @return
      */
     private static String batteryHealth(int health) {
-        String healthBat = Constants.UNKNOWN;
+        String healthBat = null;
         switch (health) {
             case BatteryManager.BATTERY_HEALTH_COLD:
                 healthBat = "cold";
@@ -134,7 +134,7 @@ public class BatteryUtils {
      * @return
      */
     private static String batteryStatus(int status) {
-        String healthBat = Constants.UNKNOWN;
+        String healthBat = null;
         switch (status) {
             case BatteryManager.BATTERY_STATUS_CHARGING:
                 healthBat = "charging";
@@ -160,7 +160,7 @@ public class BatteryUtils {
      * @return
      */
     private static String batteryPlugged(int status) {
-        String healthBat = Constants.UNKNOWN;
+        String healthBat = null;
         switch (status) {
             case BatteryManager.BATTERY_PLUGGED_AC:
                 healthBat = "ac";

@@ -5,7 +5,6 @@ import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.LogData;
 import com.ft.sdk.garble.bean.Status;
-import com.ft.sdk.garble.manager.FTExceptionHandler;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.util.ArrayList;

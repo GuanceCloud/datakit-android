@@ -33,12 +33,25 @@ public class UtilsTest {
 
     private static final String TEST_MEASUREMENT_INFLUX_DB_LINE = "TestInfluxDBLine";
     private static final String KEY_TAGS = "tags1";
+    private static final String KEY_TAGS_EMPTY = "tagEmpty";
     private static final String KEY_FIELD = "field1";
+    private static final String KEY_FIELD_EMPTY = "fieldEmpty";
     private static final String VALUE_TAGS = "tags1-value";
+    private static final Object VALUE_TAGS_EMPTY = "";
     private static final String VALUE_FIELD = "field1-value";
-    public static final long VALUE_TIME = 1598512145640L;
-    private static final String SINGLE_LINE_DATA = TEST_MEASUREMENT_INFLUX_DB_LINE + "," + KEY_TAGS + "=" + VALUE_TAGS + " " + KEY_FIELD + "=\"" + VALUE_FIELD + "\" " + VALUE_TIME * 1000000 + "\n";
-    private static final String LOG_EXPECT_DATA = SINGLE_LINE_DATA + SINGLE_LINE_DATA + SINGLE_LINE_DATA;
+    private static final Object VALUE_FIELD_EMPTY = "";
+    public static final long VALUE_TIME = 1598512145640000000L;
+    private static final String SINGLE_LINE_NORMAL_DATA = TEST_MEASUREMENT_INFLUX_DB_LINE + ","
+            + KEY_TAGS + "=" + VALUE_TAGS + " "
+            + KEY_FIELD + "=\"" + VALUE_FIELD + "\" " +
+            "" + VALUE_TIME + "\n";
+
+    private static final String SINGLE_LINE_EMPTY_DATA = TEST_MEASUREMENT_INFLUX_DB_LINE + ","
+            + KEY_TAGS_EMPTY + "=" + Constants.UNKNOWN + " "
+            + KEY_FIELD_EMPTY + "=\"" + Constants.UNKNOWN + "\" " +
+            "" + VALUE_TIME + "\n";
+
+    private static final String LOG_EXPECT_DATA = SINGLE_LINE_NORMAL_DATA + SINGLE_LINE_NORMAL_DATA + SINGLE_LINE_NORMAL_DATA;
 
 
     private Context getContext() {
@@ -63,13 +76,13 @@ public class UtilsTest {
 
 
     /**
-     * 验证日志传输行协议格式
+     * 多行行数据验证
      *
      * @throws JSONException
      * @throws InterruptedException
      */
     @Test
-    public void logLineProtocolFormatTest() throws JSONException, InterruptedException {
+    public void multiLineProtocolFormatTest() throws JSONException, InterruptedException {
 
         SyncJsonData recordData = new SyncJsonData(DataType.LOG);
         recordData.setTime(VALUE_TIME);
@@ -92,12 +105,12 @@ public class UtilsTest {
     }
 
     /**
-     * 事件数据内容校验
+     * 单数据验证，空值数据
      *
      * @throws JSONException
      */
     @Test
-    public void trackLineProtocolFormatTest() throws JSONException {
+    public void singleLineProtocolFormatTest() throws JSONException {
         JSONObject tags = new JSONObject();
         tags.put(KEY_TAGS, VALUE_TAGS);
         JSONObject fields = new JSONObject();
@@ -109,9 +122,23 @@ public class UtilsTest {
         recordDataList.add(data);
         String content = new SyncDataHelper().getBodyContent(DataType.TRACK, recordDataList);
         Assert.assertTrue(content.contains(TEST_MEASUREMENT_INFLUX_DB_LINE));
-        Assert.assertTrue(content.contains(SINGLE_LINE_DATA.replace(TEST_MEASUREMENT_INFLUX_DB_LINE, "")));
+        Assert.assertTrue(content.contains(SINGLE_LINE_NORMAL_DATA.replace(TEST_MEASUREMENT_INFLUX_DB_LINE, "")));
 
+
+        JSONObject tagsEmpty = new JSONObject();
+        tagsEmpty.put(KEY_TAGS_EMPTY, VALUE_TAGS_EMPTY);
+        JSONObject fieldsEmpty = new JSONObject();
+        fieldsEmpty.put(KEY_FIELD_EMPTY, VALUE_FIELD_EMPTY);
+        LineProtocolBean trackBeanEmpty = new LineProtocolBean(TEST_MEASUREMENT_INFLUX_DB_LINE, tagsEmpty, fieldsEmpty, VALUE_TIME);
+        SyncJsonData dataEmpty = SyncJsonData.getSyncJsonData(DataType.TRACK, trackBeanEmpty);
+
+        List<SyncJsonData> emptyRecordDataList = new ArrayList<>();
+        emptyRecordDataList.add(dataEmpty);
+        String contentEmpty = new SyncDataHelper().getBodyContent(DataType.TRACK, emptyRecordDataList);
+
+        Assert.assertTrue(contentEmpty.contains(SINGLE_LINE_EMPTY_DATA.replace(TEST_MEASUREMENT_INFLUX_DB_LINE, "")));
     }
+
 
     /**
      * 对象数据内容校验

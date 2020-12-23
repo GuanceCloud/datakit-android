@@ -1,4 +1,4 @@
-package com.ft.sdk.garble.manager;
+package com.ft.sdk;
 
 import android.app.Application;
 import android.content.BroadcastReceiver;
@@ -12,7 +12,6 @@ import android.os.Build;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.FTApplication;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.NetUtils;
 
@@ -21,7 +20,7 @@ import com.ft.sdk.garble.utils.NetUtils;
  * DATE:2020-01-19 17:35
  * Description: 监听网络连接状态
  */
-public class FTNetworkListener {
+ class FTNetworkListener {
     private final static String TAG = "FTNetworkListener";
     private static FTNetworkListener instance;
     private Application application;

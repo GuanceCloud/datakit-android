@@ -1,4 +1,4 @@
-package com.ft.sdk.garble.manager;
+package com.ft.sdk;
 
 import com.ft.sdk.garble.db.FTDBManager;
 
@@ -7,17 +7,17 @@ import com.ft.sdk.garble.db.FTDBManager;
  * DATE:2019-12-06 15:42
  * Description:
  */
-public class FTManager {
+class FTManager {
 
-    public static SyncTaskManager getSyncTaskManager(){
+    public static SyncTaskManager getSyncTaskManager() {
         return SyncTaskManager.get();
     }
 
-    public static FTActivityManager getFTActivityManager(){
+    public static FTActivityManager getFTActivityManager() {
         return FTActivityManager.get();
     }
 
-    public static FTDBManager getFTDBManager(){
+    public static FTDBManager getFTDBManager() {
         return FTDBManager.get();
     }
 }

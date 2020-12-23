@@ -91,18 +91,18 @@ public class BaseContentBean {
                 tags.put("__serviceName", serviceName);
             }
 
-            if (!tags.has("device_uuid")) {
-                tags.put("device_uuid", DeviceUtils.getUuid(FTApplication.getApplication()));
+            if (!tags.has(Constants.KEY_DEVICE_UUID)) {
+                tags.put(Constants.KEY_DEVICE_UUID, DeviceUtils.getUuid(FTApplication.getApplication()));
             }
 
-            if (!tags.has("application_uuid")) {
-                tags.put("application_uuid", FTSdk.PACKAGE_UUID);
+            if (!tags.has(Constants.KEY_APPLICATION_UUID)) {
+                tags.put(Constants.KEY_APPLICATION_UUID, FTSdk.PACKAGE_UUID);
             }
 
-            if (!tags.has("application_identifier")) {
-                tags.put("application_identifier", DeviceUtils.getApplicationId(FTApplication.getApplication()));
+            if (!tags.has(Constants.KEY_RUM_APPLICATION_IDENTIFIER)) {
+                tags.put(Constants.KEY_RUM_APPLICATION_IDENTIFIER, DeviceUtils.getApplicationId(FTApplication.getApplication()));
             }
-            tags.put("version", Utils.getAppVersionName());
+            tags.put(Constants.KEY_APP_VERSION_NAME, Utils.getAppVersionName());
 
 
         } catch (JSONException e) {

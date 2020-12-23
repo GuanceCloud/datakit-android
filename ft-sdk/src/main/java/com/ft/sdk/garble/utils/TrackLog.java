@@ -2,10 +2,10 @@ package com.ft.sdk.garble.utils;
 
 import android.util.Log;
 
-import com.ft.sdk.garble.manager.FTExceptionHandler;
+import com.ft.sdk.FTExceptionHandler;
+import com.ft.sdk.TrackLogManager;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.Status;
-import com.ft.sdk.garble.manager.TrackLogManager;
 
 /**
  * create: by huangDianHua
@@ -70,7 +70,7 @@ public class TrackLog {
 
     public static int println(boolean upload, int priority, String tag, String msg) {
         if (upload && FTExceptionHandler.get().isTrackConsoleLog()) {
-            LogBean logBean = new LogBean(Utils.translateFieldValue(Utils.getCurrentTimeStamp() + " " + getLevelMark(priority) + "/" + tag + ":" + msg), System.currentTimeMillis());
+            LogBean logBean = new LogBean(Utils.translateFieldValue(Utils.getCurrentTimeStamp() + " " + getLevelMark(priority) + "/" + tag + ":" + msg), Utils.getCurrentNanoTime());
             logBean.setServiceName(FTExceptionHandler.get().getTrackServiceName());
             logBean.setStatus(getStatus(priority));
             logBean.setEnv(FTExceptionHandler.get().getEnv());
@@ -85,7 +85,7 @@ public class TrackLog {
 
     protected static int showFullLog(boolean upload, String TAG, String message, LogType logType) {
         int segmentSize = 4 * 1024;
-        int length = message.length();
+        int length = message != null ? message.length() : 0;
         if (length <= segmentSize) {
             showLog(upload, TAG, message, logType);
         } else {

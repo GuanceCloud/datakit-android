@@ -14,11 +14,11 @@ public class LineProtocolBean {
     private JSONObject fields;
     private long timeNano;
 
-    public LineProtocolBean(String measurement, JSONObject tags, JSONObject fields, long timeMillis) {
+    public LineProtocolBean(String measurement, JSONObject tags, JSONObject fields, long timeNano) {
         this.measurement = measurement;
         this.tags = tags;
         this.fields = fields;
-        this.timeNano = timeMillis;
+        this.timeNano = timeNano;
     }
     public LineProtocolBean(String measurement, JSONObject tags, JSONObject fields) {
         this.measurement = measurement;
@@ -31,7 +31,7 @@ public class LineProtocolBean {
         this.measurement = measurement;
         this.tags = null;
         this.fields = fields;
-        this.timeNano = System.currentTimeMillis();
+        this.timeNano = Utils.getCurrentNanoTime();
     }
 
     public String getMeasurement() {

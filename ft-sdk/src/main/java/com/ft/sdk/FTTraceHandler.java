@@ -3,7 +3,6 @@ package com.ft.sdk;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.bean.TraceBean;
 import com.ft.sdk.garble.http.HttpUrl;
-import com.ft.sdk.garble.manager.FTExceptionHandler;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONObject;
