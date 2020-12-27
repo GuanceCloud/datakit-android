@@ -62,10 +62,10 @@ public class SyncTaskManager {
      * 触发延迟轮询同步
      */
     void executeSyncPoll() {
+        if (running) {
+            return;
+        }
         synchronized (this) {
-            if (running) {
-                return;
-            }
             System.out.println("=========executeSyncPoll===");
             running = true;
             errorCount.set(0);

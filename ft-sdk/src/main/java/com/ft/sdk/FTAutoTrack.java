@@ -352,13 +352,11 @@ public class FTAutoTrack {
     }
 
 
-    private static long startTimeline;
-
     /**
      * APP 启动
      */
     public static void startApp() {
-        startTimeline = Utils.getCurrentNanoTime();
+        Utils.saveSharePreference(Constants.SHARE_PRE_START_TIME, Utils.getCurrentNanoTime());
         if (!FTAutoTrackConfig.get().isAutoTrack()) {
             return;
         }
@@ -374,7 +372,7 @@ public class FTAutoTrack {
      *
      * @param timeDelayMs
      */
-    public static void sleepApp(long timeDelayMs) {
+    public static void sleepApp(long timeDelayMs, int startTimeline) {
         long now = Utils.getCurrentNanoTime() - timeDelayMs * 1000000;
         putClientTimeCost(now, now - startTimeline);
 
@@ -741,11 +739,9 @@ public class FTAutoTrack {
     /**
      * 记录应用登陆时效
      */
-    public static void putRUMLaunchPerformance(boolean isCold) {
+    public static void putRUMLaunchPerformance(boolean isCold, long duration) {
         if (!Utils.enableTraceSamplingRate()) return;
         long time = Utils.getCurrentNanoTime();
-        long duration = time - startTimeline;
-
         try {
             JSONObject tags = getRUMPublicTags();
             JSONObject fields = new JSONObject();

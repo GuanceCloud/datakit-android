@@ -6,10 +6,11 @@ import android.os.Message;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.FTActivityManager;
-import com.ft.sdk.FTAutoTrack;
-import com.ft.sdk.FTMonitor;
 import com.ft.sdk.garble.FTRUMConfig;
+import com.ft.sdk.garble.bean.AppState;
+import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.Utils;
 
 
 /**
@@ -17,10 +18,12 @@ import com.ft.sdk.garble.FTRUMConfig;
  * time: 2020/6/17 17:50:45
  * description:处理当前应用退到后台10秒后重新进入
  */
- class AppRestartCallback {
+class AppRestartCallback {
+    private static final String TAG = "AppRestartCallback";
     public static final int MSG_CHECK_SLEEP_STATUS = 1;
     public static final int DELAY_MILLIS = 10000;//10 秒
-    private boolean alreadySleep = false;
+    private boolean alreadySleep = true;
+    private boolean mInited = false;
     private final Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
@@ -33,17 +36,46 @@ import com.ft.sdk.garble.FTRUMConfig;
 
     public void onStart() {
         if (alreadySleep) {//表示从后台重新进入
-            FTAutoTrack.startApp();
+            if (mInited) {
+                FTAutoTrack.startApp();
+            }
             FTMonitor.get().checkForReStart();
+        }
+
+
+    }
+
+    public void onPostOnCreate() {
+        if (FTRUMConfig.get().isRumEnable()) {
+            if (!mInited) {
+                long startTime = Utils.querySharePreference(Constants.SHARE_PRE_START_TIME, Long.class, 0L);
+                long now = Utils.getCurrentNanoTime();
+                FTActivityManager.get().setAppState(AppState.RUN);
+                FTAutoTrack.putRUMLaunchPerformance(true, now - startTime);
+
+            }
         }
     }
 
+
     public void onPostResume() {
         if (alreadySleep) {
-            if (FTRUMConfig.get().isRumEnable()) {
-                FTAutoTrack.putRUMLaunchPerformance(false);
+            if (mInited) {
+                if (FTRUMConfig.get().isRumEnable()) {
+                    long startTime = Utils.querySharePreference(Constants.SHARE_PRE_START_TIME, Long.class, 0L);
+
+                    if (startTime > 0) {
+                        long now = Utils.getCurrentNanoTime();
+                        FTAutoTrack.putRUMLaunchPerformance(false, now - startTime);
+                    }
+
+                }
             }
             alreadySleep = false;
+        }
+        //避免重复计算页面启动的统计计算
+        if (!mInited) {
+            mInited = true;
         }
     }
 

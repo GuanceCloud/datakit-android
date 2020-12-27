@@ -12,6 +12,7 @@ import com.ft.sdk.garble.FTRUMConfig;
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.FpsUtils;
+import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.util.HashMap;
@@ -23,7 +24,6 @@ import java.util.HashMap;
  */
 public class FTActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
     private final AppRestartCallback mAppRestartCallback = new AppRestartCallback();
-    private boolean mInit = false;
     private final HashMap<Activity, Long> mCreateMap = new HashMap<>();
 
 
@@ -44,13 +44,10 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
 
     @Override
     public void onActivityPostCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
+        mAppRestartCallback.onPostOnCreate();
         FTManager.getFTActivityManager().putActivity(activity);
         if (FTRUMConfig.get().isRumEnable()) {
-            if (!mInit) {
-                FTActivityManager.get().setAppState(AppState.RUN);
-                FTAutoTrack.putRUMLaunchPerformance(true);
-                mInit = true;
-            }
+
             Long startTime = mCreateMap.get(activity);
             if (startTime != null) {
                 long duration = Utils.getCurrentNanoTime() - startTime;
@@ -100,6 +97,8 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     public void onActivityStopped(@NonNull Activity activity) {
         mAppRestartCallback.onStop();
     }
+
+
 
     @Override
     public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
