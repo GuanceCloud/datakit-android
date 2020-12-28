@@ -98,7 +98,7 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
             Iterator<String> iterator = headers.keySet().iterator();
             while (iterator.hasNext()) {
                 String key = iterator.next();
-                requestBuilder.addHeader(key, headers.get(key));
+                requestBuilder.header(key, headers.get(key));//避免重试出现重复头
             }
             newRequest = requestBuilder.build();
             response = chain.proceed(requestBuilder.build());
