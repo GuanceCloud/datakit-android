@@ -14,12 +14,12 @@ import com.ft.DebugMainActivity;
 import com.ft.R;
 import com.ft.application.MockApplication;
 import com.ft.sdk.EnvType;
+import com.ft.sdk.FTExceptionHandler;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
-import com.ft.sdk.FTExceptionHandler;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -58,8 +58,7 @@ public class ErrorTraceTest extends BaseTest {
         ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL))
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setDebug(true)//设置是否是 debug
-                .setEnv(EnvType.GRAY)
-                .setOnlySupportMainProcess(true);
+                .setEnv(EnvType.GRAY);
         //关闭数据自动同步操作
 //        SyncTaskManager.get().setRunning(true);
         stopSyncTask();

@@ -34,7 +34,7 @@ public class DemoApplication extends Application {
 
     private void initFTSDK() {
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(this, AccountUtils.ACCESS_SERVER_URL))
-                .setRumAppId(AccountUtils.getProperty(this,AccountUtils.RUM_APP_ID))
+                .setRumAppId(AccountUtils.getProperty(this, AccountUtils.RUM_APP_ID))
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setUseOAID(true)//设置 OAID 是否可用
                 .setDebug(true)//设置是否是 debug
@@ -47,8 +47,7 @@ public class DemoApplication extends Application {
                 .setNetworkTrace(true)
                 .setTraceConsoleLog(true)
                 .setEventFlowLog(true)
-                .setTraceType(TraceType.ZIPKIN)
-                .setOnlySupportMainProcess(true);
+                .setTraceType(TraceType.ZIPKIN);
         FTSdk.install(ftSDKConfig);
 
         FTSdk.get().bindUserData("brandon.test.userid");

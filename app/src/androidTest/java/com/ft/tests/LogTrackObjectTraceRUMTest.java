@@ -78,8 +78,7 @@ public class LogTrackObjectTraceRUMTest extends BaseTest {
                 .setRumAppId(AccountUtils.getProperty(context, AccountUtils.RUM_APP_ID))
                 .setTraceConsoleLog(true)
                 .setEventFlowLog(true)
-                .setTraceType(TraceType.ZIPKIN)
-                .setOnlySupportMainProcess(true);
+                .setTraceType(TraceType.ZIPKIN);
         FTSdk.install(ftSDKConfig);
         FTDBManager.get().delete();
     }
