@@ -9,6 +9,7 @@ import com.ft.sdk.garble.utils.LogUtils;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -173,9 +174,25 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
             int code = response != null ? response.code() : 0;
             json.put("code", code);
             json.put("headers", headers);
-            if (code > HttpURLConnection.HTTP_OK) {
-                json.put("body", body == null ? JSONObject.NULL : body);
-            }
+//            if (code > HttpURLConnection.HTTP_OK) {
+//                JSONObject jbBody = null;
+//                JSONArray jaBody = null;
+//                try {
+//                    jbBody = new JSONObject(body);
+//                    json.put("body", jbBody);
+//                } catch (JSONException e) {
+//                }
+//                if (jbBody == null) {
+//                    try {
+//                        jaBody = new JSONArray(body);
+//                        json.put("body", jaBody);
+//                    } catch (JSONException e) {
+//                    }
+//                }
+//                if (jaBody == null && jbBody == null) {
+//                    json.put("body", body);
+//                }
+//            }
             if (error != null && !error.isEmpty()) {
                 json.put("error", error);
             }
