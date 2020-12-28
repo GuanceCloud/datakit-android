@@ -1,7 +1,6 @@
 package com.ft.sdk;
 
 import com.ft.sdk.garble.FTHttpConfig;
-import com.ft.sdk.garble.FTRUMConfig;
 import com.ft.sdk.garble.bean.NetStatusBean;
 import com.ft.sdk.garble.http.HttpUrl;
 import com.ft.sdk.garble.http.NetStatusMonitor;
@@ -17,6 +16,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -29,7 +29,6 @@ import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-import okhttp3.Route;
 import okhttp3.internal.http.HttpHeaders;
 
 /**
@@ -171,25 +170,12 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
         JSONObject headers = response != null ? new JSONObject(response.headers().toMultimap()) : new JSONObject();
 
         try {
-            json.put("code", response != null ? response.code() : 0);
+            int code = response != null ? response.code() : 0;
+            json.put("code", code);
             json.put("headers", headers);
-//            JSONObject jbBody = null;
-//            JSONArray jaBody = null;
-//            try {
-//                jbBody = new JSONObject(body);
-//                json.put("body", jbBody);
-//            } catch (JSONException e) {
-//            }
-//            if (jbBody == null) {
-//                try {
-//                    jaBody = new JSONArray(body);
-//                    json.put("body", jaBody);
-//                } catch (JSONException e) {
-//                }
-//            }
-//            if (jaBody == null && jbBody == null) {
-//                json.put("body", body);
-//            }
+            if (code > HttpURLConnection.HTTP_OK) {
+                json.put("body", body == null ? JSONObject.NULL : body);
+            }
             if (error != null && !error.isEmpty()) {
                 json.put("error", error);
             }
