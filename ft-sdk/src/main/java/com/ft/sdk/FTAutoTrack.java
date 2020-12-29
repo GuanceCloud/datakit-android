@@ -356,7 +356,6 @@ public class FTAutoTrack {
      * APP 启动
      */
     public static void startApp() {
-        Utils.saveSharePreference(Constants.SHARE_PRE_START_TIME, Utils.getCurrentNanoTime());
         if (!FTAutoTrackConfig.get().isAutoTrack()) {
             return;
         }

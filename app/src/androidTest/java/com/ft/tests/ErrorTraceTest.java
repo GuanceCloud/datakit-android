@@ -75,7 +75,7 @@ public class ErrorTraceTest extends BaseTest {
         FTSdk.install(ftSDKConfig);
         avoidCrash();
         //产生一个崩溃信息
-        onView(ViewMatchers.withId(R.id.mock_crash_btn)).perform(ViewActions.scrollTo()).perform(click());
+        onView(ViewMatchers.withId(R.id.main_mock_crash_btn)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
         Assert.assertTrue(checkLogContent("ArithmeticException"));

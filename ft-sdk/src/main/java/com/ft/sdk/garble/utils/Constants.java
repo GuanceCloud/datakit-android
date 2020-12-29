@@ -50,7 +50,6 @@ public class Constants {
     public static final String MOCK_SON_PAGE_DATA = "mock_son_page_data";
     public static final String SHARE_PRE_STEP_DATE = "share_pre_step_date";
     public static final String SHARE_PRE_STEP_HISTORY = "share_pre_step_history";
-    public static final String SHARE_PRE_START_TIME = "share_pre_start_time";
 
     public static final String URL_MODEL_TRACK_INFLUX = "v1/write/metric";//指标数据上传路径
     public static final String URL_MODEL_RUM = "v1/write/rum";//

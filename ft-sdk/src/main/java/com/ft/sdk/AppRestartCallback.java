@@ -8,7 +8,6 @@ import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.FTRUMConfig;
 import com.ft.sdk.garble.bean.AppState;
-import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
@@ -24,6 +23,7 @@ class AppRestartCallback {
     public static final int DELAY_MILLIS = 10000;//10 秒
     private boolean alreadySleep = true;
     private boolean mInited = false;//判断第一次第一个页是否创建
+    private long startTime = 0;
     private final Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
@@ -38,6 +38,7 @@ class AppRestartCallback {
         if (alreadySleep) {//表示从后台重新进入
             if (mInited) {
                 FTAutoTrack.startApp();
+                startTime = Utils.getCurrentNanoTime();
             }
             FTMonitor.get().checkForReStart();
         }
@@ -46,17 +47,15 @@ class AppRestartCallback {
     }
 
     public void onPreOnCreate() {
-        if (FTRUMConfig.get().isRumEnable()) {
-            if (!mInited) {
-                FTAutoTrack.startApp();
-            }
+        if (!mInited) {
+            FTAutoTrack.startApp();
+            startTime = Utils.getCurrentNanoTime();
         }
     }
 
     public void onPostOnCreate() {
         if (FTRUMConfig.get().isRumEnable()) {
             if (!mInited) {
-                long startTime = Utils.querySharePreference(Constants.SHARE_PRE_START_TIME, Long.class, 0L);
                 long now = Utils.getCurrentNanoTime();
                 FTActivityManager.get().setAppState(AppState.RUN);
                 FTAutoTrack.putRUMLaunchPerformance(true, now - startTime);
@@ -69,8 +68,6 @@ class AppRestartCallback {
         if (alreadySleep) {
             if (mInited) {
                 if (FTRUMConfig.get().isRumEnable()) {
-                    long startTime = Utils.querySharePreference(Constants.SHARE_PRE_START_TIME, Long.class, 0L);
-
                     if (startTime > 0) {
                         long now = Utils.getCurrentNanoTime();
                         FTAutoTrack.putRUMLaunchPerformance(false, now - startTime);

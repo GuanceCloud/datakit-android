@@ -38,7 +38,11 @@ public final class FTActivityManager {
 
     public synchronized static FTActivityManager get() {
         if (instance == null) {
-            instance = new FTActivityManager();
+            synchronized (FTActivityManager.class) {
+                if (instance == null) {
+                    instance = new FTActivityManager();
+                }
+            }
         }
         return instance;
     }

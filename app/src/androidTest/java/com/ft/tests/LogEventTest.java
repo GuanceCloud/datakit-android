@@ -73,7 +73,7 @@ public class LogEventTest extends BaseTest {
      */
     @Test
     public void clickLambdaBtnTest() throws InterruptedException {
-        onView(ViewMatchers.withId(R.id.mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
+        onView(ViewMatchers.withId(R.id.main_mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.LOG);
@@ -89,7 +89,7 @@ public class LogEventTest extends BaseTest {
 
     @Test
     public void leaveTest() throws InterruptedException {
-        onView(withId(R.id.mock_page_jump_btn)).perform(ViewActions.scrollTo()).perform(click());
+        onView(withId(R.id.main_mock_page_jump_btn)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.LOG);
@@ -105,7 +105,7 @@ public class LogEventTest extends BaseTest {
 
     @Test
     public void enterTest() throws InterruptedException {
-        onView(withId(R.id.mock_page_jump_btn)).perform(ViewActions.scrollTo()).perform(click());
+        onView(withId(R.id.main_mock_page_jump_btn)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.LOG);

@@ -5,14 +5,22 @@
     android:orientation="vertical">
 
     <Button
-        android:id="@+id/first_to_second_btn"
+        android:id="@+id/repeat_new_repeat_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="to SecondActivity" />
+        android:text="new repeat" />
 
     <Button
-        android:id="@+id/first_to_repeat_btn"
+        android:id="@+id/repeat_to_first_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="to RepeatActivity" />
+        android:text="to FirstActivity" />
+
+    <Button
+        android:id="@+id/repeat_finish_all"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="finish all" />
+
+
 </LinearLayout>
