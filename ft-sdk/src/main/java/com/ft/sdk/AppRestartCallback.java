@@ -23,7 +23,7 @@ class AppRestartCallback {
     public static final int MSG_CHECK_SLEEP_STATUS = 1;
     public static final int DELAY_MILLIS = 10000;//10 秒
     private boolean alreadySleep = true;
-    private boolean mInited = false;
+    private boolean mInited = false;//判断第一次第一个页是否创建
     private final Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
@@ -45,6 +45,14 @@ class AppRestartCallback {
 
     }
 
+    public void onPreOnCreate() {
+        if (FTRUMConfig.get().isRumEnable()) {
+            if (!mInited) {
+                FTAutoTrack.startApp();
+            }
+        }
+    }
+
     public void onPostOnCreate() {
         if (FTRUMConfig.get().isRumEnable()) {
             if (!mInited) {
@@ -56,7 +64,6 @@ class AppRestartCallback {
             }
         }
     }
-
 
     public void onPostResume() {
         if (alreadySleep) {
@@ -84,6 +91,14 @@ class AppRestartCallback {
         if (!appForeground) {
             handler.removeMessages(MSG_CHECK_SLEEP_STATUS);
             handler.sendEmptyMessageDelayed(MSG_CHECK_SLEEP_STATUS, DELAY_MILLIS);
+        }
+    }
+
+    public void onPostDestroy() {
+        boolean empty = FTActivityManager.get().getActiveCount() == 0;
+        if (empty) {
+            mInited = false;
+            LogUtils.d(TAG, "Application all close");
         }
     }
 
