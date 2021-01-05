@@ -121,24 +121,24 @@
     Foo.prototype.sendEvent = baseSend
     Foo.prototype.addEventListener = baseAddEventListener
 
-    var api = new Foo()
+    var FT_JS_Bridge = new Foo()
 
     handler.initBridge(function () {
 
         var obj = {}
         obj["name"]= "ready"  //务必在这里调用，通知 Native 页面，如果需要 Native 页面加载完毕去触发一些事件需要用到这个回调
-        api.sendEvent(obj);
+        FT_JS_Bridge.sendEvent(obj);
     });
 
     function test() {
 
-        api.sendEvent({})
+        FT_JS_Bridge.sendEvent({})
 
-        api.sendEvent({}, function (ret, err) {
+        FT_JS_Bridge.sendEvent({}, function (ret, err) {
            console.log("sendEvent call back:" + JSON.stringify(ret) + "，" + JSON.stringify(err))
         })
 
-        api.addEventListener({}, function (ret, err) {
+        FT_JS_Bridge.addEventListener({}, function (ret, err) {
            console.log("addEventListener call back:" + JSON.stringify(ret) + "，" + JSON.stringify(err))
         })
     }
