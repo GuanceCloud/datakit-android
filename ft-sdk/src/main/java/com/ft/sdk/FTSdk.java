@@ -202,8 +202,6 @@ public class FTSdk {
                 FTFlowConfig.get().initParams(mFtSDKConfig);
             }
 
-            FTAutoTrack.startApp();
-
             float rate = mFtSDKConfig.getSamplingRate();
             if (rate > 1 || rate < 0) {
                 throw new

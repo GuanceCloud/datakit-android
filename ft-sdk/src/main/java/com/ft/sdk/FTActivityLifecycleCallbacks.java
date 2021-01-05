@@ -9,7 +9,6 @@ import androidx.annotation.Nullable;
 
 import com.ft.sdk.garble.FTFragmentManager;
 import com.ft.sdk.garble.FTRUMConfig;
-import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.FpsUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -23,7 +22,6 @@ import java.util.HashMap;
  */
 public class FTActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
     private final AppRestartCallback mAppRestartCallback = new AppRestartCallback();
-    private boolean mInit = false;
     private final HashMap<Activity, Long> mCreateMap = new HashMap<>();
 
 
@@ -34,7 +32,6 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
 //            NetUtils.get().startMonitorNetRate();
 //        }
         FTFragmentManager.getInstance().addFragmentLifecycle(activity);
-        mCreateMap.put(activity, Utils.getCurrentNanoTime());
     }
 
     @Override
@@ -43,14 +40,17 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     }
 
     @Override
+    public void onActivityPreCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
+        mCreateMap.put(activity, Utils.getCurrentNanoTime());
+        mAppRestartCallback.onPreOnCreate();
+    }
+
+    @Override
     public void onActivityPostCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
+        mAppRestartCallback.onPostOnCreate();
         FTManager.getFTActivityManager().putActivity(activity);
         if (FTRUMConfig.get().isRumEnable()) {
-            if (!mInit) {
-                FTActivityManager.get().setAppState(AppState.RUN);
-                FTAutoTrack.putRUMLaunchPerformance(true);
-                mInit = true;
-            }
+
             Long startTime = mCreateMap.get(activity);
             if (startTime != null) {
                 long duration = Utils.getCurrentNanoTime() - startTime;
@@ -101,6 +101,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
         mAppRestartCallback.onStop();
     }
 
+
     @Override
     public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
     }
@@ -114,5 +115,11 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
         //从 Activity 的管理栈中移除 Activity
         FTManager.getFTActivityManager().removeActivity(activity);
         mCreateMap.remove(activity);
+    }
+
+    @Override
+    public void onActivityPostDestroyed(@NonNull Activity activity) {
+        mAppRestartCallback.onPostDestroy();
+
     }
 }

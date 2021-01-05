@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        Button logThread = findViewById(R.id.mock_period_data_btn);
+        Button logThread = findViewById(R.id.main_mock_period_data_btn);
         logThread.setOnClickListener(v -> {
             logThreadRun = !logThreadRun;
             AtomicLong atomicLong = new AtomicLong(0);
@@ -97,10 +97,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.mock_one_data_btn).setOnClickListener(v -> {
+        findViewById(R.id.main_mock_one_data_btn).setOnClickListener(v -> {
             Log.d("LogManager", "测试日志数据=======当前时间为" + Utils.getCurrentNanoTime());
         });
-        findViewById(R.id.mock_crash_btn).setOnClickListener(v -> {
+        findViewById(R.id.main_mock_crash_btn).setOnClickListener(v -> {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -108,16 +108,16 @@ public class MainActivity extends AppCompatActivity {
                 }
             }).start();
         });
-        findViewById(R.id.mock_crash_native_btn).setOnClickListener(v -> {
+        findViewById(R.id.main_mock_crash_native_btn).setOnClickListener(v -> {
             ReflectUtils.reflectCrashAndGetExceptionMessage();
         });
-        findViewById(R.id.mock_page_jump_btn).setOnClickListener(v -> {
+        findViewById(R.id.main_mock_page_jump_btn).setOnClickListener(v -> {
             startActivity(new Intent(this, WebViewActivity.class));
         });
-        findViewById(R.id.mock_click_btn).setOnClickListener(v -> {
+        findViewById(R.id.main_mock_click_btn).setOnClickListener(v -> {
         });
 
-        findViewById(R.id.mock_okhttp_btn).setOnClickListener(v -> {
+        findViewById(R.id.main_mock_okhttp_btn).setOnClickListener(v -> {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
             }).start();
         });
 
-        findViewById(R.id.mock_httpclient_btn).setOnClickListener(v -> {
+        findViewById(R.id.main_mock_httpclient_btn).setOnClickListener(v -> {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }).start();
         });
-        findViewById(R.id.mock_ui_block_btn).setOnClickListener(v -> {
+        findViewById(R.id.main_mock_ui_block_btn).setOnClickListener(v -> {
             try {
                 Thread.sleep(1200);
             } catch (InterruptedException e) {
@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.mock_anr_btn).setOnClickListener(v -> {
+        findViewById(R.id.main_mock_anr_btn).setOnClickListener(v -> {
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException e) {
@@ -161,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
-        findViewById(R.id.view_loop_test).setOnClickListener(v -> {
+        findViewById(R.id.main_view_loop_test).setOnClickListener(v -> {
             startActivity(new Intent(MainActivity.this, FirstActivity.class));
 
         });

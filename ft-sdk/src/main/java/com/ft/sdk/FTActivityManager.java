@@ -38,7 +38,11 @@ public final class FTActivityManager {
 
     public synchronized static FTActivityManager get() {
         if (instance == null) {
-            instance = new FTActivityManager();
+            synchronized (FTActivityManager.class) {
+                if (instance == null) {
+                    instance = new FTActivityManager();
+                }
+            }
         }
         return instance;
     }
@@ -48,7 +52,7 @@ public final class FTActivityManager {
      *
      * @return
      */
-    public int getActiveCount() {
+    int getActiveCount() {
         return activityList == null ? 0 : activityList.size();
     }
 
@@ -57,33 +61,27 @@ public final class FTActivityManager {
      *
      * @return
      */
-    public Activity getTopActivity() {
+    Activity getTopActivity() {
         return topActivity;
     }
 
 
-    public void putActivity(Activity activity) {
+    void putActivity(Activity activity) {
         topActivity = activity;
         if (activityList == null) {
             activityList = new ArrayList<>();
         }
 
         activityList.add(activity);
-        //记录最近两个
-        if (activityList.size() > 2) {
-            Activity stackTop = activityList.remove(0);
-            removeActivityStatus(stackTop.getClass().getName());
-
-        }
     }
 
-    public void removeActivity(Activity activity) {
+    void removeActivity(Activity activity) {
         if (activityList != null) {
-
             try {
                 for (int i = activityList.size() - 1; i >= 0; i--) {
                     if (activityList.get(i).equals(activity)) {
                         activityList.remove(activity);
+                        removeActivityStatus(activity.getClass().getName());
                         break;
                     }
                 }
@@ -99,7 +97,7 @@ public final class FTActivityManager {
      *
      * @return
      */
-    public Class getLastActivity() {
+    Class getLastActivity() {
         if (activityList != null && activityList.size() > 1) {
             Activity activity = activityList.get(activityList.size() - 2);
             if (activity != null) {
@@ -117,7 +115,7 @@ public final class FTActivityManager {
      *
      * @return
      */
-    public boolean lastTwoActivitySame() {
+    boolean lastTwoActivitySame() {
         if (activityList != null && activityList.size() > 1) {
             Activity activity1 = activityList.get(activityList.size() - 2);
             Activity activity2 = activityList.get(activityList.size() - 1);
@@ -137,7 +135,7 @@ public final class FTActivityManager {
      * @param className
      * @param fromFragment
      */
-    public void putActivityOpenFromFragment(String className, boolean fromFragment) {
+    void putActivityOpenFromFragment(String className, boolean fromFragment) {
         if (activityOpenTypeMap == null) {
             activityOpenTypeMap = new ConcurrentHashMap<>();
         }
@@ -150,7 +148,7 @@ public final class FTActivityManager {
      * @param className
      * @return
      */
-    public boolean getActivityOpenFromFragment(String className) {
+    boolean getActivityOpenFromFragment(String className) {
         if (activityOpenTypeMap != null && activityOpenTypeMap.containsKey(className)) {
             return activityOpenTypeMap.get(className);
         }

@@ -55,8 +55,7 @@ public class SDKRunStateTest extends BaseTest {
                 .setNetworkTrace(true)
                 .setTraceConsoleLog(true)
                 .setEventFlowLog(true)
-                .setTraceType(TraceType.ZIPKIN)
-                .setOnlySupportMainProcess(true);
+                .setTraceType(TraceType.ZIPKIN);
         FTSdk.install(ftSDKConfig);
     }
 

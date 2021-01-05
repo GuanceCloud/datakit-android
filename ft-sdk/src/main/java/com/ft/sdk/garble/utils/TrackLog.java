@@ -86,6 +86,7 @@ public class TrackLog {
     protected static int showFullLog(boolean upload, String TAG, String message, LogType logType) {
         int segmentSize = 4 * 1024;
         int length = message != null ? message.length() : 0;
+        if (length == 0) return 0;
         if (length <= segmentSize) {
             showLog(upload, TAG, message, logType);
         } else {

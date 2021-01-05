@@ -14,61 +14,61 @@
 
 
         <Button
-            android:id="@+id/mock_period_data_btn"
+            android:id="@+id/main_mock_period_data_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="周期产生日志数据" />
         <Button
-            android:id="@+id/mock_one_data_btn"
+            android:id="@+id/main_mock_one_data_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="周期产生一条日志数据" />
         <Button
-            android:id="@+id/mock_crash_btn"
+            android:id="@+id/main_mock_crash_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="模拟崩溃" />
         <Button
-            android:id="@+id/mock_crash_native_btn"
+            android:id="@+id/main_mock_crash_native_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="模拟 native 崩溃" />
         <Button
-            android:id="@+id/mock_ui_block_btn"
+            android:id="@+id/main_mock_ui_block_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="模拟卡顿" />
 
         <Button
-            android:id="@+id/mock_anr_btn"
+            android:id="@+id/main_mock_anr_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="模拟 Anr" />
         <Button
-            android:id="@+id/mock_page_jump_btn"
+            android:id="@+id/main_mock_page_jump_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Web 测试" />
         <Button
-            android:id="@+id/mock_click_btn"
+            android:id="@+id/main_mock_click_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="仅用于测试用例测试点击产生的日志" />
         <Button
-            android:id="@+id/mock_okhttp_btn"
+            android:id="@+id/main_mock_okhttp_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="测试 OkHttp 请求自动添加拦截器" />
 
         <Button
-            android:id="@+id/mock_httpclient_btn"
+            android:id="@+id/main_mock_httpclient_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="测试 HttpClient5 请求自动添加拦截器" />
 
 
         <Button
-            android:id="@+id/view_loop_test"
+            android:id="@+id/main_view_loop_test"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="页面跳转测试" />

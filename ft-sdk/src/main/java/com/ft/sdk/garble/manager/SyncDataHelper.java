@@ -128,18 +128,52 @@ public class SyncDataHelper {
      */
     private String convertToLineProtocolLines(List<SyncJsonData> datas, HashMap<String, Object> extraTags) {
         StringBuilder sb = new StringBuilder();
-        String extraTagsString = parseHashToString(extraTags);
-        for (SyncJsonData recordData : datas) {
-            //获取这条事件的指标
-            sb.append(getMeasurement(recordData));
-            if (!extraTagsString.isEmpty()) {
-                sb.append(",");
-                sb.append(extraTagsString);
-                deleteLastComma(sb);
+        for (SyncJsonData data : datas) {
+            String jsonString = data.getDataString();
+            if (jsonString != null) {
+                try {
+                    //========== measurement ==========
+                    JSONObject opJson = new JSONObject(jsonString);
+                    String measurement = opJson.optString(Constants.MEASUREMENT);
+                    if (Utils.isNullOrEmpty(measurement)) {
+                        measurement = FT_KEY_VALUE_NULL;
+                    } else {
+                        measurement = Utils.translateMeasurements(measurement);
+                    }
+                    sb.append(measurement);
+
+                    //========== tags ==========
+                    JSONObject tags = opJson.optJSONObject(Constants.TAGS);
+                    if (extraTags != null) {
+                        //合并去重
+                        for (String key : extraTags.keySet()) {
+                            if (!tags.has(key)) {
+                                tags.put(key, extraTags.get(key));
+                            }
+                        }
+                    }
+                    StringBuilder tagSb = getCustomHash(tags, true);
+                    deleteLastComma(tagSb);
+                    if (tagSb.length() > 0) {
+                        sb.append(",");
+                        sb.append(tagSb.toString());
+                    }
+                    sb.append(Constants.SEPARATION_PRINT);
+
+                    //========== field ==========
+                    JSONObject fields = opJson.optJSONObject(Constants.FIELDS);
+                    StringBuilder valueSb = getCustomHash(fields, false);
+                    deleteLastComma(valueSb);
+                    sb.append(valueSb);
+                    sb.append(Constants.SEPARATION_PRINT);
+
+                    //========= time ==========
+                    sb.append(data.getTime());
+                    sb.append(Constants.SEPARATION_LINE_BREAK);
+                } catch (Exception e) {
+                    LogUtils.e(TAG, e.getMessage());
+                }
             }
-            //获取埋点事件数据
-            sb.append(composeUpdateData(recordData));
-            sb.append(Constants.SEPARATION_LINE_BREAK);
         }
         return sb.toString();
     }
@@ -164,32 +198,6 @@ public class SyncDataHelper {
     private String getTrackBodyContent(List<SyncJsonData> datas) {
         HashMap<String, Object> deviceTags = getBaseDeviceInfoTagsMap();
         return convertToLineProtocolLines(datas, deviceTags);
-    }
-
-    /**
-     * 获得数据头
-     * {@link com.ft.sdk.garble.bean.OP#CSTM} 时用field字段，其他情况用
-     * {@link com.ft.sdk.garble.utils.Constants#FT_MEASUREMENT_PAGE_EVENT}
-     *
-     * @return
-     */
-    private String getMeasurement(SyncJsonData data) {
-        String measurement;
-        try {
-
-            String jsonString = data.getDataString();
-            JSONObject jsonObject = new JSONObject(jsonString);
-            String measurementTemp = jsonObject.optString(Constants.MEASUREMENT);
-            if (Utils.isNullOrEmpty(measurementTemp)) {
-                measurement = FT_KEY_VALUE_NULL;
-            } else {
-                measurement = Utils.translateMeasurements(measurementTemp);
-            }
-        } catch (Exception e) {
-            LogUtils.e(TAG, e.getMessage());
-            measurement = FT_KEY_VALUE_NULL;
-        }
-        return measurement;
     }
 
     /**
@@ -233,38 +241,6 @@ public class SyncDataHelper {
         } else {
             sb.append(Utils.translateTagKeyValue(value));
         }
-    }
-
-    /**
-     * 拼装数据
-     *
-     * @return
-     */
-    private String composeUpdateData(SyncJsonData data) {
-        StringBuilder sb = new StringBuilder();
-        String jsonString = data.getDataString();
-        if (jsonString != null) {
-            try {
-                JSONObject opJson = new JSONObject(jsonString);
-                JSONObject tags = opJson.optJSONObject(Constants.TAGS);
-                JSONObject fields = opJson.optJSONObject(Constants.FIELDS);
-                StringBuilder tagSb = getCustomHash(tags, true);
-                StringBuilder valueSb = getCustomHash(fields, false);
-                deleteLastComma(tagSb);
-                if (tagSb.length() > 0) {
-                    sb.append(",");
-                    sb.append(tagSb.toString());
-                }
-                sb.append(Constants.SEPARATION_PRINT);
-                deleteLastComma(valueSb);
-                sb.append(valueSb);
-                sb.append(Constants.SEPARATION_PRINT);
-                sb.append(data.getTime());
-            } catch (Exception e) {
-                LogUtils.e(TAG, e.getMessage());
-            }
-        }
-        return sb.toString();
     }
 
 
@@ -638,43 +614,6 @@ public class SyncDataHelper {
         StringUtils.deleteLastCharacter(sb, ",");
     }
 
-    /**
-     * map 转化 String
-     *
-     * @param param
-     * @return
-     */
-    private static String parseHashToString(HashMap<String, Object> param) {
-        StringBuilder sb = new StringBuilder();
-        if (param != null) {
-            Iterator<String> keys = param.keySet().iterator();
-            while (keys.hasNext()) {
-                String key = keys.next();
-                Object value = param.get(key);
-                if (keys.hasNext()) {
-                    if (value != null) {
-                        if (value instanceof String && ((String) value).isEmpty()) {
-                            value = UNKNOWN;
-                        }
-                        sb.append(key).append("=").append(value).append(",");
-                    } else {
-                        sb.append(key + "=" + UNKNOWN + ",");
-                    }
-                } else {
-                    if (value != null) {
-                        if (value instanceof String && ((String) value).isEmpty()) {
-                            value = UNKNOWN;
-                        }
-                        sb.append(key + "=" + value);
-                    } else {
-                        sb.append(key + "=" + UNKNOWN);
-                    }
-                }
-            }
-        }
-
-        return sb.toString();
-    }
 
     /**
      * 获取必要的设备信息
