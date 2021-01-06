@@ -626,8 +626,8 @@ public class SyncDataHelper {
         hashMap.put(Constants.KEY_APP_VERSION_NAME, Utils.getAppVersionName());
         hashMap.put(Constants.KEY_DEVICE_APPLICATION_ID, DeviceUtils.getApplicationId(context));
         hashMap.put(Constants.KEY_DEVICE_OS, DeviceUtils.getOSName());
-        hashMap.put(Constants.KEY_DEVICE_DEVICE_BAND, Utils.translateTagKeyValue(DeviceUtils.getDeviceBand()));
-        hashMap.put(Constants.KEY_DEVICE_DEVICE_MODEL, Utils.translateTagKeyValue(DeviceUtils.getDeviceModel()));
+        hashMap.put(Constants.KEY_DEVICE_DEVICE_BAND, DeviceUtils.getDeviceBand());
+        hashMap.put(Constants.KEY_DEVICE_DEVICE_MODEL, DeviceUtils.getDeviceModel());
         hashMap.put(Constants.KEY_DEVICE_DISPLAY, DeviceUtils.getDisplay(context));
         return hashMap;
     }
