@@ -86,7 +86,7 @@ class FTTraceHandler {
         traceBean.setClazz("tracing");
         traceBean.setSpanType("entry");
         traceBean.setEndpoint(endPoint);
-        traceBean.setIsError(String.valueOf(isError));
+        traceBean.setStatus(isError?"error":"ok");
         traceBean.setServiceName(FTExceptionHandler.get().getTrackServiceName());
         traceBean.setSpanID(spanID);
         traceBean.setTraceID(traceID);

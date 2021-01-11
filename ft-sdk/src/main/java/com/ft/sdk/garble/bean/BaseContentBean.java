@@ -70,7 +70,7 @@ public class BaseContentBean {
             fields = new JSONObject();
         }
         try {
-            fields.put("__content", content);
+            fields.put("message", content);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -84,11 +84,11 @@ public class BaseContentBean {
         try {
 
             if (env != null) {
-                tags.put("__env", env.toString());
+                tags.put("env", env.toString());
             }
 
             if (!Utils.isNullOrEmpty(serviceName)) {
-                tags.put("__serviceName", serviceName);
+                tags.put("service", serviceName);
             }
 
             if (!tags.has(Constants.KEY_DEVICE_UUID)) {

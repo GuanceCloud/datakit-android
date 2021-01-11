@@ -43,7 +43,7 @@ public class LogBean extends BaseContentBean {
         super.getAllFields();
         try {
             if (duration > 0) {
-                fields.put("__duration", duration);
+                fields.put("duration", duration);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -54,10 +54,10 @@ public class LogBean extends BaseContentBean {
     public JSONObject getAllTags() {
         super.getAllTags();
         try {
-            tags.put("__status", status.name);
+            tags.put("status", status.name);
 
             if (!Utils.isNullOrEmpty(operationName)) {
-                tags.put("__operationName", operationName);
+                tags.put("operation", operationName);
             }
 
         } catch (JSONException e) {

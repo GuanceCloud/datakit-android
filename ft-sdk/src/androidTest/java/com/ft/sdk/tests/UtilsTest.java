@@ -161,7 +161,7 @@ public class UtilsTest {
         JSONObject jsonObject = array.optJSONObject(0);
         String name = jsonObject.optString(ObjectBean.INNER_NAME);
         Assert.assertEquals(name, objectName);
-        JSONObject tags = jsonObject.optJSONObject(ObjectBean.INNER_TAGS);
+        JSONObject tags = jsonObject.optJSONObject(ObjectBean.INNER_CONTENT);
         String clazz = tags.optString(ObjectBean.INNER_CLASS);
         Assert.assertEquals(clazz, Constants.DEFAULT_OBJECT_CLASS);
 

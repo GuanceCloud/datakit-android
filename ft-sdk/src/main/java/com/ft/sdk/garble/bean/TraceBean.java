@@ -20,7 +20,7 @@ public class TraceBean extends BaseContentBean {
     //用于链路日志，表示当前链路的 ID
     String traceID;
     //字符串类型，true 表示该 span 的请求响应是错误,false 或者无该标签，表示该 span 的响应是正常的请求
-    String isError;
+    String status;
     //span 的类型，目前支持 2 个值：entry 和 local，entry span 表示该 span 的调用的是服务的入口，
     // 即该服务的对其他服务提供调用请求的端点，几乎所有服务和消息队列消费者都是 entry span，
     // 因此只有 span 是 entry 类型的调用才是一个独立的请求。 local span 表示该 span 和远程调用没有任何关系，
@@ -55,7 +55,7 @@ public class TraceBean extends BaseContentBean {
         super.getAllFields();
         try {
             if (duration > 0) {
-                fields.put("__duration", duration);
+                fields.put("*duration", duration);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -69,31 +69,30 @@ public class TraceBean extends BaseContentBean {
             tags = new JSONObject();
         }
         try {
-            if (!Utils.isNullOrEmpty(clazz)) {//目前只支持tracing
-                tags.put("__class", "tracing");
-            }
+//            if (!Utils.isNullOrEmpty(clazz)) {//目前只支持tracing
+//                tags.put("__class", "tracing");
+//            }
             if (!Utils.isNullOrEmpty(parentID)) {
-                tags.put("__parentID", parentID);
+                tags.put("parent_id", parentID);
             }
             if (!Utils.isNullOrEmpty(operationName)) {
-                tags.put("__operationName", operationName);
+                tags.put("operation", operationName);
             }
             if (!Utils.isNullOrEmpty(spanID)) {
-                tags.put("__spanID", spanID);
+                tags.put("span_id", spanID);
             }
             if (!Utils.isNullOrEmpty(traceID)) {
-                tags.put("__traceID", traceID);
+                tags.put("trace_id", traceID);
             }
-            if (!Utils.isNullOrEmpty(isError)) {
-                tags.put("__isError", isError);
+            if (!Utils.isNullOrEmpty(status)) {
+                tags.put("status", status);
             }
             if (!Utils.isNullOrEmpty(spanType)) {
-                tags.put("__spanType", spanType);
+                tags.put("span_type", spanType);
             }
             if (!Utils.isNullOrEmpty(endpoint)) {
-                tags.put("__endpoint", endpoint);
+                tags.put("endpoint", endpoint);
             }
-
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -129,10 +128,10 @@ public class TraceBean extends BaseContentBean {
 
 
     /**
-     * @param isError 字符串类型，true 表示该 span 的请求响应是错误,false 或者无该标签，表示该 span 的响应是正常的请求
+     * @param status 字符串类型，true 表示该 span 的请求响应是错误,false 或者无该标签，表示该 span 的响应是正常的请求
      */
-    public void setIsError(String isError) {
-        this.isError = isError;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
 

@@ -19,9 +19,9 @@ import java.util.Map;
  * description:
  */
 public class ObjectBean {
-    public static final String INNER_NAME = "__name";
-    public static final String INNER_CLASS = "__class";
-    public static final String INNER_TAGS = "__tags";
+    public static final String INNER_NAME = "name";
+    public static final String INNER_CLASS = "class";
+    public static final String INNER_CONTENT = "content";
     private String name;//当前对象的名称，同一个分类下，对象名称如果重复，会覆盖原有数据
     private HashMap<String, Object> tags;//当前对象的标签，key-value 对，其中存在保留标签
     private String clazz = Constants.DEFAULT_OBJECT_CLASS;
@@ -56,7 +56,7 @@ public class ObjectBean {
                 Map.Entry<String, Object> entry = iterator.next();
                 jsonObject.put(entry.getKey(), entry.getValue());
             }
-            js.put(INNER_TAGS, jsonObject);
+            js.put(INNER_CONTENT, jsonObject);
         } catch (Exception e) {
             e.printStackTrace();
         }
