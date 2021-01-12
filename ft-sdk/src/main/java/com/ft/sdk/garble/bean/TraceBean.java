@@ -55,7 +55,7 @@ public class TraceBean extends BaseContentBean {
         super.getAllFields();
         try {
             if (duration > 0) {
-                fields.put("*duration", duration);
+                fields.put("duration", duration);
             }
         } catch (JSONException e) {
             e.printStackTrace();
