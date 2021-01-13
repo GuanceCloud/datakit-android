@@ -83,7 +83,6 @@ class FTTraceHandler {
         TraceBean traceBean = new TraceBean(FTHttpConfig.get().traceType.toString(), content, requestTime);
         traceBean.setOperationName(operationName);
         traceBean.setDuration(duration);
-        traceBean.setClazz("tracing");
         traceBean.setSpanType("entry");
         traceBean.setEndpoint(endPoint);
         traceBean.setStatus(isError?"error":"ok");

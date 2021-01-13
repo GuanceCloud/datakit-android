@@ -11,8 +11,6 @@ import org.json.JSONObject;
  * description:日志对象(SDK内部使用)
  */
 public class TraceBean extends BaseContentBean {
-    //日志的子分类，目前仅支持：tracing：表示该日志是链路追踪日志
-    String clazz;
     //用于链路日志，表示当前 span 的上一个 span的 ID
     String parentID;
     //用于链路日志，表示当前 span 的 ID
@@ -69,9 +67,6 @@ public class TraceBean extends BaseContentBean {
             tags = new JSONObject();
         }
         try {
-//            if (!Utils.isNullOrEmpty(clazz)) {//目前只支持tracing
-//                tags.put("__class", "tracing");
-//            }
             if (!Utils.isNullOrEmpty(parentID)) {
                 tags.put("parent_id", parentID);
             }
@@ -99,11 +94,6 @@ public class TraceBean extends BaseContentBean {
         }
 
         return tags;
-    }
-
-
-    public void setClazz(String clazz) {
-        this.clazz = clazz;
     }
 
 
