@@ -868,7 +868,7 @@ public class FTAutoTrack {
      *
      * @param log
      */
-    public static void PutRUMuiBlock(String log) {
+    public static void putRUMuiBlock(String log) {
         if (!Utils.enableTraceSamplingRate()) return;
         long time = Utils.getCurrentNanoTime();
         putFreeze("Freeze", time, log);

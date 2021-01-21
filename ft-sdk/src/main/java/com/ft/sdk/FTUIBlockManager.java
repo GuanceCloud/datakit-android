@@ -2,9 +2,6 @@ package com.ft.sdk;
 
 import android.view.Choreographer;
 
-import com.ft.sdk.FTAutoTrack;
-import com.ft.sdk.FTSDKConfig;
-import com.ft.sdk.FTTrackInner;
 import com.ft.sdk.garble.FTRUMConfig;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.Status;
@@ -42,7 +39,7 @@ public class FTUIBlockManager {
         FTMainLoopLogMonitor.getInstance().setLogCallBack(log -> {
 
             if (FTRUMConfig.get().isRumEnable()) {
-                FTAutoTrack.PutRUMuiBlock(log);
+                FTAutoTrack.putRUMuiBlock(log);
 
             } else {
                 LogBean logBean = new LogBean("------ UIBlock  ------\n " + log, Utils.getCurrentNanoTime());
