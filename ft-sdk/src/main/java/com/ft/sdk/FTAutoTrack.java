@@ -814,6 +814,7 @@ public class FTAutoTrack {
             tags.put(Constants.KEY_RUM_RESPONSE_CONTENT_TYPE, bean.responseContentType);
             tags.put(Constants.KEY_RUM_RESPONSE_CONTENT_ENCODING, bean.responseContentEncoding);
             tags.put(Constants.KEY_RUM_RESOURCE_METHOD, bean.resourceMethod);
+            tags.put(Constants.KEY_RUM_RESPONSE_SERVER, bean.responseServer);
 
             if (bean.resourceStatus > 0) {
                 tags.put(Constants.KEY_RUM_RESOURCE_STATUS, bean.resourceStatus);
@@ -854,6 +855,9 @@ public class FTAutoTrack {
             if (!bean.urlPath.isEmpty()) {
                 tags.put(Constants.KEY_RUM_RESOURCE_URL_PATH, bean.urlPath);
             }
+            tags.put(Constants.KEY_RUM_RESOURCE_URL, bean.url);
+            fields.put(Constants.KEY_RUM_REQUEST_HEADER, bean.requestHeader);
+            fields.put(Constants.KEY_RUM_RESPONSE_HEADER, bean.responseHeader);
 
             FTTrackInner.getInstance().rumES(time,
                     Constants.FT_MEASUREMENT_RUM_RESOURCE, tags, fields);

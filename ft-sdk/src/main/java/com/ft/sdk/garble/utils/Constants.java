@@ -158,12 +158,16 @@ public class Constants {
     public static final String KEY_RUM_USER_ID = "userid";
     public static final String KEY_RUM_APP_ID = "app_id";
 
+    public static final String KEY_RUM_RESOURCE_URL = "resource_url";
     public static final String KEY_RUM_RESOURCE_URL_HOST = "resource_url_host";
     public static final String KEY_RUM_RESOURCE_TYPE = "resource_type";
     public static final String KEY_RUM_RESPONSE_CONNECTION = "response_connection";
     public static final String KEY_RUM_RESPONSE_CONTENT_TYPE = "response_content_type";
     public static final String KEY_RUM_RESPONSE_CONTENT_ENCODING = "response_content_encoding";
     public static final String KEY_RUM_RESOURCE_METHOD = "resource_method";
+    public static final String KEY_RUM_RESPONSE_SERVER = "response_server";
+    public static final String KEY_RUM_RESPONSE_HEADER = "response_header";
+    public static final String KEY_RUM_REQUEST_HEADER = "request_header";
     public static final String KEY_RUM_TERMINAL = "terminal";
     public static final String KEY_RUM_SDK_PACKAGE_AGENT = "sdk_package_agent";
     public static final String KEY_RUM_SDK_PACKAGE_TRACK = "sdk_package_track";
