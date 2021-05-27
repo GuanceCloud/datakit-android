@@ -20,7 +20,7 @@ buildscript {
 
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.2'
+        classpath 'com.android.tools.build:gradle:4.2.1'
         classpath 'com.cloudcare.ft.mobile.sdk.tracker.plugin:ft-plugin:1.0.2-alpha02'
 //        classpath files('ft-plugin/build/libs/ft-plugin-1.0.2-alpha01.jar')
         classpath "com.github.gmazzo:gradle-buildconfig-plugin:2.0.2"
