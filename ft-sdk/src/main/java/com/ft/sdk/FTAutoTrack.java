@@ -24,7 +24,8 @@ import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.FTRUMConfig;
 import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.bean.AppState;
-import com.ft.sdk.garble.bean.CrashType;
+import com.ft.sdk.garble.bean.ErrorSource;
+import com.ft.sdk.garble.bean.ErrorType;
 import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.ResourceBean;
 import com.ft.sdk.garble.utils.AopUtils;
@@ -46,6 +47,8 @@ import org.json.JSONObject;
 import java.lang.reflect.Method;
 import java.util.Locale;
 import java.util.Map;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import okhttp3.OkHttpClient;
 
@@ -770,6 +773,9 @@ public class FTAutoTrack {
             tags.put(Constants.KEY_RUM_RESPONSE_CONTENT_ENCODING, bean.responseContentEncoding);
             tags.put(Constants.KEY_RUM_RESOURCE_METHOD, bean.resourceMethod);
             tags.put(Constants.KEY_RUM_RESPONSE_SERVER, bean.responseServer);
+            tags.put(Constants.KEY_RUM_ACTION_ID,bean.actionId);
+            tags.put(Constants.KEY_RUM_VIEW_ID,bean.viewId);
+            tags.put(Constants.KEY_RUM_SESSION_ID,bean.sessionId);
 
             if (bean.resourceStatus > 0) {
                 tags.put(Constants.KEY_RUM_RESOURCE_STATUS, bean.resourceStatus);
@@ -803,6 +809,8 @@ public class FTAutoTrack {
 
             if (!bean.urlPath.isEmpty()) {
                 tags.put(Constants.KEY_RUM_RESOURCE_URL_PATH, bean.urlPath);
+                tags.put(Constants.KEY_RUM_RESOURCE_URL_PATH_GROUP,
+                        bean.urlPath.substring(bean.urlPath.lastIndexOf("/") + 1));
             }
             tags.put(Constants.KEY_RUM_RESOURCE_URL, bean.url);
             fields.put(Constants.KEY_RUM_REQUEST_HEADER, bean.requestHeader);
@@ -810,6 +818,38 @@ public class FTAutoTrack {
 
             FTTrackInner.getInstance().rum(time,
                     Constants.FT_MEASUREMENT_RUM_RESOURCE, tags, fields);
+
+
+            if (bean.resourceStatus >= HttpsURLConnection.HTTP_BAD_REQUEST) {
+                JSONObject errorTags = getRUMPublicTags();
+                JSONObject errorField = new JSONObject();
+                errorTags.put(Constants.KEY_RUM_ERROR_TYPE, ErrorType.NETWORK.toString());
+                errorTags.put(Constants.KEY_RUM_ERROR_SOURCE, ErrorSource.NETWORK.toString());
+                errorTags.put(Constants.KEY_RUM_ERROR_SITUATION, AppState.RUN.toString());
+
+                if (bean.resourceStatus > 0) {
+                    errorTags.put(Constants.KEY_RUM_RESOURCE_STATUS, bean.resourceStatus);
+                    long statusGroupPrefix = bean.resourceStatus / 100;
+                    errorTags.put(Constants.KEY_RUM_RESOURCE_STATUS_GROUP, statusGroupPrefix + "xx");
+                }
+                errorTags.put(Constants.KEY_RUM_RESOURCE_URL, bean.url);
+                errorTags.put(Constants.KEY_RUM_RESOURCE_URL_HOST, bean.urlHost);
+                errorTags.put(Constants.KEY_RUM_RESOURCE_METHOD, bean.resourceMethod);
+
+                if (!bean.urlPath.isEmpty()) {
+                    errorTags.put(Constants.KEY_RUM_RESOURCE_URL_PATH, bean.urlPath);
+                    errorTags.put(Constants.KEY_RUM_RESOURCE_URL_PATH_GROUP,
+                            bean.urlPath.substring(bean.urlPath.lastIndexOf("/") + 1));
+                }
+
+                errorField.put(Constants.KEY_RUM_ERROR_MESSAGE, "");
+                errorField.put(Constants.KEY_RUM_ERROR_STACK, "");
+
+
+                FTTrackInner.getInstance().rum(time, Constants.FT_MEASUREMENT_RUM_ERROR, tags, fields);
+            }
+
+
         } catch (Exception e) {
             LogUtils.e(TAG, e.toString());
         }
@@ -845,7 +885,7 @@ public class FTAutoTrack {
      * @param message
      * @param state
      */
-    public static void putRUMCrash(String log, String message, long dateline, CrashType crashType, AppState state) {
+    public static void putRUMError(String log, String message, long dateline, ErrorType errorType, AppState state) {
 
         if (!Utils.enableTraceSamplingRate()) return;
 
@@ -853,11 +893,12 @@ public class FTAutoTrack {
             JSONObject tags = getRUMPublicTags();
             JSONObject fields = new JSONObject();
 
-            tags.put(Constants.KEY_RUM_CRASH_TYPE, crashType.toString());
-            tags.put(Constants.KEY_RUM_CRASH_SITUATION, state.toString());
+            tags.put(Constants.KEY_RUM_ERROR_TYPE, errorType.toString());
+            tags.put(Constants.KEY_RUM_ERROR_SOURCE, ErrorSource.LOGGER);
+            tags.put(Constants.KEY_RUM_ERROR_SITUATION, state.toString());
             tags.put(Constants.KEY_RUM_APPLICATION_UUID, FTSdk.PACKAGE_UUID);
-            fields.put(Constants.KEY_RUM_CRASH_MESSAGE, message);
-            fields.put(Constants.KEY_RUM_CRASH_STACK, log);
+            fields.put(Constants.KEY_RUM_ERROR_MESSAGE, message);
+            fields.put(Constants.KEY_RUM_ERROR_STACK, log);
 
             try {
                 if (FTMonitorConfig.get().isMonitorType(MonitorType.BLUETOOTH)) {

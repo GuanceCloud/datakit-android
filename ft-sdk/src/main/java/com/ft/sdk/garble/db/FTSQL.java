@@ -27,6 +27,7 @@ public class FTSQL {
     public static final String RUM_COLUMN_LONG_TASK_COUNT = "long_task_count";
     public static final String RUM_COLUMN_ERROR_COUNT = "error_count";
     public static final String RUM_COLUMN_RESOURCE_COUNT = "resource_count";
+    public static final String RUM_COLUMN_PENDING_RESOURCE = "pending_resource_count";
     public static final String RUM_COLUMN_ACTION_COUNT = "action_count";
 
     public static final String RUM_COLUMN_SESSION_ID = "session_id";
@@ -54,6 +55,7 @@ public class FTSQL {
             RUM_COLUMN_ERROR_COUNT + " INTEGER," +
             RUM_COLUMN_LONG_TASK_COUNT + " INTEGER," +
             RUM_COLUMN_RESOURCE_COUNT + " INTEGER," +
+            RUM_COLUMN_PENDING_RESOURCE + " INTEGER," +
             RUM_COLUMN_SESSION_ID + " TEXT," +
             RUM_COLUMN_VIEW_NAME + " TEXT," +
             RUM_COLUMN_VIEW_ID + " TEXT," +
@@ -74,7 +76,8 @@ public class FTSQL {
             RUM_COLUMN_LONG_TASK_COUNT + " INTEGER," +
             RUM_COLUMN_VIEW_LOAD_TIME + " BIGINT," +
             RUM_COLUMN_VIEW_TIME_SPENT + " BIGINT," +
-            RUM_COLUMN_RESOURCE_COUNT + " INTEGER" +
+            RUM_COLUMN_RESOURCE_COUNT + " INTEGER," +
+            RUM_COLUMN_PENDING_RESOURCE + " INTEGER" +
             ")";
 
 

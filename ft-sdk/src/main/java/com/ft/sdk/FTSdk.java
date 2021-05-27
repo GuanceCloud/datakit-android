@@ -214,7 +214,7 @@ public class FTSdk {
             FTMonitorConfig.get().initParams(mFtSDKConfig);
             FTUIBlockManager.start(mFtSDKConfig);
 
-//            initNativeDump();
+            initNativeDump();
 
         }
     }

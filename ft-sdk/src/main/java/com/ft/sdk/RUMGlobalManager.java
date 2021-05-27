@@ -93,13 +93,17 @@ class RUMGlobalManager {
     }
 
     void startResource(String viewId, String actionId) {
-        //update action resource count ++
-
+        ThreadPoolUtils.get().execute(() -> {
+            FTDBManager.get().increaseViewPendingResource(viewId);
+            FTDBManager.get().increaseActionPendingResource(actionId);
+        });
     }
 
     void stopResource(String viewId, String actionId) {
-        //update action resource count --
-
+        ThreadPoolUtils.get().execute(() -> {
+            FTDBManager.get().reduceViewPendingResource(viewId);
+            FTDBManager.get().reduceActionPendingResource(actionId);
+        });
     }
 
     void onCreateView(String viewName, long loadTime) {
@@ -150,8 +154,9 @@ class RUMGlobalManager {
         ThreadPoolUtils.get().execute(() -> {
             FTDBManager.get().increaseViewResource(viewId);
             FTDBManager.get().increaseActionResource(actionId);
-
         });
+        stopResource(viewId, actionId);
+
     }
 
 
@@ -176,7 +181,6 @@ class RUMGlobalManager {
     }
 
     void increaseAction(String viewId) {
-
         ThreadPoolUtils.get().execute(() -> {
             FTDBManager.get().increaseViewAction(viewId);
 

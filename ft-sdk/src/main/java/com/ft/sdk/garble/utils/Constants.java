@@ -185,11 +185,13 @@ public class Constants {
     public static final String KEY_RUM_RESOURCE_TTFB = "resource_ttfb";
     public static final String KEY_RUM_RESOURCE_TRANS = "resource_trans";
     public static final String KEY_RUM_RESOURCE_URL_PATH = "resource_url_path";
-    public static final String KEY_RUM_CRASH_TYPE = "crash_type";
-    public static final String KEY_RUM_CRASH_SITUATION = "crash_situation";
+    public static final String KEY_RUM_RESOURCE_URL_PATH_GROUP = "resource_url_path_group";
     public static final String KEY_RUM_APPLICATION_UUID = "application_uuid";
-    public static final String KEY_RUM_CRASH_MESSAGE = "crash_message";
-    public static final String KEY_RUM_CRASH_STACK = "crash_stack";
+    public static final String KEY_RUM_ERROR_MESSAGE = "error_message";
+    public static final String KEY_RUM_ERROR_STACK = "error_stack";
+    public static final String KEY_RUM_ERROR_SOURCE = "error_source";
+    public static final String KEY_RUM_ERROR_TYPE = "error_type";
+    public static final String KEY_RUM_ERROR_SITUATION = "error_situation";
     public static final String KEY_RUM_LONG_TASK_DURATION = "duration";
     public static final String KEY_RUM_LONG_TASK_STACK = "long_task_stack";
     public static final String KEY_RUM_ENV = "env";

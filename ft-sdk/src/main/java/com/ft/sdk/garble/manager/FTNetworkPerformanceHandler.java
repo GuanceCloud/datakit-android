@@ -16,7 +16,11 @@ import okhttp3.Route;
 public final class FTNetworkPerformanceHandler {
     private final ResourceBean bean = new ResourceBean();
 
-    public void setTransformContent(Request request, Response response, String responseBody, Connection connection) {
+    public void setTransformContent(Request request, Response response, String responseBody,
+                                    Connection connection, String sessionId, String viewId, String actionId) {
+        bean.sessionId = sessionId;
+        bean.viewId = viewId;
+        bean.actionId = actionId;
         bean.url = request.url().toString();
         bean.urlHost = request.url().host();
         bean.urlPath = request.url().encodedPath();

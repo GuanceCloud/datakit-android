@@ -72,6 +72,7 @@ public class FTDBManager extends DBManager {
             contentValues.put(FTSQL.RUM_COLUMN_IS_CLOSE, 0);
             contentValues.put(FTSQL.RUM_COLUMN_ACTION_COUNT, 0);
             contentValues.put(FTSQL.RUM_COLUMN_RESOURCE_COUNT, 0);
+            contentValues.put(FTSQL.RUM_COLUMN_PENDING_RESOURCE, 0);
             contentValues.put(FTSQL.RUM_COLUMN_VIEW_NAME, data.getViewName());
             contentValues.put(FTSQL.RUM_COLUMN_VIEW_REFERRER, data.getViewReferrer());
             contentValues.put(FTSQL.RUM_COLUMN_VIEW_LOAD_TIME, data.getLoadTime());
@@ -182,6 +183,22 @@ public class FTDBManager extends DBManager {
         increase(FTSQL.FT_TABLE_VIEW, viewId, FTSQL.RUM_COLUMN_RESOURCE_COUNT);
     }
 
+    public void increaseViewPendingResource(String viewId) {
+        increase(FTSQL.FT_TABLE_VIEW, viewId, FTSQL.RUM_COLUMN_PENDING_RESOURCE);
+    }
+
+    public void increaseActionPendingResource(String actionId) {
+        increase(FTSQL.FT_TABLE_ACTION, actionId, FTSQL.RUM_COLUMN_PENDING_RESOURCE);
+    }
+
+    public void reduceViewPendingResource(String viewId) {
+        reduce(FTSQL.FT_TABLE_VIEW, viewId, FTSQL.RUM_COLUMN_PENDING_RESOURCE);
+    }
+
+    public void reduceActionPendingResource(String actionId) {
+        reduce(FTSQL.FT_TABLE_ACTION, actionId, FTSQL.RUM_COLUMN_PENDING_RESOURCE);
+    }
+
     public void increaseViewError(String viewId) {
         increase(FTSQL.FT_TABLE_VIEW, viewId, FTSQL.RUM_COLUMN_ERROR_COUNT);
 
@@ -190,6 +207,7 @@ public class FTDBManager extends DBManager {
     public void increaseViewLongTask(String viewId) {
         increase(FTSQL.FT_TABLE_VIEW, viewId, FTSQL.RUM_COLUMN_LONG_TASK_COUNT);
     }
+
 
     private void increase(String tableName, String id, String columnName) {
         getDB(true, db -> {
@@ -201,6 +219,20 @@ public class FTDBManager extends DBManager {
             if (count > 0) {
                 db.execSQL("UPDATE " + tableName + " SET "
                         + columnName + "=" + columnName + "+1 WHERE " + FTSQL.RUM_COLUMN_ID + "='" + id + "'");
+            }
+        });
+    }
+
+    private void reduce(String tableName, String id, String columnName) {
+        getDB(true, db -> {
+            Cursor cursor = db.rawQuery("select count(*) from " + tableName
+                    + " where " + FTSQL.RUM_COLUMN_ID + "='" + id + "'", null);
+            cursor.moveToFirst();
+            int count = cursor.getInt(0);
+            cursor.close();
+            if (count > 0) {
+                db.execSQL("UPDATE " + tableName + " SET "
+                        + columnName + "=" + columnName + "-1 WHERE " + FTSQL.RUM_COLUMN_ID + "='" + id + "'");
             }
         });
     }
@@ -300,16 +332,17 @@ public class FTDBManager extends DBManager {
 
     public void cleanCloseViewData() {
         getDB(true, db -> {
-            db.execSQL("DELETE FROM " + FTSQL.FT_TABLE_VIEW + " WHERE " + FTSQL.RUM_COLUMN_IS_CLOSE + "=1");
+            db.execSQL("DELETE FROM " + FTSQL.FT_TABLE_VIEW + " WHERE " + FTSQL.RUM_COLUMN_IS_CLOSE
+                    + "=1 AND " + FTSQL.RUM_COLUMN_PENDING_RESOURCE + "<=0");
         });
     }
 
     public void closeAllActionAndView() {
         getDB(true, db -> {
             db.execSQL("UPDATE " + FTSQL.FT_TABLE_VIEW + " SET "
-                    + FTSQL.RUM_COLUMN_IS_CLOSE + "=1 ");
+                    + FTSQL.RUM_COLUMN_IS_CLOSE + "=1," + FTSQL.RUM_COLUMN_PENDING_RESOURCE + "=0");
             db.execSQL("UPDATE " + FTSQL.FT_TABLE_ACTION + " SET "
-                    + FTSQL.RUM_COLUMN_IS_CLOSE + "=1 ");
+                    + FTSQL.RUM_COLUMN_IS_CLOSE + "=1 ," + FTSQL.RUM_COLUMN_PENDING_RESOURCE + "=0");
         });
 
     }

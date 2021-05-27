@@ -19,7 +19,6 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import okhttp3.Connection;
@@ -85,6 +84,7 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
         String viewId = RUMGlobalManager.getInstance().getViewId();
         String actionId = RUMGlobalManager.getInstance().getActionId();
         String sessionId = RUMGlobalManager.getInstance().getSessionId();
+        RUMGlobalManager.getInstance().startResource(viewId,actionId);
         Request request = chain.request();
         Response response = null;
         Request.Builder requestBuilder = request.newBuilder();
@@ -96,9 +96,7 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
             HttpUrl httpUrl = new HttpUrl(url.host(), url.encodedPath(), url.port(), url.toString());
             HashMap<String, String> headers = handler.getTraceHeader(httpUrl);
             handler.setIsWebViewTrace(webViewTrace);
-            Iterator<String> iterator = headers.keySet().iterator();
-            while (iterator.hasNext()) {
-                String key = iterator.next();
+            for (String key : headers.keySet()) {
                 requestBuilder.header(key, headers.get(key));//避免重试出现重复头
             }
             newRequest = requestBuilder.build();
@@ -111,7 +109,8 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
         Connection connection = chain.connection();
         if (exception != null) {
             uploadNetTrace(handler, newRequest, null, "", exception.getMessage());
-            mPerformanceHandler.setTransformContent(newRequest, null, "", connection);
+            mPerformanceHandler.setTransformContent(newRequest, null, "",
+                    connection, sessionId, viewId, actionId);
 
             throw new IOException(exception);
         } else {
@@ -128,7 +127,8 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
                         responseBody1 = ResponseBody.create(responseBody1.contentType(), bytes);
                         response = response.newBuilder().body(responseBody1).build();
                         uploadNetTrace(handler, newRequest, response, responseBody, "");
-                        mPerformanceHandler.setTransformContent(newRequest, response, responseBody, connection);
+                        mPerformanceHandler.setTransformContent(newRequest, response, responseBody,
+                                connection, sessionId, viewId, actionId);
 
                     }
                 }

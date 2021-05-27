@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.FTRUMConfig;
 import com.ft.sdk.garble.bean.AppState;
-import com.ft.sdk.garble.bean.CrashType;
+import com.ft.sdk.garble.bean.ErrorType;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -43,7 +43,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
         long dateline = Utils.getCurrentNanoTime();
 
         if (FTRUMConfig.get().isRumEnable()) {
-            FTAutoTrack.putRUMCrash(crash, message, dateline, CrashType.JAVA, state);
+            FTAutoTrack.putRUMError(crash, message, dateline, ErrorType.JAVA, state);
         } else {
             uploadCrashLog(crash, dateline);
         }
@@ -161,7 +161,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
                                 if (item.getName().contains(ANR_FILE_NAME)) {
                                     FTAutoTrack.putRUMAnr(crashString, crashTime);
                                 } else if (item.getName().contains(NATIVE_FILE_NAME)) {
-                                    FTAutoTrack.putRUMCrash(crashString, "Native Crash", crashTime, CrashType.NATIVE, AppState.getValueFrom(value));
+                                    FTAutoTrack.putRUMError(crashString, "Native Crash", crashTime, ErrorType.NATIVE, AppState.getValueFrom(value));
                                 }
                             } else {
                                 uploadCrashLog(crashString, crashTime);

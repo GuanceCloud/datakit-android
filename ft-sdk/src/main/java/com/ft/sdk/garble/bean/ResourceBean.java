@@ -23,6 +23,10 @@ public class ResourceBean {
     public long resourceTTFB = -1;
     public long resourceTrans = -1;
 
+    public String sessionId;
+    public String viewId;
+    public String actionId;
+
     public void reset() {
         url = "";
         urlHost = "";
@@ -45,6 +49,10 @@ public class ResourceBean {
         resourceSSL = -1;
         resourceTTFB = -1;
         resourceTrans = -1;
+
+        sessionId = "";
+        viewId = "";
+        actionId = "";
     }
 
 }
