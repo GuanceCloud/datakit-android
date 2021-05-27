@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.ViewParent;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.lang.reflect.Method;
 
@@ -127,15 +128,31 @@ public class AopUtils {
      * @return
      */
     public static String getViewTree(View view) {
-        StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append(view.getClass().getSimpleName() + "/");
+        StringBuilder stringBuffer = new StringBuilder();
+        stringBuffer.append(view.getClass().getSimpleName()).append("/");
         ViewParent viewParent = view.getParent();
         while (viewParent != null) {
             stringBuffer.insert(0, viewParent.getClass().getSimpleName() + "/");
             viewParent = viewParent.getParent();
         }
         stringBuffer.insert(0, view.getContext().getClass().getSimpleName() + "/");
-        stringBuffer.append("#" + AopUtils.getViewId(view));
+        stringBuffer.append("#").append(AopUtils.getViewId(view));
+        return stringBuffer.toString();
+    }
+
+    /**
+     * 获取 View 描述
+     *
+     * @param view
+     * @return
+     */
+    public static String getViewDesc(View view) {
+        StringBuilder stringBuffer = new StringBuilder();
+        stringBuffer.insert(0, view.getClass().getSimpleName() + "/");
+        if (view instanceof TextView) {
+            stringBuffer.append(((TextView) view).getText().toString());
+        }
+        stringBuffer.append("#").append(AopUtils.getViewId(view));
         return stringBuffer.toString();
     }
 
@@ -194,11 +211,11 @@ public class AopUtils {
             android.app.AlertDialog alertDialog = (android.app.AlertDialog) dialog;
             Button button = alertDialog.getButton(whichButton);
             if (button != null) {
-                return getViewTree(button);
+                return getViewDesc(button);
             } else {
                 ListView listView = alertDialog.getListView();
                 if (listView != null) {
-                    return getViewTree(listView);
+                    return getViewDesc(listView);
                 }
             }
 
@@ -214,14 +231,14 @@ public class AopUtils {
             }
 
             if (button != null) {
-                return getViewTree(button);
+                return getViewDesc(button);
             } else {
                 try {
                     Method getListViewMethod = dialog.getClass().getMethod("getListView");
                     if (getListViewMethod != null) {
                         ListView listView = (ListView) getListViewMethod.invoke(dialog);
                         if (listView != null) {
-                            return getViewTree(listView);
+                            return getViewDesc(listView);
                         }
                     }
                 } catch (Exception e) {

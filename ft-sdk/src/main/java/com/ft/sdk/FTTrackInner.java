@@ -47,15 +47,44 @@ public class FTTrackInner {
         return instance;
     }
 
-    void rumInflux(long time, String measurement, final JSONObject tags, JSONObject fields) {
-        syncDataBackground(DataType.RUM_INFLUX, time, measurement, tags, fields);
+    /**
+     * rum 事件数据
+     *
+     * @param time
+     * @param measurement
+     * @param tags
+     * @param fields
+     */
+    void rum(long time, String measurement, final JSONObject tags, JSONObject fields) {
+        switch (measurement) {
+            case Constants.FT_MEASUREMENT_RUM_ERROR:
+                RUMGlobalManager.getInstance().attachRUMRelative(tags);
+                RUMGlobalManager.getInstance().increaseError(tags);
+                break;
+            case Constants.FT_MEASUREMENT_RUM_LONG_TASK:
+                RUMGlobalManager.getInstance().attachRUMRelative(tags);
+                RUMGlobalManager.getInstance().increaseLongTask(tags);
+                break;
+            case Constants.FT_MEASUREMENT_RUM_RESOURCE:
+                RUMGlobalManager.getInstance().increaseResourceCount(tags);
+                break;
+        }
 
+        syncDataBackground(DataType.RUM_APP, time, measurement, tags, fields);
     }
 
-    void rumES(long time, String measurement, final JSONObject tags, JSONObject fields) {
-        syncDataBackground(DataType.RUM_ES, time, measurement, tags, fields);
-    }
+    /**
+     * rum 同步 web 数据
+     *
+     * @param time
+     * @param measurement
+     * @param tags
+     * @param fields
+     */
+    void rumWebView(long time, String measurement, final JSONObject tags, JSONObject fields) {
+        syncDataBackground(DataType.RUM_WEBVIEW, time, measurement, tags, fields);
 
+    }
 
     /**
      * 在子线程中将埋点数据同步（经过数据库）
@@ -74,9 +103,10 @@ public class FTTrackInner {
                                     String measurement, final JSONObject tags, JSONObject fields) {
         ThreadPoolUtils.get().execute(() -> {
             try {
+
                 SyncJsonData recordData = SyncJsonData.getSyncJsonData(dataType,
                         new LineProtocolBean(measurement, tags, fields, time));
-                boolean result = FTManager.getFTDBManager().insertFTOperation(recordData);
+                boolean result = FTManager.getFTDBManager().insertFtOperation(recordData);
                 LogUtils.d(TAG, "trackBackground:insert-result=" + result);
                 FTManager.getSyncTaskManager().executeSyncPoll();
             } catch (Exception e) {
@@ -148,7 +178,6 @@ public class FTTrackInner {
             callback.onResponse(result.getHttpCode(), result.getData());
         }
     }
-
 
 
     /**

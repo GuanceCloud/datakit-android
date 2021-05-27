@@ -72,9 +72,9 @@ public class FTMonitorConfig {
 //            LocationUtils.get().setUseGeoKey(useGeoKey);
 //            LocationUtils.get().startListener();
 //        }
-        if (isMonitorType(MonitorType.FPS)) {
-            FpsUtils.get().start();
-        }
+//        if (isMonitorType(MonitorType.FPS)) {
+//            FpsUtils.get().start();
+//        }
 //        if (isMonitorType(MonitorType.SENSOR_TORCH)) {
 //            CameraUtils.get().start();
 //        }

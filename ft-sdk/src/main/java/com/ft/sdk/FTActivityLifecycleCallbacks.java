@@ -10,7 +10,6 @@ import androidx.annotation.Nullable;
 import com.ft.sdk.garble.FTFragmentManager;
 import com.ft.sdk.garble.FTRUMConfig;
 import com.ft.sdk.garble.utils.AopUtils;
-import com.ft.sdk.garble.utils.FpsUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.util.HashMap;
@@ -55,30 +54,22 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
             if (startTime != null) {
                 long duration = Utils.getCurrentNanoTime() - startTime;
                 String viewName = AopUtils.getClassName(activity);
-                String viewID = Utils.MD5(viewName).toLowerCase();
-                double fps = FpsUtils.get().getFps();
                 Class lastActivity = FTActivityManager.get().getLastActivity();
                 String parentViewName = lastActivity != null ? lastActivity.getSimpleName() : null;
-                FTAutoTrack.putRUMViewLoadPerformance(viewID, viewName, parentViewName, fps, duration);
+                FTAutoTrack.putRUMViewLoadPerformance(viewName, parentViewName, duration);
             }
         }
     }
 
     @Override
     public void onActivityResumed(@NonNull Activity activity) {
-//        LocationUtils.get().startLocationCallBack(new AsyncCallback() {
-//            @Override
-//            public void onResponse(int code, String response) {
-//                LogUtils.d("LocationUtil", "code=" + code + ",response=" + response);
-//            }
-//        });
         boolean isFirstLoad = true;
         if (FTActivityManager.get().isFirstResume.containsKey(activity.getClass().getName())
                 && FTActivityManager.get().isFirstResume.get(activity.getClass().getName())) {
             isFirstLoad = false;
         }
         //页面打开埋点数据插入
-        FTAutoTrack.startPage(activity.getClass(), isFirstLoad);
+        FTAutoTrack.startPage(activity.getClass(), activity.getTitle().toString(), isFirstLoad);
         //开启同步
         FTManager.getSyncTaskManager().executeSyncPoll();
         //标记当前页面是否是第一次调用OnResume方法

@@ -14,15 +14,16 @@ import com.ft.sdk.garble.db.FTSQL;
  * Description:
  */
 public class DatabaseHelper extends SQLiteOpenHelper {
-    private static class DatabaseSingleton{
-        static DatabaseHelper single(Context context,String name, int version){
-            return new DatabaseHelper(context,name,version);
+    private static class DatabaseSingleton {
+        static DatabaseHelper single(Context context, String name, int version) {
+            return new DatabaseHelper(context, name, version);
         }
     }
 
-    public static DatabaseHelper getInstance(Context context,String name, int version){
-        return DatabaseSingleton.single(context,name,version);
+    public static DatabaseHelper getInstance(Context context, String name, int version) {
+        return DatabaseSingleton.single(context, name, version);
     }
+
     public DatabaseHelper(@Nullable Context context, @Nullable String name, int version) {
         super(context, name, null, version);
     }
@@ -39,7 +40,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     private void createTable(SQLiteDatabase db) {
-        db.execSQL(FTSQL.FT_TABLE_CREATE);
-        db.execSQL(FTSQL.FT_TABLE_USER_DATA_CREATE);
+        db.execSQL(FTSQL.FT_TABLE_SYNC_CREATE);
+        db.execSQL(FTSQL.FT_TABLE_VIEW_CREATE);
+        db.execSQL(FTSQL.FT_TABLE_ACTION_CREATE);
+//        db.execSQL(FTSQL.FT_TABLE_USER_DATA_CREATE);
     }
 }

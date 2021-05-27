@@ -64,10 +64,8 @@ public class SyncDataHelper {
             bodyContent = getObjectBodyContent(recordDatas);
         } else if (dataType == DataType.LOG || dataType == DataType.TRACE) {
             bodyContent = getLogAndTraceBodyContent(recordDatas);
-        } else if (dataType == DataType.RUM_INFLUX) {
-            bodyContent = getRumInfluxBodyContent(recordDatas);
-        } else if (dataType == DataType.RUM_ES) {
-            bodyContent = getRumEsBodyContent(recordDatas);
+        } else if (dataType == DataType.RUM_APP) {
+            bodyContent = getRumBodyContent(recordDatas);
         } else {
             bodyContent = getTrackBodyContent(recordDatas);
         }
@@ -183,7 +181,7 @@ public class SyncDataHelper {
         return convertToLineProtocolLines(datas, hashMap);
     }
 
-    private String getRumEsBodyContent(List<SyncJsonData> datas) {
+    private String getRumBodyContent(List<SyncJsonData> datas) {
         HashMap<String, Object> hashMap = getRumEsPublicTags();
         hashMap.putAll(getBaseDeviceInfoTagsMap());
         return convertToLineProtocolLines(datas, hashMap);
@@ -624,7 +622,7 @@ public class SyncDataHelper {
         Context context = FTApplication.getApplication();
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put(Constants.KEY_APP_VERSION_NAME, Utils.getAppVersionName());
-        hashMap.put(Constants.KEY_DEVICE_APPLICATION_ID, DeviceUtils.getApplicationId(context));
+//        hashMap.put(Constants.KEY_DEVICE_APPLICATION_ID, DeviceUtils.getApplicationId(context));
         hashMap.put(Constants.KEY_DEVICE_OS, DeviceUtils.getOSName());
         hashMap.put(Constants.KEY_DEVICE_DEVICE_BAND, DeviceUtils.getDeviceBand());
         hashMap.put(Constants.KEY_DEVICE_DEVICE_MODEL, DeviceUtils.getDeviceModel());
@@ -634,7 +632,7 @@ public class SyncDataHelper {
 
     private static HashMap<String, Object> getRumEsPublicTags() {
         HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put(Constants.KEY_RUM_TERMINAL, "app");
+//        hashMap.put(Constants.KEY_RUM_TERMINAL, "app");
         hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_AGENT, FTSdk.AGENT_VERSION);
         if (!FTSdk.PLUGIN_VERSION.isEmpty()) {
             hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_TRACK, FTSdk.PLUGIN_VERSION);
@@ -642,7 +640,11 @@ public class SyncDataHelper {
         if (!FTSdk.NATIVE_VERSION.isEmpty()) {
             hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_NATIVE, FTSdk.NATIVE_VERSION);
         }
-        hashMap.put(Constants.KEY_DEVICE_OS_VERSION, DeviceUtils.getOSVersion());
+        String osVersion = DeviceUtils.getOSVersion();
+        hashMap.put(Constants.KEY_DEVICE_OS_VERSION, osVersion);
+        hashMap.put(Constants.KEY_RUM_SDK_VERSION, FTSdk.AGENT_VERSION);
+        String osVersionMajor = osVersion.contains(".") ? osVersion.split("\\.")[0] : osVersion;
+        hashMap.put(Constants.KEY_DEVICE_OS_VERSION_MAJOR, osVersionMajor);
         return hashMap;
     }
 

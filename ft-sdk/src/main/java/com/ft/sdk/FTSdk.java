@@ -187,6 +187,7 @@ public class FTSdk {
     private void initFTConfig() {
         if (mFtSDKConfig != null) {
             LogUtils.setDebug(mFtSDKConfig.isDebug());
+            RUMGlobalManager.getInstance().init();
 //            LogUtils.setDescLogShow(mFtSDKConfig.isDescLog());
             FTAliasConfig.get().initParams(mFtSDKConfig);
             FTHttpConfig.get().initParams(mFtSDKConfig);
@@ -212,7 +213,8 @@ public class FTSdk {
             FTExceptionHandler.get().initParams(mFtSDKConfig);
             FTMonitorConfig.get().initParams(mFtSDKConfig);
             FTUIBlockManager.start(mFtSDKConfig);
-            initNativeDump();
+
+//            initNativeDump();
 
         }
     }

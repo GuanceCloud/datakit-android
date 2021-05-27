@@ -182,8 +182,8 @@ public class SyncTaskManager {
             case OBJECT:
                 model = Constants.URL_MODEL_OBJECT;
                 break;
-            case RUM_INFLUX:
-            case RUM_ES:
+            case RUM_APP:
+            case RUM_WEBVIEW:
                 model = Constants.URL_MODEL_RUM;
                 break;
             default:

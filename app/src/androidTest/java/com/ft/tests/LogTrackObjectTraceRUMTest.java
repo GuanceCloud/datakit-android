@@ -185,40 +185,38 @@ public class LogTrackObjectTraceRUMTest extends BaseTest {
     }
 
     @Test
-    public void rumEsTest() throws Exception {
+    public void rumTest() throws Exception {
         onView(ViewMatchers.withId(R.id.main_view_loop_test)).perform(ViewActions.scrollTo()).perform(click());
         Thread.sleep(5000);
-        int except1 = countInDB(DataType.RUM_ES, Constants.FT_MEASUREMENT_RUM_ES_VIEW);
+        int except1 = countInDB(DataType.RUM_APP, Constants.FT_MEASUREMENT_RUM_VIEW);
         Assert.assertTrue(except1 > 0);
         resumeSyncTask();
         executeSyncTask();
         Thread.sleep(12000);
-        int except2 = countInDB(DataType.RUM_ES, Constants.FT_MEASUREMENT_RUM_ES_VIEW);
+        int except2 = countInDB(DataType.RUM_APP, Constants.FT_MEASUREMENT_RUM_VIEW);
         Assert.assertEquals(0, except2);
     }
 
-    @Test
-    public void rumInfluxTestTest() throws Exception {
-        onView(ViewMatchers.withId(R.id.main_view_loop_test)).perform(ViewActions.scrollTo()).perform(click());
-        Thread.sleep(5000);
-        int except1 = countInDB(DataType.RUM_INFLUX, Constants.FT_MEASUREMENT_RUM_INFLUX_APP_VIEW);
-        Assert.assertTrue(except1 > 0);
-        resumeSyncTask();
-        executeSyncTask();
-        Thread.sleep(12000);
-        int except2 = countInDB(DataType.RUM_ES, Constants.FT_MEASUREMENT_RUM_INFLUX_APP_VIEW);
-        Assert.assertEquals(0, except2);
-
-    }
+//    @Test
+//    public void rumInfluxTestTest() throws Exception {
+//        onView(ViewMatchers.withId(R.id.main_view_loop_test)).perform(ViewActions.scrollTo()).perform(click());
+//        Thread.sleep(5000);
+//        int except1 = countInDB(DataType.RUM_INFLUX, Constants.FT_MEASUREMENT_RUM_INFLUX_APP_VIEW);
+//        Assert.assertTrue(except1 > 0);
+//        resumeSyncTask();
+//        executeSyncTask();
+//        Thread.sleep(12000);
+//        int except2 = countInDB(DataType.RUM, Constants.FT_MEASUREMENT_RUM_INFLUX_APP_VIEW);
+//        Assert.assertEquals(0, except2);
+//
+//    }
 
     @Test
     public void rumUserBindTest() throws InterruptedException {
         FTSdk.get().bindUserData("123456");
         onView(ViewMatchers.withId(R.id.main_view_loop_test)).perform(ViewActions.scrollTo()).perform(click());
         Thread.sleep(5000);
-        int except1 = countInDB(DataType.RUM_INFLUX, "\"is_signin\":\"T\"");
-        int except2 = countInDB(DataType.RUM_ES, "\"is_signin\":\"T\"");
-        Assert.assertTrue(except1 > 0);
+        int except2 = countInDB(DataType.RUM_APP, "\"is_signin\":\"T\"");
         Assert.assertTrue(except2 > 0);
 
 
@@ -230,9 +228,7 @@ public class LogTrackObjectTraceRUMTest extends BaseTest {
         FTSdk.get().unbindUserData();
         onView(ViewMatchers.withId(R.id.main_view_loop_test)).perform(ViewActions.scrollTo()).perform(click());
         Thread.sleep(5000);
-        int except3 = countInDB(DataType.RUM_INFLUX, "\"is_signin\":\"T\"");
-        int except4 = countInDB(DataType.RUM_ES, "\"is_signin\":\"T\"");
-        Assert.assertEquals(0, except3);
+        int except4 = countInDB(DataType.RUM_APP, "\"is_signin\":\"T\"");
         Assert.assertEquals(0, except4);
     }
 

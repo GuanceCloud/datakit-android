@@ -9,7 +9,6 @@ import com.ft.sdk.garble.utils.LogUtils;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -17,7 +16,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -84,6 +82,9 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
     @NotNull
     @Override
     public Response intercept(@NotNull Chain chain) throws IOException {
+        String viewId = RUMGlobalManager.getInstance().getViewId();
+        String actionId = RUMGlobalManager.getInstance().getActionId();
+        String sessionId = RUMGlobalManager.getInstance().getSessionId();
         Request request = chain.request();
         Response response = null;
         Request.Builder requestBuilder = request.newBuilder();
