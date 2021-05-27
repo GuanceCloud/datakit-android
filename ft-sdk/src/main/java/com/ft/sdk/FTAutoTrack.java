@@ -56,6 +56,7 @@ import okhttp3.OkHttpClient;
  */
 public class FTAutoTrack {
     public final static String TAG = "FTAutoTrack";
+    public final static String WEBVIEW_HANDLED_FLAG = "webview_auto_track_handled";
 
     /**
      * 启动 APP
@@ -1128,8 +1129,10 @@ public class FTAutoTrack {
     }
 
     private static void setUpWebView(View webView) {
-        if (webView instanceof WebView) {
+        if (webView instanceof WebView && webView.getTag(R.id.ft_webview_handled_tag_view_value) == null) {
             ((WebView) webView).setWebViewClient(new FTWebViewClient());
+            new FTWebViewHandler().setWebView((WebView) webView);
+            webView.setTag(R.id.ft_webview_handled_tag_view_value, "handled");
         }
     }
 

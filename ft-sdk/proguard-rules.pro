@@ -113,4 +113,9 @@
 }
 
 
-
+-keep enum com.ft.sdk.WebAppInterface {
+    *;
+}
+-keep enum com.ft.sdk.FTWebViewHandler {
+    *;
+}
