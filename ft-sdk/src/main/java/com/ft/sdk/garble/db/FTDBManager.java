@@ -269,12 +269,14 @@ public class FTDBManager extends DBManager {
                     int actionCount = cursor.getInt(cursor.getColumnIndex(FTSQL.RUM_COLUMN_ACTION_COUNT));
                     long timeSpent = cursor.getLong(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_TIME_SPENT));
                     long startTime = cursor.getLong(cursor.getColumnIndex(FTSQL.RUM_COLUMN_START_TIME));
+                    long loadTime = cursor.getLong(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_LOAD_TIME));
 
                     ViewBean viewBean = new ViewBean();
                     viewBean.setClose(close == 1);
                     viewBean.setId(id);
                     viewBean.setActionCount(actionCount);
                     viewBean.setTimeSpent(timeSpent);
+                    viewBean.setLoadTime(loadTime);
                     viewBean.setStartTime(startTime);
                     viewBean.setResourceCount(resourceCount);
                     viewBean.setErrorCount(errorCount);

@@ -11,6 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.UUID;
 
 class RUMGlobalManager {
@@ -36,6 +37,8 @@ class RUMGlobalManager {
     ActionBean activeAction;
     ViewBean activeView = ViewBean.createLaunchViewBean(sessionId);
 
+    HashMap<String, Long> preActivityDuration = new HashMap<>();
+
     long lastSessionTime = Utils.getCurrentNanoTime();
     boolean needWaitAction = false;
 
@@ -54,11 +57,11 @@ class RUMGlobalManager {
         return activeAction.getId();
     }
 
-    void startAction(String actionName,String actionType) {
-        startAction(actionName,actionType, false);
+    void startAction(String actionName, String actionType) {
+        startAction(actionName, actionType, false);
     }
 
-    void startAction(String actionName,String actionType, boolean needWait) {
+    void startAction(String actionName, String actionType, boolean needWait) {
         if (activeAction != null) {
             long now = Utils.getCurrentNanoTime();
             needWaitAction = needWait;
@@ -99,14 +102,23 @@ class RUMGlobalManager {
 
     }
 
+    void onCreateView(String viewName, long loadTime) {
+        preActivityDuration.put(viewName, loadTime);
+    }
 
-    void startView(String viewName, String viewReferrer, long loadTime) {
+
+    void startView(String viewName, String viewReferrer) {
         if (activeView != null) {
             activeView.close();
             closeView(activeView.getId(), activeView.getTimeSpent());
 
         }
 
+        long loadTime = -1;
+        if (preActivityDuration.get(viewName) != null) {
+            loadTime = preActivityDuration.get(viewName);
+            preActivityDuration.remove(viewName);
+        }
         activeView = new ViewBean(viewName, viewReferrer, loadTime, sessionId);
         initView(activeView);
 

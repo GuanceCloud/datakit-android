@@ -64,7 +64,7 @@ public class SyncDataHelper {
             bodyContent = getObjectBodyContent(recordDatas);
         } else if (dataType == DataType.LOG || dataType == DataType.TRACE) {
             bodyContent = getLogAndTraceBodyContent(recordDatas);
-        } else if (dataType == DataType.RUM_APP) {
+        } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_WEBVIEW) {
             bodyContent = getRumBodyContent(recordDatas);
         } else {
             bodyContent = getTrackBodyContent(recordDatas);
@@ -182,7 +182,7 @@ public class SyncDataHelper {
     }
 
     private String getRumBodyContent(List<SyncJsonData> datas) {
-        HashMap<String, Object> hashMap = getRumEsPublicTags();
+        HashMap<String, Object> hashMap = getRumPublicTags();
         hashMap.putAll(getBaseDeviceInfoTagsMap());
         return convertToLineProtocolLines(datas, hashMap);
     }
@@ -630,7 +630,7 @@ public class SyncDataHelper {
         return hashMap;
     }
 
-    private static HashMap<String, Object> getRumEsPublicTags() {
+    private static HashMap<String, Object> getRumPublicTags() {
         HashMap<String, Object> hashMap = new HashMap<>();
 //        hashMap.put(Constants.KEY_RUM_TERMINAL, "app");
         hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_AGENT, FTSdk.AGENT_VERSION);

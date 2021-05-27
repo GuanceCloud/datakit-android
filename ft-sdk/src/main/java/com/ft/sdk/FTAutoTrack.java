@@ -96,7 +96,7 @@ public class FTAutoTrack {
      * Activity 开启
      * 警告！！！该方法不能删除
      *
-     * @deprecated 该方法原来被 FT Plugin 插件调用，目前不再使用。目前监控应用的启动使用{@link #startPage(Class, String, boolean)}方法
+     * @deprecated 该方法原来被 FT Plugin 插件调用，目前不再使用。目前监控应用的启动使用{@link #startPage(Class, boolean)}方法
      */
     @Deprecated
     public static void activityOnCreate(Class clazz) {
@@ -363,7 +363,7 @@ public class FTAutoTrack {
         if (!FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_START)) {
             return;
         }
-        putPageEvent(Utils.getCurrentNanoTime(), OP.LANC, null, null, null, null, null);
+        putPageEvent(Utils.getCurrentNanoTime(), OP.LANC, null, null, null, null);
     }
 
 
@@ -461,9 +461,8 @@ public class FTAutoTrack {
      * 打开某个Activity页面
      *
      * @param clazz
-     * @param title
      */
-    public static void startPage(Class<?> clazz, String title, boolean isFirstLoad) {
+    public static void startPage(Class<?> clazz, boolean isFirstLoad) {
         /*没有开启自动埋点*/
         if (!FTAutoTrackConfig.get().isAutoTrack()) {
             return;
@@ -484,7 +483,7 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)) {
             return;
         }
-        putActivityEvent(OP.OPEN_ACT, clazz, title, isFirstLoad);
+        putActivityEvent(OP.OPEN_ACT, clazz, isFirstLoad);
     }
 
     /**
@@ -513,7 +512,7 @@ public class FTAutoTrack {
         if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)) {
             return;
         }
-        putActivityEvent(OP.CLS_ACT, clazz, null, false);
+        putActivityEvent(OP.CLS_ACT, clazz, false);
     }
 
     /**
@@ -609,7 +608,7 @@ public class FTAutoTrack {
      */
     public static void putClickEvent(@NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String vtp) {
         long time = Utils.getCurrentNanoTime();
-        putPageEvent(time, op, currentPage, rootPage, null, null, vtp);
+        putPageEvent(time, op, currentPage, rootPage, null, vtp);
     }
 
     /**
@@ -630,7 +629,7 @@ public class FTAutoTrack {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        putPageEvent(time, op, currentPage, rootPage, parentPage, null, null);
+        putPageEvent(time, op, currentPage, rootPage, parentPage, null);
     }
 
     /**
@@ -638,9 +637,8 @@ public class FTAutoTrack {
      *
      * @param op
      * @param classCurrent
-     * @param title
      */
-    public static void putActivityEvent(@NonNull OP op, Class classCurrent, String title, boolean isFirstLoad) {
+    public static void putActivityEvent(@NonNull OP op, Class classCurrent, boolean isFirstLoad) {
         long time = Utils.getCurrentNanoTime();
         Class parentClass = FTActivityManager.get().getLastActivity();
         String parentPageName = Constants.FLOW_ROOT;
@@ -695,11 +693,11 @@ public class FTAutoTrack {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        putPageEvent(time, op, classCurrent.getSimpleName(), classCurrent.getSimpleName(), parentPageName, title, null);
+        putPageEvent(time, op, classCurrent.getSimpleName(), classCurrent.getSimpleName(), parentPageName, null);
     }
 
     private static void putPageEvent(long time, @NonNull OP op, @Nullable String currentPage,
-                                     @Nullable String rootPage, @Nullable String parentPage, String title, @Nullable String vtp) {
+                                     @Nullable String rootPage, @Nullable String parentPage, @Nullable String vtp) {
         try {
 //            if (vtp != null) {
 //                tags.put("vtp", vtp);
@@ -727,7 +725,7 @@ public class FTAutoTrack {
 //                SyncDataHelper.addMonitorData(tags,fields);
 //            }
 
-            handleOp(currentPage, op, vtp, title);
+            handleOp(currentPage, op, parentPage, vtp);
 
         } catch (Exception e) {
             LogUtils.e(TAG, e.toString());
@@ -746,10 +744,9 @@ public class FTAutoTrack {
     /**
      * 记录页面加载性能
      */
-    public static void putRUMViewLoadPerformance(String viewName, String parentView, long loadTime) {
+    public static void putRUMViewLoadPerformance(String viewName, long loadTime) {
         if (!Utils.enableTraceSamplingRate()) return;
-        RUMGlobalManager.getInstance().startView(viewName, parentView, loadTime);
-
+        RUMGlobalManager.getInstance().onCreateView(viewName, loadTime);
     }
 
 
@@ -975,11 +972,11 @@ public class FTAutoTrack {
 
     }
 
-    private static void handleOp(String currentPage, OP op, @Nullable String vtp, String title) {
-        handleOp(currentPage, op, 0, vtp);
+    private static void handleOp(String currentPage, OP op, String parentPage, @Nullable String vtp) {
+        handleOp(currentPage, op, parentPage, 0, vtp);
     }
 
-    private static void handleOp(String currentPage, OP op, long duration, @Nullable String vtp) {
+    private static void handleOp(String currentPage, OP op, String parentPage, long duration, @Nullable String vtp) {
         LogUtils.e(TAG, op.toEventName());
         if (!FTFlowConfig.get().isEventFlowLog()) {
             return;
@@ -1007,7 +1004,7 @@ public class FTAutoTrack {
             case OPEN_ACT:
 //            case OPEN_FRA:
                 event = Constants.EVENT_NAME_ENTER;
-//                RUMGlobalManager.getInstance().startAction(event);
+                RUMGlobalManager.getInstance().startView(currentPage, parentPage);
                 break;
             case CLS_ACT:
 //            case CLS_FRA:
@@ -1029,12 +1026,12 @@ public class FTAutoTrack {
      * @param cost
      */
     public static void timingMethod(String desc, long cost) {
-        LogUtils.d(TAG, desc);
+//        LogUtils.d(TAG, desc);
         try {
             String[] arr = desc.split("\\|");
             String[] names = arr[0].split("/");
             String pageName = names[names.length - 1];
-            handleOp(pageName, OP.OPEN, cost * 1000, null);
+            handleOp(pageName, OP.OPEN, null, cost * 1000, null);
         } catch (Exception e) {
             e.printStackTrace();
         }

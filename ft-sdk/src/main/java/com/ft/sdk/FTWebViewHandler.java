@@ -10,6 +10,8 @@ import com.ft.sdk.garble.utils.LogUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Iterator;
+
 final class FTWebViewHandler implements WebAppInterface.JsReceiver {
 
     private static final String TAG = "FTWebViewHandler";
@@ -40,9 +42,33 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
             LogUtils.d(TAG, "sendEvent：" + s);
             JSONObject json = new JSONObject(s);
             String name = json.optString("name");
-            String data = json.optString("data");
+            JSONObject data = json.optJSONObject("data");
             String tag = json.optString("_tag");
             if (name.equals("rum")) {
+                if (data != null) {
+                    JSONObject tags = data.optJSONObject("tags");
+                    JSONObject fields = data.optJSONObject("fields");
+
+                    JSONObject publicTags = FTAutoTrack.getRUMPublicTags();
+                    Iterator<String> keys = publicTags.keys();
+                    if (tags == null) {
+                        tags = new JSONObject();
+                    }
+
+                    while (keys.hasNext()) {
+                        String key = keys.next();
+                        tags.put(key, publicTags.opt(key));
+                    }
+
+                    String sessionId = RUMGlobalManager.getInstance().getSessionId();
+                    tags.put("session_id", sessionId);
+                    tags.put("is_active", false);
+                    tags.put("is_web_view", true);
+
+                    long time = data.optLong("time");
+                    String measurement = data.optString("measurement");
+                    FTTrackInner.getInstance().rumWebView(time, measurement, tags, fields);
+                }
 
             } else if (name.equals("track")) {
 
