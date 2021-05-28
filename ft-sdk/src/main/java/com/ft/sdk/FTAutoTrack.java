@@ -740,8 +740,8 @@ public class FTAutoTrack {
      */
     public static void putRUMLaunchPerformance(boolean isCold, long duration) {
         if (!Utils.enableTraceSamplingRate()) return;
-        RUMGlobalManager.getInstance().startAction(isCold ? "launch_cold" : "launch_hot",
-                isCold ? "app cold start" : "app hot start");
+        RUMGlobalManager.getInstance().startAction(
+                isCold ? "app cold start" : "app hot start", isCold ? "launch_cold" : "launch_hot");
     }
 
     /**
@@ -773,9 +773,9 @@ public class FTAutoTrack {
             tags.put(Constants.KEY_RUM_RESPONSE_CONTENT_ENCODING, bean.responseContentEncoding);
             tags.put(Constants.KEY_RUM_RESOURCE_METHOD, bean.resourceMethod);
             tags.put(Constants.KEY_RUM_RESPONSE_SERVER, bean.responseServer);
-            tags.put(Constants.KEY_RUM_ACTION_ID,bean.actionId);
-            tags.put(Constants.KEY_RUM_VIEW_ID,bean.viewId);
-            tags.put(Constants.KEY_RUM_SESSION_ID,bean.sessionId);
+            tags.put(Constants.KEY_RUM_ACTION_ID, bean.actionId);
+            tags.put(Constants.KEY_RUM_VIEW_ID, bean.viewId);
+            tags.put(Constants.KEY_RUM_SESSION_ID, bean.sessionId);
 
             if (bean.resourceStatus > 0) {
                 tags.put(Constants.KEY_RUM_RESOURCE_STATUS, bean.resourceStatus);
@@ -1046,6 +1046,8 @@ public class FTAutoTrack {
 //            case OPEN_FRA:
                 event = Constants.EVENT_NAME_ENTER;
                 RUMGlobalManager.getInstance().startView(currentPage, parentPage);
+                RUMGlobalManager.getInstance().startAction(vtp + " click", event);
+
                 break;
             case CLS_ACT:
 //            case CLS_FRA:

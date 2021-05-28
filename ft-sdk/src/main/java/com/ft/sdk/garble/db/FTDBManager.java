@@ -15,6 +15,7 @@ import com.ft.sdk.garble.bean.ViewBean;
 import com.ft.sdk.garble.db.base.DBManager;
 import com.ft.sdk.garble.db.base.DataBaseCallBack;
 import com.ft.sdk.garble.db.base.DatabaseHelper;
+import com.ft.sdk.garble.utils.LogUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -176,6 +177,7 @@ public class FTDBManager extends DBManager {
     }
 
     public void increaseViewAction(String viewId) {
+        LogUtils.d(TAG, "increase viewId:" + viewId);
         increase(FTSQL.FT_TABLE_VIEW, viewId, FTSQL.RUM_COLUMN_ACTION_COUNT);
     }
 
@@ -302,6 +304,9 @@ public class FTDBManager extends DBManager {
                     long timeSpent = cursor.getLong(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_TIME_SPENT));
                     long startTime = cursor.getLong(cursor.getColumnIndex(FTSQL.RUM_COLUMN_START_TIME));
                     long loadTime = cursor.getLong(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_LOAD_TIME));
+                    String viewName = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_NAME));
+                    String viewReferrer = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_REFERRER));
+                    LogUtils.d(TAG, " viewId:" + id + "，" + actionCount);
 
                     ViewBean viewBean = new ViewBean();
                     viewBean.setClose(close == 1);
@@ -314,6 +319,8 @@ public class FTDBManager extends DBManager {
                     viewBean.setErrorCount(errorCount);
                     viewBean.setLongTaskCount(longTaskCount);
                     viewBean.setSessionId(sessionId);
+                    viewBean.setViewName(viewName);
+                    viewBean.setViewReferrer(viewReferrer);
                     list.add(viewBean);
                 }
                 cursor.close();

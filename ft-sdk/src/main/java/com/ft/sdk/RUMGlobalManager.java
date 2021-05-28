@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 class RUMGlobalManager {
+    private static final String TAG = "RUMGlobalManager";
     static final long MAX_RESTING_TIME = 15000000000L;
     static final long SESSION_EXPIRE_TIME = 1440000000000000L;
 
@@ -40,6 +41,7 @@ class RUMGlobalManager {
     HashMap<String, Long> preActivityDuration = new HashMap<>();
 
     long lastSessionTime = Utils.getCurrentNanoTime();
+    long lastActionTIme = lastSessionTime;
     boolean needWaitAction = false;
 
     String getSessionId() {
@@ -48,11 +50,12 @@ class RUMGlobalManager {
 
     void checkSessionRefresh() {
         long now = Utils.getCurrentNanoTime();
-        boolean longResting = now - lastSessionTime > MAX_RESTING_TIME;
+        boolean longResting = now - lastActionTIme > MAX_RESTING_TIME;
         boolean longTimeSession = now - lastSessionTime > SESSION_EXPIRE_TIME;
         if (longTimeSession || longResting) {
             sessionId = UUID.randomUUID().toString();
         }
+
     }
 
 
@@ -69,6 +72,7 @@ class RUMGlobalManager {
             long now = Utils.getCurrentNanoTime();
             needWaitAction = needWait;
             long lastActionTime = activeAction.getStartTime();
+            this.lastActionTIme = lastActionTime;
             boolean waiting = needWaitAction && !activeView.isClose();
             boolean needClose = !waiting
                     && (now - lastActionTime > ActionBean.ACTION_NORMAL_TIME_OUT)
@@ -82,10 +86,10 @@ class RUMGlobalManager {
             }
 
         } else {
-            activeAction = new ActionBean(actionName, actionName, sessionId, activeView);
+            activeAction = new ActionBean(actionName, actionType, sessionId, activeView);
             initAction(activeAction);
         }
-
+        checkSessionRefresh();
 
 
     }
@@ -139,7 +143,7 @@ class RUMGlobalManager {
     }
 
     void initAction(ActionBean bean) {
-        increaseAction(bean.getId());
+        increaseAction(bean.getViewId());
         ThreadPoolUtils.get().execute(() -> {
             FTDBManager.get().initSumAction(bean);
         });
@@ -300,7 +304,9 @@ class RUMGlobalManager {
                 tags.put(Constants.KEY_RUM_VIEW_NAME, bean.getViewName());
                 tags.put(Constants.KEY_RUM_VIEW_REFERRER, bean.getViewReferrer());
                 tags.put(Constants.KEY_RUM_VIEW_ID, bean.getId());
-                fields.put(Constants.KEY_RUM_VIEW_LOAD, bean.getLoadTime());
+                if (bean.getLoadTime() > 0) {
+                    fields.put(Constants.KEY_RUM_VIEW_LOAD, bean.getLoadTime());
+                }
                 fields.put(Constants.KEY_RUM_VIEW_ACTION_COUNT, bean.getActionCount());
                 fields.put(Constants.KEY_RUM_VIEW_RESOURCE_COUNT, bean.getResourceCount());
                 fields.put(Constants.KEY_RUM_VIEW_ERROR_COUNT, bean.getErrorCount());

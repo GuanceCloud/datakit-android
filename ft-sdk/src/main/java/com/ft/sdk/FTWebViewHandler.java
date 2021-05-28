@@ -23,7 +23,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
     public void setWebView(WebView webview) {
         mWebView = webview;
         webview.getSettings().setJavaScriptEnabled(true);
-        webview.addJavascriptInterface(new WebAppInterface(webview.getContext(), this), "WebViewJavascriptBridge");
+        webview.addJavascriptInterface(new WebAppInterface(webview.getContext(), this), "FTWebViewJavascriptBridge");
 
     }
 

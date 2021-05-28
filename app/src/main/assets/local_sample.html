@@ -62,7 +62,7 @@
             } else {
                 try {
                     // Android 对象赋值
-                    self.bridge = WebViewJavascriptBridge;
+                    self.bridge = FTWebViewJavascriptBridge;
                     callback();
                 } catch (e) {
                     console.log('error', e);
@@ -146,7 +146,7 @@
 
     //这是必须要写的，用来初始化一些设置
     function setupWebViewJavascriptBridge(callback) {
-        if (window.WebViewJavascriptBridge) { return callback(WebViewJavascriptBridge); }
+        if (window.WebViewJavascriptBridge) { return callback(FTWebViewJavascriptBridge); }
         if (window.WVJBCallbacks) { return window.WVJBCallbacks.push(callback); }
         window.WVJBCallbacks = [callback];
         var WVJBIframe = document.createElement('iframe');

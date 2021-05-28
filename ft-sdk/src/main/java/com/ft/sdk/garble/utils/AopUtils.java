@@ -21,6 +21,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.Button;
 import android.widget.ListView;
@@ -151,6 +152,13 @@ public class AopUtils {
         stringBuffer.insert(0, view.getClass().getSimpleName() + "/");
         if (view instanceof TextView) {
             stringBuffer.append(((TextView) view).getText().toString());
+        } else if (view instanceof ViewGroup) {
+            if (((ViewGroup) view).getChildCount() == 1) {
+                View chiView = ((ViewGroup) view).getChildAt(0);
+                if (chiView instanceof TextView) {
+                    stringBuffer.append(((TextView) chiView).getText().toString());
+                }
+            }
         }
         stringBuffer.append("#").append(AopUtils.getViewId(view));
         return stringBuffer.toString();

@@ -202,7 +202,7 @@ public class Constants {
     public static final String KEY_RUM_VIEW_ID = "view_id";
     public static final String KEY_RUM_VIEW_REFERRER = "view_referrer";
     public static final String KEY_RUM_VIEW_NAME = "view_name";
-    public static final String KEY_RUM_VIEW_LOAD = "view_load";
+    public static final String KEY_RUM_VIEW_LOAD = "loading_time";
     public static final String KEY_RUM_VIEW_LONG_TASK_COUNT= "view_long_task_count";
     public static final String KEY_RUM_VIEW_RESOURCE_COUNT= "view_resource_count";
     public static final String KEY_RUM_VIEW_ERROR_COUNT= "view_error_count";
