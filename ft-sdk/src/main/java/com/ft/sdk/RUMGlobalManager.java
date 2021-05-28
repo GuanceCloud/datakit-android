@@ -43,13 +43,16 @@ class RUMGlobalManager {
     boolean needWaitAction = false;
 
     String getSessionId() {
+        return sessionId;
+    }
+
+    void checkSessionRefresh() {
         long now = Utils.getCurrentNanoTime();
         boolean longResting = now - lastSessionTime > MAX_RESTING_TIME;
         boolean longTimeSession = now - lastSessionTime > SESSION_EXPIRE_TIME;
         if (longTimeSession || longResting) {
             sessionId = UUID.randomUUID().toString();
         }
-        return sessionId;
     }
 
 
@@ -84,6 +87,7 @@ class RUMGlobalManager {
         }
 
 
+
     }
 
     void stopAction() {
@@ -112,10 +116,10 @@ class RUMGlobalManager {
 
 
     void startView(String viewName, String viewReferrer) {
+        checkSessionRefresh();
         if (activeView != null) {
             activeView.close();
             closeView(activeView.getId(), activeView.getTimeSpent());
-
         }
 
         long loadTime = -1;

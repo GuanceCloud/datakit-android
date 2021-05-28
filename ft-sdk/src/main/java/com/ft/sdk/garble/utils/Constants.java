@@ -36,7 +36,7 @@ public class Constants {
     public static final String FT_MEASUREMENT_MONITOR = "mobile_monitor";
 
     public static final String FT_MEASUREMENT_RUM_VIEW = "view";
-    public static final String FT_MEASUREMENT_RUM_ERROR = "crash";
+    public static final String FT_MEASUREMENT_RUM_ERROR = "error";
     public static final String FT_MEASUREMENT_RUM_LONG_TASK = "long_task";
     public static final String FT_MEASUREMENT_RUM_RESOURCE = "resource";
     public static final String FT_MEASUREMENT_RUM_ACTION = "action";
