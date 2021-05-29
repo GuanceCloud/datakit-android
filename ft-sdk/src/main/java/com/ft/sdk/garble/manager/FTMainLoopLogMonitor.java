@@ -37,8 +37,7 @@ public class FTMainLoopLogMonitor {
 
     private final HandlerThread mLogThread = new HandlerThread("UI BLock Log");
     private final Handler mIoHandler;
-    private static final long TIME_BLOCK = 1000L;//超过1秒显示卡顿
-    private static final long TIME_BLOCK_NS = 1000000000L;
+    private static final long TIME_BLOCK_NS = 1000000000L;//超过1秒显示卡顿
     private static LogCallBack mLogCallBack;
     private long lastTime;
     private long longTaskDuration;
@@ -83,10 +82,10 @@ public class FTMainLoopLogMonitor {
             long duration = Utils.getCurrentNanoTime() - lastTime;
             if (duration > TIME_BLOCK_NS) {
                 longTaskDuration = duration;
+                mIoHandler.post(mLogRunnable);
             }
         }
         lastTime = Utils.getCurrentNanoTime();
-        mIoHandler.postDelayed(mLogRunnable, TIME_BLOCK);
     }
 
     public void removeMonitor() {

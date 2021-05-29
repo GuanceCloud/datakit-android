@@ -16,7 +16,7 @@ public class FTUIBlockManager {
         @Override
         public void doFrame(long frameTimeNanos) {
 
-            FTMainLoopLogMonitor.getInstance().removeMonitor();
+//            FTMainLoopLogMonitor.getInstance().removeMonitor();
 
             FTMainLoopLogMonitor.getInstance().startMonitor();
 
