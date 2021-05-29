@@ -894,7 +894,7 @@ public class FTAutoTrack {
             JSONObject fields = new JSONObject();
 
             tags.put(Constants.KEY_RUM_ERROR_TYPE, errorType.toString());
-            tags.put(Constants.KEY_RUM_ERROR_SOURCE, ErrorSource.LOGGER);
+            tags.put(Constants.KEY_RUM_ERROR_SOURCE, ErrorSource.LOGGER.toString());
             tags.put(Constants.KEY_RUM_ERROR_SITUATION, state.toString());
             tags.put(Constants.KEY_RUM_APPLICATION_UUID, FTSdk.PACKAGE_UUID);
             fields.put(Constants.KEY_RUM_ERROR_MESSAGE, message);
@@ -1046,8 +1046,6 @@ public class FTAutoTrack {
 //            case OPEN_FRA:
                 event = Constants.EVENT_NAME_ENTER;
                 RUMGlobalManager.getInstance().startView(currentPage, parentPage);
-                RUMGlobalManager.getInstance().startAction(vtp + " click", event);
-
                 break;
             case CLS_ACT:
 //            case CLS_FRA:

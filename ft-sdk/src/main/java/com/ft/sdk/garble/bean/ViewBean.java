@@ -136,4 +136,22 @@ public class ViewBean {
     public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
     }
+
+    @Override
+    public String toString() {
+        return "ViewBean{" +
+                "id='" + id + '\'' +
+                ", viewReferrer='" + viewReferrer + '\'' +
+                ", viewName='" + viewName + '\'' +
+                ", longTaskCount=" + longTaskCount +
+                ", resourceCount=" + resourceCount +
+                ", errorCount=" + errorCount +
+                ", actionCount=" + actionCount +
+                ", isClose=" + isClose +
+                ", startTime=" + startTime +
+                ", loadTime=" + loadTime +
+                ", timeSpent=" + timeSpent +
+                ", sessionId='" + sessionId + '\'' +
+                '}';
+    }
 }

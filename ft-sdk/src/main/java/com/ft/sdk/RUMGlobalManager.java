@@ -4,6 +4,7 @@ import com.ft.sdk.garble.bean.ActionBean;
 import com.ft.sdk.garble.bean.ViewBean;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
 import com.ft.sdk.garble.utils.Utils;
 
@@ -35,14 +36,13 @@ class RUMGlobalManager {
 
     private String sessionId = UUID.randomUUID().toString();
 
-    ActionBean activeAction;
     ViewBean activeView = ViewBean.createLaunchViewBean(sessionId);
+    ActionBean activeAction;
 
     HashMap<String, Long> preActivityDuration = new HashMap<>();
 
     long lastSessionTime = Utils.getCurrentNanoTime();
-    long lastActionTIme = lastSessionTime;
-    boolean needWaitAction = false;
+    long lastActionTime = lastSessionTime;
 
     String getSessionId() {
         return sessionId;
@@ -50,14 +50,12 @@ class RUMGlobalManager {
 
     void checkSessionRefresh() {
         long now = Utils.getCurrentNanoTime();
-        boolean longResting = now - lastActionTIme > MAX_RESTING_TIME;
+        boolean longResting = now - lastActionTime > MAX_RESTING_TIME;
         boolean longTimeSession = now - lastSessionTime > SESSION_EXPIRE_TIME;
         if (longTimeSession || longResting) {
             sessionId = UUID.randomUUID().toString();
         }
-
     }
-
 
     String getActionId() {
         return activeAction.getId();
@@ -68,34 +66,33 @@ class RUMGlobalManager {
     }
 
     void startAction(String actionName, String actionType, boolean needWait) {
-        if (activeAction != null) {
-            long now = Utils.getCurrentNanoTime();
-            needWaitAction = needWait;
-            long lastActionTime = activeAction.getStartTime();
-            this.lastActionTIme = lastActionTime;
-            boolean waiting = needWaitAction && !activeView.isClose();
-            boolean needClose = !waiting
-                    && (now - lastActionTime > ActionBean.ACTION_NORMAL_TIME_OUT)
-                    || (now - lastActionTime > ActionBean.ACTION_NEED_WAIT_TIME_OUT);
-
-            if (needClose) {
-                activeAction.close();
-                closeAction(activeAction.getId(), activeAction.getDuration());
-                activeAction = new ActionBean(actionName, actionType, sessionId, activeView);
-                initAction(activeAction);
-            }
-
-        } else {
-            activeAction = new ActionBean(actionName, actionType, sessionId, activeView);
-            initAction(activeAction);
-        }
         checkSessionRefresh();
+        checkActionClose();
+        if (activeAction == null || activeAction.isClose() || !activeView.getId().equals(activeView.getId())) {
+            activeAction = new ActionBean(actionName, actionType, sessionId, activeView, needWait);
+            initAction(activeAction);
+            this.lastActionTime = activeAction.getStartTime();
 
+        }
+    }
 
+    void checkActionClose() {
+        if (activeAction == null) return;
+        long now = Utils.getCurrentNanoTime();
+        long lastActionTime = activeAction.getStartTime();
+        boolean waiting = activeAction.isNeedWaitAction() && !activeView.isClose();
+        boolean timeOut = now - lastActionTime > ActionBean.ACTION_NEED_WAIT_TIME_OUT;
+        boolean needClose = !waiting
+                && (now - lastActionTime > ActionBean.ACTION_NORMAL_TIME_OUT)
+                || timeOut;
+        if (needClose) {
+            closeAction(activeAction.getId(), activeAction.getDuration(), timeOut);
+            activeAction.close();
+        }
     }
 
     void stopAction() {
-        if (needWaitAction) {
+        if (activeAction.isNeedWaitAction()) {
             activeAction.close();
         }
     }
@@ -108,6 +105,7 @@ class RUMGlobalManager {
     }
 
     void stopResource(String viewId, String actionId) {
+        checkActionClose();
         ThreadPoolUtils.get().execute(() -> {
             FTDBManager.get().reduceViewPendingResource(viewId);
             FTDBManager.get().reduceActionPendingResource(actionId);
@@ -121,7 +119,7 @@ class RUMGlobalManager {
 
     void startView(String viewName, String viewReferrer) {
         checkSessionRefresh();
-        if (activeView != null) {
+        if (activeView != null && !activeView.isClose()) {
             activeView.close();
             closeView(activeView.getId(), activeView.getTimeSpent());
         }
@@ -137,9 +135,10 @@ class RUMGlobalManager {
     }
 
     void stopView() {
+        checkActionClose();
+
         activeView.close();
         closeView(activeView.getId(), activeView.getTimeSpent());
-
     }
 
     void initAction(ActionBean bean) {
@@ -205,9 +204,9 @@ class RUMGlobalManager {
         generateRumData();
     }
 
-    void closeAction(String actionId, long duration) {
+    void closeAction(String actionId, long duration, boolean force) {
         ThreadPoolUtils.get().execute(() -> {
-            FTDBManager.get().closeAction(actionId, duration);
+            FTDBManager.get().closeAction(actionId, duration, force);
         });
         generateRumData();
     }
@@ -280,7 +279,7 @@ class RUMGlobalManager {
                 FTTrackInner.getInstance().rum(Utils.getCurrentNanoTime(),
                         Constants.FT_MEASUREMENT_RUM_ACTION, tags, fields);
             } catch (JSONException e) {
-                e.printStackTrace();
+                LogUtils.d(TAG, e.getMessage());
             }
 
             FTDBManager.get().cleanCloseActionData();
@@ -314,7 +313,7 @@ class RUMGlobalManager {
                 fields.put(Constants.KEY_RUM_VIEW_LONG_TASK_COUNT, bean.getLongTaskCount());
                 fields.put(Constants.KEY_RUM_VIEW_IS_ACTIVE, !bean.isClose());
             } catch (JSONException e) {
-                e.printStackTrace();
+                LogUtils.d(TAG, e.getMessage());
             }
             FTTrackInner.getInstance().rum(Utils.getCurrentNanoTime(),
                     Constants.FT_MEASUREMENT_RUM_VIEW, tags, fields);

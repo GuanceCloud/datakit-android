@@ -9,6 +9,8 @@ public class ActionBean {
     public static final long ACTION_NORMAL_TIME_OUT = 100000000L;
 
     long startTime = Utils.getCurrentNanoTime();
+    boolean needWaitAction = false;
+
     String actionName;
     String actionType;
 
@@ -41,17 +43,26 @@ public class ActionBean {
         return viewReferrer;
     }
 
+    public boolean isNeedWaitAction() {
+        return needWaitAction;
+    }
+
+    public static ActionBean createLaunchAction(String sessionId, ViewBean viewBean) {
+        return new ActionBean("", "", sessionId, viewBean, false);
+    }
+
     public ActionBean() {
 
     }
 
-    public ActionBean(String actionName, String actionType, String sessionId, ViewBean viewBean) {
+    public ActionBean(String actionName, String actionType, String sessionId, ViewBean viewBean, boolean needWaitAction) {
         this.actionName = actionName;
         this.actionType = actionType;
         this.sessionId = sessionId;
         this.viewId = viewBean.getId();
         this.viewName = viewBean.getViewName();
         this.viewReferrer = viewBean.getViewReferrer();
+        this.needWaitAction = needWaitAction;
     }
 
     public String getActionType() {
@@ -79,9 +90,9 @@ public class ActionBean {
     public void close() {
         isClose = true;
         duration = Utils.getCurrentNanoTime() - startTime;
-        if (duration > ACTION_NEED_WAIT_TIME_OUT) {
-            duration = ACTION_NEED_WAIT_TIME_OUT;
-        }
+//        if (duration > ACTION_NEED_WAIT_TIME_OUT) {
+//            duration = ACTION_NEED_WAIT_TIME_OUT;
+//        }
     }
 
     public void setClose(boolean close) {
@@ -150,5 +161,26 @@ public class ActionBean {
 
     public void setViewReferrer(String viewReferrer) {
         this.viewReferrer = viewReferrer;
+    }
+
+
+    @Override
+    public String toString() {
+        return "ActionBean{" +
+                "startTime=" + startTime +
+                ", needWaitAction=" + needWaitAction +
+                ", actionName='" + actionName + '\'' +
+                ", actionType='" + actionType + '\'' +
+                ", longTaskCount=" + longTaskCount +
+                ", resourceCount=" + resourceCount +
+                ", errorCount=" + errorCount +
+                ", isClose=" + isClose +
+                ", duration=" + duration +
+                ", sessionId='" + sessionId + '\'' +
+                ", viewId='" + viewId + '\'' +
+                ", viewName='" + viewName + '\'' +
+                ", viewReferrer='" + viewReferrer + '\'' +
+                ", id='" + id + '\'' +
+                '}';
     }
 }

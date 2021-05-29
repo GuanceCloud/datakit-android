@@ -64,6 +64,7 @@ public class FTDBManager extends DBManager {
      */
 
     public void initSumView(ViewBean data) {
+        LogUtils.d(TAG, "initSumView:id" + data.getId() + ",name:" + data.getViewName());
         getDB(true, db -> {
             ContentValues contentValues = new ContentValues();
             contentValues.put(FTSQL.RUM_COLUMN_START_TIME, data.getStartTime());
@@ -91,6 +92,9 @@ public class FTDBManager extends DBManager {
      * @return
      */
     public void initSumAction(ActionBean data) {
+        LogUtils.d(TAG, "initSumAction:id" + data.getId() + ",Viewname:" + data.getViewName()
+                + ",actionName" + data.getActionName());
+
         getDB(true, db -> {
             ContentValues contentValues = new ContentValues();
             contentValues.put(FTSQL.RUM_COLUMN_START_TIME, data.getStartTime());
@@ -115,10 +119,12 @@ public class FTDBManager extends DBManager {
      * @param actionId
      * @param duration
      */
-    public void closeAction(String actionId, long duration) {
+    public void closeAction(String actionId, long duration, boolean force) {
+        String where = FTSQL.RUM_COLUMN_ID + "='" + actionId + "'"
+                + (force ? "" : ("AND " + FTSQL.RUM_COLUMN_PENDING_RESOURCE + "<=0"));
         getDB(true, db -> {
             Cursor cursor = db.rawQuery("select count(*) from " + FTSQL.FT_TABLE_ACTION
-                    + " where " + FTSQL.RUM_COLUMN_ID + "='" + actionId + "'", null);
+                    + " where " + where, null);
             cursor.moveToFirst();
             int count = cursor.getInt(0);
             cursor.close();
@@ -143,6 +149,7 @@ public class FTDBManager extends DBManager {
      * @param timeSpent
      */
     public void closeView(String viewId, long timeSpent) {
+        LogUtils.d(TAG,"closeVIew:" + viewId);
         getDB(true, db -> {
             Cursor cursor = db.rawQuery("select count(*) from " + FTSQL.FT_TABLE_VIEW
                     + " where " + FTSQL.RUM_COLUMN_ID + "='" + viewId + "'", null);
@@ -177,7 +184,6 @@ public class FTDBManager extends DBManager {
     }
 
     public void increaseViewAction(String viewId) {
-        LogUtils.d(TAG, "increase viewId:" + viewId);
         increase(FTSQL.FT_TABLE_VIEW, viewId, FTSQL.RUM_COLUMN_ACTION_COUNT);
     }
 
@@ -275,6 +281,8 @@ public class FTDBManager extends DBManager {
                     bean.setDuration(duration);
                     bean.setStartTime(startTime);
                     list.add(bean);
+                    LogUtils.d(TAG, bean.toString());
+
 
                 }
                 cursor.close();
@@ -306,7 +314,6 @@ public class FTDBManager extends DBManager {
                     long loadTime = cursor.getLong(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_LOAD_TIME));
                     String viewName = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_NAME));
                     String viewReferrer = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_REFERRER));
-                    LogUtils.d(TAG, " viewId:" + id + "，" + actionCount);
 
                     ViewBean viewBean = new ViewBean();
                     viewBean.setClose(close == 1);
@@ -322,6 +329,7 @@ public class FTDBManager extends DBManager {
                     viewBean.setViewName(viewName);
                     viewBean.setViewReferrer(viewReferrer);
                     list.add(viewBean);
+                    LogUtils.d(TAG, viewBean.toString());
                 }
                 cursor.close();
             } catch (Exception e) {
@@ -405,7 +413,9 @@ public class FTDBManager extends DBManager {
         final int[] count = new int[1];
         getDB(false, db -> {
             try {
-                Cursor cursor = db.rawQuery("select count(*) from " + FTSQL.FT_SYNC_TABLE_NAME + " where " + FTSQL.RECORD_COLUMN_DATA_TYPE + "='" + dataType.getValue() + "'", null);
+                Cursor cursor = db.rawQuery("select count(*) from "
+                        + FTSQL.FT_SYNC_TABLE_NAME + " where " + FTSQL.RECORD_COLUMN_DATA_TYPE
+                        + "='" + dataType.getValue() + "'", null);
                 cursor.moveToFirst();
                 count[0] = cursor.getInt(0);
                 cursor.close();
