@@ -1,3 +1,8 @@
+# agent 1.1.0-alpha02
+1.优化 action 统计算法
+2.修改长任务时间计算
+
+---
 # agent 1.1.0-alpha01
 1.rum 添加 action，session，view 统计功能
 
