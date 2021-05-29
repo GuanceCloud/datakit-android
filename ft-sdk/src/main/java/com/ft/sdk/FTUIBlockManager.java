@@ -36,10 +36,10 @@ public class FTUIBlockManager {
 
         isStop = false;
 
-        FTMainLoopLogMonitor.getInstance().setLogCallBack(log -> {
+        FTMainLoopLogMonitor.getInstance().setLogCallBack((log, duration) -> {
 
             if (FTRUMConfig.get().isRumEnable()) {
-                FTAutoTrack.putRUMuiBlock(log);
+                FTAutoTrack.putRUMuiBlock(log,duration);
 
             } else {
                 LogBean logBean = new LogBean("------ UIBlock  ------\n " + log, Utils.getCurrentNanoTime());

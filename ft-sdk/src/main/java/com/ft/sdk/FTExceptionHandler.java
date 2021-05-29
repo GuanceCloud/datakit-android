@@ -159,8 +159,9 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
 
                             if (FTRUMConfig.get().isRumEnable()) {
                                 if (item.getName().contains(ANR_FILE_NAME)) {
-                                    FTAutoTrack.putRUMAnr(crashString, crashTime);
-                                } else if (item.getName().contains(NATIVE_FILE_NAME)) {
+//                                    FTAutoTrack.putRUMAnr(crashString, crashTime);
+                                } else
+                                    if (item.getName().contains(NATIVE_FILE_NAME)) {
                                     FTAutoTrack.putRUMError(crashString, "Native Crash", crashTime, ErrorType.NATIVE, AppState.getValueFrom(value));
                                 }
                             } else {

@@ -861,10 +861,10 @@ public class FTAutoTrack {
      *
      * @param log
      */
-    public static void putRUMuiBlock(String log) {
+    public static void putRUMuiBlock(String log, long duration) {
         if (!Utils.enableTraceSamplingRate()) return;
         long time = Utils.getCurrentNanoTime();
-        putFreeze("Freeze", time, log);
+        putFreeze(time, log, duration);
     }
 
     /**
@@ -874,7 +874,7 @@ public class FTAutoTrack {
      */
     public static void putRUMAnr(String log, long dateline) {
         if (!Utils.enableTraceSamplingRate()) return;
-        putFreeze("ANR", dateline, log);
+        putFreeze(dateline, log, -1);
 
     }
 
@@ -936,16 +936,14 @@ public class FTAutoTrack {
     /**
      * 卡顿
      *
-     * @param freezeType ANR，Freeze 两种
      * @param dateline
      */
-    private static void putFreeze(String freezeType, long dateline, String log) {
+    private static void putFreeze(long dateline, String log, long duration) {
         if (!Utils.enableTraceSamplingRate()) return;
         try {
             JSONObject tags = getRUMPublicTags();
             JSONObject fields = new JSONObject();
-
-            fields.put(Constants.KEY_RUM_LONG_TASK_DURATION, -1);
+            fields.put(Constants.KEY_RUM_LONG_TASK_DURATION, duration);
             fields.put(Constants.KEY_RUM_LONG_TASK_STACK, log);
 
             FTTrackInner.getInstance().rum(dateline, Constants.FT_MEASUREMENT_RUM_LONG_TASK, tags, fields);

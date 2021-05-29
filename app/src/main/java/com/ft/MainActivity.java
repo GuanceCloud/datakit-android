@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
         });
         findViewById(R.id.main_mock_ui_block_btn).setOnClickListener(v -> {
             try {
-                Thread.sleep(1200);
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
