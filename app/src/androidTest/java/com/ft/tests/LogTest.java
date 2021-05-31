@@ -47,7 +47,7 @@ public class LogTest extends BaseTest {
         context = MockApplication.getContext();
         ftsdkConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL))
                 .setTraceConsoleLog(true)
-                .setEventFlowLog(true)
+                .setEnableTraceUserAction(true)
                 .setEnableTrackAppCrash(true);
         FTSdk.install(ftsdkConfig);
     }

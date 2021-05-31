@@ -82,9 +82,12 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
     @Override
     public Response intercept(@NotNull Chain chain) throws IOException {
         String viewId = RUMGlobalManager.getInstance().getViewId();
+        String viewName = RUMGlobalManager.getInstance().getViewName();
+        String viewReferrer = RUMGlobalManager.getInstance().getViewReferrer();
         String actionId = RUMGlobalManager.getInstance().getActionId();
+        String actionName = RUMGlobalManager.getInstance().getActionName();
         String sessionId = RUMGlobalManager.getInstance().getSessionId();
-        RUMGlobalManager.getInstance().startResource(viewId,actionId);
+        RUMGlobalManager.getInstance().startResource(viewId, actionId);
         Request request = chain.request();
         Response response = null;
         Request.Builder requestBuilder = request.newBuilder();
@@ -110,7 +113,7 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
         if (exception != null) {
             uploadNetTrace(handler, newRequest, null, "", exception.getMessage());
             mPerformanceHandler.setTransformContent(newRequest, null, "",
-                    connection, sessionId, viewId, actionId);
+                    connection, sessionId, viewId, viewName, viewReferrer, actionId, actionName);
 
             throw new IOException(exception);
         } else {
@@ -128,7 +131,7 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
                         response = response.newBuilder().body(responseBody1).build();
                         uploadNetTrace(handler, newRequest, response, responseBody, "");
                         mPerformanceHandler.setTransformContent(newRequest, response, responseBody,
-                                connection, sessionId, viewId, actionId);
+                                connection, sessionId, viewId, viewName, viewReferrer, actionId, actionName);
 
                     }
                 }

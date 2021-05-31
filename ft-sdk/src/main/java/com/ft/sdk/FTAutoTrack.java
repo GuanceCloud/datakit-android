@@ -17,7 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.ft.sdk.garble.FTAutoTrackConfig;
-import com.ft.sdk.garble.FTFlowConfig;
+import com.ft.sdk.garble.FTUserActionConfig;
 import com.ft.sdk.garble.FTFragmentManager;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
@@ -774,7 +774,10 @@ public class FTAutoTrack {
             tags.put(Constants.KEY_RUM_RESOURCE_METHOD, bean.resourceMethod);
             tags.put(Constants.KEY_RUM_RESPONSE_SERVER, bean.responseServer);
             tags.put(Constants.KEY_RUM_ACTION_ID, bean.actionId);
+            tags.put(Constants.KEY_RUM_ACTION_NAME, bean.actionName);
             tags.put(Constants.KEY_RUM_VIEW_ID, bean.viewId);
+            tags.put(Constants.KEY_RUM_VIEW_NAME, bean.viewName);
+            tags.put(Constants.KEY_RUM_VIEW_REFERRER, bean.viewReferrer);
             tags.put(Constants.KEY_RUM_SESSION_ID, bean.sessionId);
 
             if (bean.resourceStatus > 0) {
@@ -810,7 +813,7 @@ public class FTAutoTrack {
             if (!bean.urlPath.isEmpty()) {
                 tags.put(Constants.KEY_RUM_RESOURCE_URL_PATH, bean.urlPath);
                 tags.put(Constants.KEY_RUM_RESOURCE_URL_PATH_GROUP,
-                        bean.urlPath.substring(bean.urlPath.lastIndexOf("/") + 1));
+                        bean.urlPath.substring(0,bean.urlPath.lastIndexOf("/") + 1));
             }
             tags.put(Constants.KEY_RUM_RESOURCE_URL, bean.url);
             fields.put(Constants.KEY_RUM_REQUEST_HEADER, bean.requestHeader);
@@ -839,14 +842,13 @@ public class FTAutoTrack {
                 if (!bean.urlPath.isEmpty()) {
                     errorTags.put(Constants.KEY_RUM_RESOURCE_URL_PATH, bean.urlPath);
                     errorTags.put(Constants.KEY_RUM_RESOURCE_URL_PATH_GROUP,
-                            bean.urlPath.substring(bean.urlPath.lastIndexOf("/") + 1));
+                            bean.urlPath.replaceAll("\\/([^\\/]*)\\d([^\\/]*)","/?"));
                 }
 
                 errorField.put(Constants.KEY_RUM_ERROR_MESSAGE, "");
                 errorField.put(Constants.KEY_RUM_ERROR_STACK, "");
 
-
-                FTTrackInner.getInstance().rum(time, Constants.FT_MEASUREMENT_RUM_ERROR, tags, fields);
+                FTTrackInner.getInstance().rum(time, Constants.FT_MEASUREMENT_RUM_ERROR, errorTags, errorField);
             }
 
 
@@ -1016,10 +1018,6 @@ public class FTAutoTrack {
     }
 
     private static void handleOp(String currentPage, OP op, String parentPage, long duration, @Nullable String vtp) {
-        LogUtils.e(TAG, op.toEventName());
-        if (!FTFlowConfig.get().isEventFlowLog()) {
-            return;
-        }
 
         if (!op.equals(OP.CLK)
                 && !op.equals(OP.LANC)
@@ -1035,6 +1033,7 @@ public class FTAutoTrack {
         switch (op) {
             case CLK:
                 event = Constants.EVENT_NAME_CLICK;
+
                 RUMGlobalManager.getInstance().startAction(vtp + " click", event);
                 break;
             case LANC:

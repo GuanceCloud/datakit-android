@@ -59,7 +59,7 @@ public class LogEventTest extends BaseTest {
                 .setUseOAID(true)//设置 OAID 是否可用
                 .setDebug(true)//设置是否是 debug
                 .setNetworkTrace(true)
-                .setEventFlowLog(true);
+                .setEnableTraceUserAction(true);
         //关闭数据自动同步操作
 //        SyncTaskManager.get().setRunning(true);
         stopSyncTask();

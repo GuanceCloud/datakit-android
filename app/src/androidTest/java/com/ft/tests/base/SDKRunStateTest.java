@@ -15,7 +15,7 @@ import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.FTAutoTrackConfig;
-import com.ft.sdk.garble.FTFlowConfig;
+import com.ft.sdk.garble.FTUserActionConfig;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.FTExceptionHandler;
@@ -54,7 +54,7 @@ public class SDKRunStateTest extends BaseTest {
                 .setEnv(EnvType.GRAY)
                 .setNetworkTrace(true)
                 .setTraceConsoleLog(true)
-                .setEventFlowLog(true)
+                .setEnableTraceUserAction(true)
                 .setTraceType(TraceType.ZIPKIN);
         FTSdk.install(ftSDKConfig);
     }
@@ -95,7 +95,7 @@ public class SDKRunStateTest extends BaseTest {
 
     @Test
     public void eventFlowLogTest() {
-        Assert.assertTrue(FTFlowConfig.get().isEventFlowLog());
+        Assert.assertTrue(FTUserActionConfig.get().isEnableTraceUserAction());
     }
 
     @Test
@@ -131,6 +131,6 @@ public class SDKRunStateTest extends BaseTest {
     @Test
     public void showdownEventFlowLogTest() {
         FTSdk.get().shutDown();
-        Assert.assertFalse(FTFlowConfig.get().isEventFlowLog());
+        Assert.assertFalse(FTUserActionConfig.get().isEnableTraceUserAction());
     }
 }

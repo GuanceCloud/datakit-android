@@ -25,7 +25,10 @@ public class ResourceBean {
 
     public String sessionId;
     public String viewId;
+    public String viewName;
+    public String viewReferrer;
     public String actionId;
+    public String actionName;
 
     public void reset() {
         url = "";
@@ -52,7 +55,10 @@ public class ResourceBean {
 
         sessionId = "";
         viewId = "";
+        viewName = "";
+        viewReferrer = "";
         actionId = "";
+        actionName = "";
     }
 
 }

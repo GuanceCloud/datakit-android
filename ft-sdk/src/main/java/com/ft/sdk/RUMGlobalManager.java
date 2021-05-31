@@ -1,5 +1,6 @@
 package com.ft.sdk;
 
+import com.ft.sdk.garble.FTUserActionConfig;
 import com.ft.sdk.garble.bean.ActionBean;
 import com.ft.sdk.garble.bean.ViewBean;
 import com.ft.sdk.garble.db.FTDBManager;
@@ -58,7 +59,7 @@ class RUMGlobalManager {
     }
 
     String getActionId() {
-        return activeAction.getId();
+        return activeAction == null ? null : activeAction.getId();
     }
 
     void startAction(String actionName, String actionType) {
@@ -66,6 +67,10 @@ class RUMGlobalManager {
     }
 
     void startAction(String actionName, String actionType, boolean needWait) {
+        if (!FTUserActionConfig.get().isEnableTraceUserAction()) {
+            return;
+        }
+
         checkSessionRefresh();
         checkActionClose();
         if (activeAction == null || activeAction.isClose() || !activeView.getId().equals(activeView.getId())) {
@@ -77,6 +82,9 @@ class RUMGlobalManager {
     }
 
     void checkActionClose() {
+        if (!FTUserActionConfig.get().isEnableTraceUserAction()) {
+            return;
+        }
         if (activeAction == null) return;
         long now = Utils.getCurrentNanoTime();
         long lastActionTime = activeAction.getStartTime();
@@ -225,7 +233,7 @@ class RUMGlobalManager {
     }
 
     String getActionName() {
-        return activeAction.getActionName();
+        return activeAction == null ? null : activeAction.getActionName();
     }
 
     /**

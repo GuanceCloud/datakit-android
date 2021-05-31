@@ -122,8 +122,11 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     //通过查看请求头查看是否替换调用 OkHttpClient.Builder.build 方法成功
-                    Request request = requestUrl("http://www.weather.com.cn/data/sk/101010100.html");
-                    LogUtils.d(TAG, "header=" + request.headers().toString());
+                    Request request = requestUrl("http://testing-ft2x-api.cloudcare.cn/api/v1/df/query_data");
+                    if (request != null) {
+                        LogUtils.d(TAG, "header=" + request.headers());
+
+                    }
                 }
             }).start();
         });
