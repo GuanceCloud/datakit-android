@@ -47,7 +47,7 @@ public class DemoApplication extends Application {
                 .setSamplingRate(1f)
                 .setNetworkTrace(true)
                 .setTraceConsoleLog(true)
-                .setEnableTraceUserAction(false)
+                .setEnableTraceUserAction(true)
                 .setTraceType(TraceType.ZIPKIN);
         FTSdk.install(ftSDKConfig);
 

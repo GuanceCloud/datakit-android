@@ -55,8 +55,10 @@ public class FTSDKConfig {
     private boolean networkTrace;
     //崩溃日志的 __serviceName
     private String serviceName = DEFAULT_LOG_SERVICE_NAME;
-    //是否开启用户数据追踪
+    //是否开启用户行为追踪
     private boolean enableTraceUserAction;
+    //是否开启 view 追踪
+//    private boolean enableTraceView;
     //是否开启系统日志的上报功能
     private boolean traceConsoleLog;
     // openTrace 使用类型
@@ -167,6 +169,10 @@ public class FTSDKConfig {
         return onlySupportMainProcess;
     }
 
+//    public boolean isEnableTraceView(){
+//        return  enableTraceView;
+//    }
+
 
     /**
      * 是否使用 UseOAID 作为设备唯一识别号的替代字段
@@ -275,7 +281,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 是否开启流程图日志
+     * 是否追踪用户操作，目前支持应用启动和点击操作
      *
      * @param enableTraceUserAction
      */
@@ -284,6 +290,16 @@ public class FTSDKConfig {
         return this;
     }
 
+//
+//    /**
+//     * 是否 view 追踪
+//     * @param enableTraceView
+//     * @return
+//     */
+//    public FTSDKConfig setEnableTraceView(boolean enableTraceView){
+//        this.enableTraceView = enableTraceView;
+//        return  this;
+//    }
     /**
      * 是否开启系统日志上报功能
      *

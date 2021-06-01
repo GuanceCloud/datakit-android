@@ -903,13 +903,13 @@ public class FTAutoTrack {
             fields.put(Constants.KEY_RUM_ERROR_STACK, log);
 
             try {
-                if (FTMonitorConfig.get().isMonitorType(MonitorType.BLUETOOTH)) {
-                    tags.put(Constants.KEY_BT_OPEN, BluetoothUtils.get().isOpen());
-                }
+//                if (FTMonitorConfig.get().isMonitorType(MonitorType.BLUETOOTH)) {
+//                    tags.put(Constants.KEY_BT_OPEN, BluetoothUtils.get().isOpen());
+//                }
 
-                if (FTMonitorConfig.get().isMonitorType(MonitorType.LOCATION)) {
-                    tags.put(Constants.KEY_LOCATION_GPS_OPEN, LocationUtils.get().isOpenGps());
-                }
+//                if (FTMonitorConfig.get().isMonitorType(MonitorType.LOCATION)) {
+//                    tags.put(Constants.KEY_LOCATION_GPS_OPEN, LocationUtils.get().isOpenGps());
+//                }
 
                 tags.put(Constants.KEY_DEVICE_CARRIER, DeviceUtils.getCarrier(FTApplication.getApplication()));
                 tags.put(Constants.KEY_DEVICE_LOCALE, Locale.getDefault());

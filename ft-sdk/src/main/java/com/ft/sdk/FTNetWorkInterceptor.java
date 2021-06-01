@@ -58,9 +58,8 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
     }
 
 
-    private void uploadNetTrace(FTTraceHandler handler, Request request, @Nullable Response response, String responseBody, String error) {
+    private void uploadNetTrace(FTTraceHandler handler, String operationName, Request request, @Nullable Response response, String responseBody, String error) {
         try {
-            String operationName = request.method() + "/http";
 
             JSONObject requestContent = buildRequestJsonContent(request);
             JSONObject responseContent = buildResponseJsonContent(response, responseBody, error);
@@ -93,10 +92,12 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
         Request.Builder requestBuilder = request.newBuilder();
         Exception exception = null;
         Request newRequest = null;
+        String operationName = "";
         FTTraceHandler handler = new FTTraceHandler();
         try {
             okhttp3.HttpUrl url = request.url();
             HttpUrl httpUrl = new HttpUrl(url.host(), url.encodedPath(), url.port(), url.toString());
+            operationName = request.method() + " " + httpUrl.getPath();
             HashMap<String, String> headers = handler.getTraceHeader(httpUrl);
             handler.setIsWebViewTrace(webViewTrace);
             for (String key : headers.keySet()) {
@@ -111,7 +112,7 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
 
         Connection connection = chain.connection();
         if (exception != null) {
-            uploadNetTrace(handler, newRequest, null, "", exception.getMessage());
+            uploadNetTrace(handler, operationName, newRequest, null, "", exception.getMessage());
             mPerformanceHandler.setTransformContent(newRequest, null, "",
                     connection, sessionId, viewId, viewName, viewReferrer, actionId, actionName);
 
@@ -129,7 +130,7 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
                         responseBody = new String(bytes, getCharset(contentType));
                         responseBody1 = ResponseBody.create(responseBody1.contentType(), bytes);
                         response = response.newBuilder().body(responseBody1).build();
-                        uploadNetTrace(handler, newRequest, response, responseBody, "");
+                        uploadNetTrace(handler, operationName, newRequest, response, responseBody, "");
                         mPerformanceHandler.setTransformContent(newRequest, response, responseBody,
                                 connection, sessionId, viewId, viewName, viewReferrer, actionId, actionName);
 

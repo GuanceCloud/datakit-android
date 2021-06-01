@@ -88,20 +88,20 @@ public class MonitorTest extends BaseTest {
 //        monitorTest(MonitorType.LOCATION);
 //    }
 
-    @Test
-    public void monitorBlueToothTest() throws Exception {
-        monitorTest(MonitorType.BLUETOOTH);
-    }
+//    @Test
+//    public void monitorBlueToothTest() throws Exception {
+//        monitorTest(MonitorType.BLUETOOTH);
+//    }
 
 //    @Test
 //    public void monitorSystemTest() {
 //        monitorTest(MonitorType.SYSTEM);
 //    }
 
-    @Test
-    public void monitorFpsTest() throws Exception {
-        monitorTest(MonitorType.FPS);
-    }
+//    @Test
+//    public void monitorFpsTest() throws Exception {
+//        monitorTest(MonitorType.FPS);
+//    }
 
     /**
      * 测试监控周期切换是否正常，该测试用例需要观察控制台的输出日志《轮训监控上报数据成功》来观察
@@ -166,9 +166,9 @@ public class MonitorTest extends BaseTest {
 //        expects.put(MonitorType.NETWORK, Constants.KEY_NETWORK_PROXY);
 //        expects.put(MonitorType.CAMERA, "camera_back_px");
 //        expects.put(MonitorType.LOCATION, Constants.KEY_LOCATION_GPS_OPEN);
-        expects.put(MonitorType.BLUETOOTH, Constants.KEY_BT_OPEN);
+//        expects.put(MonitorType.BLUETOOTH, Constants.KEY_BT_OPEN);
 //        expects.put(MonitorType.SYSTEM, Constants.KEY_DEVICE_NAME);
-        expects.put(MonitorType.FPS, Constants.KEY_FPS);
+//        expects.put(MonitorType.FPS, Constants.KEY_FPS);
         return expects;
     }
 

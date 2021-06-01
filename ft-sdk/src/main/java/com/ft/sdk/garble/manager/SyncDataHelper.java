@@ -326,16 +326,16 @@ public class SyncDataHelper {
 //            if (FTMonitorConfig.get().isMonitorType(MonitorType.LOCATION)) {
 //                createLocation(tags, fields);
 //            }
-            if (FTMonitorConfig.get().isMonitorType(MonitorType.BLUETOOTH)) {
-                createBluetooth(tags, fields);
-            }
+//            if (FTMonitorConfig.get().isMonitorType(MonitorType.BLUETOOTH)) {
+//                createBluetooth(tags, fields);
+//            }
 //            if (FTMonitorConfig.get().isMonitorType(MonitorType.SYSTEM)) {
 //                //系统
 //                createSystem(tags, fields);
 //            }
-            if (FTMonitorConfig.get().isMonitorType(MonitorType.FPS)) {
-                createFps(tags, fields);
-            }
+//            if (FTMonitorConfig.get().isMonitorType(MonitorType.FPS)) {
+//                createFps(tags, fields);
+//            }
             //传感器
 //            createSensor(tags, fields);
         } catch (Exception e) {
