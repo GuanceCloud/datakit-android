@@ -82,9 +82,6 @@ class RUMGlobalManager {
     }
 
     void checkActionClose() {
-        if (!FTUserActionConfig.get().isEnableTraceUserAction()) {
-            return;
-        }
         if (activeAction == null) return;
         long now = Utils.getCurrentNanoTime();
         long lastActionTime = activeAction.getStartTime();
