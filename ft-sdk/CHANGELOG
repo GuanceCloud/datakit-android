@@ -1,3 +1,8 @@
+# agent 1.1.0-alpha04
+1.resource count 统计优化
+2.duration action 逻辑添加
+
+---
 # agent 1.1.0-alpha03
 1.trace resource 属性添加
 2.user action 配置添加
