@@ -139,6 +139,7 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
             }
         }
 
+        RUMGlobalManager.getInstance().stopResource(viewId, actionId);
         return response;
     }
 

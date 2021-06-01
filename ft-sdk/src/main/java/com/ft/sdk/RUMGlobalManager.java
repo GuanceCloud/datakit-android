@@ -62,6 +62,20 @@ class RUMGlobalManager {
         return activeAction == null ? null : activeAction.getId();
     }
 
+    void addAction(String actionName, String actionType, long duration) {
+        if (!FTUserActionConfig.get().isEnableTraceUserAction()) {
+            return;
+        }
+        checkSessionRefresh();
+
+        activeAction = new ActionBean(actionName, actionType,
+                sessionId, activeView, false);
+        activeAction.setClose(true);
+        activeAction.setDuration(duration);
+        initAction(activeAction);
+        this.lastActionTime = activeAction.getStartTime();
+    }
+
     void startAction(String actionName, String actionType) {
         startAction(actionName, actionType, false);
     }
@@ -77,7 +91,6 @@ class RUMGlobalManager {
             activeAction = new ActionBean(actionName, actionType, sessionId, activeView, needWait);
             initAction(activeAction);
             this.lastActionTime = activeAction.getStartTime();
-
         }
     }
 
@@ -111,6 +124,7 @@ class RUMGlobalManager {
 
     void stopResource(String viewId, String actionId) {
         checkActionClose();
+        increaseResourceCount(viewId,actionId);
         ThreadPoolUtils.get().execute(() -> {
             FTDBManager.get().reduceViewPendingResource(viewId);
             FTDBManager.get().reduceActionPendingResource(actionId);
@@ -160,15 +174,11 @@ class RUMGlobalManager {
         });
     }
 
-    void increaseResourceCount(JSONObject tags) {
-        String actionId = tags.optString(Constants.KEY_RUM_ACTION_ID);
-        String viewId = tags.optString(Constants.KEY_RUM_VIEW_ID);
+    void increaseResourceCount(String viewId,String actionId) {
         ThreadPoolUtils.get().execute(() -> {
             FTDBManager.get().increaseViewResource(viewId);
             FTDBManager.get().increaseActionResource(actionId);
         });
-        stopResource(viewId, actionId);
-
     }
 
 

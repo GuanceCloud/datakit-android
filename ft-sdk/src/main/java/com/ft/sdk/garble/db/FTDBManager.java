@@ -101,12 +101,13 @@ public class FTDBManager extends DBManager {
             contentValues.put(FTSQL.RUM_COLUMN_LONG_TASK_COUNT, 0);
             contentValues.put(FTSQL.RUM_COLUMN_ERROR_COUNT, 0);
             contentValues.put(FTSQL.RUM_COLUMN_ID, data.getId());
-            contentValues.put(FTSQL.RUM_COLUMN_IS_CLOSE, 0);
+            contentValues.put(FTSQL.RUM_COLUMN_IS_CLOSE, data.isClose());
             contentValues.put(FTSQL.RUM_COLUMN_SESSION_ID, data.getSessionId());
             contentValues.put(FTSQL.RUM_COLUMN_VIEW_ID, data.getViewId());
             contentValues.put(FTSQL.RUM_COLUMN_VIEW_NAME, data.getViewName());
             contentValues.put(FTSQL.RUM_COLUMN_VIEW_REFERRER, data.getViewReferrer());
             contentValues.put(FTSQL.RUM_COLUMN_RESOURCE_COUNT, 0);
+            contentValues.put(FTSQL.RUM_COLUMN_ACTION_DURATION, data.getDuration());
             contentValues.put(FTSQL.RUM_COLUMN_ACTION_NAME, data.getActionName());
             contentValues.put(FTSQL.RUM_COLUMN_ACTION_TYPE, data.getActionType());
             db.insert(FTSQL.FT_TABLE_ACTION, null, contentValues);

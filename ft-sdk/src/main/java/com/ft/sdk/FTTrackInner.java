@@ -65,9 +65,6 @@ public class FTTrackInner {
                 RUMGlobalManager.getInstance().attachRUMRelative(tags);
                 RUMGlobalManager.getInstance().increaseLongTask(tags);
                 break;
-            case Constants.FT_MEASUREMENT_RUM_RESOURCE:
-                RUMGlobalManager.getInstance().increaseResourceCount(tags);
-                break;
         }
 
         syncDataBackground(DataType.RUM_APP, time, measurement, tags, fields);

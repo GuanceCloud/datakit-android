@@ -17,7 +17,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.ft.sdk.garble.FTAutoTrackConfig;
-import com.ft.sdk.garble.FTUserActionConfig;
 import com.ft.sdk.garble.FTFragmentManager;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
@@ -29,10 +28,8 @@ import com.ft.sdk.garble.bean.ErrorType;
 import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.ResourceBean;
 import com.ft.sdk.garble.utils.AopUtils;
-import com.ft.sdk.garble.utils.BluetoothUtils;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
-import com.ft.sdk.garble.utils.LocationUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.NetUtils;
 import com.ft.sdk.garble.utils.OaidUtils;
@@ -740,8 +737,8 @@ public class FTAutoTrack {
      */
     public static void putRUMLaunchPerformance(boolean isCold, long duration) {
         if (!Utils.enableTraceSamplingRate()) return;
-        RUMGlobalManager.getInstance().startAction(
-                isCold ? "app cold start" : "app hot start", isCold ? "launch_cold" : "launch_hot");
+        RUMGlobalManager.getInstance().addAction(
+                isCold ? "app cold start" : "app hot start", isCold ? "launch_cold" : "launch_hot", duration);
     }
 
     /**
@@ -813,7 +810,7 @@ public class FTAutoTrack {
             if (!bean.urlPath.isEmpty()) {
                 tags.put(Constants.KEY_RUM_RESOURCE_URL_PATH, bean.urlPath);
                 tags.put(Constants.KEY_RUM_RESOURCE_URL_PATH_GROUP,
-                        bean.urlPath.substring(0,bean.urlPath.lastIndexOf("/") + 1));
+                        bean.urlPath.substring(0, bean.urlPath.lastIndexOf("/") + 1));
             }
             tags.put(Constants.KEY_RUM_RESOURCE_URL, bean.url);
             fields.put(Constants.KEY_RUM_REQUEST_HEADER, bean.requestHeader);
@@ -842,7 +839,7 @@ public class FTAutoTrack {
                 if (!bean.urlPath.isEmpty()) {
                     errorTags.put(Constants.KEY_RUM_RESOURCE_URL_PATH, bean.urlPath);
                     errorTags.put(Constants.KEY_RUM_RESOURCE_URL_PATH_GROUP,
-                            bean.urlPath.replaceAll("\\/([^\\/]*)\\d([^\\/]*)","/?"));
+                            bean.urlPath.replaceAll("\\/([^\\/]*)\\d([^\\/]*)", "/?"));
                 }
 
                 errorField.put(Constants.KEY_RUM_ERROR_MESSAGE, "");
