@@ -777,10 +777,13 @@ public class FTAutoTrack {
             tags.put(Constants.KEY_RUM_VIEW_REFERRER, bean.viewReferrer);
             tags.put(Constants.KEY_RUM_SESSION_ID, bean.sessionId);
 
-            if (bean.resourceStatus > 0) {
-                tags.put(Constants.KEY_RUM_RESOURCE_STATUS, bean.resourceStatus);
+            int resourceStatus = bean.resourceStatus;
+            String resourceStatusGroup = "";
+            if (resourceStatus > 0) {
+                tags.put(Constants.KEY_RUM_RESOURCE_STATUS, resourceStatus);
                 long statusGroupPrefix = bean.resourceStatus / 100;
-                tags.put(Constants.KEY_RUM_RESOURCE_STATUS_GROUP, statusGroupPrefix + "xx");
+                resourceStatusGroup = statusGroupPrefix + "xx";
+                tags.put(Constants.KEY_RUM_RESOURCE_STATUS_GROUP, resourceStatusGroup);
             }
 
             if (bean.resourceSize > 0) {
@@ -807,11 +810,16 @@ public class FTAutoTrack {
                 fields.put(Constants.KEY_RUM_RESOURCE_TRANS, bean.resourceTrans);
             }
 
-            if (!bean.urlPath.isEmpty()) {
-                tags.put(Constants.KEY_RUM_RESOURCE_URL_PATH, bean.urlPath);
-                tags.put(Constants.KEY_RUM_RESOURCE_URL_PATH_GROUP,
-                        bean.urlPath.substring(0, bean.urlPath.lastIndexOf("/") + 1));
+            String urlPath = bean.urlPath;
+            String urlPathGroup = "";
+
+            if (!urlPath.isEmpty()) {
+                urlPathGroup = urlPath.replaceAll("\\/([^\\/]*)\\d([^\\/]*)", "/?");
+                tags.put(Constants.KEY_RUM_RESOURCE_URL_PATH, urlPath);
+                tags.put(Constants.KEY_RUM_RESOURCE_URL_PATH_GROUP, urlPathGroup);
             }
+
+
             tags.put(Constants.KEY_RUM_RESOURCE_URL, bean.url);
             fields.put(Constants.KEY_RUM_REQUEST_HEADER, bean.requestHeader);
             fields.put(Constants.KEY_RUM_RESPONSE_HEADER, bean.responseHeader);
@@ -827,19 +835,17 @@ public class FTAutoTrack {
                 errorTags.put(Constants.KEY_RUM_ERROR_SOURCE, ErrorSource.NETWORK.toString());
                 errorTags.put(Constants.KEY_RUM_ERROR_SITUATION, AppState.RUN.toString());
 
-                if (bean.resourceStatus > 0) {
-                    errorTags.put(Constants.KEY_RUM_RESOURCE_STATUS, bean.resourceStatus);
-                    long statusGroupPrefix = bean.resourceStatus / 100;
-                    errorTags.put(Constants.KEY_RUM_RESOURCE_STATUS_GROUP, statusGroupPrefix + "xx");
+                if (resourceStatus > 0) {
+                    errorTags.put(Constants.KEY_RUM_RESOURCE_STATUS, resourceStatus);
+                    errorTags.put(Constants.KEY_RUM_RESOURCE_STATUS_GROUP, resourceStatusGroup);
                 }
                 errorTags.put(Constants.KEY_RUM_RESOURCE_URL, bean.url);
                 errorTags.put(Constants.KEY_RUM_RESOURCE_URL_HOST, bean.urlHost);
                 errorTags.put(Constants.KEY_RUM_RESOURCE_METHOD, bean.resourceMethod);
 
-                if (!bean.urlPath.isEmpty()) {
-                    errorTags.put(Constants.KEY_RUM_RESOURCE_URL_PATH, bean.urlPath);
-                    errorTags.put(Constants.KEY_RUM_RESOURCE_URL_PATH_GROUP,
-                            bean.urlPath.replaceAll("\\/([^\\/]*)\\d([^\\/]*)", "/?"));
+                if (!urlPath.isEmpty()) {
+                    errorTags.put(Constants.KEY_RUM_RESOURCE_URL_PATH, urlPath);
+                    errorTags.put(Constants.KEY_RUM_RESOURCE_URL_PATH_GROUP, urlPathGroup);
                 }
 
                 errorField.put(Constants.KEY_RUM_ERROR_MESSAGE, "");
