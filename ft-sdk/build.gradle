@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 
 //发布 snapshot 版本号末尾追加 "-SNAPSHOT"
-def versionNameStr = "1.1.0-alpha05"
+def versionNameStr = "1.1.0-alpha06"
 def min_plugin_version = "1.0.1-alpha05"
 
 android {
@@ -12,7 +12,7 @@ android {
     defaultConfig {
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode 70
+        versionCode 71
         versionName versionNameStr
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
