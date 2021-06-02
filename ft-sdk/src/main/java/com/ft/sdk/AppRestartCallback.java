@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.FTRUMConfig;
 import com.ft.sdk.garble.bean.AppState;
+import com.ft.sdk.garble.manager.FTMainLoopLogMonitor;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
@@ -88,6 +89,7 @@ class AppRestartCallback {
         if (!appForeground) {
             handler.removeMessages(MSG_CHECK_SLEEP_STATUS);
             handler.sendEmptyMessageDelayed(MSG_CHECK_SLEEP_STATUS, DELAY_MILLIS);
+            FTMainLoopLogMonitor.getInstance().stopMonitor();
         }
     }
 

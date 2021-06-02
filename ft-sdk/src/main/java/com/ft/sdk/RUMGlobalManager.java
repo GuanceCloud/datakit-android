@@ -37,7 +37,7 @@ class RUMGlobalManager {
 
     private String sessionId = UUID.randomUUID().toString();
 
-    ViewBean activeView = ViewBean.createLaunchViewBean(sessionId);
+    ViewBean activeView;
     ActionBean activeAction;
 
     HashMap<String, Long> preActivityDuration = new HashMap<>();

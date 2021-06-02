@@ -47,21 +47,18 @@ public class ActionBean {
         return needWaitAction;
     }
 
-    public static ActionBean createLaunchAction(String sessionId, ViewBean viewBean) {
-        return new ActionBean("", "", sessionId, viewBean, false);
-    }
-
     public ActionBean() {
 
     }
 
-    public ActionBean(String actionName, String actionType, String sessionId, ViewBean viewBean, boolean needWaitAction) {
+    public ActionBean(String actionName, String actionType,
+                      String sessionId, ViewBean viewBean, boolean needWaitAction) {
         this.actionName = actionName;
         this.actionType = actionType;
         this.sessionId = sessionId;
-        this.viewId = viewBean.getId();
-        this.viewName = viewBean.getViewName();
-        this.viewReferrer = viewBean.getViewReferrer();
+        this.viewId = viewBean == null ? null : viewBean.getId();
+        this.viewName = viewBean == null ? null : viewBean.getViewName();
+        this.viewReferrer = viewBean == null ? null : viewBean.getViewReferrer();
         this.needWaitAction = needWaitAction;
     }
 

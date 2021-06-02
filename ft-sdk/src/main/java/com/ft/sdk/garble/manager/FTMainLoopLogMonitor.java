@@ -88,6 +88,10 @@ public class FTMainLoopLogMonitor {
         lastTime = Utils.getCurrentNanoTime();
     }
 
+    public void stopMonitor() {
+        lastTime = 0;
+    }
+
     public void removeMonitor() {
         mIoHandler.removeCallbacks(mLogRunnable);
     }

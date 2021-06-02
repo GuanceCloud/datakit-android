@@ -20,10 +20,6 @@ public class ViewBean {
     long timeSpent = 0;
     String sessionId;
 
-    public static ViewBean createLaunchViewBean(String sessionId) {
-        return new ViewBean("", "", 0, sessionId);
-    }
-
     public ViewBean() {
     }
 
