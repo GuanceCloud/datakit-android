@@ -123,7 +123,6 @@ class RUMGlobalManager {
     }
 
     void stopResource(String viewId, String actionId) {
-        checkActionClose();
         increaseResourceCount(viewId,actionId);
         ThreadPoolUtils.get().execute(() -> {
             FTDBManager.get().reduceViewPendingResource(viewId);
@@ -175,6 +174,7 @@ class RUMGlobalManager {
     }
 
     void increaseResourceCount(String viewId,String actionId) {
+        checkActionClose();
         ThreadPoolUtils.get().execute(() -> {
             FTDBManager.get().increaseViewResource(viewId);
             FTDBManager.get().increaseActionResource(actionId);
@@ -183,6 +183,7 @@ class RUMGlobalManager {
 
 
     void increaseError(JSONObject tags) {
+        checkActionClose();
         String actionId = tags.optString(Constants.KEY_RUM_ACTION_ID);
         String viewId = tags.optString(Constants.KEY_RUM_VIEW_ID);
         ThreadPoolUtils.get().execute(() -> {
@@ -193,6 +194,7 @@ class RUMGlobalManager {
     }
 
     void increaseLongTask(JSONObject tags) {
+        checkActionClose();
         String actionId = tags.optString(Constants.KEY_RUM_ACTION_ID);
         String viewId = tags.optString(Constants.KEY_RUM_VIEW_ID);
         ThreadPoolUtils.get().execute(() -> {
