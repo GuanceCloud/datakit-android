@@ -34,7 +34,7 @@ public final class FTNetworkPerformanceHandler {
         int responseHeaderSize = 0;
         if (response != null) {
             bean.responseHeader = response.headers().toString();
-            responseHeaderSize = bean.responseHeader.length();
+            responseHeaderSize = bean.responseHeader.getBytes().length;
             bean.responseContentType = response.header("Content-Type");
             bean.responseConnection = response.header("Connection");
             bean.resourceMethod = request.method();
@@ -43,7 +43,7 @@ public final class FTNetworkPerformanceHandler {
             bean.resourceStatus = response.code();
         }
 
-        bean.resourceSize = responseBody == null ? 0 : responseBody.length();
+        bean.resourceSize = responseBody == null ? 0 : responseBody.getBytes().length;
         bean.resourceSize += responseHeaderSize;
 
         if (connection != null) {
