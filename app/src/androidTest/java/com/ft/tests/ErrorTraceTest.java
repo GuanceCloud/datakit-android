@@ -161,12 +161,6 @@ public class ErrorTraceTest extends BaseTest {
         return isContainLog;
     }
 
-    private void avoidCrash() {
-        try {
-            Whitebox.setInternalState(FTExceptionHandler.get(), "isAndroidTest", true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+
 
 }

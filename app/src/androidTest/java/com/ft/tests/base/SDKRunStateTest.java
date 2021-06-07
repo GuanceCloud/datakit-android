@@ -51,6 +51,8 @@ public class SDKRunStateTest extends BaseTest {
                 .setDebug(true)//设置是否是 debug
                 .setMonitorType(MonitorType.ALL)//设置监控项
                 .setEnableTrackAppCrash(true)
+                .setEnableTrackAppANR(true)
+                .setEnableTrackAppUIBlock(true)
                 .setEnv(EnvType.GRAY)
                 .setNetworkTrace(true)
                 .setTraceConsoleLog(true)
@@ -94,7 +96,7 @@ public class SDKRunStateTest extends BaseTest {
     }
 
     @Test
-    public void eventFlowLogTest() {
+    public void traceUserActionTest() {
         Assert.assertTrue(FTUserActionConfig.get().isEnableTraceUserAction());
     }
 

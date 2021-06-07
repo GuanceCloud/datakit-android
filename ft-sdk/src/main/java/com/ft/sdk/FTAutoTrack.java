@@ -834,6 +834,12 @@ public class FTAutoTrack {
                 errorTags.put(Constants.KEY_RUM_ERROR_TYPE, ErrorType.NETWORK.toString());
                 errorTags.put(Constants.KEY_RUM_ERROR_SOURCE, ErrorSource.NETWORK.toString());
                 errorTags.put(Constants.KEY_RUM_ERROR_SITUATION, AppState.RUN.toString());
+                errorTags.put(Constants.KEY_RUM_ACTION_ID, bean.actionId);
+                errorTags.put(Constants.KEY_RUM_ACTION_NAME, bean.actionName);
+                errorTags.put(Constants.KEY_RUM_VIEW_ID, bean.viewId);
+                errorTags.put(Constants.KEY_RUM_VIEW_NAME, bean.viewName);
+                errorTags.put(Constants.KEY_RUM_VIEW_REFERRER, bean.viewReferrer);
+                errorTags.put(Constants.KEY_RUM_SESSION_ID, bean.sessionId);
 
                 if (resourceStatus > 0) {
                     errorTags.put(Constants.KEY_RUM_RESOURCE_STATUS, resourceStatus);
@@ -897,7 +903,6 @@ public class FTAutoTrack {
         try {
             JSONObject tags = getRUMPublicTags();
             JSONObject fields = new JSONObject();
-
             tags.put(Constants.KEY_RUM_ERROR_TYPE, errorType.toString());
             tags.put(Constants.KEY_RUM_ERROR_SOURCE, ErrorSource.LOGGER.toString());
             tags.put(Constants.KEY_RUM_ERROR_SITUATION, state.toString());
@@ -944,7 +949,6 @@ public class FTAutoTrack {
      * @param dateline
      */
     private static void putFreeze(long dateline, String log, long duration) {
-        if (!Utils.enableTraceSamplingRate()) return;
         try {
             JSONObject tags = getRUMPublicTags();
             JSONObject fields = new JSONObject();

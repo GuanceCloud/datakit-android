@@ -107,6 +107,7 @@ public class FTDBManager extends DBManager {
             contentValues.put(FTSQL.RUM_COLUMN_VIEW_NAME, data.getViewName());
             contentValues.put(FTSQL.RUM_COLUMN_VIEW_REFERRER, data.getViewReferrer());
             contentValues.put(FTSQL.RUM_COLUMN_RESOURCE_COUNT, 0);
+            contentValues.put(FTSQL.RUM_COLUMN_PENDING_RESOURCE, 0);
             contentValues.put(FTSQL.RUM_COLUMN_ACTION_DURATION, data.getDuration());
             contentValues.put(FTSQL.RUM_COLUMN_ACTION_NAME, data.getActionName());
             contentValues.put(FTSQL.RUM_COLUMN_ACTION_TYPE, data.getActionType());
@@ -123,9 +124,12 @@ public class FTDBManager extends DBManager {
     public void closeAction(String actionId, long duration, boolean force) {
         String where = FTSQL.RUM_COLUMN_ID + "='" + actionId + "'"
                 + (force ? "" : ("AND " + FTSQL.RUM_COLUMN_PENDING_RESOURCE + "<=0"));
+
+
         getDB(true, db -> {
-            Cursor cursor = db.rawQuery("select count(*) from " + FTSQL.FT_TABLE_ACTION
-                    + " where " + where, null);
+            String sql = "select count(*) from " + FTSQL.FT_TABLE_ACTION
+                    + " where " + where;
+            Cursor cursor = db.rawQuery(sql, null);
             cursor.moveToFirst();
             int count = cursor.getInt(0);
             cursor.close();
@@ -137,6 +141,7 @@ public class FTDBManager extends DBManager {
                 contentValues.put(FTSQL.RUM_COLUMN_ACTION_DURATION, duration);
                 db.update(FTSQL.FT_TABLE_ACTION, contentValues,
                         FTSQL.RUM_COLUMN_ID + "='" + actionId + "'", null);
+
             }
         });
 
@@ -150,7 +155,7 @@ public class FTDBManager extends DBManager {
      * @param timeSpent
      */
     public void closeView(String viewId, long timeSpent) {
-        LogUtils.d(TAG,"closeVIew:" + viewId);
+        LogUtils.d(TAG, "closeVIew:" + viewId);
         getDB(true, db -> {
             Cursor cursor = db.rawQuery("select count(*) from " + FTSQL.FT_TABLE_VIEW
                     + " where " + FTSQL.RUM_COLUMN_ID + "='" + viewId + "'", null);
@@ -226,6 +231,7 @@ public class FTDBManager extends DBManager {
             int count = cursor.getInt(0);
             cursor.close();
             if (count > 0) {
+
                 db.execSQL("UPDATE " + tableName + " SET "
                         + columnName + "=" + columnName + "+1 WHERE " + FTSQL.RUM_COLUMN_ID + "='" + id + "'");
             }
@@ -341,6 +347,7 @@ public class FTDBManager extends DBManager {
     }
 
     public void cleanCloseActionData() {
+
         getDB(true, db -> {
             db.execSQL("DELETE FROM " + FTSQL.FT_TABLE_ACTION + " WHERE " + FTSQL.RUM_COLUMN_IS_CLOSE + "=1");
         });
@@ -514,13 +521,13 @@ public class FTDBManager extends DBManager {
     /**
      * 测试使用，用于删除数据库中的数据
      */
-    public boolean delete() {
-        final boolean[] result = new boolean[1];
+    public void delete() {
         getDB(true, db -> {
-            int value = db.delete(FTSQL.FT_SYNC_TABLE_NAME, null, null);
-            result[0] = value > 0;
+            db.delete(FTSQL.FT_SYNC_TABLE_NAME, null, null);
+            db.delete(FTSQL.FT_TABLE_ACTION, null, null);
+            db.delete(FTSQL.FT_TABLE_VIEW, null, null);
+
         });
-        return result[0];
     }
 
 //    /**

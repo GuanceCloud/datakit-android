@@ -19,6 +19,7 @@ import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTrack;
 import com.ft.sdk.MonitorType;
+import com.ft.sdk.RUMGlobalManager;
 import com.ft.sdk.SyncTaskManager;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.DataType;
@@ -33,7 +34,7 @@ import com.ft.utils.RequestUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,21 +53,22 @@ import static com.ft.AllTests.hasPrepare;
  */
 @RunWith(AndroidJUnit4.class)
 public class LogTrackObjectTraceRUMTest extends BaseTest {
-    Context context;
+
 
     @Rule
     public ActivityScenarioRule<DebugMainActivity> rule = new ActivityScenarioRule<>(DebugMainActivity.class);
 
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeClass
+    public static void setBeforeLaunch() throws Exception {
         if (!hasPrepare) {
             Looper.prepare();
             hasPrepare = true;
         }
+
         stopSyncTask();
 
-        context = MockApplication.getContext();
+        Context context = MockApplication.getContext();
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL))
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setUseOAID(true)//设置 OAID 是否可用
@@ -77,9 +79,11 @@ public class LogTrackObjectTraceRUMTest extends BaseTest {
                 .setNetworkTrace(true)
                 .setRumAppId(AccountUtils.getProperty(context, AccountUtils.RUM_APP_ID))
                 .setTraceConsoleLog(true)
+                .setEnableTrackAppUIBlock(true)
                 .setEnableTraceUserAction(true)
                 .setTraceType(TraceType.ZIPKIN);
         FTSdk.install(ftSDKConfig);
+
         FTDBManager.get().delete();
     }
 
@@ -197,19 +201,6 @@ public class LogTrackObjectTraceRUMTest extends BaseTest {
         Assert.assertEquals(0, except2);
     }
 
-//    @Test
-//    public void rumInfluxTestTest() throws Exception {
-//        onView(ViewMatchers.withId(R.id.main_view_loop_test)).perform(ViewActions.scrollTo()).perform(click());
-//        Thread.sleep(5000);
-//        int except1 = countInDB(DataType.RUM_INFLUX, Constants.FT_MEASUREMENT_RUM_INFLUX_APP_VIEW);
-//        Assert.assertTrue(except1 > 0);
-//        resumeSyncTask();
-//        executeSyncTask();
-//        Thread.sleep(12000);
-//        int except2 = countInDB(DataType.RUM, Constants.FT_MEASUREMENT_RUM_INFLUX_APP_VIEW);
-//        Assert.assertEquals(0, except2);
-//
-//    }
 
     @Test
     public void rumUserBindTest() throws InterruptedException {
@@ -230,6 +221,294 @@ public class LogTrackObjectTraceRUMTest extends BaseTest {
         Thread.sleep(5000);
         int except4 = countInDB(DataType.RUM_APP, "\"is_signin\":\"T\"");
         Assert.assertEquals(0, except4);
+    }
+
+
+    /**
+     * 测试点击某个按钮
+     *
+     * @throws InterruptedException
+     */
+    @Test
+    public void rumClickLambdaBtnTest() throws Exception {
+        Thread.sleep(100);
+        onView(ViewMatchers.withId(R.id.main_mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
+        //第二次操作触发 action close
+        onView(ViewMatchers.withId(R.id.main_mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
+        Thread.sleep(1000);
+
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.RUM_APP);
+        boolean value = false;
+        for (SyncJsonData recordData : recordDataList) {
+            if (recordData.toString().contains("mock_click_btn")) {
+                value = true;
+                break;
+            }
+        }
+        Assert.assertTrue(value);
+    }
+
+
+    @Test
+    public void rumActionLaunchTest() throws InterruptedException {
+        //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
+        Thread.sleep(1000);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.RUM_APP);
+        boolean value = false;
+        for (SyncJsonData recordData : recordDataList) {
+            if (recordData.toString().contains("launch")) {
+                value = true;
+                break;
+            }
+        }
+        Assert.assertTrue(value);
+    }
+
+
+    @Test
+    public void sessionGenerateTest() throws InterruptedException {
+        Thread.sleep(1000);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.RUM_APP);
+        String sessionId = "";
+        for (SyncJsonData recordData : recordDataList) {
+            try {
+                JSONObject json = new JSONObject(recordData.getDataString());
+                JSONObject tags = json.optJSONObject("tags");
+                String measurement = json.optString("measurement");
+                if ("action".equals(measurement)) {
+                    if (tags != null) {
+                        sessionId = tags.optString("session_id");
+                        break;
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        Assert.assertFalse(sessionId.isEmpty());
+
+        Thread.sleep(15000);
+
+        onView(ViewMatchers.withId(R.id.main_mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
+        Thread.sleep(100);
+        onView(ViewMatchers.withId(R.id.main_mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
+        Thread.sleep(1000);
+
+        String newSessionId = "";
+
+        recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.RUM_APP);
+        for (SyncJsonData recordData : recordDataList) {
+            try {
+                JSONObject json = new JSONObject(recordData.getDataString());
+                JSONObject tags = json.optJSONObject("tags");
+                String measurement = json.optString("measurement");
+                if ("action".equals(measurement)) {
+                    if (tags != null) {
+                        newSessionId = tags.optString("session_id");
+                        break;
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        Assert.assertNotEquals(sessionId, newSessionId);
+    }
+
+    @Test
+    public void viewGenerateTest() throws InterruptedException {
+        Thread.sleep(1000);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.RUM_APP);
+
+        String viewId = "";
+        for (SyncJsonData recordData : recordDataList) {
+            try {
+                JSONObject json = new JSONObject(recordData.getDataString());
+                JSONObject tags = json.optJSONObject("tags");
+                String measurement = json.optString("measurement");
+                if ("view".equals(measurement)) {
+                    if (tags != null) {
+                        viewId = tags.optString("view_id");
+                        break;
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        Assert.assertFalse(viewId.isEmpty());
+
+        onView(ViewMatchers.withId(R.id.main_view_loop_test)).perform(ViewActions.scrollTo()).perform(click());
+
+        String newViewId = "";
+
+        recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.RUM_APP);
+
+        for (SyncJsonData recordData : recordDataList) {
+            try {
+                JSONObject json = new JSONObject(recordData.getDataString());
+                JSONObject tags = json.optJSONObject("tags");
+                String measurement = json.optString("measurement");
+                if ("view".equals(measurement)) {
+                    if (tags != null) {
+                        newViewId = tags.optString("view_id");
+                        break;
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        Assert.assertNotEquals(viewId, newViewId);
+
+    }
+
+    @Test
+    public void actionGenerateTest() throws InterruptedException {
+        Thread.sleep(1000);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.RUM_APP);
+
+        String actionId = "";
+        for (SyncJsonData recordData : recordDataList) {
+            try {
+                JSONObject json = new JSONObject(recordData.getDataString());
+                JSONObject tags = json.optJSONObject("tags");
+                String measurement = json.optString("measurement");
+                if ("action".equals(measurement)) {
+                    if (tags != null) {
+                        actionId = tags.optString("action_id");
+                        break;
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        onView(ViewMatchers.withId(R.id.main_mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
+        Thread.sleep(100);
+        onView(ViewMatchers.withId(R.id.main_mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
+
+        recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.RUM_APP);
+
+        String newActionId = "";
+        for (SyncJsonData recordData : recordDataList) {
+            try {
+                JSONObject json = new JSONObject(recordData.getDataString());
+                JSONObject tags = json.optJSONObject("tags");
+                String measurement = json.optString("measurement");
+                if ("action".equals(measurement)) {
+                    if (tags != null) {
+                        newActionId = tags.optString("action_id");
+                        break;
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        Assert.assertNotEquals(actionId, newActionId);
+    }
+
+    /**
+     * view 统计统计 UIBlock 与 ANR 需要手动测试
+     *
+     * @throws InterruptedException
+     */
+
+    @Test
+    public void viewSumTest() throws InterruptedException {
+        avoidCrash();
+        onView(ViewMatchers.withId(R.id.main_mock_crash_btn)).perform(ViewActions.scrollTo()).perform(click());
+        Thread.sleep(1000);
+        onView(ViewMatchers.withId(R.id.main_mock_okhttp_btn)).perform(ViewActions.scrollTo()).perform(click());
+        Thread.sleep(1000);
+
+        onView(ViewMatchers.withId(R.id.main_mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
+
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.RUM_APP);
+
+        for (SyncJsonData recordData : recordDataList) {
+            try {
+                JSONObject json = new JSONObject(recordData.getDataString());
+                JSONObject fields = json.optJSONObject("fields");
+                String measurement = json.optString("measurement");
+                if ("view".equals(measurement)) {
+                    if (fields != null) {
+                        int actionCount = fields.optInt("view_action_count");
+                        int viewErrorCount = fields.optInt("view_error_count");
+                        int resourceCount = fields.optInt("view_resource_count");
+                        Assert.assertEquals(actionCount, 3);
+                        Assert.assertEquals(viewErrorCount, 1);
+                        Assert.assertEquals(resourceCount, 1);
+                        break;
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Test
+    public void actionSumTest() throws Exception {
+        avoidCrash();
+        onView(ViewMatchers.withId(R.id.main_mock_okhttp_btn)).perform(ViewActions.scrollTo()).perform(click());
+
+        syncActionCount();
+
+        Thread.sleep(5000);
+
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.RUM_APP);
+
+        for (SyncJsonData recordData : recordDataList) {
+            try {
+                JSONObject json = new JSONObject(recordData.getDataString());
+                JSONObject fields = json.optJSONObject("fields");
+                String measurement = json.optString("measurement");
+                if ("action".equals(measurement)) {
+                    if (fields != null) {
+                        int resourceCount = fields.optInt("action_resource_count");
+                        Assert.assertEquals(resourceCount, 1);
+                        break;
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        onView(ViewMatchers.withId(R.id.main_mock_crash_btn)).perform(ViewActions.scrollTo()).perform(click());
+        syncActionCount();
+
+        Thread.sleep(5000);
+
+        recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.RUM_APP);
+        for (SyncJsonData recordData : recordDataList) {
+            try {
+                JSONObject json = new JSONObject(recordData.getDataString());
+                JSONObject fields = json.optJSONObject("fields");
+                String measurement = json.optString("measurement");
+                if ("action".equals(measurement)) {
+                    if (fields != null) {
+                        int error_count = fields.optInt("action_error_count");
+                        Assert.assertEquals(error_count, 1);
+                        break;
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    private void syncActionCount() throws Exception {
+        Thread.sleep(100);
+        Whitebox.invokeMethod(RUMGlobalManager.getInstance(), "generateRumData");
     }
 
     /**

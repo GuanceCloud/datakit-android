@@ -4,6 +4,7 @@ import android.Manifest;
 
 import androidx.test.rule.GrantPermissionRule;
 
+import com.ft.sdk.FTExceptionHandler;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTrack;
 import com.ft.sdk.garble.db.FTDBManager;
@@ -44,7 +45,7 @@ public class BaseTest {
 
     }
 
-    protected void stopSyncTask() throws Exception {
+    protected static void stopSyncTask() throws Exception {
         Whitebox.invokeMethod(SyncTaskManager.get(), "setRunning", true);
 
     }
@@ -80,4 +81,12 @@ public class BaseTest {
 //        fields.put("testField", CONTENT_SIMPLE_TEST);
 //        Whitebox.invokeMethod(FTTrackInner.getInstance(), "rumInflux", "testMeasurement", tags, fields);
 //    }
+
+    protected void avoidCrash() {
+        try {
+            Whitebox.setInternalState(FTExceptionHandler.get(), "isAndroidTest", true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

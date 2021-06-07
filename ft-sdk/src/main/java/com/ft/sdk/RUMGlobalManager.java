@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
-class RUMGlobalManager {
+public class RUMGlobalManager {
     private static final String TAG = "RUMGlobalManager";
     static final long MAX_RESTING_TIME = 15000000000L;
     static final long SESSION_EXPIRE_TIME = 1440000000000000L;
@@ -123,7 +123,7 @@ class RUMGlobalManager {
     }
 
     void stopResource(String viewId, String actionId) {
-        increaseResourceCount(viewId,actionId);
+        increaseResourceCount(viewId, actionId);
         ThreadPoolUtils.get().execute(() -> {
             FTDBManager.get().reduceViewPendingResource(viewId);
             FTDBManager.get().reduceActionPendingResource(actionId);
@@ -173,33 +173,34 @@ class RUMGlobalManager {
         });
     }
 
-    void increaseResourceCount(String viewId,String actionId) {
-        checkActionClose();
+    void increaseResourceCount(String viewId, String actionId) {
         ThreadPoolUtils.get().execute(() -> {
             FTDBManager.get().increaseViewResource(viewId);
             FTDBManager.get().increaseActionResource(actionId);
+            checkActionClose();
         });
+
     }
 
 
     void increaseError(JSONObject tags) {
-        checkActionClose();
+
         String actionId = tags.optString(Constants.KEY_RUM_ACTION_ID);
         String viewId = tags.optString(Constants.KEY_RUM_VIEW_ID);
         ThreadPoolUtils.get().execute(() -> {
             FTDBManager.get().increaseActionError(actionId);
             FTDBManager.get().increaseViewError(viewId);
+            checkActionClose();
         });
-
     }
 
     void increaseLongTask(JSONObject tags) {
-        checkActionClose();
         String actionId = tags.optString(Constants.KEY_RUM_ACTION_ID);
         String viewId = tags.optString(Constants.KEY_RUM_VIEW_ID);
         ThreadPoolUtils.get().execute(() -> {
             FTDBManager.get().increaseActionLongTask(actionId);
             FTDBManager.get().increaseViewLongTask(viewId);
+            checkActionClose();
 
         });
     }
@@ -289,6 +290,7 @@ class RUMGlobalManager {
                 tags.put(Constants.KEY_RUM_ACTION_NAME, bean.getActionName());
                 tags.put(Constants.KEY_RUM_ACTION_ID, bean.getId());
                 tags.put(Constants.KEY_RUM_ACTION_TYPE, bean.getActionType());
+                tags.put(Constants.KEY_RUM_SESSION_ID, bean.getSessionId());
                 fields.put(Constants.KEY_RUM_ACTION_LONG_TASK_COUNT, bean.getLongTaskCount());
                 fields.put(Constants.KEY_RUM_ACTION_RESOURCE_COUNT, bean.getResourceCount());
                 fields.put(Constants.KEY_RUM_ACTION_ERROR_COUNT, bean.getErrorCount());
