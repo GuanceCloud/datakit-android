@@ -468,10 +468,10 @@ public class FTDBManager extends DBManager {
             Cursor cursor;
             if (limit == 0) {
                 cursor = db.query(FTSQL.FT_SYNC_TABLE_NAME, null, selection, selectionArgs,
-                        null, null, FTSQL.RECORD_COLUMN_ID + " desc");
+                        null, null, FTSQL.RECORD_COLUMN_ID + " asc");
             } else {
                 cursor = db.query(FTSQL.FT_SYNC_TABLE_NAME, null, selection, selectionArgs,
-                        null, null, FTSQL.RECORD_COLUMN_ID + " desc", "" + limit);
+                        null, null, FTSQL.RECORD_COLUMN_ID + " asc", "" + limit);
             }
             while (cursor.moveToNext()) {
                 long id = cursor.getLong(cursor.getColumnIndex(FTSQL.RECORD_COLUMN_ID));

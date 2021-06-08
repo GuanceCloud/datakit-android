@@ -1,5 +1,8 @@
 package com.ft.sdk;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import com.ft.sdk.garble.FTUserActionConfig;
 import com.ft.sdk.garble.bean.ActionBean;
 import com.ft.sdk.garble.bean.ViewBean;
@@ -9,6 +12,7 @@ import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
 import com.ft.sdk.garble.utils.Utils;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -183,7 +187,7 @@ public class RUMGlobalManager {
     }
 
 
-    void increaseError(JSONObject tags) {
+    void increaseError(@NotNull JSONObject tags) {
 
         String actionId = tags.optString(Constants.KEY_RUM_ACTION_ID);
         String viewId = tags.optString(Constants.KEY_RUM_VIEW_ID);
@@ -194,7 +198,7 @@ public class RUMGlobalManager {
         });
     }
 
-    void increaseLongTask(JSONObject tags) {
+    void increaseLongTask(@NotNull JSONObject tags) {
         String actionId = tags.optString(Constants.KEY_RUM_ACTION_ID);
         String viewId = tags.optString(Constants.KEY_RUM_VIEW_ID);
         ThreadPoolUtils.get().execute(() -> {
@@ -251,7 +255,7 @@ public class RUMGlobalManager {
      *
      * @param tags
      */
-    public void attachRUMRelative(JSONObject tags) {
+    public void attachRUMRelative(@NotNull JSONObject tags) {
         try {
             tags.put(Constants.KEY_RUM_VIEW_ID, getViewId());
 
@@ -268,21 +272,33 @@ public class RUMGlobalManager {
     }
 
 
-    public static int LIMIT_SIZE = 50;
-
-    private void generateRumData() {
+    Handler mHandler = new Handler(Looper.getMainLooper());
+    Runnable mRUMGenerateRunner = () -> {
         JSONObject tags = FTAutoTrack.getRUMPublicTags();
 
         ThreadPoolUtils.get().execute(() -> {
-            generateActionSum(tags);
-            generateViewSum(tags);
+            try {
+                generateActionSum(tags);
+                generateViewSum(tags);
+            } catch (JSONException e) {
+                LogUtils.e(TAG, e.getMessage());
+            }
         });
+    };
+
+    public static int LIMIT_SIZE = 50;
+
+    private void generateRumData() {
+        //避免过于频繁的刷新
+        mHandler.removeCallbacks(mRUMGenerateRunner);
+        mHandler.postDelayed(mRUMGenerateRunner, 100);
     }
 
-    private void generateActionSum(JSONObject tags) {
+    private void generateActionSum(JSONObject globalTags) throws JSONException {
         ArrayList<ActionBean> beans = FTDBManager.get().querySumAction(LIMIT_SIZE);
         for (ActionBean bean : beans) {
             JSONObject fields = new JSONObject();
+            JSONObject tags = new JSONObject(globalTags.toString());
             try {
                 tags.put(Constants.KEY_RUM_VIEW_NAME, bean.getViewName());
                 tags.put(Constants.KEY_RUM_VIEW_REFERRER, bean.getViewReferrer());
@@ -300,23 +316,20 @@ public class RUMGlobalManager {
             } catch (JSONException e) {
                 LogUtils.d(TAG, e.getMessage());
             }
-
             FTDBManager.get().cleanCloseActionData();
-
-
         }
         if (beans.size() < LIMIT_SIZE) {
 
         } else {
-            generateActionSum(tags);
+            generateActionSum(globalTags);
         }
     }
 
-
-    private void generateViewSum(JSONObject tags) {
+    private void generateViewSum(JSONObject globalTags) throws JSONException {
         ArrayList<ViewBean> beans = FTDBManager.get().querySumView(LIMIT_SIZE);
         for (ViewBean bean : beans) {
             JSONObject fields = new JSONObject();
+            JSONObject tags = new JSONObject(globalTags.toString());
             try {
                 tags.put(Constants.KEY_RUM_SESSION_ID, bean.getSessionId());
                 tags.put(Constants.KEY_RUM_VIEW_NAME, bean.getViewName());
@@ -334,17 +347,19 @@ public class RUMGlobalManager {
             } catch (JSONException e) {
                 LogUtils.d(TAG, e.getMessage());
             }
-            FTTrackInner.getInstance().rum(Utils.getCurrentNanoTime(),
+            long time = Utils.getCurrentNanoTime();
+
+            FTTrackInner.getInstance().rum(time,
                     Constants.FT_MEASUREMENT_RUM_VIEW, tags, fields);
 
-            FTDBManager.get().cleanCloseViewData();
 
         }
+        FTDBManager.get().cleanCloseViewData();
         if (beans.size() < LIMIT_SIZE) {
 
 
         } else {
-            generateViewSum(tags);
+            generateViewSum(globalTags);
         }
     }
 
