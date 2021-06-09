@@ -57,6 +57,17 @@ public class NetStatusBean {
         return 0;
     }
 
+    public long getFirstByteTime() {
+        if (responseStartTime > dnsStartTime) {
+            if (dnsStartTime > 0) {
+                return responseStartTime - dnsStartTime;
+            } else {
+                return responseStartTime - fetchStartTime;
+            }
+        }
+        return 0;
+    }
+
     public long getHoleRequestTime() {
         if (responseEndTime > fetchStartTime) {
             return responseEndTime - fetchStartTime;

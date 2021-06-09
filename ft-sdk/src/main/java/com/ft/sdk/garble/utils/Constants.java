@@ -163,7 +163,6 @@ public class Constants {
     public static final String KEY_RUM_RESPONSE_CONTENT_TYPE = "response_content_type";
     public static final String KEY_RUM_RESPONSE_CONTENT_ENCODING = "response_content_encoding";
     public static final String KEY_RUM_RESOURCE_METHOD = "resource_method";
-    public static final String KEY_RUM_RESPONSE_SERVER = "response_server";
     public static final String KEY_RUM_RESPONSE_HEADER = "response_header";
     public static final String KEY_RUM_REQUEST_HEADER = "request_header";
 //    public static final String KEY_RUM_TERMINAL = "terminal";
@@ -178,11 +177,13 @@ public class Constants {
     public static final String KEY_RUM_RESOURCE_STATUS = "resource_status";
     public static final String KEY_RUM_RESOURCE_STATUS_GROUP = "resource_status_group";
     public static final String KEY_RUM_RESOURCE_SIZE = "resource_size";
-    public static final String KEY_RUM_RESOURCE_LOAD = "resource_load";
+    public static final String KEY_RUM_RESOURCE_DURATION = "duration";
     public static final String KEY_RUM_RESOURCE_DNS = "resource_dns";
     public static final String KEY_RUM_RESOURCE_TCP = "resource_tcp";
     public static final String KEY_RUM_RESOURCE_SSL = "resource_ssl";
     public static final String KEY_RUM_RESOURCE_TTFB = "resource_ttfb";
+    public static final String KEY_RUM_RESOURCE_FIRST_BYTE = "resource_first_byte";
+    public static final String KEY_RUM_RESOURCE_URL_QUERY = "resource_url_query";
     public static final String KEY_RUM_RESOURCE_TRANS = "resource_trans";
     public static final String KEY_RUM_RESOURCE_URL_PATH = "resource_url_path";
     public static final String KEY_RUM_RESOURCE_URL_PATH_GROUP = "resource_url_path_group";

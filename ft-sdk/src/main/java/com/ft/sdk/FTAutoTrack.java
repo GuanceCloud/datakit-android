@@ -769,7 +769,7 @@ public class FTAutoTrack {
             tags.put(Constants.KEY_RUM_RESPONSE_CONTENT_TYPE, bean.responseContentType);
             tags.put(Constants.KEY_RUM_RESPONSE_CONTENT_ENCODING, bean.responseContentEncoding);
             tags.put(Constants.KEY_RUM_RESOURCE_METHOD, bean.resourceMethod);
-            tags.put(Constants.KEY_RUM_RESPONSE_SERVER, bean.responseServer);
+            tags.put(Constants.KEY_RUM_RESOURCE_URL_QUERY, bean.resourceUrlQuery);
             tags.put(Constants.KEY_RUM_ACTION_ID, bean.actionId);
             tags.put(Constants.KEY_RUM_ACTION_NAME, bean.actionName);
             tags.put(Constants.KEY_RUM_VIEW_ID, bean.viewId);
@@ -790,7 +790,7 @@ public class FTAutoTrack {
                 fields.put(Constants.KEY_RUM_RESOURCE_SIZE, bean.resourceSize);
             }
             if (bean.resourceLoad > 0) {
-                fields.put(Constants.KEY_RUM_RESOURCE_LOAD, bean.resourceLoad);
+                fields.put(Constants.KEY_RUM_RESOURCE_DURATION, bean.resourceLoad);
             }
 
             if (bean.resourceDNS > 0) {
@@ -810,6 +810,10 @@ public class FTAutoTrack {
                 fields.put(Constants.KEY_RUM_RESOURCE_TRANS, bean.resourceTrans);
             }
 
+            if (bean.resourceFirstByte > 0) {
+                fields.put(Constants.KEY_RUM_RESOURCE_FIRST_BYTE, bean.resourceFirstByte);
+
+            }
             String urlPath = bean.urlPath;
             String urlPathGroup = "";
 

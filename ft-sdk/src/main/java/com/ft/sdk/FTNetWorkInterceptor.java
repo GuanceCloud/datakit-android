@@ -114,7 +114,7 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
         if (exception != null) {
             uploadNetTrace(handler, operationName, newRequest, null, "", exception.getMessage());
             mPerformanceHandler.setTransformContent(newRequest, null, "",
-                    connection, sessionId, viewId, viewName, viewReferrer, actionId, actionName);
+                    sessionId, viewId, viewName, viewReferrer, actionId, actionName);
 
             throw new IOException(exception);
         } else {
@@ -132,7 +132,7 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
                         response = response.newBuilder().body(responseBody1).build();
                         uploadNetTrace(handler, operationName, newRequest, response, responseBody, "");
                         mPerformanceHandler.setTransformContent(newRequest, response, responseBody,
-                                connection, sessionId, viewId, viewName, viewReferrer, actionId, actionName);
+                                sessionId, viewId, viewName, viewReferrer, actionId, actionName);
 
                     }
                 }
