@@ -330,6 +330,8 @@ public class RUMGlobalManager {
         for (ViewBean bean : beans) {
             JSONObject fields = new JSONObject();
             JSONObject tags = new JSONObject(globalTags.toString());
+            long time = Utils.getCurrentNanoTime();
+
             try {
                 tags.put(Constants.KEY_RUM_SESSION_ID, bean.getSessionId());
                 tags.put(Constants.KEY_RUM_VIEW_NAME, bean.getViewName());
@@ -341,13 +343,16 @@ public class RUMGlobalManager {
                 fields.put(Constants.KEY_RUM_VIEW_ACTION_COUNT, bean.getActionCount());
                 fields.put(Constants.KEY_RUM_VIEW_RESOURCE_COUNT, bean.getResourceCount());
                 fields.put(Constants.KEY_RUM_VIEW_ERROR_COUNT, bean.getErrorCount());
-                fields.put(Constants.KEY_RUM_VIEW_TIME_SPENT, bean.getTimeSpent());
+                if (activeView.isClose()) {
+                    fields.put(Constants.KEY_RUM_VIEW_TIME_SPENT, bean.getTimeSpent());
+                } else {
+                    fields.put(Constants.KEY_RUM_VIEW_TIME_SPENT, time - bean.getStartTime());
+                }
                 fields.put(Constants.KEY_RUM_VIEW_LONG_TASK_COUNT, bean.getLongTaskCount());
                 fields.put(Constants.KEY_RUM_VIEW_IS_ACTIVE, !bean.isClose());
             } catch (JSONException e) {
                 LogUtils.d(TAG, e.getMessage());
             }
-            long time = Utils.getCurrentNanoTime();
 
             FTTrackInner.getInstance().rum(time,
                     Constants.FT_MEASUREMENT_RUM_VIEW, tags, fields);
