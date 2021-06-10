@@ -399,7 +399,11 @@ public class FTDBManager extends DBManager {
 
 
     public List<SyncJsonData> queryDataByDataByTypeLimit(int limit, DataType dataType) {
-        return queryDataByDescLimit(limit, FTSQL.RECORD_COLUMN_DATA_TYPE + "=? ", new String[]{dataType.getValue()});
+        return queryDataByDescLimit(limit, FTSQL.RECORD_COLUMN_DATA_TYPE + "=? ", new String[]{dataType.getValue()}, "asc");
+    }
+
+    public List<SyncJsonData> queryDataByDataByTypeLimitDesc(int limit, DataType dataType) {
+        return queryDataByDescLimit(limit, FTSQL.RECORD_COLUMN_DATA_TYPE + "=? ", new String[]{dataType.getValue()},"desc");
     }
 
     /**
@@ -409,7 +413,7 @@ public class FTDBManager extends DBManager {
      * @return
      */
     public List<SyncJsonData> queryDataByDescLimit(final int limit) {
-        return queryDataByDescLimit(limit, null, null);
+        return queryDataByDescLimit(limit, null, null, "asc");
     }
 
     /**
@@ -462,16 +466,16 @@ public class FTDBManager extends DBManager {
      * @param selectionArgs
      * @return
      */
-    public List<SyncJsonData> queryDataByDescLimit(final int limit, String selection, String[] selectionArgs) {
+    private List<SyncJsonData> queryDataByDescLimit(final int limit, String selection, String[] selectionArgs, String order) {
         final List<SyncJsonData> recordList = new ArrayList<>();
         getDB(false, db -> {
             Cursor cursor;
             if (limit == 0) {
                 cursor = db.query(FTSQL.FT_SYNC_TABLE_NAME, null, selection, selectionArgs,
-                        null, null, FTSQL.RECORD_COLUMN_ID + " asc");
+                        null, null, FTSQL.RECORD_COLUMN_ID + " " + order);
             } else {
                 cursor = db.query(FTSQL.FT_SYNC_TABLE_NAME, null, selection, selectionArgs,
-                        null, null, FTSQL.RECORD_COLUMN_ID + " asc", "" + limit);
+                        null, null, FTSQL.RECORD_COLUMN_ID + " " + order, "" + limit);
             }
             while (cursor.moveToNext()) {
                 long id = cursor.getLong(cursor.getColumnIndex(FTSQL.RECORD_COLUMN_ID));

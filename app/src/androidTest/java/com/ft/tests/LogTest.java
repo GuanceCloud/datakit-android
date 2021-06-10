@@ -56,7 +56,7 @@ public class LogTest extends BaseTest {
     public void consoleLogTest() throws InterruptedException {
         Log.d("TestLog", "控制台日志测试用例qaws");
         Thread.sleep(4000);
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(10, DataType.LOG);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(10, DataType.LOG);
         int except = 0;
         if (recordDataList != null) {
             for (SyncJsonData data : recordDataList) {

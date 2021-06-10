@@ -48,7 +48,6 @@ public class MonitorTest extends BaseTest {
         context = MockApplication.getContext();
         ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL)
         )
-                .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setMonitorType(MonitorType.ALL);//设置监控项
 
     }
@@ -132,7 +131,7 @@ public class MonitorTest extends BaseTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(1, DataType.TRACK);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(1, DataType.TRACK);
         String data = recordDataList.get(0).getDataString();
         judge(data, monitorType);
         try {

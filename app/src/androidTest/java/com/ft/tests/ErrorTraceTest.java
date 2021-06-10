@@ -150,7 +150,7 @@ public class ErrorTraceTest extends BaseTest {
      * @return
      */
     private boolean checkLogContent(String content) {
-        List<SyncJsonData> recordDataTrackList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.LOG);
+        List<SyncJsonData> recordDataTrackList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.LOG);
         boolean isContainLog = false;
         for (SyncJsonData recordData : recordDataTrackList) {
             if (recordData.getDataString().contains(content)) {

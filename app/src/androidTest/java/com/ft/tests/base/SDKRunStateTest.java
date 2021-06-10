@@ -71,15 +71,6 @@ public class SDKRunStateTest extends BaseTest {
         Assert.assertTrue(FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_CLICK));
     }
 
-    /**
-     * SDK 启动且开启监控网速判断网络速度监听服务是否启动
-     */
-    @Test
-    public void monitorNetRateRunTest() {
-        NetUtils.get().startMonitorNetRate();
-        Assert.assertTrue(Whitebox.getInternalState(NetUtils.get(), "isRunNetMonitor"));
-    }
-
     @Test
     public void monitorTypeTest() {
         Assert.assertTrue(FTMonitorConfig.get().isMonitorType(MonitorType.ALL));

@@ -267,7 +267,7 @@ public class RUMGlobalManager {
             tags.put(Constants.KEY_RUM_ACTION_NAME, RUMGlobalManager.getInstance().getActionName());
 
         } catch (JSONException e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, e.getMessage());
         }
     }
 
@@ -314,7 +314,7 @@ public class RUMGlobalManager {
                 FTTrackInner.getInstance().rum(Utils.getCurrentNanoTime(),
                         Constants.FT_MEASUREMENT_RUM_ACTION, tags, fields);
             } catch (JSONException e) {
-                LogUtils.d(TAG, e.getMessage());
+                LogUtils.e(TAG, e.getMessage());
             }
             FTDBManager.get().cleanCloseActionData();
         }
@@ -351,7 +351,7 @@ public class RUMGlobalManager {
                 fields.put(Constants.KEY_RUM_VIEW_LONG_TASK_COUNT, bean.getLongTaskCount());
                 fields.put(Constants.KEY_RUM_VIEW_IS_ACTIVE, !bean.isClose());
             } catch (JSONException e) {
-                LogUtils.d(TAG, e.getMessage());
+                LogUtils.e(TAG, e.getMessage());
             }
 
             FTTrackInner.getInstance().rum(time,
