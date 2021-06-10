@@ -34,7 +34,10 @@ public class WebViewActivity extends AppCompatActivity {
                 "https://www.jd.com/",
                 "https://www.toutiao.com/",
                 "https://www.baidu.com/test",
-                "https://www.csdn.net/"};
+                "https://www.csdn.net/",
+                "file:///android_asset/local_sample.html",
+                "http://10.100.64.165/test/rum/"
+        };
         spinner.setAdapter(new ArrayAdapter(this, R.layout.spinner_item, R.id.textView, data));
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override

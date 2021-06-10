@@ -3,6 +3,7 @@ package com.ft.application;
 import android.app.Application;
 import android.content.Context;
 
+import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.runner.AndroidJUnitRunner;
 
 /**

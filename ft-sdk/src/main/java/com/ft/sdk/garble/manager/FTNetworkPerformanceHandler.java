@@ -4,25 +4,33 @@ import com.ft.sdk.FTAutoTrack;
 import com.ft.sdk.garble.bean.NetStatusBean;
 import com.ft.sdk.garble.bean.ResourceBean;
 
-import java.net.InetAddress;
-
 import javax.net.ssl.HttpsURLConnection;
 
-import okhttp3.Connection;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.Route;
 
 public final class FTNetworkPerformanceHandler {
     private final ResourceBean bean = new ResourceBean();
 
-    public void setTransformContent(Request request, Response response, String responseBody, Connection connection) {
+    public void setTransformContent(Request request, Response response, String responseBody,
+                                    String sessionId,
+                                    String viewId, String viewName, String viewReferrer, String actionId,
+                                    String actionName) {
+        bean.sessionId = sessionId;
+        bean.viewId = viewId;
+        bean.viewName = viewName;
+        bean.viewReferrer = viewReferrer;
+        bean.actionId = actionId;
+        bean.actionName = actionName;
         bean.url = request.url().toString();
         bean.urlHost = request.url().host();
         bean.urlPath = request.url().encodedPath();
         bean.requestHeader = request.headers().toString();
+        bean.resourceUrlQuery = request.url().query();
+        int responseHeaderSize = 0;
         if (response != null) {
             bean.responseHeader = response.headers().toString();
+            responseHeaderSize = bean.responseHeader.getBytes().length;
             bean.responseContentType = response.header("Content-Type");
             bean.responseConnection = response.header("Connection");
             bean.resourceMethod = request.method();
@@ -31,16 +39,8 @@ public final class FTNetworkPerformanceHandler {
             bean.resourceStatus = response.code();
         }
 
-        bean.resourceSize = responseBody == null ? 0 : responseBody.length();
-
-        if (connection != null) {
-            Route route = connection.route();
-            InetAddress address = route.socketAddress().getAddress();
-            if (address != null) {
-                bean.responseServer = route.socketAddress().getAddress().getHostAddress();
-            }
-
-        }
+        bean.resourceSize = responseBody == null ? 0 : responseBody.getBytes().length;
+        bean.resourceSize += responseHeaderSize;
 
     }
 
@@ -52,6 +52,7 @@ public final class FTNetworkPerformanceHandler {
         bean.resourceTrans = netStatusBean.getResponseTime();
         bean.resourceTTFB = netStatusBean.getTTFB();
         bean.resourceLoad = netStatusBean.getHoleRequestTime();
+        bean.resourceFirstByte = netStatusBean.getFirstByteTime();
 
     }
 

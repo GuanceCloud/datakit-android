@@ -10,7 +10,6 @@ import androidx.annotation.Nullable;
 import com.ft.sdk.garble.FTFragmentManager;
 import com.ft.sdk.garble.FTRUMConfig;
 import com.ft.sdk.garble.utils.AopUtils;
-import com.ft.sdk.garble.utils.FpsUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.util.HashMap;
@@ -48,35 +47,26 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     @Override
     public void onActivityPostCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
         mAppRestartCallback.onPostOnCreate();
-        FTManager.getFTActivityManager().putActivity(activity);
         if (FTRUMConfig.get().isRumEnable()) {
 
             Long startTime = mCreateMap.get(activity);
             if (startTime != null) {
                 long duration = Utils.getCurrentNanoTime() - startTime;
                 String viewName = AopUtils.getClassName(activity);
-                String viewID = Utils.MD5(viewName).toLowerCase();
-                double fps = FpsUtils.get().getFps();
-                Class lastActivity = FTActivityManager.get().getLastActivity();
-                String parentViewName = lastActivity != null ? lastActivity.getSimpleName() : null;
-                FTAutoTrack.putRUMViewLoadPerformance(viewID, viewName, parentViewName, fps, duration);
+                FTAutoTrack.putRUMViewLoadPerformance(viewName, duration);
             }
         }
     }
 
     @Override
     public void onActivityResumed(@NonNull Activity activity) {
-//        LocationUtils.get().startLocationCallBack(new AsyncCallback() {
-//            @Override
-//            public void onResponse(int code, String response) {
-//                LogUtils.d("LocationUtil", "code=" + code + ",response=" + response);
-//            }
-//        });
         boolean isFirstLoad = true;
         if (FTActivityManager.get().isFirstResume.containsKey(activity.getClass().getName())
                 && FTActivityManager.get().isFirstResume.get(activity.getClass().getName())) {
             isFirstLoad = false;
         }
+        FTManager.getFTActivityManager().putActivity(activity);
+
         //页面打开埋点数据插入
         FTAutoTrack.startPage(activity.getClass(), isFirstLoad);
         //开启同步
@@ -112,8 +102,8 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
         FTActivityManager.get().isFirstResume.remove(activity.getClass().getName());
         //移除对 Fragment 的生命周期的监听
         FTFragmentManager.getInstance().removeFragmentLifecycle(activity);
-        //从 Activity 的管理栈中移除 Activity
-        FTManager.getFTActivityManager().removeActivity(activity);
+//        //从 Activity 的管理栈中移除 Activity
+//        FTManager.getFTActivityManager().removeActivity(activity);
         mCreateMap.remove(activity);
     }
 

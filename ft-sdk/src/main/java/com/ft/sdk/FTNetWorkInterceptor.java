@@ -9,7 +9,6 @@ import com.ft.sdk.garble.utils.LogUtils;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -17,11 +16,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import okhttp3.Connection;
@@ -61,9 +58,8 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
     }
 
 
-    private void uploadNetTrace(FTTraceHandler handler, Request request, @Nullable Response response, String responseBody, String error) {
+    private void uploadNetTrace(FTTraceHandler handler, String operationName, Request request, @Nullable Response response, String responseBody, String error) {
         try {
-            String operationName = request.method() + "/http";
 
             JSONObject requestContent = buildRequestJsonContent(request);
             JSONObject responseContent = buildResponseJsonContent(response, responseBody, error);
@@ -84,20 +80,27 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
     @NotNull
     @Override
     public Response intercept(@NotNull Chain chain) throws IOException {
+        String viewId = RUMGlobalManager.getInstance().getViewId();
+        String viewName = RUMGlobalManager.getInstance().getViewName();
+        String viewReferrer = RUMGlobalManager.getInstance().getViewReferrer();
+        String actionId = RUMGlobalManager.getInstance().getActionId();
+        String actionName = RUMGlobalManager.getInstance().getActionName();
+        String sessionId = RUMGlobalManager.getInstance().getSessionId();
+        RUMGlobalManager.getInstance().startResource(viewId, actionId);
         Request request = chain.request();
         Response response = null;
         Request.Builder requestBuilder = request.newBuilder();
         Exception exception = null;
         Request newRequest = null;
+        String operationName = "";
         FTTraceHandler handler = new FTTraceHandler();
         try {
             okhttp3.HttpUrl url = request.url();
             HttpUrl httpUrl = new HttpUrl(url.host(), url.encodedPath(), url.port(), url.toString());
+            operationName = request.method() + " " + httpUrl.getPath();
             HashMap<String, String> headers = handler.getTraceHeader(httpUrl);
             handler.setIsWebViewTrace(webViewTrace);
-            Iterator<String> iterator = headers.keySet().iterator();
-            while (iterator.hasNext()) {
-                String key = iterator.next();
+            for (String key : headers.keySet()) {
                 requestBuilder.header(key, headers.get(key));//避免重试出现重复头
             }
             newRequest = requestBuilder.build();
@@ -109,8 +112,9 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
 
         Connection connection = chain.connection();
         if (exception != null) {
-            uploadNetTrace(handler, newRequest, null, "", exception.getMessage());
-            mPerformanceHandler.setTransformContent(newRequest, null, "", connection);
+            uploadNetTrace(handler, operationName, newRequest, null, "", exception.getMessage());
+            mPerformanceHandler.setTransformContent(newRequest, null, "",
+                    sessionId, viewId, viewName, viewReferrer, actionId, actionName);
 
             throw new IOException(exception);
         } else {
@@ -126,14 +130,16 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
                         responseBody = new String(bytes, getCharset(contentType));
                         responseBody1 = ResponseBody.create(responseBody1.contentType(), bytes);
                         response = response.newBuilder().body(responseBody1).build();
-                        uploadNetTrace(handler, newRequest, response, responseBody, "");
-                        mPerformanceHandler.setTransformContent(newRequest, response, responseBody, connection);
+                        uploadNetTrace(handler, operationName, newRequest, response, responseBody, "");
+                        mPerformanceHandler.setTransformContent(newRequest, response, responseBody,
+                                sessionId, viewId, viewName, viewReferrer, actionId, actionName);
 
                     }
                 }
             }
         }
 
+        RUMGlobalManager.getInstance().stopResource(viewId, actionId);
         return response;
     }
 

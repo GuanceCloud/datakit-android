@@ -19,6 +19,7 @@ import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTrack;
 import com.ft.sdk.MonitorType;
+import com.ft.sdk.RUMGlobalManager;
 import com.ft.sdk.SyncTaskManager;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.DataType;
@@ -34,6 +35,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,22 +53,22 @@ import static com.ft.AllTests.hasPrepare;
  * description:
  */
 @RunWith(AndroidJUnit4.class)
-public class LogTrackObjectTraceRUMTest extends BaseTest {
-    Context context;
+public class LogTrackTraceRUMTest extends BaseTest {
+
 
     @Rule
     public ActivityScenarioRule<DebugMainActivity> rule = new ActivityScenarioRule<>(DebugMainActivity.class);
 
-
     @Before
-    public void setUp() throws Exception {
+    public  void init() throws Exception {
         if (!hasPrepare) {
             Looper.prepare();
             hasPrepare = true;
         }
+
         stopSyncTask();
 
-        context = MockApplication.getContext();
+        Context context = MockApplication.getContext();
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL))
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setUseOAID(true)//设置 OAID 是否可用
@@ -77,11 +79,13 @@ public class LogTrackObjectTraceRUMTest extends BaseTest {
                 .setNetworkTrace(true)
                 .setRumAppId(AccountUtils.getProperty(context, AccountUtils.RUM_APP_ID))
                 .setTraceConsoleLog(true)
-                .setEventFlowLog(true)
+                .setEnableTrackAppUIBlock(true)
+                .setEnableTraceUserAction(true)
                 .setTraceType(TraceType.ZIPKIN);
         FTSdk.install(ftSDKConfig);
         FTDBManager.get().delete();
     }
+
 
     /**
      * 插入一条 log 数据测试
@@ -144,7 +148,7 @@ public class LogTrackObjectTraceRUMTest extends BaseTest {
         FTTrack.getInstance().trackBackground("TestLog", null, fields);
         Thread.sleep(5000);
 
-        List<SyncJsonData> list = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.TRACK);
+        List<SyncJsonData> list = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.TRACK);
         Assert.assertTrue(list.size() > 0);
         String content = list.get(0).getDataString();
         JSONObject json = new JSONObject(content);
@@ -185,40 +189,25 @@ public class LogTrackObjectTraceRUMTest extends BaseTest {
     }
 
     @Test
-    public void rumEsTest() throws Exception {
+    public void rumTest() throws Exception {
         onView(ViewMatchers.withId(R.id.main_view_loop_test)).perform(ViewActions.scrollTo()).perform(click());
         Thread.sleep(5000);
-        int except1 = countInDB(DataType.RUM_ES, Constants.FT_MEASUREMENT_RUM_ES_VIEW);
+        int except1 = countInDB(DataType.RUM_APP, Constants.FT_MEASUREMENT_RUM_VIEW);
         Assert.assertTrue(except1 > 0);
         resumeSyncTask();
         executeSyncTask();
         Thread.sleep(12000);
-        int except2 = countInDB(DataType.RUM_ES, Constants.FT_MEASUREMENT_RUM_ES_VIEW);
+        int except2 = countInDB(DataType.RUM_APP, Constants.FT_MEASUREMENT_RUM_VIEW);
         Assert.assertEquals(0, except2);
     }
 
-    @Test
-    public void rumInfluxTestTest() throws Exception {
-        onView(ViewMatchers.withId(R.id.main_view_loop_test)).perform(ViewActions.scrollTo()).perform(click());
-        Thread.sleep(5000);
-        int except1 = countInDB(DataType.RUM_INFLUX, Constants.FT_MEASUREMENT_RUM_INFLUX_APP_VIEW);
-        Assert.assertTrue(except1 > 0);
-        resumeSyncTask();
-        executeSyncTask();
-        Thread.sleep(12000);
-        int except2 = countInDB(DataType.RUM_ES, Constants.FT_MEASUREMENT_RUM_INFLUX_APP_VIEW);
-        Assert.assertEquals(0, except2);
-
-    }
 
     @Test
     public void rumUserBindTest() throws InterruptedException {
         FTSdk.get().bindUserData("123456");
         onView(ViewMatchers.withId(R.id.main_view_loop_test)).perform(ViewActions.scrollTo()).perform(click());
         Thread.sleep(5000);
-        int except1 = countInDB(DataType.RUM_INFLUX, "\"is_signin\":\"T\"");
-        int except2 = countInDB(DataType.RUM_ES, "\"is_signin\":\"T\"");
-        Assert.assertTrue(except1 > 0);
+        int except2 = countInDB(DataType.RUM_APP, "\"is_signin\":\"T\"");
         Assert.assertTrue(except2 > 0);
 
 
@@ -230,11 +219,50 @@ public class LogTrackObjectTraceRUMTest extends BaseTest {
         FTSdk.get().unbindUserData();
         onView(ViewMatchers.withId(R.id.main_view_loop_test)).perform(ViewActions.scrollTo()).perform(click());
         Thread.sleep(5000);
-        int except3 = countInDB(DataType.RUM_INFLUX, "\"is_signin\":\"T\"");
-        int except4 = countInDB(DataType.RUM_ES, "\"is_signin\":\"T\"");
-        Assert.assertEquals(0, except3);
+        int except4 = countInDB(DataType.RUM_APP, "\"is_signin\":\"T\"");
         Assert.assertEquals(0, except4);
     }
+
+
+    /**
+     * 测试点击某个按钮
+     *
+     * @throws InterruptedException
+     */
+    @Test
+    public void rumClickLambdaBtnTest() throws Exception {
+        Thread.sleep(100);
+        onView(ViewMatchers.withId(R.id.main_mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
+        //第二次操作触发 action close
+        onView(ViewMatchers.withId(R.id.main_mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
+        Thread.sleep(1000);
+
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
+        boolean value = false;
+        for (SyncJsonData recordData : recordDataList) {
+            if (recordData.toString().contains("mock_click_btn")) {
+                value = true;
+                break;
+            }
+        }
+        Assert.assertTrue(value);
+    }
+
+
+//    @Test
+//    public void rumActionLaunchTest() throws InterruptedException {
+//        //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
+//        Thread.sleep(1000);
+//        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
+//        boolean value = false;
+//        for (SyncJsonData recordData : recordDataList) {
+//            if (recordData.toString().contains("launch")) {
+//                value = true;
+//                break;
+//            }
+//        }
+//        Assert.assertTrue(value);
+//    }
 
     /**
      * trace 一个正常的网络
@@ -293,7 +321,7 @@ public class LogTrackObjectTraceRUMTest extends BaseTest {
      * @param dataType
      */
     private void uploadData(DataType dataType) {
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, dataType);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, dataType);
         SyncDataHelper syncDataManager = new SyncDataHelper();
         String body = syncDataManager.getBodyContent(dataType, recordDataList);
         body = body.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION).replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK);
@@ -313,7 +341,7 @@ public class LogTrackObjectTraceRUMTest extends BaseTest {
      * @return
      */
     private int countInDB(DataType type, String target) {
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimit(0, type);
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, type);
         int except = 0;
         if (recordDataList != null) {
             for (SyncJsonData data : recordDataList) {

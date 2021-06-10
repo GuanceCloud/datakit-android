@@ -7,7 +7,7 @@ import androidx.annotation.NonNull;
 import com.ft.sdk.garble.FTAliasConfig;
 import com.ft.sdk.garble.FTAutoTrackConfig;
 import com.ft.sdk.garble.FTDBCachePolicy;
-import com.ft.sdk.garble.FTFlowConfig;
+import com.ft.sdk.garble.FTUserActionConfig;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.garble.FTRUMConfig;
@@ -88,7 +88,7 @@ public class FTSdk {
         FTAutoTrackConfig.release();
         FTHttpConfig.release();
         FTNetworkListener.get().release();
-        FTFlowConfig.release();
+        FTUserActionConfig.release();
         LocationUtils.get().stopListener();
         FTExceptionHandler.release();
         FTDBCachePolicy.release();
@@ -187,6 +187,7 @@ public class FTSdk {
     private void initFTConfig() {
         if (mFtSDKConfig != null) {
             LogUtils.setDebug(mFtSDKConfig.isDebug());
+            RUMGlobalManager.getInstance().init();
 //            LogUtils.setDescLogShow(mFtSDKConfig.isDescLog());
             FTAliasConfig.get().initParams(mFtSDKConfig);
             FTHttpConfig.get().initParams(mFtSDKConfig);
@@ -198,8 +199,8 @@ public class FTSdk {
 //                FTUserConfig.get().initUserDataFromDB();
 //            }
             FTNetworkListener.get().monitor();
-            if (mFtSDKConfig.isEventFlowLog()) {
-                FTFlowConfig.get().initParams(mFtSDKConfig);
+            if (mFtSDKConfig.isEnableTraceUserAction()) {
+                FTUserActionConfig.get().initParams(mFtSDKConfig);
             }
 
             float rate = mFtSDKConfig.getSamplingRate();
@@ -212,6 +213,7 @@ public class FTSdk {
             FTExceptionHandler.get().initParams(mFtSDKConfig);
             FTMonitorConfig.get().initParams(mFtSDKConfig);
             FTUIBlockManager.start(mFtSDKConfig);
+
             initNativeDump();
 
         }

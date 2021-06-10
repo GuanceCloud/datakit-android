@@ -33,7 +33,8 @@ public class DemoApplication extends Application {
     }
 
     private void initFTSDK() {
-        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(this, AccountUtils.ACCESS_SERVER_URL))
+        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(this,
+                AccountUtils.ACCESS_SERVER_URL))
                 .setRumAppId(AccountUtils.getProperty(this, AccountUtils.RUM_APP_ID))
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setUseOAID(true)//设置 OAID 是否可用
@@ -46,7 +47,7 @@ public class DemoApplication extends Application {
                 .setSamplingRate(1f)
                 .setNetworkTrace(true)
                 .setTraceConsoleLog(true)
-                .setEventFlowLog(true)
+                .setEnableTraceUserAction(true)
                 .setTraceType(TraceType.ZIPKIN);
         FTSdk.install(ftSDKConfig);
 

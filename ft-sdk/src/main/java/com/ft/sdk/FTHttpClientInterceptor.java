@@ -1,7 +1,6 @@
 package com.ft.sdk;
 
 import com.ft.sdk.garble.http.HttpUrl;
-import com.ft.sdk.garble.utils.LogUtils;
 
 import org.apache.hc.client5.http.entity.EntityBuilder;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
@@ -52,9 +51,9 @@ public class FTHttpClientInterceptor {
     public void process(HttpRequest request, EntityDetails entity, HttpContext context) throws HttpException, IOException {
         handler = new FTTraceHandler();
         try {
-            operationName = request.getMethod() + "/http";
             URI uri = request.getUri();
-            HttpUrl httpUrl = new HttpUrl(uri.getHost(), uri.getPath(), uri.getPort(),uri.toString());
+            HttpUrl httpUrl = new HttpUrl(uri.getHost(), uri.getPath(), uri.getPort(), uri.toString());
+            operationName = request.getMethod() +" "+ uri.getPath();
             HashMap<String, String> headers = handler.getTraceHeader(httpUrl);
             Iterator<String> iterator = headers.keySet().iterator();
             while (iterator.hasNext()) {
@@ -79,7 +78,7 @@ public class FTHttpClientInterceptor {
     public void process(HttpResponse response, EntityDetails entity, HttpContext context) throws HttpException, IOException {
         boolean isError = response == null || response.getCode() >= 400;
 
-        BasicEndpointDetails object= (BasicEndpointDetails) context.getAttribute("http.connection-endpoint");
+        BasicEndpointDetails object = (BasicEndpointDetails) context.getAttribute("http.connection-endpoint");
         object.getRemoteAddress();
         try {
             JSONObject jsonObject = new JSONObject();

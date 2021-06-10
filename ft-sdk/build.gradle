@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 
 //发布 snapshot 版本号末尾追加 "-SNAPSHOT"
-def versionNameStr = "1.0.4-alpha16"
+def versionNameStr = "1.1.0-alpha11"
 def min_plugin_version = "1.0.1-alpha05"
 
 android {
@@ -12,7 +12,7 @@ android {
     defaultConfig {
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode 65
+        versionCode 75
         versionName versionNameStr
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -42,7 +42,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.code.gson:gson:2.8.5'
     testImplementation 'junit:junit:4.13'
     testImplementation 'org.robolectric:android-all:10-robolectric-5803371'

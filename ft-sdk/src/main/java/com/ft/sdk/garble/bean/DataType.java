@@ -17,13 +17,11 @@ package com.ft.sdk.garble.bean;
  */
 public enum DataType {
     TRACK,
-    RUM_INFLUX,
-    RUM_ES,
+    RUM_APP,
+    RUM_WEBVIEW,
     LOG,
-    //    KEY_EVENT,
     OBJECT,
-    TRACE
-    ;
+    TRACE;
 
     public String getValue() {
         return toString().toLowerCase();

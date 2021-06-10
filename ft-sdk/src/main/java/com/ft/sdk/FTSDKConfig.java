@@ -55,8 +55,10 @@ public class FTSDKConfig {
     private boolean networkTrace;
     //崩溃日志的 __serviceName
     private String serviceName = DEFAULT_LOG_SERVICE_NAME;
-    //是否开启流程图日志显示
-    private boolean eventFlowLog;
+    //是否开启用户行为追踪
+    private boolean enableTraceUserAction;
+    //是否开启 view 追踪
+//    private boolean enableTraceView;
     //是否开启系统日志的上报功能
     private boolean traceConsoleLog;
     // openTrace 使用类型
@@ -151,8 +153,8 @@ public class FTSDKConfig {
         return serviceName;
     }
 
-    public boolean isEventFlowLog() {
-        return eventFlowLog;
+    public boolean isEnableTraceUserAction() {
+        return enableTraceUserAction;
     }
 
     public boolean isTraceConsoleLog() {
@@ -166,6 +168,10 @@ public class FTSDKConfig {
     public boolean isOnlySupportMainProcess() {
         return onlySupportMainProcess;
     }
+
+//    public boolean isEnableTraceView(){
+//        return  enableTraceView;
+//    }
 
 
     /**
@@ -275,15 +281,25 @@ public class FTSDKConfig {
     }
 
     /**
-     * 是否开启流程图日志
+     * 是否追踪用户操作，目前支持应用启动和点击操作
      *
-     * @param eventFlowLog
+     * @param enableTraceUserAction
      */
-    public FTSDKConfig setEventFlowLog(boolean eventFlowLog) {
-        this.eventFlowLog = eventFlowLog;
+    public FTSDKConfig setEnableTraceUserAction(boolean enableTraceUserAction) {
+        this.enableTraceUserAction = enableTraceUserAction;
         return this;
     }
 
+//
+//    /**
+//     * 是否 view 追踪
+//     * @param enableTraceView
+//     * @return
+//     */
+//    public FTSDKConfig setEnableTraceView(boolean enableTraceView){
+//        this.enableTraceView = enableTraceView;
+//        return  this;
+//    }
     /**
      * 是否开启系统日志上报功能
      *

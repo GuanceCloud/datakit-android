@@ -1,3 +1,52 @@
+# agent 1.1.0-alpha11
+1.补充 resource 缺失字段
+
+---
+# agent 1.1.0-alpha10
+1.修正快速切换页面统计错误的问题
+2.修正统计错位的问题
+
+---
+# agent 1.1.0-alpha09
+1.修正统计偏差的问题
+
+---
+# agent 1.1.0-alpha08
+1.修改 response size 统计
+
+---
+# agent 1.1.0-alpha07
+1.优化 action duration 统计
+
+---
+# agent 1.1.0-alpha06
+1.修正长任务计算问题
+2.去掉 launch action viewid 属性
+
+---
+# agent 1.1.0-alpha04
+1.resource count 统计优化
+2.duration action 逻辑添加
+
+---
+# agent 1.1.0-alpha03
+1.trace resource 属性添加
+2.user action 配置添加
+
+---
+# agent 1.1.0-alpha02
+1.优化 action 统计算法
+2.修改长任务时间计算
+
+---
+# agent 1.1.0-alpha01
+1.rum 添加 action，session，view 统计功能
+
+---
+# agent 1.0.4-alpha17
+1.补充缺失字段
+
+---
 # agent 1.0.4-alpha16
 1.进行字段替换
 

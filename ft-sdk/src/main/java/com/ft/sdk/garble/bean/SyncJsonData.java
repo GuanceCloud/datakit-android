@@ -58,12 +58,6 @@ public class SyncJsonData implements Cloneable {
      */
     private long time;
 
-
-    /**
-     * 用户数据关联ID
-     */
-    private String sessionid;
-
     public long getTime() {
         return time;
     }
@@ -78,15 +72,6 @@ public class SyncJsonData implements Cloneable {
     }
 
 
-    public String getSessionId() {
-        return sessionid;
-    }
-
-    public void setSessionId(String sessionid) {
-        this.sessionid = sessionid;
-    }
-
-
     @Override
     public String toString() {
         return "SyncJsonData{" +
@@ -94,7 +79,6 @@ public class SyncJsonData implements Cloneable {
                 ", dataType=" + dataType +
                 ", dataString='" + dataString + '\'' +
                 ", time=" + time +
-                ", sessionid='" + sessionid + '\'' +
                 '}';
     }
 
@@ -116,7 +100,6 @@ public class SyncJsonData implements Cloneable {
     public String printFormatRecordData() {
         StringBuilder buffer = new StringBuilder();
         buffer.append("\n{");
-        buffer.append("\n\t\"sessionId\":\"" + sessionid + "\",");
         buffer.append("\n\t\"opData\":\"" + dataString + "\"");
         buffer.append("\n}");
         return buffer.toString();
@@ -162,12 +145,6 @@ public class SyncJsonData implements Cloneable {
         JSONObject opDataJson = getLinProtocolJson(bean.getMeasurement(), tagsTemp, fields);
 
         recordData.setDataString(FloatDoubleJsonUtils.protectValueFormat(opDataJson));
-
-        String sessionId = FTUserConfig.get().getSessionId();
-        if (!Utils.isNullOrEmpty(sessionId)) {
-            recordData.setSessionId(sessionId);
-        }
-
         return recordData;
     }
 
@@ -193,7 +170,7 @@ public class SyncJsonData implements Cloneable {
      * @throws JSONException
      * @throws InvalidParameterException
      */
-    public static SyncJsonData getFromLogBean(BaseContentBean bean,DataType dataType)
+    public static SyncJsonData getFromLogBean(BaseContentBean bean, DataType dataType)
             throws JSONException, InvalidParameterException {
         SyncJsonData recordData = new SyncJsonData(dataType);
         recordData.setTime(bean.getTime());

@@ -6,7 +6,6 @@ import android.app.ActivityManager;
 import android.content.Context;
 
 import com.ft.sdk.garble.bean.AppState;
-import com.ft.sdk.garble.utils.LogUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,24 +72,27 @@ public final class FTActivityManager {
         }
 
         activityList.add(activity);
-    }
-
-    void removeActivity(Activity activity) {
-        if (activityList != null) {
-            try {
-                for (int i = activityList.size() - 1; i >= 0; i--) {
-                    if (activityList.get(i).equals(activity)) {
-                        activityList.remove(activity);
-                        removeActivityStatus(activity.getClass().getName());
-                        break;
-                    }
-                }
-            } catch (Exception e) {
-                LogUtils.e(TAG, e.getMessage());
-            }
-
+        if (activityList.size() > 2) {
+            activityList.remove(0);
         }
     }
+
+//    void removeActivity(Activity activity) {
+//        if (activityList != null) {
+//            try {
+//                for (int i = activityList.size() - 1; i >= 0; i--) {
+//                    if (activityList.get(i).equals(activity)) {
+//                        activityList.remove(activity);
+//                        removeActivityStatus(activity.getClass().getName());
+//                        break;
+//                    }
+//                }
+//            } catch (Exception e) {
+//                LogUtils.e(TAG, e.getMessage());
+//            }
+//
+//        }
+//    }
 
     /**
      * 得到上一个 Activity

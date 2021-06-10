@@ -15,7 +15,7 @@ import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.FTAutoTrackConfig;
-import com.ft.sdk.garble.FTFlowConfig;
+import com.ft.sdk.garble.FTUserActionConfig;
 import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.FTMonitorConfig;
 import com.ft.sdk.FTExceptionHandler;
@@ -51,10 +51,12 @@ public class SDKRunStateTest extends BaseTest {
                 .setDebug(true)//设置是否是 debug
                 .setMonitorType(MonitorType.ALL)//设置监控项
                 .setEnableTrackAppCrash(true)
+                .setEnableTrackAppANR(true)
+                .setEnableTrackAppUIBlock(true)
                 .setEnv(EnvType.GRAY)
                 .setNetworkTrace(true)
                 .setTraceConsoleLog(true)
-                .setEventFlowLog(true)
+                .setEnableTraceUserAction(true)
                 .setTraceType(TraceType.ZIPKIN);
         FTSdk.install(ftSDKConfig);
     }
@@ -67,15 +69,6 @@ public class SDKRunStateTest extends BaseTest {
     @Test
     public void enableAutoTrackTypeTest() {
         Assert.assertTrue(FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_CLICK));
-    }
-
-    /**
-     * SDK 启动且开启监控网速判断网络速度监听服务是否启动
-     */
-    @Test
-    public void monitorNetRateRunTest() {
-        NetUtils.get().startMonitorNetRate();
-        Assert.assertTrue(Whitebox.getInternalState(NetUtils.get(), "isRunNetMonitor"));
     }
 
     @Test
@@ -94,8 +87,8 @@ public class SDKRunStateTest extends BaseTest {
     }
 
     @Test
-    public void eventFlowLogTest() {
-        Assert.assertTrue(FTFlowConfig.get().isEventFlowLog());
+    public void traceUserActionTest() {
+        Assert.assertTrue(FTUserActionConfig.get().isEnableTraceUserAction());
     }
 
     @Test
@@ -131,6 +124,6 @@ public class SDKRunStateTest extends BaseTest {
     @Test
     public void showdownEventFlowLogTest() {
         FTSdk.get().shutDown();
-        Assert.assertFalse(FTFlowConfig.get().isEventFlowLog());
+        Assert.assertFalse(FTUserActionConfig.get().isEnableTraceUserAction());
     }
 }
