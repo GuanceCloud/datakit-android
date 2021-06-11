@@ -14,4 +14,4 @@ DataFlux 应用监测能够通过收集各个Android应用的指标数据，以�
  [Dataflux-SDK-Android Demo](https://github.com/CloudCare/dataflux-sdk-android-demo)   
 
 ## 使用文档
- [文档中心](https://help.dataflux.cn/doc/20abb3dfd3dde6dd9d2b7a47f2fc0f385b4a8e37)   
+ [文档中心](https://www.yuque.com/dataflux/doc/pnzoyp)   
