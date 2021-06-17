@@ -18,7 +18,7 @@ import java.util.UUID;
  */
 public class FTUserConfig {
     private static volatile FTUserConfig instance;
-    private volatile String sessionId;
+    private volatile String randomUserId;
     private UserData mUserData;
 
     private final Object mLock = new Object();
@@ -44,44 +44,31 @@ public class FTUserConfig {
         return getUserData() != null;
     }
 
-    /**
-     * 初始化用户SessionId
-     */
-    public void initSessionId() {
-        if (Utils.isNullOrEmpty(getSessionId())) {
-            createNewSessionId();
+
+    public void initRandomUserId() {
+        if (Utils.isNullOrEmpty(getRandomUserId())) {
+            createNewRandomUserId();
         }
     }
 
-    /**
-     * 创建一个新的用户SessionID
-     */
-    public void createNewSessionId() {
-        sessionId = "ft.rd_" + UUID.randomUUID().toString();
+
+    public void createNewRandomUserId() {
+        randomUserId = "ft.rd_" + UUID.randomUUID().toString();
         SharedPreferences sp = Utils.getSharedPreferences(FTApplication.getApplication());
-        sp.edit().putString(Constants.FT_USER_SESSION_ID, sessionId).apply();
+        sp.edit().putString(Constants.FT_RANDOM_USER_ID, randomUserId).apply();
     }
 
-    /**
-     * 返回用户的SessionId
-     *
-     * @return
-     */
-    public String getSessionId() {
-        if (!Utils.isNullOrEmpty(sessionId)) {
-            return sessionId;
+
+    public String getRandomUserId() {
+        if (!Utils.isNullOrEmpty(randomUserId)) {
+            return randomUserId;
         }
         SharedPreferences sp = Utils.getSharedPreferences(FTApplication.getApplication());
-        sessionId = sp.getString(Constants.FT_USER_SESSION_ID, null);
-        return sessionId;
+        randomUserId = sp.getString(Constants.FT_RANDOM_USER_ID, null);
+        return randomUserId;
     }
 
 
-    /**
-     * 根据 sessionID 获取用户信息
-     *
-     * @return
-     */
     public UserData getUserData() {
         synchronized (mLock) {
             if (mUserData != null) {

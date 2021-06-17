@@ -131,7 +131,7 @@ public class FTSdk {
 //                FTUserConfig.get().clearSessionId();
 //            }
 //            //初始化SessionId
-            FTUserConfig.get().initSessionId();
+            FTUserConfig.get().initRandomUserId();
 //            //绑定用户信息
             FTUserConfig.get().bindUserData("", id, null);
 //            }
@@ -194,10 +194,7 @@ public class FTSdk {
             FTAutoTrackConfig.get().initParams(mFtSDKConfig);
             FTDBCachePolicy.get().initParam(mFtSDKConfig);
             FTRUMConfig.get().initParam(mFtSDKConfig);
-            FTUserConfig.get().initSessionId();
-//            if (mFtSDKConfig.isNeedBindUser()) {
-//                FTUserConfig.get().initUserDataFromDB();
-//            }
+            FTUserConfig.get().initRandomUserId();
             FTNetworkListener.get().monitor();
             if (mFtSDKConfig.isEnableTraceUserAction()) {
                 FTUserActionConfig.get().initParams(mFtSDKConfig);

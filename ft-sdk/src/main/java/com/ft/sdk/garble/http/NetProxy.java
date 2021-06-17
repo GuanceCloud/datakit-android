@@ -25,7 +25,7 @@ public class NetProxy {
     final String CONTENT_TYPE = "text/plain";
     //字符编码
     final String CHARSET = "UTF-8";
-    private String gmtString;
+//    private String gmtString;
     private HttpBuilder httpBuilder;
     INetEngine engine;
 
@@ -91,35 +91,35 @@ public class NetProxy {
     }
 
 
-    /**
-     * 获取签名
-     *
-     * @return
-     */
-    private String getSignature() {
-        String aks = ftHttpConfig.akSecret;
-        String method = httpBuilder.getMethod().method;
-        String contentMD5 = getContentMD5WithBase64();
-        return Utils.getHMacSha1(aks, method + "\n" + contentMD5 + "\n" + CONTENT_TYPE + "\n" + gmtString);
-    }
+//    /**
+//     * 获取签名
+//     *
+//     * @return
+//     */
+//    private String getSignature() {
+//        String aks = ftHttpConfig.akSecret;
+//        String method = httpBuilder.getMethod().method;
+//        String contentMD5 = getContentMD5WithBase64();
+//        return Utils.getHMacSha1(aks, method + "\n" + contentMD5 + "\n" + CONTENT_TYPE + "\n" + gmtString);
+//    }
 
-    /**
-     * MD5 加密 请求内容
-     *
-     * @return
-     */
-    private String getContentMD5WithBase64() {
-        return Utils.contentMD5EncodeWithBase64(httpBuilder.getBodyString() == null ? "" : httpBuilder.getBodyString());
-    }
+//    /**
+//     * MD5 加密 请求内容
+//     *
+//     * @return
+//     */
+//    private String getContentMD5WithBase64() {
+//        return Utils.contentMD5EncodeWithBase64(httpBuilder.getBodyString() == null ? "" : httpBuilder.getBodyString());
+//    }
 
     /**
      * 转换时间格式
      */
-    private void calculateDate() {
+    private String calculateDate() {
         Date currentTime = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss 'GMT'", Locale.UK);
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-        gmtString = sdf.format(currentTime);
+        return sdf.format(currentTime);
     }
 
     /**
@@ -141,15 +141,13 @@ public class NetProxy {
             head.put("Content-Type", CONTENT_TYPE);
         }
         head.put("charset", CHARSET);
-        //计算日期
-        calculateDate();
         //添加日期请求头
-        head.put("Date", gmtString);
-        //如果开启了签名，添加签名信息
-        if (ftHttpConfig.enableRequestSigning) {
-            String akId = ftHttpConfig.akId;
-            head.put("Authorization", "DWAY " + akId + ":" + getSignature());
-        }
+        head.put("Date", calculateDate());
+//        如果开启了签名，添加签名信息
+//        if (ftHttpConfig.enableRequestSigning) {
+//            String akId = ftHttpConfig.akId;
+//            head.put("Authorization", "DWAY " + akId + ":" + getSignature());
+//        }
         httpBuilder.setHeadParams(head);
     }
 }

@@ -13,14 +13,12 @@ import static com.ft.sdk.garble.utils.Constants.DEFAULT_LOG_SERVICE_NAME;
  */
 public class FTSDKConfig {
     //服务器地址
-    private String serverUrl;
+    private final String serverUrl;
     private boolean useOAID;
     //是否是Debug
     private boolean isDebug;
 
     private boolean autoTrack = true;
-    //是否需要绑定用户数据
-//    private boolean needBindUser;
     //崩溃采集数据附加类型
     private int monitorType;
     //以下三个为白名单
@@ -34,12 +32,6 @@ public class FTSDKConfig {
 //    private List<Class<?>> blackViewClass;
 //    private boolean trackNetTime;
 
-    //    //页面别名对应 map
-//    private Map<String, String> pageDescMap;
-//    //事件别名对应 map
-//    private Map<String, String> vtpDescMap;
-//    //页面和视图树是否显示描述
-//    private boolean pageVtpDescEnabled;
     //设置是否需要采集崩溃日志
     private boolean enableTrackAppCrash;
     //设置是否检测 UI 卡顿
@@ -102,6 +94,7 @@ public class FTSDKConfig {
 
     /**
      * 设置 RUM AppId
+     *
      * @param rumAppId
      * @return
      */
@@ -120,17 +113,14 @@ public class FTSDKConfig {
     }
 
 
-
     public boolean isAutoTrack() {
         return autoTrack;
     }
 
 
-
     public int getMonitorType() {
         return monitorType;
     }
-
 
 
     public boolean isEnableTrackAppCrash() {
@@ -220,7 +210,6 @@ public class FTSDKConfig {
     }
 
 
-
     /**
      * 设置是否需要采集崩溃日志
      *
@@ -300,6 +289,7 @@ public class FTSDKConfig {
 //        this.enableTraceView = enableTraceView;
 //        return  this;
 //    }
+
     /**
      * 是否开启系统日志上报功能
      *

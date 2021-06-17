@@ -26,7 +26,7 @@ public class Constants {
     public static final String FT_LOG_DEFAULT_MEASUREMENT = USER_AGENT;
 
     public static final String FT_SDK_INIT_UUID = "ft.sdk.init.uuid";
-    public static final String FT_USER_SESSION_ID = "ft.user.session.id";
+    public static final String FT_RANDOM_USER_ID = "ft.user.session.id";
     public static final String FT_USER_USER_ID = "ft.user.userid";
     public static final String FT_USER_USER_NAME = "ft.user.username";
     public static final String FT_USER_USER_EXT = "ft.user.extdata";

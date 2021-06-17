@@ -20,16 +20,14 @@ import static com.ft.sdk.garble.utils.Constants.USER_AGENT;
 public class FTHttpConfig {
     private static volatile FTHttpConfig instance;
     public String serverUrl;
-    public boolean enableRequestSigning;
-    public String akId;
-    public String akSecret;
-//    public String dataWayToken;//非必须参数，Sass 版本
     public String version;
     public String uuid;
     public String userAgent;
     public boolean useOaid;
-    public int sendOutTime = 10 * 1000;
-    public int readOutTime = 10 * 1000;
+
+    public int sendOutTime = 10000;
+    public int readOutTime = 10000;
+
     //是否开启网络日志上报
     public boolean networkTrace;
     public TraceType traceType;
@@ -60,7 +58,6 @@ public class FTHttpConfig {
         version = BuildConfig.FT_SDK_VERSION;
         uuid = DeviceUtils.getSDKUUid(FTApplication.getApplication());
         userAgent = USER_AGENT;
-        EngineFactory.setNetWorkTrace(ftsdkConfig.isNetworkTrace());
         networkTrace = ftsdkConfig.isNetworkTrace();
         traceType = ftsdkConfig.getTraceType();
         if (ftsdkConfig.getTraceContentType() != null) {
