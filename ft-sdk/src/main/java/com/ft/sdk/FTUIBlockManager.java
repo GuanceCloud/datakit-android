@@ -41,13 +41,6 @@ public class FTUIBlockManager {
 
             if (FTRUMConfig.get().isRumEnable()) {
                 FTAutoTrack.putRUMuiBlock(log, duration);
-
-            } else {
-                LogBean logBean = new LogBean("------ UIBlock  ------\n " + log, Utils.getCurrentNanoTime());
-                logBean.setStatus(Status.CRITICAL);
-                logBean.setEnv(config.getEnv());
-                logBean.setServiceName(config.getServiceName());
-                FTTrackInner.getInstance().logBackground(logBean);
             }
 
         });

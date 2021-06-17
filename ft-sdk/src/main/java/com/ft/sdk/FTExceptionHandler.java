@@ -44,9 +44,10 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
 
         if (FTRUMConfig.get().isRumEnable()) {
             FTAutoTrack.putRUMError(crash, message, dateline, ErrorType.JAVA, state);
-        } else {
-            uploadCrashLog(crash, dateline);
         }
+//        else {
+//            uploadCrashLog(crash, dateline);
+//        }
 
     }
 
@@ -164,9 +165,10 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
                                     if (item.getName().contains(NATIVE_FILE_NAME)) {
                                     FTAutoTrack.putRUMError(crashString, "Native Crash", crashTime, ErrorType.NATIVE, AppState.getValueFrom(value));
                                 }
-                            } else {
-                                uploadCrashLog(crashString, crashTime);
                             }
+//                            else {
+//                                uploadCrashLog(crashString, crashTime);
+//                            }
 
 
                             Utils.deleteFile(item.getAbsolutePath());
