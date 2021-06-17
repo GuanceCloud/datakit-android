@@ -769,7 +769,8 @@ public class FTAutoTrack {
             tags.put(Constants.KEY_RUM_RESPONSE_CONTENT_TYPE, bean.responseContentType);
             tags.put(Constants.KEY_RUM_RESPONSE_CONTENT_ENCODING, bean.responseContentEncoding);
             tags.put(Constants.KEY_RUM_RESOURCE_METHOD, bean.resourceMethod);
-            tags.put(Constants.KEY_RUM_RESOURCE_URL_QUERY, bean.resourceUrlQuery);
+            tags.put(Constants.KEY_RUM_RESOURCE_TRACE_ID, bean.traceId);
+            tags.put(Constants.KEY_RUM_RESROUCE_SPAN_ID, bean.spanId);
             tags.put(Constants.KEY_RUM_ACTION_ID, bean.actionId);
             tags.put(Constants.KEY_RUM_ACTION_NAME, bean.actionName);
             tags.put(Constants.KEY_RUM_VIEW_ID, bean.viewId);

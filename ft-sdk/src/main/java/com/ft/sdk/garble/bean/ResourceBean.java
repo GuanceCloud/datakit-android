@@ -11,7 +11,9 @@ public class ResourceBean {
     public String responseContentType = "";
     public String responseContentEncoding = "";
     public String resourceMethod = "";
-    public String resourceUrlQuery ="";
+    public String resourceUrlQuery = "";
+    public String traceId = "";
+    public String spanId = "";
 
     public int resourceStatus = -1;
 
@@ -22,7 +24,7 @@ public class ResourceBean {
     public long resourceSSL = -1;
     public long resourceTTFB = -1;
     public long resourceTrans = -1;
-    public long resourceFirstByte =-1;
+    public long resourceFirstByte = -1;
 
     public String sessionId;
     public String viewId;
@@ -61,6 +63,8 @@ public class ResourceBean {
         viewReferrer = "";
         actionId = "";
         actionName = "";
+        traceId = "";
+        spanId = "";
     }
 
 }

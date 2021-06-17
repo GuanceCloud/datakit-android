@@ -15,7 +15,7 @@ public final class FTNetworkPerformanceHandler {
     public void setTransformContent(Request request, Response response, String responseBody,
                                     String sessionId,
                                     String viewId, String viewName, String viewReferrer, String actionId,
-                                    String actionName) {
+                                    String actionName, String traceId, String spanId) {
         bean.sessionId = sessionId;
         bean.viewId = viewId;
         bean.viewName = viewName;
@@ -41,6 +41,8 @@ public final class FTNetworkPerformanceHandler {
 
         bean.resourceSize = responseBody == null ? 0 : responseBody.getBytes().length;
         bean.resourceSize += responseHeaderSize;
+        bean.traceId = traceId;
+        bean.spanId = spanId;
 
     }
 

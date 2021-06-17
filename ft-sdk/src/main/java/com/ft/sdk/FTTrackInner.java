@@ -153,12 +153,6 @@ public class FTTrackInner {
      * @param callback
      */
     private void uploadTrackOPData(List<SyncJsonData> recordDataList, AsyncCallback callback) {
-//        if (!TokenCheck.get().checkToken()) {
-//            if (callback != null) {
-//                callback.onResponse(NetCodeStatus.TOKEN_ERROR, TokenCheck.get().message);
-//                return;
-//            }
-//        }
         if (recordDataList == null || recordDataList.isEmpty()) {
             return;
         }

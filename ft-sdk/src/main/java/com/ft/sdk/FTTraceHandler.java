@@ -32,6 +32,14 @@ class FTTraceHandler {
 
     private HttpUrl httpUrl;
 
+    public String getTraceID() {
+        return traceID;
+    }
+
+    public String getSpanID() {
+        return spanID;
+    }
+
     public FTTraceHandler() {
         enableTrace = Utils.enableTraceSamplingRate();
     }
@@ -85,7 +93,7 @@ class FTTraceHandler {
         traceBean.setDuration(duration);
         traceBean.setSpanType("entry");
         traceBean.setEndpoint(endPoint);
-        traceBean.setStatus(isError?"error":"ok");
+        traceBean.setStatus(isError ? "error" : "ok");
         traceBean.setServiceName(FTExceptionHandler.get().getTrackServiceName());
         traceBean.setSpanID(spanID);
         traceBean.setTraceID(traceID);

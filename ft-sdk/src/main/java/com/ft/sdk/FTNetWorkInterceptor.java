@@ -21,7 +21,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 
-import okhttp3.Connection;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.Request;
@@ -110,11 +109,10 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
             exception = e;
         }
 
-        Connection connection = chain.connection();
         if (exception != null) {
             uploadNetTrace(handler, operationName, newRequest, null, "", exception.getMessage());
             mPerformanceHandler.setTransformContent(newRequest, null, "",
-                    sessionId, viewId, viewName, viewReferrer, actionId, actionName);
+                    sessionId, viewId, viewName, viewReferrer, actionId, actionName, handler.getTraceID(), handler.getSpanID());
 
             throw new IOException(exception);
         } else {
@@ -132,7 +130,7 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
                         response = response.newBuilder().body(responseBody1).build();
                         uploadNetTrace(handler, operationName, newRequest, response, responseBody, "");
                         mPerformanceHandler.setTransformContent(newRequest, response, responseBody,
-                                sessionId, viewId, viewName, viewReferrer, actionId, actionName);
+                                sessionId, viewId, viewName, viewReferrer, actionId, actionName, handler.getTraceID(), handler.getSpanID());
 
                     }
                 }

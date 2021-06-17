@@ -184,6 +184,8 @@ public class Constants {
     public static final String KEY_RUM_RESOURCE_TTFB = "resource_ttfb";
     public static final String KEY_RUM_RESOURCE_FIRST_BYTE = "resource_first_byte";
     public static final String KEY_RUM_RESOURCE_URL_QUERY = "resource_url_query";
+    public static final String KEY_RUM_RESROUCE_SPAN_ID = "span_id";
+    public static final String KEY_RUM_RESOURCE_TRACE_ID = "trace_id";
     public static final String KEY_RUM_RESOURCE_TRANS = "resource_trans";
     public static final String KEY_RUM_RESOURCE_URL_PATH = "resource_url_path";
     public static final String KEY_RUM_RESOURCE_URL_PATH_GROUP = "resource_url_path_group";
