@@ -14,7 +14,8 @@ import com.ft.DebugMainActivity;
 import com.ft.R;
 import com.ft.application.MockApplication;
 import com.ft.sdk.EnvType;
-import com.ft.sdk.FTExceptionHandler;
+import com.ft.sdk.FTRUMConfig;
+import com.ft.sdk.FTRUMConfigManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.bean.DataType;
@@ -26,7 +27,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.reflect.Whitebox;
 
 import java.util.List;
 
@@ -46,7 +46,6 @@ public class ErrorTraceTest extends BaseTest {
 
 
     Context context;
-    FTSDKConfig ftSDKConfig;
 
     @Before
     public void setUp() throws Exception {
@@ -55,13 +54,18 @@ public class ErrorTraceTest extends BaseTest {
             hasPrepare = true;
         }
         context = MockApplication.getContext();
-        ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL))
+        FTSDKConfig ftSDKConfig = FTSDKConfig
+                .builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL))
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setDebug(true)//设置是否是 debug
                 .setEnv(EnvType.GRAY);
         //关闭数据自动同步操作
-//        SyncTaskManager.get().setRunning(true);
         stopSyncTask();
+        FTSdk.install(ftSDKConfig);
+
+        FTRUMConfigManager.get().initWithConfig(new FTRUMConfig()
+                .setRumAppId(AccountUtils.getProperty(context, AccountUtils.RUM_APP_ID))
+                .setEnableTrackAppCrash(true));
     }
 
     /**
@@ -71,8 +75,7 @@ public class ErrorTraceTest extends BaseTest {
      */
     @Test
     public void mockExceptionTest() throws InterruptedException {
-        ftSDKConfig.setEnableTrackAppCrash(true);
-        FTSdk.install(ftSDKConfig);
+
         avoidCrash();
         //产生一个崩溃信息
         onView(ViewMatchers.withId(R.id.main_mock_crash_btn)).perform(ViewActions.scrollTo()).perform(click());
@@ -82,66 +85,6 @@ public class ErrorTraceTest extends BaseTest {
 
     }
 
-//    @Test
-//    public void mockNativeException() throws InterruptedException {
-//        ftSDKConfig.setEnableTrackAppCrash(true);
-//        FTSdk.install(ftSDKConfig);
-//        avoidCrash();
-//        //产生一个崩溃信息
-//        onView(ViewMatchers.withId(R.id.mock_crash_native_btn)).perform(ViewActions.scrollTo()).perform(click());
-//        CountDownLatch countDownLatch = new CountDownLatch(1);
-//        new Thread() {
-//            @Override
-//            public void run() {
-//                try {
-//                    Thread.sleep(10000);
-//                    countDownLatch.countDown();
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }.start();
-//        countDownLatch.await();
-//
-//        Assert.assertTrue(checkLogContent("MyException"));
-//
-//        Assert.assertTrue(checkTrackWith(OP.CRASH));
-//
-//    }
-
-//    @Test //
-//    public void mockANRTest() throws InterruptedException {
-//        ftSDKConfig.setEnableTrackAppANR(true);
-//
-//        FTSdk.install(ftSDKConfig);
-//        onView(ViewMatchers.withId(R.id.mock_anr_btn)).perform(ViewActions.scrollTo()).perform(click());
-//        Thread.sleep(2000);
-//
-//        Assert.assertTrue(checkLogContent("ANR"));
-//    }
-
-//    @Test
-//    public void mockUIBlockTest() throws InterruptedException {
-//        ftSDKConfig.setEnableTrackAppUIBlock(true);
-//
-//        FTSdk.install(ftSDKConfig);
-//        onView(ViewMatchers.withId(R.id.mock_ui_block_btn)).perform(ViewActions.scrollTo()).perform(click());
-//
-//        CountDownLatch countDownLatch = new CountDownLatch(1);
-//        new Thread() {
-//            @Override
-//            public void run() {
-//                try {
-//                    Thread.sleep(10000);
-//                    countDownLatch.countDown();
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }.start();
-//        countDownLatch.await();
-//        Assert.assertTrue(checkLogContent("UIBlock"));
-//    }
 
     /**
      * 检验 Log 包含的内容
@@ -150,7 +93,7 @@ public class ErrorTraceTest extends BaseTest {
      * @return
      */
     private boolean checkLogContent(String content) {
-        List<SyncJsonData> recordDataTrackList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.LOG);
+        List<SyncJsonData> recordDataTrackList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
         boolean isContainLog = false;
         for (SyncJsonData recordData : recordDataTrackList) {
             if (recordData.getDataString().contains(content)) {
@@ -160,7 +103,6 @@ public class ErrorTraceTest extends BaseTest {
         }
         return isContainLog;
     }
-
 
 
 }

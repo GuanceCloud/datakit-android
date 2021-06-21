@@ -1,6 +1,7 @@
 package com.ft.tests.base;
 
 import android.content.Context;
+import android.os.Looper;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
@@ -8,12 +9,16 @@ import com.ft.AccountUtils;
 import com.ft.BaseTest;
 import com.ft.application.MockApplication;
 import com.ft.sdk.EnvType;
+import com.ft.sdk.FTLoggerConfig;
+import com.ft.sdk.FTLoggerConfigManager;
+import com.ft.sdk.FTRUMConfig;
+import com.ft.sdk.FTRUMConfigManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
+import com.ft.sdk.FTTraceConfig;
+import com.ft.sdk.FTTraceConfigManager;
 import com.ft.sdk.FTTrack;
-import com.ft.sdk.garble.FTRUMConfig;
 import com.ft.sdk.garble.manager.AsyncCallback;
-import com.ft.sdk.FTExceptionHandler;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,6 +29,7 @@ import org.junit.runner.RunWith;
 
 import java.util.concurrent.CountDownLatch;
 
+import static com.ft.AllTests.hasPrepare;
 import static com.ft.sdk.garble.utils.Constants.DEFAULT_LOG_SERVICE_NAME;
 import static org.junit.Assert.assertEquals;
 
@@ -39,6 +45,10 @@ public class FTInitParamTest extends BaseTest {
 
     @Before
     public void setUp() {
+        if (!hasPrepare) {
+            Looper.prepare();
+            hasPrepare = true;
+        }
         context = MockApplication.getContext();
     }
 
@@ -91,11 +101,11 @@ public class FTInitParamTest extends BaseTest {
     @Test
     public void rumAppId() {
         String appid = "appIdxxxxxx";
-        FTSDKConfig ftSDKConfig = getDefaultConfig()
-                .setRumAppId(appid);
-        FTSdk.install(ftSDKConfig);
-        Assert.assertEquals(appid, FTRUMConfig.get().getAppId());
-        Assert.assertTrue(FTRUMConfig.get().isRumEnable());
+        FTRUMConfigManager.get().initWithConfig(new FTRUMConfig().setRumAppId(appid));
+        Assert.assertEquals(appid, FTRUMConfigManager.get().getConfig().getRumAppId());
+        Assert.assertTrue(FTRUMConfigManager.get().isRumEnable());
+        Assert.assertEquals(FTRUMConfigManager.get().getConfig().getRumAppId(),appid);
+        //todo
     }
 
 
@@ -107,17 +117,20 @@ public class FTInitParamTest extends BaseTest {
     }
 
     private void serviceNameParamTest(String serviceName, String expected) {
-        FTSDKConfig ftSDKConfig = getDefaultConfig()
-                .setServiceName(serviceName);
+        FTSDKConfig ftSDKConfig = getDefaultConfig();
         FTSdk.install(ftSDKConfig);
-        Assert.assertEquals(expected, FTExceptionHandler.get().getTrackServiceName());
+        FTLoggerConfigManager.get().initWithConfig(new FTLoggerConfig().setServiceName(serviceName));
+        FTTraceConfigManager.get().initWithConfig(new FTTraceConfig().setServiceName(serviceName));
+
+        Assert.assertEquals(expected, FTLoggerConfigManager.get().getConfig().getServiceName());
+        Assert.assertEquals(expected, FTTraceConfigManager.get().getConfig().getServiceName());
     }
 
     private void envParamTest(EnvType env, EnvType expected) {
         FTSDKConfig ftSDKConfig = getDefaultConfig()
                 .setEnv(env);
         FTSdk.install(ftSDKConfig);
-        Assert.assertEquals(expected, FTExceptionHandler.get().getEnv());
+        Assert.assertEquals(expected, FTSdk.get().getBaseConfig().getEnv());
     }
 
     public void urlParamTest(String url, int expected) throws JSONException, InterruptedException {

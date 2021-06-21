@@ -260,16 +260,24 @@ public class FTRUMGlobalManager {
      * @param tags
      */
     public void attachRUMRelative(@NotNull JSONObject tags) {
+        attachRUMRelative(tags, true);
+    }
+
+    /**
+     * @param tags
+     * @param withAction
+     */
+    public void attachRUMRelative(@NotNull JSONObject tags, boolean withAction) {
         try {
             tags.put(Constants.KEY_RUM_VIEW_ID, getViewId());
 
             tags.put(Constants.KEY_RUM_VIEW_NAME, FTRUMGlobalManager.get().getViewName());
             tags.put(Constants.KEY_RUM_VIEW_REFERRER, FTRUMGlobalManager.get().getViewReferrer());
             tags.put(Constants.KEY_RUM_SESSION_ID, sessionId);
-
-            tags.put(Constants.KEY_RUM_ACTION_ID, getActionId());
-            tags.put(Constants.KEY_RUM_ACTION_NAME, FTRUMGlobalManager.get().getActionName());
-
+            if (withAction) {
+                tags.put(Constants.KEY_RUM_ACTION_ID, getActionId());
+                tags.put(Constants.KEY_RUM_ACTION_NAME, FTRUMGlobalManager.get().getActionName());
+            }
         } catch (JSONException e) {
             LogUtils.e(TAG, e.getMessage());
         }

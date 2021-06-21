@@ -48,7 +48,7 @@ public class DemoApplication extends Application {
         FTSdk.install(ftSDKConfig);
 
 
-        FTRUMConfigManager.get().initConfig(new FTRUMConfig()
+        FTRUMConfigManager.get().initWithConfig(new FTRUMConfig()
                 .setSamplingRate(1f)
                 .setRumAppId(AccountUtils.getProperty(this, AccountUtils.RUM_APP_ID))
                 .setEnableTraceUserAction(true)
@@ -62,7 +62,7 @@ public class DemoApplication extends Application {
 
 
         FTLoggerConfigManager.get()
-                .initConfig(new FTLoggerConfig()
+                .initWithConfig(new FTLoggerConfig()
                         .setSamplingRate(1f)
                         .setEnableLinkRumData(true)
                         .setEnableCustomLog(true)
@@ -70,9 +70,8 @@ public class DemoApplication extends Application {
                         .setEnableLinkRumData(true)
                 );
 
-        FTTraceConfigManager.get().initConfig(new FTTraceConfig()
+        FTTraceConfigManager.get().initWithConfig(new FTTraceConfig()
                 .setSamplingRate(1f)
-                .setNetworkTrace(true)
                 .setEnableLinkRUMData(true)
                 .setTraceType(TraceType.ZIPKIN)
 

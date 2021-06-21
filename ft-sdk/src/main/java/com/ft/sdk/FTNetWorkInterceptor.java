@@ -3,7 +3,6 @@ package com.ft.sdk;
 import com.ft.sdk.garble.bean.NetStatusBean;
 import com.ft.sdk.garble.http.HttpUrl;
 import com.ft.sdk.garble.http.NetStatusMonitor;
-import com.ft.sdk.garble.manager.FTNetworkPerformanceHandler;
 import com.ft.sdk.garble.utils.LogUtils;
 
 import org.jetbrains.annotations.NotNull;
@@ -44,7 +43,7 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
 
     private final boolean webViewTrace;
 
-    private final FTNetworkPerformanceHandler mPerformanceHandler = new FTNetworkPerformanceHandler();
+    private final FTNetworkRumHandler mNetworkRUMHandler = new FTNetworkRumHandler();
 
     public FTNetWorkInterceptor() {
         this(false);
@@ -78,13 +77,8 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
     @NotNull
     @Override
     public Response intercept(@NotNull Chain chain) throws IOException {
-        String viewId = FTRUMGlobalManager.get().getViewId();
-        String viewName = FTRUMGlobalManager.get().getViewName();
-        String viewReferrer = FTRUMGlobalManager.get().getViewReferrer();
-        String actionId = FTRUMGlobalManager.get().getActionId();
-        String actionName = FTRUMGlobalManager.get().getActionName();
-        String sessionId = FTRUMGlobalManager.get().getSessionId();
-        FTRUMGlobalManager.get().startResource(viewId, actionId);
+
+        mNetworkRUMHandler.startResource();
         Request request = chain.request();
         Response response = null;
         Request.Builder requestBuilder = request.newBuilder();
@@ -110,8 +104,8 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
 
         if (exception != null) {
             uploadNetTrace(handler, operationName, newRequest, null, "", exception.getMessage());
-            mPerformanceHandler.setTransformContent(newRequest, null, "",
-                    sessionId, viewId, viewName, viewReferrer, actionId, actionName, handler.getTraceID(), handler.getSpanID());
+            mNetworkRUMHandler.setTransformContent(newRequest, null, "",
+                    handler.getTraceID(), handler.getSpanID());
 
             throw new IOException(exception);
         } else {
@@ -128,15 +122,15 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
                         responseBody1 = ResponseBody.create(responseBody1.contentType(), bytes);
                         response = response.newBuilder().body(responseBody1).build();
                         uploadNetTrace(handler, operationName, newRequest, response, responseBody, "");
-                        mPerformanceHandler.setTransformContent(newRequest, response, responseBody,
-                                sessionId, viewId, viewName, viewReferrer, actionId, actionName, handler.getTraceID(), handler.getSpanID());
+                        mNetworkRUMHandler.setTransformContent(newRequest, response, responseBody,
+                                handler.getTraceID(), handler.getSpanID());
 
                     }
                 }
             }
         }
+        mNetworkRUMHandler.stopResource();
 
-        FTRUMGlobalManager.get().stopResource(viewId, actionId);
         return response;
     }
 
@@ -235,7 +229,7 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
     private static boolean isSupportFormat(MediaType mediaType) {
         if (mediaType == null) return false;
         String contentType = mediaType.type() + "/" + mediaType.subtype();
-        List<String> supportContentType = FTTraceConfigManager.get().traceContentType;;
+        List<String> supportContentType = FTTraceConfigManager.get().traceContentType;
         if (supportContentType == null) {
             return false;
         }
@@ -247,8 +241,8 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
 
     @Override
     protected void getNetStatusInfoWhenCallEnd(NetStatusBean bean) {
-        mPerformanceHandler.setTransformPerformance(bean);
-        mPerformanceHandler.handleUpload();
+        mNetworkRUMHandler.setTransformPerformance(bean);
+        mNetworkRUMHandler.handleUpload();
 
     }
 }

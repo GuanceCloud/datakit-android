@@ -22,12 +22,20 @@ public class FTTraceConfigManager {
     private FTTraceConfig config;
 
 
-    public void initConfig(FTTraceConfig config){
+    public void initWithConfig(FTTraceConfig config) {
         this.config = config;
     }
 
     public FTTraceConfig getConfig() {
         return config;
+    }
+
+    public boolean isNetworkTrace() {
+        return config != null && config.isNetworkTrace();
+    }
+
+    public boolean isEnableLinkRUMData() {
+        return config != null && config.isEnableLinkRUMData();
     }
 
 

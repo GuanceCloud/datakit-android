@@ -3,15 +3,12 @@ package com.ft.tests;
 import android.content.Context;
 import android.os.Looper;
 
-import androidx.test.espresso.action.ViewActions;
-import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.ft.AccountUtils;
 import com.ft.BaseTest;
 import com.ft.DebugMainActivity;
-import com.ft.R;
 import com.ft.application.MockApplication;
 import com.ft.sdk.EnvType;
 import com.ft.sdk.FTRUMConfig;
@@ -22,8 +19,6 @@ import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -32,12 +27,10 @@ import org.junit.runner.RunWith;
 
 import java.util.List;
 
-import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.action.ViewActions.click;
 import static com.ft.AllTests.hasPrepare;
 
 @RunWith(AndroidJUnit4.class)
-public class RUMViewSumTest extends BaseTest {
+public class RUMActionLaunchTest extends BaseTest {
 
     @Rule
     public ActivityScenarioRule<DebugMainActivity> rule = new ActivityScenarioRule<>(DebugMainActivity.class);
@@ -69,42 +62,21 @@ public class RUMViewSumTest extends BaseTest {
 
     }
 
+
     @Test
-    public void viewSumTest() throws InterruptedException {
+    public void rumActionLaunchTest() throws InterruptedException {
+        //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
-        avoidCrash();
-        onView(ViewMatchers.withId(R.id.main_mock_crash_btn)).perform(ViewActions.scrollTo()).perform(click());
-        Thread.sleep(1000);
-        onView(ViewMatchers.withId(R.id.main_mock_okhttp_btn)).perform(ViewActions.scrollTo()).perform(click());
-        Thread.sleep(1000);
-
-        onView(ViewMatchers.withId(R.id.main_mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
-
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
-
+        boolean value = false;
         for (SyncJsonData recordData : recordDataList) {
-            try {
-                JSONObject json = new JSONObject(recordData.getDataString());
-                JSONObject fields = json.optJSONObject("fields");
-                String measurement = json.optString("measurement");
-                if ("view".equals(measurement)) {
-                    if (fields != null) {
-                        int actionCount = fields.optInt("view_action_count");
-                        int viewErrorCount = fields.optInt("view_error_count");
-                        int resourceCount = fields.optInt("view_resource_count");
-                        Assert.assertEquals(actionCount, 3);
-                        Assert.assertEquals(viewErrorCount, 1);
-                        Assert.assertEquals(resourceCount, 1);
-                        break;
-                    }
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
+            if (recordData.toString().contains("launch")) {
+                value = true;
+                break;
             }
         }
+        Assert.assertTrue(value);
     }
-
-
 
 
 }

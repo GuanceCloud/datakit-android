@@ -22,8 +22,8 @@ public class Constants {
     public static final String SEPARATION_LINE_BREAK = "--line_break_temp--";//换行标志符，用于日志显示
     public static final String SEPARATION_REALLY_LINE_BREAK = "\n";//换行标志符，用于日志显示
 
-    public static final String USER_AGENT = "ft_mobile_sdk_android";
-    public static final String FT_LOG_DEFAULT_MEASUREMENT = USER_AGENT;
+    public static final String USER_AGENT = SDK_NAME;
+    public static final String FT_LOG_DEFAULT_MEASUREMENT = "df_rum_android_log";
 
     public static final String FT_SDK_INIT_UUID = "ft.sdk.init.uuid";
     public static final String FT_RANDOM_USER_ID = "ft.user.session.id";
@@ -54,7 +54,7 @@ public class Constants {
     public static final String URL_MODEL_OBJECT = "v1/write/object";//对象数据上传路径
 
     public static final String DEFAULT_OBJECT_CLASS = "Mobile_Device";//默认的对象名
-    public static final String DEFAULT_LOG_SERVICE_NAME = "dataflux sdk";
+    public static final String DEFAULT_LOG_SERVICE_NAME = "df_rum_android";
     public static final int MAX_DB_CACHE_NUM = 5000;//数据库最大缓存容量
 
 //    public static final String KEY_EVENT_ID = "event_id";

@@ -6,6 +6,7 @@ import com.ft.sdk.garble.bean.LogData;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.utils.Utils;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,6 +40,9 @@ public class FTLogger {
      * @param status
      */
     public void logBackground(String content, Status status) {
+
+        checkConfig();
+
         if (config.isEnableCustomLog())
             return;
         LogBean logBean = new LogBean(Utils.translateFieldValue(content), Utils.getCurrentNanoTime());
@@ -54,7 +58,8 @@ public class FTLogger {
      * @param logDataList
      */
     public void logBackground(List<LogData> logDataList) {
-        if (logDataList == null || !config.isEnableCustomLog()) {
+        checkConfig();
+        if (logDataList == null || (config.isEnableCustomLog())) {
             return;
         }
         List<BaseContentBean> logBeans = new ArrayList<>();
@@ -67,6 +72,12 @@ public class FTLogger {
             logBeans.add(logBean);
         }
         FTTrackInner.getInstance().batchLogBeanBackground(logBeans);
+    }
+
+    void checkConfig() {
+        if (config == null) {
+            throw new InvalidParameterException("使用 FTLogger，需要初始化 FTLoggerConfigManager.get().initWithConfig(FTLoggerConfig ftSdkConfig))");
+        }
     }
 
 

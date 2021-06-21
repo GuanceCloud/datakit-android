@@ -1020,7 +1020,7 @@ public class FTAutoTrack {
 
     private static void handleOp(String currentPage, OP op, String parentPage, long duration, @Nullable String vtp) {
 
-        if (!op.equals(OP.CLK)
+        if (!FTRUMConfigManager.get().isRumEnable()&&!op.equals(OP.CLK)
                 && !op.equals(OP.LANC)
                 && !op.equals(OP.OPEN_ACT)
                 && !op.equals(OP.OPEN_FRA)
@@ -1191,7 +1191,7 @@ public class FTAutoTrack {
      */
     public static OkHttpClient trackOkHttpBuilder(OkHttpClient.Builder builder) {
         FTNetWorkInterceptor interceptor = new FTNetWorkInterceptor();
-        if (FTTraceConfigManager.get().getConfig().isNetworkTrace()
+        if (FTTraceConfigManager.get().isNetworkTrace()
                 || FTRUMConfigManager.get().isRumEnable()) {
             builder.addInterceptor(interceptor);
 //            builder.addNetworkInterceptor(interceptor); //发现部分工程有兼容问题
@@ -1211,7 +1211,7 @@ public class FTAutoTrack {
      */
     public static CloseableHttpClient trackHttpClientBuilder(HttpClientBuilder builder) {
         FTHttpClientInterceptor interceptor = new FTHttpClientInterceptor();
-        if (FTTraceConfigManager.get().getConfig().isNetworkTrace()) {
+        if (FTTraceConfigManager.get().isNetworkTrace()) {
             builder.addRequestInterceptorFirst(new FTHttpClientRequestInterceptor(interceptor));
             builder.addResponseInterceptorLast(new FTHttpClientResponseInterceptor(interceptor));
         }

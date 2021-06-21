@@ -112,6 +112,7 @@ public class SyncDataHelper {
         if (loggerConfig != null && loggerConfig.isEnableLinkRumData()) {
             HashMap<String, Object> hashMap = getRumPublicTags();
             hashMap.putAll(getBaseDeviceInfoTagsMap());
+            return  convertToLineProtocolLines(datas,hashMap);
         }
         return convertToLineProtocolLines(datas);
     }
@@ -653,7 +654,6 @@ public class SyncDataHelper {
 
     private static HashMap<String, Object> getRumPublicTags() {
         HashMap<String, Object> hashMap = new HashMap<>();
-//        hashMap.put(Constants.KEY_RUM_TERMINAL, "app");
         hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_AGENT, FTSdk.AGENT_VERSION);
         if (!FTSdk.PLUGIN_VERSION.isEmpty()) {
             hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_TRACK, FTSdk.PLUGIN_VERSION);

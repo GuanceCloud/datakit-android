@@ -132,7 +132,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
 
                             String value = Utils.readSectionValueFromDump(item.getAbsolutePath(), DUMP_FILE_KEY_APP_STATE);
 
-                            if (config.isRumEnable()) {
+                            if (config.isRumEnable() && config.isEnableTrackAppCrash()) {
                                 if (item.getName().contains(ANR_FILE_NAME)) {
 //                                    FTAutoTrack.putRUMAnr(crashString, crashTime);
                                 } else if (item.getName().contains(NATIVE_FILE_NAME)) {

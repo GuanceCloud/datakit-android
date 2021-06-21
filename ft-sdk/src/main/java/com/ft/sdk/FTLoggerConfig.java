@@ -1,11 +1,13 @@
 package com.ft.sdk;
 
+import com.ft.sdk.garble.utils.Constants;
+
 public class FTLoggerConfig {
     private float samplingRate = 1;
     private boolean enableLinkRumData = false;
     private boolean enableConsoleLog = false;
     private boolean enableCustomLog = false;
-    private String serviceName = "";
+    private String serviceName = Constants.DEFAULT_LOG_SERVICE_NAME;
 
     //日志数据数据库存储策略
     private LogCacheDiscard logCacheDiscardStrategy = LogCacheDiscard.DISCARD;
@@ -51,7 +53,9 @@ public class FTLoggerConfig {
     }
 
     public FTLoggerConfig setServiceName(String serviceName) {
-        this.serviceName = serviceName;
+        if (serviceName != null) {
+            this.serviceName = serviceName;
+        }
         return this;
     }
 

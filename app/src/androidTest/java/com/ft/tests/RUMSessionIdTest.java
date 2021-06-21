@@ -14,6 +14,8 @@ import com.ft.DebugMainActivity;
 import com.ft.R;
 import com.ft.application.MockApplication;
 import com.ft.sdk.EnvType;
+import com.ft.sdk.FTRUMConfig;
+import com.ft.sdk.FTRUMConfigManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.bean.DataType;
@@ -50,14 +52,19 @@ public class RUMSessionIdTest extends BaseTest {
         stopSyncTask();
 
         Context context = MockApplication.getContext();
-        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL))
+        FTSDKConfig ftSDKConfig = FTSDKConfig
+                .builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL))
                 .setDebug(true)//设置是否是 debug
-                .setEnableTrackAppCrash(true)
-                .setEnv(EnvType.GRAY)
-                .setRumAppId(AccountUtils.getProperty(context, AccountUtils.RUM_APP_ID))
-                .setEnableTrackAppUIBlock(true)
-                .setEnableTraceUserAction(true);
+                .setEnv(EnvType.GRAY);
         FTSdk.install(ftSDKConfig);
+
+        FTRUMConfigManager.get()
+                .initWithConfig(new FTRUMConfig()
+                        .setEnableTrackAppCrash(true)
+                        .setRumAppId(AccountUtils.getProperty(context, AccountUtils.RUM_APP_ID))
+                        .setEnableTrackAppUIBlock(true)
+                        .setEnableTraceUserAction(true)
+                );
 
     }
 

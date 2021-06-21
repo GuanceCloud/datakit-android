@@ -10,6 +10,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.ft.AccountUtils;
 import com.ft.BaseTest;
 import com.ft.application.MockApplication;
+import com.ft.sdk.FTLoggerConfig;
+import com.ft.sdk.FTLoggerConfigManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.FTDBCachePolicy;
@@ -34,7 +36,6 @@ import static com.ft.AllTests.hasPrepare;
 @RunWith(AndroidJUnit4.class)
 public class LogTest extends BaseTest {
     Context context;
-    FTSDKConfig ftsdkConfig;
 
     @Before
     public void setUp() throws Exception {
@@ -42,14 +43,13 @@ public class LogTest extends BaseTest {
             Looper.prepare();
             hasPrepare = true;
         }
-//        SyncTaskManager.get().setRunning(true);
         stopSyncTask();
         context = MockApplication.getContext();
-        ftsdkConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL))
-                .setTraceConsoleLog(true)
-                .setEnableTraceUserAction(true)
-                .setEnableTrackAppCrash(true);
+        FTSDKConfig ftsdkConfig = FTSDKConfig
+                .builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL));
         FTSdk.install(ftsdkConfig);
+
+        FTLoggerConfigManager.get().initWithConfig(new FTLoggerConfig().setEnableConsoleLog(true));
     }
 
     @Test

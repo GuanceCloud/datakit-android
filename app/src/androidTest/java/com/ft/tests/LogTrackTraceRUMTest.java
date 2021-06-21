@@ -15,13 +15,17 @@ import com.ft.R;
 import com.ft.application.MockApplication;
 import com.ft.sdk.EnvType;
 import com.ft.sdk.FTLogger;
+import com.ft.sdk.FTLoggerConfig;
+import com.ft.sdk.FTLoggerConfigManager;
+import com.ft.sdk.FTRUMConfig;
+import com.ft.sdk.FTRUMConfigManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
+import com.ft.sdk.FTTraceConfig;
+import com.ft.sdk.FTTraceConfigManager;
 import com.ft.sdk.FTTrack;
 import com.ft.sdk.MonitorType;
-import com.ft.sdk.RUMGlobalManager;
 import com.ft.sdk.SyncTaskManager;
-import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.bean.SyncJsonData;
@@ -35,7 +39,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -60,7 +63,7 @@ public class LogTrackTraceRUMTest extends BaseTest {
     public ActivityScenarioRule<DebugMainActivity> rule = new ActivityScenarioRule<>(DebugMainActivity.class);
 
     @Before
-    public  void init() throws Exception {
+    public void init() throws Exception {
         if (!hasPrepare) {
             Looper.prepare();
             hasPrepare = true;
@@ -69,20 +72,29 @@ public class LogTrackTraceRUMTest extends BaseTest {
         stopSyncTask();
 
         Context context = MockApplication.getContext();
-        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL))
+        FTSDKConfig ftSDKConfig = FTSDKConfig
+                .builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL))
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setUseOAID(true)//设置 OAID 是否可用
                 .setDebug(true)//设置是否是 debug
-                .setMonitorType(MonitorType.ALL)//设置监控项
-                .setEnableTrackAppCrash(true)
-                .setEnv(EnvType.GRAY)
-                .setNetworkTrace(true)
-                .setRumAppId(AccountUtils.getProperty(context, AccountUtils.RUM_APP_ID))
-                .setTraceConsoleLog(true)
-                .setEnableTrackAppUIBlock(true)
-                .setEnableTraceUserAction(true)
-                .setTraceType(TraceType.ZIPKIN);
+                .setEnv(EnvType.GRAY);
+
         FTSdk.install(ftSDKConfig);
+
+        FTRUMConfigManager.get()
+                .initWithConfig(new FTRUMConfig()
+                        .setExtraMonitorTypeWithError(MonitorType.ALL)
+                        .setEnableTrackAppCrash(true)
+                        .setRumAppId(AccountUtils.getProperty(context, AccountUtils.RUM_APP_ID))
+                        .setEnableTrackAppUIBlock(true)
+                        .setEnableTraceUserAction(true)
+                );
+
+        FTLoggerConfigManager.get()
+                .initWithConfig(new FTLoggerConfig().setEnableConsoleLog(true));
+
+        FTTraceConfigManager.get().initWithConfig(new FTTraceConfig());
+
         FTDBManager.get().delete();
     }
 
@@ -204,7 +216,7 @@ public class LogTrackTraceRUMTest extends BaseTest {
 
     @Test
     public void rumUserBindTest() throws InterruptedException {
-        FTSdk.get().bindUserData("123456");
+        FTRUMConfigManager.get().bindUserData("123456");
         onView(ViewMatchers.withId(R.id.main_view_loop_test)).perform(ViewActions.scrollTo()).perform(click());
         Thread.sleep(5000);
         int except2 = countInDB(DataType.RUM_APP, "\"is_signin\":\"T\"");
@@ -215,8 +227,8 @@ public class LogTrackTraceRUMTest extends BaseTest {
 
     @Test
     public void rumUserUnBindTest() throws InterruptedException {
-        FTSdk.get().bindUserData("123456");
-        FTSdk.get().unbindUserData();
+        FTRUMConfigManager.get().bindUserData("123456");
+        FTRUMConfigManager.get().unbindUserData();
         onView(ViewMatchers.withId(R.id.main_view_loop_test)).perform(ViewActions.scrollTo()).perform(click());
         Thread.sleep(5000);
         int except4 = countInDB(DataType.RUM_APP, "\"is_signin\":\"T\"");
@@ -249,21 +261,6 @@ public class LogTrackTraceRUMTest extends BaseTest {
     }
 
 
-//    @Test
-//    public void rumActionLaunchTest() throws InterruptedException {
-//        //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
-//        Thread.sleep(1000);
-//        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
-//        boolean value = false;
-//        for (SyncJsonData recordData : recordDataList) {
-//            if (recordData.toString().contains("launch")) {
-//                value = true;
-//                break;
-//            }
-//        }
-//        Assert.assertTrue(value);
-//    }
-
     /**
      * trace 一个正常的网络
      *
@@ -272,7 +269,7 @@ public class LogTrackTraceRUMTest extends BaseTest {
      */
     @Test
     public void traceUploadNormalTest() throws Exception {
-        traceDataTest("http://www.weather.com.cn/data/sk/101010100.html", "www.weather.com.cn");
+        traceDataTest("https://www.baidu.com", "www.baidu.com");
     }
 
     /**
@@ -304,6 +301,7 @@ public class LogTrackTraceRUMTest extends BaseTest {
      * @throws InterruptedException
      */
     private void traceDataTest(String url, String except) throws Exception {
+        Thread.sleep(200);
         RequestUtil.requestUrl(url);
         Thread.sleep(5000);
         resumeSyncTask();

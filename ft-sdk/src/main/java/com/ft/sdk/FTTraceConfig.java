@@ -1,14 +1,16 @@
 package com.ft.sdk;
 
+import com.ft.sdk.garble.utils.Constants;
+
 import java.util.List;
 
 public class FTTraceConfig {
     private float samplingRate = 1;
-    private String serviceName;
+    private String serviceName = Constants.DEFAULT_LOG_SERVICE_NAME;
     private TraceType traceType = TraceType.ZIPKIN;
     private boolean enableLinkRUMData = false;
     private List<String> traceContentType;
-    private boolean isNetworkTrace;
+    private boolean isNetworkTrace = true;
 
     public float getSamplingRate() {
         return samplingRate;
@@ -24,7 +26,9 @@ public class FTTraceConfig {
     }
 
     public FTTraceConfig setServiceName(String serviceName) {
-        this.serviceName = serviceName;
+        if (serviceName != null) {
+            this.serviceName = serviceName;
+        }
         return this;
     }
 

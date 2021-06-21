@@ -43,7 +43,7 @@ public class FTRUMConfigManager {
     private final Object mLock = new Object();
 
 
-    public void initConfig(FTRUMConfig config) {
+    public void initWithConfig(FTRUMConfig config) {
         this.config = config;
         registerActivityLifeCallback();
         FTRUMGlobalManager.get().initParams(config);

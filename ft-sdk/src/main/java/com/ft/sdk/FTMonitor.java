@@ -18,13 +18,13 @@ import com.ft.sdk.garble.utils.Utils;
  * time: 2020/4/17 10:16:20
  * description: 监控入口
  */
+//fixme 暂不可用
 public class FTMonitor {
     public static final String TAG = "FTMonitor";
     //轮训周期，默认10秒
     private int period = 10;
     //监控类型
     private static FTMonitor instance;
-    private FTRUMConfig config;
     private Intent intent;
     private boolean isError;
     private boolean isTrying;
@@ -37,7 +37,7 @@ public class FTMonitor {
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             if (msg.what == MSG_RETRY) {
-                start(config);
+                start();
             }
         }
     };
@@ -76,8 +76,9 @@ public class FTMonitor {
 //        return this;
 //    }
 
-    public void start(FTRUMConfig config) {
-        this.config = config;
+    public void start() {
+
+        FTRUMConfig config = FTRUMConfigManager.get().getConfig();
         boolean onlyMain = true;
         try {
             onlyMain = FTSdk.get().getBaseConfig().isOnlySupportMainProcess();

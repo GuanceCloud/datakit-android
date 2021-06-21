@@ -9,12 +9,15 @@ import com.ft.AccountUtils;
 import com.ft.BaseTest;
 import com.ft.application.MockApplication;
 import com.ft.sdk.FTMonitor;
+import com.ft.sdk.FTRUMConfig;
+import com.ft.sdk.FTRUMConfigManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
+import com.ft.sdk.garble.service.FTMonitorManager;
 import com.ft.sdk.garble.utils.Constants;
 
 import org.json.JSONException;
@@ -36,7 +39,6 @@ import static com.ft.AllTests.hasPrepare;
 @RunWith(AndroidJUnit4.class)
 public class MonitorTest extends BaseTest {
     Context context;
-    FTSDKConfig ftSDKConfig;
 
     @Before
     public void setUp() {
@@ -46,24 +48,29 @@ public class MonitorTest extends BaseTest {
         }
         FTDBManager.get().delete();
         context = MockApplication.getContext();
-        ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL)
-        )
-                .setMonitorType(MonitorType.ALL);//设置监控项
+        FTSDKConfig ftSDKConfig= FTSDKConfig
+                .builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL)
+        );
+
+        FTSdk.install(ftSDKConfig);
 
     }
 
     @Test
     public void monitorBatteryTest() throws Exception {
+        FTMonitor.get().setMonitorType(MonitorType.BATTERY);
         monitorTest(MonitorType.BATTERY);
     }
 
     @Test
     public void monitorMemoryTest() throws Exception {
+        FTMonitor.get().setMonitorType(MonitorType.MEMORY);
         monitorTest(MonitorType.MEMORY);
     }
 
     @Test
     public void monitorCPUTest() throws Exception {
+        FTMonitor.get().setMonitorType(MonitorType.CPU);
         monitorTest(MonitorType.CPU);
     }
 //
@@ -109,7 +116,6 @@ public class MonitorTest extends BaseTest {
      */
     @Test
     public void monitorPeriodTest() throws InterruptedException {
-        FTSdk.install(ftSDKConfig);
         FTMonitor.get().setPeriod(2).start();
         Thread.sleep(10000);
         FTMonitor.get().setPeriod(4).start();
@@ -117,9 +123,6 @@ public class MonitorTest extends BaseTest {
     }
 
     private void monitorTest(int monitorType) throws Exception {
-        ftSDKConfig.setMonitorType(monitorType);
-        FTSdk.install(ftSDKConfig);
-
         stopSyncTask();
         try {
             simpleTrackData();

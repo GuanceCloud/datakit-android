@@ -13,6 +13,8 @@ import com.ft.sdk.FTHttpClientRequestInterceptor;
 import com.ft.sdk.FTHttpClientResponseInterceptor;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
+import com.ft.sdk.FTTraceConfig;
+import com.ft.sdk.FTTraceConfigManager;
 import com.ft.sdk.TraceType;
 
 import org.apache.hc.client5.http.classic.methods.HttpGet;
@@ -49,7 +51,6 @@ import static com.ft.utils.RequestUtil.requestUrl;
 @RunWith(AndroidJUnit4.class)
 public class TraceTest extends BaseTest {
     Context context;
-    FTSDKConfig ftsdkConfig;
 
     @Before
     public void setUp() {
@@ -58,15 +59,16 @@ public class TraceTest extends BaseTest {
             hasPrepare = true;
         }
         context = MockApplication.getContext();
-        ftsdkConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL))
-                .setXDataKitUUID("ft-dataKit-uuid-001")
-                .setNetworkTrace(true);
+        FTSDKConfig ftsdkConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL))
+                .setXDataKitUUID("ft-dataKit-uuid-001");
+        FTSdk.install(ftsdkConfig);
+        FTTraceConfigManager.get().initWithConfig(new FTTraceConfig());
+
     }
 
     @Test
     public void traceZipKinHeaderTest() {
-        ftsdkConfig.setTraceType(TraceType.ZIPKIN);
-        FTSdk.install(ftsdkConfig);
+        FTTraceConfigManager.get().initWithConfig(new FTTraceConfig().setTraceType(TraceType.ZIPKIN));
         Request request = requestUrl("http://www.weather.com.cn/data/sk/101010100.html");
         boolean expect = request.headers().names().contains(ZIPKIN_SPAN_ID) &&
                 request.headers().names().contains(ZIPKIN_TRACE_ID) &&
@@ -76,8 +78,7 @@ public class TraceTest extends BaseTest {
 
     @Test
     public void traceZipKinHeaderSpanIdFormatTest() {
-        ftsdkConfig.setTraceType(TraceType.ZIPKIN);
-        FTSdk.install(ftsdkConfig);
+        FTTraceConfigManager.get().initWithConfig(new FTTraceConfig().setTraceType(TraceType.ZIPKIN));
         Request request = requestUrl("http://www.weather.com.cn/data/sk/101010100.html");
         String spanId = request.headers().get(ZIPKIN_SPAN_ID);
         boolean spanIdResult = spanId.length() == 16;
@@ -92,8 +93,7 @@ public class TraceTest extends BaseTest {
 
     @Test
     public void traceJaegerHeaderTest() {
-        ftsdkConfig.setTraceType(TraceType.JAEGER);
-        FTSdk.install(ftsdkConfig);
+        FTTraceConfigManager.get().initWithConfig(new FTTraceConfig().setTraceType(TraceType.JAEGER));
         Request request = requestUrl("http://www.weather.com.cn/data/sk/101010100.html");
         boolean expect = request.headers().names().contains(JAEGER_KEY);
         Assert.assertTrue(expect);
@@ -119,7 +119,6 @@ public class TraceTest extends BaseTest {
 
     @Test
     public void traceHttpClientGetTest() throws IOException, InterruptedException, ParseException {
-        FTSdk.install(ftsdkConfig);
         FTHttpClientInterceptor interceptor = new FTHttpClientInterceptor();
         CloseableHttpClient httpClient = HttpClients.custom()
                 .addRequestInterceptorFirst(new FTHttpClientRequestInterceptor(interceptor))
@@ -135,7 +134,6 @@ public class TraceTest extends BaseTest {
     @Test
     public void traceHttpClientPostTest() throws Exception {
         resumeSyncTask();
-        FTSdk.install(ftsdkConfig);
         FTHttpClientInterceptor interceptor = new FTHttpClientInterceptor();
         CloseableHttpClient httpClient = HttpClients.custom()
                 .addRequestInterceptorFirst(new FTHttpClientRequestInterceptor(interceptor))

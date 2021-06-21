@@ -210,7 +210,7 @@ public class FTTrackInner {
         JSONObject rumTags = null;
         if (config.isEnableLinkRumData()) {
             rumTags = FTAutoTrack.getRUMPublicTags();
-            FTRUMGlobalManager.get().attachRUMRelative(rumTags);
+            FTRUMGlobalManager.get().attachRUMRelative(rumTags, false);
         }
 
         ArrayList<SyncJsonData> datas = new ArrayList<>();

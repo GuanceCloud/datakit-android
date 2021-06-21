@@ -9,23 +9,22 @@ import com.ft.AccountUtils;
 import com.ft.BaseTest;
 import com.ft.application.MockApplication;
 import com.ft.sdk.EnvType;
-import com.ft.sdk.FTAutoTrackType;
+import com.ft.sdk.FTLoggerConfig;
+import com.ft.sdk.FTLoggerConfigManager;
+import com.ft.sdk.FTRUMConfig;
+import com.ft.sdk.FTRUMConfigManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
+import com.ft.sdk.FTTraceConfig;
+import com.ft.sdk.FTTraceConfigManager;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.TraceType;
-import com.ft.sdk.garble.FTAutoTrackConfig;
-import com.ft.sdk.garble.FTUserActionConfig;
-import com.ft.sdk.garble.FTHttpConfig;
-import com.ft.sdk.garble.FTMonitorConfig;
-import com.ft.sdk.FTExceptionHandler;
-import com.ft.sdk.garble.utils.NetUtils;
+import com.ft.sdk.garble.FTMonitorConfigManager;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.reflect.Whitebox;
 
 import static com.ft.AllTests.hasPrepare;
 
@@ -49,81 +48,65 @@ public class SDKRunStateTest extends BaseTest {
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setUseOAID(true)//设置 OAID 是否可用
                 .setDebug(true)//设置是否是 debug
-                .setMonitorType(MonitorType.ALL)//设置监控项
-                .setEnableTrackAppCrash(true)
-                .setEnableTrackAppANR(true)
-                .setEnableTrackAppUIBlock(true)
-                .setEnv(EnvType.GRAY)
-                .setNetworkTrace(true)
-                .setTraceConsoleLog(true)
-                .setEnableTraceUserAction(true)
-                .setTraceType(TraceType.ZIPKIN);
+                .setEnv(EnvType.GRAY);
+
         FTSdk.install(ftSDKConfig);
-    }
 
-    @Test
-    public void enableAutoTrackTest() {
-        Assert.assertTrue(FTAutoTrackConfig.get().isAutoTrack());
-    }
+        FTRUMConfigManager.get().initWithConfig(new FTRUMConfig()
+                .setExtraMonitorTypeWithError(MonitorType.ALL)
+                .setEnableTrackAppANR(true)
+                .setEnableTrackAppCrash(true)
+                .setEnableTrackAppUIBlock(true)
+                .setEnableTraceUserAction(true)
+        );
 
-    @Test
-    public void enableAutoTrackTypeTest() {
-        Assert.assertTrue(FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_CLICK));
+        FTLoggerConfigManager.get().initWithConfig(new FTLoggerConfig().setEnableConsoleLog(true));
+
+        FTTraceConfigManager.get().initWithConfig(new FTTraceConfig().setTraceType(TraceType.ZIPKIN));
     }
 
     @Test
     public void monitorTypeTest() {
-        Assert.assertTrue(FTMonitorConfig.get().isMonitorType(MonitorType.ALL));
+        Assert.assertTrue(FTMonitorConfigManager.get().isMonitorType(MonitorType.ALL));
     }
 
     @Test
     public void networkTrackTest() {
-        Assert.assertTrue(FTHttpConfig.get().networkTrace);
+        Assert.assertTrue(FTTraceConfigManager.get().isNetworkTrace());
     }
 
     @Test
     public void trackConsoleLogTest() {
-        Assert.assertTrue(FTExceptionHandler.get().isTrackConsoleLog());
+        Assert.assertTrue(FTLoggerConfigManager.get().getConfig().isEnableConsoleLog());
     }
 
     @Test
     public void traceUserActionTest() {
-        Assert.assertTrue(FTUserActionConfig.get().isEnableTraceUserAction());
+        Assert.assertTrue(FTRUMConfigManager.get().getConfig().isEnableTraceUserAction());
     }
 
-    @Test
-    public void showdownEnableAutoTrackTest() {
-        FTSdk.get().shutDown();
-        Assert.assertFalse(FTAutoTrackConfig.get().isAutoTrack());
-    }
-
-    @Test
-    public void showdownEnableAutoTrackTypeTest() {
-        FTSdk.get().shutDown();
-        Assert.assertTrue(FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_CLICK));
-    }
 
     @Test
     public void showdownMonitorTypeTest() {
         FTSdk.get().shutDown();
-        Assert.assertFalse(FTMonitorConfig.get().isMonitorType(MonitorType.ALL));
+        Assert.assertFalse(FTMonitorConfigManager.get().isMonitorType(MonitorType.ALL));
     }
 
     @Test
     public void showdownNetworkTrackTest() {
         FTSdk.get().shutDown();
-        Assert.assertFalse(FTHttpConfig.get().networkTrace);
+        Assert.assertFalse(FTTraceConfigManager.get().isNetworkTrace());
     }
 
     @Test
     public void showdownTrackConsoleLogTest() {
         FTSdk.get().shutDown();
-        Assert.assertFalse(FTExceptionHandler.get().isTrackConsoleLog());
+        Assert.assertNull(FTLoggerConfigManager.get().getConfig());
     }
 
     @Test
     public void showdownEventFlowLogTest() {
         FTSdk.get().shutDown();
-        Assert.assertFalse(FTUserActionConfig.get().isEnableTraceUserAction());
+        Assert.assertNull(FTRUMConfigManager.get().getConfig());
     }
 }
