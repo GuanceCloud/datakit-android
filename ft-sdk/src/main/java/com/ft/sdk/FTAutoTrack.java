@@ -734,7 +734,7 @@ public class FTAutoTrack {
      * 记录应用登陆时效
      */
     public static void putRUMLaunchPerformance(boolean isCold, long duration) {
-        FTRUMGlobalManager.getInstance().addAction(
+        FTRUMGlobalManager.get().addAction(
                 isCold ? "app cold start" : "app hot start", isCold ? "launch_cold" : "launch_hot", duration);
     }
 
@@ -742,7 +742,7 @@ public class FTAutoTrack {
      * 记录页面加载性能
      */
     public static void putRUMViewLoadPerformance(String viewName, long loadTime) {
-        FTRUMGlobalManager.getInstance().onCreateView(viewName, loadTime);
+        FTRUMGlobalManager.get().onCreateView(viewName, loadTime);
     }
 
 
@@ -982,15 +982,15 @@ public class FTAutoTrack {
     static JSONObject getRUMPublicTags() {
         JSONObject tags = new JSONObject();
         try {
-            tags.put(Constants.KEY_RUM_APP_ID, FTRUMConfigManager.getInstance().getConfig().getRumAppId());
+            tags.put(Constants.KEY_RUM_APP_ID, FTRUMConfigManager.get().getConfig().getRumAppId());
             tags.put(Constants.KEY_RUM_SDK_NAME, Constants.SDK_NAME);
             tags.put(Constants.KEY_RUM_ENV, FTSdk.get().getBaseConfig().getEnv().toString());
             tags.put(Constants.KEY_RUM_NETWORK_TYPE, NetUtils.get().getNetWorkStateName());
-            tags.put(Constants.KEY_RUM_IS_SIGNIN, FTRUMConfigManager.getInstance().isUserDataBinded() ? "T" : "F");
-            if (FTRUMConfigManager.getInstance().isUserDataBinded() ) {
-                tags.put(Constants.KEY_RUM_USER_ID, FTRUMConfigManager.getInstance().getUserData().getId());
+            tags.put(Constants.KEY_RUM_IS_SIGNIN, FTRUMConfigManager.get().isUserDataBinded() ? "T" : "F");
+            if (FTRUMConfigManager.get().isUserDataBinded() ) {
+                tags.put(Constants.KEY_RUM_USER_ID, FTRUMConfigManager.get().getUserData().getId());
             } else {
-                tags.put(Constants.KEY_RUM_USER_ID, FTRUMGlobalManager.getInstance().getSessionId());
+                tags.put(Constants.KEY_RUM_USER_ID, FTRUMGlobalManager.get().getSessionId());
             }
 
             String uuid = "";
@@ -1035,7 +1035,7 @@ public class FTAutoTrack {
             case CLK:
                 event = Constants.EVENT_NAME_CLICK;
 
-                FTRUMGlobalManager.getInstance().startAction(vtp + " click", event);
+                FTRUMGlobalManager.get().startAction(vtp + " click", event);
                 break;
             case LANC:
                 event = Constants.EVENT_NAME_LAUNCH;
@@ -1043,13 +1043,13 @@ public class FTAutoTrack {
             case OPEN_ACT:
 //            case OPEN_FRA:
                 event = Constants.EVENT_NAME_ENTER;
-                FTRUMGlobalManager.getInstance().startView(currentPage, parentPage);
+                FTRUMGlobalManager.get().startView(currentPage, parentPage);
                 break;
             case CLS_ACT:
 //            case CLS_FRA:
                 event = Constants.EVENT_NAME_LEAVE;
 //                RUMGlobalManager.getInstance().startAction(event);
-                FTRUMGlobalManager.getInstance().stopView();
+                FTRUMGlobalManager.get().stopView();
                 break;
             case OPEN:
                 event = Constants.EVENT_NAME_OPEN;
@@ -1191,12 +1191,12 @@ public class FTAutoTrack {
      */
     public static OkHttpClient trackOkHttpBuilder(OkHttpClient.Builder builder) {
         FTNetWorkInterceptor interceptor = new FTNetWorkInterceptor();
-        if (FTTraceConfigManager.getInstance().getConfig().isNetworkTrace()
-                || FTRUMConfigManager.getInstance().isRumEnable()) {
+        if (FTTraceConfigManager.get().getConfig().isNetworkTrace()
+                || FTRUMConfigManager.get().isRumEnable()) {
             builder.addInterceptor(interceptor);
 //            builder.addNetworkInterceptor(interceptor); //发现部分工程有兼容问题
         }
-        if (FTRUMConfigManager.getInstance().isRumEnable()) {
+        if (FTRUMConfigManager.get().isRumEnable()) {
             builder.eventListener(interceptor);
         }
         return builder.build();
@@ -1211,7 +1211,7 @@ public class FTAutoTrack {
      */
     public static CloseableHttpClient trackHttpClientBuilder(HttpClientBuilder builder) {
         FTHttpClientInterceptor interceptor = new FTHttpClientInterceptor();
-        if (FTTraceConfigManager.getInstance().getConfig().isNetworkTrace()) {
+        if (FTTraceConfigManager.get().getConfig().isNetworkTrace()) {
             builder.addRequestInterceptorFirst(new FTHttpClientRequestInterceptor(interceptor));
             builder.addResponseInterceptorLast(new FTHttpClientResponseInterceptor(interceptor));
         }

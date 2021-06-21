@@ -59,17 +59,17 @@ public class FTTrackInner {
     void rum(long time, String measurement, final JSONObject tags, JSONObject fields) {
         switch (measurement) {
             case Constants.FT_MEASUREMENT_RUM_ERROR:
-                FTRUMGlobalManager.getInstance().attachRUMRelative(tags);
-                FTRUMGlobalManager.getInstance().increaseError(tags);
+                FTRUMGlobalManager.get().attachRUMRelative(tags);
+                FTRUMGlobalManager.get().increaseError(tags);
                 break;
             case Constants.FT_MEASUREMENT_RUM_LONG_TASK:
-                FTRUMGlobalManager.getInstance().attachRUMRelative(tags);
-                FTRUMGlobalManager.getInstance().increaseLongTask(tags);
+                FTRUMGlobalManager.get().attachRUMRelative(tags);
+                FTRUMGlobalManager.get().increaseLongTask(tags);
                 break;
         }
 
         String sessionId = tags.optString(Constants.KEY_RUM_SESSION_ID);
-        if (FTRUMGlobalManager.getInstance().checkSessionWillCollect(sessionId)) {
+        if (FTRUMGlobalManager.get().checkSessionWillCollect(sessionId)) {
             syncDataBackground(DataType.RUM_APP, time, measurement, tags, fields);
         }
     }
@@ -204,13 +204,13 @@ public class FTTrackInner {
      * @param logBeans
      */
     void batchLogBeanBackground(@NonNull List<BaseContentBean> logBeans) {
-        FTLoggerConfig config = FTLoggerConfigManager.getInstance().getConfig();
+        FTLoggerConfig config = FTLoggerConfigManager.get().getConfig();
         if (config == null) return;
 
         JSONObject rumTags = null;
         if (config.isEnableLinkRumData()) {
             rumTags = FTAutoTrack.getRUMPublicTags();
-            FTRUMGlobalManager.getInstance().attachRUMRelative(rumTags);
+            FTRUMGlobalManager.get().attachRUMRelative(rumTags);
         }
 
         ArrayList<SyncJsonData> datas = new ArrayList<>();

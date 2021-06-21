@@ -54,7 +54,7 @@ class AppRestartCallback {
     }
 
     public void onPostOnCreate() {
-        if (FTRUMConfigManager.getInstance().isRumEnable()) {
+        if (FTRUMConfigManager.get().isRumEnable()) {
             if (!mInited) {
                 long now = Utils.getCurrentNanoTime();
                 FTActivityManager.get().setAppState(AppState.RUN);
@@ -67,7 +67,7 @@ class AppRestartCallback {
     public void onPostResume() {
         if (alreadySleep) {
             if (mInited) {
-                if (FTRUMConfigManager.getInstance().isRumEnable()) {
+                if (FTRUMConfigManager.get().isRumEnable()) {
                     if (startTime > 0) {
                         long now = Utils.getCurrentNanoTime();
                         FTAutoTrack.putRUMLaunchPerformance(false, now - startTime);

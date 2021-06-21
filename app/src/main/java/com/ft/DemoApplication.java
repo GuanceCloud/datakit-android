@@ -48,7 +48,7 @@ public class DemoApplication extends Application {
         FTSdk.install(ftSDKConfig);
 
 
-        FTRUMConfigManager.getInstance().initConfig(new FTRUMConfig()
+        FTRUMConfigManager.get().initConfig(new FTRUMConfig()
                 .setSamplingRate(1f)
                 .setRumAppId(AccountUtils.getProperty(this, AccountUtils.RUM_APP_ID))
                 .setEnableTraceUserAction(true)
@@ -58,10 +58,10 @@ public class DemoApplication extends Application {
                 .setExtraMonitorTypeWithError(MonitorType.ALL)
         );
 
-        FTRUMConfigManager.getInstance().bindUserData("brandon.test.userid");
+        FTRUMConfigManager.get().bindUserData("brandon.test.userid");
 
 
-        FTLoggerConfigManager.getInstance()
+        FTLoggerConfigManager.get()
                 .initConfig(new FTLoggerConfig()
                         .setSamplingRate(1f)
                         .setEnableLinkRumData(true)
@@ -70,7 +70,7 @@ public class DemoApplication extends Application {
                         .setEnableLinkRumData(true)
                 );
 
-        FTTraceConfigManager.getInstance().initConfig(new FTTraceConfig()
+        FTTraceConfigManager.get().initConfig(new FTTraceConfig()
                 .setSamplingRate(1f)
                 .setNetworkTrace(true)
                 .setEnableLinkRUMData(true)

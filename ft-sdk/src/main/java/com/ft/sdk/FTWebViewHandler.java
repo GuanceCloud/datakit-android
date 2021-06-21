@@ -60,7 +60,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                         tags.put(key, publicTags.opt(key));
                     }
 
-                    String sessionId = FTRUMGlobalManager.getInstance().getSessionId();
+                    String sessionId = FTRUMGlobalManager.get().getSessionId();
                     tags.put("session_id", sessionId);
                     tags.put("is_active", false);
                     tags.put("is_web_view", true);

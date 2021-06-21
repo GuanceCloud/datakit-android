@@ -107,7 +107,7 @@ public class SyncDataHelper {
      * @return
      */
     private String getLogBodyContent(List<SyncJsonData> datas) {
-        FTLoggerConfig loggerConfig = FTLoggerConfigManager.getInstance().getConfig();
+        FTLoggerConfig loggerConfig = FTLoggerConfigManager.get().getConfig();
         //全局设置改变
         if (loggerConfig != null && loggerConfig.isEnableLinkRumData()) {
             HashMap<String, Object> hashMap = getRumPublicTags();

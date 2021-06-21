@@ -74,7 +74,7 @@ public class FTSdk {
      */
     public void shutDown() {
         SyncTaskManager.release();
-        FTRUMConfigManager.getInstance().release();
+        FTRUMConfigManager.get().release();
         FTMonitorConfigManager.release();
         FTAutoTrackConfigManager.release();
         FTHttpConfigManager.release();
@@ -82,7 +82,7 @@ public class FTSdk {
         LocationUtils.get().stopListener();
         FTExceptionHandler.release();
         FTDBCachePolicy.release();
-        FTRUMConfigManager.getInstance().unregisterActivityLifeCallback();
+        FTRUMConfigManager.get().unregisterActivityLifeCallback();
         LogUtils.w(TAG, "FT SDK 已经被关闭");
     }
 

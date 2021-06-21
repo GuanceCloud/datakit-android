@@ -46,7 +46,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     @Override
     public void onActivityPostCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
         mAppRestartCallback.onPostOnCreate();
-        if (FTRUMConfigManager.getInstance().isRumEnable()) {
+        if (FTRUMConfigManager.get().isRumEnable()) {
 
             Long startTime = mCreateMap.get(activity);
             if (startTime != null) {

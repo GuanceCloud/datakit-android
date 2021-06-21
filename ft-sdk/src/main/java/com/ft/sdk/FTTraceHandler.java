@@ -41,7 +41,7 @@ class FTTraceHandler {
     }
 
     public FTTraceHandler() {
-        config = FTTraceConfigManager.getInstance().getConfig();
+        config = FTTraceConfigManager.get().getConfig();
         enableTrace = Utils.enableTraceSamplingRate(config.getSamplingRate());
 
     }
