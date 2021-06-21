@@ -1,6 +1,6 @@
 package com.ft.sdk;
 
-import com.ft.sdk.garble.FTHttpConfig;
+import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.bean.NetStatusBean;
 import com.ft.sdk.garble.http.HttpUrl;
 import com.ft.sdk.garble.http.NetStatusMonitor;
@@ -79,13 +79,13 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
     @NotNull
     @Override
     public Response intercept(@NotNull Chain chain) throws IOException {
-        String viewId = RUMGlobalManager.getInstance().getViewId();
-        String viewName = RUMGlobalManager.getInstance().getViewName();
-        String viewReferrer = RUMGlobalManager.getInstance().getViewReferrer();
-        String actionId = RUMGlobalManager.getInstance().getActionId();
-        String actionName = RUMGlobalManager.getInstance().getActionName();
-        String sessionId = RUMGlobalManager.getInstance().getSessionId();
-        RUMGlobalManager.getInstance().startResource(viewId, actionId);
+        String viewId = FTRUMGlobalManager.getInstance().getViewId();
+        String viewName = FTRUMGlobalManager.getInstance().getViewName();
+        String viewReferrer = FTRUMGlobalManager.getInstance().getViewReferrer();
+        String actionId = FTRUMGlobalManager.getInstance().getActionId();
+        String actionName = FTRUMGlobalManager.getInstance().getActionName();
+        String sessionId = FTRUMGlobalManager.getInstance().getSessionId();
+        FTRUMGlobalManager.getInstance().startResource(viewId, actionId);
         Request request = chain.request();
         Response response = null;
         Request.Builder requestBuilder = request.newBuilder();
@@ -137,7 +137,7 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
             }
         }
 
-        RUMGlobalManager.getInstance().stopResource(viewId, actionId);
+        FTRUMGlobalManager.getInstance().stopResource(viewId, actionId);
         return response;
     }
 
@@ -236,7 +236,7 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
     private static boolean isSupportFormat(MediaType mediaType) {
         if (mediaType == null) return false;
         String contentType = mediaType.type() + "/" + mediaType.subtype();
-        List<String> supportContentType = FTHttpConfig.get().traceContentType;
+        List<String> supportContentType = FTTraceConfigManager.getInstance().traceContentType;;
         if (supportContentType == null) {
             return false;
         }

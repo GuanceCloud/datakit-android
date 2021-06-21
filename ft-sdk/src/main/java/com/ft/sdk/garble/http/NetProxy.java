@@ -1,7 +1,7 @@
 package com.ft.sdk.garble.http;
 
 import com.ft.sdk.FTSdk;
-import com.ft.sdk.garble.FTHttpConfig;
+import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
@@ -20,7 +20,7 @@ import java.util.TimeZone;
 public class NetProxy {
     public final static String TAG = "NetProxy";
     //SDK 中网络的配置
-    FTHttpConfig ftHttpConfig = FTHttpConfig.get();
+    FTHttpConfigManager ftHttpConfig = FTHttpConfigManager.get();
     //内容类型
     final String CONTENT_TYPE = "text/plain";
     //字符编码

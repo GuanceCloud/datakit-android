@@ -1,6 +1,6 @@
 package com.ft.sdk.garble.bean;
 
-import com.ft.sdk.garble.FTHttpConfig;
+import com.ft.sdk.garble.FTHttpConfigManager;
 
 public class NetStatusBean {
 
@@ -22,7 +22,7 @@ public class NetStatusBean {
      * @return
      */
     public boolean isInnerRequest() {
-        String innerUrl = FTHttpConfig.get().serverUrl;
+        String innerUrl = FTHttpConfigManager.get().serverUrl;
         if (innerUrl != null && requestHost != null && innerUrl.contains(requestHost)) {
             return true;
         }

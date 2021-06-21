@@ -1,6 +1,6 @@
 package com.ft.sdk.garble.http;
 
-import com.ft.sdk.garble.FTHttpConfig;
+import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
@@ -90,8 +90,8 @@ public class NativeNetEngine implements INetEngine {
             e.printStackTrace();
         }
         //设置连接和读取超时时间
-        mConnection.setConnectTimeout(FTHttpConfig.get().sendOutTime);
-        mConnection.setReadTimeout(FTHttpConfig.get().readOutTime);
+        mConnection.setConnectTimeout(FTHttpConfigManager.get().sendOutTime);
+        mConnection.setReadTimeout(FTHttpConfigManager.get().readOutTime);
     }
 
     private void setHeadParams() {

@@ -1,6 +1,5 @@
 package com.ft.sdk;
 
-import com.ft.sdk.garble.FTHttpConfig;
 import com.ft.sdk.garble.bean.TraceBean;
 import com.ft.sdk.garble.http.HttpUrl;
 import com.ft.sdk.garble.utils.Utils;
@@ -31,6 +30,7 @@ class FTTraceHandler {
     private boolean isWebViewTrace;
 
     private HttpUrl httpUrl;
+    private FTTraceConfig config;
 
     public String getTraceID() {
         return traceID;
@@ -41,7 +41,9 @@ class FTTraceHandler {
     }
 
     public FTTraceHandler() {
-        enableTrace = Utils.enableTraceSamplingRate();
+        config = FTTraceConfigManager.getInstance().getConfig();
+        enableTrace = Utils.enableTraceSamplingRate(config.getSamplingRate());
+
     }
 
     public HashMap<String, String> getTraceHeader(HttpUrl httpUrl) {
@@ -57,11 +59,11 @@ class FTTraceHandler {
         String parentSpanID = "0000000000000000";
 
         //在数据中添加标记
-        if (FTHttpConfig.get().traceType == TraceType.ZIPKIN) {
+        if (config.getTraceType() == TraceType.ZIPKIN) {
             headers.put(ZIPKIN_SPAN_ID, spanID);
             headers.put(ZIPKIN_TRACE_ID, traceID);
             headers.put(ZIPKIN_SAMPLED, sampled);
-        } else if (FTHttpConfig.get().traceType == TraceType.JAEGER) {
+        } else if (config.getTraceType() == TraceType.JAEGER) {
             headers.put(JAEGER_KEY, traceID + ":" + spanID + ":" + parentSpanID + ":" + sampled);
         }
 //        else if (FTHttpConfig.get().traceType == TraceType.SKYWALKING_V3) {
@@ -88,15 +90,17 @@ class FTTraceHandler {
 
         String endPoint = httpUrl.getHost() + ":" + httpUrl.getPort();
 
-        TraceBean traceBean = new TraceBean(FTHttpConfig.get().traceType.toString(), content, requestTime);
+        TraceBean traceBean = new TraceBean(config.getTraceType().toString(), content, requestTime);
         traceBean.setOperationName(operationName);
         traceBean.setDuration(duration);
         traceBean.setSpanType("entry");
         traceBean.setEndpoint(endPoint);
         traceBean.setStatus(isError ? "error" : "ok");
-        traceBean.setServiceName(FTExceptionHandler.get().getTrackServiceName());
-        traceBean.setSpanID(spanID);
-        traceBean.setTraceID(traceID);
+        traceBean.setServiceName(config.getServiceName());
+        if (config.isEnableLinkRUMData()) {
+            traceBean.setSpanID(spanID);
+            traceBean.setTraceID(traceID);
+        }
         FTTrackInner.getInstance().traceBackground(traceBean);
     }
 

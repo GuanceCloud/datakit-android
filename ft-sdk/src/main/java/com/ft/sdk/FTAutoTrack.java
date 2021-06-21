@@ -16,12 +16,10 @@ import android.widget.RadioGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.ft.sdk.garble.FTAutoTrackConfig;
+import com.ft.sdk.garble.FTAutoTrackConfigManager;
 import com.ft.sdk.garble.FTFragmentManager;
-import com.ft.sdk.garble.FTHttpConfig;
-import com.ft.sdk.garble.FTMonitorConfig;
-import com.ft.sdk.garble.FTRUMConfig;
-import com.ft.sdk.garble.FTUserConfig;
+import com.ft.sdk.garble.FTHttpConfigManager;
+import com.ft.sdk.garble.FTMonitorConfigManager;
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.ErrorSource;
 import com.ft.sdk.garble.bean.ErrorType;
@@ -357,10 +355,10 @@ public class FTAutoTrack {
      * APP 启动
      */
     public static void startApp() {
-        if (!FTAutoTrackConfig.get().isAutoTrack()) {
+        if (!FTAutoTrackConfigManager.get().isAutoTrack()) {
             return;
         }
-        if (!FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_START)) {
+        if (!FTAutoTrackConfigManager.get().enableAutoTrackType(FTAutoTrackType.APP_START)) {
             return;
         }
         putPageEvent(Utils.getCurrentNanoTime(), OP.LANC, null, null, null, null);
@@ -387,32 +385,32 @@ public class FTAutoTrack {
      */
     public static void startPage(Object clazz, Object activity, String parentPage) {
         /*没有开启自动埋点*/
-        if (!FTAutoTrackConfig.get().isAutoTrack()) {
+        if (!FTAutoTrackConfigManager.get().isAutoTrack()) {
             return;
         }
         /*设置了白名单，但当前事件不在其中*/
-        if (!FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_START)) {
+        if (!FTAutoTrackConfigManager.get().enableAutoTrackType(FTAutoTrackType.APP_START)) {
             return;
         }
 
         /*设置了白名单，但当前页面不在其中*/
-        if (!FTAutoTrackConfig.get().isOnlyAutoTrackActivity(activity.getClass())) {
+        if (!FTAutoTrackConfigManager.get().isOnlyAutoTrackActivity(activity.getClass())) {
             return;
         }
         /*设置了白名单，但当前页面不在其中*/
-        if (!FTAutoTrackConfig.get().isOnlyAutoTrackActivity((Class<?>) clazz)) {
+        if (!FTAutoTrackConfigManager.get().isOnlyAutoTrackActivity((Class<?>) clazz)) {
             return;
         }
         /*设置了黑名单，且事件在其中*/
-        if (FTAutoTrackConfig.get().disableAutoTrackType(FTAutoTrackType.APP_START)) {
+        if (FTAutoTrackConfigManager.get().disableAutoTrackType(FTAutoTrackType.APP_START)) {
             return;
         }
         /*设置了黑名单，且页面在其中*/
-        if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(activity.getClass())) {
+        if (FTAutoTrackConfigManager.get().isIgnoreAutoTrackActivity(activity.getClass())) {
             return;
         }
         /*设置了黑名单，且页面在其中*/
-        if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity((Class<?>) clazz)) {
+        if (FTAutoTrackConfigManager.get().isIgnoreAutoTrackActivity((Class<?>) clazz)) {
             return;
         }
         putFragmentEvent(OP.OPEN_FRA, AopUtils.getClassName(clazz), AopUtils.getActivityName(activity), parentPage);
@@ -426,32 +424,32 @@ public class FTAutoTrack {
      */
     public static void destroyPage(Object clazz, Object activity, String parentPage) {
         /*没有开启自动埋点*/
-        if (!FTAutoTrackConfig.get().isAutoTrack()) {
+        if (!FTAutoTrackConfigManager.get().isAutoTrack()) {
             return;
         }
         /*设置了白名单，但当前事件不在其中*/
-        if (!FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_END)) {
+        if (!FTAutoTrackConfigManager.get().enableAutoTrackType(FTAutoTrackType.APP_END)) {
             return;
         }
 
         /*设置了白名单，但当前页面不在其中*/
-        if (!FTAutoTrackConfig.get().isOnlyAutoTrackActivity(activity.getClass())) {
+        if (!FTAutoTrackConfigManager.get().isOnlyAutoTrackActivity(activity.getClass())) {
             return;
         }
         /*设置了白名单，但当前页面不在其中*/
-        if (!FTAutoTrackConfig.get().isOnlyAutoTrackActivity((Class<?>) clazz)) {
+        if (!FTAutoTrackConfigManager.get().isOnlyAutoTrackActivity((Class<?>) clazz)) {
             return;
         }
         /*设置了黑名单，且事件在其中*/
-        if (FTAutoTrackConfig.get().disableAutoTrackType(FTAutoTrackType.APP_END)) {
+        if (FTAutoTrackConfigManager.get().disableAutoTrackType(FTAutoTrackType.APP_END)) {
             return;
         }
         /*设置了黑名单，且页面在其中*/
-        if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(activity.getClass())) {
+        if (FTAutoTrackConfigManager.get().isIgnoreAutoTrackActivity(activity.getClass())) {
             return;
         }
         /*设置了黑名单，且页面在其中*/
-        if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity((Class<?>) clazz)) {
+        if (FTAutoTrackConfigManager.get().isIgnoreAutoTrackActivity((Class<?>) clazz)) {
             return;
         }
         putFragmentEvent(OP.CLS_FRA, AopUtils.getClassName(clazz), AopUtils.getActivityName(activity), parentPage);
@@ -464,23 +462,23 @@ public class FTAutoTrack {
      */
     public static void startPage(Class<?> clazz, boolean isFirstLoad) {
         /*没有开启自动埋点*/
-        if (!FTAutoTrackConfig.get().isAutoTrack()) {
+        if (!FTAutoTrackConfigManager.get().isAutoTrack()) {
             return;
         }
         /*设置了白名单，但当前事件不在其中*/
-        if (!FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_START)) {
+        if (!FTAutoTrackConfigManager.get().enableAutoTrackType(FTAutoTrackType.APP_START)) {
             return;
         }
         /*设置了白名单，但当前页面不在其中*/
-        if (!FTAutoTrackConfig.get().isOnlyAutoTrackActivity(clazz)) {
+        if (!FTAutoTrackConfigManager.get().isOnlyAutoTrackActivity(clazz)) {
             return;
         }
         /*设置了黑名单，且事件在其中*/
-        if (FTAutoTrackConfig.get().disableAutoTrackType(FTAutoTrackType.APP_START)) {
+        if (FTAutoTrackConfigManager.get().disableAutoTrackType(FTAutoTrackType.APP_START)) {
             return;
         }
         /*设置了黑名单，且页面在其中*/
-        if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)) {
+        if (FTAutoTrackConfigManager.get().isIgnoreAutoTrackActivity(clazz)) {
             return;
         }
         putActivityEvent(OP.OPEN_ACT, clazz, isFirstLoad);
@@ -493,23 +491,23 @@ public class FTAutoTrack {
      */
     public static void destroyPage(Class<?> clazz) {
         /*没有开启自动埋点*/
-        if (!FTAutoTrackConfig.get().isAutoTrack()) {
+        if (!FTAutoTrackConfigManager.get().isAutoTrack()) {
             return;
         }
         /*设置了白名单，但当前事件不在其中*/
-        if (!FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_END)) {
+        if (!FTAutoTrackConfigManager.get().enableAutoTrackType(FTAutoTrackType.APP_END)) {
             return;
         }
         /*设置了白名单，但当前页面不在其中*/
-        if (!FTAutoTrackConfig.get().isOnlyAutoTrackActivity(clazz)) {
+        if (!FTAutoTrackConfigManager.get().isOnlyAutoTrackActivity(clazz)) {
             return;
         }
         /*设置了黑名单，且事件在其中*/
-        if (FTAutoTrackConfig.get().disableAutoTrackType(FTAutoTrackType.APP_END)) {
+        if (FTAutoTrackConfigManager.get().disableAutoTrackType(FTAutoTrackType.APP_END)) {
             return;
         }
         /*设置了黑名单，且页面在其中*/
-        if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)) {
+        if (FTAutoTrackConfigManager.get().isIgnoreAutoTrackActivity(clazz)) {
             return;
         }
         putActivityEvent(OP.CLS_ACT, clazz, false);
@@ -541,21 +539,21 @@ public class FTAutoTrack {
      */
     public static void clickView(Class<?> clazz, String currentPage, String rootPage, String vtp) {
         LogUtils.showAlias("当前点击事件的 vtp 值为:" + vtp);
-        if (!FTAutoTrackConfig.get().isAutoTrack()) {
+        if (!FTAutoTrackConfigManager.get().isAutoTrack()) {
             return;
         }
-        if (!FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_CLICK)) {
-            return;
-        }
-
-        if (!FTAutoTrackConfig.get().isOnlyAutoTrackActivity(clazz)) {
+        if (!FTAutoTrackConfigManager.get().enableAutoTrackType(FTAutoTrackType.APP_CLICK)) {
             return;
         }
 
-        if (FTAutoTrackConfig.get().disableAutoTrackType(FTAutoTrackType.APP_CLICK)) {
+        if (!FTAutoTrackConfigManager.get().isOnlyAutoTrackActivity(clazz)) {
             return;
         }
-        if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)) {
+
+        if (FTAutoTrackConfigManager.get().disableAutoTrackType(FTAutoTrackType.APP_CLICK)) {
+            return;
+        }
+        if (FTAutoTrackConfigManager.get().isIgnoreAutoTrackActivity(clazz)) {
             return;
         }
         putClickEvent(OP.CLK, currentPage, rootPage, vtp);
@@ -572,26 +570,26 @@ public class FTAutoTrack {
      */
     public static void clickView(View view, Class<?> clazz, String currentPage, String rootPage, String vtp) {
         LogUtils.showAlias("当前点击事件的 vtp 值为:" + vtp);
-        if (!FTAutoTrackConfig.get().isAutoTrack()) {
+        if (!FTAutoTrackConfigManager.get().isAutoTrack()) {
             return;
         }
-        if (!FTAutoTrackConfig.get().enableAutoTrackType(FTAutoTrackType.APP_CLICK)) {
+        if (!FTAutoTrackConfigManager.get().enableAutoTrackType(FTAutoTrackType.APP_CLICK)) {
             return;
         }
-        if (!FTAutoTrackConfig.get().isOnlyAutoTrackActivity(clazz)) {
+        if (!FTAutoTrackConfigManager.get().isOnlyAutoTrackActivity(clazz)) {
             return;
         }
-        if (!FTAutoTrackConfig.get().isOnlyView(view)) {
+        if (!FTAutoTrackConfigManager.get().isOnlyView(view)) {
             return;
         }
 
-        if (FTAutoTrackConfig.get().disableAutoTrackType(FTAutoTrackType.APP_CLICK)) {
+        if (FTAutoTrackConfigManager.get().disableAutoTrackType(FTAutoTrackType.APP_CLICK)) {
             return;
         }
-        if (FTAutoTrackConfig.get().isIgnoreAutoTrackActivity(clazz)) {
+        if (FTAutoTrackConfigManager.get().isIgnoreAutoTrackActivity(clazz)) {
             return;
         }
-        if (FTAutoTrackConfig.get().isIgnoreView(view)) {
+        if (FTAutoTrackConfigManager.get().isIgnoreView(view)) {
             return;
         }
         putClickEvent(OP.CLK, currentPage, rootPage, vtp);
@@ -736,8 +734,7 @@ public class FTAutoTrack {
      * 记录应用登陆时效
      */
     public static void putRUMLaunchPerformance(boolean isCold, long duration) {
-        if (!Utils.enableTraceSamplingRate()) return;
-        RUMGlobalManager.getInstance().addAction(
+        FTRUMGlobalManager.getInstance().addAction(
                 isCold ? "app cold start" : "app hot start", isCold ? "launch_cold" : "launch_hot", duration);
     }
 
@@ -745,8 +742,7 @@ public class FTAutoTrack {
      * 记录页面加载性能
      */
     public static void putRUMViewLoadPerformance(String viewName, long loadTime) {
-        if (!Utils.enableTraceSamplingRate()) return;
-        RUMGlobalManager.getInstance().onCreateView(viewName, loadTime);
+        FTRUMGlobalManager.getInstance().onCreateView(viewName, loadTime);
     }
 
 
@@ -754,7 +750,6 @@ public class FTAutoTrack {
      * 资源加载性能
      */
     public static void putRUMResourcePerformance(ResourceBean bean) {
-        if (!Utils.enableTraceSamplingRate()) return;
         long time = Utils.getCurrentNanoTime();
         try {
             JSONObject tags = getRUMPublicTags();
@@ -878,7 +873,6 @@ public class FTAutoTrack {
      * @param log
      */
     public static void putRUMuiBlock(String log, long duration) {
-        if (!Utils.enableTraceSamplingRate()) return;
         long time = Utils.getCurrentNanoTime();
         putFreeze(time, log, duration);
     }
@@ -889,7 +883,6 @@ public class FTAutoTrack {
      * @param log
      */
     public static void putRUMAnr(String log, long dateline) {
-        if (!Utils.enableTraceSamplingRate()) return;
         putFreeze(dateline, log, -1);
 
     }
@@ -902,9 +895,6 @@ public class FTAutoTrack {
      * @param state
      */
     public static void putRUMError(String log, String message, long dateline, ErrorType errorType, AppState state) {
-
-        if (!Utils.enableTraceSamplingRate()) return;
-
         try {
             JSONObject tags = getRUMPublicTags();
             JSONObject fields = new JSONObject();
@@ -927,13 +917,13 @@ public class FTAutoTrack {
                 tags.put(Constants.KEY_DEVICE_CARRIER, DeviceUtils.getCarrier(FTApplication.getApplication()));
                 tags.put(Constants.KEY_DEVICE_LOCALE, Locale.getDefault());
 
-                if (FTMonitorConfig.get().isMonitorType(MonitorType.MEMORY)) {
+                if (FTMonitorConfigManager.get().isMonitorType(MonitorType.MEMORY)) {
                     double[] memory = DeviceUtils.getRamData(FTApplication.getApplication());
                     tags.put(Constants.KEY_MEMORY_TOTAL, memory[0] + "GB");
                     fields.put(Constants.KEY_MEMORY_USE, memory[1]);
                 }
 
-                if (FTMonitorConfig.get().isMonitorType(MonitorType.CPU)) {
+                if (FTMonitorConfigManager.get().isMonitorType(MonitorType.CPU)) {
                     fields.put(Constants.KEY_CPU_USE, DeviceUtils.getCpuUseRate());
                 }
 
@@ -973,7 +963,6 @@ public class FTAutoTrack {
      * @param duration
      */
     private static void putClientTimeCost(long time, long duration) {
-        if (!Utils.enableTraceSamplingRate()) return;
         try {
             JSONObject tags = new JSONObject();
             JSONObject fields = new JSONObject();
@@ -993,19 +982,19 @@ public class FTAutoTrack {
     static JSONObject getRUMPublicTags() {
         JSONObject tags = new JSONObject();
         try {
-            tags.put(Constants.KEY_RUM_APP_ID, FTRUMConfig.get().getAppId());
+            tags.put(Constants.KEY_RUM_APP_ID, FTRUMConfigManager.getInstance().getConfig().getRumAppId());
             tags.put(Constants.KEY_RUM_SDK_NAME, Constants.SDK_NAME);
-            tags.put(Constants.KEY_RUM_ENV, FTRUMConfig.get().getEnvType().toString());
+            tags.put(Constants.KEY_RUM_ENV, FTSdk.get().getBaseConfig().getEnv().toString());
             tags.put(Constants.KEY_RUM_NETWORK_TYPE, NetUtils.get().getNetWorkStateName());
-            tags.put(Constants.KEY_RUM_IS_SIGNIN, FTUserConfig.get().isUserDataBinded() ? "T" : "F");
-            if (FTUserConfig.get().isUserDataBinded()) {
-                tags.put(Constants.KEY_RUM_USER_ID, FTUserConfig.get().getUserData().getId());
+            tags.put(Constants.KEY_RUM_IS_SIGNIN, FTRUMConfigManager.getInstance().isUserDataBinded() ? "T" : "F");
+            if (FTRUMConfigManager.getInstance().isUserDataBinded() ) {
+                tags.put(Constants.KEY_RUM_USER_ID, FTRUMConfigManager.getInstance().getUserData().getId());
             } else {
-                tags.put(Constants.KEY_RUM_USER_ID, RUMGlobalManager.getInstance().getSessionId());
+                tags.put(Constants.KEY_RUM_USER_ID, FTRUMGlobalManager.getInstance().getSessionId());
             }
 
             String uuid = "";
-            if (FTHttpConfig.get().useOaid) {
+            if (FTHttpConfigManager.get().useOaid) {
                 String oaid = OaidUtils.getOAID(FTApplication.getApplication());
                 if (oaid != null) {
                     uuid = "oaid_" + oaid;
@@ -1046,7 +1035,7 @@ public class FTAutoTrack {
             case CLK:
                 event = Constants.EVENT_NAME_CLICK;
 
-                RUMGlobalManager.getInstance().startAction(vtp + " click", event);
+                FTRUMGlobalManager.getInstance().startAction(vtp + " click", event);
                 break;
             case LANC:
                 event = Constants.EVENT_NAME_LAUNCH;
@@ -1054,13 +1043,13 @@ public class FTAutoTrack {
             case OPEN_ACT:
 //            case OPEN_FRA:
                 event = Constants.EVENT_NAME_ENTER;
-                RUMGlobalManager.getInstance().startView(currentPage, parentPage);
+                FTRUMGlobalManager.getInstance().startView(currentPage, parentPage);
                 break;
             case CLS_ACT:
 //            case CLS_FRA:
                 event = Constants.EVENT_NAME_LEAVE;
 //                RUMGlobalManager.getInstance().startAction(event);
-                RUMGlobalManager.getInstance().stopView();
+                FTRUMGlobalManager.getInstance().stopView();
                 break;
             case OPEN:
                 event = Constants.EVENT_NAME_OPEN;
@@ -1202,11 +1191,12 @@ public class FTAutoTrack {
      */
     public static OkHttpClient trackOkHttpBuilder(OkHttpClient.Builder builder) {
         FTNetWorkInterceptor interceptor = new FTNetWorkInterceptor();
-        if (FTHttpConfig.get().networkTrace || FTRUMConfig.get().isRumEnable()) {
+        if (FTTraceConfigManager.getInstance().getConfig().isNetworkTrace()
+                || FTRUMConfigManager.getInstance().isRumEnable()) {
             builder.addInterceptor(interceptor);
 //            builder.addNetworkInterceptor(interceptor); //发现部分工程有兼容问题
         }
-        if (FTRUMConfig.get().isRumEnable()) {
+        if (FTRUMConfigManager.getInstance().isRumEnable()) {
             builder.eventListener(interceptor);
         }
         return builder.build();
@@ -1221,7 +1211,7 @@ public class FTAutoTrack {
      */
     public static CloseableHttpClient trackHttpClientBuilder(HttpClientBuilder builder) {
         FTHttpClientInterceptor interceptor = new FTHttpClientInterceptor();
-        if (FTHttpConfig.get().networkTrace) {
+        if (FTTraceConfigManager.getInstance().getConfig().isNetworkTrace()) {
             builder.addRequestInterceptorFirst(new FTHttpClientRequestInterceptor(interceptor));
             builder.addResponseInterceptorLast(new FTHttpClientResponseInterceptor(interceptor));
         }

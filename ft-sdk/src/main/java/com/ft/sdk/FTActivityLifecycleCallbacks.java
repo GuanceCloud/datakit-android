@@ -8,7 +8,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.ft.sdk.garble.FTFragmentManager;
-import com.ft.sdk.garble.FTRUMConfig;
 import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.Utils;
 
@@ -47,7 +46,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     @Override
     public void onActivityPostCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
         mAppRestartCallback.onPostOnCreate();
-        if (FTRUMConfig.get().isRumEnable()) {
+        if (FTRUMConfigManager.getInstance().isRumEnable()) {
 
             Long startTime = mCreateMap.get(activity);
             if (startTime != null) {

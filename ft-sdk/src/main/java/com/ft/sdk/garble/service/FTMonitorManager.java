@@ -1,6 +1,6 @@
 package com.ft.sdk.garble.service;
 
-import com.ft.sdk.garble.FTMonitorConfig;
+import com.ft.sdk.garble.FTMonitorConfigManager;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.http.ResponseData;
@@ -43,7 +43,7 @@ public class FTMonitorManager {
      * 开启监控
      */
     public void startMonitor() {
-        if (FTMonitorConfig.get().getMonitorType() == 0) {
+        if (FTMonitorConfigManager.get().getMonitorType() == 0) {
             LogUtils.e(TAG, "没有设置监控项，无法启用监控");
         } else {
             mThread = new MonitorThread("监控轮训", period);

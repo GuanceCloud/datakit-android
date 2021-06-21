@@ -2,7 +2,6 @@ package com.ft.sdk.garble.bean;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.garble.FTUserConfig;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.FloatDoubleJsonUtils;
 import com.ft.sdk.garble.utils.Utils;

@@ -4,21 +4,14 @@ import android.app.Application;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.garble.FTAliasConfig;
-import com.ft.sdk.garble.FTAutoTrackConfig;
+import com.ft.sdk.garble.FTAutoTrackConfigManager;
 import com.ft.sdk.garble.FTDBCachePolicy;
-import com.ft.sdk.garble.FTUserActionConfig;
-import com.ft.sdk.garble.FTHttpConfig;
-import com.ft.sdk.garble.FTMonitorConfig;
-import com.ft.sdk.garble.FTRUMConfig;
-import com.ft.sdk.garble.FTUserConfig;
+import com.ft.sdk.garble.FTHttpConfigManager;
+import com.ft.sdk.garble.FTMonitorConfigManager;
 import com.ft.sdk.garble.utils.LocationUtils;
 import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.sdk.garble.utils.PackageUtils;
 import com.ft.sdk.garble.utils.Utils;
-import com.ft.sdk.nativelib.NativeEngineInit;
 
-import java.io.File;
 import java.security.InvalidParameterException;
 
 
@@ -39,8 +32,7 @@ public class FTSdk {
     public static final String AGENT_VERSION = BuildConfig.FT_SDK_VERSION;//当前SDK 版本
     public static final String PLUGIN_MIN_VERSION = BuildConfig.MIN_FT_PLUGIN_VERSION; //当前 SDK 支持的最小 Plugin 版本
     private static FTSdk mFtSdk;
-    public FTSDKConfig mFtSDKConfig;
-    private FTActivityLifecycleCallbacks life;
+    private FTSDKConfig mFtSDKConfig;
 
     private FTSdk(@NonNull FTSDKConfig ftSDKConfig) {
         this.mFtSDKConfig = ftSDKConfig;
@@ -62,7 +54,6 @@ public class FTSdk {
                 throw new InitSDKProcessException("当前 SDK 只能在主进程中运行，如果想要在非主进程中运行可以设置 FTSDKConfig.setOnlySupportMainProcess(false)");
             }
         }
-        mFtSdk.registerActivityLifeCallback();
         mFtSdk.initFTConfig();
     }
 
@@ -83,16 +74,15 @@ public class FTSdk {
      */
     public void shutDown() {
         SyncTaskManager.release();
-        FTUserConfig.release();
-        FTMonitorConfig.release();
-        FTAutoTrackConfig.release();
-        FTHttpConfig.release();
+        FTRUMConfigManager.getInstance().release();
+        FTMonitorConfigManager.release();
+        FTAutoTrackConfigManager.release();
+        FTHttpConfigManager.release();
         FTNetworkListener.get().release();
-        FTUserActionConfig.release();
         LocationUtils.get().stopListener();
         FTExceptionHandler.release();
         FTDBCachePolicy.release();
-        unregisterActivityLifeCallback();
+        FTRUMConfigManager.getInstance().unregisterActivityLifeCallback();
         LogUtils.w(TAG, "FT SDK 已经被关闭");
     }
 
@@ -108,35 +98,6 @@ public class FTSdk {
     /**
      * 注销用户信息
      */
-    public void unbindUserData() {
-        if (mFtSDKConfig != null) {
-            LogUtils.d(TAG, "解绑用户信息");
-            //解绑用户信息
-            FTUserConfig.get().unbindUserData();
-            //清除本地缓存的SessionId
-        }
-    }
-
-    /**
-     * 绑定用户信息
-     *
-     * @param id
-     */
-    public void bindUserData(@NonNull String id) {
-        if (mFtSDKConfig != null) {
-//            if (mFtSDKConfig.isNeedBindUser()) {
-            LogUtils.d(TAG, "绑定用户信息");
-//            //如果本地的SessionID已经绑定了用于就重新生成sessionId进行绑定
-//            if (FTUserConfig.get().currentSessionHasUser()) {
-//                FTUserConfig.get().clearSessionId();
-//            }
-//            //初始化SessionId
-            FTUserConfig.get().initRandomUserId();
-//            //绑定用户信息
-            FTUserConfig.get().bindUserData("", id, null);
-//            }
-        }
-    }
 
 //    /**
 //     * 开启定，并且获取定位结果
@@ -185,97 +146,16 @@ public class FTSdk {
      * 初始化SDK本地配置数据
      */
     private void initFTConfig() {
-        if (mFtSDKConfig != null) {
-            LogUtils.setDebug(mFtSDKConfig.isDebug());
-            RUMGlobalManager.getInstance().init();
+        LogUtils.setDebug(mFtSDKConfig.isDebug());
+        FTHttpConfigManager.get().initParams(mFtSDKConfig);
+        FTNetworkListener.get().monitor();
 //            LogUtils.setDescLogShow(mFtSDKConfig.isDescLog());
-            FTAliasConfig.get().initParams(mFtSDKConfig);
-            FTHttpConfig.get().initParams(mFtSDKConfig);
-            FTAutoTrackConfig.get().initParams(mFtSDKConfig);
-            FTDBCachePolicy.get().initParam(mFtSDKConfig);
-            FTRUMConfig.get().initParam(mFtSDKConfig);
-            FTUserConfig.get().initRandomUserId();
-            FTNetworkListener.get().monitor();
-            if (mFtSDKConfig.isEnableTraceUserAction()) {
-                FTUserActionConfig.get().initParams(mFtSDKConfig);
-            }
-
-            float rate = mFtSDKConfig.getSamplingRate();
-            if (rate > 1 || rate < 0) {
-                throw new
-                        IllegalArgumentException("rate 值的范围应在[0,1]");
-            }
-            //设置采样率
-            Utils.traceSamplingRate = rate;
-            FTExceptionHandler.get().initParams(mFtSDKConfig);
-            FTMonitorConfig.get().initParams(mFtSDKConfig);
-            FTUIBlockManager.start(mFtSDKConfig);
-
-            initNativeDump();
-
-        }
     }
 
-    /**
-     * 初始化 Native 路径
-     */
-    private void initNativeDump() {
-        boolean isNativeLibSupport = PackageUtils.isNativeLibrarySupport();
 
-        if (isNativeLibSupport) {
-            NATIVE_VERSION = com.ft.sdk.nativelib.BuildConfig.VERSION_NAME;
-        }
 
-        boolean enableTrackAppCrash = mFtSDKConfig.isEnableTrackAppCrash();
-        boolean enableTrackAppANR = mFtSDKConfig.isEnableTrackAppANR();
-        if (enableTrackAppCrash || enableTrackAppANR) {
-            if (!isNativeLibSupport) {
-                LogUtils.e(TAG, "未启动 native 崩溃收集");
-                return;
-            }
-
-            Application application = FTApplication.getApplication();
-            File crashFilePath = new File(application.getFilesDir(), NATIVE_DUMP_PATH);
-            if (!crashFilePath.exists()) {
-                crashFilePath.mkdirs();
-            }
-
-            String filePath = crashFilePath.toString();
-            NativeEngineInit.init(application, filePath, enableTrackAppCrash, enableTrackAppANR);
-            FTExceptionHandler.get().checkAndSyncPreDump(filePath);
-        }
-
-    }
-
-    /**
-     * 添加 Activity 生命周期监控
-     */
-    private void registerActivityLifeCallback() {
-        life = new FTActivityLifecycleCallbacks();
-        getApplication().registerActivityLifecycleCallbacks(life);
-    }
-
-    /**
-     * 解绑 Activity 生命周期监控
-     */
-    private void unregisterActivityLifeCallback() {
-        if (life != null) {
-            getApplication().unregisterActivityLifecycleCallbacks(life);
-            life = null;
-        }
-    }
-
-    /**
-     * 设置开启网络请求追踪
-     *
-     * @param networkTrace
-     */
-    public void setNetworkTrace(boolean networkTrace) {
-        if (mFtSDKConfig == null) {
-            throw new InvalidParameterException("需要预先调用 install ");
-        }
-        mFtSDKConfig.setNetworkTrace(networkTrace);
-        FTHttpConfig.get().networkTrace = networkTrace;
+    public FTSDKConfig getBaseConfig() {
+        return mFtSDKConfig;
     }
 
 

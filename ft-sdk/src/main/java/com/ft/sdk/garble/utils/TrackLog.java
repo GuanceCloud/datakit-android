@@ -2,7 +2,9 @@ package com.ft.sdk.garble.utils;
 
 import android.util.Log;
 
-import com.ft.sdk.FTExceptionHandler;
+import com.ft.sdk.FTLoggerConfig;
+import com.ft.sdk.FTLoggerConfigManager;
+import com.ft.sdk.FTSdk;
 import com.ft.sdk.TrackLogManager;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.Status;
@@ -69,11 +71,12 @@ public class TrackLog {
     }
 
     public static int println(boolean upload, int priority, String tag, String msg) {
-        if (upload && FTExceptionHandler.get().isTrackConsoleLog()) {
+        FTLoggerConfig config = FTLoggerConfigManager.getInstance().getConfig();
+        if (upload && config != null && config.isEnableConsoleLog()) {
             LogBean logBean = new LogBean(Utils.translateFieldValue(Utils.getCurrentTimeStamp() + " " + getLevelMark(priority) + "/" + tag + ":" + msg), Utils.getCurrentNanoTime());
-            logBean.setServiceName(FTExceptionHandler.get().getTrackServiceName());
+            logBean.setServiceName(config.getServiceName());
             logBean.setStatus(getStatus(priority));
-            logBean.setEnv(FTExceptionHandler.get().getEnv());
+            logBean.setEnv(FTSdk.get().getBaseConfig().getEnv());
             TrackLogManager.get().trackLog(logBean);
         }
         return Log.println(priority, tag, msg);

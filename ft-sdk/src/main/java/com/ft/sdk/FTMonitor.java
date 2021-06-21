@@ -7,7 +7,7 @@ import android.os.Message;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.garble.FTMonitorConfig;
+import com.ft.sdk.garble.FTMonitorConfigManager;
 import com.ft.sdk.garble.service.MonitorService;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -23,9 +23,8 @@ public class FTMonitor {
     //轮训周期，默认10秒
     private int period = 10;
     //监控类型
-    private boolean useGeoKey;
-    private String geoKey;
     private static FTMonitor instance;
+    private FTRUMConfig config;
     private Intent intent;
     private boolean isError;
     private boolean isTrying;
@@ -33,12 +32,12 @@ public class FTMonitor {
     private static final int MAX_COUNT = 3;
     private int errorCount = 0;
 
-    private Handler handler = new Handler(Looper.getMainLooper()) {
+    private final Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             if (msg.what == MSG_RETRY) {
-                start();
+                start(config);
             }
         }
     };
@@ -61,7 +60,7 @@ public class FTMonitor {
     }
 
     public FTMonitor setMonitorType(int monitorType) {
-        FTMonitorConfig.get().setMonitorType(monitorType);
+        FTMonitorConfigManager.get().setMonitorType(monitorType);
         return this;
     }
 
@@ -77,15 +76,17 @@ public class FTMonitor {
 //        return this;
 //    }
 
-    public void start() {
+    public void start(FTRUMConfig config) {
+        this.config = config;
         boolean onlyMain = true;
         try {
-            onlyMain = FTSdk.get().mFtSDKConfig.isOnlySupportMainProcess();
-        }catch (Exception e){ }
-        if (onlyMain && !Utils.isMainProcess()){
+            onlyMain = FTSdk.get().getBaseConfig().isOnlySupportMainProcess();
+        } catch (Exception e) {
+        }
+        if (onlyMain && !Utils.isMainProcess()) {
             throw new InitSDKProcessException("当前 SDK 只能在主进程中运行，如果想要在非主进程中运行可以设置 FTSDKConfig.setOnlySupportMainProcess(false)");
         }
-        FTMonitorConfig.get().initParams();
+        FTMonitorConfigManager.get().initWithConfig(config);
         if (intent == null) {
             intent = new Intent(FTApplication.getApplication(), MonitorService.class);
         }
@@ -107,12 +108,12 @@ public class FTMonitor {
         handler.removeMessages(MSG_RETRY);
         if (errorCount < MAX_COUNT) {
             errorCount++;
-            LogUtils.e(TAG,"MonitorService 启动失败，10 秒后重新尝试 ==> " + errorCount);
+            LogUtils.e(TAG, "MonitorService 启动失败，10 秒后重新尝试 ==> " + errorCount);
             handler.sendEmptyMessageDelayed(MSG_RETRY, 10000);
 
         } else {
             isTrying = false;
-            LogUtils.e(TAG,"MonitorService 停止尝试");
+            LogUtils.e(TAG, "MonitorService 停止尝试");
         }
     }
 
@@ -128,7 +129,7 @@ public class FTMonitor {
             intent.putExtra("command", MonitorService.STOP_CMD);
             FTApplication.getApplication().stopService(intent);
         }
-        FTMonitorConfig.get().release();
+        FTMonitorConfigManager.get().release();
         instance = null;
     }
 }

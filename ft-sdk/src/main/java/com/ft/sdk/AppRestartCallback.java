@@ -6,7 +6,6 @@ import android.os.Message;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.garble.FTRUMConfig;
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.manager.FTMainLoopLogMonitor;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -55,7 +54,7 @@ class AppRestartCallback {
     }
 
     public void onPostOnCreate() {
-        if (FTRUMConfig.get().isRumEnable()) {
+        if (FTRUMConfigManager.getInstance().isRumEnable()) {
             if (!mInited) {
                 long now = Utils.getCurrentNanoTime();
                 FTActivityManager.get().setAppState(AppState.RUN);
@@ -68,7 +67,7 @@ class AppRestartCallback {
     public void onPostResume() {
         if (alreadySleep) {
             if (mInited) {
-                if (FTRUMConfig.get().isRumEnable()) {
+                if (FTRUMConfigManager.getInstance().isRumEnable()) {
                     if (startTime > 0) {
                         long now = Utils.getCurrentNanoTime();
                         FTAutoTrack.putRUMLaunchPerformance(false, now - startTime);

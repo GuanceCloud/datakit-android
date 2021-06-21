@@ -1,7 +1,6 @@
 package com.ft.sdk;
 
 import com.ft.sdk.garble.bean.BaseContentBean;
-import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.LogData;
 import com.ft.sdk.garble.bean.Status;
@@ -26,6 +25,12 @@ public class FTLogger {
         return SingletonHolder.INSTANCE;
     }
 
+    private FTLoggerConfig config;
+
+    void init(FTLoggerConfig config) {
+        this.config = config;
+    }
+
 
     /**
      * 将单条日志数据存入本地同步
@@ -34,10 +39,12 @@ public class FTLogger {
      * @param status
      */
     public void logBackground(String content, Status status) {
+        if (config.isEnableCustomLog())
+            return;
         LogBean logBean = new LogBean(Utils.translateFieldValue(content), Utils.getCurrentNanoTime());
-        logBean.setServiceName(FTExceptionHandler.get().getTrackServiceName());
+        logBean.setServiceName(config.getServiceName());
         logBean.setStatus(status);
-        logBean.setEnv(FTExceptionHandler.get().getEnv());
+        logBean.setEnv(FTSdk.get().getBaseConfig().getEnv());
         FTTrackInner.getInstance().logBackground(logBean);
     }
 
@@ -47,18 +54,19 @@ public class FTLogger {
      * @param logDataList
      */
     public void logBackground(List<LogData> logDataList) {
-        if (logDataList == null) {
+        if (logDataList == null || !config.isEnableCustomLog()) {
             return;
         }
         List<BaseContentBean> logBeans = new ArrayList<>();
         for (LogData logData : logDataList) {
-            LogBean logBean = new LogBean(Utils.translateFieldValue(logData.getContent()), Utils.getCurrentNanoTime());
-            logBean.setServiceName(FTExceptionHandler.get().getTrackServiceName());
+            LogBean logBean = new LogBean(Utils.translateFieldValue(logData.getContent()),
+                    Utils.getCurrentNanoTime());
+            logBean.setServiceName(config.getServiceName());
             logBean.setStatus(logData.getStatus());
-            logBean.setEnv(FTExceptionHandler.get().getEnv());
+            logBean.setEnv(FTSdk.get().getBaseConfig().getEnv());
             logBeans.add(logBean);
         }
-        FTTrackInner.getInstance().batchLogBeanBackground(logBeans, DataType.LOG);
+        FTTrackInner.getInstance().batchLogBeanBackground(logBeans);
     }
 
 

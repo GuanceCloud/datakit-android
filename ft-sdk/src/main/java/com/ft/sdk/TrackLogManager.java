@@ -3,7 +3,6 @@ package com.ft.sdk;
 
 import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.bean.BaseContentBean;
-import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -71,7 +70,7 @@ public class TrackLogManager {
                     isRunning = true;
                     logBeanList.add(logBean);//取出数据放到集合中
                     if (logBeanList.size() >= 20 || logQueue.peek() == null) {//当取出的数据大于等于20条或者没有下一条数据时执行插入数据库操作
-                        FTTrackInner.getInstance().batchLogBeanBackground(logBeanList, DataType.LOG);
+                        FTTrackInner.getInstance().batchLogBeanBackground(logBeanList);
                         logBeanList.clear();//插入完成后执行清除集合操作
                     }
                 }

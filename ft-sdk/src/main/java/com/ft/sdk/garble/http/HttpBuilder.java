@@ -1,6 +1,6 @@
 package com.ft.sdk.garble.http;
 
-import com.ft.sdk.garble.FTHttpConfig;
+import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
 import com.ft.sdk.garble.utils.Utils;
 
@@ -19,8 +19,8 @@ public class HttpBuilder {
     private RequestMethod method;
     private String bodyString;
     private HashMap<String, Object> params = new HashMap<>();
-    private int sendOutTime = FTHttpConfig.get().sendOutTime;
-    private int readOutTime = FTHttpConfig.get().readOutTime;
+    private int sendOutTime = FTHttpConfigManager.get().sendOutTime;
+    private int readOutTime = FTHttpConfigManager.get().readOutTime;
     private boolean useDefaultHead = true;
     private boolean showLog = true;
     private HashMap<String, String> headParams = new HashMap<>();
@@ -31,7 +31,7 @@ public class HttpBuilder {
 
     public String getHost() {
         if (host == null) {
-            host = FTHttpConfig.get().serverUrl;
+            host = FTHttpConfigManager.get().serverUrl;
         }
         return host;
     }
@@ -108,13 +108,13 @@ public class HttpBuilder {
 
     public HttpBuilder setSendOutTime(int time) {
         this.sendOutTime = time;
-        FTHttpConfig.get().sendOutTime = time;
+        FTHttpConfigManager.get().sendOutTime = time;
         return this;
     }
 
     public HttpBuilder setReadOutTime(int time) {
         this.readOutTime = time;
-        FTHttpConfig.get().readOutTime = time;
+        FTHttpConfigManager.get().readOutTime = time;
         return this;
     }
 

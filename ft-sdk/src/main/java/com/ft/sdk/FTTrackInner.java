@@ -17,6 +17,7 @@ import com.ft.sdk.garble.manager.SyncDataHelper;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
+import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONObject;
 
@@ -58,16 +59,19 @@ public class FTTrackInner {
     void rum(long time, String measurement, final JSONObject tags, JSONObject fields) {
         switch (measurement) {
             case Constants.FT_MEASUREMENT_RUM_ERROR:
-                RUMGlobalManager.getInstance().attachRUMRelative(tags);
-                RUMGlobalManager.getInstance().increaseError(tags);
+                FTRUMGlobalManager.getInstance().attachRUMRelative(tags);
+                FTRUMGlobalManager.getInstance().increaseError(tags);
                 break;
             case Constants.FT_MEASUREMENT_RUM_LONG_TASK:
-                RUMGlobalManager.getInstance().attachRUMRelative(tags);
-                RUMGlobalManager.getInstance().increaseLongTask(tags);
+                FTRUMGlobalManager.getInstance().attachRUMRelative(tags);
+                FTRUMGlobalManager.getInstance().increaseLongTask(tags);
                 break;
         }
 
-        syncDataBackground(DataType.RUM_APP, time, measurement, tags, fields);
+        String sessionId = tags.optString(Constants.KEY_RUM_SESSION_ID);
+        if (FTRUMGlobalManager.getInstance().checkSessionWillCollect(sessionId)) {
+            syncDataBackground(DataType.RUM_APP, time, measurement, tags, fields);
+        }
     }
 
     /**
@@ -179,7 +183,7 @@ public class FTTrackInner {
     void traceBackground(@NonNull BaseContentBean logBean) {
         ArrayList<BaseContentBean> list = new ArrayList<>();
         list.add(logBean);
-        batchLogBeanBackground(list, DataType.TRACE);
+        batchTraceBeanBackground(list);
     }
 
 
@@ -191,7 +195,7 @@ public class FTTrackInner {
     void logBackground(@NonNull LogBean logBean) {
         ArrayList<BaseContentBean> list = new ArrayList<>();
         list.add(logBean);
-        batchLogBeanBackground(list, DataType.LOG);
+        batchLogBeanBackground(list);
     }
 
     /**
@@ -199,11 +203,25 @@ public class FTTrackInner {
      *
      * @param logBeans
      */
-    void batchLogBeanBackground(@NonNull List<BaseContentBean> logBeans, DataType dataType) {
+    void batchLogBeanBackground(@NonNull List<BaseContentBean> logBeans) {
+        FTLoggerConfig config = FTLoggerConfigManager.getInstance().getConfig();
+        if (config == null) return;
+
+        JSONObject rumTags = null;
+        if (config.isEnableLinkRumData()) {
+            rumTags = FTAutoTrack.getRUMPublicTags();
+            FTRUMGlobalManager.getInstance().attachRUMRelative(rumTags);
+        }
+
         ArrayList<SyncJsonData> datas = new ArrayList<>();
         for (BaseContentBean logBean : logBeans) {
             try {
-                datas.add(SyncJsonData.getFromLogBean(logBean, dataType));
+                if (Utils.enableTraceSamplingRate(config.getSamplingRate())) {
+                    if (rumTags != null) {
+                        logBean.setTags(rumTags);
+                    }
+                    datas.add(SyncJsonData.getFromLogBean(logBean, DataType.LOG));
+                }
             } catch (Exception e) {
                 LogUtils.e(TAG, e.getMessage());
             }
@@ -212,18 +230,19 @@ public class FTTrackInner {
         judgeLogCachePolicy(datas);
     }
 
+    void batchTraceBeanBackground(@NonNull List<BaseContentBean> logBeans) {
+        ArrayList<SyncJsonData> datas = new ArrayList<>();
+        for (BaseContentBean logBean : logBeans) {
+            try {
+                datas.add(SyncJsonData.getFromLogBean(logBean, DataType.TRACE));
+            } catch (Exception e) {
+                LogUtils.e(TAG, e.getMessage());
+            }
 
-    /**
-     * 判断是否需要执行同步策略
-     *
-     * @param data
-     */
-    private void judgeLogCachePolicy(SyncJsonData data) {
-        List<SyncJsonData> list = new ArrayList<>();
-        list.add(data);
-        judgeLogCachePolicy(list);
-
+        }
+        FTManager.getFTDBManager().insertFtOptList(datas);
     }
+
 
     /**
      * 判断是否需要执行同步策略

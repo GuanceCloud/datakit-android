@@ -5,10 +5,12 @@ import android.content.Context;
 import android.location.Address;
 
 import com.ft.sdk.FTApplication;
+import com.ft.sdk.FTLoggerConfig;
+import com.ft.sdk.FTLoggerConfigManager;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
-import com.ft.sdk.garble.FTHttpConfig;
-import com.ft.sdk.garble.FTMonitorConfig;
+import com.ft.sdk.garble.FTHttpConfigManager;
+import com.ft.sdk.garble.FTMonitorConfigManager;
 import com.ft.sdk.garble.bean.BatteryBean;
 import com.ft.sdk.garble.bean.CameraPx;
 import com.ft.sdk.garble.bean.DataType;
@@ -62,8 +64,10 @@ public class SyncDataHelper {
         String bodyContent;
         if (dataType == DataType.OBJECT) {
             bodyContent = getObjectBodyContent(recordDatas);
-        } else if (dataType == DataType.LOG || dataType == DataType.TRACE) {
-            bodyContent = getLogAndTraceBodyContent(recordDatas);
+        } else if (dataType == DataType.LOG) {
+            bodyContent = getLogBodyContent(recordDatas);
+        } else if (dataType == DataType.TRACE) {
+            bodyContent = getTraceBodyContent(recordDatas);
         } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_WEBVIEW) {
             bodyContent = getRumBodyContent(recordDatas);
         } else {
@@ -97,12 +101,29 @@ public class SyncDataHelper {
     }
 
     /**
-     * 获取 日志类型数据
+     * 获取 log 类型数据
      *
      * @param datas
      * @return
      */
-    private String getLogAndTraceBodyContent(List<SyncJsonData> datas) {
+    private String getLogBodyContent(List<SyncJsonData> datas) {
+        FTLoggerConfig loggerConfig = FTLoggerConfigManager.getInstance().getConfig();
+        //全局设置改变
+        if (loggerConfig != null && loggerConfig.isEnableLinkRumData()) {
+            HashMap<String, Object> hashMap = getRumPublicTags();
+            hashMap.putAll(getBaseDeviceInfoTagsMap());
+        }
+        return convertToLineProtocolLines(datas);
+    }
+
+
+    /**
+     * 获取 trace 类型数据
+     *
+     * @param datas
+     * @return
+     */
+    private String getTraceBodyContent(List<SyncJsonData> datas) {
         return convertToLineProtocolLines(datas);
     }
 
@@ -300,15 +321,15 @@ public class SyncDataHelper {
      */
     public static void addMonitorData(JSONObject tags, JSONObject fields) {
         try {
-            if (FTMonitorConfig.get().isMonitorType(MonitorType.BATTERY)) {
+            if (FTMonitorConfigManager.get().isMonitorType(MonitorType.BATTERY)) {
                 //电池
                 createBattery(tags, fields);
             }
-            if (FTMonitorConfig.get().isMonitorType(MonitorType.MEMORY)) {
+            if (FTMonitorConfigManager.get().isMonitorType(MonitorType.MEMORY)) {
                 //内存
                 createMemory(tags, fields);
             }
-            if (FTMonitorConfig.get().isMonitorType(MonitorType.CPU)) {
+            if (FTMonitorConfigManager.get().isMonitorType(MonitorType.CPU)) {
                 //CPU
                 createCPU(tags, fields);
             }
@@ -653,7 +674,7 @@ public class SyncDataHelper {
         Context context = FTApplication.getApplication();
         HashMap<String, Object> objectHashMap = new HashMap<>();
         objectHashMap.put(Constants.KEY_DEVICE_UUID, DeviceUtils.getUuid(context));
-        if (FTHttpConfig.get().useOaid) {
+        if (FTHttpConfigManager.get().useOaid) {
             objectHashMap.put(Constants.KEY_DEVICE_OAID, OaidUtils.getOAID(context));
         }
         return objectHashMap;

@@ -56,19 +56,12 @@ public class LogBean extends BaseContentBean {
         try {
             tags.put("status", status.name);
 
-            if (!Utils.isNullOrEmpty(operationName)) {
-                tags.put("operation", operationName);
-            }
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
         return tags;
-    }
-
-    public void setOperationName(String operationName) {
-        this.operationName = operationName;
     }
 
     public void setDuration(long duration) {

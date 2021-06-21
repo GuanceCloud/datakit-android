@@ -1,6 +1,6 @@
 package com.ft.sdk.garble;
 
-import com.ft.sdk.FTSDKConfig;
+import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.LogCacheDiscard;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.db.FTDBManager;
@@ -28,8 +28,8 @@ public class FTDBCachePolicy {
         return instance;
     }
 
-    public void initParam(FTSDKConfig ftsdkConfig) {
-        this.logCacheDiscardStrategy = ftsdkConfig.getLogCacheDiscardStrategy();
+    public void initParam(FTLoggerConfig config) {
+        this.logCacheDiscardStrategy = config.getLogCacheDiscardStrategy();
     }
 
     public static void release() {

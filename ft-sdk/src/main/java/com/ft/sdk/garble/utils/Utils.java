@@ -52,8 +52,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * Description:
  */
 public class Utils {
-    public static double traceSamplingRate = 1;//采样率
-
     public static boolean isNullOrEmpty(String str) {
         return str == null || str.isEmpty();
     }
@@ -378,8 +376,8 @@ public class Utils {
      *
      * @return
      */
-    public static boolean enableTraceSamplingRate() {
-        return generateRandomNumber() <= traceSamplingRate * 100;
+    public static boolean enableTraceSamplingRate(float sampleRate) {
+        return generateRandomNumber() <= sampleRate * 100;
     }
 
     /**

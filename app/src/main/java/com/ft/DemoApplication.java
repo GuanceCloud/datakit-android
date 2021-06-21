@@ -4,8 +4,14 @@ import android.app.Application;
 import android.content.Context;
 
 import com.ft.sdk.EnvType;
+import com.ft.sdk.FTLoggerConfig;
+import com.ft.sdk.FTLoggerConfigManager;
+import com.ft.sdk.FTRUMConfig;
+import com.ft.sdk.FTRUMConfigManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
+import com.ft.sdk.FTTraceConfig;
+import com.ft.sdk.FTTraceConfigManager;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.TraceType;
 
@@ -35,23 +41,44 @@ public class DemoApplication extends Application {
     private void initFTSDK() {
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(this,
                 AccountUtils.ACCESS_SERVER_URL))
-                .setRumAppId(AccountUtils.getProperty(this, AccountUtils.RUM_APP_ID))
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setUseOAID(true)//设置 OAID 是否可用
                 .setDebug(true)//设置是否是 debug
-                .setMonitorType(MonitorType.ALL)//设置监控项
-                .setEnableTrackAppCrash(true)
-                .setEnableTrackAppANR(true)
-                .setEnableTrackAppUIBlock(true)
-                .setEnv(EnvType.GRAY)
-                .setSamplingRate(1f)
-                .setNetworkTrace(true)
-                .setTraceConsoleLog(true)
-                .setEnableTraceUserAction(true)
-                .setTraceType(TraceType.ZIPKIN);
+                .setEnv(EnvType.GRAY);
         FTSdk.install(ftSDKConfig);
 
-        FTSdk.get().bindUserData("brandon.test.userid");
+
+        FTRUMConfigManager.getInstance().initConfig(new FTRUMConfig()
+                .setSamplingRate(1f)
+                .setRumAppId(AccountUtils.getProperty(this, AccountUtils.RUM_APP_ID))
+                .setEnableTraceUserAction(true)
+                .setEnableTrackAppANR(true)
+                .setEnableTrackAppCrash(true)
+                .setEnableTrackAppUIBlock(true)
+                .setExtraMonitorTypeWithError(MonitorType.ALL)
+        );
+
+        FTRUMConfigManager.getInstance().bindUserData("brandon.test.userid");
+
+
+        FTLoggerConfigManager.getInstance()
+                .initConfig(new FTLoggerConfig()
+                        .setSamplingRate(1f)
+                        .setEnableLinkRumData(true)
+                        .setEnableCustomLog(true)
+                        .setEnableConsoleLog(true)
+                        .setEnableLinkRumData(true)
+                );
+
+        FTTraceConfigManager.getInstance().initConfig(new FTTraceConfig()
+                .setSamplingRate(1f)
+                .setNetworkTrace(true)
+                .setEnableLinkRUMData(true)
+                .setTraceType(TraceType.ZIPKIN)
+
+        );
+
+
     }
 
 }

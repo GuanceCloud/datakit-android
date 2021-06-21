@@ -1,6 +1,6 @@
 package com.ft.sdk.garble.utils;
 
-import com.ft.sdk.FTExceptionHandler;
+import com.ft.sdk.FTTraceConfig;
 import com.ft.sdk.garble.http.HttpUrl;
 
 import java.util.Locale;
@@ -25,8 +25,9 @@ public class SkyWalkingUtils {
     private String sw8;
     private String newTraceId;
     private String newParentTraceId;
+    private FTTraceConfig config;
 
-    public SkyWalkingUtils(SkyWalkingVersion version, String sampled, long requestTime, HttpUrl url) {
+    public SkyWalkingUtils(SkyWalkingVersion version, String sampled, long requestTime, HttpUrl url, FTTraceConfig config) {
         synchronized (SkyWalkingUtils.class) {//防止多线程 increasingNumber 不安顺序增加
             if (increasingNumber.get() < 9999) {
                 increasingNumber.getAndAdd(2);
@@ -39,6 +40,7 @@ public class SkyWalkingUtils {
                 increasingLong.getAndIncrement();
                 createSw6Head(sampled, requestTime, url);
             }
+            this.config = config;
         }
     }
 
@@ -61,7 +63,7 @@ public class SkyWalkingUtils {
                 Utils.encodeStringToBase64(newTraceId) + "-" +
                 Utils.encodeStringToBase64(newParentTraceId) + "-" +
                 "0-" +
-                Utils.encodeStringToBase64(FTExceptionHandler.get().getTrackServiceName()) + "-" +
+                Utils.encodeStringToBase64(config.getServiceName()) + "-" +
                 Utils.encodeStringToBase64(parentServiceUUID + "@" + NetUtils.get().getMobileIpAddress()) + "-" +
                 Utils.encodeStringToBase64(url.getPath()) + "-" +
                 Utils.encodeStringToBase64(url.getHost() + ":" + url.getPort());

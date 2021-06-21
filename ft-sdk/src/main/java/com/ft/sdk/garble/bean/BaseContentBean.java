@@ -99,9 +99,6 @@ public class BaseContentBean {
                 tags.put(Constants.KEY_APPLICATION_UUID, FTSdk.PACKAGE_UUID);
             }
 
-            if (!tags.has(Constants.KEY_RUM_APPLICATION_IDENTIFIER)) {
-                tags.put(Constants.KEY_RUM_APPLICATION_IDENTIFIER, DeviceUtils.getApplicationId(FTApplication.getApplication()));
-            }
             tags.put(Constants.KEY_APP_VERSION_NAME, Utils.getAppVersionName());
 
 
