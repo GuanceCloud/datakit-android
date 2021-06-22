@@ -42,11 +42,13 @@ class FTTraceHandler {
 
     public FTTraceHandler() {
         config = FTTraceConfigManager.get().getConfig();
-        enableTrace = Utils.enableTraceSamplingRate(config.getSamplingRate());
+        enableTrace = config != null && Utils.enableTraceSamplingRate(config.getSamplingRate());
 
     }
 
     public HashMap<String, String> getTraceHeader(HttpUrl httpUrl) {
+        if (!enableTrace) return new HashMap<>();
+
         this.httpUrl = httpUrl;
         HashMap<String, String> headers = new HashMap<>();
         String sampled;

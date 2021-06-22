@@ -47,36 +47,30 @@ public class DemoApplication extends Application {
                 .setEnv(EnvType.GRAY);
         FTSdk.install(ftSDKConfig);
 
+        FTSdk.initLogWithConfig(new FTLoggerConfig()
+                .setSamplingRate(1f)
+                .setEnableLinkRumData(true)
+                .setEnableCustomLog(true)
+                .setEnableConsoleLog(true)
+                .setEnableLinkRumData(true)
+        );
 
-        FTRUMConfigManager.get().initWithConfig(new FTRUMConfig()
+        FTSdk.initRUMWithConfig(new FTRUMConfig()
                 .setSamplingRate(1f)
                 .setRumAppId(AccountUtils.getProperty(this, AccountUtils.RUM_APP_ID))
                 .setEnableTraceUserAction(true)
                 .setEnableTrackAppANR(true)
                 .setEnableTrackAppCrash(true)
                 .setEnableTrackAppUIBlock(true)
-                .setExtraMonitorTypeWithError(MonitorType.ALL)
-        );
+                .setExtraMonitorTypeWithError(MonitorType.ALL));
 
-        FTRUMConfigManager.get().bindUserData("brandon.test.userid");
+        FTSdk.bindRumUserData("brandon.test.userid");
 
 
-        FTLoggerConfigManager.get()
-                .initWithConfig(new FTLoggerConfig()
-                        .setSamplingRate(1f)
-                        .setEnableLinkRumData(true)
-                        .setEnableCustomLog(true)
-                        .setEnableConsoleLog(true)
-                        .setEnableLinkRumData(true)
-                );
-
-        FTTraceConfigManager.get().initWithConfig(new FTTraceConfig()
+        FTSdk.initTraceWithConfig(new FTTraceConfig()
                 .setSamplingRate(1f)
                 .setEnableLinkRUMData(true)
-                .setTraceType(TraceType.ZIPKIN)
-
-        );
-
+                .setTraceType(TraceType.ZIPKIN));
 
     }
 

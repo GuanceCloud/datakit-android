@@ -16,16 +16,14 @@ import com.ft.application.MockApplication;
 import com.ft.sdk.EnvType;
 import com.ft.sdk.FTLogger;
 import com.ft.sdk.FTLoggerConfig;
-import com.ft.sdk.FTLoggerConfigManager;
 import com.ft.sdk.FTRUMConfig;
-import com.ft.sdk.FTRUMConfigManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
-import com.ft.sdk.FTTraceConfigManager;
 import com.ft.sdk.FTTrack;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.SyncTaskManager;
+import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.bean.SyncJsonData;
@@ -62,6 +60,8 @@ public class LogTrackTraceRUMTest extends BaseTest {
     @Rule
     public ActivityScenarioRule<DebugMainActivity> rule = new ActivityScenarioRule<>(DebugMainActivity.class);
 
+    private Context context;
+
     @Before
     public void init() throws Exception {
         if (!hasPrepare) {
@@ -71,7 +71,7 @@ public class LogTrackTraceRUMTest extends BaseTest {
 
         stopSyncTask();
 
-        Context context = MockApplication.getContext();
+        context = MockApplication.getContext();
         FTSDKConfig ftSDKConfig = FTSDKConfig
                 .builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL))
                 .setXDataKitUUID("ft-dataKit-uuid-001")
@@ -81,19 +81,18 @@ public class LogTrackTraceRUMTest extends BaseTest {
 
         FTSdk.install(ftSDKConfig);
 
-        FTRUMConfigManager.get()
-                .initWithConfig(new FTRUMConfig()
-                        .setExtraMonitorTypeWithError(MonitorType.ALL)
-                        .setEnableTrackAppCrash(true)
-                        .setRumAppId(AccountUtils.getProperty(context, AccountUtils.RUM_APP_ID))
-                        .setEnableTrackAppUIBlock(true)
-                        .setEnableTraceUserAction(true)
-                );
+        FTSdk.initRUMWithConfig(new FTRUMConfig()
+                .setExtraMonitorTypeWithError(MonitorType.ALL)
+                .setEnableTrackAppCrash(true)
+                .setRumAppId(AccountUtils.getProperty(context, AccountUtils.RUM_APP_ID))
+                .setEnableTrackAppUIBlock(true)
+                .setEnableTraceUserAction(true)
+        );
 
-        FTLoggerConfigManager.get()
-                .initWithConfig(new FTLoggerConfig().setEnableConsoleLog(true));
+        FTSdk.initLogWithConfig(new FTLoggerConfig()
+                .setEnableCustomLog(true));
 
-        FTTraceConfigManager.get().initWithConfig(new FTTraceConfig());
+        FTSdk.initTraceWithConfig(new FTTraceConfig());
 
         FTDBManager.get().delete();
     }
@@ -216,7 +215,7 @@ public class LogTrackTraceRUMTest extends BaseTest {
 
     @Test
     public void rumUserBindTest() throws InterruptedException {
-        FTRUMConfigManager.get().bindUserData("123456");
+        FTSdk.bindRumUserData("123456");
         onView(ViewMatchers.withId(R.id.main_view_loop_test)).perform(ViewActions.scrollTo()).perform(click());
         Thread.sleep(5000);
         int except2 = countInDB(DataType.RUM_APP, "\"is_signin\":\"T\"");
@@ -227,8 +226,8 @@ public class LogTrackTraceRUMTest extends BaseTest {
 
     @Test
     public void rumUserUnBindTest() throws InterruptedException {
-        FTRUMConfigManager.get().bindUserData("123456");
-        FTRUMConfigManager.get().unbindUserData();
+        FTSdk.bindRumUserData("123456");
+        FTSdk.unbindRumUserData();
         onView(ViewMatchers.withId(R.id.main_view_loop_test)).perform(ViewActions.scrollTo()).perform(click());
         Thread.sleep(5000);
         int except4 = countInDB(DataType.RUM_APP, "\"is_signin\":\"T\"");
@@ -293,6 +292,134 @@ public class LogTrackTraceRUMTest extends BaseTest {
     public void traceUploadErrorTest() throws Exception {
         traceDataTest("https://error.url", "error.url");
     }
+
+    @Test
+    public void traceLinkRUMDataEnable() throws InterruptedException {
+        Assert.assertTrue(checkTraceHasLinkRumData(true));
+    }
+
+    @Test
+    public void traceLinkRUMDataDisable() throws InterruptedException {
+        Assert.assertFalse(checkTraceHasLinkRumData(false));
+    }
+
+    private boolean checkTraceHasLinkRumData(boolean enableLinkRUMData) throws InterruptedException {
+        FTSdk.initTraceWithConfig(new FTTraceConfig()
+                .setTraceType(TraceType.ZIPKIN)
+                .setEnableLinkRUMData(enableLinkRUMData)
+        );
+        Thread.sleep(2000);
+
+        RequestUtil.requestUrl("http://www.weather.com.cn/data/sk/101010100.html");
+
+        Thread.sleep(5000);
+
+        List<SyncJsonData> recordDataList = FTDBManager.get()
+                .queryDataByDataByTypeLimitDesc(0, DataType.TRACE);
+
+        String tracId = "";
+        String spanId = "";
+
+        for (SyncJsonData recordData : recordDataList) {
+            try {
+                JSONObject json = new JSONObject(recordData.getDataString());
+                JSONObject tags = json.optJSONObject("tags");
+                String measurement = json.optString("measurement");
+                if ("zipkin".equals(measurement)) {
+                    if (tags != null) {
+                        tracId = tags.optString("trace_id");
+                        spanId = tags.optString("span_id");
+                        break;
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return !tracId.isEmpty() && !spanId.isEmpty();
+    }
+
+    @Test
+    public void logLinkRUMDataEnable() throws InterruptedException {
+        Assert.assertTrue(checkLogHasLinkRUMData(true));
+    }
+
+    @Test
+    public void logLinkRUMDataDisable() throws InterruptedException {
+        Assert.assertFalse(checkLogHasLinkRUMData(false));
+    }
+
+    private boolean checkLogHasLinkRUMData(boolean enableLinkRumData) throws InterruptedException {
+        FTSdk.initLogWithConfig(new FTLoggerConfig()
+                .setEnableCustomLog(true).setEnableLinkRumData(enableLinkRumData));
+
+        Thread.sleep(2000);
+
+        FTLogger.getInstance().logBackground("test", Status.CRITICAL);
+
+        Thread.sleep(5000);
+
+        List<SyncJsonData> recordDataList = FTDBManager.get()
+                .queryDataByDataByTypeLimitDesc(0, DataType.LOG);
+
+        String viewId = "";
+        String sessionId = "";
+        for (SyncJsonData recordData : recordDataList) {
+            try {
+                JSONObject json = new JSONObject(recordData.getDataString());
+                JSONObject tags = json.optJSONObject("tags");
+                String measurement = json.optString("measurement");
+                if (Constants.FT_LOG_DEFAULT_MEASUREMENT.equals(measurement)) {
+                    if (tags != null) {
+                        viewId = tags.optString("view_id");
+                        sessionId = tags.optString("session_id");
+                        break;
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return !viewId.isEmpty() && !sessionId.isEmpty();
+    }
+
+    @Test
+    public void traceSampleRateZero() throws InterruptedException {
+        FTSdk.initTraceWithConfig(new FTTraceConfig()
+                .setTraceType(TraceType.ZIPKIN)
+                .setSamplingRate(0)
+                .setEnableLinkRUMData(false));
+
+        RequestUtil.requestUrl("http://www.weather.com.cn/data/sk/101010100.html");
+        Thread.sleep(5000);
+
+        List<SyncJsonData> recordDataList = FTDBManager.get()
+                .queryDataByDataByTypeLimitDesc(0, DataType.TRACE);
+
+        Assert.assertEquals(0, recordDataList.size());
+
+
+    }
+
+
+    @Test
+    public void logSampleRateZero() throws InterruptedException {
+        FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableCustomLog(true).setSamplingRate(0));
+
+        Thread.sleep(2000);
+
+        FTLogger.getInstance().logBackground("test", Status.CRITICAL);
+
+        Thread.sleep(5000);
+
+        List<SyncJsonData> recordDataList = FTDBManager.get()
+                .queryDataByDataByTypeLimitDesc(0, DataType.LOG);
+
+        Assert.assertEquals(0, recordDataList.size());
+
+    }
+
 
     /**
      * 上传一条正常的 trace 数据测试

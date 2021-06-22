@@ -239,14 +239,23 @@ public class FTRUMGlobalManager {
 
 
     String getViewId() {
+        if (activeView == null) {
+            return null;
+        }
         return activeView.getId();
     }
 
     String getViewName() {
+        if (activeView == null) {
+            return null;
+        }
         return activeView.getViewName();
     }
 
     String getViewReferrer() {
+        if (activeView == null) {
+            return null;
+        }
         return activeView.getViewReferrer();
     }
 
@@ -401,6 +410,10 @@ public class FTRUMGlobalManager {
 
     public boolean checkSessionWillCollect(String sessionId) {
         return !notCollectMap.contains(sessionId);
+    }
+
+    public void release(){
+        mHandler.removeCallbacks(mRUMGenerateRunner);
     }
 
 

@@ -52,7 +52,7 @@ public class SDKRunStateTest extends BaseTest {
 
         FTSdk.install(ftSDKConfig);
 
-        FTRUMConfigManager.get().initWithConfig(new FTRUMConfig()
+        FTSdk.initRUMWithConfig(new FTRUMConfig()
                 .setExtraMonitorTypeWithError(MonitorType.ALL)
                 .setEnableTrackAppANR(true)
                 .setEnableTrackAppCrash(true)
@@ -60,9 +60,9 @@ public class SDKRunStateTest extends BaseTest {
                 .setEnableTraceUserAction(true)
         );
 
-        FTLoggerConfigManager.get().initWithConfig(new FTLoggerConfig().setEnableConsoleLog(true));
+        FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableConsoleLog(true));
 
-        FTTraceConfigManager.get().initWithConfig(new FTTraceConfig().setTraceType(TraceType.ZIPKIN));
+        FTSdk.initTraceWithConfig(new FTTraceConfig().setTraceType(TraceType.ZIPKIN));
     }
 
     @Test
@@ -88,25 +88,25 @@ public class SDKRunStateTest extends BaseTest {
 
     @Test
     public void showdownMonitorTypeTest() {
-        FTSdk.get().shutDown();
+        FTSdk.shutDown();
         Assert.assertFalse(FTMonitorConfigManager.get().isMonitorType(MonitorType.ALL));
     }
 
     @Test
     public void showdownNetworkTrackTest() {
-        FTSdk.get().shutDown();
+        FTSdk.shutDown();
         Assert.assertFalse(FTTraceConfigManager.get().isNetworkTrace());
     }
 
     @Test
     public void showdownTrackConsoleLogTest() {
-        FTSdk.get().shutDown();
+        FTSdk.shutDown();
         Assert.assertNull(FTLoggerConfigManager.get().getConfig());
     }
 
     @Test
     public void showdownEventFlowLogTest() {
-        FTSdk.get().shutDown();
+        FTSdk.shutDown();
         Assert.assertNull(FTRUMConfigManager.get().getConfig());
     }
 }

@@ -11,7 +11,6 @@ import com.ft.AccountUtils;
 import com.ft.BaseTest;
 import com.ft.application.MockApplication;
 import com.ft.sdk.FTLoggerConfig;
-import com.ft.sdk.FTLoggerConfigManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.FTDBCachePolicy;
@@ -49,7 +48,7 @@ public class LogTest extends BaseTest {
                 .builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL));
         FTSdk.install(ftsdkConfig);
 
-        FTLoggerConfigManager.get().initWithConfig(new FTLoggerConfig().setEnableConsoleLog(true));
+        FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableConsoleLog(true));
     }
 
     @Test

@@ -36,7 +36,7 @@ public class BaseTest {
     @After
     public void tearDown() {
         FTDBManager.get().delete();
-        FTSdk.get().shutDown();
+        FTSdk.shutDown();
     }
 
 

@@ -15,7 +15,6 @@ import com.ft.R;
 import com.ft.application.MockApplication;
 import com.ft.sdk.EnvType;
 import com.ft.sdk.FTRUMConfig;
-import com.ft.sdk.FTRUMConfigManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.bean.DataType;
@@ -63,7 +62,7 @@ public class ErrorTraceTest extends BaseTest {
         stopSyncTask();
         FTSdk.install(ftSDKConfig);
 
-        FTRUMConfigManager.get().initWithConfig(new FTRUMConfig()
+        FTSdk.initRUMWithConfig(new FTRUMConfig()
                 .setRumAppId(AccountUtils.getProperty(context, AccountUtils.RUM_APP_ID))
                 .setEnableTrackAppCrash(true));
     }

@@ -101,11 +101,10 @@ public class FTInitParamTest extends BaseTest {
     @Test
     public void rumAppId() {
         String appid = "appIdxxxxxx";
-        FTRUMConfigManager.get().initWithConfig(new FTRUMConfig().setRumAppId(appid));
+        FTSdk.initRUMWithConfig(new FTRUMConfig().setRumAppId(appid));
         Assert.assertEquals(appid, FTRUMConfigManager.get().getConfig().getRumAppId());
         Assert.assertTrue(FTRUMConfigManager.get().isRumEnable());
-        Assert.assertEquals(FTRUMConfigManager.get().getConfig().getRumAppId(),appid);
-        //todo
+        Assert.assertEquals(FTRUMConfigManager.get().getConfig().getRumAppId(), appid);
     }
 
 
@@ -119,8 +118,8 @@ public class FTInitParamTest extends BaseTest {
     private void serviceNameParamTest(String serviceName, String expected) {
         FTSDKConfig ftSDKConfig = getDefaultConfig();
         FTSdk.install(ftSDKConfig);
-        FTLoggerConfigManager.get().initWithConfig(new FTLoggerConfig().setServiceName(serviceName));
-        FTTraceConfigManager.get().initWithConfig(new FTTraceConfig().setServiceName(serviceName));
+        FTSdk.initLogWithConfig(new FTLoggerConfig().setServiceName(serviceName));
+        FTSdk.initTraceWithConfig(new FTTraceConfig().setServiceName(serviceName));
 
         Assert.assertEquals(expected, FTLoggerConfigManager.get().getConfig().getServiceName());
         Assert.assertEquals(expected, FTTraceConfigManager.get().getConfig().getServiceName());

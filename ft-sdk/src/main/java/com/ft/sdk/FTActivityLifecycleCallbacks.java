@@ -64,12 +64,12 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
                 && FTActivityManager.get().isFirstResume.get(activity.getClass().getName())) {
             isFirstLoad = false;
         }
-        FTManager.getFTActivityManager().putActivity(activity);
+        FTActivityManager.get().putActivity(activity);
 
         //页面打开埋点数据插入
         FTAutoTrack.startPage(activity.getClass(), isFirstLoad);
         //开启同步
-        FTManager.getSyncTaskManager().executeSyncPoll();
+        SyncTaskManager.get().executeSyncPoll();
         //标记当前页面是否是第一次调用OnResume方法
         FTActivityManager.get().isFirstResume.put(activity.getClass().getName(), true);
     }

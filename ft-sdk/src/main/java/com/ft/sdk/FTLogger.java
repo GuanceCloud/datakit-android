@@ -43,8 +43,9 @@ public class FTLogger {
 
         checkConfig();
 
-        if (config.isEnableCustomLog())
+        if (!config.isEnableCustomLog()) {
             return;
+        }
         LogBean logBean = new LogBean(Utils.translateFieldValue(content), Utils.getCurrentNanoTime());
         logBean.setServiceName(config.getServiceName());
         logBean.setStatus(status);
@@ -59,7 +60,7 @@ public class FTLogger {
      */
     public void logBackground(List<LogData> logDataList) {
         checkConfig();
-        if (logDataList == null || (config.isEnableCustomLog())) {
+        if (logDataList == null || (!config.isEnableCustomLog())) {
             return;
         }
         List<BaseContentBean> logBeans = new ArrayList<>();

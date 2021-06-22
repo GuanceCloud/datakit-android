@@ -73,7 +73,8 @@ public class TrackLog {
     public static int println(boolean upload, int priority, String tag, String msg) {
         FTLoggerConfig config = FTLoggerConfigManager.get().getConfig();
         if (upload && config != null && config.isEnableConsoleLog()) {
-            LogBean logBean = new LogBean(Utils.translateFieldValue(Utils.getCurrentTimeStamp() + " " + getLevelMark(priority) + "/" + tag + ":" + msg), Utils.getCurrentNanoTime());
+            LogBean logBean = new LogBean(Utils.translateFieldValue(Utils.getCurrentTimeStamp()
+                    + " " + getLevelMark(priority) + "/" + tag + ":" + msg), Utils.getCurrentNanoTime());
             logBean.setServiceName(config.getServiceName());
             logBean.setStatus(getStatus(priority));
             logBean.setEnv(FTSdk.get().getBaseConfig().getEnv());

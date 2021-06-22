@@ -22,7 +22,7 @@ public class FTTraceConfigManager {
     private FTTraceConfig config;
 
 
-    public void initWithConfig(FTTraceConfig config) {
+     void initWithConfig(FTTraceConfig config) {
         this.config = config;
     }
 

@@ -43,7 +43,7 @@ public class FTRUMConfigManager {
     private final Object mLock = new Object();
 
 
-    public void initWithConfig(FTRUMConfig config) {
+    void initWithConfig(FTRUMConfig config) {
         this.config = config;
         registerActivityLifeCallback();
         FTRUMGlobalManager.get().initParams(config);
@@ -121,12 +121,12 @@ public class FTRUMConfigManager {
      *
      * @return
      */
-    public boolean isUserDataBinded() {
+     boolean isUserDataBinded() {
         return getUserData() != null;
     }
 
 
-    public void initRandomUserId() {
+     void initRandomUserId() {
         if (Utils.isNullOrEmpty(getRandomUserId())) {
             createNewRandomUserId();
         }
@@ -140,7 +140,7 @@ public class FTRUMConfigManager {
     }
 
 
-    public String getRandomUserId() {
+     String getRandomUserId() {
         if (!Utils.isNullOrEmpty(randomUserId)) {
             return randomUserId;
         }
@@ -150,7 +150,7 @@ public class FTRUMConfigManager {
     }
 
 
-    public UserData getUserData() {
+     UserData getUserData() {
         synchronized (mLock) {
             if (mUserData != null) {
                 return mUserData;
@@ -179,7 +179,7 @@ public class FTRUMConfigManager {
      *
      * @param id
      */
-    public void bindUserData(@NonNull String id) {
+    void bindUserData(@NonNull String id) {
         LogUtils.d(TAG, "绑定用户信息");
         //初始化SessionId
         initRandomUserId();
@@ -211,7 +211,7 @@ public class FTRUMConfigManager {
     /**
      * 解绑用户信息
      */
-    public void unbindUserData() {
+    void unbindUserData() {
         LogUtils.d(TAG, "解绑用户信息");
 
         synchronized (mLock) {

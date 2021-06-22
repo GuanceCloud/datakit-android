@@ -15,7 +15,7 @@ public class FTLoggerConfigManager {
     private FTLoggerConfig config;
 
 
-    public void initWithConfig(FTLoggerConfig config) {
+    void initWithConfig(FTLoggerConfig config) {
         this.config = config;
 
         FTDBCachePolicy.get().initParam(config);

@@ -108,19 +108,19 @@ public class MonitorTest extends BaseTest {
 //    public void monitorFpsTest() throws Exception {
 //        monitorTest(MonitorType.FPS);
 //    }
-
-    /**
-     * 测试监控周期切换是否正常，该测试用例需要观察控制台的输出日志《轮训监控上报数据成功》来观察
-     *
-     * @throws InterruptedException
-     */
-    @Test
-    public void monitorPeriodTest() throws InterruptedException {
-        FTMonitor.get().setPeriod(2).start();
-        Thread.sleep(10000);
-        FTMonitor.get().setPeriod(4).start();
-        Thread.sleep(20000);
-    }
+//
+//    /**
+//     * 测试监控周期切换是否正常，该测试用例需要观察控制台的输出日志《轮训监控上报数据成功》来观察
+//     *
+//     * @throws InterruptedException
+//     */
+//    @Test
+//    public void monitorPeriodTest() throws InterruptedException {
+//        FTMonitor.get().setPeriod(2).start();
+//        Thread.sleep(10000);
+//        FTMonitor.get().setPeriod(4).start();
+//        Thread.sleep(20000);
+//    }
 
     private void monitorTest(int monitorType) throws Exception {
         stopSyncTask();

@@ -15,7 +15,6 @@ import com.ft.R;
 import com.ft.application.MockApplication;
 import com.ft.sdk.EnvType;
 import com.ft.sdk.FTRUMConfig;
-import com.ft.sdk.FTRUMConfigManager;
 import com.ft.sdk.FTRUMGlobalManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
@@ -61,13 +60,12 @@ public class RUMActionSumTest extends BaseTest {
                 .setEnv(EnvType.GRAY);
         FTSdk.install(ftSDKConfig);
 
-        FTRUMConfigManager.get()
-                .initWithConfig(new FTRUMConfig()
-                        .setEnableTrackAppCrash(true)
-                        .setRumAppId(AccountUtils.getProperty(context, AccountUtils.RUM_APP_ID))
-                        .setEnableTrackAppUIBlock(true)
-                        .setEnableTraceUserAction(true)
-                );
+        FTSdk.initRUMWithConfig(new FTRUMConfig()
+                .setEnableTrackAppCrash(true)
+                .setRumAppId(AccountUtils.getProperty(context, AccountUtils.RUM_APP_ID))
+                .setEnableTrackAppUIBlock(true)
+                .setEnableTraceUserAction(true)
+        );
 
     }
 
@@ -91,7 +89,7 @@ public class RUMActionSumTest extends BaseTest {
                 if ("action".equals(measurement)) {
                     if (fields != null) {
                         int resourceCount = fields.optInt("action_resource_count");
-                        Assert.assertEquals(resourceCount, 1);
+                        Assert.assertEquals(1, resourceCount);
                         break;
                     }
                 }
@@ -115,7 +113,7 @@ public class RUMActionSumTest extends BaseTest {
                 if ("action".equals(measurement)) {
                     if (fields != null) {
                         int error_count = fields.optInt("action_error_count");
-                        Assert.assertEquals(error_count, 1);
+                        Assert.assertEquals(1, error_count);
                         break;
                     }
                 }

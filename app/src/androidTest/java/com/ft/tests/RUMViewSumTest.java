@@ -59,13 +59,12 @@ public class RUMViewSumTest extends BaseTest {
                 .setEnv(EnvType.GRAY);
         FTSdk.install(ftSDKConfig);
 
-        FTRUMConfigManager.get()
-                .initWithConfig(new FTRUMConfig()
-                        .setEnableTrackAppCrash(true)
-                        .setRumAppId(AccountUtils.getProperty(context, AccountUtils.RUM_APP_ID))
-                        .setEnableTrackAppUIBlock(true)
-                        .setEnableTraceUserAction(true)
-                );
+        FTSdk.initRUMWithConfig(new FTRUMConfig()
+                .setEnableTrackAppCrash(true)
+                .setRumAppId(AccountUtils.getProperty(context, AccountUtils.RUM_APP_ID))
+                .setEnableTrackAppUIBlock(true)
+                .setEnableTraceUserAction(true)
+        );
 
     }
 

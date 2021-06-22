@@ -62,7 +62,7 @@ public class FTSdk {
      *
      * @return
      */
-    public static synchronized FTSdk get() throws InvalidParameterException {
+     public static synchronized FTSdk get() throws InvalidParameterException {
         if (mFtSdk == null) {
             throw new InvalidParameterException("请先安装SDK(在应用启动时调用FTSdk.install(FTSDKConfig ftSdkConfig,Application application))");
         }
@@ -72,7 +72,7 @@ public class FTSdk {
     /**
      * 关闭 SDK 正在做的操作
      */
-    public void shutDown() {
+    public static void shutDown() {
         SyncTaskManager.release();
         FTRUMConfigManager.get().release();
         FTMonitorConfigManager.release();
@@ -84,6 +84,7 @@ public class FTSdk {
         FTDBCachePolicy.release();
         FTTraceConfigManager.get().release();
         FTLoggerConfigManager.get().release();
+        FTRUMGlobalManager.get().release();
         FTRUMConfigManager.get().unregisterActivityLifeCallback();
         LogUtils.w(TAG, "FT SDK 已经被关闭");
     }
@@ -155,10 +156,51 @@ public class FTSdk {
     }
 
 
-
     public FTSDKConfig getBaseConfig() {
         return mFtSDKConfig;
     }
+
+
+    /**
+     * 设置 RUM 配置
+     * @param config
+     */
+    public static void initRUMWithConfig(@NonNull  FTRUMConfig config) {
+        FTRUMConfigManager.get().initWithConfig(config);
+
+    }
+
+    /**
+     * 设置 Trace 配置
+     * @param config
+     */
+    public static void initTraceWithConfig(@NonNull FTTraceConfig config) {
+        FTTraceConfigManager.get().initWithConfig(config);
+    }
+
+    /**
+     *
+     * @param config
+     */
+    public static void initLogWithConfig(@NonNull FTLoggerConfig config) {
+        FTLoggerConfigManager.get().initWithConfig(config);
+    }
+
+    /**
+     * 绑定用户信息
+     *
+     * @param id
+     */
+    public static void bindRumUserData(@NonNull String id) {
+        FTRUMConfigManager.get().bindUserData(id);
+    }
+
+    public static void unbindRumUserData() {
+        FTRUMConfigManager.get().unbindUserData();
+    }
+
+
+
 
 
 }

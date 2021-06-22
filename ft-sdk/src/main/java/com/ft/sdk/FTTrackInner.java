@@ -8,6 +8,7 @@ import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.LineProtocolBean;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.SyncJsonData;
+import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.http.RequestMethod;
@@ -107,9 +108,9 @@ public class FTTrackInner {
 
                 SyncJsonData recordData = SyncJsonData.getSyncJsonData(dataType,
                         new LineProtocolBean(measurement, tags, fields, time));
-                boolean result = FTManager.getFTDBManager().insertFtOperation(recordData);
+                boolean result = FTDBManager.get().insertFtOperation(recordData);
                 LogUtils.d(TAG, "trackBackground:insert-result=" + result);
-                FTManager.getSyncTaskManager().executeSyncPoll();
+                SyncTaskManager.get().executeSyncPoll();
             } catch (Exception e) {
                 e.printStackTrace();
                 LogUtils.e(TAG, e.getMessage());
@@ -240,7 +241,7 @@ public class FTTrackInner {
             }
 
         }
-        FTManager.getFTDBManager().insertFtOptList(datas);
+        FTDBManager.get().insertFtOptList(datas);
     }
 
 
@@ -259,9 +260,9 @@ public class FTTrackInner {
                     recordDataList.remove(0);
                 }
             }
-            boolean result = FTManager.getFTDBManager().insertFtOptList(recordDataList);
+            boolean result = FTDBManager.get().insertFtOptList(recordDataList);
             LogUtils.d(TAG, "judgeLogCachePolicy:insert-result=" + result);
-            FTManager.getSyncTaskManager().executeSyncPoll();
+            SyncTaskManager.get().executeSyncPoll();
         }
     }
 
