@@ -1,0 +1,57 @@
+apply plugin: 'com.android.application'
+
+apply plugin: 'kotlin-android'
+
+apply plugin: 'kotlin-parcelize'
+
+android {
+    compileSdkVersion 29
+    defaultConfig {
+        applicationId "com.cloudcare.ft.mobile.sdk.demo"
+        minSdkVersion 23
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        debug {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.core:core-ktx:1.3.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    testImplementation 'junit:junit:4.13'
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    //================FT-SDK需要使用的引用=================//
+    //FT-SDK引用
+    implementation 'com.cloudcare.ft.mobile.sdk.tracker.agent:ft-sdk:1.1.1-alpha01'
+
+    implementation 'com.cloudcare.ft.mobile.sdk.tracker.agent:ft-native:1.0.0-alpha04'
+    implementation 'com.google.code.gson:gson:2.8.5'
+
+    //FT-SDK配置打开使用OAID（ftSDKConfig.isUseOAID = true）时需要的依赖
+    implementation files('libs/miit_mdid_1.0.10.aar')
+    //需用监控网络数据时，添加该依赖，实现网络引擎
+    implementation 'com.squareup.okhttp3:okhttp:4.5.0'
+}
+//应用 FT plugin
+apply plugin: 'ft-plugin'
+
+FTExt {
+    //显示日志
+    showLog = true
+}
