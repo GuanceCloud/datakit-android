@@ -1,15 +1,7 @@
 package com.ft.sdk;
 
-import java.util.Arrays;
-import java.util.List;
-
 public class FTTraceConfigManager {
 
-    public List<String> traceContentType = Arrays.asList("application/json",
-            "application/javascript", "application/xml", "application/x-www-form-urlencoded",
-            "text/html", "text/xml", "text/plain",
-            "multipart/form-data"
-    );
 
     private static class SingletonHolder {
         private static final FTTraceConfigManager INSTANCE = new FTTraceConfigManager();
@@ -22,7 +14,10 @@ public class FTTraceConfigManager {
     private FTTraceConfig config;
 
 
-     void initWithConfig(FTTraceConfig config) {
+    void initWithConfig(FTTraceConfig config) {
+        if (config.isEnableLinkRUMData() && config.getTraceType() != TraceType.DDTRACE) {
+            throw new InitSDKProcessException("FTTraceConfig.isEnableLinkRUMData,仅支持 TraceType.DDTRACE");
+        }
         this.config = config;
     }
 

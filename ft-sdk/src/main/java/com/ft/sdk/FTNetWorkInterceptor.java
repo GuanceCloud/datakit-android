@@ -55,7 +55,9 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
     }
 
 
-    private void uploadNetTrace(FTTraceHandler handler, String operationName, Request request, @Nullable Response response, String responseBody, String error) {
+    private void uploadNetTrace(FTTraceHandler handler,
+                                String operationName, Request request,
+                                @Nullable Response response, String responseBody, String error) {
         try {
 
             JSONObject requestContent = buildRequestJsonContent(request);
@@ -229,7 +231,11 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
     private static boolean isSupportFormat(MediaType mediaType) {
         if (mediaType == null) return false;
         String contentType = mediaType.type() + "/" + mediaType.subtype();
-        List<String> supportContentType = FTTraceConfigManager.get().traceContentType;
+        FTTraceConfig config = FTTraceConfigManager.get().getConfig();
+        if (config == null) {
+            return false;
+        }
+        List<String> supportContentType = config.getTraceContentType();
         if (supportContentType == null) {
             return false;
         }

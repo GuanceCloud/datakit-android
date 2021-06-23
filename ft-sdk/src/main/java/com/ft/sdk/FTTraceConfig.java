@@ -2,15 +2,21 @@ package com.ft.sdk;
 
 import com.ft.sdk.garble.utils.Constants;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class FTTraceConfig {
     private float samplingRate = 1;
     private String serviceName = Constants.DEFAULT_LOG_SERVICE_NAME;
-    private TraceType traceType = TraceType.ZIPKIN;
+    private TraceType traceType = TraceType.DDTRACE;
     private boolean enableLinkRUMData = false;
-    private List<String> traceContentType;
-    private boolean isNetworkTrace = true;
+
+
+    public List<String> traceContentType = Arrays.asList("application/json",
+            "application/javascript", "application/xml", "application/x-www-form-urlencoded",
+            "text/html", "text/xml", "text/plain",
+            "multipart/form-data"
+    );
 
     public float getSamplingRate() {
         return samplingRate;
@@ -57,7 +63,9 @@ public class FTTraceConfig {
      * @return
      */
     public FTTraceConfig setTraceContentType(List<String> traceContentType) {
-        this.traceContentType = traceContentType;
+        if (traceContentType != null) {
+            this.traceContentType = traceContentType;
+        }
         return this;
     }
 
@@ -67,11 +75,11 @@ public class FTTraceConfig {
     }
 
     public boolean isNetworkTrace() {
-        return isNetworkTrace;
+        return true;
     }
 
-    public FTTraceConfig setNetworkTrace(boolean networkTrace) {
-        isNetworkTrace = networkTrace;
-        return this;
-    }
+//    public FTTraceConfig setNetworkTrace(boolean networkTrace) {
+//        isNetworkTrace = networkTrace;
+//        return this;
+//    }
 }

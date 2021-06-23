@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
@@ -202,6 +203,10 @@ public class Utils {
             }
         }
         return uid.toString();
+    }
+
+    public static BigInteger getDDtraceNewId(){
+        return new BigInteger(63, new SecureRandom());
     }
 
     /**

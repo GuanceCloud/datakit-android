@@ -49,7 +49,7 @@ public final class FTNetworkRumHandler {
             bean.responseConnection = response.header("Connection");
             bean.resourceMethod = request.method();
             bean.responseContentEncoding = response.header("Content-Encoding");
-            bean.resourceType = bean.responseContentType;
+            bean.resourceType = "xhr";
             bean.resourceStatus = response.code();
         }
 

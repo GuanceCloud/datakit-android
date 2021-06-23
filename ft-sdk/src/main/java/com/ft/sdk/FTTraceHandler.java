@@ -21,12 +21,17 @@ class FTTraceHandler {
     private static final String JAEGER_KEY = "uber-trace-id";
     private static final String SKYWALKING_V3_SW_8 = "sw8";
     private static final String SKYWALKING_V3_SW_6 = "sw6";
+
+    private static final String DD_TRACE_TRACE_ID_KEY = "x-datadog-trace-id";
+    private static final String DD_TRACE_SPAN_ID_KEY = "x-datadog-parent-id";
+    private static final String DD_TRACE_SAMPLING_PRIORITY_KEY = "x-datadog-sampling-priority";
+    private static final String DD_TRACE_ORIGIN_KEY = "x-datadog-origin";
     //是否可以采样
     private final boolean enableTrace;
     //请求开始时间
     private final long requestTime = Utils.getCurrentNanoTime();
-    private final String traceID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
-    private final String spanID = Utils.getGUID_16();
+    private String traceID = "";
+    private String spanID = "";
     private boolean isWebViewTrace;
 
     private HttpUrl httpUrl;
@@ -47,8 +52,8 @@ class FTTraceHandler {
     }
 
     public HashMap<String, String> getTraceHeader(HttpUrl httpUrl) {
-        if (!enableTrace) return new HashMap<>();
 
+        if (config == null) return new HashMap<>();
         this.httpUrl = httpUrl;
         HashMap<String, String> headers = new HashMap<>();
         String sampled;
@@ -61,12 +66,27 @@ class FTTraceHandler {
         String parentSpanID = "0000000000000000";
 
         //在数据中添加标记
+        if (config.getTraceType() == TraceType.ZIPKIN || config.getTraceType() == TraceType.JAEGER) {
+            traceID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
+            spanID = Utils.getGUID_16();
+        } else if (config.getTraceType() == TraceType.DDTRACE) {
+            traceID = Utils.getDDtraceNewId().longValue() + "";
+            spanID = Utils.getDDtraceNewId().longValue() + "";
+        }
+
         if (config.getTraceType() == TraceType.ZIPKIN) {
             headers.put(ZIPKIN_SPAN_ID, spanID);
             headers.put(ZIPKIN_TRACE_ID, traceID);
             headers.put(ZIPKIN_SAMPLED, sampled);
         } else if (config.getTraceType() == TraceType.JAEGER) {
             headers.put(JAEGER_KEY, traceID + ":" + spanID + ":" + parentSpanID + ":" + sampled);
+        } else if (config.getTraceType() == TraceType.DDTRACE) {
+            traceID = Utils.getDDtraceNewId().longValue() + "";
+            spanID = Utils.getDDtraceNewId().longValue() + "";
+            headers.put(DD_TRACE_ORIGIN_KEY, "rum");
+            headers.put(DD_TRACE_SAMPLING_PRIORITY_KEY, sampled);
+            headers.put(DD_TRACE_SPAN_ID_KEY, spanID);
+            headers.put(DD_TRACE_TRACE_ID_KEY, traceID);
         }
 //        else if (FTHttpConfig.get().traceType == TraceType.SKYWALKING_V3) {
 //            SkyWalkingUtils skyWalkingUtils = new SkyWalkingUtils(SkyWalkingUtils.SkyWalkingVersion.V3, sampled, requestTime, httpUrl);
