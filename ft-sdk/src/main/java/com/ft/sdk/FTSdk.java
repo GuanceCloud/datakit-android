@@ -179,7 +179,7 @@ public class FTSdk {
     }
 
     /**
-     *
+     * 设置 log 配置
      * @param config
      */
     public static void initLogWithConfig(@NonNull FTLoggerConfig config) {
@@ -195,6 +195,9 @@ public class FTSdk {
         FTRUMConfigManager.get().bindUserData(id);
     }
 
+    /**
+     * 解绑用户数据
+     */
     public static void unbindRumUserData() {
         FTRUMConfigManager.get().unbindUserData();
     }
