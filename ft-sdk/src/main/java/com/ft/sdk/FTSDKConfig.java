@@ -9,7 +9,7 @@ import com.ft.sdk.garble.utils.DeviceUtils;
  */
 public class FTSDKConfig {
     //服务器地址
-    private final String serverUrl;
+    private final String metricsUrl;
     private boolean useOAID;
     //是否是Debug
     private boolean isDebug;
@@ -34,14 +34,14 @@ public class FTSDKConfig {
     /**
      * SDK 配置项构造方法
      *
-     * @param serverUrl
+     * @param metricsUrl
      */
-    private FTSDKConfig(String serverUrl) {
-        this.serverUrl = serverUrl;
+    private FTSDKConfig(String metricsUrl) {
+        this.metricsUrl = metricsUrl;
     }
 
-    public String getServerUrl() {
-        return serverUrl;
+    public String getMetricsUrl() {
+        return metricsUrl;
     }
 
     public boolean isUseOAID() {

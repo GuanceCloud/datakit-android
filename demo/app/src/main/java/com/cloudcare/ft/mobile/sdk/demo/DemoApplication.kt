@@ -20,6 +20,7 @@ class DemoApplication : Application() {
             .setDebug(true)//是否开启Debug模式（开启后能查看调试数据）
         FTSdk.install(ftSDKConfig)
 
+        //配置 Log
         FTSdk.initLogWithConfig(
             FTLoggerConfig()
                 .setEnableConsoleLog(true)
@@ -29,6 +30,7 @@ class DemoApplication : Application() {
                 .setSamplingRate(0.8f)
 
         )
+        //配置 RUM
         FTSdk.initRUMWithConfig(
             FTRUMConfig()
                 .setRumAppId(AccountUtils.getProperty(this, AccountUtils.RUM_APP_ID))
@@ -39,6 +41,7 @@ class DemoApplication : Application() {
                 .setEnableTrackAppANR(true)
         )
 
+        //配置 Trace
         FTSdk.initTraceWithConfig(
             FTTraceConfig()
                 .setServiceName("ft-sdk-demo")
