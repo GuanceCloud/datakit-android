@@ -26,7 +26,6 @@ import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,10 +36,11 @@ import java.nio.charset.StandardCharsets;
 import okhttp3.Request;
 
 import static com.ft.AllTests.hasPrepare;
-import static com.ft.sdk.FTNetWorkInterceptor.JAEGER_KEY;
-import static com.ft.sdk.FTNetWorkInterceptor.ZIPKIN_SAMPLED;
-import static com.ft.sdk.FTNetWorkInterceptor.ZIPKIN_SPAN_ID;
-import static com.ft.sdk.FTNetWorkInterceptor.ZIPKIN_TRACE_ID;
+import static com.ft.sdk.FTTraceHandler.DD_TRACE_TRACE_ID_KEY;
+import static com.ft.sdk.FTTraceHandler.JAEGER_KEY;
+import static com.ft.sdk.FTTraceHandler.ZIPKIN_SAMPLED;
+import static com.ft.sdk.FTTraceHandler.ZIPKIN_SPAN_ID;
+import static com.ft.sdk.FTTraceHandler.ZIPKIN_TRACE_ID;
 import static com.ft.utils.RequestUtil.requestUrl;
 
 /**
@@ -49,7 +49,7 @@ import static com.ft.utils.RequestUtil.requestUrl;
  * description:
  */
 @RunWith(AndroidJUnit4.class)
-public class TraceTest extends BaseTest {
+public class TraceHeaderTest extends BaseTest {
 
     @BeforeClass
     public static void setUp() {
@@ -96,6 +96,14 @@ public class TraceTest extends BaseTest {
         FTSdk.initTraceWithConfig(new FTTraceConfig().setTraceType(TraceType.JAEGER));
         Request request = requestUrl("http://www.weather.com.cn/data/sk/101010100.html");
         boolean expect = request.headers().names().contains(JAEGER_KEY);
+        Assert.assertTrue(expect);
+    }
+
+    @Test
+    public void traceDDtraceHeaderTest() {
+        FTSdk.initTraceWithConfig(new FTTraceConfig().setTraceType(TraceType.DDTRACE));
+        Request request = requestUrl("http://www.weather.com.cn/data/sk/101010100.html");
+        boolean expect = request.headers().names().contains(DD_TRACE_TRACE_ID_KEY);
         Assert.assertTrue(expect);
     }
 

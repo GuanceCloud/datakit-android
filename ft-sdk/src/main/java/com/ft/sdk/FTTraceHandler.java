@@ -14,18 +14,18 @@ import java.util.UUID;
  * time: 2020/9/16 11:34:48
  * description: trace 数据处理
  */
-class FTTraceHandler {
-    private static final String ZIPKIN_TRACE_ID = "X-B3-TraceId";
-    private static final String ZIPKIN_SPAN_ID = "X-B3-SpanId";
-    private static final String ZIPKIN_SAMPLED = "X-B3-Sampled";
-    private static final String JAEGER_KEY = "uber-trace-id";
-    private static final String SKYWALKING_V3_SW_8 = "sw8";
-    private static final String SKYWALKING_V3_SW_6 = "sw6";
+public class FTTraceHandler {
+    public static final String ZIPKIN_TRACE_ID = "X-B3-TraceId";
+    public static final String ZIPKIN_SPAN_ID = "X-B3-SpanId";
+    public static final String ZIPKIN_SAMPLED = "X-B3-Sampled";
+    public static final String JAEGER_KEY = "uber-trace-id";
+    public static final String SKYWALKING_V3_SW_8 = "sw8";
+    public static final String SKYWALKING_V3_SW_6 = "sw6";
 
-    private static final String DD_TRACE_TRACE_ID_KEY = "x-datadog-trace-id";
-    private static final String DD_TRACE_SPAN_ID_KEY = "x-datadog-parent-id";
-    private static final String DD_TRACE_SAMPLING_PRIORITY_KEY = "x-datadog-sampling-priority";
-    private static final String DD_TRACE_ORIGIN_KEY = "x-datadog-origin";
+    public static final String DD_TRACE_TRACE_ID_KEY = "x-datadog-trace-id";
+    public static final String DD_TRACE_SPAN_ID_KEY = "x-datadog-parent-id";
+    public static final String DD_TRACE_SAMPLING_PRIORITY_KEY = "x-datadog-sampling-priority";
+    public static final String DD_TRACE_ORIGIN_KEY = "x-datadog-origin";
     //是否可以采样
     private final boolean enableTrace;
     //请求开始时间
@@ -45,7 +45,7 @@ class FTTraceHandler {
         return spanID;
     }
 
-    public FTTraceHandler() {
+     FTTraceHandler() {
         config = FTTraceConfigManager.get().getConfig();
         enableTrace = config != null && Utils.enableTraceSamplingRate(config.getSamplingRate());
 

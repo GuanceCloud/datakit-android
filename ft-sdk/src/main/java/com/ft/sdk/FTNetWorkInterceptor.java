@@ -34,12 +34,6 @@ import okhttp3.internal.http.HttpHeaders;
 public class FTNetWorkInterceptor extends NetStatusMonitor implements Interceptor {
 
     private static final String TAG = "FTNetWorkTracerInterceptor";
-    public static final String ZIPKIN_TRACE_ID = "X-B3-TraceId";
-    public static final String ZIPKIN_SPAN_ID = "X-B3-SpanId";
-    public static final String ZIPKIN_SAMPLED = "X-B3-Sampled";
-    public static final String JAEGER_KEY = "uber-trace-id";
-//    public static final String SKYWALKING_V3_SW_8 = "sw8";
-//    public static final String SKYWALKING_V3_SW_6 = "sw6";
 
     private final boolean webViewTrace;
 

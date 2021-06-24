@@ -305,7 +305,7 @@ public class LogTrackTraceRUMTest extends BaseTest {
 
     private boolean checkTraceHasLinkRumData(boolean enableLinkRUMData) throws InterruptedException {
         FTSdk.initTraceWithConfig(new FTTraceConfig()
-                .setTraceType(TraceType.ZIPKIN)
+                .setTraceType(TraceType.DDTRACE)
                 .setEnableLinkRUMData(enableLinkRUMData)
         );
         Thread.sleep(2000);
@@ -325,7 +325,7 @@ public class LogTrackTraceRUMTest extends BaseTest {
                 JSONObject json = new JSONObject(recordData.getDataString());
                 JSONObject tags = json.optJSONObject("tags");
                 String measurement = json.optString("measurement");
-                if ("zipkin".equals(measurement)) {
+                if (TraceType.DDTRACE.toString().equals(measurement)) {
                     if (tags != null) {
                         tracId = tags.optString("trace_id");
                         spanId = tags.optString("span_id");
