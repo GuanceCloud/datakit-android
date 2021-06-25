@@ -14,6 +14,7 @@ public class ResourceBean {
     public String resourceUrlQuery = "";
     public String traceId = "";
     public String spanId = "";
+    public String errorStack = "";
 
     public int resourceStatus = -1;
 
@@ -45,6 +46,7 @@ public class ResourceBean {
         responseContentEncoding = "";
         resourceMethod = "";
         resourceUrlQuery = "";
+        errorStack = "";
 
         resourceStatus = -1;
 

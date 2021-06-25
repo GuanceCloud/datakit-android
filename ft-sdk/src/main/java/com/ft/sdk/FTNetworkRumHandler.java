@@ -51,7 +51,11 @@ public final class FTNetworkRumHandler {
             bean.responseContentEncoding = response.header("Content-Encoding");
             bean.resourceType = bean.responseContentType;
             bean.resourceStatus = response.code();
+            if (bean.resourceStatus >= HttpsURLConnection.HTTP_BAD_REQUEST) {
+                bean.errorStack = responseBody == null ? "" : responseBody;
+            }
         }
+
 
         bean.resourceSize = responseBody == null ? 0 : responseBody.getBytes().length;
         bean.resourceSize += responseHeaderSize;

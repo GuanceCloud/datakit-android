@@ -853,9 +853,10 @@ public class FTAutoTrack {
                     errorTags.put(Constants.KEY_RUM_RESOURCE_URL_PATH, urlPath);
                     errorTags.put(Constants.KEY_RUM_RESOURCE_URL_PATH_GROUP, urlPathGroup);
                 }
+                String errorMsg = "[" + bean.resourceStatus + "]" + "[" + bean.url + "]";
 
-                errorField.put(Constants.KEY_RUM_ERROR_MESSAGE, "");
-                errorField.put(Constants.KEY_RUM_ERROR_STACK, "");
+                errorField.put(Constants.KEY_RUM_ERROR_MESSAGE, errorMsg);
+                errorField.put(Constants.KEY_RUM_ERROR_STACK, bean.errorStack);
 
                 FTTrackInner.getInstance().rum(time, Constants.FT_MEASUREMENT_RUM_ERROR, errorTags, errorField);
             }
@@ -987,7 +988,7 @@ public class FTAutoTrack {
             tags.put(Constants.KEY_RUM_ENV, FTSdk.get().getBaseConfig().getEnv().toString());
             tags.put(Constants.KEY_RUM_NETWORK_TYPE, NetUtils.get().getNetWorkStateName());
             tags.put(Constants.KEY_RUM_IS_SIGNIN, FTRUMConfigManager.get().isUserDataBinded() ? "T" : "F");
-            if (FTRUMConfigManager.get().isUserDataBinded() ) {
+            if (FTRUMConfigManager.get().isUserDataBinded()) {
                 tags.put(Constants.KEY_RUM_USER_ID, FTRUMConfigManager.get().getUserData().getId());
             } else {
                 tags.put(Constants.KEY_RUM_USER_ID, FTRUMGlobalManager.get().getSessionId());
@@ -1020,7 +1021,7 @@ public class FTAutoTrack {
 
     private static void handleOp(String currentPage, OP op, String parentPage, long duration, @Nullable String vtp) {
 
-        if (!FTRUMConfigManager.get().isRumEnable()&&!op.equals(OP.CLK)
+        if (!FTRUMConfigManager.get().isRumEnable() && !op.equals(OP.CLK)
                 && !op.equals(OP.LANC)
                 && !op.equals(OP.OPEN_ACT)
                 && !op.equals(OP.OPEN_FRA)
@@ -1035,7 +1036,7 @@ public class FTAutoTrack {
             case CLK:
                 event = Constants.EVENT_NAME_CLICK;
 
-                FTRUMGlobalManager.get().startAction(vtp + " click", event);
+                FTRUMGlobalManager.get().startAction(vtp, event);
                 break;
             case LANC:
                 event = Constants.EVENT_NAME_LAUNCH;
