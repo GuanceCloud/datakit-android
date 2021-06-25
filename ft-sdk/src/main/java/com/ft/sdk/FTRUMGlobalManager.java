@@ -112,8 +112,8 @@ public class FTRUMGlobalManager {
                 && (now - lastActionTime > ActionBean.ACTION_NORMAL_TIME_OUT)
                 || timeOut;
         if (needClose) {
-            closeAction(activeAction.getId(), activeAction.getDuration(), timeOut);
             activeAction.close();
+            closeAction(activeAction.getId(), activeAction.getDuration(), timeOut);
         }
     }
 
@@ -412,7 +412,7 @@ public class FTRUMGlobalManager {
         return !notCollectMap.contains(sessionId);
     }
 
-    public void release(){
+    public void release() {
         mHandler.removeCallbacks(mRUMGenerateRunner);
     }
 
