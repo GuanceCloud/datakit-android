@@ -1,3 +1,9 @@
+# agent 1.2.0-alpha01
+1.新增日志链路关联 RUM 功能
+2.新增 DDtrace 链路类型
+3.重新规划 RUM Trace Log 的配置
+
+---
 # agent 1.1.0-alpha11
 1.补充 resource 缺失字段
 
