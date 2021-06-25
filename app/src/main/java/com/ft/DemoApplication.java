@@ -70,7 +70,7 @@ public class DemoApplication extends Application {
         FTSdk.initTraceWithConfig(new FTTraceConfig()
                 .setSamplingRate(1f)
                 .setEnableLinkRUMData(true)
-                .setTraceType(TraceType.ZIPKIN));
+                .setTraceType(TraceType.DDTRACE));
 
     }
 
