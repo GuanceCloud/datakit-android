@@ -1,3 +1,8 @@
+# agent 1.2.0-alpha02
+1.修改 action_name 描述
+2.修正 action 时间统计错误的问题
+
+---
 # agent 1.2.0-alpha01
 1.新增日志链路关联 RUM 功能
 2.新增 DDtrace 链路类型
