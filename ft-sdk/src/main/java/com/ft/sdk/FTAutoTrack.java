@@ -245,7 +245,7 @@ public class FTAutoTrack {
     public static void trackTabLayoutSelected(TabLayout.Tab tab) {
         try {
             Object object = tab.view.getContext();
-            clickView(tab.view, object.getClass(), AopUtils.getClassName(object), AopUtils.getSupperClassName(object), AopUtils.getParentViewTree(tab.view) + "#" + tab.getPosition());
+            clickView(tab.view, object.getClass(), AopUtils.getClassName(object), AopUtils.getSupperClassName(object), AopUtils.getViewDesc(tab.view) + "#" + tab.getPosition());
         } catch (Exception e) {
             e.printStackTrace();
         }
