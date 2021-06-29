@@ -108,14 +108,4 @@
 
 #SDK
 -dontwarn com.ft.sdk.**
--keep class com.ft.sdk.**{
-  *;
-}
-
-
--keep enum com.ft.sdk.WebAppInterface {
-    *;
-}
--keep enum com.ft.sdk.FTWebViewHandler {
-    *;
-}
+-keep class com.ft.sdk.**{*;}

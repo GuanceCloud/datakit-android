@@ -95,7 +95,7 @@ public class FTRUMGlobalManager {
 
         checkSessionRefresh();
         checkActionClose();
-        if (activeAction == null || activeAction.isClose() || !activeView.getId().equals(activeView.getId())) {
+        if (activeAction == null || activeAction.isClose() || !activeView.getId().equals(activeAction.getViewId())) {
             activeAction = new ActionBean(actionName, actionType, sessionId, activeView, needWait);
             initAction(activeAction);
             this.lastActionTime = activeAction.getStartTime();

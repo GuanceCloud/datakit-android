@@ -21,22 +21,12 @@
 #-renamesourcefileattribute SourceFile
 
 
--keep class ftnative.NativeHandler {
-    native <methods>;
-    void crashCallback(...);
-    void traceCallback(...);
-}
+-dontwarn com.ft.sdk.**
+-keep class com.ft.sdk.**{*;}
 
--keep class ftnative.NativeCrash{
- *;
-}
-
--keep class ftnative.NativeCrash$InitParameters{
- *;
-}
+-keep class ftnative.*{*;}
 
 -keep class com.bun.miitmdid.core.**{*;}
 
--keep class * extends com.ft.sdk.garble.http.ResponseData{
-     *;
-}
+-keepnames class * extends android.view.View
+
