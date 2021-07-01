@@ -52,13 +52,13 @@ public class ActionBean {
     }
 
     public ActionBean(String actionName, String actionType,
-                      String sessionId, ViewBean viewBean, boolean needWaitAction) {
+                      String sessionId, String viewId,String viewName,String viewReferrer , boolean needWaitAction) {
         this.actionName = actionName;
         this.actionType = actionType;
         this.sessionId = sessionId;
-        this.viewId = viewBean == null ? null : viewBean.getId();
-        this.viewName = viewBean == null ? null : viewBean.getViewName();
-        this.viewReferrer = viewBean == null ? null : viewBean.getViewReferrer();
+        this.viewId = viewId;
+        this.viewName = viewName;
+        this.viewReferrer = viewReferrer;
         this.needWaitAction = needWaitAction;
     }
 
