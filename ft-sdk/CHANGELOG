@@ -1,3 +1,8 @@
+# agent 1.2.0-alpha04
+1.action viewName 错误为题修复
+2.Tab 点击描述优化
+
+---
 # agent 1.2.0-alpha03
 1.action id 判断问题修复
 2.click 事件部分 action_name 错误的问题
