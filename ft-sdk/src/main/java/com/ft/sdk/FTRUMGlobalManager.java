@@ -286,12 +286,12 @@ public class FTRUMGlobalManager {
         try {
             tags.put(Constants.KEY_RUM_VIEW_ID, getViewId());
 
-            tags.put(Constants.KEY_RUM_VIEW_NAME, FTRUMGlobalManager.get().getViewName());
-            tags.put(Constants.KEY_RUM_VIEW_REFERRER, FTRUMGlobalManager.get().getViewReferrer());
+            tags.put(Constants.KEY_RUM_VIEW_NAME, getViewName());
+            tags.put(Constants.KEY_RUM_VIEW_REFERRER, getViewReferrer());
             tags.put(Constants.KEY_RUM_SESSION_ID, sessionId);
             if (withAction) {
                 tags.put(Constants.KEY_RUM_ACTION_ID, getActionId());
-                tags.put(Constants.KEY_RUM_ACTION_NAME, FTRUMGlobalManager.get().getActionName());
+                tags.put(Constants.KEY_RUM_ACTION_NAME, getActionName());
             }
         } catch (JSONException e) {
             LogUtils.e(TAG, e.getMessage());
