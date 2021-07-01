@@ -160,7 +160,10 @@ public class AopUtils {
                 }
             }
         }
-        stringBuffer.append("#").append(AopUtils.getViewId(view));
+        String viewId = AopUtils.getViewId(view);
+        if (viewId != null) {
+            stringBuffer.append("#").append(viewId);
+        }
         return stringBuffer.toString();
     }
 
