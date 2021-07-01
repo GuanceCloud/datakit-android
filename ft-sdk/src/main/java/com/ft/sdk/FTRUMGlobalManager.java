@@ -101,7 +101,7 @@ public class FTRUMGlobalManager {
         String viewReferrer = activeView.getViewReferrer();
         checkSessionRefresh();
         checkActionClose();
-        if (activeAction == null || activeAction.isClose() || !activeView.getId().equals(activeAction.getViewId())) {
+        if (activeAction == null || activeAction.isClose() ) {
             activeAction = new ActionBean(actionName, actionType, sessionId, viewId, viewName, viewReferrer, needWait);
             initAction(activeAction);
             this.lastActionTime = activeAction.getStartTime();
@@ -116,7 +116,7 @@ public class FTRUMGlobalManager {
         boolean timeOut = now - lastActionTime > ActionBean.ACTION_NEED_WAIT_TIME_OUT;
         boolean needClose = !waiting
                 && (now - lastActionTime > ActionBean.ACTION_NORMAL_TIME_OUT)
-                || timeOut;
+                || timeOut || !activeView.getId().equals(activeAction.getViewId());
         if (needClose) {
             activeAction.close();
             closeAction(activeAction.getId(), activeAction.getDuration(), timeOut);
