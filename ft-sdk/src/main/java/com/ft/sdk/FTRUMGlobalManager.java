@@ -74,9 +74,9 @@ public class FTRUMGlobalManager {
         if (!config.isEnableTraceUserAction()) {
             return;
         }
-        String viewId = activeView.getId();
-        String viewName = activeView.getViewName();
-        String viewReferrer = activeView.getViewReferrer();
+        String viewId = activeView != null ? activeView.getId() : null;
+        String viewName = activeView != null ? activeView.getViewName() : null;
+        String viewReferrer = activeView != null ? activeView.getViewReferrer() : null;
         checkSessionRefresh();
 
         activeAction = new ActionBean(actionName, actionType,
@@ -96,12 +96,12 @@ public class FTRUMGlobalManager {
             return;
         }
 
-        String viewId = activeView.getId();
-        String viewName = activeView.getViewName();
-        String viewReferrer = activeView.getViewReferrer();
+        String viewId = activeView != null ? activeView.getId() : null;
+        String viewName = activeView != null ? activeView.getViewName() : null;
+        String viewReferrer = activeView != null ? activeView.getViewReferrer() : null;
         checkSessionRefresh();
         checkActionClose();
-        if (activeAction == null || activeAction.isClose() ) {
+        if (activeAction == null || activeAction.isClose()) {
             activeAction = new ActionBean(actionName, actionType, sessionId, viewId, viewName, viewReferrer, needWait);
             initAction(activeAction);
             this.lastActionTime = activeAction.getStartTime();
