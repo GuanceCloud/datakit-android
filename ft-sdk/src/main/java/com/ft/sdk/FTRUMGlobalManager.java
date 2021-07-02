@@ -381,7 +381,7 @@ public class FTRUMGlobalManager {
                 LogUtils.e(TAG, e.getMessage());
             }
 
-            FTTrackInner.getInstance().rum(time,
+            FTTrackInner.getInstance().rum(bean.getStartTime(),
                     Constants.FT_MEASUREMENT_RUM_VIEW, tags, fields);
 
 
