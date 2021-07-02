@@ -338,7 +338,7 @@ public class FTRUMGlobalManager {
                 fields.put(Constants.KEY_RUM_ACTION_RESOURCE_COUNT, bean.getResourceCount());
                 fields.put(Constants.KEY_RUM_ACTION_ERROR_COUNT, bean.getErrorCount());
                 fields.put(Constants.KEY_RUM_ACTION_DURATION, bean.getDuration());
-                FTTrackInner.getInstance().rum(Utils.getCurrentNanoTime(),
+                FTTrackInner.getInstance().rum(bean.getStartTime(),
                         Constants.FT_MEASUREMENT_RUM_ACTION, tags, fields);
             } catch (JSONException e) {
                 LogUtils.e(TAG, e.getMessage());
