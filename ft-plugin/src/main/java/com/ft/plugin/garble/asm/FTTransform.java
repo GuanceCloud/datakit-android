@@ -12,7 +12,8 @@ import com.android.build.api.transform.TransformInput;
 import com.android.build.api.transform.TransformInvocation;
 import com.android.build.api.transform.TransformOutputProvider;
 import com.android.build.gradle.internal.pipeline.TransformManager;
-import com.android.ide.common.internal.WaitableExecutor;
+//import com.android.ide.common.internal.WaitableExecutor;
+import com.android.ide.common.workers.WorkerExecutorFacade;
 import com.ft.plugin.garble.FTExtension;
 import com.ft.plugin.garble.Logger;
 import com.ft.plugin.garble.bytecode.FTWeaver;
@@ -27,6 +28,10 @@ import java.net.URLClassLoader;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * From https://github.com/Leaking/Hunter/blob/master/hunter-transform/src/main/java/com/quinn/hunter/transform/HunterTransform.java
@@ -36,11 +41,16 @@ import java.util.Set;
 public class FTTransform extends Transform {
     private final Project project;
     private final BaseWeaver bytecodeWeaver = new FTWeaver();
-    private final WaitableExecutor waitableExecutor;
+    private final Worker waitableExecutor;
+
+    private static final int cpuCount = Runtime.getRuntime().availableProcessors();
+    private final static ExecutorService IO = new ThreadPoolExecutor(0, cpuCount * 3,
+            30L, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>());
 
     public FTTransform(Project project) {
         this.project = project;
-        this.waitableExecutor = WaitableExecutor.useGlobalSharedThreadPool();
+        this.waitableExecutor = new Worker(IO) ;
     }
 
     @Override
@@ -165,13 +175,13 @@ public class FTTransform extends Transform {
 
         }
 
-        waitableExecutor.waitForTasksWithQuickFail(true);
+        waitableExecutor.await();
         long costTime = System.currentTimeMillis() - startTime;
         Logger.debug((getName() + " cost " + costTime + "ms"));
     }
 
     private void transformSingleFile(final File inputFile, final File outputFile, final String srcBaseDir) {
-        waitableExecutor.execute(() -> {
+        waitableExecutor.submit(() -> {
             bytecodeWeaver.weaveSingleClassToFile(inputFile, outputFile, srcBaseDir);
             return null;
         });
@@ -182,14 +192,14 @@ public class FTTransform extends Transform {
         final String outputDirPath = outputDir.getAbsolutePath();
         if (inputDir.isDirectory()) {
             for (final File file : com.android.utils.FileUtils.getAllFiles(inputDir)) {
-                waitableExecutor.execute(() -> {
+                waitableExecutor.submit(() -> {
                     String filePath = file.getAbsolutePath();
                     File outputFile = new File(filePath.replace(inputDirPath, outputDirPath));
                     try {
                         bytecodeWeaver.weaveSingleClassToFile(file, outputFile, inputDirPath);
                     } catch (Exception e) {
                         Logger.debug("修改类异常-文件名：" + filePath + "----异常原因：" + e);
-                        throw e.getClass().newInstance();
+                        throw e;
                     }
                     return null;
                 });
@@ -198,14 +208,14 @@ public class FTTransform extends Transform {
     }
 
     private void transformJar(final File srcJar, final File destJar, Status status) {
-        waitableExecutor.execute(() -> {
+        waitableExecutor.submit(() -> {
             bytecodeWeaver.weaveJar(srcJar, destJar);
             return null;
         });
     }
 
     private void cleanDexBuilderFolder(File dest) {
-        waitableExecutor.execute(() -> {
+        waitableExecutor.submit(() -> {
             try {
                 String dexBuilderDir = replaceLastPart(dest.getAbsolutePath(), getName(), "dexBuilder");
                 //intermediates/transforms/dexBuilder/debug
