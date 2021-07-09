@@ -19,5 +19,9 @@ public class FirstActivity extends NameTitleActivity {
             startActivity(new Intent(FirstActivity.this, RepeatActivity.class));
 
         });
+
+        findViewById(R.id.first_to_tabview_btn).setOnClickListener(v -> {
+            startActivity(new Intent(FirstActivity.this, TabViewActivity.class));
+        });
     }
 }

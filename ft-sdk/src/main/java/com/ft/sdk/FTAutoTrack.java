@@ -81,7 +81,6 @@ public class FTAutoTrack {
      */
     public static void startActivityByWay(Boolean fromFragment, Intent intent) {
         try {
-            LogUtils.d(TAG, "activityFromWay=" + fromFragment + ",,,intent=" + intent);
             if (intent != null && intent.getComponent() != null) {
                 FTActivityManager.get().putActivityOpenFromFragment(intent.getComponent().getClassName(), fromFragment);
             }

@@ -93,7 +93,7 @@ public class FTDBManager extends DBManager {
      */
     public void initSumAction(ActionBean data) {
         LogUtils.d(TAG, "initSumAction:id" + data.getId() + ",Viewname:" + data.getViewName()
-                + ",actionName" + data.getActionName());
+                + ",actionName:" + data.getActionName());
 
         getDB(true, db -> {
             ContentValues contentValues = new ContentValues();

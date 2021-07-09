@@ -34,6 +34,7 @@
         <activity android:name=".ThirdActivity" />
         <activity android:name=".FirstActivity" />
         <activity android:name=".RepeatActivity" />
+        <activity android:name=".TabViewActivity" />
     </application>
 
 </manifest>
