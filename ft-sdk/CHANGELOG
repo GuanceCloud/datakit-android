@@ -1,3 +1,8 @@
+# agent 1.2.0-alpha05
+1.修改 UIBlock 错误条件读取问题
+2.优化 UIBlock 算法
+
+---
 # agent 1.2.0-alpha04
 1.action viewName 错误为题修复
 2.Tab 点击描述优化
