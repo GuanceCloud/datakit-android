@@ -75,6 +75,8 @@ class AppRestartCallback {
 
                 }
             }
+            FTMainLoopLogMonitor.getInstance().resume();
+
             alreadySleep = false;
         }
         //避免重复计算页面启动的统计计算
@@ -88,7 +90,6 @@ class AppRestartCallback {
         if (!appForeground) {
             handler.removeMessages(MSG_CHECK_SLEEP_STATUS);
             handler.sendEmptyMessageDelayed(MSG_CHECK_SLEEP_STATUS, DELAY_MILLIS);
-            FTMainLoopLogMonitor.getInstance().stopMonitor();
         }
     }
 
@@ -108,6 +109,7 @@ class AppRestartCallback {
         if (!appForeground) {
 //            FTAutoTrack.sleepApp(DELAY_MILLIS);
             alreadySleep = true;
+            FTMainLoopLogMonitor.getInstance().pause();
         }
     }
 

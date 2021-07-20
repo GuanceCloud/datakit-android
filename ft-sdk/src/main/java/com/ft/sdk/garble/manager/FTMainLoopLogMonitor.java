@@ -40,6 +40,7 @@ public class FTMainLoopLogMonitor {
     private static final long TIME_BLOCK_NS = 1000000000L;//超过1秒显示卡顿
     private static LogCallBack mLogCallBack;
     private long lastTime;
+    private boolean isPause;
     private long longTaskDuration;
 
     public interface LogCallBack {
@@ -78,6 +79,7 @@ public class FTMainLoopLogMonitor {
 
 
     public void startMonitor() {
+        if (isPause) return;
         if (lastTime > 0) {
             long duration = Utils.getCurrentNanoTime() - lastTime;
             if (duration > TIME_BLOCK_NS) {
@@ -88,9 +90,16 @@ public class FTMainLoopLogMonitor {
         lastTime = Utils.getCurrentNanoTime();
     }
 
-    public void stopMonitor() {
+    public void pause() {
+        isPause = true;
         lastTime = 0;
     }
+
+    public void resume() {
+        isPause = false;
+
+    }
+
 
     public void removeMonitor() {
         mIoHandler.removeCallbacks(mLogRunnable);

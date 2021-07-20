@@ -62,7 +62,7 @@ public class FTSdk {
      *
      * @return
      */
-     public static synchronized FTSdk get() throws InvalidParameterException {
+    public static synchronized FTSdk get() throws InvalidParameterException {
         if (mFtSdk == null) {
             throw new InvalidParameterException("请先安装SDK(在应用启动时调用FTSdk.install(FTSDKConfig ftSdkConfig,Application application))");
         }
@@ -82,6 +82,7 @@ public class FTSdk {
         LocationUtils.get().stopListener();
         FTExceptionHandler.release();
         FTDBCachePolicy.release();
+        FTUIBlockManager.release();
         FTTraceConfigManager.get().release();
         FTLoggerConfigManager.get().release();
         FTRUMGlobalManager.get().release();
@@ -163,15 +164,17 @@ public class FTSdk {
 
     /**
      * 设置 RUM 配置
+     *
      * @param config
      */
-    public static void initRUMWithConfig(@NonNull  FTRUMConfig config) {
+    public static void initRUMWithConfig(@NonNull FTRUMConfig config) {
         FTRUMConfigManager.get().initWithConfig(config);
 
     }
 
     /**
      * 设置 Trace 配置
+     *
      * @param config
      */
     public static void initTraceWithConfig(@NonNull FTTraceConfig config) {
@@ -180,6 +183,7 @@ public class FTSdk {
 
     /**
      * 设置 log 配置
+     *
      * @param config
      */
     public static void initLogWithConfig(@NonNull FTLoggerConfig config) {
@@ -201,9 +205,6 @@ public class FTSdk {
     public static void unbindRumUserData() {
         FTRUMConfigManager.get().unbindUserData();
     }
-
-
-
 
 
 }

@@ -26,8 +26,8 @@ public class FTUIBlockManager {
 
 
     public static void start(FTRUMConfig config) {
-        if (config.isRumEnable()
-                && config.isEnableTrackAppUIBlock()) {
+        if (!config.isRumEnable()
+                && !config.isEnableTrackAppUIBlock()) {
             return;
         }
 
