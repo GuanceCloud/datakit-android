@@ -3,7 +3,7 @@ apply from: 'maven.gradle'
 
 repositories {
     mavenCentral()
-    jcenter()
+//    jcenter()
 }
 
 dependencies {

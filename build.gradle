@@ -7,7 +7,7 @@ buildscript {
     }
     repositories {
         google()
-        jcenter()
+//        jcenter()
 //        mavenLocal()
         maven {
             url "${maven_publish_url}/maven-releases"
@@ -20,7 +20,7 @@ buildscript {
 
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.2.1'
+        classpath 'com.android.tools.build:gradle:7.0.0'
         classpath 'com.cloudcare.ft.mobile.sdk.tracker.plugin:ft-plugin:1.0.2-alpha02'
 //        classpath files('ft-plugin/build/libs/ft-plugin-1.0.2-alpha03.jar')
         classpath "com.github.gmazzo:gradle-buildconfig-plugin:2.0.2"
@@ -32,7 +32,7 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
         mavenLocal()
         maven {
             url "${maven_publish_url}/maven-releases"
