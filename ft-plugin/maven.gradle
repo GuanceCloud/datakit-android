@@ -14,21 +14,16 @@ buildConfig {
 
 }
 
-task sourceJar(type: Jar) {
-    from sourceSets.main.allJava
-}
 
 
 afterEvaluate {
     publishing {
         publications {
-            mavenAar(MavenPublication) {
+            mavenJar(MavenPublication) {
                 groupId group
                 artifactId 'ft-plugin'
                 version version
-                artifact sourceJar {
-                    classifier "sources"
-                }
+                artifact jar
             }
         }
         repositories {
