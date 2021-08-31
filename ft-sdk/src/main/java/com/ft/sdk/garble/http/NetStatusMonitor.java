@@ -1,10 +1,11 @@
 package com.ft.sdk.garble.http;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.ft.sdk.garble.bean.NetStatusBean;
 import com.ft.sdk.garble.utils.Utils;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -27,18 +28,18 @@ public abstract class NetStatusMonitor extends EventListener {
     protected abstract void getNetStatusInfoWhenCallEnd(NetStatusBean bean);
 
     @Override
-    public void callEnd(@NotNull Call call) {
+    public void callEnd(@NonNull Call call) {
         super.callEnd(call);
         getNetStatusInfoWhenCallEnd(netStatusBean);
     }
 
     @Override
-    public void callFailed(@NotNull Call call, @NotNull IOException ioe) {
+    public void callFailed(@NonNull Call call, @NonNull IOException ioe) {
         super.callFailed(call, ioe);
     }
 
     @Override
-    public void callStart(@NotNull Call call) {
+    public void callStart(@NonNull Call call) {
         super.callStart(call);
         netStatusBean.reset();
         netStatusBean.requestHost = call.request().url().host();
@@ -47,57 +48,57 @@ public abstract class NetStatusMonitor extends EventListener {
     }
 
     @Override
-    public void responseHeadersStart(@NotNull Call call) {
+    public void responseHeadersStart(@NonNull Call call) {
         super.responseHeadersStart(call);
         netStatusBean.responseStartTime = Utils.getCurrentNanoTime();
 
     }
 
     @Override
-    public void responseBodyEnd(@NotNull Call call, long byteCount) {
+    public void responseBodyEnd(@NonNull Call call, long byteCount) {
         super.responseBodyEnd(call, byteCount);
         netStatusBean.responseEndTime = Utils.getCurrentNanoTime();
     }
 
-    @Override
-    public void responseFailed(@NotNull Call call, @NotNull IOException ioe) {
-        super.responseFailed(call, ioe);
-    }
+//    @Override
+//    public void responseFailed(@NonNull Call call, @NonNull IOException ioe) {
+//        super.responseFailed(call, ioe);
+//    }
 
     @Override
-    public void dnsEnd(@NotNull Call call, @NotNull String domainName, @NotNull List<InetAddress> inetAddressList) {
+    public void dnsEnd(@NonNull Call call, @NonNull String domainName, @NonNull List<InetAddress> inetAddressList) {
         super.dnsEnd(call, domainName, inetAddressList);
         netStatusBean.dnsEndTime = Utils.getCurrentNanoTime();
     }
 
     @Override
-    public void dnsStart(@NotNull Call call, @NotNull String domainName) {
+    public void dnsStart(@NonNull Call call, @NonNull String domainName) {
         super.dnsStart(call, domainName);
         netStatusBean.dnsStartTime = Utils.getCurrentNanoTime();
     }
 
     @Override
-    public void secureConnectEnd(@NotNull Call call, @Nullable Handshake handshake) {
+    public void secureConnectEnd(@NonNull Call call, @NonNull Handshake handshake) {
         super.secureConnectEnd(call, handshake);
         netStatusBean.sslEndTime = Utils.getCurrentNanoTime();
 
     }
 
     @Override
-    public void secureConnectStart(@NotNull Call call) {
+    public void secureConnectStart(@NonNull Call call) {
         super.secureConnectStart(call);
         netStatusBean.sslStartTime = Utils.getCurrentNanoTime();
     }
 
     @Override
-    public void connectStart(@NotNull Call call, @NotNull InetSocketAddress inetSocketAddress, @NotNull Proxy proxy) {
+    public void connectStart(@NonNull Call call, @NonNull InetSocketAddress inetSocketAddress, @NonNull Proxy proxy) {
         super.connectStart(call, inetSocketAddress, proxy);
         netStatusBean.tcpStartTime = Utils.getCurrentNanoTime();
 
     }
 
     @Override
-    public void connectEnd(@NotNull Call call, @NotNull InetSocketAddress inetSocketAddress, @NotNull Proxy proxy, @Nullable Protocol protocol) {
+    public void connectEnd(@NonNull Call call, @NonNull InetSocketAddress inetSocketAddress, @NonNull Proxy proxy, @Nullable Protocol protocol) {
         super.connectEnd(call, inetSocketAddress, proxy, protocol);
         netStatusBean.tcpEndTime = Utils.getCurrentNanoTime();
     }

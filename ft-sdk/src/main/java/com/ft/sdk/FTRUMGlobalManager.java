@@ -3,6 +3,8 @@ package com.ft.sdk;
 import android.os.Handler;
 import android.os.Looper;
 
+import androidx.annotation.NonNull;
+
 import com.ft.sdk.garble.bean.ActionBean;
 import com.ft.sdk.garble.bean.ViewBean;
 import com.ft.sdk.garble.db.FTDBManager;
@@ -11,7 +13,6 @@ import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.ThreadPoolUtils;
 import com.ft.sdk.garble.utils.Utils;
 
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -197,7 +198,7 @@ public class FTRUMGlobalManager {
     }
 
 
-    void increaseError(@NotNull JSONObject tags) {
+    void increaseError(@NonNull JSONObject tags) {
 
         String actionId = tags.optString(Constants.KEY_RUM_ACTION_ID);
         String viewId = tags.optString(Constants.KEY_RUM_VIEW_ID);
@@ -208,7 +209,7 @@ public class FTRUMGlobalManager {
         });
     }
 
-    void increaseLongTask(@NotNull JSONObject tags) {
+    void increaseLongTask(@NonNull JSONObject tags) {
         String actionId = tags.optString(Constants.KEY_RUM_ACTION_ID);
         String viewId = tags.optString(Constants.KEY_RUM_VIEW_ID);
         ThreadPoolUtils.get().execute(() -> {
@@ -274,7 +275,7 @@ public class FTRUMGlobalManager {
      *
      * @param tags
      */
-    public void attachRUMRelative(@NotNull JSONObject tags) {
+    public void attachRUMRelative(@NonNull JSONObject tags) {
         attachRUMRelative(tags, true);
     }
 
@@ -282,7 +283,7 @@ public class FTRUMGlobalManager {
      * @param tags
      * @param withAction
      */
-    public void attachRUMRelative(@NotNull JSONObject tags, boolean withAction) {
+    public void attachRUMRelative(@NonNull JSONObject tags, boolean withAction) {
         try {
             tags.put(Constants.KEY_RUM_VIEW_ID, getViewId());
 

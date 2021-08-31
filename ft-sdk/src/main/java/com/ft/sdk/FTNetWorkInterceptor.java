@@ -1,12 +1,13 @@
 package com.ft.sdk;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.ft.sdk.garble.bean.NetStatusBean;
 import com.ft.sdk.garble.http.HttpUrl;
 import com.ft.sdk.garble.http.NetStatusMonitor;
 import com.ft.sdk.garble.utils.LogUtils;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -70,9 +71,9 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
     }
 
 
-    @NotNull
+    @NonNull
     @Override
-    public Response intercept(@NotNull Chain chain) throws IOException {
+    public Response intercept(@NonNull Chain chain) throws IOException {
 
         mNetworkRUMHandler.startResource();
         Request request = chain.request();
@@ -109,7 +110,7 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
             Response.Builder responseBuilder = response.newBuilder();
             Response clone = responseBuilder.build();
             ResponseBody responseBody1 = clone.body();
-            if (HttpHeaders.promisesBody(clone)) {
+            if (HttpHeaders.hasBody(clone)) {
                 if (responseBody1 != null) {
                     if (isSupportFormat(responseBody1.contentType())) {
                         byte[] bytes = toByteArray(responseBody1.byteStream());
