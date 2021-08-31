@@ -1,3 +1,7 @@
+# agent 1.2.0-alpha06
+1.适配 okhttp3 3.12.0 版本
+
+---
 # agent 1.2.0-alpha05
 1.修改 UIBlock 错误条件读取问题
 2.优化 UIBlock 算法
