@@ -1,6 +1,12 @@
 package com.ft.sdk;
 
+import com.ft.sdk.garble.bean.LogBean;
+import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.utils.Constants;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class FTLoggerConfig {
     private float samplingRate = 1;
@@ -8,6 +14,8 @@ public class FTLoggerConfig {
     private boolean enableConsoleLog = false;
     private boolean enableCustomLog = false;
     private String serviceName = Constants.DEFAULT_LOG_SERVICE_NAME;
+    private String logPrefix = "";
+    private List<Status> logLevelFilters;
 
     //日志数据数据库存储策略
     private LogCacheDiscard logCacheDiscardStrategy = LogCacheDiscard.DISCARD;
@@ -36,6 +44,12 @@ public class FTLoggerConfig {
 
     public FTLoggerConfig setEnableConsoleLog(boolean enableConsoleLog) {
         this.enableConsoleLog = enableConsoleLog;
+        return this;
+    }
+
+    public FTLoggerConfig setEnableConsoleLog(boolean enableConsoleLog, String prefix) {
+        this.enableConsoleLog = enableConsoleLog;
+        this.logPrefix = prefix;
         return this;
     }
 
@@ -73,5 +87,29 @@ public class FTLoggerConfig {
     public FTLoggerConfig setLogCacheDiscardStrategy(LogCacheDiscard logCacheDiscardStrategy) {
         this.logCacheDiscardStrategy = logCacheDiscardStrategy;
         return this;
+    }
+
+    public String getLogPrefix() {
+        return logPrefix;
+    }
+
+    public List<Status> getLogLevelFilters() {
+        return logLevelFilters;
+    }
+
+    public void setLogLevelFilters(Status[] logLevelFilters) {
+        this.logLevelFilters = Arrays.asList(logLevelFilters);
+    }
+
+    public boolean checkLogBeanWillPrint(LogBean logBean){
+        if (logPrefix == null
+                ||  logBean.getContent().startsWith(logPrefix)) {
+            if ((logLevelFilters == null
+                    || logLevelFilters.size() == 0)
+                    || logLevelFilters.contains(logBean.getStatus())) {
+                return true;
+            }
+        }
+        return  false;
     }
 }

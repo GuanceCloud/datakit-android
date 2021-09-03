@@ -21,8 +21,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class TrackLogManager {
     private static final String TAG = "TrackLogManager";
     private static TrackLogManager instance;
-    private List<BaseContentBean> logBeanList = new CopyOnWriteArrayList<>();
-    private LinkedBlockingQueue<LogBean> logQueue = new LinkedBlockingQueue<>();
+    private final List<BaseContentBean> logBeanList = new CopyOnWriteArrayList<>();
+    private final LinkedBlockingQueue<LogBean> logQueue = new LinkedBlockingQueue<>();
     private volatile boolean isRunning;
 
     private TrackLogManager() {

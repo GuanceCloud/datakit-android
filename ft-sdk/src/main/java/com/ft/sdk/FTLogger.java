@@ -50,7 +50,10 @@ public class FTLogger {
         logBean.setServiceName(config.getServiceName());
         logBean.setStatus(status);
         logBean.setEnv(FTSdk.get().getBaseConfig().getEnv());
-        FTTrackInner.getInstance().logBackground(logBean);
+        if (config.checkLogBeanWillPrint(logBean)) {
+            FTTrackInner.getInstance().logBackground(logBean);
+        }
+
     }
 
     /**
@@ -70,7 +73,9 @@ public class FTLogger {
             logBean.setServiceName(config.getServiceName());
             logBean.setStatus(logData.getStatus());
             logBean.setEnv(FTSdk.get().getBaseConfig().getEnv());
-            logBeans.add(logBean);
+            if (config.checkLogBeanWillPrint(logBean)) {
+                logBeans.add(logBean);
+            }
         }
         FTTrackInner.getInstance().batchLogBeanBackground(logBeans);
     }
