@@ -1,10 +1,8 @@
 package com.ft.sdk;
 
-import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.utils.Constants;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -101,15 +99,15 @@ public class FTLoggerConfig {
         this.logLevelFilters = Arrays.asList(logLevelFilters);
     }
 
-    public boolean checkLogBeanWillPrint(LogBean logBean){
-        if (logPrefix == null
-                ||  logBean.getContent().startsWith(logPrefix)) {
-            if ((logLevelFilters == null
-                    || logLevelFilters.size() == 0)
-                    || logLevelFilters.contains(logBean.getStatus())) {
-                return true;
-            }
-        }
-        return  false;
+    public boolean checkPrefix(String message) {
+        return logPrefix == null
+                || message.startsWith(logPrefix);
+    }
+
+
+    public boolean checkLogLevel(Status status) {
+        return (logLevelFilters == null
+                || logLevelFilters.size() == 0)
+                || logLevelFilters.contains(status);
     }
 }

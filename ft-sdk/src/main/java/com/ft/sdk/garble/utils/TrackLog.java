@@ -78,7 +78,7 @@ public class TrackLog {
             logBean.setServiceName(config.getServiceName());
             logBean.setStatus(getStatus(priority));
             logBean.setEnv(FTSdk.get().getBaseConfig().getEnv());
-            if (config.checkLogBeanWillPrint(logBean)) {
+            if (config.checkLogLevel(logBean.getStatus())&&config.checkPrefix(msg)) {
                 TrackLogManager.get().trackLog(logBean);
             }
         }

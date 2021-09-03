@@ -50,7 +50,7 @@ public class FTLogger {
         logBean.setServiceName(config.getServiceName());
         logBean.setStatus(status);
         logBean.setEnv(FTSdk.get().getBaseConfig().getEnv());
-        if (config.checkLogBeanWillPrint(logBean)) {
+        if (config.checkLogLevel(status)) {
             FTTrackInner.getInstance().logBackground(logBean);
         }
 
@@ -73,7 +73,7 @@ public class FTLogger {
             logBean.setServiceName(config.getServiceName());
             logBean.setStatus(logData.getStatus());
             logBean.setEnv(FTSdk.get().getBaseConfig().getEnv());
-            if (config.checkLogBeanWillPrint(logBean)) {
+            if (config.checkLogLevel(logBean.getStatus())) {
                 logBeans.add(logBean);
             }
         }
