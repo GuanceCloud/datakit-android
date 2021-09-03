@@ -95,8 +95,9 @@ public class FTLoggerConfig {
         return logLevelFilters;
     }
 
-    public void setLogLevelFilters(Status[] logLevelFilters) {
+    public FTLoggerConfig setLogLevelFilters(Status[] logLevelFilters) {
         this.logLevelFilters = Arrays.asList(logLevelFilters);
+        return this;
     }
 
     public boolean checkPrefix(String message) {
