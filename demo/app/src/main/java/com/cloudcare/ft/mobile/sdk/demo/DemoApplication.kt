@@ -2,6 +2,7 @@ package com.cloudcare.ft.mobile.sdk.demo
 
 import android.app.Application
 import com.ft.sdk.*
+import com.ft.sdk.garble.bean.Status
 
 /**
  * BY huangDianHua
@@ -24,9 +25,11 @@ class DemoApplication : Application() {
         FTSdk.initLogWithConfig(
             FTLoggerConfig()
                 .setEnableConsoleLog(true)
+//                .setEnableConsoleLog(true,"log prefix")
                 .setServiceName("ft-sdk-demo")
                 .setEnableLinkRumData(true)
                 .setEnableCustomLog(true)
+//                .setLogLevelFilters(arrayOf(Status.CRITICAL))
                 .setSamplingRate(0.8f)
 
         )
