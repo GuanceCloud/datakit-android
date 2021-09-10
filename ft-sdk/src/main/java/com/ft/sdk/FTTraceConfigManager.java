@@ -33,6 +33,9 @@ public class FTTraceConfigManager {
         return config != null && config.isEnableLinkRUMData();
     }
 
+    public boolean isEnableWebTrace() {
+        return config != null && config.isEnableWebTrace();
+    }
 
     void release() {
         config = null;

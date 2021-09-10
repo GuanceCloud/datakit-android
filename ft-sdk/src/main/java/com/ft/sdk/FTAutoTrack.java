@@ -1167,7 +1167,11 @@ public class FTAutoTrack {
 
     private static void setUpWebView(View webView) {
         if (webView instanceof WebView && webView.getTag(R.id.ft_webview_handled_tag_view_value) == null) {
-//            ((WebView) webView).setWebViewClient(new FTWebViewClient());
+
+            if (FTTraceConfigManager.get().isNetworkTrace()
+                    && FTTraceConfigManager.get().isEnableWebTrace()) {
+                ((WebView) webView).setWebViewClient(new FTWebViewClient());
+            }
             new FTWebViewHandler().setWebView((WebView) webView);
             webView.setTag(R.id.ft_webview_handled_tag_view_value, "handled");
         }

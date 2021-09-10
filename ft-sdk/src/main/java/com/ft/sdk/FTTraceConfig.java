@@ -9,6 +9,7 @@ public class FTTraceConfig {
     private float samplingRate = 1;
     private String serviceName = Constants.DEFAULT_LOG_SERVICE_NAME;
     private TraceType traceType = TraceType.DDTRACE;
+    private boolean enableWebTrace = false;
     private boolean enableLinkRUMData = false;
 
 
@@ -76,6 +77,15 @@ public class FTTraceConfig {
 
     public boolean isNetworkTrace() {
         return true;
+    }
+
+    public boolean isEnableWebTrace() {
+        return enableWebTrace;
+    }
+
+    public FTTraceConfig setEnableWebTrace(boolean enableWebTrace) {
+        this.enableWebTrace = enableWebTrace;
+        return this;
     }
 
 //    public FTTraceConfig setNetworkTrace(boolean networkTrace) {
