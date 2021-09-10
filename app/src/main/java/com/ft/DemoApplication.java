@@ -5,13 +5,10 @@ import android.content.Context;
 
 import com.ft.sdk.EnvType;
 import com.ft.sdk.FTLoggerConfig;
-import com.ft.sdk.FTLoggerConfigManager;
 import com.ft.sdk.FTRUMConfig;
-import com.ft.sdk.FTRUMConfigManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
-import com.ft.sdk.FTTraceConfigManager;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.TraceType;
 
