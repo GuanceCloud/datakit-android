@@ -38,6 +38,7 @@ import java.util.LinkedList;
  * Description:
  */
 public class NetUtils {
+    private final static String TAG = "NetUtils";
     public final static int NETWORK_NONE = 0;
     public final static int NETWORK_WIFI = 1;
     public final static int NETWORK_2G = 2;
@@ -126,7 +127,15 @@ public class NetUtils {
         if (telephonyManager == null) {
             return NETWORK_NONE;
         }
-        int networkType = telephonyManager.getNetworkType();
+        int networkType = NETWORK_UNKNOWN;
+
+        try {
+            networkType = telephonyManager.getNetworkType();
+        } catch (Exception ex) {
+            LogUtils.e(TAG, ex.getMessage());
+            return NETWORK_UNKNOWN;
+        }
+
         switch (networkType) {
             case TelephonyManager.NETWORK_TYPE_GPRS:
             case TelephonyManager.NETWORK_TYPE_CDMA:
@@ -394,7 +403,7 @@ public class NetUtils {
      * @return
      */
     public String getSSId() {
-        String ssId = null  ;
+        String ssId = null;
         WifiManager manager = (WifiManager) FTApplication.getApplication().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         if (manager != null) {
             WifiInfo wifiInfo = manager.getConnectionInfo();
@@ -403,7 +412,7 @@ public class NetUtils {
                 if (ssId.length() > 2 && ssId.charAt(0) == '"' && ssId.charAt(ssId.length() - 1) == '"') {
                     return ssId.substring(1, ssId.length() - 1);
                 } else if (ssId.contains("<unknown ssid>")) {
-                    ssId =null;
+                    ssId = null;
                 }
             }
         }
