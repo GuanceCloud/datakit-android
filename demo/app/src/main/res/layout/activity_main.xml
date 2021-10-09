@@ -22,6 +22,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="写日志" />
+        <Button
+            android:id="@+id/dynamic_rum_tag_1_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="动态设置 RUM Tag 1" />
+
+        <Button
+            android:id="@+id/dynamic_rum_tag_2_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="动态设置 RUM Tag 2" />
 
 
     </LinearLayout>

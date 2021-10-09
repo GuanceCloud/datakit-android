@@ -16,7 +16,7 @@ android {
     }
     buildTypes {
         debug {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -24,6 +24,20 @@ android {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
     }
+
+    flavorDimensions "tier"
+
+    productFlavors {
+
+        prodTest {
+            buildConfigField "String", "CUSTOM_TAG", "\"Custom tag\""
+            buildConfigField "String", "CUSTOM_VALUE", "\"Custom value\""
+            dimension "tier"
+
+        }
+
+    }
+
 }
 
 dependencies {
@@ -38,7 +52,7 @@ dependencies {
 
     //================FT-SDK需要使用的引用=================//
     //FT-SDK引用
-    implementation 'com.cloudcare.ft.mobile.sdk.tracker.agent:ft-sdk:1.2.1-alpha01'
+    implementation 'com.cloudcare.ft.mobile.sdk.tracker.agent:ft-sdk:1.2.3-alpha01'
 
     implementation 'com.cloudcare.ft.mobile.sdk.tracker.agent:ft-native:1.0.0-alpha04'
     implementation 'com.google.code.gson:gson:2.8.5'
