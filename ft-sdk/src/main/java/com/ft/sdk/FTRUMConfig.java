@@ -1,5 +1,9 @@
 package com.ft.sdk;
 
+import androidx.annotation.NonNull;
+
+import java.util.HashMap;
+
 public class FTRUMConfig {
     private float samplingRate = 1;
 
@@ -14,6 +18,9 @@ public class FTRUMConfig {
     private boolean enableTraceUserAction;
     //崩溃采集数据附加类型
     private int extraMonitorTypeWithError;
+
+    //设置全局 tag
+    private HashMap<String, String> globalContext =new HashMap<>();
 
     public float getSamplingRate() {
         return samplingRate;
@@ -80,5 +87,14 @@ public class FTRUMConfig {
 
     public boolean isRumEnable() {
         return rumAppId != null;
+    }
+
+    public FTRUMConfig addGlobalContext(@NonNull String key, @NonNull String value) {
+        this.globalContext.put(key,value);
+        return this;
+    }
+
+    public HashMap<String, String> getGlobalContext() {
+        return globalContext;
     }
 }

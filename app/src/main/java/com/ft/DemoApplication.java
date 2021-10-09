@@ -59,6 +59,8 @@ public class DemoApplication extends Application {
                 .setEnableTrackAppANR(true)
                 .setEnableTrackAppCrash(true)
                 .setEnableTrackAppUIBlock(true)
+                .addGlobalContext("track_id","[track_id]")
+                .addGlobalContext("custom_tag","any tags")
                 .setExtraMonitorTypeWithError(MonitorType.ALL));
 
         FTSdk.bindRumUserData("brandon.test.userid");

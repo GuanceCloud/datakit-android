@@ -40,6 +40,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -983,7 +984,15 @@ public class FTAutoTrack {
     static JSONObject getRUMPublicTags() {
         JSONObject tags = new JSONObject();
         try {
-            tags.put(Constants.KEY_RUM_APP_ID, FTRUMConfigManager.get().getConfig().getRumAppId());
+            FTRUMConfig config = FTRUMConfigManager.get().getConfig();
+            HashMap<String, String> globalContext = config.getGlobalContext();
+            for (Map.Entry<String, String> entry : globalContext.entrySet()) {
+                String key = entry.getKey();
+                Object value = entry.getValue();
+                tags.put(key, value.toString());
+            }
+
+            tags.put(Constants.KEY_RUM_APP_ID, config.getRumAppId());
             tags.put(Constants.KEY_RUM_SDK_NAME, Constants.SDK_NAME);
             tags.put(Constants.KEY_RUM_ENV, FTSdk.get().getBaseConfig().getEnv().toString());
             tags.put(Constants.KEY_RUM_NETWORK_TYPE, NetUtils.get().getNetWorkStateName());
