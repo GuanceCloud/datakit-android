@@ -20,6 +20,7 @@ class DemoApplication : Application() {
     companion object {
         private const val CUSTOM_STATIC_TAG = "static_tag"
         private const val CUSTOM_DYNAMIC_TAG = "dynamic_tag"
+        private const val SP_STORE_DATA= "store_data"
 
         fun setSDK(context: Context) {
             val ftSDKConfig = FTSDKConfig.builder(
@@ -43,7 +44,7 @@ class DemoApplication : Application() {
 
             )
 
-            val sp = context.getSharedPreferences("storeData", MODE_PRIVATE)
+            val sp = context.getSharedPreferences(SP_STORE_DATA, MODE_PRIVATE)
             val customDynamicValue = sp.getString(CUSTOM_DYNAMIC_TAG, "not set")
 
             //配置 RUM
@@ -69,7 +70,7 @@ class DemoApplication : Application() {
         }
 
         fun setDynamicParams(context: Context, value: String) {
-            val sp = context.getSharedPreferences("storeData", MODE_PRIVATE)
+            val sp = context.getSharedPreferences(SP_STORE_DATA, MODE_PRIVATE)
             sp.edit().putString(CUSTOM_DYNAMIC_TAG, value).apply()
 
         }
