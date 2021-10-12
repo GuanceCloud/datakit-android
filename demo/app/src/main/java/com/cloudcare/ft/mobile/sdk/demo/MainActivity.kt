@@ -8,7 +8,6 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.ft.sdk.FTLogger
-import com.ft.sdk.FTSdk
 import com.ft.sdk.garble.bean.LogData
 import com.ft.sdk.garble.bean.Status
 import com.ft.sdk.garble.http.RequestMethod
@@ -67,16 +66,10 @@ class MainActivity : AppCompatActivity() {
             FTLogger.getInstance().logBackground(mutableListOf(LogData("test1", Status.INFO)))
         }
 
-        findViewById<Button>(R.id.dynamic_rum_tag_1_btn).setOnClickListener {
-            DemoApplication.setDynamicParams(this, "set from 1")
+        findViewById<Button>(R.id.dynamic_rum_tag_btn).setOnClickListener {
+            DemoApplication.setDynamicParams(this, "set from dynamic")
             finish()
 
-        }
-
-        findViewById<Button>(R.id.dynamic_rum_tag_2_btn).setOnClickListener {
-            DemoApplication.setDynamicParams(this, "set from 2")
-            FTSdk.shutDown()
-            DemoApplication.setSDK(this)
         }
 
 
