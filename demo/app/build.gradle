@@ -30,7 +30,6 @@ android {
     productFlavors {
 
         prodTest {
-            buildConfigField "String", "CUSTOM_TAG", "\"Custom tag\""
             buildConfigField "String", "CUSTOM_VALUE", "\"Custom value\""
             dimension "tier"
 
