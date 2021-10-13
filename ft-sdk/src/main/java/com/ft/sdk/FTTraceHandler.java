@@ -45,7 +45,7 @@ public class FTTraceHandler {
         return spanID;
     }
 
-     FTTraceHandler() {
+    FTTraceHandler() {
         config = FTTraceConfigManager.get().getConfig();
         enableTrace = config != null && Utils.enableTraceSamplingRate(config.getSamplingRate());
 
@@ -119,10 +119,8 @@ public class FTTraceHandler {
         traceBean.setEndpoint(endPoint);
         traceBean.setStatus(isError ? "error" : "ok");
         traceBean.setServiceName(config.getServiceName());
-        if (config.isEnableLinkRUMData()) {
-            traceBean.setSpanID(spanID);
-            traceBean.setTraceID(traceID);
-        }
+        traceBean.setSpanID(spanID);
+        traceBean.setTraceID(traceID);
         FTTrackInner.getInstance().traceBackground(traceBean);
     }
 
