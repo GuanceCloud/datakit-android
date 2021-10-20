@@ -33,6 +33,7 @@ import com.ft.sdk.garble.utils.NetUtils;
 import com.ft.sdk.garble.utils.OaidUtils;
 import com.ft.sdk.garble.utils.Utils;
 import com.google.android.material.tabs.TabLayout;
+import com.google.gson.Gson;
 
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
@@ -40,6 +41,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -986,12 +988,15 @@ public class FTAutoTrack {
         try {
             FTRUMConfig config = FTRUMConfigManager.get().getConfig();
             HashMap<String, String> globalContext = config.getGlobalContext();
+            ArrayList<String> customKeys = new ArrayList<>();
             for (Map.Entry<String, String> entry : globalContext.entrySet()) {
                 String key = entry.getKey();
+                customKeys.add(key);
                 Object value = entry.getValue();
                 tags.put(key, value.toString());
             }
 
+            tags.put(Constants.KEY_RUM_CUSTOM_KEYS, new Gson().toJson(customKeys));
             tags.put(Constants.KEY_RUM_APP_ID, config.getRumAppId());
             tags.put(Constants.KEY_RUM_SDK_NAME, Constants.SDK_NAME);
             tags.put(Constants.KEY_RUM_ENV, FTSdk.get().getBaseConfig().getEnv().toString());

@@ -59,7 +59,7 @@ public class DemoApplication extends Application {
                 .setEnableTrackAppANR(true)
                 .setEnableTrackAppCrash(true)
                 .setEnableTrackAppUIBlock(true)
-                .addGlobalContext("track_id","[track_id]")
+                .addGlobalContext("track_id",AccountUtils.getProperty(this, AccountUtils.TRACK_ID))
                 .addGlobalContext("custom_tag","any tags")
                 .setExtraMonitorTypeWithError(MonitorType.ALL));
 

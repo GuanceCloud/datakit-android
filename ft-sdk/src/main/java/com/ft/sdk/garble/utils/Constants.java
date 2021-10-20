@@ -154,6 +154,7 @@ public class Constants {
     public static final String KEY_RUM_IS_SIGNIN = "is_signin";
     public static final String KEY_RUM_USER_ID = "userid";
     public static final String KEY_RUM_APP_ID = "app_id";
+    public static final String KEY_RUM_CUSTOM_KEYS = "custom_keys";
     public static final String KEY_RUM_SDK_NAME = "sdk_name";
 
     public static final String KEY_RUM_RESOURCE_URL = "resource_url";
