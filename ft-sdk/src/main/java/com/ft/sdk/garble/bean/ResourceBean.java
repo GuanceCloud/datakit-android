@@ -1,6 +1,7 @@
 package com.ft.sdk.garble.bean;
 
 public class ResourceBean {
+
     public String url = "";
     public String urlHost = "";
     public String urlPath = "";
@@ -34,39 +35,5 @@ public class ResourceBean {
     public String actionId;
     public String actionName;
 
-    public void reset() {
-        url = "";
-        urlHost = "";
-        urlPath = "";
-        resourceType = "";
-        requestHeader = "";
-        responseHeader = "";
-        responseConnection = "";
-        responseContentType = "";
-        responseContentEncoding = "";
-        resourceMethod = "";
-        resourceUrlQuery = "";
-        errorStack = "";
-
-        resourceStatus = -1;
-
-        resourceSize = -1;
-        resourceLoad = -1;
-        resourceDNS = -1;
-        resourceTCP = -1;
-        resourceSSL = -1;
-        resourceTTFB = -1;
-        resourceTrans = -1;
-        resourceFirstByte = -1;
-
-        sessionId = "";
-        viewId = "";
-        viewName = "";
-        viewReferrer = "";
-        actionId = "";
-        actionName = "";
-        traceId = "";
-        spanId = "";
-    }
 
 }

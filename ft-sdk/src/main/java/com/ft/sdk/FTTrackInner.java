@@ -58,17 +58,6 @@ public class FTTrackInner {
      * @param fields
      */
     void rum(long time, String measurement, final JSONObject tags, JSONObject fields) {
-        switch (measurement) {
-            case Constants.FT_MEASUREMENT_RUM_ERROR:
-                FTRUMGlobalManager.get().attachRUMRelative(tags);
-                FTRUMGlobalManager.get().increaseError(tags);
-                break;
-            case Constants.FT_MEASUREMENT_RUM_LONG_TASK:
-                FTRUMGlobalManager.get().attachRUMRelative(tags);
-                FTRUMGlobalManager.get().increaseLongTask(tags);
-                break;
-        }
-
         String sessionId = tags.optString(Constants.KEY_RUM_SESSION_ID);
         if (FTRUMGlobalManager.get().checkSessionWillCollect(sessionId)) {
             syncDataBackground(DataType.RUM_APP, time, measurement, tags, fields);

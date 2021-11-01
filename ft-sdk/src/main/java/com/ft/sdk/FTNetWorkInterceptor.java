@@ -4,9 +4,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.ft.sdk.garble.bean.NetStatusBean;
+import com.ft.sdk.garble.bean.ResourceParams;
 import com.ft.sdk.garble.http.HttpUrl;
 import com.ft.sdk.garble.http.NetStatusMonitor;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,6 +25,7 @@ import java.util.List;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import okhttp3.internal.http.HttpHeaders;
@@ -38,7 +41,9 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
 
     private final boolean webViewTrace;
 
-    private final FTNetworkRumHandler mNetworkRUMHandler = new FTNetworkRumHandler();
+
+//    private final FTNetworkRumHandler mNetworkRUMHandler = new FTNetworkRumHandler();
+//    private final ArrayList<FTNetworkRumHandler> mArr = new ArrayList<>();
 
     public FTNetWorkInterceptor() {
         this(false);
@@ -74,35 +79,43 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
     @NonNull
     @Override
     public Response intercept(@NonNull Chain chain) throws IOException {
-
-        mNetworkRUMHandler.startResource();
         Request request = chain.request();
         Response response = null;
         Request.Builder requestBuilder = request.newBuilder();
         Exception exception = null;
         Request newRequest = null;
         String operationName = "";
-        FTTraceHandler handler = new FTTraceHandler();
+        FTTraceHandler traceHandler = new FTTraceHandler();
         try {
             okhttp3.HttpUrl url = request.url();
             HttpUrl httpUrl = new HttpUrl(url.host(), url.encodedPath(), url.port(), url.toString());
             operationName = request.method() + " " + httpUrl.getPath();
-            HashMap<String, String> headers = handler.getTraceHeader(httpUrl);
-            handler.setIsWebViewTrace(webViewTrace);
+            HashMap<String, String> headers = traceHandler.getTraceHeader(httpUrl);
+            traceHandler.setIsWebViewTrace(webViewTrace);
             for (String key : headers.keySet()) {
                 requestBuilder.header(key, headers.get(key));//避免重试出现重复头
             }
+
             newRequest = requestBuilder.build();
             response = chain.proceed(requestBuilder.build());
 
         } catch (IOException e) {
             exception = e;
         }
+        String resourceId = Utils.identifyRequest(newRequest);
+        FTRUMGlobalManager manager = FTRUMGlobalManager.get();
+
+        manager.startResource(resourceId);
+
+        ResourceParams params = new ResourceParams();
+        params.url = newRequest.url().toString();
+        params.requestHeader = newRequest.headers().toString();
+        params.resourceMethod = newRequest.method();
 
         if (exception != null) {
-            uploadNetTrace(handler, operationName, newRequest, null, "", exception.getMessage());
-            mNetworkRUMHandler.setTransformContent(newRequest, null, "",
-                    handler.getTraceID(), handler.getSpanID());
+            uploadNetTrace(traceHandler, operationName, newRequest, null, "", exception.getMessage());
+            manager.setTransformContent(resourceId, params,
+                    traceHandler.getTraceID(), traceHandler.getSpanID());
 
             throw new IOException(exception);
         } else {
@@ -118,15 +131,23 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
                         responseBody = new String(bytes, getCharset(contentType));
                         responseBody1 = ResponseBody.create(responseBody1.contentType(), bytes);
                         response = response.newBuilder().body(responseBody1).build();
-                        uploadNetTrace(handler, operationName, newRequest, response, responseBody, "");
-                        mNetworkRUMHandler.setTransformContent(newRequest, response, responseBody,
-                                handler.getTraceID(), handler.getSpanID());
+                        uploadNetTrace(traceHandler, operationName, newRequest, response, responseBody, "");
+
+                        params.responseHeader = response.headers().toString();
+                        params.responseBody = responseBody;
+                        params.responseContentType = response.header("Content-Type");
+                        params.responseConnection = response.header("Connection");
+                        params.responseContentEncoding = response.header("Content-Encoding");
+                        params.resourceStatus = response.code();
+                        manager.setTransformContent(resourceId, params,
+                                traceHandler.getTraceID(), traceHandler.getSpanID());
 
                     }
                 }
             }
         }
-        mNetworkRUMHandler.stopResource();
+        manager.stopResource(resourceId);
+
 
         return response;
     }
@@ -241,9 +262,7 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
     }
 
     @Override
-    protected void getNetStatusInfoWhenCallEnd(NetStatusBean bean) {
-        mNetworkRUMHandler.setTransformPerformance(bean);
-        mNetworkRUMHandler.handleUpload();
-
+    protected void getNetStatusInfoWhenCallEnd(String requestId, NetStatusBean bean) {
+        FTRUMGlobalManager.get().putRUMResourcePerformance(requestId, bean);
     }
 }

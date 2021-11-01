@@ -47,6 +47,9 @@ import static com.ft.sdk.garble.utils.Constants.FT_SHARE_PER_FILE;
 import static com.ft.sdk.garble.utils.Constants.TAGS;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import okhttp3.Request;
+import okhttp3.RequestBody;
+
 /**
  * BY huangDianHua
  * DATE:2019-11-29 17:54
@@ -505,6 +508,26 @@ public class Utils {
      */
     public static long getCurrentNanoTime() {
         return System.currentTimeMillis() * 1000000L + System.nanoTime() % 1000000L;
+    }
+
+
+    public static String identifyRequest(Request request) {
+        String method = request.method();
+        String url = request.url().toString();
+        RequestBody body = request.body();
+        if (body == null || body == RequestBody.create(new byte[0], null)) {
+            return method + "_" + url;
+        } else {
+            long contentLength = 0;
+            try {
+                contentLength = body.contentLength();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            String contentType = body.contentType() == null ? "" : body.contentType().toString();
+            return method + "_" + url + "_" + contentType + "_" + contentLength;
+
+        }
     }
 }
 

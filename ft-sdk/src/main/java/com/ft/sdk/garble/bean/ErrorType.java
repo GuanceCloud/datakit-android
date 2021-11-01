@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 public enum ErrorType {
     NATIVE("native_crash"),
     JAVA("java_crash"),
+    FLUTTER("flutter_crash"),
     NETWORK("network_error");
 
 

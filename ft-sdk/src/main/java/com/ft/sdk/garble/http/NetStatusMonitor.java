@@ -6,7 +6,6 @@ import androidx.annotation.Nullable;
 import com.ft.sdk.garble.bean.NetStatusBean;
 import com.ft.sdk.garble.utils.Utils;
 
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -25,12 +24,12 @@ public abstract class NetStatusMonitor extends EventListener {
 
     private final NetStatusBean netStatusBean = new NetStatusBean();
 
-    protected abstract void getNetStatusInfoWhenCallEnd(NetStatusBean bean);
+    protected abstract void getNetStatusInfoWhenCallEnd(String requestId, NetStatusBean bean);
 
     @Override
     public void callEnd(@NonNull Call call) {
         super.callEnd(call);
-        getNetStatusInfoWhenCallEnd(netStatusBean);
+        getNetStatusInfoWhenCallEnd(Utils.identifyRequest(call.request()), netStatusBean);
     }
 
     @Override

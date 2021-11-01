@@ -34,9 +34,7 @@ public class FTUIBlockManager {
         isStop = false;
 
         FTMainLoopLogMonitor.getInstance().setLogCallBack((log, duration) -> {
-
-            FTAutoTrack.putRUMuiBlock(log, duration);
-
+            FTRUMGlobalManager.get().addLongTask(log, duration);
         });
 
 

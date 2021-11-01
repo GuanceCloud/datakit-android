@@ -31,7 +31,7 @@ public class OkHttpEngine implements INetEngine {
         if (client == null) {
             NetStatusMonitor listener = new NetStatusMonitor() {
                 @Override
-                public void getNetStatusInfoWhenCallEnd(NetStatusBean bean) {
+                public void getNetStatusInfoWhenCallEnd(String requestId, NetStatusBean bean) {
                     NetUtils.get().setLastMonitorStatus(bean);
                 }
             };
