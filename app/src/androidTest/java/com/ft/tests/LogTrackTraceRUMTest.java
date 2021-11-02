@@ -315,7 +315,7 @@ public class LogTrackTraceRUMTest extends BaseTest {
         Thread.sleep(5000);
 
         List<SyncJsonData> recordDataList = FTDBManager.get()
-                .queryDataByDataByTypeLimitDesc(0, DataType.TRACE);
+                .queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
 
         String tracId = "";
         String spanId = "";
@@ -325,7 +325,7 @@ public class LogTrackTraceRUMTest extends BaseTest {
                 JSONObject json = new JSONObject(recordData.getDataString());
                 JSONObject tags = json.optJSONObject("tags");
                 String measurement = json.optString("measurement");
-                if (TraceType.DDTRACE.toString().equals(measurement)) {
+                if (Constants.FT_MEASUREMENT_RUM_RESOURCE.equals(measurement)) {
                     if (tags != null) {
                         tracId = tags.optString("trace_id");
                         spanId = tags.optString("span_id");
