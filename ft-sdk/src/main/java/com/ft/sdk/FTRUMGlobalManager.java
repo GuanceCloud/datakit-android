@@ -298,7 +298,13 @@ public class FTRUMGlobalManager {
     public void putRUMResourcePerformance(String resourceId, NetStatusBean netStatusBean) {
         ResourceBean bean = resourceBeanMap.get(resourceId);
 
-        if (bean == null || bean.resourceStatus < HttpsURLConnection.HTTP_OK) {
+        if (bean == null) {
+            return;
+        }
+        if (bean.resourceStatus < HttpsURLConnection.HTTP_OK) {
+            ThreadPoolUtils.get().execute(() -> {
+                resourceBeanMap.remove(resourceId);
+            });
             return;
         }
         long time = Utils.getCurrentNanoTime();
@@ -441,6 +447,14 @@ public class FTRUMGlobalManager {
     }
 
 
+    /**
+     * 设置网络传输内容
+     *
+     * @param resourceId
+     * @param params
+     * @param traceId
+     * @param spanId
+     */
     public void setTransformContent(String resourceId, ResourceParams params,
                                     String traceId, String spanId) {
 
@@ -483,8 +497,8 @@ public class FTRUMGlobalManager {
 
 
     void increaseLongTask(@NonNull JSONObject tags) {
-        String actionId = getActionId();
-        String viewId = getViewId();
+        String actionId = tags.optString(Constants.KEY_RUM_ACTION_ID);
+        String viewId = tags.optString(Constants.KEY_RUM_VIEW_ID);
         ThreadPoolUtils.get().execute(() -> {
             FTDBManager.get().increaseActionLongTask(actionId);
             FTDBManager.get().increaseViewLongTask(viewId);
@@ -558,6 +572,8 @@ public class FTRUMGlobalManager {
     }
 
     /**
+     * 添加界面 RUM 相关界面属性
+     *
      * @param tags
      * @param withAction
      */
