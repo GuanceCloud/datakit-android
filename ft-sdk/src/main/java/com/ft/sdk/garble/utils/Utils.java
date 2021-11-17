@@ -303,6 +303,7 @@ public class Utils {
      * @return
      */
     public static String translateTagKeyValue(String oldStr) {
+        oldStr = oldStr.replace("\n"," ");
         oldStr = translateSpecialCharacters(",", oldStr);
         oldStr = translateSpecialCharacters("=", oldStr);
         return translateSpecialCharacters(" ", oldStr);
