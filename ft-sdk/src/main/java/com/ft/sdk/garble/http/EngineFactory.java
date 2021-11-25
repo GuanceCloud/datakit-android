@@ -16,7 +16,10 @@ public class EngineFactory {
         if (FTTraceConfigManager.get().isNetworkTrace()) {
             try {
                 if (!PackageUtils.isOKHttp3Support()) {
-                    LogUtils.e(TAG, "检测到你开启了网络链路追踪，但是你没有依赖 okHttp。使用该功能请先在项目中依赖 okHttp");
+                    if (!PackageUtils.isThirdPartySupport()) {
+                        LogUtils.e(TAG, "检测到你开启了网络链路追踪，" +
+                                "但是你没有依赖 okHttp。使用该功能请先在项目中依赖 okHttp");
+                    }
                     return new NativeNetEngine();
                 }
                 return new OkHttpEngine();
