@@ -45,8 +45,8 @@ class FTTraceHandler {
         return spanID;
     }
 
-    public String getUrl() {
-        return httpUrl.getHoleUrl();
+    public HttpUrl getUrl() {
+        return httpUrl;
     }
 
     FTTraceHandler() {

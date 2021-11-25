@@ -5,8 +5,10 @@ import com.ft.sdk.garble.http.HttpUrl;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -26,8 +28,14 @@ public class FTTraceManager {
             throws MalformedURLException {
         FTTraceHandler handler = new FTTraceHandler();
         URL url = new URL(urlString);
-        HashMap<String, String> map = handler
-                .getTraceHeader(new HttpUrl(url.getHost(), url.getPath(), url.getPort(), urlString));
+        HashMap<String, String> map = null;
+        try {
+            map = handler
+                    .getTraceHeader(new HttpUrl(url.getHost(),
+                            URLEncoder.encode(url.getPath(), "UTF-8"), url.getPort(), urlString));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         handlerMap.put(key, handler);
         return map;
     }
@@ -38,12 +46,14 @@ public class FTTraceManager {
 
 
     public void addTrace(String key, String httpMethod, HashMap<String, String> requestHeader,
-                         HashMap<String, String> responseHeader, String operationName, int statusCode,
+                         HashMap<String, String> responseHeader, int statusCode,
                          String errorMsg) {
 
         FTTraceHandler handler = handlerMap.get(key);
         if (handler != null) {
-            String url = handler.getUrl();
+            String url = handler.getUrl().getHoleUrl();
+            String path = handler.getUrl().getPath();
+            String operationName = httpMethod.toUpperCase() + " " + path;
             JSONObject json = new JSONObject();
             try {
                 JSONObject requestContent = new JSONObject();
