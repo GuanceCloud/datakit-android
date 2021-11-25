@@ -103,7 +103,7 @@ public class FTRUMGlobalManager {
         this.lastActionTime = activeAction.getStartTime();
     }
 
-    void startAction(String actionName, String actionType) {
+    public void startAction(String actionName, String actionType) {
         startAction(actionName, actionType, false);
     }
 
@@ -145,7 +145,7 @@ public class FTRUMGlobalManager {
         }
     }
 
-    void startResource(String resourceId) {
+    public void startResource(String resourceId) {
         ResourceBean bean = new ResourceBean();
         attachRUMRelative(bean);
         resourceBeanMap.put(resourceId, bean);
@@ -157,7 +157,7 @@ public class FTRUMGlobalManager {
         });
     }
 
-    void stopResource(String resourceId) {
+    public void stopResource(String resourceId) {
         ResourceBean bean = resourceBeanMap.get(resourceId);
         if (bean != null) {
             String actionId = bean.actionId;
@@ -175,7 +175,7 @@ public class FTRUMGlobalManager {
     }
 
 
-    void startView(String viewName, String viewReferrer) {
+    public void startView(String viewName, String viewReferrer) {
         checkSessionRefresh();
         if (activeView != null && !activeView.isClose()) {
             activeView.close();
@@ -192,7 +192,7 @@ public class FTRUMGlobalManager {
 
     }
 
-    void stopView() {
+    public void stopView() {
         checkActionClose();
 
         activeView.close();
@@ -234,7 +234,7 @@ public class FTRUMGlobalManager {
         });
     }
 
-    void addError(String log, String message, long dateline, ErrorType errorType, AppState state) {
+    public void addError(String log, String message, long dateline, ErrorType errorType, AppState state) {
         try {
             JSONObject tags = FTAutoTrack.getRUMPublicTags();
             attachRUMRelative(tags, true);
@@ -295,7 +295,7 @@ public class FTRUMGlobalManager {
     /**
      * 资源加载性能
      */
-    public void putRUMResourcePerformance(String resourceId, NetStatusBean netStatusBean) {
+    void putRUMResourcePerformance(String resourceId, NetStatusBean netStatusBean) {
         ResourceBean bean = resourceBeanMap.get(resourceId);
 
         if (bean == null) {
@@ -446,6 +446,21 @@ public class FTRUMGlobalManager {
         });
     }
 
+    /**
+     * 设置网络传输内容
+     *
+     * @param resourceId
+     * @param params
+     */
+    public void addResource(String resourceId, ResourceParams params, NetStatusBean netStatusBean) {
+        FTTraceHandler handler = FTTraceManager.get().getHandler(resourceId);
+        if (handler != null) {
+            String spanId = handler.getSpanID();
+            String traceId = handler.getTraceID();
+            setTransformContent(resourceId, params, traceId, spanId);
+            putRUMResourcePerformance(resourceId, netStatusBean);
+        }
+    }
 
     /**
      * 设置网络传输内容
@@ -455,8 +470,8 @@ public class FTRUMGlobalManager {
      * @param traceId
      * @param spanId
      */
-    public void setTransformContent(String resourceId, ResourceParams params,
-                                    String traceId, String spanId) {
+    void setTransformContent(String resourceId, ResourceParams params,
+                             String traceId, String spanId) {
 
         ResourceBean bean = resourceBeanMap.get(resourceId);
 
