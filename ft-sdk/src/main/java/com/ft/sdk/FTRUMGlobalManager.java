@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -40,7 +41,7 @@ public class FTRUMGlobalManager {
     static final long MAX_RESTING_TIME = 15000000000L;
     static final long SESSION_EXPIRE_TIME = 1440000000000000L;
     static final long FILTER_CAPACITY = 5;
-    private final HashMap<String, ResourceBean> resourceBeanMap = new HashMap<>();
+    private final ConcurrentHashMap<String, ResourceBean> resourceBeanMap = new ConcurrentHashMap<>();
 
     private FTRUMGlobalManager() {
 
@@ -454,12 +455,14 @@ public class FTRUMGlobalManager {
      */
     public void addResource(String resourceId, ResourceParams params, NetStatusBean netStatusBean) {
         FTTraceHandler handler = FTTraceManager.get().getHandler(resourceId);
+        String spanId = "";
+        String traceId = "";
         if (handler != null) {
-            String spanId = handler.getSpanID();
-            String traceId = handler.getTraceID();
-            setTransformContent(resourceId, params, traceId, spanId);
-            putRUMResourcePerformance(resourceId, netStatusBean);
+            spanId = handler.getSpanID();
+            traceId = handler.getTraceID();
         }
+        setTransformContent(resourceId, params, traceId, spanId);
+        putRUMResourcePerformance(resourceId, netStatusBean);
     }
 
     /**

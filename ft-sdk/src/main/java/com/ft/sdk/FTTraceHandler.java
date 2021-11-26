@@ -14,7 +14,7 @@ import java.util.UUID;
  * time: 2020/9/16 11:34:48
  * description: trace 数据处理
  */
-class FTTraceHandler {
+public class FTTraceHandler {
     public static final String ZIPKIN_TRACE_ID = "X-B3-TraceId";
     public static final String ZIPKIN_SPAN_ID = "X-B3-SpanId";
     public static final String ZIPKIN_SAMPLED = "X-B3-Sampled";
