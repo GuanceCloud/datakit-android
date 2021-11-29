@@ -64,7 +64,7 @@ public class FTDBManager extends DBManager {
      */
 
     public void initSumView(ViewBean data) {
-        LogUtils.d(TAG, "initSumView:id" + data.getId() + ",name:" + data.getViewName());
+        LogUtils.d(TAG, "initSumView:id:" + data.getId() + ",name:" + data.getViewName());
         getDB(true, db -> {
             ContentValues contentValues = new ContentValues();
             contentValues.put(FTSQL.RUM_COLUMN_START_TIME, data.getStartTime());

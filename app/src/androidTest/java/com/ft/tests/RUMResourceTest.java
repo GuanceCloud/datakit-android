@@ -61,7 +61,7 @@ public class RUMResourceTest extends BaseTest {
     @Test
     public void resourceDataTest() throws InterruptedException {
 
-
+        FTRUMGlobalManager.get().startView("Current","Preview");
         String resourceId = Utils.getGUID_16();
         FTRUMGlobalManager.get().startResource(resourceId);
         ResourceParams params = new ResourceParams();
@@ -90,8 +90,9 @@ public class RUMResourceTest extends BaseTest {
         params.resourceStatus = 200;
 
         NetStatusBean bean = new NetStatusBean();
-        FTRUMGlobalManager.get().addResource(resourceId, params, bean);
         FTRUMGlobalManager.get().stopResource(resourceId);
+        FTRUMGlobalManager.get().addResource(resourceId, params, bean);
+        FTRUMGlobalManager.get().stopView();
 
         Thread.sleep(5000);
 
@@ -122,5 +123,7 @@ public class RUMResourceTest extends BaseTest {
 
 
     }
+
+
 
 }
