@@ -435,6 +435,8 @@ public class FTRUMGlobalManager {
                 errorField.put(Constants.KEY_RUM_ERROR_STACK, bean.errorStack);
 
                 FTTrackInner.getInstance().rum(time, Constants.FT_MEASUREMENT_RUM_ERROR, errorTags, errorField);
+                increaseError(tags);
+
             }
 
 
