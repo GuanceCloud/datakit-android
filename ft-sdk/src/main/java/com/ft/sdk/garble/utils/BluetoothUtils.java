@@ -85,11 +85,11 @@ public class BluetoothUtils {
         IntentFilter iFilter = new IntentFilter();
         iFilter.addAction(BluetoothDevice.ACTION_FOUND);
         //设置广播接收器和安装过滤器
-        FTApplication.getApplication().registerReceiver(new foundReceiver(), iFilter);
+        FTApplication.getApplication().registerReceiver(new FoundReceiver(), iFilter);
         bluetoothAdapter.startDiscovery();
     }
 
-    class foundReceiver extends BroadcastReceiver {
+    static class FoundReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
