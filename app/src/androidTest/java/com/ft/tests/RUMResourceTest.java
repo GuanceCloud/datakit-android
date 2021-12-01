@@ -61,7 +61,6 @@ public class RUMResourceTest extends BaseTest {
     @Test
     public void resourceDataTest() throws InterruptedException {
 
-        FTRUMGlobalManager.get().startView("Current","Preview");
         String resourceId = Utils.getGUID_16();
         FTRUMGlobalManager.get().startResource(resourceId);
         ResourceParams params = new ResourceParams();
@@ -86,13 +85,12 @@ public class RUMResourceTest extends BaseTest {
         params.responseConnection = "";
         params.responseContentEncoding = "";
         params.responseContentType = "";
-        params.url = "https://www.baidu.com";
+        params.url = "https://www.baidu.com/url path";
         params.resourceStatus = 200;
 
         NetStatusBean bean = new NetStatusBean();
         FTRUMGlobalManager.get().stopResource(resourceId);
         FTRUMGlobalManager.get().addResource(resourceId, params, bean);
-        FTRUMGlobalManager.get().stopView();
 
         Thread.sleep(5000);
 

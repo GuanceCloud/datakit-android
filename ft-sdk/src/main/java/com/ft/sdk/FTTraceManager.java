@@ -1,14 +1,14 @@
 package com.ft.sdk;
 
 import com.ft.sdk.garble.http.HttpUrl;
+import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,17 +25,13 @@ public class FTTraceManager {
     }
 
     public HashMap<String, String> getTraceHeader(String key, String urlString)
-            throws MalformedURLException {
+            throws MalformedURLException, URISyntaxException {
         FTTraceHandler handler = new FTTraceHandler();
-        URL url = new URL(urlString);
-        HashMap<String, String> map = null;
-        try {
-            map = handler
-                    .getTraceHeader(new HttpUrl(url.getHost(),
-                            URLEncoder.encode(url.getPath(), "UTF-8"), url.getPort(), urlString));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+
+        URL url = Utils.parseFromUrl(urlString);
+        HashMap<String, String> map = handler
+                .getTraceHeader(new HttpUrl(url.getHost(), url.getPath(), url.getPort(), urlString));
+
         handlerMap.put(key, handler);
         return map;
     }

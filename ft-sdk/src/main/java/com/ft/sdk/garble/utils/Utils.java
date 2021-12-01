@@ -26,6 +26,10 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
@@ -529,6 +533,17 @@ public class Utils {
             return method + "_" + url + "_" + contentType + "_" + contentLength;
 
         }
+    }
+
+    public static URL parseFromUrl(String urlString) throws URISyntaxException, MalformedURLException {
+        URL url = new URL(urlString);
+        URI uri = new URI(
+                url.getProtocol(),
+                url.getHost(),
+                url.getPath(),
+                url.getRef());
+        return uri.toURL();
+
     }
 }
 

@@ -24,10 +24,9 @@ import com.ft.sdk.garble.utils.Utils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
@@ -484,13 +483,13 @@ public class FTRUMGlobalManager {
             return;
         }
         try {
-            URL url = new URL(params.url);
+            URL url = Utils.parseFromUrl(params.url);
             bean.url = params.url;
             bean.urlHost = url.getHost();
-            bean.urlPath = URLEncoder.encode(url.getPath(), "UTF-8");
+            bean.urlPath = url.getPath();
             bean.resourceUrlQuery = url.getQuery();
 
-        } catch (MalformedURLException | UnsupportedEncodingException e) {
+        } catch (MalformedURLException | URISyntaxException e) {
             e.printStackTrace();
         }
 
