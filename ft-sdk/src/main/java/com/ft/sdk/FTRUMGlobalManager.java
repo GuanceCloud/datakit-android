@@ -64,7 +64,7 @@ public class FTRUMGlobalManager {
     ViewBean activeView;
     ActionBean activeAction;
 
-    HashMap<String, Long> preActivityDuration = new HashMap<>();
+    ConcurrentHashMap<String, Long> preActivityDuration = new ConcurrentHashMap<>();
 
     long lastSessionTime = Utils.getCurrentNanoTime();
     long lastActionTime = lastSessionTime;
@@ -87,9 +87,6 @@ public class FTRUMGlobalManager {
     }
 
     void addAction(String actionName, String actionType, long duration) {
-        if (!config.isEnableTraceUserAction()) {
-            return;
-        }
         String viewId = activeView != null ? activeView.getId() : null;
         String viewName = activeView != null ? activeView.getViewName() : null;
         String viewReferrer = activeView != null ? activeView.getViewReferrer() : null;
@@ -108,9 +105,6 @@ public class FTRUMGlobalManager {
     }
 
     void startAction(String actionName, String actionType, boolean needWait) {
-        if (!config.isEnableTraceUserAction()) {
-            return;
-        }
 
         String viewId = activeView != null ? activeView.getId() : null;
         String viewName = activeView != null ? activeView.getViewName() : null;
@@ -274,7 +268,7 @@ public class FTRUMGlobalManager {
 
     }
 
-    void addLongTask(String log, long duration) {
+    public void addLongTask(String log, long duration) {
         try {
             long time = Utils.getCurrentNanoTime();
             JSONObject tags = FTAutoTrack.getRUMPublicTags();

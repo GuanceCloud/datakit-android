@@ -21,11 +21,11 @@ public class FTFragmentManager {
     /**
      * 该map在{@link #removeFragmentLifecycle} 方法中回收
      */
-    private ConcurrentHashMap<String, FTFragmentLifecycleCallback> fragmentLifecycleCall = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, FTFragmentLifecycleCallback> fragmentLifecycleCall = new ConcurrentHashMap<>();
     /**
      * 该map在{@link #removeFragmentLifecycle} 方法中回收
      */
-    private ConcurrentHashMap<String, Activity> activityConcurrentHashMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Activity> activityConcurrentHashMap = new ConcurrentHashMap<>();
     //应该被忽略的Fragment
     public List<String> ignoreFragments = Arrays.asList("com.bumptech.glide.manager.SupportRequestManagerFragment");
 

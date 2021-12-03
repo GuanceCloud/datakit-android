@@ -19,8 +19,7 @@ import java.util.HashMap;
  * Description: Activity 生命周期回调类
  */
 public class FTActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
-    private final AppRestartCallback mAppRestartCallback = new AppRestartCallback();
-    private final HashMap<Activity, Long> mCreateMap = new HashMap<>();
+    private final LifeCircleTraceCallback mAppRestartCallback = new LifeCircleTraceCallback();
 
 
     @Override
@@ -39,44 +38,29 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
 
     @Override
     public void onActivityPreCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
-        mCreateMap.put(activity, Utils.getCurrentNanoTime());
-        mAppRestartCallback.onPreOnCreate();
+        mAppRestartCallback.onPreOnCreate(activity);
     }
 
     @Override
     public void onActivityPostCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
-        mAppRestartCallback.onPostOnCreate();
-        if (FTRUMConfigManager.get().isRumEnable()) {
+        mAppRestartCallback.onPostOnCreate(activity);
 
-            Long startTime = mCreateMap.get(activity);
-            if (startTime != null) {
-                long duration = Utils.getCurrentNanoTime() - startTime;
-                String viewName = AopUtils.getClassName(activity);
-                FTAutoTrack.putRUMViewLoadPerformance(viewName, duration);
-            }
-        }
     }
 
     @Override
     public void onActivityResumed(@NonNull Activity activity) {
-        boolean isFirstLoad = true;
-        if (FTActivityManager.get().isFirstResume.containsKey(activity.getClass().getName())
-                && FTActivityManager.get().isFirstResume.get(activity.getClass().getName())) {
-            isFirstLoad = false;
-        }
         FTActivityManager.get().putActivity(activity);
 
         //页面打开埋点数据插入
-        FTAutoTrack.startPage(activity.getClass(), isFirstLoad);
+        FTAutoTrack.startPage(activity.getClass());
         //开启同步
         SyncTaskManager.get().executeSyncPoll();
         //标记当前页面是否是第一次调用OnResume方法
-        FTActivityManager.get().isFirstResume.put(activity.getClass().getName(), true);
     }
 
     @Override
     public void onActivityPostResumed(@NonNull Activity activity) {
-        mAppRestartCallback.onPostResume();
+        mAppRestartCallback.onPostResume(activity);
     }
 
     @Override
@@ -98,17 +82,12 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     @Override
     public void onActivityDestroyed(@NonNull Activity activity) {
         //移除当前页面是否第一次调用 onResume 的标记
-        FTActivityManager.get().isFirstResume.remove(activity.getClass().getName());
-        //移除对 Fragment 的生命周期的监听
         FTFragmentManager.getInstance().removeFragmentLifecycle(activity);
-//        //从 Activity 的管理栈中移除 Activity
-//        FTManager.getFTActivityManager().removeActivity(activity);
-        mCreateMap.remove(activity);
     }
 
     @Override
     public void onActivityPostDestroyed(@NonNull Activity activity) {
-        mAppRestartCallback.onPostDestroy();
+        mAppRestartCallback.onPostDestroy(activity);
 
     }
 }

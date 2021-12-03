@@ -58,6 +58,7 @@ public class SDKRunStateTest extends BaseTest {
                 .setEnableTrackAppCrash(true)
                 .setEnableTrackAppUIBlock(true)
                 .setEnableTraceUserAction(true)
+                .setEnableTraceUserView(true)
         );
 
         FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableConsoleLog(true));
@@ -83,6 +84,11 @@ public class SDKRunStateTest extends BaseTest {
     @Test
     public void traceUserActionTest() {
         Assert.assertTrue(FTRUMConfigManager.get().getConfig().isEnableTraceUserAction());
+    }
+
+    @Test
+    public void traceUserViewTest() {
+        Assert.assertTrue(FTRUMConfigManager.get().getConfig().isEnableTraceUserView());
     }
 
 

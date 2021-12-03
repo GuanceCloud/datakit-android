@@ -18,7 +18,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class FTActivityManager {
     public final static String TAG = "FTActivityManager";
-    public ConcurrentHashMap<String, Boolean> isFirstResume;
     private static volatile FTActivityManager instance;
     //栈顶 Activity
     private Activity topActivity;
@@ -32,7 +31,6 @@ public final class FTActivityManager {
     private FTActivityManager() {
         activityList = new ArrayList<>();
         activityOpenTypeMap = new ConcurrentHashMap<>();
-        isFirstResume = new ConcurrentHashMap<>();
     }
 
     public synchronized static FTActivityManager get() {
@@ -77,22 +75,6 @@ public final class FTActivityManager {
         }
     }
 
-//    void removeActivity(Activity activity) {
-//        if (activityList != null) {
-//            try {
-//                for (int i = activityList.size() - 1; i >= 0; i--) {
-//                    if (activityList.get(i).equals(activity)) {
-//                        activityList.remove(activity);
-//                        removeActivityStatus(activity.getClass().getName());
-//                        break;
-//                    }
-//                }
-//            } catch (Exception e) {
-//                LogUtils.e(TAG, e.getMessage());
-//            }
-//
-//        }
-//    }
 
     /**
      * 得到上一个 Activity
@@ -112,24 +94,6 @@ public final class FTActivityManager {
         }
     }
 
-    /**
-     * 判断最后两个Activity 是否为同一个 Activity
-     *
-     * @return
-     */
-    boolean lastTwoActivitySame() {
-        if (activityList != null && activityList.size() > 1) {
-            Activity activity1 = activityList.get(activityList.size() - 2);
-            Activity activity2 = activityList.get(activityList.size() - 1);
-            if (activity1 != null && activity2 != null) {
-                return activity1.getClass().getName().equals(activity2.getClass().getName());
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
 
     /**
      * 存储每个 Activity 是由什么方式打开的

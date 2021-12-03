@@ -19,11 +19,7 @@ import androidx.annotation.Nullable;
 import com.ft.sdk.garble.FTAutoTrackConfigManager;
 import com.ft.sdk.garble.FTFragmentManager;
 import com.ft.sdk.garble.FTHttpConfigManager;
-import com.ft.sdk.garble.bean.AppState;
-import com.ft.sdk.garble.bean.ErrorSource;
-import com.ft.sdk.garble.bean.ErrorType;
 import com.ft.sdk.garble.bean.OP;
-import com.ft.sdk.garble.bean.ResourceBean;
 import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
@@ -43,8 +39,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.net.ssl.HttpsURLConnection;
 
 import okhttp3.OkHttpClient;
 
@@ -94,7 +88,7 @@ public class FTAutoTrack {
      * Activity 开启
      * 警告！！！该方法不能删除
      *
-     * @deprecated 该方法原来被 FT Plugin 插件调用，目前不再使用。目前监控应用的启动使用{@link #startPage(Class, boolean)}方法
+     * @deprecated 该方法原来被 FT Plugin 插件调用，目前不再使用。目前监控应用的启动使用{@link #startPage(Class)}方法
      */
     @Deprecated
     public static void activityOnCreate(Class clazz) {
@@ -461,7 +455,7 @@ public class FTAutoTrack {
      *
      * @param clazz
      */
-    public static void startPage(Class<?> clazz, boolean isFirstLoad) {
+    public static void startPage(Class<?> clazz) {
         /*没有开启自动埋点*/
         if (!FTAutoTrackConfigManager.get().isAutoTrack()) {
             return;
@@ -482,7 +476,7 @@ public class FTAutoTrack {
         if (FTAutoTrackConfigManager.get().isIgnoreAutoTrackActivity(clazz)) {
             return;
         }
-        putActivityEvent(OP.OPEN_ACT, clazz, isFirstLoad);
+        putActivityEvent(OP.OPEN_ACT, clazz);
     }
 
     /**
@@ -511,7 +505,7 @@ public class FTAutoTrack {
         if (FTAutoTrackConfigManager.get().isIgnoreAutoTrackActivity(clazz)) {
             return;
         }
-        putActivityEvent(OP.CLS_ACT, clazz, false);
+        putActivityEvent(OP.CLS_ACT, clazz);
     }
 
     /**
@@ -633,17 +627,15 @@ public class FTAutoTrack {
 
     /**
      * Activity 开关
-     *
-     * @param op
+     *  @param op
      * @param classCurrent
      */
-    public static void putActivityEvent(@NonNull OP op, Class classCurrent, boolean isFirstLoad) {
+    public static void putActivityEvent(@NonNull OP op, Class classCurrent) {
         long time = Utils.getCurrentNanoTime();
         Class parentClass = FTActivityManager.get().getLastActivity();
         String parentPageName = Constants.FLOW_ROOT;
         if (op == OP.OPEN_ACT) {
             //是第一次加载 Activity ，说明其为从其他Activity 中打开
-            if (isFirstLoad) {
                 //如果没有上一个 Activity 说明其为 根结点
                 if (parentClass != null) {
                     //判断从 上一个 页面的Activity 还是 Fragment 中打开
@@ -661,29 +653,6 @@ public class FTAutoTrack {
                         parentPageName = parentClass.getSimpleName();
                     }
                 }
-            } else {
-                //如果最后两个为同一个 Activity 说明 Activity 为 页面重启
-                if (FTActivityManager.get().lastTwoActivitySame()) {
-                    parentPageName = classCurrent.getSimpleName();
-                } else {
-                    //如果不相等，表示从其他返回过来
-                    if (parentClass != null) {
-                        boolean isFromFragment = FTActivityManager.get().getActivityOpenFromFragment(parentClass.getName());
-                        if (isFromFragment) {
-                            //这部分需要创建一条子页面的数据
-                            Class lastFragment = FTFragmentManager.getInstance().getLastFragmentName(classCurrent.getName());
-                            if (lastFragment != null) {
-                                parentPageName = Constants.MOCK_SON_PAGE_DATA + ":" + lastFragment.getSimpleName() + ":" + parentClass.getSimpleName();
-                            } else {
-                                parentPageName = Constants.MOCK_SON_PAGE_DATA + ":" + parentClass.getSimpleName();
-                            }
-                        } else {
-                            //从Activity 中打开则找到上一个Activity
-                            parentPageName = parentClass.getSimpleName();
-                        }
-                    }
-                }
-            }
         }
         try {
             if (op == OP.OPEN_ACT) {
@@ -745,7 +714,6 @@ public class FTAutoTrack {
     public static void putRUMViewLoadPerformance(String viewName, long loadTime) {
         FTRUMGlobalManager.get().onCreateView(viewName, loadTime);
     }
-
 
 
     /**
@@ -822,17 +790,31 @@ public class FTAutoTrack {
     }
 
     private static void handleOp(String currentPage, OP op, String parentPage, long duration, @Nullable String vtp) {
-
-        if (!FTRUMConfigManager.get().isRumEnable() && !op.equals(OP.CLK)
+        FTRUMConfigManager manager = FTRUMConfigManager.get();
+        if (!manager.isRumEnable()) {
+            return;
+        }
+        if (!op.equals(OP.CLK)
                 && !op.equals(OP.LANC)
                 && !op.equals(OP.OPEN_ACT)
                 && !op.equals(OP.OPEN_FRA)
                 && !op.equals(OP.CLS_ACT)
                 && !op.equals(OP.CLS_FRA)
-//                && !op.equals(OP.OPEN)
+            //                && !op.equals(OP.OPEN))
+
         ) {
             return;
         }
+        if (op.equals(OP.CLK) && !manager.getConfig().isEnableTraceUserAction()) {
+            return;
+        }
+
+        if ((op.equals(OP.OPEN_ACT) || op.equals(OP.CLS_ACT))
+                && !manager.getConfig().isEnableTraceUserView()) {
+            return;
+        }
+
+
         String event = "";
         switch (op) {
             case CLK:
@@ -851,7 +833,6 @@ public class FTAutoTrack {
             case CLS_ACT:
 //            case CLS_FRA:
                 event = Constants.EVENT_NAME_LEAVE;
-//                RUMGlobalManager.getInstance().startAction(event);
                 FTRUMGlobalManager.get().stopView();
                 break;
             case OPEN:

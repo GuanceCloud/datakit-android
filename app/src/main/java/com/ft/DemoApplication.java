@@ -56,6 +56,7 @@ public class DemoApplication extends Application {
                 .setSamplingRate(1f)
                 .setRumAppId(AccountUtils.getProperty(this, AccountUtils.RUM_APP_ID))
                 .setEnableTraceUserAction(true)
+                .setEnableTraceUserView(true)
                 .setEnableTrackAppANR(true)
                 .setEnableTrackAppCrash(true)
                 .setEnableTrackAppUIBlock(true)

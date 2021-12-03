@@ -14,13 +14,15 @@ public class FTRUMConfig {
     private boolean enableTrackAppUIBlock;
     //设置是否检测 ANR
     private boolean enableTrackAppANR;
-    //是否开启用户行为追踪
+    //是否开启用户行为 action 追踪
     private boolean enableTraceUserAction;
+    //是否开启用户行为 view 追踪
+    private boolean enableTraceUserView;
     //崩溃采集数据附加类型
     private int extraMonitorTypeWithError;
 
     //设置全局 tag
-    private HashMap<String, String> globalContext =new HashMap<>();
+    private HashMap<String, String> globalContext = new HashMap<>();
 
     public float getSamplingRate() {
         return samplingRate;
@@ -76,6 +78,15 @@ public class FTRUMConfig {
         return this;
     }
 
+    public FTRUMConfig setEnableTraceUserView(boolean enableTraceUserView) {
+        this.enableTraceUserView = enableTraceUserView;
+        return this;
+    }
+
+    public boolean isEnableTraceUserView() {
+        return enableTraceUserView;
+    }
+
     public int getExtraMonitorTypeWithError() {
         return extraMonitorTypeWithError;
     }
@@ -90,7 +101,7 @@ public class FTRUMConfig {
     }
 
     public FTRUMConfig addGlobalContext(@NonNull String key, @NonNull String value) {
-        this.globalContext.put(key,value);
+        this.globalContext.put(key, value);
         return this;
     }
 
