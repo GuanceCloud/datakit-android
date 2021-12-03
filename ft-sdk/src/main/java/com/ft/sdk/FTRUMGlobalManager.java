@@ -228,6 +228,9 @@ public class FTRUMGlobalManager {
         });
     }
 
+    public void addError(String log, String message, ErrorType errorType, AppState state){
+        addError(log,message,Utils.getCurrentNanoTime(),errorType,state);
+    }
     public void addError(String log, String message, long dateline, ErrorType errorType, AppState state) {
         try {
             JSONObject tags = FTAutoTrack.getRUMPublicTags();
