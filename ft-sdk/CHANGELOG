@@ -1,3 +1,7 @@
+# agent 1.3.1-alpha04
+1. 优化 AddError
+
+---
 # agent 1.3.1-alpha03
 1. 用户行为追踪逻辑调整
 2. RUM 开放 LongTask 接口
