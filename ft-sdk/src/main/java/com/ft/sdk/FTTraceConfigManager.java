@@ -26,7 +26,7 @@ public class FTTraceConfigManager {
     }
 
     public boolean isNetworkTrace() {
-        return config != null && config.isNetworkTrace();
+        return config != null && config.isEnableAutoTrace();
     }
 
     public boolean isEnableLinkRUMData() {

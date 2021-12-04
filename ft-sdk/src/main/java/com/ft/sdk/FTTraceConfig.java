@@ -10,6 +10,7 @@ public class FTTraceConfig {
     private String serviceName = Constants.DEFAULT_LOG_SERVICE_NAME;
     private TraceType traceType = TraceType.DDTRACE;
     private boolean enableWebTrace = false;
+    private boolean enableAutoTrace = false;
     private boolean enableLinkRUMData = false;
 
 
@@ -75,8 +76,8 @@ public class FTTraceConfig {
         return traceContentType;
     }
 
-    public boolean isNetworkTrace() {
-        return true;
+    public boolean isEnableAutoTrace() {
+        return enableAutoTrace;
     }
 
     public boolean isEnableWebTrace() {
@@ -88,8 +89,9 @@ public class FTTraceConfig {
         return this;
     }
 
-//    public FTTraceConfig setNetworkTrace(boolean networkTrace) {
-//        isNetworkTrace = networkTrace;
-//        return this;
-//    }
+
+    public FTTraceConfig setEnableAutoTrace(boolean enableAutoTrace) {
+        this.enableAutoTrace = enableAutoTrace;
+        return this;
+    }
 }

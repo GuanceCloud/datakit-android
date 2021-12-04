@@ -69,6 +69,7 @@ public class DemoApplication extends Application {
 
         FTSdk.initTraceWithConfig(new FTTraceConfig()
                 .setSamplingRate(1f)
+                .setEnableAutoTrace(true)
                 .setEnableLinkRUMData(true)
                 .setTraceType(TraceType.DDTRACE));
 
