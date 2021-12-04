@@ -25,7 +25,7 @@ public class FTTraceConfigManager {
         return config;
     }
 
-    public boolean isNetworkTrace() {
+    public boolean isEnableAutoTrace() {
         return config != null && config.isEnableAutoTrace();
     }
 

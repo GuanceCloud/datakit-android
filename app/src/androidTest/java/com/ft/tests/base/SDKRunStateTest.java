@@ -73,7 +73,7 @@ public class SDKRunStateTest extends BaseTest {
 
     @Test
     public void networkTrackTest() {
-        Assert.assertTrue(FTTraceConfigManager.get().isNetworkTrace());
+        Assert.assertTrue(FTTraceConfigManager.get().isEnableAutoTrace());
     }
 
     @Test
@@ -101,7 +101,7 @@ public class SDKRunStateTest extends BaseTest {
     @Test
     public void showdownNetworkTrackTest() {
         FTSdk.shutDown();
-        Assert.assertFalse(FTTraceConfigManager.get().isNetworkTrace());
+        Assert.assertFalse(FTTraceConfigManager.get().isEnableAutoTrace());
     }
 
     @Test

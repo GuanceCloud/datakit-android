@@ -13,7 +13,7 @@ public class EngineFactory {
     public static final String TAG = "EngineFactory";
 
     public static INetEngine createEngine() {
-        if (FTTraceConfigManager.get().isNetworkTrace()) {
+        if (FTTraceConfigManager.get().isEnableAutoTrace()) {
             try {
                 if (!PackageUtils.isOKHttp3Support()) {
                     if (!PackageUtils.isThirdPartySupport()) {

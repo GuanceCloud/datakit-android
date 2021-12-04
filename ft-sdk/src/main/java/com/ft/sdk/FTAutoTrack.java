@@ -951,8 +951,7 @@ public class FTAutoTrack {
     private static void setUpWebView(View webView) {
         if (webView instanceof WebView && webView.getTag(R.id.ft_webview_handled_tag_view_value) == null) {
 
-            if (FTTraceConfigManager.get().isNetworkTrace()
-                    && FTTraceConfigManager.get().isEnableWebTrace()) {
+            if (FTTraceConfigManager.get().isEnableWebTrace()) {
                 ((WebView) webView).setWebViewClient(new FTWebViewClient());
             }
             new FTWebViewHandler().setWebView((WebView) webView);
@@ -979,7 +978,7 @@ public class FTAutoTrack {
      */
     public static OkHttpClient trackOkHttpBuilder(OkHttpClient.Builder builder) {
         FTNetWorkInterceptor interceptor = new FTNetWorkInterceptor();
-        if (FTTraceConfigManager.get().isNetworkTrace()
+        if (FTTraceConfigManager.get().isEnableAutoTrace()
                 || FTRUMConfigManager.get().isRumEnable()) {
             builder.addInterceptor(interceptor);
 //            builder.addNetworkInterceptor(interceptor); //发现部分工程有兼容问题
@@ -999,7 +998,7 @@ public class FTAutoTrack {
      */
     public static CloseableHttpClient trackHttpClientBuilder(HttpClientBuilder builder) {
         FTHttpClientInterceptor interceptor = new FTHttpClientInterceptor();
-        if (FTTraceConfigManager.get().isNetworkTrace()) {
+        if (FTTraceConfigManager.get().isEnableAutoTrace()) {
             builder.addRequestInterceptorFirst(new FTHttpClientRequestInterceptor(interceptor));
             builder.addResponseInterceptorLast(new FTHttpClientResponseInterceptor(interceptor));
         }
