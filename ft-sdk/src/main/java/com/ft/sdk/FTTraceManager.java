@@ -12,6 +12,9 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 链路追踪
+ */
 public class FTTraceManager {
     private final ConcurrentHashMap<String, FTTraceHandler> handlerMap = new ConcurrentHashMap<>();
 
@@ -24,6 +27,14 @@ public class FTTraceManager {
         return FTTraceManager.SingletonHolder.INSTANCE;
     }
 
+    /**
+     * 获取 trace http 请求头参数
+     * @param key 链路 id
+     * @param urlString url 地址
+     * @return
+     * @throws MalformedURLException
+     * @throws URISyntaxException
+     */
     public HashMap<String, String> getTraceHeader(String key, String urlString)
             throws MalformedURLException, URISyntaxException {
         FTTraceHandler handler = new FTTraceHandler();
@@ -41,6 +52,15 @@ public class FTTraceManager {
     }
 
 
+    /**
+     * 发送 trace 数据
+     * @param key  链路 id
+     * @param httpMethod 请求类型 post ，get
+     * @param requestHeader  请求数据头
+     * @param responseHeader 数据响应头
+     * @param statusCode http 状态吗
+     * @param errorMsg 请求错误信息
+     */
     public void addTrace(String key, String httpMethod, HashMap<String, String> requestHeader,
                          HashMap<String, String> responseHeader, int statusCode,
                          String errorMsg) {

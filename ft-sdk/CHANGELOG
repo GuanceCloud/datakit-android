@@ -1,3 +1,8 @@
+# agent 1.3.1-alpha05
+1.调整方法可见修饰
+2.添加方法注释
+
+---
 # agent 1.3.1-alpha04
 1. 优化 AddError
 

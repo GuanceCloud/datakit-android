@@ -28,13 +28,15 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.net.ssl.HttpsURLConnection;
 
+/**
+ *  RUM 数据管理
+ */
 public class FTRUMGlobalManager {
     private static final String TAG = "RUMGlobalManager";
     static final long MAX_RESTING_TIME = 15000000000L;
@@ -54,26 +56,24 @@ public class FTRUMGlobalManager {
         return FTRUMGlobalManager.SingletonHolder.INSTANCE;
     }
 
-    private FTRUMConfig config;
-
     private String sessionId = UUID.randomUUID().toString();
 
 
     private final ArrayList<String> notCollectMap = new ArrayList<>();
 
-    ViewBean activeView;
-    ActionBean activeAction;
+    private ViewBean activeView;
+    private ActionBean activeAction;
 
-    ConcurrentHashMap<String, Long> preActivityDuration = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Long> preActivityDuration = new ConcurrentHashMap<>();
 
-    long lastSessionTime = Utils.getCurrentNanoTime();
-    long lastActionTime = lastSessionTime;
+    private final long lastSessionTime = Utils.getCurrentNanoTime();
+    private long lastActionTime = lastSessionTime;
 
     String getSessionId() {
         return sessionId;
     }
 
-    void checkSessionRefresh() {
+    private void checkSessionRefresh() {
         long now = Utils.getCurrentNanoTime();
         boolean longResting = now - lastActionTime > MAX_RESTING_TIME;
         boolean longTimeSession = now - lastSessionTime > SESSION_EXPIRE_TIME;
@@ -82,7 +82,7 @@ public class FTRUMGlobalManager {
         }
     }
 
-    String getActionId() {
+    private String getActionId() {
         return activeAction == null ? null : activeAction.getId();
     }
 
@@ -100,6 +100,11 @@ public class FTRUMGlobalManager {
         this.lastActionTime = activeAction.getStartTime();
     }
 
+    /**
+     * action 起始
+     * @param actionName action 名称
+     * @param actionType action 类型
+     */
     public void startAction(String actionName, String actionType) {
         startAction(actionName, actionType, false);
     }
@@ -118,7 +123,7 @@ public class FTRUMGlobalManager {
         }
     }
 
-    void checkActionClose() {
+    private void checkActionClose() {
         if (activeAction == null) return;
         long now = Utils.getCurrentNanoTime();
         long lastActionTime = activeAction.getStartTime();
@@ -139,6 +144,10 @@ public class FTRUMGlobalManager {
         }
     }
 
+    /**
+     * resource 起始
+     * @param resourceId 资源 Id
+     */
     public void startResource(String resourceId) {
         ResourceBean bean = new ResourceBean();
         attachRUMRelative(bean);
@@ -151,6 +160,10 @@ public class FTRUMGlobalManager {
         });
     }
 
+    /**
+     * resource 终止
+     * @param resourceId 资源 Id
+     */
     public void stopResource(String resourceId) {
         ResourceBean bean = resourceBeanMap.get(resourceId);
         if (bean != null) {
@@ -169,6 +182,11 @@ public class FTRUMGlobalManager {
     }
 
 
+    /**
+     * view 起始
+     * @param viewName  当前页面名称
+     * @param viewReferrer 前一页面名称
+     */
     public void startView(String viewName, String viewReferrer) {
         checkSessionRefresh();
         if (activeView != null && !activeView.isClose()) {
@@ -186,6 +204,9 @@ public class FTRUMGlobalManager {
 
     }
 
+    /**
+     * view 结束
+     */
     public void stopView() {
         checkActionClose();
 
@@ -193,7 +214,7 @@ public class FTRUMGlobalManager {
         closeView(activeView.getId(), activeView.getTimeSpent());
     }
 
-    void initAction(ActionBean bean) {
+    private void initAction(ActionBean bean) {
         increaseAction(bean.getViewId());
         ThreadPoolUtils.get().execute(() -> {
             FTDBManager.get().initSumAction(bean);
@@ -201,13 +222,13 @@ public class FTRUMGlobalManager {
 
     }
 
-    void initView(ViewBean bean) {
+    private void initView(ViewBean bean) {
         ThreadPoolUtils.get().execute(() -> {
             FTDBManager.get().initSumView(bean);
         });
     }
 
-    void increaseResourceCount(String viewId, String actionId) {
+    private void increaseResourceCount(String viewId, String actionId) {
         ThreadPoolUtils.get().execute(() -> {
             FTDBManager.get().increaseViewResource(viewId);
             FTDBManager.get().increaseActionResource(actionId);
@@ -217,7 +238,7 @@ public class FTRUMGlobalManager {
     }
 
 
-    void increaseError(@NonNull JSONObject tags) {
+    private void increaseError(@NonNull JSONObject tags) {
 
         String actionId = tags.optString(Constants.KEY_RUM_ACTION_ID);
         String viewId = tags.optString(Constants.KEY_RUM_VIEW_ID);
@@ -228,9 +249,25 @@ public class FTRUMGlobalManager {
         });
     }
 
-    public void addError(String log, String message, ErrorType errorType, AppState state){
-        addError(log,message,Utils.getCurrentNanoTime(),errorType,state);
+    /**
+     * 添加错误
+     * @param log 日志
+     * @param message 消息
+     * @param errorType 错误类型
+     * @param state 程序运行状态
+     */
+    public void addError(String log, String message, ErrorType errorType, AppState state) {
+        addError(log, message, Utils.getCurrentNanoTime(), errorType, state);
     }
+
+    /**
+     * 添加错误
+     * @param log 日志
+     * @param message 消息
+     * @param errorType 错误类型
+     * @param state 程序运行状态
+     * @param  dateline 发生时间，纳秒
+     */
     public void addError(String log, String message, long dateline, ErrorType errorType, AppState state) {
         try {
             JSONObject tags = FTAutoTrack.getRUMPublicTags();
@@ -271,6 +308,11 @@ public class FTRUMGlobalManager {
 
     }
 
+    /**
+     * 添加长任务
+     * @param log 日志内容
+     * @param duration 持续时间，纳秒
+     */
     public void addLongTask(String log, long duration) {
         try {
             long time = Utils.getCurrentNanoTime();
@@ -512,7 +554,7 @@ public class FTRUMGlobalManager {
     }
 
 
-    void increaseLongTask(@NonNull JSONObject tags) {
+    private void increaseLongTask(@NonNull JSONObject tags) {
         String actionId = tags.optString(Constants.KEY_RUM_ACTION_ID);
         String viewId = tags.optString(Constants.KEY_RUM_VIEW_ID);
         ThreadPoolUtils.get().execute(() -> {
@@ -523,7 +565,7 @@ public class FTRUMGlobalManager {
         });
     }
 
-    void increaseAction(String viewId) {
+    private void increaseAction(String viewId) {
         ThreadPoolUtils.get().execute(() -> {
             FTDBManager.get().increaseViewAction(viewId);
 
@@ -532,7 +574,7 @@ public class FTRUMGlobalManager {
     }
 
 
-    void closeView(String viewId, long timeSpent) {
+    private void closeView(String viewId, long timeSpent) {
         ThreadPoolUtils.get().execute(() -> {
             FTDBManager.get().closeView(viewId, timeSpent);
 
@@ -540,7 +582,7 @@ public class FTRUMGlobalManager {
         generateRumData();
     }
 
-    void closeAction(String actionId, long duration, boolean force) {
+    private void closeAction(String actionId, long duration, boolean force) {
         ThreadPoolUtils.get().execute(() -> {
             FTDBManager.get().closeAction(actionId, duration, force);
         });
@@ -548,28 +590,28 @@ public class FTRUMGlobalManager {
     }
 
 
-    String getViewId() {
+    private String getViewId() {
         if (activeView == null) {
             return null;
         }
         return activeView.getId();
     }
 
-    String getViewName() {
+    private String getViewName() {
         if (activeView == null) {
             return null;
         }
         return activeView.getViewName();
     }
 
-    String getViewReferrer() {
+    private String getViewReferrer() {
         if (activeView == null) {
             return null;
         }
         return activeView.getViewReferrer();
     }
 
-    String getActionName() {
+    private String getActionName() {
         return activeAction == null ? null : activeAction.getActionName();
     }
 
@@ -624,7 +666,7 @@ public class FTRUMGlobalManager {
         });
     };
 
-    public static int LIMIT_SIZE = 50;
+    private static final int LIMIT_SIZE = 50;
 
     private void generateRumData() {
         //避免过于频繁的刷新
@@ -707,7 +749,6 @@ public class FTRUMGlobalManager {
     }
 
     public void initParams(FTRUMConfig config) {
-        this.config = config;
         checkSessionKeep(sessionId, config.getSamplingRate());
         ThreadPoolUtils.get().execute(() -> {
             FTDBManager.get().closeAllActionAndView();

@@ -10,6 +10,9 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 打印日志
+ */
 public class FTLogger {
 
     private static final String TAG = "FTLogger";
@@ -36,8 +39,8 @@ public class FTLogger {
     /**
      * 将单条日志数据存入本地同步
      *
-     * @param content
-     * @param status
+     * @param content 日志内容
+     * @param status 日志等级
      */
     public void logBackground(String content, Status status) {
 
@@ -80,7 +83,7 @@ public class FTLogger {
         FTTrackInner.getInstance().batchLogBeanBackground(logBeans);
     }
 
-    void checkConfig() {
+    private void checkConfig() {
         if (config == null) {
             throw new InvalidParameterException("使用 FTLogger，需要初始化 FTLoggerConfigManager.get().initWithConfig(FTLoggerConfig ftSdkConfig))");
         }
