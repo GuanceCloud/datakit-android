@@ -12,27 +12,28 @@
         android:orientation="vertical">
 
         <Button
-            android:id="@+id/http_request_btn"
+            android:id="@+id/manual_action_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="网络请求" />
+            android:text="手动 Action" />
 
         <Button
-            android:id="@+id/write_log_btn"
+            android:id="@+id/manual_http_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="写日志" />
-        <Button
-            android:id="@+id/dynamic_rum_tag_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="动态设置" />
-        <Button
-            android:id="@+id/manual_data_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="手动设置" />
+            android:text="手动 Trace Resource" />
 
+
+        <Button
+            android:id="@+id/manual_error_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="手动 Error" />
+        <Button
+            android:id="@+id/manual_longtask_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="手动 LongTask" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

@@ -1,13 +1,14 @@
 package com.cloudcare.ft.mobile.sdk.demo
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.ft.sdk.FTLogger
+import com.ft.sdk.*
 import com.ft.sdk.garble.bean.LogData
 import com.ft.sdk.garble.bean.Status
 import com.ft.sdk.garble.http.RequestMethod
@@ -70,6 +71,22 @@ class MainActivity : AppCompatActivity() {
             DemoApplication.setDynamicParams(this, "set from dynamic")
             finish()
 
+        }
+
+        findViewById<Button>(R.id.manual_data_btn).setOnClickListener {
+            FTSdk.initTraceWithConfig(
+                FTTraceConfig()
+                    .setEnableLinkRUMData(true)
+                    .setTraceType(TraceType.DDTRACE)
+            )
+
+            FTSdk.initRUMWithConfig(
+                FTRUMConfig()
+                    .setRumAppId(AccountUtils.getProperty(this, AccountUtils.RUM_APP_ID))
+                    .setEnableTrackAppCrash(true)
+                    .setEnableTrackAppANR(true)
+            )
+            startActivity(Intent(this, ManualActivity::class.java))
         }
 
 
