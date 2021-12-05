@@ -66,6 +66,7 @@ class DemoApplication : Application() {
                 FTTraceConfig()
                     .setServiceName("ft-sdk-demo")
                     .setSamplingRate(0.8f)
+                    .setEnableAutoTrace(true)
                     .setEnableLinkRUMData(true)
             )
         }

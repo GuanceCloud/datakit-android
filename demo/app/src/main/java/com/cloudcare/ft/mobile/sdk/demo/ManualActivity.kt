@@ -3,7 +3,8 @@ package com.cloudcare.ft.mobile.sdk.demo
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import com.ft.sdk.*
+import com.ft.sdk.FTRUMGlobalManager
+import com.ft.sdk.FTTraceManager
 import com.ft.sdk.garble.bean.AppState
 import com.ft.sdk.garble.bean.ErrorType
 import com.ft.sdk.garble.bean.NetStatusBean
@@ -37,7 +38,7 @@ class ManualActivity : AppCompatActivity() {
                     FTRUMGlobalManager.get().startResource(uuid)
                     val original = chain.request()
 
-                    val requestBuilder = original.newBuilder()// <-- this is the important line
+                    val requestBuilder = original.newBuilder()
                     for (key in headers.keys) {
                         requestBuilder.header(key!!, headers[key]!!)
                     }
@@ -63,26 +64,26 @@ class ManualActivity : AppCompatActivity() {
 
                         //发送 resource 指标数据
                         FTRUMGlobalManager.get().addResource(uuid, params, netStatusBean)
-                    }
 
-                    val requestHeaderMap = HashMap<String, String>()
-                    val responseHeaderMap = HashMap<String, String>()
-                    request.headers.forEach {
-                        requestHeaderMap[it.first] = it.second
-                    }
-                    response!!.headers.forEach {
-                        responseHeaderMap[it.first] = it.second
+                        val requestHeaderMap = HashMap<String, String>()
+                        val responseHeaderMap = HashMap<String, String>()
+                        request.headers.forEach {
+                            requestHeaderMap[it.first] = it.second
+                        }
+                        response!!.headers.forEach {
+                            responseHeaderMap[it.first] = it.second
 
+                        }
+                        //发送 trace 数据
+                        FTTraceManager.get().addTrace(
+                            url,
+                            request.method,
+                            requestHeaderMap,
+                            responseHeaderMap,
+                            response!!.code,
+                            ""
+                        )
                     }
-                    //发送 trace 数据
-                    FTTraceManager.get().addTrace(
-                        url,
-                        request.method,
-                        requestHeaderMap,
-                        responseHeaderMap,
-                        response!!.code,
-                        ""
-                    );
 
                     response!!
                 }.build()
