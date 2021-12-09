@@ -127,11 +127,11 @@ public class FTRUMGlobalManager {
         if (activeAction == null) return;
         long now = Utils.getCurrentNanoTime();
         long lastActionTime = activeAction.getStartTime();
-        boolean waiting = activeAction.isNeedWaitAction() && !activeView.isClose();
+        boolean waiting = activeAction.isNeedWaitAction() && (activeView != null && !activeView.isClose());
         boolean timeOut = now - lastActionTime > ActionBean.ACTION_NEED_WAIT_TIME_OUT;
         boolean needClose = !waiting
                 && (now - lastActionTime > ActionBean.ACTION_NORMAL_TIME_OUT)
-                || timeOut || !activeView.getId().equals(activeAction.getViewId());
+                || timeOut || (activeView != null && !activeView.getId().equals(activeAction.getViewId()));
         if (needClose) {
             activeAction.close();
             closeAction(activeAction.getId(), activeAction.getDuration(), timeOut);

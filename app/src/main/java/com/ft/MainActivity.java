@@ -1,5 +1,7 @@
 package com.ft;
 
+import static android.content.pm.PackageManager.PERMISSION_DENIED;
+
 import android.Manifest;
 import android.content.Intent;
 import android.os.Build;
@@ -30,8 +32,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import static android.content.pm.PackageManager.PERMISSION_DENIED;
-
 
 public class MainActivity extends AppCompatActivity {
 
@@ -61,13 +61,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissions(new String[]{Manifest.permission.CAMERA
-                    , Manifest.permission.ACCESS_FINE_LOCATION
-                    , Manifest.permission.ACCESS_COARSE_LOCATION
-                    , Manifest.permission.READ_PHONE_STATE
-                    , Manifest.permission.WRITE_EXTERNAL_STORAGE
-                    , Manifest.permission.BLUETOOTH
-                    , Manifest.permission.BLUETOOTH_ADMIN}, 1);
+            requestPermissions(new String[]{
+                    Manifest.permission.READ_PHONE_STATE
+            }, 1);
         }
 
 

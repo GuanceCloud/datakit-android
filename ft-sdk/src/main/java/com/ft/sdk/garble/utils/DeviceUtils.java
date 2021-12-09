@@ -181,7 +181,7 @@ public class DeviceUtils {
         } catch (SecurityException e) {
             LogUtils.e(TAG, "未能获取到系统>>Manifest.permission.READ_PHONE_STATE<<权限");
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtils.e(TAG,e.getMessage());
         }
         return imei;
     }
@@ -342,13 +342,13 @@ public class DeviceUtils {
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LogUtils.e(TAG,e.getMessage());
                 }
             } else {
                 LogUtils.e(TAG, "没有获得到 READ_PHONE_STATE 权限无法获取运营商信息");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtils.e(TAG,e.getMessage());
         }
         return null;
     }

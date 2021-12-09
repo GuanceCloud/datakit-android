@@ -17,10 +17,7 @@ import okhttp3.Request
 import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
-    private val storagePermission = Manifest.permission.WRITE_EXTERNAL_STORAGE
     private val phonePermission = Manifest.permission.READ_PHONE_STATE
-    private val cameraPermission = Manifest.permission.CAMERA
-    private val findLocationPermission = Manifest.permission.ACCESS_FINE_LOCATION
     private var requestPermissions = arrayOf<String>()
     private val REQUEST_CODE = 0x001
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,17 +25,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         //请求权限
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(storagePermission) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions = requestPermissions.plus(storagePermission)
-            }
             if (checkSelfPermission(phonePermission) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions = requestPermissions.plus(phonePermission)
-            }
-            if (checkSelfPermission(cameraPermission) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions = requestPermissions.plus(cameraPermission)
-            }
-            if (checkSelfPermission(findLocationPermission) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions = requestPermissions.plus(findLocationPermission)
             }
             if (requestPermissions.isNotEmpty()) {
                 requestPermissions(requestPermissions, REQUEST_CODE)
@@ -102,21 +90,14 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == REQUEST_CODE) {
             var count = 0
             for (i in grantResults.indices) {
-                if (permissions[i] == storagePermission && grantResults[i] == PackageManager.PERMISSION_DENIED) {
-                    count += 1
-                }
                 if (permissions[i] == phonePermission && grantResults[i] == PackageManager.PERMISSION_DENIED) {
-                    count += 2
+                    count += 1
                 }
             }
             if (count > 0) {
                 Toast.makeText(
                     this,
-                    when (count) {
-                        1 -> "你拒绝了存储权限"
-                        2 -> "你拒绝了电话权限"
-                        else -> "你拒绝了存储和电话权限"
-                    },
+                    "你拒绝了电话权限",
                     Toast.LENGTH_SHORT
                 ).show()
             }
