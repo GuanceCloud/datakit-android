@@ -1,6 +1,10 @@
 package com.ft.sdk;
 
+import com.ft.sdk.garble.utils.LogUtils;
+
 public class FTTraceConfigManager {
+
+    private static final String TAG = "FTTraceConfigManager";
 
 
     private static class SingletonHolder {
@@ -16,7 +20,8 @@ public class FTTraceConfigManager {
 
     void initWithConfig(FTTraceConfig config) {
         if (config.isEnableLinkRUMData() && config.getTraceType() != TraceType.DDTRACE) {
-            throw new InitSDKProcessException("FTTraceConfig.isEnableLinkRUMData,仅支持 TraceType.DDTRACE");
+            LogUtils.e(TAG, "FTTraceConfig.isEnableLinkRUMData,仅支持 TraceType.DDTRACE");
+            return;
         }
         this.config = config;
     }

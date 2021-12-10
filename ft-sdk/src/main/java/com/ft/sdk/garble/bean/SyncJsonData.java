@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.FloatDoubleJsonUtils;
 import com.ft.sdk.garble.utils.Utils;
+import com.ft.sdk.internal.exception.FTInvalidParameterException;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -136,7 +137,7 @@ public class SyncJsonData implements Cloneable {
      * @throws InvalidParameterException
      */
     public static SyncJsonData getSyncJsonData(DataType dataType, LineProtocolBean bean)
-            throws JSONException, InvalidParameterException {
+            throws JSONException, FTInvalidParameterException {
         JSONObject tagsTemp = bean.getTags();
         JSONObject fields = bean.getFields();
         SyncJsonData recordData = new SyncJsonData(dataType);
@@ -170,7 +171,7 @@ public class SyncJsonData implements Cloneable {
      * @throws InvalidParameterException
      */
     public static SyncJsonData getFromLogBean(BaseContentBean bean, DataType dataType)
-            throws JSONException, InvalidParameterException {
+            throws JSONException, FTInvalidParameterException {
         SyncJsonData recordData = new SyncJsonData(dataType);
         recordData.setTime(bean.getTime());
         JSONObject opDataJson = getLinProtocolJson(bean.getMeasurement(), bean.getAllTags(), bean.getAllFields());
@@ -190,7 +191,7 @@ public class SyncJsonData implements Cloneable {
      */
     private static JSONObject getLinProtocolJson(String measurement,
                                                  JSONObject tags, JSONObject fields)
-            throws JSONException, InvalidParameterException {
+            throws JSONException, FTInvalidParameterException {
 
         JSONObject tagsTemp = tags;
 
@@ -200,7 +201,7 @@ public class SyncJsonData implements Cloneable {
         if (measurement != null) {
             opDataJson.put(Constants.MEASUREMENT, measurement);
         } else {
-            throw new InvalidParameterException("指标集 measurement 不能为空");
+            throw new FTInvalidParameterException("指标集 measurement 不能为空");
         }
         if (tagsTemp == null) {
             tagsTemp = new JSONObject();
@@ -209,7 +210,7 @@ public class SyncJsonData implements Cloneable {
         if (fields != null) {
             opDataJson.put(Constants.FIELDS, fields);
         } else {
-            throw new InvalidParameterException("指标集 fields 不能为空");
+            throw new FTInvalidParameterException("指标集 fields 不能为空");
         }
         return opDataJson;
 

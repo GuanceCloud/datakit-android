@@ -194,30 +194,33 @@ public class FTTrackInner {
      * @param logBeans
      */
     void batchLogBeanBackground(@NonNull List<BaseContentBean> logBeans) {
-        FTLoggerConfig config = FTLoggerConfigManager.get().getConfig();
-        if (config == null) return;
-
-        JSONObject rumTags = null;
-        if (config.isEnableLinkRumData()) {
-            rumTags = FTAutoTrack.getRUMPublicTags();
-            FTRUMGlobalManager.get().attachRUMRelative(rumTags, false);
-        }
-
-        ArrayList<SyncJsonData> datas = new ArrayList<>();
-        for (BaseContentBean logBean : logBeans) {
-            try {
-                if (Utils.enableTraceSamplingRate(config.getSamplingRate())) {
-                    if (rumTags != null) {
-                        logBean.setTags(rumTags);
-                    }
-                    datas.add(SyncJsonData.getFromLogBean(logBean, DataType.LOG));
-                }
-            } catch (Exception e) {
-                LogUtils.e(TAG, e.getMessage());
+        try {
+            FTLoggerConfig config = FTLoggerConfigManager.get().getConfig();
+            JSONObject rumTags = null;
+            if (config.isEnableLinkRumData()) {
+                rumTags = FTAutoTrack.getRUMPublicTags();
+                FTRUMGlobalManager.get().attachRUMRelative(rumTags, false);
             }
 
+            ArrayList<SyncJsonData> datas = new ArrayList<>();
+            for (BaseContentBean logBean : logBeans) {
+                try {
+                    if (Utils.enableTraceSamplingRate(config.getSamplingRate())) {
+                        if (rumTags != null) {
+                            logBean.setTags(rumTags);
+                        }
+                        datas.add(SyncJsonData.getFromLogBean(logBean, DataType.LOG));
+                    }
+                } catch (Exception e) {
+                    LogUtils.e(TAG, e.getMessage());
+                }
+
+            }
+            judgeLogCachePolicy(datas);
+        } catch (Exception e) {
+            LogUtils.e(TAG, e.getMessage());
         }
-        judgeLogCachePolicy(datas);
+
     }
 
     void batchTraceBeanBackground(@NonNull List<BaseContentBean> logBeans) {

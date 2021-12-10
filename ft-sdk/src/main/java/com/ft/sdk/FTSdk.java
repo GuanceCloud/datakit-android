@@ -12,8 +12,6 @@ import com.ft.sdk.garble.utils.LocationUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
-import java.security.InvalidParameterException;
-
 
 /**
  * BY huangDianHua
@@ -46,12 +44,14 @@ public class FTSdk {
      */
     public static synchronized void install(@NonNull FTSDKConfig ftSDKConfig) {
         if (ftSDKConfig == null) {
-            throw new InvalidParameterException("参数 ftSDKConfig 不能为 null");
+            LogUtils.e(TAG, "参数 ftSDKConfig 不能为 null");
+            return;
         } else {
             mFtSdk = new FTSdk(ftSDKConfig);
             boolean onlyMain = ftSDKConfig.isOnlySupportMainProcess();
             if (onlyMain && !Utils.isMainProcess()) {
-                throw new InitSDKProcessException("当前 SDK 只能在主进程中运行，如果想要在非主进程中运行可以设置 FTSDKConfig.setOnlySupportMainProcess(false)");
+                LogUtils.e(TAG, "当前 SDK 只能在主进程中运行，如果想要在非主进程中运行可以设置 FTSDKConfig.setOnlySupportMainProcess(false)");
+                return;
             }
         }
         mFtSdk.initFTConfig();
@@ -62,9 +62,9 @@ public class FTSdk {
      *
      * @return
      */
-    public static synchronized FTSdk get() throws InvalidParameterException {
+    public static synchronized FTSdk get() {
         if (mFtSdk == null) {
-            throw new InvalidParameterException("请先安装SDK(在应用启动时调用FTSdk.install(FTSDKConfig ftSdkConfig,Application application))");
+            LogUtils.e(TAG, "请先安装SDK(在应用启动时调用FTSdk.install(FTSDKConfig ftSdkConfig))");
         }
         return mFtSdk;
     }
@@ -168,7 +168,11 @@ public class FTSdk {
      * @param config
      */
     public static void initRUMWithConfig(@NonNull FTRUMConfig config) {
-        FTRUMConfigManager.get().initWithConfig(config);
+        try {
+            FTRUMConfigManager.get().initWithConfig(config);
+        } catch (Exception e) {
+            LogUtils.e(TAG, e.getMessage());
+        }
 
     }
 
@@ -178,7 +182,11 @@ public class FTSdk {
      * @param config
      */
     public static void initTraceWithConfig(@NonNull FTTraceConfig config) {
-        FTTraceConfigManager.get().initWithConfig(config);
+        try {
+            FTTraceConfigManager.get().initWithConfig(config);
+        } catch (Exception e) {
+            LogUtils.e(TAG, e.getMessage());
+        }
     }
 
     /**
@@ -187,7 +195,11 @@ public class FTSdk {
      * @param config
      */
     public static void initLogWithConfig(@NonNull FTLoggerConfig config) {
-        FTLoggerConfigManager.get().initWithConfig(config);
+        try {
+            FTLoggerConfigManager.get().initWithConfig(config);
+        } catch (Exception e) {
+            LogUtils.e(TAG, e.getMessage());
+        }
     }
 
     /**

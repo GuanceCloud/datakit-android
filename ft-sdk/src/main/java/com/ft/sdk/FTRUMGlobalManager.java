@@ -35,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.net.ssl.HttpsURLConnection;
 
 /**
- *  RUM 数据管理
+ * RUM 数据管理
  */
 public class FTRUMGlobalManager {
     private static final String TAG = "RUMGlobalManager";
@@ -102,6 +102,7 @@ public class FTRUMGlobalManager {
 
     /**
      * action 起始
+     *
      * @param actionName action 名称
      * @param actionType action 类型
      */
@@ -146,6 +147,7 @@ public class FTRUMGlobalManager {
 
     /**
      * resource 起始
+     *
      * @param resourceId 资源 Id
      */
     public void startResource(String resourceId) {
@@ -162,6 +164,7 @@ public class FTRUMGlobalManager {
 
     /**
      * resource 终止
+     *
      * @param resourceId 资源 Id
      */
     public void stopResource(String resourceId) {
@@ -184,7 +187,8 @@ public class FTRUMGlobalManager {
 
     /**
      * view 起始
-     * @param viewName  当前页面名称
+     *
+     * @param viewName     当前页面名称
      * @param viewReferrer 前一页面名称
      */
     public void startView(String viewName, String viewReferrer) {
@@ -251,10 +255,11 @@ public class FTRUMGlobalManager {
 
     /**
      * 添加错误
-     * @param log 日志
-     * @param message 消息
+     *
+     * @param log       日志
+     * @param message   消息
      * @param errorType 错误类型
-     * @param state 程序运行状态
+     * @param state     程序运行状态
      */
     public void addError(String log, String message, ErrorType errorType, AppState state) {
         addError(log, message, Utils.getCurrentNanoTime(), errorType, state);
@@ -262,11 +267,12 @@ public class FTRUMGlobalManager {
 
     /**
      * 添加错误
-     * @param log 日志
-     * @param message 消息
+     *
+     * @param log       日志
+     * @param message   消息
      * @param errorType 错误类型
-     * @param state 程序运行状态
-     * @param  dateline 发生时间，纳秒
+     * @param state     程序运行状态
+     * @param dateline  发生时间，纳秒
      */
     public void addError(String log, String message, long dateline, ErrorType errorType, AppState state) {
         try {
@@ -295,7 +301,7 @@ public class FTRUMGlobalManager {
                 }
 
 
-            } catch (Exception e) {
+            } catch (JSONException e) {
                 LogUtils.e(TAG, e.getMessage());
             }
 
@@ -310,7 +316,8 @@ public class FTRUMGlobalManager {
 
     /**
      * 添加长任务
-     * @param log 日志内容
+     *
+     * @param log      日志内容
      * @param duration 持续时间，纳秒
      */
     public void addLongTask(String log, long duration) {
@@ -325,8 +332,8 @@ public class FTRUMGlobalManager {
             FTTrackInner.getInstance().rum(time, Constants.FT_MEASUREMENT_RUM_LONG_TASK, tags, fields);
             increaseLongTask(tags);
 
-        } catch (JSONException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            LogUtils.e(TAG, e.getMessage());
         }
     }
 
@@ -654,16 +661,20 @@ public class FTRUMGlobalManager {
 
     Handler mHandler = new Handler(Looper.getMainLooper());
     Runnable mRUMGenerateRunner = () -> {
-        JSONObject tags = FTAutoTrack.getRUMPublicTags();
+        try {
+            JSONObject tags = FTAutoTrack.getRUMPublicTags();
+            ThreadPoolUtils.get().execute(() -> {
+                try {
+                    generateActionSum(tags);
+                    generateViewSum(tags);
+                } catch (JSONException e) {
+                    LogUtils.e(TAG, e.getMessage());
+                }
+            });
+        } catch (Exception e) {
+            LogUtils.e(TAG, e.getMessage());
 
-        ThreadPoolUtils.get().execute(() -> {
-            try {
-                generateActionSum(tags);
-                generateViewSum(tags);
-            } catch (JSONException e) {
-                LogUtils.e(TAG, e.getMessage());
-            }
-        });
+        }
     };
 
     private static final int LIMIT_SIZE = 50;

@@ -4,9 +4,9 @@ import com.ft.sdk.garble.bean.BaseContentBean;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.LogData;
 import com.ft.sdk.garble.bean.Status;
+import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,12 +40,11 @@ public class FTLogger {
      * 将单条日志数据存入本地同步
      *
      * @param content 日志内容
-     * @param status 日志等级
+     * @param status  日志等级
      */
     public void logBackground(String content, Status status) {
 
-        checkConfig();
-
+        if(!checkConfig())return;
         if (!config.isEnableCustomLog()) {
             return;
         }
@@ -65,7 +64,7 @@ public class FTLogger {
      * @param logDataList
      */
     public void logBackground(List<LogData> logDataList) {
-        checkConfig();
+         if(!checkConfig())return;
         if (logDataList == null || (!config.isEnableCustomLog())) {
             return;
         }
@@ -83,10 +82,12 @@ public class FTLogger {
         FTTrackInner.getInstance().batchLogBeanBackground(logBeans);
     }
 
-    private void checkConfig() {
+    private boolean checkConfig() {
         if (config == null) {
-            throw new InvalidParameterException("使用 FTLogger，需要初始化 FTLoggerConfigManager.get().initWithConfig(FTLoggerConfig ftSdkConfig))");
+            LogUtils.e(TAG, "使用 FTLogger，需要初始化 FTLoggerConfigManager.get().initWithConfig(FTLoggerConfig ftSdkConfig))");
+            return false;
         }
+        return true;
     }
 
 

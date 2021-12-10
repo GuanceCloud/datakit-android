@@ -18,6 +18,8 @@ public class FTRUMConfig {
     private boolean enableTraceUserAction;
     //是否开启用户行为 view 追踪
     private boolean enableTraceUserView;
+    //是否开启用户欣慰 Resource 追踪
+    private boolean enableTraceUserResource;
     //崩溃采集数据附加类型
     private int extraMonitorTypeWithError;
 
@@ -85,6 +87,15 @@ public class FTRUMConfig {
 
     public boolean isEnableTraceUserView() {
         return enableTraceUserView;
+    }
+
+    public boolean isEnableTraceUserResource() {
+        return enableTraceUserResource;
+    }
+
+    public FTRUMConfig setEnableTraceUserResource(boolean enableTraceUserResource){
+        this.enableTraceUserResource = enableTraceUserResource;
+        return this;
     }
 
     public int getExtraMonitorTypeWithError() {

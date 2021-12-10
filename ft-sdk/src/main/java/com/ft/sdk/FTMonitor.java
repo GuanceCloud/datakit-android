@@ -85,7 +85,8 @@ public class FTMonitor {
         } catch (Exception e) {
         }
         if (onlyMain && !Utils.isMainProcess()) {
-            throw new InitSDKProcessException("当前 SDK 只能在主进程中运行，如果想要在非主进程中运行可以设置 FTSDKConfig.setOnlySupportMainProcess(false)");
+            LogUtils.e(TAG, "当前 SDK 只能在主进程中运行，如果想要在非主进程中运行可以设置 FTSDKConfig.setOnlySupportMainProcess(false)");
+            return;
         }
         FTMonitorConfigManager.get().initWithConfig(config);
         if (intent == null) {

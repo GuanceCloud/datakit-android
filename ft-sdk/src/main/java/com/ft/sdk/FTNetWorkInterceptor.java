@@ -25,7 +25,6 @@ import java.util.List;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import okhttp3.internal.http.HttpHeaders;
@@ -55,45 +54,35 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
     }
 
 
-    private void uploadNetTrace(FTTraceHandler handler,
-                                String operationName, Request request,
-                                @Nullable Response response, String responseBody, String error) {
-        try {
-
-            JSONObject requestContent = buildRequestJsonContent(request);
-            JSONObject responseContent = buildResponseJsonContent(response, responseBody, error);
-            boolean isError = response == null || response.code() >= 400;
-
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("requestContent", requestContent);
-            jsonObject.put("responseContent", responseContent);
-
-            handler.traceDataUpload(jsonObject, operationName, isError);
-
-        } catch (Exception e) {
-            LogUtils.e(TAG, e.getMessage());
-        }
-    }
-
-
     @NonNull
     @Override
     public Response intercept(@NonNull Chain chain) throws IOException {
+
+        FTRUMConfig rumConfig = FTRUMConfigManager.get().getConfig();
+        FTTraceConfig traceConfig = FTTraceConfigManager.get().getConfig();
+        if ((rumConfig != null && !rumConfig.isEnableTraceUserResource() && traceConfig != null &&
+                !traceConfig.isEnableAutoTrace()) || (rumConfig == null && traceConfig == null)) {
+            return chain.proceed(chain.request());
+        }
+
         Request request = chain.request();
         Response response = null;
         Request.Builder requestBuilder = request.newBuilder();
         Exception exception = null;
         Request newRequest = null;
         String operationName = "";
+        TraceDelegate traceDelegate = new TraceDelegate(traceConfig);
         FTTraceHandler traceHandler = new FTTraceHandler();
         try {
             okhttp3.HttpUrl url = request.url();
             HttpUrl httpUrl = new HttpUrl(url.host(), url.encodedPath(), url.port(), url.toString());
-            operationName = request.method() + " " + httpUrl.getPath();
-            HashMap<String, String> headers = traceHandler.getTraceHeader(httpUrl);
-            traceHandler.setIsWebViewTrace(webViewTrace);
-            for (String key : headers.keySet()) {
-                requestBuilder.header(key, headers.get(key));//避免重试出现重复头
+            if (traceConfig != null && traceConfig.isEnableAutoTrace()) {
+                operationName = request.method() + " " + httpUrl.getPath();
+                HashMap<String, String> headers = traceHandler.getTraceHeader(httpUrl);
+                traceHandler.setIsWebViewTrace(webViewTrace);
+                for (String key : headers.keySet()) {
+                    requestBuilder.header(key, headers.get(key));//避免重试出现重复头
+                }
             }
 
             newRequest = requestBuilder.build();
@@ -102,10 +91,11 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
         } catch (IOException e) {
             exception = e;
         }
-        String resourceId = Utils.identifyRequest(newRequest);
-        FTRUMGlobalManager manager = FTRUMGlobalManager.get();
 
-        manager.startResource(resourceId);
+        String resourceId = Utils.identifyRequest(newRequest);
+        ResourceDelegate resourceDelegate = new ResourceDelegate(rumConfig);
+
+        resourceDelegate.startResource(resourceId);
 
         ResourceParams params = new ResourceParams();
         params.url = newRequest.url().toString();
@@ -113,8 +103,8 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
         params.resourceMethod = newRequest.method();
 
         if (exception != null) {
-            uploadNetTrace(traceHandler, operationName, newRequest, null, "", exception.getMessage());
-            manager.setTransformContent(resourceId, params,
+            traceDelegate.uploadNetTrace(traceHandler, operationName, newRequest, null, "", exception.getMessage());
+            resourceDelegate.setTransformContent(resourceId, params,
                     traceHandler.getTraceID(), traceHandler.getSpanID());
 
             throw new IOException(exception);
@@ -131,7 +121,7 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
                         responseBody = new String(bytes, getCharset(contentType));
                         responseBody1 = ResponseBody.create(responseBody1.contentType(), bytes);
                         response = response.newBuilder().body(responseBody1).build();
-                        uploadNetTrace(traceHandler, operationName, newRequest, response, responseBody, "");
+                        traceDelegate.uploadNetTrace(traceHandler, operationName, newRequest, response, responseBody, "");
 
                         params.responseHeader = response.headers().toString();
                         params.responseBody = responseBody;
@@ -139,16 +129,14 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
                         params.responseConnection = response.header("Connection");
                         params.responseContentEncoding = response.header("Content-Encoding");
                         params.resourceStatus = response.code();
-                        manager.setTransformContent(resourceId, params,
+                        resourceDelegate.setTransformContent(resourceId, params,
                                 traceHandler.getTraceID(), traceHandler.getSpanID());
 
                     }
                 }
             }
         }
-        manager.stopResource(resourceId);
-
-
+        resourceDelegate.stopResource(resourceId);
         return response;
     }
 
@@ -264,5 +252,67 @@ public class FTNetWorkInterceptor extends NetStatusMonitor implements Intercepto
     @Override
     protected void getNetStatusInfoWhenCallEnd(String requestId, NetStatusBean bean) {
         FTRUMGlobalManager.get().putRUMResourcePerformance(requestId, bean);
+    }
+
+    static class ResourceDelegate {
+        private final FTRUMConfig config;
+
+        private final FTRUMGlobalManager manager;
+
+        ResourceDelegate(FTRUMConfig config) {
+            this.config = config;
+            this.manager = FTRUMGlobalManager.get();
+        }
+
+        void startResource(String resourceId) {
+            if (config == null || !config.isEnableTraceUserResource()) return;
+            manager.startResource(resourceId);
+        }
+
+        void stopResource(String resourceId) {
+            if (config == null || !config.isEnableTraceUserResource()) return;
+            manager.stopResource(resourceId);
+
+        }
+
+        void setTransformContent(String resourceId, ResourceParams params,
+                                 String traceId, String spanId) {
+            if (config == null || !config.isEnableTraceUserResource()) return;
+            manager.setTransformContent(resourceId, params, traceId, spanId);
+
+        }
+    }
+
+    class TraceDelegate {
+        private final FTTraceConfig config;
+
+        TraceDelegate(FTTraceConfig config) {
+            this.config = config;
+
+        }
+
+        void uploadNetTrace(FTTraceHandler handler,
+                            String operationName, Request request,
+                            @Nullable Response response, String responseBody, String error) {
+
+            if (config == null || !config.isEnableAutoTrace()) return;
+            try {
+
+                JSONObject requestContent = buildRequestJsonContent(request);
+                JSONObject responseContent = buildResponseJsonContent(response, responseBody, error);
+                boolean isError = response == null || response.code() >= 400;
+
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("requestContent", requestContent);
+                jsonObject.put("responseContent", responseContent);
+
+                handler.traceDataUpload(jsonObject, operationName, isError);
+
+            } catch (Exception e) {
+                LogUtils.e(TAG, e.getMessage());
+            }
+
+        }
+
     }
 }

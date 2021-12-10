@@ -1,5 +1,7 @@
 package com.ft.sdk;
 
+import static com.ft.sdk.FTApplication.getApplication;
+
 import android.app.Application;
 import android.content.SharedPreferences;
 
@@ -17,8 +19,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.util.UUID;
-
-import static com.ft.sdk.FTApplication.getApplication;
 
 public class FTRUMConfigManager {
 
@@ -121,12 +121,12 @@ public class FTRUMConfigManager {
      *
      * @return
      */
-     boolean isUserDataBinded() {
+    boolean isUserDataBinded() {
         return getUserData() != null;
     }
 
 
-     void initRandomUserId() {
+    void initRandomUserId() {
         if (Utils.isNullOrEmpty(getRandomUserId())) {
             createNewRandomUserId();
         }
@@ -140,7 +140,7 @@ public class FTRUMConfigManager {
     }
 
 
-     String getRandomUserId() {
+    String getRandomUserId() {
         if (!Utils.isNullOrEmpty(randomUserId)) {
             return randomUserId;
         }
@@ -150,7 +150,7 @@ public class FTRUMConfigManager {
     }
 
 
-     UserData getUserData() {
+    UserData getUserData() {
         synchronized (mLock) {
             if (mUserData != null) {
                 return mUserData;

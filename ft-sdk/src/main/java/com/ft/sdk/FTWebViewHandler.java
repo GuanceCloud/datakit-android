@@ -85,7 +85,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                 callbackFromNative(tag, callbackMethod, ret, err);
             }
 
-        } catch (JSONException e) {
+        } catch (Exception e) {
             LogUtils.e(TAG, e.getMessage());
         }
 

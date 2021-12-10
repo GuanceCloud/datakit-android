@@ -85,8 +85,8 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
         } else {
             if (mDefaultExceptionHandler != null) {
                 try {
-
                     mDefaultExceptionHandler.uncaughtException(t, e);
+
                 } catch (Exception ex) {
                 }
             } else {

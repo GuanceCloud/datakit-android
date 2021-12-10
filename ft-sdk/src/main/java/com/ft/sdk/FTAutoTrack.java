@@ -32,7 +32,6 @@ import com.google.gson.Gson;
 
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Method;
@@ -627,7 +626,8 @@ public class FTAutoTrack {
 
     /**
      * Activity 开关
-     *  @param op
+     *
+     * @param op
      * @param classCurrent
      */
     public static void putActivityEvent(@NonNull OP op, Class classCurrent) {
@@ -636,23 +636,23 @@ public class FTAutoTrack {
         String parentPageName = Constants.FLOW_ROOT;
         if (op == OP.OPEN_ACT) {
             //是第一次加载 Activity ，说明其为从其他Activity 中打开
-                //如果没有上一个 Activity 说明其为 根结点
-                if (parentClass != null) {
-                    //判断从 上一个 页面的Activity 还是 Fragment 中打开
-                    boolean isFromFragment = FTActivityManager.get().getActivityOpenFromFragment(classCurrent.getName());
-                    if (isFromFragment) {
-                        //从 Fragment 打开则找到上一个页面的 Fragment
-                        Class c = FTFragmentManager.getInstance().getLastFragmentName(parentClass.getName());
-                        if (c != null) {
-                            parentPageName = parentClass.getSimpleName() + "." + c.getSimpleName();
-                        } else {
-                            parentPageName = parentClass.getSimpleName();
-                        }
+            //如果没有上一个 Activity 说明其为 根结点
+            if (parentClass != null) {
+                //判断从 上一个 页面的Activity 还是 Fragment 中打开
+                boolean isFromFragment = FTActivityManager.get().getActivityOpenFromFragment(classCurrent.getName());
+                if (isFromFragment) {
+                    //从 Fragment 打开则找到上一个页面的 Fragment
+                    Class c = FTFragmentManager.getInstance().getLastFragmentName(parentClass.getName());
+                    if (c != null) {
+                        parentPageName = parentClass.getSimpleName() + "." + c.getSimpleName();
                     } else {
-                        //从Activity 中打开则找到上一个Activity
                         parentPageName = parentClass.getSimpleName();
                     }
+                } else {
+                    //从Activity 中打开则找到上一个Activity
+                    parentPageName = parentClass.getSimpleName();
                 }
+            }
         }
         try {
             if (op == OP.OPEN_ACT) {
@@ -739,48 +739,41 @@ public class FTAutoTrack {
      *
      * @return
      */
-    static JSONObject getRUMPublicTags() {
+    static JSONObject getRUMPublicTags() throws Exception {
         JSONObject tags = new JSONObject();
-        try {
-            FTRUMConfig config = FTRUMConfigManager.get().getConfig();
-            HashMap<String, String> globalContext = config.getGlobalContext();
-            ArrayList<String> customKeys = new ArrayList<>();
-            for (Map.Entry<String, String> entry : globalContext.entrySet()) {
-                String key = entry.getKey();
-                customKeys.add(key);
-                Object value = entry.getValue();
-                tags.put(key, value.toString());
-            }
-
-            tags.put(Constants.KEY_RUM_CUSTOM_KEYS, new Gson().toJson(customKeys));
-            tags.put(Constants.KEY_RUM_APP_ID, config.getRumAppId());
-            tags.put(Constants.KEY_RUM_SDK_NAME, Constants.SDK_NAME);
-            tags.put(Constants.KEY_RUM_ENV, FTSdk.get().getBaseConfig().getEnv().toString());
-            tags.put(Constants.KEY_RUM_NETWORK_TYPE, NetUtils.get().getNetWorkStateName());
-            tags.put(Constants.KEY_RUM_IS_SIGNIN, FTRUMConfigManager.get().isUserDataBinded() ? "T" : "F");
-            if (FTRUMConfigManager.get().isUserDataBinded()) {
-                tags.put(Constants.KEY_RUM_USER_ID, FTRUMConfigManager.get().getUserData().getId());
-            } else {
-                tags.put(Constants.KEY_RUM_USER_ID, FTRUMGlobalManager.get().getSessionId());
-            }
-
-            String uuid = "";
-            if (FTHttpConfigManager.get().useOaid) {
-                String oaid = OaidUtils.getOAID(FTApplication.getApplication());
-                if (oaid != null) {
-                    uuid = "oaid_" + oaid;
-                }
-            }
-            if (uuid.isEmpty()) {
-                uuid = DeviceUtils.getUuid(FTApplication.getApplication());
-            }
-            tags.put(Constants.KEY_DEVICE_UUID, uuid);
-            tags.put(Constants.KEY_RUM_SESSION_TYPE, "user");
-
-
-        } catch (JSONException e) {
-            LogUtils.e(TAG, e.getMessage());
+        FTRUMConfig config = FTRUMConfigManager.get().getConfig();
+        HashMap<String, String> globalContext = config.getGlobalContext();
+        ArrayList<String> customKeys = new ArrayList<>();
+        for (Map.Entry<String, String> entry : globalContext.entrySet()) {
+            String key = entry.getKey();
+            customKeys.add(key);
+            Object value = entry.getValue();
+            tags.put(key, value.toString());
         }
+        tags.put(Constants.KEY_RUM_CUSTOM_KEYS, new Gson().toJson(customKeys));
+        tags.put(Constants.KEY_RUM_APP_ID, config.getRumAppId());
+        tags.put(Constants.KEY_RUM_SDK_NAME, Constants.SDK_NAME);
+        tags.put(Constants.KEY_RUM_ENV, FTSdk.get().getBaseConfig().getEnv().toString());
+        tags.put(Constants.KEY_RUM_NETWORK_TYPE, NetUtils.get().getNetWorkStateName());
+        tags.put(Constants.KEY_RUM_IS_SIGNIN, FTRUMConfigManager.get().isUserDataBinded() ? "T" : "F");
+        if (FTRUMConfigManager.get().isUserDataBinded()) {
+            tags.put(Constants.KEY_RUM_USER_ID, FTRUMConfigManager.get().getUserData().getId());
+        } else {
+            tags.put(Constants.KEY_RUM_USER_ID, FTRUMGlobalManager.get().getSessionId());
+        }
+
+        String uuid = "";
+        if (FTHttpConfigManager.get().useOaid) {
+            String oaid = OaidUtils.getOAID(FTApplication.getApplication());
+            if (oaid != null) {
+                uuid = "oaid_" + oaid;
+            }
+        }
+        if (uuid.isEmpty()) {
+            uuid = DeviceUtils.getUuid(FTApplication.getApplication());
+        }
+        tags.put(Constants.KEY_DEVICE_UUID, uuid);
+        tags.put(Constants.KEY_RUM_SESSION_TYPE, "user");
         return tags;
 
     }
@@ -978,11 +971,8 @@ public class FTAutoTrack {
      */
     public static OkHttpClient trackOkHttpBuilder(OkHttpClient.Builder builder) {
         FTNetWorkInterceptor interceptor = new FTNetWorkInterceptor();
-        if (FTTraceConfigManager.get().isEnableAutoTrace()
-                || FTRUMConfigManager.get().isRumEnable()) {
-            builder.addInterceptor(interceptor);
+        builder.addInterceptor(interceptor);
 //            builder.addNetworkInterceptor(interceptor); //发现部分工程有兼容问题
-        }
         if (FTRUMConfigManager.get().isRumEnable()) {
             builder.eventListener(interceptor);
         }
