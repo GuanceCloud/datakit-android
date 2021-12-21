@@ -17,8 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ThreadPoolUtils {
     public static final String TAG = "ThreadPoolUtils";
-    private final static int CPU_COUNT = Runtime.getRuntime().availableProcessors();
-    private final static int CORE_POOL_SIZE = CPU_COUNT;
+    private final static int CORE_POOL_SIZE = 1;
     private final static int MAXIMUM_POOL_SIZE = 128;
     private final static int KEEP_ALIVE = 5;
     private BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>();
