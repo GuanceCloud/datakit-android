@@ -69,6 +69,8 @@ public class RUMSessionIdTest extends BaseTest {
     @Test
     public void sessionGenerateTest() throws InterruptedException {
         Thread.sleep(1000);
+        onView(ViewMatchers.withId(R.id.main_mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
+        Thread.sleep(1000);
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
         String sessionId = "";
         for (SyncJsonData recordData : recordDataList) {
@@ -93,7 +95,7 @@ public class RUMSessionIdTest extends BaseTest {
         onView(ViewMatchers.withId(R.id.main_mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
         Thread.sleep(100);
         onView(ViewMatchers.withId(R.id.main_mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
-        Thread.sleep(1000);
+        Thread.sleep(2000);
 
         String newSessionId = "";
 

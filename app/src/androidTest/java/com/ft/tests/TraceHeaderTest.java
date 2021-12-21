@@ -1,5 +1,13 @@
 package com.ft.tests;
 
+import static com.ft.AllTests.hasPrepare;
+import static com.ft.sdk.FTTraceHandler.DD_TRACE_TRACE_ID_KEY;
+import static com.ft.sdk.FTTraceHandler.JAEGER_KEY;
+import static com.ft.sdk.FTTraceHandler.ZIPKIN_SAMPLED;
+import static com.ft.sdk.FTTraceHandler.ZIPKIN_SPAN_ID;
+import static com.ft.sdk.FTTraceHandler.ZIPKIN_TRACE_ID;
+import static com.ft.utils.RequestUtil.requestUrl;
+
 import android.content.Context;
 import android.os.Looper;
 
@@ -35,14 +43,6 @@ import java.nio.charset.StandardCharsets;
 
 import okhttp3.Request;
 
-import static com.ft.AllTests.hasPrepare;
-import static com.ft.sdk.FTTraceHandler.DD_TRACE_TRACE_ID_KEY;
-import static com.ft.sdk.FTTraceHandler.JAEGER_KEY;
-import static com.ft.sdk.FTTraceHandler.ZIPKIN_SAMPLED;
-import static com.ft.sdk.FTTraceHandler.ZIPKIN_SPAN_ID;
-import static com.ft.sdk.FTTraceHandler.ZIPKIN_TRACE_ID;
-import static com.ft.utils.RequestUtil.requestUrl;
-
 /**
  * author: huangDianHua
  * time: 2020/8/26 13:54:56
@@ -68,7 +68,7 @@ public class TraceHeaderTest extends BaseTest {
 
     @Test
     public void traceZipKinHeaderTest() {
-        FTSdk.initTraceWithConfig(new FTTraceConfig().setTraceType(TraceType.ZIPKIN));
+        FTSdk.initTraceWithConfig(new FTTraceConfig().setEnableAutoTrace(true).setTraceType(TraceType.ZIPKIN));
         Request request = requestUrl("http://www.weather.com.cn/data/sk/101010100.html");
         boolean expect = request.headers().names().contains(ZIPKIN_SPAN_ID) &&
                 request.headers().names().contains(ZIPKIN_TRACE_ID) &&
@@ -78,7 +78,9 @@ public class TraceHeaderTest extends BaseTest {
 
     @Test
     public void traceZipKinHeaderSpanIdFormatTest() {
-        FTSdk.initTraceWithConfig(new FTTraceConfig().setTraceType(TraceType.ZIPKIN));
+        FTSdk.initTraceWithConfig(new FTTraceConfig()
+                .setEnableAutoTrace(true)
+                .setTraceType(TraceType.ZIPKIN));
         Request request = requestUrl("http://www.weather.com.cn/data/sk/101010100.html");
         String spanId = request.headers().get(ZIPKIN_SPAN_ID);
         boolean spanIdResult = spanId.length() == 16;
@@ -93,7 +95,9 @@ public class TraceHeaderTest extends BaseTest {
 
     @Test
     public void traceJaegerHeaderTest() {
-        FTSdk.initTraceWithConfig(new FTTraceConfig().setTraceType(TraceType.JAEGER));
+        FTSdk.initTraceWithConfig(new FTTraceConfig()
+                .setEnableAutoTrace(true)
+                .setTraceType(TraceType.JAEGER));
         Request request = requestUrl("http://www.weather.com.cn/data/sk/101010100.html");
         boolean expect = request.headers().names().contains(JAEGER_KEY);
         Assert.assertTrue(expect);
@@ -101,7 +105,9 @@ public class TraceHeaderTest extends BaseTest {
 
     @Test
     public void traceDDtraceHeaderTest() {
-        FTSdk.initTraceWithConfig(new FTTraceConfig().setTraceType(TraceType.DDTRACE));
+        FTSdk.initTraceWithConfig(new FTTraceConfig()
+                .setEnableAutoTrace(true)
+                .setTraceType(TraceType.DDTRACE));
         Request request = requestUrl("http://www.weather.com.cn/data/sk/101010100.html");
         boolean expect = request.headers().names().contains(DD_TRACE_TRACE_ID_KEY);
         Assert.assertTrue(expect);

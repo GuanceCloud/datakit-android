@@ -93,6 +93,7 @@ public class RUMActionIdTest extends BaseTest {
         onView(ViewMatchers.withId(R.id.main_mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
         Thread.sleep(100);
         onView(ViewMatchers.withId(R.id.main_mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
+        Thread.sleep(2000);
 
         recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
 

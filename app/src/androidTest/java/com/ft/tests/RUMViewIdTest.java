@@ -63,6 +63,7 @@ public class RUMViewIdTest extends BaseTest {
                 .setRumAppId(AccountUtils.getProperty(context, AccountUtils.RUM_APP_ID))
                 .setEnableTrackAppUIBlock(true)
                 .setEnableTraceUserAction(true)
+                .setEnableTraceUserView(true)
         );
     }
 

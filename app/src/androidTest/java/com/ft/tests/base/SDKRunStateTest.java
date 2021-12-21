@@ -1,5 +1,7 @@
 package com.ft.tests.base;
 
+import static com.ft.AllTests.hasPrepare;
+
 import android.content.Context;
 import android.os.Looper;
 
@@ -25,8 +27,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import static com.ft.AllTests.hasPrepare;
 
 /**
  * author: huangDianHua
@@ -63,7 +63,9 @@ public class SDKRunStateTest extends BaseTest {
 
         FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableConsoleLog(true));
 
-        FTSdk.initTraceWithConfig(new FTTraceConfig().setTraceType(TraceType.ZIPKIN));
+        FTSdk.initTraceWithConfig(new FTTraceConfig()
+                .setEnableAutoTrace(true)
+                .setTraceType(TraceType.ZIPKIN));
     }
 
     @Test

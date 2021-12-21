@@ -7,8 +7,8 @@ import androidx.test.rule.GrantPermissionRule;
 import com.ft.sdk.FTExceptionHandler;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTrack;
-import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.SyncTaskManager;
+import com.ft.sdk.garble.db.FTDBManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,13 +25,9 @@ public class BaseTest {
     protected static final String CONTENT_SIMPLE_TEST = "----simpleTest----";
     protected static final String TEST_MEASUREMENT = "testMeasurement";
     @Rule
-    public GrantPermissionRule permissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA
-            , Manifest.permission.ACCESS_FINE_LOCATION
-            , Manifest.permission.ACCESS_COARSE_LOCATION
-            , Manifest.permission.READ_PHONE_STATE
-            , Manifest.permission.WRITE_EXTERNAL_STORAGE
-            , Manifest.permission.BLUETOOTH
-            , Manifest.permission.BLUETOOTH_ADMIN);
+    public GrantPermissionRule permissionRule = GrantPermissionRule.grant(
+            Manifest.permission.READ_PHONE_STATE
+    );
 
     @After
     public void tearDown() {

@@ -87,12 +87,14 @@ public class LogTrackTraceRUMTest extends BaseTest {
                 .setRumAppId(AccountUtils.getProperty(context, AccountUtils.RUM_APP_ID))
                 .setEnableTrackAppUIBlock(true)
                 .setEnableTraceUserAction(true)
+                .setEnableTraceUserView(true)
+                .setEnableTraceUserResource(true)
         );
 
         FTSdk.initLogWithConfig(new FTLoggerConfig()
                 .setEnableCustomLog(true));
 
-        FTSdk.initTraceWithConfig(new FTTraceConfig());
+        FTSdk.initTraceWithConfig(new FTTraceConfig().setEnableAutoTrace(true));
 
         FTDBManager.get().delete();
     }
@@ -246,7 +248,7 @@ public class LogTrackTraceRUMTest extends BaseTest {
         onView(ViewMatchers.withId(R.id.main_mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
         //第二次操作触发 action close
         onView(ViewMatchers.withId(R.id.main_mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
-        Thread.sleep(1000);
+        Thread.sleep(2000);
 
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
         boolean value = false;
@@ -306,6 +308,7 @@ public class LogTrackTraceRUMTest extends BaseTest {
     private boolean checkTraceHasLinkRumData(boolean enableLinkRUMData) throws InterruptedException {
         FTSdk.initTraceWithConfig(new FTTraceConfig()
                 .setTraceType(TraceType.DDTRACE)
+                .setEnableAutoTrace(true)
                 .setEnableLinkRUMData(enableLinkRUMData)
         );
         Thread.sleep(2000);
