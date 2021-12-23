@@ -1,7 +1,7 @@
 package com.ft.sdk.garble.http;
 
 import com.ft.sdk.garble.FTHttpConfigManager;
-import com.ft.sdk.garble.utils.ThreadPoolUtils;
+import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.security.InvalidParameterException;
@@ -163,7 +163,7 @@ public class HttpBuilder {
     }
 
     public <T extends ResponseData> void executeAsync(Class<T> tClass, HttpCallback<T> callback) {
-        ThreadPoolUtils.get().execute(() -> callback.onComplete(new NetProxy(this).execute(tClass)));
+        DataUploaderThreadPool.get().execute(() -> callback.onComplete(new NetProxy(this).execute(tClass)));
     }
 
     /**

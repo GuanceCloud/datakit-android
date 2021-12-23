@@ -12,7 +12,7 @@ import com.ft.sdk.garble.manager.AsyncCallback;
 import com.ft.sdk.garble.manager.SyncDataHelper;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.sdk.garble.utils.ThreadPoolUtils;
+import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.util.ArrayList;
@@ -66,10 +66,10 @@ public class SyncTaskManager {
             return;
         }
         synchronized (this) {
-            System.out.println("=========executeSyncPoll===");
+            LogUtils.d(TAG, "=========executeSyncPoll===");
             running = true;
             errorCount.set(0);
-            ThreadPoolUtils.get().execute(() -> {
+            DataUploaderThreadPool.get().execute(() -> {
                 try {
 
                     LogUtils.e(TAG, " \n*******************************************************\n" +
@@ -212,6 +212,6 @@ public class SyncTaskManager {
     }
 
     public static void release() {
-        ThreadPoolUtils.get().shutDown();
+        DataUploaderThreadPool.get().shutDown();
     }
 }

@@ -1,6 +1,7 @@
-package com.ft.sdk.garble.utils;
+package com.ft.sdk.garble.threadpool;
 
-import java.util.concurrent.ArrayBlockingQueue;
+import com.ft.sdk.garble.utils.LogUtils;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -15,30 +16,28 @@ import java.util.concurrent.atomic.AtomicInteger;
  * DATE:2019-11-29 18:57
  * Description:
  */
-public class ThreadPoolUtils {
-    public static final String TAG = "ThreadPoolUtils";
-    private final static int CORE_POOL_SIZE = 1;
+public abstract class BaseThreadPool {
+    public static final String TAG = "BaseThreadPool";
     private final static int MAXIMUM_POOL_SIZE = 128;
     private final static int KEEP_ALIVE = 5;
-    private BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>();
+    private BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
     private ThreadPoolExecutor executor;
-    private static ThreadPoolUtils threadPoolUtils;
+    private final int corePoolSize;
 
-    private ThreadPoolUtils() {
-        executor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE, TimeUnit.SECONDS, workQueue, threadFactory);
+    public BaseThreadPool(int corePoolSize) {
+        this.corePoolSize = corePoolSize;
+        executor = createNew();
         executor.setRejectedExecutionHandler(sRunOnSerialPolicy);
     }
 
     private final RejectedExecutionHandler sRunOnSerialPolicy =
             new RejectedExecutionHandler() {
                 public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
-                    LogUtils.w(TAG,"Exceeded ThreadPoolExecutor pool size");
-                    // As a last ditch fallback, run it on an executor with an unbounded queue.
-                    // Create this executor lazily, hopefully almost never.
+                    LogUtils.w(TAG, "Exceeded ThreadPoolExecutor pool size");
                     synchronized (this) {
                         if (executor == null) {
-                            workQueue = new LinkedBlockingQueue<Runnable>();
-                            executor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE, TimeUnit.SECONDS, workQueue, threadFactory);
+                            workQueue = new LinkedBlockingQueue<>();
+                            executor = createNew();
                             executor.allowCoreThreadTimeOut(true);
                         }
                     }
@@ -46,21 +45,13 @@ public class ThreadPoolUtils {
                 }
             };
 
-    public static ThreadPoolUtils get() {
-        synchronized (ThreadPoolUtils.class) {
-            if (threadPoolUtils == null) {
-                threadPoolUtils = new ThreadPoolUtils();
-            }
-            return threadPoolUtils;
-        }
-    }
 
-    private static ThreadFactory threadFactory = new ThreadFactory() {
+    private  static ThreadFactory threadFactory = new ThreadFactory() {
         private final AtomicInteger integer = new AtomicInteger();
 
         @Override
         public Thread newThread(Runnable r) {
-            return new Thread(r, "ThreadPoolUtils:" + integer.getAndIncrement());
+            return new Thread(r, TAG + ":" + integer.getAndIncrement());
         }
     };
 
@@ -99,6 +90,12 @@ public class ThreadPoolUtils {
     }
 
     public void reStartPool() {
-        executor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE, TimeUnit.SECONDS, workQueue, threadFactory);
+        executor = createNew();
+    }
+
+    private ThreadPoolExecutor createNew() {
+        return new ThreadPoolExecutor(corePoolSize, MAXIMUM_POOL_SIZE, KEEP_ALIVE,
+                TimeUnit.SECONDS, workQueue, threadFactory);
+
     }
 }

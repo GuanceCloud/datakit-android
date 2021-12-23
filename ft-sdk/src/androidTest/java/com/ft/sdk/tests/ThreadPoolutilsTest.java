@@ -1,6 +1,6 @@
 package com.ft.sdk.tests;
 
-import com.ft.sdk.garble.utils.ThreadPoolUtils;
+import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,23 +16,23 @@ import static org.junit.Assert.assertTrue;
 public class ThreadPoolutilsTest {
     @Before
     public void threadPool(){
-        ThreadPoolUtils.get().execute(new Runnable() {
+        DataUploaderThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
                 while (true){}
             }
         });
-        ThreadPoolUtils.get().shutDown();
+        DataUploaderThreadPool.get().shutDown();
     }
 
     @Test
     public void testThreadPool(){
-        assertFalse(ThreadPoolUtils.get().poolRunning());
+        assertFalse(DataUploaderThreadPool.get().poolRunning());
     }
 
     @Test
     public void testReThreadPool(){
-        ThreadPoolUtils.get().reStartPool();
-        assertTrue(ThreadPoolUtils.get().poolRunning());
+        DataUploaderThreadPool.get().reStartPool();
+        assertTrue(DataUploaderThreadPool.get().poolRunning());
     }
 }

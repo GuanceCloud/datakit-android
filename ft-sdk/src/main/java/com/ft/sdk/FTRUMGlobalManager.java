@@ -15,10 +15,10 @@ import com.ft.sdk.garble.bean.ResourceBean;
 import com.ft.sdk.garble.bean.ResourceParams;
 import com.ft.sdk.garble.bean.ViewBean;
 import com.ft.sdk.garble.db.FTDBManager;
+import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.sdk.garble.utils.ThreadPoolUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONException;
@@ -156,7 +156,7 @@ public class FTRUMGlobalManager {
         resourceBeanMap.put(resourceId, bean);
         String actionId = bean.actionId;
         String viewId = bean.viewId;
-        ThreadPoolUtils.get().execute(() -> {
+        EventConsumerThreadPool.get().execute(() -> {
             FTDBManager.get().increaseViewPendingResource(viewId);
             FTDBManager.get().increaseActionPendingResource(actionId);
         });
@@ -173,7 +173,7 @@ public class FTRUMGlobalManager {
             String actionId = bean.actionId;
             String viewId = bean.viewId;
             increaseResourceCount(viewId, actionId);
-            ThreadPoolUtils.get().execute(() -> {
+            EventConsumerThreadPool.get().execute(() -> {
                 FTDBManager.get().reduceViewPendingResource(viewId);
                 FTDBManager.get().reduceActionPendingResource(actionId);
             });
@@ -220,20 +220,20 @@ public class FTRUMGlobalManager {
 
     private void initAction(ActionBean bean) {
         increaseAction(bean.getViewId());
-        ThreadPoolUtils.get().execute(() -> {
+        EventConsumerThreadPool.get().execute(() -> {
             FTDBManager.get().initSumAction(bean);
         });
 
     }
 
     private void initView(ViewBean bean) {
-        ThreadPoolUtils.get().execute(() -> {
+        EventConsumerThreadPool.get().execute(() -> {
             FTDBManager.get().initSumView(bean);
         });
     }
 
     private void increaseResourceCount(String viewId, String actionId) {
-        ThreadPoolUtils.get().execute(() -> {
+        EventConsumerThreadPool.get().execute(() -> {
             FTDBManager.get().increaseViewResource(viewId);
             FTDBManager.get().increaseActionResource(actionId);
             checkActionClose();
@@ -246,7 +246,7 @@ public class FTRUMGlobalManager {
 
         String actionId = tags.optString(Constants.KEY_RUM_ACTION_ID);
         String viewId = tags.optString(Constants.KEY_RUM_VIEW_ID);
-        ThreadPoolUtils.get().execute(() -> {
+        EventConsumerThreadPool.get().execute(() -> {
             FTDBManager.get().increaseActionError(actionId);
             FTDBManager.get().increaseViewError(viewId);
             checkActionClose();
@@ -348,7 +348,7 @@ public class FTRUMGlobalManager {
             return;
         }
         if (bean.resourceStatus < HttpsURLConnection.HTTP_OK) {
-            ThreadPoolUtils.get().execute(() -> {
+            EventConsumerThreadPool.get().execute(() -> {
                 resourceBeanMap.remove(resourceId);
             });
             return;
@@ -489,7 +489,7 @@ public class FTRUMGlobalManager {
             LogUtils.e(TAG, e.toString());
         }
 
-        ThreadPoolUtils.get().execute(() -> {
+        EventConsumerThreadPool.get().execute(() -> {
             resourceBeanMap.remove(resourceId);
         });
     }
@@ -564,7 +564,7 @@ public class FTRUMGlobalManager {
     private void increaseLongTask(@NonNull JSONObject tags) {
         String actionId = tags.optString(Constants.KEY_RUM_ACTION_ID);
         String viewId = tags.optString(Constants.KEY_RUM_VIEW_ID);
-        ThreadPoolUtils.get().execute(() -> {
+        EventConsumerThreadPool.get().execute(() -> {
             FTDBManager.get().increaseActionLongTask(actionId);
             FTDBManager.get().increaseViewLongTask(viewId);
             checkActionClose();
@@ -573,7 +573,7 @@ public class FTRUMGlobalManager {
     }
 
     private void increaseAction(String viewId) {
-        ThreadPoolUtils.get().execute(() -> {
+        EventConsumerThreadPool.get().execute(() -> {
             FTDBManager.get().increaseViewAction(viewId);
 
         });
@@ -582,7 +582,7 @@ public class FTRUMGlobalManager {
 
 
     private void closeView(String viewId, long timeSpent) {
-        ThreadPoolUtils.get().execute(() -> {
+        EventConsumerThreadPool.get().execute(() -> {
             FTDBManager.get().closeView(viewId, timeSpent);
 
         });
@@ -590,7 +590,7 @@ public class FTRUMGlobalManager {
     }
 
     private void closeAction(String actionId, long duration, boolean force) {
-        ThreadPoolUtils.get().execute(() -> {
+        EventConsumerThreadPool.get().execute(() -> {
             FTDBManager.get().closeAction(actionId, duration, force);
         });
         generateRumData();
@@ -663,7 +663,7 @@ public class FTRUMGlobalManager {
     Runnable mRUMGenerateRunner = () -> {
         try {
             JSONObject tags = FTAutoTrack.getRUMPublicTags();
-            ThreadPoolUtils.get().execute(() -> {
+            EventConsumerThreadPool.get().execute(() -> {
                 try {
                     generateActionSum(tags);
                     generateViewSum(tags);
@@ -761,7 +761,7 @@ public class FTRUMGlobalManager {
 
     public void initParams(FTRUMConfig config) {
         checkSessionKeep(sessionId, config.getSamplingRate());
-        ThreadPoolUtils.get().execute(() -> {
+        EventConsumerThreadPool.get().execute(() -> {
             FTDBManager.get().closeAllActionAndView();
         });
 

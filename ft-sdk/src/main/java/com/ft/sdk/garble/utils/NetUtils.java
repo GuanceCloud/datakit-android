@@ -23,6 +23,7 @@ import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.http.ResponseData;
 import com.ft.sdk.garble.manager.AsyncCallback;
+import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -476,7 +477,7 @@ public class NetUtils {
      * @param callback
      */
     public void getPublicIp(AsyncCallback callback) {
-        ThreadPoolUtils.get().execute(() -> {
+        DataUploaderThreadPool.get().execute(() -> {
             ResponseData result = HttpBuilder.Builder()
                     .setUrl(PUBLIC_IP_API)
                     .setMethod(RequestMethod.GET)

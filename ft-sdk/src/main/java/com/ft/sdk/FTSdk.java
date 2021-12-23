@@ -8,9 +8,11 @@ import com.ft.sdk.garble.FTAutoTrackConfigManager;
 import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.FTMonitorConfigManager;
+import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
 import com.ft.sdk.garble.utils.LocationUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
+import com.ft.sdk.internal.exception.FTInitSDKProcessException;
 
 
 /**
@@ -50,8 +52,7 @@ public class FTSdk {
             mFtSdk = new FTSdk(ftSDKConfig);
             boolean onlyMain = ftSDKConfig.isOnlySupportMainProcess();
             if (onlyMain && !Utils.isMainProcess()) {
-                LogUtils.e(TAG, "当前 SDK 只能在主进程中运行，如果想要在非主进程中运行可以设置 FTSDKConfig.setOnlySupportMainProcess(false)");
-                return;
+                throw new FTInitSDKProcessException( "当前 SDK 只能在主进程中运行，如果想要在非主进程中运行可以设置 FTSDKConfig.setOnlySupportMainProcess(false)");
             }
         }
         mFtSdk.initFTConfig();
@@ -87,6 +88,7 @@ public class FTSdk {
         FTLoggerConfigManager.get().release();
         FTRUMGlobalManager.get().release();
         FTRUMConfigManager.get().unregisterActivityLifeCallback();
+        EventConsumerThreadPool.get().shutDown();
         LogUtils.w(TAG, "FT SDK 已经被关闭");
     }
 

@@ -17,7 +17,7 @@ import com.ft.sdk.garble.manager.AsyncCallback;
 import com.ft.sdk.garble.manager.SyncDataHelper;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.sdk.garble.utils.ThreadPoolUtils;
+import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONObject;
@@ -92,7 +92,7 @@ public class FTTrackInner {
 
     private void syncDataBackground(DataType dataType, long time,
                                     String measurement, final JSONObject tags, JSONObject fields) {
-        ThreadPoolUtils.get().execute(() -> {
+        DataUploaderThreadPool.get().execute(() -> {
             try {
 
                 SyncJsonData recordData = SyncJsonData.getSyncJsonData(dataType,
@@ -105,7 +105,6 @@ public class FTTrackInner {
                 LogUtils.e(TAG, e.getMessage());
             }
         });
-
     }
 
 
@@ -116,7 +115,7 @@ public class FTTrackInner {
      * @param callback
      */
     void trackAsync(@NonNull List<LineProtocolBean> trackBeans, AsyncCallback callback) {
-        ThreadPoolUtils.get().execute(() -> {
+        DataUploaderThreadPool.get().execute(() -> {
             List<SyncJsonData> recordDataList = new ArrayList<>();
             for (LineProtocolBean t : trackBeans) {
                 try {

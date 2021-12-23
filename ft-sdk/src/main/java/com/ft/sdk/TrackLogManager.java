@@ -6,7 +6,7 @@ import com.ft.sdk.garble.bean.BaseContentBean;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.sdk.garble.utils.ThreadPoolUtils;
+import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -81,6 +81,6 @@ public class TrackLogManager {
             }
             return true;
         });
-        ThreadPoolUtils.get().execute(futureTask);
+        DataUploaderThreadPool.get().execute(futureTask);
     }
 }

@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.ErrorType;
-import com.ft.sdk.garble.utils.ThreadPoolUtils;
+import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.io.File;
@@ -116,7 +116,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
      * @param nativeDumpPath
      */
     public void checkAndSyncPreDump(String nativeDumpPath) {
-        ThreadPoolUtils.get().execute(() -> {
+        EventConsumerThreadPool.get().execute(() -> {
             File file = new File(nativeDumpPath);
             if (!file.exists()) {
                 return;
