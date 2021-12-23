@@ -10,9 +10,9 @@ import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.manager.AsyncCallback;
 import com.ft.sdk.garble.manager.SyncDataHelper;
+import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.util.ArrayList;
@@ -28,10 +28,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SyncTaskManager {
     public final static String TAG = "SyncTaskManager";
     private static volatile SyncTaskManager instance;
-    private final int CLOSE_TIME = 5;
-    private final int LIMIT_SIZE = 10;
-    private final int SLEEP_TIME = 10 * 1000;
-    private volatile AtomicInteger errorCount = new AtomicInteger(0);
+    private static final int CLOSE_TIME = 5;
+    private static final int LIMIT_SIZE = 10;
+    private static final int SLEEP_TIME = 10 * 1000;
+    private final AtomicInteger errorCount = new AtomicInteger(0);
     private volatile boolean running;
 
 
