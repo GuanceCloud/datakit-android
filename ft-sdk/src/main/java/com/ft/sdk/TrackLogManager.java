@@ -4,13 +4,12 @@ package com.ft.sdk;
 import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.bean.BaseContentBean;
 import com.ft.sdk.garble.bean.LogBean;
+import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -61,7 +60,7 @@ public class TrackLogManager {
             return;
         }
         isRunning = true;
-        FutureTask<Boolean> futureTask = new FutureTask(() -> {
+        Runnable futureTask = () -> {
             try {
                 //当队列中有数据时，不断执行取数据操作
                 LogBean logBean;
@@ -79,8 +78,7 @@ public class TrackLogManager {
             } finally {
                 isRunning = false;
             }
-            return true;
-        });
+        };
         DataUploaderThreadPool.get().execute(futureTask);
     }
 }

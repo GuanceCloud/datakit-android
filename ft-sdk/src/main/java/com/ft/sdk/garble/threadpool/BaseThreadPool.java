@@ -65,15 +65,6 @@ public abstract class BaseThreadPool {
         }
     }
 
-    public void execute(FutureTask futureTask) {
-        if (!poolRunning()) {
-            reStartPool();
-        }
-        if (executor != null) {
-            executor.execute(futureTask);
-        }
-    }
-
     public void cancel(FutureTask futureTask) {
         futureTask.cancel(true);
     }
