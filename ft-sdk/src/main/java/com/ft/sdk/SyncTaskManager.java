@@ -1,5 +1,12 @@
 package com.ft.sdk;
 
+
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+
+import androidx.annotation.NonNull;
+
 import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncJsonData;
@@ -27,12 +34,23 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class SyncTaskManager {
     public final static String TAG = "SyncTaskManager";
-    private static volatile SyncTaskManager instance;
     private static final int CLOSE_TIME = 5;
     private static final int LIMIT_SIZE = 10;
     private static final int SLEEP_TIME = 10 * 1000;
     private final AtomicInteger errorCount = new AtomicInteger(0);
     private volatile boolean running;
+
+    private static final int MSG_SYNC = 1;
+
+    private final Handler mHandler = new Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            if (msg.what == MSG_SYNC) {
+                executePoll();
+            }
+        }
+    };
 
 
     private final static DataType[] SYNC_MAP = DataType.values();
@@ -50,18 +68,15 @@ public class SyncTaskManager {
 
     }
 
-    public synchronized static SyncTaskManager get() {
-        if (instance == null) {
-            instance = new SyncTaskManager();
-        }
-        return instance;
+    private static class SingletonHolder {
+        private static final SyncTaskManager INSTANCE = new SyncTaskManager();
     }
 
+    public static SyncTaskManager get() {
+        return SyncTaskManager.SingletonHolder.INSTANCE;
+    }
 
-    /**
-     * 触发延迟轮询同步
-     */
-    void executeSyncPoll() {
+    private void executePoll() {
         if (running) {
             return;
         }
@@ -96,6 +111,14 @@ public class SyncTaskManager {
                 }
             });
         }
+    }
+
+    /**
+     * 触发延迟轮询同步
+     */
+    void executeSyncPoll() {
+        mHandler.removeMessages(MSG_SYNC);
+        mHandler.sendEmptyMessageDelayed(MSG_SYNC, 100);
     }
 
     /**

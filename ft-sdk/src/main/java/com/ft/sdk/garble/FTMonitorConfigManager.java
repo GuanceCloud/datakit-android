@@ -11,7 +11,7 @@ import com.ft.sdk.garble.utils.SensorUtils;
  * Description:监控项配置
  */
 public class FTMonitorConfigManager {
-    private static FTMonitorConfigManager ftMonitorConfig;
+    private volatile static FTMonitorConfigManager ftMonitorConfig;
     private int monitorType;
 //    private String geoKey;
 //    private boolean useGeoKey;
@@ -36,10 +36,12 @@ public class FTMonitorConfigManager {
     }
 
     public static FTMonitorConfigManager get() {
-        if (ftMonitorConfig == null) {
-            ftMonitorConfig = new FTMonitorConfigManager();
+        synchronized (FTMonitorConfigManager.class) {
+            if (ftMonitorConfig == null) {
+                ftMonitorConfig = new FTMonitorConfigManager();
+            }
+            return ftMonitorConfig;
         }
-        return ftMonitorConfig;
     }
 
     public void initWithConfig(FTRUMConfig config) {
@@ -49,7 +51,7 @@ public class FTMonitorConfigManager {
     }
 
 //    public void initParams() {
-        //注册传感器监听
+    //注册传感器监听
 //        SensorUtils.get().register();
 //        if (isMonitorType(MonitorType.NETWORK)) {
 //            //开启网络监听

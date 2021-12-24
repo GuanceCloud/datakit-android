@@ -46,7 +46,7 @@ public abstract class BaseThreadPool {
             };
 
 
-    private  static ThreadFactory threadFactory = new ThreadFactory() {
+    private static final ThreadFactory threadFactory = new ThreadFactory() {
         private final AtomicInteger integer = new AtomicInteger();
 
         @Override
