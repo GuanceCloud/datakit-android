@@ -15,6 +15,9 @@ import java.util.concurrent.CountDownLatch;
  */
 public class OaidUtils {
     public static final String TAG = "OaidUtils";
+
+    private final static int INIT_ERROR_RESULT_DELAY = 1008614;
+    private final static int INIT_ERROR_RESULT_OK = 1008610;
     // OAID
     private static String oaid = null;
     private static CountDownLatch countDownLatch;
@@ -61,7 +64,7 @@ public class OaidUtils {
             if (retryCount == 0) {
                 return;
             }
-            final int INIT_ERROR_RESULT_DELAY = 1008614;            //获取接口是异步的，结果会在回调中返回，回调执行的回调可能在工作线程
+
             Class identifyListener = Class.forName("com.bun.miitmdid.interfaces.IIdentifierListener");
             // 创建 OAID 获取实例
             IdentifyListenerHandler handler = new IdentifyListenerHandler();
@@ -70,7 +73,7 @@ public class OaidUtils {
             Class<?> midSDKHelper = Class.forName("com.bun.miitmdid.core.MdidSdkHelper");
             Method initSDK = midSDKHelper.getDeclaredMethod("InitSdk", Context.class, boolean.class, identifyListener);
             int errCode = (int) initSDK.invoke(null, context, true, iIdentifierListener);
-            if (errCode != INIT_ERROR_RESULT_DELAY) {
+            if (errCode != INIT_ERROR_RESULT_DELAY && errCode != INIT_ERROR_RESULT_OK) {
                 //LogUtils.d("get oaid failed : " + errCode);
                 getOAIDReflect(context, --retryCount);
                 if (retryCount == 0) {
@@ -78,16 +81,13 @@ public class OaidUtils {
                 }
             }
 
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                        //ignore
-                    }
-                    countDownLatch.countDown();
+            new Thread(() -> {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    //ignore
                 }
+                countDownLatch.countDown();
             }).start();
         } catch (Exception e) {
             //LogUtils.d(e.getMessage());

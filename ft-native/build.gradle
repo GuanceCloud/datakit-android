@@ -4,11 +4,11 @@ apply plugin: 'maven-publish'
 def versionNameStr="1.0.0-alpha04"
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
 //    ndkVersion '21.3.6528147'
     defaultConfig {
         minSdkVersion 23
-        targetSdkVersion 30
+        targetSdkVersion 31
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 

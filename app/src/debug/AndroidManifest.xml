@@ -5,7 +5,9 @@
 
 
     <application>
-        <activity android:name=".DebugMainActivity">
+        <activity
+            android:name=".DebugMainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
