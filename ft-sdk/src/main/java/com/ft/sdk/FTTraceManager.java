@@ -73,7 +73,6 @@ public class FTTraceManager {
     public void addTrace(String key, String httpMethod, HashMap<String, String> requestHeader,
                          HashMap<String, String> responseHeader, int statusCode,
                          String errorMsg) {
-        LogUtils.e(TAG, "addTrace");
         FTTraceHandler handler = handlerMap.get(key);
         if (handler != null) {
             String url = handler.getUrl().getHoleUrl();
