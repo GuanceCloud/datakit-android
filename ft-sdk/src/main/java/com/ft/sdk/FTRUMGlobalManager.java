@@ -176,6 +176,7 @@ public class FTRUMGlobalManager {
             EventConsumerThreadPool.get().execute(() -> {
                 FTDBManager.get().reduceViewPendingResource(viewId);
                 FTDBManager.get().reduceActionPendingResource(actionId);
+                FTTraceManager.get().removeByStopResource(resourceId);
             });
         }
     }
@@ -350,7 +351,7 @@ public class FTRUMGlobalManager {
         if (bean.resourceStatus < HttpsURLConnection.HTTP_OK) {
             EventConsumerThreadPool.get().execute(() -> {
                 resourceBeanMap.remove(resourceId);
-                FTTraceManager.get().removeHandler(resourceId);
+                FTTraceManager.get().removeByAddResource(resourceId);
             });
             return;
         }
@@ -489,7 +490,7 @@ public class FTRUMGlobalManager {
 
         EventConsumerThreadPool.get().execute(() -> {
             resourceBeanMap.remove(resourceId);
-            FTTraceManager.get().removeHandler(resourceId);
+            FTTraceManager.get().removeByAddResource(resourceId);
         });
     }
 
