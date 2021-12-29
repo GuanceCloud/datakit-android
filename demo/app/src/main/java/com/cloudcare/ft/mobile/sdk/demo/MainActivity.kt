@@ -65,7 +65,6 @@ class MainActivity : AppCompatActivity() {
             FTSdk.initTraceWithConfig(
                 FTTraceConfig()
                     .setEnableLinkRUMData(true)
-                    .setTraceType(TraceType.DDTRACE)
             )
 
             FTSdk.initRUMWithConfig(

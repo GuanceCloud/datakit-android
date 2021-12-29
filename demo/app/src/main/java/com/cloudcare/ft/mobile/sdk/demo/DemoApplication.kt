@@ -53,6 +53,7 @@ class DemoApplication : Application() {
                     .setRumAppId(AccountUtils.getProperty(context, AccountUtils.RUM_APP_ID))
                     .setEnableTraceUserAction(true)
                     .setEnableTraceUserView(true)
+                    .setEnableTraceUserResource(true)
                     .setSamplingRate(0.8f)
                     .addGlobalContext(CUSTOM_STATIC_TAG, BuildConfig.CUSTOM_VALUE)
                     .addGlobalContext(CUSTOM_DYNAMIC_TAG, customDynamicValue!!)
