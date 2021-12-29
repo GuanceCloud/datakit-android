@@ -1,6 +1,7 @@
 package com.ft.sdk;
 
 import com.ft.sdk.garble.http.HttpUrl;
+import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONException;
@@ -16,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 链路追踪
  */
 public class FTTraceManager {
+    private static final String TAG = "FTTraceManager";
     private final ConcurrentHashMap<String, FTTraceHandler> handlerMap = new ConcurrentHashMap<>();
 
 
@@ -27,9 +29,21 @@ public class FTTraceManager {
         return FTTraceManager.SingletonHolder.INSTANCE;
     }
 
+
+    HashMap<String, String> getTraceHeader(String key, HttpUrl httpUrl) {
+        FTTraceHandler handler = new FTTraceHandler();
+
+        HashMap<String, String> map = handler
+                .getTraceHeader(httpUrl);
+
+        handlerMap.put(key, handler);
+        return map;
+    }
+
     /**
      * 获取 trace http 请求头参数
-     * @param key 链路 id
+     *
+     * @param key       链路 id
      * @param urlString url 地址
      * @return
      * @throws MalformedURLException
@@ -37,14 +51,8 @@ public class FTTraceManager {
      */
     public HashMap<String, String> getTraceHeader(String key, String urlString)
             throws MalformedURLException, URISyntaxException {
-        FTTraceHandler handler = new FTTraceHandler();
-
         URL url = Utils.parseFromUrl(urlString);
-        HashMap<String, String> map = handler
-                .getTraceHeader(new HttpUrl(url.getHost(), url.getPath(), url.getPort(), urlString));
-
-        handlerMap.put(key, handler);
-        return map;
+        return getTraceHeader(key, new HttpUrl(url.getHost(), url.getPath(), url.getPort(), urlString));
     }
 
     FTTraceHandler getHandler(String key) {
@@ -54,17 +62,18 @@ public class FTTraceManager {
 
     /**
      * 发送 trace 数据
-     * @param key  链路 id
-     * @param httpMethod 请求类型 post ，get
+     *
+     * @param key            链路 id
+     * @param httpMethod     请求类型 post ，get
      * @param requestHeader  请求数据头
      * @param responseHeader 数据响应头
-     * @param statusCode http 状态吗
-     * @param errorMsg 请求错误信息
+     * @param statusCode     http 状态吗
+     * @param errorMsg       请求错误信息
      */
     public void addTrace(String key, String httpMethod, HashMap<String, String> requestHeader,
                          HashMap<String, String> responseHeader, int statusCode,
                          String errorMsg) {
-
+        LogUtils.e(TAG, "addTrace");
         FTTraceHandler handler = handlerMap.get(key);
         if (handler != null) {
             String url = handler.getUrl().getHoleUrl();
@@ -94,8 +103,15 @@ public class FTTraceManager {
                 e.printStackTrace();
             }
         }
-        handlerMap.remove(key);
 
+        if (!FTRUMConfigManager.get().isRumEnable()
+                || !FTRUMConfigManager.get().getConfig().isEnableTraceUserResource()) {
+            removeHandler(key);
+        }
+    }
+
+    void removeHandler(String key) {
+        handlerMap.remove(key);
     }
 
 

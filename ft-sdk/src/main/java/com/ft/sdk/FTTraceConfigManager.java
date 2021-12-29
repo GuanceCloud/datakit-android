@@ -1,6 +1,7 @@
 package com.ft.sdk;
 
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.PackageUtils;
 
 public class FTTraceConfigManager {
 
@@ -19,9 +20,14 @@ public class FTTraceConfigManager {
 
 
     void initWithConfig(FTTraceConfig config) {
+        if (config.isEnableAutoTrace()) {
+            if (!PackageUtils.isOKHttp3Support()) {
+                LogUtils.e(TAG, "检测到 Trace EnableAutoTrace = true，" +
+                        "但是你没有依赖 okHttp，此功能仅支持 okHttp");
+            }
+        }
         if (config.isEnableLinkRUMData() && config.getTraceType() != TraceType.DDTRACE) {
             LogUtils.e(TAG, "FTTraceConfig.isEnableLinkRUMData,仅支持 TraceType.DDTRACE");
-            return;
         }
         this.config = config;
     }

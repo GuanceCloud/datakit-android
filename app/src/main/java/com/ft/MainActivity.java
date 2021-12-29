@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -49,6 +50,13 @@ public class MainActivity extends AppCompatActivity {
         try {
             Response response = client.newCall(builder.build()).execute();
             request = response.request();
+
+            ResponseBody responseBody = response.body();
+            String string = "";
+            if (responseBody != null) {
+                string = responseBody.string();
+            }
+            LogUtils.d(TAG, "url:" + url + "\n" + string);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -118,26 +126,23 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     //通过查看请求头查看是否替换调用 OkHttpClient.Builder.build 方法成功
-                    Request request = requestUrl("http://www.weather.com.cn/data/sk/101010100.html");
+                    Request request = requestUrl("https://www.baidu.com");
                     LogUtils.d(TAG, "header=" + request.headers().toString());
                 }
             }).start();
         });
 
         findViewById(R.id.main_mock_httpclient_btn).setOnClickListener(v -> {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        CloseableHttpClient httpClient = HttpClients.custom()
-                                .build();
-                        HttpGet httpGet = new HttpGet("http://www.weather.com.cn/data/sk/101010100.html");
-                        CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
-                        System.out.println("response:" + EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8));
-                        httpResponse.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+            new Thread(() -> {
+                try {
+                    CloseableHttpClient httpClient = HttpClients.custom()
+                            .build();
+                    HttpGet httpGet = new HttpGet("https://www.baidu.com");
+                    CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
+                    System.out.println("response:" + EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8));
+                    httpResponse.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }).start();
         });

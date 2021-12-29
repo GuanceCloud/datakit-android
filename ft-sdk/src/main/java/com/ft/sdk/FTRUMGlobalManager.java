@@ -341,7 +341,7 @@ public class FTRUMGlobalManager {
     /**
      * 资源加载性能
      */
-    void putRUMResourcePerformance(String resourceId, NetStatusBean netStatusBean) {
+     void putRUMResourcePerformance(String resourceId, NetStatusBean netStatusBean) {
         ResourceBean bean = resourceBeanMap.get(resourceId);
 
         if (bean == null) {
@@ -350,6 +350,7 @@ public class FTRUMGlobalManager {
         if (bean.resourceStatus < HttpsURLConnection.HTTP_OK) {
             EventConsumerThreadPool.get().execute(() -> {
                 resourceBeanMap.remove(resourceId);
+                FTTraceManager.get().removeHandler(resourceId);
             });
             return;
         }
@@ -481,16 +482,14 @@ public class FTRUMGlobalManager {
 
                 FTTrackInner.getInstance().rum(time, Constants.FT_MEASUREMENT_RUM_ERROR, errorTags, errorField);
                 increaseError(tags);
-
             }
-
-
         } catch (Exception e) {
             LogUtils.e(TAG, e.toString());
         }
 
         EventConsumerThreadPool.get().execute(() -> {
             resourceBeanMap.remove(resourceId);
+            FTTraceManager.get().removeHandler(resourceId);
         });
     }
 
@@ -501,6 +500,17 @@ public class FTRUMGlobalManager {
      * @param params
      */
     public void addResource(String resourceId, ResourceParams params, NetStatusBean netStatusBean) {
+        setTransformContent(resourceId, params);
+        putRUMResourcePerformance(resourceId, netStatusBean);
+    }
+
+    /**
+     * 设置网络传输内容
+     *
+     * @param params
+     */
+     void setTransformContent(String resourceId, ResourceParams params) {
+
         FTTraceHandler handler = FTTraceManager.get().getHandler(resourceId);
         String spanId = "";
         String traceId = "";
@@ -508,20 +518,6 @@ public class FTRUMGlobalManager {
             spanId = handler.getSpanID();
             traceId = handler.getTraceID();
         }
-        setTransformContent(resourceId, params, traceId, spanId);
-        putRUMResourcePerformance(resourceId, netStatusBean);
-    }
-
-    /**
-     * 设置网络传输内容
-     *
-     * @param resourceId
-     * @param params
-     * @param traceId
-     * @param spanId
-     */
-    void setTransformContent(String resourceId, ResourceParams params,
-                             String traceId, String spanId) {
 
         ResourceBean bean = resourceBeanMap.get(resourceId);
 

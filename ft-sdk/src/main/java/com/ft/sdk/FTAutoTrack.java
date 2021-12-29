@@ -970,11 +970,16 @@ public class FTAutoTrack {
      * @return
      */
     public static OkHttpClient trackOkHttpBuilder(OkHttpClient.Builder builder) {
-        FTNetWorkInterceptor interceptor = new FTNetWorkInterceptor();
-        builder.addInterceptor(interceptor);
+        if (FTTraceConfigManager.get().isEnableAutoTrace()) {
+            builder.addInterceptor(new FTTraceInterceptor());
+        }
 //            builder.addNetworkInterceptor(interceptor); //发现部分工程有兼容问题
         if (FTRUMConfigManager.get().isRumEnable()) {
-            builder.eventListener(interceptor);
+            if (FTRUMConfigManager.get().getConfig().isEnableTraceUserResource()) {
+                FTResourceInterceptor interceptor = new FTResourceInterceptor();
+                builder.addInterceptor(interceptor);
+                builder.eventListener(interceptor);
+            }
         }
         return builder.build();
     }

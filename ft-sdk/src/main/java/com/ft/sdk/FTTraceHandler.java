@@ -55,7 +55,7 @@ public class FTTraceHandler {
 
     }
 
-    public HashMap<String, String> getTraceHeader(HttpUrl httpUrl) {
+     HashMap<String, String> getTraceHeader(HttpUrl httpUrl) {
 
         if (config == null) return new HashMap<>();
         this.httpUrl = httpUrl;
@@ -106,7 +106,7 @@ public class FTTraceHandler {
         return headers;
     }
 
-    public void traceDataUpload(JSONObject content, String operationName, boolean isError) {
+     void traceDataUpload(JSONObject content, String operationName, boolean isError) {
         if (!enableTrace) {
             return;
         }
@@ -129,7 +129,4 @@ public class FTTraceHandler {
     }
 
 
-    public void setIsWebViewTrace(boolean isWebViewTrace) {
-        this.isWebViewTrace = isWebViewTrace;
-    }
 }

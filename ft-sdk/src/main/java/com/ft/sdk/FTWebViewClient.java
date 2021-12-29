@@ -30,7 +30,7 @@ public class FTWebViewClient extends WebViewClient {
 
     private static final String TAG = "FTWebViewClient";
     static OkHttpClient mClient = new OkHttpClient.Builder()
-            .addInterceptor(new FTNetWorkInterceptor(true))
+            .addInterceptor(new FTTraceInterceptor(true))
             .connectTimeout(30, TimeUnit.SECONDS)
             .build();
     private String mOriginUrl;

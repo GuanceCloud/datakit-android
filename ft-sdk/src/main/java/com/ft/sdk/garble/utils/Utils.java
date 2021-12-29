@@ -21,16 +21,20 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -51,6 +55,7 @@ import static com.ft.sdk.garble.utils.Constants.FT_SHARE_PER_FILE;
 import static com.ft.sdk.garble.utils.Constants.TAGS;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
@@ -544,6 +549,26 @@ public class Utils {
                 url.getRef());
         return uri.toURL();
 
+    }
+
+
+    public static Charset getCharset(MediaType contentType) {
+        Charset charset = contentType != null ? contentType.charset(StandardCharsets.UTF_8) : StandardCharsets.UTF_8;
+        if (charset == null) charset = StandardCharsets.UTF_8;
+        return charset;
+    }
+
+    public static byte[] toByteArray(InputStream input) throws IOException {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        write(input, output);
+        output.close();
+        return output.toByteArray();
+    }
+
+    public static void write(InputStream inputStream, OutputStream outputStream) throws IOException {
+        int len;
+        byte[] buffer = new byte[4096];
+        while ((len = inputStream.read(buffer)) != -1) outputStream.write(buffer, 0, len);
     }
 }
 

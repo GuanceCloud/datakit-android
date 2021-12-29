@@ -29,16 +29,9 @@ public class OkHttpEngine implements INetEngine {
     @Override
     public void defaultConfig(HttpBuilder httpBuilder) {
         if (client == null) {
-            NetStatusMonitor listener = new NetStatusMonitor() {
-                @Override
-                public void getNetStatusInfoWhenCallEnd(String requestId, NetStatusBean bean) {
-                    NetUtils.get().setLastMonitorStatus(bean);
-                }
-            };
             client = new OkHttpClient.Builder()
                     .connectTimeout(httpBuilder.getSendOutTime(), TimeUnit.MILLISECONDS)
                     .readTimeout(httpBuilder.getReadOutTime(), TimeUnit.MILLISECONDS)
-                    .eventListener(listener)
                     .build();
         }
     }

@@ -33,11 +33,6 @@ public abstract class NetStatusMonitor extends EventListener {
     }
 
     @Override
-    public void callFailed(@NonNull Call call, @NonNull IOException ioe) {
-        super.callFailed(call, ioe);
-    }
-
-    @Override
     public void callStart(@NonNull Call call) {
         super.callStart(call);
         netStatusBean.reset();
