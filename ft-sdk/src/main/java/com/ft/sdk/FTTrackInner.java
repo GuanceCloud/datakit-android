@@ -15,9 +15,9 @@ import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.http.ResponseData;
 import com.ft.sdk.garble.manager.AsyncCallback;
 import com.ft.sdk.garble.manager.SyncDataHelper;
+import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONObject;
@@ -233,6 +233,7 @@ public class FTTrackInner {
 
         }
         FTDBManager.get().insertFtOptList(datas);
+        SyncTaskManager.get().executeSyncPoll();
     }
 
 
