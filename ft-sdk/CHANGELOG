@@ -1,3 +1,7 @@
+# agent 1.3.1-alpha14
+1.修复单个 Trace 数据不触发同步的问题
+
+---
 # agent 1.3.1-alpha13
 1.优化 Trace resource 调度逻辑，去掉次序调用要求
 
