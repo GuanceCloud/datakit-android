@@ -1,6 +1,6 @@
 package com.ft.sdk;
 
-import android.app.Application;
+import android.content.Context;
 
 import androidx.annotation.NonNull;
 
@@ -9,10 +9,15 @@ import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.FTMonitorConfigManager;
 import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
+import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LocationUtils;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.OaidUtils;
 import com.ft.sdk.garble.utils.Utils;
 import com.ft.sdk.internal.exception.FTInitSDKProcessException;
+
+import java.util.HashMap;
 
 
 /**
@@ -32,7 +37,7 @@ public class FTSdk {
     public static final String AGENT_VERSION = BuildConfig.FT_SDK_VERSION;//当前SDK 版本
     public static final String PLUGIN_MIN_VERSION = BuildConfig.MIN_FT_PLUGIN_VERSION; //当前 SDK 支持的最小 Plugin 版本
     private static FTSdk mFtSdk;
-    private FTSDKConfig mFtSDKConfig;
+    private final FTSDKConfig mFtSDKConfig;
 
     private FTSdk(@NonNull FTSDKConfig ftSDKConfig) {
         this.mFtSDKConfig = ftSDKConfig;
@@ -52,10 +57,10 @@ public class FTSdk {
             mFtSdk = new FTSdk(ftSDKConfig);
             boolean onlyMain = ftSDKConfig.isOnlySupportMainProcess();
             if (onlyMain && !Utils.isMainProcess()) {
-                throw new FTInitSDKProcessException( "当前 SDK 只能在主进程中运行，如果想要在非主进程中运行可以设置 FTSDKConfig.setOnlySupportMainProcess(false)");
+                throw new FTInitSDKProcessException("当前 SDK 只能在主进程中运行，如果想要在非主进程中运行可以设置 FTSDKConfig.setOnlySupportMainProcess(false)");
             }
         }
-        mFtSdk.initFTConfig();
+        mFtSdk.initFTConfig(ftSDKConfig);
     }
 
     /**
@@ -91,19 +96,6 @@ public class FTSdk {
         EventConsumerThreadPool.get().shutDown();
         LogUtils.w(TAG, "FT SDK 已经被关闭");
     }
-
-    /**
-     * 返回当前的 Application
-     *
-     * @return
-     */
-    public Application getApplication() {
-        return FTApplication.getApplication();
-    }
-
-    /**
-     * 注销用户信息
-     */
 
 //    /**
 //     * 开启定，并且获取定位结果
@@ -151,10 +143,11 @@ public class FTSdk {
     /**
      * 初始化SDK本地配置数据
      */
-    private void initFTConfig() {
-        LogUtils.setDebug(mFtSDKConfig.isDebug());
-        FTHttpConfigManager.get().initParams(mFtSDKConfig);
+    private void initFTConfig(FTSDKConfig config) {
+        LogUtils.setDebug(config.isDebug());
+        FTHttpConfigManager.get().initParams(config);
         FTNetworkListener.get().monitor();
+        appendGlobalContext(config);
 //            LogUtils.setDescLogShow(mFtSDKConfig.isDescLog());
     }
 
@@ -218,6 +211,47 @@ public class FTSdk {
      */
     public static void unbindRumUserData() {
         FTRUMConfigManager.get().unbindUserData();
+    }
+
+    /**
+     * 获取公用 tags
+     *
+     * @return
+     */
+    HashMap<String, Object> getBasePublicTags() {
+        return mFtSDKConfig.getGlobalContext();
+    }
+
+    /**
+     * 补充全局 tags
+     *
+     * @param config
+     */
+    private void appendGlobalContext(FTSDKConfig config) {
+        HashMap<String, Object> hashMap = config.getGlobalContext();
+        hashMap.put(Constants.KEY_APP_VERSION_NAME, Utils.getAppVersionName());
+        hashMap.put(Constants.KEY_SDK_NAME, Constants.SDK_NAME);
+        hashMap.put(Constants.KEY_APPLICATION_UUID, FTSdk.PACKAGE_UUID);
+        hashMap.put(Constants.KEY_ENV, config.getEnv().toString());
+        String uuid = "";
+        if (FTHttpConfigManager.get().useOaid) {
+            String oaid = OaidUtils.getOAID(FTApplication.getApplication());
+            if (oaid != null) {
+                uuid = "oaid_" + oaid;
+            }
+        }
+        if (uuid.isEmpty()) {
+            uuid = DeviceUtils.getUuid(FTApplication.getApplication());
+        }
+        hashMap.put(Constants.KEY_DEVICE_UUID, uuid);
+        hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_AGENT, FTSdk.AGENT_VERSION);
+        if (!FTSdk.PLUGIN_VERSION.isEmpty()) {
+            hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_TRACK, FTSdk.PLUGIN_VERSION);
+        }
+        if (!FTSdk.NATIVE_VERSION.isEmpty()) {
+            hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_NATIVE, FTSdk.NATIVE_VERSION);
+        }
+        hashMap.put(Constants.KEY_SDK_VERSION, FTSdk.AGENT_VERSION);
     }
 
 

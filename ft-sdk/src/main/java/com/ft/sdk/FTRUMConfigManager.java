@@ -3,6 +3,7 @@ package com.ft.sdk;
 import static com.ft.sdk.FTApplication.getApplication;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.SharedPreferences;
 
 import androidx.annotation.NonNull;
@@ -10,14 +11,20 @@ import androidx.annotation.NonNull;
 import com.ft.sdk.garble.FTMonitorConfigManager;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.NetUtils;
 import com.ft.sdk.garble.utils.PackageUtils;
 import com.ft.sdk.garble.utils.Utils;
 import com.ft.sdk.nativelib.NativeEngineInit;
+import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class FTRUMConfigManager {
@@ -52,6 +59,7 @@ public class FTRUMConfigManager {
         initRandomUserId();
         FTMonitorConfigManager.get().initWithConfig(config);
         FTUIBlockManager.start(config);
+        initRUMGlobalContext(config);
 
         initNativeDump();
     }
@@ -223,6 +231,55 @@ public class FTRUMConfigManager {
         }
     }
 
+    /**
+     * @param config
+     */
+    void initRUMGlobalContext(FTRUMConfig config) {
+        Context context = FTApplication.getApplication();
+        HashMap<String, Object> rumGlobalContext = config.getGlobalContext();
+        ArrayList<String> customKeys = new ArrayList<>();
+        for (Map.Entry<String, Object> entry : rumGlobalContext.entrySet()) {
+            String key = entry.getKey();
+            customKeys.add(key);
+            Object value = entry.getValue();
+            rumGlobalContext.put(key, value.toString());
+        }
+        rumGlobalContext.put(Constants.KEY_RUM_CUSTOM_KEYS, new Gson().toJson(customKeys));
+        rumGlobalContext.put(Constants.KEY_RUM_APP_ID, config.getRumAppId());
+        rumGlobalContext.put(Constants.KEY_RUM_SESSION_TYPE, "user");
+        rumGlobalContext.put(Constants.KEY_DEVICE_OS, DeviceUtils.getOSName());
+        rumGlobalContext.put(Constants.KEY_DEVICE_DEVICE_BAND, DeviceUtils.getDeviceBand());
+        rumGlobalContext.put(Constants.KEY_DEVICE_DEVICE_MODEL, DeviceUtils.getDeviceModel());
+        rumGlobalContext.put(Constants.KEY_DEVICE_DISPLAY, DeviceUtils.getDisplay(context));
+
+        String osVersion = DeviceUtils.getOSVersion();
+        rumGlobalContext.put(Constants.KEY_DEVICE_OS_VERSION, osVersion);
+        String osVersionMajor = osVersion.contains(".") ? osVersion.split("\\.")[0] : osVersion;
+        rumGlobalContext.put(Constants.KEY_DEVICE_OS_VERSION_MAJOR, osVersionMajor);
+    }
+
+    /**
+     * 获取变化的公用 tag
+     *
+     * @return
+     */
+    JSONObject getRUMPublicDynamicTags() throws Exception {
+        JSONObject tags = new JSONObject();
+        HashMap<String, Object> rumGlobalContext = config.getGlobalContext();
+        for (Map.Entry<String, Object> entry : rumGlobalContext.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            tags.put(key, value.toString());
+        }
+        tags.put(Constants.KEY_RUM_NETWORK_TYPE, NetUtils.get().getNetWorkStateName());
+        tags.put(Constants.KEY_RUM_IS_SIGN_IN, FTRUMConfigManager.get().isUserDataBinded() ? "T" : "F");
+        if (FTRUMConfigManager.get().isUserDataBinded()) {
+            tags.put(Constants.KEY_RUM_USER_ID, FTRUMConfigManager.get().getUserData().getId());
+        } else {
+            tags.put(Constants.KEY_RUM_USER_ID, FTRUMGlobalManager.get().getSessionId());
+        }
+        return tags;
+    }
 
     void release() {
         config = null;

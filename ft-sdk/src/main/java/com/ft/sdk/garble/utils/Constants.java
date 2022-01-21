@@ -15,6 +15,7 @@ public class Constants {
     public static final String UNKNOWN = "N/A";
     public static final String FLOW_ROOT = "root";
     public static final String MEASUREMENT = "measurement";
+    public static final String TIME = "time";
     public static final String FIELDS = "fields";
     public static final String TAGS = "tags";
     public static final String SEPARATION_PRINT = "--temp_separation--";
@@ -67,6 +68,7 @@ public class Constants {
 //    public static final String KEY_PAGE_EVENT_USER_NAME = "ud_name";
 
     public static final String KEY_TIME_COST_DURATION = "duration";
+    public static final String KEY_STATUS= "status";
 
     public static final String KEY_BATTERY_TOTAL = "battery_total";
     public static final String KEY_BATTERY_CHARGE_TYPE = "battery_charge_type";
@@ -131,9 +133,14 @@ public class Constants {
     public static final String KEY_FPS = "fps";
     public static final String KEY_TORCH = "torch";
 
-    public static final String KEY_DEVICE_UUID = "device_uuid";
+    public static final String KEY_SERVICE = "service";
+    public static final String KEY_ENV = "env";
     public static final String KEY_APPLICATION_UUID = "application_uuid";
-//    public static final String KEY_DEVICE_APPLICATION_ID = "app_identifiedid";
+    public static final String KEY_APP_VERSION_NAME = "version";
+    public static final String KEY_SDK_NAME = "sdk_name";
+    public static final String KEY_MESSAGE = "message";
+
+    public static final String KEY_DEVICE_UUID = "device_uuid";
     public static final String KEY_DEVICE_OS = "os";
     public static final String KEY_DEVICE_OS_VERSION = "os_version";
     public static final String KEY_DEVICE_OS_VERSION_MAJOR = "os_version_major";
@@ -142,8 +149,6 @@ public class Constants {
     public static final String KEY_DEVICE_DISPLAY = "screen_size";
     public static final String KEY_DEVICE_CARRIER = "carrier";
     public static final String KEY_DEVICE_LOCALE = "locale";
-    public static final String KEY_DEVICE_OAID = "oaid";
-    public static final String KEY_APP_VERSION_NAME = "version";
 
     public static final String EVENT_NAME_LAUNCH = "launch";
     public static final String EVENT_NAME_OPEN = "open";
@@ -151,11 +156,10 @@ public class Constants {
     public static final String EVENT_NAME_LEAVE = "leave";
     public static final String EVENT_NAME_ENTER = "enter";
 
-    public static final String KEY_RUM_IS_SIGNIN = "is_signin";
+    public static final String KEY_RUM_IS_SIGN_IN = "is_signin";
     public static final String KEY_RUM_USER_ID = "userid";
     public static final String KEY_RUM_APP_ID = "app_id";
     public static final String KEY_RUM_CUSTOM_KEYS = "custom_keys";
-    public static final String KEY_RUM_SDK_NAME = "sdk_name";
 
     public static final String KEY_RUM_RESOURCE_URL = "resource_url";
     public static final String KEY_RUM_RESOURCE_URL_HOST = "resource_url_host";
@@ -170,7 +174,7 @@ public class Constants {
     public static final String KEY_RUM_SDK_PACKAGE_AGENT = "sdk_package_agent";
     public static final String KEY_RUM_SDK_PACKAGE_TRACK = "sdk_package_track";
     public static final String KEY_RUM_SDK_PACKAGE_NATIVE = "sdk_package_native";
-    public static final String KEY_RUM_SDK_VERSION = "sdk_version";
+    public static final String KEY_SDK_VERSION = "sdk_version";
 //    public static final String KEY_RUM_APP_STARTUP_TYPE = "app_startup_type";
 //    public static final String KEY_RUM_APP_APDEX_LEVEL = "app_apdex_level";
 //    public static final String KEY_RUM_APP_STARTUP_DURATION = "app_startup_duration";
@@ -184,13 +188,11 @@ public class Constants {
     public static final String KEY_RUM_RESOURCE_SSL = "resource_ssl";
     public static final String KEY_RUM_RESOURCE_TTFB = "resource_ttfb";
     public static final String KEY_RUM_RESOURCE_FIRST_BYTE = "resource_first_byte";
-    public static final String KEY_RUM_RESOURCE_URL_QUERY = "resource_url_query";
-    public static final String KEY_RUM_RESROUCE_SPAN_ID = "span_id";
+    public static final String KEY_RUM_RESOURCE_SPAN_ID = "span_id";
     public static final String KEY_RUM_RESOURCE_TRACE_ID = "trace_id";
     public static final String KEY_RUM_RESOURCE_TRANS = "resource_trans";
     public static final String KEY_RUM_RESOURCE_URL_PATH = "resource_url_path";
     public static final String KEY_RUM_RESOURCE_URL_PATH_GROUP = "resource_url_path_group";
-    public static final String KEY_RUM_APPLICATION_UUID = "application_uuid";
     public static final String KEY_RUM_ERROR_MESSAGE = "error_message";
     public static final String KEY_RUM_ERROR_STACK = "error_stack";
     public static final String KEY_RUM_ERROR_SOURCE = "error_source";
@@ -198,7 +200,6 @@ public class Constants {
     public static final String KEY_RUM_ERROR_SITUATION = "error_situation";
     public static final String KEY_RUM_LONG_TASK_DURATION = "duration";
     public static final String KEY_RUM_LONG_TASK_STACK = "long_task_stack";
-    public static final String KEY_RUM_ENV = "env";
     public static final String KEY_RUM_NETWORK_TYPE = "network_type";
 
     public static final String KEY_RUM_SESSION_ID = "session_id";
@@ -213,6 +214,7 @@ public class Constants {
     public static final String KEY_RUM_VIEW_ACTION_COUNT= "view_action_count";
     public static final String KEY_RUM_VIEW_TIME_SPENT= "time_spent";
     public static final String KEY_RUM_VIEW_IS_ACTIVE= "is_active";
+    public static final String KEY_RUM_VIEW_IS_WEB_VIEW= "is_web_view";
 
     public static final String KEY_RUM_ACTION_ID = "action_id";
     public static final String KEY_RUM_ACTION_NAME = "action_name";
@@ -227,9 +229,6 @@ public class Constants {
      * OP EVENT 数据对照
      */
     public final static HashMap<OP, String> OP_EVENT_MAPS = new HashMap<>();
-    public static final String KEY_RUM_APPLICATION_IDENTIFIER = "application_identifier";
-
-
     static {
         OP_EVENT_MAPS.put(OP.LANC, Constants.EVENT_NAME_LAUNCH);
         OP_EVENT_MAPS.put(OP.CLK, Constants.EVENT_NAME_CLICK);

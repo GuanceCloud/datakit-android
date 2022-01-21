@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.webkit.WebView;
 
+import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 
 import org.json.JSONException;
@@ -14,7 +15,16 @@ import java.util.Iterator;
 
 final class FTWebViewHandler implements WebAppInterface.JsReceiver {
 
-    private static final String TAG = "FTWebViewHandler";
+    private static final String LOG_TAG = "FTWebViewHandler";
+
+    public static final String WEB_JS_STATUS = "status";
+    public static final String WEB_JS_INNER_TAG = "_tag";
+    public static final String WEB_JS_TYPE_RUM = "rum";
+    public static final String WEB_JS_TYPE_TRACK = "track";
+    public static final String WEB_JS_TYPE_LOG = "log";
+    public static final String WEB_JS_TYPE_URL_VERIFY = "urlVerify";
+    public static final String WEB_JS_NAME = "name";
+    public static final String WEB_JS_DATA = "data";
 
     private final Handler mHandler = new Handler(Looper.getMainLooper());
 
@@ -39,17 +49,17 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
     @Override
     public void sendEvent(String s, String callbackMethod) {
         try {
-            LogUtils.d(TAG, "sendEvent：" + s);
+            LogUtils.d(LOG_TAG, "sendEvent：" + s);
             JSONObject json = new JSONObject(s);
-            String name = json.optString("name");
-            JSONObject data = json.optJSONObject("data");
-            String tag = json.optString("_tag");
-            if (name.equals("rum")) {
+            String name = json.optString(WEB_JS_NAME);
+            JSONObject data = json.optJSONObject(WEB_JS_DATA);
+            String tag = json.optString(WEB_JS_INNER_TAG);
+            if (name.equals(WEB_JS_TYPE_RUM)) {
                 if (data != null) {
-                    JSONObject tags = data.optJSONObject("tags");
-                    JSONObject fields = data.optJSONObject("fields");
+                    JSONObject tags = data.optJSONObject(Constants.TAGS);
+                    JSONObject fields = data.optJSONObject(Constants.FIELDS);
 
-                    JSONObject publicTags = FTAutoTrack.getRUMPublicTags();
+                    JSONObject publicTags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
                     Iterator<String> keys = publicTags.keys();
                     if (tags == null) {
                         tags = new JSONObject();
@@ -61,32 +71,32 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                     }
 
                     String sessionId = FTRUMGlobalManager.get().getSessionId();
-                    tags.put("session_id", sessionId);
-                    tags.put("is_active", false);
-                    tags.put("is_web_view", true);
+                    tags.put(Constants.KEY_RUM_SESSION_ID, sessionId);
+                    tags.put(Constants.KEY_RUM_VIEW_IS_ACTIVE, false);
+                    tags.put(Constants.KEY_RUM_VIEW_IS_WEB_VIEW, true);
 
-                    long time = data.optLong("time");
-                    String measurement = data.optString("measurement");
+                    long time = data.optLong(Constants.TIME);
+                    String measurement = data.optString(Constants.MEASUREMENT);
                     FTTrackInner.getInstance().rumWebView(time, measurement, tags, fields);
                 }
 
-            } else if (name.equals("track")) {
+            } else if (name.equals(WEB_JS_TYPE_TRACK)) {
 
-            } else if (name.equals("log")) {
+            } else if (name.equals(WEB_JS_TYPE_LOG)) {
 
-            } else if (name.equals("urlVerify")) {
+            } else if (name.equals(WEB_JS_TYPE_URL_VERIFY)) {
 
             }
             if (callbackMethod != null && callbackMethod.isEmpty()) {
                 JSONObject retJson = new JSONObject();
-                retJson.put("status", true);
+                retJson.put(WEB_JS_STATUS, true);
                 String ret = retJson.toString();
                 String err = "{}";
                 callbackFromNative(tag, callbackMethod, ret, err);
             }
 
         } catch (Exception e) {
-            LogUtils.e(TAG, e.getMessage());
+            LogUtils.e(LOG_TAG, e.getMessage());
         }
 
 
@@ -97,15 +107,15 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
 
         try {
             JSONObject json = new JSONObject(s);
-            String name = json.optString("name");
-            String tag = json.optString("_tag");
+            String name = json.optString(WEB_JS_NAME);
+            String tag = json.optString(WEB_JS_INNER_TAG);
 
             // NO implement
             String ret = "{}";
             String err = "{}";
             callbackFromNative(tag, callBackMethod, ret, err);
         } catch (JSONException e) {
-            LogUtils.e(TAG, e.getMessage());
+            LogUtils.e(LOG_TAG, e.getMessage());
         }
 
     }
@@ -131,7 +141,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                     }
                 });
             } else {
-                LogUtils.e(TAG, "This Android Device may be low than 4.4, can't get js call Back ");
+                LogUtils.e(LOG_TAG, "This Android Device may be low than 4.4, can't get js call Back ");
                 mWebView.loadUrl("javascript:" + method);
             }
 

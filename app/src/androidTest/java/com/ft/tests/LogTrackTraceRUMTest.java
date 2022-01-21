@@ -29,7 +29,7 @@ import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.manager.AsyncCallback;
-import com.ft.sdk.garble.manager.SyncDataHelper;
+import com.ft.sdk.SyncDataHelper;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.utils.RequestUtil;
 

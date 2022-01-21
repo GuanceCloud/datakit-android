@@ -1,6 +1,10 @@
 package com.ft.sdk;
 
+import androidx.annotation.NonNull;
+
 import com.ft.sdk.garble.utils.DeviceUtils;
+
+import java.util.HashMap;
 
 /**
  * BY huangDianHua
@@ -19,6 +23,8 @@ public class FTSDKConfig {
 
     // SDK 是否只支持在主进程中初始化
     private boolean onlySupportMainProcess = true;
+
+    private final HashMap<String, Object> globalContext = new HashMap<>();
 
     /**
      * 构建 SDK 必要的配置参数
@@ -117,6 +123,27 @@ public class FTSDKConfig {
     public FTSDKConfig setOnlySupportMainProcess(boolean onlySupportMainProcess) {
         this.onlySupportMainProcess = onlySupportMainProcess;
         return this;
+    }
+
+    /**
+     * 添加全局属性
+     *
+     * @param key
+     * @param value
+     * @return
+     */
+    public FTSDKConfig addGlobalContext(@NonNull String key, @NonNull String value) {
+        this.globalContext.put(key, value);
+        return this;
+    }
+
+    /**
+     * 获取全局属性
+     *
+     * @return
+     */
+    public HashMap<String, Object> getGlobalContext() {
+        return this.globalContext;
     }
 
 }

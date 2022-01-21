@@ -1,11 +1,10 @@
 package com.ft.sdk.garble;
 
-import com.ft.sdk.BuildConfig;
+import static com.ft.sdk.garble.utils.Constants.USER_AGENT;
+
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.garble.utils.DeviceUtils;
-
-import static com.ft.sdk.garble.utils.Constants.USER_AGENT;
 
 /**
  * BY huangDianHua
@@ -15,7 +14,6 @@ import static com.ft.sdk.garble.utils.Constants.USER_AGENT;
 public class FTHttpConfigManager {
     private static volatile FTHttpConfigManager instance;
     public String serverUrl;
-    public String version;
     public String uuid;
     public String userAgent;
     public boolean useOaid;
@@ -41,7 +39,6 @@ public class FTHttpConfigManager {
         }
         serverUrl = ftsdkConfig.getMetricsUrl();
         useOaid = ftsdkConfig.isUseOAID();
-        version = BuildConfig.FT_SDK_VERSION;
         uuid = DeviceUtils.getSDKUUid(FTApplication.getApplication());
         userAgent = USER_AGENT;
 

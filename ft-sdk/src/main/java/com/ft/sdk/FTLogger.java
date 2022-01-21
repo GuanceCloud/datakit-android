@@ -51,7 +51,6 @@ public class FTLogger {
         LogBean logBean = new LogBean(Utils.translateFieldValue(content), Utils.getCurrentNanoTime());
         logBean.setServiceName(config.getServiceName());
         logBean.setStatus(status);
-        logBean.setEnv(FTSdk.get().getBaseConfig().getEnv());
         if (config.checkLogLevel(status)) {
             FTTrackInner.getInstance().logBackground(logBean);
         }
@@ -74,7 +73,6 @@ public class FTLogger {
                     Utils.getCurrentNanoTime());
             logBean.setServiceName(config.getServiceName());
             logBean.setStatus(logData.getStatus());
-            logBean.setEnv(FTSdk.get().getBaseConfig().getEnv());
             if (config.checkLogLevel(logBean.getStatus())) {
                 logBeans.add(logBean);
             }

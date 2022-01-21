@@ -77,7 +77,6 @@ public class TrackLog {
                     + " " + getLevelMark(priority) + "/" + tag + ":" + msg), Utils.getCurrentNanoTime());
             logBean.setServiceName(config.getServiceName());
             logBean.setStatus(getStatus(priority));
-            logBean.setEnv(FTSdk.get().getBaseConfig().getEnv());
             if (config.checkLogLevel(logBean.getStatus())&&config.checkPrefix(msg)) {
                 TrackLogManager.get().trackLog(logBean);
             }

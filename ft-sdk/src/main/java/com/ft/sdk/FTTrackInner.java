@@ -14,7 +14,6 @@ import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.http.ResponseData;
 import com.ft.sdk.garble.manager.AsyncCallback;
-import com.ft.sdk.garble.manager.SyncDataHelper;
 import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -197,7 +196,7 @@ public class FTTrackInner {
             FTLoggerConfig config = FTLoggerConfigManager.get().getConfig();
             JSONObject rumTags = null;
             if (config.isEnableLinkRumData()) {
-                rumTags = FTAutoTrack.getRUMPublicTags();
+                rumTags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
                 FTRUMGlobalManager.get().attachRUMRelative(rumTags, false);
             }
 
@@ -206,7 +205,7 @@ public class FTTrackInner {
                 try {
                     if (Utils.enableTraceSamplingRate(config.getSamplingRate())) {
                         if (rumTags != null) {
-                            logBean.setTags(rumTags);
+                            logBean.appendTags(rumTags);
                         }
                         datas.add(SyncJsonData.getFromLogBean(logBean, DataType.LOG));
                     }

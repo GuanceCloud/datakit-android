@@ -1,10 +1,7 @@
 package com.ft.sdk.garble.bean;
 
-import com.ft.sdk.EnvType;
-import com.ft.sdk.FTApplication;
-import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.utils.Constants;
-import com.ft.sdk.garble.utils.DeviceUtils;
+import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONException;
@@ -16,6 +13,7 @@ import org.json.JSONObject;
  * description:日志对象(SDK内部使用)
  */
 public class BaseContentBean {
+    private static final String TAG = "BaseContentBean";
     protected static final int LIMIT_SIZE = 30720;
     //指定当前日志的来源，比如如果来源于 Ngnix，可指定为 Nginx，
     // 同一应用产生的日志 source 应该一样，这样在 DataFlux 中方便针对该来源的日志配置同一的提取规则
@@ -24,12 +22,10 @@ public class BaseContentBean {
 
     String serviceName;
 
-    EnvType env;
-
     long time;
 
-    JSONObject tags;
-    JSONObject fields;
+    final JSONObject tags = new JSONObject();
+    final JSONObject fields = new JSONObject();
 
     /**
      * 是否超过 30KB
@@ -66,11 +62,8 @@ public class BaseContentBean {
     }
 
     public JSONObject getAllFields() {
-        if (fields == null) {
-            fields = new JSONObject();
-        }
         try {
-            fields.put("message", content);
+            fields.put(Constants.KEY_MESSAGE, content);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -78,30 +71,10 @@ public class BaseContentBean {
     }
 
     public JSONObject getAllTags() {
-        if (tags == null) {
-            tags = new JSONObject();
-        }
         try {
-
-            if (env != null) {
-                tags.put("env", env.toString());
-            }
-
             if (!Utils.isNullOrEmpty(serviceName)) {
-                tags.put("service", serviceName);
+                tags.put(Constants.KEY_SERVICE, serviceName);
             }
-
-            if (!tags.has(Constants.KEY_DEVICE_UUID)) {
-                tags.put(Constants.KEY_DEVICE_UUID, DeviceUtils.getUuid(FTApplication.getApplication()));
-            }
-
-            if (!tags.has(Constants.KEY_APPLICATION_UUID)) {
-                tags.put(Constants.KEY_APPLICATION_UUID, FTSdk.PACKAGE_UUID);
-            }
-
-            tags.put(Constants.KEY_APP_VERSION_NAME, Utils.getAppVersionName());
-
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -122,25 +95,16 @@ public class BaseContentBean {
         return time;
     }
 
+    public void appendTags(JSONObject tags) {
+        while (tags.keys().hasNext()) {
+            String key = tags.keys().next();
+            try {
+                tags.put(key, tags.get(key));
+            } catch (JSONException e) {
+                LogUtils.e(TAG, e.getMessage());
+            }
 
-    public JSONObject getTags() {
-        return tags;
-    }
-
-    public void setTags(JSONObject tags) {
-        this.tags = tags;
-    }
-
-    public JSONObject getFields() {
-        return fields;
-    }
-
-    public void setFields(JSONObject fields) {
-        this.fields = fields;
-    }
-
-    public void setEnv(EnvType env) {
-        this.env = env;
+        }
     }
 
     public void setServiceName(String serviceName) {

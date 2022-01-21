@@ -15,7 +15,7 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.ft.sdk.garble.manager.SyncDataHelper.addMonitorData;
+import static com.ft.sdk.SyncDataHelper.addMonitorData;
 
 /**
  * BY huangDianHua

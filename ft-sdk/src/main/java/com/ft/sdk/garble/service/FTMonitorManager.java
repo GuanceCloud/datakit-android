@@ -4,7 +4,7 @@ import com.ft.sdk.garble.FTMonitorConfigManager;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.http.ResponseData;
-import com.ft.sdk.garble.manager.SyncDataHelper;
+import com.ft.sdk.SyncDataHelper;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 

@@ -277,13 +277,12 @@ public class FTRUMGlobalManager {
      */
     public void addError(String log, String message, long dateline, ErrorType errorType, AppState state) {
         try {
-            JSONObject tags = FTAutoTrack.getRUMPublicTags();
+            JSONObject tags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
             attachRUMRelative(tags, true);
             JSONObject fields = new JSONObject();
             tags.put(Constants.KEY_RUM_ERROR_TYPE, errorType.toString());
             tags.put(Constants.KEY_RUM_ERROR_SOURCE, ErrorSource.LOGGER.toString());
             tags.put(Constants.KEY_RUM_ERROR_SITUATION, state.toString());
-            tags.put(Constants.KEY_RUM_APPLICATION_UUID, FTSdk.PACKAGE_UUID);
             fields.put(Constants.KEY_RUM_ERROR_MESSAGE, message);
             fields.put(Constants.KEY_RUM_ERROR_STACK, log);
 
@@ -324,7 +323,7 @@ public class FTRUMGlobalManager {
     public void addLongTask(String log, long duration) {
         try {
             long time = Utils.getCurrentNanoTime();
-            JSONObject tags = FTAutoTrack.getRUMPublicTags();
+            JSONObject tags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
             attachRUMRelative(tags, true);
             JSONObject fields = new JSONObject();
             fields.put(Constants.KEY_RUM_LONG_TASK_DURATION, duration);
@@ -342,7 +341,7 @@ public class FTRUMGlobalManager {
     /**
      * 资源加载性能
      */
-     void putRUMResourcePerformance(String resourceId, NetStatusBean netStatusBean) {
+    void putRUMResourcePerformance(String resourceId, NetStatusBean netStatusBean) {
         ResourceBean bean = resourceBeanMap.get(resourceId);
 
         if (bean == null) {
@@ -373,7 +372,7 @@ public class FTRUMGlobalManager {
         bean.resourceFirstByte = netStatusBean.getFirstByteTime();
 
         try {
-            JSONObject tags = FTAutoTrack.getRUMPublicTags();
+            JSONObject tags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
 
             tags.put(Constants.KEY_RUM_ACTION_ID, actionId);
             tags.put(Constants.KEY_RUM_ACTION_NAME, actionName);
@@ -394,7 +393,7 @@ public class FTRUMGlobalManager {
             tags.put(Constants.KEY_RUM_RESPONSE_CONTENT_ENCODING, bean.responseContentEncoding);
             tags.put(Constants.KEY_RUM_RESOURCE_METHOD, bean.resourceMethod);
             tags.put(Constants.KEY_RUM_RESOURCE_TRACE_ID, bean.traceId);
-            tags.put(Constants.KEY_RUM_RESROUCE_SPAN_ID, bean.spanId);
+            tags.put(Constants.KEY_RUM_RESOURCE_SPAN_ID, bean.spanId);
 
             int resourceStatus = bean.resourceStatus;
             String resourceStatusGroup = "";
@@ -452,7 +451,7 @@ public class FTRUMGlobalManager {
 
 
             if (bean.resourceStatus >= HttpsURLConnection.HTTP_BAD_REQUEST) {
-                JSONObject errorTags = FTAutoTrack.getRUMPublicTags();
+                JSONObject errorTags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
                 JSONObject errorField = new JSONObject();
                 errorTags.put(Constants.KEY_RUM_ERROR_TYPE, ErrorType.NETWORK.toString());
                 errorTags.put(Constants.KEY_RUM_ERROR_SOURCE, ErrorSource.NETWORK.toString());
@@ -510,7 +509,7 @@ public class FTRUMGlobalManager {
      *
      * @param params
      */
-     void setTransformContent(String resourceId, ResourceParams params) {
+    void setTransformContent(String resourceId, ResourceParams params) {
 
         FTTraceHandler handler = FTTraceManager.get().getHandler(resourceId);
         String spanId = "";
@@ -659,7 +658,7 @@ public class FTRUMGlobalManager {
     Handler mHandler = new Handler(Looper.getMainLooper());
     Runnable mRUMGenerateRunner = () -> {
         try {
-            JSONObject tags = FTAutoTrack.getRUMPublicTags();
+            JSONObject tags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
             EventConsumerThreadPool.get().execute(() -> {
                 try {
                     generateActionSum(tags);

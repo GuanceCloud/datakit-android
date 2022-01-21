@@ -8,7 +8,7 @@ import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.LineProtocolBean;
 import com.ft.sdk.garble.bean.ObjectBean;
 import com.ft.sdk.garble.bean.SyncJsonData;
-import com.ft.sdk.garble.manager.SyncDataHelper;
+import com.ft.sdk.SyncDataHelper;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.Utils;
 

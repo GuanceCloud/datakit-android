@@ -1,15 +1,11 @@
-package com.ft.sdk.garble.manager;
+package com.ft.sdk;
+
+import static com.ft.sdk.garble.utils.Constants.FT_KEY_VALUE_NULL;
+import static com.ft.sdk.garble.utils.Constants.UNKNOWN;
 
 import android.bluetooth.BluetoothDevice;
-import android.content.Context;
 import android.location.Address;
 
-import com.ft.sdk.FTApplication;
-import com.ft.sdk.FTLoggerConfig;
-import com.ft.sdk.FTLoggerConfigManager;
-import com.ft.sdk.FTSdk;
-import com.ft.sdk.MonitorType;
-import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.FTMonitorConfigManager;
 import com.ft.sdk.garble.bean.BatteryBean;
 import com.ft.sdk.garble.bean.CameraPx;
@@ -27,7 +23,6 @@ import com.ft.sdk.garble.utils.GpuUtils;
 import com.ft.sdk.garble.utils.LocationUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.NetUtils;
-import com.ft.sdk.garble.utils.OaidUtils;
 import com.ft.sdk.garble.utils.StringUtils;
 import com.ft.sdk.garble.utils.Utils;
 
@@ -40,9 +35,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
-import static com.ft.sdk.garble.utils.Constants.FT_KEY_VALUE_NULL;
-import static com.ft.sdk.garble.utils.Constants.UNKNOWN;
 
 /**
  * BY huangDianHua
@@ -110,9 +102,8 @@ public class SyncDataHelper {
         FTLoggerConfig loggerConfig = FTLoggerConfigManager.get().getConfig();
         //全局设置改变
         if (loggerConfig != null && loggerConfig.isEnableLinkRumData()) {
-            HashMap<String, Object> hashMap = getRumPublicTags();
-            hashMap.putAll(getBaseDeviceInfoTagsMap());
-            return  convertToLineProtocolLines(datas,hashMap);
+            HashMap<String, Object> hashMap = FTSdk.get().getBasePublicTags();
+            return convertToLineProtocolLines(datas, hashMap);
         }
         return convertToLineProtocolLines(datas);
     }
@@ -198,14 +189,9 @@ public class SyncDataHelper {
         return sb.toString();
     }
 
-    private String getRumInfluxBodyContent(List<SyncJsonData> datas) {
-        HashMap<String, Object> hashMap = getBaseDeviceInfoTagsMap();
-        return convertToLineProtocolLines(datas, hashMap);
-    }
 
     private String getRumBodyContent(List<SyncJsonData> datas) {
-        HashMap<String, Object> hashMap = getRumPublicTags();
-        hashMap.putAll(getBaseDeviceInfoTagsMap());
+        HashMap<String, Object> hashMap = FTSdk.get().getBasePublicTags();
         return convertToLineProtocolLines(datas, hashMap);
     }
 
@@ -216,7 +202,7 @@ public class SyncDataHelper {
      * @return
      */
     private String getTrackBodyContent(List<SyncJsonData> datas) {
-        HashMap<String, Object> deviceTags = getBaseDeviceInfoTagsMap();
+        HashMap<String, Object> deviceTags = FTSdk.get().getBasePublicTags();
         return convertToLineProtocolLines(datas, deviceTags);
     }
 
@@ -308,9 +294,9 @@ public class SyncDataHelper {
             ArrayList<SyncJsonData> dataArrayList = new ArrayList<>();
             dataArrayList.add(data);
 
-            HashMap<String, Object> extrasMap = getBaseDeviceInfoTagsMap();
-            extrasMap.putAll(getUniqueIdMap());
-            convertToLineProtocolLines(dataArrayList, extrasMap);
+            HashMap<String, Object> extrasMap = FTSdk.get().getBasePublicTags();
+//            extrasMap.putAll(getUniqueIdMap());
+            return convertToLineProtocolLines(dataArrayList, extrasMap);
         } catch (JSONException e) {
             LogUtils.e(TAG, e.getMessage());
         }
@@ -634,51 +620,6 @@ public class SyncDataHelper {
         StringUtils.deleteLastCharacter(sb, ",");
     }
 
-
-    /**
-     * 获取必要的设备信息
-     *
-     * @return
-     */
-    private static HashMap<String, Object> getBaseDeviceInfoTagsMap() {
-        Context context = FTApplication.getApplication();
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put(Constants.KEY_APP_VERSION_NAME, Utils.getAppVersionName());
-//        hashMap.put(Constants.KEY_DEVICE_APPLICATION_ID, DeviceUtils.getApplicationId(context));
-        hashMap.put(Constants.KEY_DEVICE_OS, DeviceUtils.getOSName());
-        hashMap.put(Constants.KEY_DEVICE_DEVICE_BAND, DeviceUtils.getDeviceBand());
-        hashMap.put(Constants.KEY_DEVICE_DEVICE_MODEL, DeviceUtils.getDeviceModel());
-        hashMap.put(Constants.KEY_DEVICE_DISPLAY, DeviceUtils.getDisplay(context));
-        return hashMap;
-    }
-
-    private static HashMap<String, Object> getRumPublicTags() {
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_AGENT, FTSdk.AGENT_VERSION);
-        if (!FTSdk.PLUGIN_VERSION.isEmpty()) {
-            hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_TRACK, FTSdk.PLUGIN_VERSION);
-        }
-        if (!FTSdk.NATIVE_VERSION.isEmpty()) {
-            hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_NATIVE, FTSdk.NATIVE_VERSION);
-        }
-        String osVersion = DeviceUtils.getOSVersion();
-        hashMap.put(Constants.KEY_DEVICE_OS_VERSION, osVersion);
-        hashMap.put(Constants.KEY_RUM_SDK_VERSION, FTSdk.AGENT_VERSION);
-        String osVersionMajor = osVersion.contains(".") ? osVersion.split("\\.")[0] : osVersion;
-        hashMap.put(Constants.KEY_DEVICE_OS_VERSION_MAJOR, osVersionMajor);
-        return hashMap;
-    }
-
-
-    public static HashMap<String, Object> getUniqueIdMap() {
-        Context context = FTApplication.getApplication();
-        HashMap<String, Object> objectHashMap = new HashMap<>();
-        objectHashMap.put(Constants.KEY_DEVICE_UUID, DeviceUtils.getUuid(context));
-        if (FTHttpConfigManager.get().useOaid) {
-            objectHashMap.put(Constants.KEY_DEVICE_OAID, OaidUtils.getOAID(context));
-        }
-        return objectHashMap;
-    }
 
     /**
      * 将上传的数据格式化（供打印日志使用）

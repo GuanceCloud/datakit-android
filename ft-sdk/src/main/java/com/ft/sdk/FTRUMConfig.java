@@ -24,7 +24,7 @@ public class FTRUMConfig {
     private int extraMonitorTypeWithError;
 
     //设置全局 tag
-    private final HashMap<String, String> globalContext = new HashMap<>();
+    private final HashMap<String, Object> globalContext = new HashMap<>();
 
     public float getSamplingRate() {
         return samplingRate;
@@ -116,7 +116,7 @@ public class FTRUMConfig {
         return this;
     }
 
-    public HashMap<String, String> getGlobalContext() {
+    public HashMap<String, Object> getGlobalContext() {
         return globalContext;
     }
 }

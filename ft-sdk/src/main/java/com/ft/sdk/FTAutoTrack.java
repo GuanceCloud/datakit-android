@@ -734,50 +734,6 @@ public class FTAutoTrack {
         }
     }
 
-    /**
-     * 获取变化的公用 tag
-     *
-     * @return
-     */
-    static JSONObject getRUMPublicTags() throws Exception {
-        JSONObject tags = new JSONObject();
-        FTRUMConfig config = FTRUMConfigManager.get().getConfig();
-        HashMap<String, String> globalContext = config.getGlobalContext();
-        ArrayList<String> customKeys = new ArrayList<>();
-        for (Map.Entry<String, String> entry : globalContext.entrySet()) {
-            String key = entry.getKey();
-            customKeys.add(key);
-            Object value = entry.getValue();
-            tags.put(key, value.toString());
-        }
-        tags.put(Constants.KEY_RUM_CUSTOM_KEYS, new Gson().toJson(customKeys));
-        tags.put(Constants.KEY_RUM_APP_ID, config.getRumAppId());
-        tags.put(Constants.KEY_RUM_SDK_NAME, Constants.SDK_NAME);
-        tags.put(Constants.KEY_RUM_ENV, FTSdk.get().getBaseConfig().getEnv().toString());
-        tags.put(Constants.KEY_RUM_NETWORK_TYPE, NetUtils.get().getNetWorkStateName());
-        tags.put(Constants.KEY_RUM_IS_SIGNIN, FTRUMConfigManager.get().isUserDataBinded() ? "T" : "F");
-        if (FTRUMConfigManager.get().isUserDataBinded()) {
-            tags.put(Constants.KEY_RUM_USER_ID, FTRUMConfigManager.get().getUserData().getId());
-        } else {
-            tags.put(Constants.KEY_RUM_USER_ID, FTRUMGlobalManager.get().getSessionId());
-        }
-
-        String uuid = "";
-        if (FTHttpConfigManager.get().useOaid) {
-            String oaid = OaidUtils.getOAID(FTApplication.getApplication());
-            if (oaid != null) {
-                uuid = "oaid_" + oaid;
-            }
-        }
-        if (uuid.isEmpty()) {
-            uuid = DeviceUtils.getUuid(FTApplication.getApplication());
-        }
-        tags.put(Constants.KEY_DEVICE_UUID, uuid);
-        tags.put(Constants.KEY_RUM_SESSION_TYPE, "user");
-        return tags;
-
-    }
-
     private static void handleOp(String currentPage, OP op, String parentPage, @Nullable String vtp) {
         handleOp(currentPage, op, parentPage, 0, vtp);
     }

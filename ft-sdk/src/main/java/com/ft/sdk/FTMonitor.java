@@ -18,7 +18,7 @@ import com.ft.sdk.garble.utils.Utils;
  * time: 2020/4/17 10:16:20
  * description: 监控入口
  */
-//fixme 暂不可用
+//unused
 public class FTMonitor {
     public static final String TAG = "FTMonitor";
     //轮训周期，默认10秒

@@ -63,18 +63,15 @@ public class TraceBean extends BaseContentBean {
 
     public JSONObject getAllTags() {
         super.getAllTags();
-        if (tags == null) {
-            tags = new JSONObject();
-        }
         try {
-            tags.put("type","custom");
+            tags.put("type", "custom");
 
             if (!Utils.isNullOrEmpty(parentID)) {
                 tags.put("parent_id", parentID);
             }
             if (!Utils.isNullOrEmpty(operationName)) {
                 tags.put("operation", operationName);
-                tags.put("resource",operationName);
+                tags.put("resource", operationName);
             }
             if (!Utils.isNullOrEmpty(spanID)) {
                 tags.put("span_id", spanID);
