@@ -97,7 +97,7 @@ public class FTTrackInner {
                 SyncJsonData recordData = SyncJsonData.getSyncJsonData(dataType,
                         new LineProtocolBean(measurement, tags, fields, time));
                 boolean result = FTDBManager.get().insertFtOperation(recordData);
-                LogUtils.d(TAG, "trackBackground:" + dataType.toString() + ",insert-result=" + result);
+                LogUtils.d(TAG, "syncDataBackground:" + dataType.toString() + ":insert-result=" + result);
                 SyncTaskManager.get().executeSyncPoll();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -196,7 +196,7 @@ public class FTTrackInner {
             FTLoggerConfig config = FTLoggerConfigManager.get().getConfig();
             JSONObject rumTags = null;
             if (config.isEnableLinkRumData()) {
-                rumTags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
+                rumTags = FTRUMConfigManager.get().getRUMPublicDynamicTags(true);
                 FTRUMGlobalManager.get().attachRUMRelative(rumTags, false);
             }
 
@@ -231,7 +231,9 @@ public class FTTrackInner {
             }
 
         }
-        FTDBManager.get().insertFtOptList(datas);
+        boolean result = FTDBManager.get().insertFtOptList(datas);
+        LogUtils.d(TAG, "batchTraceBeanBackground:insert-result=" + result);
+
         SyncTaskManager.get().executeSyncPoll();
     }
 

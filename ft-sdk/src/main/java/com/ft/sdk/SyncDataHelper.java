@@ -99,13 +99,9 @@ public class SyncDataHelper {
      * @return
      */
     private String getLogBodyContent(List<SyncJsonData> datas) {
-        FTLoggerConfig loggerConfig = FTLoggerConfigManager.get().getConfig();
-        //全局设置改变
-        if (loggerConfig != null && loggerConfig.isEnableLinkRumData()) {
-            HashMap<String, Object> hashMap = FTSdk.get().getBasePublicTags();
-            return convertToLineProtocolLines(datas, hashMap);
-        }
-        return convertToLineProtocolLines(datas);
+        HashMap<String, Object> hashMap = FTSdk.get().getBasePublicTags();
+        hashMap.putAll(FTLoggerConfigManager.get().getConfig().getGlobalContext());
+        return convertToLineProtocolLines(datas, hashMap);
     }
 
 
@@ -116,7 +112,32 @@ public class SyncDataHelper {
      * @return
      */
     private String getTraceBodyContent(List<SyncJsonData> datas) {
-        return convertToLineProtocolLines(datas);
+        HashMap<String, Object> hashMap = FTSdk.get().getBasePublicTags();
+        hashMap.putAll(FTTraceConfigManager.get().getConfig().getGlobalContext());
+        return convertToLineProtocolLines(datas, hashMap);
+    }
+
+    /**
+     * 封装 RUM 数据
+     *
+     * @param datas
+     * @return
+     */
+    private String getRumBodyContent(List<SyncJsonData> datas) {
+        HashMap<String, Object> hashMap = FTSdk.get().getBasePublicTags();
+        hashMap.putAll(FTRUMConfigManager.get().getConfig().getGlobalContext());
+        return convertToLineProtocolLines(datas, hashMap);
+    }
+
+    /**
+     * 封装本地埋点数据
+     *
+     * @param datas
+     * @return
+     */
+    private String getTrackBodyContent(List<SyncJsonData> datas) {
+        HashMap<String, Object> deviceTags = FTSdk.get().getBasePublicTags();
+        return convertToLineProtocolLines(datas, deviceTags);
     }
 
 
@@ -189,22 +210,6 @@ public class SyncDataHelper {
         return sb.toString();
     }
 
-
-    private String getRumBodyContent(List<SyncJsonData> datas) {
-        HashMap<String, Object> hashMap = FTSdk.get().getBasePublicTags();
-        return convertToLineProtocolLines(datas, hashMap);
-    }
-
-    /**
-     * 封装本地埋点数据
-     *
-     * @param datas
-     * @return
-     */
-    private String getTrackBodyContent(List<SyncJsonData> datas) {
-        HashMap<String, Object> deviceTags = FTSdk.get().getBasePublicTags();
-        return convertToLineProtocolLines(datas, deviceTags);
-    }
 
     /**
      * 获取自定义数据

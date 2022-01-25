@@ -1,8 +1,11 @@
 package com.ft.sdk;
 
+import androidx.annotation.NonNull;
+
 import com.ft.sdk.garble.utils.Constants;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class FTTraceConfig {
@@ -12,6 +15,9 @@ public class FTTraceConfig {
     private boolean enableWebTrace = false;
     private boolean enableAutoTrace = false;
     private boolean enableLinkRUMData = false;
+
+    //设置全局 tag
+    private final HashMap<String, Object> globalContext = new HashMap<>();
 
 
     public List<String> traceContentType = Arrays.asList("application/json",
@@ -93,5 +99,14 @@ public class FTTraceConfig {
     public FTTraceConfig setEnableAutoTrace(boolean enableAutoTrace) {
         this.enableAutoTrace = enableAutoTrace;
         return this;
+    }
+
+    public FTTraceConfig addGlobalContext(@NonNull String key, @NonNull String value) {
+        this.globalContext.put(key, value);
+        return this;
+    }
+
+    public HashMap<String, Object> getGlobalContext() {
+        return globalContext;
     }
 }

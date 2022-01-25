@@ -1,9 +1,12 @@
 package com.ft.sdk;
 
+import androidx.annotation.NonNull;
+
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.utils.Constants;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class FTLoggerConfig {
@@ -14,6 +17,9 @@ public class FTLoggerConfig {
     private String serviceName = Constants.DEFAULT_LOG_SERVICE_NAME;
     private String logPrefix = "";
     private List<Status> logLevelFilters;
+
+    //设置全局 tag
+    private final HashMap<String, Object> globalContext = new HashMap<>();
 
     //日志数据数据库存储策略
     private LogCacheDiscard logCacheDiscardStrategy = LogCacheDiscard.DISCARD;
@@ -110,5 +116,14 @@ public class FTLoggerConfig {
         return (logLevelFilters == null
                 || logLevelFilters.size() == 0)
                 || logLevelFilters.contains(status);
+    }
+
+    public FTLoggerConfig addGlobalContext(@NonNull String key, @NonNull String value) {
+        this.globalContext.put(key, value);
+        return this;
+    }
+
+    public HashMap<String, Object> getGlobalContext() {
+        return globalContext;
     }
 }

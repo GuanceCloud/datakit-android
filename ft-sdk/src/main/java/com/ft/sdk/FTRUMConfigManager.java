@@ -258,18 +258,24 @@ public class FTRUMConfigManager {
         rumGlobalContext.put(Constants.KEY_DEVICE_OS_VERSION_MAJOR, osVersionMajor);
     }
 
+    JSONObject getRUMPublicDynamicTags() throws Exception {
+        return getRUMPublicDynamicTags(false);
+    }
+
     /**
      * 获取变化的公用 tag
      *
      * @return
      */
-    JSONObject getRUMPublicDynamicTags() throws Exception {
+    JSONObject getRUMPublicDynamicTags(boolean includeRUMStatic) throws Exception {
         JSONObject tags = new JSONObject();
-        HashMap<String, Object> rumGlobalContext = config.getGlobalContext();
-        for (Map.Entry<String, Object> entry : rumGlobalContext.entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
-            tags.put(key, value.toString());
+        if (includeRUMStatic) {
+            HashMap<String, Object> rumGlobalContext = config.getGlobalContext();
+            for (Map.Entry<String, Object> entry : rumGlobalContext.entrySet()) {
+                String key = entry.getKey();
+                Object value = entry.getValue();
+                tags.put(key, value.toString());
+            }
         }
         tags.put(Constants.KEY_RUM_NETWORK_TYPE, NetUtils.get().getNetWorkStateName());
         tags.put(Constants.KEY_RUM_IS_SIGN_IN, FTRUMConfigManager.get().isUserDataBinded() ? "T" : "F");

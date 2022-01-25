@@ -7,6 +7,8 @@ import com.ft.sdk.garble.utils.Utils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Iterator;
+
 /**
  * create: by huangDianHua
  * time: 2020/6/5 15:08:45
@@ -96,8 +98,9 @@ public class BaseContentBean {
     }
 
     public void appendTags(JSONObject tags) {
-        while (tags.keys().hasNext()) {
-            String key = tags.keys().next();
+        Iterator<String> it = tags.keys();
+        while (it.hasNext()) {
+            String key = it.next();
             try {
                 tags.put(key, tags.get(key));
             } catch (JSONException e) {
