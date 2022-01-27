@@ -4,6 +4,7 @@ import static com.ft.AllTests.hasPrepare;
 
 import android.content.Context;
 import android.os.Looper;
+import android.util.Log;
 
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -13,7 +14,7 @@ import com.ft.BaseTest;
 import com.ft.DebugMainActivity;
 import com.ft.application.MockApplication;
 import com.ft.sdk.EnvType;
-import com.ft.sdk.FTRUMConfig;
+import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.bean.DataType;
@@ -26,7 +27,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
-public class RUMActionLaunchTest extends BaseTest {
+public class LogGlobalContextTest extends BaseTest {
+    public static final String CUSTOM_KEY = "custom_key";
+    public static final String CUSTOM_VALUE = "custom_value";
 
     @Rule
     public ActivityScenarioRule<DebugMainActivity> rule = new ActivityScenarioRule<>(DebugMainActivity.class);
@@ -48,22 +51,21 @@ public class RUMActionLaunchTest extends BaseTest {
                 .setEnv(EnvType.GRAY);
         FTSdk.install(ftSDKConfig);
 
-        FTSdk.initRUMWithConfig(new FTRUMConfig()
-                .setEnableTrackAppCrash(true)
-                .setRumAppId(AccountUtils.getProperty(context, AccountUtils.RUM_APP_ID))
-                .setEnableTrackAppUIBlock(true)
-                .setEnableTraceUserAction(true)
+        FTSdk.initLogWithConfig(new FTLoggerConfig()
+                .addGlobalContext(CUSTOM_KEY, CUSTOM_VALUE)
+                .setEnableConsoleLog(true)
         );
 
     }
 
-
     @Test
-    public void rumActionLaunchTest() throws InterruptedException {
-        //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
+    public void logGlobalContextTest() throws Exception {
         Thread.sleep(1000);
-        Assert.assertTrue(CheckUtils.checkValue(DataType.RUM_APP, "launch", 0));
+        Log.d("TestLog", "log test");
+
+        Thread.sleep(1000);
+        Assert.assertTrue(CheckUtils.checkValue(DataType.LOG,
+                new String[]{CUSTOM_KEY, CUSTOM_VALUE}, 0));
+
     }
-
-
 }

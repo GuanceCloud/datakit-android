@@ -112,7 +112,6 @@ public class RUMActionSumTest extends BaseTest {
                 JSONObject json = new JSONObject(recordData.getDataString());
                 JSONObject fields = json.optJSONObject("fields");
                 String measurement = json.optString("measurement");
-                Log.e("RUMActionSumTest",recordData.getDataString());
 //                if ("action".equals(measurement)) {
 //                    Log.e("RUMActionSumTest",recordData.getDataString());
 //                    if (fields != null) {

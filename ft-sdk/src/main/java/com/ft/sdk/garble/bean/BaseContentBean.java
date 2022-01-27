@@ -102,7 +102,7 @@ public class BaseContentBean {
         while (it.hasNext()) {
             String key = it.next();
             try {
-                tags.put(key, tags.get(key));
+                this.tags.put(key, tags.get(key));
             } catch (JSONException e) {
                 LogUtils.e(TAG, e.getMessage());
             }

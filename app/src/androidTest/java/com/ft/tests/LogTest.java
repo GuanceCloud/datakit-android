@@ -19,15 +19,12 @@ import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.Status;
-import com.ft.sdk.garble.bean.SyncJsonData;
-import com.ft.sdk.garble.db.FTDBManager;
+import com.ft.utils.CheckUtils;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.util.List;
 
 /**
  * author: huangDianHua
@@ -55,19 +52,9 @@ public class LogTest extends BaseTest {
     @Test
     public void consoleLogTest() throws InterruptedException {
         FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableConsoleLog(true));
-
         Log.d("TestLog", "控制台日志测试用例qaws");
         Thread.sleep(4000);
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(10, DataType.LOG);
-        int except = 0;
-        if (recordDataList != null) {
-            for (SyncJsonData data : recordDataList) {
-                if (data.getDataString().contains("控制台日志测试用例qaws")) {
-                    except++;
-                }
-            }
-        }
-        Assert.assertEquals(1, except);
+        Assert.assertTrue(CheckUtils.checkValue(DataType.LOG, "控制台日志测试用例qaws", 10));
 
     }
 
@@ -75,32 +62,16 @@ public class LogTest extends BaseTest {
     public void consoleLogPrefixTest() throws InterruptedException {
         FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableConsoleLog(true, "debug"));
 
-        Log.d("TestLog", "log test");
+        String logContent = "logTest";
+        Log.d("TestLog", logContent);
 
         Thread.sleep(1000);
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(10, DataType.LOG);
-        int except = 0;
-        if (recordDataList != null) {
-            for (SyncJsonData data : recordDataList) {
-                if (data.getDataString().contains("log test")) {
-                    except++;
-                }
-            }
-        }
-        Assert.assertEquals(0, except);
+        Assert.assertFalse(CheckUtils.checkValue(DataType.LOG, logContent, 10));
 
-        Log.d("TestLog", "debug log test");
+        logContent = "debug log test";
+        Log.d("TestLog", logContent);
         Thread.sleep(1000);
-        recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(10, DataType.LOG);
-        except = 0;
-        if (recordDataList != null) {
-            for (SyncJsonData data : recordDataList) {
-                if (data.getDataString().contains("debug log test")) {
-                    except++;
-                }
-            }
-        }
-        Assert.assertEquals(1, except);
+        Assert.assertTrue(CheckUtils.checkValue(DataType.LOG, logContent, 10));
 
 
     }
@@ -111,34 +82,19 @@ public class LogTest extends BaseTest {
                 .setEnableConsoleLog(true)
                 .setLogLevelFilters(new Status[]{Status.ERROR}));
 
-        Log.d("TestLog", "log test");
-        FTLogger.getInstance().logBackground("log test", Status.INFO);
+        String logContent = "logTest";
+        Log.d("TestLog", logContent);
+        FTLogger.getInstance().logBackground(logContent, Status.INFO);
 
         Thread.sleep(1000);
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(10, DataType.LOG);
-        int except = 0;
-        if (recordDataList != null) {
-            for (SyncJsonData data : recordDataList) {
-                if (data.getDataString().contains("log test")) {
-                    except++;
-                }
-            }
-        }
+        int except = CheckUtils.getCount(DataType.LOG, logContent, 10);
         Assert.assertEquals(0, except);
 
-        Log.e("TestLog", "log test");
-        FTLogger.getInstance().logBackground("log test", Status.ERROR);
+        Log.e("TestLog", logContent);
+        FTLogger.getInstance().logBackground(logContent, Status.ERROR);
 
         Thread.sleep(1000);
-        recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(10, DataType.LOG);
-        except = 0;
-        if (recordDataList != null) {
-            for (SyncJsonData data : recordDataList) {
-                if (data.getDataString().contains("log test")) {
-                    except++;
-                }
-            }
-        }
+        except = CheckUtils.getCount(DataType.LOG, logContent, 10);
         Assert.assertEquals(2, except);
 
 
@@ -153,19 +109,15 @@ public class LogTest extends BaseTest {
     public void triggerPolicyTest() throws InterruptedException {
         FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableConsoleLog(true));
 
+        String logContent = "控制台日志测试用例";
         FTDBCachePolicy.get().optCount(4990);
         for (int i = 0; i < 20; i++) {
-            Log.d("TestLog", i + "-控制台日志测试用例");
+            Log.d("TestLog", i + "-" + logContent);
             Thread.sleep(10);
         }
         Thread.sleep(2000);
-        List<SyncJsonData> dataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.LOG);
-        int count = 0;
-        for (SyncJsonData recordData : dataList) {
-            if (recordData.getDataString().contains("控制台日志测试用例")) {
-                count++;
-            }
-        }
+        int count = CheckUtils.getCount(DataType.LOG, logContent, 0);
+
         System.out.println("count=" + count);
         //Thread.sleep(300000);
         Assert.assertTrue(10 >= count);

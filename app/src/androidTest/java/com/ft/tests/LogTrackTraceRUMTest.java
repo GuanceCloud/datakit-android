@@ -1,5 +1,9 @@
 package com.ft.tests;
 
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
+import static com.ft.AllTests.hasPrepare;
+
 import android.content.Context;
 import android.os.Looper;
 
@@ -22,6 +26,7 @@ import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
 import com.ft.sdk.FTTrack;
 import com.ft.sdk.MonitorType;
+import com.ft.sdk.SyncDataHelper;
 import com.ft.sdk.SyncTaskManager;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.DataType;
@@ -29,8 +34,8 @@ import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.manager.AsyncCallback;
-import com.ft.sdk.SyncDataHelper;
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.utils.CheckUtils;
 import com.ft.utils.RequestUtil;
 
 import org.json.JSONException;
@@ -43,10 +48,6 @@ import org.junit.runner.RunWith;
 import org.powermock.reflect.Whitebox;
 
 import java.util.List;
-
-import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.action.ViewActions.click;
-import static com.ft.AllTests.hasPrepare;
 
 /**
  * author: huangDianHua
@@ -96,7 +97,6 @@ public class LogTrackTraceRUMTest extends BaseTest {
 
         FTSdk.initTraceWithConfig(new FTTraceConfig().setEnableAutoTrace(true));
 
-        FTDBManager.get().delete();
     }
 
 
@@ -108,11 +108,12 @@ public class LogTrackTraceRUMTest extends BaseTest {
     @Test
     public void logInsertDataTest() throws InterruptedException {
         //产生一条日志数据
-        FTLogger.getInstance().logBackground("----logInsertDataTest----", Status.CRITICAL);
+        String logContent = "----logInsertDataTest----";
+        FTLogger.getInstance().logBackground(logContent, Status.CRITICAL);
         //线程池中插入，有一定的时间延迟，这里设置5秒等待时间
         Thread.sleep(5000);
         //从数据库中查询是否有插入的数据
-        int except = countInDB(DataType.LOG, "----logInsertDataTest----");
+        int except = CheckUtils.getCount(DataType.LOG, logContent, 0);
         Assert.assertEquals(1, except);
     }
 
@@ -139,9 +140,11 @@ public class LogTrackTraceRUMTest extends BaseTest {
     @Test
     public void logSyncTest() throws Exception {
         resumeSyncTask();
-        FTLogger.getInstance().logBackground("----logUploadTest----", Status.CRITICAL);
+        String logContent = "----logUploadTest----";
+
+        FTLogger.getInstance().logBackground(logContent, Status.CRITICAL);
         Thread.sleep(12000);
-        int except = countInDB(DataType.LOG, "----logUploadTest----");
+        int except = CheckUtils.getCount(DataType.LOG, logContent, 0);
         Assert.assertEquals(0, except);
     }
 
@@ -192,12 +195,12 @@ public class LogTrackTraceRUMTest extends BaseTest {
     public void trackSyncTest() throws Exception {
         simpleTrackData();
         Thread.sleep(5000);
-        int except1 = countInDB(DataType.TRACK, CONTENT_SIMPLE_TEST);
+        int except1 = CheckUtils.getCount(DataType.TRACK, CONTENT_SIMPLE_TEST, 0);
         Assert.assertTrue(except1 > 0);
         resumeSyncTask();
         executeSyncTask();
         Thread.sleep(12000);
-        int except2 = countInDB(DataType.TRACK, CONTENT_SIMPLE_TEST);
+        int except2 = CheckUtils.getCount(DataType.TRACK, CONTENT_SIMPLE_TEST, 0);
         Assert.assertEquals(0, except2);
     }
 
@@ -205,12 +208,12 @@ public class LogTrackTraceRUMTest extends BaseTest {
     public void rumTest() throws Exception {
         onView(ViewMatchers.withId(R.id.main_view_loop_test)).perform(ViewActions.scrollTo()).perform(click());
         Thread.sleep(5000);
-        int except1 = countInDB(DataType.RUM_APP, Constants.FT_MEASUREMENT_RUM_VIEW);
+        int except1 = CheckUtils.getCount(DataType.RUM_APP, Constants.FT_MEASUREMENT_RUM_VIEW, 0);
         Assert.assertTrue(except1 > 0);
         resumeSyncTask();
         executeSyncTask();
         Thread.sleep(12000);
-        int except2 = countInDB(DataType.RUM_APP, Constants.FT_MEASUREMENT_RUM_VIEW);
+        int except2 = CheckUtils.getCount(DataType.RUM_APP, Constants.FT_MEASUREMENT_RUM_VIEW, 0);
         Assert.assertEquals(0, except2);
     }
 
@@ -220,7 +223,7 @@ public class LogTrackTraceRUMTest extends BaseTest {
         FTSdk.bindRumUserData("123456");
         onView(ViewMatchers.withId(R.id.main_view_loop_test)).perform(ViewActions.scrollTo()).perform(click());
         Thread.sleep(5000);
-        int except2 = countInDB(DataType.RUM_APP, "\"is_signin\":\"T\"");
+        int except2 = CheckUtils.getCount(DataType.RUM_APP, "is_signin=T", 0);
         Assert.assertTrue(except2 > 0);
 
 
@@ -232,7 +235,7 @@ public class LogTrackTraceRUMTest extends BaseTest {
         FTSdk.unbindRumUserData();
         onView(ViewMatchers.withId(R.id.main_view_loop_test)).perform(ViewActions.scrollTo()).perform(click());
         Thread.sleep(5000);
-        int except4 = countInDB(DataType.RUM_APP, "\"is_signin\":\"T\"");
+        int except4 = CheckUtils.getCount(DataType.RUM_APP, "is_signin=T", 0);
         Assert.assertEquals(0, except4);
     }
 
@@ -244,21 +247,13 @@ public class LogTrackTraceRUMTest extends BaseTest {
      */
     @Test
     public void rumClickLambdaBtnTest() throws Exception {
-        Thread.sleep(100);
+        Thread.sleep(500);
         onView(ViewMatchers.withId(R.id.main_mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
         //第二次操作触发 action close
         onView(ViewMatchers.withId(R.id.main_mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
         Thread.sleep(2000);
 
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
-        boolean value = false;
-        for (SyncJsonData recordData : recordDataList) {
-            if (recordData.toString().contains("mock_click_btn")) {
-                value = true;
-                break;
-            }
-        }
-        Assert.assertTrue(value);
+        Assert.assertTrue(CheckUtils.checkValue(DataType.RUM_APP, "mock_click_btn", 0));
     }
 
 
@@ -436,9 +431,9 @@ public class LogTrackTraceRUMTest extends BaseTest {
         Thread.sleep(5000);
         resumeSyncTask();
         executeSyncTask();
-        int except1 = countInDB(DataType.TRACE, except);
+        int except1 = CheckUtils.getCount(DataType.TRACE, except, 0);
         Thread.sleep(12000);
-        int except2 = countInDB(DataType.TRACE, except);
+        int except2 = CheckUtils.getCount(DataType.TRACE, except, 0);
         Assert.assertTrue(except1 > 0);
         Assert.assertEquals(0, except2);
     }
@@ -462,22 +457,5 @@ public class LogTrackTraceRUMTest extends BaseTest {
         }
     }
 
-    /**
-     * 判断数据库中包含几条目标数据
-     *
-     * @param target
-     * @return
-     */
-    private int countInDB(DataType type, String target) {
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, type);
-        int except = 0;
-        if (recordDataList != null) {
-            for (SyncJsonData data : recordDataList) {
-                if (data.getDataString().contains(target)) {
-                    except++;
-                }
-            }
-        }
-        return except;
-    }
+
 }

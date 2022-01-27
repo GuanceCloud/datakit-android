@@ -46,7 +46,6 @@ public class MonitorTest extends BaseTest {
             Looper.prepare();
             hasPrepare = true;
         }
-        FTDBManager.get().delete();
         context = MockApplication.getContext();
         FTSDKConfig ftSDKConfig= FTSDKConfig
                 .builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL)

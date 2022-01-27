@@ -17,16 +17,13 @@ import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.bean.DataType;
-import com.ft.sdk.garble.bean.SyncJsonData;
-import com.ft.sdk.garble.db.FTDBManager;
+import com.ft.utils.CheckUtils;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.util.List;
 
 @RunWith(AndroidJUnit4.class)
 public class RUMGlobalContextTest extends BaseTest {
@@ -64,14 +61,6 @@ public class RUMGlobalContextTest extends BaseTest {
     @Test
     public void globalContextTest() throws Exception {
         Thread.sleep(1000);
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
-        boolean value = false;
-        for (SyncJsonData recordData : recordDataList) {
-            if (recordData.toString().contains(CUSTOM_KEY) && recordData.toString().contains(CUSTOM_VALUE)) {
-                value = true;
-                break;
-            }
-        }
-        Assert.assertTrue(value);
+        Assert.assertTrue(CheckUtils.checkValue(DataType.RUM_APP, new String[]{CUSTOM_KEY, CUSTOM_VALUE}, 0));
     }
 }
