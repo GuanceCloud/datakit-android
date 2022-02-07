@@ -92,7 +92,7 @@ public class FTDBManager extends DBManager {
      * @return
      */
     public void initSumAction(ActionBean data) {
-        LogUtils.d(TAG, "initSumAction:id" + data.getId() + ",Viewname:" + data.getViewName()
+        LogUtils.d(TAG, "initSumAction,id:" + data.getId() + ",Viewname:" + data.getViewName()
                 + ",actionName:" + data.getActionName());
 
         getDB(true, db -> {
@@ -403,7 +403,7 @@ public class FTDBManager extends DBManager {
     }
 
     public List<SyncJsonData> queryDataByDataByTypeLimitDesc(int limit, DataType dataType) {
-        return queryDataByDescLimit(limit, FTSQL.RECORD_COLUMN_DATA_TYPE + "=? ", new String[]{dataType.getValue()},"desc");
+        return queryDataByDescLimit(limit, FTSQL.RECORD_COLUMN_DATA_TYPE + "=? ", new String[]{dataType.getValue()}, "desc");
     }
 
     /**

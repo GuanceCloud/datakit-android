@@ -1,8 +1,11 @@
 package com.ft.tests;
 
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
+import static com.ft.AllTests.hasPrepare;
+
 import android.content.Context;
 import android.os.Looper;
-import android.util.Log;
 
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.matcher.ViewMatchers;
@@ -33,10 +36,6 @@ import org.junit.runner.RunWith;
 import org.powermock.reflect.Whitebox;
 
 import java.util.List;
-
-import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.action.ViewActions.click;
-import static com.ft.AllTests.hasPrepare;
 
 @RunWith(AndroidJUnit4.class)
 public class RUMActionSumTest extends BaseTest {
@@ -76,7 +75,6 @@ public class RUMActionSumTest extends BaseTest {
         Thread.sleep(1000);
         avoidCrash();
         onView(ViewMatchers.withId(R.id.main_mock_okhttp_btn)).perform(ViewActions.scrollTo()).perform(click());
-
         syncActionCount();
 
         Thread.sleep(5000);
@@ -102,6 +100,7 @@ public class RUMActionSumTest extends BaseTest {
 
 
         onView(ViewMatchers.withId(R.id.main_mock_crash_btn)).perform(ViewActions.scrollTo()).perform(click());
+        checkActionClose();
         syncActionCount();
 
         Thread.sleep(5000);
@@ -112,14 +111,13 @@ public class RUMActionSumTest extends BaseTest {
                 JSONObject json = new JSONObject(recordData.getDataString());
                 JSONObject fields = json.optJSONObject("fields");
                 String measurement = json.optString("measurement");
-//                if ("action".equals(measurement)) {
-//                    Log.e("RUMActionSumTest",recordData.getDataString());
-//                    if (fields != null) {
-//                        int error_count = fields.optInt("action_error_count");
-//                        Assert.assertEquals(1, error_count);
-//                        break;
-//                    }
-//                }
+                if ("action".equals(measurement)) {
+                    if (fields != null) {
+                        int error_count = fields.optInt("action_error_count");
+                        Assert.assertEquals(1, error_count);
+                        break;
+                    }
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -130,6 +128,12 @@ public class RUMActionSumTest extends BaseTest {
     private void syncActionCount() throws Exception {
         Thread.sleep(1000);
         Whitebox.invokeMethod(FTRUMGlobalManager.get(), "generateRumData");
+    }
+
+    private void checkActionClose() throws Exception {
+        Thread.sleep(500);
+        Whitebox.invokeMethod(FTRUMGlobalManager.get(), "checkActionClose");
+
     }
 
 }
