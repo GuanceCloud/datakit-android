@@ -65,20 +65,22 @@ public class FTTraceInterceptor implements Interceptor {
                     null, 0, exception.getMessage());
             throw new IOException(exception);
         } else {
-            String responseBody = "";
+            String responseBodyString = "";
             String errorMsg = "";
             int code = response.code();
             if (code >= HttpURLConnection.HTTP_BAD_REQUEST) {
-                Response.Builder responseBuilder = response.newBuilder();
-                Response clone = responseBuilder.build();
-                ResponseBody responseBody1 = clone.body();
-                if (HttpHeaders.hasBody(clone)) {
-                    if (responseBody1 != null) {
-                        if (isSupportFormat(responseBody1.contentType())) {
-                            byte[] bytes = Utils.toByteArray(responseBody1.byteStream());
-                            MediaType contentType = responseBody1.contentType();
-                            responseBody = new String(bytes, Utils.getCharset(contentType));
-                            errorMsg = responseBody;
+                ResponseBody responseBody = response.body();
+                if (HttpHeaders.hasBody(response)) {
+                    if (responseBody != null) {
+                        if (isSupportFormat(responseBody.contentType())) {
+                            byte[] bytes = Utils.toByteArray(responseBody.byteStream());
+                            MediaType contentType = responseBody.contentType();
+                            responseBodyString = new String(bytes, Utils.getCharset(contentType));
+                            errorMsg = responseBodyString;
+
+                            ResponseBody copyResponseBody = ResponseBody.create(responseBody.contentType(), bytes);
+                            response = response.newBuilder().body(copyResponseBody).build();
+
                         }
                     }
                 }

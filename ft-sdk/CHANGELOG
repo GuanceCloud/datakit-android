@@ -1,3 +1,7 @@
+# agent 1.3.1-alpha15
+1.修正 trace 发挥 400 以上错误时，ResponseBody 无法  read 的问题
+
+---
 # agent 1.3.1-alpha14
 1.修复单个 Trace 数据不触发同步的问题
 

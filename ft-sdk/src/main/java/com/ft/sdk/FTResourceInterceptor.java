@@ -42,20 +42,18 @@ public class FTResourceInterceptor extends NetStatusMonitor implements Intercept
         if (exception != null) {
             throw new IOException(exception);
         } else {
-            String responseBody = "";
-            Response.Builder responseBuilder = response.newBuilder();
-            Response clone = responseBuilder.build();
-            ResponseBody responseBody1 = clone.body();
-            if (HttpHeaders.hasBody(clone)) {
-                if (responseBody1 != null) {
-                    byte[] bytes = Utils.toByteArray(responseBody1.byteStream());
-                    MediaType contentType = responseBody1.contentType();
-                    responseBody = new String(bytes, Utils.getCharset(contentType));
-                    responseBody1 = ResponseBody.create(responseBody1.contentType(), bytes);
-                    response = response.newBuilder().body(responseBody1).build();
+            String responseBodyString = "";
+            ResponseBody responseBody = response.body();
+            if (HttpHeaders.hasBody(response)) {
+                if (responseBody != null) {
+                    byte[] bytes = Utils.toByteArray(responseBody.byteStream());
+                    MediaType contentType = responseBody.contentType();
+                    responseBodyString = new String(bytes, Utils.getCharset(contentType));
+                    ResponseBody copyResponseBody = ResponseBody.create(responseBody.contentType(), bytes);
+                    response = response.newBuilder().body(copyResponseBody).build();
 
                     params.responseHeader = response.headers().toString();
-                    params.responseBody = responseBody;
+                    params.responseBody = responseBodyString;
                     params.responseContentType = response.header("Content-Type");
                     params.responseConnection = response.header("Connection");
                     params.responseContentEncoding = response.header("Content-Encoding");
