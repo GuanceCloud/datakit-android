@@ -5,6 +5,7 @@ import static com.ft.sdk.garble.utils.Constants.USER_AGENT;
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.garble.utils.DeviceUtils;
+import com.ft.sdk.garble.utils.LogUtils;
 
 /**
  * BY huangDianHua
@@ -12,6 +13,7 @@ import com.ft.sdk.garble.utils.DeviceUtils;
  * Description:
  */
 public class FTHttpConfigManager {
+    private static final String TAG = "FTHttpConfigManager";
     private static volatile FTHttpConfigManager instance;
     public String serverUrl;
     public String uuid;
@@ -41,6 +43,8 @@ public class FTHttpConfigManager {
         useOaid = ftsdkConfig.isUseOAID();
         uuid = DeviceUtils.getSDKUUid(FTApplication.getApplication());
         userAgent = USER_AGENT;
+
+        LogUtils.d(TAG, "serverUrl:" + serverUrl);
 
     }
 
