@@ -24,9 +24,6 @@ public class FTSDKConfig {
     // SDK 是否只支持在主进程中初始化
     private boolean onlySupportMainProcess = true;
 
-    //
-    private boolean backendSample = false;
-
     private final HashMap<String, Object> globalContext = new HashMap<>();
 
     /**
@@ -140,20 +137,7 @@ public class FTSDKConfig {
         return this;
     }
 
-    /**
-     * 设置 BackendSample 后端采样，当为 true 时，log trace，rum sampleRate 设置不再起效
-     *
-     * @param backendSample
-     * @return
-     */
-    public FTSDKConfig setBackendSample(boolean backendSample) {
-        this.backendSample = backendSample;
-        return this;
-    }
 
-    public boolean isBackendSample() {
-        return this.backendSample;
-    }
 
     /**
      * 获取全局属性

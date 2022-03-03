@@ -228,9 +228,6 @@ public class FTSdk {
     private void appendGlobalContext(FTSDKConfig config) {
         HashMap<String, Object> hashMap = config.getGlobalContext();
         hashMap.put(Constants.KEY_APP_VERSION_NAME, Utils.getAppVersionName());
-        if (config.isBackendSample()) {
-//            hashMap.put(Constants.KEY_BACKENDSAMPLE, 1);
-        }
         hashMap.put(Constants.KEY_SDK_NAME, Constants.SDK_NAME);
         hashMap.put(Constants.KEY_APPLICATION_UUID, FTSdk.PACKAGE_UUID);
         hashMap.put(Constants.KEY_ENV, config.getEnv().toString());
