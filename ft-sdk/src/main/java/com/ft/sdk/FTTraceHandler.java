@@ -2,6 +2,7 @@ package com.ft.sdk;
 
 import com.ft.sdk.garble.bean.TraceBean;
 import com.ft.sdk.garble.http.HttpUrl;
+import com.ft.sdk.garble.utils.SkyWalkingUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONObject;
@@ -55,7 +56,7 @@ public class FTTraceHandler {
 
     }
 
-     HashMap<String, String> getTraceHeader(HttpUrl httpUrl) {
+    HashMap<String, String> getTraceHeader(HttpUrl httpUrl) {
 
         if (config == null) return new HashMap<>();
         this.httpUrl = httpUrl;
@@ -91,13 +92,13 @@ public class FTTraceHandler {
             headers.put(DD_TRACE_SAMPLING_PRIORITY_KEY, sampled);
             headers.put(DD_TRACE_SPAN_ID_KEY, spanID);
             headers.put(DD_TRACE_TRACE_ID_KEY, traceID);
+        } else if (config.getTraceType() == TraceType.SKYWALKING_V3) {
+            SkyWalkingUtils skyWalkingUtils = new SkyWalkingUtils(SkyWalkingUtils.SkyWalkingVersion.V3, sampled, requestTime, httpUrl, config);
+            traceID = skyWalkingUtils.getNewTraceId();
+            spanID = skyWalkingUtils.getNewParentTraceId() + "0";
+            headers.put(SKYWALKING_V3_SW_8, skyWalkingUtils.getSw());
         }
-//        else if (FTHttpConfig.get().traceType == TraceType.SKYWALKING_V3) {
-//            SkyWalkingUtils skyWalkingUtils = new SkyWalkingUtils(SkyWalkingUtils.SkyWalkingVersion.V3, sampled, requestTime, httpUrl);
-//            traceID = skyWalkingUtils.getNewTraceId();
-//            spanID = skyWalkingUtils.getNewParentTraceId() + "0";
-//            headers.put(SKYWALKING_V3_SW_8, skyWalkingUtils.getSw());
-//        } else if (FTHttpConfig.get().traceType == TraceType.SKYWALKING_V2) {
+//        else if (FTHttpConfig.get().traceType == TraceType.SKYWALKING_V2) {
 //            SkyWalkingUtils skyWalkingUtils = new SkyWalkingUtils(SkyWalkingUtils.SkyWalkingVersion.V2, sampled, requestTime, httpUrl);
 //            traceID = skyWalkingUtils.getNewTraceId();
 //            spanID = skyWalkingUtils.getNewParentTraceId() + "0";
@@ -106,7 +107,7 @@ public class FTTraceHandler {
         return headers;
     }
 
-     void traceDataUpload(JSONObject content, String operationName, boolean isError) {
+    void traceDataUpload(JSONObject content, String operationName, boolean isError) {
         if (!enableTrace) {
             return;
         }
