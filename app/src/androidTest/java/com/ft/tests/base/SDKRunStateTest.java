@@ -21,7 +21,7 @@ import com.ft.sdk.FTTraceConfig;
 import com.ft.sdk.FTTraceConfigManager;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.TraceType;
-import com.ft.sdk.garble.FTMonitorConfigManager;
+import com.ft.sdk.FTMonitorConfigManager;
 
 import org.junit.Assert;
 import org.junit.Before;

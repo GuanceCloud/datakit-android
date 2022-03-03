@@ -1,6 +1,6 @@
 package com.ft.sdk.garble.service;
 
-import com.ft.sdk.garble.FTMonitorConfigManager;
+import com.ft.sdk.FTMonitorConfigManager;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.http.ResponseData;

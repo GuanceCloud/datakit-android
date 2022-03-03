@@ -5,7 +5,6 @@ import android.os.Looper;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.garble.FTMonitorConfigManager;
 import com.ft.sdk.garble.bean.ActionBean;
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.ErrorSource;
@@ -43,6 +42,7 @@ public class FTRUMGlobalManager {
     static final long SESSION_EXPIRE_TIME = 1440000000000000L;
     static final long FILTER_CAPACITY = 5;
     private final ConcurrentHashMap<String, ResourceBean> resourceBeanMap = new ConcurrentHashMap<>();
+    private ArrayList<String> viewList = new ArrayList<>();
 
     private FTRUMGlobalManager() {
 
@@ -181,7 +181,7 @@ public class FTRUMGlobalManager {
         }
     }
 
-    void onCreateView(String viewName, long loadTime) {
+    public void onCreateView(String viewName, long loadTime) {
         preActivityDuration.put(viewName, loadTime);
     }
 
@@ -189,34 +189,63 @@ public class FTRUMGlobalManager {
     /**
      * view 起始
      *
-     * @param viewName     当前页面名称
-     * @param viewReferrer 前一页面名称
+     * @param viewName 当前页面名称
      */
-    public void startView(String viewName, String viewReferrer) {
+    public void startView(String viewName) {
+        if (!viewList.contains(viewName)) {
+            viewList.add(viewName);
+            if (viewList.size() > 2) {
+                viewList.remove(0);
+            }
+        }
+
         checkSessionRefresh();
         if (activeView != null && !activeView.isClose()) {
             activeView.close();
             closeView(activeView.getId(), activeView.getTimeSpent());
         }
 
+
         long loadTime = -1;
         if (preActivityDuration.get(viewName) != null) {
             loadTime = preActivityDuration.get(viewName);
             preActivityDuration.remove(viewName);
         }
+        String viewReferrer = getLastView();
         activeView = new ViewBean(viewName, viewReferrer, loadTime, sessionId);
         initView(activeView);
 
     }
 
     /**
+     * 获取上一页面
+     *
+     * @return
+     */
+    String getLastView() {
+        LogUtils.d(TAG, viewList.toString());
+        if (viewList.size() > 1) {
+            String viewName = viewList.get(viewList.size() - 2);
+            if (viewName != null) {
+                return viewName;
+            } else {
+                return Constants.FLOW_ROOT;
+            }
+        } else {
+            return Constants.FLOW_ROOT;
+        }
+    }
+
+    /**
      * view 结束
      */
     public void stopView() {
+        LogUtils.d(TAG, "stopView");
         checkActionClose();
 
         activeView.close();
         closeView(activeView.getId(), activeView.getTimeSpent());
+
     }
 
     private void initAction(ActionBean bean) {
@@ -755,7 +784,7 @@ public class FTRUMGlobalManager {
         }
     }
 
-    public void initParams(FTRUMConfig config) {
+     void initParams(FTRUMConfig config) {
         checkSessionKeep(sessionId, config.getSamplingRate());
         EventConsumerThreadPool.get().execute(() -> {
             FTDBManager.get().closeAllActionAndView();
@@ -780,6 +809,7 @@ public class FTRUMGlobalManager {
 
     public void release() {
         mHandler.removeCallbacks(mRUMGenerateRunner);
+        viewList.clear();
     }
 
 

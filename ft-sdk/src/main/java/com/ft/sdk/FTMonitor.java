@@ -7,7 +7,6 @@ import android.os.Message;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.garble.FTMonitorConfigManager;
 import com.ft.sdk.garble.service.MonitorService;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;

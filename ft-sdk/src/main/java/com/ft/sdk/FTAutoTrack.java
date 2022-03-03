@@ -18,25 +18,18 @@ import androidx.annotation.Nullable;
 
 import com.ft.sdk.garble.FTAutoTrackConfigManager;
 import com.ft.sdk.garble.FTFragmentManager;
-import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.Constants;
-import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.sdk.garble.utils.NetUtils;
-import com.ft.sdk.garble.utils.OaidUtils;
 import com.ft.sdk.garble.utils.Utils;
 import com.google.android.material.tabs.TabLayout;
-import com.google.gson.Gson;
 
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.json.JSONObject;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 import okhttp3.OkHttpClient;
@@ -355,7 +348,7 @@ public class FTAutoTrack {
         if (!FTAutoTrackConfigManager.get().enableAutoTrackType(FTAutoTrackType.APP_START)) {
             return;
         }
-        putPageEvent(Utils.getCurrentNanoTime(), OP.LANC, null, null, null, null);
+        putPageEvent(Utils.getCurrentNanoTime(), OP.LANC, null, null, null);
     }
 
 
@@ -600,7 +593,7 @@ public class FTAutoTrack {
      */
     public static void putClickEvent(@NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String vtp) {
         long time = Utils.getCurrentNanoTime();
-        putPageEvent(time, op, currentPage, rootPage, null, vtp);
+        putPageEvent(time, op, currentPage, rootPage, vtp);
     }
 
     /**
@@ -621,7 +614,7 @@ public class FTAutoTrack {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        putPageEvent(time, op, currentPage, rootPage, parentPage, null);
+        putPageEvent(time, op, currentPage, rootPage, null);
     }
 
     /**
@@ -632,28 +625,28 @@ public class FTAutoTrack {
      */
     public static void putActivityEvent(@NonNull OP op, Class classCurrent) {
         long time = Utils.getCurrentNanoTime();
-        Class parentClass = FTActivityManager.get().getLastActivity();
-        String parentPageName = Constants.FLOW_ROOT;
-        if (op == OP.OPEN_ACT) {
-            //是第一次加载 Activity ，说明其为从其他Activity 中打开
-            //如果没有上一个 Activity 说明其为 根结点
-            if (parentClass != null) {
-                //判断从 上一个 页面的Activity 还是 Fragment 中打开
-                boolean isFromFragment = FTActivityManager.get().getActivityOpenFromFragment(classCurrent.getName());
-                if (isFromFragment) {
-                    //从 Fragment 打开则找到上一个页面的 Fragment
-                    Class c = FTFragmentManager.getInstance().getLastFragmentName(parentClass.getName());
-                    if (c != null) {
-                        parentPageName = parentClass.getSimpleName() + "." + c.getSimpleName();
-                    } else {
-                        parentPageName = parentClass.getSimpleName();
-                    }
-                } else {
-                    //从Activity 中打开则找到上一个Activity
-                    parentPageName = parentClass.getSimpleName();
-                }
-            }
-        }
+//        Class parentClass = FTActivityManager.get().getLastActivity();
+//        String parentPageName = Constants.FLOW_ROOT;
+//        if (op == OP.OPEN_ACT) {
+//            //是第一次加载 Activity ，说明其为从其他Activity 中打开
+//            //如果没有上一个 Activity 说明其为 根结点
+//            if (parentClass != null) {
+//                //判断从 上一个 页面的Activity 还是 Fragment 中打开
+//                boolean isFromFragment = FTActivityManager.get().getActivityOpenFromFragment(classCurrent.getName());
+//                if (isFromFragment) {
+//                    //从 Fragment 打开则找到上一个页面的 Fragment
+//                    Class c = FTFragmentManager.getInstance().getLastFragmentName(parentClass.getName());
+//                    if (c != null) {
+//                        parentPageName = parentClass.getSimpleName() + "." + c.getSimpleName();
+//                    } else {
+//                        parentPageName = parentClass.getSimpleName();
+//                    }
+//                } else {
+//                    //从Activity 中打开则找到上一个Activity
+//                    parentPageName = parentClass.getSimpleName();
+//                }
+//            }
+//        }
         try {
             if (op == OP.OPEN_ACT) {
                 LogUtils.showAlias("当前页面的 name 值为:" + classCurrent.getSimpleName());
@@ -661,11 +654,11 @@ public class FTAutoTrack {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        putPageEvent(time, op, classCurrent.getSimpleName(), classCurrent.getSimpleName(), parentPageName, null);
+        putPageEvent(time, op, classCurrent.getSimpleName(), classCurrent.getSimpleName(), null);
     }
 
     private static void putPageEvent(long time, @NonNull OP op, @Nullable String currentPage,
-                                     @Nullable String rootPage, @Nullable String parentPage, @Nullable String vtp) {
+                                     @Nullable String rootPage, @Nullable String vtp) {
         try {
 //            if (vtp != null) {
 //                tags.put("vtp", vtp);
@@ -693,7 +686,7 @@ public class FTAutoTrack {
 //                SyncDataHelper.addMonitorData(tags,fields);
 //            }
 
-            handleOp(currentPage, op, parentPage, vtp);
+            handleOp(currentPage, op, vtp);
 
         } catch (Exception e) {
             LogUtils.e(TAG, e.toString());
@@ -734,11 +727,11 @@ public class FTAutoTrack {
         }
     }
 
-    private static void handleOp(String currentPage, OP op, String parentPage, @Nullable String vtp) {
-        handleOp(currentPage, op, parentPage, 0, vtp);
+    private static void handleOp(String currentPage, OP op, @Nullable String vtp) {
+        handleOp(currentPage, op, 0, vtp);
     }
 
-    private static void handleOp(String currentPage, OP op, String parentPage, long duration, @Nullable String vtp) {
+    private static void handleOp(String currentPage, OP op, long duration, @Nullable String vtp) {
         FTRUMConfigManager manager = FTRUMConfigManager.get();
         if (!manager.isRumEnable()) {
             return;
@@ -777,7 +770,7 @@ public class FTAutoTrack {
             case OPEN_ACT:
 //            case OPEN_FRA:
                 event = Constants.EVENT_NAME_ENTER;
-                FTRUMGlobalManager.get().startView(currentPage, parentPage);
+                FTRUMGlobalManager.get().startView(currentPage);
                 break;
             case CLS_ACT:
 //            case CLS_FRA:
@@ -803,7 +796,7 @@ public class FTAutoTrack {
             String[] arr = desc.split("\\|");
             String[] names = arr[0].split("/");
             String pageName = names[names.length - 1];
-            handleOp(pageName, OP.OPEN, null, cost * 1000, null);
+            handleOp(pageName, OP.OPEN, cost * 1000, null);
         } catch (Exception e) {
             e.printStackTrace();
         }

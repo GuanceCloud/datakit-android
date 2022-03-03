@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.garble.FTMonitorConfigManager;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;

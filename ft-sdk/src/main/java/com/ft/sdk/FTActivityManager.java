@@ -21,15 +21,12 @@ public final class FTActivityManager {
     private static volatile FTActivityManager instance;
     //栈顶 Activity
     private Activity topActivity;
-    //存在的 Activity
-    private List<Activity> activityList;
 
     private ConcurrentHashMap<String, Boolean> activityOpenTypeMap;
 
     private AppState appState = AppState.STARTUP;
 
     private FTActivityManager() {
-        activityList = new ArrayList<>();
         activityOpenTypeMap = new ConcurrentHashMap<>();
     }
 
@@ -45,15 +42,6 @@ public final class FTActivityManager {
     }
 
     /**
-     * 获取当前存活的Activity
-     *
-     * @return
-     */
-    int getActiveCount() {
-        return activityList == null ? 0 : activityList.size();
-    }
-
-    /**
      * 获得栈顶Activity
      *
      * @return
@@ -65,35 +53,7 @@ public final class FTActivityManager {
 
     void putActivity(Activity activity) {
         topActivity = activity;
-        if (activityList == null) {
-            activityList = new ArrayList<>();
-        }
-
-        activityList.add(activity);
-        if (activityList.size() > 2) {
-            activityList.remove(0);
-        }
     }
-
-
-    /**
-     * 得到上一个 Activity
-     *
-     * @return
-     */
-    Class getLastActivity() {
-        if (activityList != null && activityList.size() > 1) {
-            Activity activity = activityList.get(activityList.size() - 2);
-            if (activity != null) {
-                return activity.getClass();
-            } else {
-                return null;
-            }
-        } else {
-            return null;
-        }
-    }
-
 
     /**
      * 存储每个 Activity 是由什么方式打开的

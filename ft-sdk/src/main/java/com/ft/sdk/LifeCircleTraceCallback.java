@@ -116,13 +116,11 @@ class LifeCircleTraceCallback {
     }
 
     public void onPostDestroy(Context context) {
-        boolean empty = FTActivityManager.get().getActiveCount() == 0;
-        if (empty) {
+        mCreateMap.remove(context);
+        if (mCreateMap.isEmpty()) {
             mInited = false;
             LogUtils.d(TAG, "Application all close");
         }
-
-        mCreateMap.remove(context);
     }
 
     /**

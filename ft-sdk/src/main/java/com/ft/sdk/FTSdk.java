@@ -1,13 +1,10 @@
 package com.ft.sdk;
 
-import android.content.Context;
-
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.FTAutoTrackConfigManager;
 import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.FTHttpConfigManager;
-import com.ft.sdk.garble.FTMonitorConfigManager;
 import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;

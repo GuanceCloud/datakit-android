@@ -1,6 +1,5 @@
-package com.ft.sdk.garble;
+package com.ft.sdk;
 
-import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.garble.utils.CameraUtils;
 import com.ft.sdk.garble.utils.FpsUtils;
 import com.ft.sdk.garble.utils.SensorUtils;
@@ -44,7 +43,7 @@ public class FTMonitorConfigManager {
         }
     }
 
-    public void initWithConfig(FTRUMConfig config) {
+    void initWithConfig(FTRUMConfig config) {
         monitorType = config.getExtraMonitorTypeWithError();
 //        geoKey = ftsdkConfig.getGeoKey();
 //        useGeoKey = ftsdkConfig.isUseGeoKey();

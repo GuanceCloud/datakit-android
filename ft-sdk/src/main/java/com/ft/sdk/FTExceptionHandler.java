@@ -55,7 +55,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     private FTRUMConfig config;
 
-    public void initConfig(FTRUMConfig config) {
+    void initConfig(FTRUMConfig config) {
         this.config = config;
     }
 

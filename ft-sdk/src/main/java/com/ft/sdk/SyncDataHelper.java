@@ -6,7 +6,6 @@ import static com.ft.sdk.garble.utils.Constants.UNKNOWN;
 import android.bluetooth.BluetoothDevice;
 import android.location.Address;
 
-import com.ft.sdk.garble.FTMonitorConfigManager;
 import com.ft.sdk.garble.bean.BatteryBean;
 import com.ft.sdk.garble.bean.CameraPx;
 import com.ft.sdk.garble.bean.DataType;
