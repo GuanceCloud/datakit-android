@@ -18,14 +18,13 @@ public class SkyWalkingUtils {
         V2, V3
     }
 
-    private static AtomicInteger increasingNumber = new AtomicInteger(-1);
-    private static AtomicLong increasingLong = new AtomicLong(0);
-    private static String traceIDUUID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
-    private static String parentServiceUUID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
+    private final static AtomicInteger increasingNumber = new AtomicInteger(-1);
+    private final static AtomicLong increasingLong = new AtomicLong(0);
+    private final static String traceIDUUID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
+    private final static String parentServiceUUID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
     private String sw8;
     private String newTraceId;
     private String newParentTraceId;
-    private FTTraceConfig config;
 
     public SkyWalkingUtils(SkyWalkingVersion version, String sampled, long requestTime, HttpUrl url, FTTraceConfig config) {
         synchronized (SkyWalkingUtils.class) {//防止多线程 increasingNumber 不安顺序增加
@@ -35,12 +34,12 @@ public class SkyWalkingUtils {
                 increasingNumber.set(1);
             }
             if (version == SkyWalkingVersion.V3) {
-                createSw8Head(sampled, requestTime, url);
+                createSw8Head(sampled, requestTime, url, config);
             } else if (version == SkyWalkingVersion.V2) {
                 increasingLong.getAndIncrement();
                 createSw6Head(sampled, requestTime, url);
             }
-            this.config = config;
+
         }
     }
 
@@ -56,14 +55,14 @@ public class SkyWalkingUtils {
         return newParentTraceId;
     }
 
-    private void createSw8Head(String sampled, long requestTime, HttpUrl url) {
+    private void createSw8Head(String sampled, long requestTime, HttpUrl url, FTTraceConfig config) {
         newParentTraceId = traceIDUUID + "." + Thread.currentThread().getId() + "." + requestTime + String.format(Locale.getDefault(), "%04d", increasingNumber.get() - 1);
         newTraceId = traceIDUUID + "." + Thread.currentThread().getId() + "." + requestTime + String.format(Locale.getDefault(), "%04d", increasingNumber.get());
         sw8 = sampled + "-" +
                 Utils.encodeStringToBase64(newTraceId) + "-" +
                 Utils.encodeStringToBase64(newParentTraceId) + "-" +
                 "0-" +
-                Utils.encodeStringToBase64(config.getServiceName()) + "-" +
+                Utils.encodeStringToBase64(config.getServiceName() + "") + "-" +
                 Utils.encodeStringToBase64(parentServiceUUID + "@" + NetUtils.get().getMobileIpAddress()) + "-" +
                 Utils.encodeStringToBase64(url.getPath()) + "-" +
                 Utils.encodeStringToBase64(url.getHost() + ":" + url.getPort());

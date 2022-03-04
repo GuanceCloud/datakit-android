@@ -6,9 +6,11 @@ public enum TraceType {
     SKYWALKING_V3,
     JAEGER;
 
-
     @Override
     public String toString() {
+        if (this.equals(SKYWALKING_V3)) {
+            return "skywalking";
+        }
         return super.toString().toLowerCase();
     }
 }
