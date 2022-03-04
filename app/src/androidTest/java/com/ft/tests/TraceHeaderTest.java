@@ -3,6 +3,8 @@ package com.ft.tests;
 import static com.ft.AllTests.hasPrepare;
 import static com.ft.sdk.FTTraceHandler.DD_TRACE_TRACE_ID_KEY;
 import static com.ft.sdk.FTTraceHandler.JAEGER_KEY;
+import static com.ft.sdk.FTTraceHandler.SKYWALKING_V3_SW_8;
+import static com.ft.sdk.FTTraceHandler.W3C_TRACEPARENT_KEY;
 import static com.ft.sdk.FTTraceHandler.ZIPKIN_SAMPLED;
 import static com.ft.sdk.FTTraceHandler.ZIPKIN_SPAN_ID;
 import static com.ft.sdk.FTTraceHandler.ZIPKIN_TRACE_ID;
@@ -113,14 +115,25 @@ public class TraceHeaderTest extends BaseTest {
         Assert.assertTrue(expect);
     }
 
-//    @Test
-//    public void traceSkyWalkingV3HeaderTest() {
-//        ftsdkConfig.setTraceType(TraceType.SKYWALKING_V3);
-//        FTSdk.install(ftsdkConfig);
-//        Request request = requestUrl("http://www.weather.com.cn/data/sk/101010100.html");
-//        boolean expect = request.headers().names().contains(SKYWALKING_V3_SW_8);
-//        Assert.assertTrue(expect);
-//    }
+    @Test
+    public void traceSkyWalkingV3HeaderTest() {
+        FTSdk.initTraceWithConfig(new FTTraceConfig()
+                .setEnableAutoTrace(true)
+                .setTraceType(TraceType.SKYWALKING_V3));
+        Request request = requestUrl("http://www.weather.com.cn/data/sk/101010100.html");
+        boolean expect = request.headers().names().contains(SKYWALKING_V3_SW_8);
+        Assert.assertTrue(expect);
+    }
+
+    @Test
+    public void traceW3CTraceParentTest() {
+        FTSdk.initTraceWithConfig(new FTTraceConfig()
+                .setEnableAutoTrace(true)
+                .setTraceType(TraceType.W3C_TRACEPARENT));
+        Request request = requestUrl("http://www.weather.com.cn/data/sk/101010100.html");
+        boolean expect = request.headers().names().contains(W3C_TRACEPARENT_KEY);
+        Assert.assertTrue(expect);
+    }
 //
 //    @Test
 //    public void traceSkyWalkingV2HeaderTest() {
