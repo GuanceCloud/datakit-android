@@ -68,7 +68,7 @@ public class TraceHeaderTest extends BaseTest {
 
     @Test
     public void traceZipKinHeaderTest() {
-        FTSdk.initTraceWithConfig(new FTTraceConfig().setEnableAutoTrace(true).setTraceType(TraceType.ZIPKIN));
+        FTSdk.initTraceWithConfig(new FTTraceConfig().setEnableAutoTrace(true).setTraceType(TraceType.ZIPKIN_MULTI_HEADER));
         Request request = requestUrl("http://www.weather.com.cn/data/sk/101010100.html");
         boolean expect = request.headers().names().contains(ZIPKIN_SPAN_ID) &&
                 request.headers().names().contains(ZIPKIN_TRACE_ID) &&
@@ -80,7 +80,7 @@ public class TraceHeaderTest extends BaseTest {
     public void traceZipKinHeaderSpanIdFormatTest() {
         FTSdk.initTraceWithConfig(new FTTraceConfig()
                 .setEnableAutoTrace(true)
-                .setTraceType(TraceType.ZIPKIN));
+                .setTraceType(TraceType.ZIPKIN_MULTI_HEADER));
         Request request = requestUrl("http://www.weather.com.cn/data/sk/101010100.html");
         String spanId = request.headers().get(ZIPKIN_SPAN_ID);
         boolean spanIdResult = spanId.length() == 16;

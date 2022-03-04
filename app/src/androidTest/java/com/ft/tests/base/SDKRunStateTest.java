@@ -65,7 +65,7 @@ public class SDKRunStateTest extends BaseTest {
 
         FTSdk.initTraceWithConfig(new FTTraceConfig()
                 .setEnableAutoTrace(true)
-                .setTraceType(TraceType.ZIPKIN));
+                .setTraceType(TraceType.ZIPKIN_MULTI_HEADER));
     }
 
     @Test

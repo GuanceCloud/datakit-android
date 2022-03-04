@@ -19,6 +19,8 @@ public class FTTraceHandler {
     public static final String ZIPKIN_TRACE_ID = "X-B3-TraceId";
     public static final String ZIPKIN_SPAN_ID = "X-B3-SpanId";
     public static final String ZIPKIN_SAMPLED = "X-B3-Sampled";
+    public static final String ZIPKIN_B3_HEADER = "b3";
+    public static final String W3C_TRACEPARENT_KEY = "traceparent";
     public static final String JAEGER_KEY = "uber-trace-id";
     public static final String SKYWALKING_V3_SW_8 = "sw8";
     public static final String SKYWALKING_V3_SW_6 = "sw6";
@@ -71,7 +73,9 @@ public class FTTraceHandler {
         String parentSpanID = "0000000000000000";
 
         //在数据中添加标记
-        if (config.getTraceType() == TraceType.ZIPKIN || config.getTraceType() == TraceType.JAEGER) {
+        if (config.getTraceType() == TraceType.ZIPKIN_MULTI_HEADER
+                || config.getTraceType() == TraceType.ZIPKIN_SINGLE_HEADER
+                || config.getTraceType() == TraceType.JAEGER) {
             traceID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
             spanID = Utils.getGUID_16();
         } else if (config.getTraceType() == TraceType.DDTRACE) {
@@ -79,10 +83,16 @@ public class FTTraceHandler {
             spanID = Utils.getDDtraceNewId().longValue() + "";
         }
 
-        if (config.getTraceType() == TraceType.ZIPKIN) {
+        if (config.getTraceType() == TraceType.ZIPKIN_MULTI_HEADER) {
             headers.put(ZIPKIN_SPAN_ID, spanID);
             headers.put(ZIPKIN_TRACE_ID, traceID);
             headers.put(ZIPKIN_SAMPLED, sampled);
+        } else if (config.getTraceType() == TraceType.ZIPKIN_SINGLE_HEADER) {
+            headers.put(ZIPKIN_B3_HEADER, traceID + "-" + spanID + "-" + sampled + "-" + parentSpanID);
+        } else if (config.getTraceType() == TraceType.W3C_TRACEPARENT) {
+            String version = "00";
+            String sampledStr = "0" + sampled;
+            headers.put(W3C_TRACEPARENT_KEY, version + "-" + traceID + "-" + parentSpanID + "-" + sampledStr);
         } else if (config.getTraceType() == TraceType.JAEGER) {
             headers.put(JAEGER_KEY, traceID + ":" + spanID + ":" + parentSpanID + ":" + sampled);
         } else if (config.getTraceType() == TraceType.DDTRACE) {
