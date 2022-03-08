@@ -61,37 +61,38 @@ public class FTTraceInterceptor implements Interceptor {
         }
 
         if (exception != null) {
-            FTTraceManager.get().addTrace(uniqueKey, request.method(), requestHeaders,
-                    null, 0, exception.getMessage());
+//            FTTraceManager.get().addTrace(uniqueKey, request.method(), requestHeaders,
+//                    null, 0, exception.getMessage());
             throw new IOException(exception);
-        } else {
-            String responseBodyString = "";
-            String errorMsg = "";
-            int code = response.code();
-            if (code >= HttpURLConnection.HTTP_BAD_REQUEST) {
-                ResponseBody responseBody = response.body();
-                if (HttpHeaders.hasBody(response)) {
-                    if (responseBody != null) {
-                        if (isSupportFormat(responseBody.contentType())) {
-                            byte[] bytes = Utils.toByteArray(responseBody.byteStream());
-                            MediaType contentType = responseBody.contentType();
-                            responseBodyString = new String(bytes, Utils.getCharset(contentType));
-                            errorMsg = responseBodyString;
-
-                            ResponseBody copyResponseBody = ResponseBody.create(responseBody.contentType(), bytes);
-                            response = response.newBuilder().body(copyResponseBody).build();
-
-                        }
-                    }
-                }
-            }
-            HashMap<String, String> responseHeaders = new HashMap<>();
-            for (String key : response.headers().names()) {
-                responseHeaders.put(key, response.header(key));
-            }
-            FTTraceManager.get().addTrace(uniqueKey, request.method(),
-                    requestHeaders, responseHeaders, response.code(), errorMsg);
         }
+//        else {
+//            String responseBodyString = "";
+//            String errorMsg = "";
+//            int code = response.code();
+//            if (code >= HttpURLConnection.HTTP_BAD_REQUEST) {
+//                ResponseBody responseBody = response.body();
+//                if (HttpHeaders.hasBody(response)) {
+//                    if (responseBody != null) {
+//                        if (isSupportFormat(responseBody.contentType())) {
+//                            byte[] bytes = Utils.toByteArray(responseBody.byteStream());
+//                            MediaType contentType = responseBody.contentType();
+//                            responseBodyString = new String(bytes, Utils.getCharset(contentType));
+//                            errorMsg = responseBodyString;
+//
+//                            ResponseBody copyResponseBody = ResponseBody.create(responseBody.contentType(), bytes);
+//                            response = response.newBuilder().body(copyResponseBody).build();
+//
+//                        }
+//                    }
+//                }
+//            }
+//            HashMap<String, String> responseHeaders = new HashMap<>();
+//            for (String key : response.headers().names()) {
+//                responseHeaders.put(key, response.header(key));
+//            }
+//            FTTraceManager.get().addTrace(uniqueKey, request.method(),
+//                    requestHeaders, responseHeaders, response.code(), errorMsg);
+//        }
         return response;
     }
 

@@ -64,59 +64,59 @@ public class FTTraceManager {
     }
 
 
-    /**
-     * 发送 trace 数据
-     *
-     * @param key            链路 id
-     * @param httpMethod     请求类型 post ，get
-     * @param requestHeader  请求数据头
-     * @param responseHeader 数据响应头
-     * @param statusCode     http 状态吗
-     * @param errorMsg       请求错误信息
-     */
-    public void addTrace(String key, String httpMethod, HashMap<String, String> requestHeader,
-                         HashMap<String, String> responseHeader, int statusCode,
-                         String errorMsg) {
-        FTTraceManagerContainer container = handlerMap.get(key);
-        if (container != null) {
-            FTTraceHandler handler = container.handler;
-            String url = handler.getUrl().getHoleUrl();
-            String path = handler.getUrl().getPath();
-            String operationName = httpMethod.toUpperCase() + " " + path;
-            JSONObject json = new JSONObject();
-            try {
-                JSONObject requestContent = new JSONObject();
-                requestContent.put("method", httpMethod);
-                requestContent.put("headers", requestHeader);
-                requestContent.put("url", url);
+//    /**
+//     * 发送 trace 数据
+//     *
+//     * @param key            链路 id
+//     * @param httpMethod     请求类型 post ，get
+//     * @param requestHeader  请求数据头
+//     * @param responseHeader 数据响应头
+//     * @param statusCode     http 状态吗
+//     * @param errorMsg       请求错误信息
+//     */
+//    public void addTrace(String key, String httpMethod, HashMap<String, String> requestHeader,
+//                         HashMap<String, String> responseHeader, int statusCode,
+//                         String errorMsg) {
+//        FTTraceManagerContainer container = handlerMap.get(key);
+//        if (container != null) {
+//            FTTraceHandler handler = container.handler;
+//            String url = handler.getUrl().getHoleUrl();
+//            String path = handler.getUrl().getPath();
+//            String operationName = httpMethod.toUpperCase() + " " + path;
+//            JSONObject json = new JSONObject();
+//            try {
+//                JSONObject requestContent = new JSONObject();
+//                requestContent.put("method", httpMethod);
+//                requestContent.put("headers", requestHeader);
+//                requestContent.put("url", url);
+//
+//                JSONObject responseContent = new JSONObject();
+//                responseContent.put("code", statusCode);
+//                responseContent.put("headers", responseHeader);
+//                boolean isError = false;
+//                if (statusCode >= 400) {
+//                    responseContent.put("error", errorMsg);
+//                    isError = true;
+//                }
+//
+//                json.put("requestContent", requestContent);
+//                json.put("responseContent", responseContent);
+//
+//                handler.traceDataUpload(json, operationName, isError);
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        removeByTrace(key);
+//    }
 
-                JSONObject responseContent = new JSONObject();
-                responseContent.put("code", statusCode);
-                responseContent.put("headers", responseHeader);
-                boolean isError = false;
-                if (statusCode >= 400) {
-                    responseContent.put("error", errorMsg);
-                    isError = true;
-                }
-
-                json.put("requestContent", requestContent);
-                json.put("responseContent", responseContent);
-
-                handler.traceDataUpload(json, operationName, isError);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        removeByTrace(key);
-    }
-
-    void removeByTrace(String key) {
-        FTTraceManagerContainer container = handlerMap.get(key);
-        if (container != null) {
-            container.traced = true;
-            checkToRemove(key, container);
-        }
-    }
+//    void removeByTrace(String key) {
+//        FTTraceManagerContainer container = handlerMap.get(key);
+//        if (container != null) {
+//            container.traced = true;
+//            checkToRemove(key, container);
+//        }
+//    }
 
     void removeByAddResource(String key) {
         FTTraceManagerContainer container = handlerMap.get(key);
@@ -135,7 +135,7 @@ public class FTTraceManager {
     }
 
     void checkToRemove(String key, FTTraceManagerContainer container) {
-        if (container.addResourced && container.resourceStop && container.traced
+        if (container.addResourced && container.resourceStop
                 || container.isTimeOut()) {
             handlerMap.remove(key);
         }
@@ -145,7 +145,6 @@ public class FTTraceManager {
      * 检验结束生命周期容器，当 trace stopResource addResource 均调用后，对象会被移除
      */
     static class FTTraceManagerContainer {
-        private boolean traced = false;
         private boolean addResourced = !FTRUMConfigManager.get().isRumEnable();
         private boolean resourceStop = addResourced;
         private final long startTime = System.currentTimeMillis();
