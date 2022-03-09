@@ -245,10 +245,10 @@ public class FTRUMConfigManager {
             Object value = entry.getValue();
             rumGlobalContext.put(key, value.toString());
         }
-        if(config.isBackendSample()){
+//        if(config.isBackendSample()){
             //sample
 //            rumGlobalContext.put(Constants.KEY_BACKENDSAMPLE,"");
-        }
+//        }
         rumGlobalContext.put(Constants.KEY_RUM_CUSTOM_KEYS, new Gson().toJson(customKeys));
         rumGlobalContext.put(Constants.KEY_RUM_APP_ID, config.getRumAppId());
         rumGlobalContext.put(Constants.KEY_RUM_SESSION_TYPE, "user");

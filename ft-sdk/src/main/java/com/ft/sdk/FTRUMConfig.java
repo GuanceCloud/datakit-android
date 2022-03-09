@@ -23,7 +23,7 @@ public class FTRUMConfig {
     //崩溃采集数据附加类型
     private int extraMonitorTypeWithError;
 
-    private boolean backendSample = false;
+//    private boolean backendSample = false;
 
     //设置全局 tag
     private final HashMap<String, Object> globalContext = new HashMap<>();
@@ -123,18 +123,18 @@ public class FTRUMConfig {
     }
 
 
-    /**
-     * 设置 BackendSample 后端采样，当为 true 时，rum sampleRate 设置不再起效
-     *
-     * @param backendSample
-     * @return
-     */
-    public FTRUMConfig setBackendSample(boolean backendSample) {
-        this.backendSample = backendSample;
-        return this;
-    }
-
-    public boolean isBackendSample() {
-        return this.backendSample;
-    }
+//    /**
+//     * 设置 BackendSample 后端采样，当为 true 时，rum sampleRate 设置不再起效
+//     *
+//     * @param backendSample
+//     * @return
+//     */
+//    public FTRUMConfig setBackendSample(boolean backendSample) {
+//        this.backendSample = backendSample;
+//        return this;
+//    }
+//
+//    public boolean isBackendSample() {
+//        return this.backendSample;
+//    }
 }
