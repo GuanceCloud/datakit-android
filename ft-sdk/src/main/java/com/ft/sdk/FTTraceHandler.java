@@ -26,7 +26,7 @@ public class FTTraceHandler {
     public static final String SKYWALKING_V3_SW_6 = "sw6";
 
     public static final String DD_TRACE_TRACE_ID_KEY = "x-datadog-trace-id";
-    public static final String DD_TRACE_SPAN_ID_KEY = "x-datadog-parent-id";
+    public static final String DD_TRACE_PARENT_SPAN_ID_KEY = "x-datadog-parent-id";
     public static final String DD_TRACE_SAMPLING_PRIORITY_KEY = "x-datadog-sampling-priority";
     public static final String DD_TRACE_ORIGIN_KEY = "x-datadog-origin";
     //是否可以采样
@@ -70,12 +70,11 @@ public class FTTraceHandler {
         } else {
             sampled = "0";
         }
-        String parentSpanID = "0000000000000000";
 
         //在数据中添加标记
         if (config.getTraceType() == TraceType.ZIPKIN_MULTI_HEADER
                 || config.getTraceType() == TraceType.ZIPKIN_SINGLE_HEADER
-                || config.getTraceType() == TraceType.JAEGER) {
+                || config.getTraceType() == TraceType.JAEGER || config.getTraceType() == TraceType.W3C_TRACEPARENT) {
             traceID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
             spanID = Utils.getGUID_16();
         } else if (config.getTraceType() == TraceType.DDTRACE) {
@@ -88,19 +87,20 @@ public class FTTraceHandler {
             headers.put(ZIPKIN_TRACE_ID, traceID);
             headers.put(ZIPKIN_SAMPLED, sampled);
         } else if (config.getTraceType() == TraceType.ZIPKIN_SINGLE_HEADER) {
-            headers.put(ZIPKIN_B3_HEADER, traceID + "-" + spanID + "-" + sampled + "-" + parentSpanID);
+            headers.put(ZIPKIN_B3_HEADER, traceID + "-" + spanID + "-" + sampled);
         } else if (config.getTraceType() == TraceType.W3C_TRACEPARENT) {
             String version = "00";
             String sampledStr = "0" + sampled;
-            headers.put(W3C_TRACEPARENT_KEY, version + "-" + traceID + "-" + parentSpanID + "-" + sampledStr);
+            headers.put(W3C_TRACEPARENT_KEY, version + "-" + traceID + "-" + "0000000000000001" + "-" + sampledStr);
         } else if (config.getTraceType() == TraceType.JAEGER) {
+            String parentSpanID = "0";
             headers.put(JAEGER_KEY, traceID + ":" + spanID + ":" + parentSpanID + ":" + sampled);
         } else if (config.getTraceType() == TraceType.DDTRACE) {
             traceID = Utils.getDDtraceNewId().longValue() + "";
             spanID = Utils.getDDtraceNewId().longValue() + "";
             headers.put(DD_TRACE_ORIGIN_KEY, "rum");
             headers.put(DD_TRACE_SAMPLING_PRIORITY_KEY, sampled);
-            headers.put(DD_TRACE_SPAN_ID_KEY, spanID);
+            headers.put(DD_TRACE_PARENT_SPAN_ID_KEY, "0");
             headers.put(DD_TRACE_TRACE_ID_KEY, traceID);
         } else if (config.getTraceType() == TraceType.SKYWALKING_V3) {
             SkyWalkingUtils skyWalkingUtils = new SkyWalkingUtils(SkyWalkingUtils.SkyWalkingVersion.V3, sampled, requestTime, httpUrl, config);
