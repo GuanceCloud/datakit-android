@@ -99,7 +99,8 @@ public class SyncDataHelper {
      * @return
      */
     private String getLogBodyContent(List<SyncJsonData> datas) {
-        HashMap<String, Object> hashMap = FTSdk.get().getBasePublicTags();
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.putAll(FTSdk.get().getBasePublicTags());
         hashMap.putAll(FTLoggerConfigManager.get().getConfig().getGlobalContext());
         return convertToLineProtocolLines(datas, hashMap);
     }
@@ -112,7 +113,8 @@ public class SyncDataHelper {
      * @return
      */
     private String getTraceBodyContent(List<SyncJsonData> datas) {
-        HashMap<String, Object> hashMap = FTSdk.get().getBasePublicTags();
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.putAll(FTSdk.get().getBasePublicTags());
         hashMap.putAll(FTTraceConfigManager.get().getConfig().getGlobalContext());
         return convertToLineProtocolLines(datas, hashMap);
     }
@@ -124,7 +126,8 @@ public class SyncDataHelper {
      * @return
      */
     private String getRumBodyContent(List<SyncJsonData> datas) {
-        HashMap<String, Object> hashMap = FTSdk.get().getBasePublicTags();
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.putAll(FTSdk.get().getBasePublicTags());
         hashMap.putAll(FTRUMConfigManager.get().getConfig().getGlobalContext());
         return convertToLineProtocolLines(datas, hashMap);
     }
@@ -299,8 +302,8 @@ public class SyncDataHelper {
             ArrayList<SyncJsonData> dataArrayList = new ArrayList<>();
             dataArrayList.add(data);
 
-            HashMap<String, Object> extrasMap = FTSdk.get().getBasePublicTags();
-//            extrasMap.putAll(getUniqueIdMap());
+            HashMap<String, Object> extrasMap = new HashMap<>();
+            extrasMap.putAll(FTSdk.get().getBasePublicTags());
             return convertToLineProtocolLines(dataArrayList, extrasMap);
         } catch (JSONException e) {
             LogUtils.e(TAG, e.getMessage());
