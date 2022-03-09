@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     //通过查看请求头查看是否替换调用 OkHttpClient.Builder.build 方法成功
-                    Request request = requestUrl("https://www.baidu.com");
+                    Request request = requestUrl("http://testing-ft2x-api.cloudcare.cn/api/v1/account/permissions");
                     LogUtils.d(TAG, "header=" + request.headers().toString());
                 }
             }).start();
@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     CloseableHttpClient httpClient = HttpClients.custom()
                             .build();
-                    HttpGet httpGet = new HttpGet("https://www.baidu.com");
+                    HttpGet httpGet = new HttpGet("http://testing-ft2x-api.cloudcare.cn/api/v1/account/permissions");
                     CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
                     System.out.println("response:" + EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8));
                     httpResponse.close();
