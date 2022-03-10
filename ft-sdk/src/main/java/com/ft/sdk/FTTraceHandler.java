@@ -38,7 +38,7 @@ public class FTTraceHandler {
     private boolean isWebViewTrace;
 
     private HttpUrl httpUrl;
-    private FTTraceConfig config;
+    private final FTTraceConfig config;
 
     public String getTraceID() {
         return traceID;
@@ -91,7 +91,8 @@ public class FTTraceHandler {
         } else if (config.getTraceType() == TraceType.W3C_TRACEPARENT) {
             String version = "00";
             String sampledStr = "0" + sampled;
-            headers.put(W3C_TRACEPARENT_KEY, version + "-" + traceID + "-" + "0000000000000001" + "-" + sampledStr);
+            String parentID = spanID;
+            headers.put(W3C_TRACEPARENT_KEY, version + "-" + traceID + "-" + parentID + "-" + sampledStr);
         } else if (config.getTraceType() == TraceType.JAEGER) {
             String parentSpanID = "0";
             headers.put(JAEGER_KEY, traceID + ":" + spanID + ":" + parentSpanID + ":" + sampled);
