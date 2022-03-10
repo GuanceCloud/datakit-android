@@ -51,7 +51,7 @@ public class TraceGlobalContextTest extends BaseTest {
                 .setEnv(EnvType.GRAY);
         FTSdk.install(ftSDKConfig);
 
-        FTSdk.initTraceWithConfig(new FTTraceConfig().addGlobalContext(CUSTOM_KEY, CUSTOM_VALUE));
+//        FTSdk.initTraceWithConfig(new FTTraceConfig().addGlobalContext(CUSTOM_KEY, CUSTOM_VALUE));
 
     }
 
