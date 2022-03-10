@@ -74,7 +74,7 @@ public class FTTraceHandler {
         //在数据中添加标记
         if (config.getTraceType() == TraceType.ZIPKIN_MULTI_HEADER
                 || config.getTraceType() == TraceType.ZIPKIN_SINGLE_HEADER
-                || config.getTraceType() == TraceType.JAEGER || config.getTraceType() == TraceType.W3C_TRACEPARENT) {
+                || config.getTraceType() == TraceType.JAEGER || config.getTraceType() == TraceType.TRACEPARENT) {
             traceID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
             spanID = Utils.getGUID_16();
         } else if (config.getTraceType() == TraceType.DDTRACE) {
@@ -88,7 +88,7 @@ public class FTTraceHandler {
             headers.put(ZIPKIN_SAMPLED, sampled);
         } else if (config.getTraceType() == TraceType.ZIPKIN_SINGLE_HEADER) {
             headers.put(ZIPKIN_B3_HEADER, traceID + "-" + spanID + "-" + sampled);
-        } else if (config.getTraceType() == TraceType.W3C_TRACEPARENT) {
+        } else if (config.getTraceType() == TraceType.TRACEPARENT) {
             String version = "00";
             String sampledStr = "0" + sampled;
             String parentID = spanID;
@@ -103,7 +103,7 @@ public class FTTraceHandler {
             headers.put(DD_TRACE_SAMPLING_PRIORITY_KEY, sampled);
             headers.put(DD_TRACE_PARENT_SPAN_ID_KEY, "0");
             headers.put(DD_TRACE_TRACE_ID_KEY, traceID);
-        } else if (config.getTraceType() == TraceType.SKYWALKING_V3) {
+        } else if (config.getTraceType() == TraceType.SKYWALKING) {
             SkyWalkingUtils skyWalkingUtils = new SkyWalkingUtils(SkyWalkingUtils.SkyWalkingVersion.V3, sampled, requestTime, httpUrl, config);
             traceID = skyWalkingUtils.getNewTraceId();
             spanID = skyWalkingUtils.getNewParentTraceId() + "0";

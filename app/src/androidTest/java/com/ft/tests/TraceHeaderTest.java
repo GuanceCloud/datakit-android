@@ -119,7 +119,7 @@ public class TraceHeaderTest extends BaseTest {
     public void traceSkyWalkingV3HeaderTest() {
         FTSdk.initTraceWithConfig(new FTTraceConfig()
                 .setEnableAutoTrace(true)
-                .setTraceType(TraceType.SKYWALKING_V3));
+                .setTraceType(TraceType.SKYWALKING));
         Request request = requestUrl("http://www.weather.com.cn/data/sk/101010100.html");
         boolean expect = request.headers().names().contains(SKYWALKING_V3_SW_8);
         Assert.assertTrue(expect);
@@ -129,7 +129,7 @@ public class TraceHeaderTest extends BaseTest {
     public void traceW3CTraceParentTest() {
         FTSdk.initTraceWithConfig(new FTTraceConfig()
                 .setEnableAutoTrace(true)
-                .setTraceType(TraceType.W3C_TRACEPARENT));
+                .setTraceType(TraceType.TRACEPARENT));
         Request request = requestUrl("http://www.weather.com.cn/data/sk/101010100.html");
         boolean expect = request.headers().names().contains(W3C_TRACEPARENT_KEY);
         Assert.assertTrue(expect);
