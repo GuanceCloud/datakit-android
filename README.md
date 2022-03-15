@@ -11,7 +11,7 @@ DataFlux 应用监测能够通过收集各个Android应用的指标数据，以�
 
 ## 示例
 
- [Dataflux-SDK-Android Demo](https://github.com/DataFlux-cn/datakit-android/tree/dev/demo)   
+ [Dataflux-SDK-Android Demo](https://github.com/GuanceCloud/datakit-android/tree/dev/demo)   
 
 ## 使用文档
  [文档中心](https://www.yuque.com/dataflux/doc/pnzoyp)   
