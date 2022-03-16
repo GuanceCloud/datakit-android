@@ -81,15 +81,7 @@ class ManualActivity : AppCompatActivity() {
                             responseHeaderMap[it.first] = it.second
 
                         }
-                        //发送 trace 数据
-                        FTTraceManager.get().addTrace(
-                            uuid,
-                            request.method,
-                            requestHeaderMap,
-                            responseHeaderMap,
-                            response!!.code,
-                            ""
-                        )
+
                     }
                     response!!
                 }.eventListener(object : EventListener() {
