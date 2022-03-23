@@ -1,5 +1,5 @@
-# agent 1.3.3-alpha03
-1.修正 DDTrace ID 生成范围
+# agent 1.3.3-alpha04
+1.修正 DDTrace ID 算法
 
 ---
 # agent 1.3.3-alpha02
