@@ -26,8 +26,10 @@ public class FTTraceHandler {
     public static final String SKYWALKING_V3_SW_6 = "sw6";
 
     public static final String DD_TRACE_TRACE_ID_KEY = "x-datadog-trace-id";
+
     public static final String DD_TRACE_PARENT_SPAN_ID_KEY = "x-datadog-parent-id";
     public static final String DD_TRACE_SAMPLING_PRIORITY_KEY = "x-datadog-sampling-priority";
+    public static final String DD_TRACE_SAMPLED = "x-datadog-sampled";
     public static final String DD_TRACE_ORIGIN_KEY = "x-datadog-origin";
     //是否可以采样
     private final boolean enableTrace;
@@ -100,8 +102,9 @@ public class FTTraceHandler {
             traceID = Utils.getDDtraceNewId().longValue() + "";
             spanID = Utils.getDDtraceNewId().longValue() + "";
             headers.put(DD_TRACE_ORIGIN_KEY, "rum");
-            headers.put(DD_TRACE_SAMPLING_PRIORITY_KEY, sampled);
-            headers.put(DD_TRACE_PARENT_SPAN_ID_KEY, "0");
+            headers.put(DD_TRACE_SAMPLING_PRIORITY_KEY, "1");
+            headers.put(DD_TRACE_SAMPLED, sampled);
+            headers.put(DD_TRACE_PARENT_SPAN_ID_KEY, spanID);
             headers.put(DD_TRACE_TRACE_ID_KEY, traceID);
         } else if (config.getTraceType() == TraceType.SKYWALKING) {
             SkyWalkingUtils skyWalkingUtils = new SkyWalkingUtils(SkyWalkingUtils.SkyWalkingVersion.V3, sampled, requestTime, httpUrl, config);
