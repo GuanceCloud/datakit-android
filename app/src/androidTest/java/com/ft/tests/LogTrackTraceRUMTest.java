@@ -385,7 +385,7 @@ public class LogTrackTraceRUMTest extends BaseTest {
     @Test
     public void traceSampleRateZero() throws InterruptedException {
         FTSdk.initTraceWithConfig(new FTTraceConfig()
-                .setTraceType(TraceType.ZIPKIN)
+                .setTraceType(TraceType.ZIPKIN_MULTI_HEADER)
                 .setSamplingRate(0)
                 .setEnableLinkRUMData(false));
 

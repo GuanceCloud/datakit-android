@@ -76,19 +76,19 @@ public class FTHttpClientInterceptor {
      * @throws IOException
      */
     public void process(HttpResponse response, EntityDetails entity, HttpContext context) throws HttpException, IOException {
-        boolean isError = response == null || response.getCode() >= 400;
-
-        BasicEndpointDetails object = (BasicEndpointDetails) context.getAttribute("http.connection-endpoint");
-        object.getRemoteAddress();
-        try {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("requestContent", requestContent);
-            jsonObject.put("responseContent", buildResponseJsonContent(response, entity, response.getReasonPhrase()));
-
-            handler.traceDataUpload(jsonObject, operationName, isError);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        boolean isError = response == null || response.getCode() >= 400;
+//
+//        BasicEndpointDetails object = (BasicEndpointDetails) context.getAttribute("http.connection-endpoint");
+//        object.getRemoteAddress();
+//        try {
+//            JSONObject jsonObject = new JSONObject();
+//            jsonObject.put("requestContent", requestContent);
+//            jsonObject.put("responseContent", buildResponseJsonContent(response, entity, response.getReasonPhrase()));
+//
+//            handler.traceDataUpload(jsonObject, operationName, isError);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
     /**

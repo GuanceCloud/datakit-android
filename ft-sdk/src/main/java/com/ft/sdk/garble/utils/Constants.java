@@ -68,7 +68,7 @@ public class Constants {
 //    public static final String KEY_PAGE_EVENT_USER_NAME = "ud_name";
 
     public static final String KEY_TIME_COST_DURATION = "duration";
-    public static final String KEY_STATUS= "status";
+    public static final String KEY_STATUS = "status";
 
     public static final String KEY_BATTERY_TOTAL = "battery_total";
     public static final String KEY_BATTERY_CHARGE_TYPE = "battery_charge_type";
@@ -139,6 +139,7 @@ public class Constants {
     public static final String KEY_APP_VERSION_NAME = "version";
     public static final String KEY_SDK_NAME = "sdk_name";
     public static final String KEY_MESSAGE = "message";
+    public static final String KEY_BACKENDSAMPLE = "backend_sample";
 
     public static final String KEY_DEVICE_UUID = "device_uuid";
     public static final String KEY_DEVICE_OS = "os";
@@ -170,7 +171,7 @@ public class Constants {
     public static final String KEY_RUM_RESOURCE_METHOD = "resource_method";
     public static final String KEY_RUM_RESPONSE_HEADER = "response_header";
     public static final String KEY_RUM_REQUEST_HEADER = "request_header";
-//    public static final String KEY_RUM_TERMINAL = "terminal";
+    //    public static final String KEY_RUM_TERMINAL = "terminal";
     public static final String KEY_RUM_SDK_PACKAGE_AGENT = "sdk_package_agent";
     public static final String KEY_RUM_SDK_PACKAGE_TRACK = "sdk_package_track";
     public static final String KEY_RUM_SDK_PACKAGE_NATIVE = "sdk_package_native";
@@ -208,27 +209,28 @@ public class Constants {
     public static final String KEY_RUM_VIEW_REFERRER = "view_referrer";
     public static final String KEY_RUM_VIEW_NAME = "view_name";
     public static final String KEY_RUM_VIEW_LOAD = "loading_time";
-    public static final String KEY_RUM_VIEW_LONG_TASK_COUNT= "view_long_task_count";
-    public static final String KEY_RUM_VIEW_RESOURCE_COUNT= "view_resource_count";
-    public static final String KEY_RUM_VIEW_ERROR_COUNT= "view_error_count";
-    public static final String KEY_RUM_VIEW_ACTION_COUNT= "view_action_count";
-    public static final String KEY_RUM_VIEW_TIME_SPENT= "time_spent";
-    public static final String KEY_RUM_VIEW_IS_ACTIVE= "is_active";
-    public static final String KEY_RUM_VIEW_IS_WEB_VIEW= "is_web_view";
+    public static final String KEY_RUM_VIEW_LONG_TASK_COUNT = "view_long_task_count";
+    public static final String KEY_RUM_VIEW_RESOURCE_COUNT = "view_resource_count";
+    public static final String KEY_RUM_VIEW_ERROR_COUNT = "view_error_count";
+    public static final String KEY_RUM_VIEW_ACTION_COUNT = "view_action_count";
+    public static final String KEY_RUM_VIEW_TIME_SPENT = "time_spent";
+    public static final String KEY_RUM_VIEW_IS_ACTIVE = "is_active";
+    public static final String KEY_RUM_VIEW_IS_WEB_VIEW = "is_web_view";
 
     public static final String KEY_RUM_ACTION_ID = "action_id";
     public static final String KEY_RUM_ACTION_NAME = "action_name";
-    public static final String KEY_RUM_ACTION_TYPE= "action_type";
-    public static final String KEY_RUM_ACTION_LONG_TASK_COUNT= "action_long_task_count";
-    public static final String KEY_RUM_ACTION_RESOURCE_COUNT= "action_resource_count";
-    public static final String KEY_RUM_ACTION_ERROR_COUNT= "action_error_count";
-    public static final String KEY_RUM_ACTION_DURATION= "duration";
+    public static final String KEY_RUM_ACTION_TYPE = "action_type";
+    public static final String KEY_RUM_ACTION_LONG_TASK_COUNT = "action_long_task_count";
+    public static final String KEY_RUM_ACTION_RESOURCE_COUNT = "action_resource_count";
+    public static final String KEY_RUM_ACTION_ERROR_COUNT = "action_error_count";
+    public static final String KEY_RUM_ACTION_DURATION = "duration";
 
 
     /**
      * OP EVENT 数据对照
      */
     public final static HashMap<OP, String> OP_EVENT_MAPS = new HashMap<>();
+
     static {
         OP_EVENT_MAPS.put(OP.LANC, Constants.EVENT_NAME_LAUNCH);
         OP_EVENT_MAPS.put(OP.CLK, Constants.EVENT_NAME_CLICK);

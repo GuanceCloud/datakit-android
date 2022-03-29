@@ -39,12 +39,12 @@ public class FTTraceConfig {
         return serviceName;
     }
 
-    public FTTraceConfig setServiceName(String serviceName) {
-        if (serviceName != null) {
-            this.serviceName = serviceName;
-        }
-        return this;
-    }
+//    public FTTraceConfig setServiceName(String serviceName) {
+//        if (serviceName != null) {
+//            this.serviceName = serviceName;
+//        }
+//        return this;
+//    }
 
     public TraceType getTraceType() {
         return traceType;
@@ -64,18 +64,18 @@ public class FTTraceConfig {
         return this;
     }
 
-    /**
-     * 设置支持的采集类型
-     *
-     * @param traceContentType
-     * @return
-     */
-    public FTTraceConfig setTraceContentType(List<String> traceContentType) {
-        if (traceContentType != null) {
-            this.traceContentType = traceContentType;
-        }
-        return this;
-    }
+//    /**
+//     * 设置支持的采集类型
+//     *
+//     * @param traceContentType
+//     * @return
+//     */
+//    public FTTraceConfig setTraceContentType(List<String> traceContentType) {
+//        if (traceContentType != null) {
+//            this.traceContentType = traceContentType;
+//        }
+//        return this;
+//    }
 
 
     public List<String> getTraceContentType() {
@@ -101,10 +101,10 @@ public class FTTraceConfig {
         return this;
     }
 
-    public FTTraceConfig addGlobalContext(@NonNull String key, @NonNull String value) {
-        this.globalContext.put(key, value);
-        return this;
-    }
+//    public FTTraceConfig addGlobalContext(@NonNull String key, @NonNull String value) {
+//        this.globalContext.put(key, value);
+//        return this;
+//    }
 
     public HashMap<String, Object> getGlobalContext() {
         return globalContext;

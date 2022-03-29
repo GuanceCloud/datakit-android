@@ -26,9 +26,6 @@ public class FTTraceConfigManager {
                         "但是你没有依赖 okHttp，此功能仅支持 okHttp");
             }
         }
-        if (config.isEnableLinkRUMData() && config.getTraceType() != TraceType.DDTRACE) {
-            LogUtils.e(TAG, "FTTraceConfig.isEnableLinkRUMData,仅支持 TraceType.DDTRACE");
-        }
         this.config = config;
     }
 

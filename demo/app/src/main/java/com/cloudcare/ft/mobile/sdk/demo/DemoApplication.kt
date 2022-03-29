@@ -65,7 +65,6 @@ class DemoApplication : Application() {
             //配置 Trace
             FTSdk.initTraceWithConfig(
                 FTTraceConfig()
-                    .setServiceName("ft-sdk-demo")
                     .setSamplingRate(0.8f)
                     .setEnableAutoTrace(true)
                     .setEnableLinkRUMData(true)

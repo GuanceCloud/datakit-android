@@ -218,7 +218,7 @@ public class Utils {
     }
 
     public static BigInteger getDDtraceNewId(){
-        return new BigInteger(63, new SecureRandom());
+        return new BigInteger(64, new SecureRandom());
     }
 
     /**
