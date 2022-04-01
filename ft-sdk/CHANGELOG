@@ -1,3 +1,8 @@
+# agent 1.3.4-alpha01
+1.启动事件计算规则修改
+2.RUM 页面 viewReferrer 记录规则修改
+
+---
 # agent 1.3.3-alpha04
 1.修正 DDTrace ID 算法
 

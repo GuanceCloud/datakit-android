@@ -8,10 +8,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.ft.sdk.garble.FTFragmentManager;
-import com.ft.sdk.garble.utils.AopUtils;
-import com.ft.sdk.garble.utils.Utils;
-
-import java.util.HashMap;
 
 /**
  * BY huangDianHua
@@ -31,9 +27,16 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
         FTFragmentManager.getInstance().addFragmentLifecycle(activity);
     }
 
+
+    @Override
+    public void onActivityPreStarted(@NonNull Activity activity) {
+        mAppRestartCallback.onPreStart();
+
+    }
+
     @Override
     public void onActivityStarted(@NonNull Activity activity) {
-        mAppRestartCallback.onStart();
+
     }
 
     @Override
@@ -49,13 +52,13 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
 
     @Override
     public void onActivityResumed(@NonNull Activity activity) {
-        FTActivityManager.get().putActivity(activity);
 
         //页面打开埋点数据插入
         FTAutoTrack.startPage(activity.getClass());
         //开启同步
-        SyncTaskManager.get().executeSyncPoll();
-        //标记当前页面是否是第一次调用OnResume方法
+        if (FTSdk.checkInstallState()) {
+            SyncTaskManager.get().executeSyncPoll();
+        }
     }
 
     @Override

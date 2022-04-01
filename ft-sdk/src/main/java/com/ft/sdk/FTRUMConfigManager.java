@@ -40,9 +40,6 @@ public class FTRUMConfigManager {
 
     private FTRUMConfig config;
 
-    private FTActivityLifecycleCallbacks life;
-
-
     private volatile String randomUserId;
     private UserData mUserData;
 
@@ -51,7 +48,6 @@ public class FTRUMConfigManager {
 
     void initWithConfig(FTRUMConfig config) {
         this.config = config;
-        registerActivityLifeCallback();
         FTRUMGlobalManager.get().initParams(config);
 //        FTAutoTrackConfigManager.get().initParams();
         FTExceptionHandler.get().initConfig(config);
@@ -59,6 +55,10 @@ public class FTRUMConfigManager {
         FTMonitorConfigManager.get().initWithConfig(config);
         FTUIBlockManager.start(config);
         initRUMGlobalContext(config);
+        if(config.isRumEnable()&&config.isEnableTraceUserAction()){
+
+        }
+        FTAppStartCounter.get().checkToReUpload();
 
         initNativeDump();
     }
@@ -100,25 +100,6 @@ public class FTRUMConfigManager {
 
     public FTRUMConfig getConfig() {
         return config;
-    }
-
-
-    /**
-     * 添加 Activity 生命周期监控
-     */
-    private void registerActivityLifeCallback() {
-        life = new FTActivityLifecycleCallbacks();
-        getApplication().registerActivityLifecycleCallbacks(life);
-    }
-
-    /**
-     * 解绑 Activity 生命周期监控
-     */
-    void unregisterActivityLifeCallback() {
-        if (life != null) {
-            getApplication().unregisterActivityLifecycleCallbacks(life);
-            life = null;
-        }
     }
 
 
@@ -232,6 +213,7 @@ public class FTRUMConfigManager {
 
     /**
      * 初始化 RUM GlobalContext
+     *
      * @param config
      */
     void initRUMGlobalContext(FTRUMConfig config) {
@@ -245,7 +227,7 @@ public class FTRUMConfigManager {
             rumGlobalContext.put(key, value.toString());
         }
 //        if(config.isBackendSample()){
-            //sample
+        //sample
 //            rumGlobalContext.put(Constants.KEY_BACKENDSAMPLE,"");
 //        }
         rumGlobalContext.put(Constants.KEY_RUM_CUSTOM_KEYS, new Gson().toJson(customKeys));

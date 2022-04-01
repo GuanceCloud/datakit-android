@@ -41,10 +41,13 @@ class LifeCircleTraceCallback {
         }
     };
 
-    public void onStart() {
+    /**
+     * start 之前
+     */
+    public void onPreStart() {
         if (alreadySleep) {//表示从后台重新进入
             if (mInited) {
-                FTAutoTrack.startApp();
+//                FTAutoTrack.startApp();
                 startTime = Utils.getCurrentNanoTime();
             }
             FTMonitor.get().checkForReStart();
@@ -57,34 +60,44 @@ class LifeCircleTraceCallback {
         mCreateMap.put(context, Utils.getCurrentNanoTime());
 
         if (!mInited) {
-            FTAutoTrack.startApp();
+//            FTAutoTrack.startApp();
             startTime = Utils.getCurrentNanoTime();
         }
     }
 
     public void onPostOnCreate(Context context) {
         FTRUMConfigManager manager = FTRUMConfigManager.get();
-        if (manager.isRumEnable()) {
-            FTRUMConfig config = manager.getConfig();
-            if (config.isEnableTraceUserAction()) {
-                if (!mInited) {
-                    long now = Utils.getCurrentNanoTime();
-                    FTActivityManager.get().setAppState(AppState.RUN);
-                    FTAutoTrack.putRUMLaunchPerformance(true, now - startTime);
+        FTRUMConfig config = manager.getConfig();
 
+        if (!mInited) {
+            long now = Utils.getCurrentNanoTime();
+            FTActivityManager.get().setAppState(AppState.RUN);
+            FTAppStartCounter.get().codeStart(now - startTime);
+            if (manager.isRumEnable()) {
+                if (config.isEnableTraceUserAction()) {
+                    FTAppStartCounter.get().codeStartUpload();
                 }
             }
+
+        }
+
+        if (manager.isRumEnable()) {
             if (config.isEnableTraceUserView()) {
                 Long startTime = mCreateMap.get(context);
                 if (startTime != null) {
                     long duration = Utils.getCurrentNanoTime() - startTime;
                     String viewName = AopUtils.getClassName(context);
-                    FTAutoTrack.putRUMViewLoadPerformance(viewName, duration);
+                    FTRUMGlobalManager.get().onCreateView(viewName, duration);
                 }
             }
         }
     }
 
+    /**
+     * resume 之后
+     *
+     * @param context
+     */
     public void onPostResume(Context context) {
         if (alreadySleep) {
             if (mInited) {
@@ -92,7 +105,8 @@ class LifeCircleTraceCallback {
                         && FTRUMConfigManager.get().getConfig().isEnableTraceUserAction()) {
                     if (startTime > 0) {
                         long now = Utils.getCurrentNanoTime();
-                        FTAutoTrack.putRUMLaunchPerformance(false, now - startTime);
+                        FTAppStartCounter.get().hotStart(now - startTime);
+
                     }
 
                 }

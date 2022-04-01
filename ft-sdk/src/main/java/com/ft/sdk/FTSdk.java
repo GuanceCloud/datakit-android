@@ -32,7 +32,6 @@ public class FTSdk {
     public static String PACKAGE_UUID = "";
     //下面两个变量也不能随便改动，改动请同时更改 plugin 中对应的值
     public static final String AGENT_VERSION = BuildConfig.FT_SDK_VERSION;//当前SDK 版本
-    public static final String PLUGIN_MIN_VERSION = BuildConfig.MIN_FT_PLUGIN_VERSION; //当前 SDK 支持的最小 Plugin 版本
     private static FTSdk mFtSdk;
     private final FTSDKConfig mFtSDKConfig;
 
@@ -73,6 +72,14 @@ public class FTSdk {
     }
 
     /**
+     * 检查设置状态
+     * @return
+     */
+    static boolean checkInstallState() {
+        return mFtSdk != null && mFtSdk.mFtSDKConfig != null;
+    }
+
+    /**
      * 关闭 SDK 正在做的操作
      */
     public static void shutDown() {
@@ -89,7 +96,6 @@ public class FTSdk {
         FTTraceConfigManager.get().release();
         FTLoggerConfigManager.get().release();
         FTRUMGlobalManager.get().release();
-        FTRUMConfigManager.get().unregisterActivityLifeCallback();
         EventConsumerThreadPool.get().shutDown();
         LogUtils.w(TAG, "FT SDK 已经被关闭");
     }

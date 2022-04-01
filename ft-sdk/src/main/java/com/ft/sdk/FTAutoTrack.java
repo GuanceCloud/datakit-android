@@ -1,5 +1,7 @@
 package com.ft.sdk;
 
+import static com.ft.sdk.FTApplication.getApplication;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -52,7 +54,8 @@ public class FTAutoTrack {
     @Deprecated
     public static void startApp(Object object) {
         try {
-            startApp();
+            FTActivityLifecycleCallbacks life = new FTActivityLifecycleCallbacks();
+            getApplication().registerActivityLifecycleCallbacks(life);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -117,17 +120,17 @@ public class FTAutoTrack {
      */
     public static void notifyUserVisibleHint(Object clazz, Object activity, boolean isVisible) {
         //LogUtils.d("Fragment[\n"+isVisible+"=====>fragment:"+((Class)clazz).getSimpleName());
-        try {
-            String className;
-            if (activity == null) {
-                Activity activity1 = FTActivityManager.get().getTopActivity();
-                className = activity1.getClass().getName();
-            } else {
-                className = activity.getClass().getName();
-            }
-            FTFragmentManager.getInstance().setFragmentVisible(className, (Class) clazz, isVisible);
-        } catch (Exception e) {
-        }
+//        try {
+//            String className;
+//            if (activity == null) {
+//                Activity activity1 = FTActivityManager.get().getTopActivity();
+//                className = activity1.getClass().getName();
+//            } else {
+//                className = activity.getClass().getName();
+//            }
+//            FTFragmentManager.getInstance().setFragmentVisible(className, (Class) clazz, isVisible);
+//        } catch (Exception e) {
+//        }
     }
 
     /**
@@ -699,13 +702,6 @@ public class FTAutoTrack {
     public static void putRUMLaunchPerformance(boolean isCold, long duration) {
         FTRUMGlobalManager.get().addAction(
                 isCold ? "app cold start" : "app hot start", isCold ? "launch_cold" : "launch_hot", duration);
-    }
-
-    /**
-     * 记录页面加载性能
-     */
-    public static void putRUMViewLoadPerformance(String viewName, long loadTime) {
-        FTRUMGlobalManager.get().onCreateView(viewName, loadTime);
     }
 
 
