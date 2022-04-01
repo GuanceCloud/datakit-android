@@ -37,47 +37,56 @@ public class FTUtil {
     private static final HashSet<String> targetActivityClass = new HashSet<>();
     private static final HashSet<String> targetMenuMethodDesc = new HashSet<>();
     private static final HashSet<String> specialClass = new HashSet<>();
+    private static final HashSet<String> targetApplicationClass = new HashSet<>();
+
 
     static {
-        /**
+        /*
          * Menu
          */
         targetMenuMethodDesc.add("onContextItemSelected(Landroid/view/MenuItem;)Z");
         targetMenuMethodDesc.add("onOptionsItemSelected(Landroid/view/MenuItem;)Z");
         targetMenuMethodDesc.add("onNavigationItemSelected(Landroid/view/MenuItem;)Z");
 
-        /**
+        /*
+          For Android Application
+         */
+
+        targetApplicationClass.add("androidx.multidex.MultiDexApplication");
+        targetApplicationClass.add("android/app/Application");
+
+        /*
          * For Android App Fragment
          */
         targetFragmentClass.add("android/app/Fragment");
         targetFragmentClass.add("android/app/ListFragment");
         targetFragmentClass.add("android/app/DialogFragment");
 
-        /**
+        /*
          * For Support V4 Fragment
          */
         targetV4FragmentClass.add("android/support/v4/app/Fragment");
         targetV4FragmentClass.add("android/support/v4/app/ListFragment");
         targetV4FragmentClass.add("android/support/v4/app/DialogFragment");
 
-        /**
+        /*
          * For AndroidX Fragment
          */
         targetXFragmentClass.add("androidx/fragment/app/Fragment");
         targetXFragmentClass.add("androidx/fragment/app/ListFragment");
         targetXFragmentClass.add("androidx/fragment/app/DialogFragment");
 
-        /**
+        /*
          * For Android App Activity
          */
         targetActivityClass.add("android/app/Activity");
 
-        /**
+        /*
          * For AndroidX Activity
          */
         targetActivityClass.add("androidx/fragment/app/FragmentActivity");
 
-        /** 将一些特例需要排除在外 */
+        /*将一些特例需要排除在外 */
         specialClass.add("com.bumptech.glide.manager.SupportRequestManagerFragment");
 
     }
@@ -113,6 +122,10 @@ public class FTUtil {
 
     public static boolean isTargetClassInSpecial(String className) {
         return specialClass.contains(className);
+    }
+
+    public static boolean isInstanceOfApplication(String nameDesc) {
+        return targetApplicationClass.contains(nameDesc);
     }
 
 }

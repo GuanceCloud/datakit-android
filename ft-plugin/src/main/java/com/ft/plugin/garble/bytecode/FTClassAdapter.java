@@ -66,15 +66,7 @@ public class FTClassAdapter extends ClassVisitor {
                 String agentVersion = (String) value;
                 if (!VersionUtils.firstVerGreaterEqual(agentVersion, BuildConfig.MIN_SDK_VERSION)) {
                     String errorTip = "你目前集成的 FT SDK 的版本为 " + agentVersion + ",当前插件支持 SDK 的最低版本为 " + BuildConfig.MIN_SDK_VERSION
-                            + ",详细信息请参考：https://github.com/CloudCare/dataflux-sdk-android";
-                    throw new Error(errorTip);
-                }
-            }
-            if (name.equals("PLUGIN_MIN_VERSION")) {// 获取 PLUGIN_MIN_VERSION 判断是否高于支持的最低版本
-                String pluginMinVersion = (String) value;
-                if (!VersionUtils.firstVerGreaterEqual(BuildConfig.PLUGIN_VERSION, pluginMinVersion)) {
-                    String errorTip = "你目前集成的 FT Plugin 的版本为 " + BuildConfig.PLUGIN_VERSION + ",当前 SDK 支持的插件的最低版本为 " + pluginMinVersion
-                            + ",详细信息请参考：https://github.com/CloudCare/dataflux-sdk-android";
+                            + ",详细信息请参考：https://github.com/GuanceCloud/datakit-android";
                     throw new Error(errorTip);
                 }
             }

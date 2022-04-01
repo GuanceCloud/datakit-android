@@ -6,7 +6,7 @@ package com.ft.plugin.garble;
  * Description:
  */
 public class Logger {
-    private static String TAG = "[FT-Plugin]:";
+    private static final String TAG = "[FT-Plugin]:";
     private static boolean debug = true;
 
     public static void setDebug(boolean debug) {

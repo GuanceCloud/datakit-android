@@ -261,6 +261,18 @@ public class FTMethodAdapter extends AdviceAdapter {
             return;
         }
 
+        /*
+         * 写Application方法
+         */
+        if (FTUtil.isInstanceOfApplication(superName)) {
+            FTMethodCell ftMethodCell = FTHookConfig.APPLICATION_METHODS.get(nameDesc);
+            if (ftMethodCell != null) {
+                handleCode(ftMethodCell);
+                isHasTracked = true;
+                return;
+            }
+        }
+
         if (ClassNameAnalytics.isFTSdkApi(className.replaceAll("/", "."))) {
             if (nameDesc.equals("install(Lcom/ft/sdk/FTSDKConfig;)V")) {
                 mv.visitLdcInsn(BuildConfig.PLUGIN_VERSION);
