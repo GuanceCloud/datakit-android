@@ -55,10 +55,9 @@ public class FTRUMConfigManager {
         FTMonitorConfigManager.get().initWithConfig(config);
         FTUIBlockManager.start(config);
         initRUMGlobalContext(config);
-        if(config.isRumEnable()&&config.isEnableTraceUserAction()){
-
+        if (config.isRumEnable() && config.isEnableTraceUserAction()) {
+            FTAppStartCounter.get().checkToReUpload();
         }
-        FTAppStartCounter.get().checkToReUpload();
 
         initNativeDump();
     }
