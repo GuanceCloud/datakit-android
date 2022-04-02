@@ -1,4 +1,4 @@
-package com.ft.sdk.tests;
+package com.ft.sdk;
 
 import android.content.Context;
 
@@ -17,6 +17,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
+import org.powermock.reflect.Whitebox;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,10 +59,7 @@ public class UtilsTest {
         return InstrumentationRegistry.getInstrumentation().getTargetContext();
     }
 
-    @Test
-    public void isNetworkAvailable() {
-        assertTrue(Utils.isNetworkAvailable(getContext()));
-    }
+
 
     @Test
     public void contentMD5Encode() {
@@ -82,7 +80,7 @@ public class UtilsTest {
      * @throws InterruptedException
      */
     @Test
-    public void multiLineProtocolFormatTest() throws JSONException, InterruptedException {
+    public void multiLineProtocolFormatTest() throws Exception {
 
         SyncJsonData recordData = new SyncJsonData(DataType.LOG);
         recordData.setTime(VALUE_TIME);
@@ -100,8 +98,10 @@ public class UtilsTest {
         recordDataList.add(recordData);
         recordDataList.add(recordData);
         recordDataList.add(recordData);
-        String content = new SyncDataHelper().getBodyContent(DataType.LOG, recordDataList);
-        Assert.assertEquals(LOG_EXPECT_DATA, content);
+        String content = Whitebox.invokeMethod(new SyncDataHelper(), "convertToLineProtocolLines",
+                recordDataList);
+        Assert.assertEquals(LOG_EXPECT_DATA, content.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION)
+                .replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK));
     }
 
     /**
@@ -110,7 +110,7 @@ public class UtilsTest {
      * @throws JSONException
      */
     @Test
-    public void singleLineProtocolFormatTest() throws JSONException {
+    public void singleLineProtocolFormatTest() throws Exception {
         JSONObject tags = new JSONObject();
         tags.put(KEY_TAGS, VALUE_TAGS);
         JSONObject fields = new JSONObject();
@@ -120,9 +120,11 @@ public class UtilsTest {
 
         List<SyncJsonData> recordDataList = new ArrayList<>();
         recordDataList.add(data);
-        String content = new SyncDataHelper().getBodyContent(DataType.TRACK, recordDataList);
-        Assert.assertTrue(content.contains(TEST_MEASUREMENT_INFLUX_DB_LINE));
-        Assert.assertTrue(content.contains(SINGLE_LINE_NORMAL_DATA.replace(TEST_MEASUREMENT_INFLUX_DB_LINE, "")));
+        String content = Whitebox.invokeMethod(new SyncDataHelper(), "convertToLineProtocolLines",
+                recordDataList);
+
+        assertEquals(content.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION)
+                .replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK), SINGLE_LINE_NORMAL_DATA);
 
 
         JSONObject tagsEmpty = new JSONObject();
@@ -134,9 +136,11 @@ public class UtilsTest {
 
         List<SyncJsonData> emptyRecordDataList = new ArrayList<>();
         emptyRecordDataList.add(dataEmpty);
-        String contentEmpty = new SyncDataHelper().getBodyContent(DataType.TRACK, emptyRecordDataList);
+        String contentEmpty = Whitebox.invokeMethod(new SyncDataHelper(), "convertToLineProtocolLines",
+                emptyRecordDataList);
 
-        Assert.assertTrue(contentEmpty.contains(SINGLE_LINE_EMPTY_DATA.replace(TEST_MEASUREMENT_INFLUX_DB_LINE, "")));
+        assertEquals(SINGLE_LINE_EMPTY_DATA, contentEmpty.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION)
+                .replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK));
     }
 
 

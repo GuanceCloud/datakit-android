@@ -1,4 +1,4 @@
-package com.ft.sdk.tests;
+package com.ft.sdk;
 
 import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 

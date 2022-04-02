@@ -5,10 +5,12 @@ import android.content.Context;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.ft.sdk.garble.utils.DeviceUtils;
+import com.ft.sdk.garble.utils.Utils;
 
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * BY huangDianHua
@@ -28,6 +30,11 @@ public class DeviceUtilsTest {
     @Test
     public void getUuid() {
         assertNotEquals("", DeviceUtils.getUuid(getContext()));
+    }
+
+    @Test
+    public void isNetworkAvailable() {
+        assertTrue(Utils.isNetworkAvailable(getContext()));
     }
 
 }

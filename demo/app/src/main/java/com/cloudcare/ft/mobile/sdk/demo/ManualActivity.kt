@@ -179,7 +179,7 @@ class ManualActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        FTRUMGlobalManager.get().startView("ManualActivity", "MainActivity");
+        FTRUMGlobalManager.get().startView("ManualActivity");
     }
 
     override fun onPause() {

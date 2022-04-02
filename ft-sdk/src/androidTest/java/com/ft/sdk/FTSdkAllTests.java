@@ -2,10 +2,6 @@ package com.ft.sdk;
 
 import com.ft.sdk.tests.DeviceUtilsTest;
 import com.ft.sdk.tests.FTDBManagerTest;
-import com.ft.sdk.tests.FTTrackTest;
-import com.ft.sdk.tests.GenericsUtilsTest;
-import com.ft.sdk.tests.ThreadPoolutilsTest;
-import com.ft.sdk.tests.UtilsTest;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -16,11 +12,9 @@ import org.junit.runners.Suite;
  * Description:
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({DeviceUtilsTest.class,
-        FTTrackTest.class,
-        GenericsUtilsTest.class,
+@Suite.SuiteClasses({
         FTDBManagerTest.class,
-        ThreadPoolutilsTest.class,
-        UtilsTest.class})
+        DeviceUtilsTest.class}
+)
 public class FTSdkAllTests {
 }

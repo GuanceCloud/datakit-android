@@ -138,8 +138,9 @@ public class SyncDataHelper {
      * @return
      */
     private String getTrackBodyContent(List<SyncJsonData> datas) {
-        HashMap<String, Object> deviceTags = FTSdk.get().getBasePublicTags();
-        return convertToLineProtocolLines(datas, deviceTags);
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.putAll(FTSdk.get().getBasePublicTags());
+        return convertToLineProtocolLines(datas, hashMap);
     }
 
 

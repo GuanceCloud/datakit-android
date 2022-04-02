@@ -119,10 +119,8 @@ public class FTInitParamTest extends BaseTest {
         FTSDKConfig ftSDKConfig = getDefaultConfig();
         FTSdk.install(ftSDKConfig);
         FTSdk.initLogWithConfig(new FTLoggerConfig().setServiceName(serviceName));
-        FTSdk.initTraceWithConfig(new FTTraceConfig().setServiceName(serviceName));
 
         Assert.assertEquals(expected, FTLoggerConfigManager.get().getConfig().getServiceName());
-        Assert.assertEquals(expected, FTTraceConfigManager.get().getConfig().getServiceName());
     }
 
     private void envParamTest(EnvType env, EnvType expected) {
