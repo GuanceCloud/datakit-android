@@ -1,6 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'jacoco'
-
 
 android {
     compileSdkVersion 31
@@ -17,9 +15,6 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-        debug{
-            testCoverageEnabled=true
         }
     }
     compileOptions {
