@@ -134,8 +134,10 @@ public class FTRUMGlobalManager {
                 && (now - lastActionTime > ActionBean.ACTION_NORMAL_TIME_OUT)
                 || timeOut || (activeView != null && !activeView.getId().equals(activeAction.getViewId()));
         if (needClose) {
-            activeAction.close();
-            closeAction(activeAction.getId(), activeAction.getDuration(), timeOut);
+            if (!activeAction.isClose()) {
+                activeAction.close();
+                closeAction(activeAction.getId(), activeAction.getDuration(), timeOut);
+            }
         }
     }
 
@@ -784,7 +786,7 @@ public class FTRUMGlobalManager {
         }
     }
 
-     void initParams(FTRUMConfig config) {
+    void initParams(FTRUMConfig config) {
         checkSessionKeep(sessionId, config.getSamplingRate());
         EventConsumerThreadPool.get().execute(() -> {
             FTDBManager.get().closeAllActionAndView();
