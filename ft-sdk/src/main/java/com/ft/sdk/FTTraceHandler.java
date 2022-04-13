@@ -80,8 +80,8 @@ public class FTTraceHandler {
             traceID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
             spanID = Utils.getGUID_16();
         } else if (config.getTraceType() == TraceType.DDTRACE) {
-            traceID = Utils.getDDtraceNewId().longValue() + "";
-            spanID = Utils.getDDtraceNewId().longValue() + "";
+            traceID = Utils.getDDtraceNewId() + "";
+            spanID = Utils.getDDtraceNewId() + "";
         }
 
         if (config.getTraceType() == TraceType.ZIPKIN_MULTI_HEADER) {
@@ -99,8 +99,8 @@ public class FTTraceHandler {
             String parentSpanID = "0";
             headers.put(JAEGER_KEY, traceID + ":" + spanID + ":" + parentSpanID + ":" + sampled);
         } else if (config.getTraceType() == TraceType.DDTRACE) {
-            traceID = Utils.getDDtraceNewId().longValue() + "";
-            spanID = Utils.getDDtraceNewId().longValue() + "";
+            traceID = Utils.getDDtraceNewId() + "";
+            spanID = Utils.getDDtraceNewId() + "";
             headers.put(DD_TRACE_ORIGIN_KEY, "rum");
             headers.put(DD_TRACE_SAMPLING_PRIORITY_KEY, "1");
             headers.put(DD_TRACE_SAMPLED, sampled);
