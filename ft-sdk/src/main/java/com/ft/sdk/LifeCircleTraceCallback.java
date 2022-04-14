@@ -74,9 +74,7 @@ class LifeCircleTraceCallback {
             FTActivityManager.get().setAppState(AppState.RUN);
             FTAppStartCounter.get().codeStart(now - startTime);
             if (manager.isRumEnable()) {
-                if (config.isEnableTraceUserAction()) {
-                    FTAppStartCounter.get().codeStartUpload();
-                }
+                FTAppStartCounter.get().codeStartUpload();
             }
 
         }
@@ -101,8 +99,7 @@ class LifeCircleTraceCallback {
     public void onPostResume(Context context) {
         if (alreadySleep) {
             if (mInited) {
-                if (FTRUMConfigManager.get().isRumEnable()
-                        && FTRUMConfigManager.get().getConfig().isEnableTraceUserAction()) {
+                if (FTRUMConfigManager.get().isRumEnable()) {
                     if (startTime > 0) {
                         long now = Utils.getCurrentNanoTime();
                         FTAppStartCounter.get().hotStart(now - startTime);
