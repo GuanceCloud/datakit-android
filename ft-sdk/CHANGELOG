@@ -1,3 +1,7 @@
+# agent 1.3.4-alpha04
+1. 去掉 config action 与应用登录的关联
+
+---
 # agent 1.3.4-alpha03
 1. 分支合并更新
 
