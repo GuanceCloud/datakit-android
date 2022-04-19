@@ -247,7 +247,7 @@ public class LogTrackTraceRUMTest extends BaseTest {
      */
     @Test
     public void rumClickLambdaBtnTest() throws Exception {
-        Thread.sleep(500);
+        Thread.sleep(3000);
         onView(ViewMatchers.withId(R.id.main_mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
         //第二次操作触发 action close
         onView(ViewMatchers.withId(R.id.main_mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
@@ -257,38 +257,38 @@ public class LogTrackTraceRUMTest extends BaseTest {
     }
 
 
-    /**
-     * trace 一个正常的网络
-     *
-     * @throws JSONException
-     * @throws InterruptedException
-     */
-    @Test
-    public void traceUploadNormalTest() throws Exception {
-        traceDataTest("https://www.baidu.com", "www.baidu.com");
-    }
-
-    /**
-     * trace 网络超时
-     *
-     * @throws JSONException
-     * @throws InterruptedException
-     */
-    @Test
-    public void traceUploadTimeOutTest() throws Exception {
-        traceDataTest("https://www.google.com", "www.google.com");
-    }
-
-    /**
-     * trace 网络错误
-     *
-     * @throws JSONException
-     * @throws InterruptedException
-     */
-    @Test
-    public void traceUploadErrorTest() throws Exception {
-        traceDataTest("https://error.url", "error.url");
-    }
+//    /**
+//     * trace 一个正常的网络
+//     *
+//     * @throws JSONException
+//     * @throws InterruptedException
+//     */
+//    @Test
+//    public void traceUploadNormalTest() throws Exception {
+//        traceDataTest("https://www.baidu.com", "www.baidu.com");
+//    }
+//
+//    /**
+//     * trace 网络超时
+//     *
+//     * @throws JSONException
+//     * @throws InterruptedException
+//     */
+//    @Test
+//    public void traceUploadTimeOutTest() throws Exception {
+//        traceDataTest("https://www.google.com", "www.google.com");
+//    }
+//
+//    /**
+//     * trace 网络错误
+//     *
+//     * @throws JSONException
+//     * @throws InterruptedException
+//     */
+//    @Test
+//    public void traceUploadErrorTest() throws Exception {
+//        traceDataTest("https://error.url", "error.url");
+//    }
 
     @Test
     public void traceLinkRUMDataEnable() throws InterruptedException {
@@ -419,24 +419,24 @@ public class LogTrackTraceRUMTest extends BaseTest {
     }
 
 
-    /**
-     * 上传一条正常的 trace 数据测试
-     *
-     * @throws JSONException
-     * @throws InterruptedException
-     */
-    private void traceDataTest(String url, String except) throws Exception {
-        Thread.sleep(200);
-        RequestUtil.requestUrl(url);
-        Thread.sleep(5000);
-        resumeSyncTask();
-        executeSyncTask();
-        int except1 = CheckUtils.getCount(DataType.TRACE, except, 0);
-        Thread.sleep(12000);
-        int except2 = CheckUtils.getCount(DataType.TRACE, except, 0);
-        Assert.assertTrue(except1 > 0);
-        Assert.assertEquals(0, except2);
-    }
+//    /**
+//     * 上传一条正常的 trace 数据测试
+//     *
+//     * @throws JSONException
+//     * @throws InterruptedException
+//     */
+//    private void traceDataTest(String url, String except) throws Exception {
+//        Thread.sleep(200);
+//        RequestUtil.requestUrl(url);
+//        Thread.sleep(5000);
+//        resumeSyncTask();
+//        executeSyncTask();
+//        int except1 = CheckUtils.getCount(DataType.TRACE, except, 0);
+//        Thread.sleep(12000);
+//        int except2 = CheckUtils.getCount(DataType.TRACE, except, 0);
+//        Assert.assertTrue(except1 > 0);
+//        Assert.assertEquals(0, except2);
+//    }
 
     /**
      * 上传数据测试

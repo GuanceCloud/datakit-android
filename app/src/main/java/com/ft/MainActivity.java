@@ -39,11 +39,11 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
     boolean logThreadRun = false;
-    static OkHttpClient client = new OkHttpClient.Builder()
+    OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
             .build();
 
-    public static Request requestUrl(@NonNull String url) {
+    public Request requestUrl(@NonNull String url) {
         Request.Builder builder = new Request.Builder().url(url)
                 .method(RequestMethod.GET.name(), null);
         Request request = null;
@@ -179,4 +179,5 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
 }

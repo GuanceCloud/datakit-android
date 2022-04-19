@@ -55,12 +55,6 @@ public class UtilsTest {
     private static final String LOG_EXPECT_DATA = SINGLE_LINE_NORMAL_DATA + SINGLE_LINE_NORMAL_DATA + SINGLE_LINE_NORMAL_DATA;
 
 
-    private Context getContext() {
-        return InstrumentationRegistry.getInstrumentation().getTargetContext();
-    }
-
-
-
     @Test
     public void contentMD5Encode() {
         assertEquals("M1QEWjl2Ic2SQG8fmM3ikg==", Utils.contentMD5EncodeWithBase64("1122334455"));

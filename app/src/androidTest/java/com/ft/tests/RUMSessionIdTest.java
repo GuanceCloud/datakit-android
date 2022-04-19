@@ -15,6 +15,7 @@ import com.ft.R;
 import com.ft.application.MockApplication;
 import com.ft.sdk.EnvType;
 import com.ft.sdk.FTRUMConfig;
+import com.ft.sdk.FTRUMGlobalManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.bean.DataType;
@@ -28,6 +29,7 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.powermock.reflect.Whitebox;
 
 import java.util.List;
 
@@ -67,9 +69,10 @@ public class RUMSessionIdTest extends BaseTest {
     }
 
     @Test
-    public void sessionGenerateTest() throws InterruptedException {
-        Thread.sleep(1000);
+    public void sessionGenerateTest() throws Exception {
+        Thread.sleep(2000);
         onView(ViewMatchers.withId(R.id.main_mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
+        checkActionClose();
         Thread.sleep(1000);
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
         String sessionId = "";

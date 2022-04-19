@@ -107,6 +107,7 @@ public class FTRUMGlobalManager {
      * @param actionType action 类型
      */
     public void startAction(String actionName, String actionType) {
+        LogUtils.e("BrandonTest","startAction");
         startAction(actionName, actionType, false);
     }
 

@@ -70,7 +70,7 @@ public class RUMViewSumTest extends BaseTest {
 
     @Test
     public void viewSumTest() throws InterruptedException {
-        Thread.sleep(1000);
+        Thread.sleep(2000);
         avoidCrash();
         onView(ViewMatchers.withId(R.id.main_mock_crash_btn)).perform(ViewActions.scrollTo()).perform(click());
         Thread.sleep(1000);

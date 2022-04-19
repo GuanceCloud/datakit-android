@@ -16,11 +16,8 @@ import static org.junit.Assert.assertTrue;
 public class ThreadPoolutilsTest {
     @Before
     public void threadPool(){
-        DataUploaderThreadPool.get().execute(new Runnable() {
-            @Override
-            public void run() {
-                while (true){}
-            }
+        DataUploaderThreadPool.get().execute(() -> {
+            while (true){}
         });
         DataUploaderThreadPool.get().shutDown();
     }

@@ -72,10 +72,11 @@ public class RUMActionSumTest extends BaseTest {
 
     @Test
     public void actionSumTest() throws Exception {
-        Thread.sleep(1000);
+        Thread.sleep(2000);
         avoidCrash();
         onView(ViewMatchers.withId(R.id.main_mock_okhttp_btn)).perform(ViewActions.scrollTo()).perform(click());
-        syncActionCount();
+        Thread.sleep(2000);
+        checkActionClose();
 
         Thread.sleep(5000);
 
@@ -101,7 +102,6 @@ public class RUMActionSumTest extends BaseTest {
 
         onView(ViewMatchers.withId(R.id.main_mock_crash_btn)).perform(ViewActions.scrollTo()).perform(click());
         checkActionClose();
-        syncActionCount();
 
         Thread.sleep(5000);
 
@@ -125,15 +125,5 @@ public class RUMActionSumTest extends BaseTest {
 
     }
 
-    private void syncActionCount() throws Exception {
-        Thread.sleep(1000);
-        Whitebox.invokeMethod(FTRUMGlobalManager.get(), "generateRumData");
-    }
-
-    private void checkActionClose() throws Exception {
-        Thread.sleep(500);
-        Whitebox.invokeMethod(FTRUMGlobalManager.get(), "checkActionClose");
-
-    }
 
 }

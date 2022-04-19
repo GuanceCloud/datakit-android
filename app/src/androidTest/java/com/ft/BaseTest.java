@@ -5,6 +5,7 @@ import android.Manifest;
 import androidx.test.rule.GrantPermissionRule;
 
 import com.ft.sdk.FTExceptionHandler;
+import com.ft.sdk.FTRUMGlobalManager;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTrack;
 import com.ft.sdk.SyncTaskManager;
@@ -84,5 +85,11 @@ public class BaseTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    protected void checkActionClose() throws Exception {
+        Thread.sleep(500);
+        Whitebox.invokeMethod(FTRUMGlobalManager.get(), "checkActionClose");
+
     }
 }
