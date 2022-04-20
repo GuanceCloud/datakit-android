@@ -72,8 +72,8 @@ public class RUMSessionIdTest extends BaseTest {
     public void sessionGenerateTest() throws Exception {
         Thread.sleep(2000);
         onView(ViewMatchers.withId(R.id.main_mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
-        checkActionClose();
-        Thread.sleep(1000);
+        generateRumData();
+        Thread.sleep(2000);
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
         String sessionId = "";
         for (SyncJsonData recordData : recordDataList) {

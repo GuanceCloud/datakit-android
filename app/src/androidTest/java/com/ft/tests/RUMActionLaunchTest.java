@@ -59,9 +59,11 @@ public class RUMActionLaunchTest extends BaseTest {
 
 
     @Test
-    public void rumActionLaunchTest() throws InterruptedException {
+    public void rumActionLaunchTest() throws Exception {
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
+        generateRumData();
         Thread.sleep(1000);
+
         Assert.assertTrue(CheckUtils.checkValue(DataType.RUM_APP, "launch", 0));
     }
 

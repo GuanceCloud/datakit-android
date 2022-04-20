@@ -75,7 +75,6 @@ public class RUMActionSumTest extends BaseTest {
         Thread.sleep(2000);
         avoidCrash();
         onView(ViewMatchers.withId(R.id.main_mock_okhttp_btn)).perform(ViewActions.scrollTo()).perform(click());
-        Thread.sleep(2000);
         checkActionClose();
 
         Thread.sleep(5000);

@@ -12,9 +12,6 @@ import com.ft.tests.base.SDKRunStateTest;
 import com.ft.tests.ErrorTraceTest;
 import com.ft.tests.LogTest;
 import com.ft.tests.LogTrackTraceRUMTest;
-import com.ft.tests.TraceHeaderTest;
-//import com.ft.tests.MonitorTest;
-//import com.ft.tests.LocationTest;
 import com.ft.tests.base.OaidTest;
 
 import org.junit.runner.RunWith;
@@ -40,7 +37,6 @@ import org.junit.runners.Suite;
         OaidTest.class,//oaid 测试
 
         SDKRunStateTest.class,//SDK 生命周期测试
-        TraceHeaderTest.class,//trace 测试
         ErrorTraceTest.class//Log-崩溃日志测试
 })
 public class AllTests {

@@ -60,7 +60,8 @@ public class RUMGlobalContextTest extends BaseTest {
 
     @Test
     public void globalContextTest() throws Exception {
-        Thread.sleep(1000);
+        generateRumData();
+        Thread.sleep(2000);
         Assert.assertTrue(CheckUtils.checkValue(DataType.RUM_APP, new String[]{CUSTOM_KEY, CUSTOM_VALUE}, 0));
     }
 }

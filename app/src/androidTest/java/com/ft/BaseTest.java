@@ -88,8 +88,14 @@ public class BaseTest {
     }
 
     protected void checkActionClose() throws Exception {
-        Thread.sleep(500);
+        Thread.sleep(1000);
         Whitebox.invokeMethod(FTRUMGlobalManager.get(), "checkActionClose");
+
+    }
+
+    protected void generateRumData() throws Exception {
+        Thread.sleep(1000);
+        Whitebox.invokeMethod(FTRUMGlobalManager.get(), "generateRumData");
 
     }
 }

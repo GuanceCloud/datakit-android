@@ -4,6 +4,7 @@ import static com.ft.AllTests.hasPrepare;
 
 import android.content.Context;
 import android.os.Looper;
+import android.util.Log;
 
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -49,6 +50,7 @@ public class SDKGlobalContextTest extends BaseTest {
         FTSDKConfig ftSDKConfig = FTSDKConfig
                 .builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL))
                 .setDebug(true)//设置是否是 debug
+                .addGlobalContext(CUSTOM_KEY, CUSTOM_VALUE)
                 .setEnv(EnvType.GRAY);
         FTSdk.install(ftSDKConfig);
 
@@ -57,14 +59,15 @@ public class SDKGlobalContextTest extends BaseTest {
                 .setEnableTraceUserAction(true)
         );
 
-        FTSdk.initLogWithConfig(new FTLoggerConfig());
+        FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableConsoleLog(true));
 
         FTSdk.initTraceWithConfig(new FTTraceConfig());
     }
 
     @Test
     public void rumGlobalContextTest() throws Exception {
-        Thread.sleep(1000);
+        generateRumData();
+        Thread.sleep(2000);
         Assert.assertTrue(CheckUtils.checkValue(DataType.RUM_APP,
                 new String[]{CUSTOM_KEY, CUSTOM_VALUE}, 0));
     }
@@ -72,16 +75,14 @@ public class SDKGlobalContextTest extends BaseTest {
     @Test
     public void logGlobalContextTest() throws Exception {
         Thread.sleep(1000);
+        Log.d("TestLog", "log test");
+        Thread.sleep(2000);
         Assert.assertTrue(CheckUtils.checkValue(DataType.LOG,
                 new String[]{CUSTOM_KEY, CUSTOM_VALUE}, 0));
 
     }
 
-    @Test
-    public void traceGlobalContextTest() throws Exception {
-        Thread.sleep(1000);
-        Assert.assertTrue(CheckUtils.checkValue(DataType.TRACE,
-                new String[]{CUSTOM_KEY, CUSTOM_VALUE}, 0));
-
+    @Override
+    public void tearDown() {
     }
 }

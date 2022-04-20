@@ -76,6 +76,7 @@ public class RUMViewIdTest extends BaseTest {
     @Test
     public void viewGenerateTest() throws InterruptedException {
         Thread.sleep(2000);
+
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
 
         String viewId = "";
@@ -98,7 +99,7 @@ public class RUMViewIdTest extends BaseTest {
 
         onView(ViewMatchers.withId(R.id.main_view_loop_test)).perform(ViewActions.scrollTo()).perform(click());
 
-        Thread.sleep(1000);
+        Thread.sleep(3000);
 
         String newViewId = "";
 
