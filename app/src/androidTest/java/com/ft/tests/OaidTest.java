@@ -1,4 +1,4 @@
-package com.ft.tests.base;
+package com.ft.tests;
 
 import android.content.Context;
 import android.os.Looper;

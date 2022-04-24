@@ -1,18 +1,18 @@
 package com.ft;
 
 //import com.ft.tests.FTAutoTrackTest;
+
 import com.ft.tests.MonitorTest;
 import com.ft.tests.RUMActionIdTest;
 import com.ft.tests.RUMActionSumTest;
 import com.ft.tests.RUMSessionIdTest;
 import com.ft.tests.RUMViewIdTest;
 import com.ft.tests.RUMViewSumTest;
-import com.ft.tests.base.FTInitParamTest;
-import com.ft.tests.base.SDKRunStateTest;
 import com.ft.tests.ErrorTraceTest;
 import com.ft.tests.LogTest;
 import com.ft.tests.LogTrackTraceRUMTest;
-import com.ft.tests.base.OaidTest;
+import com.ft.tests.OaidTest;
+import com.ft.tests.base.FTInitParamTest;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -36,7 +36,6 @@ import org.junit.runners.Suite;
         MonitorTest.class,//监控测试
         OaidTest.class,//oaid 测试
 
-        SDKRunStateTest.class,//SDK 生命周期测试
         ErrorTraceTest.class//Log-崩溃日志测试
 })
 public class AllTests {

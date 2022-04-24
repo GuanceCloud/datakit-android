@@ -1,15 +1,11 @@
-package com.ft.tests.base;
-
-import static com.ft.AllTests.hasPrepare;
+package com.ft.sdk.tests;
 
 import android.content.Context;
 import android.os.Looper;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
 
-import com.ft.AccountUtils;
-import com.ft.BaseTest;
-import com.ft.application.MockApplication;
 import com.ft.sdk.EnvType;
 import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.FTLoggerConfigManager;
@@ -28,14 +24,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-/**
- * author: huangDianHua
- * time: 2020/8/25 13:42:48
- * description:
- */
 @RunWith(AndroidJUnit4.class)
-public class SDKRunStateTest extends BaseTest {
-    Context context;
+public class SDKRunStateTest {
+
+    static boolean hasPrepare = false;
 
     @Before
     public void setUp() {
@@ -43,8 +35,7 @@ public class SDKRunStateTest extends BaseTest {
             Looper.prepare();
             hasPrepare = true;
         }
-        context = MockApplication.getContext();
-        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL))
+        FTSDKConfig ftSDKConfig = FTSDKConfig.builder("http://test.url")
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setUseOAID(true)//设置 OAID 是否可用
                 .setDebug(true)//设置是否是 debug
