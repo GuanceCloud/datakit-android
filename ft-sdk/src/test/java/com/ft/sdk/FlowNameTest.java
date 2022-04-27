@@ -5,7 +5,7 @@ import com.ft.sdk.garble.utils.Utils;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class FlowProductTest {
+public class FlowNameTest {
     @Test
     public void isLegalProduct0(){
         Assert.assertTrue(Utils.isLegalProduct("123wwe-_A"));

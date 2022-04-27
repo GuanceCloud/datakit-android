@@ -1,4 +1,4 @@
-package com.ft.utils;
+package com.ft.test.utils;
 
 import com.ft.sdk.SyncDataHelper;
 import com.ft.sdk.garble.bean.DataType;

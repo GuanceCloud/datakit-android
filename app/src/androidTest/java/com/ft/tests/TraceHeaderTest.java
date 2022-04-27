@@ -8,7 +8,7 @@ import static com.ft.sdk.FTTraceHandler.W3C_TRACEPARENT_KEY;
 import static com.ft.sdk.FTTraceHandler.ZIPKIN_SAMPLED;
 import static com.ft.sdk.FTTraceHandler.ZIPKIN_SPAN_ID;
 import static com.ft.sdk.FTTraceHandler.ZIPKIN_TRACE_ID;
-import static com.ft.utils.RequestUtil.requestUrl;
+import static com.ft.test.utils.RequestUtil.requestUrl;
 
 import android.content.Context;
 import android.os.Looper;

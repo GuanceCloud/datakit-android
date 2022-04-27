@@ -46,7 +46,6 @@ public class DemoApplication extends Application {
 
         FTSdk.initLogWithConfig(new FTLoggerConfig()
                 .setSamplingRate(1f)
-                .setEnableLinkRumData(true)
                 .setEnableCustomLog(true)
                 .setEnableConsoleLog(true)
                 .setEnableLinkRumData(true)

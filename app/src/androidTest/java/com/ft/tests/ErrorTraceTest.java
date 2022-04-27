@@ -22,7 +22,7 @@ import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.bean.DataType;
-import com.ft.utils.CheckUtils;
+import com.ft.test.utils.CheckUtils;
 
 import org.junit.Assert;
 import org.junit.Before;

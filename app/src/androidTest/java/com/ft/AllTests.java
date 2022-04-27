@@ -2,17 +2,11 @@ package com.ft;
 
 //import com.ft.tests.FTAutoTrackTest;
 
-import com.ft.tests.MonitorTest;
-import com.ft.tests.RUMActionIdTest;
-import com.ft.tests.RUMActionSumTest;
-import com.ft.tests.RUMSessionIdTest;
-import com.ft.tests.RUMViewIdTest;
-import com.ft.tests.RUMViewSumTest;
 import com.ft.tests.ErrorTraceTest;
-import com.ft.tests.LogTest;
-import com.ft.tests.LogTrackTraceRUMTest;
-import com.ft.tests.OaidTest;
-import com.ft.tests.base.FTInitParamTest;
+import com.ft.tests.ConsoleLogTest;
+import com.ft.tests.ServerConnectTest;
+import com.ft.tests.RUMResourceTest;
+import com.ft.tests.TraceHeaderTest;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -24,19 +18,11 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        RUMActionIdTest.class,
-        RUMActionSumTest.class,
-        RUMSessionIdTest.class,
-        RUMViewIdTest.class,
-        RUMViewSumTest.class,
-        LogTrackTraceRUMTest.class,//数据同步-log、track、trace
-
-        LogTest.class,//Log-控制台日志,短时间批量插入丢弃策略测试
-        FTInitParamTest.class,//Base-Property 参数测试
-        MonitorTest.class,//监控测试
-        OaidTest.class,//oaid 测试
-
-        ErrorTraceTest.class//Log-崩溃日志测试
+        ConsoleLogTest.class,//Log-控制台日志,短时间批量插入丢弃策略测试
+        ServerConnectTest.class,//Base-Property 参数测试
+        ErrorTraceTest.class,//Log-崩溃日志测试
+        TraceHeaderTest.class,
+        RUMResourceTest.class
 })
 public class AllTests {
     public static boolean hasPrepare;

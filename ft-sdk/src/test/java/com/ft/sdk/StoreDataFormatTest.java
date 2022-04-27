@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
  * DATE:2019-12-16 10:17
  * Description:
  */
-public class FTTrackTest {
+public class StoreDataFormatTest {
 
     @Test
     public void isLegalValues() {

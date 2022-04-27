@@ -1,4 +1,4 @@
-package com.ft.utils;
+package com.ft.test.utils;
 
 import android.os.Build;
 

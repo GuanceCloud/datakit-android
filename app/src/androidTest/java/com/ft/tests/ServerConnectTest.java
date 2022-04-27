@@ -1,4 +1,4 @@
-package com.ft.tests.base;
+package com.ft.tests;
 
 import android.content.Context;
 import android.os.Looper;
@@ -39,7 +39,7 @@ import static org.junit.Assert.assertEquals;
  * Description: 用户绑定与解绑测试类
  */
 @RunWith(AndroidJUnit4.class)
-public class FTInitParamTest extends BaseTest {
+public class ServerConnectTest extends BaseTest {
     Context context = null;
     int codeScope = 0;
 
@@ -64,29 +64,11 @@ public class FTInitParamTest extends BaseTest {
 
 
     @Test
-    public void emptyServiceName() {
-        serviceNameParamTest(null, DEFAULT_LOG_SERVICE_NAME);
-    }
-
-    @Test
-    public void normalServiceName() {
-        serviceNameParamTest("Test", "Test");
-    }
-
-    @Test
-    public void emptyEnv() {
-        envParamTest(null, EnvType.PROD);
-    }
-
-    @Test
-    public void normalEnv() {
-        envParamTest(EnvType.GRAY, EnvType.GRAY);
-    }
-
-    @Test
     public void emptyUrl() throws JSONException, InterruptedException {
         urlParamTest(null, 10004);
     }
+
+
 
     @Test
     public void errorUrl() throws JSONException, InterruptedException {
@@ -98,14 +80,7 @@ public class FTInitParamTest extends BaseTest {
         urlParamTest(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL), 200);
     }
 
-    @Test
-    public void rumAppId() {
-        String appid = "appIdxxxxxx";
-        FTSdk.initRUMWithConfig(new FTRUMConfig().setRumAppId(appid));
-        Assert.assertEquals(appid, FTRUMConfigManager.get().getConfig().getRumAppId());
-        Assert.assertTrue(FTRUMConfigManager.get().isRumEnable());
-        Assert.assertEquals(FTRUMConfigManager.get().getConfig().getRumAppId(), appid);
-    }
+
 
 
     private void uuidParamTest(String uuid, int expected) throws JSONException, InterruptedException {
@@ -115,20 +90,6 @@ public class FTInitParamTest extends BaseTest {
         requestNetVerifyData(expected);
     }
 
-    private void serviceNameParamTest(String serviceName, String expected) {
-        FTSDKConfig ftSDKConfig = getDefaultConfig();
-        FTSdk.install(ftSDKConfig);
-        FTSdk.initLogWithConfig(new FTLoggerConfig().setServiceName(serviceName));
-
-        Assert.assertEquals(expected, FTLoggerConfigManager.get().getConfig().getServiceName());
-    }
-
-    private void envParamTest(EnvType env, EnvType expected) {
-        FTSDKConfig ftSDKConfig = getDefaultConfig()
-                .setEnv(env);
-        FTSdk.install(ftSDKConfig);
-        Assert.assertEquals(expected, FTSdk.get().getBaseConfig().getEnv());
-    }
 
     public void urlParamTest(String url, int expected) throws JSONException, InterruptedException {
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(url);

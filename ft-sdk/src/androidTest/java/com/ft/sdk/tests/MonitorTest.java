@@ -1,35 +1,24 @@
-package com.ft.tests;
-
-import android.content.Context;
-import android.os.Looper;
+package com.ft.sdk.tests;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.ft.AccountUtils;
-import com.ft.BaseTest;
-import com.ft.application.MockApplication;
 import com.ft.sdk.FTMonitor;
-import com.ft.sdk.FTRUMConfig;
-import com.ft.sdk.FTRUMConfigManager;
-import com.ft.sdk.FTSDKConfig;
-import com.ft.sdk.FTSdk;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
-import com.ft.sdk.garble.service.FTMonitorManager;
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.test.base.FTBaseTest;
 
 import org.json.JSONException;
+import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.HashMap;
 import java.util.List;
 
-import static com.ft.AllTests.hasPrepare;
 
 /**
  * author: huangDianHua
@@ -37,23 +26,7 @@ import static com.ft.AllTests.hasPrepare;
  * description:监控类数据测试
  */
 @RunWith(AndroidJUnit4.class)
-public class MonitorTest extends BaseTest {
-    Context context;
-
-    @Before
-    public void setUp() {
-        if (!hasPrepare) {
-            Looper.prepare();
-            hasPrepare = true;
-        }
-        context = MockApplication.getContext();
-        FTSDKConfig ftSDKConfig= FTSDKConfig
-                .builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL)
-        );
-
-        FTSdk.install(ftSDKConfig);
-
-    }
+public class MonitorTest extends FTBaseTest {
 
     @Test
     public void monitorBatteryTest() throws Exception {
@@ -172,7 +145,6 @@ public class MonitorTest extends BaseTest {
 //        expects.put(MonitorType.FPS, Constants.KEY_FPS);
         return expects;
     }
-
 
 }
 

@@ -12,14 +12,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.ft.AccountUtils;
 import com.ft.BaseTest;
 import com.ft.application.MockApplication;
-import com.ft.sdk.FTLogger;
 import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.Status;
-import com.ft.utils.CheckUtils;
+import com.ft.test.utils.CheckUtils;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -32,7 +31,7 @@ import org.junit.runner.RunWith;
  * description:控制台日志测试用例、丢弃策略测试
  */
 @RunWith(AndroidJUnit4.class)
-public class LogTest extends BaseTest {
+public class ConsoleLogTest extends BaseTest {
     Context context;
 
     @Before
@@ -78,24 +77,22 @@ public class LogTest extends BaseTest {
 
     @Test
     public void consoleLogLevelTest() throws InterruptedException {
-        FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableCustomLog(true)
+        FTSdk.initLogWithConfig(new FTLoggerConfig()
                 .setEnableConsoleLog(true)
                 .setLogLevelFilters(new Status[]{Status.ERROR}));
 
         String logContent = "logTest";
         Log.d("TestLog", logContent);
-        FTLogger.getInstance().logBackground(logContent, Status.INFO);
 
         Thread.sleep(1000);
         int except = CheckUtils.getCount(DataType.LOG, logContent, 10);
         Assert.assertEquals(0, except);
 
         Log.e("TestLog", logContent);
-        FTLogger.getInstance().logBackground(logContent, Status.ERROR);
 
         Thread.sleep(1000);
         except = CheckUtils.getCount(DataType.LOG, logContent, 10);
-        Assert.assertEquals(2, except);
+        Assert.assertEquals(1, except);
 
 
     }

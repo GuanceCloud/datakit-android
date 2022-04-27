@@ -28,6 +28,8 @@ import java.util.List;
 public class FTDBManager extends DBManager {
     private static FTDBManager ftdbManager;
     public final static String TAG = "FTDBManager";
+    private boolean isAndroidTest = false;
+
 
     private FTDBManager() {
     }
@@ -347,13 +349,14 @@ public class FTDBManager extends DBManager {
     }
 
     public void cleanCloseActionData() {
-
+        if (isAndroidTest) return;
         getDB(true, db -> {
             db.execSQL("DELETE FROM " + FTSQL.FT_TABLE_ACTION + " WHERE " + FTSQL.RUM_COLUMN_IS_CLOSE + "=1");
         });
     }
 
     public void cleanCloseViewData() {
+        if (isAndroidTest) return;
         getDB(true, db -> {
             db.execSQL("DELETE FROM " + FTSQL.FT_TABLE_VIEW + " WHERE " + FTSQL.RUM_COLUMN_IS_CLOSE
                     + "=1 AND " + FTSQL.RUM_COLUMN_PENDING_RESOURCE + "<=0");

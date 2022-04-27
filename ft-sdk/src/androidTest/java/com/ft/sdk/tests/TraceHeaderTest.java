@@ -117,7 +117,7 @@ public class TraceHeaderTest {
         HashMap<String, String> map = null;
         try {
             map = FTTraceManager.get()
-                    .getTraceHeader(key, "https://www.baidu.com");
+                    .getTraceHeader(key, "https://www.test.url");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (URISyntaxException e) {
