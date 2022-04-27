@@ -1,6 +1,5 @@
 package com.ft.sdk.tests;
 
-import static androidx.test.espresso.action.ViewActions.click;
 import static com.ft.sdk.FTSdkAllTests.hasPrepare;
 
 import android.os.Looper;
@@ -30,6 +29,7 @@ import com.google.mockwebserver.MockWebServer;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -314,34 +314,6 @@ public class RUMTest extends FTBaseTest {
         FTRUMGlobalManager.get().addResource(resourceId, params, bean);
     }
 
-    @Test
-    public void rumUserBindTest() throws InterruptedException {
-        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
-        FTSdk.initRUMWithConfig(new FTRUMConfig());
-        FTRUMGlobalManager.get().startView(ANY_VIEW);
-        FTRUMGlobalManager.get().stopView();
-        waitForInThreadPool();
-        FTSdk.bindRumUserData("123456");
-        Thread.sleep(5000);
-        int except2 = CheckUtils.getCount(DataType.RUM_APP, "is_signin=T", 0);
-        Assert.assertTrue(except2 > 0);
-
-
-    }
-
-    @Test
-    public void rumUserUnBindTest() throws InterruptedException {
-        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
-        FTSdk.initRUMWithConfig(new FTRUMConfig());
-        FTRUMGlobalManager.get().startView(ANY_VIEW);
-        FTRUMGlobalManager.get().stopView();
-        waitForInThreadPool();
-        FTSdk.bindRumUserData("123456");
-        FTSdk.unbindRumUserData();
-        Thread.sleep(5000);
-        int except4 = CheckUtils.getCount(DataType.RUM_APP, "is_signin=T", 0);
-        Assert.assertEquals(0, except4);
-    }
 
     @Test
     public void traceLinkRUMDataEnable() throws InterruptedException, IOException {
