@@ -44,6 +44,7 @@ dependencies {
     testImplementation 'org.robolectric:android-all:10-robolectric-5803371'
     testImplementation 'org.robolectric:robolectric:4.7.2'
     testImplementation 'org.robolectric:shadows-httpclient:3.3.2'
+    testImplementation 'org.powermock:powermock-module-junit4:2.0.7'
     testImplementation 'com.google.mockwebserver:mockwebserver:20130706'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

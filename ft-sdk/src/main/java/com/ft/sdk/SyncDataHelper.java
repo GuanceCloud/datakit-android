@@ -473,80 +473,80 @@ public class SyncDataHelper {
     }
 
 
-    /**
-     * 添加相机监控数据
-     *
-     * @param tags
-     * @param fields
-     */
-    private static void createCamera(JSONObject tags, JSONObject fields) {
-        try {
-            List<CameraPx> cameraPxs = CameraUtils.get().getCameraPxList(FTApplication.getApplication());
-            for (CameraPx cameraPx : cameraPxs) {
-                tags.put(cameraPx.getPx()[0], cameraPx.getPx()[1]);
-            }
-        } catch (Exception e) {
-            LogUtils.e(TAG, "相机数据获取异常:" + e.getMessage());
-        }
-    }
+//    /**
+//     * 添加相机监控数据
+//     *
+//     * @param tags
+//     * @param fields
+//     */
+//    private static void createCamera(JSONObject tags, JSONObject fields) {
+//        try {
+//            List<CameraPx> cameraPxs = CameraUtils.get().getCameraPxList(FTApplication.getApplication());
+//            for (CameraPx cameraPx : cameraPxs) {
+//                tags.put(cameraPx.getPx()[0], cameraPx.getPx()[1]);
+//            }
+//        } catch (Exception e) {
+//            LogUtils.e(TAG, "相机数据获取异常:" + e.getMessage());
+//        }
+//    }
+//
+//    /**
+//     * 添加位置监控数据
+//     *
+//     * @param tags
+//     * @param fields
+//     */
+//    private static void createLocation(JSONObject tags, JSONObject fields) {
+//        try {
+//            Address address = LocationUtils.get().getAddress();
+//            double[] location = LocationUtils.get().getLocation();
+//            if (address != null) {
+//                tags.put(Constants.KEY_LOCATION_PROVINCE, address.getAdminArea());
+//                tags.put(Constants.KEY_LOCATION_CITY, address.getLocality());
+//                tags.put(Constants.KEY_LOCATION_COUNTRY, address.getCountryName());
+//            } else {
+//                tags.put(Constants.KEY_LOCATION_PROVINCE, null);
+//                tags.put(Constants.KEY_LOCATION_CITY, null);
+//                tags.put(Constants.KEY_LOCATION_COUNTRY, null);
+//            }
+//
+//            if (location != null) {
+//                fields.put(Constants.KEY_LOCATION_LATITUDE, location[0]);
+//                fields.put(Constants.KEY_LOCATION_LONGITUDE, location[1]);
+//            } else {
+//                fields.put(Constants.KEY_LOCATION_LATITUDE, 0);
+//                fields.put(Constants.KEY_LOCATION_LONGITUDE, 0);
+//            }
+//            tags.put(Constants.KEY_LOCATION_GPS_OPEN, LocationUtils.get().isOpenGps());
+//        } catch (Exception e) {
+//            LogUtils.e(TAG, "位置数据获取异常:" + e.getMessage());
+//        }
+//    }
 
-    /**
-     * 添加位置监控数据
-     *
-     * @param tags
-     * @param fields
-     */
-    private static void createLocation(JSONObject tags, JSONObject fields) {
-        try {
-            Address address = LocationUtils.get().getAddress();
-            double[] location = LocationUtils.get().getLocation();
-            if (address != null) {
-                tags.put(Constants.KEY_LOCATION_PROVINCE, address.getAdminArea());
-                tags.put(Constants.KEY_LOCATION_CITY, address.getLocality());
-                tags.put(Constants.KEY_LOCATION_COUNTRY, address.getCountryName());
-            } else {
-                tags.put(Constants.KEY_LOCATION_PROVINCE, null);
-                tags.put(Constants.KEY_LOCATION_CITY, null);
-                tags.put(Constants.KEY_LOCATION_COUNTRY, null);
-            }
+//    private static void createSystem(JSONObject tags, JSONObject fields) {
+//        try {
+//            fields.put(Constants.KEY_DEVICE_OPEN_TIME, DeviceUtils.getSystemOpenTime());
+//            tags.put(Constants.KEY_DEVICE_NAME, BluetoothUtils.get().getDeviceName());
+//        } catch (Exception e) {
+//            LogUtils.e(TAG, "系统数据获取异常:" + e.getMessage());
+//        }
+//    }
 
-            if (location != null) {
-                fields.put(Constants.KEY_LOCATION_LATITUDE, location[0]);
-                fields.put(Constants.KEY_LOCATION_LONGITUDE, location[1]);
-            } else {
-                fields.put(Constants.KEY_LOCATION_LATITUDE, 0);
-                fields.put(Constants.KEY_LOCATION_LONGITUDE, 0);
-            }
-            tags.put(Constants.KEY_LOCATION_GPS_OPEN, LocationUtils.get().isOpenGps());
-        } catch (Exception e) {
-            LogUtils.e(TAG, "位置数据获取异常:" + e.getMessage());
-        }
-    }
-
-    private static void createSystem(JSONObject tags, JSONObject fields) {
-        try {
-            fields.put(Constants.KEY_DEVICE_OPEN_TIME, DeviceUtils.getSystemOpenTime());
-            tags.put(Constants.KEY_DEVICE_NAME, BluetoothUtils.get().getDeviceName());
-        } catch (Exception e) {
-            LogUtils.e(TAG, "系统数据获取异常:" + e.getMessage());
-        }
-    }
-
-    private static void createBluetooth(JSONObject tags, JSONObject fields) {
-        try {
-            Set<BluetoothDevice> set = BluetoothUtils.get().getBondedDevices();
-            if (set != null) {
-                int i = 1;
-                for (BluetoothDevice device : set) {
-                    fields.put(Constants.KEY_BT_DEVICE + (i++), device.getAddress());
-                }
-            }
-            tags.put(Constants.KEY_BT_OPEN, BluetoothUtils.get().isOpen());
-
-        } catch (Exception e) {
-            LogUtils.e(TAG, "蓝牙数据获取异常:" + e.getMessage());
-        }
-    }
+//    private static void createBluetooth(JSONObject tags, JSONObject fields) {
+//        try {
+//            Set<BluetoothDevice> set = BluetoothUtils.get().getBondedDevices();
+//            if (set != null) {
+//                int i = 1;
+//                for (BluetoothDevice device : set) {
+//                    fields.put(Constants.KEY_BT_DEVICE + (i++), device.getAddress());
+//                }
+//            }
+//            tags.put(Constants.KEY_BT_OPEN, BluetoothUtils.get().isOpen());
+//
+//        } catch (Exception e) {
+//            LogUtils.e(TAG, "蓝牙数据获取异常:" + e.getMessage());
+//        }
+//    }
 
 //    private static void createSensor(JSONObject tags, JSONObject fields) {
 //        try {

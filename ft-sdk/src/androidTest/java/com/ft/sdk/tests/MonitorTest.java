@@ -2,7 +2,7 @@ package com.ft.sdk.tests;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.ft.sdk.FTMonitor;
+import com.ft.sdk.FTMonitorConfigManager;
 import com.ft.sdk.MonitorType;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncJsonData;
@@ -11,7 +11,6 @@ import com.ft.sdk.garble.utils.Constants;
 import com.ft.test.base.FTBaseTest;
 
 import org.json.JSONException;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,19 +29,19 @@ public class MonitorTest extends FTBaseTest {
 
     @Test
     public void monitorBatteryTest() throws Exception {
-        FTMonitor.get().setMonitorType(MonitorType.BATTERY);
+        FTMonitorConfigManager.get().setMonitorType(MonitorType.BATTERY);
         monitorTest(MonitorType.BATTERY);
     }
 
     @Test
     public void monitorMemoryTest() throws Exception {
-        FTMonitor.get().setMonitorType(MonitorType.MEMORY);
+        FTMonitorConfigManager.get().setMonitorType(MonitorType.MEMORY);
         monitorTest(MonitorType.MEMORY);
     }
 
     @Test
     public void monitorCPUTest() throws Exception {
-        FTMonitor.get().setMonitorType(MonitorType.CPU);
+        FTMonitorConfigManager.get().setMonitorType(MonitorType.CPU);
         monitorTest(MonitorType.CPU);
     }
 //
@@ -146,5 +145,9 @@ public class MonitorTest extends FTBaseTest {
         return expects;
     }
 
+    @Override
+    public void tearDown() {
+        FTDBManager.get().delete();
+    }
 }
 

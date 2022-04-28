@@ -18,6 +18,7 @@ import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
 import com.ft.sdk.FTTraceConfigManager;
 import com.ft.sdk.FTTrack;
+import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.manager.AsyncCallback;
 
 import org.json.JSONException;
@@ -65,7 +66,7 @@ public class ServerConnectTest extends BaseTest {
 
     @Test
     public void emptyUrl() throws JSONException, InterruptedException {
-        urlParamTest(null, 10004);
+        urlParamTest(null, NetCodeStatus.UNKNOWN_EXCEPTION_CODE);
     }
 
 

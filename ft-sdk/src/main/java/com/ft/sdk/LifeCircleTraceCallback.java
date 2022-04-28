@@ -50,7 +50,7 @@ class LifeCircleTraceCallback {
 //                FTAutoTrack.startApp();
                 startTime = Utils.getCurrentNanoTime();
             }
-            FTMonitor.get().checkForReStart();
+//            FTMonitor.get().checkForReStart();
         }
 
 

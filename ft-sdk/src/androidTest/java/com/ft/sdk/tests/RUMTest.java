@@ -270,6 +270,10 @@ public class RUMTest extends FTBaseTest {
 
     }
 
+    /**
+     * 测试采样率 100%
+     * @throws Exception
+     */
     @Test
     public void sampleRate100Test() throws Exception {
         FTSdk.initRUMWithConfig(new FTRUMConfig().setSamplingRate(100));
@@ -282,6 +286,10 @@ public class RUMTest extends FTBaseTest {
 
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     private void generateRUMData() throws Exception {
         FTRUMGlobalManager.get().startView(ANY_VIEW);
         FTRUMGlobalManager.get().addError(ERROR, ERROR_MESSAGE, ErrorType.JAVA, AppState.RUN);
@@ -294,6 +302,9 @@ public class RUMTest extends FTBaseTest {
         Thread.sleep(3000L);
     }
 
+    /**
+     * 发送资源
+     */
     private void sendResource() {
         String resourceId = Utils.getGUID_16();
         FTRUMGlobalManager.get().startResource(resourceId);
@@ -314,6 +325,11 @@ public class RUMTest extends FTBaseTest {
         FTRUMGlobalManager.get().addResource(resourceId, params, bean);
     }
 
+    /**
+     * RUM link Trace
+     * @throws InterruptedException
+     * @throws IOException
+     */
 
     @Test
     public void traceLinkRUMDataEnable() throws InterruptedException, IOException {
