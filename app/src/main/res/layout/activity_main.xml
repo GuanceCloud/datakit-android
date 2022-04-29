@@ -60,12 +60,6 @@
             android:layout_height="wrap_content"
             android:text="测试 OkHttp 请求自动添加拦截器" />
 
-        <Button
-            android:id="@+id/main_mock_httpclient_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="测试 HttpClient5 请求自动添加拦截器" />
-
 
         <Button
             android:id="@+id/main_view_loop_test"

@@ -8,7 +8,6 @@ import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
-import com.ft.sdk.garble.utils.LocationUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.OaidUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -89,7 +88,7 @@ public class FTSdk {
         FTAutoTrackConfigManager.release();
         FTHttpConfigManager.release();
         FTNetworkListener.get().release();
-        LocationUtils.get().stopListener();
+//        LocationUtils.get().stopListener();
         FTExceptionHandler.release();
         FTDBCachePolicy.release();
         FTUIBlockManager.release();

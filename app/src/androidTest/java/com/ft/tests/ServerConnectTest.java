@@ -8,30 +8,26 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.ft.AccountUtils;
 import com.ft.BaseTest;
 import com.ft.application.MockApplication;
-import com.ft.sdk.EnvType;
 import com.ft.sdk.FTLoggerConfig;
-import com.ft.sdk.FTLoggerConfigManager;
-import com.ft.sdk.FTRUMConfig;
-import com.ft.sdk.FTRUMConfigManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
-import com.ft.sdk.FTTraceConfig;
-import com.ft.sdk.FTTraceConfigManager;
-import com.ft.sdk.FTTrack;
+import com.ft.sdk.FTTrackInner;
+import com.ft.sdk.garble.bean.LineProtocolBean;
 import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.manager.AsyncCallback;
+import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.powermock.reflect.Whitebox;
 
+import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 
 import static com.ft.AllTests.hasPrepare;
-import static com.ft.sdk.garble.utils.Constants.DEFAULT_LOG_SERVICE_NAME;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -53,59 +49,40 @@ public class ServerConnectTest extends BaseTest {
         context = MockApplication.getContext();
     }
 
-    @Test
-    public void emptyUuidParamTest() throws JSONException, InterruptedException {
-        uuidParamTest(null, 200);
-    }
 
     @Test
-    public void normalUuidParamTest() throws JSONException, InterruptedException {
-        uuidParamTest("ft-dataKit-uuid-001", 200);
-    }
-
-
-    @Test
-    public void emptyUrl() throws JSONException, InterruptedException {
+    public void emptyUrl() throws Exception {
         urlParamTest(null, NetCodeStatus.UNKNOWN_EXCEPTION_CODE);
     }
 
 
-
     @Test
-    public void errorUrl() throws JSONException, InterruptedException {
+    public void errorUrl() throws Exception {
         urlParamTest("http://www.baidu.com", 404);
     }
 
     @Test
-    public void normalUrl() throws JSONException, InterruptedException {
+    public void normalUrl() throws Exception {
         urlParamTest(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL), 200);
     }
 
 
-
-
-    private void uuidParamTest(String uuid, int expected) throws JSONException, InterruptedException {
-        FTSDKConfig ftSDKConfig = getDefaultConfig()
-                .setXDataKitUUID(uuid);
-        FTSdk.install(ftSDKConfig);
-        requestNetVerifyData(expected);
-    }
-
-
-    public void urlParamTest(String url, int expected) throws JSONException, InterruptedException {
+    public void urlParamTest(String url, int expected) throws Exception {
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(url);
         FTSdk.install(ftSDKConfig);
+        FTSdk.initLogWithConfig(new FTLoggerConfig());
         requestNetVerifyData(expected);
     }
 
-
-    private void requestNetVerifyData(int expected) throws JSONException, InterruptedException {
+    private void requestNetVerifyData(int expected) throws Exception {
         CountDownLatch countDownLatch = new CountDownLatch(1);
         JSONObject tags = new JSONObject();
         tags.put("testTag", "111");
         JSONObject fields = new JSONObject();
         fields.put("testFields", "222");
-        FTTrack.getInstance().trackImmediate("TestMeasurement", tags, fields, new AsyncCallback() {
+        long time = Utils.getCurrentNanoTime();
+        LineProtocolBean bean = new LineProtocolBean("TestMeasurement", tags, fields, time);
+        Whitebox.invokeMethod(FTTrackInner.getInstance(), "trackAsync", Collections.singletonList(bean), new AsyncCallback() {
             @Override
             public void onResponse(int code, String response) {
                 codeScope = code;
@@ -116,8 +93,4 @@ public class ServerConnectTest extends BaseTest {
         assertEquals(expected, codeScope);
     }
 
-    private FTSDKConfig getDefaultConfig() {
-        return FTSDKConfig.builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL)
-        );
-    }
 }

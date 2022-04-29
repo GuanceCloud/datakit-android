@@ -7,7 +7,7 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import com.ft.sdk.FTExceptionHandler;
 import com.ft.sdk.FTRUMGlobalManager;
 import com.ft.sdk.FTSdk;
-import com.ft.sdk.FTTrack;
+import com.ft.sdk.FTTrackInner;
 import com.ft.sdk.SyncDataHelper;
 import com.ft.sdk.SyncTaskManager;
 import com.ft.sdk.garble.bean.DataType;
@@ -16,6 +16,7 @@ import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.manager.AsyncCallback;
 import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,13 +55,12 @@ public class FTBaseTest {
         Whitebox.invokeMethod(SyncTaskManager.get(), "executeSyncPoll");
     }
 
-    protected void simpleTrackData() throws JSONException {
-        JSONObject tags = new JSONObject();
-        tags.put("testTag", "tagTest");
-        JSONObject fields = new JSONObject();
-        fields.put("testField", CONTENT_SIMPLE_TEST);
-        FTTrack.getInstance().trackBackground(TEST_MEASUREMENT, tags, fields);
+    protected void invokeSyncData(DataType type, String measurement, JSONObject tags, JSONObject fileds) throws Exception {
+        Whitebox.invokeMethod(FTTrackInner.getInstance(), "syncDataBackground",
+                type, Utils.getCurrentNanoTime(), measurement, tags, fileds);
+
     }
+
 
     protected void avoidCrash() {
         try {

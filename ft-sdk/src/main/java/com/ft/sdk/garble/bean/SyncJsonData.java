@@ -4,18 +4,13 @@ import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.FloatDoubleJsonUtils;
-import com.ft.sdk.garble.utils.Utils;
 import com.ft.sdk.internal.exception.FTInvalidParameterException;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.security.InvalidParameterException;
-import java.util.ArrayList;
-import java.util.List;
 
-import static com.ft.sdk.SyncDataHelper.addMonitorData;
 
 /**
  * BY huangDianHua
@@ -92,40 +87,6 @@ public class SyncJsonData implements Cloneable {
         return dataString;
     }
 
-    /**
-     * 获得格式化的打印内容
-     *
-     * @return
-     */
-    public String printFormatRecordData() {
-        StringBuilder buffer = new StringBuilder();
-        buffer.append("\n{");
-        buffer.append("\n\t\"opData\":\"" + dataString + "\"");
-        buffer.append("\n}");
-        return buffer.toString();
-    }
-
-    public static SyncJsonData getFromObjectData(ObjectBean objectBean) {
-        ArrayList<ObjectBean> list = new ArrayList<>();
-        list.add(objectBean);
-        return getFromObjectList(list);
-    }
-
-    public static SyncJsonData getFromObjectList(List<ObjectBean> datas) {
-
-        SyncJsonData jsonData = new SyncJsonData(DataType.OBJECT);
-        JSONArray array = new JSONArray();
-        for (ObjectBean data : datas
-        ) {
-            array.put(data.getJSONData());
-
-        }
-        jsonData.setDataString(array.toString());
-
-        return jsonData;
-
-    }
-
 
     /**
      * 追踪数据转化
@@ -146,19 +107,6 @@ public class SyncJsonData implements Cloneable {
 
         recordData.setDataString(FloatDoubleJsonUtils.protectValueFormat(opDataJson));
         return recordData;
-    }
-
-    public static SyncJsonData getMonitorData() throws JSONException {
-        JSONObject tags = new JSONObject();
-        JSONObject fields = new JSONObject();
-        addMonitorData(tags, fields);
-        SyncJsonData recordData = new SyncJsonData(DataType.TRACK);
-
-        JSONObject opDataJson = getLinProtocolJson(Constants.FT_MEASUREMENT_MONITOR, tags, fields);
-        recordData.setDataString(FloatDoubleJsonUtils.protectValueFormat(opDataJson));
-        recordData.setTime(Utils.getCurrentNanoTime());
-        return recordData;
-
     }
 
 

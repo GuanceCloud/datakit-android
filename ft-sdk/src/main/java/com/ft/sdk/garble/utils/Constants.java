@@ -42,17 +42,11 @@ public class Constants {
     public static final String FT_MEASUREMENT_RUM_RESOURCE = "resource";
     public static final String FT_MEASUREMENT_RUM_ACTION = "action";
 
-    public static final String PERFIX = "ft_parent_not_fragment";
-
-    public static final String MOCK_SON_PAGE_DATA = "mock_son_page_data";
-    public static final String SHARE_PRE_STEP_DATE = "share_pre_step_date";
-    public static final String SHARE_PRE_STEP_HISTORY = "share_pre_step_history";
 
     public static final String URL_MODEL_TRACK_INFLUX = "v1/write/metric";//指标数据上传路径
     public static final String URL_MODEL_RUM = "v1/write/rum";//
     public static final String URL_MODEL_LOG = "v1/write/logging";//日志数据上传路径
     public static final String URL_MODEL_TRACING = "v1/write/tracing";//链路上传
-    public static final String URL_MODEL_OBJECT = "v1/write/object";//对象数据上传路径
 
     public static final String DEFAULT_OBJECT_CLASS = "Mobile_Device";//默认的对象名
     public static final String DEFAULT_LOG_SERVICE_NAME = "df_rum_android";
@@ -82,10 +76,6 @@ public class Constants {
     public static final String KEY_CPU_TEMPERATURE = "cpu_temperature";
     public static final String KEY_CPU_HZ = "cpu_hz";
 
-    public static final String KEY_GPU_MODEL = "gpu_model";
-    public static final String KEY_GPU_HZ = "gpu_hz";
-    public static final String KEY_GPU_RATE = "gpu_rate";
-
     public static final String KEY_NETWORK_TYPE = "network_type";
     public static final String KEY_NETWORK_STRENGTH = "network_strength";
     public static final String KEY_NETWORK_IN_RATE = "network_in_rate";
@@ -101,37 +91,8 @@ public class Constants {
     public static final String KEY_NETWORK_TCP_TIME = "network_tcp_time";
     public static final String KEY_NETWORK_DNS_TIME = "network_dns_time";
     public static final String KEY_NETWORK_RESPONSE_TIME = "network_response_time";
-//    public static final String KEY_NETWORK_ERROR_RATE = "network_error_rate";
 
-    public static final String KEY_LOCATION_PROVINCE = "province";
-    public static final String KEY_LOCATION_CITY = "city";
-    public static final String KEY_LOCATION_COUNTRY = "country";
-    public static final String KEY_LOCATION_LATITUDE = "latitude";
-    public static final String KEY_LOCATION_LONGITUDE = "longitude";
-    public static final String KEY_LOCATION_GPS_OPEN = "gps_open";
 
-    public static final String KEY_DEVICE_OPEN_TIME = "device_open_time";
-    public static final String KEY_DEVICE_NAME = "device_name";
-
-    public static final String KEY_BT_DEVICE = "bt_device";
-    public static final String KEY_BT_OPEN = "bt_open";
-
-//    public static final String KEY_SENSOR_BRIGHTNESS = "screen_brightness";
-//    public static final String KEY_SENSOR_LIGHT = "light";
-//    public static final String KEY_SENSOR_PROXIMITY = "proximity";
-//    public static final String KEY_SENSOR_STEPS = "steps";
-//    public static final String KEY_SENSOR_ROTATION_X = "rotation_x";
-//    public static final String KEY_SENSOR_ROTATION_Y = "rotation_y";
-//    public static final String KEY_SENSOR_ROTATION_Z = "rotation_z";
-//    public static final String KEY_SENSOR_ACCELERATION_X = "acceleration_x";
-//    public static final String KEY_SENSOR_ACCELERATION_Y = "acceleration_y";
-//    public static final String KEY_SENSOR_ACCELERATION_Z = "acceleration_z";
-//    public static final String KEY_SENSOR_MAGNETIC_X = "magnetic_x";
-//    public static final String KEY_SENSOR_MAGNETIC_Y = "magnetic_y";
-//    public static final String KEY_SENSOR_MAGNETIC_Z = "magnetic_z";
-
-    public static final String KEY_FPS = "fps";
-    public static final String KEY_TORCH = "torch";
 
     public static final String KEY_SERVICE = "service";
     public static final String KEY_ENV = "env";
@@ -171,14 +132,10 @@ public class Constants {
     public static final String KEY_RUM_RESOURCE_METHOD = "resource_method";
     public static final String KEY_RUM_RESPONSE_HEADER = "response_header";
     public static final String KEY_RUM_REQUEST_HEADER = "request_header";
-    //    public static final String KEY_RUM_TERMINAL = "terminal";
     public static final String KEY_RUM_SDK_PACKAGE_AGENT = "sdk_package_agent";
     public static final String KEY_RUM_SDK_PACKAGE_TRACK = "sdk_package_track";
     public static final String KEY_RUM_SDK_PACKAGE_NATIVE = "sdk_package_native";
     public static final String KEY_SDK_VERSION = "sdk_version";
-//    public static final String KEY_RUM_APP_STARTUP_TYPE = "app_startup_type";
-//    public static final String KEY_RUM_APP_APDEX_LEVEL = "app_apdex_level";
-//    public static final String KEY_RUM_APP_STARTUP_DURATION = "app_startup_duration";
 
     public static final String KEY_RUM_RESOURCE_STATUS = "resource_status";
     public static final String KEY_RUM_RESOURCE_STATUS_GROUP = "resource_status_group";

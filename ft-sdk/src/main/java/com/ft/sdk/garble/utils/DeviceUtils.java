@@ -153,40 +153,6 @@ public class DeviceUtils {
 
 
     /**
-     * 获得设备IMEI码
-     *
-     * @return
-     */
-    @SuppressLint("MissingPermission")
-    public static String getImei(Context context) {
-        String imei = "";
-        try {
-            if (!Utils.hasPermission(context, Manifest.permission.READ_PHONE_STATE)) {
-                return imei;
-            }
-            TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-            if (tm != null) {
-                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                    if (tm.hasCarrierPrivileges()) {
-                        imei = tm.getImei();
-                    } else {
-                        LogUtils.d(TAG, "未能获取到设备的IMEI信息");
-                    }
-                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    imei = tm.getImei();
-                } else {
-                    imei = tm.getDeviceId();
-                }
-            }
-        } catch (SecurityException e) {
-            LogUtils.e(TAG, "未能获取到系统>>Manifest.permission.READ_PHONE_STATE<<权限");
-        } catch (Exception e) {
-            LogUtils.e(TAG,e.getMessage());
-        }
-        return imei;
-    }
-
-    /**
      * 获得系统名称
      *
      * @return

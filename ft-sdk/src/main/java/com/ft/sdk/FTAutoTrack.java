@@ -19,7 +19,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.ft.sdk.garble.FTAutoTrackConfigManager;
-import com.ft.sdk.garble.FTFragmentManager;
 import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.Constants;
@@ -27,9 +26,6 @@ import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 import com.google.android.material.tabs.TabLayout;
 
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
-import org.json.JSONObject;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -352,18 +348,6 @@ public class FTAutoTrack {
             return;
         }
         putPageEvent(Utils.getCurrentNanoTime(), OP.LANC, null, null, null);
-    }
-
-
-    /**
-     * 应用休眠
-     *
-     * @param timeDelayMs
-     */
-    public static void sleepApp(long timeDelayMs, int startTimeline) {
-        long now = Utils.getCurrentNanoTime() - timeDelayMs * 1000000;
-        putClientTimeCost(now, now - startTimeline);
-
     }
 
 
@@ -705,24 +689,6 @@ public class FTAutoTrack {
     }
 
 
-    /**
-     * 记录应用消耗时间
-     *
-     * @param time
-     * @param duration
-     */
-    private static void putClientTimeCost(long time, long duration) {
-        try {
-            JSONObject tags = new JSONObject();
-            JSONObject fields = new JSONObject();
-            fields.put(Constants.KEY_TIME_COST_DURATION, duration * 1000);
-
-            FTTrackInner.getInstance().trackBackground(time, Constants.FT_MEASUREMENT_TIME_COST_CLIENT, tags, fields);
-        } catch (Exception e) {
-            LogUtils.e(TAG, e.toString());
-        }
-    }
-
     private static void handleOp(String currentPage, OP op, @Nullable String vtp) {
         handleOp(currentPage, op, 0, vtp);
     }
@@ -929,19 +895,5 @@ public class FTAutoTrack {
         return builder.build();
     }
 
-    /**
-     * 插桩方法用来替换调用的 org/apache/hc/client5/http/impl/classic/HttpClientBuilder.build() 方法，该方法结构谨慎修改，修该后请同步修改
-     * [com.ft.plugin.garble.bytecode.FTMethodAdapter] 类中的 visitMethodInsn 方法中关于该替换内容的部分
-     *
-     * @param builder
-     * @return
-     */
-    public static CloseableHttpClient trackHttpClientBuilder(HttpClientBuilder builder) {
-        FTHttpClientInterceptor interceptor = new FTHttpClientInterceptor();
-        if (FTTraceConfigManager.get().isEnableAutoTrace()) {
-            builder.addRequestInterceptorFirst(new FTHttpClientRequestInterceptor(interceptor));
-            builder.addResponseInterceptorLast(new FTHttpClientResponseInterceptor(interceptor));
-        }
-        return builder.build();
-    }
+
 }

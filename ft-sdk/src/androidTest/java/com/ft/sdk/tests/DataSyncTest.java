@@ -127,37 +127,6 @@ public class DataSyncTest extends FTBaseTest {
         Assert.assertEquals(0, except);
     }
 
-    /**
-     * 上传一条 track 数据测试
-     *
-     * @throws InterruptedException
-     * @throws JSONException
-     */
-    @Test
-    public void trackUploadDataTest() throws InterruptedException, JSONException {
-        simpleTrackData();
-        Thread.sleep(5000);
-        uploadData(DataType.TRACK);
-    }
-
-    /**
-     * 同步删除测试
-     *
-     * @throws InterruptedException
-     * @throws JSONException
-     */
-    @Test
-    public void trackSyncTest() throws Exception {
-        simpleTrackData();
-        Thread.sleep(5000);
-        int except1 = CheckUtils.getCount(DataType.TRACK, CONTENT_SIMPLE_TEST, 0);
-        Assert.assertTrue(except1 > 0);
-        resumeSyncTask();
-        executeSyncTask();
-        Thread.sleep(12000);
-        int except2 = CheckUtils.getCount(DataType.TRACK, CONTENT_SIMPLE_TEST, 0);
-        Assert.assertEquals(0, except2);
-    }
 
 
     @After

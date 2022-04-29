@@ -27,7 +27,7 @@ public class RequestUtil {
             .connectTimeout(10, TimeUnit.SECONDS)
             .build();
 
-    public static Request requestUrl(@NonNull String url) {
+    public static Request okhttpRequestUrl(@NonNull String url) {
         Request.Builder builder = new Request.Builder().url(url)
                 .method(RequestMethod.GET.name(), null);
         Request request = null;
@@ -41,15 +41,4 @@ public class RequestUtil {
         return request;
     }
 
-    public static Response requestUrlResponse(@NonNull String url) {
-        Request.Builder builder = new Request.Builder().url(url)
-                .method(RequestMethod.GET.name(), null);
-        Response response = null;
-        try {
-            response = client.newCall(builder.build()).execute();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return response;
-    }
 }

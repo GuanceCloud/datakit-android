@@ -17,12 +17,6 @@ import com.ft.sdk.garble.reflect.ReflectUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
-import org.apache.hc.client5.http.classic.methods.HttpGet;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.apache.hc.core5.http.io.entity.EntityUtils;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
@@ -132,20 +126,6 @@ public class MainActivity extends AppCompatActivity {
             }).start();
         });
 
-        findViewById(R.id.main_mock_httpclient_btn).setOnClickListener(v -> {
-            new Thread(() -> {
-                try {
-                    CloseableHttpClient httpClient = HttpClients.custom()
-                            .build();
-                    HttpGet httpGet = new HttpGet("http://testing-ft2x-api.cloudcare.cn/api/v1/account/permissions");
-                    CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
-                    System.out.println("response:" + EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8));
-                    httpResponse.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }).start();
-        });
         findViewById(R.id.main_mock_ui_block_btn).setOnClickListener(v -> {
             try {
                 Thread.sleep(2000);

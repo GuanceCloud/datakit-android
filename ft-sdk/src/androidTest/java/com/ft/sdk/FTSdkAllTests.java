@@ -2,9 +2,17 @@ package com.ft.sdk;
 
 import com.ft.sdk.tests.ConfigTest;
 import com.ft.sdk.tests.DataFormatTest;
+import com.ft.sdk.tests.DataSyncTest;
 import com.ft.sdk.tests.DeviceUtilsTest;
 import com.ft.sdk.tests.FTDBManagerTest;
+import com.ft.sdk.tests.LogGlobalContextTest;
+import com.ft.sdk.tests.LogTest;
+import com.ft.sdk.tests.MonitorConfigTest;
+import com.ft.sdk.tests.OaidTest;
+import com.ft.sdk.tests.RUMGlobalContextTest;
 import com.ft.sdk.tests.RUMTest;
+import com.ft.sdk.tests.RUMUserBindTest;
+import com.ft.sdk.tests.SDKGlobalContextTest;
 import com.ft.sdk.tests.SDKRunStateTest;
 import com.ft.sdk.tests.TraceHeaderTest;
 
@@ -18,12 +26,18 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        FTDBManagerTest.class,
-        DeviceUtilsTest.class,
-        RUMTest.class,
-        SDKRunStateTest.class,
         ConfigTest.class,
         DataFormatTest.class,
+        DeviceUtilsTest.class,
+        FTDBManagerTest.class,
+        LogGlobalContextTest.class,
+        LogTest.class,
+        MonitorConfigTest.class,
+        OaidTest.class,
+        RUMTest.class,
+        RUMUserBindTest.class,
+        SDKGlobalContextTest.class,
+        SDKRunStateTest.class,
         TraceHeaderTest.class}
 )
 public class FTSdkAllTests {

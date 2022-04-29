@@ -37,7 +37,6 @@ public class FTTraceHandler {
     private final long requestTime = Utils.getCurrentNanoTime();
     private String traceID = "";
     private String spanID = "";
-    private boolean isWebViewTrace;
 
     private HttpUrl httpUrl;
     private final FTTraceConfig config;
@@ -121,27 +120,27 @@ public class FTTraceHandler {
         return headers;
     }
 
-    void traceDataUpload(JSONObject content, String operationName, boolean isError) {
-        if (!enableTrace) {
-            return;
-        }
-        //请求结束时间
-        long responseTime = Utils.getCurrentNanoTime();
-        long duration = (responseTime - requestTime) / 1000;
-
-        String endPoint = httpUrl.getHost() + ":" + httpUrl.getPort();
-
-        TraceBean traceBean = new TraceBean(config.getTraceType().toString(), content, requestTime);
-        traceBean.setOperationName(operationName);
-        traceBean.setDuration(duration);
-        traceBean.setSpanType("entry");
-        traceBean.setEndpoint(endPoint);
-        traceBean.setStatus(isError ? "error" : "ok");
-        traceBean.setServiceName(config.getServiceName());
-        traceBean.setSpanID(spanID);
-        traceBean.setTraceID(traceID);
-        FTTrackInner.getInstance().traceBackground(traceBean);
-    }
+//    void traceDataUpload(JSONObject content, String operationName, boolean isError) {
+//        if (!enableTrace) {
+//            return;
+//        }
+//        //请求结束时间
+//        long responseTime = Utils.getCurrentNanoTime();
+//        long duration = (responseTime - requestTime) / 1000;
+//
+//        String endPoint = httpUrl.getHost() + ":" + httpUrl.getPort();
+//
+//        TraceBean traceBean = new TraceBean(config.getTraceType().toString(), content, requestTime);
+//        traceBean.setOperationName(operationName);
+//        traceBean.setDuration(duration);
+//        traceBean.setSpanType("entry");
+//        traceBean.setEndpoint(endPoint);
+//        traceBean.setStatus(isError ? "error" : "ok");
+//        traceBean.setServiceName(config.getServiceName());
+//        traceBean.setSpanID(spanID);
+//        traceBean.setTraceID(traceID);
+//        FTTrackInner.getInstance().traceBackground(traceBean);
+//    }
 
 
 }

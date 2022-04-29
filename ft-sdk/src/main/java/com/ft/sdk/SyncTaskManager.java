@@ -140,7 +140,6 @@ public class SyncTaskManager {
         }
         SyncDataHelper syncDataManager = new SyncDataHelper();
         String body = syncDataManager.getBodyContent(dataType, requestDatas);
-        SyncDataHelper.printUpdateData(dataType == DataType.OBJECT, body);
         LogUtils.d(TAG, body);
         requestNet(dataType, body, (code, response) -> {
             if (code >= 200 && code < 500) {
@@ -201,22 +200,13 @@ public class SyncTaskManager {
             case LOG:
                 model = Constants.URL_MODEL_LOG;
                 break;
-            case OBJECT:
-                model = Constants.URL_MODEL_OBJECT;
-                break;
+            default:
             case RUM_APP:
             case RUM_WEBVIEW:
                 model = Constants.URL_MODEL_RUM;
                 break;
-            default:
-            case TRACK:
-                model = Constants.URL_MODEL_TRACK_INFLUX;
-                break;
         }
         String content_type = "text/plain";
-        if (DataType.OBJECT == dataType) {
-            content_type = "application/json";
-        }
         FTResponseData result = HttpBuilder.Builder()
                 .addHeadParam("Content-Type", content_type)
                 .setModel(model)

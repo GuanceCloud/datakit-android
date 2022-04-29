@@ -15,6 +15,7 @@ import com.ft.sdk.garble.bean.ResourceParams;
 import com.ft.sdk.garble.bean.ViewBean;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
+import com.ft.sdk.garble.utils.BatteryUtils;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -329,6 +330,10 @@ public class FTRUMGlobalManager {
 
                 if (FTMonitorConfigManager.get().isMonitorType(MonitorType.CPU)) {
                     fields.put(Constants.KEY_CPU_USE, DeviceUtils.getCpuUseRate());
+                }
+                if (FTMonitorConfigManager.get().isMonitorType(MonitorType.BATTERY)) {
+                    fields.put(Constants.KEY_BATTERY_USE, (float) BatteryUtils.getBatteryInfo(FTApplication.getApplication()).getBr());
+
                 }
 
 

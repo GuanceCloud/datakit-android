@@ -1,9 +1,5 @@
 package com.ft.sdk;
 
-import com.ft.sdk.garble.utils.CameraUtils;
-import com.ft.sdk.garble.utils.FpsUtils;
-import com.ft.sdk.garble.utils.SensorUtils;
-
 /**
  * BY huangDianHua
  * DATE:2020-01-09 17:26
@@ -88,9 +84,9 @@ public class FTMonitorConfigManager {
      * 清楚当前监控配置项
      */
     public static void release() {
-        SensorUtils.get().release();
-        FpsUtils.get().release();
-        CameraUtils.get().release();
+//        SensorUtils.get().release();
+//        FpsUtils.get().release();
+//        CameraUtils.get().release();
         ftMonitorConfig = null;
     }
 }

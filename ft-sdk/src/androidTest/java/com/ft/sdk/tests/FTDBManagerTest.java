@@ -3,10 +3,12 @@ package com.ft.sdk.tests;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.ft.sdk.FTSdk;
-import com.ft.sdk.FTTrack;
+import com.ft.sdk.FTTrackInner;
+import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBConfig;
 import com.ft.sdk.garble.db.FTDBManager;
+import com.ft.test.base.FTBaseTest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,7 +26,7 @@ import static org.junit.Assert.assertEquals;
  * DATE:2019-12-25 16:38
  * Description: 数据库创库,插入数据,删除数据测试
  */
-public class FTDBManagerTest {
+public class FTDBManagerTest extends FTBaseTest {
     private int repeatTime = 100;
 
     /**
@@ -54,7 +56,7 @@ public class FTDBManagerTest {
      * @throws JSONException
      */
     @Test
-    public void insertDataTest() throws InterruptedException, JSONException {
+    public void insertDataTest() throws Exception {
         insertData();
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
@@ -69,7 +71,7 @@ public class FTDBManagerTest {
      * @throws InterruptedException
      */
     @Test
-    public void insertMultiDataTest() throws JSONException, InterruptedException {
+    public void insertMultiDataTest() throws Exception {
         int i = 0;
         while (i < repeatTime) {
             insertData();
@@ -89,7 +91,7 @@ public class FTDBManagerTest {
      * @throws InterruptedException
      */
     @Test
-    public void deleteDataByIdsTest() throws JSONException, InterruptedException {
+    public void deleteDataByIdsTest() throws Exception {
         insertData();
         insertData();
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
@@ -110,23 +112,19 @@ public class FTDBManagerTest {
      *
      * @throws JSONException
      */
-    private void insertData() throws JSONException {
+    private void insertData() throws Exception {
         JSONObject tags = new JSONObject();
         tags.put("name", "json");
         JSONObject values = new JSONObject();
         values.put("value", "success");
 //        SyncTaskManager.get().setRunning(true);
         stopSyncTask();
-        FTTrack.getInstance().trackBackground("TestEvent", tags, values);
+        invokeSyncData(DataType.LOG, "TestEvent", tags, values);
+
     }
 
-
-    private void stopSyncTask() {
-        try {
-            Whitebox.invokeMethod(FTSdk.get(), "setRunning", true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    @Override
+    public void tearDown() {
 
     }
 }

@@ -29,7 +29,6 @@ import com.google.mockwebserver.MockWebServer;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -357,7 +356,7 @@ public class RUMTest extends FTBaseTest {
         );
         Thread.sleep(2000);
 
-        RequestUtil.requestUrl(mockWebServer.getUrl("/").toString());
+        RequestUtil.okhttpRequestUrl(mockWebServer.getUrl("/").toString());
 
         Thread.sleep(5000);
 

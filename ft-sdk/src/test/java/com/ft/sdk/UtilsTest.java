@@ -55,18 +55,6 @@ public class UtilsTest {
     private static final String LOG_EXPECT_DATA = SINGLE_LINE_NORMAL_DATA + SINGLE_LINE_NORMAL_DATA + SINGLE_LINE_NORMAL_DATA;
 
 
-    @Test
-    public void contentMD5Encode() {
-        assertEquals("M1QEWjl2Ic2SQG8fmM3ikg==", Utils.contentMD5EncodeWithBase64("1122334455"));
-    }
-
-    @Test
-    public void getHMacSha1() {
-        //String value = Utils.getHMacSha1("screct", "POST" + "\n" + "xrKOMvb4g+/lSVHoW8XcaA==" + "\n" + "application/json" + "\n" + "Wed, 02 Sep 2020 09:41:24 GMT");
-        assertEquals("4me5NXJallTGFmZiO3csizbWI90=", Utils.getHMacSha1("screct", "123456"));
-    }
-
-
     /**
      * 多行行数据验证
      *
@@ -110,7 +98,7 @@ public class UtilsTest {
         JSONObject fields = new JSONObject();
         fields.put(KEY_FIELD, VALUE_FIELD);
         LineProtocolBean trackBean = new LineProtocolBean(TEST_MEASUREMENT_INFLUX_DB_LINE, tags, fields, VALUE_TIME);
-        SyncJsonData data = SyncJsonData.getSyncJsonData(DataType.TRACK, trackBean);
+        SyncJsonData data = SyncJsonData.getSyncJsonData(DataType.LOG, trackBean);
 
         List<SyncJsonData> recordDataList = new ArrayList<>();
         recordDataList.add(data);
@@ -126,7 +114,7 @@ public class UtilsTest {
         JSONObject fieldsEmpty = new JSONObject();
         fieldsEmpty.put(KEY_FIELD_EMPTY, VALUE_FIELD_EMPTY);
         LineProtocolBean trackBeanEmpty = new LineProtocolBean(TEST_MEASUREMENT_INFLUX_DB_LINE, tagsEmpty, fieldsEmpty, VALUE_TIME);
-        SyncJsonData dataEmpty = SyncJsonData.getSyncJsonData(DataType.TRACK, trackBeanEmpty);
+        SyncJsonData dataEmpty = SyncJsonData.getSyncJsonData(DataType.LOG, trackBeanEmpty);
 
         List<SyncJsonData> emptyRecordDataList = new ArrayList<>();
         emptyRecordDataList.add(dataEmpty);
@@ -138,31 +126,4 @@ public class UtilsTest {
     }
 
 
-    /**
-     * 对象数据内容校验
-     *
-     * @throws JSONException
-     */
-
-    @Test
-    public void objectDataTest() throws JSONException {
-
-        String objectName = "objectTest";
-        ObjectBean objectBean = new ObjectBean(objectName);
-        ArrayList<SyncJsonData> list = new ArrayList<>();
-
-        list.add(SyncJsonData.getFromObjectData(objectBean));
-        String content = new SyncDataHelper().getBodyContent(DataType.OBJECT, list);
-
-        JSONArray array = new JSONArray(content);
-        Assert.assertTrue(array.length() > 0);
-        JSONObject jsonObject = array.optJSONObject(0);
-        String name = jsonObject.optString(ObjectBean.INNER_NAME);
-        Assert.assertEquals(name, objectName);
-        JSONObject tags = jsonObject.optJSONObject(ObjectBean.INNER_CONTENT);
-        String clazz = tags.optString(ObjectBean.INNER_CLASS);
-        Assert.assertEquals(clazz, Constants.DEFAULT_OBJECT_CLASS);
-
-
-    }
 }
