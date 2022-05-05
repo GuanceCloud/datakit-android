@@ -11,11 +11,9 @@ import java.util.Arrays;
  */
 public enum OP {
     //页面事件
-    LANC("lanc"),
     CLK("clk"),
-    CSTM("cstm"),
     //    FLOW_CHART("flow_chart"),
-    OPEN("open"),
+//    OPEN("open"),
     OPEN_ACT("opn_act"),
     OPEN_FRA("open_fra"),
     CLS_ACT("cls_act"),
@@ -48,23 +46,6 @@ public enum OP {
     @Override
     public String toString() {
         return value;
-    }
-
-    public String toEventName() {
-        return Constants.OP_EVENT_MAPS.get(this);
-    }
-
-    public static OP fromValue(String value) {
-        for (OP op : values()) {
-            if (op.value.equals(value)) {
-                return op;
-            }
-        }
-        return null;
-    }
-
-    public boolean needMonitorData() {
-        return Arrays.asList(Constants.MERGE_MONITOR_EVENTS).contains(this);
     }
 
 }

@@ -50,7 +50,7 @@ public class SyncDataHelper {
         } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_WEBVIEW) {
             bodyContent = getRumBodyContent(recordDatas);
         } else {
-            bodyContent = getTrackBodyContent(recordDatas);
+            bodyContent = "";
         }
         return bodyContent.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION)
                 .replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK);
@@ -96,19 +96,6 @@ public class SyncDataHelper {
         hashMap.putAll(FTRUMConfigManager.get().getConfig().getGlobalContext());
         return convertToLineProtocolLines(datas, hashMap);
     }
-
-    /**
-     * 封装本地埋点数据
-     *
-     * @param datas
-     * @return
-     */
-    private String getTrackBodyContent(List<SyncJsonData> datas) {
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.putAll(FTSdk.get().getBasePublicTags());
-        return convertToLineProtocolLines(datas, hashMap);
-    }
-
 
     /**
      * 转化为行协议数据
@@ -222,54 +209,6 @@ public class SyncDataHelper {
             sb.append(Utils.translateTagKeyValue(value));
         }
     }
-
-
-    /**
-     * 添加网络监控数据
-     *
-     * @param tags
-     * @param fields
-     */
-    private static void createNetWork(JSONObject tags, JSONObject fields) {
-        try {
-            int networkType = NetUtils.get().getNetworkState(FTApplication.getApplication());
-            if (networkType == 1) {
-                tags.put(Constants.KEY_NETWORK_TYPE, "Wi-Fi");
-            } else if (networkType == 0) {
-                tags.put(Constants.KEY_NETWORK_TYPE, null);
-            } else {
-                tags.put(Constants.KEY_NETWORK_TYPE, "蜂窝网络");
-            }
-            fields.put(Constants.KEY_NETWORK_STRENGTH, NetUtils.get().getSignalStrength(FTApplication.getApplication()));
-            fields.put(Constants.KEY_NETWORK_IN_RATE, NetUtils.get().getNetDownRate());
-            fields.put(Constants.KEY_NETWORK_OUT_RATE, NetUtils.get().getNetUpRate());
-            tags.put(Constants.KEY_NETWORK_PROXY, NetUtils.get().isWifiProxy(FTApplication.getApplication()));
-            String[] dns = NetUtils.get().getDnsFromConnectionManager(FTApplication.getApplication());
-            for (int i = 0; i < dns.length; i++) {
-                fields.put(Constants.KEY_NETWORK_DNS + (i + 1), dns[i]);
-            }
-            tags.put(Constants.KEY_NETWORK_ROAM, NetUtils.get().getRoamState());
-            fields.put(Constants.KEY_NETWORK_WIFI_SSID, NetUtils.get().getSSId());
-            fields.put(Constants.KEY_NETWORK_WIFI_IP, NetUtils.get().getWifiIp());
-            NetStatusBean lastStatus = NetUtils.get().getLastMonitorStatus();
-
-            if (lastStatus != null) {
-                if (lastStatus.isInnerRequest()) {
-                    fields.put(Constants.KEY_INNER_NETWORK_TCP_TIME, lastStatus.getTcpTime());
-                    fields.put(Constants.KEY_INNER_NETWORK_DNS_TIME, lastStatus.getDNSTime());
-                    fields.put(Constants.KEY_INNER_NETWORK_RESPONSE_TIME, lastStatus.getResponseTime());
-                } else {
-                    fields.put(Constants.KEY_NETWORK_TCP_TIME, lastStatus.getTcpTime());
-                    fields.put(Constants.KEY_NETWORK_DNS_TIME, lastStatus.getDNSTime());
-                    fields.put(Constants.KEY_NETWORK_RESPONSE_TIME, lastStatus.getResponseTime());
-                }
-//                fields.put(Constants.KEY_NETWORK_ERROR_RATE, lastStatus.getErrorRate());
-            }
-        } catch (Exception e) {
-            LogUtils.e(TAG, "网络数据获取异常:" + e.getMessage());
-        }
-    }
-
 
     /**
      * 删除最后的逗号

@@ -211,19 +211,6 @@ public class DeviceUtils {
     }
 
     /**
-     * 返回系统开机时间
-     *
-     * @return
-     */
-    public static String getSystemOpenTime() {
-        //毫秒数
-        long time = SystemClock.elapsedRealtime();
-        long startTime = System.currentTimeMillis() - time;
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        return dateFormat.format(new Date(startTime));
-    }
-
-    /**
      * 获取运行内存容量和内存使用率
      *
      * @param context
@@ -244,19 +231,6 @@ public class DeviceUtils {
             e.printStackTrace();
             return new double[]{0.00, 0.00};
         }
-    }
-
-    /**
-     * CPU平台信息
-     *
-     * @return
-     */
-    public static String getHardWare() {
-        String result = Build.HARDWARE;
-        if (Utils.isNullOrEmpty(result)) {
-            return null;
-        }
-        return result;
     }
 
     /**
@@ -386,16 +360,5 @@ public class DeviceUtils {
             }
         }
         return stringBuilder.toString();
-    }
-
-    /**
-     * 获取系统的亮度(值范围在0-255)
-     *
-     * @return
-     */
-    public static double getSystemScreenBrightnessValue() {
-        ContentResolver contentResolver = FTApplication.getApplication().getContentResolver();
-        int defVal = 125;
-        return Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS, defVal) / 255d;
     }
 }

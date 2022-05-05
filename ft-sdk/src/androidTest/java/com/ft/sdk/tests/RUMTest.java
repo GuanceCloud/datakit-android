@@ -32,6 +32,7 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.powermock.reflect.Whitebox;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -46,7 +47,8 @@ public class RUMTest extends FTBaseTest {
     public static final String FIRST_VIEW = "FirstView";
     public static final String SECOND_VIEW = "SecondView";
     public static final String ROOT = "root";
-    public static final String ACTION = "action";
+    public static final String ACTION_NAME = "action";
+    public static final long DURATION = 1000L;
     public static final String ACTION_TYPE_NAME = "action test";
     public static final String ANY_ACTION = "AnyAction";
     public static final String LONG_TASK = "longTask";
@@ -80,23 +82,37 @@ public class RUMTest extends FTBaseTest {
 
     @Test
     public void actionGenerateTest() throws Exception {
-        FTRUMGlobalManager.get().startAction(ACTION, ACTION_TYPE_NAME);
+        FTRUMGlobalManager.get().startAction(ACTION_NAME, ACTION_TYPE_NAME);
         invokeCheckActionClose();
         waitForInThreadPool();
         ArrayList<ActionBean> list = FTDBManager.get().querySumAction(0);
 
         ActionBean action = list.get(0);
         Assert.assertTrue(action.isClose());
-        Assert.assertEquals(action.getActionName(), ACTION);
+        Assert.assertEquals(action.getActionName(), ACTION_NAME);
         Assert.assertEquals(action.getActionType(), ACTION_TYPE_NAME);
 
 
     }
 
+    @Test
+    public void addActionTest() throws Exception {
+        Whitebox.invokeMethod(FTRUMGlobalManager.get(), "addAction",
+                ACTION_NAME, ACTION_TYPE_NAME, DURATION);
+        waitForInThreadPool();
+
+        ArrayList<ActionBean> list = FTDBManager.get().querySumAction(0);
+
+        ActionBean action = list.get(0);
+        Assert.assertTrue(action.isClose());
+        Assert.assertEquals(action.getActionName(), ACTION_NAME);
+        Assert.assertEquals(action.getActionType(), ACTION_TYPE_NAME);
+    }
+
 
     @Test
     public void viewGenerateTest() throws Exception {
-        FTRUMGlobalManager.get().onCreateView(FIRST_VIEW, 6000000L);
+        FTRUMGlobalManager.get().onCreateView(FIRST_VIEW, DURATION);
         FTRUMGlobalManager.get().startView(FIRST_VIEW);
         FTRUMGlobalManager.get().stopView();
 
@@ -153,7 +169,7 @@ public class RUMTest extends FTBaseTest {
     public void viewActionSumTest() throws Exception {
         FTRUMGlobalManager.get().startView(FIRST_VIEW);
 
-        FTRUMGlobalManager.get().startAction(ACTION, ACTION_TYPE_NAME);
+        FTRUMGlobalManager.get().startAction(ACTION_NAME, ACTION_TYPE_NAME);
 
         Request request = new Request.Builder().url("https://www.baidu.com").build();
 
@@ -167,7 +183,7 @@ public class RUMTest extends FTBaseTest {
         FTRUMGlobalManager.get().addError("error", "error msg", ErrorType.JAVA, AppState.RUN);
 
 
-        FTRUMGlobalManager.get().addLongTask("longtask", 1000000L);
+        FTRUMGlobalManager.get().addLongTask("longtask", DURATION);
         invokeCheckActionClose();
         waitForInThreadPool();
 
@@ -194,7 +210,7 @@ public class RUMTest extends FTBaseTest {
     @Test
     public void sessionIdTest() throws Exception {
         FTRUMGlobalManager.get().startView(FIRST_VIEW);
-        FTRUMGlobalManager.get().startAction(ACTION, ACTION_TYPE_NAME);
+        FTRUMGlobalManager.get().startAction(ACTION_NAME, ACTION_TYPE_NAME);
         invokeCheckActionClose();
         waitForInThreadPool();
 
@@ -208,7 +224,7 @@ public class RUMTest extends FTBaseTest {
 
         Thread.sleep(15000);
 
-        FTRUMGlobalManager.get().startAction(ACTION, ACTION_TYPE_NAME);
+        FTRUMGlobalManager.get().startAction(ACTION_NAME, ACTION_TYPE_NAME);
         invokeCheckActionClose();
         waitForInThreadPool();
 
@@ -271,6 +287,7 @@ public class RUMTest extends FTBaseTest {
 
     /**
      * 测试采样率 100%
+     *
      * @throws Exception
      */
     @Test
@@ -286,13 +303,12 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     *
      * @throws Exception
      */
     private void generateRUMData() throws Exception {
         FTRUMGlobalManager.get().startView(ANY_VIEW);
         FTRUMGlobalManager.get().addError(ERROR, ERROR_MESSAGE, ErrorType.JAVA, AppState.RUN);
-        FTRUMGlobalManager.get().addLongTask(LONG_TASK, 100000L);
+        FTRUMGlobalManager.get().addLongTask(LONG_TASK, DURATION);
         FTRUMGlobalManager.get().startAction(ANY_ACTION, "Any");
         invokeCheckActionClose();
         sendResource();
@@ -325,7 +341,8 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * RUM link Trace
+     * RUM link Trace enable
+     *
      * @throws InterruptedException
      * @throws IOException
      */
@@ -335,6 +352,12 @@ public class RUMTest extends FTBaseTest {
         Assert.assertTrue(checkTraceHasLinkRumData(true));
     }
 
+    /**
+     * RUM link Trace disable
+     *
+     * @throws InterruptedException
+     * @throws IOException
+     */
     @Test
     public void traceLinkRUMDataDisable() throws InterruptedException, IOException {
         Assert.assertFalse(checkTraceHasLinkRumData(false));

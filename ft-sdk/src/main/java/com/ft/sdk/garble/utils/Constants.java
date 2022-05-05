@@ -71,10 +71,7 @@ public class Constants {
 
     public static final String KEY_MEMORY_TOTAL = "memory_total";
     public static final String KEY_MEMORY_USE = "memory_use";
-    public static final String KEY_CPU_NO = "cpu_no";
     public static final String KEY_CPU_USE = "cpu_use";
-    public static final String KEY_CPU_TEMPERATURE = "cpu_temperature";
-    public static final String KEY_CPU_HZ = "cpu_hz";
 
     public static final String KEY_NETWORK_TYPE = "network_type";
     public static final String KEY_NETWORK_STRENGTH = "network_strength";
@@ -189,26 +186,8 @@ public class Constants {
     public final static HashMap<OP, String> OP_EVENT_MAPS = new HashMap<>();
 
     static {
-        OP_EVENT_MAPS.put(OP.LANC, Constants.EVENT_NAME_LAUNCH);
         OP_EVENT_MAPS.put(OP.CLK, Constants.EVENT_NAME_CLICK);
-        OP_EVENT_MAPS.put(OP.CLS_FRA, Constants.EVENT_NAME_LEAVE);
-        OP_EVENT_MAPS.put(OP.CLS_ACT, Constants.EVENT_NAME_LEAVE);
-        OP_EVENT_MAPS.put(OP.OPEN_ACT, Constants.EVENT_NAME_ENTER);
-        OP_EVENT_MAPS.put(OP.OPEN_FRA, Constants.EVENT_NAME_ENTER);
     }
-
-
-    /**
-     * 需要监控数据的 OP 类型
-     */
-    public static final OP[] MERGE_MONITOR_EVENTS = new OP[]{
-            OP.LANC,
-            OP.CLK,
-            OP.CLS_FRA,
-            OP.CLS_ACT,
-            OP.OPEN_ACT,
-            OP.OPEN_FRA,
-    };
 
 
 }

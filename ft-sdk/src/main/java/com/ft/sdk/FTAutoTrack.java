@@ -45,7 +45,7 @@ public class FTAutoTrack {
      * 启动 APP
      * 警告！！！该方法不能删除
      *
-     * @deprecated 该方法原来被 FT Plugin 插件调用，目前不再使用。目前监控应用的启动使用{@link #startApp()}方法
+     * @deprecated 该方法原来被 FT Plugin 插件调用
      */
     @Deprecated
     public static void startApp(Object object) {
@@ -338,20 +338,6 @@ public class FTAutoTrack {
 
 
     /**
-     * APP 启动
-     */
-    public static void startApp() {
-        if (!FTAutoTrackConfigManager.get().isAutoTrack()) {
-            return;
-        }
-        if (!FTAutoTrackConfigManager.get().enableAutoTrackType(FTAutoTrackType.APP_START)) {
-            return;
-        }
-        putPageEvent(Utils.getCurrentNanoTime(), OP.LANC, null, null, null);
-    }
-
-
-    /**
      * 打开某个Fragment页面
      *
      * @param clazz
@@ -387,7 +373,7 @@ public class FTAutoTrack {
         if (FTAutoTrackConfigManager.get().isIgnoreAutoTrackActivity((Class<?>) clazz)) {
             return;
         }
-        putFragmentEvent(OP.OPEN_FRA, AopUtils.getClassName(clazz), AopUtils.getActivityName(activity), parentPage);
+//        putFragmentEvent(OP.OPEN_FRA, AopUtils.getClassName(clazz), AopUtils.getActivityName(activity), parentPage);
     }
 
     /**
@@ -698,51 +684,16 @@ public class FTAutoTrack {
         if (!manager.isRumEnable()) {
             return;
         }
-        if (!op.equals(OP.CLK)
-                && !op.equals(OP.LANC)
-                && !op.equals(OP.OPEN_ACT)
-                && !op.equals(OP.OPEN_FRA)
-                && !op.equals(OP.CLS_ACT)
-                && !op.equals(OP.CLS_FRA)
-            //                && !op.equals(OP.OPEN))
-
-        ) {
+        if (!op.equals(OP.CLK)) {
             return;
         }
-        if (op.equals(OP.CLK) && !manager.getConfig().isEnableTraceUserAction()) {
+        if (!manager.getConfig().isEnableTraceUserAction()) {
             return;
         }
-
-        if ((op.equals(OP.OPEN_ACT) || op.equals(OP.CLS_ACT))
-                && !manager.getConfig().isEnableTraceUserView()) {
-            return;
-        }
-
 
         String event = "";
-        switch (op) {
-            case CLK:
-                event = Constants.EVENT_NAME_CLICK;
-
-                FTRUMGlobalManager.get().startAction(vtp, event);
-                break;
-            case LANC:
-                event = Constants.EVENT_NAME_LAUNCH;
-                break;
-            case OPEN_ACT:
-//            case OPEN_FRA:
-                event = Constants.EVENT_NAME_ENTER;
-                FTRUMGlobalManager.get().startView(currentPage);
-                break;
-            case CLS_ACT:
-//            case CLS_FRA:
-                event = Constants.EVENT_NAME_LEAVE;
-                FTRUMGlobalManager.get().stopView();
-                break;
-            case OPEN:
-                event = Constants.EVENT_NAME_OPEN;
-                break;
-        }
+        event = Constants.EVENT_NAME_CLICK;
+        FTRUMGlobalManager.get().startAction(vtp, event);
 
     }
 
@@ -755,10 +706,10 @@ public class FTAutoTrack {
     public static void timingMethod(String desc, long cost) {
 //        LogUtils.d(TAG, desc);
         try {
-            String[] arr = desc.split("\\|");
-            String[] names = arr[0].split("/");
-            String pageName = names[names.length - 1];
-            handleOp(pageName, OP.OPEN, cost * 1000, null);
+//            String[] arr = desc.split("\\|");
+//            String[] names = arr[0].split("/");
+//            String pageName = names[names.length - 1];
+//            handleOp(pageName, OP.OPEN, cost * 1000, null);
         } catch (Exception e) {
             e.printStackTrace();
         }

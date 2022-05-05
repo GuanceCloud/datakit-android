@@ -22,6 +22,7 @@ import java.util.List;
 public class CpuUtils {
     private CpuUtils() {
     }
+
     public final int DEVICEINFO_UNKNOWN = -1;
     private RandomAccessFile mProcStatFile;
     private RandomAccessFile mAppStatFile;
@@ -60,137 +61,6 @@ public class CpuUtils {
         cpuUtils.mLastCpuTime = 0L;
         cpuUtils.mLastAppCpuTime = 0L;
         return cpuUtils;
-    }
-
-    /**
-     * 获取 CPU 核数
-     * https://blog.csdn.net/gundumw100/article/details/69997479
-     *
-     * @return
-     */
-    public int getNumberOfCPUCores() {
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD_MR1) {
-            return 1;
-        }
-        int cores;
-        try {
-            cores = new File("/sys/devices/system/cpu/").listFiles(CPU_FILTER).length;
-        } catch (SecurityException e) {
-            cores = DEVICEINFO_UNKNOWN;
-        } catch (NullPointerException e) {
-            cores = DEVICEINFO_UNKNOWN;
-        }
-        return cores;
-    }
-
-    private final FileFilter CPU_FILTER = pathname -> {
-        String path = pathname.getName();
-        //regex is slow, so checking char by char.
-        if (path.startsWith("cpu")) {
-            for (int i = 3; i < path.length(); i++) {
-                if (path.charAt(i) < '0' || path.charAt(i) > '9') {
-                    return false;
-                }
-            }
-            return true;
-        }
-        return false;
-    };
-
-
-    /**
-     * 获取 CPU 最大频率
-     *
-     * @return
-     */
-    public double getCPUMaxFreqKHz() {
-        if(maxFreq != DEVICEINFO_UNKNOWN){
-            return maxFreq;
-        }
-        try {
-            for (int i = 0; i < getNumberOfCPUCores(); i++) {
-                String filename =
-                        "/sys/devices/system/cpu/cpu" + i + "/cpufreq/cpuinfo_max_freq";
-                File cpuInfoMaxFreqFile = new File(filename);
-                if (cpuInfoMaxFreqFile.exists()) {
-                    byte[] buffer = new byte[128];
-                    FileInputStream stream = new FileInputStream(cpuInfoMaxFreqFile);
-                    try {
-                        stream.read(buffer);
-                        int endIndex = 0;
-                        //Trim the first number out of the byte buffer.
-                        while (buffer[endIndex] >= '0' && buffer[endIndex] <= '9'
-                                && endIndex < buffer.length) endIndex++;
-                        String str = new String(buffer, 0, endIndex);
-                        Integer freqBound = Integer.parseInt(str);
-                        if (freqBound > maxFreq) maxFreq = freqBound;
-                    } catch (NumberFormatException e) {
-                        //Fall through and use /proc/cpuinfo.
-                    } finally {
-                        stream.close();
-                    }
-                }
-            }
-            if (maxFreq == DEVICEINFO_UNKNOWN) {
-                FileInputStream stream = new FileInputStream("/proc/cpuinfo");
-                try {
-                    int freqBound = parseFileForValue("cpu MHz", stream);
-                    freqBound *= 1000; //MHz -> kHz
-                    if (freqBound > maxFreq) maxFreq = freqBound;
-                } finally {
-                    stream.close();
-                }
-            }
-        } catch (IOException e) {
-            maxFreq = DEVICEINFO_UNKNOWN; //Fall through and return unknown.
-        }
-        if(maxFreq >0){
-            return maxFreq;
-        }
-        return 0;
-    }
-
-    private int parseFileForValue(String textToMatch, FileInputStream stream) {
-        byte[] buffer = new byte[1024];
-        try {
-            int length = stream.read(buffer);
-            for (int i = 0; i < length; i++) {
-                if (buffer[i] == '\n' || i == 0) {
-                    if (buffer[i] == '\n') i++;
-                    for (int j = i; j < length; j++) {
-                        int textIndex = j - i;
-                        //Text doesn't match query at some point.
-                        if (buffer[j] != textToMatch.charAt(textIndex)) {
-                            break;
-                        }
-                        //Text matches query here.
-                        if (textIndex == textToMatch.length() - 1) {
-                            return extractValue(buffer, j);
-                        }
-                    }
-                }
-            }
-        } catch (IOException e) {
-            //Ignore any exceptions and fall through to return unknown value.
-        } catch (NumberFormatException e) {
-        }
-        return DEVICEINFO_UNKNOWN;
-    }
-
-    private int extractValue(byte[] buffer, int index) {
-        while (index < buffer.length && buffer[index] != '\n') {
-            if (buffer[index] >= '0' && buffer[index] <= '9') {
-                int start = index;
-                index++;
-                while (index < buffer.length && buffer[index] >= '0' && buffer[index] <= '9') {
-                    index++;
-                }
-                String str = new String(buffer, 0, start, index - start);
-                return Integer.parseInt(str);
-            }
-            index++;
-        }
-        return DEVICEINFO_UNKNOWN;
     }
 
     /**
@@ -293,55 +163,5 @@ public class CpuUtils {
         return value;
     }
 
-    /**
-     * 获得 CPU 的温度
-     *
-     * @return
-     */
-    public double getCpuTemperature() {
-        double currentTemp = 0.0D;
-        for (String path : CPU_TEMP_FILE_PATHS) {
-            try {
-                Double temp = readOnLine(new File(path));
-                if (isTemperatureValid(temp)) {
-                    currentTemp = temp;
-                } else if (isTemperatureValid(temp / (double) 1000)) {
-                    currentTemp = temp / (double) 1000;
-                }
-                if (currentTemp != 0) {
-                    break;
-                }
-            } catch (Exception e) {
-            }
-        }
-        if(currentTemp == 0){
-            return 0;
-        }
-        return currentTemp;
-    }
 
-    private double readOnLine(File file) {
-        FileInputStream fileInputStream = null;
-        String s = "";
-        try {
-            fileInputStream = new FileInputStream(file);
-            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            s = bufferedReader.readLine();
-            fileInputStream.close();
-            inputStreamReader.close();
-            bufferedReader.close();
-        } catch (Exception e) {
-        }
-        double result = 0;
-        try {
-            result = Double.parseDouble(s);
-        } catch (NumberFormatException e) {
-        }
-        return result;
-    }
-
-    private boolean isTemperatureValid(double temp) {
-        return temp >= -30.0D && temp <= 250.0D;
-    }
 }

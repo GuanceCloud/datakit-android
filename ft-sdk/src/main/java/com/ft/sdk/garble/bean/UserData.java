@@ -48,9 +48,6 @@ public class UserData {
         }
     }
 
-    public boolean isEmpty() {
-        return Utils.isNullOrEmpty(name) || Utils.isNullOrEmpty(id) || exts == null;
-    }
 
     @Override
     public boolean equals(@Nullable Object obj) {
