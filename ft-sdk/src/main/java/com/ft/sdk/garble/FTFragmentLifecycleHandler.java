@@ -94,7 +94,7 @@ public class FTFragmentLifecycleHandler {
         if (clazz != null) {
             parent = clazz.getSimpleName();
         }
-        FTAutoTrack.startPage(fragment, activity, parent);
+//        FTAutoTrack.startPage(fragment, activity, parent);
         fragmentList.add(fragment);
     }
 
@@ -103,7 +103,7 @@ public class FTFragmentLifecycleHandler {
      * @param fragment
      */
     private void hidden(Class fragment) {
-        FTAutoTrack.destroyPage(fragment, activity, Constants.FLOW_ROOT);
+//        FTAutoTrack.destroyPage(fragment, activity, Constants.FLOW_ROOT);
     }
 
     /**

@@ -54,7 +54,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     public void onActivityResumed(@NonNull Activity activity) {
 
         //页面打开埋点数据插入
-        FTAutoTrack.startPage(activity.getClass());
+        FTRUMGlobalManager.get().startView(activity.getClass().getSimpleName());
         //开启同步
         if (FTSdk.checkInstallState()) {
             SyncTaskManager.get().executeSyncPoll();
@@ -69,7 +69,8 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     @Override
     public void onActivityPaused(@NonNull Activity activity) {
         //页面关闭埋点数据插入
-        FTAutoTrack.destroyPage(activity.getClass());
+        FTRUMGlobalManager.get().stopView();
+
     }
 
     @Override

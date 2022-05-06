@@ -1,9 +1,11 @@
 package com.ft;
 
-//import com.ft.tests.FTAutoTrackTest;
 
 import com.ft.tests.ErrorTraceTest;
 import com.ft.tests.ConsoleLogTest;
+import com.ft.tests.RUMClickActionTest;
+import com.ft.tests.RUMLaunchActionTest;
+import com.ft.tests.RUMViewTest;
 import com.ft.tests.ServerConnectTest;
 import com.ft.tests.RUMResourceTest;
 import com.ft.tests.TraceHeaderTest;
@@ -22,6 +24,9 @@ import org.junit.runners.Suite;
         ServerConnectTest.class,//Base-Property 参数测试
         ErrorTraceTest.class,//Log-崩溃日志测试
         TraceHeaderTest.class,
+        RUMLaunchActionTest.class,
+        RUMClickActionTest.class,
+        RUMViewTest.class,
         RUMResourceTest.class
 })
 public class AllTests {

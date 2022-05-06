@@ -12,6 +12,8 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.ft.sdk.FTLogger;
+import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.reflect.ReflectUtils;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -32,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
-    boolean logThreadRun = false;
     OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
             .build();
@@ -68,36 +69,6 @@ public class MainActivity extends AppCompatActivity {
             }, 1);
         }
 
-
-        Button logThread = findViewById(R.id.main_mock_period_data_btn);
-        logThread.setOnClickListener(v -> {
-            logThreadRun = !logThreadRun;
-            AtomicLong atomicLong = new AtomicLong(0);
-            if (logThreadRun) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        while (logThreadRun) {
-                            Log.d("LogManager", "data=======" + atomicLong.getAndIncrement());
-                            try {
-                                Thread.sleep(100);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                }).start();
-            }
-            if (logThreadRun) {
-                logThread.setText("周期产生日志数据--运行");
-            } else {
-                logThread.setText("周期产生日志数据--结束");
-            }
-        });
-
-        findViewById(R.id.main_mock_one_data_btn).setOnClickListener(v -> {
-            Log.d("LogManager", "测试日志数据=======当前时间为" + Utils.getCurrentNanoTime());
-        });
         findViewById(R.id.main_mock_crash_btn).setOnClickListener(v -> {
             new Thread(new Runnable() {
                 @Override
@@ -113,6 +84,10 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(this, WebViewActivity.class));
         });
         findViewById(R.id.main_mock_click_btn).setOnClickListener(v -> {
+        });
+        findViewById(R.id.main_mock_log_btn).setOnClickListener(v -> {
+            Log.i(TAG, "console log");
+            FTLogger.getInstance().logBackground("custom Log", Status.INFO);
         });
 
         findViewById(R.id.main_mock_okhttp_btn).setOnClickListener(v -> {
