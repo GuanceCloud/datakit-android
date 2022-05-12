@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     //通过查看请求头查看是否替换调用 OkHttpClient.Builder.build 方法成功
-                    Request request = requestUrl("http://testing-ft2x-api.cloudcare.cn/api/v1/account/permissions");
+                    Request request = requestUrl(AccountUtils.getProperty(MainActivity.this, AccountUtils.TRACE_URL));
                     LogUtils.d(TAG, "header=" + request.headers().toString());
                 }
             }).start();

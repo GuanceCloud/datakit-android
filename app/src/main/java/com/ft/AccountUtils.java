@@ -12,6 +12,7 @@ public class AccountUtils {
     public final static String ACCESS_SERVER_URL = "ACCESS_SERVER_URL";
     public final static String RUM_APP_ID = "RUM_APP_ID";
     public final static String TRACK_ID = "TRACK_ID";
+    public final static String TRACE_URL = "TRACE_URL";
 
     /**
      * 本地配置文件中读取登录的账户数据
