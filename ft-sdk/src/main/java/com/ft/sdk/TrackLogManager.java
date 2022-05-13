@@ -5,6 +5,7 @@ import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.bean.BaseContentBean;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
+import com.ft.sdk.garble.threadpool.LogConsumerThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 
@@ -79,6 +80,6 @@ public class TrackLogManager {
                 isRunning = false;
             }
         };
-        DataUploaderThreadPool.get().execute(futureTask);
+        LogConsumerThreadPool.get().execute(futureTask);
     }
 }
