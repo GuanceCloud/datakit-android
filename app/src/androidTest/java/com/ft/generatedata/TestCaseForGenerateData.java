@@ -62,7 +62,7 @@ public class TestCaseForGenerateData extends BaseTest {
 
         FTSdk.initLogWithConfig(new FTLoggerConfig()
                 .setEnableCustomLog(true)
-                .setEnableConsoleLog(true));
+                .setEnableConsoleLog(true,"custom"));
 
         FTSdk.initTraceWithConfig(new FTTraceConfig()
                 .setEnableAutoTrace(true)
@@ -72,6 +72,7 @@ public class TestCaseForGenerateData extends BaseTest {
 
     @Test
     public void generateData() throws InterruptedException {
+        Thread.sleep(5000);//等待 emulator 开启 网络链接
 
         onView(ViewMatchers.withId(R.id.main_mock_ui_block_btn)).perform(ViewActions.scrollTo()).perform(click());
 
@@ -98,7 +99,7 @@ public class TestCaseForGenerateData extends BaseTest {
 
         onView(ViewMatchers.withId(R.id.third_to_first_btn)).perform(click());
 
-        Thread.sleep(100000);
+        Thread.sleep(20000);//等待 后台同步数据
     }
 
 
