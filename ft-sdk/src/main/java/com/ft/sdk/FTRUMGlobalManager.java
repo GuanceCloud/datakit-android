@@ -43,7 +43,7 @@ public class FTRUMGlobalManager {
     static final long SESSION_EXPIRE_TIME = 1440000000000000L;
     static final long FILTER_CAPACITY = 5;
     private final ConcurrentHashMap<String, ResourceBean> resourceBeanMap = new ConcurrentHashMap<>();
-    private ArrayList<String> viewList = new ArrayList<>();
+    private final ArrayList<String> viewList = new ArrayList<>();
 
     private FTRUMGlobalManager() {
 
@@ -373,11 +373,28 @@ public class FTRUMGlobalManager {
         }
     }
 
+    void setNetState(String resourceId, NetStatusBean netStatusBean) {
+        ResourceBean bean = resourceBeanMap.get(resourceId);
+
+        if (bean == null) {
+            return;
+        }
+        bean.resourceDNS = netStatusBean.getDNSTime();
+        bean.resourceSSL = netStatusBean.getSSLTime();
+        bean.resourceTCP = netStatusBean.getTcpTime();
+
+        bean.resourceTrans = netStatusBean.getResponseTime();
+        bean.resourceTTFB = netStatusBean.getTTFB();
+        bean.resourceLoad = netStatusBean.getHoleRequestTime();
+        bean.resourceFirstByte = netStatusBean.getFirstByteTime();
+        bean.netStateSet = true;
+        checkToAddResource(resourceId, bean);
+    }
 
     /**
      * 资源加载性能
      */
-    void putRUMResourcePerformance(String resourceId, NetStatusBean netStatusBean) {
+    void putRUMResourcePerformance(String resourceId) {
         ResourceBean bean = resourceBeanMap.get(resourceId);
 
         if (bean == null) {
@@ -397,15 +414,6 @@ public class FTRUMGlobalManager {
         String viewName = bean.viewName;
         String viewReferrer = bean.viewReferrer;
         String sessionId = bean.sessionId;
-
-        bean.resourceDNS = netStatusBean.getDNSTime();
-        bean.resourceSSL = netStatusBean.getSSLTime();
-        bean.resourceTCP = netStatusBean.getTcpTime();
-
-        bean.resourceTrans = netStatusBean.getResponseTime();
-        bean.resourceTTFB = netStatusBean.getTTFB();
-        bean.resourceLoad = netStatusBean.getHoleRequestTime();
-        bean.resourceFirstByte = netStatusBean.getFirstByteTime();
 
         try {
             JSONObject tags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
@@ -537,7 +545,7 @@ public class FTRUMGlobalManager {
      */
     public void addResource(String resourceId, ResourceParams params, NetStatusBean netStatusBean) {
         setTransformContent(resourceId, params);
-        putRUMResourcePerformance(resourceId, netStatusBean);
+        setNetState(resourceId, netStatusBean);
     }
 
     /**
@@ -590,6 +598,8 @@ public class FTRUMGlobalManager {
             bean.traceId = traceId;
             bean.spanId = spanId;
         }
+        bean.contentSet = true;
+        checkToAddResource(resourceId, bean);
     }
 
 
@@ -819,5 +829,10 @@ public class FTRUMGlobalManager {
         viewList.clear();
     }
 
+    void checkToAddResource(String key, ResourceBean bean) {
+        if (bean.contentSet && bean.netStateSet) {
+            putRUMResourcePerformance(key);
+        }
+    }
 
 }

@@ -126,7 +126,7 @@ public class Utils {
         return uid.toString();
     }
 
-    public static BigInteger getDDtraceNewId(){
+    public static BigInteger getDDtraceNewId() {
         return new BigInteger(64, new SecureRandom());
     }
 
@@ -147,7 +147,7 @@ public class Utils {
      * @return
      */
     public static String translateTagKeyValue(String oldStr) {
-        oldStr = oldStr.replace("\n"," ");
+        oldStr = oldStr.replace("\n", " ");
         oldStr = translateSpecialCharacters(",", oldStr);
         oldStr = translateSpecialCharacters("=", oldStr);
         return translateSpecialCharacters(" ", oldStr);
@@ -360,7 +360,7 @@ public class Utils {
         String method = request.method();
         String url = request.url().toString();
         RequestBody body = request.body();
-        if (body == null || body == RequestBody.create(new byte[0], null)) {
+        if (body == null || body == RequestBody.create(null, new byte[0] )) {
             return method + "_" + url;
         } else {
             long contentLength = 0;

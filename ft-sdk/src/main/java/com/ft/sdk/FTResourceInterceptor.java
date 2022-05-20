@@ -69,7 +69,7 @@ public class FTResourceInterceptor extends NetStatusMonitor implements Intercept
 
     @Override
     protected void getNetStatusInfoWhenCallEnd(String requestId, NetStatusBean bean) {
-        FTRUMGlobalManager.get().putRUMResourcePerformance(requestId, bean);
+        FTRUMGlobalManager.get().setNetState(requestId, bean);
     }
 
 

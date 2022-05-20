@@ -59,6 +59,7 @@ dependencies {
     //FT-SDK配置打开使用OAID（ftSDKConfig.isUseOAID = true）时需要的依赖
     implementation files('libs/oaid_sdk_1.0.22.aar')
     //需用监控网络数据时，添加该依赖，实现网络引擎
+//    implementation 'com.squareup.okhttp3:okhttp:3.12.12'
     implementation 'com.squareup.okhttp3:okhttp:4.5.0'
 }
 //应用 FT plugin

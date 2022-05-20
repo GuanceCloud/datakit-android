@@ -35,5 +35,8 @@ public class ResourceBean {
     public String actionId;
     public String actionName;
 
+    public boolean netStateSet = false;
+    public boolean contentSet = false;
+
 
 }
