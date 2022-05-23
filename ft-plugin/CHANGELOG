@@ -1,3 +1,7 @@
+# plugin 1.1.0-alpha02
+1.修正 MultiDex 库不兼容的问题
+
+---
 # plugin 1.1.0-alpha01
 1.application 启动事件捕捉
 2.兼容版本规则修改

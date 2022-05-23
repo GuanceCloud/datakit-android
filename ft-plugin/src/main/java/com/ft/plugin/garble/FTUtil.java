@@ -52,7 +52,7 @@ public class FTUtil {
           For Android Application
          */
 
-        targetApplicationClass.add("androidx.multidex.MultiDexApplication");
+        targetApplicationClass.add("androidx/multidex/MultiDexApplication");
         targetApplicationClass.add("android/app/Application");
 
         /*
@@ -87,7 +87,7 @@ public class FTUtil {
         targetActivityClass.add("androidx/fragment/app/FragmentActivity");
 
         /*将一些特例需要排除在外 */
-        specialClass.add("com.bumptech.glide.manager.SupportRequestManagerFragment");
+        specialClass.add("com/bumptech/glide/manager/SupportRequestManagerFragment");
 
     }
 
