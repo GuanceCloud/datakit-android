@@ -45,9 +45,8 @@ public class FTAutoTrack {
      * 启动 APP
      * 警告！！！该方法不能删除
      *
-     * @deprecated 该方法原来被 FT Plugin 插件调用
+     *  该方法原来被 FT Plugin 插件调用
      */
-    @Deprecated
     public static void startApp(Object object) {
         try {
             FTActivityLifecycleCallbacks life = new FTActivityLifecycleCallbacks();
