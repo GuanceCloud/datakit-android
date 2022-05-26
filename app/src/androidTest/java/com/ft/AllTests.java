@@ -4,7 +4,9 @@ package com.ft;
 import com.ft.tests.ErrorTraceTest;
 import com.ft.tests.ConsoleLogTest;
 import com.ft.tests.RUMClickActionTest;
+import com.ft.tests.RUMDisableTest;
 import com.ft.tests.RUMLaunchActionTest;
+import com.ft.tests.RUMNoConfigTest;
 import com.ft.tests.RUMViewTest;
 import com.ft.tests.ServerConnectTest;
 import com.ft.tests.RUMResourceTest;
@@ -27,7 +29,9 @@ import org.junit.runners.Suite;
         RUMLaunchActionTest.class,
         RUMClickActionTest.class,
         RUMViewTest.class,
-        RUMResourceTest.class
+        RUMResourceTest.class,
+        RUMDisableTest.class,
+        RUMNoConfigTest.class,
 })
 public class AllTests {
     public static boolean hasPrepare;
