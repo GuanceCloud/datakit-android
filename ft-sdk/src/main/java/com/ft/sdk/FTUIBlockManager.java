@@ -1,48 +1,56 @@
 package com.ft.sdk;
 
-import android.view.Choreographer;
+import android.os.Looper;
+import android.util.Printer;
 
-import com.ft.sdk.garble.manager.FTMainLoopLogMonitor;
+import com.ft.sdk.garble.utils.Utils;
 
 
 public class FTUIBlockManager {
+    private static final long TIME_BLOCK_NS = 1000000000L;//超过1秒显示卡顿
+    private static final String PREFIX_METHOD_DISPATCH_START = ">>>>> Dispatching to ";
+    private static final String PREFIX_METHOD_DISPATCH_END = "<<<<< Finished to ";
 
-    static Choreographer.FrameCallback callback = new Choreographer.FrameCallback() {
+    private static class SingletonHolder {
+        private static final FTUIBlockManager INSTANCE = new FTUIBlockManager();
+    }
 
+    public static FTUIBlockManager get() {
+        return FTUIBlockManager.SingletonHolder.INSTANCE;
+    }
+
+    final Printer printer = new Printer() {
         @Override
-        public void doFrame(long frameTimeNanos) {
+        public void println(String x) {
+            if (x == null) return;
 
-//            FTMainLoopLogMonitor.getInstance().removeMonitor();
+            if (x.startsWith(PREFIX_METHOD_DISPATCH_START)) {
+                method = x.substring(PREFIX_METHOD_DISPATCH_START.length());
+                startTime = Utils.getCurrentNanoTime();
+            } else if (x.startsWith(PREFIX_METHOD_DISPATCH_END)) {
+                long duration = Utils.getCurrentNanoTime() - startTime;
+                if (duration > TIME_BLOCK_NS) {
+                    FTRUMGlobalManager.get().addLongTask(method, duration);
+                }
 
-            FTMainLoopLogMonitor.getInstance().startMonitor();
+            }
 
-            if (isStop) return;
-
-            Choreographer.getInstance().postFrameCallback(this);
         }
     };
 
-    private static boolean isStop = true;
+    private long startTime;
+    private String method;
 
-
-    public static void start(FTRUMConfig config) {
+    public void start(FTRUMConfig config) {
         if (!config.isRumEnable()
                 && !config.isEnableTrackAppUIBlock()) {
             return;
         }
 
-        isStop = false;
-
-        FTMainLoopLogMonitor.getInstance().setLogCallBack((log, duration) -> {
-            FTRUMGlobalManager.get().addLongTask(log, duration);
-        });
-
-
-        Choreographer.getInstance().postFrameCallback(callback);
+        Looper.getMainLooper().setMessageLogging(printer);
     }
 
-    public static void release() {
-        FTMainLoopLogMonitor.release();
-        isStop = true;
+    public void release() {
+        Looper.getMainLooper().setMessageLogging(null);
     }
 }

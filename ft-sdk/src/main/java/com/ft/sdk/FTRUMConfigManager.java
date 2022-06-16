@@ -53,7 +53,7 @@ public class FTRUMConfigManager {
         FTExceptionHandler.get().initConfig(config);
         initRandomUserId();
         FTMonitorConfigManager.get().initWithConfig(config);
-        FTUIBlockManager.start(config);
+        FTUIBlockManager.get().start(config);
         initRUMGlobalContext(config);
         if (config.isRumEnable() && config.isEnableTraceUserAction()) {
             FTAppStartCounter.get().checkToReUpload();

@@ -72,6 +72,7 @@ public class FTSdk {
 
     /**
      * 检查设置状态
+     *
      * @return
      */
     static boolean checkInstallState() {
@@ -91,7 +92,7 @@ public class FTSdk {
 //        LocationUtils.get().stopListener();
         FTExceptionHandler.release();
         FTDBCachePolicy.release();
-        FTUIBlockManager.release();
+        FTUIBlockManager.get().release();
         FTTraceConfigManager.get().release();
         FTLoggerConfigManager.get().release();
         FTRUMGlobalManager.get().release();
