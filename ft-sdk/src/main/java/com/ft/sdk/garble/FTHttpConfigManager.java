@@ -18,7 +18,6 @@ public class FTHttpConfigManager {
     public String serverUrl;
     public String uuid;
     public String userAgent;
-    public boolean useOaid;
 
     public int sendOutTime = 10000;
     public int readOutTime = 10000;
@@ -40,7 +39,6 @@ public class FTHttpConfigManager {
             return;
         }
         serverUrl = ftsdkConfig.getMetricsUrl();
-        useOaid = ftsdkConfig.isUseOAID();
         uuid = DeviceUtils.getSDKUUid(FTApplication.getApplication());
         userAgent = USER_AGENT;
 

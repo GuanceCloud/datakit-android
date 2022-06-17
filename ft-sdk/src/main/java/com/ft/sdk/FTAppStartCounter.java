@@ -1,10 +1,13 @@
 package com.ft.sdk;
 
+import com.ft.sdk.garble.utils.Utils;
+
 /**
  * 启动计时
  */
 class FTAppStartCounter {
     private long codeStartTime = 0;
+    private long codeStartTimeLine = 0;
 
     private FTAppStartCounter() {
 
@@ -18,6 +21,17 @@ class FTAppStartCounter {
         return FTAppStartCounter.SingletonHolder.INSTANCE;
     }
 
+    void markCodeStartTimeLine() {
+        codeStartTimeLine = Utils.getCurrentNanoTime();
+    }
+
+    long getMarkCodeTimeLine() {
+        return codeStartTimeLine;
+    }
+
+    void resetCodeStartTimeline() {
+        codeStartTimeLine = 0;
+    }
 
     void codeStart(long codeStartTime) {
         this.codeStartTime = codeStartTime;

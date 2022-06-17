@@ -9,7 +9,6 @@ import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.sdk.garble.utils.OaidUtils;
 import com.ft.sdk.garble.utils.Utils;
 import com.ft.sdk.internal.exception.FTInitSDKProcessException;
 
@@ -151,6 +150,7 @@ public class FTSdk {
         FTHttpConfigManager.get().initParams(config);
         FTNetworkListener.get().monitor();
         appendGlobalContext(config);
+        FTAppStartCounter.get().markCodeStartTimeLine();
 //            LogUtils.setDescLogShow(mFtSDKConfig.isDescLog());
     }
 
@@ -236,16 +236,8 @@ public class FTSdk {
         hashMap.put(Constants.KEY_SDK_NAME, Constants.SDK_NAME);
         hashMap.put(Constants.KEY_APPLICATION_UUID, FTSdk.PACKAGE_UUID);
         hashMap.put(Constants.KEY_ENV, config.getEnv().toString());
-        String uuid = "";
-        if (FTHttpConfigManager.get().useOaid) {
-            String oaid = OaidUtils.getOAID(FTApplication.getApplication());
-            if (oaid != null) {
-                uuid = "oaid_" + oaid;
-            }
-        }
-        if (uuid.isEmpty()) {
-            uuid = DeviceUtils.getUuid(FTApplication.getApplication());
-        }
+        String uuid = DeviceUtils.getUuid(FTApplication.getApplication());
+        ;
         hashMap.put(Constants.KEY_DEVICE_UUID, uuid);
         hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_AGENT, FTSdk.AGENT_VERSION);
         if (!FTSdk.PLUGIN_VERSION.isEmpty()) {

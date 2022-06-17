@@ -8,7 +8,6 @@ import android.os.Message;
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.bean.AppState;
-import com.ft.sdk.garble.manager.FTMainLoopLogMonitor;
 import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -72,7 +71,13 @@ class LifeCircleTraceCallback {
         if (!mInited) {
             long now = Utils.getCurrentNanoTime();
             FTActivityManager.get().setAppState(AppState.RUN);
-            FTAppStartCounter.get().codeStart(now - startTime);
+            long codeStartTime = FTAppStartCounter.get().getMarkCodeTimeLine();
+            if (codeStartTime > 0) {
+                FTAppStartCounter.get().codeStart(now - codeStartTime);
+                FTAppStartCounter.get().resetCodeStartTimeline();
+            } else {
+                FTAppStartCounter.get().hotStart(now - startTime);
+            }
             if (manager.isRumEnable()) {
                 FTAppStartCounter.get().codeStartUpload();
             }
@@ -108,8 +113,6 @@ class LifeCircleTraceCallback {
 
                 }
             }
-            FTMainLoopLogMonitor.getInstance().resume();
-
             alreadySleep = false;
         }
         //避免重复计算页面启动的统计计算
@@ -140,9 +143,7 @@ class LifeCircleTraceCallback {
     private void checkLongTimeSleep() {
         boolean appForeground = FTActivityManager.get().isAppForeground();
         if (!appForeground) {
-//            FTAutoTrack.sleepApp(DELAY_MILLIS);
             alreadySleep = true;
-            FTMainLoopLogMonitor.getInstance().pause();
         }
     }
 

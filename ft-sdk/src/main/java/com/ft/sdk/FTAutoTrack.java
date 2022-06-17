@@ -44,13 +44,14 @@ public class FTAutoTrack {
     /**
      * 启动 APP
      * 警告！！！该方法不能删除
-     *
-     *  该方法原来被 FT Plugin 插件调用
+     * <p>
+     * 该方法原来被 FT Plugin 插件调用
      */
     public static void startApp(Object object) {
         try {
             FTActivityLifecycleCallbacks life = new FTActivityLifecycleCallbacks();
             getApplication().registerActivityLifecycleCallbacks(life);
+            FTAppStartCounter.get().markCodeStartTimeLine();
         } catch (Exception e) {
             e.printStackTrace();
         }

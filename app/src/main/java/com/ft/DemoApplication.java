@@ -39,7 +39,6 @@ public class DemoApplication extends Application {
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(this,
                 AccountUtils.ACCESS_SERVER_URL))
                 .setXDataKitUUID("ft-dataKit-uuid-001")
-                .setUseOAID(true)//设置 OAID 是否可用
                 .setDebug(true)//设置是否是 debug
                 .setEnv(EnvType.GRAY);
         FTSdk.install(ftSDKConfig);

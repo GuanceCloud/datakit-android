@@ -27,7 +27,6 @@ class DemoApplication : Application() {
                 AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL)
             )
                 .setXDataKitUUID("ft-dataKit-uuid-001")
-                .setUseOAID(true)//是否使用OAID
                 .setDebug(true)//是否开启Debug模式（开启后能查看调试数据）
             FTSdk.install(ftSDKConfig)
 

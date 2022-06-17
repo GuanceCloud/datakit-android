@@ -14,7 +14,6 @@ import java.util.HashMap;
 public class FTSDKConfig {
     //服务器地址
     private final String metricsUrl;
-    private boolean useOAID;
     //是否是Debug
     private boolean isDebug;
 
@@ -50,9 +49,6 @@ public class FTSDKConfig {
         return metricsUrl;
     }
 
-    public boolean isUseOAID() {
-        return useOAID;
-    }
 
     public boolean isDebug() {
         return isDebug;
@@ -66,16 +62,6 @@ public class FTSDKConfig {
         return onlySupportMainProcess;
     }
 
-    /**
-     * 是否使用 UseOAID 作为设备唯一识别号的替代字段
-     *
-     * @param useOAID
-     * @return
-     */
-    public FTSDKConfig setUseOAID(boolean useOAID) {
-        this.useOAID = useOAID;
-        return this;
-    }
 
     /**
      * 设置数据采集端的名称
