@@ -150,7 +150,6 @@ public class FTSdk {
         FTHttpConfigManager.get().initParams(config);
         FTNetworkListener.get().monitor();
         appendGlobalContext(config);
-        FTAppStartCounter.get().markCodeStartTimeLine();
 //            LogUtils.setDescLogShow(mFtSDKConfig.isDescLog());
     }
 
