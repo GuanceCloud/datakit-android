@@ -122,6 +122,9 @@ public class FTRUMGlobalManager {
             activeAction = new ActionBean(actionName, actionType, sessionId, viewId, viewName, viewReferrer, needWait);
             initAction(activeAction);
             this.lastActionTime = activeAction.getStartTime();
+
+            mHandler.removeCallbacks(mActionRecheckRunner);
+            mHandler.postDelayed(mActionRecheckRunner, 5000);
         }
     }
 
@@ -226,7 +229,7 @@ public class FTRUMGlobalManager {
      * @return
      */
     String getLastView() {
-        LogUtils.d(TAG, viewList.toString());
+        LogUtils.d(TAG, "getlastview:" + viewList);
         if (viewList.size() > 1) {
             String viewName = viewList.get(viewList.size() - 2);
             if (viewName != null) {
@@ -243,7 +246,6 @@ public class FTRUMGlobalManager {
      * view 结束
      */
     public void stopView() {
-        LogUtils.d(TAG, "stopView");
         checkActionClose();
 
         activeView.close();
@@ -702,7 +704,7 @@ public class FTRUMGlobalManager {
 
 
     Handler mHandler = new Handler(Looper.getMainLooper());
-    Runnable mRUMGenerateRunner = () -> {
+    final Runnable mRUMGenerateRunner = () -> {
         try {
             JSONObject tags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
             EventConsumerThreadPool.get().execute(() -> {
@@ -718,6 +720,9 @@ public class FTRUMGlobalManager {
 
         }
     };
+
+    final Runnable mActionRecheckRunner = () -> checkActionClose();
+
 
     private static final int LIMIT_SIZE = 50;
 
