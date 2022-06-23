@@ -7,11 +7,11 @@
 
 ## 简介
 
-DataFlux 应用监测能够通过收集各个Android应用的指标数据，以可视化的方式分析各个Android应用端的性能。
+观测云应用监测能够通过收集各个 Android 应用的指标数据，以可视化的方式分析各个 Android 应用端的性能。
 
 ## 示例
 
- [Dataflux-SDK-Android Demo](https://github.com/GuanceCloud/datakit-android/tree/dev/demo)   
+ [观测云 SDK Android Demo](https://github.com/GuanceCloud/datakit-android/tree/dev/demo)   
 
 ## 使用文档
  [文档中心](https://docs.guance.com/real-user-monitoring/android/app-access/)   
