@@ -1,11 +1,13 @@
 package com.ft.sdk;
 
+import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 /**
  * 启动计时
  */
 class FTAppStartCounter {
+    private static final String TAG = "FTAppStartCounter";
     private long codeStartTime = 0;
     private long codeStartTimeLine = 0;
 
@@ -35,6 +37,7 @@ class FTAppStartCounter {
 
     void codeStart(long codeStartTime) {
         this.codeStartTime = codeStartTime;
+        LogUtils.d(TAG, "codeStart:" + codeStartTime);
 
     }
 
