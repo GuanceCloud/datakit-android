@@ -75,12 +75,15 @@ class LifeCircleTraceCallback {
             if (codeStartTime > 0) {
                 FTAppStartCounter.get().codeStart(now - codeStartTime);
                 FTAppStartCounter.get().resetCodeStartTimeline();
+                if (manager.isRumEnable()) {
+                    FTAppStartCounter.get().codeStartUpload();
+                }
             } else {
-                FTAppStartCounter.get().hotStart(now - startTime);
+                if (manager.isRumEnable()) {
+                    FTAppStartCounter.get().hotStart(now - startTime);
+                }
             }
-            if (manager.isRumEnable()) {
-                FTAppStartCounter.get().codeStartUpload();
-            }
+
 
         }
 

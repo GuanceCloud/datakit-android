@@ -46,6 +46,7 @@ class FTAppStartCounter {
     }
 
     void codeStartUpload() {
+        if (codeStartTime <= 0) return;
         FTAutoTrack.putRUMLaunchPerformance(true, codeStartTime);
         codeStartTime = 0;
     }

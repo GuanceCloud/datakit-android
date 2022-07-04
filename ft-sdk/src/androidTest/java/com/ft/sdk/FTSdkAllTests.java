@@ -8,7 +8,6 @@ import com.ft.sdk.tests.FTDBManagerTest;
 import com.ft.sdk.tests.LogGlobalContextTest;
 import com.ft.sdk.tests.LogTest;
 import com.ft.sdk.tests.MonitorConfigTest;
-import com.ft.sdk.tests.OaidTest;
 import com.ft.sdk.tests.RUMGlobalContextTest;
 import com.ft.sdk.tests.RUMTest;
 import com.ft.sdk.tests.RUMUserBindTest;
@@ -33,7 +32,6 @@ import org.junit.runners.Suite;
         LogGlobalContextTest.class,
         LogTest.class,
         MonitorConfigTest.class,
-        OaidTest.class,
         RUMTest.class,
         RUMUserBindTest.class,
         SDKGlobalContextTest.class,

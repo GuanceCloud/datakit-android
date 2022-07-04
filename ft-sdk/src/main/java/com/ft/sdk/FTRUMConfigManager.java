@@ -56,6 +56,7 @@ public class FTRUMConfigManager {
         FTUIBlockManager.get().start(config);
         initRUMGlobalContext(config);
         if (config.isRumEnable() && config.isEnableTraceUserAction()) {
+            //应对 flutter reactNative application 生命周期启动早于条件设置
             FTAppStartCounter.get().checkToReUpload();
         }
 

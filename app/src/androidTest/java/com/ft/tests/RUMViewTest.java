@@ -7,6 +7,7 @@ import static com.ft.AllTests.hasPrepare;
 
 import android.content.Context;
 import android.os.Looper;
+import android.util.Log;
 
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.matcher.ViewMatchers;
@@ -80,12 +81,20 @@ public class RUMViewTest extends BaseTest {
             try {
                 JSONObject json = new JSONObject(recordData.getDataString());
                 JSONObject tags = json.optJSONObject("tags");
+                JSONObject fields = json.optJSONObject("fields");
                 String measurement = json.optString("measurement");
                 if ("view".equals(measurement)) {
-                    if (tags != null) {
-                        viewId = tags.optString("view_id");
-                        break;
+                    if (fields != null) {
+                        if (fields.optBoolean("is_active", false)) {
+                            if (tags != null) {
+                                viewId = tags.optString("view_id");
+                                break;
+                            }
+                        }
+
                     }
+
+
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -105,12 +114,19 @@ public class RUMViewTest extends BaseTest {
             try {
                 JSONObject json = new JSONObject(recordData.getDataString());
                 JSONObject tags = json.optJSONObject("tags");
+                JSONObject fields = json.optJSONObject("fields");
                 String measurement = json.optString("measurement");
                 if ("view".equals(measurement)) {
-                    if (tags != null) {
-                        newViewId = tags.optString("view_id");
-                        break;
+                    if (fields != null) {
+                        if (fields.optBoolean("is_active", false)) {
+                            if (tags != null) {
+                                newViewId = tags.optString("view_id");
+                                break;
+                            }
+                        }
+
                     }
+
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
