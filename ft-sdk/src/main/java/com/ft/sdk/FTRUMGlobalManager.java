@@ -178,6 +178,7 @@ public class FTRUMGlobalManager {
         if (bean != null) {
             String actionId = bean.actionId;
             String viewId = bean.viewId;
+            bean.endTime = Utils.getCurrentNanoTime();
             increaseResourceCount(viewId, actionId);
             EventConsumerThreadPool.get().execute(() -> {
                 FTDBManager.get().reduceViewPendingResource(viewId);
@@ -387,7 +388,8 @@ public class FTRUMGlobalManager {
 
         bean.resourceTrans = netStatusBean.getResponseTime();
         bean.resourceTTFB = netStatusBean.getTTFB();
-        bean.resourceLoad = netStatusBean.getHoleRequestTime();
+        long resourceLoad = netStatusBean.getHoleRequestTime();
+        bean.resourceLoad = resourceLoad > 0 ? resourceLoad : bean.endTime - bean.startTime;
         bean.resourceFirstByte = netStatusBean.getFirstByteTime();
         bean.netStateSet = true;
         checkToAddResource(resourceId, bean);

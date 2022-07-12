@@ -1,5 +1,7 @@
 package com.ft.sdk.garble.bean;
 
+import com.ft.sdk.garble.utils.Utils;
+
 public class ResourceBean {
 
     public String url = "";
@@ -27,6 +29,9 @@ public class ResourceBean {
     public long resourceTTFB = -1;
     public long resourceTrans = -1;
     public long resourceFirstByte = -1;
+
+    public long startTime = Utils.getCurrentNanoTime();
+    public long endTime = -1;
 
     public String sessionId;
     public String viewId;
