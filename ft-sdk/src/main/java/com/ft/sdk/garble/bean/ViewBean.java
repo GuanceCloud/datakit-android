@@ -1,5 +1,7 @@
 package com.ft.sdk.garble.bean;
 
+import androidx.annotation.NonNull;
+
 import com.ft.sdk.garble.utils.Utils;
 
 import java.util.UUID;
@@ -20,17 +22,6 @@ public class ViewBean {
     long timeSpent = 0;
     String sessionId;
 
-    public ViewBean() {
-    }
-
-    public ViewBean(String name, String viewReferrer, long loadTime, String sessionId) {
-        this.viewName = name;
-        this.viewReferrer = viewReferrer;
-        this.loadTime = loadTime;
-        this.sessionId = sessionId;
-    }
-
-
     public String getViewReferrer() {
         return viewReferrer;
     }
@@ -38,7 +29,6 @@ public class ViewBean {
     public String getViewName() {
         return viewName;
     }
-
 
     public String getId() {
         return id;
@@ -50,11 +40,6 @@ public class ViewBean {
 
     public boolean isClose() {
         return isClose;
-    }
-
-    public void close() {
-        isClose = true;
-        timeSpent = Utils.getCurrentNanoTime() - startTime;
     }
 
     public int getLongTaskCount() {
@@ -133,6 +118,7 @@ public class ViewBean {
         this.sessionId = sessionId;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "ViewBean{" +
@@ -150,4 +136,5 @@ public class ViewBean {
                 ", sessionId='" + sessionId + '\'' +
                 '}';
     }
+
 }

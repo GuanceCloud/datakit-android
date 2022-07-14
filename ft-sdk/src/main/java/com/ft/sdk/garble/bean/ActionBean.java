@@ -1,15 +1,14 @@
 package com.ft.sdk.garble.bean;
 
+import androidx.annotation.NonNull;
+
 import com.ft.sdk.garble.utils.Utils;
 
 import java.util.UUID;
 
 public class ActionBean {
-    public static final long ACTION_NEED_WAIT_TIME_OUT = 5000000000L;
-    public static final long ACTION_NORMAL_TIME_OUT = 100000000L;
-
+    String id = UUID.randomUUID().toString();
     long startTime = Utils.getCurrentNanoTime();
-    boolean needWaitAction = false;
 
     String actionName;
     String actionType;
@@ -27,6 +26,10 @@ public class ActionBean {
     String viewName;
     String viewReferrer;
 
+    public ActionBean() {
+
+    }
+
     public String getSessionId() {
         return sessionId;
     }
@@ -43,30 +46,11 @@ public class ActionBean {
         return viewReferrer;
     }
 
-    public boolean isNeedWaitAction() {
-        return needWaitAction;
-    }
-
-    public ActionBean() {
-
-    }
-
-    public ActionBean(String actionName, String actionType,
-                      String sessionId, String viewId,String viewName,String viewReferrer , boolean needWaitAction) {
-        this.actionName = actionName;
-        this.actionType = actionType;
-        this.sessionId = sessionId;
-        this.viewId = viewId;
-        this.viewName = viewName;
-        this.viewReferrer = viewReferrer;
-        this.needWaitAction = needWaitAction;
-    }
 
     public String getActionType() {
         return actionType;
     }
 
-    String id = UUID.randomUUID().toString();
 
     public String getId() {
         return id;
@@ -82,14 +66,6 @@ public class ActionBean {
 
     public boolean isClose() {
         return isClose;
-    }
-
-    public void close() {
-        isClose = true;
-        duration = Utils.getCurrentNanoTime() - startTime;
-//        if (duration > ACTION_NEED_WAIT_TIME_OUT) {
-//            duration = ACTION_NEED_WAIT_TIME_OUT;
-//        }
     }
 
     public void setClose(boolean close) {
@@ -161,11 +137,11 @@ public class ActionBean {
     }
 
 
+    @NonNull
     @Override
     public String toString() {
         return "ActionBean{" +
                 "startTime=" + startTime +
-                ", needWaitAction=" + needWaitAction +
                 ", actionName='" + actionName + '\'' +
                 ", actionType='" + actionType + '\'' +
                 ", longTaskCount=" + longTaskCount +
@@ -180,4 +156,5 @@ public class ActionBean {
                 ", id='" + id + '\'' +
                 '}';
     }
+
 }

@@ -26,7 +26,6 @@ import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
-import com.ft.sdk.SyncTaskManager;
 
 import org.junit.BeforeClass;
 import org.junit.Rule;

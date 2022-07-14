@@ -37,6 +37,7 @@ class FTAppStartCounter {
 
     void resetCodeStartTimeline() {
         codeStartTimeLine = 0;
+        LogUtils.d(TAG, "resetCodeStartTimeline");
     }
 
     void codeStart(long codeStartTime) {

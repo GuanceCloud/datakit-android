@@ -136,6 +136,7 @@ class LifeCircleTraceCallback {
         mCreateMap.remove(context);
         if (mCreateMap.isEmpty()) {
             mInited = false;
+            FTAppStartCounter.get().resetCodeStartTimeline();
             LogUtils.d(TAG, "Application all close");
         }
     }

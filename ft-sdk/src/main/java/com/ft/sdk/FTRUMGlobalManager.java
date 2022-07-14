@@ -6,6 +6,8 @@ import android.os.Looper;
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.bean.ActionBean;
+import com.ft.sdk.garble.bean.ActiveActionBean;
+import com.ft.sdk.garble.bean.ActiveViewBean;
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.ErrorSource;
 import com.ft.sdk.garble.bean.ErrorType;
@@ -62,8 +64,8 @@ public class FTRUMGlobalManager {
 
     private final ArrayList<String> notCollectMap = new ArrayList<>();
 
-    private ViewBean activeView;
-    private ActionBean activeAction;
+    private ActiveViewBean activeView;
+    private ActiveActionBean activeAction;
 
     private final ConcurrentHashMap<String, Long> preActivityDuration = new ConcurrentHashMap<>();
 
@@ -93,7 +95,7 @@ public class FTRUMGlobalManager {
         String viewReferrer = activeView != null ? activeView.getViewReferrer() : null;
         checkSessionRefresh();
 
-        activeAction = new ActionBean(actionName, actionType,
+        ActiveActionBean activeAction = new ActiveActionBean(actionName, actionType,
                 sessionId, viewId, viewName, viewReferrer, false);
         activeAction.setClose(true);
         activeAction.setDuration(duration);
@@ -119,7 +121,7 @@ public class FTRUMGlobalManager {
         checkSessionRefresh();
         checkActionClose();
         if (activeAction == null || activeAction.isClose()) {
-            activeAction = new ActionBean(actionName, actionType, sessionId, viewId, viewName, viewReferrer, needWait);
+            activeAction = new ActiveActionBean(actionName, actionType, sessionId, viewId, viewName, viewReferrer, needWait);
             initAction(activeAction);
             this.lastActionTime = activeAction.getStartTime();
 
@@ -133,14 +135,14 @@ public class FTRUMGlobalManager {
         long now = Utils.getCurrentNanoTime();
         long lastActionTime = activeAction.getStartTime();
         boolean waiting = activeAction.isNeedWaitAction() && (activeView != null && !activeView.isClose());
-        boolean timeOut = now - lastActionTime > ActionBean.ACTION_NEED_WAIT_TIME_OUT;
+        boolean timeOut = now - lastActionTime > ActiveActionBean.ACTION_NEED_WAIT_TIME_OUT;
         boolean needClose = !waiting
-                && (now - lastActionTime > ActionBean.ACTION_NORMAL_TIME_OUT)
+                && (now - lastActionTime > ActiveActionBean.ACTION_NORMAL_TIME_OUT)
                 || timeOut || (activeView != null && !activeView.getId().equals(activeAction.getViewId()));
         if (needClose) {
             if (!activeAction.isClose()) {
                 activeAction.close();
-                closeAction(activeAction.getId(), activeAction.getDuration(), timeOut);
+                closeAction(activeAction, timeOut);
             }
         }
     }
@@ -209,7 +211,7 @@ public class FTRUMGlobalManager {
         checkSessionRefresh();
         if (activeView != null && !activeView.isClose()) {
             activeView.close();
-            closeView(activeView.getId(), activeView.getTimeSpent());
+            closeView(activeView);
         }
 
 
@@ -219,7 +221,7 @@ public class FTRUMGlobalManager {
             preActivityDuration.remove(viewName);
         }
         String viewReferrer = getLastView();
-        activeView = new ViewBean(viewName, viewReferrer, loadTime, sessionId);
+        activeView = new ActiveViewBean(viewName, viewReferrer, loadTime, sessionId);
         initView(activeView);
 
     }
@@ -250,11 +252,12 @@ public class FTRUMGlobalManager {
         checkActionClose();
 
         activeView.close();
-        closeView(activeView.getId(), activeView.getTimeSpent());
+        closeView(activeView);
 
     }
 
-    private void initAction(ActionBean bean) {
+    private void initAction(ActiveActionBean activeActionBean) {
+        ActionBean bean = activeActionBean.convertToActionBean();
         increaseAction(bean.getViewId());
         EventConsumerThreadPool.get().execute(() -> {
             FTDBManager.get().initSumAction(bean);
@@ -262,7 +265,8 @@ public class FTRUMGlobalManager {
 
     }
 
-    private void initView(ViewBean bean) {
+    private void initView(ActiveViewBean activeViewBean) {
+        ViewBean bean = activeViewBean.convertToViewBean();
         EventConsumerThreadPool.get().execute(() -> {
             FTDBManager.get().initSumView(bean);
         });
@@ -626,16 +630,19 @@ public class FTRUMGlobalManager {
 
     }
 
-
-    private void closeView(String viewId, long timeSpent) {
+    private void closeView(ActiveViewBean activeViewBean) {
+        ViewBean viewBean = activeViewBean.convertToViewBean();
+        String viewId = viewBean.getId();
+        long timeSpent = viewBean.getTimeSpent();
         EventConsumerThreadPool.get().execute(() -> {
             FTDBManager.get().closeView(viewId, timeSpent);
-
         });
         generateRumData();
     }
 
-    private void closeAction(String actionId, long duration, boolean force) {
+    private void closeAction(ActiveActionBean bean, boolean force) {
+        String actionId = bean.getId();
+        long duration = bean.getDuration();
         EventConsumerThreadPool.get().execute(() -> {
             FTDBManager.get().closeAction(actionId, duration, force);
         });
@@ -783,7 +790,7 @@ public class FTRUMGlobalManager {
                 fields.put(Constants.KEY_RUM_VIEW_ACTION_COUNT, bean.getActionCount());
                 fields.put(Constants.KEY_RUM_VIEW_RESOURCE_COUNT, bean.getResourceCount());
                 fields.put(Constants.KEY_RUM_VIEW_ERROR_COUNT, bean.getErrorCount());
-                if (activeView.isClose()) {
+                if (bean.isClose()) {
                     fields.put(Constants.KEY_RUM_VIEW_TIME_SPENT, bean.getTimeSpent());
                 } else {
                     fields.put(Constants.KEY_RUM_VIEW_TIME_SPENT, time - bean.getStartTime());
