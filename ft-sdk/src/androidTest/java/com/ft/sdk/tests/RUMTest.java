@@ -422,6 +422,8 @@ public class RUMTest extends FTBaseTest {
         FTRUMGlobalManager.get().stopView();
         sendResource();
 
+        waitForInThreadPool();
+
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
 
         for (SyncJsonData recordData : recordDataList) {
@@ -439,7 +441,6 @@ public class RUMTest extends FTBaseTest {
                 e.printStackTrace();
             }
         }
-
 
     }
 
