@@ -685,7 +685,7 @@ public class FTRUMGlobalManager {
         bean.viewName = getViewName();
         bean.viewReferrer = getViewReferrer();
         bean.sessionId = getSessionId();
-        if (!activeAction.isClose()) {
+        if (activeAction != null && !activeAction.isClose()) {
             bean.actionId = getActionId();
             bean.actionName = getActionName();
         }
@@ -705,7 +705,7 @@ public class FTRUMGlobalManager {
             tags.put(Constants.KEY_RUM_VIEW_REFERRER, getViewReferrer());
             tags.put(Constants.KEY_RUM_SESSION_ID, sessionId);
             if (withAction) {
-                if (!activeAction.isClose()) {
+                if (activeAction != null && !activeAction.isClose()) {
                     tags.put(Constants.KEY_RUM_ACTION_ID, getActionId());
                     tags.put(Constants.KEY_RUM_ACTION_NAME, getActionName());
                 }
