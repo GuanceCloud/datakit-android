@@ -409,4 +409,38 @@ public class RUMTest extends FTBaseTest {
         return !tracId.isEmpty() && !spanId.isEmpty();
     }
 
+    /**
+     *
+     * @throws InterruptedException
+     */
+    @Test
+    public void resourceWithOutActionId() throws InterruptedException {
+        FTRUMGlobalManager.get().startView(ANY_VIEW);
+        FTRUMGlobalManager.get().startAction(ANY_ACTION, "Any");
+        Thread.sleep(100);
+
+        FTRUMGlobalManager.get().stopView();
+        sendResource();
+
+        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
+
+        for (SyncJsonData recordData : recordDataList) {
+            try {
+                JSONObject json = new JSONObject(recordData.getDataString());
+                JSONObject tags = json.optJSONObject("tags");
+                String measurement = json.optString("measurement");
+                if ("resource".equals(measurement)) {
+                    if (tags != null) {
+                        Assert.assertFalse(tags.has("action_id"));
+                        break;
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+    }
+
 }

@@ -124,6 +124,7 @@ public class FTDBManager extends DBManager {
      * @param duration
      */
     public void closeAction(String actionId, long duration, boolean force) {
+        LogUtils.d(TAG, "closeAction:" + actionId + ",duration:" + duration);
         String where = FTSQL.RUM_COLUMN_ID + "='" + actionId + "'"
                 + (force ? "" : ("AND " + FTSQL.RUM_COLUMN_PENDING_RESOURCE + "<=0"));
 
@@ -157,7 +158,7 @@ public class FTDBManager extends DBManager {
      * @param timeSpent
      */
     public void closeView(String viewId, long timeSpent) {
-        LogUtils.d(TAG, "closeVIew:" + viewId);
+        LogUtils.d(TAG, "closeVIew:" + viewId + ",timeSpent:" + timeSpent);
         getDB(true, db -> {
             Cursor cursor = db.rawQuery("select count(*) from " + FTSQL.FT_TABLE_VIEW
                     + " where " + FTSQL.RUM_COLUMN_ID + "='" + viewId + "'", null);
@@ -226,6 +227,7 @@ public class FTDBManager extends DBManager {
 
 
     private void increase(String tableName, String id, String columnName) {
+        if (id == null) return;
         getDB(true, db -> {
             Cursor cursor = db.rawQuery("select count(*) from " + tableName
                     + " where " + FTSQL.RUM_COLUMN_ID + "='" + id + "'", null);
@@ -241,6 +243,7 @@ public class FTDBManager extends DBManager {
     }
 
     private void reduce(String tableName, String id, String columnName) {
+        if (id == null) return;
         getDB(true, db -> {
             Cursor cursor = db.rawQuery("select count(*) from " + tableName
                     + " where " + FTSQL.RUM_COLUMN_ID + "='" + id + "'", null);
@@ -364,6 +367,7 @@ public class FTDBManager extends DBManager {
     }
 
     public void closeAllActionAndView() {
+        LogUtils.d(TAG, "closeAllActionAndView");
         getDB(true, db -> {
             db.execSQL("UPDATE " + FTSQL.FT_TABLE_VIEW + " SET "
                     + FTSQL.RUM_COLUMN_IS_CLOSE + "=1," + FTSQL.RUM_COLUMN_PENDING_RESOURCE + "=0");

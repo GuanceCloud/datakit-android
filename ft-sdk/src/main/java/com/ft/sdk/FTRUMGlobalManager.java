@@ -160,7 +160,7 @@ public class FTRUMGlobalManager {
      */
     public void startResource(String resourceId) {
         ResourceBean bean = new ResourceBean();
-        attachRUMRelative(bean);
+        attachRUMRelativeForResource(bean);
         resourceBeanMap.put(resourceId, bean);
         String actionId = bean.actionId;
         String viewId = bean.viewId;
@@ -680,13 +680,15 @@ public class FTRUMGlobalManager {
      *
      * @param bean
      */
-    private void attachRUMRelative(@NonNull ResourceBean bean) {
+    private void attachRUMRelativeForResource(@NonNull ResourceBean bean) {
         bean.viewId = getViewId();
         bean.viewName = getViewName();
         bean.viewReferrer = getViewReferrer();
         bean.sessionId = getSessionId();
-        bean.actionId = getActionId();
-        bean.actionName = getActionName();
+        if (!activeAction.isClose()) {
+            bean.actionId = getActionId();
+            bean.actionName = getActionName();
+        }
     }
 
     /**
@@ -703,8 +705,10 @@ public class FTRUMGlobalManager {
             tags.put(Constants.KEY_RUM_VIEW_REFERRER, getViewReferrer());
             tags.put(Constants.KEY_RUM_SESSION_ID, sessionId);
             if (withAction) {
-                tags.put(Constants.KEY_RUM_ACTION_ID, getActionId());
-                tags.put(Constants.KEY_RUM_ACTION_NAME, getActionName());
+                if (!activeAction.isClose()) {
+                    tags.put(Constants.KEY_RUM_ACTION_ID, getActionId());
+                    tags.put(Constants.KEY_RUM_ACTION_NAME, getActionName());
+                }
             }
         } catch (JSONException e) {
             LogUtils.e(TAG, e.getMessage());
@@ -712,7 +716,7 @@ public class FTRUMGlobalManager {
     }
 
 
-    Handler mHandler = new Handler(Looper.getMainLooper());
+    final Handler mHandler = new Handler(Looper.getMainLooper());
     final Runnable mRUMGenerateRunner = () -> {
         try {
             JSONObject tags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
