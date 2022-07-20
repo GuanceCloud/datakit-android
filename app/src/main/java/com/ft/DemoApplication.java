@@ -3,13 +3,14 @@ package com.ft;
 import android.app.Application;
 import android.content.Context;
 
+import com.ft.sdk.DeviceMetricsMonitorType;
 import com.ft.sdk.EnvType;
 import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
-import com.ft.sdk.MonitorType;
+import com.ft.sdk.ErrorMonitorType;
 import com.ft.sdk.TraceType;
 
 /**
@@ -37,7 +38,7 @@ public class DemoApplication extends Application {
 
     private void initFTSDK() {
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(this,
-                AccountUtils.ACCESS_SERVER_URL))
+                        AccountUtils.ACCESS_SERVER_URL))
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setDebug(true)//设置是否是 debug
                 .setEnv(EnvType.GRAY);
@@ -59,9 +60,10 @@ public class DemoApplication extends Application {
                 .setEnableTrackAppANR(true)
                 .setEnableTrackAppCrash(true)
                 .setEnableTrackAppUIBlock(true)
-                .addGlobalContext("track_id",AccountUtils.getProperty(this, AccountUtils.TRACK_ID))
-                .addGlobalContext("custom_tag","any tags")
-                .setExtraMonitorTypeWithError(MonitorType.ALL));
+                .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL)
+                .addGlobalContext("track_id", AccountUtils.getProperty(this, AccountUtils.TRACK_ID))
+                .addGlobalContext("custom_tag", "any tags")
+                .setExtraMonitorTypeWithError(ErrorMonitorType.ALL));
 
         FTSdk.bindRumUserData("brandon.test.userid");
 

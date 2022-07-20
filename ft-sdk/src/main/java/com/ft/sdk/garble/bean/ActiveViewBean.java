@@ -29,6 +29,14 @@ public class ActiveViewBean extends ViewBean {
         bean.loadTime = this.loadTime;
         bean.timeSpent = this.timeSpent;
         bean.sessionId = this.sessionId;
+        bean.memoryMax = this.memoryMax;
+        bean.memoryAvg = this.memoryAvg;
+        bean.cpuTickCountAvg = this.cpuTickCountAvg;
+        bean.cpuTickCountMax = this.cpuTickCountMax;
+        bean.batteryCurrentMax = this.batteryCurrentMax;
+        bean.batteryCurrentAvg = this.batteryCurrentAvg;
+        bean.fpsAvg = this.fpsAvg;
+        bean.fpsMini = this.fpsMini;
         return bean;
     }
 

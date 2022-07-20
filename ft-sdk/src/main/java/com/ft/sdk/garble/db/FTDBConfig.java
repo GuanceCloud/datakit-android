@@ -6,6 +6,6 @@ package com.ft.sdk.garble.db;
  * Description:
  */
 public class FTDBConfig {
-    public static String DATABASE_NAME = "ft_cache_database.db";
+    public static String DATABASE_NAME = "gc_cache_database.db";
     public static int DATABASE_VERSION = 1;
 }

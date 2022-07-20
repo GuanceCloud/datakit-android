@@ -23,36 +23,13 @@ public class CpuUtils {
     private CpuUtils() {
     }
 
-    public final int DEVICEINFO_UNKNOWN = -1;
     private RandomAccessFile mProcStatFile;
     private RandomAccessFile mAppStatFile;
+    private RandomAccessFile mSelfStatFile;
+
     private Long mLastCpuTime;
     private Long mLastAppCpuTime;
     private static CpuUtils cpuUtils;
-    private int maxFreq = DEVICEINFO_UNKNOWN;
-
-    //常见获取 CPU 温度的系统文件路径,TODO 当获取不到温度时尝试扩展这个文件路径集合
-    //参考1：https://blog.csdn.net/willway_wang/article/details/87599122
-    //参考2：https://github.com/kamgurgul/cpu-info
-    private final List<String> CPU_TEMP_FILE_PATHS = Arrays.asList(
-            "/sys/devices/system/cpu/cpu0/cpufreq/cpu_temp",
-            "/sys/devices/system/cpu/cpu0/cpufreq/FakeShmoo_cpu_temp",
-            "/sys/class/thermal/thermal_zone0/temp",
-            "/sys/class/i2c-adapter/i2c-4/4-004c/temperature",
-            "/sys/devices/platform/tegra-i2c.3/i2c-4/4-004c/temperature",
-            "/sys/devices/platform/omap/omap_temp_sensor.0/temperature",
-            "/sys/devices/platform/tegra_tmon/temp1_input",
-            "/sys/kernel/debug/tegra_thermal/temp_tj",
-            "/sys/devices/platform/s5p-tmu/temperature",
-            "/sys/class/thermal/thermal_zone1/temp",
-            "/sys/class/hwmon/hwmon0/device/temp1_input",
-            "/sys/devices/virtual/thermal/thermal_zone1/temp",
-            "/sys/devices/virtual/thermal/thermal_zone0/temp",
-            "/sys/class/thermal/thermal_zone3/temp",
-            "/sys/class/thermal/thermal_zone4/temp",
-            "/sys/class/hwmon/hwmonX/temp1_input",
-            "/sys/devices/platform/s5p-tmu/curr_temp"
-    );
 
     public synchronized static CpuUtils get() {
         if (cpuUtils == null) {
@@ -68,7 +45,7 @@ public class CpuUtils {
      *
      * @return
      */
-    public float getCpuDataForO() {
+    public float getCPUUsageForO() {
         java.lang.Process process = null;
         try {
             process = Runtime.getRuntime().exec("top -n 1");
@@ -128,7 +105,7 @@ public class CpuUtils {
      *
      * @return
      */
-    public float getCPUData() {
+    public float getCPUUsage() {
         long cpuTime;
         long appTime;
         float value = 0.0f;
@@ -161,6 +138,23 @@ public class CpuUtils {
 
         }
         return value;
+    }
+
+    public long getAppCPUTickCount() {
+        try {
+            if (mSelfStatFile == null) {
+                mSelfStatFile = new RandomAccessFile("/proc/" + android.os.Process.myPid() + "/stat", "r");
+            } else {
+                mSelfStatFile.seek(0);
+            }
+            String statString = mSelfStatFile.readLine();
+            String[] procStats = statString.split(" ");
+            return Long.parseLong(procStats[13]);
+
+        } catch (Exception e) {
+
+        }
+        return -1;
     }
 
 

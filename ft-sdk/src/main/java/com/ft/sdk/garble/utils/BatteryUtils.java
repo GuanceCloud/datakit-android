@@ -7,6 +7,8 @@ import android.os.BatteryManager;
 
 import com.ft.sdk.garble.bean.BatteryBean;
 
+import java.util.concurrent.ExecutorService;
+
 /**
  * BY huangDianHua
  * DATE:2020-01-09 17:47
@@ -21,7 +23,7 @@ public class BatteryUtils {
      * @param context
      * @return
      */
-    public static int getBatteryCurrent(Context context) {
+    public static int getBatteryUsage(Context context) {
         int capacity = 0;
         try {
             BatteryManager manager = (BatteryManager) context.getSystemService(Context.BATTERY_SERVICE);
@@ -34,12 +36,29 @@ public class BatteryUtils {
     }
 
     /**
+     * 当前电流,单位 mA
+     *
+     * @param context
+     * @return
+     */
+    public static int getBatteryCurrent(Context context) {
+        try {
+            BatteryManager manager = (BatteryManager) context.getSystemService(Context.BATTERY_SERVICE);
+            return manager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_NOW) / 1000;
+        } catch (Exception e) {
+
+        }
+        return 0;
+    }
+
+
+    /**
      * 获取电池的容量
      *
      * @param context
      * @return
      */
-    public static String getBatteryTotal(Context context) {
+    public static String getBatteryCapacity(Context context) {
         if (batteryCapacity > 0) {
             return batteryCapacity + "mAh";
         }
@@ -85,8 +104,8 @@ public class BatteryUtils {
                 } else {
                     batteryBean.setVoltage(voltage);
                 }
-                batteryBean.setPower(getBatteryTotal(context));
-                batteryBean.setBr(getBatteryCurrent(context));
+                batteryBean.setPower(getBatteryCapacity(context));
+                batteryBean.setBr(getBatteryUsage(context));
             }
         } catch (Exception e) {
         }

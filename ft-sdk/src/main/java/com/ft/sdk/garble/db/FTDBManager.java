@@ -1,5 +1,6 @@
 package com.ft.sdk.garble.db;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -25,6 +26,7 @@ import java.util.List;
  * DATE:2019-12-02 15:55
  * Description:
  */
+@SuppressLint("Range")
 public class FTDBManager extends DBManager {
     private static FTDBManager ftdbManager;
     public final static String TAG = "FTDBManager";
@@ -81,6 +83,7 @@ public class FTDBManager extends DBManager {
             contentValues.put(FTSQL.RUM_COLUMN_VIEW_REFERRER, data.getViewReferrer());
             contentValues.put(FTSQL.RUM_COLUMN_VIEW_LOAD_TIME, data.getLoadTime());
             contentValues.put(FTSQL.RUM_COLUMN_SESSION_ID, data.getSessionId());
+            contentValues.put(FTSQL.RUM_COLUMN_EXTRA_ATTR, data.getAttrJsonString());
             db.insert(FTSQL.FT_TABLE_VIEW, null, contentValues);
 
         });
@@ -277,6 +280,7 @@ public class FTDBManager extends DBManager {
                     String viewId = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_ID));
                     String viewName = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_NAME));
                     String viewReferrer = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_REFERRER));
+                    String attr = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_EXTRA_ATTR));
 
                     ActionBean bean = new ActionBean();
                     bean.setClose(close == 1);
@@ -326,6 +330,7 @@ public class FTDBManager extends DBManager {
                     long loadTime = cursor.getLong(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_LOAD_TIME));
                     String viewName = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_NAME));
                     String viewReferrer = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_REFERRER));
+                    String attr = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_EXTRA_ATTR));
 
                     ViewBean viewBean = new ViewBean();
                     viewBean.setClose(close == 1);
@@ -340,6 +345,8 @@ public class FTDBManager extends DBManager {
                     viewBean.setSessionId(sessionId);
                     viewBean.setViewName(viewName);
                     viewBean.setViewReferrer(viewReferrer);
+                    viewBean.setFromAttrJsonString(attr);
+
                     list.add(viewBean);
                     LogUtils.d(TAG, viewBean.toString());
                 }

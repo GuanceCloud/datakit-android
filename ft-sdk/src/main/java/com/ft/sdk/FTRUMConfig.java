@@ -23,6 +23,10 @@ public class FTRUMConfig {
     //崩溃采集数据附加类型
     private int extraMonitorTypeWithError;
 
+    private int deviceMetricsMonitorType;
+
+    private DetectFrequency deviceMetricsDetectFrequency = DetectFrequency.DEFAULT;
+
 //    private boolean backendSample = false;
 
     //设置全局 tag
@@ -95,7 +99,7 @@ public class FTRUMConfig {
         return enableTraceUserResource;
     }
 
-    public FTRUMConfig setEnableTraceUserResource(boolean enableTraceUserResource){
+    public FTRUMConfig setEnableTraceUserResource(boolean enableTraceUserResource) {
         this.enableTraceUserResource = enableTraceUserResource;
         return this;
     }
@@ -108,6 +112,7 @@ public class FTRUMConfig {
         this.extraMonitorTypeWithError = extraMonitorTypeWithError;
         return this;
     }
+
 
     public boolean isRumEnable() {
         return rumAppId != null;
@@ -123,7 +128,26 @@ public class FTRUMConfig {
     }
 
 
-//    /**
+    public FTRUMConfig setDeviceMetricsMonitorType(int deviceMetricsMonitorType) {
+        this.deviceMetricsMonitorType = deviceMetricsMonitorType;
+        return this;
+    }
+
+    public FTRUMConfig setDeviceMetricsMonitorType(int deviceMetricsMonitorType, DetectFrequency frequency) {
+        this.deviceMetricsMonitorType = deviceMetricsMonitorType;
+        this.deviceMetricsDetectFrequency = frequency;
+        return this;
+    }
+
+    public int getDeviceMetricsMonitorType() {
+        return deviceMetricsMonitorType;
+    }
+
+    public DetectFrequency getDeviceMetricsDetectFrequency() {
+        return deviceMetricsDetectFrequency;
+    }
+
+    //    /**
 //     * 设置 BackendSample 后端采样，当为 true 时，rum sampleRate 设置不再起效
 //     *
 //     * @param backendSample

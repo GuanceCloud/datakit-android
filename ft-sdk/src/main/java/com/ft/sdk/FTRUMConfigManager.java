@@ -52,7 +52,7 @@ public class FTRUMConfigManager {
 //        FTAutoTrackConfigManager.get().initParams();
         FTExceptionHandler.get().initConfig(config);
         initRandomUserId();
-        FTMonitorConfigManager.get().initWithConfig(config);
+        FTMonitorManager.get().initWithConfig(config);
         FTUIBlockManager.get().start(config);
         initRUMGlobalContext(config);
         if (config.isRumEnable() && config.isEnableTraceUserAction()) {

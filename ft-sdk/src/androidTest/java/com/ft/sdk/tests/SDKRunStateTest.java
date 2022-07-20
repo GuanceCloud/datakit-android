@@ -15,9 +15,9 @@ import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
 import com.ft.sdk.FTTraceConfigManager;
-import com.ft.sdk.MonitorType;
+import com.ft.sdk.ErrorMonitorType;
 import com.ft.sdk.TraceType;
-import com.ft.sdk.FTMonitorConfigManager;
+import com.ft.sdk.FTMonitorManager;
 import com.ft.test.base.FTBaseTest;
 
 import org.junit.Assert;
@@ -43,7 +43,7 @@ public class SDKRunStateTest extends FTBaseTest {
         FTSdk.install(ftSDKConfig);
 
         FTSdk.initRUMWithConfig(new FTRUMConfig()
-                .setExtraMonitorTypeWithError(MonitorType.ALL)
+                .setExtraMonitorTypeWithError(ErrorMonitorType.ALL)
                 .setEnableTrackAppANR(true)
                 .setEnableTrackAppCrash(true)
                 .setEnableTrackAppUIBlock(true)
@@ -60,7 +60,7 @@ public class SDKRunStateTest extends FTBaseTest {
 
     @Test
     public void monitorTypeTest() {
-        Assert.assertTrue(FTMonitorConfigManager.get().isMonitorType(MonitorType.ALL));
+        Assert.assertTrue(FTMonitorManager.get().isErrorMonitorType(ErrorMonitorType.ALL));
     }
 
     @Test
@@ -87,7 +87,7 @@ public class SDKRunStateTest extends FTBaseTest {
     @Test
     public void showdownMonitorTypeTest() {
         FTSdk.shutDown();
-        Assert.assertFalse(FTMonitorConfigManager.get().isMonitorType(MonitorType.ALL));
+        Assert.assertFalse(FTMonitorManager.get().isErrorMonitorType(ErrorMonitorType.ALL));
     }
 
     @Test

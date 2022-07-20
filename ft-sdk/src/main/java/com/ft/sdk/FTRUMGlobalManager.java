@@ -11,6 +11,7 @@ import com.ft.sdk.garble.bean.ActiveViewBean;
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.ErrorSource;
 import com.ft.sdk.garble.bean.ErrorType;
+import com.ft.sdk.garble.bean.MonitorInfoBean;
 import com.ft.sdk.garble.bean.NetStatusBean;
 import com.ft.sdk.garble.bean.ResourceBean;
 import com.ft.sdk.garble.bean.ResourceParams;
@@ -45,6 +46,7 @@ public class FTRUMGlobalManager {
     static final long SESSION_EXPIRE_TIME = 1440000000000000L;
     static final long FILTER_CAPACITY = 5;
     private final ConcurrentHashMap<String, ResourceBean> resourceBeanMap = new ConcurrentHashMap<>();
+
     private final ArrayList<String> viewList = new ArrayList<>();
 
     private FTRUMGlobalManager() {
@@ -222,6 +224,8 @@ public class FTRUMGlobalManager {
         }
         String viewReferrer = getLastView();
         activeView = new ActiveViewBean(viewName, viewReferrer, loadTime, sessionId);
+        FTMonitorManager.get().addMonitor(activeView.getId());
+        FTMonitorManager.get().attachMonitorData(activeView);
         initView(activeView);
 
     }
@@ -250,7 +254,8 @@ public class FTRUMGlobalManager {
      */
     public void stopView() {
         checkActionClose();
-
+        FTMonitorManager.get().attachMonitorData(activeView);
+        FTMonitorManager.get().removeMonitor(activeView.getId());
         activeView.close();
         closeView(activeView);
 
@@ -329,16 +334,16 @@ public class FTRUMGlobalManager {
                 tags.put(Constants.KEY_DEVICE_CARRIER, DeviceUtils.getCarrier(FTApplication.getApplication()));
                 tags.put(Constants.KEY_DEVICE_LOCALE, Locale.getDefault());
 
-                if (FTMonitorConfigManager.get().isMonitorType(MonitorType.MEMORY)) {
+                if (FTMonitorManager.get().isErrorMonitorType(ErrorMonitorType.MEMORY)) {
                     double[] memory = DeviceUtils.getRamData(FTApplication.getApplication());
                     tags.put(Constants.KEY_MEMORY_TOTAL, memory[0] + "GB");
                     fields.put(Constants.KEY_MEMORY_USE, memory[1]);
                 }
 
-                if (FTMonitorConfigManager.get().isMonitorType(MonitorType.CPU)) {
-                    fields.put(Constants.KEY_CPU_USE, DeviceUtils.getCpuUseRate());
+                if (FTMonitorManager.get().isErrorMonitorType(ErrorMonitorType.CPU)) {
+                    fields.put(Constants.KEY_CPU_USE, DeviceUtils.getCpuUsage());
                 }
-                if (FTMonitorConfigManager.get().isMonitorType(MonitorType.BATTERY)) {
+                if (FTMonitorManager.get().isErrorMonitorType(ErrorMonitorType.BATTERY)) {
                     fields.put(Constants.KEY_BATTERY_USE, (float) BatteryUtils.getBatteryInfo(FTApplication.getApplication()).getBr());
 
                 }
@@ -801,6 +806,25 @@ public class FTRUMGlobalManager {
                 }
                 fields.put(Constants.KEY_RUM_VIEW_LONG_TASK_COUNT, bean.getLongTaskCount());
                 fields.put(Constants.KEY_RUM_VIEW_IS_ACTIVE, !bean.isClose());
+
+                if (FTMonitorManager.get().isDeviceMetricsMonitorType(DeviceMetricsMonitorType.CPU)) {
+                    fields.put(Constants.KEY_CPU_TICK_COUNT_MAX, bean.getCpuTickCountMax());
+                    fields.put(Constants.KEY_CPU_TICK_COUNT_AVG, bean.getCpuTickCountAvg());
+                }
+                if (FTMonitorManager.get().isDeviceMetricsMonitorType(DeviceMetricsMonitorType.MEMORY)) {
+                    fields.put(Constants.KEY_MEMORY_MAX, bean.getMemoryMax());
+                    fields.put(Constants.KEY_MEMORY_AVG, bean.getMemoryAvg());
+                }
+                if (FTMonitorManager.get().isDeviceMetricsMonitorType(DeviceMetricsMonitorType.BATTERY)) {
+                    fields.put(Constants.KEY_BATTERY_CURRENT_AVG, bean.getBatteryCurrentAvg());
+                    fields.put(Constants.KEY_BATTERY_CURRENT_MAX, bean.getBatteryCurrentMax());
+                }
+                if (FTMonitorManager.get().isDeviceMetricsMonitorType(DeviceMetricsMonitorType.FPS)) {
+                    fields.put(Constants.KEY_FPS_AVG, bean.getBatteryCurrentMax());
+                    fields.put(Constants.KEY_FPS_MINI, bean.getBatteryCurrentMax());
+
+                }
+
             } catch (JSONException e) {
                 LogUtils.e(TAG, e.getMessage());
             }

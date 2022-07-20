@@ -1,37 +1,24 @@
 package com.ft.sdk.tests;
 
-import static com.ft.sdk.FTSdkAllTests.hasPrepare;
-
-import android.os.Looper;
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.ft.sdk.EnvType;
-import com.ft.sdk.FTLoggerConfig;
-import com.ft.sdk.FTMonitorConfigManager;
 import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTRUMGlobalManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
-import com.ft.sdk.MonitorType;
+import com.ft.sdk.ErrorMonitorType;
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.ErrorType;
-import com.ft.sdk.garble.bean.SyncJsonData;
-import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.test.base.FTBaseTest;
 import com.ft.test.utils.CheckUtils;
 
-import org.json.JSONException;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.util.HashMap;
-import java.util.List;
 
 
 /**
@@ -53,7 +40,7 @@ public class MonitorConfigTest extends FTBaseTest {
 
         FTSdk.initRUMWithConfig(new FTRUMConfig()
                 .setRumAppId(TEST_FAKE_RUM_ID)
-                .setExtraMonitorTypeWithError(MonitorType.ALL));
+                .setExtraMonitorTypeWithError(ErrorMonitorType.ALL));
     }
 
     @Test

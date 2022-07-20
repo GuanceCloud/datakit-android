@@ -84,7 +84,7 @@ public class FTSdk {
     public static void shutDown() {
         SyncTaskManager.release();
         FTRUMConfigManager.get().release();
-        FTMonitorConfigManager.release();
+        FTMonitorManager.release();
         FTAutoTrackConfigManager.release();
         FTHttpConfigManager.release();
         FTNetworkListener.get().release();

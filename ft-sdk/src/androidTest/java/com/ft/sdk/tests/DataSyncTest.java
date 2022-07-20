@@ -13,20 +13,15 @@ import com.ft.sdk.FTRUMGlobalManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
-import com.ft.sdk.MonitorType;
-import com.ft.sdk.TraceType;
+import com.ft.sdk.ErrorMonitorType;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.Status;
-import com.ft.sdk.garble.bean.SyncJsonData;
-import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.test.base.FTBaseTest;
 import com.ft.test.utils.CheckUtils;
-import com.ft.test.utils.RequestUtil;
 import com.google.mockwebserver.MockResponse;
 import com.google.mockwebserver.MockWebServer;
 
-import org.json.JSONException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -62,7 +57,7 @@ public class DataSyncTest extends FTBaseTest {
         FTSdk.install(ftSDKConfig);
 
         FTSdk.initRUMWithConfig(new FTRUMConfig()
-                .setExtraMonitorTypeWithError(MonitorType.ALL)
+                .setExtraMonitorTypeWithError(ErrorMonitorType.ALL)
                 .setEnableTrackAppCrash(true)
                 .setRumAppId(TEST_FAKE_RUM_ID)
                 .setEnableTrackAppUIBlock(true)

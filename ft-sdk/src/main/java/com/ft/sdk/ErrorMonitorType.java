@@ -1,11 +1,8 @@
 package com.ft.sdk;
 
 /**
- * BY huangDianHua
- * DATE:2020-01-09 17:16
- * Description:
  */
-public class MonitorType {
+public class ErrorMonitorType {
     public static int ALL = 0xFFFFFFFF;
     public static int BATTERY = 1<<1;
     public static int MEMORY = 1<<2;

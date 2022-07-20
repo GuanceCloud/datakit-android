@@ -41,6 +41,7 @@ public class FTSQL {
     public static final String RUM_COLUMN_ACTION_NAME = "action_name";
     public static final String RUM_COLUMN_ACTION_TYPE = "action_type";
     public static final String RUM_COLUMN_ACTION_DURATION = "duration";
+    public static final String RUM_COLUMN_EXTRA_ATTR = "extra_attr";
 
     public static final String FT_TABLE_ACTION = "rum_action";
 
@@ -61,7 +62,8 @@ public class FTSQL {
             RUM_COLUMN_VIEW_ID + " TEXT," +
             RUM_COLUMN_VIEW_REFERRER + " TEXT," +
             RUM_COLUMN_ACTION_NAME + " TEXT," +
-            RUM_COLUMN_ACTION_TYPE + " TEXT" +
+            RUM_COLUMN_ACTION_TYPE + " TEXT," +
+            RUM_COLUMN_EXTRA_ATTR + " TEXT" +
             ")";
     public static final String FT_TABLE_VIEW_CREATE = "CREATE TABLE if not exists " + FT_TABLE_VIEW +
             " (" +
@@ -77,7 +79,8 @@ public class FTSQL {
             RUM_COLUMN_VIEW_LOAD_TIME + " BIGINT," +
             RUM_COLUMN_VIEW_TIME_SPENT + " BIGINT," +
             RUM_COLUMN_RESOURCE_COUNT + " INTEGER," +
-            RUM_COLUMN_PENDING_RESOURCE + " INTEGER" +
+            RUM_COLUMN_PENDING_RESOURCE + " INTEGER," +
+            RUM_COLUMN_EXTRA_ATTR + " TEXT" +
             ")";
 
 

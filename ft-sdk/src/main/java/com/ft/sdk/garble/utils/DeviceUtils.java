@@ -3,34 +3,35 @@ package com.ft.sdk.garble.utils;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.Build;
-import android.os.SystemClock;
+import android.os.Debug;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 
-import com.ft.sdk.BuildConfig;
 import com.ft.sdk.FTApplication;
 
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.RandomAccessFile;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.ft.sdk.garble.utils.Utils.getSharedPreferences;
 
@@ -41,6 +42,24 @@ import static com.ft.sdk.garble.utils.Utils.getSharedPreferences;
  */
 public class DeviceUtils {
     public static final String TAG = "DeviceUtils";
+    private static final String STATUS_PATH = "/proc/self/status";
+    private static final String VM_RSS_PATTERN = "VmRSS:\\s+(\\d+) kB";
+
+    private RandomAccessFile mProcStatusFile;
+
+
+    private DeviceUtils() {
+
+    }
+
+    private static class SingletonHolder {
+        private static final DeviceUtils INSTANCE = new DeviceUtils();
+    }
+
+    public static DeviceUtils get() {
+        return DeviceUtils.SingletonHolder.INSTANCE;
+    }
+
     private static final Map<String, String> sCarrierMap = new HashMap<String, String>() {
         {
             //中国移动
@@ -217,7 +236,6 @@ public class DeviceUtils {
      * @return
      */
     public static double[] getRamData(Context context) {
-        DecimalFormat showFloatFormat = new DecimalFormat("0.00");
         try {
             ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
             ActivityManager.MemoryInfo info = new ActivityManager.MemoryInfo();
@@ -234,16 +252,50 @@ public class DeviceUtils {
     }
 
     /**
+     * 获取内存，单位 Byte
+     *
+     * @param
+     * @return
+     */
+    public long getAppMemoryUseSize() {
+        long memorySize = 0;
+        try {
+            if (mProcStatusFile == null) {
+                mProcStatusFile = new RandomAccessFile("/proc/" + android.os.Process.myPid() + "/status", "r");
+            } else {
+                mProcStatusFile.seek(0);
+            }
+            String statusString;
+            Pattern p = Pattern.compile(VM_RSS_PATTERN);
+            while ((statusString = mProcStatusFile.readLine()) != null) {
+                Matcher m = p.matcher(statusString);
+                if (m.matches()) {
+                    memorySize = Long.parseLong(m.group(1));
+                    break;
+                }
+            }
+            return memorySize * 1000;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return memorySize;
+
+    }
+
+
+    /**
      * 获得CPU使用率
      *
      * @return
      */
-    public static double getCpuUseRate() {
+    public static double getCpuUsage() {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                return Utils.formatDouble(CpuUtils.get().getCpuDataForO());
+                return Utils.formatDouble(CpuUtils.get().getCPUUsageForO());
             } else {
-                return Utils.formatDouble(CpuUtils.get().getCPUData());
+                return Utils.formatDouble(CpuUtils.get().getCPUUsage());
             }
         } catch (Exception e) {
             return 0.00;
@@ -282,13 +334,13 @@ public class DeviceUtils {
                         }
                     }
                 } catch (Exception e) {
-                    LogUtils.e(TAG,e.getMessage());
+                    LogUtils.e(TAG, e.getMessage());
                 }
             } else {
                 LogUtils.e(TAG, "没有获得到 READ_PHONE_STATE 权限无法获取运营商信息");
             }
         } catch (Exception e) {
-            LogUtils.e(TAG,e.getMessage());
+            LogUtils.e(TAG, e.getMessage());
         }
         return null;
     }

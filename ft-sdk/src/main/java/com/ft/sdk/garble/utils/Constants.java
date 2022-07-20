@@ -73,6 +73,15 @@ public class Constants {
     public static final String KEY_MEMORY_USE = "memory_use";
     public static final String KEY_CPU_USE = "cpu_use";
 
+    public static final String KEY_CPU_TICK_COUNT_AVG = "cpu_tick_count_avg";
+    public static final String KEY_CPU_TICK_COUNT_MAX = "cpu_tick_count_max";
+    public static final String KEY_MEMORY_AVG = "memory_avg";
+    public static final String KEY_MEMORY_MAX = "memory_max";
+    public static final String KEY_FPS_MINI = "fps_mini";
+    public static final String KEY_FPS_AVG = "fps_avg";
+    public static final String KEY_BATTERY_CURRENT_AVG = "battery_current_avg";
+    public static final String KEY_BATTERY_CURRENT_MAX = "battery_current_max";
+
     public static final String KEY_NETWORK_TYPE = "network_type";
     public static final String KEY_NETWORK_STRENGTH = "network_strength";
     public static final String KEY_NETWORK_IN_RATE = "network_in_rate";
