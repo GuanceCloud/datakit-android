@@ -38,9 +38,11 @@ public class FpsUtils {
         metronome.addListener(fps -> mFps = fps);
     }
 
-    public void release() {
-        if (metronome != null) {
-            metronome.stop();
+    public static void release() {
+        if (fpsUtils != null) {
+            if (fpsUtils.metronome != null) {
+                fpsUtils.metronome.stop();
+            }
         }
     }
 

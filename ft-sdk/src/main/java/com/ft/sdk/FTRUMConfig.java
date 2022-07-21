@@ -23,6 +23,7 @@ public class FTRUMConfig {
     //崩溃采集数据附加类型
     private int extraMonitorTypeWithError;
 
+    //监控指标数据类型
     private int deviceMetricsMonitorType;
 
     private DetectFrequency deviceMetricsDetectFrequency = DetectFrequency.DEFAULT;

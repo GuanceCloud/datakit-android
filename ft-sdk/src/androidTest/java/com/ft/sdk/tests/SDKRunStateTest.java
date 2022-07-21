@@ -6,6 +6,7 @@ import android.os.Looper;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.ft.sdk.DeviceMetricsMonitorType;
 import com.ft.sdk.EnvType;
 import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.FTLoggerConfigManager;
@@ -44,6 +45,7 @@ public class SDKRunStateTest extends FTBaseTest {
 
         FTSdk.initRUMWithConfig(new FTRUMConfig()
                 .setExtraMonitorTypeWithError(ErrorMonitorType.ALL)
+                .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL)
                 .setEnableTrackAppANR(true)
                 .setEnableTrackAppCrash(true)
                 .setEnableTrackAppUIBlock(true)
@@ -59,8 +61,13 @@ public class SDKRunStateTest extends FTBaseTest {
     }
 
     @Test
-    public void monitorTypeTest() {
+    public void monitorErrorTypeTest() {
         Assert.assertTrue(FTMonitorManager.get().isErrorMonitorType(ErrorMonitorType.ALL));
+    }
+
+    @Test
+    public void monitorDeviceMetricsMonitorTYpe() {
+        Assert.assertTrue(FTMonitorManager.get().isDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL));
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.ft.test.base;
 
 import android.content.Context;
+import android.os.Looper;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 

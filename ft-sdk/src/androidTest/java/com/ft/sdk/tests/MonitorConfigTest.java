@@ -2,6 +2,7 @@ package com.ft.sdk.tests;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.ft.sdk.DeviceMetricsMonitorType;
 import com.ft.sdk.EnvType;
 import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTRUMGlobalManager;
@@ -16,6 +17,7 @@ import com.ft.test.base.FTBaseTest;
 import com.ft.test.utils.CheckUtils;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,8 +31,8 @@ import org.junit.runner.RunWith;
 @RunWith(AndroidJUnit4.class)
 public class MonitorConfigTest extends FTBaseTest {
 
-    @BeforeClass
-    public static void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         stopSyncTask();
         FTSDKConfig ftSDKConfig = FTSDKConfig
                 .builder(TEST_FAKE_URL)
@@ -40,11 +42,13 @@ public class MonitorConfigTest extends FTBaseTest {
 
         FTSdk.initRUMWithConfig(new FTRUMConfig()
                 .setRumAppId(TEST_FAKE_RUM_ID)
-                .setExtraMonitorTypeWithError(ErrorMonitorType.ALL));
+                .setExtraMonitorTypeWithError(ErrorMonitorType.ALL)
+                .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL)
+        );
     }
 
     @Test
-    public void monitorTest() throws Exception {
+    public void monitorErrorTest() throws Exception {
         FTRUMGlobalManager.get().addError("log", "message", ErrorType.JAVA, AppState.RUN);
 
         Thread.sleep(3000);
@@ -55,6 +59,25 @@ public class MonitorConfigTest extends FTBaseTest {
                 Constants.KEY_CPU_USE
         }, 0));
 
+    }
+
+    @Test
+    public void monitorDeviceMetrics() throws InterruptedException {
+        FTRUMGlobalManager.get().startView(ANY_VIEW);
+        Thread.sleep(500);
+        FTRUMGlobalManager.get().stopView();
+        waitForInThreadPool();
+        Thread.sleep(3000L);
+        Assert.assertTrue(CheckUtils.checkValue(DataType.RUM_APP, new String[]{
+                Constants.KEY_FPS_AVG,
+                Constants.KEY_FPS_MINI,
+                Constants.KEY_MEMORY_AVG,
+                Constants.KEY_MEMORY_MAX,
+                Constants.KEY_CPU_TICK_COUNT_AVG,
+                Constants.KEY_CPU_TICK_COUNT_MAX,
+                Constants.KEY_FPS_MINI,
+                Constants.KEY_FPS_AVG,
+        }, 0));
     }
 
 

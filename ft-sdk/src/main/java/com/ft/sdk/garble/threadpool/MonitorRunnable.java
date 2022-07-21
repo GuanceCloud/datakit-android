@@ -2,6 +2,7 @@ package com.ft.sdk.garble.threadpool;
 
 import com.ft.sdk.DetectFrequency;
 import com.ft.sdk.DeviceMetricsMonitorType;
+import com.ft.sdk.FTActivityManager;
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTMonitorManager;
 import com.ft.sdk.FTRUMConfigManager;
@@ -32,12 +33,16 @@ public class MonitorRunnable implements Runnable {
 
     @Override
     public void run() {
+        if (!FTActivityManager.get().isAppForeground()) return;
         if (FTMonitorManager.get().isDeviceMetricsMonitorType(DeviceMetricsMonitorType.CPU)) {
             computeMonitorBean(cpuBean, CpuUtils.get().getAppCPUTickCount());
         }
 
         if (FTMonitorManager.get().isDeviceMetricsMonitorType(DeviceMetricsMonitorType.FPS)) {
-            computeMonitorBean(fpsBean, FpsUtils.get().getFps());
+            double fps = FpsUtils.get().getFps();
+            if (fps > 0) {
+                computeMonitorBean(fpsBean, fps);
+            }
         }
         if (FTMonitorManager.get().isDeviceMetricsMonitorType(DeviceMetricsMonitorType.MEMORY)) {
             long memory = DeviceUtils.get().getAppMemoryUseSize();
@@ -69,6 +74,8 @@ public class MonitorRunnable implements Runnable {
     }
 
     private void computeMonitorBean(MonitorInfoBean bean, double lastValue) {
+        if (bean.count == 0) {
+        }
         int count = bean.count + 1;
         bean.avgValue = (lastValue + (bean.count * bean.avgValue)) / count;
         bean.maxValue = Math.max(lastValue, bean.maxValue);

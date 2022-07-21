@@ -160,7 +160,7 @@ public class FTDBManager extends DBManager {
      * @param viewId
      * @param timeSpent
      */
-    public void closeView(String viewId, long timeSpent) {
+    public void closeView(String viewId, long timeSpent, String attr) {
         LogUtils.d(TAG, "closeVIew:" + viewId + ",timeSpent:" + timeSpent);
         getDB(true, db -> {
             Cursor cursor = db.rawQuery("select count(*) from " + FTSQL.FT_TABLE_VIEW
@@ -174,6 +174,7 @@ public class FTDBManager extends DBManager {
 
                 contentValues.put(FTSQL.RUM_COLUMN_IS_CLOSE, 1);
                 contentValues.put(FTSQL.RUM_COLUMN_VIEW_TIME_SPENT, timeSpent);
+                contentValues.put(FTSQL.RUM_COLUMN_EXTRA_ATTR, attr);
                 db.update(FTSQL.FT_TABLE_VIEW, contentValues,
                         FTSQL.RUM_COLUMN_ID + "='" + viewId + "'", null);
             }

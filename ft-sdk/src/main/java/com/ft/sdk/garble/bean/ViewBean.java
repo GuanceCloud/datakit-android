@@ -221,7 +221,7 @@ public class ViewBean {
             this.batteryCurrentAvg = json.optInt(Constants.KEY_BATTERY_CURRENT_AVG);
             this.batteryCurrentMax = json.getInt(Constants.KEY_BATTERY_CURRENT_MAX);
             this.fpsAvg = json.optDouble(Constants.KEY_FPS_AVG);
-            this.fpsMini = json.getInt(Constants.KEY_FPS_MINI);
+            this.fpsMini = json.optDouble(Constants.KEY_FPS_MINI);
             this.memoryAvg = json.optLong(Constants.KEY_MEMORY_AVG);
             this.memoryMax = json.optLong(Constants.KEY_MEMORY_MAX);
             this.cpuTickCountAvg = json.optLong(Constants.KEY_CPU_TICK_COUNT_AVG);
@@ -248,8 +248,15 @@ public class ViewBean {
                 ", startTime=" + startTime +
                 ", loadTime=" + loadTime +
                 ", timeSpent=" + timeSpent +
+                ", fpsMini=" + fpsMini +
+                ", fpsAvg=" + fpsAvg +
+                ", cpuTickCountAvg=" + cpuTickCountAvg +
+                ", cpuTickCountMax=" + cpuTickCountMax +
+                ", memoryAvg=" + memoryAvg +
+                ", memoryMax=" + memoryMax +
+                ", batteryCurrentAvg=" + batteryCurrentAvg +
+                ", batteryCurrentMax=" + batteryCurrentMax +
                 ", sessionId='" + sessionId + '\'' +
                 '}';
     }
-
 }

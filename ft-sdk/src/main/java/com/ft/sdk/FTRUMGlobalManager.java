@@ -203,7 +203,7 @@ public class FTRUMGlobalManager {
      * @param viewName 当前页面名称
      */
     public void startView(String viewName) {
-        if (!viewList.contains(viewName)) {
+        if (viewList.isEmpty() || !viewList.get(viewList.size() - 1).equals(viewName)) {
             viewList.add(viewName);
             if (viewList.size() > 2) {
                 viewList.remove(0);
@@ -236,7 +236,7 @@ public class FTRUMGlobalManager {
      * @return
      */
     String getLastView() {
-        LogUtils.d(TAG, "getlastview:" + viewList);
+        LogUtils.d(TAG, "getLastView:" + viewList);
         if (viewList.size() > 1) {
             String viewName = viewList.get(viewList.size() - 2);
             if (viewName != null) {
@@ -271,6 +271,8 @@ public class FTRUMGlobalManager {
     }
 
     private void initView(ActiveViewBean activeViewBean) {
+        LogUtils.e(TAG, "start viewId:" + activeViewBean.toString());
+
         ViewBean bean = activeViewBean.convertToViewBean();
         EventConsumerThreadPool.get().execute(() -> {
             FTDBManager.get().initSumView(bean);
@@ -636,11 +638,13 @@ public class FTRUMGlobalManager {
     }
 
     private void closeView(ActiveViewBean activeViewBean) {
+        LogUtils.e(TAG, "closeView:" + activeViewBean.toString());
+
         ViewBean viewBean = activeViewBean.convertToViewBean();
         String viewId = viewBean.getId();
         long timeSpent = viewBean.getTimeSpent();
         EventConsumerThreadPool.get().execute(() -> {
-            FTDBManager.get().closeView(viewId, timeSpent);
+            FTDBManager.get().closeView(viewId, timeSpent, viewBean.getAttrJsonString());
         });
         generateRumData();
     }
@@ -820,8 +824,8 @@ public class FTRUMGlobalManager {
                     fields.put(Constants.KEY_BATTERY_CURRENT_MAX, bean.getBatteryCurrentMax());
                 }
                 if (FTMonitorManager.get().isDeviceMetricsMonitorType(DeviceMetricsMonitorType.FPS)) {
-                    fields.put(Constants.KEY_FPS_AVG, bean.getBatteryCurrentMax());
-                    fields.put(Constants.KEY_FPS_MINI, bean.getBatteryCurrentMax());
+                    fields.put(Constants.KEY_FPS_AVG, bean.getFpsAvg());
+                    fields.put(Constants.KEY_FPS_MINI, bean.getFpsMini());
 
                 }
 

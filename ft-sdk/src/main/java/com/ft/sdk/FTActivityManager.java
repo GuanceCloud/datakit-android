@@ -92,7 +92,7 @@ public final class FTActivityManager {
         }
     }
 
-    boolean isAppForeground() {
+    public boolean isAppForeground() {
         ActivityManager am = (ActivityManager) FTApplication.getApplication().getSystemService(Context.ACTIVITY_SERVICE);
         if (am == null) return false;
         List<ActivityManager.RunningAppProcessInfo> info = am.getRunningAppProcesses();

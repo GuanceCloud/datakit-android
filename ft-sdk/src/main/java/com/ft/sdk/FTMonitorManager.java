@@ -128,7 +128,7 @@ public class FTMonitorManager {
      * 清楚当前监控配置项
      */
     public static void release() {
-        FpsUtils.get().release();
+        FpsUtils.release();
         ftMonitorConfig = null;
     }
 

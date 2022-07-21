@@ -3,7 +3,7 @@ package com.ft.sdk.garble.bean;
 public class MonitorInfoBean {
     public double avgValue;
     public double maxValue;
-    public double miniValue;
+    public double miniValue = Double.MAX_VALUE;
     public int count = 0;
 
 
@@ -21,7 +21,7 @@ public class MonitorInfoBean {
         return new MonitorInfoBean(avgValue, miniValue, miniValue, count);
     }
 
-   public boolean isValid() {
+    public boolean isValid() {
         return count > 0;
     }
 
