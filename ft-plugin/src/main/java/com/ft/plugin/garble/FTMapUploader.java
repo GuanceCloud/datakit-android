@@ -19,23 +19,25 @@ import java.util.HashMap;
 public class FTMapUploader {
 
     private final Project project;
-    private final static String CMAKE_DEBUG_SYMBOL_PATH = "/intermediates/cmake/debug/obj";
+    private final static String CMAKE_DEBUG_SYMBOL_PATH = "/build/intermediates/cmake/debug/obj";
 
     private final HashMap<String, ProguardSettingConfig> proguardSettingMap = new HashMap<>();
 
-    private final static String SYMBOL_MERGE_PATH = "/tmp/ft-mergeNativeSymbols";
-    private final static String SYMBOL_MERGE_ZIP_PATH = "/tmp/symbol.zip";
+    private final static String SYMBOL_MERGE_PATH = "/tmp/ft_sourcemap_merge";
+    private final static String SYMBOL_MERGE_ZIP_PATH = "/tmp/ft_sourcemap.zip";
 
     private final ArrayList<String> symbolPaths = new ArrayList<>();
     private final String tmpBuildPath;
     private final String zipBuildPath;
+    private final FTExtension extension;
 
 
-    public FTMapUploader(Project project) {
+    public FTMapUploader(Project project, FTExtension extension) {
         this.project = project;
         String buildPath = project.getBuildDir().getAbsolutePath();
-        tmpBuildPath = buildPath + SYMBOL_MERGE_PATH;
-        zipBuildPath = buildPath + SYMBOL_MERGE_ZIP_PATH;
+        this.tmpBuildPath = buildPath + SYMBOL_MERGE_PATH;
+        this.zipBuildPath = buildPath + SYMBOL_MERGE_ZIP_PATH;
+        this.extension = extension;
     }
 
     /**
@@ -61,12 +63,16 @@ public class FTMapUploader {
                     if (config != null) {
 
                         if (!symbolPaths.isEmpty()) {
-                            mergeFileAndZip(tmpBuildPath, symbolPaths.toArray(new String[0]));
+                            FTFileUtils.copyDifferentFolderFilesIntoOne(tmpBuildPath, symbolPaths.toArray(new String[0]));
                         }
+                        if (new File(config.mappingOutputPath).exists()) {
+                            FTFileUtils.copyFile(new File(config.mappingOutputPath), new File(tmpBuildPath + "/mapping.txt"));
+                        }
+                        FTFileUtils.zipFiles(new File(tmpBuildPath).listFiles(), new File(zipBuildPath));
                         uploadWithParams(config);
                     }
 
-                } catch (InterruptedException | IOException e) {
+                } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
                 }
 
@@ -100,17 +106,6 @@ public class FTMapUploader {
 
     }
 
-    /**
-     * 合并并生成 zip
-     * @param tmpBuildPath
-     * @param symbolPaths
-     * @throws IOException
-     */
-    private void mergeFileAndZip(String tmpBuildPath, String... symbolPaths) throws IOException {
-        FTFileUtils.copyDifferentFolderFilesIntoOne(tmpBuildPath, symbolPaths);
-        FTFileUtils.zipDirectory(new File(tmpBuildPath), new File(zipBuildPath));
-    }
-
 
     /**
      * 上传 debug native symbol 文件
@@ -136,6 +131,7 @@ public class FTMapUploader {
                         String moduleName = dependency.getName();
                         String debugSymbolPath = rootPath + "/" + moduleName + CMAKE_DEBUG_SYMBOL_PATH;
                         File file = new File(debugSymbolPath);
+                        Logger.debug("debugSymbolPath:"+debugSymbolPath);
                         if (file.exists()) {
                             symbolPaths.add(debugSymbolPath);
                         }
@@ -154,13 +150,19 @@ public class FTMapUploader {
     }
 
     /**
-     *  上传符号文件
+     * 上传符号文件
+     *
      * @param settingConfig
      * @throws IOException
      * @throws InterruptedException
      */
     private void uploadWithParams(ProguardSettingConfig settingConfig) throws IOException, InterruptedException {
-        String cmd = "curl -v http://www.baidu.com --fail";
+        Logger.debug(extension.toString());
+        String cmd = "curl -X POST " + extension.datakitDCAUrl + "/v1/rum/sourcemap?app_id="
+                + extension.appId + "&env=" + extension.env + "&version="
+                + settingConfig.versionName + "&platform=android -F file=@" + zipBuildPath + " -H Content-Type:multipart/form-data";
+
+        Logger.debug(cmd);
         ProcessBuilder builder = new ProcessBuilder(cmd.split(" "));
         builder.redirectErrorStream(true);
 
@@ -176,7 +178,7 @@ public class FTMapUploader {
 
         process.waitFor();
 
-        Logger.debug("response:" + sb.toString());
+        Logger.debug("response:" + sb);
 
         int exitCode = process.exitValue();
         if (exitCode != 0) {
@@ -193,7 +195,6 @@ public class FTMapUploader {
         String versionName;
         int versionCode;
         String mappingOutputPath;
-        String debugSymbolPath;
 
         @Override
         public String toString() {
@@ -201,7 +202,6 @@ public class FTMapUploader {
                     "applicationId='" + applicationId + '\'' +
                     ", versionName='" + versionName + '\'' +
                     ", versionCode=" + versionCode +
-                    ", debugSymbolPath=" + debugSymbolPath +
                     ", outMappingOutputPath='" + mappingOutputPath + '\'' +
                     '}';
         }

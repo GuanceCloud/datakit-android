@@ -29,7 +29,7 @@ public class FTPlugin implements Plugin<Project> {
 
             Logger.setDebug(extension.showLog);
 
-            FTMapUploader f = new FTMapUploader(p);
+            FTMapUploader f = new FTMapUploader(p, extension);
 
 
             if (extension.autoUploadProguardMap) {

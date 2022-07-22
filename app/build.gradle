@@ -7,7 +7,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 31
         versionCode 1
-        versionName "1.0"
+        versionName "1.2"
         testInstrumentationRunner "com.ft.application.MockTestRunner"
     }
 
@@ -68,8 +68,11 @@ apply plugin: 'ft-plugin'
 
 FTExt {
     showLog = true
-//    openAutoTrack = true
 //    autoUploadProguardMap = true
+//    autoUploadNativeDebugSymbol = true
+//    datakitDCAUrl='[datakit dca url]'
+//    appId='[your app appid]'
+//    env='prod'
 }
 repositories {
     mavenCentral()

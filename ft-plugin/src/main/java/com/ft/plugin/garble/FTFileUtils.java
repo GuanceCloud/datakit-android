@@ -2,11 +2,16 @@ package com.ft.plugin.garble;
 
 import com.android.utils.FileUtils;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -14,6 +19,7 @@ import java.util.zip.ZipOutputStream;
 class FTFileUtils {
     /**
      * 复制合并文件
+     *
      * @param mergedFolderStr
      * @param foldersStr
      */
@@ -134,5 +140,137 @@ class FTFileUtils {
      */
     public static void zipDirectory(File srcDir) throws IOException {
         zipDirectory(srcDir, new File(srcDir.getAbsolutePath() + ".zip"), true);
+    }
+
+
+    /**
+     * 对一个文件数组进行压缩。数组长度必须大于0
+     *
+     * @param files     文件数组。长度必须大于0
+     * @param zipFile   压缩后产生的文件
+     * @param overwrite 如存在同名文件，是否覆盖
+     * @throws IOException
+     */
+    public static void zipFiles(File[] files, File zipFile, boolean overwrite) throws IOException {
+        if (zipFile == null || files == null) {
+            throw new IllegalArgumentException("zipFile和srcDir不能为空!");
+        }
+        if (files.length == 0) {
+            throw new IOException("不能对一个空的文件列表进行压缩");
+        }
+        if (!overwrite && zipFile.exists()) {
+            throw new IOException(zipFile.getAbsolutePath() + "文件已存在，参数设定了不能覆盖。");
+        }
+        if (!zipFile.exists()) {
+            zipFile.createNewFile();
+        }
+
+        ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream(zipFile));
+        byte[] buffer = new byte[2048];
+        int length;
+        for (File file : files) {
+            if(file.isDirectory()){
+                zipDirectory(zipOutputStream,file,file.getName());
+            }else{
+                FileInputStream fileInputStream = new FileInputStream(file);
+                zipOutputStream.putNextEntry(new ZipEntry(file.getName()));
+                while ((length = fileInputStream.read(buffer)) != -1) {
+                    zipOutputStream.write(buffer, 0, length);
+                    zipOutputStream.flush();
+                }
+                fileInputStream.close();
+            }
+
+        }
+
+        zipOutputStream.close();
+    }
+
+    /**
+     * 对一个文件列表进行压缩。列表长度长度必须大于0
+     *
+     * @param fileList  文件列表。长度必须大于0
+     * @param zipFile   压缩后产生的文件
+     * @param overwrite 如果已经存在同名文件，是否覆盖。
+     * @throws IOException
+     */
+    public static void zipFiles(List<File> fileList, File zipFile, boolean overwrite) throws IOException {
+        zipFiles(fileList.toArray(new File[fileList.size()]), zipFile, overwrite);
+    }
+
+    /**
+     * 对一个文件列表进行压缩，列表长度长度必须大于0。如存在同名目标文件，则会覆盖它。
+     *
+     * @param fileList 文件列表。长度必须大于0
+     * @param zipFile  压缩后生成的文件
+     * @throws IOException
+     */
+    public static void zipFiles(List<File> fileList, File zipFile) throws IOException {
+        zipFiles(fileList.toArray(new File[fileList.size()]), zipFile, true);
+    }
+
+    /**
+     * 对一个文件数组进行压缩，数组长度必须大于0。如存在同名目标文件，则会覆盖它。
+     *
+     * @param files   文件数组。长度必须大于0
+     * @param zipFile 压缩后生成的文件
+     * @throws IOException
+     */
+    public static void zipFiles(File[] files, File zipFile) throws IOException {
+        zipFiles(files, zipFile, true);
+    }
+
+    /**
+     * 复制文件
+     *
+     * @param src
+     * @param tar
+     * @return
+     */
+
+    public static boolean copyFile(File src, File tar) {
+
+        if (!tar.getParentFile().exists()) {
+            tar.getParentFile().mkdirs();
+        }
+
+        if (!tar.exists()) {
+            try {
+                tar.createNewFile();
+            } catch (IOException e) {
+
+            }
+        }
+
+        try {
+            if (src.isFile()) {
+
+                InputStream is = new FileInputStream(src);
+                OutputStream op = new FileOutputStream(tar);
+                BufferedInputStream bis = new BufferedInputStream(is);
+                BufferedOutputStream bos = new BufferedOutputStream(op);
+                byte[] bt = new byte[8192];
+                int len = bis.read(bt);
+                while (len != -1) {
+                    bos.write(bt, 0, len);
+                    len = bis.read(bt);
+                }
+                bis.close();
+                bos.close();
+            }
+            if (src.isDirectory()) {
+                File[] f = src.listFiles();
+                tar.mkdir();
+                for (int i = 0; i < f.length; i++) {
+                    copyFile(f[i].getAbsoluteFile(),
+                            new File(tar.getAbsoluteFile() + File.separator
+                                    + f[i].getName())
+                    );
+                }
+            }
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 }
