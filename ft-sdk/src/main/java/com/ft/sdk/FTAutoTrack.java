@@ -52,7 +52,9 @@ public class FTAutoTrack {
             if (Utils.isMainProcess()) {
                 FTActivityLifecycleCallbacks life = new FTActivityLifecycleCallbacks();
                 getApplication().registerActivityLifecycleCallbacks(life);
-                FTAppStartCounter.get().markCodeStartTimeLine();
+                if (FTActivityManager.get().isAppForeground()) {
+                    FTAppStartCounter.get().markCodeStartTimeLine();
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
