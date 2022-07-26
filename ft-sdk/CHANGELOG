@@ -1,5 +1,9 @@
+# agent 1.3.7-alpha03
+1.修改 CPU 指标规则
+
+---
 # agent 1.3.7-alpha02
-1.
+1.修正冷启动统计时间规则
 
 ---
 # agent 1.3.7-alpha01
