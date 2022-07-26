@@ -30,8 +30,8 @@ public class ViewBean {
     double fpsMini;
     double fpsAvg;
 
-    long cpuTickCountAvg;
-    long cpuTickCountMax;
+    double cpuTickCountPerSecond = -1;
+    long cpuTickCount = -1;
 
     long memoryAvg;
     long memoryMax;
@@ -154,20 +154,20 @@ public class ViewBean {
         this.fpsAvg = fpsAvg;
     }
 
-    public long getCpuTickCountAvg() {
-        return cpuTickCountAvg;
+    public double getCpuTickCountPerSecond() {
+        return cpuTickCountPerSecond;
     }
 
-    public void setCpuTickCountAvg(long cpuTickCountAvg) {
-        this.cpuTickCountAvg = cpuTickCountAvg;
+    public void setCpuTickCountPerSecond(double cpuTickCountPerSecond) {
+        this.cpuTickCountPerSecond = cpuTickCountPerSecond;
     }
 
-    public long getCpuTickCountMax() {
-        return cpuTickCountMax;
+    public long getCpuTickCount() {
+        return cpuTickCount;
     }
 
-    public void setCpuTickCountMax(long cpuTickCountMax) {
-        this.cpuTickCountMax = cpuTickCountMax;
+    public void setCpuTickCount(long cpuTickCount) {
+        this.cpuTickCount = cpuTickCount;
     }
 
     public long getMemoryAvg() {
@@ -208,8 +208,8 @@ public class ViewBean {
         map.put(Constants.KEY_BATTERY_CURRENT_MAX, batteryCurrentMax);
         map.put(Constants.KEY_FPS_AVG, fpsAvg);
         map.put(Constants.KEY_FPS_MINI, fpsMini);
-        map.put(Constants.KEY_CPU_TICK_COUNT_AVG, cpuTickCountAvg);
-        map.put(Constants.KEY_CPU_TICK_COUNT_MAX, cpuTickCountMax);
+        map.put(Constants.KEY_CPU_TICK_COUNT, cpuTickCountPerSecond);
+        map.put(Constants.KEY_CPU_TICK_COUNT_PER_SECOND, cpuTickCount);
         map.put(Constants.KEY_MEMORY_AVG, memoryAvg);
         map.put(Constants.KEY_MEMORY_MAX, memoryMax);
         return new Gson().toJson(map);
@@ -224,8 +224,8 @@ public class ViewBean {
             this.fpsMini = json.optDouble(Constants.KEY_FPS_MINI);
             this.memoryAvg = json.optLong(Constants.KEY_MEMORY_AVG);
             this.memoryMax = json.optLong(Constants.KEY_MEMORY_MAX);
-            this.cpuTickCountAvg = json.optLong(Constants.KEY_CPU_TICK_COUNT_AVG);
-            this.cpuTickCountMax = json.optLong(Constants.KEY_CPU_TICK_COUNT_MAX);
+            this.cpuTickCountPerSecond = json.optDouble(Constants.KEY_CPU_TICK_COUNT);
+            this.cpuTickCount = json.optLong(Constants.KEY_CPU_TICK_COUNT_PER_SECOND);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -250,8 +250,8 @@ public class ViewBean {
                 ", timeSpent=" + timeSpent +
                 ", fpsMini=" + fpsMini +
                 ", fpsAvg=" + fpsAvg +
-                ", cpuTickCountAvg=" + cpuTickCountAvg +
-                ", cpuTickCountMax=" + cpuTickCountMax +
+                ", cpuTickCountPerSecond=" + cpuTickCountPerSecond +
+                ", cpuTickCount=" + cpuTickCount +
                 ", memoryAvg=" + memoryAvg +
                 ", memoryMax=" + memoryMax +
                 ", batteryCurrentAvg=" + batteryCurrentAvg +

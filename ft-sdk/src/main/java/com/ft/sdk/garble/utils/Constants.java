@@ -73,8 +73,8 @@ public class Constants {
     public static final String KEY_MEMORY_USE = "memory_use";
     public static final String KEY_CPU_USE = "cpu_use";
 
-    public static final String KEY_CPU_TICK_COUNT_AVG = "cpu_tick_count_avg";
-    public static final String KEY_CPU_TICK_COUNT_MAX = "cpu_tick_count_max";
+    public static final String KEY_CPU_TICK_COUNT = "cpu_tick_count";
+    public static final String KEY_CPU_TICK_COUNT_PER_SECOND = "cpu_tick_count_per_second";
     public static final String KEY_MEMORY_AVG = "memory_avg";
     public static final String KEY_MEMORY_MAX = "memory_max";
     public static final String KEY_FPS_MINI = "fps_mini";

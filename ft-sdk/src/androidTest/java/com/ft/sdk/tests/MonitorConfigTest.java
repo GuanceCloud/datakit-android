@@ -18,7 +18,6 @@ import com.ft.test.utils.CheckUtils;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -61,24 +60,24 @@ public class MonitorConfigTest extends FTBaseTest {
 
     }
 
-    @Test
-    public void monitorDeviceMetrics() throws InterruptedException {
-        FTRUMGlobalManager.get().startView(ANY_VIEW);
-        Thread.sleep(500);
-        FTRUMGlobalManager.get().stopView();
-        waitForInThreadPool();
-        Thread.sleep(3000L);
-        Assert.assertTrue(CheckUtils.checkValue(DataType.RUM_APP, new String[]{
-                Constants.KEY_FPS_AVG,
-                Constants.KEY_FPS_MINI,
-                Constants.KEY_MEMORY_AVG,
-                Constants.KEY_MEMORY_MAX,
-                Constants.KEY_CPU_TICK_COUNT_AVG,
-                Constants.KEY_CPU_TICK_COUNT_MAX,
-                Constants.KEY_FPS_MINI,
-                Constants.KEY_FPS_AVG,
-        }, 0));
-    }
+//    @Test
+//    public void monitorDeviceMetrics() throws InterruptedException {
+//        FTRUMGlobalManager.get().startView(ANY_VIEW);
+//        Thread.sleep(1500);
+//        FTRUMGlobalManager.get().stopView();
+//        waitForInThreadPool();
+//        Thread.sleep(3000L);
+//        Assert.assertTrue(CheckUtils.checkValue(DataType.RUM_APP, new String[]{
+//                Constants.KEY_FPS_AVG,
+//                Constants.KEY_FPS_MINI,
+//                Constants.KEY_MEMORY_AVG,
+//                Constants.KEY_MEMORY_MAX,
+//                Constants.KEY_CPU_TICK_COUNT,
+//                Constants.KEY_CPU_TICK_COUNT_PER_SECOND,
+//                Constants.KEY_FPS_MINI,
+//                Constants.KEY_FPS_AVG,
+//        }, 0));
+//    }
 
 
 }

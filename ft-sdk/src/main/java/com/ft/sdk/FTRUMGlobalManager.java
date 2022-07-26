@@ -11,7 +11,6 @@ import com.ft.sdk.garble.bean.ActiveViewBean;
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.ErrorSource;
 import com.ft.sdk.garble.bean.ErrorType;
-import com.ft.sdk.garble.bean.MonitorInfoBean;
 import com.ft.sdk.garble.bean.NetStatusBean;
 import com.ft.sdk.garble.bean.ResourceBean;
 import com.ft.sdk.garble.bean.ResourceParams;
@@ -812,8 +811,14 @@ public class FTRUMGlobalManager {
                 fields.put(Constants.KEY_RUM_VIEW_IS_ACTIVE, !bean.isClose());
 
                 if (FTMonitorManager.get().isDeviceMetricsMonitorType(DeviceMetricsMonitorType.CPU)) {
-                    fields.put(Constants.KEY_CPU_TICK_COUNT_MAX, bean.getCpuTickCountMax());
-                    fields.put(Constants.KEY_CPU_TICK_COUNT_AVG, bean.getCpuTickCountAvg());
+                    double cpuTickCountPerSecond = bean.getCpuTickCountPerSecond();
+                    long cpuTickCount = bean.getCpuTickCount();
+                    if (cpuTickCountPerSecond > -1) {
+                        fields.put(Constants.KEY_CPU_TICK_COUNT_PER_SECOND, cpuTickCountPerSecond);
+                    }
+                    if (cpuTickCount > -1) {
+                        fields.put(Constants.KEY_CPU_TICK_COUNT, cpuTickCount);
+                    }
                 }
                 if (FTMonitorManager.get().isDeviceMetricsMonitorType(DeviceMetricsMonitorType.MEMORY)) {
                     fields.put(Constants.KEY_MEMORY_MAX, bean.getMemoryMax());

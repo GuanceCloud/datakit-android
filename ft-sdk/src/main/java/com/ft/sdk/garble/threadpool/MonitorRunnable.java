@@ -35,7 +35,7 @@ public class MonitorRunnable implements Runnable {
     public void run() {
         if (!FTActivityManager.get().isAppForeground()) return;
         if (FTMonitorManager.get().isDeviceMetricsMonitorType(DeviceMetricsMonitorType.CPU)) {
-            computeMonitorBean(cpuBean, CpuUtils.get().getAppCPUTickCount());
+            computeCpuBean(cpuBean, CpuUtils.get().getAppCPUTickCount());
         }
 
         if (FTMonitorManager.get().isDeviceMetricsMonitorType(DeviceMetricsMonitorType.FPS)) {
@@ -73,9 +73,17 @@ public class MonitorRunnable implements Runnable {
         return batteryBean;
     }
 
-    private void computeMonitorBean(MonitorInfoBean bean, double lastValue) {
+    private void computeCpuBean(MonitorInfoBean bean, double value) {
         if (bean.count == 0) {
+            bean.miniValue = value;
+        } else {
+            bean.maxValue = value;
         }
+        bean.count = bean.count + 1;
+
+    }
+
+    private void computeMonitorBean(MonitorInfoBean bean, double lastValue) {
         int count = bean.count + 1;
         bean.avgValue = (lastValue + (bean.count * bean.avgValue)) / count;
         bean.maxValue = Math.max(lastValue, bean.maxValue);

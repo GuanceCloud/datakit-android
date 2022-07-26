@@ -10,16 +10,16 @@ public class MonitorInfoBean {
     public MonitorInfoBean() {
     }
 
-    public MonitorInfoBean(double avgValue, double maxValue, double miniValue, int count) {
-        this.avgValue = avgValue;
-        this.maxValue = maxValue;
-        this.miniValue = miniValue;
-        this.count = count;
-    }
-
-    public MonitorInfoBean cloneData() {
-        return new MonitorInfoBean(avgValue, miniValue, miniValue, count);
-    }
+//    public MonitorInfoBean(double avgValue, double maxValue, double miniValue, int count) {
+//        this.avgValue = avgValue;
+//        this.maxValue = maxValue;
+//        this.miniValue = miniValue;
+//        this.count = count;
+//    }
+//
+//    public MonitorInfoBean cloneData() {
+//        return new MonitorInfoBean(avgValue, miniValue, miniValue, count);
+//    }
 
     public boolean isValid() {
         return count > 0;

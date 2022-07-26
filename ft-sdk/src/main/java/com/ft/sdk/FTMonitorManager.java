@@ -1,19 +1,12 @@
 package com.ft.sdk;
 
-import android.view.View;
-
 import com.ft.sdk.garble.bean.MonitorInfoBean;
 import com.ft.sdk.garble.bean.ViewBean;
 import com.ft.sdk.garble.threadpool.MonitorRunnable;
-import com.ft.sdk.garble.utils.BatteryUtils;
-import com.ft.sdk.garble.utils.CpuUtils;
-import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.FpsUtils;
+import com.ft.sdk.garble.utils.Utils;
 
 import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -24,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 public class FTMonitorManager {
 
     private static final int NOT_SET = 0;
+    private static final long ONE_SECOND_NANO_TIMES = 1000000000;
     private volatile static FTMonitorManager ftMonitorConfig;
     private int errorMonitorType;
     private int deviceMetricsMonitorType = NOT_SET;
@@ -89,13 +83,18 @@ public class FTMonitorManager {
             if (runnable != null) {
                 MonitorInfoBean battery = runnable.getBatteryBean();
                 if (battery.isValid()) {
-                    bean.setBatteryCurrentMax((int) battery.maxValue);
+                    bean.setBatteryCurrentMax((int) battery.miniValue);
                     bean.setBatteryCurrentAvg((int) battery.avgValue);
                 }
                 MonitorInfoBean cpu = runnable.getCpuBean();
                 if (cpu.isValid()) {
-                    bean.setCpuTickCountMax((long) cpu.maxValue);
-                    bean.setCpuTickCountAvg((long) cpu.avgValue);
+                    if (cpu.maxValue > 0) {
+                        long tickCount = (long) cpu.maxValue - (long) cpu.miniValue;
+                        bean.setCpuTickCount(tickCount);
+                        long now = Utils.getCurrentNanoTime();
+                        bean.setCpuTickCountPerSecond((double) (tickCount * ONE_SECOND_NANO_TIMES) / (double) (now - bean.getStartTime()));
+                    }
+
                 }
                 MonitorInfoBean fps = runnable.getFpsBean();
                 if (fps.isValid()) {

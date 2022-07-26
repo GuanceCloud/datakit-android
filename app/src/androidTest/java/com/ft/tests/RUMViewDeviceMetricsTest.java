@@ -85,13 +85,14 @@ public class RUMViewDeviceMetricsTest extends BaseTest {
                 String measurement = json.optString("measurement");
                 if ("view".equals(measurement)) {
                     if (fields != null) {
-                        if (fields.optBoolean(Constants.KEY_RUM_VIEW_IS_ACTIVE, false)) {
-                            Assert.assertTrue(fields.optLong(Constants.KEY_CPU_TICK_COUNT_MAX) > 0);
-                            Assert.assertTrue(fields.optLong(Constants.KEY_CPU_TICK_COUNT_AVG) > 0);
+                        if (!fields.optBoolean(Constants.KEY_RUM_VIEW_IS_ACTIVE, true)) {
+                            Assert.assertTrue(fields.optDouble(Constants.KEY_CPU_TICK_COUNT_PER_SECOND) > 0);
+                            Assert.assertTrue(fields.optLong(Constants.KEY_CPU_TICK_COUNT) > 0);
                             Assert.assertTrue(fields.optLong(Constants.KEY_MEMORY_MAX) > 0);
                             Assert.assertTrue(fields.optLong(Constants.KEY_MEMORY_AVG) > 0);
                             Assert.assertTrue(fields.optLong(Constants.KEY_BATTERY_CURRENT_MAX) > 0);
                             Assert.assertTrue(fields.optLong(Constants.KEY_BATTERY_CURRENT_AVG) > 0);
+                            break;
 //                            fields.optDouble(Constants.KEY_FPS_MINI);
 //                            fields.optDouble(Constants.KEY_FPS_AVG);
                         }
