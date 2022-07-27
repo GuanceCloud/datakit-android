@@ -24,6 +24,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.powermock.reflect.Whitebox;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -97,6 +98,14 @@ public class FTBaseTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    protected void setSessionExpire() throws IllegalAccessException {
+        Field lastActionField = Whitebox.getField(FTRUMGlobalManager.class, "lastActionTime");
+        lastActionField.setAccessible(true);
+        long lastActionTime = (long) lastActionField.get(FTRUMGlobalManager.get());
+        Whitebox.setInternalState(FTRUMGlobalManager.get(), "lastActionTime", lastActionTime - 900000000000L);
+
     }
 
     /**
