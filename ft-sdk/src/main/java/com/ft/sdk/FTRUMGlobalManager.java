@@ -41,8 +41,8 @@ import javax.net.ssl.HttpsURLConnection;
  */
 public class FTRUMGlobalManager {
     private static final String TAG = "RUMGlobalManager";
-    static final long MAX_RESTING_TIME = 15000000000L;
-    static final long SESSION_EXPIRE_TIME = 1440000000000000L;
+    static final long MAX_RESTING_TIME = 900000000000L;
+    static final long SESSION_EXPIRE_TIME = 14400000000000L;
     static final long FILTER_CAPACITY = 5;
     private final ConcurrentHashMap<String, ResourceBean> resourceBeanMap = new ConcurrentHashMap<>();
 

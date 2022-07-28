@@ -221,8 +221,7 @@ public class RUMTest extends FTBaseTest {
         ViewBean view = viewList.get(0);
         Assert.assertFalse(action.getSessionId().isEmpty());
         Assert.assertEquals(action.getSessionId(), view.getSessionId());
-
-        Thread.sleep(15000);
+        setSessionExpire();
 
         FTRUMGlobalManager.get().startAction(ACTION_NAME, ACTION_TYPE_NAME);
         invokeCheckActionClose();
@@ -410,7 +409,6 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     *
      * @throws InterruptedException
      */
     @Test
