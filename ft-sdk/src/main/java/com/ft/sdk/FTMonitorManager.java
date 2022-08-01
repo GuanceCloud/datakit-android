@@ -83,7 +83,7 @@ public class FTMonitorManager {
             if (runnable != null) {
                 MonitorInfoBean battery = runnable.getBatteryBean();
                 if (battery.isValid()) {
-                    bean.setBatteryCurrentMax((int) battery.miniValue);
+                    bean.setBatteryCurrentMax((int) battery.maxValue);
                     bean.setBatteryCurrentAvg((int) battery.avgValue);
                 }
                 MonitorInfoBean cpu = runnable.getCpuBean();

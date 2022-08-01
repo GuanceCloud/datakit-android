@@ -1,3 +1,8 @@
+# agent 1.3.7-alpha04
+1.agent 1.3.6-beta05，agent 1.3.6-beta06 功能合并
+2.修改电池最大值错误
+
+---
 # agent 1.3.7-alpha03
 1.修改 CPU 指标规则
 
