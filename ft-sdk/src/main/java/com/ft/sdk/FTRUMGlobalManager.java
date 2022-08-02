@@ -270,7 +270,7 @@ public class FTRUMGlobalManager {
     }
 
     private void initView(ActiveViewBean activeViewBean) {
-        LogUtils.e(TAG, "start viewId:" + activeViewBean.toString());
+        LogUtils.d(TAG, "start viewId:" + activeViewBean.toString());
 
         ViewBean bean = activeViewBean.convertToViewBean();
         EventConsumerThreadPool.get().execute(() -> {
