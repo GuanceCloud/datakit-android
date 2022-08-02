@@ -1,5 +1,9 @@
 package com.ft.plugin.garble;
 
+import org.gradle.api.Action;
+import org.gradle.api.NamedDomainObjectContainer;
+import org.gradle.api.Project;
+
 /**
  * BY huangDianHua
  * DATE:2019-11-29 14:50
@@ -14,9 +18,23 @@ public class FTExtension {
     public String appId = "";
     public String env = "prod";
 
+    private final NamedDomainObjectContainer<ProductFlavorModel> prodFlavor;
+
+    public FTExtension(Project project) {
+        prodFlavor = project.container(ProductFlavorModel.class);
+    }
+
+    public NamedDomainObjectContainer<ProductFlavorModel> getOther() {
+        return prodFlavor;
+    }
+
+    public void prodFlavors(Action<NamedDomainObjectContainer<ProductFlavorModel>> action) {
+        action.execute(prodFlavor);
+    }
+
     @Override
     public String toString() {
-        return "FTExtension{" +
+        return "FTExtension{ " +
                 "showLog=" + showLog +
                 ", openAutoTrack=" + openAutoTrack +
                 ", autoUploadProguardMap=" + autoUploadProguardMap +

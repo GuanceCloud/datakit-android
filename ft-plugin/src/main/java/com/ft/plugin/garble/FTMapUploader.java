@@ -30,6 +30,7 @@ public class FTMapUploader {
     private final String tmpBuildPath;
     private final String zipBuildPath;
     private final FTExtension extension;
+    private final HashMap<String, ProductFlavorModel> flavorModelHashMap = new HashMap<>();
 
 
     public FTMapUploader(Project project, FTExtension extension) {
@@ -38,12 +39,18 @@ public class FTMapUploader {
         this.tmpBuildPath = buildPath + SYMBOL_MERGE_PATH;
         this.zipBuildPath = buildPath + SYMBOL_MERGE_ZIP_PATH;
         this.extension = extension;
+        extension.getOther().forEach(valueModel -> flavorModelHashMap.put(valueModel.getName(), valueModel));
     }
 
     /**
      * 上传 proguard 符号文件
      */
     public void configProguardUpload() {
+        if (flavorModelHashMap.isEmpty()) {
+            if (!extension.autoUploadProguardMap) {
+                return;
+            }
+        }
         AppExtension appExtension = (AppExtension) project.getProperties().get("android");
 
         appExtension.getApplicationVariants().all(applicationVariant -> {
@@ -56,20 +63,25 @@ public class FTMapUploader {
             Task ftTask = project.getTasks().create("ft" + variantName + "UploadSymbolMap", task -> {
 
             }).doLast(task -> {
+                ProductFlavorModel model = getFlavorModelFromName(variantName);
 
                 try {
                     ProguardSettingConfig config = proguardSettingMap.get(assembleTaskName);
                     Logger.debug("task:" + assembleTaskName + ",config:" + config + "");
                     if (config != null) {
+                        if (model.isAutoUploadNativeDebugSymbol()) {
+                            if (!symbolPaths.isEmpty()) {
+                                FTFileUtils.copyDifferentFolderFilesIntoOne(tmpBuildPath, symbolPaths.toArray(new String[0]));
+                            }
+                        }
+                        if (model.isAutoUploadProguardMap()) {
+                            if (new File(config.mappingOutputPath).exists()) {
+                                FTFileUtils.copyFile(new File(config.mappingOutputPath), new File(tmpBuildPath + "/mapping.txt"));
+                            }
+                        }
 
-                        if (!symbolPaths.isEmpty()) {
-                            FTFileUtils.copyDifferentFolderFilesIntoOne(tmpBuildPath, symbolPaths.toArray(new String[0]));
-                        }
-                        if (new File(config.mappingOutputPath).exists()) {
-                            FTFileUtils.copyFile(new File(config.mappingOutputPath), new File(tmpBuildPath + "/mapping.txt"));
-                        }
                         FTFileUtils.zipFiles(new File(tmpBuildPath).listFiles(), new File(zipBuildPath));
-                        uploadWithParams(config);
+                        uploadWithParams(config, model);
                     }
 
                 } catch (IOException | InterruptedException e) {
@@ -111,6 +123,11 @@ public class FTMapUploader {
      * 上传 debug native symbol 文件
      */
     public void configNativeSymbolUpload() {
+        if (flavorModelHashMap.isEmpty()) {
+            if (!extension.autoUploadNativeDebugSymbol) {
+                return;
+            }
+        }
         project.afterEvaluate(p -> {
 
             p.getAllprojects().forEach(subProject -> {
@@ -131,7 +148,7 @@ public class FTMapUploader {
                         String moduleName = dependency.getName();
                         String debugSymbolPath = rootPath + "/" + moduleName + CMAKE_DEBUG_SYMBOL_PATH;
                         File file = new File(debugSymbolPath);
-                        Logger.debug("debugSymbolPath:"+debugSymbolPath);
+                        Logger.debug("debugSymbolPath:" + debugSymbolPath);
                         if (file.exists()) {
                             symbolPaths.add(debugSymbolPath);
                         }
@@ -156,10 +173,10 @@ public class FTMapUploader {
      * @throws IOException
      * @throws InterruptedException
      */
-    private void uploadWithParams(ProguardSettingConfig settingConfig) throws IOException, InterruptedException {
-        Logger.debug(extension.toString());
-        String cmd = "curl -X POST " + extension.datakitDCAUrl + "/v1/rum/sourcemap?app_id="
-                + extension.appId + "&env=" + extension.env + "&version="
+    private void uploadWithParams(ProguardSettingConfig settingConfig, ProductFlavorModel model) throws IOException, InterruptedException {
+        Logger.debug(model.toString());
+        String cmd = "curl -X POST " + model.getDatakitDCAUrl() + "/v1/rum/sourcemap?app_id="
+                + model.getAppId() + "&env=" + model.getEnv() + "&version="
                 + settingConfig.versionName + "&platform=android -F file=@" + zipBuildPath + " -H Content-Type:multipart/form-data";
 
         Logger.debug(cmd);
@@ -187,6 +204,17 @@ public class FTMapUploader {
         }
 
         process.destroy();
+    }
+
+    private ProductFlavorModel getFlavorModelFromName(String variantName) {
+        ProductFlavorModel model = flavorModelHashMap.get(variantName.replace("Release",""));
+        if (model != null) {
+            return model;
+        } else {
+            model = new ProductFlavorModel(variantName);
+            model.setFromFTExtension(extension);
+        }
+        return model;
     }
 
 

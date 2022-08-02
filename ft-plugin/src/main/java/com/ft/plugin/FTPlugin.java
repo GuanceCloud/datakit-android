@@ -20,7 +20,7 @@ public class FTPlugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
         AppExtension appExtension = (AppExtension) project.getProperties().get("android");
-        project.getExtensions().create("FTExt", FTExtension.class);
+        project.getExtensions().create("FTExt", FTExtension.class, project);
         appExtension.registerTransform(new FTTransform(project), Collections.EMPTY_LIST);
 
         project.afterEvaluate(p -> {
@@ -30,15 +30,8 @@ public class FTPlugin implements Plugin<Project> {
             Logger.setDebug(extension.showLog);
 
             FTMapUploader f = new FTMapUploader(p, extension);
-
-
-            if (extension.autoUploadProguardMap) {
-                f.configProguardUpload();
-            }
-
-            if (extension.autoUploadNativeDebugSymbol) {
-                f.configNativeSymbolUpload();
-            }
+            f.configProguardUpload();
+            f.configNativeSymbolUpload();
 
 
         });
