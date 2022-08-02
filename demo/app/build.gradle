@@ -4,6 +4,9 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-parcelize'
 
+//应用 FT plugin
+apply plugin: 'ft-plugin'
+
 android {
     compileSdkVersion 31
     defaultConfig {
@@ -19,6 +22,11 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
     }
     compileOptions {
         sourceCompatibility = 1.8
@@ -32,11 +40,42 @@ android {
         prodTest {
             buildConfigField "String", "CUSTOM_VALUE", "\"Custom value\""
             dimension "tier"
+        }
 
+        prodPublish{
+            buildConfigField "String", "CUSTOM_VALUE", "\"Custom value\""
+            dimension "tier"
         }
 
     }
 
+}
+
+FTExt {
+    showLog = true
+    autoUploadProguardMap = true
+    autoUploadNativeDebugSymbol = true
+    datakitDCAUrl='[datakit dca url]'
+    appId='[appid]'
+    env='gray'
+
+    prodFlavors {
+        prodTest {
+            autoUploadProguardMap = true
+            autoUploadNativeDebugSymbol = true
+            datakitDCAUrl = 'http://localhost:9531' //remote datakit dca address
+            appId = 'appid_xxxxx'
+            env = 'gray'
+
+        }
+        prodPublish {
+            autoUploadProguardMap = true
+            autoUploadNativeDebugSymbol = true
+            datakitDCAUrl = 'http://localhost:9531' //remote datakit dca address
+            appId = 'appid_xxxxx'
+            env = 'prod'
+        }
+    }
 }
 
 dependencies {
@@ -59,11 +98,4 @@ dependencies {
     //需用监控网络数据时，添加该依赖，实现网络引擎
 //    implementation 'com.squareup.okhttp3:okhttp:3.12.12'
     implementation 'com.squareup.okhttp3:okhttp:4.5.0'
-}
-//应用 FT plugin
-apply plugin: 'ft-plugin'
-
-FTExt {
-    //显示日志
-    showLog = true
 }

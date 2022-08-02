@@ -34,6 +34,23 @@ android {
             excludes += ['META-INF/DEPENDENCIES']
         }
     }
+
+    flavorDimensions "tier"
+
+    productFlavors {
+
+        prodTest {
+            buildConfigField "String", "CUSTOM_VALUE", "\"Custom value\""
+            dimension "tier"
+        }
+
+        prodPublish {
+            buildConfigField "String", "CUSTOM_VALUE", "\"Custom value\""
+            dimension "tier"
+
+        }
+
+    }
 }
 
 dependencies {
@@ -68,11 +85,28 @@ apply plugin: 'ft-plugin'
 
 FTExt {
     showLog = true
-//    autoUploadProguardMap = true
-//    autoUploadNativeDebugSymbol = true
-//    datakitDCAUrl='[datakit dca url]'
-//    appId='[your app appid]'
-//    env='prod'
+    autoUploadProguardMap = true
+    autoUploadNativeDebugSymbol = true
+    datakitDCAUrl='[datakit dca url]'
+    appId='[appid]'
+    env='gray'
+
+    prodFlavors {
+        prodTest {
+            autoUploadProguardMap = true
+            autoUploadNativeDebugSymbol = true
+            datakitDCAUrl = '[datakit dca url]'
+            appId = '[appid]'
+            env = 'gray'
+        }
+        prodPublish {
+            autoUploadProguardMap = true
+            autoUploadNativeDebugSymbol = true
+            datakitDCAUrl = '[datakit dca url]'
+            appId = '[appid]'
+            env = 'prod'
+        }
+    }
 }
 repositories {
     mavenCentral()
