@@ -1,6 +1,7 @@
 package com.ft.plugin.garble;
 
 import com.android.build.gradle.AppExtension;
+import com.android.utils.FileUtils;
 
 import org.gradle.api.Project;
 import org.gradle.api.Task;
@@ -23,12 +24,12 @@ public class FTMapUploader {
 
     private final HashMap<String, ProguardSettingConfig> proguardSettingMap = new HashMap<>();
 
-    private final static String SYMBOL_MERGE_PATH = "/tmp/ft_sourcemap_merge";
-    private final static String SYMBOL_MERGE_ZIP_PATH = "/tmp/ft_sourcemap.zip";
+    private final static String SYMBOL_MERGE_PATH_FORMAT = "/tmp/ftSourceMapMerge-%s";
+    private final static String SYMBOL_MERGE_ZIP_PATH_FORMAT = "/tmp/ftSourceMap-%s.zip";
 
     private final ArrayList<String> symbolPaths = new ArrayList<>();
-    private final String tmpBuildPath;
-    private final String zipBuildPath;
+    private final String tmpBuildPathFormat;
+    private final String zipBuildPathFormat;
     private final FTExtension extension;
     private final HashMap<String, ProductFlavorModel> flavorModelHashMap = new HashMap<>();
 
@@ -36,8 +37,8 @@ public class FTMapUploader {
     public FTMapUploader(Project project, FTExtension extension) {
         this.project = project;
         String buildPath = project.getBuildDir().getAbsolutePath();
-        this.tmpBuildPath = buildPath + SYMBOL_MERGE_PATH;
-        this.zipBuildPath = buildPath + SYMBOL_MERGE_ZIP_PATH;
+        this.tmpBuildPathFormat = buildPath + SYMBOL_MERGE_PATH_FORMAT;
+        this.zipBuildPathFormat = buildPath + SYMBOL_MERGE_ZIP_PATH_FORMAT;
         this.extension = extension;
         extension.getOther().forEach(valueModel -> flavorModelHashMap.put(valueModel.getName(), valueModel));
     }
@@ -60,11 +61,20 @@ public class FTMapUploader {
 
             String assembleTaskName = "assemble" + capVariantName;
 
-            Task ftTask = project.getTasks().create("ft" + variantName + "UploadSymbolMap", task -> {
+            Task ftTask = project.getTasks().create("ft" + capVariantName + "UploadSymbolMap", task -> {
 
             }).doLast(task -> {
                 ProductFlavorModel model = getFlavorModelFromName(variantName);
+                Logger.debug("ProductFlavorModel:" + model);
 
+                String tmpBuildPath = String.format(tmpBuildPathFormat, variantName);
+                String zipBuildPath = String.format(zipBuildPathFormat, variantName);
+                try {
+                    FileUtils.deleteIfExists(new File(tmpBuildPath));
+                    FileUtils.deleteIfExists(new File(zipBuildPath));
+                } catch (IOException e) {
+                    Logger.debug("tmp  delete error:" + e.getMessage());
+                }
                 try {
                     ProguardSettingConfig config = proguardSettingMap.get(assembleTaskName);
                     Logger.debug("task:" + assembleTaskName + ",config:" + config + "");
@@ -81,7 +91,7 @@ public class FTMapUploader {
                         }
 
                         FTFileUtils.zipFiles(new File(tmpBuildPath).listFiles(), new File(zipBuildPath));
-                        uploadWithParams(config, model);
+                        uploadWithParams(config, model, zipBuildPath);
                     }
 
                 } catch (IOException | InterruptedException e) {
@@ -157,7 +167,7 @@ public class FTMapUploader {
                 if (symbolPaths.isEmpty()) {
                     Logger.error("native symbol not found");
                 } else {
-                    Logger.debug("paths:" + symbolPaths.toString());
+                    Logger.debug("paths:" + symbolPaths);
                 }
 
             }
@@ -173,7 +183,7 @@ public class FTMapUploader {
      * @throws IOException
      * @throws InterruptedException
      */
-    private void uploadWithParams(ProguardSettingConfig settingConfig, ProductFlavorModel model) throws IOException, InterruptedException {
+    private void uploadWithParams(ProguardSettingConfig settingConfig, ProductFlavorModel model, String zipBuildPath) throws IOException, InterruptedException {
         Logger.debug(model.toString());
         String cmd = "curl -X POST " + model.getDatakitDCAUrl() + "/v1/rum/sourcemap?app_id="
                 + model.getAppId() + "&env=" + model.getEnv() + "&version="
@@ -207,8 +217,10 @@ public class FTMapUploader {
     }
 
     private ProductFlavorModel getFlavorModelFromName(String variantName) {
-        ProductFlavorModel model = flavorModelHashMap.get(variantName.replace("Release",""));
+        ProductFlavorModel model = flavorModelHashMap
+                .get(variantName.replace("Release", ""));
         if (model != null) {
+            model.mergeFTExtension(extension);
             return model;
         } else {
             model = new ProductFlavorModel(variantName);
