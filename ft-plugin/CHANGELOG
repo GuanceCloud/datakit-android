@@ -1,3 +1,11 @@
+# plugin 1.1.1-alpha03
+1.优化FtExt 条件覆盖规则
+
+---
+# plugin 1.1.1-alpha02
+1.支持 productFlavor 配置
+
+---
 # plugin 1.1.1-alpha01
 1.添加 native symbol 文件 mapping 文件打包功能
 
