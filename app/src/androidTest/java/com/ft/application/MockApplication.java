@@ -3,9 +3,6 @@ package com.ft.application;
 import android.app.Application;
 import android.content.Context;
 
-import com.ft.AccountUtils;
-import com.ft.sdk.FTSDKConfig;
-import com.ft.sdk.FTSdk;
 
 /**
  * author: huangDianHua

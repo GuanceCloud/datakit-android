@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     //通过查看请求头查看是否替换调用 OkHttpClient.Builder.build 方法成功
-                    Request request = requestUrl(AccountUtils.getProperty(MainActivity.this, AccountUtils.TRACE_URL));
+                    Request request = requestUrl(BuildConfig.TRACE_URL);
                     LogUtils.d(TAG, "header=" + request.headers().toString());
                 }
             }).start();

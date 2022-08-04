@@ -637,7 +637,7 @@ public class FTRUMGlobalManager {
     }
 
     private void closeView(ActiveViewBean activeViewBean) {
-        LogUtils.e(TAG, "closeView:" + activeViewBean.toString());
+        LogUtils.d(TAG, "closeView:" + activeViewBean.toString());
 
         ViewBean viewBean = activeViewBean.convertToViewBean();
         String viewId = viewBean.getId();
