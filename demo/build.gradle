@@ -13,10 +13,28 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:7.2.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.cloudcare.ft.mobile.sdk.tracker.plugin:ft-plugin:1.1.1-alpha02'
+        classpath 'com.cloudcare.ft.mobile.sdk.tracker.plugin:ft-plugin:1.1.1-alpha03'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
+
+    Properties properties = new Properties()
+    def localPropertiesPath = 'local.properties'
+    if (project.rootProject.file(localPropertiesPath).exists()) {
+        properties.load(project.rootProject.file(localPropertiesPath).newDataInputStream())
+    }
+
+    def appIdString = properties.getProperty("RUM_APP_ID")
+    def datakitRUMUrl = properties.getProperty("ACCESS_SERVER_URL")
+    def datakitDCAUrl = properties.getProperty("SOURCE_MAP_URL")
+
+    ext.ft_env = [
+            'rumAppid'  : appIdString,
+            'datakitRUMUrl': datakitRUMUrl,
+            'datakitDCAUrl': datakitDCAUrl,
+            'prodTestEnv'  : 'gray',
+            'prodPublishEnv'  : 'prod'
+    ]
 }
 
 allprojects {

@@ -20,12 +20,10 @@ class DemoApplication : Application() {
     companion object {
         private const val CUSTOM_STATIC_TAG = "static_tag"
         private const val CUSTOM_DYNAMIC_TAG = "dynamic_tag"
-        private const val SP_STORE_DATA= "store_data"
+        private const val SP_STORE_DATA = "store_data"
 
         fun setSDK(context: Context) {
-            val ftSDKConfig = FTSDKConfig.builder(
-                AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL)
-            )
+            val ftSDKConfig = FTSDKConfig.builder(BuildConfig.ACCESS_SERVER_URL)
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setDebug(true)//是否开启Debug模式（开启后能查看调试数据）
             FTSdk.install(ftSDKConfig)
@@ -49,7 +47,7 @@ class DemoApplication : Application() {
             //配置 RUM
             FTSdk.initRUMWithConfig(
                 FTRUMConfig()
-                    .setRumAppId(AccountUtils.getProperty(context, AccountUtils.RUM_APP_ID))
+                    .setRumAppId(BuildConfig.RUM_APP_ID)
                     .setEnableTraceUserAction(true)
                     .setEnableTraceUserView(true)
                     .setEnableTraceUserResource(true)
