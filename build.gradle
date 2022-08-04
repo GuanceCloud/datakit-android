@@ -5,6 +5,28 @@ buildscript {
         maven_publish_url = 'https://mvnrepo.jiagouyun.com/repository'
         getDefaultProperties = this.&getDefaultProperties
     }
+
+    Properties properties = new Properties()
+    def localPropertiesPath = 'local.properties'
+    if (project.rootProject.file(localPropertiesPath).exists()) {
+        properties.load(project.rootProject.file(localPropertiesPath).newDataInputStream())
+    }
+
+    def appIdString = properties.getProperty("RUM_APP_ID")
+    def datakitRUMUrl = properties.getProperty("ACCESS_SERVER_URL")
+    def datakitDCAUrl = properties.getProperty("SOURCE_MAP_URL")
+    def trackId = properties.getProperty("TRACK_ID")
+    def traceUrl = properties.getProperty("TRACE_URL")
+
+    ext.ft_env = [
+            'rumAppid'  : appIdString,
+            'datakitRUMUrl': datakitRUMUrl,
+            'datakitDCAUrl': datakitDCAUrl,
+            'trackId'   : trackId,
+            'traceUrl'  : traceUrl,
+            'prodTestEnv'  : 'gray',
+            'prodPublishEnv'  : 'prod'
+    ]
     repositories {
         google()
 //        jcenter()
@@ -21,8 +43,8 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.2.1'
-        classpath 'com.cloudcare.ft.mobile.sdk.tracker.plugin:ft-plugin:1.1.1-alpha02'
-//        classpath files('ft-plugin/build/libs/ft-plugin-1.1.1-alpha02.jar')
+        classpath 'com.cloudcare.ft.mobile.sdk.tracker.plugin:ft-plugin:1.1.1-alpha03'
+//        classpath files('ft-plugin/build/libs/ft-plugin-1.1.1-alpha03.jar')
         classpath "com.github.gmazzo:gradle-buildconfig-plugin:2.0.2"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -55,7 +77,7 @@ def getDefaultProperties() {
         properties.setProperty("LDAP_ACCOUNT", userName)
         properties.setProperty("LDAP_PWD", password)
     } else {
-        def file =project.rootProject.file('local.properties')
+        def file = project.rootProject.file('local.properties')
         if (file.exists()) {
             properties.load(file.newDataInputStream())
         }
