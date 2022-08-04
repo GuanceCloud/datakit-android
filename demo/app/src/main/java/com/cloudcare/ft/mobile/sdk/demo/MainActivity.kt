@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
 
             FTSdk.initRUMWithConfig(
                 FTRUMConfig()
-                    .setRumAppId(AccountUtils.getProperty(this, AccountUtils.RUM_APP_ID))
+                    .setRumAppId(BuildConfig.RUM_APP_ID)
                     .setEnableTrackAppCrash(true)
                     .setEnableTrackAppANR(true)
             )
