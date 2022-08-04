@@ -20,7 +20,7 @@ import java.util.HashMap;
 public class FTMapUploader {
 
     private final Project project;
-    private final static String CMAKE_DEBUG_SYMBOL_PATH = "/build/intermediates/cmake/debug/obj";
+    private final static String CMAKE_DEBUG_SYMBOL_PATH = "/intermediates/cmake/debug/obj";
 
     private final HashMap<String, ProguardSettingConfig> proguardSettingMap = new HashMap<>();
 
@@ -156,7 +156,7 @@ public class FTMapUploader {
                 configuration.getAllDependencies().forEach(dependency -> {
                     if (dependency instanceof ProjectDependency) {
                         String moduleName = dependency.getName();
-                        String debugSymbolPath = rootPath + "/" + moduleName + CMAKE_DEBUG_SYMBOL_PATH;
+                        String debugSymbolPath = rootPath + "/" + moduleName +"/build"+ CMAKE_DEBUG_SYMBOL_PATH;
                         File file = new File(debugSymbolPath);
                         Logger.debug("debugSymbolPath:" + debugSymbolPath);
                         if (file.exists()) {
