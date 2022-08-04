@@ -7,7 +7,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 31
         versionCode 1
-        versionName "1.2"
+        versionName "1.4"
         testInstrumentationRunner "com.ft.application.MockTestRunner"
     }
 
@@ -41,11 +41,21 @@ android {
 
         prodTest {
             buildConfigField "String", "CUSTOM_VALUE", "\"Custom value\""
+            buildConfigField "String", "ACCESS_SERVER_URL", "\"${ft_env.datakitRUMUrl}\""
+            buildConfigField "String", "RUM_APP_ID", "\"${ft_env.rumAppid}\""
+            buildConfigField "String", "TRACK_ID", "\"${ft_env.trackId}\""
+            buildConfigField "String", "TRACE_URL", "\"${ft_env.traceUrl}\""
+            buildConfigField "String", "ENV", "\"${ft_env.prodTestEnv}\""
             dimension "tier"
         }
 
         prodPublish {
             buildConfigField "String", "CUSTOM_VALUE", "\"Custom value\""
+            buildConfigField "String", "ACCESS_SERVER_URL", "\"${ft_env.datakitRUMUrl}\""
+            buildConfigField "String", "RUM_APP_ID", "\"${ft_env.rumAppid}\""
+            buildConfigField "String", "TRACK_ID", "\"${ft_env.trackId}\""
+            buildConfigField "String", "TRACE_URL", "\"${ft_env.traceUrl}\""
+            buildConfigField "String", "ENV", "\"${ft_env.prodPublishEnv}\""
             dimension "tier"
 
         }
@@ -85,26 +95,27 @@ apply plugin: 'ft-plugin'
 
 FTExt {
     showLog = true
+
     autoUploadProguardMap = true
     autoUploadNativeDebugSymbol = true
-    datakitDCAUrl='[datakit dca url]'
-    appId='[appid]'
-    env='gray'
+    datakitDCAUrl = ft_env.datakitRUMUrl
+    appId = ft_env.rumAppid
+    env = 'common'
 
     prodFlavors {
         prodTest {
             autoUploadProguardMap = true
             autoUploadNativeDebugSymbol = true
-            datakitDCAUrl = '[datakit dca url]'
-            appId = '[appid]'
-            env = 'gray'
+            datakitDCAUrl = ft_env.datakitRUMUrl
+            appId = ft_env.rumAppid
+            env = ft_env.prodTestEnv
         }
         prodPublish {
             autoUploadProguardMap = true
             autoUploadNativeDebugSymbol = true
-            datakitDCAUrl = '[datakit dca url]'
-            appId = '[appid]'
-            env = 'prod'
+            datakitDCAUrl = ft_env.datakitRUMUrl
+            appId = ft_env.rumAppid
+            env = ft_env.prodPublishEnv
         }
     }
 }
