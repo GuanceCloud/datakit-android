@@ -18,20 +18,5 @@ public enum EnvType {
         return super.toString().toLowerCase();
     }
 
-
-    /**
-     * 从 String 匹配对应的
-     *
-     * @param env
-     * @return
-     */
-    public static EnvType getEnvType(String env) {
-        for (EnvType type : EnvType.values()) {
-            if (type.toString().equalsIgnoreCase(env)) {
-                return type;
-            }
-        }
-        return PROD;
-    }
 }
 
