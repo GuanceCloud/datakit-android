@@ -147,12 +147,14 @@ public class FTRUMConfigManager {
             SharedPreferences sp = Utils.getSharedPreferences(FTApplication.getApplication());
             String id = sp.getString(Constants.FT_USER_USER_ID, null);
             String userName = sp.getString(Constants.FT_USER_USER_NAME, null);
+            String email = sp.getString(Constants.FT_USER_USER_EMAIL, null);
             String ext = sp.getString(Constants.FT_USER_USER_EXT, null);
             if (id == null) {
                 return null;
             } else {
                 UserData data = new UserData();
                 data.setId(id);
+                data.setEmail(email);
                 data.setName(userName);
                 if (ext != null) {
                     data.setExtsWithJsonString(ext);
@@ -165,32 +167,25 @@ public class FTRUMConfigManager {
     /**
      * 绑定用户信息
      *
-     * @param id
-     */
-    void bindUserData(@NonNull String id) {
-        LogUtils.d(TAG, "绑定用户信息");
-        //初始化SessionId
-        initRandomUserId();
-        //绑定用户信息
-        bindUserData("", id, null);
-    }
-
-    /**
-     * 绑定用户信息
-     *
      * @param name
      * @param id
      * @param exts
      */
-    private void bindUserData(String name, String id, JSONObject exts) {
+    void bindUserData(String id, String name, String email, HashMap<String, Object> exts) {
+        LogUtils.d(TAG, "绑定用户信息");
+        //初始化SessionId
+        initRandomUserId();
+        //绑定用户信息
         synchronized (mLock) {
             SharedPreferences sp = Utils.getSharedPreferences(FTApplication.getApplication());
             sp.edit().putString(Constants.FT_USER_USER_ID, id).apply();
             sp.edit().putString(Constants.FT_USER_USER_NAME, name).apply();
-            sp.edit().putString(Constants.FT_USER_USER_EXT, exts != null ? exts.toString() : null).apply();
+            sp.edit().putString(Constants.FT_USER_USER_EMAIL, email).apply();
+            sp.edit().putString(Constants.FT_USER_USER_EXT, exts != null ? new Gson().toJson(exts) : null).apply();
             UserData data = new UserData();
             data.setId(id);
             data.setName(name);
+            data.setEmail(email);
             data.setExts(exts);
             mUserData = data;
         }
@@ -266,7 +261,22 @@ public class FTRUMConfigManager {
         tags.put(Constants.KEY_RUM_NETWORK_TYPE, NetUtils.get().getNetWorkStateName());
         tags.put(Constants.KEY_RUM_IS_SIGN_IN, FTRUMConfigManager.get().isUserDataBinded() ? "T" : "F");
         if (FTRUMConfigManager.get().isUserDataBinded()) {
+            UserData data = FTRUMConfigManager.get().getUserData();
             tags.put(Constants.KEY_RUM_USER_ID, FTRUMConfigManager.get().getUserData().getId());
+            if (data.getName() != null) {
+                tags.put(Constants.KEY_RUM_USER_NAME, data.getName());
+            }
+
+            if (data.getEmail() != null) {
+                tags.put(Constants.KEY_RUM_USER_EMAIL, data.getEmail());
+            }
+            if (data.getExts() != null) {
+                HashMap<String, Object> ext = data.getExts();
+                for (String key : ext.keySet()) {
+                    tags.put(key, ext.get(key));
+                }
+            }
+
         } else {
             tags.put(Constants.KEY_RUM_USER_ID, FTRUMGlobalManager.get().getSessionId());
         }

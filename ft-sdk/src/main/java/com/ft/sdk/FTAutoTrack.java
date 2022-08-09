@@ -671,7 +671,7 @@ public class FTAutoTrack {
                 new Class[]{String.class, byte[].class});
     }
 
-    private static void setUpWebView(View webView) {
+    public static void setUpWebView(View webView) {
         if (webView instanceof WebView && webView.getTag(R.id.ft_webview_handled_tag_view_value) == null) {
 
             if (FTTraceConfigManager.get().isEnableWebTrace()) {

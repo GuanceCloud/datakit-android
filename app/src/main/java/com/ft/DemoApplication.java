@@ -12,6 +12,9 @@ import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
 import com.ft.sdk.ErrorMonitorType;
 import com.ft.sdk.TraceType;
+import com.ft.sdk.garble.bean.UserData;
+
+import java.util.HashMap;
 
 /**
  * BY huangDianHua
@@ -65,8 +68,15 @@ public class DemoApplication extends Application {
                 .addGlobalContext("custom_tag", "any tags")
                 .setExtraMonitorTypeWithError(ErrorMonitorType.ALL));
 
-        FTSdk.bindRumUserData("brandon.test.userid");
 
+        UserData userData = new UserData();
+        userData.setName("brandon");
+        userData.setId("brandon.test.userid");
+        userData.setEmail("brandon@mail.com");
+        HashMap<String, Object> extMap = new HashMap<>();
+        extMap.put("ft_key", "ft_value");
+        userData.setExts(extMap);
+        FTSdk.bindRumUserData(userData);
 
         FTSdk.initTraceWithConfig(new FTTraceConfig()
                 .setSamplingRate(1f)
