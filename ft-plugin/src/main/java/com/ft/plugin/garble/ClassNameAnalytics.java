@@ -24,21 +24,32 @@ public class ClassNameAnalytics {
     public static final String FT_SDK_PACKAGE = "com.ft.sdk";
     public static final String FT_SDK = "com.ft.sdk.FTSdk";
 
-
     /**
      * 配置需要排除的类
      * @param className
      * @return
      */
-    public static boolean isFTSDKFile(String className){
-        return className.startsWith(FT_SDK_PACKAGE) && !className.equals(FT_SDK+".class");
+    public static boolean isFTSDKFile(String className) {
+        return className.startsWith(FT_SDK_PACKAGE) && !className.equals(FT_SDK + ".class");
     }
 
-    public static boolean isFTSdkApi(String className){
+    public static boolean isFTSdkApi(String className) {
         return className.equals(FT_SDK);
     }
-    
-    public static boolean isAndroidGenerated(String className){
+
+    public static boolean isDCloud(String className) {
+        return className.contains(Constants.CLASS_NAME_DCLOUD_PATH);
+    }
+
+    public static boolean isTencent(String className) {
+        return className.contains(Constants.CLASS_NAME_TENCENT_PATH);
+    }
+
+    public static boolean isTaoBao(String className) {
+        return className.contains(Constants.CLASS_NAME_TAOBAO_PATH);
+    }
+
+    public static boolean isAndroidGenerated(String className) {
         return className.contains("R$") ||
                 className.contains("R2$") ||
                 className.contains("R.class") ||

@@ -46,6 +46,7 @@ public class FTMethodAdapter extends AdviceAdapter {
     private String superName;
     private String methodName;
     private boolean isHasTracked = false;
+    private boolean needSkip = false;
     //name + desc
     private String nameDesc;
 
@@ -60,7 +61,14 @@ public class FTMethodAdapter extends AdviceAdapter {
         this.superName = supperName;
         this.className = className;
         this.interfaces = interfaces;
+        this.nameDesc = name + desc;
         //Logger.info(">>>> 开始扫描类 <" + className + "> 的方法:" + methodName + "<<<<");
+
+        if (FTUtil.isTargetClassInSpecial(className)
+                || Constants.FT_SDK_API.equals(className) || isWebViewInner(className, superName, nameDesc)) {
+            Logger.debug("skip:" + className + ",superName:" + supperName);
+            needSkip = true;
+        }
     }
 
     /**
@@ -70,7 +78,10 @@ public class FTMethodAdapter extends AdviceAdapter {
      */
     private boolean needTrackTime() {
         if ((superName.equals("androidx/appcompat/app/AppCompatActivity") ||
-                superName.equals("android/app/Activity")) && !className.startsWith("android/") && !className.startsWith("androidx/") && (methodName + methodDesc).equals("onCreate(Landroid/os/Bundle;)V")) {
+                superName.equals("android/app/Activity"))
+                && !className.startsWith("android/")
+                && !className.startsWith("androidx/")
+                && (methodName + methodDesc).equals("onCreate(Landroid/os/Bundle;)V")) {
             return true;
         }
         return false;
@@ -108,7 +119,9 @@ public class FTMethodAdapter extends AdviceAdapter {
         super.visitEnd();
         if (isHasTracked) {
             FTHookConfig.mLambdaMethodCells.remove(nameDesc);
-            Logger.debug("Hooked Class<" + className + ">的 method: " + methodName + "," + methodDesc);
+            if (!needSkip) {
+                Logger.debug("Hooked Class<" + className + ">的 method: " + methodName + "," + methodDesc);
+            }
         }
     }
 
@@ -141,6 +154,10 @@ public class FTMethodAdapter extends AdviceAdapter {
 
     @Override
     public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
+        if (needSkip) {
+            super.visitMethodInsn(opcode, owner, name, desc, itf);
+            return;
+        }
         if (Constants.CLASS_NAME_HTTP_CLIENT_BUILDER.equals(owner)) {//替换调用 org/apache/hc/client5/http/impl/classic/HttpClientBuilder.build() 的方法
             if ("build()Lorg/apache/hc/client5/http/impl/classic/CloseableHttpClient;".contains(name + desc)) {
                 mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_API, "trackHttpClientBuilder", "(Lorg/apache/hc/client5/http/impl/classic/HttpClientBuilder;)Lorg/apache/hc/client5/http/impl/classic/CloseableHttpClient;", false);
@@ -154,7 +171,8 @@ public class FTMethodAdapter extends AdviceAdapter {
                 super.visitMethodInsn(opcode, owner, name, desc, itf);
             }
         } else if (Constants.CLASS_NAME_WEBVIEW.equals(owner)) {//替换系统中调用 WebView 的加载链接方法
-            if (TARGET_WEBVIEW_METHOD.contains(name + desc) && !Constants.FT_SDK_API.equals(className)) {
+            if (TARGET_WEBVIEW_METHOD.contains(name + desc)) {
+                Logger.debug("TARGET_WEBVIEW_METHOD:owner:" + owner + ",class:" + className + "," + name + "," + superName);
                 mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_API, name, desc.replaceFirst("\\(", "(" + Constants.VIEW_DESC), itf);
             } else {
                 super.visitMethodInsn(opcode, owner, name, desc, itf);
@@ -219,7 +237,6 @@ public class FTMethodAdapter extends AdviceAdapter {
     @Override
     protected void onMethodEnter() {
         super.onMethodEnter();
-        nameDesc = methodName + methodDesc;
         pubAndNoStaticAccess = FTUtil.isPublic(methodAccess) && !FTUtil.isStatic(methodAccess);
         handleCode();
     }
@@ -257,10 +274,6 @@ public class FTMethodAdapter extends AdviceAdapter {
     }
 
     void handleCode() {
-        if (FTUtil.isTargetClassInSpecial(className)) {
-            return;
-        }
-
         /*
          * 写Application方法
          */
@@ -432,6 +445,14 @@ public class FTMethodAdapter extends AdviceAdapter {
         } else {
             return getVisitPosition(types, index - 1, isStaticMethod) + types[index - 1].getSize();
         }
+    }
+
+    private boolean isWebViewInner(String className, String superName, String methodNameDesc) {
+        return (ClassNameAnalytics.isDCloud(className)
+                || ClassNameAnalytics.isTencent(className)
+                || ClassNameAnalytics.isTaoBao(className)
+                || superName.equals(Constants.CLASS_NAME_WEBVIEW))
+                && TARGET_WEBVIEW_METHOD.contains(methodNameDesc);
     }
 }
 
