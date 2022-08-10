@@ -21,7 +21,7 @@ public class UserData {
     private String name;
     private String id;
     private String email;
-    private HashMap<String, Object> exts;
+    private HashMap<String, String> exts;
 
     public String getName() {
         return name;
@@ -39,7 +39,7 @@ public class UserData {
         this.id = id;
     }
 
-    public HashMap<String, Object> getExts() {
+    public HashMap<String, String> getExts() {
         return exts;
     }
 
@@ -51,13 +51,13 @@ public class UserData {
         this.email = email;
     }
 
-    public void setExts(HashMap<String, Object> exts) {
+    public void setExts(HashMap<String, String> exts) {
         this.exts = exts;
     }
 
     public void setExtsWithJsonString(String data) {
         try {
-            Type type = new TypeToken<HashMap<String, Object>>() {
+            Type type = new TypeToken<HashMap<String, String>>() {
             }.getType();
             exts = new Gson().fromJson(data, type);
         } catch (Exception e) {

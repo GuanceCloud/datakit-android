@@ -73,7 +73,7 @@ public class DemoApplication extends Application {
         userData.setName("brandon");
         userData.setId("brandon.test.userid");
         userData.setEmail("brandon@mail.com");
-        HashMap<String, Object> extMap = new HashMap<>();
+        HashMap<String, String> extMap = new HashMap<>();
         extMap.put("ft_key", "ft_value");
         userData.setExts(extMap);
         FTSdk.bindRumUserData(userData);

@@ -171,7 +171,7 @@ public class FTRUMConfigManager {
      * @param id
      * @param exts
      */
-    void bindUserData(String id, String name, String email, HashMap<String, Object> exts) {
+    void bindUserData(String id, String name, String email, HashMap<String, String> exts) {
         LogUtils.d(TAG, "绑定用户信息");
         //初始化SessionId
         initRandomUserId();
@@ -271,7 +271,7 @@ public class FTRUMConfigManager {
                 tags.put(Constants.KEY_RUM_USER_EMAIL, data.getEmail());
             }
             if (data.getExts() != null) {
-                HashMap<String, Object> ext = data.getExts();
+                HashMap<String, String> ext = data.getExts();
                 for (String key : ext.keySet()) {
                     tags.put(key, ext.get(key));
                 }
