@@ -1,3 +1,7 @@
+# plugin 1.1.2-alpha01
+1.修正 WebView 衍生类注入后，发生循环调用的问题
+
+---
 # plugin 1.1.1-alpha01
 1.添加 native symbol 文件 mapping 文件打包功能
 
