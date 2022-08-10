@@ -3,8 +3,14 @@ package com.ft.sdk.garble.bean;
 import androidx.annotation.Nullable;
 
 import com.ft.sdk.garble.utils.Utils;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONObject;
+
+import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * BY huangDianHua
@@ -14,7 +20,8 @@ import org.json.JSONObject;
 public class UserData {
     private String name;
     private String id;
-    private JSONObject exts;
+    private String email;
+    private HashMap<String, Object> exts;
 
     public String getName() {
         return name;
@@ -32,17 +39,27 @@ public class UserData {
         this.id = id;
     }
 
-    public JSONObject getExts() {
+    public HashMap<String, Object> getExts() {
         return exts;
     }
 
-    public void setExts(JSONObject exts) {
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setExts(HashMap<String, Object> exts) {
         this.exts = exts;
     }
 
     public void setExtsWithJsonString(String data) {
         try {
-            exts = new JSONObject(data);
+            Type type = new TypeToken<HashMap<String, Object>>() {
+            }.getType();
+            exts = new Gson().fromJson(data, type);
         } catch (Exception e) {
             e.printStackTrace();
         }
