@@ -28,7 +28,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
     private static final String DUMP_FILE_KEY_APP_STATE = "appState";
 
     private static FTExceptionHandler instance;
-    private Thread.UncaughtExceptionHandler mDefaultExceptionHandler;
+    private final Thread.UncaughtExceptionHandler mDefaultExceptionHandler;
     private boolean isAndroidTest = false;
 
     public void uploadCrashLog(String crash, String message, AppState state) {

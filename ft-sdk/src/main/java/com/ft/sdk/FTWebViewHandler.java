@@ -87,7 +87,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
             } else if (name.equals(WEB_JS_TYPE_URL_VERIFY)) {
 
             }
-            if (callbackMethod != null && callbackMethod.isEmpty()) {
+            if (callbackMethod != null && !callbackMethod.isEmpty()) {
                 JSONObject retJson = new JSONObject();
                 retJson.put(WEB_JS_STATUS, true);
                 String ret = retJson.toString();
@@ -126,7 +126,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
 
     private void callbackFromNative(String requestTag, String callBackMethod, String retJsonString, String errJsonString) {
         String separate = !retJsonString.isEmpty() && !errJsonString.isEmpty() ? "," : "";
-        String jsStr = callBackMethod + "[" + requestTag + "](" + retJsonString + separate + errJsonString + ")";
+        String jsStr = callBackMethod + "[\"" + requestTag + "\"](" + retJsonString + separate + errJsonString + ")";
         callJsMethod(jsStr);
 
     }
