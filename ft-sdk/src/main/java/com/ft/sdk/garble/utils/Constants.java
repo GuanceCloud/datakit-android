@@ -30,6 +30,7 @@ public class Constants {
     public static final String FT_RANDOM_USER_ID = "ft.user.session.id";
     public static final String FT_USER_USER_ID = "ft.user.userid";
     public static final String FT_USER_USER_NAME = "ft.user.username";
+    public static final String FT_USER_USER_EMAIL = "ft.user.email";
     public static final String FT_USER_USER_EXT = "ft.user.extdata";
     public static final String FT_SHARE_PER_FILE = "ftSDKShareFile";
 
@@ -126,6 +127,8 @@ public class Constants {
 
     public static final String KEY_RUM_IS_SIGN_IN = "is_signin";
     public static final String KEY_RUM_USER_ID = "userid";
+    public static final String KEY_RUM_USER_NAME = "user_name";
+    public static final String KEY_RUM_USER_EMAIL = "user_email";
     public static final String KEY_RUM_APP_ID = "app_id";
     public static final String KEY_RUM_CUSTOM_KEYS = "custom_keys";
 

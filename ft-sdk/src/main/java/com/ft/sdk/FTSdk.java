@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import com.ft.sdk.garble.FTAutoTrackConfigManager;
 import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.FTHttpConfigManager;
+import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
@@ -205,7 +206,15 @@ public class FTSdk {
      * @param id
      */
     public static void bindRumUserData(@NonNull String id) {
-        FTRUMConfigManager.get().bindUserData(id);
+        FTRUMConfigManager.get().bindUserData(id, null, null, null);
+    }
+
+
+    /**
+     * 绑定用户信息
+     */
+    public static void bindRumUserData(@NonNull UserData data) {
+        FTRUMConfigManager.get().bindUserData(data.getId(), data.getName(), data.getEmail(), data.getExts());
     }
 
     /**
@@ -236,7 +245,6 @@ public class FTSdk {
         hashMap.put(Constants.KEY_APPLICATION_UUID, FTSdk.PACKAGE_UUID);
         hashMap.put(Constants.KEY_ENV, config.getEnv().toString());
         String uuid = DeviceUtils.getUuid(FTApplication.getApplication());
-        ;
         hashMap.put(Constants.KEY_DEVICE_UUID, uuid);
         hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_AGENT, FTSdk.AGENT_VERSION);
         if (!FTSdk.PLUGIN_VERSION.isEmpty()) {
