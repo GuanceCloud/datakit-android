@@ -17,6 +17,9 @@ public class FTSDKConfig {
     //是否是Debug
     private boolean isDebug;
 
+    private boolean enableAccessAndroidID = true;
+
+
     //崩溃日志的环境
     private EnvType env = EnvType.PROD;
 
@@ -101,6 +104,23 @@ public class FTSDKConfig {
 
 
     /**
+     * 设置是否获取 Android ID
+     * <p>
+     * 当为 false ，device_uuid 字段不再获取
+     *
+     * @param enableAccessAndroidID
+     * @return
+     */
+    public FTSDKConfig setEnableAccessAndroidID(boolean enableAccessAndroidID) {
+        this.enableAccessAndroidID = enableAccessAndroidID;
+        return this;
+    }
+
+    public boolean isEnableAccessAndroidID() {
+        return enableAccessAndroidID;
+    }
+
+    /**
      * 是否只支持在主进程中初始化 SDK
      *
      * @param onlySupportMainProcess
@@ -122,7 +142,6 @@ public class FTSDKConfig {
         this.globalContext.put(key, value);
         return this;
     }
-
 
 
     /**

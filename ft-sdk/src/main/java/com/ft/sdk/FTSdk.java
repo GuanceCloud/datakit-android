@@ -233,6 +233,23 @@ public class FTSdk {
         return mFtSDKConfig.getGlobalContext();
     }
 
+
+    /**
+     * 动态控制获取 Android ID
+     *
+     * @param enableAccessAndroidID
+     */
+    public static void setEnableAccessAndroidID(boolean enableAccessAndroidID) {
+        if (checkInstallState()) {
+            FTSDKConfig currentConfig = mFtSdk.mFtSDKConfig;
+            currentConfig.setEnableAccessAndroidID(enableAccessAndroidID);
+            String uuid = enableAccessAndroidID ? DeviceUtils.getUuid(FTApplication.getApplication()) : "";
+            currentConfig.getGlobalContext().put(Constants.KEY_DEVICE_UUID, uuid);
+
+        }
+    }
+
+
     /**
      * 补充全局 tags
      *
@@ -244,7 +261,7 @@ public class FTSdk {
         hashMap.put(Constants.KEY_SDK_NAME, Constants.SDK_NAME);
         hashMap.put(Constants.KEY_APPLICATION_UUID, FTSdk.PACKAGE_UUID);
         hashMap.put(Constants.KEY_ENV, config.getEnv().toString());
-        String uuid = DeviceUtils.getUuid(FTApplication.getApplication());
+        String uuid = config.isEnableAccessAndroidID() ? DeviceUtils.getUuid(FTApplication.getApplication()) : "";
         hashMap.put(Constants.KEY_DEVICE_UUID, uuid);
         hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_AGENT, FTSdk.AGENT_VERSION);
         if (!FTSdk.PLUGIN_VERSION.isEmpty()) {

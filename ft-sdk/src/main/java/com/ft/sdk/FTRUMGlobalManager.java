@@ -90,7 +90,7 @@ public class FTRUMGlobalManager {
         return activeAction == null ? null : activeAction.getId();
     }
 
-    void addAction(String actionName, String actionType, long duration) {
+    void addAction(String actionName, String actionType, long duration,long startTime) {
         String viewId = activeView != null ? activeView.getId() : null;
         String viewName = activeView != null ? activeView.getViewName() : null;
         String viewReferrer = activeView != null ? activeView.getViewReferrer() : null;
@@ -100,6 +100,7 @@ public class FTRUMGlobalManager {
                 sessionId, viewId, viewName, viewReferrer, false);
         activeAction.setClose(true);
         activeAction.setDuration(duration);
+        activeAction.setStartTime(startTime);
         initAction(activeAction);
         this.lastActionTime = activeAction.getStartTime();
     }

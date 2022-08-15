@@ -47,14 +47,14 @@ class FTAppStartCounter {
     }
 
     void codeStartUpload() {
-        if (codeStartTime <= 0) return;
-        FTAutoTrack.putRUMLaunchPerformance(true, codeStartTime);
+        if (codeStartTime <= 0 || codeStartTimeLine <= 0) return;
+        FTAutoTrack.putRUMLaunchPerformance(true, codeStartTime, codeStartTimeLine);
         codeStartTime = 0;
     }
 
 
     void hotStart(long hotStartTime) {
-        FTAutoTrack.putRUMLaunchPerformance(false, hotStartTime);
+        FTAutoTrack.putRUMLaunchPerformance(false, hotStartTime, Utils.getCurrentNanoTime());
     }
 
 

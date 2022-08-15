@@ -537,9 +537,9 @@ public class FTAutoTrack {
     /**
      * 记录应用登陆时效
      */
-    public static void putRUMLaunchPerformance(boolean isCold, long duration) {
+    public static void putRUMLaunchPerformance(boolean isCold, long duration, long startTime) {
         FTRUMGlobalManager.get().addAction(
-                isCold ? "app cold start" : "app hot start", isCold ? "launch_cold" : "launch_hot", duration);
+                isCold ? "app cold start" : "app hot start", isCold ? "launch_cold" : "launch_hot", duration, startTime);
     }
 
 
