@@ -19,8 +19,8 @@ public class FTMonitorManager {
     private static final int NOT_SET = 0;
     private static final long ONE_SECOND_NANO_TIMES = 1000000000;
     private volatile static FTMonitorManager ftMonitorConfig;
-    private int errorMonitorType;
-    private int deviceMetricsMonitorType = NOT_SET;
+    private ErrorMonitorType errorMonitorType;
+    private DeviceMetricsMonitorType deviceMetricsMonitorType = DeviceMetricsMonitorType.NO_SET;
 
 
     private final HashMap<String, MonitorRunnable> runnerMap = new HashMap<>();
@@ -56,18 +56,18 @@ public class FTMonitorManager {
      * @param errorMonitorType
      * @return
      */
-    public boolean isErrorMonitorType(int errorMonitorType) {
+    public boolean isErrorMonitorType(ErrorMonitorType errorMonitorType) {
         //判断某一种监控项是否开启
-        return (this.errorMonitorType | errorMonitorType) == this.errorMonitorType;
+        return (this.errorMonitorType.getValue() | errorMonitorType.getValue()) == this.errorMonitorType.getValue();
     }
 
-    public boolean isDeviceMetricsMonitorType(int deviceMetricsMonitorType) {
-        return (this.deviceMetricsMonitorType | deviceMetricsMonitorType) == this.deviceMetricsMonitorType;
+    public boolean isDeviceMetricsMonitorType(DeviceMetricsMonitorType deviceMetricsMonitorType) {
+        return (this.deviceMetricsMonitorType.getValue() | deviceMetricsMonitorType.getValue()) == this.deviceMetricsMonitorType.getValue();
 
     }
 
     public void addMonitor(String viewId) {
-        if (deviceMetricsMonitorType == NOT_SET) return;
+        if (deviceMetricsMonitorType == DeviceMetricsMonitorType.NO_SET) return;
         synchronized (runnerMap) {
             MonitorRunnable runner = new MonitorRunnable();
             runnerMap.put(viewId, runner);
@@ -77,7 +77,7 @@ public class FTMonitorManager {
 
     public void attachMonitorData(ViewBean bean) {
         String viewId = bean.getId();
-        if (deviceMetricsMonitorType == NOT_SET) return;
+        if (deviceMetricsMonitorType == DeviceMetricsMonitorType.NO_SET) return;
         synchronized (runnerMap) {
             MonitorRunnable runnable = runnerMap.get(viewId);
             if (runnable != null) {
@@ -112,7 +112,7 @@ public class FTMonitorManager {
     }
 
     public void removeMonitor(String viewId) {
-        if (deviceMetricsMonitorType == NOT_SET) return;
+        if (deviceMetricsMonitorType == DeviceMetricsMonitorType.NO_SET) return;
         synchronized (runnerMap) {
             MonitorRunnable runnable = runnerMap.get(viewId);
             if (runnable != null) {

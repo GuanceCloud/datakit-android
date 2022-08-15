@@ -21,10 +21,10 @@ public class FTRUMConfig {
     //是否开启用户欣慰 Resource 追踪
     private boolean enableTraceUserResource;
     //崩溃采集数据附加类型
-    private int extraMonitorTypeWithError;
+    private ErrorMonitorType extraMonitorTypeWithError;
 
     //监控指标数据类型
-    private int deviceMetricsMonitorType;
+    private DeviceMetricsMonitorType deviceMetricsMonitorType;
 
     private DetectFrequency deviceMetricsDetectFrequency = DetectFrequency.DEFAULT;
 
@@ -105,11 +105,11 @@ public class FTRUMConfig {
         return this;
     }
 
-    public int getExtraMonitorTypeWithError() {
+    public ErrorMonitorType getExtraMonitorTypeWithError() {
         return extraMonitorTypeWithError;
     }
 
-    public FTRUMConfig setExtraMonitorTypeWithError(int extraMonitorTypeWithError) {
+    public FTRUMConfig setExtraMonitorTypeWithError(ErrorMonitorType extraMonitorTypeWithError) {
         this.extraMonitorTypeWithError = extraMonitorTypeWithError;
         return this;
     }
@@ -129,18 +129,18 @@ public class FTRUMConfig {
     }
 
 
-    public FTRUMConfig setDeviceMetricsMonitorType(int deviceMetricsMonitorType) {
+    public FTRUMConfig setDeviceMetricsMonitorType(DeviceMetricsMonitorType deviceMetricsMonitorType) {
         this.deviceMetricsMonitorType = deviceMetricsMonitorType;
         return this;
     }
 
-    public FTRUMConfig setDeviceMetricsMonitorType(int deviceMetricsMonitorType, DetectFrequency frequency) {
+    public FTRUMConfig setDeviceMetricsMonitorType(DeviceMetricsMonitorType deviceMetricsMonitorType, DetectFrequency frequency) {
         this.deviceMetricsMonitorType = deviceMetricsMonitorType;
         this.deviceMetricsDetectFrequency = frequency;
         return this;
     }
 
-    public int getDeviceMetricsMonitorType() {
+    public DeviceMetricsMonitorType getDeviceMetricsMonitorType() {
         return deviceMetricsMonitorType;
     }
 
