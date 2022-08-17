@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.guardsquare.proguard'
+//apply plugin: 'com.guardsquare.proguard'
 
 android {
     compileSdkVersion 31
@@ -23,7 +23,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }
@@ -74,14 +74,14 @@ android {
     }
 }
 
-proguard {
-    configurations {
-        release {
-            defaultConfiguration 'proguard-android-optimize.txt'
-            configuration 'proguard-rules.pro'
-        }
-    }
-}
+//proguard {
+//    configurations {
+//        release {
+//            defaultConfiguration 'proguard-android-optimize.txt'
+//            configuration 'proguard-rules.pro'
+//        }
+//    }
+//}
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
