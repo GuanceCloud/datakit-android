@@ -1,10 +1,6 @@
-# plugin 1.1.1-beta02
-1.添加 proguard 支持
-
----
-# plugin 1.1.1-beta01
+# plugin 1.1.1-alpha04
 1.修正 cmake path 主项目错误的问题
-
+2.添加 proguard 支持
 ---
 # plugin 1.1.1-alpha03
 1.优化FtExt 条件覆盖规则
