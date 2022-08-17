@@ -116,24 +116,24 @@ apply plugin: 'ft-plugin'
 FTExt {
     showLog = true
 
-    autoUploadProguardMap = false
+    autoUploadMap = false
     autoUploadNativeDebugSymbol = false
-    datakitDCAUrl = ft_env.datakitRUMUrl
+    datakitDCAUrl = ft_env.datakitDCAUrl
     appId = ft_env.rumAppid
     env = 'common'
 
     prodFlavors {
         prodTest {
-            autoUploadProguardMap = false
-            autoUploadNativeDebugSymbol = false
-            datakitDCAUrl = ft_env.datakitRUMUrl
+            autoUploadMap = true
+            autoUploadNativeDebugSymbol = true
+            datakitDCAUrl = ft_env.datakitDCAUrl
             appId = ft_env.rumAppid
             env = ft_env.prodTestEnv
         }
         prodPublish {
-            autoUploadProguardMap = false
-            autoUploadNativeDebugSymbol = false
-            datakitDCAUrl = ft_env.datakitRUMUrl
+            autoUploadMap = true
+            autoUploadNativeDebugSymbol = true
+            datakitDCAUrl = ft_env.datakitDCAUrl
             appId = ft_env.rumAppid
             env = ft_env.prodPublishEnv
         }

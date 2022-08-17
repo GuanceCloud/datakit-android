@@ -1,3 +1,7 @@
+# plugin 1.1.1-beta02
+1.添加 proguard 支持
+
+---
 # plugin 1.1.1-beta01
 1.修正 cmake path 主项目错误的问题
 
