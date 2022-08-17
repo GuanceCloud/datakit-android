@@ -30,7 +30,7 @@ public class FTPlugin implements Plugin<Project> {
             Logger.setDebug(extension.showLog);
 
             FTMapUploader f = new FTMapUploader(p, extension);
-            f.configProguardUpload();
+            f.configMapUpload();
             f.configNativeSymbolUpload();
 
 

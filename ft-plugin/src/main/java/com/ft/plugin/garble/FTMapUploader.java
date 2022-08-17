@@ -5,6 +5,7 @@ import com.android.utils.FileUtils;
 
 import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.gradle.api.UnknownDomainObjectException;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ProjectDependency;
 
@@ -22,14 +23,16 @@ public class FTMapUploader {
     private final Project project;
     private final static String CMAKE_DEBUG_SYMBOL_PATH = "/intermediates/cmake/debug/obj";
 
-    private final HashMap<String, ProguardSettingConfig> proguardSettingMap = new HashMap<>();
+    private final HashMap<String, ObfuscationSettingConfig> obfuscationSettingMap = new HashMap<>();
 
     private final static String SYMBOL_MERGE_PATH_FORMAT = "/tmp/ftSourceMapMerge-%s";
     private final static String SYMBOL_MERGE_ZIP_PATH_FORMAT = "/tmp/ftSourceMap-%s.zip";
+    private final static String PROGUARD_MAPPING_PATH = "/outputs/proguard/%s/mapping/mapping.txt";
 
     private final ArrayList<String> symbolPaths = new ArrayList<>();
     private final String tmpBuildPathFormat;
     private final String zipBuildPathFormat;
+    private final String proguardBuildPathFormat;
     private final FTExtension extension;
     private final HashMap<String, ProductFlavorModel> flavorModelHashMap = new HashMap<>();
 
@@ -39,16 +42,17 @@ public class FTMapUploader {
         String buildPath = project.getBuildDir().getAbsolutePath();
         this.tmpBuildPathFormat = buildPath + SYMBOL_MERGE_PATH_FORMAT;
         this.zipBuildPathFormat = buildPath + SYMBOL_MERGE_ZIP_PATH_FORMAT;
+        this.proguardBuildPathFormat = buildPath + PROGUARD_MAPPING_PATH;
         this.extension = extension;
         extension.getOther().forEach(valueModel -> flavorModelHashMap.put(valueModel.getName(), valueModel));
     }
 
     /**
-     * 上传 proguard 符号文件
+     * 上传混淆符号文件
      */
-    public void configProguardUpload() {
+    public void configMapUpload() {
         if (flavorModelHashMap.isEmpty()) {
-            if (!extension.autoUploadProguardMap) {
+            if (!extension.autoUploadMap) {
                 return;
             }
         }
@@ -67,6 +71,10 @@ public class FTMapUploader {
                 ProductFlavorModel model = getFlavorModelFromName(variantName);
                 Logger.debug("ProductFlavorModel:" + model);
 
+                if (!model.isAutoUploadMap() && !model.isAutoUploadNativeDebugSymbol()) {
+                    return;
+                }
+
                 String tmpBuildPath = String.format(tmpBuildPathFormat, variantName);
                 String zipBuildPath = String.format(zipBuildPathFormat, variantName);
                 try {
@@ -76,7 +84,7 @@ public class FTMapUploader {
                     Logger.debug("tmp  delete error:" + e.getMessage());
                 }
                 try {
-                    ProguardSettingConfig config = proguardSettingMap.get(assembleTaskName);
+                    ObfuscationSettingConfig config = obfuscationSettingMap.get(assembleTaskName);
                     Logger.debug("task:" + assembleTaskName + ",config:" + config + "");
                     if (config != null) {
                         if (model.isAutoUploadNativeDebugSymbol()) {
@@ -84,12 +92,11 @@ public class FTMapUploader {
                                 FTFileUtils.copyDifferentFolderFilesIntoOne(tmpBuildPath, symbolPaths.toArray(new String[0]));
                             }
                         }
-                        if (model.isAutoUploadProguardMap()) {
+                        if (model.isAutoUploadMap()) {
                             if (new File(config.mappingOutputPath).exists()) {
                                 FTFileUtils.copyFile(new File(config.mappingOutputPath), new File(tmpBuildPath + "/mapping.txt"));
                             }
                         }
-
                         FTFileUtils.zipFiles(new File(tmpBuildPath).listFiles(), new File(zipBuildPath));
                         uploadWithParams(config, model, zipBuildPath);
                     }
@@ -106,22 +113,45 @@ public class FTMapUploader {
                 });
             }
 
-            applicationVariant.getAssembleProvider().get().doLast(task -> {
 
+            applicationVariant.getAssembleProvider().get().doLast(task -> {
                 if (!task.getName().endsWith("Debug")) {
-                    applicationVariant.getMappingFileProvider().get().getFiles().forEach(file -> {
-                        if (file != null && file.exists()) {
-                            ProguardSettingConfig config = new ProguardSettingConfig();
+                    if (applicationVariant.getBuildType().isMinifyEnabled()) {
+
+                        applicationVariant.getMappingFileProvider().get().getFiles().forEach(file -> {
+                            if (file != null && file.exists()) {
+                                ObfuscationSettingConfig config = new ObfuscationSettingConfig();
+                                config.applicationId = applicationVariant.getApplicationId();
+                                config.versionName = applicationVariant.getVersionName();
+                                config.versionCode = applicationVariant.getVersionCode();
+                                config.mappingOutputPath = file.getAbsoluteFile().toString();
+
+                                Logger.debug("Map Config:" + config + ",task:" + task.getName());
+
+                                obfuscationSettingMap.put(task.getName(), config);
+                            }
+                        });
+
+                    } else {
+                        boolean isProguardSet = false;
+                        try {
+                            project.getExtensions().getByName("proguard");
+                            isProguardSet = true;
+                        } catch (UnknownDomainObjectException e) {
+                            Logger.error(e.getMessage());
+                        }
+
+                        if (isProguardSet) {
+                            ObfuscationSettingConfig config = new ObfuscationSettingConfig();
                             config.applicationId = applicationVariant.getApplicationId();
                             config.versionName = applicationVariant.getVersionName();
                             config.versionCode = applicationVariant.getVersionCode();
-                            config.mappingOutputPath = file.getAbsoluteFile().toString();
-
+                            config.mappingOutputPath = String.format(proguardBuildPathFormat,
+                                    variantName);
                             Logger.debug("Map Config:" + config + ",task:" + task.getName());
-
-                            proguardSettingMap.put(task.getName(), config);
+                            obfuscationSettingMap.put(task.getName(), config);
                         }
-                    });
+                    }
                 }
             });
         });
@@ -156,7 +186,7 @@ public class FTMapUploader {
                 configuration.getAllDependencies().forEach(dependency -> {
                     if (dependency instanceof ProjectDependency) {
                         String moduleName = dependency.getName();
-                        String debugSymbolPath = rootPath + "/" + moduleName +"/build"+ CMAKE_DEBUG_SYMBOL_PATH;
+                        String debugSymbolPath = rootPath + "/" + moduleName + "/build" + CMAKE_DEBUG_SYMBOL_PATH;
                         File file = new File(debugSymbolPath);
                         Logger.debug("debugSymbolPath:" + debugSymbolPath);
                         if (file.exists()) {
@@ -183,7 +213,7 @@ public class FTMapUploader {
      * @throws IOException
      * @throws InterruptedException
      */
-    private void uploadWithParams(ProguardSettingConfig settingConfig, ProductFlavorModel model, String zipBuildPath) throws IOException, InterruptedException {
+    private void uploadWithParams(ObfuscationSettingConfig settingConfig, ProductFlavorModel model, String zipBuildPath) throws IOException, InterruptedException {
         Logger.debug(model.toString());
         String cmd = "curl -X POST " + model.getDatakitDCAUrl() + "/v1/rum/sourcemap?app_id="
                 + model.getAppId() + "&env=" + model.getEnv() + "&version="
@@ -230,7 +260,7 @@ public class FTMapUploader {
     }
 
 
-    static class ProguardSettingConfig {
+    static class ObfuscationSettingConfig {
         String applicationId;
         String versionName;
         int versionCode;

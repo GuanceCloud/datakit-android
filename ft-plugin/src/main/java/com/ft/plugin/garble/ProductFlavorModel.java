@@ -3,7 +3,7 @@ package com.ft.plugin.garble;
 public class ProductFlavorModel {
 
     private final String name;
-    private Boolean autoUploadProguardMap; //是否自动上 map 文件
+    private Boolean autoUploadMap; //是否自动上 map 文件
     private Boolean autoUploadNativeDebugSymbol;//是否上传 native debug symbol
     private String datakitDCAUrl;
     private String appId;
@@ -17,12 +17,12 @@ public class ProductFlavorModel {
         return name;
     }
 
-    public Boolean isAutoUploadProguardMap() {
-        return autoUploadProguardMap;
+    public Boolean isAutoUploadMap() {
+        return autoUploadMap;
     }
 
-    public void setAutoUploadProguardMap(boolean autoUploadProguardMap) {
-        this.autoUploadProguardMap = autoUploadProguardMap;
+    public void setAutoUploadMap(boolean autoUploadMap) {
+        this.autoUploadMap = autoUploadMap;
     }
 
     public Boolean isAutoUploadNativeDebugSymbol() {
@@ -61,7 +61,7 @@ public class ProductFlavorModel {
         this.env = extension.env;
         this.appId = extension.appId;
         this.autoUploadNativeDebugSymbol = extension.autoUploadNativeDebugSymbol;
-        this.autoUploadProguardMap = extension.autoUploadProguardMap;
+        this.autoUploadMap = extension.autoUploadMap;
         this.datakitDCAUrl = extension.datakitDCAUrl;
     }
 
@@ -72,8 +72,8 @@ public class ProductFlavorModel {
         if (this.appId == null) {
             this.appId = extension.appId;
         }
-        if (this.autoUploadProguardMap == null) {
-            this.autoUploadProguardMap = extension.autoUploadProguardMap;
+        if (this.autoUploadMap == null) {
+            this.autoUploadMap = extension.autoUploadMap;
         }
         if (this.autoUploadNativeDebugSymbol == null) {
             this.autoUploadNativeDebugSymbol = extension.autoUploadNativeDebugSymbol;
@@ -87,7 +87,7 @@ public class ProductFlavorModel {
     public String toString() {
         return "ProductFlavorModel{" +
                 "name='" + name + '\'' +
-                ", autoUploadProguardMap=" + autoUploadProguardMap +
+                ", autoUploadMap=" + autoUploadMap +
                 ", autoUploadNativeDebugSymbol=" + autoUploadNativeDebugSymbol +
                 ", datakitDCAUrl='" + datakitDCAUrl + '\'' +
                 ", appId='" + appId + '\'' +
