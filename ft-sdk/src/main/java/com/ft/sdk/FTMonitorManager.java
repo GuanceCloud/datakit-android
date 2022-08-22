@@ -16,10 +16,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class FTMonitorManager {
 
-    private static final int NOT_SET = 0;
     private static final long ONE_SECOND_NANO_TIMES = 1000000000;
     private volatile static FTMonitorManager ftMonitorConfig;
-    private ErrorMonitorType errorMonitorType;
+    private ErrorMonitorType errorMonitorType = ErrorMonitorType.NO_SET;
     private DeviceMetricsMonitorType deviceMetricsMonitorType = DeviceMetricsMonitorType.NO_SET;
 
 

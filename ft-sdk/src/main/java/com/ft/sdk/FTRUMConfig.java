@@ -21,10 +21,10 @@ public class FTRUMConfig {
     //是否开启用户欣慰 Resource 追踪
     private boolean enableTraceUserResource;
     //崩溃采集数据附加类型
-    private ErrorMonitorType extraMonitorTypeWithError;
+    private ErrorMonitorType extraMonitorTypeWithError = ErrorMonitorType.NO_SET;
 
     //监控指标数据类型
-    private DeviceMetricsMonitorType deviceMetricsMonitorType;
+    private DeviceMetricsMonitorType deviceMetricsMonitorType = DeviceMetricsMonitorType.NO_SET;
 
     private DetectFrequency deviceMetricsDetectFrequency = DetectFrequency.DEFAULT;
 
