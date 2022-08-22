@@ -40,11 +40,10 @@ public class DemoApplication extends Application {
     }
 
     private void initFTSDK() {
-        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(AccountUtils.getProperty(this,
-                        AccountUtils.ACCESS_SERVER_URL))
+        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.ACCESS_SERVER_URL)
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setDebug(true)//设置是否是 debug
-                .setEnv(EnvType.GRAY);
+                .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()));
         FTSdk.install(ftSDKConfig);
 
         FTSdk.initLogWithConfig(new FTLoggerConfig()
@@ -56,7 +55,7 @@ public class DemoApplication extends Application {
 
         FTSdk.initRUMWithConfig(new FTRUMConfig()
                 .setSamplingRate(1f)
-                .setRumAppId(AccountUtils.getProperty(this, AccountUtils.RUM_APP_ID))
+                .setRumAppId(BuildConfig.RUM_APP_ID)
                 .setEnableTraceUserAction(true)
                 .setEnableTraceUserView(true)
                 .setEnableTraceUserResource(true)
@@ -64,7 +63,7 @@ public class DemoApplication extends Application {
                 .setEnableTrackAppCrash(true)
                 .setEnableTrackAppUIBlock(true)
                 .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL)
-                .addGlobalContext("track_id", AccountUtils.getProperty(this, AccountUtils.TRACK_ID))
+                .addGlobalContext("track_id", BuildConfig.TRACK_ID)
                 .addGlobalContext("custom_tag", "any tags")
                 .setExtraMonitorTypeWithError(ErrorMonitorType.ALL));
 

@@ -13,10 +13,12 @@ import static com.ft.test.utils.RequestUtil.okhttpRequestUrl;
 import android.content.Context;
 import android.os.Looper;
 
+import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.ft.AccountUtils;
 import com.ft.BaseTest;
+import com.ft.BuildConfig;
+import com.ft.DebugMainActivity;
 import com.ft.application.MockApplication;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
@@ -25,11 +27,10 @@ import com.ft.sdk.TraceType;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 import okhttp3.Request;
 
@@ -41,6 +42,9 @@ import okhttp3.Request;
 @RunWith(AndroidJUnit4.class)
 public class TraceHeaderTest extends BaseTest {
 
+    @Rule
+    public ActivityScenarioRule<DebugMainActivity> rule = new ActivityScenarioRule<>(DebugMainActivity.class);
+
     @BeforeClass
     public static void setUp() {
         if (!hasPrepare) {
@@ -49,7 +53,7 @@ public class TraceHeaderTest extends BaseTest {
         }
         Context context = MockApplication.getContext();
         FTSDKConfig ftsdkConfig = FTSDKConfig
-                .builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL))
+                .builder(BuildConfig.ACCESS_SERVER_URL)
                 .setXDataKitUUID("ft-dataKit-uuid-001");
         FTSdk.install(ftsdkConfig);
         FTSdk.initTraceWithConfig(new FTTraceConfig().setEnableLinkRUMData(false));

@@ -12,8 +12,8 @@ import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.ft.AccountUtils;
 import com.ft.BaseTest;
+import com.ft.BuildConfig;
 import com.ft.DebugMainActivity;
 import com.ft.R;
 import com.ft.application.MockApplication;
@@ -24,7 +24,6 @@ import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
-import com.ft.test.utils.CheckUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,14 +53,14 @@ public class RUMClickActionTest extends BaseTest {
 
         Context context = MockApplication.getContext();
         FTSDKConfig ftSDKConfig = FTSDKConfig
-                .builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL))
+                .builder(BuildConfig.ACCESS_SERVER_URL)
                 .setDebug(true)//设置是否是 debug
                 .setEnv(EnvType.GRAY);
         FTSdk.install(ftSDKConfig);
 
         FTSdk.initRUMWithConfig(new FTRUMConfig()
                 .setEnableTrackAppCrash(true)
-                .setRumAppId(AccountUtils.getProperty(context, AccountUtils.RUM_APP_ID))
+                .setRumAppId(BuildConfig.RUM_APP_ID)
                 .setEnableTrackAppUIBlock(true)
                 .setEnableTraceUserAction(true)
         );
@@ -100,8 +99,6 @@ public class RUMClickActionTest extends BaseTest {
         Assert.assertNotNull(actionId);
         Assert.assertFalse(actionId.isEmpty());
     }
-
-
 
 
 }

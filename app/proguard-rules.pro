@@ -21,10 +21,12 @@
 #-renamesourcefileattribute SourceFile
 
 -dontwarn com.ft.sdk.**
+
 -keep class com.ft.sdk.**{*;}
 
 -keep class ftnative.*{*;}
 
--keep class com.bun.miitmdid.core.**{*;}
-
 -keepnames class * extends android.view.View
+
+
+-dontwarn okhttp3.**

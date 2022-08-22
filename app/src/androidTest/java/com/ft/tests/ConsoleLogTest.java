@@ -9,8 +9,8 @@ import android.util.Log;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.ft.AccountUtils;
 import com.ft.BaseTest;
+import com.ft.BuildConfig;
 import com.ft.application.MockApplication;
 import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.FTSDKConfig;
@@ -43,7 +43,7 @@ public class ConsoleLogTest extends BaseTest {
         stopSyncTask();
         context = MockApplication.getContext();
         FTSDKConfig ftsdkConfig = FTSDKConfig
-                .builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL));
+                .builder(BuildConfig.ACCESS_SERVER_URL);
         FTSdk.install(ftsdkConfig);
 
     }

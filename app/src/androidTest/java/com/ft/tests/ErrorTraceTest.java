@@ -12,8 +12,8 @@ import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.ft.AccountUtils;
 import com.ft.BaseTest;
+import com.ft.BuildConfig;
 import com.ft.DebugMainActivity;
 import com.ft.R;
 import com.ft.application.MockApplication;
@@ -51,7 +51,7 @@ public class ErrorTraceTest extends BaseTest {
         }
         context = MockApplication.getContext();
         FTSDKConfig ftSDKConfig = FTSDKConfig
-                .builder(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL))
+                .builder(BuildConfig.ACCESS_SERVER_URL)
                 .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setDebug(true)//设置是否是 debug
                 .setEnv(EnvType.GRAY);
@@ -60,7 +60,7 @@ public class ErrorTraceTest extends BaseTest {
         FTSdk.install(ftSDKConfig);
 
         FTSdk.initRUMWithConfig(new FTRUMConfig()
-                .setRumAppId(AccountUtils.getProperty(context, AccountUtils.RUM_APP_ID))
+                .setRumAppId(BuildConfig.RUM_APP_ID)
                 .setEnableTrackAppCrash(true));
     }
 

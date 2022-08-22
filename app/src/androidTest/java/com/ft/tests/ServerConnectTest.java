@@ -5,8 +5,9 @@ import android.os.Looper;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.ft.AccountUtils;
+
 import com.ft.BaseTest;
+import com.ft.BuildConfig;
 import com.ft.application.MockApplication;
 import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.FTSDKConfig;
@@ -63,7 +64,7 @@ public class ServerConnectTest extends BaseTest {
 
     @Test
     public void normalUrl() throws Exception {
-        urlParamTest(AccountUtils.getProperty(context, AccountUtils.ACCESS_SERVER_URL), 200);
+        urlParamTest(BuildConfig.ACCESS_SERVER_URL, 200);
     }
 
 

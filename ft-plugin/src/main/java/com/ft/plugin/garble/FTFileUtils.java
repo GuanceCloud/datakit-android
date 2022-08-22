@@ -169,9 +169,9 @@ class FTFileUtils {
         byte[] buffer = new byte[2048];
         int length;
         for (File file : files) {
-            if(file.isDirectory()){
-                zipDirectory(zipOutputStream,file,file.getName());
-            }else{
+            if (file.isDirectory()) {
+                zipDirectory(zipOutputStream, file, file.getName());
+            } else {
                 FileInputStream fileInputStream = new FileInputStream(file);
                 zipOutputStream.putNextEntry(new ZipEntry(file.getName()));
                 while ((length = fileInputStream.read(buffer)) != -1) {
