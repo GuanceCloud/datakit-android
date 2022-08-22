@@ -28,6 +28,21 @@ public class Constants {
      */
     public static final String CLASS_NAME_WEBVIEW = "android/webkit/WebView";
     /**
+     * Tencent SDK 路径
+     */
+    public static final String CLASS_NAME_TENCENT_PATH = "com/tencent/smtt/sdk/";
+
+    /**
+     * Taobao Weex 路径
+     */
+    public static final String CLASS_NAME_TAOBAO_PATH = "com/taobao/weex/";
+
+    /**
+     * Dcloud 路径
+     */
+    public static final String CLASS_NAME_DCLOUD_PATH = "io/dcloud/";
+
+    /**
      * OkHttpClient$Builder
      */
     public static final String CLASS_NAME_OKHTTP_BUILDER = "okhttp3/OkHttpClient$Builder";
@@ -67,5 +82,5 @@ public class Constants {
     public static final String OKHTTP_BUILDER_DESC = "Lokhttp3/OkHttpClient$Builder;";
 
 
-    public static final String PACKAGE_UUID =  UUID.randomUUID().toString();
+    public static final String PACKAGE_UUID = UUID.randomUUID().toString();
 }

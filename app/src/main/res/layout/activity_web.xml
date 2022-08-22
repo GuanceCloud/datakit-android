@@ -11,12 +11,12 @@
         android:layout_height="60dp"
         android:id="@+id/spinner"
         android:popupBackground="@color/colorAccent"/>
-    <WebView
+    <com.ft.CustomWebView
         android:id="@+id/webView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="60dp">
-    </WebView>
+    </com.ft.CustomWebView>
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyleHorizontal"

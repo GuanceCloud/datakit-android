@@ -1,3 +1,7 @@
+# plugin 1.1.2-alpha01
+1.修正 WebView 衍生类注入后，发生循环调用的问题
+
+---
 # plugin 1.1.1-alpha04
 1.修正 cmake path 主项目错误的问题
 2.添加 proguard 支持
