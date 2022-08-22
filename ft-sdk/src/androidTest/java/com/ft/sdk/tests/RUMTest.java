@@ -98,7 +98,7 @@ public class RUMTest extends FTBaseTest {
     @Test
     public void addActionTest() throws Exception {
         Whitebox.invokeMethod(FTRUMGlobalManager.get(), "addAction",
-                ACTION_NAME, ACTION_TYPE_NAME, DURATION);
+                ACTION_NAME, ACTION_TYPE_NAME, DURATION, Utils.getCurrentNanoTime());
         waitForInThreadPool();
 
         ArrayList<ActionBean> list = FTDBManager.get().querySumAction(0);
