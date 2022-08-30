@@ -219,7 +219,7 @@ public class FTRUMConfigManager {
             String key = entry.getKey();
             customKeys.add(key);
             Object value = entry.getValue();
-            rumGlobalContext.put(key, value.toString());
+            rumGlobalContext.put(key, value);
         }
 //        if(config.isBackendSample()){
         //sample
@@ -255,7 +255,7 @@ public class FTRUMConfigManager {
             for (Map.Entry<String, Object> entry : rumGlobalContext.entrySet()) {
                 String key = entry.getKey();
                 Object value = entry.getValue();
-                tags.put(key, value.toString());
+                tags.put(key, value);
             }
         }
         tags.put(Constants.KEY_RUM_NETWORK_TYPE, NetUtils.get().getNetWorkStateName());

@@ -136,6 +136,7 @@ public class SyncDataHelper {
                         //合并去重
                         for (String key : extraTags.keySet()) {
                             if (!tags.has(key)) {
+                                //此处空对象会被移除
                                 tags.put(key, extraTags.get(key));
                             }
                         }
