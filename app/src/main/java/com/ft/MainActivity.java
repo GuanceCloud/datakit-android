@@ -3,12 +3,10 @@ package com.ft;
 import static android.content.pm.PackageManager.PERMISSION_DENIED;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,12 +16,9 @@ import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.reflect.ReflectUtils;
 import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.sdk.garble.utils.Utils;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -35,13 +30,10 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
-    OkHttpClient client = new OkHttpClient.Builder()
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .build();
+    OkHttpClient client = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).build();
 
     public Request requestUrl(@NonNull String url) {
-        Request.Builder builder = new Request.Builder().url(url)
-                .method(RequestMethod.GET.name(), null);
+        Request.Builder builder = new Request.Builder().url(url).method(RequestMethod.GET.name(), null);
         Request request = null;
         try {
             Response response = client.newCall(builder.build()).execute();
@@ -65,9 +57,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissions(new String[]{
-                    Manifest.permission.READ_PHONE_STATE
-            }, 1);
+            requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE}, 1);
         }
 
         findViewById(R.id.main_mock_crash_btn).setOnClickListener(v -> {
