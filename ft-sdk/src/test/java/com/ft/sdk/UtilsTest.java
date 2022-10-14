@@ -1,18 +1,12 @@
 package com.ft.sdk;
 
-import android.content.Context;
-
-import androidx.test.platform.app.InstrumentationRegistry;
+import static org.junit.Assert.assertEquals;
 
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.LineProtocolBean;
-import com.ft.sdk.garble.bean.ObjectBean;
 import com.ft.sdk.garble.bean.SyncJsonData;
-import com.ft.sdk.SyncDataHelper;
 import com.ft.sdk.garble.utils.Constants;
-import com.ft.sdk.garble.utils.Utils;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -21,9 +15,6 @@ import org.powermock.reflect.Whitebox;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * BY huangDianHua

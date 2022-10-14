@@ -1,12 +1,11 @@
 package com.ft.sdk;
 
-import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
+
+import org.junit.Test;
 
 /**
  *
@@ -25,8 +24,7 @@ public class ThreadPoolTest {
 
         DataUploaderThreadPool.get().shutDown();
 
-            assertFalse(DataUploaderThreadPool.get().poolRunning());
-
+        assertFalse(DataUploaderThreadPool.get().poolRunning());
 
 
         DataUploaderThreadPool.get().reStartPool();
