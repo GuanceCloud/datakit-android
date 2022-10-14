@@ -18,9 +18,10 @@ import okhttp3.ResponseBody;
 import okhttp3.internal.http.HttpHeaders;
 
 /**
- * create: by huangDianHua
- * time: 2020/5/18 10:06:37
- * description:
+ * OKHttp Trace Interceptor
+ *
+ * 为 http 链路添加链路 header
+ *
  */
 public class FTTraceInterceptor implements Interceptor {
 

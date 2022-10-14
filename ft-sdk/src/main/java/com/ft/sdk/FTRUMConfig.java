@@ -30,6 +30,8 @@ public class FTRUMConfig {
 
 //    private boolean backendSample = false;
 
+    private FTInTakeUrlHandler handler;
+
     //设置全局 tag
     private final HashMap<String, Object> globalContext = new HashMap<>();
 
@@ -146,6 +148,15 @@ public class FTRUMConfig {
 
     public DetectFrequency getDeviceMetricsDetectFrequency() {
         return deviceMetricsDetectFrequency;
+    }
+
+    public FTRUMConfig setResourceUrlHandler(FTInTakeUrlHandler handler) {
+        this.handler = handler;
+        return this;
+    }
+
+    public FTInTakeUrlHandler getResourceUrlHandler() {
+        return handler;
     }
 
     //    /**

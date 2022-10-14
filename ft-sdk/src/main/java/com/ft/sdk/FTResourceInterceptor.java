@@ -17,6 +17,7 @@ import okhttp3.ResponseBody;
 import okhttp3.internal.http.HttpHeaders;
 
 /**
+ * OKHttp Resource Interceptor
  *
  */
 public class FTResourceInterceptor extends NetStatusMonitor implements Interceptor {
@@ -26,16 +27,26 @@ public class FTResourceInterceptor extends NetStatusMonitor implements Intercept
         Request request = chain.request();
         Response response = null;
         Exception exception = null;
-        String resourceId = Utils.identifyRequest(request);
-        FTRUMGlobalManager.get().startResource(resourceId);
+        String url = request.url().toString();
+
+        boolean isInTakeUrl = FTRUMConfigManager.get().getConfig()
+                .getResourceUrlHandler().isInTakeUrl(url);
 
         try {
             response = chain.proceed(request);
+
+            if (isInTakeUrl) {
+                return response;
+            }
+
         } catch (IOException e) {
             exception = e;
         }
+
+        String resourceId = Utils.identifyRequest(request);
+        FTRUMGlobalManager.get().startResource(resourceId);
         ResourceParams params = new ResourceParams();
-        params.url = request.url().toString();
+        params.url = url;
         params.requestHeader = request.headers().toString();
         params.resourceMethod = request.method();
 
