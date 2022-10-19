@@ -371,6 +371,8 @@ public class RUMTest extends FTBaseTest {
         mockWebServer.enqueue(mockResponse);
         mockWebServer.play();
 
+        FTSdk.initRUMWithConfig(new FTRUMConfig());
+
         FTSdk.initTraceWithConfig(new FTTraceConfig()
                 .setTraceType(TraceType.DDTRACE)
                 .setEnableAutoTrace(true)
