@@ -4,7 +4,6 @@ package com.ft.sdk.tests;
 import static com.ft.sdk.FTSdkAllTests.hasPrepare;
 
 import android.os.Looper;
-import android.util.Log;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
@@ -13,11 +12,9 @@ import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.Status;
-import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.test.base.FTBaseTest;
 import com.ft.test.utils.CheckUtils;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

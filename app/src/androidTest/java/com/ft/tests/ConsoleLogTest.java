@@ -3,7 +3,6 @@ package com.ft.tests;
 
 import static com.ft.AllTests.hasPrepare;
 
-import android.content.Context;
 import android.os.Looper;
 import android.util.Log;
 
@@ -11,7 +10,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.ft.BaseTest;
 import com.ft.BuildConfig;
-import com.ft.application.MockApplication;
 import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
@@ -32,7 +30,6 @@ import org.junit.runner.RunWith;
  */
 @RunWith(AndroidJUnit4.class)
 public class ConsoleLogTest extends BaseTest {
-    Context context;
 
     @Before
     public void setUp() throws Exception {
@@ -41,7 +38,6 @@ public class ConsoleLogTest extends BaseTest {
             hasPrepare = true;
         }
         stopSyncTask();
-        context = MockApplication.getContext();
         FTSDKConfig ftsdkConfig = FTSDKConfig
                 .builder(BuildConfig.ACCESS_SERVER_URL);
         FTSdk.install(ftsdkConfig);

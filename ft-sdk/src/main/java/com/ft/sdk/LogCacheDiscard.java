@@ -6,5 +6,8 @@ package com.ft.sdk;
  * description:日志数据库缓存丢弃策略
  */
 public enum LogCacheDiscard {
-    DISCARD,DISCARD_OLDEST
+    //丢弃前置
+    DISCARD,
+    //丢弃后置
+    DISCARD_OLDEST
 }

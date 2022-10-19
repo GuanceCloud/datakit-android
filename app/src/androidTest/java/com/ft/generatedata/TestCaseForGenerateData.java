@@ -1,14 +1,10 @@
 package com.ft.generatedata;
 
 import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.Espresso.pressBack;
 import static androidx.test.espresso.action.ViewActions.click;
-
 import static com.ft.AllTests.hasPrepare;
 
-import android.content.Context;
 import android.os.Looper;
-import android.view.View;
 
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.matcher.ViewMatchers;
@@ -19,7 +15,6 @@ import com.ft.BaseTest;
 import com.ft.BuildConfig;
 import com.ft.DebugMainActivity;
 import com.ft.R;
-import com.ft.application.MockApplication;
 import com.ft.sdk.EnvType;
 import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.FTRUMConfig;
@@ -44,7 +39,6 @@ public class TestCaseForGenerateData extends BaseTest {
             Looper.prepare();
             hasPrepare = true;
         }
-        Context context = MockApplication.getContext();
         FTSDKConfig ftSDKConfig = FTSDKConfig
                 .builder(BuildConfig.ACCESS_SERVER_URL)
                 .setDebug(true)//设置是否是 debug

@@ -1,14 +1,14 @@
 package com.ft.tests;
 
-import android.content.Context;
+import static com.ft.AllTests.hasPrepare;
+import static org.junit.Assert.assertEquals;
+
 import android.os.Looper;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-
 import com.ft.BaseTest;
 import com.ft.BuildConfig;
-import com.ft.application.MockApplication;
 import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
@@ -18,7 +18,6 @@ import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.manager.AsyncCallback;
 import com.ft.sdk.garble.utils.Utils;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,9 +27,6 @@ import org.powermock.reflect.Whitebox;
 import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 
-import static com.ft.AllTests.hasPrepare;
-import static org.junit.Assert.assertEquals;
-
 /**
  * BY huangDianHua
  * DATE:2020-01-10 15:20
@@ -38,7 +34,6 @@ import static org.junit.Assert.assertEquals;
  */
 @RunWith(AndroidJUnit4.class)
 public class ServerConnectTest extends BaseTest {
-    Context context = null;
     int codeScope = 0;
 
     @Before
@@ -47,7 +42,6 @@ public class ServerConnectTest extends BaseTest {
             Looper.prepare();
             hasPrepare = true;
         }
-        context = MockApplication.getContext();
     }
 
 

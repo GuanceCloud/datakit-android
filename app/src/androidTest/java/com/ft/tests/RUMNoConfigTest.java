@@ -2,7 +2,6 @@ package com.ft.tests;
 
 import static com.ft.AllTests.hasPrepare;
 
-import android.content.Context;
 import android.os.Looper;
 
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
@@ -10,7 +9,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.ft.BuildConfig;
 import com.ft.DebugMainActivity;
-import com.ft.application.MockApplication;
 import com.ft.sdk.EnvType;
 import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTSDKConfig;
@@ -37,7 +35,6 @@ public class RUMNoConfigTest extends BaseNoRUMDataTest {
 
         stopSyncTask();
 
-        Context context = MockApplication.getContext();
         FTSDKConfig ftSDKConfig = FTSDKConfig
                 .builder(BuildConfig.ACCESS_SERVER_URL)
                 .setDebug(true)//设置是否是 debug

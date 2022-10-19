@@ -16,7 +16,6 @@ import com.ft.test.utils.CheckUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

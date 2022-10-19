@@ -10,7 +10,6 @@ import static com.ft.sdk.FTTraceHandler.ZIPKIN_SPAN_ID;
 import static com.ft.sdk.FTTraceHandler.ZIPKIN_TRACE_ID;
 import static com.ft.test.utils.RequestUtil.okhttpRequestUrl;
 
-import android.content.Context;
 import android.os.Looper;
 
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
@@ -19,7 +18,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.ft.BaseTest;
 import com.ft.BuildConfig;
 import com.ft.DebugMainActivity;
-import com.ft.application.MockApplication;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
@@ -30,7 +28,6 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 
 import okhttp3.Request;
 
@@ -51,7 +48,6 @@ public class TraceHeaderTest extends BaseTest {
             Looper.prepare();
             hasPrepare = true;
         }
-        Context context = MockApplication.getContext();
         FTSDKConfig ftsdkConfig = FTSDKConfig
                 .builder(BuildConfig.ACCESS_SERVER_URL)
                 .setXDataKitUUID("ft-dataKit-uuid-001");

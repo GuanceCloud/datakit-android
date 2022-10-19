@@ -1,4 +1,6 @@
 package com.ft.sdk.internal.exception;
 
-public interface FTException {
-}
+/**
+ * 基础 FTException
+ */
+public interface FTException { }

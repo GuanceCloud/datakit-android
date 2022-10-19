@@ -30,7 +30,7 @@ public class FTRUMConfig {
 
 //    private boolean backendSample = false;
 
-    private FTInTakeUrlHandler handler;
+    private FTInTakeUrlHandler handler = url -> false;
 
     //设置全局 tag
     private final HashMap<String, Object> globalContext = new HashMap<>();

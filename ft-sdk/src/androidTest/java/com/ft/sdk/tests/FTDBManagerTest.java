@@ -1,9 +1,9 @@
 package com.ft.sdk.tests;
 
+import static org.junit.Assert.assertEquals;
+
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.ft.sdk.FTSdk;
-import com.ft.sdk.FTTrackInner;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBConfig;
@@ -14,12 +14,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
-import org.powermock.reflect.Whitebox;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * BY huangDianHua

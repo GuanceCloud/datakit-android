@@ -4,7 +4,6 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static com.ft.AllTests.hasPrepare;
 
-import android.content.Context;
 import android.os.Looper;
 
 import androidx.test.espresso.action.ViewActions;
@@ -16,7 +15,6 @@ import com.ft.BaseTest;
 import com.ft.BuildConfig;
 import com.ft.DebugMainActivity;
 import com.ft.R;
-import com.ft.application.MockApplication;
 import com.ft.sdk.EnvType;
 import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTSDKConfig;
@@ -41,15 +39,12 @@ public class ErrorTraceTest extends BaseTest {
     public ActivityScenarioRule<DebugMainActivity> rule = new ActivityScenarioRule<>(DebugMainActivity.class);
 
 
-    Context context;
-
     @Before
     public void setUp() throws Exception {
         if (!hasPrepare) {
             Looper.prepare();
             hasPrepare = true;
         }
-        context = MockApplication.getContext();
         FTSDKConfig ftSDKConfig = FTSDKConfig
                 .builder(BuildConfig.ACCESS_SERVER_URL)
                 .setXDataKitUUID("ft-dataKit-uuid-001")
