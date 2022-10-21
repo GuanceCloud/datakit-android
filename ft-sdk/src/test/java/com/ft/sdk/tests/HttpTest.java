@@ -1,4 +1,4 @@
-package com.ft.sdk;
+package com.ft.sdk.tests;
 
 import static org.junit.Assert.assertEquals;
 

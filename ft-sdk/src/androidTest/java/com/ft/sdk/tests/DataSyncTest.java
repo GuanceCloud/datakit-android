@@ -1,7 +1,7 @@
 package com.ft.sdk.tests;
 
 
-import static com.ft.sdk.FTSdkAllTests.hasPrepare;
+import static com.ft.sdk.tests.FTSdkAllTests.hasPrepare;
 
 import android.os.Looper;
 

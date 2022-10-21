@@ -1,4 +1,4 @@
-package com.ft.sdk;
+package com.ft.sdk.tests;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

@@ -1,7 +1,8 @@
-package com.ft.sdk;
+package com.ft.sdk.tests;
 
 import static org.junit.Assert.assertEquals;
 
+import com.ft.sdk.SyncDataHelper;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.LineProtocolBean;
 import com.ft.sdk.garble.bean.SyncJsonData;

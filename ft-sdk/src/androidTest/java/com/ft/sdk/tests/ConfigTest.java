@@ -1,6 +1,6 @@
 package com.ft.sdk.tests;
 
-import static com.ft.sdk.FTSdkAllTests.hasPrepare;
+import static com.ft.sdk.tests.FTSdkAllTests.hasPrepare;
 import static com.ft.sdk.garble.utils.Constants.DEFAULT_LOG_SERVICE_NAME;
 
 import android.os.Looper;

@@ -1,4 +1,4 @@
-package com.ft.sdk;
+package com.ft.sdk.tests;
 
 import com.ft.sdk.garble.utils.GenericsUtils;
 

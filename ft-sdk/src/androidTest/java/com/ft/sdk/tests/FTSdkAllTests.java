@@ -1,4 +1,4 @@
-package com.ft.sdk;
+package com.ft.sdk.tests;
 
 import com.ft.sdk.tests.ConfigTest;
 import com.ft.sdk.tests.DataFormatTest;
