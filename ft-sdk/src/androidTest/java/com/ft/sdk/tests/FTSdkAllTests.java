@@ -1,18 +1,5 @@
 package com.ft.sdk.tests;
 
-import com.ft.sdk.tests.ConfigTest;
-import com.ft.sdk.tests.DataFormatTest;
-import com.ft.sdk.tests.DeviceUtilsTest;
-import com.ft.sdk.tests.FTDBManagerTest;
-import com.ft.sdk.tests.LogGlobalContextTest;
-import com.ft.sdk.tests.LogTest;
-import com.ft.sdk.tests.MonitorConfigTest;
-import com.ft.sdk.tests.RUMTest;
-import com.ft.sdk.tests.RUMUserBindTest;
-import com.ft.sdk.tests.SDKGlobalContextTest;
-import com.ft.sdk.tests.SDKRunStateTest;
-import com.ft.sdk.tests.TraceHeaderTest;
-
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
