@@ -115,6 +115,12 @@ public class FTRUMGlobalManager {
         startAction(actionName, actionType, false);
     }
 
+    /**
+     * action 起始
+     * @param actionName action 名称
+     * @param actionType action 类型
+     * @param needWait 是否需要等待
+     */
     void startAction(String actionName, String actionType, boolean needWait) {
 
         String viewId = activeView != null ? activeView.getId() : null;
@@ -132,6 +138,9 @@ public class FTRUMGlobalManager {
         }
     }
 
+    /**
+     * 检测 action 是否需要关闭
+     */
     private void checkActionClose() {
         if (activeAction == null) return;
         long now = Utils.getCurrentNanoTime();
@@ -149,6 +158,9 @@ public class FTRUMGlobalManager {
         }
     }
 
+    /**
+     * 停止 action
+     */
     void stopAction() {
         if (activeAction.isNeedWaitAction()) {
             activeAction.close();
@@ -192,6 +204,11 @@ public class FTRUMGlobalManager {
         }
     }
 
+    /**
+     * 创建 view
+     * @param viewName 界面名称
+     * @param loadTime 加载事件，单位毫秒 ms
+     */
     public void onCreateView(String viewName, long loadTime) {
         preActivityDuration.put(viewName, loadTime);
     }
@@ -261,6 +278,10 @@ public class FTRUMGlobalManager {
 
     }
 
+    /**
+     * 初始化 action
+     * @param activeActionBean
+     */
     private void initAction(ActiveActionBean activeActionBean) {
         ActionBean bean = activeActionBean.convertToActionBean();
         increaseAction(bean.getViewId());
@@ -270,6 +291,10 @@ public class FTRUMGlobalManager {
 
     }
 
+    /**
+     * 初始化 view
+     * @param activeViewBean
+     */
     private void initView(ActiveViewBean activeViewBean) {
         LogUtils.d(TAG, "start viewId:" + activeViewBean.toString());
 
@@ -279,6 +304,11 @@ public class FTRUMGlobalManager {
         });
     }
 
+    /**
+     *  增加 Resource 数量
+     * @param viewId view 唯一 id
+     * @param actionId action 唯一 id
+     */
     private void increaseResourceCount(String viewId, String actionId) {
         EventConsumerThreadPool.get().execute(() -> {
             FTDBManager.get().increaseViewResource(viewId);
@@ -289,6 +319,10 @@ public class FTRUMGlobalManager {
     }
 
 
+    /**
+     * 增加 Error 数量
+     * @param tags
+     */
     private void increaseError(@NonNull JSONObject tags) {
 
         String actionId = tags.optString(Constants.KEY_RUM_ACTION_ID);

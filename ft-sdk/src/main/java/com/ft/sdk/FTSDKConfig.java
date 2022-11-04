@@ -17,15 +17,25 @@ public class FTSDKConfig {
     //是否是Debug
     private boolean isDebug;
 
+    /**
+     * 是否可访问 Android ID
+     */
     private boolean enableAccessAndroidID = true;
 
-
-    //崩溃日志的环境
+    /**
+     * 数据上传环境
+     */
     private EnvType env = EnvType.PROD;
 
-    // SDK 是否只支持在主进程中初始化
+    /**
+     * SDK 是否只支持在主进程中初始化
+     * {@link FTSDKConfig.setOnlySupportMainProcess}
+     */
     private boolean onlySupportMainProcess = true;
 
+    /**
+     *
+     */
     private final HashMap<String, Object> globalContext = new HashMap<>();
 
     /**
@@ -42,7 +52,7 @@ public class FTSDKConfig {
     /**
      * SDK 配置项构造方法
      *
-     * @param metricsUrl
+     * @param metricsUrl  datakit 上传地址
      */
     private FTSDKConfig(String metricsUrl) {
         this.metricsUrl = metricsUrl;
@@ -53,14 +63,23 @@ public class FTSDKConfig {
     }
 
 
+    /**
+     * @return 是否处于 debug 状态
+     */
     public boolean isDebug() {
         return isDebug;
     }
 
+    /**
+     * @return 获取环境变量请问
+     */
     public EnvType getEnv() {
         return env;
     }
 
+    /**
+     * @return 是否支持主进程
+     */
     public boolean isOnlySupportMainProcess() {
         return onlySupportMainProcess;
     }
@@ -134,8 +153,8 @@ public class FTSDKConfig {
     /**
      * 添加全局属性
      *
-     * @param key
-     * @param value
+     * @param key 键名
+     * @param value jian
      * @return
      */
     public FTSDKConfig addGlobalContext(@NonNull String key, @NonNull String value) {
