@@ -76,8 +76,8 @@ class LifeCircleTraceCallback {
                 FTAppStartCounter.get().codeStart(now - codeStartTime);
                 if (manager.isRumEnable()) {
                     FTAppStartCounter.get().codeStartUpload();
+                    FTAppStartCounter.get().resetCodeStartTimeline();
                 }
-                FTAppStartCounter.get().resetCodeStartTimeline();
             } else {
                 if (manager.isRumEnable()) {
                     FTAppStartCounter.get().hotStart(now - startTime);
