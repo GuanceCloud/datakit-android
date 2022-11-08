@@ -39,7 +39,6 @@ import okhttp3.OkHttpClient;
  */
 public class FTAutoTrack {
     public final static String TAG = "FTAutoTrack";
-    public final static String WEBVIEW_HANDLED_FLAG = "webview_auto_track_handled";
 
     /**
      * 启动 APP

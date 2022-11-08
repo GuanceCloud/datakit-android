@@ -227,7 +227,7 @@ public class FTTrackInner {
     /**
      * 判断是否需要执行同步策略
      *
-     * @param recordDataList
+     * @param recordDataList  {@link  SyncJsonData} 列表
      */
     private void judgeLogCachePolicy(@NonNull List<SyncJsonData> recordDataList) {
         //如果 OP 类型不等于 LOG 则直接进行数据库操作；否则执行同步策略，根据同步策略返回结果判断是否需要执行数据库操作

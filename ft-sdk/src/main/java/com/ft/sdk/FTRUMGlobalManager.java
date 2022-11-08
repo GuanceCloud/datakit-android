@@ -122,7 +122,7 @@ public class FTRUMGlobalManager {
      *
      * @param actionName action 名称
      * @param actionType action 类型
-     * @param property   action 属性参数
+     * @param property   附加属性参数
      */
     public void startAction(String actionName, String actionType, HashMap<String, Object> property) {
         startAction(actionName, actionType, false, property);
@@ -145,7 +145,7 @@ public class FTRUMGlobalManager {
      * @param actionName action 名称
      * @param actionType action 类型
      * @param needWait   是否需要等待
-     * @param property        action 属性参数
+     * @param property   附加属性参数
      */
     void startAction(String actionName, String actionType, boolean needWait, HashMap<String, Object> property) {
 
@@ -236,7 +236,7 @@ public class FTRUMGlobalManager {
 
     /**
      * @param resourceId
-     * @param property
+     * @param property   附加属性参数
      */
     public void stopResource(String resourceId, HashMap<String, Object> property) {
         ResourceBean bean = resourceBeanMap.get(resourceId);
@@ -280,6 +280,7 @@ public class FTRUMGlobalManager {
      * view 起始
      *
      * @param viewName 当前页面名称
+     * @param property 附加属性参数
      */
     public void startView(String viewName, HashMap<String, Object> property) {
         if (viewList.isEmpty() || !viewList.get(viewList.size() - 1).equals(viewName)) {
@@ -338,6 +339,11 @@ public class FTRUMGlobalManager {
         stopView(null);
     }
 
+    /**
+     * view 结束
+     *
+     * @param property 附加属性参数
+     */
     public void stopView(HashMap<String, Object> property) {
         checkActionClose();
         if (property != null) {
@@ -352,7 +358,7 @@ public class FTRUMGlobalManager {
     /**
      * 初始化 action
      *
-     * @param activeActionBean
+     * @param activeActionBean 当前激活的操作
      */
     private void initAction(ActiveActionBean activeActionBean) {
         ActionBean bean = activeActionBean.convertToActionBean();
@@ -366,7 +372,7 @@ public class FTRUMGlobalManager {
     /**
      * 初始化 view
      *
-     * @param activeViewBean
+     * @param activeViewBean 当前激活的页面
      */
     private void initView(ActiveViewBean activeViewBean) {
         LogUtils.d(TAG, "start viewId:" + activeViewBean.toString());
@@ -410,7 +416,7 @@ public class FTRUMGlobalManager {
     }
 
     /**
-     * 添加错误
+     * 添加错误信息
      *
      * @param log       日志
      * @param message   消息
@@ -422,6 +428,15 @@ public class FTRUMGlobalManager {
     }
 
 
+    /**
+     * 添加错误信息
+     *
+     * @param log
+     * @param message
+     * @param errorType
+     * @param state
+     * @param map
+     */
     public void addError(String log, String message, ErrorType errorType, AppState state, HashMap<String, Object> map) {
         addError(log, message, Utils.getCurrentNanoTime(), errorType, state, map);
     }
@@ -717,6 +732,7 @@ public class FTRUMGlobalManager {
      *
      * @param resourceId
      * @param params
+     * @param netStatusBean
      */
     public void addResource(String resourceId, ResourceParams params, NetStatusBean netStatusBean) {
         setTransformContent(resourceId, params);
@@ -725,7 +741,7 @@ public class FTRUMGlobalManager {
 
     /**
      * 设置网络传输内容
-     *
+     * @param resourceId
      * @param params
      */
     void setTransformContent(String resourceId, ResourceParams params) {
@@ -1044,6 +1060,11 @@ public class FTRUMGlobalManager {
         }
     }
 
+    /**
+     *
+     * @param sessionId
+     * @return
+     */
     public boolean checkSessionWillCollect(String sessionId) {
         return !notCollectMap.contains(sessionId);
     }
@@ -1053,6 +1074,11 @@ public class FTRUMGlobalManager {
         viewList.clear();
     }
 
+    /**
+     * 检测
+     * @param key
+     * @param bean
+     */
     void checkToAddResource(String key, ResourceBean bean) {
         if (bean.contentSet && bean.netStateSet) {
             putRUMResourcePerformance(key);
