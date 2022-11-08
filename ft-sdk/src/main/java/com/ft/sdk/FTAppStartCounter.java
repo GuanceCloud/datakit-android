@@ -3,9 +3,6 @@ package com.ft.sdk;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
-import java.util.Map;
-import java.util.Set;
-
 /**
  * 启动计时
  */
@@ -61,6 +58,7 @@ class FTAppStartCounter {
     void checkToReUpload() {
         if (codeStartTime > 0) {
             codeStartUpload();
+            resetCodeStartTimeline();
         }
     }
 
