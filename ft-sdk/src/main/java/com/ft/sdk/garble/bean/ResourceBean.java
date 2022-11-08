@@ -2,6 +2,8 @@ package com.ft.sdk.garble.bean;
 
 import com.ft.sdk.garble.utils.Utils;
 
+import java.util.HashMap;
+
 public class ResourceBean {
 
     public String url = "";
@@ -39,6 +41,7 @@ public class ResourceBean {
     public String viewReferrer;
     public String actionId;
     public String actionName;
+    public HashMap<String,Object> map = new HashMap<>();
 
     public boolean netStateSet = false;
     public boolean contentSet = false;

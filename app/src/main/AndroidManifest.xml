@@ -32,6 +32,7 @@
         <activity android:name=".FirstActivity" />
         <activity android:name=".RepeatActivity" />
         <activity android:name=".TabViewActivity" />
+        <activity android:name=".ManualRUMActivity" />
     </application>
 
 </manifest>

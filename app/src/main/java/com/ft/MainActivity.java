@@ -112,6 +112,11 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(MainActivity.this, FirstActivity.class));
 
         });
+
+        findViewById(R.id.main_manual_rum_btn).setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, ManualRUMActivity.class));
+
+        });
     }
 
     @Override

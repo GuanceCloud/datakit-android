@@ -10,6 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.UUID;
 
 public class ViewBean {
@@ -40,6 +41,12 @@ public class ViewBean {
     int batteryCurrentMax;
 
     String sessionId;
+
+    HashMap<String, Object> property = new HashMap<>();
+
+    public HashMap<String, Object> getProperty() {
+        return property;
+    }
 
     public String getViewReferrer() {
         return viewReferrer;
@@ -212,6 +219,7 @@ public class ViewBean {
         map.put(Constants.KEY_CPU_TICK_COUNT_PER_SECOND, cpuTickCount);
         map.put(Constants.KEY_MEMORY_AVG, memoryAvg);
         map.put(Constants.KEY_MEMORY_MAX, memoryMax);
+        map.put(Constants.KEY_RUM_PROPERTY, property);
         return new Gson().toJson(map);
     }
 
@@ -227,6 +235,15 @@ public class ViewBean {
             this.cpuTickCountPerSecond = json.optDouble(Constants.KEY_CPU_TICK_COUNT);
             this.cpuTickCount = json.optLong(Constants.KEY_CPU_TICK_COUNT_PER_SECOND);
 
+            JSONObject jsonProperty = json.optJSONObject(Constants.KEY_RUM_PROPERTY);
+            if (jsonProperty != null) {
+                Iterator<String> keys = jsonProperty.keys();
+
+                while (keys.hasNext()) {
+                    String key = keys.next();
+                    this.property.put(key, jsonProperty.opt(key));
+                }
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }

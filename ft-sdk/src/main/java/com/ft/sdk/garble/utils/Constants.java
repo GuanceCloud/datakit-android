@@ -100,7 +100,6 @@ public class Constants {
     public static final String KEY_NETWORK_RESPONSE_TIME = "network_response_time";
 
 
-
     public static final String KEY_SERVICE = "service";
     public static final String KEY_ENV = "env";
     public static final String KEY_APPLICATION_UUID = "application_uuid";
@@ -190,6 +189,8 @@ public class Constants {
     public static final String KEY_RUM_ACTION_RESOURCE_COUNT = "action_resource_count";
     public static final String KEY_RUM_ACTION_ERROR_COUNT = "action_error_count";
     public static final String KEY_RUM_ACTION_DURATION = "duration";
+
+    public static final String KEY_RUM_PROPERTY = "property";
 
 
     /**

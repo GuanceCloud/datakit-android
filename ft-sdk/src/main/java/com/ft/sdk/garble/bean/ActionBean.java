@@ -2,8 +2,15 @@ package com.ft.sdk.garble.bean;
 
 import androidx.annotation.NonNull;
 
+import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.Utils;
+import com.google.gson.Gson;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.UUID;
 
 public class ActionBean {
@@ -25,6 +32,12 @@ public class ActionBean {
     String viewId;
     String viewName;
     String viewReferrer;
+
+    HashMap<String, Object> property = new HashMap<>();
+
+    public HashMap<String, Object> getProperty() {
+        return property;
+    }
 
     public ActionBean() {
 
@@ -134,6 +147,33 @@ public class ActionBean {
 
     public void setViewReferrer(String viewReferrer) {
         this.viewReferrer = viewReferrer;
+    }
+
+    public String getAttrJsonString() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put(Constants.KEY_RUM_PROPERTY, property);
+        return new Gson().toJson(map);
+    }
+
+    public void setFromAttrJsonString(String jsonString) {
+        if (jsonString == null) return;
+        try {
+
+            JSONObject json = new JSONObject(jsonString);
+            JSONObject jsonProperty = json.optJSONObject(Constants.KEY_RUM_PROPERTY);
+            if (jsonProperty != null) {
+                Iterator<String> keys = jsonProperty.keys();
+
+                while (keys.hasNext()) {
+                    String key = keys.next();
+                    this.property.put(key, jsonProperty.opt(key));
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 
 

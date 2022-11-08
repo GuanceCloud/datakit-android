@@ -30,7 +30,9 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -90,7 +92,7 @@ public class FTRUMGlobalManager {
         return activeAction == null ? null : activeAction.getId();
     }
 
-    void addAction(String actionName, String actionType, long duration,long startTime) {
+    void addAction(String actionName, String actionType, long duration, long startTime) {
         String viewId = activeView != null ? activeView.getId() : null;
         String viewName = activeView != null ? activeView.getViewName() : null;
         String viewReferrer = activeView != null ? activeView.getViewReferrer() : null;
@@ -117,11 +119,35 @@ public class FTRUMGlobalManager {
 
     /**
      * action 起始
+     *
      * @param actionName action 名称
      * @param actionType action 类型
-     * @param needWait 是否需要等待
+     * @param property   action 属性参数
+     */
+    public void startAction(String actionName, String actionType, HashMap<String, Object> property) {
+        startAction(actionName, actionType, false, property);
+    }
+
+    /**
+     * action 起始
+     *
+     * @param actionName action 名称
+     * @param actionType action 类型
+     * @param needWait   是否需要等待
      */
     void startAction(String actionName, String actionType, boolean needWait) {
+        startAction(actionName, actionType, needWait, null);
+    }
+
+    /**
+     * action 起始
+     *
+     * @param actionName action 名称
+     * @param actionType action 类型
+     * @param needWait   是否需要等待
+     * @param property        action 属性参数
+     */
+    void startAction(String actionName, String actionType, boolean needWait, HashMap<String, Object> property) {
 
         String viewId = activeView != null ? activeView.getId() : null;
         String viewName = activeView != null ? activeView.getViewName() : null;
@@ -131,6 +157,9 @@ public class FTRUMGlobalManager {
         if (activeAction == null || activeAction.isClose()) {
             activeAction = new ActiveActionBean(actionName, actionType, sessionId, viewId, viewName, viewReferrer, needWait);
             initAction(activeAction);
+            if (property != null) {
+                activeAction.getProperty().putAll(property);
+            }
             this.lastActionTime = activeAction.getStartTime();
 
             mHandler.removeCallbacks(mActionRecheckRunner);
@@ -173,7 +202,19 @@ public class FTRUMGlobalManager {
      * @param resourceId 资源 Id
      */
     public void startResource(String resourceId) {
+        startResource(resourceId, null);
+    }
+
+    /**
+     * resource 起始
+     *
+     * @param resourceId 资源 Id
+     */
+    public void startResource(String resourceId, HashMap<String, Object> property) {
         ResourceBean bean = new ResourceBean();
+        if (property != null) {
+            bean.map.putAll(property);
+        }
         attachRUMRelativeForResource(bean);
         resourceBeanMap.put(resourceId, bean);
         String actionId = bean.actionId;
@@ -190,8 +231,19 @@ public class FTRUMGlobalManager {
      * @param resourceId 资源 Id
      */
     public void stopResource(String resourceId) {
+        startResource(resourceId, null);
+    }
+
+    /**
+     * @param resourceId
+     * @param property
+     */
+    public void stopResource(String resourceId, HashMap<String, Object> property) {
         ResourceBean bean = resourceBeanMap.get(resourceId);
         if (bean != null) {
+            if (property != null) {
+                bean.map.putAll(property);
+            }
             String actionId = bean.actionId;
             String viewId = bean.viewId;
             bean.endTime = Utils.getCurrentNanoTime();
@@ -206,6 +258,7 @@ public class FTRUMGlobalManager {
 
     /**
      * 创建 view
+     *
      * @param viewName 界面名称
      * @param loadTime 加载事件，单位毫秒 ms
      */
@@ -220,6 +273,15 @@ public class FTRUMGlobalManager {
      * @param viewName 当前页面名称
      */
     public void startView(String viewName) {
+        startView(viewName, null);
+    }
+
+    /**
+     * view 起始
+     *
+     * @param viewName 当前页面名称
+     */
+    public void startView(String viewName, HashMap<String, Object> property) {
         if (viewList.isEmpty() || !viewList.get(viewList.size() - 1).equals(viewName)) {
             viewList.add(viewName);
             if (viewList.size() > 2) {
@@ -241,6 +303,9 @@ public class FTRUMGlobalManager {
         }
         String viewReferrer = getLastView();
         activeView = new ActiveViewBean(viewName, viewReferrer, loadTime, sessionId);
+        if (property != null) {
+            activeView.getProperty().putAll(property);
+        }
         FTMonitorManager.get().addMonitor(activeView.getId());
         FTMonitorManager.get().attachMonitorData(activeView);
         initView(activeView);
@@ -270,16 +335,23 @@ public class FTRUMGlobalManager {
      * view 结束
      */
     public void stopView() {
+        stopView(null);
+    }
+
+    public void stopView(HashMap<String, Object> property) {
         checkActionClose();
+        if (property != null) {
+            activeView.getProperty().putAll(property);
+        }
         FTMonitorManager.get().attachMonitorData(activeView);
         FTMonitorManager.get().removeMonitor(activeView.getId());
         activeView.close();
         closeView(activeView);
-
     }
 
     /**
      * 初始化 action
+     *
      * @param activeActionBean
      */
     private void initAction(ActiveActionBean activeActionBean) {
@@ -293,6 +365,7 @@ public class FTRUMGlobalManager {
 
     /**
      * 初始化 view
+     *
      * @param activeViewBean
      */
     private void initView(ActiveViewBean activeViewBean) {
@@ -305,8 +378,9 @@ public class FTRUMGlobalManager {
     }
 
     /**
-     *  增加 Resource 数量
-     * @param viewId view 唯一 id
+     * 增加 Resource 数量
+     *
+     * @param viewId   view 唯一 id
      * @param actionId action 唯一 id
      */
     private void increaseResourceCount(String viewId, String actionId) {
@@ -321,6 +395,7 @@ public class FTRUMGlobalManager {
 
     /**
      * 增加 Error 数量
+     *
      * @param tags
      */
     private void increaseError(@NonNull JSONObject tags) {
@@ -346,6 +421,11 @@ public class FTRUMGlobalManager {
         addError(log, message, Utils.getCurrentNanoTime(), errorType, state);
     }
 
+
+    public void addError(String log, String message, ErrorType errorType, AppState state, HashMap<String, Object> map) {
+        addError(log, message, Utils.getCurrentNanoTime(), errorType, state, map);
+    }
+
     /**
      * 添加错误
      *
@@ -356,6 +436,20 @@ public class FTRUMGlobalManager {
      * @param dateline  发生时间，纳秒
      */
     public void addError(String log, String message, long dateline, ErrorType errorType, AppState state) {
+        addError(log, message, dateline, errorType, state, null);
+    }
+
+    /**
+     * 添加错误
+     *
+     * @param log       日志
+     * @param message   消息
+     * @param errorType 错误类型
+     * @param state     程序运行状态
+     * @param dateline  发生时间，纳秒
+     */
+    public void addError(String log, String message, long dateline, ErrorType errorType,
+                         AppState state, HashMap<String, Object> map) {
         try {
             JSONObject tags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
             attachRUMRelative(tags, true);
@@ -363,6 +457,15 @@ public class FTRUMGlobalManager {
             tags.put(Constants.KEY_RUM_ERROR_TYPE, errorType.toString());
             tags.put(Constants.KEY_RUM_ERROR_SOURCE, ErrorSource.LOGGER.toString());
             tags.put(Constants.KEY_RUM_ERROR_SITUATION, state.toString());
+
+            if (map != null) {
+                for (Map.Entry<String, Object> entry : map.entrySet()) {
+                    String key = entry.getKey();
+                    Object value = entry.getValue();
+                    fields.put(key, value);
+                }
+            }
+
             fields.put(Constants.KEY_RUM_ERROR_MESSAGE, message);
             fields.put(Constants.KEY_RUM_ERROR_STACK, log);
 
@@ -404,7 +507,7 @@ public class FTRUMGlobalManager {
      * @param log      日志内容
      * @param duration 持续时间，纳秒
      */
-    public void addLongTask(String log, long duration) {
+    public void addLongTask(String log, long duration, HashMap<String, Object> map) {
         try {
             long time = Utils.getCurrentNanoTime();
             JSONObject tags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
@@ -413,12 +516,30 @@ public class FTRUMGlobalManager {
             fields.put(Constants.KEY_RUM_LONG_TASK_DURATION, duration);
             fields.put(Constants.KEY_RUM_LONG_TASK_STACK, log);
 
+            if (map != null) {
+                for (Map.Entry<String, Object> entry : map.entrySet()) {
+                    String key = entry.getKey();
+                    Object value = entry.getValue();
+                    fields.put(key, value);
+                }
+            }
+
             FTTrackInner.getInstance().rum(time, Constants.FT_MEASUREMENT_RUM_LONG_TASK, tags, fields);
             increaseLongTask(tags);
 
         } catch (Exception e) {
             LogUtils.e(TAG, e.getMessage());
         }
+    }
+
+    /**
+     * 添加长任务
+     *
+     * @param log      日志内容
+     * @param duration 持续时间，纳秒
+     */
+    public void addLongTask(String log, long duration) {
+        addLongTask(log, duration, null);
     }
 
     void setNetState(String resourceId, NetStatusBean netStatusBean) {
@@ -536,6 +657,11 @@ public class FTRUMGlobalManager {
 
 
             tags.put(Constants.KEY_RUM_RESOURCE_URL, bean.url);
+            for (Map.Entry<String, Object> entry : bean.map.entrySet()) {
+                String key = entry.getKey();
+                Object value = entry.getValue();
+                fields.put(key, value);
+            }
             fields.put(Constants.KEY_RUM_REQUEST_HEADER, bean.requestHeader);
             fields.put(Constants.KEY_RUM_RESPONSE_HEADER, bean.responseHeader);
 
@@ -801,10 +927,16 @@ public class FTRUMGlobalManager {
                 tags.put(Constants.KEY_RUM_ACTION_ID, bean.getId());
                 tags.put(Constants.KEY_RUM_ACTION_TYPE, bean.getActionType());
                 tags.put(Constants.KEY_RUM_SESSION_ID, bean.getSessionId());
+                for (Map.Entry<String, Object> entry : bean.getProperty().entrySet()) {
+                    String key = entry.getKey();
+                    Object value = entry.getValue();
+                    fields.put(key, value);
+                }
                 fields.put(Constants.KEY_RUM_ACTION_LONG_TASK_COUNT, bean.getLongTaskCount());
                 fields.put(Constants.KEY_RUM_ACTION_RESOURCE_COUNT, bean.getResourceCount());
                 fields.put(Constants.KEY_RUM_ACTION_ERROR_COUNT, bean.getErrorCount());
                 fields.put(Constants.KEY_RUM_ACTION_DURATION, bean.getDuration());
+
                 FTTrackInner.getInstance().rum(bean.getStartTime(),
                         Constants.FT_MEASUREMENT_RUM_ACTION, tags, fields);
             } catch (JSONException e) {
@@ -831,6 +963,11 @@ public class FTRUMGlobalManager {
                 tags.put(Constants.KEY_RUM_VIEW_NAME, bean.getViewName());
                 tags.put(Constants.KEY_RUM_VIEW_REFERRER, bean.getViewReferrer());
                 tags.put(Constants.KEY_RUM_VIEW_ID, bean.getId());
+                for (Map.Entry<String, Object> entry : bean.getProperty().entrySet()) {
+                    String key = entry.getKey();
+                    Object value = entry.getValue();
+                    fields.put(key, value);
+                }
                 if (bean.getLoadTime() > 0) {
                     fields.put(Constants.KEY_RUM_VIEW_LOAD, bean.getLoadTime());
                 }
@@ -868,6 +1005,7 @@ public class FTRUMGlobalManager {
                     fields.put(Constants.KEY_FPS_MINI, bean.getFpsMini());
 
                 }
+
 
             } catch (JSONException e) {
                 LogUtils.e(TAG, e.getMessage());

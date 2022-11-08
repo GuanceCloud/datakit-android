@@ -5,6 +5,9 @@ import com.ft.sdk.garble.utils.Constants;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * create: by huangDianHua
  * time: 2020/6/5 15:08:45
@@ -19,6 +22,12 @@ public class LogBean extends BaseContentBean {
     //用于链路日志，当前链路的请求响应时间，微秒为单位
     long duration;
 
+    HashMap<String, Object> property = new HashMap<>();
+
+    public HashMap<String, Object> getProperty() {
+        return property;
+    }
+
     public LogBean(String content, long time) {
         super(content, time);
     }
@@ -28,6 +37,14 @@ public class LogBean extends BaseContentBean {
         try {
             if (duration > 0) {
                 fields.put(Constants.KEY_TIME_COST_DURATION, duration);
+            }
+
+            if (!property.isEmpty()) {
+                for (Map.Entry<String, Object> entry : property.entrySet()) {
+                    String key = entry.getKey();
+                    Object value = entry.getValue();
+                    fields.put(key, value);
+                }
             }
         } catch (JSONException e) {
             e.printStackTrace();

@@ -116,6 +116,7 @@ public class FTDBManager extends DBManager {
             contentValues.put(FTSQL.RUM_COLUMN_ACTION_DURATION, data.getDuration());
             contentValues.put(FTSQL.RUM_COLUMN_ACTION_NAME, data.getActionName());
             contentValues.put(FTSQL.RUM_COLUMN_ACTION_TYPE, data.getActionType());
+            contentValues.put(FTSQL.RUM_COLUMN_EXTRA_ATTR, data.getAttrJsonString());
             db.insert(FTSQL.FT_TABLE_ACTION, null, contentValues);
         });
     }
@@ -297,6 +298,7 @@ public class FTDBManager extends DBManager {
                     bean.setResourceCount(resourceCount);
                     bean.setDuration(duration);
                     bean.setStartTime(startTime);
+                    bean.setFromAttrJsonString(attr);
                     list.add(bean);
                     LogUtils.d(TAG, bean.toString());
 
