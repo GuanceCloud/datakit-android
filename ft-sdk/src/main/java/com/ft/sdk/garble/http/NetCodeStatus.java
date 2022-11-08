@@ -37,9 +37,4 @@ public class NetCodeStatus {
      */
     public static final int UNKNOWN_EXCEPTION_CODE = 10004;
 
-    /**
-     * token 错误
-     */
-    public static final int TOKEN_ERROR = 10005;
-
 }
