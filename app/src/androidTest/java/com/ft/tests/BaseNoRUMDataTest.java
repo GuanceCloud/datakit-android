@@ -22,7 +22,7 @@ abstract public class BaseNoRUMDataTest extends BaseTest {
     @Test
     public void viewGenerateTest() throws Exception {
         invokeGenerateRumData();
-        Thread.sleep(3000);
+        Thread.sleep(1000);
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0,
                 DataType.RUM_APP);
 
@@ -38,7 +38,7 @@ abstract public class BaseNoRUMDataTest extends BaseTest {
         onView(ViewMatchers.withId(R.id.main_mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
 
         invokeCheckActionClose();
-        Thread.sleep(3000);
+        Thread.sleep(1000);
 
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
 
@@ -51,7 +51,7 @@ abstract public class BaseNoRUMDataTest extends BaseTest {
         onView(ViewMatchers.withId(R.id.main_mock_okhttp_btn)).perform(ViewActions.scrollTo()).perform(click());
         invokeCheckActionClose();
 
-        Thread.sleep(5000);
+        Thread.sleep(2000);
 
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
 

@@ -80,7 +80,7 @@ public class RUMViewDeviceMetricsTest extends BaseTest {
                 JSONObject json = new JSONObject(recordData.getDataString());
                 JSONObject fields = json.optJSONObject("fields");
                 String measurement = json.optString("measurement");
-                if ("view".equals(measurement)) {
+                if (Constants.FT_MEASUREMENT_RUM_VIEW.equals(measurement)) {
                     if (fields != null) {
                         if (!fields.optBoolean(Constants.KEY_RUM_VIEW_IS_ACTIVE, true)) {
                             Assert.assertTrue(fields.optDouble(Constants.KEY_CPU_TICK_COUNT_PER_SECOND) > 0);

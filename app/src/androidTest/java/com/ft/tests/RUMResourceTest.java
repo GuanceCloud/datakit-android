@@ -69,7 +69,7 @@ public class RUMResourceTest extends BaseTest {
         onView(ViewMatchers.withId(R.id.main_mock_okhttp_btn)).perform(ViewActions.scrollTo()).perform(click());
         invokeCheckActionClose();
 
-        Thread.sleep(5000);
+        Thread.sleep(1000);
 
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
 

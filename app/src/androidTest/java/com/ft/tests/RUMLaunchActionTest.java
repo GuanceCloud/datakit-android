@@ -62,7 +62,7 @@ public class RUMLaunchActionTest extends BaseTest {
         invokeGenerateRumData();
         Thread.sleep(3000);
 
-        Assert.assertTrue(CheckUtils.checkValue(DataType.RUM_APP, "launch", 0));
+        Assert.assertTrue(CheckUtils.checkValueInLineProtocol(DataType.RUM_APP, "launch"));
     }
 
 

@@ -72,7 +72,7 @@ public class RUMClickActionTest extends BaseTest {
         onView(ViewMatchers.withId(R.id.main_mock_click_btn)).perform(ViewActions.scrollTo()).perform(click());
 
         invokeCheckActionClose();
-        Thread.sleep(3000);
+        Thread.sleep(300);
 
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
 

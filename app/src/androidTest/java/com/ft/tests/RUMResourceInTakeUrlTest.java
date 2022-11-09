@@ -22,6 +22,7 @@ import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
+import com.ft.sdk.garble.utils.Constants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -70,8 +71,7 @@ public class RUMResourceInTakeUrlTest extends BaseTest {
         Thread.sleep(2000);
         onView(ViewMatchers.withId(R.id.main_mock_okhttp_btn)).perform(ViewActions.scrollTo()).perform(click());
         invokeCheckActionClose();
-
-        Thread.sleep(5000);
+        Thread.sleep(1000);
 
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
 
@@ -80,9 +80,9 @@ public class RUMResourceInTakeUrlTest extends BaseTest {
                 JSONObject json = new JSONObject(recordData.getDataString());
                 JSONObject fields = json.optJSONObject("fields");
                 String measurement = json.optString("measurement");
-                if ("action".equals(measurement)) {
+                if (Constants.FT_MEASUREMENT_RUM_ACTION.equals(measurement)) {
                     if (fields != null) {
-                        int resourceCount = fields.optInt("action_resource_count");
+                        int resourceCount = fields.optInt(Constants.KEY_RUM_ACTION_RESOURCE_COUNT);
                         Assert.assertEquals(0, resourceCount);
                         break;
                     }

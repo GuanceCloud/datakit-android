@@ -4,7 +4,6 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static com.ft.AllTests.hasPrepare;
 
-import android.content.Context;
 import android.os.Looper;
 
 import androidx.test.espresso.action.ViewActions;
@@ -16,7 +15,6 @@ import com.ft.BaseTest;
 import com.ft.BuildConfig;
 import com.ft.DebugMainActivity;
 import com.ft.R;
-import com.ft.application.MockApplication;
 import com.ft.sdk.EnvType;
 import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTSDKConfig;
@@ -80,7 +78,7 @@ public class RUMViewTest extends BaseTest {
                 JSONObject tags = json.optJSONObject("tags");
                 JSONObject fields = json.optJSONObject("fields");
                 String measurement = json.optString("measurement");
-                if ("view".equals(measurement)) {
+                if (Constants.FT_MEASUREMENT_RUM_VIEW.equals(measurement)) {
                     if (fields != null) {
                         if (fields.optBoolean(Constants.KEY_RUM_VIEW_IS_ACTIVE, false)) {
                             if (tags != null) {
@@ -113,11 +111,11 @@ public class RUMViewTest extends BaseTest {
                 JSONObject tags = json.optJSONObject("tags");
                 JSONObject fields = json.optJSONObject("fields");
                 String measurement = json.optString("measurement");
-                if ("view".equals(measurement)) {
+                if (Constants.FT_MEASUREMENT_RUM_VIEW.equals(measurement)) {
                     if (fields != null) {
-                        if (fields.optBoolean("is_active", false)) {
+                        if (fields.optBoolean(Constants.KEY_RUM_VIEW_IS_ACTIVE, false)) {
                             if (tags != null) {
-                                newViewId = tags.optString("view_id");
+                                newViewId = tags.optString(Constants.KEY_RUM_VIEW_ID);
                                 break;
                             }
                         }

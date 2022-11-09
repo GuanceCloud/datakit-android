@@ -72,7 +72,7 @@ public class ErrorTraceTest extends BaseTest {
         onView(ViewMatchers.withId(R.id.main_mock_crash_btn)).perform(ViewActions.scrollTo()).perform(click());
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
-        Assert.assertTrue(CheckUtils.checkValue(DataType.RUM_APP, "ArithmeticException", 0));
+        Assert.assertTrue(CheckUtils.checkValueInLineProtocol(DataType.RUM_APP, "ArithmeticException"));
     }
 
 

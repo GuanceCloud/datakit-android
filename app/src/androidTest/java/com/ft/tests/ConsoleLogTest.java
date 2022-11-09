@@ -13,6 +13,7 @@ import com.ft.BuildConfig;
 import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
+import com.ft.sdk.SyncTaskManager;
 import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.Status;
@@ -45,34 +46,33 @@ public class ConsoleLogTest extends BaseTest {
     }
 
     @Test
-    public void consoleLogTest() throws InterruptedException {
+    public void consoleLogTest() throws Exception {
         FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableConsoleLog(true));
         Log.d("TestLog", "控制台日志测试用例qaws");
-        Thread.sleep(4000);
-        Assert.assertTrue(CheckUtils.checkValue(DataType.LOG, "控制台日志测试用例qaws", 10));
+        Thread.sleep(300);
+        Assert.assertTrue(CheckUtils.checkValueInLineProtocol(DataType.LOG, "控制台日志测试用例qaws"));
 
     }
 
     @Test
-    public void consoleLogPrefixTest() throws InterruptedException {
+    public void consoleLogPrefixTest() throws Exception {
         FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableConsoleLog(true, "debug"));
 
         String logContent = "logTest";
         Log.d("TestLog", logContent);
-
         Thread.sleep(1000);
-        Assert.assertFalse(CheckUtils.checkValue(DataType.LOG, logContent, 10));
+        Assert.assertFalse(CheckUtils.checkValueInLineProtocol(DataType.LOG, logContent));
 
         logContent = "debug log test";
         Log.d("TestLog", logContent);
         Thread.sleep(1000);
-        Assert.assertTrue(CheckUtils.checkValue(DataType.LOG, logContent, 10));
+        Assert.assertTrue(CheckUtils.checkValueInLineProtocol(DataType.LOG, logContent));
 
 
     }
 
     @Test
-    public void consoleLogLevelTest() throws InterruptedException {
+    public void consoleLogLevelTest() throws Exception {
         FTSdk.initLogWithConfig(new FTLoggerConfig()
                 .setEnableConsoleLog(true)
                 .setLogLevelFilters(new Status[]{Status.ERROR}));
