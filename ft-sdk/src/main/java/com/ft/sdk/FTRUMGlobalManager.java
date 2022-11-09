@@ -213,7 +213,7 @@ public class FTRUMGlobalManager {
     public void startResource(String resourceId, HashMap<String, Object> property) {
         ResourceBean bean = new ResourceBean();
         if (property != null) {
-            bean.map.putAll(property);
+            bean.property.putAll(property);
         }
         attachRUMRelativeForResource(bean);
         resourceBeanMap.put(resourceId, bean);
@@ -231,7 +231,7 @@ public class FTRUMGlobalManager {
      * @param resourceId 资源 Id
      */
     public void stopResource(String resourceId) {
-        startResource(resourceId, null);
+        stopResource(resourceId, null);
     }
 
     /**
@@ -242,7 +242,7 @@ public class FTRUMGlobalManager {
         ResourceBean bean = resourceBeanMap.get(resourceId);
         if (bean != null) {
             if (property != null) {
-                bean.map.putAll(property);
+                bean.property.putAll(property);
             }
             String actionId = bean.actionId;
             String viewId = bean.viewId;
@@ -435,10 +435,10 @@ public class FTRUMGlobalManager {
      * @param message
      * @param errorType
      * @param state
-     * @param map
+     * @param property
      */
-    public void addError(String log, String message, ErrorType errorType, AppState state, HashMap<String, Object> map) {
-        addError(log, message, Utils.getCurrentNanoTime(), errorType, state, map);
+    public void addError(String log, String message, ErrorType errorType, AppState state, HashMap<String, Object> property) {
+        addError(log, message, Utils.getCurrentNanoTime(), errorType, state, property);
     }
 
     /**
@@ -464,7 +464,7 @@ public class FTRUMGlobalManager {
      * @param dateline  发生时间，纳秒
      */
     public void addError(String log, String message, long dateline, ErrorType errorType,
-                         AppState state, HashMap<String, Object> map) {
+                         AppState state, HashMap<String, Object> property) {
         try {
             JSONObject tags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
             attachRUMRelative(tags, true);
@@ -473,8 +473,8 @@ public class FTRUMGlobalManager {
             tags.put(Constants.KEY_RUM_ERROR_SOURCE, ErrorSource.LOGGER.toString());
             tags.put(Constants.KEY_RUM_ERROR_SITUATION, state.toString());
 
-            if (map != null) {
-                for (Map.Entry<String, Object> entry : map.entrySet()) {
+            if (property != null) {
+                for (Map.Entry<String, Object> entry : property.entrySet()) {
                     String key = entry.getKey();
                     Object value = entry.getValue();
                     fields.put(key, value);
@@ -522,7 +522,7 @@ public class FTRUMGlobalManager {
      * @param log      日志内容
      * @param duration 持续时间，纳秒
      */
-    public void addLongTask(String log, long duration, HashMap<String, Object> map) {
+    public void addLongTask(String log, long duration, HashMap<String, Object> property) {
         try {
             long time = Utils.getCurrentNanoTime();
             JSONObject tags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
@@ -531,8 +531,8 @@ public class FTRUMGlobalManager {
             fields.put(Constants.KEY_RUM_LONG_TASK_DURATION, duration);
             fields.put(Constants.KEY_RUM_LONG_TASK_STACK, log);
 
-            if (map != null) {
-                for (Map.Entry<String, Object> entry : map.entrySet()) {
+            if (property != null) {
+                for (Map.Entry<String, Object> entry : property.entrySet()) {
                     String key = entry.getKey();
                     Object value = entry.getValue();
                     fields.put(key, value);
@@ -672,7 +672,7 @@ public class FTRUMGlobalManager {
 
 
             tags.put(Constants.KEY_RUM_RESOURCE_URL, bean.url);
-            for (Map.Entry<String, Object> entry : bean.map.entrySet()) {
+            for (Map.Entry<String, Object> entry : bean.property.entrySet()) {
                 String key = entry.getKey();
                 Object value = entry.getValue();
                 fields.put(key, value);

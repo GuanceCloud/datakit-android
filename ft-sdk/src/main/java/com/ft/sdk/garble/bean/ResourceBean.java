@@ -41,7 +41,7 @@ public class ResourceBean {
     public String viewReferrer;
     public String actionId;
     public String actionName;
-    public HashMap<String,Object> map = new HashMap<>();
+    public HashMap<String,Object> property = new HashMap<>();
 
     public boolean netStateSet = false;
     public boolean contentSet = false;
