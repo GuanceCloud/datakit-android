@@ -41,8 +41,8 @@ public class LogGlobalContextTest extends FTBaseTest {
     @Test
     public void logGlobalContextTest() {
         FTLogger.getInstance().logBackground("test Log", Status.INFO);
-        Assert.assertTrue(CheckUtils.checkValue(DataType.LOG,
-                new String[]{CUSTOM_KEY, CUSTOM_VALUE}, 0));
+        Assert.assertTrue(CheckUtils.checkValueInLineProtocol(DataType.LOG,
+                new String[]{CUSTOM_KEY, CUSTOM_VALUE}));
 
     }
 }

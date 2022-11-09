@@ -16,6 +16,9 @@ import org.junit.Test;
 
 public class RUMUserBindTest extends FTBaseTest {
 
+    public static final String USER_ID = "123456";
+    public static final String IS_SIGNIN_T = "is_signin=T";
+
     @BeforeClass
     public static void setup() throws Exception {
         avoidCleanData();
@@ -27,24 +30,24 @@ public class RUMUserBindTest extends FTBaseTest {
     @Test
     public void rumUserBindTest() throws InterruptedException {
 
-        FTSdk.bindRumUserData("123456");
+        FTSdk.bindRumUserData(USER_ID);
         FTRUMGlobalManager.get().startView(ANY_VIEW);
         FTRUMGlobalManager.get().stopView();
         waitForInThreadPool();
         Thread.sleep(5000);
-        int except2 = CheckUtils.getCount(DataType.RUM_APP, "is_signin=T", 0);
+        int except2 = CheckUtils.getCount(DataType.RUM_APP, IS_SIGNIN_T, 0);
         Assert.assertTrue(except2 > 0);
     }
 
     @Test
     public void rumUserUnBindTest() throws InterruptedException {
-        FTSdk.bindRumUserData("123456");
+        FTSdk.bindRumUserData(USER_ID);
         FTSdk.unbindRumUserData();
         FTRUMGlobalManager.get().startView(ANY_VIEW);
         FTRUMGlobalManager.get().stopView();
         waitForInThreadPool();
         Thread.sleep(5000);
-        int except4 = CheckUtils.getCount(DataType.RUM_APP, "is_signin=T", 0);
+        int except4 = CheckUtils.getCount(DataType.RUM_APP, IS_SIGNIN_T, 0);
         Assert.assertEquals(0, except4);
     }
 

@@ -102,8 +102,8 @@ public class LogTest extends FTBaseTest {
                 String measurement = json.optString("measurement");
                 if (Constants.FT_LOG_DEFAULT_MEASUREMENT.equals(measurement)) {
                     if (tags != null) {
-                        viewId = tags.optString("view_id");
-                        sessionId = tags.optString("session_id");
+                        viewId = tags.optString(Constants.KEY_RUM_VIEW_ID);
+                        sessionId = tags.optString(Constants.KEY_RUM_SESSION_ID);
                         break;
                     }
                 }

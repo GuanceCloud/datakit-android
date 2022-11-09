@@ -37,7 +37,7 @@ public class FTBaseTest {
     protected static final String CUSTOM_KEY = "custom_key";
     protected static final String CUSTOM_VALUE = "custom_value";
     protected static final String TEST_FAKE_RUM_ID = "rumId";
-    protected static final String TEST_FAKE_URL = "http://test.url";
+    protected static final String TEST_FAKE_URL = "http://www.test.url";
 
 
     protected Context getContext() {

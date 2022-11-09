@@ -54,8 +54,8 @@ public class RUMGlobalContextTest extends FTBaseTest {
         FTRUMGlobalManager.get().stopView();
         waitForInThreadPool();
         Thread.sleep(3000L);
-        Assert.assertTrue(CheckUtils.checkValue(DataType.RUM_APP,
-                new String[]{CUSTOM_KEY, CUSTOM_VALUE}, 0));
+        Assert.assertTrue(CheckUtils.checkValueInLineProtocol(DataType.RUM_APP,
+                new String[]{CUSTOM_KEY, CUSTOM_VALUE}));
     }
 
 
