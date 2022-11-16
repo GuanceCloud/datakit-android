@@ -3,9 +3,6 @@ package com.ft.sdk;
 import com.ft.sdk.garble.http.HttpUrl;
 import com.ft.sdk.garble.utils.Utils;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -17,8 +14,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class FTTraceManager {
     private static final String TAG = "FTTraceManager";
-    private final ConcurrentHashMap<String, FTTraceManagerContainer> handlerMap =
-            new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, FTTraceManagerContainer> handlerMap
+            = new ConcurrentHashMap<>(1000);
 
 
     private static class SingletonHolder {
@@ -33,8 +30,7 @@ public class FTTraceManager {
     HashMap<String, String> getTraceHeader(String key, HttpUrl httpUrl) {
         FTTraceHandler handler = new FTTraceHandler();
 
-        HashMap<String, String> map = handler
-                .getTraceHeader(httpUrl);
+        HashMap<String, String> map = handler.getTraceHeader(httpUrl);
 
         handlerMap.put(key, new FTTraceManagerContainer(handler));
         return map;
@@ -49,8 +45,7 @@ public class FTTraceManager {
      * @throws MalformedURLException
      * @throws URISyntaxException
      */
-    public HashMap<String, String> getTraceHeader(String key, String urlString)
-            throws MalformedURLException, URISyntaxException {
+    public HashMap<String, String> getTraceHeader(String key, String urlString) throws MalformedURLException, URISyntaxException {
         URL url = Utils.parseFromUrl(urlString);
         return getTraceHeader(key, new HttpUrl(url.getHost(), url.getPath(), url.getPort(), urlString));
     }
@@ -135,8 +130,7 @@ public class FTTraceManager {
     }
 
     void checkToRemove(String key, FTTraceManagerContainer container) {
-        if (container.addResourced && container.resourceStop
-                || container.isTimeOut()) {
+        if (container.addResourced && container.resourceStop || container.isTimeOut()) {
             handlerMap.remove(key);
         }
     }

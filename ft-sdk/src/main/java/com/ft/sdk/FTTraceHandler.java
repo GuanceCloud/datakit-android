@@ -1,11 +1,8 @@
 package com.ft.sdk;
 
-import com.ft.sdk.garble.bean.TraceBean;
 import com.ft.sdk.garble.http.HttpUrl;
 import com.ft.sdk.garble.utils.SkyWalkingUtils;
 import com.ft.sdk.garble.utils.Utils;
-
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -29,7 +26,6 @@ public class FTTraceHandler {
 
     public static final String DD_TRACE_PARENT_SPAN_ID_KEY = "x-datadog-parent-id";
     public static final String DD_TRACE_SAMPLING_PRIORITY_KEY = "x-datadog-sampling-priority";
-    public static final String DD_TRACE_SAMPLED = "x-datadog-sampled";
     public static final String DD_TRACE_ORIGIN_KEY = "x-datadog-origin";
     //是否可以采样
     private final boolean enableTrace;
@@ -101,8 +97,7 @@ public class FTTraceHandler {
             traceID = Utils.getDDtraceNewId() + "";
             spanID = Utils.getDDtraceNewId() + "";
             headers.put(DD_TRACE_ORIGIN_KEY, "rum");
-            headers.put(DD_TRACE_SAMPLING_PRIORITY_KEY, "1");
-            headers.put(DD_TRACE_SAMPLED, sampled);
+            headers.put(DD_TRACE_SAMPLING_PRIORITY_KEY, enableTrace ? "2" : "-1");
             headers.put(DD_TRACE_PARENT_SPAN_ID_KEY, spanID);
             headers.put(DD_TRACE_TRACE_ID_KEY, traceID);
         } else if (config.getTraceType() == TraceType.SKYWALKING) {
