@@ -1,11 +1,15 @@
+# agent 1.3.8-beta03
+1.修改 DDtrace Header Propagation 规则
+
+---
 # agent 1.3.8-beta02
 1.修正冷启动时间在跨平台 SDK 应用错误的问题
 
-
+---
 # agent 1.3.8-beta01
 1.同 agent 1.3.8-alpha05
 
-
+---
 # agent 1.3.8-alpha05
 1. 启动时间统计优化
 2. Android ID 获取逻辑

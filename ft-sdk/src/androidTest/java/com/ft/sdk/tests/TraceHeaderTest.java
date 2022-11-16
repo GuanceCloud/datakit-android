@@ -2,7 +2,6 @@ package com.ft.sdk.tests;
 
 import static com.ft.sdk.FTTraceHandler.DD_TRACE_ORIGIN_KEY;
 import static com.ft.sdk.FTTraceHandler.DD_TRACE_PARENT_SPAN_ID_KEY;
-import static com.ft.sdk.FTTraceHandler.DD_TRACE_SAMPLED;
 import static com.ft.sdk.FTTraceHandler.DD_TRACE_SAMPLING_PRIORITY_KEY;
 import static com.ft.sdk.FTTraceHandler.JAEGER_KEY;
 import static com.ft.sdk.FTTraceHandler.SKYWALKING_V3_SW_8;
@@ -75,15 +74,12 @@ public class TraceHeaderTest {
         HashMap<String, String> headerMap = getHeaders();
 
         String traceId = headerMap.get(DD_TRACE_PARENT_SPAN_ID_KEY);
-        String sample = headerMap.get(DD_TRACE_SAMPLED);
         String key = headerMap.get(DD_TRACE_ORIGIN_KEY);
         String samplingPriorityKey = headerMap.get(DD_TRACE_SAMPLING_PRIORITY_KEY);
         Assert.assertNotNull(traceId);
-        Assert.assertNotNull(sample);
         Assert.assertNotNull(samplingPriorityKey);
         Assert.assertNotNull(key);
         Assert.assertFalse(traceId.isEmpty());
-        Assert.assertFalse(sample.isEmpty());
         Assert.assertFalse(key.isEmpty());
         Assert.assertFalse(samplingPriorityKey.isEmpty());
 
