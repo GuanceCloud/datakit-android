@@ -79,6 +79,9 @@ public class Constants {
     public static final String KEY_MEMORY_AVG = "memory_avg";
     public static final String KEY_MEMORY_MAX = "memory_max";
     public static final String KEY_FPS_MINI = "fps_mini";
+    /**
+     *  FPS 平均值，数值越低代表帧数用户体验越差
+     */
     public static final String KEY_FPS_AVG = "fps_avg";
     public static final String KEY_BATTERY_CURRENT_AVG = "battery_current_avg";
     public static final String KEY_BATTERY_CURRENT_MAX = "battery_current_max";

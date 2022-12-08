@@ -35,6 +35,10 @@ public class FTRUMConfig {
     //设置全局 tag
     private final HashMap<String, Object> globalContext = new HashMap<>();
 
+    /**
+     * 获取采样率
+     * @return 采样率，浮点，0～1
+     */
     public float getSamplingRate() {
         return samplingRate;
     }
@@ -44,6 +48,10 @@ public class FTRUMConfig {
         return this;
     }
 
+    /**
+     * 获取 RUM AppId
+     * @return 返回 RUM AppId 字符
+     */
     public String getRumAppId() {
         return rumAppId;
     }

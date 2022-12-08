@@ -35,9 +35,9 @@ public class FTWebViewClient extends WebViewClient {
             .build();
     private String mOriginUrl;
 
-    private FTWebViewEventTracker mEventHelper = new FTWebViewEventTracker();
+    private final FTWebViewEventTracker mEventHelper = new FTWebViewEventTracker();
 
-    private CountDownLatch mCountDownLatch = new CountDownLatch(1);
+    private final CountDownLatch mCountDownLatch = new CountDownLatch(1);
 
     @Nullable
     @Override

@@ -83,6 +83,11 @@ public class MonitorRunnable implements Runnable {
 
     }
 
+    /**
+     *
+     * @param bean
+     * @param lastValue
+     */
     private void computeMonitorBean(MonitorInfoBean bean, double lastValue) {
         int count = bean.count + 1;
         bean.avgValue = (lastValue + (bean.count * bean.avgValue)) / count;

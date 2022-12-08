@@ -26,7 +26,6 @@ import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 import com.google.android.material.tabs.TabLayout;
 
-
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -82,7 +81,7 @@ public class FTAutoTrack {
      * Activity 开启
      * 警告！！！该方法不能删除
      *
-     * @deprecated 该方法原来被 FT Plugin 插件调用，目前不再使用。目前监控应用的启动使用{@link #startPage(Class)}方法
+     * @deprecated 该方法原来被 FT Plugin 插件调用，目前不再使用。
      */
     @Deprecated
     public static void activityOnCreate(Class clazz) {
@@ -98,7 +97,7 @@ public class FTAutoTrack {
      * Activity 关闭
      * 警告！！！该方法不能删除
      *
-     * @deprecated 该方法原来被 FT Plugin 插件调用，目前不再使用。目前监控应用的启动使用{@link #destroyPage(Class)}方法
+     * @deprecated 该方法原来被 FT Plugin 插件调用，目前不再使用。
      */
     @Deprecated
     public static void activityOnDestroy(Class clazz) {
@@ -138,7 +137,7 @@ public class FTAutoTrack {
      *
      * @param clazz
      * @param activity
-     * @deprecated 该方法原来被 FT Plugin 插件调用，目前不再使用。目前监控应用的启动使用{@link #startPage(Object, Object, String)}方法
+     * @deprecated 该方法原来被 FT Plugin 插件调用，目前不再使用。
      */
     @Deprecated
     public static void fragmentOnResume(Object clazz, Object activity) {
@@ -156,7 +155,7 @@ public class FTAutoTrack {
      *
      * @param clazz
      * @param activity
-     * @deprecated 该方法原来被 FT Plugin 插件调用，目前不再使用。目前监控应用的启动使用{@link #destroyPage(Object, Object, String)}方法
+     * @deprecated 该方法原来被 FT Plugin 插件调用，目前不再使用。
      */
     @Deprecated
     public static void fragmentOnPause(Object clazz, Object activity) {
@@ -170,8 +169,9 @@ public class FTAutoTrack {
 
     /**
      * 点击事件
+     * 警告！！！该方法不能删除
      *
-     * @param view
+     * @param view 点击触发的页面 {@link View}
      */
     public static void trackViewOnClick(View view) {
         if (view == null) {

@@ -123,7 +123,7 @@ public class FTMonitorManager {
 
 
     /**
-     * 清楚当前监控配置项
+     * 清除当前监控配置项
      */
     public static void release() {
         FpsUtils.release();

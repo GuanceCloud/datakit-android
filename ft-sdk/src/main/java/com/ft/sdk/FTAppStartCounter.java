@@ -5,15 +5,22 @@ import com.ft.sdk.garble.utils.Utils;
 
 /**
  * 启动计时
+ *
+ * <a href="https://docs.guance.com/real-user-monitoring/explorer/">查看器</a>
+ * @author Brandon
  */
 class FTAppStartCounter {
     private static final String TAG = "FTAppStartCounter";
+    /**
+     * 时间段，单位纳秒
+     */
     private long codeStartTime = 0;
+    /**
+     * 时间线，单位纳秒
+     */
     private long codeStartTimeLine = 0;
 
-    private FTAppStartCounter() {
-
-    }
+    private FTAppStartCounter() {}
 
     private static class SingletonHolder {
         private static final FTAppStartCounter INSTANCE = new FTAppStartCounter();
@@ -23,38 +30,62 @@ class FTAppStartCounter {
         return FTAppStartCounter.SingletonHolder.INSTANCE;
     }
 
+    /**
+     * 标记应用冷启动事件
+     */
     void markCodeStartTimeLine() {
         codeStartTimeLine = Utils.getCurrentNanoTime();
         LogUtils.d(TAG, "markCodeStartTimeLine");
     }
 
+    /**
+     * 获取冷启动时间
+     * @return  返回冷启动时间线，单位纳秒
+     */
     long getMarkCodeTimeLine() {
         return codeStartTimeLine;
     }
 
+    /**
+     * 重置冷启动时间线
+     */
     void resetCodeStartTimeline() {
         codeStartTimeLine = 0;
         LogUtils.d(TAG, "resetCodeStartTimeline");
     }
 
+    /**
+     * 记录冷启动时间段
+     * @param codeStartTime 冷启动时间段，单位纳秒
+     */
     void codeStart(long codeStartTime) {
         this.codeStartTime = codeStartTime;
         LogUtils.d(TAG, "codeStart:" + codeStartTime);
 
     }
 
+    /**
+     * 上传冷启动时间
+     */
     void codeStartUpload() {
         if (codeStartTime <= 0 || codeStartTimeLine <= 0) return;
         FTAutoTrack.putRUMLaunchPerformance(true, codeStartTime, codeStartTimeLine);
         codeStartTime = 0;
     }
 
-
+    /**
+     * 上传热启动时间
+     * @param hotStartTime 热启动时间段，单位纳秒
+     */
     void hotStart(long hotStartTime) {
         FTAutoTrack.putRUMLaunchPerformance(false, hotStartTime, Utils.getCurrentNanoTime());
     }
 
 
+    /**
+     * 检测重传，应用于生命周期，早于 SDK {@link FTSdk#install(FTSDKConfig)}的情况，一般用于第三方框架使用 ，
+     * 例如 flutter SDK，ReactNative SDK
+     */
     void checkToReUpload() {
         if (codeStartTime > 0) {
             codeStartUpload();

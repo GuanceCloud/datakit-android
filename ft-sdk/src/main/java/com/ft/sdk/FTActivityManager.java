@@ -7,27 +7,29 @@ import android.content.Context;
 
 import com.ft.sdk.garble.bean.AppState;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * BY huangDianHua
  * DATE:2019-12-06 13:36
- * Description: Activity 管理类
+ * Description: {@link Activity} 管理类
  */
 public final class FTActivityManager {
     public final static String TAG = "FTActivityManager";
     private static volatile FTActivityManager instance;
-    //栈顶 Activity
-    private Activity topActivity;
 
-    private ConcurrentHashMap<String, Boolean> activityOpenTypeMap;
+    /**
+     *
+     */
+    private final ConcurrentHashMap<String, Boolean> activityOpenTypeMap = new ConcurrentHashMap<>();
 
+    /**
+     * 默认为 {@link AppState#STARTUP}
+     */
     private AppState appState = AppState.STARTUP;
 
     private FTActivityManager() {
-        activityOpenTypeMap = new ConcurrentHashMap<>();
     }
 
     public synchronized static FTActivityManager get() {
@@ -42,29 +44,12 @@ public final class FTActivityManager {
     }
 
     /**
-     * 获得栈顶Activity
-     *
-     * @return
-     */
-    Activity getTopActivity() {
-        return topActivity;
-    }
-
-
-    void putActivity(Activity activity) {
-        topActivity = activity;
-    }
-
-    /**
-     * 存储每个 Activity 是由什么方式打开的
+     * 存储每个 {@link Activity} 是由什么方式打开的
      *
      * @param className
      * @param fromFragment
      */
     void putActivityOpenFromFragment(String className, boolean fromFragment) {
-        if (activityOpenTypeMap == null) {
-            activityOpenTypeMap = new ConcurrentHashMap<>();
-        }
         activityOpenTypeMap.put(className, fromFragment);
     }
 
@@ -75,8 +60,8 @@ public final class FTActivityManager {
      * @return
      */
     boolean getActivityOpenFromFragment(String className) {
-        if (activityOpenTypeMap != null && activityOpenTypeMap.containsKey(className)) {
-            return activityOpenTypeMap.get(className);
+        if (activityOpenTypeMap.containsKey(className)) {
+            return Boolean.TRUE.equals(activityOpenTypeMap.get(className));
         }
         return false;
     }
@@ -87,11 +72,14 @@ public final class FTActivityManager {
      * @param className
      */
     void removeActivityStatus(String className) {
-        if (activityOpenTypeMap != null) {
-            activityOpenTypeMap.remove(className);
-        }
+        activityOpenTypeMap.remove(className);
     }
 
+    /**
+     * 判断是否应用是否在前台
+     *
+     * @return true 前台，反之为后台
+     */
     public boolean isAppForeground() {
         ActivityManager am = (ActivityManager) FTApplication.getApplication().getSystemService(Context.ACTIVITY_SERVICE);
         if (am == null) return false;
@@ -107,10 +95,17 @@ public final class FTActivityManager {
         return false;
     }
 
+    /**
+     * 设置当前 {@link AppState}
+     * @param state {@link AppState}
+     */
     void setAppState(AppState state) {
         this.appState = state;
     }
 
+    /**
+     * @return {@link AppState}
+     */
     AppState getAppState() {
         return appState;
     }

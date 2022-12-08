@@ -29,7 +29,7 @@ public class FTSDKConfig {
 
     /**
      * SDK 是否只支持在主进程中初始化
-     * {@link FTSDKConfig.setOnlySupportMainProcess}
+     * {@link FTSDKConfig#setOnlySupportMainProcess(boolean)}
      */
     private boolean onlySupportMainProcess = true;
 

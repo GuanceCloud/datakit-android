@@ -13,19 +13,19 @@ public enum ErrorMonitorType {
      */
     ALL(0xFFFFFFFF),
     /**
-     * 当前电手机的电池量
+     * 当前电手机的电池量,{@link com.ft.sdk.garble.utils.Constants#KEY_BATTERY_USE}
      */
     BATTERY(1 << 1),
     /**
-     * 手机当前内存
+     * 手机当前内存,{@link com.ft.sdk.garble.utils.Constants#KEY_MEMORY_USE}
      */
     MEMORY(1 << 2),
     /**
-     * 当前 CPU 负载
+     * 当前 CPU 负载,{@link com.ft.sdk.garble.utils.Constants#KEY_CPU_USE}
      */
     CPU(1 << 3),
     /**
-     * 未设置状态
+     * 未设置状态,用于监控未设置判断 {@link  FTMonitorManager}
      */
     NO_SET(0);
     private final int value;

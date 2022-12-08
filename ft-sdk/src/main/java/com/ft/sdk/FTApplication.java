@@ -8,6 +8,11 @@ import java.lang.reflect.Method;
  * BY huangDianHua
  * DATE:2020-03-6 17:58
  * Description:
+ *
+ * 用于处理需要 {@link android.content.Context} 参数的情况，此为类的映射方式获取应该尽量避免此对象的使用，
+ * 避免后期被禁用使用的风险
+ *
+ *
  */
 public class FTApplication {
     private static volatile Application instance;
@@ -28,6 +33,12 @@ public class FTApplication {
 
     }
 
+    /**
+     * 获取当前应用实例
+     *
+     * @return 当前 {@link Application} 实例
+     *
+     */
     private static Application getCurrentApplication() {
         Object activityThread;
         try {

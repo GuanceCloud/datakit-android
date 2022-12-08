@@ -1,6 +1,9 @@
 package com.ft.sdk.garble.utils;
 
-import android.Manifest;
+import static com.ft.sdk.garble.utils.Constants.FT_SHARE_PER_FILE;
+import static com.ft.sdk.garble.utils.Constants.TAGS;
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -35,9 +38,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidKeyException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -45,15 +45,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
-import static com.ft.sdk.garble.utils.Constants.FT_SHARE_PER_FILE;
-import static com.ft.sdk.garble.utils.Constants.TAGS;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 import okhttp3.MediaType;
 import okhttp3.Request;
@@ -349,6 +340,7 @@ public class Utils {
 
     /**
      * 获取纳秒时间
+     *
      * @return
      */
     public static long getCurrentNanoTime() {
@@ -360,7 +352,7 @@ public class Utils {
         String method = request.method();
         String url = request.url().toString();
         RequestBody body = request.body();
-        if (body == null || body == RequestBody.create(null, new byte[0] )) {
+        if (body == null || body == RequestBody.create(null, new byte[0])) {
             return method + "_" + url;
         } else {
             long contentLength = 0;

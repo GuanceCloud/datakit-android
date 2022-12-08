@@ -6,9 +6,10 @@ package com.ft.sdk;
  * Description:
  */
 public enum FTAutoTrackType {
-    APP_START(1),APP_END(1<<1),APP_CLICK(1<<2);
-    public int type;
-    FTAutoTrackType(int type){
+    APP_START(1), APP_END(1 << 1), APP_CLICK(1 << 2);
+    public final int type;
+
+    FTAutoTrackType(int type) {
         this.type = type;
     }
 }
