@@ -80,12 +80,12 @@ public class DataSyncTest extends FTBaseTest {
         FTRUMGlobalManager.get().stopView();
 
         waitForInThreadPool();
-        Thread.sleep(5000);
+        Thread.sleep(2000);
         int except1 = CheckUtils.getCount(DataType.RUM_APP, Constants.FT_MEASUREMENT_RUM_VIEW, 0);
         Assert.assertTrue(except1 > 0);
         resumeSyncTask();
         executeSyncTask();
-        Thread.sleep(12000);
+        Thread.sleep(3000);
         int except2 = CheckUtils.getCount(DataType.RUM_APP, Constants.FT_MEASUREMENT_RUM_VIEW, 0);
         Assert.assertEquals(0, except2);
     }
@@ -101,7 +101,7 @@ public class DataSyncTest extends FTBaseTest {
         //产生一条日志数据
         FTLogger.getInstance().logBackground("----logUpdateDataTest----", Status.CRITICAL);
         //线程池中插入，有一定的时间延迟，这里设置5秒等待时间
-        Thread.sleep(5000);
+        Thread.sleep(3000);
         uploadData(DataType.LOG);
     }
 

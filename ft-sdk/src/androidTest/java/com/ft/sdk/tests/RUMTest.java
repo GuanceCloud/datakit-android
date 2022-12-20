@@ -126,7 +126,7 @@ public class RUMTest extends FTBaseTest {
         ActionBean action = list.get(0);
         Assert.assertEquals(action.getProperty().get(PROPERTY_NAME), PROPERTY_VALUE);
 
-        Thread.sleep(3000);
+        Thread.sleep(2000);
 
         Assert.assertTrue(CheckUtils.checkDynamicValue(PROPERTY_NAME, PROPERTY_VALUE,
                 Constants.FT_MEASUREMENT_RUM_ACTION, DataType.RUM_APP, false));
@@ -177,7 +177,7 @@ public class RUMTest extends FTBaseTest {
 
         invokeGenerateRumData();
 
-        Thread.sleep(3000);
+        Thread.sleep(2000);
 
         Assert.assertTrue(CheckUtils.checkDynamicValue(PROPERTY_NAME, PROPERTY_VALUE,
                 Constants.FT_MEASUREMENT_RUM_VIEW, DataType.RUM_APP, false));
@@ -190,7 +190,7 @@ public class RUMTest extends FTBaseTest {
 
         invokeGenerateRumData();
 
-        Thread.sleep(3000);
+        Thread.sleep(2000);
 
         Assert.assertTrue(CheckUtils.checkDynamicValue(PROPERTY_NAME, PROPERTY_OVERRIDE_VALUE,
                 Constants.FT_MEASUREMENT_RUM_VIEW, DataType.RUM_APP, false));
@@ -297,7 +297,7 @@ public class RUMTest extends FTBaseTest {
     public void resourceDataTest() throws InterruptedException {
         sendResource();
 
-        Thread.sleep(3000);
+        Thread.sleep(2000);
 
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
 
@@ -324,7 +324,7 @@ public class RUMTest extends FTBaseTest {
         property.put(PROPERTY_NAME, PROPERTY_VALUE);
         sendResource(property, null);
 
-        Thread.sleep(3000);
+        Thread.sleep(2000);
 
         Assert.assertTrue(CheckUtils.checkDynamicValue(PROPERTY_NAME, PROPERTY_VALUE,
                 Constants.FT_MEASUREMENT_RUM_RESOURCE, DataType.RUM_APP, false));
@@ -340,7 +340,7 @@ public class RUMTest extends FTBaseTest {
 
         sendResource(property, propertyOverride);
 
-        Thread.sleep(3000);
+        Thread.sleep(2000);
 
         Assert.assertTrue(CheckUtils.checkDynamicValue(PROPERTY_NAME, PROPERTY_OVERRIDE_VALUE,
                 Constants.FT_MEASUREMENT_RUM_RESOURCE, DataType.RUM_APP, false));
@@ -501,11 +501,11 @@ public class RUMTest extends FTBaseTest {
                 .setEnableAutoTrace(true)
                 .setEnableLinkRUMData(enableLinkRUMData)
         );
-        Thread.sleep(2000);
+        Thread.sleep(1000);
 
         RequestUtil.okhttpRequestUrl(mockWebServer.getUrl("/").toString());
 
-        Thread.sleep(5000);
+        Thread.sleep(1000);
 
         List<SyncJsonData> recordDataList = FTDBManager.get()
                 .queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);

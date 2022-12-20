@@ -69,9 +69,9 @@ public class RUMViewDeviceMetricsTest extends BaseTest {
     @Test
     public void viewDeviceMetricsTest() throws Exception {
         invokeGenerateRumData();
-        Thread.sleep(3000);
+        Thread.sleep(2000);
         onView(ViewMatchers.withId(R.id.main_view_loop_test)).perform(ViewActions.scrollTo()).perform(click());
-        Thread.sleep(3000);
+        Thread.sleep(2000);
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0,
                 DataType.RUM_APP);
 

@@ -67,7 +67,7 @@ public class RUMViewTest extends BaseTest {
     @Test
     public void viewGenerateTest() throws Exception {
         invokeGenerateRumData();
-        Thread.sleep(3000);
+        Thread.sleep(2000);
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0,
                 DataType.RUM_APP);
 

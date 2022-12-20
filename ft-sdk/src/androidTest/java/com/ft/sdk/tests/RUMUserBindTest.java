@@ -34,7 +34,7 @@ public class RUMUserBindTest extends FTBaseTest {
         FTRUMGlobalManager.get().startView(ANY_VIEW);
         FTRUMGlobalManager.get().stopView();
         waitForInThreadPool();
-        Thread.sleep(5000);
+        Thread.sleep(2000);
         int except2 = CheckUtils.getCount(DataType.RUM_APP, IS_SIGNIN_T, 0);
         Assert.assertTrue(except2 > 0);
     }
@@ -46,7 +46,7 @@ public class RUMUserBindTest extends FTBaseTest {
         FTRUMGlobalManager.get().startView(ANY_VIEW);
         FTRUMGlobalManager.get().stopView();
         waitForInThreadPool();
-        Thread.sleep(5000);
+        Thread.sleep(2000);
         int except4 = CheckUtils.getCount(DataType.RUM_APP, IS_SIGNIN_T, 0);
         Assert.assertEquals(0, except4);
     }

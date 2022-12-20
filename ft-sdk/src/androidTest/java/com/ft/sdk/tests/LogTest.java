@@ -33,11 +33,11 @@ public class LogTest extends FTBaseTest {
     public void logSampleRateZero() throws InterruptedException {
         FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableCustomLog(true).setSamplingRate(0));
 
-        Thread.sleep(2000);
+        Thread.sleep(1000);
 
         FTLogger.getInstance().logBackground("test", Status.CRITICAL);
 
-        Thread.sleep(5000);
+        Thread.sleep(2000);
 
         List<SyncJsonData> recordDataList = FTDBManager.get()
                 .queryDataByDataByTypeLimitDesc(0, DataType.LOG);
@@ -59,8 +59,8 @@ public class LogTest extends FTBaseTest {
         //产生一条日志数据
         String logContent = "----logInsertDataTest----";
         FTLogger.getInstance().logBackground(logContent, Status.CRITICAL);
-        //线程池中插入，有一定的时间延迟，这里设置5秒等待时间
-        Thread.sleep(5000);
+        //线程池中插入，有一定的时间延迟，这里设置3秒等待时间
+        Thread.sleep(2000);
         //从数据库中查询是否有插入的数据
         int except = CheckUtils.getCount(DataType.LOG, logContent, 0);
         Assert.assertEquals(1, except);
@@ -88,7 +88,7 @@ public class LogTest extends FTBaseTest {
         FTLogger.getInstance().logBackground("test", Status.CRITICAL);
         waitForInThreadPool();
 
-        Thread.sleep(5000);
+        Thread.sleep(2000);
 
         List<SyncJsonData> recordDataList = FTDBManager.get()
                 .queryDataByDataByTypeLimitDesc(0, DataType.LOG);

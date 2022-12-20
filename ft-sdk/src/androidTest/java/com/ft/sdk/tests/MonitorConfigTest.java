@@ -50,7 +50,7 @@ public class MonitorConfigTest extends FTBaseTest {
     public void monitorErrorTest() throws Exception {
         FTRUMGlobalManager.get().addError("log", "message", ErrorType.JAVA, AppState.RUN);
 
-        Thread.sleep(3000);
+        Thread.sleep(2000);
         Assert.assertTrue(CheckUtils.checkValueInLineProtocol(DataType.RUM_APP, new String[]{
                 Constants.KEY_BATTERY_USE,
                 Constants.KEY_MEMORY_TOTAL,

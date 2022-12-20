@@ -60,7 +60,7 @@ public class RUMLaunchActionTest extends BaseTest {
     public void rumActionLaunchTest() throws Exception {
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         invokeGenerateRumData();
-        Thread.sleep(3000);
+        Thread.sleep(2000);
 
         Assert.assertTrue(CheckUtils.checkValueInLineProtocol(DataType.RUM_APP, "launch"));
     }

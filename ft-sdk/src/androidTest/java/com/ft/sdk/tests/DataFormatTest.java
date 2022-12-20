@@ -42,7 +42,7 @@ public class DataFormatTest extends FTBaseTest {
         fields.put("floatValue", 0f);
         fields.put("doubleValue", 0d);
         invokeSyncData(DataType.LOG, "TestLog", null, fields);
-        Thread.sleep(5000);
+        Thread.sleep(3000);
 
         List<SyncJsonData> list = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.LOG);
         Assert.assertTrue(list.size() > 0);
