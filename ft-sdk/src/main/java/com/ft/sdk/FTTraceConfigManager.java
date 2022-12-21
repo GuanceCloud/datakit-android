@@ -19,6 +19,10 @@ public class FTTraceConfigManager {
     private FTTraceConfig config;
 
 
+    /**
+     *
+     * @param config
+     */
     void initWithConfig(FTTraceConfig config) {
         if (config.isEnableAutoTrace()) {
             if (!PackageUtils.isOKHttp3Support()) {
@@ -29,22 +33,41 @@ public class FTTraceConfigManager {
         this.config = config;
     }
 
+    /**
+     *
+     * @return
+     */
     public FTTraceConfig getConfig() {
         return config;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isEnableAutoTrace() {
         return config != null && config.isEnableAutoTrace();
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isEnableLinkRUMData() {
         return config != null && config.isEnableLinkRUMData();
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isEnableWebTrace() {
         return config != null && config.isEnableWebTrace();
     }
 
+    /**
+     *
+     */
     void release() {
         config = null;
     }

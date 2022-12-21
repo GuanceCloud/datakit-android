@@ -36,12 +36,19 @@ public class FTMonitorManager {
         }
     }
 
+    /**
+     *
+     * @param config
+     */
     void initWithConfig(FTRUMConfig config) {
         errorMonitorType = config.getExtraMonitorTypeWithError();
         deviceMetricsMonitorType = config.getDeviceMetricsMonitorType();
         initParams();
     }
 
+    /**
+     *
+     */
     private void initParams() {
         if (isDeviceMetricsMonitorType(DeviceMetricsMonitorType.FPS)) {
             FpsUtils.get().start();
@@ -110,6 +117,10 @@ public class FTMonitorManager {
         }
     }
 
+    /**
+     * 移除监控
+     * @param viewId
+     */
     public void removeMonitor(String viewId) {
         if (deviceMetricsMonitorType == DeviceMetricsMonitorType.NO_SET) return;
         synchronized (runnerMap) {

@@ -37,6 +37,7 @@ public class FTRUMConfig {
 
     /**
      * 获取采样率
+     *
      * @return 采样率，浮点，0～1
      */
     public float getSamplingRate() {
@@ -50,6 +51,7 @@ public class FTRUMConfig {
 
     /**
      * 获取 RUM AppId
+     *
      * @return 返回 RUM AppId 字符
      */
     public String getRumAppId() {

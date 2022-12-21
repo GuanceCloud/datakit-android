@@ -42,7 +42,7 @@ public class FTSDKConfig {
      * 构建 SDK 必要的配置参数
      *
      * @param metricsUrl 服务器地址
-     * @return
+     * @return {@link FTRUMConfig} SDK 配置
      */
     public static FTSDKConfig builder(String metricsUrl) {
         return new FTSDKConfig(metricsUrl);
@@ -52,7 +52,7 @@ public class FTSDKConfig {
     /**
      * SDK 配置项构造方法
      *
-     * @param metricsUrl  datakit 上传地址
+     * @param metricsUrl datakit 上传地址
      */
     private FTSDKConfig(String metricsUrl) {
         this.metricsUrl = metricsUrl;
@@ -78,7 +78,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * @return 是否支持主进程
+     * @return 是否只支持主进程
      */
     public boolean isOnlySupportMainProcess() {
         return onlySupportMainProcess;
@@ -142,7 +142,7 @@ public class FTSDKConfig {
     /**
      * 是否只支持在主进程中初始化 SDK
      *
-     * @param onlySupportMainProcess
+     * @param onlySupportMainProcess true，wei
      * @return
      */
     public FTSDKConfig setOnlySupportMainProcess(boolean onlySupportMainProcess) {
@@ -153,7 +153,7 @@ public class FTSDKConfig {
     /**
      * 添加全局属性
      *
-     * @param key 键名
+     * @param key   键名
      * @param value jian
      * @return
      */

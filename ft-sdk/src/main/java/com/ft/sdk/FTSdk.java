@@ -80,7 +80,7 @@ public class FTSdk {
     }
 
     /**
-     * 关闭 SDK 正在做的操作
+     * 关闭 SDK 内容正在运行对象
      */
     public static void shutDown() {
         SyncTaskManager.release();
@@ -227,7 +227,7 @@ public class FTSdk {
     /**
      * 获取公用 tags
      *
-     * @return
+     * @return 获取基础 Tags ，key value 形式
      */
     HashMap<String, Object> getBasePublicTags() {
         return mFtSDKConfig.getGlobalContext();
@@ -237,7 +237,7 @@ public class FTSdk {
     /**
      * 动态控制获取 Android ID
      *
-     * @param enableAccessAndroidID
+     * @param enableAccessAndroidID 是为应用，否为不应用
      */
     public static void setEnableAccessAndroidID(boolean enableAccessAndroidID) {
         if (checkInstallState()) {

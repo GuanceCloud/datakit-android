@@ -47,10 +47,12 @@ public class FTAutoTrack {
      */
     public static void startApp(Object object) {
         try {
+            //判断是否为主进程
             if (Utils.isMainProcess()) {
                 FTActivityLifecycleCallbacks life = new FTActivityLifecycleCallbacks();
                 getApplication().registerActivityLifecycleCallbacks(life);
-                if (FTActivityManager.get().isAppForeground()) {
+                //排除在后台被启动的情况
+                if (Utils.isAppForeground()) {
                     FTAppStartCounter.get().markCodeStartTimeLine();
                 }
             }
@@ -68,13 +70,13 @@ public class FTAutoTrack {
      * @param intent
      */
     public static void startActivityByWay(Boolean fromFragment, Intent intent) {
-        try {
-            if (intent != null && intent.getComponent() != null) {
-                FTActivityManager.get().putActivityOpenFromFragment(intent.getComponent().getClassName(), fromFragment);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            if (intent != null && intent.getComponent() != null) {
+//                FTActivityManager.get().putActivityOpenFromFragment(intent.getComponent().getClassName(), fromFragment);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
     /**
@@ -301,6 +303,11 @@ public class FTAutoTrack {
         }
     }
 
+    /**
+     * {@link MenuItem}
+     *
+     * @param menuItem
+     */
     public static void trackMenuItem(MenuItem menuItem) {
         try {
             trackMenuItem(null, menuItem);
@@ -458,7 +465,7 @@ public class FTAutoTrack {
     }
 
     /**
-     * Activity 开关
+     * {@link Activity} 开关
      *
      * @param op
      * @param classCurrent
@@ -538,7 +545,9 @@ public class FTAutoTrack {
      */
     public static void putRUMLaunchPerformance(boolean isCold, long duration, long startTime) {
         FTRUMGlobalManager.get().addAction(
-                isCold ? "app cold start" : "app hot start", isCold ? "launch_cold" : "launch_hot", duration, startTime);
+                isCold ? Constants.ACTION_NAME_LAUNCH_COLD : Constants.ACTION_NAME_LAUNCH_HOT,
+                isCold ? Constants.ACTION_TYPE_LAUNCH_COLD : Constants.ACTION_TYPE_LAUNCH_HOT,
+                duration, startTime);
     }
 
 
@@ -583,7 +592,7 @@ public class FTAutoTrack {
     }
 
     /**
-     * 插桩方法用来替换调用的 android/webkit/webView.loadUrl 方法，该方法结构谨慎修改，修该后请同步修改
+     * 插桩方法用来替换调用的 {@link android.webkit.WebView#loadUrl(String)} 方法，该方法结构谨慎修改，修该后请同步修改
      * [com.ft.plugin.garble.bytecode.FTMethodAdapter] 类中的 visitMethodInsn 方法中关于该替换内容的部分
      *
      * @param webView
@@ -600,7 +609,7 @@ public class FTAutoTrack {
     }
 
     /**
-     * 插桩方法用来替换调用的 android/webkit/webView.loadUrl 方法，该方法结构谨慎修改，修该后请同步修改
+     * 插桩方法用来替换调用的 {@link android.webkit.WebView#loadUrl(String)} 方法，该方法结构谨慎修改，修该后请同步修改
      * [com.ft.plugin.garble.bytecode.FTMethodAdapter] 类中的 visitMethodInsn 方法中关于该替换内容的部分
      *
      * @param webView
@@ -617,7 +626,7 @@ public class FTAutoTrack {
     }
 
     /**
-     * 插桩方法用来替换调用的 android/webkit/webView.loadData 方法，该方法结构谨慎修改，修该后请同步修改
+     * 插桩方法用来替换调用的 {@link android.webkit.WebView#loadData(String, String, String)}方法，该方法结构谨慎修改，修该后请同步修改
      * [com.ft.plugin.garble.bytecode.FTMethodAdapter] 类中的 visitMethodInsn 方法中关于该替换内容的部分
      *
      * @param webView
@@ -635,7 +644,7 @@ public class FTAutoTrack {
     }
 
     /**
-     * 插桩方法用来替换调用的 android/webkit/webView.loadDataWithBaseURL 方法，该方法结构谨慎修改，修该后请同步修改
+     * 插桩方法用来替换调用的 {@link android.webkit.WebView#loadDataWithBaseURL(String, String, String, String, String)} 方法，该方法结构谨慎修改，修该后请同步修改
      * [com.ft.plugin.garble.bytecode.FTMethodAdapter] 类中的 visitMethodInsn 方法中关于该替换内容的部分
      *
      * @param webView
@@ -654,7 +663,7 @@ public class FTAutoTrack {
     }
 
     /**
-     * 插桩方法用来替换调用的 android/webkit/webView.postUrl 方法，该方法结构谨慎修改，修该后请同步修改
+     * 插桩方法用来替换调用的 {@link android.webkit.WebView#postUrl(String, byte[])} } 方法，该方法结构谨慎修改，修该后请同步修改
      * [com.ft.plugin.garble.bytecode.FTMethodAdapter] 类中的 visitMethodInsn 方法中关于该替换内容的部分
      *
      * @param webView
@@ -681,6 +690,13 @@ public class FTAutoTrack {
         }
     }
 
+    /**
+     *
+     * @param webView
+     * @param methodName
+     * @param params
+     * @param paramTypes
+     */
     private static void invokeWebViewLoad(View webView, String methodName, Object[] params, Class[] paramTypes) {
         try {
             Class<?> clazz = webView.getClass();
@@ -692,7 +708,7 @@ public class FTAutoTrack {
     }
 
     /**
-     * 插桩方法用来替换调用的 OkHttpClient.Builder.build() 方法，该方法结构谨慎修改，修该后请同步修改
+     * 插桩方法用来替换调用的 {@link OkHttpClient.Builder#build() }方法，该方法结构谨慎修改，修该后请同步修改
      * [com.ft.plugin.garble.bytecode.FTMethodAdapter] 类中的 visitMethodInsn 方法中关于该替换内容的部分
      *
      * @param builder

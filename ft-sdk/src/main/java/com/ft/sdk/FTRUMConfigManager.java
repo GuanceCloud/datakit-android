@@ -26,6 +26,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * @author Brandon
+ *
+ *
+ *
+ */
 public class FTRUMConfigManager {
 
     private static final String TAG = "FTRUMConfigManager";
@@ -46,6 +52,10 @@ public class FTRUMConfigManager {
     private final Object mLock = new Object();
 
 
+    /**
+     * RUM 条件初始化
+     * @param config {@link FTRUMConfig} 配置信息
+     */
     void initWithConfig(FTRUMConfig config) {
         this.config = config;
         FTRUMGlobalManager.get().initParams(config);
@@ -94,6 +104,10 @@ public class FTRUMConfigManager {
 
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isRumEnable() {
         return config != null && config.getRumAppId() != null;
     }

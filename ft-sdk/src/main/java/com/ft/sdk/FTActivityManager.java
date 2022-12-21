@@ -46,7 +46,7 @@ public final class FTActivityManager {
     /**
      * 存储每个 {@link Activity} 是由什么方式打开的
      *
-     * @param className
+     * @param className  {@link Activity} 衍生类名
      * @param fromFragment
      */
     void putActivityOpenFromFragment(String className, boolean fromFragment) {
@@ -75,35 +75,18 @@ public final class FTActivityManager {
         activityOpenTypeMap.remove(className);
     }
 
-    /**
-     * 判断是否应用是否在前台
-     *
-     * @return true 前台，反之为后台
-     */
-    public boolean isAppForeground() {
-        ActivityManager am = (ActivityManager) FTApplication.getApplication().getSystemService(Context.ACTIVITY_SERVICE);
-        if (am == null) return false;
-        List<ActivityManager.RunningAppProcessInfo> info = am.getRunningAppProcesses();
-        if (info == null || info.size() == 0) return false;
-        for (ActivityManager.RunningAppProcessInfo aInfo : info) {
-            if (aInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
-                if (aInfo.processName.equals(FTApplication.getApplication().getPackageName())) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+
 
     /**
      * 设置当前 {@link AppState}
-     * @param state {@link AppState}
+     * @param state  {@link AppState} 应用运行状态
      */
     void setAppState(AppState state) {
         this.appState = state;
     }
 
     /**
+     * 获取当前 {@link AppState}
      * @return {@link AppState}
      */
     AppState getAppState() {

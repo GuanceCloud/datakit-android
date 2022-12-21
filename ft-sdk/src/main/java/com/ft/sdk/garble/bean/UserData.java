@@ -2,15 +2,11 @@ package com.ft.sdk.garble.bean;
 
 import androidx.annotation.Nullable;
 
-import com.ft.sdk.garble.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import org.json.JSONObject;
-
 import java.lang.reflect.Type;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * BY huangDianHua

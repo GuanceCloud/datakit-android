@@ -8,35 +8,45 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.ft.sdk.garble.FTFragmentManager;
+import com.ft.sdk.garble.utils.Constants;
+
+import java.util.HashMap;
+
 
 /**
  * BY huangDianHua
  * DATE:2019-12-06 11:18
- * Description: Activity 生命周期回调类
+ * Description: {@link Activity} 生命周期回调类
+ * <p>
+ * 用于监听 {@link Activity} 生命周期，结合 {@link LifeCircleTraceCallback},在
+ * {@link #onActivityPreStarted(Activity),#onActivityPreCreated(Activity, Bundle), #onActivityPostCreated(Activity)}
+ * 从而输出以 {@link Activity} 为 {@link  Constants#FT_MEASUREMENT_RUM_VIEW} 指标
+ * 页面加载时间：{@link Constants#KEY_RUM_VIEW_LOAD}
+ * 启动时间：{@link Constants#ACTION_TYPE_LAUNCH_HOT},{@link Constants#ACTION_NAME_LAUNCH_COLD}
+ *
+ * 这些可以通过观测云 Studio <a href="https://docs.guance.com/real-user-monitoring/explorer/view/">查看器 View</a> 进行查看
+ *
  */
 public class FTActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
     private final LifeCircleTraceCallback mAppRestartCallback = new LifeCircleTraceCallback();
 
 
     /**
-     * 应用创建
+     * {@link Activity} 创建
+     * <p>
+     * no use
      *
      * @param activity           {@link Activity}.
      * @param savedInstanceState {@link Activity#onSaveInstanceState(Bundle)}
      */
     @Override
-    public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
-        //防止监听网速的线程挂掉，在页面打开时判断线程是够挂了，挂了重启
-//        if (FTMonitorConfig.get().isMonitorType(MonitorType.NETWORK)) {
-//            NetUtils.get().startMonitorNetRate();
-//        }
-        FTFragmentManager.getInstance().addFragmentLifecycle(activity);
+    public void onActivityCreated(@NonNull Activity activity, @NonNull Bundle savedInstanceState) {
     }
 
     /**
      * {@link Activity#onStart()}}  之前调用，使用 {@link LifeCircleTraceCallback#onPreStart()} 处理，
      * 集成应用中 {@link Activity#onStart()}} 逻辑
+     *
      * @param activity {@link Activity}.
      */
     @Override
@@ -46,8 +56,9 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     }
 
     /**
-     * no use
-     * @param activity  {@link Activity}.
+     * {@link Activity#onStart()}} 之后调用，no use
+     *
+     * @param activity {@link Activity}.
      */
     @Override
     public void onActivityStarted(@NonNull Activity activity) {
@@ -55,7 +66,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     }
 
     /**
-     * {@link LifeCircleTraceCallback#onPreOnCreate(Context)}  }
+     * {@link LifeCircleTraceCallback#onPreOnCreate(Context)}  } 用于记录应用开始时间
      *
      * @param activity           {@link Activity}.
      * @param savedInstanceState {@link Activity#onSaveInstanceState(Bundle)}.
@@ -66,7 +77,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     }
 
     /**
-     * {@link LifeCircleTraceCallback#onPostOnCreate(Context)}  }
+     * {@link LifeCircleTraceCallback#onPostOnCreate(Context)}  } 用于记录应用创建完毕时间
      *
      * @param activity           {@link Activity }.
      * @param savedInstanceState {@link Activity#onSaveInstanceState(Bundle)}.
@@ -78,8 +89,9 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     }
 
     /**
-     *
-     *
+     * {@link Activity#onResume()}  } 恢复事件
+     * <p>
+     * {@link FTRUMConfigManager#isRumEnable()} 开启状态下，使用 {@link FTRUMGlobalManager#startView(String, HashMap)}
      *
      * @param activity {@link Activity }.
      */
@@ -100,6 +112,8 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     }
 
     /**
+     * {@link Activity#onPostResume()} 恢复之后 ，{@link  LifeCircleTraceCallback#onPostResume(Context)}
+     *
      * @param activity {@link Activity }.
      */
     @Override
@@ -108,6 +122,9 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     }
 
     /**
+     * {@link Activity#onPause()}时调用，{@link FTRUMConfigManager#isRumEnable()} 开启状态下，
+     * 使用 {@link FTRUMGlobalManager#stopView()}
+     *
      * @param activity {@link Activity }.
      */
     @Override
@@ -121,6 +138,8 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     }
 
     /**
+     * {@link Activity#onStop()} 时调用，{@link  LifeCircleTraceCallback#onStop()} 处理页面休眠事务处理
+     *
      * @param activity {@link Activity }.
      */
     @Override
@@ -130,8 +149,11 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
 
 
     /**
+     * {@link Activity} 保存状态
+     * <p>
+     * no use
      *
-     * @param activity           {@link Activity }.
+     * @param activity {@link Activity }.
      * @param outState {@link Activity#onSaveInstanceState(Bundle)}.
      */
     @Override
@@ -139,19 +161,24 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     }
 
     /**
+     * {@link Activity} 销毁
+     * <p>
+     * no use
+     *
      * @param activity {@link Activity }.
      */
     @Override
     public void onActivityDestroyed(@NonNull Activity activity) {
-        //移除当前页面是否第一次调用 onResume 的标记
-        FTFragmentManager.getInstance().removeFragmentLifecycle(activity);
     }
 
     /**
+     * {@link Activity#onDestroy()}之后调用 ，配合 {@link LifeCircleTraceCallback#onPostDestroy(Context)}
+     * 处理一些 {@link Activity} 生命周期结束后的逻辑
+     *
      * @param activity {@link Activity }.
      */
     @Override
-    public void onActivityPostDestroyed(@NonNull Activity activity) {
+    public void onActivityPostDestroyed(Activity activity) {
         mAppRestartCallback.onPostDestroy(activity);
 
     }

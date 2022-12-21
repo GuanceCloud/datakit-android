@@ -18,11 +18,18 @@ import okhttp3.internal.http.HttpHeaders;
 
 /**
  * OKHttp Resource Interceptor
+ *
+ * @author Brandon
  */
 public class FTResourceInterceptor extends NetStatusMonitor implements Interceptor {
+    /**
+     * @param chain
+     * @return
+     * @throws IOException
+     */
     @NonNull
     @Override
-    public Response intercept(@NonNull Chain chain) throws IOException {
+    public Response intercept(Chain chain) throws IOException {
         Request request = chain.request();
         Response response = null;
         Exception exception = null;
@@ -78,6 +85,10 @@ public class FTResourceInterceptor extends NetStatusMonitor implements Intercept
         return response;
     }
 
+    /**
+     * @param requestId
+     * @param bean
+     */
     @Override
     protected void getNetStatusInfoWhenCallEnd(String requestId, NetStatusBean bean) {
         FTRUMGlobalManager.get().setNetState(requestId, bean);

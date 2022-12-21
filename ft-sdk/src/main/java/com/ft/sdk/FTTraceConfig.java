@@ -1,6 +1,5 @@
 package com.ft.sdk;
 
-import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.utils.Constants;
 
@@ -49,6 +48,14 @@ public class FTTraceConfig {
     public TraceType getTraceType() {
         return traceType;
     }
+
+    /**
+     * <a href="https://docs.guance.com/real-user-monitoring/explorer/resource/">查看器 Resource</a>功能，
+     * 用于追查一些有问题 Resource 数据的 Trace 链路追查
+     *
+     * @param traceType
+     * @return
+     */
 
     public FTTraceConfig setTraceType(TraceType traceType) {
         this.traceType = traceType;

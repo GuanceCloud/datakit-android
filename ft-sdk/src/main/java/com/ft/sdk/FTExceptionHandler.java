@@ -20,25 +20,47 @@ import java.nio.charset.Charset;
  * description:崩溃日志处理
  */
 public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
-    private static final String TAG = "FTExceptionHandler";
+
+    /**
+     * Android tombstone 文件前缀
+     */
     private static final String EXCEPTION_FILE_PREFIX_TOMBSTONE = "tombstone";
+
+    /**
+     * Android ANR 文件名内包含字符，暂不使用
+     */
     private static final String ANR_FILE_NAME = "anr";
+
+    /**
+     * Android Native 文件包含字符
+     */
     private static final String NATIVE_FILE_NAME = "native";
-    private static final String APP_STATE_RUNNING = "running";
+
+    /**
+     * 判断 App 运行状态字段
+     */
     private static final String DUMP_FILE_KEY_APP_STATE = "appState";
 
     private static FTExceptionHandler instance;
     private final Thread.UncaughtExceptionHandler mDefaultExceptionHandler;
+    /**
+     * 用于测试用例
+     */
     private boolean isAndroidTest = false;
 
+    /**
+     * 上传崩溃日志，根据 {@link FTRUMConfig#isRumEnable(),FTRUMConfig#isEnableTrackAppCrash()} 进行判断
+     *
+     * @param crash   崩溃日志简述
+     * @param message 崩溃堆栈
+     * @param state   app 运行状态 {@link  AppState}
+     */
     public void uploadCrashLog(String crash, String message, AppState state) {
         if (config.isRumEnable() &&
                 config.isEnableTrackAppCrash()) {
             long dateline = Utils.getCurrentNanoTime();
             FTRUMGlobalManager.get().addError(crash, message, dateline, ErrorType.JAVA, state);
         }
-
-
     }
 
     private FTExceptionHandler() {
@@ -55,11 +77,26 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     private FTRUMConfig config;
 
+    /**
+     * 初始化 {@link FTRUMConfig},在 {@link FTSdk#initRUMWithConfig(FTRUMConfig)} } 中惊醒
+     *
+     * @param config
+     */
     void initConfig(FTRUMConfig config) {
         this.config = config;
     }
 
 
+    /**
+     * 抓取全局未捕获异常 {@link Exception}
+     * <p>
+     * 此处捕获的是 Java 代码层的异常，不包含 C/C++ 异常，抓取数据后，
+     * 会重新将异常内容抛出，避免集成方正常的异常捕获逻辑，异常数据会{@link #uploadCrashLog(String, String, AppState)}
+     * 上传异常数据
+     *
+     * @param t 返回异常线程
+     * @param e 返回抛出异常对象
+     */
     @Override
     public void uncaughtException(@NonNull Thread t, @NonNull Throwable e) {
         Writer writer = new StringWriter();
@@ -75,20 +112,18 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
         uploadCrashLog(result, e.getMessage(), FTActivityManager.get().getAppState());
 
         try {
-            Thread.sleep(3000);
+            //给数据存存储空出一些时间
+            Thread.sleep(2000);
         } catch (InterruptedException ex) {
             ex.printStackTrace();
         }
 
+        //测试用例直接
         if (isAndroidTest) {
             e.printStackTrace();
         } else {
             if (mDefaultExceptionHandler != null) {
-                try {
-                    mDefaultExceptionHandler.uncaughtException(t, e);
-
-                } catch (Exception ex) {
-                }
+                mDefaultExceptionHandler.uncaughtException(t, e);
             } else {
                 try {
                     android.os.Process.killProcess(android.os.Process.myPid());
@@ -154,6 +189,9 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
     }
 
 
+    /**
+     *
+     */
     public static void release() {
         instance = null;
     }

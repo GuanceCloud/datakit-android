@@ -1,5 +1,6 @@
 package com.ft.sdk.garble.bean;
 
+
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.utils.Constants;

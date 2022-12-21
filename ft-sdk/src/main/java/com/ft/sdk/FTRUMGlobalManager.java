@@ -3,8 +3,6 @@ package com.ft.sdk;
 import android.os.Handler;
 import android.os.Looper;
 
-import androidx.annotation.NonNull;
-
 import com.ft.sdk.garble.bean.ActionBean;
 import com.ft.sdk.garble.bean.ActiveActionBean;
 import com.ft.sdk.garble.bean.ActiveViewBean;
@@ -39,12 +37,21 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.net.ssl.HttpsURLConnection;
 
 /**
- * RUM 数据管理
+ * RUM 数据管理，RUM 添加数据，可以通过<a href="https://docs.guance.com/real-user-monitoring/explorer/">查看器</a>
  */
 public class FTRUMGlobalManager {
     private static final String TAG = "RUMGlobalManager";
+    /**
+     *
+     */
     static final long MAX_RESTING_TIME = 900000000000L;
+    /**
+     *
+     */
     static final long SESSION_EXPIRE_TIME = 14400000000000L;
+    /**
+     *
+     */
     static final long FILTER_CAPACITY = 5;
     private final ConcurrentHashMap<String, ResourceBean> resourceBeanMap = new ConcurrentHashMap<>();
 
@@ -404,7 +411,7 @@ public class FTRUMGlobalManager {
      *
      * @param tags
      */
-    private void increaseError(@NonNull JSONObject tags) {
+    private void increaseError(JSONObject tags) {
 
         String actionId = tags.optString(Constants.KEY_RUM_ACTION_ID);
         String viewId = tags.optString(Constants.KEY_RUM_VIEW_ID);
@@ -741,6 +748,7 @@ public class FTRUMGlobalManager {
 
     /**
      * 设置网络传输内容
+     *
      * @param resourceId
      * @param params
      */
@@ -794,7 +802,7 @@ public class FTRUMGlobalManager {
     }
 
 
-    private void increaseLongTask(@NonNull JSONObject tags) {
+    private void increaseLongTask(JSONObject tags) {
         String actionId = tags.optString(Constants.KEY_RUM_ACTION_ID);
         String viewId = tags.optString(Constants.KEY_RUM_VIEW_ID);
         EventConsumerThreadPool.get().execute(() -> {
@@ -865,7 +873,7 @@ public class FTRUMGlobalManager {
      *
      * @param bean
      */
-    private void attachRUMRelativeForResource(@NonNull ResourceBean bean) {
+    private void attachRUMRelativeForResource(ResourceBean bean) {
         bean.viewId = getViewId();
         bean.viewName = getViewName();
         bean.viewReferrer = getViewReferrer();
@@ -882,7 +890,7 @@ public class FTRUMGlobalManager {
      * @param tags
      * @param withAction
      */
-    void attachRUMRelative(@NonNull JSONObject tags, boolean withAction) {
+    void attachRUMRelative(JSONObject tags, boolean withAction) {
         try {
             tags.put(Constants.KEY_RUM_VIEW_ID, getViewId());
 
@@ -1061,7 +1069,6 @@ public class FTRUMGlobalManager {
     }
 
     /**
-     *
      * @param sessionId
      * @return
      */
@@ -1076,6 +1083,7 @@ public class FTRUMGlobalManager {
 
     /**
      * 检测
+     *
      * @param key
      * @param bean
      */

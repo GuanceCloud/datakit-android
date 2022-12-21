@@ -2,7 +2,6 @@ package com.ft.sdk.garble.threadpool;
 
 import com.ft.sdk.DetectFrequency;
 import com.ft.sdk.DeviceMetricsMonitorType;
-import com.ft.sdk.FTActivityManager;
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTMonitorManager;
 import com.ft.sdk.FTRUMConfigManager;
@@ -11,7 +10,7 @@ import com.ft.sdk.garble.utils.BatteryUtils;
 import com.ft.sdk.garble.utils.CpuUtils;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.FpsUtils;
-import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.Utils;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -33,7 +32,7 @@ public class MonitorRunnable implements Runnable {
 
     @Override
     public void run() {
-        if (!FTActivityManager.get().isAppForeground()) return;
+        if (!Utils.isAppForeground()) return;
         if (FTMonitorManager.get().isDeviceMetricsMonitorType(DeviceMetricsMonitorType.CPU)) {
             computeCpuBean(cpuBean, CpuUtils.get().getAppCPUTickCount());
         }
@@ -84,7 +83,6 @@ public class MonitorRunnable implements Runnable {
     }
 
     /**
-     *
      * @param bean
      * @param lastValue
      */

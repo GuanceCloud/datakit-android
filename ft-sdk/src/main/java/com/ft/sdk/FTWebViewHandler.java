@@ -13,6 +13,12 @@ import org.json.JSONObject;
 
 import java.util.Iterator;
 
+/**
+ *
+ *
+ *
+ * @author Brandon
+ */
 final class FTWebViewHandler implements WebAppInterface.JsReceiver {
 
     private static final String LOG_TAG = "FTWebViewHandler";
@@ -26,14 +32,23 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
     public static final String WEB_JS_NAME = "name";
     public static final String WEB_JS_DATA = "data";
 
+    /**
+     * 需要配合 Web
+     */
+    private static final String FT_WEB_VIEW_JAVASCRIPT_BRIDGE = "FTWebViewJavascriptBridge";
+
     private final Handler mHandler = new Handler(Looper.getMainLooper());
 
     private WebView mWebView;
 
+    /**
+     *
+     * @param webview
+     */
     public void setWebView(WebView webview) {
         mWebView = webview;
         webview.getSettings().setJavaScriptEnabled(true);
-        webview.addJavascriptInterface(new WebAppInterface(webview.getContext(), this), "FTWebViewJavascriptBridge");
+        webview.addJavascriptInterface(new WebAppInterface(webview.getContext(), this), FT_WEB_VIEW_JAVASCRIPT_BRIDGE);
 
     }
 
@@ -41,11 +56,20 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
     public FTWebViewHandler() {
     }
 
+    /**
+     *
+     * @param s
+     */
     @Override
     public void sendEvent(String s) {
         sendEvent(s, null);
     }
 
+    /**
+     *
+     * @param s
+     * @param callbackMethod
+     */
     @Override
     public void sendEvent(String s, String callbackMethod) {
         try {
@@ -81,11 +105,11 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                 }
 
             } else if (name.equals(WEB_JS_TYPE_TRACK)) {
-
+                //no use
             } else if (name.equals(WEB_JS_TYPE_LOG)) {
-
+                //no use
             } else if (name.equals(WEB_JS_TYPE_URL_VERIFY)) {
-
+                //no use
             }
             if (callbackMethod != null && !callbackMethod.isEmpty()) {
                 JSONObject retJson = new JSONObject();
@@ -102,6 +126,11 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
 
     }
 
+    /**
+     *
+     * @param s
+     * @param callBackMethod
+     */
     @Override
     public void addEventListener(String s, String callBackMethod) {
 
@@ -131,6 +160,11 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
 
     }
 
+    /**
+     *
+     * @param method
+     * @param callback
+     */
     private void callJsMethod(String method, CallbackFromJS callback) {
         mHandler.post(() -> {
 
@@ -150,6 +184,9 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
     }
 
 
+    /**
+     *
+     */
     interface CallbackFromJS {
         void callBack(String content);
     }

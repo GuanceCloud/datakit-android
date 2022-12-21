@@ -7,7 +7,7 @@ import androidx.annotation.NonNull;
  */
 public enum AppState {
     /**
-     *  未知状态，当获取不到时，标记为 Unknown
+     * 未知状态，当获取不到时，标记为 Unknown
      */
     UNKNOWN,
     /**
@@ -21,6 +21,7 @@ public enum AppState {
 
     /**
      * 从字符转化对应的
+     *
      * @param value @{@link AppState} 对应字符
      * @return 返回当前运行状态
      */
@@ -37,6 +38,7 @@ public enum AppState {
 
     /**
      * 用于行协议传参，行协议中均为小写
+     *
      * @return 小写字符 unknown，startup，run
      */
     @NonNull

@@ -22,14 +22,35 @@ import java.util.HashMap;
  */
 class LifeCircleTraceCallback {
     private static final String TAG = "AppRestartCallback";
+    /**
+     * 消息通道
+     */
     public static final int MSG_CHECK_SLEEP_STATUS = 1;
-    public static final int DELAY_MILLIS = 10000;//10 秒
+    /**
+     * 休眠延迟时间
+     */
+    public static final int DELAY_SLEEP_MILLIS = 10000;//10 秒
+    /**
+     * 是否已处于休眠状态
+     */
     private boolean alreadySleep = true;
-    private boolean mInited = false;//判断第一次第一个页是否创建
+    /**
+     * 判断第一次第一个页是否创建
+     */
+    private boolean mInited = false;//
+    /**
+     * 应用启动时间点
+     */
     private long startTime = 0;
 
+    /**
+     * 缓存创建时间点
+     */
     private final HashMap<Context, Long> mCreateMap = new HashMap<>();
 
+    /**
+     * 用于发送延迟消息，10 秒后执行休眠 {@link #alreadySleep} = true 操作
+     */
     private final Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
@@ -55,6 +76,10 @@ class LifeCircleTraceCallback {
 
     }
 
+    /**
+     *
+     * @param context
+     */
     public void onPreOnCreate(Context context) {
         mCreateMap.put(context, Utils.getCurrentNanoTime());
 
@@ -64,6 +89,10 @@ class LifeCircleTraceCallback {
         }
     }
 
+    /**
+     *
+     * @param context
+     */
     public void onPostOnCreate(Context context) {
         FTRUMConfigManager manager = FTRUMConfigManager.get();
         FTRUMConfig config = manager.getConfig();
@@ -124,14 +153,21 @@ class LifeCircleTraceCallback {
         }
     }
 
+    /**
+     *
+     */
     public void onStop() {
-        boolean appForeground = FTActivityManager.get().isAppForeground();
+        boolean appForeground = Utils.isAppForeground();
         if (!appForeground) {
             handler.removeMessages(MSG_CHECK_SLEEP_STATUS);
-            handler.sendEmptyMessageDelayed(MSG_CHECK_SLEEP_STATUS, DELAY_MILLIS);
+            handler.sendEmptyMessageDelayed(MSG_CHECK_SLEEP_STATUS, DELAY_SLEEP_MILLIS);
         }
     }
 
+    /**
+     *
+     * @param context
+     */
     public void onPostDestroy(Context context) {
         mCreateMap.remove(context);
         if (mCreateMap.isEmpty()) {
@@ -145,7 +181,7 @@ class LifeCircleTraceCallback {
      * 检测是否长时间休眠
      */
     private void checkLongTimeSleep() {
-        boolean appForeground = FTActivityManager.get().isAppForeground();
+        boolean appForeground = Utils.isAppForeground();
         if (!appForeground) {
             alreadySleep = true;
         }

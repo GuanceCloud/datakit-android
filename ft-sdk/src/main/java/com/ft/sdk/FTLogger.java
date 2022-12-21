@@ -12,7 +12,11 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * 打印日志
+ *
+ * 打印输出观测云 Studio 可以查看的日志
+ *
+ * @author Brandon
+ *
  */
 public class FTLogger {
 
@@ -32,6 +36,9 @@ public class FTLogger {
 
     private FTLoggerConfig config;
 
+    /**
+     * @param config {@link  FTLoggerConfig} 初始化 config
+     */
     void init(FTLoggerConfig config) {
         this.config = config;
     }
@@ -74,7 +81,7 @@ public class FTLogger {
     /**
      * 将多条日志数据存入本地同步(异步)
      *
-     * @param logDataList
+     * @param logDataList {@link LogData} 列表
      */
     public void logBackground(List<LogData> logDataList) {
         if (!checkConfig()) return;
@@ -94,6 +101,10 @@ public class FTLogger {
         FTTrackInner.getInstance().batchLogBeanBackground(logBeans);
     }
 
+    /**
+     * 检验 {@link FTLoggerConfig} 是否初始化
+     * @return true 为已初始化，反之为 false
+     */
     private boolean checkConfig() {
         if (config == null) {
             LogUtils.e(TAG, "使用 FTLogger，需要初始化 FTLoggerConfigManager.get().initWithConfig(FTLoggerConfig ftSdkConfig))");

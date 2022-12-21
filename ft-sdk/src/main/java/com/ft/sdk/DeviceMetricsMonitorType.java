@@ -8,8 +8,8 @@ import java.util.HashMap;
  * 设备检测类型
  * <p>
  * 在 View 传输类型中 {@link FTRUMGlobalManager#startView(String, HashMap)}
- * 输出页面的电池、内存、CPU、FPS 等信息，通过这些信息来判断，用户在当前页面浏览的体验情况
- * ，通过观测云 Studio <a href="https://docs.guance.com/real-user-monitoring/explorer/">查看器</a>View 进行查看
+ * 输出页面的电池、内存、CPU、FPS 等信息，通过这些信息来判断用户在当前页面浏览的体验情况
+ * ，通过观测云 Studio <a href="https://docs.guance.com/real-user-monitoring/explorer/view/">查看器 View</a> 进行查看
  * <p>
  * 在 {@link FTRUMConfig#setDeviceMetricsMonitorType(DeviceMetricsMonitorType, DetectFrequency)} 进行设置
  * 采集频率请看 {@link DetectFrequency }
@@ -64,7 +64,9 @@ public enum DeviceMetricsMonitorType {
 
 
     /**
-     * @param value 位运算数值
+     * 内部是使用构造函数
+     *
+     * @param value 整型
      */
     DeviceMetricsMonitorType(int value) {
 
@@ -72,7 +74,7 @@ public enum DeviceMetricsMonitorType {
     }
 
     /**
-     * @return 获取位运行数值
+     * @return 获取 {@link DeviceMetricsMonitorType} 整型数值
      */
     public int getValue() {
         return value;

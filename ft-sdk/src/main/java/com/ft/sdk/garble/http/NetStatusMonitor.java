@@ -6,7 +6,6 @@ import androidx.annotation.Nullable;
 import com.ft.sdk.garble.bean.NetStatusBean;
 import com.ft.sdk.garble.utils.Utils;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Proxy;

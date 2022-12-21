@@ -14,6 +14,9 @@ public class Constants {
     public static final String FT_KEY_VALUE_NULL = "null";
     public static final String UNKNOWN = "N/A";
     public static final String FLOW_ROOT = "root";
+    /**
+     * 行协议，指标
+     */
     public static final String MEASUREMENT = "measurement";
     public static final String TIME = "time";
     public static final String FIELDS = "fields";
@@ -80,7 +83,7 @@ public class Constants {
     public static final String KEY_MEMORY_MAX = "memory_max";
     public static final String KEY_FPS_MINI = "fps_mini";
     /**
-     *  FPS 平均值，数值越低代表帧数用户体验越差
+     * FPS 平均值，数值越低代表帧数用户体验越差
      */
     public static final String KEY_FPS_AVG = "fps_avg";
     public static final String KEY_BATTERY_CURRENT_AVG = "battery_current_avg";
@@ -194,6 +197,12 @@ public class Constants {
     public static final String KEY_RUM_ACTION_DURATION = "duration";
 
     public static final String KEY_RUM_PROPERTY = "property";
+
+    public static final String ACTION_TYPE_LAUNCH_COLD = "launch_cold";
+    public static final String ACTION_TYPE_LAUNCH_HOT = "launch_hot";
+
+    public static final String ACTION_NAME_LAUNCH_COLD = "app cold start";
+    public static final String ACTION_NAME_LAUNCH_HOT = "app hot start";
 
 
     /**

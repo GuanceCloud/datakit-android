@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 
 
 public enum ErrorSource {
-    LOGGER ("logger"),
+    LOGGER("logger"),
     NETWORK("network");
 
 

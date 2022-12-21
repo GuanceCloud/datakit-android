@@ -5,7 +5,10 @@ import android.util.Printer;
 
 import com.ft.sdk.garble.utils.Utils;
 
-
+/**
+ * 用于检测界面卡顿
+ * @author Brandon
+ */
 public class FTUIBlockManager {
     private static final long TIME_BLOCK_NS = 1000000000L;//超过1秒显示卡顿
     private static final String PREFIX_METHOD_DISPATCH_START = ">>>>> Dispatching to ";
@@ -41,6 +44,10 @@ public class FTUIBlockManager {
     private long startTime;
     private String method;
 
+    /**
+     * 启动初始化
+     * @param config
+     */
     public void start(FTRUMConfig config) {
         if (!config.isRumEnable()
                 && !config.isEnableTrackAppUIBlock()) {

@@ -1,5 +1,6 @@
 package com.ft.sdk;
 
+import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
@@ -7,6 +8,18 @@ import com.ft.sdk.garble.utils.Utils;
  * 启动计时
  *
  * <a href="https://docs.guance.com/real-user-monitoring/explorer/">查看器</a>
+ * <p>
+ * {@link Constants#MEASUREMENT} 为 {@link Constants#FT_MEASUREMENT_RUM_ACTION}
+ * {@link Constants#KEY_RUM_ACTION_TYPE} 为 {@link  Constants#ACTION_NAME_LAUNCH_COLD,
+ * Constants#ACTION_TYPE_LAUNCH_HOT}
+ * <p>
+ * 生命周期概念参考内容官方文档
+ * <a href="https://developer.android.com/topic/performance/vitals/launch-time?hl=zh-cn">启动时间</a>
+ *
+ * <p>
+ * 冷启动，对应 {@link Constants#ACTION_NAME_LAUNCH_COLD}
+ * 温启动，热启动，对应{@link Constants#ACTION_TYPE_LAUNCH_HOT}
+ *
  * @author Brandon
  */
 class FTAppStartCounter {
@@ -20,7 +33,8 @@ class FTAppStartCounter {
      */
     private long codeStartTimeLine = 0;
 
-    private FTAppStartCounter() {}
+    private FTAppStartCounter() {
+    }
 
     private static class SingletonHolder {
         private static final FTAppStartCounter INSTANCE = new FTAppStartCounter();
@@ -31,7 +45,7 @@ class FTAppStartCounter {
     }
 
     /**
-     * 标记应用冷启动事件
+     * 标记应用冷启动时间
      */
     void markCodeStartTimeLine() {
         codeStartTimeLine = Utils.getCurrentNanoTime();
@@ -40,7 +54,8 @@ class FTAppStartCounter {
 
     /**
      * 获取冷启动时间
-     * @return  返回冷启动时间线，单位纳秒
+     *
+     * @return 返回冷启动时间线，单位纳秒
      */
     long getMarkCodeTimeLine() {
         return codeStartTimeLine;
@@ -56,6 +71,7 @@ class FTAppStartCounter {
 
     /**
      * 记录冷启动时间段
+     *
      * @param codeStartTime 冷启动时间段，单位纳秒
      */
     void codeStart(long codeStartTime) {
@@ -75,6 +91,9 @@ class FTAppStartCounter {
 
     /**
      * 上传热启动时间
+     *
+     * {@link Constants#KEY_RUM_ACTION_TYPE} = {@link  Constants#KEYRUM}
+     *
      * @param hotStartTime 热启动时间段，单位纳秒
      */
     void hotStart(long hotStartTime) {

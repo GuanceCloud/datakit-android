@@ -6,7 +6,6 @@ import com.ft.sdk.garble.http.HttpUrl;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -14,14 +13,11 @@ import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
-import okhttp3.internal.http.HttpHeaders;
 
 /**
  * OKHttp Trace Interceptor
- *
+ * <p>
  * 为 http 链路添加链路 header
- *
  */
 public class FTTraceInterceptor implements Interceptor {
 

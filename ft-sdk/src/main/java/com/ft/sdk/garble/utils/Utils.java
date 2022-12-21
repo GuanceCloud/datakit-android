@@ -90,6 +90,26 @@ public class Utils {
         return context.getSharedPreferences(FT_SHARE_PER_FILE, Context.MODE_PRIVATE);
     }
 
+    /**
+     * 判断是否应用是否在前台
+     *
+     * @return true 前台，反之为后台
+     */
+    public static boolean isAppForeground() {
+        ActivityManager am = (ActivityManager) FTApplication.getApplication().getSystemService(Context.ACTIVITY_SERVICE);
+        if (am == null) return false;
+        List<ActivityManager.RunningAppProcessInfo> info = am.getRunningAppProcesses();
+        if (info == null || info.size() == 0) return false;
+        for (ActivityManager.RunningAppProcessInfo aInfo : info) {
+            if (aInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                if (aInfo.processName.equals(FTApplication.getApplication().getPackageName())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public static String getGUID_16() {
         StringBuilder uid = new StringBuilder();
         //产生16位的强随机数

@@ -38,6 +38,9 @@ import com.ft.sdk.garble.utils.NetUtils;
         return instance;
     }
 
+    /**
+     *
+     */
     public void monitor() {
         if (networkCallback == null) {
             networkCallback = new FTNetWorkCallback();
@@ -115,6 +118,9 @@ import com.ft.sdk.garble.utils.NetUtils;
 
     }
 
+    /**
+     * 释放对象，{@link FTSdk#shutDown()} 时使用
+     */
     public void release() {
         if (connectivityManager == null) {
             instance = null;
