@@ -122,13 +122,9 @@ public class Utils {
                     //0-9的随机数
                     uid.append(rd.nextInt(10));
                     break;
-//                case 1:
-//                    //ASCII在65-90之间为大写,获取大写随机
-//                    uid.append((char) (rd.nextInt(25) + 65));
-//                    break;
                 case 1:
-                    //ASCII在97-122之间为小写，获取小写随机
-                    uid.append((char) (rd.nextInt(5) + 97));
+                    //a-f 随机
+                    uid.append((char) (rd.nextInt(6) + 97));
                     break;
                 default:
                     break;
