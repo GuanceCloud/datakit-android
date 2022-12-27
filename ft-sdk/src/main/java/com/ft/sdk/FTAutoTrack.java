@@ -24,8 +24,8 @@ import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
-import com.google.android.material.tabs.TabLayout;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -232,11 +232,15 @@ public class FTAutoTrack {
      *
      * @param tab
      */
-    public static void trackTabLayoutSelected(TabLayout.Tab tab) {
+    public static void trackTabLayoutSelected(Object tab) {
         try {
-            Object object = tab.view.getContext();
-            clickView(tab.view, object.getClass(), AopUtils.getClassName(object),
-                    AopUtils.getSupperClassName(object), AopUtils.getViewDesc(tab.view) + "#pos:" + tab.getPosition());
+            Field viewField = tab.getClass().getField("view");
+            View view = (View) viewField.get(tab);
+            Method getPosition = tab.getClass().getMethod("getPosition");
+            int position = (int) getPosition.invoke(tab);
+            Object object = view.getContext();
+            clickView(view, object.getClass(), AopUtils.getClassName(object),
+                    AopUtils.getSupperClassName(object), AopUtils.getViewDesc(view) + "#pos:" + position);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -691,7 +695,6 @@ public class FTAutoTrack {
     }
 
     /**
-     *
      * @param webView
      * @param methodName
      * @param params

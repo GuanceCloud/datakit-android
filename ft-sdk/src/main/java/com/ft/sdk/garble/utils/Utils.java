@@ -15,8 +15,6 @@ import android.os.Process;
 import android.text.TextUtils;
 import android.util.Base64;
 
-import androidx.core.content.ContextCompat;
-
 import com.ft.sdk.FTApplication;
 
 import org.json.JSONArray;
@@ -31,6 +29,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -60,8 +59,39 @@ public class Utils {
         return str == null || str.isEmpty();
     }
 
+    /**
+     * 检测权限
+     * @param context
+     * @param permission
+     * @return
+     */
     public static boolean hasPermission(Context context, String permission) {
-        return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
+        try {
+            Class<?> contextCompat = null;
+            try {
+                contextCompat = Class.forName("android.support.v4.content.ContextCompat");
+            } catch (Exception e) {
+                //ignored
+            }
+
+            if (contextCompat == null) {
+                try {
+                    contextCompat = Class.forName("androidx.core.content.ContextCompat");
+                } catch (Exception e) {
+                    //ignored
+                }
+            }
+
+            if (contextCompat == null) {
+                return true;
+            }
+
+            Method checkSelfPermissionMethod = contextCompat.getMethod("checkSelfPermission", Context.class, String.class);
+            int result = (int) checkSelfPermissionMethod.invoke(null, new Object[]{context, permission});
+            return result == PackageManager.PERMISSION_GRANTED;
+        } catch (Exception e) {
+            return true;
+        }
     }
 
     public static boolean isNetworkAvailable() {

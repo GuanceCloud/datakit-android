@@ -528,10 +528,10 @@ public class FTHookConfig {
                 "(Lcom/google/android/material/tabs/TabLayout$Tab;)V",
                 "com/google/android/material/tabs/TabLayout$OnTabSelectedListener",
                 "trackTabLayoutSelected",
-                "(Lcom/google/android/material/tabs/TabLayout$Tab;)V",
+                "(Ljava/lang/Object;)V",
                 Arrays.asList(
                         new FTSubMethodCell(FTMethodType.ALOAD, 1),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "trackTabLayoutSelected", "(Lcom/google/android/material/tabs/TabLayout$Tab;)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "trackTabLayoutSelected", "(Ljava/lang/Object;)V", false)
                 )
         ));
     }

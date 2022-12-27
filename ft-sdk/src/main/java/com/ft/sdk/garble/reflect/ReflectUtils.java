@@ -33,11 +33,11 @@ public class ReflectUtils {
      */
     private static void reflectInvokeMethodV(String method) {
         try {
-            Class<?> clazzRegisterSignalHandler = Class.forName(CLASS_NAME_EXCEPTION_HANDLER);
-            Method getMethod = clazzRegisterSignalHandler.getMethod("get");
-            Object objException = getMethod.invoke(clazzRegisterSignalHandler);
-            Method registerSignalHandlerMethod = clazzRegisterSignalHandler.getMethod(method);
-            registerSignalHandlerMethod.invoke(objException);
+            Class<?> exceptionHandlerClass = Class.forName(CLASS_NAME_EXCEPTION_HANDLER);
+            Method getMethod = exceptionHandlerClass.getMethod("get");
+            Object instance = getMethod.invoke(exceptionHandlerClass);
+            Method handlerMethod = exceptionHandlerClass.getMethod(method);
+            handlerMethod.invoke(instance);
         } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException | ClassNotFoundException e) {
             e.printStackTrace();
         }
