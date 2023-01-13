@@ -42,17 +42,17 @@ import javax.net.ssl.HttpsURLConnection;
 public class FTRUMGlobalManager {
     private static final String TAG = "RUMGlobalManager";
     /**
-     *
+     * 间断操作（中途休眠） Session 重置事件为 15分钟
      */
     static final long MAX_RESTING_TIME = 900000000000L;
     /**
-     *
+     * 持续 Session 最大重置事件，4小时
      */
     static final long SESSION_EXPIRE_TIME = 14400000000000L;
     /**
-     *
+     * Session 最大存储数值
      */
-    static final long FILTER_CAPACITY = 5;
+    static final long SESSION_FILTER_CAPACITY = 5;
     private final ConcurrentHashMap<String, ResourceBean> resourceBeanMap = new ConcurrentHashMap<>();
 
     private final ArrayList<String> viewList = new ArrayList<>();
@@ -81,6 +81,7 @@ public class FTRUMGlobalManager {
 
     private final long lastSessionTime = Utils.getCurrentNanoTime();
     private long lastActionTime = lastSessionTime;
+    private float sampleRate = 1f;
 
     String getSessionId() {
         return sessionId;
@@ -92,6 +93,7 @@ public class FTRUMGlobalManager {
         boolean longTimeSession = now - lastSessionTime > SESSION_EXPIRE_TIME;
         if (longTimeSession || longResting) {
             sessionId = UUID.randomUUID().toString();
+            checkSessionKeep(sessionId, sampleRate);
         }
     }
 
@@ -1050,7 +1052,8 @@ public class FTRUMGlobalManager {
     }
 
     void initParams(FTRUMConfig config) {
-        checkSessionKeep(sessionId, config.getSamplingRate());
+        sampleRate = config.getSamplingRate();
+        checkSessionKeep(sessionId, sampleRate);
         EventConsumerThreadPool.get().execute(() -> {
             FTDBManager.get().closeAllActionAndView();
         });
@@ -1060,7 +1063,7 @@ public class FTRUMGlobalManager {
     private void checkSessionKeep(String sessionId, float sampleRate) {
         boolean collect = Utils.enableTraceSamplingRate(sampleRate);
         if (!collect) {
-            if (notCollectMap.size() + 1 > FILTER_CAPACITY) {
+            if (notCollectMap.size() + 1 > SESSION_FILTER_CAPACITY) {
                 notCollectMap.remove(0);
             }
             notCollectMap.add(sessionId);
