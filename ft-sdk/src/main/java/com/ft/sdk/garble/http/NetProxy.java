@@ -48,7 +48,7 @@ public class NetProxy {
             return getResponseData(tClass, NetCodeStatus.UNKNOWN_EXCEPTION_CODE, "请求地址错误");
         }
         if (httpBuilder.isUseDefaultHead()) {
-            //设置 DataFlux 请求特有的请求头
+            //设置特有的请求头
             setHeadParams();
         }
         engine.createRequest(httpBuilder);

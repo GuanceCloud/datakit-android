@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public class LogBean extends BaseContentBean {
     //指定当前日志的来源，比如如果来源于 Ngnix，可指定为 Nginx，
-    // 同一应用产生的日志 source 应该一样，这样在 DataFlux 中方便针对该来源的日志配置同一的提取规则
+    // 同一应用产生的日志 source 应该一样，这样在观测云中方便针对该来源的日志配置同一的提取规则
     //日志等级
     Status status = Status.INFO;
 
