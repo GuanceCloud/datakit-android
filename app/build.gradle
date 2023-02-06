@@ -3,8 +3,9 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 31
+    namespace "com.ft"
+
     defaultConfig {
-        applicationId "com.ft"
         minSdkVersion 21
         targetSdkVersion 31
         versionCode 1
@@ -29,7 +30,7 @@ android {
         }
         debug {
             //gradlew createDebugCoverageReport 测试用例覆盖率报告
-            testCoverageEnabled = false
+            testCoverageEnabled = true
         }
     }
     compileOptions {

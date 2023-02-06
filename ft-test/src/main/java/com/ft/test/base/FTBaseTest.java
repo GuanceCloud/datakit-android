@@ -54,7 +54,7 @@ public class FTBaseTest {
     }
 
     protected void executeSyncTask() throws Exception {
-        Whitebox.invokeMethod(SyncTaskManager.get(), "executeSyncPoll");
+        Whitebox.invokeMethod(SyncTaskManager.get(), "executePoll");
     }
 
     protected void invokeSyncData(DataType type, String measurement, JSONObject tags, JSONObject fileds) throws Exception {
