@@ -1,7 +1,7 @@
 package com.ft.sdk.tests;
 
 import static com.ft.sdk.tests.FTSdkAllTests.hasPrepare;
-import static com.ft.sdk.garble.utils.Constants.DEFAULT_LOG_SERVICE_NAME;
+import static com.ft.sdk.garble.utils.Constants.DEFAULT_SERVICE_NAME;
 
 import android.os.Looper;
 
@@ -31,7 +31,7 @@ public class ConfigTest extends FTBaseTest {
 
     @Test
     public void emptyServiceName() {
-        serviceNameParamTest(null, DEFAULT_LOG_SERVICE_NAME);
+        serviceNameParamTest(null, DEFAULT_SERVICE_NAME);
     }
 
     @Test
@@ -60,10 +60,10 @@ public class ConfigTest extends FTBaseTest {
 
     private void serviceNameParamTest(String serviceName, String expected) {
         FTSDKConfig ftSDKConfig = getDefaultConfig();
+        ftSDKConfig.setServiceName(serviceName);
         FTSdk.install(ftSDKConfig);
-        FTSdk.initLogWithConfig(new FTLoggerConfig().setServiceName(serviceName));
 
-        Assert.assertEquals(expected, FTLoggerConfigManager.get().getConfig().getServiceName());
+        Assert.assertEquals(expected, ftSDKConfig.getServiceName());
     }
 
     private void envParamTest(EnvType env, EnvType expected) {

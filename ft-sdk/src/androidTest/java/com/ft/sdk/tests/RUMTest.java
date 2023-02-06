@@ -396,6 +396,8 @@ public class RUMTest extends FTBaseTest {
                 .get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
         Assert.assertEquals(0, recordDataList.size());
 
+        FTSdk.initRUMWithConfig(new FTRUMConfig().setSamplingRate(1f));
+
     }
 
     /**
@@ -405,7 +407,7 @@ public class RUMTest extends FTBaseTest {
      */
     @Test
     public void sampleRate100Test() throws Exception {
-        FTSdk.initRUMWithConfig(new FTRUMConfig().setSamplingRate(100));
+        FTSdk.initRUMWithConfig(new FTRUMConfig().setSamplingRate(1f));
 
         generateRUMData();
 

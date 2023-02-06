@@ -6,6 +6,7 @@ android {
     namespace "com.ft"
 
     defaultConfig {
+        applicationId "com.ft"
         minSdkVersion 21
         targetSdkVersion 31
         versionCode 1

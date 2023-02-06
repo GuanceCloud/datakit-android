@@ -85,7 +85,7 @@ public class DataSyncTest extends FTBaseTest {
         Assert.assertTrue(except1 > 0);
         resumeSyncTask();
         executeSyncTask();
-        Thread.sleep(3000);
+        Thread.sleep(1000);
         int except2 = CheckUtils.getCount(DataType.RUM_APP, Constants.FT_MEASUREMENT_RUM_VIEW, 0);
         Assert.assertEquals(0, except2);
     }
