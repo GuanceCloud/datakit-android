@@ -29,10 +29,11 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+/**
+ * 基础测试用例类，用于快速构建 Android Test
+ */
 public class FTBaseTest {
 
-    protected static final String CONTENT_SIMPLE_TEST = "----simpleTest----";
-    protected static final String TEST_MEASUREMENT = "testMeasurement";
     public static final String ANY_VIEW = "AnyView";
     protected static final String CUSTOM_KEY = "custom_key";
     protected static final String CUSTOM_VALUE = "custom_value";
@@ -44,6 +45,10 @@ public class FTBaseTest {
         return InstrumentationRegistry.getInstrumentation().getTargetContext();
     }
 
+    /**
+     * 停止数据同步
+     * @throws Exception
+     */
     protected static void stopSyncTask() throws Exception {
         Whitebox.invokeMethod(SyncTaskManager.get(), "setRunning", true);
 
@@ -57,6 +62,17 @@ public class FTBaseTest {
         Whitebox.invokeMethod(SyncTaskManager.get(), "executePoll");
     }
 
+    /**
+     * 立即进行数据同步
+     * <p>
+     * {@link FTTrackInner#syncDataBackground(DataType, long, String, JSONObject, JSONObject)}
+     *
+     * @param type
+     * @param measurement
+     * @param tags
+     * @param fileds
+     * @throws Exception
+     */
     protected void invokeSyncData(DataType type, String measurement, JSONObject tags, JSONObject fileds) throws Exception {
         Whitebox.invokeMethod(FTTrackInner.getInstance(), "syncDataBackground",
                 type, Utils.getCurrentNanoTime(), measurement, tags, fileds);
@@ -64,6 +80,11 @@ public class FTBaseTest {
     }
 
 
+    /**
+     * 组织程序崩溃，保证测试用例执行不中断
+     * <p>
+     * {@link FTExceptionHandler#isAndroidTest}
+     */
     protected void avoidCrash() {
         try {
             Whitebox.setInternalState(FTExceptionHandler.get(), "isAndroidTest", true);
@@ -72,6 +93,13 @@ public class FTBaseTest {
         }
     }
 
+    /**
+     * 关闭当前激活 Action
+     * <p>
+     * {@link FTRUMGlobalManager#checkActionClose()}
+     *
+     * @throws Exception
+     */
     protected void invokeCheckActionClose() throws Exception {
         Thread.sleep(1000);
         Whitebox.invokeMethod(FTRUMGlobalManager.get(), "checkActionClose");

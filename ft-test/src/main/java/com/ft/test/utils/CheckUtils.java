@@ -35,50 +35,6 @@ public class CheckUtils {
         return result;
     }
 
-    /**
-     *
-     * @param key
-     * @param dataType
-     * @param isTag
-     * @return
-     */
-    public static boolean checkDynamicKey(String key, DataType dataType, boolean isTag) {
-        return checkDynamicKeys(new String[]{key}, dataType, isTag);
-    }
-
-    /**
-     *
-     * @param keys
-     * @param dataType
-     * @param isTag
-     * @return
-     */
-    public static boolean checkDynamicKeys(String[] keys, DataType dataType, boolean isTag) {
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, dataType);
-        for (SyncJsonData recordData : recordDataList) {
-            try {
-                JSONObject json = new JSONObject(recordData.getDataString());
-                for (String key : keys) {
-                    if (isTag) {
-                        JSONObject tags = json.optJSONObject("tags");
-                        if (tags != null) {
-                            return tags.has(key);
-                        }
-
-                    } else {
-                        JSONObject fields = json.optJSONObject("fields");
-                        if (fields != null) {
-                            return fields.has(key);
-                        }
-                    }
-                }
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        return false;
-    }
 
 
     /**
@@ -122,6 +78,7 @@ public class CheckUtils {
     }
 
     /**
+     * 获取数据数量
      * @param dataType
      * @param checkValues
      * @param limit
@@ -144,6 +101,7 @@ public class CheckUtils {
     }
 
     /**
+     * 获取数据数量
      * @param dataType
      * @param value
      * @param limit
@@ -155,6 +113,8 @@ public class CheckUtils {
 
 
     /**
+     *
+     * 检验行协议中的数据值
      * @param dataType
      * @param value
      * @return

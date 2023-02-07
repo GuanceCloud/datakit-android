@@ -27,6 +27,11 @@ public class RequestUtil {
             .connectTimeout(10, TimeUnit.SECONDS)
             .build();
 
+    /**
+     *  发起一个 http 请求
+     * @param url 请求地址
+     * @return
+     */
     public static Request okhttpRequestUrl(@NonNull String url) {
         Request.Builder builder = new Request.Builder().url(url)
                 .method(RequestMethod.GET.name(), null);
