@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 
 //发布 snapshot 版本号末尾追加 "-SNAPSHOT"
-def versionNameStr = "1.3.9-alpha02"
+def versionNameStr = "1.3.9-beta01"
 
 android {
     compileSdkVersion 31
