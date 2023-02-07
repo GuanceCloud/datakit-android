@@ -23,7 +23,7 @@ public class FTSDKConfig {
      */
     private boolean enableAccessAndroidID = true;
 
-    private String serviceName;
+    private String serviceName = Constants.DEFAULT_SERVICE_NAME;
 
     /**
      * 数据上传环境
@@ -64,6 +64,7 @@ public class FTSDKConfig {
 
     /**
      * 获取 datakit 数据上报地址
+     *
      * @return
      */
     public String getMetricsUrl() {
@@ -184,7 +185,10 @@ public class FTSDKConfig {
         return serviceName;
     }
 
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
+    public FTSDKConfig setServiceName(String serviceName) {
+        if (serviceName != null && !serviceName.isEmpty()) {
+            this.serviceName = serviceName;
+        }
+        return this;
     }
 }

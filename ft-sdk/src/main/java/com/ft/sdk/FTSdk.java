@@ -167,8 +167,8 @@ public class FTSdk {
      */
     public static void initRUMWithConfig(@NonNull FTRUMConfig config) {
         try {
-            FTRUMConfigManager.get().initWithConfig(config);
             config.setServiceName(mFtSdk.getBaseConfig().getServiceName());
+            FTRUMConfigManager.get().initWithConfig(config);
         } catch (Exception e) {
             LogUtils.e(TAG, e.getMessage());
         }
@@ -195,8 +195,8 @@ public class FTSdk {
      */
     public static void initLogWithConfig(@NonNull FTLoggerConfig config) {
         try {
-            FTLoggerConfigManager.get().initWithConfig(config);
             config.setServiceName(mFtSdk.getBaseConfig().getServiceName());
+            FTLoggerConfigManager.get().initWithConfig(config);
         } catch (Exception e) {
             LogUtils.e(TAG, e.getMessage());
         }

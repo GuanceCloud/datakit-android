@@ -91,15 +91,14 @@ public class FTRUMConfig {
      * 设置 serviceName
      *
      * @param serviceName
-     * @return
      */
-    public FTRUMConfig setServiceName(String serviceName) {
+    void setServiceName(String serviceName) {
         this.serviceName = serviceName;
-        return this;
     }
 
     /**
      * 获取 serviceName
+     *
      * @return
      */
     public String getServiceName() {
@@ -126,6 +125,7 @@ public class FTRUMConfig {
 
     /**
      * 设置是否监测 App 崩溃
+     *
      * @param enableTrackAppCrash
      * @return
      */
@@ -140,6 +140,7 @@ public class FTRUMConfig {
 
     /**
      * 是否监测 App UI卡顿
+     *
      * @param enableTrackAppUIBlock
      * @return
      */

@@ -11,7 +11,6 @@ import java.util.List;
 
 
 /**
- *
  * 配置日志 {@link FTLogger} 输出使用的参数配置
  *
  * @author Brandon
@@ -83,6 +82,7 @@ public class FTLoggerConfig {
 
     /**
      * 设置是否与 RUM 数据关联
+     *
      * @param enableLinkRumData
      * @return
      */
@@ -134,15 +134,12 @@ public class FTLoggerConfig {
      *
      * @return
      */
-     public String getServiceName() {
+    public String getServiceName() {
         return serviceName;
     }
 
-     FTLoggerConfig setServiceName(String serviceName) {
-        if (serviceName != null) {
-            this.serviceName = serviceName;
-        }
-        return this;
+    void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
     }
 
 
