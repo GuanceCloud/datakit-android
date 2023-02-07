@@ -1,6 +1,7 @@
 package com.ft.sdk.garble.utils;
 
 import com.ft.sdk.garble.bean.OP;
+import com.ft.sdk.garble.bean.ErrorType;
 
 import java.util.HashMap;
 
@@ -10,8 +11,18 @@ import java.util.HashMap;
  * Description:
  */
 public class Constants {
+    /**
+     * SDK 名称
+     */
     public static final String SDK_NAME = "df_android_rum_sdk";
+    /**
+     * 非法数值
+     */
     public static final String FT_KEY_VALUE_NULL = "null";
+
+    /**
+     * 未知类型
+     */
     public static final String UNKNOWN = "N/A";
     public static final String FLOW_ROOT = "root";
     /**
@@ -40,20 +51,41 @@ public class Constants {
     public static final String FT_MEASUREMENT_TIME_COST_CLIENT = "mobile_client_time_cost";
     public static final String FT_MEASUREMENT_MONITOR = "mobile_monitor";
 
+    /**
+     * 页面数据指标，暂时指 Activity 生命周期
+     */
     public static final String FT_MEASUREMENT_RUM_VIEW = "view";
+    /**
+     * 发生错的数据指标，例如崩溃、网络错误及用户自定义错误,{@link ErrorType}
+     */
     public static final String FT_MEASUREMENT_RUM_ERROR = "error";
+    /**
+     * 长延迟操作指标，用于记录应用运行卡顿问题
+     */
     public static final String FT_MEASUREMENT_RUM_LONG_TASK = "long_task";
+    /**
+     * 资源指标，记录网络请求耗时指标及状态和错误内容
+     */
     public static final String FT_MEASUREMENT_RUM_RESOURCE = "resource";
+    /**
+     * 操作行为指标，指用户点击、或者自定义行为
+     */
     public static final String FT_MEASUREMENT_RUM_ACTION = "action";
 
 
     public static final String URL_MODEL_TRACK_INFLUX = "v1/write/metric";//指标数据上传路径
+    /**
+     * RUM，用户访问监测，datakit 请求地址
+     **/
     public static final String URL_MODEL_RUM = "v1/write/rum";//
+    /**
+     * Log，日志，datakit 请求地址
+     **/
     public static final String URL_MODEL_LOG = "v1/write/logging";//日志数据上传路径
     public static final String URL_MODEL_TRACING = "v1/write/tracing";//链路上传
 
     public static final String DEFAULT_OBJECT_CLASS = "Mobile_Device";//默认的对象名
-    public static final String DEFAULT_LOG_SERVICE_NAME = "df_rum_android";
+    public static final String DEFAULT_SERVICE_NAME = "df_rum_android";
     public static final int MAX_DB_CACHE_NUM = 5000;//数据库最大缓存容量
 
 //    public static final String KEY_EVENT_ID = "event_id";
@@ -89,21 +121,21 @@ public class Constants {
     public static final String KEY_BATTERY_CURRENT_AVG = "battery_current_avg";
     public static final String KEY_BATTERY_CURRENT_MAX = "battery_current_max";
 
-    public static final String KEY_NETWORK_TYPE = "network_type";
-    public static final String KEY_NETWORK_STRENGTH = "network_strength";
-    public static final String KEY_NETWORK_IN_RATE = "network_in_rate";
-    public static final String KEY_NETWORK_OUT_RATE = "network_out_rate";
-    public static final String KEY_NETWORK_PROXY = "network_proxy";
-    public static final String KEY_NETWORK_DNS = "dns";
-    public static final String KEY_NETWORK_ROAM = "roam";
-    public static final String KEY_NETWORK_WIFI_SSID = "wifi_ssid";
-    public static final String KEY_NETWORK_WIFI_IP = "wifi_ip";
-    public static final String KEY_INNER_NETWORK_TCP_TIME = "_network_tcp_time";
-    public static final String KEY_INNER_NETWORK_DNS_TIME = "_network_dns_time";
-    public static final String KEY_INNER_NETWORK_RESPONSE_TIME = "_network_response_time";
-    public static final String KEY_NETWORK_TCP_TIME = "network_tcp_time";
-    public static final String KEY_NETWORK_DNS_TIME = "network_dns_time";
-    public static final String KEY_NETWORK_RESPONSE_TIME = "network_response_time";
+//    public static final String KEY_NETWORK_TYPE = "network_type";
+//    public static final String KEY_NETWORK_STRENGTH = "network_strength";
+//    public static final String KEY_NETWORK_IN_RATE = "network_in_rate";
+//    public static final String KEY_NETWORK_OUT_RATE = "network_out_rate";
+//    public static final String KEY_NETWORK_PROXY = "network_proxy";
+//    public static final String KEY_NETWORK_DNS = "dns";
+//    public static final String KEY_NETWORK_ROAM = "roam";
+//    public static final String KEY_NETWORK_WIFI_SSID = "wifi_ssid";
+//    public static final String KEY_NETWORK_WIFI_IP = "wifi_ip";
+//    public static final String KEY_INNER_NETWORK_TCP_TIME = "_network_tcp_time";
+//    public static final String KEY_INNER_NETWORK_DNS_TIME = "_network_dns_time";
+//    public static final String KEY_INNER_NETWORK_RESPONSE_TIME = "_network_response_time";
+//    public static final String KEY_NETWORK_TCP_TIME = "network_tcp_time";
+//    public static final String KEY_NETWORK_DNS_TIME = "network_dns_time";
+//    public static final String KEY_NETWORK_RESPONSE_TIME = "network_response_time";
 
 
     public static final String KEY_SERVICE = "service";
@@ -124,11 +156,11 @@ public class Constants {
     public static final String KEY_DEVICE_CARRIER = "carrier";
     public static final String KEY_DEVICE_LOCALE = "locale";
 
-    public static final String EVENT_NAME_LAUNCH = "launch";
-    public static final String EVENT_NAME_OPEN = "open";
+    //    public static final String EVENT_NAME_LAUNCH = "launch";
+//    public static final String EVENT_NAME_OPEN = "open";
     public static final String EVENT_NAME_CLICK = "click";
-    public static final String EVENT_NAME_LEAVE = "leave";
-    public static final String EVENT_NAME_ENTER = "enter";
+//    public static final String EVENT_NAME_LEAVE = "leave";
+//    public static final String EVENT_NAME_ENTER = "enter";
 
     public static final String KEY_RUM_IS_SIGN_IN = "is_signin";
     public static final String KEY_RUM_USER_ID = "userid";
@@ -174,28 +206,78 @@ public class Constants {
     public static final String KEY_RUM_LONG_TASK_STACK = "long_task_stack";
     public static final String KEY_RUM_NETWORK_TYPE = "network_type";
 
+    /**
+     * 会话 ID
+     */
     public static final String KEY_RUM_SESSION_ID = "session_id";
+
+    /**
+     * 会话类型
+     */
     public static final String KEY_RUM_SESSION_TYPE = "session_type";
     public static final String KEY_RUM_VIEW_ID = "view_id";
+    /**
+     * 页面来源，页面的父级
+     */
     public static final String KEY_RUM_VIEW_REFERRER = "view_referrer";
+    /**
+     * 页面名称
+     */
     public static final String KEY_RUM_VIEW_NAME = "view_name";
+
+    /**
+     * 页面加载时间
+     */
     public static final String KEY_RUM_VIEW_LOAD = "loading_time";
     public static final String KEY_RUM_VIEW_LONG_TASK_COUNT = "view_long_task_count";
+    /**
+     * 页面周期，资源请求数，{@link #FT_MEASUREMENT_RUM_RESOURCE}
+     */
     public static final String KEY_RUM_VIEW_RESOURCE_COUNT = "view_resource_count";
     public static final String KEY_RUM_VIEW_ERROR_COUNT = "view_error_count";
     public static final String KEY_RUM_VIEW_ACTION_COUNT = "view_action_count";
     public static final String KEY_RUM_VIEW_TIME_SPENT = "time_spent";
+    /**
+     * 页面是否，正处在激活状态
+     */
     public static final String KEY_RUM_VIEW_IS_ACTIVE = "is_active";
     public static final String KEY_RUM_VIEW_IS_WEB_VIEW = "is_web_view";
 
+    /**
+     * 操作 ID ，{@link #FT_MEASUREMENT_RUM_ACTION}
+     */
     public static final String KEY_RUM_ACTION_ID = "action_id";
+    /**
+     * 操作名称
+     */
     public static final String KEY_RUM_ACTION_NAME = "action_name";
+
+    /**
+     * 操作类型
+     */
     public static final String KEY_RUM_ACTION_TYPE = "action_type";
+
+    /**
+     * action 周期内容长耗时数量统计，{@link Constants#FT_MEASUREMENT_RUM_LONG_TASK}
+     */
     public static final String KEY_RUM_ACTION_LONG_TASK_COUNT = "action_long_task_count";
+
+    /**
+     * action 生命周期中, 发生{@link Constants#FT_MEASUREMENT_RUM_RESOURCE} 次数
+     */
     public static final String KEY_RUM_ACTION_RESOURCE_COUNT = "action_resource_count";
+    /**
+     * action 生命周期中，发生{@link Constants#FT_MEASUREMENT_RUM_ERROR} 次数
+     */
     public static final String KEY_RUM_ACTION_ERROR_COUNT = "action_error_count";
+    /**
+     * action 耗时，单位纳秒
+     */
     public static final String KEY_RUM_ACTION_DURATION = "duration";
 
+    /**
+     * 行协议数据，附加属性
+     */
     public static final String KEY_RUM_PROPERTY = "property";
 
     public static final String ACTION_TYPE_LAUNCH_COLD = "launch_cold";

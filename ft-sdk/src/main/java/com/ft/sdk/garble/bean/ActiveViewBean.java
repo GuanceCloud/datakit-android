@@ -2,8 +2,20 @@ package com.ft.sdk.garble.bean;
 
 import com.ft.sdk.garble.utils.Utils;
 
+/**
+ * 当前激活 {@link ViewBean}
+ *
+ * @author Brandon
+ */
 public class ActiveViewBean extends ViewBean {
 
+    /**
+     *
+     * @param name
+     * @param viewReferrer
+     * @param loadTime
+     * @param sessionId
+     */
     public ActiveViewBean(String name, String viewReferrer, long loadTime, String sessionId) {
         this.viewName = name;
         this.viewReferrer = viewReferrer;
@@ -11,11 +23,19 @@ public class ActiveViewBean extends ViewBean {
         this.sessionId = sessionId;
     }
 
+    /**
+     * 关闭激活状态
+     */
     public void close() {
         this.isClose = true;
         timeSpent = Utils.getCurrentNanoTime() - startTime;
     }
 
+    /**
+     * 转化为 {@link ViewBean}
+     *
+     * @return
+     */
     public ViewBean convertToViewBean() {
         ViewBean bean = new ViewBean();
         bean.id = this.id;

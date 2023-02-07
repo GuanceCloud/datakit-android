@@ -9,9 +9,21 @@ import org.json.JSONObject;
  * time 2020/3/12 10:59:15
  */
 public class LineProtocolBean {
+    /**
+     * 数据指标
+     */
     private String measurement;
+    /**
+     * 标签数据
+     */
     private JSONObject tags;
+    /**
+     * 指标数据
+     */
     private JSONObject fields;
+    /**
+     *  产生时间，单位纳秒
+     */
     private long timeNano;
 
     public LineProtocolBean(String measurement, JSONObject tags, JSONObject fields, long timeNano) {

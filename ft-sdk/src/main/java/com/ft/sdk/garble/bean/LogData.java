@@ -6,9 +6,13 @@ package com.ft.sdk.garble.bean;
  * description:日志对象(外部使用)
  */
 public class LogData {
-    //日志内容，纯文本或 JSONString 都可以
+    /**
+     * 日志内容，纯文本或 JSONString 都可以
+     */
     String content;
-    //日志等级
+    /**
+     * 日志等级
+     */
     Status status = Status.INFO;
 
     public LogData(String content, Status status) {

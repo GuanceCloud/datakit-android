@@ -3,6 +3,7 @@ package com.ft.sdk;
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.utils.DeviceUtils;
+import com.ft.sdk.garble.utils.Constants;
 
 import java.util.HashMap;
 
@@ -22,6 +23,8 @@ public class FTSDKConfig {
      */
     private boolean enableAccessAndroidID = true;
 
+    private String serviceName;
+
     /**
      * 数据上传环境
      */
@@ -34,7 +37,8 @@ public class FTSDKConfig {
     private boolean onlySupportMainProcess = true;
 
     /**
-     *
+     * 全局参数，例如 {@link Constants#KEY_APP_VERSION_NAME} 等固定配置参数，
+     * 或通过 {@link FTSDKConfig#addGlobalContext(String, String)} 用户自定义添加的变量参数
      */
     private final HashMap<String, Object> globalContext = new HashMap<>();
 
@@ -58,6 +62,10 @@ public class FTSDKConfig {
         this.metricsUrl = metricsUrl;
     }
 
+    /**
+     * 获取 datakit 数据上报地址
+     * @return
+     */
     public String getMetricsUrl() {
         return metricsUrl;
     }
@@ -172,4 +180,11 @@ public class FTSDKConfig {
         return this.globalContext;
     }
 
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
 }

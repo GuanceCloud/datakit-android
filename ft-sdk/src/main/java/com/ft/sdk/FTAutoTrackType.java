@@ -16,7 +16,7 @@ public enum FTAutoTrackType {
     APP_CLICK(1 << 2);
 
     /**
-     *
+     * Auto track 类型
      */
     public final int type;
 

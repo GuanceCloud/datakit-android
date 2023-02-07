@@ -37,7 +37,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.net.ssl.HttpsURLConnection;
 
 /**
- * RUM 数据管理，RUM 添加数据，可以通过<a href="https://docs.guance.com/real-user-monitoring/explorer/">查看器</a>
+ * RUM 数据管理，记录 Action，View，LongTask，Error，并统计
+ * {@link Constants#KEY_RUM_VIEW_ACTION_COUNT }
+ * {@link Constants#KEY_RUM_ACTION_ERROR_COUNT}
+ * ，可以通过<a href="https://docs.guance.com/real-user-monitoring/explorer/">查看器</a>
  */
 public class FTRUMGlobalManager {
     private static final String TAG = "RUMGlobalManager";
@@ -69,17 +72,38 @@ public class FTRUMGlobalManager {
         return FTRUMGlobalManager.SingletonHolder.INSTANCE;
     }
 
+    /**
+     * {@link Constants#KEY_RUM_SESSION_ID}
+     */
     private String sessionId = UUID.randomUUID().toString();
 
 
+    /**
+     * 不手机
+     */
     private final ArrayList<String> notCollectMap = new ArrayList<>();
 
+    /**
+     * 当前激活 View
+     */
     private ActiveViewBean activeView;
+
+    /**
+     * 当前激活 Action
+     */
     private ActiveActionBean activeAction;
+
 
     private final ConcurrentHashMap<String, Long> preActivityDuration = new ConcurrentHashMap<>();
 
+    /**
+     * 最近 Session 时间，单位纳秒
+     */
     private final long lastSessionTime = Utils.getCurrentNanoTime();
+
+    /**
+     * 最近 Action 时间
+     */
     private long lastActionTime = lastSessionTime;
     private float sampleRate = 1f;
 

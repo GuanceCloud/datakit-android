@@ -308,7 +308,7 @@ public class FTAutoTrack {
     }
 
     /**
-     * {@link MenuItem}
+     * {@link MenuItem} 点击事件
      *
      * @param menuItem
      */
@@ -320,6 +320,11 @@ public class FTAutoTrack {
         }
     }
 
+    /**
+     *  {@link MenuItem} 点击事件
+     * @param object
+     * @param menuItem
+     */
     public static void trackMenuItem(Object object, MenuItem menuItem) {
         try {
             clickView((Class<?>) object, AopUtils.getClassName(object), AopUtils.getSupperClassName(object), menuItem.getClass().getName() + "/" + menuItem.getItemId());
@@ -328,6 +333,11 @@ public class FTAutoTrack {
         }
     }
 
+    /**
+     * 对话框事件监听
+     * @param dialogInterface
+     * @param whichButton
+     */
     public static void trackDialog(DialogInterface dialogInterface, int whichButton) {
         try {
             Dialog dialog = null;
@@ -447,66 +457,66 @@ public class FTAutoTrack {
         putPageEvent(time, op, currentPage, rootPage, vtp);
     }
 
-    /**
-     * Fragment 开关
-     *
-     * @param op
-     * @param currentPage
-     * @param rootPage
-     * @param parentPage
-     */
-    public static void putFragmentEvent(@NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String parentPage) {
-        long time = Utils.getCurrentNanoTime();
-        try {
-            if (op == OP.OPEN_FRA) {
-                //显示Fragment的页面名称为 Activity.Fragment
-                LogUtils.showAlias("当前页面的 name 值为:" + rootPage + "." + currentPage);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        putPageEvent(time, op, currentPage, rootPage, null);
-    }
-
-    /**
-     * {@link Activity} 开关
-     *
-     * @param op
-     * @param classCurrent
-     */
-    public static void putActivityEvent(@NonNull OP op, Class classCurrent) {
-        long time = Utils.getCurrentNanoTime();
-//        Class parentClass = FTActivityManager.get().getLastActivity();
-//        String parentPageName = Constants.FLOW_ROOT;
-//        if (op == OP.OPEN_ACT) {
-//            //是第一次加载 Activity ，说明其为从其他Activity 中打开
-//            //如果没有上一个 Activity 说明其为 根结点
-//            if (parentClass != null) {
-//                //判断从 上一个 页面的Activity 还是 Fragment 中打开
-//                boolean isFromFragment = FTActivityManager.get().getActivityOpenFromFragment(classCurrent.getName());
-//                if (isFromFragment) {
-//                    //从 Fragment 打开则找到上一个页面的 Fragment
-//                    Class c = FTFragmentManager.getInstance().getLastFragmentName(parentClass.getName());
-//                    if (c != null) {
-//                        parentPageName = parentClass.getSimpleName() + "." + c.getSimpleName();
-//                    } else {
-//                        parentPageName = parentClass.getSimpleName();
-//                    }
-//                } else {
-//                    //从Activity 中打开则找到上一个Activity
-//                    parentPageName = parentClass.getSimpleName();
-//                }
+//    /**
+//     * Fragment 开关
+//     *
+//     * @param op
+//     * @param currentPage
+//     * @param rootPage
+//     * @param parentPage
+//     */
+//    public static void putFragmentEvent(@NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String parentPage) {
+//        long time = Utils.getCurrentNanoTime();
+//        try {
+//            if (op == OP.OPEN_FRA) {
+//                //显示Fragment的页面名称为 Activity.Fragment
+//                LogUtils.showAlias("当前页面的 name 值为:" + rootPage + "." + currentPage);
 //            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
 //        }
-        try {
-            if (op == OP.OPEN_ACT) {
-                LogUtils.showAlias("当前页面的 name 值为:" + classCurrent.getSimpleName());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        putPageEvent(time, op, classCurrent.getSimpleName(), classCurrent.getSimpleName(), null);
-    }
+//        putPageEvent(time, op, currentPage, rootPage, null);
+//    }
+//
+//    /**
+//     * {@link Activity} 开关
+//     *
+//     * @param op
+//     * @param classCurrent
+//     */
+//    public static void putActivityEvent(@NonNull OP op, Class classCurrent) {
+//        long time = Utils.getCurrentNanoTime();
+////        Class parentClass = FTActivityManager.get().getLastActivity();
+////        String parentPageName = Constants.FLOW_ROOT;
+////        if (op == OP.OPEN_ACT) {
+////            //是第一次加载 Activity ，说明其为从其他Activity 中打开
+////            //如果没有上一个 Activity 说明其为 根结点
+////            if (parentClass != null) {
+////                //判断从 上一个 页面的Activity 还是 Fragment 中打开
+////                boolean isFromFragment = FTActivityManager.get().getActivityOpenFromFragment(classCurrent.getName());
+////                if (isFromFragment) {
+////                    //从 Fragment 打开则找到上一个页面的 Fragment
+////                    Class c = FTFragmentManager.getInstance().getLastFragmentName(parentClass.getName());
+////                    if (c != null) {
+////                        parentPageName = parentClass.getSimpleName() + "." + c.getSimpleName();
+////                    } else {
+////                        parentPageName = parentClass.getSimpleName();
+////                    }
+////                } else {
+////                    //从Activity 中打开则找到上一个Activity
+////                    parentPageName = parentClass.getSimpleName();
+////                }
+////            }
+////        }
+//        try {
+//            if (op == OP.OPEN_ACT) {
+//                LogUtils.showAlias("当前页面的 name 值为:" + classCurrent.getSimpleName());
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        putPageEvent(time, op, classCurrent.getSimpleName(), classCurrent.getSimpleName(), null);
+//    }
 
     private static void putPageEvent(long time, @NonNull OP op, @Nullable String currentPage,
                                      @Nullable String rootPage, @Nullable String vtp) {
@@ -683,6 +693,10 @@ public class FTAutoTrack {
                 new Class[]{String.class, byte[].class});
     }
 
+    /**
+     * 设置 webview 监听事件
+     * @param webView
+     */
     public static void setUpWebView(View webView) {
         if (webView instanceof WebView && webView.getTag(R.id.ft_webview_handled_tag_view_value) == null) {
 
@@ -695,9 +709,11 @@ public class FTAutoTrack {
     }
 
     /**
+     * 调用 webview 方法
+     *
      * @param webView
-     * @param methodName
-     * @param params
+     * @param methodName 方法名
+     * @param params 参数
      * @param paramTypes
      */
     private static void invokeWebViewLoad(View webView, String methodName, Object[] params, Class[] paramTypes) {

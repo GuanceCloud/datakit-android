@@ -14,14 +14,21 @@ import java.util.Map;
  * description:日志对象(SDK内部使用)
  */
 public class LogBean extends BaseContentBean {
-    //指定当前日志的来源，比如如果来源于 Ngnix，可指定为 Nginx，
-    // 同一应用产生的日志 source 应该一样，这样在观测云中方便针对该来源的日志配置同一的提取规则
-    //日志等级
+    /**
+     * 指定当前日志的来源，比如如果来源于 Ngnix，可指定为 Nginx，
+     * 同一应用产生的日志 source 应该一样，这样在观测云中方便针对该来源的日志配置同一的提取规则
+     * 日志等级
+     */
     Status status = Status.INFO;
 
-    //用于链路日志，当前链路的请求响应时间，微秒为单位
+    /**
+     * 用于链路日志，当前链路的请求响应时间，微秒为单位
+     */
     long duration;
 
+    /**
+     * 扩展属性
+     */
     HashMap<String, Object> property = new HashMap<>();
 
     public HashMap<String, Object> getProperty() {
@@ -32,6 +39,10 @@ public class LogBean extends BaseContentBean {
         super(content, time);
     }
 
+    /**
+     * 获取所有日志中指标数据
+     * @return
+     */
     public JSONObject getAllFields() {
         super.getAllFields();
         try {
@@ -52,6 +63,10 @@ public class LogBean extends BaseContentBean {
         return fields;
     }
 
+    /**
+     * 获取所有日志中标签数据
+     * @return
+     */
     public JSONObject getAllTags() {
         super.getAllTags();
         try {

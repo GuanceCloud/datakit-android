@@ -46,7 +46,7 @@ public class SyncTaskManager {
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             if (msg.what == MSG_SYNC) {
-                executePoll();
+                executePoll(true);
             }
         }
     };
@@ -55,7 +55,7 @@ public class SyncTaskManager {
     private final static DataType[] SYNC_MAP = DataType.values();
 
     /**
-     * 警告!!! 该方法仅用于测试使用!!!
+     * For AndroidTest
      *
      * @param running
      */
@@ -75,7 +75,14 @@ public class SyncTaskManager {
         return SyncTaskManager.SingletonHolder.INSTANCE;
     }
 
+    /**
+     * For AndroidTest
+     */
     private void executePoll() {
+        executePoll(false);
+    }
+
+    private void executePoll(boolean withSleep) {
         if (running) {
             return;
         }
@@ -89,7 +96,9 @@ public class SyncTaskManager {
                     LogUtils.d(TAG, " \n*******************************************************\n" +
                             "******************数据同步线程运行中*******************\n" +
                             "*******************************************************\n");
-                    Thread.sleep(SLEEP_TIME);
+                    if (withSleep) {
+                        Thread.sleep(SLEEP_TIME);
+                    }
 
                     for (DataType dataType : SYNC_MAP) {
                         List<SyncJsonData> dataList = queryFromData(dataType);
@@ -121,7 +130,7 @@ public class SyncTaskManager {
     }
 
     /**
-     * 执行同步操作
+     * 执行存储数据同步操作
      */
     private synchronized void handleSyncOpt(final DataType dataType, final List<SyncJsonData> requestDatas) {
 
@@ -167,6 +176,11 @@ public class SyncTaskManager {
         }
     }
 
+    /**
+     * 查询
+     * @param dataType
+     * @return
+     */
     private List<SyncJsonData> queryFromData(DataType dataType) {
         return FTDBManager.get().queryDataByDataByTypeLimit(LIMIT_SIZE, dataType);
     }

@@ -9,7 +9,7 @@ public interface FTInTakeUrlHandler {
     /**
      * 是否采集这个地址数据
      *
-     * @param url url 地址，例子 https://www.guance.com/
+     * @param url url 地址，例子 <a href="https://www.guance.com/">点击查看</a>
      * @return true 采集，false 不采集
      */
     boolean isInTakeUrl(String url);

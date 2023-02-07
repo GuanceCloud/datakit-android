@@ -22,9 +22,19 @@ public class SyncJsonData implements Cloneable {
 
     private static final String TAG = "SyncJsonData";
 
+    /**
+     * 同步数据唯一 id
+     */
     long id;
+
+    /**
+     * 同步数据类型
+     */
     DataType dataType;
 
+    /**
+     * 同步数据字符类型数据
+     */
     String dataString;
 
     public SyncJsonData(DataType dataType) {

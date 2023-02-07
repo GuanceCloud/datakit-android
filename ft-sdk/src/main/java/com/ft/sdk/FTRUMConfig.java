@@ -2,38 +2,70 @@ package com.ft.sdk;
 
 import androidx.annotation.NonNull;
 
+import com.ft.sdk.garble.utils.Constants;
+
 import java.util.HashMap;
 
 public class FTRUMConfig {
+    /**
+     * 采样率
+     */
     private float samplingRate = 1;
 
+    /**
+     * RUM appID
+     */
     private String rumAppId = "";
-    //设置是否需要采集崩溃日志
+    /**
+     * 设置是否需要采集崩溃日志
+     */
     private boolean enableTrackAppCrash;
-    //设置是否检测 UI 卡顿
+    /**
+     * 设置是否检测 UI 卡顿
+     */
     private boolean enableTrackAppUIBlock;
-    //设置是否检测 ANR
+    /**
+     * 设置是否检测 ANR
+     */
     private boolean enableTrackAppANR;
-    //是否开启用户行为 action 追踪
+    /**
+     * 是否开启用户行为 action 追踪
+     */
     private boolean enableTraceUserAction;
-    //是否开启用户行为 view 追踪
+    /**
+     * 是否开启用户行为 view 追踪
+     */
     private boolean enableTraceUserView;
-    //是否开启用户欣慰 Resource 追踪
+    /**
+     * 是否开启用户欣慰 Resource 追踪
+     */
     private boolean enableTraceUserResource;
-    //崩溃采集数据附加类型
+    /**
+     * 崩溃采集数据附加类型
+     */
     private ErrorMonitorType extraMonitorTypeWithError = ErrorMonitorType.NO_SET;
 
-    //监控指标数据类型
+    /**
+     * 监控指标数据类型
+     */
     private DeviceMetricsMonitorType deviceMetricsMonitorType = DeviceMetricsMonitorType.NO_SET;
 
+    /**
+     * 设备监测指标检测周期
+     */
     private DetectFrequency deviceMetricsDetectFrequency = DetectFrequency.DEFAULT;
 
 //    private boolean backendSample = false;
 
     private FTInTakeUrlHandler handler = url -> false;
 
-    //设置全局 tag
+    /**
+     * 设置全局 tag
+     */
     private final HashMap<String, Object> globalContext = new HashMap<>();
+
+
+    private String serviceName = Constants.DEFAULT_SERVICE_NAME;
 
     /**
      * 获取采样率
@@ -44,9 +76,34 @@ public class FTRUMConfig {
         return samplingRate;
     }
 
+    /**
+     * 设置采用率
+     *
+     * @param samplingRate
+     * @return
+     */
     public FTRUMConfig setSamplingRate(float samplingRate) {
         this.samplingRate = samplingRate;
         return this;
+    }
+
+    /**
+     * 设置 serviceName
+     *
+     * @param serviceName
+     * @return
+     */
+    public FTRUMConfig setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+        return this;
+    }
+
+    /**
+     * 获取 serviceName
+     * @return
+     */
+    public String getServiceName() {
+        return this.serviceName;
     }
 
     /**
@@ -67,6 +124,11 @@ public class FTRUMConfig {
         return enableTrackAppCrash;
     }
 
+    /**
+     * 设置是否监测 App 崩溃
+     * @param enableTrackAppCrash
+     * @return
+     */
     public FTRUMConfig setEnableTrackAppCrash(boolean enableTrackAppCrash) {
         this.enableTrackAppCrash = enableTrackAppCrash;
         return this;
@@ -76,6 +138,11 @@ public class FTRUMConfig {
         return enableTrackAppUIBlock;
     }
 
+    /**
+     * 是否监测 App UI卡顿
+     * @param enableTrackAppUIBlock
+     * @return
+     */
     public FTRUMConfig setEnableTrackAppUIBlock(boolean enableTrackAppUIBlock) {
         this.enableTrackAppUIBlock = enableTrackAppUIBlock;
         return this;

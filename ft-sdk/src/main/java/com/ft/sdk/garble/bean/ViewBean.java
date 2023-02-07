@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.Utils;
 import com.google.gson.Gson;
+import com.ft.sdk.FTRUMGlobalManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,35 +14,112 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.UUID;
 
+/**
+ * View 指标数据，以下数据为页面页面生命周期内容产生的数据指标，从 {@link FTRUMGlobalManager#startView(String)} 到
+ * <p>
+ * {@link FTRUMGlobalManager#stopView()}  }
+ *
+ * @author Brandon
+ */
 public class ViewBean {
+    /**
+     * View 唯一ID， {@link Constants#KEY_RUM_VIEW_ID}
+     */
     String id = UUID.randomUUID().toString();
+    /**
+     * 页面来源，页面的父级，{@link Constants#KEY_RUM_VIEW_REFERRER}
+     */
     String viewReferrer;
+    /**
+     * 页面名称，{@link Constants#KEY_RUM_VIEW_NAME}
+     */
     String viewName;
 
+    /**
+     * longtask 捕获到的次数，{@link Constants#KEY_RUM_ACTION_LONG_TASK_COUNT}
+     */
     int longTaskCount;
+
+    /**
+     * 网络资源请求的次数,{@link Constants#KEY_RUM_VIEW_RESOURCE_COUNT}
+     */
     int resourceCount;
+    /**
+     * 发生错误的次数，{@link Constants#KEY_RUM_VIEW_ERROR_COUNT}
+     */
     int errorCount;
+
+    /**
+     * 捕获 Action 的次数 {@link  Constants#KEY_RUM_VIEW_ACTION_COUNT}
+     */
     int actionCount;
 
+    /**
+     * 是否处于激活状态， {@link  Constants#KEY_RUM_VIEW_IS_ACTIVE}
+     */
     boolean isClose = false;
+    /**
+     * 开始时间，单位纳秒
+     */
     long startTime = Utils.getCurrentNanoTime();
+
+    /**
+     * 页面加载时间，单位纳秒，{@link Constants#KEY_RUM_VIEW_LOAD}
+     */
     long loadTime = 0;
+
+    /**
+     * 页面停留时间，单位纳秒，{@link Constants#KEY_RUM_VIEW_TIME_SPENT}
+     */
     long timeSpent = 0;
 
+    /**
+     * 最小帧数
+     */
     double fpsMini;
+
+    /**
+     * 页面平均帧数
+     */
     double fpsAvg;
 
+    /**
+     * cpu 每秒跳动次数
+     */
     double cpuTickCountPerSecond = -1;
+
+    /**
+     * cpu 跳动次数
+     */
     long cpuTickCount = -1;
 
+    /**
+     * 平均内容
+     */
     long memoryAvg;
+
+    /**
+     * 最大内容
+     */
     long memoryMax;
 
+    /**
+     * 平均电池消耗
+     */
     int batteryCurrentAvg;
+    /**
+     * 电池最最大消耗
+     */
     int batteryCurrentMax;
 
+    /**
+     * {@link FTRUMGlobalManager#sessionId}
+     */
     String sessionId;
 
+    /**
+     * 页面附加属性,{@link  Constants#KEY_RUM_PROPERTY}
+     */
     HashMap<String, Object> property = new HashMap<>();
 
     public HashMap<String, Object> getProperty() {
@@ -209,6 +287,11 @@ public class ViewBean {
         this.batteryCurrentMax = batteryCurrentMax;
     }
 
+    /**
+     * 将指标数据转化为 json 字符
+     *
+     * @return
+     */
     public String getAttrJsonString() {
         HashMap<String, Object> map = new HashMap<>();
         map.put(Constants.KEY_BATTERY_CURRENT_AVG, batteryCurrentAvg);
@@ -223,6 +306,11 @@ public class ViewBean {
         return new Gson().toJson(map);
     }
 
+    /**
+     * 从 json 字符转化 View 指标数据
+     *
+     * @param jsonString
+     */
     public void setFromAttrJsonString(String jsonString) {
         try {
             JSONObject json = new JSONObject(jsonString);

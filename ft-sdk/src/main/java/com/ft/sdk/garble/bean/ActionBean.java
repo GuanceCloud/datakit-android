@@ -13,26 +13,75 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.UUID;
 
+/**
+ * 用户行为操作生命周指标，{@link Constants#FT_MEASUREMENT_RUM_ACTION}
+ */
 public class ActionBean {
+    /**
+     * Action 唯一ID,{@link Constants#KEY_RUM_ACTION_ID}
+     */
     String id = UUID.randomUUID().toString();
+    /**
+     * Action 开始时间
+     */
     long startTime = Utils.getCurrentNanoTime();
 
+    /**
+     * Action 名称，，{@link Constants#KEY_RUM_ACTION_NAME}
+     */
     String actionName;
+
+    /**
+     * Action 类型 ，{@link Constants#KEY_RUM_ACTION_TYPE}
+     */
     String actionType;
 
+    /**
+     * longtask 捕获次数，{@link Constants#KEY_RUM_ACTION_LONG_TASK_COUNT}
+     */
     int longTaskCount;
+
+    /**
+     * resource 请求次数，{@link Constants#KEY_RUM_ACTION_RESOURCE_COUNT}
+     */
     int resourceCount;
+    /**
+     * 错误次数， {@link Constants#KEY_RUM_ACTION_ERROR_COUNT}
+     */
     int errorCount;
 
+    /**
+     * 是否关闭
+     */
     boolean isClose = false;
 
+    /**
+     * Action 持续时间
+     */
     long duration = 0;
+    /**
+     * 会话 ID，{@link com.ft.sdk.FTRUMGlobalManager#sessionId}
+     */
     String sessionId;
 
+    /**
+     * 页面 ID，{@link  ViewBean#id}
+     */
     String viewId;
+
+    /**
+     * 页面名称 {@link  ViewBean#viewName}
+     */
     String viewName;
+
+    /**
+     * 页面来源，页面的父级 {@link ViewBean#viewReferrer}
+     */
     String viewReferrer;
 
+    /**
+     * Action 附加属性,{@link  Constants#KEY_RUM_PROPERTY}
+     */
     HashMap<String, Object> property = new HashMap<>();
 
     public HashMap<String, Object> getProperty() {

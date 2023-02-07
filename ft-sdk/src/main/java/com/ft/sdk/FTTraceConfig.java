@@ -1,25 +1,38 @@
 package com.ft.sdk;
 
-
-import com.ft.sdk.garble.utils.Constants;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 public class FTTraceConfig {
+    /**
+     * 采样率
+     */
     private float samplingRate = 1;
-    private String serviceName = Constants.DEFAULT_LOG_SERVICE_NAME;
+    /**
+     * 追踪类型链路
+     */
     private TraceType traceType = TraceType.DDTRACE;
+    /**
+     * webview 是否开启链路追踪
+     */
     private boolean enableWebTrace = false;
+    /**
+     * 是否开启自动 http
+     */
     private boolean enableAutoTrace = false;
+    /**
+     * 是否与 RUM 数据关联
+     */
     private boolean enableLinkRUMData = false;
 
-    //设置全局 tag
+    /**
+     * 设置全局 tag
+     */
     private final HashMap<String, Object> globalContext = new HashMap<>();
 
 
-    public List<String> traceContentType = Arrays.asList("application/json",
+    private final List<String> traceContentType = Arrays.asList("application/json",
             "application/javascript", "application/xml", "application/x-www-form-urlencoded",
             "text/html", "text/xml", "text/plain",
             "multipart/form-data"
@@ -33,17 +46,6 @@ public class FTTraceConfig {
         this.samplingRate = samplingRate;
         return this;
     }
-
-    public String getServiceName() {
-        return serviceName;
-    }
-
-//    public FTTraceConfig setServiceName(String serviceName) {
-//        if (serviceName != null) {
-//            this.serviceName = serviceName;
-//        }
-//        return this;
-//    }
 
     public TraceType getTraceType() {
         return traceType;

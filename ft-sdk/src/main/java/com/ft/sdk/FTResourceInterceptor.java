@@ -9,6 +9,7 @@ import com.ft.sdk.garble.utils.Utils;
 
 import java.io.IOException;
 
+import okhttp3.Call;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.Request;
@@ -18,6 +19,8 @@ import okhttp3.internal.http.HttpHeaders;
 
 /**
  * OKHttp Resource Interceptor
+ *
+ * 记录 RUM Resource 指标数据
  *
  * @author Brandon
  */
@@ -86,6 +89,8 @@ public class FTResourceInterceptor extends NetStatusMonitor implements Intercept
     }
 
     /**
+     * 记录网络请求中耗时指标 {@link NetStatusBean},在 {@link  okhttp3.EventListener#callEnd(Call)} 时进行调用
+     *
      * @param requestId
      * @param bean
      */

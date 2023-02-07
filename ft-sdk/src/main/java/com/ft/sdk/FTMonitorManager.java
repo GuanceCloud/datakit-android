@@ -16,12 +16,29 @@ import java.util.concurrent.TimeUnit;
  */
 public class FTMonitorManager {
 
+    /**
+     * 一秒，单位纳秒
+     */
     private static final long ONE_SECOND_NANO_TIMES = 1000000000;
+
+    /**
+     *
+     */
     private volatile static FTMonitorManager ftMonitorConfig;
+
+    /**
+     *
+     */
     private ErrorMonitorType errorMonitorType = ErrorMonitorType.NO_SET;
+    /**
+     *
+     */
     private DeviceMetricsMonitorType deviceMetricsMonitorType = DeviceMetricsMonitorType.NO_SET;
 
 
+    /**
+     *
+     */
     private final HashMap<String, MonitorRunnable> runnerMap = new HashMap<>();
 
     private FTMonitorManager() {
@@ -37,6 +54,7 @@ public class FTMonitorManager {
     }
 
     /**
+     * 初始化
      *
      * @param config
      */
@@ -47,7 +65,7 @@ public class FTMonitorManager {
     }
 
     /**
-     *
+     * 初始化参数
      */
     private void initParams() {
         if (isDeviceMetricsMonitorType(DeviceMetricsMonitorType.FPS)) {
@@ -67,11 +85,20 @@ public class FTMonitorManager {
         return (this.errorMonitorType.getValue() | errorMonitorType.getValue()) == this.errorMonitorType.getValue();
     }
 
+    /**
+     *
+     * @param deviceMetricsMonitorType
+     * @return
+     */
     public boolean isDeviceMetricsMonitorType(DeviceMetricsMonitorType deviceMetricsMonitorType) {
         return (this.deviceMetricsMonitorType.getValue() | deviceMetricsMonitorType.getValue()) == this.deviceMetricsMonitorType.getValue();
 
     }
 
+    /**
+     * 注册 viewId，为 viewId
+     * @param viewId View 唯一 ID ,{@link ViewBean#id}
+     */
     public void addMonitor(String viewId) {
         if (deviceMetricsMonitorType == DeviceMetricsMonitorType.NO_SET) return;
         synchronized (runnerMap) {
@@ -81,6 +108,10 @@ public class FTMonitorManager {
         }
     }
 
+    /**
+     *  附加监控指标数据, fps, cpu, memory
+     * @param bean
+     */
     public void attachMonitorData(ViewBean bean) {
         String viewId = bean.getId();
         if (deviceMetricsMonitorType == DeviceMetricsMonitorType.NO_SET) return;
@@ -118,7 +149,8 @@ public class FTMonitorManager {
     }
 
     /**
-     * 移除监控
+     * 移除监控，在一个页面结束后，移除
+     *
      * @param viewId
      */
     public void removeMonitor(String viewId) {

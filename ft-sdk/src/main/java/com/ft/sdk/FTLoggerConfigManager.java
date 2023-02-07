@@ -40,7 +40,7 @@ public class FTLoggerConfigManager {
     }
 
     /**
-     * 配置释放滞空
+     * 配置释放置空
      */
     void release() {
         config = null;

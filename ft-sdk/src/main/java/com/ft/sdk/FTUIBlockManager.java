@@ -10,7 +10,10 @@ import com.ft.sdk.garble.utils.Utils;
  * @author Brandon
  */
 public class FTUIBlockManager {
-    private static final long TIME_BLOCK_NS = 1000000000L;//超过1秒显示卡顿
+    /**
+     * 超过1秒显示卡顿
+     */
+    private static final long TIME_BLOCK_NS = 1000000000L;
     private static final String PREFIX_METHOD_DISPATCH_START = ">>>>> Dispatching to ";
     private static final String PREFIX_METHOD_DISPATCH_END = "<<<<< Finished to ";
 
@@ -57,6 +60,9 @@ public class FTUIBlockManager {
         Looper.getMainLooper().setMessageLogging(printer);
     }
 
+    /**
+     * 释放 MessageLogging
+     */
     public void release() {
         Looper.getMainLooper().setMessageLogging(null);
     }

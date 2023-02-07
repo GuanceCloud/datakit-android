@@ -11,27 +11,57 @@ import java.util.List;
 
 
 /**
+ *
+ * 配置日志 {@link FTLogger} 输出使用的参数配置
+ *
  * @author Brandon
  */
 public class FTLoggerConfig {
+    /**
+     * 设置采集率
+     */
     private float samplingRate = 1;
+    /**
+     * 是否与 RUM 数据关联
+     */
     private boolean enableLinkRumData = false;
+    /**
+     * 是否开启控制台日志输出
+     */
     private boolean enableConsoleLog = false;
+    /**
+     * 是否开启自定义日志
+     */
     private boolean enableCustomLog = false;
 
     /**
-     * 服务名称 {@link Constants#KEY_SERVICE },默认为 {@link Constants#DEFAULT_LOG_SERVICE_NAME}
+     * 服务名称 {@link Constants#KEY_SERVICE },默认为 {@link Constants#DEFAULT_SERVICE_NAME}
      */
-    private String serviceName = Constants.DEFAULT_LOG_SERVICE_NAME;
+    private String serviceName = Constants.DEFAULT_SERVICE_NAME;
+    /**
+     * log 过滤前缀
+     */
     private String logPrefix = "";
+    /**
+     * log 日志等级过滤
+     */
     private List<Status> logLevelFilters;
 
-    //设置全局 tag
+    /**
+     * 设置全局 tag
+     */
     private final HashMap<String, Object> globalContext = new HashMap<>();
 
-    //日志数据数据库存储策略
+    /**
+     * 日志数据数据库存储策略
+     */
     private LogCacheDiscard logCacheDiscardStrategy = LogCacheDiscard.DISCARD;
 
+    /**
+     * 获取采样率
+     *
+     * @return
+     */
     public float getSamplingRate() {
         return samplingRate;
     }
@@ -47,16 +77,12 @@ public class FTLoggerConfig {
         return this;
     }
 
-    /**
-     * 是否关联 RUM 数据
-     *
-     * @return
-     */
     public boolean isEnableLinkRumData() {
         return enableLinkRumData;
     }
 
     /**
+     * 设置是否与 RUM 数据关联
      * @param enableLinkRumData
      * @return
      */
@@ -65,9 +91,6 @@ public class FTLoggerConfig {
         return this;
     }
 
-    /**
-     * @return
-     */
     public boolean isEnableConsoleLog() {
         return enableConsoleLog;
     }
@@ -111,11 +134,11 @@ public class FTLoggerConfig {
      *
      * @return
      */
-    public String getServiceName() {
+     public String getServiceName() {
         return serviceName;
     }
 
-    public FTLoggerConfig setServiceName(String serviceName) {
+     FTLoggerConfig setServiceName(String serviceName) {
         if (serviceName != null) {
             this.serviceName = serviceName;
         }
@@ -143,24 +166,13 @@ public class FTLoggerConfig {
         return this;
     }
 
-    /**
-     * 获取日志
-     *
-     * @return
-     */
-    public String getLogPrefix() {
-        return logPrefix;
-    }
 
     /**
-     * 过去日志过滤规则
+     * 设置日志等级过滤
      *
+     * @param logLevelFilters
      * @return
      */
-    public List<Status> getLogLevelFilters() {
-        return logLevelFilters;
-    }
-
     public FTLoggerConfig setLogLevelFilters(Status[] logLevelFilters) {
         this.logLevelFilters = Arrays.asList(logLevelFilters);
         return this;
@@ -195,9 +207,6 @@ public class FTLoggerConfig {
         return this;
     }
 
-    /**
-     * @return
-     */
     public HashMap<String, Object> getGlobalContext() {
         return globalContext;
     }

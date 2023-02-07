@@ -28,9 +28,6 @@ import java.util.UUID;
 
 /**
  * @author Brandon
- *
- *
- *
  */
 public class FTRUMConfigManager {
 
@@ -54,6 +51,7 @@ public class FTRUMConfigManager {
 
     /**
      * RUM 条件初始化
+     *
      * @param config {@link FTRUMConfig} 配置信息
      */
     void initWithConfig(FTRUMConfig config) {
@@ -105,7 +103,6 @@ public class FTRUMConfigManager {
     }
 
     /**
-     *
      * @return
      */
     public boolean isRumEnable() {
@@ -246,6 +243,7 @@ public class FTRUMConfigManager {
         rumGlobalContext.put(Constants.KEY_DEVICE_DEVICE_BAND, DeviceUtils.getDeviceBand());
         rumGlobalContext.put(Constants.KEY_DEVICE_DEVICE_MODEL, DeviceUtils.getDeviceModel());
         rumGlobalContext.put(Constants.KEY_DEVICE_DISPLAY, DeviceUtils.getDisplay(context));
+        rumGlobalContext.put(Constants.KEY_SERVICE, config.getServiceName());
 
         String osVersion = DeviceUtils.getOSVersion();
         rumGlobalContext.put(Constants.KEY_DEVICE_OS_VERSION, osVersion);

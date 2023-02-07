@@ -16,16 +16,30 @@ import java.util.Iterator;
  */
 public class BaseContentBean {
     private static final String TAG = "BaseContentBean";
+    /**
+     * 内容大小限制 30 KB
+     */
     protected static final int LIMIT_SIZE = 30720;
-    //指定当前日志的来源，比如如果来源于 Ngnix，可指定为 Nginx，
-    // 同一应用产生的日志 source 应该一样，这样在观测云中方便针对该来源的日志配置同一的提取规则
+    /**
+     * 指定当前日志的来源，比如如果来源于 Ngnix，可指定为 Nginx，
+     * 同一应用产生的日志 source 应该一样，这样在观测云中方便针对该来源的日志配置同一的提取规则
+     */
     String measurement;
+
+    /**
+     *  日志内容
+     */
     String content;
 
+    /**
+     * 运行服务名称
+     */
     String serviceName;
 
+    /**
+     * 日志生成时间
+     */
     long time;
-
     final JSONObject tags = new JSONObject();
     final JSONObject fields = new JSONObject();
 
@@ -63,6 +77,10 @@ public class BaseContentBean {
         this(Constants.FT_LOG_DEFAULT_MEASUREMENT, json.toString(), time);
     }
 
+    /**
+     * 获取所有指标数据
+     * @return
+     */
     public JSONObject getAllFields() {
         try {
             fields.put(Constants.KEY_MESSAGE, content);
@@ -72,6 +90,10 @@ public class BaseContentBean {
         return fields;
     }
 
+    /**
+     * 获取所有标签数据
+     * @return
+     */
     public JSONObject getAllTags() {
         try {
             if (!Utils.isNullOrEmpty(serviceName)) {

@@ -3,7 +3,7 @@ package com.ft.sdk.garble.bean;
 /**
  * BY huangDianHua
  * DATE:2020-01-17 13:30
- * Description:
+ * Description: 电池指标数据
  */
 public class BatteryBean {
     /**

@@ -62,7 +62,7 @@ public class SkyWalkingUtils {
                 Utils.encodeStringToBase64(newTraceId) + "-" +
                 Utils.encodeStringToBase64(newParentTraceId) + "-" +
                 "0-" +
-                Utils.encodeStringToBase64(Constants.DEFAULT_LOG_SERVICE_NAME + "") + "-" +
+                Utils.encodeStringToBase64(Constants.DEFAULT_SERVICE_NAME + "") + "-" +
                 Utils.encodeStringToBase64(parentServiceUUID + "@" + NetUtils.get().getMobileIpAddress()) + "-" +
                 Utils.encodeStringToBase64(url.getPath()) + "-" +
                 Utils.encodeStringToBase64(url.getHost() + ":" + url.getPort());

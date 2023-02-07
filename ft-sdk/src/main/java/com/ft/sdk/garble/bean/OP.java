@@ -10,14 +10,16 @@ import java.util.Arrays;
  * Description:
  */
 public enum OP {
-    //页面事件
-    CLK("clk"),
+    /**
+     * 页面点击事件
+     */
+    CLK("clk");
     //    FLOW_CHART("flow_chart"),
 //    OPEN("open"),
-    OPEN_ACT("opn_act"),
-    OPEN_FRA("open_fra"),
-    CLS_ACT("cls_act"),
-    CLS_FRA("cls_fra");
+//    OPEN_ACT("opn_act"),
+//    OPEN_FRA("open_fra"),
+//    CLS_ACT("cls_act"),
+//    CLS_FRA("cls_fra");
 
 //    //webview 事件
 //    WEBVIEW_LOADING("webview_loading"),
