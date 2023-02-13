@@ -358,10 +358,10 @@ public class FTRUMGlobalManager {
             if (viewName != null) {
                 return viewName;
             } else {
-                return Constants.FLOW_ROOT;
+                return Constants.VIEW_NAME_ROOT;
             }
         } else {
-            return Constants.FLOW_ROOT;
+            return Constants.VIEW_NAME_ROOT;
         }
     }
 
