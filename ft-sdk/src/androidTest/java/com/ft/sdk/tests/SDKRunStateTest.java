@@ -44,8 +44,8 @@ public class SDKRunStateTest extends FTBaseTest {
         FTSdk.install(ftSDKConfig);
 
         FTSdk.initRUMWithConfig(new FTRUMConfig()
-                .setExtraMonitorTypeWithError(ErrorMonitorType.ALL)
-                .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL)
+                .setExtraMonitorTypeWithError(ErrorMonitorType.ALL.getValue())
+                .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
                 .setEnableTrackAppANR(true)
                 .setEnableTrackAppCrash(true)
                 .setEnableTrackAppUIBlock(true)

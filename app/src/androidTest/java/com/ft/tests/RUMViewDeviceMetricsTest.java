@@ -59,7 +59,7 @@ public class RUMViewDeviceMetricsTest extends BaseTest {
 
         FTSdk.initRUMWithConfig(new FTRUMConfig()
                 .setRumAppId(BuildConfig.RUM_APP_ID)
-                .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL)
+                .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
                 .setEnableTraceUserView(true)
         );
 

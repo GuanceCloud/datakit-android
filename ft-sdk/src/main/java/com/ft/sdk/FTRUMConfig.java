@@ -43,12 +43,12 @@ public class FTRUMConfig {
     /**
      * 崩溃采集数据附加类型
      */
-    private ErrorMonitorType extraMonitorTypeWithError = ErrorMonitorType.NO_SET;
+    private int extraMonitorTypeWithError = ErrorMonitorType.NO_SET;
 
     /**
      * 监控指标数据类型
      */
-    private DeviceMetricsMonitorType deviceMetricsMonitorType = DeviceMetricsMonitorType.NO_SET;
+    private int deviceMetricsMonitorType = DeviceMetricsMonitorType.NO_SET;
 
     /**
      * 设备监测指标检测周期
@@ -185,11 +185,23 @@ public class FTRUMConfig {
         return this;
     }
 
-    public ErrorMonitorType getExtraMonitorTypeWithError() {
+    public int getExtraMonitorTypeWithError() {
         return extraMonitorTypeWithError;
     }
 
+    /**
+     * 使用 {@link #setDeviceMetricsMonitorType(int)} 替代
+     *
+     * @param extraMonitorTypeWithError
+     * @return
+     */
+    @Deprecated
     public FTRUMConfig setExtraMonitorTypeWithError(ErrorMonitorType extraMonitorTypeWithError) {
+        this.extraMonitorTypeWithError = extraMonitorTypeWithError.getValue();
+        return this;
+    }
+
+    public FTRUMConfig setExtraMonitorTypeWithError(int extraMonitorTypeWithError) {
         this.extraMonitorTypeWithError = extraMonitorTypeWithError;
         return this;
     }
@@ -209,18 +221,48 @@ public class FTRUMConfig {
     }
 
 
-    public FTRUMConfig setDeviceMetricsMonitorType(DeviceMetricsMonitorType deviceMetricsMonitorType) {
+    /**
+     * 支持或参数 battery | cpu | memory
+     * @param deviceMetricsMonitorType
+     * @return
+     */
+    public FTRUMConfig setDeviceMetricsMonitorType(int deviceMetricsMonitorType) {
         this.deviceMetricsMonitorType = deviceMetricsMonitorType;
         return this;
     }
 
-    public FTRUMConfig setDeviceMetricsMonitorType(DeviceMetricsMonitorType deviceMetricsMonitorType, DetectFrequency frequency) {
+    /**
+     * 使用 {@link #setDeviceMetricsMonitorType(int)} 替代
+     *
+     * @param deviceMetricsMonitorType
+     * @return
+     */
+    @Deprecated
+    public FTRUMConfig setDeviceMetricsMonitorType(DeviceMetricsMonitorType deviceMetricsMonitorType) {
+        this.deviceMetricsMonitorType = deviceMetricsMonitorType.getValue();
+        return this;
+    }
+
+    public FTRUMConfig setDeviceMetricsMonitorType(int deviceMetricsMonitorType, DetectFrequency frequency) {
         this.deviceMetricsMonitorType = deviceMetricsMonitorType;
         this.deviceMetricsDetectFrequency = frequency;
         return this;
     }
 
-    public DeviceMetricsMonitorType getDeviceMetricsMonitorType() {
+    /**
+     * 使用 {@link #setDeviceMetricsMonitorType(int, DetectFrequency)} 替代
+     *
+     * @param deviceMetricsMonitorType
+     * @return
+     */
+    @Deprecated
+    public FTRUMConfig setDeviceMetricsMonitorType(DeviceMetricsMonitorType deviceMetricsMonitorType, DetectFrequency frequency) {
+        this.deviceMetricsMonitorType = deviceMetricsMonitorType.getValue();
+        this.deviceMetricsDetectFrequency = frequency;
+        return this;
+    }
+
+    public int getDeviceMetricsMonitorType() {
         return deviceMetricsMonitorType;
     }
 

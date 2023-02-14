@@ -41,8 +41,8 @@ public class MonitorConfigTest extends FTBaseTest {
 
         FTSdk.initRUMWithConfig(new FTRUMConfig()
                 .setRumAppId(TEST_FAKE_RUM_ID)
-                .setExtraMonitorTypeWithError(ErrorMonitorType.ALL)
-                .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL)
+                .setExtraMonitorTypeWithError(ErrorMonitorType.ALL.getValue())
+                .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
         );
     }
 

@@ -64,13 +64,13 @@ public class DemoApplication extends Application {
                 .setEnableTrackAppANR(true)
                 .setEnableTrackAppCrash(true)
                 .setEnableTrackAppUIBlock(true)
-                .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL)
+                .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
                 .setResourceUrlHandler(url -> {
                     return false;
                 })
                 .addGlobalContext("track_id", BuildConfig.TRACK_ID)
                 .addGlobalContext("custom_tag", "any tags")
-                .setExtraMonitorTypeWithError(ErrorMonitorType.ALL));
+                .setExtraMonitorTypeWithError(ErrorMonitorType.ALL.getValue()));
 
 
         UserData userData = new UserData();

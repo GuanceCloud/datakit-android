@@ -57,7 +57,7 @@ public class DataSyncTest extends FTBaseTest {
         FTSdk.install(ftSDKConfig);
 
         FTSdk.initRUMWithConfig(new FTRUMConfig()
-                .setExtraMonitorTypeWithError(ErrorMonitorType.ALL)
+                .setExtraMonitorTypeWithError(ErrorMonitorType.ALL.getValue())
                 .setEnableTrackAppCrash(true)
                 .setRumAppId(TEST_FAKE_RUM_ID)
                 .setEnableTrackAppUIBlock(true)
@@ -121,7 +121,6 @@ public class DataSyncTest extends FTBaseTest {
         int except = CheckUtils.getCount(DataType.LOG, logContent, 0);
         Assert.assertEquals(0, except);
     }
-
 
 
     @After

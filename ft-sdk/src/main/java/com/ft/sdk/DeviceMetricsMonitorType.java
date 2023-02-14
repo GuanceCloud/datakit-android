@@ -55,12 +55,12 @@ public enum DeviceMetricsMonitorType {
      *
      * @link Constants#KEY_FPS_MINI }
      */
-    FPS(1 << 4),
+    FPS(1 << 4);
+    private final int value;
     /**
      * 未设置, 用于监控未设置判断 {@link  FTMonitorManager}，
      */
-    NO_SET(0);
-    private final int value;
+    public static final int NO_SET = 0;
 
 
     /**

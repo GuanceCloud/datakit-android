@@ -29,11 +29,11 @@ public class FTMonitorManager {
     /**
      *
      */
-    private ErrorMonitorType errorMonitorType = ErrorMonitorType.NO_SET;
+    private int errorMonitorType = ErrorMonitorType.NO_SET;
     /**
      *
      */
-    private DeviceMetricsMonitorType deviceMetricsMonitorType = DeviceMetricsMonitorType.NO_SET;
+    private int deviceMetricsMonitorType = DeviceMetricsMonitorType.NO_SET;
 
 
     /**
@@ -82,21 +82,21 @@ public class FTMonitorManager {
      */
     public boolean isErrorMonitorType(ErrorMonitorType errorMonitorType) {
         //判断某一种监控项是否开启
-        return (this.errorMonitorType.getValue() | errorMonitorType.getValue()) == this.errorMonitorType.getValue();
+        return (this.errorMonitorType | errorMonitorType.getValue()) == this.errorMonitorType;
     }
 
     /**
-     *
      * @param deviceMetricsMonitorType
      * @return
      */
     public boolean isDeviceMetricsMonitorType(DeviceMetricsMonitorType deviceMetricsMonitorType) {
-        return (this.deviceMetricsMonitorType.getValue() | deviceMetricsMonitorType.getValue()) == this.deviceMetricsMonitorType.getValue();
+        return (this.deviceMetricsMonitorType | deviceMetricsMonitorType.getValue()) == this.deviceMetricsMonitorType;
 
     }
 
     /**
      * 注册 viewId，为 viewId
+     *
      * @param viewId View 唯一 ID ,{@link ViewBean#id}
      */
     public void addMonitor(String viewId) {
@@ -109,7 +109,8 @@ public class FTMonitorManager {
     }
 
     /**
-     *  附加监控指标数据, fps, cpu, memory
+     * 附加监控指标数据, fps, cpu, memory
+     *
      * @param bean
      */
     public void attachMonitorData(ViewBean bean) {

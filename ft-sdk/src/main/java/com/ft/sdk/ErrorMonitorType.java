@@ -23,12 +23,13 @@ public enum ErrorMonitorType {
     /**
      * 当前 CPU 负载,{@link com.ft.sdk.garble.utils.Constants#KEY_CPU_USE}
      */
-    CPU(1 << 3),
+    CPU(1 << 3);
+
+    private final int value;
     /**
      * 未设置状态,用于监控未设置判断 {@link  FTMonitorManager}
      */
-    NO_SET(0);
-    private final int value;
+    public static final int NO_SET = 0;
 
 
     ErrorMonitorType(int value) {
