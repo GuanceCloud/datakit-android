@@ -22,6 +22,9 @@ public class TrackLogManager {
     private static final String TAG = "TrackLogManager";
     private static TrackLogManager instance;
     private final List<BaseContentBean> logBeanList = new CopyOnWriteArrayList<>();
+    /**
+     * log 输入队列
+     */
     private final LinkedBlockingQueue<LogBean> logQueue = new LinkedBlockingQueue<>();
     private volatile boolean isRunning;
 

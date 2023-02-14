@@ -14,8 +14,11 @@ import org.json.JSONObject;
 import java.util.Iterator;
 
 /**
- *
- *
+ * 用于配合 web 接收应用内 webview 数据指标
+ * 需要配合观测云 web js sdk 使用
+ * <a href="https://github.com/GuanceCloud/datakit-js">datakit-js</a>,
+ * {@link #FT_WEB_VIEW_JAVASCRIPT_BRIDGE}，
+ * 参考 Demo 见 app/src/main/assets/local_sample.html
  *
  * @author Brandon
  */
@@ -23,13 +26,39 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
 
     private static final String LOG_TAG = "FTWebViewHandler";
 
+    /**
+     * 回调状态，true 为正常，反之为 false
+     */
     public static final String WEB_JS_STATUS = "status";
+
+    /**
+     * 用于标记回调标签，数值为 time ms
+     */
     public static final String WEB_JS_INNER_TAG = "_tag";
+    /**
+     * RUM 数据
+     */
     public static final String WEB_JS_TYPE_RUM = "rum";
+    /**
+     * 指标类型传输
+     */
     public static final String WEB_JS_TYPE_TRACK = "track";
+    /**
+     * 日志类型数据
+     */
     public static final String WEB_JS_TYPE_LOG = "log";
+    /**
+     * url 验证，用于验证地址属于白名单
+     */
     public static final String WEB_JS_TYPE_URL_VERIFY = "urlVerify";
+
+    /**
+     * 传递方法名
+     */
     public static final String WEB_JS_NAME = "name";
+    /**
+     * 方法参数
+     */
     public static final String WEB_JS_DATA = "data";
 
     /**
@@ -42,6 +71,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
     private WebView mWebView;
 
     /**
+     * 在 web view 注册 js 方法
      *
      * @param webview
      */
@@ -56,16 +86,19 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
     public FTWebViewHandler() {
     }
 
-    /**
-     *
-     * @param s
-     */
+
     @Override
     public void sendEvent(String s) {
         sendEvent(s, null);
     }
 
     /**
+     * datakit-js 在 webview 调用的通道方法，处理 datakit 业务逻辑相关
+     * {@link #WEB_JS_NAME}
+     * {@link #WEB_JS_TYPE_RUM}
+     * {@link #WEB_JS_TYPE_TRACK}  (未涉及)
+     * {@link #WEB_JS_TYPE_LOG} (未涉及)
+     * {@link #WEB_JS_TYPE_URL_VERIFY} (未涉及)
      *
      * @param s
      * @param callbackMethod
@@ -127,10 +160,12 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
     }
 
     /**
+     * 添加监听方法
      *
      * @param s
      * @param callBackMethod
      */
+
     @Override
     public void addEventListener(String s, String callBackMethod) {
 
@@ -149,10 +184,23 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
 
     }
 
+    /**
+     * 调用 webview 页面 js 方法
+     *
+     * @param method
+     */
     private void callJsMethod(String method) {
         callJsMethod(method, null);
     }
 
+    /**
+     * 调用 webview 页面 js 方法
+     *
+     * @param requestTag
+     * @param callBackMethod 回调方法
+     * @param retJsonString  调用成功，返回 json 数据
+     * @param errJsonString  调用是失败，返回 json 数据
+     */
     private void callbackFromNative(String requestTag, String callBackMethod, String retJsonString, String errJsonString) {
         String separate = !retJsonString.isEmpty() && !errJsonString.isEmpty() ? "," : "";
         String jsStr = callBackMethod + "[\"" + requestTag + "\"](" + retJsonString + separate + errJsonString + ")";
@@ -161,9 +209,10 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
     }
 
     /**
+     * 调用 webview 页面 js 方法，并接受页面回调
      *
-     * @param method
-     * @param callback
+     * @param method   js 方法
+     * @param callback 回调
      */
     private void callJsMethod(String method, CallbackFromJS callback) {
         mHandler.post(() -> {
@@ -185,7 +234,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
 
 
     /**
-     *
+     * 页面 js 回调
      */
     interface CallbackFromJS {
         void callBack(String content);

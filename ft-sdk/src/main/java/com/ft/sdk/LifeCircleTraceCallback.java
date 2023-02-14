@@ -90,7 +90,7 @@ class LifeCircleTraceCallback {
     }
 
     /**
-     *
+     * onCreate 之后
      * @param context
      */
     public void onPostOnCreate(Context context) {
@@ -165,7 +165,7 @@ class LifeCircleTraceCallback {
     }
 
     /**
-     *
+     * onDestroy
      * @param context
      */
     public void onPostDestroy(Context context) {

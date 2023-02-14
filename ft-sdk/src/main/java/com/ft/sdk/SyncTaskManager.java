@@ -29,14 +29,30 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * BY huangDianHua
  * DATE:2019-12-05 20:41
- * Description:同步
+ * Description:数据同步管理，将数据存储
  */
 public class SyncTaskManager {
     public final static String TAG = "SyncTaskManager";
-    private static final int CLOSE_TIME = 5;
+    /**
+     *  最大容忍错误次数
+     */
+    private static final int MAX_ERROR_COUNT = 5;
+    /**
+     * 一个同步周期内一次请求包含数据条目数量
+     */
     private static final int LIMIT_SIZE = 10;
-    private static final int SLEEP_TIME = 10 * 1000;
+    /**
+     *传输间歇休眠时间
+     */
+    private static final int SLEEP_TIME = 10000;
+    /**
+     * 统计一个周期内错误的次
+     */
     private final AtomicInteger errorCount = new AtomicInteger(0);
+
+    /**
+     * 是否正处于同步中，避免重复执行
+     */
     private volatile boolean running;
 
     private static final int MSG_SYNC = 1;
@@ -52,6 +68,9 @@ public class SyncTaskManager {
     };
 
 
+    /**
+     * 同步数据类型
+     */
     private final static DataType[] SYNC_MAP = DataType.values();
 
     /**
@@ -139,7 +158,7 @@ public class SyncTaskManager {
             return;
         }
 
-        if (errorCount.get() >= CLOSE_TIME) {
+        if (errorCount.get() >= MAX_ERROR_COUNT) {
             LogUtils.e(TAG, " \n************连续同步失败5次，停止当前轮询同步***********");
             return;
         }
@@ -237,6 +256,9 @@ public class SyncTaskManager {
 
     }
 
+    /**
+     * 释放上传同步资源
+     */
     public static void release() {
         DataUploaderThreadPool.get().shutDown();
     }
