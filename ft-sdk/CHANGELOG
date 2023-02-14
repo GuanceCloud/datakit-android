@@ -1,3 +1,7 @@
+# agent 1.3.9-beta02
+1.优化 DeviceMetricsMonitorType，ErrorMonitorType Config 传参数
+
+---
 # agent 1.3.9-beta01
 1.测试用例适配优化
 2.补充文档注释
