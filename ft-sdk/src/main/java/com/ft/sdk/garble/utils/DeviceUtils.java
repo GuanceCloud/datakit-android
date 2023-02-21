@@ -9,7 +9,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.Build;
-import android.os.Debug;
+import android.os.Process;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
@@ -282,6 +282,26 @@ public class DeviceUtils {
         }
         return memorySize;
 
+    }
+
+    /**
+     * 进程启动到当前间隔时间,单位毫秒 {@link Process#getStartUptimeMillis();}
+     *
+     * @return
+     */
+    public long getStartTime() {
+        long appTime = -1;
+        try {
+            RandomAccessFile appStatFile = new RandomAccessFile("/proc/"
+                    + android.os.Process.myPid() + "/stat", "r");
+            String appStatString = appStatFile.readLine();
+            String[] appStats = appStatString.split(" ");
+            appTime = Long.parseLong(appStats[19]);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return appTime;
     }
 
 
