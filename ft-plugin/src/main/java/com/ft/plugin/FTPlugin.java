@@ -11,6 +11,41 @@ import org.gradle.api.Project;
 
 import java.util.Collections;
 
+
+
+/*
+  app
+  |--build.gradle
+
+  FTExt {                                        //传参对象
+      showLog = true                             //是否显示日志
+
+      autoUploadMap = false                     //是否上传 map
+      autoUploadNativeDebugSymbol = false       //是否上传 c/c++ native debug symbol 文件
+      datakitDCAUrl = ft_env.datakitDCAUrl      // datakit DCA 地址
+      appId = ft_env.rumAppid                   // appid
+     env = 'common'                            //对应环境
+
+       //Flavor 覆盖逻辑
+      prodFlavors {
+          prodTest {
+              autoUploadMap = true
+              autoUploadNativeDebugSymbol = true
+              datakitDCAUrl = ft_env.datakitDCAUrl
+              appId = ft_env.rumAppid
+              env = ft_env.prodTestEnv
+          }
+          prodPublish {
+              autoUploadMap = true
+              autoUploadNativeDebugSymbol = true
+              datakitDCAUrl = ft_env.datakitDCAUrl
+              appId = ft_env.rumAppid
+              env = ft_env.prodPublishEnv
+          }
+      }
+  }
+ */
+
 /**
  * BY huangDianHua
  * DATE:2019-11-29 12:33
@@ -24,7 +59,7 @@ public class FTPlugin implements Plugin<Project> {
         appExtension.registerTransform(new FTTransform(project), Collections.EMPTY_LIST);
 
         project.afterEvaluate(p -> {
-
+            //传参数对象
             FTExtension extension = (FTExtension) p.getExtensions().getByName("FTExt");
 
             Logger.setDebug(extension.showLog);
@@ -32,8 +67,6 @@ public class FTPlugin implements Plugin<Project> {
             FTMapUploader f = new FTMapUploader(p, extension);
             f.configMapUpload();
             f.configNativeSymbolUpload();
-
-
         });
 
     }

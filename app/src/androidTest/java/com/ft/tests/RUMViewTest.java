@@ -34,6 +34,9 @@ import org.junit.runner.RunWith;
 
 import java.util.List;
 
+/**
+ * RUM View 数据监测
+ */
 @RunWith(AndroidJUnit4.class)
 public class RUMViewTest extends BaseTest {
 
@@ -63,7 +66,10 @@ public class RUMViewTest extends BaseTest {
 
     }
 
-
+    /**
+     *
+     * @throws Exception
+     */
     @Test
     public void viewGenerateTest() throws Exception {
         invokeGenerateRumData();

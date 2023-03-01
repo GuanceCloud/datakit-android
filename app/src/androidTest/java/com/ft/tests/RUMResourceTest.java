@@ -33,6 +33,11 @@ import org.junit.runner.RunWith;
 
 import java.util.List;
 
+/**
+ * 资源请求数据监测
+ *
+ * @author Brandon
+ */
 @RunWith(AndroidJUnit4.class)
 public class RUMResourceTest extends BaseTest {
 

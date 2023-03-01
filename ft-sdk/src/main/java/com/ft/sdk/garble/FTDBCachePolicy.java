@@ -13,7 +13,14 @@ import com.ft.sdk.garble.utils.Constants;
  */
 public class FTDBCachePolicy {
     private volatile static FTDBCachePolicy instance;
+
+    /**
+     * 当前数据量
+     */
     private volatile int count = 0;
+    /**
+     * 数据舍弃规则
+     */
     private LogCacheDiscard logCacheDiscardStrategy = LogCacheDiscard.DISCARD;
 
 

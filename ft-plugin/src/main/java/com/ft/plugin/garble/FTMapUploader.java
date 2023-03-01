@@ -17,16 +17,30 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-
+/**
+ * 负责符号文件打包与上传
+ */
 public class FTMapUploader {
 
     private final Project project;
+    /**
+     * debug symbol 路径
+     */
     private final static String CMAKE_DEBUG_SYMBOL_PATH = "/intermediates/cmake/debug/obj";
 
     private final HashMap<String, ObfuscationSettingConfig> obfuscationSettingMap = new HashMap<>();
 
+    /**
+     * 数据合并路径
+     */
     private final static String SYMBOL_MERGE_PATH_FORMAT = "/tmp/ftSourceMapMerge-%s";
+    /**
+     * zip 文件打包路径
+     */
     private final static String SYMBOL_MERGE_ZIP_PATH_FORMAT = "/tmp/ftSourceMap-%s.zip";
+    /**
+     * proguard 符号文件
+     */
     private final static String PROGUARD_MAPPING_PATH = "/outputs/proguard/%s/mapping/mapping.txt";
 
     private final ArrayList<String> symbolPaths = new ArrayList<>();
@@ -78,6 +92,7 @@ public class FTMapUploader {
                 String tmpBuildPath = String.format(tmpBuildPathFormat, variantName);
                 String zipBuildPath = String.format(zipBuildPathFormat, variantName);
                 try {
+                    //删除之前的 cache
                     FileUtils.deleteIfExists(new File(tmpBuildPath));
                     FileUtils.deleteIfExists(new File(zipBuildPath));
                 } catch (IOException e) {

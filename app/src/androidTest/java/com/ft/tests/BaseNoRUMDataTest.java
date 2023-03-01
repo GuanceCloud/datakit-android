@@ -17,8 +17,17 @@ import org.junit.Test;
 
 import java.util.List;
 
+/**
+ * RUM 数据生成基础累，用于检验不同场景配置，获取到不同的数据
+ */
 abstract public class BaseNoRUMDataTest extends BaseTest {
 
+    /**
+     *
+     * RUM View 数据生成模拟测试
+     *
+     * @throws Exception
+     */
     @Test
     public void viewGenerateTest() throws Exception {
         invokeGenerateRumData();
@@ -31,6 +40,12 @@ abstract public class BaseNoRUMDataTest extends BaseTest {
 
     }
 
+    /**
+     *
+     * RUM Action 点击事件模拟测试
+     *
+     * @throws Exception
+     */
     @Test
     public void rumCLickTest() throws Exception {
         Thread.sleep(2000);
@@ -45,6 +60,10 @@ abstract public class BaseNoRUMDataTest extends BaseTest {
         Assert.assertTrue(recordDataList.isEmpty());
     }
 
+    /**
+     *  RUM Resource 网络资源请求模拟测试
+     * @throws Exception
+     */
     @Test
     public void resourceInterceptorTest() throws Exception {
         Thread.sleep(2000);

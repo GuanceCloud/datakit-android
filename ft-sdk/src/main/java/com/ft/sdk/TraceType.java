@@ -31,22 +31,22 @@ public enum TraceType {
     ZIPKIN_MULTI_HEADER,
 
     /**
-     * zipkin single header b3
+     * zipkin single header,b3
      */
     ZIPKIN_SINGLE_HEADER,
 
     /**
-     * w3c traceparent
+     * w3c, traceparent
      */
     TRACEPARENT,
 
     /**
-     * skywalking 8.0+
+     * skywalking 8.0+, sw-8
      */
     SKYWALKING,
 
     /**
-     * jaeger,header uber-trace-id
+     * jaeger, header uber-trace-id
      */
     JAEGER;
 

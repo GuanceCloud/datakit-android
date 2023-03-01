@@ -11,12 +11,19 @@ import org.json.JSONObject;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * 测试用例数据校验类
+ *
+ * @author Brandon
+ */
 public class CheckUtils {
 
     /**
+     * 检验行协议数据是否存在
+     *
      * @param dataType
-     * @param checkValues
-     * @return
+     * @param checkValues 需要检验数据集
+     * @return 数据是否存在，是为存在
      */
     public static boolean checkValueInLineProtocol(DataType dataType, String[] checkValues) {
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, dataType);
@@ -36,12 +43,13 @@ public class CheckUtils {
     }
 
 
-
     /**
+     * 检验动态参数，针对校验 action view，resource，error， longtask 提交的 property 动态参数
+     *
      * @param key
      * @param value
-     * @param targetMeasurement
-     * @param isTag
+     * @param targetMeasurement 指定指标，{@link com.ft.sdk.garble.utils.Constants#MEASUREMENT}
+     * @param isTag             是否是 tag
      * @return
      * @throws NullPointerException
      */
@@ -79,8 +87,9 @@ public class CheckUtils {
 
     /**
      * 获取数据数量
+     *
      * @param dataType
-     * @param checkValues
+     * @param checkValues 需要检验数据集
      * @param limit
      * @return
      */
@@ -102,10 +111,11 @@ public class CheckUtils {
 
     /**
      * 获取数据数量
+     *
      * @param dataType
-     * @param value
+     * @param value    需要
      * @param limit
-     * @return
+     * @return 数据是否存在，是为存在
      */
     public static int getCount(DataType dataType, String value, int limit) {
         return getCount(dataType, new String[]{value}, limit);
@@ -113,11 +123,11 @@ public class CheckUtils {
 
 
     /**
+     * 检验行协议中的单个数据值
      *
-     * 检验行协议中的数据值
      * @param dataType
-     * @param value
-     * @return
+     * @param value 需要校验
+     * @return 数据是否存在，是为存在
      */
     public static boolean checkValueInLineProtocol(DataType dataType, String value) {
         return checkValueInLineProtocol(dataType, new String[]{value});

@@ -34,6 +34,10 @@ public class FTHttpConfigManager {
         return instance;
     }
 
+    /**
+     *
+     * @param ftsdkConfig
+     */
     public void initParams(FTSDKConfig ftsdkConfig) {
         if (ftsdkConfig == null) {
             return;
@@ -47,6 +51,9 @@ public class FTHttpConfigManager {
     }
 
 
+    /**
+     * 释放 SDK 相关
+     */
     public static void release() {
         instance = null;
     }

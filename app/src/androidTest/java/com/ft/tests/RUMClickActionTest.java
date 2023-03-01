@@ -33,6 +33,9 @@ import org.junit.runner.RunWith;
 
 import java.util.List;
 
+/**
+ * RUM 点击事件监测
+ */
 @RunWith(AndroidJUnit4.class)
 public class RUMClickActionTest extends BaseTest {
 

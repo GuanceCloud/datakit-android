@@ -35,6 +35,11 @@ import org.junit.runner.RunWith;
 
 import java.util.List;
 
+/**
+ * View 内 fps cpu memory battery 数据监测
+ *
+ * @author Brandon
+ */
 @RunWith(AndroidJUnit4.class)
 public class RUMViewDeviceMetricsTest extends BaseTest {
 

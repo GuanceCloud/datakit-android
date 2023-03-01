@@ -48,6 +48,11 @@ public class FTHookConfig {
 
     /**
      * Activity中的方法
+     *
+     * {@link Activity#onCreate()}
+     * {@link Activity#onDestroy()}
+     * {@link Activity#startActivityForResult()}
+     *
      */
     public final static HashMap<String, FTMethodCell> ACTIVITY_METHODS = new HashMap<>();
 
@@ -88,6 +93,10 @@ public class FTHookConfig {
 
     /**
      * FragmentX中的方法
+     *
+     * {@link Fragment#onResume()}
+     * {@link Fragment#onPause()}
+     * {@link Fragment#setUserVisibleHint()}
      */
     public final static HashMap<String, FTMethodCell> FRAGMENT_X_METHODS = new HashMap<>();
 
@@ -134,6 +143,10 @@ public class FTHookConfig {
 
     /**
      * Fragment中的方法
+     *
+     * {@link Fragment#onResume()}
+     * {@link Fragment#onPause()}
+     * {@link Fragment#setUserVisibleHint()}
      */
     public final static HashMap<String, FTMethodCell> FRAGMENT_METHODS = new HashMap<>();
 
@@ -179,6 +192,10 @@ public class FTHookConfig {
 
     /**
      * FragmentV4中的方法
+     *
+     * {@link Fragment#onResume()}
+     * {@link Fragment#onPause()}
+     * {@link Fragment#setUserVisibleHint()}
      */
     public final static HashMap<String, FTMethodCell> FRAGMENT_V4_METHODS = new HashMap<>();
 
@@ -223,6 +240,9 @@ public class FTHookConfig {
 
     }
 
+    /**
+     * PopMenu 点击事件
+     */
     public final static FTMethodCell MENU_METHODS = new FTMethodCell(
             "", "", "trackMenuItem", "(Ljava/lang/Object;Landroid/view/MenuItem;)V",
             Arrays.asList(
@@ -233,6 +253,9 @@ public class FTHookConfig {
             )
     );
 
+    /**
+     * View 点击事件
+     */
     public final static FTMethodCell CLICK_METHOD = new FTMethodCell(
             "", "", "trackViewOnClick", "(Ljava/lang/Object;Landroid/view/View;)V",
             Arrays.asList(
@@ -243,6 +266,9 @@ public class FTHookConfig {
             )
     );
 
+    /**
+     * 点击事件 MAP
+     */
     public final static HashMap<String, FTMethodCell> CLICK_METHODS_SYSTEM = new HashMap<>();
 
     static {

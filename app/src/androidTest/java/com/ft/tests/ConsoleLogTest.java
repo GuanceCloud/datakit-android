@@ -45,6 +45,10 @@ public class ConsoleLogTest extends BaseTest {
 
     }
 
+    /**
+     * console 数据测试
+     * @throws Exception
+     */
     @Test
     public void consoleLogTest() throws Exception {
         FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableConsoleLog(true));
@@ -54,6 +58,10 @@ public class ConsoleLogTest extends BaseTest {
 
     }
 
+    /**
+     * console prefix 过滤测试
+     * @throws Exception
+     */
     @Test
     public void consoleLogPrefixTest() throws Exception {
         FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableConsoleLog(true, "debug"));
@@ -71,6 +79,11 @@ public class ConsoleLogTest extends BaseTest {
 
     }
 
+    /**
+     * console {@link Status} 等级测试
+     *
+     * @throws Exception
+     */
     @Test
     public void consoleLogLevelTest() throws Exception {
         FTSdk.initLogWithConfig(new FTLoggerConfig()

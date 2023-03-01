@@ -31,7 +31,7 @@ import org.junit.runner.RunWith;
 /**
  * author: huangDianHua
  * time: 2020/8/27 11:21:02
- * description: UIblock ANR nativeCrash 需要手动测试，测试用例无法模拟
+ * description: UIBlock ANR nativeCrash 需要手动测试，测试用例无法模拟
  */
 @RunWith(AndroidJUnit4.class)
 public class ErrorTraceTest extends BaseTest {

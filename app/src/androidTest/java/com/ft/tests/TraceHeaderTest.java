@@ -5,6 +5,7 @@ import static com.ft.sdk.FTTraceHandler.DD_TRACE_TRACE_ID_KEY;
 import static com.ft.sdk.FTTraceHandler.JAEGER_KEY;
 import static com.ft.sdk.FTTraceHandler.SKYWALKING_V3_SW_8;
 import static com.ft.sdk.FTTraceHandler.W3C_TRACEPARENT_KEY;
+import static com.ft.sdk.FTTraceHandler.ZIPKIN_B3_HEADER;
 import static com.ft.sdk.FTTraceHandler.ZIPKIN_SAMPLED;
 import static com.ft.sdk.FTTraceHandler.ZIPKIN_SPAN_ID;
 import static com.ft.sdk.FTTraceHandler.ZIPKIN_TRACE_ID;
@@ -34,7 +35,7 @@ import okhttp3.Request;
 /**
  * author: huangDianHua
  * time: 2020/8/26 13:54:56
- * description:
+ * description: 网络请求 Trace Header 正确性监测
  */
 @RunWith(AndroidJUnit4.class)
 public class TraceHeaderTest extends BaseTest {
@@ -55,9 +56,11 @@ public class TraceHeaderTest extends BaseTest {
         FTSdk.initTraceWithConfig(new FTTraceConfig().setEnableLinkRUMData(false));
 
     }
-
+    /**
+     * {@link TraceType#ZIPKIN_MULTI_HEADER}
+     */
     @Test
-    public void traceZipKinHeaderTest() {
+    public void traceZipKinMultiHeaderTest() {
         FTSdk.initTraceWithConfig(new FTTraceConfig().setEnableAutoTrace(true).setTraceType(TraceType.ZIPKIN_MULTI_HEADER));
         Request request = okhttpRequestUrl("http://www.weather.com.cn/data/sk/101010100.html");
         boolean expect = request.headers().names().contains(ZIPKIN_SPAN_ID) &&
@@ -66,6 +69,20 @@ public class TraceHeaderTest extends BaseTest {
         Assert.assertTrue(expect);
     }
 
+    /**
+     * {@link TraceType#ZIPKIN_SINGLE_HEADER}
+     */
+    @Test
+    public void traceZipKinSingleHeaderTest() {
+        FTSdk.initTraceWithConfig(new FTTraceConfig().setEnableAutoTrace(true).setTraceType(TraceType.ZIPKIN_MULTI_HEADER));
+        Request request = okhttpRequestUrl("http://www.weather.com.cn/data/sk/101010100.html");
+        boolean expect = request.headers().names().contains(ZIPKIN_B3_HEADER);
+        Assert.assertTrue(expect);
+    }
+
+    /**
+     * {@link TraceType#JAEGER}
+     */
     @Test
     public void traceJaegerHeaderTest() {
         FTSdk.initTraceWithConfig(new FTTraceConfig()
@@ -76,6 +93,9 @@ public class TraceHeaderTest extends BaseTest {
         Assert.assertTrue(expect);
     }
 
+    /**
+     * {@link TraceType#DDTRACE}
+     */
     @Test
     public void traceDDtraceHeaderTest() {
         FTSdk.initTraceWithConfig(new FTTraceConfig()
@@ -85,7 +105,9 @@ public class TraceHeaderTest extends BaseTest {
         boolean expect = request.headers().names().contains(DD_TRACE_TRACE_ID_KEY);
         Assert.assertTrue(expect);
     }
-
+    /**
+     * {@link TraceType#SKYWALKING}
+     */
     @Test
     public void traceSkyWalkingV3HeaderTest() {
         FTSdk.initTraceWithConfig(new FTTraceConfig()
@@ -96,6 +118,9 @@ public class TraceHeaderTest extends BaseTest {
         Assert.assertTrue(expect);
     }
 
+    /**
+     * {@link TraceType#TRACEPARENT}
+     */
     @Test
     public void traceW3CTraceParentTest() {
         FTSdk.initTraceWithConfig(new FTTraceConfig()

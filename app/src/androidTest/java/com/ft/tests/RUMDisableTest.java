@@ -17,6 +17,9 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 
+/**
+ * 无 RUM 配置，数据校验
+ */
 @RunWith(AndroidJUnit4.class)
 public class RUMDisableTest extends BaseNoRUMDataTest {
 

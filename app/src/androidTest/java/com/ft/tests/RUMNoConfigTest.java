@@ -18,7 +18,9 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 
-
+/**
+ * RUM 仅仅配置 appid，但不开启功能，数据校验
+ */
 @RunWith(AndroidJUnit4.class)
 public class RUMNoConfigTest extends BaseNoRUMDataTest {
 

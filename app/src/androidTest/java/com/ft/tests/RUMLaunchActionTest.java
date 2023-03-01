@@ -23,7 +23,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-
+/**
+ * 启动 Action 数据校验
+ */
 @RunWith(AndroidJUnit4.class)
 public class RUMLaunchActionTest extends BaseTest {
 

@@ -46,7 +46,8 @@ public class FTBaseTest {
     }
 
     /**
-     * 停止数据同步
+     * 停止数据同步，{@link SyncTaskManager#running} 变量来实现
+     *
      * @throws Exception
      */
     protected static void stopSyncTask() throws Exception {
@@ -54,10 +55,19 @@ public class FTBaseTest {
 
     }
 
+    /**
+     * 恢复数据同步
+     *
+     * @throws Exception
+     */
     protected void resumeSyncTask() throws Exception {
         Whitebox.invokeMethod(SyncTaskManager.get(), "setRunning", false);
     }
 
+    /**
+     * 立即执行数据同步
+     * @throws Exception
+     */
     protected void executeSyncTask() throws Exception {
         Whitebox.invokeMethod(SyncTaskManager.get(), "executePoll");
     }
@@ -106,6 +116,10 @@ public class FTBaseTest {
 
     }
 
+    /**
+     * 立即生成 RUM 相关数据
+     * @throws Exception
+     */
     protected void invokeGenerateRumData() throws Exception {
         Thread.sleep(1000);
         Whitebox.invokeMethod(FTRUMGlobalManager.get(), "generateRumData");
@@ -121,6 +135,9 @@ public class FTBaseTest {
 
     }
 
+    /**
+     * 禁止数据清理，通过 {@link FTDBManager#isAndroidTest} 逻辑跳过删除逻辑来实现
+     */
     protected static void avoidCleanData() {
         try {
             Whitebox.setInternalState(FTDBManager.get(), "isAndroidTest", true);
@@ -129,6 +146,10 @@ public class FTBaseTest {
         }
     }
 
+    /**
+     * 使 session 立即过期，以缩短测试用例在测试过程中的耗时等待
+     * @throws IllegalAccessException
+     */
     protected void setSessionExpire() throws IllegalAccessException {
         Field lastActionField = Whitebox.getField(FTRUMGlobalManager.class, "lastActionTime");
         lastActionField.setAccessible(true);
@@ -156,6 +177,9 @@ public class FTBaseTest {
         }
     }
 
+    /**
+     * 测试完毕，删除清空数据
+     */
     @After
     public void tearDown() {
         FTDBManager.get().delete();

@@ -121,7 +121,9 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                     if (tags == null) {
                         tags = new JSONObject();
                     }
-
+                    if (fields == null) {
+                        fields = new JSONObject();
+                    }
                     while (keys.hasNext()) {
                         String key = keys.next();
                         tags.put(key, publicTags.opt(key));
@@ -129,8 +131,8 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
 
                     String sessionId = FTRUMGlobalManager.get().getSessionId();
                     tags.put(Constants.KEY_RUM_SESSION_ID, sessionId);
-                    tags.put(Constants.KEY_RUM_VIEW_IS_ACTIVE, false);
                     tags.put(Constants.KEY_RUM_VIEW_IS_WEB_VIEW, true);
+                    fields.put(Constants.KEY_RUM_VIEW_IS_ACTIVE, false);
 
                     long time = data.optLong(Constants.TIME);
                     String measurement = data.optString(Constants.MEASUREMENT);

@@ -1,5 +1,6 @@
 package com.ft.sdk.garble.threadpool;
 
+import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.utils.LogUtils;
 
 import java.util.concurrent.BlockingQueue;
@@ -14,12 +15,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * BY huangDianHua
  * DATE:2019-11-29 18:57
- * Description:
+ * Description:线程池基类，用于构建阻塞线程队列来消费数据
  */
 public abstract class BaseThreadPool {
     public static final String TAG = "BaseThreadPool";
+    /**
+     * 最大容量
+     */
     private final static int MAXIMUM_POOL_SIZE = 128;
     private final static int KEEP_ALIVE = 5;
+    /**
+     * 阻塞线程队列
+     */
     private BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
     private ThreadPoolExecutor executor;
     private final int corePoolSize;
@@ -73,6 +80,9 @@ public abstract class BaseThreadPool {
         return executor != null && !executor.isShutdown();
     }
 
+    /**
+     * 释放队列资源，在 {@link FTSdk#shutDown()} 时，会被回收
+     */
     public void shutDown() {
         if (executor != null && !executor.isShutdown()) {
             executor.shutdownNow();
@@ -80,6 +90,9 @@ public abstract class BaseThreadPool {
         }
     }
 
+    /**
+     *
+     */
     public void reStartPool() {
         executor = createNew();
     }

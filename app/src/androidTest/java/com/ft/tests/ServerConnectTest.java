@@ -44,23 +44,39 @@ public class ServerConnectTest extends BaseTest {
         }
     }
 
-
+    /**
+     *
+     * @throws Exception
+     */
     @Test
     public void emptyUrl() throws Exception {
         urlParamTest(null, NetCodeStatus.UNKNOWN_EXCEPTION_CODE);
     }
 
-
+    /**
+     *
+     * @throws Exception
+     */
     @Test
     public void errorUrl() throws Exception {
         urlParamTest("http://www.baidu.com", 404);
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     @Test
     public void normalUrl() throws Exception {
         urlParamTest(BuildConfig.ACCESS_SERVER_URL, 200);
     }
 
+    /**
+     *
+     * @param url
+     * @param expected
+     * @throws Exception
+     */
 
     public void urlParamTest(String url, int expected) throws Exception {
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(url);
@@ -69,6 +85,12 @@ public class ServerConnectTest extends BaseTest {
         requestNetVerifyData(expected);
     }
 
+
+    /**
+     * 
+     * @param expected
+     * @throws Exception
+     */
     private void requestNetVerifyData(int expected) throws Exception {
         CountDownLatch countDownLatch = new CountDownLatch(1);
         JSONObject tags = new JSONObject();

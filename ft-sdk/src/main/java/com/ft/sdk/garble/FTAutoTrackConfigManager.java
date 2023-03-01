@@ -301,16 +301,6 @@ public class FTAutoTrackConfigManager {
         }
     }
 
-    /**
-     * 该属性在 agent_1.0.2-alpha04 后将不再有用。
-     *
-     * @return
-     */
-    @Deprecated
-    public String getProduct() {
-        return "";
-    }
-
     public static void release() {
         instance = null;
     }

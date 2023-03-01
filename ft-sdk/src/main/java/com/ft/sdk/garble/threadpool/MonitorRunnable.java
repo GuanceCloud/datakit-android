@@ -16,6 +16,12 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 应用监控 Runnable，根据 {@link DetectFrequency} 周期，计算 fps，cpu，memory，battery
+ * 对应 {@link DeviceMetricsMonitorType}
+ *
+ * @author Brandon
+ */
 public class MonitorRunnable implements Runnable {
     private final ScheduledExecutorService service = new ScheduledThreadPoolExecutor(1);
     private final DetectFrequency detectFrequency;
@@ -32,6 +38,7 @@ public class MonitorRunnable implements Runnable {
 
     @Override
     public void run() {
+        //节省资源开销，页面处于前台时才记录数据
         if (!Utils.isAppForeground()) return;
         if (FTMonitorManager.get().isDeviceMetricsMonitorType(DeviceMetricsMonitorType.CPU)) {
             computeCpuBean(cpuBean, CpuUtils.get().getAppCPUTickCount());
@@ -72,6 +79,11 @@ public class MonitorRunnable implements Runnable {
         return batteryBean;
     }
 
+    /**
+     * 记录 CPU  最大值，最小值
+     * @param bean
+     * @param value
+     */
     private void computeCpuBean(MonitorInfoBean bean, double value) {
         if (bean.count == 0) {
             bean.miniValue = value;
@@ -83,8 +95,11 @@ public class MonitorRunnable implements Runnable {
     }
 
     /**
+     *
+     * 最大值，最小值，以及平均值的计算
+     *
      * @param bean
-     * @param lastValue
+     * @param lastValue 最近数值
      */
     private void computeMonitorBean(MonitorInfoBean bean, double lastValue) {
         int count = bean.count + 1;
@@ -94,6 +109,9 @@ public class MonitorRunnable implements Runnable {
         bean.count = count;
     }
 
+    /**
+     * 队列资源释放
+     */
     public void stop() {
         service.shutdown();
     }

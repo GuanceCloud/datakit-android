@@ -10,14 +10,15 @@ import androidx.test.runner.AndroidJUnitRunner;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * author: huangDianHua
  * time: 2020/9/2 17:27:01
- * description:
+ * description: InstrumentationRunner 应用 app-build.gradle defaultConfig.testInstrumentationRunner 中应用
  */
 public class MockTestRunner extends AndroidJUnitRunner {
-    private static final Charset UTF8 = Charset.forName("UTF-8");
+    private static final Charset UTF8 = StandardCharsets.UTF_8;
 
     @Override
     public Application newApplication(ClassLoader cl, String className, Context context) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
@@ -27,7 +28,7 @@ public class MockTestRunner extends AndroidJUnitRunner {
     @Override
     public void finish(int resultCode, Bundle results) {
         try {
-            Class rt = Class.forName("org.jacoco.agent.rt.RT");
+            Class<?> rt = Class.forName("org.jacoco.agent.rt.RT");
             Method getAgent = rt.getMethod("getAgent");
             Method dump = getAgent.getReturnType().getMethod("dump", boolean.class);
             Object agent = getAgent.invoke(null);

@@ -27,6 +27,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+/**
+ * 负责为测试在对应环境，生成完善体系的 RUM，Log 以及 Trace，方便检查移动端相关数据是否正常
+ *
+ * 配置 Jenkins 自动化配合使用
+ *
+ * @author Brandon
+ */
 @RunWith(AndroidJUnit4.class)
 public class TestCaseForGenerateData extends BaseTest {
 

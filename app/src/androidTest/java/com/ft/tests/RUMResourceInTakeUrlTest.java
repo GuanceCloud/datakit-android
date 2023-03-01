@@ -34,6 +34,9 @@ import org.junit.runner.RunWith;
 
 import java.util.List;
 
+/**
+ * RUM resource url 过滤校验
+ */
 @RunWith(AndroidJUnit4.class)
 public class RUMResourceInTakeUrlTest extends BaseTest {
 
