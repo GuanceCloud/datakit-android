@@ -74,7 +74,7 @@ public class TraceHeaderTest extends BaseTest {
      */
     @Test
     public void traceZipKinSingleHeaderTest() {
-        FTSdk.initTraceWithConfig(new FTTraceConfig().setEnableAutoTrace(true).setTraceType(TraceType.ZIPKIN_MULTI_HEADER));
+        FTSdk.initTraceWithConfig(new FTTraceConfig().setEnableAutoTrace(true).setTraceType(TraceType.ZIPKIN_SINGLE_HEADER));
         Request request = okhttpRequestUrl("http://www.weather.com.cn/data/sk/101010100.html");
         boolean expect = request.headers().names().contains(ZIPKIN_B3_HEADER);
         Assert.assertTrue(expect);
