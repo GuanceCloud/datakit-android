@@ -68,23 +68,26 @@ public class TrackLogManager {
             return;
         }
         isRunning = true;
-        Runnable futureTask = () -> {
-            try {
-                //当队列中有数据时，不断执行取数据操作
-                LogBean logBean;
-                //take 为阻塞方法，所以该线程会一直在运行中
-                while ((logBean = logQueue.take()) != null) {
-                    isRunning = true;
-                    logBeanList.add(logBean);//取出数据放到集合中
-                    if (logBeanList.size() >= 20 || logQueue.peek() == null) {//当取出的数据大于等于20条或者没有下一条数据时执行插入数据库操作
-                        FTTrackInner.getInstance().batchLogBeanBackground(logBeanList);
-                        logBeanList.clear();//插入完成后执行清除集合操作
+        Runnable futureTask = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    //当队列中有数据时，不断执行取数据操作
+                    LogBean logBean;
+                    //take 为阻塞方法，所以该线程会一直在运行中
+                    while ((logBean = logQueue.take()) != null) {
+                        isRunning = true;
+                        logBeanList.add(logBean);//取出数据放到集合中
+                        if (logBeanList.size() >= 20 || logQueue.peek() == null) {//当取出的数据大于等于20条或者没有下一条数据时执行插入数据库操作
+                            FTTrackInner.getInstance().batchLogBeanBackground(logBeanList);
+                            logBeanList.clear();//插入完成后执行清除集合操作
+                        }
                     }
+                } catch (Exception e) {
+                    LogUtils.e(TAG, e.getMessage());
+                } finally {
+                    isRunning = false;
                 }
-            } catch (Exception e) {
-                LogUtils.e(TAG, e.getMessage());
-            } finally {
-                isRunning = false;
             }
         };
         LogConsumerThreadPool.get().execute(futureTask);

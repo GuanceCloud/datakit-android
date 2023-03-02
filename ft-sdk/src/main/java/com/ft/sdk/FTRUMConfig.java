@@ -57,7 +57,12 @@ public class FTRUMConfig {
 
 //    private boolean backendSample = false;
 
-    private FTInTakeUrlHandler handler = url -> false;
+    private FTInTakeUrlHandler handler = new FTInTakeUrlHandler() {
+        @Override
+        public boolean isInTakeUrl(String url) {
+            return false;
+        }
+    };
 
     /**
      * 设置全局 tag

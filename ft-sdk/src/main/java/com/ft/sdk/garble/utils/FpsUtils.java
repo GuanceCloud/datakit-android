@@ -35,7 +35,12 @@ public class FpsUtils {
             metronome = new Metronome();
         }
         metronome.start();
-        metronome.addListener(fps -> mFps = fps);
+        metronome.addListener(new Audience() {
+            @Override
+            public void heartbeat(double fps) {
+                mFps = fps;
+            }
+        });
     }
 
     public static void release() {

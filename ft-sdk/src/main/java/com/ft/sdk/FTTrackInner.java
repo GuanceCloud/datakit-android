@@ -76,19 +76,22 @@ public class FTTrackInner {
 
     }
 
-    private void syncDataBackground(DataType dataType, long time,
-                                    String measurement, final JSONObject tags, JSONObject fields) {
-        DataUploaderThreadPool.get().execute(() -> {
-            try {
+    private void syncDataBackground(final DataType dataType, final long time,
+                                    final String measurement, final JSONObject tags, final JSONObject fields) {
+        DataUploaderThreadPool.get().execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
 
-                SyncJsonData recordData = SyncJsonData.getSyncJsonData(dataType,
-                        new LineProtocolBean(measurement, tags, fields, time));
-                boolean result = FTDBManager.get().insertFtOperation(recordData);
-                LogUtils.d(TAG, "syncDataBackground:" + dataType.toString() + ":insert-result=" + result);
-                SyncTaskManager.get().executeSyncPoll();
-            } catch (Exception e) {
-                e.printStackTrace();
-                LogUtils.e(TAG, e.getMessage());
+                    SyncJsonData recordData = SyncJsonData.getSyncJsonData(dataType,
+                            new LineProtocolBean(measurement, tags, fields, time));
+                    boolean result = FTDBManager.get().insertFtOperation(recordData);
+                    LogUtils.d(TAG, "syncDataBackground:" + dataType.toString() + ":insert-result=" + result);
+                    SyncTaskManager.get().executeSyncPoll();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    LogUtils.e(TAG, e.getMessage());
+                }
             }
         });
     }
@@ -97,28 +100,32 @@ public class FTTrackInner {
     /**
      * 在子线程中将埋点数据同步(不经过数据库)
      * inovke by test Case
+     *
      * @param trackBeans
      * @param callback
      */
-    void trackAsync(@NonNull List<LineProtocolBean> trackBeans, AsyncCallback callback) {
-        DataUploaderThreadPool.get().execute(() -> {
-            List<SyncJsonData> recordDataList = new ArrayList<>();
-            for (LineProtocolBean t : trackBeans) {
-                try {
-                    SyncJsonData recordData = SyncJsonData.getSyncJsonData(DataType.RUM_APP,
-                            new LineProtocolBean(t.getMeasurement(), t.getTags(),
-                                    t.getFields(), t.getTimeNano()));
-                    recordDataList.add(recordData);
-                    uploadTrackOPData(recordDataList, callback);
-                } catch (Exception e) {
-                    if (callback != null) {
-                        if (e instanceof InvalidParameterException) {
-                            callback.onResponse(NetCodeStatus.INVALID_PARAMS_EXCEPTION_CODE, e.getMessage());
-                        } else {
-                            callback.onResponse(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, e.getMessage());
+    void trackAsync(@NonNull final List<LineProtocolBean> trackBeans, final AsyncCallback callback) {
+        DataUploaderThreadPool.get().execute(new Runnable() {
+            @Override
+            public void run() {
+                List<SyncJsonData> recordDataList = new ArrayList<>();
+                for (LineProtocolBean t : trackBeans) {
+                    try {
+                        SyncJsonData recordData = SyncJsonData.getSyncJsonData(DataType.RUM_APP,
+                                new LineProtocolBean(t.getMeasurement(), t.getTags(),
+                                        t.getFields(), t.getTimeNano()));
+                        recordDataList.add(recordData);
+                        FTTrackInner.this.uploadTrackOPData(recordDataList, callback);
+                    } catch (Exception e) {
+                        if (callback != null) {
+                            if (e instanceof InvalidParameterException) {
+                                callback.onResponse(NetCodeStatus.INVALID_PARAMS_EXCEPTION_CODE, e.getMessage());
+                            } else {
+                                callback.onResponse(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, e.getMessage());
+                            }
                         }
+                        LogUtils.e(TAG, e.getMessage());
                     }
-                    LogUtils.e(TAG, e.getMessage());
                 }
             }
         });
@@ -227,7 +234,7 @@ public class FTTrackInner {
     /**
      * 判断是否需要执行同步策略
      *
-     * @param recordDataList  {@link  SyncJsonData} 列表
+     * @param recordDataList {@link  SyncJsonData} 列表
      */
     private void judgeLogCachePolicy(@NonNull List<SyncJsonData> recordDataList) {
         //如果 OP 类型不等于 LOG 则直接进行数据库操作；否则执行同步策略，根据同步策略返回结果判断是否需要执行数据库操作

@@ -3,6 +3,7 @@ package com.ft.sdk;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.webkit.ValueCallback;
 import android.webkit.WebView;
 
 import com.ft.sdk.garble.utils.Constants;
@@ -216,20 +217,26 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
      * @param method   js 方法
      * @param callback 回调
      */
-    private void callJsMethod(String method, CallbackFromJS callback) {
-        mHandler.post(() -> {
+    private void callJsMethod(final String method, final CallbackFromJS callback) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                mWebView.evaluateJavascript(method, value -> {
-                    if (callback != null) {
-                        callback.callBack(value);
-                    }
-                });
-            } else {
-                LogUtils.e(LOG_TAG, "This Android Device may be low than 4.4, can't get js call Back ");
-                mWebView.loadUrl("javascript:" + method);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    mWebView.evaluateJavascript(method, new ValueCallback<String>() {
+                        @Override
+                        public void onReceiveValue(String value) {
+                            if (callback != null) {
+                                callback.callBack(value);
+                            }
+                        }
+                    });
+                } else {
+                    LogUtils.e(LOG_TAG, "This Android Device may be low than 4.4, can't get js call Back ");
+                    mWebView.loadUrl("javascript:" + method);
+                }
+
             }
-
         });
 
     }

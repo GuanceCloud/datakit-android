@@ -34,7 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SyncTaskManager {
     public final static String TAG = "SyncTaskManager";
     /**
-     *  最大容忍错误次数
+     * 最大容忍错误次数
      */
     private static final int MAX_ERROR_COUNT = 5;
     /**
@@ -42,7 +42,7 @@ public class SyncTaskManager {
      */
     private static final int LIMIT_SIZE = 10;
     /**
-     *传输间歇休眠时间
+     * 传输间歇休眠时间
      */
     private static final int SLEEP_TIME = 10000;
     /**
@@ -101,7 +101,7 @@ public class SyncTaskManager {
         executePoll(false);
     }
 
-    private void executePoll(boolean withSleep) {
+    private void executePoll(final boolean withSleep) {
         if (running) {
             return;
         }
@@ -109,32 +109,35 @@ public class SyncTaskManager {
             LogUtils.d(TAG, "=========executeSyncPoll===");
             running = true;
             errorCount.set(0);
-            DataUploaderThreadPool.get().execute(() -> {
-                try {
+            DataUploaderThreadPool.get().execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
 
-                    LogUtils.d(TAG, " \n*******************************************************\n" +
-                            "******************数据同步线程运行中*******************\n" +
-                            "*******************************************************\n");
-                    if (withSleep) {
-                        Thread.sleep(SLEEP_TIME);
-                    }
-
-                    for (DataType dataType : SYNC_MAP) {
-                        List<SyncJsonData> dataList = queryFromData(dataType);
-
-                        if (dataList.isEmpty()) {
-                            continue;
+                        LogUtils.d(TAG, " \n*******************************************************\n" +
+                                "******************数据同步线程运行中*******************\n" +
+                                "*******************************************************\n");
+                        if (withSleep) {
+                            Thread.sleep(SLEEP_TIME);
                         }
-                        handleSyncOpt(dataType, dataList);
-                    }
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    running = false;
-                    LogUtils.d(TAG, " \n********************************************************\n" +
-                            "******************数据同步线程已结束********************\n" +
-                            "********************************************************\n");
+                        for (DataType dataType : SYNC_MAP) {
+                            List<SyncJsonData> dataList = SyncTaskManager.this.queryFromData(dataType);
+
+                            if (dataList.isEmpty()) {
+                                continue;
+                            }
+                            SyncTaskManager.this.handleSyncOpt(dataType, dataList);
+                        }
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
+                        running = false;
+                        LogUtils.d(TAG, " \n********************************************************\n" +
+                                "******************数据同步线程已结束********************\n" +
+                                "********************************************************\n");
+                    }
                 }
             });
         }
@@ -169,20 +172,23 @@ public class SyncTaskManager {
         SyncDataHelper syncDataManager = new SyncDataHelper();
         String body = syncDataManager.getBodyContent(dataType, requestDatas);
         LogUtils.d(TAG, body);
-        requestNet(dataType, body, (code, response) -> {
-            if (code >= 200 && code < 500) {
-                LogUtils.d(TAG, "\n**********************同步数据成功**********************");
-                deleteLastQuery(requestDatas);
-                if (dataType == DataType.LOG) {
-                    FTDBCachePolicy.get().optCount(-requestDatas.size());
+        requestNet(dataType, body, new AsyncCallback() {
+            @Override
+            public void onResponse(int code, String response) {
+                if (code >= 200 && code < 500) {
+                    LogUtils.d(TAG, "\n**********************同步数据成功**********************");
+                    SyncTaskManager.this.deleteLastQuery(requestDatas);
+                    if (dataType == DataType.LOG) {
+                        FTDBCachePolicy.get().optCount(-requestDatas.size());
+                    }
+                    errorCount.set(0);
+                    if (code > 200) {
+                        LogUtils.e(TAG, "同步数据出错(忽略)-[code:" + code + ",response:" + response + "]");
+                    }
+                } else {
+                    LogUtils.e(TAG, "同步数据失败-[code:" + code + ",response:" + response + "]");
+                    errorCount.getAndIncrement();
                 }
-                errorCount.set(0);
-                if (code > 200) {
-                    LogUtils.e(TAG, "同步数据出错(忽略)-[code:" + code + ",response:" + response + "]");
-                }
-            } else {
-                LogUtils.e(TAG, "同步数据失败-[code:" + code + ",response:" + response + "]");
-                errorCount.getAndIncrement();
             }
         });
 
@@ -197,6 +203,7 @@ public class SyncTaskManager {
 
     /**
      * 查询
+     *
      * @param dataType
      * @return
      */

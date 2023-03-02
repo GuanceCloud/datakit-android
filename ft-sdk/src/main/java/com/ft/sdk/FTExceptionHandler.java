@@ -150,37 +150,40 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
      *
      * @param nativeDumpPath
      */
-    public void checkAndSyncPreDump(String nativeDumpPath) {
-        EventConsumerThreadPool.get().execute(() -> {
-            File file = new File(nativeDumpPath);
-            if (!file.exists()) {
-                return;
-            }
-            File[] list = file.listFiles();
-            if (list != null && list.length > 0) {
-                for (File item : list) {
+    public void checkAndSyncPreDump(final String nativeDumpPath) {
+        EventConsumerThreadPool.get().execute(new Runnable() {
+            @Override
+            public void run() {
+                File file = new File(nativeDumpPath);
+                if (!file.exists()) {
+                    return;
+                }
+                File[] list = file.listFiles();
+                if (list != null && list.length > 0) {
+                    for (File item : list) {
 
-                    if (item.getName().startsWith(EXCEPTION_FILE_PREFIX_TOMBSTONE)) {
-                        try {
-                            String crashString = Utils.readFile(item.getAbsolutePath(), Charset.defaultCharset());
-                            long crashTime = file.lastModified() * 1000000L;
+                        if (item.getName().startsWith(EXCEPTION_FILE_PREFIX_TOMBSTONE)) {
+                            try {
+                                String crashString = Utils.readFile(item.getAbsolutePath(), Charset.defaultCharset());
+                                long crashTime = file.lastModified() * 1000000L;
 
-                            String value = Utils.readSectionValueFromDump(item.getAbsolutePath(), DUMP_FILE_KEY_APP_STATE);
+                                String value = Utils.readSectionValueFromDump(item.getAbsolutePath(), DUMP_FILE_KEY_APP_STATE);
 
-                            if (config.isRumEnable() && config.isEnableTrackAppCrash()) {
-                                if (item.getName().contains(ANR_FILE_NAME)) {
+                                if (config.isRumEnable() && config.isEnableTrackAppCrash()) {
+                                    if (item.getName().contains(ANR_FILE_NAME)) {
 //                                    FTAutoTrack.putRUMAnr(crashString, crashTime);
-                                } else if (item.getName().contains(NATIVE_FILE_NAME)) {
-                                    FTRUMGlobalManager.get().addError(crashString, "Native Crash",
-                                            crashTime, ErrorType.NATIVE, AppState.getValueFrom(value));
+                                    } else if (item.getName().contains(NATIVE_FILE_NAME)) {
+                                        FTRUMGlobalManager.get().addError(crashString, "Native Crash",
+                                                crashTime, ErrorType.NATIVE, AppState.getValueFrom(value));
 
+                                    }
                                 }
+
+
+                                Utils.deleteFile(item.getAbsolutePath());
+                            } catch (IOException e) {
+                                e.printStackTrace();
                             }
-
-
-                            Utils.deleteFile(item.getAbsolutePath());
-                        } catch (IOException e) {
-                            e.printStackTrace();
                         }
                     }
                 }

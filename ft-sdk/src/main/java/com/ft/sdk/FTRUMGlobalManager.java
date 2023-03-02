@@ -250,11 +250,14 @@ public class FTRUMGlobalManager {
         }
         attachRUMRelativeForResource(bean);
         resourceBeanMap.put(resourceId, bean);
-        String actionId = bean.actionId;
-        String viewId = bean.viewId;
-        EventConsumerThreadPool.get().execute(() -> {
-            FTDBManager.get().increaseViewPendingResource(viewId);
-            FTDBManager.get().increaseActionPendingResource(actionId);
+        final String actionId = bean.actionId;
+        final String viewId = bean.viewId;
+        EventConsumerThreadPool.get().execute(new Runnable() {
+            @Override
+            public void run() {
+                FTDBManager.get().increaseViewPendingResource(viewId);
+                FTDBManager.get().increaseActionPendingResource(actionId);
+            }
         });
     }
 
@@ -271,20 +274,23 @@ public class FTRUMGlobalManager {
      * @param resourceId
      * @param property   附加属性参数
      */
-    public void stopResource(String resourceId, HashMap<String, Object> property) {
+    public void stopResource(final String resourceId, HashMap<String, Object> property) {
         ResourceBean bean = resourceBeanMap.get(resourceId);
         if (bean != null) {
             if (property != null) {
                 bean.property.putAll(property);
             }
-            String actionId = bean.actionId;
-            String viewId = bean.viewId;
+            final String actionId = bean.actionId;
+            final String viewId = bean.viewId;
             bean.endTime = Utils.getCurrentNanoTime();
             increaseResourceCount(viewId, actionId);
-            EventConsumerThreadPool.get().execute(() -> {
-                FTDBManager.get().reduceViewPendingResource(viewId);
-                FTDBManager.get().reduceActionPendingResource(actionId);
-                FTTraceManager.get().removeByStopResource(resourceId);
+            EventConsumerThreadPool.get().execute(new Runnable() {
+                @Override
+                public void run() {
+                    FTDBManager.get().reduceViewPendingResource(viewId);
+                    FTDBManager.get().reduceActionPendingResource(actionId);
+                    FTTraceManager.get().removeByStopResource(resourceId);
+                }
             });
         }
     }
@@ -394,10 +400,13 @@ public class FTRUMGlobalManager {
      * @param activeActionBean 当前激活的操作
      */
     private void initAction(ActiveActionBean activeActionBean) {
-        ActionBean bean = activeActionBean.convertToActionBean();
+        final ActionBean bean = activeActionBean.convertToActionBean();
         increaseAction(bean.getViewId());
-        EventConsumerThreadPool.get().execute(() -> {
-            FTDBManager.get().initSumAction(bean);
+        EventConsumerThreadPool.get().execute(new Runnable() {
+            @Override
+            public void run() {
+                FTDBManager.get().initSumAction(bean);
+            }
         });
 
     }
@@ -410,9 +419,12 @@ public class FTRUMGlobalManager {
     private void initView(ActiveViewBean activeViewBean) {
         LogUtils.d(TAG, "start viewId:" + activeViewBean.toString());
 
-        ViewBean bean = activeViewBean.convertToViewBean();
-        EventConsumerThreadPool.get().execute(() -> {
-            FTDBManager.get().initSumView(bean);
+        final ViewBean bean = activeViewBean.convertToViewBean();
+        EventConsumerThreadPool.get().execute(new Runnable() {
+            @Override
+            public void run() {
+                FTDBManager.get().initSumView(bean);
+            }
         });
     }
 
@@ -422,11 +434,14 @@ public class FTRUMGlobalManager {
      * @param viewId   view 唯一 id
      * @param actionId action 唯一 id
      */
-    private void increaseResourceCount(String viewId, String actionId) {
-        EventConsumerThreadPool.get().execute(() -> {
-            FTDBManager.get().increaseViewResource(viewId);
-            FTDBManager.get().increaseActionResource(actionId);
-            checkActionClose();
+    private void increaseResourceCount(final String viewId, final String actionId) {
+        EventConsumerThreadPool.get().execute(new Runnable() {
+            @Override
+            public void run() {
+                FTDBManager.get().increaseViewResource(viewId);
+                FTDBManager.get().increaseActionResource(actionId);
+                FTRUMGlobalManager.this.checkActionClose();
+            }
         });
 
     }
@@ -439,12 +454,15 @@ public class FTRUMGlobalManager {
      */
     private void increaseError(JSONObject tags) {
 
-        String actionId = tags.optString(Constants.KEY_RUM_ACTION_ID);
-        String viewId = tags.optString(Constants.KEY_RUM_VIEW_ID);
-        EventConsumerThreadPool.get().execute(() -> {
-            FTDBManager.get().increaseActionError(actionId);
-            FTDBManager.get().increaseViewError(viewId);
-            checkActionClose();
+        final String actionId = tags.optString(Constants.KEY_RUM_ACTION_ID);
+        final String viewId = tags.optString(Constants.KEY_RUM_VIEW_ID);
+        EventConsumerThreadPool.get().execute(new Runnable() {
+            @Override
+            public void run() {
+                FTDBManager.get().increaseActionError(actionId);
+                FTDBManager.get().increaseViewError(viewId);
+                FTRUMGlobalManager.this.checkActionClose();
+            }
         });
     }
 
@@ -612,16 +630,19 @@ public class FTRUMGlobalManager {
     /**
      * 资源加载性能
      */
-    void putRUMResourcePerformance(String resourceId) {
+    void putRUMResourcePerformance(final String resourceId) {
         ResourceBean bean = resourceBeanMap.get(resourceId);
 
         if (bean == null) {
             return;
         }
         if (bean.resourceStatus < HttpsURLConnection.HTTP_OK) {
-            EventConsumerThreadPool.get().execute(() -> {
-                resourceBeanMap.remove(resourceId);
-                FTTraceManager.get().removeByAddResource(resourceId);
+            EventConsumerThreadPool.get().execute(new Runnable() {
+                @Override
+                public void run() {
+                    resourceBeanMap.remove(resourceId);
+                    FTTraceManager.get().removeByAddResource(resourceId);
+                }
             });
             return;
         }
@@ -754,9 +775,12 @@ public class FTRUMGlobalManager {
             LogUtils.e(TAG, e.toString());
         }
 
-        EventConsumerThreadPool.get().execute(() -> {
-            resourceBeanMap.remove(resourceId);
-            FTTraceManager.get().removeByAddResource(resourceId);
+        EventConsumerThreadPool.get().execute(new Runnable() {
+            @Override
+            public void run() {
+                resourceBeanMap.remove(resourceId);
+                FTTraceManager.get().removeByAddResource(resourceId);
+            }
         });
     }
 
@@ -829,20 +853,26 @@ public class FTRUMGlobalManager {
 
 
     private void increaseLongTask(JSONObject tags) {
-        String actionId = tags.optString(Constants.KEY_RUM_ACTION_ID);
-        String viewId = tags.optString(Constants.KEY_RUM_VIEW_ID);
-        EventConsumerThreadPool.get().execute(() -> {
-            FTDBManager.get().increaseActionLongTask(actionId);
-            FTDBManager.get().increaseViewLongTask(viewId);
-            checkActionClose();
+        final String actionId = tags.optString(Constants.KEY_RUM_ACTION_ID);
+        final String viewId = tags.optString(Constants.KEY_RUM_VIEW_ID);
+        EventConsumerThreadPool.get().execute(new Runnable() {
+            @Override
+            public void run() {
+                FTDBManager.get().increaseActionLongTask(actionId);
+                FTDBManager.get().increaseViewLongTask(viewId);
+                FTRUMGlobalManager.this.checkActionClose();
 
+            }
         });
     }
 
-    private void increaseAction(String viewId) {
-        EventConsumerThreadPool.get().execute(() -> {
-            FTDBManager.get().increaseViewAction(viewId);
+    private void increaseAction(final String viewId) {
+        EventConsumerThreadPool.get().execute(new Runnable() {
+            @Override
+            public void run() {
+                FTDBManager.get().increaseViewAction(viewId);
 
+            }
         });
 
     }
@@ -850,20 +880,26 @@ public class FTRUMGlobalManager {
     private void closeView(ActiveViewBean activeViewBean) {
         LogUtils.d(TAG, "closeView:" + activeViewBean.toString());
 
-        ViewBean viewBean = activeViewBean.convertToViewBean();
-        String viewId = viewBean.getId();
-        long timeSpent = viewBean.getTimeSpent();
-        EventConsumerThreadPool.get().execute(() -> {
-            FTDBManager.get().closeView(viewId, timeSpent, viewBean.getAttrJsonString());
+        final ViewBean viewBean = activeViewBean.convertToViewBean();
+        final String viewId = viewBean.getId();
+        final long timeSpent = viewBean.getTimeSpent();
+        EventConsumerThreadPool.get().execute(new Runnable() {
+            @Override
+            public void run() {
+                FTDBManager.get().closeView(viewId, timeSpent, viewBean.getAttrJsonString());
+            }
         });
         generateRumData();
     }
 
-    private void closeAction(ActiveActionBean bean, boolean force) {
-        String actionId = bean.getId();
-        long duration = bean.getDuration();
-        EventConsumerThreadPool.get().execute(() -> {
-            FTDBManager.get().closeAction(actionId, duration, force);
+    private void closeAction(ActiveActionBean bean, final boolean force) {
+        final String actionId = bean.getId();
+        final long duration = bean.getDuration();
+        EventConsumerThreadPool.get().execute(new Runnable() {
+            @Override
+            public void run() {
+                FTDBManager.get().closeAction(actionId, duration, force);
+            }
         });
         generateRumData();
     }
@@ -936,24 +972,35 @@ public class FTRUMGlobalManager {
 
 
     final Handler mHandler = new Handler(Looper.getMainLooper());
-    final Runnable mRUMGenerateRunner = () -> {
-        try {
-            JSONObject tags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
-            EventConsumerThreadPool.get().execute(() -> {
-                try {
-                    generateActionSum(tags);
-                    generateViewSum(tags);
-                } catch (JSONException e) {
-                    LogUtils.e(TAG, e.getMessage());
-                }
-            });
-        } catch (Exception e) {
-            LogUtils.e(TAG, e.getMessage());
+    final Runnable mRUMGenerateRunner = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                final JSONObject tags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
+                EventConsumerThreadPool.get().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            FTRUMGlobalManager.this.generateActionSum(tags);
+                            FTRUMGlobalManager.this.generateViewSum(tags);
+                        } catch (JSONException e) {
+                            LogUtils.e(TAG, e.getMessage());
+                        }
+                    }
+                });
+            } catch (Exception e) {
+                LogUtils.e(TAG, e.getMessage());
 
+            }
         }
     };
 
-    final Runnable mActionRecheckRunner = () -> checkActionClose();
+    final Runnable mActionRecheckRunner = new Runnable() {
+        @Override
+        public void run() {
+            FTRUMGlobalManager.this.checkActionClose();
+        }
+    };
 
 
     private static final int LIMIT_SIZE = 50;
@@ -1078,8 +1125,11 @@ public class FTRUMGlobalManager {
     void initParams(FTRUMConfig config) {
         sampleRate = config.getSamplingRate();
         checkSessionKeep(sessionId, sampleRate);
-        EventConsumerThreadPool.get().execute(() -> {
-            FTDBManager.get().closeAllActionAndView();
+        EventConsumerThreadPool.get().execute(new Runnable() {
+            @Override
+            public void run() {
+                FTDBManager.get().closeAllActionAndView();
+            }
         });
 
     }

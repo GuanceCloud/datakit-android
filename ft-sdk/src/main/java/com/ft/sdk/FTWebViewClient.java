@@ -41,11 +41,14 @@ public class FTWebViewClient extends WebViewClient {
 
     @Nullable
     @Override
-    public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+    public WebResourceResponse shouldInterceptRequest(final WebView view, WebResourceRequest request) {
 
-        view.post(() -> {
-            mOriginUrl = view.getUrl();
-            mCountDownLatch.countDown();
+        view.post(new Runnable() {
+            @Override
+            public void run() {
+                mOriginUrl = view.getUrl();
+                mCountDownLatch.countDown();
+            }
         });
         try {
             mCountDownLatch.await(1L, TimeUnit.SECONDS);
