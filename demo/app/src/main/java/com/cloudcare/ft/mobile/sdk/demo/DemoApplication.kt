@@ -25,6 +25,7 @@ class DemoApplication : Application() {
         fun setSDK(context: Context) {
             val ftSDKConfig = FTSDKConfig.builder(BuildConfig.ACCESS_SERVER_URL)
                 .setXDataKitUUID("ft-dataKit-uuid-001")
+                .setServiceName("ft-sdk-demo")
                 .setDebug(true)//是否开启Debug模式（开启后能查看调试数据）
             FTSdk.install(ftSDKConfig)
 
@@ -33,7 +34,6 @@ class DemoApplication : Application() {
                 FTLoggerConfig()
                     .setEnableConsoleLog(true)
 //                .setEnableConsoleLog(true,"log prefix")
-                    .setServiceName("ft-sdk-demo")
                     .setEnableLinkRumData(true)
                     .setEnableCustomLog(true)
 //                .setLogLevelFilters(arrayOf(Status.CRITICAL))
