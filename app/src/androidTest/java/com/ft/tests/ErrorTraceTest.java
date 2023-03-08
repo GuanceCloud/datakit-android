@@ -67,6 +67,7 @@ public class ErrorTraceTest extends BaseTest {
     @Test
     public void mockExceptionTest() throws InterruptedException {
 
+        //阻止 application 崩溃，如果崩溃测试用例也会结束
         avoidCrash();
         //产生一个崩溃信息
         onView(ViewMatchers.withId(R.id.main_mock_crash_btn)).perform(ViewActions.scrollTo()).perform(click());

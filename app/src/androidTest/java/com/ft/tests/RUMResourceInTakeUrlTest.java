@@ -16,6 +16,7 @@ import com.ft.BuildConfig;
 import com.ft.DebugMainActivity;
 import com.ft.R;
 import com.ft.sdk.EnvType;
+import com.ft.sdk.FTInTakeUrlHandler;
 import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
@@ -69,6 +70,11 @@ public class RUMResourceInTakeUrlTest extends BaseTest {
 
     }
 
+    /**
+     * 验证 OkHttp ft-plugin织入 Interceptor 相关代码的情况下，{@link FTRUMConfig#setResourceUrlHandler(FTInTakeUrlHandler)} 是否正确起小
+     *
+     * @throws Exception
+     */
     @Test
     public void resourceInterceptorTest() throws Exception {
         Thread.sleep(2000);

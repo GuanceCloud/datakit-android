@@ -45,7 +45,7 @@ public class ServerConnectTest extends BaseTest {
     }
 
     /**
-     *
+     * 空地址错误校验
      * @throws Exception
      */
     @Test
@@ -54,7 +54,7 @@ public class ServerConnectTest extends BaseTest {
     }
 
     /**
-     *
+     * 错误 Datakit 地址校验
      * @throws Exception
      */
     @Test
@@ -63,7 +63,7 @@ public class ServerConnectTest extends BaseTest {
     }
 
     /**
-     *
+     * 正常地址校验
      * @throws Exception
      */
     @Test
@@ -72,7 +72,7 @@ public class ServerConnectTest extends BaseTest {
     }
 
     /**
-     *
+     * 正常配置数据请求校验
      * @param url
      * @param expected
      * @throws Exception
@@ -87,7 +87,7 @@ public class ServerConnectTest extends BaseTest {
 
 
     /**
-     * 
+     * Datakit 数据请求校验
      * @param expected
      * @throws Exception
      */

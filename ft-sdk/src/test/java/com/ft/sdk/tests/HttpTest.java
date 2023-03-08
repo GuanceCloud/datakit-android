@@ -27,7 +27,13 @@ import java.net.HttpURLConnection;
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest = Config.NONE, sdk = 21)
 public class HttpTest {
+    /**
+     * 模拟成功返回 json
+     */
     private static final String SUCCESS_WITH_JSON_RESPONSE = "{\"code\":200,\"errorCode\":\"\",\"message\":\"\"}";
+    /**
+     * 模拟无数据返回
+     */
     private static final String EMPTY_RESPONSE = "";
     private MockWebServer mMockWebServer;
 

@@ -68,6 +68,10 @@ public class RUMResourceTest extends BaseTest {
 
     }
 
+    /**
+     *  验证 OkHttp ft-plugin 是否正确织入 Interceptor 相关代码
+     * @throws Exception
+     */
     @Test
     public void resourceInterceptorTest() throws Exception {
         Thread.sleep(2000);

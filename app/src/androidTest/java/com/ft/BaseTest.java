@@ -18,6 +18,9 @@ import org.junit.Rule;
  */
 public class BaseTest extends FTBaseTest {
 
+    /**
+     * 申请 {@link Manifest.permission#READ_PHONE_STATE} 权限
+     */
     @Rule
     public GrantPermissionRule permissionRule = GrantPermissionRule.grant(
             Manifest.permission.READ_PHONE_STATE
@@ -28,7 +31,9 @@ public class BaseTest extends FTBaseTest {
      */
     @After
     public void tearDown() {
+        //数据库删除
         FTDBManager.get().delete();
+        //关闭 SDK
         FTSdk.shutDown();
     }
 

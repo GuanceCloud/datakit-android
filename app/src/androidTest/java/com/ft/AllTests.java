@@ -18,7 +18,7 @@ import org.junit.runners.Suite;
 /**
  * author: huangDianHua
  * time: 2020/8/27 17:36:40
- * description:
+ * description: 数据测试合集
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({

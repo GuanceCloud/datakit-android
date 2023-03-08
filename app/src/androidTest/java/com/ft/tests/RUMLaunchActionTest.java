@@ -58,6 +58,10 @@ public class RUMLaunchActionTest extends BaseTest {
     }
 
 
+    /**
+     * 验证应用启动后，是否正常生成 Action 数据
+     * @throws Exception
+     */
     @Test
     public void rumActionLaunchTest() throws Exception {
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据

@@ -71,6 +71,23 @@ public class RUMViewDeviceMetricsTest extends BaseTest {
     }
 
 
+    /**
+     * 检验应用真实启动过程中，是否真确显示
+     * {@link Constants#KEY_CPU_TICK_COUNT_PER_SECOND}
+     * {@link Constants#KEY_CPU_TICK_COUNT}
+     * {@link Constants#KEY_MEMORY_MAX}
+     * {@link Constants#KEY_MEMORY_AVG}
+     * {@link Constants#KEY_BATTERY_CURRENT_MAX}
+     * {@link Constants#KEY_BATTERY_CURRENT_AVG}
+     * 等指标数值
+     * <p>
+     * 目前
+     * {@link Constants#KEY_FPS_MINI}
+     * {@link Constants#KEY_FPS_AVG}
+     * 无法通过测试用例检验，只能通过人为检验确认正确性
+     *
+     * @throws Exception
+     */
     @Test
     public void viewDeviceMetricsTest() throws Exception {
         invokeGenerateRumData();

@@ -6,10 +6,14 @@ import org.powermock.reflect.Whitebox;
 
 import java.lang.reflect.Field;
 
+/**
+ *
+ * @author Brandon
+ */
 public class TestUtils {
 
     /**
-     * 检测是否为虚拟机设备
+     * 检测是否为虚拟机设备进行测试用例
      * @return
      */
     public static boolean isEmulator() {

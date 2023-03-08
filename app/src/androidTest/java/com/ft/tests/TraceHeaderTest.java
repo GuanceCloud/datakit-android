@@ -35,7 +35,7 @@ import okhttp3.Request;
 /**
  * author: huangDianHua
  * time: 2020/8/26 13:54:56
- * description: 网络请求 Trace Header 正确性监测
+ * description: 网络请求 Trace Header 正确性检测
  */
 @RunWith(AndroidJUnit4.class)
 public class TraceHeaderTest extends BaseTest {

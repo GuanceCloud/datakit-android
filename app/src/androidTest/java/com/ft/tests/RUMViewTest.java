@@ -67,7 +67,7 @@ public class RUMViewTest extends BaseTest {
     }
 
     /**
-     *
+     * 检验真实应用启动，页面跳动，{@link com.ft.sdk.FTActivityLifecycleCallbacks} 是否正常输出 View 数据
      * @throws Exception
      */
     @Test

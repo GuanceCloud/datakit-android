@@ -68,6 +68,10 @@ public class RUMClickActionTest extends BaseTest {
     }
 
 
+    /**
+     * 模拟真实应用启动情况下，点击 Button 后，Action 相关数据是否正常生成
+     * @throws Exception
+     */
     @Test
     public void rumCLickTest() throws Exception {
         Thread.sleep(2000);

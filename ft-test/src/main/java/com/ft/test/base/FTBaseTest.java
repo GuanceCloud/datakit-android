@@ -126,6 +126,10 @@ public class FTBaseTest {
 
     }
 
+    /**
+     * 等待线程池队列执行结束，目的是让线程池函数在测试用例中串行，等待操作结束
+     * @throws InterruptedException
+     */
     protected void waitForInThreadPool() throws InterruptedException {
         CountDownLatch countDownLatch = new CountDownLatch(1);
         EventConsumerThreadPool.get().execute(() -> {

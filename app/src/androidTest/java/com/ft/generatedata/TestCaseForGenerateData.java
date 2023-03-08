@@ -70,6 +70,27 @@ public class TestCaseForGenerateData extends BaseTest {
 
     }
 
+    /**
+     * 根据时序顺序生成
+     * action
+     * long task
+     * action
+     * error
+     * action
+     * log
+     * action
+     * resource
+     * action
+     * view
+     * action
+     * view
+     * action
+     * view
+     *
+     * 等待传输完毕后关闭
+     *
+     * @throws InterruptedException
+     */
     @Test
     public void generateData() throws InterruptedException {
         Thread.sleep(5000);//等待 emulator 开启 网络链接

@@ -58,7 +58,7 @@ public class UtilsTest {
 
 
     /**
-     * 多行行数据验证
+     * 多行行数据验证，验证 {@link SyncDataHelper#convertToLineProtocolLines(List)} 数据转化过程中是否会发生数据错误
      *
      * @throws JSONException
      * @throws InterruptedException
@@ -89,7 +89,7 @@ public class UtilsTest {
     }
 
     /**
-     * 单数据验证，空值数据
+     * 单数据验证，验证 {@link SyncDataHelper#convertToLineProtocolLines(List)} 数据转化过程中是否会发生数据错误
      *
      * @throws JSONException
      */
