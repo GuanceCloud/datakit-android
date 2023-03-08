@@ -3,40 +3,23 @@ package com.ft.sdk.garble.utils;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.ConnectivityManager;
-import android.net.LinkProperties;
-import android.net.Network;
 import android.net.NetworkInfo;
-import android.net.TrafficStats;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.os.Build;
-import android.telephony.PhoneStateListener;
-import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
-import android.text.TextUtils;
-
-import androidx.annotation.Nullable;
 
 import com.ft.sdk.FTApplication;
-import com.ft.sdk.garble.bean.NetStatusBean;
-import com.ft.sdk.garble.http.HttpBuilder;
-import com.ft.sdk.garble.http.RequestMethod;
-import com.ft.sdk.garble.http.ResponseData;
-import com.ft.sdk.garble.manager.AsyncCallback;
-import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.text.DecimalFormat;
 import java.util.Enumeration;
-import java.util.LinkedList;
 
 
 /**
  * BY huangDianHua
  * DATE:2020-01-09 13:58
- * Description:
+ * Description: 网络信息相关 IP，网络类型等
  */
 public class NetUtils {
     private final static String TAG = "NetUtils";
@@ -181,9 +164,9 @@ public class NetUtils {
     }
 
     /**
-     * 获取当前设备的IP
+     * 获取当前设备的IP，处于公网会显示公网 IP，局域网中会显示局域网 IP
      *
-     * @return
+     * @return 返回 8.8.8.8 格式的字符
      */
     public String getMobileIpAddress() {
         NetworkInfo networkInfo = ((ConnectivityManager) FTApplication.getApplication().getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
@@ -204,8 +187,6 @@ public class NetUtils {
                 }
             } else if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
                 return getWifiIp();
-            } else {
-
             }
         }
         return null;

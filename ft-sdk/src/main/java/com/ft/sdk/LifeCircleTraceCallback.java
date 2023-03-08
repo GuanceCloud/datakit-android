@@ -1,6 +1,8 @@
 package com.ft.sdk;
 
+import android.app.Activity;
 import android.content.Context;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -62,7 +64,7 @@ class LifeCircleTraceCallback {
     };
 
     /**
-     * start 之前
+     * {@link Activity#onStart()} 之前
      */
     public void onPreStart() {
         if (alreadySleep) {//表示从后台重新进入
@@ -77,6 +79,7 @@ class LifeCircleTraceCallback {
     }
 
     /**
+     * {@link Activity#onCreate(Bundle)} 之前
      *
      * @param context
      */
@@ -90,7 +93,8 @@ class LifeCircleTraceCallback {
     }
 
     /**
-     * onCreate 之后
+     * {@link Activity#onCreate(Bundle)} 之后
+     *
      * @param context
      */
     public void onPostOnCreate(Context context) {
@@ -129,7 +133,7 @@ class LifeCircleTraceCallback {
     }
 
     /**
-     * resume 之后
+     * {@link Activity#onResume() }  之后
      *
      * @param context
      */
@@ -154,18 +158,20 @@ class LifeCircleTraceCallback {
     }
 
     /**
-     *
+     * {@link Activity#onStop() }
      */
     public void onStop() {
         boolean appForeground = Utils.isAppForeground();
         if (!appForeground) {
             handler.removeMessages(MSG_CHECK_SLEEP_STATUS);
+            //休眠一段时候后执行,为了区分短时间唤醒的行为
             handler.sendEmptyMessageDelayed(MSG_CHECK_SLEEP_STATUS, DELAY_SLEEP_MILLIS);
         }
     }
 
     /**
-     * onDestroy
+     * {@link Activity#onDestroy() }
+     *
      * @param context
      */
     public void onPostDestroy(Context context) {

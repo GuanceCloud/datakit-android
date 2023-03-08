@@ -14,10 +14,18 @@ public class ResponseData {
         this.data = data;
     }
 
+    /**
+     * http code
+     * @return
+     */
     public int getHttpCode() {
         return httpCode;
     }
 
+    /**
+     * http 返回数据内容，字符形式返回
+     * @return
+     */
     public String getData() {
         return data;
     }

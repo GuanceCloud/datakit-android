@@ -18,13 +18,12 @@ public class HttpBuilder {
     private String model;
     private RequestMethod method;
     private String bodyString;
-    private HashMap<String, Object> params = new HashMap<>();
+    private final HashMap<String, Object> params = new HashMap<>();
     private int sendOutTime = FTHttpConfigManager.get().sendOutTime;
     private int readOutTime = FTHttpConfigManager.get().readOutTime;
     private boolean useDefaultHead = true;
     private boolean showLog = true;
-    private HashMap<String, String> headParams = new HashMap<>();
-    private boolean enableToken = true;
+    private final HashMap<String, String> headParams = new HashMap<>();
     public static HttpBuilder Builder() {
         return new HttpBuilder();
     }
@@ -148,20 +147,32 @@ public class HttpBuilder {
         return this;
     }
 
+    /**
+     * 是否显示
+     * @param show
+     * @return
+     */
     public HttpBuilder setShowLog(boolean show) {
         this.showLog = show;
         return this;
     }
 
-    public HttpBuilder enableToken(boolean enableToken){
-        this.enableToken = enableToken;
-        return this;
-    }
-
+    /**
+     * 数据同步 HTTP 请求
+     * @param tClass
+     * @return
+     * @param <T>
+     */
     public <T extends ResponseData> T executeSync(Class<T> tClass) {
         return new NetProxy(this).execute(tClass);
     }
 
+    /**
+     * 数据异步 HTTP 请求
+     * @param tClass
+     * @param callback
+     * @param <T>
+     */
     public <T extends ResponseData> void executeAsync(Class<T> tClass, HttpCallback<T> callback) {
         DataUploaderThreadPool.get().execute(() -> callback.onComplete(new NetProxy(this).execute(tClass)));
     }

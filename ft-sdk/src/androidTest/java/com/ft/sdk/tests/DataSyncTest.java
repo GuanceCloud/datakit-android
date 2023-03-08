@@ -30,6 +30,11 @@ import org.junit.Test;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 
+/**
+ * 数据同步验证，验证数据数据是否有积压问题或者数据请求错误问题
+ *
+ * @author Brandon
+ */
 public class DataSyncTest extends FTBaseTest {
 
     private static final String EMPTY_RESPONSE = "";
@@ -72,7 +77,10 @@ public class DataSyncTest extends FTBaseTest {
         FTSdk.initTraceWithConfig(new FTTraceConfig().setEnableAutoTrace(true));
     }
 
-
+    /**
+     * {@link DataType#RUM_APP} 类型数据同步验证。检验数据写入和数据上传
+     * @throws Exception
+     */
     @Test
     public void rumTest() throws Exception {
 
@@ -92,7 +100,7 @@ public class DataSyncTest extends FTBaseTest {
 
 
     /**
-     * 上传一条 log 数据测试
+     * 日志数数据写入测试
      *
      * @throws InterruptedException
      */
@@ -107,7 +115,7 @@ public class DataSyncTest extends FTBaseTest {
 
 
     /**
-     * 同步删除测试
+     * 数据同步测试，数据同步完成后会从缓存中删除
      *
      * @throws InterruptedException
      */

@@ -1,5 +1,7 @@
 package com.ft.sdk;
 
+import androidx.annotation.NonNull;
+
 import com.ft.sdk.garble.utils.Constants;
 
 /**
@@ -17,6 +19,9 @@ public enum TraceType {
      * x-datadog-parent-id
      * x-datadog-sampling-priority
      * x-datadog-origin
+     *
+     * <a href="https://docs.datadoghq.com/synthetics/apm/">了解更多</a>
+     *
      */
     DDTRACE,
 
@@ -27,21 +32,29 @@ public enum TraceType {
      * X-B3-SpanId
      * X-B3-Sampled
      *
+     * <a href="https://github.com/openzipkin/b3-propagation">了解更多</a>
+     *
      */
     ZIPKIN_MULTI_HEADER,
 
     /**
      * zipkin single header,b3
+     *
+     * <a href="https://github.com/openzipkin/b3-propagation">了解更多</a>
      */
     ZIPKIN_SINGLE_HEADER,
 
     /**
      * w3c, traceparent
+     *
+     * <a href="https://www.w3.org/TR/trace-context/#traceparent-header-field-values">了解更多</a>
      */
     TRACEPARENT,
 
     /**
      * skywalking 8.0+, sw-8
+     *
+     * <a href="https://skywalking.apache.org/docs/main/next/en/api/x-process-propagation-headers-v3/#skywalking-cross-process-propagation-headers-protocol">了解更多</a>
      */
     SKYWALKING,
 
@@ -54,6 +67,7 @@ public enum TraceType {
      * @return Trace 类型小写字符类型，例如 zipkin，ddtrace 等。
      * 用于行协议数据输出 {@link Constants#MEASUREMENT}使用
      */
+    @NonNull
     @Override
     public String toString() {
         switch (this) {

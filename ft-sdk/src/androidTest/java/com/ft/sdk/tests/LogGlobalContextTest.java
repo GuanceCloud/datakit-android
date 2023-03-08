@@ -20,7 +20,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-
+/**
+ * 日志 globalContext 测试
+ * @author Brandon
+ */
 @RunWith(AndroidJUnit4.class)
 public class LogGlobalContextTest extends FTBaseTest {
 
@@ -38,6 +41,9 @@ public class LogGlobalContextTest extends FTBaseTest {
         );
     }
 
+    /**
+     * 日志输出过程中会把  globalContext 添加的数据一起输出
+     */
     @Test
     public void logGlobalContextTest() {
         FTLogger.getInstance().logBackground("test Log", Status.INFO);

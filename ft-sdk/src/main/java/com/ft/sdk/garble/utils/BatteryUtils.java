@@ -7,12 +7,10 @@ import android.os.BatteryManager;
 
 import com.ft.sdk.garble.bean.BatteryBean;
 
-import java.util.concurrent.ExecutorService;
-
 /**
  * BY huangDianHua
  * DATE:2020-01-09 17:47
- * Description:参考开源项目地址 https://github.com/guxiaonian/MobileInfo
+ * Description:参考开源项目 <a href="https://github.com/guxiaonian/MobileInfo">地址</a>
  */
 public class BatteryUtils {
     static double batteryCapacity = 0; //电池的容量mAh
@@ -53,7 +51,7 @@ public class BatteryUtils {
 
 
     /**
-     * 获取电池的容量
+     * 获取电池的容量,单位毫安时 , xxx mAh
      *
      * @param context
      * @return

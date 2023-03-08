@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 /**
  * BY huangDianHua
  * DATE:2019-12-02 11:23
- * Description:
+ * Description:数据库管理，获取数据库对象以及数据关闭
  */
 public abstract class DBManager {
     private SQLiteOpenHelper databaseHelper;
@@ -18,6 +18,11 @@ public abstract class DBManager {
         return databaseHelper;
     }
 
+    /**
+     * 同步锁，使数据库操作线程安全
+     * @param write
+     * @param callBack
+     */
     protected void getDB(boolean write,DataBaseCallBack callBack){
         synchronized (this){
             SQLiteOpenHelper helper = getDataBaseHelper();
@@ -33,6 +38,9 @@ public abstract class DBManager {
         }
     }
 
+    /**
+     * 关闭并释放数据库文件对象
+     */
     protected void shutDown(){
         synchronized (this){
             if(databaseHelper != null){

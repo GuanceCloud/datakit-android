@@ -20,7 +20,7 @@ public enum AppState {
     RUN;
 
     /**
-     * 从字符转化对应的
+     * 从字符转化对应的 AppState
      *
      * @param value @{@link AppState} 对应字符
      * @return 返回当前运行状态

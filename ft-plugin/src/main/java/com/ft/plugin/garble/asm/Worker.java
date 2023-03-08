@@ -10,8 +10,7 @@ import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 /**
- *
- * From https://github.com/Leaking/Hunter/blob/master/hunter-transform/src/main/java/com/quinn/hunter/transform/concurrent/Worker.java
+ *  <a href="https://github.com/Leaking/Hunter/blob/master/hunter-transform/src/main/java/com/quinn/hunter/transform/concurrent/Worker.java">参考资料</a>
  */
 public class Worker {
     protected final LinkedList<Future<?>> futures = new LinkedList<Future<?>>() {

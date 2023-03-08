@@ -1,10 +1,28 @@
 package com.ft.sdk.garble.utils;
 
+/**
+ * 根据编辑后 Runtime 类映射来判断，应用程序是否对一个库进行依赖
+ *
+ * @author Brandon
+ */
 public class PackageUtils {
-
+    /**
+     *  native SDK 依赖主类 package 路径
+     */
     private static final String PACKAGE_NATIVE_ENGINE_CLASS = "com.ft.sdk.nativelib.NativeEngineInit";
+
+    /**
+     *  Okhttp 主类 package 路径
+     */
     private static final String PACKAGE_OKHTTP3 = "okhttp3.OkHttpClient";
+
+    /**
+     * Flutter Application package 路径
+     */
     private static final String PACKAGE_FLUTTER = "io.flutter.app.FlutterApplication";
+    /**
+     * React Native Application package 路径
+     */
     private static final String PACKAGE_REACT_NATIVE = "com.facebook.react.ReactApplication";
 
     /**

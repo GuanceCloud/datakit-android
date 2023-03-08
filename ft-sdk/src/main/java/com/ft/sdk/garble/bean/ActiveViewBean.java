@@ -3,7 +3,9 @@ package com.ft.sdk.garble.bean;
 import com.ft.sdk.garble.utils.Utils;
 
 /**
- * 当前激活 {@link ViewBean}
+ * 当前激活状态 {@link ViewBean}
+ *
+ * 一个应用同一时间只会存在一个 ActiveViewBean
  *
  * @author Brandon
  */

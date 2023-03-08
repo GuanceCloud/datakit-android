@@ -7,6 +7,9 @@ package com.ft.plugin.garble;
  */
 public class Logger {
     private static final String TAG = "[FT-Plugin]:";
+    /**
+     * 设置 debug，开启后，会在 build 过程中输出日志
+     */
     private static boolean debug = true;
 
     public static void setDebug(boolean debug) {

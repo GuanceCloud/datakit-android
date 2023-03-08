@@ -8,6 +8,8 @@ import org.junit.Test;
 
 /**
  * 对行协议传输数据进行特殊字符转化校验
+ *
+ * @author Brandon
  */
 public class LineProtocolEscapeTest {
 
@@ -21,19 +23,27 @@ public class LineProtocolEscapeTest {
     private final static String MIX_FIELD = JSON_STRING + NEED_ESCAPE_STRING;
     private final static String MIXED_RESULT = "\"{\\\"key\\\":\\\"value\\\",\\\"jsonString\\\":\\\"{\\\\\\\"key\\\\\\\":\\\\\\\"value\\\\\\\"}\\\"}\\\"Test log\\\\,\\\\\\\\=\"";
 
-
+    /**
+     * 行协议中 field 特殊字符是否正确进行转译
+     */
     @Test
     public void fieldEscape() {
         String fieldValue = Utils.translateFieldValue(NEED_ESCAPE_STRING);
         Assert.assertEquals(FIELD_RESULT, fieldValue);
     }
 
+    /**
+     * 行协议中 field json 形式格式是否正确进行转译
+     */
     @Test
     public void fieldEscapeJson() {
         String fieldValue = Utils.translateFieldValue(JSON_STRING);
         Assert.assertEquals(JSONObject.quote(JSON_STRING), fieldValue);
     }
 
+    /**
+     * 行协议中 field 在混合数据情况下是否正确进行转译
+     */
     @Test
     public void fieldEscapeMixString() {
         String fieldValue = Utils.translateFieldValue(MIX_FIELD);
@@ -42,12 +52,17 @@ public class LineProtocolEscapeTest {
         System.out.println(MIXED_RESULT);
     }
 
+    /**
+     * 行协议中 measurement 特殊字符是否正确进行转译
+     */
     @Test
     public void measurementEscape() {
         String measureValue = Utils.translateMeasurements(NEED_ESCAPE_STRING);
         Assert.assertEquals(MEASUREMENT_RESULT, measureValue);
     }
-
+    /**
+     * 行协议中 tag 特殊字符是否正确进行转译
+     */
     @Test
     public void tagEscape() {
         String tagValue = Utils.translateTagKeyValue(NEED_ESCAPE_STRING);

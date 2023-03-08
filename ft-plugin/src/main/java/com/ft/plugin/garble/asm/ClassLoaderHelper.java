@@ -16,13 +16,14 @@ import java.net.URLClassLoader;
 import java.util.Collection;
 
 /**
- * From https://github.com/Leaking/Hunter/blob/master/hunter-transform/src/main/java/com/quinn/hunter/transform/asm/ClassLoaderHelper.java
+ *  <a href="https://github.com/Leaking/Hunter/blob/master/hunter-transform/src/main/java/com/quinn/hunter/transform/asm/ClassLoaderHelper.java">参考资料</a>
  * DATE:2019-11-29 14:28
  * Description:
  */
 public class ClassLoaderHelper {
     /**
      * 获取包含所有 class 文件的 ClassLoader
+     *
      * @param inputs
      * @param referencedInputs
      * @param project

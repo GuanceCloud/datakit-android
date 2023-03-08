@@ -14,6 +14,11 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+/**
+ * RUM 用户数据绑定数据验证
+ *
+ * @author Brandon
+ */
 public class RUMUserBindTest extends FTBaseTest {
 
     public static final String USER_ID = "123456";
@@ -27,6 +32,10 @@ public class RUMUserBindTest extends FTBaseTest {
         FTSdk.initRUMWithConfig(new FTRUMConfig());
     }
 
+    /**
+     * 绑定用户，数据验证
+     * @throws InterruptedException
+     */
     @Test
     public void rumUserBindTest() throws InterruptedException {
 
@@ -39,6 +48,10 @@ public class RUMUserBindTest extends FTBaseTest {
         Assert.assertTrue(except2 > 0);
     }
 
+    /**
+     * 解绑用户数据，验证是否清理数据
+     * @throws InterruptedException
+     */
     @Test
     public void rumUserUnBindTest() throws InterruptedException {
         FTSdk.bindRumUserData(USER_ID);

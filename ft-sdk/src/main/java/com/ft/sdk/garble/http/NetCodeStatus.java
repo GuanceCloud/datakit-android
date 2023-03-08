@@ -3,7 +3,7 @@ package com.ft.sdk.garble.http;
 /**
  * BY huangDianHua
  * DATE:2019-12-16 11:30
- * Description:
+ * Description: 定义网络相关的错误与错误码
  */
 public class NetCodeStatus {
     /**

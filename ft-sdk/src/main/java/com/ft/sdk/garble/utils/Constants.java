@@ -163,9 +163,9 @@ public class Constants {
      */
     public static final String KEY_STATUS = "status";
 
-    public static final String KEY_BATTERY_TOTAL = "battery_total";
-    public static final String KEY_BATTERY_CHARGE_TYPE = "battery_charge_type";
-    public static final String KEY_BATTERY_STATUS = "battery_status";
+    //    public static final String KEY_BATTERY_TOTAL = "battery_total";
+//    public static final String KEY_BATTERY_CHARGE_TYPE = "battery_charge_type";
+//    public static final String KEY_BATTERY_STATUS = "battery_status";
     public static final String KEY_BATTERY_USE = "battery_use";
 
     /* 页面周期 start =======> */
@@ -474,6 +474,9 @@ public class Constants {
      * 会话类型
      */
     public static final String KEY_RUM_SESSION_TYPE = "session_type";
+    /**
+     * view ID，{@link com.ft.sdk.garble.bean.ViewBean}
+     */
     public static final String KEY_RUM_VIEW_ID = "view_id";
     /**
      * 页面来源，页面的父级

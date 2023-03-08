@@ -20,16 +20,20 @@ public class FTTraceHandler {
     public static final String W3C_TRACEPARENT_KEY = "traceparent";
     public static final String JAEGER_KEY = "uber-trace-id";
     public static final String SKYWALKING_V3_SW_8 = "sw8";
-    public static final String SKYWALKING_V3_SW_6 = "sw6";
+//    public static final String SKYWALKING_V3_SW_6 = "sw6";
 
     public static final String DD_TRACE_TRACE_ID_KEY = "x-datadog-trace-id";
 
     public static final String DD_TRACE_PARENT_SPAN_ID_KEY = "x-datadog-parent-id";
     public static final String DD_TRACE_SAMPLING_PRIORITY_KEY = "x-datadog-sampling-priority";
     public static final String DD_TRACE_ORIGIN_KEY = "x-datadog-origin";
-    //是否可以采样
+    /**
+     * 是否可以采样
+     */
     private final boolean enableTrace;
-    //请求开始时间
+    /**
+     * 请求开始时间
+     */
     private final long requestTime = Utils.getCurrentNanoTime();
     private String traceID = "";
     private String spanID = "";

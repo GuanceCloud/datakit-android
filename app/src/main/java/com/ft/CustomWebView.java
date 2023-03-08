@@ -4,6 +4,9 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.webkit.WebView;
 
+/**
+ * 用于 xml layout 自定义使用，plugin 织入效果查看
+ */
 public class CustomWebView extends WebView {
     public CustomWebView(Context context) {
         super(context);

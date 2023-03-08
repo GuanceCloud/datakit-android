@@ -30,7 +30,7 @@ import android.widget.TextView;
 import java.lang.reflect.Method;
 
 /**
- * 本类借鉴修改了来自 Sensors Data 的项目 https://github.com/sensorsdata/sa-sdk-android
+ * 本类借鉴修改了来自 <a href="https://github.com/sensorsdata/sa-sdk-android">Sensors Data 的项目</a>
  * 中的 AopUtil.java 类
  */
 public class AopUtils {

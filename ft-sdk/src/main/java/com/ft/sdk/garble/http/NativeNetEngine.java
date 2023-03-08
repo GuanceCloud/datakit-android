@@ -27,17 +27,25 @@ import static com.ft.sdk.garble.http.NetCodeStatus.UNKNOWN_EXCEPTION_CODE;
  */
 public class NativeNetEngine implements INetEngine {
     public static final String TAG = "NativeNetEngine";
-    //字符编码
+    /**
+     * 字符编码，UTF8
+     */
     final String CHARSET = "UTF-8";
-    //内容类型
-    final String CONTENT_TYPE = "text/plain";
-    //参数包装类
+    /**
+     * 参数包装类
+     */
     HttpBuilder mHttpBuilder;
-    //网络连接
+    /**
+     * 网络连接
+     */
     HttpURLConnection mConnection;
-    //连接状态（true - 成功，false - 失败）
+    /**
+     * 连接状态（true - 成功，false - 失败）
+     */
     boolean connSuccess = false;
-    //网络请求的回复码
+    /**
+     * 网络请求的回复码
+     */
     private int responseCode = NetCodeStatus.UNKNOWN_EXCEPTION_CODE;
 
     @Override
@@ -148,21 +156,14 @@ public class NativeNetEngine implements INetEngine {
             responseCode = mConnection.getResponseCode();
             if (responseCode >= 300) {
                 inputStream = mConnection.getErrorStream();
-                if(inputStream != null) {
-                    inputStreamReader = new InputStreamReader(inputStream, CHARSET);
-                    reader = new BufferedReader(inputStreamReader);
-                    while ((tempLine = reader.readLine()) != null) {
-                        resultBuffer.append(tempLine);
-                    }
-                }
             } else {
                 inputStream = mConnection.getInputStream();
-                if(inputStream != null) {
-                    inputStreamReader = new InputStreamReader(inputStream, CHARSET);
-                    reader = new BufferedReader(inputStreamReader);
-                    while ((tempLine = reader.readLine()) != null) {
-                        resultBuffer.append(tempLine);
-                    }
+            }
+            if(inputStream != null) {
+                inputStreamReader = new InputStreamReader(inputStream, CHARSET);
+                reader = new BufferedReader(inputStreamReader);
+                while ((tempLine = reader.readLine()) != null) {
+                    resultBuffer.append(tempLine);
                 }
             }
         } catch (SocketTimeoutException e) {
@@ -179,6 +180,15 @@ public class NativeNetEngine implements INetEngine {
         }
         return getResponseData(responseCode, resultBuffer.toString());
     }
+
+    /**
+     * 关闭数据连接
+     * @param connection
+     * @param outputStream
+     * @param reader
+     * @param inputStreamReader
+     * @param inputStream
+     */
 
     private void close(
             HttpURLConnection connection,

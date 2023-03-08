@@ -60,6 +60,9 @@ public class DeviceUtils {
         return DeviceUtils.SingletonHolder.INSTANCE;
     }
 
+    /**
+     * 运营商 map
+     */
     private static final Map<String, String> sCarrierMap = new HashMap<String, String>() {
         {
             //中国移动

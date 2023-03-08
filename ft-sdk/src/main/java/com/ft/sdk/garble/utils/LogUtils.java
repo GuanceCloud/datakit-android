@@ -6,18 +6,19 @@ import static com.ft.sdk.garble.utils.TrackLog.showFullLog;
 /**
  * BY huangDianHua
  * DATE:2019-12-03 15:56
- * Description:
+ * Description:负责内部日志输出
  */
 public class LogUtils{
     protected static String TAG = "[FT-SDK]:";
 
+    /**
+     * 是否为调试模式，为 true 时，输出控制台日志
+     */
     private static boolean mDebug = true;
+    /**
+     *
+     */
     private static boolean aliasLogShow = false;
-
-    public static boolean isDebug() {
-        return mDebug;
-    }
-
     public static void setDebug(boolean debug) {
         mDebug = debug;
     }

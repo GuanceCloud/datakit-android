@@ -3,8 +3,14 @@ package com.ft.plugin.garble;
 public class ProductFlavorModel {
 
     private final String name;
-    private Boolean autoUploadMap; //是否自动上 map 文件
-    private Boolean autoUploadNativeDebugSymbol;//是否上传 native debug symbol
+    /**
+     * 是否自动上 map 文件
+     */
+    private Boolean autoUploadMap;
+    /**
+     * 是否上传 native debug symbol
+     */
+    private Boolean autoUploadNativeDebugSymbol;
     private String datakitDCAUrl;
     private String appId;
     private String env;
@@ -64,6 +70,13 @@ public class ProductFlavorModel {
         this.autoUploadMap = extension.autoUploadMap;
         this.datakitDCAUrl = extension.datakitDCAUrl;
     }
+
+    /**
+     * {@link FTExtension} 配置与 {@link ProductFlavorModel} 参数配置进行合并，{@link ProductFlavorModel}配置覆盖
+     * {@link FTExtension} 中的配置
+     *
+     * @param extension
+     */
 
     public void mergeFTExtension(FTExtension extension) {
         if (this.env == null) {

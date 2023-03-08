@@ -16,6 +16,9 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+/**
+ * 文件工具类
+ */
 class FTFileUtils {
     /**
      * 复制合并文件

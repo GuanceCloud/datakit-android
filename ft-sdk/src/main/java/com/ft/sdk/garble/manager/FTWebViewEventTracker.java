@@ -8,12 +8,27 @@ import com.ft.sdk.garble.utils.Utils;
  *
  */
 public class FTWebViewEventTracker {
+    /**
+     * 页面白屏时长
+     */
     private long whitePageDuration = -1;
+    /**
+     * 页面结束时长
+     */
     private long finishDuration = -1;
 
+    /**
+     * 页面开始时间点
+     */
     private long startTimeline;
+    /**
+     * 页面结束时间点
+     */
     private long finishTimeLine;
 
+    /**
+     * 页面结束时间
+     */
     private long loadingTimeLine;
 
     /**

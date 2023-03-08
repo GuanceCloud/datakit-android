@@ -17,8 +17,10 @@
 package com.ft.plugin.garble;
 
 /**
- * 本类借鉴修改了来自 Sensors Data 的项目 https://github.com/sensorsdata/sa-sdk-android-plugin2
+ * 本类借鉴修改了来自 Sensors Data 的项目 <a href="https://github.com/sensorsdata/sa-sdk-android-plugin2">sa-sdk-android-plugin2</a>
  * 中的 ClassNameAnalytics 类
+ *
+ * @author huangdianhua
  */
 public class ClassNameAnalytics {
     public static final String FT_SDK_PACKAGE = "com.ft.sdk";
@@ -26,6 +28,7 @@ public class ClassNameAnalytics {
 
     /**
      * 配置需要排除的类
+     *
      * @param className
      * @return
      */

@@ -22,6 +22,9 @@ import org.junit.Test;
 
 import java.util.List;
 
+/**
+ * 日志输出测试
+ */
 public class LogTest extends FTBaseTest {
 
     @Before
@@ -29,6 +32,11 @@ public class LogTest extends FTBaseTest {
         stopSyncTask();
     }
 
+    /**
+     * 测试采样率为 0 时，数据采集的情况
+     *
+     * @throws InterruptedException
+     */
     @Test
     public void logSampleRateZero() throws InterruptedException {
         FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableCustomLog(true).setSamplingRate(0));
@@ -67,15 +75,33 @@ public class LogTest extends FTBaseTest {
     }
 
 
+    /**
+     * 验证 {@link FTLoggerConfig#enableLinkRumData}为 true 时，日志输出是否包含 rum 相关数据
+     *
+     * @throws InterruptedException
+     */
     @Test
     public void logLinkRUMDataEnable() throws InterruptedException {
         Assert.assertTrue(checkLogHasLinkRUMData(true));
     }
 
+    /**
+     * 验证 {@link FTLoggerConfig#enableLinkRumData}为 false 时，日志输出是否包含 rum 相关数据
+     *
+     * @throws InterruptedException
+     */
     @Test
     public void logLinkRUMDataDisable() throws InterruptedException {
         Assert.assertFalse(checkLogHasLinkRUMData(false));
     }
+
+    /**
+     * 检验 {@link Constants#KEY_RUM_VIEW_ID}, {@link Constants#KEY_RUM_SESSION_ID} 字段来判断是否已经和 RUM 数据进行关联
+     *
+     * @param enableLinkRumData
+     * @return
+     * @throws InterruptedException
+     */
 
     private boolean checkLogHasLinkRUMData(boolean enableLinkRumData) throws InterruptedException {
         FTSdk.initRUMWithConfig(new FTRUMConfig());

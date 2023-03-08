@@ -91,12 +91,16 @@ public abstract class BaseThreadPool {
     }
 
     /**
-     *
+     * 重置，重新创建队列
      */
     public void reStartPool() {
         executor = createNew();
     }
 
+    /**
+     * 新建线程池
+     * @return
+     */
     private ThreadPoolExecutor createNew() {
         return new ThreadPoolExecutor(corePoolSize, MAXIMUM_POOL_SIZE, KEEP_ALIVE,
                 TimeUnit.SECONDS, workQueue, threadFactory);

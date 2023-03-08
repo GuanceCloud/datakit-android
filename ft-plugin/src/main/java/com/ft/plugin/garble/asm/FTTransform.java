@@ -12,8 +12,6 @@ import com.android.build.api.transform.TransformInput;
 import com.android.build.api.transform.TransformInvocation;
 import com.android.build.api.transform.TransformOutputProvider;
 import com.android.build.gradle.internal.pipeline.TransformManager;
-//import com.android.ide.common.internal.WaitableExecutor;
-import com.android.ide.common.workers.WorkerExecutorFacade;
 import com.ft.plugin.garble.FTExtension;
 import com.ft.plugin.garble.Logger;
 import com.ft.plugin.garble.bytecode.FTWeaver;
@@ -34,7 +32,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * From https://github.com/Leaking/Hunter/blob/master/hunter-transform/src/main/java/com/quinn/hunter/transform/HunterTransform.java
+ * <a href="https://github.com/Leaking/Hunter/blob/master/hunter-transform/src/main/java/com/quinn/hunter/transform/HunterTransform.java">参考资料</a>
  * DATE:2019-11-29 13:33
  * Description:字节码转换基类
  */
@@ -50,7 +48,7 @@ public class FTTransform extends Transform {
 
     public FTTransform(Project project) {
         this.project = project;
-        this.waitableExecutor = new Worker(IO) ;
+        this.waitableExecutor = new Worker(IO);
     }
 
     @Override

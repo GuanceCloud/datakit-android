@@ -55,6 +55,11 @@ import okhttp3.RequestBody;
  * Description:
  */
 public class Utils {
+    /**
+     * 字符判断，判断字符非空
+     * @param str
+     * @return
+     */
     public static boolean isNullOrEmpty(String str) {
         return str == null || str.isEmpty();
     }
@@ -94,16 +99,28 @@ public class Utils {
         }
     }
 
+    /**
+     * 判断是否连接网络
+     * @return
+     */
     public static boolean isNetworkAvailable() {
         return isNetworkAvailable(FTApplication.getApplication());
     }
 
+    /**
+     * 判断是否连接网络
+     * @return
+     */
     public static boolean isNetworkAvailable(Context context) {
         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetWork = manager.getActiveNetworkInfo();
         return activeNetWork != null && activeNetWork.isConnected();
     }
 
+    /**
+     * 获取应用 app 名称 AndroidManifest.xml application.labelName
+     * @return
+     */
     public static String getAppVersionName() {
         PackageManager manager = FTApplication.getApplication().getPackageManager();
         PackageInfo info = null;
@@ -116,6 +133,11 @@ public class Utils {
         }
     }
 
+    /**
+     * 获取 SDK 缓存  {@link SharedPreferences}
+     * @param context
+     * @return
+     */
     public static SharedPreferences getSharedPreferences(Context context) {
         return context.getSharedPreferences(FT_SHARE_PER_FILE, Context.MODE_PRIVATE);
     }
@@ -140,6 +162,10 @@ public class Utils {
         return false;
     }
 
+    /**
+     * 获取 16 字符长度的 GUID
+     * @return
+     */
     public static String getGUID_16() {
         StringBuilder uid = new StringBuilder();
         //产生16位的强随机数
@@ -163,6 +189,10 @@ public class Utils {
         return uid.toString();
     }
 
+    /**
+     * 获取 64 位随机数
+     * @return
+     */
     public static BigInteger getDDtraceNewId() {
         return new BigInteger(64, new SecureRandom());
     }

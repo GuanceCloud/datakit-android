@@ -15,12 +15,16 @@ import static org.junit.Assert.assertTrue;
 /**
  * BY huangDianHua
  * DATE:2019-12-16 18:40
- * Description:
+ * Description:设备相关信息验证
  */
 public class DeviceUtilsTest {
     private Context getContext() {
         return InstrumentationRegistry.getInstrumentation().getTargetContext();
     }
+
+    /**
+     * 验证设备
+     */
 
     @Test
     public void getSDKUUid() {

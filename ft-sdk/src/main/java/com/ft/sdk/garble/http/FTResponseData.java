@@ -11,8 +11,17 @@ import java.net.HttpURLConnection;
  * Description:
  */
 public class FTResponseData extends ResponseData {
+    /**
+     * http code
+     */
     private int code;
+    /**
+     * 错误 code， 一部分是 datakit 网络请求返回的错误代码，一部分是 {@link NetCodeStatus} 返回的错误码
+     */
     private String errorCode;
+    /**
+     * 请求错误简要信息
+     */
     private String message;
 
     public FTResponseData(int httpCode, String data) {

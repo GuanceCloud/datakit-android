@@ -19,14 +19,19 @@ import java.util.TimeZone;
  */
 public class NetProxy {
     public final static String TAG = "NetProxy";
-    //SDK 中网络的配置
+    /**
+     * SDK 中网络的配置
+     */
     FTHttpConfigManager ftHttpConfig = FTHttpConfigManager.get();
-    //内容类型
+    /**
+     * 内容类型
+     */
     final String CONTENT_TYPE = "text/plain";
-    //字符编码
+    /**
+     * 字符编码
+     */
     final String CHARSET = "UTF-8";
-//    private String gmtString;
-    private HttpBuilder httpBuilder;
+    private final HttpBuilder httpBuilder;
     INetEngine engine;
 
     public NetProxy(HttpBuilder httpBuilder) {

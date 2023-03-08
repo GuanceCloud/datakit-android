@@ -276,9 +276,21 @@ public class FTMapUploader {
 
 
     static class ObfuscationSettingConfig {
+        /**
+         * 包名
+         */
         String applicationId;
+        /**
+         * 版本号 字符 例如 1.0.0
+         */
         String versionName;
+        /**
+         * Build Code
+         */
         int versionCode;
+        /**
+         * map 输出地址
+         */
         String mappingOutputPath;
 
         @Override

@@ -17,7 +17,8 @@ import okhttp3.Handshake;
 import okhttp3.Protocol;
 
 /**
- *
+ * 配合 OKHttp {@link EventListener} 获取网络请求 dns、ssl、tcp 等时间点指标
+ * @author Brandon
  */
 public abstract class NetStatusMonitor extends EventListener {
 

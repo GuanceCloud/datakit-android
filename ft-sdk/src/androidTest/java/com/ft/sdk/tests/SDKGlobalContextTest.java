@@ -23,6 +23,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+/**
+ * SDK 全局 globalContext 参数验证
+ *
+ * @author Brandon
+ */
 @RunWith(AndroidJUnit4.class)
 public class SDKGlobalContextTest extends FTBaseTest {
 
@@ -50,6 +55,10 @@ public class SDKGlobalContextTest extends FTBaseTest {
         FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableCustomLog(true));
     }
 
+    /**
+     * SDK 全局 globalContext 在 RUM 数据中正确性验证
+     * @throws Exception
+     */
     @Test
     public void rumGlobalContextTest() throws Exception {
         FTRUMGlobalManager.get().startView(ANY_VIEW);
@@ -60,6 +69,10 @@ public class SDKGlobalContextTest extends FTBaseTest {
                 new String[]{CUSTOM_KEY, CUSTOM_VALUE}));
     }
 
+    /**
+     * SDK 全局 globalContext 在 log 数据中正确性验证
+     * @throws Exception
+     */
     @Test
     public void logGlobalContextTest() throws Exception {
         FTLogger.getInstance().logBackground("log test", Status.INFO);

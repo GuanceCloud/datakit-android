@@ -7,15 +7,36 @@ import org.gradle.api.Project;
 /**
  * BY huangDianHua
  * DATE:2019-11-29 14:50
- * Description:
+ * Description: gradle plugin extension 配置
  */
 public class FTExtension {
-    public boolean showLog = false;//是否显示日志
-    public boolean openAutoTrack = true;//是否打开自动track
-    public boolean autoUploadMap = false; //是否自动上 map 文件
-    public boolean autoUploadNativeDebugSymbol = false;//是否上传 native debug symbol
+    /**
+     * 是否显示日志
+     */
+    public boolean showLog = false;
+    /**
+     * 是否打开自动track
+     */
+    public boolean openAutoTrack = true;
+    /**
+     * 是否自动上 map 文件
+     */
+    public boolean autoUploadMap = false;
+    /**
+     * 是否上传 native debug symbol
+     */
+    public boolean autoUploadNativeDebugSymbol = false;
+    /**
+     *  datakit DCA 上传地址，一般为 datakitUrl  9531 端口
+     */
     public String datakitDCAUrl = "";
+    /**
+     *
+     */
     public String appId = "";
+    /**
+     *
+     */
     public String env = "prod";
 
     private final NamedDomainObjectContainer<ProductFlavorModel> prodFlavor;

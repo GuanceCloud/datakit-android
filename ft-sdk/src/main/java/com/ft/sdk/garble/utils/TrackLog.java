@@ -70,6 +70,14 @@ public class TrackLog {
         return println(true, Log.INFO, tag, msg);
     }
 
+    /**
+     *
+     * @param upload
+     * @param priority
+     * @param tag
+     * @param msg
+     * @return
+     */
     public static int println(boolean upload, int priority, String tag, String msg) {
         FTLoggerConfig config = FTLoggerConfigManager.get().getConfig();
         if (upload && config != null && config.isEnableConsoleLog()) {
@@ -84,10 +92,25 @@ public class TrackLog {
         return Log.println(priority, tag, msg);
     }
 
+    /**
+     *
+     * @param TAG
+     * @param message
+     * @param logType
+     * @return
+     */
     public static int showFullLog(String TAG, String message, LogType logType) {
         return showFullLog(false, TAG, message, logType);
     }
 
+    /**
+     *
+     * @param upload
+     * @param TAG
+     * @param message
+     * @param logType
+     * @return
+     */
     protected static int showFullLog(boolean upload, String TAG, String message, LogType logType) {
         int segmentSize = 4 * 1024;
         int length = message != null ? message.length() : 0;
@@ -111,6 +134,14 @@ public class TrackLog {
         return length;
     }
 
+    /**
+     *
+     * @param upload
+     * @param tag
+     * @param message
+     * @param logType
+     * @return
+     */
     private static int showLog(boolean upload, String tag, String message, LogType logType) {
         switch (logType) {
             case E:
@@ -126,6 +157,11 @@ public class TrackLog {
         }
     }
 
+    /**
+     *
+     * @param priority
+     * @return
+     */
     private static Status getStatus(int priority) {
         switch (priority) {
             case Log.VERBOSE:
@@ -142,6 +178,11 @@ public class TrackLog {
         }
     }
 
+    /**
+     *
+     * @param priority
+     * @return
+     */
     private static String getLevelMark(int priority) {
         switch (priority) {
             case Log.VERBOSE:
@@ -157,6 +198,13 @@ public class TrackLog {
         }
     }
 
+    /**
+     * 日志类型
+     * 「」
+     *
+     *
+     *
+     */
     enum LogType {
         I, D, E, V, W
     }

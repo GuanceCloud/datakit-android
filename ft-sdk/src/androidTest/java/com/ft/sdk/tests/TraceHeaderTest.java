@@ -23,9 +23,16 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 
-
+/**
+ * Trace 链路 propagation header 测试
+ *
+ * @author Brandon
+ */
 public class TraceHeaderTest {
 
+    /**
+     * {@link  TraceType#ZIPKIN_MULTI_HEADER} 类型测试
+     */
     @Test
     public void traceZipKinHeaderTest() {
         FTSdk.initTraceWithConfig(new FTTraceConfig()
@@ -44,6 +51,9 @@ public class TraceHeaderTest {
 
     }
 
+    /**
+     * {@link  TraceType#ZIPKIN_SINGLE_HEADER} 类型测试
+     */
     @Test
     public void traceZipKinSingleHeaderTest() {
         FTSdk.initTraceWithConfig(new FTTraceConfig()
@@ -55,6 +65,9 @@ public class TraceHeaderTest {
         Assert.assertFalse(header.isEmpty());
     }
 
+    /**
+     * {@link  TraceType#JAEGER} 类型测试
+     */
     @Test
     public void traceJaegerHeaderTest() {
         FTSdk.initTraceWithConfig(new FTTraceConfig()
@@ -66,6 +79,9 @@ public class TraceHeaderTest {
         Assert.assertFalse(header.isEmpty());
     }
 
+    /**
+     * {@link  TraceType#DDTRACE} 类型测试
+     */
     @Test
     public void traceDDtraceHeaderTest() {
         FTSdk.initTraceWithConfig(new FTTraceConfig()
@@ -85,6 +101,9 @@ public class TraceHeaderTest {
 
     }
 
+    /**
+     * {@link  TraceType#SKYWALKING} 类型测试
+     */
     @Test
     public void traceSkyWalkingV3HeaderTest() {
         FTSdk.initTraceWithConfig(new FTTraceConfig()
@@ -96,6 +115,9 @@ public class TraceHeaderTest {
         Assert.assertFalse(header.isEmpty());
     }
 
+    /**
+     * {@link  TraceType#TRACEPARENT} 类型测试
+     */
     @Test
     public void traceW3CTraceParentTest() {
         FTSdk.initTraceWithConfig(new FTTraceConfig()
@@ -107,7 +129,10 @@ public class TraceHeaderTest {
         Assert.assertFalse(header.isEmpty());
     }
 
-
+    /**
+     * 获取 http 请求的所有头参数
+     * @return
+     */
     private HashMap<String, String> getHeaders() {
         String key = "uuid";
         HashMap<String, String> map = null;

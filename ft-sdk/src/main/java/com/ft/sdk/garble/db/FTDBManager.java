@@ -30,6 +30,10 @@ import java.util.List;
 public class FTDBManager extends DBManager {
     private static FTDBManager ftdbManager;
     public final static String TAG = "FTDBManager";
+
+    /**
+     * 用于 Android Test
+     */
     private boolean isAndroidTest = false;
 
 
@@ -61,7 +65,7 @@ public class FTDBManager extends DBManager {
 
 
     /**
-     * 更新 view 统计
+     * RUM view 数据统计
      *
      * @param data
      * @return
@@ -94,7 +98,7 @@ public class FTDBManager extends DBManager {
 
 
     /**
-     * 更新 action 统计
+     * RUM action 统计
      *
      * @param data
      * @return
@@ -243,6 +247,13 @@ public class FTDBManager extends DBManager {
     }
 
 
+    /**
+     * 数据 count++
+     *
+     * @param tableName
+     * @param id
+     * @param columnName
+     */
     private void increase(final String tableName, final String id, final String columnName) {
         if (id == null) return;
         getDB(true, new DataBaseCallBack() {
@@ -262,6 +273,14 @@ public class FTDBManager extends DBManager {
         });
     }
 
+    /**
+     * 数据 count--
+     *
+     * @param tableName
+     * @param id
+     * @param columnName
+     */
+
     private void reduce(final String tableName, final String id, final String columnName) {
         if (id == null) return;
         getDB(true, new DataBaseCallBack() {
@@ -280,6 +299,12 @@ public class FTDBManager extends DBManager {
         });
     }
 
+    /**
+     * 获取 Action 各项数据统计，{@link ActionBean}
+     *
+     * @param limit
+     * @return
+     */
     public ArrayList<ActionBean> querySumAction(final int limit) {
         final ArrayList<ActionBean> list = new ArrayList<>();
         getDB(false, new DataBaseCallBack() {
@@ -333,6 +358,13 @@ public class FTDBManager extends DBManager {
         return list;
     }
 
+    /**
+     * 获取 View 各项数据统计 {@link ViewBean}
+     *
+     * @param limit
+     * @return
+     */
+
     public ArrayList<ViewBean> querySumView(final int limit) {
         final ArrayList<ViewBean> list = new ArrayList<>();
 
@@ -385,6 +417,9 @@ public class FTDBManager extends DBManager {
         return list;
     }
 
+    /**
+     * 清理所有 Action 数据
+     */
     public void cleanCloseActionData() {
         if (isAndroidTest) return;
         getDB(true, new DataBaseCallBack() {
@@ -395,6 +430,9 @@ public class FTDBManager extends DBManager {
         });
     }
 
+    /**
+     * 清理所有 View 数据
+     */
     public void cleanCloseViewData() {
         if (isAndroidTest) return;
         getDB(true, new DataBaseCallBack() {

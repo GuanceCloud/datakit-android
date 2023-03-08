@@ -17,17 +17,36 @@ import java.util.List;
 /**
  * BY huangDianHua
  * DATE:2020-01-08 18:58
- * Description:
+ * Description: 获取设备 CPU 相关数据指标
  */
 public class CpuUtils {
     private CpuUtils() {
     }
 
+    /**
+     * 文件 /proc/stat
+     */
     private RandomAccessFile mProcStatFile;
+
+    /**
+     * 文件 /proc/{pid}/stat
+     */
     private RandomAccessFile mAppStatFile;
+
+
+    /**
+     * 文件 /proc/{pid}/stat
+     */
     private RandomAccessFile mSelfStatFile;
 
+    /**
+     *  CPU 最近一次跳动次数
+     */
     private Long mLastCpuTime;
+
+    /**
+     * 应用最近一次 App CPU 跳动次数
+     */
     private Long mLastAppCpuTime;
     private static CpuUtils cpuUtils;
 
@@ -119,8 +138,8 @@ public class CpuUtils {
             }
             String procStatString = mProcStatFile.readLine();
             String appStatString = mAppStatFile.readLine();
-            String procStats[] = procStatString.split(" ");
-            String appStats[] = appStatString.split(" ");
+            String[] procStats = procStatString.split(" ");
+            String[] appStats = appStatString.split(" ");
             cpuTime = Long.parseLong(procStats[2]) + Long.parseLong(procStats[3])
                     + Long.parseLong(procStats[4]) + Long.parseLong(procStats[5])
                     + Long.parseLong(procStats[6]) + Long.parseLong(procStats[7])
@@ -140,6 +159,10 @@ public class CpuUtils {
         return value;
     }
 
+    /**
+     * 获取应用 CPU 跳动次数
+     * @return
+     */
     public long getAppCPUTickCount() {
         try {
             if (mSelfStatFile == null) {

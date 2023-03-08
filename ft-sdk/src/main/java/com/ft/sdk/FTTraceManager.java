@@ -113,6 +113,10 @@ public class FTTraceManager {
 //        }
 //    }
 
+    /**
+     * addResource 根据 key 数值移除
+     * @param key
+     */
     void removeByAddResource(String key) {
         FTTraceManagerContainer container = handlerMap.get(key);
         if (container != null) {
@@ -121,6 +125,10 @@ public class FTTraceManager {
         }
     }
 
+    /**
+     * stopResource 根据 key 数值移除
+     * @param key
+     */
     void removeByStopResource(String key) {
         FTTraceManagerContainer container = handlerMap.get(key);
         if (container != null) {
@@ -129,6 +137,11 @@ public class FTTraceManager {
         }
     }
 
+    /**
+     * 检验是否需要释放
+     * @param key
+     * @param container
+     */
     void checkToRemove(String key, FTTraceManagerContainer container) {
         if (container.addResourced && container.resourceStop || container.isTimeOut()) {
             handlerMap.remove(key);
@@ -141,6 +154,9 @@ public class FTTraceManager {
     static class FTTraceManagerContainer {
         private boolean addResourced = !FTRUMConfigManager.get().isRumEnable();
         private boolean resourceStop = addResourced;
+        /**
+         * 开始时间
+         */
         private final long startTime = System.currentTimeMillis();
         private static final int TIME_OUT = 60000;//暂不考虑长链接情况
 

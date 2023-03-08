@@ -4,11 +4,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.ft.sdk.DeviceMetricsMonitorType;
 import com.ft.sdk.EnvType;
+import com.ft.sdk.ErrorMonitorType;
 import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTRUMGlobalManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
-import com.ft.sdk.ErrorMonitorType;
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.ErrorType;
@@ -46,6 +46,15 @@ public class MonitorConfigTest extends FTBaseTest {
         );
     }
 
+    /**
+     * {@link FTRUMGlobalManager#addError(String, String, ErrorType, AppState)} 过程中检测是否正确
+     * 附带 {@link Constants#KEY_BATTERY_USE}
+     * {@link Constants#KEY_MEMORY_TOTAL}
+     * {@link Constants#KEY_MEMORY_USE}
+     * {@link Constants#KEY_CPU_USE}
+     *
+     * @throws Exception
+     */
     @Test
     public void monitorErrorTest() throws Exception {
         FTRUMGlobalManager.get().addError("log", "message", ErrorType.JAVA, AppState.RUN);
@@ -59,7 +68,11 @@ public class MonitorConfigTest extends FTBaseTest {
         }));
 
     }
-
+///**
+// * 目前监控数值无法通过测试用例的方式来检验正确性，只能通过人为查看进行验证
+// */
+//
+//
 //    @Test
 //    public void monitorDeviceMetrics() throws InterruptedException {
 //        FTRUMGlobalManager.get().startView(ANY_VIEW);

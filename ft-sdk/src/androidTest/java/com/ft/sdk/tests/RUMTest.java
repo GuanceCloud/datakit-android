@@ -60,8 +60,14 @@ public class RUMTest extends FTBaseTest {
     public static final String ERROR_MESSAGE = "error message";
     public static final String LONG_TASK_MESSAGE = "long task message";
 
+    /**
+     * 模拟 http 返回 头参数
+     */
     public static final String RESOURCE_REQUEST_HEADER = "{x-datadog-parent-id=73566521391796532, x-datadog-sampling-priority=1, " +
             "ft-dio-key=a44e0ab0-232f-4f93-a6fd-b7a45cf8d20c, x-datadog-origin=rum, x-datadog-trace-id=123622877354441421}";
+    /**
+     * 模拟 http 请求 头参数
+     */
     public static final String RESOURCE_RESPONSE_HEADER = "{date=[Fri, 26 Nov 2021 06:08:47 GMT], server=[sffe], content-length=[1437]," +
             " expires=[Fri, 01 Jan 1990 00:00:00 GMT], vary=[Accept-Encoding], content-encoding=[gzip]," +
             " pragma=[no-cache], last-modified=[Fri, 19 Jun 2020 10:30:00 GMT], x-xss-protection=[0], " +
@@ -86,6 +92,11 @@ public class RUMTest extends FTBaseTest {
         avoidCleanData();
     }
 
+    /**
+     * {@link FTRUMGlobalManager#startAction(String, String)} 数据生成测试
+     *
+     * @throws Exception
+     */
     @Test
     public void actionGenerateTest() throws Exception {
         FTRUMGlobalManager.get().startAction(ACTION_NAME, ACTION_TYPE_NAME);
@@ -101,6 +112,11 @@ public class RUMTest extends FTBaseTest {
 
     }
 
+    /**
+     * {@link FTRUMGlobalManager#addAction(String, String, long, long)} } 数据生成测试
+     *
+     * @throws Exception
+     */
     @Test
     public void addActionTest() throws Exception {
         Whitebox.invokeMethod(FTRUMGlobalManager.get(), "addAction",
@@ -115,6 +131,11 @@ public class RUMTest extends FTBaseTest {
         Assert.assertEquals(action.getActionType(), ACTION_TYPE_NAME);
     }
 
+    /**
+     * Action 携带动态参数测试
+     *
+     * @throws Exception
+     */
     @Test
     public void actionGenerateParamsTest() throws Exception {
         HashMap<String, Object> property = new HashMap<>();
@@ -132,6 +153,11 @@ public class RUMTest extends FTBaseTest {
                 Constants.FT_MEASUREMENT_RUM_ACTION, DataType.RUM_APP, false));
     }
 
+    /**
+     * View 数据生成测试
+     *
+     * @throws Exception
+     */
 
     @Test
     public void viewGenerateTest() throws Exception {
@@ -161,6 +187,11 @@ public class RUMTest extends FTBaseTest {
 
     }
 
+    /**
+     * View 携带动态参数测试
+     *
+     * @throws Exception
+     */
     @Test
     public void viewGenerateParamsTest() throws Exception {
         HashMap<String, Object> property = new HashMap<>();
@@ -197,6 +228,11 @@ public class RUMTest extends FTBaseTest {
 
     }
 
+    /**
+     * 模拟连续 view 跳转操作，最后验证各个 {@link ViewBean#viewReferrer}是否对应正确
+     *
+     * @throws InterruptedException
+     */
     @Test
     public void viewMapTest() throws InterruptedException {
         FTRUMGlobalManager.get().startView(FIRST_VIEW);
@@ -224,6 +260,16 @@ public class RUMTest extends FTBaseTest {
 
     }
 
+    /**
+     * 模拟进入 View 后，进行一个 Action ，一个 Resource，一个 Error，一个 LongTask
+     * <p>
+     * 最后验证 {@link ViewBean#resourceCount}
+     * {@link ViewBean#errorCount}
+     * {@link ViewBean#longTaskCount}
+     * {@link ViewBean#actionCount} 数量是否正确
+     *
+     * @throws Exception
+     */
     @Test
     public void viewActionSumTest() throws Exception {
         FTRUMGlobalManager.get().startView(FIRST_VIEW);
@@ -265,6 +311,11 @@ public class RUMTest extends FTBaseTest {
 
     }
 
+    /**
+     * 模拟 session id 过期，在一个session id 过期之后，进行操作会生成新的 session id
+     *
+     * @throws Exception
+     */
     @Test
     public void sessionIdTest() throws Exception {
         FTRUMGlobalManager.get().startView(FIRST_VIEW);
@@ -292,7 +343,11 @@ public class RUMTest extends FTBaseTest {
 
     }
 
-
+    /**
+     * 模拟发起一 Resource 请求
+     *
+     * @throws InterruptedException
+     */
     @Test
     public void resourceDataTest() throws InterruptedException {
         sendResource();
@@ -318,6 +373,11 @@ public class RUMTest extends FTBaseTest {
         }
     }
 
+    /**
+     * 模拟 Resource 请求期间附带动态参数
+     *
+     * @throws InterruptedException
+     */
     @Test
     public void resourceDataParamsTest() throws InterruptedException {
         HashMap<String, Object> property = new HashMap<>();
@@ -331,6 +391,11 @@ public class RUMTest extends FTBaseTest {
 
     }
 
+    /**
+     * Resource 动态参数覆盖测试
+     *
+     * @throws InterruptedException
+     */
     @Test
     public void resourceDataParamsOverrideTest() throws InterruptedException {
         HashMap<String, Object> property = new HashMap<>();
@@ -346,6 +411,11 @@ public class RUMTest extends FTBaseTest {
                 Constants.FT_MEASUREMENT_RUM_RESOURCE, DataType.RUM_APP, false));
     }
 
+    /**
+     * Error 数据测试
+     *
+     * @throws InterruptedException
+     */
     @Test
     public void errorDataTest() throws InterruptedException {
         FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
@@ -356,6 +426,11 @@ public class RUMTest extends FTBaseTest {
                 new String[]{ERROR, ERROR_MESSAGE}));
     }
 
+    /**
+     * Error 数据附带动态参数测试
+     *
+     * @throws InterruptedException
+     */
     @Test
     public void errorDataParamsTest() throws InterruptedException {
         FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
@@ -368,6 +443,11 @@ public class RUMTest extends FTBaseTest {
                 Constants.FT_MEASUREMENT_RUM_ERROR, DataType.RUM_APP, false));
     }
 
+    /**
+     * LongTask 数据测试
+     *
+     * @throws InterruptedException
+     */
     @Test
     public void longTaskTest() throws InterruptedException {
         FTRUMGlobalManager.get().addLongTask(LONG_TASK_MESSAGE, DURATION);
@@ -376,6 +456,11 @@ public class RUMTest extends FTBaseTest {
                 Constants.FT_MEASUREMENT_RUM_LONG_TASK, DataType.RUM_APP, false));
     }
 
+    /**
+     * LongTask 数据附带动态参数测试
+     *
+     * @throws InterruptedException
+     */
     @Test
     public void longTaskParamsTest() throws InterruptedException {
         HashMap<String, Object> property = new HashMap<>();
@@ -386,6 +471,11 @@ public class RUMTest extends FTBaseTest {
                 Constants.FT_MEASUREMENT_RUM_LONG_TASK, DataType.RUM_APP, false));
     }
 
+    /**
+     * {@link FTRUMConfig#samplingRate} 采样率为 0测试
+     *
+     * @throws Exception
+     */
     @Test
     public void sampleRateZeroTest() throws Exception {
         FTSdk.initRUMWithConfig(new FTRUMConfig().setSamplingRate(0));
@@ -401,7 +491,7 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * 测试采样率 100%
+     * {@link FTRUMConfig#samplingRate} 采样率 100% 测试
      *
      * @throws Exception
      */
@@ -418,6 +508,8 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
+     * View Action Error LongTask 数据生成
+     *
      * @throws Exception
      */
     private void generateRUMData() throws Exception {
@@ -433,16 +525,17 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * 发送资源
+     * 模拟发送 Resource 资源数据
      */
     private void sendResource() {
         sendResource(null, null);
     }
 
     /**
-     * 发送资源
+     * 模拟发送 Resource 资源数据
      *
-     * @param property
+     * @param property         动态参数
+     * @param propertyOverride 需要覆盖的动态参数
      */
     private void sendResource(HashMap<String, Object> property, HashMap<String, Object> propertyOverride) {
         String resourceId = Utils.getGUID_16();
@@ -465,7 +558,7 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * RUM link Trace enable
+     * {@link FTTraceConfig#enableLinkRUMData}  为 true 情况下，检验 RUM 是否包含链路链路相关数据
      *
      * @throws InterruptedException
      * @throws IOException
@@ -477,7 +570,7 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * RUM link Trace disable
+     * {@link FTTraceConfig#enableLinkRUMData}  为 false 情况下，检验 RUM 是否包含链路链路相关数据
      *
      * @throws InterruptedException
      * @throws IOException
@@ -487,6 +580,14 @@ public class RUMTest extends FTBaseTest {
         Assert.assertFalse(checkTraceHasLinkRumData(false));
     }
 
+    /**
+     * 检验 RUM 数据 {@link Constants#KEY_RUM_RESOURCE_TRACE_ID},{@link Constants#KEY_RUM_RESOURCE_SPAN_ID }是否包含在内
+     *
+     * @param enableLinkRUMData
+     * @return
+     * @throws InterruptedException
+     * @throws IOException
+     */
     private boolean checkTraceHasLinkRumData(boolean enableLinkRUMData) throws InterruptedException, IOException {
         MockWebServer mockWebServer = new MockWebServer();
 
@@ -536,6 +637,8 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
+     * 检验如果 Resource 过程中未发生 Action 数据是否正，是否会监测到 Action
+     *
      * @throws InterruptedException
      */
     @Test

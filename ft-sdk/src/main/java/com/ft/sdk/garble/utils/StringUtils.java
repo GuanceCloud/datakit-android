@@ -2,6 +2,10 @@ package com.ft.sdk.garble.utils;
 
 import java.util.Collection;
 
+/**
+ *
+ * @author Brandon
+ */
 public class StringUtils {
     public static <E extends String> String arrayToSeparateString(Collection<? extends E> list, String seperater) {
         if (list.size() > 0) {

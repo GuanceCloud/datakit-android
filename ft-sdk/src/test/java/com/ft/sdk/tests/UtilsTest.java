@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * BY huangDianHua
  * DATE:2019-12-16 18:06
- * Description:
+ * Description:杂项测试
  */
 public class UtilsTest {
 
@@ -34,16 +34,26 @@ public class UtilsTest {
     private static final String VALUE_FIELD = "field1-value";
     private static final Object VALUE_FIELD_EMPTY = "";
     public static final long VALUE_TIME = 1598512145640000000L;
+
+    /**
+     * 正常行协议数据
+     */
     private static final String SINGLE_LINE_NORMAL_DATA = TEST_MEASUREMENT_INFLUX_DB_LINE + ","
             + KEY_TAGS + "=" + VALUE_TAGS + " "
             + KEY_FIELD + "=\"" + VALUE_FIELD + "\" " +
             "" + VALUE_TIME + "\n";
 
+    /**
+     * 空行协议数据
+     */
     private static final String SINGLE_LINE_EMPTY_DATA = TEST_MEASUREMENT_INFLUX_DB_LINE + ","
             + KEY_TAGS_EMPTY + "=" + Constants.UNKNOWN + " "
             + KEY_FIELD_EMPTY + "=\"" + Constants.UNKNOWN + "\" " +
             "" + VALUE_TIME + "\n";
 
+    /**
+     * 合并正常行协议和空行协议数据，形成三行数据
+     */
     private static final String LOG_EXPECT_DATA = SINGLE_LINE_NORMAL_DATA + SINGLE_LINE_NORMAL_DATA + SINGLE_LINE_NORMAL_DATA;
 
 

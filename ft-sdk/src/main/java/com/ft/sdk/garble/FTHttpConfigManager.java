@@ -10,16 +10,31 @@ import com.ft.sdk.garble.utils.LogUtils;
 /**
  * BY huangDianHua
  * DATE:2019-12-09 19:39
- * Description:
+ * Description: SDK 内部请求配置
  */
 public class FTHttpConfigManager {
     private static final String TAG = "FTHttpConfigManager";
     private static volatile FTHttpConfigManager instance;
+    /**
+     *  datakit 服务端请求地址
+     */
     public String serverUrl;
+    /**
+     * 64位 随机uuid
+     */
     public String uuid;
+    /**
+     * 请求 http USER-AGENT header
+     */
     public String userAgent;
 
+    /**
+     * http 发送连接时间
+     */
     public int sendOutTime = 10000;
+    /**
+     * http 请求返回读取
+     */
     public int readOutTime = 10000;
 
 
@@ -35,7 +50,7 @@ public class FTHttpConfigManager {
     }
 
     /**
-     *
+     * 配置初始化
      * @param ftsdkConfig
      */
     public void initParams(FTSDKConfig ftsdkConfig) {

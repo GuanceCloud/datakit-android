@@ -17,6 +17,10 @@ import org.junit.Test;
 
 import java.util.List;
 
+/**
+ * 传输数据传说过程中，数据格式验证
+ * @author Brandon
+ */
 public class DataFormatTest extends FTBaseTest {
 
 

@@ -19,6 +19,10 @@ public class FpsUtils {
 
     private double mFps;
 
+    /**
+     * 获取 FPS 数值
+     * @return
+     */
     public double getFps() {
         return mFps;
     }
@@ -30,6 +34,9 @@ public class FpsUtils {
         return fpsUtils;
     }
 
+    /**
+     *
+     */
     public void start() {
         if (metronome == null) {
             metronome = new Metronome();
@@ -43,6 +50,9 @@ public class FpsUtils {
         });
     }
 
+    /**
+     * 方式
+     */
     public static void release() {
         if (fpsUtils != null) {
             if (fpsUtils.metronome != null) {
@@ -52,9 +62,12 @@ public class FpsUtils {
     }
 
 
+    /**
+     *
+     */
     private static class Metronome implements Choreographer.FrameCallback {
 
-        private Choreographer choreographer;
+        private final Choreographer choreographer;
 
         private long frameStartTime = 0;
         private int framesRendered = 0;
@@ -66,10 +79,16 @@ public class FpsUtils {
             choreographer = Choreographer.getInstance();
         }
 
+        /**
+         *
+         */
         public void start() {
             choreographer.postFrameCallback(this);
         }
 
+        /**
+         *
+         */
         public void stop() {
             frameStartTime = 0;
             framesRendered = 0;
@@ -110,6 +129,7 @@ public class FpsUtils {
                 frameStartTime = currentTimeMillis;
             }
 
+            //逐帧请求
             choreographer.postFrameCallback(this);
         }
     }

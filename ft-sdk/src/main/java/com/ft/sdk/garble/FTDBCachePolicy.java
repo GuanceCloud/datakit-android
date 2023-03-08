@@ -35,6 +35,10 @@ public class FTDBCachePolicy {
         return instance;
     }
 
+    /**
+     * 初始化配置参数
+     * @param config
+     */
     public void initParam(FTLoggerConfig config) {
         this.logCacheDiscardStrategy = config.getLogCacheDiscardStrategy();
     }

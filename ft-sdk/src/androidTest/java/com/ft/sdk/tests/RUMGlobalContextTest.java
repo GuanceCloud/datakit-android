@@ -21,6 +21,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+/**
+ * RUM globalContext 参数检测
+ *
+ * @author Brandon
+ */
 @RunWith(AndroidJUnit4.class)
 public class RUMGlobalContextTest extends FTBaseTest {
 
@@ -48,6 +53,10 @@ public class RUMGlobalContextTest extends FTBaseTest {
 
     }
 
+    /**
+     * 生成 View 数据时，会把  globalContext 添加的数据一起输出
+     * @throws Exception
+     */
     @Test
     public void globalContextTest() throws Exception {
         FTRUMGlobalManager.get().startView(ANY_VIEW);

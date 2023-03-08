@@ -1,19 +1,22 @@
 package com.ft.sdk.tests;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 /**
  * BY huangDianHua
  * DATE:2019-12-16 10:17
- * Description:
+ * Description:非法字符校验
  */
 public class StoreDataFormatTest {
 
+    /**
+     * 空数据合法性验证
+     */
     @Test
     public void isLegalValues() {
         try {
@@ -23,6 +26,9 @@ public class StoreDataFormatTest {
         }
     }
 
+    /**
+     * 字符类型数据合法性验证
+     */
     @Test
     public void isLegalValues1() {
         try {
@@ -34,6 +40,9 @@ public class StoreDataFormatTest {
         }
     }
 
+    /**
+     * json 对象数据合法性验证
+     */
     @Test
     public void isLegalValues2() {
         try {
@@ -44,6 +53,10 @@ public class StoreDataFormatTest {
             e.printStackTrace();
         }
     }
+
+    /**
+     * 布尔类型数据合法性验证
+     */
 
     @Test
     public void isLegalValues3() {
@@ -67,6 +80,9 @@ public class StoreDataFormatTest {
         }
     }
 
+    /**
+     * json 对象数据合法性验证
+     */
     @Test
     public void isLegalValues5() {
         try {
@@ -80,6 +96,9 @@ public class StoreDataFormatTest {
         }
     }
 
+    /**
+     * jsonarr 数据合法性验证
+     */
     @Test
     public void isLegalValues6() {
         try {

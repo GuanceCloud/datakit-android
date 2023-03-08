@@ -20,7 +20,7 @@ import okhttp3.ResponseBody;
 /**
  * create: by huangDianHua
  * time: 2020/4/21 17:51:48
- * description:
+ * description: 基于 okhttp 请求框架的 INetEngine
  */
 public class OkHttpEngine implements INetEngine {
     private static OkHttpClient client;

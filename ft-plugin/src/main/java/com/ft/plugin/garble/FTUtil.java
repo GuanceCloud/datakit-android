@@ -16,10 +16,6 @@
  */
 package com.ft.plugin.garble;
 
-/**
- * 本类借鉴修改了来自 Sensors Data 的项目 https://github.com/sensorsdata/sa-sdk-android-plugin2
- * 中的 SensorsAnalyticsUtil.groovy 类
- */
 import org.objectweb.asm.Opcodes;
 
 import java.util.HashSet;
@@ -28,6 +24,8 @@ import java.util.HashSet;
  * BY huangDianHua
  * DATE:2019-12-03 11:43
  * Description:
+ * 本类借鉴修改了来自 Sensors Data 的项目 <a href="https://github.com/sensorsdata/sa-sdk-android-plugin2">sa-sdk-android-plugin2</a>
+ * 中的 SensorsAnalyticsUtil.groovy 类
  */
 public class FTUtil {
     public static final int ASM_VERSION = Opcodes.ASM7;

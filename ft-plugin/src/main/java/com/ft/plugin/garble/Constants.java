@@ -1,7 +1,6 @@
 
 package com.ft.plugin.garble;
 
-import com.ft.plugin.BuildConfig;
 
 import java.util.UUID;
 
@@ -82,5 +81,8 @@ public class Constants {
     public static final String OKHTTP_BUILDER_DESC = "Lokhttp3/OkHttpClient$Builder;";
 
 
+    /**
+     * 用于形成 application_uuid ，一次 build 会生成一个固定的 uuid
+     */
     public static final String PACKAGE_UUID = UUID.randomUUID().toString();
 }

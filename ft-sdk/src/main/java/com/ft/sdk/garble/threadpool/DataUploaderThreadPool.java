@@ -6,6 +6,9 @@ package com.ft.sdk.garble.threadpool;
  * @author Brandon
  */
 public class DataUploaderThreadPool extends BaseThreadPool {
+    /**
+     * 当前可用 CPU 数
+     */
     private final static int CPU_COUNT = Runtime.getRuntime().availableProcessors();
     private final static int CORE_POOL_SIZE = CPU_COUNT;
     private static DataUploaderThreadPool threadPoolUtils;

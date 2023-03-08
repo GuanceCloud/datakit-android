@@ -7,7 +7,7 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 
 /**
- * From https://github.com/Leaking/Hunter/blob/master/hunter-timing-plugin/src/main/groovy/com/quinn/hunter/plugin/timing/bytecode/TimingWeaver.java
+ * <a href="https://github.com/Leaking/Hunter/blob/master/hunter-timing-plugin/src/main/groovy/com/quinn/hunter/plugin/timing/bytecode/TimingWeaver.java">参考资料</a>
  * DATE:2019-11-29 15:16
  * Description:
  */
