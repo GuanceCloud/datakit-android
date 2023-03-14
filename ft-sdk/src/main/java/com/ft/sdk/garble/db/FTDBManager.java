@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * BY huangDianHua
  * DATE:2019-12-02 15:55
- * Description:
+ * Description:数据库管理类
  */
 @SuppressLint("Range")
 public class FTDBManager extends DBManager {
