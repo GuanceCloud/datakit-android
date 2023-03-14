@@ -20,8 +20,6 @@ import java.security.InvalidParameterException;
  */
 public class SyncJsonData implements Cloneable {
 
-    private static final String TAG = "SyncJsonData";
-
     /**
      * 同步数据唯一 id
      */

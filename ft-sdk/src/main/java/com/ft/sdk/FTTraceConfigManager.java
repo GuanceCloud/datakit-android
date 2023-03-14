@@ -5,7 +5,7 @@ import com.ft.sdk.garble.utils.PackageUtils;
 
 public class FTTraceConfigManager {
 
-    private static final String TAG = "FTTraceConfigManager";
+    private static final String TAG = "[FT-SDK]FTTraceConfigManager";
 
 
     private static class SingletonHolder {

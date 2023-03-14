@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Description:线程池基类，用于构建阻塞线程队列来消费数据
  */
 public abstract class BaseThreadPool {
-    public static final String TAG = "BaseThreadPool";
+    public static final String TAG = "[FT-SDK]BaseThreadPool";
     /**
      * 最大容量
      */

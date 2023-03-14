@@ -26,7 +26,7 @@ import static com.ft.sdk.garble.http.NetCodeStatus.UNKNOWN_EXCEPTION_CODE;
  * Description: 原生 HttpUrlConnection 网络请求引擎
  */
 public class NativeNetEngine implements INetEngine {
-    public static final String TAG = "NativeNetEngine";
+    public static final String TAG = "[FT-SDK]NativeNetEngine";
     /**
      * 字符编码，UTF8
      */

@@ -31,7 +31,7 @@ import java.util.UUID;
  */
 public class FTRUMConfigManager {
 
-    private static final String TAG = "FTRUMConfigManager";
+    private static final String TAG = "[FT-SDK]FTRUMConfigManager";
 
     private static class SingletonHolder {
         private static final FTRUMConfigManager INSTANCE = new FTRUMConfigManager();

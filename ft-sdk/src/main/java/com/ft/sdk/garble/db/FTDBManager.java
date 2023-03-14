@@ -29,7 +29,7 @@ import java.util.List;
 @SuppressLint("Range")
 public class FTDBManager extends DBManager {
     private static FTDBManager ftdbManager;
-    public final static String TAG = "FTDBManager";
+    public final static String TAG = "[FT-SDK]DBManager";
 
     /**
      * 用于 Android Test

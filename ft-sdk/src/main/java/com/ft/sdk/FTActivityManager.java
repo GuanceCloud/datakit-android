@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Description: {@link Activity} 管理类
  */
 public final class FTActivityManager {
-    public final static String TAG = "FTActivityManager";
+    public final static String TAG = "[FT-SDK]ActivityManager";
     private static volatile FTActivityManager instance;
 
     /**

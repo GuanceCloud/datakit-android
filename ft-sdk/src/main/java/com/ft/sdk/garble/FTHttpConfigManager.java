@@ -13,7 +13,7 @@ import com.ft.sdk.garble.utils.LogUtils;
  * Description: SDK 内部请求配置
  */
 public class FTHttpConfigManager {
-    private static final String TAG = "FTHttpConfigManager";
+    private static final String TAG = "[FT-SDK]FTHttpConfigManager";
     private static volatile FTHttpConfigManager instance;
     /**
      *  datakit 服务端请求地址

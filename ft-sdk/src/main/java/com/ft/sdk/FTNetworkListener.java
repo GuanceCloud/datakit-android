@@ -21,7 +21,7 @@ import com.ft.sdk.garble.utils.NetUtils;
  * Description: 监听网络连接状态
  */
  class FTNetworkListener {
-    private final static String TAG = "FTNetworkListener";
+    private final static String TAG = "[FT-SDK]FTNetworkListener";
     private static FTNetworkListener instance;
     private Application application;
     private FTNetWorkCallback networkCallback;

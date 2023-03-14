@@ -28,7 +28,7 @@ import okhttp3.Response;
  */
 public class FTWebViewClient extends WebViewClient {
 
-    private static final String TAG = "FTWebViewClient";
+    private static final String TAG = "[FT-SDK]FTWebViewClient";
     static OkHttpClient mClient = new OkHttpClient.Builder()
             .addInterceptor(new FTTraceInterceptor(true))
             .connectTimeout(30, TimeUnit.SECONDS)

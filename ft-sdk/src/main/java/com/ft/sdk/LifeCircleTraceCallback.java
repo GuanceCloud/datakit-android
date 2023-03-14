@@ -23,7 +23,7 @@ import java.util.HashMap;
  * description:处理当前应用退到后台10秒后重新进入
  */
 class LifeCircleTraceCallback {
-    private static final String TAG = "AppRestartCallback";
+    private static final String TAG = "[FT-SDK]LifeCircleTraceCallback";
     /**
      * 消息通道
      */

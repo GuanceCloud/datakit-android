@@ -41,8 +41,7 @@ import static com.ft.sdk.garble.utils.Utils.getSharedPreferences;
  * Description:
  */
 public class DeviceUtils {
-    public static final String TAG = "DeviceUtils";
-    private static final String STATUS_PATH = "/proc/self/status";
+    public static final String TAG = "[FT-SDK]DeviceUtils";
     private static final String VM_RSS_PATTERN = "VmRSS:\\s+(\\d+) kB";
 
     private RandomAccessFile mProcStatusFile;

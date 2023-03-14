@@ -2,8 +2,7 @@ package com.ft.sdk.garble.http;
 
 import android.util.Log;
 
-import com.ft.sdk.garble.bean.NetStatusBean;
-import com.ft.sdk.garble.utils.NetUtils;
+import com.ft.sdk.garble.utils.LogUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -23,6 +22,8 @@ import okhttp3.ResponseBody;
  * description: 基于 okhttp 请求框架的 INetEngine
  */
 public class OkHttpEngine implements INetEngine {
+    private final static String TAG = "[FT-SDK]OkHttpEngine";
+
     private static OkHttpClient client;
     private Request request;
 
@@ -65,7 +66,7 @@ public class OkHttpEngine implements INetEngine {
             }
             return new ResponseData(response.code(), string);
         } catch (IOException e) {
-            Log.e("FT-SDK", e.getLocalizedMessage() + ",检查本地网络连接是否正常");
+            LogUtils.e(TAG, e.getLocalizedMessage() + ",检查本地网络连接是否正常");
             return new ResponseData(103, e.getLocalizedMessage() + ",检查本地网络连接是否正常");
         } catch (Exception e) {
             return new ResponseData(104, e.getLocalizedMessage());

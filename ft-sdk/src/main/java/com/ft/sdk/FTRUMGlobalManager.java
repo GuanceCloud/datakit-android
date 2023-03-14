@@ -43,7 +43,7 @@ import javax.net.ssl.HttpsURLConnection;
  * ，可以通过<a href="https://docs.guance.com/real-user-monitoring/explorer/">查看器</a>
  */
 public class FTRUMGlobalManager {
-    private static final String TAG = "RUMGlobalManager";
+    private static final String TAG = "[FT-SDK]RUMGlobalManager";
     /**
      * 间断操作（中途休眠） Session 重置事件为 15分钟
      */

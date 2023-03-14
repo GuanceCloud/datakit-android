@@ -31,7 +31,7 @@ import java.util.List;
  * Description:
  */
 public class SyncDataHelper {
-    public final static String TAG = "SyncDataHelper";
+    public final static String TAG = "[FT-SDK]SyncDataHelper";
 
     /**
      * 封装同步上传的数据

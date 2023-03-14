@@ -22,7 +22,7 @@ import java.util.HashMap;
  * Description:
  */
 public class FTSdk {
-    public final static String TAG = "FTSdk";
+    public final static String TAG = "[FT-SDK]";
     public static final String NATIVE_DUMP_PATH = "ftCrashDmp";
     //该变量不能改动，其值由 Plugin 动态改写
     public static String PLUGIN_VERSION = "";
@@ -167,7 +167,7 @@ public class FTSdk {
      */
     public static void initRUMWithConfig(@NonNull FTRUMConfig config) {
         try {
-            config.setServiceName(mFtSdk.getBaseConfig().getServiceName());
+            config.setServiceName(get().getBaseConfig().getServiceName());
             FTRUMConfigManager.get().initWithConfig(config);
         } catch (Exception e) {
             LogUtils.e(TAG, e.getMessage());
@@ -195,7 +195,7 @@ public class FTSdk {
      */
     public static void initLogWithConfig(@NonNull FTLoggerConfig config) {
         try {
-            config.setServiceName(mFtSdk.getBaseConfig().getServiceName());
+            config.setServiceName(get().getBaseConfig().getServiceName());
             FTLoggerConfigManager.get().initWithConfig(config);
         } catch (Exception e) {
             LogUtils.e(TAG, e.getMessage());

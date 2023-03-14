@@ -23,7 +23,7 @@ import com.ft.sdk.garble.utils.Utils;
  * @author Brandon
  */
 class FTAppStartCounter {
-    private static final String TAG = "FTAppStartCounter";
+    private static final String TAG = "[FT-SDK]FTAppStartCounter";
     /**
      * 时间段，单位纳秒
      */

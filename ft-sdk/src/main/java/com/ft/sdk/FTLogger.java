@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class FTLogger {
 
-    private static final String TAG = "FTLogger";
+    private static final String TAG = "[FT-SDK]FTLogger";
 
     private FTLogger() {
 

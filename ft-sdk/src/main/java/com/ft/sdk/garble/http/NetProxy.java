@@ -18,7 +18,7 @@ import java.util.TimeZone;
  * description:
  */
 public class NetProxy {
-    public final static String TAG = "NetProxy";
+    public final static String TAG = "[FT-SDK]NetProxy";
     /**
      * SDK 中网络的配置
      */

@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 链路追踪
  */
 public class FTTraceManager {
-    private static final String TAG = "FTTraceManager";
+    private static final String TAG = "[FT-SDK]FTTraceManager";
     private final ConcurrentHashMap<String, FTTraceManagerContainer> handlerMap
             = new ConcurrentHashMap<>(1000);
 

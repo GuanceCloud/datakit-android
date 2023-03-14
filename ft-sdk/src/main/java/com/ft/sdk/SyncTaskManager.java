@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Description:数据同步管理，将数据存储
  */
 public class SyncTaskManager {
-    public final static String TAG = "SyncTaskManager";
+    public final static String TAG = "[FT-SDK]SyncTaskManager";
     /**
      * 最大容忍错误次数
      */
