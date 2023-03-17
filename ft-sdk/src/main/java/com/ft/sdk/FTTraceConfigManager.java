@@ -1,11 +1,12 @@
 package com.ft.sdk;
 
+import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.PackageUtils;
 
 public class FTTraceConfigManager {
 
-    private static final String TAG = "[FT-SDK]FTTraceConfigManager";
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "FTTraceConfigManager";
 
 
     private static class SingletonHolder {

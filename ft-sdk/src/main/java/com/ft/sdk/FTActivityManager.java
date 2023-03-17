@@ -6,6 +6,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 
 import com.ft.sdk.garble.bean.AppState;
+import com.ft.sdk.garble.utils.Constants;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Description: {@link Activity} 管理类
  */
 public final class FTActivityManager {
-    public final static String TAG = "[FT-SDK]ActivityManager";
+    public final static String TAG = Constants.LOG_TAG_PREFIX + "ActivityManager";
     private static volatile FTActivityManager instance;
 
     /**

@@ -15,7 +15,7 @@ import java.util.Iterator;
  * description:日志对象(SDK内部使用)
  */
 public class BaseContentBean {
-    private static final String TAG = "[FT-SDK]BaseContentBean";
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "BaseContentBean";
     /**
      * 内容大小限制 30 KB
      */

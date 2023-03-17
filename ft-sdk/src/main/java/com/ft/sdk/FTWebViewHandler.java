@@ -25,7 +25,7 @@ import java.util.Iterator;
  */
 final class FTWebViewHandler implements WebAppInterface.JsReceiver {
 
-    private static final String LOG_TAG = "[FT-SDK]FTWebViewHandler";
+    private static final String LOG_TAG = Constants.LOG_TAG_PREFIX + "FTWebViewHandler";
 
     /**
      * 回调状态，true 为正常，反之为 false

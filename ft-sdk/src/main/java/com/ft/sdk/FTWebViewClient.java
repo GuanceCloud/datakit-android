@@ -9,6 +9,7 @@ import android.webkit.WebViewClient;
 import androidx.annotation.Nullable;
 
 import com.ft.sdk.garble.manager.FTWebViewEventTracker;
+import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 
 import java.io.IOException;
@@ -28,7 +29,7 @@ import okhttp3.Response;
  */
 public class FTWebViewClient extends WebViewClient {
 
-    private static final String TAG = "[FT-SDK]FTWebViewClient";
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "FTWebViewClient";
     static OkHttpClient mClient = new OkHttpClient.Builder()
             .addInterceptor(new FTTraceInterceptor(true))
             .connectTimeout(30, TimeUnit.SECONDS)

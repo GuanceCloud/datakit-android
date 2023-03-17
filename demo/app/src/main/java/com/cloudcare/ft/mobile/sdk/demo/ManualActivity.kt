@@ -1,10 +1,11 @@
 package com.cloudcare.ft.mobile.sdk.demo
 
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.ft.sdk.FTRUMGlobalManager
+import com.ft.sdk.FTResourceInterceptor
+import com.ft.sdk.FTTraceInterceptor
 import com.ft.sdk.FTTraceManager
 import com.ft.sdk.garble.bean.AppState
 import com.ft.sdk.garble.bean.ErrorType
@@ -15,13 +16,16 @@ import com.ft.sdk.garble.utils.LogUtils
 import com.ft.sdk.garble.utils.Utils
 import okhttp3.*
 import okhttp3.EventListener
+import java.io.IOException
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.Proxy
 import java.util.*
-import kotlin.collections.HashMap
 
-
+/**
+ *  Action Resource 和 Trace  手动方式 示范
+ *
+ */
 class ManualActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,7 +36,35 @@ class ManualActivity : AppCompatActivity() {
             FTRUMGlobalManager.get().startAction("[action button]", "click")
         }
 
+
         findViewById<Button>(R.id.manual_http_btn).setOnClickListener {
+            //手动设置 OKHttp
+            Thread {
+                val requestBuilder: Request.Builder = Request.Builder()
+                    .url("https://www.guance.com")
+                    .method("get", null)
+
+                val builder = OkHttpClient.Builder()
+                builder.addInterceptor(FTTraceInterceptor())
+                val interceptor = FTResourceInterceptor()
+                builder.addInterceptor(interceptor)
+                builder.eventListener(interceptor)
+                val client = builder.build()
+
+                try {
+                    val response: Response =
+                        client.newCall(requestBuilder.build()).execute()
+                    LogUtils.d("http request", "response:${response.code}")
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+            }.start()
+
+
+        }
+
+        findViewById<Button>(R.id.manual_http_custom_btn).setOnClickListener {
+            //自定义 Resource TraceHeader
             Thread {
                 val uuid = UUID.randomUUID().toString()
                 val url = "https://www.guance.com"

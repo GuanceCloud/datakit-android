@@ -197,6 +197,8 @@ public class FTRUMConfig {
     /**
      * 使用 {@link #setDeviceMetricsMonitorType(int)} 替代
      *
+     *  setExtraMonitorTypeWithError(ErrorMonitorType.ALL.getValue())
+     *
      * @param extraMonitorTypeWithError
      * @return
      */
@@ -228,6 +230,9 @@ public class FTRUMConfig {
 
     /**
      * 支持或参数 battery | cpu | memory
+     *
+     *  setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
+     *
      * @param deviceMetricsMonitorType
      * @return
      */

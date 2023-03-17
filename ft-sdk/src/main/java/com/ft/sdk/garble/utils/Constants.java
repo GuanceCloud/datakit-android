@@ -12,6 +12,8 @@ import java.util.UUID;
  * Description: SDK 常量声明
  */
 public class Constants {
+
+    public static final String LOG_TAG_PREFIX="[FT-SDK]";
     /**
      * SDK 名称
      */

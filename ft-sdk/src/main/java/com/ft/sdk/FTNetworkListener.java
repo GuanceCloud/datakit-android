@@ -12,6 +12,7 @@ import android.os.Build;
 
 import androidx.annotation.NonNull;
 
+import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.NetUtils;
 
@@ -20,8 +21,8 @@ import com.ft.sdk.garble.utils.NetUtils;
  * DATE:2020-01-19 17:35
  * Description: 监听网络连接状态
  */
- class FTNetworkListener {
-    private final static String TAG = "[FT-SDK]FTNetworkListener";
+class FTNetworkListener {
+    private final static String TAG = Constants.LOG_TAG_PREFIX + "FTNetworkListener";
     private static FTNetworkListener instance;
     private Application application;
     private FTNetWorkCallback networkCallback;
@@ -31,7 +32,7 @@ import com.ft.sdk.garble.utils.NetUtils;
     private FTNetworkListener() {
     }
 
-    public synchronized static FTNetworkListener get() {
+    synchronized static FTNetworkListener get() {
         if (instance == null) {
             instance = new FTNetworkListener();
         }
@@ -39,9 +40,9 @@ import com.ft.sdk.garble.utils.NetUtils;
     }
 
     /**
-     *
+     * 配置初始化网络类型监控对象
      */
-    public void monitor() {
+    void monitor() {
         if (networkCallback == null) {
             networkCallback = new FTNetWorkCallback();
         }
@@ -80,7 +81,7 @@ import com.ft.sdk.garble.utils.NetUtils;
     /**
      * 网络状态变化回调类
      */
-    public class FTNetWorkCallback extends ConnectivityManager.NetworkCallback {
+    class FTNetWorkCallback extends ConnectivityManager.NetworkCallback {
 
         @Override
         public void onAvailable(@NonNull Network network) {
@@ -97,7 +98,7 @@ import com.ft.sdk.garble.utils.NetUtils;
     /**
      * 网络变化广播接受类
      */
-    public class FTNetworkReceiver extends BroadcastReceiver {
+    class FTNetworkReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -111,7 +112,7 @@ import com.ft.sdk.garble.utils.NetUtils;
     private void judgeNetState() {
         //大于 0 有网
         if (NetUtils.get().getNetworkState(application) > 0) {
-            LogUtils.d(TAG, "Net->" + "网络已连接");
+            LogUtils.d(TAG, "Net Connected");
             SyncTaskManager.get().executeSyncPoll();
         }
 
@@ -121,7 +122,7 @@ import com.ft.sdk.garble.utils.NetUtils;
     /**
      * 释放对象，{@link FTSdk#shutDown()} 时使用
      */
-    public void release() {
+    void release() {
         if (connectivityManager == null) {
             instance = null;
             return;

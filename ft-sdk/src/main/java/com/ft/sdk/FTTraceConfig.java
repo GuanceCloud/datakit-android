@@ -4,6 +4,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ *
+ *
+ * @author Brandon
+ */
 public class FTTraceConfig {
     /**
      * 采样率

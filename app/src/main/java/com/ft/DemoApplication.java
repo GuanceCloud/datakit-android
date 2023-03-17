@@ -7,7 +7,6 @@ import android.net.Uri;
 import com.ft.sdk.DeviceMetricsMonitorType;
 import com.ft.sdk.EnvType;
 import com.ft.sdk.ErrorMonitorType;
-import com.ft.sdk.FTInTakeUrlHandler;
 import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTSDKConfig;
@@ -15,7 +14,6 @@ import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.UserData;
-import com.ft.sdk.garble.utils.LogUtils;
 
 import java.util.HashMap;
 
@@ -65,9 +63,7 @@ public class DemoApplication extends Application {
                 .setEnableTrackAppCrash(true)
                 .setEnableTrackAppUIBlock(true)
                 .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
-                .setResourceUrlHandler(url -> {
-                    return false;
-                })
+                .setResourceUrlHandler(url -> false)
                 .addGlobalContext("track_id", BuildConfig.TRACK_ID)
                 .addGlobalContext("custom_tag", "any tags")
                 .setExtraMonitorTypeWithError(ErrorMonitorType.ALL.getValue()));

@@ -1,6 +1,7 @@
 package com.ft.sdk.garble.http;
 
 import com.ft.sdk.garble.FTHttpConfigManager;
+import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
@@ -26,7 +27,7 @@ import static com.ft.sdk.garble.http.NetCodeStatus.UNKNOWN_EXCEPTION_CODE;
  * Description: 原生 HttpUrlConnection 网络请求引擎
  */
 public class NativeNetEngine implements INetEngine {
-    public static final String TAG = "[FT-SDK]NativeNetEngine";
+    public static final String TAG = Constants.LOG_TAG_PREFIX + "NativeNetEngine";
     /**
      * 字符编码，UTF8
      */

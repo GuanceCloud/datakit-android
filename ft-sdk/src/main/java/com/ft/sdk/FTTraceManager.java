@@ -1,6 +1,7 @@
 package com.ft.sdk;
 
 import com.ft.sdk.garble.http.HttpUrl;
+import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.net.MalformedURLException;
@@ -13,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 链路追踪
  */
 public class FTTraceManager {
-    private static final String TAG = "[FT-SDK]FTTraceManager";
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "FTTraceManager";
     private final ConcurrentHashMap<String, FTTraceManagerContainer> handlerMap
             = new ConcurrentHashMap<>(1000);
 

@@ -9,6 +9,8 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.ft.sdk.*
+import com.ft.sdk.garble.bean.AppState
+import com.ft.sdk.garble.bean.ErrorType
 import com.ft.sdk.garble.bean.LogData
 import com.ft.sdk.garble.bean.Status
 import com.ft.sdk.garble.http.RequestMethod
@@ -40,7 +42,8 @@ class MainActivity : AppCompatActivity() {
                     .connectTimeout(10, TimeUnit.SECONDS)
                     .build()
 
-                val builder: Request.Builder = Request.Builder().url("http://www.baidu.com")
+                val builder: Request.Builder = Request.Builder()
+                    .url("https://www.guance.com")
                     .method(RequestMethod.GET.name, null)
 
                 client.newCall(builder.build()).execute()

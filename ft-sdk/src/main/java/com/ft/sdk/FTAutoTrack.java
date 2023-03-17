@@ -37,7 +37,8 @@ import okhttp3.OkHttpClient;
  * Description
  */
 public class FTAutoTrack {
-    public final static String TAG = "[FT-SDK]AutoTrack";
+    public final static String TAG = Constants.LOG_TAG_PREFIX + "AutoTrack";
+
 
     /**
      * 启动 APP

@@ -16,12 +16,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="手动 Action" />
-
         <Button
             android:id="@+id/manual_http_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="手动 Trace Resource" />
+            android:text="手动 OKHttp 设置" />
+
+        <Button
+            android:id="@+id/manual_http_custom_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="手动 Trace Resource 自定义" />
 
 
         <Button

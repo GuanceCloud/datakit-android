@@ -19,7 +19,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * description: 本地打印日志同步管理类
  */
 public class TrackLogManager {
-    private static final String TAG = "[FT-SDK]TrackLogManager";
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "TrackLogManager";
     private static TrackLogManager instance;
     private final List<BaseContentBean> logBeanList = new CopyOnWriteArrayList<>();
     /**

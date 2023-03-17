@@ -22,7 +22,7 @@ import java.util.Enumeration;
  * Description: 网络信息相关 IP，网络类型等
  */
 public class NetUtils {
-    private final static String TAG = "[FT-SDK]NetUtils";
+    private final static String TAG = Constants.LOG_TAG_PREFIX + "NetUtils";
     public final static int NETWORK_NONE = 0;
     public final static int NETWORK_WIFI = 1;
     public final static int NETWORK_2G = 2;

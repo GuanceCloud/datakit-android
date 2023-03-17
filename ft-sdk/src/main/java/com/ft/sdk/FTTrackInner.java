@@ -31,7 +31,7 @@ import java.util.List;
  * description:内部使用的 Track 方法
  */
 public class FTTrackInner {
-    private final static String TAG = "[FT-SDK]FTTrackInner";
+    private final static String TAG = Constants.LOG_TAG_PREFIX + "FTTrackInner";
     private static FTTrackInner instance;
 
     private FTTrackInner() {

@@ -4,6 +4,7 @@ import static com.ft.sdk.garble.utils.Constants.USER_AGENT;
 
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTSDKConfig;
+import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 
@@ -13,10 +14,10 @@ import com.ft.sdk.garble.utils.LogUtils;
  * Description: SDK 内部请求配置
  */
 public class FTHttpConfigManager {
-    private static final String TAG = "[FT-SDK]FTHttpConfigManager";
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "FTHttpConfigManager";
     private static volatile FTHttpConfigManager instance;
     /**
-     *  datakit 服务端请求地址
+     * datakit 服务端请求地址
      */
     public String serverUrl;
     /**
@@ -51,6 +52,7 @@ public class FTHttpConfigManager {
 
     /**
      * 配置初始化
+     *
      * @param ftsdkConfig
      */
     public void initParams(FTSDKConfig ftsdkConfig) {

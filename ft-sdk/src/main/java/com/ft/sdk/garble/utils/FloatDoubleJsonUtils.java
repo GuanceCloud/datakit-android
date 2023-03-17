@@ -20,7 +20,7 @@ import java.util.Map;
  */
 public class FloatDoubleJsonUtils {
 
-    private static final String TAG = "[FT-SDK]FloatDoubleJsonUtils";
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "FloatDoubleJsonUtils";
 
     /**
      * 转化在 json中 float 的数值，避免在转化过程中被简化,例如 1.0 会转化成 "1.0"，避免 "1.0" 被简化为 1，

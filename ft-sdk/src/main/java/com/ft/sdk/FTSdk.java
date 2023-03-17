@@ -1,5 +1,7 @@
 package com.ft.sdk;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.FTAutoTrackConfigManager;
@@ -80,7 +82,7 @@ public class FTSdk {
     }
 
     /**
-     * 关闭 SDK 内容正在运行对象
+     * 关闭 SDK 内正在运行对象
      */
     public static void shutDown() {
         SyncTaskManager.release();
@@ -273,6 +275,13 @@ public class FTSdk {
             hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_NATIVE, FTSdk.NATIVE_VERSION);
         }
         hashMap.put(Constants.KEY_SDK_VERSION, FTSdk.AGENT_VERSION);
+    }
+
+    /**
+     * 当使用 ft-plugin 时使用，具体使用方式见
+     */
+    public static void manualStartup(){
+        FTAutoTrack.startApp(null);
     }
 
 

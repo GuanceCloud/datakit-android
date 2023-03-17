@@ -43,7 +43,7 @@ import javax.net.ssl.HttpsURLConnection;
  * ，可以通过<a href="https://docs.guance.com/real-user-monitoring/explorer/">查看器</a>
  */
 public class FTRUMGlobalManager {
-    private static final String TAG = "[FT-SDK]RUMGlobalManager";
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "RUMGlobalManager";
     /**
      * 间断操作（中途休眠） Session 重置事件为 15分钟
      */
@@ -141,7 +141,7 @@ public class FTRUMGlobalManager {
     }
 
     /**
-     * action 起始
+     *  添加 action
      *
      * @param actionName action 名称
      * @param actionType action 类型
@@ -151,7 +151,7 @@ public class FTRUMGlobalManager {
     }
 
     /**
-     * action 起始
+     * 添加 action
      *
      * @param actionName action 名称
      * @param actionType action 类型
@@ -162,7 +162,7 @@ public class FTRUMGlobalManager {
     }
 
     /**
-     * action 起始
+     * 添加 action
      *
      * @param actionName action 名称
      * @param actionType action 类型
@@ -482,11 +482,11 @@ public class FTRUMGlobalManager {
     /**
      * 添加错误信息
      *
-     * @param log
-     * @param message
-     * @param errorType
-     * @param state
-     * @param property
+     * @param log       日志
+     * @param message   消息
+     * @param errorType 错误类型
+     * @param state     程序运行状态
+     * @param property  附加属性
      */
     public void addError(String log, String message, ErrorType errorType, AppState state, HashMap<String, Object> property) {
         addError(log, message, Utils.getCurrentNanoTime(), errorType, state, property);
@@ -629,6 +629,8 @@ public class FTRUMGlobalManager {
 
     /**
      * 资源加载性能
+     *
+     * @param resourceId 资源 id
      */
     void putRUMResourcePerformance(final String resourceId) {
         ResourceBean bean = resourceBeanMap.get(resourceId);
@@ -787,7 +789,7 @@ public class FTRUMGlobalManager {
     /**
      * 设置网络传输内容
      *
-     * @param resourceId
+     * @param resourceId 资源 id
      * @param params
      * @param netStatusBean
      */
@@ -799,7 +801,7 @@ public class FTRUMGlobalManager {
     /**
      * 设置网络传输内容
      *
-     * @param resourceId
+     * @param resourceId 资源 id
      * @param params
      */
     void setTransformContent(String resourceId, ResourceParams params) {

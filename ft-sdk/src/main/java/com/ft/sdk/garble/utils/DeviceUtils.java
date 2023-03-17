@@ -41,7 +41,7 @@ import static com.ft.sdk.garble.utils.Utils.getSharedPreferences;
  * Description:
  */
 public class DeviceUtils {
-    public static final String TAG = "[FT-SDK]DeviceUtils";
+    public static final String TAG = Constants.LOG_TAG_PREFIX + "DeviceUtils";
     private static final String VM_RSS_PATTERN = "VmRSS:\\s+(\\d+) kB";
 
     private RandomAccessFile mProcStatusFile;

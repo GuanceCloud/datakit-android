@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.utils.AopUtils;
+import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
@@ -23,7 +24,7 @@ import java.util.HashMap;
  * description:处理当前应用退到后台10秒后重新进入
  */
 class LifeCircleTraceCallback {
-    private static final String TAG = "[FT-SDK]LifeCircleTraceCallback";
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "LifeCircleTraceCallback";
     /**
      * 消息通道
      */

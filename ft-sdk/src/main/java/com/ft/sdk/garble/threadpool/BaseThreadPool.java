@@ -1,6 +1,7 @@
 package com.ft.sdk.garble.threadpool;
 
 import com.ft.sdk.FTSdk;
+import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 
 import java.util.concurrent.BlockingQueue;
@@ -18,7 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Description:线程池基类，用于构建阻塞线程队列来消费数据
  */
 public abstract class BaseThreadPool {
-    public static final String TAG = "[FT-SDK]BaseThreadPool";
+    public static final String TAG = Constants.LOG_TAG_PREFIX + "BaseThreadPool";
     /**
      * 最大容量
      */

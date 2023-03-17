@@ -9,7 +9,7 @@ import com.ft.sdk.*
  * DATE:2019-12-13 11:44
  * Description:
  */
-class DemoApplication : Application() {
+open class DemoApplication : Application() {
 
 
     override fun onCreate() {

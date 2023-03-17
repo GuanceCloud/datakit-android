@@ -4,6 +4,7 @@ import com.ft.sdk.garble.bean.BaseContentBean;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.LogData;
 import com.ft.sdk.garble.bean.Status;
+import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
@@ -20,7 +21,7 @@ import java.util.List;
  */
 public class FTLogger {
 
-    private static final String TAG = "[FT-SDK]FTLogger";
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "FTLogger";
 
     private FTLogger() {
 

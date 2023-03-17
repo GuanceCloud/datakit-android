@@ -6,8 +6,6 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import androidx.annotation.NonNull;
-
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
@@ -31,7 +29,7 @@ import java.util.UUID;
  */
 public class FTRUMConfigManager {
 
-    private static final String TAG = "[FT-SDK]FTRUMConfigManager";
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "FTRUMConfigManager";
 
     private static class SingletonHolder {
         private static final FTRUMConfigManager INSTANCE = new FTRUMConfigManager();
@@ -183,7 +181,7 @@ public class FTRUMConfigManager {
      * @param exts
      */
     void bindUserData(String id, String name, String email, HashMap<String, String> exts) {
-        LogUtils.d(TAG, "绑定用户信息");
+        LogUtils.d(TAG, "bindUserData:id=" + id + ",name=" + name + ",email=" + email + ",exts=" + exts);
         //初始化SessionId
         initRandomUserId();
         //绑定用户信息
@@ -206,7 +204,7 @@ public class FTRUMConfigManager {
      * 解绑用户信息
      */
     void unbindUserData() {
-        LogUtils.d(TAG, "解绑用户信息");
+        LogUtils.d(TAG, "unbindUserData");
 
         synchronized (mLock) {
             SharedPreferences sp = Utils.getSharedPreferences(FTApplication.getApplication());

@@ -16,6 +16,7 @@ import com.ft.sdk.garble.bean.ViewBean;
 import com.ft.sdk.garble.db.base.DBManager;
 import com.ft.sdk.garble.db.base.DataBaseCallBack;
 import com.ft.sdk.garble.db.base.DatabaseHelper;
+import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ import java.util.List;
 @SuppressLint("Range")
 public class FTDBManager extends DBManager {
     private static FTDBManager ftdbManager;
-    public final static String TAG = "[FT-SDK]DBManager";
+    public final static String TAG = Constants.LOG_TAG_PREFIX + "DBManager";
 
     /**
      * 用于 Android Test
