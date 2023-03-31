@@ -280,6 +280,11 @@ public class FTRUMConfig {
         return deviceMetricsDetectFrequency;
     }
 
+    /**
+     * 设置 Url 过滤规则
+     * @param handler
+     * @return
+     */
     public FTRUMConfig setResourceUrlHandler(FTInTakeUrlHandler handler) {
         this.handler = handler;
         return this;
