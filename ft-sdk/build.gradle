@@ -33,6 +33,7 @@ android {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
     }
+    namespace 'com.ft.sdk'
 }
 
 dependencies {

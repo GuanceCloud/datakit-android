@@ -1,7 +1,5 @@
 package com.ft.sdk;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.FTAutoTrackConfigManager;
@@ -280,7 +278,7 @@ public class FTSdk {
     /**
      * 当使用 ft-plugin 时使用，具体使用方式见
      */
-    public static void manualStartup(){
+    public static void manualStartup() {
         FTAutoTrack.startApp(null);
     }
 
