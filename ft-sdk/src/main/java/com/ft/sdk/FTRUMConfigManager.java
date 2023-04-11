@@ -223,18 +223,11 @@ public class FTRUMConfigManager {
     void initRUMGlobalContext(FTRUMConfig config) {
         Context context = FTApplication.getApplication();
         HashMap<String, Object> rumGlobalContext = config.getGlobalContext();
-        ArrayList<String> customKeys = new ArrayList<>();
-        for (Map.Entry<String, Object> entry : rumGlobalContext.entrySet()) {
-            String key = entry.getKey();
-            customKeys.add(key);
-            Object value = entry.getValue();
-            rumGlobalContext.put(key, value);
-        }
 //        if(config.isBackendSample()){
         //sample
 //            rumGlobalContext.put(Constants.KEY_BACKENDSAMPLE,"");
 //        }
-        rumGlobalContext.put(Constants.KEY_RUM_CUSTOM_KEYS, new Gson().toJson(customKeys));
+        rumGlobalContext.put(Constants.KEY_RUM_CUSTOM_KEYS, new Gson().toJson(rumGlobalContext.keySet()));
         rumGlobalContext.put(Constants.KEY_RUM_APP_ID, config.getRumAppId());
         rumGlobalContext.put(Constants.KEY_RUM_SESSION_TYPE, "user");
         rumGlobalContext.put(Constants.KEY_DEVICE_OS, DeviceUtils.getOSName());
