@@ -1,6 +1,9 @@
 package com.ft.sdk.garble.bean;
 
+import android.util.Log;
+
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.LogUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,6 +17,7 @@ import java.util.Map;
  * description:日志对象(SDK内部使用)
  */
 public class LogBean extends BaseContentBean {
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "LogBean";
     /**
      * 指定当前日志的来源，比如如果来源于 Ngnix，可指定为 Nginx，
      * 同一应用产生的日志 source 应该一样，这样在观测云中方便针对该来源的日志配置同一的提取规则
@@ -41,6 +45,7 @@ public class LogBean extends BaseContentBean {
 
     /**
      * 获取所有日志中指标数据
+     *
      * @return
      */
     public JSONObject getAllFields() {
@@ -58,13 +63,15 @@ public class LogBean extends BaseContentBean {
                 }
             }
         } catch (JSONException e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, Log.getStackTraceString(e));
+
         }
         return fields;
     }
 
     /**
      * 获取所有日志中标签数据
+     *
      * @return
      */
     public JSONObject getAllTags() {
@@ -72,7 +79,8 @@ public class LogBean extends BaseContentBean {
         try {
             tags.put(Constants.KEY_STATUS, status.name);
         } catch (JSONException e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, Log.getStackTraceString(e));
+
         }
 
         return tags;

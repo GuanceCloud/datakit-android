@@ -1,11 +1,14 @@
 package com.ft.sdk.garble.bean;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
+import com.ft.sdk.FTRUMGlobalManager;
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 import com.google.gson.Gson;
-import com.ft.sdk.FTRUMGlobalManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,6 +25,7 @@ import java.util.UUID;
  * @author Brandon
  */
 public class ViewBean {
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "ViewBean";
     /**
      * View 唯一ID， {@link Constants#KEY_RUM_VIEW_ID}
      */
@@ -333,7 +337,7 @@ public class ViewBean {
                 }
             }
         } catch (JSONException e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, Log.getStackTraceString(e));
         }
 
     }

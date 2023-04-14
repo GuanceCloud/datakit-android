@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
+import android.util.Log;
 
 import com.ft.sdk.garble.bean.BatteryBean;
 
@@ -13,6 +14,7 @@ import com.ft.sdk.garble.bean.BatteryBean;
  * Description:参考开源项目 <a href="https://github.com/guxiaonian/MobileInfo">地址</a>
  */
 public class BatteryUtils {
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "BatteryUtils";
     static double batteryCapacity = 0; //电池的容量mAh
 
     /**
@@ -28,7 +30,7 @@ public class BatteryUtils {
             int value = manager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);//当前电量剩余百分比
             capacity = (100 - value);
         } catch (Exception e) {
-
+            LogUtils.e(TAG, Log.getStackTraceString(e));
         }
         return capacity;
     }
@@ -66,7 +68,7 @@ public class BatteryUtils {
             mPowerProfile = Class.forName(POWER_PROFILE_CLASS).getConstructor(Context.class).newInstance(context);
             batteryCapacity = (double) Class.forName(POWER_PROFILE_CLASS).getMethod("getBatteryCapacity").invoke(mPowerProfile);
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, Log.getStackTraceString(e));
         }
         if (batteryCapacity == 0) {
             return "";

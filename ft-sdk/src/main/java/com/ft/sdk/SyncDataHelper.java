@@ -3,24 +3,17 @@ package com.ft.sdk;
 import static com.ft.sdk.garble.utils.Constants.FT_KEY_VALUE_NULL;
 import static com.ft.sdk.garble.utils.Constants.UNKNOWN;
 
-import com.ft.sdk.garble.bean.BatteryBean;
+import android.util.Log;
+
 import com.ft.sdk.garble.bean.DataType;
-import com.ft.sdk.garble.bean.NetStatusBean;
 import com.ft.sdk.garble.bean.SyncJsonData;
-import com.ft.sdk.garble.utils.BatteryUtils;
 import com.ft.sdk.garble.utils.Constants;
-import com.ft.sdk.garble.utils.CpuUtils;
-import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.sdk.garble.utils.NetUtils;
 import com.ft.sdk.garble.utils.StringUtils;
 import com.ft.sdk.garble.utils.Utils;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -100,6 +93,7 @@ public class SyncDataHelper {
     /**
      * 转化为行协议数据
      * invoke by Test case
+     *
      * @param datas
      * @return
      */
@@ -160,7 +154,7 @@ public class SyncDataHelper {
                     sb.append(data.getTime());
                     sb.append(Constants.SEPARATION_LINE_BREAK);
                 } catch (Exception e) {
-                    LogUtils.e(TAG, e.getMessage());
+                    LogUtils.e(TAG, Log.getStackTraceString(e));
                 }
             }
         }

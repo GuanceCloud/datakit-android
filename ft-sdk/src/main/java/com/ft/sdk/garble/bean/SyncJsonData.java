@@ -1,10 +1,13 @@
 package com.ft.sdk.garble.bean;
 
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.FloatDoubleJsonUtils;
+import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.internal.exception.FTInvalidParameterException;
 
 import org.json.JSONException;
@@ -19,6 +22,7 @@ import java.security.InvalidParameterException;
  * Description: 数据存储 Data Json 数据
  */
 public class SyncJsonData implements Cloneable {
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "SyncJsonData";
 
     /**
      * 同步数据唯一 id
@@ -44,7 +48,8 @@ public class SyncJsonData implements Cloneable {
             this.dataString = dataString;
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, Log.getStackTraceString(e));
+
         }
     }
 

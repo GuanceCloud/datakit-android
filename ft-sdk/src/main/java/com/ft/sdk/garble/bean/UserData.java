@@ -1,7 +1,11 @@
 package com.ft.sdk.garble.bean;
 
+import android.util.Log;
+
 import androidx.annotation.Nullable;
 
+import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.LogUtils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -14,6 +18,7 @@ import java.util.HashMap;
  * Description:用户绑定存储数据
  */
 public class UserData {
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "UserData";
 
     /**
      * 用户名称
@@ -76,7 +81,7 @@ public class UserData {
             }.getType();
             exts = new Gson().fromJson(data, type);
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, Log.getStackTraceString(e));
         }
     }
 

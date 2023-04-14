@@ -14,6 +14,7 @@ import android.net.NetworkInfo;
 import android.os.Process;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.util.Log;
 
 import com.ft.sdk.FTApplication;
 
@@ -55,8 +56,11 @@ import okhttp3.RequestBody;
  * Description:
  */
 public class Utils {
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "Utils";
+
     /**
      * 字符判断，判断字符非空
+     *
      * @param str
      * @return
      */
@@ -66,6 +70,7 @@ public class Utils {
 
     /**
      * 检测权限
+     *
      * @param context
      * @param permission
      * @return
@@ -101,6 +106,7 @@ public class Utils {
 
     /**
      * 判断是否连接网络
+     *
      * @return
      */
     public static boolean isNetworkAvailable() {
@@ -109,6 +115,7 @@ public class Utils {
 
     /**
      * 判断是否连接网络
+     *
      * @return
      */
     public static boolean isNetworkAvailable(Context context) {
@@ -119,6 +126,7 @@ public class Utils {
 
     /**
      * 获取应用 app 名称 AndroidManifest.xml application.labelName
+     *
      * @return
      */
     public static String getAppVersionName() {
@@ -128,13 +136,14 @@ public class Utils {
             info = manager.getPackageInfo(FTApplication.getApplication().getPackageName(), 0);
             return info.versionName;
         } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, Log.getStackTraceString(e));
             return "";
         }
     }
 
     /**
      * 获取 SDK 缓存  {@link SharedPreferences}
+     *
      * @param context
      * @return
      */
@@ -164,6 +173,7 @@ public class Utils {
 
     /**
      * 获取 16 字符长度的 GUID
+     *
      * @return
      */
     public static String getGUID_16() {
@@ -191,6 +201,7 @@ public class Utils {
 
     /**
      * 获取 64 位随机数
+     *
      * @return
      */
     public static BigInteger getDDtraceNewId() {
@@ -409,7 +420,7 @@ public class Utils {
                 }
             }
         } catch (Exception e) {
-            LogUtils.e(TAGS, e.getMessage());
+            LogUtils.e(TAGS, Log.getStackTraceString(e));
         }
         return value;
     }
@@ -435,7 +446,7 @@ public class Utils {
             try {
                 contentLength = body.contentLength();
             } catch (IOException e) {
-                e.printStackTrace();
+                LogUtils.e(TAG, Log.getStackTraceString(e));
             }
             String contentType = body.contentType() == null ? "" : body.contentType().toString();
             return method + "_" + url + "_" + contentType + "_" + contentLength;

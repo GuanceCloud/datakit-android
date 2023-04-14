@@ -1,5 +1,9 @@
 package com.ft.sdk.garble.reflect;
 
+import android.util.Log;
+
+import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.nativelib.ExceptionHandler;
 
 import java.lang.reflect.InvocationTargetException;
@@ -7,11 +11,12 @@ import java.lang.reflect.Method;
 
 /**
  * @author Brandon
- *
+ * <p>
  * 用于模拟生成"用户访问监测"中 Error 数据中 {@link com.ft.sdk.garble.bean.ErrorType#NATIVE} 类型数据
  * 数据筛查使用方法，请参考 @see <a href="https://docs.guance.com/real-user-monitoring/explorer/error/">查看器 Error</a>
  */
 public class ReflectUtils {
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "ReflectUtils";
     /**
      * ft-native 中 {@link ExceptionHandler } 类路径，如果 {@link ExceptionHandler } 发生更改，需要对应进行更改
      */
@@ -38,8 +43,10 @@ public class ReflectUtils {
             Object instance = getMethod.invoke(exceptionHandlerClass);
             Method handlerMethod = exceptionHandlerClass.getMethod(method);
             handlerMethod.invoke(instance);
-        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException | ClassNotFoundException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException |
+                 ClassNotFoundException e) {
+            LogUtils.e(TAG, Log.getStackTraceString(e));
+
         }
     }
 }

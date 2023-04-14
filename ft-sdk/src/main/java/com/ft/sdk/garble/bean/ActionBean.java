@@ -1,8 +1,11 @@
 package com.ft.sdk.garble.bean;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 import com.google.gson.Gson;
 
@@ -17,6 +20,7 @@ import java.util.UUID;
  * 用户行为操作生命周指标，{@link Constants#FT_MEASUREMENT_RUM_ACTION}
  */
 public class ActionBean {
+    private static final String TAG = Constants.LOG_TAG_PREFIX +"ActionBean";
     /**
      * Action 唯一ID,{@link Constants#KEY_RUM_ACTION_ID}
      */
@@ -220,7 +224,8 @@ public class ActionBean {
             }
 
         } catch (JSONException e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, Log.getStackTraceString(e));
+
         }
 
     }

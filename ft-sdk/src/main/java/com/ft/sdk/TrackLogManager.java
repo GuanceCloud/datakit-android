@@ -1,6 +1,8 @@
 
 package com.ft.sdk;
 
+import android.util.Log;
+
 import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.bean.BaseContentBean;
 import com.ft.sdk.garble.bean.LogBean;
@@ -84,7 +86,7 @@ public class TrackLogManager {
                         }
                     }
                 } catch (Exception e) {
-                    LogUtils.e(TAG, e.getMessage());
+                    LogUtils.e(TAG, Log.getStackTraceString(e));
                 } finally {
                     isRunning = false;
                 }

@@ -7,6 +7,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
 import com.ft.sdk.FTApplication;
 
@@ -79,7 +80,7 @@ public class NetUtils {
         try {
             networkType = telephonyManager.getNetworkType();
         } catch (Exception ex) {
-            LogUtils.e(TAG, ex.getMessage());
+            LogUtils.e(TAG, Log.getStackTraceString(ex));
             return NETWORK_UNKNOWN;
         }
 
@@ -183,7 +184,8 @@ public class NetUtils {
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LogUtils.e(TAG, Log.getStackTraceString(e));
+
                 }
             } else if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
                 return getWifiIp();

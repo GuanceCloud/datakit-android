@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -352,7 +353,7 @@ public class FTDBManager extends DBManager {
                     }
                     cursor.close();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LogUtils.e(TAG, Log.getStackTraceString(e));
                 }
             }
         });
@@ -411,7 +412,8 @@ public class FTDBManager extends DBManager {
                     }
                     cursor.close();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LogUtils.e(TAG, Log.getStackTraceString(e));
+
                 }
             }
         });
@@ -526,7 +528,7 @@ public class FTDBManager extends DBManager {
                     count[0] = cursor.getInt(0);
                     cursor.close();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LogUtils.e(TAG, Log.getStackTraceString(e));
                 }
             }
         });
@@ -547,7 +549,8 @@ public class FTDBManager extends DBManager {
                 try {
                     db.execSQL("DELETE FROM ft_operation_record where _id in (SELECT _id from ft_operation_record where " + FTSQL.RECORD_COLUMN_DATA_TYPE + "='" + type.getValue() + "' ORDER by tm ASC LIMIT " + limit + ")");
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LogUtils.e(TAG, Log.getStackTraceString(e));
+
                 }
             }
         });

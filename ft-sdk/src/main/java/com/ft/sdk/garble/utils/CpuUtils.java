@@ -1,18 +1,13 @@
 package com.ft.sdk.garble.utils;
 
-import android.os.Build;
 import android.os.Process;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * BY huangDianHua
@@ -20,6 +15,8 @@ import java.util.List;
  * Description: 获取设备 CPU 相关数据指标
  */
 public class CpuUtils {
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "CpuUtils";
+
     private CpuUtils() {
     }
 
@@ -40,7 +37,7 @@ public class CpuUtils {
     private RandomAccessFile mSelfStatFile;
 
     /**
-     *  CPU 最近一次跳动次数
+     * CPU 最近一次跳动次数
      */
     private Long mLastCpuTime;
 
@@ -98,7 +95,8 @@ public class CpuUtils {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, Log.getStackTraceString(e));
+
         } finally {
             if (process != null) {
                 process.destroy();
@@ -161,6 +159,7 @@ public class CpuUtils {
 
     /**
      * 获取应用 CPU 跳动次数
+     *
      * @return
      */
     public long getAppCPUTickCount() {

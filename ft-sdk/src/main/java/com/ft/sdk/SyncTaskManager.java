@@ -4,6 +4,7 @@ package com.ft.sdk;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -131,7 +132,7 @@ public class SyncTaskManager {
                         }
 
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        LogUtils.e(TAG, Log.getStackTraceString(e));
                     } finally {
                         running = false;
                         LogUtils.d(TAG, " \n********************************************************\n" +
@@ -256,7 +257,7 @@ public class SyncTaskManager {
         try {
             syncCallback.onResponse(result.getCode(), result.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtils.e(TAG,Log.getStackTraceString(e));
             syncCallback.onResponse(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, e.getLocalizedMessage());
             LogUtils.e(TAG, "上传错误：" + e.getLocalizedMessage());
         }

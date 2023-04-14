@@ -1,5 +1,7 @@
 package com.ft.sdk;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.FTAutoTrackConfigManager;
@@ -22,7 +24,7 @@ import java.util.HashMap;
  * Description:
  */
 public class FTSdk {
-    public final static String TAG = "[FT-SDK]";
+    public final static String TAG = Constants.LOG_TAG_PREFIX + "FTSdk";
     public static final String NATIVE_DUMP_PATH = "ftCrashDmp";
     //该变量不能改动，其值由 Plugin 动态改写
     public static String PLUGIN_VERSION = "";
@@ -170,7 +172,7 @@ public class FTSdk {
             config.setServiceName(get().getBaseConfig().getServiceName());
             FTRUMConfigManager.get().initWithConfig(config);
         } catch (Exception e) {
-            LogUtils.e(TAG, e.getMessage());
+            LogUtils.e(TAG, Log.getStackTraceString(e));
         }
 
     }
@@ -184,7 +186,7 @@ public class FTSdk {
         try {
             FTTraceConfigManager.get().initWithConfig(config);
         } catch (Exception e) {
-            LogUtils.e(TAG, e.getMessage());
+            LogUtils.e(TAG, Log.getStackTraceString(e));
         }
     }
 
@@ -198,7 +200,7 @@ public class FTSdk {
             config.setServiceName(get().getBaseConfig().getServiceName());
             FTLoggerConfigManager.get().initWithConfig(config);
         } catch (Exception e) {
-            LogUtils.e(TAG, e.getMessage());
+            LogUtils.e(TAG, Log.getStackTraceString(e));
         }
     }
 

@@ -1,10 +1,14 @@
 package com.ft.sdk;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.ErrorType;
 import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
+import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.io.File;
@@ -20,6 +24,7 @@ import java.nio.charset.Charset;
  * description:崩溃日志处理
  */
 public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "FTExceptionHandler";
 
     /**
      * Android tombstone 文件前缀
@@ -182,7 +187,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
 
                                 Utils.deleteFile(item.getAbsolutePath());
                             } catch (IOException e) {
-                                e.printStackTrace();
+                                LogUtils.e(TAG, Log.getStackTraceString(e));
                             }
                         }
                     }

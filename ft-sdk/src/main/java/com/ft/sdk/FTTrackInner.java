@@ -1,5 +1,7 @@
 package com.ft.sdk;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.FTDBCachePolicy;
@@ -89,8 +91,7 @@ public class FTTrackInner {
                     LogUtils.d(TAG, "syncDataBackground:" + dataType.toString() + ":insert-result=" + result);
                     SyncTaskManager.get().executeSyncPoll();
                 } catch (Exception e) {
-                    e.printStackTrace();
-                    LogUtils.e(TAG, e.getMessage());
+                    LogUtils.e(TAG, Log.getStackTraceString(e));
                 }
             }
         });
@@ -124,7 +125,7 @@ public class FTTrackInner {
                                 callback.onResponse(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, e.getMessage());
                             }
                         }
-                        LogUtils.e(TAG, e.getMessage());
+                        LogUtils.e(TAG,Log.getStackTraceString(e));
                     }
                 }
             }
@@ -203,13 +204,13 @@ public class FTTrackInner {
                         datas.add(SyncJsonData.getFromLogBean(logBean, DataType.LOG));
                     }
                 } catch (Exception e) {
-                    LogUtils.e(TAG, e.getMessage());
+                    LogUtils.e(TAG,Log.getStackTraceString(e));
                 }
 
             }
             judgeLogCachePolicy(datas);
         } catch (Exception e) {
-            LogUtils.e(TAG, e.getMessage());
+            LogUtils.e(TAG,Log.getStackTraceString(e));
         }
 
     }
@@ -220,7 +221,7 @@ public class FTTrackInner {
 //            try {
 //                datas.add(SyncJsonData.getFromLogBean(logBean, DataType.TRACE));
 //            } catch (Exception e) {
-//                LogUtils.e(TAG, e.getMessage());
+//                LogUtils.e(TAG,Log.getStackTraceString(e));
 //            }
 //
 //        }

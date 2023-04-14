@@ -1,5 +1,7 @@
 package com.ft.sdk.garble.utils;
 
+import static com.ft.sdk.garble.utils.Utils.getSharedPreferences;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
@@ -14,6 +16,7 @@ import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 
 import com.ft.sdk.FTApplication;
 
@@ -24,16 +27,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
-import java.text.DecimalFormat;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.ft.sdk.garble.utils.Utils.getSharedPreferences;
 
 /**
  * BY huangDianHua
@@ -140,7 +139,7 @@ public class DeviceUtils {
         try {
             androidID = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
         } catch (Exception e) {
-            LogUtils.e(TAG, e.getMessage());
+            LogUtils.e(TAG, Log.getStackTraceString(e));
 
         }
         return androidID;
@@ -166,7 +165,7 @@ public class DeviceUtils {
             ApplicationInfo info = manager.getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
             return info.loadLabel(manager).toString();
         } catch (Exception e) {
-            LogUtils.e(TAG, e.getMessage());
+            LogUtils.e(TAG, Log.getStackTraceString(e));
 
         }
         return "";
@@ -248,7 +247,7 @@ public class DeviceUtils {
             strings[1] = Utils.formatDouble((data[0] - data[1]) * 100.0 / data[0]);
             return strings;
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, Log.getStackTraceString(e));
             return new double[]{0.00, 0.00};
         }
     }
@@ -278,9 +277,9 @@ public class DeviceUtils {
             }
             return memorySize * 1000;
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, Log.getStackTraceString(e));
         } catch (IOException e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, Log.getStackTraceString(e));
         }
         return memorySize;
 
@@ -301,7 +300,8 @@ public class DeviceUtils {
             appTime = Long.parseLong(appStats[19]);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, Log.getStackTraceString(e));
+
         }
         return appTime;
     }
@@ -356,13 +356,13 @@ public class DeviceUtils {
                         }
                     }
                 } catch (Exception e) {
-                    LogUtils.e(TAG, e.getMessage());
+                    LogUtils.e(TAG, Log.getStackTraceString(e));
                 }
             } else {
                 LogUtils.e(TAG, "没有获得到 READ_PHONE_STATE 权限无法获取运营商信息");
             }
         } catch (Exception e) {
-            LogUtils.e(TAG, e.getMessage());
+            LogUtils.e(TAG, Log.getStackTraceString(e));
         }
         return null;
     }
@@ -395,7 +395,8 @@ public class DeviceUtils {
                 return carrier;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, Log.getStackTraceString(e));
+
         }
         return alternativeName;
     }
@@ -423,13 +424,14 @@ public class DeviceUtils {
                 stringBuilder.append(line);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, Log.getStackTraceString(e));
         } finally {
             if (bf != null) {
                 try {
                     bf.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LogUtils.e(TAG, Log.getStackTraceString(e));
+
                 }
             }
         }

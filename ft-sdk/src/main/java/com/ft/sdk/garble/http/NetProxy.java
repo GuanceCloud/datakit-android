@@ -1,5 +1,7 @@
 package com.ft.sdk.garble.http;
 
+import android.util.Log;
+
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.utils.Constants;
@@ -88,7 +90,8 @@ public class NetProxy {
                     try {
                         return con.newInstance(code, message);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        LogUtils.e(TAG, Log.getStackTraceString(e));
+
                     }
                 }
             }

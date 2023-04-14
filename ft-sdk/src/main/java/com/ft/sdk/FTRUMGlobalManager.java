@@ -2,6 +2,7 @@ package com.ft.sdk;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import com.ft.sdk.garble.bean.ActionBean;
 import com.ft.sdk.garble.bean.ActiveActionBean;
@@ -141,7 +142,7 @@ public class FTRUMGlobalManager {
     }
 
     /**
-     *  添加 action
+     * 添加 action
      *
      * @param actionName action 名称
      * @param actionType action 类型
@@ -555,14 +556,14 @@ public class FTRUMGlobalManager {
 
 
             } catch (JSONException e) {
-                LogUtils.e(TAG, e.getMessage());
+                LogUtils.e(TAG, Log.getStackTraceString(e));
             }
 
             FTTrackInner.getInstance().rum(dateline, Constants.FT_MEASUREMENT_RUM_ERROR, tags, fields);
             increaseError(tags);
 
         } catch (Exception e) {
-            LogUtils.e(TAG, e.getMessage());
+            LogUtils.e(TAG, Log.getStackTraceString(e));
         }
 
     }
@@ -594,7 +595,7 @@ public class FTRUMGlobalManager {
             increaseLongTask(tags);
 
         } catch (Exception e) {
-            LogUtils.e(TAG, e.getMessage());
+            LogUtils.e(TAG, Log.getStackTraceString(e));
         }
     }
 
@@ -774,7 +775,7 @@ public class FTRUMGlobalManager {
                 increaseError(tags);
             }
         } catch (Exception e) {
-            LogUtils.e(TAG, e.toString());
+            LogUtils.e(TAG, Log.getStackTraceString(e));
         }
 
         EventConsumerThreadPool.get().execute(new Runnable() {
@@ -789,7 +790,7 @@ public class FTRUMGlobalManager {
     /**
      * 设置网络传输内容
      *
-     * @param resourceId 资源 id
+     * @param resourceId    资源 id
      * @param params
      * @param netStatusBean
      */
@@ -827,7 +828,7 @@ public class FTRUMGlobalManager {
             bean.resourceUrlQuery = url.getQuery();
 
         } catch (MalformedURLException | URISyntaxException e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, Log.getStackTraceString(e));
         }
 
         bean.requestHeader = params.requestHeader;
@@ -968,7 +969,7 @@ public class FTRUMGlobalManager {
                 }
             }
         } catch (JSONException e) {
-            LogUtils.e(TAG, e.getMessage());
+            LogUtils.e(TAG, Log.getStackTraceString(e));
         }
     }
 
@@ -986,12 +987,12 @@ public class FTRUMGlobalManager {
                             FTRUMGlobalManager.this.generateActionSum(tags);
                             FTRUMGlobalManager.this.generateViewSum(tags);
                         } catch (JSONException e) {
-                            LogUtils.e(TAG, e.getMessage());
+                            LogUtils.e(TAG, Log.getStackTraceString(e));
                         }
                     }
                 });
             } catch (Exception e) {
-                LogUtils.e(TAG, e.getMessage());
+                LogUtils.e(TAG, Log.getStackTraceString(e));
 
             }
         }
@@ -1039,7 +1040,7 @@ public class FTRUMGlobalManager {
                 FTTrackInner.getInstance().rum(bean.getStartTime(),
                         Constants.FT_MEASUREMENT_RUM_ACTION, tags, fields);
             } catch (JSONException e) {
-                LogUtils.e(TAG, e.getMessage());
+                LogUtils.e(TAG, Log.getStackTraceString(e));
             }
             FTDBManager.get().cleanCloseActionData();
         }
@@ -1107,7 +1108,7 @@ public class FTRUMGlobalManager {
 
 
             } catch (JSONException e) {
-                LogUtils.e(TAG, e.getMessage());
+                LogUtils.e(TAG, Log.getStackTraceString(e));
             }
 
             FTTrackInner.getInstance().rum(bean.getStartTime(),

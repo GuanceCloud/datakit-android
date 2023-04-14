@@ -20,6 +20,8 @@ import java.util.Set;
 
 import static com.ft.sdk.garble.http.NetCodeStatus.UNKNOWN_EXCEPTION_CODE;
 
+import android.util.Log;
+
 
 /**
  * BY huangDianHua
@@ -83,7 +85,8 @@ public class NativeNetEngine implements INetEngine {
                 connSuccess = true;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, Log.getStackTraceString(e));
+
         }
         return connSuccess;
     }
@@ -96,7 +99,7 @@ public class NativeNetEngine implements INetEngine {
             //设置连接方式
             mConnection.setRequestMethod(mHttpBuilder.getMethod().method);
         } catch (ProtocolException e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, Log.getStackTraceString(e));
         }
         //设置连接和读取超时时间
         mConnection.setConnectTimeout(FTHttpConfigManager.get().sendOutTime);
@@ -175,7 +178,8 @@ public class NativeNetEngine implements INetEngine {
             responseCode = NetCodeStatus.FILE_IO_EXCEPTION_CODE;
         } catch (Exception e) {
             //其他异常未知错误
-            e.printStackTrace();
+            LogUtils.e(TAG, Log.getStackTraceString(e));
+
         } finally {
             close(mConnection, outputStream, reader, inputStreamReader, inputStream);
         }
@@ -205,28 +209,29 @@ public class NativeNetEngine implements INetEngine {
                 outputStream.close();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, Log.getStackTraceString(e));
         }
         try {
             if (reader != null) {
                 reader.close();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, Log.getStackTraceString(e));
         }
         try {
             if (inputStreamReader != null) {
                 inputStreamReader.close();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, Log.getStackTraceString(e));
         }
         try {
             if (inputStream != null) {
                 inputStream.close();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, Log.getStackTraceString(e));
+
         }
     }
 

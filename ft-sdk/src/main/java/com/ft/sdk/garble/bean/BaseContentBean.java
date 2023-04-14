@@ -1,5 +1,7 @@
 package com.ft.sdk.garble.bean;
 
+import android.util.Log;
+
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -85,7 +87,7 @@ public class BaseContentBean {
         try {
             fields.put(Constants.KEY_MESSAGE, content);
         } catch (JSONException e) {
-            e.printStackTrace();
+            LogUtils.e(TAG,Log.getStackTraceString(e));
         }
         return fields;
     }
@@ -100,7 +102,7 @@ public class BaseContentBean {
                 tags.put(Constants.KEY_SERVICE, serviceName);
             }
         } catch (JSONException e) {
-            e.printStackTrace();
+            LogUtils.e(TAG,Log.getStackTraceString(e));
         }
 
         return tags;
@@ -126,7 +128,7 @@ public class BaseContentBean {
             try {
                 this.tags.put(key, tags.get(key));
             } catch (JSONException e) {
-                LogUtils.e(TAG, e.getMessage());
+                LogUtils.e(TAG, Log.getStackTraceString(e));
             }
 
         }

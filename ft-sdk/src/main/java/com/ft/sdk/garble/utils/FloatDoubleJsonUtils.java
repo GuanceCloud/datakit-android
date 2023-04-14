@@ -1,5 +1,7 @@
 package com.ft.sdk.garble.utils;
 
+import android.util.Log;
+
 import com.google.gson.GsonBuilder;
 
 import org.json.JSONArray;
@@ -31,7 +33,7 @@ public class FloatDoubleJsonUtils {
         try {
             return new GsonBuilder().serializeNulls().create().toJson(toMap(json));
         } catch (JSONException e) {
-            LogUtils.e(TAG, e.getMessage());
+            LogUtils.e(TAG, Log.getStackTraceString(e));
             return "{}";
         }
 

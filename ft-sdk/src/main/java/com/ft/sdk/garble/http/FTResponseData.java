@@ -1,5 +1,10 @@
 package com.ft.sdk.garble.http;
 
+import android.util.Log;
+
+import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.LogUtils;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -11,6 +16,7 @@ import java.net.HttpURLConnection;
  * Description:
  */
 public class FTResponseData extends ResponseData {
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "FTResponseData";
     /**
      * http code
      */
@@ -41,7 +47,7 @@ public class FTResponseData extends ResponseData {
                 errorCode = NetCodeStatus.NET_STATUS_RESPONSE_NOT_JSON_ERR;
                 message = data;
             } catch (Exception e) {
-                e.printStackTrace();
+                LogUtils.e(TAG, Log.getStackTraceString(e));
             }
 
         }

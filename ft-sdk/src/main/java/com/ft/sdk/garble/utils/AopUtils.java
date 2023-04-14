@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -34,6 +35,8 @@ import java.lang.reflect.Method;
  * 中的 AopUtil.java 类
  */
 public class AopUtils {
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "AopUtils";
+
     /**
      * 通过 View 的 ID 获取 View 上的字符串值
      *
@@ -74,7 +77,8 @@ public class AopUtils {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, Log.getStackTraceString(e));
+
         }
         return activity;
     }
@@ -109,7 +113,8 @@ public class AopUtils {
             try {
                 return ((Class) object).getSuperclass().getSimpleName();
             } catch (Exception e) {
-                e.printStackTrace();
+                LogUtils.e(TAG, Log.getStackTraceString(e));
+
             }
         }
         return object.getClass().getSuperclass().getSimpleName();

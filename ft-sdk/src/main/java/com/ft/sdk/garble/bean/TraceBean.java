@@ -1,5 +1,9 @@
 package com.ft.sdk.garble.bean;
 
+import android.util.Log;
+
+import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONException;
@@ -11,6 +15,8 @@ import org.json.JSONObject;
  * description:日志对象(SDK内部使用)
  */
 public class TraceBean extends BaseContentBean {
+
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "TraceBean";
     /**
      * 用于链路日志，表示当前 span 的上一个 span的 ID
      */
@@ -44,7 +50,7 @@ public class TraceBean extends BaseContentBean {
     String operationName;
 
     /**
-     *  trace 执行时间
+     * trace 执行时间
      */
     long duration;
 
@@ -68,6 +74,7 @@ public class TraceBean extends BaseContentBean {
 
     /**
      * 获取所有链路中指标数据
+     *
      * @return
      */
     public JSONObject getAllFields() {
@@ -77,13 +84,14 @@ public class TraceBean extends BaseContentBean {
                 fields.put("duration", duration);
             }
         } catch (JSONException e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, Log.getStackTraceString(e));
         }
         return fields;
     }
 
     /**
      * 获取所有链路中标签数据
+     *
      * @return
      */
     public JSONObject getAllTags() {
@@ -115,7 +123,8 @@ public class TraceBean extends BaseContentBean {
             }
 
         } catch (JSONException e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, Log.getStackTraceString(e));
+
         }
 
         return tags;
