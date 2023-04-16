@@ -155,6 +155,8 @@ public class FTTransform extends Transform {
                                 break;
                             case ADDED:
                             case CHANGED:
+
+
                                 try {
                                     FileUtils.touch(destFile);
                                 } catch (IOException e) {

@@ -7,11 +7,13 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.ft.sdk.FTLogger;
+import com.ft.sdk.garble.annotation.IgnoreAOP;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.reflect.ReflectUtils;
@@ -116,6 +118,13 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.main_manual_rum_btn).setOnClickListener(v -> {
             startActivity(new Intent(MainActivity.this, ManualRUMActivity.class));
 
+        });
+        findViewById(R.id.main_aop_ignore).setOnClickListener(new View.OnClickListener() {
+            @Override
+            @IgnoreAOP
+            public void onClick(View v) {
+
+            }
         });
     }
 

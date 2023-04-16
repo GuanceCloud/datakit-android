@@ -1,3 +1,7 @@
+# plugin 1.1.4-alpha01
+1.支持 Annotation IgnoreAOP
+
+---
 # plugin 1.1.3-beta01
 1.优化 com.google.android.material:material 控件调用
 

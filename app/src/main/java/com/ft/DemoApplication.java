@@ -1,8 +1,6 @@
 package com.ft;
 
-import android.app.Application;
 import android.content.Context;
-import android.net.Uri;
 
 import com.ft.sdk.DeviceMetricsMonitorType;
 import com.ft.sdk.EnvType;
@@ -13,6 +11,7 @@ import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
 import com.ft.sdk.TraceType;
+import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.bean.UserData;
 
 import java.util.HashMap;
@@ -22,7 +21,7 @@ import java.util.HashMap;
  * DATE:2019-12-02 15:15
  * Description:
  */
-public class DemoApplication extends Application {
+public class DemoApplication extends BaseApplication {
     private static Context instance;
 
     public static Context getContext() {
@@ -50,6 +49,7 @@ public class DemoApplication extends Application {
                 .setSamplingRate(1f)
                 .setEnableCustomLog(true)
                 .setEnableConsoleLog(true)
+                .setLogLevelFilters(new Status[]{Status.ERROR})
                 .setEnableLinkRumData(true)
         );
 

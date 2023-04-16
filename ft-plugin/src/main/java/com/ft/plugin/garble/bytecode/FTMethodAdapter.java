@@ -26,6 +26,7 @@ import com.ft.plugin.garble.FTSubMethodCell;
 import com.ft.plugin.garble.FTUtil;
 import com.ft.plugin.garble.Logger;
 
+import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -41,6 +42,7 @@ import java.util.List;
  * 访问类方法结构
  */
 public class FTMethodAdapter extends AdviceAdapter {
+    private static final String IGNORE_ANNOTATION_DESC = "Lcom/ft/sdk/garble/annotation/IgnoreAOP;";
     private String[] interfaces;
     private String className;
     private String superName;
@@ -274,12 +276,14 @@ public class FTMethodAdapter extends AdviceAdapter {
     }
 
     void handleCode() {
+        if(needSkip)return;
         /*
          * 写Application方法
          */
         if (FTUtil.isInstanceOfApplication(superName)) {
             FTMethodCell ftMethodCell = FTHookConfig.APPLICATION_METHODS.get(nameDesc);
             if (ftMethodCell != null) {
+                Logger.debug("Application:"+className+":"+needSkip);
                 handleCode(ftMethodCell);
                 isHasTracked = true;
                 return;
@@ -447,12 +451,37 @@ public class FTMethodAdapter extends AdviceAdapter {
         }
     }
 
+    /**
+     * 是否为第三方或内部 WebView 方法
+     *
+     * @param className
+     * @param superName
+     * @param methodNameDesc
+     * @return
+     */
     private boolean isWebViewInner(String className, String superName, String methodNameDesc) {
         return (ClassNameAnalytics.isDCloud(className)
                 || ClassNameAnalytics.isTencent(className)
                 || ClassNameAnalytics.isTaoBao(className)
                 || superName.equals(Constants.CLASS_NAME_WEBVIEW))
                 && TARGET_WEBVIEW_METHOD.contains(methodNameDesc);
+    }
+
+
+    /**
+     * Annotation 访问
+     * @param descriptor the class descriptor of the annotation class.
+     * @param visible {@literal true} if the annotation is visible at runtime.
+     * @return
+     */
+    @Override
+    public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
+        if (IGNORE_ANNOTATION_DESC.equals(descriptor)) {
+            Logger.debug("ignore:" + className + ":" + methodName);
+            needSkip = true;
+            return null;
+        }
+        return super.visitAnnotation(descriptor, visible);
     }
 }
 

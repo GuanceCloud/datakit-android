@@ -71,6 +71,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="自定义 RUM LOG" />
+
+        <Button
+            android:id="@+id/main_aop_ignore"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="AOP Ignore Example" />
     </LinearLayout>
 
 
