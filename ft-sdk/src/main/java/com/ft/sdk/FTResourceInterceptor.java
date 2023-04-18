@@ -5,6 +5,8 @@ import androidx.annotation.NonNull;
 import com.ft.sdk.garble.bean.NetStatusBean;
 import com.ft.sdk.garble.bean.ResourceParams;
 import com.ft.sdk.garble.http.NetStatusMonitor;
+import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.io.IOException;
@@ -25,6 +27,9 @@ import okhttp3.internal.http.HttpHeaders;
  * @author Brandon
  */
 public class FTResourceInterceptor extends NetStatusMonitor implements Interceptor {
+
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "FTResourceInterceptor";
+
     /**
      * @param chain
      * @return
@@ -54,6 +59,7 @@ public class FTResourceInterceptor extends NetStatusMonitor implements Intercept
         }
 
         String resourceId = Utils.identifyRequest(request);
+        LogUtils.d(TAG, "intercept id:" + url + "," + resourceId);
         FTRUMGlobalManager.get().startResource(resourceId);
         ResourceParams params = new ResourceParams();
         params.url = url;

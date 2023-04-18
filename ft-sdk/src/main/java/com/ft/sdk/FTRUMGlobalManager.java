@@ -245,12 +245,15 @@ public class FTRUMGlobalManager {
      * @param resourceId 资源 Id
      */
     public void startResource(String resourceId, HashMap<String, Object> property) {
+        LogUtils.d(TAG, "startResource:" + resourceId);
         ResourceBean bean = new ResourceBean();
         if (property != null) {
             bean.property.putAll(property);
         }
         attachRUMRelativeForResource(bean);
-        resourceBeanMap.put(resourceId, bean);
+        synchronized (resourceBeanMap) {
+            resourceBeanMap.put(resourceId, bean);
+        }
         final String actionId = bean.actionId;
         final String viewId = bean.viewId;
         EventConsumerThreadPool.get().execute(new Runnable() {
@@ -268,6 +271,7 @@ public class FTRUMGlobalManager {
      * @param resourceId 资源 Id
      */
     public void stopResource(String resourceId) {
+        LogUtils.d(TAG, "stopResource:" + resourceId);
         stopResource(resourceId, null);
     }
 
@@ -610,9 +614,12 @@ public class FTRUMGlobalManager {
     }
 
     void setNetState(String resourceId, NetStatusBean netStatusBean) {
+        LogUtils.d(TAG, "setNetState:" + resourceId);
+
         ResourceBean bean = resourceBeanMap.get(resourceId);
 
         if (bean == null) {
+            LogUtils.e(TAG, "setNetState:" + resourceId + ",bean null");
             return;
         }
         bean.resourceDNS = netStatusBean.getDNSTime();
@@ -634,16 +641,21 @@ public class FTRUMGlobalManager {
      * @param resourceId 资源 id
      */
     void putRUMResourcePerformance(final String resourceId) {
+        LogUtils.d(TAG, "putRUMResourcePerformance:" + resourceId);
         ResourceBean bean = resourceBeanMap.get(resourceId);
 
         if (bean == null) {
+            LogUtils.e(TAG, "putRUMResourcePerformance:" + resourceId + ",bean null");
             return;
         }
         if (bean.resourceStatus < HttpsURLConnection.HTTP_OK) {
             EventConsumerThreadPool.get().execute(new Runnable() {
                 @Override
                 public void run() {
+                    synchronized (resourceBeanMap) {
+                    LogUtils.d(TAG, "net error remove id:" + resourceId);
                     resourceBeanMap.remove(resourceId);
+                    }
                     FTTraceManager.get().removeByAddResource(resourceId);
                 }
             });
@@ -781,7 +793,10 @@ public class FTRUMGlobalManager {
         EventConsumerThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
-                resourceBeanMap.remove(resourceId);
+                synchronized (resourceBeanMap) {
+                    LogUtils.d(TAG, "final remove id:" + resourceId);
+                    resourceBeanMap.remove(resourceId);
+                }
                 FTTraceManager.get().removeByAddResource(resourceId);
             }
         });
@@ -818,6 +833,7 @@ public class FTRUMGlobalManager {
         ResourceBean bean = resourceBeanMap.get(resourceId);
 
         if (bean == null || params.resourceStatus < HttpsURLConnection.HTTP_OK) {
+            LogUtils.d(TAG, "setTransformContent bean:" + bean);
             return;
         }
         try {
@@ -1168,6 +1184,7 @@ public class FTRUMGlobalManager {
      * @param bean
      */
     void checkToAddResource(String key, ResourceBean bean) {
+        LogUtils.d(TAG, "checkToAddResource:" + key + ",header" + bean.requestHeader + "," + bean.url);
         if (bean.contentSet && bean.netStateSet) {
             putRUMResourcePerformance(key);
         }

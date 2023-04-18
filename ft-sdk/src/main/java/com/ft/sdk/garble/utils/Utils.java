@@ -434,6 +434,11 @@ public class Utils {
         return System.currentTimeMillis() * 1000000L + System.nanoTime() % 1000000L;
     }
 
+    /**
+     * 生成相对唯一的 resourceId
+     * @param request
+     * @return
+     */
 
     public static String identifyRequest(Request request) {
         String method = request.method();
