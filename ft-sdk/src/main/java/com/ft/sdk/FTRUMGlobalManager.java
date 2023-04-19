@@ -613,6 +613,11 @@ public class FTRUMGlobalManager {
         addLongTask(log, duration, null);
     }
 
+    /**
+     * 传输网络连接指标参数
+     * @param resourceId
+     * @param netStatusBean
+     */
     void setNetState(String resourceId, NetStatusBean netStatusBean) {
         LogUtils.d(TAG, "setNetState:" + resourceId);
 

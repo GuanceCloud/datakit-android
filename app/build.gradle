@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 //apply plugin: 'com.guardsquare.proguard'
 
 android {
-    compileSdkVersion 33
+    compileSdk 33
     namespace "com.ft"
 
     defaultConfig {
@@ -43,13 +43,13 @@ android {
             jniLibs.srcDirs = ['libs']
         }
     }
-    packagingOptions {
+    packaging {
         resources {
             excludes += ['META-INF/DEPENDENCIES']
         }
     }
 
-    flavorDimensions "tier"
+    flavorDimensions  "tier"
 
     productFlavors {
 

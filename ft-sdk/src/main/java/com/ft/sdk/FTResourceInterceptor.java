@@ -2,16 +2,13 @@ package com.ft.sdk;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.garble.bean.NetStatusBean;
 import com.ft.sdk.garble.bean.ResourceParams;
-import com.ft.sdk.garble.http.NetStatusMonitor;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.io.IOException;
 
-import okhttp3.Call;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.Request;
@@ -21,12 +18,12 @@ import okhttp3.internal.http.HttpHeaders;
 
 /**
  * OKHttp Resource Interceptor
- *
+ * <p>
  * 记录 RUM Resource 指标数据
  *
  * @author Brandon
  */
-public class FTResourceInterceptor extends NetStatusMonitor implements Interceptor {
+public class FTResourceInterceptor implements Interceptor {
 
     private static final String TAG = Constants.LOG_TAG_PREFIX + "FTResourceInterceptor";
 
@@ -59,7 +56,7 @@ public class FTResourceInterceptor extends NetStatusMonitor implements Intercept
         }
 
         String resourceId = Utils.identifyRequest(request);
-        LogUtils.d(TAG, "intercept id:" + url + "," + resourceId);
+        LogUtils.d(TAG, "intercept id:" + resourceId);
         FTRUMGlobalManager.get().startResource(resourceId);
         ResourceParams params = new ResourceParams();
         params.url = url;
@@ -92,17 +89,6 @@ public class FTResourceInterceptor extends NetStatusMonitor implements Intercept
         FTRUMGlobalManager.get().setTransformContent(resourceId, params);
         FTRUMGlobalManager.get().stopResource(resourceId);
         return response;
-    }
-
-    /**
-     * 记录网络请求中耗时指标 {@link NetStatusBean},在 {@link  okhttp3.EventListener#callEnd(Call)} 时进行调用
-     *
-     * @param requestId
-     * @param bean
-     */
-    @Override
-    protected void getNetStatusInfoWhenCallEnd(String requestId, NetStatusBean bean) {
-        FTRUMGlobalManager.get().setNetState(requestId, bean);
     }
 
 

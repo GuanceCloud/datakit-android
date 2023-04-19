@@ -1,4 +1,4 @@
-package com.ft.sdk.garble.http;
+package com.ft.sdk;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,9 +18,10 @@ import okhttp3.Protocol;
 
 /**
  * 配合 OKHttp {@link EventListener} 获取网络请求 dns、ssl、tcp 等时间点指标
+ *
  * @author Brandon
  */
-public abstract class NetStatusMonitor extends EventListener {
+public class FTResourceEventListener extends EventListener {
 
     private String requestHost = null;
     private long fetchStartTime = -1;
@@ -33,7 +34,11 @@ public abstract class NetStatusMonitor extends EventListener {
     private long tcpStartTime = -1;
     private long tcpEndTime = -1;
 
-    protected abstract void getNetStatusInfoWhenCallEnd(String requestId, NetStatusBean bean);
+    private final String resourceId;
+
+    public FTResourceEventListener(String resourceId) {
+        this.resourceId = resourceId;
+    }
 
     @Override
     public void callEnd(@NonNull Call call) {
@@ -49,7 +54,7 @@ public abstract class NetStatusMonitor extends EventListener {
         netStatusBean.sslStartTime = sslStartTime;
         netStatusBean.tcpStartTime = tcpStartTime;
         netStatusBean.tcpEndTime = tcpEndTime;
-        getNetStatusInfoWhenCallEnd(Utils.identifyRequest(call.request()), netStatusBean);
+        FTRUMGlobalManager.get().setNetState(this.resourceId, netStatusBean);
     }
 
     @Override
@@ -115,6 +120,19 @@ public abstract class NetStatusMonitor extends EventListener {
     public void connectEnd(@NonNull Call call, @NonNull InetSocketAddress inetSocketAddress, @NonNull Proxy proxy, @Nullable Protocol protocol) {
         super.connectEnd(call, inetSocketAddress, proxy, protocol);
         tcpEndTime = Utils.getCurrentNanoTime();
+    }
+
+    public static class FTFactory implements EventListener.Factory {
+        /**
+         *
+         * @param call
+         * @return
+         */
+        @NonNull
+        @Override
+        public EventListener create(@NonNull Call call) {
+            return new FTResourceEventListener(Utils.identifyRequest(call.request()));
+        }
     }
 
 

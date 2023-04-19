@@ -2,6 +2,7 @@ package com.ft.test.utils;
 
 import androidx.annotation.NonNull;
 
+import com.ft.sdk.FTResourceEventListener;
 import com.ft.sdk.FTResourceInterceptor;
 import com.ft.sdk.FTTraceInterceptor;
 import com.ft.sdk.garble.http.RequestMethod;
@@ -19,11 +20,10 @@ import okhttp3.Response;
  * description:发起一个简单的请求
  */
 public class RequestUtil {
-    static FTResourceInterceptor resourceInterceptor = new FTResourceInterceptor();
     static OkHttpClient client = new OkHttpClient.Builder()
             .addInterceptor(new FTTraceInterceptor())
-            .addInterceptor(resourceInterceptor)
-            .eventListener(resourceInterceptor)
+            .addInterceptor(new FTResourceInterceptor())
+            .eventListenerFactory(new FTResourceEventListener.FTFactory())
             .connectTimeout(10, TimeUnit.SECONDS)
             .build();
 

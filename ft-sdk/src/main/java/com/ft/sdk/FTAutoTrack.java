@@ -49,7 +49,7 @@ public class FTAutoTrack {
      */
     public static void startApp(Object object) {
         try {
-            LogUtils.d(TAG,"startApp");
+            LogUtils.d(TAG, "startApp");
             //判断是否为主进程
             if (Utils.isMainProcess()) {
                 FTActivityLifecycleCallbacks life = new FTActivityLifecycleCallbacks();
@@ -752,16 +752,15 @@ public class FTAutoTrack {
      * @return
      */
     public static OkHttpClient trackOkHttpBuilder(OkHttpClient.Builder builder) {
-        LogUtils.d(TAG,"trackOkHttpBuilder");
+        LogUtils.d(TAG, "trackOkHttpBuilder");
         if (FTTraceConfigManager.get().isEnableAutoTrace()) {
             builder.addInterceptor(new FTTraceInterceptor());
         }
 //            builder.addNetworkInterceptor(interceptor); //发现部分工程有兼容问题
         if (FTRUMConfigManager.get().isRumEnable()) {
             if (FTRUMConfigManager.get().getConfig().isEnableTraceUserResource()) {
-                FTResourceInterceptor interceptor = new FTResourceInterceptor();
-                builder.addInterceptor(interceptor);
-                builder.eventListener(interceptor);
+                builder.addInterceptor(new FTResourceInterceptor());
+                builder.eventListenerFactory(new FTResourceEventListener.FTFactory());
             }
         }
         return builder.build();
