@@ -1,15 +1,21 @@
 package com.ft.plugin;
 
-import com.android.build.gradle.AppExtension;
+import com.android.build.api.instrumentation.FramesComputationMode;
+import com.android.build.api.instrumentation.InstrumentationParameters;
+import com.android.build.api.instrumentation.InstrumentationScope;
+import com.android.build.api.variant.AndroidComponentsExtension;
+import com.android.build.api.variant.Variant;
 import com.ft.plugin.garble.FTExtension;
 import com.ft.plugin.garble.FTMapUploader;
 import com.ft.plugin.garble.Logger;
 import com.ft.plugin.garble.asm.FTTransform;
 
+import org.gradle.api.Action;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
-import java.util.Collections;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
 
 
 
@@ -54,9 +60,7 @@ import java.util.Collections;
 public class FTPlugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
-        AppExtension appExtension = (AppExtension) project.getProperties().get("android");
         project.getExtensions().create("FTExt", FTExtension.class, project);
-        appExtension.registerTransform(new FTTransform(project), Collections.EMPTY_LIST);
 
         project.afterEvaluate(p -> {
             //传参数对象
@@ -68,6 +72,25 @@ public class FTPlugin implements Plugin<Project> {
             f.configMapUpload();
             f.configNativeSymbolUpload();
         });
+
+        AndroidComponentsExtension extension = project.getExtensions().getByType(AndroidComponentsExtension.class);
+        extension.onVariants(extension.selector().all(), new Action<Variant>() {
+            @Override
+            public void execute(Variant variant) {
+                variant.getInstrumentation()
+                        .transformClassesWith(FTTransform.class, InstrumentationScope.PROJECT, new Function1<InstrumentationParameters.None, Unit>() {
+                            @Override
+                            public Unit invoke(InstrumentationParameters.None none) {
+
+                                return Unit.INSTANCE;
+                            }
+                        });
+                variant.getInstrumentation()
+                        .setAsmFramesComputationMode(FramesComputationMode.COMPUTE_FRAMES_FOR_INSTRUMENTED_METHODS);
+
+            }
+        });
+
 
     }
 }

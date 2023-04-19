@@ -16,6 +16,8 @@
  */
 package com.ft.plugin.garble.bytecode;
 
+import static com.ft.plugin.garble.FTUtil.ASM_VERSION;
+
 import com.ft.plugin.BuildConfig;
 import com.ft.plugin.garble.ClassNameAnalytics;
 import com.ft.plugin.garble.VersionUtils;
@@ -23,8 +25,6 @@ import com.ft.plugin.garble.VersionUtils;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
-
-import static com.ft.plugin.garble.FTUtil.ASM_VERSION;
 
 /**
  * 本类借鉴修改了来自 Sensors Data  的项目<a href="https://github.com/sensorsdata/sa-sdk-android-plugin2">sa-sdk-android-plugin2</a>
@@ -35,7 +35,7 @@ public class FTClassAdapter extends ClassVisitor {
     private String superName;
     private String[] interfaces;
 
-    FTClassAdapter(final ClassVisitor cv) {
+    public FTClassAdapter(final ClassVisitor cv) {
         super(ASM_VERSION, cv);
         //Logger.info(">>>> goon scan class ");
     }

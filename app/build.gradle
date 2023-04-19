@@ -112,33 +112,34 @@ dependencies {
 
 
 apply plugin: 'ft-plugin'
+//apply<FTPlugin>()
 
-FTExt {
-    showLog = true
-
-    autoUploadMap = false
-    autoUploadNativeDebugSymbol = false
-    datakitDCAUrl = ft_env.datakitDCAUrl
-    appId = ft_env.rumAppid
-    env = 'common'
-
-    prodFlavors {
-        prodTest {
-            autoUploadMap = true
-            autoUploadNativeDebugSymbol = true
-            datakitDCAUrl = ft_env.datakitDCAUrl
-            appId = ft_env.rumAppid
-            env = ft_env.prodTestEnv
-        }
-        prodPublish {
-            autoUploadMap = true
-            autoUploadNativeDebugSymbol = true
-            datakitDCAUrl = ft_env.datakitDCAUrl
-            appId = ft_env.rumAppid
-            env = ft_env.prodPublishEnv
-        }
-    }
-}
+//FTExt {
+//    showLog = true
+//
+//    autoUploadMap = false
+//    autoUploadNativeDebugSymbol = false
+//    datakitDCAUrl = ft_env.datakitDCAUrl
+//    appId = ft_env.rumAppid
+//    env = 'common'
+//
+//    prodFlavors {
+//        prodTest {
+//            autoUploadMap = true
+//            autoUploadNativeDebugSymbol = true
+//            datakitDCAUrl = ft_env.datakitDCAUrl
+//            appId = ft_env.rumAppid
+//            env = ft_env.prodTestEnv
+//        }
+//        prodPublish {
+//            autoUploadMap = true
+//            autoUploadNativeDebugSymbol = true
+//            datakitDCAUrl = ft_env.datakitDCAUrl
+//            appId = ft_env.rumAppid
+//            env = ft_env.prodPublishEnv
+//        }
+//    }
+//}
 repositories {
     mavenCentral()
 }

@@ -1,15 +1,21 @@
 apply plugin: 'groovy'
+apply plugin: 'org.jetbrains.kotlin.jvm'
+//apply plugin: 'java-library'
+
 apply from: 'maven.gradle'
 
 repositories {
+    google()
     mavenCentral()
-//    jcenter()
 }
 
 dependencies {
-    implementation gradleApi()
-    implementation localGroovy()
-    implementation 'com.android.tools.build:gradle:4.0.1'
+    implementation(gradleApi())
+    implementation("com.android.tools.build:gradle:8.0.0")
+    compileOnly("commons-io:commons-io:2.6")
+    compileOnly("commons-codec:commons-codec:1.15")
+    compileOnly("org.ow2.asm:asm-commons:9.2")
+    compileOnly("org.ow2.asm:asm-tree:9.2")
 }
 
 

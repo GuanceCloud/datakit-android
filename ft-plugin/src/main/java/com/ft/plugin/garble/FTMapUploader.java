@@ -1,13 +1,13 @@
 package com.ft.plugin.garble;
 
 import com.android.build.gradle.AppExtension;
-import com.android.utils.FileUtils;
 
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.UnknownDomainObjectException;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ProjectDependency;
+import org.gradle.internal.impldep.org.apache.commons.io.FileUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -93,8 +93,8 @@ public class FTMapUploader {
                 String zipBuildPath = String.format(zipBuildPathFormat, variantName);
                 try {
                     //删除之前的 cache
-                    FileUtils.deleteIfExists(new File(tmpBuildPath));
-                    FileUtils.deleteIfExists(new File(zipBuildPath));
+                    FileUtils.delete(new File(tmpBuildPath));
+                    FileUtils.delete(new File(zipBuildPath));
                 } catch (IOException e) {
                     Logger.debug("tmp  delete error:" + e.getMessage());
                 }

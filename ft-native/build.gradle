@@ -51,10 +51,6 @@ dependencies {
 
 }
 
-task sourceJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier "sources"
-}
 
 afterEvaluate {
     publishing {
@@ -63,7 +59,6 @@ afterEvaluate {
                 groupId 'com.cloudcare.ft.mobile.sdk.tracker.agent'
                 artifactId 'ft-native'
                 version versionNameStr
-                artifact(sourceJar)
                 artifact("$buildDir/outputs/aar/ft-native-release.aar"){
                     builtBy assemble
                 }
