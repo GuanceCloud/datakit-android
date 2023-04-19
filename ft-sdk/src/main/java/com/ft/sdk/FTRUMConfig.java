@@ -37,7 +37,7 @@ public class FTRUMConfig {
      */
     private boolean enableTraceUserView;
     /**
-     * 是否开启用户欣慰 Resource 追踪
+     * 是否开启用户行为 Resource 追踪
      */
     private boolean enableTraceUserResource;
     /**

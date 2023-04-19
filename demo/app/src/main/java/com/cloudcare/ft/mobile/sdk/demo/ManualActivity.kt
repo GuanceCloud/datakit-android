@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.ft.sdk.FTRUMGlobalManager
+import com.ft.sdk.FTResourceEventListener
 import com.ft.sdk.FTResourceInterceptor
 import com.ft.sdk.FTTraceInterceptor
 import com.ft.sdk.FTTraceManager
@@ -46,9 +47,8 @@ class ManualActivity : AppCompatActivity() {
 
                 val builder = OkHttpClient.Builder()
                 builder.addInterceptor(FTTraceInterceptor())
-                val interceptor = FTResourceInterceptor()
-                builder.addInterceptor(interceptor)
-                builder.eventListener(interceptor)
+                builder.addInterceptor(FTResourceInterceptor())
+                builder.eventListenerFactory(FTResourceEventListener.FTFactory())
                 val client = builder.build()
 
                 try {
