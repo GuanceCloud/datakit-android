@@ -86,7 +86,7 @@ public class ManualRUMActivity extends NameTitleActivity {
         findViewById(R.id.manual_log_btn).setOnClickListener(v -> {
             HashMap<String, Object> property = new HashMap<>();
             property.put("sp_label", "HomePage");
-            FTLogger.getInstance().logBackground("Manual Log", Status.INFO, property);
+            FTLogger.getInstance().logBackground("Manual Log", Status.ERROR, property);
         });
 
     }

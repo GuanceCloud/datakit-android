@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.ft.sdk.FTLogger;
+import com.ft.sdk.FTResourceEventListener;
 import com.ft.sdk.garble.annotation.IgnoreAOP;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.http.RequestMethod;
@@ -32,7 +33,9 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
-    OkHttpClient client = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).build();
+    OkHttpClient client = new OkHttpClient.Builder()
+            .eventListenerFactory(new FTResourceEventListener.FTFactory())
+            .connectTimeout(10, TimeUnit.SECONDS).build();
 
     public Request requestUrl(@NonNull String url) {
         Request.Builder builder = new Request.Builder().url(url).method(RequestMethod.GET.name(), null);
@@ -79,8 +82,8 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.main_mock_click_btn).setOnClickListener(v -> {
         });
         findViewById(R.id.main_mock_log_btn).setOnClickListener(v -> {
-            Log.i(TAG, "console log");
-            FTLogger.getInstance().logBackground("custom Log", Status.INFO);
+            Log.e(TAG, "console log");
+            FTLogger.getInstance().logBackground("custom Log", Status.ERROR);
         });
 
         findViewById(R.id.main_mock_okhttp_btn).setOnClickListener(v -> {
