@@ -3,6 +3,8 @@ package com.cloudcare.ft.mobile.sdk.demo
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import com.cloudcare.ft.mobile.sdk.custom.okhttp.CustomEventListener
+import com.cloudcare.ft.mobile.sdk.custom.okhttp.CustomInterceptor
 import com.ft.sdk.FTRUMGlobalManager
 import com.ft.sdk.FTResourceEventListener
 import com.ft.sdk.FTResourceInterceptor
@@ -15,13 +17,18 @@ import com.ft.sdk.garble.bean.ResourceParams
 import com.ft.sdk.garble.http.RequestMethod
 import com.ft.sdk.garble.utils.LogUtils
 import com.ft.sdk.garble.utils.Utils
-import okhttp3.*
+import okhttp3.Call
 import okhttp3.EventListener
+import okhttp3.Handshake
+import okhttp3.OkHttpClient
+import okhttp3.Protocol
+import okhttp3.Request
+import okhttp3.Response
 import java.io.IOException
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.Proxy
-import java.util.*
+import java.util.UUID
 
 /**
  *  Action Resource 和 Trace  手动方式 示范
@@ -46,9 +53,9 @@ class ManualActivity : AppCompatActivity() {
                     .method("get", null)
 
                 val builder = OkHttpClient.Builder()
-                builder.addInterceptor(FTTraceInterceptor())
-                builder.addInterceptor(FTResourceInterceptor())
-                builder.eventListenerFactory(FTResourceEventListener.FTFactory())
+                    .addInterceptor(FTTraceInterceptor())
+                    .addInterceptor(FTResourceInterceptor())
+                    .eventListenerFactory(FTResourceEventListener.FTFactory())
                 val client = builder.build()
 
                 try {
@@ -60,6 +67,30 @@ class ManualActivity : AppCompatActivity() {
                 }
             }.start()
 
+        }
+
+        findViewById<Button>(R.id.manual_http_custom_interceptor_btn).setOnClickListener {
+            //OKHttp 自定义 EventListener Interceptor
+            Thread {
+                val requestBuilder: Request.Builder = Request.Builder()
+                    .url("https://www.guance.com")
+                    .method("get", null)
+
+                val builder = OkHttpClient.Builder()
+                    .addInterceptor(FTTraceInterceptor())
+                    .addInterceptor(FTResourceInterceptor())
+                    .addInterceptor(CustomInterceptor())
+                    .eventListenerFactory(CustomEventListener())
+                val client = builder.build()
+
+                try {
+                    val response: Response =
+                        client.newCall(requestBuilder.build()).execute()
+                    LogUtils.d("http request", "response:${response.code}")
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+            }.start()
 
         }
 
