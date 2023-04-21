@@ -21,7 +21,7 @@ afterEvaluate {
         publications {
             mavenJar(MavenPublication) {
                 groupId group
-                artifactId 'ft-plugin'
+                artifactId 'ft-plugin-legacy'
                 version version
                 artifact jar
             }
