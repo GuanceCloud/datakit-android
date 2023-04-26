@@ -78,7 +78,7 @@ public class FTPlugin implements Plugin<Project> {
             @Override
             public void execute(Variant variant) {
                 variant.getInstrumentation()
-                        .transformClassesWith(FTTransform.class, InstrumentationScope.PROJECT, new Function1<InstrumentationParameters.None, Unit>() {
+                        .transformClassesWith(FTTransform.class, InstrumentationScope.ALL, new Function1<InstrumentationParameters.None, Unit>() {
                             @Override
                             public Unit invoke(InstrumentationParameters.None none) {
 

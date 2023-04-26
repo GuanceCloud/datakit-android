@@ -1,6 +1,4 @@
 apply plugin: 'groovy'
-apply plugin: 'org.jetbrains.kotlin.jvm'
-//apply plugin: 'java-library'
 
 apply from: 'maven.gradle'
 
