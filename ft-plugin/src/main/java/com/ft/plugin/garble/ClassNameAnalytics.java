@@ -23,21 +23,17 @@ package com.ft.plugin.garble;
  * @author huangdianhua
  */
 public class ClassNameAnalytics {
-    public static final String FT_SDK_PACKAGE = "com.ft.sdk";
-    public static final String FT_SDK = "com.ft.sdk.FTSdk";
 
-    /**
-     * 配置需要排除的类
-     *
-     * @param className
-     * @return
-     */
-    public static boolean isFTSDKFile(String className) {
-        return className.startsWith(FT_SDK_PACKAGE) && !className.equals(FT_SDK + ".class");
-    }
+    private static final String FT_SDK_CLASS = Constants.FT_SDK_PACKAGE + "/FTSdk";
+
 
     public static boolean isFTSdkApi(String className) {
-        return className.equals(FT_SDK);
+        return className.equals(FT_SDK_CLASS);
+    }
+
+    public static boolean isFTSdkPackage(String className) {
+        return className.startsWith(Constants.FT_SDK_PACKAGE)
+                || className.startsWith(Constants.FT_NATIVE_PACKAGE);
     }
 
     public static boolean isDCloud(String className) {
@@ -52,11 +48,9 @@ public class ClassNameAnalytics {
         return className.contains(Constants.CLASS_NAME_TAOBAO_PATH);
     }
 
-    public static boolean isAndroidGenerated(String className) {
-        return className.contains("R$") ||
-                className.contains("R2$") ||
-                className.contains("R.class") ||
-                className.contains("R2.class") ||
-                className.contains("BuildConfig.class");
+    public static boolean isAndroidPackage(String className) {
+        return (className.startsWith("android/")
+                || className.startsWith("androidx/"))
+                || className.startsWith("com/google/android");
     }
 }

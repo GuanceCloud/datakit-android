@@ -26,12 +26,21 @@ import java.util.HashMap;
 public class FTSdk {
     public final static String TAG = Constants.LOG_TAG_PREFIX + "FTSdk";
     public static final String NATIVE_DUMP_PATH = "ftCrashDmp";
-    //该变量不能改动，其值由 Plugin 动态改写
+    /**
+     * 由 Plugin ASM 进行改写，写入的是 Plugin 的版本号
+     */
     public static String PLUGIN_VERSION = "";
+    /**
+     * 改变量 {@link FTSdk#initRUMWithConfig(FTRUMConfig)} 后被初始化，集成后 ft-native 后才会被被赋值
+     */
     public static String NATIVE_VERSION = "";
-    //变量由 Plugin 写入，同一个编译版本，UUID 相同
+    /**
+     * 变量由 Plugin ASM 写入，同一次编译版本 UUID 相同
+     */
     public static String PACKAGE_UUID = "";
-    //下面两个变量也不能随便改动，改动请同时更改 plugin 中对应的值
+    /**
+     * 面两个变量也不能随便改动，改动请同时更改 plugin 中对应的值
+     */
     public static final String AGENT_VERSION = BuildConfig.FT_SDK_VERSION;//当前SDK 版本
     private static FTSdk mFtSdk;
     private final FTSDKConfig mFtSDKConfig;

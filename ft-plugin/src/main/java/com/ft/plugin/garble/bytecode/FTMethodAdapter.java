@@ -66,11 +66,18 @@ public class FTMethodAdapter extends AdviceAdapter {
         this.nameDesc = name + desc;
         //Logger.info(">>>> 开始扫描类 <" + className + "> 的方法:" + methodName + "<<<<");
 
+        boolean isSDKInner = innerSDKSkip(className);
         if (FTUtil.isTargetClassInSpecial(className)
-                || Constants.FT_SDK_API.equals(className) || isWebViewInner(className, superName, nameDesc)) {
-            Logger.debug("skip:" + className + ",superName:" + supperName);
+                || innerSDKSkip(className)
+                || isWebViewInner(className, superName, nameDesc)) {
+
+            if (!isSDKInner) {
+                Logger.debug("skip:" + className + ",superName:" + supperName);
+            }
+
             needSkip = true;
         }
+
     }
 
     /**
@@ -110,7 +117,7 @@ public class FTMethodAdapter extends AdviceAdapter {
                 mv.visitVarInsn(LSTORE, index);
                 mv.visitLdcInsn(className + "|" + methodName + "|" + methodDesc);
                 mv.visitVarInsn(LLOAD, index);
-                mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_API, "timingMethod", "(Ljava/lang/String;J)V", false);
+                mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "timingMethod", "(Ljava/lang/String;J)V", false);
             }
         }
         super.visitInsn(opcode);
@@ -160,80 +167,77 @@ public class FTMethodAdapter extends AdviceAdapter {
             super.visitMethodInsn(opcode, owner, name, desc, itf);
             return;
         }
-        if (Constants.CLASS_NAME_HTTP_CLIENT_BUILDER.equals(owner)) {//替换调用 org/apache/hc/client5/http/impl/classic/HttpClientBuilder.build() 的方法
-            if ("build()Lorg/apache/hc/client5/http/impl/classic/CloseableHttpClient;".contains(name + desc)) {
-                mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_API, "trackHttpClientBuilder", "(Lorg/apache/hc/client5/http/impl/classic/HttpClientBuilder;)Lorg/apache/hc/client5/http/impl/classic/CloseableHttpClient;", false);
-            } else {
-                super.visitMethodInsn(opcode, owner, name, desc, itf);
-            }
-        } else if (Constants.CLASS_NAME_OKHTTP_BUILDER.equals(owner)) {//替换调用 OkHttpClient.Builder.build() 的方法
-            if ("build()Lokhttp3/OkHttpClient;".contains(name + desc)) {
-                mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_API, "trackOkHttpBuilder", "(Lokhttp3/OkHttpClient$Builder;)Lokhttp3/OkHttpClient;", false);
-            } else {
-                super.visitMethodInsn(opcode, owner, name, desc, itf);
-            }
-        } else if (Constants.CLASS_NAME_WEBVIEW.equals(owner)) {//替换系统中调用 WebView 的加载链接方法
-            if (TARGET_WEBVIEW_METHOD.contains(name + desc)) {
-                Logger.debug("TARGET_WEBVIEW_METHOD:owner:" + owner + ",class:" + className + "," + name + "," + superName);
-                mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_API, name, desc.replaceFirst("\\(", "(" + Constants.VIEW_DESC), itf);
-            } else {
-                super.visitMethodInsn(opcode, owner, name, desc, itf);
-            }
-        } else if (Constants.CLASS_NAME_LOG.equals(owner)) {//这部分为替换使用的系统Log
-            if ("i".equals(name)) {
-                if (Constants.METHOD_DESC_S_S_I.equals(desc)) {
-                    mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "i", Constants.METHOD_DESC_S_S_I, false);
-                } else if (Constants.METHOD_DESC_S_S_T_I.equals(desc)) {
-                    mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "i", Constants.METHOD_DESC_S_S_T_I, false);
-                } else {
-                    super.visitMethodInsn(opcode, owner, name, desc, itf);
+        switch (owner) {
+            case Constants.CLASS_NAME_HTTP_CLIENT_BUILDER:
+                if ("build()Lorg/apache/hc/client5/http/impl/classic/CloseableHttpClient;".contains(name + desc)) {
+                    mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackHttpClientBuilder", "(Lorg/apache/hc/client5/http/impl/classic/HttpClientBuilder;)Lorg/apache/hc/client5/http/impl/classic/CloseableHttpClient;", false);
+                    return;
                 }
-            } else if ("d".equals(name)) {
-                if (Constants.METHOD_DESC_S_S_I.equals(desc)) {
-                    mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "d", Constants.METHOD_DESC_S_S_I, false);
-                } else if (Constants.METHOD_DESC_S_S_T_I.equals(desc)) {
-                    mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "d", Constants.METHOD_DESC_S_S_T_I, false);
-                } else {
-                    super.visitMethodInsn(opcode, owner, name, desc, itf);
+                break;
+
+            case Constants.CLASS_NAME_OKHTTP_BUILDER:
+                if ("build()Lokhttp3/OkHttpClient;".contains(name + desc)) {
+                    mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackOkHttpBuilder", "(Lokhttp3/OkHttpClient$Builder;)Lokhttp3/OkHttpClient;", false);
+                    return;
                 }
-            } else if ("v".equals(name)) {
-                if (Constants.METHOD_DESC_S_S_I.equals(desc)) {
-                    mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "v", Constants.METHOD_DESC_S_S_I, false);
-                } else if (Constants.METHOD_DESC_S_S_T_I.equals(desc)) {
-                    mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "v", Constants.METHOD_DESC_S_S_T_I, false);
-                } else {
-                    super.visitMethodInsn(opcode, owner, name, desc, itf);
+                break;
+
+            case Constants.CLASS_NAME_WEBVIEW:
+                if (TARGET_WEBVIEW_METHOD.contains(name + desc)) {
+                    Logger.debug("TARGET_WEBVIEW_METHOD:owner:" + owner + ",class:" + className + "," + name + "," + superName);
+                    mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, name, desc.replaceFirst("\\(", "(" + Constants.VIEW_DESC), itf);
+                    return;
                 }
-            } else if ("e".equals(name)) {
-                if (Constants.METHOD_DESC_S_S_I.equals(desc)) {
-                    mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "e", Constants.METHOD_DESC_S_S_I, false);
-                } else if (Constants.METHOD_DESC_S_S_T_I.equals(desc)) {
-                    mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "e", Constants.METHOD_DESC_S_S_T_I, false);
-                } else {
+                break;
+
+            case Constants.CLASS_NAME_LOG:
+
+                if (ClassNameAnalytics.isAndroidPackage(className) || ClassNameAnalytics.isFTSdkApi(className)) {
                     super.visitMethodInsn(opcode, owner, name, desc, itf);
+                    return;
                 }
-            } else if ("w".equals(name)) {
-                if (Constants.METHOD_DESC_S_S_I.equals(desc)) {
-                    mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "w", Constants.METHOD_DESC_S_S_I, false);
-                } else if (Constants.METHOD_DESC_S_S_T_I.equals(desc)) {
-                    mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "w", Constants.METHOD_DESC_S_S_T_I, false);
-                } else if (Constants.METHOD_DESC_S_T_I.equals(desc)) {
-                    mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "w", Constants.METHOD_DESC_S_T_I, false);
-                } else {
-                    super.visitMethodInsn(opcode, owner, name, desc, itf);
+
+                switch (name) {
+                    case "i", "d", "v", "e" -> {
+                        if (Constants.METHOD_DESC_S_S_I.equals(desc)) {
+                            mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, name, Constants.METHOD_DESC_S_S_I, false);
+                        } else if (Constants.METHOD_DESC_S_S_T_I.equals(desc)) {
+                            mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, name, Constants.METHOD_DESC_S_S_T_I, false);
+                        } else {
+                            super.visitMethodInsn(opcode, owner, name, desc, itf);
+                        }
+                        return;
+                    }
+                    case "w" -> {
+                        if (Constants.METHOD_DESC_S_S_I.equals(desc)) {
+                            mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "w", Constants.METHOD_DESC_S_S_I, false);
+                        } else if (Constants.METHOD_DESC_S_S_T_I.equals(desc)) {
+                            mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "w", Constants.METHOD_DESC_S_S_T_I, false);
+                        } else if (Constants.METHOD_DESC_S_T_I.equals(desc)) {
+                            mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "w", Constants.METHOD_DESC_S_T_I, false);
+                        } else {
+                            super.visitMethodInsn(opcode, owner, name, desc, itf);
+                        }
+                        return;
+                    }
+                    case "println" -> {
+                        if (Constants.METHOD_DESC_S_S_I.equals(desc)) {
+                            mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "println", Constants.METHOD_DESC_S_S_I, false);
+                        } else {
+                            super.visitMethodInsn(opcode, owner, name, desc, itf);
+                        }
+                        return;
+                    }
+                    default -> {
+                    }
                 }
-            } else if ("println".equals(name)) {
-                if (Constants.METHOD_DESC_S_S_I.equals(desc)) {
-                    mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "println", Constants.METHOD_DESC_S_S_I, false);
-                } else {
-                    super.visitMethodInsn(opcode, owner, name, desc, itf);
-                }
-            } else {
-                super.visitMethodInsn(opcode, owner, name, desc, itf);
-            }
-        } else {
-            super.visitMethodInsn(opcode, owner, name, desc, itf);
+                break;
+
+            default:
+                break;
         }
+
+        super.visitMethodInsn(opcode, owner, name, desc, itf);
     }
 
     @Override
@@ -276,21 +280,20 @@ public class FTMethodAdapter extends AdviceAdapter {
     }
 
     void handleCode() {
-        if(needSkip)return;
+        if (needSkip) return;
         /*
          * 写Application方法
          */
         if (FTUtil.isInstanceOfApplication(superName)) {
             FTMethodCell ftMethodCell = FTHookConfig.APPLICATION_METHODS.get(nameDesc);
             if (ftMethodCell != null) {
-                Logger.debug("Application:"+className+":"+needSkip);
                 handleCode(ftMethodCell);
                 isHasTracked = true;
                 return;
             }
         }
 
-        if (ClassNameAnalytics.isFTSdkApi(className.replaceAll("/", "."))) {
+        if (ClassNameAnalytics.isFTSdkApi(className)) {
             if (nameDesc.equals("install(Lcom/ft/sdk/FTSDKConfig;)V")) {
                 mv.visitLdcInsn(BuildConfig.PLUGIN_VERSION);
                 mv.visitFieldInsn(PUTSTATIC, "com/ft/sdk/FTSdk", "PLUGIN_VERSION", "Ljava/lang/String;");
@@ -378,7 +381,7 @@ public class FTMethodAdapter extends AdviceAdapter {
                 if ("(Landroid/view/MenuItem;)Z".equals(lambdaMethodCell.desc)) {
                     mv.visitVarInsn(Opcodes.ALOAD, 0);
                     mv.visitVarInsn(Opcodes.ALOAD, getVisitPosition(lambdaTypes, paramStart, isStaticMethod));
-                    mv.visitMethodInsn(Opcodes.INVOKESTATIC, Constants.FT_SDK_API, lambdaMethodCell.agentName, "(Ljava/lang/Object;Landroid/view/MenuItem;)V", false);
+                    mv.visitMethodInsn(Opcodes.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, lambdaMethodCell.agentName, "(Ljava/lang/Object;Landroid/view/MenuItem;)V", false);
                     isHasTracked = true;
                     return;
                 }
@@ -387,7 +390,7 @@ public class FTMethodAdapter extends AdviceAdapter {
                 mv.visitVarInsn(lambdaMethodCell.opcodes.get(i - paramStart), getVisitPosition(lambdaTypes, i, isStaticMethod));
             }
 
-            mv.visitMethodInsn(Opcodes.INVOKESTATIC, Constants.FT_SDK_API, lambdaMethodCell.agentName, lambdaMethodCell.agentDesc, false);
+            mv.visitMethodInsn(Opcodes.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, lambdaMethodCell.agentName, lambdaMethodCell.agentDesc, false);
             isHasTracked = true;
             return;
         }
@@ -452,6 +455,16 @@ public class FTMethodAdapter extends AdviceAdapter {
     }
 
     /**
+     * SDK 内部方法，除了 {@link Constants#FT_SDK_PACKAGE} 外，都不需要扫描
+     *
+     * @param className
+     * @return
+     */
+    private boolean innerSDKSkip(String className) {
+        return (ClassNameAnalytics.isFTSdkPackage(className) && !ClassNameAnalytics.isFTSdkApi(className));
+    }
+
+    /**
      * 是否为第三方或内部 WebView 方法
      *
      * @param className
@@ -470,8 +483,9 @@ public class FTMethodAdapter extends AdviceAdapter {
 
     /**
      * Annotation 访问
+     *
      * @param descriptor the class descriptor of the annotation class.
-     * @param visible {@literal true} if the annotation is visible at runtime.
+     * @param visible    {@literal true} if the annotation is visible at runtime.
      * @return
      */
     @Override

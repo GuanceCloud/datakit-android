@@ -11,6 +11,7 @@ import com.ft.BaseTest;
 import com.ft.BuildConfig;
 import com.ft.DebugMainActivity;
 import com.ft.sdk.EnvType;
+import com.ft.sdk.FTAutoTrack;
 import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
@@ -54,7 +55,8 @@ public class RUMLaunchActionTest extends BaseTest {
                 .setEnableTrackAppUIBlock(true)
                 .setEnableTraceUserAction(true)
         );
-
+        //plugin 1.2.0 以上版本，需要手动调用
+        FTAutoTrack.startApp(null);
     }
 
 

@@ -28,6 +28,11 @@ import org.junit.runner.RunWith;
  * author: huangDianHua
  * time: 2020/8/26 15:21:02
  * description:控制台日志测试用例、丢弃策略测试
+ *
+ * ft-plugin:1.2.0 以上版本暂不可用
+ *
+ * 目前适配 AGP 8.0，Gradle 8.0 之后，发现在 AndroidTest build 过程中 ASM 已经织入，但是在运行时不会进行 hook
+ *
  */
 @RunWith(AndroidJUnit4.class)
 public class ConsoleLogTest extends BaseTest {

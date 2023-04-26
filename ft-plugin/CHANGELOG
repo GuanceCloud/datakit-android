@@ -1,5 +1,11 @@
+# plugin 1.2.0-beta02
+1.修正 application uuid，plugin 版本不生成问题
+2.优化性能
+
+---
+
 # plugin 1.2.0-beta01
-1.Gradle 8.0,AGP 8.0 适配
+1.plugin 1.2.0-alpha01
 
 ---
 # plugin 1.2.0-alpha01

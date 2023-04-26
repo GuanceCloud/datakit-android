@@ -11,9 +11,15 @@ import java.util.UUID;
  */
 public class Constants {
     /**
+     * SDK 包名
+     */
+    public static final String FT_SDK_PACKAGE = "com/ft/sdk";
+    public static final String FT_NATIVE_PACKAGE = "ftnative/";
+
+    /**
      * SDK 中的插桩类
      */
-    public static final String FT_SDK_API = "com/ft/sdk/FTAutoTrack";
+    public static final String FT_SDK_HOOK_CLASS = "com/ft/sdk/FTAutoTrack";
     /**
      * {@link System}
      */

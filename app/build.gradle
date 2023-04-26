@@ -112,7 +112,6 @@ dependencies {
 
 
 apply plugin: 'ft-plugin'
-//apply<FTPlugin>()
 
 FTExt {
     showLog = true

@@ -61,7 +61,7 @@ public class FTClassAdapter extends ClassVisitor {
      */
     @Override
     public FieldVisitor visitField(int access, String name, String desc, String signature, Object value) {
-        if (ClassNameAnalytics.isFTSdkApi(className.replaceAll("/", "."))) {//判断是否是 FTSdk 类
+        if (ClassNameAnalytics.isFTSdkApi(className)) {//判断是否是 FTSdk 类
             if (name.equals("AGENT_VERSION")) {//获得 AGENT_VERSION 判断是否高于最低版本
                 String agentVersion = (String) value;
                 if (!VersionUtils.firstVerGreaterEqual(agentVersion, BuildConfig.MIN_SDK_VERSION)) {
