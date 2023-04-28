@@ -41,7 +41,7 @@ public class FTHookConfig {
                 Arrays.asList(
                         new FTSubMethodCell(FTMethodType.ALOAD, 0),
                         new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "startApp", "(Ljava/lang/Object;)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "startApp", "(Ljava/lang/Object;)V", false)
                 )
         ));
     }
@@ -65,7 +65,7 @@ public class FTHookConfig {
                 Arrays.asList(
                         new FTSubMethodCell(FTMethodType.ALOAD, 0),
                         new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "activityOnCreate", "(Ljava/lang/Class;)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "activityOnCreate", "(Ljava/lang/Class;)V", false)
                 )));
         ACTIVITY_METHODS.put("onDestroy()V", new FTMethodCell(
                 "onDestroy",
@@ -75,7 +75,7 @@ public class FTHookConfig {
                 Arrays.asList(
                         new FTSubMethodCell(FTMethodType.ALOAD, 0),
                         new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "activityOnDestroy", "(Ljava/lang/Class;)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "activityOnDestroy", "(Ljava/lang/Class;)V", false)
                 )));
         ACTIVITY_METHODS.put("startActivityForResult(Landroid/content/Intent;ILandroid/os/Bundle;)V", new FTMethodCell(
                 "startActivityForResult",
@@ -87,7 +87,7 @@ public class FTHookConfig {
                         new FTSubMethodCell(FTMethodType.GETFIELD, "androidx/fragment/app/FragmentActivity", "mStartedActivityFromFragment", "Z", false),
                         new FTSubMethodCell(FTMethodType.INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;", false),
                         new FTSubMethodCell(FTMethodType.ALOAD, 1),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "startActivityByWay", "(Ljava/lang/Boolean;Landroid/content/Intent;)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "startActivityByWay", "(Ljava/lang/Boolean;Landroid/content/Intent;)V", false)
                 )));
     }
 
@@ -111,7 +111,7 @@ public class FTHookConfig {
                         new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
                         new FTSubMethodCell(FTMethodType.ALOAD, 0),
                         new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "androidx/fragment/app/Fragment", "getActivity", "()Landroidx/fragment/app/FragmentActivity;", false),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "fragmentOnResume", "(Ljava/lang/Object;Ljava/lang/Object;)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "fragmentOnResume", "(Ljava/lang/Object;Ljava/lang/Object;)V", false)
                 )));
         FRAGMENT_X_METHODS.put("onPause()V", new FTMethodCell(
                 "onPause",
@@ -123,7 +123,7 @@ public class FTHookConfig {
                         new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
                         new FTSubMethodCell(FTMethodType.ALOAD, 0),
                         new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "androidx/fragment/app/Fragment", "getActivity", "()Landroidx/fragment/app/FragmentActivity;", false),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "fragmentOnPause", "(Ljava/lang/Object;Ljava/lang/Object;)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "fragmentOnPause", "(Ljava/lang/Object;Ljava/lang/Object;)V", false)
                 )));
         FRAGMENT_X_METHODS.put("setUserVisibleHint(Z)V", new FTMethodCell(
                 "setUserVisibleHint",
@@ -136,7 +136,7 @@ public class FTHookConfig {
                         new FTSubMethodCell(FTMethodType.ALOAD, 0),
                         new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "androidx/fragment/app/Fragment", "getActivity", "()Landroidx/fragment/app/FragmentActivity;", false),
                         new FTSubMethodCell(FTMethodType.ILOAD, 1),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "notifyUserVisibleHint", "(Ljava/lang/Object;Ljava/lang/Object;Z)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "notifyUserVisibleHint", "(Ljava/lang/Object;Ljava/lang/Object;Z)V", false)
                 )));
     }
 
@@ -161,7 +161,7 @@ public class FTHookConfig {
                         new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
                         new FTSubMethodCell(FTMethodType.ALOAD, 0),
                         new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "android/app/Fragment", "getActivity", "()Landroid/app/Activity;", false),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "fragmentOnResume", "(Ljava/lang/Object;Ljava/lang/Object;)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "fragmentOnResume", "(Ljava/lang/Object;Ljava/lang/Object;)V", false)
                 )));
         FRAGMENT_METHODS.put("onPause()V", new FTMethodCell(
                 "onPause",
@@ -173,7 +173,7 @@ public class FTHookConfig {
                         new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
                         new FTSubMethodCell(FTMethodType.ALOAD, 0),
                         new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "android/app/Fragment", "getActivity", "()Landroid/app/Activity;", false),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "fragmentOnPause", "(Ljava/lang/Object;Ljava/lang/Object;)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "fragmentOnPause", "(Ljava/lang/Object;Ljava/lang/Object;)V", false)
                 )));
         FRAGMENT_METHODS.put("setUserVisibleHint(Z)V", new FTMethodCell(
                 "setUserVisibleHint",
@@ -186,7 +186,7 @@ public class FTHookConfig {
                         new FTSubMethodCell(FTMethodType.ALOAD, 0),
                         new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "android/app/Fragment", "getActivity", "()Landroid/app/Activity;", false),
                         new FTSubMethodCell(FTMethodType.ILOAD, 1),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "notifyUserVisibleHint", "(Ljava/lang/Object;Ljava/lang/Object;Z)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "notifyUserVisibleHint", "(Ljava/lang/Object;Ljava/lang/Object;Z)V", false)
                 )));
     }
 
@@ -210,7 +210,7 @@ public class FTHookConfig {
                         new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
                         new FTSubMethodCell(FTMethodType.ALOAD, 0),
                         new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "android/support/v4/app/Fragment", "getActivity", "()Landroid/support/v4/app/FragmentActivity;", false),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "fragmentOnResume", "(Ljava/lang/Object;Ljava/lang/Object;)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "fragmentOnResume", "(Ljava/lang/Object;Ljava/lang/Object;)V", false)
                 )));
         FRAGMENT_V4_METHODS.put("onPause()V", new FTMethodCell(
                 "onPause",
@@ -222,7 +222,7 @@ public class FTHookConfig {
                         new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
                         new FTSubMethodCell(FTMethodType.ALOAD, 0),
                         new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "android/support/v4/app/Fragment", "getActivity", "()Landroid/support/v4/app/FragmentActivity;", false),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "fragmentOnPause", "(Ljava/lang/Object;Ljava/lang/Object;)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "fragmentOnPause", "(Ljava/lang/Object;Ljava/lang/Object;)V", false)
                 )));
         FRAGMENT_V4_METHODS.put("setUserVisibleHint(Z)V", new FTMethodCell(
                 "setUserVisibleHint",
@@ -235,7 +235,7 @@ public class FTHookConfig {
                         new FTSubMethodCell(FTMethodType.ALOAD, 0),
                         new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "android/support/v4/app/Fragment", "getActivity", "()Landroid/support/v4/app/FragmentActivity;", false),
                         new FTSubMethodCell(FTMethodType.ILOAD, 1),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "notifyUserVisibleHint", "(Ljava/lang/Object;Ljava/lang/Object;Z)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "notifyUserVisibleHint", "(Ljava/lang/Object;Ljava/lang/Object;Z)V", false)
                 )));
 
     }
@@ -249,7 +249,7 @@ public class FTHookConfig {
                     new FTSubMethodCell(FTMethodType.ALOAD, 0),
                     new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
                     new FTSubMethodCell(FTMethodType.ALOAD, 1),
-                    new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "trackMenuItem", "(Ljava/lang/Object;Landroid/view/MenuItem;)V", false)
+                    new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackMenuItem", "(Ljava/lang/Object;Landroid/view/MenuItem;)V", false)
             )
     );
 
@@ -262,7 +262,7 @@ public class FTHookConfig {
                     new FTSubMethodCell(FTMethodType.ALOAD, 0),
                     new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
                     new FTSubMethodCell(FTMethodType.ALOAD, 1),
-                    new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "trackViewOnClick", "(Ljava/lang/Object;Landroid/view/View;)V", false)
+                    new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackViewOnClick", "(Ljava/lang/Object;Landroid/view/View;)V", false)
             )
     );
 
@@ -280,7 +280,7 @@ public class FTHookConfig {
                 "(Landroid/view/View;)V",
                 Arrays.asList(
                         new FTSubMethodCell(FTMethodType.ALOAD, 1),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "trackViewOnClick", "(Landroid/view/View;)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackViewOnClick", "(Landroid/view/View;)V", false)
                 )
 
         ));//
@@ -293,7 +293,7 @@ public class FTHookConfig {
                 "(Landroid/view/View;)V",
                 Arrays.asList(
                         new FTSubMethodCell(FTMethodType.ALOAD, 1),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "trackViewOnClick", "(Landroid/view/View;)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackViewOnClick", "(Landroid/view/View;)V", false)
                 )
         ));//
         addInterfaceMethod(new FTMethodCell(
@@ -304,7 +304,7 @@ public class FTHookConfig {
                 "(Landroid/view/View;)V",
                 Arrays.asList(
                         new FTSubMethodCell(FTMethodType.ALOAD, 1),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "trackViewOnClick", "(Landroid/view/View;)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackViewOnClick", "(Landroid/view/View;)V", false)
                 )
         ));//
 
@@ -316,7 +316,7 @@ public class FTHookConfig {
                 "(Landroid/view/View;)V",
                 Arrays.asList(
                         new FTSubMethodCell(FTMethodType.ALOAD, 1),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "trackViewOnClick", "(Landroid/view/View;)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackViewOnClick", "(Landroid/view/View;)V", false)
                 )
         ));//
 
@@ -329,7 +329,7 @@ public class FTHookConfig {
                 Arrays.asList(
                         new FTSubMethodCell(FTMethodType.ALOAD, 1),
                         new FTSubMethodCell(FTMethodType.ILOAD, 2),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "trackRadioGroup", "(Landroid/widget/RadioGroup;I)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackRadioGroup", "(Landroid/widget/RadioGroup;I)V", false)
                 )
         ));//
 
@@ -343,7 +343,7 @@ public class FTHookConfig {
                         new FTSubMethodCell(FTMethodType.ALOAD, 1),
                         new FTSubMethodCell(FTMethodType.ALOAD, 2),
                         new FTSubMethodCell(FTMethodType.ILOAD, 3),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "trackListView", "(Landroid/widget/AdapterView;Landroid/view/View;I)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackListView", "(Landroid/widget/AdapterView;Landroid/view/View;I)V", false)
                 )));
 
 
@@ -357,7 +357,7 @@ public class FTHookConfig {
                         new FTSubMethodCell(FTMethodType.ALOAD, 1),
                         new FTSubMethodCell(FTMethodType.ALOAD, 2),
                         new FTSubMethodCell(FTMethodType.ILOAD, 3),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "trackListView", "(Landroid/widget/AdapterView;Landroid/view/View;I)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackListView", "(Landroid/widget/AdapterView;Landroid/view/View;I)V", false)
                 )));
 
 
@@ -372,7 +372,7 @@ public class FTHookConfig {
                         new FTSubMethodCell(FTMethodType.ALOAD, 1),
                         new FTSubMethodCell(FTMethodType.ALOAD, 2),
                         new FTSubMethodCell(FTMethodType.ILOAD, 3),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "trackExpandableListViewOnGroupClick", "(Landroid/widget/ExpandableListView;Landroid/view/View;I)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackExpandableListViewOnGroupClick", "(Landroid/widget/ExpandableListView;Landroid/view/View;I)V", false)
                 )));
         addInterfaceMethod(new FTMethodCell(
                 "onChildClick",
@@ -385,7 +385,7 @@ public class FTHookConfig {
                         new FTSubMethodCell(FTMethodType.ALOAD, 2),
                         new FTSubMethodCell(FTMethodType.ILOAD, 3),
                         new FTSubMethodCell(FTMethodType.ILOAD, 4),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "trackExpandableListViewOnChildClick", "(Landroid/widget/ExpandableListView;Landroid/view/View;II)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackExpandableListViewOnChildClick", "(Landroid/widget/ExpandableListView;Landroid/view/View;II)V", false)
                 )));
 
         addInterfaceMethod(new FTMethodCell(
@@ -396,7 +396,7 @@ public class FTHookConfig {
                 "(Ljava/lang/String;)V",
                 Arrays.asList(
                         new FTSubMethodCell(FTMethodType.ALOAD, 1),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "trackTabHost", "(Ljava/lang/String;)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackTabHost", "(Ljava/lang/String;)V", false)
                 )));
 
         addInterfaceMethod(new FTMethodCell(
@@ -407,7 +407,7 @@ public class FTHookConfig {
                 "(Landroid/view/MenuItem;)V",
                 Arrays.asList(
                         new FTSubMethodCell(FTMethodType.ALOAD, 1),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "trackMenuItem", "(Landroid/view/MenuItem;)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackMenuItem", "(Landroid/view/MenuItem;)V", false)
                 )));
 
         addInterfaceMethod(new FTMethodCell(
@@ -418,7 +418,7 @@ public class FTHookConfig {
                 "(Landroid/view/MenuItem;)V",
                 Arrays.asList(
                         new FTSubMethodCell(FTMethodType.ALOAD, 1),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "trackMenuItem", "(Landroid/view/MenuItem;)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackMenuItem", "(Landroid/view/MenuItem;)V", false)
                 )));
 
         addInterfaceMethod(new FTMethodCell(
@@ -429,7 +429,7 @@ public class FTHookConfig {
                 "(Landroid/view/MenuItem;)V",
                 Arrays.asList(
                         new FTSubMethodCell(FTMethodType.ALOAD, 1),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "trackMenuItem", "(Landroid/view/MenuItem;)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackMenuItem", "(Landroid/view/MenuItem;)V", false)
                 )));
 
         addInterfaceMethod(new FTMethodCell(
@@ -440,7 +440,7 @@ public class FTHookConfig {
                 "(Landroid/view/MenuItem;)V",
                 Arrays.asList(
                         new FTSubMethodCell(FTMethodType.ALOAD, 1),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "trackMenuItem", "(Landroid/view/MenuItem;)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackMenuItem", "(Landroid/view/MenuItem;)V", false)
                 )));
 
         addInterfaceMethod(new FTMethodCell(
@@ -452,7 +452,7 @@ public class FTHookConfig {
                 Arrays.asList(
                         new FTSubMethodCell(FTMethodType.ALOAD, 1),
                         new FTSubMethodCell(FTMethodType.ILOAD, 2),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "trackDialog", "(Landroid/content/DialogInterface;I)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackDialog", "(Landroid/content/DialogInterface;I)V", false)
                 )));
         addInterfaceMethod(new FTMethodCell(
                 "onClick",
@@ -463,7 +463,7 @@ public class FTHookConfig {
                 Arrays.asList(
                         new FTSubMethodCell(FTMethodType.ALOAD, 1),
                         new FTSubMethodCell(FTMethodType.ILOAD, 2),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "trackDialog", "(Landroid/content/DialogInterface;I)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackDialog", "(Landroid/content/DialogInterface;I)V", false)
                 )));
 
         addInterfaceMethod(new FTMethodCell(
@@ -474,7 +474,7 @@ public class FTHookConfig {
                 "(Landroid/view/MenuItem;)V",
                 Arrays.asList(
                         new FTSubMethodCell(FTMethodType.ALOAD, 1),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "trackMenuItem", "(Landroid/view/MenuItem;)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackMenuItem", "(Landroid/view/MenuItem;)V", false)
                 )));
 
         addInterfaceMethod(new FTMethodCell(
@@ -485,7 +485,7 @@ public class FTHookConfig {
                 "(Landroid/view/MenuItem;)V",
                 Arrays.asList(
                         new FTSubMethodCell(FTMethodType.ALOAD, 1),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "trackMenuItem", "(Landroid/view/MenuItem;)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackMenuItem", "(Landroid/view/MenuItem;)V", false)
                 )));
 
         addInterfaceMethod(new FTMethodCell(
@@ -496,7 +496,7 @@ public class FTHookConfig {
                 "(Landroid/view/MenuItem;)V",
                 Arrays.asList(
                         new FTSubMethodCell(FTMethodType.ALOAD, 1),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "trackMenuItem", "(Landroid/view/MenuItem;)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackMenuItem", "(Landroid/view/MenuItem;)V", false)
                 )));
 
         addInterfaceMethod(new FTMethodCell(
@@ -508,7 +508,7 @@ public class FTHookConfig {
                 Arrays.asList(
                         new FTSubMethodCell(FTMethodType.ALOAD, 1),
                         new FTSubMethodCell(FTMethodType.ALOAD, 2),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "trackViewOnTouch", "(Landroid/view/View;Landroid/view/MotionEvent;)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackViewOnTouch", "(Landroid/view/View;Landroid/view/MotionEvent;)V", false)
                 )));
         addInterfaceMethod(new FTMethodCell(
                 "onPageSelected",
@@ -520,7 +520,7 @@ public class FTHookConfig {
                         new FTSubMethodCell(FTMethodType.ALOAD, 0),
                         new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
                         new FTSubMethodCell(FTMethodType.ILOAD, 1),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "trackViewPagerChange", "(Ljava/lang/Object;I)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackViewPagerChange", "(Ljava/lang/Object;I)V", false)
                 )
         ));//androidx/viewpager/widget/ViewPager
         addInterfaceMethod(new FTMethodCell(
@@ -533,7 +533,7 @@ public class FTHookConfig {
                         new FTSubMethodCell(FTMethodType.ALOAD, 0),
                         new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
                         new FTSubMethodCell(FTMethodType.ILOAD, 1),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "trackViewPagerChange", "(Ljava/lang/Object;I)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackViewPagerChange", "(Ljava/lang/Object;I)V", false)
                 )
         ));//com/android/internal/widget/ViewPager
         addInterfaceMethod(new FTMethodCell(
@@ -546,7 +546,7 @@ public class FTHookConfig {
                         new FTSubMethodCell(FTMethodType.ALOAD, 0),
                         new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
                         new FTSubMethodCell(FTMethodType.ILOAD, 1),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "trackViewPagerChange", "(Ljava/lang/Object;I)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackViewPagerChange", "(Ljava/lang/Object;I)V", false)
                 )
         ));//android/support/v4/view/ViewPager
         addInterfaceMethod(new FTMethodCell(
@@ -557,7 +557,7 @@ public class FTHookConfig {
                 "(Ljava/lang/Object;)V",
                 Arrays.asList(
                         new FTSubMethodCell(FTMethodType.ALOAD, 1),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_API, "trackTabLayoutSelected", "(Ljava/lang/Object;)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackTabLayoutSelected", "(Ljava/lang/Object;)V", false)
                 )
         ));
     }
