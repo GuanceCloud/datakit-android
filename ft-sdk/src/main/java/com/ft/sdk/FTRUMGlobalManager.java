@@ -688,9 +688,7 @@ public class FTRUMGlobalManager {
 
             tags.put(Constants.KEY_RUM_RESOURCE_URL_HOST, bean.urlHost);
 
-            if (bean.resourceType != null && !bean.resourceType.isEmpty()) {
-                tags.put(Constants.KEY_RUM_RESOURCE_TYPE, bean.resourceType);
-            }
+            tags.put(Constants.KEY_RUM_RESOURCE_TYPE, "network");
             tags.put(Constants.KEY_RUM_RESPONSE_CONNECTION, bean.responseConnection);
             tags.put(Constants.KEY_RUM_RESPONSE_CONTENT_TYPE, bean.responseContentType);
             tags.put(Constants.KEY_RUM_RESPONSE_CONTENT_ENCODING, bean.responseContentEncoding);
