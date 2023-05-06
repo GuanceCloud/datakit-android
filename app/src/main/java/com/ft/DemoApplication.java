@@ -1,7 +1,5 @@
 package com.ft;
 
-import android.content.Context;
-
 import com.ft.sdk.DeviceMetricsMonitorType;
 import com.ft.sdk.EnvType;
 import com.ft.sdk.ErrorMonitorType;
@@ -22,11 +20,6 @@ import java.util.HashMap;
  * Description:
  */
 public class DemoApplication extends BaseApplication {
-    private static Context instance;
-
-    public static Context getContext() {
-        return instance;
-    }
 
     public DemoApplication() {
         super();
@@ -35,7 +28,6 @@ public class DemoApplication extends BaseApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-        instance = this;
         initFTSDK();
     }
 
