@@ -24,6 +24,7 @@ public class WebViewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //        WebView.setWebContentsDebuggingEnabled(true);
         setContentView(R.layout.activity_web);
         spinner = findViewById(R.id.spinner);
         webView = findViewById(R.id.webView);
