@@ -67,6 +67,18 @@ public class FTTraceManager {
         return getTraceHeader(key, new HttpUrl(url.getHost(), url.getPath(), url.getPort(), urlString));
     }
 
+    /**
+     *  获取 trace http 请求头参数
+     * @param urlString url 地址
+     * @return
+     * @throws MalformedURLException
+     * @throws URISyntaxException
+     */
+    public HashMap<String, String> getTraceHeader(String urlString) throws MalformedURLException, URISyntaxException {
+        URL url = Utils.parseFromUrl(urlString);
+        return getTraceHeader( new HttpUrl(url.getHost(), url.getPath(), url.getPort(), urlString));
+    }
+
     FTTraceHandler getHandler(String key) {
         FTTraceManagerContainer container = handlerMap.get(key);
         if (container != null) {
