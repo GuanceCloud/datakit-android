@@ -15,8 +15,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class FTTraceManager {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "FTTraceManager";
-    private final ConcurrentHashMap<String, FTTraceManagerContainer> handlerMap
-            = new ConcurrentHashMap<>(1000);
+    private final SizeLimitedConcurrentHashMap<String, FTTraceManagerContainer> handlerMap
+            = new SizeLimitedConcurrentHashMap<>(1000);
 
 
     private static class SingletonHolder {
@@ -27,7 +27,23 @@ public class FTTraceManager {
         return FTTraceManager.SingletonHolder.INSTANCE;
     }
 
+    /**
+     * 只使用 Trace 时使用
+     *
+     * @param httpUrl
+     * @return
+     */
+    HashMap<String, String> getTraceHeader(HttpUrl httpUrl) {
+        return new FTTraceHandler().getTraceHeader(httpUrl);
+    }
 
+    /**
+     * 需要 RUM Trace 同时使用时使用
+     *
+     * @param key
+     * @param httpUrl
+     * @return
+     */
     HashMap<String, String> getTraceHeader(String key, HttpUrl httpUrl) {
         FTTraceHandler handler = new FTTraceHandler();
 
@@ -174,6 +190,36 @@ public class FTTraceManager {
          */
         boolean isTimeOut() {
             return System.currentTimeMillis() - startTime > TIME_OUT;
+        }
+    }
+
+    private static class SizeLimitedConcurrentHashMap<K, V> extends ConcurrentHashMap<K, V> {
+        private final int maxSize;
+
+        public SizeLimitedConcurrentHashMap(int maxSize) {
+            super();
+            this.maxSize = maxSize;
+        }
+
+        @Override
+        public V put(K key, V value) {
+            V result = super.put(key, value);
+            if (size() > maxSize) {
+                removeEldest();
+            }
+            return result;
+        }
+
+        private void removeEldest() {
+            K eldestKey = null;
+            for (K key : keySet()) {
+                if (eldestKey == null || key.hashCode() < eldestKey.hashCode()) {
+                    eldestKey = key;
+                }
+            }
+            if (eldestKey != null) {
+                remove(eldestKey);
+            }
         }
     }
 
