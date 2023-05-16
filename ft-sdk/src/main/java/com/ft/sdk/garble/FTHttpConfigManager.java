@@ -2,10 +2,8 @@ package com.ft.sdk.garble;
 
 import static com.ft.sdk.garble.utils.Constants.USER_AGENT;
 
-import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.garble.utils.Constants;
-import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 
 /**
@@ -60,7 +58,7 @@ public class FTHttpConfigManager {
             return;
         }
         serverUrl = ftsdkConfig.getMetricsUrl();
-        uuid = DeviceUtils.getSDKUUid(FTApplication.getApplication());
+//        uuid = DeviceUtils.getSDKUUid(FTApplication.getApplication());
         userAgent = USER_AGENT;
 
         LogUtils.d(TAG, "serverUrl:" + serverUrl);

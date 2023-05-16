@@ -88,45 +88,6 @@ public class DeviceUtils {
         }
     };
 
-    /**
-     * 获取 SDK 的 UUID
-     *
-     * @param context
-     * @return
-     */
-    public static String getSDKUUid(Context context) {
-        final SharedPreferences preferences = getSharedPreferences(context);
-        String sdkUUid = null;
-
-        if (preferences != null) {
-            sdkUUid = preferences.getString(Constants.FT_SDK_INIT_UUID, null);
-        }
-
-        if (sdkUUid == null) {
-            sdkUUid = UUID.randomUUID().toString();
-            if (preferences != null) {
-                final SharedPreferences.Editor editor = preferences.edit();
-                editor.putString(Constants.FT_SDK_INIT_UUID, sdkUUid);
-                editor.apply();
-            }
-        }
-
-        return sdkUUid;
-    }
-
-    /**
-     * 设置 SDK uuid
-     *
-     * @param uuid
-     */
-    public static void setSDKUUid(String uuid) {
-        final SharedPreferences preferences = getSharedPreferences(FTApplication.getApplication());
-        if (preferences != null) {
-            final SharedPreferences.Editor editor = preferences.edit();
-            editor.putString(Constants.FT_SDK_INIT_UUID, uuid);
-            editor.apply();
-        }
-    }
 
     /**
      * 获取设备唯一标识

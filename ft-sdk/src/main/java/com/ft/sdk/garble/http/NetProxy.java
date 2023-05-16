@@ -117,11 +117,11 @@ public class NetProxy {
         if (head == null) {
             head = new HashMap<>();
         }
-        head.put("X-Datakit-UUID", ftHttpConfig.uuid);
+//        head.put("X-Datakit-UUID", ftHttpConfig.uuid);
         head.put("User-Agent", ftHttpConfig.userAgent +
                 ";agent_" + FTSdk.AGENT_VERSION +
-                ";autotrack_" + FTSdk.PLUGIN_VERSION+
-                ";native"
+                ";autotrack_" + FTSdk.PLUGIN_VERSION +
+                ";native_" + FTSdk.NATIVE_VERSION
         );
         head.put("Accept-Language", "zh-CN");
         if (!head.containsKey("Content-Type")) {

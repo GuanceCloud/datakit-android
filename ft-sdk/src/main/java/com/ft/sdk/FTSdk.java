@@ -286,12 +286,5 @@ public class FTSdk {
         hashMap.put(Constants.KEY_SDK_VERSION, FTSdk.AGENT_VERSION);
     }
 
-    /**
-     * 当使用 ft-plugin 时使用，具体使用方式见
-     */
-    public static void manualStartup() {
-        FTAutoTrack.startApp(null);
-    }
-
 
 }

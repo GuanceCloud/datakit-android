@@ -94,16 +94,6 @@ public class FTSDKConfig {
     }
 
 
-    /**
-     * 设置数据采集端的名称
-     *
-     * @param uuid
-     * @return
-     */
-    public FTSDKConfig setXDataKitUUID(String uuid) {
-        DeviceUtils.setSDKUUid(uuid);
-        return this;
-    }
 
     /**
      * 是否开启Debug，开启后将显示 SDK 运行日志

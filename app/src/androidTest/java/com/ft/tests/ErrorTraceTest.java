@@ -47,7 +47,6 @@ public class ErrorTraceTest extends BaseTest {
         }
         FTSDKConfig ftSDKConfig = FTSDKConfig
                 .builder(BuildConfig.ACCESS_SERVER_URL)
-                .setXDataKitUUID("ft-dataKit-uuid-001")
                 .setDebug(true)//设置是否是 debug
                 .setEnv(EnvType.GRAY);
         //关闭数据自动同步操作
