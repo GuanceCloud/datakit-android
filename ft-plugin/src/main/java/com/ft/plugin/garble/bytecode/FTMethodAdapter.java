@@ -198,7 +198,10 @@ public class FTMethodAdapter extends AdviceAdapter {
                 }
 
                 switch (name) {
-                    case "i", "d", "v", "e" -> {
+                    case "i":
+                    case "d":
+                    case "v":
+                    case "e":
                         if (Constants.METHOD_DESC_S_S_I.equals(desc)) {
                             mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, name, Constants.METHOD_DESC_S_S_I, false);
                         } else if (Constants.METHOD_DESC_S_S_T_I.equals(desc)) {
@@ -207,8 +210,7 @@ public class FTMethodAdapter extends AdviceAdapter {
                             super.visitMethodInsn(opcode, owner, name, desc, itf);
                         }
                         return;
-                    }
-                    case "w" -> {
+                    case "w":
                         if (Constants.METHOD_DESC_S_S_I.equals(desc)) {
                             mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "w", Constants.METHOD_DESC_S_S_I, false);
                         } else if (Constants.METHOD_DESC_S_S_T_I.equals(desc)) {
@@ -219,17 +221,17 @@ public class FTMethodAdapter extends AdviceAdapter {
                             super.visitMethodInsn(opcode, owner, name, desc, itf);
                         }
                         return;
-                    }
-                    case "println" -> {
+
+                    case "println":
                         if (Constants.METHOD_DESC_S_S_I.equals(desc)) {
                             mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "println", Constants.METHOD_DESC_S_S_I, false);
                         } else {
                             super.visitMethodInsn(opcode, owner, name, desc, itf);
                         }
                         return;
-                    }
-                    default -> {
-                    }
+
+                    default:
+                        break;
                 }
                 break;
 

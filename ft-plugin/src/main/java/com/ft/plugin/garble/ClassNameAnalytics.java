@@ -25,7 +25,17 @@ package com.ft.plugin.garble;
 public class ClassNameAnalytics {
 
     private static final String FT_SDK_CLASS = Constants.FT_SDK_PACKAGE + "/FTSdk";
+    private static final String FT_SDK_PACKAGE = "com.ft.sdk";
+    private static final String FT_SDK = "com.ft.sdk.FTSdk";
 
+    /**
+     * 配置需要排除的类
+     * @param className
+     * @return
+     */
+    public static boolean isFTSDKFile(String className){
+        return className.startsWith(FT_SDK_PACKAGE) && !className.equals(FT_SDK+".class");
+    }
 
     public static boolean isFTSdkApi(String className) {
         return className.equals(FT_SDK_CLASS);
@@ -52,5 +62,13 @@ public class ClassNameAnalytics {
         return (className.startsWith("android/")
                 || className.startsWith("androidx/"))
                 || className.startsWith("com/google/android");
+    }
+
+    public static boolean isAndroidGenerated(String className){
+        return className.contains("R$") ||
+                className.contains("R2$") ||
+                className.contains("R.class") ||
+                className.contains("R2.class") ||
+                className.contains("BuildConfig.class");
     }
 }
