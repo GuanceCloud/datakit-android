@@ -25,6 +25,8 @@ afterEvaluate {
                 version version
                 artifact jar
             }
+            //fixme 可以有 pom 方式直接直接指向另一个包，目前未知如何实现
+            //例如：https://plugins.gradle.org/m2/org/jetbrains/kotlin/android/org.jetbrains.kotlin.android.gradle.plugin/0.0.1-test-1/
             mavenJava(MavenPublication) {
                 groupId group
                 artifactId 'com.cloudcare.ft.mobile.sdk.tracker.plugin.gradle.plugin'
