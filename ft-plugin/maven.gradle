@@ -25,6 +25,12 @@ afterEvaluate {
                 version version
                 artifact jar
             }
+            mavenJava(MavenPublication) {
+                groupId group + '.legacy'
+                artifactId 'com.cloudcare.ft.mobile.sdk.tracker.plugin.legacy.gradle.plugin'
+                version version
+                artifact jar
+            }
         }
         repositories {
             maven {
