@@ -8,6 +8,11 @@ import com.ft.plugin.garble.bytecode.FTClassAdapter;
 
 import org.objectweb.asm.ClassVisitor;
 
+/**
+ * 创建 asm class visitor
+ *
+ * @author Brandon
+ */
 public abstract class FTTransform implements AsmClassVisitorFactory<InstrumentationParameters.None> {
 
     @Override

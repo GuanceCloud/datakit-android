@@ -45,6 +45,10 @@ public class FTSdk {
     private static FTSdk mFtSdk;
     private final FTSDKConfig mFtSDKConfig;
 
+    /**
+     *
+     * @param ftSDKConfig
+     */
     private FTSdk(@NonNull FTSDKConfig ftSDKConfig) {
         this.mFtSDKConfig = ftSDKConfig;
     }

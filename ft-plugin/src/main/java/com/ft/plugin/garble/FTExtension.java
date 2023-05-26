@@ -31,11 +31,11 @@ public class FTExtension {
      */
     public String datakitDCAUrl = "";
     /**
-     *
+     * 应用 appid
      */
     public String appId = "";
     /**
-     *
+     * 上传 sourcemap 上传环境
      */
     public String env = "prod";
 

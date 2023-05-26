@@ -23,6 +23,9 @@ public class FTSDKConfig {
      */
     private boolean enableAccessAndroidID = true;
 
+    /**
+     * 应用服务名
+     */
     private String serviceName = Constants.DEFAULT_SERVICE_NAME;
 
     /**

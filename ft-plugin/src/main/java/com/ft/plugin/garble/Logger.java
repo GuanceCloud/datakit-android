@@ -6,6 +6,9 @@ package com.ft.plugin.garble;
  * Description:
  */
 public class Logger {
+    /**
+     * 输出日志前缀
+     */
     private static final String TAG = "[FT-Plugin]:";
     /**
      * 设置 debug，开启后，会在 build 过程中输出日志

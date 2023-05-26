@@ -53,6 +53,12 @@ class FTFileUtils {
         }
     }
 
+    /**
+     * 上传 map 文件
+     * @param baseFolder
+     * @param filesMap
+     * @param relativeName
+     */
     private static void updateFilesMap(final File baseFolder, final Map<String, File> filesMap,
                                        final String relativeName) {
         for (final File file : baseFolder.listFiles()) {
@@ -69,6 +75,12 @@ class FTFileUtils {
         }
     }
 
+    /**
+     * 获取文件相对地址
+     * @param baseName
+     * @param fileName
+     * @return
+     */
     private static String getFileRelativeName(final String baseName, final String fileName) {
         return baseName == null ? fileName : baseName + "/" + fileName;
     }

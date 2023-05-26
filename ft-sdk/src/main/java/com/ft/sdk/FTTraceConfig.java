@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class FTTraceConfig {
     /**
-     * 采样率
+     * 采样率，[0,1]
      */
     private float samplingRate = 1;
     /**
@@ -92,6 +92,10 @@ public class FTTraceConfig {
 //    }
 
 
+    /**
+     * 获取链路支持
+     * @return
+     */
     public List<String> getTraceContentType() {
         return traceContentType;
     }

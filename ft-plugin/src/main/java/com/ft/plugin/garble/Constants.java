@@ -14,6 +14,9 @@ public class Constants {
      * SDK 包名
      */
     public static final String FT_SDK_PACKAGE = "com/ft/sdk";
+    /**
+     * SDK native 库
+     */
     public static final String FT_NATIVE_PACKAGE = "ftnative/";
 
     /**
