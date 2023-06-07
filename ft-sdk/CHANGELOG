@@ -1,5 +1,5 @@
 # agent 1.3.12-beta01
-1.修正
+1.修正 3.12.0 okhttp 依赖 resource 某些情况下，不发送的问题
 
 ---
 # agent 1.3.12-alpha01
