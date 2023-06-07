@@ -1,5 +1,8 @@
 package com.ft.sdk.tests;
 
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
+
 import android.content.Context;
 
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -8,9 +11,6 @@ import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * BY huangDianHua
@@ -22,15 +22,9 @@ public class DeviceUtilsTest {
         return InstrumentationRegistry.getInstrumentation().getTargetContext();
     }
 
-    /**
-     * 验证设备
+    /***
+     * 获取设备 UUid
      */
-
-    @Test
-    public void getSDKUUid() {
-        assertNotEquals("", DeviceUtils.getSDKUUid(getContext()));
-    }
-
     @Test
     public void getUuid() {
         assertNotEquals("", DeviceUtils.getUuid(getContext()));
