@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.cloudcare.ft.mobile.sdk.custom.okhttp.CustomEventListener
+import com.cloudcare.ft.mobile.sdk.custom.okhttp.CustomEventListenerFactory
 import com.cloudcare.ft.mobile.sdk.custom.okhttp.CustomInterceptor
 import com.ft.sdk.FTRUMGlobalManager
 import com.ft.sdk.FTResourceEventListener
@@ -80,7 +81,7 @@ class ManualActivity : AppCompatActivity() {
                     .addInterceptor(FTTraceInterceptor())
                     .addInterceptor(FTResourceInterceptor())
                     .addInterceptor(CustomInterceptor())
-                    .eventListenerFactory(CustomEventListener())
+                    .eventListenerFactory(CustomEventListenerFactory())
                 val client = builder.build()
 
                 try {

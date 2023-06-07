@@ -615,6 +615,7 @@ public class FTRUMGlobalManager {
 
     /**
      * 传输网络连接指标参数
+     *
      * @param resourceId
      * @param netStatusBean
      */
@@ -658,8 +659,8 @@ public class FTRUMGlobalManager {
                 @Override
                 public void run() {
                     synchronized (resourceBeanMap) {
-                    LogUtils.d(TAG, "net error remove id:" + resourceId);
-                    resourceBeanMap.remove(resourceId);
+                        LogUtils.d(TAG, "net error remove id:" + resourceId);
+                        resourceBeanMap.remove(resourceId);
                     }
                     FTTraceManager.get().removeByAddResource(resourceId);
                 }
@@ -835,8 +836,13 @@ public class FTRUMGlobalManager {
 
         ResourceBean bean = resourceBeanMap.get(resourceId);
 
-        if (bean == null || params.resourceStatus < HttpsURLConnection.HTTP_OK) {
-            LogUtils.d(TAG, "setTransformContent bean:" + bean);
+        if (bean == null) {
+            LogUtils.d(TAG, "setTransformContent bean null");
+            return;
+        }
+
+        if (params.resourceStatus < HttpsURLConnection.HTTP_OK) {
+            LogUtils.d(TAG, "setTransformContent code < 200");
             return;
         }
         try {

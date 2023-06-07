@@ -34,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
     OkHttpClient client = new OkHttpClient.Builder()
-            .eventListenerFactory(new FTResourceEventListener.FTFactory())
             .connectTimeout(10, TimeUnit.SECONDS).build();
 
     public Request requestUrl(@NonNull String url) {

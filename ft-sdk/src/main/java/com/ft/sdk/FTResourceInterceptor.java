@@ -74,16 +74,19 @@ public class FTResourceInterceptor implements Interceptor {
                     MediaType contentType = responseBody.contentType();
                     responseBodyString = new String(bytes, Utils.getCharset(contentType));
                     ResponseBody copyResponseBody = ResponseBody.create(responseBody.contentType(), bytes);
+                    response.close();
+
                     response = response.newBuilder().body(copyResponseBody).build();
-
-                    params.responseHeader = response.headers().toString();
-                    params.responseBody = responseBodyString;
-                    params.responseContentType = response.header("Content-Type");
-                    params.responseConnection = response.header("Connection");
-                    params.responseContentEncoding = response.header("Content-Encoding");
-                    params.resourceStatus = response.code();
-
                 }
+
+                params.responseHeader = response.headers().toString();
+                params.responseBody = responseBodyString;
+                params.responseContentType = response.header("Content-Type");
+                params.responseConnection = response.header("Connection");
+                params.responseContentEncoding = response.header("Content-Encoding");
+                params.resourceStatus = response.code();
+            } else {
+                LogUtils.d(TAG, "response body empty");
             }
         }
         FTRUMGlobalManager.get().setTransformContent(resourceId, params);

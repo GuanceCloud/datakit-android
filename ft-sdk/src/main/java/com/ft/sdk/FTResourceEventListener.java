@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.ft.sdk.garble.bean.NetStatusBean;
+import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.net.InetAddress;
@@ -22,6 +24,7 @@ import okhttp3.Protocol;
  * @author Brandon
  */
 public class FTResourceEventListener extends EventListener {
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "FTResourceEventListener";
 
     private String requestHost = null;
     private long fetchStartTime = -1;
@@ -37,12 +40,15 @@ public class FTResourceEventListener extends EventListener {
     private final String resourceId;
 
     public FTResourceEventListener(String resourceId) {
+        LogUtils.d(TAG, "FTFactory create:" + resourceId);
         this.resourceId = resourceId;
     }
 
     @Override
     public void callEnd(@NonNull Call call) {
         super.callEnd(call);
+        LogUtils.d(TAG, "callEnd:" + resourceId);
+
         NetStatusBean netStatusBean = new NetStatusBean();
         netStatusBean.requestHost = requestHost;
         netStatusBean.fetchStartTime = fetchStartTime;
@@ -64,19 +70,27 @@ public class FTResourceEventListener extends EventListener {
         requestHost = call.request().url().host();
         fetchStartTime = Utils.getCurrentNanoTime();
 
+        LogUtils.d(TAG, "callStart:" + resourceId);
     }
 
     @Override
     public void responseHeadersStart(@NonNull Call call) {
         super.responseHeadersStart(call);
         responseStartTime = Utils.getCurrentNanoTime();
+        LogUtils.d(TAG, "responseHeadersStart:" + resourceId);
+    }
 
+    @Override
+    public void responseBodyStart(Call call) {
+        super.responseBodyStart(call);
+        LogUtils.d(TAG, "responseBodyStart:" + resourceId);
     }
 
     @Override
     public void responseBodyEnd(@NonNull Call call, long byteCount) {
         super.responseBodyEnd(call, byteCount);
         responseEndTime = Utils.getCurrentNanoTime();
+        LogUtils.d(TAG, "responseBodyEnd:" + resourceId);
     }
 
 //    @Override
@@ -88,12 +102,16 @@ public class FTResourceEventListener extends EventListener {
     public void dnsEnd(@NonNull Call call, @NonNull String domainName, @NonNull List<InetAddress> inetAddressList) {
         super.dnsEnd(call, domainName, inetAddressList);
         dnsEndTime = Utils.getCurrentNanoTime();
+
+        LogUtils.d(TAG, "dnsEnd:" + resourceId);
     }
 
     @Override
     public void dnsStart(@NonNull Call call, @NonNull String domainName) {
         super.dnsStart(call, domainName);
         dnsStartTime = Utils.getCurrentNanoTime();
+
+        LogUtils.d(TAG, "dnsStart:" + resourceId);
     }
 
     @Override
@@ -101,12 +119,15 @@ public class FTResourceEventListener extends EventListener {
         super.secureConnectEnd(call, handshake);
         sslEndTime = Utils.getCurrentNanoTime();
 
+        LogUtils.d(TAG, "secureConnectEnd:" + resourceId);
     }
 
     @Override
     public void secureConnectStart(@NonNull Call call) {
         super.secureConnectStart(call);
         sslStartTime = Utils.getCurrentNanoTime();
+
+        LogUtils.d(TAG, "secureConnectStart:" + resourceId);
     }
 
     @Override
@@ -114,17 +135,19 @@ public class FTResourceEventListener extends EventListener {
         super.connectStart(call, inetSocketAddress, proxy);
         tcpStartTime = Utils.getCurrentNanoTime();
 
+        LogUtils.d(TAG, "connectStart:" + resourceId);
     }
 
     @Override
     public void connectEnd(@NonNull Call call, @NonNull InetSocketAddress inetSocketAddress, @NonNull Proxy proxy, @Nullable Protocol protocol) {
         super.connectEnd(call, inetSocketAddress, proxy, protocol);
         tcpEndTime = Utils.getCurrentNanoTime();
+
+        LogUtils.d(TAG, "connectEnd:" + resourceId);
     }
 
     public static class FTFactory implements EventListener.Factory {
         /**
-         *
          * @param call
          * @return
          */

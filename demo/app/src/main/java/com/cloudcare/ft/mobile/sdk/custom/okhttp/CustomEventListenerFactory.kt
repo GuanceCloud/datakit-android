@@ -9,7 +9,7 @@ import okhttp3.EventListener
  * @see com.ft.sdk.FTResourceEventListener.FTFactory()
  *
  */
-class CustomEventListener : FTResourceEventListener.FTFactory() {
+class CustomEventListenerFactory : FTResourceEventListener.FTFactory() {
     override fun create(call: Call): EventListener {
         //在这里实现自定义方法
         return super.create(call)
