@@ -108,7 +108,7 @@ public class FTLogger {
      */
     private boolean checkConfig() {
         if (config == null) {
-            LogUtils.e(TAG, "使用 FTLogger，需要初始化 FTLoggerConfigManager.get().initWithConfig(FTLoggerConfig ftSdkConfig))");
+            LogUtils.e(TAG, "使用 FTLogger，需要初始化 FTSdk.initLogWithConfig(FTLoggerConfig ftSdkConfig))");
             return false;
         }
         return true;
