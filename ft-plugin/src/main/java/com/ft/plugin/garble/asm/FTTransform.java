@@ -11,6 +11,8 @@ import org.objectweb.asm.ClassVisitor;
 /**
  * 创建 asm class visitor
  *
+ * 仅支持 AGP 7.4.2 以上，Gradle 7.2.0 以上，其他版本查看分支 plugin_legacy_support
+ *
  * @author Brandon
  */
 public abstract class FTTransform implements AsmClassVisitorFactory<InstrumentationParameters.None> {
