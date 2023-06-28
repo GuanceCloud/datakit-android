@@ -123,11 +123,12 @@ public class FTSDKConfig {
 
     /**
      * 设置数据传输环境
+     *
      * @param env
      * @return
      */
     public FTSDKConfig setEnv(String env) {
-        if (env != null) {
+        if (env != null && !env.isEmpty()) {
             this.env = env;
         }
         return this;
