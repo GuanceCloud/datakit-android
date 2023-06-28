@@ -78,6 +78,7 @@ public class ConfigTest extends FTBaseTest {
 
     /**
      * 验证 serviceName
+     *
      * @param serviceName
      * @param expected
      */
@@ -91,6 +92,7 @@ public class ConfigTest extends FTBaseTest {
 
     /**
      * 验证 env 参数
+     *
      * @param env
      * @param expected
      */
@@ -98,7 +100,7 @@ public class ConfigTest extends FTBaseTest {
         FTSDKConfig ftSDKConfig = getDefaultConfig()
                 .setEnv(env);
         FTSdk.install(ftSDKConfig);
-        Assert.assertEquals(expected, FTSdk.get().getBaseConfig().getEnv());
+        Assert.assertEquals(expected.toString(), FTSdk.get().getBaseConfig().getEnv());
     }
 
     private FTSDKConfig getDefaultConfig() {

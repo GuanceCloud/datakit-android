@@ -46,7 +46,6 @@ public class FTSdk {
     private final FTSDKConfig mFtSDKConfig;
 
     /**
-     *
      * @param ftSDKConfig
      */
     private FTSdk(@NonNull FTSDKConfig ftSDKConfig) {
@@ -277,7 +276,7 @@ public class FTSdk {
         hashMap.put(Constants.KEY_APP_VERSION_NAME, Utils.getAppVersionName());
         hashMap.put(Constants.KEY_SDK_NAME, Constants.SDK_NAME);
         hashMap.put(Constants.KEY_APPLICATION_UUID, FTSdk.PACKAGE_UUID);
-        hashMap.put(Constants.KEY_ENV, config.getEnv().toString());
+        hashMap.put(Constants.KEY_ENV, config.getEnv());
         String uuid = config.isEnableAccessAndroidID() ? DeviceUtils.getUuid(FTApplication.getApplication()) : "";
         hashMap.put(Constants.KEY_DEVICE_UUID, uuid);
         hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_AGENT, FTSdk.AGENT_VERSION);
