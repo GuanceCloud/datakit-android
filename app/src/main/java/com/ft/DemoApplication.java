@@ -33,7 +33,7 @@ public class DemoApplication extends BaseApplication {
 
     private void initFTSDK() {
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.ACCESS_SERVER_URL)
-                .setDebug(true)//设置是否是 debug
+                .setDebug(false)//设置是否是 debug
                 .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()));
         FTSdk.install(ftSDKConfig);
 
@@ -41,6 +41,7 @@ public class DemoApplication extends BaseApplication {
                 .setSamplingRate(1f)
                 .setEnableCustomLog(true)
                 .setEnableConsoleLog(true)
+                .setPrintCustomLogToConsole(true)
                 .setLogLevelFilters(new Status[]{Status.ERROR})
                 .setEnableLinkRumData(true)
         );
