@@ -37,11 +37,10 @@ public class FTHookConfig {
                 "onCreate",
                 "()V",
                 "startApp",
-                "(Ljava/lang/Object;)V",
+                "(Landroid/app/Application;)V",
                 Arrays.asList(
                         new FTSubMethodCell(FTMethodType.ALOAD, 0),
-                        new FTSubMethodCell(FTMethodType.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false),
-                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "startApp", "(Ljava/lang/Object;)V", false)
+                        new FTSubMethodCell(FTMethodType.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "startApp", "(Landroid/app/Application;)V", false)
                 )
         ));
     }
