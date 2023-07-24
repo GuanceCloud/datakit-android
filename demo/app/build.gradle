@@ -11,10 +11,10 @@ android {
     buildFeatures {
         buildConfig = true
     }
-    namespace 'com.cloudcare.ft.mobile.sdk.demo'
+    namespace 'com.guance.mobile.sdk.demo'
     compileSdkVersion 33
     defaultConfig {
-        applicationId "com.cloudcare.ft.mobile.sdk.demo"
+        applicationId "com.guance.mobile.sdk.demo"
         minSdkVersion 23
         targetSdkVersion 33
         versionCode 1
@@ -33,8 +33,12 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = 1.8
-        targetCompatibility = 1.8
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
     }
 
     flavorDimensions "tier"
@@ -45,6 +49,7 @@ android {
             buildConfigField "String", "CUSTOM_VALUE", "\"Custom value\""
             buildConfigField "String", "ACCESS_SERVER_URL", "\"${ft_env.datakitRUMUrl}\""
             buildConfigField "String", "RUM_APP_ID", "\"${ft_env.rumAppid}\""
+            buildConfigField "String", "DEMO_API_URL", "\"${ft_env.demoAPIURL}\""
             buildConfigField "String", "ENV", "\"${ft_env.prodTestEnv}\""
             dimension "tier"
         }
@@ -53,6 +58,7 @@ android {
             buildConfigField "String", "CUSTOM_VALUE", "\"Custom value\""
             buildConfigField "String", "ACCESS_SERVER_URL", "\"${ft_env.datakitRUMUrl}\""
             buildConfigField "String", "RUM_APP_ID", "\"${ft_env.rumAppid}\""
+            buildConfigField "String", "DEMO_API_URL", "\"${ft_env.demoAPIURL}\""
             buildConfigField "String", "ENV", "\"${ft_env.prodPublishEnv}\""
             dimension "tier"
         }
@@ -92,12 +98,8 @@ FTExt {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.core:core-ktx:1.3.0'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    testImplementation 'junit:junit:4.13'
-    androidTestImplementation 'androidx.test:runner:1.2.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.2'
 
     //================FT-SDK需要使用的引用=================//
     //FT-SDK引用

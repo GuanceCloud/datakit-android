@@ -9,7 +9,7 @@
 //}
 
 buildscript {
-    ext.kotlin_version = '1.6.21'
+    ext.kotlin_version = '1.8.20'
     repositories {
         google()
         //添加FT SDK的远程仓库地址
@@ -33,6 +33,7 @@ buildscript {
     }
 
     def appIdString = properties.getProperty("RUM_APP_ID")
+    def demoAPIURL = properties.getProperty("DEMO_API_URL")
     def datakitRUMUrl = properties.getProperty("ACCESS_SERVER_URL")
     def datakitDCAUrl = properties.getProperty("SOURCE_MAP_URL")
 
@@ -40,6 +41,7 @@ buildscript {
             'rumAppid'  : appIdString,
             'datakitRUMUrl': datakitRUMUrl,
             'datakitDCAUrl': datakitDCAUrl,
+            'demoAPIURL': demoAPIURL,
             'prodTestEnv'  : 'gray',
             'prodPublishEnv'  : 'prod'
     ]

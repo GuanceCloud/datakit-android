@@ -20,6 +20,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".ManualActivity" />
+        <activity android:name=".NativeActivity" />
+        <activity android:name=".LoginActivity" />
+        <activity android:name=".WebViewActivity" />
+        <activity android:name=".SettingActivity" />
     </application>
 
 </manifest>

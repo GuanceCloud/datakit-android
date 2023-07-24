@@ -34,7 +34,7 @@ import java.util.UUID
  *  Action Resource 和 Trace  手动方式 示范
  *
  */
-class ManualActivity : AppCompatActivity() {
+class ManualActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -1,7 +1,18 @@
 <resources>
-    <string name="app_name">FTSdkDemo</string>
+    <string name="app_name">GuanceDemo</string>
     <string name="str_custom_track">主动埋点（不返回上传结果）</string>
     <string name="str_custom_track_result">主动埋点（异步返回上传结果）</string>
     <string name="str_custom_track_multi_result">主动埋点多条数据（异步返回上传结果）</string>
     <string name="str_upload_flow_chart">上传流程图</string>
+    <string name="password">密码</string>
+    <string name="email">Email</string>
+    <string name="login">登录</string>
+    <string name="username">用户名</string>
+    <string name="url_check">地址检测</string>
+    <string name="app_id">AppId</string>
+    <string name="demo_api_address">Demo API Address</string>
+    <string name="datakit_address">Datakit Address</string>
+    <string name="login_edit_setting">编辑 Demo 配置</string>
+    <string name="main_index_mine">我的</string>
+    <string name="main_index_home">首页</string>
 </resources>

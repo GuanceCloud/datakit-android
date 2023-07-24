@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?><!-- res/menu/options_menu.xml -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menu_item1"
+        android:icon="@drawable/ic_baseline_file_copy_24"
+        android:title="剪切板导入"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_item2"
+        android:icon="@drawable/ic_baseline_save_24"
+        android:title="保存"
+        app:showAsAction="ifRoom" />
+</menu>
