@@ -117,7 +117,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                     JSONObject tags = data.optJSONObject(Constants.TAGS);
                     JSONObject fields = data.optJSONObject(Constants.FIELDS);
 
-                    JSONObject publicTags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
+                    JSONObject publicTags = FTRUMConfigManager.get().getRUMPublicDynamicTags(true);
                     Iterator<String> keys = publicTags.keys();
                     if (tags == null) {
                         tags = new JSONObject();
