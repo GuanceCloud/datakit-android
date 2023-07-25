@@ -33,7 +33,7 @@ public class DemoApplication extends BaseApplication {
 
     private void initFTSDK() {
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.ACCESS_SERVER_URL)
-                .setDebug(false)//设置是否是 debug
+                .setDebug(true)//设置是否是 debug
                 .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()));
         FTSdk.install(ftSDKConfig);
 

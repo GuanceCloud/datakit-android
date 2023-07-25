@@ -74,7 +74,7 @@ object HttpEngine {
 
     private const val API_SEGMENT = "/api"
     private const val API_LOGIN: String = "$API_SEGMENT/login"
-    private const val API_USER_INFO: String = "$API_SEGMENT/user"
+    const val API_USER_INFO: String = "$API_SEGMENT/user"
 
     private lateinit var apiAddress: String
 

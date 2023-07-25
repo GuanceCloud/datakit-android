@@ -2,7 +2,6 @@ package com.cloudcare.ft.mobile.sdk.demo
 
 import android.os.Bundle
 import android.view.Menu
-import androidx.appcompat.app.AppCompatActivity
 
 class SettingActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -1,13 +1,19 @@
 package com.cloudcare.ft.mobile.sdk.demo.manager
 
 import android.content.Context
-import com.cloudcare.ft.mobile.sdk.demo.*
+import com.cloudcare.ft.mobile.sdk.demo.BuildConfig
 import com.cloudcare.ft.mobile.sdk.demo.data.DEFAULT_API_ADDRESS
 import com.cloudcare.ft.mobile.sdk.demo.data.DEFAULT_APP_ID
 import com.cloudcare.ft.mobile.sdk.demo.data.DEFAULT_DATAKIT_ADDRESS
+import com.cloudcare.ft.mobile.sdk.demo.http.HttpEngine
 import com.ft.sdk.FTApplication
 
-data class SettingData(val datakitAddress: String, val demoApiAddress: String, val appId: String)
+
+data class SettingData(val datakitAddress: String, val demoApiAddress: String, val appId: String) {
+    fun getUserInfoUrl(): String {
+        return demoApiAddress + HttpEngine.API_USER_INFO
+    }
+}
 
 object SettingConfigManager {
 
@@ -27,6 +33,7 @@ object SettingConfigManager {
         editor.apply()
 
     }
+
 
     fun readSetting(): SettingData {
         val sharedPreferences = FTApplication.getApplication()

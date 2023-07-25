@@ -42,7 +42,7 @@ class WebViewActivity : BaseActivity() {
         }
 
         // 加载网页
-        webView.loadUrl(data.demoApiAddress)
+        webView.loadUrl("${data.demoApiAddress}?requestUrl=${data.getUserInfoUrl()}")
 
     }
 

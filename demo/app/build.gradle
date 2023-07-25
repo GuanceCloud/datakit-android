@@ -11,7 +11,7 @@ android {
     buildFeatures {
         buildConfig = true
     }
-    namespace 'com.guance.mobile.sdk.demo'
+    namespace 'com.cloudcare.ft.mobile.sdk.demo'
     compileSdkVersion 33
     defaultConfig {
         applicationId "com.guance.mobile.sdk.demo"
