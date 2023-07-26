@@ -2,6 +2,8 @@ package com.ft;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -11,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -30,12 +33,12 @@ public class WebViewActivity extends AppCompatActivity {
         webView = findViewById(R.id.webView);
         progressBar = findViewById(R.id.progressBar);
         String[] data = new String[]{
-                "https://www.taobao.com",
-                "https://www.tmall.com/",
-                "https://www.jd.com/",
-                "https://www.toutiao.com/",
-                "https://www.baidu.com/test",
-                "https://www.csdn.net/",
+//                "https://www.taobao.com",
+//                "https://www.tmall.com/",
+//                "https://www.jd.com/",
+//                "https://www.toutiao.com/",
+//                "https://www.baidu.com/test",
+//                "https://www.csdn.net/",
                 "file:///android_asset/local_sample.html",
                 "http://10.100.64.166/test/rum/"
         };
@@ -74,6 +77,20 @@ public class WebViewActivity extends AppCompatActivity {
             }
 
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.webview_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.refresh) {
+            webView.reload();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
