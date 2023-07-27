@@ -2,12 +2,12 @@ package com.ft.plugin.garble;
 
 import com.android.build.gradle.AppExtension;
 
+import org.apache.tools.ant.util.FileUtils;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.UnknownDomainObjectException;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ProjectDependency;
-import org.gradle.internal.impldep.org.apache.commons.io.FileUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -91,13 +91,9 @@ public class FTMapUploader {
 
                 String tmpBuildPath = String.format(tmpBuildPathFormat, variantName);
                 String zipBuildPath = String.format(zipBuildPathFormat, variantName);
-                try {
-                    //删除之前的 cache
-                    FileUtils.delete(new File(tmpBuildPath));
-                    FileUtils.delete(new File(zipBuildPath));
-                } catch (IOException e) {
-                    Logger.debug("tmp  delete error:" + e.getMessage());
-                }
+                //删除之前的 cache
+                FileUtils.delete(new File(tmpBuildPath));
+                FileUtils.delete(new File(zipBuildPath));
                 try {
                     ObfuscationSettingConfig config = obfuscationSettingMap.get(assembleTaskName);
                     Logger.debug("task:" + assembleTaskName + ",config:" + config + "");
