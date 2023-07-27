@@ -12,6 +12,7 @@ import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.PackageUtils;
 import com.ft.sdk.garble.utils.Utils;
 import com.ft.sdk.internal.exception.FTInitSDKProcessException;
 
@@ -31,9 +32,10 @@ public class FTSdk {
      */
     public static String PLUGIN_VERSION = "";
     /**
-     * 改变量 {@link FTSdk#initRUMWithConfig(FTRUMConfig)} 后被初始化，集成后 ft-native 后才会被被赋值
+     * 集成后 ft-native 后才会被被赋值,直接访问 {@link com.ft.sdk.nativelib.BuildConfig#VERSION_NAME} 来获取
      */
-    public static String NATIVE_VERSION = "";
+    public static String NATIVE_VERSION = PackageUtils.isNativeLibrarySupport() ? com.ft.sdk.nativelib.BuildConfig.VERSION_NAME : "";
+    ;
     /**
      * 变量由 Plugin ASM 写入，同一次编译版本 UUID 相同
      */

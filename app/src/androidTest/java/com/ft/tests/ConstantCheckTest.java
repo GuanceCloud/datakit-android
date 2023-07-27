@@ -60,7 +60,7 @@ public class ConstantCheckTest extends BaseTest {
     }
 
     /**
-     * 检验 ft-native 版本好
+     * 检验 ft-native 版本号
      * {@link com.ft.sdk.garble.utils.Constants#KEY_RUM_SDK_PACKAGE_NATIVE}
      */
     @Test
