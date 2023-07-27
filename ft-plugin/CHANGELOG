@@ -1,3 +1,7 @@
+# plugin 1.2.1-beta01
+1.修正 sourceMap 上传发生错误的问题
+
+---
 # plugin 1.2.1-alpha01
 1.适配阿里云 Sophix 热修复集成后无法采集 View 数据的问题
 
