@@ -27,12 +27,17 @@ abstract class BaseData(private val returnResult: ReturnResult) {
     internal fun parse() {
         if (code != ERROR_CODE_LOCAL) {
             if (returnResult.result != null) {
-                val json = JSONObject(returnResult.result)
-                if (code == HttpURLConnection.HTTP_OK) {
-                    onHttpOk(json)
-                } else {
-                    onHttpError(json)
+                try {
+                    val json = JSONObject(returnResult.result)
+                    if (code == HttpURLConnection.HTTP_OK) {
+                        onHttpOk(json)
+                    } else {
+                        onHttpError(json)
+                    }
+                } catch (e: Exception) {
+                    onHttpError(JSONObject("{\"error\":\"connect error\"}"))
                 }
+
             } else {
                 code = ERROR_CODE_BODY_EMPTY
                 errorMessage = "Body Empty"
@@ -75,10 +80,12 @@ object HttpEngine {
     private const val API_SEGMENT = "/api"
     private const val API_LOGIN: String = "$API_SEGMENT/login"
     const val API_USER_INFO: String = "$API_SEGMENT/user"
+    private const val API_CONNECT: String = "/connect"
+    private const val API_DATAKIT_PING: String = "/v1/ping"
 
     private lateinit var apiAddress: String
 
-    fun initAddress(url: String) {
+    fun initAPIAddress(url: String) {
         this.apiAddress = url;
     }
 
@@ -93,9 +100,22 @@ object HttpEngine {
 
     fun userinfo(): UserData {
         val url = "$apiAddress$API_USER_INFO"
-        val builder: Request.Builder = Request.Builder().url(url).method("get", null);
+        val builder: Request.Builder = Request.Builder().url(url)
         return request(builder.build())
     }
+
+    fun datakitPing(datakitUrl: String): ConnectData {
+        val url = "$datakitUrl$API_DATAKIT_PING"
+        val builder: Request.Builder = Request.Builder().url("http://10.100.64.166:9529/v1/ping")
+        return request(builder.build())
+    }
+
+    fun apiConnect(demoAPIUrl: String): ConnectData {
+        val url = "$demoAPIUrl$API_CONNECT"
+        val builder: Request.Builder = Request.Builder().url(url)
+        return request(builder.build())
+    }
+
 
     private inline fun <reified T : BaseData> request(request: Request): T {
         if (!Utils.isNetworkAvailable(FTApplication.getApplication())) {

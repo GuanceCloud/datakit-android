@@ -19,8 +19,6 @@ import com.ft.sdk.FTTraceConfig
  * Description:
  */
 open class DemoApplication : Application() {
-
-
     override fun onCreate() {
         super.onCreate()
         setSDK(this)
@@ -33,7 +31,7 @@ open class DemoApplication : Application() {
 
         fun setSDK(context: Context) {
             val data = SettingConfigManager.readSetting()
-            HttpEngine.initAddress(data.demoApiAddress)
+            HttpEngine.initAPIAddress(data.demoApiAddress)
             val ftSDKConfig =
                 FTSDKConfig.builder(data.datakitAddress)
                     .setServiceName("ft-sdk-demo")

@@ -1,79 +1,42 @@
 package com.cloudcare.ft.mobile.sdk.demo
 
-import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
-import android.widget.Toast
-import com.ft.sdk.FTRUMConfig
-import com.ft.sdk.FTSdk
-import com.ft.sdk.FTTraceConfig
+import com.ft.sdk.garble.reflect.ReflectUtils
 
 class NativeActivity : BaseActivity() {
-    private val phonePermission = Manifest.permission.READ_PHONE_STATE
-    private var requestPermissions = arrayOf<String>()
-    private val REQUEST_CODE = 0x001
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        title = "Native View"
         setContentView(R.layout.activity_native_view)
 
-        //请求权限
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(phonePermission) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions = requestPermissions.plus(phonePermission)
-            }
-            if (requestPermissions.isNotEmpty()) {
-                requestPermissions(requestPermissions, REQUEST_CODE)
-            }
-        }
-
-        findViewById<Button>(R.id.dynamic_rum_tag_btn).setOnClickListener {
+        findViewById<Button>(R.id.native_dynamic_rum_tag_btn).setOnClickListener {
+            val intent = Intent(this@NativeActivity, MainActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            startActivity(intent)
             DemoApplication.setDynamicParams(this, "set from dynamic")
-            finish()
-
+            DemoApplication.setSDK(this@NativeActivity)
         }
 
-        findViewById<Button>(R.id.manual_data_btn).setOnClickListener {
-            FTSdk.initTraceWithConfig(
-                FTTraceConfig()
-                    .setEnableLinkRUMData(true)
-            )
-
-            FTSdk.initRUMWithConfig(
-                FTRUMConfig()
-                    .setRumAppId(BuildConfig.RUM_APP_ID)
-                    .setEnableTrackAppCrash(true)
-                    .setEnableTrackAppANR(true)
-            )
-            startActivity(Intent(this, ManualActivity::class.java))
+        findViewById<View>(R.id.native_crash_java_kotlin_data_btn).setOnClickListener { v: View? ->
+            Thread { val i = 1 / 0 }.start()
+        }
+        findViewById<View>(R.id.native_crash_c_cpp_data_btn).setOnClickListener { v: View? ->
+            ReflectUtils.reflectCrashAndGetExceptionMessage()
         }
 
+
+        findViewById<View>(R.id.native_long_task_data_btn).setOnClickListener { v: View? ->
+            try {
+                Thread.sleep(2000)
+            } catch (e: InterruptedException) {
+                e.printStackTrace()
+            }
+        }
 
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        //权限回调提示
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_CODE) {
-            var count = 0
-            for (i in grantResults.indices) {
-                if (permissions[i] == phonePermission && grantResults[i] == PackageManager.PERMISSION_DENIED) {
-                    count += 1
-                }
-            }
-            if (count > 0) {
-                Toast.makeText(
-                    this,
-                    "你拒绝了电话权限",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-    }
 }

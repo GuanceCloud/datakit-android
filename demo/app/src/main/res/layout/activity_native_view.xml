@@ -12,15 +12,28 @@
         android:orientation="vertical">
 
         <Button
-            android:id="@+id/dynamic_rum_tag_btn"
+            android:id="@+id/native_crash_java_kotlin_data_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="动态设置" />
+            android:text="Crash Java/Kotlin" />
+
         <Button
-            android:id="@+id/manual_data_btn"
+            android:id="@+id/native_crash_c_cpp_data_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="手动设置" />
+            android:text="Crash C/C++" />
+
+        <Button
+            android:id="@+id/native_long_task_data_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="UIBlock(Longtask)" />
+
+        <Button
+            android:id="@+id/native_dynamic_rum_tag_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tag 动态设置" />
 
 
     </LinearLayout>

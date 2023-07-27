@@ -5,12 +5,14 @@ import android.widget.Toast
 import com.cloudcare.ft.mobile.sdk.demo.http.HttpEngine
 import com.cloudcare.ft.mobile.sdk.demo.http.UserData
 import com.ft.sdk.FTApplication
+import com.ft.sdk.FTSdk
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.net.HttpURLConnection
+
 
 @DelicateCoroutinesApi
 object AccountManager {
@@ -38,7 +40,7 @@ object AccountManager {
                 && userData?.avatar.isNullOrEmpty()
                 && userData?.email.isNullOrEmpty())
 
-        return false;
+        return isLogin
     }
 
     fun login(userName: String, password: String, callback: Callback) {
@@ -61,13 +63,22 @@ object AccountManager {
         }
     }
 
-    fun getUserInfo() {
+    fun getUserInfo(success: (() -> Unit)? = null) {
         GlobalScope.launch(Dispatchers.IO) {
             val data = HttpEngine.userinfo()
 
             withContext(Dispatchers.Main) {
                 if (data.code == HttpURLConnection.HTTP_OK) {
                     saveUserData(data)
+
+                    val userData = com.ft.sdk.garble.bean.UserData()
+                    userData.email = data.email
+                    userData.name = data.username
+                    userData.id = data.email
+                    FTSdk.bindRumUserData(userData)
+                    success?.let {
+                        it()
+                    }
                 }
             }
         }
@@ -88,6 +99,7 @@ object AccountManager {
         editor.putString(KEY_USER_EMAIL, data.email)
         editor.putString(KEY_USER_AVATAR, data.avatar)
         editor.apply()
+
     }
 
     /**
@@ -103,6 +115,20 @@ object AccountManager {
         userData.email = sharedPreferences.getString(KEY_USER_EMAIL, null)
         userData.avatar = sharedPreferences.getString(KEY_USER_AVATAR, null)
         return userData
+    }
+
+    private fun cleanUserData() {
+        val sharedPreferences = FTApplication.getApplication()
+            .getSharedPreferences(PREFS_USER_DATA_NAME, Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.clear()
+        editor.apply()
+    }
+
+    fun logout() {
+        isLogin = false
+        cleanUserData()
+        FTSdk.unbindRumUserData()
     }
 
 

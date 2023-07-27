@@ -107,8 +107,10 @@ dependencies {
 
     implementation 'com.cloudcare.ft.mobile.sdk.tracker.agent:ft-native:1.0.0-beta01'
     implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.squareup.picasso:picasso:2.8'
 
     //需用监控网络数据时，添加该依赖，实现网络引擎
 //    implementation 'com.squareup.okhttp3:okhttp:3.12.12'
     implementation 'com.squareup.okhttp3:okhttp:4.5.0'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 }

@@ -1,24 +1,30 @@
 package com.cloudcare.ft.mobile.sdk.demo
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.cloudcare.ft.mobile.sdk.demo.adapter.SimpleAdapter
+import androidx.fragment.app.Fragment
+import androidx.viewpager2.widget.ViewPager2
+import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
+import com.cloudcare.ft.mobile.sdk.demo.adapter.ViewPagerAdapter
+import com.cloudcare.ft.mobile.sdk.demo.fragment.HomeFragment
+import com.cloudcare.ft.mobile.sdk.demo.fragment.MineFragment
 import com.cloudcare.ft.mobile.sdk.demo.manager.AccountManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
 import kotlinx.coroutines.DelicateCoroutinesApi
 
 
-class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener,
-    NavigationBarView.OnItemSelectedListener {
+@DelicateCoroutinesApi
+class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListener {
 
-    private val dataList = listOf("Native View", "WebView")
 
     var resultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -26,63 +32,108 @@ class MainActivity : AppCompatActivity(), SimpleAdapter.OnItemClickListener,
                 setUpView()
             }
         }
+    private val phonePermission = Manifest.permission.READ_PHONE_STATE
+    private var requestPermissions = arrayOf<String>()
+    private val REQUEST_CODE = 0x001
 
-    @OptIn(DelicateCoroutinesApi::class)
+    private var viewPager: ViewPager2? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_loading)
         if (AccountManager.checkLogin()) {
             setUpView()
         } else {
-            resultLauncher.launch(Intent(this@MainActivity, LoginActivity::class.java))
+            goToLogin()
         }
+    }
 
+    fun goToLogin() {
+        resultLauncher.launch(Intent(this@MainActivity, LoginActivity::class.java))
 
     }
 
     private fun setUpView() {
         title = getString(R.string.main_index_home)
         setContentView(R.layout.activity_main)
-        val recyclerView: RecyclerView = findViewById(R.id.recyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = SimpleAdapter(dataList, this)
+
+        viewPager = findViewById(R.id.viewPager)
+
+        val fragments: MutableList<Fragment> = ArrayList()
+        fragments.add(HomeFragment())
+        fragments.add(MineFragment())
+
+        val adapter = ViewPagerAdapter(this, fragments)
+        viewPager?.adapter = adapter
+        viewPager?.registerOnPageChangeCallback(object : OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                when (position) {
+                    0 -> {
+                        title = getString(R.string.main_index_home)
+                    }
+
+                    1 -> {
+                        title = getString(R.string.main_index_mine)
+                    }
+                }
+            }
+
+        })
 
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNavigationView.setOnItemSelectedListener(this)
 
-    }
 
-    override fun onItemClick(data: String) {
-        when (data) {
-            "Native View" -> {
-                startActivity(Intent(this@MainActivity, NativeActivity::class.java))
-
+        //请求权限
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(phonePermission) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions = requestPermissions.plus(phonePermission)
             }
-
-            "WebView" -> {
-                startActivity(Intent(this@MainActivity, WebViewActivity::class.java))
-
+            if (requestPermissions.isNotEmpty()) {
+                requestPermissions(requestPermissions, REQUEST_CODE)
             }
-
         }
-    }
 
+    }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.navigation_home -> {
-                title = getString(R.string.main_index_home)
+                viewPager?.currentItem = 0
                 return true
 
             }
 
             R.id.navigation_profile -> {
-                title = getString(R.string.main_index_mine)
-
+                viewPager?.currentItem = 1
                 return true
             }
         }
         return false
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        //权限回调提示
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CODE) {
+            var count = 0
+            for (i in grantResults.indices) {
+                if (permissions[i] == phonePermission && grantResults[i] == PackageManager.PERMISSION_DENIED) {
+                    count += 1
+                }
+            }
+            if (count > 0) {
+                Toast.makeText(
+                    this,
+                    "你拒绝了电话权限",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
 
 

@@ -35,7 +35,7 @@ class LoginActivity : AppCompatActivity(), AccountManager.Callback {
 
         val editBtn = findViewById<TextView>(R.id.login_setting_btn)
 
-        val spannableString = SpannableString(getString(R.string.login_edit_setting))
+        val spannableString = SpannableString(getString(R.string.edit_setting))
 
         val underlineSpan = UnderlineSpan()
 

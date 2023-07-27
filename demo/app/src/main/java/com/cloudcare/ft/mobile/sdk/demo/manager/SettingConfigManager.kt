@@ -7,21 +7,37 @@ import com.cloudcare.ft.mobile.sdk.demo.data.DEFAULT_APP_ID
 import com.cloudcare.ft.mobile.sdk.demo.data.DEFAULT_DATAKIT_ADDRESS
 import com.cloudcare.ft.mobile.sdk.demo.http.HttpEngine
 import com.ft.sdk.FTApplication
+import org.json.JSONObject
 
+private const val PREFS_USER_DATA_NAME = "gc_demo_sdk_setting"
+private const val KEY_DEMO_DATAKIT_ADDRESS = "datakitAddress"
+private const val KEY_DEMO_API_ADDRESS = "demoApiAddress"
+private const val KEY_DEMO_APP_ID = "demoAndroidAppId"
 
 data class SettingData(val datakitAddress: String, val demoApiAddress: String, val appId: String) {
     fun getUserInfoUrl(): String {
         return demoApiAddress + HttpEngine.API_USER_INFO
     }
+
+    companion object {
+        fun readFromJson(jsonString: String): SettingData? {
+            try {
+                val json = JSONObject(jsonString)
+                val datakitAddress = json.optString(KEY_DEMO_DATAKIT_ADDRESS, "")
+                val demoApiAddress = json.optString(KEY_DEMO_API_ADDRESS, "")
+                val appId = json.optString(KEY_DEMO_APP_ID, "")
+                return SettingData(datakitAddress, demoApiAddress, appId)
+            } catch (_: Exception) {
+
+
+            }
+            return null
+
+        }
+    }
 }
 
 object SettingConfigManager {
-
-    private const val PREFS_USER_DATA_NAME = "gc_demo_sdk_setting"
-    private const val KEY_DEMO_DATAKIT_ADDRESS = "datakitAddress"
-    private const val KEY_DEMO_API_ADDRESS = "demoApiAddress"
-    private const val KEY_DEMO_APP_ID = "appId"
-
 
     fun saveSetting(data: SettingData) {
         val sharedPreferences = FTApplication.getApplication()

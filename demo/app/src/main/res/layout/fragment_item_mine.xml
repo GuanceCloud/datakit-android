@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mine_refresh_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/mine_avatar"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="32dp" />
+
+        <TextView
+            android:id="@+id/mine_username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/mine_avatar"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="16dp"
+            android:text="SomeOne"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/mine_email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/mine_username"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="8dp"
+            android:text="someone@example.com"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/mine_edit_setting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/mine_email"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="32dp"
+            android:text="@string/edit_setting" />
+
+        <Button
+            android:id="@+id/mine_logout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/mine_edit_setting"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="8dp"
+            android:text="退出登陆" />
+
+    </RelativeLayout>
+
+
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
