@@ -71,7 +71,7 @@ FTExt {
     showLog = true
     autoUploadMap = true
     autoUploadNativeDebugSymbol = true
-    datakitDCAUrl = ft_env.datakitRUMUrl
+    datakitDCAUrl = ft_env.datakitDCAUrl
     appId = ft_env.rumAppid
     env = 'common'
 
@@ -80,7 +80,7 @@ FTExt {
         prodTest {
             autoUploadMap = true
             autoUploadNativeDebugSymbol = true
-            datakitDCAUrl = ft_env.datakitRUMUrl //remote datakit dca address
+            datakitDCAUrl = ft_env.datakitDCAUrl //remote datakit dca address
             appId = ft_env.rumAppid
             env = ft_env.prodPublishEnv
 
@@ -88,7 +88,7 @@ FTExt {
         prodPublish {
             autoUploadMap = true
             autoUploadNativeDebugSymbol = true
-            datakitDCAUrl = ft_env.datakitRUMUrl
+            datakitDCAUrl = ft_env.datakitDCAUrl
             appId = ft_env.rumAppid
             env = ft_env.prodPublishEnv
         }
