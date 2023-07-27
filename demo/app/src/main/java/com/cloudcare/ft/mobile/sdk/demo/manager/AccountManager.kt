@@ -84,9 +84,6 @@ object AccountManager {
         }
     }
 
-    /**
-     *
-     */
     private fun saveUserData(data: UserData) {
         this.userData = data;
 
@@ -102,9 +99,6 @@ object AccountManager {
 
     }
 
-    /**
-     *
-     */
     private fun readUserData(): UserData {
         val sharedPreferences = FTApplication.getApplication().getSharedPreferences(
             PREFS_USER_DATA_NAME,

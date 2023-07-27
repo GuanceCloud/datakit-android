@@ -6,11 +6,13 @@ import com.cloudcare.ft.mobile.sdk.demo.http.HttpEngine
 import com.cloudcare.ft.mobile.sdk.demo.manager.SettingConfigManager
 import com.ft.sdk.DeviceMetricsMonitorType
 import com.ft.sdk.ErrorMonitorType
+import com.ft.sdk.FTLogger
 import com.ft.sdk.FTLoggerConfig
 import com.ft.sdk.FTRUMConfig
 import com.ft.sdk.FTSDKConfig
 import com.ft.sdk.FTSdk
 import com.ft.sdk.FTTraceConfig
+import com.ft.sdk.garble.bean.Status
 
 
 /**
@@ -45,6 +47,7 @@ open class DemoApplication : Application() {
 //                .setEnableConsoleLog(true,"log prefix")
                     .setEnableLinkRumData(true)
                     .setEnableCustomLog(true)
+                    .setPrintCustomLogToConsole(true)
 //                .setLogLevelFilters(arrayOf(Status.CRITICAL))
                     .setSamplingRate(0.8f)
 
@@ -60,7 +63,7 @@ open class DemoApplication : Application() {
                     .setEnableTraceUserAction(true)
                     .setEnableTraceUserView(true)
                     .setEnableTraceUserResource(true)
-                    .setSamplingRate(0.8f)
+                    .setSamplingRate(1f)
                     .addGlobalContext(CUSTOM_STATIC_TAG, BuildConfig.CUSTOM_VALUE)
                     .addGlobalContext(CUSTOM_DYNAMIC_TAG, customDynamicValue!!)
                     .setExtraMonitorTypeWithError(ErrorMonitorType.ALL.value)
@@ -72,7 +75,7 @@ open class DemoApplication : Application() {
             //配置 Trace
             FTSdk.initTraceWithConfig(
                 FTTraceConfig()
-                    .setSamplingRate(0.8f)
+                    .setSamplingRate(1f)
                     .setEnableAutoTrace(true)
                     .setEnableLinkRUMData(true)
             )

@@ -194,18 +194,12 @@ class SettingActivity : BaseActivity() {
             val apiConnect = HttpEngine.apiConnect(settingData.demoApiAddress)
 
             withContext(Dispatchers.Main) {
-                if (datakitConnect.code == HttpURLConnection.HTTP_OK) {
-
-                } else {
+                if (datakitConnect.code != HttpURLConnection.HTTP_OK) {
                     datakitAddressEt?.error = datakitConnect.errorMessage
-
                 }
 
-                if (apiConnect.code == HttpURLConnection.HTTP_OK) {
-
-                } else {
+                if (apiConnect.code != HttpURLConnection.HTTP_OK) {
                     demoAPIAddressEt?.error = apiConnect.errorMessage
-
                 }
                 UtilsDialog.hideLoadingDialog()
 

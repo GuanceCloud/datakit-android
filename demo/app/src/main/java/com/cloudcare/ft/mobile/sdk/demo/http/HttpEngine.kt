@@ -1,7 +1,13 @@
 package com.cloudcare.ft.mobile.sdk.demo.http
 
+import android.util.Log
 import com.cloudcare.ft.mobile.sdk.demo.utils.Utils
 import com.ft.sdk.FTApplication
+import com.ft.sdk.FTLogger
+import com.ft.sdk.FTRUMGlobalManager
+import com.ft.sdk.garble.bean.AppState
+import com.ft.sdk.garble.bean.ErrorType
+import com.ft.sdk.garble.bean.Status
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -13,7 +19,8 @@ abstract class BaseData(private val returnResult: ReturnResult) {
     companion object {
         const val ERROR_CODE_LOCAL = 0
         const val ERROR_CODE_BODY_EMPTY = 100
-        const val ERROR_CODE_NET_WORK_ERROR = 101
+        const val ERROR_CODE_NET_WORK_NO_AVAILABLE = 101
+        const val ERROR_CODE_NET_WORK_CONNECT_ERROR = 102
     }
 
     var code: Int = ERROR_CODE_LOCAL
@@ -32,15 +39,29 @@ abstract class BaseData(private val returnResult: ReturnResult) {
                     if (code == HttpURLConnection.HTTP_OK) {
                         onHttpOk(json)
                     } else {
-                        onHttpError(json)
+                        when (code) {
+                            ERROR_CODE_NET_WORK_NO_AVAILABLE -> {
+                                onHttpError(JSONObject("{\"error\":\"network no available\"}"))
+                            }
+
+                            ERROR_CODE_NET_WORK_CONNECT_ERROR -> {
+                                onHttpError(JSONObject("{\"error\":\"connect error:1\"}"))
+                            }
+
+                            else -> {
+                                onHttpError(json)
+                            }
+                        }
                     }
-                } catch (e: Exception) {
-                    onHttpError(JSONObject("{\"error\":\"connect error\"}"))
+                } catch (_: Exception) {
+                    onHttpError(JSONObject("{\"error\":\"connect error:0\"}"))
+                    FTLogger.getInstance()
+                        .logBackground("JSON Parse Error with:${returnResult.result}", Status.ERROR)
                 }
 
             } else {
                 code = ERROR_CODE_BODY_EMPTY
-                errorMessage = "Body Empty"
+                errorMessage = "connect error:3"
             }
         }
     }
@@ -106,7 +127,7 @@ object HttpEngine {
 
     fun datakitPing(datakitUrl: String): ConnectData {
         val url = "$datakitUrl$API_DATAKIT_PING"
-        val builder: Request.Builder = Request.Builder().url("http://10.100.64.166:9529/v1/ping")
+        val builder: Request.Builder = Request.Builder().url(url)
         return request(builder.build())
     }
 
@@ -119,9 +140,24 @@ object HttpEngine {
 
     private inline fun <reified T : BaseData> request(request: Request): T {
         if (!Utils.isNetworkAvailable(FTApplication.getApplication())) {
-            return ReturnResult(BaseData.ERROR_CODE_NET_WORK_ERROR).convertFTData()
+            return ReturnResult(BaseData.ERROR_CODE_NET_WORK_NO_AVAILABLE).convertFTData()
         }
-        return OkHttpClientInstance.get().newCall(request).execute().convertFTData()
+        try {
+            return OkHttpClientInstance.get().newCall(request).execute().convertFTData()
+
+        } catch (e: Exception) {
+            FTRUMGlobalManager.get()
+                .addError(
+                    e.message,
+                    Log.getStackTraceString(e),
+                    ErrorType.JAVA,
+                    AppState.RUN
+                )
+        }
+
+        return ReturnResult(BaseData.ERROR_CODE_NET_WORK_CONNECT_ERROR).convertFTData()
+
+
     }
 
 

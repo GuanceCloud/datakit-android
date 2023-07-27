@@ -17,6 +17,8 @@ import com.cloudcare.ft.mobile.sdk.demo.adapter.ViewPagerAdapter
 import com.cloudcare.ft.mobile.sdk.demo.fragment.HomeFragment
 import com.cloudcare.ft.mobile.sdk.demo.fragment.MineFragment
 import com.cloudcare.ft.mobile.sdk.demo.manager.AccountManager
+import com.ft.sdk.FTLogger
+import com.ft.sdk.garble.bean.Status
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -43,6 +45,7 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
         setContentView(R.layout.activity_loading)
         if (AccountManager.checkLogin()) {
             setUpView()
+            FTLogger.getInstance().logBackground("Account Exists", Status.INFO)
         } else {
             goToLogin()
         }
