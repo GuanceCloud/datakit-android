@@ -22,4 +22,8 @@
     <string name="setting_import_success">配置导入成功</string>
     <string name="setting_import_fail">配置解析失败</string>
     <string name="setting_configure_not_found">未发现配置</string>
+    <string name="setting_tip_connect_success">地址连接正常</string>
+    <string name="setting_log_out">退出登录</string>
+    <string name="setting_version">版本号</string>
+    <string name="webview_refresh">刷新</string>
 </resources>

@@ -62,7 +62,8 @@ class LoginActivity : AppCompatActivity(), AccountManager.Callback {
     }
 
     override fun onBackPressed() {
-        moveTaskToBack(true)
+        super.onBackPressed()
+        finishAffinity()
     }
 
 

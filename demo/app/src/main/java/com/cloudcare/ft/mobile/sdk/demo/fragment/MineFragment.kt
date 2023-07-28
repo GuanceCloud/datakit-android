@@ -5,16 +5,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.cloudcare.ft.mobile.sdk.demo.BuildConfig
 import com.cloudcare.ft.mobile.sdk.demo.MainActivity
 import com.cloudcare.ft.mobile.sdk.demo.R
 import com.cloudcare.ft.mobile.sdk.demo.SettingActivity
 import com.cloudcare.ft.mobile.sdk.demo.manager.AccountManager
-import com.ft.sdk.FTLogger
+import com.cloudcare.ft.mobile.sdk.demo.utils.CircleTransform
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.DelicateCoroutinesApi
 
@@ -33,16 +33,19 @@ class MineFragment : Fragment() {
     }
 
     private fun setUpView(view: View) {
-        view.findViewById<Button>(R.id.mine_edit_setting).setOnClickListener {
+        view.findViewById<View>(R.id.mine_edit_setting).setOnClickListener {
             startActivity(Intent(context, SettingActivity::class.java))
         }
 
         bindUserView(view)
 
-        view.findViewById<Button>(R.id.mine_logout).setOnClickListener {
+        view.findViewById<View>(R.id.mine_logout).setOnClickListener {
             AccountManager.logout()
             (context as MainActivity).goToLogin()
         }
+
+        view.findViewById<TextView>(R.id.mine_app_version).text =
+            "${BuildConfig.VERSION_NAME}${(if(BuildConfig.DEBUG)"-Debug" else "")} (${BuildConfig.VERSION_CODE})"
 
         val refreshView: SwipeRefreshLayout = view.findViewById(R.id.mine_refresh_layout)
         refreshView.setOnRefreshListener {
@@ -62,6 +65,7 @@ class MineFragment : Fragment() {
         val avatarIv = view.findViewById<ImageView>(R.id.mine_avatar)
         Picasso.get()
             .load(userdata?.avatar)
+            .transform(CircleTransform())
 //            .placeholder(R.drawable.placeholder) // Optional placeholder image while loading
 //            .error(R.drawable.error_image) // Optional error image if the loading fails
             .into(avatarIv)

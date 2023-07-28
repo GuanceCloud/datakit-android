@@ -115,8 +115,7 @@ object HttpEngine {
         val json = """{"username": "$user", "password": "$password"}"""
         val builder: Request.Builder = Request.Builder().url(url)
             .method("post", json.toRequestBody("application/json".toMediaTypeOrNull()))
-        return OkHttpClientInstance.get()
-            .newCall(builder.build()).execute().convertFTData()
+        return request(builder.build())
     }
 
     fun userinfo(): UserData {

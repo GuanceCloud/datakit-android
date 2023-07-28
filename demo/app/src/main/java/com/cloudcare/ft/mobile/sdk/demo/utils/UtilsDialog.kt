@@ -20,4 +20,8 @@ object UtilsDialog {
             loadingDialog?.dismiss()
         }
     }
+
+    fun showToast(){
+        
+    }
 }

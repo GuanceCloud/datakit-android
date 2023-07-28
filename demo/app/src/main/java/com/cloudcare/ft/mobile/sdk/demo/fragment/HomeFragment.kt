@@ -11,11 +11,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.cloudcare.ft.mobile.sdk.demo.NativeActivity
 import com.cloudcare.ft.mobile.sdk.demo.R
 import com.cloudcare.ft.mobile.sdk.demo.WebViewActivity
+import com.cloudcare.ft.mobile.sdk.demo.adapter.DividerItemDecoration
+import com.cloudcare.ft.mobile.sdk.demo.adapter.ListItem
 import com.cloudcare.ft.mobile.sdk.demo.adapter.SimpleAdapter
 
 class HomeFragment : Fragment(), SimpleAdapter.OnItemClickListener {
 
-    private val dataList = listOf("Native View", "WebView")
+    private val dataList =
+        listOf(
+            ListItem("Native View", "Android 原生界面", R.drawable.ic_android),
+            ListItem("WebView", "Android Webview 界面，通过观测云 JS 配置实现", R.drawable.ic_web)
+        )
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,6 +35,12 @@ class HomeFragment : Fragment(), SimpleAdapter.OnItemClickListener {
         val recyclerView: RecyclerView = rootView.findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = SimpleAdapter(dataList, this)
+        recyclerView.addItemDecoration(
+            DividerItemDecoration(
+                context,
+                androidx.appcompat.R.drawable.abc_list_divider_material
+            )
+        )
         return rootView
     }
 

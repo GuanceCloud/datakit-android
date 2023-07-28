@@ -27,7 +27,6 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 @DelicateCoroutinesApi
 class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListener {
 
-
     var resultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
@@ -53,12 +52,14 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
 
     fun goToLogin() {
         resultLauncher.launch(Intent(this@MainActivity, LoginActivity::class.java))
-
     }
 
     private fun setUpView() {
         title = getString(R.string.main_index_home)
         setContentView(R.layout.activity_main)
+
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+        bottomNavigationView.setOnItemSelectedListener(this)
 
         viewPager = findViewById(R.id.viewPager)
 
@@ -73,19 +74,19 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
                 when (position) {
                     0 -> {
                         title = getString(R.string.main_index_home)
+                        bottomNavigationView.selectedItemId = R.id.navigation_home
                     }
 
                     1 -> {
                         title = getString(R.string.main_index_mine)
+                        bottomNavigationView.selectedItemId = R.id.navigation_profile
                     }
+
                 }
+
             }
 
         })
-
-        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
-        bottomNavigationView.setOnItemSelectedListener(this)
-
 
         //请求权限
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

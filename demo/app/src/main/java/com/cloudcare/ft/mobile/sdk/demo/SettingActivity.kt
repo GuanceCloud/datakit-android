@@ -38,17 +38,17 @@ class SettingActivity : BaseActivity() {
         demoAPIAddressEt = findViewById(R.id.setting_demo_api)
         appIDEt = findViewById(R.id.setting_app_id)
 
-        appIDEt?.setOnFocusChangeListener { v, hasFocus ->
-            checkAppId()
-        }
-
-        datakitAddressEt?.setOnFocusChangeListener { v, hasFocus ->
-            checkDatakitAddress()
-        }
-
-        demoAPIAddressEt?.setOnFocusChangeListener { v, hasFocus ->
-            checkDemoAPIAddress()
-        }
+//        appIDEt?.setOnFocusChangeListener { _, _ ->
+//            checkAppId()
+//        }
+//
+//        datakitAddressEt?.setOnFocusChangeListener { _, _ ->
+//            checkDatakitAddress()
+//        }
+//
+//        demoAPIAddressEt?.setOnFocusChangeListener { _, _ ->
+//            checkDemoAPIAddress()
+//        }
 
         findViewById<Button>(R.id.setting_check).setOnClickListener {
             val data = SettingData(
@@ -57,7 +57,11 @@ class SettingActivity : BaseActivity() {
                 appIDEt?.text.toString()
             )
             checkAddressConnect(data) {
-                Toast.makeText(this@SettingActivity, "链接正常", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this@SettingActivity,
+                    getString(R.string.setting_tip_connect_success),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
@@ -168,7 +172,7 @@ class SettingActivity : BaseActivity() {
                     builder.setTitle(getString(R.string.tip))
                     builder.setMessage(getString(R.string.setting_tip_restart))
 
-                    builder.setPositiveButton("OK") { dialog, which ->
+                    builder.setPositiveButton("OK") { _, _ ->
                         val intent = Intent(this@SettingActivity, MainActivity::class.java)
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                         startActivity(intent)

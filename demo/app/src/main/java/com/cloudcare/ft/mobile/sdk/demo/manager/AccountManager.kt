@@ -122,6 +122,7 @@ object AccountManager {
     fun logout() {
         isLogin = false
         cleanUserData()
+        userData = null
         FTSdk.unbindRumUserData()
     }
 
