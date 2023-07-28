@@ -2,7 +2,6 @@ package com.cloudcare.ft.mobile.sdk.demo
 
 import android.os.Bundle
 import android.widget.Button
-import androidx.appcompat.app.AppCompatActivity
 import com.cloudcare.ft.mobile.sdk.custom.okhttp.CustomEventListenerFactory
 import com.cloudcare.ft.mobile.sdk.custom.okhttp.CustomInterceptor
 import com.ft.sdk.FTRUMGlobalManager
@@ -34,7 +33,7 @@ import java.util.UUID
  *  Action Resource 和 Trace  手动方式 示范
  *
  */
-class ManualActivity : AppCompatActivity() {
+class ManualActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

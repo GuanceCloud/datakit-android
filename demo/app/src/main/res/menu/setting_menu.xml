@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?><!-- res/menu/options_menu.xml -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/setting_import_setting"
+        android:icon="@drawable/ic_baseline_file_copy_24"
+        android:title="@string/setting_import_from_clipboard"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/setting_save"
+        android:icon="@drawable/ic_baseline_save_24"
+        android:title="@string/setting_save"
+        app:showAsAction="ifRoom" />
+</menu>

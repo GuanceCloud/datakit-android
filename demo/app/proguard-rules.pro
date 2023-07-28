@@ -20,13 +20,33 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
-
+#=========== SDK 所需配置
 -dontwarn com.ft.sdk.**
 -keep class com.ft.sdk.**{*;}
 
 -keep class ftnative.*{*;}
 
 -keep class com.bun.miitmdid.core.**{*;}
+-keep class com.cloudcare.ft.mobile.sdk.demo.http.*{*;}
 
 -keepnames class * extends android.view.View
+#====================
+
+
+
+-dontwarn org.bouncycastle.jsse.BCSSLParameters
+-dontwarn org.bouncycastle.jsse.BCSSLSocket
+-dontwarn org.bouncycastle.jsse.provider.BouncyCastleJsseProvider
+-dontwarn org.conscrypt.Conscrypt$Version
+-dontwarn org.conscrypt.Conscrypt
+-dontwarn org.conscrypt.ConscryptHostnameVerifier
+-dontwarn org.openjsse.javax.net.ssl.SSLParameters
+-dontwarn org.openjsse.javax.net.ssl.SSLSocket
+-dontwarn org.openjsse.net.ssl.OpenJSSE
+
+-dontwarn okhttp3.internal.platform.**
+-dontwarn org.conscrypt.**
+-dontwarn org.bouncycastle.**
+-dontwarn org.openjsse.**
+
 

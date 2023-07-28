@@ -2,7 +2,18 @@ package com.cloudcare.ft.mobile.sdk.demo
 
 import android.app.Application
 import android.content.Context
-import com.ft.sdk.*
+import com.cloudcare.ft.mobile.sdk.demo.http.HttpEngine
+import com.cloudcare.ft.mobile.sdk.demo.manager.SettingConfigManager
+import com.ft.sdk.DeviceMetricsMonitorType
+import com.ft.sdk.ErrorMonitorType
+import com.ft.sdk.FTLogger
+import com.ft.sdk.FTLoggerConfig
+import com.ft.sdk.FTRUMConfig
+import com.ft.sdk.FTSDKConfig
+import com.ft.sdk.FTSdk
+import com.ft.sdk.FTTraceConfig
+import com.ft.sdk.garble.bean.Status
+
 
 /**
  * BY huangDianHua
@@ -10,8 +21,6 @@ import com.ft.sdk.*
  * Description:
  */
 open class DemoApplication : Application() {
-
-
     override fun onCreate() {
         super.onCreate()
         setSDK(this)
@@ -23,9 +32,12 @@ open class DemoApplication : Application() {
         private const val SP_STORE_DATA = "store_data"
 
         fun setSDK(context: Context) {
-            val ftSDKConfig = FTSDKConfig.builder(BuildConfig.ACCESS_SERVER_URL)
-                .setServiceName("ft-sdk-demo")
-                .setDebug(true)//是否开启Debug模式（开启后能查看调试数据）
+            val data = SettingConfigManager.readSetting()
+            HttpEngine.initAPIAddress(data.demoApiAddress)
+            val ftSDKConfig =
+                FTSDKConfig.builder(data.datakitAddress)
+                    .setServiceName("ft-sdk-demo")
+                    .setDebug(true)//是否开启Debug模式（开启后能查看调试数据）
             FTSdk.install(ftSDKConfig)
 
             //配置 Log
@@ -35,6 +47,7 @@ open class DemoApplication : Application() {
 //                .setEnableConsoleLog(true,"log prefix")
                     .setEnableLinkRumData(true)
                     .setEnableCustomLog(true)
+                    .setPrintCustomLogToConsole(true)
 //                .setLogLevelFilters(arrayOf(Status.CRITICAL))
                     .setSamplingRate(0.8f)
 
@@ -46,11 +59,11 @@ open class DemoApplication : Application() {
             //配置 RUM
             FTSdk.initRUMWithConfig(
                 FTRUMConfig()
-                    .setRumAppId(BuildConfig.RUM_APP_ID)
+                    .setRumAppId(data.appId)
                     .setEnableTraceUserAction(true)
                     .setEnableTraceUserView(true)
                     .setEnableTraceUserResource(true)
-                    .setSamplingRate(0.8f)
+                    .setSamplingRate(1f)
                     .addGlobalContext(CUSTOM_STATIC_TAG, BuildConfig.CUSTOM_VALUE)
                     .addGlobalContext(CUSTOM_DYNAMIC_TAG, customDynamicValue!!)
                     .setExtraMonitorTypeWithError(ErrorMonitorType.ALL.value)
@@ -62,7 +75,7 @@ open class DemoApplication : Application() {
             //配置 Trace
             FTSdk.initTraceWithConfig(
                 FTTraceConfig()
-                    .setSamplingRate(0.8f)
+                    .setSamplingRate(1f)
                     .setEnableAutoTrace(true)
                     .setEnableLinkRUMData(true)
             )

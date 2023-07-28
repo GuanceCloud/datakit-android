@@ -2,3 +2,4 @@
 /app/src/main/assets/testaccount.properties
 /local.properties
 /app/build/
+*.keystore
