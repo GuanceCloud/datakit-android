@@ -40,7 +40,7 @@
 
             android:textColor="#aaa"
 
-            android:textSize="14sp" />
+            android:textSize="12sp" />
     </LinearLayout>
 
 
