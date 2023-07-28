@@ -200,10 +200,16 @@ class SettingActivity : BaseActivity() {
             withContext(Dispatchers.Main) {
                 if (datakitConnect.code != HttpURLConnection.HTTP_OK) {
                     datakitAddressEt?.error = datakitConnect.errorMessage
+                }else{
+                    datakitAddressEt?.error = null
+
                 }
 
                 if (apiConnect.code != HttpURLConnection.HTTP_OK) {
                     demoAPIAddressEt?.error = apiConnect.errorMessage
+                }else{
+                    demoAPIAddressEt?.error = null
+
                 }
                 UtilsDialog.hideLoadingDialog()
 
