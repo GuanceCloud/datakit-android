@@ -147,8 +147,8 @@ object HttpEngine {
         } catch (e: Exception) {
             FTRUMGlobalManager.get()
                 .addError(
-                    e.message,
                     Log.getStackTraceString(e),
+                    e.message,
                     ErrorType.JAVA,
                     AppState.RUN
                 )
