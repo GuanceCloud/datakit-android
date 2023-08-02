@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -27,6 +28,7 @@ public class FTMapUploader {
      * debug symbol 路径
      */
     private final static String CMAKE_DEBUG_SYMBOL_PATH = "/intermediates/cmake/debug/obj";
+    private final static String CMAKE_CXX_PATH = "/intermediates/cxx/Debug";
     private final static String NAME_RELEASE_COMPILE_CLASSPATH = "releaseCompileClasspath";
 
     private final HashMap<String, ObfuscationSettingConfig> obfuscationSettingMap = new HashMap<>();
@@ -212,11 +214,14 @@ public class FTMapUploader {
     private void appendSymbolPath(Project p, ArrayList<String> list, String flavor) {
 
         p.getAllprojects().forEach(subProject -> {
-            String debugSymbolPath = subProject.getBuildDir().getAbsolutePath() + CMAKE_DEBUG_SYMBOL_PATH;
+            String buildPath = subProject.getBuildDir().getAbsolutePath();
+            String debugSymbolPath = buildPath + CMAKE_DEBUG_SYMBOL_PATH;
 
             File file = new File(debugSymbolPath);
             if (file.exists()) {
                 list.add(debugSymbolPath);
+            } else {
+                compatibleWithAGP8(buildPath, list);
             }
         });
         String name = flavor.length() == 0 ? NAME_RELEASE_COMPILE_CLASSPATH :
@@ -227,11 +232,14 @@ public class FTMapUploader {
             configuration.getAllDependencies().forEach(dependency -> {
                 if (dependency instanceof ProjectDependency) {
                     String moduleName = dependency.getName();
+                    String buildPath = rootPath + "/" + moduleName + "/build";
                     String debugSymbolPath = rootPath + "/" + moduleName + "/build" + CMAKE_DEBUG_SYMBOL_PATH;
                     File file = new File(debugSymbolPath);
                     Logger.debug("debugSymbolPath:" + debugSymbolPath);
                     if (file.exists()) {
                         list.add(debugSymbolPath);
+                    } else {
+                        compatibleWithAGP8(buildPath, list);
                     }
                 }
             });
@@ -243,6 +251,50 @@ public class FTMapUploader {
 
         }
 
+    }
+
+    /**
+     * 兼容 AGP 8.0 ，AGP 8.0 {@link #CMAKE_DEBUG_SYMBOL_PATH} 消失了，目前只能使用 {@link #CMAKE_CXX_PATH} 文件夹下，
+     * 最新更新的文件夹来作为替代方案
+     *
+     * @param buildPath
+     * @param list
+     */
+    private void compatibleWithAGP8(String buildPath, ArrayList<String> list) {
+        String cxxPath = buildPath + CMAKE_CXX_PATH;
+        File file = new File(cxxPath);
+        File recentFile = findMostRecentlyModifiedFolder(file);
+        if (recentFile != null) {
+            File objPath = new File(recentFile.getAbsoluteFile() + "/obj");
+            if (objPath.exists()) {
+                list.add(objPath.getAbsolutePath());
+            }
+        }
+    }
+
+    /**
+     * 找到最近更新更新的文件
+     *
+     * @param folder
+     * @return
+     */
+    private File findMostRecentlyModifiedFolder(File folder) {
+        File mostRecentlyModifiedFolder = null;
+        Date mostRecentDate = new Date(0);
+
+        if (folder.exists() && folder.isDirectory()) {
+            for (File file : folder.listFiles()) {
+                if (file.isDirectory()) {
+                    Date lastModifiedDate = new Date(file.lastModified());
+                    if (lastModifiedDate.after(mostRecentDate)) {
+                        mostRecentlyModifiedFolder = file;
+                        mostRecentDate = lastModifiedDate;
+                    }
+                }
+            }
+        }
+
+        return mostRecentlyModifiedFolder;
     }
 
     /**
