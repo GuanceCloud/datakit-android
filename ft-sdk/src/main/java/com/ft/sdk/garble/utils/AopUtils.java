@@ -21,12 +21,15 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.ft.sdk.FTApplication;
 
 import java.lang.reflect.Method;
 
@@ -146,8 +149,21 @@ public class AopUtils {
         return stringBuffer.toString();
     }
 
+
     /**
-     * 获取 View 描述
+     * 获取 MenuItem 描述  className/title#(Resource Entry Name)
+     *
+     * @param item
+     * @return
+     */
+    public static String getMenuItem(MenuItem item) {
+        return item.getClass().getSimpleName() + "/" + item.getTitle()
+                + "#" + FTApplication.getApplication().getResources().getResourceEntryName(item.getItemId());
+
+    }
+
+    /**
+     * 获取 View 描述 className/text#(Resource Entry Name)
      *
      * @param view
      * @return

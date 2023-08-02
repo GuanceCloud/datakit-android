@@ -366,7 +366,8 @@ public class FTAutoTrack {
      */
     public static void trackMenuItem(Object object, MenuItem menuItem) {
         try {
-            clickView((Class<?>) object, AopUtils.getClassName(object), AopUtils.getSupperClassName(object), menuItem.getClass().getName() + "/" + menuItem.getItemId());
+            clickView((Class<?>) object, AopUtils.getClassName(object), AopUtils.getSupperClassName(object),
+                    AopUtils.getMenuItem(menuItem));
         } catch (Exception e) {
             LogUtils.e(TAG, Log.getStackTraceString(e));
 
