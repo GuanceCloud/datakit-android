@@ -89,39 +89,84 @@ public class FTUtil {
 
     }
 
+    /**
+     * 是否为公开方法
+     * @param access
+     * @return
+     */
     public static boolean isPublic(int access) {
         return (access & Opcodes.ACC_PUBLIC) != 0;
     }
 
+    /**
+     * 是否是静态方法
+     * @param access
+     * @return
+     */
     public static boolean isStatic(int access) {
         return (access & Opcodes.ACC_STATIC) != 0;
     }
 
 
+    /**
+     * 是否继承 Menu
+     * @param nameDesc
+     * @return
+     */
     public static boolean isTargetMenuMethodDesc(String nameDesc) {
         return targetMenuMethodDesc.contains(nameDesc);
     }
 
+    /**
+     * 是否继承 Android App Fragment
+     * @param superName
+     * @return
+     */
     public static boolean isInstanceOfFragment(String superName) {
         return targetFragmentClass.contains(superName);
     }
 
+    /**
+     * 是否继承 Androidx App Fragment
+     * @param superName
+     * @return
+     */
     public static boolean isInstanceOfXFragment(String superName) {
         return targetXFragmentClass.contains(superName);
     }
 
+    /**
+     * 是否继承 Android V4 Fragment
+     * @param superName
+     * @return
+     */
     public static boolean isInstanceOfV4Fragment(String superName) {
         return targetV4FragmentClass.contains(superName);
     }
 
+    /**
+     * 是否继承 Activity
+     * @param superName
+     * @return
+     */
     public static boolean isInstanceOfActivity(String superName) {
         return targetActivityClass.contains(superName);
     }
 
+    /**
+     * 是否为特定的类
+     * @param className
+     * @return
+     */
     public static boolean isTargetClassInSpecial(String className) {
         return specialClass.contains(className);
     }
 
+    /**
+     * 是否继承 Application
+     * @param nameDesc
+     * @return
+     */
     public static boolean isInstanceOfApplication(String nameDesc) {
         return targetApplicationClass.contains(nameDesc);
     }
