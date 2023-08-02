@@ -15,12 +15,12 @@ android {
     }
 
     namespace 'com.cloudcare.ft.mobile.sdk.demo'
-    compileSdkVersion 33
+    compileSdk 33
     defaultConfig {
         applicationId "com.guance.mobile.sdk.demo"
         minSdkVersion 23
         targetSdkVersion 33
-        versionCode 2
+        versionCode 3
         versionName "1.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -54,7 +54,7 @@ android {
         jvmTarget = '1.8'
     }
 
-    flavorDimensions "tier"
+    flavorDimensions = ['tier']
 
     productFlavors {
 
@@ -135,10 +135,13 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.2'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    implementation project(path: ':nativelib')
+
 
     //================FT-SDK需要使用的引用=================//
     //FT-SDK引用
-    implementation('com.cloudcare.ft.mobile.sdk.tracker.agent:ft-sdk:1.3.15-beta01')
+    implementation('com.cloudcare.ft.mobile.sdk.tracker.agent:ft-sdk:1.3.16-alpha01')
 
     implementation 'com.cloudcare.ft.mobile.sdk.tracker.agent:ft-native:1.0.0-beta01'
     implementation 'com.google.code.gson:gson:2.8.5'
@@ -147,5 +150,5 @@ dependencies {
     //需用监控网络数据时，添加该依赖，实现网络引擎
 //    implementation 'com.squareup.okhttp3:okhttp:3.12.12'
     implementation 'com.squareup.okhttp3:okhttp:4.5.0'
-    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+
 }

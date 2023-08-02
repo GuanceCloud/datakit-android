@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
-import com.ft.sdk.garble.reflect.ReflectUtils
+import com.cloudcare.ft.mobile.sdk.demo.nativelib.NativeLib
 
 class NativeActivity : BaseActivity() {
 
@@ -25,7 +25,7 @@ class NativeActivity : BaseActivity() {
             Thread { val i = 1 / 0 }.start()
         }
         findViewById<View>(R.id.native_crash_c_cpp_data_btn).setOnClickListener { v: View? ->
-            ReflectUtils.reflectCrashAndGetExceptionMessage()
+            NativeLib().crashTest()
         }
 
 

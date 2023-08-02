@@ -19,9 +19,10 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.0.0'
+        classpath 'com.android.tools.build:gradle:8.1.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.cloudcare.ft.mobile.sdk.tracker.plugin:ft-plugin:1.2.1-beta01'
+        classpath 'com.cloudcare.ft.mobile.sdk.tracker.plugin:ft-plugin:1.2.2-alpha01'
+//        classpath files('../ft-plugin/build/libs/ft-plugin-1.2.1-beta01.jar')
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }

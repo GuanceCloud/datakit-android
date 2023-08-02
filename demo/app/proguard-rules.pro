@@ -26,13 +26,11 @@
 
 -keep class ftnative.*{*;}
 
--keep class com.bun.miitmdid.core.**{*;}
--keep class com.cloudcare.ft.mobile.sdk.demo.http.*{*;}
-
 -keepnames class * extends android.view.View
+-keepnames class * extends android.view.MenuItem
+#=========
+-keep class com.cloudcare.ft.mobile.sdk.demo.http.*{*;}
 #====================
-
-
 
 -dontwarn org.bouncycastle.jsse.BCSSLParameters
 -dontwarn org.bouncycastle.jsse.BCSSLSocket

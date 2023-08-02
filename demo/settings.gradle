@@ -19,5 +19,5 @@
 //    }
 //}
 
-include ':app'
-rootProject.name='FTSdkDemo'
+rootProject.name = 'FTSdkDemo'
+include ':app', ':nativelib'
