@@ -27,6 +27,7 @@ public class FTMapUploader {
      * debug symbol 路径
      */
     private final static String CMAKE_DEBUG_SYMBOL_PATH = "/intermediates/cmake/debug/obj";
+    private final static String NAME_RELEASE_COMPILE_CLASSPATH = "releaseCompileClasspath";
 
     private final HashMap<String, ObfuscationSettingConfig> obfuscationSettingMap = new HashMap<>();
 
@@ -43,7 +44,7 @@ public class FTMapUploader {
      */
     private final static String PROGUARD_MAPPING_PATH = "/outputs/proguard/%s/mapping/mapping.txt";
 
-    private final ArrayList<String> symbolPaths = new ArrayList<>();
+    private final HashMap<String, ArrayList<String>> symbolPathsMap = new HashMap<>();
     private final String tmpBuildPathFormat;
     private final String zipBuildPathFormat;
     private final String proguardBuildPathFormat;
@@ -75,7 +76,7 @@ public class FTMapUploader {
         appExtension.getApplicationVariants().all(applicationVariant -> {
             String variantName = applicationVariant.getName();
 
-            String capVariantName = variantName.substring(0, 1).toUpperCase() + variantName.substring(1);
+            String capVariantName = FTStringUtils.captitalizedString(variantName);
 
             String assembleTaskName = "assemble" + capVariantName;
 
@@ -99,7 +100,8 @@ public class FTMapUploader {
                     Logger.debug("task:" + assembleTaskName + ",config:" + config + "");
                     if (config != null) {
                         if (model.isAutoUploadNativeDebugSymbol()) {
-                            if (!symbolPaths.isEmpty()) {
+                            ArrayList<String> symbolPaths = symbolPathsMap.get(model.getName());
+                            if (symbolPaths != null && !symbolPaths.isEmpty()) {
                                 FTFileUtils.copyDifferentFolderFilesIntoOne(tmpBuildPath, symbolPaths.toArray(new String[0]));
                             }
                         }
@@ -180,40 +182,66 @@ public class FTMapUploader {
             }
         }
         project.afterEvaluate(p -> {
+            AppExtension appExtension = (AppExtension) p.getProperties().get("android");
 
-            p.getAllprojects().forEach(subProject -> {
-                String debugSymbolPath = subProject.getBuildDir().getAbsolutePath() + CMAKE_DEBUG_SYMBOL_PATH;
+            if (appExtension.getProductFlavors().size() > 0) {
+                appExtension.getProductFlavors().all(flavor -> {
+                    // 获取 Flavor 的名称
+                    String flavorName = flavor.getName();
+                    ArrayList<String> symbolPaths = symbolPathsMap.computeIfAbsent(flavorName, k -> new ArrayList<>());
+                    appendSymbolPath(p, symbolPaths, flavorName);
 
-                File file = new File(debugSymbolPath);
-                if (file.exists()) {
-                    symbolPaths.add(debugSymbolPath);
-                }
-
-            });
-
-            Configuration configuration = project.getConfigurations().findByName("releaseCompileClasspath");
-            if (configuration != null) {
-                String rootPath = p.getRootDir().getAbsolutePath();
-                configuration.getAllDependencies().forEach(dependency -> {
-                    if (dependency instanceof ProjectDependency) {
-                        String moduleName = dependency.getName();
-                        String debugSymbolPath = rootPath + "/" + moduleName + "/build" + CMAKE_DEBUG_SYMBOL_PATH;
-                        File file = new File(debugSymbolPath);
-                        Logger.debug("debugSymbolPath:" + debugSymbolPath);
-                        if (file.exists()) {
-                            symbolPaths.add(debugSymbolPath);
-                        }
-                    }
                 });
-                if (symbolPaths.isEmpty()) {
-                    Logger.error("native symbol not found");
-                } else {
-                    Logger.debug("paths:" + symbolPaths);
-                }
-
+            } else {
+                ArrayList<String> symbolPaths = symbolPathsMap.computeIfAbsent("release", k -> new ArrayList<>());
+                appendSymbolPath(p, symbolPaths, "");
             }
 
+
         });
+
+    }
+
+    /**
+     * 扫描并添加 native cmake build 路径
+     *
+     * @param p
+     * @param list
+     * @param flavor
+     */
+    private void appendSymbolPath(Project p, ArrayList<String> list, String flavor) {
+
+        p.getAllprojects().forEach(subProject -> {
+            String debugSymbolPath = subProject.getBuildDir().getAbsolutePath() + CMAKE_DEBUG_SYMBOL_PATH;
+
+            File file = new File(debugSymbolPath);
+            if (file.exists()) {
+                list.add(debugSymbolPath);
+            }
+        });
+        String name = flavor.length() == 0 ? NAME_RELEASE_COMPILE_CLASSPATH :
+                (flavor + FTStringUtils.captitalizedString(NAME_RELEASE_COMPILE_CLASSPATH));
+        Configuration configuration = p.getConfigurations().findByName(name);
+        if (configuration != null) {
+            String rootPath = p.getRootDir().getAbsolutePath();
+            configuration.getAllDependencies().forEach(dependency -> {
+                if (dependency instanceof ProjectDependency) {
+                    String moduleName = dependency.getName();
+                    String debugSymbolPath = rootPath + "/" + moduleName + "/build" + CMAKE_DEBUG_SYMBOL_PATH;
+                    File file = new File(debugSymbolPath);
+                    Logger.debug("debugSymbolPath:" + debugSymbolPath);
+                    if (file.exists()) {
+                        list.add(debugSymbolPath);
+                    }
+                }
+            });
+            if (symbolPathsMap.isEmpty()) {
+                Logger.error("native symbol not found");
+            } else {
+                Logger.debug("paths:" + symbolPathsMap);
+            }
+
+        }
 
     }
 
@@ -261,9 +289,11 @@ public class FTMapUploader {
         ProductFlavorModel model = flavorModelHashMap
                 .get(variantName.replace("Release", ""));
         if (model != null) {
+            //多个 flavor
             model.mergeFTExtension(extension);
             return model;
         } else {
+            //不设置 flavor, 此处 variantName = release
             model = new ProductFlavorModel(variantName);
             model.setFromFTExtension(extension);
         }
