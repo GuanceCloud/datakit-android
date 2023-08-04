@@ -9,7 +9,7 @@
 
 ## 示例
 
- [观测云 SDK Android Demo](https://github.com/GuanceCloud/datakit-android/tree/dev/demo)   
+ [观测云 SDK Android Demo](https://github.com/GuanceDemo/guance-app-demo/tree/master/src/android/demo)   
 
 ## 使用文档
  [文档中心](https://docs.guance.com/real-user-monitoring/android/app-access/)   
