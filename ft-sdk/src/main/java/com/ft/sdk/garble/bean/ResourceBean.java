@@ -68,12 +68,12 @@ public class ResourceBean {
     /**
      * 链路 ID {@link TraceBean#traceID}
      */
-    public String traceId = "";
+    public String traceId = null;
 
     /**
      * 链路 Span ID {@link TraceBean#spanID}
      */
-    public String spanId = "";
+    public String spanId = null;
 
     /**
      * 请求错误日志堆栈

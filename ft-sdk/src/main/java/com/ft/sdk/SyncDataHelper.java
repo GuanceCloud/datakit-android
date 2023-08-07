@@ -1,7 +1,6 @@
 package com.ft.sdk;
 
 import static com.ft.sdk.garble.utils.Constants.FT_KEY_VALUE_NULL;
-import static com.ft.sdk.garble.utils.Constants.UNKNOWN;
 
 import android.util.Log;
 
@@ -174,12 +173,19 @@ public class SyncDataHelper {
         while (keys.hasNext()) {
             String keyTemp = keys.next();
             Object value = obj.opt(keyTemp);
-            String key = Utils.translateTagKeyValue(keyTemp);
-            sb.append(key);
-            sb.append("=");
             if (value == null || "".equals(value) || JSONObject.NULL.equals(value)) {
-                addQuotationMarks(sb, UNKNOWN, !isTag);
+                if (!isTag) {
+                    String key = Utils.translateTagKeyValue(keyTemp);
+                    sb.append(key);
+                    sb.append("=");
+                    sb.append("\"\"");
+                } else {
+                    continue;
+                }
             } else {
+                String key = Utils.translateTagKeyValue(keyTemp);
+                sb.append(key);
+                sb.append("=");
                 if (value instanceof Float) {
                     sb.append(Utils.formatDouble((float) value));
                 } else if (value instanceof Double) {

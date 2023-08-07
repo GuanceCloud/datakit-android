@@ -46,9 +46,8 @@ public class UtilsTest {
     /**
      * 空行协议数据
      */
-    private static final String SINGLE_LINE_EMPTY_DATA = TEST_MEASUREMENT_INFLUX_DB_LINE + ","
-            + KEY_TAGS_EMPTY + "=" + Constants.UNKNOWN + " "
-            + KEY_FIELD_EMPTY + "=\"" + Constants.UNKNOWN + "\" " +
+    private static final String SINGLE_LINE_EMPTY_DATA = TEST_MEASUREMENT_INFLUX_DB_LINE +" "
+            + KEY_FIELD_EMPTY + "=\"\" " +
             "" + VALUE_TIME + "\n";
 
     /**
