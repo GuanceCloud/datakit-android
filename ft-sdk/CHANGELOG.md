@@ -1,3 +1,7 @@
+# agent 1.3.16-alpha02
+1.tag，field 为空时，规则修改
+
+---
 # agent 1.3.16-alpha01
 1.优化 AOP MenuItem 点击生成 ActionName 的描述 
 
