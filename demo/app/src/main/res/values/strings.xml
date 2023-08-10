@@ -1,7 +1,0 @@
-<resources>
-    <string name="app_name">FTSdkDemo</string>
-    <string name="str_custom_track">主动埋点（不返回上传结果）</string>
-    <string name="str_custom_track_result">主动埋点（异步返回上传结果）</string>
-    <string name="str_custom_track_multi_result">主动埋点多条数据（异步返回上传结果）</string>
-    <string name="str_upload_flow_chart">上传流程图</string>
-</resources>
