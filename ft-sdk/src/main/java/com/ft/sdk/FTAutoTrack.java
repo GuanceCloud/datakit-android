@@ -3,6 +3,7 @@ package com.ft.sdk;
 import static com.ft.sdk.FTApplication.getApplication;
 
 import android.app.Activity;
+import android.app.Application;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -47,7 +48,7 @@ public class FTAutoTrack {
      * <p>
      * 该方法原来被 FT Plugin 插件调用
      */
-    public static void startApp(Object object) {
+    public static void startApp(Application object) {
         try {
             LogUtils.d(TAG,"startApp");
             //判断是否为主进程
