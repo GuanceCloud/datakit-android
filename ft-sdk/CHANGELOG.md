@@ -1,3 +1,7 @@
+# agent 1.3.16-alpha03
+1.弱化 service process SDK 初始化错误的提示
+
+---
 # agent 1.3.16-alpha02
 1.tag，field 为空时，规则修改
 

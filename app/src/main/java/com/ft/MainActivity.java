@@ -13,48 +13,19 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.ft.sdk.FTLogger;
-import com.ft.sdk.FTResourceEventListener;
 import com.ft.sdk.garble.annotation.IgnoreAOP;
 import com.ft.sdk.garble.bean.Status;
-import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.reflect.ReflectUtils;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.service.TestService;
+import com.ft.utils.RequestUtils;
 
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
 
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-
-    OkHttpClient client = new OkHttpClient.Builder()
-            .connectTimeout(10, TimeUnit.SECONDS).build();
-
-    public Request requestUrl(@NonNull String url) {
-        Request.Builder builder = new Request.Builder().url(url).method(RequestMethod.GET.name(), null);
-        Request request = null;
-        try {
-            Response response = client.newCall(builder.build()).execute();
-            request = response.request();
-
-            ResponseBody responseBody = response.body();
-            String string = "";
-            if (responseBody != null) {
-                string = responseBody.string();
-            }
-            LogUtils.d(TAG, "url:" + url + "\n" + string);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return request;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     //通过查看请求头查看是否替换调用 OkHttpClient.Builder.build 方法成功
-                    Request request = requestUrl(BuildConfig.TRACE_URL);
+                    Request request = RequestUtils.requestUrl(BuildConfig.TRACE_URL);
                     LogUtils.d(TAG, "header=" + request.headers().toString());
                 }
             }).start();
@@ -126,6 +97,14 @@ public class MainActivity extends AppCompatActivity {
             @IgnoreAOP
             public void onClick(View v) {
 
+            }
+        });
+
+        findViewById(R.id.main_start_service).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent serviceIntent = new Intent(MainActivity.this, TestService.class);
+                startService(serviceIntent);
             }
         });
     }

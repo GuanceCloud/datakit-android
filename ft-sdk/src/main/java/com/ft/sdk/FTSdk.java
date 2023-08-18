@@ -1,5 +1,7 @@
 package com.ft.sdk;
 
+import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -14,7 +16,6 @@ import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.PackageUtils;
 import com.ft.sdk.garble.utils.Utils;
-import com.ft.sdk.internal.exception.FTInitSDKProcessException;
 
 import java.util.HashMap;
 
@@ -67,8 +68,14 @@ public class FTSdk {
         } else {
             mFtSdk = new FTSdk(ftSDKConfig);
             boolean onlyMain = ftSDKConfig.isOnlySupportMainProcess();
-            if (onlyMain && !Utils.isMainProcess()) {
-                throw new FTInitSDKProcessException("当前 SDK 只能在主进程中运行，如果想要在非主进程中运行可以设置 FTSDKConfig.setOnlySupportMainProcess(false)");
+            if (onlyMain) {
+                Context context = FTApplication.getApplication();
+                String currentProcessName = Utils.getCurrentProcessName();
+                String packageName = context.getPackageName();
+                if (!TextUtils.isEmpty(packageName) && !TextUtils.equals(packageName, currentProcessName)) {
+                    LogUtils.e(TAG, "当前 SDK 只能在主进程中运行，当前进程为 " + currentProcessName + "，如果想要在非主进程中运行可以设置 FTSDKConfig.setOnlySupportMainProcess(false)");
+                    return;
+                }
             }
         }
         mFtSdk.initFTConfig(ftSDKConfig);
