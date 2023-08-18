@@ -1,4 +1,4 @@
-# agent 1.3.16-alpha03
+# agent 1.3.16-beta01
 1.弱化 service process SDK 初始化错误的提示
 
 ---
