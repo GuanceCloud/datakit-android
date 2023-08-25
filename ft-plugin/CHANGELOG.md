@@ -1,3 +1,7 @@
+# plugin 1.2.2-beta01
+1.同 plugin 1.2.2-alpha01
+
+---
 # plugin 1.2.2-alpha01
 1.修正 flavor 设置后，无法上传 native symbol 的问题
 2.兼容 AGP 8.0 不生成 /intermediates/cmake/debug/obj 路径的问题
