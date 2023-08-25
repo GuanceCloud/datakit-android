@@ -83,6 +83,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Start Service" />
+
+        <Button
+            android:id="@+id/main_lazy_init"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="延迟初始化" />
     </LinearLayout>
 
 

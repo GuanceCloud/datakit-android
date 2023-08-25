@@ -28,10 +28,12 @@ public class DemoApplication extends BaseApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-        initFTSDK();
+        if (!BuildConfig.LAZY_INIT) {
+            initFTSDK();
+        }
     }
 
-    private void initFTSDK() {
+    static void initFTSDK() {
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.ACCESS_SERVER_URL)
                 .setDebug(true)//设置是否是 debug
                 .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()));
