@@ -8,6 +8,7 @@ import com.ft.sdk.garble.utils.LogUtils;
 
 import java.io.IOException;
 
+import okhttp3.Call;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
@@ -34,4 +35,26 @@ public class RequestUtils {
         }
         return request;
     }
+
+    public static void asyncRequest(String url) {
+        Request.Builder builder = new Request.Builder()
+                .url(url).method(RequestMethod.GET.name(), null);
+        OkHttpClientSingleton.getInstance()
+                .newCall(builder.build()).enqueue(new okhttp3.Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        // 处理响应
+                        System.out.println(response.body().string());
+                        response.close();
+                    }
+                });
+
+
+    }
+
 }
