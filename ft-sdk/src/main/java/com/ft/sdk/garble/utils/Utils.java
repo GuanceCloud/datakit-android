@@ -245,16 +245,12 @@ public class Utils {
      * For string field values use a backslash character \ to escape:
      */
     public static String translateFieldValue(String oldStr) {
-        if (oldStr.equals(Constants.UNKNOWN)) {
-            return "\"" + oldStr + "\"";
+        if (Utils.isJSONValid(oldStr)) {
+            return JSONObject.quote(oldStr);
         } else {
-            if (Utils.isJSONValid(oldStr)) {
-                return JSONObject.quote(oldStr);
-            } else {
-                oldStr = oldStr.replace("\\", "\\\\");
-                oldStr = translateSpecialCharacters("\"", oldStr);
-                return "\"" + oldStr + "\"";
-            }
+            oldStr = oldStr.replace("\\", "\\\\");
+            oldStr = translateSpecialCharacters("\"", oldStr);
+            return "\"" + oldStr + "\"";
         }
     }
 
@@ -436,6 +432,7 @@ public class Utils {
 
     /**
      * 生成相对唯一的 resourceId
+     *
      * @param request
      * @return
      */

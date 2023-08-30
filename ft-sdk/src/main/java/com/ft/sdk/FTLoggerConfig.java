@@ -57,6 +57,11 @@ public class FTLoggerConfig {
     private LogCacheDiscard logCacheDiscardStrategy = LogCacheDiscard.DISCARD;
 
     /**
+     * 自定义日志打印配置
+     */
+    private boolean printCustomLogToConsole = false;
+
+    /**
      * 获取采样率
      *
      * @return
@@ -76,6 +81,11 @@ public class FTLoggerConfig {
         return this;
     }
 
+    /**
+     * 是否与 RUM 数据关联
+     *
+     * @return
+     */
     public boolean isEnableLinkRumData() {
         return enableLinkRumData;
     }
@@ -91,11 +101,18 @@ public class FTLoggerConfig {
         return this;
     }
 
+    /**
+     * 是否开启控制日志抓取
+     *
+     * @return
+     */
     public boolean isEnableConsoleLog() {
         return enableConsoleLog;
     }
 
     /**
+     * 设置是否开启控制日志抓取
+     *
      * @param enableConsoleLog
      * @return
      */
@@ -105,7 +122,7 @@ public class FTLoggerConfig {
     }
 
     /**
-     * @param enableConsoleLog
+     * @param enableConsoleLog 是否开启控制日志抓取
      * @param prefix           日志过滤前缀
      * @return
      */
@@ -172,6 +189,25 @@ public class FTLoggerConfig {
      */
     public FTLoggerConfig setLogLevelFilters(Status[] logLevelFilters) {
         this.logLevelFilters = Arrays.asList(logLevelFilters);
+        return this;
+    }
+
+    /**
+     * 是否开启自定义日志打印
+     *
+     * @return
+     */
+    public boolean isPrintCustomLogToConsole() {
+        return printCustomLogToConsole;
+    }
+
+    /**
+     * 设置是否将自定义日志打印至 console
+     *
+     * @param printCustomLogToConsole
+     */
+    public FTLoggerConfig setPrintCustomLogToConsole(boolean printCustomLogToConsole) {
+        this.printCustomLogToConsole = printCustomLogToConsole;
         return this;
     }
 

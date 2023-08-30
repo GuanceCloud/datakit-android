@@ -50,12 +50,12 @@ public class TraceHeaderTest extends BaseTest {
             hasPrepare = true;
         }
         FTSDKConfig ftsdkConfig = FTSDKConfig
-                .builder(BuildConfig.ACCESS_SERVER_URL)
-                .setXDataKitUUID("ft-dataKit-uuid-001");
+                .builder(BuildConfig.ACCESS_SERVER_URL);
         FTSdk.install(ftsdkConfig);
         FTSdk.initTraceWithConfig(new FTTraceConfig().setEnableLinkRUMData(false));
 
     }
+
     /**
      * {@link TraceType#ZIPKIN_MULTI_HEADER}
      */
@@ -105,6 +105,7 @@ public class TraceHeaderTest extends BaseTest {
         boolean expect = request.headers().names().contains(DD_TRACE_TRACE_ID_KEY);
         Assert.assertTrue(expect);
     }
+
     /**
      * {@link TraceType#SKYWALKING}
      */

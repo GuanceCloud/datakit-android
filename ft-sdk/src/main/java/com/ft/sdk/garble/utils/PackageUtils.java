@@ -26,6 +26,11 @@ public class PackageUtils {
     private static final String PACKAGE_REACT_NATIVE = "com.facebook.react.ReactApplication";
 
     /**
+     * alibaba taobao SophixApplication package 路径
+     */
+    private static final String PACKAGE_SOPHIX = "com.taobao.sophix.SophixApplication";
+
+    /**
      * 是否使用 NDK 库
      * @return
      */
@@ -50,6 +55,18 @@ public class PackageUtils {
         }
         return false;
 
+    }
+
+    /**
+     * 获取 SophixApplication 的 class
+     * @return
+     */
+    public static Class<?> getSophixClass() {
+        try {
+            return Class.forName(PACKAGE_SOPHIX);
+        } catch (ClassNotFoundException ignored) {
+        }
+        return null;
     }
 
     /**

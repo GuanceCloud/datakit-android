@@ -389,6 +389,7 @@ public class FTRUMGlobalManager {
      * @param property 附加属性参数
      */
     public void stopView(HashMap<String, Object> property) {
+        if (activeView == null) return;
         checkActionClose();
         if (property != null) {
             activeView.getProperty().putAll(property);

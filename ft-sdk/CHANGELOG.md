@@ -1,3 +1,44 @@
+# agent 1.3.16-alpha04
+1.SDK 延迟加载异常处理
+
+---
+# agent 1.3.16-beta01
+1.弱化 service process SDK 初始化错误的提示
+
+---
+# agent 1.3.16-alpha02
+1.tag，field 为空时，规则修改
+
+---
+# agent 1.3.16-alpha01
+1.优化 AOP MenuItem 点击生成 ActionName 的描述 
+
+---
+# agent 1.3.15-beta01
+1.同 1.3.15-alpha03
+
+---
+# agent 1.3.15-alpha03
+1.修改 webview js 调用 service 赋值
+
+---
+# agent 1.3.15-alpha02
+1.修改 webview js 回掉上传逻辑
+
+---
+# agent 1.3.15-alpha01
+1.适配阿里云 Sophix 热修复集成后无法采集 View 数据的问题
+
+---
+# agent 1.3.14-beta01
+1.同 1.3.13-alpha01
+2.添加自定义日志打印到控制台的功能
+
+---
+# agent 1.3.13-alpha01
+1.添加自定义 env
+
+---
 # agent 1.3.12-beta01
 1.修正 3.12.0 okhttp 依赖 resource 某些情况下，不发送的问题
 
@@ -167,7 +208,6 @@
 1.修正已close action 还会被篡改 duration 的问题
 
 ---
-
 # agent 1.3.4-alpha01
 1.启动事件计算规则修改
 2.RUM 页面 viewReferrer 记录规则修改
@@ -177,7 +217,6 @@
 1.修正 ID 溢出问题
 
 ---
-
 # agent 1.3.3-alpha04
 1.修正 DDTrace ID 算法
 
@@ -358,7 +397,6 @@
 # agent 1.1.0-alpha03
 1.trace resource 属性添加
 2.user action 配置添加
-
 ---
 # agent 1.1.0-alpha02
 1.优化 action 统计算法
@@ -445,18 +483,15 @@
 1.添加页面别名和事件别名
 
 ---
-
 # agent 1.0.2-alpha01
 1.独立监控模块，提供周期上报功能
 
 ---
-
 # agent 1.0.1-alpha10
 1.上报流程图
 2.修改监控项指标集
 
 ---
-
 # agent 1.0.0
 1.用户自定义埋点
 2.FT Gateway 数据同步

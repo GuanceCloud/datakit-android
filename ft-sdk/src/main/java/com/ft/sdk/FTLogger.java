@@ -13,11 +13,9 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- *
  * 打印输出观测云 Studio 可以查看的日志
  *
  * @author Brandon
- *
  */
 public class FTLogger {
 
@@ -67,6 +65,26 @@ public class FTLogger {
         if (!config.isEnableCustomLog()) {
             return;
         }
+        if (config.isPrintCustomLogToConsole()) {
+            String propertyString = property == null ? "" : "," + property;
+            String message = "[" + status.name.toUpperCase() + "]" + content + propertyString;
+            switch (status) {
+                case INFO:
+                    LogUtils.i(Constants.LOG_TAG_PREFIX, message, true);
+                    break;
+                case WARNING:
+                    LogUtils.w(Constants.LOG_TAG_PREFIX, message, true);
+                    break;
+                case ERROR:
+                case CRITICAL:
+                    LogUtils.e(Constants.LOG_TAG_PREFIX, message, true);
+                    break;
+                case OK:
+                    LogUtils.v(Constants.LOG_TAG_PREFIX, message, true);
+                    break;
+            }
+        }
+
         LogBean logBean = new LogBean(Utils.translateFieldValue(content), Utils.getCurrentNanoTime());
         logBean.setServiceName(config.getServiceName());
         if (property != null) {
@@ -104,11 +122,12 @@ public class FTLogger {
 
     /**
      * 检验 {@link FTLoggerConfig} 是否初始化
+     *
      * @return true 为已初始化，反之为 false
      */
     private boolean checkConfig() {
         if (config == null) {
-            LogUtils.e(TAG, "使用 FTLogger，需要初始化 FTLoggerConfigManager.get().initWithConfig(FTLoggerConfig ftSdkConfig))");
+            LogUtils.e(TAG, "使用 FTLogger，需要初始化 FTSdk.initLogWithConfig(FTLoggerConfig ftSdkConfig))");
             return false;
         }
         return true;

@@ -28,6 +28,10 @@ public class OkHttpEngine implements INetEngine {
     private static OkHttpClient client;
     private Request request;
 
+    /**
+     * Http 请求基础配置初始化
+     * @param httpBuilder
+     */
     @Override
     public void defaultConfig(HttpBuilder httpBuilder) {
         if (client == null) {
@@ -38,6 +42,10 @@ public class OkHttpEngine implements INetEngine {
         }
     }
 
+    /**
+     * 创建请求对象
+     * @param httpBuilder
+     */
     @Override
     public void createRequest(HttpBuilder httpBuilder) {
         RequestBody requestBody = null;
@@ -56,6 +64,14 @@ public class OkHttpEngine implements INetEngine {
                 .build();
     }
 
+    /**
+     * 执行 http 请求，如果 http 正常，返回  code 和 body code = 103
+     *
+     * code = 103，IOException
+     * code = 104，Exception
+     *
+     * @return
+     */
     @Override
     public ResponseData execute() {
         try {

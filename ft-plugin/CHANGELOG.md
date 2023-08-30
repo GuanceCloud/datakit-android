@@ -1,3 +1,20 @@
+# plugin 1.2.2-beta01
+1.同 plugin 1.2.2-alpha01
+
+---
+# plugin 1.2.2-alpha01
+1.修正 flavor 设置后，无法上传 native symbol 的问题
+2.兼容 AGP 8.0 不生成 /intermediates/cmake/debug/obj 路径的问题
+
+---
+# plugin 1.2.1-beta01
+1.修正 sourceMap 上传发生错误的问题
+
+---
+# plugin 1.2.1-alpha01
+1.适配阿里云 Sophix 热修复集成后无法采集 View 数据的问题
+
+---
 # plugin 1.2.0-beta03
 1.兼容 Java 11 版本
 

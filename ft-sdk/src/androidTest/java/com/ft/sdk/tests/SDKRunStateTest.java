@@ -41,7 +41,6 @@ public class SDKRunStateTest extends FTBaseTest {
             hasPrepare = true;
         }
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(TEST_FAKE_URL)
-                .setXDataKitUUID("ft-dataKit-uuid-001")//设置 OAID 是否可用
                 .setDebug(true)//设置是否是 debug
                 .setEnv(EnvType.GRAY);
 

@@ -2,7 +2,6 @@ package com.ft.sdk;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.Constants;
 
 import java.util.HashMap;
@@ -31,7 +30,7 @@ public class FTSDKConfig {
     /**
      * 数据上传环境
      */
-    private EnvType env = EnvType.PROD;
+    private String env = EnvType.PROD.toString();
 
     /**
      * SDK 是否只支持在主进程中初始化
@@ -85,7 +84,7 @@ public class FTSDKConfig {
     /**
      * @return 获取环境变量请问
      */
-    public EnvType getEnv() {
+    public String getEnv() {
         return env;
     }
 
@@ -95,7 +94,6 @@ public class FTSDKConfig {
     public boolean isOnlySupportMainProcess() {
         return onlySupportMainProcess;
     }
-
 
 
     /**
@@ -118,6 +116,19 @@ public class FTSDKConfig {
      */
     public FTSDKConfig setEnv(EnvType env) {
         if (env != null) {
+            this.env = env.toString();
+        }
+        return this;
+    }
+
+    /**
+     * 设置数据传输环境
+     *
+     * @param env
+     * @return
+     */
+    public FTSDKConfig setEnv(String env) {
+        if (env != null && !env.isEmpty()) {
             this.env = env;
         }
         return this;

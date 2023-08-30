@@ -1,5 +1,7 @@
 package com.ft.sdk;
 
+import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -12,8 +14,8 @@ import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.PackageUtils;
 import com.ft.sdk.garble.utils.Utils;
-import com.ft.sdk.internal.exception.FTInitSDKProcessException;
 
 import java.util.HashMap;
 
@@ -31,9 +33,10 @@ public class FTSdk {
      */
     public static String PLUGIN_VERSION = "";
     /**
-     * 改变量 {@link FTSdk#initRUMWithConfig(FTRUMConfig)} 后被初始化，集成后 ft-native 后才会被被赋值
+     * 集成后 ft-native 后才会被被赋值,直接访问 {@link com.ft.sdk.nativelib.BuildConfig#VERSION_NAME} 来获取
      */
-    public static String NATIVE_VERSION = "";
+    public static String NATIVE_VERSION = PackageUtils.isNativeLibrarySupport() ? com.ft.sdk.nativelib.BuildConfig.VERSION_NAME : "";
+    ;
     /**
      * 变量由 Plugin ASM 写入，同一次编译版本 UUID 相同
      */
@@ -46,7 +49,6 @@ public class FTSdk {
     private final FTSDKConfig mFtSDKConfig;
 
     /**
-     *
      * @param ftSDKConfig
      */
     private FTSdk(@NonNull FTSDKConfig ftSDKConfig) {
@@ -66,8 +68,14 @@ public class FTSdk {
         } else {
             mFtSdk = new FTSdk(ftSDKConfig);
             boolean onlyMain = ftSDKConfig.isOnlySupportMainProcess();
-            if (onlyMain && !Utils.isMainProcess()) {
-                throw new FTInitSDKProcessException("当前 SDK 只能在主进程中运行，如果想要在非主进程中运行可以设置 FTSDKConfig.setOnlySupportMainProcess(false)");
+            if (onlyMain) {
+                Context context = FTApplication.getApplication();
+                String currentProcessName = Utils.getCurrentProcessName();
+                String packageName = context.getPackageName();
+                if (!TextUtils.isEmpty(packageName) && !TextUtils.equals(packageName, currentProcessName)) {
+                    LogUtils.e(TAG, "当前 SDK 只能在主进程中运行，当前进程为 " + currentProcessName + "，如果想要在非主进程中运行可以设置 FTSDKConfig.setOnlySupportMainProcess(false)");
+                    return;
+                }
             }
         }
         mFtSdk.initFTConfig(ftSDKConfig);
@@ -277,7 +285,7 @@ public class FTSdk {
         hashMap.put(Constants.KEY_APP_VERSION_NAME, Utils.getAppVersionName());
         hashMap.put(Constants.KEY_SDK_NAME, Constants.SDK_NAME);
         hashMap.put(Constants.KEY_APPLICATION_UUID, FTSdk.PACKAGE_UUID);
-        hashMap.put(Constants.KEY_ENV, config.getEnv().toString());
+        hashMap.put(Constants.KEY_ENV, config.getEnv());
         String uuid = config.isEnableAccessAndroidID() ? DeviceUtils.getUuid(FTApplication.getApplication()) : "";
         hashMap.put(Constants.KEY_DEVICE_UUID, uuid);
         hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_AGENT, FTSdk.AGENT_VERSION);

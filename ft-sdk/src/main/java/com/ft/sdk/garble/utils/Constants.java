@@ -24,11 +24,6 @@ public class Constants {
     public static final String FT_KEY_VALUE_NULL = "null";
 
     /**
-     * 未知类型赋值
-     */
-    public static final String UNKNOWN = "N/A";
-
-    /**
      * 行协议，指标
      */
     public static final String MEASUREMENT = "measurement";
@@ -72,10 +67,6 @@ public class Constants {
      */
     public static final String FT_LOG_DEFAULT_MEASUREMENT = "df_rum_android_log";
 
-    /**
-     * SDK 默认 uuid，{@link UUID#randomUUID()}
-     */
-    public static final String FT_SDK_INIT_UUID = "ft.sdk.init.uuid";
     /**
      * 存储 {@link  android.content.SharedPreferences} {@link #KEY_RUM_SESSION_ID} 键值
      */

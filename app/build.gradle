@@ -49,7 +49,7 @@ android {
         }
     }
 
-    flavorDimensions  "tier"
+    flavorDimensions=['tier']
 
     productFlavors {
 
@@ -60,6 +60,7 @@ android {
             buildConfigField "String", "TRACK_ID", "\"${ft_env.trackId}\""
             buildConfigField "String", "TRACE_URL", "\"${ft_env.traceUrl}\""
             buildConfigField "String", "ENV", "\"${ft_env.prodTestEnv}\""
+            buildConfigField "Boolean", "LAZY_INIT", "true"
             dimension "tier"
         }
 
@@ -70,6 +71,7 @@ android {
             buildConfigField "String", "TRACK_ID", "\"${ft_env.trackId}\""
             buildConfigField "String", "TRACE_URL", "\"${ft_env.traceUrl}\""
             buildConfigField "String", "ENV", "\"${ft_env.prodPublishEnv}\""
+            buildConfigField "Boolean", "LAZY_INIT", "true"
             dimension "tier"
 
         }
@@ -98,7 +100,7 @@ dependencies {
     androidTestImplementation 'androidx.test:rules:1.5.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-
+//    implementation 'com.cloudcare.ft.mobile.sdk.tracker.agent:ft-sdk:1.3.16-alpha04'
     implementation project(":ft-sdk")
     implementation project(":ft-native")
 

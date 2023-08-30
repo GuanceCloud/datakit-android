@@ -32,6 +32,10 @@
         <activity android:name=".RepeatActivity" />
         <activity android:name=".TabViewActivity" />
         <activity android:name=".ManualRUMActivity" />
+
+        <service
+            android:name=".service.TestService"
+            android:process=":test_process" />
     </application>
 
 </manifest>

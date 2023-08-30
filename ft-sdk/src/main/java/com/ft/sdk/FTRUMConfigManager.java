@@ -19,7 +19,6 @@ import com.google.gson.Gson;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -66,13 +65,13 @@ public class FTRUMConfigManager {
             FTAppStartCounter.get().checkToReUpload();
         }
 
-        initNativeDump();
+        initNativeDump(config);
     }
 
     /**
      * 初始化 Native 路径
      */
-    private void initNativeDump() {
+    private void initNativeDump(FTRUMConfig config) {
         boolean isNativeLibSupport = PackageUtils.isNativeLibrarySupport();
 
         if (isNativeLibSupport) {

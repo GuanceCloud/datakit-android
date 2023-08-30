@@ -3,6 +3,7 @@ package com.ft.sdk;
 import static com.ft.sdk.FTApplication.getApplication;
 
 import android.app.Activity;
+import android.app.Application;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -24,6 +25,7 @@ import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.PackageUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.lang.reflect.Field;
@@ -47,21 +49,47 @@ public class FTAutoTrack {
      * <p>
      * 该方法原来被 FT Plugin 插件调用
      */
-    public static void startApp(Object object) {
+    public static void startApp(Application app) {
         try {
-            LogUtils.d(TAG, "startApp");
+            LogUtils.d(TAG, "startApp:" + app);
             //判断是否为主进程
             if (Utils.isMainProcess()) {
                 FTActivityLifecycleCallbacks life = new FTActivityLifecycleCallbacks();
-                getApplication().registerActivityLifecycleCallbacks(life);
-                //排除在后台被启动的情况
-                if (Utils.isAppForeground()) {
-                    FTAppStartCounter.get().markCodeStartTimeLine();
+
+                if (app != null) {
+                    Class<?> clazz = PackageUtils.getSophixClass();
+                    if (clazz == null || !clazz.isInstance(app)) {
+                        app.registerActivityLifecycleCallbacks(life);
+                        //排除在后台被启动的情况
+                        if (Utils.isAppForeground()) {
+                            FTAppStartCounter.get().markCodeStartTimeLine();
+                        }
+                    }
+
+                } else {
+                    getApplication().registerActivityLifecycleCallbacks(life);
+
+                    //排除在后台被启动的情况
+                    if (Utils.isAppForeground()) {
+                        FTAppStartCounter.get().markCodeStartTimeLine();
+                    }
                 }
             }
         } catch (Exception e) {
             LogUtils.e(TAG, Log.getStackTraceString(e));
         }
+    }
+
+    /**
+     * 启动 APP
+     * 警告！！！该方法不能删除
+     * <p>
+     * 该方法原来被 FT Plugin 插件调用
+     * 兼容 ft-plugin:1.2.0-beta03 之前的版本
+     */
+    public static void startApp(Object object) {
+        LogUtils.d(TAG, "invoke compatible start app");
+        startApp(null);
     }
 
     /**
@@ -338,7 +366,8 @@ public class FTAutoTrack {
      */
     public static void trackMenuItem(Object object, MenuItem menuItem) {
         try {
-            clickView((Class<?>) object, AopUtils.getClassName(object), AopUtils.getSupperClassName(object), menuItem.getClass().getName() + "/" + menuItem.getItemId());
+            clickView((Class<?>) object, AopUtils.getClassName(object), AopUtils.getSupperClassName(object),
+                    AopUtils.getMenuItem(menuItem));
         } catch (Exception e) {
             LogUtils.e(TAG, Log.getStackTraceString(e));
 
