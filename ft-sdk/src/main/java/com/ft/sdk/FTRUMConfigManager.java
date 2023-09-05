@@ -260,7 +260,7 @@ public class FTRUMConfigManager {
                 tags.put(key, value);
             }
         }
-        tags.put(Constants.KEY_RUM_NETWORK_TYPE, NetUtils.get().getNetWorkStateName());
+        tags.put(Constants.KEY_RUM_NETWORK_TYPE, NetUtils.getNetWorkStateName());
         tags.put(Constants.KEY_RUM_IS_SIGN_IN, FTRUMConfigManager.get().isUserDataBinded() ? "T" : "F");
         if (FTRUMConfigManager.get().isUserDataBinded()) {
             UserData data = FTRUMConfigManager.get().getUserData();

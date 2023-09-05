@@ -1,3 +1,7 @@
+# agent 1.3.16-alpha05
+1. READ_PHONE_STATE 权限依赖关系弱化，优化无 READ_PHONE_STATE 错误提示
+
+---
 # agent 1.3.16-alpha04
 1.SDK 延迟加载异常处理
 
