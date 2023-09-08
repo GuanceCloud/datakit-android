@@ -106,7 +106,7 @@ public class FTSdk {
      * 关闭 SDK 内正在运行对象
      */
     public static void shutDown() {
-        SyncTaskManager.release();
+        SyncTaskManager.get().release();
         FTRUMConfigManager.get().release();
         FTMonitorManager.release();
         FTAutoTrackConfigManager.release();
@@ -120,6 +120,7 @@ public class FTSdk {
         FTLoggerConfigManager.get().release();
         FTRUMGlobalManager.get().release();
         EventConsumerThreadPool.get().shutDown();
+        mFtSdk = null;
         LogUtils.w(TAG, "FT SDK 已经被关闭");
     }
 
@@ -174,6 +175,7 @@ public class FTSdk {
         FTHttpConfigManager.get().initParams(config);
         FTNetworkListener.get().monitor();
         appendGlobalContext(config);
+        SyncTaskManager.get().init();
 //            LogUtils.setDescLogShow(mFtSDKConfig.isDescLog());
     }
 

@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.ft.sdk.FTLogger;
+import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.annotation.IgnoreAOP;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.reflect.ReflectUtils;
@@ -117,6 +118,14 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(MainActivity.this, "需要先更改 LAZY_INIT 为 true", Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+
+        findViewById(R.id.main_shut_down).setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                FTSdk.shutDown();
             }
         });
     }
