@@ -1,12 +1,11 @@
 package com.ft.test.base;
 
 import android.content.Context;
-import android.os.Looper;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.ft.sdk.FTExceptionHandler;
-import com.ft.sdk.FTRUMGlobalManager;
+import com.ft.sdk.FTRUMInnerManager;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTrackInner;
 import com.ft.sdk.SyncDataHelper;
@@ -19,7 +18,6 @@ import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.Utils;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Assert;
@@ -106,13 +104,13 @@ public class FTBaseTest {
     /**
      * 关闭当前激活 Action
      * <p>
-     * {@link FTRUMGlobalManager#checkActionClose()}
+     * {@link FTRUMInnerManager#checkActionClose()}
      *
      * @throws Exception
      */
     protected void invokeCheckActionClose() throws Exception {
         Thread.sleep(1000);
-        Whitebox.invokeMethod(FTRUMGlobalManager.get(), "checkActionClose");
+        Whitebox.invokeMethod(FTRUMInnerManager.get(), "checkActionClose");
 
     }
 
@@ -122,7 +120,7 @@ public class FTBaseTest {
      */
     protected void invokeGenerateRumData() throws Exception {
         Thread.sleep(1000);
-        Whitebox.invokeMethod(FTRUMGlobalManager.get(), "generateRumData");
+        Whitebox.invokeMethod(FTRUMInnerManager.get(), "generateRumData");
 
     }
 
@@ -155,10 +153,10 @@ public class FTBaseTest {
      * @throws IllegalAccessException
      */
     protected void setSessionExpire() throws IllegalAccessException {
-        Field lastActionField = Whitebox.getField(FTRUMGlobalManager.class, "lastActionTime");
+        Field lastActionField = Whitebox.getField(FTRUMInnerManager.class, "lastActionTime");
         lastActionField.setAccessible(true);
-        long lastActionTime = (long) lastActionField.get(FTRUMGlobalManager.get());
-        Whitebox.setInternalState(FTRUMGlobalManager.get(), "lastActionTime", lastActionTime - 900000000000L);
+        long lastActionTime = (long) lastActionField.get(FTRUMInnerManager.get());
+        Whitebox.setInternalState(FTRUMInnerManager.get(), "lastActionTime", lastActionTime - 900000000000L);
 
     }
 

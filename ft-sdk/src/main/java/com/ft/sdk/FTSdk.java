@@ -119,6 +119,7 @@ public class FTSdk {
         FTTraceConfigManager.get().release();
         FTLoggerConfigManager.get().release();
         FTRUMGlobalManager.get().release();
+        FTRUMInnerManager.get().release();
         EventConsumerThreadPool.get().shutDown();
         mFtSdk = null;
         LogUtils.w(TAG, "FT SDK 已经被关闭");

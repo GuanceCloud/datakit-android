@@ -113,11 +113,11 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.main_lazy_init).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (BuildConfig.LAZY_INIT) {
+//                if (BuildConfig.LAZY_INIT) {
                     DemoApplication.initFTSDK();
-                } else {
-                    Toast.makeText(MainActivity.this, "需要先更改 LAZY_INIT 为 true", Toast.LENGTH_SHORT).show();
-                }
+//                } else {
+//                    Toast.makeText(MainActivity.this, "需要先更改 LAZY_INIT 为 true", Toast.LENGTH_SHORT).show();
+//                }
             }
         });
 

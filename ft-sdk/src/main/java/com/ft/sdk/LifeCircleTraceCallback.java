@@ -127,7 +127,7 @@ class LifeCircleTraceCallback {
                 if (startTime != null) {
                     long duration = Utils.getCurrentNanoTime() - startTime;
                     String viewName = AopUtils.getClassName(context);
-                    FTRUMGlobalManager.get().onCreateView(viewName, duration);
+                    FTRUMInnerManager.get().onCreateView(viewName, duration);
                 }
             }
         }

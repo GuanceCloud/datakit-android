@@ -60,7 +60,7 @@ public class FTTrackInner {
      */
     void rum(long time, String measurement, final JSONObject tags, JSONObject fields) {
         String sessionId = tags.optString(Constants.KEY_RUM_SESSION_ID);
-        if (FTRUMGlobalManager.get().checkSessionWillCollect(sessionId)) {
+        if (FTRUMInnerManager.get().checkSessionWillCollect(sessionId)) {
             syncDataBackground(DataType.RUM_APP, time, measurement, tags, fields);
         }
     }
@@ -192,7 +192,7 @@ public class FTTrackInner {
             JSONObject rumTags = null;
             if (config.isEnableLinkRumData()) {
                 rumTags = FTRUMConfigManager.get().getRUMPublicDynamicTags(true);
-                FTRUMGlobalManager.get().attachRUMRelative(rumTags, false);
+                FTRUMInnerManager.get().attachRUMRelative(rumTags, false);
             }
 
             ArrayList<SyncJsonData> datas = new ArrayList<>();

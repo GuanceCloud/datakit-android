@@ -4,6 +4,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.ft.sdk.FTRUMInnerManager;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -64,7 +65,7 @@ public class ActionBean {
      */
     long duration = 0;
     /**
-     * 会话 ID，{@link com.ft.sdk.FTRUMGlobalManager#sessionId}
+     * 会话 ID，{@link FTRUMInnerManager#sessionId}
      */
     String sessionId;
 

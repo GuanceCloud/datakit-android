@@ -53,7 +53,8 @@ public class FTRUMConfigManager {
      */
     void initWithConfig(FTRUMConfig config) {
         this.config = config;
-        FTRUMGlobalManager.get().initParams(config);
+        FTRUMInnerManager.get().initParams(config);
+        FTRUMGlobalManager.get().initConfig(config);
 //        FTAutoTrackConfigManager.get().initParams();
         FTExceptionHandler.get().initConfig(config);
         initRandomUserId();
@@ -280,7 +281,7 @@ public class FTRUMConfigManager {
             }
 
         } else {
-            tags.put(Constants.KEY_RUM_USER_ID, FTRUMGlobalManager.get().getSessionId());
+            tags.put(Constants.KEY_RUM_USER_ID, FTRUMInnerManager.get().getSessionId());
         }
         return tags;
     }
