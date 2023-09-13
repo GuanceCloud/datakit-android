@@ -132,7 +132,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                         }
                     }
 
-                    String sessionId = FTRUMGlobalManager.get().getSessionId();
+                    String sessionId = FTRUMInnerManager.get().getSessionId();
                     tags.put(Constants.KEY_RUM_SESSION_ID, sessionId);
                     tags.put(Constants.KEY_RUM_VIEW_IS_WEB_VIEW, true);
                     fields.put(Constants.KEY_RUM_VIEW_IS_ACTIVE, false);

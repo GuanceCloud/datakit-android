@@ -1,5 +1,6 @@
 package com.ft.sdk.garble.bean;
 
+import com.ft.sdk.FTRUMInnerManager;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.util.HashMap;
@@ -136,7 +137,7 @@ public class ResourceBean {
     public long endTime = -1;
 
     /**
-     * 会话 ID ,{@link  com.ft.sdk.FTRUMGlobalManager#sessionId}
+     * 会话 ID ,{@link  FTRUMInnerManager#sessionId}
      */
     public String sessionId;
 

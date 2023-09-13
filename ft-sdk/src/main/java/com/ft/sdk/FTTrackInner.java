@@ -60,7 +60,7 @@ public class FTTrackInner {
      */
     void rum(long time, String measurement, final JSONObject tags, JSONObject fields) {
         String sessionId = tags.optString(Constants.KEY_RUM_SESSION_ID);
-        if (FTRUMGlobalManager.get().checkSessionWillCollect(sessionId)) {
+        if (FTRUMInnerManager.get().checkSessionWillCollect(sessionId)) {
             syncDataBackground(DataType.RUM_APP, time, measurement, tags, fields);
         }
     }
@@ -125,7 +125,7 @@ public class FTTrackInner {
                                 callback.onResponse(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, e.getMessage());
                             }
                         }
-                        LogUtils.e(TAG,Log.getStackTraceString(e));
+                        LogUtils.e(TAG, Log.getStackTraceString(e));
                     }
                 }
             }
@@ -143,8 +143,8 @@ public class FTTrackInner {
         if (recordDataList == null || recordDataList.isEmpty()) {
             return;
         }
-        SyncDataHelper syncDataManager = new SyncDataHelper();
-        String body = syncDataManager.getBodyContent(DataType.LOG, recordDataList);
+        SyncDataHelper syncData = new SyncDataHelper();
+        String body = syncData.getBodyContent(DataType.LOG, recordDataList);
         String model = Constants.URL_MODEL_LOG;
         String content_type = "text/plain";
         ResponseData result = HttpBuilder.Builder()
@@ -188,10 +188,11 @@ public class FTTrackInner {
     void batchLogBeanBackground(@NonNull List<BaseContentBean> logBeans) {
         try {
             FTLoggerConfig config = FTLoggerConfigManager.get().getConfig();
+            if (config == null) return;
             JSONObject rumTags = null;
             if (config.isEnableLinkRumData()) {
                 rumTags = FTRUMConfigManager.get().getRUMPublicDynamicTags(true);
-                FTRUMGlobalManager.get().attachRUMRelative(rumTags, false);
+                FTRUMInnerManager.get().attachRUMRelative(rumTags, false);
             }
 
             ArrayList<SyncJsonData> datas = new ArrayList<>();
@@ -204,13 +205,13 @@ public class FTTrackInner {
                         datas.add(SyncJsonData.getFromLogBean(logBean, DataType.LOG));
                     }
                 } catch (Exception e) {
-                    LogUtils.e(TAG,Log.getStackTraceString(e));
+                    LogUtils.e(TAG, Log.getStackTraceString(e));
                 }
 
             }
             judgeLogCachePolicy(datas);
         } catch (Exception e) {
-            LogUtils.e(TAG,Log.getStackTraceString(e));
+            LogUtils.e(TAG, Log.getStackTraceString(e));
         }
 
     }

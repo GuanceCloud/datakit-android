@@ -56,6 +56,8 @@ public class SyncTaskManager {
      */
     private volatile boolean running;
 
+    private boolean isStop = false;
+
     private static final int MSG_SYNC = 1;
 
     private final Handler mHandler = new Handler(Looper.getMainLooper()) {
@@ -103,7 +105,7 @@ public class SyncTaskManager {
     }
 
     private void executePoll(final boolean withSleep) {
-        if (running) {
+        if (running || isStop) {
             return;
         }
         synchronized (this) {
@@ -170,8 +172,8 @@ public class SyncTaskManager {
         if (requestDatas == null || requestDatas.isEmpty()) {
             return;
         }
-        SyncDataHelper syncDataManager = new SyncDataHelper();
-        String body = syncDataManager.getBodyContent(dataType, requestDatas);
+        SyncDataHelper syncData = new SyncDataHelper();
+        String body = syncData.getBodyContent(dataType, requestDatas);
         LogUtils.d(TAG, body);
         requestNet(dataType, body, new AsyncCallback() {
             @Override
@@ -257,17 +259,23 @@ public class SyncTaskManager {
         try {
             syncCallback.onResponse(result.getCode(), result.getMessage());
         } catch (Exception e) {
-            LogUtils.e(TAG,Log.getStackTraceString(e));
+            LogUtils.e(TAG, Log.getStackTraceString(e));
             syncCallback.onResponse(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, e.getLocalizedMessage());
             LogUtils.e(TAG, "上传错误：" + e.getLocalizedMessage());
         }
 
     }
 
+    public void init() {
+        isStop = false;
+    }
+
     /**
      * 释放上传同步资源
      */
-    public static void release() {
+    public void release() {
         DataUploaderThreadPool.get().shutDown();
+        mHandler.removeMessages(MSG_SYNC);
+        isStop = true;
     }
 }

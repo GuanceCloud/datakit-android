@@ -25,6 +25,19 @@ import java.util.List;
 public class SyncDataHelper {
     public final static String TAG = Constants.LOG_TAG_PREFIX + "SyncDataHelper";
 
+    private final HashMap<String, Object> basePublicTags;
+    private final HashMap<String, Object> logTags;
+    private final HashMap<String, Object> rumTags;
+    private final HashMap<String, Object> traceTags;
+
+
+    public SyncDataHelper() {
+        basePublicTags = FTSdk.checkInstallState() ? FTSdk.get().getBasePublicTags() : new HashMap<>();
+        logTags = FTLoggerConfigManager.get().getConfig() != null ? FTLoggerConfigManager.get().getConfig().getGlobalContext() : new HashMap<>();
+        rumTags = FTRUMConfigManager.get().getConfig() != null ? FTRUMConfigManager.get().getConfig().getGlobalContext() : new HashMap<>();
+        traceTags = FTTraceConfigManager.get().getConfig() != null ? FTTraceConfigManager.get().getConfig().getGlobalContext() : new HashMap<>();
+    }
+
     /**
      * 封装同步上传的数据
      *
@@ -57,8 +70,8 @@ public class SyncDataHelper {
      */
     private String getLogBodyContent(List<SyncJsonData> datas) {
         HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.putAll(FTSdk.get().getBasePublicTags());
-        hashMap.putAll(FTLoggerConfigManager.get().getConfig().getGlobalContext());
+        hashMap.putAll(basePublicTags);
+        hashMap.putAll(logTags);
         return convertToLineProtocolLines(datas, hashMap);
     }
 
@@ -71,8 +84,8 @@ public class SyncDataHelper {
      */
     private String getTraceBodyContent(List<SyncJsonData> datas) {
         HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.putAll(FTSdk.get().getBasePublicTags());
-        hashMap.putAll(FTTraceConfigManager.get().getConfig().getGlobalContext());
+        hashMap.putAll(basePublicTags);
+        hashMap.putAll(traceTags);
         return convertToLineProtocolLines(datas, hashMap);
     }
 
@@ -84,8 +97,8 @@ public class SyncDataHelper {
      */
     private String getRumBodyContent(List<SyncJsonData> datas) {
         HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.putAll(FTSdk.get().getBasePublicTags());
-        hashMap.putAll(FTRUMConfigManager.get().getConfig().getGlobalContext());
+        hashMap.putAll(basePublicTags);
+        hashMap.putAll(rumTags);
         return convertToLineProtocolLines(datas, hashMap);
     }
 

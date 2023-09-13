@@ -57,7 +57,7 @@ public class FTResourceInterceptor implements Interceptor {
 
         String resourceId = Utils.identifyRequest(request);
         LogUtils.d(TAG, "intercept id:" + resourceId);
-        FTRUMGlobalManager.get().startResource(resourceId);
+        FTRUMInnerManager.get().startResource(resourceId);
         ResourceParams params = new ResourceParams();
         params.url = url;
         params.requestHeader = request.headers().toString();
@@ -89,8 +89,8 @@ public class FTResourceInterceptor implements Interceptor {
                 LogUtils.d(TAG, "response body empty");
             }
         }
-        FTRUMGlobalManager.get().setTransformContent(resourceId, params);
-        FTRUMGlobalManager.get().stopResource(resourceId);
+        FTRUMInnerManager.get().setTransformContent(resourceId, params);
+        FTRUMInnerManager.get().stopResource(resourceId);
         return response;
     }
 

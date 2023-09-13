@@ -602,7 +602,7 @@ public class FTAutoTrack {
      * 记录应用登陆时效
      */
     public static void putRUMLaunchPerformance(boolean isCold, long duration, long startTime) {
-        FTRUMGlobalManager.get().addAction(
+        FTRUMInnerManager.get().addAction(
                 isCold ? Constants.ACTION_NAME_LAUNCH_COLD : Constants.ACTION_NAME_LAUNCH_HOT,
                 isCold ? Constants.ACTION_TYPE_LAUNCH_COLD : Constants.ACTION_TYPE_LAUNCH_HOT,
                 duration, startTime);
@@ -627,7 +627,7 @@ public class FTAutoTrack {
 
         String event = "";
         event = Constants.EVENT_NAME_CLICK;
-        FTRUMGlobalManager.get().startAction(vtp, event);
+        FTRUMInnerManager.get().startAction(vtp, event);
 
     }
 

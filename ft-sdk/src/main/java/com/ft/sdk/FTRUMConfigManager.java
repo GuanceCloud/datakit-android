@@ -53,7 +53,8 @@ public class FTRUMConfigManager {
      */
     void initWithConfig(FTRUMConfig config) {
         this.config = config;
-        FTRUMGlobalManager.get().initParams(config);
+        FTRUMInnerManager.get().initParams(config);
+        FTRUMGlobalManager.get().initConfig(config);
 //        FTAutoTrackConfigManager.get().initParams();
         FTExceptionHandler.get().initConfig(config);
         initRandomUserId();
@@ -260,7 +261,7 @@ public class FTRUMConfigManager {
                 tags.put(key, value);
             }
         }
-        tags.put(Constants.KEY_RUM_NETWORK_TYPE, NetUtils.get().getNetWorkStateName());
+        tags.put(Constants.KEY_RUM_NETWORK_TYPE, NetUtils.getNetWorkStateName());
         tags.put(Constants.KEY_RUM_IS_SIGN_IN, FTRUMConfigManager.get().isUserDataBinded() ? "T" : "F");
         if (FTRUMConfigManager.get().isUserDataBinded()) {
             UserData data = FTRUMConfigManager.get().getUserData();
@@ -280,7 +281,7 @@ public class FTRUMConfigManager {
             }
 
         } else {
-            tags.put(Constants.KEY_RUM_USER_ID, FTRUMGlobalManager.get().getSessionId());
+            tags.put(Constants.KEY_RUM_USER_ID, FTRUMInnerManager.get().getSessionId());
         }
         return tags;
     }

@@ -111,7 +111,7 @@ class FTNetworkListener {
      */
     private void judgeNetState() {
         //大于 0 有网
-        if (NetUtils.get().getNetworkState(application) > 0) {
+        if (NetUtils.isNetworkAvailable(application)) {
             LogUtils.d(TAG, "Net Connected");
             SyncTaskManager.get().executeSyncPoll();
         }

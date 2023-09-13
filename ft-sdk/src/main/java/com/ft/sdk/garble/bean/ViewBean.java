@@ -4,7 +4,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.FTRUMGlobalManager;
+import com.ft.sdk.FTRUMInnerManager;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -18,9 +18,9 @@ import java.util.Iterator;
 import java.util.UUID;
 
 /**
- * View 指标数据，以下数据为页面页面生命周期内容产生的数据指标，从 {@link FTRUMGlobalManager#startView(String)} 到
+ * View 指标数据，以下数据为页面页面生命周期内容产生的数据指标，从 {@link FTRUMInnerManager#startView(String)} 到
  * <p>
- * {@link FTRUMGlobalManager#stopView()}  }
+ * {@link FTRUMInnerManager#stopView()}  }
  *
  * @author Brandon
  */
@@ -117,7 +117,7 @@ public class ViewBean {
     int batteryCurrentMax;
 
     /**
-     * {@link FTRUMGlobalManager#sessionId}
+     * {@link FTRUMInnerManager#sessionId}
      */
     String sessionId;
 

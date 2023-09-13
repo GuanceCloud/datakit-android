@@ -1,5 +1,6 @@
 package com.ft.sdk.garble.utils;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -24,35 +25,40 @@ import java.util.Enumeration;
  */
 public class NetUtils {
     private final static String TAG = Constants.LOG_TAG_PREFIX + "NetUtils";
-    public final static int NETWORK_NONE = 0;
+    public final static int NETWORK_NONE = -1;
+    public final static int NETWORK_UNKNOWN = 0;
     public final static int NETWORK_WIFI = 1;
     public final static int NETWORK_2G = 2;
     public final static int NETWORK_3G = 3;
     public final static int NETWORK_4G = 4;
     public final static int NETWORK_5G = 5;
-    public final static int NETWORK_UNKNOWN = NETWORK_5G + 1;
 
-    private static NetUtils netUtils;
-
-    private NetUtils() {
-    }
-
-    public synchronized static NetUtils get() {
-        if (netUtils == null) {
-            netUtils = new NetUtils();
+    /**
+     * 检查网络是否可用
+     *
+     * @param context
+     * @return
+     */
+    public static boolean isNetworkAvailable(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager != null) {
+            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+            return activeNetworkInfo != null && activeNetworkInfo.isConnected();
         }
-        return netUtils;
+        return false;
     }
 
 
     /**
      * 获得网络类型
+     * <p>
+     * {@link  Manifest.permission#READ_PHONE_STATE}
      *
      * @param context
      * @return
      */
     @SuppressLint("MissingPermission")
-    public int getNetworkState(Context context) {
+    public static int getNetworkState(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (null == cm) {
             return NETWORK_NONE;
@@ -78,7 +84,11 @@ public class NetUtils {
         int networkType = NETWORK_UNKNOWN;
 
         try {
-            networkType = telephonyManager.getNetworkType();
+            if (Utils.hasPermission(context, Manifest.permission.READ_PHONE_STATE)) {
+                networkType = telephonyManager.getNetworkType();
+            } else {
+                LogUtils.e(TAG, "没有获得到 READ_PHONE_STATE 权限无法获取运营商信息");
+            }
         } catch (Exception ex) {
             LogUtils.e(TAG, Log.getStackTraceString(ex));
             return NETWORK_UNKNOWN;
@@ -118,10 +128,11 @@ public class NetUtils {
 
     /**
      * 获取网络类型名称
+     * {@link  Manifest.permission#READ_PHONE_STATE}
      *
      * @return
      */
-    public String getNetWorkStateName() {
+    public static String getNetWorkStateName() {
 
         int type = getNetworkState(FTApplication.getApplication());
         switch (type) {
@@ -149,7 +160,7 @@ public class NetUtils {
      *
      * @return
      */
-    public String getWifiIp() {
+    public static String getWifiIp() {
         String ip = null;
         WifiManager manager = (WifiManager) FTApplication.getApplication().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         if (manager != null) {
@@ -169,7 +180,7 @@ public class NetUtils {
      *
      * @return 返回 8.8.8.8 格式的字符
      */
-    public String getMobileIpAddress() {
+    public static String getMobileIpAddress() {
         NetworkInfo networkInfo = ((ConnectivityManager) FTApplication.getApplication().getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
             if (networkInfo.getType() == ConnectivityManager.TYPE_MOBILE) {

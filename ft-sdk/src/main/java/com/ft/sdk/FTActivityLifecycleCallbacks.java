@@ -91,7 +91,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     /**
      * {@link Activity#onResume()}  } 恢复事件
      * <p>
-     * {@link FTRUMConfigManager#isRumEnable()} 开启状态下，使用 {@link FTRUMGlobalManager#startView(String, HashMap)}
+     * {@link FTRUMConfigManager#isRumEnable()} 开启状态下，使用 {@link FTRUMInnerManager#startView(String, HashMap)}
      *
      * @param activity {@link Activity }.
      */
@@ -101,7 +101,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
         //页面打开埋点数据插入
         FTRUMConfigManager manager = FTRUMConfigManager.get();
         if (manager.isRumEnable() && manager.getConfig().isEnableTraceUserView()) {
-            FTRUMGlobalManager.get().startView(activity.getClass().getSimpleName());
+            FTRUMInnerManager.get().startView(activity.getClass().getSimpleName());
         }
 
 
@@ -123,7 +123,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
 
     /**
      * {@link Activity#onPause()}时调用，{@link FTRUMConfigManager#isRumEnable()} 开启状态下，
-     * 使用 {@link FTRUMGlobalManager#stopView()}
+     * 使用 {@link FTRUMInnerManager#stopView()}
      *
      * @param activity {@link Activity }.
      */
@@ -132,7 +132,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
         //页面关闭埋点数据插入
         FTRUMConfigManager manager = FTRUMConfigManager.get();
         if (manager.isRumEnable() && manager.getConfig().isEnableTraceUserView()) {
-            FTRUMGlobalManager.get().stopView();
+            FTRUMInnerManager.get().stopView();
         }
 
     }

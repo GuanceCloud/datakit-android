@@ -36,7 +36,7 @@ public class FTUIBlockManager {
             } else if (x.startsWith(PREFIX_METHOD_DISPATCH_END)) {
                 long duration = Utils.getCurrentNanoTime() - startTime;
                 if (duration > TIME_BLOCK_NS) {
-                    FTRUMGlobalManager.get().addLongTask(method, duration);
+                    FTRUMInnerManager.get().addLongTask(method, duration);
                 }
 
             }

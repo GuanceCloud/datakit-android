@@ -60,7 +60,7 @@ public class FTResourceEventListener extends EventListener {
         netStatusBean.sslStartTime = sslStartTime;
         netStatusBean.tcpStartTime = tcpStartTime;
         netStatusBean.tcpEndTime = tcpEndTime;
-        FTRUMGlobalManager.get().setNetState(this.resourceId, netStatusBean);
+        FTRUMInnerManager.get().setNetState(this.resourceId, netStatusBean);
     }
 
     @Override

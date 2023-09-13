@@ -1,7 +1,7 @@
 package com.ft.sdk;
 
 /**
- * 错误检测类型，在 Error 传输类型中 {@link FTRUMGlobalManager#addError} 在调用的时候自动添加
+ * 错误检测类型，在 Error 传输类型中 {@link FTRUMInnerManager#addError} 在调用的时候自动添加
  *
  * @author Brandon
  */
