@@ -1,5 +1,7 @@
 package com.ft.utils;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.ft.http.OkHttpClientSingleton;
@@ -31,7 +33,7 @@ public class RequestUtils {
             LogUtils.d(TAG, "url:" + url + "\n" + string);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            LogUtils.e(TAG, Log.getStackTraceString(e));
         }
         return request;
     }

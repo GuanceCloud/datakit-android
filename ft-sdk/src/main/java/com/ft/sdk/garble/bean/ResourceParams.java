@@ -40,5 +40,5 @@ public class ResourceParams {
     /**
      * http 返回 code
      */
-    public int resourceStatus = -1;
+    public int resourceStatus = 0;
 }

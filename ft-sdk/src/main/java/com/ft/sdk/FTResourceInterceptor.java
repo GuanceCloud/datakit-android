@@ -63,9 +63,7 @@ public class FTResourceInterceptor implements Interceptor {
         params.requestHeader = request.headers().toString();
         params.resourceMethod = request.method();
 
-        if (exception != null) {
-            throw new IOException(exception);
-        } else {
+        if (exception == null) {
             String responseBodyString = "";
             ResponseBody responseBody = response.body();
             if (HttpHeaders.hasBody(response)) {
@@ -91,6 +89,10 @@ public class FTResourceInterceptor implements Interceptor {
         }
         FTRUMInnerManager.get().setTransformContent(resourceId, params);
         FTRUMInnerManager.get().stopResource(resourceId);
+
+        if (exception != null) {
+            throw new IOException(exception);
+        }
         return response;
     }
 

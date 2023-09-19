@@ -8,7 +8,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -64,7 +63,10 @@ public class MainActivity extends AppCompatActivity {
                 public void run() {
                     //通过查看请求头查看是否替换调用 OkHttpClient.Builder.build 方法成功
                     Request request = RequestUtils.requestUrl(BuildConfig.TRACE_URL);
-                    LogUtils.d(TAG, "header=" + request.headers().toString());
+                    if (request != null) {
+                        LogUtils.d(TAG, "header=" + request.headers());
+
+                    }
                 }
             }).start();
         });
@@ -114,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 //                if (BuildConfig.LAZY_INIT) {
-                    DemoApplication.initFTSDK();
+                DemoApplication.initFTSDK();
 //                } else {
 //                    Toast.makeText(MainActivity.this, "需要先更改 LAZY_INIT 为 true", Toast.LENGTH_SHORT).show();
 //                }

@@ -84,7 +84,7 @@ public class ResourceBean {
     /**
      * 请求返回 code {@link  HttpsURLConnection#HTTP_OK,HttpsURLConnection#HTTP_UNAUTHORIZED} 等等
      */
-    public int resourceStatus = -1;
+    public int resourceStatus = 0;
 
     /**
      * 资源请求大小，单位 byte
