@@ -12,9 +12,13 @@ import java.util.HashMap;
  * Description:
  */
 public class FTSDKConfig {
-    //服务器地址
+    /**
+     * datakit 数据写入地址
+     */
     private final String metricsUrl;
-    //是否是Debug
+    /**
+     * 是否开启 Debug
+     */
     private boolean isDebug;
 
     /**

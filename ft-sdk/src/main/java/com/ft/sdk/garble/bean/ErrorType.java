@@ -16,7 +16,7 @@ public enum ErrorType {
      */
     JAVA("java_crash"),
     /**
-     *  Flutter {@linkplain https://github.com/GuanceCloud/datakit-flutter}
+     * Flutter {@linkplain https://github.com/GuanceCloud/datakit-flutter}
      */
     FLUTTER("flutter_crash"),
     /**
@@ -30,6 +30,21 @@ public enum ErrorType {
     ErrorType(String value) {
         this.value = value;
     }
+
+
+    public static ErrorType getValueFrom(String value) {
+        ErrorType[] errorTypes = values();
+
+        for (int i = 0; i < values().length; ++i) {
+            ErrorType state = errorTypes[i];
+            if (state.toString().toLowerCase().equals(value)) {
+                return state;
+            }
+        }
+
+        return NATIVE;
+    }
+
 
     @NonNull
     @Override
