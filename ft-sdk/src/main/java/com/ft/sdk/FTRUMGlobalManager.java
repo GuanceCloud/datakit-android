@@ -5,6 +5,7 @@ import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.ErrorType;
 import com.ft.sdk.garble.bean.NetStatusBean;
 import com.ft.sdk.garble.bean.ResourceParams;
+import com.ft.sdk.garble.utils.Utils;
 
 import java.util.HashMap;
 
@@ -24,6 +25,18 @@ public class FTRUMGlobalManager {
     void initConfig(FTRUMConfig config) {
         if (config.isRumEnable()) {
             innerManager = FTRUMInnerManager.get();
+        }
+    }
+
+    /**
+     * 添加 Action
+     * @param actionName action 名称
+     * @param actionType action 类型
+     * @param duration 纳秒，持续时间
+     */
+    public void addAction(String actionName, String actionType, long duration) {
+        if (innerManager != null) {
+            innerManager.addAction(actionName, actionType, duration, Utils.getCurrentNanoTime());
         }
     }
 
