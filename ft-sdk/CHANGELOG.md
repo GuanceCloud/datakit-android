@@ -1,3 +1,8 @@
+# agent 1.3.16-beta03
+1. 调整 Open API 结构
+2. Resource 本地错误逻辑添加
+
+---
 # agent 1.3.16-beta02
 1. 优化 SDK 关闭
 2. 同 agent 1.3.16-alpha05
