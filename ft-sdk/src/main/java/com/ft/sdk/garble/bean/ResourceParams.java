@@ -28,6 +28,11 @@ public class ResourceParams {
      * http 头 Content-Encoding
      */
     public String responseContentEncoding = "";
+
+    /**
+     * response 内容大小
+     */
+    public long responseContentLength = 0;
     /**
      * http 请求
      */

@@ -30,9 +30,10 @@ public class FTRUMGlobalManager {
 
     /**
      * 添加 Action
+     *
      * @param actionName action 名称
      * @param actionType action 类型
-     * @param duration 纳秒，持续时间
+     * @param duration   纳秒，持续时间
      */
     public void addAction(String actionName, String actionType, long duration) {
         if (innerManager != null) {
@@ -210,6 +211,7 @@ public class FTRUMGlobalManager {
      * @param errorType 错误类型
      * @param state     程序运行状态
      * @param dateline  发生时间，纳秒
+     * @param property  附加属性
      */
     public void addError(String log, String message, long dateline, ErrorType errorType,
                          AppState state, HashMap<String, Object> property) {
@@ -224,6 +226,7 @@ public class FTRUMGlobalManager {
      *
      * @param log      日志内容
      * @param duration 持续时间，纳秒
+     * @param property 附加属性
      */
     public void addLongTask(String log, long duration, HashMap<String, Object> property) {
         if (innerManager != null) {

@@ -25,12 +25,14 @@ public class RequestUtils {
             Response response = OkHttpClientSingleton.getInstance().newCall(builder.build()).execute();
             request = response.request();
 
+            int code = response.code();
             ResponseBody responseBody = response.body();
             String string = "";
             if (responseBody != null) {
+                //这里需要消费，event listener 才会被调用
                 string = responseBody.string();
             }
-            LogUtils.d(TAG, "url:" + url + "\n" + string);
+            LogUtils.d(TAG, "url:" + url + "\n" + code);
 
         } catch (IOException e) {
             LogUtils.e(TAG, Log.getStackTraceString(e));

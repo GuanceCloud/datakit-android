@@ -1,3 +1,7 @@
+# agent 1.3.17-alpha01
+1. 优化 resource body size 计算逻辑
+
+---
 # agent 1.3.16-beta03
 1. 调整 Open API 结构
 2. Resource 本地错误逻辑添加
