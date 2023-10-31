@@ -1,4 +1,8 @@
 # agent 1.3.17-alpha01
+1. 支持 resource 自定义数据方式
+
+---
+# agent 1.3.17-alpha01
 1. 优化 resource body size 计算逻辑
 
 ---
