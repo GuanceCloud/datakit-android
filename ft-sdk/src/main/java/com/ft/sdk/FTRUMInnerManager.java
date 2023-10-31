@@ -869,9 +869,11 @@ public class FTRUMInnerManager {
         if (bean.resourceStatus >= HttpsURLConnection.HTTP_BAD_REQUEST) {
             bean.errorStack = params.responseBody == null ? "" : params.responseBody;
         }
-//        int responseHeaderSize = bean.responseHeader.getBytes().length;
-//        bean.resourceSize = params.responseBody == null ? 0 : params.responseBody.getBytes().length;
-//        bean.resourceSize += responseHeaderSize;
+
+        if (params.property != null) {
+            bean.property.putAll(params.property);
+        }
+
         if (FTTraceConfigManager.get().isEnableLinkRUMData()) {
             bean.traceId = traceId;
             bean.spanId = spanId;

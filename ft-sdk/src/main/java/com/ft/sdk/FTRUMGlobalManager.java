@@ -83,6 +83,7 @@ public class FTRUMGlobalManager {
      * resource 起始
      *
      * @param resourceId 资源 Id
+     * @param property   附加属性参数
      */
     public void startResource(String resourceId, HashMap<String, Object> property) {
         if (innerManager != null) {
@@ -104,7 +105,7 @@ public class FTRUMGlobalManager {
 
 
     /**
-     * @param resourceId
+     * @param resourceId 资源 Id
      * @param property   附加属性参数
      */
     public void stopResource(final String resourceId, HashMap<String, Object> property) {

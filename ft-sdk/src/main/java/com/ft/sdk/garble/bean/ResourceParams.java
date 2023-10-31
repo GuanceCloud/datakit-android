@@ -1,5 +1,7 @@
 package com.ft.sdk.garble.bean;
 
+import java.util.HashMap;
+
 /**
  * Resource 请求参数
  */
@@ -46,4 +48,9 @@ public class ResourceParams {
      * http 返回 code
      */
     public int resourceStatus = 0;
+
+    /**
+     * 附加属性参数
+     */
+    public HashMap<String,Object> property;
 }

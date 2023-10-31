@@ -13,15 +13,26 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.ft.sdk.FTLogger;
+import com.ft.sdk.FTResourceEventListener;
+import com.ft.sdk.FTResourceInterceptor;
 import com.ft.sdk.FTSdk;
+import com.ft.sdk.FTTraceInterceptor;
 import com.ft.sdk.garble.annotation.IgnoreAOP;
 import com.ft.sdk.garble.bean.Status;
+import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.reflect.ReflectUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.service.TestService;
 import com.ft.utils.RequestUtils;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -69,6 +80,71 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }).start();
+        });
+
+        findViewById(R.id.main_mock_okhttp_custom_content_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                new Thread() {
+                    @Override
+                    public void run() {
+
+                        //自定义采集内容，需要先关闭自动采集配置
+                        // FTTraceConfig.setEnableAutoTrace(false)
+                        // FTRUMConfig.setEnableTraceUserResource(false)
+
+                        OkHttpClient client = new OkHttpClient.Builder()
+                                .addInterceptor(new FTTraceInterceptor())
+                                .addInterceptor(new FTResourceInterceptor(new FTResourceInterceptor.ContentHandlerHelper() {
+                                    @Override
+                                    public void onRequest(Request request, HashMap<String, Object> extraData) {
+                                        String contentType = request.header("Content-Type");
+
+                                        extraData.put("df_request_header", request.headers());
+                                        if ("application/json".equals(contentType) ||
+                                                "application/x-www-form-urlencoded".equals(contentType) ||
+                                                "application/xml".equals(contentType)) {
+                                            extraData.put("df_request_body", request.body());
+                                        }
+
+                                    }
+
+                                    @Override
+                                    public void onResponse(Response response, HashMap<String, Object> extraData) throws IOException {
+
+                                        String contentType = response.header("Content-Type");
+
+                                        extraData.put("df_response_header", response.headers());
+
+                                        if ("application/json".equals(contentType) ||
+                                                "application/xml".equals(contentType)) {
+                                            //copy 读取部分 body，避免大数据消费
+                                            ResponseBody body = response.peekBody(33554432);
+                                            extraData.put("df_response_body", body.string());
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onException(Exception e, HashMap<String, Object> extraData) {
+
+                                    }
+                                }))
+                                .eventListenerFactory(new FTResourceEventListener.FTFactory())
+                                .connectTimeout(10, TimeUnit.SECONDS).build();
+                        Request.Builder builder = new Request.Builder()
+                                .url(BuildConfig.TRACE_URL)
+                                .method(RequestMethod.GET.name(), null);
+                        try {
+                            client.newCall(builder.build()).execute();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }.start();
+
+
+            }
         });
 
         findViewById(R.id.main_mock_ui_block_btn).setOnClickListener(v -> {

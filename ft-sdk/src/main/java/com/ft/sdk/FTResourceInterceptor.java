@@ -9,6 +9,7 @@ import com.ft.sdk.garble.utils.Utils;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.util.HashMap;
 
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
@@ -25,6 +26,53 @@ import okhttp3.internal.http.HttpHeaders;
  * @author Brandon
  */
 public class FTResourceInterceptor implements Interceptor {
+
+    private ContentHandlerHelper handlerHelper;
+
+
+    /**
+     * 拦截 Okhttp 的 Request 和 Response ，
+     * 通过 {@link #onRequest(Request, HashMap)}{@link  #onResponse(Response, HashMap)} 中 extraData
+     * 追加自定义采集的数据
+     *
+     */
+    public abstract static class ContentHandlerHelper {
+
+        private final HashMap<String, Object> extraData = new HashMap<>();
+
+        /**
+         * OKHttp Request
+         *
+         * @param request
+         * @param extraData 附加数据
+         */
+        public abstract void onRequest(Request request, HashMap<String, Object> extraData);
+
+        /**
+         * OKHttp Response
+         *
+         * @param response
+         * @param extraData 附加数据
+         */
+        public abstract void onResponse(Response response, HashMap<String, Object> extraData) throws IOException;
+
+        /**
+         * 返回网络链接过程中的异常
+         *
+         * @param e 请求发生的 IOException 数据
+         * @param extraData 附加数据
+         */
+        public abstract void onException(Exception e, HashMap<String, Object> extraData);
+
+    }
+
+    public FTResourceInterceptor() {
+
+    }
+
+    public FTResourceInterceptor(ContentHandlerHelper handlerHelper) {
+        this.handlerHelper = handlerHelper;
+    }
 
     private static final String TAG = Constants.LOG_TAG_PREFIX + "FTResourceInterceptor";
     private static final int BYTE_LIMIT_COUNT = 33554432;
@@ -47,10 +95,17 @@ public class FTResourceInterceptor implements Interceptor {
                 .getResourceUrlHandler().isInTakeUrl(url);
 
         try {
+            if (handlerHelper != null) {
+                handlerHelper.onRequest(request, handlerHelper.extraData);
+            }
             response = chain.proceed(request);
 
             if (isInTakeUrl) {
                 return response;
+            }
+
+            if (handlerHelper != null) {
+                handlerHelper.onResponse(response, handlerHelper.extraData);
             }
 
         } catch (IOException e) {
@@ -107,7 +162,21 @@ public class FTResourceInterceptor implements Interceptor {
                     params.responseContentLength += responseHeaderString.length();
                 }
             }
+        } else {
+            if (handlerHelper != null) {
+                handlerHelper.onException(exception, handlerHelper.extraData);
+            }
         }
+
+        if (handlerHelper != null) {
+            if (params.property == null) {
+                params.property = new HashMap<>();
+            }
+            params.property.putAll(handlerHelper.extraData);
+
+        }
+
+
         FTRUMInnerManager.get().setTransformContent(resourceId, params);
         FTRUMInnerManager.get().stopResource(resourceId);
 
