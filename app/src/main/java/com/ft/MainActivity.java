@@ -95,13 +95,21 @@ public class MainActivity extends AppCompatActivity {
                         // FTRUMConfig.setEnableTraceUserResource(false)
 
                         OkHttpClient client = new OkHttpClient.Builder()
+//                                .addInterceptor(new FTTraceInterceptor(new FTTraceInterceptor.HeaderHandler() {
+//                                    @Override
+//                                    public HashMap<String, String> getTraceHeader(Request request) {
+//                                        HashMap<String, String> map = new HashMap<>();
+//                                        map.put("custom_header","test_value");
+//                                        return map;
+//                                    }
+//                                }))
                                 .addInterceptor(new FTTraceInterceptor())
                                 .addInterceptor(new FTResourceInterceptor(new FTResourceInterceptor.ContentHandlerHelper() {
                                     @Override
                                     public void onRequest(Request request, HashMap<String, Object> extraData) {
                                         String contentType = request.header("Content-Type");
 
-                                        extraData.put("df_request_header", request.headers());
+                                        extraData.put("df_request_header", request.headers().toString());
                                         if ("application/json".equals(contentType) ||
                                                 "application/x-www-form-urlencoded".equals(contentType) ||
                                                 "application/xml".equals(contentType)) {
@@ -115,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
 
                                         String contentType = response.header("Content-Type");
 
-                                        extraData.put("df_response_header", response.headers());
+                                        extraData.put("df_response_header", response.headers().toString());
 
                                         if ("application/json".equals(contentType) ||
                                                 "application/xml".equals(contentType)) {

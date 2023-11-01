@@ -1196,7 +1196,7 @@ public class FTRUMInnerManager {
      * @param bean
      */
     void checkToAddResource(String key, ResourceBean bean) {
-        LogUtils.d(TAG, "checkToAddResource:" + key + ",header" + bean.requestHeader + "," + bean.url);
+        LogUtils.d(TAG, "checkToAddResource:" + key + ",header：" + bean.requestHeader + "," + bean.url);
         if (bean.contentSet && bean.netStateSet) {
             putRUMResourcePerformance(key);
         }
