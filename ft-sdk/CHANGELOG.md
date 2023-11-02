@@ -1,3 +1,8 @@
+# agent 1.3.17-beta01
+1.同 agent 1.3.17-alpha01，agent 1.3.17-alpha02
+2.新增自定义 TraceHeader
+
+---
 # agent 1.3.17-alpha02
 1. 支持 resource 自定义数据方式
 
