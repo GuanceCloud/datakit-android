@@ -33,6 +33,27 @@ public class FTTraceInterceptor implements Interceptor {
     }
 
 
+    public FTTraceInterceptor(HeaderHandler headerHandler) {
+        this.webViewTrace = false;
+        this.headerHandler = headerHandler;
+    }
+
+    private HeaderHandler headerHandler;
+
+    /**
+     * 自定义 TraceHeader
+     */
+    public abstract static class HeaderHandler {
+        /**
+         *
+         * @param request OKHttp 请求 Request
+         * @return 替换 TraceHeader 内容
+         */
+        public abstract HashMap<String, String> getTraceHeader(Request request);
+
+    }
+
+
     @NonNull
     @Override
     public Response intercept(@NonNull Chain chain) throws IOException {
@@ -44,7 +65,8 @@ public class FTTraceInterceptor implements Interceptor {
         String uniqueKey = Utils.identifyRequest(request);
         okhttp3.HttpUrl url = request.url();
         HttpUrl httpUrl = new HttpUrl(url.host(), url.encodedPath(), url.port(), url.toString());
-        HashMap<String, String> requestHeaders = FTTraceManager.get().getTraceHeader(uniqueKey, httpUrl);
+        HashMap<String, String> requestHeaders = headerHandler != null ?
+                headerHandler.getTraceHeader(request) : FTTraceManager.get().getTraceHeader(uniqueKey, httpUrl);
         try {
 
             for (String key : requestHeaders.keySet()) {

@@ -1,5 +1,9 @@
 package com.ft.sdk.garble.http;
 
+import static com.ft.sdk.garble.http.NetCodeStatus.UNKNOWN_EXCEPTION_CODE;
+
+import android.util.Log;
+
 import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -17,10 +21,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import static com.ft.sdk.garble.http.NetCodeStatus.UNKNOWN_EXCEPTION_CODE;
-
-import android.util.Log;
 
 
 /**
@@ -80,7 +80,7 @@ public class NativeNetEngine implements INetEngine {
             if (mConnection == null) {
                 //连接打开失败提示
                 responseCode = NetCodeStatus.NETWORK_EXCEPTION_CODE;
-                LogUtils.e(TAG,String.format("connect %s feature", url.toString()));
+                LogUtils.e(TAG, String.format("connect %s feature", url.toString()));
             } else {
                 connSuccess = true;
             }
@@ -121,7 +121,7 @@ public class NativeNetEngine implements INetEngine {
         try {
             return request();
         } catch (Exception e) {
-            LogUtils.e(TAG,e.getMessage());
+            LogUtils.e(TAG, e.getMessage());
             return getResponseData(UNKNOWN_EXCEPTION_CODE, e.getMessage());
         }
     }
@@ -163,7 +163,7 @@ public class NativeNetEngine implements INetEngine {
             } else {
                 inputStream = mConnection.getInputStream();
             }
-            if(inputStream != null) {
+            if (inputStream != null) {
                 inputStreamReader = new InputStreamReader(inputStream, CHARSET);
                 reader = new BufferedReader(inputStreamReader);
                 while ((tempLine = reader.readLine()) != null) {
@@ -173,9 +173,11 @@ public class NativeNetEngine implements INetEngine {
         } catch (SocketTimeoutException e) {
             //连接超时提示
             responseCode = HttpURLConnection.HTTP_CLIENT_TIMEOUT;
+            LogUtils.e(TAG, Log.getStackTraceString(e));
         } catch (IOException e) {
             //IO异常提示
             responseCode = NetCodeStatus.FILE_IO_EXCEPTION_CODE;
+            LogUtils.e(TAG, Log.getStackTraceString(e));
         } catch (Exception e) {
             //其他异常未知错误
             LogUtils.e(TAG, Log.getStackTraceString(e));
@@ -188,6 +190,7 @@ public class NativeNetEngine implements INetEngine {
 
     /**
      * 关闭数据连接
+     *
      * @param connection
      * @param outputStream
      * @param reader

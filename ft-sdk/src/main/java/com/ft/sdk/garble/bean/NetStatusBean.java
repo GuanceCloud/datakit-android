@@ -1,6 +1,8 @@
 package com.ft.sdk.garble.bean;
 
 
+import java.util.HashMap;
+
 /**
  * 网络资源请求，资源指标数据
  */
@@ -20,7 +22,7 @@ public class NetStatusBean {
      */
     public long tcpEndTime = -1;
     /**
-     *  dns 解析开始时间
+     * dns 解析开始时间
      */
     public long dnsStartTime = -1;
     /**
@@ -37,14 +39,19 @@ public class NetStatusBean {
     public long responseEndTime = -1;
 
     /**
-     *  ssl 连接开始时间
+     * ssl 连接开始时间
      */
     public long sslStartTime = -1;
 
     /**
-     *  ssl 连接结束时间
+     * ssl 连接结束时间
      */
     public long sslEndTime = -1;
+
+    /**
+     * 附加属性，
+     */
+    public HashMap<String, Object> property;
 
     /**
      * 请求主机地址
@@ -53,6 +60,7 @@ public class NetStatusBean {
 
     /**
      * 获取 tcp 连接时长
+     *
      * @return
      */
     public long getTcpTime() {
@@ -64,6 +72,7 @@ public class NetStatusBean {
 
     /**
      * 获取 dns 解析时长
+     *
      * @return
      */
     public long getDNSTime() {
@@ -75,6 +84,7 @@ public class NetStatusBean {
 
     /**
      * 获取请求返回时长
+     *
      * @return
      */
     public long getResponseTime() {
@@ -87,6 +97,7 @@ public class NetStatusBean {
 
     /**
      * 获取 ttfb 时时长
+     *
      * @return
      */
     public long getTTFB() {
@@ -98,6 +109,7 @@ public class NetStatusBean {
 
     /**
      * 首字节时间
+     *
      * @return
      */
     public long getFirstByteTime() {
@@ -113,6 +125,7 @@ public class NetStatusBean {
 
     /**
      * 整个请求请求时长
+     *
      * @return
      */
     public long getHoleRequestTime() {
@@ -124,6 +137,7 @@ public class NetStatusBean {
 
     /**
      * ssl 连接时长
+     *
      * @return
      */
 

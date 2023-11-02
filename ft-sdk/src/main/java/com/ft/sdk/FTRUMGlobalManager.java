@@ -5,6 +5,7 @@ import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.ErrorType;
 import com.ft.sdk.garble.bean.NetStatusBean;
 import com.ft.sdk.garble.bean.ResourceParams;
+import com.ft.sdk.garble.utils.Utils;
 
 import java.util.HashMap;
 
@@ -24,6 +25,19 @@ public class FTRUMGlobalManager {
     void initConfig(FTRUMConfig config) {
         if (config.isRumEnable()) {
             innerManager = FTRUMInnerManager.get();
+        }
+    }
+
+    /**
+     * 添加 Action
+     *
+     * @param actionName action 名称
+     * @param actionType action 类型
+     * @param duration   纳秒，持续时间
+     */
+    public void addAction(String actionName, String actionType, long duration) {
+        if (innerManager != null) {
+            innerManager.addAction(actionName, actionType, duration, Utils.getCurrentNanoTime());
         }
     }
 
@@ -69,6 +83,7 @@ public class FTRUMGlobalManager {
      * resource 起始
      *
      * @param resourceId 资源 Id
+     * @param property   附加属性参数
      */
     public void startResource(String resourceId, HashMap<String, Object> property) {
         if (innerManager != null) {
@@ -90,7 +105,7 @@ public class FTRUMGlobalManager {
 
 
     /**
-     * @param resourceId
+     * @param resourceId 资源 Id
      * @param property   附加属性参数
      */
     public void stopResource(final String resourceId, HashMap<String, Object> property) {
@@ -197,6 +212,7 @@ public class FTRUMGlobalManager {
      * @param errorType 错误类型
      * @param state     程序运行状态
      * @param dateline  发生时间，纳秒
+     * @param property  附加属性
      */
     public void addError(String log, String message, long dateline, ErrorType errorType,
                          AppState state, HashMap<String, Object> property) {
@@ -211,6 +227,7 @@ public class FTRUMGlobalManager {
      *
      * @param log      日志内容
      * @param duration 持续时间，纳秒
+     * @param property 附加属性
      */
     public void addLongTask(String log, long duration, HashMap<String, Object> property) {
         if (innerManager != null) {

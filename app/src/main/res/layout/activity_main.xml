@@ -61,6 +61,12 @@
             android:text="测试 OkHttp 请求自动添加拦截器" />
 
         <Button
+            android:id="@+id/main_mock_okhttp_custom_content_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="测试 OkHttp 自定义内容" />
+
+        <Button
             android:id="@+id/main_view_loop_test"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -89,6 +95,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="延迟初始化" />
+
         <Button
             android:id="@+id/main_shut_down"
             android:layout_width="match_parent"

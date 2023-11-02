@@ -655,19 +655,19 @@ public class FTRUMInnerManager {
             LogUtils.e(TAG, "putRUMResourcePerformance:" + resourceId + ",bean null");
             return;
         }
-        if (bean.resourceStatus < HttpsURLConnection.HTTP_OK) {
-            EventConsumerThreadPool.get().execute(new Runnable() {
-                @Override
-                public void run() {
-                    synchronized (resourceBeanMap) {
-                        LogUtils.d(TAG, "net error remove id:" + resourceId);
-                        resourceBeanMap.remove(resourceId);
-                    }
-                    FTTraceManager.get().removeByAddResource(resourceId);
-                }
-            });
-            return;
-        }
+//        if (bean.resourceStatus < HttpsURLConnection.HTTP_OK) {
+//            EventConsumerThreadPool.get().execute(new Runnable() {
+//                @Override
+//                public void run() {
+//                    synchronized (resourceBeanMap) {
+//                        LogUtils.d(TAG, "net error remove id:" + resourceId);
+//                        resourceBeanMap.remove(resourceId);
+//                    }
+//                    FTTraceManager.get().removeByAddResource(resourceId);
+//                }
+//            });
+//            return;
+//        }
         long time = Utils.getCurrentNanoTime();
         String actionId = bean.actionId;
         String viewId = bean.viewId;
@@ -700,8 +700,8 @@ public class FTRUMInnerManager {
 
             int resourceStatus = bean.resourceStatus;
             String resourceStatusGroup = "";
+            tags.put(Constants.KEY_RUM_RESOURCE_STATUS, resourceStatus);
             if (resourceStatus > 0) {
-                tags.put(Constants.KEY_RUM_RESOURCE_STATUS, resourceStatus);
                 long statusGroupPrefix = bean.resourceStatus / 100;
                 resourceStatusGroup = statusGroupPrefix + "xx";
                 tags.put(Constants.KEY_RUM_RESOURCE_STATUS_GROUP, resourceStatusGroup);
@@ -842,10 +842,10 @@ public class FTRUMInnerManager {
             return;
         }
 
-        if (params.resourceStatus < HttpsURLConnection.HTTP_OK) {
-            LogUtils.d(TAG, "setTransformContent code < 200");
-            return;
-        }
+//        if (params.resourceStatus < HttpsURLConnection.HTTP_OK) {
+//            LogUtils.d(TAG, "setTransformContent code < 200");
+//            return;
+//        }
         try {
             URL url = Utils.parseFromUrl(params.url);
             bean.url = params.url;
@@ -859,19 +859,21 @@ public class FTRUMInnerManager {
 
         bean.requestHeader = params.requestHeader;
         bean.responseHeader = params.responseHeader;
-        int responseHeaderSize = bean.responseHeader.getBytes().length;
         bean.responseContentType = params.responseContentType;
         bean.responseConnection = params.responseConnection;
         bean.resourceMethod = params.resourceMethod;
         bean.responseContentEncoding = params.responseContentEncoding;
         bean.resourceType = bean.responseContentType;
         bean.resourceStatus = params.resourceStatus;
+        bean.resourceSize = params.responseContentLength;
         if (bean.resourceStatus >= HttpsURLConnection.HTTP_BAD_REQUEST) {
             bean.errorStack = params.responseBody == null ? "" : params.responseBody;
         }
 
-        bean.resourceSize = params.responseBody == null ? 0 : params.responseBody.getBytes().length;
-        bean.resourceSize += responseHeaderSize;
+        if (params.property != null) {
+            bean.property.putAll(params.property);
+        }
+
         if (FTTraceConfigManager.get().isEnableLinkRUMData()) {
             bean.traceId = traceId;
             bean.spanId = spanId;
@@ -1194,7 +1196,7 @@ public class FTRUMInnerManager {
      * @param bean
      */
     void checkToAddResource(String key, ResourceBean bean) {
-        LogUtils.d(TAG, "checkToAddResource:" + key + ",header" + bean.requestHeader + "," + bean.url);
+        LogUtils.d(TAG, "checkToAddResource:" + key + ",header：" + bean.requestHeader + "," + bean.url);
         if (bean.contentSet && bean.netStateSet) {
             putRUMResourcePerformance(key);
         }

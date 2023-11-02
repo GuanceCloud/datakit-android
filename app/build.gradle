@@ -104,8 +104,6 @@ dependencies {
     implementation project(":ft-sdk")
     implementation project(":ft-native")
 
-    //implementation 'com.cloudcare.ft.mobile.sdk.traker.agent:ft-sdk:1.0.2-alpha13'
-
     implementation 'com.squareup.okhttp3:okhttp:4.5.0'
 
 //    debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'

@@ -1,3 +1,21 @@
+# agent 1.3.17-beta01
+1.同 agent 1.3.17-alpha01，agent 1.3.17-alpha02
+2.新增自定义 TraceHeader
+
+---
+# agent 1.3.17-alpha02
+1. 支持 resource 自定义数据方式
+
+---
+# agent 1.3.17-alpha01
+1. 优化 resource body size 计算逻辑
+
+---
+# agent 1.3.16-beta03
+1. 调整 Open API 结构
+2. Resource 本地错误逻辑添加
+
+---
 # agent 1.3.16-beta02
 1. 优化 SDK 关闭
 2. 同 agent 1.3.16-alpha05

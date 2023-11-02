@@ -8,6 +8,9 @@ import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
+
+
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -48,19 +51,14 @@ public class FTResourceEventListener extends EventListener {
     public void callEnd(@NonNull Call call) {
         super.callEnd(call);
         LogUtils.d(TAG, "callEnd:" + resourceId);
+        computeTimeline();
+    }
 
-        NetStatusBean netStatusBean = new NetStatusBean();
-        netStatusBean.requestHost = requestHost;
-        netStatusBean.fetchStartTime = fetchStartTime;
-        netStatusBean.responseStartTime = responseStartTime;
-        netStatusBean.responseEndTime = responseEndTime;
-        netStatusBean.dnsEndTime = dnsEndTime;
-        netStatusBean.dnsStartTime = dnsStartTime;
-        netStatusBean.sslEndTime = sslEndTime;
-        netStatusBean.sslStartTime = sslStartTime;
-        netStatusBean.tcpStartTime = tcpStartTime;
-        netStatusBean.tcpEndTime = tcpEndTime;
-        FTRUMInnerManager.get().setNetState(this.resourceId, netStatusBean);
+    @Override
+    public void callFailed(@NonNull Call call, @NonNull IOException ioe) {
+        super.callFailed(call, ioe);
+        LogUtils.d(TAG, "callFailed:" + resourceId);
+        computeTimeline();
     }
 
     @Override
@@ -144,6 +142,21 @@ public class FTResourceEventListener extends EventListener {
         tcpEndTime = Utils.getCurrentNanoTime();
 
         LogUtils.d(TAG, "connectEnd:" + resourceId);
+    }
+
+    private void computeTimeline() {
+        NetStatusBean netStatusBean = new NetStatusBean();
+        netStatusBean.requestHost = requestHost;
+        netStatusBean.fetchStartTime = fetchStartTime;
+        netStatusBean.responseStartTime = responseStartTime;
+        netStatusBean.responseEndTime = responseEndTime;
+        netStatusBean.dnsEndTime = dnsEndTime;
+        netStatusBean.dnsStartTime = dnsStartTime;
+        netStatusBean.sslEndTime = sslEndTime;
+        netStatusBean.sslStartTime = sslStartTime;
+        netStatusBean.tcpStartTime = tcpStartTime;
+        netStatusBean.tcpEndTime = tcpEndTime;
+        FTRUMInnerManager.get().setNetState(this.resourceId, netStatusBean);
     }
 
     public static class FTFactory implements EventListener.Factory {
