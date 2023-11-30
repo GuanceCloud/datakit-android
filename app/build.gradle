@@ -49,13 +49,15 @@ android {
         }
     }
 
-    flavorDimensions=['tier']
+    flavorDimensions = ['tier']
 
     productFlavors {
 
         prodTest {
             buildConfigField "String", "CUSTOM_VALUE", "\"Custom value\""
-            buildConfigField "String", "ACCESS_SERVER_URL", "\"${ft_env.datakitRUMUrl}\""
+            buildConfigField "String", "DATAKIT_URL", "\"${ft_env.datakitRUMUrl}\""
+            buildConfigField "String", "DATAWAY_URL", "\"${ft_env.datawayRUMUrl}\""
+            buildConfigField "String", "DATAWAY_TOKEN", "\"${ft_env.datawayToken}\""
             buildConfigField "String", "RUM_APP_ID", "\"${ft_env.rumAppid}\""
             buildConfigField "String", "TRACK_ID", "\"${ft_env.trackId}\""
             buildConfigField "String", "TRACE_URL", "\"${ft_env.traceUrl}\""
@@ -66,7 +68,9 @@ android {
 
         prodPublish {
             buildConfigField "String", "CUSTOM_VALUE", "\"Custom value\""
-            buildConfigField "String", "ACCESS_SERVER_URL", "\"${ft_env.datakitRUMUrl}\""
+            buildConfigField "String", "DATAKIT_URL", "\"${ft_env.datakitRUMUrl}\""
+            buildConfigField "String", "DATAWAY_URL", "\"${ft_env.datawayRUMUrl}\""
+            buildConfigField "String", "DATAWAY_TOKEN", "\"${ft_env.datawayToken}\""
             buildConfigField "String", "RUM_APP_ID", "\"${ft_env.rumAppid}\""
             buildConfigField "String", "TRACK_ID", "\"${ft_env.trackId}\""
             buildConfigField "String", "TRACE_URL", "\"${ft_env.traceUrl}\""

@@ -14,23 +14,34 @@ import java.util.Iterator;
  * Description:
  */
 public class HttpBuilder {
+
+    private String DATAWAY_URL_HOST_FORMAT = "/%s?token=%s&to_headless=true";
     private String host;
     private String model;
     private RequestMethod method;
     private String bodyString;
-    private final HashMap<String, Object> params = new HashMap<>();
+//    private final HashMap<String, Object> params = new HashMap<>();
     private int sendOutTime = FTHttpConfigManager.get().sendOutTime;
     private int readOutTime = FTHttpConfigManager.get().readOutTime;
     private boolean useDefaultHead = true;
     private boolean showLog = true;
+
+    private boolean isDataway = false;
     private final HashMap<String, String> headParams = new HashMap<>();
+
     public static HttpBuilder Builder() {
         return new HttpBuilder();
     }
 
     public String getHost() {
         if (host == null) {
-            host = FTHttpConfigManager.get().serverUrl;
+            if (!Utils.isNullOrEmpty(FTHttpConfigManager.get().datakitUrl)) {
+                host = FTHttpConfigManager.get().datakitUrl;
+            } else {
+                isDataway = true;
+                host = FTHttpConfigManager.get().datawayUrl;
+            }
+
         }
         return host;
     }
@@ -45,14 +56,10 @@ public class HttpBuilder {
     public String getUrl() {
         String url = getHost();
         if (!Utils.isNullOrEmpty(model)) {
-            url += "/" + model;
-        }
-        String query = getQueryString();
-        if (!Utils.isNullOrEmpty(query)) {
-            if(url.contains("?")){
-                url+=query;
-            }else {
-                url += "?" + query;
+            if (!isDataway) {
+                url += "/" + model;
+            } else {
+                url +=  String.format(DATAWAY_URL_HOST_FORMAT, model, FTHttpConfigManager.get().clientToken);
             }
         }
         return url;
@@ -76,10 +83,6 @@ public class HttpBuilder {
 
     public HashMap<String, String> getHeadParams() {
         return headParams;
-    }
-
-    public HashMap<String, Object> getParams() {
-        return params;
     }
 
     public boolean isShowLog() {
@@ -122,15 +125,6 @@ public class HttpBuilder {
         return this;
     }
 
-    public HttpBuilder setParams(HashMap<String, Object> hashMap) {
-        this.params.putAll(hashMap);
-        return this;
-    }
-
-    public HttpBuilder addParams(String key, Object value) {
-        this.params.put(key, value);
-        return this;
-    }
 
     public HttpBuilder useDefaultHead(boolean useDefault) {
         this.useDefaultHead = useDefault;
@@ -148,55 +142,13 @@ public class HttpBuilder {
     }
 
     /**
-     * 是否显示
-     * @param show
-     * @return
-     */
-    public HttpBuilder setShowLog(boolean show) {
-        this.showLog = show;
-        return this;
-    }
-
-    /**
      * 数据同步 HTTP 请求
+     *
      * @param tClass
-     * @return
      * @param <T>
+     * @return
      */
     public <T extends ResponseData> T executeSync(Class<T> tClass) {
         return new NetProxy(this).execute(tClass);
-    }
-
-    /**
-     * 数据异步 HTTP 请求
-     * @param tClass
-     * @param callback
-     * @param <T>
-     */
-    public <T extends ResponseData> void executeAsync(Class<T> tClass, HttpCallback<T> callback) {
-        DataUploaderThreadPool.get().execute(() -> callback.onComplete(new NetProxy(this).execute(tClass)));
-    }
-
-    /**
-     * 封装 get 请求参数
-     *
-     * @return
-     */
-    private String getQueryString() {
-        StringBuffer sb = new StringBuffer();
-        //if (method == RequestMethod.GET) {
-            HashMap<String, Object> param = params;
-//            if(FTHttpConfig.get().dataWayToken != null && enableToken){
-//                param.put("token",FTHttpConfig.get().dataWayToken);
-//            }
-            if (param != null) {
-                Iterator<String> keys = param.keySet().iterator();
-                while (keys.hasNext()) {
-                    String key = keys.next();
-                    sb.append("&" + key + "=" + param.get(key));
-                }
-            }
-        //}
-        return sb.toString();
     }
 }

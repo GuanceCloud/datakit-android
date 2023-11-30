@@ -17,7 +17,18 @@ public class FTHttpConfigManager {
     /**
      * datakit 服务端请求地址
      */
-    public String serverUrl;
+    public String datakitUrl;
+
+    /**
+     * dataway 服务端请求地址
+     */
+    public String datawayUrl;
+
+
+    /**
+     * dataway 使用 token
+     */
+    public String clientToken;
     /**
      * 64位 随机uuid
      */
@@ -57,12 +68,14 @@ public class FTHttpConfigManager {
         if (ftsdkConfig == null) {
             return;
         }
-        serverUrl = ftsdkConfig.getMetricsUrl();
+        datakitUrl = ftsdkConfig.getDatakitUrl();
 //        uuid = DeviceUtils.getSDKUUid(FTApplication.getApplication());
         userAgent = USER_AGENT;
 
-        LogUtils.d(TAG, "serverUrl:" + serverUrl);
+        LogUtils.d(TAG, "serverUrl:" + datakitUrl);
 
+        datawayUrl = ftsdkConfig.getDatawayUrl();
+        clientToken = ftsdkConfig.getClientToken();
     }
 
 

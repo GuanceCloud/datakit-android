@@ -13,8 +13,10 @@ buildscript {
     }
 
     def appIdString = properties.getProperty("RUM_APP_ID")
-    def datakitRUMUrl = properties.getProperty("ACCESS_SERVER_URL")
+    def datakitRUMUrl = properties.getProperty("DATAKIT_URL")
     def datakitDCAUrl = properties.getProperty("SOURCE_MAP_URL")
+    def datawayRUMUrl = properties.getProperty("DATAWAY_URL")
+    def datawayToken = properties.getProperty("DATAWAY_TOKEN")
     def trackId = properties.getProperty("TRACK_ID")
     def traceUrl = properties.getProperty("TRACE_URL")
 
@@ -22,6 +24,8 @@ buildscript {
             'rumAppid'  : appIdString,
             'datakitRUMUrl': datakitRUMUrl,
             'datakitDCAUrl': datakitDCAUrl,
+            'datawayRUMUrl': datawayRUMUrl,
+            'datawayToken': datawayToken,
             'trackId'   : trackId,
             'traceUrl'  : traceUrl,
             'prodTestEnv'  : 'gray',
@@ -62,6 +66,10 @@ allprojects {
         maven {
             url "${maven_publish_url}/maven-releases"
         }
+        //
+//        flatDir {
+//            dirs 'libs'
+//        }
     }
     configurations.all {
         resolutionStrategy {
