@@ -104,6 +104,7 @@ public class LogTest extends FTBaseTest {
      */
 
     private boolean checkLogHasLinkRUMData(boolean enableLinkRumData) throws InterruptedException {
+        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
         FTSdk.initRUMWithConfig(new FTRUMConfig());
 
         FTSdk.initLogWithConfig(new FTLoggerConfig()

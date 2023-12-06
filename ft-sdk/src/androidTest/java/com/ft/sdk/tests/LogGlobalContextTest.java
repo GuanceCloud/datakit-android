@@ -9,6 +9,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.ft.sdk.FTLogger;
 import com.ft.sdk.FTLoggerConfig;
+import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.Status;
@@ -35,6 +36,7 @@ public class LogGlobalContextTest extends FTBaseTest {
             hasPrepare = true;
         }
         stopSyncTask();
+        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
         FTSdk.initLogWithConfig(new FTLoggerConfig()
                 .addGlobalContext(CUSTOM_KEY, CUSTOM_VALUE)
                 .setEnableCustomLog(true)

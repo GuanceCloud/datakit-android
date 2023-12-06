@@ -30,9 +30,9 @@ import com.google.mockwebserver.MockWebServer;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.powermock.reflect.Whitebox;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -92,6 +92,12 @@ public class RUMTest extends FTBaseTest {
         avoidCleanData();
     }
 
+    @Before
+    public void initRUM() {
+        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
+        FTSdk.initRUMWithConfig(new FTRUMConfig().setRumAppId(TEST_FAKE_RUM_ID));
+    }
+
     /**
      * {@link FTRUMGlobalManager#startAction(String, String)} 数据生成测试
      *
@@ -119,8 +125,7 @@ public class RUMTest extends FTBaseTest {
      */
     @Test
     public void addActionTest() throws Exception {
-        Whitebox.invokeMethod(FTRUMGlobalManager.get(), "addAction",
-                ACTION_NAME, ACTION_TYPE_NAME, DURATION, Utils.getCurrentNanoTime());
+        FTRUMGlobalManager.get().addAction(ACTION_NAME, ACTION_TYPE_NAME, DURATION);
         waitForInThreadPool();
 
         ArrayList<ActionBean> list = FTDBManager.get().querySumAction(0);
@@ -653,7 +658,7 @@ public class RUMTest extends FTBaseTest {
         waitForInThreadPool();
 
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
-
+        Assert.assertTrue(recordDataList.size() > 0);
         for (SyncJsonData recordData : recordDataList) {
             try {
                 JSONObject json = new JSONObject(recordData.getDataString());

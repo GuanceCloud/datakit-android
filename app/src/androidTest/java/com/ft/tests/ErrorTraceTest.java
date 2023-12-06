@@ -46,7 +46,7 @@ public class ErrorTraceTest extends BaseTest {
             hasPrepare = true;
         }
         FTSDKConfig ftSDKConfig = FTSDKConfig
-                .builder(BuildConfig.ACCESS_SERVER_URL)
+                .builder(BuildConfig.DATAKIT_URL)
                 .setDebug(true)//设置是否是 debug
                 .setEnv(EnvType.GRAY);
         //关闭数据自动同步操作

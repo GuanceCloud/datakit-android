@@ -55,7 +55,7 @@ public class RUMResourceInTakeUrlTest extends BaseTest {
         stopSyncTask();
 
         FTSDKConfig ftSDKConfig = FTSDKConfig
-                .builder(BuildConfig.ACCESS_SERVER_URL)
+                .builder(BuildConfig.DATAKIT_URL)
                 .setDebug(true)//设置是否是 debug
                 .setEnv(EnvType.GRAY);
         FTSdk.install(ftSDKConfig);
@@ -63,7 +63,12 @@ public class RUMResourceInTakeUrlTest extends BaseTest {
         FTSdk.initRUMWithConfig(new FTRUMConfig()
                 .setEnableTrackAppCrash(true)
                 .setRumAppId(BuildConfig.RUM_APP_ID)
-                .setResourceUrlHandler(url -> url.equals(BuildConfig.TRACE_URL))
+                .setResourceUrlHandler(new FTInTakeUrlHandler() {
+                    @Override
+                    public boolean isInTakeUrl(String url) {
+                        return url.equals(BuildConfig.TRACE_URL);
+                    }
+                })
                 .setEnableTraceUserAction(true)
                 .setEnableTraceUserResource(true)
         );

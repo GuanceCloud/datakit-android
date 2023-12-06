@@ -69,6 +69,7 @@ public class ConfigTest extends FTBaseTest {
      */
     @Test
     public void rumAppId() {
+        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
         String appid = "appIdxxxxxx";
         FTSdk.initRUMWithConfig(new FTRUMConfig().setRumAppId(appid));
         Assert.assertEquals(appid, FTRUMConfigManager.get().getConfig().getRumAppId());
