@@ -13,6 +13,13 @@ public class NetStatusBean {
      */
     public long fetchStartTime = -1;
 
+
+    /**
+     * 请求开始时间
+     */
+    public long requestStartTime = -1;
+
+
     /**
      * tcp 连接时间
      */
@@ -101,8 +108,8 @@ public class NetStatusBean {
      * @return
      */
     public long getTTFB() {
-        if (responseStartTime > fetchStartTime) {
-            return responseStartTime - fetchStartTime;
+        if (responseStartTime > requestStartTime) {
+            return responseStartTime - requestStartTime;
         }
         return 0;
     }
@@ -117,7 +124,7 @@ public class NetStatusBean {
             if (dnsStartTime > 0) {
                 return responseStartTime - dnsStartTime;
             } else {
-                return responseStartTime - fetchStartTime;
+                return responseStartTime - requestStartTime;
             }
         }
         return 0;
