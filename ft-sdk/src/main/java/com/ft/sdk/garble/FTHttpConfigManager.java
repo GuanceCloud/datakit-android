@@ -68,14 +68,12 @@ public class FTHttpConfigManager {
         if (ftsdkConfig == null) {
             return;
         }
-        datakitUrl = ftsdkConfig.getDatakitUrl();
-//        uuid = DeviceUtils.getSDKUUid(FTApplication.getApplication());
         userAgent = USER_AGENT;
-
-        LogUtils.d(TAG, "serverUrl:" + datakitUrl);
-
+        datakitUrl = ftsdkConfig.getDatakitUrl();
         datawayUrl = ftsdkConfig.getDatawayUrl();
         clientToken = ftsdkConfig.getClientToken();
+
+        LogUtils.d(TAG, "datakitUrl:" + datakitUrl + ",datawayUrl:" + datawayUrl);
     }
 
 
