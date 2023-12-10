@@ -27,9 +27,14 @@ public class FTExtension {
      */
     public boolean autoUploadNativeDebugSymbol = false;
     /**
-     *  datakit DCA 上传地址，一般为 datakitUrl  9531 端口
+     *  datakit 上传地址，一般为 datakitUrl  端口
      */
-    public String datakitDCAUrl = "";
+    public String datakitUrl = "";
+
+    /**
+     *  dataway token
+     */
+    public String datawayToken = "";
     /**
      * 应用 appid
      */
@@ -60,7 +65,8 @@ public class FTExtension {
                 ", openAutoTrack=" + openAutoTrack +
                 ", autoUploadMap=" + autoUploadMap +
                 ", autoUploadNativeDebugSymbol=" + autoUploadNativeDebugSymbol +
-                ", datakitDCAUrl='" + datakitDCAUrl + '\'' +
+                ", datakitUrl='" + datakitUrl + '\'' +
+                ", datawayToken='" + datawayToken + '\'' +
                 ", appId='" + appId + '\'' +
                 ", env='" + env + '\'' +
                 '}';

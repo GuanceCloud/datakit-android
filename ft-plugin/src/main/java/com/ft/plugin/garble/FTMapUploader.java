@@ -29,6 +29,7 @@ public class FTMapUploader {
      */
     private final static String CMAKE_DEBUG_SYMBOL_PATH = "/intermediates/cmake/debug/obj";
     private final static String CMAKE_CXX_PATH = "/intermediates/cxx/Debug";
+    private final static String UNITY_SYMBOLS_PATH = "/unityLibrary/symbols";
     private final static String NAME_RELEASE_COMPILE_CLASSPATH = "releaseCompileClasspath";
 
     private final HashMap<String, ObfuscationSettingConfig> obfuscationSettingMap = new HashMap<>();
@@ -233,13 +234,20 @@ public class FTMapUploader {
                 if (dependency instanceof ProjectDependency) {
                     String moduleName = dependency.getName();
                     String buildPath = rootPath + "/" + moduleName + "/build";
-                    String debugSymbolPath = rootPath + "/" + moduleName + "/build" + CMAKE_DEBUG_SYMBOL_PATH;
+                    String debugSymbolPath = buildPath + CMAKE_DEBUG_SYMBOL_PATH;
                     File file = new File(debugSymbolPath);
-                    Logger.debug("debugSymbolPath:" + debugSymbolPath);
                     if (file.exists()) {
+                        Logger.debug("debugSymbolPath:" + debugSymbolPath);
                         list.add(debugSymbolPath);
                     } else {
                         compatibleWithAGP8(buildPath, list);
+                    }
+
+                    String unitySymbolsPath = rootPath + UNITY_SYMBOLS_PATH;
+                    File unitySymbols = new File(unitySymbolsPath);
+                    Logger.debug("unitySymbolsPath:" + unitySymbolsPath);
+                    if (unitySymbols.exists()) {
+                        list.add(unitySymbolsPath);
                     }
                 }
             });
@@ -267,6 +275,7 @@ public class FTMapUploader {
         if (recentFile != null) {
             File objPath = new File(recentFile.getAbsoluteFile() + "/obj");
             if (objPath.exists()) {
+                Logger.debug("debugSymbolPath:" + objPath.getAbsolutePath());
                 list.add(objPath.getAbsolutePath());
             }
         }
@@ -306,9 +315,13 @@ public class FTMapUploader {
      */
     private void uploadWithParams(ObfuscationSettingConfig settingConfig, ProductFlavorModel model, String zipBuildPath) throws IOException, InterruptedException {
         Logger.debug(model.toString());
-        String cmd = "curl -X POST " + model.getDatakitDCAUrl() + "/v1/rum/sourcemap?app_id="
-                + model.getAppId() + "&env=" + model.getEnv() + "&version="
-                + settingConfig.versionName + "&platform=android -F file=@" + zipBuildPath + " -H Content-Type:multipart/form-data";
+        String cmd = "curl -X PUT " + model.getDatakitUrl() + "/v1/sourcemap?"
+                + "app_id=" + model.getAppId()
+                + "&env=" + model.getEnv()
+                + "&version=" + settingConfig.versionName
+                + "&platform=android"
+                + "&token=" + model.getDatawayToken() +
+                " -F file=@" + zipBuildPath + " -H Content-Type:multipart/form-data";
 
         Logger.debug(cmd);
         ProcessBuilder builder = new ProcessBuilder(cmd.split(" "));

@@ -11,7 +11,8 @@ public class ProductFlavorModel {
      * 是否上传 native debug symbol
      */
     private Boolean autoUploadNativeDebugSymbol;
-    private String datakitDCAUrl;
+    private String datakitUrl;
+    private String datawayToken;
     private String appId;
     private String env;
 
@@ -27,40 +28,25 @@ public class ProductFlavorModel {
         return autoUploadMap;
     }
 
-    public void setAutoUploadMap(boolean autoUploadMap) {
-        this.autoUploadMap = autoUploadMap;
-    }
-
     public Boolean isAutoUploadNativeDebugSymbol() {
         return autoUploadNativeDebugSymbol;
     }
 
-    public void setAutoUploadNativeDebugSymbol(boolean autoUploadNativeDebugSymbol) {
-        this.autoUploadNativeDebugSymbol = autoUploadNativeDebugSymbol;
+    public String getDatakitUrl() {
+        return datakitUrl;
     }
 
-    public String getDatakitDCAUrl() {
-        return datakitDCAUrl;
-    }
 
-    public void setDatakitDCAUrl(String datakitDCAUrl) {
-        this.datakitDCAUrl = datakitDCAUrl;
+    public String getDatawayToken() {
+        return datawayToken;
     }
 
     public String getAppId() {
         return appId;
     }
 
-    public void setAppId(String appId) {
-        this.appId = appId;
-    }
-
     public String getEnv() {
         return env;
-    }
-
-    public void setEnv(String env) {
-        this.env = env;
     }
 
     public void setFromFTExtension(FTExtension extension) {
@@ -68,7 +54,8 @@ public class ProductFlavorModel {
         this.appId = extension.appId;
         this.autoUploadNativeDebugSymbol = extension.autoUploadNativeDebugSymbol;
         this.autoUploadMap = extension.autoUploadMap;
-        this.datakitDCAUrl = extension.datakitDCAUrl;
+        this.datakitUrl = extension.datakitUrl;
+        this.datawayToken = extension.datawayToken;
     }
 
     /**
@@ -91,8 +78,12 @@ public class ProductFlavorModel {
         if (this.autoUploadNativeDebugSymbol == null) {
             this.autoUploadNativeDebugSymbol = extension.autoUploadNativeDebugSymbol;
         }
-        if (this.datakitDCAUrl == null) {
-            this.datakitDCAUrl = extension.datakitDCAUrl;
+        if (this.datakitUrl == null) {
+            this.datakitUrl = extension.datakitUrl;
+        }
+
+        if (this.datawayToken == null) {
+            this.datawayToken = extension.datawayToken;
         }
     }
 
@@ -102,7 +93,7 @@ public class ProductFlavorModel {
                 "name='" + name + '\'' +
                 ", autoUploadMap=" + autoUploadMap +
                 ", autoUploadNativeDebugSymbol=" + autoUploadNativeDebugSymbol +
-                ", datakitDCAUrl='" + datakitDCAUrl + '\'' +
+                ", datakitDCAUrl='" + datakitUrl + '\'' +
                 ", appId='" + appId + '\'' +
                 ", env='" + env + '\'' +
                 '}';
