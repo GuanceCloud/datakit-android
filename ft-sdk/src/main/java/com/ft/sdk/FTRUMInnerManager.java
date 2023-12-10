@@ -1166,6 +1166,12 @@ public class FTRUMInnerManager {
 
     }
 
+    /**
+     * 根据采样率确认这个 session_id 是否需要被采集
+     *
+     * @param sessionId
+     * @param sampleRate
+     */
     private void checkSessionKeep(String sessionId, float sampleRate) {
         boolean collect = Utils.enableTraceSamplingRate(sampleRate);
         if (!collect) {
@@ -1173,11 +1179,13 @@ public class FTRUMInnerManager {
                 notCollectMap.remove(0);
             }
             notCollectMap.add(sessionId);
-
+            LogUtils.d(TAG, "根据 FTRUMConfig SampleRate 采样率计算，当前 session 不被采集，session_id:" + sessionId);
         }
     }
 
     /**
+     * 确认 session 是否需要被采集
+     *
      * @param sessionId
      * @return
      */
@@ -1193,7 +1201,7 @@ public class FTRUMInnerManager {
     }
 
     /**
-     * 检测
+     * 检测追加 AddResource 数据时间
      *
      * @param key
      * @param bean

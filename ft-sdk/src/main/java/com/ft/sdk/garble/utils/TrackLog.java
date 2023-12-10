@@ -4,7 +4,6 @@ import android.util.Log;
 
 import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.FTLoggerConfigManager;
-import com.ft.sdk.FTSdk;
 import com.ft.sdk.TrackLogManager;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.Status;
@@ -71,7 +70,6 @@ public class TrackLog {
     }
 
     /**
-     *
      * @param upload
      * @param priority
      * @param tag
@@ -85,7 +83,7 @@ public class TrackLog {
                     + " " + getLevelMark(priority) + "/" + tag + ":" + msg), Utils.getCurrentNanoTime());
             logBean.setServiceName(config.getServiceName());
             logBean.setStatus(getStatus(priority));
-            if (config.checkLogLevel(logBean.getStatus())&&config.checkPrefix(msg)) {
+            if (config.checkLogLevel(logBean.getStatus()) && config.checkPrefix(msg)) {
                 TrackLogManager.get().trackLog(logBean);
             }
         }
@@ -93,7 +91,6 @@ public class TrackLog {
     }
 
     /**
-     *
      * @param TAG
      * @param message
      * @param logType
@@ -104,7 +101,6 @@ public class TrackLog {
     }
 
     /**
-     *
      * @param upload
      * @param TAG
      * @param message
@@ -135,7 +131,6 @@ public class TrackLog {
     }
 
     /**
-     *
      * @param upload
      * @param tag
      * @param message
@@ -158,7 +153,6 @@ public class TrackLog {
     }
 
     /**
-     *
      * @param priority
      * @return
      */
@@ -179,7 +173,6 @@ public class TrackLog {
     }
 
     /**
-     *
      * @param priority
      * @return
      */
@@ -201,9 +194,6 @@ public class TrackLog {
     /**
      * 日志类型
      * 「」
-     *
-     *
-     *
      */
     enum LogType {
         I, D, E, V, W

@@ -74,8 +74,10 @@ public class FTTrackInner {
      * @param fields
      */
     void rumWebView(long time, String measurement, final JSONObject tags, JSONObject fields) {
-        syncDataBackground(DataType.RUM_WEBVIEW, time, measurement, tags, fields);
-
+        String sessionId = tags.optString(Constants.KEY_RUM_SESSION_ID);
+        if (FTRUMInnerManager.get().checkSessionWillCollect(sessionId)) {
+            syncDataBackground(DataType.RUM_WEBVIEW, time, measurement, tags, fields);
+        }
     }
 
     private void syncDataBackground(final DataType dataType, final long time,
@@ -203,6 +205,8 @@ public class FTTrackInner {
                             logBean.appendTags(rumTags);
                         }
                         datas.add(SyncJsonData.getFromLogBean(logBean, DataType.LOG));
+                    } else {
+                        LogUtils.d(TAG, "根据 FTLogConfig SampleRate 计算，将被丢弃=>" + logBean.getContent());
                     }
                 } catch (Exception e) {
                     LogUtils.e(TAG, Log.getStackTraceString(e));
