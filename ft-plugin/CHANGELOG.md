@@ -1,3 +1,7 @@
+# plugin 1.2.2-alpha02
+1.适配 datakit 新 sourcemap 规则适配
+
+---
 # plugin 1.2.2-beta01
 1.同 plugin 1.2.2-alpha01
 
