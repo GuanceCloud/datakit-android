@@ -84,9 +84,9 @@ public class OkHttpEngine implements INetEngine {
             return new ResponseData(response.code(), string);
         } catch (IOException e) {
             LogUtils.e(TAG, e.getLocalizedMessage() + ",检查本地网络连接是否正常");
-            return new ResponseData(103, e.getLocalizedMessage() + ",检查本地网络连接是否正常");
+            return new ResponseData(NetCodeStatus.FILE_IO_EXCEPTION_CODE, e.getLocalizedMessage() + ",检查本地网络连接是否正常");
         } catch (Exception e) {
-            return new ResponseData(104, e.getLocalizedMessage());
+            return new ResponseData(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, e.getLocalizedMessage());
         }
     }
 }

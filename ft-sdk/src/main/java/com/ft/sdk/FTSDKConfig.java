@@ -31,6 +31,8 @@ public class FTSDKConfig {
      */
     private String serviceName = Constants.DEFAULT_SERVICE_NAME;
 
+    private int dataSyncRetryCount = SyncTaskManager.MAX_ERROR_COUNT;
+
     /**
      * 数据上传环境
      */
@@ -197,6 +199,15 @@ public class FTSDKConfig {
         if (serviceName != null && !serviceName.isEmpty()) {
             this.serviceName = serviceName;
         }
+        return this;
+    }
+
+    public int getDataSyncRetryCount() {
+        return dataSyncRetryCount;
+    }
+
+    public FTSDKConfig setDataSyncRetryCount(int dataSyncRetryCount) {
+        this.dataSyncRetryCount = Math.max(0, Math.min(SyncTaskManager.MAX_ERROR_COUNT, dataSyncRetryCount));
         return this;
     }
 }

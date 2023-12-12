@@ -13,7 +13,7 @@ buildscript {
     }
 
     def appIdString = properties.getProperty("RUM_APP_ID")
-    def datakitRUMUrl = properties.getProperty("ACCESS_SERVER_URL")
+    def datakitRUMUrl = properties.getProperty("DATAKIT_URL")
     def datakitDCAUrl = properties.getProperty("SOURCE_MAP_URL")
     def trackId = properties.getProperty("TRACK_ID")
     def traceUrl = properties.getProperty("TRACE_URL")

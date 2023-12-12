@@ -37,7 +37,7 @@ public class SyncTaskManager {
     /**
      * 最大容忍错误次数
      */
-    private static final int MAX_ERROR_COUNT = 5;
+    public static final int MAX_ERROR_COUNT = 5;
     /**
      * 一个同步周期内一次请求包含数据条目数量
      */
@@ -59,6 +59,8 @@ public class SyncTaskManager {
     private boolean isStop = false;
 
     private static final int MSG_SYNC = 1;
+
+    private int dataSyncMaxRetryCount;
 
     private final Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
@@ -164,9 +166,11 @@ public class SyncTaskManager {
             return;
         }
 
-        if (errorCount.get() >= MAX_ERROR_COUNT) {
-            LogUtils.e(TAG, " \n************连续同步失败5次，停止当前轮询同步***********");
-            return;
+        if (dataSyncMaxRetryCount > 0) {
+            if (errorCount.get() >= dataSyncMaxRetryCount) {
+                LogUtils.e(TAG, " \n************连续同步失败" + dataSyncMaxRetryCount + "次，停止当前轮询同步***********");
+                return;
+            }
         }
 
         if (requestDatas == null || requestDatas.isEmpty()) {
@@ -178,14 +182,14 @@ public class SyncTaskManager {
         requestNet(dataType, body, new AsyncCallback() {
             @Override
             public void onResponse(int code, String response) {
-                if (code >= 200 && code < 500) {
+                if (dataSyncMaxRetryCount == 0 || (code >= 200 && code < 500)) {
                     LogUtils.d(TAG, "\n**********************同步数据成功**********************");
                     SyncTaskManager.this.deleteLastQuery(requestDatas);
                     if (dataType == DataType.LOG) {
                         FTDBCachePolicy.get().optCount(-requestDatas.size());
                     }
                     errorCount.set(0);
-                    if (code > 200) {
+                    if ((dataSyncMaxRetryCount == 0 && code != 200) || code > 200) {
                         LogUtils.e(TAG, "同步数据出错(忽略)-[code:" + code + ",response:" + response + "]");
                     }
                 } else {
@@ -266,8 +270,9 @@ public class SyncTaskManager {
 
     }
 
-    public void init() {
+    public void init(FTSDKConfig config) {
         isStop = false;
+        dataSyncMaxRetryCount = config.getDataSyncRetryCount();
     }
 
     /**

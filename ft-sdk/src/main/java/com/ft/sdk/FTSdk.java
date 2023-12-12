@@ -176,7 +176,7 @@ public class FTSdk {
         FTHttpConfigManager.get().initParams(config);
         FTNetworkListener.get().monitor();
         appendGlobalContext(config);
-        SyncTaskManager.get().init();
+        SyncTaskManager.get().init(config);
 //            LogUtils.setDescLogShow(mFtSDKConfig.isDescLog());
     }
 
