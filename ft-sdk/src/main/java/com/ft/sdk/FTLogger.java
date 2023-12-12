@@ -43,14 +43,9 @@ public class FTLogger {
     }
 
 
-    /**
-     * 将单条日志数据存入本地同步
-     *
-     * @param content 日志内容
-     * @param status  日志等级
-     */
     public void logBackground(String content, Status status) {
-        logBackground(content, status, null);
+        logBackground(content, status, null, false);
+
     }
 
     /**
@@ -59,7 +54,21 @@ public class FTLogger {
      * @param content 日志内容
      * @param status  日志等级
      */
+    public void logBackground(String content, Status status, boolean isSilence) {
+        logBackground(content, status, null, isSilence);
+    }
+
     public void logBackground(String content, Status status, HashMap<String, Object> property) {
+        logBackground(content, status, property, false);
+    }
+
+    /**
+     * 将单条日志数据存入本地同步
+     *
+     * @param content 日志内容
+     * @param status  日志等级
+     */
+    public void logBackground(String content, Status status, HashMap<String, Object> property, boolean isSilence) {
 
         if (!checkConfig()) return;
         if (!config.isEnableCustomLog()) {
@@ -92,7 +101,7 @@ public class FTLogger {
         }
         logBean.setStatus(status);
         if (config.checkLogLevel(status)) {
-            FTTrackInner.getInstance().logBackground(logBean);
+            FTTrackInner.getInstance().logBackground(logBean, isSilence);
         }
 
     }
@@ -117,7 +126,7 @@ public class FTLogger {
                 logBeans.add(logBean);
             }
         }
-        FTTrackInner.getInstance().batchLogBeanBackground(logBeans);
+        FTTrackInner.getInstance().batchLogBeanBackground(logBeans, false);
     }
 
     /**

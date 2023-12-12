@@ -173,11 +173,21 @@ public class FTTrackInner {
      * 将单条日志数据存入本地同步
      *
      * @param logBean
+     * @param isSilence 是否立即触发同步
      */
-    void logBackground(@NonNull LogBean logBean) {
+    void logBackground(@NonNull LogBean logBean, boolean isSilence) {
         ArrayList<BaseContentBean> list = new ArrayList<>();
         list.add(logBean);
-        batchLogBeanBackground(list);
+        batchLogBeanBackground(list, isSilence);
+    }
+
+    /**
+     * 将单条日志数据存入本地同步
+     *
+     * @param logBean
+     */
+    void logBackground(@NonNull LogBean logBean) {
+        logBackground(logBean, false);
     }
 
     /**
@@ -185,7 +195,7 @@ public class FTTrackInner {
      *
      * @param logBeans
      */
-    void batchLogBeanBackground(@NonNull List<BaseContentBean> logBeans) {
+    void batchLogBeanBackground(@NonNull List<BaseContentBean> logBeans, boolean isSilence) {
         try {
             FTLoggerConfig config = FTLoggerConfigManager.get().getConfig();
             if (config == null) return;
@@ -209,7 +219,7 @@ public class FTTrackInner {
                 }
 
             }
-            judgeLogCachePolicy(datas);
+            judgeLogCachePolicy(datas, isSilence);
         } catch (Exception e) {
             LogUtils.e(TAG, Log.getStackTraceString(e));
         }
@@ -238,7 +248,7 @@ public class FTTrackInner {
      *
      * @param recordDataList {@link  SyncJsonData} 列表
      */
-    private void judgeLogCachePolicy(@NonNull List<SyncJsonData> recordDataList) {
+    private void judgeLogCachePolicy(@NonNull List<SyncJsonData> recordDataList, boolean silence) {
         //如果 OP 类型不等于 LOG 则直接进行数据库操作；否则执行同步策略，根据同步策略返回结果判断是否需要执行数据库操作
         int length = recordDataList.size();
         int policyStatus = FTDBCachePolicy.get().optLogCachePolicy(length);
@@ -250,7 +260,9 @@ public class FTTrackInner {
             }
             boolean result = FTDBManager.get().insertFtOptList(recordDataList);
             LogUtils.d(TAG, "judgeLogCachePolicy:insert-result=" + result);
-            SyncTaskManager.get().executeSyncPoll();
+            if (!silence) {
+                SyncTaskManager.get().executeSyncPoll();
+            }
         }
     }
 
