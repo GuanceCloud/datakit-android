@@ -110,10 +110,8 @@ public class TrackLog {
     public static int showFullLog(String TAG, String message, LogType logType) {
         if (isSetInnerLogHandler()) {
             innerLogHandler.printInnerLog(logType.toString(), TAG, message);
-            return -1;
-        } else {
-            return showFullLog(false, TAG, message, logType);
         }
+        return showFullLog(false, TAG, message, logType);
     }
 
     /**
