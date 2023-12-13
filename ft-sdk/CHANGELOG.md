@@ -1,3 +1,8 @@
+# agent 1.3.17-alpha03
+1.添加数据同步最大同步次数
+2.添加内部日志接管对象
+
+---
 # agent 1.3.17-beta01
 1.同 agent 1.3.17-alpha01，agent 1.3.17-alpha02
 2.新增自定义 TraceHeader

@@ -3,6 +3,10 @@ package com.ft.sdk.garble.utils;
 
 import static com.ft.sdk.garble.utils.TrackLog.showFullLog;
 
+import com.ft.sdk.FTInnerLogHandler;
+import com.ft.sdk.FTLogger;
+import com.ft.sdk.FTLoggerConfig;
+
 /**
  * BY huangDianHua
  * DATE:2019-12-03 15:56
@@ -83,6 +87,23 @@ public class LogUtils {
         if (aliasLogShow) {
             showFullLog(TAG, message, TrackLog.LogType.D);
         }
+    }
+
+
+    /**
+     * 设置内部日志输出对象
+     *
+     * 注意:为避免与
+     * {@link FTLoggerConfig#enableConsoleLog}
+     * {@link FTLoggerConfig#printCustomLogToConsole}  产生循环调用的情况
+     * innerLogHandler 设置后，这两数值自动为 false
+     *
+     * {@link FTLogger}，如果使用 FTLogger 避免使用 {@link  com.ft.sdk.garble.bean.Status#OK}
+     *
+     * @param innerLogHandler
+     */
+    public static void registerInnerLogHandler(FTInnerLogHandler innerLogHandler) {
+        TrackLog.setInnerLogHandler(innerLogHandler);
     }
 
 

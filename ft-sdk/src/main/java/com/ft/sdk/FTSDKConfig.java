@@ -42,6 +42,11 @@ public class FTSDKConfig {
     private String serviceName = Constants.DEFAULT_SERVICE_NAME;
 
     /**
+     * 数据同步最大重复尝试次数
+     */
+    private int dataSyncRetryCount = SyncTaskManager.MAX_ERROR_COUNT;
+
+    /**
      * 数据上传环境
      */
     private String env = EnvType.PROD.toString();
@@ -245,10 +250,29 @@ public class FTSDKConfig {
         return serviceName;
     }
 
+    /**
+     * 设置应用服务名
+     * @param serviceName 服务名
+     * @return
+     */
     public FTSDKConfig setServiceName(String serviceName) {
         if (serviceName != null && !serviceName.isEmpty()) {
             this.serviceName = serviceName;
         }
+        return this;
+    }
+
+    public int getDataSyncRetryCount() {
+        return dataSyncRetryCount;
+    }
+
+    /**
+     * 设置最大同步重试次数，最小 0，最大 5，设置为 0，如果数据传输发生错误将直接丢弃
+     * @param dataSyncRetryCount 重试次数，
+     * @return
+     */
+    public FTSDKConfig setDataSyncRetryCount(int dataSyncRetryCount) {
+        this.dataSyncRetryCount = Math.max(0, Math.min(SyncTaskManager.MAX_ERROR_COUNT, dataSyncRetryCount));
         return this;
     }
 }

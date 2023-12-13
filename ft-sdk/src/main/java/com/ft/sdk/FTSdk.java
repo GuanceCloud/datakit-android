@@ -15,6 +15,7 @@ import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.PackageUtils;
+import com.ft.sdk.garble.utils.TrackLog;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.util.HashMap;
@@ -176,7 +177,7 @@ public class FTSdk {
         FTHttpConfigManager.get().initParams(config);
         FTNetworkListener.get().monitor();
         appendGlobalContext(config);
-        SyncTaskManager.get().init();
+        SyncTaskManager.get().init(config);
 //            LogUtils.setDescLogShow(mFtSDKConfig.isDescLog());
     }
 

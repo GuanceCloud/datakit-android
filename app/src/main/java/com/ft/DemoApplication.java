@@ -3,6 +3,7 @@ package com.ft;
 import com.ft.sdk.DeviceMetricsMonitorType;
 import com.ft.sdk.EnvType;
 import com.ft.sdk.ErrorMonitorType;
+import com.ft.sdk.FTInnerLogHandler;
 import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTSDKConfig;
@@ -11,6 +12,7 @@ import com.ft.sdk.FTTraceConfig;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.bean.UserData;
+import com.ft.sdk.garble.utils.LogUtils;
 
 import java.util.HashMap;
 
@@ -37,7 +39,8 @@ public class DemoApplication extends BaseApplication {
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAWAY_URL,
                         BuildConfig.DATAWAY_TOKEN)
                 .setDebug(true)//设置是否是 debug
-                .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()));
+                .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()))
+                .setDataSyncRetryCount(0);
         FTSdk.install(ftSDKConfig);
 
         FTSdk.initLogWithConfig(new FTLoggerConfig()
@@ -48,6 +51,15 @@ public class DemoApplication extends BaseApplication {
                 .setLogLevelFilters(new Status[]{Status.ERROR})
                 .setEnableLinkRumData(true)
         );
+
+        LogUtils.registerInnerLogHandler(new FTInnerLogHandler() {
+            @Override
+            public void printInnerLog(String level, String tag, String logContent) {
+//                if(level.equals("E")){
+//                    FTLogger.getInstance().logBackground(logContent,Status.ERROR,true);
+//                }
+            }
+        });
 
         FTSdk.initRUMWithConfig(new FTRUMConfig()
                 .setSamplingRate(1f)

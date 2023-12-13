@@ -2,6 +2,7 @@ package com.ft.sdk.garble.utils;
 
 import android.util.Log;
 
+import com.ft.sdk.FTInnerLogHandler;
 import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.FTLoggerConfigManager;
 import com.ft.sdk.TrackLogManager;
@@ -90,6 +91,16 @@ public class TrackLog {
         return Log.println(priority, tag, msg);
     }
 
+    private static FTInnerLogHandler innerLogHandler;
+
+    public static void setInnerLogHandler(FTInnerLogHandler innerLogHandler) {
+        TrackLog.innerLogHandler = innerLogHandler;
+    }
+
+    public static boolean isSetInnerLogHandler() {
+        return TrackLog.innerLogHandler != null;
+    }
+
     /**
      * @param TAG
      * @param message
@@ -97,6 +108,9 @@ public class TrackLog {
      * @return
      */
     public static int showFullLog(String TAG, String message, LogType logType) {
+        if (isSetInnerLogHandler()) {
+            innerLogHandler.printInnerLog(logType.toString(), TAG, message);
+        }
         return showFullLog(false, TAG, message, logType);
     }
 
