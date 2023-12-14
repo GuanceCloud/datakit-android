@@ -46,6 +46,11 @@ public class SyncTaskManager {
      * 传输间歇休眠时间
      */
     private static final int SLEEP_TIME = 10000;
+
+    /**
+     * 重试等待时间
+     */
+    private static final int RETRY_DELAY_SLEEP_TIME = 100;
     /**
      * 统计一个周期内错误的次
      */
@@ -111,7 +116,7 @@ public class SyncTaskManager {
             return;
         }
         synchronized (this) {
-            LogUtils.d(TAG, "=========executeSyncPoll===");
+            LogUtils.d(TAG, "=========executeSyncPoll=========");
             running = true;
             errorCount.set(0);
             DataUploaderThreadPool.get().execute(new Runnable() {
@@ -119,9 +124,7 @@ public class SyncTaskManager {
                 public void run() {
                     try {
 
-                        LogUtils.d(TAG, " \n*******************************************************\n" +
-                                "******************数据同步线程运行中*******************\n" +
-                                "*******************************************************\n");
+                        LogUtils.d(TAG, "******************数据同步线程运行中*******************>>>\n");
                         if (withSleep) {
                             Thread.sleep(SLEEP_TIME);
                         }
@@ -139,9 +142,7 @@ public class SyncTaskManager {
                         LogUtils.e(TAG, Log.getStackTraceString(e));
                     } finally {
                         running = false;
-                        LogUtils.d(TAG, " \n********************************************************\n" +
-                                "******************数据同步线程已结束********************\n" +
-                                "********************************************************\n");
+                        LogUtils.d(TAG, "<<<**********************数据同步线程已结束**********************\n");
                     }
                 }
             });
@@ -183,7 +184,7 @@ public class SyncTaskManager {
             @Override
             public void onResponse(int code, String response) {
                 if (dataSyncMaxRetryCount == 0 || (code >= 200 && code < 500)) {
-                    LogUtils.d(TAG, "\n**********************同步数据成功**********************");
+                    LogUtils.d(TAG, "\n<<<**********************同步数据成功**********************");
                     SyncTaskManager.this.deleteLastQuery(requestDatas);
                     if (dataType == DataType.LOG) {
                         FTDBCachePolicy.get().optCount(-requestDatas.size());
@@ -193,8 +194,16 @@ public class SyncTaskManager {
                         LogUtils.e(TAG, "同步数据出错(忽略)-[code:" + code + ",response:" + response + "]");
                     }
                 } else {
-                    LogUtils.e(TAG, "同步数据失败-[code:" + code + ",response:" + response + "]");
+                    LogUtils.e(TAG, errorCount.get() + ":同步数据失败-[code:" + code + ",response:" + response + "]");
                     errorCount.getAndIncrement();
+
+                    if (errorCount.get() > 0) {
+                        try {
+                            Thread.sleep((long) errorCount.get() * RETRY_DELAY_SLEEP_TIME);
+                        } catch (InterruptedException e) {
+                            LogUtils.e(TAG, Log.getStackTraceString(e));
+                        }
+                    }
                 }
             }
         });
@@ -234,9 +243,9 @@ public class SyncTaskManager {
     /**
      * 上传数据
      *
-     * @param dataType
-     * @param body
-     * @param syncCallback
+     * @param dataType     数据类型
+     * @param body         数据行协议结果
+     * @param syncCallback 异步对象
      */
     public synchronized void requestNet(DataType dataType, String body, final AsyncCallback syncCallback) {
         String model;
@@ -263,9 +272,8 @@ public class SyncTaskManager {
         try {
             syncCallback.onResponse(result.getCode(), result.getMessage());
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, "上传错误：\n" + Log.getStackTraceString(e));
             syncCallback.onResponse(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, e.getLocalizedMessage());
-            LogUtils.e(TAG, "上传错误：" + e.getLocalizedMessage());
         }
 
     }
