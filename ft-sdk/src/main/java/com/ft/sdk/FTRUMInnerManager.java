@@ -76,7 +76,7 @@ public class FTRUMInnerManager {
     /**
      * {@link Constants#KEY_RUM_SESSION_ID}
      */
-    private String sessionId = UUID.randomUUID().toString();
+    private String sessionId = Utils.randomUUID();
 
 
     /**

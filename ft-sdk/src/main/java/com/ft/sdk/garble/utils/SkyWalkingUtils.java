@@ -27,8 +27,8 @@ public class SkyWalkingUtils {
      * 自增整型
      */
     private final static AtomicLong increasingLong = new AtomicLong(0);
-    private final static String traceIDUUID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
-    private final static String parentServiceUUID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
+    private final static String traceIDUUID = Utils.randomUUID().toLowerCase();
+    private final static String parentServiceUUID = Utils.randomUUID().toLowerCase();
     private String sw8;
     private String newTraceId;
     private String newParentTraceId;

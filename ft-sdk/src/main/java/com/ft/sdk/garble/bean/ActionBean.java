@@ -25,7 +25,7 @@ public class ActionBean {
     /**
      * Action 唯一ID,{@link Constants#KEY_RUM_ACTION_ID}
      */
-    String id = UUID.randomUUID().toString();
+    String id = Utils.randomUUID();
     /**
      * Action 开始时间
      */

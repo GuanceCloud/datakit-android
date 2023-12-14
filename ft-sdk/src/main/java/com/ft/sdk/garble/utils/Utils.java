@@ -42,9 +42,12 @@ import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 
 import okhttp3.MediaType;
 import okhttp3.Request;
@@ -197,6 +200,14 @@ public class Utils {
             }
         }
         return uid.toString();
+    }
+
+    /**
+     * 获取 uuid
+     * @return
+     */
+    public static String randomUUID() {
+        return UUID.randomUUID().toString().replace("-", "");
     }
 
     /**
