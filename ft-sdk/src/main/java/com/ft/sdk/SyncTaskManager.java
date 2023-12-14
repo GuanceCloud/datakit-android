@@ -267,7 +267,7 @@ public class SyncTaskManager {
                 .addHeadParam("Content-Type", content_type)
                 .setModel(model)
                 .setMethod(RequestMethod.POST)
-                .setBodyString(body).executeSync(FTResponseData.class);
+                .setBodyString(body).executeSync();
 
         try {
             syncCallback.onResponse(result.getCode(), result.getMessage());

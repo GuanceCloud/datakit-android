@@ -1,12 +1,10 @@
 package com.ft.sdk.garble.http;
 
 import com.ft.sdk.garble.FTHttpConfigManager;
-import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.security.InvalidParameterException;
 import java.util.HashMap;
-import java.util.Iterator;
 
 /**
  * BY huangDianHua
@@ -15,12 +13,11 @@ import java.util.Iterator;
  */
 public class HttpBuilder {
 
-    private String DATAWAY_URL_HOST_FORMAT = "/%s?token=%s&to_headless=true";
+    private final static String DATAWAY_URL_HOST_FORMAT = "/%s?token=%s&to_headless=true";
     private String host;
     private String model;
     private RequestMethod method;
     private String bodyString;
-//    private final HashMap<String, Object> params = new HashMap<>();
     private int sendOutTime = FTHttpConfigManager.get().sendOutTime;
     private int readOutTime = FTHttpConfigManager.get().readOutTime;
     private boolean useDefaultHead = true;
@@ -59,7 +56,7 @@ public class HttpBuilder {
             if (!isDataway) {
                 url += "/" + model;
             } else {
-                url +=  String.format(DATAWAY_URL_HOST_FORMAT, model, FTHttpConfigManager.get().clientToken);
+                url += String.format(DATAWAY_URL_HOST_FORMAT, model, FTHttpConfigManager.get().clientToken);
             }
         }
         return url;
@@ -144,11 +141,9 @@ public class HttpBuilder {
     /**
      * 数据同步 HTTP 请求
      *
-     * @param tClass
-     * @param <T>
      * @return
      */
-    public <T extends ResponseData> T executeSync(Class<T> tClass) {
-        return new NetProxy(this).execute(tClass);
+    public FTResponseData executeSync() {
+        return new NetProxy(this).execute();
     }
 }

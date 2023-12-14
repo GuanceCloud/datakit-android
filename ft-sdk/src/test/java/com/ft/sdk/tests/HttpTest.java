@@ -64,8 +64,8 @@ public class HttpTest {
                 .setUrl(mMockWebServer.getUrl("/").toString())
                 .setMethod(RequestMethod.POST)
                 .setBodyString("")
-                .executeSync(FTResponseData.class);
-        assertEquals(HttpURLConnection.HTTP_OK, result.getHttpCode());
+                .executeSync();
+        assertEquals(HttpURLConnection.HTTP_OK, result.getCode());
     }
 
     /**
@@ -85,8 +85,8 @@ public class HttpTest {
                 .setUrl(mMockWebServer.getUrl("/").toString())
                 .setMethod(RequestMethod.POST)
                 .setBodyString("")
-                .executeSync(FTResponseData.class);
-        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, result.getHttpCode());
+                .executeSync();
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, result.getCode());
     }
 
     /**
@@ -106,7 +106,7 @@ public class HttpTest {
                 .setUrl(mMockWebServer.getUrl("/").toString())
                 .setMethod(RequestMethod.POST)
                 .setBodyString("")
-                .executeSync(FTResponseData.class);
+                .executeSync();
         assertEquals(HttpURLConnection.HTTP_OK, result.getCode());
     }
 
@@ -127,7 +127,7 @@ public class HttpTest {
                 .setUrl(mMockWebServer.getUrl("/").toString())
                 .setMethod(RequestMethod.POST)
                 .setBodyString("")
-                .executeSync(FTResponseData.class);
+                .executeSync();
         assertEquals(NetCodeStatus.NET_STATUS_RESPONSE_NOT_JSON, result.getCode());
     }
 }

@@ -47,56 +47,20 @@ public class NetProxy {
         }
     }
 
-    public <T extends ResponseData> T execute(Class<T> tClass) {
+    public FTResponseData execute() {
         if (!Utils.isNetworkAvailable()) {
-            return getResponseData(tClass, NetCodeStatus.NETWORK_EXCEPTION_CODE, "网络未连接");
+            return new FTResponseData(NetCodeStatus.NETWORK_EXCEPTION_CODE, "网络未连接");
         }
         if (!httpBuilder.getUrl().startsWith("http://") && !httpBuilder.getUrl().startsWith("https://")) {
             //请求地址为空是提示错误
-            return getResponseData(tClass, NetCodeStatus.UNKNOWN_EXCEPTION_CODE, "请求地址错误");
+            return new FTResponseData(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, "请求地址错误");
         }
         if (httpBuilder.isUseDefaultHead()) {
             //设置特有的请求头
             setHeadParams();
         }
         engine.createRequest(httpBuilder);
-        ResponseData responseData = engine.execute();
-        if (responseData != null) {
-            if (httpBuilder.isShowLog()) {
-                LogUtils.d(TAG, "HTTP-response:[code:" + responseData.getHttpCode() + ",response:" + responseData.getData() + "]");
-            }
-            return getResponseData(tClass, responseData.getHttpCode(), responseData.getData());
-        } else {
-            return getResponseData(tClass, NetCodeStatus.UNKNOWN_EXCEPTION_CODE, "");
-        }
-    }
-
-    /**
-     * 构建网络请求返回对象
-     *
-     * @param tClass
-     * @param code
-     * @param message
-     * @param <T>
-     * @return
-     */
-    private <T extends ResponseData> T getResponseData(Class<T> tClass, int code, String message) {
-        Constructor[] constructor = tClass.getConstructors();
-        for (Constructor<T> con : constructor) {
-            Class[] classes = con.getParameterTypes();
-            if (classes.length == 2) {
-                if (classes[0].getName().equals(int.class.getName()) &&
-                        classes[1].getName().equals(String.class.getName())) {
-                    try {
-                        return con.newInstance(code, message);
-                    } catch (Exception e) {
-                        LogUtils.e(TAG, Log.getStackTraceString(e));
-
-                    }
-                }
-            }
-        }
-        return null;
+        return engine.execute();
     }
 
     /**
@@ -117,7 +81,6 @@ public class NetProxy {
         if (head == null) {
             head = new HashMap<>();
         }
-//        head.put("X-Datakit-UUID", ftHttpConfig.uuid);
         head.put("User-Agent", ftHttpConfig.userAgent +
                 ";agent_" + FTSdk.AGENT_VERSION +
                 ";autotrack_" + FTSdk.PLUGIN_VERSION +
@@ -130,11 +93,6 @@ public class NetProxy {
         head.put("charset", CHARSET);
         //添加日期请求头
         head.put("Date", calculateDate());
-//        如果开启了签名，添加签名信息
-//        if (ftHttpConfig.enableRequestSigning) {
-//            String akId = ftHttpConfig.akId;
-//            head.put("Authorization", "DWAY " + akId + ":" + getSignature());
-//        }
         httpBuilder.setHeadParams(head);
     }
 }

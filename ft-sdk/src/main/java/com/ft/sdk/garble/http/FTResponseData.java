@@ -15,7 +15,7 @@ import java.net.HttpURLConnection;
  * DATE:2019-12-16 16:15
  * Description:
  */
-public class FTResponseData extends ResponseData {
+public class FTResponseData {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "FTResponseData";
     /**
      * http code
@@ -31,7 +31,6 @@ public class FTResponseData extends ResponseData {
     private String message;
 
     public FTResponseData(int httpCode, String data) {
-        super(httpCode, data);
         if (httpCode == HttpURLConnection.HTTP_OK) {
             code = httpCode;
         } else {

@@ -73,7 +73,7 @@ public class OkHttpEngine implements INetEngine {
      * @return
      */
     @Override
-    public ResponseData execute() {
+    public FTResponseData execute() {
         try {
             Response response = client.newCall(request).execute();
             ResponseBody responseBody = response.body();
@@ -81,12 +81,12 @@ public class OkHttpEngine implements INetEngine {
             if (responseBody != null) {
                 string = responseBody.string();
             }
-            return new ResponseData(response.code(), string);
+            return new FTResponseData(response.code(), string);
         } catch (IOException e) {
             LogUtils.e(TAG, e.getLocalizedMessage() + ",检查本地网络连接是否正常");
-            return new ResponseData(NetCodeStatus.FILE_IO_EXCEPTION_CODE, e.getLocalizedMessage() + ",检查本地网络连接是否正常");
+            return new FTResponseData(NetCodeStatus.FILE_IO_EXCEPTION_CODE, e.getLocalizedMessage() + ",检查本地网络连接是否正常");
         } catch (Exception e) {
-            return new ResponseData(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, e.getLocalizedMessage());
+            return new FTResponseData(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, e.getLocalizedMessage());
         }
     }
 }

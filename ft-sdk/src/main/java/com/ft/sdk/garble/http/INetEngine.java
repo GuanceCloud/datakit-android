@@ -24,5 +24,5 @@ public interface INetEngine {
      * 执行请求
      * @return
      */
-    ResponseData execute();
+    FTResponseData execute();
 }
