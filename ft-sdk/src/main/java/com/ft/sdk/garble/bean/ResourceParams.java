@@ -1,6 +1,8 @@
 package com.ft.sdk.garble.bean;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Resource 请求参数
@@ -10,14 +12,26 @@ public class ResourceParams {
      * http 请求地址
      */
     public String url = "";
+
     /**
-     * http 请求头
+     * http 请求头，如果为空则会读取 {@link #requestHeaderMap}
      */
     public String requestHeader = "";
     /**
-     * http 返回头
+     * http 返回头,如果为空则会读取 {@link #responseHeaderMap}
      */
     public String responseHeader = "";
+
+    /**
+     * http 请求头
+     */
+    public HashMap<String, List<String>> requestHeaderMap;
+
+
+    /**
+     * http 返回头
+     */
+    public HashMap<String, List<String>> responseHeaderMap;
     /**
      * http 头 Connection
      */
@@ -52,5 +66,5 @@ public class ResourceParams {
     /**
      * 附加属性参数
      */
-    public HashMap<String,Object> property;
+    public HashMap<String, Object> property;
 }

@@ -36,8 +36,7 @@ public class DemoApplication extends BaseApplication {
     }
 
     static void initFTSDK() {
-        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAWAY_URL,
-                        BuildConfig.DATAWAY_TOKEN)
+        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAKIT_URL)
                 .setDebug(true)//设置是否是 debug
                 .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()))
                 .setDataSyncRetryCount(0);
@@ -52,14 +51,14 @@ public class DemoApplication extends BaseApplication {
                 .setEnableLinkRumData(true)
         );
 
-        LogUtils.registerInnerLogHandler(new FTInnerLogHandler() {
-            @Override
-            public void printInnerLog(String level, String tag, String logContent) {
+//        LogUtils.registerInnerLogHandler(new FTInnerLogHandler() {
+//            @Override
+//            public void printInnerLog(String level, String tag, String logContent) {
 //                if(level.equals("E")){
 //                    FTLogger.getInstance().logBackground(logContent,Status.ERROR,true);
-//                }
-            }
-        });
+////                }
+//            }
+//        });
 
         FTSdk.initRUMWithConfig(new FTRUMConfig()
                 .setSamplingRate(1f)

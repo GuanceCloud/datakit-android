@@ -275,6 +275,20 @@ public class FTRUMGlobalManager {
      */
     public void addResource(String resourceId, ResourceParams params, NetStatusBean netStatusBean) {
         if (innerManager != null) {
+            if (Utils.isNullOrEmpty(params.requestHeader)) {
+                params.requestHeader = Utils.convertToHttpRawData(params.requestHeaderMap);
+            }
+            if (Utils.isNullOrEmpty(params.responseHeader)) {
+                params.responseHeader = Utils.convertToHttpRawData(params.responseHeaderMap);
+            }
+
+            if (params.responseContentLength <= 0) {
+                if (params.responseBody == null) {
+                    params.responseBody = "";
+                }
+                params.responseContentLength = params.responseBody.length() + params.responseHeader.length();
+            }
+
             innerManager.addResource(resourceId, params, netStatusBean);
         }
     }

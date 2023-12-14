@@ -497,5 +497,32 @@ public class Utils {
         byte[] buffer = new byte[4096];
         while ((len = inputStream.read(buffer)) != -1) outputStream.write(buffer, 0, len);
     }
+
+    /**
+     * 转化 http header raw 数据
+     *
+     * @param httpHeader
+     * @return
+     */
+    public static String convertToHttpRawData(HashMap<String, List<String>> httpHeader) {
+        StringBuilder rawData = new StringBuilder();
+
+        for (Map.Entry<String, List<String>> entry : httpHeader.entrySet()) {
+            String key = entry.getKey();
+            List<String> values = entry.getValue();
+
+            // 添加每个键值对到HTTP原始数据
+            rawData.append(key).append(": ");
+
+            for (int i = 0; i < values.size(); i++) {
+                rawData.append(values.get(i));
+                if (i < values.size() - 1) {
+                    rawData.append(", ");
+                }
+            }
+            rawData.append("\r\n");
+        }
+        return rawData.toString();
+    }
 }
 
