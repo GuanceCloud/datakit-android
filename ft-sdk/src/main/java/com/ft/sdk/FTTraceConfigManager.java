@@ -21,7 +21,7 @@ public class FTTraceConfigManager {
 
 
     /**
-     *
+     * Trace 配置初始化
      * @param config
      */
     void initWithConfig(FTTraceConfig config) {

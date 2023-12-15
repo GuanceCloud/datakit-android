@@ -80,7 +80,7 @@ public class FTRUMInnerManager {
 
 
     /**
-     * 不手机
+     * 不收集
      */
     private final ArrayList<String> notCollectMap = new ArrayList<>();
 

@@ -105,6 +105,11 @@ public class CpuUtils {
         return 0;
     }
 
+    /**
+     * 获取 CPU 索引
+     * @param line
+     * @return
+     */
     private int getCPUIndex(String line) {
         if (line.contains("CPU")) {
             String[] titles = line.split("\\s+");

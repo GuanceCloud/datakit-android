@@ -4,6 +4,9 @@ import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
 
+/**
+ *  Okhttp 测试对象单例管理
+ */
 public class OkHttpClientSingleton {
     private static OkHttpClient instance;
 

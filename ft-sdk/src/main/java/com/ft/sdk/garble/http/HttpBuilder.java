@@ -21,8 +21,6 @@ public class HttpBuilder {
     private int sendOutTime = FTHttpConfigManager.get().sendOutTime;
     private int readOutTime = FTHttpConfigManager.get().readOutTime;
     private boolean useDefaultHead = true;
-    private boolean showLog = true;
-
     private boolean isDataway = false;
     private final HashMap<String, String> headParams = new HashMap<>();
 
@@ -80,10 +78,6 @@ public class HttpBuilder {
 
     public HashMap<String, String> getHeadParams() {
         return headParams;
-    }
-
-    public boolean isShowLog() {
-        return showLog;
     }
 
     public boolean isUseDefaultHead() {

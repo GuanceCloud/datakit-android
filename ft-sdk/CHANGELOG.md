@@ -1,3 +1,7 @@
+# agent 1.3.17-alpha05
+1.优化日志输出
+
+---
 # agent 1.3.17-alpha04
 1.优化重试机制
 2.新增 addResource header map 支持

@@ -64,7 +64,7 @@ public class FTTraceInterceptor implements Interceptor {
 
         String uniqueKey = Utils.identifyRequest(request);
         okhttp3.HttpUrl url = request.url();
-        HttpUrl httpUrl = new HttpUrl(url.host(), url.encodedPath(), url.port(), url.toString());
+        HttpUrl httpUrl = new HttpUrl(url.host(), url.encodedPath(), url.port());
         HashMap<String, String> requestHeaders = headerHandler != null ?
                 headerHandler.getTraceHeader(request) : FTTraceManager.get().getTraceHeader(uniqueKey, httpUrl);
         try {

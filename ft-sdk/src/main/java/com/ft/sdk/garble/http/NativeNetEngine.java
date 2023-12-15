@@ -51,12 +51,22 @@ public class NativeNetEngine implements INetEngine {
      */
     private int responseCode = NetCodeStatus.UNKNOWN_EXCEPTION_CODE;
 
+    /**
+     * {@link INetEngine#defaultConfig(HttpBuilder)}
+     *
+     * @param httpBuilder
+     */
     @Override
     public void defaultConfig(HttpBuilder httpBuilder) {
         this.mHttpBuilder = httpBuilder;
 
     }
 
+    /**
+     * {@link INetEngine#createRequest(HttpBuilder)} }
+     *
+     * @param httpBuilder
+     */
     @Override
     public void createRequest(HttpBuilder httpBuilder) {
         openConnection();

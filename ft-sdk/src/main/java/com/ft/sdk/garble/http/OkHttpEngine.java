@@ -1,9 +1,6 @@
 package com.ft.sdk.garble.http;
 
-import android.util.Log;
-
 import com.ft.sdk.garble.utils.Constants;
-import com.ft.sdk.garble.utils.LogUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -30,6 +27,7 @@ public class OkHttpEngine implements INetEngine {
 
     /**
      * Http 请求基础配置初始化
+     *
      * @param httpBuilder
      */
     @Override
@@ -44,6 +42,7 @@ public class OkHttpEngine implements INetEngine {
 
     /**
      * 创建请求对象
+     *
      * @param httpBuilder
      */
     @Override
@@ -65,10 +64,9 @@ public class OkHttpEngine implements INetEngine {
     }
 
     /**
-     * 执行 http 请求，如果 http 正常，返回  code 和 body code = 103
-     *
-     * code = 103，IOException
-     * code = 104，Exception
+     * 执行 http 请求，如果 http 正常，返回  code 和 body
+     * code = {@link NetCodeStatus#FILE_IO_EXCEPTION_CODE}，IOException
+     * code = {@link NetCodeStatus#UNKNOWN_EXCEPTION_CODE}，Exception
      *
      * @return
      */
@@ -83,7 +81,6 @@ public class OkHttpEngine implements INetEngine {
             }
             return new FTResponseData(response.code(), string);
         } catch (IOException e) {
-            LogUtils.e(TAG, e.getLocalizedMessage() + ",检查本地网络连接是否正常");
             return new FTResponseData(NetCodeStatus.FILE_IO_EXCEPTION_CODE, e.getLocalizedMessage() + ",检查本地网络连接是否正常");
         } catch (Exception e) {
             return new FTResponseData(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, e.getLocalizedMessage());

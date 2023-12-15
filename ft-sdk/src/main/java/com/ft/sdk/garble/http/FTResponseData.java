@@ -30,25 +30,30 @@ public class FTResponseData {
      */
     private String message;
 
-    public FTResponseData(int httpCode, String data) {
-        if (httpCode == HttpURLConnection.HTTP_OK) {
-            code = httpCode;
+    public FTResponseData(int code, String data) {
+        if (code == HttpURLConnection.HTTP_OK) {
+            this.code = code;
+            message = data;
         } else {
-            try {
-                if (data != null) {
-                    JSONObject jsonObject = new JSONObject(data);
-                    code = jsonObject.optInt("code", httpCode);
-                    errorCode = jsonObject.optString("errorCode");
-                    message = jsonObject.optString("message");
+            if (code < NetCodeStatus.NETWORK_EXCEPTION_CODE) {
+                try {
+                    if (data != null) {
+                        JSONObject jsonObject = new JSONObject(data);
+                        this.code = jsonObject.optInt("code", code);
+                        errorCode = jsonObject.optString("errorCode");
+                        message = jsonObject.optString("message");
+                    }
+                } catch (JSONException e) {
+                    this.code = NetCodeStatus.NET_STATUS_RESPONSE_NOT_JSON;
+                    errorCode = NetCodeStatus.NET_STATUS_RESPONSE_NOT_JSON_ERR;
+                    message = data;
+                } catch (Exception e) {
+                    LogUtils.e(TAG, Log.getStackTraceString(e));
                 }
-            } catch (JSONException e) {
-                code = NetCodeStatus.NET_STATUS_RESPONSE_NOT_JSON;
-                errorCode = NetCodeStatus.NET_STATUS_RESPONSE_NOT_JSON_ERR;
+            } else {
+                this.code = code;
                 message = data;
-            } catch (Exception e) {
-                LogUtils.e(TAG, Log.getStackTraceString(e));
             }
-
         }
     }
 

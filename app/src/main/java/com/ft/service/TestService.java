@@ -7,11 +7,15 @@ import android.os.IBinder;
 import androidx.annotation.Nullable;
 
 import com.ft.BuildConfig;
+import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.utils.RequestUtils;
 
 import okhttp3.Request;
 
+/**
+ * 测试 service ，okhttp网络请求追踪情况，{@link FTSDKConfig#isOnlySupportMainProcess()}
+ */
 public class TestService extends Service {
     private static final String TAG = "TestService";
 

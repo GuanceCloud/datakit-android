@@ -73,7 +73,7 @@ public class FTHttpConfigManager {
         datawayUrl = ftsdkConfig.getDatawayUrl();
         clientToken = ftsdkConfig.getClientToken();
 
-        LogUtils.d(TAG, "datakitUrl:" + datakitUrl + ",datawayUrl:" + datawayUrl);
+        LogUtils.d(TAG, "serverUrl ==>\ndatakitUrl:" + datakitUrl + "\ndatawayUrl:" + datawayUrl);
     }
 
 

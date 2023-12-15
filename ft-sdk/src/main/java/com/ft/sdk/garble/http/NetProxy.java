@@ -1,14 +1,11 @@
 package com.ft.sdk.garble.http;
 
-import android.util.Log;
-
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
-import java.lang.reflect.Constructor;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,17 +22,17 @@ public class NetProxy {
     /**
      * SDK 中网络的配置
      */
-    FTHttpConfigManager ftHttpConfig = FTHttpConfigManager.get();
+    private final FTHttpConfigManager ftHttpConfig = FTHttpConfigManager.get();
     /**
      * 内容类型
      */
-    final String CONTENT_TYPE = "text/plain";
+    private static final String CONTENT_TYPE = "text/plain";
     /**
      * 字符编码
      */
-    final String CHARSET = "UTF-8";
+    private static final String CHARSET = "UTF-8";
     private final HttpBuilder httpBuilder;
-    INetEngine engine;
+    private final INetEngine engine;
 
     public NetProxy(HttpBuilder httpBuilder) {
         this.httpBuilder = httpBuilder;
@@ -47,6 +44,11 @@ public class NetProxy {
         }
     }
 
+    /**
+     * 执行网络请求
+     *
+     * @return
+     */
     public FTResponseData execute() {
         if (!Utils.isNetworkAvailable()) {
             return new FTResponseData(NetCodeStatus.NETWORK_EXCEPTION_CODE, "网络未连接");

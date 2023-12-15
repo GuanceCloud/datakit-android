@@ -192,6 +192,8 @@ public class SyncTaskManager {
                     errorCount.set(0);
                     if ((dataSyncMaxRetryCount == 0 && code != 200) || code > 200) {
                         LogUtils.e(TAG, "同步数据出错(忽略)-[code:" + code + ",response:" + response + "]");
+                    } else {
+                        LogUtils.d(TAG, "[code:" + code + ",response:" + response + "]");
                     }
                 } else {
                     LogUtils.e(TAG, errorCount.get() + ":同步数据失败-[code:" + code + ",response:" + response + "]");
