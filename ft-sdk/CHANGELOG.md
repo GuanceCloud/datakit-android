@@ -1,5 +1,6 @@
 # agent 1.3.17-alpha05
 1.优化日志输出
+2.add Resource 空指针数据处理
 
 ---
 # agent 1.3.17-alpha04

@@ -204,6 +204,7 @@ public class Utils {
 
     /**
      * 获取 uuid
+     *
      * @return
      */
     public static String randomUUID() {
@@ -505,6 +506,9 @@ public class Utils {
      * @return
      */
     public static String convertToHttpRawData(HashMap<String, List<String>> httpHeader) {
+        if (httpHeader == null) {
+            return "";
+        }
         StringBuilder rawData = new StringBuilder();
 
         for (Map.Entry<String, List<String>> entry : httpHeader.entrySet()) {
