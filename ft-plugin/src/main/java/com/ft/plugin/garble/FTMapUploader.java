@@ -315,7 +315,7 @@ public class FTMapUploader {
      */
     private void uploadWithParams(ObfuscationSettingConfig settingConfig, ProductFlavorModel model, String zipBuildPath) throws IOException, InterruptedException {
         Logger.debug(model.toString());
-        String cmd = "curl -X PUT " + model.getDatakitUrl() + "/v1/sourcemap?"
+        String cmd = "curl -m 1800 -X PUT " + model.getDatakitUrl() + "/v1/sourcemap?"
                 + "app_id=" + model.getAppId()
                 + "&env=" + model.getEnv()
                 + "&version=" + settingConfig.versionName
