@@ -122,7 +122,8 @@ FTExt {
 
     autoUploadMap = false
     autoUploadNativeDebugSymbol = false
-    datakitDCAUrl = ft_env.datakitDCAUrl
+    datakitUrl = ft_env.datakitRUMUrl
+    datawayToken = ft_env.datawayToken
     appId = ft_env.rumAppid
     env = 'common'
 
@@ -130,14 +131,16 @@ FTExt {
         prodTest {
             autoUploadMap = true
             autoUploadNativeDebugSymbol = true
-            datakitDCAUrl = ft_env.datakitDCAUrl
+            datakitUrl = ft_env.datakitRUMUrl
+            datawayToken = ft_env.datawayToken
             appId = ft_env.rumAppid
             env = ft_env.prodTestEnv
         }
         prodPublish {
             autoUploadMap = true
             autoUploadNativeDebugSymbol = true
-            datakitDCAUrl = ft_env.datakitDCAUrl
+            datakitUrl = ft_env.datakitRUMUrl
+            datawayToken = ft_env.datawayToken
             appId = ft_env.rumAppid
             env = ft_env.prodPublishEnv
         }
