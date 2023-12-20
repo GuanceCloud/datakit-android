@@ -316,6 +316,11 @@ public class Utils {
      * @return
      */
     public static boolean enableTraceSamplingRate(float sampleRate) {
+        if (sampleRate <= 0) {
+            return false;
+        } else if (sampleRate >= 1) {
+            return true;
+        }
         return generateRandomNumber() <= sampleRate * 100;
     }
 
@@ -324,9 +329,9 @@ public class Utils {
      *
      * @return
      */
-    public static double generateRandomNumber() {
+    public static float generateRandomNumber() {
         Random random = new Random();
-        return Math.floor(random.nextDouble() * 100);
+        return random.nextFloat() * 100;
     }
 
     /**
