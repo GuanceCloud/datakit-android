@@ -47,7 +47,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.4.2'
-        classpath 'com.cloudcare.ft.mobile.sdk.tracker.plugin:ft-plugin:1.2.2-beta01'
+        classpath 'com.cloudcare.ft.mobile.sdk.tracker.plugin:ft-plugin:1.2.2-alpha02'
 //        classpath 'com.guardsquare:proguard-gradle:7.1.0'
 //        classpath files('ft-plugin/build/libs/ft-plugin-1.2.2-beta02.jar')
 
