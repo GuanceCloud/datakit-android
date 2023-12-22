@@ -53,7 +53,7 @@ public class RUMClickActionTest extends BaseTest {
         stopSyncTask();
 
         FTSDKConfig ftSDKConfig = FTSDKConfig
-                .builder(BuildConfig.ACCESS_SERVER_URL)
+                .builder(BuildConfig.DATAKIT_URL)
                 .setDebug(true)//设置是否是 debug
                 .setEnv(EnvType.GRAY);
         FTSdk.install(ftSDKConfig);

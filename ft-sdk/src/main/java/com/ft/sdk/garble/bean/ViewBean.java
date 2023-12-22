@@ -29,7 +29,7 @@ public class ViewBean {
     /**
      * View 唯一ID， {@link Constants#KEY_RUM_VIEW_ID}
      */
-    String id = UUID.randomUUID().toString();
+    String id = Utils.randomUUID();
     /**
      * 页面来源，页面的父级，{@link Constants#KEY_RUM_VIEW_REFERRER}
      */

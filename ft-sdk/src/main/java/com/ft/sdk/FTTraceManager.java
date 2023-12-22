@@ -64,7 +64,7 @@ public class FTTraceManager {
      */
     public HashMap<String, String> getTraceHeader(String key, String urlString) throws MalformedURLException, URISyntaxException {
         URL url = Utils.parseFromUrl(urlString);
-        return getTraceHeader(key, new HttpUrl(url.getHost(), url.getPath(), url.getPort(), urlString));
+        return getTraceHeader(key, new HttpUrl(url.getHost(), url.getPath(), url.getPort()));
     }
 
     /**
@@ -76,7 +76,7 @@ public class FTTraceManager {
      */
     public HashMap<String, String> getTraceHeader(String urlString) throws MalformedURLException, URISyntaxException {
         URL url = Utils.parseFromUrl(urlString);
-        return getTraceHeader( new HttpUrl(url.getHost(), url.getPath(), url.getPort(), urlString));
+        return getTraceHeader( new HttpUrl(url.getHost(), url.getPath(), url.getPort()));
     }
 
     FTTraceHandler getHandler(String key) {

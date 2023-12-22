@@ -9,17 +9,16 @@ public class HttpUrl {
     private final String host;
     private final String path;
     private final int port;
-    private final String holeUrl;
 
-    public HttpUrl(String host, String path, int port, String holeUrl) {
+    public HttpUrl(String host, String path, int port) {
         this.host = host;
         this.path = path;
         this.port = port;
-        this.holeUrl = holeUrl;
     }
 
     /**
      * url host
+     *
      * @return
      */
     public String getHost() {
@@ -29,6 +28,7 @@ public class HttpUrl {
 
     /**
      * url path
+     *
      * @return
      */
     public String getPath() {
@@ -38,6 +38,7 @@ public class HttpUrl {
 
     /**
      * 地址端口
+     *
      * @return
      */
     public int getPort() {
@@ -45,7 +46,4 @@ public class HttpUrl {
     }
 
 
-    public String getHoleUrl() {
-        return holeUrl;
-    }
 }

@@ -39,6 +39,7 @@ import okhttp3.Request;
  */
 @RunWith(AndroidJUnit4.class)
 public class TraceHeaderTest extends BaseTest {
+    private static  final  String TEST_URL ="https://www.guance.com";
 
     @Rule
     public ActivityScenarioRule<DebugMainActivity> rule = new ActivityScenarioRule<>(DebugMainActivity.class);
@@ -50,7 +51,7 @@ public class TraceHeaderTest extends BaseTest {
             hasPrepare = true;
         }
         FTSDKConfig ftsdkConfig = FTSDKConfig
-                .builder(BuildConfig.ACCESS_SERVER_URL);
+                .builder(BuildConfig.DATAKIT_URL);
         FTSdk.install(ftsdkConfig);
         FTSdk.initTraceWithConfig(new FTTraceConfig().setEnableLinkRUMData(false));
 
@@ -62,7 +63,7 @@ public class TraceHeaderTest extends BaseTest {
     @Test
     public void traceZipKinMultiHeaderTest() {
         FTSdk.initTraceWithConfig(new FTTraceConfig().setEnableAutoTrace(true).setTraceType(TraceType.ZIPKIN_MULTI_HEADER));
-        Request request = okhttpRequestUrl("http://www.weather.com.cn/data/sk/101010100.html");
+        Request request = okhttpRequestUrl(TEST_URL);
         boolean expect = request.headers().names().contains(ZIPKIN_SPAN_ID) &&
                 request.headers().names().contains(ZIPKIN_TRACE_ID) &&
                 request.headers().names().contains(ZIPKIN_SAMPLED);
@@ -75,7 +76,7 @@ public class TraceHeaderTest extends BaseTest {
     @Test
     public void traceZipKinSingleHeaderTest() {
         FTSdk.initTraceWithConfig(new FTTraceConfig().setEnableAutoTrace(true).setTraceType(TraceType.ZIPKIN_SINGLE_HEADER));
-        Request request = okhttpRequestUrl("http://www.weather.com.cn/data/sk/101010100.html");
+        Request request = okhttpRequestUrl(TEST_URL);
         boolean expect = request.headers().names().contains(ZIPKIN_B3_HEADER);
         Assert.assertTrue(expect);
     }
@@ -88,7 +89,7 @@ public class TraceHeaderTest extends BaseTest {
         FTSdk.initTraceWithConfig(new FTTraceConfig()
                 .setEnableAutoTrace(true)
                 .setTraceType(TraceType.JAEGER));
-        Request request = okhttpRequestUrl("http://www.weather.com.cn/data/sk/101010100.html");
+        Request request = okhttpRequestUrl(TEST_URL);
         boolean expect = request.headers().names().contains(JAEGER_KEY);
         Assert.assertTrue(expect);
     }
@@ -101,7 +102,7 @@ public class TraceHeaderTest extends BaseTest {
         FTSdk.initTraceWithConfig(new FTTraceConfig()
                 .setEnableAutoTrace(true)
                 .setTraceType(TraceType.DDTRACE));
-        Request request = okhttpRequestUrl("http://www.weather.com.cn/data/sk/101010100.html");
+        Request request = okhttpRequestUrl(TEST_URL);
         boolean expect = request.headers().names().contains(DD_TRACE_TRACE_ID_KEY);
         Assert.assertTrue(expect);
     }
@@ -114,7 +115,7 @@ public class TraceHeaderTest extends BaseTest {
         FTSdk.initTraceWithConfig(new FTTraceConfig()
                 .setEnableAutoTrace(true)
                 .setTraceType(TraceType.SKYWALKING));
-        Request request = okhttpRequestUrl("http://www.weather.com.cn/data/sk/101010100.html");
+        Request request = okhttpRequestUrl(TEST_URL);
         boolean expect = request.headers().names().contains(SKYWALKING_V3_SW_8);
         Assert.assertTrue(expect);
     }
@@ -127,7 +128,7 @@ public class TraceHeaderTest extends BaseTest {
         FTSdk.initTraceWithConfig(new FTTraceConfig()
                 .setEnableAutoTrace(true)
                 .setTraceType(TraceType.TRACEPARENT));
-        Request request = okhttpRequestUrl("http://www.weather.com.cn/data/sk/101010100.html");
+        Request request = okhttpRequestUrl(TEST_URL);
         boolean expect = request.headers().names().contains(W3C_TRACEPARENT_KEY);
         Assert.assertTrue(expect);
     }

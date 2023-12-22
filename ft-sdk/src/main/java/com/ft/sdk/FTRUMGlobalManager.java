@@ -187,6 +187,23 @@ public class FTRUMGlobalManager {
         }
     }
 
+    /**
+     * 添加错误
+     *
+     * @param log       日志
+     * @param message   消息
+     * @param errorType 错误类型
+     * @param state     程序运行状态
+     * @param dateline  发生时间，纳秒
+     */
+    public void addError(String log, String message, long dateline, ErrorType errorType,
+                         AppState state) {
+        if (innerManager != null) {
+            innerManager.addError(log, message, dateline, errorType, state);
+        }
+
+    }
+
 
     /**
      * 添加错误信息
@@ -258,6 +275,20 @@ public class FTRUMGlobalManager {
      */
     public void addResource(String resourceId, ResourceParams params, NetStatusBean netStatusBean) {
         if (innerManager != null) {
+            if (Utils.isNullOrEmpty(params.requestHeader)) {
+                params.requestHeader = Utils.convertToHttpRawData(params.requestHeaderMap);
+            }
+            if (Utils.isNullOrEmpty(params.responseHeader)) {
+                params.responseHeader = Utils.convertToHttpRawData(params.responseHeaderMap);
+            }
+
+            if (params.responseContentLength <= 0) {
+                if (params.responseBody == null) {
+                    params.responseBody = "";
+                }
+                params.responseContentLength = params.responseBody.length() + params.responseHeader.length();
+            }
+
             innerManager.addResource(resourceId, params, netStatusBean);
         }
     }

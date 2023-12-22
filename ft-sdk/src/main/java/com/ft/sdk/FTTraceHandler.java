@@ -76,7 +76,7 @@ public class FTTraceHandler {
         if (config.getTraceType() == TraceType.ZIPKIN_MULTI_HEADER
                 || config.getTraceType() == TraceType.ZIPKIN_SINGLE_HEADER
                 || config.getTraceType() == TraceType.JAEGER || config.getTraceType() == TraceType.TRACEPARENT) {
-            traceID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
+            traceID = Utils.randomUUID().toLowerCase();
             spanID = Utils.getGUID_16();
         } else if (config.getTraceType() == TraceType.DDTRACE) {
             traceID = Utils.getDDtraceNewId() + "";

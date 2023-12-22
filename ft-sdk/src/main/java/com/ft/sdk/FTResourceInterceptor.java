@@ -34,7 +34,6 @@ public class FTResourceInterceptor implements Interceptor {
      * 拦截 Okhttp 的 Request 和 Response ，
      * 通过 {@link #onRequest(Request, HashMap)}{@link  #onResponse(Response, HashMap)} 中 extraData
      * 追加自定义采集的数据
-     *
      */
     public abstract static class ContentHandlerHelper {
 
@@ -59,7 +58,7 @@ public class FTResourceInterceptor implements Interceptor {
         /**
          * 返回网络链接过程中的异常
          *
-         * @param e 请求发生的 IOException 数据
+         * @param e         请求发生的 IOException 数据
          * @param extraData 附加数据
          */
         public abstract void onException(Exception e, HashMap<String, Object> extraData);
@@ -109,7 +108,11 @@ public class FTResourceInterceptor implements Interceptor {
             }
 
         } catch (IOException e) {
-            exception = e;
+            if (isInTakeUrl) {
+                throw new IOException(e);
+            } else {
+                exception = e;
+            }
         }
 
         String resourceId = Utils.identifyRequest(request);

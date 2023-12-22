@@ -1,14 +1,11 @@
 package com.ft.sdk.garble.http;
 
-import android.util.Log;
-
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
-import java.lang.reflect.Constructor;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,17 +22,17 @@ public class NetProxy {
     /**
      * SDK 中网络的配置
      */
-    FTHttpConfigManager ftHttpConfig = FTHttpConfigManager.get();
+    private final FTHttpConfigManager ftHttpConfig = FTHttpConfigManager.get();
     /**
      * 内容类型
      */
-    final String CONTENT_TYPE = "text/plain";
+    private static final String CONTENT_TYPE = "text/plain";
     /**
      * 字符编码
      */
-    final String CHARSET = "UTF-8";
+    private static final String CHARSET = "UTF-8";
     private final HttpBuilder httpBuilder;
-    INetEngine engine;
+    private final INetEngine engine;
 
     public NetProxy(HttpBuilder httpBuilder) {
         this.httpBuilder = httpBuilder;
@@ -47,56 +44,25 @@ public class NetProxy {
         }
     }
 
-    public <T extends ResponseData> T execute(Class<T> tClass) {
+    /**
+     * 执行网络请求
+     *
+     * @return
+     */
+    public FTResponseData execute() {
         if (!Utils.isNetworkAvailable()) {
-            return getResponseData(tClass, NetCodeStatus.NETWORK_EXCEPTION_CODE, "网络未连接");
+            return new FTResponseData(NetCodeStatus.NETWORK_EXCEPTION_CODE, "网络未连接");
         }
         if (!httpBuilder.getUrl().startsWith("http://") && !httpBuilder.getUrl().startsWith("https://")) {
             //请求地址为空是提示错误
-            return getResponseData(tClass, NetCodeStatus.UNKNOWN_EXCEPTION_CODE, "请求地址错误");
+            return new FTResponseData(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, "请求地址错误");
         }
         if (httpBuilder.isUseDefaultHead()) {
             //设置特有的请求头
             setHeadParams();
         }
         engine.createRequest(httpBuilder);
-        ResponseData responseData = engine.execute();
-        if (responseData != null) {
-            if (httpBuilder.isShowLog()) {
-                LogUtils.d(TAG, "HTTP-response:[code:" + responseData.getHttpCode() + ",response:" + responseData.getData() + "]");
-            }
-            return getResponseData(tClass, responseData.getHttpCode(), responseData.getData());
-        } else {
-            return getResponseData(tClass, NetCodeStatus.UNKNOWN_EXCEPTION_CODE, "");
-        }
-    }
-
-    /**
-     * 构建网络请求返回对象
-     *
-     * @param tClass
-     * @param code
-     * @param message
-     * @param <T>
-     * @return
-     */
-    private <T extends ResponseData> T getResponseData(Class<T> tClass, int code, String message) {
-        Constructor[] constructor = tClass.getConstructors();
-        for (Constructor<T> con : constructor) {
-            Class[] classes = con.getParameterTypes();
-            if (classes.length == 2) {
-                if (classes[0].getName().equals(int.class.getName()) &&
-                        classes[1].getName().equals(String.class.getName())) {
-                    try {
-                        return con.newInstance(code, message);
-                    } catch (Exception e) {
-                        LogUtils.e(TAG, Log.getStackTraceString(e));
-
-                    }
-                }
-            }
-        }
-        return null;
+        return engine.execute();
     }
 
     /**
@@ -117,7 +83,6 @@ public class NetProxy {
         if (head == null) {
             head = new HashMap<>();
         }
-//        head.put("X-Datakit-UUID", ftHttpConfig.uuid);
         head.put("User-Agent", ftHttpConfig.userAgent +
                 ";agent_" + FTSdk.AGENT_VERSION +
                 ";autotrack_" + FTSdk.PLUGIN_VERSION +
@@ -130,11 +95,6 @@ public class NetProxy {
         head.put("charset", CHARSET);
         //添加日期请求头
         head.put("Date", calculateDate());
-//        如果开启了签名，添加签名信息
-//        if (ftHttpConfig.enableRequestSigning) {
-//            String akId = ftHttpConfig.akId;
-//            head.put("Authorization", "DWAY " + akId + ":" + getSignature());
-//        }
         httpBuilder.setHeadParams(head);
     }
 }

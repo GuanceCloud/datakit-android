@@ -68,7 +68,7 @@ public class ServerConnectTest extends BaseTest {
      */
     @Test
     public void normalUrl() throws Exception {
-        urlParamTest(BuildConfig.ACCESS_SERVER_URL, 200);
+        urlParamTest(BuildConfig.DATAKIT_URL, 200);
     }
 
     /**

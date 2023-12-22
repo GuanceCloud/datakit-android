@@ -30,7 +30,7 @@ public class ConstantCheckTest extends BaseTest {
             hasPrepare = true;
         }
         FTSDKConfig ftsdkConfig = FTSDKConfig
-                .builder(BuildConfig.ACCESS_SERVER_URL);
+                .builder(BuildConfig.DATAKIT_URL);
         FTSdk.install(ftsdkConfig);
 
         FTSdk.initRUMWithConfig(new FTRUMConfig());

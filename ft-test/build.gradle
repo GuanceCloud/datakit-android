@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         minSdk 21
-        targetSdk 33
+        targetSdk 34
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -27,7 +27,7 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.test:runner:1.4.0'
+    implementation 'androidx.test:runner:1.5.2'
     api 'org.powermock:powermock-module-junit4:2.0.7'
     compileOnly 'com.squareup.okhttp3:okhttp:4.5.0'
     compileOnly project(":ft-sdk")

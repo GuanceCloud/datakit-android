@@ -31,6 +31,7 @@ public class FTResourceEventListener extends EventListener {
 
     private String requestHost = null;
     private long fetchStartTime = -1;
+    private long requestStartTime = -1;
     private long responseStartTime = -1;
     private long responseEndTime = -1;
     private long dnsEndTime = -1;
@@ -82,6 +83,12 @@ public class FTResourceEventListener extends EventListener {
     public void responseBodyStart(Call call) {
         super.responseBodyStart(call);
         LogUtils.d(TAG, "responseBodyStart:" + resourceId);
+    }
+
+    @Override
+    public void requestHeadersStart(@NonNull Call call) {
+        super.requestHeadersStart(call);
+        requestStartTime = Utils.getCurrentNanoTime();
     }
 
     @Override
@@ -156,6 +163,7 @@ public class FTResourceEventListener extends EventListener {
         netStatusBean.sslStartTime = sslStartTime;
         netStatusBean.tcpStartTime = tcpStartTime;
         netStatusBean.tcpEndTime = tcpEndTime;
+        netStatusBean.requestStartTime = requestStartTime;
         FTRUMInnerManager.get().setNetState(this.resourceId, netStatusBean);
     }
 

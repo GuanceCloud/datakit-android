@@ -15,7 +15,17 @@ public class FTSDKConfig {
     /**
      * datakit 数据写入地址
      */
-    private final String metricsUrl;
+    private final String datakitUrl;
+
+    /**
+     * dataway 数据写入地址
+     */
+    private final String datawayUrl;
+
+    /**
+     *
+     */
+    private final String clientToken;
     /**
      * 是否开启 Debug
      */
@@ -30,6 +40,11 @@ public class FTSDKConfig {
      * 应用服务名
      */
     private String serviceName = Constants.DEFAULT_SERVICE_NAME;
+
+    /**
+     * 数据同步最大重复尝试次数
+     */
+    private int dataSyncRetryCount = SyncTaskManager.MAX_ERROR_COUNT;
 
     /**
      * 数据上传环境
@@ -51,21 +66,45 @@ public class FTSDKConfig {
     /**
      * 构建 SDK 必要的配置参数
      *
-     * @param metricsUrl 服务器地址
+     * @param datakitUrl datakit 上传地址
      * @return {@link FTRUMConfig} SDK 配置
      */
-    public static FTSDKConfig builder(String metricsUrl) {
-        return new FTSDKConfig(metricsUrl);
+    public static FTSDKConfig builder(String datakitUrl) {
+        return new FTSDKConfig(datakitUrl);
     }
 
+    /**
+     * 构建 SDK 必要的配置参数
+     *
+     * @param datawayUrl dataway 上传地址
+     * @param clientToken token
+     * @return {@link FTRUMConfig} SDK 配置
+     */
+    public static FTSDKConfig builder(String datawayUrl, String clientToken) {
+        return new FTSDKConfig(datawayUrl, clientToken);
+    }
 
     /**
      * SDK 配置项构造方法
      *
-     * @param metricsUrl datakit 上传地址
+     * @param datakitUrl datakit 上传地址
      */
-    private FTSDKConfig(String metricsUrl) {
-        this.metricsUrl = metricsUrl;
+    private FTSDKConfig(String datakitUrl) {
+        this.datakitUrl = datakitUrl;
+        this.datawayUrl = "";
+        this.clientToken = "";
+    }
+
+    /**
+     * SDK 配置项构造方法, 直传 dataway 配置
+     *
+     * @param datawayUrl  dataway
+     * @param clientToken data
+     */
+    private FTSDKConfig(String datawayUrl, String clientToken) {
+        this.datawayUrl = datawayUrl;
+        this.clientToken = clientToken;
+        this.datakitUrl = "";
     }
 
     /**
@@ -73,8 +112,26 @@ public class FTSDKConfig {
      *
      * @return
      */
-    public String getMetricsUrl() {
-        return metricsUrl;
+    public String getDatakitUrl() {
+        return datakitUrl;
+    }
+
+    /**
+     * 获取 dataway 上传地址
+     *
+     * @return
+     */
+    public String getDatawayUrl() {
+        return datawayUrl;
+    }
+
+    /**
+     * 获取 dataway 使用 token
+     *
+     * @return
+     */
+    public String getClientToken() {
+        return clientToken;
     }
 
 
@@ -193,10 +250,29 @@ public class FTSDKConfig {
         return serviceName;
     }
 
+    /**
+     * 设置应用服务名
+     * @param serviceName 服务名
+     * @return
+     */
     public FTSDKConfig setServiceName(String serviceName) {
         if (serviceName != null && !serviceName.isEmpty()) {
             this.serviceName = serviceName;
         }
+        return this;
+    }
+
+    public int getDataSyncRetryCount() {
+        return dataSyncRetryCount;
+    }
+
+    /**
+     * 设置最大同步重试次数，最小 0，最大 5，设置为 0，如果数据传输发生错误将直接丢弃
+     * @param dataSyncRetryCount 重试次数，
+     * @return
+     */
+    public FTSDKConfig setDataSyncRetryCount(int dataSyncRetryCount) {
+        this.dataSyncRetryCount = Math.max(0, Math.min(SyncTaskManager.MAX_ERROR_COUNT, dataSyncRetryCount));
         return this;
     }
 }

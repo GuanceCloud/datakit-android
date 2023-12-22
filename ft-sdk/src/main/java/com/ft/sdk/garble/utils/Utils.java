@@ -42,9 +42,12 @@ import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 
 import okhttp3.MediaType;
 import okhttp3.Request;
@@ -200,6 +203,15 @@ public class Utils {
     }
 
     /**
+     * 获取 uuid
+     *
+     * @return
+     */
+    public static String randomUUID() {
+        return UUID.randomUUID().toString().replace("-", "");
+    }
+
+    /**
      * 获取 64 位随机数
      *
      * @return
@@ -304,6 +316,11 @@ public class Utils {
      * @return
      */
     public static boolean enableTraceSamplingRate(float sampleRate) {
+        if (sampleRate <= 0) {
+            return false;
+        } else if (sampleRate >= 1) {
+            return true;
+        }
         return generateRandomNumber() <= sampleRate * 100;
     }
 
@@ -312,9 +329,9 @@ public class Utils {
      *
      * @return
      */
-    public static double generateRandomNumber() {
+    public static float generateRandomNumber() {
         Random random = new Random();
-        return Math.floor(random.nextDouble() * 100);
+        return random.nextFloat() * 100;
     }
 
     /**
@@ -485,6 +502,36 @@ public class Utils {
         int len;
         byte[] buffer = new byte[4096];
         while ((len = inputStream.read(buffer)) != -1) outputStream.write(buffer, 0, len);
+    }
+
+    /**
+     * 转化 http header raw 数据
+     *
+     * @param httpHeader
+     * @return
+     */
+    public static String convertToHttpRawData(HashMap<String, List<String>> httpHeader) {
+        if (httpHeader == null) {
+            return "";
+        }
+        StringBuilder rawData = new StringBuilder();
+
+        for (Map.Entry<String, List<String>> entry : httpHeader.entrySet()) {
+            String key = entry.getKey();
+            List<String> values = entry.getValue();
+
+            // 添加每个键值对到HTTP原始数据
+            rawData.append(key).append(": ");
+
+            for (int i = 0; i < values.size(); i++) {
+                rawData.append(values.get(i));
+                if (i < values.size() - 1) {
+                    rawData.append(", ");
+                }
+            }
+            rawData.append("\r\n");
+        }
+        return rawData.toString();
     }
 }
 

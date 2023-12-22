@@ -11,6 +11,10 @@ import com.ft.sdk.garble.utils.PackageUtils;
 public class EngineFactory {
     public static final String TAG = Constants.LOG_TAG_PREFIX + "EngineFactory";
 
+    /**
+     * 创建同步引擎对象
+     * @return
+     */
     public static INetEngine createEngine() {
         //如果监测到 okhttp 依赖库就是用 Okhttp
         if (PackageUtils.isOKHttp3Support()) {

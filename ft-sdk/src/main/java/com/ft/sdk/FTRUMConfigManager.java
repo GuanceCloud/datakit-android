@@ -21,7 +21,6 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * @author Brandon
@@ -131,7 +130,7 @@ public class FTRUMConfigManager {
 
 
     public void createNewRandomUserId() {
-        randomUserId = "ft.rd_" + UUID.randomUUID().toString();
+        randomUserId = "ft.rd_" + Utils.randomUUID();
         SharedPreferences sp = Utils.getSharedPreferences(FTApplication.getApplication());
         sp.edit().putString(Constants.FT_RANDOM_USER_ID, randomUserId).apply();
     }

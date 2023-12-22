@@ -1,3 +1,18 @@
+# agent 1.3.17-alpha05
+1.优化日志输出
+2.add Resource 空指针数据处理
+
+---
+# agent 1.3.17-alpha04
+1.优化重试机制
+2.新增 addResource header map 支持
+
+---
+# agent 1.3.17-alpha03
+1.添加数据同步最大同步次数
+2.添加内部日志接管对象
+
+---
 # agent 1.3.17-beta01
 1.同 agent 1.3.17-alpha01，agent 1.3.17-alpha02
 2.新增自定义 TraceHeader

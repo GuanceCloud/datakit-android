@@ -11,11 +11,6 @@ import com.ft.sdk.garble.bean.LineProtocolBean;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
-import com.ft.sdk.garble.http.HttpBuilder;
-import com.ft.sdk.garble.http.NetCodeStatus;
-import com.ft.sdk.garble.http.RequestMethod;
-import com.ft.sdk.garble.http.ResponseData;
-import com.ft.sdk.garble.manager.AsyncCallback;
 import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -23,7 +18,6 @@ import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONObject;
 
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,8 +68,10 @@ public class FTTrackInner {
      * @param fields
      */
     void rumWebView(long time, String measurement, final JSONObject tags, JSONObject fields) {
-        syncDataBackground(DataType.RUM_WEBVIEW, time, measurement, tags, fields);
-
+        String sessionId = tags.optString(Constants.KEY_RUM_SESSION_ID);
+        if (FTRUMInnerManager.get().checkSessionWillCollect(sessionId)) {
+            syncDataBackground(DataType.RUM_WEBVIEW, time, measurement, tags, fields);
+        }
     }
 
     private void syncDataBackground(final DataType dataType, final long time,
@@ -88,7 +84,7 @@ public class FTTrackInner {
                     SyncJsonData recordData = SyncJsonData.getSyncJsonData(dataType,
                             new LineProtocolBean(measurement, tags, fields, time));
                     boolean result = FTDBManager.get().insertFtOperation(recordData);
-                    LogUtils.d(TAG, "syncDataBackground:" + dataType.toString() + ":insert-result=" + result);
+                    LogUtils.d(TAG, "syncDataBackground:" + measurement + "," + dataType.toString() + ":insert=" + result);
                     SyncTaskManager.get().executeSyncPoll();
                 } catch (Exception e) {
                     LogUtils.e(TAG, Log.getStackTraceString(e));
@@ -99,75 +95,16 @@ public class FTTrackInner {
 
 
     /**
-     * 在子线程中将埋点数据同步(不经过数据库)
-     * inovke by test Case
+     * 将单条日志数据存入本地同步
      *
-     * @param trackBeans
-     * @param callback
+     * @param logBean
+     * @param isSilence 是否立即触发同步
      */
-    void trackAsync(@NonNull final List<LineProtocolBean> trackBeans, final AsyncCallback callback) {
-        DataUploaderThreadPool.get().execute(new Runnable() {
-            @Override
-            public void run() {
-                List<SyncJsonData> recordDataList = new ArrayList<>();
-                for (LineProtocolBean t : trackBeans) {
-                    try {
-                        SyncJsonData recordData = SyncJsonData.getSyncJsonData(DataType.RUM_APP,
-                                new LineProtocolBean(t.getMeasurement(), t.getTags(),
-                                        t.getFields(), t.getTimeNano()));
-                        recordDataList.add(recordData);
-                        FTTrackInner.this.uploadTrackOPData(recordDataList, callback);
-                    } catch (Exception e) {
-                        if (callback != null) {
-                            if (e instanceof InvalidParameterException) {
-                                callback.onResponse(NetCodeStatus.INVALID_PARAMS_EXCEPTION_CODE, e.getMessage());
-                            } else {
-                                callback.onResponse(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, e.getMessage());
-                            }
-                        }
-                        LogUtils.e(TAG, Log.getStackTraceString(e));
-                    }
-                }
-            }
-        });
+    void logBackground(@NonNull LogBean logBean, boolean isSilence) {
+        ArrayList<BaseContentBean> list = new ArrayList<>();
+        list.add(logBean);
+        batchLogBeanBackground(list, isSilence);
     }
-
-
-    /**
-     * 同步上传用户埋点信息，并返回上传结果
-     *
-     * @param recordDataList
-     * @param callback
-     */
-    private void uploadTrackOPData(List<SyncJsonData> recordDataList, AsyncCallback callback) {
-        if (recordDataList == null || recordDataList.isEmpty()) {
-            return;
-        }
-        SyncDataHelper syncData = new SyncDataHelper();
-        String body = syncData.getBodyContent(DataType.LOG, recordDataList);
-        String model = Constants.URL_MODEL_LOG;
-        String content_type = "text/plain";
-        ResponseData result = HttpBuilder.Builder()
-                .setModel(model)
-                .addHeadParam("Content-Type", content_type)
-                .setMethod(RequestMethod.POST)
-                .setBodyString(body).executeSync(ResponseData.class);
-        if (callback != null) {
-            callback.onResponse(result.getHttpCode(), result.getData());
-        }
-    }
-
-//    /**
-//     * 将单条日志数据存入本地同步
-//     *
-//     * @param logBean
-//     */
-//    void traceBackground(@NonNull BaseContentBean logBean) {
-//        ArrayList<BaseContentBean> list = new ArrayList<>();
-//        list.add(logBean);
-//        batchTraceBeanBackground(list);
-//    }
-
 
     /**
      * 将单条日志数据存入本地同步
@@ -175,9 +112,7 @@ public class FTTrackInner {
      * @param logBean
      */
     void logBackground(@NonNull LogBean logBean) {
-        ArrayList<BaseContentBean> list = new ArrayList<>();
-        list.add(logBean);
-        batchLogBeanBackground(list);
+        logBackground(logBean, false);
     }
 
     /**
@@ -185,7 +120,7 @@ public class FTTrackInner {
      *
      * @param logBeans
      */
-    void batchLogBeanBackground(@NonNull List<BaseContentBean> logBeans) {
+    void batchLogBeanBackground(@NonNull List<BaseContentBean> logBeans, boolean isSilence) {
         try {
             FTLoggerConfig config = FTLoggerConfigManager.get().getConfig();
             if (config == null) return;
@@ -203,13 +138,15 @@ public class FTTrackInner {
                             logBean.appendTags(rumTags);
                         }
                         datas.add(SyncJsonData.getFromLogBean(logBean, DataType.LOG));
+                    } else {
+                        LogUtils.d(TAG, "根据 FTLogConfig SampleRate 计算，将被丢弃=>" + logBean.getContent());
                     }
                 } catch (Exception e) {
                     LogUtils.e(TAG, Log.getStackTraceString(e));
                 }
 
             }
-            judgeLogCachePolicy(datas);
+            judgeLogCachePolicy(datas, isSilence);
         } catch (Exception e) {
             LogUtils.e(TAG, Log.getStackTraceString(e));
         }
@@ -238,7 +175,7 @@ public class FTTrackInner {
      *
      * @param recordDataList {@link  SyncJsonData} 列表
      */
-    private void judgeLogCachePolicy(@NonNull List<SyncJsonData> recordDataList) {
+    private void judgeLogCachePolicy(@NonNull List<SyncJsonData> recordDataList, boolean silence) {
         //如果 OP 类型不等于 LOG 则直接进行数据库操作；否则执行同步策略，根据同步策略返回结果判断是否需要执行数据库操作
         int length = recordDataList.size();
         int policyStatus = FTDBCachePolicy.get().optLogCachePolicy(length);
@@ -250,7 +187,9 @@ public class FTTrackInner {
             }
             boolean result = FTDBManager.get().insertFtOptList(recordDataList);
             LogUtils.d(TAG, "judgeLogCachePolicy:insert-result=" + result);
-            SyncTaskManager.get().executeSyncPoll();
+            if (!silence) {
+                SyncTaskManager.get().executeSyncPoll();
+            }
         }
     }
 

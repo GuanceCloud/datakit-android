@@ -13,7 +13,6 @@ import com.ft.BuildConfig;
 import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
-import com.ft.sdk.SyncTaskManager;
 import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.Status;
@@ -45,7 +44,7 @@ public class ConsoleLogTest extends BaseTest {
         }
         stopSyncTask();
         FTSDKConfig ftsdkConfig = FTSDKConfig
-                .builder(BuildConfig.ACCESS_SERVER_URL);
+                .builder(BuildConfig.DATAKIT_URL);
         FTSdk.install(ftsdkConfig);
 
     }

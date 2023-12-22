@@ -7,21 +7,6 @@ import java.util.Collection;
  * @author Brandon
  */
 public class StringUtils {
-    public static <E extends String> String arrayToSeparateString(Collection<? extends E> list, String seperater) {
-        if (list.size() > 0) {
-            StringBuilder nameBuilder = new StringBuilder();
-
-            for (String item : list) {
-                nameBuilder.append(item).append(",");
-            }
-
-            nameBuilder.deleteCharAt(nameBuilder.length() - 1);
-
-            return nameBuilder.toString();
-        } else {
-            return "";
-        }
-    }
 
 
     /**

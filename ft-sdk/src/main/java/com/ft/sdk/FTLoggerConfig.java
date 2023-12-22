@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.TrackLog;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -107,7 +108,7 @@ public class FTLoggerConfig {
      * @return
      */
     public boolean isEnableConsoleLog() {
-        return enableConsoleLog;
+        return !TrackLog.isSetInnerLogHandler() && enableConsoleLog;
     }
 
     /**
@@ -198,7 +199,7 @@ public class FTLoggerConfig {
      * @return
      */
     public boolean isPrintCustomLogToConsole() {
-        return printCustomLogToConsole;
+        return !TrackLog.isSetInnerLogHandler() && printCustomLogToConsole;
     }
 
     /**

@@ -27,8 +27,8 @@ public class SkyWalkingUtils {
      * 自增整型
      */
     private final static AtomicLong increasingLong = new AtomicLong(0);
-    private final static String traceIDUUID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
-    private final static String parentServiceUUID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
+    private final static String traceIDUUID = Utils.randomUUID().toLowerCase();
+    private final static String parentServiceUUID = Utils.randomUUID().toLowerCase();
     private String sw8;
     private String newTraceId;
     private String newParentTraceId;
@@ -78,7 +78,7 @@ public class SkyWalkingUtils {
                 Utils.encodeStringToBase64(newTraceId) + "-" +
                 Utils.encodeStringToBase64(newParentTraceId) + "-" +
                 "0-" +
-                Utils.encodeStringToBase64(Constants.DEFAULT_SERVICE_NAME + "") + "-" +
+                Utils.encodeStringToBase64(Constants.DEFAULT_SERVICE_NAME) + "-" +
                 Utils.encodeStringToBase64(parentServiceUUID + "@" + NetUtils.getMobileIpAddress()) + "-" +
                 Utils.encodeStringToBase64(url.getPath()) + "-" +
                 Utils.encodeStringToBase64(url.getHost() + ":" + url.getPort());

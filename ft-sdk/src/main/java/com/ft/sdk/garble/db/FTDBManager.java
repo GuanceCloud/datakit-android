@@ -347,9 +347,6 @@ public class FTDBManager extends DBManager {
                         bean.setStartTime(startTime);
                         bean.setFromAttrJsonString(attr);
                         list.add(bean);
-                        LogUtils.d(TAG, bean.toString());
-
-
                     }
                     cursor.close();
                 } catch (Exception e) {
@@ -408,7 +405,6 @@ public class FTDBManager extends DBManager {
                         viewBean.setFromAttrJsonString(attr);
 
                         list.add(viewBean);
-                        LogUtils.d(TAG, viewBean.toString());
                     }
                     cursor.close();
                 } catch (Exception e) {

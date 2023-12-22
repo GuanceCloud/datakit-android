@@ -104,17 +104,6 @@ public class SyncDataHelper {
 
     /**
      * 转化为行协议数据
-     * invoke by Test case
-     *
-     * @param datas
-     * @return
-     */
-    private String convertToLineProtocolLines(List<SyncJsonData> datas) {
-        return convertToLineProtocolLines(datas, null);
-    }
-
-    /**
-     * 转化为行协议数据
      *
      * @param datas
      * @param extraTags
@@ -147,6 +136,7 @@ public class SyncDataHelper {
                             }
                         }
                     }
+                    tags.put(Constants.KEY_SDK_DATA_FLAG, Utils.randomUUID());
                     StringBuilder tagSb = getCustomHash(tags, true);
                     deleteLastComma(tagSb);
                     if (tagSb.length() > 0) {

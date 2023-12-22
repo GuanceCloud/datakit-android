@@ -15,7 +15,7 @@ import java.net.HttpURLConnection;
  * DATE:2019-12-16 16:15
  * Description:
  */
-public class FTResponseData extends ResponseData {
+public class FTResponseData {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "FTResponseData";
     /**
      * http code
@@ -30,26 +30,30 @@ public class FTResponseData extends ResponseData {
      */
     private String message;
 
-    public FTResponseData(int httpCode, String data) {
-        super(httpCode, data);
-        if (httpCode == HttpURLConnection.HTTP_OK) {
-            code = httpCode;
+    public FTResponseData(int code, String data) {
+        if (code == HttpURLConnection.HTTP_OK) {
+            this.code = code;
+            message = data;
         } else {
-            try {
-                if (data != null) {
-                    JSONObject jsonObject = new JSONObject(data);
-                    code = jsonObject.optInt("code", httpCode);
-                    errorCode = jsonObject.optString("errorCode");
-                    message = jsonObject.optString("message");
+            if (code < NetCodeStatus.NETWORK_EXCEPTION_CODE) {
+                try {
+                    if (data != null) {
+                        JSONObject jsonObject = new JSONObject(data);
+                        this.code = jsonObject.optInt("code", code);
+                        errorCode = jsonObject.optString("errorCode");
+                        message = jsonObject.optString("message");
+                    }
+                } catch (JSONException e) {
+                    this.code = NetCodeStatus.NET_STATUS_RESPONSE_NOT_JSON;
+                    errorCode = NetCodeStatus.NET_STATUS_RESPONSE_NOT_JSON_ERR;
+                    message = data;
+                } catch (Exception e) {
+                    LogUtils.e(TAG, Log.getStackTraceString(e));
                 }
-            } catch (JSONException e) {
-                code = NetCodeStatus.NET_STATUS_RESPONSE_NOT_JSON;
-                errorCode = NetCodeStatus.NET_STATUS_RESPONSE_NOT_JSON_ERR;
+            } else {
+                this.code = code;
                 message = data;
-            } catch (Exception e) {
-                LogUtils.e(TAG, Log.getStackTraceString(e));
             }
-
         }
     }
 

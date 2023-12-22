@@ -51,12 +51,22 @@ public class NativeNetEngine implements INetEngine {
      */
     private int responseCode = NetCodeStatus.UNKNOWN_EXCEPTION_CODE;
 
+    /**
+     * {@link INetEngine#defaultConfig(HttpBuilder)}
+     *
+     * @param httpBuilder
+     */
     @Override
     public void defaultConfig(HttpBuilder httpBuilder) {
         this.mHttpBuilder = httpBuilder;
 
     }
 
+    /**
+     * {@link INetEngine#createRequest(HttpBuilder)} }
+     *
+     * @param httpBuilder
+     */
     @Override
     public void createRequest(HttpBuilder httpBuilder) {
         openConnection();
@@ -117,26 +127,22 @@ public class NativeNetEngine implements INetEngine {
     }
 
     @Override
-    public ResponseData execute() {
+    public FTResponseData execute() {
         try {
             return request();
         } catch (Exception e) {
             LogUtils.e(TAG, e.getMessage());
-            return getResponseData(UNKNOWN_EXCEPTION_CODE, e.getMessage());
+            return new FTResponseData(UNKNOWN_EXCEPTION_CODE, e.getMessage());
         }
     }
 
-    private ResponseData request() {
+    private FTResponseData request() {
         if (!connSuccess) {
             //如果连接失败，直接返回相应提示
-            return getResponseData(responseCode,
+            return new FTResponseData(responseCode,
                     "");
         }
-        if (!Utils.isNetworkAvailable()) {
-            //无网络连接返回无网络提示
-            return getResponseData(NetCodeStatus.NETWORK_EXCEPTION_CODE,
-                    "");
-        }
+
         RequestMethod method = mHttpBuilder.getMethod();
         boolean isDoInput = method == RequestMethod.POST;
         OutputStream outputStream = null;
@@ -185,7 +191,7 @@ public class NativeNetEngine implements INetEngine {
         } finally {
             close(mConnection, outputStream, reader, inputStreamReader, inputStream);
         }
-        return getResponseData(responseCode, resultBuffer.toString());
+        return new FTResponseData(responseCode, resultBuffer.toString());
     }
 
     /**
@@ -238,15 +244,5 @@ public class NativeNetEngine implements INetEngine {
         }
     }
 
-    /**
-     * 构建网络请求返回对象
-     *
-     * @param code
-     * @param message
-     * @return
-     */
-    private ResponseData getResponseData(int code, String message) {
-        return new ResponseData(code, message);
-    }
 }
 

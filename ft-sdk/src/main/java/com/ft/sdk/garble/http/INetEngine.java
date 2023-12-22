@@ -15,7 +15,7 @@ public interface INetEngine {
     void defaultConfig(HttpBuilder httpBuilder);
 
     /**
-     * 建立网络请求
+     * 建立同步网络请求
      * @param httpBuilder
      */
     void createRequest(HttpBuilder httpBuilder);
@@ -24,5 +24,5 @@ public interface INetEngine {
      * 执行请求
      * @return
      */
-    ResponseData execute();
+    FTResponseData execute();
 }

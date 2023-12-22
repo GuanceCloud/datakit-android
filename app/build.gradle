@@ -2,13 +2,13 @@ apply plugin: 'com.android.application'
 //apply plugin: 'com.guardsquare.proguard'
 
 android {
-    compileSdk 33
+    compileSdk 34
     namespace "com.ft"
 
     defaultConfig {
         applicationId "com.ft"
         minSdkVersion 21
-        targetSdkVersion 33
+        targetSdkVersion 34
         versionCode 1
         versionName "1.4"
         testInstrumentationRunner "com.ft.application.MockTestRunner"
@@ -49,13 +49,15 @@ android {
         }
     }
 
-    flavorDimensions=['tier']
+    flavorDimensions = ['tier']
 
     productFlavors {
 
         prodTest {
             buildConfigField "String", "CUSTOM_VALUE", "\"Custom value\""
-            buildConfigField "String", "ACCESS_SERVER_URL", "\"${ft_env.datakitRUMUrl}\""
+            buildConfigField "String", "DATAKIT_URL", "\"${ft_env.datakitRUMUrl}\""
+            buildConfigField "String", "DATAWAY_URL", "\"${ft_env.datawayRUMUrl}\""
+            buildConfigField "String", "DATAWAY_TOKEN", "\"${ft_env.tokenWithDatawayUpload}\""
             buildConfigField "String", "RUM_APP_ID", "\"${ft_env.rumAppid}\""
             buildConfigField "String", "TRACK_ID", "\"${ft_env.trackId}\""
             buildConfigField "String", "TRACE_URL", "\"${ft_env.traceUrl}\""
@@ -66,7 +68,9 @@ android {
 
         prodPublish {
             buildConfigField "String", "CUSTOM_VALUE", "\"Custom value\""
-            buildConfigField "String", "ACCESS_SERVER_URL", "\"${ft_env.datakitRUMUrl}\""
+            buildConfigField "String", "DATAKIT_URL", "\"${ft_env.datakitRUMUrl}\""
+            buildConfigField "String", "DATAWAY_URL", "\"${ft_env.datawayRUMUrl}\""
+            buildConfigField "String", "DATAWAY_TOKEN", "\"${ft_env.tokenWithDatawayUpload}\""
             buildConfigField "String", "RUM_APP_ID", "\"${ft_env.rumAppid}\""
             buildConfigField "String", "TRACK_ID", "\"${ft_env.trackId}\""
             buildConfigField "String", "TRACE_URL", "\"${ft_env.traceUrl}\""
@@ -118,7 +122,8 @@ FTExt {
 
     autoUploadMap = false
     autoUploadNativeDebugSymbol = false
-    datakitDCAUrl = ft_env.datakitDCAUrl
+    datakitUrl = ft_env.datakitRUMUrl
+    datawayToken = ft_env.datawayToken
     appId = ft_env.rumAppid
     env = 'common'
 
@@ -126,14 +131,16 @@ FTExt {
         prodTest {
             autoUploadMap = true
             autoUploadNativeDebugSymbol = true
-            datakitDCAUrl = ft_env.datakitDCAUrl
+            datakitUrl = ft_env.datakitRUMUrl
+            datawayToken = ft_env.datawayToken
             appId = ft_env.rumAppid
             env = ft_env.prodTestEnv
         }
         prodPublish {
             autoUploadMap = true
             autoUploadNativeDebugSymbol = true
-            datakitDCAUrl = ft_env.datakitDCAUrl
+            datakitUrl = ft_env.datakitRUMUrl
+            datawayToken = ft_env.datawayToken
             appId = ft_env.rumAppid
             env = ft_env.prodPublishEnv
         }
