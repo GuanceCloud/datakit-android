@@ -1,6 +1,5 @@
-# plugin 1.2.3-beta01
+# plugin 1.3.0-beta01
 1.plugin 1.2.2-alpha02
-2.上传 source map 新增
 
 ---
 # plugin 1.2.2-alpha02
