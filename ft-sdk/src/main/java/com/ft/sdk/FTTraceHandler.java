@@ -5,7 +5,6 @@ import com.ft.sdk.garble.utils.SkyWalkingUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.util.HashMap;
-import java.util.UUID;
 
 /**
  * author: huangDianHua
@@ -79,8 +78,8 @@ public class FTTraceHandler {
             traceID = Utils.randomUUID().toLowerCase();
             spanID = Utils.getGUID_16();
         } else if (config.getTraceType() == TraceType.DDTRACE) {
-            traceID = Utils.getDDtraceNewId() + "";
-            spanID = Utils.getDDtraceNewId() + "";
+            traceID = String.valueOf(Utils.getDDtraceNewId());
+            spanID = String.valueOf(Utils.getDDtraceNewId());
         }
 
         if (config.getTraceType() == TraceType.ZIPKIN_MULTI_HEADER) {
@@ -98,8 +97,8 @@ public class FTTraceHandler {
             String parentSpanID = "0";
             headers.put(JAEGER_KEY, traceID + ":" + spanID + ":" + parentSpanID + ":" + sampled);
         } else if (config.getTraceType() == TraceType.DDTRACE) {
-            traceID = Utils.getDDtraceNewId() + "";
-            spanID = Utils.getDDtraceNewId() + "";
+            traceID = String.valueOf(Utils.getDDtraceNewId());
+            spanID = String.valueOf(Utils.getDDtraceNewId());
             headers.put(DD_TRACE_ORIGIN_KEY, "rum");
             headers.put(DD_TRACE_SAMPLING_PRIORITY_KEY, enableTrace ? "2" : "-1");
             headers.put(DD_TRACE_PARENT_SPAN_ID_KEY, spanID);

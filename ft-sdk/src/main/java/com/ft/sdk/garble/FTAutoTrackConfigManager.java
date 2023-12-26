@@ -142,10 +142,7 @@ public class FTAutoTrackConfigManager {
         if (enableAutoTrackType == 0) {
             return true;
         }
-        if ((enableAutoTrackType | type.type) == enableAutoTrackType) {
-            return true;
-        }
-        return false;
+        return (enableAutoTrackType | type.type) == enableAutoTrackType;
     }
 
     /**
@@ -161,10 +158,7 @@ public class FTAutoTrackConfigManager {
         if (onlyAutoTrackActivities == null || onlyAutoTrackActivities.isEmpty()) {
             return true;
         }
-        if (onlyAutoTrackActivities.contains(activity.hashCode())) {
-            return true;
-        }
-        return false;
+        return onlyAutoTrackActivities.contains(activity.hashCode());
     }
 
     /**
@@ -231,10 +225,7 @@ public class FTAutoTrackConfigManager {
         if (disableAutoTrackType == 0) {
             return false;
         }
-        if ((disableAutoTrackType | type.type) == disableAutoTrackType) {
-            return true;
-        }
-        return false;
+        return (disableAutoTrackType | type.type) == disableAutoTrackType;
     }
 
     /**
@@ -247,10 +238,7 @@ public class FTAutoTrackConfigManager {
         if (activity == null) {
             return false;
         }
-        if (ignoreAutoTrackActivities != null && ignoreAutoTrackActivities.contains(activity.hashCode())) {
-            return true;
-        }
-        return false;
+        return ignoreAutoTrackActivities != null && ignoreAutoTrackActivities.contains(activity.hashCode());
     }
 
     /**

@@ -314,7 +314,7 @@ public class FTDBManager extends DBManager {
             public void run(SQLiteDatabase db) {
                 try {
                     Cursor cursor = db.query(FTSQL.FT_TABLE_ACTION, null, FTSQL.RUM_COLUMN_IS_CLOSE + "=1", null,
-                            null, null, FTSQL.RUM_COLUMN_START_TIME + " asc", limit == 0 ? null : limit + "");
+                            null, null, FTSQL.RUM_COLUMN_START_TIME + " asc", limit == 0 ? null : String.valueOf(limit));
                     while (cursor.moveToNext()) {
                         String id = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_ID));
                         int close = cursor.getInt(cursor.getColumnIndex(FTSQL.RUM_COLUMN_IS_CLOSE));
@@ -373,7 +373,7 @@ public class FTDBManager extends DBManager {
 
                 try {
                     Cursor cursor = db.query(FTSQL.FT_TABLE_VIEW, null, null, null,
-                            null, null, FTSQL.RUM_COLUMN_START_TIME + " asc", limit == 0 ? null : limit + "");
+                            null, null, FTSQL.RUM_COLUMN_START_TIME + " asc", limit == 0 ? null : String.valueOf(limit));
                     while (cursor.moveToNext()) {
                         String id = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_ID));
                         int close = cursor.getInt(cursor.getColumnIndex(FTSQL.RUM_COLUMN_IS_CLOSE));
@@ -571,7 +571,7 @@ public class FTDBManager extends DBManager {
                             null, null, FTSQL.RECORD_COLUMN_ID + " " + order);
                 } else {
                     cursor = db.query(FTSQL.FT_SYNC_TABLE_NAME, null, selection, selectionArgs,
-                            null, null, FTSQL.RECORD_COLUMN_ID + " " + order, "" + limit);
+                            null, null, FTSQL.RECORD_COLUMN_ID + " " + order, String.valueOf(limit));
                 }
                 while (cursor.moveToNext()) {
                     long id = cursor.getLong(cursor.getColumnIndex(FTSQL.RECORD_COLUMN_ID));

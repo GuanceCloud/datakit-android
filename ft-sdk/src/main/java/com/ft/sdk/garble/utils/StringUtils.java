@@ -1,9 +1,6 @@
 package com.ft.sdk.garble.utils;
 
-import java.util.Collection;
-
 /**
- *
  * @author Brandon
  */
 public class StringUtils {

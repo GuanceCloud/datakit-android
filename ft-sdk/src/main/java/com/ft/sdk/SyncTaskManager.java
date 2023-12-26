@@ -237,7 +237,7 @@ public class SyncTaskManager {
     private void deleteLastQuery(List<SyncJsonData> list) {
         List<String> ids = new ArrayList<>();
         for (SyncJsonData r : list) {
-            ids.add(r.getId() + "");
+            ids.add(String.valueOf(r.getId()));
         }
         FTDBManager.get().delete(ids);
     }

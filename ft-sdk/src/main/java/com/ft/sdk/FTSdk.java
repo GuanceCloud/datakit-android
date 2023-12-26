@@ -37,7 +37,6 @@ public class FTSdk {
      * 集成后 ft-native 后才会被被赋值,直接访问 {@link com.ft.sdk.nativelib.BuildConfig#VERSION_NAME} 来获取
      */
     public static String NATIVE_VERSION = PackageUtils.isNativeLibrarySupport() ? com.ft.sdk.nativelib.BuildConfig.VERSION_NAME : "";
-    ;
     /**
      * 变量由 Plugin ASM 写入，同一次编译版本 UUID 相同
      */

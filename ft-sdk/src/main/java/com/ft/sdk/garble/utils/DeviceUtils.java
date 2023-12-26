@@ -1,12 +1,9 @@
 package com.ft.sdk.garble.utils;
 
-import static com.ft.sdk.garble.utils.Utils.getSharedPreferences;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
@@ -18,8 +15,6 @@ import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
-import com.ft.sdk.FTApplication;
-
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -30,7 +25,6 @@ import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

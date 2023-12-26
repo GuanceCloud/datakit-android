@@ -164,7 +164,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
                     return;
                 }
                 File[] list = file.listFiles();
-                if (list != null && list.length > 0) {
+                if (list != null) {
                     for (File item : list) {
 
                         if (item.getName().startsWith(EXCEPTION_FILE_PREFIX_TOMBSTONE)) {

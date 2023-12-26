@@ -103,9 +103,7 @@ public class UserData {
             }
 
             if (exts == null || temp.exts == null || !exts.toString().equals(temp.exts.toString())) {
-                if (!(exts == null && temp.exts == null)) {
-                    return false;
-                }
+                return exts == null && temp.exts == null;
             }
             return true;
         } else {

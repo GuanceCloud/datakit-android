@@ -1,10 +1,9 @@
 package com.ft.sdk.garble.utils;
 
-import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.ErrorType;
+import com.ft.sdk.garble.bean.OP;
 
 import java.util.HashMap;
-import java.util.UUID;
 
 /**
  * BY huangDianHua
@@ -13,7 +12,7 @@ import java.util.UUID;
  */
 public class Constants {
 
-    public static final String LOG_TAG_PREFIX="[FT-SDK]";
+    public static final String LOG_TAG_PREFIX = "[FT-SDK]";
     /**
      * SDK 名称
      */
@@ -366,9 +365,9 @@ public class Constants {
     public static final String KEY_RUM_SDK_PACKAGE_NATIVE = "sdk_package_native";
 
     /**
-     *  SDK 数据标记
+     * SDK 数据标记
      */
-    public static final  String KEY_SDK_DATA_FLAG="sdk_data_id";
+    public static final String KEY_SDK_DATA_FLAG = "sdk_data_id";
 
     /**
      * SDK 版本号，这里为 agent 版本 {@link #KEY_RUM_SDK_PACKAGE_AGENT}

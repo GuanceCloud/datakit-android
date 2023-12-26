@@ -7,7 +7,6 @@ import com.ft.sdk.garble.utils.FpsUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
 
 /**
  * BY huangDianHua
