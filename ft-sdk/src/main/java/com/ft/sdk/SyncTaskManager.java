@@ -182,7 +182,7 @@ public class SyncTaskManager {
         LogUtils.d(TAG, body);
         requestNet(dataType, body, new AsyncCallback() {
             @Override
-            public void onResponse(int code, String response) {
+            public void onResponse(int code, String response, String errorCode) {
                 if (dataSyncMaxRetryCount == 0 || (code >= 200 && code < 500)) {
                     LogUtils.d(TAG, "\n<<<**********************同步数据成功**********************");
                     SyncTaskManager.this.deleteLastQuery(requestDatas);
@@ -191,12 +191,12 @@ public class SyncTaskManager {
                     }
                     errorCount.set(0);
                     if ((dataSyncMaxRetryCount == 0 && code != 200) || code > 200) {
-                        LogUtils.e(TAG, "同步数据出错(忽略)-[code:" + code + ",response:" + response + "]");
+                        LogUtils.e(TAG, "同步失败(忽略)-[code:" + code + ",errorCode:" + errorCode + ",response:" + response + "]");
                     } else {
                         LogUtils.d(TAG, "[code:" + code + ",response:" + response + "]");
                     }
                 } else {
-                    LogUtils.e(TAG, errorCount.get() + ":同步数据失败-[code:" + code + ",response:" + response + "]");
+                    LogUtils.e(TAG, errorCount.get() + ":同步失败-[code:" + code + ",response:" + response + "]");
                     errorCount.getAndIncrement();
 
                     if (errorCount.get() > 0) {
@@ -272,10 +272,10 @@ public class SyncTaskManager {
                 .setBodyString(body).executeSync();
 
         try {
-            syncCallback.onResponse(result.getCode(), result.getMessage());
+            syncCallback.onResponse(result.getCode(), result.getMessage(), result.getErrorCode());
         } catch (Exception e) {
             LogUtils.e(TAG, "上传错误：\n" + Log.getStackTraceString(e));
-            syncCallback.onResponse(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, e.getLocalizedMessage());
+            syncCallback.onResponse(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, e.getLocalizedMessage(), "");
         }
 
     }

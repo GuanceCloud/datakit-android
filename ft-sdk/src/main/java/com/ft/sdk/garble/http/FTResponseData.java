@@ -44,8 +44,7 @@ public class FTResponseData {
                         message = jsonObject.optString("message");
                     }
                 } catch (JSONException e) {
-                    this.code = NetCodeStatus.NET_STATUS_RESPONSE_NOT_JSON;
-                    errorCode = NetCodeStatus.NET_STATUS_RESPONSE_NOT_JSON_ERR;
+                    this.code = code;
                     message = data;
                 } catch (Exception e) {
                     LogUtils.e(TAG, Log.getStackTraceString(e));

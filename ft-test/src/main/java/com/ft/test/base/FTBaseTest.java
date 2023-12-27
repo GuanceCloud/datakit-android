@@ -64,6 +64,7 @@ public class FTBaseTest {
 
     /**
      * 立即执行数据同步
+     *
      * @throws Exception
      */
     protected void executeSyncTask() throws Exception {
@@ -116,6 +117,7 @@ public class FTBaseTest {
 
     /**
      * 立即生成 RUM 相关数据
+     *
      * @throws Exception
      */
     protected void invokeGenerateRumData() throws Exception {
@@ -126,6 +128,7 @@ public class FTBaseTest {
 
     /**
      * 等待线程池队列执行结束，目的是让线程池函数在测试用例中串行，等待操作结束
+     *
      * @throws InterruptedException
      */
     protected void waitForInThreadPool() throws InterruptedException {
@@ -150,6 +153,7 @@ public class FTBaseTest {
 
     /**
      * 使 session 立即过期，以缩短测试用例在测试过程中的耗时等待
+     *
      * @throws IllegalAccessException
      */
     protected void setSessionExpire() throws IllegalAccessException {
@@ -173,7 +177,7 @@ public class FTBaseTest {
 
         try {
             Whitebox.invokeMethod(SyncTaskManager.get(), "requestNet", dataType, body,
-                    (AsyncCallback) (code, response) -> Assert.assertEquals(200, code));
+                    (AsyncCallback) (code, response, errorCode) -> Assert.assertEquals(200, code));
         } catch (Exception e) {
             e.printStackTrace();
         }

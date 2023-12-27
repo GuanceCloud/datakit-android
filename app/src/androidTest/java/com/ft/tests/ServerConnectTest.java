@@ -101,7 +101,7 @@ public class ServerConnectTest extends BaseTest {
         LineProtocolBean bean = new LineProtocolBean("TestMeasurement", tags, fields, time);
         Whitebox.invokeMethod(FTTrackInner.getInstance(), "trackAsync", Collections.singletonList(bean), new AsyncCallback() {
             @Override
-            public void onResponse(int code, String response) {
+            public void onResponse(int code, String response,String errorCode) {
                 codeScope = code;
                 countDownLatch.countDown();
             }
