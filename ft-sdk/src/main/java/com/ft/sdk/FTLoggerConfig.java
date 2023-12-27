@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class FTLoggerConfig {
     /**
-     * 设置采集率
+     * 采样率，[0,1]
      */
     private float samplingRate = 1;
     /**
@@ -134,9 +134,9 @@ public class FTLoggerConfig {
     }
 
     /**
-     * 判断是否已已经开启自定义
+     * 判断是否已经开启自定义日志
      *
-     * @return
+     * @return true 开启，false 未开启
      */
     public boolean isEnableCustomLog() {
         return enableCustomLog;

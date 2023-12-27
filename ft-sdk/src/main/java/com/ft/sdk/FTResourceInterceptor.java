@@ -74,6 +74,9 @@ public class FTResourceInterceptor implements Interceptor {
     }
 
     private static final String TAG = Constants.LOG_TAG_PREFIX + "FTResourceInterceptor";
+    /**
+     * 最大读取 byte 计算 32KB
+     */
     private static final int BYTE_LIMIT_COUNT = 33554432;
 
     /**
