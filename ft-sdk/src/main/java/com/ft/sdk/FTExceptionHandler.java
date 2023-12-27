@@ -64,7 +64,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
         if (config.isRumEnable() &&
                 config.isEnableTrackAppCrash()) {
             long dateline = Utils.getCurrentNanoTime();
-            FTRUMInnerManager.get().addError(crash, message, dateline, ErrorType.JAVA, state);
+            FTRUMInnerManager.get().addError(crash, message, dateline, ErrorType.JAVA.toString(), state);
         }
     }
 
@@ -179,7 +179,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
 //                                    FTAutoTrack.putRUMAnr(crashString, crashTime);
                                     } else if (item.getName().contains(NATIVE_FILE_NAME)) {
                                         FTRUMInnerManager.get().addError(crashString, "Native Crash",
-                                                crashTime, ErrorType.NATIVE, AppState.getValueFrom(value));
+                                                crashTime, ErrorType.NATIVE.toString(), AppState.getValueFrom(value));
 
                                     }
                                 }

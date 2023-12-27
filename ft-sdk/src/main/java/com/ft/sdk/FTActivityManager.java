@@ -18,7 +18,7 @@ public final class FTActivityManager {
     private static volatile FTActivityManager instance;
 
     /**
-     *
+     * 存活 activity map
      */
     private final ConcurrentHashMap<String, Boolean> activityOpenTypeMap = new ConcurrentHashMap<>();
 

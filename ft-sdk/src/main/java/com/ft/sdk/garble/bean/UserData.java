@@ -73,7 +73,7 @@ public class UserData {
     /**
      * 通过 json string 转化 {@link #exts} 数据
      *
-     * @param data
+     * @param data json 字符数据内容
      */
     public void setExtsWithJsonString(String data) {
         try {

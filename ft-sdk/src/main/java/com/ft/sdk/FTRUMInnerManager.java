@@ -478,7 +478,7 @@ public class FTRUMInnerManager {
      * @param errorType 错误类型
      * @param state     程序运行状态
      */
-    public void addError(String log, String message, ErrorType errorType, AppState state) {
+    public void addError(String log, String message, String errorType, AppState state) {
         addError(log, message, Utils.getCurrentNanoTime(), errorType, state);
     }
 
@@ -492,7 +492,7 @@ public class FTRUMInnerManager {
      * @param state     程序运行状态
      * @param property  附加属性
      */
-    public void addError(String log, String message, ErrorType errorType, AppState state, HashMap<String, Object> property) {
+    public void addError(String log, String message, String errorType, AppState state, HashMap<String, Object> property) {
         addError(log, message, Utils.getCurrentNanoTime(), errorType, state, property);
     }
 
@@ -505,7 +505,7 @@ public class FTRUMInnerManager {
      * @param state     程序运行状态
      * @param dateline  发生时间，纳秒
      */
-    public void addError(String log, String message, long dateline, ErrorType errorType, AppState state) {
+    public void addError(String log, String message, long dateline, String errorType, AppState state) {
         addError(log, message, dateline, errorType, state, null);
     }
 
@@ -518,7 +518,7 @@ public class FTRUMInnerManager {
      * @param state     程序运行状态
      * @param dateline  发生时间，纳秒
      */
-    public void addError(String log, String message, long dateline, ErrorType errorType,
+    public void addError(String log, String message, long dateline, String errorType,
                          AppState state, HashMap<String, Object> property) {
         new Thread() {
             @Override
@@ -527,7 +527,7 @@ public class FTRUMInnerManager {
                     JSONObject tags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
                     attachRUMRelative(tags, true);
                     JSONObject fields = new JSONObject();
-                    tags.put(Constants.KEY_RUM_ERROR_TYPE, errorType.toString());
+                    tags.put(Constants.KEY_RUM_ERROR_TYPE, errorType);
                     tags.put(Constants.KEY_RUM_ERROR_SOURCE, ErrorSource.LOGGER.toString());
                     tags.put(Constants.KEY_RUM_ERROR_SITUATION, state.toString());
 

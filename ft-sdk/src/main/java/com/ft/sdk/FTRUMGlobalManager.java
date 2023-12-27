@@ -172,7 +172,6 @@ public class FTRUMGlobalManager {
         }
     }
 
-
     /**
      * 添加错误信息
      *
@@ -181,7 +180,7 @@ public class FTRUMGlobalManager {
      * @param errorType 错误类型
      * @param state     程序运行状态
      */
-    public void addError(String log, String message, ErrorType errorType, AppState state) {
+    public void addError(String log, String message, String errorType, AppState state) {
         if (innerManager != null) {
             innerManager.addError(log, message, errorType, state);
         }
@@ -196,7 +195,7 @@ public class FTRUMGlobalManager {
      * @param state     程序运行状态
      * @param dateline  发生时间，纳秒
      */
-    public void addError(String log, String message, long dateline, ErrorType errorType,
+    public void addError(String log, String message, long dateline, String errorType,
                          AppState state) {
         if (innerManager != null) {
             innerManager.addError(log, message, dateline, errorType, state);
@@ -214,9 +213,76 @@ public class FTRUMGlobalManager {
      * @param state     程序运行状态
      * @param property  附加属性
      */
-    public void addError(String log, String message, ErrorType errorType, AppState state, HashMap<String, Object> property) {
+    public void addError(String log, String message, String errorType, AppState state, HashMap<String, Object> property) {
         if (innerManager != null) {
             innerManager.addError(log, message, errorType, state, property);
+        }
+    }
+
+
+    /**
+     * 添加错误
+     *
+     * @param log       日志
+     * @param message   消息
+     * @param errorType 错误类型
+     * @param state     程序运行状态
+     * @param dateline  发生时间，纳秒
+     * @param property  附加属性
+     */
+    public void addError(String log, String message, long dateline, String errorType,
+                         AppState state, HashMap<String, Object> property) {
+        if (innerManager != null) {
+            innerManager.addError(log, message, dateline, errorType, state, property);
+        }
+
+    }
+
+
+    /**
+     * 添加错误信息
+     *
+     * @param log       日志
+     * @param message   消息
+     * @param errorType 错误类型
+     * @param state     程序运行状态
+     */
+    public void addError(String log, String message, ErrorType errorType, AppState state) {
+        if (innerManager != null) {
+            innerManager.addError(log, message, errorType.toString(), state);
+        }
+    }
+
+    /**
+     * 添加错误
+     *
+     * @param log       日志
+     * @param message   消息
+     * @param errorType 错误类型
+     * @param state     程序运行状态
+     * @param dateline  发生时间，纳秒
+     */
+    public void addError(String log, String message, long dateline, ErrorType errorType,
+                         AppState state) {
+        if (innerManager != null) {
+            innerManager.addError(log, message, dateline, errorType.toString(), state);
+        }
+
+    }
+
+
+    /**
+     * 添加错误信息
+     *
+     * @param log       日志
+     * @param message   消息
+     * @param errorType 错误类型
+     * @param state     程序运行状态
+     * @param property  附加属性
+     */
+    public void addError(String log, String message, ErrorType errorType, AppState state, HashMap<String, Object> property) {
+        if (innerManager != null) {
+            innerManager.addError(log, message, errorType.toString(), state, property);
         }
     }
 
@@ -234,7 +300,7 @@ public class FTRUMGlobalManager {
     public void addError(String log, String message, long dateline, ErrorType errorType,
                          AppState state, HashMap<String, Object> property) {
         if (innerManager != null) {
-            innerManager.addError(log, message, dateline, errorType, state, property);
+            innerManager.addError(log, message, dateline, errorType.toString(), state, property);
         }
 
     }
@@ -270,8 +336,8 @@ public class FTRUMGlobalManager {
      * 设置网络传输内容
      *
      * @param resourceId    资源 id
-     * @param params
-     * @param netStatusBean
+     * @param params        {@link ResourceParams} 请求内容信息
+     * @param netStatusBean {@link  NetStatusBean} 网络性能指标
      */
     public void addResource(String resourceId, ResourceParams params, NetStatusBean netStatusBean) {
         if (innerManager != null) {
@@ -294,6 +360,9 @@ public class FTRUMGlobalManager {
     }
 
 
+    /**
+     * 对象释放，SDK 关闭后清零
+     */
     public void release() {
         innerManager = null;
     }
