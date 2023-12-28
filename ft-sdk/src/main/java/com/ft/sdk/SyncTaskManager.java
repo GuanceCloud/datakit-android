@@ -20,6 +20,7 @@ import com.ft.sdk.garble.manager.AsyncCallback;
 import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.internal.exception.FTNetworkNoAvailableException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -133,7 +134,12 @@ public class SyncTaskManager {
                         }
 
                     } catch (Exception e) {
-                        LogUtils.e(TAG, Log.getStackTraceString(e));
+                        if (e instanceof FTNetworkNoAvailableException) {
+                            LogUtils.e(TAG, "Network not available Stop poll");
+                        } else {
+                            LogUtils.e(TAG, Log.getStackTraceString(e));
+
+                        }
                     } finally {
                         running = false;
                         LogUtils.d(TAG, "<<<******************* Sync Poll Finish *******************\n");
@@ -154,7 +160,7 @@ public class SyncTaskManager {
     /**
      * 执行存储数据同步操作
      */
-    private synchronized void handleSyncOpt(final DataType dataType) {
+    private synchronized void handleSyncOpt(final DataType dataType) throws FTNetworkNoAvailableException {
         final List<SyncJsonData> requestDataList = new ArrayList<>();
 
         while (true) {
@@ -249,7 +255,7 @@ public class SyncTaskManager {
      * @param body         数据行协议结果
      * @param syncCallback 异步对象
      */
-    public synchronized void requestNet(DataType dataType, String body, final AsyncCallback syncCallback) {
+    public synchronized void requestNet(DataType dataType, String body, final AsyncCallback syncCallback) throws FTNetworkNoAvailableException {
         String model;
         switch (dataType) {
             case TRACE:
@@ -270,6 +276,10 @@ public class SyncTaskManager {
                 .setModel(model)
                 .setMethod(RequestMethod.POST)
                 .setBodyString(body).executeSync();
+
+        if (result.getCode() == NetCodeStatus.NETWORK_EXCEPTION_CODE) {
+            throw new FTNetworkNoAvailableException();
+        }
 
         try {
             syncCallback.onResponse(result.getCode(), result.getMessage(), result.getErrorCode());
