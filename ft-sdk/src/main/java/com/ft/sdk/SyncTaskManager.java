@@ -274,7 +274,7 @@ public class SyncTaskManager {
         try {
             syncCallback.onResponse(result.getCode(), result.getMessage(), result.getErrorCode());
         } catch (Exception e) {
-            LogUtils.e(TAG, "上传错误：\n" + Log.getStackTraceString(e));
+            LogUtils.e(TAG, "requestNet：\n" + Log.getStackTraceString(e));
             syncCallback.onResponse(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, e.getLocalizedMessage(), "");
         }
 
