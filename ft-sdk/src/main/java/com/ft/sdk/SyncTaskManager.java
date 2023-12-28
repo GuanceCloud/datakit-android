@@ -20,7 +20,6 @@ import com.ft.sdk.garble.manager.AsyncCallback;
 import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.sdk.garble.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +49,7 @@ public class SyncTaskManager {
     /**
      * 重试等待时间
      */
-    private static final int RETRY_DELAY_SLEEP_TIME = 100;
+    private static final int RETRY_DELAY_SLEEP_TIME = 500;
     /**
      * 统计一个周期内错误的次
      */
@@ -116,7 +115,7 @@ public class SyncTaskManager {
             return;
         }
         synchronized (this) {
-            LogUtils.d(TAG, "=========executeSyncPoll=========");
+            LogUtils.d(TAG, "******************* Execute Sync Poll *******************");
             running = true;
             errorCount.set(0);
             DataUploaderThreadPool.get().execute(new Runnable() {
@@ -124,25 +123,20 @@ public class SyncTaskManager {
                 public void run() {
                     try {
 
-                        LogUtils.d(TAG, "******************数据同步线程运行中*******************>>>\n");
+                        LogUtils.d(TAG, "******************* Sync Poll Running *******************>>>\n");
                         if (withSleep) {
                             Thread.sleep(SLEEP_TIME);
                         }
 
                         for (DataType dataType : SYNC_MAP) {
-                            List<SyncJsonData> dataList = SyncTaskManager.this.queryFromData(dataType);
-
-                            if (dataList.isEmpty()) {
-                                continue;
-                            }
-                            SyncTaskManager.this.handleSyncOpt(dataType, dataList);
+                            SyncTaskManager.this.handleSyncOpt(dataType);
                         }
 
                     } catch (Exception e) {
                         LogUtils.e(TAG, Log.getStackTraceString(e));
                     } finally {
                         running = false;
-                        LogUtils.d(TAG, "<<<**********************数据同步线程已结束**********************\n");
+                        LogUtils.d(TAG, "<<<******************* Sync Poll Finish *******************\n");
                     }
                 }
             });
@@ -160,61 +154,67 @@ public class SyncTaskManager {
     /**
      * 执行存储数据同步操作
      */
-    private synchronized void handleSyncOpt(final DataType dataType, final List<SyncJsonData> requestDatas) {
+    private synchronized void handleSyncOpt(final DataType dataType) {
+        final List<SyncJsonData> requestDataList = new ArrayList<>();
 
-        if (!Utils.isNetworkAvailable()) {
-            LogUtils.e(TAG, " \n**********************网络未连接************************");
-            return;
-        }
+        while (true) {
+            List<SyncJsonData> cacheDataList = queryFromData(dataType);
 
-        if (dataSyncMaxRetryCount > 0) {
-            if (errorCount.get() >= dataSyncMaxRetryCount) {
-                LogUtils.e(TAG, " \n************连续同步失败" + dataSyncMaxRetryCount + "次，停止当前轮询同步***********");
-                return;
+            requestDataList.addAll(cacheDataList);
+
+            if (requestDataList.isEmpty()) {
+                break;
             }
-        }
 
-        if (requestDatas == null || requestDatas.isEmpty()) {
-            return;
-        }
-        SyncDataHelper syncData = new SyncDataHelper();
-        String body = syncData.getBodyContent(dataType, requestDatas);
-        LogUtils.d(TAG, body);
-        requestNet(dataType, body, new AsyncCallback() {
-            @Override
-            public void onResponse(int code, String response, String errorCode) {
-                if (dataSyncMaxRetryCount == 0 || (code >= 200 && code < 500)) {
-                    LogUtils.d(TAG, "\n<<<**********************同步数据成功**********************");
-                    SyncTaskManager.this.deleteLastQuery(requestDatas);
-                    if (dataType == DataType.LOG) {
-                        FTDBCachePolicy.get().optCount(-requestDatas.size());
-                    }
-                    errorCount.set(0);
-                    if ((dataSyncMaxRetryCount == 0 && code != 200) || code > 200) {
-                        LogUtils.e(TAG, "同步失败(忽略)-[code:" + code + ",errorCode:" + errorCode + ",response:" + response + "]");
+            LogUtils.d(TAG, "Sync Data Count:" + requestDataList.size());
+
+            SyncDataHelper syncData = new SyncDataHelper();
+            String body = syncData.getBodyContent(dataType, requestDataList);
+            LogUtils.d(TAG, body);
+            requestNet(dataType, body, new AsyncCallback() {
+                @Override
+                public void onResponse(int code, String response, String errorCode) {
+                    if (dataSyncMaxRetryCount == 0 || (code >= 200 && code < 500)) {
+                        SyncTaskManager.this.deleteLastQuery(requestDataList);
+                        if (dataType == DataType.LOG) {
+                            FTDBCachePolicy.get().optCount(-requestDataList.size());
+                        }
+                        errorCount.set(0);
+                        if ((dataSyncMaxRetryCount == 0 && code != 200) || code > 200) {
+                            LogUtils.e(TAG, "Sync Fail (Ignore)-[code:" + code + ",errorCode:" + errorCode + ",response:" + response + "]");
+                        } else {
+                            LogUtils.d(TAG, "Sync Success-[code:" + code + ",response:" + response + "]");
+                        }
                     } else {
-                        LogUtils.d(TAG, "[code:" + code + ",response:" + response + "]");
-                    }
-                } else {
-                    LogUtils.e(TAG, errorCount.get() + ":同步失败-[code:" + code + ",response:" + response + "]");
-                    errorCount.getAndIncrement();
+                        errorCount.getAndIncrement();
+                        LogUtils.e(TAG, errorCount.get() + ":Sync Fail-[code:" + code + ",response:" + response + "]");
 
-                    if (errorCount.get() > 0) {
-                        try {
-                            Thread.sleep((long) errorCount.get() * RETRY_DELAY_SLEEP_TIME);
-                        } catch (InterruptedException e) {
-                            LogUtils.e(TAG, Log.getStackTraceString(e));
+                        if (errorCount.get() > 0) {
+                            try {
+                                Thread.sleep((long) errorCount.get() * RETRY_DELAY_SLEEP_TIME);
+                            } catch (InterruptedException e) {
+                                LogUtils.e(TAG, Log.getStackTraceString(e));
+                            }
                         }
                     }
                 }
-            }
-        });
 
-        if (requestDatas.size() < LIMIT_SIZE) {
-            //do nothing
-        } else {
-            List<SyncJsonData> nextList = queryFromData(dataType);
-            handleSyncOpt(dataType, nextList);
+            });
+            requestDataList.clear();
+
+            if (dataSyncMaxRetryCount > 0) {
+                if (errorCount.get() >= dataSyncMaxRetryCount) {
+                    LogUtils.e(TAG, " \n************ Sync Fail: " + dataSyncMaxRetryCount + " times，stop poll ***********");
+                    break;
+                } else {
+                    continue;
+                }
+            }
+
+            //当前缓存数据已获取完毕，等待下一次数据触发
+            if (cacheDataList.size() < LIMIT_SIZE) {
+                break;
+            }
 
         }
     }

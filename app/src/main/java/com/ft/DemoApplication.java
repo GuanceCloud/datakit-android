@@ -38,8 +38,7 @@ public class DemoApplication extends BaseApplication {
     static void initFTSDK() {
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAKIT_URL)
                 .setDebug(true)//设置是否是 debug
-                .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()))
-                .setDataSyncRetryCount(0);
+                .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()));
         FTSdk.install(ftSDKConfig);
 
         FTSdk.initLogWithConfig(new FTLoggerConfig()
