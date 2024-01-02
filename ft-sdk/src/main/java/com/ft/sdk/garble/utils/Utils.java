@@ -17,9 +17,9 @@ import android.util.Base64;
 import android.util.Log;
 
 import com.ft.sdk.FTApplication;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -396,20 +396,17 @@ public class Utils {
     /**
      * 是否是 json
      *
-     * @param test
+     * @param json
      * @return
      */
-    public static boolean isJSONValid(String test) {
+    public static boolean isJSONValid(String json) {
         try {
-            new JSONObject(test);
-        } catch (JSONException ex) {
-            try {
-                new JSONArray(test);
-            } catch (JSONException ex1) {
-                return false;
-            }
+            JsonParser parser = new JsonParser();
+            parser.parse(json);
+            return true;
+        } catch (JsonParseException e) {
+            return false;
         }
-        return true;
     }
 
     /**
