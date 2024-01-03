@@ -94,10 +94,10 @@ class FTAppStartCounter {
      *
      * {@link Constants#KEY_RUM_ACTION_TYPE} = {@link  Constants#KEYRUM}
      *
-     * @param hotStartTime 热启动时间段，单位纳秒
+     * @param hotStartDuration 热启动时间段，单位纳秒
      */
-    void hotStart(long hotStartTime) {
-        FTAutoTrack.putRUMLaunchPerformance(false, hotStartTime, Utils.getCurrentNanoTime());
+    void hotStart(long hotStartDuration,long startTime) {
+        FTAutoTrack.putRUMLaunchPerformance(false, hotStartDuration, startTime);
     }
 
 
