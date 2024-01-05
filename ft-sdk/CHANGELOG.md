@@ -2,7 +2,7 @@
 1.优化数据同步机制
 2.优化内部日志输出
 3.支持公网 Dataway 上传
-
+4.支持自定义 error 数据中的 error_type 字段属性 
 
 ---
 # agent 1.3.17-alpha05
