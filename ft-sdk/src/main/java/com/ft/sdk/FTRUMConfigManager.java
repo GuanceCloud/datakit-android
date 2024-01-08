@@ -130,7 +130,7 @@ public class FTRUMConfigManager {
 
 
     public void createNewRandomUserId() {
-        randomUserId = "ft.rd_" + Utils.randomUUID();
+        randomUserId = "rd_" + Utils.randomUUID();
         SharedPreferences sp = Utils.getSharedPreferences(FTApplication.getApplication());
         sp.edit().putString(Constants.FT_RANDOM_USER_ID, randomUserId).apply();
     }
@@ -280,7 +280,7 @@ public class FTRUMConfigManager {
             }
 
         } else {
-            tags.put(Constants.KEY_RUM_USER_ID, FTRUMInnerManager.get().getSessionId());
+            tags.put(Constants.KEY_RUM_USER_ID, getRandomUserId());
         }
         return tags;
     }
