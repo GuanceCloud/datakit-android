@@ -106,7 +106,7 @@ public class FTDBManager extends DBManager {
      * @return
      */
     public void initSumAction(final ActionBean data) {
-        LogUtils.d(TAG, "initSumAction,id:" + data.getId() + ",Viewname:" + data.getViewName()
+        LogUtils.d(TAG, "initSumAction,id:" + data.getId() + ",ViewName:" + data.getViewName()
                 + ",actionName:" + data.getActionName());
 
         getDB(true, new DataBaseCallBack() {
@@ -117,7 +117,7 @@ public class FTDBManager extends DBManager {
                 contentValues.put(FTSQL.RUM_COLUMN_LONG_TASK_COUNT, 0);
                 contentValues.put(FTSQL.RUM_COLUMN_ERROR_COUNT, 0);
                 contentValues.put(FTSQL.RUM_COLUMN_ID, data.getId());
-                contentValues.put(FTSQL.RUM_COLUMN_IS_CLOSE, data.isClose());
+                contentValues.put(FTSQL.RUM_COLUMN_IS_CLOSE, data.isClose() ? 1 : 0);
                 contentValues.put(FTSQL.RUM_COLUMN_SESSION_ID, data.getSessionId());
                 contentValues.put(FTSQL.RUM_COLUMN_VIEW_ID, data.getViewId());
                 contentValues.put(FTSQL.RUM_COLUMN_VIEW_NAME, data.getViewName());
@@ -290,15 +290,61 @@ public class FTDBManager extends DBManager {
             public void run(SQLiteDatabase db) {
                 Cursor cursor = db.rawQuery("select count(*) from " + tableName
                         + " where " + FTSQL.RUM_COLUMN_ID + "='" + id + "'", null);
-                cursor.moveToFirst();
-                int count = cursor.getInt(0);
-                cursor.close();
-                if (count > 0) {
-                    db.execSQL("UPDATE " + tableName + " SET "
-                            + columnName + "=" + columnName + "-1 WHERE " + FTSQL.RUM_COLUMN_ID + "='" + id + "'");
+                if (cursor.moveToFirst()) {
+                    int count = cursor.getInt(0);
+                    if (count > 0) {
+                        db.execSQL("UPDATE " + tableName + " SET "
+                                + columnName + "=" + columnName + "-1 WHERE " + FTSQL.RUM_COLUMN_ID + "='" + id + "'");
+                    }
                 }
+                cursor.close();
             }
         });
+    }
+
+    /**
+     * 更新 View 上传时间,{@link  FTSQL#RUM_DATA_UPLOAD_TIME},用于标记延迟的 Resource 数据
+     */
+    public void updateViewUploadTime(String viewId, long dateTime) {
+        updateViewDateTimeByColumn(viewId, FTSQL.RUM_DATA_UPLOAD_TIME, dateTime);
+
+
+    }
+
+    /**
+     * 更新 View 更新时间,{@link  FTSQL#RUM_DATA_UPLOAD_TIME},用于标记延迟的 Resource 数据
+     */
+    public void updateViewUpdateTime(String viewId, long dateTime) {
+        updateViewDateTimeByColumn(viewId, FTSQL.RUM_DATA_UPDATE_TIME, dateTime);
+
+    }
+
+    /**
+     * 更新 viewid update 和 upload 更新状态
+     *
+     * @param viewId
+     * @param columName {@link FTSQL#RUM_DATA_UPDATE_TIME},{@link FTSQL#RUM_DATA_UPLOAD_TIME}
+     * @param dateTime  时间，毫秒
+     */
+    private void updateViewDateTimeByColumn(String viewId, String columName, long dateTime) {
+        getDB(true, new DataBaseCallBack() {
+                    @Override
+                    public void run(SQLiteDatabase db) {
+                        Cursor cursor = db.rawQuery("select count(*) from " + FTSQL.FT_TABLE_VIEW
+                                + " where " + FTSQL.RUM_COLUMN_ID + "='" + viewId + "'", null);
+                        if (cursor.moveToFirst()) {
+                            int count = cursor.getInt(0);
+                            if (count > 0) {
+                                db.execSQL("UPDATE " + FTSQL.FT_TABLE_VIEW + " SET "
+                                        + columName + "=" + dateTime
+                                        + " WHERE " + FTSQL.RUM_COLUMN_ID + "='" + viewId + "'");
+                            }
+                        }
+
+                        cursor.close();
+                    }
+                }
+        );
     }
 
     /**
@@ -372,8 +418,13 @@ public class FTDBManager extends DBManager {
             public void run(SQLiteDatabase db) {
 
                 try {
-                    Cursor cursor = db.query(FTSQL.FT_TABLE_VIEW, null, null, null,
-                            null, null, FTSQL.RUM_COLUMN_START_TIME + " asc", limit == 0 ? null : String.valueOf(limit));
+                    String selection = "(" + FTSQL.RUM_COLUMN_IS_CLOSE + "=1 AND (" +
+                            FTSQL.RUM_DATA_UPLOAD_TIME + "<" + FTSQL.RUM_DATA_UPDATE_TIME
+                            + " OR " + FTSQL.RUM_DATA_UPLOAD_TIME + "=0 )) OR "
+                            + FTSQL.RUM_COLUMN_IS_CLOSE + "=0";
+                    Cursor cursor = db.query(FTSQL.FT_TABLE_VIEW, null, selection,
+                            null, null, null,
+                            FTSQL.RUM_COLUMN_START_TIME + " asc", limit == 0 ? null : String.valueOf(limit));
                     while (cursor.moveToNext()) {
                         String id = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_ID));
                         int close = cursor.getInt(cursor.getColumnIndex(FTSQL.RUM_COLUMN_IS_CLOSE));
@@ -417,7 +468,7 @@ public class FTDBManager extends DBManager {
     }
 
     /**
-     * 清理所有 Action 数据
+     * 清理所有 Action {@link FTSQL#RUM_COLUMN_IS_CLOSE} = 1 数据
      */
     public void cleanCloseActionData() {
         if (isAndroidTest) return;
@@ -430,7 +481,7 @@ public class FTDBManager extends DBManager {
     }
 
     /**
-     * 清理所有 View 数据
+     * 清理所有 View {@link FTSQL#RUM_COLUMN_IS_CLOSE} = 1 数据
      */
     public void cleanCloseViewData() {
         if (isAndroidTest) return;
@@ -449,7 +500,7 @@ public class FTDBManager extends DBManager {
             @Override
             public void run(SQLiteDatabase db) {
                 db.execSQL("UPDATE " + FTSQL.FT_TABLE_VIEW + " SET "
-                        + FTSQL.RUM_COLUMN_IS_CLOSE + "=1," + FTSQL.RUM_COLUMN_PENDING_RESOURCE + "=0");
+                        + FTSQL.RUM_COLUMN_IS_CLOSE + "=1," + FTSQL.RUM_COLUMN_PENDING_RESOURCE + "=0," + FTSQL.RUM_DATA_UPDATE_TIME + "=" + System.currentTimeMillis());
                 db.execSQL("UPDATE " + FTSQL.FT_TABLE_ACTION + " SET "
                         + FTSQL.RUM_COLUMN_IS_CLOSE + "=1 ," + FTSQL.RUM_COLUMN_PENDING_RESOURCE + "=0");
             }
@@ -635,6 +686,15 @@ public class FTDBManager extends DBManager {
 
             }
         });
+    }
+
+    /**
+     * 释放数据库
+     */
+    public static void release() {
+        if (ftdbManager != null) {
+            ftdbManager.shutDown();
+        }
     }
 
 //    /**

@@ -142,6 +142,7 @@ public class SyncTaskManager {
                         }
                     } finally {
                         running = false;
+                        FTDBManager.get().closeDB();
                         LogUtils.d(TAG, "<<<******************* Sync Poll Finish *******************\n");
                     }
                 }
@@ -212,8 +213,6 @@ public class SyncTaskManager {
                 if (errorCount.get() >= dataSyncMaxRetryCount) {
                     LogUtils.e(TAG, " \n************ Sync Fail: " + dataSyncMaxRetryCount + " times，stop poll ***********");
                     break;
-                } else {
-                    continue;
                 }
             }
 

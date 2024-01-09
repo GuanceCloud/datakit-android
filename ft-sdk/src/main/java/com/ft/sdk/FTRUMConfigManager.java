@@ -122,6 +122,9 @@ public class FTRUMConfigManager {
     }
 
 
+    /**
+     * 初始化随机 userid
+     */
     void initRandomUserId() {
         if (Utils.isNullOrEmpty(getRandomUserId())) {
             createNewRandomUserId();
@@ -130,7 +133,7 @@ public class FTRUMConfigManager {
 
 
     public void createNewRandomUserId() {
-        randomUserId = "rd_" + Utils.randomUUID();
+        randomUserId = "ft.rd_" + Utils.randomUUID();
         SharedPreferences sp = Utils.getSharedPreferences(FTApplication.getApplication());
         sp.edit().putString(Constants.FT_RANDOM_USER_ID, randomUserId).apply();
     }
@@ -145,7 +148,10 @@ public class FTRUMConfigManager {
         return randomUserId;
     }
 
-
+    /**
+     * 获取绑定用户信息
+     * @return
+     */
     UserData getUserData() {
         synchronized (mLock) {
             if (mUserData != null) {
@@ -222,10 +228,6 @@ public class FTRUMConfigManager {
     void initRUMGlobalContext(FTRUMConfig config) {
         Context context = FTApplication.getApplication();
         HashMap<String, Object> rumGlobalContext = config.getGlobalContext();
-//        if(config.isBackendSample()){
-        //sample
-//            rumGlobalContext.put(Constants.KEY_BACKENDSAMPLE,"");
-//        }
         rumGlobalContext.put(Constants.KEY_RUM_CUSTOM_KEYS, new Gson().toJson(rumGlobalContext.keySet()));
         rumGlobalContext.put(Constants.KEY_RUM_APP_ID, config.getRumAppId());
         rumGlobalContext.put(Constants.KEY_RUM_SESSION_TYPE, "user");

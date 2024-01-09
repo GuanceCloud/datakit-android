@@ -370,6 +370,11 @@ public class Constants {
     public static final String KEY_SDK_DATA_FLAG = "sdk_data_id";
 
     /**
+     * SDK View 更新时间
+     */
+    public static final String KEY_SDK_VIEW_UPDATE_TIME = "view_update_time";
+
+    /**
      * SDK 版本号，这里为 agent 版本 {@link #KEY_RUM_SDK_PACKAGE_AGENT}
      */
     public static final String KEY_SDK_VERSION = "sdk_version";

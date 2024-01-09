@@ -78,6 +78,14 @@ public class FTSQL {
      */
     public static final String RUM_COLUMN_PENDING_RESOURCE = "pending_resource_count";
     /**
+     * 数据上传时间
+     */
+    public static final String RUM_DATA_UPLOAD_TIME = "data_upload_time";
+    /**
+     * 数据更新时间
+     */
+    public static final  String RUM_DATA_UPDATE_TIME="data_update_time";
+    /**
      * {@link com.ft.sdk.garble.bean.ViewBean#actionCount}
      */
     public static final String RUM_COLUMN_ACTION_COUNT = "action_count";
@@ -147,7 +155,7 @@ public class FTSQL {
             RUM_COLUMN_ID + " TEXT PRIMARY KEY," +
             RUM_COLUMN_START_TIME + " BIGINT," +
             RUM_COLUMN_ACTION_DURATION + " BIGINT," +
-            RUM_COLUMN_IS_CLOSE + " TEXT," +
+            RUM_COLUMN_IS_CLOSE + " INTEGER," +
             RUM_COLUMN_ERROR_COUNT + " INTEGER," +
             RUM_COLUMN_LONG_TASK_COUNT + " INTEGER," +
             RUM_COLUMN_RESOURCE_COUNT + " INTEGER," +
@@ -169,7 +177,7 @@ public class FTSQL {
             RUM_COLUMN_VIEW_NAME + " TEXT," +
             RUM_COLUMN_VIEW_REFERRER + " TEXT," +
             RUM_COLUMN_START_TIME + " BIGINT," +
-            RUM_COLUMN_IS_CLOSE + " TEXT," +
+            RUM_COLUMN_IS_CLOSE + " INTEGER," +
             RUM_COLUMN_SESSION_ID + " TEXT," +
             RUM_COLUMN_ACTION_COUNT + " INTEGER," +
             RUM_COLUMN_ERROR_COUNT + " INTEGER," +
@@ -178,6 +186,8 @@ public class FTSQL {
             RUM_COLUMN_VIEW_TIME_SPENT + " BIGINT," +
             RUM_COLUMN_RESOURCE_COUNT + " INTEGER," +
             RUM_COLUMN_PENDING_RESOURCE + " INTEGER," +
+            RUM_DATA_UPDATE_TIME + " BIGINT DEFAULT 0," +
+            RUM_DATA_UPLOAD_TIME + " BIGINT DEFAULT 0," +
             RUM_COLUMN_EXTRA_ATTR + " TEXT" +
             ")";
 

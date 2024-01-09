@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -53,6 +52,7 @@ public class FTRUMInnerManager {
      * 持续 Session 最大重置事件，4小时
      */
     static final long SESSION_EXPIRE_TIME = 14400000000000L;
+//    static final long SESSION_EXPIRE_TIME = 5000000000L;//5秒
     /**
      * Session 最大存储数值
      */
@@ -100,7 +100,7 @@ public class FTRUMInnerManager {
     /**
      * 最近 Session 时间，单位纳秒
      */
-    private final long lastSessionTime = Utils.getCurrentNanoTime();
+    private long lastSessionTime = Utils.getCurrentNanoTime();
 
     /**
      * 最近 Action 时间
@@ -112,13 +112,42 @@ public class FTRUMInnerManager {
         return sessionId;
     }
 
-    private void checkSessionRefresh() {
+    /**
+     * 检测重置 session_id
+     *
+     * @return
+     */
+    private void checkSessionRefresh(boolean checkRefreshView) {
         long now = Utils.getCurrentNanoTime();
         boolean longResting = now - lastActionTime > MAX_RESTING_TIME;
         boolean longTimeSession = now - lastSessionTime > SESSION_EXPIRE_TIME;
         if (longTimeSession || longResting) {
-            sessionId = UUID.randomUUID().toString();
+            lastSessionTime = now;
+
+            sessionId = Utils.randomUUID();
             checkSessionKeep(sessionId, sampleRate);
+
+            if (checkRefreshView) {
+                if (activeView != null && !activeView.isClose()) {
+                    activeView.close();
+                    closeView(activeView);
+
+                    String viewName = activeView.getViewName();
+                    String viewReferrer = activeView.getViewReferrer();
+                    HashMap<String, Object> property = activeView.getProperty();
+                    long loadTime = activeView.getLoadTime();
+
+                    activeView = new ActiveViewBean(viewName, viewReferrer, loadTime, sessionId);
+                    if (property != null) {
+                        activeView.getProperty().putAll(property);
+                    }
+                    FTMonitorManager.get().addMonitor(activeView.getId());
+                    FTMonitorManager.get().attachMonitorData(activeView);
+                    initView(activeView);
+                    LogUtils.d(TAG, "New sessionId:" + activeView.getSessionId() + ",viewId:" + activeView.getId());
+                }
+            }
+
         }
     }
 
@@ -130,7 +159,7 @@ public class FTRUMInnerManager {
         String viewId = activeView != null ? activeView.getId() : null;
         String viewName = activeView != null ? activeView.getViewName() : null;
         String viewReferrer = activeView != null ? activeView.getViewReferrer() : null;
-        checkSessionRefresh();
+        checkSessionRefresh(true);
 
         ActiveActionBean activeAction = new ActiveActionBean(actionName, actionType,
                 sessionId, viewId, viewName, viewReferrer, false);
@@ -186,7 +215,7 @@ public class FTRUMInnerManager {
         String viewId = activeView != null ? activeView.getId() : null;
         String viewName = activeView != null ? activeView.getViewName() : null;
         String viewReferrer = activeView != null ? activeView.getViewReferrer() : null;
-        checkSessionRefresh();
+        checkSessionRefresh(true);
         checkActionClose();
         if (activeAction == null || activeAction.isClose()) {
             activeAction = new ActiveActionBean(actionName, actionType, sessionId, viewId, viewName, viewReferrer, needWait);
@@ -246,6 +275,7 @@ public class FTRUMInnerManager {
      */
     void startResource(String resourceId, HashMap<String, Object> property) {
         LogUtils.d(TAG, "startResource:" + resourceId);
+        checkSessionRefresh(true);
         ResourceBean bean = new ResourceBean();
         if (property != null) {
             bean.property.putAll(property);
@@ -293,6 +323,7 @@ public class FTRUMInnerManager {
                 @Override
                 public void run() {
                     FTDBManager.get().reduceViewPendingResource(viewId);
+                    FTDBManager.get().updateViewUpdateTime(viewId, System.currentTimeMillis());
                     FTDBManager.get().reduceActionPendingResource(actionId);
                     FTTraceManager.get().removeByStopResource(resourceId);
                 }
@@ -334,7 +365,7 @@ public class FTRUMInnerManager {
             }
         }
 
-        checkSessionRefresh();
+        checkSessionRefresh(false);
         if (activeView != null && !activeView.isClose()) {
             activeView.close();
             closeView(activeView);
@@ -524,6 +555,8 @@ public class FTRUMInnerManager {
             @Override
             public void run() {
                 try {
+                    checkSessionRefresh(true);
+
                     JSONObject tags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
                     attachRUMRelative(tags, true);
                     JSONObject fields = new JSONObject();
@@ -584,7 +617,7 @@ public class FTRUMInnerManager {
      */
     public void addLongTask(String log, long duration, HashMap<String, Object> property) {
         try {
-            long time = Utils.getCurrentNanoTime();
+            checkSessionRefresh(true);
             JSONObject tags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
             attachRUMRelative(tags, true);
             JSONObject fields = new JSONObject();
@@ -599,7 +632,7 @@ public class FTRUMInnerManager {
                 }
             }
 
-            FTTrackInner.getInstance().rum(time, Constants.FT_MEASUREMENT_RUM_LONG_TASK, tags, fields);
+            FTTrackInner.getInstance().rum(Utils.getCurrentNanoTime(), Constants.FT_MEASUREMENT_RUM_LONG_TASK, tags, fields);
             increaseLongTask(tags);
 
         } catch (Exception e) {
@@ -919,6 +952,7 @@ public class FTRUMInnerManager {
             @Override
             public void run() {
                 FTDBManager.get().closeView(viewId, timeSpent, viewBean.getAttrJsonString());
+                FTDBManager.get().updateViewUpdateTime(viewId, System.currentTimeMillis());
             }
         });
         generateRumData();
@@ -1085,7 +1119,6 @@ public class FTRUMInnerManager {
         for (ViewBean bean : beans) {
             JSONObject fields = new JSONObject();
             JSONObject tags = new JSONObject(globalTags.toString());
-            long time = Utils.getCurrentNanoTime();
 
             try {
                 tags.put(Constants.KEY_RUM_SESSION_ID, bean.getSessionId());
@@ -1106,10 +1139,12 @@ public class FTRUMInnerManager {
                 if (bean.isClose()) {
                     fields.put(Constants.KEY_RUM_VIEW_TIME_SPENT, bean.getTimeSpent());
                 } else {
-                    fields.put(Constants.KEY_RUM_VIEW_TIME_SPENT, time - bean.getStartTime());
+                    fields.put(Constants.KEY_RUM_VIEW_TIME_SPENT, Utils.getCurrentNanoTime()
+                            - bean.getStartTime());
                 }
                 fields.put(Constants.KEY_RUM_VIEW_LONG_TASK_COUNT, bean.getLongTaskCount());
                 fields.put(Constants.KEY_RUM_VIEW_IS_ACTIVE, !bean.isClose());
+                fields.put(Constants.KEY_SDK_VIEW_UPDATE_TIME, System.currentTimeMillis());
 
                 if (FTMonitorManager.get().isDeviceMetricsMonitorType(DeviceMetricsMonitorType.CPU)) {
                     double cpuTickCountPerSecond = bean.getCpuTickCountPerSecond();
@@ -1142,6 +1177,7 @@ public class FTRUMInnerManager {
 
             FTTrackInner.getInstance().rum(bean.getStartTime(),
                     Constants.FT_MEASUREMENT_RUM_VIEW, tags, fields);
+            FTDBManager.get().updateViewUploadTime(bean.getId(), System.currentTimeMillis());
 
 
         }

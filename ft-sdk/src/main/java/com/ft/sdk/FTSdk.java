@@ -10,6 +10,7 @@ import com.ft.sdk.garble.FTAutoTrackConfigManager;
 import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.bean.UserData;
+import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
@@ -121,6 +122,7 @@ public class FTSdk {
         FTRUMGlobalManager.get().release();
         FTRUMInnerManager.get().release();
         EventConsumerThreadPool.get().shutDown();
+        FTDBManager.release();
         mFtSdk = null;
         LogUtils.w(TAG, "FT SDK 已经被关闭");
     }
