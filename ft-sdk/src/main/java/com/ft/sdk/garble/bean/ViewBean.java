@@ -15,7 +15,6 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.UUID;
 
 /**
  * View 指标数据，以下数据为页面页面生命周期内容产生的数据指标，从 {@link FTRUMInnerManager#startView(String)} 到
@@ -78,48 +77,63 @@ public class ViewBean {
     long timeSpent = 0;
 
     /**
-     * 最小帧数
+     * 最小帧数, {@link  Constants#KEY_FPS_MINI}
      */
     double fpsMini;
 
     /**
-     * 页面平均帧数
+     * 页面平均帧数,{@link  Constants#KEY_FPS_AVG}
      */
     double fpsAvg;
 
     /**
-     * cpu 每秒跳动次数
+     * cpu 每秒跳动次数,{@link  Constants#KEY_CPU_TICK_COUNT_PER_SECOND}
      */
     double cpuTickCountPerSecond = -1;
 
     /**
-     * cpu 跳动次数
+     * cpu 跳动次数,{@link  Constants#KEY_CPU_TICK_COUNT}
      */
     long cpuTickCount = -1;
 
     /**
-     * 平均内容
+     * 平均内存,{@link  Constants#KEY_MEMORY_AVG}
      */
     long memoryAvg;
 
     /**
-     * 最大内容
+     * 最大内存，,{@link  Constants#KEY_MEMORY_MAX}
      */
     long memoryMax;
 
     /**
-     * 平均电池消耗
+     * 平均电池消耗,{@link  Constants#KEY_BATTERY_CURRENT_AVG}
      */
     int batteryCurrentAvg;
     /**
-     * 电池最最大消耗
+     * 电池最最大消耗,{@link  Constants#KEY_BATTERY_CURRENT_MAX}
      */
     int batteryCurrentMax;
 
     /**
-     * {@link FTRUMInnerManager#sessionId}
+     * {@link FTRUMInnerManager#sessionId},{@link Constants#KEY_RUM_SESSION_ID}
      */
     String sessionId;
+
+
+    /**
+     * 页面更新次数,{@link  Constants#KEY_SDK_VIEW_UPDATE_TIME}
+     */
+    long viewUpdateTime = 0;
+
+
+    public long getViewUpdateTime() {
+        return viewUpdateTime;
+    }
+
+    public void setViewUpdateTime(long viewUpdateTime) {
+        this.viewUpdateTime = viewUpdateTime;
+    }
 
     /**
      * 页面附加属性,{@link  Constants#KEY_RUM_PROPERTY}

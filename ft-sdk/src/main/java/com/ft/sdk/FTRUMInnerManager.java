@@ -1144,7 +1144,7 @@ public class FTRUMInnerManager {
                 }
                 fields.put(Constants.KEY_RUM_VIEW_LONG_TASK_COUNT, bean.getLongTaskCount());
                 fields.put(Constants.KEY_RUM_VIEW_IS_ACTIVE, !bean.isClose());
-                fields.put(Constants.KEY_SDK_VIEW_UPDATE_TIME, System.currentTimeMillis());
+                fields.put(Constants.KEY_SDK_VIEW_UPDATE_TIME, bean.getViewUpdateTime());
 
                 if (FTMonitorManager.get().isDeviceMetricsMonitorType(DeviceMetricsMonitorType.CPU)) {
                     double cpuTickCountPerSecond = bean.getCpuTickCountPerSecond();

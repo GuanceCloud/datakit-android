@@ -338,6 +338,9 @@ public class FTDBManager extends DBManager {
                                 db.execSQL("UPDATE " + FTSQL.FT_TABLE_VIEW + " SET "
                                         + columName + "=" + dateTime
                                         + " WHERE " + FTSQL.RUM_COLUMN_ID + "='" + viewId + "'");
+                                db.execSQL("UPDATE " + FTSQL.FT_TABLE_VIEW + " SET "
+                                        + FTSQL.RUM_VIEW_UPDATE_TIME + "=" + FTSQL.RUM_VIEW_UPDATE_TIME + "+ 1"
+                                        + " WHERE " + FTSQL.RUM_COLUMN_ID + "='" + viewId + "'");
                             }
                         }
 
@@ -439,6 +442,7 @@ public class FTDBManager extends DBManager {
                         String viewName = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_NAME));
                         String viewReferrer = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_REFERRER));
                         String attr = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_EXTRA_ATTR));
+                        long viewUpdateTime = cursor.getLong(cursor.getColumnIndex(FTSQL.RUM_VIEW_UPDATE_TIME));
 
                         ViewBean viewBean = new ViewBean();
                         viewBean.setClose(close == 1);
@@ -454,6 +458,7 @@ public class FTDBManager extends DBManager {
                         viewBean.setViewName(viewName);
                         viewBean.setViewReferrer(viewReferrer);
                         viewBean.setFromAttrJsonString(attr);
+                        viewBean.setViewUpdateTime(viewUpdateTime);
 
                         list.add(viewBean);
                     }

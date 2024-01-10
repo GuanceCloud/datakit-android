@@ -18,6 +18,9 @@ import java.util.HashMap;
 
 import okhttp3.Request;
 
+/**
+ * 手动使用 RUM 例子
+ */
 public class ManualRUMActivity extends NameTitleActivity {
 
     public static final String HTTPS_FAKE_URL = "https://www.fakeurl.com";

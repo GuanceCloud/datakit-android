@@ -84,7 +84,11 @@ public class FTSQL {
     /**
      * 数据更新时间
      */
-    public static final  String RUM_DATA_UPDATE_TIME="data_update_time";
+    public static final String RUM_DATA_UPDATE_TIME = "data_update_time";
+    /**
+     * 数据生成次数
+     */
+    public static final String RUM_VIEW_UPDATE_TIME = "view_update_time";
     /**
      * {@link com.ft.sdk.garble.bean.ViewBean#actionCount}
      */
@@ -188,6 +192,7 @@ public class FTSQL {
             RUM_COLUMN_PENDING_RESOURCE + " INTEGER," +
             RUM_DATA_UPDATE_TIME + " BIGINT DEFAULT 0," +
             RUM_DATA_UPLOAD_TIME + " BIGINT DEFAULT 0," +
+            RUM_VIEW_UPDATE_TIME + " BIGINT DEFAULT 1," +
             RUM_COLUMN_EXTRA_ATTR + " TEXT" +
             ")";
 
