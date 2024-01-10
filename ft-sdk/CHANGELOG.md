@@ -1,3 +1,11 @@
+# agent 1.4.1-alpha01
+1.修复由于超长 session 导致的 view 展示重复数据的问题
+2.修复未结束 resource 导致重复传 view 数据的问题
+3.修改无 userid 绑定随机 uuid 算法
+4.新增 view_update_time 自增数，解决数据并发写入次序问题 
+5.优化数据同步
+
+---
 # agent 1.4.0-beta01
 1.优化数据同步机制
 2.优化内部日志输出
