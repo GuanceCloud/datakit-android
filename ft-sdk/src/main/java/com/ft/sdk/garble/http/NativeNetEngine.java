@@ -90,7 +90,6 @@ public class NativeNetEngine implements INetEngine {
             if (mConnection == null) {
                 //连接打开失败提示
                 responseCode = NetCodeStatus.NETWORK_EXCEPTION_CODE;
-                LogUtils.e(TAG, String.format("connect %s feature", url));
             } else {
                 connSuccess = true;
             }
@@ -139,8 +138,7 @@ public class NativeNetEngine implements INetEngine {
     private FTResponseData request() {
         if (!connSuccess) {
             //如果连接失败，直接返回相应提示
-            return new FTResponseData(responseCode,
-                    "");
+            return new FTResponseData(responseCode, "");
         }
 
         RequestMethod method = mHttpBuilder.getMethod();
@@ -178,15 +176,16 @@ public class NativeNetEngine implements INetEngine {
             }
         } catch (SocketTimeoutException e) {
             //连接超时提示
-            responseCode = HttpURLConnection.HTTP_CLIENT_TIMEOUT;
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            responseCode = NetCodeStatus.FILE_IO_EXCEPTION_CODE;
+            return new FTResponseData(responseCode, e.getLocalizedMessage());
         } catch (IOException e) {
             //IO异常提示
             responseCode = NetCodeStatus.FILE_IO_EXCEPTION_CODE;
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            return new FTResponseData(responseCode, e.getLocalizedMessage());
         } catch (Exception e) {
             //其他异常未知错误
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            responseCode = NetCodeStatus.UNKNOWN_EXCEPTION_CODE;
+            return new FTResponseData(responseCode, e.getLocalizedMessage());
 
         } finally {
             close(mConnection, outputStream, reader, inputStreamReader, inputStream);

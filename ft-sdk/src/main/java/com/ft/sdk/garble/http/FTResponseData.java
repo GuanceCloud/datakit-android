@@ -33,25 +33,25 @@ public class FTResponseData {
     public FTResponseData(int code, String data) {
         if (code == HttpURLConnection.HTTP_OK) {
             this.code = code;
-            message = data;
+            this.message = data;
         } else {
             if (code < NetCodeStatus.NETWORK_EXCEPTION_CODE) {
                 try {
                     if (data != null) {
                         JSONObject jsonObject = new JSONObject(data);
                         this.code = jsonObject.optInt("code", code);
-                        errorCode = jsonObject.optString("errorCode");
-                        message = jsonObject.optString("message");
+                        this.errorCode = jsonObject.optString("errorCode");
+                        this.message = jsonObject.optString("message");
                     }
                 } catch (JSONException e) {
                     this.code = code;
-                    message = data;
+                    this.message = data;
                 } catch (Exception e) {
                     LogUtils.e(TAG, Log.getStackTraceString(e));
                 }
             } else {
                 this.code = code;
-                message = data;
+                this.message = data;
             }
         }
     }
