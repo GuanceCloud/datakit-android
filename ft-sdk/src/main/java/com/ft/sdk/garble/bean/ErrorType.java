@@ -18,6 +18,16 @@ public enum ErrorType {
      * {<a href="https://github.com/GuanceCloud/datakit-flutter">Flutter SDK </a>}
      */
     FLUTTER("flutter_crash"),
+
+    /**
+     * 由于 ANR 产生的崩溃问题
+     */
+    ANR_CRASH("anr_crash"),
+
+    /**
+     * 触发的 ANR 事件
+     */
+    ANR_ERROR("anr_error"),
     /**
      * 网络请求错误
      */

@@ -59,6 +59,7 @@ public class FTRUMConfigManager {
         initRandomUserId();
         FTMonitorManager.get().initWithConfig(config);
         FTUIBlockManager.get().start(config);
+        FTANRDetector.get().init(config);
         initRUMGlobalContext(config);
         if (config.isRumEnable() && config.isEnableTraceUserAction()) {
             //应对 flutter reactNative application 生命周期启动早于条件设置
@@ -76,6 +77,10 @@ public class FTRUMConfigManager {
 
         if (isNativeLibSupport) {
             FTSdk.NATIVE_VERSION = com.ft.sdk.nativelib.BuildConfig.VERSION_NAME;
+        }
+
+        if (!config.isRumEnable()) {
+            return;
         }
 
         boolean enableTrackAppCrash = config.isEnableTrackAppCrash();
@@ -150,6 +155,7 @@ public class FTRUMConfigManager {
 
     /**
      * 获取绑定用户信息
+     *
      * @return
      */
     UserData getUserData() {

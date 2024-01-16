@@ -39,4 +39,31 @@ public class StringUtils {
         }
         return sb.toString();
     }
+
+    public static String getStringFromStackTraceElement(StackTraceElement[] stackTrace) {
+
+        StringBuilder stackTraceString = new StringBuilder();
+        // 遍历堆栈跟踪信息
+        for (StackTraceElement stackTraceElement : stackTrace) {
+            // 获取类名
+            String className = stackTraceElement.getClassName();
+
+            // 获取方法名
+            String methodName = stackTraceElement.getMethodName();
+
+            // 获取行号
+            int lineNumber = stackTraceElement.getLineNumber();
+
+            // 获取文件名
+            String fileName = stackTraceElement.getFileName();
+
+            // 组合信息
+            String stackTraceInfo = String.format("%s.%s(%s:%d)", className, methodName, fileName, lineNumber);
+
+            // 打印信息
+            stackTraceString.append(stackTraceInfo).append("\n");
+        }
+
+        return stackTraceString.toString();
+    }
 }
