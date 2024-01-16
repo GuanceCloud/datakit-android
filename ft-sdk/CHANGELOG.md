@@ -1,3 +1,9 @@
+# agent 1.4.1-alpha02
+1.新增 ANR Error 事件和 ANR 引起崩溃的日志
+2.修复 Okhttp 中使用加密算法，单纯依赖 ASM 写入，resource 不发送的问题
+3.支持自定义 Resource 内容，与 FTTraceConfig.enableAutoTrace，FTRUMConfig.enableTraceUserResource 同时开启
+
+---
 # agent 1.4.1-alpha01
 1.修复由于超长 session 导致的 view 展示重复数据的问题
 2.修复未结束 resource 导致重复传 view 数据的问题
