@@ -32,6 +32,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 
 /**
@@ -782,16 +783,45 @@ public class FTAutoTrack {
      */
     public static OkHttpClient trackOkHttpBuilder(OkHttpClient.Builder builder) {
         LogUtils.d(TAG, "trackOkHttpBuilder");
-        if (FTTraceConfigManager.get().isEnableAutoTrace()) {
-            builder.addInterceptor(new FTTraceInterceptor());
-        }
+
 //            builder.addNetworkInterceptor(interceptor); //发现部分工程有兼容问题
         if (FTRUMConfigManager.get().isRumEnable()) {
             if (FTRUMConfigManager.get().getConfig().isEnableTraceUserResource()) {
-                builder.addInterceptor(new FTResourceInterceptor());
-                builder.eventListenerFactory(new FTResourceEventListener.FTFactory());
+                boolean hasSetResource = false;//是否已经设置 FTResourceInterceptor
+                for (Interceptor interceptor : builder.interceptors()) {
+                    if (interceptor instanceof FTResourceInterceptor) {
+                        hasSetResource = true;
+                        break;
+                    }
+
+                }
+                if (!hasSetResource) {
+                    builder.interceptors().add(0, new FTResourceInterceptor());
+                }
+                FTResourceEventListener.FTFactory factory = FTRUMConfigManager.get().getOverrideEventListener();
+                if (factory != null) {
+                    builder.eventListenerFactory(factory);
+                } else {
+                    builder.eventListenerFactory(new FTResourceEventListener.FTFactory());
+                }
             }
         }
+
+        if (FTTraceConfigManager.get().isEnableAutoTrace()) {
+            boolean hasSetTrace = false;//是否已经设置 FTResourceInterceptor
+
+            for (Interceptor interceptor : builder.interceptors()) {
+                if (interceptor instanceof FTTraceInterceptor) {
+                    hasSetTrace = true;
+                    break;
+                }
+
+            }
+            if (!hasSetTrace) {
+                builder.interceptors().add(0, new FTTraceInterceptor());
+            }
+        }
+
         return builder.build();
     }
 

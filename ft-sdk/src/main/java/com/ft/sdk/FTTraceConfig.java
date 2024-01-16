@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- *
- *
  * @author Brandon
  */
 public class FTTraceConfig {
@@ -94,12 +92,16 @@ public class FTTraceConfig {
 
     /**
      * 获取链路支持
+     *
      * @return
      */
     public List<String> getTraceContentType() {
         return traceContentType;
     }
 
+    /**
+     * {@link #enableAutoTrace}
+     */
     public boolean isEnableAutoTrace() {
         return enableAutoTrace;
     }
@@ -114,15 +116,17 @@ public class FTTraceConfig {
     }
 
 
+    /**
+     * {@link #enableAutoTrace}
+     *
+     * @param enableAutoTrace
+     * @return
+     */
     public FTTraceConfig setEnableAutoTrace(boolean enableAutoTrace) {
         this.enableAutoTrace = enableAutoTrace;
         return this;
     }
 
-//    public FTTraceConfig addGlobalContext(@NonNull String key, @NonNull String value) {
-//        this.globalContext.put(key, value);
-//        return this;
-//    }
 
     public HashMap<String, Object> getGlobalContext() {
         return globalContext;

@@ -105,6 +105,8 @@ public class FTRUMConfigManager {
     }
 
     /**
+     * RUM 是否开启
+     *
      * @return
      */
     public boolean isRumEnable() {
@@ -113,6 +115,17 @@ public class FTRUMConfigManager {
 
     public FTRUMConfig getConfig() {
         return config;
+    }
+
+    /**
+     * 返回自定义覆盖全局的 {@link FTResourceEventListener.FTFactory}
+     *
+     * @return
+     */
+    public FTResourceEventListener.FTFactory getOverrideEventListener() {
+        if (config == null) return null;
+        if (config.getOkHttpEventListenerHandler() == null) return null;
+        return config.getOkHttpEventListenerHandler().getEventListenerFTFactory();
     }
 
 
