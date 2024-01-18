@@ -1,6 +1,5 @@
 package com.ft.sdk.garble.utils;
 
-import com.ft.sdk.FTTraceConfig;
 import com.ft.sdk.garble.http.HttpUrl;
 
 import java.util.Locale;
@@ -32,7 +31,7 @@ public class SkyWalkingUtils {
     private String newTraceId;
     private String newParentTraceId;
 
-    public SkyWalkingUtils(SkyWalkingVersion version, String sampled, long requestTime, HttpUrl url, FTTraceConfig config) {
+    public SkyWalkingUtils(SkyWalkingVersion version, String sampled, long requestTime, HttpUrl url, String serviceName) {
         synchronized (SkyWalkingUtils.class) {//防止多线程 increasingNumber 不安顺序增加
             if (increasingNumber.get() < 9999) {
                 increasingNumber.getAndAdd(2);
@@ -40,7 +39,7 @@ public class SkyWalkingUtils {
                 increasingNumber.set(1);
             }
             if (version == SkyWalkingVersion.V3) {
-                createSw8Head(sampled, requestTime, url, config);
+                createSw8Head(sampled, requestTime, url, serviceName);
             } else if (version == SkyWalkingVersion.V2) {
                 increasingLong.getAndIncrement();
                 createSw6Head(sampled, requestTime, url);
@@ -65,19 +64,20 @@ public class SkyWalkingUtils {
      * 基于 skywalking 官方 v3 算法
      *
      * <a href="https://skywalking.apache.org/docs/main/v9.0.0/en/protocols/skywalking-cross-process-propagation-headers-protocol-v3/">查看官方文档</a>
+     *
      * @param sampled
      * @param requestTime
      * @param url
-     * @param config
+     * @param serviceName
      */
-    private void createSw8Head(String sampled, long requestTime, HttpUrl url, FTTraceConfig config) {
+    private void createSw8Head(String sampled, long requestTime, HttpUrl url, String serviceName) {
         newParentTraceId = traceIDUUID + "." + Thread.currentThread().getId() + "." + requestTime + String.format(Locale.getDefault(), "%04d", increasingNumber.get() - 1);
         newTraceId = traceIDUUID + "." + Thread.currentThread().getId() + "." + requestTime + String.format(Locale.getDefault(), "%04d", increasingNumber.get());
         sw8 = sampled + "-" +
                 Utils.encodeStringToBase64(newTraceId) + "-" +
                 Utils.encodeStringToBase64(newParentTraceId) + "-" +
                 "0-" +
-                Utils.encodeStringToBase64(config.getServiceName()) + "-" +
+                Utils.encodeStringToBase64(serviceName) + "-" +
                 Utils.encodeStringToBase64(parentServiceUUID + "@" + NetUtils.getMobileIpAddress()) + "-" +
                 Utils.encodeStringToBase64(url.getPath()) + "-" +
                 Utils.encodeStringToBase64(url.getHost() + ":" + url.getPort());

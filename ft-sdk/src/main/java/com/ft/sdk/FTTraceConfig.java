@@ -34,7 +34,7 @@ public class FTTraceConfig {
     /**
      * 服务名称 {@link Constants#KEY_SERVICE },默认为 {@link Constants#DEFAULT_SERVICE_NAME}
      */
-    private String serviceName = Constants.DEFAULT_SERVICE_NAME;
+    String serviceName = Constants.DEFAULT_SERVICE_NAME;
 
     /**
      * 设置全局 tag
@@ -83,11 +83,7 @@ public class FTTraceConfig {
         return this;
     }
 
-    public String getServiceName() {
-        return serviceName;
-    }
-
-    public void setServiceName(String serviceName) {
+    void setServiceName(String serviceName) {
         this.serviceName = serviceName;
     }
 
