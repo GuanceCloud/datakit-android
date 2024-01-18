@@ -139,7 +139,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
 
                     long time = data.optLong(Constants.TIME);
                     String measurement = data.optString(Constants.MEASUREMENT);
-                    FTTrackInner.getInstance().rumWebView(time, measurement, tags, fields);
+                    FTTrackInner.getInstance().rumWebView(time * 1000000, measurement, tags, fields);
                 }
 
             } else if (name.equals(WEB_JS_TYPE_TRACK)) {
