@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.powermock.reflect.Whitebox;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -46,7 +47,7 @@ public class UtilsTest {
     /**
      * 空行协议数据
      */
-    private static final String SINGLE_LINE_EMPTY_DATA = TEST_MEASUREMENT_INFLUX_DB_LINE +" "
+    private static final String SINGLE_LINE_EMPTY_DATA = TEST_MEASUREMENT_INFLUX_DB_LINE + " "
             + KEY_FIELD_EMPTY + "=\"\" " +
             "" + VALUE_TIME + "\n";
 
@@ -81,8 +82,7 @@ public class UtilsTest {
         recordDataList.add(recordData);
         recordDataList.add(recordData);
         recordDataList.add(recordData);
-        String content = Whitebox.invokeMethod(new SyncDataHelper(), "convertToLineProtocolLines",
-                recordDataList);
+        String content = convertToLineProtocolLines(recordDataList);
         Assert.assertEquals(LOG_EXPECT_DATA, content.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION)
                 .replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK));
     }
@@ -103,8 +103,7 @@ public class UtilsTest {
 
         List<SyncJsonData> recordDataList = new ArrayList<>();
         recordDataList.add(data);
-        String content = Whitebox.invokeMethod(new SyncDataHelper(), "convertToLineProtocolLines",
-                recordDataList);
+        String content = convertToLineProtocolLines(recordDataList);
 
         assertEquals(content.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION)
                 .replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK), SINGLE_LINE_NORMAL_DATA);
@@ -119,11 +118,15 @@ public class UtilsTest {
 
         List<SyncJsonData> emptyRecordDataList = new ArrayList<>();
         emptyRecordDataList.add(dataEmpty);
-        String contentEmpty = Whitebox.invokeMethod(new SyncDataHelper(), "convertToLineProtocolLines",
-                emptyRecordDataList);
+        String contentEmpty = convertToLineProtocolLines(emptyRecordDataList);
 
         assertEquals(SINGLE_LINE_EMPTY_DATA, contentEmpty.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION)
                 .replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK));
+    }
+
+    private String convertToLineProtocolLines(List<SyncJsonData> list) throws Exception {
+        return Whitebox.invokeMethod(new SyncDataHelper(), "convertToLineProtocolLines",
+                list, new HashMap<>(), false);
     }
 
 

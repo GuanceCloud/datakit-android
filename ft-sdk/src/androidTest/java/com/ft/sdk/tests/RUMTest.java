@@ -176,7 +176,7 @@ public class RUMTest extends FTBaseTest {
 
         waitForInThreadPool();
 
-        ArrayList<ViewBean> list = FTDBManager.get().querySumView(0);
+        ArrayList<ViewBean> list = FTDBManager.get().querySumView(0, true);
         Assert.assertEquals(list.size(), 2);
 
         ViewBean firstView = list.get(0);
@@ -250,7 +250,7 @@ public class RUMTest extends FTBaseTest {
 
         waitForInThreadPool();
 
-        ArrayList<ViewBean> list = FTDBManager.get().querySumView(0);
+        ArrayList<ViewBean> list = FTDBManager.get().querySumView(0, true);
         Assert.assertEquals(list.size(), 2);
 
         ViewBean firstView = list.get(0);

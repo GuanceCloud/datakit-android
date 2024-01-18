@@ -110,6 +110,17 @@ public class SyncDataHelper {
      * @return
      */
     private String convertToLineProtocolLines(List<SyncJsonData> datas, HashMap<String, Object> extraTags) {
+        return convertToLineProtocolLines(datas, extraTags, true);
+    }
+
+    /**
+     * 转化为行协议数据
+     *
+     * @param datas
+     * @param extraTags
+     * @return
+     */
+    private String convertToLineProtocolLines(List<SyncJsonData> datas, HashMap<String, Object> extraTags, boolean withUUid) {
         StringBuilder sb = new StringBuilder();
         for (SyncJsonData data : datas) {
             String jsonString = data.getDataString();
@@ -136,7 +147,9 @@ public class SyncDataHelper {
                             }
                         }
                     }
-                    tags.put(Constants.KEY_SDK_DATA_FLAG, Utils.randomUUID());
+                    if (withUUid) {
+                        tags.put(Constants.KEY_SDK_DATA_FLAG, Utils.randomUUID());
+                    }
                     StringBuilder tagSb = getCustomHash(tags, true);
                     deleteLastComma(tagSb);
                     if (tagSb.length() > 0) {

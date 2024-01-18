@@ -406,6 +406,10 @@ public class FTDBManager extends DBManager {
         return list;
     }
 
+    public ArrayList<ViewBean> querySumView(final int limit) {
+        return querySumView(limit, false);
+    }
+
     /**
      * 获取 View 各项数据统计 {@link ViewBean}
      *
@@ -413,7 +417,7 @@ public class FTDBManager extends DBManager {
      * @return
      */
 
-    public ArrayList<ViewBean> querySumView(final int limit) {
+    public ArrayList<ViewBean> querySumView(final int limit, boolean allData) {
         final ArrayList<ViewBean> list = new ArrayList<>();
 
         getDB(false, new DataBaseCallBack() {
@@ -421,7 +425,7 @@ public class FTDBManager extends DBManager {
             public void run(SQLiteDatabase db) {
 
                 try {
-                    String selection = "(" + FTSQL.RUM_COLUMN_IS_CLOSE + "=1 AND (" +
+                    String selection = allData ? null : "(" + FTSQL.RUM_COLUMN_IS_CLOSE + "=1 AND (" +
                             FTSQL.RUM_DATA_UPLOAD_TIME + "<" + FTSQL.RUM_DATA_UPDATE_TIME
                             + " OR " + FTSQL.RUM_DATA_UPLOAD_TIME + "=0 )) OR "
                             + FTSQL.RUM_COLUMN_IS_CLOSE + "=0";
