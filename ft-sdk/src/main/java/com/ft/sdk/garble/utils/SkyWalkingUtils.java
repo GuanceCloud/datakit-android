@@ -4,7 +4,6 @@ import com.ft.sdk.FTTraceConfig;
 import com.ft.sdk.garble.http.HttpUrl;
 
 import java.util.Locale;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -78,7 +77,7 @@ public class SkyWalkingUtils {
                 Utils.encodeStringToBase64(newTraceId) + "-" +
                 Utils.encodeStringToBase64(newParentTraceId) + "-" +
                 "0-" +
-                Utils.encodeStringToBase64(Constants.DEFAULT_SERVICE_NAME) + "-" +
+                Utils.encodeStringToBase64(config.getServiceName()) + "-" +
                 Utils.encodeStringToBase64(parentServiceUUID + "@" + NetUtils.getMobileIpAddress()) + "-" +
                 Utils.encodeStringToBase64(url.getPath()) + "-" +
                 Utils.encodeStringToBase64(url.getHost() + ":" + url.getPort());

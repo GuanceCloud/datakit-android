@@ -210,6 +210,7 @@ public class FTSdk {
      */
     public static void initTraceWithConfig(@NonNull FTTraceConfig config) {
         try {
+            config.setServiceName(get().getBaseConfig().getServiceName());
             FTTraceConfigManager.get().initWithConfig(config);
         } catch (Exception e) {
             LogUtils.e(TAG, Log.getStackTraceString(e));

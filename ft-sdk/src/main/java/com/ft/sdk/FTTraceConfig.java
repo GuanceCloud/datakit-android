@@ -1,5 +1,7 @@
 package com.ft.sdk;
 
+import com.ft.sdk.garble.utils.Constants;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +30,11 @@ public class FTTraceConfig {
      * 是否与 RUM 数据关联
      */
     private boolean enableLinkRUMData = false;
+
+    /**
+     * 服务名称 {@link Constants#KEY_SERVICE },默认为 {@link Constants#DEFAULT_SERVICE_NAME}
+     */
+    private String serviceName = Constants.DEFAULT_SERVICE_NAME;
 
     /**
      * 设置全局 tag
@@ -76,7 +83,15 @@ public class FTTraceConfig {
         return this;
     }
 
-//    /**
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
+
+    //    /**
 //     * 设置支持的采集类型
 //     *
 //     * @param traceContentType

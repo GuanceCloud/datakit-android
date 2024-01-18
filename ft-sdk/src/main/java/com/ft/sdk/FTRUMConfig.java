@@ -72,6 +72,9 @@ public class FTRUMConfig {
     private final HashMap<String, Object> globalContext = new HashMap<>();
 
 
+    /**
+     * 服务名称 {@link Constants#KEY_SERVICE },默认为 {@link Constants#DEFAULT_SERVICE_NAME}
+     */
     private String serviceName = Constants.DEFAULT_SERVICE_NAME;
 
     /**
