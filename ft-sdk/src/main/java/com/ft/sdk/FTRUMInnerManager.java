@@ -300,7 +300,7 @@ public class FTRUMInnerManager {
      *
      * @param resourceId 资源 Id
      */
-    public void stopResource(String resourceId) {
+    void stopResource(String resourceId) {
         LogUtils.d(TAG, "stopResource:" + resourceId);
         stopResource(resourceId, null);
     }
@@ -309,7 +309,7 @@ public class FTRUMInnerManager {
      * @param resourceId
      * @param property   附加属性参数
      */
-    public void stopResource(final String resourceId, HashMap<String, Object> property) {
+    void stopResource(final String resourceId, HashMap<String, Object> property) {
         ResourceBean bean = resourceBeanMap.get(resourceId);
         if (bean != null) {
             if (property != null) {
@@ -337,7 +337,7 @@ public class FTRUMInnerManager {
      * @param viewName 界面名称
      * @param loadTime 加载事件，单位毫秒 ms
      */
-    public void onCreateView(String viewName, long loadTime) {
+    void onCreateView(String viewName, long loadTime) {
         preActivityDuration.put(viewName, loadTime);
     }
 
@@ -509,7 +509,7 @@ public class FTRUMInnerManager {
      * @param errorType 错误类型
      * @param state     程序运行状态
      */
-    public void addError(String log, String message, String errorType, AppState state) {
+    void addError(String log, String message, String errorType, AppState state) {
         addError(log, message, Utils.getCurrentNanoTime(), errorType, state);
     }
 
@@ -523,7 +523,7 @@ public class FTRUMInnerManager {
      * @param state     程序运行状态
      * @param property  附加属性
      */
-    public void addError(String log, String message, String errorType, AppState state, HashMap<String, Object> property) {
+    void addError(String log, String message, String errorType, AppState state, HashMap<String, Object> property) {
         addError(log, message, Utils.getCurrentNanoTime(), errorType, state, property);
     }
 
@@ -536,7 +536,7 @@ public class FTRUMInnerManager {
      * @param state     程序运行状态
      * @param dateline  发生时间，纳秒
      */
-    public void addError(String log, String message, long dateline, String errorType, AppState state) {
+    void addError(String log, String message, long dateline, String errorType, AppState state) {
         addError(log, message, dateline, errorType, state, null);
     }
 
@@ -615,7 +615,7 @@ public class FTRUMInnerManager {
      * @param log      日志内容
      * @param duration 持续时间，纳秒
      */
-    public void addLongTask(String log, long duration, HashMap<String, Object> property) {
+    void addLongTask(String log, long duration, HashMap<String, Object> property) {
         try {
             checkSessionRefresh(true);
             JSONObject tags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
@@ -632,7 +632,7 @@ public class FTRUMInnerManager {
                 }
             }
 
-            FTTrackInner.getInstance().rum(Utils.getCurrentNanoTime(), Constants.FT_MEASUREMENT_RUM_LONG_TASK, tags, fields);
+            FTTrackInner.getInstance().rum(Utils.getCurrentNanoTime() - duration, Constants.FT_MEASUREMENT_RUM_LONG_TASK, tags, fields);
             increaseLongTask(tags);
 
         } catch (Exception e) {
@@ -646,7 +646,7 @@ public class FTRUMInnerManager {
      * @param log      日志内容
      * @param duration 持续时间，纳秒
      */
-    public void addLongTask(String log, long duration) {
+    void addLongTask(String log, long duration) {
         addLongTask(log, duration, null);
     }
 
