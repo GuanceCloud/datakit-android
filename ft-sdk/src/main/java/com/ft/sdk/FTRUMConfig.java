@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 public class FTRUMConfig {
     /**
-     * 采样率
+     * 采样率，[0,1],作用域为同一 session_id 下所有 View，Action，LongTask，Error 数据
      */
     private float samplingRate = 1;
 

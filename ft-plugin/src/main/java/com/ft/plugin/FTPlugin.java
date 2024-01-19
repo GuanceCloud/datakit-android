@@ -23,33 +23,35 @@ import kotlin.jvm.functions.Function1;
   app
   |--build.gradle
 
-  FTExt {                                        //传参对象
-      showLog = true                             //是否显示日志
+    FTExt {
+        showLog = true
 
-      autoUploadMap = false                     //是否上传 map
-      autoUploadNativeDebugSymbol = false       //是否上传 c/c++ native debug symbol 文件
-      datakitDCAUrl = ft_env.datakitDCAUrl      // datakit DCA 地址
-      appId = ft_env.rumAppid                   // appid
-     env = 'common'                            //对应环境
+        autoUploadMap = false
+        autoUploadNativeDebugSymbol = false
+        datakitUrl = ft_env.datakitRUMUrl
+        datawayToken = ft_env.datawayToken
+        appId = ft_env.rumAppid
+        env = 'common'
 
-       //Flavor 覆盖逻辑
-      prodFlavors {
-          prodTest {
-              autoUploadMap = true
-              autoUploadNativeDebugSymbol = true
-              datakitDCAUrl = ft_env.datakitDCAUrl
-              appId = ft_env.rumAppid
-              env = ft_env.prodTestEnv
-          }
-          prodPublish {
-              autoUploadMap = true
-              autoUploadNativeDebugSymbol = true
-              datakitDCAUrl = ft_env.datakitDCAUrl
-              appId = ft_env.rumAppid
-              env = ft_env.prodPublishEnv
-          }
-      }
-  }
+        prodFlavors {
+            prodTest {
+                autoUploadMap = true
+                autoUploadNativeDebugSymbol = true
+                datakitUrl = ft_env.datakitRUMUrl
+                datawayToken = ft_env.datawayToken
+                appId = ft_env.rumAppid
+                env = ft_env.prodTestEnv
+            }
+            prodPublish {
+                autoUploadMap = true
+                autoUploadNativeDebugSymbol = true
+                datakitUrl = ft_env.datakitRUMUrl
+                datawayToken = ft_env.datawayToken
+                appId = ft_env.rumAppid
+                env = ft_env.prodPublishEnv
+            }
+        }
+    }
  */
 
 /**

@@ -3,28 +3,30 @@ package com.ft.sdk.garble.bean;
 import androidx.annotation.NonNull;
 
 /**
- *
  * @author Brandon
  */
 public enum ErrorType {
     /**
-     *
+     * C++/C 类型崩溃
      */
     NATIVE("native_crash"),
     /**
-     *
+     * Java 类型崩溃
      */
     JAVA("java_crash"),
     /**
-     * Flutter {@linkplain https://github.com/GuanceCloud/datakit-flutter}
+     * {<a href="https://github.com/GuanceCloud/datakit-flutter">Flutter SDK </a>}
      */
     FLUTTER("flutter_crash"),
     /**
-     * 网络请求
+     * 网络请求错误
      */
     NETWORK("network_error");
 
 
+    /**
+     * 错误类型，最终显示在行协议中的字符内容
+     */
     private final String value;
 
     ErrorType(String value) {
@@ -32,6 +34,12 @@ public enum ErrorType {
     }
 
 
+    /**
+     * 从字符转化成对应 ErrorType
+     *
+     * @param value native_crash, java_crash, flutter_crash, network_error
+     * @return {@link ErrorType} 类型
+     */
     public static ErrorType getValueFrom(String value) {
         ErrorType[] errorTypes = values();
 

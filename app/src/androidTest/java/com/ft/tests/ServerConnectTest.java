@@ -99,9 +99,9 @@ public class ServerConnectTest extends BaseTest {
         fields.put("testFields", "222");
         long time = Utils.getCurrentNanoTime();
         LineProtocolBean bean = new LineProtocolBean("TestMeasurement", tags, fields, time);
-        Whitebox.invokeMethod(FTTrackInner.getInstance(), "trackAsync", Collections.singletonList(bean), new AsyncCallback() {
+        Whitebox.invokeMethod(FTTrackInner.getInstance(), "trackLogAsync", Collections.singletonList(bean), new AsyncCallback() {
             @Override
-            public void onResponse(int code, String response) {
+            public void onResponse(int code, String response,String errorCode) {
                 codeScope = code;
                 countDownLatch.countDown();
             }

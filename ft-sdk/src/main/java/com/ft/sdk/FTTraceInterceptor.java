@@ -133,10 +133,7 @@ public class FTTraceInterceptor implements Interceptor {
         if (supportContentType == null) {
             return false;
         }
-        if (supportContentType.contains(contentType)) {
-            return true;
-        }
-        return false;
+        return supportContentType.contains(contentType);
     }
 
 

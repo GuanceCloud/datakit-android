@@ -11,6 +11,11 @@ import com.ft.sdk.garble.bean.LineProtocolBean;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
+import com.ft.sdk.garble.http.FTResponseData;
+import com.ft.sdk.garble.http.HttpBuilder;
+import com.ft.sdk.garble.http.NetCodeStatus;
+import com.ft.sdk.garble.http.RequestMethod;
+import com.ft.sdk.garble.manager.AsyncCallback;
 import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -18,6 +23,7 @@ import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONObject;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -93,6 +99,52 @@ public class FTTrackInner {
         });
     }
 
+
+    /**
+     * 在子线程中将埋点数据同步(不经过数据库)
+     * inovke by test Case
+     *
+     * @param trackBeans
+     * @param callback
+     */
+    void trackLogAsync(@NonNull final List<LineProtocolBean> trackBeans, final AsyncCallback callback) {
+        DataUploaderThreadPool.get().execute(new Runnable() {
+            @Override
+            public void run() {
+                List<SyncJsonData> recordDataList = new ArrayList<>();
+                for (LineProtocolBean t : trackBeans) {
+                    try {
+                        SyncJsonData recordData = SyncJsonData.getSyncJsonData(DataType.RUM_APP,
+                                new LineProtocolBean(t.getMeasurement(), t.getTags(),
+                                        t.getFields(), t.getTimeNano()));
+                        recordDataList.add(recordData);
+
+                        SyncDataHelper syncDataManager = new SyncDataHelper();
+                        String body = syncDataManager.getBodyContent(DataType.LOG, recordDataList);
+                        String model = Constants.URL_MODEL_LOG;
+                        String content_type = "text/plain";
+                        FTResponseData result = HttpBuilder.Builder()
+                                .setModel(model)
+                                .addHeadParam("Content-Type", content_type)
+                                .setMethod(RequestMethod.POST)
+                                .setBodyString(body).executeSync();
+                        if (callback != null) {
+                            callback.onResponse(result.getCode(), result.getMessage(), result.getErrorCode());
+                        }
+                    } catch (Exception e) {
+                        if (callback != null) {
+                            if (e instanceof InvalidParameterException) {
+                                callback.onResponse(NetCodeStatus.INVALID_PARAMS_EXCEPTION_CODE, e.getMessage(), "");
+                            } else {
+                                callback.onResponse(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, e.getMessage(), "");
+                            }
+                        }
+                        LogUtils.e(TAG, Log.getStackTraceString(e));
+                    }
+                }
+            }
+        });
+    }
 
     /**
      * 将单条日志数据存入本地同步

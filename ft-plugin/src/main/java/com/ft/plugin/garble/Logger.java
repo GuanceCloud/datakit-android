@@ -19,12 +19,20 @@ public class Logger {
         Logger.debug = debug;
     }
 
+    /**
+     *  debug 级别日志
+     * @param message
+     */
     public static void debug(Object message) {
         if (debug) {
             System.out.println(TAG + message);
         }
     }
 
+    /**
+     * error 级别日志
+     * @param message
+     */
     public static void error(Object message) {
         System.err.println(TAG + message);
     }

@@ -141,7 +141,7 @@ public class SyncDataHelper {
                     deleteLastComma(tagSb);
                     if (tagSb.length() > 0) {
                         sb.append(",");
-                        sb.append(tagSb.toString());
+                        sb.append(tagSb);
                     }
                     sb.append(Constants.SEPARATION_PRINT);
 

@@ -5,6 +5,8 @@ import static com.ft.sdk.garble.utils.Constants.USER_AGENT;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.StringUtils;
+import com.ft.sdk.garble.utils.Utils;
 
 /**
  * BY huangDianHua
@@ -73,7 +75,15 @@ public class FTHttpConfigManager {
         datawayUrl = ftsdkConfig.getDatawayUrl();
         clientToken = ftsdkConfig.getClientToken();
 
-        LogUtils.d(TAG, "serverUrl ==>\ndatakitUrl:" + datakitUrl + "\ndatawayUrl:" + datawayUrl);
+        if (!Utils.isNullOrEmpty(datakitUrl)) {
+            LogUtils.d(TAG, "serverUrl ==>\nDatakit Url:" + datakitUrl);
+        } else {
+            String maskToken = StringUtils.maskHalfCharacter(clientToken);
+            LogUtils.d(TAG, "serverUrl ==>  " + "\nDataway Url:"
+                    + datawayUrl + ",clientToken:" + maskToken);
+        }
+
+
     }
 
 

@@ -6,16 +6,6 @@ package com.ft.sdk.garble.http;
  * Description: 定义网络相关的错误与错误码
  */
 public class NetCodeStatus {
-    /**
-     * 网络返回数据不是json
-     */
-    public static final int NET_STATUS_RESPONSE_NOT_JSON = 2;
-
-    /**
-     * 网络返回数据不是json
-     */
-    public static final String NET_STATUS_RESPONSE_NOT_JSON_ERR = "net.response.not.json";
-
 
     /**
      * 网络问题

@@ -8,8 +8,6 @@ import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
-
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -52,14 +50,14 @@ public class FTResourceEventListener extends EventListener {
     public void callEnd(@NonNull Call call) {
         super.callEnd(call);
         LogUtils.d(TAG, "callEnd:" + resourceId);
-        computeTimeline();
+        setNetworkMetricsTimeline();
     }
 
     @Override
     public void callFailed(@NonNull Call call, @NonNull IOException ioe) {
         super.callFailed(call, ioe);
         LogUtils.d(TAG, "callFailed:" + resourceId);
-        computeTimeline();
+        setNetworkMetricsTimeline();
     }
 
     @Override
@@ -151,7 +149,10 @@ public class FTResourceEventListener extends EventListener {
         LogUtils.d(TAG, "connectEnd:" + resourceId);
     }
 
-    private void computeTimeline() {
+    /**
+     * 将指标数据写入到对应 {@link this#resourceId} 的 Resource 数据里
+     */
+    private void setNetworkMetricsTimeline() {
         NetStatusBean netStatusBean = new NetStatusBean();
         netStatusBean.requestHost = requestHost;
         netStatusBean.fetchStartTime = fetchStartTime;
@@ -167,6 +168,9 @@ public class FTResourceEventListener extends EventListener {
         FTRUMInnerManager.get().setNetState(this.resourceId, netStatusBean);
     }
 
+    /**
+     * 创建 {@link  FTResourceEventListener} 对应 {@link  EventListener.Factory} 对象
+     */
     public static class FTFactory implements EventListener.Factory {
         /**
          * @param call
@@ -175,6 +179,7 @@ public class FTResourceEventListener extends EventListener {
         @NonNull
         @Override
         public EventListener create(@NonNull Call call) {
+            //自动计算 resourceId
             return new FTResourceEventListener(Utils.identifyRequest(call.request()));
         }
     }

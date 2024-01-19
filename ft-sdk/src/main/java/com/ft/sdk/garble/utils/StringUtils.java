@@ -1,9 +1,6 @@
 package com.ft.sdk.garble.utils;
 
-import java.util.Collection;
-
 /**
- *
  * @author Brandon
  */
 public class StringUtils {
@@ -22,5 +19,24 @@ public class StringUtils {
         if (index > 0 && index == sb.length() - 1) {
             sb.deleteCharAt(sb.length() - 1);
         }
+    }
+
+
+    /***
+     * 对数据进行脱敏
+     * @param str
+     * @return
+     */
+    public static String maskHalfCharacter(String str) {
+        StringBuilder sb = new StringBuilder();
+        int length = str.length();
+        for (int i = 0; i < length; i++) {
+            if (i > length / 2) {
+                sb.append(str.charAt(i));
+            } else {
+                sb.append("*");
+            }
+        }
+        return sb.toString();
     }
 }

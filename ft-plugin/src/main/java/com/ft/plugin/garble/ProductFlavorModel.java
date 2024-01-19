@@ -11,9 +11,23 @@ public class ProductFlavorModel {
      * 是否上传 native debug symbol
      */
     private Boolean autoUploadNativeDebugSymbol;
+
+    /**
+     *  datakit 上传地址
+     */
     private String datakitUrl;
+    /**
+     * 工作空间 dataway token
+     */
     private String datawayToken;
+    /**
+     * 用户访问监测，应用 appid
+     */
     private String appId;
+
+    /**
+     * 应用开发环境
+     */
     private String env;
 
     public ProductFlavorModel(String name) {

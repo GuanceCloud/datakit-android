@@ -90,7 +90,7 @@ public class NativeNetEngine implements INetEngine {
             if (mConnection == null) {
                 //连接打开失败提示
                 responseCode = NetCodeStatus.NETWORK_EXCEPTION_CODE;
-                LogUtils.e(TAG, String.format("connect %s feature", url.toString()));
+                LogUtils.e(TAG, String.format("connect %s feature", url));
             } else {
                 connSuccess = true;
             }

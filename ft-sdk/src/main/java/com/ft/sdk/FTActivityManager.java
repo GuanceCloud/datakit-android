@@ -2,13 +2,10 @@ package com.ft.sdk;
 
 
 import android.app.Activity;
-import android.app.ActivityManager;
-import android.content.Context;
 
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.utils.Constants;
 
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -21,7 +18,7 @@ public final class FTActivityManager {
     private static volatile FTActivityManager instance;
 
     /**
-     *
+     * 存活 activity map
      */
     private final ConcurrentHashMap<String, Boolean> activityOpenTypeMap = new ConcurrentHashMap<>();
 
@@ -47,7 +44,7 @@ public final class FTActivityManager {
     /**
      * 存储每个 {@link Activity} 是由什么方式打开的
      *
-     * @param className  {@link Activity} 衍生类名
+     * @param className    {@link Activity} 衍生类名
      * @param fromFragment
      */
     void putActivityOpenFromFragment(String className, boolean fromFragment) {
@@ -77,10 +74,10 @@ public final class FTActivityManager {
     }
 
 
-
     /**
      * 设置当前 {@link AppState}
-     * @param state  {@link AppState} 应用运行状态
+     *
+     * @param state {@link AppState} 应用运行状态
      */
     void setAppState(AppState state) {
         this.appState = state;
@@ -88,6 +85,7 @@ public final class FTActivityManager {
 
     /**
      * 获取当前 {@link AppState}
+     *
      * @return {@link AppState}
      */
     AppState getAppState() {

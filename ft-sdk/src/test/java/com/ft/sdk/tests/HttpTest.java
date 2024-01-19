@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import com.ft.sdk.garble.http.FTResponseData;
 import com.ft.sdk.garble.http.HttpBuilder;
-import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.google.mockwebserver.MockResponse;
 import com.google.mockwebserver.MockWebServer;
@@ -110,24 +109,4 @@ public class HttpTest {
         assertEquals(HttpURLConnection.HTTP_OK, result.getCode());
     }
 
-    /**
-     * 模拟网络 200 且返回数据不是JSON格式
-     *
-     * @throws Exception
-     */
-    @Test
-    public void mockedRequest400NotJson() throws Exception {
-        MockResponse mockResponse = new MockResponse();
-        mockResponse.setBody(EMPTY_RESPONSE);
-        mockResponse.setResponseCode(HttpURLConnection.HTTP_BAD_REQUEST);
-        mMockWebServer.enqueue(mockResponse);
-        mMockWebServer.play();
-
-        FTResponseData result = HttpBuilder.Builder()
-                .setUrl(mMockWebServer.getUrl("/").toString())
-                .setMethod(RequestMethod.POST)
-                .setBodyString("")
-                .executeSync();
-        assertEquals(NetCodeStatus.NET_STATUS_RESPONSE_NOT_JSON, result.getCode());
-    }
 }
