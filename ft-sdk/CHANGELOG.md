@@ -1,3 +1,8 @@
+# agent 1.4.1-beta01
+1. agent 1.4.1-alpha01, agent 1.4.1-alpha02，agent 1.4.1-alpha03
+2. 调整 longtask 发生时间点
+
+---
 # agent 1.4.1-alpha03
 1.webview 时间精度问题适配
 2.skywalking propagation header service 参数调整 
