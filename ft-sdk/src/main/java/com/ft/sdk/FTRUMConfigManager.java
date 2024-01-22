@@ -122,7 +122,7 @@ public class FTRUMConfigManager {
      *
      * @return
      */
-    public FTResourceEventListener.FTFactory getOverrideEventListener() {
+     FTResourceEventListener.FTFactory getOverrideEventListener() {
         if (config == null) return null;
         if (config.getOkHttpEventListenerHandler() == null) return null;
         return config.getOkHttpEventListenerHandler().getEventListenerFTFactory();

@@ -300,7 +300,7 @@ public class FTRUMConfig {
         return intTakeUrlHandler;
     }
 
-    public FTOkHttpEventListenerHandler getOkHttpEventListenerHandler() {
+    FTOkHttpEventListenerHandler getOkHttpEventListenerHandler() {
         return okHttpEventListenerHandler;
     }
 
