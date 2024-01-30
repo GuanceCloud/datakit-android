@@ -75,9 +75,9 @@ public class FTRUMConfigManager {
     private void initNativeDump(FTRUMConfig config) {
         boolean isNativeLibSupport = PackageUtils.isNativeLibrarySupport();
 
-        if (isNativeLibSupport) {
-            FTSdk.NATIVE_VERSION = com.ft.sdk.nativelib.BuildConfig.VERSION_NAME;
-        }
+//        if (isNativeLibSupport) {
+//            FTSdk.NATIVE_VERSION = com.ft.sdk.nativelib.BuildConfig.VERSION_NAME;
+//        }
 
         if (!config.isRumEnable()) {
             return;
