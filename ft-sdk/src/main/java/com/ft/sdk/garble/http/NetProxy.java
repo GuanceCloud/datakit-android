@@ -51,11 +51,11 @@ public class NetProxy {
      */
     public FTResponseData execute() {
         if (!Utils.isNetworkAvailable()) {
-            return new FTResponseData(NetCodeStatus.NETWORK_EXCEPTION_CODE, "网络未连接");
+            return new FTResponseData(NetCodeStatus.NETWORK_EXCEPTION_CODE, "");
         }
         if (!httpBuilder.getUrl().startsWith("http://") && !httpBuilder.getUrl().startsWith("https://")) {
             //请求地址为空是提示错误
-            return new FTResponseData(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, "请求地址错误");
+            return new FTResponseData(NetCodeStatus.INVALID_PARAMS_EXCEPTION_CODE, "请求地址错误");
         }
         if (httpBuilder.isUseDefaultHead()) {
             //设置特有的请求头

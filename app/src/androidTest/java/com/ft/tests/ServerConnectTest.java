@@ -50,7 +50,7 @@ public class ServerConnectTest extends BaseTest {
      */
     @Test
     public void emptyUrl() throws Exception {
-        urlParamTest(null, NetCodeStatus.UNKNOWN_EXCEPTION_CODE);
+        urlParamTest(null, NetCodeStatus.INVALID_PARAMS_EXCEPTION_CODE);
     }
 
     /**

@@ -133,4 +133,8 @@ public class TraceHeaderTest extends BaseTest {
         Assert.assertTrue(expect);
     }
 
+    @Override
+    public void tearDown() {
+
+    }
 }

@@ -22,6 +22,7 @@ public class FTTraceConfigManager {
 
     /**
      * Trace 配置初始化
+     *
      * @param config
      */
     void initWithConfig(FTTraceConfig config) {
@@ -35,7 +36,6 @@ public class FTTraceConfigManager {
     }
 
     /**
-     *
      * @return
      */
     public FTTraceConfig getConfig() {
@@ -43,7 +43,6 @@ public class FTTraceConfigManager {
     }
 
     /**
-     *
      * @return
      */
     public boolean isEnableAutoTrace() {
@@ -51,7 +50,6 @@ public class FTTraceConfigManager {
     }
 
     /**
-     *
      * @return
      */
     public boolean isEnableLinkRUMData() {
@@ -59,7 +57,6 @@ public class FTTraceConfigManager {
     }
 
     /**
-     *
      * @return
      */
     public boolean isEnableWebTrace() {
@@ -67,7 +64,7 @@ public class FTTraceConfigManager {
     }
 
     /**
-     *
+     * 释放资源
      */
     void release() {
         config = null;

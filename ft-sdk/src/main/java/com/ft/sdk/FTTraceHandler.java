@@ -104,7 +104,7 @@ public class FTTraceHandler {
             headers.put(DD_TRACE_PARENT_SPAN_ID_KEY, spanID);
             headers.put(DD_TRACE_TRACE_ID_KEY, traceID);
         } else if (config.getTraceType() == TraceType.SKYWALKING) {
-            SkyWalkingUtils skyWalkingUtils = new SkyWalkingUtils(SkyWalkingUtils.SkyWalkingVersion.V3, sampled, requestTime, httpUrl, config);
+            SkyWalkingUtils skyWalkingUtils = new SkyWalkingUtils(SkyWalkingUtils.SkyWalkingVersion.V3, sampled, requestTime, httpUrl, config.serviceName);
             traceID = skyWalkingUtils.getNewTraceId();
             spanID = skyWalkingUtils.getNewParentTraceId() + "0";
             headers.put(SKYWALKING_V3_SW_8, skyWalkingUtils.getSw());

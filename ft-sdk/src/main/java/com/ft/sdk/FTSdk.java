@@ -10,12 +10,12 @@ import com.ft.sdk.garble.FTAutoTrackConfigManager;
 import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.bean.UserData;
+import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.PackageUtils;
-import com.ft.sdk.garble.utils.TrackLog;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.util.HashMap;
@@ -121,6 +121,8 @@ public class FTSdk {
         FTRUMGlobalManager.get().release();
         FTRUMInnerManager.get().release();
         EventConsumerThreadPool.get().shutDown();
+        FTANRDetector.get().release();
+        FTDBManager.release();
         mFtSdk = null;
         LogUtils.w(TAG, "FT SDK 已经被关闭");
     }
@@ -208,6 +210,7 @@ public class FTSdk {
      */
     public static void initTraceWithConfig(@NonNull FTTraceConfig config) {
         try {
+            config.setServiceName(get().getBaseConfig().getServiceName());
             FTTraceConfigManager.get().initWithConfig(config);
         } catch (Exception e) {
             LogUtils.e(TAG, Log.getStackTraceString(e));
@@ -229,7 +232,8 @@ public class FTSdk {
     }
 
     /**
-     * 绑定用户信息
+     * 绑定用户信息,{@link Constants#KEY_RUM_IS_SIGN_IN},绑定后字段为 T，绑定一次，字段数据会持续保留数据直到，调用
+     * {@link #unbindRumUserData()}
      *
      * @param id
      */
@@ -239,14 +243,14 @@ public class FTSdk {
 
 
     /**
-     * 绑定用户信息
+     * 绑定用户信息,{@link #bindRumUserData(String)}  }
      */
     public static void bindRumUserData(@NonNull UserData data) {
         FTRUMConfigManager.get().bindUserData(data.getId(), data.getName(), data.getEmail(), data.getExts());
     }
 
     /**
-     * 解绑用户数据
+     * 解绑用户数据 {@link Constants#KEY_RUM_IS_SIGN_IN},绑定后字段为 F
      */
     public static void unbindRumUserData() {
         FTRUMConfigManager.get().unbindUserData();

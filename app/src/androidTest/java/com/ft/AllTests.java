@@ -24,9 +24,9 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
         // AGP 8.0 以后无法在测试用例中对 Log.d 方法进行 ASM 织入
 //        ConsoleLogTest.class,//Log-控制台日志,短时间批量插入丢弃策略测试
+        TraceHeaderTest.class,
         ServerConnectTest.class,//Base-Property 参数测试
         ErrorTraceTest.class,//Log-崩溃日志测试
-        TraceHeaderTest.class,
         RUMLaunchActionTest.class,
         RUMClickActionTest.class,
         RUMViewTest.class,

@@ -59,6 +59,7 @@ public class FTRUMConfigManager {
         initRandomUserId();
         FTMonitorManager.get().initWithConfig(config);
         FTUIBlockManager.get().start(config);
+        FTANRDetector.get().init(config);
         initRUMGlobalContext(config);
         if (config.isRumEnable() && config.isEnableTraceUserAction()) {
             //应对 flutter reactNative application 生命周期启动早于条件设置
@@ -76,6 +77,10 @@ public class FTRUMConfigManager {
 
         if (isNativeLibSupport) {
             FTSdk.NATIVE_VERSION = com.ft.sdk.nativelib.BuildConfig.VERSION_NAME;
+        }
+
+        if (!config.isRumEnable()) {
+            return;
         }
 
         boolean enableTrackAppCrash = config.isEnableTrackAppCrash();
@@ -100,6 +105,8 @@ public class FTRUMConfigManager {
     }
 
     /**
+     * RUM 是否开启
+     *
      * @return
      */
     public boolean isRumEnable() {
@@ -108,6 +115,17 @@ public class FTRUMConfigManager {
 
     public FTRUMConfig getConfig() {
         return config;
+    }
+
+    /**
+     * 返回自定义覆盖全局的 {@link FTResourceEventListener.FTFactory}
+     *
+     * @return
+     */
+     FTResourceEventListener.FTFactory getOverrideEventListener() {
+        if (config == null) return null;
+        if (config.getOkHttpEventListenerHandler() == null) return null;
+        return config.getOkHttpEventListenerHandler().getEventListenerFTFactory();
     }
 
 
@@ -122,6 +140,9 @@ public class FTRUMConfigManager {
     }
 
 
+    /**
+     * 初始化随机 userid
+     */
     void initRandomUserId() {
         if (Utils.isNullOrEmpty(getRandomUserId())) {
             createNewRandomUserId();
@@ -145,7 +166,11 @@ public class FTRUMConfigManager {
         return randomUserId;
     }
 
-
+    /**
+     * 获取绑定用户信息
+     *
+     * @return
+     */
     UserData getUserData() {
         synchronized (mLock) {
             if (mUserData != null) {
@@ -222,10 +247,6 @@ public class FTRUMConfigManager {
     void initRUMGlobalContext(FTRUMConfig config) {
         Context context = FTApplication.getApplication();
         HashMap<String, Object> rumGlobalContext = config.getGlobalContext();
-//        if(config.isBackendSample()){
-        //sample
-//            rumGlobalContext.put(Constants.KEY_BACKENDSAMPLE,"");
-//        }
         rumGlobalContext.put(Constants.KEY_RUM_CUSTOM_KEYS, new Gson().toJson(rumGlobalContext.keySet()));
         rumGlobalContext.put(Constants.KEY_RUM_APP_ID, config.getRumAppId());
         rumGlobalContext.put(Constants.KEY_RUM_SESSION_TYPE, "user");
@@ -280,7 +301,7 @@ public class FTRUMConfigManager {
             }
 
         } else {
-            tags.put(Constants.KEY_RUM_USER_ID, FTRUMInnerManager.get().getSessionId());
+            tags.put(Constants.KEY_RUM_USER_ID, getRandomUserId());
         }
         return tags;
     }

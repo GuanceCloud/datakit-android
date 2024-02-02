@@ -20,8 +20,6 @@ import okhttp3.ResponseBody;
  * description: 基于 okhttp 请求框架的 INetEngine
  */
 public class OkHttpEngine implements INetEngine {
-    private final static String TAG = Constants.LOG_TAG_PREFIX + "OkHttpEngine";
-
     private static OkHttpClient client;
     private Request request;
 

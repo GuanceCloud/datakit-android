@@ -10,11 +10,13 @@ import com.ft.sdk.garble.utils.LogUtils;
 
 import java.io.IOException;
 
-import okhttp3.Call;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
+/**
+ * 用于 Okhttp 网络数据请求测试
+ */
 public class RequestUtils {
     private static final String TAG = "RequestUtils";
 
@@ -38,27 +40,6 @@ public class RequestUtils {
             LogUtils.e(TAG, Log.getStackTraceString(e));
         }
         return request;
-    }
-
-    public static void asyncRequest(String url) {
-        Request.Builder builder = new Request.Builder()
-                .url(url).method(RequestMethod.GET.name(), null);
-        OkHttpClientSingleton.getInstance()
-                .newCall(builder.build()).enqueue(new okhttp3.Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        // 处理响应
-                        System.out.println(response.body().string());
-                        response.close();
-                    }
-                });
-
-
     }
 
 }

@@ -1,8 +1,32 @@
+# agent 1.4.1-beta01
+1. agent 1.4.1-alpha01, agent 1.4.1-alpha02，agent 1.4.1-alpha03
+2. 调整 longtask 发生时间点
+
+---
+# agent 1.4.1-alpha03
+1.webview 时间精度问题适配
+2.skywalking propagation header service 参数调整 
+
+---
+# agent 1.4.1-alpha02
+1.新增 ANR Error 事件和 ANR 引起崩溃的日志
+2.修复 Okhttp 中使用加密算法，单纯依赖 ASM 写入，resource 不发送的问题
+3.支持自定义 Resource 内容，与 FTTraceConfig.enableAutoTrace，FTRUMConfig.enableTraceUserResource 同时开启
+
+---
+# agent 1.4.1-alpha01
+1.修复由于超长 session 导致的 view 展示重复数据的问题
+2.修复未结束 resource 导致重复传 view 数据的问题
+3.修改无 userid 绑定随机 uuid 算法
+4.新增 view_update_time 自增数，解决数据并发写入次序问题 
+5.优化数据同步
+
+---
 # agent 1.4.0-beta01
 1.优化数据同步机制
 2.优化内部日志输出
 3.支持公网 Dataway 上传
-
+4.支持自定义 error 数据中的 error_type 字段属性 
 
 ---
 # agent 1.3.17-alpha05

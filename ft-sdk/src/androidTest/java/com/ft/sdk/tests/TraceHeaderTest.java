@@ -10,11 +10,13 @@ import static com.ft.sdk.FTTraceHandler.ZIPKIN_SAMPLED;
 import static com.ft.sdk.FTTraceHandler.ZIPKIN_SPAN_ID;
 import static com.ft.sdk.FTTraceHandler.ZIPKIN_TRACE_ID;
 
+import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
 import com.ft.sdk.FTTraceHandler;
 import com.ft.sdk.FTTraceManager;
 import com.ft.sdk.TraceType;
+import com.ft.test.base.FTBaseTest;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -28,13 +30,14 @@ import java.util.HashMap;
  *
  * @author Brandon
  */
-public class TraceHeaderTest {
+public class TraceHeaderTest extends FTBaseTest {
 
     /**
      * {@link  TraceType#ZIPKIN_MULTI_HEADER} 类型测试
      */
     @Test
     public void traceZipKinHeaderTest() {
+        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
         FTSdk.initTraceWithConfig(new FTTraceConfig()
                 .setEnableAutoTrace(true)
                 .setTraceType(TraceType.ZIPKIN_MULTI_HEADER));
@@ -56,6 +59,7 @@ public class TraceHeaderTest {
      */
     @Test
     public void traceZipKinSingleHeaderTest() {
+        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
         FTSdk.initTraceWithConfig(new FTTraceConfig()
                 .setEnableAutoTrace(true)
                 .setTraceType(TraceType.ZIPKIN_SINGLE_HEADER));
@@ -70,6 +74,7 @@ public class TraceHeaderTest {
      */
     @Test
     public void traceJaegerHeaderTest() {
+        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
         FTSdk.initTraceWithConfig(new FTTraceConfig()
                 .setEnableAutoTrace(true)
                 .setTraceType(TraceType.JAEGER));
@@ -84,6 +89,7 @@ public class TraceHeaderTest {
      */
     @Test
     public void traceDDtraceHeaderTest() {
+        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
         FTSdk.initTraceWithConfig(new FTTraceConfig()
                 .setEnableAutoTrace(true)
                 .setTraceType(TraceType.DDTRACE));
@@ -106,6 +112,7 @@ public class TraceHeaderTest {
      */
     @Test
     public void traceSkyWalkingV3HeaderTest() {
+        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
         FTSdk.initTraceWithConfig(new FTTraceConfig()
                 .setEnableAutoTrace(true)
                 .setTraceType(TraceType.SKYWALKING));
@@ -120,6 +127,7 @@ public class TraceHeaderTest {
      */
     @Test
     public void traceW3CTraceParentTest() {
+        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
         FTSdk.initTraceWithConfig(new FTTraceConfig()
                 .setEnableAutoTrace(true)
                 .setTraceType(TraceType.TRACEPARENT));

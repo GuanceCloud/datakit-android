@@ -39,6 +39,7 @@ public class LogTest extends FTBaseTest {
      */
     @Test
     public void logSampleRateZero() throws InterruptedException {
+        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
         FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableCustomLog(true).setSamplingRate(0));
 
         Thread.sleep(1000);

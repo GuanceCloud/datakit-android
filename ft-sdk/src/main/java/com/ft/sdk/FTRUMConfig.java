@@ -57,12 +57,14 @@ public class FTRUMConfig {
 
 //    private boolean backendSample = false;
 
-    private FTInTakeUrlHandler handler = new FTInTakeUrlHandler() {
+    private FTInTakeUrlHandler intTakeUrlHandler = new FTInTakeUrlHandler() {
         @Override
         public boolean isInTakeUrl(String url) {
             return false;
         }
     };
+
+    private FTOkHttpEventListenerHandler okHttpEventListenerHandler;
 
     /**
      * 设置全局 tag
@@ -70,6 +72,9 @@ public class FTRUMConfig {
     private final HashMap<String, Object> globalContext = new HashMap<>();
 
 
+    /**
+     * 服务名称 {@link Constants#KEY_SERVICE },默认为 {@link Constants#DEFAULT_SERVICE_NAME}
+     */
     private String serviceName = Constants.DEFAULT_SERVICE_NAME;
 
     /**
@@ -196,8 +201,8 @@ public class FTRUMConfig {
 
     /**
      * 使用 {@link #setDeviceMetricsMonitorType(int)} 替代
-     *
-     *  setExtraMonitorTypeWithError(ErrorMonitorType.ALL.getValue())
+     * <p>
+     * setExtraMonitorTypeWithError(ErrorMonitorType.ALL.getValue())
      *
      * @param extraMonitorTypeWithError
      * @return
@@ -230,8 +235,8 @@ public class FTRUMConfig {
 
     /**
      * 支持或参数 battery | cpu | memory
-     *
-     *  setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
+     * <p>
+     * setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
      *
      * @param deviceMetricsMonitorType
      * @return
@@ -282,17 +287,28 @@ public class FTRUMConfig {
 
     /**
      * 设置 Url 过滤规则
+     *
      * @param handler
      * @return
      */
     public FTRUMConfig setResourceUrlHandler(FTInTakeUrlHandler handler) {
-        this.handler = handler;
+        this.intTakeUrlHandler = handler;
         return this;
     }
 
     public FTInTakeUrlHandler getResourceUrlHandler() {
-        return handler;
+        return intTakeUrlHandler;
     }
+
+    FTOkHttpEventListenerHandler getOkHttpEventListenerHandler() {
+        return okHttpEventListenerHandler;
+    }
+
+    public FTRUMConfig setOkHttpEventListenerHandler(FTOkHttpEventListenerHandler okHttpResourceHandler) {
+        this.okHttpEventListenerHandler = okHttpResourceHandler;
+        return this;
+    }
+
 
     //    /**
 //     * 设置 BackendSample 后端采样，当为 true 时，rum sampleRate 设置不再起效

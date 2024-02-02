@@ -1,12 +1,12 @@
 package com.ft.sdk;
 
+import com.ft.sdk.garble.utils.Constants;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 /**
- *
- *
  * @author Brandon
  */
 public class FTTraceConfig {
@@ -30,6 +30,11 @@ public class FTTraceConfig {
      * 是否与 RUM 数据关联
      */
     private boolean enableLinkRUMData = false;
+
+    /**
+     * 服务名称 {@link Constants#KEY_SERVICE },默认为 {@link Constants#DEFAULT_SERVICE_NAME}
+     */
+    String serviceName = Constants.DEFAULT_SERVICE_NAME;
 
     /**
      * 设置全局 tag
@@ -78,7 +83,11 @@ public class FTTraceConfig {
         return this;
     }
 
-//    /**
+    void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
+
+    //    /**
 //     * 设置支持的采集类型
 //     *
 //     * @param traceContentType
@@ -94,12 +103,16 @@ public class FTTraceConfig {
 
     /**
      * 获取链路支持
+     *
      * @return
      */
     public List<String> getTraceContentType() {
         return traceContentType;
     }
 
+    /**
+     * {@link #enableAutoTrace}
+     */
     public boolean isEnableAutoTrace() {
         return enableAutoTrace;
     }
@@ -114,15 +127,17 @@ public class FTTraceConfig {
     }
 
 
+    /**
+     * {@link #enableAutoTrace}
+     *
+     * @param enableAutoTrace
+     * @return
+     */
     public FTTraceConfig setEnableAutoTrace(boolean enableAutoTrace) {
         this.enableAutoTrace = enableAutoTrace;
         return this;
     }
 
-//    public FTTraceConfig addGlobalContext(@NonNull String key, @NonNull String value) {
-//        this.globalContext.put(key, value);
-//        return this;
-//    }
 
     public HashMap<String, Object> getGlobalContext() {
         return globalContext;
