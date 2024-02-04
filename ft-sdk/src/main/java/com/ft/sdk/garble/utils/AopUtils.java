@@ -87,6 +87,20 @@ public class AopUtils {
     }
 
     /**
+     * 返回当前类
+     *
+     * @param object
+     * @return
+     */
+    public static Class<?> getClass(Object object) {
+        if (object == null) {
+            return null;
+        }
+        return object.getClass();
+    }
+
+
+    /**
      * 返回当前类的名称
      *
      * @param object
