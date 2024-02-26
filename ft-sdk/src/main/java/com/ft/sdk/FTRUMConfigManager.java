@@ -253,6 +253,7 @@ public class FTRUMConfigManager {
         rumGlobalContext.put(Constants.KEY_DEVICE_OS, DeviceUtils.getOSName());
         rumGlobalContext.put(Constants.KEY_DEVICE_DEVICE_BAND, DeviceUtils.getDeviceBand());
         rumGlobalContext.put(Constants.KEY_DEVICE_DEVICE_MODEL, DeviceUtils.getDeviceModel());
+        rumGlobalContext.put(Constants.KEY_DEVICE_DEVICE_ARCH, DeviceUtils.getDeviceArch());
         rumGlobalContext.put(Constants.KEY_DEVICE_DISPLAY, DeviceUtils.getDisplay(context));
         rumGlobalContext.put(Constants.KEY_SERVICE, config.getServiceName());
 

@@ -63,7 +63,7 @@ public class DemoApplication extends BaseApplication {
                 .setSamplingRate(1f)
                 .setRumAppId(BuildConfig.RUM_APP_ID)
                 .setEnableTraceUserAction(false)
-                .setEnableTraceUserView(false)
+                .setEnableTraceUserView(true)
                 .setEnableTraceUserResource(false)
                 .setEnableTrackAppANR(false)
                 .setEnableTrackAppCrash(false)

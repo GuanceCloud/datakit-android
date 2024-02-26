@@ -274,6 +274,7 @@ public class Constants {
     public static final String KEY_DEVICE_OS_VERSION_MAJOR = "os_version_major";
     public static final String KEY_DEVICE_DEVICE_BAND = "device";
     public static final String KEY_DEVICE_DEVICE_MODEL = "model";
+    public static final String KEY_DEVICE_DEVICE_ARCH = "arch";
     public static final String KEY_DEVICE_DISPLAY = "screen_size";
     public static final String KEY_DEVICE_CARRIER = "carrier";
     public static final String KEY_DEVICE_LOCALE = "locale";

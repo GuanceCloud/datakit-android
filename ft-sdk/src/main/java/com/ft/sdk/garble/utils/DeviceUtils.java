@@ -172,6 +172,14 @@ public class DeviceUtils {
         return Build.MODEL;
     }
 
+    /**
+     *  获取 CPU ABI 架构
+     * @return
+     */
+    public static String getDeviceArch() {
+        return System.getProperty("os.arch");
+    }
+
 
     /**
      * 获得设备分辨率
