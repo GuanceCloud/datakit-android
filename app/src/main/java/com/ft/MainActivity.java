@@ -196,6 +196,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        findViewById(R.id.main_flush_sync_data).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FTSdk.flushSyncData();
+            }
+        });
+
         findViewById(R.id.main_lazy_init).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

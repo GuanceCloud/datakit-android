@@ -36,6 +36,8 @@ public class DemoApplication extends BaseApplication {
     static void initFTSDK() {
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAKIT_URL)
                 .setDebug(true)//设置是否是 debug
+                .setAutoSync(false)
+                .setCustomSyncPageSize(30)
                 .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()));
         FTSdk.install(ftSDKConfig);
 
@@ -60,16 +62,16 @@ public class DemoApplication extends BaseApplication {
         FTSdk.initRUMWithConfig(new FTRUMConfig()
                 .setSamplingRate(1f)
                 .setRumAppId(BuildConfig.RUM_APP_ID)
-                .setEnableTraceUserAction(true)
-                .setEnableTraceUserView(true)
-                .setEnableTraceUserResource(true)
-                .setEnableTrackAppANR(true)
-                .setEnableTrackAppCrash(true)
-                .setEnableTrackAppUIBlock(true)
-                .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
+                .setEnableTraceUserAction(false)
+                .setEnableTraceUserView(false)
+                .setEnableTraceUserResource(false)
+                .setEnableTrackAppANR(false)
+                .setEnableTrackAppCrash(false)
+                .setEnableTrackAppUIBlock(false)
+                .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.NO_SET)
                 .setResourceUrlHandler(url -> false)
-                .addGlobalContext("track_id", BuildConfig.TRACK_ID)
-                .addGlobalContext("custom_tag", "any tags")
+//                .addGlobalContext("track_id", BuildConfig.TRACK_ID)
+//                .addGlobalContext("custom_tag", "any tags")
                 .setExtraMonitorTypeWithError(ErrorMonitorType.ALL.getValue()));
 
 
@@ -84,7 +86,7 @@ public class DemoApplication extends BaseApplication {
 
         FTSdk.initTraceWithConfig(new FTTraceConfig()
                 .setSamplingRate(1f)
-                .setEnableAutoTrace(true)
+                .setEnableAutoTrace(false)
                 .setEnableLinkRUMData(true)
                 .setTraceType(TraceType.DDTRACE));
 
