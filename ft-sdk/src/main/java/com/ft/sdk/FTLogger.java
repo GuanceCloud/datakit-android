@@ -94,7 +94,7 @@ public class FTLogger {
             }
         }
 
-        LogBean logBean = new LogBean(Utils.translateFieldValue(content), Utils.getCurrentNanoTime());
+        LogBean logBean = new LogBean(content, Utils.getCurrentNanoTime());
         logBean.setServiceName(config.getServiceName());
         if (property != null) {
             logBean.getProperty().putAll(property);
@@ -118,7 +118,7 @@ public class FTLogger {
         }
         List<BaseContentBean> logBeans = new ArrayList<>();
         for (LogData logData : logDataList) {
-            LogBean logBean = new LogBean(Utils.translateFieldValue(logData.getContent()),
+            LogBean logBean = new LogBean(logData.getContent(),
                     Utils.getCurrentNanoTime());
             logBean.setServiceName(config.getServiceName());
             logBean.setStatus(logData.getStatus());
