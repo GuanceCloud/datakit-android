@@ -38,10 +38,7 @@ public class SyncTaskManager {
      * 最大容忍错误次数
      */
     public static final int MAX_ERROR_COUNT = 5;
-    /**
-     * 一个同步周期内一次请求包含数据条目数量
-     */
-    private static final int LIMIT_SIZE = 10;
+
     /**
      * 传输间歇休眠时间
      */
@@ -66,6 +63,8 @@ public class SyncTaskManager {
     private static final int MSG_SYNC = 1;
 
     private int dataSyncMaxRetryCount;
+
+    private boolean autoSync;
 
     private final Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
@@ -104,10 +103,12 @@ public class SyncTaskManager {
         return SyncTaskManager.SingletonHolder.INSTANCE;
     }
 
+    private int pageSize = SyncPageSize.MEDIUM.getValue();
+
     /**
      * For AndroidTest
      */
-    private void executePoll() {
+    void executePoll() {
         executePoll(false);
     }
 
@@ -124,10 +125,11 @@ public class SyncTaskManager {
                 public void run() {
                     try {
 
-                        LogUtils.d(TAG, "******************* Sync Poll Running *******************>>>\n");
                         if (withSleep) {
+                            LogUtils.d(TAG, "******************* Sync Poll Waiting *******************>>>\n");
                             Thread.sleep(SLEEP_TIME);
                         }
+                        LogUtils.d(TAG, "******************* Sync Poll Running *******************>>>\n");
 
                         for (DataType dataType : SYNC_MAP) {
                             SyncTaskManager.this.handleSyncOpt(dataType);
@@ -154,8 +156,10 @@ public class SyncTaskManager {
      * 触发延迟轮询同步
      */
     void executeSyncPoll() {
-        mHandler.removeMessages(MSG_SYNC);
-        mHandler.sendEmptyMessageDelayed(MSG_SYNC, 100);
+        if (autoSync) {
+            mHandler.removeMessages(MSG_SYNC);
+            mHandler.sendEmptyMessageDelayed(MSG_SYNC, 100);
+        }
     }
 
     /**
@@ -217,8 +221,14 @@ public class SyncTaskManager {
             }
 
             //当前缓存数据已获取完毕，等待下一次数据触发
-            if (cacheDataList.size() < LIMIT_SIZE) {
+            if (cacheDataList.size() < pageSize) {
                 break;
+            }
+
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
 
         }
@@ -231,7 +241,7 @@ public class SyncTaskManager {
      * @return
      */
     private List<SyncJsonData> queryFromData(DataType dataType) {
-        return FTDBManager.get().queryDataByDataByTypeLimit(LIMIT_SIZE, dataType);
+        return FTDBManager.get().queryDataByDataByTypeLimit(pageSize, dataType);
     }
 
     /**
@@ -292,6 +302,8 @@ public class SyncTaskManager {
     public void init(FTSDKConfig config) {
         isStop = false;
         dataSyncMaxRetryCount = config.getDataSyncRetryCount();
+        pageSize = config.getPageSize();
+        autoSync = config.isAutoSync();
     }
 
     /**

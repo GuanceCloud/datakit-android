@@ -111,8 +111,8 @@ public class NativeNetEngine implements INetEngine {
             LogUtils.e(TAG, Log.getStackTraceString(e));
         }
         //设置连接和读取超时时间
-        mConnection.setConnectTimeout(FTHttpConfigManager.get().sendOutTime);
-        mConnection.setReadTimeout(FTHttpConfigManager.get().readOutTime);
+        mConnection.setConnectTimeout(FTHttpConfigManager.get().getSendOutTime());
+        mConnection.setReadTimeout(FTHttpConfigManager.get().getReadOutTime());
     }
 
     private void setHeadParams() {

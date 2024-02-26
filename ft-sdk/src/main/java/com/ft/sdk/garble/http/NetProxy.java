@@ -83,7 +83,7 @@ public class NetProxy {
         if (head == null) {
             head = new HashMap<>();
         }
-        head.put("User-Agent", ftHttpConfig.userAgent +
+        head.put("User-Agent", ftHttpConfig.getUserAgent() +
                 ";agent_" + FTSdk.AGENT_VERSION +
                 ";autotrack_" + FTSdk.PLUGIN_VERSION +
                 ";native_" + FTSdk.NATIVE_VERSION

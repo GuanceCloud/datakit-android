@@ -36,6 +36,14 @@ public class FTSDKConfig {
      */
     private boolean enableAccessAndroidID = true;
 
+
+    /**
+     * 是否进行自动同步
+     */
+    private boolean autoSync = true;
+
+    private int pageSize = SyncPageSize.MEDIUM.getValue();
+
     /**
      * 服务名称 {@link Constants#KEY_SERVICE },默认为 {@link Constants#DEFAULT_SERVICE_NAME}
      */
@@ -76,7 +84,7 @@ public class FTSDKConfig {
     /**
      * 构建 SDK 必要的配置参数
      *
-     * @param datawayUrl dataway 上传地址
+     * @param datawayUrl  dataway 上传地址
      * @param clientToken token
      * @return {@link FTRUMConfig} SDK 配置
      */
@@ -183,6 +191,55 @@ public class FTSDKConfig {
     }
 
     /**
+     * 设置是否自动同步
+     *
+     * @return
+     */
+    public FTSDKConfig setAutoSync(boolean autoSync) {
+        this.autoSync = autoSync;
+        return this;
+    }
+
+    /**
+     * 设置数据同步大小
+     *
+     * @param pageSize
+     * @return
+     */
+    public FTSDKConfig setSyncPageSize(SyncPageSize pageSize) {
+        this.pageSize = pageSize.getValue();
+        return this;
+    }
+
+    /**
+     * 自定义数据同步大小
+     *
+     * @param pageSize
+     * @return
+     */
+    public FTSDKConfig setCustomSyncPageSize(int pageSize) {
+        this.pageSize = Math.max(SyncPageSize.MINI.getValue(), Math.min(SyncPageSize.LARGE.getValue(), pageSize));
+        return this;
+    }
+
+    /**
+     * 是否进行自动同步
+     *
+     * @return
+     */
+    public boolean isAutoSync() {
+        return this.autoSync;
+    }
+
+    /**
+     * 获取一次请求条目数量
+     * @return
+     */
+    public int getPageSize() {
+        return this.pageSize;
+    }
+
+    /**
      * 设置数据传输环境
      *
      * @param env
@@ -228,7 +285,7 @@ public class FTSDKConfig {
      * 添加全局属性
      *
      * @param key   键名
-     * @param value jian
+     * @param value 键值
      * @return
      */
     public FTSDKConfig addGlobalContext(@NonNull String key, @NonNull String value) {
@@ -252,6 +309,7 @@ public class FTSDKConfig {
 
     /**
      * 设置应用服务名
+     *
      * @param serviceName 服务名
      * @return
      */
@@ -268,6 +326,7 @@ public class FTSDKConfig {
 
     /**
      * 设置最大同步重试次数，最小 0，最大 5，设置为 0，如果数据传输发生错误将直接丢弃
+     *
      * @param dataSyncRetryCount 重试次数，
      * @return
      */

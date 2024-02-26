@@ -306,4 +306,12 @@ public class FTSdk {
     }
 
 
+    /**
+     * 主动同步数据
+     */
+    public static void flushSyncData() {
+        SyncTaskManager.get().executePoll();
+    }
+
+
 }

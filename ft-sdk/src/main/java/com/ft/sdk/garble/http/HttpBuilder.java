@@ -18,8 +18,8 @@ public class HttpBuilder {
     private String model;
     private RequestMethod method;
     private String bodyString;
-    private int sendOutTime = FTHttpConfigManager.get().sendOutTime;
-    private int readOutTime = FTHttpConfigManager.get().readOutTime;
+    private int sendOutTime = FTHttpConfigManager.get().getSendOutTime();
+    private int readOutTime = FTHttpConfigManager.get().getReadOutTime();
     private boolean useDefaultHead = true;
     private boolean isDataway = false;
     private final HashMap<String, String> headParams = new HashMap<>();
@@ -30,11 +30,11 @@ public class HttpBuilder {
 
     public String getHost() {
         if (host == null) {
-            if (!Utils.isNullOrEmpty(FTHttpConfigManager.get().datakitUrl)) {
-                host = FTHttpConfigManager.get().datakitUrl;
+            if (!Utils.isNullOrEmpty(FTHttpConfigManager.get().getDatakitUrl())) {
+                host = FTHttpConfigManager.get().getDatakitUrl();
             } else {
                 isDataway = true;
-                host = FTHttpConfigManager.get().datawayUrl;
+                host = FTHttpConfigManager.get().getDatawayUrl();
             }
 
         }
@@ -54,7 +54,7 @@ public class HttpBuilder {
             if (!isDataway) {
                 url += "/" + model;
             } else {
-                url += String.format(DATAWAY_URL_HOST_FORMAT, model, FTHttpConfigManager.get().clientToken);
+                url += String.format(DATAWAY_URL_HOST_FORMAT, model, FTHttpConfigManager.get().getClientToken());
             }
         }
         return url;
@@ -99,17 +99,6 @@ public class HttpBuilder {
         return this;
     }
 
-    public HttpBuilder setSendOutTime(int time) {
-        this.sendOutTime = time;
-        FTHttpConfigManager.get().sendOutTime = time;
-        return this;
-    }
-
-    public HttpBuilder setReadOutTime(int time) {
-        this.readOutTime = time;
-        FTHttpConfigManager.get().readOutTime = time;
-        return this;
-    }
 
     public HttpBuilder setModel(String model) {
         this.model = model;
