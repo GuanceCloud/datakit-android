@@ -1,3 +1,9 @@
+# agent 1.4.2-alpha01
+1. 添加自动同步开关，支持手动上传数据
+2. 添加 arch cpu abi 架构字段显示
+3. 支持修改同步请求单次请求数据
+
+---
 # agent 1.4.1-beta01
 1. agent 1.4.1-alpha01, agent 1.4.1-alpha02，agent 1.4.1-alpha03
 2. 调整 longtask 发生时间点
