@@ -11,7 +11,6 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * BY huangDianHua
@@ -32,8 +31,23 @@ public abstract class BaseThreadPool {
     private ThreadPoolExecutor executor;
     private final int corePoolSize;
 
-    public BaseThreadPool(int corePoolSize) {
+    private final ThreadFactory threadFactory;
+
+    public BaseThreadPool(int corePoolSize, String threadName) {
+        this(corePoolSize, threadName, Thread.NORM_PRIORITY);
+
+    }
+
+    public BaseThreadPool(int corePoolSize, String threadName, int priority) {
         this.corePoolSize = corePoolSize;
+        this.threadFactory = new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                Thread thread = new Thread(r, threadName);
+                thread.setPriority(priority);
+                return thread;
+            }
+        };
         executor = createNew();
         executor.setRejectedExecutionHandler(sRunOnSerialPolicy);
     }
@@ -52,16 +66,6 @@ public abstract class BaseThreadPool {
                     executor.execute(r);
                 }
             };
-
-
-    private static final ThreadFactory threadFactory = new ThreadFactory() {
-        private final AtomicInteger integer = new AtomicInteger();
-
-        @Override
-        public Thread newThread(Runnable r) {
-            return new Thread(r, TAG + ":" + integer.getAndIncrement());
-        }
-    };
 
 
     public void execute(Runnable runnable) {
@@ -100,6 +104,7 @@ public abstract class BaseThreadPool {
 
     /**
      * 新建线程池
+     *
      * @return
      */
     private ThreadPoolExecutor createNew() {

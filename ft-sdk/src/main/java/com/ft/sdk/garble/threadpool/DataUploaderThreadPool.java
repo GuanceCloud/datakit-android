@@ -13,8 +13,9 @@ public class DataUploaderThreadPool extends BaseThreadPool {
     private final static int CORE_POOL_SIZE = CPU_COUNT;
     private static DataUploaderThreadPool threadPoolUtils;
 
+
     private DataUploaderThreadPool() {
-        super(CORE_POOL_SIZE);
+        super(CORE_POOL_SIZE, "FTDataUp", Thread.MIN_PRIORITY);
     }
 
 

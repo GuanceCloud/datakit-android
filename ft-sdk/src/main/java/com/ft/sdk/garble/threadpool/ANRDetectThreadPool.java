@@ -10,7 +10,7 @@ public class ANRDetectThreadPool extends BaseThreadPool {
 
 
     private ANRDetectThreadPool() {
-        super(CORE_POOL_SIZE);
+        super(CORE_POOL_SIZE, "FTANRDetect");
     }
 
 

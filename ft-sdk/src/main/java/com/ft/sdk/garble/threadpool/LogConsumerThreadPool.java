@@ -4,7 +4,7 @@ package com.ft.sdk.garble.threadpool;
  * BY huangDianHua
  * DATE:2019-11-29 18:57
  * Description:
- *
+ * <p>
  * 负责缓存日志数据的消费
  */
 public class LogConsumerThreadPool extends BaseThreadPool {
@@ -14,7 +14,7 @@ public class LogConsumerThreadPool extends BaseThreadPool {
 
 
     private LogConsumerThreadPool() {
-        super(CORE_POOL_SIZE);
+        super(CORE_POOL_SIZE, "FTLogCsr", 4);
     }
 
 

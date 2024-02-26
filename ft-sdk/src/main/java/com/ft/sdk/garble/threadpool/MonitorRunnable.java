@@ -14,6 +14,7 @@ import com.ft.sdk.garble.utils.Utils;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -23,7 +24,12 @@ import java.util.concurrent.TimeUnit;
  * @author Brandon
  */
 public class MonitorRunnable implements Runnable {
-    private final ScheduledExecutorService service = new ScheduledThreadPoolExecutor(1);
+    private final ScheduledExecutorService service = new ScheduledThreadPoolExecutor(1, new ThreadFactory() {
+        @Override
+        public Thread newThread(Runnable r) {
+            return new Thread(r, "FTMetricsMTR");
+        }
+    });
     private final DetectFrequency detectFrequency;
     private final MonitorInfoBean fpsBean = new MonitorInfoBean();
     private final MonitorInfoBean cpuBean = new MonitorInfoBean();
@@ -81,6 +87,7 @@ public class MonitorRunnable implements Runnable {
 
     /**
      * 记录 CPU  最大值，最小值
+     *
      * @param bean
      * @param value
      */
@@ -95,7 +102,6 @@ public class MonitorRunnable implements Runnable {
     }
 
     /**
-     *
      * 最大值，最小值，以及平均值的计算
      *
      * @param bean
