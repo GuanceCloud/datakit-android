@@ -135,7 +135,7 @@ public class Constants {
     /**
      * 日志最大限制缓存数
      */
-    public static final int MAX_DB_CACHE_NUM = 5000;//数据库最大缓存容量
+    public static final int MAX_DB_LOG_CACHE_NUM = 5000;//数据库最大缓存容量
 
 //    public static final String KEY_EVENT_ID = "event_id";
 //    public static final String KEY_EVENT = "event";
