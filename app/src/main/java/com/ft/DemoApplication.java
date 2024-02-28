@@ -36,7 +36,7 @@ public class DemoApplication extends BaseApplication {
     static void initFTSDK() {
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAKIT_URL)
                 .setDebug(true)//设置是否是 debug
-                .setAutoSync(false)
+                .setAutoSync(true)
                 .setCustomSyncPageSize(30)
                 .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()));
         FTSdk.install(ftSDKConfig);
@@ -45,6 +45,7 @@ public class DemoApplication extends BaseApplication {
                 .setSamplingRate(1f)
                 .setEnableCustomLog(true)
                 .setEnableConsoleLog(true)
+                .setLogCacheLimitCount(1000)
                 .setPrintCustomLogToConsole(true)
                 .setLogLevelFilters(new Status[]{Status.ERROR})
                 .setEnableLinkRumData(true)
