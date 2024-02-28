@@ -218,7 +218,7 @@ public class FTSDKConfig {
      * @return
      */
     public FTSDKConfig setCustomSyncPageSize(int pageSize) {
-        this.pageSize = Math.max(SyncPageSize.MINI.getValue(), Math.min(SyncPageSize.LARGE.getValue(), pageSize));
+        this.pageSize = Math.max(SyncPageSize.MINI.getValue(), pageSize);
         return this;
     }
 
@@ -233,6 +233,7 @@ public class FTSDKConfig {
 
     /**
      * 获取一次请求条目数量
+     *
      * @return
      */
     public int getPageSize() {

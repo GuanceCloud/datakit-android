@@ -4,6 +4,7 @@ import com.ft.sdk.garble.bean.BaseContentBean;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.LogData;
 import com.ft.sdk.garble.bean.Status;
+import com.ft.sdk.garble.threadpool.LogConsumerThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -126,7 +127,14 @@ public class FTLogger {
                 logBeans.add(logBean);
             }
         }
-        FTTrackInner.getInstance().batchLogBeanBackground(logBeans, false);
+        LogConsumerThreadPool.get().execute(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        FTTrackInner.getInstance().batchLogBeanBackground(logBeans, false);
+
+                    }
+                });
     }
 
     /**

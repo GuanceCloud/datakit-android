@@ -39,6 +39,9 @@ public class SyncJsonData implements Cloneable {
      */
     String dataString;
 
+    JSONObject dataJson;
+
+
     public SyncJsonData(DataType dataType) {
         this.dataType = dataType;
     }
@@ -102,6 +105,10 @@ public class SyncJsonData implements Cloneable {
     }
 
 
+    public JSONObject getDataJson() {
+        return dataJson;
+    }
+
     /**
      * 追踪数据转化
      *
@@ -136,8 +143,8 @@ public class SyncJsonData implements Cloneable {
             throws JSONException, FTInvalidParameterException {
         SyncJsonData recordData = new SyncJsonData(dataType);
         recordData.setTime(bean.getTime());
-        JSONObject opDataJson = getLinProtocolJson(bean.getMeasurement(), bean.getAllTags(), bean.getAllFields());
-        recordData.setDataString(FloatDoubleJsonUtils.protectValueFormat(opDataJson));
+        //        recordData.setDataString(new GsonBuilder().serializeNulls().create().toJson(opDataJson));
+        recordData.dataJson = getLinProtocolJson(bean.getMeasurement(), bean.getAllTags(), bean.getAllFields());
         return recordData;
     }
 

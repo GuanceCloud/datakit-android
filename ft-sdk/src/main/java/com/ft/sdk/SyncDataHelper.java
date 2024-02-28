@@ -123,55 +123,55 @@ public class SyncDataHelper {
     private String convertToLineProtocolLines(List<SyncJsonData> datas, HashMap<String, Object> extraTags, boolean withUUid) {
         StringBuilder sb = new StringBuilder();
         for (SyncJsonData data : datas) {
-            String jsonString = data.getDataString();
-            if (jsonString != null) {
-                try {
-                    //========== measurement ==========
-                    JSONObject opJson = new JSONObject(jsonString);
-                    String measurement = opJson.optString(Constants.MEASUREMENT);
-                    if (Utils.isNullOrEmpty(measurement)) {
-                        measurement = FT_KEY_VALUE_NULL;
-                    } else {
-                        measurement = Utils.translateMeasurements(measurement);
-                    }
-                    sb.append(measurement);
+//            String jsonString = data.getDataString();
+//            if (jsonString != null) {
+            try {
+                //========== measurement ==========
+                JSONObject opJson = data.getDataJson();
+                String measurement = opJson.optString(Constants.MEASUREMENT);
+                if (Utils.isNullOrEmpty(measurement)) {
+                    measurement = FT_KEY_VALUE_NULL;
+                } else {
+                    measurement = Utils.translateMeasurements(measurement);
+                }
+                sb.append(measurement);
 
-                    //========== tags ==========
-                    JSONObject tags = opJson.optJSONObject(Constants.TAGS);
-                    if (extraTags != null) {
-                        //合并去重
-                        for (String key : extraTags.keySet()) {
-                            if (!tags.has(key)) {
-                                //此处空对象会被移除
-                                tags.put(key, extraTags.get(key));
-                            }
+                //========== tags ==========
+                JSONObject tags = opJson.optJSONObject(Constants.TAGS);
+                if (extraTags != null) {
+                    //合并去重
+                    for (String key : extraTags.keySet()) {
+                        if (!tags.has(key)) {
+                            //此处空对象会被移除
+                            tags.put(key, extraTags.get(key));
                         }
                     }
-                    if (withUUid) {
-                        tags.put(Constants.KEY_SDK_DATA_FLAG, Utils.randomUUID());
-                    }
-                    StringBuilder tagSb = getCustomHash(tags, true);
-                    deleteLastComma(tagSb);
-                    if (tagSb.length() > 0) {
-                        sb.append(",");
-                        sb.append(tagSb);
-                    }
-                    sb.append(Constants.SEPARATION_PRINT);
-
-                    //========== field ==========
-                    JSONObject fields = opJson.optJSONObject(Constants.FIELDS);
-                    StringBuilder valueSb = getCustomHash(fields, false);
-                    deleteLastComma(valueSb);
-                    sb.append(valueSb);
-                    sb.append(Constants.SEPARATION_PRINT);
-
-                    //========= time ==========
-                    sb.append(data.getTime());
-                    sb.append(Constants.SEPARATION_LINE_BREAK);
-                } catch (Exception e) {
-                    LogUtils.e(TAG, Log.getStackTraceString(e));
                 }
+                if (withUUid) {
+                    tags.put(Constants.KEY_SDK_DATA_FLAG, Utils.randomUUID());
+                }
+                StringBuilder tagSb = getCustomHash(tags, true);
+                deleteLastComma(tagSb);
+                if (tagSb.length() > 0) {
+                    sb.append(",");
+                    sb.append(tagSb);
+                }
+                sb.append(Constants.SEPARATION_PRINT);
+
+                //========== field ==========
+                JSONObject fields = opJson.optJSONObject(Constants.FIELDS);
+                StringBuilder valueSb = getCustomHash(fields, false);
+                deleteLastComma(valueSb);
+                sb.append(valueSb);
+                sb.append(Constants.SEPARATION_PRINT);
+
+                //========= time ==========
+                sb.append(data.getTime());
+                sb.append(Constants.SEPARATION_LINE_BREAK);
+            } catch (Exception e) {
+                LogUtils.e(TAG, Log.getStackTraceString(e));
             }
+//            }
         }
         return sb.toString();
     }

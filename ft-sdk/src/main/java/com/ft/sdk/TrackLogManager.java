@@ -1,18 +1,21 @@
 
 package com.ft.sdk;
 
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.bean.BaseContentBean;
 import com.ft.sdk.garble.bean.LogBean;
-import com.ft.sdk.garble.threadpool.LogConsumerThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * author: huangDianHua
@@ -21,12 +24,20 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class TrackLogManager {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "TrackLogManager";
+
+    private final Handler handler = new Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            rotationSync(msg.arg1 == 1, false);
+        }
+    };
+    private static final int MSG_FINISH_FLUSH = 1;
     private static TrackLogManager instance;
     private final List<BaseContentBean> logBeanList = new CopyOnWriteArrayList<>();
-    /**
-     * log 输入队列
-     */
-    private final LinkedBlockingQueue<LogBean> logQueue = new LinkedBlockingQueue<>();
+    //    /**
+//     * log 输入队列
+//     */
+//    private final LinkedBlockingQueue<LogBean> logQueue = new LinkedBlockingQueue<>();
     private volatile boolean isRunning;
 
     private TrackLogManager() {
@@ -44,52 +55,49 @@ public class TrackLogManager {
     /**
      * @param logBean {@link LogBean} 发送日志数据
      */
-    public synchronized void trackLog(LogBean logBean) {
-        //防止内存中队列容量超过一定限制，这里同样使用同步丢弃策略
-        if (logQueue.size() >= Constants.MAX_DB_CACHE_NUM) {
-            switch (FTDBCachePolicy.get().getLogCacheDiscardStrategy()) {
-                case DISCARD:
-                    break;
-                case DISCARD_OLDEST:
-                    logQueue.poll();
-                    logQueue.add(logBean);
-                    break;
-                default:
-                    logQueue.add(logBean);
+    public void trackLog(LogBean logBean, boolean isSilence) {
+        synchronized (logBeanList) {
+            //防止内存中队列容量超过一定限制，这里同样使用同步丢弃策略
+            if (logBeanList.size() >= FTDBCachePolicy.get().getLimitCount()) {
+                switch (FTDBCachePolicy.get().getLogCacheDiscardStrategy()) {
+                    case DISCARD:
+                        break;
+                    case DISCARD_OLDEST:
+                        logBeanList.remove(0);
+                        logBeanList.add(logBean);
+                        break;
+                    default:
+                        logBeanList.add(logBean);
+                }
+            } else {
+                logBeanList.add(logBean);
             }
-        } else {
-            logQueue.add(logBean);
+            rotationSync(isSilence, true);
+
         }
-        rotationSync();
+
     }
 
-    private void rotationSync() {
-        if (isRunning) {
-            return;
-        }
-        isRunning = true;
-        Runnable futureTask = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    //当队列中有数据时，不断执行取数据操作
-                    LogBean logBean;
-                    //take 为阻塞方法，所以该线程会一直在运行中
-                    while ((logBean = logQueue.take()) != null) {
-                        isRunning = true;
-                        logBeanList.add(logBean);//取出数据放到集合中
-                        if (logBeanList.size() >= 20 || logQueue.peek() == null) {//当取出的数据大于等于20条或者没有下一条数据时执行插入数据库操作
-                            FTTrackInner.getInstance().batchLogBeanBackground(logBeanList, false);
-                            logBeanList.clear();//插入完成后执行清除集合操作
-                        }
-                    }
-                } catch (Exception e) {
-                    LogUtils.e(TAG, Log.getStackTraceString(e));
-                } finally {
-                    isRunning = false;
-                }
+
+    private void rotationSync(boolean isSilence, boolean wait) {
+        //当队列中有数据时，不断执行取数据操作
+        if (logBeanList.size() >= 20 || !wait) {
+            try {
+                FTTrackInner.getInstance().batchLogBeanBackground(logBeanList, false);
+                logBeanList.clear();//插入完成后执行清除集合操作
+
+            } catch (Exception e) {
+                LogUtils.d(TAG, Log.getStackTraceString(e));
             }
-        };
-        LogConsumerThreadPool.get().execute(futureTask);
+        }
+
+        if (wait) {
+            handler.removeMessages(MSG_FINISH_FLUSH);
+            Message message = new Message();
+            message.what = MSG_FINISH_FLUSH;
+            message.arg1 = isSilence ? 1 : 0;
+            handler.sendMessageDelayed(message, 300);
+
+        }
     }
 }
