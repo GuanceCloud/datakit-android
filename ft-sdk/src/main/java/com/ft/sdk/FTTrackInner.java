@@ -17,6 +17,7 @@ import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.manager.AsyncCallback;
 import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
+import com.ft.sdk.garble.threadpool.LogConsumerThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -153,9 +154,7 @@ public class FTTrackInner {
      * @param isSilence 是否立即触发同步
      */
     void logBackground(@NonNull LogBean logBean, boolean isSilence) {
-        ArrayList<BaseContentBean> list = new ArrayList<>();
-        list.add(logBean);
-        batchLogBeanBackground(list, isSilence);
+        TrackLogManager.get().trackLog(logBean, isSilence);
     }
 
     /**
@@ -229,20 +228,26 @@ public class FTTrackInner {
      */
     private void judgeLogCachePolicy(@NonNull List<SyncJsonData> recordDataList, boolean silence) {
         //如果 OP 类型不等于 LOG 则直接进行数据库操作；否则执行同步策略，根据同步策略返回结果判断是否需要执行数据库操作
-        int length = recordDataList.size();
-        int policyStatus = FTDBCachePolicy.get().optLogCachePolicy(length);
-        if (policyStatus >= 0) {//执行同步策略
-            if (policyStatus > 0) {
-                for (int i = 0; i < policyStatus && i < length; i++) {
-                    recordDataList.remove(0);
+        LogConsumerThreadPool.get().execute(new Runnable() {
+            @Override
+            public void run() {
+                int length = recordDataList.size();
+                int policyStatus = FTDBCachePolicy.get().optLogCachePolicy(length);
+                if (policyStatus >= 0) {//执行同步策略
+                    if (policyStatus > 0) {
+                        for (int i = 0; i < policyStatus && i < length; i++) {
+                            recordDataList.remove(0);
+                        }
+                    }
+                    boolean result = FTDBManager.get().insertFtOptList(recordDataList);
+                    LogUtils.d(TAG, "judgeLogCachePolicy:insert-result=" + result);
+                    if (!silence) {
+                        SyncTaskManager.get().executeSyncPoll();
+                    }
                 }
             }
-            boolean result = FTDBManager.get().insertFtOptList(recordDataList);
-            LogUtils.d(TAG, "judgeLogCachePolicy:insert-result=" + result);
-            if (!silence) {
-                SyncTaskManager.get().executeSyncPoll();
-            }
-        }
+        });
+
     }
 
 

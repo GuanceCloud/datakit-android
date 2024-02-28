@@ -36,7 +36,7 @@ public class DemoApplication extends BaseApplication {
     static void initFTSDK() {
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAKIT_URL)
                 .setDebug(true)//设置是否是 debug
-                .setAutoSync(false)
+                .setAutoSync(true)
                 .setCustomSyncPageSize(30)
                 .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()));
         FTSdk.install(ftSDKConfig);

@@ -85,7 +85,7 @@ public class TrackLog {
             logBean.setServiceName(config.getServiceName());
             logBean.setStatus(getStatus(priority));
             if (config.checkLogLevel(logBean.getStatus()) && config.checkPrefix(msg)) {
-                TrackLogManager.get().trackLog(logBean);
+                TrackLogManager.get().trackLog(logBean, false);
             }
         }
         return Log.println(priority, tag, msg);
