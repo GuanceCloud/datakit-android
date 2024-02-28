@@ -44,7 +44,7 @@ public class TrackLogManager {
     /**
      * @param logBean {@link LogBean} 发送日志数据
      */
-    public synchronized void trackLog(LogBean logBean,boolean isSilence) {
+    public synchronized void trackLog(LogBean logBean, boolean isSilence) {
         //防止内存中队列容量超过一定限制，这里同样使用同步丢弃策略
         if (logQueue.size() >= FTDBCachePolicy.get().getLimitCount()) {
             switch (FTDBCachePolicy.get().getLogCacheDiscardStrategy()) {
@@ -68,7 +68,7 @@ public class TrackLogManager {
             return;
         }
         isRunning = true;
-        Runnable futureTask = new Runnable() {
+        LogConsumerThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -79,7 +79,7 @@ public class TrackLogManager {
                         isRunning = true;
                         logBeanList.add(logBean);//取出数据放到集合中
                         if (logBeanList.size() >= 20 || logQueue.peek() == null) {//当取出的数据大于等于20条或者没有下一条数据时执行插入数据库操作
-                            FTTrackInner.getInstance().batchLogBeanBackground(logBeanList, isSilence);
+                            FTTrackInner.getInstance().batchLogBeanSync(logBeanList, isSilence);
                             logBeanList.clear();//插入完成后执行清除集合操作
                         }
                     }
@@ -89,7 +89,6 @@ public class TrackLogManager {
                     isRunning = false;
                 }
             }
-        };
-        LogConsumerThreadPool.get().execute(futureTask);
+        });
     }
 }

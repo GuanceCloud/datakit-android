@@ -127,14 +127,12 @@ public class FTLogger {
                 logBeans.add(logBean);
             }
         }
-        LogConsumerThreadPool.get().execute(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        FTTrackInner.getInstance().batchLogBeanBackground(logBeans, false);
-
-                    }
-                });
+        LogConsumerThreadPool.get().execute(new Runnable() {
+            @Override
+            public void run() {
+                FTTrackInner.getInstance().batchLogBeanSync(logBeans, false);
+            }
+        });
     }
 
     /**
