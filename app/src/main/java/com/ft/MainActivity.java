@@ -65,7 +65,10 @@ public class MainActivity extends AppCompatActivity {
         });
         findViewById(R.id.main_mock_log_btn).setOnClickListener(v -> {
             Log.e(TAG, "console log");
-            FTLogger.getInstance().logBackground("custom Log", Status.ERROR);
+            for (int i = 0; i < 1000; i++) {
+                FTLogger.getInstance().logBackground("custom Log", Status.ERROR);
+            }
+
         });
 
         findViewById(R.id.main_mock_okhttp_btn).setOnClickListener(v -> {

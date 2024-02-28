@@ -45,6 +45,7 @@ public class DemoApplication extends BaseApplication {
                 .setSamplingRate(1f)
                 .setEnableCustomLog(true)
                 .setEnableConsoleLog(true)
+                .setLogCacheLimitCount(1000)
                 .setPrintCustomLogToConsole(true)
                 .setLogLevelFilters(new Status[]{Status.ERROR})
                 .setEnableLinkRumData(true)
