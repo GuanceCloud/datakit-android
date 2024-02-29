@@ -555,12 +555,12 @@ public class Utils {
 
 
     /**
-     *
+     * 写入文件
      * @param file
      * @param content
      * @throws IOException
      */
-    public static void appendData(File file, String content) throws IOException {
+    public static void writeToFile(File file, String content) throws IOException {
         RandomAccessFile raf = new RandomAccessFile(file, "rw");
         FileChannel channel = raf.getChannel();
         MappedByteBuffer buffer = channel.map(FileChannel.MapMode.READ_WRITE, channel.size(), content.length());
