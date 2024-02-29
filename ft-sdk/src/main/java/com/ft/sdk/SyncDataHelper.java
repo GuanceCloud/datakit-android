@@ -40,6 +40,24 @@ public class SyncDataHelper {
 
     /**
      * 封装同步上传的数据
+     * @param data
+     * @return
+     */
+    public String getBodyContent(SyncJsonData data) {
+        HashMap<String, Object> hashMap = new HashMap<>(basePublicTags);
+        if (data.getDataType() == DataType.LOG) {
+            hashMap.putAll(logTags);
+        } else if (data.getDataType() == DataType.TRACE) {
+            hashMap.putAll(traceTags);
+        } else if (data.getDataType() == DataType.RUM_APP || data.getDataType() == DataType.RUM_WEBVIEW) {
+            hashMap.putAll(rumTags);
+        }
+        return convertToLineProtocolLine(data, hashMap, true, false);
+
+    }
+
+    /**
+     * 封装同步上传的数据
      *
      * @param dataType
      * @param recordDatas
@@ -58,7 +76,7 @@ public class SyncDataHelper {
             bodyContent = "";
         }
         return bodyContent.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION)
-                .replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK);
+                .replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REAL_LINE_BREAK);
     }
 
 
@@ -120,58 +138,72 @@ public class SyncDataHelper {
      * @param extraTags
      * @return
      */
-    private String convertToLineProtocolLines(List<SyncJsonData> datas, HashMap<String, Object> extraTags, boolean withUUid) {
+    private String convertToLineProtocolLines(List<SyncJsonData> datas, HashMap<String, Object> extraTags,
+                                              boolean withUUID) {
         StringBuilder sb = new StringBuilder();
-        for (SyncJsonData data : datas) {
-//            String jsonString = data.getDataString();
-//            if (jsonString != null) {
-            try {
-                //========== measurement ==========
-                JSONObject opJson = data.getDataJson();
-                String measurement = opJson.optString(Constants.MEASUREMENT);
-                if (Utils.isNullOrEmpty(measurement)) {
-                    measurement = FT_KEY_VALUE_NULL;
-                } else {
-                    measurement = Utils.translateMeasurements(measurement);
-                }
-                sb.append(measurement);
 
-                //========== tags ==========
-                JSONObject tags = opJson.optJSONObject(Constants.TAGS);
-                if (extraTags != null) {
-                    //合并去重
-                    for (String key : extraTags.keySet()) {
-                        if (!tags.has(key)) {
-                            //此处空对象会被移除
-                            tags.put(key, extraTags.get(key));
-                        }
+        for (SyncJsonData data : datas) {
+            sb.append(convertToLineProtocolLine(data, extraTags, withUUID, true));
+        }
+        return sb.toString();
+    }
+
+    /**
+     * 转化为单条行协议数据
+     *
+     * @param data
+     * @param extraTags
+     * @return
+     */
+    private String convertToLineProtocolLine(SyncJsonData data, HashMap<String, Object> extraTags,
+                                             boolean withUUid, boolean multiLine) {
+        StringBuilder sb = new StringBuilder();
+
+        try {
+            //========== measurement ==========
+            JSONObject opJson = data.getDataJson();
+            String measurement = opJson.optString(Constants.MEASUREMENT);
+            if (Utils.isNullOrEmpty(measurement)) {
+                measurement = FT_KEY_VALUE_NULL;
+            } else {
+                measurement = Utils.translateMeasurements(measurement);
+            }
+            sb.append(measurement);
+
+            //========== tags ==========
+            JSONObject tags = opJson.optJSONObject(Constants.TAGS);
+            if (extraTags != null) {
+                //合并去重
+                for (String key : extraTags.keySet()) {
+                    if (!tags.has(key)) {
+                        //此处空对象会被移除
+                        tags.put(key, extraTags.get(key));
                     }
                 }
-                if (withUUid) {
-                    tags.put(Constants.KEY_SDK_DATA_FLAG, Utils.randomUUID());
-                }
-                StringBuilder tagSb = getCustomHash(tags, true);
-                deleteLastComma(tagSb);
-                if (tagSb.length() > 0) {
-                    sb.append(",");
-                    sb.append(tagSb);
-                }
-                sb.append(Constants.SEPARATION_PRINT);
-
-                //========== field ==========
-                JSONObject fields = opJson.optJSONObject(Constants.FIELDS);
-                StringBuilder valueSb = getCustomHash(fields, false);
-                deleteLastComma(valueSb);
-                sb.append(valueSb);
-                sb.append(Constants.SEPARATION_PRINT);
-
-                //========= time ==========
-                sb.append(data.getTime());
-                sb.append(Constants.SEPARATION_LINE_BREAK);
-            } catch (Exception e) {
-                LogUtils.e(TAG, Log.getStackTraceString(e));
             }
-//            }
+            if (withUUid) {
+                tags.put(Constants.KEY_SDK_DATA_FLAG, Utils.randomUUID());
+            }
+            StringBuilder tagSb = getCustomHash(tags, true);
+            deleteLastComma(tagSb);
+            if (tagSb.length() > 0) {
+                sb.append(",");
+                sb.append(tagSb);
+            }
+            sb.append(multiLine ? Constants.SEPARATION_PRINT : Constants.SEPARATION);
+
+            //========== field ==========
+            JSONObject fields = opJson.optJSONObject(Constants.FIELDS);
+            StringBuilder valueSb = getCustomHash(fields, false);
+            deleteLastComma(valueSb);
+            sb.append(valueSb);
+            sb.append(multiLine ? Constants.SEPARATION_PRINT : Constants.SEPARATION);
+
+            //========= time ==========
+            sb.append(data.getTime());
+            sb.append(multiLine ? Constants.SEPARATION_LINE_BREAK : Constants.SEPARATION_REAL_LINE_BREAK);
+        } catch (Exception e) {
+            LogUtils.e(TAG, Log.getStackTraceString(e));
         }
         return sb.toString();
     }

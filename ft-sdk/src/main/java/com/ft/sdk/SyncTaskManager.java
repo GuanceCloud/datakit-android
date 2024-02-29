@@ -179,8 +179,13 @@ public class SyncTaskManager {
 
             LogUtils.d(TAG, "Sync Data Count:" + requestDataList.size());
 
-            SyncDataHelper syncData = new SyncDataHelper();
-            String body = syncData.getBodyContent(dataType, requestDataList);
+//            SyncDataHelper syncData = new SyncDataHelper();
+            StringBuilder sb = new StringBuilder();
+            for (SyncJsonData data : cacheDataList) {
+                sb.append(data.getDataString());
+            }
+
+            String body = sb.toString();
             LogUtils.d(TAG, body);
             requestNet(dataType, body, new AsyncCallback() {
                 @Override

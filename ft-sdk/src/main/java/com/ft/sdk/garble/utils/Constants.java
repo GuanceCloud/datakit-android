@@ -54,7 +54,7 @@ public class Constants {
     /**
      * 最终数据行协议单条数据分隔
      */
-    public static final String SEPARATION_REALLY_LINE_BREAK = "\n";//换行标志符，用于日志显示
+    public static final String SEPARATION_REAL_LINE_BREAK = "\n";//换行标志符，用于日志显示
 
     /**
      * 同步数据 http 请求 header user-agent

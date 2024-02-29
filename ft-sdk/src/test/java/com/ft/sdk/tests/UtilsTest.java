@@ -84,7 +84,7 @@ public class UtilsTest {
         recordDataList.add(recordData);
         String content = convertToLineProtocolLines(recordDataList);
         Assert.assertEquals(LOG_EXPECT_DATA, content.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION)
-                .replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK));
+                .replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REAL_LINE_BREAK));
     }
 
     /**
@@ -94,19 +94,20 @@ public class UtilsTest {
      */
     @Test
     public void singleLineProtocolFormatTest() throws Exception {
+        SyncDataHelper helper = new SyncDataHelper();
         JSONObject tags = new JSONObject();
         tags.put(KEY_TAGS, VALUE_TAGS);
         JSONObject fields = new JSONObject();
         fields.put(KEY_FIELD, VALUE_FIELD);
         LineProtocolBean trackBean = new LineProtocolBean(TEST_MEASUREMENT_INFLUX_DB_LINE, tags, fields, VALUE_TIME);
-        SyncJsonData data = SyncJsonData.getSyncJsonData(DataType.LOG, trackBean);
+        SyncJsonData data = SyncJsonData.getSyncJsonData(helper, DataType.LOG, trackBean);
 
         List<SyncJsonData> recordDataList = new ArrayList<>();
         recordDataList.add(data);
         String content = convertToLineProtocolLines(recordDataList);
 
         assertEquals(content.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION)
-                .replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK), SINGLE_LINE_NORMAL_DATA);
+                .replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REAL_LINE_BREAK), SINGLE_LINE_NORMAL_DATA);
 
 
         JSONObject tagsEmpty = new JSONObject();
@@ -114,14 +115,14 @@ public class UtilsTest {
         JSONObject fieldsEmpty = new JSONObject();
         fieldsEmpty.put(KEY_FIELD_EMPTY, VALUE_FIELD_EMPTY);
         LineProtocolBean trackBeanEmpty = new LineProtocolBean(TEST_MEASUREMENT_INFLUX_DB_LINE, tagsEmpty, fieldsEmpty, VALUE_TIME);
-        SyncJsonData dataEmpty = SyncJsonData.getSyncJsonData(DataType.LOG, trackBeanEmpty);
+        SyncJsonData dataEmpty = SyncJsonData.getSyncJsonData(helper, DataType.LOG, trackBeanEmpty);
 
         List<SyncJsonData> emptyRecordDataList = new ArrayList<>();
         emptyRecordDataList.add(dataEmpty);
         String contentEmpty = convertToLineProtocolLines(emptyRecordDataList);
 
         assertEquals(SINGLE_LINE_EMPTY_DATA, contentEmpty.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION)
-                .replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK));
+                .replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REAL_LINE_BREAK));
     }
 
     private String convertToLineProtocolLines(List<SyncJsonData> list) throws Exception {

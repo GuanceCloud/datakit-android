@@ -5,8 +5,8 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.ft.sdk.SyncDataHelper;
 import com.ft.sdk.garble.utils.Constants;
-import com.ft.sdk.garble.utils.FloatDoubleJsonUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.internal.exception.FTInvalidParameterException;
 
@@ -118,15 +118,14 @@ public class SyncJsonData implements Cloneable {
      * @throws JSONException
      * @throws InvalidParameterException
      */
-    public static SyncJsonData getSyncJsonData(DataType dataType, LineProtocolBean bean)
+    public static SyncJsonData getSyncJsonData(SyncDataHelper helper, DataType dataType, LineProtocolBean bean)
             throws JSONException, FTInvalidParameterException {
         JSONObject tagsTemp = bean.getTags();
         JSONObject fields = bean.getFields();
         SyncJsonData recordData = new SyncJsonData(dataType);
         recordData.setTime(bean.getTimeNano());
-        JSONObject opDataJson = getLinProtocolJson(bean.getMeasurement(), tagsTemp, fields);
-
-        recordData.setDataString(FloatDoubleJsonUtils.protectValueFormat(opDataJson));
+        recordData.dataJson = getLinProtocolJson(bean.getMeasurement(), tagsTemp, fields);
+        recordData.setDataString(helper.getBodyContent(recordData));
         return recordData;
     }
 
@@ -139,12 +138,12 @@ public class SyncJsonData implements Cloneable {
      * @throws JSONException
      * @throws InvalidParameterException
      */
-    public static SyncJsonData getFromLogBean(BaseContentBean bean, DataType dataType)
+    public static SyncJsonData getFromLogBean(SyncDataHelper helper, BaseContentBean bean, DataType dataType)
             throws JSONException, FTInvalidParameterException {
         SyncJsonData recordData = new SyncJsonData(dataType);
         recordData.setTime(bean.getTime());
-        //        recordData.setDataString(new GsonBuilder().serializeNulls().create().toJson(opDataJson));
         recordData.dataJson = getLinProtocolJson(bean.getMeasurement(), bean.getAllTags(), bean.getAllFields());
+        recordData.setDataString(helper.getBodyContent(recordData));
         return recordData;
     }
 

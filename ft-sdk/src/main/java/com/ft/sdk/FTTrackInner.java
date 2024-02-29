@@ -4,6 +4,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.bean.BaseContentBean;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.LineProtocolBean;
@@ -35,6 +36,8 @@ public class FTTrackInner {
     private final static String TAG = Constants.LOG_TAG_PREFIX + "FTTrackInner";
     private static FTTrackInner instance;
 
+    private SyncDataHelper dataHelper;
+
     private FTTrackInner() {
     }
 
@@ -47,6 +50,10 @@ public class FTTrackInner {
             }
         }
         return instance;
+    }
+
+    void initSyncDataHelper() {
+        dataHelper = new SyncDataHelper();
     }
 
     /**
@@ -86,7 +93,7 @@ public class FTTrackInner {
             public void run() {
                 try {
 
-                    SyncJsonData recordData = SyncJsonData.getSyncJsonData(dataType,
+                    SyncJsonData recordData = SyncJsonData.getSyncJsonData(dataHelper, dataType,
                             new LineProtocolBean(measurement, tags, fields, time));
                     boolean result = FTDBManager.get().insertFtOperation(recordData);
                     LogUtils.d(TAG, "syncDataBackground:" + measurement + "," + dataType.toString() + ":insert=" + result);
@@ -113,13 +120,12 @@ public class FTTrackInner {
                 List<SyncJsonData> recordDataList = new ArrayList<>();
                 for (LineProtocolBean t : trackBeans) {
                     try {
-                        SyncJsonData recordData = SyncJsonData.getSyncJsonData(DataType.RUM_APP,
+                        SyncJsonData recordData = SyncJsonData.getSyncJsonData(dataHelper, DataType.RUM_APP,
                                 new LineProtocolBean(t.getMeasurement(), t.getTags(),
                                         t.getFields(), t.getTimeNano()));
                         recordDataList.add(recordData);
 
-                        SyncDataHelper syncDataManager = new SyncDataHelper();
-                        String body = syncDataManager.getBodyContent(DataType.LOG, recordDataList);
+                        String body = dataHelper.getBodyContent(DataType.LOG, recordDataList);
                         String model = Constants.URL_MODEL_LOG;
                         String content_type = "text/plain";
                         FTResponseData result = HttpBuilder.Builder()
@@ -186,7 +192,7 @@ public class FTTrackInner {
                         if (rumTags != null) {
                             logBean.appendTags(rumTags);
                         }
-                        datas.add(SyncJsonData.getFromLogBean(logBean, DataType.LOG));
+                        datas.add(SyncJsonData.getFromLogBean(dataHelper, logBean, DataType.LOG));
                     } else {
                         LogUtils.d(TAG, "根据 FTLogConfig SampleRate 计算，将被丢弃=>" + logBean.getContent());
                     }
@@ -226,30 +232,20 @@ public class FTTrackInner {
      */
     private void judgeLogCachePolicy(@NonNull List<SyncJsonData> recordDataList, boolean silence) {
         //如果 OP 类型不等于 LOG 则直接进行数据库操作；否则执行同步策略，根据同步策略返回结果判断是否需要执行数据库操作
-        String result = new SyncDataHelper().getBodyContent(DataType.LOG, recordDataList);
-        LogUtils.d(TAG, "judgeLogCachePolicy:insert-result\n" + result);
-        SyncDataCacheManager.get().appendData(result);
-
-//                FTDBManager.get().insertFtOperation()
-        if (!silence) {
-            SyncTaskManager.get().executeSyncPoll();
+        int length = recordDataList.size();
+        int policyStatus = FTDBCachePolicy.get().optLogCachePolicy(length);
+        if (policyStatus >= 0) {//执行同步策略
+            if (policyStatus > 0) {
+                for (int i = 0; i < policyStatus && i < length; i++) {
+                    recordDataList.remove(0);
+                }
+            }
+            boolean result = FTDBManager.get().insertFtOptList(recordDataList);
+            LogUtils.d(TAG, "judgeLogCachePolicy:insert-result=" + result);
+            if (!silence) {
+                SyncTaskManager.get().executeSyncPoll();
+            }
         }
-
-
-//        int length = recordDataList.size();
-//        int policyStatus = FTDBCachePolicy.get().optLogCachePolicy(length);
-//        if (policyStatus >= 0) {//执行同步策略
-//            if (policyStatus > 0) {
-//                for (int i = 0; i < policyStatus && i < length; i++) {
-//                    recordDataList.remove(0);
-//                }
-//            }
-//            String result =  new SyncDataHelper().getBodyContent(DataType.LOG,recordDataList);
-//            LogUtils.d(TAG, "judgeLogCachePolicy:insert-result\n" + result);
-//            if (!silence) {
-//                SyncTaskManager.get().executeSyncPoll();
-//            }
-//        }
     }
 
 
