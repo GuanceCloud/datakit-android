@@ -32,19 +32,39 @@ public class SyncDataHelper {
 
 
     public SyncDataHelper() {
-        basePublicTags = FTSdk.checkInstallState() ? FTSdk.get().getBasePublicTags() : new HashMap<>();
-        logTags = FTLoggerConfigManager.get().getConfig() != null ? FTLoggerConfigManager.get().getConfig().getGlobalContext() : new HashMap<>();
-        rumTags = FTRUMConfigManager.get().getConfig() != null ? FTRUMConfigManager.get().getConfig().getGlobalContext() : new HashMap<>();
-        traceTags = FTTraceConfigManager.get().getConfig() != null ? FTTraceConfigManager.get().getConfig().getGlobalContext() : new HashMap<>();
+        basePublicTags = new HashMap<>();
+        logTags = new HashMap<>();
+        rumTags = new HashMap<>();
+        traceTags = new HashMap<>();
+    }
+
+    void initBaseConfig(FTSDKConfig config) {
+        basePublicTags.putAll(config.getGlobalContext());
+    }
+
+    void initLogConfig(FTLoggerConfig config) {
+        logTags.putAll(basePublicTags);
+        logTags.putAll(config.getGlobalContext());
+    }
+
+    void initRUMConfig(FTRUMConfig config) {
+        rumTags.putAll(basePublicTags);
+        rumTags.putAll(config.getGlobalContext());
+    }
+
+    void initTraceConfig(FTTraceConfig config) {
+        traceTags.putAll(basePublicTags);
+        traceTags.putAll(config.getGlobalContext());
     }
 
     /**
      * 封装同步上传的数据
+     *
      * @param data
      * @return
      */
     public String getBodyContent(SyncJsonData data) {
-        HashMap<String, Object> hashMap = new HashMap<>(basePublicTags);
+        HashMap<String, Object> hashMap = new HashMap<>();
         if (data.getDataType() == DataType.LOG) {
             hashMap.putAll(logTags);
         } else if (data.getDataType() == DataType.TRACE) {
@@ -53,7 +73,6 @@ public class SyncDataHelper {
             hashMap.putAll(rumTags);
         }
         return convertToLineProtocolLine(data, hashMap, true, false);
-
     }
 
     /**

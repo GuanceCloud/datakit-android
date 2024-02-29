@@ -179,8 +179,7 @@ public class FTSdk {
         FTNetworkListener.get().monitor();
         appendGlobalContext(config);
         SyncTaskManager.get().init(config);
-//        SyncDataCacheManager.get().init();
-        FTTrackInner.getInstance().initSyncDataHelper();
+        FTTrackInner.getInstance().initBaseConfig(config);
 //            LogUtils.setDescLogShow(mFtSDKConfig.isDescLog());
     }
 

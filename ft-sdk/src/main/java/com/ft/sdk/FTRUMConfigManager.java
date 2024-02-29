@@ -52,6 +52,7 @@ public class FTRUMConfigManager {
      */
     void initWithConfig(FTRUMConfig config) {
         this.config = config;
+
         FTRUMInnerManager.get().initParams(config);
         FTRUMGlobalManager.get().initConfig(config);
 //        FTAutoTrackConfigManager.get().initParams();
@@ -61,6 +62,7 @@ public class FTRUMConfigManager {
         FTUIBlockManager.get().start(config);
         FTANRDetector.get().init(config);
         initRUMGlobalContext(config);
+        FTTrackInner.getInstance().initRUMConfig(config);
         if (config.isRumEnable() && config.isEnableTraceUserAction()) {
             //应对 flutter reactNative application 生命周期启动早于条件设置
             FTAppStartCounter.get().checkToReUpload();
@@ -122,7 +124,7 @@ public class FTRUMConfigManager {
      *
      * @return
      */
-     FTResourceEventListener.FTFactory getOverrideEventListener() {
+    FTResourceEventListener.FTFactory getOverrideEventListener() {
         if (config == null) return null;
         if (config.getOkHttpEventListenerHandler() == null) return null;
         return config.getOkHttpEventListenerHandler().getEventListenerFTFactory();

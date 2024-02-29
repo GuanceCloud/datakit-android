@@ -36,7 +36,7 @@ public class FTTrackInner {
     private final static String TAG = Constants.LOG_TAG_PREFIX + "FTTrackInner";
     private static FTTrackInner instance;
 
-    private SyncDataHelper dataHelper;
+    private final SyncDataHelper dataHelper = new SyncDataHelper();
 
     private FTTrackInner() {
     }
@@ -52,8 +52,20 @@ public class FTTrackInner {
         return instance;
     }
 
-    void initSyncDataHelper() {
-        dataHelper = new SyncDataHelper();
+    void initBaseConfig(FTSDKConfig config) {
+        dataHelper.initBaseConfig(config);
+    }
+
+    void initLogConfig(FTLoggerConfig config) {
+        dataHelper.initLogConfig(config);
+    }
+
+    void initTraceConfig(FTTraceConfig config) {
+        dataHelper.initTraceConfig(config);
+    }
+
+    void initRUMConfig(FTRUMConfig config) {
+        dataHelper.initRUMConfig(config);
     }
 
     /**

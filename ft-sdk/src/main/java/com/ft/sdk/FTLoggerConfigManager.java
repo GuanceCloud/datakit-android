@@ -4,6 +4,7 @@ import com.ft.sdk.garble.FTDBCachePolicy;
 
 /**
  * 日志配置管理
+ *
  * @author Brandon
  */
 public class FTLoggerConfigManager {
@@ -21,6 +22,7 @@ public class FTLoggerConfigManager {
 
     /**
      * 日志配置初始化
+     *
      * @param config
      */
     void initWithConfig(FTLoggerConfig config) {
@@ -28,11 +30,13 @@ public class FTLoggerConfigManager {
 
         FTDBCachePolicy.get().initParam(config);
         FTLogger.getInstance().init(config);
+        FTTrackInner.getInstance().initLogConfig(config);
 
     }
 
     /**
-     *  获取日志配置
+     * 获取日志配置
+     *
      * @return
      */
     public FTLoggerConfig getConfig() {
