@@ -31,7 +31,7 @@ public class SyncDataCacheManager {
 
     public synchronized void appendData(String data) {
         try {
-            Utils.appendData(cacheFile, data);
+            Utils.writeToFile(cacheFile, data);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

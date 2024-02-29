@@ -179,7 +179,6 @@ public class SyncTaskManager {
 
             LogUtils.d(TAG, "Sync Data Count:" + requestDataList.size());
 
-//            SyncDataHelper syncData = new SyncDataHelper();
             StringBuilder sb = new StringBuilder();
             for (SyncJsonData data : cacheDataList) {
                 sb.append(data.getDataString());
@@ -230,12 +229,6 @@ public class SyncTaskManager {
                 break;
             }
 
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-
         }
     }
 
@@ -260,6 +253,10 @@ public class SyncTaskManager {
             ids.add(String.valueOf(r.getId()));
         }
         FTDBManager.get().delete(ids);
+    }
+
+    private void reload(List<SyncJsonData> list){
+
     }
 
     /**
