@@ -7,6 +7,9 @@ import com.ft.sdk.FTInnerLogHandler;
 import com.ft.sdk.FTLogger;
 import com.ft.sdk.FTLoggerConfig;
 
+import java.io.File;
+import java.io.IOException;
+
 /**
  * BY huangDianHua
  * DATE:2019-12-03 15:56
@@ -92,18 +95,51 @@ public class LogUtils {
 
     /**
      * 设置内部日志输出对象
-     *
+     * <p>
      * 注意:为避免与
-     * {@link FTLoggerConfig#enableConsoleLog}
+     * <p>
      * {@link FTLoggerConfig#printCustomLogToConsole}  产生循环调用的情况
      * innerLogHandler 设置后，这两数值自动为 false
-     *
+     * <p>
      * {@link FTLogger}，如果使用 FTLogger 避免使用 {@link  com.ft.sdk.garble.bean.Status#OK}
      *
      * @param innerLogHandler
      */
     public static void registerInnerLogHandler(FTInnerLogHandler innerLogHandler) {
         TrackLog.setInnerLogHandler(innerLogHandler);
+    }
+
+    /**
+     * 将内部日志转化成文件
+     * <p>
+     * {@link FTLoggerConfig#printCustomLogToConsole}  产生循环调用的情况
+     * innerLogHandler 设置后，这两数值自动为 false
+     * <p>
+     * {@link FTLogger}，如果使用 FTLogger 避免使用 {@link  com.ft.sdk.garble.bean.Status#OK}
+     *
+     * @param fileName 缓存文件名
+     */
+    public static void registerInnerLogCacheToFile(File file) {
+        TrackLog.setInnerLogHandler(new FTInnerLogHandler() {
+            @Override
+            public void printInnerLog(String level, String tag, String logContent) {
+                try {
+                    Utils.writeToFile(file, String.format("%s %s %s \n", level, tag, logContent));
+                } catch (IOException e) {
+                    //这里避免循环调用 无法使用 LogUtils
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    /**
+     * 将内部日志转化成文件
+     *
+     * @param fileName 缓存文件名
+     */
+    public static void registerInnerLogCacheToFile(String fileName) {
+        registerInnerLogCacheToFile(new File(fileName));
     }
 
 

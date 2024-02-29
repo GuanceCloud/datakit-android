@@ -30,12 +30,15 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
@@ -530,5 +533,42 @@ public class Utils {
         }
         return rawData.toString();
     }
+
+
+    // 读取文件
+    public static String readFile(File file) throws IOException {
+        RandomAccessFile raf = new RandomAccessFile(file, "r");
+        FileChannel channel = raf.getChannel();
+        MappedByteBuffer buffer = channel.map(FileChannel.MapMode.READ_ONLY, 0, file.length());
+
+        byte[] bytes = new byte[buffer.remaining()];
+        buffer.get(bytes);
+        String content = new String(bytes);
+
+        buffer.force();
+        channel.close();
+        raf.close();
+
+        return content;
+    }
+
+
+    /**
+     * 写入文件
+     * @param file
+     * @param content
+     * @throws IOException
+     */
+    public static void writeToFile(File file, String content) throws IOException {
+        RandomAccessFile raf = new RandomAccessFile(file, "rw");
+        FileChannel channel = raf.getChannel();
+        MappedByteBuffer buffer = channel.map(FileChannel.MapMode.READ_WRITE, channel.size(), content.length());
+        buffer.position(0);
+        buffer.put(content.getBytes());
+        buffer.force();
+        channel.close();
+        raf.close();
+    }
+
 }
 

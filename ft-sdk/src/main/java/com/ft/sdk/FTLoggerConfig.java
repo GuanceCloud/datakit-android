@@ -110,7 +110,7 @@ public class FTLoggerConfig {
      * @return
      */
     public boolean isEnableConsoleLog() {
-        return !TrackLog.isSetInnerLogHandler() && enableConsoleLog;
+        return  enableConsoleLog;
     }
 
     /**
