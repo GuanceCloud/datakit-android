@@ -31,7 +31,7 @@ public class ManualRUMActivity extends NameTitleActivity {
         setContentView(R.layout.activity_manual);
         findViewById(R.id.manual_start_action_btn).setOnClickListener(v -> {
             HashMap<String, Object> property = new HashMap<>();
-            property.put("sp_count", 1);
+            property.put("sp_count", 1.0);
             FTRUMGlobalManager.get().startAction("Action Start", "Button_Click", property);
 
         });

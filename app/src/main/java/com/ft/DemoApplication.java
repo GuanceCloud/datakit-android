@@ -9,7 +9,6 @@ import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
 import com.ft.sdk.TraceType;
-import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.bean.UserData;
 
 import java.util.HashMap;
@@ -30,46 +29,44 @@ public class DemoApplication extends BaseApplication {
         super.onCreate();
         if (!BuildConfig.LAZY_INIT) {
             initFTSDK();
+
+//            File cacheFile = new File(getFilesDir(), "LogCache.log");
+//            LogUtils.registerInnerLogCacheToFile(cacheFile);
+
         }
     }
+
 
     static void initFTSDK() {
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAKIT_URL)
                 .setDebug(true)//设置是否是 debug
-                .setAutoSync(true)
-                .setCustomSyncPageSize(30)
+                .setAutoSync(false)
+                .setCustomSyncPageSize(100)
+                .setNeedTransformOldCache(true)
                 .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()));
         FTSdk.install(ftSDKConfig);
 
         FTSdk.initLogWithConfig(new FTLoggerConfig()
-                .setSamplingRate(1f)
-                .setEnableCustomLog(true)
-                .setEnableConsoleLog(true)
-                .setLogCacheLimitCount(1000)
-                .setPrintCustomLogToConsole(true)
-                .setLogLevelFilters(new Status[]{Status.ERROR})
-                .setEnableLinkRumData(true)
+                        .setSamplingRate(1f)
+                        .setEnableCustomLog(true)
+                        .setEnableConsoleLog(true)
+                        .setLogCacheLimitCount(10000)
+                        .setPrintCustomLogToConsole(true)
+//                .setLogLevelFilters(new Status[]{Status.ERROR})
+                        .setEnableLinkRumData(true)
         );
 
-//        LogUtils.registerInnerLogHandler(new FTInnerLogHandler() {
-//            @Override
-//            public void printInnerLog(String level, String tag, String logContent) {
-//                if(level.equals("E")){
-//                    FTLogger.getInstance().logBackground(logContent,Status.ERROR,true);
-////                }
-//            }
-//        });
 
         FTSdk.initRUMWithConfig(new FTRUMConfig()
                 .setSamplingRate(1f)
                 .setRumAppId(BuildConfig.RUM_APP_ID)
-                .setEnableTraceUserAction(false)
+                .setEnableTraceUserAction(true)
                 .setEnableTraceUserView(true)
-                .setEnableTraceUserResource(false)
-                .setEnableTrackAppANR(false)
-                .setEnableTrackAppCrash(false)
-                .setEnableTrackAppUIBlock(false)
-                .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.NO_SET)
+                .setEnableTraceUserResource(true)
+                .setEnableTrackAppANR(true)
+                .setEnableTrackAppCrash(true)
+                .setEnableTrackAppUIBlock(true)
+                .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
                 .setResourceUrlHandler(url -> false)
 //                .addGlobalContext("track_id", BuildConfig.TRACK_ID)
 //                .addGlobalContext("custom_tag", "any tags")

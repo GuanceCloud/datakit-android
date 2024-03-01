@@ -180,6 +180,8 @@ public class FTSdk {
         appendGlobalContext(config);
         SyncTaskManager.get().init(config);
         FTTrackInner.getInstance().initBaseConfig(config);
+
+
 //            LogUtils.setDescLogShow(mFtSDKConfig.isDescLog());
     }
 

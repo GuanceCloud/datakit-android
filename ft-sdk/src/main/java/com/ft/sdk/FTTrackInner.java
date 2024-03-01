@@ -107,7 +107,7 @@ public class FTTrackInner {
 
                     SyncJsonData recordData = SyncJsonData.getSyncJsonData(dataHelper, dataType,
                             new LineProtocolBean(measurement, tags, fields, time));
-                    boolean result = FTDBManager.get().insertFtOperation(recordData);
+                    boolean result = FTDBManager.get().insertFtOperation(recordData, false);
                     LogUtils.d(TAG, "syncDataBackground:" + measurement + "," + dataType.toString() + ":insert=" + result);
                     SyncTaskManager.get().executeSyncPoll();
                 } catch (Exception e) {
@@ -252,12 +252,16 @@ public class FTTrackInner {
                     recordDataList.remove(0);
                 }
             }
-            boolean result = FTDBManager.get().insertFtOptList(recordDataList);
+            boolean result = FTDBManager.get().insertFtOptList(recordDataList, false);
             LogUtils.d(TAG, "judgeLogCachePolicy:insert-result=" + result);
             if (!silence) {
                 SyncTaskManager.get().executeSyncPoll();
             }
         }
+    }
+
+    SyncDataHelper getCurrentDataHelper() {
+        return dataHelper;
     }
 
 

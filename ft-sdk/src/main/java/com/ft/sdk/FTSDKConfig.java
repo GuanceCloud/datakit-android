@@ -66,6 +66,11 @@ public class FTSDKConfig {
     private boolean onlySupportMainProcess = true;
 
     /**
+     * 是否迁移旧数据，SDK 从旧版本迁移至 1.5.0 需要进行数据迁移
+     */
+    private boolean needTransformOldCache = false;
+
+    /**
      * 全局参数，例如 {@link Constants#KEY_APP_VERSION_NAME} 等固定配置参数，
      * 或通过 {@link FTSDKConfig#addGlobalContext(String, String)} 用户自定义添加的变量参数
      */
@@ -334,5 +339,20 @@ public class FTSDKConfig {
     public FTSDKConfig setDataSyncRetryCount(int dataSyncRetryCount) {
         this.dataSyncRetryCount = Math.max(0, Math.min(SyncTaskManager.MAX_ERROR_COUNT, dataSyncRetryCount));
         return this;
+    }
+
+
+    /**
+     * 设置是否迁移
+     * @param needTransformOldCache 是否迁移旧数据，默认为 false
+     * @return
+     */
+    public FTSDKConfig setNeedTransformOldCache(boolean needTransformOldCache) {
+        this.needTransformOldCache = needTransformOldCache;
+        return this;
+    }
+
+    public boolean isNeedTransformOldCache() {
+        return needTransformOldCache;
     }
 }

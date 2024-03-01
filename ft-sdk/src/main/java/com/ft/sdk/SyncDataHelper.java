@@ -1,6 +1,7 @@
 package com.ft.sdk;
 
 import static com.ft.sdk.garble.utils.Constants.FT_KEY_VALUE_NULL;
+import static com.ft.sdk.garble.utils.Constants.KEY_SDK_DATA_FLAG;
 
 import android.util.Log;
 
@@ -65,6 +66,7 @@ public class SyncDataHelper {
      */
     public String getBodyContent(SyncJsonData data) {
         HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put(KEY_SDK_DATA_FLAG, data.getUuid());
         if (data.getDataType() == DataType.LOG) {
             hashMap.putAll(logTags);
         } else if (data.getDataType() == DataType.TRACE) {
@@ -72,7 +74,7 @@ public class SyncDataHelper {
         } else if (data.getDataType() == DataType.RUM_APP || data.getDataType() == DataType.RUM_WEBVIEW) {
             hashMap.putAll(rumTags);
         }
-        return convertToLineProtocolLine(data, hashMap, true, false);
+        return convertToLineProtocolLine(data, hashMap, false);
     }
 
     /**
@@ -106,9 +108,7 @@ public class SyncDataHelper {
      * @return
      */
     private String getLogBodyContent(List<SyncJsonData> datas) {
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.putAll(basePublicTags);
-        hashMap.putAll(logTags);
+        HashMap<String, Object> hashMap = new HashMap<>(logTags);
         return convertToLineProtocolLines(datas, hashMap);
     }
 
@@ -120,9 +120,7 @@ public class SyncDataHelper {
      * @return
      */
     private String getTraceBodyContent(List<SyncJsonData> datas) {
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.putAll(basePublicTags);
-        hashMap.putAll(traceTags);
+        HashMap<String, Object> hashMap = new HashMap<>(traceTags);
         return convertToLineProtocolLines(datas, hashMap);
     }
 
@@ -133,11 +131,10 @@ public class SyncDataHelper {
      * @return
      */
     private String getRumBodyContent(List<SyncJsonData> datas) {
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.putAll(basePublicTags);
-        hashMap.putAll(rumTags);
+        HashMap<String, Object> hashMap = new HashMap<>(rumTags);
         return convertToLineProtocolLines(datas, hashMap);
     }
+
 
     /**
      * 转化为行协议数据
@@ -147,22 +144,10 @@ public class SyncDataHelper {
      * @return
      */
     private String convertToLineProtocolLines(List<SyncJsonData> datas, HashMap<String, Object> extraTags) {
-        return convertToLineProtocolLines(datas, extraTags, true);
-    }
-
-    /**
-     * 转化为行协议数据
-     *
-     * @param datas
-     * @param extraTags
-     * @return
-     */
-    private String convertToLineProtocolLines(List<SyncJsonData> datas, HashMap<String, Object> extraTags,
-                                              boolean withUUID) {
         StringBuilder sb = new StringBuilder();
 
         for (SyncJsonData data : datas) {
-            sb.append(convertToLineProtocolLine(data, extraTags, withUUID, true));
+            sb.append(convertToLineProtocolLine(data, extraTags, true));
         }
         return sb.toString();
     }
@@ -175,7 +160,7 @@ public class SyncDataHelper {
      * @return
      */
     private String convertToLineProtocolLine(SyncJsonData data, HashMap<String, Object> extraTags,
-                                             boolean withUUid, boolean multiLine) {
+                                             boolean multiLine) {
         StringBuilder sb = new StringBuilder();
 
         try {
@@ -199,9 +184,6 @@ public class SyncDataHelper {
                         tags.put(key, extraTags.get(key));
                     }
                 }
-            }
-            if (withUUid) {
-                tags.put(Constants.KEY_SDK_DATA_FLAG, Utils.randomUUID());
             }
             StringBuilder tagSb = getCustomHash(tags, true);
             deleteLastComma(tagSb);

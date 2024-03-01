@@ -14,5 +14,5 @@ public class FTDBConfig {
     /**
      *  db 版本号
      */
-    public static int DATABASE_VERSION = 2;
+    public static int DATABASE_VERSION = 3;
 }
