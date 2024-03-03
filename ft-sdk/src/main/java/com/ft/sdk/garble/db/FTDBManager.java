@@ -733,13 +733,14 @@ public class FTDBManager extends DBManager {
      *
      * @param ids
      */
-    public void delete(final List<String> ids) {
+    public void delete(final List<String> ids, boolean oldCache) {
         getDB(true, new DataBaseCallBack() {
             @Override
             public void run(SQLiteDatabase db) {
                 db.beginTransaction();
+                String tableName = oldCache ? FTSQL.FT_SYNC_OLD_CACHE_TABLE_NAME : FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME;
                 for (String id : ids) {
-                    db.delete(FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME, FTSQL.RECORD_COLUMN_ID + "=?", new String[]{id});
+                    db.delete(tableName, FTSQL.RECORD_COLUMN_ID + "=?", new String[]{id});
                 }
                 db.setTransactionSuccessful();
                 db.endTransaction();

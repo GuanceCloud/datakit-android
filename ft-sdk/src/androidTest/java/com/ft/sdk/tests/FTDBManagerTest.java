@@ -99,7 +99,7 @@ public class FTDBManagerTest extends FTBaseTest {
         for (SyncJsonData recordData : recordDataList) {
             integers.add("" + recordData.getId());
         }
-        FTDBManager.get().delete(integers);
+        FTDBManager.get().delete(integers, false);
         List<SyncJsonData> recordDataList1 = FTDBManager.get().queryDataByDescLimit(0);
         assertEquals(0, recordDataList1.size());
     }

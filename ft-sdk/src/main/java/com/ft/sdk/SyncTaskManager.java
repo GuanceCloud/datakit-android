@@ -20,6 +20,7 @@ import com.ft.sdk.garble.manager.AsyncCallback;
 import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.Utils;
 import com.ft.sdk.internal.exception.FTNetworkNoAvailableException;
 
 import org.json.JSONObject;
@@ -262,11 +263,20 @@ public class SyncTaskManager {
      * @param list
      */
     private void deleteLastQuery(List<SyncJsonData> list) {
+        deleteLastQuery(list, false);
+    }
+
+    /**
+     * 删除已经上传的数据
+     *
+     * @param list
+     */
+    private void deleteLastQuery(List<SyncJsonData> list, boolean oldCache) {
         List<String> ids = new ArrayList<>();
         for (SyncJsonData r : list) {
             ids.add(String.valueOf(r.getId()));
         }
-        FTDBManager.get().delete(ids);
+        FTDBManager.get().delete(ids, oldCache);
     }
 
     /**
@@ -349,6 +359,7 @@ public class SyncTaskManager {
                             SyncJsonData data = it.next();
                             try {
                                 String jsonString = data.getDataString();
+                                data.setUuid(Utils.randomUUID());//旧数据中没有 uuid
                                 data.setDataJson(new JSONObject(jsonString));
                                 data.setDataString(helper.getBodyContent(data));
                             } catch (Exception e) {
@@ -356,6 +367,7 @@ public class SyncTaskManager {
                             }
                         }
                         FTDBManager.get().insertFtOptList(list, false);
+                        deleteLastQuery(list, true);
                         if (list.size() < OLD_CACHE_TRANSFORM_PAGE_SIZE) {
                             LogUtils.d(TAG, "==> old cache transform end");
                             FTDBManager.get().deleteOldCacheTable();
