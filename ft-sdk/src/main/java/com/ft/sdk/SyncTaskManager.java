@@ -80,6 +80,8 @@ public class SyncTaskManager {
 
     private boolean autoSync;
 
+    private int syncSleepTime;
+
     private final Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
@@ -244,6 +246,15 @@ public class SyncTaskManager {
                 break;
             }
 
+            if (syncSleepTime > 0) {
+                try {
+                    Thread.sleep(syncSleepTime);
+                } catch (InterruptedException e) {
+                    LogUtils.d(TAG, Log.getStackTraceString(e));
+                }
+            }
+
+
         }
     }
 
@@ -387,6 +398,7 @@ public class SyncTaskManager {
         dataSyncMaxRetryCount = config.getDataSyncRetryCount();
         pageSize = config.getPageSize();
         autoSync = config.isAutoSync();
+        syncSleepTime = config.getSyncSleepTime();
         if (config.isNeedTransformOldCache()) {
             oldDBDataTransform();
         }

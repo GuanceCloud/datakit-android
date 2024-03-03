@@ -44,6 +44,8 @@ public class FTSDKConfig {
 
     private int pageSize = SyncPageSize.MEDIUM.getValue();
 
+    private int syncSleepTime = 0;
+
     /**
      * 服务名称 {@link Constants#KEY_SERVICE },默认为 {@link Constants#DEFAULT_SERVICE_NAME}
      */
@@ -354,5 +356,20 @@ public class FTSDKConfig {
 
     public boolean isNeedTransformOldCache() {
         return needTransformOldCache;
+    }
+
+    /**
+     * 设置每次同步的间歇时间, 休眠时间 [0,100] 之间
+     *
+     * @param sleepTimeMs 数据同步间歇时间
+     * @return
+     */
+    public FTSDKConfig setSyncSleepTime(int sleepTimeMs) {
+        this.syncSleepTime = Math.max(0, Math.min(sleepTimeMs, 100));
+        return this;
+    }
+
+    public int getSyncSleepTime() {
+        return syncSleepTime;
     }
 }
