@@ -11,7 +11,11 @@ import com.ft.sdk.FTTraceConfig;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.bean.UserData;
+import com.ft.sdk.garble.utils.LogUtils;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -29,6 +33,9 @@ public class DemoApplication extends BaseApplication {
     public void onCreate() {
         super.onCreate();
         if (!BuildConfig.LAZY_INIT) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+            String timestamp = dateFormat.format(new Date());
+            LogUtils.registerInnerLogCacheToFile(new File(getFilesDir(), timestamp + ".log"));
             initFTSDK();
         }
     }
@@ -85,11 +92,6 @@ public class DemoApplication extends BaseApplication {
         userData.setExts(extMap);
         FTSdk.bindRumUserData(userData);
 
-        FTSdk.initTraceWithConfig(new FTTraceConfig()
-                .setSamplingRate(1f)
-                .setEnableAutoTrace(true)
-                .setEnableLinkRUMData(true)
-                .setTraceType(TraceType.DDTRACE));
 
     }
 

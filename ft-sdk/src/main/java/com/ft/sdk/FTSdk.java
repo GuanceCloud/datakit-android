@@ -179,6 +179,7 @@ public class FTSdk {
         FTNetworkListener.get().monitor();
         appendGlobalContext(config);
         SyncTaskManager.get().init(config);
+        LogUtils.d(TAG,"initFTConfig complete");
 //            LogUtils.setDescLogShow(mFtSDKConfig.isDescLog());
     }
 
@@ -197,6 +198,8 @@ public class FTSdk {
         try {
             config.setServiceName(get().getBaseConfig().getServiceName());
             FTRUMConfigManager.get().initWithConfig(config);
+            LogUtils.d(TAG,"initRUMWithConfig complete");
+
         } catch (Exception e) {
             LogUtils.e(TAG, Log.getStackTraceString(e));
         }
@@ -212,6 +215,8 @@ public class FTSdk {
         try {
             config.setServiceName(get().getBaseConfig().getServiceName());
             FTTraceConfigManager.get().initWithConfig(config);
+            LogUtils.d(TAG,"initTraceWithConfig complete");
+
         } catch (Exception e) {
             LogUtils.e(TAG, Log.getStackTraceString(e));
         }
@@ -226,6 +231,8 @@ public class FTSdk {
         try {
             config.setServiceName(get().getBaseConfig().getServiceName());
             FTLoggerConfigManager.get().initWithConfig(config);
+            LogUtils.d(TAG,"initLogWithConfig complete");
+
         } catch (Exception e) {
             LogUtils.e(TAG, Log.getStackTraceString(e));
         }

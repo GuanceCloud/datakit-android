@@ -15,6 +15,7 @@ import com.ft.sdk.garble.bean.ResourceBean;
 import com.ft.sdk.garble.bean.ResourceParams;
 import com.ft.sdk.garble.bean.ViewBean;
 import com.ft.sdk.garble.db.FTDBManager;
+import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
 import com.ft.sdk.garble.utils.BatteryUtils;
 import com.ft.sdk.garble.utils.Constants;
@@ -1105,7 +1106,13 @@ public class FTRUMInnerManager {
             } catch (JSONException e) {
                 LogUtils.e(TAG, Log.getStackTraceString(e));
             }
-            FTDBManager.get().cleanCloseActionData();
+
+            DataUploaderThreadPool.get().execute(new Runnable() {
+                @Override
+                public void run() {
+                    FTDBManager.get().cleanCloseActionData();
+                }
+            });
         }
         if (beans.size() < LIMIT_SIZE) {
 
@@ -1177,11 +1184,25 @@ public class FTRUMInnerManager {
 
             FTTrackInner.getInstance().rum(bean.getStartTime(),
                     Constants.FT_MEASUREMENT_RUM_VIEW, tags, fields);
-            FTDBManager.get().updateViewUploadTime(bean.getId(), System.currentTimeMillis());
+
+            DataUploaderThreadPool.get().execute(new Runnable() {
+                @Override
+                public void run() {
+                    FTDBManager.get().updateViewUploadTime(bean.getId(), System.currentTimeMillis());
+
+                }
+            });
 
 
         }
-        FTDBManager.get().cleanCloseViewData();
+
+        DataUploaderThreadPool.get().execute(new Runnable() {
+            @Override
+            public void run() {
+                FTDBManager.get().cleanCloseViewData();
+            }
+        });
+
         if (beans.size() < LIMIT_SIZE) {
 
 

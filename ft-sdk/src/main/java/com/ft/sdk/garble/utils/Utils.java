@@ -26,10 +26,12 @@ import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
@@ -561,10 +563,18 @@ public class Utils {
      * @throws IOException
      */
     public static void writeToFile(File file, String content) throws IOException {
-        RandomAccessFile raf = new RandomAccessFile(file, "rw");
-        raf.seek(file.length()); // Move to end of file
-        raf.writeBytes(content);
-        raf.close();
+        try {
+            RandomAccessFile raf = new RandomAccessFile(file, "rw");
+            raf.seek(raf.length()); // Move to end of file
+
+            OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(raf.getFD()), "UTF-8");
+            writer.write(content);
+            writer.close();
+
+            raf.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

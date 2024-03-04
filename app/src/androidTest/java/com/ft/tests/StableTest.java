@@ -5,7 +5,10 @@ import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.pressBack;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 
+import static com.ft.AllTests.hasPrepare;
+
 import android.content.Context;
+import android.os.Looper;
 
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
@@ -46,6 +49,16 @@ public class StableTest extends BaseTest {
 
     @BeforeClass
     public static void settingBeforeLaunch() {
+        if (!hasPrepare) {
+            Looper.prepare();
+            hasPrepare = true;
+        }
+
+        Context application = InstrumentationRegistry.getInstrumentation().getTargetContext().getApplicationContext();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+        String timestamp = dateFormat.format(new Date());
+        LogUtils.registerInnerLogCacheToFile(new File(application.getFilesDir(), timestamp + ".log"));
+
 
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAKIT_URL)
                 .setDebug(true)//设置是否是 debug
@@ -86,11 +99,6 @@ public class StableTest extends BaseTest {
                 .setEnableAutoTrace(true)
                 .setEnableLinkRUMData(true)
                 .setTraceType(TraceType.DDTRACE));
-
-        Context application = InstrumentationRegistry.getInstrumentation().getTargetContext().getApplicationContext();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-        String timestamp = dateFormat.format(new Date());
-        LogUtils.registerInnerLogCacheToFile(new File(application.getFilesDir(), timestamp + ".log"));
 
         FTAutoTrack.startApp(null);
 
@@ -138,7 +146,7 @@ public class StableTest extends BaseTest {
     }
 
     /**
-     * 高负载过程中发生 natvie crash
+     * 高负载过程中发生 native crash
      *
      * @throws Exception
      */
@@ -164,6 +172,7 @@ public class StableTest extends BaseTest {
             Thread.sleep(200);
             onView(withId(android.R.id.content)).perform(pressBack());
         }
+        onView(withId(android.R.id.content)).perform(pressBack());
     }
 
     @Override
