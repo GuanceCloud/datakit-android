@@ -83,7 +83,7 @@ public class StableTest extends BaseTest {
 
         FTSdk.initTraceWithConfig(new FTTraceConfig()
                 .setSamplingRate(1f)
-                .setEnableAutoTrace(false)
+                .setEnableAutoTrace(true)
                 .setEnableLinkRUMData(true)
                 .setTraceType(TraceType.DDTRACE));
 
@@ -127,10 +127,13 @@ public class StableTest extends BaseTest {
      */
     @Test
     public void highLoadWithCrash() throws Exception {
+        //阻止 application 崩溃，如果崩溃测试用例也会结束
+        avoidCrash();
         highLoadData(60);
         onView(withId(R.id.main_mock_crash_btn)).perform(ViewActions.scrollTo()).perform(click());
         waitEventConsumeInThreadPool();
 
+        Thread.sleep(1000);
 
     }
 
