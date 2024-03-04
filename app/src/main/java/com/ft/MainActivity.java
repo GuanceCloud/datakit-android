@@ -6,7 +6,6 @@ import android.Manifest;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 
@@ -46,28 +45,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         setContentView(R.layout.activity_main);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                new Thread() {
-                    @Override
-                    public void run() {
-                        for (int i = 0; i < 150; i++) {
-                            try {
-                                Thread.sleep(6);
-                            } catch (InterruptedException e) {
-                                throw new RuntimeException(e);
-                            }
-                            Log.e(TAG, "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111");
-//                            gsonBuilder.create().toJson(new JSONObject());
-//                            FTLogger.getInstance().logBackground("11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111", Status.ERROR);
-                        }
-                    }
-                }.start();
-
-            }
-        }, 3000);
-
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE}, 1);
@@ -91,10 +68,7 @@ public class MainActivity extends AppCompatActivity {
         });
         findViewById(R.id.main_mock_log_btn).setOnClickListener(v -> {
             Log.e(TAG, "console log");
-            for (int i = 0; i < 1000; i++) {
-                FTLogger.getInstance().logBackground("custom Log", Status.ERROR);
-            }
-
+            FTLogger.getInstance().logBackground("custom Log", Status.ERROR);
         });
 
         findViewById(R.id.main_mock_okhttp_btn).setOnClickListener(v -> {
@@ -225,10 +199,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.main_flush_sync_data).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.main_flush_sync_data_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FTSdk.flushSyncData();
+            }
+        });
+
+        findViewById(R.id.main_high_load_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, HighLoadActivity.class));
             }
         });
 

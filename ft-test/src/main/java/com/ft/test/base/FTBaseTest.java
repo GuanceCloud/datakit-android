@@ -14,6 +14,7 @@ import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.manager.AsyncCallback;
+import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.Utils;
@@ -131,7 +132,7 @@ public class FTBaseTest {
      *
      * @throws InterruptedException
      */
-    protected void waitForInThreadPool() throws InterruptedException {
+    protected void waitEventConsumeInThreadPool() throws InterruptedException {
         CountDownLatch countDownLatch = new CountDownLatch(1);
         EventConsumerThreadPool.get().execute(() -> {
             countDownLatch.countDown();

@@ -63,13 +63,13 @@ public class DemoApplication extends BaseApplication {
         FTSdk.initRUMWithConfig(new FTRUMConfig()
                 .setSamplingRate(1f)
                 .setRumAppId(BuildConfig.RUM_APP_ID)
-                .setEnableTraceUserAction(false)
+                .setEnableTraceUserAction(true)
                 .setEnableTraceUserView(true)
-                .setEnableTraceUserResource(false)
-                .setEnableTrackAppANR(false)
-                .setEnableTrackAppCrash(false)
-                .setEnableTrackAppUIBlock(false)
-                .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.NO_SET)
+                .setEnableTraceUserResource(true)
+                .setEnableTrackAppANR(true)
+                .setEnableTrackAppCrash(true)
+                .setEnableTrackAppUIBlock(true)
+                .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
                 .setResourceUrlHandler(url -> false)
 //                .addGlobalContext("track_id", BuildConfig.TRACK_ID)
 //                .addGlobalContext("custom_tag", "any tags")
@@ -87,7 +87,7 @@ public class DemoApplication extends BaseApplication {
 
         FTSdk.initTraceWithConfig(new FTTraceConfig()
                 .setSamplingRate(1f)
-                .setEnableAutoTrace(false)
+                .setEnableAutoTrace(true)
                 .setEnableLinkRUMData(true)
                 .setTraceType(TraceType.DDTRACE));
 

@@ -124,7 +124,7 @@ public class LogUtils {
             @Override
             public void printInnerLog(String level, String tag, String logContent) {
                 try {
-                    Utils.writeToFile(file, String.format("%s %s %s \n", level, tag, logContent));
+                    Utils.writeToFile(file, String.format("%s %s %s %s \n", Utils.getCurrentTimeStamp(), level, tag, logContent));
                 } catch (IOException e) {
                     //这里避免循环调用 无法使用 LogUtils
                     e.printStackTrace();

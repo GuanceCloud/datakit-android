@@ -555,18 +555,15 @@ public class Utils {
 
     /**
      * 写入文件
+     *
      * @param file
      * @param content
      * @throws IOException
      */
     public static void writeToFile(File file, String content) throws IOException {
         RandomAccessFile raf = new RandomAccessFile(file, "rw");
-        FileChannel channel = raf.getChannel();
-        MappedByteBuffer buffer = channel.map(FileChannel.MapMode.READ_WRITE, channel.size(), content.length());
-        buffer.position(0);
-        buffer.put(content.getBytes());
-        buffer.force();
-        channel.close();
+        raf.seek(file.length()); // Move to end of file
+        raf.writeBytes(content);
         raf.close();
     }
 

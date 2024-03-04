@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/high_load_log_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="并发日志" />
+
+    <Button
+        android:id="@+id/high_load_http_request_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="并发 http 请求" />
+
+    <Button
+        android:id="@+id/high_load_to_repeat_view_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="to RepeatActivity" />
+</LinearLayout>
