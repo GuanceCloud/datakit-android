@@ -101,7 +101,7 @@ public class FTRUMConfigManager {
 
             String filePath = crashFilePath.toString();
 
-            if (VersionUtils.firstVerGreaterEqual(FTSdk.NATIVE_VERSION, "1.0.0")) {
+            if (VersionUtils.firstVerGreaterEqual(FTSdk.NATIVE_VERSION, "1.1.0-alpha01")) {
                 final CrashCallback crashCallback = new CrashCallback() {
                     @Override
                     public void onCrash(String crashPath) {
