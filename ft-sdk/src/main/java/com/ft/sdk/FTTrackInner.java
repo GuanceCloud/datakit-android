@@ -90,7 +90,7 @@ public class FTTrackInner {
                     SyncJsonData recordData = SyncJsonData.getSyncJsonData(dataType,
                             new LineProtocolBean(measurement, tags, fields, time));
                     boolean result = FTDBManager.get().insertFtOperation(recordData);
-                    LogUtils.d(TAG, "syncDataBackground:" + measurement + "," + dataType.toString() + ":insert=" + result);
+                    LogUtils.d(TAG, "syncDataBackground:" + measurement + " " + dataType.toString() + ":insert=" + result);
                     SyncTaskManager.get().executeSyncPoll();
                 } catch (Exception e) {
                     LogUtils.e(TAG, Log.getStackTraceString(e));
