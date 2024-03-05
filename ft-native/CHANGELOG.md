@@ -1,3 +1,7 @@
+# native 1.1.0-alpha01
+1.添加 ANR 和 Native Crash 回调
+
+----------------------
 # native 1.0.0-beta01
 1.调整包结构
 
