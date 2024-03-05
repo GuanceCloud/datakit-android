@@ -17,6 +17,7 @@ import com.ft.sdk.garble.bean.ViewBean;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
+import com.ft.sdk.garble.threadpool.RunnerCompleteCallBack;
 import com.ft.sdk.garble.utils.BatteryUtils;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
@@ -511,7 +512,7 @@ public class FTRUMInnerManager {
      * @param state     程序运行状态
      */
     void addError(String log, String message, String errorType, AppState state) {
-        addError(log, message, Utils.getCurrentNanoTime(), errorType, state);
+        addError(log, message, Utils.getCurrentNanoTime(), errorType, state, null);
     }
 
 
@@ -525,7 +526,7 @@ public class FTRUMInnerManager {
      * @param property  附加属性
      */
     void addError(String log, String message, String errorType, AppState state, HashMap<String, Object> property) {
-        addError(log, message, Utils.getCurrentNanoTime(), errorType, state, property);
+        addError(log, message, Utils.getCurrentNanoTime(), errorType, state, property, null);
     }
 
     /**
@@ -537,8 +538,8 @@ public class FTRUMInnerManager {
      * @param state     程序运行状态
      * @param dateline  发生时间，纳秒
      */
-    void addError(String log, String message, long dateline, String errorType, AppState state) {
-        addError(log, message, dateline, errorType, state, null);
+    void addError(String log, String message, long dateline, String errorType, AppState state, RunnerCompleteCallBack callBack) {
+        addError(log, message, dateline, errorType, state, null, callBack);
     }
 
     /**
@@ -551,7 +552,7 @@ public class FTRUMInnerManager {
      * @param dateline  发生时间，纳秒
      */
     public void addError(String log, String message, long dateline, String errorType,
-                         AppState state, HashMap<String, Object> property) {
+                         AppState state, HashMap<String, Object> property, RunnerCompleteCallBack callBack) {
         new Thread() {
             @Override
             public void run() {
@@ -599,8 +600,16 @@ public class FTRUMInnerManager {
                         LogUtils.e(TAG, Log.getStackTraceString(e));
                     }
 
-                    FTTrackInner.getInstance().rum(dateline, Constants.FT_MEASUREMENT_RUM_ERROR, tags, fields);
-                    increaseError(tags);
+                    FTTrackInner.getInstance().rum(dateline, Constants.FT_MEASUREMENT_RUM_ERROR, tags, fields, new RunnerCompleteCallBack() {
+                        @Override
+                        public void onComplete() {
+                            increaseError(tags);
+                            if (callBack != null) {
+                                callBack.onComplete();
+                            }
+
+                        }
+                    });
 
                 } catch (Exception e) {
                     LogUtils.e(TAG, Log.getStackTraceString(e));
@@ -633,7 +642,7 @@ public class FTRUMInnerManager {
                 }
             }
 
-            FTTrackInner.getInstance().rum(Utils.getCurrentNanoTime() - duration, Constants.FT_MEASUREMENT_RUM_LONG_TASK, tags, fields);
+            FTTrackInner.getInstance().rum(Utils.getCurrentNanoTime() - duration, Constants.FT_MEASUREMENT_RUM_LONG_TASK, tags, fields, null);
             increaseLongTask(tags);
 
         } catch (Exception e) {
@@ -792,7 +801,7 @@ public class FTRUMInnerManager {
             fields.put(Constants.KEY_RUM_RESPONSE_HEADER, bean.responseHeader);
 
             FTTrackInner.getInstance().rum(time,
-                    Constants.FT_MEASUREMENT_RUM_RESOURCE, tags, fields);
+                    Constants.FT_MEASUREMENT_RUM_RESOURCE, tags, fields, null);
 
 
             if (bean.resourceStatus >= HttpsURLConnection.HTTP_BAD_REQUEST) {
@@ -825,7 +834,7 @@ public class FTRUMInnerManager {
                 errorField.put(Constants.KEY_RUM_ERROR_MESSAGE, errorMsg);
                 errorField.put(Constants.KEY_RUM_ERROR_STACK, bean.errorStack);
 
-                FTTrackInner.getInstance().rum(time, Constants.FT_MEASUREMENT_RUM_ERROR, errorTags, errorField);
+                FTTrackInner.getInstance().rum(time, Constants.FT_MEASUREMENT_RUM_ERROR, errorTags, errorField, null);
                 increaseError(tags);
             }
         } catch (Exception e) {
@@ -1102,7 +1111,7 @@ public class FTRUMInnerManager {
                 fields.put(Constants.KEY_RUM_ACTION_DURATION, bean.getDuration());
 
                 FTTrackInner.getInstance().rum(bean.getStartTime(),
-                        Constants.FT_MEASUREMENT_RUM_ACTION, tags, fields);
+                        Constants.FT_MEASUREMENT_RUM_ACTION, tags, fields, null);
             } catch (JSONException e) {
                 LogUtils.e(TAG, Log.getStackTraceString(e));
             }
@@ -1183,7 +1192,7 @@ public class FTRUMInnerManager {
             }
 
             FTTrackInner.getInstance().rum(bean.getStartTime(),
-                    Constants.FT_MEASUREMENT_RUM_VIEW, tags, fields);
+                    Constants.FT_MEASUREMENT_RUM_VIEW, tags, fields, null);
 
             DataUploaderThreadPool.get().execute(new Runnable() {
                 @Override

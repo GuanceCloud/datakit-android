@@ -5,14 +5,19 @@ import static com.ft.sdk.FTApplication.getApplication;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
+import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.UserData;
+import com.ft.sdk.garble.threadpool.RunnerCompleteCallBack;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.NetUtils;
 import com.ft.sdk.garble.utils.PackageUtils;
 import com.ft.sdk.garble.utils.Utils;
+import com.ft.sdk.garble.utils.VersionUtils;
+import com.ft.sdk.nativelib.CrashCallback;
 import com.ft.sdk.nativelib.NativeEngineInit;
 import com.google.gson.Gson;
 
@@ -21,6 +26,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * @author Brandon
@@ -75,10 +81,6 @@ public class FTRUMConfigManager {
     private void initNativeDump(FTRUMConfig config) {
         boolean isNativeLibSupport = PackageUtils.isNativeLibrarySupport();
 
-//        if (isNativeLibSupport) {
-//            FTSdk.NATIVE_VERSION = com.ft.sdk.nativelib.BuildConfig.VERSION_NAME;
-//        }
-
         if (!config.isRumEnable()) {
             return;
         }
@@ -98,8 +100,40 @@ public class FTRUMConfigManager {
             }
 
             String filePath = crashFilePath.toString();
-            NativeEngineInit.init(application, filePath, enableTrackAppCrash, enableTrackAppANR);
-            FTExceptionHandler.get().checkAndSyncPreDump(filePath);
+
+            if (VersionUtils.firstVerGreaterEqual(FTSdk.NATIVE_VERSION, "1.0.0")) {
+                final CrashCallback crashCallback = new CrashCallback() {
+                    @Override
+                    public void onCrash(String crashPath) {
+                        //fixme 这里如果 native crash 文件过大可能存在性能问题
+                        CountDownLatch latch = new CountDownLatch(1);
+                        FTExceptionHandler.get().uploadNativeCrashBackground(new File(crashPath),
+                                AppState.RUN, false, new RunnerCompleteCallBack() {
+                                    @Override
+                                    public void onComplete() {
+                                        Utils.deleteFile(crashPath);
+                                        latch.countDown();
+                                    }
+                                });
+
+                        try {
+                            latch.await();
+                        } catch (InterruptedException e) {
+                            LogUtils.e(TAG, Log.getStackTraceString(e));
+                        }
+                    }
+                };
+
+                NativeEngineInit.init(application, filePath, enableTrackAppCrash, enableTrackAppANR, crashCallback);
+                //补充上传没有成功上传的 Native Crash，上传 ANR Crash
+                FTExceptionHandler.get().checkAndSyncPreDump(filePath, null);
+
+
+            } else {
+                NativeEngineInit.init(application, filePath, enableTrackAppCrash, enableTrackAppANR);
+                FTExceptionHandler.get().checkAndSyncPreDump(filePath, null);
+            }
+
         }
 
     }
@@ -122,7 +156,7 @@ public class FTRUMConfigManager {
      *
      * @return
      */
-     FTResourceEventListener.FTFactory getOverrideEventListener() {
+    FTResourceEventListener.FTFactory getOverrideEventListener() {
         if (config == null) return null;
         if (config.getOkHttpEventListenerHandler() == null) return null;
         return config.getOkHttpEventListenerHandler().getEventListenerFTFactory();

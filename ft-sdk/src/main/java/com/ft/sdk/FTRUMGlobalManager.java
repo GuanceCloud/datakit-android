@@ -198,7 +198,7 @@ public class FTRUMGlobalManager {
     public void addError(String log, String message, long dateline, String errorType,
                          AppState state) {
         if (innerManager != null) {
-            innerManager.addError(log, message, dateline, errorType, state);
+            innerManager.addError(log, message, dateline, errorType, state, null);
         }
 
     }
@@ -233,7 +233,7 @@ public class FTRUMGlobalManager {
     public void addError(String log, String message, long dateline, String errorType,
                          AppState state, HashMap<String, Object> property) {
         if (innerManager != null) {
-            innerManager.addError(log, message, dateline, errorType, state, property);
+            innerManager.addError(log, message, dateline, errorType, state, property, null);
         }
 
     }
@@ -265,7 +265,7 @@ public class FTRUMGlobalManager {
     public void addError(String log, String message, long dateline, ErrorType errorType,
                          AppState state) {
         if (innerManager != null) {
-            innerManager.addError(log, message, dateline, errorType.toString(), state);
+            innerManager.addError(log, message, dateline, errorType.toString(), state, null);
         }
 
     }
@@ -300,7 +300,7 @@ public class FTRUMGlobalManager {
     public void addError(String log, String message, long dateline, ErrorType errorType,
                          AppState state, HashMap<String, Object> property) {
         if (innerManager != null) {
-            innerManager.addError(log, message, dateline, errorType.toString(), state, property);
+            innerManager.addError(log, message, dateline, errorType.toString(), state, property, null);
         }
 
     }
