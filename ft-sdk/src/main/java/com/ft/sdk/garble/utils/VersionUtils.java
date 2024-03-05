@@ -69,8 +69,8 @@ public class VersionUtils {
     public static boolean firstVerGreaterEqual(String firstVer, String secondVer) {
         if (Utils.isNullOrEmpty(firstVer) || Utils.isNullOrEmpty(secondVer)) return false;
 
-        String[] firstVerArr = firstVer.split("-");
-        String[] secondVerArr = secondVer.split("-");
+        String[] firstVerArr = firstVer.replace("-SNAPSHOT", "").split("-");
+        String[] secondVerArr = secondVer.replace("-SNAPSHOT", "").split("-");
         if (firstVerArr.length == 1 && firstVerArr.length == secondVerArr.length) {
             return compareVersion(firstVerArr[0], secondVerArr[0]) >= 0;
         } else if (firstVerArr.length == 2 && firstVerArr.length == secondVerArr.length) {

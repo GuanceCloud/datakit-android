@@ -36,7 +36,7 @@ public class FTSdk {
     /**
      * 集成后 ft-native 后才会被被赋值,直接访问 {@link com.ft.sdk.nativelib.BuildConfig#VERSION_NAME} 来获取
      */
-    public static String NATIVE_VERSION = PackageUtils.isNativeLibrarySupport() ? com.ft.sdk.nativelib.BuildConfig.VERSION_NAME : "";
+    public static String NATIVE_VERSION = PackageUtils.isNativeLibrarySupport() ? PackageUtils.getNativeLibVersion() : "";
     /**
      * 变量由 Plugin ASM 写入，同一次编译版本 UUID 相同
      */
@@ -179,7 +179,7 @@ public class FTSdk {
         FTNetworkListener.get().monitor();
         appendGlobalContext(config);
         SyncTaskManager.get().init(config);
-        LogUtils.d(TAG,"initFTConfig complete");
+        LogUtils.d(TAG, "initFTConfig complete");
 //            LogUtils.setDescLogShow(mFtSDKConfig.isDescLog());
     }
 
@@ -198,7 +198,7 @@ public class FTSdk {
         try {
             config.setServiceName(get().getBaseConfig().getServiceName());
             FTRUMConfigManager.get().initWithConfig(config);
-            LogUtils.d(TAG,"initRUMWithConfig complete");
+            LogUtils.d(TAG, "initRUMWithConfig complete");
 
         } catch (Exception e) {
             LogUtils.e(TAG, Log.getStackTraceString(e));
@@ -215,7 +215,7 @@ public class FTSdk {
         try {
             config.setServiceName(get().getBaseConfig().getServiceName());
             FTTraceConfigManager.get().initWithConfig(config);
-            LogUtils.d(TAG,"initTraceWithConfig complete");
+            LogUtils.d(TAG, "initTraceWithConfig complete");
 
         } catch (Exception e) {
             LogUtils.e(TAG, Log.getStackTraceString(e));
@@ -231,7 +231,7 @@ public class FTSdk {
         try {
             config.setServiceName(get().getBaseConfig().getServiceName());
             FTLoggerConfigManager.get().initWithConfig(config);
-            LogUtils.d(TAG,"initLogWithConfig complete");
+            LogUtils.d(TAG, "initLogWithConfig complete");
 
         } catch (Exception e) {
             LogUtils.e(TAG, Log.getStackTraceString(e));
