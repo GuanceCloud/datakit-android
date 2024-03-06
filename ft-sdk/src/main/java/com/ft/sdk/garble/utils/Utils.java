@@ -23,15 +23,15 @@ import com.google.gson.JsonParser;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
@@ -306,12 +306,16 @@ public class Utils {
                 calendar.get(Calendar.DAY_OF_MONTH);
     }
 
-    /**
-     * 转换时间格式
-     */
+    private static final ThreadLocal<SimpleDateFormat> dateFormatThreadLocal = new ThreadLocal<SimpleDateFormat>() {
+        @Override
+        protected SimpleDateFormat initialValue() {
+            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS", Locale.getDefault());
+        }
+    };
+
     public static String getCurrentTimeStamp() {
         Date currentTime = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS", Locale.getDefault());
+        SimpleDateFormat sdf = dateFormatThreadLocal.get();
         return sdf.format(currentTime);
     }
 
@@ -537,7 +541,12 @@ public class Utils {
     }
 
 
-    // 读取文件
+    /**
+     * MMAP 方式读取文件
+     * @param file
+     * @return
+     * @throws IOException
+     */
     public static String readFile(File file) throws IOException {
         RandomAccessFile raf = new RandomAccessFile(file, "r");
         FileChannel channel = raf.getChannel();
@@ -554,6 +563,20 @@ public class Utils {
         return content;
     }
 
+    /**
+     * 从文件名去后缀
+     * @param fileName 文件名
+     * @return
+     */
+    public static String getNameWithoutExtension(String fileName) {
+        int pos = fileName.lastIndexOf(".");
+        if (pos > 0) {
+            return fileName.substring(0, pos);
+        } else {
+            return fileName;
+        }
+    }
+
 
     /**
      * 写入文件
@@ -563,18 +586,8 @@ public class Utils {
      * @throws IOException
      */
     public static void writeToFile(File file, String content) throws IOException {
-        try {
-            RandomAccessFile raf = new RandomAccessFile(file, "rw");
-            raf.seek(raf.length()); // Move to end of file
-
-            OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(raf.getFD()), "UTF-8");
-            writer.write(content);
-            writer.close();
-
-            raf.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
+        writer.write(content);
     }
 
 }

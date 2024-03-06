@@ -3,12 +3,13 @@ package com.ft.sdk.garble.utils;
 
 import static com.ft.sdk.garble.utils.TrackLog.showFullLog;
 
+import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTInnerLogHandler;
 import com.ft.sdk.FTLogger;
 import com.ft.sdk.FTLoggerConfig;
+import com.ft.sdk.garble.manager.LogFileHelper;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * BY huangDianHua
@@ -98,7 +99,7 @@ public class LogUtils {
      * <p>
      * 注意:为避免与
      * <p>
-     * {@link FTLoggerConfig#printCustomLogToConsole}  产生循环调用的情况
+     * {@link FTLoggerConfig#setPrintCustomLogToConsole(boolean)}  产生循环调用的情况
      * innerLogHandler 设置后，这两数值自动为 false
      * <p>
      * {@link FTLogger}，如果使用 FTLogger 避免使用 {@link  com.ft.sdk.garble.bean.Status#OK}
@@ -112,7 +113,7 @@ public class LogUtils {
     /**
      * 将内部日志转化成文件
      * <p>
-     * {@link FTLoggerConfig#printCustomLogToConsole}  产生循环调用的情况
+     * {@link FTLoggerConfig#setPrintCustomLogToConsole(boolean)}  产生循环调用的情况
      * innerLogHandler 设置后，这两数值自动为 false
      * <p>
      * {@link FTLogger}，如果使用 FTLogger 避免使用 {@link  com.ft.sdk.garble.bean.Status#OK}
@@ -120,15 +121,12 @@ public class LogUtils {
      * @param file 缓存文件
      */
     public static void registerInnerLogCacheToFile(File file) {
+        final LogFileHelper helper = new LogFileHelper(FTApplication.getApplication(), file);
+
         TrackLog.setInnerLogHandler(new FTInnerLogHandler() {
             @Override
             public void printInnerLog(String level, String tag, String logContent) {
-                try {
-                    Utils.writeToFile(file, String.format("%s %s %s %s \n", Utils.getCurrentTimeStamp(), level, tag, logContent));
-                } catch (IOException e) {
-                    //这里避免循环调用 无法使用 LogUtils
-                    e.printStackTrace();
-                }
+                helper.appendLog(String.format("%s %s %s %s \n", Utils.getCurrentTimeStamp(), level, tag, logContent));
             }
         });
     }

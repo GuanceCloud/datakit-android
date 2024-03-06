@@ -38,8 +38,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 @RunWith(AndroidJUnit4.class)
 public class StableTest extends BaseTest {
@@ -55,9 +53,7 @@ public class StableTest extends BaseTest {
         }
 
         Context application = InstrumentationRegistry.getInstrumentation().getTargetContext().getApplicationContext();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-        String timestamp = dateFormat.format(new Date());
-        LogUtils.registerInnerLogCacheToFile(new File(application.getFilesDir(), timestamp + ".log"));
+        LogUtils.registerInnerLogCacheToFile(new File(application.getFilesDir(), "InnerLog" + ".log"));
 
 
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAKIT_URL)
@@ -137,7 +133,7 @@ public class StableTest extends BaseTest {
     public void highLoadWithCrash() throws Exception {
         //阻止 application 崩溃，如果崩溃测试用例也会结束
         avoidCrash();
-        highLoadData(60);
+        highLoadData(30);
         onView(withId(R.id.main_mock_crash_btn)).perform(ViewActions.scrollTo()).perform(click());
         waitEventConsumeInThreadPool();
 

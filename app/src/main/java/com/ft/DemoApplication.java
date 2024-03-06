@@ -33,9 +33,7 @@ public class DemoApplication extends BaseApplication {
     public void onCreate() {
         super.onCreate();
         if (!BuildConfig.LAZY_INIT) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-            String timestamp = dateFormat.format(new Date());
-            LogUtils.registerInnerLogCacheToFile(new File(getFilesDir(), timestamp + ".log"));
+            LogUtils.registerInnerLogCacheToFile(new File(getFilesDir(), "InnerLog" + ".log"));
             initFTSDK();
         }
     }
