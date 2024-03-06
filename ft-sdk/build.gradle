@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 
 //发布 snapshot 版本号末尾追加 "-SNAPSHOT"
-def versionNameStr = "1.4.3-alpha02"
+def versionNameStr = "1.4.3-alpha03-SNAPSHOT"
 
 android {
     compileSdk 34
@@ -64,9 +64,11 @@ afterEvaluate {
                 groupId 'com.cloudcare.ft.mobile.sdk.tracker.agent'
                 artifactId 'ft-sdk'
                 version versionNameStr
-                artifact("$buildDir/outputs/aar/ft-sdk-release.aar") {
-                    builtBy assemble
-                }
+                artifact project.tasks.bundleReleaseAar
+                // 添加源码Javadoc到发布的AAR文件中
+                artifact androidJavadocsJar
+                artifact androidSourcesJar
+
             }
         }
         repositories {
@@ -95,6 +97,45 @@ task generateAarAndPublish {
 task aar {
     dependsOn 'assemble'
 
+}
+
+/**
+ * 报错，不影响上传任务
+ */
+task androidJavadocs(type: Javadoc) {
+
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+
+    android.libraryVariants.all { variant ->
+        if (variant.name == 'release') {
+            //BuildConfig Class Not Found
+            source += variant.javaCompileProvider.get().source
+            //Dependencies  Library Class Not Found
+            owner.classpath += variant.javaCompileProvider.get().classpath
+        }
+    }
+    exclude '**/R.html', '**/R.*.html', '**/index.html'
+    //ignore doc lint
+    options.addStringOption('Xdoclint:none', '-quiet')
+    //ignore build fail
+    failOnError false
+}
+
+task androidJavadocsJar(type: Jar) {
+    dependsOn androidJavadocs
+    archiveClassifier = 'javadoc'
+    from androidJavadocs.destinationDir
+}
+
+task androidSourcesJar(type: Jar) {
+    archiveClassifier = 'sources'
+    from android.sourceSets.main.java.srcDirs
+}
+
+artifacts {
+    archives androidSourcesJar
+    archives androidJavadocsJar
 }
 
 

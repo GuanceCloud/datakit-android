@@ -59,9 +59,7 @@ afterEvaluate {
                 groupId 'com.cloudcare.ft.mobile.sdk.tracker.agent'
                 artifactId 'ft-native'
                 version versionNameStr
-                artifact("$buildDir/outputs/aar/ft-native-release.aar"){
-                    builtBy assemble
-                }
+                artifact project.tasks.bundleReleaseAar
             }
         }
         repositories {
