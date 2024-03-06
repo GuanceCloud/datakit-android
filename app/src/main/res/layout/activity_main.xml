@@ -91,10 +91,16 @@
             android:text="Start Service" />
 
         <Button
-            android:id="@+id/main_flush_sync_data"
+            android:id="@+id/main_flush_sync_data_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="手动同步数据" />
+
+        <Button
+            android:id="@+id/main_high_load_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="高负载场景" />
 
         <Button
             android:id="@+id/main_lazy_init"

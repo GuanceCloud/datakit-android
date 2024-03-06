@@ -17,6 +17,7 @@ import com.ft.DebugMainActivity;
 import com.ft.R;
 import com.ft.sdk.DeviceMetricsMonitorType;
 import com.ft.sdk.EnvType;
+import com.ft.sdk.FTAutoTrack;
 import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
@@ -67,6 +68,8 @@ public class RUMViewDeviceMetricsTest extends BaseTest {
                 .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
                 .setEnableTraceUserView(true)
         );
+
+        FTAutoTrack.startApp(null);
 
     }
 

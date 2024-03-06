@@ -32,6 +32,7 @@
         <activity android:name=".RepeatActivity" />
         <activity android:name=".TabViewActivity" />
         <activity android:name=".ManualRUMActivity" />
+        <activity android:name=".HighLoadActivity" />
 
         <service
             android:name=".service.TestService"

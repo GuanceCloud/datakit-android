@@ -87,7 +87,7 @@ public class DataSyncTest extends FTBaseTest {
         FTRUMGlobalManager.get().startView(ANY_VIEW);
         FTRUMGlobalManager.get().stopView();
 
-        waitForInThreadPool();
+        waitEventConsumeInThreadPool();
         Thread.sleep(2000);
         int except1 = CheckUtils.getCount(DataType.RUM_APP, Constants.FT_MEASUREMENT_RUM_VIEW, 0);
         Assert.assertTrue(except1 > 0);

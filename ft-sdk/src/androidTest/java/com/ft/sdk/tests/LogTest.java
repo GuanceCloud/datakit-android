@@ -114,7 +114,7 @@ public class LogTest extends FTBaseTest {
 
         FTRUMGlobalManager.get().startView(ANY_VIEW);
         FTLogger.getInstance().logBackground("test", Status.CRITICAL);
-        waitForInThreadPool();
+        waitEventConsumeInThreadPool();
 
         Thread.sleep(2000);
 

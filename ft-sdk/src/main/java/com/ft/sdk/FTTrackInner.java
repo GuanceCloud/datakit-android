@@ -17,6 +17,7 @@ import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.manager.AsyncCallback;
 import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
+import com.ft.sdk.garble.threadpool.RunnerCompleteCallBack;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -76,10 +77,10 @@ public class FTTrackInner {
      * @param tags
      * @param fields
      */
-    void rum(long time, String measurement, final JSONObject tags, JSONObject fields) {
+    void rum(long time, String measurement, final JSONObject tags, JSONObject fields, RunnerCompleteCallBack callBack) {
         String sessionId = tags.optString(Constants.KEY_RUM_SESSION_ID);
         if (FTRUMInnerManager.get().checkSessionWillCollect(sessionId)) {
-            syncDataBackground(DataType.RUM_APP, time, measurement, tags, fields);
+            syncDataBackground(DataType.RUM_APP, time, measurement, tags, fields,callBack);
         }
     }
 
@@ -94,12 +95,21 @@ public class FTTrackInner {
     void rumWebView(long time, String measurement, final JSONObject tags, JSONObject fields) {
         String sessionId = tags.optString(Constants.KEY_RUM_SESSION_ID);
         if (FTRUMInnerManager.get().checkSessionWillCollect(sessionId)) {
-            syncDataBackground(DataType.RUM_WEBVIEW, time, measurement, tags, fields);
+            syncDataBackground(DataType.RUM_WEBVIEW, time, measurement, tags, fields, null);
         }
     }
 
+    /**
+     * 同步数据异步写入
+     * @param dataType
+     * @param time
+     * @param measurement
+     * @param tags
+     * @param fields
+     * @param callBack
+     */
     private void syncDataBackground(final DataType dataType, final long time,
-                                    final String measurement, final JSONObject tags, final JSONObject fields) {
+                                    final String measurement, final JSONObject tags, final JSONObject fields, RunnerCompleteCallBack callBack) {
         DataUploaderThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
@@ -108,7 +118,10 @@ public class FTTrackInner {
                     SyncJsonData recordData = SyncJsonData.getSyncJsonData(dataHelper, dataType,
                             new LineProtocolBean(measurement, tags, fields, time));
                     boolean result = FTDBManager.get().insertFtOperation(recordData, false);
-                    LogUtils.d(TAG, "syncDataBackground:" + measurement + "," + dataType.toString() + ":insert=" + result);
+                    LogUtils.d(TAG, "syncDataBackground:" + measurement + " " + dataType.toString() + ":insert=" + result);
+                    if (callBack != null) {
+                        callBack.onComplete();
+                    }
                     SyncTaskManager.get().executeSyncPoll();
                 } catch (Exception e) {
                     LogUtils.e(TAG, Log.getStackTraceString(e));

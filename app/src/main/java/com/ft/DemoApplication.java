@@ -10,7 +10,11 @@ import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.UserData;
+import com.ft.sdk.garble.utils.LogUtils;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -28,6 +32,7 @@ public class DemoApplication extends BaseApplication {
     public void onCreate() {
         super.onCreate();
         if (!BuildConfig.LAZY_INIT) {
+            LogUtils.registerInnerLogCacheToFile(new File(getFilesDir(), "InnerLog" + ".log"));
             initFTSDK();
 
 //            File cacheFile = new File(getFilesDir(), "LogCache.log");
@@ -40,20 +45,19 @@ public class DemoApplication extends BaseApplication {
     static void initFTSDK() {
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAKIT_URL)
                 .setDebug(true)//设置是否是 debug
-                .setAutoSync(false)
+                .setAutoSync(true)
                 .setCustomSyncPageSize(100)
-                .setNeedTransformOldCache(true)
                 .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()));
         FTSdk.install(ftSDKConfig);
 
         FTSdk.initLogWithConfig(new FTLoggerConfig()
-                        .setSamplingRate(1f)
-                        .setEnableCustomLog(true)
-                        .setEnableConsoleLog(true)
-                        .setLogCacheLimitCount(10000)
-                        .setPrintCustomLogToConsole(true)
-//                .setLogLevelFilters(new Status[]{Status.ERROR})
-                        .setEnableLinkRumData(true)
+                .setSamplingRate(1f)
+                .setEnableCustomLog(true)
+                .setEnableConsoleLog(true)
+                .setLogCacheLimitCount(10000)
+                .setPrintCustomLogToConsole(true)
+                .setLogLevelFilters(new Status[]{Status.ERROR})
+                .setEnableLinkRumData(true)
         );
 
 
@@ -82,11 +86,6 @@ public class DemoApplication extends BaseApplication {
         userData.setExts(extMap);
         FTSdk.bindRumUserData(userData);
 
-        FTSdk.initTraceWithConfig(new FTTraceConfig()
-                .setSamplingRate(1f)
-                .setEnableAutoTrace(false)
-                .setEnableLinkRUMData(true)
-                .setTraceType(TraceType.DDTRACE));
 
     }
 

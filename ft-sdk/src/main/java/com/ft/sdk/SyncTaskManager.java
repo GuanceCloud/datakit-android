@@ -72,16 +72,35 @@ public class SyncTaskManager {
      */
     private boolean isOldCaching;
 
+    /**
+     * 是否停止
+     */
     private boolean isStop = false;
 
+    /**
+     * 同步消息
+     */
     private static final int MSG_SYNC = 1;
 
+    /**
+     * 最大错误尝试次数，超出之后，队列数据将停止，等待下次同步触发
+     */
     private int dataSyncMaxRetryCount;
 
+    /**
+     * 是否进行自动同步
+     */
     private boolean autoSync;
 
+    /**
+     * 同步请求间歇时间
+     */
     private int syncSleepTime;
 
+
+    /**
+     * 用于跨步线程消息发送
+     */
     private final Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {

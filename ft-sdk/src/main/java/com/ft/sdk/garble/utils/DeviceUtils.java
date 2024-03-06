@@ -249,7 +249,7 @@ public class DeviceUtils {
     }
 
     /**
-     * 进程启动到当前间隔时间,单位毫秒 {@link Process#getStartUptimeMillis();}
+     * 进程启动到当前间隔时间,单位毫秒 {@link Process#getStartUptimeMillis()}
      *
      * @return
      */

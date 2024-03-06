@@ -75,7 +75,7 @@ public class FTDBManager extends DBManager {
      */
 
     public void initSumView(final ViewBean data) {
-        LogUtils.d(TAG, "initSumView:id:" + data.getId() + ",name:" + data.getViewName());
+        LogUtils.d(TAG, "initSumView id:" + data.getId() + ",name:" + data.getViewName());
         getDB(true, new DataBaseCallBack() {
             @Override
             public void run(SQLiteDatabase db) {
@@ -107,7 +107,7 @@ public class FTDBManager extends DBManager {
      * @return
      */
     public void initSumAction(final ActionBean data) {
-        LogUtils.d(TAG, "initSumAction,id:" + data.getId() + ",ViewName:" + data.getViewName()
+        LogUtils.d(TAG, "initSumAction id:" + data.getId() + ",ViewName:" + data.getViewName()
                 + ",actionName:" + data.getActionName());
 
         getDB(true, new DataBaseCallBack() {

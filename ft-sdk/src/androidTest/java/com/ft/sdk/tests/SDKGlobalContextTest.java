@@ -63,7 +63,7 @@ public class SDKGlobalContextTest extends FTBaseTest {
     public void rumGlobalContextTest() throws Exception {
         FTRUMGlobalManager.get().startView(ANY_VIEW);
         FTRUMGlobalManager.get().stopView();
-        waitForInThreadPool();
+        waitEventConsumeInThreadPool();
         Thread.sleep(3000L);
         Assert.assertTrue(CheckUtils.checkValueInLineProtocol(DataType.RUM_APP,
                 new String[]{CUSTOM_KEY, CUSTOM_VALUE}));

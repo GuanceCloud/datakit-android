@@ -2,6 +2,20 @@
 1. 更改数据落盘方式
 
 ---
+# agent 1.4.3-alpha02
+1. 修正 Native Library 版本号获取方式
+
+---
+# agent 1.4.3-alpha01
+1. Native Crash 捕获时机优化，会尝试在崩溃当下捕获
+2. Java Crash 在崩溃入库后，再进行 rethrow 
+
+---
+# agent 1.4.2-alpha04
+1. 新增同步请求间歇时长设置
+
+---
+
 # agent 1.4.2-alpha03
 1. 新增内部日志转文件方法
 

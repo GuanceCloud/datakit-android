@@ -19,7 +19,7 @@ import java.util.HashMap;
  * Description: {@link Activity} 生命周期回调类
  * <p>
  * 用于监听 {@link Activity} 生命周期，结合 {@link LifeCircleTraceCallback},在
- * {@link #onActivityPreStarted(Activity),#onActivityPreCreated(Activity, Bundle), #onActivityPostCreated(Activity)}
+ * {@link #onActivityPreStarted(Activity)},{@link #onActivityPreCreated(Activity, Bundle)}, {@link #onActivityPostCreated(Activity, Bundle)} }}
  * 从而输出以 {@link Activity} 为 {@link  Constants#FT_MEASUREMENT_RUM_VIEW} 指标
  * 页面加载时间：{@link Constants#KEY_RUM_VIEW_LOAD}
  * 启动时间：{@link Constants#ACTION_TYPE_LAUNCH_HOT},{@link Constants#ACTION_NAME_LAUNCH_COLD}
