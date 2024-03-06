@@ -117,7 +117,7 @@ public class LogUtils {
      * <p>
      * {@link FTLogger}，如果使用 FTLogger 避免使用 {@link  com.ft.sdk.garble.bean.Status#OK}
      *
-     * @param fileName 缓存文件名
+     * @param file 缓存文件
      */
     public static void registerInnerLogCacheToFile(File file) {
         TrackLog.setInnerLogHandler(new FTInnerLogHandler() {

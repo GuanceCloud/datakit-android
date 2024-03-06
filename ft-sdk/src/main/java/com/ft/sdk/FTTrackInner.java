@@ -81,6 +81,15 @@ public class FTTrackInner {
         }
     }
 
+    /**
+     * 同步数据异步写入
+     * @param dataType
+     * @param time
+     * @param measurement
+     * @param tags
+     * @param fields
+     * @param callBack
+     */
     private void syncDataBackground(final DataType dataType, final long time,
                                     final String measurement, final JSONObject tags, final JSONObject fields, RunnerCompleteCallBack callBack) {
         DataUploaderThreadPool.get().execute(new Runnable() {
