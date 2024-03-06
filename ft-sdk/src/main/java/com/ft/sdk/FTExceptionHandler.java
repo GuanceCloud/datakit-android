@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.ErrorType;
+import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
 import com.ft.sdk.garble.threadpool.RunnerCompleteCallBack;
 import com.ft.sdk.garble.utils.Constants;
@@ -98,7 +99,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
      * 抓取全局未捕获异常 {@link Exception}
      * <p>
      * 此处捕获的是 Java 代码层的异常，不包含 C/C++ 异常，抓取数据后，
-     * 会重新将异常内容抛出，避免集成方正常的异常捕获逻辑，异常数据会{@link #uploadCrashLog(String, String, AppState)}
+     * 会重新将异常内容抛出，避免集成方正常的异常捕获逻辑，异常数据会{@link #uploadCrashLog(String, String, AppState, RunnerCompleteCallBack)} )}
      * 上传异常数据
      *
      * @param t 返回异常线程
@@ -145,7 +146,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
      * @param nativeDumpPath
      */
     public void checkAndSyncPreDump(final String nativeDumpPath, RunnerCompleteCallBack callBack) {
-        EventConsumerThreadPool.get().execute(new Runnable() {
+        DataUploaderThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
                 File file = new File(nativeDumpPath);
@@ -220,7 +221,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
 
 
     /**
-     *
+     * 释放对象，也就是会舍弃 {@link #config} 的配置
      */
     public static void release() {
         instance = null;

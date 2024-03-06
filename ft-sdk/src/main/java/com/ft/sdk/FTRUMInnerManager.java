@@ -15,7 +15,6 @@ import com.ft.sdk.garble.bean.ResourceBean;
 import com.ft.sdk.garble.bean.ResourceParams;
 import com.ft.sdk.garble.bean.ViewBean;
 import com.ft.sdk.garble.db.FTDBManager;
-import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
 import com.ft.sdk.garble.threadpool.RunnerCompleteCallBack;
 import com.ft.sdk.garble.utils.BatteryUtils;
@@ -537,6 +536,7 @@ public class FTRUMInnerManager {
      * @param errorType 错误类型
      * @param state     程序运行状态
      * @param dateline  发生时间，纳秒
+     * @param callBack
      */
     void addError(String log, String message, long dateline, String errorType, AppState state, RunnerCompleteCallBack callBack) {
         addError(log, message, dateline, errorType, state, null, callBack);
@@ -550,36 +550,40 @@ public class FTRUMInnerManager {
      * @param errorType 错误类型
      * @param state     程序运行状态
      * @param dateline  发生时间，纳秒
+     * @param callBack
      */
     public void addError(String log, String message, long dateline, String errorType,
                          AppState state, HashMap<String, Object> property, RunnerCompleteCallBack callBack) {
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    checkSessionRefresh(true);
 
-                    JSONObject tags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
-                    attachRUMRelative(tags, true);
-                    JSONObject fields = new JSONObject();
-                    tags.put(Constants.KEY_RUM_ERROR_TYPE, errorType);
-                    tags.put(Constants.KEY_RUM_ERROR_SOURCE, ErrorSource.LOGGER.toString());
-                    tags.put(Constants.KEY_RUM_ERROR_SITUATION, state.toString());
+        try {
+            checkSessionRefresh(true);
 
-                    if (property != null) {
-                        for (Map.Entry<String, Object> entry : property.entrySet()) {
-                            String key = entry.getKey();
-                            Object value = entry.getValue();
-                            fields.put(key, value);
-                        }
-                    }
+            final JSONObject tags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
+            attachRUMRelative(tags, true);
+            final JSONObject fields = new JSONObject();
+            tags.put(Constants.KEY_RUM_ERROR_TYPE, errorType);
+            tags.put(Constants.KEY_RUM_ERROR_SOURCE, ErrorSource.LOGGER.toString());
+            tags.put(Constants.KEY_RUM_ERROR_SITUATION, state.toString());
 
-                    fields.put(Constants.KEY_RUM_ERROR_MESSAGE, message);
-                    fields.put(Constants.KEY_RUM_ERROR_STACK, log);
+            if (property != null) {
+                for (Map.Entry<String, Object> entry : property.entrySet()) {
+                    String key = entry.getKey();
+                    Object value = entry.getValue();
+                    fields.put(key, value);
+                }
+            }
 
+            fields.put(Constants.KEY_RUM_ERROR_MESSAGE, message);
+            fields.put(Constants.KEY_RUM_ERROR_STACK, log);
+
+            EventConsumerThreadPool.get().execute(new Runnable() {
+                @Override
+                public void run() {
                     try {
-                        tags.put(Constants.KEY_DEVICE_CARRIER, DeviceUtils.getCarrier(FTApplication.getApplication()));
+
+                        //---- 获取设备信息，资源耗时操作----->
                         tags.put(Constants.KEY_DEVICE_LOCALE, Locale.getDefault());
+                        tags.put(Constants.KEY_DEVICE_CARRIER, DeviceUtils.getCarrier(FTApplication.getApplication()));
 
                         if (FTMonitorManager.get().isErrorMonitorType(ErrorMonitorType.MEMORY)) {
                             double[] memory = DeviceUtils.getRamData(FTApplication.getApplication());
@@ -594,29 +598,26 @@ public class FTRUMInnerManager {
                             fields.put(Constants.KEY_BATTERY_USE, (float) BatteryUtils.getBatteryInfo(FTApplication.getApplication()).getBr());
 
                         }
+                        //<--------
+                        FTTrackInner.getInstance().rum(dateline, Constants.FT_MEASUREMENT_RUM_ERROR, tags, fields, new RunnerCompleteCallBack() {
+                            @Override
+                            public void onComplete() {
+                                increaseError(tags);
+                                if (callBack != null) {
+                                    callBack.onComplete();
+                                }
+                            }
+                        });
 
-
-                    } catch (JSONException e) {
+                    } catch (Exception e) {
                         LogUtils.e(TAG, Log.getStackTraceString(e));
                     }
-
-                    FTTrackInner.getInstance().rum(dateline, Constants.FT_MEASUREMENT_RUM_ERROR, tags, fields, new RunnerCompleteCallBack() {
-                        @Override
-                        public void onComplete() {
-                            increaseError(tags);
-                            if (callBack != null) {
-                                callBack.onComplete();
-                            }
-
-                        }
-                    });
-
-                } catch (Exception e) {
-                    LogUtils.e(TAG, Log.getStackTraceString(e));
                 }
-            }
-        }.start();
+            });
 
+        } catch (Exception e) {
+            LogUtils.e(TAG, Log.getStackTraceString(e));
+        }
     }
 
     /**
@@ -834,8 +835,12 @@ public class FTRUMInnerManager {
                 errorField.put(Constants.KEY_RUM_ERROR_MESSAGE, errorMsg);
                 errorField.put(Constants.KEY_RUM_ERROR_STACK, bean.errorStack);
 
-                FTTrackInner.getInstance().rum(time, Constants.FT_MEASUREMENT_RUM_ERROR, errorTags, errorField, null);
-                increaseError(tags);
+                FTTrackInner.getInstance().rum(time, Constants.FT_MEASUREMENT_RUM_ERROR, errorTags, errorField, new RunnerCompleteCallBack() {
+                    @Override
+                    public void onComplete() {
+                        increaseError(tags);
+                    }
+                });
             }
         } catch (Exception e) {
             LogUtils.e(TAG, Log.getStackTraceString(e));
@@ -1116,13 +1121,8 @@ public class FTRUMInnerManager {
                 LogUtils.e(TAG, Log.getStackTraceString(e));
             }
 
-            DataUploaderThreadPool.get().execute(new Runnable() {
-                @Override
-                public void run() {
-                    FTDBManager.get().cleanCloseActionData();
-                }
-            });
         }
+        FTDBManager.get().cleanCloseActionData();
         if (beans.size() < LIMIT_SIZE) {
 
         } else {
@@ -1192,25 +1192,17 @@ public class FTRUMInnerManager {
             }
 
             FTTrackInner.getInstance().rum(bean.getStartTime(),
-                    Constants.FT_MEASUREMENT_RUM_VIEW, tags, fields, null);
-
-            DataUploaderThreadPool.get().execute(new Runnable() {
-                @Override
-                public void run() {
-                    FTDBManager.get().updateViewUploadTime(bean.getId(), System.currentTimeMillis());
-
-                }
-            });
+                    Constants.FT_MEASUREMENT_RUM_VIEW, tags, fields, new RunnerCompleteCallBack() {
+                        @Override
+                        public void onComplete() {
+                            FTDBManager.get().updateViewUploadTime(bean.getId(), System.currentTimeMillis());
+                        }
+                    });
 
 
         }
 
-        DataUploaderThreadPool.get().execute(new Runnable() {
-            @Override
-            public void run() {
-                FTDBManager.get().cleanCloseViewData();
-            }
-        });
+        FTDBManager.get().cleanCloseViewData();
 
         if (beans.size() < LIMIT_SIZE) {
 
