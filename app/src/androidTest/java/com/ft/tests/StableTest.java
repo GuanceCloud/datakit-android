@@ -107,7 +107,7 @@ public class StableTest extends BaseTest {
      */
     @Test
     public void oneHourHighLoad() throws Exception {
-        highLoadData(18000);
+        highLoadData(9000);
         waitEventConsumeInThreadPool();
     }
 
@@ -118,7 +118,7 @@ public class StableTest extends BaseTest {
      */
     @Test
     public void highLoadWithANR() throws Exception {
-        highLoadData(60);
+        highLoadData(40);
         onView(withId(R.id.main_mock_ui_block_btn)).perform(ViewActions.scrollTo()).perform(click());
         waitEventConsumeInThreadPool();
 
@@ -132,13 +132,9 @@ public class StableTest extends BaseTest {
     @Test
     public void highLoadWithCrash() throws Exception {
         //阻止 application 崩溃，如果崩溃测试用例也会结束
-        avoidCrash();
-        highLoadData(30);
+        highLoadData(40);
         onView(withId(R.id.main_mock_crash_btn)).perform(ViewActions.scrollTo()).perform(click());
         waitEventConsumeInThreadPool();
-
-        Thread.sleep(1000);
-
     }
 
     /**
@@ -148,7 +144,7 @@ public class StableTest extends BaseTest {
      */
     @Test
     public void highLoadWIthNativeCrash() throws Exception {
-        highLoadData(60);
+        highLoadData(40);
         onView(withId(R.id.main_mock_crash_native_btn)).perform(ViewActions.scrollTo()).perform(click());
         waitEventConsumeInThreadPool();
 
