@@ -39,6 +39,13 @@ import org.junit.runner.RunWith;
 
 import java.io.File;
 
+/**
+ *
+ * 高负载 Java Crash，Native Crash
+ *
+ * ANR 测试无法通过 Android Test 测试，需要手动触发
+ *
+ */
 @RunWith(AndroidJUnit4.class)
 public class StableTest extends BaseTest {
 
@@ -109,19 +116,6 @@ public class StableTest extends BaseTest {
     public void oneHourHighLoad() throws Exception {
         highLoadData(9000);
         waitEventConsumeInThreadPool();
-    }
-
-    /**
-     * 高负载过程中发生 ANR
-     *
-     * @throws Exception
-     */
-    @Test
-    public void highLoadWithANR() throws Exception {
-        highLoadData(40);
-        onView(withId(R.id.main_mock_ui_block_btn)).perform(ViewActions.scrollTo()).perform(click());
-        waitEventConsumeInThreadPool();
-
     }
 
     /**

@@ -4,7 +4,6 @@ import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.LogCacheDiscard;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.db.FTDBManager;
-import com.ft.sdk.garble.utils.Constants;
 
 /**
  * author: huangDianHua
@@ -50,6 +49,7 @@ public class FTDBCachePolicy {
 
     /**
      * 获取限制数量
+     *
      * @return
      */
     public int getLimitCount() {
@@ -71,6 +71,15 @@ public class FTDBCachePolicy {
      */
     public synchronized void optCount(int optCount) {
         count += optCount;
+    }
+
+    /**
+     * 如果写入数据量大于总限制的一半
+     *
+     * @return 是否达到一半
+     */
+    public boolean reachHalfLimit() {
+        return count > limitCount / 2;
     }
 
     /**
