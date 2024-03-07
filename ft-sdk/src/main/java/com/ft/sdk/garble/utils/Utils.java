@@ -588,6 +588,7 @@ public class Utils {
     public static void writeToFile(File file, String content) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
         writer.write(content);
+        writer.flush();
     }
 
 }
