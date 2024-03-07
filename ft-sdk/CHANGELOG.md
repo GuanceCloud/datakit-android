@@ -1,3 +1,9 @@
+# agent 1.4.3-alpha03
+1. 传输性能优化
+2. aar 添加 javadoc 和 source jar
+3. 内部文件日志管理优化
+
+---
 # agent 1.4.3-alpha02
 1. 修正 Native Library 版本号获取方式
 
