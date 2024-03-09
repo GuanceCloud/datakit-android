@@ -16,6 +16,8 @@ public class HighLoadActivity extends NameTitleActivity {
     private static final String TAG = "HighLoadActivity";
     private static final int DATA_COUNT = 18000;
 
+    private final Object logLock = new Object();
+    private final Object httpLock = new Object();
     private int logCount = 0;
     private int httpCount = 0;
 
@@ -56,7 +58,10 @@ public class HighLoadActivity extends NameTitleActivity {
                     try {
                         Thread.sleep(20);
                         Log.e(TAG, Constants.LOG_TEST_DATA_512_BYTE);
-                        LogUtils.d(TAG, "batchLog" + (++logCount));
+                        synchronized (logLock) {
+                            LogUtils.d(TAG, "batchLog" + (++logCount));
+
+                        }
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
@@ -71,7 +76,9 @@ public class HighLoadActivity extends NameTitleActivity {
                     try {
                         Thread.sleep(20);
                         FTLogger.getInstance().logBackground(Constants.LOG_TEST_DATA_512_BYTE, Status.ERROR);
-                        LogUtils.d(TAG, "batchLog" + (++logCount));
+                        synchronized (logLock) {
+                            LogUtils.d(TAG, "batchLog" + (++logCount));
+                        }
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
@@ -87,7 +94,10 @@ public class HighLoadActivity extends NameTitleActivity {
             public void run() {
                 for (int i = 0; i < DATA_COUNT; i++) {
                     RequestUtils.requestUrl(BuildConfig.TRACE_URL);
-                    LogUtils.d(TAG, "batchHttpRequest:" + (++httpCount));
+                    synchronized (httpLock) {
+                        LogUtils.d(TAG, "batchHttpRequest:" + (++httpCount));
+
+                    }
 
                     try {
                         Thread.sleep(200);

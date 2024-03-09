@@ -14,8 +14,6 @@ import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.LogUtils;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -89,6 +87,12 @@ public class DemoApplication extends BaseApplication {
         extMap.put("ft_key", "ft_value");
         userData.setExts(extMap);
         FTSdk.bindRumUserData(userData);
+
+        FTSdk.initTraceWithConfig(new FTTraceConfig()
+                .setSamplingRate(1f)
+                .setEnableAutoTrace(true)
+                .setEnableLinkRUMData(true)
+                .setTraceType(TraceType.DDTRACE));
 
 
     }

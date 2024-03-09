@@ -4,12 +4,12 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.pressBack;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
-
 import static com.ft.AllTests.hasPrepare;
 
 import android.content.Context;
 import android.os.Looper;
 
+import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -40,11 +40,9 @@ import org.junit.runner.RunWith;
 import java.io.File;
 
 /**
- *
  * 高负载 Java Crash，Native Crash
- *
+ * <p>
  * ANR 测试无法通过 Android Test 测试，需要手动触发
- *
  */
 @RunWith(AndroidJUnit4.class)
 public class StableTest extends BaseTest {
@@ -114,7 +112,7 @@ public class StableTest extends BaseTest {
      */
     @Test
     public void oneHourHighLoad() throws Exception {
-        highLoadData(9000);
+        highLoadData(3600);//1小时
         waitEventConsumeInThreadPool();
     }
 
@@ -157,8 +155,33 @@ public class StableTest extends BaseTest {
             onView(withId(R.id.high_load_to_repeat_view_btn)).perform(click());
             Thread.sleep(200);
             onView(withId(android.R.id.content)).perform(pressBack());
+            Thread.sleep(200);
         }
         onView(withId(android.R.id.content)).perform(pressBack());
+    }
+
+
+    /**
+     * 应用强制结束
+     * @throws Exception
+     */
+    @Test
+    public void launchAppMultipleTimes() throws Exception {
+        // 定义启动次数
+        int numLaunches = 2;
+
+        // 循环启动应用程序
+        for (int i = 0; i < numLaunches; i++) {
+            // 启动Activity
+            ActivityScenario scenario = ActivityScenario.launch(DebugMainActivity.class);
+
+            highLoadData(1);
+            // 等待一段时间，可以根据实际情况调整
+            Thread.sleep(2000);
+
+            // 结束Activity
+            scenario.close();
+        }
     }
 
     @Override
