@@ -114,7 +114,7 @@ public class StableTest extends BaseTest {
     private void computeDBMaxSize() {
         if (databaseFile.exists()) {
             long currentDBSize = databaseFile.length();
-            maxDBSize = Math.max(currentDBSize, databaseFile.length());
+            maxDBSize = Math.max(currentDBSize, maxDBSize);
 
         }
 
