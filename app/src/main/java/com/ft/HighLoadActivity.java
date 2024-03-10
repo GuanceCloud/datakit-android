@@ -93,11 +93,12 @@ public class HighLoadActivity extends NameTitleActivity {
             @Override
             public void run() {
                 for (int i = 0; i < DATA_COUNT; i++) {
-                    RequestUtils.requestUrl(BuildConfig.TRACE_URL);
                     synchronized (httpLock) {
                         LogUtils.d(TAG, "batchHttpRequest:" + (++httpCount));
 
                     }
+                    RequestUtils.requestUrl(BuildConfig.TRACE_URL + httpCount);
+
 
                     try {
                         Thread.sleep(200);

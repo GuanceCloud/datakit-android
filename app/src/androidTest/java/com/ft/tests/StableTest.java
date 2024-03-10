@@ -30,6 +30,7 @@ import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.UserData;
+import com.ft.sdk.garble.db.FTDBConfig;
 import com.ft.sdk.garble.utils.LogUtils;
 
 import org.junit.BeforeClass;
@@ -50,6 +51,10 @@ public class StableTest extends BaseTest {
     @Rule
     public ActivityScenarioRule<DebugMainActivity> rule = new ActivityScenarioRule<>(DebugMainActivity.class);
 
+    private static File databaseFile;
+
+    private long maxDBSize = 0;
+
     @BeforeClass
     public static void settingBeforeLaunch() {
         if (!hasPrepare) {
@@ -60,6 +65,7 @@ public class StableTest extends BaseTest {
         Context application = InstrumentationRegistry.getInstrumentation().getTargetContext().getApplicationContext();
         LogUtils.registerInnerLogCacheToFile(new File(application.getFilesDir(), "InnerLog" + ".log"));
 
+        databaseFile = application.getDatabasePath(FTDBConfig.DATABASE_NAME);
 
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAKIT_URL)
                 .setDebug(true)//设置是否是 debug
@@ -102,6 +108,15 @@ public class StableTest extends BaseTest {
                 .setTraceType(TraceType.DDTRACE));
 
         FTAutoTrack.startApp(null);
+
+    }
+
+    private void computeDBMaxSize() {
+        if (databaseFile.exists()) {
+            long currentDBSize = databaseFile.length();
+            maxDBSize = Math.max(currentDBSize, databaseFile.length());
+
+        }
 
     }
 
@@ -156,13 +171,16 @@ public class StableTest extends BaseTest {
             Thread.sleep(200);
             onView(withId(android.R.id.content)).perform(pressBack());
             Thread.sleep(200);
+            computeDBMaxSize();
         }
         onView(withId(android.R.id.content)).perform(pressBack());
+        LogUtils.d("MAX_DB_SIZE", "max db size:" + maxDBSize);
     }
 
 
     /**
      * 应用强制结束
+     *
      * @throws Exception
      */
     @Test
