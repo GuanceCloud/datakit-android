@@ -51,7 +51,7 @@ public class FpsUtils {
     }
 
     /**
-     * 方式
+     * 释放
      */
     public static void release() {
         if (fpsUtils != null) {

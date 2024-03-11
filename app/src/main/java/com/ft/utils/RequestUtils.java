@@ -20,6 +20,11 @@ import okhttp3.ResponseBody;
 public class RequestUtils {
     private static final String TAG = "RequestUtils";
 
+    /**
+     * 发起网络 GET 请求，
+     * @param url 请求地址
+     * @return
+     */
     public static Request requestUrl(@NonNull String url) {
         Request.Builder builder = new Request.Builder().url(url).method(RequestMethod.GET.name(), null);
         Request request = null;

@@ -32,19 +32,6 @@ public class LineProtocolBean {
         this.fields = fields;
         this.timeNano = timeNano;
     }
-    public LineProtocolBean(String measurement, JSONObject tags, JSONObject fields) {
-        this.measurement = measurement;
-        this.tags = tags;
-        this.fields = fields;
-        this.timeNano = Utils.getCurrentNanoTime();
-    }
-
-    public LineProtocolBean(String measurement, JSONObject fields) {
-        this.measurement = measurement;
-        this.tags = null;
-        this.fields = fields;
-        this.timeNano = Utils.getCurrentNanoTime();
-    }
 
     public String getMeasurement() {
         return measurement;
