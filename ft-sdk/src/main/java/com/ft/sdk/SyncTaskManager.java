@@ -54,6 +54,21 @@ public class SyncTaskManager {
     private static final int OLD_CACHE_TRANSFORM_PAGE_SIZE = 100;
 
     /**
+     * 60*100 @{@link #INTERVAL}
+     */
+    private static final int MAX_PEEK_AVOIDANCE_TIME = 60;
+
+    /**
+     * 高频行为间隔时间
+     */
+    private static final int INTERVAL = 100;
+
+    /**
+     * 执行次数
+     */
+    private long lastPollTime;
+
+    /**
      * 重试等待时间
      */
     private static final int RETRY_DELAY_SLEEP_TIME = 500;
@@ -172,9 +187,9 @@ public class SyncTaskManager {
 
                     } catch (Exception e) {
                         if (e instanceof FTNetworkNoAvailableException) {
-                            LogUtils.e(TAG, "Network not available Stop poll");
+                            LogUtils.e(TAG, "Sync Fail-Network not available Stop poll");
                         } else {
-                            LogUtils.e(TAG, Log.getStackTraceString(e));
+                            LogUtils.e(TAG, "Sync Fail:\n" + Log.getStackTraceString(e));
 
                         }
                     } finally {
@@ -192,8 +207,17 @@ public class SyncTaskManager {
      */
     void executeSyncPoll() {
         if (autoSync) {
-            mHandler.removeMessages(MSG_SYNC);
-            mHandler.sendEmptyMessageDelayed(MSG_SYNC, 100);
+            if (FTDBCachePolicy.get().reachHalfLimit()) {
+                if (!running) {
+                    LogUtils.w(TAG, "Rapid Log Growth，Start to Sync ");
+                    mHandler.removeMessages(MSG_SYNC);
+                    executePoll();
+                }
+            } else {
+                mHandler.removeMessages(MSG_SYNC);
+                mHandler.sendEmptyMessageDelayed(MSG_SYNC, INTERVAL);
+            }
+
         }
     }
 

@@ -4,12 +4,12 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.pressBack;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
-
 import static com.ft.AllTests.hasPrepare;
 
 import android.content.Context;
 import android.os.Looper;
 
+import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -30,6 +30,7 @@ import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.UserData;
+import com.ft.sdk.garble.db.FTDBConfig;
 import com.ft.sdk.garble.utils.LogUtils;
 
 import org.junit.BeforeClass;
@@ -39,11 +40,20 @@ import org.junit.runner.RunWith;
 
 import java.io.File;
 
+/**
+ * 高负载 Java Crash，Native Crash
+ * <p>
+ * ANR 测试无法通过 Android Test 测试，需要手动触发
+ */
 @RunWith(AndroidJUnit4.class)
 public class StableTest extends BaseTest {
 
     @Rule
     public ActivityScenarioRule<DebugMainActivity> rule = new ActivityScenarioRule<>(DebugMainActivity.class);
+
+    private static File databaseFile;
+
+    private long maxDBSize = 0;
 
     @BeforeClass
     public static void settingBeforeLaunch() {
@@ -55,6 +65,7 @@ public class StableTest extends BaseTest {
         Context application = InstrumentationRegistry.getInstrumentation().getTargetContext().getApplicationContext();
         LogUtils.registerInnerLogCacheToFile(new File(application.getFilesDir(), "InnerLog" + ".log"));
 
+        databaseFile = application.getDatabasePath(FTDBConfig.DATABASE_NAME);
 
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAKIT_URL)
                 .setDebug(true)//设置是否是 debug
@@ -100,6 +111,15 @@ public class StableTest extends BaseTest {
 
     }
 
+    private void computeDBMaxSize() {
+        if (databaseFile.exists()) {
+            long currentDBSize = databaseFile.length();
+            maxDBSize = Math.max(currentDBSize, maxDBSize);
+
+        }
+
+    }
+
     /**
      * 一小时左右高负载数据
      *
@@ -107,21 +127,8 @@ public class StableTest extends BaseTest {
      */
     @Test
     public void oneHourHighLoad() throws Exception {
-        highLoadData(18000);
+        highLoadData(3600);//1小时
         waitEventConsumeInThreadPool();
-    }
-
-    /**
-     * 高负载过程中发生 ANR
-     *
-     * @throws Exception
-     */
-    @Test
-    public void highLoadWithANR() throws Exception {
-        highLoadData(60);
-        onView(withId(R.id.main_mock_ui_block_btn)).perform(ViewActions.scrollTo()).perform(click());
-        waitEventConsumeInThreadPool();
-
     }
 
     /**
@@ -132,13 +139,9 @@ public class StableTest extends BaseTest {
     @Test
     public void highLoadWithCrash() throws Exception {
         //阻止 application 崩溃，如果崩溃测试用例也会结束
-        avoidCrash();
-        highLoadData(30);
+        highLoadData(40);
         onView(withId(R.id.main_mock_crash_btn)).perform(ViewActions.scrollTo()).perform(click());
         waitEventConsumeInThreadPool();
-
-        Thread.sleep(1000);
-
     }
 
     /**
@@ -148,7 +151,7 @@ public class StableTest extends BaseTest {
      */
     @Test
     public void highLoadWIthNativeCrash() throws Exception {
-        highLoadData(60);
+        highLoadData(40);
         onView(withId(R.id.main_mock_crash_native_btn)).perform(ViewActions.scrollTo()).perform(click());
         waitEventConsumeInThreadPool();
 
@@ -167,8 +170,36 @@ public class StableTest extends BaseTest {
             onView(withId(R.id.high_load_to_repeat_view_btn)).perform(click());
             Thread.sleep(200);
             onView(withId(android.R.id.content)).perform(pressBack());
+            Thread.sleep(200);
+            computeDBMaxSize();
         }
         onView(withId(android.R.id.content)).perform(pressBack());
+        LogUtils.d("MAX_DB_SIZE", "max db size:" + maxDBSize);
+    }
+
+
+    /**
+     * 应用强制结束
+     *
+     * @throws Exception
+     */
+    @Test
+    public void launchAppMultipleTimes() throws Exception {
+        // 定义启动次数
+        int numLaunches = 2;
+
+        // 循环启动应用程序
+        for (int i = 0; i < numLaunches; i++) {
+            // 启动Activity
+            ActivityScenario scenario = ActivityScenario.launch(DebugMainActivity.class);
+
+            highLoadData(1);
+            // 等待一段时间，可以根据实际情况调整
+            Thread.sleep(2000);
+
+            // 结束Activity
+            scenario.close();
+        }
     }
 
     @Override
