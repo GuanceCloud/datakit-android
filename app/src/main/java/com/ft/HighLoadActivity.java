@@ -12,14 +12,48 @@ import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.utils.RequestUtils;
 
+/**
+ * 高速写入数据
+ * 1秒 100 条日志
+ * 1秒 10次网络请求
+ */
 public class HighLoadActivity extends NameTitleActivity {
     private static final String TAG = "HighLoadActivity";
+    /**
+     * 36000/2，并发一个线程 http 数量
+     */
     private static final int HTTP_DATA_COUNT = 18000;
+    /**
+     * 360000/2，并发线程一个线程日志量
+     */
     private static final int LOG_DATA_COUNT = 180000;
+    /**
+     * 1000/50，并发2线程平均 10 ms 一次
+     */
+    public static final int LOG_SLEEP = 20;
 
+    /**
+     * 1000/5 ，并发 2 线程平均100 毫秒 1次
+     */
+    public static final int HTTP_REQUEST_SLEEP = 200;
+
+    /**
+     * 日志同步锁
+     */
     private final Object logLock = new Object();
+
+    /**
+     * http 同步锁
+     */
     private final Object httpLock = new Object();
+
+    /**
+     * 日志调用次数
+     */
     private int logCount = 0;
+    /**
+     * 网络请求次数
+     */
     private int httpCount = 0;
 
     @Override
@@ -51,13 +85,18 @@ public class HighLoadActivity extends NameTitleActivity {
         });
     }
 
+    /**
+     * 批量日志
+     * 控制台日志，{@link #LOG_DATA_COUNT}
+     * 自定义日志, {@link #LOG_DATA_COUNT}
+     */
     private void batchLog() {
         new Thread() {
             @Override
             public void run() {
                 for (int i = 0; i < LOG_DATA_COUNT; i++) {
                     try {
-                        Thread.sleep(20);
+                        Thread.sleep(LOG_SLEEP);
                         Log.e(TAG, Constants.LOG_TEST_DATA_512_BYTE);
                         synchronized (logLock) {
                             LogUtils.d(TAG, "batchLog" + (++logCount));
@@ -75,7 +114,7 @@ public class HighLoadActivity extends NameTitleActivity {
             public void run() {
                 for (int i = 0; i < LOG_DATA_COUNT; i++) {
                     try {
-                        Thread.sleep(20);
+                        Thread.sleep(LOG_SLEEP);
                         FTLogger.getInstance().logBackground(Constants.LOG_TEST_DATA_512_BYTE, Status.ERROR);
                         synchronized (logLock) {
                             LogUtils.d(TAG, "batchLog" + (++logCount));
@@ -89,6 +128,9 @@ public class HighLoadActivity extends NameTitleActivity {
 
     }
 
+    /**
+     * 批量 http 请求 {@link #LOG_DATA_COUNT}
+     */
     private void batchHttpRequest() {
         new Thread() {
             @Override
@@ -102,7 +144,7 @@ public class HighLoadActivity extends NameTitleActivity {
 
 
                     try {
-                        Thread.sleep(200);
+                        Thread.sleep(HTTP_REQUEST_SLEEP);
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }

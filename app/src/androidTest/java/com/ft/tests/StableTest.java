@@ -107,10 +107,15 @@ public class StableTest extends BaseTest {
                 .setEnableLinkRUMData(true)
                 .setTraceType(TraceType.DDTRACE));
 
+
+        //plugin 1.2.0 以上版本，需要手动调用
         FTAutoTrack.startApp(null);
 
     }
 
+    /**
+     * 统计当前数据库最大
+     */
     private void computeDBMaxSize() {
         if (databaseFile.exists()) {
             long currentDBSize = databaseFile.length();
@@ -158,7 +163,7 @@ public class StableTest extends BaseTest {
     }
 
     /**
-     * 高负载
+     * 高数据写入场景
      *
      * @throws Exception
      */
@@ -174,6 +179,7 @@ public class StableTest extends BaseTest {
             computeDBMaxSize();
         }
         onView(withId(android.R.id.content)).perform(pressBack());
+        //打印数据库最大的数值
         LogUtils.d("MAX_DB_SIZE", "max db size:" + maxDBSize);
     }
 
@@ -202,6 +208,10 @@ public class StableTest extends BaseTest {
         }
     }
 
+    /**
+     *
+     * 保留不删除数据
+     */
     @Override
     public void tearDown() {
     }

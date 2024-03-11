@@ -53,20 +53,11 @@ public class SyncTaskManager {
      */
     private static final int OLD_CACHE_TRANSFORM_PAGE_SIZE = 100;
 
-    /**
-     * 60*100 @{@link #INTERVAL}
-     */
-    private static final int MAX_PEEK_AVOIDANCE_TIME = 60;
 
     /**
      * 高频行为间隔时间
      */
     private static final int INTERVAL = 100;
-
-    /**
-     * 执行次数
-     */
-    private long lastPollTime;
 
     /**
      * 重试等待时间
@@ -112,6 +103,11 @@ public class SyncTaskManager {
      */
     private int syncSleepTime;
 
+    /**
+     * 同步请求条目数量
+     */
+    private int pageSize = SyncPageSize.MEDIUM.getValue();
+
 
     /**
      * 用于跨步线程消息发送
@@ -153,15 +149,21 @@ public class SyncTaskManager {
         return SyncTaskManager.SingletonHolder.INSTANCE;
     }
 
-    private int pageSize = SyncPageSize.MEDIUM.getValue();
 
     /**
-     * For AndroidTest
+     * 执行数据同步
+     * <p>
+     * 注意 ：AndroidTest 会调用这个方法
      */
     void executePoll() {
         executePoll(false);
     }
 
+    /**
+     * 执行数据同步
+     *
+     * @param withSleep 是否进行睡眠，{@link #SLEEP_TIME}
+     */
     private void executePoll(final boolean withSleep) {
         if (running || isStop) {
             return;
@@ -302,10 +304,10 @@ public class SyncTaskManager {
     }
 
     /**
-     * 查询
+     * 查询对应数数据类型的数据
      *
-     * @param dataType
-     * @return
+     * @param dataType 数据类型
+     * @return 同步数据
      */
     private List<SyncJsonData> queryFromData(DataType dataType) {
         return FTDBManager.get().queryDataByDataByTypeLimit(pageSize, dataType);

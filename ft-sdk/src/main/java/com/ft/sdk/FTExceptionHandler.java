@@ -143,7 +143,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
     /**
      * 检测并上传 native dump 文件
      *
-     * @param nativeDumpPath
+     * @param nativeDumpPath 生成 ANR 或 Native Crash tombstone 文件路径
      */
     public void checkAndSyncPreDump(final String nativeDumpPath, RunnerCompleteCallBack callBack) {
         DataUploaderThreadPool.get().execute(new Runnable() {
@@ -176,8 +176,8 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
      * 在消费队列中，进行 Native Crash 的上传
      *
      * @param item
-     * @param state
-     * @param isPreCrash
+     * @param state 应用状态
+     * @param isPreCrash 是否是前一次异常数据，false 代表上传的是当下崩溃的信息
      * @param callBack
      */
     public void uploadNativeCrashBackground(File item, AppState state, boolean isPreCrash, RunnerCompleteCallBack callBack) {

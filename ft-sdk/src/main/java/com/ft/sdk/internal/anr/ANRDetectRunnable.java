@@ -45,6 +45,7 @@ public final class ANRDetectRunnable implements Runnable {
                     runnable.wait(ANR_DETECT_DURATION_MS);
 
                     if (!runnable.isCalled()) {
+                        //如果超时间没有调用则，添加一条 Error 数据
                         FTRUMGlobalManager.get().addError(
                                 StringUtils.getStringFromStackTraceElement(handler.getLooper().getThread().getStackTrace()),
                                 "android_anr", ErrorType.ANR_ERROR, AppState.RUN);
@@ -69,7 +70,14 @@ public final class ANRDetectRunnable implements Runnable {
         isClose = true;
     }
 
+    /**
+     * 检查是否被调用的 Runner 对象
+     */
     public static class CallbackRunnable implements Runnable {
+        /**
+         * 是否被调用
+         * @return
+         */
         public boolean isCalled() {
             return called;
         }
@@ -81,6 +89,9 @@ public final class ANRDetectRunnable implements Runnable {
             called = true;
         }
 
+        /**
+         * 重置
+         */
         public void reset() {
             called = false;
         }

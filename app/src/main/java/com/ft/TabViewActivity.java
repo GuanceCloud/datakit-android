@@ -15,6 +15,9 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
 
+/**
+ *  Tab
+ */
 public class TabViewActivity extends NameTitleActivity {
 
 

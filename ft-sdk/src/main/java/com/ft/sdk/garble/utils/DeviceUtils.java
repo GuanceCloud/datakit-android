@@ -101,33 +101,6 @@ public class DeviceUtils {
     }
 
     /**
-     * 获取应用ID
-     *
-     * @return
-     */
-    public static String getApplicationId(Context context) {
-        return context.getPackageName();
-    }
-
-    /**
-     * 获得程序名称
-     *
-     * @return
-     */
-    public static String getAppName(Context context) {
-        try {
-            PackageManager manager = context.getPackageManager();
-            ApplicationInfo info = manager.getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
-            return info.loadLabel(manager).toString();
-        } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
-
-        }
-        return "";
-    }
-
-
-    /**
      * 获得系统名称
      *
      * @return

@@ -40,6 +40,11 @@ public class StringUtils {
         return sb.toString();
     }
 
+    /**
+     * 获取堆栈字符，自动换行
+     * @param stackTrace
+     * @return
+     */
     public static String getStringFromStackTraceElement(StackTraceElement[] stackTrace) {
 
         StringBuilder stackTraceString = new StringBuilder();

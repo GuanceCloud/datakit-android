@@ -31,7 +31,8 @@ public class ManualRUMActivity extends NameTitleActivity {
         setContentView(R.layout.activity_manual);
         findViewById(R.id.manual_start_action_btn).setOnClickListener(v -> {
             HashMap<String, Object> property = new HashMap<>();
-            property.put("sp_count", 1.0);
+            property.put("sp_count", 1);
+            //开启自动获取，会与这里自定义 action 发生冲突，小于 100 ms 间隔的 action 会被屏蔽
             FTRUMGlobalManager.get().startAction("Action Start", "Button_Click", property);
 
         });

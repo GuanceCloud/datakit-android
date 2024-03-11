@@ -18,6 +18,9 @@ public class FTDBCachePolicy {
      */
     private volatile int count = 0;
 
+    /**
+     * 限制数量
+     */
     private int limitCount = 0;
 
     /**
@@ -67,7 +70,7 @@ public class FTDBCachePolicy {
     /**
      * 操作 Log 日志计数
      *
-     * @param optCount
+     * @param optCount 写入数据数量
      */
     public synchronized void optCount(int optCount) {
         count += optCount;
