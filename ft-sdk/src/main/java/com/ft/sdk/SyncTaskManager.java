@@ -173,9 +173,9 @@ public class SyncTaskManager {
 
                     } catch (Exception e) {
                         if (e instanceof FTNetworkNoAvailableException) {
-                            LogUtils.e(TAG, "Network not available Stop poll");
+                            LogUtils.e(TAG, "Sync Fail:Network not available Stop poll");
                         } else {
-                            LogUtils.e(TAG, Log.getStackTraceString(e));
+                            LogUtils.e(TAG, "Sync Fail:\n" + Log.getStackTraceString(e));
 
                         }
                     } finally {
