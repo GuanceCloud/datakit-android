@@ -97,10 +97,9 @@ public class HighLoadActivity extends NameTitleActivity {
                 for (int i = 0; i < LOG_DATA_COUNT; i++) {
                     try {
                         Thread.sleep(LOG_SLEEP);
-                        Log.e(TAG, Constants.LOG_TEST_DATA_512_BYTE);
                         synchronized (logLock) {
                             LogUtils.d(TAG, "batchLog" + (++logCount));
-
+                            Log.e(TAG, "count:" + logCount + "," + Constants.LOG_TEST_DATA_512_BYTE);
                         }
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
@@ -115,9 +114,9 @@ public class HighLoadActivity extends NameTitleActivity {
                 for (int i = 0; i < LOG_DATA_COUNT; i++) {
                     try {
                         Thread.sleep(LOG_SLEEP);
-                        FTLogger.getInstance().logBackground(Constants.LOG_TEST_DATA_512_BYTE, Status.ERROR);
                         synchronized (logLock) {
                             LogUtils.d(TAG, "batchLog" + (++logCount));
+                            FTLogger.getInstance().logBackground("count:" + logCount + "," + Constants.LOG_TEST_DATA_512_BYTE, Status.ERROR);
                         }
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
@@ -138,10 +137,8 @@ public class HighLoadActivity extends NameTitleActivity {
                 for (int i = 0; i < HTTP_DATA_COUNT; i++) {
                     synchronized (httpLock) {
                         LogUtils.d(TAG, "batchHttpRequest:" + (++httpCount));
-
+                        RequestUtils.requestUrl(BuildConfig.TRACE_URL + httpCount);
                     }
-                    RequestUtils.requestUrl(BuildConfig.TRACE_URL + httpCount);
-
 
                     try {
                         Thread.sleep(HTTP_REQUEST_SLEEP);
