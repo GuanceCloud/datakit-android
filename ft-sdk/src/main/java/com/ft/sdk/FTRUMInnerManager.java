@@ -466,6 +466,8 @@ public class FTRUMInnerManager {
 
     /**
      * 增加 Resource 数量
+     * {@link Constants#FT_MEASUREMENT_RUM_ACTION} 数据增加 {@link Constants#KEY_RUM_ACTION_RESOURCE_COUNT}
+     * {@link Constants#FT_MEASUREMENT_RUM_VIEW} 数据增加 {@link Constants#KEY_RUM_VIEW_ERROR_COUNT}
      *
      * @param viewId   view 唯一 id
      * @param actionId action 唯一 id
@@ -485,6 +487,8 @@ public class FTRUMInnerManager {
 
     /**
      * 增加 Error 数量
+     * {@link Constants#FT_MEASUREMENT_RUM_ACTION} 数据增加 {@link Constants#KEY_RUM_ACTION_ERROR_COUNT}
+     * {@link Constants#FT_MEASUREMENT_RUM_VIEW} 数据增加 {@link Constants#KEY_RUM_VIEW_ERROR_COUNT}
      *
      * @param tags
      */
@@ -934,6 +938,13 @@ public class FTRUMInnerManager {
     }
 
 
+    /**
+     * LongTask 自增
+     * {@link Constants#KEY_RUM_ACTION_LONG_TASK_COUNT}
+     * {@link Constants#KEY_RUM_VIEW_LONG_TASK_COUNT}
+     *
+     * @param tags
+     */
     private void increaseLongTask(JSONObject tags) {
         final String actionId = tags.optString(Constants.KEY_RUM_ACTION_ID);
         final String viewId = tags.optString(Constants.KEY_RUM_VIEW_ID);
@@ -948,6 +959,12 @@ public class FTRUMInnerManager {
         });
     }
 
+    /**
+     * action 数量自增
+     * {@link Constants#KEY_RUM_VIEW_ACTION_COUNT}
+     *
+     * @param viewId
+     */
     private void increaseAction(final String viewId) {
         EventConsumerThreadPool.get().execute(new Runnable() {
             @Override
