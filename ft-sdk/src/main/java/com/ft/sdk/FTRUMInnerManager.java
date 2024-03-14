@@ -96,6 +96,9 @@ public class FTRUMInnerManager {
     private ActiveActionBean activeAction;
 
 
+    /**
+     * 记录 activity 的创建时，消耗的时间
+     */
     private final ConcurrentHashMap<String, Long> preActivityDuration = new ConcurrentHashMap<>();
 
     /**
@@ -105,8 +108,14 @@ public class FTRUMInnerManager {
 
     /**
      * 最近 Action 时间
+     * <p>
+     * 注意 ：AndroidTest 会调用这个方法 {@link com.ft.test.base.FTBaseTest#setSessionExpire()}
      */
     private long lastActionTime = lastSessionTime;
+
+    /**
+     * 采样率，{@link FTRUMConfig#samplingRate}
+     */
     private float sampleRate = 1f;
 
     String getSessionId() {

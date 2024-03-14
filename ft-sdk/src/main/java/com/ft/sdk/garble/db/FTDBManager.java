@@ -34,7 +34,7 @@ public class FTDBManager extends DBManager {
     public final static String TAG = Constants.LOG_TAG_PREFIX + "DBManager";
 
     /**
-     * 用于 Android Test
+     * 注意 ：AndroidTest 会调用这个方法 {@link com.ft.test.base.FTBaseTest#avoidCleanData()}
      */
     private boolean isAndroidTest = false;
 

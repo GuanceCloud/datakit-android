@@ -62,7 +62,7 @@ public class FTTrackInner {
     void rum(long time, String measurement, final JSONObject tags, JSONObject fields, RunnerCompleteCallBack callBack) {
         String sessionId = tags.optString(Constants.KEY_RUM_SESSION_ID);
         if (FTRUMInnerManager.get().checkSessionWillCollect(sessionId)) {
-            syncDataBackground(DataType.RUM_APP, time, measurement, tags, fields,callBack);
+            syncDataBackground(DataType.RUM_APP, time, measurement, tags, fields, callBack);
         }
     }
 
@@ -77,12 +77,29 @@ public class FTTrackInner {
     void rumWebView(long time, String measurement, final JSONObject tags, JSONObject fields) {
         String sessionId = tags.optString(Constants.KEY_RUM_SESSION_ID);
         if (FTRUMInnerManager.get().checkSessionWillCollect(sessionId)) {
-            syncDataBackground(DataType.RUM_WEBVIEW, time, measurement, tags, fields, null);
+            syncDataBackground(DataType.RUM_WEBVIEW, time, measurement, tags, fields);
         }
     }
 
     /**
      * 同步数据异步写入
+     * <p>
+     * AndroidTest 调用方法  {@link com.ft.test.base.FTBaseTest#invokeSyncData(DataType, String, JSONObject, JSONObject)}
+     *
+     * @param dataType
+     * @param time
+     * @param measurement
+     * @param tags
+     * @param fields
+     */
+    private void syncDataBackground(final DataType dataType, final long time,
+                                    final String measurement, final JSONObject tags, final JSONObject fields) {
+        syncDataBackground(dataType, time, measurement, tags, fields, null);
+    }
+
+    /**
+     * 同步数据异步写入
+     *
      * @param dataType
      * @param time
      * @param measurement

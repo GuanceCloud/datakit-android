@@ -52,7 +52,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
     private static FTExceptionHandler instance;
     private final Thread.UncaughtExceptionHandler mDefaultExceptionHandler;
     /**
-     * 用于测试用例
+     * 注意 ：AndroidTest 会调用这个方法 {@link com.ft.test.base.FTBaseTest#avoidCrash()}
      */
     private boolean isAndroidTest = false;
 
@@ -176,7 +176,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
      * 在消费队列中，进行 Native Crash 的上传
      *
      * @param item
-     * @param state 应用状态
+     * @param state      应用状态
      * @param isPreCrash 是否是前一次异常数据，false 代表上传的是当下崩溃的信息
      * @param callBack
      */
