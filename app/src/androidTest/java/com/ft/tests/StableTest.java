@@ -200,6 +200,7 @@ public class StableTest extends BaseTest {
         // 循环启动应用程序
         // 启动Activity
         ActivityScenario scenario = ActivityScenario.launch(DebugMainActivity.class);
+        Thread.sleep(300);
 
         highLoadData(1);
         // 等待一段时间，可以根据实际情况调整

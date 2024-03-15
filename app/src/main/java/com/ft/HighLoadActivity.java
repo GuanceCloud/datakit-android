@@ -10,10 +10,8 @@ import androidx.annotation.Nullable;
 import com.ft.sdk.FTLogger;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.threadpool.ThreadPoolHandler;
 import com.ft.utils.RequestUtils;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * 高速写入数据
@@ -59,8 +57,6 @@ public class HighLoadActivity extends NameTitleActivity {
      */
     private int httpCount = 0;
 
-    final ExecutorService executor = Executors.newFixedThreadPool(4);
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,7 +93,7 @@ public class HighLoadActivity extends NameTitleActivity {
      */
     private void batchLog() {
 
-        executor.execute(new Runnable() {
+        ThreadPoolHandler.get().getExecutor().execute(new Runnable() {
             @Override
             public void run() {
                 for (int i = 0; i < LOG_DATA_COUNT; i++) {
@@ -108,13 +104,14 @@ public class HighLoadActivity extends NameTitleActivity {
                             Log.e(TAG, "count:" + logCount + "," + Constants.LOG_TEST_DATA_512_BYTE);
                         }
                     } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
+                        e.printStackTrace();
+                        break;
                     }
                 }
             }
         });
 
-        executor.execute(new Runnable() {
+        ThreadPoolHandler.get().getExecutor().execute(new Runnable() {
             @Override
             public void run() {
                 for (int i = 0; i < LOG_DATA_COUNT; i++) {
@@ -125,7 +122,9 @@ public class HighLoadActivity extends NameTitleActivity {
                             FTLogger.getInstance().logBackground("count:" + logCount + "," + Constants.LOG_TEST_DATA_512_BYTE, Status.ERROR);
                         }
                     } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
+                        e.printStackTrace();
+                        break;
+
                     }
                 }
             }
@@ -136,7 +135,7 @@ public class HighLoadActivity extends NameTitleActivity {
      * 批量 http 请求 {@link #LOG_DATA_COUNT}
      */
     private void batchHttpRequest() {
-        executor.execute(new Runnable() {
+        ThreadPoolHandler.get().getExecutor().execute(new Runnable() {
             @Override
             public void run() {
                 for (int i = 0; i < HTTP_DATA_COUNT; i++) {
@@ -148,7 +147,8 @@ public class HighLoadActivity extends NameTitleActivity {
                     try {
                         Thread.sleep(HTTP_REQUEST_SLEEP);
                     } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
+                        e.printStackTrace();
+                        break;
                     }
                 }
             }
