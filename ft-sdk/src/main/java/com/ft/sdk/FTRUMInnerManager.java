@@ -421,7 +421,7 @@ public class FTRUMInnerManager {
      * view 结束
      */
     void stopView() {
-        stopView(null);
+        stopView(null, null);
     }
 
     /**
@@ -429,7 +429,7 @@ public class FTRUMInnerManager {
      *
      * @param property 附加属性参数
      */
-    void stopView(HashMap<String, Object> property) {
+    void stopView(HashMap<String, Object> property, RunnerCompleteCallBack callBack) {
         if (activeView == null) return;
         checkActionClose();
         if (property != null) {
@@ -438,7 +438,7 @@ public class FTRUMInnerManager {
         FTMonitorManager.get().attachMonitorData(activeView);
         FTMonitorManager.get().removeMonitor(activeView.getId());
         activeView.close();
-        closeView(activeView);
+        closeView(activeView, callBack);
     }
 
     /**
@@ -563,7 +563,7 @@ public class FTRUMInnerManager {
      * @param errorType 错误类型
      * @param state     程序运行状态
      * @param dateline  发生时间，纳秒
-     * @param callBack
+     * @param callBack  线程池调用结束回调
      */
     public void addError(String log, String message, long dateline, String errorType,
                          AppState state, HashMap<String, Object> property, RunnerCompleteCallBack callBack) {
@@ -617,7 +617,8 @@ public class FTRUMInnerManager {
                             public void onComplete() {
                                 increaseError(tags);
                                 if (callBack != null) {
-                                    callBack.onComplete();
+                                    // Java Crash，Native Crash 需要记录当下状态的崩溃
+                                    stopView(null, callBack);
                                 }
                             }
                         });
@@ -986,6 +987,17 @@ public class FTRUMInnerManager {
     }
 
     private void closeView(ActiveViewBean activeViewBean) {
+        closeView(activeViewBean, null);
+    }
+
+    /**
+     * 关闭 View，计算 {@link ViewBean#timeSpent},{@link ViewBean#isClose} 为 true，并更新
+     * {@link FTSQL#RUM_DATA_UPDATE_TIME}
+     *
+     * @param activeViewBean
+     * @param callBack
+     */
+    private void closeView(ActiveViewBean activeViewBean, RunnerCompleteCallBack callBack) {
         final ViewBean viewBean = activeViewBean.convertToViewBean();
         final String viewId = viewBean.getId();
         final long timeSpent = viewBean.getTimeSpent();
@@ -994,11 +1006,20 @@ public class FTRUMInnerManager {
             public void run() {
                 FTDBManager.get().closeView(viewId, timeSpent, viewBean.getAttrJsonString());
                 FTDBManager.get().updateViewUpdateTime(viewId, System.currentTimeMillis());
+                if (callBack != null) {
+                    callBack.onComplete();
+                }
             }
         });
         generateRumData();
     }
 
+    /**
+     * 关闭 Action，计算 {@link ActionBean#duration},{@link ActionBean#isClose} 为 true
+     *
+     * @param bean
+     * @param force 强制关闭
+     */
     private void closeAction(ActiveActionBean bean, final boolean force) {
         final String actionId = bean.getId();
         final long duration = bean.getDuration();

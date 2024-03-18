@@ -168,7 +168,7 @@ public class FTRUMGlobalManager {
      */
     public void stopView(HashMap<String, Object> property) {
         if (innerManager != null) {
-            innerManager.stopView(property);
+            innerManager.stopView(property, null);
         }
     }
 
