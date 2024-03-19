@@ -3,6 +3,7 @@ package com.ft.sdk.garble.db;
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -92,7 +93,14 @@ public class FTDBManager extends DBManager {
                 contentValues.put(FTSQL.RUM_COLUMN_VIEW_LOAD_TIME, data.getLoadTime());
                 contentValues.put(FTSQL.RUM_COLUMN_SESSION_ID, data.getSessionId());
                 contentValues.put(FTSQL.RUM_COLUMN_EXTRA_ATTR, data.getAttrJsonString());
-                db.insert(FTSQL.FT_TABLE_VIEW, null, contentValues);
+
+                try {
+                    db.insertOrThrow(FTSQL.FT_TABLE_VIEW, null, contentValues);
+                } catch (SQLException e) {
+                    LogUtils.e(TAG, "initSumView id:" + data.getId() + "db insert ignore, " +
+                            "reason:" + e.getMessage());
+
+                }
 
             }
         });
@@ -106,7 +114,7 @@ public class FTDBManager extends DBManager {
      * @return
      */
     public void initSumAction(final ActionBean data) {
-        LogUtils.d(TAG, "initSumAction id:" + data.getId() + ",ViewName:" + data.getViewName()
+        LogUtils.e(TAG, "initSumAction id:" + data.getId() + ",ViewName:" + data.getViewName()
                 + ",actionName:" + data.getActionName());
 
         getDB(true, new DataBaseCallBack() {
@@ -128,7 +136,12 @@ public class FTDBManager extends DBManager {
                 contentValues.put(FTSQL.RUM_COLUMN_ACTION_NAME, data.getActionName());
                 contentValues.put(FTSQL.RUM_COLUMN_ACTION_TYPE, data.getActionType());
                 contentValues.put(FTSQL.RUM_COLUMN_EXTRA_ATTR, data.getAttrJsonString());
-                db.insert(FTSQL.FT_TABLE_ACTION, null, contentValues);
+                try {
+                    db.insertOrThrow(FTSQL.FT_TABLE_ACTION, null, contentValues);
+                } catch (SQLException e) {
+                    LogUtils.d(TAG, "initSumAction id:" + data.getId() + "db insert ignore, " +
+                            "reason:" + e.getMessage());
+                }
             }
         });
     }
