@@ -14,7 +14,6 @@ import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.manager.AsyncCallback;
-import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.Utils;
@@ -45,7 +44,7 @@ public class FTBaseTest {
     }
 
     /**
-     * 停止数据同步，{@link SyncTaskManager#running} 变量来实现
+     * 停止数据同步，{@link SyncTaskManager#running} = true 变量来实现
      *
      * @throws Exception
      */
@@ -55,7 +54,7 @@ public class FTBaseTest {
     }
 
     /**
-     * 恢复数据同步
+     * 恢复数据同步,{@link SyncTaskManager#running} = false 变量来实现
      *
      * @throws Exception
      */
@@ -65,6 +64,8 @@ public class FTBaseTest {
 
     /**
      * 立即执行数据同步
+     * <p>
+     * {@link SyncTaskManager#executePoll()}
      *
      * @throws Exception
      */
@@ -118,6 +119,8 @@ public class FTBaseTest {
 
     /**
      * 立即生成 RUM 相关数据
+     * <p>
+     * {@link FTRUMInnerManager#generateRumData()}
      *
      * @throws Exception
      */
@@ -129,11 +132,13 @@ public class FTBaseTest {
 
     /**
      * 等待线程池队列执行结束，目的是让线程池函数在测试用例中串行，等待操作结束
+     * <p>
+     * {@link EventConsumerThreadPool}
      *
      * @throws InterruptedException
      */
     protected void waitEventConsumeInThreadPool() throws InterruptedException {
-        CountDownLatch countDownLatch = new CountDownLatch(1);
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
         EventConsumerThreadPool.get().execute(() -> {
             countDownLatch.countDown();
         });
@@ -154,6 +159,8 @@ public class FTBaseTest {
 
     /**
      * 使 session 立即过期，以缩短测试用例在测试过程中的耗时等待
+     * <p>
+     * {@link FTRUMInnerManager#lastActionTime}
      *
      * @throws IllegalAccessException
      */
@@ -167,6 +174,8 @@ public class FTBaseTest {
 
     /**
      * 上传数据测试
+     * <p>
+     * {@link SyncTaskManager#requestNet(DataType, String, AsyncCallback)}
      *
      * @param dataType
      */

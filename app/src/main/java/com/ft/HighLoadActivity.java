@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import com.ft.sdk.FTLogger;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.threadpool.ThreadPoolHandler;
 import com.ft.utils.RequestUtils;
 
 /**
@@ -91,66 +92,67 @@ public class HighLoadActivity extends NameTitleActivity {
      * 自定义日志, {@link #LOG_DATA_COUNT}
      */
     private void batchLog() {
-        new Thread() {
+
+        ThreadPoolHandler.get().getExecutor().execute(new Runnable() {
             @Override
             public void run() {
                 for (int i = 0; i < LOG_DATA_COUNT; i++) {
                     try {
                         Thread.sleep(LOG_SLEEP);
-                        Log.e(TAG, Constants.LOG_TEST_DATA_512_BYTE);
                         synchronized (logLock) {
-                            LogUtils.d(TAG, "batchLog" + (++logCount));
-
+                            LogUtils.d(TAG, Thread.currentThread().getId() + ",batchLog" + (++logCount));
+                            Log.e(TAG, "count:" + logCount + "," + Constants.LOG_TEST_DATA_512_BYTE);
                         }
                     } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
+                        e.printStackTrace();
+                        break;
                     }
                 }
             }
-        }.start();
+        });
 
-        new Thread() {
+        ThreadPoolHandler.get().getExecutor().execute(new Runnable() {
             @Override
             public void run() {
                 for (int i = 0; i < LOG_DATA_COUNT; i++) {
                     try {
                         Thread.sleep(LOG_SLEEP);
-                        FTLogger.getInstance().logBackground(Constants.LOG_TEST_DATA_512_BYTE, Status.ERROR);
                         synchronized (logLock) {
-                            LogUtils.d(TAG, "batchLog" + (++logCount));
+                            LogUtils.d(TAG, Thread.currentThread().getId() + ",batchLog" + (++logCount));
+                            FTLogger.getInstance().logBackground("count:" + logCount + "," + Constants.LOG_TEST_DATA_512_BYTE, Status.ERROR);
                         }
                     } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
+                        e.printStackTrace();
+                        break;
+
                     }
                 }
             }
-        }.start();
-
+        });
     }
 
     /**
      * 批量 http 请求 {@link #LOG_DATA_COUNT}
      */
     private void batchHttpRequest() {
-        new Thread() {
+        ThreadPoolHandler.get().getExecutor().execute(new Runnable() {
             @Override
             public void run() {
                 for (int i = 0; i < HTTP_DATA_COUNT; i++) {
                     synchronized (httpLock) {
                         LogUtils.d(TAG, "batchHttpRequest:" + (++httpCount));
-
+                        RequestUtils.requestUrl(BuildConfig.TRACE_URL + httpCount);
                     }
-                    RequestUtils.requestUrl(BuildConfig.TRACE_URL + httpCount);
-
 
                     try {
                         Thread.sleep(HTTP_REQUEST_SLEEP);
                     } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
+                        e.printStackTrace();
+                        break;
                     }
                 }
             }
-        }.start();
+        });
 
     }
 }

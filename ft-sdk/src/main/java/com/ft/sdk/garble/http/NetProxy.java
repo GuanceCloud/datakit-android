@@ -55,7 +55,7 @@ public class NetProxy {
         }
         if (!httpBuilder.getUrl().startsWith("http://") && !httpBuilder.getUrl().startsWith("https://")) {
             //请求地址为空是提示错误
-            return new FTResponseData(NetCodeStatus.INVALID_PARAMS_EXCEPTION_CODE, "请求地址错误");
+            return new FTResponseData(NetCodeStatus.INVALID_PARAMS_EXCEPTION_CODE, "请求地址错误，检查地址 http(s) scheme");
         }
         if (httpBuilder.isUseDefaultHead()) {
             //设置特有的请求头

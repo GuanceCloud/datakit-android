@@ -1,10 +1,6 @@
 package com.ft.sdk.garble.threadpool;
 
 /**
- * BY huangDianHua
- * DATE:2019-11-29 18:57
- * Description:
- * <p>
  * 负责缓存日志数据的消费
  */
 public class LogConsumerThreadPool extends BaseThreadPool {

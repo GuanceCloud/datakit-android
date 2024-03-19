@@ -40,11 +40,12 @@ public class FTHttpConfigManager {
     /**
      * http 发送连接时间
      */
-    private int sendOutTime = 10000;
+    private int sendOutTime = 30000;
+
     /**
      * http 请求返回读取
      */
-    private int readOutTime = 10000;
+    private int readOutTime = 40000;//大于 Dataway Datakit 30秒时间
 
     private FTHttpConfigManager() {
 
@@ -67,6 +68,7 @@ public class FTHttpConfigManager {
             return;
         }
         userAgent = USER_AGENT;
+        sendOutTime = Math.max(sendOutTime, ftsdkConfig.getPageSize() * 1000);
         datakitUrl = ftsdkConfig.getDatakitUrl();
         datawayUrl = ftsdkConfig.getDatawayUrl();
         clientToken = ftsdkConfig.getClientToken();

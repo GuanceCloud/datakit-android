@@ -129,7 +129,9 @@ public class SyncTaskManager {
     private final static DataType[] SYNC_MAP = DataType.values();
 
     /**
-     * For AndroidTest
+     * 注意 ：AndroidTest 会调用这个方法
+     * {@link com.ft.test.base.FTBaseTest#stopSyncTask() }
+     * {@link com.ft.test.base.FTBaseTest#resumeSyncTask() }
      *
      * @param running
      */
@@ -153,7 +155,7 @@ public class SyncTaskManager {
     /**
      * 执行数据同步
      * <p>
-     * 注意 ：AndroidTest 会调用这个方法
+     * 注意 ：AndroidTest 会调用这个方法 {@link com.ft.test.base.FTBaseTest#executeSyncTask()}
      */
     void executePoll() {
         executePoll(false);
@@ -350,12 +352,14 @@ public class SyncTaskManager {
 
     /**
      * 上传数据
+     * <p>
+     * 注意 ：AndroidTest 会调用这个方法 {@link com.ft.test.base.FTBaseTest#uploadData(DataType)}
      *
      * @param dataType     数据类型
      * @param body         数据行协议结果
      * @param syncCallback 异步对象
      */
-    public synchronized void requestNet(DataType dataType, String body, final AsyncCallback syncCallback) throws FTNetworkNoAvailableException {
+    private synchronized void requestNet(DataType dataType, String body, final AsyncCallback syncCallback) throws FTNetworkNoAvailableException {
         String model;
         switch (dataType) {
             case TRACE:

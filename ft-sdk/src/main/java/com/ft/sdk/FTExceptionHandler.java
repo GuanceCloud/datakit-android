@@ -52,16 +52,19 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
     private static FTExceptionHandler instance;
     private final Thread.UncaughtExceptionHandler mDefaultExceptionHandler;
     /**
-     * 用于测试用例
+     * 注意 ：AndroidTest 会调用这个方法 {@link com.ft.test.base.FTBaseTest#avoidCrash()}
      */
     private boolean isAndroidTest = false;
 
     /**
      * 上传崩溃日志，根据 {@link FTRUMConfig#isRumEnable(),FTRUMConfig#isEnableTrackAppCrash()} 进行判断
+     * <p>
+     * 这里线程调用的路径是 FTEventCsr -> FTDataUp -> FTEventCsr
      *
-     * @param crash   崩溃日志简述
-     * @param message 崩溃堆栈
-     * @param state   app 运行状态 {@link  AppState}
+     * @param crash    崩溃日志简述
+     * @param message  崩溃堆栈
+     * @param state    app 运行状态 {@link  AppState}
+     * @param callBack
      */
     public void uploadCrashLog(String crash, String message, AppState state, RunnerCompleteCallBack callBack) {
         if (config.isRumEnable() &&
@@ -174,9 +177,12 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     /**
      * 在消费队列中，进行 Native Crash 的上传
+     * <p>
+     * 这里会有 FTEventCsr 内线程嵌套，但是不太可能存在线程阻塞，这里是为了加载崩溃日志内容和写入 Error 数据，
+     * 在 EventConsumerThreadPool 顺序执行. 线程执行路径为  FTEventCsr-> FTEventCsr -> FTDataUp -> FTEventCsr
      *
-     * @param item
-     * @param state 应用状态
+     * @param item       crash 日志内容文件
+     * @param state      应用状态
      * @param isPreCrash 是否是前一次异常数据，false 代表上传的是当下崩溃的信息
      * @param callBack
      */

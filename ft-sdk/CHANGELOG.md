@@ -8,6 +8,11 @@
 1. 更改数据 MMAP 落盘方式
 
 ---
+# agent 1.4.3-beta01
+1. 内部日志写文件方法 try-with-resources 保护
+2. agent 1.4.3-alpha01，agent 1.4.3-alpha02，agent 1.4.3-alpha03
+
+---
 # agent 1.4.3-alpha03
 1. 传输性能优化
 2. aar 添加 javadoc 和 source jar
@@ -27,7 +32,6 @@
 1. 新增同步请求间歇时长设置
 
 ---
-
 # agent 1.4.2-alpha03
 1. 新增内部日志转文件方法
 

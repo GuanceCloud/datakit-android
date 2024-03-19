@@ -32,6 +32,8 @@ import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.db.FTDBConfig;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.test.base.Repeat;
+import com.ft.test.base.RepeatRule;
 
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -51,6 +53,9 @@ public class StableTest extends BaseTest {
     @Rule
     public ActivityScenarioRule<DebugMainActivity> rule = new ActivityScenarioRule<>(DebugMainActivity.class);
 
+    @Rule
+    public RepeatRule repeatRule = new RepeatRule();
+
     private static File databaseFile;
 
     private long maxDBSize = 0;
@@ -67,7 +72,7 @@ public class StableTest extends BaseTest {
 
         databaseFile = application.getDatabasePath(FTDBConfig.DATABASE_NAME);
 
-        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAKIT_URL)
+        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAWAY_URL,BuildConfig.DATAWAY_TOKEN)
                 .setDebug(true)//设置是否是 debug
                 .setAutoSync(true)
                 .setCustomSyncPageSize(100)
@@ -190,26 +195,20 @@ public class StableTest extends BaseTest {
      * @throws Exception
      */
     @Test
+    @Repeat(2)
     public void launchAppMultipleTimes() throws Exception {
-        // 定义启动次数
-        int numLaunches = 2;
-
         // 循环启动应用程序
-        for (int i = 0; i < numLaunches; i++) {
-            // 启动Activity
-            ActivityScenario scenario = ActivityScenario.launch(DebugMainActivity.class);
+        // 启动Activity
+        ActivityScenario scenario = ActivityScenario.launch(DebugMainActivity.class);
+        Thread.sleep(300);
 
-            highLoadData(1);
-            // 等待一段时间，可以根据实际情况调整
-            Thread.sleep(2000);
-
-            // 结束Activity
-            scenario.close();
-        }
+        highLoadData(1);
+        // 等待一段时间，可以根据实际情况调整
+        Thread.sleep(2000);
+        scenario.close();
     }
 
     /**
-     *
      * 保留不删除数据
      */
     @Override

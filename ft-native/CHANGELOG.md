@@ -1,3 +1,7 @@
+# native 1.1.0-beta01
+1.native 1.1.0-alpha01
+
+----------------------
 # native 1.1.0-alpha01
 1.添加 ANR 和 Native Crash 回调
 

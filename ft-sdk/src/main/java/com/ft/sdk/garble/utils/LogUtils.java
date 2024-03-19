@@ -100,7 +100,7 @@ public class LogUtils {
      * 注意:为避免与
      * <p>
      * {@link FTLoggerConfig#setPrintCustomLogToConsole(boolean)}  产生循环调用的情况
-     * innerLogHandler 设置后，这两数值自动为 false
+     * innerLogHandler 设置后，这个值自动为 false
      * <p>
      * {@link FTLogger}，如果使用 FTLogger 避免使用 {@link  com.ft.sdk.garble.bean.Status#OK}
      *
@@ -114,7 +114,7 @@ public class LogUtils {
      * 将内部日志转化成文件
      * <p>
      * {@link FTLoggerConfig#setPrintCustomLogToConsole(boolean)}  产生循环调用的情况
-     * innerLogHandler 设置后，这两数值自动为 false
+     * innerLogHandler 设置后，这个值自动为 false
      * <p>
      * {@link FTLogger}，如果使用 FTLogger 避免使用 {@link  com.ft.sdk.garble.bean.Status#OK}
      *
