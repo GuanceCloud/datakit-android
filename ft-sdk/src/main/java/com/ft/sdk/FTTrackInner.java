@@ -270,6 +270,8 @@ public class FTTrackInner {
             if (!silence) {
                 SyncTaskManager.get().executeSyncPoll();
             }
+        } else {
+            LogUtils.e(TAG, "reach log limit, drop log count:" + length);
         }
     }
 
