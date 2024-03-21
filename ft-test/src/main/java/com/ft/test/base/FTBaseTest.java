@@ -37,6 +37,7 @@ public class FTBaseTest {
     protected static final String CUSTOM_VALUE = "custom_value";
     protected static final String TEST_FAKE_RUM_ID = "rumId";
     protected static final String TEST_FAKE_URL = "http://www.test.url";
+    protected static final String TEST_FAKE_CLIENT_TOKEN = "fake_client_token";
 
 
     protected Context getContext() {
@@ -191,6 +192,17 @@ public class FTBaseTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     *  使用 Whitebox 检验私有变量
+     * @param target 访问已创建实例
+     * @param fieldName 私有变量名称
+     * @param expect 预期值
+     * @return  fieldName 是否与 expect 相同
+     */
+    protected boolean checkInnerFieldValue(Object target, String fieldName, Object expect) {
+        return Whitebox.getInternalState(target, fieldName).equals(expect);
     }
 
     /**
