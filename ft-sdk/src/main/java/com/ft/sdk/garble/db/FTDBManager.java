@@ -114,7 +114,7 @@ public class FTDBManager extends DBManager {
      * @return
      */
     public void initSumAction(final ActionBean data) {
-        LogUtils.e(TAG, "initSumAction id:" + data.getId() + ",ViewName:" + data.getViewName()
+        LogUtils.d(TAG, "initSumAction id:" + data.getId() + ",ViewName:" + data.getViewName()
                 + ",actionName:" + data.getActionName());
 
         getDB(true, new DataBaseCallBack() {
@@ -616,7 +616,7 @@ public class FTDBManager extends DBManager {
             @Override
             public void run(SQLiteDatabase db) {
                 try {
-                    db.execSQL("DELETE FROM ft_operation_record where _id in (SELECT _id from ft_operation_record where " + FTSQL.RECORD_COLUMN_DATA_TYPE + "='" + type.getValue() + "' ORDER by tm ASC LIMIT " + limit + ")");
+                    db.execSQL("DELETE FROM " + FTSQL.FT_SYNC_TABLE_NAME + " where _id in (SELECT _id from " + FTSQL.FT_SYNC_TABLE_NAME + " where " + FTSQL.RECORD_COLUMN_DATA_TYPE + "='" + type.getValue() + "' ORDER by tm ASC LIMIT " + limit + ")");
                 } catch (Exception e) {
                     LogUtils.e(TAG, Log.getStackTraceString(e));
 
