@@ -261,9 +261,9 @@ public class FTTrackInner {
         int policyStatus = FTDBCachePolicy.get().optLogCachePolicy(length);
         if (policyStatus >= 0) {//执行同步策略
             if (policyStatus > 0) {
-                for (int i = 0; i < policyStatus && i < length; i++) {
-                    recordDataList.remove(0);
-                }
+                int dropCount = Math.min(policyStatus, length);
+                recordDataList.subList(0, dropCount).clear();
+                LogUtils.e(TAG, "reach log limit, drop log count:" + dropCount);
             }
             boolean result = FTDBManager.get().insertFtOptList(recordDataList);
             LogUtils.d(TAG, "judgeLogCachePolicy:insert-result=" + result);
