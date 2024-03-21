@@ -1,3 +1,10 @@
+# agent 1.4.3-beta02
+1.崩溃时尝试 stopView 补充页面停留时间
+2.数据同步请求超时时间，响应时间延长
+3.内部日志输出优化
+4.修正日志丢弃旧数据策略，表名错误的问题
+
+---
 # agent 1.4.3-beta01
 1. 内部日志写文件方法 try-with-resources 保护
 2. agent 1.4.3-alpha01，agent 1.4.3-alpha02，agent 1.4.3-alpha03
