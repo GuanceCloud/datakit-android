@@ -7,6 +7,10 @@
 3. 支持发送 Log 数据，控制台自动写入，需要使用 ft-plugin
 4. 链路 http header propagation，仅支持 Okhttp，并需要使用 ft-plugin
 5. 支持数据同步参数配置，请求条目数据，同步间歇时间，以及日志缓存条目数。
+6. 支持 SDK 内部日志转化为文件
+
+# agent 1.4.3-beta03
+1. Action,View 数据生成方式优化
 
 ---
 # agent 1.4.3-beta02
