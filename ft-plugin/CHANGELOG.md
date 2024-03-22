@@ -1,3 +1,13 @@
+# plugin 1.3.0
+1.支持 datakit source map 自动上传，支持 native symbol 的上传
+2.支持捕获 Application 冷热启动，Activity 页面跳转，View、ListView、Dialog、Tab 点击事件。
+3.支持 Webview Js 监听方法的写入
+4.支持 Okhttp Trace 和 Resource 数据自动写入
+5.支持 Gradle 8.0,AGP 8.0 
+6.支持 IgnoreAOP 忽略标记
+7.支持兼容阿里云热修复框架
+
+---
 # plugin 1.3.0-beta01
 1.plugin 1.2.2-alpha02
 
