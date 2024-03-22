@@ -1,3 +1,14 @@
+# agent 1.4.3
+1. 支持 Dataway 与 Datakit 的地址上传
+2. 支持发送 Action，View，Resource，LongTask，Error 类型的 RUM 数据。
+   * View，Action 页面跳转，控件点击操作自动采集，需要使用 ft-plugin
+   * Resource，自动采集，仅支持 Okhttp，并需要使用 ft-plugin
+   * Error 中的 Native Crash 和 ANR 需要使用 ft-native
+3. 支持发送 Log 数据，控制台自动写入，需要使用 ft-plugin
+4. 链路 http header propagation，仅支持 Okhttp，并需要使用 ft-plugin
+5. 支持数据同步参数配置，请求条目数据，同步间歇时间，以及日志缓存条目数。
+
+---
 # agent 1.4.3-beta02
 1.崩溃时尝试 stopView 补充页面停留时间
 2.数据同步请求超时时间，响应时间延长
