@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.UserData;
+import com.ft.sdk.garble.manager.SingletonGson;
 import com.ft.sdk.garble.threadpool.RunnerCompleteCallBack;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
@@ -19,7 +20,6 @@ import com.ft.sdk.garble.utils.Utils;
 import com.ft.sdk.garble.utils.VersionUtils;
 import com.ft.sdk.nativelib.CrashCallback;
 import com.ft.sdk.nativelib.NativeEngineInit;
-import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
@@ -67,6 +67,7 @@ public class FTRUMConfigManager {
         FTUIBlockManager.get().start(config);
         FTANRDetector.get().init(config);
         initRUMGlobalContext(config);
+        FTTrackInner.getInstance().initRUMConfig(config);
         if (config.isRumEnable() && config.isEnableTraceUserAction()) {
             //应对 flutter reactNative application 生命周期启动早于条件设置
             FTAppStartCounter.get().checkToReUpload();
@@ -240,15 +241,13 @@ public class FTRUMConfigManager {
      */
     void bindUserData(String id, String name, String email, HashMap<String, String> exts) {
         LogUtils.d(TAG, "bindUserData:id=" + id + ",name=" + name + ",email=" + email + ",exts=" + exts);
-        //初始化SessionId
-        initRandomUserId();
         //绑定用户信息
         synchronized (mLock) {
             SharedPreferences sp = Utils.getSharedPreferences(FTApplication.getApplication());
             sp.edit().putString(Constants.FT_USER_USER_ID, id).apply();
             sp.edit().putString(Constants.FT_USER_USER_NAME, name).apply();
             sp.edit().putString(Constants.FT_USER_USER_EMAIL, email).apply();
-            sp.edit().putString(Constants.FT_USER_USER_EXT, exts != null ? new Gson().toJson(exts) : null).apply();
+            sp.edit().putString(Constants.FT_USER_USER_EXT, exts != null ? SingletonGson.getInstance().toJson(exts) : null).apply();
             UserData data = new UserData();
             data.setId(id);
             data.setName(name);
@@ -281,7 +280,10 @@ public class FTRUMConfigManager {
     void initRUMGlobalContext(FTRUMConfig config) {
         Context context = FTApplication.getApplication();
         HashMap<String, Object> rumGlobalContext = config.getGlobalContext();
-        rumGlobalContext.put(Constants.KEY_RUM_CUSTOM_KEYS, new Gson().toJson(rumGlobalContext.keySet()));
+        if (!rumGlobalContext.isEmpty()) {
+            rumGlobalContext.put(Constants.KEY_RUM_CUSTOM_KEYS, SingletonGson.getInstance()
+                    .toJson(rumGlobalContext.keySet()));
+        }
         rumGlobalContext.put(Constants.KEY_RUM_APP_ID, config.getRumAppId());
         rumGlobalContext.put(Constants.KEY_RUM_SESSION_TYPE, "user");
         rumGlobalContext.put(Constants.KEY_DEVICE_OS, DeviceUtils.getOSName());

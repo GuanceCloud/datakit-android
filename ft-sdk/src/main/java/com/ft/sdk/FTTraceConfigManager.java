@@ -33,6 +33,7 @@ public class FTTraceConfigManager {
             }
         }
         this.config = config;
+        FTTrackInner.getInstance().initTraceConfig(config);
     }
 
     /**

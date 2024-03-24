@@ -37,6 +37,8 @@ public class FTTrackInner {
     private final static String TAG = Constants.LOG_TAG_PREFIX + "FTTrackInner";
     private static FTTrackInner instance;
 
+    private final SyncDataHelper dataHelper = new SyncDataHelper();
+
     private FTTrackInner() {
     }
 
@@ -49,6 +51,38 @@ public class FTTrackInner {
             }
         }
         return instance;
+    }
+
+    /**
+     * 初始化基础 SDK 配置
+     * @param config
+     */
+    void initBaseConfig(FTSDKConfig config) {
+        dataHelper.initBaseConfig(config);
+    }
+
+    /**
+     * 初始化 SDK Log 配置
+     * @param config
+     */
+    void initLogConfig(FTLoggerConfig config) {
+        dataHelper.initLogConfig(config);
+    }
+
+    /**
+     * 初始化 SDK Trace 配置
+     * @param config
+     */
+    void initTraceConfig(FTTraceConfig config) {
+        dataHelper.initTraceConfig(config);
+    }
+
+    /**
+     * 初始化 SDK RUM 配置
+     * @param config
+     */
+    void initRUMConfig(FTRUMConfig config) {
+        dataHelper.initRUMConfig(config);
     }
 
     /**
@@ -149,8 +183,7 @@ public class FTTrackInner {
                                         t.getFields(), t.getTimeNano()));
                         recordDataList.add(recordData);
 
-                        SyncDataHelper syncDataManager = new SyncDataHelper();
-                        String body = syncDataManager.getBodyContent(DataType.LOG, recordDataList);
+                        String body = dataHelper.getBodyContent(DataType.LOG, recordDataList);
                         String model = Constants.URL_MODEL_LOG;
                         String content_type = "text/plain";
                         FTResponseData result = HttpBuilder.Builder()
@@ -273,6 +306,10 @@ public class FTTrackInner {
         } else {
             LogUtils.e(TAG, "reach log limit, drop log count:" + length);
         }
+    }
+
+    SyncDataHelper getCurrentDataHelper() {
+        return dataHelper;
     }
 
 

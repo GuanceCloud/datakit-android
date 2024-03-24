@@ -240,8 +240,8 @@ public class SyncTaskManager {
 
             LogUtils.d(TAG, "Sync Data Count:" + requestDataList.size());
 
-            SyncDataHelper syncData = new SyncDataHelper();
-            String body = syncData.getBodyContent(dataType, requestDataList);
+            SyncDataHelper helper = FTTrackInner.getInstance().getCurrentDataHelper();
+            String body = helper.getBodyContent(dataType, requestDataList);
             LogUtils.d(TAG, body);
             requestNet(dataType, body, new AsyncCallback() {
                 @Override
