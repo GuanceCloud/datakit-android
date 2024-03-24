@@ -177,7 +177,7 @@ public class ConfigTest extends FTBaseTest {
         Assert.assertTrue(checkInnerFieldValue(SyncTaskManager.get(), "autoSync", true));
 
         FTSdk.install(config.setAutoSync(false));
-        Assert.assertFalse(checkInnerFieldValue(SyncTaskManager.get(), "autoSync", false));
+        Assert.assertTrue(checkInnerFieldValue(SyncTaskManager.get(), "autoSync", false));
     }
 
     /**

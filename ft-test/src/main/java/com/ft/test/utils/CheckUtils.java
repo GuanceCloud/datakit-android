@@ -1,5 +1,6 @@
 package com.ft.test.utils;
 
+import com.ft.sdk.FTTrackInner;
 import com.ft.sdk.SyncDataHelper;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncJsonData;
@@ -7,6 +8,7 @@ import com.ft.sdk.garble.db.FTDBManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.powermock.reflect.Whitebox;
 
 import java.util.List;
 import java.util.Objects;
@@ -27,7 +29,7 @@ public class CheckUtils {
      */
     public static boolean checkValueInLineProtocol(DataType dataType, String[] checkValues) {
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, dataType);
-        SyncDataHelper syncDataManager = new SyncDataHelper();
+        SyncDataHelper syncDataManager = Whitebox.getInternalState(FTTrackInner.getInstance(),"dataHelper");;
         String body = syncDataManager.getBodyContent(dataType, recordDataList);
         boolean result = false;
         for (String item : checkValues) {
@@ -95,7 +97,7 @@ public class CheckUtils {
      */
     public static int getCount(DataType dataType, String[] checkValues, int limit) {
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(limit, dataType);
-        SyncDataHelper syncDataManager = new SyncDataHelper();
+        SyncDataHelper syncDataManager = Whitebox.getInternalState(FTTrackInner.getInstance(),"dataHelper");;
         String body = syncDataManager.getBodyContent(dataType, recordDataList);
         int count = 0;
         for (String item : checkValues) {

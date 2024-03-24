@@ -182,7 +182,7 @@ public class FTBaseTest {
      */
     protected void uploadData(DataType dataType) {
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, dataType);
-        SyncDataHelper syncDataManager = new SyncDataHelper();
+        SyncDataHelper syncDataManager =  Whitebox.getInternalState(FTTrackInner.getInstance(),"dataHelper");
         String body = syncDataManager.getBodyContent(dataType, recordDataList);
         body = body.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION).replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK);
 
