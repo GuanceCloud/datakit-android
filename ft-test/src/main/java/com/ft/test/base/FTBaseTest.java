@@ -177,6 +177,7 @@ public class FTBaseTest {
      * 上传数据测试
      * <p>
      * {@link SyncTaskManager#requestNet(DataType, String, AsyncCallback)}
+     * {@link FTTrackInner#dataHelper}
      *
      * @param dataType
      */

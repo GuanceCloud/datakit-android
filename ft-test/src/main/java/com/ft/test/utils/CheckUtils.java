@@ -89,6 +89,7 @@ public class CheckUtils {
 
     /**
      * 获取数据数量
+     * {@link FTTrackInner#dataHelper}
      *
      * @param dataType
      * @param checkValues 需要检验数据集
