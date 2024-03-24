@@ -247,7 +247,7 @@ public class FTRUMConfigManager {
             sp.edit().putString(Constants.FT_USER_USER_ID, id).apply();
             sp.edit().putString(Constants.FT_USER_USER_NAME, name).apply();
             sp.edit().putString(Constants.FT_USER_USER_EMAIL, email).apply();
-            sp.edit().putString(Constants.FT_USER_USER_EXT, exts != null ? SingletonGson.getInstance().toJson(exts) : null).apply();
+            sp.edit().putString(Constants.FT_USER_USER_EXT, exts != null ? Utils.hashMapObjectToJson(exts) : null).apply();
             UserData data = new UserData();
             data.setId(id);
             data.setName(name);
@@ -281,8 +281,7 @@ public class FTRUMConfigManager {
         Context context = FTApplication.getApplication();
         HashMap<String, Object> rumGlobalContext = config.getGlobalContext();
         if (!rumGlobalContext.isEmpty()) {
-            rumGlobalContext.put(Constants.KEY_RUM_CUSTOM_KEYS, SingletonGson.getInstance()
-                    .toJson(rumGlobalContext.keySet()));
+            rumGlobalContext.put(Constants.KEY_RUM_CUSTOM_KEYS, Utils.setToJsonString(rumGlobalContext.keySet()));
         }
         rumGlobalContext.put(Constants.KEY_RUM_APP_ID, config.getRumAppId());
         rumGlobalContext.put(Constants.KEY_RUM_SESSION_TYPE, "user");

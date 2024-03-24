@@ -17,6 +17,7 @@ import android.util.Base64;
 import android.util.Log;
 
 import com.ft.sdk.FTApplication;
+import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
@@ -48,10 +49,12 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
 import okhttp3.MediaType;
@@ -538,6 +541,58 @@ public class Utils {
             rawData.append("\r\n");
         }
         return rawData.toString();
+    }
+
+
+    /**
+     * 数组转化为 json 字符的方法，替换 Gson 高损耗
+     * @param values
+     * @return
+     */
+    public static String setToJsonString(Set<String> values) {
+        StringBuilder jsonBuilder = new StringBuilder();
+        jsonBuilder.append("[");
+        Iterator<String> iterator = values.iterator();
+        while (iterator.hasNext()) {
+            jsonBuilder.append("\"").append(iterator.next()).append("\"");
+            if (iterator.hasNext()) {
+                jsonBuilder.append(", ");
+            }
+        }
+        jsonBuilder.append("]");
+        return jsonBuilder.toString();
+    }
+
+
+    /**
+     * Hashmap 转化为 json，基础类型自行转化，其他类型交给 gson，可以降低损耗
+     * @param map
+     * @return
+     */
+
+    public static <T> String hashMapObjectToJson(HashMap<String, T> map) {
+        StringBuilder jsonBuilder = new StringBuilder();
+        jsonBuilder.append("{");
+        for (String key : map.keySet()) {
+            jsonBuilder.append("\"").append(key).append("\":");
+            Object value = map.get(key);
+            if (value instanceof String) {
+                jsonBuilder.append("\"").append(value).append("\"");
+            } else if (value instanceof Number || value instanceof Boolean) {
+                jsonBuilder.append(value);
+            } else {
+                // 对于非基本类型，使用 Gson 进行转换
+                Gson gson = new Gson();
+                jsonBuilder.append(gson.toJson(value));
+            }
+            jsonBuilder.append(", ");
+        }
+        if (!map.isEmpty()) {
+            // 删除最后一个逗号和空格
+            jsonBuilder.delete(jsonBuilder.length() - 2, jsonBuilder.length());
+        }
+        jsonBuilder.append("}");
+        return jsonBuilder.toString();
     }
 
 

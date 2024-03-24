@@ -208,7 +208,7 @@ public class ActionBean {
     public String getAttrJsonString() {
         HashMap<String, Object> map = new HashMap<>();
         map.put(Constants.KEY_RUM_PROPERTY, property);
-        return SingletonGson.getInstance().toJson(map);
+        return Utils.hashMapObjectToJson(map);
     }
 
     public void setFromAttrJsonString(String jsonString) {
