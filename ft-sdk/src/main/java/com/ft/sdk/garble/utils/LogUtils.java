@@ -121,7 +121,20 @@ public class LogUtils {
      * @param file 缓存文件
      */
     public static void registerInnerLogCacheToFile(File file) {
-        final LogFileHelper helper = new LogFileHelper(FTApplication.getApplication(), file);
+        registerInnerLogCacheToFile(file, false);
+    }
+
+
+    /**
+     * {@link #registerInnerLogCacheToFile}
+     * {@link com.ft.sdk.tests.InnerLogTest}
+     * 将内部日志转化成文件
+     *
+     * @param file          缓存文件
+     * @param isAndroidTest 是否是 Android Test
+     */
+    private static void registerInnerLogCacheToFile(File file, boolean isAndroidTest) {
+        final LogFileHelper helper = new LogFileHelper(FTApplication.getApplication(), file, isAndroidTest);
 
         TrackLog.setInnerLogHandler(new FTInnerLogHandler() {
             @Override

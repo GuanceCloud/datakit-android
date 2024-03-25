@@ -16,6 +16,7 @@ import org.junit.runners.Suite;
         FTDBManagerTest.class,
         LogGlobalContextTest.class,
         LogTest.class,
+        InnerLogTest.class,
         MonitorConfigTest.class,
         RUMTest.class,
         RUMUserBindTest.class,

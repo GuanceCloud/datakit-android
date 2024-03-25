@@ -17,7 +17,6 @@ import com.ft.sdk.garble.manager.AsyncCallback;
 import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.Utils;
-import com.ft.test.utils.CheckUtils;
 
 import org.json.JSONObject;
 import org.junit.After;

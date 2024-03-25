@@ -17,20 +17,43 @@ import java.util.Comparator;
 public class LogFileHelper {
 
     private static final String TAG = Constants.LOG_TAG_PREFIX + "LogFileHelper";
+    /**
+     * 日志分割大小限制
+     */
     private final static int SPLIT_FILE_SIZE = 33554432; //32MB
-    private final static String LOG_BACKUP_CACHE_PATH = "LogBackup";
+
+    /**
+     * 日志总大小限制
+     */
     private final static int CACHE_MAX_TOTAL_SIZE = 1073741824; //1G
+
+    /**
+     * Android Test 日志分割大小限制
+     */
+    public final static int TEST_CACHE_MAX_TOTAL_SIZE = 100;
+
+    /**
+     * Android Test 日志总大小限制
+     */
+    private final static int TEST_SPLIT_FILE_SIZE = 50;
+
+    public final static String LOG_BACKUP_CACHE_PATH = "LogBackup";
 
     private final File cacheFile;
 
     private final File backupLogDir;
 
-    public LogFileHelper(Context context, File cache) {
+    private final int cacheMaxTotalSize;
+    private final int splitFileSize;
+
+    public LogFileHelper(Context context, File cache, boolean isAndroidTest) {
         this.backupLogDir = new File(context.getFilesDir(), LOG_BACKUP_CACHE_PATH);
         if (!backupLogDir.exists()) {
             backupLogDir.mkdirs();
         }
         this.cacheFile = cache;
+        this.splitFileSize = isAndroidTest ? TEST_SPLIT_FILE_SIZE : SPLIT_FILE_SIZE;
+        this.cacheMaxTotalSize = isAndroidTest ? TEST_CACHE_MAX_TOTAL_SIZE : CACHE_MAX_TOTAL_SIZE;
     }
 
     /**
@@ -41,7 +64,7 @@ public class LogFileHelper {
      * @param logMessage 日志数据
      */
     public void appendLog(String logMessage) {
-        if (cacheFile.length() >= SPLIT_FILE_SIZE) {
+        if (cacheFile.length() >= splitFileSize) {
             String filePath = cacheFile.getAbsolutePath();
             splitLog(filePath);
         }
@@ -71,7 +94,7 @@ public class LogFileHelper {
      *
      * @param logDir 日志路径
      */
-    private static void deleteOldLogFilesIfNecessary(File logDir) {
+    private void deleteOldLogFilesIfNecessary(File logDir) {
         File[] logFiles = logDir.listFiles();
         if (logFiles == null || logFiles.length == 0) {
             return;
@@ -89,7 +112,7 @@ public class LogFileHelper {
             totalSize += file.length();
         }
 
-        if (totalSize > CACHE_MAX_TOTAL_SIZE) {
+        if (totalSize > cacheMaxTotalSize) {
             long deletedSize = 0;
             for (File file : logFiles) {
                 long fileSize = file.length();
