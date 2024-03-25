@@ -5,10 +5,12 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.FTRUMInnerManager;
+import com.ft.sdk.garble.manager.SingletonGson;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -206,7 +208,7 @@ public class ActionBean {
     public String getAttrJsonString() {
         HashMap<String, Object> map = new HashMap<>();
         map.put(Constants.KEY_RUM_PROPERTY, property);
-        return new Gson().toJson(map);
+        return Utils.hashMapObjectToJson(map);
     }
 
     public void setFromAttrJsonString(String jsonString) {

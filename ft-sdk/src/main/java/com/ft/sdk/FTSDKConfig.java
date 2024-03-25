@@ -365,7 +365,8 @@ public class FTSDKConfig {
      * @return
      */
     public FTSDKConfig setSyncSleepTime(int sleepTimeMs) {
-        this.syncSleepTime = Math.max(0, Math.min(sleepTimeMs, 100));
+        this.syncSleepTime = Math.max(SyncTaskManager.SYNC_SLEEP_MINI_TIME_MS,
+                Math.min(sleepTimeMs, SyncTaskManager.SYNC_SLEEP_MAX_TIME_MS));
         return this;
     }
 

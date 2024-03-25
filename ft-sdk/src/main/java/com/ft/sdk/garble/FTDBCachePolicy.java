@@ -82,7 +82,7 @@ public class FTDBCachePolicy {
      * @return 是否达到一半
      */
     public boolean reachHalfLimit() {
-        return count > limitCount / 2;
+        return limitCount > 0 && count > limitCount / 2;
     }
 
     /**

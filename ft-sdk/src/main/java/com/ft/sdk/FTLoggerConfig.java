@@ -43,7 +43,7 @@ public class FTLoggerConfig {
      */
     private String logPrefix = "";
 
-    private int logCacheLimitCount = Constants.MAX_DB_LOG_CACHE_NUM;
+    private int logCacheLimitCount = Constants.DEFAULT_DB_LOG_CACHE_NUM;
     /**
      * log 日志等级过滤
      */

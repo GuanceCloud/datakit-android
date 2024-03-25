@@ -1,7 +1,8 @@
 package com.ft.sdk.garble.threadpool;
 
 /**
- * 负责数据上行传输，与数据入数据库，根据 {@link #CPU_COUNT} 来确定线程池 core size，
+ * 负责数据上行传输，与数据入数据库，根据 {@link #CPU_COUNT} 来确定线程池 core size。场景：{@link com.ft.sdk.SyncTaskManager} 同步，
+ * 和{@link com.ft.sdk.FTExceptionHandler} native crash 文件加载写入
  *
  * @author Brandon
  */

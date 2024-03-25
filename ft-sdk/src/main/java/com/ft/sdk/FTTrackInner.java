@@ -70,6 +70,38 @@ public class FTTrackInner {
     }
 
     /**
+     * 初始化基础 SDK 配置
+     * @param config
+     */
+    void initBaseConfig(FTSDKConfig config) {
+        dataHelper.initBaseConfig(config);
+    }
+
+    /**
+     * 初始化 SDK Log 配置
+     * @param config
+     */
+    void initLogConfig(FTLoggerConfig config) {
+        dataHelper.initLogConfig(config);
+    }
+
+    /**
+     * 初始化 SDK Trace 配置
+     * @param config
+     */
+    void initTraceConfig(FTTraceConfig config) {
+        dataHelper.initTraceConfig(config);
+    }
+
+    /**
+     * 初始化 SDK RUM 配置
+     * @param config
+     */
+    void initRUMConfig(FTRUMConfig config) {
+        dataHelper.initRUMConfig(config);
+    }
+
+    /**
      * rum 事件数据
      *
      * @param time
@@ -278,9 +310,9 @@ public class FTTrackInner {
         int policyStatus = FTDBCachePolicy.get().optLogCachePolicy(length);
         if (policyStatus >= 0) {//执行同步策略
             if (policyStatus > 0) {
-                for (int i = 0; i < policyStatus && i < length; i++) {
-                    recordDataList.remove(0);
-                }
+                int dropCount = Math.min(policyStatus, length);
+                recordDataList.subList(0, dropCount).clear();
+                LogUtils.e(TAG, "reach log limit, drop log count:" + dropCount);
             }
             boolean result = FTDBManager.get().insertFtOptList(recordDataList, false);
             LogUtils.d(TAG, "judgeLogCachePolicy:insert-result=" + result);

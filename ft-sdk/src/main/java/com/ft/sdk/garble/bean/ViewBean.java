@@ -8,7 +8,6 @@ import com.ft.sdk.FTRUMInnerManager;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
-import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -321,7 +320,7 @@ public class ViewBean {
         map.put(Constants.KEY_MEMORY_AVG, memoryAvg);
         map.put(Constants.KEY_MEMORY_MAX, memoryMax);
         map.put(Constants.KEY_RUM_PROPERTY, property);
-        return new Gson().toJson(map);
+        return Utils.hashMapObjectToJson(map);
     }
 
     /**

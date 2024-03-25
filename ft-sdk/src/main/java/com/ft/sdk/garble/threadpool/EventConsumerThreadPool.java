@@ -1,7 +1,7 @@
 package com.ft.sdk.garble.threadpool;
 
 /**
- * 负责 RUM Action View LongTask Resource Error 数据的事件消费
+ * 负责 RUM Action View LongTask Resource Error 数据的事件消费,{@link com.ft.sdk.garble.bean.DataType#RUM_APP}
  */
 public class EventConsumerThreadPool extends BaseThreadPool {
     private final static int CORE_POOL_SIZE = 1;

@@ -44,6 +44,18 @@ public class SyncTaskManager {
     public static final int MAX_ERROR_COUNT = 5;
 
     /**
+     * 最大同步休眠时间
+     */
+    public static final int SYNC_SLEEP_MAX_TIME_MS = 100;
+
+
+    /**
+     * 最小同步休眠时间
+     */
+    public static final int SYNC_SLEEP_MINI_TIME_MS = 0;
+
+
+    /**
      * 传输间歇休眠时间
      */
     private static final int SLEEP_TIME = 10000;

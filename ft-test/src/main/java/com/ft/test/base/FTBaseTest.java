@@ -37,6 +37,7 @@ public class FTBaseTest {
     protected static final String CUSTOM_VALUE = "custom_value";
     protected static final String TEST_FAKE_RUM_ID = "rumId";
     protected static final String TEST_FAKE_URL = "http://www.test.url";
+    protected static final String TEST_FAKE_CLIENT_TOKEN = "fake_client_token";
 
 
     protected Context getContext() {
@@ -176,12 +177,13 @@ public class FTBaseTest {
      * 上传数据测试
      * <p>
      * {@link SyncTaskManager#requestNet(DataType, String, AsyncCallback)}
+     * {@link FTTrackInner#dataHelper}
      *
      * @param dataType
      */
     protected void uploadData(DataType dataType) {
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, dataType);
-        SyncDataHelper syncDataManager = new SyncDataHelper();
+        SyncDataHelper syncDataManager =  Whitebox.getInternalState(FTTrackInner.getInstance(),"dataHelper");
         String body = syncDataManager.getBodyContent(dataType, recordDataList);
         body = body.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION).replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REAL_LINE_BREAK);
 
@@ -191,6 +193,17 @@ public class FTBaseTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     *  使用 Whitebox 检验私有变量
+     * @param target 访问已创建实例
+     * @param fieldName 私有变量名称
+     * @param expect 预期值
+     * @return  fieldName 是否与 expect 相同
+     */
+    protected boolean checkInnerFieldValue(Object target, String fieldName, Object expect) {
+        return Whitebox.getInternalState(target, fieldName).equals(expect);
     }
 
     /**
