@@ -46,12 +46,12 @@ public class InnerLogTest extends FTBaseTest {
      */
     @Before
     public void setUp() throws Exception {
-        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL).setDebug(true));
-
         Context application = InstrumentationRegistry.getInstrumentation().getTargetContext().getApplicationContext();
         logFile = new File(application.getFilesDir(), INNER_LOG_LOG_FILE);
         logBackFile = new File(application.getFilesDir(), LogFileHelper.LOG_BACKUP_CACHE_PATH);
         Whitebox.invokeMethod(LogUtils.class, logFile, true);
+
+        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL).setDebug(true));
     }
 
 
