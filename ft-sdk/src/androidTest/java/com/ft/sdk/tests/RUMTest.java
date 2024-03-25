@@ -658,7 +658,7 @@ public class RUMTest extends FTBaseTest {
         waitEventConsumeInThreadPool();
 
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
-        Assert.assertTrue(recordDataList.size() > 0);
+        Assert.assertFalse(recordDataList.isEmpty());
         for (SyncJsonData recordData : recordDataList) {
             try {
                 JSONObject json = new JSONObject(recordData.getDataString());
@@ -666,6 +666,7 @@ public class RUMTest extends FTBaseTest {
                 String measurement = json.optString("measurement");
                 if (Constants.FT_MEASUREMENT_RUM_RESOURCE.equals(measurement)) {
                     if (tags != null) {
+                        System.out.println("json:" + json);
                         Assert.assertFalse(tags.has(Constants.KEY_RUM_ACTION_ID));
                         break;
                     }

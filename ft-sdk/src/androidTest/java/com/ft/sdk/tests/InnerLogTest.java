@@ -100,6 +100,7 @@ public class InnerLogTest extends FTBaseTest {
             }
         }
 
+        System.out.println("totalSize:" + totalSize);
         Assert.assertTrue(totalSize <= LogFileHelper.TEST_CACHE_MAX_TOTAL_SIZE);
     }
 
