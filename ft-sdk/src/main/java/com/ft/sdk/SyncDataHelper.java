@@ -32,7 +32,7 @@ public class SyncDataHelper {
     private final HashMap<String, Object> traceTags;
 
 
-    public SyncDataHelper() {
+    protected SyncDataHelper() {
         basePublicTags = new HashMap<>();
         logTags = new HashMap<>();
         rumTags = new HashMap<>();

@@ -95,7 +95,7 @@ public class UtilsTest {
      */
     @Test
     public void singleLineProtocolFormatTest() throws Exception {
-        SyncDataHelper helper = new SyncDataHelper();
+        SyncDataHelper helper = Whitebox.getInternalState(FTTrackInner.getInstance(), "dataHelper");
         JSONObject tags = new JSONObject();
         tags.put(KEY_TAGS, VALUE_TAGS);
         JSONObject fields = new JSONObject();

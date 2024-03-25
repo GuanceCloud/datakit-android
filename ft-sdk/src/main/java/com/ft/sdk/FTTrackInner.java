@@ -52,23 +52,6 @@ public class FTTrackInner {
         }
         return instance;
     }
-
-    void initBaseConfig(FTSDKConfig config) {
-        dataHelper.initBaseConfig(config);
-    }
-
-    void initLogConfig(FTLoggerConfig config) {
-        dataHelper.initLogConfig(config);
-    }
-
-    void initTraceConfig(FTTraceConfig config) {
-        dataHelper.initTraceConfig(config);
-    }
-
-    void initRUMConfig(FTRUMConfig config) {
-        dataHelper.initRUMConfig(config);
-    }
-
     /**
      * 初始化基础 SDK 配置
      * @param config
