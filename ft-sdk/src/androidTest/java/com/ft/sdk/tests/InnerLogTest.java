@@ -4,6 +4,8 @@ import android.content.Context;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 
+import com.ft.sdk.FTSDKConfig;
+import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.manager.LogFileHelper;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -30,7 +32,6 @@ public class InnerLogTest extends FTBaseTest {
     /**
      * sample：2024-03-25 08:54:22:386 E InnerLogTest 111111111
      * 刚好 {@link LogFileHelper#TEST_SPLIT_FILE_SIZE}
-     *
      */
     public static final String TEST_DATA = "111111111";
 
@@ -45,6 +46,8 @@ public class InnerLogTest extends FTBaseTest {
      */
     @Before
     public void setUp() throws Exception {
+        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL).setDebug(true));
+
         Context application = InstrumentationRegistry.getInstrumentation().getTargetContext().getApplicationContext();
         logFile = new File(application.getFilesDir(), INNER_LOG_LOG_FILE);
         logBackFile = new File(application.getFilesDir(), LogFileHelper.LOG_BACKUP_CACHE_PATH);

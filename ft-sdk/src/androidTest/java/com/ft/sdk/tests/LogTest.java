@@ -6,6 +6,8 @@ import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTRUMGlobalManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
+import com.ft.sdk.LogCacheDiscard;
+import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.LogData;
 import com.ft.sdk.garble.bean.Status;
@@ -171,6 +173,53 @@ public class LogTest extends FTBaseTest {
         }
 
         return !viewId.isEmpty() && !sessionId.isEmpty();
+    }
+
+
+    /**
+     * 测试大批量插入数据，是否触发丢弃策略
+     *
+     * @throws InterruptedException
+     */
+    @Test
+    public void triggerDiscardPolicyTest() throws InterruptedException {
+        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
+        FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableCustomLog(true));
+        batchLog(10);
+
+    }
+
+    /**
+     * 测试大批量插入数据，是否触发丢弃策略
+     *
+     * @throws InterruptedException
+     */
+    @Test
+    public void triggerDiscardOldPolicyTest() throws InterruptedException {
+        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
+        FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableCustomLog(true)
+                .setLogCacheDiscardStrategy(LogCacheDiscard.DISCARD_OLDEST));
+        batchLog(19);
+    }
+
+    /**
+     * 批量日志
+     * @param expectCount 预期数量
+     * @throws InterruptedException
+     */
+    private void batchLog(int expectCount) throws InterruptedException {
+        String logContent = "custom log";
+        FTDBCachePolicy.get().optCount(4990);
+        for (int i = 0; i < 20; i++) {
+            FTLogger.getInstance().logBackground(i + "-" + logContent, Status.CRITICAL);
+            Thread.sleep(10);
+        }
+        Thread.sleep(2000);
+        int count = CheckUtils.getCount(DataType.LOG, logContent, 0);
+
+        System.out.println("count=" + count);
+        //Thread.sleep(300000);
+        Assert.assertTrue(expectCount >= count);
     }
 
 
