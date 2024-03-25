@@ -126,7 +126,8 @@ public class UtilsTest {
     }
 
     /**
-     * 调用 {@link SyncDataHelper#convertToLineProtocolLines(List, HashMap, boolean)},{@link FTTrackInner#dataHelper}
+     * 调用 {@link SyncDataHelper#convertToLineProtocolLines(List, HashMap, boolean)}
+     * ,{@link FTTrackInner#dataHelper}
      *
      * @param list
      * @return
