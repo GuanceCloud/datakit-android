@@ -37,6 +37,11 @@ public class FTTrackInner {
     private final static String TAG = Constants.LOG_TAG_PREFIX + "FTTrackInner";
     private static FTTrackInner instance;
 
+    /**
+     * 测试用例调用
+     * {@link com.ft.test.base.FTBaseTest#getInnerSyncDataHelper()}
+     * {@link com.ft.sdk.tests.UtilsTest#convertToLineProtocolLines(List)}
+     */
     private final SyncDataHelper dataHelper = new SyncDataHelper();
 
     private FTTrackInner() {
@@ -54,6 +59,7 @@ public class FTTrackInner {
     }
     /**
      * 初始化基础 SDK 配置
+     *
      * @param config
      */
     void initBaseConfig(FTSDKConfig config) {
@@ -62,6 +68,7 @@ public class FTTrackInner {
 
     /**
      * 初始化 SDK Log 配置
+     *
      * @param config
      */
     void initLogConfig(FTLoggerConfig config) {
@@ -70,6 +77,7 @@ public class FTTrackInner {
 
     /**
      * 初始化 SDK Trace 配置
+     *
      * @param config
      */
     void initTraceConfig(FTTraceConfig config) {
@@ -78,6 +86,7 @@ public class FTTrackInner {
 
     /**
      * 初始化 SDK RUM 配置
+     *
      * @param config
      */
     void initRUMConfig(FTRUMConfig config) {

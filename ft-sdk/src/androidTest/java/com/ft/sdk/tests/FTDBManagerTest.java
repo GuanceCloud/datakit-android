@@ -24,7 +24,7 @@ import java.util.List;
  * Description: 数据库创库,插入数据,删除数据测试
  */
 public class FTDBManagerTest extends FTBaseTest {
-    private int repeatTime = 100;
+    private static final int repeatTime = 100;
 
     /**
      * 在运行测试用例前先删除之前数据库中存在的数据
