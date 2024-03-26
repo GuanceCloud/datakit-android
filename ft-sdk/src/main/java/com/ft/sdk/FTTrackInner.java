@@ -17,6 +17,7 @@ import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.manager.AsyncCallback;
 import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
+import com.ft.sdk.garble.threadpool.RunnerCompleteCallBack;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -36,6 +37,13 @@ public class FTTrackInner {
     private final static String TAG = Constants.LOG_TAG_PREFIX + "FTTrackInner";
     private static FTTrackInner instance;
 
+    /**
+     * 测试用例调用
+     * {@link com.ft.test.base.FTBaseTest#getInnerSyncDataHelper()}
+     * {@link com.ft.sdk.tests.UtilsTest#convertToLineProtocolLines(List)}
+     */
+    private final SyncDataHelper dataHelper = new SyncDataHelper();
+
     private FTTrackInner() {
     }
 
@@ -51,6 +59,42 @@ public class FTTrackInner {
     }
 
     /**
+     * 初始化基础 SDK 配置
+     *
+     * @param config
+     */
+    void initBaseConfig(FTSDKConfig config) {
+        dataHelper.initBaseConfig(config);
+    }
+
+    /**
+     * 初始化 SDK Log 配置
+     *
+     * @param config
+     */
+    void initLogConfig(FTLoggerConfig config) {
+        dataHelper.initLogConfig(config);
+    }
+
+    /**
+     * 初始化 SDK Trace 配置
+     *
+     * @param config
+     */
+    void initTraceConfig(FTTraceConfig config) {
+        dataHelper.initTraceConfig(config);
+    }
+
+    /**
+     * 初始化 SDK RUM 配置
+     *
+     * @param config
+     */
+    void initRUMConfig(FTRUMConfig config) {
+        dataHelper.initRUMConfig(config);
+    }
+
+    /**
      * rum 事件数据
      *
      * @param time
@@ -58,10 +102,10 @@ public class FTTrackInner {
      * @param tags
      * @param fields
      */
-    void rum(long time, String measurement, final JSONObject tags, JSONObject fields) {
+    void rum(long time, String measurement, final JSONObject tags, JSONObject fields, RunnerCompleteCallBack callBack) {
         String sessionId = tags.optString(Constants.KEY_RUM_SESSION_ID);
         if (FTRUMInnerManager.get().checkSessionWillCollect(sessionId)) {
-            syncDataBackground(DataType.RUM_APP, time, measurement, tags, fields);
+            syncDataBackground(DataType.RUM_APP, time, measurement, tags, fields, callBack);
         }
     }
 
@@ -80,8 +124,34 @@ public class FTTrackInner {
         }
     }
 
+    /**
+     * 同步数据异步写入
+     * <p>
+     * AndroidTest 调用方法  {@link com.ft.test.base.FTBaseTest#invokeSyncData(DataType, String, JSONObject, JSONObject)}
+     *
+     * @param dataType
+     * @param time
+     * @param measurement
+     * @param tags
+     * @param fields
+     */
     private void syncDataBackground(final DataType dataType, final long time,
                                     final String measurement, final JSONObject tags, final JSONObject fields) {
+        syncDataBackground(dataType, time, measurement, tags, fields, null);
+    }
+
+    /**
+     * 同步数据异步写入
+     *
+     * @param dataType
+     * @param time
+     * @param measurement
+     * @param tags
+     * @param fields
+     * @param callBack
+     */
+    private void syncDataBackground(final DataType dataType, final long time,
+                                    final String measurement, final JSONObject tags, final JSONObject fields, RunnerCompleteCallBack callBack) {
         DataUploaderThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
@@ -90,7 +160,10 @@ public class FTTrackInner {
                     SyncJsonData recordData = SyncJsonData.getSyncJsonData(dataType,
                             new LineProtocolBean(measurement, tags, fields, time));
                     boolean result = FTDBManager.get().insertFtOperation(recordData);
-                    LogUtils.d(TAG, "syncDataBackground:" + measurement + "," + dataType.toString() + ":insert=" + result);
+                    LogUtils.d(TAG, "syncDataBackground:" + measurement + " " + dataType.toString() + ":insert=" + result);
+                    if (callBack != null) {
+                        callBack.onComplete();
+                    }
                     SyncTaskManager.get().executeSyncPoll();
                 } catch (Exception e) {
                     LogUtils.e(TAG, Log.getStackTraceString(e));
@@ -119,8 +192,7 @@ public class FTTrackInner {
                                         t.getFields(), t.getTimeNano()));
                         recordDataList.add(recordData);
 
-                        SyncDataHelper syncDataManager = new SyncDataHelper();
-                        String body = syncDataManager.getBodyContent(DataType.LOG, recordDataList);
+                        String body = dataHelper.getBodyContent(DataType.LOG, recordDataList);
                         String model = Constants.URL_MODEL_LOG;
                         String content_type = "text/plain";
                         FTResponseData result = HttpBuilder.Builder()
@@ -153,9 +225,7 @@ public class FTTrackInner {
      * @param isSilence 是否立即触发同步
      */
     void logBackground(@NonNull LogBean logBean, boolean isSilence) {
-        ArrayList<BaseContentBean> list = new ArrayList<>();
-        list.add(logBean);
-        batchLogBeanBackground(list, isSilence);
+        TrackLogManager.get().trackLog(logBean, isSilence);
     }
 
     /**
@@ -168,11 +238,11 @@ public class FTTrackInner {
     }
 
     /**
-     * 将多条日志数据存入本地同步(异步)
+     * 将多条日志数据存入本地同步(同步)
      *
      * @param logBeans
      */
-    void batchLogBeanBackground(@NonNull List<BaseContentBean> logBeans, boolean isSilence) {
+    void batchLogBeanSync(@NonNull List<BaseContentBean> logBeans, boolean isSilence) {
         try {
             FTLoggerConfig config = FTLoggerConfigManager.get().getConfig();
             if (config == null) return;
@@ -233,16 +303,22 @@ public class FTTrackInner {
         int policyStatus = FTDBCachePolicy.get().optLogCachePolicy(length);
         if (policyStatus >= 0) {//执行同步策略
             if (policyStatus > 0) {
-                for (int i = 0; i < policyStatus && i < length; i++) {
-                    recordDataList.remove(0);
-                }
+                int dropCount = Math.min(policyStatus, length);
+                recordDataList.subList(0, dropCount).clear();
+                LogUtils.e(TAG, "reach log limit, drop log count:" + dropCount);
             }
             boolean result = FTDBManager.get().insertFtOptList(recordDataList);
             LogUtils.d(TAG, "judgeLogCachePolicy:insert-result=" + result);
             if (!silence) {
                 SyncTaskManager.get().executeSyncPoll();
             }
+        } else {
+            LogUtils.e(TAG, "reach log limit, drop log count:" + length);
         }
+    }
+
+    SyncDataHelper getCurrentDataHelper() {
+        return dataHelper;
     }
 
 

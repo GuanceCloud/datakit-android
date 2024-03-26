@@ -5,22 +5,28 @@ import static com.ft.sdk.FTApplication.getApplication;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
+import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.UserData;
+import com.ft.sdk.garble.manager.SingletonGson;
+import com.ft.sdk.garble.threadpool.RunnerCompleteCallBack;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.NetUtils;
 import com.ft.sdk.garble.utils.PackageUtils;
 import com.ft.sdk.garble.utils.Utils;
+import com.ft.sdk.garble.utils.VersionUtils;
+import com.ft.sdk.nativelib.CrashCallback;
 import com.ft.sdk.nativelib.NativeEngineInit;
-import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * @author Brandon
@@ -61,6 +67,7 @@ public class FTRUMConfigManager {
         FTUIBlockManager.get().start(config);
         FTANRDetector.get().init(config);
         initRUMGlobalContext(config);
+        FTTrackInner.getInstance().initRUMConfig(config);
         if (config.isRumEnable() && config.isEnableTraceUserAction()) {
             //应对 flutter reactNative application 生命周期启动早于条件设置
             FTAppStartCounter.get().checkToReUpload();
@@ -74,10 +81,6 @@ public class FTRUMConfigManager {
      */
     private void initNativeDump(FTRUMConfig config) {
         boolean isNativeLibSupport = PackageUtils.isNativeLibrarySupport();
-
-        if (isNativeLibSupport) {
-            FTSdk.NATIVE_VERSION = com.ft.sdk.nativelib.BuildConfig.VERSION_NAME;
-        }
 
         if (!config.isRumEnable()) {
             return;
@@ -98,8 +101,40 @@ public class FTRUMConfigManager {
             }
 
             String filePath = crashFilePath.toString();
-            NativeEngineInit.init(application, filePath, enableTrackAppCrash, enableTrackAppANR);
-            FTExceptionHandler.get().checkAndSyncPreDump(filePath);
+
+            if (VersionUtils.firstVerGreaterEqual(FTSdk.NATIVE_VERSION, "1.1.0-alpha01")) {
+                final CrashCallback crashCallback = new CrashCallback() {
+                    @Override
+                    public void onCrash(String crashPath) {
+                        //fixme 这里如果 native crash 文件过大可能存在性能问题
+                        CountDownLatch latch = new CountDownLatch(1);
+                        FTExceptionHandler.get().uploadNativeCrashBackground(new File(crashPath),
+                                AppState.RUN, false, new RunnerCompleteCallBack() {
+                                    @Override
+                                    public void onComplete() {
+                                        Utils.deleteFile(crashPath);
+                                        latch.countDown();
+                                    }
+                                });
+
+                        try {
+                            latch.await();
+                        } catch (InterruptedException e) {
+                            LogUtils.e(TAG, Log.getStackTraceString(e));
+                        }
+                    }
+                };
+
+                NativeEngineInit.init(application, filePath, enableTrackAppCrash, enableTrackAppANR, crashCallback);
+                //补充上传没有成功上传的 Native Crash，上传 ANR Crash
+                FTExceptionHandler.get().checkAndSyncPreDump(filePath, null);
+
+
+            } else {
+                NativeEngineInit.init(application, filePath, enableTrackAppCrash, enableTrackAppANR);
+                FTExceptionHandler.get().checkAndSyncPreDump(filePath, null);
+            }
+
         }
 
     }
@@ -122,7 +157,7 @@ public class FTRUMConfigManager {
      *
      * @return
      */
-     FTResourceEventListener.FTFactory getOverrideEventListener() {
+    FTResourceEventListener.FTFactory getOverrideEventListener() {
         if (config == null) return null;
         if (config.getOkHttpEventListenerHandler() == null) return null;
         return config.getOkHttpEventListenerHandler().getEventListenerFTFactory();
@@ -206,15 +241,13 @@ public class FTRUMConfigManager {
      */
     void bindUserData(String id, String name, String email, HashMap<String, String> exts) {
         LogUtils.d(TAG, "bindUserData:id=" + id + ",name=" + name + ",email=" + email + ",exts=" + exts);
-        //初始化SessionId
-        initRandomUserId();
         //绑定用户信息
         synchronized (mLock) {
             SharedPreferences sp = Utils.getSharedPreferences(FTApplication.getApplication());
             sp.edit().putString(Constants.FT_USER_USER_ID, id).apply();
             sp.edit().putString(Constants.FT_USER_USER_NAME, name).apply();
             sp.edit().putString(Constants.FT_USER_USER_EMAIL, email).apply();
-            sp.edit().putString(Constants.FT_USER_USER_EXT, exts != null ? new Gson().toJson(exts) : null).apply();
+            sp.edit().putString(Constants.FT_USER_USER_EXT, exts != null ? Utils.hashMapObjectToJson(exts) : null).apply();
             UserData data = new UserData();
             data.setId(id);
             data.setName(name);
@@ -247,12 +280,15 @@ public class FTRUMConfigManager {
     void initRUMGlobalContext(FTRUMConfig config) {
         Context context = FTApplication.getApplication();
         HashMap<String, Object> rumGlobalContext = config.getGlobalContext();
-        rumGlobalContext.put(Constants.KEY_RUM_CUSTOM_KEYS, new Gson().toJson(rumGlobalContext.keySet()));
+        if (!rumGlobalContext.isEmpty()) {
+            rumGlobalContext.put(Constants.KEY_RUM_CUSTOM_KEYS, Utils.setToJsonString(rumGlobalContext.keySet()));
+        }
         rumGlobalContext.put(Constants.KEY_RUM_APP_ID, config.getRumAppId());
         rumGlobalContext.put(Constants.KEY_RUM_SESSION_TYPE, "user");
         rumGlobalContext.put(Constants.KEY_DEVICE_OS, DeviceUtils.getOSName());
         rumGlobalContext.put(Constants.KEY_DEVICE_DEVICE_BAND, DeviceUtils.getDeviceBand());
         rumGlobalContext.put(Constants.KEY_DEVICE_DEVICE_MODEL, DeviceUtils.getDeviceModel());
+        rumGlobalContext.put(Constants.KEY_DEVICE_DEVICE_ARCH, DeviceUtils.getDeviceArch());
         rumGlobalContext.put(Constants.KEY_DEVICE_DISPLAY, DeviceUtils.getDisplay(context));
         rumGlobalContext.put(Constants.KEY_SERVICE, config.getServiceName());
 

@@ -4,7 +4,6 @@ import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.LogCacheDiscard;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.db.FTDBManager;
-import com.ft.sdk.garble.utils.Constants;
 
 /**
  * author: huangDianHua
@@ -18,6 +17,12 @@ public class FTDBCachePolicy {
      * 当前数据量
      */
     private volatile int count = 0;
+
+    /**
+     * 限制数量
+     */
+    private int limitCount = 0;
+
     /**
      * 数据舍弃规则
      */
@@ -37,10 +42,21 @@ public class FTDBCachePolicy {
 
     /**
      * 初始化配置参数
+     *
      * @param config
      */
     public void initParam(FTLoggerConfig config) {
         this.logCacheDiscardStrategy = config.getLogCacheDiscardStrategy();
+        this.limitCount = config.getLogCacheLimitCount();
+    }
+
+    /**
+     * 获取限制数量
+     *
+     * @return
+     */
+    public int getLimitCount() {
+        return limitCount;
     }
 
     public static void release() {
@@ -54,10 +70,19 @@ public class FTDBCachePolicy {
     /**
      * 操作 Log 日志计数
      *
-     * @param optCount
+     * @param optCount 写入数据数量
      */
     public synchronized void optCount(int optCount) {
         count += optCount;
+    }
+
+    /**
+     * 如果写入数据量大于总限制的一半
+     *
+     * @return 是否达到一半
+     */
+    public boolean reachHalfLimit() {
+        return limitCount > 0 && count > limitCount / 2;
     }
 
     /**
@@ -67,7 +92,7 @@ public class FTDBCachePolicy {
      */
     public int optLogCachePolicy(int limit) {
         int status = 0;
-        if (count >= Constants.MAX_DB_CACHE_NUM) {//当数据量大于配置的数据库最大存储量时，执行丢弃策略
+        if (count >= limitCount) {//当数据量大于配置的数据库最大存储量时，执行丢弃策略
             if (logCacheDiscardStrategy == LogCacheDiscard.DISCARD) {//直接丢弃数据
                 status = -1;
             } else if (logCacheDiscardStrategy == LogCacheDiscard.DISCARD_OLDEST) {//丢弃数据库中的前几条数据
@@ -77,8 +102,8 @@ public class FTDBCachePolicy {
             }
         } else {
             int needInsert = 0;
-            if (count + limit >= Constants.MAX_DB_CACHE_NUM) {
-                needInsert = Constants.MAX_DB_CACHE_NUM - count;
+            if (count + limit >= limitCount) {
+                needInsert = limitCount - count;
                 status = limit - needInsert;
                 limit = needInsert;
             }

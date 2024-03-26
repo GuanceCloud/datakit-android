@@ -11,7 +11,9 @@ import com.ft.sdk.FTTraceConfig;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.bean.UserData;
+import com.ft.sdk.garble.utils.LogUtils;
 
+import java.io.File;
 import java.util.HashMap;
 
 /**
@@ -29,13 +31,16 @@ public class DemoApplication extends BaseApplication {
     public void onCreate() {
         super.onCreate();
         if (!BuildConfig.LAZY_INIT) {
+            LogUtils.registerInnerLogCacheToFile(new File(getFilesDir(), "InnerLog" + ".log"));
             initFTSDK();
         }
     }
 
     static void initFTSDK() {
-        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAKIT_URL)
+        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAWAY_URL, BuildConfig.DATAWAY_TOKEN)
                 .setDebug(true)//设置是否是 debug
+                .setAutoSync(true)
+                .setCustomSyncPageSize(100)
                 .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()));
         FTSdk.install(ftSDKConfig);
 
@@ -43,6 +48,7 @@ public class DemoApplication extends BaseApplication {
                 .setSamplingRate(1f)
                 .setEnableCustomLog(true)
                 .setEnableConsoleLog(true)
+                .setLogCacheLimitCount(10000)
                 .setPrintCustomLogToConsole(true)
                 .setLogLevelFilters(new Status[]{Status.ERROR})
                 .setEnableLinkRumData(true)
@@ -68,8 +74,8 @@ public class DemoApplication extends BaseApplication {
                 .setEnableTrackAppUIBlock(true)
                 .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
                 .setResourceUrlHandler(url -> false)
-                .addGlobalContext("track_id", BuildConfig.TRACK_ID)
-                .addGlobalContext("custom_tag", "any tags")
+//                .addGlobalContext("track_id", BuildConfig.TRACK_ID)
+//                .addGlobalContext("custom_tag", "any tags")
                 .setExtraMonitorTypeWithError(ErrorMonitorType.ALL.getValue()));
 
 
@@ -87,6 +93,7 @@ public class DemoApplication extends BaseApplication {
                 .setEnableAutoTrace(true)
                 .setEnableLinkRUMData(true)
                 .setTraceType(TraceType.DDTRACE));
+
 
     }
 

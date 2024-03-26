@@ -3,7 +3,6 @@ package com.ft.sdk.internal.anr;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 
 import com.ft.sdk.FTRUMGlobalManager;
 import com.ft.sdk.garble.bean.AppState;
@@ -13,12 +12,15 @@ import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.StringUtils;
 
 /**
- * ANR 错误监测
+ * ANR 错误监测，循环监测两个 Runner 执行相差时间是否超过 {@link #ANR_DETECT_DURATION_MS},超过则追加一条 ANR 错误信息
  */
 public final class ANRDetectRunnable implements Runnable {
 
     private static final String TAG = Constants.LOG_TAG_PREFIX + "ANRDetectRunnable";
 
+    /**
+     * 监测周期
+     */
     public static final int ANR_DETECT_DURATION_MS = 5000;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -43,6 +45,7 @@ public final class ANRDetectRunnable implements Runnable {
                     runnable.wait(ANR_DETECT_DURATION_MS);
 
                     if (!runnable.isCalled()) {
+                        //如果超时间没有调用则，添加一条 Error 数据
                         FTRUMGlobalManager.get().addError(
                                 StringUtils.getStringFromStackTraceElement(handler.getLooper().getThread().getStackTrace()),
                                 "android_anr", ErrorType.ANR_ERROR, AppState.RUN);
@@ -60,11 +63,21 @@ public final class ANRDetectRunnable implements Runnable {
         }
     }
 
+    /**
+     * 关闭 Runner
+     */
     public void shutdown() {
         isClose = true;
     }
 
+    /**
+     * 检查是否被调用的 Runner 对象
+     */
     public static class CallbackRunnable implements Runnable {
+        /**
+         * 是否被调用
+         * @return
+         */
         public boolean isCalled() {
             return called;
         }
@@ -76,6 +89,9 @@ public final class ANRDetectRunnable implements Runnable {
             called = true;
         }
 
+        /**
+         * 重置
+         */
         public void reset() {
             called = false;
         }

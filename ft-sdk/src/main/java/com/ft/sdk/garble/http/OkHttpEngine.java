@@ -1,8 +1,7 @@
 package com.ft.sdk.garble.http;
 
-import com.ft.sdk.garble.utils.Constants;
-
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -78,6 +77,8 @@ public class OkHttpEngine implements INetEngine {
                 string = responseBody.string();
             }
             return new FTResponseData(response.code(), string);
+        } catch (SocketTimeoutException e) {
+            return new FTResponseData(NetCodeStatus.FILE_TIMEOUT_CODE, e.getLocalizedMessage() + ",网络超时");
         } catch (IOException e) {
             return new FTResponseData(NetCodeStatus.FILE_IO_EXCEPTION_CODE, e.getLocalizedMessage() + ",检查本地网络连接是否正常");
         } catch (Exception e) {

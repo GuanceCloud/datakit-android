@@ -47,8 +47,9 @@ public class LogGlobalContextTest extends FTBaseTest {
      * 日志输出过程中会把  globalContext 添加的数据一起输出
      */
     @Test
-    public void logGlobalContextTest() {
+    public void logGlobalContextTest() throws InterruptedException {
         FTLogger.getInstance().logBackground("test Log", Status.INFO);
+        Thread.sleep(2000);
         Assert.assertTrue(CheckUtils.checkValueInLineProtocol(DataType.LOG,
                 new String[]{CUSTOM_KEY, CUSTOM_VALUE}));
 

@@ -42,7 +42,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         setContentView(R.layout.activity_main);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE}, 1);
         }
@@ -193,6 +196,20 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent serviceIntent = new Intent(MainActivity.this, TestService.class);
                 startService(serviceIntent);
+            }
+        });
+
+        findViewById(R.id.main_flush_sync_data_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FTSdk.flushSyncData();
+            }
+        });
+
+        findViewById(R.id.main_high_load_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, HighLoadActivity.class));
             }
         });
 

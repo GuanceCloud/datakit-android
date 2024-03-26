@@ -22,9 +22,16 @@ public class NetCodeStatus {
      */
     public static final int FILE_IO_EXCEPTION_CODE = 10003;
 
+
+
+    /**
+     * 超时
+     */
+    public static final int FILE_TIMEOUT_CODE = 10004;
+
     /**
      * 未知问题
      */
-    public static final int UNKNOWN_EXCEPTION_CODE = 10004;
+    public static final int UNKNOWN_EXCEPTION_CODE = 11000;
 
 }

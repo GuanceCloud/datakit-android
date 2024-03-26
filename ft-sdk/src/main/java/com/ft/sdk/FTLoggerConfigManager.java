@@ -28,6 +28,7 @@ public class FTLoggerConfigManager {
 
         FTDBCachePolicy.get().initParam(config);
         FTLogger.getInstance().init(config);
+        FTTrackInner.getInstance().initLogConfig(config);
 
     }
 

@@ -15,6 +15,7 @@ public class OkHttpClientSingleton {
 
     public static synchronized OkHttpClient getInstance() {
         if (instance == null) {
+            // connect time 10 秒
             instance = new OkHttpClient.Builder()
                     .connectTimeout(10, TimeUnit.SECONDS).build();
         }

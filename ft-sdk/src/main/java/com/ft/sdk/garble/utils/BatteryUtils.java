@@ -86,25 +86,25 @@ public class BatteryUtils {
         try {
             Intent batteryStatus = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
             if (batteryStatus != null) {
-                int temperature = batteryStatus.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1);
-                int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-                int plugState = batteryStatus.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
-                int health = batteryStatus.getIntExtra(BatteryManager.EXTRA_HEALTH, -1);
-                boolean present = batteryStatus.getBooleanExtra(BatteryManager.EXTRA_PRESENT, false);
-                String technology = batteryStatus.getStringExtra(BatteryManager.EXTRA_TECHNOLOGY);
-                int voltage = batteryStatus.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1);
-                batteryBean.setStatus(batteryStatus(status));
-                batteryBean.setTemperature(temperature / 10);
-                batteryBean.setPlugState(batteryPlugged(plugState));
-                batteryBean.setHealth(batteryHealth(health));
-                batteryBean.setPresent(present);
-                batteryBean.setTechnology(technology);
-                if (voltage > 1000) {
-                    batteryBean.setVoltage(voltage / 1000f);
-                } else {
-                    batteryBean.setVoltage(voltage);
-                }
-                batteryBean.setPower(getBatteryCapacity(context));
+//                int temperature = batteryStatus.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1);
+//                int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+//                int plugState = batteryStatus.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+//                int health = batteryStatus.getIntExtra(BatteryManager.EXTRA_HEALTH, -1);
+//                boolean present = batteryStatus.getBooleanExtra(BatteryManager.EXTRA_PRESENT, false);
+//                String technology = batteryStatus.getStringExtra(BatteryManager.EXTRA_TECHNOLOGY);
+//                int voltage = batteryStatus.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1);
+//                batteryBean.setStatus(batteryStatus(status));
+//                batteryBean.setTemperature(temperature / 10);
+//                batteryBean.setPlugState(batteryPlugged(plugState));
+//                batteryBean.setHealth(batteryHealth(health));
+//                batteryBean.setPresent(present);
+//                batteryBean.setTechnology(technology);
+//                if (voltage > 1000) {
+//                    batteryBean.setVoltage(voltage / 1000f);
+//                } else {
+//                    batteryBean.setVoltage(voltage);
+//                }
+//                batteryBean.setPower(getBatteryCapacity(context));
                 batteryBean.setBr(getBatteryUsage(context));
             }
         } catch (Exception e) {

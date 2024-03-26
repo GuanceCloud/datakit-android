@@ -6,7 +6,9 @@ import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.ErrorType;
+import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
+import com.ft.sdk.garble.threadpool.RunnerCompleteCallBack;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -17,6 +19,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 
 /**
  * create: by huangDianHua
@@ -49,22 +52,25 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
     private static FTExceptionHandler instance;
     private final Thread.UncaughtExceptionHandler mDefaultExceptionHandler;
     /**
-     * 用于测试用例
+     * 注意 ：AndroidTest 会调用这个方法 {@link com.ft.test.base.FTBaseTest#avoidCrash()}
      */
     private boolean isAndroidTest = false;
 
     /**
      * 上传崩溃日志，根据 {@link FTRUMConfig#isRumEnable(),FTRUMConfig#isEnableTrackAppCrash()} 进行判断
+     * <p>
+     * 这里线程调用的路径是 FTEventCsr -> FTDataUp -> FTEventCsr
      *
-     * @param crash   崩溃日志简述
-     * @param message 崩溃堆栈
-     * @param state   app 运行状态 {@link  AppState}
+     * @param crash    崩溃日志简述
+     * @param message  崩溃堆栈
+     * @param state    app 运行状态 {@link  AppState}
+     * @param callBack
      */
-    public void uploadCrashLog(String crash, String message, AppState state) {
+    public void uploadCrashLog(String crash, String message, AppState state, RunnerCompleteCallBack callBack) {
         if (config.isRumEnable() &&
                 config.isEnableTrackAppCrash()) {
             long dateline = Utils.getCurrentNanoTime();
-            FTRUMInnerManager.get().addError(crash, message, dateline, ErrorType.JAVA.toString(), state);
+            FTRUMInnerManager.get().addError(crash, message, dateline, ErrorType.JAVA.toString(), state, callBack);
         }
     }
 
@@ -96,7 +102,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
      * 抓取全局未捕获异常 {@link Exception}
      * <p>
      * 此处捕获的是 Java 代码层的异常，不包含 C/C++ 异常，抓取数据后，
-     * 会重新将异常内容抛出，避免集成方正常的异常捕获逻辑，异常数据会{@link #uploadCrashLog(String, String, AppState)}
+     * 会重新将异常内容抛出，避免集成方正常的异常捕获逻辑，异常数据会{@link #uploadCrashLog(String, String, AppState, RunnerCompleteCallBack)} )}
      * 上传异常数据
      *
      * @param t 返回异常线程
@@ -114,49 +120,36 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
         }
         printWriter.close();
         String result = writer.toString();
-        uploadCrashLog(result, e.getMessage(), FTActivityManager.get().getAppState());
+        uploadCrashLog(result, e.getMessage(), FTActivityManager.get().getAppState(), new RunnerCompleteCallBack() {
+            @Override
+            public void onComplete() {
+                //测试用例直接
+                if (isAndroidTest) {
+                    e.printStackTrace();
+                } else {
+                    if (mDefaultExceptionHandler != null) {
+                        mDefaultExceptionHandler.uncaughtException(t, e);
+                    } else {
+                        try {
+                            android.os.Process.killProcess(android.os.Process.myPid());
+                            System.exit(10);
+                        } catch (Exception ex2) {
 
-        try {
-            //给数据存存储空出一些时间
-            Thread.sleep(2000);
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
-        }
-
-        //测试用例直接
-        if (isAndroidTest) {
-            e.printStackTrace();
-        } else {
-            if (mDefaultExceptionHandler != null) {
-                mDefaultExceptionHandler.uncaughtException(t, e);
-            } else {
-                try {
-                    android.os.Process.killProcess(android.os.Process.myPid());
-                    System.exit(10);
-                } catch (Exception ex2) {
-
+                        }
+                    }
                 }
             }
-        }
+        });
 
     }
-
-//    private void uploadCrashLog(String crash, long timeLine) {
-//        LogUtils.d("FTExceptionHandler", "crash=" + crash);
-//        LogBean logBean = new LogBean(Utils.translateFieldValue(crash), timeLine);
-//        logBean.setStatus(Status.CRITICAL);
-//        logBean.setEnv(env);
-//        logBean.setServiceName(trackServiceName);
-//        FTTrackInner.getInstance().logBackground(logBean);
-//    }
 
     /**
      * 检测并上传 native dump 文件
      *
-     * @param nativeDumpPath
+     * @param nativeDumpPath 生成 ANR 或 Native Crash tombstone 文件路径
      */
-    public void checkAndSyncPreDump(final String nativeDumpPath) {
-        EventConsumerThreadPool.get().execute(new Runnable() {
+    public void checkAndSyncPreDump(final String nativeDumpPath, RunnerCompleteCallBack callBack) {
+        DataUploaderThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
                 File file = new File(nativeDumpPath);
@@ -169,21 +162,8 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
 
                         if (item.getName().startsWith(EXCEPTION_FILE_PREFIX_TOMBSTONE)) {
                             try {
-                                String crashString = Utils.readFile(item.getAbsolutePath(), Charset.defaultCharset());
-                                long crashTime = file.lastModified() * 1000000L;
-
                                 String value = Utils.readSectionValueFromDump(item.getAbsolutePath(), DUMP_FILE_KEY_APP_STATE);
-
-                                if (config.isEnableTrackAppANR()
-                                        && item.getName().contains(ANR_FILE_NAME)) {
-                                    FTRUMInnerManager.get().addError(crashString, "Native Crash",
-                                            crashTime, ErrorType.ANR_CRASH.toString(), AppState.getValueFrom(value));
-                                } else if (config.isEnableTrackAppCrash()
-                                        && item.getName().contains(NATIVE_FILE_NAME)) {
-                                    FTRUMInnerManager.get().addError(crashString, "Native Crash",
-                                            crashTime, ErrorType.NATIVE.toString(), AppState.getValueFrom(value));
-                                }
-
+                                uploadNativeCrash(item, AppState.getValueFrom(value), true, callBack);
                                 Utils.deleteFile(item.getAbsolutePath());
                             } catch (IOException e) {
                                 LogUtils.e(TAG, Log.getStackTraceString(e));
@@ -195,9 +175,59 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
         });
     }
 
+    /**
+     * 在消费队列中，进行 Native Crash 的上传
+     * <p>
+     * 这里会有 FTEventCsr 内线程嵌套，但是不太可能存在线程阻塞，这里是为了加载崩溃日志内容和写入 Error 数据，
+     * 在 EventConsumerThreadPool 顺序执行. 线程执行路径为  FTEventCsr-> FTEventCsr -> FTDataUp -> FTEventCsr
+     *
+     * @param item       crash 日志内容文件
+     * @param state      应用状态
+     * @param isPreCrash 是否是前一次异常数据，false 代表上传的是当下崩溃的信息
+     * @param callBack
+     */
+    public void uploadNativeCrashBackground(File item, AppState state, boolean isPreCrash, RunnerCompleteCallBack callBack) {
+        EventConsumerThreadPool.get().execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    uploadNativeCrash(item, state, isPreCrash, callBack);
+                } catch (IOException e) {
+                    LogUtils.e(TAG, Log.getStackTraceString(e));
+                }
+            }
+        });
+    }
 
     /**
+     * 上传 Native Crash
      *
+     * @param item
+     * @param state
+     * @param isPreCrash true 记录前一次的崩溃数据，反之是当下的崩溃数据
+     * @param callBack
+     * @throws IOException
+     */
+    private void uploadNativeCrash(File item, AppState state, boolean isPreCrash, RunnerCompleteCallBack callBack) throws IOException {
+        String crashString = Utils.readFile(item.getAbsolutePath(), Charset.defaultCharset());
+        long crashTime = item.lastModified() * 1000000L;
+        HashMap<String, Object> property = new HashMap<>();
+        property.put("is_pre_crash", isPreCrash);
+        if (config.isEnableTrackAppANR()
+                && item.getName().contains(ANR_FILE_NAME)) {
+            FTRUMInnerManager.get().addError(crashString, "Native Crash",
+                    crashTime, ErrorType.ANR_CRASH.toString(), state, property, callBack);
+        } else if (config.isEnableTrackAppCrash()
+                && item.getName().contains(NATIVE_FILE_NAME)) {
+            FTRUMInnerManager.get().addError(crashString, "Native Crash",
+                    crashTime, ErrorType.NATIVE.toString(), state, property, callBack);
+        }
+
+    }
+
+
+    /**
+     * 释放对象，也就是会舍弃 {@link #config} 的配置
      */
     public static void release() {
         instance = null;

@@ -6,7 +6,10 @@ import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTRUMGlobalManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
+import com.ft.sdk.LogCacheDiscard;
+import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.bean.DataType;
+import com.ft.sdk.garble.bean.LogData;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
@@ -20,6 +23,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -30,6 +35,22 @@ public class LogTest extends FTBaseTest {
     @Before
     public void setUp() throws Exception {
         stopSyncTask();
+    }
+
+    /**
+     * 验证没有设置 {@link FTLoggerConfig} 前提下，是否正确
+     *
+     * @throws InterruptedException
+     */
+    @Test
+    public void withOutLogConfig() throws InterruptedException {
+        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
+        List<SyncJsonData> recordDataList = FTDBManager.get()
+                .queryDataByDataByTypeLimitDesc(0, DataType.LOG);
+
+        FTLogger.getInstance().logBackground("test", Status.CRITICAL);
+        Thread.sleep(2000);
+        Assert.assertEquals(0, recordDataList.size());
     }
 
     /**
@@ -68,11 +89,22 @@ public class LogTest extends FTBaseTest {
         //产生一条日志数据
         String logContent = "----logInsertDataTest----";
         FTLogger.getInstance().logBackground(logContent, Status.CRITICAL);
+        FTLogger.getInstance().logBackground(logContent, Status.WARNING, true);
+        HashMap<String, Object> property = new HashMap<>();
+        property.put("fakeKey", "fakeValue");
+        FTLogger.getInstance().logBackground(logContent, Status.ERROR, property);
+
+        ArrayList<LogData> list = new ArrayList<>();
+        list.add(new LogData(logContent, Status.OK));
+        list.add(new LogData(logContent, Status.INFO));
+        FTLogger.getInstance().logBackground(list);
+
+//        waitLogConsumeInThreadPool();
         //线程池中插入，有一定的时间延迟，这里设置3秒等待时间
-        Thread.sleep(2000);
+        Thread.sleep(1000);
         //从数据库中查询是否有插入的数据
         int except = CheckUtils.getCount(DataType.LOG, logContent, 0);
-        Assert.assertEquals(1, except);
+        Assert.assertEquals(5, except);
     }
 
 
@@ -114,7 +146,7 @@ public class LogTest extends FTBaseTest {
 
         FTRUMGlobalManager.get().startView(ANY_VIEW);
         FTLogger.getInstance().logBackground("test", Status.CRITICAL);
-        waitForInThreadPool();
+        waitEventConsumeInThreadPool();
 
         Thread.sleep(2000);
 
@@ -141,6 +173,53 @@ public class LogTest extends FTBaseTest {
         }
 
         return !viewId.isEmpty() && !sessionId.isEmpty();
+    }
+
+
+    /**
+     * 测试大批量插入数据，是否触发丢弃策略
+     *
+     * @throws InterruptedException
+     */
+    @Test
+    public void triggerDiscardPolicyTest() throws InterruptedException {
+        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
+        FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableCustomLog(true));
+        batchLog(10);
+
+    }
+
+    /**
+     * 测试大批量插入数据，是否触发丢弃策略
+     *
+     * @throws InterruptedException
+     */
+    @Test
+    public void triggerDiscardOldPolicyTest() throws InterruptedException {
+        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
+        FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableCustomLog(true)
+                .setLogCacheDiscardStrategy(LogCacheDiscard.DISCARD_OLDEST));
+        batchLog(19);
+    }
+
+    /**
+     * 批量日志
+     * @param expectCount 预期数量
+     * @throws InterruptedException
+     */
+    private void batchLog(int expectCount) throws InterruptedException {
+        String logContent = "custom log";
+        FTDBCachePolicy.get().optCount(4990);
+        for (int i = 0; i < 20; i++) {
+            FTLogger.getInstance().logBackground(i + "-" + logContent, Status.CRITICAL);
+            Thread.sleep(10);
+        }
+        Thread.sleep(2000);
+        int count = CheckUtils.getCount(DataType.LOG, logContent, 0);
+
+        System.out.println("count=" + count);
+        //Thread.sleep(300000);
+        Assert.assertTrue(expectCount >= count);
     }
 
 

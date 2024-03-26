@@ -42,6 +42,8 @@ public class FTLoggerConfig {
      * log 过滤前缀
      */
     private String logPrefix = "";
+
+    private int logCacheLimitCount = Constants.DEFAULT_DB_LOG_CACHE_NUM;
     /**
      * log 日志等级过滤
      */
@@ -108,7 +110,7 @@ public class FTLoggerConfig {
      * @return
      */
     public boolean isEnableConsoleLog() {
-        return !TrackLog.isSetInnerLogHandler() && enableConsoleLog;
+        return  enableConsoleLog;
     }
 
     /**
@@ -210,6 +212,26 @@ public class FTLoggerConfig {
     public FTLoggerConfig setPrintCustomLogToConsole(boolean printCustomLogToConsole) {
         this.printCustomLogToConsole = printCustomLogToConsole;
         return this;
+    }
+
+    /**
+     * 设置日志最大条目数量,最小不小于 1000
+     *
+     * @param count
+     * @return
+     */
+    public FTLoggerConfig setLogCacheLimitCount(int count) {
+        this.logCacheLimitCount = Math.max(1000, count);
+        return this;
+    }
+
+
+    /**
+     * 获取最大日志条目数量限制
+     * @return
+     */
+    public int getLogCacheLimitCount() {
+        return logCacheLimitCount;
     }
 
     /**

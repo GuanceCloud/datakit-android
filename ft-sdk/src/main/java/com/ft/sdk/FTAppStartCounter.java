@@ -71,6 +71,7 @@ class FTAppStartCounter {
 
     /**
      * 记录冷启动时间段
+     *  * {@link Constants#KEY_RUM_ACTION_TYPE} = {@link  Constants#ACTION_TYPE_LAUNCH_COLD}
      *
      * @param codeStartTime 冷启动时间段，单位纳秒
      */
@@ -92,7 +93,7 @@ class FTAppStartCounter {
     /**
      * 上传热启动时间
      *
-     * {@link Constants#KEY_RUM_ACTION_TYPE} = {@link  Constants#KEYRUM}
+     * {@link Constants#KEY_RUM_ACTION_TYPE} = {@link  Constants#ACTION_TYPE_LAUNCH_HOT}
      *
      * @param hotStartDuration 热启动时间段，单位纳秒
      */

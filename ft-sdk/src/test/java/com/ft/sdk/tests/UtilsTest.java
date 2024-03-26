@@ -2,6 +2,7 @@ package com.ft.sdk.tests;
 
 import static org.junit.Assert.assertEquals;
 
+import com.ft.sdk.FTTrackInner;
 import com.ft.sdk.SyncDataHelper;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.LineProtocolBean;
@@ -124,8 +125,17 @@ public class UtilsTest {
                 .replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK));
     }
 
+    /**
+     * 调用 {@link SyncDataHelper#convertToLineProtocolLines(List, HashMap, boolean)}
+     * ,{@link FTTrackInner#dataHelper}
+     *
+     * @param list
+     * @return
+     * @throws Exception
+     */
     private String convertToLineProtocolLines(List<SyncJsonData> list) throws Exception {
-        return Whitebox.invokeMethod(new SyncDataHelper(), "convertToLineProtocolLines",
+        SyncDataHelper helper = Whitebox.getInternalState(FTTrackInner.getInstance(), "dataHelper");
+        return Whitebox.invokeMethod(helper, "convertToLineProtocolLines",
                 list, new HashMap<>(), false);
     }
 

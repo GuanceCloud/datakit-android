@@ -19,36 +19,33 @@ public class FTHttpConfigManager {
     /**
      * datakit 服务端请求地址
      */
-    public String datakitUrl;
+    private String datakitUrl;
 
     /**
      * dataway 服务端请求地址
      */
-    public String datawayUrl;
+    private String datawayUrl;
 
 
     /**
      * dataway 使用 token
      */
-    public String clientToken;
-    /**
-     * 64位 随机uuid
-     */
-    public String uuid;
+    private String clientToken;
+
     /**
      * 请求 http USER-AGENT header
      */
-    public String userAgent;
+    private String userAgent;
 
     /**
      * http 发送连接时间
      */
-    public int sendOutTime = 10000;
+    private int sendOutTime = 30000;
+
     /**
      * http 请求返回读取
      */
-    public int readOutTime = 10000;
-
+    private int readOutTime = 40000;//大于 Dataway Datakit 30秒时间
 
     private FTHttpConfigManager() {
 
@@ -71,6 +68,7 @@ public class FTHttpConfigManager {
             return;
         }
         userAgent = USER_AGENT;
+        sendOutTime = Math.max(sendOutTime, ftsdkConfig.getPageSize() * 1000);
         datakitUrl = ftsdkConfig.getDatakitUrl();
         datawayUrl = ftsdkConfig.getDatawayUrl();
         clientToken = ftsdkConfig.getClientToken();
@@ -86,6 +84,29 @@ public class FTHttpConfigManager {
 
     }
 
+    public String getDatakitUrl() {
+        return datakitUrl;
+    }
+
+    public String getDatawayUrl() {
+        return datawayUrl;
+    }
+
+    public String getClientToken() {
+        return clientToken;
+    }
+
+    public String getUserAgent() {
+        return userAgent;
+    }
+
+    public int getSendOutTime() {
+        return sendOutTime;
+    }
+
+    public int getReadOutTime() {
+        return readOutTime;
+    }
 
     /**
      * 释放 SDK 相关

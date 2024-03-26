@@ -17,25 +17,31 @@ import android.util.Base64;
 import android.util.Log;
 
 import com.ft.sdk.FTApplication;
+import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
@@ -43,10 +49,12 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
 import okhttp3.MediaType;
@@ -301,12 +309,16 @@ public class Utils {
                 calendar.get(Calendar.DAY_OF_MONTH);
     }
 
-    /**
-     * 转换时间格式
-     */
+    private static final ThreadLocal<SimpleDateFormat> dateFormatThreadLocal = new ThreadLocal<SimpleDateFormat>() {
+        @Override
+        protected SimpleDateFormat initialValue() {
+            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS", Locale.getDefault());
+        }
+    };
+
     public static String getCurrentTimeStamp() {
         Date currentTime = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS", Locale.getDefault());
+        SimpleDateFormat sdf = dateFormatThreadLocal.get();
         return sdf.format(currentTime);
     }
 
@@ -530,5 +542,110 @@ public class Utils {
         }
         return rawData.toString();
     }
+
+
+    /**
+     * 数组转化为 json 字符的方法，替换 Gson 高损耗
+     * @param values
+     * @return
+     */
+    public static String setToJsonString(Set<String> values) {
+        StringBuilder jsonBuilder = new StringBuilder();
+        jsonBuilder.append("[");
+        Iterator<String> iterator = values.iterator();
+        while (iterator.hasNext()) {
+            jsonBuilder.append("\"").append(iterator.next()).append("\"");
+            if (iterator.hasNext()) {
+                jsonBuilder.append(", ");
+            }
+        }
+        jsonBuilder.append("]");
+        return jsonBuilder.toString();
+    }
+
+
+    /**
+     * Hashmap 转化为 json，基础类型自行转化，其他类型交给 gson，可以降低损耗
+     * @param map
+     * @return
+     */
+
+    public static <T> String hashMapObjectToJson(HashMap<String, T> map) {
+        StringBuilder jsonBuilder = new StringBuilder();
+        jsonBuilder.append("{");
+        for (String key : map.keySet()) {
+            jsonBuilder.append("\"").append(key).append("\":");
+            Object value = map.get(key);
+            if (value instanceof String) {
+                jsonBuilder.append("\"").append(value).append("\"");
+            } else if (value instanceof Number || value instanceof Boolean) {
+                jsonBuilder.append(value);
+            } else {
+                // 对于非基本类型，使用 Gson 进行转换
+                Gson gson = new Gson();
+                jsonBuilder.append(gson.toJson(value));
+            }
+            jsonBuilder.append(", ");
+        }
+        if (!map.isEmpty()) {
+            // 删除最后一个逗号和空格
+            jsonBuilder.delete(jsonBuilder.length() - 2, jsonBuilder.length());
+        }
+        jsonBuilder.append("}");
+        return jsonBuilder.toString();
+    }
+
+
+    /**
+     * MMAP 方式读取文件
+     * @param file
+     * @return
+     * @throws IOException
+     */
+    public static String readFile(File file) throws IOException {
+        RandomAccessFile raf = new RandomAccessFile(file, "r");
+        FileChannel channel = raf.getChannel();
+        MappedByteBuffer buffer = channel.map(FileChannel.MapMode.READ_ONLY, 0, file.length());
+
+        byte[] bytes = new byte[buffer.remaining()];
+        buffer.get(bytes);
+        String content = new String(bytes);
+
+        buffer.force();
+        channel.close();
+        raf.close();
+
+        return content;
+    }
+
+    /**
+     * 从文件名去后缀
+     * @param fileName 文件名
+     * @return
+     */
+    public static String getNameWithoutExtension(String fileName) {
+        int pos = fileName.lastIndexOf(".");
+        if (pos > 0) {
+            return fileName.substring(0, pos);
+        } else {
+            return fileName;
+        }
+    }
+
+
+    /**
+     * 写入文件
+     *
+     * @param file
+     * @param content
+     * @throws IOException
+     */
+    public static void writeToFile(File file, String content) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
+            writer.write(content);
+            writer.flush();
+        }
+    }
+
 }
 

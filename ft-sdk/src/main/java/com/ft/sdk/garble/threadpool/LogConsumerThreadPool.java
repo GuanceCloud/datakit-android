@@ -1,11 +1,7 @@
 package com.ft.sdk.garble.threadpool;
 
 /**
- * BY huangDianHua
- * DATE:2019-11-29 18:57
- * Description:
- *
- * 负责缓存日志数据的消费
+ * 负责缓存日志数据的消费，{@link com.ft.sdk.garble.bean.DataType#LOG}
  */
 public class LogConsumerThreadPool extends BaseThreadPool {
     private final static int CORE_POOL_SIZE = 1;
@@ -14,7 +10,7 @@ public class LogConsumerThreadPool extends BaseThreadPool {
 
 
     private LogConsumerThreadPool() {
-        super(CORE_POOL_SIZE);
+        super(CORE_POOL_SIZE, "FTLogCsr", 4);
     }
 
 

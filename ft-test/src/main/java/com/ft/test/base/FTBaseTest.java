@@ -37,6 +37,7 @@ public class FTBaseTest {
     protected static final String CUSTOM_VALUE = "custom_value";
     protected static final String TEST_FAKE_RUM_ID = "rumId";
     protected static final String TEST_FAKE_URL = "http://www.test.url";
+    protected static final String TEST_FAKE_CLIENT_TOKEN = "fake_client_token";
 
 
     protected Context getContext() {
@@ -44,7 +45,7 @@ public class FTBaseTest {
     }
 
     /**
-     * 停止数据同步，{@link SyncTaskManager#running} 变量来实现
+     * 停止数据同步，{@link SyncTaskManager#running} = true 变量来实现
      *
      * @throws Exception
      */
@@ -54,7 +55,7 @@ public class FTBaseTest {
     }
 
     /**
-     * 恢复数据同步
+     * 恢复数据同步,{@link SyncTaskManager#running} = false 变量来实现
      *
      * @throws Exception
      */
@@ -64,6 +65,8 @@ public class FTBaseTest {
 
     /**
      * 立即执行数据同步
+     * <p>
+     * {@link SyncTaskManager#executePoll()}
      *
      * @throws Exception
      */
@@ -117,6 +120,8 @@ public class FTBaseTest {
 
     /**
      * 立即生成 RUM 相关数据
+     * <p>
+     * {@link FTRUMInnerManager#generateRumData()}
      *
      * @throws Exception
      */
@@ -128,11 +133,13 @@ public class FTBaseTest {
 
     /**
      * 等待线程池队列执行结束，目的是让线程池函数在测试用例中串行，等待操作结束
+     * <p>
+     * {@link EventConsumerThreadPool}
      *
      * @throws InterruptedException
      */
-    protected void waitForInThreadPool() throws InterruptedException {
-        CountDownLatch countDownLatch = new CountDownLatch(1);
+    protected void waitEventConsumeInThreadPool() throws InterruptedException {
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
         EventConsumerThreadPool.get().execute(() -> {
             countDownLatch.countDown();
         });
@@ -153,6 +160,8 @@ public class FTBaseTest {
 
     /**
      * 使 session 立即过期，以缩短测试用例在测试过程中的耗时等待
+     * <p>
+     * {@link FTRUMInnerManager#lastActionTime}
      *
      * @throws IllegalAccessException
      */
@@ -166,12 +175,14 @@ public class FTBaseTest {
 
     /**
      * 上传数据测试
+     * <p>
+     * {@link SyncTaskManager#requestNet(DataType, String, AsyncCallback)}
      *
      * @param dataType
      */
     protected void uploadData(DataType dataType) {
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, dataType);
-        SyncDataHelper syncDataManager = new SyncDataHelper();
+        SyncDataHelper syncDataManager = getInnerSyncDataHelper();
         String body = syncDataManager.getBodyContent(dataType, recordDataList);
         body = body.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION).replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK);
 
@@ -181,6 +192,31 @@ public class FTBaseTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 使用 Whitebox 检验私有变量
+     *
+     * @param target    访问已创建实例
+     * @param fieldName 私有变量名称
+     * @param expect    预期值
+     * @return fieldName 是否与 expect 相同
+     */
+    protected boolean checkInnerFieldValue(Object target, String fieldName, Object expect) {
+        return Whitebox.getInternalState(target, fieldName).equals(expect);
+    }
+
+
+
+    /**
+     * 获取当前 dataHelper 对象
+     * {@link FTTrackInner#dataHelper}
+     *
+     * @return
+     */
+
+    public static SyncDataHelper getInnerSyncDataHelper() {
+        return Whitebox.getInternalState(FTTrackInner.getInstance(), "dataHelper");
     }
 
     /**

@@ -31,12 +31,33 @@ public class SyncDataHelper {
     private final HashMap<String, Object> traceTags;
 
 
-    public SyncDataHelper() {
-        basePublicTags = FTSdk.checkInstallState() ? FTSdk.get().getBasePublicTags() : new HashMap<>();
-        logTags = FTLoggerConfigManager.get().getConfig() != null ? FTLoggerConfigManager.get().getConfig().getGlobalContext() : new HashMap<>();
-        rumTags = FTRUMConfigManager.get().getConfig() != null ? FTRUMConfigManager.get().getConfig().getGlobalContext() : new HashMap<>();
-        traceTags = FTTraceConfigManager.get().getConfig() != null ? FTTraceConfigManager.get().getConfig().getGlobalContext() : new HashMap<>();
+     protected SyncDataHelper() {
+        basePublicTags = new HashMap<>();
+        logTags = new HashMap<>();
+        rumTags = new HashMap<>();
+        traceTags = new HashMap<>();
     }
+
+    void initBaseConfig(FTSDKConfig config) {
+        basePublicTags.putAll(config.getGlobalContext());
+    }
+
+    void initLogConfig(FTLoggerConfig config) {
+        logTags.putAll(basePublicTags);
+        logTags.putAll(config.getGlobalContext());
+    }
+
+    void initRUMConfig(FTRUMConfig config) {
+        rumTags.putAll(basePublicTags);
+        rumTags.putAll(config.getGlobalContext());
+    }
+
+    void initTraceConfig(FTTraceConfig config) {
+        traceTags.putAll(basePublicTags);
+        traceTags.putAll(config.getGlobalContext());
+    }
+
+
 
     /**
      * 封装同步上传的数据
@@ -69,9 +90,7 @@ public class SyncDataHelper {
      * @return
      */
     private String getLogBodyContent(List<SyncJsonData> datas) {
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.putAll(basePublicTags);
-        hashMap.putAll(logTags);
+        HashMap<String, Object> hashMap = new HashMap<>(logTags);
         return convertToLineProtocolLines(datas, hashMap);
     }
 
@@ -83,9 +102,7 @@ public class SyncDataHelper {
      * @return
      */
     private String getTraceBodyContent(List<SyncJsonData> datas) {
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.putAll(basePublicTags);
-        hashMap.putAll(traceTags);
+        HashMap<String, Object> hashMap = new HashMap<>(traceTags);
         return convertToLineProtocolLines(datas, hashMap);
     }
 
@@ -96,9 +113,7 @@ public class SyncDataHelper {
      * @return
      */
     private String getRumBodyContent(List<SyncJsonData> datas) {
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.putAll(basePublicTags);
-        hashMap.putAll(rumTags);
+        HashMap<String, Object> hashMap = new HashMap<>(rumTags);
         return convertToLineProtocolLines(datas, hashMap);
     }
 

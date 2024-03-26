@@ -38,14 +38,29 @@ public class SyncTaskManager {
      * 最大容忍错误次数
      */
     public static final int MAX_ERROR_COUNT = 5;
+
     /**
-     * 一个同步周期内一次请求包含数据条目数量
+     * 最大同步休眠时间
      */
-    private static final int LIMIT_SIZE = 10;
+    public static final int SYNC_SLEEP_MAX_TIME_MS = 100;
+
+
+    /**
+     * 最小同步休眠时间
+     */
+    public static final int SYNC_SLEEP_MINI_TIME_MS = 0;
+
+
     /**
      * 传输间歇休眠时间
      */
     private static final int SLEEP_TIME = 10000;
+
+
+    /**
+     * 高频行为间隔时间
+     */
+    private static final int INTERVAL = 100;
 
     /**
      * 重试等待时间
@@ -61,12 +76,40 @@ public class SyncTaskManager {
      */
     private volatile boolean running;
 
+    /**
+     * 是否停止
+     */
     private boolean isStop = false;
 
+    /**
+     * 同步消息
+     */
     private static final int MSG_SYNC = 1;
 
+    /**
+     * 最大错误尝试次数，超出之后，队列数据将停止，等待下次同步触发
+     */
     private int dataSyncMaxRetryCount;
 
+    /**
+     * 是否进行自动同步
+     */
+    private boolean autoSync;
+
+    /**
+     * 同步请求间歇时间
+     */
+    private int syncSleepTime;
+
+    /**
+     * 同步请求条目数量
+     */
+    private int pageSize = SyncPageSize.MEDIUM.getValue();
+
+
+    /**
+     * 用于跨步线程消息发送
+     */
     private final Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
@@ -84,7 +127,9 @@ public class SyncTaskManager {
     private final static DataType[] SYNC_MAP = DataType.values();
 
     /**
-     * For AndroidTest
+     * 注意 ：AndroidTest 会调用这个方法
+     * {@link com.ft.test.base.FTBaseTest#stopSyncTask() }
+     * {@link com.ft.test.base.FTBaseTest#resumeSyncTask() }
      *
      * @param running
      */
@@ -104,13 +149,21 @@ public class SyncTaskManager {
         return SyncTaskManager.SingletonHolder.INSTANCE;
     }
 
+
     /**
-     * For AndroidTest
+     * 执行数据同步
+     * <p>
+     * 注意 ：AndroidTest 会调用这个方法 {@link com.ft.test.base.FTBaseTest#executeSyncTask()}
      */
-    private void executePoll() {
+    void executePoll() {
         executePoll(false);
     }
 
+    /**
+     * 执行数据同步
+     *
+     * @param withSleep 是否进行睡眠，{@link #SLEEP_TIME}
+     */
     private void executePoll(final boolean withSleep) {
         if (running || isStop) {
             return;
@@ -124,10 +177,11 @@ public class SyncTaskManager {
                 public void run() {
                     try {
 
-                        LogUtils.d(TAG, "******************* Sync Poll Running *******************>>>\n");
                         if (withSleep) {
+                            LogUtils.d(TAG, "******************* Sync Poll Waiting *******************>>>\n");
                             Thread.sleep(SLEEP_TIME);
                         }
+                        LogUtils.d(TAG, "******************* Sync Poll Running *******************>>>\n");
 
                         for (DataType dataType : SYNC_MAP) {
                             SyncTaskManager.this.handleSyncOpt(dataType);
@@ -135,9 +189,9 @@ public class SyncTaskManager {
 
                     } catch (Exception e) {
                         if (e instanceof FTNetworkNoAvailableException) {
-                            LogUtils.e(TAG, "Network not available Stop poll");
+                            LogUtils.e(TAG, "Sync Fail-Network not available Stop poll");
                         } else {
-                            LogUtils.e(TAG, Log.getStackTraceString(e));
+                            LogUtils.e(TAG, "Sync Fail:\n" + Log.getStackTraceString(e));
 
                         }
                     } finally {
@@ -154,8 +208,19 @@ public class SyncTaskManager {
      * 触发延迟轮询同步
      */
     void executeSyncPoll() {
-        mHandler.removeMessages(MSG_SYNC);
-        mHandler.sendEmptyMessageDelayed(MSG_SYNC, 100);
+        if (autoSync) {
+            if (FTDBCachePolicy.get().reachHalfLimit()) {
+                if (!running) {
+                    LogUtils.w(TAG, "Rapid Log Growth，Start to Sync ");
+                    mHandler.removeMessages(MSG_SYNC);
+                    executePoll();
+                }
+            } else {
+                mHandler.removeMessages(MSG_SYNC);
+                mHandler.sendEmptyMessageDelayed(MSG_SYNC, INTERVAL);
+            }
+
+        }
     }
 
     /**
@@ -175,8 +240,8 @@ public class SyncTaskManager {
 
             LogUtils.d(TAG, "Sync Data Count:" + requestDataList.size());
 
-            SyncDataHelper syncData = new SyncDataHelper();
-            String body = syncData.getBodyContent(dataType, requestDataList);
+            SyncDataHelper helper = FTTrackInner.getInstance().getCurrentDataHelper();
+            String body = helper.getBodyContent(dataType, requestDataList);
             LogUtils.d(TAG, body);
             requestNet(dataType, body, new AsyncCallback() {
                 @Override
@@ -217,21 +282,30 @@ public class SyncTaskManager {
             }
 
             //当前缓存数据已获取完毕，等待下一次数据触发
-            if (cacheDataList.size() < LIMIT_SIZE) {
+            if (cacheDataList.size() < pageSize) {
                 break;
             }
+
+            if (syncSleepTime > 0) {
+                try {
+                    Thread.sleep(syncSleepTime);
+                } catch (InterruptedException e) {
+                    LogUtils.d(TAG, Log.getStackTraceString(e));
+                }
+            }
+
 
         }
     }
 
     /**
-     * 查询
+     * 查询对应数数据类型的数据
      *
-     * @param dataType
-     * @return
+     * @param dataType 数据类型
+     * @return 同步数据
      */
     private List<SyncJsonData> queryFromData(DataType dataType) {
-        return FTDBManager.get().queryDataByDataByTypeLimit(LIMIT_SIZE, dataType);
+        return FTDBManager.get().queryDataByDataByTypeLimit(pageSize, dataType);
     }
 
     /**
@@ -249,12 +323,14 @@ public class SyncTaskManager {
 
     /**
      * 上传数据
+     * <p>
+     * 注意 ：AndroidTest 会调用这个方法 {@link com.ft.test.base.FTBaseTest#uploadData(DataType)}
      *
      * @param dataType     数据类型
      * @param body         数据行协议结果
      * @param syncCallback 异步对象
      */
-    public synchronized void requestNet(DataType dataType, String body, final AsyncCallback syncCallback) throws FTNetworkNoAvailableException {
+    private synchronized void requestNet(DataType dataType, String body, final AsyncCallback syncCallback) throws FTNetworkNoAvailableException {
         String model;
         switch (dataType) {
             case TRACE:
@@ -292,6 +368,9 @@ public class SyncTaskManager {
     public void init(FTSDKConfig config) {
         isStop = false;
         dataSyncMaxRetryCount = config.getDataSyncRetryCount();
+        pageSize = config.getPageSize();
+        autoSync = config.isAutoSync();
+        syncSleepTime = config.getSyncSleepTime();
     }
 
     /**

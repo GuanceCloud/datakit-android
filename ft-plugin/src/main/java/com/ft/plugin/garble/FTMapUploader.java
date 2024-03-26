@@ -28,10 +28,21 @@ public class FTMapUploader {
      * debug symbol 路径
      */
     private final static String CMAKE_DEBUG_SYMBOL_PATH = "/intermediates/cmake/debug/obj";
+
+    /**
+     * native c/c++ build 生成路径
+     */
     private final static String CMAKE_CXX_PATH = "/intermediates/cxx/Debug";
+
+    /**
+     * Unity Symbol 生成路径
+     */
     private final static String UNITY_SYMBOLS_PATH = "/unityLibrary/symbols";
     private final static String NAME_RELEASE_COMPILE_CLASSPATH = "releaseCompileClasspath";
 
+    /**
+     * R8 混淆生成路径
+     */
     private final HashMap<String, ObfuscationSettingConfig> obfuscationSettingMap = new HashMap<>();
 
     /**
@@ -48,6 +59,10 @@ public class FTMapUploader {
     private final static String PROGUARD_MAPPING_PATH = "/outputs/proguard/%s/mapping/mapping.txt";
 
     private final HashMap<String, ArrayList<String>> symbolPathsMap = new HashMap<>();
+
+    /**
+     * zip 打包对象，临时生成路径
+     */
     private final String tmpBuildPathFormat;
     private final String zipBuildPathFormat;
     private final String proguardBuildPathFormat;
@@ -309,7 +324,7 @@ public class FTMapUploader {
     /**
      * 上传符号文件
      *
-     * @param settingConfig
+     * @param settingConfig 混淆配置
      * @throws IOException
      * @throws InterruptedException
      */
@@ -366,6 +381,9 @@ public class FTMapUploader {
     }
 
 
+    /**
+     * 混淆配置
+     */
     static class ObfuscationSettingConfig {
         /**
          * 包名

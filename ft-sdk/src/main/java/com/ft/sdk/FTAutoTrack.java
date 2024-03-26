@@ -275,7 +275,7 @@ public class FTAutoTrack {
             Method getPosition = tab.getClass().getMethod("getPosition");
             int position = (int) getPosition.invoke(tab);
             Object object = view.getContext();
-            clickView(view, object.getClass(), AopUtils.getClassName(object),
+            clickView(view, AopUtils.getClass(object), AopUtils.getClassName(object),
                     AopUtils.getSupperClassName(object), AopUtils.getViewDesc(view) + "#pos:" + position);
         } catch (Exception e) {
             LogUtils.e(TAG, Log.getStackTraceString(e));
@@ -337,7 +337,7 @@ public class FTAutoTrack {
                 if (object == null) {
                     object = AopUtils.getActivityFromContext(view.getContext());
                 }
-                clickView(view, object.getClass(), AopUtils.getClassName(object),
+                clickView(view, AopUtils.getClass(object), AopUtils.getClassName(object),
                         AopUtils.getSupperClassName(object), AopUtils.getViewDesc(view));
             }
         } catch (Exception e) {
@@ -414,7 +414,7 @@ public class FTAutoTrack {
     public static void trackViewOnTouch(View view, MotionEvent motionEvent) {
         try {
             Object object = view.getContext();
-            clickView(view, object.getClass(), AopUtils.getClassName(object),
+            clickView(view, AopUtils.getClass(object), AopUtils.getClassName(object),
                     AopUtils.getSupperClassName(object), AopUtils.getViewDesc(view));
         } catch (Exception e) {
             LogUtils.e(TAG, Log.getStackTraceString(e));

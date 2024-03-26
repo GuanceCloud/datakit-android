@@ -23,7 +23,7 @@ public class FTANRDetector {
     /**
      * 配置初始化
      *
-     * @param config
+     * @param config rum 配置
      */
     void init(FTRUMConfig config) {
         if (config.isEnableTrackAppANR()) {

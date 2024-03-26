@@ -111,8 +111,8 @@ public class NativeNetEngine implements INetEngine {
             LogUtils.e(TAG, Log.getStackTraceString(e));
         }
         //设置连接和读取超时时间
-        mConnection.setConnectTimeout(FTHttpConfigManager.get().sendOutTime);
-        mConnection.setReadTimeout(FTHttpConfigManager.get().readOutTime);
+        mConnection.setConnectTimeout(FTHttpConfigManager.get().getSendOutTime());
+        mConnection.setReadTimeout(FTHttpConfigManager.get().getReadOutTime());
     }
 
     private void setHeadParams() {
@@ -176,12 +176,12 @@ public class NativeNetEngine implements INetEngine {
             }
         } catch (SocketTimeoutException e) {
             //连接超时提示
-            responseCode = NetCodeStatus.FILE_IO_EXCEPTION_CODE;
-            return new FTResponseData(responseCode, e.getLocalizedMessage());
+            responseCode = NetCodeStatus.FILE_TIMEOUT_CODE;
+            return new FTResponseData(responseCode, e.getLocalizedMessage() + ",网络超时");
         } catch (IOException e) {
             //IO异常提示
             responseCode = NetCodeStatus.FILE_IO_EXCEPTION_CODE;
-            return new FTResponseData(responseCode, e.getLocalizedMessage());
+            return new FTResponseData(responseCode, e.getLocalizedMessage() + ",检查本地网络连接是否正常");
         } catch (Exception e) {
             //其他异常未知错误
             responseCode = NetCodeStatus.UNKNOWN_EXCEPTION_CODE;

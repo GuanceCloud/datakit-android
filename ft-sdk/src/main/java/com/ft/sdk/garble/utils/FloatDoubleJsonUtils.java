@@ -2,7 +2,7 @@ package com.ft.sdk.garble.utils;
 
 import android.util.Log;
 
-import com.google.gson.GsonBuilder;
+import com.ft.sdk.garble.manager.SingletonGson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,7 +31,7 @@ public class FloatDoubleJsonUtils {
     public static String protectValueFormat(JSONObject json) {
 
         try {
-            return new GsonBuilder().serializeNulls().create().toJson(toMap(json));
+            return SingletonGson.getInstance().toJson(toMap(json));
         } catch (JSONException e) {
             LogUtils.e(TAG, Log.getStackTraceString(e));
             return "{}";

@@ -107,7 +107,7 @@ public class RUMTest extends FTBaseTest {
     public void actionGenerateTest() throws Exception {
         FTRUMGlobalManager.get().startAction(ACTION_NAME, ACTION_TYPE_NAME);
         invokeCheckActionClose();
-        waitForInThreadPool();
+        waitEventConsumeInThreadPool();
         ArrayList<ActionBean> list = FTDBManager.get().querySumAction(0);
 
         ActionBean action = list.get(0);
@@ -126,7 +126,7 @@ public class RUMTest extends FTBaseTest {
     @Test
     public void addActionTest() throws Exception {
         FTRUMGlobalManager.get().addAction(ACTION_NAME, ACTION_TYPE_NAME, DURATION);
-        waitForInThreadPool();
+        waitEventConsumeInThreadPool();
 
         ArrayList<ActionBean> list = FTDBManager.get().querySumAction(0);
 
@@ -147,7 +147,7 @@ public class RUMTest extends FTBaseTest {
         property.put(PROPERTY_NAME, PROPERTY_VALUE);
         FTRUMGlobalManager.get().startAction(ACTION_NAME, ACTION_TYPE_NAME, property);
         invokeCheckActionClose();
-        waitForInThreadPool();
+        waitEventConsumeInThreadPool();
         ArrayList<ActionBean> list = FTDBManager.get().querySumAction(0);
         ActionBean action = list.get(0);
         Assert.assertEquals(action.getProperty().get(PROPERTY_NAME), PROPERTY_VALUE);
@@ -174,7 +174,7 @@ public class RUMTest extends FTBaseTest {
 
         FTRUMGlobalManager.get().startView(SECOND_VIEW);
 
-        waitForInThreadPool();
+        waitEventConsumeInThreadPool();
 
         ArrayList<ViewBean> list = FTDBManager.get().querySumView(0, true);
         Assert.assertEquals(list.size(), 2);
@@ -205,7 +205,7 @@ public class RUMTest extends FTBaseTest {
         FTRUMGlobalManager.get().onCreateView(FIRST_VIEW, DURATION);
         FTRUMGlobalManager.get().startView(FIRST_VIEW, property);
 
-        waitForInThreadPool();
+        waitEventConsumeInThreadPool();
 
         ArrayList<ViewBean> list = FTDBManager.get().querySumView(0);
         ViewBean viewStart = list.get(0);
@@ -248,7 +248,7 @@ public class RUMTest extends FTBaseTest {
         FTRUMGlobalManager.get().startView(SECOND_VIEW);
         FTRUMGlobalManager.get().stopView();
 
-        waitForInThreadPool();
+        waitEventConsumeInThreadPool();
 
         ArrayList<ViewBean> list = FTDBManager.get().querySumView(0, true);
         Assert.assertEquals(list.size(), 2);
@@ -294,7 +294,7 @@ public class RUMTest extends FTBaseTest {
 
         FTRUMGlobalManager.get().addLongTask(LONG_TASK_MESSAGE, DURATION);
         invokeCheckActionClose();
-        waitForInThreadPool();
+        waitEventConsumeInThreadPool();
 
         ArrayList<ActionBean> actionList = FTDBManager.get().querySumAction(0);
         Assert.assertEquals(actionList.size(), 1);
@@ -304,7 +304,7 @@ public class RUMTest extends FTBaseTest {
         Assert.assertEquals(action.getErrorCount(), 1);
         Assert.assertEquals(action.getLongTaskCount(), 1);
 
-        waitForInThreadPool();
+        waitEventConsumeInThreadPool();
 
         ArrayList<ViewBean> viewList = FTDBManager.get().querySumView(0);
         ViewBean view = viewList.get(0);
@@ -326,7 +326,7 @@ public class RUMTest extends FTBaseTest {
         FTRUMGlobalManager.get().startView(FIRST_VIEW);
         FTRUMGlobalManager.get().startAction(ACTION_NAME, ACTION_TYPE_NAME);
         invokeCheckActionClose();
-        waitForInThreadPool();
+        waitEventConsumeInThreadPool();
 
         ArrayList<ActionBean> actionList = FTDBManager.get().querySumAction(0);
         ActionBean action = actionList.get(0);
@@ -339,7 +339,7 @@ public class RUMTest extends FTBaseTest {
 
         FTRUMGlobalManager.get().startAction(ACTION_NAME, ACTION_TYPE_NAME);
         invokeCheckActionClose();
-        waitForInThreadPool();
+        waitEventConsumeInThreadPool();
 
         ArrayList<ActionBean> newActionList = FTDBManager.get().querySumAction(0);
         ActionBean newAction = newActionList.get(1);
@@ -525,7 +525,7 @@ public class RUMTest extends FTBaseTest {
         invokeCheckActionClose();
         sendResource();
         FTRUMGlobalManager.get().stopView();
-        waitForInThreadPool();
+        waitEventConsumeInThreadPool();
         Thread.sleep(3000L);
     }
 
@@ -655,10 +655,10 @@ public class RUMTest extends FTBaseTest {
         FTRUMGlobalManager.get().stopView();
         sendResource();
 
-        waitForInThreadPool();
+        waitEventConsumeInThreadPool();
 
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
-        Assert.assertTrue(recordDataList.size() > 0);
+        Assert.assertFalse(recordDataList.isEmpty());
         for (SyncJsonData recordData : recordDataList) {
             try {
                 JSONObject json = new JSONObject(recordData.getDataString());
@@ -666,6 +666,7 @@ public class RUMTest extends FTBaseTest {
                 String measurement = json.optString("measurement");
                 if (Constants.FT_MEASUREMENT_RUM_RESOURCE.equals(measurement)) {
                     if (tags != null) {
+                        System.out.println("json:" + json);
                         Assert.assertFalse(tags.has(Constants.KEY_RUM_ACTION_ID));
                         break;
                     }

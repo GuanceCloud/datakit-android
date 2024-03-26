@@ -109,27 +109,4 @@ public class ConsoleLogTest extends BaseTest {
 
 
     }
-
-    /**
-     * 测试大批量插入数据，是否触发丢弃策略
-     *
-     * @throws InterruptedException
-     */
-    @Test
-    public void triggerPolicyTest() throws InterruptedException {
-        FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableConsoleLog(true));
-
-        String logContent = "控制台日志测试用例";
-        FTDBCachePolicy.get().optCount(4990);
-        for (int i = 0; i < 20; i++) {
-            Log.d("TestLog", i + "-" + logContent);
-            Thread.sleep(10);
-        }
-        Thread.sleep(2000);
-        int count = CheckUtils.getCount(DataType.LOG, logContent, 0);
-
-        System.out.println("count=" + count);
-        //Thread.sleep(300000);
-        Assert.assertTrue(10 >= count);
-    }
 }

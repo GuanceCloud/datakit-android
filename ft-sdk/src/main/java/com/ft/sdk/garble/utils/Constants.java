@@ -135,7 +135,12 @@ public class Constants {
     /**
      * 日志最大限制缓存数
      */
-    public static final int MAX_DB_CACHE_NUM = 5000;//数据库最大缓存容量
+    public static final int DEFAULT_DB_LOG_CACHE_NUM = 5000;
+
+    /**
+     * 日志缓存最小缓存数限制
+     */
+    public static final int MINI_DB_LOG_CACHE_NUM = 1000;
 
 //    public static final String KEY_EVENT_ID = "event_id";
 //    public static final String KEY_EVENT = "event";
@@ -274,6 +279,7 @@ public class Constants {
     public static final String KEY_DEVICE_OS_VERSION_MAJOR = "os_version_major";
     public static final String KEY_DEVICE_DEVICE_BAND = "device";
     public static final String KEY_DEVICE_DEVICE_MODEL = "model";
+    public static final String KEY_DEVICE_DEVICE_ARCH = "arch";
     public static final String KEY_DEVICE_DISPLAY = "screen_size";
     public static final String KEY_DEVICE_CARRIER = "carrier";
     public static final String KEY_DEVICE_LOCALE = "locale";

@@ -69,7 +69,8 @@ public class RUMResourceTest extends BaseTest {
     }
 
     /**
-     *  验证 OkHttp ft-plugin 是否正确织入 Interceptor 相关代码
+     * 验证 OkHttp ft-plugin 是否正确织入 Interceptor 相关代码
+     *
      * @throws Exception
      */
     @Test
@@ -86,12 +87,15 @@ public class RUMResourceTest extends BaseTest {
             try {
                 JSONObject json = new JSONObject(recordData.getDataString());
                 JSONObject fields = json.optJSONObject("fields");
+                JSONObject tags = json.optJSONObject("tags");
                 String measurement = json.optString("measurement");
                 if ("action".equals(measurement)) {
-                    if (fields != null) {
-                        int resourceCount = fields.optInt("action_resource_count");
-                        Assert.assertEquals(1, resourceCount);
-                        break;
+                    if (fields != null && tags != null) {
+                        if (tags.optString("action_type").equals("click")) {
+                            int resourceCount = fields.optInt("action_resource_count");
+                            Assert.assertEquals(1, resourceCount);
+                            break;
+                        }
                     }
                 }
             } catch (JSONException e) {
