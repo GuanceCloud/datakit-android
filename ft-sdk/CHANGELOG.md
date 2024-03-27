@@ -1,3 +1,7 @@
+# agent 1.4.4-alpha01
+1. 数据库链接容错保护
+
+---
 # agent 1.4.3
 1. 支持 Dataway 与 Datakit 的地址上传
 2. 支持发送 Action，View，Resource，LongTask，Error 类型的 RUM 数据。
@@ -9,6 +13,7 @@
 5. 支持数据同步参数配置，请求条目数据，同步间歇时间，以及日志缓存条目数。
 6. 支持 SDK 内部日志转化为文件
 
+---
 # agent 1.4.3-beta04
 1. 日志高速缓存策略判断条件优化
 
