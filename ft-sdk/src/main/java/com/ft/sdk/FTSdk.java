@@ -66,7 +66,6 @@ public class FTSdk {
             LogUtils.e(TAG, "参数 ftSDKConfig 不能为 null");
             return;
         } else {
-            mFtSdk = new FTSdk(ftSDKConfig);
             boolean onlyMain = ftSDKConfig.isOnlySupportMainProcess();
             if (onlyMain) {
                 Context context = FTApplication.getApplication();
@@ -77,6 +76,7 @@ public class FTSdk {
                     return;
                 }
             }
+            mFtSdk = new FTSdk(ftSDKConfig);
         }
         mFtSdk.initFTConfig(ftSDKConfig);
     }
