@@ -7,6 +7,8 @@
         android:name="android.permission.LOCAL_MAC_ADDRESS"
         tools:ignore="ProtectedPermissions" />
 
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
     <application
         android:name=".DemoApplication"
         android:allowBackup="true"
@@ -27,6 +29,7 @@
         </activity>
         <activity android:name=".WebViewActivity" />
         <activity android:name=".SecondActivity" />
+
         <activity android:name=".ThirdActivity" />
         <activity android:name=".FirstActivity" />
         <activity android:name=".RepeatActivity" />
@@ -37,6 +40,19 @@
         <service
             android:name=".service.TestService"
             android:process=":test_process" />
+
+        <receiver
+            android:name=".directboot.BootBroadcastReceiver"
+            android:directBootAware="true"
+            android:process=":another_process"
+            android:exported="false">
+            <!-- Listening the BOOT_COMPLETED action for legacy pre-N devices -->
+            <intent-filter>
+<!--                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />-->
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>
