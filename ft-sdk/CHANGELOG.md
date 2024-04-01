@@ -1,3 +1,7 @@
+# agent 1.4.4-beta01
+1. 修正 RUM 不开启 View 采集, Crash 不会 rethrow 的问题 
+
+---
 # agent 1.4.4-alpha02
 1. 修正 setOnlySupportMainProcess true 时，子进程配置部份不起效问题
 
