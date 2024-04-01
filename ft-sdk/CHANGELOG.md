@@ -1,3 +1,7 @@
+# agent 1.4.4-alpha02
+1. 修正 setOnlySupportMainProcess true 时，子进程配置部份不起效问题
+
+---
 # agent 1.4.4-alpha01
 1. 数据库链接容错保护
 
