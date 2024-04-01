@@ -2,7 +2,7 @@ package com.ft;
 
 
 import com.ft.tests.ErrorTraceTest;
-import com.ft.tests.ConsoleLogTest;
+import com.ft.tests.ProcessConfigTest;
 import com.ft.tests.RUMClickActionTest;
 import com.ft.tests.RUMDisableTest;
 import com.ft.tests.RUMLaunchActionTest;
@@ -33,6 +33,7 @@ import org.junit.runners.Suite;
         RUMResourceTest.class,
         RUMDisableTest.class,
         RUMNoConfigTest.class,
+        ProcessConfigTest.class
 })
 public class AllTests {
     public static boolean hasPrepare;

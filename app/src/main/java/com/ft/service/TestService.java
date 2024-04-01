@@ -24,7 +24,7 @@ public class TestService extends Service {
     public static final String ACTION_MESSAGE = "com.ft.action.MESSAGE";
     private static final String TAG = "TestService";
     /**
-     *  SDK 安装状态
+     * SDK 安装状态
      */
     public static final String INSTALLED_STATE = "installed";
 
@@ -60,7 +60,12 @@ public class TestService extends Service {
         return null; // Service不需要绑定，返回null
     }
 
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        //结束进程后， ProcessConfigTest，采能进行下一次 Application.onCreate 重新调用
+        android.os.Process.killProcess(android.os.Process.myPid());
+    }
 }
 
 
