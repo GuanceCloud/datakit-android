@@ -69,7 +69,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         IntentFilter filter = new IntentFilter(TestService.ACTION_MESSAGE);
-        registerReceiver(messageReceiver, filter);
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            registerReceiver(messageReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            registerReceiver(messageReceiver, filter);
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE}, 1);
