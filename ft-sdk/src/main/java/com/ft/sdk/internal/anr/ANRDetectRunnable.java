@@ -23,6 +23,9 @@ public final class ANRDetectRunnable implements Runnable {
      */
     public static final int ANR_DETECT_DURATION_MS = 5000;
 
+    /**
+     * 主线程消息 Handler
+     */
     private final Handler handler = new Handler(Looper.getMainLooper());
 
     public ANRDetectRunnable() {

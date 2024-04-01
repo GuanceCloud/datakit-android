@@ -9,7 +9,6 @@ import android.util.Log;
 
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.UserData;
-import com.ft.sdk.garble.manager.SingletonGson;
 import com.ft.sdk.garble.threadpool.RunnerCompleteCallBack;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
@@ -46,8 +45,16 @@ public class FTRUMConfigManager {
     private FTRUMConfig config;
 
     private volatile String randomUserId;
+
+    /**
+     * 绑定用户数据
+     */
     private UserData mUserData;
 
+
+    /**
+     * 用户数据同步锁
+     */
     private final Object mLock = new Object();
 
 
@@ -77,7 +84,10 @@ public class FTRUMConfigManager {
     }
 
     /**
-     * 初始化 Native 路径
+     * 初始化 Native Library 配置。
+     * {@link FTExceptionHandler#NATIVE_CALLBACK_VERSION} 以下的版本，判断是否有dump 文件，如果有就上传。
+     * {@link FTExceptionHandler#NATIVE_CALLBACK_VERSION} 以上的版本，设置 Native 版本回调，并对未成功回调的数据进行补充上传，
+     * 并标记为 {@link FTExceptionHandler#IS_PRE_CRASH}
      */
     private void initNativeDump(FTRUMConfig config) {
         boolean isNativeLibSupport = PackageUtils.isNativeLibrarySupport();
@@ -102,7 +112,7 @@ public class FTRUMConfigManager {
 
             String filePath = crashFilePath.toString();
 
-            if (VersionUtils.firstVerGreaterEqual(FTSdk.NATIVE_VERSION, "1.1.0-alpha01")) {
+            if (VersionUtils.firstVerGreaterEqual(FTSdk.NATIVE_VERSION, FTExceptionHandler.NATIVE_CALLBACK_VERSION)) {
                 final CrashCallback crashCallback = new CrashCallback() {
                     @Override
                     public void onCrash(String crashPath) {

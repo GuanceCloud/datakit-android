@@ -430,7 +430,12 @@ public class FTRUMInnerManager {
      * @param property 附加属性参数
      */
     void stopView(HashMap<String, Object> property, RunnerCompleteCallBack callBack) {
-        if (activeView == null) return;
+        if (activeView == null) {
+            if (callBack != null) {
+                callBack.onComplete();
+            }
+            return;
+        }
         checkActionClose();
         if (property != null) {
             activeView.getProperty().putAll(property);
@@ -1140,7 +1145,6 @@ public class FTRUMInnerManager {
     }
 
     /**
-     *
      * @param globalTags
      * @throws JSONException
      */

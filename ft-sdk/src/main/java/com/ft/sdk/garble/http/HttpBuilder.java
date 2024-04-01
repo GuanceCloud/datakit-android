@@ -13,12 +13,22 @@ import java.util.HashMap;
  */
 public class HttpBuilder {
 
+    /**
+     * dataway 数据收发地址
+     */
     private final static String DATAWAY_URL_HOST_FORMAT = "/%s?token=%s&to_headless=true";
     private String host;
     private String model;
     private RequestMethod method;
     private String bodyString;
+
+    /**
+     * {@link FTHttpConfigManager#sendOutTime}
+     */
     private int sendOutTime = FTHttpConfigManager.get().getSendOutTime();
+    /**
+     * {@link FTHttpConfigManager#readOutTime}
+     */
     private int readOutTime = FTHttpConfigManager.get().getReadOutTime();
     private boolean useDefaultHead = true;
     private boolean isDataway = false;

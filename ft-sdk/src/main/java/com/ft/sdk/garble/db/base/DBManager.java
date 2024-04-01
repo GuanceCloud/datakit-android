@@ -2,6 +2,7 @@ package com.ft.sdk.garble.db.base;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -33,15 +34,19 @@ public abstract class DBManager {
      */
     protected void getDB(boolean write, DataBaseCallBack callBack) {
         synchronized (this) {
-            SQLiteOpenHelper helper = getDataBaseHelper();
-            SQLiteDatabase db;
-            if (write)
-                db = helper.getWritableDatabase();
-            else
-                db = helper.getReadableDatabase();
-            if (db.isOpen()) {
-                callBack.run(db);
-                //db.close();
+            try {
+                SQLiteOpenHelper helper = getDataBaseHelper();
+                SQLiteDatabase db;
+                if (write)
+                    db = helper.getWritableDatabase();
+                else
+                    db = helper.getReadableDatabase();
+                if (db.isOpen()) {
+                    callBack.run(db);
+                    //db.close();
+                }
+            } catch (Exception e) {
+                LogUtils.e(TAG, Log.getStackTraceString(e));
             }
         }
     }

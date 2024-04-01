@@ -49,6 +49,17 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
      */
     private static final String DUMP_FILE_KEY_APP_STATE = "appState";
 
+    /**
+     * 是否是之前的崩溃的数据，{@link #NATIVE_CALLBACK_VERSION } 以后的版本会对之后补充的崩溃信息进行标记
+     */
+    public static final String IS_PRE_CRASH = "is_pre_crash";
+
+
+    /**
+     * 可以接受到 native crash 回调的版本
+     */
+    public static final String NATIVE_CALLBACK_VERSION = "1.1.0-alpha01";
+
     private static FTExceptionHandler instance;
     private final Thread.UncaughtExceptionHandler mDefaultExceptionHandler;
     /**
@@ -212,7 +223,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
         String crashString = Utils.readFile(item.getAbsolutePath(), Charset.defaultCharset());
         long crashTime = item.lastModified() * 1000000L;
         HashMap<String, Object> property = new HashMap<>();
-        property.put("is_pre_crash", isPreCrash);
+        property.put(IS_PRE_CRASH, isPreCrash);
         if (config.isEnableTrackAppANR()
                 && item.getName().contains(ANR_FILE_NAME)) {
             FTRUMInnerManager.get().addError(crashString, "Native Crash",
