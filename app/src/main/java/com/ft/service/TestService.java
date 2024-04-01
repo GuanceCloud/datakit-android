@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 
 import com.ft.BuildConfig;
 import com.ft.sdk.FTSDKConfig;
+import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.utils.RequestUtils;
 
@@ -17,12 +18,26 @@ import okhttp3.Request;
  * 测试 service ，okhttp网络请求追踪情况，{@link FTSDKConfig#isOnlySupportMainProcess()}
  */
 public class TestService extends Service {
+    /**
+     * 收发使用 Action Filter
+     */
+    public static final String ACTION_MESSAGE = "com.ft.action.MESSAGE";
     private static final String TAG = "TestService";
+    /**
+     *  SDK 安装状态
+     */
+    public static final String INSTALLED_STATE = "installed";
 
     @Override
     public void onCreate() {
         super.onCreate();
         // 初始化操作
+        boolean sdkInstalled = FTSdk.get() != null;
+
+        Intent intent = new Intent(ACTION_MESSAGE);
+        intent.putExtra(INSTALLED_STATE, sdkInstalled);
+        //跨进程发送
+        sendBroadcast(intent);
     }
 
     @Override
