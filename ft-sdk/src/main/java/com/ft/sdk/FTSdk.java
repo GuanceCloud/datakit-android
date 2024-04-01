@@ -127,49 +127,6 @@ public class FTSdk {
         LogUtils.w(TAG, "FT SDK 已经被关闭");
     }
 
-//    /**
-//     * 开启定，并且获取定位结果
-//     */
-//    public static void startLocation(String geoKey, AsyncCallback syncCallback) {
-//        if (!Utils.isNullOrEmpty(geoKey)) {
-//            LocationUtils.get().setGeoKey(geoKey);
-//            LocationUtils.get().setUseGeoKey(true);
-//        }
-//        LocationUtils.get().startLocationCallBack(syncCallback);
-//    }
-
-//    /**
-//     * j
-//     * 创建获取 GPU 信息的GLSurfaceView
-//     *
-//     * @param root
-//     */
-//    public void setGpuRenderer(ViewGroup root) {
-//        try {
-//            if (FTMonitorConfig.get().isMonitorType(MonitorType.GPU)) {
-//                LogUtils.d(TAG, "绑定视图监听 GPU 信息");
-//                Context context = getApplication();
-//                final RendererUtil mRendererUtil = new RendererUtil();
-//                GLSurfaceView mGLSurfaceView = new GLSurfaceView(context);
-//                ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(1, 1);
-//                mGLSurfaceView.setLayoutParams(layoutParams);
-//                root.addView(mGLSurfaceView);
-//                mGLSurfaceView.setEGLContextClientVersion(1);
-//                mGLSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 0, 0);
-//                mGLSurfaceView.setRenderer(mRendererUtil);
-//                mGLSurfaceView.post(() -> {
-//                    String gl_vendor = mRendererUtil.gl_vendor;
-//                    String gl_renderer = mRendererUtil.gl_renderer;
-//                    GpuUtils.GPU_VENDOR_RENDERER = gl_vendor + "_" + gl_renderer;
-//                    if (gl_renderer != null && gl_vendor != null) {
-//                        mGLSurfaceView.surfaceDestroyed(mGLSurfaceView.getHolder());
-//                    }
-//                });
-//            }
-//        } catch (Exception e) {
-//        }
-//    }
-
     /**
      * 初始化SDK本地配置数据
      */
