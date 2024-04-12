@@ -38,6 +38,11 @@ public abstract class BaseThreadPool {
 
     }
 
+    /**
+     * @param corePoolSize
+     * @param threadName   线程名
+     * @param priority     权重
+     */
     public BaseThreadPool(int corePoolSize, String threadName, int priority) {
         this.corePoolSize = corePoolSize;
         this.threadFactory = new ThreadFactory() {
@@ -81,6 +86,10 @@ public abstract class BaseThreadPool {
         futureTask.cancel(true);
     }
 
+    /**
+     * 用于判断线程池是否在运行
+     * @return
+     */
     public boolean poolRunning() {
         return executor != null && !executor.isShutdown();
     }

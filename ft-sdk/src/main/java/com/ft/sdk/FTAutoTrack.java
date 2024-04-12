@@ -498,123 +498,7 @@ public class FTAutoTrack {
      * @param vtp
      */
     public static void putClickEvent(@NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String vtp) {
-        long time = Utils.getCurrentNanoTime();
-        putPageEvent(time, op, currentPage, rootPage, vtp);
-    }
 
-//    /**
-//     * Fragment 开关
-//     *
-//     * @param op
-//     * @param currentPage
-//     * @param rootPage
-//     * @param parentPage
-//     */
-//    public static void putFragmentEvent(@NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String parentPage) {
-//        long time = Utils.getCurrentNanoTime();
-//        try {
-//            if (op == OP.OPEN_FRA) {
-//                //显示Fragment的页面名称为 Activity.Fragment
-//                LogUtils.showAlias("当前页面的 name 值为:" + rootPage + "." + currentPage);
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        putPageEvent(time, op, currentPage, rootPage, null);
-//    }
-//
-//    /**
-//     * {@link Activity} 开关
-//     *
-//     * @param op
-//     * @param classCurrent
-//     */
-//    public static void putActivityEvent(@NonNull OP op, Class classCurrent) {
-//        long time = Utils.getCurrentNanoTime();
-////        Class parentClass = FTActivityManager.get().getLastActivity();
-////        String parentPageName = Constants.FLOW_ROOT;
-////        if (op == OP.OPEN_ACT) {
-////            //是第一次加载 Activity ，说明其为从其他Activity 中打开
-////            //如果没有上一个 Activity 说明其为 根结点
-////            if (parentClass != null) {
-////                //判断从 上一个 页面的Activity 还是 Fragment 中打开
-////                boolean isFromFragment = FTActivityManager.get().getActivityOpenFromFragment(classCurrent.getName());
-////                if (isFromFragment) {
-////                    //从 Fragment 打开则找到上一个页面的 Fragment
-////                    Class c = FTFragmentManager.getInstance().getLastFragmentName(parentClass.getName());
-////                    if (c != null) {
-////                        parentPageName = parentClass.getSimpleName() + "." + c.getSimpleName();
-////                    } else {
-////                        parentPageName = parentClass.getSimpleName();
-////                    }
-////                } else {
-////                    //从Activity 中打开则找到上一个Activity
-////                    parentPageName = parentClass.getSimpleName();
-////                }
-////            }
-////        }
-//        try {
-//            if (op == OP.OPEN_ACT) {
-//                LogUtils.showAlias("当前页面的 name 值为:" + classCurrent.getSimpleName());
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        putPageEvent(time, op, classCurrent.getSimpleName(), classCurrent.getSimpleName(), null);
-//    }
-
-    private static void putPageEvent(long time, @NonNull OP op, @Nullable String currentPage,
-                                     @Nullable String rootPage, @Nullable String vtp) {
-        try {
-//            if (vtp != null) {
-//                tags.put("vtp", vtp);
-//                fields.put("vtp_desc", FTAliasConfig.get().getVtpDesc(vtp));
-//                fields.put("vtp_id", Utils.MD5(vtp));
-//            }
-//
-//            if (!Utils.isNullOrEmpty(currentPage)) {
-//                //如果是 Fragment 就把Activity 的名称也添加上去
-//                if (op.equals(OP.OPEN_FRA) || op.equals(OP.CLS_FRA)) {
-//                    tags.put(Constants.KEY_PAGE_EVENT_CURRENT_PAGE_NAME, rootPage + "." + currentPage);
-//                    fields.put(Constants.KEY_PAGE_EVENT_PAGE_DESC, FTAliasConfig.get().getPageDesc(rootPage + "." + currentPage));
-//
-//                } else {
-//                    tags.put(Constants.KEY_PAGE_EVENT_CURRENT_PAGE_NAME, currentPage);
-//                    fields.put(Constants.KEY_PAGE_EVENT_PAGE_DESC, FTAliasConfig.get().getPageDesc(currentPage));
-//                }
-//            }
-//
-//            String eventName = op.toEventName();
-//            fields.put(Constants.KEY_EVENT, eventName);
-//            tags.put(Constants.KEY_EVENT_ID, Utils.MD5(eventName));
-
-//            if(op.needMonitorData()){
-//                SyncDataHelper.addMonitorData(tags,fields);
-//            }
-
-            handleOp(currentPage, op, vtp);
-
-        } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
-        }
-    }
-
-    /**
-     * 记录应用登陆时效
-     */
-    public static void putRUMLaunchPerformance(boolean isCold, long duration, long startTime) {
-        FTRUMInnerManager.get().addAction(
-                isCold ? Constants.ACTION_NAME_LAUNCH_COLD : Constants.ACTION_NAME_LAUNCH_HOT,
-                isCold ? Constants.ACTION_TYPE_LAUNCH_COLD : Constants.ACTION_TYPE_LAUNCH_HOT,
-                duration, startTime);
-    }
-
-
-    private static void handleOp(String currentPage, OP op, @Nullable String vtp) {
-        handleOp(currentPage, op, 0, vtp);
-    }
-
-    private static void handleOp(String currentPage, OP op, long duration, @Nullable String vtp) {
         FTRUMConfigManager manager = FTRUMConfigManager.get();
         if (!manager.isRumEnable()) {
             return;
@@ -626,11 +510,20 @@ public class FTAutoTrack {
             return;
         }
 
-        String event = "";
-        event = Constants.EVENT_NAME_CLICK;
-        FTRUMInnerManager.get().startAction(vtp, event);
-
+        FTRUMInnerManager.get().startAction(vtp, Constants.EVENT_NAME_CLICK);
     }
+
+
+    /**
+     * 记录应用登陆时效
+     */
+    public static void putRUMLaunchPerformance(boolean isCold, long duration, long startTime) {
+        FTRUMInnerManager.get().addAction(
+                isCold ? Constants.ACTION_NAME_LAUNCH_COLD : Constants.ACTION_NAME_LAUNCH_HOT,
+                isCold ? Constants.ACTION_TYPE_LAUNCH_COLD : Constants.ACTION_TYPE_LAUNCH_HOT,
+                duration, startTime);
+    }
+
 
     /**
      * 获取相应埋点方法（Activity）所执行的时间(该方法会在所有的继承了 AppCompatActivity 的 Activity 中的 onCreate 中调用)
