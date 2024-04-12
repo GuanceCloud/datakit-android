@@ -73,7 +73,9 @@ public class SyncTaskManager {
     private final AtomicInteger errorCount = new AtomicInteger(0);
 
 
-    private final ID36Generator generator = new ID36Generator();
+    private final ID36Generator rumGenerator = new ID36Generator();
+    private final ID36Generator logGenerator = new ID36Generator();
+
 
     /**
      * 是否正处于同步中，避免重复执行
@@ -245,7 +247,13 @@ public class SyncTaskManager {
             LogUtils.d(TAG, "Sync Data Count:" + requestDataList.size());
 
             SyncDataHelper helper = FTTrackInner.getInstance().getCurrentDataHelper();
-            String body = helper.getBodyContent(dataType, requestDataList, generator.getCurrentId());
+            String packageId = "";
+            if (dataType == DataType.LOG) {
+                packageId = logGenerator.generateID();
+            } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_WEBVIEW) {
+                packageId = rumGenerator.getCurrentId();
+            }
+            String body = helper.getBodyContent(dataType, requestDataList, packageId);
             LogUtils.d(TAG, body);
             requestNet(dataType, body, new AsyncCallback() {
                 @Override
@@ -259,8 +267,15 @@ public class SyncTaskManager {
                         if ((dataSyncMaxRetryCount == 0 && code != 200) || code > 200) {
                             LogUtils.e(TAG, "Sync Fail (Ignore)-[code:" + code + ",errorCode:" + errorCode + ",response:" + response + "]");
                         } else {
-                            generator.next();
-                            LogUtils.d(TAG, "Sync Success-[code:" + code + ",response:" + response + "]");
+                            String innerLogFlag = "";
+                            if (dataType == DataType.LOG) {
+                                innerLogFlag = dataType + ":" + logGenerator.getCurrentId();
+                                logGenerator.next();
+                            } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_WEBVIEW) {
+                                innerLogFlag = dataType + ":" + rumGenerator.getCurrentId();
+                                rumGenerator.next();
+                            }
+                            LogUtils.d(TAG, "pkg:" + innerLogFlag + " Sync Success-[code:" + code + ",response:" + response + "]");
                         }
                     } else {
                         errorCount.getAndIncrement();
