@@ -244,16 +244,17 @@ public class SyncTaskManager {
                 break;
             }
 
-            LogUtils.d(TAG, "Sync Data Count:" + requestDataList.size());
+            int dataCount = requestDataList.size();
+            LogUtils.d(TAG, "Sync Data Count:" + dataCount);
 
             SyncDataHelper helper = FTTrackInner.getInstance().getCurrentDataHelper();
             String packageId = "";
             if (dataType == DataType.LOG) {
-                packageId = logGenerator.generateID();
+                packageId = logGenerator.getCurrentId();
             } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_WEBVIEW) {
                 packageId = rumGenerator.getCurrentId();
             }
-            String body = helper.getBodyContent(dataType, requestDataList, packageId);
+            String body = helper.getBodyContent(dataType, requestDataList, packageId + "." + dataCount);
             LogUtils.d(TAG, body);
             requestNet(dataType, body, new AsyncCallback() {
                 @Override
