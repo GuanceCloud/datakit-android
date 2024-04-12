@@ -255,7 +255,6 @@ public class SyncTaskManager {
                 packageId = rumGenerator.getCurrentId();
             }
             String body = helper.getBodyContent(dataType, requestDataList, packageId + "." + dataCount);
-            LogUtils.d(TAG, body);
             requestNet(dataType, body, new AsyncCallback() {
                 @Override
                 public void onResponse(int code, String response, String errorCode) {
@@ -270,13 +269,13 @@ public class SyncTaskManager {
                         } else {
                             String innerLogFlag = "";
                             if (dataType == DataType.LOG) {
-                                innerLogFlag = dataType + ":" + logGenerator.getCurrentId();
+                                innerLogFlag = "log-" + logGenerator.getCurrentId();
                                 logGenerator.next();
                             } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_WEBVIEW) {
-                                innerLogFlag = dataType + ":" + rumGenerator.getCurrentId();
+                                innerLogFlag = "rum-" + rumGenerator.getCurrentId();
                                 rumGenerator.next();
                             }
-                            LogUtils.d(TAG, "pkg:" + innerLogFlag + " Sync Success-[code:" + code + ",response:" + response + "]");
+                            LogUtils.d(TAG, "pkg_id:" + innerLogFlag + " Sync Success-[code:" + code + ",response:" + response + "]");
                         }
                     } else {
                         errorCount.getAndIncrement();
@@ -372,7 +371,7 @@ public class SyncTaskManager {
                 .setModel(model)
                 .setMethod(RequestMethod.POST)
                 .setBodyString(body).executeSync();
-
+        LogUtils.d(TAG, body);
         if (result.getCode() == NetCodeStatus.NETWORK_EXCEPTION_CODE) {
             throw new FTNetworkNoAvailableException();
         }
