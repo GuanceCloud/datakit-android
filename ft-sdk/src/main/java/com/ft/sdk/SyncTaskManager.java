@@ -19,6 +19,7 @@ import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.manager.AsyncCallback;
 import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.ID36Generator;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.internal.exception.FTNetworkNoAvailableException;
 
@@ -70,6 +71,9 @@ public class SyncTaskManager {
      * 统计一个周期内错误的次
      */
     private final AtomicInteger errorCount = new AtomicInteger(0);
+
+
+    private final ID36Generator generator = new ID36Generator();
 
     /**
      * 是否正处于同步中，避免重复执行
@@ -241,7 +245,7 @@ public class SyncTaskManager {
             LogUtils.d(TAG, "Sync Data Count:" + requestDataList.size());
 
             SyncDataHelper helper = FTTrackInner.getInstance().getCurrentDataHelper();
-            String body = helper.getBodyContent(dataType, requestDataList);
+            String body = helper.getBodyContent(dataType, requestDataList, generator.getCurrentId());
             LogUtils.d(TAG, body);
             requestNet(dataType, body, new AsyncCallback() {
                 @Override
@@ -255,6 +259,7 @@ public class SyncTaskManager {
                         if ((dataSyncMaxRetryCount == 0 && code != 200) || code > 200) {
                             LogUtils.e(TAG, "Sync Fail (Ignore)-[code:" + code + ",errorCode:" + errorCode + ",response:" + response + "]");
                         } else {
+                            generator.next();
                             LogUtils.d(TAG, "Sync Success-[code:" + code + ",response:" + response + "]");
                         }
                     } else {
