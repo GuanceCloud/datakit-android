@@ -175,7 +175,7 @@ public class Constants {
     public static final String KEY_MEMORY_TOTAL = "memory_total";
 
     /**
-     * 内存消耗量，单位 GB
+     * 内存消耗量，百分比, 当前设备总占用率
      */
     public static final String KEY_MEMORY_USE = "memory_use";
     /**
