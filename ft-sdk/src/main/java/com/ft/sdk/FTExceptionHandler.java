@@ -203,8 +203,11 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
             public void run() {
                 try {
                     uploadNativeCrash(item, state, isPreCrash, callBack);
-                } catch (IOException e) {
+                } catch (Exception e) {
                     LogUtils.e(TAG, Log.getStackTraceString(e));
+                    if (callBack != null) {
+                        callBack.onComplete();
+                    }
                 }
             }
         });
@@ -241,6 +244,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
      * 释放对象，也就是会舍弃 {@link #config} 的配置
      */
     public static void release() {
+        Thread.setDefaultUncaughtExceptionHandler(instance.mDefaultExceptionHandler);
         instance = null;
     }
 }
