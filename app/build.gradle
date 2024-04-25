@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 //apply plugin: 'com.guardsquare.proguard'
+//apply plugin: 'com.sensorsdata.analytics.android'
 
 android {
     compileSdk 34
@@ -35,8 +36,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     sourceSets {
         main {
@@ -96,6 +97,14 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.google.android.material:material:1.1.0'
 
+    implementation 'com.umeng.umsdk:common:9.6.8'
+    implementation 'com.umeng.umsdk:asms:1.8.2'
+    implementation 'com.umeng.umsdk:apm:1.9.5'
+    implementation 'com.tencent.bugly:crashreport:latest.release'
+    implementation 'com.sensorsdata.analytics.android:SensorsAnalyticsSDK:6.8.0'
+    implementation 'io.sentry:sentry-android:7.8.0'
+
+
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.mockito:mockito-core:3.4.6'
 
@@ -116,6 +125,10 @@ dependencies {
 //    debugImplementation 'com.amitshekhar.android:debug-db-encrypt:1.0.6'
 }
 
+
+//sensorsAnalytics {
+//    debug = true
+//}
 
 apply plugin: 'ft-plugin'
 

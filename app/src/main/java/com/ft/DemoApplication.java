@@ -1,6 +1,7 @@
 package com.ft;
 
 import android.content.Context;
+import android.os.Bundle;
 
 import com.ft.sdk.DeviceMetricsMonitorType;
 import com.ft.sdk.EnvType;
@@ -15,9 +16,16 @@ import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.utils.CrossProcessSetting;
+import com.sensorsdata.analytics.android.sdk.SAConfigOptions;
+import com.sensorsdata.analytics.android.sdk.SensorsDataAPI;
+import com.tencent.bugly.crashreport.CrashReport;
+import com.uc.crashsdk.export.CrashApi;
+import com.umeng.commonsdk.UMConfigure;
 
 import java.io.File;
 import java.util.HashMap;
+
+import io.sentry.android.core.SentryAndroid;
 
 /**
  * BY huangDianHua
@@ -35,11 +43,40 @@ public class DemoApplication extends BaseApplication {
         super.onCreate();
         if (!BuildConfig.LAZY_INIT) {
             LogUtils.registerInnerLogCacheToFile(new File(getFilesDir(), "InnerLog" + ".log"));
+            initThirdParty();
             initFTSDK(this);
         }
+
+    }
+
+    private void initThirdParty() {
+        //umeng
+        UMConfigure.setLogEnabled(true);
+        UMConfigure.init(this, "5f4366edd3093221547c3e73", "umeng", UMConfigure.DEVICE_TYPE_PHONE, "");
+
+        final Bundle customInfo = new Bundle();
+        customInfo.putBoolean("mCallNativeDefaultHandler", true);
+        CrashApi.getInstance().updateCustomInfo(customInfo);
+
+
+        SAConfigOptions saConfigOptions = new SAConfigOptions("http://127.0.0.1");
+        saConfigOptions.enableTrackAppCrash();
+// 需要在主线程初始化神策 SDK
+        SensorsDataAPI.startWithConfigOptions(this, saConfigOptions);
+
+        SentryAndroid.init(this, options -> {
+            options.setDsn("___PUBLIC_DSN___");
+            options.setEnvironment("production");
+            options.setEnableUncaughtExceptionHandler(true);
+            options.setEnabled(false);
+        });
+
+        CrashReport.initCrashReport(this,"d2e9a8c798",true);
+
     }
 
     static void initFTSDK(Context context) {
+
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAWAY_URL, BuildConfig.DATAWAY_TOKEN)
                 .setDebug(true)//设置是否是 debug
                 .setAutoSync(true)
