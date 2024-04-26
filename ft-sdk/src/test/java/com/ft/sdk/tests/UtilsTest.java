@@ -126,7 +126,7 @@ public class UtilsTest {
     }
 
     /**
-     * 调用 {@link SyncDataHelper#convertToLineProtocolLines(List, HashMap, boolean)}
+     * 调用 {@link SyncDataHelper#convertToLineProtocolLines(List, HashMap, String)} }
      * ,{@link FTTrackInner#dataHelper}
      *
      * @param list
@@ -136,7 +136,8 @@ public class UtilsTest {
     private String convertToLineProtocolLines(List<SyncJsonData> list) throws Exception {
         SyncDataHelper helper = Whitebox.getInternalState(FTTrackInner.getInstance(), "dataHelper");
         return Whitebox.invokeMethod(helper, "convertToLineProtocolLines",
-                list, new HashMap<>(), false);
+                list, new HashMap<>(), "").toString()
+                .replaceAll(",sdk_data_id=(.*?)" + Constants.SEPARATION_PRINT, Constants.SEPARATION_PRINT);
     }
 
 
