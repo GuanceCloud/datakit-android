@@ -19,6 +19,7 @@ import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.manager.AsyncCallback;
 import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.ID36Generator;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.internal.exception.FTNetworkNoAvailableException;
 
@@ -70,6 +71,17 @@ public class SyncTaskManager {
      * 统计一个周期内错误的次
      */
     private final AtomicInteger errorCount = new AtomicInteger(0);
+
+
+    /**
+     * RUM 数据同步包 id 标记
+     */
+    private final ID36Generator rumGenerator = new ID36Generator();
+    /**
+     * log 数据同步包 id 标记
+     */
+    private final ID36Generator logGenerator = new ID36Generator();
+
 
     /**
      * 是否正处于同步中，避免重复执行
@@ -238,11 +250,17 @@ public class SyncTaskManager {
                 break;
             }
 
-            LogUtils.d(TAG, "Sync Data Count:" + requestDataList.size());
+            int dataCount = requestDataList.size();
+            LogUtils.d(TAG, "Sync Data Count:" + dataCount);
 
             SyncDataHelper helper = FTTrackInner.getInstance().getCurrentDataHelper();
-            String body = helper.getBodyContent(dataType, requestDataList);
-            LogUtils.d(TAG, body);
+            String packageId = "";
+            if (dataType == DataType.LOG) {
+                packageId = logGenerator.getCurrentId();
+            } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_WEBVIEW) {
+                packageId = rumGenerator.getCurrentId();
+            }
+            String body = helper.getBodyContent(dataType, requestDataList, packageId + "." + dataCount);
             requestNet(dataType, body, new AsyncCallback() {
                 @Override
                 public void onResponse(int code, String response, String errorCode) {
@@ -255,7 +273,15 @@ public class SyncTaskManager {
                         if ((dataSyncMaxRetryCount == 0 && code != 200) || code > 200) {
                             LogUtils.e(TAG, "Sync Fail (Ignore)-[code:" + code + ",errorCode:" + errorCode + ",response:" + response + "]");
                         } else {
-                            LogUtils.d(TAG, "Sync Success-[code:" + code + ",response:" + response + "]");
+                            String innerLogFlag = "";
+                            if (dataType == DataType.LOG) {
+                                innerLogFlag = "log-" + logGenerator.getCurrentId();
+                                logGenerator.next();
+                            } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_WEBVIEW) {
+                                innerLogFlag = "rum-" + rumGenerator.getCurrentId();
+                                rumGenerator.next();
+                            }
+                            LogUtils.d(TAG, "pkg_id:" + innerLogFlag + " Sync Success-[code:" + code + ",response:" + response + "]");
                         }
                     } else {
                         errorCount.getAndIncrement();
@@ -351,7 +377,7 @@ public class SyncTaskManager {
                 .setModel(model)
                 .setMethod(RequestMethod.POST)
                 .setBodyString(body).executeSync();
-
+        LogUtils.d(TAG, body);
         if (result.getCode() == NetCodeStatus.NETWORK_EXCEPTION_CODE) {
             throw new FTNetworkNoAvailableException();
         }

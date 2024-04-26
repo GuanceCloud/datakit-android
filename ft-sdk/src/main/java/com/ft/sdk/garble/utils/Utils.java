@@ -46,7 +46,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -297,17 +296,6 @@ public class Utils {
         return (double) Math.round(value * 100) / 100;
     }
 
-    /**
-     * 得到当前日期的字符串
-     *
-     * @return
-     */
-    public static String getDateString() {
-        Calendar calendar = Calendar.getInstance();
-        return calendar.get(Calendar.YEAR) + "-" +
-                calendar.get(Calendar.MONTH) + "-" +
-                calendar.get(Calendar.DAY_OF_MONTH);
-    }
 
     private static final ThreadLocal<SimpleDateFormat> dateFormatThreadLocal = new ThreadLocal<SimpleDateFormat>() {
         @Override
@@ -316,10 +304,18 @@ public class Utils {
         }
     };
 
+    /**
+     * 日志日期，个同事yyyy-MM-dd HH:mm:ss:SSS
+     *
+     * @return
+     */
     public static String getCurrentTimeStamp() {
         Date currentTime = new Date();
         SimpleDateFormat sdf = dateFormatThreadLocal.get();
-        return sdf.format(currentTime);
+        if (sdf != null) {
+            return sdf.format(currentTime);
+        }
+        return "";
     }
 
     /**
@@ -394,6 +390,14 @@ public class Utils {
         return new String(bytes, encoding);
     }
 
+    /**
+     * 删除文件，如果是文件夹遍历删除，只做一级文件夹遍历
+     * <p>
+     * 用于测试用例，和 Native Crash 文件上传完毕后的清理工作
+     *
+     * @param path
+     * @return
+     */
     public static boolean deleteFile(String path) {
         File folder = new File(path);
         if (folder.isDirectory()) {
@@ -493,6 +497,12 @@ public class Utils {
 
     }
 
+    /**
+     * 获取编码
+     *
+     * @param contentType
+     * @return
+     */
 
     public static Charset getCharset(MediaType contentType) {
         Charset charset = contentType != null ? contentType.charset(StandardCharsets.UTF_8) : StandardCharsets.UTF_8;
@@ -546,6 +556,7 @@ public class Utils {
 
     /**
      * 数组转化为 json 字符的方法，替换 Gson 高损耗
+     *
      * @param values
      * @return
      */
@@ -566,38 +577,45 @@ public class Utils {
 
     /**
      * Hashmap 转化为 json，基础类型自行转化，其他类型交给 gson，可以降低损耗
+     *
      * @param map
-     * @return
+     * @return 正常返回数据 json string ，转化异常返回空字符串
      */
 
     public static <T> String hashMapObjectToJson(HashMap<String, T> map) {
         StringBuilder jsonBuilder = new StringBuilder();
-        jsonBuilder.append("{");
-        for (String key : map.keySet()) {
-            jsonBuilder.append("\"").append(key).append("\":");
-            Object value = map.get(key);
-            if (value instanceof String) {
-                jsonBuilder.append("\"").append(value).append("\"");
-            } else if (value instanceof Number || value instanceof Boolean) {
-                jsonBuilder.append(value);
-            } else {
-                // 对于非基本类型，使用 Gson 进行转换
-                Gson gson = new Gson();
-                jsonBuilder.append(gson.toJson(value));
+        try {
+            jsonBuilder.append("{");
+            for (String key : map.keySet()) {
+                jsonBuilder.append("\"").append(key).append("\":");
+                Object value = map.get(key);
+                if (value instanceof String) {
+                    jsonBuilder.append("\"").append(value).append("\"");
+                } else if (value instanceof Number || value instanceof Boolean) {
+                    jsonBuilder.append(value);
+                } else {
+                    // 对于非基本类型，使用 Gson 进行转换
+                    Gson gson = new Gson();
+                    jsonBuilder.append(gson.toJson(value));
+                }
+                jsonBuilder.append(", ");
             }
-            jsonBuilder.append(", ");
+            if (!map.isEmpty()) {
+                // 删除最后一个逗号和空格
+                jsonBuilder.delete(jsonBuilder.length() - 2, jsonBuilder.length());
+            }
+            jsonBuilder.append("}");
+        } catch (Exception e) {
+            LogUtils.d(TAG, Log.getStackTraceString(e));
+            return "";
         }
-        if (!map.isEmpty()) {
-            // 删除最后一个逗号和空格
-            jsonBuilder.delete(jsonBuilder.length() - 2, jsonBuilder.length());
-        }
-        jsonBuilder.append("}");
         return jsonBuilder.toString();
     }
 
 
     /**
      * MMAP 方式读取文件
+     *
      * @param file
      * @return
      * @throws IOException
@@ -620,6 +638,7 @@ public class Utils {
 
     /**
      * 从文件名去后缀
+     *
      * @param fileName 文件名
      * @return
      */

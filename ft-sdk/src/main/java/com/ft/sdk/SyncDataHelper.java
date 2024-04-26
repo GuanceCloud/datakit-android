@@ -18,20 +18,21 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * BY huangDianHua
- * DATE:2019-12-11 14:48
- * Description:
+ * 数据组装类，把采集数据从存储数据序列化行协议数据
  */
 public class SyncDataHelper {
     public final static String TAG = Constants.LOG_TAG_PREFIX + "SyncDataHelper";
 
+    /**
+     * 基础数据标签
+     */
     private final HashMap<String, Object> basePublicTags;
     private final HashMap<String, Object> logTags;
     private final HashMap<String, Object> rumTags;
     private final HashMap<String, Object> traceTags;
 
 
-     protected SyncDataHelper() {
+    protected SyncDataHelper() {
         basePublicTags = new HashMap<>();
         logTags = new HashMap<>();
         rumTags = new HashMap<>();
@@ -58,7 +59,6 @@ public class SyncDataHelper {
     }
 
 
-
     /**
      * 封装同步上传的数据
      *
@@ -66,15 +66,17 @@ public class SyncDataHelper {
      * @param recordDatas
      * @return
      */
-    public String getBodyContent(DataType dataType, List<SyncJsonData> recordDatas) {
-
+    public String getBodyContent(DataType dataType, List<SyncJsonData> recordDatas, String packageId) {
         String bodyContent;
         if (dataType == DataType.LOG) {
-            bodyContent = getLogBodyContent(recordDatas);
+            // log 数据
+            bodyContent = convertToLineProtocolLines(recordDatas, new HashMap<>(logTags), packageId);
         } else if (dataType == DataType.TRACE) {
-            bodyContent = getTraceBodyContent(recordDatas);
+            // trace 数据
+            bodyContent = convertToLineProtocolLines(recordDatas, new HashMap<>(traceTags), packageId);
         } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_WEBVIEW) {
-            bodyContent = getRumBodyContent(recordDatas);
+            //rum 数据
+            bodyContent = convertToLineProtocolLines(recordDatas, new HashMap<>(rumTags), packageId);
         } else {
             bodyContent = "";
         }
@@ -82,40 +84,18 @@ public class SyncDataHelper {
                 .replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK);
     }
 
-
     /**
-     * 获取 log 类型数据
+     * 封装同步上传的数据，主要用于测试用例使用
      *
-     * @param datas
+     *
+     * @param dataType
+     * @param recordDatas
      * @return
      */
-    private String getLogBodyContent(List<SyncJsonData> datas) {
-        HashMap<String, Object> hashMap = new HashMap<>(logTags);
-        return convertToLineProtocolLines(datas, hashMap);
+    public String getBodyContent(DataType dataType, List<SyncJsonData> recordDatas) {
+        return getBodyContent(dataType, recordDatas, null);
     }
 
-
-    /**
-     * 获取 trace 类型数据
-     *
-     * @param datas
-     * @return
-     */
-    private String getTraceBodyContent(List<SyncJsonData> datas) {
-        HashMap<String, Object> hashMap = new HashMap<>(traceTags);
-        return convertToLineProtocolLines(datas, hashMap);
-    }
-
-    /**
-     * 封装 RUM 数据
-     *
-     * @param datas
-     * @return
-     */
-    private String getRumBodyContent(List<SyncJsonData> datas) {
-        HashMap<String, Object> hashMap = new HashMap<>(rumTags);
-        return convertToLineProtocolLines(datas, hashMap);
-    }
 
     /**
      * 转化为行协议数据
@@ -124,18 +104,8 @@ public class SyncDataHelper {
      * @param extraTags
      * @return
      */
-    private String convertToLineProtocolLines(List<SyncJsonData> datas, HashMap<String, Object> extraTags) {
-        return convertToLineProtocolLines(datas, extraTags, true);
-    }
-
-    /**
-     * 转化为行协议数据
-     *
-     * @param datas
-     * @param extraTags
-     * @return
-     */
-    private String convertToLineProtocolLines(List<SyncJsonData> datas, HashMap<String, Object> extraTags, boolean withUUid) {
+    private String convertToLineProtocolLines(List<SyncJsonData> datas, HashMap<String, Object> extraTags,
+                                              String packageId) {
         StringBuilder sb = new StringBuilder();
         for (SyncJsonData data : datas) {
             String jsonString = data.getDataString();
@@ -162,8 +132,10 @@ public class SyncDataHelper {
                             }
                         }
                     }
-                    if (withUUid) {
+                    if (Utils.isNullOrEmpty(packageId)) {
                         tags.put(Constants.KEY_SDK_DATA_FLAG, Utils.randomUUID());
+                    } else {
+                        tags.put(Constants.KEY_SDK_DATA_FLAG, packageId + "." + Utils.randomUUID());
                     }
                     StringBuilder tagSb = getCustomHash(tags, true);
                     deleteLastComma(tagSb);
@@ -234,6 +206,13 @@ public class SyncDataHelper {
         return sb;
     }
 
+    /**
+     * 添加引号标记
+     *
+     * @param sb
+     * @param value 愿数据
+     * @param add   是否需要添加
+     */
     private static void addQuotationMarks(StringBuilder sb, String value, boolean add) {
         if (add) {
             sb.append(Utils.translateFieldValue(value));
