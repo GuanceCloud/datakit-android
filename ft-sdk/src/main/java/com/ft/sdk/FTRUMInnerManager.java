@@ -229,10 +229,10 @@ public class FTRUMInnerManager {
         checkActionClose();
         if (activeAction == null || activeAction.isClose()) {
             activeAction = new ActiveActionBean(actionName, actionType, sessionId, viewId, viewName, viewReferrer, needWait);
-            initAction(activeAction);
             if (property != null) {
                 activeAction.getProperty().putAll(property);
             }
+            initAction(activeAction);
             this.lastActionTime = activeAction.getStartTime();
 
             mHandler.removeCallbacks(mActionRecheckRunner);
