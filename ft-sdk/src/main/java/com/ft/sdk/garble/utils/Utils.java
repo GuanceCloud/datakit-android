@@ -499,6 +499,7 @@ public class Utils {
 
     /**
      * 获取编码
+     *
      * @param contentType
      * @return
      */
@@ -578,31 +579,36 @@ public class Utils {
      * Hashmap 转化为 json，基础类型自行转化，其他类型交给 gson，可以降低损耗
      *
      * @param map
-     * @return
+     * @return 正常返回数据 json string ，转化异常返回空字符串
      */
 
     public static <T> String hashMapObjectToJson(HashMap<String, T> map) {
         StringBuilder jsonBuilder = new StringBuilder();
-        jsonBuilder.append("{");
-        for (String key : map.keySet()) {
-            jsonBuilder.append("\"").append(key).append("\":");
-            Object value = map.get(key);
-            if (value instanceof String) {
-                jsonBuilder.append("\"").append(value).append("\"");
-            } else if (value instanceof Number || value instanceof Boolean) {
-                jsonBuilder.append(value);
-            } else {
-                // 对于非基本类型，使用 Gson 进行转换
-                Gson gson = new Gson();
-                jsonBuilder.append(gson.toJson(value));
+        try {
+            jsonBuilder.append("{");
+            for (String key : map.keySet()) {
+                jsonBuilder.append("\"").append(key).append("\":");
+                Object value = map.get(key);
+                if (value instanceof String) {
+                    jsonBuilder.append("\"").append(value).append("\"");
+                } else if (value instanceof Number || value instanceof Boolean) {
+                    jsonBuilder.append(value);
+                } else {
+                    // 对于非基本类型，使用 Gson 进行转换
+                    Gson gson = new Gson();
+                    jsonBuilder.append(gson.toJson(value));
+                }
+                jsonBuilder.append(", ");
             }
-            jsonBuilder.append(", ");
+            if (!map.isEmpty()) {
+                // 删除最后一个逗号和空格
+                jsonBuilder.delete(jsonBuilder.length() - 2, jsonBuilder.length());
+            }
+            jsonBuilder.append("}");
+        } catch (Exception e) {
+            LogUtils.d(TAG, Log.getStackTraceString(e));
+            return "";
         }
-        if (!map.isEmpty()) {
-            // 删除最后一个逗号和空格
-            jsonBuilder.delete(jsonBuilder.length() - 2, jsonBuilder.length());
-        }
-        jsonBuilder.append("}");
         return jsonBuilder.toString();
     }
 
