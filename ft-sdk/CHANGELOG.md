@@ -1,3 +1,9 @@
+# agent 1.4.5-beta01
+1.重复初始化兼容优化处理
+2.优化 c/c++ 数据上传逻辑，避免在某些上传过程中发生异常退出后，发生死锁
+3.优化 startAction Property 属性写入逻辑，避免发生线程安全访问问题
+
+---
 # agent 1.4.4
 1. 数据库链接容错保护
 2. 修正 setOnlySupportMainProcess true 时，子进程配置部份不起效问题
