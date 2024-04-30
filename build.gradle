@@ -15,7 +15,7 @@ buildscript {
     def appIdString = properties.getProperty("RUM_APP_ID")
     def datakitRUMUrl = properties.getProperty("DATAKIT_URL")
     def datawayRUMUrl = properties.getProperty("DATAWAY_URL")
-    def tokenWithDatawayUpload = properties.getProperty("TOKEN_WITH_DATAWAY_UPLOAD")
+    def clientToken = properties.getProperty("CLIENT_TOKEN")
     def datawayToken = properties.getProperty("DATAWAY_TOKEN")
     def trackId = properties.getProperty("TRACK_ID")
     def traceUrl = properties.getProperty("TRACE_URL")
@@ -24,7 +24,7 @@ buildscript {
             'rumAppid'  : appIdString,
             'datakitRUMUrl': datakitRUMUrl,
             'datawayRUMUrl': datawayRUMUrl,
-            'tokenWithDatawayUpload': tokenWithDatawayUpload,
+            'clientToken': clientToken,
             'datawayToken': datawayToken,
             'trackId'   : trackId,
             'traceUrl'  : traceUrl,
