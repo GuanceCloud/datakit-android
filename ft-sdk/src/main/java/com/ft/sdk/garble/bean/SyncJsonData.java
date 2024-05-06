@@ -102,7 +102,7 @@ public class SyncJsonData implements Cloneable {
     }
 
     /**
-     * 标记包序列发送 id
+     * 标记包序列发送 id,替换 [uuid] 为 [packageId].[dataCount].[uuid]
      *
      * @param packageId 包 id
      * @param dataCount 数量
@@ -115,6 +115,11 @@ public class SyncJsonData implements Cloneable {
         return dataString;
     }
 
+    /**
+     * 替换 (sdk_data_id=)([0-9a-z]+).([0-9]+).[uuid] 为 sdk_data_id=[uuid]
+     * @param newUUID 新 uuid
+     * @return
+     */
     public String getDataString(String newUUID) {
         if (newUUID != null) {
             dataString = dataString.replaceFirst("(" + Constants.KEY_SDK_DATA_FLAG + "=)([0-9a-z]+).([0-9]+)."
