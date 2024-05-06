@@ -178,7 +178,13 @@ public class MainActivity extends AppCompatActivity {
                                 .url(BuildConfig.TRACE_URL)
                                 .method(RequestMethod.GET.name(), null);
                         try {
-                            client.newCall(builder.build()).execute();
+                            Response response = client.newCall(builder.build()).execute();
+                            ResponseBody responseBody = response.body();
+                            if (responseBody != null) {
+                                //这里需要消费，event listener 才会被调用
+                               String string = responseBody.string();
+                            }
+
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
