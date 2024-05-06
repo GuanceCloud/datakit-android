@@ -1,5 +1,7 @@
 package com.ft;
 
+import android.content.Context;
+
 import com.ft.sdk.DeviceMetricsMonitorType;
 import com.ft.sdk.EnvType;
 import com.ft.sdk.ErrorMonitorType;
@@ -12,8 +14,8 @@ import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.utils.CrossProcessSetting;
 
-import java.io.File;
 import java.util.HashMap;
 
 /**
@@ -31,21 +33,18 @@ public class DemoApplication extends BaseApplication {
     public void onCreate() {
         super.onCreate();
         if (!BuildConfig.LAZY_INIT) {
-            LogUtils.registerInnerLogCacheToFile(new File(getFilesDir(), "InnerLog" + ".log"));
-            initFTSDK();
-
-//            File cacheFile = new File(getFilesDir(), "LogCache.log");
-//            LogUtils.registerInnerLogCacheToFile(cacheFile);
-
+            LogUtils.registerInnerLogCacheToFile();
+            initFTSDK(this);
         }
     }
 
 
-    static void initFTSDK() {
-        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAWAY_URL, BuildConfig.DATAWAY_TOKEN)
+    static void initFTSDK(Context context) {
+        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAWAY_URL, BuildConfig.CLIENT_TOKEN)
                 .setDebug(true)//设置是否是 debug
                 .setAutoSync(true)
                 .setCustomSyncPageSize(100)
+                .setOnlySupportMainProcess(CrossProcessSetting.isOnlyMainProcess(context))
                 .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()));
         FTSdk.install(ftSDKConfig);
 

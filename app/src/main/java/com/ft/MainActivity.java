@@ -3,11 +3,15 @@ package com.ft;
 import static android.content.pm.PackageManager.PERMISSION_DENIED;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -39,6 +43,24 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
+    private final BroadcastReceiver messageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(TestService.ACTION_MESSAGE)) {
+                boolean installed = intent.getBooleanExtra(TestService.INSTALLED_STATE, false);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Button button = findViewById(R.id.main_start_service);
+                        button.setText(getString(installed ? R.string.start_service_installed
+                                : R.string.start_service_not_install));
+                    }
+                });
+                // 在这里处理接收到的消息
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +68,14 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
+        IntentFilter filter = new IntentFilter(TestService.ACTION_MESSAGE);
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            registerReceiver(messageReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            registerReceiver(messageReceiver, filter);
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE}, 1);
@@ -169,7 +199,13 @@ public class MainActivity extends AppCompatActivity {
                                 .url(BuildConfig.TRACE_URL)
                                 .method(RequestMethod.GET.name(), null);
                         try {
-                            client.newCall(builder.build()).execute();
+                            Response response = client.newCall(builder.build()).execute();
+                            ResponseBody responseBody = response.body();
+                            if (responseBody != null) {
+                                //这里需要消费，event listener 才会被调用
+                               String string = responseBody.string();
+                            }
+
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
@@ -239,7 +275,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 //                if (BuildConfig.LAZY_INIT) {
-                DemoApplication.initFTSDK();
+                DemoApplication.initFTSDK(MainActivity.this);
 //                } else {
 //                    Toast.makeText(MainActivity.this, "需要先更改 LAZY_INIT 为 true", Toast.LENGTH_SHORT).show();
 //                }
@@ -267,4 +303,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void finish() {
+        super.finish();
+        unregisterReceiver(messageReceiver);
+    }
 }

@@ -20,7 +20,7 @@ public enum DataType {
      */
     LOG,
     /**
-     * SDK Trace 数据
+     * SDK Trace 数据，目前不在使用
      */
     TRACE;
 

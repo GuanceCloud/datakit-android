@@ -27,8 +27,10 @@ public class FTANRDetector {
      */
     void init(FTRUMConfig config) {
         if (config.isEnableTrackAppANR()) {
-            runnable = new ANRDetectRunnable();
-            ANRDetectThreadPool.get().execute(runnable);
+            if (runnable == null) {
+                runnable = new ANRDetectRunnable();
+                ANRDetectThreadPool.get().execute(runnable);
+            }
         }
     }
 
@@ -37,8 +39,9 @@ public class FTANRDetector {
      */
     void release() {
         ANRDetectThreadPool.get().shutDown();
-        if(runnable!=null){
+        if (runnable != null) {
             runnable.shutdown();
+            runnable = null;
         }
     }
 }

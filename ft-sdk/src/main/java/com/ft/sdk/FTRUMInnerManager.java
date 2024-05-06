@@ -229,10 +229,10 @@ public class FTRUMInnerManager {
         checkActionClose();
         if (activeAction == null || activeAction.isClose()) {
             activeAction = new ActiveActionBean(actionName, actionType, sessionId, viewId, viewName, viewReferrer, needWait);
-            initAction(activeAction);
             if (property != null) {
                 activeAction.getProperty().putAll(property);
             }
+            initAction(activeAction);
             this.lastActionTime = activeAction.getStartTime();
 
             mHandler.removeCallbacks(mActionRecheckRunner);
@@ -430,7 +430,12 @@ public class FTRUMInnerManager {
      * @param property 附加属性参数
      */
     void stopView(HashMap<String, Object> property, RunnerCompleteCallBack callBack) {
-        if (activeView == null) return;
+        if (activeView == null) {
+            if (callBack != null) {
+                callBack.onComplete();
+            }
+            return;
+        }
         checkActionClose();
         if (property != null) {
             activeView.getProperty().putAll(property);
@@ -1140,7 +1145,6 @@ public class FTRUMInnerManager {
     }
 
     /**
-     *
      * @param globalTags
      * @throws JSONException
      */

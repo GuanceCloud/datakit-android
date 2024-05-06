@@ -1,5 +1,7 @@
 package com.ft.sdk.garble.utils;
 
+import android.os.Build;
+
 import com.ft.sdk.garble.bean.ErrorType;
 import com.ft.sdk.garble.bean.OP;
 
@@ -173,7 +175,7 @@ public class Constants {
     public static final String KEY_MEMORY_TOTAL = "memory_total";
 
     /**
-     * 内存消耗量，单位 GB
+     * 内存消耗量，百分比, 当前设备总占用率
      */
     public static final String KEY_MEMORY_USE = "memory_use";
     /**
@@ -271,24 +273,42 @@ public class Constants {
      * 系统，固定为 android
      */
     public static final String KEY_DEVICE_OS = "os";
-
+    /**
+     * os 版本
+     */
+    public static final String KEY_DEVICE_OS_VERSION = "os_version";
+    /**
+     * os 主要版本
+     */
+    public static final String KEY_DEVICE_OS_VERSION_MAJOR = "os_version_major";
+    /**
+     * {@link Build#BRAND}  移动设备厂商
+     */
+    public static final String KEY_DEVICE_DEVICE_BAND = "device";
+    /**
+     * {@link  Build#MODEL} 移动设备型号
+     */
+    public static final String KEY_DEVICE_DEVICE_MODEL = "model";
+    /**
+     * os.arch
+     */
+    public static final String KEY_DEVICE_DEVICE_ARCH = "arch";
+    /**
+     * 屏幕尺寸
+     */
+    public static final String KEY_DEVICE_DISPLAY = "screen_size";
+    /**
+     * 手机蜂窝运营商
+     */
+    public static final String KEY_DEVICE_CARRIER = "carrier";
     /**
      *
      */
-    public static final String KEY_DEVICE_OS_VERSION = "os_version";
-    public static final String KEY_DEVICE_OS_VERSION_MAJOR = "os_version_major";
-    public static final String KEY_DEVICE_DEVICE_BAND = "device";
-    public static final String KEY_DEVICE_DEVICE_MODEL = "model";
-    public static final String KEY_DEVICE_DEVICE_ARCH = "arch";
-    public static final String KEY_DEVICE_DISPLAY = "screen_size";
-    public static final String KEY_DEVICE_CARRIER = "carrier";
     public static final String KEY_DEVICE_LOCALE = "locale";
-
-    //    public static final String EVENT_NAME_LAUNCH = "launch";
-//    public static final String EVENT_NAME_OPEN = "open";
+    /**
+     *  点击事件
+     */
     public static final String EVENT_NAME_CLICK = "click";
-//    public static final String EVENT_NAME_LEAVE = "leave";
-//    public static final String EVENT_NAME_ENTER = "enter";
 
     /**
      * 是否为已登录状态
@@ -371,7 +391,10 @@ public class Constants {
     public static final String KEY_RUM_SDK_PACKAGE_NATIVE = "sdk_package_native";
 
     /**
-     * SDK 数据标记
+     * SDK 数据标记 [package uuid].[32 digit random uuid]
+     * <p>
+     * {@link ID36Generator}
+     * {@link Utils#randomUUID()}
      */
     public static final String KEY_SDK_DATA_FLAG = "sdk_data_id";
 

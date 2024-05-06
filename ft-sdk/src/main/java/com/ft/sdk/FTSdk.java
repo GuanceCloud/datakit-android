@@ -62,23 +62,26 @@ public class FTSdk {
      * @return
      */
     public static synchronized void install(@NonNull FTSDKConfig ftSDKConfig) {
-        if (ftSDKConfig == null) {
-            LogUtils.e(TAG, "参数 ftSDKConfig 不能为 null");
-            return;
-        } else {
-            mFtSdk = new FTSdk(ftSDKConfig);
-            boolean onlyMain = ftSDKConfig.isOnlySupportMainProcess();
-            if (onlyMain) {
-                Context context = FTApplication.getApplication();
-                String currentProcessName = Utils.getCurrentProcessName();
-                String packageName = context.getPackageName();
-                if (!TextUtils.isEmpty(packageName) && !TextUtils.equals(packageName, currentProcessName)) {
-                    LogUtils.e(TAG, "当前 SDK 只能在主进程中运行，当前进程为 " + currentProcessName + "，如果想要在非主进程中运行可以设置 FTSDKConfig.setOnlySupportMainProcess(false)");
-                    return;
+        try {
+            if (ftSDKConfig == null) {
+                LogUtils.e(TAG, "参数 ftSDKConfig 不能为 null");
+            } else {
+                boolean onlyMain = ftSDKConfig.isOnlySupportMainProcess();
+                if (onlyMain) {
+                    Context context = FTApplication.getApplication();
+                    String currentProcessName = Utils.getCurrentProcessName();
+                    String packageName = context.getPackageName();
+                    if (!TextUtils.isEmpty(packageName) && !TextUtils.equals(packageName, currentProcessName)) {
+                        LogUtils.e(TAG, "当前 SDK 只能在主进程中运行，当前进程为 " + currentProcessName + "，如果想要在非主进程中运行可以设置 FTSDKConfig.setOnlySupportMainProcess(false)");
+                        return;
+                    }
                 }
+                mFtSdk = new FTSdk(ftSDKConfig);
+                mFtSdk.initFTConfig(ftSDKConfig);
             }
+        } catch (Exception e) {
+            LogUtils.e(TAG, "initFTConfig fail:\n" + Log.getStackTraceString(e));
         }
-        mFtSdk.initFTConfig(ftSDKConfig);
     }
 
     /**
@@ -127,49 +130,6 @@ public class FTSdk {
         LogUtils.w(TAG, "FT SDK 已经被关闭");
     }
 
-//    /**
-//     * 开启定，并且获取定位结果
-//     */
-//    public static void startLocation(String geoKey, AsyncCallback syncCallback) {
-//        if (!Utils.isNullOrEmpty(geoKey)) {
-//            LocationUtils.get().setGeoKey(geoKey);
-//            LocationUtils.get().setUseGeoKey(true);
-//        }
-//        LocationUtils.get().startLocationCallBack(syncCallback);
-//    }
-
-//    /**
-//     * j
-//     * 创建获取 GPU 信息的GLSurfaceView
-//     *
-//     * @param root
-//     */
-//    public void setGpuRenderer(ViewGroup root) {
-//        try {
-//            if (FTMonitorConfig.get().isMonitorType(MonitorType.GPU)) {
-//                LogUtils.d(TAG, "绑定视图监听 GPU 信息");
-//                Context context = getApplication();
-//                final RendererUtil mRendererUtil = new RendererUtil();
-//                GLSurfaceView mGLSurfaceView = new GLSurfaceView(context);
-//                ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(1, 1);
-//                mGLSurfaceView.setLayoutParams(layoutParams);
-//                root.addView(mGLSurfaceView);
-//                mGLSurfaceView.setEGLContextClientVersion(1);
-//                mGLSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 0, 0);
-//                mGLSurfaceView.setRenderer(mRendererUtil);
-//                mGLSurfaceView.post(() -> {
-//                    String gl_vendor = mRendererUtil.gl_vendor;
-//                    String gl_renderer = mRendererUtil.gl_renderer;
-//                    GpuUtils.GPU_VENDOR_RENDERER = gl_vendor + "_" + gl_renderer;
-//                    if (gl_renderer != null && gl_vendor != null) {
-//                        mGLSurfaceView.surfaceDestroyed(mGLSurfaceView.getHolder());
-//                    }
-//                });
-//            }
-//        } catch (Exception e) {
-//        }
-//    }
-
     /**
      * 初始化SDK本地配置数据
      */
@@ -181,7 +141,6 @@ public class FTSdk {
         SyncTaskManager.get().init(config);
         FTTrackInner.getInstance().initBaseConfig(config);
         LogUtils.d(TAG, "initFTConfig complete");
-//            LogUtils.setDescLogShow(mFtSDKConfig.isDescLog());
     }
 
 
@@ -202,7 +161,7 @@ public class FTSdk {
             LogUtils.d(TAG, "initRUMWithConfig complete");
 
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, "initRUMWithConfig fail:\n" + Log.getStackTraceString(e));
         }
 
     }
@@ -219,7 +178,7 @@ public class FTSdk {
             LogUtils.d(TAG, "initTraceWithConfig complete");
 
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, "initTraceWithConfig fail:\n" + Log.getStackTraceString(e));
         }
     }
 
@@ -235,7 +194,7 @@ public class FTSdk {
             LogUtils.d(TAG, "initLogWithConfig complete");
 
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, "initLogWithConfig fail:\n" + Log.getStackTraceString(e));
         }
     }
 

@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,6 +42,10 @@ public class FTResponseData {
                         JSONObject jsonObject = new JSONObject(data);
                         this.code = jsonObject.optInt("code", code);
                         this.errorCode = jsonObject.optString("errorCode");
+                        if (Utils.isNullOrEmpty(errorCode)) {
+                            //dataway error code compatible
+                            this.errorCode = jsonObject.optString("error_code");
+                        }
                         this.message = jsonObject.optString("message");
                     }
                 } catch (JSONException e) {
