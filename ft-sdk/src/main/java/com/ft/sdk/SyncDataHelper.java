@@ -85,47 +85,23 @@ public class SyncDataHelper {
      * @param recordDatas
      * @return
      */
-    public String getBodyContent(DataType dataType, List<SyncJsonData> recordDatas, String packageId) {
+    public String getBodyContent(DataType dataType, List<SyncJsonData> recordDatas) {
         String bodyContent;
         if (dataType == DataType.LOG) {
             // log 数据
-            bodyContent = convertToLineProtocolLines(recordDatas, new HashMap<>(logTags), packageId);
+            bodyContent = convertToLineProtocolLines(recordDatas, new HashMap<>(logTags));
         } else if (dataType == DataType.TRACE) {
             // trace 数据
-            bodyContent = convertToLineProtocolLines(recordDatas, new HashMap<>(traceTags), packageId);
+            bodyContent = convertToLineProtocolLines(recordDatas, new HashMap<>(traceTags));
         } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_WEBVIEW) {
             //rum 数据
-            bodyContent = convertToLineProtocolLines(recordDatas, new HashMap<>(rumTags), packageId);
+            bodyContent = convertToLineProtocolLines(recordDatas, new HashMap<>(rumTags));
         } else {
             bodyContent = "";
         }
         return bodyContent.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION)
                 .replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REAL_LINE_BREAK);
     }
-
-    /**
-     * 封装同步上传的数据，主要用于测试用例使用
-     *
-     *
-     * @param datas
-     * @return
-     */
-    private String getTraceBodyContent(List<SyncJsonData> datas) {
-        HashMap<String, Object> hashMap = new HashMap<>(traceTags);
-        return convertToLineProtocolLines(datas, hashMap);
-    }
-
-    /**
-     * 封装 RUM 数据
-     *
-     * @param datas
-     * @return
-     */
-    private String getRumBodyContent(List<SyncJsonData> datas) {
-        HashMap<String, Object> hashMap = new HashMap<>(rumTags);
-        return convertToLineProtocolLines(datas, hashMap);
-    }
-
 
     /**
      * 转化为行协议数据

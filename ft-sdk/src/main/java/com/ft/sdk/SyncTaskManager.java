@@ -275,7 +275,7 @@ public class SyncTaskManager {
                 packageId = rumGenerator.getCurrentId();
             }
             for (SyncJsonData data : cacheDataList) {
-                sb.append(data.getDataString());
+                sb.append(data.getDataStringWithPackageId(packageId, dataCount));
             }
 
             String body = sb.toString();

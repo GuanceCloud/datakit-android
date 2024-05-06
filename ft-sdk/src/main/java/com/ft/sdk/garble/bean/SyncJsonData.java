@@ -101,9 +101,24 @@ public class SyncJsonData implements Cloneable {
         return dataString;
     }
 
+    /**
+     * 标记包序列发送 id
+     *
+     * @param packageId 包 id
+     * @param dataCount 数量
+     * @return
+     */
+    public String getDataStringWithPackageId(String packageId, int dataCount) {
+        if (packageId != null) {
+            dataString = dataString.replace(uuid, packageId + "." + dataCount + "." + uuid);
+        }
+        return dataString;
+    }
+
     public String getDataString(String newUUID) {
         if (newUUID != null) {
-            dataString = dataString.replace(uuid, newUUID);
+            dataString = dataString.replaceFirst("(" + Constants.KEY_SDK_DATA_FLAG + "=)([0-9a-z]+).([0-9]+)."
+                    + uuid, Constants.KEY_SDK_DATA_FLAG + "=" + newUUID);
         }
         return dataString;
     }

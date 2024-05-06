@@ -19,7 +19,6 @@ import com.ft.sdk.garble.manager.AsyncCallback;
 import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.threadpool.RunnerCompleteCallBack;
 import com.ft.sdk.garble.utils.Constants;
-import com.ft.sdk.garble.utils.ID36Generator;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
@@ -58,6 +57,7 @@ public class FTTrackInner {
         }
         return instance;
     }
+
     /**
      * 初始化基础 SDK 配置
      *
@@ -187,7 +187,7 @@ public class FTTrackInner {
                 List<SyncJsonData> recordDataList = new ArrayList<>();
                 for (LineProtocolBean t : trackBeans) {
                     try {
-                        SyncJsonData recordData = SyncJsonData.getSyncJsonData(dataHelper, DataType.RUM_APP,
+                        SyncJsonData recordData = SyncJsonData.getSyncJsonData(dataHelper, DataType.LOG,
                                 new LineProtocolBean(t.getMeasurement(), t.getTags(),
                                         t.getFields(), t.getTimeNano()));
                         recordDataList.add(recordData);
