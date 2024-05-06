@@ -170,7 +170,7 @@ public class Utils {
         ActivityManager am = (ActivityManager) FTApplication.getApplication().getSystemService(Context.ACTIVITY_SERVICE);
         if (am == null) return false;
         List<ActivityManager.RunningAppProcessInfo> info = am.getRunningAppProcesses();
-        if (info == null || info.size() == 0) return false;
+        if (info == null || info.isEmpty()) return false;
         for (ActivityManager.RunningAppProcessInfo aInfo : info) {
             if (aInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
                 if (aInfo.processName.equals(FTApplication.getApplication().getPackageName())) {
@@ -364,6 +364,7 @@ public class Utils {
         int myPid = Process.myPid();
         ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningAppProcessInfo> processes = manager.getRunningAppProcesses();
+        if (processes == null || processes.isEmpty()) return null;
         for (ActivityManager.RunningAppProcessInfo info : processes) {
             if (myPid == info.pid) {
                 return info.processName;
