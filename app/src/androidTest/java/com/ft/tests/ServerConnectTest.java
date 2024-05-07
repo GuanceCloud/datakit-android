@@ -13,12 +13,11 @@ import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTrackInner;
-import com.ft.sdk.garble.bean.LineProtocolBean;
+import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.manager.AsyncCallback;
 import com.ft.sdk.garble.utils.Utils;
 
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -79,7 +78,7 @@ public class ServerConnectTest extends BaseTest {
      */
 
     public void urlParamTest(String url, int expected) throws Exception {
-        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(url);
+        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(url).setDebug(true);
         FTSdk.install(ftSDKConfig);
         FTSdk.initLogWithConfig(new FTLoggerConfig());
         requestNetVerifyData(expected);
@@ -93,15 +92,11 @@ public class ServerConnectTest extends BaseTest {
      */
     private void requestNetVerifyData(int expected) throws Exception {
         CountDownLatch countDownLatch = new CountDownLatch(1);
-        JSONObject tags = new JSONObject();
-        tags.put("testTag", "111");
-        JSONObject fields = new JSONObject();
-        fields.put("testFields", "222");
         long time = Utils.getCurrentNanoTime();
-        LineProtocolBean bean = new LineProtocolBean("TestMeasurement", tags, fields, time);
-        Whitebox.invokeMethod(FTTrackInner.getInstance(), "trackLogAsync", Collections.singletonList(bean), new AsyncCallback() {
+        LogBean bean = new LogBean("connect test", time);
+        Whitebox.invokeMethod(FTTrackInner.getInstance(), "trackLogAsync", bean, new AsyncCallback() {
             @Override
-            public void onResponse(int code, String response,String errorCode) {
+            public void onResponse(int code, String response, String errorCode) {
                 codeScope = code;
                 countDownLatch.countDown();
             }
