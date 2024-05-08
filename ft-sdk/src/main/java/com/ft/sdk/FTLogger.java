@@ -1,6 +1,5 @@
 package com.ft.sdk;
 
-import com.ft.sdk.garble.bean.BaseContentBean;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.LogData;
 import com.ft.sdk.garble.bean.Status;
@@ -8,7 +7,6 @@ import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -42,10 +40,53 @@ public class FTLogger {
         this.config = config;
     }
 
-
+    /**
+     * 将单条日志数据存入本地同步
+     *
+     * @param content 日志内容
+     * @param status  日志等级
+     */
     public void logBackground(String content, Status status) {
-        logBackground(content, status, null, false);
+        logBackground(content, status.name, null, false);
 
+    }
+
+    /**
+     * 将单条日志数据存入本地同步
+     *
+     * @param content   日志内容
+     * @param status    日志等级
+     * @param isSilence 是否静默
+     */
+    public void logBackground(String content, Status status, boolean isSilence) {
+        logBackground(content, status.name, null, isSilence);
+    }
+
+    /**
+     * 将单条日志数据存入本地同步
+     *
+     * @param content  日志内容
+     * @param status   日志等级
+     * @param property 附加属性
+     */
+    public void logBackground(String content, Status status, HashMap<String, Object> property) {
+        logBackground(content, status.name, property, false);
+    }
+
+    /**
+     * 将单条日志数据存入本地同步
+     *
+     * @param content   日志内容
+     * @param status    日志等级
+     * @param property  附加属性
+     * @param isSilence 是否静默
+     */
+    public void logBackground(String content, Status status, HashMap<String, Object> property, boolean isSilence) {
+        logBackground(content, status.name, property, isSilence);
+    }
+
+    public void logBackground(String content, String status) {
+        logBackground(content, status, null);
     }
 
     /**
@@ -54,21 +95,23 @@ public class FTLogger {
      * @param content 日志内容
      * @param status  日志等级
      */
-    public void logBackground(String content, Status status, boolean isSilence) {
+    public void logBackground(String content, String status, boolean isSilence) {
         logBackground(content, status, null, isSilence);
     }
 
-    public void logBackground(String content, Status status, HashMap<String, Object> property) {
+    public void logBackground(String content, String status, HashMap<String, Object> property) {
         logBackground(content, status, property, false);
     }
 
     /**
      * 将单条日志数据存入本地同步
      *
-     * @param content 日志内容
-     * @param status  日志等级
+     * @param content   日志内容
+     * @param status    自定义状态
+     * @param property  附加属性
+     * @param isSilence 是否静默
      */
-    public void logBackground(String content, Status status, HashMap<String, Object> property, boolean isSilence) {
+    public void logBackground(String content, String status, HashMap<String, Object> property, boolean isSilence) {
 
         if (!checkConfig()) return;
         if (!config.isEnableCustomLog()) {
@@ -76,22 +119,37 @@ public class FTLogger {
         }
         if (config.isPrintCustomLogToConsole()) {
             String propertyString = property == null ? "" : "," + property;
-            String message = "[" + status.name.toUpperCase() + "]" + content + propertyString;
-            switch (status) {
-                case INFO:
-                    LogUtils.i(Constants.LOG_TAG_PREFIX, message, true);
+            String message = "[" + status.toUpperCase() + "]" + content + propertyString;
+
+            boolean contain = false;
+            for (Status s : Status.values()) {
+                if (s.name.equals(status.toLowerCase())) {
+                    contain = true;
                     break;
-                case WARNING:
-                    LogUtils.w(Constants.LOG_TAG_PREFIX, message, true);
-                    break;
-                case ERROR:
-                case CRITICAL:
-                    LogUtils.e(Constants.LOG_TAG_PREFIX, message, true);
-                    break;
-                case OK:
-                    LogUtils.v(Constants.LOG_TAG_PREFIX, message, true);
-                    break;
+                }
             }
+
+            if (contain) {
+                switch (Status.valueOf(status.toUpperCase())) {
+                    case INFO:
+                        LogUtils.i(Constants.LOG_TAG_PREFIX, message, true);
+                        break;
+                    case WARNING:
+                        LogUtils.w(Constants.LOG_TAG_PREFIX, message, true);
+                        break;
+                    case ERROR:
+                    case CRITICAL:
+                        LogUtils.e(Constants.LOG_TAG_PREFIX, message, true);
+                        break;
+                    case OK:
+                        LogUtils.v(Constants.LOG_TAG_PREFIX, message, true);
+                        break;
+                }
+            } else {
+                LogUtils.i(Constants.LOG_TAG_PREFIX, message, true);
+            }
+
+
         }
 
         LogBean logBean = new LogBean(content, Utils.getCurrentNanoTime());
@@ -116,16 +174,14 @@ public class FTLogger {
         if (logDataList == null || (!config.isEnableCustomLog())) {
             return;
         }
-        List<BaseContentBean> logBeans = new ArrayList<>();
         for (LogData logData : logDataList) {
             LogBean logBean = new LogBean(logData.getContent(),
                     Utils.getCurrentNanoTime());
             logBean.setServiceName(config.getServiceName());
             logBean.setStatus(logData.getStatus());
             if (config.checkLogLevel(logBean.getStatus())) {
-                logBeans.add(logBean);
+                TrackLogManager.get().trackLog(logBean, false);
             }
-            TrackLogManager.get().trackLog(logBean, false);
         }
     }
 

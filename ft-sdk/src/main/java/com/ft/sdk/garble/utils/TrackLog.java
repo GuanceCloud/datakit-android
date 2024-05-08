@@ -80,10 +80,9 @@ public class TrackLog {
     public static int println(boolean upload, int priority, String tag, String msg) {
         FTLoggerConfig config = FTLoggerConfigManager.get().getConfig();
         if (upload && config != null && config.isEnableConsoleLog()) {
-            LogBean logBean = new LogBean(Utils.getCurrentTimeStamp()
-                    + " " + getLevelMark(priority) + "/" + tag + ":" + msg, Utils.getCurrentNanoTime());
+            LogBean logBean = new LogBean(getLevelMark(priority) + "/" + tag + ":" + msg, Utils.getCurrentNanoTime());
             logBean.setServiceName(config.getServiceName());
-            logBean.setStatus(getStatus(priority));
+            logBean.setStatus(getStatus(priority).name);
             if (config.checkLogLevel(logBean.getStatus()) && config.checkPrefix(msg)) {
                 TrackLogManager.get().trackLog(logBean, false);
             }
@@ -175,8 +174,9 @@ public class TrackLog {
             case Log.VERBOSE:
                 return Status.OK;
             case Log.INFO:
-            case Log.DEBUG:
                 return Status.INFO;
+            case Log.DEBUG:
+                return Status.DEBUG;
             case Log.ERROR:
                 return Status.ERROR;
             case Log.WARN:
@@ -200,6 +200,8 @@ public class TrackLog {
                 return "E";
             case Log.WARN:
                 return "W";
+            case Log.ASSERT:
+                return "A";
             default:
                 return "I";
         }

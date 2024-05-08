@@ -11,6 +11,11 @@ public enum Status {
      */
     INFO("info"),
     /**
+     * 调试
+     */
+    DEBUG("debug"),
+
+    /**
      * 警告
      */
     WARNING("warning"),
