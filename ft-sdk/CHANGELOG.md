@@ -1,3 +1,8 @@
+# agent 1.4.6-alpha02
+1. 新增日志新增 Status.Debug 类型
+2. FTLogger 自定义日志支持自定义 status 字段
+
+---
 # agent 1.4.6-alpha01
 1. SDK 初始化容错优化
 
