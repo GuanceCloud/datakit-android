@@ -22,7 +22,6 @@ import com.tencent.bugly.crashreport.CrashReport;
 import com.uc.crashsdk.export.CrashApi;
 import com.umeng.commonsdk.UMConfigure;
 
-import java.io.File;
 import java.util.HashMap;
 
 import io.sentry.android.core.SentryAndroid;
@@ -42,7 +41,7 @@ public class DemoApplication extends BaseApplication {
     public void onCreate() {
         super.onCreate();
         if (!BuildConfig.LAZY_INIT) {
-            LogUtils.registerInnerLogCacheToFile(new File(getFilesDir(), "InnerLog" + ".log"));
+            LogUtils.registerInnerLogCacheToFile();
             initThirdParty();
             initFTSDK(this);
         }
@@ -76,8 +75,7 @@ public class DemoApplication extends BaseApplication {
     }
 
     static void initFTSDK(Context context) {
-
-        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAWAY_URL, BuildConfig.DATAWAY_TOKEN)
+        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAWAY_URL, BuildConfig.CLIENT_TOKEN)
                 .setDebug(true)//设置是否是 debug
                 .setAutoSync(true)
                 .setCustomSyncPageSize(100)

@@ -13,9 +13,14 @@ public class LogData {
     /**
      * 日志等级
      */
-    Status status = Status.INFO;
+    String status;
 
     public LogData(String content, Status status) {
+        this.content = content;
+        this.status = status.name;
+    }
+
+    public LogData(String content, String status) {
         this.content = content;
         this.status = status;
     }
@@ -28,11 +33,11 @@ public class LogData {
         this.content = content;
     }
 
-    public Status getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(Status status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 }

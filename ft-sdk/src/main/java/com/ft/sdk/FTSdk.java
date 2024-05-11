@@ -62,23 +62,26 @@ public class FTSdk {
      * @return
      */
     public static synchronized void install(@NonNull FTSDKConfig ftSDKConfig) {
-        if (ftSDKConfig == null) {
-            LogUtils.e(TAG, "参数 ftSDKConfig 不能为 null");
-            return;
-        } else {
-            boolean onlyMain = ftSDKConfig.isOnlySupportMainProcess();
-            if (onlyMain) {
-                Context context = FTApplication.getApplication();
-                String currentProcessName = Utils.getCurrentProcessName();
-                String packageName = context.getPackageName();
-                if (!TextUtils.isEmpty(packageName) && !TextUtils.equals(packageName, currentProcessName)) {
-                    LogUtils.e(TAG, "当前 SDK 只能在主进程中运行，当前进程为 " + currentProcessName + "，如果想要在非主进程中运行可以设置 FTSDKConfig.setOnlySupportMainProcess(false)");
-                    return;
+        try {
+            if (ftSDKConfig == null) {
+                LogUtils.e(TAG, "参数 ftSDKConfig 不能为 null");
+            } else {
+                boolean onlyMain = ftSDKConfig.isOnlySupportMainProcess();
+                if (onlyMain) {
+                    Context context = FTApplication.getApplication();
+                    String currentProcessName = Utils.getCurrentProcessName();
+                    String packageName = context.getPackageName();
+                    if (!TextUtils.isEmpty(packageName) && !TextUtils.equals(packageName, currentProcessName)) {
+                        LogUtils.e(TAG, "当前 SDK 只能在主进程中运行，当前进程为 " + currentProcessName + "，如果想要在非主进程中运行可以设置 FTSDKConfig.setOnlySupportMainProcess(false)");
+                        return;
+                    }
                 }
+                mFtSdk = new FTSdk(ftSDKConfig);
+                mFtSdk.initFTConfig(ftSDKConfig);
             }
-            mFtSdk = new FTSdk(ftSDKConfig);
+        } catch (Exception e) {
+            LogUtils.e(TAG, "initFTConfig fail:\n" + Log.getStackTraceString(e));
         }
-        mFtSdk.initFTConfig(ftSDKConfig);
     }
 
     /**
@@ -138,7 +141,6 @@ public class FTSdk {
         SyncTaskManager.get().init(config);
         FTTrackInner.getInstance().initBaseConfig(config);
         LogUtils.d(TAG, "initFTConfig complete");
-//            LogUtils.setDescLogShow(mFtSDKConfig.isDescLog());
     }
 
 
@@ -159,7 +161,7 @@ public class FTSdk {
             LogUtils.d(TAG, "initRUMWithConfig complete");
 
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, "initRUMWithConfig fail:\n" + Log.getStackTraceString(e));
         }
 
     }
@@ -176,7 +178,7 @@ public class FTSdk {
             LogUtils.d(TAG, "initTraceWithConfig complete");
 
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, "initTraceWithConfig fail:\n" + Log.getStackTraceString(e));
         }
     }
 
@@ -192,7 +194,7 @@ public class FTSdk {
             LogUtils.d(TAG, "initLogWithConfig complete");
 
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, "initLogWithConfig fail:\n" + Log.getStackTraceString(e));
         }
     }
 

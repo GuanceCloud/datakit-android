@@ -5,25 +5,21 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.FTRUMInnerManager;
-import com.ft.sdk.garble.manager.SingletonGson;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.UUID;
 
 /**
  * 用户行为操作生命周指标，{@link Constants#FT_MEASUREMENT_RUM_ACTION}
  */
 public class ActionBean {
-    private static final String TAG = Constants.LOG_TAG_PREFIX +"ActionBean";
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "ActionBean";
     /**
      * Action 唯一ID,{@link Constants#KEY_RUM_ACTION_ID}
      */
@@ -205,12 +201,20 @@ public class ActionBean {
         this.viewReferrer = viewReferrer;
     }
 
+    /**
+     * 将 action 属性数据转化为 json 字符，在数据存入本地缓存时写入
+     * @return
+     */
     public String getAttrJsonString() {
         HashMap<String, Object> map = new HashMap<>();
         map.put(Constants.KEY_RUM_PROPERTY, property);
         return Utils.hashMapObjectToJson(map);
     }
 
+    /**
+     * json 数据重新序列化，在数据从本地缓存取出时调用
+     * @param jsonString
+     */
     public void setFromAttrJsonString(String jsonString) {
         if (jsonString == null) return;
         try {

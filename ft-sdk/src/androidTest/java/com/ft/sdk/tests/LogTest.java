@@ -97,6 +97,8 @@ public class LogTest extends FTBaseTest {
         ArrayList<LogData> list = new ArrayList<>();
         list.add(new LogData(logContent, Status.OK));
         list.add(new LogData(logContent, Status.INFO));
+        list.add(new LogData(logContent, Status.DEBUG));
+        list.add(new LogData(logContent, "custom_status_type"));
         FTLogger.getInstance().logBackground(list);
 
 //        waitLogConsumeInThreadPool();
@@ -104,7 +106,7 @@ public class LogTest extends FTBaseTest {
         Thread.sleep(1000);
         //从数据库中查询是否有插入的数据
         int except = CheckUtils.getCount(DataType.LOG, logContent, 0);
-        Assert.assertEquals(5, except);
+        Assert.assertEquals(7, except);
     }
 
 
@@ -204,6 +206,7 @@ public class LogTest extends FTBaseTest {
 
     /**
      * 批量日志
+     *
      * @param expectCount 预期数量
      * @throws InterruptedException
      */

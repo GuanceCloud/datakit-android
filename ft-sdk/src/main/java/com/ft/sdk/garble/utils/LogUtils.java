@@ -17,6 +17,12 @@ import java.io.File;
  * Description:负责内部日志输出
  */
 public class LogUtils {
+
+    /**
+     * 默认缓存文件名称
+     */
+    private final static String DEFAULT_INNER_LOG_FILE = "LogInner.log";
+
     protected static String TAG = "[FT-SDK]:";
 
     /**
@@ -113,6 +119,8 @@ public class LogUtils {
     /**
      * 将内部日志转化成文件
      * <p>
+     * 需要开启 {@link com.ft.sdk.FTSDKConfig#setDebug(boolean)} 设置为 true 开启 debug 模式
+     * <p>
      * {@link FTLoggerConfig#setPrintCustomLogToConsole(boolean)}  产生循环调用的情况
      * innerLogHandler 设置后，这个值自动为 false
      * <p>
@@ -146,11 +154,34 @@ public class LogUtils {
 
     /**
      * 将内部日志转化成文件
+     * <p>
+     * 需要开启 {@link com.ft.sdk.FTSDKConfig#setDebug(boolean)} 设置为 true 开启 debug 模式
+     * <p>
+     * {@link FTLoggerConfig#setPrintCustomLogToConsole(boolean)}  产生循环调用的情况
+     * innerLogHandler 设置后，这个值自动为 false
+     * <p>
+     * {@link FTLogger}，如果使用 FTLogger 避免使用 {@link  com.ft.sdk.garble.bean.Status#OK}
      *
      * @param fileName 缓存文件名
      */
     public static void registerInnerLogCacheToFile(String fileName) {
         registerInnerLogCacheToFile(new File(fileName));
+    }
+
+    /**
+     * 将内部日志转化为文件
+     * 默认路径：/data/data/{package_name}/files/LogInner.log
+     * <p>
+     * 需要开启 {@link com.ft.sdk.FTSDKConfig#setDebug(boolean)} 设置为 true 开启 debug 模式
+     * <p>
+     * {@link FTLoggerConfig#setPrintCustomLogToConsole(boolean)}  产生循环调用的情况
+     * innerLogHandler 设置后，这个值自动为 false
+     * <p>
+     * {@link FTLogger}，如果使用 FTLogger 避免使用 {@link  com.ft.sdk.garble.bean.Status#OK}
+     */
+    public static void registerInnerLogCacheToFile() {
+        String filePath = FTApplication.getApplication().getFilesDir().toString() + File.separator + DEFAULT_INNER_LOG_FILE;
+        registerInnerLogCacheToFile(new File(filePath));
     }
 
 

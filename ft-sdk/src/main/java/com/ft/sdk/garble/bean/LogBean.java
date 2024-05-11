@@ -23,7 +23,7 @@ public class LogBean extends BaseContentBean {
      * 同一应用产生的日志 source 应该一样，这样在观测云中方便针对该来源的日志配置同一的提取规则
      * 日志等级
      */
-    Status status = Status.INFO;
+    String status = Status.INFO.name;
 
     /**
      * 用于链路日志，当前链路的请求响应时间，微秒为单位
@@ -77,7 +77,7 @@ public class LogBean extends BaseContentBean {
     public JSONObject getAllTags() {
         super.getAllTags();
         try {
-            tags.put(Constants.KEY_STATUS, status.name);
+            tags.put(Constants.KEY_STATUS, status);
         } catch (JSONException e) {
             LogUtils.e(TAG, Log.getStackTraceString(e));
 
@@ -90,11 +90,11 @@ public class LogBean extends BaseContentBean {
         this.duration = duration;
     }
 
-    public Status getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(Status status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 

@@ -99,7 +99,9 @@ public class MainActivity extends AppCompatActivity {
         });
         findViewById(R.id.main_mock_log_btn).setOnClickListener(v -> {
             Log.e(TAG, "console log");
+            Log.d(TAG, "console log");
             FTLogger.getInstance().logBackground("custom Log", Status.ERROR);
+            FTLogger.getInstance().logBackground("custom status Log","customType");
         });
 
         findViewById(R.id.main_mock_okhttp_btn).setOnClickListener(v -> {
@@ -178,7 +180,13 @@ public class MainActivity extends AppCompatActivity {
                                 .url(BuildConfig.TRACE_URL)
                                 .method(RequestMethod.GET.name(), null);
                         try {
-                            client.newCall(builder.build()).execute();
+                            Response response = client.newCall(builder.build()).execute();
+                            ResponseBody responseBody = response.body();
+                            if (responseBody != null) {
+                                //这里需要消费，event listener 才会被调用
+                               String string = responseBody.string();
+                            }
+
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }

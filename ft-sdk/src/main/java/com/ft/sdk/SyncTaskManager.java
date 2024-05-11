@@ -73,7 +73,13 @@ public class SyncTaskManager {
     private final AtomicInteger errorCount = new AtomicInteger(0);
 
 
+    /**
+     * RUM 数据同步包 id 标记
+     */
     private final ID36Generator rumGenerator = new ID36Generator();
+    /**
+     * log 数据同步包 id 标记
+     */
     private final ID36Generator logGenerator = new ID36Generator();
 
 

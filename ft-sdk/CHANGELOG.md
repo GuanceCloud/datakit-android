@@ -1,3 +1,24 @@
+# agent 1.4.6-alpha02
+1. 新增日志新增 Status.Debug 类型
+2. FTLogger 自定义日志支持自定义 status 字段
+
+---
+# agent 1.4.6-alpha01
+1. SDK 初始化容错优化
+
+---
+# agent 1.4.5
+1. 重复初始化兼容优化处理
+2. 优化 c/c++ 崩溃采集数据同步逻辑，避免在某些场景下意外中断退出从而导致死锁
+3. 优化 startAction Property 属性写入逻辑，避免发生线程安全访问问题
+
+---
+# agent 1.4.5-beta01
+1. 重复初始化兼容优化处理
+2. 优化 c/c++ 崩溃采集数据同步逻辑，避免在某些场景下意外中断退出从而导致死锁
+3. 优化 startAction Property 属性写入逻辑，避免发生线程安全访问问题
+
+---
 # agent 1.4.4
 1. 数据库链接容错保护
 2. 修正 setOnlySupportMainProcess true 时，子进程配置部份不起效问题
