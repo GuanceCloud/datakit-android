@@ -16,7 +16,6 @@ import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.utils.CrossProcessSetting;
 
-import java.io.File;
 import java.util.HashMap;
 
 /**
@@ -34,13 +33,13 @@ public class DemoApplication extends BaseApplication {
     public void onCreate() {
         super.onCreate();
         if (!BuildConfig.LAZY_INIT) {
-            LogUtils.registerInnerLogCacheToFile(new File(getFilesDir(), "InnerLog" + ".log"));
+            LogUtils.registerInnerLogCacheToFile();
             initFTSDK(this);
         }
     }
 
     static void initFTSDK(Context context) {
-        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAWAY_URL, BuildConfig.DATAWAY_TOKEN)
+        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAWAY_URL, BuildConfig.CLIENT_TOKEN)
                 .setDebug(true)//设置是否是 debug
                 .setAutoSync(true)
                 .setCustomSyncPageSize(100)
@@ -54,7 +53,7 @@ public class DemoApplication extends BaseApplication {
                 .setEnableConsoleLog(true)
                 .setLogCacheLimitCount(10000)
                 .setPrintCustomLogToConsole(true)
-                .setLogLevelFilters(new Status[]{Status.ERROR})
+                .setLogLevelFilters(new Status[]{Status.ERROR,Status.DEBUG})
                 .setEnableLinkRumData(true)
         );
 
