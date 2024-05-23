@@ -1276,10 +1276,16 @@ public class FTRUMInnerManager {
     private void checkSessionKeep(String sessionId, float sampleRate) {
         boolean collect = Utils.enableTraceSamplingRate(sampleRate);
         if (!collect) {
-            if (notCollectMap.size() + 1 > SESSION_FILTER_CAPACITY) {
-                notCollectMap.remove(0);
+            synchronized (notCollectMap) {
+                if (notCollectMap.size() + 1 > SESSION_FILTER_CAPACITY) {
+                    try {
+                        notCollectMap.remove(0);
+                    } catch (Exception e) {
+                        LogUtils.d(TAG, Log.getStackTraceString(e));
+                    }
+                }
+                notCollectMap.add(sessionId);
             }
-            notCollectMap.add(sessionId);
             LogUtils.d(TAG, "根据 FTRUMConfig SampleRate 采样率计算，当前 session 不被采集，session_id:" + sessionId);
         }
     }
