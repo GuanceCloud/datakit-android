@@ -1,3 +1,9 @@
+# agent 1.4.7-alpha01
+1. 修复开启 RUM SampleRate 后，高并发网路请求引发的数组线程安全问题
+2. SDK 中 ConnectivityManager.registerDefaultNetworkCallback 方法容错
+3. 组件资源名 id 获取优化
+
+---
 # agent 1.4.6
 1. SDK 初始化容错优化
 2. 新增日志新增 Status.Debug 类型
