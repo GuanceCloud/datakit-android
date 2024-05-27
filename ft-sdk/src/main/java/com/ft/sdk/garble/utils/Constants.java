@@ -463,6 +463,12 @@ public class Constants {
      * 资源 url path 分组，对类似 url 自动分组 /?/path/query?params=x1
      */
     public static final String KEY_RUM_RESOURCE_URL_PATH_GROUP = "resource_url_path_group";
+
+    /**
+     * host IP 地址
+     */
+    public static final String KEY_RUM_RESOURCE_HOST_IP = "resource_host_ip";
+
     /**
      * 错误简短描述
      */

@@ -703,6 +703,7 @@ public class FTRUMInnerManager {
         long resourceLoad = netStatusBean.getHoleRequestTime();
         bean.resourceLoad = resourceLoad > 0 ? resourceLoad : bean.endTime - bean.startTime;
         bean.resourceFirstByte = netStatusBean.getFirstByteTime();
+        bean.resourceHostIP = netStatusBean.resourceHostIP;
         bean.netStateSet = true;
         checkToAddResource(resourceId, bean);
     }
@@ -796,6 +797,9 @@ public class FTRUMInnerManager {
                 tags.put(Constants.KEY_RUM_RESOURCE_URL_PATH_GROUP, urlPathGroup);
             }
 
+            if (!Utils.isNullOrEmpty(bean.resourceHostIP)) {
+                tags.put(Constants.KEY_RUM_RESOURCE_HOST_IP, bean.resourceHostIP);
+            }
 
             tags.put(Constants.KEY_RUM_RESOURCE_URL, bean.url);
             for (Map.Entry<String, Object> entry : bean.property.entrySet()) {
