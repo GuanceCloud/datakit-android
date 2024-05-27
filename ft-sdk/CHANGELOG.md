@@ -1,3 +1,8 @@
+# agent 1.5.0-alpha01
+1. RUM resource 网络请求添加 remote ip 地址解析功能
+2. 添加行协议 Integer 数据兼容模式，处理 web 数据类型冲突问题
+
+---
 # agent 1.4.7-alpha01
 1. 修复开启 RUM SampleRate 后，高并发网路请求引发的数组线程安全问题
 2. SDK 中 ConnectivityManager.registerDefaultNetworkCallback 方法容错
