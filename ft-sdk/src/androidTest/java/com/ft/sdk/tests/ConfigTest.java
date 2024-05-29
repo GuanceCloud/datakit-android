@@ -92,6 +92,16 @@ public class ConfigTest extends FTBaseTest {
     }
 
     /**
+     * Integer 兼容模式
+     */
+    @Test
+    public void enableDataIntegerCompatible() {
+        FTSdk.install(getDatakitConfig().enableDataIntegerCompatible());
+        Assert.assertTrue(FTSdk.get().getBaseConfig().isEnableDataIntegerCompatible());
+        Assert.assertTrue(getSDKConfigInSyncDataHelper().isEnableDataIntegerCompatible());
+    }
+
+    /**
      * 日志条缓存条目数配置验证，自定义数值，默认数值，和最小数值限制
      */
     @Test
@@ -104,7 +114,7 @@ public class ConfigTest extends FTBaseTest {
         FTSdk.initLogWithConfig(new FTLoggerConfig().setLogCacheLimitCount(0));
         Assert.assertEquals(Constants.MINI_DB_LOG_CACHE_NUM, FTDBCachePolicy.get().getLimitCount());
 
-        int customCount =10000;
+        int customCount = 10000;
         FTSdk.initLogWithConfig(new FTLoggerConfig().setLogCacheLimitCount(customCount));
         Assert.assertEquals(customCount, FTDBCachePolicy.get().getLimitCount());
 
@@ -236,24 +246,6 @@ public class ConfigTest extends FTBaseTest {
                 .setEnv(env);
         FTSdk.install(ftSDKConfig);
         Assert.assertEquals(expected, FTSdk.get().getBaseConfig().getEnv());
-    }
-
-    /**
-     * 获取 Datakit 客户端配置
-     *
-     * @return
-     */
-    private FTSDKConfig getDatakitConfig() {
-        return FTSDKConfig.builder(TEST_FAKE_URL);
-    }
-
-    /**
-     * 获取 dataway 客户端配置
-     *
-     * @return
-     */
-    private FTSDKConfig getDatawaytConfig() {
-        return FTSDKConfig.builder(TEST_FAKE_URL, TEST_FAKE_CLIENT_TOKEN);
     }
 
     @Override

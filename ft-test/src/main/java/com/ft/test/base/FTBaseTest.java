@@ -6,6 +6,7 @@ import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.ft.sdk.FTExceptionHandler;
 import com.ft.sdk.FTRUMInnerManager;
+import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTrackInner;
 import com.ft.sdk.SyncDataHelper;
@@ -45,6 +46,24 @@ public class FTBaseTest {
     }
 
     /**
+     * 获取 Datakit 客户端配置
+     *
+     * @return
+     */
+    protected FTSDKConfig getDatakitConfig() {
+        return FTSDKConfig.builder(TEST_FAKE_URL);
+    }
+
+    /**
+     * 获取 dataway 客户端配置
+     *
+     * @return
+     */
+    protected FTSDKConfig getDatawaytConfig() {
+        return FTSDKConfig.builder(TEST_FAKE_URL, TEST_FAKE_CLIENT_TOKEN);
+    }
+
+    /**
      * 停止数据同步，{@link SyncTaskManager#running} = true 变量来实现
      *
      * @throws Exception
@@ -53,6 +72,7 @@ public class FTBaseTest {
         Whitebox.invokeMethod(SyncTaskManager.get(), "setRunning", true);
 
     }
+
 
     /**
      * 恢复数据同步,{@link SyncTaskManager#running} = false 变量来实现
@@ -207,7 +227,6 @@ public class FTBaseTest {
     }
 
 
-
     /**
      * 获取当前 dataHelper 对象
      * {@link FTTrackInner#dataHelper}
@@ -217,6 +236,15 @@ public class FTBaseTest {
 
     public static SyncDataHelper getInnerSyncDataHelper() {
         return Whitebox.getInternalState(FTTrackInner.getInstance(), "dataHelper");
+    }
+
+    /**
+     * 获取当前 datahelper 中 config属性
+     * {@link FTTrackInner#dataHelper} 的 config
+     * @return
+     */
+    public static FTSDKConfig getSDKConfigInSyncDataHelper() {
+        return Whitebox.getInternalState(getInnerSyncDataHelper(), "config");
     }
 
     /**
