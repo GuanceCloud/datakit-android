@@ -20,24 +20,22 @@ public class FTMonitorManager {
      */
     private static final long ONE_SECOND_NANO_TIMES = 1000000000;
 
-    /**
-     *
-     */
     private volatile static FTMonitorManager ftMonitorConfig;
 
     /**
-     *
+     * {@link  ErrorMonitorType} ,默认不设置
      */
     private int errorMonitorType = ErrorMonitorType.NO_SET;
     /**
-     *
+     * {@link  DeviceMetricsMonitorType} ,默认不设置
      */
     private int deviceMetricsMonitorType = DeviceMetricsMonitorType.NO_SET;
 
-
     /**
-     *
+     * {@link DetectFrequency},默认使用 DEFAULT
      */
+    private DetectFrequency detectFrequency = DetectFrequency.DEFAULT;
+
     private final HashMap<String, MonitorRunnable> runnerMap = new HashMap<>();
 
     private FTMonitorManager() {
@@ -60,6 +58,7 @@ public class FTMonitorManager {
     void initWithConfig(FTRUMConfig config) {
         errorMonitorType = config.getExtraMonitorTypeWithError();
         deviceMetricsMonitorType = config.getDeviceMetricsMonitorType();
+        detectFrequency = config.getDeviceMetricsDetectFrequency();
         initParams();
     }
 
@@ -101,7 +100,7 @@ public class FTMonitorManager {
     public void addMonitor(String viewId) {
         if (deviceMetricsMonitorType == DeviceMetricsMonitorType.NO_SET) return;
         synchronized (runnerMap) {
-            MonitorRunnable runner = new MonitorRunnable();
+            MonitorRunnable runner = new MonitorRunnable(detectFrequency);
             runnerMap.put(viewId, runner);
             runner.run();
         }
