@@ -43,7 +43,7 @@ public class FTLogger {
     /**
      * 将单条日志数据存入本地同步
      *
-     * @param content 日志内容
+     * @param content 日志内容，最大限制 {@link com.ft.sdk.garble.bean.BaseContentBean#LIMIT_SIZE}
      * @param status  日志等级
      */
     public void logBackground(String content, Status status) {
@@ -54,7 +54,7 @@ public class FTLogger {
     /**
      * 将单条日志数据存入本地同步
      *
-     * @param content   日志内容
+     * @param content   日志内容，最大限制 {@link com.ft.sdk.garble.bean.BaseContentBean#LIMIT_SIZE}
      * @param status    日志等级
      * @param isSilence 是否静默
      */
@@ -65,7 +65,7 @@ public class FTLogger {
     /**
      * 将单条日志数据存入本地同步
      *
-     * @param content  日志内容
+     * @param content  日志内容，最大限制 {@link com.ft.sdk.garble.bean.BaseContentBean#LIMIT_SIZE}
      * @param status   日志等级
      * @param property 附加属性
      */
@@ -76,7 +76,7 @@ public class FTLogger {
     /**
      * 将单条日志数据存入本地同步
      *
-     * @param content   日志内容
+     * @param content   日志内容，最大限制 {@link com.ft.sdk.garble.bean.BaseContentBean#LIMIT_SIZE}
      * @param status    日志等级
      * @param property  附加属性
      * @param isSilence 是否静默
@@ -92,7 +92,7 @@ public class FTLogger {
     /**
      * 将单条日志数据存入本地同步
      *
-     * @param content 日志内容
+     * @param content 日志内容，最大限制 {@link com.ft.sdk.garble.bean.BaseContentBean#LIMIT_SIZE}
      * @param status  日志等级
      */
     public void logBackground(String content, String status, boolean isSilence) {
@@ -106,7 +106,7 @@ public class FTLogger {
     /**
      * 将单条日志数据存入本地同步
      *
-     * @param content   日志内容
+     * @param content   日志内容，最大限制 {@link com.ft.sdk.garble.bean.BaseContentBean#LIMIT_SIZE}
      * @param status    自定义状态
      * @param property  附加属性
      * @param isSilence 是否静默
