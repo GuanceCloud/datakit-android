@@ -1,5 +1,7 @@
 package com.ft.sdk;
 
+import androidx.annotation.Nullable;
+
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.PackageUtils;
@@ -39,6 +41,7 @@ public class FTTraceConfigManager {
     /**
      * @return
      */
+    @Nullable
     public FTTraceConfig getConfig() {
         return config;
     }

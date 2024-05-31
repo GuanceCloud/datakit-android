@@ -100,6 +100,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
 
         //页面打开埋点数据插入
         FTRUMConfigManager manager = FTRUMConfigManager.get();
+        //config nonnull here ingore warning
         if (manager.isRumEnable() && manager.getConfig().isEnableTraceUserView()) {
             FTRUMInnerManager.get().startView(activity.getClass().getSimpleName());
         }

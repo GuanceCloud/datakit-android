@@ -31,6 +31,8 @@ public class SyncDataHelper {
     private final HashMap<String, Object> rumTags;
     private final HashMap<String, Object> traceTags;
 
+    private FTSDKConfig config;
+
 
     protected SyncDataHelper() {
         basePublicTags = new HashMap<>();
@@ -40,6 +42,7 @@ public class SyncDataHelper {
     }
 
     void initBaseConfig(FTSDKConfig config) {
+        this.config = config;
         basePublicTags.putAll(config.getGlobalContext());
     }
 
@@ -87,7 +90,6 @@ public class SyncDataHelper {
     /**
      * 封装同步上传的数据，主要用于测试用例使用
      *
-     *
      * @param dataType
      * @param recordDatas
      * @return
@@ -106,6 +108,11 @@ public class SyncDataHelper {
      */
     private String convertToLineProtocolLines(List<SyncJsonData> datas, HashMap<String, Object> extraTags,
                                               String packageId) {
+
+        boolean integerCompatible = false;
+        if (config != null) {
+            integerCompatible = config.isEnableDataIntegerCompatible();
+        }
         StringBuilder sb = new StringBuilder();
         for (SyncJsonData data : datas) {
             String jsonString = data.getDataString();
@@ -137,7 +144,7 @@ public class SyncDataHelper {
                     } else {
                         tags.put(Constants.KEY_SDK_DATA_FLAG, packageId + "." + Utils.randomUUID());
                     }
-                    StringBuilder tagSb = getCustomHash(tags, true);
+                    StringBuilder tagSb = getCustomHash(tags, true, integerCompatible);
                     deleteLastComma(tagSb);
                     if (tagSb.length() > 0) {
                         sb.append(",");
@@ -147,7 +154,7 @@ public class SyncDataHelper {
 
                     //========== field ==========
                     JSONObject fields = opJson.optJSONObject(Constants.FIELDS);
-                    StringBuilder valueSb = getCustomHash(fields, false);
+                    StringBuilder valueSb = getCustomHash(fields, false, integerCompatible);
                     deleteLastComma(valueSb);
                     sb.append(valueSb);
                     sb.append(Constants.SEPARATION_PRINT);
@@ -170,7 +177,7 @@ public class SyncDataHelper {
      * @param obj
      * @return
      */
-    private static StringBuilder getCustomHash(JSONObject obj, boolean isTag) {
+    private static StringBuilder getCustomHash(JSONObject obj, boolean isTag, boolean integerCompatible) {
         StringBuilder sb = new StringBuilder();
         Iterator<String> keys = obj.keys();
         while (keys.hasNext()) {
@@ -196,7 +203,7 @@ public class SyncDataHelper {
                 } else if (value instanceof Boolean) {
                     sb.append(value);
                 } else if (value instanceof Long || value instanceof Integer) {
-                    sb.append(value).append(isTag ? "" : "i");
+                    sb.append(value).append(isTag || integerCompatible ? "" : "i");
                 } else {// String or Others
                     addQuotationMarks(sb, String.valueOf(value), !isTag);
                 }

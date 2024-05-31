@@ -4,7 +4,6 @@ import com.ft.sdk.DetectFrequency;
 import com.ft.sdk.DeviceMetricsMonitorType;
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTMonitorManager;
-import com.ft.sdk.FTRUMConfigManager;
 import com.ft.sdk.garble.bean.MonitorInfoBean;
 import com.ft.sdk.garble.utils.BatteryUtils;
 import com.ft.sdk.garble.utils.CpuUtils;
@@ -37,8 +36,9 @@ public class MonitorRunnable implements Runnable {
     private final MonitorInfoBean batteryBean = new MonitorInfoBean();
 
 
-    public MonitorRunnable() {
-        detectFrequency = FTRUMConfigManager.get().getConfig().getDeviceMetricsDetectFrequency();
+
+    public MonitorRunnable(DetectFrequency detectFrequency) {
+        this.detectFrequency = detectFrequency;
     }
 
 

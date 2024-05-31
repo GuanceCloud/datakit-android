@@ -506,6 +506,7 @@ public class FTAutoTrack {
         if (!op.equals(OP.CLK)) {
             return;
         }
+        //config nonnull here ingore warning
         if (!manager.getConfig().isEnableTraceUserAction()) {
             return;
         }
@@ -679,7 +680,9 @@ public class FTAutoTrack {
 
 //            builder.addNetworkInterceptor(interceptor); //发现部分工程有兼容问题
         if (FTRUMConfigManager.get().isRumEnable()) {
-            if (FTRUMConfigManager.get().getConfig().isEnableTraceUserResource()) {
+            FTRUMConfig config = FTRUMConfigManager.get().getConfig();
+            //config nonnull here ingore warning
+            if (config.isEnableTraceUserResource()) {
                 boolean hasSetResource = false;//是否已经设置 FTResourceInterceptor
                 for (Interceptor interceptor : builder.interceptors()) {
                     if (interceptor instanceof FTResourceInterceptor) {
@@ -695,7 +698,7 @@ public class FTAutoTrack {
                 if (factory != null) {
                     builder.eventListenerFactory(factory);
                 } else {
-                    builder.eventListenerFactory(new FTResourceEventListener.FTFactory());
+                    builder.eventListenerFactory(new FTResourceEventListener.FTFactory(config.isEnableResourceHostIP()));
                 }
             }
         }

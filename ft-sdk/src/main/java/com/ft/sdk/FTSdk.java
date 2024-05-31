@@ -114,7 +114,7 @@ public class FTSdk {
         FTMonitorManager.release();
         FTAutoTrackConfigManager.release();
         FTHttpConfigManager.release();
-        FTNetworkListener.get().release();
+        FTNetworkListener.release();
 //        LocationUtils.get().stopListener();
         FTExceptionHandler.release();
         FTDBCachePolicy.release();

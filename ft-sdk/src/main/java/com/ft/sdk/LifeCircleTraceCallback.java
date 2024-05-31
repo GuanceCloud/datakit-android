@@ -108,11 +108,13 @@ class LifeCircleTraceCallback {
             long codeStartTime = FTAppStartCounter.get().getMarkCodeTimeLine();
             if (codeStartTime > 0) {
                 FTAppStartCounter.get().codeStart(now - codeStartTime);
+                //config nonnull here ingore warning
                 if (manager.isRumEnable() && config.isEnableTraceUserAction()) {
                     FTAppStartCounter.get().codeStartUpload();
                     FTAppStartCounter.get().resetCodeStartTimeline();
                 }
             } else {
+                //config nonnull here ingore warning
                 if (manager.isRumEnable() && config.isEnableTraceUserAction()) {
                     FTAppStartCounter.get().hotStart(now - startTime, startTime);
                 }
@@ -122,6 +124,7 @@ class LifeCircleTraceCallback {
         }
 
         if (manager.isRumEnable()) {
+            //config nonnull here ingore warning
             if (config.isEnableTraceUserView()) {
                 Long startTime = mCreateMap.get(context);
                 if (startTime != null) {
@@ -142,7 +145,7 @@ class LifeCircleTraceCallback {
         if (alreadySleep) {
             if (mInited) {
                 FTRUMConfig config = FTRUMConfigManager.get().getConfig();
-                if (config.isRumEnable() && config.isEnableTraceUserAction()) {
+                if (config != null && config.isRumEnable() && config.isEnableTraceUserAction()) {
                     if (startTime > 0) {
                         long now = Utils.getCurrentNanoTime();
                         FTAppStartCounter.get().hotStart(now - startTime, startTime);

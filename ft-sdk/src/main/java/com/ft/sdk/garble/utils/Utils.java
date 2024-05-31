@@ -5,12 +5,14 @@ import static com.ft.sdk.garble.utils.Constants.TAGS;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import android.app.ActivityManager;
+import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Process;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -360,14 +362,18 @@ public class Utils {
      * @return
      */
     public static String getCurrentProcessName() {
-        Context context = FTApplication.getApplication();
-        int myPid = Process.myPid();
-        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        List<ActivityManager.RunningAppProcessInfo> processes = manager.getRunningAppProcesses();
-        if (processes == null || processes.isEmpty()) return null;
-        for (ActivityManager.RunningAppProcessInfo info : processes) {
-            if (myPid == info.pid) {
-                return info.processName;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            return Application.getProcessName();
+        } else {
+            Context context = FTApplication.getApplication();
+            int myPid = Process.myPid();
+            ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+            List<ActivityManager.RunningAppProcessInfo> processes = manager.getRunningAppProcesses();
+            if (processes == null || processes.isEmpty()) return null;
+            for (ActivityManager.RunningAppProcessInfo info : processes) {
+                if (myPid == info.pid) {
+                    return info.processName;
+                }
             }
         }
         return null;

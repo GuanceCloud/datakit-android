@@ -1,3 +1,29 @@
+# agent 1.5.0-alpha04
+1. RUM Log Trace config 读取临界场景容错处理 
+
+---
+# agent 1.5.0-alpha03
+1. RUM resource 网络请求添加 remote ip 地址解析功能
+2. 添加行协议 Integer 数据兼容模式，处理 web 数据类型冲突问题
+
+---
+# agent 1.4.7-alpha01
+1. 修复开启 RUM SampleRate 后，高并发网路请求引发的数组线程安全问题
+2. ConnectivityManager.registerDefaultNetworkCallback 方法容错优化
+3. 自动采集 Action click 中控件资源名 id 获取优化
+
+---
+# agent 1.4.6
+1. SDK 初始化容错优化
+2. 新增日志新增 Status.Debug 类型
+3. 控制台抓取日志等级对应关系调整： Log.i -> info，Log.d -> debug
+4. FTLogger 自定义日志支持自定义 status 字段
+
+---
+# agent 1.4.6-beta01
+1. 同 agent 1.4.6-alpha02
+
+---
 # agent 1.4.6-alpha02
 1. 新增日志新增 Status.Debug 类型
 2. FTLogger 自定义日志支持自定义 status 字段

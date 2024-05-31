@@ -89,7 +89,7 @@ public class DemoApplication extends BaseApplication {
                 .setEnableConsoleLog(true)
                 .setLogCacheLimitCount(10000)
                 .setPrintCustomLogToConsole(true)
-                .setLogLevelFilters(new Status[]{Status.ERROR})
+                .setLogLevelFilters(new Status[]{Status.ERROR,Status.DEBUG})
                 .setEnableLinkRumData(true)
         );
 

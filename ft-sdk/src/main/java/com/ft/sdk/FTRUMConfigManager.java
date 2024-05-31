@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import androidx.annotation.Nullable;
+
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.threadpool.RunnerCompleteCallBack;
@@ -158,6 +160,7 @@ public class FTRUMConfigManager {
         return config != null && config.getRumAppId() != null;
     }
 
+    @Nullable
     public FTRUMConfig getConfig() {
         return config;
     }
