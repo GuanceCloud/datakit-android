@@ -1,4 +1,8 @@
-# agent 1.5.0-alpha01
+# agent 1.5.0-alpha04
+1. RUM Log Trace config 读取临界场景容错处理 
+
+---
+# agent 1.5.0-alpha03
 1. RUM resource 网络请求添加 remote ip 地址解析功能
 2. 添加行协议 Integer 数据兼容模式，处理 web 数据类型冲突问题
 
