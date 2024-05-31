@@ -277,11 +277,10 @@ public class SyncTaskManager {
                 packageId = rumGenerator.getCurrentId();
             }
             for (SyncJsonData data : cacheDataList) {
-                sb.append(data.getDataStringWithPackageId(packageId, dataCount));
+                sb.append(data.getDataStringWithPackageId(packageId, pid, dataCount));
             }
 
             String body = sb.toString();
-            LogUtils.d(TAG, body);
             requestNet(dataType, body, new AsyncCallback() {
                 @Override
                 public void onResponse(int code, String response, String errorCode) {

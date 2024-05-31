@@ -185,7 +185,7 @@ public class FTTrackInner {
             public void run() {
                 List<SyncJsonData> recordDataList = new ArrayList<>();
                 try {
-                    SyncJsonData recordData = SyncJsonData.getFromLogBean(bean);
+                    SyncJsonData recordData = SyncJsonData.getFromLogBean(dataHelper, bean);
                     recordDataList.add(recordData);
                     String body = dataHelper.getBodyContent(DataType.LOG, recordDataList);
                     String model = Constants.URL_MODEL_LOG;
@@ -253,7 +253,7 @@ public class FTTrackInner {
                         if (rumTags != null) {
                             logBean.appendTags(rumTags);
                         }
-                        datas.add(SyncJsonData.getFromLogBean(dataHelper, logBean, DataType.LOG));
+                        datas.add(SyncJsonData.getFromLogBean(dataHelper, logBean));
                     } else {
                         LogUtils.d(TAG, "根据 FTLogConfig SampleRate 计算，将被丢弃=>" + logBean.getContent());
                     }

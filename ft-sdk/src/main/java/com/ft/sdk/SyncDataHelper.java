@@ -107,33 +107,14 @@ public class SyncDataHelper {
     }
 
     /**
-     * 封装同步上传的数据，主要用于测试用例使用
-     *
-     * @param dataType
-     * @param recordDatas
-     * @return
-     */
-    public String getBodyContent(DataType dataType, List<SyncJsonData> recordDatas) {
-        return getBodyContent(dataType, recordDatas, null);
-    }
-
-
-    /**
      * 转化为行协议数据
      *
      * @param datas
      * @param extraTags
      * @return
      */
-    private String convertToLineProtocolLines(List<SyncJsonData> datas, HashMap<String, Object> extraTags,
-                                              String packageId) {
-
-        boolean integerCompatible = false;
-        if (config != null) {
-            integerCompatible = config.isEnableDataIntegerCompatible();
-        }
+    private String convertToLineProtocolLines(List<SyncJsonData> datas, HashMap<String, Object> extraTags) {
         StringBuilder sb = new StringBuilder();
-
         for (SyncJsonData data : datas) {
             sb.append(convertToLineProtocolLine(data, extraTags, true));
         }
@@ -150,6 +131,10 @@ public class SyncDataHelper {
      */
     private String convertToLineProtocolLine(SyncJsonData data, HashMap<String, Object> extraTags,
                                              boolean multiLine) {
+        boolean integerCompatible = false;
+        if (config != null) {
+            integerCompatible = config.isEnableDataIntegerCompatible();
+        }
         StringBuilder sb = new StringBuilder();
 
         try {
@@ -174,7 +159,7 @@ public class SyncDataHelper {
                     }
                 }
             }
-            StringBuilder tagSb = getCustomHash(tags, true);
+            StringBuilder tagSb = getCustomHash(tags, true, integerCompatible);
             deleteLastComma(tagSb);
             if (tagSb.length() > 0) {
                 sb.append(",");
@@ -184,7 +169,7 @@ public class SyncDataHelper {
 
             //========== field ==========
             JSONObject fields = opJson.optJSONObject(Constants.FIELDS);
-            StringBuilder valueSb = getCustomHash(fields, false);
+            StringBuilder valueSb = getCustomHash(fields, false, integerCompatible);
             deleteLastComma(valueSb);
             sb.append(valueSb);
             sb.append(multiLine ? Constants.SEPARATION_PRINT : Constants.SEPARATION);

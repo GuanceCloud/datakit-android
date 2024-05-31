@@ -108,15 +108,16 @@ public class SyncJsonData implements Cloneable {
      * @param dataCount 数量
      * @return
      */
-    public String getDataStringWithPackageId(String packageId, int dataCount) {
+    public String getDataStringWithPackageId(String packageId, int pid, int dataCount) {
         if (packageId != null) {
-            dataString = dataString.replace(uuid, packageId + "." + dataCount + "." + uuid);
+            dataString = dataString.replace(uuid, packageId + "." + pid + "." + dataCount + "." + uuid);
         }
         return dataString;
     }
 
     /**
      * 替换 (sdk_data_id=)([0-9a-z]+).([0-9]+).[uuid] 为 sdk_data_id=[uuid]
+     *
      * @param newUUID 新 uuid
      * @return
      */
@@ -175,7 +176,7 @@ public class SyncJsonData implements Cloneable {
      * @throws JSONException
      * @throws InvalidParameterException
      */
-    public static SyncJsonData getFromLogBean(SyncDataHelper helper, BaseContentBean bean, DataType dataType)
+    public static SyncJsonData getFromLogBean(SyncDataHelper helper, BaseContentBean bean)
             throws JSONException, FTInvalidParameterException {
         SyncJsonData recordData = new SyncJsonData(DataType.LOG);
         recordData.setTime(bean.getTime());
