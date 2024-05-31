@@ -39,6 +39,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class SyncTaskManager {
     public final static String TAG = Constants.LOG_TAG_PREFIX + "SyncTaskManager";
+    public final static int pid = android.os.Process.myPid();
+
     /**
      * 最大容忍错误次数
      */

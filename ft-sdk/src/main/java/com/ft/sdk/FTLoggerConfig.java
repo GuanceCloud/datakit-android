@@ -6,6 +6,7 @@ import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.TrackLog;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -47,7 +48,7 @@ public class FTLoggerConfig {
     /**
      * log 日志等级过滤
      */
-    private List<Status> logLevelFilters;
+    private List<String> logLevelFilters;
 
     /**
      * 设置全局 tag
@@ -110,7 +111,7 @@ public class FTLoggerConfig {
      * @return
      */
     public boolean isEnableConsoleLog() {
-        return  enableConsoleLog;
+        return enableConsoleLog;
     }
 
     /**
@@ -191,6 +192,21 @@ public class FTLoggerConfig {
      * @return
      */
     public FTLoggerConfig setLogLevelFilters(Status[] logLevelFilters) {
+        List<String> array = new ArrayList<>();
+        for (Status s : logLevelFilters) {
+            array.add(s.name);
+        }
+        this.logLevelFilters = array;
+        return this;
+    }
+
+    /**
+     * 设置日志等级过滤
+     *
+     * @param logLevelFilters
+     * @return
+     */
+    public FTLoggerConfig setLogLevelFilters(String[] logLevelFilters) {
         this.logLevelFilters = Arrays.asList(logLevelFilters);
         return this;
     }
@@ -228,6 +244,7 @@ public class FTLoggerConfig {
 
     /**
      * 获取最大日志条目数量限制
+     *
      * @return
      */
     public int getLogCacheLimitCount() {
@@ -252,9 +269,9 @@ public class FTLoggerConfig {
      * @param status
      * @return 是否设置
      */
-    public boolean checkLogLevel(Status status) {
+    public boolean checkLogLevel(String status) {
         return (logLevelFilters == null
-                || logLevelFilters.size() == 0)
+                || logLevelFilters.isEmpty())
                 || logLevelFilters.contains(status);
     }
 

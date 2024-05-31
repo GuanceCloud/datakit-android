@@ -177,42 +177,36 @@ public class FTTrackInner {
      * 在子线程中将埋点数据同步(不经过数据库)
      * inovke by test Case
      *
-     * @param trackBeans
      * @param callback
      */
-    void trackLogAsync(@NonNull final List<LineProtocolBean> trackBeans, final AsyncCallback callback) {
+    void trackLogAsync(@NonNull final BaseContentBean bean, final AsyncCallback callback) {
         DataUploaderThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
                 List<SyncJsonData> recordDataList = new ArrayList<>();
-                for (LineProtocolBean t : trackBeans) {
-                    try {
-                        SyncJsonData recordData = SyncJsonData.getSyncJsonData(dataHelper, DataType.LOG,
-                                new LineProtocolBean(t.getMeasurement(), t.getTags(),
-                                        t.getFields(), t.getTimeNano()));
-                        recordDataList.add(recordData);
-
-                        String body = dataHelper.getBodyContent(DataType.LOG, recordDataList);
-                        String model = Constants.URL_MODEL_LOG;
-                        String content_type = "text/plain";
-                        FTResponseData result = HttpBuilder.Builder()
-                                .setModel(model)
-                                .addHeadParam("Content-Type", content_type)
-                                .setMethod(RequestMethod.POST)
-                                .setBodyString(body).executeSync();
-                        if (callback != null) {
-                            callback.onResponse(result.getCode(), result.getMessage(), result.getErrorCode());
-                        }
-                    } catch (Exception e) {
-                        if (callback != null) {
-                            if (e instanceof InvalidParameterException) {
-                                callback.onResponse(NetCodeStatus.INVALID_PARAMS_EXCEPTION_CODE, e.getMessage(), "");
-                            } else {
-                                callback.onResponse(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, e.getMessage(), "");
-                            }
-                        }
-                        LogUtils.e(TAG, Log.getStackTraceString(e));
+                try {
+                    SyncJsonData recordData = SyncJsonData.getFromLogBean(bean);
+                    recordDataList.add(recordData);
+                    String body = dataHelper.getBodyContent(DataType.LOG, recordDataList);
+                    String model = Constants.URL_MODEL_LOG;
+                    String content_type = "text/plain";
+                    FTResponseData result = HttpBuilder.Builder()
+                            .setModel(model)
+                            .addHeadParam("Content-Type", content_type)
+                            .setMethod(RequestMethod.POST)
+                            .setBodyString(body).executeSync();
+                    if (callback != null) {
+                        callback.onResponse(result.getCode(), result.getMessage(), result.getErrorCode());
                     }
+                } catch (Exception e) {
+                    if (callback != null) {
+                        if (e instanceof InvalidParameterException) {
+                            callback.onResponse(NetCodeStatus.INVALID_PARAMS_EXCEPTION_CODE, e.getMessage(), "");
+                        } else {
+                            callback.onResponse(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, e.getMessage(), "");
+                        }
+                    }
+                    LogUtils.e(TAG, Log.getStackTraceString(e));
                 }
             }
         });

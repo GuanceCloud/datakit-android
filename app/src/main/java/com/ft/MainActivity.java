@@ -98,29 +98,10 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.main_mock_click_btn).setOnClickListener(v -> {
         });
         findViewById(R.id.main_mock_log_btn).setOnClickListener(v -> {
-            new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                    for (int i = 0; i < 3000; i++) {
-                        try {
-                            Thread.sleep(6);
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-//                        FTLogger.getInstance().logBackground("custom Log" + i, Status.ERROR);
-                        Log.e(TAG, "Thread console log" + i);
-                    }
-
-
-                }
-            }.start();
-
-
+            Log.e(TAG, "console log");
+            Log.d(TAG, "console log");
+            FTLogger.getInstance().logBackground("custom Log", Status.ERROR);
+            FTLogger.getInstance().logBackground("custom status Log","customType");
         });
 
         findViewById(R.id.main_mock_okhttp_btn).setOnClickListener(v -> {

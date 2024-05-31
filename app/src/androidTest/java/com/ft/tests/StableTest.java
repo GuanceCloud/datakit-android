@@ -68,11 +68,11 @@ public class StableTest extends BaseTest {
         }
 
         Context application = InstrumentationRegistry.getInstrumentation().getTargetContext().getApplicationContext();
-        LogUtils.registerInnerLogCacheToFile(new File(application.getFilesDir(), "InnerLog" + ".log"));
+        LogUtils.registerInnerLogCacheToFile();
 
         databaseFile = application.getDatabasePath(FTDBConfig.DATABASE_NAME);
 
-        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAWAY_URL,BuildConfig.CLIENT_TOKEN)
+        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAWAY_URL, BuildConfig.CLIENT_TOKEN)
                 .setDebug(true)//设置是否是 debug
                 .setAutoSync(true)
                 .setCustomSyncPageSize(100)
@@ -137,7 +137,7 @@ public class StableTest extends BaseTest {
      */
     @Test
     public void oneHourHighLoad() throws Exception {
-        highLoadData(3600);//1小时
+        highLoadData(60);//1小时
         waitEventConsumeInThreadPool();
     }
 

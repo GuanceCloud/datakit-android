@@ -32,6 +32,8 @@ public class SyncDataHelper {
     private final HashMap<String, Object> rumTags;
     private final HashMap<String, Object> traceTags;
 
+    private FTSDKConfig config;
+
 
     protected SyncDataHelper() {
         basePublicTags = new HashMap<>();
@@ -41,6 +43,7 @@ public class SyncDataHelper {
     }
 
     void initBaseConfig(FTSDKConfig config) {
+        this.config = config;
         basePublicTags.putAll(config.getGlobalContext());
     }
 
@@ -104,13 +107,31 @@ public class SyncDataHelper {
     }
 
     /**
+     * 封装同步上传的数据，主要用于测试用例使用
+     *
+     * @param dataType
+     * @param recordDatas
+     * @return
+     */
+    public String getBodyContent(DataType dataType, List<SyncJsonData> recordDatas) {
+        return getBodyContent(dataType, recordDatas, null);
+    }
+
+
+    /**
      * 转化为行协议数据
      *
      * @param datas
      * @param extraTags
      * @return
      */
-    private String convertToLineProtocolLines(List<SyncJsonData> datas, HashMap<String, Object> extraTags) {
+    private String convertToLineProtocolLines(List<SyncJsonData> datas, HashMap<String, Object> extraTags,
+                                              String packageId) {
+
+        boolean integerCompatible = false;
+        if (config != null) {
+            integerCompatible = config.isEnableDataIntegerCompatible();
+        }
         StringBuilder sb = new StringBuilder();
 
         for (SyncJsonData data : datas) {
@@ -184,7 +205,7 @@ public class SyncDataHelper {
      * @param obj
      * @return
      */
-    private static StringBuilder getCustomHash(JSONObject obj, boolean isTag) {
+    private static StringBuilder getCustomHash(JSONObject obj, boolean isTag, boolean integerCompatible) {
         StringBuilder sb = new StringBuilder();
         Iterator<String> keys = obj.keys();
         while (keys.hasNext()) {
@@ -210,7 +231,7 @@ public class SyncDataHelper {
                 } else if (value instanceof Boolean) {
                     sb.append(value);
                 } else if (value instanceof Long || value instanceof Integer) {
-                    sb.append(value).append(isTag ? "" : "i");
+                    sb.append(value).append(isTag || integerCompatible ? "" : "i");
                 } else {// String or Others
                     addQuotationMarks(sb, String.valueOf(value), !isTag);
                 }

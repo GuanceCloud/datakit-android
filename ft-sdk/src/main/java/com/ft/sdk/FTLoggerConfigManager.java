@@ -1,5 +1,7 @@
 package com.ft.sdk;
 
+import androidx.annotation.Nullable;
+
 import com.ft.sdk.garble.FTDBCachePolicy;
 
 /**
@@ -39,6 +41,7 @@ public class FTLoggerConfigManager {
      *
      * @return
      */
+    @Nullable
     public FTLoggerConfig getConfig() {
         return config;
     }

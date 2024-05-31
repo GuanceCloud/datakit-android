@@ -49,6 +49,7 @@ public class FTRUMInnerManager {
      * 间断操作（中途休眠） Session 重置事件为 15分钟
      */
     static final long MAX_RESTING_TIME = 900000000000L;
+//    static final long MAX_RESTING_TIME = 1000000000L;//1秒
     /**
      * 持续 Session 最大重置事件，4小时
      */
@@ -83,7 +84,7 @@ public class FTRUMInnerManager {
     /**
      * 不收集
      */
-    private final ArrayList<String> notCollectMap = new ArrayList<>();
+    private final ArrayList<String> notCollectArr = new ArrayList<>();
 
     /**
      * 当前激活 View
@@ -291,9 +292,7 @@ public class FTRUMInnerManager {
             bean.property.putAll(property);
         }
         attachRUMRelativeForResource(bean);
-        synchronized (resourceBeanMap) {
-            resourceBeanMap.put(resourceId, bean);
-        }
+        resourceBeanMap.put(resourceId, bean);
         final String actionId = bean.actionId;
         final String viewId = bean.viewId;
         EventConsumerThreadPool.get().execute(new Runnable() {
@@ -704,6 +703,7 @@ public class FTRUMInnerManager {
         long resourceLoad = netStatusBean.getHoleRequestTime();
         bean.resourceLoad = resourceLoad > 0 ? resourceLoad : bean.endTime - bean.startTime;
         bean.resourceFirstByte = netStatusBean.getFirstByteTime();
+        bean.resourceHostIP = netStatusBean.resourceHostIP;
         bean.netStateSet = true;
         checkToAddResource(resourceId, bean);
     }
@@ -721,19 +721,6 @@ public class FTRUMInnerManager {
             LogUtils.e(TAG, "putRUMResourcePerformance:" + resourceId + ",bean null");
             return;
         }
-//        if (bean.resourceStatus < HttpsURLConnection.HTTP_OK) {
-//            EventConsumerThreadPool.get().execute(new Runnable() {
-//                @Override
-//                public void run() {
-//                    synchronized (resourceBeanMap) {
-//                        LogUtils.d(TAG, "net error remove id:" + resourceId);
-//                        resourceBeanMap.remove(resourceId);
-//                    }
-//                    FTTraceManager.get().removeByAddResource(resourceId);
-//                }
-//            });
-//            return;
-//        }
         long time = Utils.getCurrentNanoTime();
         String actionId = bean.actionId;
         String viewId = bean.viewId;
@@ -810,6 +797,9 @@ public class FTRUMInnerManager {
                 tags.put(Constants.KEY_RUM_RESOURCE_URL_PATH_GROUP, urlPathGroup);
             }
 
+            if (!Utils.isNullOrEmpty(bean.resourceHostIP)) {
+                tags.put(Constants.KEY_RUM_RESOURCE_HOST_IP, bean.resourceHostIP);
+            }
 
             tags.put(Constants.KEY_RUM_RESOURCE_URL, bean.url);
             for (Map.Entry<String, Object> entry : bean.property.entrySet()) {
@@ -868,10 +858,8 @@ public class FTRUMInnerManager {
         EventConsumerThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
-                synchronized (resourceBeanMap) {
-                    LogUtils.d(TAG, "final remove id:" + resourceId);
-                    resourceBeanMap.remove(resourceId);
-                }
+                LogUtils.d(TAG, "final remove id:" + resourceId);
+                resourceBeanMap.remove(resourceId);
                 FTTraceManager.get().removeByAddResource(resourceId);
             }
         });
@@ -1276,10 +1264,16 @@ public class FTRUMInnerManager {
     private void checkSessionKeep(String sessionId, float sampleRate) {
         boolean collect = Utils.enableTraceSamplingRate(sampleRate);
         if (!collect) {
-            if (notCollectMap.size() + 1 > SESSION_FILTER_CAPACITY) {
-                notCollectMap.remove(0);
+            synchronized (notCollectArr) {
+                if (notCollectArr.size() + 1 > SESSION_FILTER_CAPACITY) {
+                    try {
+                        notCollectArr.remove(0);
+                    } catch (Exception e) {
+                        LogUtils.d(TAG, Log.getStackTraceString(e));
+                    }
+                }
+                notCollectArr.add(sessionId);
             }
-            notCollectMap.add(sessionId);
             LogUtils.d(TAG, "根据 FTRUMConfig SampleRate 采样率计算，当前 session 不被采集，session_id:" + sessionId);
         }
     }
@@ -1291,13 +1285,15 @@ public class FTRUMInnerManager {
      * @return
      */
     public boolean checkSessionWillCollect(String sessionId) {
-        return !notCollectMap.contains(sessionId);
+        return !notCollectArr.contains(sessionId);
     }
 
     public void release() {
         mHandler.removeCallbacks(mRUMGenerateRunner);
         activeAction = null;
         activeView = null;
+        notCollectArr.clear();
+        resourceBeanMap.clear();
         viewList.clear();
     }
 
