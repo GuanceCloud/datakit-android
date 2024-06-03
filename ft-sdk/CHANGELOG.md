@@ -1,3 +1,7 @@
+# agent 1.5.0-beta01
+1. RUM Log Trace config 读取临界场景容错处理
+
+---
 # agent 1.5.0-alpha04
 1. RUM Log Trace config 读取临界场景容错处理 
 
