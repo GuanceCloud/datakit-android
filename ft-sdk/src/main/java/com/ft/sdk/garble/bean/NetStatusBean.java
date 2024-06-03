@@ -55,6 +55,12 @@ public class NetStatusBean {
      */
     public long sslEndTime = -1;
 
+
+    /**
+     * host IP 地址
+     */
+    public String resourceHostIP = "";
+
     /**
      * 附加属性，
      */

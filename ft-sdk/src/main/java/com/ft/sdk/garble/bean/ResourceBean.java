@@ -126,6 +126,13 @@ public class ResourceBean {
      */
     public long resourceFirstByte = -1;
 
+
+    /**
+     * host IP 地址
+     */
+    public String resourceHostIP = "";
+
+
     /**
      * 资源请求开始时间
      */

@@ -67,6 +67,12 @@ public class FTSDKConfig {
      */
     private boolean onlySupportMainProcess = true;
 
+
+    /**
+     * 行协议兼容模式，integer 数据兼容模式，处理 web 数据数据类型冲突问题。
+     */
+    private boolean enableDataIntegerCompatible = false;
+
     /**
      * 全局参数，例如 {@link Constants#KEY_APP_VERSION_NAME} 等固定配置参数，
      * 或通过 {@link FTSDKConfig#addGlobalContext(String, String)} 用户自定义添加的变量参数
@@ -352,5 +358,17 @@ public class FTSDKConfig {
 
     public int getSyncSleepTime() {
         return syncSleepTime;
+    }
+
+    public boolean isEnableDataIntegerCompatible() {
+        return enableDataIntegerCompatible;
+    }
+
+    /**
+     * {@link #enableDataIntegerCompatible} 设置为 true
+     */
+    public FTSDKConfig enableDataIntegerCompatible() {
+        this.enableDataIntegerCompatible = true;
+        return this;
     }
 }

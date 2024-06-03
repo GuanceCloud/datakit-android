@@ -171,8 +171,13 @@ public class AopUtils {
      * @return
      */
     public static String getMenuItem(MenuItem item) {
-        return item.getClass().getSimpleName() + "/" + item.getTitle()
-                + "#" + FTApplication.getApplication().getResources().getResourceEntryName(item.getItemId());
+        try {
+            return item.getClass().getSimpleName() + "/" + item.getTitle()
+                    + "#" + FTApplication.getApplication().getResources().getResourceEntryName(item.getItemId());
+        } catch (Exception e) {
+            LogUtils.d(TAG, Log.getStackTraceString(e));
+        }
+        return "";
 
     }
 

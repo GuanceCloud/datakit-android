@@ -38,11 +38,16 @@ public class FTResourceEventListener extends EventListener {
     private long sslStartTime = -1;
     private long tcpStartTime = -1;
     private long tcpEndTime = -1;
+    private String resourceHostIP;
 
     private final String resourceId;
 
-    public FTResourceEventListener(String resourceId) {
+    private final boolean enableResourceHostIP;
+
+    public FTResourceEventListener(String resourceId, Boolean enableResourceHostIP) {
         LogUtils.d(TAG, "FTFactory create:" + resourceId);
+
+        this.enableResourceHostIP = enableResourceHostIP;
         this.resourceId = resourceId;
     }
 
@@ -137,8 +142,10 @@ public class FTResourceEventListener extends EventListener {
     public void connectStart(@NonNull Call call, @NonNull InetSocketAddress inetSocketAddress, @NonNull Proxy proxy) {
         super.connectStart(call, inetSocketAddress, proxy);
         tcpStartTime = Utils.getCurrentNanoTime();
-
-        LogUtils.d(TAG, "connectStart:" + resourceId);
+        if (enableResourceHostIP) {
+            resourceHostIP = inetSocketAddress.getAddress().getHostAddress();
+        }
+        LogUtils.d(TAG, "connectStart:" + resourceId + ",hostAddr:" + resourceHostIP);
     }
 
     @Override
@@ -165,6 +172,7 @@ public class FTResourceEventListener extends EventListener {
         netStatusBean.tcpStartTime = tcpStartTime;
         netStatusBean.tcpEndTime = tcpEndTime;
         netStatusBean.requestStartTime = requestStartTime;
+        netStatusBean.resourceHostIP = resourceHostIP;
         FTRUMInnerManager.get().setNetState(this.resourceId, netStatusBean);
     }
 
@@ -172,6 +180,21 @@ public class FTResourceEventListener extends EventListener {
      * 创建 {@link  FTResourceEventListener} 对应 {@link  EventListener.Factory} 对象
      */
     public static class FTFactory implements EventListener.Factory {
+
+        /**
+         * 开启 resource host ip 采集
+         */
+        private final boolean enableResourceHostIP;
+
+        public FTFactory() {
+            this.enableResourceHostIP = false;
+        }
+
+        public FTFactory(boolean enableResourceHostIP) {
+            this.enableResourceHostIP = enableResourceHostIP;
+        }
+
+
         /**
          * @param call
          * @return
@@ -180,7 +203,8 @@ public class FTResourceEventListener extends EventListener {
         @Override
         public EventListener create(@NonNull Call call) {
             //自动计算 resourceId
-            return new FTResourceEventListener(Utils.identifyRequest(call.request()));
+            return new FTResourceEventListener(Utils.identifyRequest(call.request()),
+                    this.enableResourceHostIP);
         }
     }
 

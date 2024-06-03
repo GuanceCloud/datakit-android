@@ -35,6 +35,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class SyncTaskManager {
     public final static String TAG = Constants.LOG_TAG_PREFIX + "SyncTaskManager";
+    public final static int pid = android.os.Process.myPid();
+
     /**
      * 最大容忍错误次数
      */
@@ -260,7 +262,7 @@ public class SyncTaskManager {
             } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_WEBVIEW) {
                 packageId = rumGenerator.getCurrentId();
             }
-            String body = helper.getBodyContent(dataType, requestDataList, packageId + "." + dataCount);
+            String body = helper.getBodyContent(dataType, requestDataList, packageId + "." + pid +"." + dataCount );
             requestNet(dataType, body, new AsyncCallback() {
                 @Override
                 public void onResponse(int code, String response, String errorCode) {

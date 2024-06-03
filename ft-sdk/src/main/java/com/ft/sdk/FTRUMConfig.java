@@ -40,6 +40,11 @@ public class FTRUMConfig {
      * 是否开启用户行为 Resource 追踪
      */
     private boolean enableTraceUserResource;
+
+    /**
+     * 开启 resource host ip 采集
+     */
+    private boolean enableResourceHostIP;
     /**
      * 崩溃采集数据附加类型
      */
@@ -195,6 +200,11 @@ public class FTRUMConfig {
         return this;
     }
 
+    public FTRUMConfig setEnableResourceHostIP(boolean enableTraceUserResource) {
+        this.enableResourceHostIP = enableTraceUserResource;
+        return this;
+    }
+
     public int getExtraMonitorTypeWithError() {
         return extraMonitorTypeWithError;
     }
@@ -307,6 +317,10 @@ public class FTRUMConfig {
     public FTRUMConfig setOkHttpEventListenerHandler(FTOkHttpEventListenerHandler okHttpResourceHandler) {
         this.okHttpEventListenerHandler = okHttpResourceHandler;
         return this;
+    }
+
+    public Boolean isEnableResourceHostIP() {
+        return this.enableResourceHostIP;
     }
 
 
