@@ -53,8 +53,8 @@ public class FTRUMInnerManager {
     /**
      * 持续 Session 最大重置事件，4小时
      */
-    static final long SESSION_EXPIRE_TIME = 14400000000000L;
-//    static final long SESSION_EXPIRE_TIME = 5000000000L;//5秒
+//    static final long SESSION_EXPIRE_TIME = 14400000000000L;
+    static final long SESSION_EXPIRE_TIME = 15000000000L;//5秒
     /**
      * Session 最大存储数值
      */
@@ -134,6 +134,7 @@ public class FTRUMInnerManager {
         boolean longTimeSession = now - lastSessionTime > SESSION_EXPIRE_TIME;
         if (longTimeSession || longResting) {
             lastSessionTime = now;
+            lastActionTime = now;
 
             sessionId = Utils.randomUUID();
             checkSessionKeep(sessionId, sampleRate);
