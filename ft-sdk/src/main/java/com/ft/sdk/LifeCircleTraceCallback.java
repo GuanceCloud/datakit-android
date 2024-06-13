@@ -108,13 +108,13 @@ class LifeCircleTraceCallback {
             long codeStartTime = FTAppStartCounter.get().getMarkCodeTimeLine();
             if (codeStartTime > 0) {
                 FTAppStartCounter.get().codeStart(now - codeStartTime);
-                //config nonnull here ingore warning
+                //config nonnull here ignore warning
                 if (manager.isRumEnable() && config.isEnableTraceUserAction()) {
                     FTAppStartCounter.get().codeStartUpload();
                     FTAppStartCounter.get().resetCodeStartTimeline();
                 }
             } else {
-                //config nonnull here ingore warning
+                //config nonnull here ignore warning
                 if (manager.isRumEnable() && config.isEnableTraceUserAction()) {
                     FTAppStartCounter.get().hotStart(now - startTime, startTime);
                 }
@@ -124,7 +124,7 @@ class LifeCircleTraceCallback {
         }
 
         if (manager.isRumEnable()) {
-            //config nonnull here ingore warning
+            //config nonnull here ignore warning
             if (config.isEnableTraceUserView()) {
                 Long startTime = mCreateMap.get(context);
                 if (startTime != null) {

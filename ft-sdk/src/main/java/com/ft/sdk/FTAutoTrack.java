@@ -506,7 +506,7 @@ public class FTAutoTrack {
         if (!op.equals(OP.CLK)) {
             return;
         }
-        //config nonnull here ingore warning
+        //config nonnull here ignore warning
         if (!manager.getConfig().isEnableTraceUserAction()) {
             return;
         }
@@ -681,7 +681,7 @@ public class FTAutoTrack {
 //            builder.addNetworkInterceptor(interceptor); //发现部分工程有兼容问题
         if (FTRUMConfigManager.get().isRumEnable()) {
             FTRUMConfig config = FTRUMConfigManager.get().getConfig();
-            //config nonnull here ingore warning
+            //config nonnull here ignore warning
             if (config.isEnableTraceUserResource()) {
                 boolean hasSetResource = false;//是否已经设置 FTResourceInterceptor
                 for (Interceptor interceptor : builder.interceptors()) {

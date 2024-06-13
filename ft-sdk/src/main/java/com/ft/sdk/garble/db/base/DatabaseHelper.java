@@ -44,6 +44,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    @Override
+    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        if (oldVersion == 3 && newVersion < 3) {
+            //ignore improve for performance version
+        } else {
+            super.onDowngrade(db, oldVersion, newVersion);
+        }
+    }
+
     /**
      * 在应用创建时，创建 {@link FTSQL#FT_TABLE_SYNC_CREATE)},{@link FTSQL#FT_TABLE_VIEW_CREATE)},{@link FTSQL#FT_TABLE_ACTION_CREATE)}
      *
