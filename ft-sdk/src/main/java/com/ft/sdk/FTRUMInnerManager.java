@@ -137,6 +137,8 @@ public class FTRUMInnerManager {
             lastActionTime = now;
 
             sessionId = Utils.randomUUID();
+            LogUtils.d(TAG, "New SessionId:" + activeView.getSessionId());
+
             checkSessionKeep(sessionId, sampleRate);
 
             if (checkRefreshView) {
@@ -156,7 +158,7 @@ public class FTRUMInnerManager {
                     FTMonitorManager.get().addMonitor(activeView.getId());
                     FTMonitorManager.get().attachMonitorData(activeView);
                     initView(activeView);
-                    LogUtils.d(TAG, "New sessionId:" + activeView.getSessionId() + ",viewId:" + activeView.getId());
+                    LogUtils.d(TAG, "checkRefreshView sessionId:" + activeView.getSessionId() + ",viewId:" + activeView.getId());
                 }
             }
 
@@ -395,6 +397,7 @@ public class FTRUMInnerManager {
         FTMonitorManager.get().addMonitor(activeView.getId());
         FTMonitorManager.get().attachMonitorData(activeView);
         initView(activeView);
+        lastActionTime = activeView.getStartTime();
 
     }
 

@@ -108,7 +108,8 @@ public class LogUtils {
      * {@link FTLoggerConfig#setPrintCustomLogToConsole(boolean)}  产生循环调用的情况
      * innerLogHandler 设置后，这个值自动为 false
      * <p>
-     * {@link FTLogger}，如果使用 FTLogger 避免使用 {@link  com.ft.sdk.garble.bean.Status#OK}
+     * {@link FTLogger}，如果使用 FTLogger level 为 D level 的日志会导致死循环，因为数据写入就会生成相关 Inner Debug
+     *
      *
      * @param innerLogHandler
      */
@@ -124,7 +125,7 @@ public class LogUtils {
      * {@link FTLoggerConfig#setPrintCustomLogToConsole(boolean)}  产生循环调用的情况
      * innerLogHandler 设置后，这个值自动为 false
      * <p>
-     * {@link FTLogger}，如果使用 FTLogger 避免使用 {@link  com.ft.sdk.garble.bean.Status#OK}
+     * {@link FTLogger}，如果使用 FTLogger level 为 D level 的日志会导致死循环，因为数据写入就会生成相关 Inner Debug
      *
      * @param file 缓存文件
      */
