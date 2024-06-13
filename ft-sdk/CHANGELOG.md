@@ -1,3 +1,7 @@
+# agent 1.5.1-alpha02
+1. 优化长时间场景下 session_id 刷新机制
+
+---
 # agent 1.5.1-alpha01
 1. 修复长 session 且无 action 更新场景下，频繁更新 session_id 的问题
 
