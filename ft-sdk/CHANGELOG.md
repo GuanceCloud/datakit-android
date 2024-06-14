@@ -1,3 +1,11 @@
+# agent 1.5.1-alpha02
+1. 优化长时间场景下 session_id 刷新机制
+
+---
+# agent 1.5.1-alpha01
+1. 修复长 session 且无 action 更新场景下，频繁更新 session_id 的问题
+
+---
 # agent 1.5.0
 1. RUM resource 网络请求添加 remote ip 地址解析功能
 2. 修复开启 RUM SampleRate 后，高并发网路请求引发的数组线程安全问题
