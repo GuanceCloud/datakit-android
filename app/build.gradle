@@ -1,6 +1,11 @@
 apply plugin: 'com.android.application'
 //apply plugin: 'com.guardsquare.proguard'
 //apply plugin: 'com.sensorsdata.analytics.android'
+// Make sure that you have the Google services Gradle plugin
+apply plugin: 'com.google.gms.google-services'
+
+// Add the Crashlytics Gradle plugin
+apply plugin: 'com.google.firebase.crashlytics'
 
 android {
     compileSdk 34
@@ -104,10 +109,12 @@ dependencies {
     implementation 'com.sensorsdata.analytics.android:SensorsAnalyticsSDK:6.8.0'
     implementation 'io.sentry:sentry-android:7.8.0'
 
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
+    implementation 'com.google.firebase:firebase-analytics-ktx'
 
-    testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.mockito:mockito-core:3.4.6'
-
+    testImplementation 'junit:junit:4.13.2'
     androidTestImplementation project(':ft-test')
     androidTestImplementation 'androidx.test:runner:1.5.2'
     androidTestImplementation 'androidx.test:rules:1.5.0'
