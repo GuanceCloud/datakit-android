@@ -83,6 +83,11 @@ public class FTRUMConfig {
     private String serviceName = Constants.DEFAULT_SERVICE_NAME;
 
     /**
+     * Crash 时 logcat 附属信息
+     */
+    private ExtraLogCatWithError extraLogCatWithError;
+
+    /**
      * 获取采样率
      *
      * @return 采样率，浮点，0～1
@@ -146,6 +151,19 @@ public class FTRUMConfig {
      */
     public FTRUMConfig setEnableTrackAppCrash(boolean enableTrackAppCrash) {
         this.enableTrackAppCrash = enableTrackAppCrash;
+        return this;
+    }
+
+    /**
+     * 设置是否监测 App 崩溃
+     *
+     * @param enableTrackAppCrash
+     * @return
+     */
+    public FTRUMConfig setEnableTrackAppCrash(boolean enableTrackAppCrash,
+                                              ExtraLogCatWithError extraLogCatWithError) {
+        this.enableTrackAppCrash = enableTrackAppCrash;
+        this.extraLogCatWithError = extraLogCatWithError;
         return this;
     }
 
@@ -321,6 +339,10 @@ public class FTRUMConfig {
 
     public Boolean isEnableResourceHostIP() {
         return this.enableResourceHostIP;
+    }
+
+    public ExtraLogCatWithError getExtraLogCatWithError() {
+        return extraLogCatWithError;
     }
 
 
