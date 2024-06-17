@@ -137,7 +137,7 @@ public class FTRUMInnerManager {
             lastActionTime = now;
 
             sessionId = Utils.randomUUID();
-            LogUtils.d(TAG, "New SessionId:" + activeView.getSessionId());
+            LogUtils.d(TAG, "New SessionId:" + sessionId);
 
             checkSessionKeep(sessionId, sampleRate);
 
