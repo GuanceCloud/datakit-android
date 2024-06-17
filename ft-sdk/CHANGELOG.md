@@ -1,3 +1,9 @@
+# agent 1.5.1-alpha03
+1. ANR 及 Java Crash 补充其他线程代码堆栈
+2. Java Crash 添加附加 logcat 功能
+3. 处理 session_id 刷新偶现异常问题
+
+---
 # agent 1.5.1-alpha02
 1. 优化长时间场景下 session_id 刷新机制
 

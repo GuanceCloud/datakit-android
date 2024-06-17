@@ -157,7 +157,8 @@ public class FTRUMConfig {
     /**
      * 设置是否监测 App 崩溃
      *
-     * @param enableTrackAppCrash
+     * @param enableTrackAppCrash 是否开启 Crash 最总
+     * @param  extraLogCatWithError  Java Crash 附加配置 logcat
      * @return
      */
     public FTRUMConfig setEnableTrackAppCrash(boolean enableTrackAppCrash,
