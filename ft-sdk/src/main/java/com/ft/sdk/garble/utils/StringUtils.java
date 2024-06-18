@@ -93,8 +93,9 @@ public class StringUtils {
                     .append(" prio:").append(thread.getPriority())
                     .append(" tg:").append(thread.getThreadGroup())
                     .append(" stat:").append(thread.getState())
+                    .append("\n")
+                    .append(StringUtils.getStringFromStackTraceElement(stackTraceElements))
                     .append("\n");
-            stack.append(StringUtils.getStringFromStackTraceElement(stackTraceElements));
         }
         return stack.toString();
 

@@ -121,7 +121,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
      */
     @Override
     public void uncaughtException(@NonNull Thread t, @NonNull Throwable e) {
-        Writer writer = new StringWriter();
+        StringWriter writer = new StringWriter();
         PrintWriter printWriter = new PrintWriter(writer);
         e.printStackTrace(printWriter);
         Throwable cause = e.getCause();
@@ -130,16 +130,16 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
             cause = cause.getCause();
         }
         printWriter.close();
-        String result = writer.toString();
-        result += Utils.getAllThreadStack();
+        writer.append("\n").append(Utils.getAllThreadStack());
         ExtraLogCatWithError logCatWithError = config.getExtraLogCatWithError();
         if (logCatWithError != null) {
-            result += Utils.getLogcat(logCatWithError.getLogcatMainLines(),
-                    logCatWithError.getLogcatSystemLines(),
-                    logCatWithError.getLogcatEventsLines());
+            writer.append("\n")
+                    .append(Utils.getLogcat(logCatWithError.getLogcatMainLines(),
+                            logCatWithError.getLogcatSystemLines(),
+                            logCatWithError.getLogcatEventsLines()));
         }
 
-        uploadCrashLog(result, e.getMessage(), FTActivityManager.get().getAppState(), new RunnerCompleteCallBack() {
+        uploadCrashLog(writer.toString(), e.getMessage(), FTActivityManager.get().getAppState(), new RunnerCompleteCallBack() {
             @Override
             public void onComplete() {
                 //测试用例直接

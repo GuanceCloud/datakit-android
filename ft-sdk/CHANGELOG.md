@@ -1,3 +1,7 @@
+# agent 1.5.1-beta01
+1. 同 agent 1.5.1-alpha03
+
+---
 # agent 1.5.1-alpha03
 1. ANR 及 Java Crash 补充其他线程代码堆栈
 2. Java Crash 添加附加 logcat 功能
