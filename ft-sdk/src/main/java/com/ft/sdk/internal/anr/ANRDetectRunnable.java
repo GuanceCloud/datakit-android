@@ -4,6 +4,7 @@ package com.ft.sdk.internal.anr;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.ft.sdk.ExtraLogCatSetting;
 import com.ft.sdk.FTRUMGlobalManager;
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.ErrorType;
@@ -24,12 +25,15 @@ public final class ANRDetectRunnable implements Runnable {
      */
     public static final int ANR_DETECT_DURATION_MS = 5000;
 
+    private final ExtraLogCatSetting extraLogCatSetting;
+
     /**
      * 主线程消息 Handler
      */
     private final Handler handler = new Handler(Looper.getMainLooper());
 
-    public ANRDetectRunnable() {
+    public ANRDetectRunnable(ExtraLogCatSetting extraLogCatSetting) {
+        this.extraLogCatSetting = extraLogCatSetting;
     }
 
     private final CallbackRunnable runnable = new CallbackRunnable();
@@ -52,6 +56,11 @@ public final class ANRDetectRunnable implements Runnable {
                         String stackTrace =
                                 StringUtils.getStringFromStackTraceElement(handler.getLooper().getThread().getStackTrace())
                                         + "\n" + Utils.getAllThreadStack();
+                        if (extraLogCatSetting != null) {
+                            stackTrace += Utils.getLogcat(extraLogCatSetting.getLogcatMainLines(),
+                                    extraLogCatSetting.getLogcatSystemLines(),
+                                    extraLogCatSetting.getLogcatEventsLines());
+                        }
 
                         //如果超时间没有调用则，添加一条 Error 数据
                         FTRUMGlobalManager.get().addError(stackTrace, "android_anr", ErrorType.ANR_ERROR, AppState.RUN);

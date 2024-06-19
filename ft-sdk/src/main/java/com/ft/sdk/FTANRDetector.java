@@ -28,7 +28,7 @@ public class FTANRDetector {
     void init(FTRUMConfig config) {
         if (config.isEnableTrackAppANR()) {
             if (runnable == null) {
-                runnable = new ANRDetectRunnable();
+                runnable = new ANRDetectRunnable(config.getExtraLogCatWithANR());
                 ANRDetectThreadPool.get().execute(runnable);
             }
         }

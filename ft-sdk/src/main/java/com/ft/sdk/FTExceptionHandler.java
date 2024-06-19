@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 
@@ -59,6 +58,11 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
      * 可以接受到 native crash 回调的版本
      */
     public static final String NATIVE_CALLBACK_VERSION = "1.1.0-alpha01";
+
+    /**
+     * 可以接受 native logcat 行数限制的版本
+     */
+    public static final String NATIVE_LOGCAT_SETTING_VERSION = "1.1.1-alpha01";
 
     private static FTExceptionHandler instance;
     private final Thread.UncaughtExceptionHandler mDefaultExceptionHandler;
@@ -131,7 +135,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
         }
         printWriter.close();
         writer.append("\n").append(Utils.getAllThreadStack());
-        ExtraLogCatWithError logCatWithError = config.getExtraLogCatWithError();
+        ExtraLogCatSetting logCatWithError = config.getExtraLogCatWithJavaCrash();
         if (logCatWithError != null) {
             writer.append("\n")
                     .append(Utils.getLogcat(logCatWithError.getLogcatMainLines(),

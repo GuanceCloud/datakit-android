@@ -1,3 +1,8 @@
+# agent 1.5.1-beta02
+1. 添加 logcat Native Crash 和 ANR 配置功能
+2. logcat 输出格式优化
+
+---
 # agent 1.5.1-beta01
 1. 同 agent 1.5.1-alpha03
 
