@@ -1,3 +1,9 @@
+# agent 1.5.1
+1. Java Crash 及 ANR 补充其他线程代码堆栈
+2. Java Crash，Native Crash，ANR 添加附加 logcat 配置功能
+3. 修复长 session 且无 action 更新场景下，频繁更新 session_id 的问题
+
+---
 # agent 1.5.1-beta02
 1. 添加 logcat Native Crash 和 ANR 配置功能
 2. logcat 输出格式优化
