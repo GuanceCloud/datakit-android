@@ -1,3 +1,11 @@
+# native 1.1.1
+1. 添加 Native Crash 和 ANR 中 logcat 配置功能
+
+----------------------
+# native 1.1.1-alpha01
+1. 添加 Native Crash 和 ANR 中 logcat 配置功能
+
+----------------------
 # native 1.1.0
 1. 支持捕获 ANR Crash
 2. 支持捕获 C/C++ Native Crash

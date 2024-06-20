@@ -21,6 +21,7 @@ import com.ft.sdk.garble.utils.Utils;
 import com.ft.sdk.garble.utils.VersionUtils;
 import com.ft.sdk.nativelib.CrashCallback;
 import com.ft.sdk.nativelib.NativeEngineInit;
+import com.ft.sdk.nativelib.NativeExtraLogCatSetting;
 
 import org.json.JSONObject;
 
@@ -137,7 +138,32 @@ public class FTRUMConfigManager {
                     }
                 };
 
-                NativeEngineInit.init(application, filePath, enableTrackAppCrash, enableTrackAppANR, crashCallback);
+                if (VersionUtils.firstVerGreaterEqual(FTSdk.NATIVE_VERSION, FTExceptionHandler.NATIVE_LOGCAT_SETTING_VERSION)) {
+                    NativeExtraLogCatSetting nativeExtraLogCatSetting = null;
+                    if (config.getExtraLogCatWithNativeCrash() != null) {
+                        nativeExtraLogCatSetting = new NativeExtraLogCatSetting(
+                                config.getExtraLogCatWithNativeCrash().getLogcatMainLines(),
+                                config.getExtraLogCatWithNativeCrash().getLogcatSystemLines(),
+                                config.getExtraLogCatWithNativeCrash().getLogcatEventsLines());
+                    }
+                    NativeExtraLogCatSetting anrExtraLogCatSetting = null;
+
+                    if (config.getExtraLogCatWithANR() != null) {
+                        anrExtraLogCatSetting = new NativeExtraLogCatSetting(
+                                config.getExtraLogCatWithANR().getLogcatMainLines(),
+                                config.getExtraLogCatWithANR().getLogcatSystemLines(),
+                                config.getExtraLogCatWithANR().getLogcatEventsLines());
+                    }
+
+                    NativeEngineInit.init(application, filePath, enableTrackAppCrash, enableTrackAppANR,
+                            crashCallback,
+                            nativeExtraLogCatSetting,
+                            anrExtraLogCatSetting);
+                } else {
+                    NativeEngineInit.init(application, filePath, enableTrackAppCrash, enableTrackAppANR,
+                            crashCallback);
+                }
+
                 //补充上传没有成功上传的 Native Crash，上传 ANR Crash
                 FTExceptionHandler.get().checkAndSyncPreDump(filePath, null);
 
