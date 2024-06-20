@@ -1,9 +1,9 @@
 # native 1.1.1
-1. 添加 logcat Native Crash 和 ANR 配置功能
+1. 添加 Native Crash 和 ANR 中 logcat 配置功能
 
 ----------------------
 # native 1.1.1-alpha01
-1. 添加 logcat Native Crash 和 ANR 配置功能
+1. 添加 Native Crash 和 ANR 中 logcat 配置功能
 
 ----------------------
 # native 1.1.0
