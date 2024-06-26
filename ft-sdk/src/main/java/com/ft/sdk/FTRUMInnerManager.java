@@ -818,7 +818,8 @@ public class FTRUMInnerManager {
                     Constants.FT_MEASUREMENT_RUM_RESOURCE, tags, fields, null);
 
 
-            if (bean.resourceStatus >= HttpsURLConnection.HTTP_BAD_REQUEST) {
+            if (bean.resourceStatus >= HttpsURLConnection.HTTP_BAD_REQUEST
+                    || (bean.resourceStatus == 0 && !Utils.isNullOrEmpty(bean.errorStack))) {
                 JSONObject errorTags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
                 JSONObject errorField = new JSONObject();
                 errorTags.put(Constants.KEY_RUM_ERROR_TYPE, ErrorType.NETWORK.toString());
@@ -930,6 +931,8 @@ public class FTRUMInnerManager {
         bean.resourceSize = params.responseContentLength;
         if (bean.resourceStatus >= HttpsURLConnection.HTTP_BAD_REQUEST) {
             bean.errorStack = params.responseBody == null ? "" : params.responseBody;
+        } else if (bean.resourceStatus == 0 && !Utils.isNullOrEmpty(params.requestErrorStack)) {
+            bean.errorStack = params.requestErrorStack;
         }
 
         if (params.property != null) {
