@@ -36,6 +36,7 @@
         <activity android:name=".TabViewActivity" />
         <activity android:name=".ManualRUMActivity" />
         <activity android:name=".HighLoadActivity" />
+        <activity android:name=".IgnoreClassActivity" />
 
         <service
             android:name=".service.TestService"

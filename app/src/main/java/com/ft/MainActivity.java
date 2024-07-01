@@ -226,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             @IgnoreAOP
             public void onClick(View v) {
-
+                startActivity(new Intent(MainActivity.this, IgnoreClassActivity.class));
             }
         });
 
