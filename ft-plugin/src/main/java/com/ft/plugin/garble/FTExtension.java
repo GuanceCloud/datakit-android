@@ -44,6 +44,11 @@ public class FTExtension {
      */
     public String env = "prod";
 
+    /**
+     * asm 版本，默认为 asm9, 支持 asm7 ～ asm9
+     */
+    public String asmVersion = "asm9";
+
     private final NamedDomainObjectContainer<ProductFlavorModel> prodFlavor;
 
     public FTExtension(Project project) {
@@ -69,6 +74,7 @@ public class FTExtension {
                 ", datawayToken='" + datawayToken + '\'' +
                 ", appId='" + appId + '\'' +
                 ", env='" + env + '\'' +
+                ", asmVersion='" + asmVersion + '\'' +
                 '}';
     }
 }

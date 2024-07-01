@@ -16,12 +16,14 @@
  */
 package com.ft.plugin.garble.bytecode;
 
-import static com.ft.plugin.garble.FTUtil.ASM_VERSION;
-
 import com.ft.plugin.BuildConfig;
+import com.ft.plugin.garble.PluginConfigManager;
 import com.ft.plugin.garble.ClassNameAnalytics;
+import com.ft.plugin.garble.Constants;
+import com.ft.plugin.garble.Logger;
 import com.ft.plugin.garble.VersionUtils;
 
+import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
@@ -34,10 +36,10 @@ public class FTClassAdapter extends ClassVisitor {
     private String className;
     private String superName;
     private String[] interfaces;
+    private boolean needSkip;
 
     public FTClassAdapter(final ClassVisitor cv) {
-        super(ASM_VERSION, cv);
-        //Logger.info(">>>> goon scan class ");
+        super(PluginConfigManager.get().getASMVersion(), cv);
     }
 
     @Override
@@ -46,7 +48,14 @@ public class FTClassAdapter extends ClassVisitor {
         this.className = name;
         this.superName = superName;
         this.interfaces = interfaces;
-        //Logger.info(">>>> start scan class ----> " + className + ", superName=" + superName);
+    }
+
+    @Override
+    public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
+        if (Constants.IGNORE_ANNOTATION.equalsIgnoreCase(descriptor)) {
+            needSkip = true;
+        }
+        return super.visitAnnotation(descriptor, visible);
     }
 
     /**
@@ -88,6 +97,11 @@ public class FTClassAdapter extends ClassVisitor {
     public MethodVisitor visitMethod(final int access, final String name,
                                      final String desc, final String signature, final String[] exceptions) {
         MethodVisitor mv = cv.visitMethod(access, name, desc, signature, exceptions);
-        return new FTMethodAdapter(mv, access, name, desc, className, interfaces, superName);
+        if (needSkip) {
+            Logger.debug("ignoreAOP-> class:" + className + ",super:" + superName + ", method:" + name + desc);
+            return mv;
+        } else {
+            return new FTMethodAdapter(mv, access, name, desc, className, interfaces, superName);
+        }
     }
 }
