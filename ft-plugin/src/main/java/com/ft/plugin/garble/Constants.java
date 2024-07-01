@@ -91,4 +91,9 @@ public class Constants {
      * 用于形成 application_uuid ，一次 build 会生成一个固定的 uuid
      */
     public static final String PACKAGE_UUID = UUID.randomUUID().toString();
+
+    public static final String IGNORE_ANNOTATION = "Lcom/ft/sdk/garble/annotation/IgnoreAOP;";
+
+    public static final String INNER_CLASS_METHOD_PREFIX = "access$";
+
 }

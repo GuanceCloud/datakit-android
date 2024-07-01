@@ -4,6 +4,7 @@ import com.android.build.gradle.AppExtension;
 import com.ft.plugin.garble.FTExtension;
 import com.ft.plugin.garble.FTMapUploader;
 import com.ft.plugin.garble.Logger;
+import com.ft.plugin.garble.PluginConfigManager;
 import com.ft.plugin.garble.asm.FTTransform;
 
 import org.gradle.api.Plugin;
@@ -61,8 +62,10 @@ public class FTPlugin implements Plugin<Project> {
         project.afterEvaluate(p -> {
             //传参数对象
             FTExtension extension = (FTExtension) p.getExtensions().getByName("FTExt");
+            PluginConfigManager.get().setExtension(extension);
 
             Logger.setDebug(extension.showLog);
+            Logger.debug("ASM Version:" + extension.asmVersion);
 
             FTMapUploader f = new FTMapUploader(p, extension);
             f.configMapUpload();
