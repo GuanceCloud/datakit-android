@@ -27,8 +27,21 @@ public class FTMapUploader {
      * debug symbol 路径
      */
     private final static String CMAKE_DEBUG_SYMBOL_PATH = "/intermediates/cmake/debug/obj";
+
+    /**
+     * native c/c++ build 生成路径
+     */
+    private final static String CMAKE_CXX_PATH = "/intermediates/cxx/Debug";
+
+    /**
+     * Unity Symbol 生成路径
+     */
+    private final static String UNITY_SYMBOLS_PATH = "/unityLibrary/symbols";
     private final static String NAME_RELEASE_COMPILE_CLASSPATH = "releaseCompileClasspath";
 
+    /**
+     * R8 混淆生成路径
+     */
     private final HashMap<String, ObfuscationSettingConfig> obfuscationSettingMap = new HashMap<>();
 
     /**
@@ -45,6 +58,10 @@ public class FTMapUploader {
     private final static String PROGUARD_MAPPING_PATH = "/outputs/proguard/%s/mapping/mapping.txt";
 
     private final HashMap<String, ArrayList<String>> symbolPathsMap = new HashMap<>();
+
+    /**
+     * zip 打包对象，临时生成路径
+     */
     private final String tmpBuildPathFormat;
     private final String zipBuildPathFormat;
     private final String proguardBuildPathFormat;
@@ -216,7 +233,8 @@ public class FTMapUploader {
     private void appendSymbolPath(Project p, ArrayList<String> list, String flavor) {
 
         p.getAllprojects().forEach(subProject -> {
-            String debugSymbolPath = subProject.getBuildDir().getAbsolutePath() + CMAKE_DEBUG_SYMBOL_PATH;
+            String buildPath = subProject.getBuildDir().getAbsolutePath();
+            String debugSymbolPath = buildPath + CMAKE_DEBUG_SYMBOL_PATH;
 
             File file = new File(debugSymbolPath);
             if (file.exists()) {
@@ -231,11 +249,19 @@ public class FTMapUploader {
             configuration.getAllDependencies().forEach(dependency -> {
                 if (dependency instanceof ProjectDependency) {
                     String moduleName = dependency.getName();
-                    String debugSymbolPath = rootPath + "/" + moduleName + "/build" + CMAKE_DEBUG_SYMBOL_PATH;
+                    String buildPath = rootPath + "/" + moduleName + "/build";
+                    String debugSymbolPath = buildPath + CMAKE_DEBUG_SYMBOL_PATH;
                     File file = new File(debugSymbolPath);
-                    Logger.debug("debugSymbolPath:" + debugSymbolPath);
                     if (file.exists()) {
+                        Logger.debug("debugSymbolPath:" + debugSymbolPath);
                         list.add(debugSymbolPath);
+                    }
+
+                    String unitySymbolsPath = rootPath + UNITY_SYMBOLS_PATH;
+                    File unitySymbols = new File(unitySymbolsPath);
+                    Logger.debug("unitySymbolsPath:" + unitySymbolsPath);
+                    if (unitySymbols.exists()) {
+                        list.add(unitySymbolsPath);
                     }
                 }
             });
@@ -252,15 +278,19 @@ public class FTMapUploader {
     /**
      * 上传符号文件
      *
-     * @param settingConfig
+     * @param settingConfig 混淆配置
      * @throws IOException
      * @throws InterruptedException
      */
     private void uploadWithParams(ObfuscationSettingConfig settingConfig, ProductFlavorModel model, String zipBuildPath) throws IOException, InterruptedException {
         Logger.debug(model.toString());
-        String cmd = "curl -X POST " + model.getDatakitDCAUrl() + "/v1/rum/sourcemap?app_id="
-                + model.getAppId() + "&env=" + model.getEnv() + "&version="
-                + settingConfig.versionName + "&platform=android -F file=@" + zipBuildPath + " -H Content-Type:multipart/form-data";
+        String cmd = "curl -m 1800 -X PUT " + model.getDatakitUrl() + "/v1/sourcemap?"
+                + "app_id=" + model.getAppId()
+                + "&env=" + model.getEnv()
+                + "&version=" + settingConfig.versionName
+                + "&platform=android"
+                + "&token=" + model.getDatawayToken() +
+                " -F file=@" + zipBuildPath + " -H Content-Type:multipart/form-data";
 
         Logger.debug(cmd);
         ProcessBuilder builder = new ProcessBuilder(cmd.split(" "));
@@ -305,6 +335,9 @@ public class FTMapUploader {
     }
 
 
+    /**
+     * 混淆配置
+     */
     static class ObfuscationSettingConfig {
         /**
          * 包名
