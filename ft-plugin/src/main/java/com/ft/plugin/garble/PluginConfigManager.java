@@ -29,11 +29,11 @@ public class PluginConfigManager {
      */
     public int getASMVersion() {
         String asmVersion = extension.asmVersion;
-        if (asmVersion.equalsIgnoreCase("asm8")) {
-            return Opcodes.ASM8;
-        } else if (asmVersion.equalsIgnoreCase("asm9")) {
-            return Opcodes.ASM9;
-        }
+//        if (asmVersion.equalsIgnoreCase("asm8")) {
+//            return Opcodes.ASM8;
+//        } else if (asmVersion.equalsIgnoreCase("asm9")) {
+//            return Opcodes.ASM9;
+//        }
         return Opcodes.ASM7;
     }
 }
