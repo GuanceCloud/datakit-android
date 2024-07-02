@@ -1,3 +1,7 @@
+# agent 1.5.2-alpha02
+1. resource 添加本地网络错误类型的提示
+
+---
 # agent 1.5.1
 1. Java Crash 及 ANR 补充其他线程代码堆栈
 2. Java Crash，Native Crash，ANR 添加附加 logcat 配置功能
