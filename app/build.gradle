@@ -121,6 +121,7 @@ FTExt {
     datakitDCAUrl = ft_env.datakitDCAUrl
     appId = ft_env.rumAppid
     env = 'common'
+//    ignorePackages=['com/ft/http']
 
     prodFlavors {
         prodTest {

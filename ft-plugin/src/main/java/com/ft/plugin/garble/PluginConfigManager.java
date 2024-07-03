@@ -2,6 +2,8 @@ package com.ft.plugin.garble;
 
 import org.objectweb.asm.Opcodes;
 
+import java.util.List;
+
 /**
  * 全局配置管理
  */
@@ -20,6 +22,8 @@ public class PluginConfigManager {
 
     public void setExtension(FTExtension extension) {
         this.extension = extension;
+        //默认添加听云
+        this.extension.ignorePackages.add(Constants.CLASS_NAME_TING_YUN_PACKAGE);
     }
 
     /**
@@ -35,5 +39,9 @@ public class PluginConfigManager {
 //            return Opcodes.ASM9;
 //        }
         return Opcodes.ASM7;
+    }
+
+    public List<String> getIgnorePackages() {
+        return extension.ignorePackages;
     }
 }

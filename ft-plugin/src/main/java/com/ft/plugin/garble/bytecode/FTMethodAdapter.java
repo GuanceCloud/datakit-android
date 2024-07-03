@@ -500,12 +500,19 @@ public class FTMethodAdapter extends AdviceAdapter {
     }
 
     /**
-     * 需要忽略的包
+     * 需要忽略的包，class name 支持 . 分隔的方式
      *
      * @return
      */
     private boolean isIgnorePackage(String className) {
-        return ClassNameAnalytics.isTingYun(className);
+        boolean isPackageIgnore = false;
+        for (String packageName : PluginConfigManager.get().getIgnorePackages()) {
+            if (className.startsWith(packageName.replace(".", "/"))) {
+                isPackageIgnore = true;
+                break;
+            }
+        }
+        return isPackageIgnore;
     }
 
     /**

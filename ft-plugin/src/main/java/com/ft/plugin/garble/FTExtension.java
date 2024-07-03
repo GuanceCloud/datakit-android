@@ -4,6 +4,9 @@ import org.gradle.api.Action;
 import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.Project;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * BY huangDianHua
  * DATE:2019-11-29 14:50
@@ -27,12 +30,12 @@ public class FTExtension {
      */
     public boolean autoUploadNativeDebugSymbol = false;
     /**
-     *  datakit 上传地址，一般为 datakitUrl  端口
+     * datakit 上传地址，一般为 datakitUrl  端口
      */
     public String datakitUrl = "";
 
     /**
-     *  dataway token
+     * dataway token
      */
     public String datawayToken = "";
     /**
@@ -43,6 +46,9 @@ public class FTExtension {
      * 上传 sourcemap 上传环境
      */
     public String env = "prod";
+
+
+    public List<String> ignorePackages = new ArrayList<>();
 
     private final NamedDomainObjectContainer<ProductFlavorModel> prodFlavor;
 
