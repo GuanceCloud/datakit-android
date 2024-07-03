@@ -1,3 +1,7 @@
+# plugin 1.3.1-alpha03
+1. 添加 ignorePackages 通过包名方式方式对 ASM 进行忽略
+
+---
 # plugin 1.3.1-alpha02
 1. 添加 asmVersion 配置功能
 2. 修复了 WebView 自定义方法 loadUrl、loadData、loadDataWithBaseURL 和 postUrl 在 ASM 写入后导致循环调用，从而无法加载 WebView 内容的问题
