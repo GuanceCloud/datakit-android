@@ -505,7 +505,7 @@ public class FTMethodAdapter extends AdviceAdapter {
      * @return
      */
     private boolean isIgnorePackage(String className) {
-        return !ClassNameAnalytics.isTingYun(className);
+        return ClassNameAnalytics.isTingYun(className);
     }
 
     /**
