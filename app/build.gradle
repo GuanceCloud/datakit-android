@@ -128,6 +128,7 @@ FTExt {
     datawayToken = ft_env.datawayToken
     appId = ft_env.rumAppid
     env = 'common'
+//    ignorePackages=['com/ft/http']
 
     prodFlavors {
         prodTest {
