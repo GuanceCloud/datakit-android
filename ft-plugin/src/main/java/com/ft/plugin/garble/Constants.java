@@ -17,6 +17,11 @@ public class Constants {
     public static final String FT_NATIVE_PACKAGE = "ftnative/";
 
     /**
+     * TingYun 路径
+     */
+    public static final String CLASS_NAME_TING_YUN_PACKAGE = "com/networkbench";
+
+    /**
      * SDK 中的插桩类
      */
     public static final String FT_SDK_HOOK_CLASS = "com/ft/sdk/FTAutoTrack";

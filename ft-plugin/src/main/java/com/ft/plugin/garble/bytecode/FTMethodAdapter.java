@@ -66,7 +66,8 @@ public class FTMethodAdapter extends AdviceAdapter {
         this.nameDesc = name + desc;
 
         boolean isSDKInner = innerSDKSkip(className);
-        if (FTUtil.isTargetClassInSpecial(className)
+        boolean isIgnorePack = isIgnorePackage(className);
+        if (FTUtil.isTargetClassInSpecial(className) || isIgnorePack
                 || isSDKInner
                 || isWebViewInner(className, superName, nameDesc)) {
             if (!isSDKInner) {
@@ -172,6 +173,8 @@ public class FTMethodAdapter extends AdviceAdapter {
                             "(Lorg/apache/hc/client5/http/impl/classic/HttpClientBuilder;)" +
                                     "Lorg/apache/hc/client5/http/impl/classic/CloseableHttpClient;",
                             false);
+                    Logger.debug("CLASS_NAME_HTTP_CLIENT_BUILDER-> owner:" + owner + ", class:" + className
+                            + ", super:" + superName + ", method:" + name + desc + " | " + nameDesc);
                     return;
                 }
                 break;
@@ -181,6 +184,9 @@ public class FTMethodAdapter extends AdviceAdapter {
                     mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackOkHttpBuilder",
                             "(Lokhttp3/OkHttpClient$Builder;)Lokhttp3/OkHttpClient;",
                             false);
+
+                    Logger.debug("CLASS_NAME_OKHTTP_BUILDER-> owner:" + owner + ", class:" + className
+                            + ", super:" + superName + ", method:" + name + desc + " | " + nameDesc);
                     return;
                 }
                 break;
@@ -451,6 +457,7 @@ public class FTMethodAdapter extends AdviceAdapter {
          */
         if (FTUtil.isTargetMenuMethodDesc(nameDesc)) {
             handleCode(FTHookConfig.MENU_METHODS);
+            isHasTracked = true;
             return;
         }
 
@@ -488,7 +495,17 @@ public class FTMethodAdapter extends AdviceAdapter {
      * @return
      */
     private boolean innerSDKSkip(String className) {
-        return (ClassNameAnalytics.isFTSdkPackage(className) && !ClassNameAnalytics.isFTSdkApi(className));
+        return (ClassNameAnalytics.isFTSdkPackage(className)
+                && !ClassNameAnalytics.isFTSdkApi(className));
+    }
+
+    /**
+     * 需要忽略的包
+     *
+     * @return
+     */
+    private boolean isIgnorePackage(String className) {
+        return !ClassNameAnalytics.isTingYun(className);
     }
 
     /**

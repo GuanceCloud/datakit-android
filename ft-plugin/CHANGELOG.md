@@ -1,3 +1,7 @@
+# plugin 1.1.7-alpha02
+1. 听云冲突逻辑修复
+
+---
 # plugin 1.1.7-alpha01
 1. 修复 webview 自定义 loadUrl，loadData，loadDataWithBaseURL，postUrl 内部方法，在 ASM 写入之后导致调用，无法加载 webview 内容的问题
 2. IgnoreAOP 支持在类声明，进行 AOP 的整体忽略
