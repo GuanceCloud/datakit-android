@@ -48,6 +48,10 @@ public class ClassNameAnalytics {
         return className.contains(Constants.CLASS_NAME_TAOBAO_PATH);
     }
 
+    public static boolean isTingYun(String className) {
+        return className.contains(Constants.CLASS_NAME_TING_YUN_PACKAGE);
+    }
+
     public static boolean isAndroidPackage(String className) {
         return (className.startsWith("android/")
                 || className.startsWith("androidx/"))

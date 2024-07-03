@@ -71,7 +71,8 @@ public class FTPlugin implements Plugin<Project> {
             PluginConfigManager.get().setExtension(extension);
 
             Logger.setDebug(extension.showLog);
-            Logger.debug("ASM Version:" + extension.asmVersion);
+            Logger.debug("Plugin Version:" + BuildConfig.PLUGIN_VERSION +
+                    ",ASM Version:" + extension.asmVersion);
 
             FTMapUploader f = new FTMapUploader(p, extension);
             f.configMapUpload();
