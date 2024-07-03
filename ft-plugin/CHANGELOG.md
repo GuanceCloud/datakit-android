@@ -1,3 +1,7 @@
+# plugin 1.1.7-alpha04
+1. 添加 ignorePackages 通过包名方式方式对 ASM 进行忽略
+
+---
 # plugin 1.1.7-alpha03
 1. 听云冲突逻辑修复
 

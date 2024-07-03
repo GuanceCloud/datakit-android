@@ -118,7 +118,7 @@ FTExt {
 
     autoUploadMap = false
     autoUploadNativeDebugSymbol = false
-    datakitDCAUrl = ft_env.datakitDCAUrl
+//    data = ft_env.datakitDCAUrl
     appId = ft_env.rumAppid
     env = 'common'
 //    ignorePackages=['com/ft/http']
@@ -127,14 +127,14 @@ FTExt {
         prodTest {
             autoUploadMap = true
             autoUploadNativeDebugSymbol = true
-            datakitDCAUrl = ft_env.datakitDCAUrl
+//            datakitDCAUrl = ft_env.datakitDCAUrl
             appId = ft_env.rumAppid
             env = ft_env.prodTestEnv
         }
         prodPublish {
             autoUploadMap = true
             autoUploadNativeDebugSymbol = true
-            datakitDCAUrl = ft_env.datakitDCAUrl
+//            datakitDCAUrl = ft_env.datakitDCAUrl
             appId = ft_env.rumAppid
             env = ft_env.prodPublishEnv
         }
