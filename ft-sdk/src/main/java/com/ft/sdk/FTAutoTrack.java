@@ -646,6 +646,7 @@ public class FTAutoTrack {
             }
             new FTWebViewHandler().setWebView((WebView) webView);
             webView.setTag(R.id.ft_webview_handled_tag_view_value, "handled");
+            LogUtils.d(TAG, "setUpWebView-> webNativeTrace:" + FTTraceConfigManager.get().isEnableWebTrace());
         }
     }
 

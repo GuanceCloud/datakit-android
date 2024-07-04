@@ -2,6 +2,9 @@ package com.ft.plugin.garble;
 
 public class ProductFlavorModel {
 
+    /**
+     * favor 名称
+     */
     private final String name;
     /**
      * 是否自动上 map 文件
@@ -13,7 +16,7 @@ public class ProductFlavorModel {
     private Boolean autoUploadNativeDebugSymbol;
 
     /**
-     *  datakit 上传地址
+     * datakit 上传地址
      */
     private String datakitUrl;
     /**
@@ -107,7 +110,7 @@ public class ProductFlavorModel {
                 "name='" + name + '\'' +
                 ", autoUploadMap=" + autoUploadMap +
                 ", autoUploadNativeDebugSymbol=" + autoUploadNativeDebugSymbol +
-                ", datakitDCAUrl='" + datakitUrl + '\'' +
+                ", datakitUrl='" + datakitUrl + '\'' +
                 ", appId='" + appId + '\'' +
                 ", env='" + env + '\'' +
                 '}';

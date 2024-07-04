@@ -1,5 +1,7 @@
 package com.ft.sdk;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.bean.ResourceParams;
@@ -171,6 +173,8 @@ public class FTResourceInterceptor implements Interceptor {
         } else {
             if (handlerHelper != null) {
                 handlerHelper.onException(exception, handlerHelper.extraData);
+            } else {
+                params.requestErrorStack = Log.getStackTraceString(exception);
             }
         }
 

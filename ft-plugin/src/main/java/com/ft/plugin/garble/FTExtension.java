@@ -4,6 +4,9 @@ import org.gradle.api.Action;
 import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.Project;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * BY huangDianHua
  * DATE:2019-11-29 14:50
@@ -27,12 +30,12 @@ public class FTExtension {
      */
     public boolean autoUploadNativeDebugSymbol = false;
     /**
-     *  datakit 上传地址，一般为 datakitUrl  端口
+     * datakit 上传地址，一般为 datakitUrl  端口
      */
     public String datakitUrl = "";
 
     /**
-     *  dataway token
+     * dataway token
      */
     public String datawayToken = "";
     /**
@@ -44,6 +47,19 @@ public class FTExtension {
      */
     public String env = "prod";
 
+    /**
+     * asm 版本，默认为 asm9, 支持 asm7 ～ asm9
+     */
+    public String asmVersion = "asm9";
+
+    /**
+     * 忽略的包名路径，例子：['com.ft','com/ft']，两者效果等效，起效顺序按照数据排列顺序
+     */
+    public List<String> ignorePackages = new ArrayList<>();
+
+    /**
+     * 发布版本 favor 配置，{@link ProductFlavorModel}
+     */
     private final NamedDomainObjectContainer<ProductFlavorModel> prodFlavor;
 
     public FTExtension(Project project) {
@@ -69,6 +85,7 @@ public class FTExtension {
                 ", datawayToken='" + datawayToken + '\'' +
                 ", appId='" + appId + '\'' +
                 ", env='" + env + '\'' +
+                ", asmVersion='" + asmVersion + '\'' +
                 '}';
     }
 }
