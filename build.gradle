@@ -21,15 +21,15 @@ buildscript {
     def traceUrl = properties.getProperty("TRACE_URL")
 
     ext.ft_env = [
-            'rumAppid'  : appIdString,
-            'datakitRUMUrl': datakitRUMUrl,
-            'datawayRUMUrl': datawayRUMUrl,
-            'clientToken': clientToken,
-            'datawayToken': datawayToken,
-            'trackId'   : trackId,
-            'traceUrl'  : traceUrl,
-            'prodTestEnv'  : 'gray',
-            'prodPublishEnv'  : 'prod'
+            'rumAppid'      : appIdString,
+            'datakitRUMUrl' : datakitRUMUrl,
+            'datawayRUMUrl' : datawayRUMUrl,
+            'clientToken'   : clientToken,
+            'datawayToken'  : datawayToken,
+            'trackId'       : trackId,
+            'traceUrl'      : traceUrl,
+            'prodTestEnv'   : 'gray',
+            'prodPublishEnv': 'prod'
     ]
     repositories {
         google()
@@ -47,7 +47,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.4.2'
-        classpath 'com.cloudcare.ft.mobile.sdk.tracker.plugin:ft-plugin:1.3.1-alpha02'
+        classpath 'com.cloudcare.ft.mobile.sdk.tracker.plugin:ft-plugin:1.3.1-beta01'
 //        classpath 'com.guardsquare:proguard-gradle:7.1.0'
 //        classpath files('ft-plugin/build/libs/ft-plugin-1.3.1-alpha02.jar')
 

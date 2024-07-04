@@ -1,3 +1,7 @@
+# agent 1.5.2-beta01
+1. resource 添加本地网络错误类型的提示
+
+---
 # agent 1.5.2-alpha02
 1. resource 添加本地网络错误类型的提示
 
