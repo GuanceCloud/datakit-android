@@ -44,15 +44,35 @@ import java.util.List;
  */
 public class FTMethodAdapter extends AdviceAdapter {
     private final String[] interfaces;
+
+    /**
+     * 访问类名
+     */
     private final String className;
+    /**
+     * 访问父类
+     */
     private final String superName;
+    /**
+     * 方法名
+     */
     private final String methodName;
+    /**
+     * 是否已经进行写入
+     */
     private boolean isHasTracked = false;
+    /**
+     * 是否跳过
+     */
     private boolean needSkip = false;
-    //name + desc
+    /**
+     * name + desc
+     */
     private final String nameDesc;
 
-    //访问权限是public并且非静态
+    /**
+     * 访问权限是public并且非静态
+     */
     private boolean pubAndNoStaticAccess;
 
     private int startVarIndex;
