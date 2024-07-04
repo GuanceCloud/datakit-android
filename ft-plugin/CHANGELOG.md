@@ -1,3 +1,7 @@
+# plugin 1.3.1-beta01
+1. 发布配置添加 source code 与 Java Doc
+
+---
 # plugin 1.3.1-alpha03
 1. 添加 ignorePackages 通过包名方式方式对 ASM 进行忽略
 
