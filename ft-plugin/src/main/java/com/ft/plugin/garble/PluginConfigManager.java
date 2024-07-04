@@ -35,10 +35,10 @@ public class PluginConfigManager {
         String asmVersion = extension.asmVersion;
         if (asmVersion.equalsIgnoreCase("asm8")) {
             return Opcodes.ASM8;
-        } else if (asmVersion.equalsIgnoreCase("asm9")) {
-            return Opcodes.ASM9;
+        } else if (asmVersion.equalsIgnoreCase("asm7")) {
+            return Opcodes.ASM7;
         }
-        return Opcodes.ASM7;
+        return Opcodes.ASM9;
     }
 
     public List<String> getIgnorePackages() {

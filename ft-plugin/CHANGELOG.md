@@ -1,3 +1,10 @@
+# plugin 1.3.1
+1. 添加 asmVersion 配置功能，支持 asm7 - asm9，默认为 asm9
+2. 修复了 WebView 自定义方法 loadUrl、loadData、loadDataWithBaseURL 和 postUrl 在 ASM 写入后导致循环调用，从而无法加载 WebView 内容的问题
+3. IgnoreAOP 支持在类中声明，进行整个类中的方法忽略
+4. 添加 ignorePackages 配置， 支持通过包路径配置对 ASM 进行忽略
+
+---
 # plugin 1.3.1-beta01
 1. 发布配置添加 source code 与 Java Doc
 
