@@ -24,12 +24,16 @@ afterEvaluate {
                 artifactId 'ft-plugin-legacy'
                 version version
                 artifact jar
+                artifact javadocJar
+                artifact sourceJar
             }
             mavenJava(MavenPublication) {
                 groupId group + '.legacy'
                 artifactId 'com.cloudcare.ft.mobile.sdk.tracker.plugin.legacy.gradle.plugin'
                 version version
                 artifact jar
+                artifact javadocJar
+                artifact sourceJar
             }
         }
         repositories {
@@ -49,9 +53,25 @@ afterEvaluate {
     }
 }
 
+
 task generateJarAndPublish {
     dependsOn 'clean'
     dependsOn 'publish'
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+    archiveClassifier = 'javadoc'
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allSource
+    archiveClassifier = 'sources'
+}
+
+javadoc{
+    options.addStringOption('Xdoclint:none', '-quiet')
+    failOnError = false
 }
 
 
