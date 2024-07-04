@@ -48,8 +48,14 @@ public class FTExtension {
     public String env = "prod";
 
 
+    /**
+     * 忽略的包名路径，例子：['com.ft','com/ft']，两者效果等效，起效顺序按照数据排列顺序
+     */
     public List<String> ignorePackages = new ArrayList<>();
 
+    /**
+     * 发布版本 favor 配置，{@link ProductFlavorModel}
+     */
     private final NamedDomainObjectContainer<ProductFlavorModel> prodFlavor;
 
     public FTExtension(Project project) {

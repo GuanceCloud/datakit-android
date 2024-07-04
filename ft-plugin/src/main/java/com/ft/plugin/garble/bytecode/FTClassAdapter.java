@@ -36,6 +36,9 @@ public class FTClassAdapter extends ClassVisitor {
     private String className;
     private String superName;
     private String[] interfaces;
+    /**
+     * 是否跳过
+     */
     private boolean needSkip;
 
     public FTClassAdapter(final ClassVisitor cv) {
