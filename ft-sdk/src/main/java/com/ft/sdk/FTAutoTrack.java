@@ -8,7 +8,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -77,7 +76,7 @@ public class FTAutoTrack {
                 }
             }
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
     }
 
@@ -122,7 +121,7 @@ public class FTAutoTrack {
         try {
             //startPage(clazz);
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
         }
     }
@@ -139,7 +138,7 @@ public class FTAutoTrack {
         try {
             //destroyPage(clazz);
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
         }
     }
@@ -181,7 +180,7 @@ public class FTAutoTrack {
             //LogUtils.d("Fragment[\nOnCreateView=====>fragment:"+((Class)clazz).getSimpleName());
             //startPage(clazz, activity);
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
         }
     }
@@ -200,7 +199,7 @@ public class FTAutoTrack {
             //LogUtils.d("Fragment[\nOnDestroyView=====>fragment:"+((Class)clazz).getSimpleName());
             //destroyPage(clazz, activity);
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
         }
     }
@@ -278,7 +277,7 @@ public class FTAutoTrack {
             clickView(view, AopUtils.getClass(object), AopUtils.getClassName(object),
                     AopUtils.getSupperClassName(object), AopUtils.getViewDesc(view) + "#pos:" + position);
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
         }
     }
@@ -319,7 +318,7 @@ public class FTAutoTrack {
 
             trackViewOnClick(object, view, view.isPressed());
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
         }
     }
@@ -341,7 +340,7 @@ public class FTAutoTrack {
                         AopUtils.getSupperClassName(object), AopUtils.getViewDesc(view));
             }
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
     }
 
@@ -354,7 +353,7 @@ public class FTAutoTrack {
         try {
             trackMenuItem(null, menuItem);
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
         }
     }
@@ -370,7 +369,7 @@ public class FTAutoTrack {
             clickView((Class<?>) object, AopUtils.getClassName(object), AopUtils.getSupperClassName(object),
                     AopUtils.getMenuItem(menuItem));
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
         }
     }
@@ -399,7 +398,7 @@ public class FTAutoTrack {
 
             clickView(activity.getClass(), AopUtils.getClassName(activity), AopUtils.getSupperClassName(activity), AopUtils.getDialogClickView(dialog, whichButton));
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
         }
     }
@@ -417,7 +416,7 @@ public class FTAutoTrack {
             clickView(view, AopUtils.getClass(object), AopUtils.getClassName(object),
                     AopUtils.getSupperClassName(object), AopUtils.getViewDesc(view));
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
         }
     }
@@ -540,7 +539,7 @@ public class FTAutoTrack {
 //            String pageName = names[names.length - 1];
 //            handleOp(pageName, OP.OPEN, cost * 1000, null);
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
         }
     }
@@ -664,7 +663,7 @@ public class FTAutoTrack {
             Method loadMethod = clazz.getMethod(methodName, paramTypes);
             loadMethod.invoke(webView, params);
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
         }
     }

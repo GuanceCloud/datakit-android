@@ -2,7 +2,6 @@ package com.ft.sdk;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 
 import com.ft.sdk.garble.bean.ActionBean;
 import com.ft.sdk.garble.bean.ActiveActionBean;
@@ -632,13 +631,13 @@ public class FTRUMInnerManager {
                         });
 
                     } catch (Exception e) {
-                        LogUtils.e(TAG, Log.getStackTraceString(e));
+                        LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                     }
                 }
             });
 
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
     }
 
@@ -669,7 +668,7 @@ public class FTRUMInnerManager {
             increaseLongTask(tags);
 
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
     }
 
@@ -857,7 +856,7 @@ public class FTRUMInnerManager {
                 });
             }
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
 
         EventConsumerThreadPool.get().execute(new Runnable() {
@@ -917,7 +916,7 @@ public class FTRUMInnerManager {
             bean.resourceUrlQuery = url.getQuery();
 
         } catch (MalformedURLException | URISyntaxException e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
 
         bean.requestHeader = params.requestHeader;
@@ -1094,7 +1093,7 @@ public class FTRUMInnerManager {
                 }
             }
         } catch (JSONException e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
     }
 
@@ -1112,12 +1111,12 @@ public class FTRUMInnerManager {
                             FTRUMInnerManager.this.generateActionSum(tags);
                             FTRUMInnerManager.this.generateViewSum(tags);
                         } catch (JSONException e) {
-                            LogUtils.e(TAG, Log.getStackTraceString(e));
+                            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                         }
                     }
                 });
             } catch (Exception e) {
-                LogUtils.e(TAG, Log.getStackTraceString(e));
+                LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
             }
         }
@@ -1171,7 +1170,7 @@ public class FTRUMInnerManager {
                     FTTrackInner.getInstance().rum(bean.getStartTime(),
                             Constants.FT_MEASUREMENT_RUM_ACTION, tags, fields, null);
                 } catch (JSONException e) {
-                    LogUtils.e(TAG, Log.getStackTraceString(e));
+                    LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                 }
             }
             FTDBManager.get().cleanCloseActionData();
@@ -1234,7 +1233,7 @@ public class FTRUMInnerManager {
                         fields.put(Constants.KEY_FPS_MINI, bean.getFpsMini());
                     }
                 } catch (JSONException e) {
-                    LogUtils.e(TAG, Log.getStackTraceString(e));
+                    LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                 }
 
                 FTTrackInner.getInstance().rum(bean.getStartTime(),
@@ -1276,7 +1275,7 @@ public class FTRUMInnerManager {
                     try {
                         notCollectArr.remove(0);
                     } catch (Exception e) {
-                        LogUtils.d(TAG, Log.getStackTraceString(e));
+                        LogUtils.d(TAG, LogUtils.getStackTraceString(e));
                     }
                 }
                 notCollectArr.add(sessionId);

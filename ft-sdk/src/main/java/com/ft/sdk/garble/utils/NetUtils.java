@@ -90,7 +90,7 @@ public class NetUtils {
                 LogUtils.e(TAG, "没有获得到 READ_PHONE_STATE 权限无法获取运营商信息");
             }
         } catch (Exception ex) {
-            LogUtils.e(TAG, Log.getStackTraceString(ex));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(ex));
             return NETWORK_UNKNOWN;
         }
 
@@ -195,7 +195,7 @@ public class NetUtils {
                         }
                     }
                 } catch (Exception e) {
-                    LogUtils.e(TAG, Log.getStackTraceString(e));
+                    LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
                 }
             } else if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {

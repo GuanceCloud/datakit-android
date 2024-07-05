@@ -412,7 +412,7 @@ public class FTDBManager extends DBManager {
                     }
                     cursor.close();
                 } catch (Exception e) {
-                    LogUtils.e(TAG, Log.getStackTraceString(e));
+                    LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                 }
             }
         });
@@ -481,7 +481,7 @@ public class FTDBManager extends DBManager {
                     }
                     cursor.close();
                 } catch (Exception e) {
-                    LogUtils.e(TAG, Log.getStackTraceString(e));
+                    LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
                 }
             }
@@ -597,7 +597,7 @@ public class FTDBManager extends DBManager {
                     count[0] = cursor.getInt(0);
                     cursor.close();
                 } catch (Exception e) {
-                    LogUtils.e(TAG, Log.getStackTraceString(e));
+                    LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                 }
             }
         });

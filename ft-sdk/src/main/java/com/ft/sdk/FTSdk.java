@@ -2,7 +2,6 @@ package com.ft.sdk;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -80,7 +79,7 @@ public class FTSdk {
                 mFtSdk.initFTConfig(ftSDKConfig);
             }
         } catch (Exception e) {
-            LogUtils.e(TAG, "initFTConfig fail:\n" + Log.getStackTraceString(e));
+            LogUtils.e(TAG, "initFTConfig fail:\n" + LogUtils.getStackTraceString(e));
         }
     }
 
@@ -161,7 +160,7 @@ public class FTSdk {
             LogUtils.d(TAG, "initRUMWithConfig complete");
 
         } catch (Exception e) {
-            LogUtils.e(TAG, "initRUMWithConfig fail:\n" + Log.getStackTraceString(e));
+            LogUtils.e(TAG, "initRUMWithConfig fail:\n" + LogUtils.getStackTraceString(e));
         }
 
     }
@@ -178,7 +177,7 @@ public class FTSdk {
             LogUtils.d(TAG, "initTraceWithConfig complete");
 
         } catch (Exception e) {
-            LogUtils.e(TAG, "initTraceWithConfig fail:\n" + Log.getStackTraceString(e));
+            LogUtils.e(TAG, "initTraceWithConfig fail:\n" + LogUtils.getStackTraceString(e));
         }
     }
 
@@ -194,7 +193,7 @@ public class FTSdk {
             LogUtils.d(TAG, "initLogWithConfig complete");
 
         } catch (Exception e) {
-            LogUtils.e(TAG, "initLogWithConfig fail:\n" + Log.getStackTraceString(e));
+            LogUtils.e(TAG, "initLogWithConfig fail:\n" + LogUtils.getStackTraceString(e));
         }
     }
 

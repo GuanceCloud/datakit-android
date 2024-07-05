@@ -1,7 +1,5 @@
 package com.ft.sdk;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.bean.AppState;
@@ -189,7 +187,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
                                 uploadNativeCrash(item, AppState.getValueFrom(value), true, callBack);
                                 Utils.deleteFile(item.getAbsolutePath());
                             } catch (IOException e) {
-                                LogUtils.e(TAG, Log.getStackTraceString(e));
+                                LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                             }
                         }
                     }
@@ -216,7 +214,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
                 try {
                     uploadNativeCrash(item, state, isPreCrash, callBack);
                 } catch (Exception e) {
-                    LogUtils.e(TAG, Log.getStackTraceString(e));
+                    LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                     if (callBack != null) {
                         callBack.onComplete();
                     }

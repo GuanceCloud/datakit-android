@@ -9,7 +9,6 @@ import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkRequest;
 import android.os.Build;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -79,7 +78,7 @@ class FTNetworkListener {
                 application.registerReceiver(networkReceiver, intentFilter);
             }
         } catch (Exception e) {
-            LogUtils.d(TAG, Log.getStackTraceString(e));
+            LogUtils.d(TAG, LogUtils.getStackTraceString(e));
         }
     }
 

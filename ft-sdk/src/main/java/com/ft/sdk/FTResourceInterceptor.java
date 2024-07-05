@@ -174,7 +174,7 @@ public class FTResourceInterceptor implements Interceptor {
             if (handlerHelper != null) {
                 handlerHelper.onException(exception, handlerHelper.extraData);
             } else {
-                params.requestErrorStack = Log.getStackTraceString(exception);
+                params.requestErrorStack = LogUtils.getStackTraceString(exception);
             }
         }
 

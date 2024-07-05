@@ -1,7 +1,5 @@
 package com.ft.sdk.garble.reflect;
 
-import android.util.Log;
-
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.nativelib.ExceptionHandler;
@@ -45,7 +43,7 @@ public class ReflectUtils {
             handlerMethod.invoke(instance);
         } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException |
                  ClassNotFoundException e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
         }
     }

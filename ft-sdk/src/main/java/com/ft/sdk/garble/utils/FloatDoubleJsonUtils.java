@@ -1,7 +1,5 @@
 package com.ft.sdk.garble.utils;
 
-import android.util.Log;
-
 import com.ft.sdk.garble.manager.SingletonGson;
 
 import org.json.JSONArray;
@@ -15,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
  * 做 Json 中 float 数值保护使用
  *
  * @author Brandon
@@ -33,7 +30,7 @@ public class FloatDoubleJsonUtils {
         try {
             return SingletonGson.getInstance().toJson(toMap(json));
         } catch (JSONException e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
             return "{}";
         }
 
@@ -41,7 +38,8 @@ public class FloatDoubleJsonUtils {
 
 
     /**
-     *  JSON 单个对象类型转化
+     * JSON 单个对象类型转化
+     *
      * @param jsonobj
      * @return
      * @throws JSONException
@@ -64,6 +62,7 @@ public class FloatDoubleJsonUtils {
 
     /**
      * JSON 数组类型转化
+     *
      * @param array
      * @return
      * @throws JSONException
