@@ -10,6 +10,7 @@ import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.garble.manager.LogFileHelper;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -213,6 +214,47 @@ public class LogUtils {
         tr.printStackTrace(pw);
         pw.flush();
         return sw.toString();
+    }
+
+    /**
+     *
+     * 获取网络错误描述
+     *
+     * @param e 网络请求发生的 IOException
+     * @return
+     */
+    public static String getNetworkExceptionDesc(IOException e) {
+        if (e instanceof java.net.SocketTimeoutException) {
+            return "Network Timeout";
+        } else if (e instanceof java.net.UnknownHostException) {
+            return "Unknown Host";
+        } else if (e instanceof java.net.ConnectException) {
+            return "Connection Refused";
+        } else if (e instanceof javax.net.ssl.SSLHandshakeException) {
+            return "SSL Handshake Failed";
+        } else if (e instanceof javax.net.ssl.SSLPeerUnverifiedException) {
+            return "SSL Peer Unverified";
+        } else if (e instanceof java.net.ProtocolException) {
+            return "Protocol Error";
+        } else if (e instanceof java.io.InterruptedIOException) {
+            return "Request Interrupted";
+        } else if (e instanceof java.io.EOFException) {
+            return "Connection Closed Prematurely";
+        } else if (e instanceof java.net.NoRouteToHostException) {
+            return "No Route to Host";
+        } else if (e instanceof java.net.BindException) {
+            return "Address Already in Use";
+        } else if (e instanceof java.net.PortUnreachableException) {
+            return "Port Unreachable";
+        } else if (e instanceof java.net.MalformedURLException) {
+            return "Malformed URL";
+        } else if (e instanceof java.net.HttpRetryException) {
+            return "HTTP Retry Required";
+        } else if (e instanceof java.net.UnknownServiceException) {
+            return "Unknown Service";
+        } else {
+            return "";
+        }
     }
 
 

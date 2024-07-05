@@ -843,7 +843,8 @@ public class FTRUMInnerManager {
                     errorTags.put(Constants.KEY_RUM_RESOURCE_URL_PATH, urlPath);
                     errorTags.put(Constants.KEY_RUM_RESOURCE_URL_PATH_GROUP, urlPathGroup);
                 }
-                String errorMsg = "[" + bean.resourceStatus + "]" + "[" + bean.url + "]";
+                String localErrorMsg = Utils.isNullOrEmpty(bean.errorMsg) ? "" : ":" + bean.errorMsg;
+                String errorMsg = "[" + bean.resourceStatus + localErrorMsg + "]" + "[" + bean.url + "]";
 
                 errorField.put(Constants.KEY_RUM_ERROR_MESSAGE, errorMsg);
                 errorField.put(Constants.KEY_RUM_ERROR_STACK, bean.errorStack);
@@ -932,6 +933,7 @@ public class FTRUMInnerManager {
             bean.errorStack = params.responseBody == null ? "" : params.responseBody;
         } else if (bean.resourceStatus == 0 && !Utils.isNullOrEmpty(params.requestErrorStack)) {
             bean.errorStack = params.requestErrorStack;
+            bean.errorMsg = params.requestErrorMsg;
         }
 
         if (params.property != null) {
