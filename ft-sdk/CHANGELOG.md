@@ -1,3 +1,7 @@
+# agent 1.5.2-beta02
+1. 补充 resource 本地网络错误的简单描述
+
+---
 # agent 1.5.2-beta01
 1. 同 agent 1.5.2-alpha02
 
