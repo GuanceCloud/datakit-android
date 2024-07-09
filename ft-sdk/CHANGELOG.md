@@ -1,3 +1,7 @@
+# agent 1.5.2-beta03
+1. 同 agent 1.5.2-alpha03
+
+---
 # agent 1.5.2-alpha03
  1. 修复 setEnableTrackAppCrash(false) 时 exception rethrow 问题
 
