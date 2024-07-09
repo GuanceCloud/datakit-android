@@ -1,5 +1,5 @@
-# agent 1.5.2
- 1. Error network_error 添加本地网络错误类型的提示，用于补充说明 Resource 数据中 resource_status=0 场景
+# agent 1.5.2-alpha03
+ 1. 修复 setEnableTrackAppCrash(false) 时 exception rethrow 问题
 
 ---
 # agent 1.5.2-beta02

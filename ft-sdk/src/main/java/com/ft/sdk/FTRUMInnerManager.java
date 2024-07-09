@@ -632,12 +632,18 @@ public class FTRUMInnerManager {
 
                     } catch (Exception e) {
                         LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+                        if (callBack != null) {
+                            callBack.onComplete();
+                        }
                     }
                 }
             });
 
         } catch (Exception e) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+            if (callBack != null) {
+                callBack.onComplete();
+            }
         }
     }
 

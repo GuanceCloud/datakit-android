@@ -63,7 +63,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
     public static final String NATIVE_LOGCAT_SETTING_VERSION = "1.1.1-alpha01";
 
     private static FTExceptionHandler instance;
-    private final Thread.UncaughtExceptionHandler mDefaultExceptionHandler;
+    private Thread.UncaughtExceptionHandler mDefaultExceptionHandler;
     /**
      * 注意 ：AndroidTest 会调用这个方法 {@link com.ft.test.base.FTBaseTest#avoidCrash()}
      */
@@ -80,16 +80,11 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
      * @param callBack
      */
     public void uploadCrashLog(String crash, String message, AppState state, RunnerCompleteCallBack callBack) {
-        if (config.isRumEnable() &&
-                config.isEnableTrackAppCrash()) {
-            long dateline = Utils.getCurrentNanoTime();
-            FTRUMInnerManager.get().addError(crash, message, dateline, ErrorType.JAVA.toString(), state, callBack);
-        }
+        long dateline = Utils.getCurrentNanoTime();
+        FTRUMInnerManager.get().addError(crash, message, dateline, ErrorType.JAVA.toString(), state, callBack);
     }
 
     private FTExceptionHandler() {
-        mDefaultExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
-        Thread.setDefaultUncaughtExceptionHandler(this);
     }
 
     public static FTExceptionHandler get() {
@@ -108,6 +103,14 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
      */
     void initConfig(FTRUMConfig config) {
         this.config = config;
+        if (config.isRumEnable() &&
+                config.isEnableTrackAppCrash()) {
+            mDefaultExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
+            //避免重复设置
+            if (!(mDefaultExceptionHandler instanceof FTExceptionHandler)) {
+                Thread.setDefaultUncaughtExceptionHandler(this);
+            }
+        }
     }
 
 
@@ -150,13 +153,6 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
                 } else {
                     if (mDefaultExceptionHandler != null) {
                         mDefaultExceptionHandler.uncaughtException(t, e);
-                    } else {
-                        try {
-                            android.os.Process.killProcess(android.os.Process.myPid());
-                            System.exit(10);
-                        } catch (Exception ex2) {
-
-                        }
                     }
                 }
             }
