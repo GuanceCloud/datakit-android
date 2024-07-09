@@ -34,6 +34,16 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
+
+//            firebaseCrashlytics {
+//                // Enable processing and uploading of native symbols to Firebase servers.
+//                // By default, this is disabled to improve build speeds.
+//                // This flag must be enabled to see properly-symbolicated native
+//                // stack traces in the Crashlytics dashboard.
+//                nativeSymbolUploadEnabled true
+//                unstrippedNativeLibsDir 'ft-native/libs'
+//            }
+
         }
         debug {
             //gradlew createDebugCoverageReport 测试用例覆盖率报告
