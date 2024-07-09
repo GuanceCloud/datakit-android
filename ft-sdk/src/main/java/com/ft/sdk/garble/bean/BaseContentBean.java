@@ -1,7 +1,5 @@
 package com.ft.sdk.garble.bean;
 
-import android.util.Log;
-
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -29,7 +27,7 @@ public class BaseContentBean {
     String measurement;
 
     /**
-     *  日志内容
+     * 日志内容
      */
     String content;
 
@@ -81,19 +79,21 @@ public class BaseContentBean {
 
     /**
      * 获取所有指标数据
+     *
      * @return
      */
     public JSONObject getAllFields() {
         try {
             fields.put(Constants.KEY_MESSAGE, content);
         } catch (JSONException e) {
-            LogUtils.e(TAG,Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
         return fields;
     }
 
     /**
      * 获取所有标签数据
+     *
      * @return
      */
     public JSONObject getAllTags() {
@@ -102,7 +102,7 @@ public class BaseContentBean {
                 tags.put(Constants.KEY_SERVICE, serviceName);
             }
         } catch (JSONException e) {
-            LogUtils.e(TAG,Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
 
         return tags;
@@ -128,7 +128,7 @@ public class BaseContentBean {
             try {
                 this.tags.put(key, tags.get(key));
             } catch (JSONException e) {
-                LogUtils.e(TAG, Log.getStackTraceString(e));
+                LogUtils.e(TAG, LogUtils.getStackTraceString(e));
             }
 
         }

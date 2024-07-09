@@ -1,7 +1,5 @@
 package com.ft.sdk.garble.http;
 
-import android.util.Log;
-
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -52,7 +50,7 @@ public class FTResponseData {
                     this.code = code;
                     this.message = data;
                 } catch (Exception e) {
-                    LogUtils.e(TAG, Log.getStackTraceString(e));
+                    LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                 }
             } else {
                 this.code = code;

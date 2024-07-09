@@ -1,7 +1,5 @@
 package com.ft.sdk.garble.bean;
 
-import android.util.Log;
-
 import androidx.annotation.Nullable;
 
 import com.ft.sdk.garble.utils.Constants;
@@ -81,7 +79,7 @@ public class UserData {
             }.getType();
             exts = new Gson().fromJson(data, type);
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
     }
 

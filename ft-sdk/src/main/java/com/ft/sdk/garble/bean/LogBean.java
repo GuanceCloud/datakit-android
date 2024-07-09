@@ -1,7 +1,5 @@
 package com.ft.sdk.garble.bean;
 
-import android.util.Log;
-
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 
@@ -63,7 +61,7 @@ public class LogBean extends BaseContentBean {
                 }
             }
         } catch (JSONException e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
         }
         return fields;
@@ -79,7 +77,7 @@ public class LogBean extends BaseContentBean {
         try {
             tags.put(Constants.KEY_STATUS, status);
         } catch (JSONException e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
         }
 

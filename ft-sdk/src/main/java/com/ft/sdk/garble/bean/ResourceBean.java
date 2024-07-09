@@ -82,6 +82,11 @@ public class ResourceBean {
     public String errorStack = "";
 
     /**
+     * 错误消息
+     */
+    public String errorMsg = "";
+
+    /**
      * 请求返回 code {@link  HttpsURLConnection#HTTP_OK,HttpsURLConnection#HTTP_UNAUTHORIZED} 等等
      */
     public int resourceStatus = 0;

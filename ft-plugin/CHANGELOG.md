@@ -1,3 +1,29 @@
+# plugin 1.3.1
+1. 添加 asmVersion 配置功能，支持 asm7 - asm9，默认为 asm9
+2. 修复了 WebView 子类重写方法在 ASM 写入后导致循环调用，从而无法加载 WebView 内容的问题
+   (涉及方法 loadUrl、loadData、loadDataWithBaseURL、 postUrl)
+3. IgnoreAOP 支持在类中声明，进行整个类中的方法忽略
+4. 添加 ignorePackages 配置， 支持通过包路径配置对 ASM 进行忽略
+
+---
+# plugin 1.3.1-beta01
+1. 发布配置添加 source code 与 Java Doc
+
+---
+# plugin 1.3.1-alpha03
+1. 添加 ignorePackages 通过包名方式方式对 ASM 进行忽略
+
+---
+# plugin 1.3.1-alpha02
+1. 添加 asmVersion 配置功能
+2. 修复了 WebView 自定义方法 loadUrl、loadData、loadDataWithBaseURL 和 postUrl 在 ASM 写入后导致循环调用，从而无法加载 WebView 内容的问题
+3. IgnoreAOP 支持在类声明，进行 AOP 的整体忽略
+
+---
+# plugin 1.3.1-alpha01
+1.兼容 asm9
+
+---
 # plugin 1.3.0
 1. 支持 datakit source map 自动上传，支持 native symbol 的上传
 2. 支持捕获 Application 冷热启动，Activity 页面跳转，View、ListView、Dialog、Tab 点击事件。

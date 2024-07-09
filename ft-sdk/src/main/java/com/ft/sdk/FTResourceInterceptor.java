@@ -89,7 +89,7 @@ public class FTResourceInterceptor implements Interceptor {
     public Response intercept(Chain chain) throws IOException {
         Request request = chain.request();
         Response response = null;
-        Exception exception = null;
+        IOException exception = null;
         String url = request.url().toString();
 
         FTRUMConfig rumConfig = FTRUMConfigManager.get().getConfig();
@@ -171,6 +171,9 @@ public class FTResourceInterceptor implements Interceptor {
         } else {
             if (handlerHelper != null) {
                 handlerHelper.onException(exception, handlerHelper.extraData);
+            } else {
+                params.requestErrorStack = LogUtils.getStackTraceString(exception);
+                params.requestErrorMsg = LogUtils.getNetworkExceptionDesc(exception);
             }
         }
 

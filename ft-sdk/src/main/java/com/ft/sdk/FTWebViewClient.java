@@ -1,7 +1,6 @@
 package com.ft.sdk;
 
 import android.graphics.Bitmap;
-import android.util.Log;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
@@ -55,7 +54,7 @@ public class FTWebViewClient extends WebViewClient {
         try {
             mCountDownLatch.await(1L, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
         try {
             String url = request.getUrl().toString();
@@ -66,7 +65,7 @@ public class FTWebViewClient extends WebViewClient {
                 return super.shouldInterceptRequest(view, request);
             }
         } catch (Exception e) {
-            LogUtils.e(TAG,Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
             return super.shouldInterceptRequest(view, request);
         }
     }

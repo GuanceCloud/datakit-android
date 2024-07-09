@@ -25,6 +25,7 @@ import com.ft.plugin.garble.FTMethodType;
 import com.ft.plugin.garble.FTSubMethodCell;
 import com.ft.plugin.garble.FTUtil;
 import com.ft.plugin.garble.Logger;
+import com.ft.plugin.garble.PluginConfigManager;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Handle;
@@ -42,39 +43,56 @@ import java.util.List;
  * 访问类方法结构
  */
 public class FTMethodAdapter extends AdviceAdapter {
-    private static final String IGNORE_ANNOTATION_DESC = "Lcom/ft/sdk/garble/annotation/IgnoreAOP;";
-    private String[] interfaces;
-    private String className;
-    private String superName;
-    private String methodName;
-    private boolean isHasTracked = false;
-    private boolean needSkip = false;
-    //name + desc
-    private String nameDesc;
+    private final String[] interfaces;
 
-    //访问权限是public并且非静态
+    /**
+     * 访问类名
+     */
+    private final String className;
+    /**
+     * 访问父类
+     */
+    private final String superName;
+    /**
+     * 方法名
+     */
+    private final String methodName;
+    /**
+     * 是否已经进行写入
+     */
+    private boolean isHasTracked = false;
+    /**
+     * 是否跳过
+     */
+    private boolean needSkip = false;
+    /**
+     * name + desc
+     */
+    private final String nameDesc;
+
+    /**
+     * 访问权限是public并且非静态
+     */
     private boolean pubAndNoStaticAccess;
 
     private int startVarIndex;
 
     public FTMethodAdapter(MethodVisitor mv, int access, String name, String desc, String className, String[] interfaces, String supperName) {
-        super(FTUtil.ASM_VERSION, mv, access, name, desc);
+        super(PluginConfigManager.get().getASMVersion(), mv, access, name, desc);
         this.methodName = name;
         this.superName = supperName;
         this.className = className;
         this.interfaces = interfaces;
         this.nameDesc = name + desc;
-        //Logger.info(">>>> 开始扫描类 <" + className + "> 的方法:" + methodName + "<<<<");
 
         boolean isSDKInner = innerSDKSkip(className);
-        if (FTUtil.isTargetClassInSpecial(className)
-                || innerSDKSkip(className)
+        boolean isIgnorePack = isIgnorePackage(className);
+        if (FTUtil.isTargetClassInSpecial(className) || isIgnorePack
+                || isSDKInner
                 || isWebViewInner(className, superName, nameDesc)) {
-
             if (!isSDKInner) {
-                Logger.debug("skip:" + className + ",superName:" + supperName);
+                Logger.debug("skip-> class:" + className + ",super:" + supperName + ",desc:" + nameDesc);
             }
-
             needSkip = true;
         }
 
@@ -86,21 +104,19 @@ public class FTMethodAdapter extends AdviceAdapter {
      * @return
      */
     private boolean needTrackTime() {
-        if ((superName.equals("androidx/appcompat/app/AppCompatActivity") ||
+        return (superName.equals("androidx/appcompat/app/AppCompatActivity") ||
                 superName.equals("android/app/Activity"))
                 && !className.startsWith("android/")
                 && !className.startsWith("androidx/")
-                && (methodName + methodDesc).equals("onCreate(Landroid/os/Bundle;)V")) {
-            return true;
-        }
-        return false;
+                && (methodName + methodDesc).equals("onCreate(Landroid/os/Bundle;)V");
     }
 
     @Override
     public void visitCode() {
         super.visitCode();
         if (needTrackTime()) {
-            mv.visitMethodInsn(Opcodes.INVOKESTATIC, Constants.CLASS_NAME_SYSTEM, "currentTimeMillis", "()J", false);
+            mv.visitMethodInsn(Opcodes.INVOKESTATIC, Constants.CLASS_NAME_SYSTEM, "currentTimeMillis",
+                    "()J", false);
             startVarIndex = newLocal(Type.LONG_TYPE);
             mv.visitVarInsn(Opcodes.LSTORE, startVarIndex);
         }
@@ -110,14 +126,16 @@ public class FTMethodAdapter extends AdviceAdapter {
     public void visitInsn(int opcode) {
         if (needTrackTime()) {
             if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
-                mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_SYSTEM, "currentTimeMillis", "()J", false);
+                mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_SYSTEM, "currentTimeMillis",
+                        "()J", false);
                 mv.visitVarInsn(LLOAD, startVarIndex);
                 mv.visitInsn(LSUB);
                 int index = newLocal(Type.LONG_TYPE);
                 mv.visitVarInsn(LSTORE, index);
                 mv.visitLdcInsn(className + "|" + methodName + "|" + methodDesc);
                 mv.visitVarInsn(LLOAD, index);
-                mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "timingMethod", "(Ljava/lang/String;J)V", false);
+                mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "timingMethod",
+                        "(Ljava/lang/String;J)V", false);
             }
         }
         super.visitInsn(opcode);
@@ -129,7 +147,7 @@ public class FTMethodAdapter extends AdviceAdapter {
         if (isHasTracked) {
             FTHookConfig.mLambdaMethodCells.remove(nameDesc);
             if (!needSkip) {
-                Logger.debug("Hooked Class<" + className + ">的 method: " + methodName + "," + methodDesc);
+                Logger.debug("Hooked Class<" + className + ">的 method: " + methodName + ", desc:" + methodDesc);
             }
         }
     }
@@ -156,7 +174,8 @@ public class FTMethodAdapter extends AdviceAdapter {
     /**
      * WebView 中包含的所有加载方式
      */
-    private static final List<String> TARGET_WEBVIEW_METHOD = Arrays.asList("loadUrl(Ljava/lang/String;)V", "loadUrl(Ljava/lang/String;Ljava/util/Map;)V",
+    private static final List<String> TARGET_WEBVIEW_METHOD = Arrays.asList("loadUrl(Ljava/lang/String;)V",
+            "loadUrl(Ljava/lang/String;Ljava/util/Map;)V",
             "loadData(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
             "loadDataWithBaseURL(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
             "postUrl(Ljava/lang/String;[B)V");
@@ -170,23 +189,41 @@ public class FTMethodAdapter extends AdviceAdapter {
         switch (owner) {
             case Constants.CLASS_NAME_HTTP_CLIENT_BUILDER:
                 if ("build()Lorg/apache/hc/client5/http/impl/classic/CloseableHttpClient;".contains(name + desc)) {
-                    mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackHttpClientBuilder", "(Lorg/apache/hc/client5/http/impl/classic/HttpClientBuilder;)Lorg/apache/hc/client5/http/impl/classic/CloseableHttpClient;", false);
+                    mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackHttpClientBuilder",
+                            "(Lorg/apache/hc/client5/http/impl/classic/HttpClientBuilder;)" +
+                                    "Lorg/apache/hc/client5/http/impl/classic/CloseableHttpClient;",
+                            false);
+                    Logger.debug("CLASS_NAME_HTTP_CLIENT_BUILDER-> owner:" + owner + ", class:" + className
+                            + ", super:" + superName + ", method:" + name + desc + " | " + nameDesc);
                     return;
                 }
                 break;
 
             case Constants.CLASS_NAME_OKHTTP_BUILDER:
                 if ("build()Lokhttp3/OkHttpClient;".contains(name + desc)) {
-                    mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackOkHttpBuilder", "(Lokhttp3/OkHttpClient$Builder;)Lokhttp3/OkHttpClient;", false);
+                    mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackOkHttpBuilder",
+                            "(Lokhttp3/OkHttpClient$Builder;)Lokhttp3/OkHttpClient;",
+                            false);
+
+                    Logger.debug("CLASS_NAME_OKHTTP_BUILDER-> owner:" + owner + ", class:" + className
+                            + ", super:" + superName + ", method:" + name + desc + " | " + nameDesc);
                     return;
                 }
                 break;
 
             case Constants.CLASS_NAME_WEBVIEW:
-                if (TARGET_WEBVIEW_METHOD.contains(name + desc)) {
-                    Logger.debug("TARGET_WEBVIEW_METHOD:owner:" + owner + ",class:" + className + "," + name + "," + superName);
-                    mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, name, desc.replaceFirst("\\(", "(" + Constants.VIEW_DESC), itf);
-                    return;
+                String method = name + desc;
+                if (TARGET_WEBVIEW_METHOD.contains(method)) {
+                    if (nameDesc.startsWith(Constants.INNER_CLASS_METHOD_PREFIX)) {
+                        Logger.debug("WebInner Ignore-> owner:" + owner + ", class:" + className
+                                + ", super:" + superName + ", method:" + nameDesc);
+                    } else {
+                        Logger.debug("TARGET_WEBVIEW_METHOD-> owner:" + owner + ", class:" + className
+                                + ", super:" + superName + ", method:" + method + " | " + nameDesc);
+                        mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, name,
+                                desc.replaceFirst("\\(", "(" + Constants.VIEW_DESC), itf);
+                        return;
+                    }
                 }
                 break;
 
@@ -203,20 +240,25 @@ public class FTMethodAdapter extends AdviceAdapter {
                     case "v":
                     case "e":
                         if (Constants.METHOD_DESC_S_S_I.equals(desc)) {
-                            mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, name, Constants.METHOD_DESC_S_S_I, false);
+                            mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, name,
+                                    Constants.METHOD_DESC_S_S_I, false);
                         } else if (Constants.METHOD_DESC_S_S_T_I.equals(desc)) {
-                            mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, name, Constants.METHOD_DESC_S_S_T_I, false);
+                            mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, name,
+                                    Constants.METHOD_DESC_S_S_T_I, false);
                         } else {
                             super.visitMethodInsn(opcode, owner, name, desc, itf);
                         }
                         return;
                     case "w":
                         if (Constants.METHOD_DESC_S_S_I.equals(desc)) {
-                            mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "w", Constants.METHOD_DESC_S_S_I, false);
+                            mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "w",
+                                    Constants.METHOD_DESC_S_S_I, false);
                         } else if (Constants.METHOD_DESC_S_S_T_I.equals(desc)) {
-                            mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "w", Constants.METHOD_DESC_S_S_T_I, false);
+                            mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "w",
+                                    Constants.METHOD_DESC_S_S_T_I, false);
                         } else if (Constants.METHOD_DESC_S_T_I.equals(desc)) {
-                            mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "w", Constants.METHOD_DESC_S_T_I, false);
+                            mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "w",
+                                    Constants.METHOD_DESC_S_T_I, false);
                         } else {
                             super.visitMethodInsn(opcode, owner, name, desc, itf);
                         }
@@ -224,7 +266,8 @@ public class FTMethodAdapter extends AdviceAdapter {
 
                     case "println":
                         if (Constants.METHOD_DESC_S_S_I.equals(desc)) {
-                            mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "println", Constants.METHOD_DESC_S_S_I, false);
+                            mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG,
+                                    "println", Constants.METHOD_DESC_S_S_I, false);
                         } else {
                             super.visitMethodInsn(opcode, owner, name, desc, itf);
                         }
@@ -298,10 +341,12 @@ public class FTMethodAdapter extends AdviceAdapter {
         if (ClassNameAnalytics.isFTSdkApi(className)) {
             if (nameDesc.equals("install(Lcom/ft/sdk/FTSDKConfig;)V")) {
                 mv.visitLdcInsn(BuildConfig.PLUGIN_VERSION);
-                mv.visitFieldInsn(PUTSTATIC, "com/ft/sdk/FTSdk", "PLUGIN_VERSION", "Ljava/lang/String;");
+                mv.visitFieldInsn(PUTSTATIC, "com/ft/sdk/FTSdk", "PLUGIN_VERSION",
+                        "Ljava/lang/String;");
 
                 mv.visitLdcInsn(Constants.PACKAGE_UUID);
-                mv.visitFieldInsn(PUTSTATIC, "com/ft/sdk/FTSdk", "PACKAGE_UUID", "Ljava/lang/String;");
+                mv.visitFieldInsn(PUTSTATIC, "com/ft/sdk/FTSdk", "PACKAGE_UUID",
+                        "Ljava/lang/String;");
 
                 isHasTracked = true;
                 return;
@@ -383,16 +428,20 @@ public class FTMethodAdapter extends AdviceAdapter {
                 if ("(Landroid/view/MenuItem;)Z".equals(lambdaMethodCell.desc)) {
                     mv.visitVarInsn(Opcodes.ALOAD, 0);
                     mv.visitVarInsn(Opcodes.ALOAD, getVisitPosition(lambdaTypes, paramStart, isStaticMethod));
-                    mv.visitMethodInsn(Opcodes.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, lambdaMethodCell.agentName, "(Ljava/lang/Object;Landroid/view/MenuItem;)V", false);
+                    mv.visitMethodInsn(Opcodes.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS,
+                            lambdaMethodCell.agentName, "(Ljava/lang/Object;Landroid/view/MenuItem;)V",
+                            false);
                     isHasTracked = true;
                     return;
                 }
             }
             for (int i = paramStart; i < paramStart + lambdaMethodCell.paramsCount; i++) {
-                mv.visitVarInsn(lambdaMethodCell.opcodes.get(i - paramStart), getVisitPosition(lambdaTypes, i, isStaticMethod));
+                mv.visitVarInsn(lambdaMethodCell.opcodes.get(i - paramStart), getVisitPosition(lambdaTypes,
+                        i, isStaticMethod));
             }
 
-            mv.visitMethodInsn(Opcodes.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, lambdaMethodCell.agentName, lambdaMethodCell.agentDesc, false);
+            mv.visitMethodInsn(Opcodes.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, lambdaMethodCell.agentName,
+                    lambdaMethodCell.agentDesc, false);
             isHasTracked = true;
             return;
         }
@@ -402,7 +451,9 @@ public class FTMethodAdapter extends AdviceAdapter {
             return;
         }
 
-        if ((className.startsWith("android/") || className.startsWith("androidx/")) && !(className.startsWith("android/support/v17/leanback") || className.startsWith("androidx/leanback"))) {
+        if ((className.startsWith("android/") || className.startsWith("androidx/")) &&
+                !(className.startsWith("android/support/v17/leanback")
+                        || className.startsWith("androidx/leanback"))) {
             return;
         }
 
@@ -426,6 +477,7 @@ public class FTMethodAdapter extends AdviceAdapter {
          */
         if (FTUtil.isTargetMenuMethodDesc(nameDesc)) {
             handleCode(FTHookConfig.MENU_METHODS);
+            isHasTracked = true;
             return;
         }
 
@@ -463,7 +515,24 @@ public class FTMethodAdapter extends AdviceAdapter {
      * @return
      */
     private boolean innerSDKSkip(String className) {
-        return (ClassNameAnalytics.isFTSdkPackage(className) && !ClassNameAnalytics.isFTSdkApi(className));
+        return (ClassNameAnalytics.isFTSdkPackage(className)
+                && !ClassNameAnalytics.isFTSdkApi(className));
+    }
+
+    /**
+     * 需要忽略的包，class name 支持 . 分隔的方式
+     *
+     * @return
+     */
+    private boolean isIgnorePackage(String className) {
+        boolean isPackageIgnore = false;
+        for (String packageName : PluginConfigManager.get().getIgnorePackages()) {
+            if (className.startsWith(packageName.replace(".", "/"))) {
+                isPackageIgnore = true;
+                break;
+            }
+        }
+        return isPackageIgnore;
     }
 
     /**
@@ -492,8 +561,8 @@ public class FTMethodAdapter extends AdviceAdapter {
      */
     @Override
     public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
-        if (IGNORE_ANNOTATION_DESC.equals(descriptor)) {
-            Logger.debug("ignore:" + className + ":" + methodName);
+        if (Constants.IGNORE_ANNOTATION.equals(descriptor)) {
+            Logger.debug("ignoreAOP-> class:" + className + ",super:" + superName + ", method:" + methodName);
             needSkip = true;
             return null;
         }

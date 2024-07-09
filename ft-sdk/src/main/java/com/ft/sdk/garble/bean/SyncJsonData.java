@@ -1,8 +1,6 @@
 package com.ft.sdk.garble.bean;
 
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.utils.Constants;
@@ -48,7 +46,7 @@ public class SyncJsonData implements Cloneable {
             this.dataString = dataString;
 
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
         }
     }

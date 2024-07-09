@@ -1,19 +1,18 @@
 apply plugin: 'maven-publish'
 group = 'com.cloudcare.ft.mobile.sdk.tracker.plugin'
 
-version = '1.3.1-alpha01'//当前版本号
+version = '1.3.1'//当前版本号
 def minVersion = '1.3.15-beta01' //最低支持的 SDK 版本
 
 apply plugin: "com.github.gmazzo.buildconfig"//https://github.com/gmazzo/gradle-buildconfig-plugin
 
 buildConfig {
-    forClass(packageName = "com.ft.plugin", className = "BuildConfig"){
+    forClass(packageName = "com.ft.plugin", className = "BuildConfig") {
         buildConfigField("String", "PLUGIN_VERSION", "\"$version\"")
         buildConfigField("String", "MIN_SDK_VERSION", "\"$minVersion\"")
     }
 
 }
-
 
 
 afterEvaluate {
@@ -24,6 +23,8 @@ afterEvaluate {
                 artifactId 'ft-plugin'
                 version version
                 artifact jar
+                artifact javadocJar
+                artifact sourceJar
             }
             //fixme 可以有 pom 方式直接直接指向另一个包，目前未知如何实现
             //例如：https://plugins.gradle.org/m2/org/jetbrains/kotlin/android/org.jetbrains.kotlin.android.gradle.plugin/0.0.1-test-1/
@@ -32,6 +33,8 @@ afterEvaluate {
                 artifactId 'com.cloudcare.ft.mobile.sdk.tracker.plugin.gradle.plugin'
                 version version
                 artifact jar
+                artifact javadocJar
+                artifact sourceJar
             }
         }
         repositories {
@@ -51,9 +54,25 @@ afterEvaluate {
     }
 }
 
+
 task generateJarAndPublish {
     dependsOn 'clean'
     dependsOn 'publish'
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+    archiveClassifier = 'javadoc'
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allSource
+    archiveClassifier = 'sources'
+}
+
+javadoc{
+    options.addStringOption('Xdoclint:none', '-quiet')
+    failOnError = false
 }
 
 

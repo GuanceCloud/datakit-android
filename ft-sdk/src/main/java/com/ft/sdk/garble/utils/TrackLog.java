@@ -22,7 +22,7 @@ public class TrackLog {
 
     /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
     public static int i(String tag, String msg, Throwable e) {
-        return showFullLog(true, tag, msg + "\n" + Log.getStackTraceString(e), LogType.I);
+        return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e), LogType.I);
     }
 
     /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
@@ -32,7 +32,7 @@ public class TrackLog {
 
     /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
     public static int d(String tag, String msg, Throwable e) {
-        return showFullLog(true, tag, msg + "\n" + Log.getStackTraceString(e), LogType.D);
+        return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e), LogType.D);
     }
 
     /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
@@ -42,7 +42,7 @@ public class TrackLog {
 
     /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
     public static int v(String tag, String msg, Throwable e) {
-        return showFullLog(true, tag, msg + "\n" + Log.getStackTraceString(e), LogType.V);
+        return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e), LogType.V);
     }
 
     /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
@@ -52,7 +52,7 @@ public class TrackLog {
 
     /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
     public static int e(String tag, String msg, Throwable e) {
-        return showFullLog(true, tag, msg + "\n" + Log.getStackTraceString(e), LogType.E);
+        return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e), LogType.E);
     }
 
     /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
@@ -62,7 +62,7 @@ public class TrackLog {
 
     /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
     public static int w(String tag, String msg, Throwable e) {
-        return showFullLog(true, tag, msg + "\n" + Log.getStackTraceString(e), LogType.W);
+        return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e), LogType.W);
     }
 
     /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/

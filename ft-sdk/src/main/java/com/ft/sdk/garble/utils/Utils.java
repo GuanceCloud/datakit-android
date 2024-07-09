@@ -16,7 +16,6 @@ import android.os.Build;
 import android.os.Process;
 import android.text.TextUtils;
 import android.util.Base64;
-import android.util.Log;
 
 import com.ft.sdk.FTApplication;
 import com.google.gson.Gson;
@@ -34,6 +33,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Method;
@@ -48,6 +48,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -148,7 +149,7 @@ public class Utils {
             info = manager.getPackageInfo(FTApplication.getApplication().getPackageName(), 0);
             return info.versionName;
         } catch (PackageManager.NameNotFoundException e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
             return "";
         }
     }
@@ -453,7 +454,7 @@ public class Utils {
                 }
             }
         } catch (Exception e) {
-            LogUtils.e(TAGS, Log.getStackTraceString(e));
+            LogUtils.e(TAGS, LogUtils.getStackTraceString(e));
         }
         return value;
     }
@@ -485,7 +486,7 @@ public class Utils {
             try {
                 contentLength = body.contentLength();
             } catch (IOException e) {
-                LogUtils.e(TAG, Log.getStackTraceString(e));
+                LogUtils.e(TAG, LogUtils.getStackTraceString(e));
             }
             String contentType = body.contentType() == null ? "" : body.contentType().toString();
             return method + "_" + url + "_" + contentType + "_" + contentLength;
@@ -613,7 +614,7 @@ public class Utils {
             }
             jsonBuilder.append("}");
         } catch (Exception e) {
-            LogUtils.d(TAG, Log.getStackTraceString(e));
+            LogUtils.d(TAG, LogUtils.getStackTraceString(e));
             return "";
         }
         return jsonBuilder.toString();
@@ -671,6 +672,109 @@ public class Utils {
             writer.write(content);
             writer.flush();
         }
+    }
+
+    /**
+     * 获取 logcat
+     * {@see https://github.com/iqiyi/xCrash/blob/457066ceb48fb84b993f1f04871d9e634d752792/xcrash_lib/src/main/java/xcrash/Util.java}
+     *
+     * @param logcatMainLines   这是主要的日志缓冲区，包含大部分应用程序的日志输出，[0,500]，default 200
+     * @param logcatSystemLines 系统日志缓冲区，包含系统级别的日志信息，[0,500]，default 50
+     * @param logcatEventsLines 事件日志缓冲区，主要记录特定的事件信息，[0,500]，default 50
+     * @return
+     */
+    public static String getLogcat(int logcatMainLines, int logcatSystemLines, int logcatEventsLines) {
+        int pid = android.os.Process.myPid();
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("\nlogcat:\n");
+
+        if (logcatMainLines > 0) {
+            getLogcatByBufferName(pid, sb, "main", logcatMainLines, 'D');
+        }
+        if (logcatSystemLines > 0) {
+            getLogcatByBufferName(pid, sb, "system", logcatSystemLines, 'W');
+        }
+        if (logcatEventsLines > 0) {
+            getLogcatByBufferName(pid, sb, "events", logcatSystemLines, 'I');
+        }
+
+        sb.append("\n");
+
+        return sb.toString();
+    }
+
+    /**
+     * {@see https://github.com/iqiyi/xCrash/blob/457066ceb48fb84b993f1f04871d9e634d752792/xcrash_lib/src/main/java/xcrash/Util.java}
+     *
+     * @param pid
+     * @param sb
+     * @param bufferName
+     * @param lines
+     * @param priority
+     */
+    private static void getLogcatByBufferName(int pid, StringBuilder sb, String bufferName, int lines, char priority) {
+        boolean withPid = (android.os.Build.VERSION.SDK_INT >= 24);
+        String pidString = Integer.toString(pid);
+        String pidLabel = " " + pidString + " ";
+
+        //command for ProcessBuilder
+        List<String> command = new ArrayList<String>();
+        command.add("/system/bin/logcat");
+        command.add("-b");
+        command.add(bufferName);
+        command.add("-d");
+        command.add("-v");
+        command.add("threadtime");
+        command.add("-t");
+        command.add(Integer.toString(withPid ? lines : (int) (lines * 1.2)));
+        if (withPid) {
+            command.add("--pid");
+            command.add(pidString);
+        }
+        command.add("*:" + priority);
+
+        //append the command line
+        Object[] commandArray = command.toArray();
+        sb.append("--------- tail end of log ").append(bufferName);
+        sb.append(" (").append(android.text.TextUtils.join(" ", commandArray)).append(")\n");
+
+        //append logs
+        BufferedReader br = null;
+        String line;
+        try {
+            java.lang.Process process = new ProcessBuilder().command(command).start();
+            br = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            while ((line = br.readLine()) != null) {
+                if (withPid || line.contains(pidLabel)) {
+                    sb.append(line).append("\n");
+                }
+            }
+        } catch (Exception e) {
+            LogUtils.e(TAG, "Util run logcat command failed");
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
+    }
+
+    /**
+     * 获取所有线程堆栈
+     *
+     * @return
+     */
+    public static String getAllThreadStack() {
+        String stack = "";
+        try {
+            stack = StringUtils.getThreadAllStackTrace(Thread.getAllStackTraces());
+        } catch (Exception e) {
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+        }
+        return stack;
     }
 
 }

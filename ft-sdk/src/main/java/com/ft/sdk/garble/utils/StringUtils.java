@@ -1,5 +1,7 @@
 package com.ft.sdk.garble.utils;
 
+import java.util.Map;
+
 /**
  * @author Brandon
  */
@@ -42,6 +44,7 @@ public class StringUtils {
 
     /**
      * 获取堆栈字符，自动换行
+     *
      * @param stackTrace
      * @return
      */
@@ -71,4 +74,31 @@ public class StringUtils {
 
         return stackTraceString.toString();
     }
+
+
+    /**
+     * 转化 Map<Thread, StackTraceElement[]>  堆栈
+     *
+     * @param allStackTraces
+     * @return
+     */
+    public static String getThreadAllStackTrace(Map<Thread, StackTraceElement[]> allStackTraces) {
+        StringBuilder stack = new StringBuilder();
+        // 遍历 Map 并打印每个线程的堆栈跟踪信息
+        for (Map.Entry<Thread, StackTraceElement[]> entry : allStackTraces.entrySet()) {
+            Thread thread = entry.getKey();
+            StackTraceElement[] stackTraceElements = entry.getValue();
+            stack.append(thread.getId()).append("-")
+                    .append(thread.getName())
+                    .append(" prio:").append(thread.getPriority())
+                    .append(" tg:").append(thread.getThreadGroup())
+                    .append(" stat:").append(thread.getState())
+                    .append("\n")
+                    .append(StringUtils.getStringFromStackTraceElement(stackTraceElements))
+                    .append("\n");
+        }
+        return stack.toString();
+
+    }
+
 }
