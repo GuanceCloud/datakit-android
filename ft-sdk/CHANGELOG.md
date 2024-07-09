@@ -1,3 +1,7 @@
+# agent 1.5.2
+ 1. Error network_error 添加本地网络错误类型的提示，用于补充说明 Resource 数据中 resource_status=0 场景
+
+---
 # agent 1.5.2-beta02
 1. 补充 resource 本地网络错误的简单描述
 
