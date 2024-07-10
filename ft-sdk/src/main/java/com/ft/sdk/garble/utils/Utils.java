@@ -222,6 +222,14 @@ public class Utils {
     }
 
     /**
+     * 获取全零 uuid
+     * @return
+     */
+    public static String getEmptyUUID() {
+        return new UUID(0, 0).toString().replace("-", "");
+    }
+
+    /**
      * 获取 64 位随机数
      *
      * @return

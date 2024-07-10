@@ -77,7 +77,7 @@ public class FTRUMInnerManager {
     /**
      * {@link Constants#KEY_RUM_SESSION_ID}
      */
-    private String sessionId = Utils.randomUUID();
+    private String sessionId = Utils.getEmptyUUID();
 
 
     /**
@@ -1259,6 +1259,7 @@ public class FTRUMInnerManager {
 
     void initParams(FTRUMConfig config) {
         sampleRate = config.getSamplingRate();
+        sessionId = Utils.randomUUID();
         checkSessionKeep(sessionId, sampleRate);
         EventConsumerThreadPool.get().execute(new Runnable() {
             @Override
