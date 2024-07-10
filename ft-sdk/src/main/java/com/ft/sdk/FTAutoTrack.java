@@ -676,7 +676,11 @@ public class FTAutoTrack {
      * @return
      */
     public static OkHttpClient trackOkHttpBuilder(OkHttpClient.Builder builder) {
-        LogUtils.d(TAG, "trackOkHttpBuilder");
+        if (FTSdk.checkInstallState()) {
+            LogUtils.d(TAG, "trackOkHttpBuilder");
+        } else {
+            LogUtils.e(TAG, "trackOkHttpBuilder: OkhttpClient.Build Before SDK install");
+        }
 
 //            builder.addNetworkInterceptor(interceptor); //发现部分工程有兼容问题
         if (FTRUMConfigManager.get().isRumEnable()) {
@@ -693,6 +697,8 @@ public class FTAutoTrack {
                 }
                 if (!hasSetResource) {
                     builder.interceptors().add(0, new FTResourceInterceptor());
+                } else {
+                    LogUtils.d(TAG, "Skip FTResourceInterceptor setting");
                 }
                 FTResourceEventListener.FTFactory factory = FTRUMConfigManager.get().getOverrideEventListener();
                 if (factory != null) {
@@ -715,6 +721,8 @@ public class FTAutoTrack {
             }
             if (!hasSetTrace) {
                 builder.interceptors().add(0, new FTTraceInterceptor());
+            } else {
+                LogUtils.d(TAG, "Skip FTTraceInterceptor setting");
             }
         }
 
