@@ -32,16 +32,24 @@ public class PluginConfigManager {
      * @return
      */
     public int getASMVersion() {
-        String asmVersion = extension.asmVersion;
-        if (asmVersion.equalsIgnoreCase("asm8")) {
-            return Opcodes.ASM8;
-        } else if (asmVersion.equalsIgnoreCase("asm7")) {
-            return Opcodes.ASM7;
+        try {
+            String asmVersion = extension.asmVersion;
+            if (asmVersion.equalsIgnoreCase("asm8")) {
+                return Opcodes.ASM8;
+            } else if (asmVersion.equalsIgnoreCase("asm7")) {
+                return Opcodes.ASM7;
+            }
+        } catch (NullPointerException e) {
+            Logger.debug("Get FTExtension error: using asm9 default.");
         }
+
         return Opcodes.ASM9;
     }
 
     public List<String> getIgnorePackages() {
+        if (extension == null) {
+            Logger.debug("Get FTExtension error: ignore ignorePackages");
+        }
         return extension.ignorePackages;
     }
 }
