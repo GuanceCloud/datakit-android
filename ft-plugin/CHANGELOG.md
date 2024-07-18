@@ -1,3 +1,7 @@
+# plugin 1.3.2-alpha01
+1. 编译容错处理
+
+---
 # plugin 1.3.1
 1. 添加 asmVersion 配置功能，支持 asm7 - asm9，默认为 asm9
 2. 修复了 WebView 子类重写方法在 ASM 写入后导致循环调用，从而无法加载 WebView 内容的问题

@@ -79,8 +79,8 @@ public class FTPlugin implements Plugin<Project> {
             f.configNativeSymbolUpload();
         });
 
-        AndroidComponentsExtension extension = project.getExtensions().getByType(AndroidComponentsExtension.class);
-        extension.onVariants(extension.selector().all(), new Action<Variant>() {
+        AndroidComponentsExtension androidComponents = project.getExtensions().getByType(AndroidComponentsExtension.class);
+        androidComponents.onVariants(androidComponents.selector().all(), new Action<Variant>() {
             @Override
             public void execute(Variant variant) {
                 variant.getInstrumentation()
