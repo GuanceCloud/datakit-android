@@ -66,6 +66,11 @@ public class TrackLog {
     }
 
     /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
+    public static int w(String tag, Throwable e) {
+        return showFullLog(true, tag, LogUtils.getStackTraceString(e), LogType.W);
+    }
+
+    /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
     public static int println(String tag, String msg) {
         return println(true, Log.INFO, tag, msg);
     }
