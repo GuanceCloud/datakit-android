@@ -20,7 +20,6 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,7 +79,7 @@ public class AopUtils {
                 }
             }
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
         }
         return activity;
@@ -130,7 +129,7 @@ public class AopUtils {
             try {
                 return ((Class) object).getSuperclass().getSimpleName();
             } catch (Exception e) {
-                LogUtils.e(TAG, Log.getStackTraceString(e));
+                LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
             }
         }
@@ -175,7 +174,7 @@ public class AopUtils {
             return item.getClass().getSimpleName() + "/" + item.getTitle()
                     + "#" + FTApplication.getApplication().getResources().getResourceEntryName(item.getItemId());
         } catch (Exception e) {
-            LogUtils.d(TAG, Log.getStackTraceString(e));
+            LogUtils.d(TAG, LogUtils.getStackTraceString(e));
         }
         return "";
 

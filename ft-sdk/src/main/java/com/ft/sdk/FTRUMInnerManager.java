@@ -2,7 +2,6 @@ package com.ft.sdk;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 
 import com.ft.sdk.garble.bean.ActionBean;
 import com.ft.sdk.garble.bean.ActiveActionBean;
@@ -78,7 +77,7 @@ public class FTRUMInnerManager {
     /**
      * {@link Constants#KEY_RUM_SESSION_ID}
      */
-    private String sessionId = Utils.randomUUID();
+    private String sessionId = Utils.getEmptyUUID();
 
 
     /**
@@ -137,7 +136,7 @@ public class FTRUMInnerManager {
             lastActionTime = now;
 
             sessionId = Utils.randomUUID();
-            LogUtils.d(TAG, "New SessionId:" + activeView.getSessionId());
+            LogUtils.d(TAG, "New SessionId:" + sessionId);
 
             checkSessionKeep(sessionId, sampleRate);
 
@@ -632,13 +631,19 @@ public class FTRUMInnerManager {
                         });
 
                     } catch (Exception e) {
-                        LogUtils.e(TAG, Log.getStackTraceString(e));
+                        LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+                        if (callBack != null) {
+                            callBack.onComplete();
+                        }
                     }
                 }
             });
 
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+            if (callBack != null) {
+                callBack.onComplete();
+            }
         }
     }
 
@@ -669,7 +674,7 @@ public class FTRUMInnerManager {
             increaseLongTask(tags);
 
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
     }
 
@@ -818,7 +823,8 @@ public class FTRUMInnerManager {
                     Constants.FT_MEASUREMENT_RUM_RESOURCE, tags, fields, null);
 
 
-            if (bean.resourceStatus >= HttpsURLConnection.HTTP_BAD_REQUEST) {
+            if (bean.resourceStatus >= HttpsURLConnection.HTTP_BAD_REQUEST
+                    || (bean.resourceStatus == 0 && !Utils.isNullOrEmpty(bean.errorStack))) {
                 JSONObject errorTags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
                 JSONObject errorField = new JSONObject();
                 errorTags.put(Constants.KEY_RUM_ERROR_TYPE, ErrorType.NETWORK.toString());
@@ -843,7 +849,8 @@ public class FTRUMInnerManager {
                     errorTags.put(Constants.KEY_RUM_RESOURCE_URL_PATH, urlPath);
                     errorTags.put(Constants.KEY_RUM_RESOURCE_URL_PATH_GROUP, urlPathGroup);
                 }
-                String errorMsg = "[" + bean.resourceStatus + "]" + "[" + bean.url + "]";
+                String localErrorMsg = Utils.isNullOrEmpty(bean.errorMsg) ? "" : ":" + bean.errorMsg;
+                String errorMsg = "[" + bean.resourceStatus + localErrorMsg + "]" + "[" + bean.url + "]";
 
                 errorField.put(Constants.KEY_RUM_ERROR_MESSAGE, errorMsg);
                 errorField.put(Constants.KEY_RUM_ERROR_STACK, bean.errorStack);
@@ -856,7 +863,7 @@ public class FTRUMInnerManager {
                 });
             }
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
 
         EventConsumerThreadPool.get().execute(new Runnable() {
@@ -916,7 +923,7 @@ public class FTRUMInnerManager {
             bean.resourceUrlQuery = url.getQuery();
 
         } catch (MalformedURLException | URISyntaxException e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
 
         bean.requestHeader = params.requestHeader;
@@ -930,6 +937,9 @@ public class FTRUMInnerManager {
         bean.resourceSize = params.responseContentLength;
         if (bean.resourceStatus >= HttpsURLConnection.HTTP_BAD_REQUEST) {
             bean.errorStack = params.responseBody == null ? "" : params.responseBody;
+        } else if (bean.resourceStatus == 0 && !Utils.isNullOrEmpty(params.requestErrorStack)) {
+            bean.errorStack = params.requestErrorStack;
+            bean.errorMsg = params.requestErrorMsg;
         }
 
         if (params.property != null) {
@@ -1091,7 +1101,7 @@ public class FTRUMInnerManager {
                 }
             }
         } catch (JSONException e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
     }
 
@@ -1109,12 +1119,12 @@ public class FTRUMInnerManager {
                             FTRUMInnerManager.this.generateActionSum(tags);
                             FTRUMInnerManager.this.generateViewSum(tags);
                         } catch (JSONException e) {
-                            LogUtils.e(TAG, Log.getStackTraceString(e));
+                            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                         }
                     }
                 });
             } catch (Exception e) {
-                LogUtils.e(TAG, Log.getStackTraceString(e));
+                LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
             }
         }
@@ -1168,7 +1178,7 @@ public class FTRUMInnerManager {
                     FTTrackInner.getInstance().rum(bean.getStartTime(),
                             Constants.FT_MEASUREMENT_RUM_ACTION, tags, fields, null);
                 } catch (JSONException e) {
-                    LogUtils.e(TAG, Log.getStackTraceString(e));
+                    LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                 }
             }
             FTDBManager.get().cleanCloseActionData();
@@ -1231,7 +1241,7 @@ public class FTRUMInnerManager {
                         fields.put(Constants.KEY_FPS_MINI, bean.getFpsMini());
                     }
                 } catch (JSONException e) {
-                    LogUtils.e(TAG, Log.getStackTraceString(e));
+                    LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                 }
 
                 FTTrackInner.getInstance().rum(bean.getStartTime(),
@@ -1249,6 +1259,7 @@ public class FTRUMInnerManager {
 
     void initParams(FTRUMConfig config) {
         sampleRate = config.getSamplingRate();
+        sessionId = Utils.randomUUID();
         checkSessionKeep(sessionId, sampleRate);
         EventConsumerThreadPool.get().execute(new Runnable() {
             @Override
@@ -1273,7 +1284,7 @@ public class FTRUMInnerManager {
                     try {
                         notCollectArr.remove(0);
                     } catch (Exception e) {
-                        LogUtils.d(TAG, Log.getStackTraceString(e));
+                        LogUtils.d(TAG, LogUtils.getStackTraceString(e));
                     }
                 }
                 notCollectArr.add(sessionId);

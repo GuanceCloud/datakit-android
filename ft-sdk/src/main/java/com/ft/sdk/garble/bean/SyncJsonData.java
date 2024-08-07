@@ -50,7 +50,13 @@ public class SyncJsonData implements Cloneable {
     }
 
     public void setDataString(String dataString) {
-        this.dataString = dataString;
+        try {
+            this.dataString = dataString;
+
+        } catch (Exception e) {
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+
+        }
     }
 
 

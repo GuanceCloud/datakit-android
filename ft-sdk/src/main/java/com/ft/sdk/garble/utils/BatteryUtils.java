@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
-import android.util.Log;
 
 import com.ft.sdk.garble.bean.BatteryBean;
 
@@ -30,7 +29,7 @@ public class BatteryUtils {
             int value = manager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);//当前电量剩余百分比
             capacity = (100 - value);
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
         return capacity;
     }
@@ -46,7 +45,7 @@ public class BatteryUtils {
             BatteryManager manager = (BatteryManager) context.getSystemService(Context.BATTERY_SERVICE);
             return manager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_NOW) / 1000;
         } catch (Exception e) {
-
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
         return 0;
     }
@@ -68,7 +67,7 @@ public class BatteryUtils {
             mPowerProfile = Class.forName(POWER_PROFILE_CLASS).getConstructor(Context.class).newInstance(context);
             batteryCapacity = (double) Class.forName(POWER_PROFILE_CLASS).getMethod("getBatteryCapacity").invoke(mPowerProfile);
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
         if (batteryCapacity == 0) {
             return "";

@@ -1,7 +1,5 @@
 package com.ft.sdk;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.FTDBCachePolicy;
@@ -166,7 +164,7 @@ public class FTTrackInner {
                     }
                     SyncTaskManager.get().executeSyncPoll();
                 } catch (Exception e) {
-                    LogUtils.e(TAG, Log.getStackTraceString(e));
+                    LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                 }
             }
         });
@@ -206,7 +204,7 @@ public class FTTrackInner {
                             callback.onResponse(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, e.getMessage(), "");
                         }
                     }
-                    LogUtils.e(TAG, Log.getStackTraceString(e));
+                    LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                 }
             }
         });
@@ -258,13 +256,13 @@ public class FTTrackInner {
                         LogUtils.d(TAG, "根据 FTLogConfig SampleRate 计算，将被丢弃=>" + logBean.getContent());
                     }
                 } catch (Exception e) {
-                    LogUtils.e(TAG, Log.getStackTraceString(e));
+                    LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                 }
 
             }
             judgeLogCachePolicy(datas, isSilence);
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
 
     }

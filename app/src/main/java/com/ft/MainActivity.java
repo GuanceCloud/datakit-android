@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.main_mock_log_btn).setOnClickListener(v -> {
             Log.e(TAG, "console log");
             Log.d(TAG, "console log");
+            Log.w(TAG,new Exception());
             FTLogger.getInstance().logBackground("custom Log", Status.ERROR);
             FTLogger.getInstance().logBackground("custom status Log","customType");
         });
@@ -226,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             @IgnoreAOP
             public void onClick(View v) {
-
+                startActivity(new Intent(MainActivity.this, IgnoreClassActivity.class));
             }
         });
 

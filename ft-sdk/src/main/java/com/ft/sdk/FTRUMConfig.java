@@ -83,6 +83,21 @@ public class FTRUMConfig {
     private String serviceName = Constants.DEFAULT_SERVICE_NAME;
 
     /**
+     * Java Crash 时 logcat 附属信息
+     */
+    private ExtraLogCatSetting extraLogCatWithJavaCrash;
+
+    /**
+     * Native Crash 时 logcat 附属信息
+     */
+    private ExtraLogCatSetting extraLogCatWithNativeCrash;
+
+    /**
+     * ANR  时 logcat 附属信息
+     */
+    private ExtraLogCatSetting extraLogCatWithANR;
+
+    /**
      * 获取采样率
      *
      * @return 采样率，浮点，0～1
@@ -149,6 +164,23 @@ public class FTRUMConfig {
         return this;
     }
 
+    /**
+     * 设置是否监测 App 崩溃
+     *
+     * @param enableTrackAppCrash        是否开启 Crash 最总
+     * @param extraLogCatWithJavaCrash   Java Crash 附加配置 logcat
+     * @param extraLogCatWithNativeCrash Native Crash 附加配置 logcat
+     * @return
+     */
+    public FTRUMConfig setEnableTrackAppCrash(boolean enableTrackAppCrash,
+                                              ExtraLogCatSetting extraLogCatWithJavaCrash,
+                                              ExtraLogCatSetting extraLogCatWithNativeCrash) {
+        this.enableTrackAppCrash = enableTrackAppCrash;
+        this.extraLogCatWithJavaCrash = extraLogCatWithJavaCrash;
+        this.extraLogCatWithNativeCrash = extraLogCatWithNativeCrash;
+        return this;
+    }
+
     public boolean isEnableTrackAppUIBlock() {
         return enableTrackAppUIBlock;
     }
@@ -168,8 +200,28 @@ public class FTRUMConfig {
         return enableTrackAppANR;
     }
 
+    /**
+     * 是否开启 ANR 检测，默认为 false
+     *
+     * @param enableTrackAppANR
+     * @return
+     */
+
     public FTRUMConfig setEnableTrackAppANR(boolean enableTrackAppANR) {
         this.enableTrackAppANR = enableTrackAppANR;
+        return this;
+    }
+
+    /**
+     * 是否开启 ANR 检测，默认为 false
+     *
+     * @param enableTrackAppANR
+     * @param extraLogCatWithANR ANR Crash 附加配置 logcat
+     * @return
+     */
+    public FTRUMConfig setEnableTrackAppANR(boolean enableTrackAppANR, ExtraLogCatSetting extraLogCatWithANR) {
+        this.enableTrackAppANR = enableTrackAppANR;
+        this.extraLogCatWithANR = extraLogCatWithANR;
         return this;
     }
 
@@ -323,6 +375,17 @@ public class FTRUMConfig {
         return this.enableResourceHostIP;
     }
 
+    public ExtraLogCatSetting getExtraLogCatWithJavaCrash() {
+        return extraLogCatWithJavaCrash;
+    }
+
+    public ExtraLogCatSetting getExtraLogCatWithNativeCrash() {
+        return extraLogCatWithNativeCrash;
+    }
+
+    public ExtraLogCatSetting getExtraLogCatWithANR() {
+        return extraLogCatWithANR;
+    }
 
     //    /**
 //     * 设置 BackendSample 后端采样，当为 true 时，rum sampleRate 设置不再起效

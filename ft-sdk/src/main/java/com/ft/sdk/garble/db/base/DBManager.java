@@ -2,7 +2,6 @@ package com.ft.sdk.garble.db.base;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -46,7 +45,7 @@ public abstract class DBManager {
                     //db.close();
                 }
             } catch (Exception e) {
-                LogUtils.e(TAG, Log.getStackTraceString(e));
+                LogUtils.e(TAG, LogUtils.getStackTraceString(e));
             }
         }
     }

@@ -1,7 +1,5 @@
 package com.ft.sdk;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.bean.AppState;
@@ -17,7 +15,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 
@@ -60,8 +57,13 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
      */
     public static final String NATIVE_CALLBACK_VERSION = "1.1.0-alpha01";
 
+    /**
+     * 可以接受 native logcat 行数限制的版本
+     */
+    public static final String NATIVE_LOGCAT_SETTING_VERSION = "1.1.1-alpha01";
+
     private static FTExceptionHandler instance;
-    private final Thread.UncaughtExceptionHandler mDefaultExceptionHandler;
+    private Thread.UncaughtExceptionHandler mDefaultExceptionHandler;
     /**
      * 注意 ：AndroidTest 会调用这个方法 {@link com.ft.test.base.FTBaseTest#avoidCrash()}
      */
@@ -78,16 +80,11 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
      * @param callBack
      */
     public void uploadCrashLog(String crash, String message, AppState state, RunnerCompleteCallBack callBack) {
-        if (config.isRumEnable() &&
-                config.isEnableTrackAppCrash()) {
-            long dateline = Utils.getCurrentNanoTime();
-            FTRUMInnerManager.get().addError(crash, message, dateline, ErrorType.JAVA.toString(), state, callBack);
-        }
+        long dateline = Utils.getCurrentNanoTime();
+        FTRUMInnerManager.get().addError(crash, message, dateline, ErrorType.JAVA.toString(), state, callBack);
     }
 
     private FTExceptionHandler() {
-        mDefaultExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
-        Thread.setDefaultUncaughtExceptionHandler(this);
     }
 
     public static FTExceptionHandler get() {
@@ -106,6 +103,14 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
      */
     void initConfig(FTRUMConfig config) {
         this.config = config;
+        if (config.isRumEnable() &&
+                config.isEnableTrackAppCrash()) {
+            mDefaultExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
+            //避免重复设置
+            if (!(mDefaultExceptionHandler instanceof FTExceptionHandler)) {
+                Thread.setDefaultUncaughtExceptionHandler(this);
+            }
+        }
     }
 
 
@@ -121,7 +126,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
      */
     @Override
     public void uncaughtException(@NonNull Thread t, @NonNull Throwable e) {
-        Writer writer = new StringWriter();
+        StringWriter writer = new StringWriter();
         PrintWriter printWriter = new PrintWriter(writer);
         e.printStackTrace(printWriter);
         Throwable cause = e.getCause();
@@ -130,8 +135,16 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
             cause = cause.getCause();
         }
         printWriter.close();
-        String result = writer.toString();
-        uploadCrashLog(result, e.getMessage(), FTActivityManager.get().getAppState(), new RunnerCompleteCallBack() {
+        writer.append("\n").append(Utils.getAllThreadStack());
+        ExtraLogCatSetting logCatWithError = config.getExtraLogCatWithJavaCrash();
+        if (logCatWithError != null) {
+            writer.append("\n")
+                    .append(Utils.getLogcat(logCatWithError.getLogcatMainLines(),
+                            logCatWithError.getLogcatSystemLines(),
+                            logCatWithError.getLogcatEventsLines()));
+        }
+
+        uploadCrashLog(writer.toString(), e.getMessage(), FTActivityManager.get().getAppState(), new RunnerCompleteCallBack() {
             @Override
             public void onComplete() {
                 //测试用例直接
@@ -140,13 +153,6 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
                 } else {
                     if (mDefaultExceptionHandler != null) {
                         mDefaultExceptionHandler.uncaughtException(t, e);
-                    } else {
-                        try {
-                            android.os.Process.killProcess(android.os.Process.myPid());
-                            System.exit(10);
-                        } catch (Exception ex2) {
-
-                        }
                     }
                 }
             }
@@ -177,7 +183,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
                                 uploadNativeCrash(item, AppState.getValueFrom(value), true, callBack);
                                 Utils.deleteFile(item.getAbsolutePath());
                             } catch (IOException e) {
-                                LogUtils.e(TAG, Log.getStackTraceString(e));
+                                LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                             }
                         }
                     }
@@ -204,7 +210,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
                 try {
                     uploadNativeCrash(item, state, isPreCrash, callBack);
                 } catch (Exception e) {
-                    LogUtils.e(TAG, Log.getStackTraceString(e));
+                    LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                     if (callBack != null) {
                         callBack.onComplete();
                     }

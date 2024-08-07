@@ -1,6 +1,5 @@
 package com.ft.sdk.garble.bean;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -62,6 +61,15 @@ public class ResourceParams {
      * http 返回 code
      */
     public int resourceStatus = 0;
+
+    /**
+     *  请求错误
+     */
+    public String requestErrorStack ="";
+    /**
+     * 错误消息
+     */
+    public String requestErrorMsg ="";
 
     /**
      * 附加属性参数

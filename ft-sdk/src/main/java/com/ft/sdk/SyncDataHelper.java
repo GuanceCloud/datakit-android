@@ -3,8 +3,6 @@ package com.ft.sdk;
 import static com.ft.sdk.garble.utils.Constants.FT_KEY_VALUE_NULL;
 import static com.ft.sdk.garble.utils.Constants.KEY_SDK_DATA_FLAG;
 
-import android.util.Log;
-
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.utils.Constants;
@@ -178,7 +176,7 @@ public class SyncDataHelper {
             sb.append(data.getTime());
             sb.append(multiLine ? Constants.SEPARATION_LINE_BREAK : Constants.SEPARATION_REAL_LINE_BREAK);
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
         return sb.toString();
     }

@@ -4,7 +4,6 @@ package com.ft.sdk;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -219,7 +218,7 @@ public class SyncTaskManager {
                         if (e instanceof FTNetworkNoAvailableException) {
                             LogUtils.e(TAG, "Sync Fail-Network not available Stop poll");
                         } else {
-                            LogUtils.e(TAG, "Sync Fail:\n" + Log.getStackTraceString(e));
+                            LogUtils.e(TAG, "Sync Fail:\n" + LogUtils.getStackTraceString(e));
 
                         }
                     } finally {
@@ -312,7 +311,7 @@ public class SyncTaskManager {
                                 SyncTaskManager.this.reInsertData(requestDataList);
                                 Thread.sleep((long) errorCount.get() * RETRY_DELAY_SLEEP_TIME);
                             } catch (InterruptedException e) {
-                                LogUtils.e(TAG, Log.getStackTraceString(e));
+                                LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                             }
                         }
                     }
@@ -337,7 +336,7 @@ public class SyncTaskManager {
                 try {
                     Thread.sleep(syncSleepTime);
                 } catch (InterruptedException e) {
-                    LogUtils.d(TAG, Log.getStackTraceString(e));
+                    LogUtils.d(TAG, LogUtils.getStackTraceString(e));
                 }
             }
 
@@ -428,7 +427,7 @@ public class SyncTaskManager {
         try {
             syncCallback.onResponse(result.getCode(), result.getMessage(), result.getErrorCode());
         } catch (Exception e) {
-            LogUtils.e(TAG, "requestNet：\n" + Log.getStackTraceString(e));
+            LogUtils.e(TAG, "requestNet：\n" + LogUtils.getStackTraceString(e));
             syncCallback.onResponse(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, e.getLocalizedMessage(), "");
         }
 

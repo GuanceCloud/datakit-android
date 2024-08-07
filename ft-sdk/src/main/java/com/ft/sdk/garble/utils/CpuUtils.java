@@ -2,7 +2,6 @@ package com.ft.sdk.garble.utils;
 
 import android.os.Process;
 import android.text.TextUtils;
-import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -95,7 +94,7 @@ public class CpuUtils {
                 }
             }
         } catch (IOException e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
         } finally {
             if (process != null) {
@@ -107,6 +106,7 @@ public class CpuUtils {
 
     /**
      * 获取 CPU 索引
+     *
      * @param line
      * @return
      */

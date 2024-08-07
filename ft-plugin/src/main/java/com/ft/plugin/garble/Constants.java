@@ -20,6 +20,11 @@ public class Constants {
     public static final String FT_NATIVE_PACKAGE = "ftnative/";
 
     /**
+     * TingYun 路径
+     */
+    public static final String CLASS_NAME_TING_YUN_PACKAGE = "com/networkbench";
+
+    /**
      * SDK 中的插桩类
      */
     public static final String FT_SDK_HOOK_CLASS = "com/ft/sdk/FTAutoTrack";
@@ -77,21 +82,23 @@ public class Constants {
      */
     public static final String METHOD_DESC_S_T_I = "(Ljava/lang/String;Ljava/lang/Throwable;)I";
     /**
-     * void fun(String url)
-     */
-    public static final String METHOD_DESC_S_V = "(Ljava/lang/String;)V";
-    /**
      * View
      */
     public static final String VIEW_DESC = "Landroid/view/View;";
-    /**
-     * OKHttp-Builder
-     */
-    public static final String OKHTTP_BUILDER_DESC = "Lokhttp3/OkHttpClient$Builder;";
-
 
     /**
      * 用于形成 application_uuid ，一次 build 会生成一个固定的 uuid
      */
     public static final String PACKAGE_UUID = UUID.randomUUID().toString();
+
+    /**
+     * ft-sdk 中 {@link com.ft.sdk.garble.annotation.IgnoreAOP} ASM 字节码写入标记
+     */
+    public static final String IGNORE_ANNOTATION = "Lcom/ft/sdk/garble/annotation/IgnoreAOP;";
+
+    /**
+     * 类内部 super 方式访问的方法的名
+     */
+    public static final String INNER_CLASS_METHOD_PREFIX = "access$";
+
 }
