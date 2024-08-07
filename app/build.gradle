@@ -1,11 +1,5 @@
 apply plugin: 'com.android.application'
 //apply plugin: 'com.guardsquare.proguard'
-//apply plugin: 'com.sensorsdata.analytics.android'
-// Make sure that you have the Google services Gradle plugin
-apply plugin: 'com.google.gms.google-services'
-
-// Add the Crashlytics Gradle plugin
-apply plugin: 'com.google.firebase.crashlytics'
 
 android {
     compileSdk 34
@@ -34,16 +28,6 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
-
-//            firebaseCrashlytics {
-//                // Enable processing and uploading of native symbols to Firebase servers.
-//                // By default, this is disabled to improve build speeds.
-//                // This flag must be enabled to see properly-symbolicated native
-//                // stack traces in the Crashlytics dashboard.
-//                nativeSymbolUploadEnabled true
-//                unstrippedNativeLibsDir 'ft-native/libs'
-//            }
-
         }
         debug {
             //gradlew createDebugCoverageReport 测试用例覆盖率报告
@@ -51,8 +35,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     sourceSets {
         main {
@@ -112,19 +96,6 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.google.android.material:material:1.1.0'
 
-    implementation 'com.umeng.umsdk:common:9.6.8'
-    implementation 'com.umeng.umsdk:asms:1.8.2'
-    implementation 'com.umeng.umsdk:apm:1.9.5'
-    implementation 'com.tencent.bugly:crashreport:latest.release'
-    implementation 'com.sensorsdata.analytics.android:SensorsAnalyticsSDK:6.8.0'
-    implementation 'io.sentry:sentry-android:7.8.0'
-
-    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
-    implementation 'com.google.firebase:firebase-crashlytics-ktx'
-    implementation 'com.google.firebase:firebase-analytics-ktx'
-    implementation 'com.networkbench:tingyun-ea-agent-android:2.17.4'
-
-    testImplementation 'org.mockito:mockito-core:3.4.6'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation project(':ft-test')
     androidTestImplementation 'androidx.test:runner:1.5.2'
@@ -136,6 +107,8 @@ dependencies {
 //    implementation 'com.cloudcare.ft.mobile.sdk.tracker.agent:ft-sdk:1.3.16-alpha04'
     implementation project(":ft-sdk")
     implementation project(":ft-native")
+//    implementation project(":ft-session-replay")
+    implementation project(":ft-session-replay-material")
 
     implementation 'com.squareup.okhttp3:okhttp:4.5.0'
 
@@ -143,10 +116,6 @@ dependencies {
 //    debugImplementation 'com.amitshekhar.android:debug-db-encrypt:1.0.6'
 }
 
-
-//sensorsAnalytics {
-//    debug = true
-//}
 
 apply plugin: 'ft-plugin'
 
@@ -159,7 +128,6 @@ FTExt {
     datawayToken = ft_env.datawayToken
     appId = ft_env.rumAppid
     env = 'common'
-//    ignorePackages=['com.ft.http']
 
     prodFlavors {
         prodTest {

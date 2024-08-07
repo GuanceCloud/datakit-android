@@ -1,48 +1,3 @@
-# agent 1.5.2-alpha03
- 1. 修复 setEnableTrackAppCrash(false) 时 exception rethrow 问题
-
----
-# agent 1.5.2-beta02
-1. 补充 resource 本地网络错误的简单描述
-
----
-# agent 1.5.2-beta01
-1. 同 agent 1.5.2-alpha02
-
----
-# agent 1.5.2-alpha02
-1. resource 添加本地网络错误类型的提示
-
----
-# agent 1.5.1
-1. Java Crash 及 ANR 补充其他线程代码堆栈
-2. Java Crash，Native Crash，ANR 添加附加 logcat 配置功能
-3. 修复长 session 且无 action 更新场景下，频繁更新 session_id 的问题
-
----
-# agent 1.5.1-beta02
-1. 添加 logcat Native Crash 和 ANR 配置功能
-2. logcat 输出格式优化
-
----
-# agent 1.5.1-beta01
-1. 同 agent 1.5.1-alpha03
-
----
-# agent 1.5.1-alpha03
-1. ANR 及 Java Crash 补充其他线程代码堆栈
-2. Java Crash 添加附加 logcat 功能
-3. 处理 session_id 刷新偶现异常问题
-
----
-# agent 1.5.1-alpha02
-1. 优化长时间场景下 session_id 刷新机制
-
----
-# agent 1.5.1-alpha01
-1. 修复长 session 且无 action 更新场景下，频繁更新 session_id 的问题
-
----
 # agent 1.5.0
 1. RUM resource 网络请求添加 remote ip 地址解析功能
 2. 修复开启 RUM SampleRate 后，高并发网路请求引发的数组线程安全问题
@@ -342,6 +297,10 @@
 # agent 1.3.9-beta01
 1. 测试用例适配优化
 2. 补充文档注释
+
+---
+# agent 1.3.9-alpha03
+1.添加 session replay 功能
 
 ---
 # agent 1.3.9-alpha02

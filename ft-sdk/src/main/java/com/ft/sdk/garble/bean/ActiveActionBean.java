@@ -4,8 +4,8 @@ import com.ft.sdk.garble.utils.Utils;
 
 /**
  * 当前激活 {@link ActionBean}
- *
- *  一个应用同一时间只会存在一个 ActiveActionBean
+ * <p>
+ * 一个应用同一时间只会存在一个 ActiveActionBean
  *
  * @author Brandon
  */
@@ -81,6 +81,7 @@ public class ActiveActionBean extends ActionBean {
         bean.viewId = this.viewId;
         bean.viewName = this.viewName;
         bean.viewReferrer = this.viewReferrer;
+        bean.hasReplay = this.hasReplay;
         bean.property = this.property;
         return bean;
     }

@@ -79,6 +79,12 @@
             android:text="自定义 RUM LOG" />
 
         <Button
+            android:id="@+id/main_session_replay_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="session replay" />
+
+        <Button
             android:id="@+id/main_aop_ignore"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

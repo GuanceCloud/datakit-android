@@ -130,6 +130,11 @@ public class Constants {
     public static final String URL_MODEL_TRACING = "v1/write/tracing";
 
     /**
+     *
+     */
+    public static final String URL_MODEL_SESSION_REPLAY = "v1/write/rum/replay";
+
+    /**
      * 默认服务名，字段 service
      */
     public static final String DEFAULT_SERVICE_NAME = "df_rum_android";
@@ -215,6 +220,9 @@ public class Constants {
      * 当前应用 battery 最大消耗量
      */
     public static final String KEY_BATTERY_CURRENT_MAX = "battery_current_max";
+
+
+    public static final String KEY_HAS_REPLAY = "session_has_replay";
 
     /* <======= 页面周期 end */
 
@@ -306,7 +314,7 @@ public class Constants {
      */
     public static final String KEY_DEVICE_LOCALE = "locale";
     /**
-     *  点击事件
+     * 点击事件
      */
     public static final String EVENT_NAME_CLICK = "click";
 
@@ -600,6 +608,11 @@ public class Constants {
      * 行协议数据，附加属性
      */
     public static final String KEY_RUM_PROPERTY = "property";
+
+    public static final String SESSION_REPLAY_BUS_MESSAGE_TYPE_KEY = "type";
+    public static final String RUM_SESSION_RENEWED_BUS_MESSAGE = "rum_session_renewed";
+    public static final String RUM_KEEP_SESSION_BUS_MESSAGE_KEY = "keepSession";
+    public static final String RUM_SESSION_ID_BUS_MESSAGE_KEY = "sessionId";
 
     /**
      * 冷启动，action_type

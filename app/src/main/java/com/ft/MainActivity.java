@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
             Log.e(TAG, "console log");
             Log.d(TAG, "console log");
             FTLogger.getInstance().logBackground("custom Log", Status.ERROR);
-            FTLogger.getInstance().logBackground("custom status Log","customType");
+            FTLogger.getInstance().logBackground("custom status Log", "customType");
         });
 
         findViewById(R.id.main_mock_okhttp_btn).setOnClickListener(v -> {
@@ -184,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
                             ResponseBody responseBody = response.body();
                             if (responseBody != null) {
                                 //这里需要消费，event listener 才会被调用
-                               String string = responseBody.string();
+                                String string = responseBody.string();
                             }
 
                         } catch (IOException e) {
@@ -260,6 +260,13 @@ public class MainActivity extends AppCompatActivity {
 //                } else {
 //                    Toast.makeText(MainActivity.this, "需要先更改 LAZY_INIT 为 true", Toast.LENGTH_SHORT).show();
 //                }
+            }
+        });
+
+        findViewById(R.id.main_session_replay_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, SessionReplayActivity.class));
             }
         });
 

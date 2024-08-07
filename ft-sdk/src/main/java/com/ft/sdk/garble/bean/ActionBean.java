@@ -80,6 +80,8 @@ public class ActionBean {
      */
     String viewReferrer;
 
+    boolean hasReplay;
+
     /**
      * Action 附加属性,{@link  Constants#KEY_RUM_PROPERTY}
      */
@@ -199,6 +201,10 @@ public class ActionBean {
         this.viewReferrer = viewReferrer;
     }
 
+    public void setHasReplay(boolean hasReplay) {
+        this.hasReplay = hasReplay;
+    }
+
     /**
      * 将 action 属性数据转化为 json 字符，在数据存入本地缓存时写入
      *
@@ -207,6 +213,7 @@ public class ActionBean {
     public String getAttrJsonString() {
         HashMap<String, Object> map = new HashMap<>();
         map.put(Constants.KEY_RUM_PROPERTY, property);
+        map.put(Constants.KEY_HAS_REPLAY, hasReplay);
         return Utils.hashMapObjectToJson(map);
     }
 
@@ -229,7 +236,7 @@ public class ActionBean {
                     this.property.put(key, jsonProperty.opt(key));
                 }
             }
-
+            this.hasReplay = json.optBoolean(Constants.KEY_HAS_REPLAY, false);
         } catch (JSONException e) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
