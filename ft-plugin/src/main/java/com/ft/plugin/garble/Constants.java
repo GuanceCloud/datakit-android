@@ -37,6 +37,17 @@ public class Constants {
      * Android WebView 类名
      */
     public static final String CLASS_NAME_WEBVIEW = "android/webkit/WebView";
+
+    /**
+     * React Native WebView 类名
+     */
+    public static final String CLASS_NAME_RN_WEBVIEW = "com/reactnativecommunity/webview/RNCWebView";
+
+    /**
+     * Tencent WebView
+     */
+    public static final String CLASS_NAME_TENCENT_WEBVIEW = "com/tencent/smtt/sdk/WebView";
+
     /**
      * Tencent SDK 路径
      */

@@ -212,6 +212,8 @@ public class FTMethodAdapter extends AdviceAdapter {
                 break;
 
             case Constants.CLASS_NAME_WEBVIEW:
+            case Constants.CLASS_NAME_RN_WEBVIEW:
+            case Constants.CLASS_NAME_TENCENT_WEBVIEW:
                 String method = name + desc;
                 if (TARGET_WEBVIEW_METHOD.contains(method)) {
                     if (nameDesc.startsWith(Constants.INNER_CLASS_METHOD_PREFIX)) {
