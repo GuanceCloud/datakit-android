@@ -19,7 +19,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 
 public class WebViewActivity extends AppCompatActivity {
-    private CustomWebView webView;
+    private WebView webView;         // visit
+//    private CustomWebView webView; // visit skip
     private Spinner spinner;
     private ProgressBar progressBar;
 

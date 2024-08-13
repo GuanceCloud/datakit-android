@@ -1,3 +1,7 @@
+# plugin 1.3.2
+1. 支持 React Native WebView 事件自动捕获
+
+---
 # plugin 1.3.2-alpha01
 1. 编译容错处理
 

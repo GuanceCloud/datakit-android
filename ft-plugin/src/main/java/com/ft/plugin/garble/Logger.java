@@ -17,6 +17,7 @@ public class Logger {
 
     public static void setDebug(boolean debug) {
         Logger.debug = debug;
+        System.out.println(TAG + "setDebug:" + debug);
     }
 
     /**
