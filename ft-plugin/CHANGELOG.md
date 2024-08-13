@@ -1,3 +1,7 @@
+# plugin 1.1.8
+1. 支持 React Native WebView 事件自动捕获
+
+---
 # plugin 1.1.7
 1. 修复了 WebView 子类重写方法在 ASM 写入后导致循环调用，从而无法加载 WebView 内容的问题
    (涉及方法 loadUrl、loadData、loadDataWithBaseURL、 postUrl)
