@@ -5,7 +5,6 @@ import static com.ft.sdk.FTApplication.getApplication;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -133,7 +132,7 @@ public class FTRUMConfigManager {
                         try {
                             latch.await();
                         } catch (InterruptedException e) {
-                            LogUtils.e(TAG, Log.getStackTraceString(e));
+                            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                         }
                     }
                 };

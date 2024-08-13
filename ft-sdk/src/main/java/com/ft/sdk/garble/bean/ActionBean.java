@@ -1,7 +1,5 @@
 package com.ft.sdk.garble.bean;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.FTRUMInnerManager;
@@ -203,6 +201,7 @@ public class ActionBean {
 
     /**
      * 将 action 属性数据转化为 json 字符，在数据存入本地缓存时写入
+     *
      * @return
      */
     public String getAttrJsonString() {
@@ -213,6 +212,7 @@ public class ActionBean {
 
     /**
      * json 数据重新序列化，在数据从本地缓存取出时调用
+     *
      * @param jsonString
      */
     public void setFromAttrJsonString(String jsonString) {
@@ -231,7 +231,7 @@ public class ActionBean {
             }
 
         } catch (JSONException e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
         }
 

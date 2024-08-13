@@ -2,6 +2,7 @@ package com.ft.plugin.garble;
 
 import org.objectweb.asm.Opcodes;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,16 +33,25 @@ public class PluginConfigManager {
      * @return
      */
     public int getASMVersion() {
-        String asmVersion = extension.asmVersion;
-        if (asmVersion.equalsIgnoreCase("asm8")) {
-            return Opcodes.ASM8;
-        } else if (asmVersion.equalsIgnoreCase("asm7")) {
-            return Opcodes.ASM7;
+        try {
+            String asmVersion = extension.asmVersion;
+            if (asmVersion.equalsIgnoreCase("asm8")) {
+                return Opcodes.ASM8;
+            } else if (asmVersion.equalsIgnoreCase("asm7")) {
+                return Opcodes.ASM7;
+            }
+        } catch (NullPointerException e) {
+            Logger.error("Get FTExtension error: using asm9 default.");
         }
+
         return Opcodes.ASM9;
     }
 
     public List<String> getIgnorePackages() {
+        if (extension == null) {
+            Logger.error("Get FTExtension error: ignore ignorePackages");
+            return new ArrayList<>();
+        }
         return extension.ignorePackages;
     }
 }

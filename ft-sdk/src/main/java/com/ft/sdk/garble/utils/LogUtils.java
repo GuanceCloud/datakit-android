@@ -10,6 +10,9 @@ import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.garble.manager.LogFileHelper;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 /**
  * BY huangDianHua
@@ -110,7 +113,6 @@ public class LogUtils {
      * <p>
      * {@link FTLogger}，如果使用 FTLogger level 为 D level 的日志会导致死循环，因为数据写入就会生成相关 Inner Debug
      *
-     *
      * @param innerLogHandler
      */
     public static void registerInnerLogHandler(FTInnerLogHandler innerLogHandler) {
@@ -183,6 +185,76 @@ public class LogUtils {
     public static void registerInnerLogCacheToFile() {
         String filePath = FTApplication.getApplication().getFilesDir().toString() + File.separator + DEFAULT_INNER_LOG_FILE;
         registerInnerLogCacheToFile(new File(filePath));
+    }
+
+
+    /**
+     * {@link android.util.Log#getStackTraceString(Throwable)} 去掉 UnknownHostException 排除逻辑
+     *
+     * @param tr
+     * @return
+     */
+    public static String getStackTraceString(Throwable tr) {
+        if (tr == null) {
+            return "";
+        }
+
+        // This is to reduce the amount of log spew that apps do in the non-error
+        // condition of the network being unavailable.
+//        Throwable t = tr;
+//        while (t != null) {
+////            if (t instanceof UnknownHostException) {
+////                return "";
+////            }
+//            t = t.getCause();
+//        }
+
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new FastPrintWriter(sw, false, 256);
+        tr.printStackTrace(pw);
+        pw.flush();
+        return sw.toString();
+    }
+
+    /**
+     *
+     * 获取网络错误描述
+     *
+     * @param e 网络请求发生的 IOException
+     * @return
+     */
+    public static String getNetworkExceptionDesc(IOException e) {
+        if (e instanceof java.net.SocketTimeoutException) {
+            return "Network Timeout";
+        } else if (e instanceof java.net.UnknownHostException) {
+            return "Unknown Host";
+        } else if (e instanceof java.net.ConnectException) {
+            return "Connection Refused";
+        } else if (e instanceof javax.net.ssl.SSLHandshakeException) {
+            return "SSL Handshake Failed";
+        } else if (e instanceof javax.net.ssl.SSLPeerUnverifiedException) {
+            return "SSL Peer Unverified";
+        } else if (e instanceof java.net.ProtocolException) {
+            return "Protocol Error";
+        } else if (e instanceof java.io.InterruptedIOException) {
+            return "Request Interrupted";
+        } else if (e instanceof java.io.EOFException) {
+            return "Connection Closed Prematurely";
+        } else if (e instanceof java.net.NoRouteToHostException) {
+            return "No Route to Host";
+        } else if (e instanceof java.net.BindException) {
+            return "Address Already in Use";
+        } else if (e instanceof java.net.PortUnreachableException) {
+            return "Port Unreachable";
+        } else if (e instanceof java.net.MalformedURLException) {
+            return "Malformed URL";
+        } else if (e instanceof java.net.HttpRetryException) {
+            return "HTTP Retry Required";
+        } else if (e instanceof java.net.UnknownServiceException) {
+            return "Unknown Service";
+        } else {
+            return "";
+        }
     }
 
 

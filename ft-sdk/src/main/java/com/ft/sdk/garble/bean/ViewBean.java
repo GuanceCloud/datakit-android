@@ -1,7 +1,5 @@
 package com.ft.sdk.garble.bean;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.FTRUMInnerManager;
@@ -350,7 +348,7 @@ public class ViewBean {
                 }
             }
         } catch (JSONException e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
 
     }

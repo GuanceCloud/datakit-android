@@ -1,3 +1,24 @@
+# agent 1.5.3-alpha01
+1. 处理在使用 ft-plugin 时，调用 Log.w(String,Throwable) 引发异常的问题
+
+---
+# agent 1.5.2
+1. Error network_error 添加本地网络错误类型的提示，用于补充说明 Resource 数据中 resource_status=0 场景
+2. 修复 setEnableTrackAppCrash(false) 时 uncaughtException rethrow 传递问题
+
+---
+# agent 1.5.2-beta03
+1. 同 agent 1.5.2-alpha03
+
+---
+# agent 1.5.2-alpha03
+ 1. 修复 setEnableTrackAppCrash(false) 时 uncaughtException rethrow 传递问题
+
+---
+# agent 1.5.2-beta02
+1. 补充 resource 本地网络错误的简单描述
+
+---
 # agent 1.5.2-beta01
 1. 同 agent 1.5.2-alpha02
 

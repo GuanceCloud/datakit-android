@@ -66,6 +66,10 @@ public class ResourceParams {
      *  请求错误
      */
     public String requestErrorStack ="";
+    /**
+     * 错误消息
+     */
+    public String requestErrorMsg ="";
 
     /**
      * 附加属性参数

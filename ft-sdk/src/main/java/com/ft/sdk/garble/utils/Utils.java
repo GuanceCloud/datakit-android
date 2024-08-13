@@ -16,7 +16,6 @@ import android.os.Build;
 import android.os.Process;
 import android.text.TextUtils;
 import android.util.Base64;
-import android.util.Log;
 
 import com.ft.sdk.FTApplication;
 import com.google.gson.Gson;
@@ -150,7 +149,7 @@ public class Utils {
             info = manager.getPackageInfo(FTApplication.getApplication().getPackageName(), 0);
             return info.versionName;
         } catch (PackageManager.NameNotFoundException e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
             return "";
         }
     }
@@ -220,6 +219,14 @@ public class Utils {
      */
     public static String randomUUID() {
         return UUID.randomUUID().toString().replace("-", "");
+    }
+
+    /**
+     * 获取全零 uuid
+     * @return
+     */
+    public static String getEmptyUUID() {
+        return new UUID(0, 0).toString().replace("-", "");
     }
 
     /**
@@ -455,7 +462,7 @@ public class Utils {
                 }
             }
         } catch (Exception e) {
-            LogUtils.e(TAGS, Log.getStackTraceString(e));
+            LogUtils.e(TAGS, LogUtils.getStackTraceString(e));
         }
         return value;
     }
@@ -487,7 +494,7 @@ public class Utils {
             try {
                 contentLength = body.contentLength();
             } catch (IOException e) {
-                LogUtils.e(TAG, Log.getStackTraceString(e));
+                LogUtils.e(TAG, LogUtils.getStackTraceString(e));
             }
             String contentType = body.contentType() == null ? "" : body.contentType().toString();
             return method + "_" + url + "_" + contentType + "_" + contentLength;
@@ -615,7 +622,7 @@ public class Utils {
             }
             jsonBuilder.append("}");
         } catch (Exception e) {
-            LogUtils.d(TAG, Log.getStackTraceString(e));
+            LogUtils.d(TAG, LogUtils.getStackTraceString(e));
             return "";
         }
         return jsonBuilder.toString();
@@ -773,7 +780,7 @@ public class Utils {
         try {
             stack = StringUtils.getThreadAllStackTrace(Thread.getAllStackTraces());
         } catch (Exception e) {
-            LogUtils.e(TAG, Log.getStackTraceString(e));
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
         return stack;
     }
