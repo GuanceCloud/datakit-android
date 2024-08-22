@@ -5,7 +5,6 @@ import androidx.annotation.NonNull;
 
 import com.ft.sdk.SyncDataHelper;
 import com.ft.sdk.garble.utils.Constants;
-import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 import com.ft.sdk.internal.exception.FTInvalidParameterException;
 
@@ -21,8 +20,6 @@ import java.security.InvalidParameterException;
  * Description: 数据存储 Data Json 数据
  */
 public class SyncJsonData implements Cloneable {
-    private static final String TAG = Constants.LOG_TAG_PREFIX + "SyncJsonData";
-
     /**
      * 同步数据唯一 id, 同步上传过程中才会赋值
      */
@@ -34,14 +31,9 @@ public class SyncJsonData implements Cloneable {
     DataType dataType;
 
     /**
-     * 同步数据字符类型数据，行协议数据
+     * 同步数据字符类型数据，旧数据数据为 json，新数据为行协议
      */
     String dataString;
-
-    /**
-     * 同步数据 json 数据。同步上传过程中不会设置这个变量
-     */
-    JSONObject dataJson;
 
 
     String uuid;
@@ -52,13 +44,7 @@ public class SyncJsonData implements Cloneable {
     }
 
     public void setDataString(String dataString) {
-        try {
-            this.dataString = dataString;
-
-        } catch (Exception e) {
-            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
-
-        }
+        this.dataString = dataString;
     }
 
 
@@ -116,9 +102,10 @@ public class SyncJsonData implements Cloneable {
      * @param dataCount 数量
      * @return
      */
-    public String getDataStringWithPackageId(String packageId, int pid, int dataCount) {
+    public String getLineProtocolDataWithPkgId(String packageId, int pid, int dataCount) {
         if (packageId != null) {
-            dataString = dataString.replace(uuid, packageId + "." + pid + "." + dataCount + "." + uuid);
+            dataString = dataString.replace(uuid, packageId + "."
+                    + pid + "." + dataCount + "." + uuid);
         }
         return dataString;
     }
@@ -131,19 +118,11 @@ public class SyncJsonData implements Cloneable {
      */
     public String getDataString(String newUUID) {
         if (newUUID != null) {
-            dataString = dataString.replaceFirst("(" + Constants.KEY_SDK_DATA_FLAG + "=)([0-9a-z]+).([0-9]+)."
+            dataString = dataString.replaceFirst("(" +
+                    Constants.KEY_SDK_DATA_FLAG + "=)([0-9a-z]+).([0-9]+)."
                     + uuid, Constants.KEY_SDK_DATA_FLAG + "=" + newUUID);
         }
         return dataString;
-    }
-
-
-    public JSONObject getDataJson() {
-        return dataJson;
-    }
-
-    public void setDataJson(JSONObject json) {
-        this.dataJson = json;
     }
 
     public String getUuid() {
@@ -160,18 +139,16 @@ public class SyncJsonData implements Cloneable {
      * @param dataType
      * @param bean
      * @return
-     * @throws JSONException
      * @throws InvalidParameterException
      */
     public static SyncJsonData getSyncJsonData(SyncDataHelper helper, DataType dataType, LineProtocolBean bean)
-            throws JSONException, FTInvalidParameterException {
+            throws FTInvalidParameterException {
         JSONObject tagsTemp = bean.getTags();
         JSONObject fields = bean.getFields();
         SyncJsonData recordData = new SyncJsonData(dataType);
         recordData.setTime(bean.getTimeNano());
         recordData.setUuid(Utils.randomUUID());
-        recordData.setDataJson(getLinProtocolJson(bean.getMeasurement(), tagsTemp, fields));
-        recordData.setDataString(helper.getBodyContent(recordData));
+        recordData.setDataString(helper.getBodyContent(bean.getMeasurement(), tagsTemp, fields, bean.getTimeNano(), dataType));
         return recordData;
     }
 
@@ -185,12 +162,12 @@ public class SyncJsonData implements Cloneable {
      * @throws InvalidParameterException
      */
     public static SyncJsonData getFromLogBean(SyncDataHelper helper, BaseContentBean bean)
-            throws JSONException, FTInvalidParameterException {
+            throws FTInvalidParameterException {
         SyncJsonData recordData = new SyncJsonData(DataType.LOG);
         recordData.setTime(bean.getTime());
         recordData.setUuid(Utils.randomUUID());
-        recordData.setDataJson(getLinProtocolJson(bean.getMeasurement(), bean.getAllTags(), bean.getAllFields()));
-        recordData.setDataString(helper.getBodyContent(recordData));
+        recordData.setDataString(helper.getBodyContent(bean.getMeasurement(),
+                bean.getAllTags(), bean.getAllFields(), bean.getTime(), DataType.LOG));
         return recordData;
     }
 
@@ -210,10 +187,7 @@ public class SyncJsonData implements Cloneable {
             throws JSONException, FTInvalidParameterException {
 
         JSONObject tagsTemp = tags;
-
         JSONObject opDataJson = new JSONObject();
-
-
         if (measurement != null) {
             opDataJson.put(Constants.MEASUREMENT, measurement);
         } else {

@@ -22,9 +22,8 @@ import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
+import com.ft.test.utils.LineProtocolData;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -70,6 +69,7 @@ public class RUMClickActionTest extends BaseTest {
 
     /**
      * 模拟真实应用启动情况下，点击 Button 后，Action 相关数据是否正常生成
+     *
      * @throws Exception
      */
     @Test
@@ -85,18 +85,10 @@ public class RUMClickActionTest extends BaseTest {
 
         String actionId = "";
         for (SyncJsonData recordData : recordDataList) {
-            try {
-                JSONObject json = new JSONObject(recordData.getDataString());
-                JSONObject tags = json.optJSONObject("tags");
-                String measurement = json.optString("measurement");
-                if ("action".equals(measurement)) {
-                    if (tags != null) {
-                        actionId = tags.optString("action_id");
-                        break;
-                    }
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
+            LineProtocolData parser = new LineProtocolData(recordData.getDataString());
+            String measurement = parser.getMeasurement();
+            if ("action".equals(measurement)) {
+                actionId = parser.getTagAsString("action_id");
             }
         }
 

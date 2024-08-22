@@ -16,9 +16,8 @@ import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.test.base.FTBaseTest;
 import com.ft.test.utils.CheckUtils;
+import com.ft.test.utils.LineProtocolData;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -158,19 +157,12 @@ public class LogTest extends FTBaseTest {
         String viewId = "";
         String sessionId = "";
         for (SyncJsonData recordData : recordDataList) {
-            try {
-                JSONObject json = new JSONObject(recordData.getDataString());
-                JSONObject tags = json.optJSONObject("tags");
-                String measurement = json.optString("measurement");
-                if (Constants.FT_LOG_DEFAULT_MEASUREMENT.equals(measurement)) {
-                    if (tags != null) {
-                        viewId = tags.optString(Constants.KEY_RUM_VIEW_ID);
-                        sessionId = tags.optString(Constants.KEY_RUM_SESSION_ID);
-                        break;
-                    }
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
+            LineProtocolData lineProtocolData = new LineProtocolData(recordData.getDataString());
+            String measurement = lineProtocolData.getMeasurement();
+            if (Constants.FT_LOG_DEFAULT_MEASUREMENT.equals(measurement)) {
+                    viewId = lineProtocolData.getTagAsString(Constants.KEY_RUM_VIEW_ID);
+                    sessionId = lineProtocolData.getTagAsString(Constants.KEY_RUM_SESSION_ID);
+                    break;
             }
         }
 

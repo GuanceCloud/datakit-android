@@ -1,10 +1,8 @@
 package com.ft.sdk;
 
 import static com.ft.sdk.garble.utils.Constants.FT_KEY_VALUE_NULL;
-import static com.ft.sdk.garble.utils.Constants.KEY_SDK_DATA_FLAG;
 
 import com.ft.sdk.garble.bean.DataType;
-import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.StringUtils;
@@ -14,7 +12,6 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * 数据组装类，把采集数据从存储数据序列化行协议数据
@@ -30,7 +27,7 @@ public class SyncDataHelper {
     private final HashMap<String, Object> rumTags;
     private final HashMap<String, Object> traceTags;
 
-    private FTSDKConfig config;
+    protected FTSDKConfig config;
 
 
     protected SyncDataHelper() {
@@ -60,75 +57,45 @@ public class SyncDataHelper {
         traceTags.putAll(config.getGlobalContext());
     }
 
-    /**
-     * 封装同步上传的数据
-     *
-     * @param data
-     * @return
-     */
-    public String getBodyContent(SyncJsonData data) {
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put(KEY_SDK_DATA_FLAG, data.getUuid());
-        if (data.getDataType() == DataType.LOG) {
-            hashMap.putAll(logTags);
-        } else if (data.getDataType() == DataType.TRACE) {
-            hashMap.putAll(traceTags);
-        } else if (data.getDataType() == DataType.RUM_APP || data.getDataType() == DataType.RUM_WEBVIEW) {
-            hashMap.putAll(rumTags);
-        }
-        return convertToLineProtocolLine(data, hashMap, false);
-    }
 
     /**
-     * 封装同步上传的数据
+     * 数据转行协议存储
      *
+     * @param measurement
+     * @param tags
+     * @param fields
+     * @param timeStamp
      * @param dataType
-     * @param recordDatas
      * @return
      */
-    public String getBodyContent(DataType dataType, List<SyncJsonData> recordDatas) {
+
+    public String getBodyContent(String measurement, JSONObject tags,
+                                 JSONObject fields, long timeStamp, DataType dataType) {
         String bodyContent;
         if (dataType == DataType.LOG) {
             // log 数据
-            bodyContent = convertToLineProtocolLines(recordDatas, new HashMap<>(logTags));
+            bodyContent = convertToLineProtocolLine(measurement, tags, fields, new HashMap<>(logTags),
+                    timeStamp, config);
+
         } else if (dataType == DataType.TRACE) {
             // trace 数据
-            bodyContent = convertToLineProtocolLines(recordDatas, new HashMap<>(traceTags));
+            bodyContent = convertToLineProtocolLine(measurement, tags, fields, new HashMap<>(traceTags),
+                    timeStamp, config);
         } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_WEBVIEW) {
             //rum 数据
-            bodyContent = convertToLineProtocolLines(recordDatas, new HashMap<>(rumTags));
+            bodyContent = convertToLineProtocolLine(measurement, tags, fields, new HashMap<>(rumTags),
+                    timeStamp, config);
         } else {
             bodyContent = "";
         }
-        return bodyContent.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION)
-                .replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REAL_LINE_BREAK);
+        return bodyContent;
+
     }
 
-    /**
-     * 转化为行协议数据
-     *
-     * @param datas
-     * @param extraTags
-     * @return
-     */
-    private String convertToLineProtocolLines(List<SyncJsonData> datas, HashMap<String, Object> extraTags) {
-        StringBuilder sb = new StringBuilder();
-        for (SyncJsonData data : datas) {
-            sb.append(convertToLineProtocolLine(data, extraTags, true));
-        }
-        return sb.toString();
-    }
-
-
-    /**
-     * 转化为单条行协议数据
-     *
-     * @param data
-     * @param extraTags
-     * @return
-     */
-    private String convertToLineProtocolLine(SyncJsonData data, HashMap<String, Object> extraTags,
-                                             boolean multiLine) {
+     static String convertToLineProtocolLine(String measurement, JSONObject tags,
+                                                      JSONObject fields,
+                                                      HashMap<String, Object> extraTags, long timeStamp,
+                                                      FTSDKConfig config) {
         boolean integerCompatible = false;
         if (config != null) {
             integerCompatible = config.isEnableDataIntegerCompatible();
@@ -137,8 +104,6 @@ public class SyncDataHelper {
 
         try {
             //========== measurement ==========
-            JSONObject opJson = data.getDataJson();
-            String measurement = opJson.optString(Constants.MEASUREMENT);
             if (Utils.isNullOrEmpty(measurement)) {
                 measurement = FT_KEY_VALUE_NULL;
             } else {
@@ -147,7 +112,6 @@ public class SyncDataHelper {
             sb.append(measurement);
 
             //========== tags ==========
-            JSONObject tags = opJson.optJSONObject(Constants.TAGS);
             if (extraTags != null) {
                 //合并去重
                 for (String key : extraTags.keySet()) {
@@ -163,18 +127,17 @@ public class SyncDataHelper {
                 sb.append(",");
                 sb.append(tagSb);
             }
-            sb.append(multiLine ? Constants.SEPARATION_PRINT : Constants.SEPARATION);
+            sb.append(Constants.SEPARATION);
 
             //========== field ==========
-            JSONObject fields = opJson.optJSONObject(Constants.FIELDS);
             StringBuilder valueSb = getCustomHash(fields, false, integerCompatible);
             deleteLastComma(valueSb);
             sb.append(valueSb);
-            sb.append(multiLine ? Constants.SEPARATION_PRINT : Constants.SEPARATION);
+            sb.append(Constants.SEPARATION);
 
             //========= time ==========
-            sb.append(data.getTime());
-            sb.append(multiLine ? Constants.SEPARATION_LINE_BREAK : Constants.SEPARATION_REAL_LINE_BREAK);
+            sb.append(timeStamp);
+            sb.append(Constants.SEPARATION_REAL_LINE_BREAK);
         } catch (Exception e) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
@@ -246,6 +209,15 @@ public class SyncDataHelper {
      */
     private static void deleteLastComma(StringBuilder sb) {
         StringUtils.deleteLastCharacter(sb, ",");
+    }
+
+    /**
+     * 获取兼容迁移方法
+     *
+     * @return
+     */
+    SyncDataCompatHelper getCompat() {
+        return new SyncDataCompatHelper(logTags, traceTags, rumTags, config);
     }
 
 

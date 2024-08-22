@@ -24,9 +24,8 @@ import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.test.utils.LineProtocolData;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -71,6 +70,7 @@ public class RUMViewTest extends BaseTest {
 
     /**
      * 检验真实应用启动，页面跳动，{@link com.ft.sdk.FTActivityLifecycleCallbacks} 是否正常输出 View 数据
+     *
      * @throws Exception
      */
     @Test
@@ -82,26 +82,14 @@ public class RUMViewTest extends BaseTest {
 
         String viewId = "";
         for (SyncJsonData recordData : recordDataList) {
-            try {
-                JSONObject json = new JSONObject(recordData.getDataString());
-                JSONObject tags = json.optJSONObject("tags");
-                JSONObject fields = json.optJSONObject("fields");
-                String measurement = json.optString("measurement");
-                if (Constants.FT_MEASUREMENT_RUM_VIEW.equals(measurement)) {
-                    if (fields != null) {
-                        if (fields.optBoolean(Constants.KEY_RUM_VIEW_IS_ACTIVE, false)) {
-                            if (tags != null) {
-                                viewId = tags.optString(Constants.KEY_RUM_VIEW_ID);
-                                break;
-                            }
-                        }
-
-                    }
-
+            LineProtocolData data = new LineProtocolData(recordData.getDataString());
+            String measurement = data.getMeasurement();
+            if (Constants.FT_MEASUREMENT_RUM_VIEW.equals(measurement)) {
+                if (data.getFieldAsBoolean(Constants.KEY_RUM_VIEW_IS_ACTIVE,true)) {
+                    viewId = data.getTagAsString(Constants.KEY_RUM_VIEW_ID);
+                    break;
 
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
         }
         Assert.assertFalse(viewId.isEmpty());
@@ -115,25 +103,14 @@ public class RUMViewTest extends BaseTest {
         recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
 
         for (SyncJsonData recordData : recordDataList) {
-            try {
-                JSONObject json = new JSONObject(recordData.getDataString());
-                JSONObject tags = json.optJSONObject("tags");
-                JSONObject fields = json.optJSONObject("fields");
-                String measurement = json.optString("measurement");
-                if (Constants.FT_MEASUREMENT_RUM_VIEW.equals(measurement)) {
-                    if (fields != null) {
-                        if (fields.optBoolean(Constants.KEY_RUM_VIEW_IS_ACTIVE, false)) {
-                            if (tags != null) {
-                                newViewId = tags.optString(Constants.KEY_RUM_VIEW_ID);
-                                break;
-                            }
-                        }
-
-                    }
+            LineProtocolData data = new LineProtocolData(recordData.getDataString());
+            String measurement = data.getMeasurement();
+            if (Constants.FT_MEASUREMENT_RUM_VIEW.equals(measurement)) {
+                if (data.getFieldAsBoolean(Constants.KEY_RUM_VIEW_IS_ACTIVE,true)) {
+                        newViewId = data.getTagAsString(Constants.KEY_RUM_VIEW_ID);
+                        break;
 
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
         }
 

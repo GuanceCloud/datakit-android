@@ -23,12 +23,11 @@ import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.Utils;
 import com.ft.test.base.FTBaseTest;
 import com.ft.test.utils.CheckUtils;
+import com.ft.test.utils.LineProtocolData;
 import com.ft.test.utils.RequestUtil;
 import com.google.mockwebserver.MockResponse;
 import com.google.mockwebserver.MockWebServer;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -362,19 +361,13 @@ public class RUMTest extends FTBaseTest {
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
 
         for (SyncJsonData recordData : recordDataList) {
-            try {
-                JSONObject json = new JSONObject(recordData.getDataString());
-                JSONObject fields = json.optJSONObject("fields");
-                String measurement = json.optString("measurement");
-                if (Constants.FT_MEASUREMENT_RUM_RESOURCE.equals(measurement)) {
-                    if (fields != null) {
-                        Assert.assertTrue(fields.length() > 0);
-                        break;
-                    }
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
+            LineProtocolData data = new LineProtocolData(recordData.getDataString());
+
+            if (Constants.FT_MEASUREMENT_RUM_RESOURCE.equals(data.getMeasurement())) {
+                Assert.assertTrue(data.getFieldSize() > 0);
+                break;
             }
+
         }
     }
 
@@ -622,20 +615,15 @@ public class RUMTest extends FTBaseTest {
         String spanId = "";
 
         for (SyncJsonData recordData : recordDataList) {
-            try {
-                JSONObject json = new JSONObject(recordData.getDataString());
-                JSONObject tags = json.optJSONObject("tags");
-                String measurement = json.optString("measurement");
-                if (Constants.FT_MEASUREMENT_RUM_RESOURCE.equals(measurement)) {
-                    if (tags != null) {
-                        tracId = tags.optString(Constants.KEY_RUM_RESOURCE_TRACE_ID);
-                        spanId = tags.optString(Constants.KEY_RUM_RESOURCE_SPAN_ID);
-                        break;
-                    }
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
+
+            LineProtocolData data = new LineProtocolData(recordData.getDataString());
+
+            if (Constants.FT_MEASUREMENT_RUM_RESOURCE.equals(data.getMeasurement())) {
+                tracId = data.getTagAsString(Constants.KEY_RUM_RESOURCE_TRACE_ID,"");
+                spanId = data.getTagAsString(Constants.KEY_RUM_RESOURCE_SPAN_ID,"");
+                break;
             }
+
         }
         mockWebServer.shutdown();
         return !tracId.isEmpty() && !spanId.isEmpty();
@@ -660,19 +648,10 @@ public class RUMTest extends FTBaseTest {
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
         Assert.assertFalse(recordDataList.isEmpty());
         for (SyncJsonData recordData : recordDataList) {
-            try {
-                JSONObject json = new JSONObject(recordData.getDataString());
-                JSONObject tags = json.optJSONObject("tags");
-                String measurement = json.optString("measurement");
-                if (Constants.FT_MEASUREMENT_RUM_RESOURCE.equals(measurement)) {
-                    if (tags != null) {
-                        System.out.println("json:" + json);
-                        Assert.assertFalse(tags.has(Constants.KEY_RUM_ACTION_ID));
-                        break;
-                    }
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
+            LineProtocolData data = new LineProtocolData(recordData.getDataString());
+            if (Constants.FT_MEASUREMENT_RUM_RESOURCE.equals(data.getMeasurement())) {
+                Assert.assertNull(data.getTagAsString(Constants.KEY_RUM_ACTION_ID));
+                break;
             }
         }
 

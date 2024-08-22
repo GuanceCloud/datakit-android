@@ -42,17 +42,9 @@ public class Constants {
     public static final String TAGS = "tags";
 
     /**
-     * 预处理数据分隔符
-     */
-    public static final String SEPARATION_PRINT = "--temp_separation--";
-    /**
      * 最终数据数据分隔符
      */
     public static final String SEPARATION = " ";
-    /**
-     * 预处理数据数据分行符号
-     */
-    public static final String SEPARATION_LINE_BREAK = "--line_break_temp--";//换行标志符，用于日志显示
     /**
      * 最终数据行协议单条数据分隔
      */

@@ -16,7 +16,6 @@ import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.manager.AsyncCallback;
 import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
-import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONObject;
@@ -202,12 +201,13 @@ public class FTBaseTest {
      */
     protected void uploadData(DataType dataType) {
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, dataType);
-        SyncDataHelper syncDataManager = getInnerSyncDataHelper();
-        String body = syncDataManager.getBodyContent(dataType, recordDataList);
-        body = body.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION).replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REAL_LINE_BREAK);
+        StringBuilder body = new StringBuilder();
+        for (SyncJsonData syncJsonData : recordDataList) {
+            body.append(syncJsonData.getDataString());
+        }
 
         try {
-            Whitebox.invokeMethod(SyncTaskManager.get(), "requestNet", dataType, body,
+            Whitebox.invokeMethod(SyncTaskManager.get(), "requestNet", dataType, body.toString(),
                     (AsyncCallback) (code, response, errorCode) -> Assert.assertEquals(200, code));
         } catch (Exception e) {
             e.printStackTrace();
@@ -241,6 +241,7 @@ public class FTBaseTest {
     /**
      * 获取当前 datahelper 中 config属性
      * {@link FTTrackInner#dataHelper} 的 config
+     *
      * @return
      */
     public static FTSDKConfig getSDKConfigInSyncDataHelper() {

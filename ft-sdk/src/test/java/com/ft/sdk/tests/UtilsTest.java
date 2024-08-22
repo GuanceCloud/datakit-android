@@ -84,8 +84,7 @@ public class UtilsTest {
         recordDataList.add(recordData);
         recordDataList.add(recordData);
         String content = convertToLineProtocolLines(recordDataList);
-        Assert.assertEquals(LOG_EXPECT_DATA, content.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION)
-                .replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REAL_LINE_BREAK));
+        Assert.assertEquals(LOG_EXPECT_DATA, content);
     }
 
     /**
@@ -107,8 +106,7 @@ public class UtilsTest {
         recordDataList.add(data);
         String content = convertToLineProtocolLines(recordDataList);
 
-        assertEquals(content.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION)
-                .replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REAL_LINE_BREAK), SINGLE_LINE_NORMAL_DATA);
+        assertEquals(content, SINGLE_LINE_NORMAL_DATA);
 
 
         JSONObject tagsEmpty = new JSONObject();
@@ -122,8 +120,7 @@ public class UtilsTest {
         emptyRecordDataList.add(dataEmpty);
         String contentEmpty = convertToLineProtocolLines(emptyRecordDataList);
 
-        assertEquals(SINGLE_LINE_EMPTY_DATA, contentEmpty.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION)
-                .replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REAL_LINE_BREAK));
+        assertEquals(SINGLE_LINE_EMPTY_DATA, contentEmpty);
     }
 
     /**
@@ -137,8 +134,8 @@ public class UtilsTest {
     private String convertToLineProtocolLines(List<SyncJsonData> list) throws Exception {
         SyncDataHelper helper = Whitebox.getInternalState(FTTrackInner.getInstance(), "dataHelper");
         return Whitebox.invokeMethod(helper, "convertToLineProtocolLines",
-                list, new HashMap<>(), "").toString()
-                .replaceAll(",sdk_data_id=(.*?)" + Constants.SEPARATION_PRINT, Constants.SEPARATION_PRINT);
+                        list, new HashMap<>(), "").toString()
+                .replaceAll(",sdk_data_id=(.*?)", "");
     }
 
 

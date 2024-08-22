@@ -276,7 +276,7 @@ public class SyncTaskManager {
                 packageId = rumGenerator.getCurrentId();
             }
             for (SyncJsonData data : cacheDataList) {
-                sb.append(data.getDataStringWithPackageId(packageId, pid, dataCount));
+                sb.append(data.getLineProtocolDataWithPkgId(packageId, pid, dataCount));
             }
 
             String body = sb.toString();
@@ -434,7 +434,7 @@ public class SyncTaskManager {
     }
 
     /**
-     * 旧数据迁移，1.5.0 版本本一下的数据需要迁移
+     * 旧数据迁移，1.5.0 版本以下的数据需要迁移
      */
     void oldDBDataTransform() {
         if (isOldCaching) return;
@@ -449,31 +449,37 @@ public class SyncTaskManager {
                 @Override
                 public void run() {
                     LogUtils.d(TAG, "==> old cache transform start");
-
-                    SyncDataHelper helper = FTTrackInner.getInstance().getCurrentDataHelper();
-                    while (true) {
-                        List<SyncJsonData> list = FTDBManager.get().queryDataByDescLimit(OLD_CACHE_TRANSFORM_PAGE_SIZE, true);
-                        Iterator<SyncJsonData> it = list.iterator();
-                        while (it.hasNext()) {
-                            SyncJsonData data = it.next();
-                            try {
-                                String jsonString = data.getDataString();
-                                data.setUuid(Utils.randomUUID());//旧数据中没有 uuid
-                                data.setDataJson(new JSONObject(jsonString));
-                                data.setDataString(helper.getBodyContent(data));
-                            } catch (Exception e) {
-                                it.remove();
+                    try {
+                        SyncDataCompatHelper helper = FTTrackInner.getInstance()
+                                .getCurrentDataHelper().getCompat();
+                        while (true) {
+                            List<SyncJsonData> list = FTDBManager.get().queryDataByDescLimit(OLD_CACHE_TRANSFORM_PAGE_SIZE,
+                                    true);
+                            Iterator<SyncJsonData> it = list.iterator();
+                            while (it.hasNext()) {
+                                SyncJsonData data = it.next();
+                                try {
+                                    String oldFormatData = data.getDataString();//获取旧格式数据
+                                    data.setUuid(Utils.randomUUID());//旧数据中没有 uuid
+                                    data.setDataString(helper.getBodyContent(new JSONObject(oldFormatData),
+                                            data.getDataType(),
+                                            Utils.randomUUID(),
+                                            data.getTime()));//转化成新格式
+                                } catch (Exception e) {
+                                    it.remove();
+                                }
+                            }
+                            FTDBManager.get().insertFtOptList(list, false);
+                            deleteLastQuery(list, true);
+                            if (list.size() < OLD_CACHE_TRANSFORM_PAGE_SIZE) {
+                                LogUtils.d(TAG, "==> old cache transform end");
+                                FTDBManager.get().deleteOldCacheTable();
+                                break;
                             }
                         }
-                        FTDBManager.get().insertFtOptList(list, false);
-                        deleteLastQuery(list, true);
-                        if (list.size() < OLD_CACHE_TRANSFORM_PAGE_SIZE) {
-                            LogUtils.d(TAG, "==> old cache transform end");
-                            FTDBManager.get().deleteOldCacheTable();
-                            break;
-                        }
+                    } catch (Exception e) {
+                        LogUtils.d(TAG, "==> oldDBDataTransform Failed:" + LogUtils.getStackTraceString(e));
                     }
-
                 }
             });
         }

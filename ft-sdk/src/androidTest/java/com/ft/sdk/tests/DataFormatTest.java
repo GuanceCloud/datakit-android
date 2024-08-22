@@ -8,6 +8,7 @@ import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.test.base.FTBaseTest;
+import com.ft.test.utils.LineProtocolData;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,6 +20,7 @@ import java.util.List;
 
 /**
  * 传输数据传说过程中，数据格式验证
+ *
  * @author Brandon
  */
 public class DataFormatTest extends FTBaseTest {
@@ -49,11 +51,11 @@ public class DataFormatTest extends FTBaseTest {
         Thread.sleep(3000);
 
         List<SyncJsonData> list = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.LOG);
-        Assert.assertTrue(list.size() > 0);
+        Assert.assertFalse(list.isEmpty());
         String content = list.get(0).getDataString();
-        JSONObject json = new JSONObject(content);
-        Assert.assertTrue(json.getJSONObject("fields").optString("floatValue").contains("."));
-        Assert.assertTrue(json.getJSONObject("fields").optString("doubleValue").contains("."));
+        LineProtocolData data = new LineProtocolData(content);
+        Assert.assertTrue(data.getField("floatValue").toString().contains("."));
+        Assert.assertTrue(data.getField("doubleValue").toString().contains("."));
     }
 
 

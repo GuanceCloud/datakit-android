@@ -181,11 +181,9 @@ public class FTTrackInner {
         DataUploaderThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
-                List<SyncJsonData> recordDataList = new ArrayList<>();
                 try {
                     SyncJsonData recordData = SyncJsonData.getFromLogBean(dataHelper, bean);
-                    recordDataList.add(recordData);
-                    String body = dataHelper.getBodyContent(DataType.LOG, recordDataList);
+                    String body = recordData.getDataString();
                     String model = Constants.URL_MODEL_LOG;
                     String content_type = "text/plain";
                     FTResponseData result = HttpBuilder.Builder()
