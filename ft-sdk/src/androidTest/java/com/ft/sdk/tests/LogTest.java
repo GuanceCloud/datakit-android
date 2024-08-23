@@ -1,5 +1,9 @@
 package com.ft.sdk.tests;
 
+import static com.ft.sdk.tests.FTSdkAllTests.hasPrepare;
+
+import android.os.Looper;
+
 import com.ft.sdk.FTLogger;
 import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.FTRUMConfig;
@@ -33,7 +37,12 @@ public class LogTest extends FTBaseTest {
 
     @Before
     public void setUp() throws Exception {
+        if (!hasPrepare) {
+            Looper.prepare();
+            hasPrepare = true;
+        }
         stopSyncTask();
+        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL).setDebug(true));
     }
 
     /**
@@ -43,7 +52,6 @@ public class LogTest extends FTBaseTest {
      */
     @Test
     public void withOutLogConfig() throws InterruptedException {
-        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
         List<SyncJsonData> recordDataList = FTDBManager.get()
                 .queryDataByDataByTypeLimitDesc(0, DataType.LOG);
 
@@ -59,7 +67,6 @@ public class LogTest extends FTBaseTest {
      */
     @Test
     public void logSampleRateZero() throws InterruptedException {
-        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
         FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableCustomLog(true).setSamplingRate(0));
 
         Thread.sleep(1000);
@@ -82,7 +89,6 @@ public class LogTest extends FTBaseTest {
      */
     @Test
     public void logInsertDataTest() throws InterruptedException {
-        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
         FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableCustomLog(true));
 
         //产生一条日志数据
@@ -138,7 +144,6 @@ public class LogTest extends FTBaseTest {
      */
 
     private boolean checkLogHasLinkRUMData(boolean enableLinkRumData) throws InterruptedException {
-        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
         FTSdk.initRUMWithConfig(new FTRUMConfig());
 
         FTSdk.initLogWithConfig(new FTLoggerConfig()
@@ -177,7 +182,6 @@ public class LogTest extends FTBaseTest {
      */
     @Test
     public void triggerDiscardPolicyTest() throws InterruptedException {
-        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
         FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableCustomLog(true));
         batchLog(10);
 
@@ -190,7 +194,6 @@ public class LogTest extends FTBaseTest {
      */
     @Test
     public void triggerDiscardOldPolicyTest() throws InterruptedException {
-        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
         FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableCustomLog(true)
                 .setLogCacheDiscardStrategy(LogCacheDiscard.DISCARD_OLDEST));
         batchLog(19);

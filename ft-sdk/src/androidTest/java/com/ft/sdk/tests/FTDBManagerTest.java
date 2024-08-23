@@ -4,15 +4,15 @@ import static org.junit.Assert.assertEquals;
 
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.ft.sdk.FTApplication;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncJsonData;
-import com.ft.sdk.garble.db.FTDBConfig;
 import com.ft.sdk.garble.db.FTDBManager;
+import com.ft.sdk.garble.db.base.DatabaseHelper;
 import com.ft.test.base.FTBaseTest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -27,23 +27,14 @@ public class FTDBManagerTest extends FTBaseTest {
     private static final int repeatTime = 100;
 
     /**
-     * 在运行测试用例前先删除之前数据库中存在的数据
-     */
-    @Before
-    public void deleteTableData() {
-        FTDBManager.get().delete();
-    }
-
-    /**
      * 测试创建数据库
      */
     @Test
     public void createDatabase() {
-        FTDBConfig.DATABASE_NAME = "test.db";
-        FTDBConfig.DATABASE_VERSION = 1;
-        SQLiteOpenHelper helper = FTDBManager.get().initDataBaseHelper();
-        assertEquals(FTDBConfig.DATABASE_NAME, helper.getDatabaseName());
-
+        String testDBName = "test.db";
+        int dbVersion = 1;
+        SQLiteOpenHelper helper = DatabaseHelper.getInstance(FTApplication.getApplication(), testDBName, dbVersion);
+        assertEquals(testDBName, helper.getDatabaseName());
     }
 
     /**
@@ -120,8 +111,4 @@ public class FTDBManagerTest extends FTBaseTest {
 
     }
 
-    @Override
-    public void tearDown() {
-
-    }
 }

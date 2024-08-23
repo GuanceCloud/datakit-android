@@ -77,7 +77,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    private void update2to3(SQLiteDatabase db){
+    private void update2to3(SQLiteDatabase db) {
         db.execSQL(FTSQL.FT_TABLE_SYNC_CREATE);
     }
 }

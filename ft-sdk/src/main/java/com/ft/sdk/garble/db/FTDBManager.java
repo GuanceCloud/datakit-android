@@ -770,6 +770,7 @@ public class FTDBManager extends DBManager {
                 db.delete(FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME, null, null);
                 db.delete(FTSQL.FT_TABLE_ACTION, null, null);
                 db.delete(FTSQL.FT_TABLE_VIEW, null, null);
+                LogUtils.e(TAG,"DB table delete");
 
             }
         });
