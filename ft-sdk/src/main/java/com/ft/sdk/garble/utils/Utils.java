@@ -18,7 +18,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 
 import com.ft.sdk.FTApplication;
-import com.google.gson.Gson;
+import com.ft.sdk.garble.manager.SingletonGson;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
@@ -29,7 +29,6 @@ import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -224,6 +223,7 @@ public class Utils {
 
     /**
      * 获取全零 uuid
+     *
      * @return
      */
     public static String getEmptyUUID() {
@@ -612,8 +612,7 @@ public class Utils {
                     jsonBuilder.append(value);
                 } else {
                     // 对于非基本类型，使用 Gson 进行转换
-                    Gson gson = new Gson();
-                    jsonBuilder.append(gson.toJson(value));
+                    jsonBuilder.append(SingletonGson.getInstance().toJson(value));
                 }
                 jsonBuilder.append(", ");
             }
