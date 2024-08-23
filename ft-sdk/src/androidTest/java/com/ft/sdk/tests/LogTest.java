@@ -160,9 +160,9 @@ public class LogTest extends FTBaseTest {
             LineProtocolData lineProtocolData = new LineProtocolData(recordData.getDataString());
             String measurement = lineProtocolData.getMeasurement();
             if (Constants.FT_LOG_DEFAULT_MEASUREMENT.equals(measurement)) {
-                    viewId = lineProtocolData.getTagAsString(Constants.KEY_RUM_VIEW_ID);
-                    sessionId = lineProtocolData.getTagAsString(Constants.KEY_RUM_SESSION_ID);
-                    break;
+                viewId = lineProtocolData.getTagAsString(Constants.KEY_RUM_VIEW_ID, "");
+                sessionId = lineProtocolData.getTagAsString(Constants.KEY_RUM_SESSION_ID, "");
+                break;
             }
         }
 

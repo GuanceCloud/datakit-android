@@ -96,7 +96,7 @@ public class SyncJsonData implements Cloneable {
     }
 
     /**
-     * 标记包序列发送 id,替换 [uuid] 为 [packageId].[dataCount].[uuid]
+     * 标记包序列发送 id,替换 [uuid] 为 [packageId].[pid].[pkg_dataCount].[uuid]
      *
      * @param packageId 包 id
      * @param dataCount 数量
@@ -104,14 +104,14 @@ public class SyncJsonData implements Cloneable {
      */
     public String getLineProtocolDataWithPkgId(String packageId, int pid, int dataCount) {
         if (packageId != null) {
-            dataString = dataString.replace(uuid, packageId + "."
+            dataString = dataString.replaceFirst(uuid, packageId + "."
                     + pid + "." + dataCount + "." + uuid);
         }
         return dataString;
     }
 
     /**
-     * 替换 (sdk_data_id=)([0-9a-z]+).([0-9]+).[uuid] 为 sdk_data_id=[uuid]
+     * 替换 (sdk_data_id=)[packageId].[pid].[pkg_dataCount].[uuid] 为 sdk_data_id=[uuid]
      *
      * @param newUUID 新 uuid
      * @return
@@ -119,7 +119,7 @@ public class SyncJsonData implements Cloneable {
     public String getDataString(String newUUID) {
         if (newUUID != null) {
             dataString = dataString.replaceFirst("(" +
-                    Constants.KEY_SDK_DATA_FLAG + "=)([0-9a-z]+).([0-9]+)."
+                    Constants.KEY_SDK_DATA_FLAG + "=)(.*)"
                     + uuid, Constants.KEY_SDK_DATA_FLAG + "=" + newUUID);
         }
         return dataString;
@@ -145,10 +145,11 @@ public class SyncJsonData implements Cloneable {
             throws FTInvalidParameterException {
         JSONObject tagsTemp = bean.getTags();
         JSONObject fields = bean.getFields();
+        String uuid = Utils.randomUUID();
         SyncJsonData recordData = new SyncJsonData(dataType);
         recordData.setTime(bean.getTimeNano());
-        recordData.setUuid(Utils.randomUUID());
-        recordData.setDataString(helper.getBodyContent(bean.getMeasurement(), tagsTemp, fields, bean.getTimeNano(), dataType));
+        recordData.setUuid(uuid);
+        recordData.setDataString(helper.getBodyContent(bean.getMeasurement(), tagsTemp, fields, bean.getTimeNano(), dataType, uuid));
         return recordData;
     }
 
@@ -164,47 +165,12 @@ public class SyncJsonData implements Cloneable {
     public static SyncJsonData getFromLogBean(SyncDataHelper helper, BaseContentBean bean)
             throws FTInvalidParameterException {
         SyncJsonData recordData = new SyncJsonData(DataType.LOG);
+        String uuid = Utils.randomUUID();
         recordData.setTime(bean.getTime());
-        recordData.setUuid(Utils.randomUUID());
+        recordData.setUuid(uuid);
         recordData.setDataString(helper.getBodyContent(bean.getMeasurement(),
-                bean.getAllTags(), bean.getAllFields(), bean.getTime(), DataType.LOG));
+                bean.getAllTags(), bean.getAllFields(), bean.getTime(), DataType.LOG, uuid));
         return recordData;
     }
-
-
-    /**
-     * 获取行协议对应的 指标，标签，数值对应的 Json 对象
-     *
-     * @param measurement
-     * @param tags
-     * @param fields
-     * @return
-     * @throws JSONException
-     * @throws InvalidParameterException
-     */
-    private static JSONObject getLinProtocolJson(String measurement,
-                                                 JSONObject tags, JSONObject fields)
-            throws JSONException, FTInvalidParameterException {
-
-        JSONObject tagsTemp = tags;
-        JSONObject opDataJson = new JSONObject();
-        if (measurement != null) {
-            opDataJson.put(Constants.MEASUREMENT, measurement);
-        } else {
-            throw new FTInvalidParameterException("指标集 measurement 不能为空");
-        }
-        if (tagsTemp == null) {
-            tagsTemp = new JSONObject();
-        }
-        opDataJson.put(Constants.TAGS, tagsTemp);
-        if (fields != null) {
-            opDataJson.put(Constants.FIELDS, fields);
-        } else {
-            throw new FTInvalidParameterException("指标集 fields 不能为空");
-        }
-        return opDataJson;
-
-    }
-
 
 }

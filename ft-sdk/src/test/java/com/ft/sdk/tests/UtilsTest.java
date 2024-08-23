@@ -16,7 +16,6 @@ import org.junit.Test;
 import org.powermock.reflect.Whitebox;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -67,8 +66,6 @@ public class UtilsTest {
     @Test
     public void multiLineProtocolFormatTest() throws Exception {
 
-        SyncJsonData recordData = new SyncJsonData(DataType.LOG);
-        recordData.setTime(VALUE_TIME);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(Constants.MEASUREMENT, TEST_MEASUREMENT_INFLUX_DB_LINE);
         JSONObject tags = new JSONObject();
@@ -77,18 +74,24 @@ public class UtilsTest {
         fields.put(KEY_FIELD, VALUE_FIELD);
         jsonObject.put(Constants.TAGS, tags);
         jsonObject.put(Constants.FIELDS, fields);
-        recordData.setDataString(jsonObject.toString());
+
+        SyncDataHelper helper = Whitebox.getInternalState(FTTrackInner.getInstance(), "dataHelper");
+        LineProtocolBean trackBean = new LineProtocolBean(TEST_MEASUREMENT_INFLUX_DB_LINE, tags, fields, VALUE_TIME);
+        SyncJsonData recordData = SyncJsonData.getSyncJsonData(helper, DataType.LOG, trackBean);
 
         List<SyncJsonData> recordDataList = new ArrayList<>();
         recordDataList.add(recordData);
         recordDataList.add(recordData);
         recordDataList.add(recordData);
-        String content = convertToLineProtocolLines(recordDataList);
-        Assert.assertEquals(LOG_EXPECT_DATA, content);
+        StringBuilder content = new StringBuilder();
+        for (SyncJsonData syncJsonData : recordDataList) {
+            content.append(syncJsonData.getDataString());
+        }
+        Assert.assertEquals(LOG_EXPECT_DATA, content.toString());
     }
 
     /**
-     * 单数据验证，验证 {@link SyncDataHelper#convertToLineProtocolLines(List)} 数据转化过程中是否会发生数据错误
+     * 单数据验证, 数据转化过程中是否会发生数据错误
      *
      * @throws JSONException
      */
@@ -102,9 +105,7 @@ public class UtilsTest {
         LineProtocolBean trackBean = new LineProtocolBean(TEST_MEASUREMENT_INFLUX_DB_LINE, tags, fields, VALUE_TIME);
         SyncJsonData data = SyncJsonData.getSyncJsonData(helper, DataType.LOG, trackBean);
 
-        List<SyncJsonData> recordDataList = new ArrayList<>();
-        recordDataList.add(data);
-        String content = convertToLineProtocolLines(recordDataList);
+        String content = data.getDataString();
 
         assertEquals(content, SINGLE_LINE_NORMAL_DATA);
 
@@ -116,26 +117,9 @@ public class UtilsTest {
         LineProtocolBean trackBeanEmpty = new LineProtocolBean(TEST_MEASUREMENT_INFLUX_DB_LINE, tagsEmpty, fieldsEmpty, VALUE_TIME);
         SyncJsonData dataEmpty = SyncJsonData.getSyncJsonData(helper, DataType.LOG, trackBeanEmpty);
 
-        List<SyncJsonData> emptyRecordDataList = new ArrayList<>();
-        emptyRecordDataList.add(dataEmpty);
-        String contentEmpty = convertToLineProtocolLines(emptyRecordDataList);
+        String contentEmpty = dataEmpty.getDataString();
 
         assertEquals(SINGLE_LINE_EMPTY_DATA, contentEmpty);
-    }
-
-    /**
-     * 调用 {@link SyncDataHelper#convertToLineProtocolLines(List, HashMap, String)} }
-     * ,{@link FTTrackInner#dataHelper}
-     *
-     * @param list
-     * @return
-     * @throws Exception
-     */
-    private String convertToLineProtocolLines(List<SyncJsonData> list) throws Exception {
-        SyncDataHelper helper = Whitebox.getInternalState(FTTrackInner.getInstance(), "dataHelper");
-        return Whitebox.invokeMethod(helper, "convertToLineProtocolLines",
-                        list, new HashMap<>(), "").toString()
-                .replaceAll(",sdk_data_id=(.*?)", "");
     }
 
 

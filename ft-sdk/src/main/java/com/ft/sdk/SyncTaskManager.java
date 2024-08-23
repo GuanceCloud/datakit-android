@@ -133,6 +133,11 @@ public class SyncTaskManager {
      */
     private int pageSize = SyncPageSize.MEDIUM.getValue();
 
+    /**
+     *
+     */
+    private Runnable oldCacheRunner;
+
 
     /**
      * 用于跨步线程消息发送
@@ -192,6 +197,11 @@ public class SyncTaskManager {
      * @param withSleep 是否进行睡眠，{@link #SLEEP_TIME}
      */
     private void executePoll(final boolean withSleep) {
+        if (oldCacheRunner != null) {
+            oldCacheRunner.run();
+            oldCacheRunner = null;
+        }
+
         if (running || isStop) {
             return;
         }
@@ -460,13 +470,15 @@ public class SyncTaskManager {
                                 SyncJsonData data = it.next();
                                 try {
                                     String oldFormatData = data.getDataString();//获取旧格式数据
-                                    data.setUuid(Utils.randomUUID());//旧数据中没有 uuid
+                                    String uuid =Utils.randomUUID();
+                                    data.setUuid(uuid);//旧数据中没有 uuid
                                     data.setDataString(helper.getBodyContent(new JSONObject(oldFormatData),
                                             data.getDataType(),
-                                            Utils.randomUUID(),
+                                            uuid,
                                             data.getTime()));//转化成新格式
                                 } catch (Exception e) {
                                     it.remove();
+                                    LogUtils.e(TAG, "==> old cache insert error");
                                 }
                             }
                             FTDBManager.get().insertFtOptList(list, false);
@@ -494,7 +506,12 @@ public class SyncTaskManager {
         autoSync = config.isAutoSync();
         syncSleepTime = config.getSyncSleepTime();
         if (config.isNeedTransformOldCache()) {
-            oldDBDataTransform();
+            oldCacheRunner = new Runnable() {
+                @Override
+                public void run() {
+                    oldDBDataTransform();
+                }
+            };
         }
     }
 
@@ -504,6 +521,7 @@ public class SyncTaskManager {
     public void release() {
         DataUploaderThreadPool.get().shutDown();
         mHandler.removeMessages(MSG_SYNC);
+        oldCacheRunner = null;
         isStop = true;
     }
 }

@@ -635,7 +635,7 @@ public class FTDBManager extends DBManager {
             @Override
             public void run(SQLiteDatabase db) {
                 try {
-                    db.execSQL("DELETE FROM " + FTSQL.FT_SYNC_OLD_CACHE_TABLE_NAME + " where _id in (SELECT _id from " + FTSQL.FT_SYNC_OLD_CACHE_TABLE_NAME + " where " + FTSQL.RECORD_COLUMN_DATA_TYPE + "='" + type.getValue() + "' ORDER by tm ASC LIMIT " + limit + ")");
+                    db.execSQL("DELETE FROM " + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " where _id in (SELECT _id from " + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " where " + FTSQL.RECORD_COLUMN_DATA_TYPE + "='" + type.getValue() + "' ORDER by tm ASC LIMIT " + limit + ")");
                 } catch (Exception e) {
                     LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 

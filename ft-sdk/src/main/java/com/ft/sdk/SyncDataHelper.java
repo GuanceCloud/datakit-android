@@ -1,12 +1,14 @@
 package com.ft.sdk;
 
 import static com.ft.sdk.garble.utils.Constants.FT_KEY_VALUE_NULL;
+import static com.ft.sdk.garble.utils.Constants.KEY_SDK_DATA_FLAG;
 
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.StringUtils;
 import com.ft.sdk.garble.utils.Utils;
+import com.ft.sdk.internal.exception.FTInvalidParameterException;
 
 import org.json.JSONObject;
 
@@ -66,24 +68,30 @@ public class SyncDataHelper {
      * @param fields
      * @param timeStamp
      * @param dataType
+     * @param uuid
      * @return
      */
 
     public String getBodyContent(String measurement, JSONObject tags,
-                                 JSONObject fields, long timeStamp, DataType dataType) {
+                                 JSONObject fields, long timeStamp, DataType dataType, String uuid) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put(KEY_SDK_DATA_FLAG, uuid);
         String bodyContent;
         if (dataType == DataType.LOG) {
             // log 数据
-            bodyContent = convertToLineProtocolLine(measurement, tags, fields, new HashMap<>(logTags),
+            hashMap.putAll(logTags);
+            bodyContent = convertToLineProtocolLine(measurement, tags, fields, hashMap,
                     timeStamp, config);
 
         } else if (dataType == DataType.TRACE) {
             // trace 数据
-            bodyContent = convertToLineProtocolLine(measurement, tags, fields, new HashMap<>(traceTags),
+            hashMap.putAll(traceTags);
+            bodyContent = convertToLineProtocolLine(measurement, tags, fields, hashMap,
                     timeStamp, config);
         } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_WEBVIEW) {
             //rum 数据
-            bodyContent = convertToLineProtocolLine(measurement, tags, fields, new HashMap<>(rumTags),
+            hashMap.putAll(rumTags);
+            bodyContent = convertToLineProtocolLine(measurement, tags, fields, hashMap,
                     timeStamp, config);
         } else {
             bodyContent = "";
@@ -92,10 +100,24 @@ public class SyncDataHelper {
 
     }
 
-     static String convertToLineProtocolLine(String measurement, JSONObject tags,
-                                                      JSONObject fields,
-                                                      HashMap<String, Object> extraTags, long timeStamp,
-                                                      FTSDKConfig config) {
+    static String convertToLineProtocolLine(String measurement, JSONObject tags,
+                                            JSONObject fields,
+                                            HashMap<String, Object> extraTags, long timeStamp,
+                                            FTSDKConfig config) {
+
+
+        if (measurement == null) {
+            throw new FTInvalidParameterException("指标集 measurement 不能为空");
+        }
+
+        if (fields == null) {
+            throw new FTInvalidParameterException("指标集 fields 不能为空");
+        }
+
+        if (tags == null) {
+            tags = new JSONObject();
+        }
+
         boolean integerCompatible = false;
         if (config != null) {
             integerCompatible = config.isEnableDataIntegerCompatible();

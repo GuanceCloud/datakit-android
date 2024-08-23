@@ -383,7 +383,7 @@ public class Constants {
     public static final String KEY_RUM_SDK_PACKAGE_NATIVE = "sdk_package_native";
 
     /**
-     * SDK 数据标记 [package uuid].[32 digit random uuid]
+     * SDK 数据标记 [packageId].[pid].[pkg_dataCount].[uuid]
      * <p>
      * {@link ID36Generator}
      * {@link Utils#randomUUID()}
