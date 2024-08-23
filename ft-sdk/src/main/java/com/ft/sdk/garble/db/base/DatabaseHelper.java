@@ -45,7 +45,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion == 3 && newVersion < 3) {
-            //ignore improve for performance version
+            createTable(db);
         } else {
             super.onDowngrade(db, oldVersion, newVersion);
         }
