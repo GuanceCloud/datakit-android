@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 /**
  * 数据组装类，把采集数据从存储数据序列化行协议数据
@@ -72,26 +73,29 @@ public class SyncDataHelper {
      * @return
      */
 
-    public String getBodyContent(String measurement, JSONObject tags,
-                                 JSONObject fields, long timeStamp, DataType dataType, String uuid) {
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put(KEY_SDK_DATA_FLAG, uuid);
+    public String getBodyContent(String measurement, HashMap<String, Object> tags,
+                                 HashMap<String, Object> fields, long timeStamp, DataType dataType, String uuid) {
+        HashMap<String, Object> mergeTags = new LinkedHashMap<>();
+        mergeTags.put(KEY_SDK_DATA_FLAG, uuid);//让 uuid 放置第一位，字符替换时可以节省损耗
+        if (tags != null) {
+            mergeTags.putAll(tags);
+        }
         String bodyContent;
         if (dataType == DataType.LOG) {
             // log 数据
-            hashMap.putAll(logTags);
-            bodyContent = convertToLineProtocolLine(measurement, tags, fields, hashMap,
+            mergeTags.putAll(logTags);
+            bodyContent = convertToLineProtocolLine(measurement, mergeTags, fields,
                     timeStamp, config);
 
         } else if (dataType == DataType.TRACE) {
             // trace 数据
-            hashMap.putAll(traceTags);
-            bodyContent = convertToLineProtocolLine(measurement, tags, fields, hashMap,
+            mergeTags.putAll(traceTags);
+            bodyContent = convertToLineProtocolLine(measurement, mergeTags, fields,
                     timeStamp, config);
         } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_WEBVIEW) {
             //rum 数据
-            hashMap.putAll(rumTags);
-            bodyContent = convertToLineProtocolLine(measurement, tags, fields, hashMap,
+            mergeTags.putAll(rumTags);
+            bodyContent = convertToLineProtocolLine(measurement, mergeTags, fields,
                     timeStamp, config);
         } else {
             bodyContent = "";
@@ -100,9 +104,9 @@ public class SyncDataHelper {
 
     }
 
-    static String convertToLineProtocolLine(String measurement, JSONObject tags,
-                                            JSONObject fields,
-                                            HashMap<String, Object> extraTags, long timeStamp,
+    static String convertToLineProtocolLine(String measurement, HashMap<String, Object> tags,
+                                            HashMap<String, Object> fields,
+                                            long timeStamp,
                                             FTSDKConfig config) {
 
 
@@ -112,10 +116,6 @@ public class SyncDataHelper {
 
         if (fields == null) {
             throw new FTInvalidParameterException("指标集 fields 不能为空");
-        }
-
-        if (tags == null) {
-            tags = new JSONObject();
         }
 
         boolean integerCompatible = false;
@@ -134,15 +134,6 @@ public class SyncDataHelper {
             sb.append(measurement);
 
             //========== tags ==========
-            if (extraTags != null) {
-                //合并去重
-                for (String key : extraTags.keySet()) {
-                    if (!tags.has(key)) {
-                        //此处空对象会被移除
-                        tags.put(key, extraTags.get(key));
-                    }
-                }
-            }
             StringBuilder tagSb = getCustomHash(tags, true, integerCompatible);
             deleteLastComma(tagSb);
             if (tagSb.length() > 0) {
@@ -173,12 +164,12 @@ public class SyncDataHelper {
      * @param obj
      * @return
      */
-    private static StringBuilder getCustomHash(JSONObject obj, boolean isTag, boolean integerCompatible) {
+    private static StringBuilder getCustomHash(HashMap<String, Object> obj, boolean isTag, boolean integerCompatible) {
         StringBuilder sb = new StringBuilder();
-        Iterator<String> keys = obj.keys();
+        Iterator<String> keys = obj.keySet().iterator();
         while (keys.hasNext()) {
             String keyTemp = keys.next();
-            Object value = obj.opt(keyTemp);
+            Object value = obj.get(keyTemp);
             if (value == null || "".equals(value) || JSONObject.NULL.equals(value)) {
                 if (!isTag) {
                     String key = Utils.translateTagKeyValue(keyTemp);

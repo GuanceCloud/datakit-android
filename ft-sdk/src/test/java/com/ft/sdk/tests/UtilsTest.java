@@ -10,12 +10,12 @@ import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.utils.Constants;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 import org.powermock.reflect.Whitebox;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -66,14 +66,14 @@ public class UtilsTest {
     @Test
     public void multiLineProtocolFormatTest() throws Exception {
 
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put(Constants.MEASUREMENT, TEST_MEASUREMENT_INFLUX_DB_LINE);
-        JSONObject tags = new JSONObject();
+        HashMap<String,Object> map = new HashMap<>();
+        map.put(Constants.MEASUREMENT, TEST_MEASUREMENT_INFLUX_DB_LINE);
+        HashMap<String,Object> tags = new HashMap<>();
         tags.put(KEY_TAGS, VALUE_TAGS);
-        JSONObject fields = new JSONObject();
+        HashMap<String,Object> fields = new HashMap<>();
         fields.put(KEY_FIELD, VALUE_FIELD);
-        jsonObject.put(Constants.TAGS, tags);
-        jsonObject.put(Constants.FIELDS, fields);
+        map.put(Constants.TAGS, tags);
+        map.put(Constants.FIELDS, fields);
 
         SyncDataHelper helper = Whitebox.getInternalState(FTTrackInner.getInstance(), "dataHelper");
         LineProtocolBean trackBean = new LineProtocolBean(TEST_MEASUREMENT_INFLUX_DB_LINE, tags, fields, VALUE_TIME);
@@ -98,9 +98,9 @@ public class UtilsTest {
     @Test
     public void singleLineProtocolFormatTest() throws Exception {
         SyncDataHelper helper = Whitebox.getInternalState(FTTrackInner.getInstance(), "dataHelper");
-        JSONObject tags = new JSONObject();
+        HashMap<String,Object> tags = new HashMap<>();
         tags.put(KEY_TAGS, VALUE_TAGS);
-        JSONObject fields = new JSONObject();
+        HashMap<String,Object> fields = new HashMap<>();
         fields.put(KEY_FIELD, VALUE_FIELD);
         LineProtocolBean trackBean = new LineProtocolBean(TEST_MEASUREMENT_INFLUX_DB_LINE, tags, fields, VALUE_TIME);
         SyncJsonData data = SyncJsonData.getSyncJsonData(helper, DataType.LOG, trackBean);
@@ -110,9 +110,9 @@ public class UtilsTest {
         assertEquals(content, SINGLE_LINE_NORMAL_DATA);
 
 
-        JSONObject tagsEmpty = new JSONObject();
+        HashMap<String,Object> tagsEmpty = new HashMap<>();
         tagsEmpty.put(KEY_TAGS_EMPTY, VALUE_TAGS_EMPTY);
-        JSONObject fieldsEmpty = new JSONObject();
+        HashMap<String,Object> fieldsEmpty = new HashMap<>();
         fieldsEmpty.put(KEY_FIELD_EMPTY, VALUE_FIELD_EMPTY);
         LineProtocolBean trackBeanEmpty = new LineProtocolBean(TEST_MEASUREMENT_INFLUX_DB_LINE, tagsEmpty, fieldsEmpty, VALUE_TIME);
         SyncJsonData dataEmpty = SyncJsonData.getSyncJsonData(helper, DataType.LOG, trackBeanEmpty);

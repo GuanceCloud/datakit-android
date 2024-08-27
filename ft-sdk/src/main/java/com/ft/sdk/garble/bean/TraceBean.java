@@ -1,11 +1,11 @@
 package com.ft.sdk.garble.bean;
 
 import com.ft.sdk.garble.utils.Constants;
-import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
-import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.HashMap;
 
 /**
  * create: by huangDianHua
@@ -75,15 +75,15 @@ public class TraceBean extends BaseContentBean {
      *
      * @return
      */
-    public JSONObject getAllFields() {
+    public HashMap<String, Object> getAllFields() {
         super.getAllFields();
-        try {
-            if (duration > 0) {
-                fields.put("duration", duration);
-            }
-        } catch (JSONException e) {
-            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+//        try {
+        if (duration > 0) {
+            fields.put("duration", duration);
         }
+//        } catch (JSONException e) {
+//            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+//        }
         return fields;
     }
 
@@ -92,38 +92,38 @@ public class TraceBean extends BaseContentBean {
      *
      * @return
      */
-    public JSONObject getAllTags() {
+    public HashMap<String, Object> getAllTags() {
         super.getAllTags();
-        try {
-            tags.put("type", "custom");
+//        try {
+        tags.put("type", "custom");
 
-            if (!Utils.isNullOrEmpty(parentID)) {
-                tags.put("parent_id", parentID);
-            }
-            if (!Utils.isNullOrEmpty(operationName)) {
-                tags.put("operation", operationName);
-                tags.put("resource", operationName);
-            }
-            if (!Utils.isNullOrEmpty(spanID)) {
-                tags.put("span_id", spanID);
-            }
-            if (!Utils.isNullOrEmpty(traceID)) {
-                tags.put("trace_id", traceID);
-            }
-            if (!Utils.isNullOrEmpty(status)) {
-                tags.put("status", status);
-            }
-            if (!Utils.isNullOrEmpty(spanType)) {
-                tags.put("span_type", spanType);
-            }
-            if (!Utils.isNullOrEmpty(endpoint)) {
-                tags.put("endpoint", endpoint);
-            }
-
-        } catch (JSONException e) {
-            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
-
+        if (!Utils.isNullOrEmpty(parentID)) {
+            tags.put("parent_id", parentID);
         }
+        if (!Utils.isNullOrEmpty(operationName)) {
+            tags.put("operation", operationName);
+            tags.put("resource", operationName);
+        }
+        if (!Utils.isNullOrEmpty(spanID)) {
+            tags.put("span_id", spanID);
+        }
+        if (!Utils.isNullOrEmpty(traceID)) {
+            tags.put("trace_id", traceID);
+        }
+        if (!Utils.isNullOrEmpty(status)) {
+            tags.put("status", status);
+        }
+        if (!Utils.isNullOrEmpty(spanType)) {
+            tags.put("span_type", spanType);
+        }
+        if (!Utils.isNullOrEmpty(endpoint)) {
+            tags.put("endpoint", endpoint);
+        }
+
+//        } catch (JSONException e) {
+//            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+//
+//        }
 
         return tags;
     }

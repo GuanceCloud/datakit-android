@@ -9,9 +9,9 @@ import com.ft.sdk.garble.utils.Utils;
 import com.ft.sdk.internal.exception.FTInvalidParameterException;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.security.InvalidParameterException;
+import java.util.HashMap;
 
 
 /**
@@ -143,13 +143,12 @@ public class SyncJsonData implements Cloneable {
      */
     public static SyncJsonData getSyncJsonData(SyncDataHelper helper, DataType dataType, LineProtocolBean bean)
             throws FTInvalidParameterException {
-        JSONObject tagsTemp = bean.getTags();
-        JSONObject fields = bean.getFields();
         String uuid = Utils.randomUUID();
         SyncJsonData recordData = new SyncJsonData(dataType);
         recordData.setTime(bean.getTimeNano());
         recordData.setUuid(uuid);
-        recordData.setDataString(helper.getBodyContent(bean.getMeasurement(), tagsTemp, fields, bean.getTimeNano(), dataType, uuid));
+        recordData.setDataString(helper.getBodyContent(bean.getMeasurement(), bean.getTags(),
+                bean.getFields(), bean.getTimeNano(), dataType, uuid));
         return recordData;
     }
 

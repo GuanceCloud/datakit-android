@@ -1,5 +1,7 @@
 package com.ft.test.utils;
 
+import com.ft.sdk.garble.utils.HashMapUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -92,94 +94,83 @@ public class LineProtocolData {
     }
 
     public String getFieldAsString(String key) {
-        return getAsType(fieldMap, key, String.class, null);
+        return HashMapUtils.getString(fieldMap, key, null);
     }
 
     public String getFieldAsString(String key, String defaultValue) {
-        return getAsType(fieldMap, key, String.class, defaultValue);
+        return HashMapUtils.getString(fieldMap, key, defaultValue);
     }
 
     public Boolean getFieldAsBoolean(String key) {
-        return getAsType(fieldMap, key, Boolean.class, null);
+        return HashMapUtils.getBoolean(fieldMap, key, null);
     }
 
     public Boolean getFieldAsBoolean(String key, Boolean defaultValue) {
-        return getAsType(fieldMap, key, Boolean.class, defaultValue);
+        return HashMapUtils.getBoolean(fieldMap, key, defaultValue);
     }
 
     public Integer getFieldAsInt(String key) {
-        return getAsType(fieldMap, key, Integer.class, null);
+        return HashMapUtils.getInt(fieldMap, key, null);
     }
 
     public Integer getFieldAsInt(String key, Integer defaultValue) {
-        return getAsType(fieldMap, key, Integer.class, defaultValue);
+        return HashMapUtils.getInt(fieldMap, key, defaultValue);
     }
 
     public Long getFieldAsLong(String key) {
-        return getAsType(fieldMap, key, Long.class, null);
+        return HashMapUtils.getLong(fieldMap, key, null);
     }
 
     public Long getFieldAsLong(String key, Long defaultValue) {
-        return getAsType(fieldMap, key, Long.class, defaultValue);
+        return HashMapUtils.getLong(fieldMap, key, defaultValue);
     }
 
     public Double getFieldAsDouble(String key) {
-        return getAsType(fieldMap, key, Double.class, null);
+        return HashMapUtils.getDouble(fieldMap, key, null);
     }
 
     public Double getFieldAsDouble(String key, Double defaultValue) {
-        return getAsType(fieldMap, key, Double.class, defaultValue);
+        return HashMapUtils.getDouble(fieldMap, key, defaultValue);
     }
 
     public String getTagAsString(String key) {
-        return getAsType(tagMap, key, String.class, null);
+        return HashMapUtils.getString(tagMap, key, null);
     }
 
     public String getTagAsString(String key, String defaultValue) {
-        return getAsType(tagMap, key, String.class, defaultValue);
+        return HashMapUtils.getString(tagMap, key, defaultValue);
     }
 
     public Boolean getTagAsBoolean(String key) {
-        return getAsType(tagMap, key, Boolean.class, null);
+        return HashMapUtils.getBoolean(tagMap, key, null);
     }
 
     public Boolean getTagAsBoolean(String key, Boolean defaultValue) {
-        return getAsType(tagMap, key, Boolean.class, defaultValue);
+        return HashMapUtils.getBoolean(tagMap, key, defaultValue);
     }
 
     public Integer getTagAsInt(String key) {
-        return getAsType(tagMap, key, Integer.class, null);
+        return HashMapUtils.getInt(tagMap, key, null);
     }
 
     public Integer getTagAsInt(String key, Integer defaultValue) {
-        return getAsType(tagMap, key, Integer.class, defaultValue);
+        return HashMapUtils.getInt(tagMap, key, defaultValue);
     }
 
     public Long getTagAsLong(String key) {
-        return getAsType(tagMap, key, Long.class, null);
+        return HashMapUtils.getLong(tagMap, key, null);
     }
 
     public Long getTagAsLong(String key, Long defaultValue) {
-        return getAsType(tagMap, key, Long.class, defaultValue);
+        return HashMapUtils.getLong(tagMap, key, defaultValue);
     }
 
     public Double getTagAsDouble(String key) {
-        return getAsType(tagMap, key, Double.class, null);
+        return HashMapUtils.getDouble(tagMap, key, null);
     }
 
     public Double getTagAsDouble(String key, Double defaultValue) {
-        return getAsType(tagMap, key, Double.class, defaultValue);
-    }
-
-    private <T> T getAsType(Map<String, Object> map, String key, Class<T> type, T defaultValue) {
-        Object value = map.get(key);
-        if (value == null) {
-            return defaultValue; // Return the default value if the key is not present or the value is null
-        }
-        if (type.isInstance(value)) {
-            return type.cast(value);
-        }
-        return defaultValue; // Return the default value if the type does not match
+        return HashMapUtils.getDouble(tagMap, key, defaultValue);
     }
 
     private String[] splitRespectingEscapedSpaces(String input, char delimiter, int limit) {

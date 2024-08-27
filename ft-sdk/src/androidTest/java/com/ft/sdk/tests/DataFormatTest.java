@@ -11,11 +11,11 @@ import com.ft.test.base.FTBaseTest;
 import com.ft.test.utils.LineProtocolData;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -44,7 +44,7 @@ public class DataFormatTest extends FTBaseTest {
 
     @Test
     public void trackFloatDoubleDataTest() throws Exception {
-        JSONObject fields = new JSONObject();
+        HashMap<String, Object> fields = new HashMap<>();
         fields.put("floatValue", 0f);
         fields.put("doubleValue", 0d);
         invokeSyncData(DataType.LOG, "TestLog", null, fields);

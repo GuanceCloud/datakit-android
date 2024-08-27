@@ -22,6 +22,7 @@ import com.ft.sdk.garble.manager.SingletonGson;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -626,6 +627,28 @@ public class Utils {
             return "";
         }
         return jsonBuilder.toString();
+    }
+
+
+    /**
+     * JSONObject 转化成 Map<String, Object>
+     *
+     * @param jsonObject
+     * @return
+     */
+    public static HashMap<String, Object> jsonToMap(@Nullable JSONObject jsonObject) {
+        if (jsonObject == null) return null;
+        HashMap<String, Object> map = new HashMap<>();
+        // 获取 JSONObject 的键的迭代器
+        Iterator<String> keys = jsonObject.keys();
+        // 遍历每个键并将键值对放入 HashMap 中
+        while (keys.hasNext()) {
+            String key = keys.next();
+            Object value = jsonObject.opt(key);
+            // 将键值对放入 HashMap
+            map.put(key, value);
+        }
+        return map;
     }
 
 

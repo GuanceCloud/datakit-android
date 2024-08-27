@@ -12,10 +12,10 @@ import com.ft.sdk.garble.db.base.DatabaseHelper;
 import com.ft.test.base.FTBaseTest;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -41,7 +41,7 @@ public class FTDBManagerTest extends FTBaseTest {
      * 测试向数据库中插入一条数据是否插入成功
      *
      * @throws InterruptedException
-     * @throws JSONException
+     * @throws Exception
      */
     @Test
     public void insertDataTest() throws Exception {
@@ -55,7 +55,7 @@ public class FTDBManagerTest extends FTBaseTest {
     /**
      * 测试向数据库中插入 {@link #repeatTime} 条数据，和查到的数据是否相同
      *
-     * @throws JSONException
+     * @throws Exception
      * @throws InterruptedException
      */
     @Test
@@ -75,7 +75,7 @@ public class FTDBManagerTest extends FTBaseTest {
     /**
      * 测试通过数据的ID来删除数据
      *
-     * @throws JSONException
+     * @throws Exception
      * @throws InterruptedException
      */
     @Test
@@ -98,12 +98,12 @@ public class FTDBManagerTest extends FTBaseTest {
     /**
      * 向数据库中插入一条数据
      *
-     * @throws JSONException
+     * @throws Exception
      */
     private void insertData() throws Exception {
-        JSONObject tags = new JSONObject();
+        HashMap<String, Object> tags = new HashMap<>();
         tags.put("name", "json");
-        JSONObject values = new JSONObject();
+        HashMap<String, Object> values = new HashMap<>();
         values.put("value", "success");
 //        SyncTaskManager.get().setRunning(true);
         stopSyncTask();

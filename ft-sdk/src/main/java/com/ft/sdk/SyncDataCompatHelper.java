@@ -5,15 +5,17 @@ import static com.ft.sdk.garble.utils.Constants.KEY_SDK_DATA_FLAG;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * 用于转化旧格式数据
  */
-public class SyncDataCompatHelper  {
+public class SyncDataCompatHelper {
 
     public final static String TAG = Constants.LOG_TAG_PREFIX + "SyncDataCompatHelper";
 
@@ -39,8 +41,8 @@ public class SyncDataCompatHelper  {
      * @return
      */
     public String getBodyContent(JSONObject json, DataType dataType, String uuid, long timeStamp) {
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put(KEY_SDK_DATA_FLAG, uuid);
+        HashMap<String, Object> hashMap = new LinkedHashMap<>();
+        hashMap.put(KEY_SDK_DATA_FLAG, uuid);//让 uuid 放置第一位，字符替换时可以节省损耗
         if (dataType == DataType.LOG) {
             hashMap.putAll(logTags);
         } else if (dataType == DataType.TRACE) {
@@ -55,15 +57,21 @@ public class SyncDataCompatHelper  {
      * 转化为单条行协议数据
      *
      * @param opJson
-     * @param extraTags
+     * @param mergeTags
      * @return
      */
-    private String convertToLineProtocolLine(JSONObject opJson, long timeStamp, HashMap<String, Object> extraTags) {
+    private String convertToLineProtocolLine(JSONObject opJson, long timeStamp, HashMap<String, Object> mergeTags) {
         try {
             String measurement = opJson.optString(Constants.MEASUREMENT);
             JSONObject tags = opJson.optJSONObject(Constants.TAGS);
             JSONObject fields = opJson.optJSONObject(Constants.FIELDS);
-            return SyncDataHelper.convertToLineProtocolLine(measurement, tags, fields, extraTags, timeStamp,config);
+
+            HashMap<String, Object> jsonTags = Utils.jsonToMap(tags);
+            if (jsonTags != null) {
+                mergeTags.putAll(jsonTags);
+            }
+
+            return SyncDataHelper.convertToLineProtocolLine(measurement, mergeTags, Utils.jsonToMap(fields), timeStamp, config);
         } catch (Exception e) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }

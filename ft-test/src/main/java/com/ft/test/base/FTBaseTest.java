@@ -24,6 +24,7 @@ import org.junit.Assert;
 import org.powermock.reflect.Whitebox;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -104,7 +105,7 @@ public class FTBaseTest {
      * @param fileds
      * @throws Exception
      */
-    protected void invokeSyncData(DataType type, String measurement, JSONObject tags, JSONObject fileds) throws Exception {
+    protected void invokeSyncData(DataType type, String measurement, HashMap<String,Object> tags, HashMap<String,Object> fileds) throws Exception {
         Whitebox.invokeMethod(FTTrackInner.getInstance(), "syncDataBackground",
                 type, Utils.getCurrentNanoTime(), measurement, tags, fileds);
 

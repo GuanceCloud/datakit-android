@@ -470,7 +470,7 @@ public class SyncTaskManager {
                                 SyncJsonData data = it.next();
                                 try {
                                     String oldFormatData = data.getDataString();//获取旧格式数据
-                                    String uuid =Utils.randomUUID();
+                                    String uuid = Utils.randomUUID();
                                     data.setUuid(uuid);//旧数据中没有 uuid
                                     data.setDataString(helper.getBodyContent(new JSONObject(oldFormatData),
                                             data.getDataType(),
