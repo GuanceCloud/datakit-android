@@ -8,10 +8,12 @@ import android.webkit.WebView;
 
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.Iterator;
 
 /**
@@ -114,32 +116,34 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
             String tag = json.optString(WEB_JS_INNER_TAG);
             if (name.equals(WEB_JS_TYPE_RUM)) {
                 if (data != null) {
-                    JSONObject tags = data.optJSONObject(Constants.TAGS);
-                    JSONObject fields = data.optJSONObject(Constants.FIELDS);
+                    JSONObject jsonTags = data.optJSONObject(Constants.TAGS);
+                    JSONObject jsonFields = data.optJSONObject(Constants.FIELDS);
 
-                    JSONObject publicTags = FTRUMConfigManager.get().getRUMPublicDynamicTags(true);
-                    Iterator<String> keys = publicTags.keys();
-                    if (tags == null) {
-                        tags = new JSONObject();
+                    HashMap<String,Object> publicTags = FTRUMConfigManager.get().getRUMPublicDynamicTags(true);
+                    Iterator<String> keys = publicTags.keySet().iterator();
+                    if (jsonTags == null) {
+                        jsonTags = new JSONObject();
                     }
-                    if (fields == null) {
-                        fields = new JSONObject();
+                    if (jsonFields == null) {
+                        jsonFields = new JSONObject();
                     }
                     while (keys.hasNext()) {
                         String key = keys.next();
                         if (!key.equals(Constants.KEY_SERVICE)) {
-                            tags.put(key, publicTags.opt(key));
+                            jsonTags.put(key, publicTags.get(key));
                         }
                     }
 
                     String sessionId = FTRUMInnerManager.get().getSessionId();
-                    tags.put(Constants.KEY_RUM_SESSION_ID, sessionId);
-                    tags.put(Constants.KEY_RUM_VIEW_IS_WEB_VIEW, true);
-                    fields.put(Constants.KEY_RUM_VIEW_IS_ACTIVE, false);
+                    jsonTags.put(Constants.KEY_RUM_SESSION_ID, sessionId);
+                    jsonTags.put(Constants.KEY_RUM_VIEW_IS_WEB_VIEW, true);
+                    jsonFields.put(Constants.KEY_RUM_VIEW_IS_ACTIVE, false);
 
+                    HashMap<String,Object> tagMaps= Utils.jsonToMap(jsonTags);
+                    HashMap<String,Object> fieldMaps= Utils.jsonToMap(jsonFields);
                     long time = data.optLong(Constants.TIME);
                     String measurement = data.optString(Constants.MEASUREMENT);
-                    FTTrackInner.getInstance().rumWebView(time * 1000000, measurement, tags, fields);
+                    FTTrackInner.getInstance().rumWebView(time * 1000000, measurement, tagMaps, fieldMaps);
                 }
 
             } else if (name.equals(WEB_JS_TYPE_TRACK)) {

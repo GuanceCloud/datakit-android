@@ -1,14 +1,10 @@
 package com.ft.test.utils;
 
-import com.ft.sdk.FTTrackInner;
 import com.ft.sdk.SyncDataHelper;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.test.base.FTBaseTest;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Objects;
@@ -29,11 +25,13 @@ public class CheckUtils {
      */
     public static boolean checkValueInLineProtocol(DataType dataType, String[] checkValues) {
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, dataType);
-        SyncDataHelper syncDataManager = FTBaseTest.getInnerSyncDataHelper();
-        String body = syncDataManager.getBodyContent(dataType, recordDataList);
+        StringBuilder body = new StringBuilder();
+        for (SyncJsonData data : recordDataList) {
+            body.append(data.getDataString());
+        }
         boolean result = false;
         for (String item : checkValues) {
-            boolean contain = body.contains(item);
+            boolean contain = body.toString().contains(item);
             if (!contain) {
                 result = false;
                 break;
@@ -60,28 +58,16 @@ public class CheckUtils {
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, dataType);
 
         for (SyncJsonData recordData : recordDataList) {
-            try {
-                JSONObject json = new JSONObject(recordData.getDataString());
-                if (isTag) {
-                    JSONObject tags = json.optJSONObject("tags");
-                    String measurement = json.optString("measurement");
-                    if (targetMeasurement.equals(measurement)) {
-                        if (tags != null) {
-                            return Objects.equals(tags.opt(key), value);
-                        }
-                    }
-                } else {
-                    JSONObject fields = json.optJSONObject("fields");
-                    String measurement = json.optString("measurement");
-                    if (targetMeasurement.equals(measurement)) {
-                        if (fields != null) {
-                            return Objects.equals(fields.opt(key), value);
-                        }
-                    }
+            LineProtocolData lineProtocolData = new LineProtocolData(recordData.getDataString());
+            String measurement = lineProtocolData.getMeasurement();
+            if (isTag) {
+                if (targetMeasurement.equals(measurement)) {
+                    return Objects.equals(lineProtocolData.getTagAsString(key), value);
                 }
-
-            } catch (JSONException e) {
-                e.printStackTrace();
+            } else {
+                if (targetMeasurement.equals(measurement)) {
+                    return Objects.equals(lineProtocolData.getFieldAsString(key), value);
+                }
             }
         }
         return false;
@@ -97,11 +83,13 @@ public class CheckUtils {
      */
     public static int getCount(DataType dataType, String[] checkValues, int limit) {
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(limit, dataType);
-        SyncDataHelper syncDataManager = FTBaseTest.getInnerSyncDataHelper();
-        String body = syncDataManager.getBodyContent(dataType, recordDataList);
+        StringBuilder body = new StringBuilder();
+        for (SyncJsonData syncJsonData : recordDataList) {
+            body.append(syncJsonData.getDataString());
+        }
         int count = 0;
         for (String item : checkValues) {
-            String[] lines = body.split("\n");
+            String[] lines = body.toString().split("\n");
             for (String line : lines) {
                 if (line.contains(item)) {
                     count++;

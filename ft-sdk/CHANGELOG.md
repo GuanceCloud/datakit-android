@@ -1,3 +1,19 @@
+# agent 1.6.0-beta01
+1. 同 1.6.0-alpha02
+2. 优化 Inner Log 缓存清理规则
+
+---
+# agent 1.6.0-alpha02
+1. 修正日志丢弃策略
+2. 优化全局 json 数据存储
+
+---
+# agent 1.6.0-alpha01
+1. 优化数据序列化存储规则
+2. 恢复数据库落盘
+3. 1.5.2 功能合并
+
+---
 # agent 1.5.3-alpha01
 1. 处理在使用 ft-plugin 时，调用 Log.w(String,Throwable) 引发异常的问题
 

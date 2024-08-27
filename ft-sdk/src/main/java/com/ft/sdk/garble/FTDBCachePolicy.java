@@ -4,6 +4,7 @@ import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.LogCacheDiscard;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.db.FTDBManager;
+import com.ft.sdk.garble.utils.LogUtils;
 
 /**
  * author: huangDianHua
@@ -106,6 +107,7 @@ public class FTDBCachePolicy {
                 needInsert = limitCount - count;
                 status = limit - needInsert;
                 limit = needInsert;
+
             }
             optCount(limit);
         }

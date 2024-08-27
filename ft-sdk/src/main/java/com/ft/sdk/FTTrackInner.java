@@ -17,6 +17,7 @@ import com.ft.sdk.garble.manager.AsyncCallback;
 import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.threadpool.RunnerCompleteCallBack;
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.HashMapUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
@@ -24,6 +25,7 @@ import org.json.JSONObject;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -100,8 +102,8 @@ public class FTTrackInner {
      * @param tags
      * @param fields
      */
-    void rum(long time, String measurement, final JSONObject tags, JSONObject fields, RunnerCompleteCallBack callBack) {
-        String sessionId = tags.optString(Constants.KEY_RUM_SESSION_ID);
+    void rum(long time, String measurement, final HashMap<String, Object> tags, HashMap<String, Object> fields, RunnerCompleteCallBack callBack) {
+        String sessionId = HashMapUtils.getString(tags, Constants.KEY_RUM_SESSION_ID);
         if (FTRUMInnerManager.get().checkSessionWillCollect(sessionId)) {
             syncDataBackground(DataType.RUM_APP, time, measurement, tags, fields, callBack);
         }
@@ -115,8 +117,8 @@ public class FTTrackInner {
      * @param tags
      * @param fields
      */
-    void rumWebView(long time, String measurement, final JSONObject tags, JSONObject fields) {
-        String sessionId = tags.optString(Constants.KEY_RUM_SESSION_ID);
+    void rumWebView(long time, String measurement, final HashMap<String, Object> tags, HashMap<String, Object> fields) {
+        String sessionId = HashMapUtils.getString(tags, Constants.KEY_RUM_SESSION_ID);
         if (FTRUMInnerManager.get().checkSessionWillCollect(sessionId)) {
             syncDataBackground(DataType.RUM_WEBVIEW, time, measurement, tags, fields);
         }
@@ -134,7 +136,7 @@ public class FTTrackInner {
      * @param fields
      */
     private void syncDataBackground(final DataType dataType, final long time,
-                                    final String measurement, final JSONObject tags, final JSONObject fields) {
+                                    final String measurement, final HashMap<String, Object> tags, final HashMap<String, Object> fields) {
         syncDataBackground(dataType, time, measurement, tags, fields, null);
     }
 
@@ -149,15 +151,15 @@ public class FTTrackInner {
      * @param callBack
      */
     private void syncDataBackground(final DataType dataType, final long time,
-                                    final String measurement, final JSONObject tags, final JSONObject fields, RunnerCompleteCallBack callBack) {
+                                    final String measurement, final HashMap<String, Object> tags, final HashMap<String, Object> fields, RunnerCompleteCallBack callBack) {
         DataUploaderThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
                 try {
 
-                    SyncJsonData recordData = SyncJsonData.getSyncJsonData(dataType,
+                    SyncJsonData recordData = SyncJsonData.getSyncJsonData(dataHelper, dataType,
                             new LineProtocolBean(measurement, tags, fields, time));
-                    boolean result = FTDBManager.get().insertFtOperation(recordData);
+                    boolean result = FTDBManager.get().insertFtOperation(recordData, false);
                     LogUtils.d(TAG, "syncDataBackground:" + measurement + " " + dataType.toString() + ":insert=" + result);
                     if (callBack != null) {
                         callBack.onComplete();
@@ -181,11 +183,9 @@ public class FTTrackInner {
         DataUploaderThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
-                List<SyncJsonData> recordDataList = new ArrayList<>();
                 try {
-                    SyncJsonData recordData = SyncJsonData.getFromLogBean(bean);
-                    recordDataList.add(recordData);
-                    String body = dataHelper.getBodyContent(DataType.LOG, recordDataList);
+                    SyncJsonData recordData = SyncJsonData.getFromLogBean(dataHelper, bean);
+                    String body = recordData.getDataString();
                     String model = Constants.URL_MODEL_LOG;
                     String content_type = "text/plain";
                     FTResponseData result = HttpBuilder.Builder()
@@ -238,7 +238,7 @@ public class FTTrackInner {
         try {
             FTLoggerConfig config = FTLoggerConfigManager.get().getConfig();
             if (config == null) return;
-            JSONObject rumTags = null;
+            HashMap<String, Object> rumTags = null;
             if (config.isEnableLinkRumData()) {
                 rumTags = FTRUMConfigManager.get().getRUMPublicDynamicTags(true);
                 FTRUMInnerManager.get().attachRUMRelative(rumTags, false);
@@ -251,7 +251,7 @@ public class FTTrackInner {
                         if (rumTags != null) {
                             logBean.appendTags(rumTags);
                         }
-                        datas.add(SyncJsonData.getFromLogBean(logBean));
+                        datas.add(SyncJsonData.getFromLogBean(dataHelper, logBean));
                     } else {
                         LogUtils.d(TAG, "根据 FTLogConfig SampleRate 计算，将被丢弃=>" + logBean.getContent());
                     }
@@ -299,7 +299,7 @@ public class FTTrackInner {
                 recordDataList.subList(0, dropCount).clear();
                 LogUtils.e(TAG, "reach log limit, drop log count:" + dropCount);
             }
-            boolean result = FTDBManager.get().insertFtOptList(recordDataList);
+            boolean result = FTDBManager.get().insertFtOptList(recordDataList, false);
             LogUtils.d(TAG, "judgeLogCachePolicy:insert-result=" + result);
             if (!silence) {
                 SyncTaskManager.get().executeSyncPoll();

@@ -39,6 +39,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //升级数据库
         if (oldVersion == 1 && newVersion == 2) {
             update1to2(db);
+        } else if (oldVersion < 3 && newVersion == 3) {
+            update2to3(db);
         }
     }
 
@@ -73,5 +75,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("ALTER TABLE " + FTSQL.FT_TABLE_VIEW + " ADD COLUMN  " + FTSQL.RUM_DATA_UPDATE_TIME + " BIGINT DEFAULT 0");
         db.execSQL("ALTER TABLE " + FTSQL.FT_TABLE_VIEW + " ADD COLUMN  " + FTSQL.RUM_VIEW_UPDATE_TIME + " BIGINT DEFAULT 1");
 
+    }
+
+    private void update2to3(SQLiteDatabase db) {
+        db.execSQL(FTSQL.FT_TABLE_SYNC_CREATE);
     }
 }

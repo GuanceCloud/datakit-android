@@ -36,7 +36,7 @@ public class LogGlobalContextTest extends FTBaseTest {
             hasPrepare = true;
         }
         stopSyncTask();
-        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
+        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL).setDebug(true));
         FTSdk.initLogWithConfig(new FTLoggerConfig()
                 .addGlobalContext(CUSTOM_KEY, CUSTOM_VALUE)
                 .setEnableCustomLog(true)
