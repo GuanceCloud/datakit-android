@@ -1,6 +1,7 @@
 # agent 1.6.0-beta01
 1. 同 1.6.0-alpha02
 2. 优化 Inner Log 缓存清理规则
+3. 优化行协议转化存储规则
 
 ---
 # agent 1.6.0-alpha02
