@@ -485,7 +485,7 @@ public class SyncTaskManager {
                             deleteLastQuery(list, true);
                             if (list.size() < OLD_CACHE_TRANSFORM_PAGE_SIZE) {
                                 LogUtils.d(TAG, "==> old cache transform end");
-                                FTDBManager.get().deleteOldCacheTable();
+                                //不删除旧表避免 SDK 版本回退发生兼容问题
                                 break;
                             }
                         }

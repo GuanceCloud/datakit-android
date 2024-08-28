@@ -644,47 +644,29 @@ public class FTDBManager extends DBManager {
         });
     }
 
-    /**
-     * 判断表是否存在
-     *
-     * @param tableName
-     * @return
-     */
-    public boolean isTableExist(String tableName) {
-        final Boolean[] exists = {false};
-        getDB(false, new DataBaseCallBack() {
-            @Override
-            public void run(SQLiteDatabase db) {
-                Cursor cursor = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table' AND name=?", new String[]{tableName});
-                exists[0] = cursor.getCount() > 0;
-                cursor.close();
-            }
-        });
-
-        return exists[0];
-    }
 
     /**
-     * 判断是否存在旧缓存
+     * 判断是否存在旧缓存,如果 table 不存在，则会被 {@link #getDB} exception try catch 直接捕获
      *
      * @return
      */
     public boolean isOldCacheExist() {
-        return isTableExist(FTSQL.FT_SYNC_OLD_CACHE_TABLE_NAME);
-    }
-
-    /**
-     * 删除旧表
-     */
-    public void deleteOldCacheTable() {
+        final boolean[] result = new boolean[1];
         getDB(false, new DataBaseCallBack() {
             @Override
             public void run(SQLiteDatabase db) {
-                db.execSQL("DROP TABLE " + FTSQL.FT_SYNC_OLD_CACHE_TABLE_NAME);
+                Cursor cursor = db.rawQuery("SELECT EXISTS (SELECT 1 FROM " + FTSQL.FT_SYNC_OLD_CACHE_TABLE_NAME + ");", null);
+
+                if (cursor != null) {
+                    if (cursor.moveToFirst()) {
+                        result[0] = cursor.getInt(0) == 1;
+                    }
+                    cursor.close();
+                }
             }
         });
+        return result[0];
     }
-
 
     /**
      * 根据条件查询数据
@@ -770,7 +752,7 @@ public class FTDBManager extends DBManager {
                 db.delete(FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME, null, null);
                 db.delete(FTSQL.FT_TABLE_ACTION, null, null);
                 db.delete(FTSQL.FT_TABLE_VIEW, null, null);
-                LogUtils.e(TAG,"DB table delete");
+                LogUtils.e(TAG, "DB table delete");
 
             }
         });

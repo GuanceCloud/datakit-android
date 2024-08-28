@@ -45,6 +45,7 @@ public class DemoApplication extends BaseApplication {
                 .setAutoSync(true)
                 .setCustomSyncPageSize(100)
                 .setOnlySupportMainProcess(CrossProcessSetting.isOnlyMainProcess(context))
+                .setNeedTransformOldCache(true)
                 .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()));
         FTSdk.install(ftSDKConfig);
 
