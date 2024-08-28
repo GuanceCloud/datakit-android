@@ -494,6 +494,8 @@ public class SyncTaskManager {
                     }
                 }
             });
+        } else {
+            LogUtils.d(TAG, "==> no old cache need transform");
         }
 
 

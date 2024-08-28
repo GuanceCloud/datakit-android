@@ -23,6 +23,7 @@ import com.ft.sdk.garble.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * BY huangDianHua
@@ -655,13 +656,21 @@ public class FTDBManager extends DBManager {
         getDB(false, new DataBaseCallBack() {
             @Override
             public void run(SQLiteDatabase db) {
-                Cursor cursor = db.rawQuery("SELECT EXISTS (SELECT 1 FROM " + FTSQL.FT_SYNC_OLD_CACHE_TABLE_NAME + ");", null);
+                try {
+                    Cursor cursor = db.rawQuery("SELECT EXISTS (SELECT 1 FROM " + FTSQL.FT_SYNC_OLD_CACHE_TABLE_NAME + ");", null);
 
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        result[0] = cursor.getInt(0) == 1;
+                    if (cursor != null) {
+                        if (cursor.moveToFirst()) {
+                            result[0] = cursor.getInt(0) == 1;
+                        }
+                        cursor.close();
                     }
-                    cursor.close();
+                } catch (SQLException e) {
+                    if (Objects.requireNonNull(e.getMessage()).contains("no such table: sync_data")) {
+                        LogUtils.d(TAG, "There is no old cache in 'sync_data', ignore this error");
+                    } else {
+                        LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+                    }
                 }
             }
         });
