@@ -1,6 +1,6 @@
 # agent 1.6.0
-1. 优化数据存储和同步性能。
-（1.6.0 以下版本数据存储缓存存在差异，可以通过 FTSDKConfig.setNeedTransformOldCache 配置进行旧数据兼容同步）
+1. 优化数据存储和同步性能
+（旧版本升级至 1.6.0 需要配置 FTSDKConfig.setNeedTransformOldCache 进行旧数据兼容同步）
 2. 处理在使用 ft-plugin 时，调用 Log.w(String,Throwable) 引发异常的问题
 
 ---
