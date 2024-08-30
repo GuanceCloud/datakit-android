@@ -38,6 +38,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -994,8 +995,8 @@ public class FTRUMInnerManager {
      * @param tags
      */
     private void increaseLongTask(HashMap<String, Object> tags) {
-        final String actionId = HashMapUtils.getString(tags,Constants.KEY_RUM_ACTION_ID);
-        final String viewId = HashMapUtils.getString(tags,Constants.KEY_RUM_VIEW_ID);
+        final String actionId = HashMapUtils.getString(tags, Constants.KEY_RUM_ACTION_ID);
+        final String viewId = HashMapUtils.getString(tags, Constants.KEY_RUM_VIEW_ID);
         EventConsumerThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
@@ -1128,20 +1129,17 @@ public class FTRUMInnerManager {
     void attachRUMRelative(HashMap<String, Object> tags, boolean withAction) {
         tags.put(Constants.KEY_RUM_VIEW_ID, getViewId());
 
-            tags.put(Constants.KEY_RUM_VIEW_NAME, getViewName());
-            tags.put(Constants.KEY_RUM_VIEW_REFERRER, getViewReferrer());
-            tags.put(Constants.KEY_RUM_SESSION_ID, sessionId);
-            tags.put(Constants.KEY_HAS_REPLAY, viewHasReplay());
-            if (withAction) {
-                if (activeAction != null && !activeAction.isClose()) {
-                    tags.put(Constants.KEY_RUM_ACTION_ID, getActionId());
-                    tags.put(Constants.KEY_RUM_ACTION_NAME, getActionName());
-                }
+        tags.put(Constants.KEY_RUM_VIEW_NAME, getViewName());
+        tags.put(Constants.KEY_RUM_VIEW_REFERRER, getViewReferrer());
+        tags.put(Constants.KEY_RUM_SESSION_ID, sessionId);
+        tags.put(Constants.KEY_HAS_REPLAY, viewHasReplay());
+        if (withAction) {
+            if (activeAction != null && !activeAction.isClose()) {
+                tags.put(Constants.KEY_RUM_ACTION_ID, getActionId());
+                tags.put(Constants.KEY_RUM_ACTION_NAME, getActionName());
             }
         }
-
     }
-
 
     private final Handler mHandler = new Handler(Looper.getMainLooper());
     private final Runnable mRUMGenerateRunner = new Runnable() {
@@ -1296,16 +1294,16 @@ public class FTRUMInnerManager {
     void updateSessionViewMap(Map<String, Object> map) {
         if (activeView != null) {
             if (map.containsKey(Constants.KEY_RUM_VIEW_ID)) {
-                String viewId = map.get(Constants.KEY_RUM_VIEW_ID).toString();
+                String viewId = HashMapUtils.getString(map, Constants.KEY_RUM_VIEW_ID);
                 if (viewId.equals(activeView.getId())) {
                     if (map.containsKey(viewId)) {
                         Object viewMap = map.get(viewId);
                         if (viewMap instanceof Map) {
                             if (((Map<?, ?>) viewMap).containsKey(VIEW_RECORDS_COUNT_KEY)) {
-                                activeView.setRecordsCount((long) ((Map<String, Object>) viewMap).get(VIEW_RECORDS_COUNT_KEY));
+                                activeView.setRecordsCount(HashMapUtils.getLong(map, VIEW_RECORDS_COUNT_KEY));
                             }
                             if (((Map<?, ?>) viewMap).containsKey(HAS_REPLAY_KEY)) {
-                                activeView.setHasReplay((boolean) ((Map<String, Object>) viewMap).get(HAS_REPLAY_KEY));
+                                activeView.setHasReplay(HashMapUtils.getBoolean(map, HAS_REPLAY_KEY));
                             }
                         }
                     }
