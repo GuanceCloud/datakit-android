@@ -91,7 +91,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     /**
      * {@link Activity#onResume()}  } 恢复事件
      * <p>
-     * {@link FTRUMConfigManager#isRumEnable()} 开启状态下，使用 {@link FTRUMInnerManager#startView(String, HashMap)}
+     * {@link FTRUMConfigManager#isRumEnable()} 开启状态下，使用 {@link FTRUMGlobalManager#startView(String, HashMap)}
      *
      * @param activity {@link Activity }.
      */
@@ -102,7 +102,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
         FTRUMConfigManager manager = FTRUMConfigManager.get();
         //config nonnull here ignore warning
         if (manager.isRumEnable() && manager.getConfig().isEnableTraceUserView()) {
-            FTRUMInnerManager.get().startView(activity.getClass().getSimpleName());
+            FTRUMGlobalManager.get().startView(activity.getClass().getSimpleName());
         }
 
 

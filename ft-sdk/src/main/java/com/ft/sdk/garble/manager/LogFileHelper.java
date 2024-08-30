@@ -118,7 +118,7 @@ public class LogFileHelper {
                 long fileSize = file.length();
                 if (file.delete()) {
                     deletedSize += fileSize;
-                    if (deletedSize >= totalSize * 0.2) {
+                    if (totalSize - deletedSize <= cacheMaxTotalSize * 0.8) {
                         break;
                     }
                 } else {

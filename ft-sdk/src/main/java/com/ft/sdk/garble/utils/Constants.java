@@ -42,21 +42,13 @@ public class Constants {
     public static final String TAGS = "tags";
 
     /**
-     * 预处理数据分隔符
-     */
-    public static final String SEPARATION_PRINT = "--temp_separation--";
-    /**
      * 最终数据数据分隔符
      */
     public static final String SEPARATION = " ";
     /**
-     * 预处理数据数据分行符号
-     */
-    public static final String SEPARATION_LINE_BREAK = "--line_break_temp--";//换行标志符，用于日志显示
-    /**
      * 最终数据行协议单条数据分隔
      */
-    public static final String SEPARATION_REALLY_LINE_BREAK = "\n";//换行标志符，用于日志显示
+    public static final String SEPARATION_REAL_LINE_BREAK = "\n";//换行标志符，用于日志显示
 
     /**
      * 同步数据 http 请求 header user-agent
@@ -399,7 +391,7 @@ public class Constants {
     public static final String KEY_RUM_SDK_PACKAGE_NATIVE = "sdk_package_native";
 
     /**
-     * SDK 数据标记 [package uuid].[32 digit random uuid]
+     * SDK 数据标记 [packageId].[pid].[pkg_dataCount].[uuid]
      * <p>
      * {@link ID36Generator}
      * {@link Utils#randomUUID()}

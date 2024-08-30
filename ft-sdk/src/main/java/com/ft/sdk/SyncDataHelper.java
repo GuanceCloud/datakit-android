@@ -1,19 +1,20 @@
 package com.ft.sdk;
 
 import static com.ft.sdk.garble.utils.Constants.FT_KEY_VALUE_NULL;
+import static com.ft.sdk.garble.utils.Constants.KEY_SDK_DATA_FLAG;
 
 import com.ft.sdk.garble.bean.DataType;
-import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.StringUtils;
 import com.ft.sdk.garble.utils.Utils;
+import com.ft.sdk.internal.exception.FTInvalidParameterException;
 
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
+import java.util.LinkedHashMap;
 
 /**
  * 数据组装类，把采集数据从存储数据序列化行协议数据
@@ -29,7 +30,7 @@ public class SyncDataHelper {
     private final HashMap<String, Object> rumTags;
     private final HashMap<String, Object> traceTags;
 
-    private FTSDKConfig config;
+    protected FTSDKConfig config;
 
 
     protected SyncDataHelper() {
@@ -61,109 +62,97 @@ public class SyncDataHelper {
 
 
     /**
-     * 封装同步上传的数据
+     * 数据转行协议存储
      *
+     * @param measurement
+     * @param tags
+     * @param fields
+     * @param timeStamp
      * @param dataType
-     * @param recordDatas
+     * @param uuid
      * @return
      */
-    public String getBodyContent(DataType dataType, List<SyncJsonData> recordDatas, String packageId) {
+
+    public String getBodyContent(String measurement, HashMap<String, Object> tags,
+                                 HashMap<String, Object> fields, long timeStamp, DataType dataType, String uuid) {
+        HashMap<String, Object> mergeTags = new LinkedHashMap<>();
+        mergeTags.put(KEY_SDK_DATA_FLAG, uuid);//让 uuid 放置第一位，字符替换时可以节省损耗
+        if (tags != null) {
+            mergeTags.putAll(tags);
+        }
         String bodyContent;
         if (dataType == DataType.LOG) {
             // log 数据
-            bodyContent = convertToLineProtocolLines(recordDatas, new HashMap<>(logTags), packageId);
+            mergeTags.putAll(logTags);
+            bodyContent = convertToLineProtocolLine(measurement, mergeTags, fields,
+                    timeStamp, config);
+
         } else if (dataType == DataType.TRACE) {
             // trace 数据
-            bodyContent = convertToLineProtocolLines(recordDatas, new HashMap<>(traceTags), packageId);
+            mergeTags.putAll(traceTags);
+            bodyContent = convertToLineProtocolLine(measurement, mergeTags, fields,
+                    timeStamp, config);
         } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_WEBVIEW) {
             //rum 数据
-            bodyContent = convertToLineProtocolLines(recordDatas, new HashMap<>(rumTags), packageId);
+            mergeTags.putAll(rumTags);
+            bodyContent = convertToLineProtocolLine(measurement, mergeTags, fields,
+                    timeStamp, config);
         } else {
             bodyContent = "";
         }
-        return bodyContent.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION)
-                .replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK);
+        return bodyContent;
+
     }
 
-    /**
-     * 封装同步上传的数据，主要用于测试用例使用
-     *
-     * @param dataType
-     * @param recordDatas
-     * @return
-     */
-    public String getBodyContent(DataType dataType, List<SyncJsonData> recordDatas) {
-        return getBodyContent(dataType, recordDatas, null);
-    }
+    static String convertToLineProtocolLine(String measurement, HashMap<String, Object> tags,
+                                            HashMap<String, Object> fields,
+                                            long timeStamp,
+                                            FTSDKConfig config) {
 
 
-    /**
-     * 转化为行协议数据
-     *
-     * @param datas
-     * @param extraTags
-     * @return
-     */
-    private String convertToLineProtocolLines(List<SyncJsonData> datas, HashMap<String, Object> extraTags,
-                                              String packageId) {
+        if (measurement == null) {
+            throw new FTInvalidParameterException("指标集 measurement 不能为空");
+        }
+
+        if (fields == null) {
+            throw new FTInvalidParameterException("指标集 fields 不能为空");
+        }
 
         boolean integerCompatible = false;
         if (config != null) {
             integerCompatible = config.isEnableDataIntegerCompatible();
         }
         StringBuilder sb = new StringBuilder();
-        for (SyncJsonData data : datas) {
-            String jsonString = data.getDataString();
-            if (jsonString != null) {
-                try {
-                    //========== measurement ==========
-                    JSONObject opJson = new JSONObject(jsonString);
-                    String measurement = opJson.optString(Constants.MEASUREMENT);
-                    if (Utils.isNullOrEmpty(measurement)) {
-                        measurement = FT_KEY_VALUE_NULL;
-                    } else {
-                        measurement = Utils.translateMeasurements(measurement);
-                    }
-                    sb.append(measurement);
 
-                    //========== tags ==========
-                    JSONObject tags = opJson.optJSONObject(Constants.TAGS);
-                    if (extraTags != null) {
-                        //合并去重
-                        for (String key : extraTags.keySet()) {
-                            if (!tags.has(key)) {
-                                //此处空对象会被移除
-                                tags.put(key, extraTags.get(key));
-                            }
-                        }
-                    }
-                    if (Utils.isNullOrEmpty(packageId)) {
-                        tags.put(Constants.KEY_SDK_DATA_FLAG, Utils.randomUUID());
-                    } else {
-                        tags.put(Constants.KEY_SDK_DATA_FLAG, packageId + "." + Utils.randomUUID());
-                    }
-                    StringBuilder tagSb = getCustomHash(tags, true, integerCompatible);
-                    deleteLastComma(tagSb);
-                    if (tagSb.length() > 0) {
-                        sb.append(",");
-                        sb.append(tagSb);
-                    }
-                    sb.append(Constants.SEPARATION_PRINT);
-
-                    //========== field ==========
-                    JSONObject fields = opJson.optJSONObject(Constants.FIELDS);
-                    StringBuilder valueSb = getCustomHash(fields, false, integerCompatible);
-                    deleteLastComma(valueSb);
-                    sb.append(valueSb);
-                    sb.append(Constants.SEPARATION_PRINT);
-
-                    //========= time ==========
-                    sb.append(data.getTime());
-                    sb.append(Constants.SEPARATION_LINE_BREAK);
-                } catch (Exception e) {
-                    LogUtils.e(TAG, LogUtils.getStackTraceString(e));
-                }
+        try {
+            //========== measurement ==========
+            if (Utils.isNullOrEmpty(measurement)) {
+                measurement = FT_KEY_VALUE_NULL;
+            } else {
+                measurement = Utils.translateMeasurements(measurement);
             }
+            sb.append(measurement);
+
+            //========== tags ==========
+            StringBuilder tagSb = getCustomHash(tags, true, integerCompatible);
+            deleteLastComma(tagSb);
+            if (tagSb.length() > 0) {
+                sb.append(",");
+                sb.append(tagSb);
+            }
+            sb.append(Constants.SEPARATION);
+
+            //========== field ==========
+            StringBuilder valueSb = getCustomHash(fields, false, integerCompatible);
+            deleteLastComma(valueSb);
+            sb.append(valueSb);
+            sb.append(Constants.SEPARATION);
+
+            //========= time ==========
+            sb.append(timeStamp);
+            sb.append(Constants.SEPARATION_REAL_LINE_BREAK);
+        } catch (Exception e) {
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
         return sb.toString();
     }
@@ -175,12 +164,12 @@ public class SyncDataHelper {
      * @param obj
      * @return
      */
-    private static StringBuilder getCustomHash(JSONObject obj, boolean isTag, boolean integerCompatible) {
+    private static StringBuilder getCustomHash(HashMap<String, Object> obj, boolean isTag, boolean integerCompatible) {
         StringBuilder sb = new StringBuilder();
-        Iterator<String> keys = obj.keys();
+        Iterator<String> keys = obj.keySet().iterator();
         while (keys.hasNext()) {
             String keyTemp = keys.next();
-            Object value = obj.opt(keyTemp);
+            Object value = obj.get(keyTemp);
             if (value == null || "".equals(value) || JSONObject.NULL.equals(value)) {
                 if (!isTag) {
                     String key = Utils.translateTagKeyValue(keyTemp);
@@ -233,6 +222,15 @@ public class SyncDataHelper {
      */
     private static void deleteLastComma(StringBuilder sb) {
         StringUtils.deleteLastCharacter(sb, ",");
+    }
+
+    /**
+     * 获取兼容迁移方法
+     *
+     * @return
+     */
+    SyncDataCompatHelper getCompat() {
+        return new SyncDataCompatHelper(logTags, traceTags, rumTags, config);
     }
 
 

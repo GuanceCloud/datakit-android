@@ -7,7 +7,7 @@ import java.util.HashMap;
 /**
  * 设备检测类型
  * <p>
- * 在 View 传输类型中 {@link FTRUMInnerManager#startView(String, HashMap)}
+ * 在 View 传输类型中 {@link FTRUMGlobalManager#startView(String, HashMap)}
  * 输出页面的电池、内存、CPU、FPS 等信息，通过这些信息来判断用户在当前页面浏览的体验情况
  * ，通过观测云 Studio <a href="https://docs.guance.com/real-user-monitoring/explorer/view/">查看器 View</a> 进行查看
  * <p>

@@ -3,15 +3,15 @@ package com.ft.sdk.garble.bean;
 
 import androidx.annotation.NonNull;
 
+import com.ft.sdk.SyncDataHelper;
 import com.ft.sdk.garble.utils.Constants;
-import com.ft.sdk.garble.utils.FloatDoubleJsonUtils;
-import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.Utils;
 import com.ft.sdk.internal.exception.FTInvalidParameterException;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.security.InvalidParameterException;
+import java.util.HashMap;
 
 
 /**
@@ -20,10 +20,8 @@ import java.security.InvalidParameterException;
  * Description: 数据存储 Data Json 数据
  */
 public class SyncJsonData implements Cloneable {
-    private static final String TAG = Constants.LOG_TAG_PREFIX + "SyncJsonData";
-
     /**
-     * 同步数据唯一 id
+     * 同步数据唯一 id, 同步上传过程中才会赋值
      */
     long id;
 
@@ -33,22 +31,20 @@ public class SyncJsonData implements Cloneable {
     DataType dataType;
 
     /**
-     * 同步数据字符类型数据
+     * 同步数据字符类型数据，旧数据数据为 json，新数据为行协议
      */
     String dataString;
+
+
+    String uuid;
+
 
     public SyncJsonData(DataType dataType) {
         this.dataType = dataType;
     }
 
     public void setDataString(String dataString) {
-        try {
-            this.dataString = dataString;
-
-        } catch (Exception e) {
-            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
-
-        }
+        this.dataString = dataString;
     }
 
 
@@ -99,6 +95,43 @@ public class SyncJsonData implements Cloneable {
         return dataString;
     }
 
+    /**
+     * 标记包序列发送 id,替换 [uuid] 为 [packageId].[pid].[pkg_dataCount].[uuid]
+     *
+     * @param packageId 包 id
+     * @param dataCount 数量
+     * @return
+     */
+    public String getLineProtocolDataWithPkgId(String packageId, int pid, int dataCount) {
+        if (packageId != null) {
+            dataString = dataString.replaceFirst(uuid, packageId + "."
+                    + pid + "." + dataCount + "." + uuid);
+        }
+        return dataString;
+    }
+
+    /**
+     * 替换 (sdk_data_id=)[packageId].[pid].[pkg_dataCount].[uuid] 为 sdk_data_id=[uuid]
+     *
+     * @param newUUID 新 uuid
+     * @return
+     */
+    public String getDataString(String newUUID) {
+        if (newUUID != null) {
+            dataString = dataString.replaceFirst("(" +
+                    Constants.KEY_SDK_DATA_FLAG + "=)(.*)"
+                    + uuid, Constants.KEY_SDK_DATA_FLAG + "=" + newUUID);
+        }
+        return dataString;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
 
     /**
      * 追踪数据转化
@@ -106,18 +139,16 @@ public class SyncJsonData implements Cloneable {
      * @param dataType
      * @param bean
      * @return
-     * @throws JSONException
      * @throws InvalidParameterException
      */
-    public static SyncJsonData getSyncJsonData(DataType dataType, LineProtocolBean bean)
-            throws JSONException, FTInvalidParameterException {
-        JSONObject tagsTemp = bean.getTags();
-        JSONObject fields = bean.getFields();
+    public static SyncJsonData getSyncJsonData(SyncDataHelper helper, DataType dataType, LineProtocolBean bean)
+            throws FTInvalidParameterException {
+        String uuid = Utils.randomUUID();
         SyncJsonData recordData = new SyncJsonData(dataType);
         recordData.setTime(bean.getTimeNano());
-        JSONObject opDataJson = getLinProtocolJson(bean.getMeasurement(), tagsTemp, fields);
-
-        recordData.setDataString(FloatDoubleJsonUtils.protectValueFormat(opDataJson));
+        recordData.setUuid(uuid);
+        recordData.setDataString(helper.getBodyContent(bean.getMeasurement(), bean.getTags(),
+                bean.getFields(), bean.getTimeNano(), dataType, uuid));
         return recordData;
     }
 
@@ -130,51 +161,15 @@ public class SyncJsonData implements Cloneable {
      * @throws JSONException
      * @throws InvalidParameterException
      */
-    public static SyncJsonData getFromLogBean(BaseContentBean bean)
-            throws JSONException, FTInvalidParameterException {
+    public static SyncJsonData getFromLogBean(SyncDataHelper helper, BaseContentBean bean)
+            throws FTInvalidParameterException {
         SyncJsonData recordData = new SyncJsonData(DataType.LOG);
+        String uuid = Utils.randomUUID();
         recordData.setTime(bean.getTime());
-        JSONObject opDataJson = getLinProtocolJson(bean.getMeasurement(), bean.getAllTags(), bean.getAllFields());
-        recordData.setDataString(FloatDoubleJsonUtils.protectValueFormat(opDataJson));
+        recordData.setUuid(uuid);
+        recordData.setDataString(helper.getBodyContent(bean.getMeasurement(),
+                bean.getAllTags(), bean.getAllFields(), bean.getTime(), DataType.LOG, uuid));
         return recordData;
     }
-
-    /**
-     * 获取行协议对应的 指标，标签，数值对应的 Json 对象
-     *
-     * @param measurement
-     * @param tags
-     * @param fields
-     * @return
-     * @throws JSONException
-     * @throws InvalidParameterException
-     */
-    private static JSONObject getLinProtocolJson(String measurement,
-                                                 JSONObject tags, JSONObject fields)
-            throws JSONException, FTInvalidParameterException {
-
-        JSONObject tagsTemp = tags;
-
-        JSONObject opDataJson = new JSONObject();
-
-
-        if (measurement != null) {
-            opDataJson.put(Constants.MEASUREMENT, measurement);
-        } else {
-            throw new FTInvalidParameterException("指标集 measurement 不能为空");
-        }
-        if (tagsTemp == null) {
-            tagsTemp = new JSONObject();
-        }
-        opDataJson.put(Constants.TAGS, tagsTemp);
-        if (fields != null) {
-            opDataJson.put(Constants.FIELDS, fields);
-        } else {
-            throw new FTInvalidParameterException("指标集 fields 不能为空");
-        }
-        return opDataJson;
-
-    }
-
 
 }

@@ -10,7 +10,6 @@ import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.utils.Constants;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 import org.powermock.reflect.Whitebox;
@@ -67,77 +66,63 @@ public class UtilsTest {
     @Test
     public void multiLineProtocolFormatTest() throws Exception {
 
-        SyncJsonData recordData = new SyncJsonData(DataType.LOG);
-        recordData.setTime(VALUE_TIME);
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put(Constants.MEASUREMENT, TEST_MEASUREMENT_INFLUX_DB_LINE);
-        JSONObject tags = new JSONObject();
+        HashMap<String, Object> map = new HashMap<>();
+        map.put(Constants.MEASUREMENT, TEST_MEASUREMENT_INFLUX_DB_LINE);
+        HashMap<String, Object> tags = new HashMap<>();
         tags.put(KEY_TAGS, VALUE_TAGS);
-        JSONObject fields = new JSONObject();
+        HashMap<String, Object> fields = new HashMap<>();
         fields.put(KEY_FIELD, VALUE_FIELD);
-        jsonObject.put(Constants.TAGS, tags);
-        jsonObject.put(Constants.FIELDS, fields);
-        recordData.setDataString(jsonObject.toString());
+        map.put(Constants.TAGS, tags);
+        map.put(Constants.FIELDS, fields);
+
+        SyncDataHelper helper = Whitebox.getInternalState(FTTrackInner.getInstance(), "dataHelper");
+        LineProtocolBean trackBean = new LineProtocolBean(TEST_MEASUREMENT_INFLUX_DB_LINE, tags, fields, VALUE_TIME);
+        SyncJsonData recordData = SyncJsonData.getSyncJsonData(helper, DataType.LOG, trackBean);
 
         List<SyncJsonData> recordDataList = new ArrayList<>();
         recordDataList.add(recordData);
         recordDataList.add(recordData);
         recordDataList.add(recordData);
-        String content = convertToLineProtocolLines(recordDataList);
-        Assert.assertEquals(LOG_EXPECT_DATA, content.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION)
-                .replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK));
+        StringBuilder content = new StringBuilder();
+        for (SyncJsonData syncJsonData : recordDataList) {
+            content.append(syncJsonData.getDataString());
+        }
+        Assert.assertEquals(LOG_EXPECT_DATA, content.toString().replaceAll("(" +
+                Constants.KEY_SDK_DATA_FLAG + "=)(.*),", ""));
     }
 
     /**
-     * 单数据验证，验证 {@link SyncDataHelper#convertToLineProtocolLines(List)} 数据转化过程中是否会发生数据错误
+     * 单数据验证, 数据转化过程中是否会发生数据错误
      *
      * @throws JSONException
      */
     @Test
     public void singleLineProtocolFormatTest() throws Exception {
-        JSONObject tags = new JSONObject();
+        SyncDataHelper helper = Whitebox.getInternalState(FTTrackInner.getInstance(), "dataHelper");
+        HashMap<String, Object> tags = new HashMap<>();
         tags.put(KEY_TAGS, VALUE_TAGS);
-        JSONObject fields = new JSONObject();
+        HashMap<String, Object> fields = new HashMap<>();
         fields.put(KEY_FIELD, VALUE_FIELD);
         LineProtocolBean trackBean = new LineProtocolBean(TEST_MEASUREMENT_INFLUX_DB_LINE, tags, fields, VALUE_TIME);
-        SyncJsonData data = SyncJsonData.getSyncJsonData(DataType.LOG, trackBean);
+        SyncJsonData data = SyncJsonData.getSyncJsonData(helper, DataType.LOG, trackBean);
 
-        List<SyncJsonData> recordDataList = new ArrayList<>();
-        recordDataList.add(data);
-        String content = convertToLineProtocolLines(recordDataList);
+        String content = data.getDataString();
+        content = content.replaceFirst("(" +
+                Constants.KEY_SDK_DATA_FLAG + "=)(.*),", "");
 
-        assertEquals(content.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION)
-                .replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK), SINGLE_LINE_NORMAL_DATA);
+        assertEquals(content, SINGLE_LINE_NORMAL_DATA);
 
 
-        JSONObject tagsEmpty = new JSONObject();
+        HashMap<String, Object> tagsEmpty = new HashMap<>();
         tagsEmpty.put(KEY_TAGS_EMPTY, VALUE_TAGS_EMPTY);
-        JSONObject fieldsEmpty = new JSONObject();
+        HashMap<String, Object> fieldsEmpty = new HashMap<>();
         fieldsEmpty.put(KEY_FIELD_EMPTY, VALUE_FIELD_EMPTY);
         LineProtocolBean trackBeanEmpty = new LineProtocolBean(TEST_MEASUREMENT_INFLUX_DB_LINE, tagsEmpty, fieldsEmpty, VALUE_TIME);
-        SyncJsonData dataEmpty = SyncJsonData.getSyncJsonData(DataType.LOG, trackBeanEmpty);
+        SyncJsonData dataEmpty = SyncJsonData.getSyncJsonData(helper, DataType.LOG, trackBeanEmpty);
 
-        List<SyncJsonData> emptyRecordDataList = new ArrayList<>();
-        emptyRecordDataList.add(dataEmpty);
-        String contentEmpty = convertToLineProtocolLines(emptyRecordDataList);
-
-        assertEquals(SINGLE_LINE_EMPTY_DATA, contentEmpty.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION)
-                .replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK));
-    }
-
-    /**
-     * 调用 {@link SyncDataHelper#convertToLineProtocolLines(List, HashMap, String)} }
-     * ,{@link FTTrackInner#dataHelper}
-     *
-     * @param list
-     * @return
-     * @throws Exception
-     */
-    private String convertToLineProtocolLines(List<SyncJsonData> list) throws Exception {
-        SyncDataHelper helper = Whitebox.getInternalState(FTTrackInner.getInstance(), "dataHelper");
-        return Whitebox.invokeMethod(helper, "convertToLineProtocolLines",
-                list, new HashMap<>(), "").toString()
-                .replaceAll(",sdk_data_id=(.*?)" + Constants.SEPARATION_PRINT, Constants.SEPARATION_PRINT);
+        String contentEmpty = dataEmpty.getDataString();
+        contentEmpty = contentEmpty.replaceFirst(",\\s?" + Constants.KEY_SDK_DATA_FLAG + "=[\\w\\d]+", "");
+        assertEquals(SINGLE_LINE_EMPTY_DATA, contentEmpty);
     }
 
 

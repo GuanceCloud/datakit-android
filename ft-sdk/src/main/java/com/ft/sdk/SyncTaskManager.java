@@ -20,9 +20,13 @@ import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.ID36Generator;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.Utils;
 import com.ft.sdk.internal.exception.FTNetworkNoAvailableException;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -58,6 +62,11 @@ public class SyncTaskManager {
      */
     private static final int SLEEP_TIME = 10000;
 
+    /**
+     * 数据迁移一页面数量
+     */
+    private static final int OLD_CACHE_TRANSFORM_PAGE_SIZE = 100;
+
 
     /**
      * 高频行为间隔时间
@@ -90,6 +99,11 @@ public class SyncTaskManager {
     private volatile boolean running;
 
     /**
+     * 是否正在在旧数据迁移
+     */
+    private boolean isOldCaching;
+
+    /**
      * 是否停止
      */
     private boolean isStop = false;
@@ -118,6 +132,11 @@ public class SyncTaskManager {
      * 同步请求条目数量
      */
     private int pageSize = SyncPageSize.MEDIUM.getValue();
+
+    /**
+     *
+     */
+    private Runnable oldCacheRunner;
 
 
     /**
@@ -178,6 +197,11 @@ public class SyncTaskManager {
      * @param withSleep 是否进行睡眠，{@link #SLEEP_TIME}
      */
     private void executePoll(final boolean withSleep) {
+        if (oldCacheRunner != null) {
+            oldCacheRunner.run();
+            oldCacheRunner = null;
+        }
+
         if (running || isStop) {
             return;
         }
@@ -254,14 +278,18 @@ public class SyncTaskManager {
             int dataCount = requestDataList.size();
             LogUtils.d(TAG, "Sync Data Count:" + dataCount);
 
-            SyncDataHelper helper = FTTrackInner.getInstance().getCurrentDataHelper();
+            StringBuilder sb = new StringBuilder();
             String packageId = "";
             if (dataType == DataType.LOG) {
                 packageId = logGenerator.getCurrentId();
             } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_WEBVIEW) {
                 packageId = rumGenerator.getCurrentId();
             }
-            String body = helper.getBodyContent(dataType, requestDataList, packageId + "." + pid + "." + dataCount);
+            for (SyncJsonData data : cacheDataList) {
+                sb.append(data.getLineProtocolDataWithPkgId(packageId, pid, dataCount));
+            }
+
+            String body = sb.toString();
             requestNet(dataType, body, new AsyncCallback() {
                 @Override
                 public void onResponse(int code, String response, String errorCode) {
@@ -290,6 +318,7 @@ public class SyncTaskManager {
 
                         if (errorCount.get() > 0) {
                             try {
+                                SyncTaskManager.this.reInsertData(requestDataList);
                                 Thread.sleep((long) errorCount.get() * RETRY_DELAY_SLEEP_TIME);
                             } catch (InterruptedException e) {
                                 LogUtils.e(TAG, LogUtils.getStackTraceString(e));
@@ -341,11 +370,33 @@ public class SyncTaskManager {
      * @param list
      */
     private void deleteLastQuery(List<SyncJsonData> list) {
+        deleteLastQuery(list, false);
+    }
+
+    /**
+     * 删除已经上传的数据
+     *
+     * @param list
+     */
+    private void deleteLastQuery(List<SyncJsonData> list, boolean oldCache) {
         List<String> ids = new ArrayList<>();
         for (SyncJsonData r : list) {
             ids.add(String.valueOf(r.getId()));
         }
-        FTDBManager.get().delete(ids);
+        FTDBManager.get().delete(ids, oldCache);
+    }
+
+    /**
+     * 重新插入数据，并更改 uuid
+     *
+     * @param list
+     */
+    private void reInsertData(List<SyncJsonData> list) {
+        //删掉原先的数据
+        deleteLastQuery(list);
+
+        //重新插入数据，
+        FTDBManager.get().insertFtOptList(list, true);
     }
 
     /**
@@ -392,12 +443,78 @@ public class SyncTaskManager {
 
     }
 
+    /**
+     * 旧数据迁移，1.5.0 版本以下的数据需要迁移
+     */
+    void oldDBDataTransform() {
+        if (isOldCaching) return;
+
+        boolean needTransform = FTDBManager.get().isOldCacheExist();
+
+        if (needTransform) {
+            LogUtils.d(TAG, "==> old cache need transform");
+            isOldCaching = true;//不需要结束，一次出错等待下次启动
+
+            DataUploaderThreadPool.get().execute(new Runnable() {
+                @Override
+                public void run() {
+                    LogUtils.d(TAG, "==> old cache transform start");
+                    try {
+                        SyncDataCompatHelper helper = FTTrackInner.getInstance()
+                                .getCurrentDataHelper().getCompat();
+                        while (true) {
+                            List<SyncJsonData> list = FTDBManager.get().queryDataByDescLimit(OLD_CACHE_TRANSFORM_PAGE_SIZE,
+                                    true);
+                            Iterator<SyncJsonData> it = list.iterator();
+                            while (it.hasNext()) {
+                                SyncJsonData data = it.next();
+                                try {
+                                    String oldFormatData = data.getDataString();//获取旧格式数据
+                                    String uuid = Utils.randomUUID();
+                                    data.setUuid(uuid);//旧数据中没有 uuid
+                                    data.setDataString(helper.getBodyContent(new JSONObject(oldFormatData),
+                                            data.getDataType(),
+                                            uuid,
+                                            data.getTime()));//转化成新格式
+                                } catch (Exception e) {
+                                    it.remove();
+                                    LogUtils.e(TAG, "==> old cache insert error");
+                                }
+                            }
+                            FTDBManager.get().insertFtOptList(list, false);
+                            deleteLastQuery(list, true);
+                            if (list.size() < OLD_CACHE_TRANSFORM_PAGE_SIZE) {
+                                LogUtils.d(TAG, "==> old cache transform end");
+                                //不删除旧表避免 SDK 版本回退发生兼容问题
+                                break;
+                            }
+                        }
+                    } catch (Exception e) {
+                        LogUtils.d(TAG, "==> oldDBDataTransform Failed:" + LogUtils.getStackTraceString(e));
+                    }
+                }
+            });
+        } else {
+            LogUtils.d(TAG, "==> no old cache need transform");
+        }
+
+
+    }
+
     public void init(FTSDKConfig config) {
         isStop = false;
         dataSyncMaxRetryCount = config.getDataSyncRetryCount();
         pageSize = config.getPageSize();
         autoSync = config.isAutoSync();
         syncSleepTime = config.getSyncSleepTime();
+        if (config.isNeedTransformOldCache()) {
+            oldCacheRunner = new Runnable() {
+                @Override
+                public void run() {
+                    oldDBDataTransform();
+                }
+            };
+        }
     }
 
     /**
@@ -406,6 +523,7 @@ public class SyncTaskManager {
     public void release() {
         DataUploaderThreadPool.get().shutDown();
         mHandler.removeMessages(MSG_SYNC);
+        oldCacheRunner = null;
         isStop = true;
     }
 }

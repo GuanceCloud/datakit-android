@@ -1,5 +1,9 @@
 package com.ft.sdk.tests;
 
+import static com.ft.sdk.tests.FTSdkAllTests.hasPrepare;
+
+import android.os.Looper;
+
 import com.ft.sdk.FTLogger;
 import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.FTRUMConfig;
@@ -16,9 +20,8 @@ import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.test.base.FTBaseTest;
 import com.ft.test.utils.CheckUtils;
+import com.ft.test.utils.LineProtocolData;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +37,12 @@ public class LogTest extends FTBaseTest {
 
     @Before
     public void setUp() throws Exception {
+        if (!hasPrepare) {
+            Looper.prepare();
+            hasPrepare = true;
+        }
         stopSyncTask();
+        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL).setDebug(true));
     }
 
     /**
@@ -44,7 +52,6 @@ public class LogTest extends FTBaseTest {
      */
     @Test
     public void withOutLogConfig() throws InterruptedException {
-        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
         List<SyncJsonData> recordDataList = FTDBManager.get()
                 .queryDataByDataByTypeLimitDesc(0, DataType.LOG);
 
@@ -60,7 +67,6 @@ public class LogTest extends FTBaseTest {
      */
     @Test
     public void logSampleRateZero() throws InterruptedException {
-        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
         FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableCustomLog(true).setSamplingRate(0));
 
         Thread.sleep(1000);
@@ -83,7 +89,6 @@ public class LogTest extends FTBaseTest {
      */
     @Test
     public void logInsertDataTest() throws InterruptedException {
-        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
         FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableCustomLog(true));
 
         //产生一条日志数据
@@ -139,7 +144,6 @@ public class LogTest extends FTBaseTest {
      */
 
     private boolean checkLogHasLinkRUMData(boolean enableLinkRumData) throws InterruptedException {
-        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
         FTSdk.initRUMWithConfig(new FTRUMConfig());
 
         FTSdk.initLogWithConfig(new FTLoggerConfig()
@@ -158,19 +162,12 @@ public class LogTest extends FTBaseTest {
         String viewId = "";
         String sessionId = "";
         for (SyncJsonData recordData : recordDataList) {
-            try {
-                JSONObject json = new JSONObject(recordData.getDataString());
-                JSONObject tags = json.optJSONObject("tags");
-                String measurement = json.optString("measurement");
-                if (Constants.FT_LOG_DEFAULT_MEASUREMENT.equals(measurement)) {
-                    if (tags != null) {
-                        viewId = tags.optString(Constants.KEY_RUM_VIEW_ID);
-                        sessionId = tags.optString(Constants.KEY_RUM_SESSION_ID);
-                        break;
-                    }
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
+            LineProtocolData lineProtocolData = new LineProtocolData(recordData.getDataString());
+            String measurement = lineProtocolData.getMeasurement();
+            if (Constants.FT_LOG_DEFAULT_MEASUREMENT.equals(measurement)) {
+                viewId = lineProtocolData.getTagAsString(Constants.KEY_RUM_VIEW_ID, "");
+                sessionId = lineProtocolData.getTagAsString(Constants.KEY_RUM_SESSION_ID, "");
+                break;
             }
         }
 
@@ -185,7 +182,6 @@ public class LogTest extends FTBaseTest {
      */
     @Test
     public void triggerDiscardPolicyTest() throws InterruptedException {
-        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
         FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableCustomLog(true));
         batchLog(10);
 
@@ -198,7 +194,6 @@ public class LogTest extends FTBaseTest {
      */
     @Test
     public void triggerDiscardOldPolicyTest() throws InterruptedException {
-        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
         FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableCustomLog(true)
                 .setLogCacheDiscardStrategy(LogCacheDiscard.DISCARD_OLDEST));
         batchLog(19);

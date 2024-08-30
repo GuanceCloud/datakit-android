@@ -43,12 +43,14 @@ public class DemoApplication extends BaseApplication {
         }
     }
 
+
     static void initFTSDK(Context context) {
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAKIT_URL)
                 .setDebug(true)//设置是否是 debug
                 .setAutoSync(true)
                 .setCustomSyncPageSize(100)
                 .setOnlySupportMainProcess(CrossProcessSetting.isOnlyMainProcess(context))
+                .setNeedTransformOldCache(true)
                 .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()));
         FTSdk.install(ftSDKConfig);
 
@@ -62,14 +64,6 @@ public class DemoApplication extends BaseApplication {
                 .setEnableLinkRumData(true)
         );
 
-//        LogUtils.registerInnerLogHandler(new FTInnerLogHandler() {
-//            @Override
-//            public void printInnerLog(String level, String tag, String logContent) {
-//                if(level.equals("E")){
-//                    FTLogger.getInstance().logBackground(logContent,Status.ERROR,true);
-////                }
-//            }
-//        });
 
         FTSdk.initRUMWithConfig(new FTRUMConfig()
                 .setSamplingRate(1f)

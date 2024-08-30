@@ -7,6 +7,7 @@ import com.ft.sdk.garble.utils.Utils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.Iterator;
 
 /**
@@ -40,8 +41,8 @@ public class BaseContentBean {
      * 日志生成时间
      */
     long time;
-    final JSONObject tags = new JSONObject();
-    final JSONObject fields = new JSONObject();
+    final HashMap<String, Object> tags = new HashMap<>();
+    final HashMap<String, Object> fields = new HashMap<>();
 
     /**
      * 是否超过 30KB
@@ -82,12 +83,9 @@ public class BaseContentBean {
      *
      * @return
      */
-    public JSONObject getAllFields() {
-        try {
-            fields.put(Constants.KEY_MESSAGE, content);
-        } catch (JSONException e) {
-            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
-        }
+    public HashMap<String, Object> getAllFields() {
+        fields.put(Constants.KEY_MESSAGE, content);
+
         return fields;
     }
 
@@ -96,15 +94,10 @@ public class BaseContentBean {
      *
      * @return
      */
-    public JSONObject getAllTags() {
-        try {
-            if (!Utils.isNullOrEmpty(serviceName)) {
-                tags.put(Constants.KEY_SERVICE, serviceName);
-            }
-        } catch (JSONException e) {
-            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+    public HashMap<String,Object> getAllTags() {
+        if (!Utils.isNullOrEmpty(serviceName)) {
+            tags.put(Constants.KEY_SERVICE, serviceName);
         }
-
         return tags;
     }
 
@@ -121,17 +114,8 @@ public class BaseContentBean {
         return time;
     }
 
-    public void appendTags(JSONObject tags) {
-        Iterator<String> it = tags.keys();
-        while (it.hasNext()) {
-            String key = it.next();
-            try {
-                this.tags.put(key, tags.get(key));
-            } catch (JSONException e) {
-                LogUtils.e(TAG, LogUtils.getStackTraceString(e));
-            }
-
-        }
+    public void appendTags(HashMap<String, Object> tags) {
+        this.tags.putAll(tags);
     }
 
     public void setServiceName(String serviceName) {
