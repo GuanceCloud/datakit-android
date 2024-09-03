@@ -76,7 +76,6 @@ public class FTPlugin implements Plugin<Project> {
 
             FTMapUploader f = new FTMapUploader(p, extension);
             f.configMapUpload();
-            f.configNativeSymbolUpload();
         });
 
         AndroidComponentsExtension androidComponents = project.getExtensions().getByType(AndroidComponentsExtension.class);
