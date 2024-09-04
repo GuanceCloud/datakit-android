@@ -107,9 +107,10 @@ public class FTMapUploader {
                 String tmpBuildPath = String.format(tmpBuildPathFormat, variantName);
                 String zipBuildPath = String.format(zipBuildPathFormat, variantName);
                 //删除之前的 cache
-                FileUtils.delete(new File(tmpBuildPath));
-                FileUtils.delete(new File(zipBuildPath));
                 try {
+                    deleteRecursively(new File(tmpBuildPath));
+                    FileUtils.delete(new File(zipBuildPath));
+
                     ObfuscationSettingConfig config = obfuscationSettingMap.get(assembleTaskName);
                     Logger.debug("task:" + assembleTaskName + ",config:" + config);
                     if (config != null) {
@@ -182,6 +183,24 @@ public class FTMapUploader {
             });
         });
 
+    }
+
+    /**
+     * 删除文件夹
+     *
+     * @param file
+     * @throws IOException
+     */
+    private void deleteRecursively(File file) {
+        if (file.isDirectory()) {
+            File[] fileList = file.listFiles();
+            if (fileList != null) {
+                for (File subFile : fileList) {
+                    deleteRecursively(subFile);
+                }
+            }
+        }
+        FileUtils.delete(file);  // 使用 FileUtils 删除文件或文件夹
     }
 
 
