@@ -100,7 +100,9 @@ public class FTMapUploader {
                 }
 
                 ArrayList<String> symbolPaths = new ArrayList<>();
-                appendSymbolPath(project, symbolPaths, variantName, model.getNativeLibPath());
+                if (model.isAutoUploadNativeDebugSymbol()) {
+                    appendSymbolPath(project, symbolPaths, variantName, model.getNativeLibPath());
+                }
 
                 String tmpBuildPath = String.format(tmpBuildPathFormat, variantName);
                 String zipBuildPath = String.format(zipBuildPathFormat, variantName);
