@@ -40,8 +40,8 @@ afterEvaluate {
         repositories {
             maven {
 
-                def releasesRepoUrl = "$maven_publish_url/maven-releases"
-                def snapshotsRepoUrl = "$maven_publish_url/maven-snapshots"
+                def releasesRepoUrl = "$mavenPublishUrl/maven-releases"
+                def snapshotsRepoUrl = "$mavenPublishUrl/maven-snapshots"
                 url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
                 credentials {
                     username = getDefaultProperties().get("LDAP_ACCOUNT")
