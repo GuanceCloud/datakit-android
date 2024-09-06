@@ -58,6 +58,11 @@ public class FTExtension {
     public List<String> ignorePackages = new ArrayList<>();
 
     /**
+     * 默认认定 [project]/build/intermediates/merged_native_libs
+     */
+    public  String nativeLibPath = "";
+
+    /**
      * 发布版本 favor 配置，{@link ProductFlavorModel}
      */
     private final NamedDomainObjectContainer<ProductFlavorModel> prodFlavor;
