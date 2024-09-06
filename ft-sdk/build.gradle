@@ -6,7 +6,6 @@ ext {
 
     mavenGroupId = "com.cloudcare.ft.mobile.sdk.tracker.agent"
     mavenArtifactId = "ft-sdk"
-    withSourceCode = true
 }
 
 apply from: '../maven_aar_publish.gradle'

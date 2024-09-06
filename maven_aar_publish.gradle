@@ -8,11 +8,9 @@ afterEvaluate {
                 artifactId mavenArtifactId
                 version pkgVersion
                 artifact project.tasks.bundleReleaseAar
-                if (withSourceCode) {
-                    // 添加源码Javadoc到发布的AAR文件中
-                    artifact androidJavadocsJar
-                    artifact androidSourcesJar
-                }
+                // 添加源码Javadoc到发布的AAR文件中
+                artifact androidJavadocsJar
+                artifact androidSourcesJar
             }
         }
 
