@@ -122,11 +122,6 @@ public class Constants {
     public static final String URL_MODEL_TRACING = "v1/write/tracing";
 
     /**
-     *
-     */
-    public static final String URL_MODEL_SESSION_REPLAY = "v1/write/rum/replay";
-
-    /**
      * 默认服务名，字段 service
      */
     public static final String DEFAULT_SERVICE_NAME = "df_rum_android";

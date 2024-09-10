@@ -654,7 +654,7 @@ public class FTRUMInnerManager {
                             fields.put(Constants.KEY_CPU_USE, DeviceUtils.getCpuUsage());
                         }
                         if (FTMonitorManager.get().isErrorMonitorType(ErrorMonitorType.BATTERY)) {
-                            fields.put(Constants.KEY_BATTERY_USE, (float) BatteryUtils.getBatteryInfo(FTApplication.getApplication()).getBr());
+                            fields.put(Constants.KEY_BATTERY_USE, (float) BatteryUtils.getBatteryInfo(FTApplication.getApplication()).getUsage());
 
                         }
                         //<--------

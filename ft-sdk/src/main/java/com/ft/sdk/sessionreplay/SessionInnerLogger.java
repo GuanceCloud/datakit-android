@@ -53,15 +53,12 @@ public class SessionInnerLogger implements InternalLogger {
 
     @Override
     public void e(String tag, String message, Throwable e) {
-        e(tag, message + "\n" + LogUtils.getStackTraceString(e));
+        e(tag, message, e, false);
     }
 
     @Override
     public void e(String tag, String message, Throwable e, boolean onlyOnce) {
-        if (onlyOnce && checkCached(message)) {
-            return;
-        }
-
+        e(tag, message + "\n" + LogUtils.getStackTraceString(e), onlyOnce);
     }
 
     @Override
@@ -80,8 +77,7 @@ public class SessionInnerLogger implements InternalLogger {
 
     @Override
     public void w(String tag, String message) {
-        LogUtils.w(Constants.LOG_TAG_PREFIX + tag, message);
-
+        w(tag, message, false);
     }
 
     @Override
@@ -89,30 +85,25 @@ public class SessionInnerLogger implements InternalLogger {
         if (onlyOnce && checkCached(message)) {
             return;
         }
-        w(tag, message);
+        LogUtils.w(Constants.LOG_TAG_PREFIX + tag, message);
     }
 
     @Override
     public void w(String tag, String message, Throwable e, boolean onlyOnce) {
-        if (onlyOnce && checkCached(message)) {
-            return;
-        }
-
-
+        w(tag, message + "\n" + LogUtils.getStackTraceString(e), onlyOnce);
     }
 
     @Override
     public void w(String tag, String message, Throwable e) {
-
-        w(tag, message + "\n" + LogUtils.getStackTraceString(e), false);
+        w(tag, message, e, false);
     }
 
     private boolean checkCached(String message) {
         if (!cachedList.contains(message)) {
             cachedList.add(message);
-            return true;
+            return false;
         }
-        return false;
+        return true;
     }
 }
 

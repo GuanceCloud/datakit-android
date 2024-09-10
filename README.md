@@ -13,3 +13,10 @@
 
 ## 使用文档
  [文档中心](https://docs.guance.com/real-user-monitoring/android/app-access/)   
+
+## 开源代码使用
+* [ft-session-replay](ft-session-replay) 基于 datadog [dd-sdk-android-session-replay](https://github.com/DataDog/dd-sdk-android/tree/develop/features/dd-sdk-android-session-replay) 二次开发
+* [ft-session-replay-material](ft-session-replay-material) 基于 datadog [dd-sdk-android-session-replay-material](https://github.com/DataDog/dd-sdk-android/tree/develop/features/dd-sdk-android-session-replay-material) 二次开发
+
+## 第三方 Licenses
+- Datadog [dd-sdk-android](https://github.com/DataDog/dd-sdk-android/blob/develop/LICENSE)

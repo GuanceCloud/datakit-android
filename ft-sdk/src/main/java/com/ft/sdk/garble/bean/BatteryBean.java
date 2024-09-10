@@ -9,114 +9,87 @@ public class BatteryBean {
     /**
      * 电量使用量
      */
-    private int br;
-//    /**
-//     * 电池状态
-//     */
-//    private String status;
+    private int usage;
 
-//    /**
-//     * 电池充电状态
-//     */
-//    private String plugState;
+    /**
+     * 是否在省电模式
+     */
+    private boolean isSaveMode;
 
-//    /**
-//     * 电池健康状态
-//     */
-//    private String health;
-//
-//    /**
-//     * 是否有电池
-//     */
-//    private boolean present;
-//    /**
-//     * 电池制造技术
-//     */
-//    private String technology;
-//    /**
-//     * 电池温度
-//     */
-//    private double temperature;
-//
-//    /**
-//     *  电池电压
-//     */
-//    private double voltage;
+    /**
+     * 电池是否存在
+     */
+    private boolean isBatteryPresent;
 
-//    /**
-//     * 电池电总量
-//     */
-//    private String power;
+    /**
+     * {@link android.os.BatteryManager#BATTERY_STATUS_FULL}
+     * {@link android.os.BatteryManager#BATTERY_STATUS_NOT_CHARGING}
+     * {@link android.os.BatteryManager#BATTERY_STATUS_DISCHARGING}
+     * {@link android.os.BatteryManager#BATTERY_STATUS_CHARGING}
+     */
+    private int batteryStatue;
 
-    public int getBr() {
-        return br;
+
+    /**
+     * 电池充电状态
+     * {@link android.os.BatteryManager#BATTERY_PLUGGED_AC}
+     * {@link android.os.BatteryManager#BATTERY_PLUGGED_USB}
+     * {@link android.os.BatteryManager#BATTERY_PLUGGED_WIRELESS}
+     */
+    private int plugState;
+
+    /**
+     * 电池剩余
+     */
+    private int level;
+
+    public int getUsage() {
+        return usage;
     }
 
-    public void setBr(int br) {
-        this.br = br;
+    public void setUsage(int br) {
+        this.usage = br;
     }
 
-//    public String getStatus() {
-//        return status;
-//    }
-//
-//    public void setStatus(String status) {
-//        this.status = status;
-//    }
+    public boolean isSaveMode() {
+        return isSaveMode;
+    }
 
-//    public String getPlugState() {
-//        return plugState;
-//    }
-//
-//    public void setPlugState(String plugState) {
-//        this.plugState = plugState;
-//    }
+    public void setSaveMode(boolean saveMode) {
+        isSaveMode = saveMode;
+    }
 
-//    public String getHealth() {
-//        return health;
-//    }
-//
-//    public void setHealth(String health) {
-//        this.health = health;
-//    }
-//
-//    public boolean isPresent() {
-//        return present;
-//    }
-//
-//    public void setPresent(boolean present) {
-//        this.present = present;
-//    }
+    public int getPlugState() {
+        return plugState;
+    }
 
-//    public String getTechnology() {
-//        return technology;
-//    }
-//
-//    public void setTechnology(String technology) {
-//        this.technology = technology;
-//    }
-//
-//    public double getTemperature() {
-//        return temperature;
-//    }
-//
-//    public void setTemperature(double temperature) {
-//        this.temperature = temperature;
-//    }
-//
-//    public double getVoltage() {
-//        return voltage;
-//    }
-//
-//    public void setVoltage(double voltage) {
-//        this.voltage = voltage;
-//    }
+    public void setPlugState(int plugState) {
+        this.plugState = plugState;
+    }
 
-//    public String getPower() {
-//        return power;
-//    }
-//
-//    public void setPower(String power) {
-//        this.power = power;
-//    }
+    public boolean isBatteryPresent() {
+        return isBatteryPresent;
+    }
+
+    public void setBatteryPresent(boolean batteryPresent) {
+        isBatteryPresent = batteryPresent;
+    }
+
+    public int getBatteryStatue() {
+        return batteryStatue;
+    }
+
+    public void setBatteryStatue(int batteryStatue) {
+        this.batteryStatue = batteryStatue;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+        this.usage = 100 - level;
+    }
+
 }

@@ -12,6 +12,8 @@ import kotlin.text.Charsets;
 
 public class SessionReplayRecordWriter implements RecordWriter {
 
+    private static final String TAG = "SessionReplayRecordWriter";
+
     private final FeatureSdkCore sdkCore;
     private final RecordCallback recordCallback;
     private static final String SESSION_REPLAY_FEATURE_NAME = "session-replay";
@@ -27,7 +29,7 @@ public class SessionReplayRecordWriter implements RecordWriter {
         boolean forceNew = !viewId.equals(record.getViewId());
         if (forceNew) {
             viewId = record.getViewId();
-            System.out.println("forceNew:" + forceNew + ",viewId:" + viewId);
+            sdkCore.getInternalLogger().i(TAG, "forceNew:viewId:" + viewId);
         }
 
         sdkCore.getFeature(SESSION_REPLAY_FEATURE_NAME).withWriteContext(forceNew, new DataConsumerCallback() {

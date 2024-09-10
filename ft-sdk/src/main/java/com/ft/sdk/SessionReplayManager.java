@@ -145,4 +145,12 @@ public class SessionReplayManager implements FeatureSdkCore {
         return "";
     }
 
+
+    void stop() {
+        for (SDKFeature value : features.values()) {
+            value.stop();
+        }
+        features.clear();
+    }
+
 }

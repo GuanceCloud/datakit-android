@@ -43,7 +43,7 @@ public class SyncTaskManager {
     /**
      * 最大容忍错误次数
      */
-    public static final int MAX_ERROR_COUNT = 5;
+    static final int MAX_ERROR_COUNT = 5;
 
     /**
      * 最大同步休眠时间

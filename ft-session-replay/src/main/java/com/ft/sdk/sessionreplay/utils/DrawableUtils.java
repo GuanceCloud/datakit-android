@@ -135,15 +135,6 @@ public class DrawableUtils {
         return bitmapCachesManager.getBitmapByProperties(width, height, config);
     }
 
-    public interface BitmapCreationCallback {
-
-        @WorkerThread
-        void onReady(Bitmap bitmap);
-
-        @WorkerThread
-        void onFailure();
-    }
-
     public static final int MAX_BITMAP_SIZE_BYTES_WITH_RESOURCE_ENDPOINT = 10 * 1024 * 1024; // 10mb
     private static final int ARGB_8888_PIXEL_SIZE_BYTES = 4;
     public static final String FAILED_TO_CREATE_SCALED_BITMAP_ERROR =

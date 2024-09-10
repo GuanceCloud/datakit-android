@@ -1,6 +1,7 @@
 package com.ft.sdk.sessionreplay;
 
 import android.content.Context;
+import android.os.BatteryManager;
 
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTRUMConfig;
@@ -13,8 +14,8 @@ import com.ft.sdk.feature.Feature;
 import com.ft.sdk.feature.FeatureContextUpdateReceiver;
 import com.ft.sdk.feature.FeatureEventReceiver;
 import com.ft.sdk.feature.FeatureScope;
+import com.ft.sdk.garble.bean.BatteryBean;
 import com.ft.sdk.garble.http.HttpBuilder;
-import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 import com.ft.sdk.sessionreplay.internal.StorageBackedFeature;
@@ -50,7 +51,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-
+/**
+ *
+ */
 public class SDKFeature implements FeatureScope {
     private static final String TAG = "SDKFeatureScope";
     private final AtomicReference<FeatureEventReceiver> eventReceiver = new AtomicReference<>(null);
@@ -64,6 +67,8 @@ public class SDKFeature implements FeatureScope {
     private final AtomicBoolean initialized = new AtomicBoolean(false);
     private SessionReplayContext sdkContext;
     private Storage storage = new NoOpStorage();
+
+    private final BatteryPowerWatcher watcher = new BatteryPowerWatcher();
 
     private UploadScheduler uploadScheduler = new NoOpUploadScheduler();
 
@@ -87,21 +92,23 @@ public class SDKFeature implements FeatureScope {
                     BatchProcessingLevel.MEDIUM.getMaxBatchesPerUploadJob());
 
             String url = HttpBuilder.Builder()
-                    .setModel(Constants.URL_MODEL_SESSION_REPLAY).getUrl() + "?precision=ms";
+                    .setModel(SessionReplayConstants.URL_MODEL_SESSION_REPLAY).getUrl() + "?precision=ms";
 
             LogUtils.d(TAG, featureName + ":Session Replay Url:" + url);
 
-            FTRUMConfig rumConfig = FTRUMConfigManager.get().getConfig();
             FTSDKConfig sdkConfig = FTSdk.get().getBaseConfig();
+            FTRUMConfig rumConfig = FTRUMConfigManager.get().getConfig();
+
+            String appId = rumConfig == null ? "" : rumConfig.getRumAppId();
             sdkContext = new SessionReplayContext(url, sdkConfig.getEnv(),
-                    FTSdk.AGENT_VERSION, TrackingConsent.GRANTED,
-                    rumConfig.getRumAppId());
+                    FTSdk.AGENT_VERSION, TrackingConsent.GRANTED, appId);
 
             setupUploader(wrappedFeature, dataUploadConfiguration);
         }
         wrappedFeature.onInitialize(context);
         initialized.set(true);
         uploadScheduler.startScheduling();
+        watcher.register(context);
     }
 
     private void setupUploader(Feature feature, DataUploadConfiguration configuration) {
@@ -109,9 +116,26 @@ public class SDKFeature implements FeatureScope {
             if (feature.getName().equals(Feature.SESSION_REPLAY_FEATURE_NAME)) {
                 uploadScheduler = new DataUploadScheduler(feature.getName(), internalLogger,
                         configuration, storage, new SessionReplayUploader(sdkContext,
-                        new BatchesToSegmentsMapper(internalLogger), internalLogger), sdkContext);
+                        new BatchesToSegmentsMapper(internalLogger), internalLogger), sdkContext,
+                        new SystemInfoProxy() {
+                            @Override
+                            public boolean isNetworkAvailable() {
+                                return Utils.isNetworkAvailable();
+                            }
+
+                            @Override
+                            public boolean isBatteryHealthToSync() {
+                                BatteryBean batteryBean = watcher.batteryBean;
+                                boolean batteryEnough = batteryBean.getLevel() > SessionReplayConstants.BATTERY_LIMIT;
+                                boolean batteryPlug = batteryBean.getPlugState() == BatteryManager.BATTERY_PLUGGED_AC
+                                        || batteryBean.getPlugState() == BatteryManager.BATTERY_PLUGGED_WIRELESS
+                                        || batteryBean.getPlugState() == BatteryManager.BATTERY_PLUGGED_USB;
+                                boolean isFullOrCharging = batteryBean.getBatteryStatue() == BatteryManager.BATTERY_STATUS_FULL ||
+                                        batteryBean.getBatteryStatue() == BatteryManager.BATTERY_STATUS_CHARGING;
+                                return batteryEnough || batteryPlug || !batteryBean.isBatteryPresent() || isFullOrCharging;
+                            }
+                        });
             } else {
-                //fixme
                 uploadScheduler = new NoOpUploadScheduler();
             }
 
@@ -208,14 +232,14 @@ public class SDKFeature implements FeatureScope {
         }
     }
 
-    //todo
-    private void stop() {
+    public void stop() {
         if (initialized.get()) {
             wrappedFeature.onStop();
 
             uploadScheduler.stopScheduling();
             uploadScheduler = new NoOpUploadScheduler();
             storage = new NoOpStorage();
+            watcher.unRegister(FTApplication.getApplication());
         }
     }
 

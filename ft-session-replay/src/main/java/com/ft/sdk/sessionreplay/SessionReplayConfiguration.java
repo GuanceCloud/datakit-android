@@ -28,7 +28,7 @@ public class SessionReplayConfiguration {
     public static class Builder {
         @FloatRange(from = 0.0, to = 100.0)
         private final float sampleRate;
-        private String customEndpointUrl;
+        private String customEndpointUrl                                                                                    ;
         private SessionReplayPrivacy privacy = SessionReplayPrivacy.MASK;
         private ExtensionSupport extensionSupport = new NoOpExtensionSupport();
 
@@ -41,10 +41,10 @@ public class SessionReplayConfiguration {
             return this;
         }
 
-        public Builder useCustomEndpoint(String endpoint) {
-            customEndpointUrl = endpoint;
-            return this;
-        }
+//        public Builder useCustomEndpoint(String endpoint) {
+//            customEndpointUrl = endpoint;
+//            return this;
+//        }
 
         public Builder setPrivacy(SessionReplayPrivacy privacy) {
             this.privacy = privacy;
@@ -66,15 +66,15 @@ public class SessionReplayConfiguration {
         }
     }
 
-    public String getCustomEndpointUrl() {
+    String getCustomEndpointUrl() {
         return customEndpointUrl;
     }
 
-    public SessionReplayPrivacy getPrivacy() {
+    SessionReplayPrivacy getPrivacy() {
         return privacy;
     }
 
-    public List<MapperTypeWrapper<?>> getCustomMappers() {
+    List<MapperTypeWrapper<?>> getCustomMappers() {
         return customMappers;
     }
 

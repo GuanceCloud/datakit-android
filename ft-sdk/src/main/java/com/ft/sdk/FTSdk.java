@@ -125,6 +125,7 @@ public class FTSdk {
         EventConsumerThreadPool.get().shutDown();
         FTANRDetector.get().release();
         FTDBManager.release();
+        SessionReplayManager.get().stop();
         mFtSdk = null;
         LogUtils.w(TAG, "FT SDK 已经被关闭");
     }

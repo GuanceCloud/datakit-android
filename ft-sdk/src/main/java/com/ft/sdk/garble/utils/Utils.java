@@ -11,6 +11,8 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Process;
@@ -133,9 +135,22 @@ public class Utils {
      * @return
      */
     public static boolean isNetworkAvailable(Context context) {
-        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetWork = manager.getActiveNetworkInfo();
-        return activeNetWork != null && activeNetWork.isConnected();
+        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(
+                Context.CONNECTIVITY_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // API 23及以上，使用NetworkCapabilities
+            Network network = manager.getActiveNetwork();
+            if (network != null) {
+                NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);
+                return capabilities != null && capabilities.hasCapability(
+                        NetworkCapabilities.NET_CAPABILITY_INTERNET);
+            }
+            return false;
+        } else {
+            // API 23以下，使用已过时的NetworkInfo
+            NetworkInfo activeNetworkInfo = manager.getActiveNetworkInfo();
+            return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+        }
     }
 
     /**

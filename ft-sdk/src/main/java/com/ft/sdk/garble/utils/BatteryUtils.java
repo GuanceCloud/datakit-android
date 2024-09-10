@@ -104,7 +104,7 @@ public class BatteryUtils {
 //                    batteryBean.setVoltage(voltage);
 //                }
 //                batteryBean.setPower(getBatteryCapacity(context));
-                batteryBean.setBr(getBatteryUsage(context));
+                batteryBean.setUsage(getBatteryUsage(context));
             }
         } catch (Exception e) {
         }

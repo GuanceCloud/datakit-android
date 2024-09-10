@@ -8,15 +8,18 @@ import com.ft.sdk.sessionreplay.internal.excepiton.InvalidPayloadFormatException
 import com.ft.sdk.sessionreplay.internal.net.BatchesToSegmentsMapper;
 import com.ft.sdk.sessionreplay.internal.net.BytesCompressor;
 import com.ft.sdk.sessionreplay.internal.storage.RawBatchEvent;
+import com.ft.sdk.sessionreplay.internal.storage.UploadResult;
 import com.ft.sdk.sessionreplay.model.MobileSegment;
 import com.ft.sdk.sessionreplay.utils.InternalLogger;
 import com.google.gson.JsonObject;
 
 import java.io.ByteArrayInputStream;
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 负责 session replay 上传逻辑
+ */
 public class SessionReplayUploader {
 
     private static final String TAG = "SessionReplayUploader";
@@ -56,7 +59,7 @@ public class SessionReplayUploader {
      *
      * @param context
      */
-    public int upload(SessionReplayContext context, List<RawBatchEvent> batchData, byte[] byteArray) throws Exception {
+    public UploadResult upload(SessionReplayContext context, List<RawBatchEvent> batchData, byte[] byteArray) throws Exception {
         List<byte[]> serializedSegments = new ArrayList<>();
         for (RawBatchEvent event : batchData) {
             serializedSegments.add(event.getData());
@@ -77,8 +80,6 @@ public class SessionReplayUploader {
         StringBuilder jsonString = new StringBuilder();
         for (int index = 0; index < serializedSegmentPair.size(); index++) {
             Pair<MobileSegment, JsonObject> segment = serializedSegmentPair.get(index);
-
-            // Adding newline character at the end of each segment for proper decompression
             jsonString.append(segment.second.toString()).append("\n");
             if (start == -1) {
                 start = segment.first.start;
@@ -101,7 +102,7 @@ public class SessionReplayUploader {
         data.addFormField(KEY_END, end + "");
         data.addFormField(KEY_RECORDS_COUNT, recordsCount + "");
 
-        data.addFormField(KEY_INDEX_IN_VIEW, 0 + "");//fixme
+        data.addFormField(KEY_INDEX_IN_VIEW, 0 + "");//fixme 目前在移动端无实际作用
         data.addFormField(HAS_FULL_SNAPSHOT, hasFullSnapshot + "");
         data.addFormField(KEY_SOURCE, "android");
         data.addFormField(KEY_RAW_SEGMENT_SIZE, segmentAsByteArray.length + "");
@@ -113,16 +114,15 @@ public class SessionReplayUploader {
         data.addFormField(KEY_VIEW_ID, viewId);
 
         Bundle b = data.finish();
-        int code = b.getInt("code");
-        if (code == HttpURLConnection.HTTP_OK) {
+        UploadResult result = new UploadResult(b.getInt("code"), b.getString("response"));
+        if (result.isSuccess()) {
             internalLogger.d(TAG, "Session Upload Success. view_id:" + viewId
                     + ",count:" + recordsCount + ",hasFullSnapshot:" + hasFullSnapshot);
         } else {
-            String response = b.getString("response");
             internalLogger.e(TAG, "Session Upload Failed. view_id:" + viewId
-                    + ",count:" + recordsCount + ",code:" + code + ",response:" + response);
+                    + ",count:" + recordsCount + ",code:" + result.getCode() + ",response:" + result.getResponse());
         }
-        return code;
+        return result;
 
     }
 

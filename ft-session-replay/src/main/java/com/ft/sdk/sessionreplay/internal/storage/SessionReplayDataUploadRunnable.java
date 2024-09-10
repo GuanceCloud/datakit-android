@@ -1,7 +1,11 @@
 package com.ft.sdk.sessionreplay.internal.storage;
 
+import static com.ft.sdk.sessionreplay.SessionReplayConstants.DECREASE_PERCENT;
+import static com.ft.sdk.sessionreplay.SessionReplayConstants.INCREASE_PERCENT;
+
 import com.ft.sdk.api.context.SessionReplayContext;
 import com.ft.sdk.sessionreplay.SessionReplayUploader;
+import com.ft.sdk.sessionreplay.SystemInfoProxy;
 import com.ft.sdk.sessionreplay.internal.persistence.BatchData;
 import com.ft.sdk.sessionreplay.internal.persistence.BatchId;
 import com.ft.sdk.sessionreplay.internal.persistence.DataUploadConfiguration;
@@ -9,7 +13,6 @@ import com.ft.sdk.sessionreplay.internal.persistence.Storage;
 import com.ft.sdk.sessionreplay.internal.utils.ExecutorUtils;
 import com.ft.sdk.sessionreplay.utils.InternalLogger;
 
-import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -21,20 +24,21 @@ public class SessionReplayDataUploadRunnable implements Runnable {
     private final String featureName;
     private final ScheduledThreadPoolExecutor threadPoolExecutor;
     private final Storage storage;
-    private SessionReplayUploader dataUploader;
+    private final SessionReplayUploader dataUploader;
     private long currentDelayIntervalMs;
-    private long minDelayMs;
-    private long maxDelayMs;
-    private int maxBatchesPerJob;
+    private final long minDelayMs;
+    private final long maxDelayMs;
+    private final int maxBatchesPerJob;
     private final SessionReplayContext sdkContext;
     private final InternalLogger internalLogger;
+    private final SystemInfoProxy systemInfoProxy;
 
     public SessionReplayDataUploadRunnable(String featureName, ScheduledThreadPoolExecutor threadPoolExecutor,
                                            Storage storage,
                                            SessionReplayUploader uploader,
                                            DataUploadConfiguration dataUploadConfiguration,
                                            SessionReplayContext context,
-                                           InternalLogger internalLogger) {
+                                           InternalLogger internalLogger, SystemInfoProxy systemInfoProxy) {
         this.featureName = featureName;
         this.threadPoolExecutor = threadPoolExecutor;
         this.storage = storage;
@@ -45,43 +49,44 @@ public class SessionReplayDataUploadRunnable implements Runnable {
         this.maxBatchesPerJob = dataUploadConfiguration.getMaxBatchesPerUploadJob();
         this.sdkContext = context;
         this.internalLogger = internalLogger;
+        this.systemInfoProxy = systemInfoProxy;
     }
 
     @Override
     public void run() {
-        int batchConsumerAvailableAttempts = maxBatchesPerJob;
-        int code = 0;
+        UploadResult result = null;
+        if (systemInfoProxy.isNetworkAvailable() && systemInfoProxy.isBatteryHealthToSync()) {
+            int batchConsumerAvailableAttempts = maxBatchesPerJob;
+            do {
+                batchConsumerAvailableAttempts--;
+                result = handleNextBatch(sdkContext);
 
-        do {
-            batchConsumerAvailableAttempts--;
-            //fixme
-            code = handleNextBatch(sdkContext);
-
-        } while (batchConsumerAvailableAttempts > 0 && code == 200);
-
-        if (code > 0) {
-
-            //todo 处理频次
+            } while (batchConsumerAvailableAttempts > 0 && result != null && result.isSuccess());
+        }
+        if (result != null && result.isSuccess()) {
+            currentDelayIntervalMs = Math.max((long) (currentDelayIntervalMs * DECREASE_PERCENT), minDelayMs);
+        } else {
+            currentDelayIntervalMs = Math.min((long) (currentDelayIntervalMs * INCREASE_PERCENT), maxDelayMs);
         }
 
-        handleNextUpload();
+        handleNextUpload(currentDelayIntervalMs);
     }
 
-    private int handleNextBatch(SessionReplayContext context) {
-        int uploadStatus = 0;
+    private UploadResult handleNextBatch(SessionReplayContext context) {
+        UploadResult result = null;
         BatchData nextBatchData = storage.readNextBatch();
         if (nextBatchData != null) {
-            uploadStatus = consumeBatch(
+            result = consumeBatch(
                     context,
                     nextBatchData.getId(),
                     nextBatchData.getData(),
                     nextBatchData.getMetadata()
             );
         }
-        return uploadStatus;
+        return result;
     }
 
-    private void handleNextUpload() {
+    private void handleNextUpload(long currentDelayIntervalMs) {
         this.threadPoolExecutor.remove(this);
         ExecutorUtils.scheduleSafe(threadPoolExecutor,
                 featureName + ":data upload", currentDelayIntervalMs,
@@ -90,26 +95,26 @@ public class SessionReplayDataUploadRunnable implements Runnable {
                 this);
     }
 
-    private int consumeBatch(
+    private UploadResult consumeBatch(
             SessionReplayContext context,
             BatchId batchId,
             List<RawBatchEvent> batch,
             byte[] batchMeta
     ) {
-        int status = 0;
+        UploadResult result = null;
         try {
-            status = dataUploader.upload(context, batch, batchMeta);
+            result = dataUploader.upload(context, batch, batchMeta);
+            if (result != null) {
+                storage.confirmBatchRead(batchId,
+                        !result.isNeedReTry() ? new RemovalReason.Flushed()
+                                : new RemovalReason.Invalid(), true);
+            } else {
+                storage.confirmBatchRead(batchId, new RemovalReason.Flushed(), false);
+            }
         } catch (Exception e) {
-            internalLogger.e(TAG, "", e);
+            internalLogger.e(TAG, e.getMessage(), e);
         }
-        if (status == HttpURLConnection.HTTP_OK || status >= HttpURLConnection.HTTP_BAD_REQUEST
-                && status < HttpURLConnection.HTTP_INTERNAL_ERROR) {
-            storage.confirmBatchRead(batchId,
-                    status == HttpURLConnection.HTTP_OK ? new RemovalReason.Flushed()
-                            : new RemovalReason.Invalid(), true);
-        } else {
-            storage.confirmBatchRead(batchId, new RemovalReason.Flushed(), false);
-        }
-        return status;
+
+        return result;
     }
 }

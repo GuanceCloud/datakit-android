@@ -20,7 +20,7 @@ public class RateBasedSampler implements Sampler {
     @Override
     public boolean sample() {
         float sampleRate = getSampleRate();
-        return sampleRate == 0f ? false : sampleRate == 100f ? true : random.nextFloat() * 100 <= sampleRate;
+        return sampleRate != 0f && (sampleRate == 100f || random.nextFloat() * 100 <= sampleRate);
     }
 
     @Override

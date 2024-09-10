@@ -1,5 +1,5 @@
 apply plugin: 'com.android.library'
-
+apply from: '../maven_aar_publish.gradle'
 ext {
     //发布 snapshot 版本号末尾追加 "-SNAPSHOT"
     pkgVersion = "1.7.0-alpha01"
@@ -7,8 +7,6 @@ ext {
     mavenGroupId = "com.cloudcare.ft.mobile.sdk.tracker.agent"
     mavenArtifactId = "ft-sdk"
 }
-
-apply from: '../maven_aar_publish.gradle'
 
 android {
     compileSdk 34
@@ -57,7 +55,7 @@ dependencies {
     androidTestImplementation 'com.squareup.okhttp3:okhttp:4.5.0'
     androidTestImplementation 'com.google.mockwebserver:mockwebserver:20130706'
     androidTestImplementation 'org.powermock:powermock-module-junit4:2.0.7'
-    compileOnly 'com.google.android.material:material:1.1.0'
+    compileOnly 'com.google.android.material:material:1.3.0'
     compileOnly 'com.squareup.okhttp3:okhttp:4.5.0'
     compileOnly project(":ft-native")
     compileOnly project(":ft-session-replay")

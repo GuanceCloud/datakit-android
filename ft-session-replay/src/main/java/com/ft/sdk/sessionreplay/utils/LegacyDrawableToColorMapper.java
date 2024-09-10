@@ -22,7 +22,7 @@ public class LegacyDrawableToColorMapper implements DrawableToColorMapper {
     @Override
     public Integer mapDrawableToColor(Drawable drawable, InternalLogger internalLogger) {
         Integer result;
-        if (drawable instanceof ColorDrawable) {
+        if (drawable instanceof ColorDrawable ) {
             result = resolveColorDrawable((ColorDrawable) drawable);
         } else if (drawable instanceof RippleDrawable) {
             result = resolveRippleDrawable((RippleDrawable) drawable, internalLogger);
@@ -40,9 +40,8 @@ public class LegacyDrawableToColorMapper implements DrawableToColorMapper {
             final String drawableTypeFinal = drawableType;
             Map<String, Object> additionalProperties = new HashMap<>();
             additionalProperties.put("replay.drawable.type", drawableType);
-            //fixme once
             internalLogger.i(TAG, "No mapper found for drawable " + drawableTypeFinal
-                    + ",additionalProperties:" + additionalProperties);
+                    + ",additionalProperties:" + additionalProperties,true);
             result = null;
         }
         return result;

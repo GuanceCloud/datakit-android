@@ -74,25 +74,30 @@ public class ResourceResolver {
                 ? ((BitmapDrawable) drawable).getBitmap()
                 : null;
 
-        threadPoolExecutor.execute(() -> createBitmap(
-                resources,
-                drawable,
-                drawableWidth,
-                drawableHeight,
-                displayMetrics,
-                bitmapFromDrawable,
-                new ResolveResourceCallback() {
-                    @Override
-                    public void onResolved(String resourceId, byte[] resourceData) {
-                        resourceItemCreationHandler.queueItem(resourceId, resourceData);
-                        resourceResolverCallback.onSuccess(resourceId);
-                    }
+        threadPoolExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                createBitmap(
+                        resources,
+                        drawable,
+                        drawableWidth,
+                        drawableHeight,
+                        displayMetrics,
+                        bitmapFromDrawable,
+                        new ResolveResourceCallback() {
+                            @Override
+                            public void onResolved(String resourceId, byte[] resourceData) {
+                                resourceItemCreationHandler.queueItem(resourceId, resourceData);
+                                resourceResolverCallback.onSuccess(resourceId);
+                            }
 
-                    @Override
-                    public void onFailed() {
-                        resourceResolverCallback.onFailure();
-                    }
-                }));
+                            @Override
+                            public void onFailed() {
+                                resourceResolverCallback.onFailure();
+                            }
+                        });
+            }
+        });
     }
 
     @WorkerThread

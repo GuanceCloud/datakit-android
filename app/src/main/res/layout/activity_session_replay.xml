@@ -14,7 +14,7 @@
             android:id="@+id/session_replay_record_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="record" />
+            android:text="这是按钮" />
 
         <LinearLayout
             android:layout_width="match_parent"
