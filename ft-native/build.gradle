@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library'
-apply from:'../maven_aar_publish.gradle'
 
 ext {
     pkgVersion = "1.1.1"
@@ -54,3 +53,5 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
 }
+
+apply from:'../maven_aar_publish.gradle'
