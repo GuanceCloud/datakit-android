@@ -1,5 +1,5 @@
 apply plugin: 'com.android.library'
-apply from: '../maven_aar_publish.gradle'
+
 ext {
     //发布 snapshot 版本号末尾追加 "-SNAPSHOT"
     pkgVersion = "1.7.0-alpha01"
@@ -60,5 +60,8 @@ dependencies {
     compileOnly project(":ft-native")
     compileOnly project(":ft-session-replay")
 }
+
+apply from: '../maven_aar_publish.gradle'
+
 
 
