@@ -26,13 +26,13 @@ public class SessionReplayConfiguration {
     }
 
     public static class Builder {
-        @FloatRange(from = 0.0, to = 100.0)
+        @FloatRange(from = 0.0, to = 1.0)
         private final float sampleRate;
-        private String customEndpointUrl                                                                                    ;
+        private String customEndpointUrl;
         private SessionReplayPrivacy privacy = SessionReplayPrivacy.MASK;
         private ExtensionSupport extensionSupport = new NoOpExtensionSupport();
 
-        public Builder(@FloatRange(from = 0.0, to = 100.0) float sampleRate) {
+        public Builder(@FloatRange(from = 0.0, to = 1.0) float sampleRate) {
             this.sampleRate = sampleRate;
         }
 

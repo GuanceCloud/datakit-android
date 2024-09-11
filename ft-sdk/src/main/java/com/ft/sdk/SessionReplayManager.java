@@ -1,5 +1,7 @@
 package com.ft.sdk;
 
+import static com.ft.sdk.feature.Feature.SESSION_REPLAY_FEATURE_NAME;
+
 import android.content.Context;
 
 import com.ft.sdk.feature.Feature;
@@ -7,6 +9,7 @@ import com.ft.sdk.feature.FeatureContextUpdateReceiver;
 import com.ft.sdk.feature.FeatureEventReceiver;
 import com.ft.sdk.feature.FeatureScope;
 import com.ft.sdk.feature.FeatureSdkCore;
+import com.ft.sdk.garble.threadpool.ThreadPoolFactory;
 import com.ft.sdk.sessionreplay.SDKFeature;
 import com.ft.sdk.sessionreplay.SessionInnerLogger;
 import com.ft.sdk.sessionreplay.internal.SessionReplayRecordCallback;
@@ -16,6 +19,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
 
 
 public class SessionReplayManager implements FeatureSdkCore {
@@ -66,7 +71,6 @@ public class SessionReplayManager implements FeatureSdkCore {
         SDKFeature scope = features.get(featureName);
         if (scope != null) {
             synchronized (scope) {
-                //fixme
                 Map<String, Object> featureContext = getFeatureContext(featureName);
                 updateCallback.onUpdate(featureContext);
 
@@ -127,17 +131,25 @@ public class SessionReplayManager implements FeatureSdkCore {
 
     @Override
     public ExecutorService createSingleThreadExecutorService(String executorContext) {
-        return null;
+        return new ThreadPoolFactory(executorContext).getExecutor();
     }
 
     @Override
     public ScheduledExecutorService createScheduledExecutorService(String executorContext) {
-        return null;
+        //no use
+        return new ScheduledThreadPoolExecutor(1, new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                Thread thread = new Thread(r, "FT-" + executorContext);
+                thread.setPriority(4);
+                return thread;
+            }
+        });
     }
 
     @Override
     public String getName() {
-        return "session-replay";
+        return SESSION_REPLAY_FEATURE_NAME;
     }
 
     @Override

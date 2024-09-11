@@ -8,7 +8,12 @@ public class RateBasedSampler implements Sampler {
     private final Supplier<Float> sampleRateProvider;
 
     public RateBasedSampler(float sampleRate) {
-        this.sampleRateProvider = () -> sampleRate;
+        this.sampleRateProvider = new Supplier<Float>() {
+            @Override
+            public Float get() {
+                return sampleRate;
+            }
+        };
     }
 
     public RateBasedSampler(double sampleRate) {
@@ -20,7 +25,7 @@ public class RateBasedSampler implements Sampler {
     @Override
     public boolean sample() {
         float sampleRate = getSampleRate();
-        return sampleRate != 0f && (sampleRate == 100f || random.nextFloat() * 100 <= sampleRate);
+        return sampleRate != 0f && (sampleRate == 1f || random.nextFloat() * 100 <= sampleRate * 100);
     }
 
     @Override
@@ -29,13 +34,12 @@ public class RateBasedSampler implements Sampler {
         if (rawSampleRate < 0f) {
             System.out.println("Sample rate value provided " + rawSampleRate + " is below 0, setting it to 0.");
             return 0f;
-        } else if (rawSampleRate > 100f) {
-            System.out.println("Sample rate value provided " + rawSampleRate + " is above 100, setting it to 100.");
-            return 100f;
+        } else if (rawSampleRate > 1f) {
+            System.out.println("Sample rate value provided " + rawSampleRate + " is above 1, setting it to 1.");
+            return 1f;
         } else {
             return rawSampleRate;
         }
     }
 
-    public static final float SAMPLE_ALL_RATE = 100f;
 }

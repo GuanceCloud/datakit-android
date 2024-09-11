@@ -5,6 +5,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
+import java.util.Objects;
+
 public class TextPosition {
     private final Padding padding;
     private final Alignment alignment;
@@ -56,5 +58,18 @@ public class TextPosition {
                     e
             );
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TextPosition that = (TextPosition) o;
+        return Objects.equals(padding, that.padding) && Objects.equals(alignment, that.alignment);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(padding, alignment);
     }
 }

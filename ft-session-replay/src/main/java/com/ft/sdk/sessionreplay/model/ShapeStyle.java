@@ -6,6 +6,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
 import java.util.Locale;
+import java.util.Objects;
 
 public class ShapeStyle {
     private final String backgroundColor;
@@ -87,5 +88,16 @@ public class ShapeStyle {
         return (float) (this.opacity != null ? this.opacity : 1f) >= FULL_OPACITY_ALPHA;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ShapeStyle that = (ShapeStyle) o;
+        return Objects.equals(backgroundColor, that.backgroundColor) && Objects.equals(opacity, that.opacity) && Objects.equals(cornerRadius, that.cornerRadius);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(backgroundColor, opacity, cornerRadius);
+    }
 }

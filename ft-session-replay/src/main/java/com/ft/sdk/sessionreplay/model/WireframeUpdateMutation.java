@@ -1,9 +1,9 @@
 package com.ft.sdk.sessionreplay.model;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,11 +63,15 @@ public abstract class WireframeUpdateMutation {
         }
 
         if (result == null) {
-            String message = "Unable to parse json into one of type WireframeUpdateMutation\n" +
-                    errors.stream().map(Throwable::getMessage).reduce("", (acc, err) -> acc + "\n" + err);
-            throw new JsonParseException(message);
+            // Collect all error messages manually
+            StringBuilder message = new StringBuilder("Unable to parse json into one of type WireframeUpdateMutation");
+            for (Throwable error : errors) {
+                message.append("\n").append(error.getMessage());
+            }
+            throw new JsonParseException(message.toString());
         }
 
         return result;
     }
 }
+

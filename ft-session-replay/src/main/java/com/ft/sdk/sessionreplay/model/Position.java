@@ -47,4 +47,5 @@ public class Position {
             throw new JsonParseException("Unable to parse json into type Position", e);
         }
     }
+
 }

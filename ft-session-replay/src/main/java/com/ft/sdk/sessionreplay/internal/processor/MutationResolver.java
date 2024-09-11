@@ -17,6 +17,7 @@ import com.ft.sdk.sessionreplay.model.Wireframe;
 import com.ft.sdk.sessionreplay.model.WireframeClip;
 import com.ft.sdk.sessionreplay.model.WireframeUpdateMutation;
 import com.ft.sdk.sessionreplay.utils.InternalLogger;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,6 +45,7 @@ public class MutationResolver {
     public MobileMutationData resolveMutations(
             List<Wireframe> oldSnapshot,
             List<Wireframe> newSnapshot) {
+        System.out.println("resolveMutations:" + oldSnapshot + ",\n" + newSnapshot);
 
         Map<Long, Symbol> table = new HashMap<>();
         List<Entry> oa = new ArrayList<>();
@@ -172,7 +174,9 @@ public class MutationResolver {
         }
 
         if (!adds.isEmpty() || !removes.isEmpty() || !updates.isEmpty()) {
-            return new MobileMutationData(adds, removes, updates);
+            MobileMutationData data = new MobileMutationData(adds, removes, updates);
+            System.out.println(new Gson().toJson(data));
+            return data;
         } else {
             return null;
         }
@@ -235,25 +239,25 @@ public class MutationResolver {
                         , null, null, currentWireframe.getSlotId(), null
                 );
 
-        if (!prevWireframe.getX().equals(currentWireframe.getX())) {
+        if (!Objects.equals(prevWireframe.getX(), currentWireframe.getX())) {
             mutation = mutation.setX(currentWireframe.getX());
         }
-        if (!prevWireframe.getY().equals(currentWireframe.getY())) {
+        if (!Objects.equals(prevWireframe.getY(), currentWireframe.getY())) {
             mutation = mutation.setY(currentWireframe.getY());
         }
-        if (!prevWireframe.getWidth().equals(currentWireframe.getWidth())) {
+        if (!Objects.equals(prevWireframe.getWidth(), currentWireframe.getWidth())) {
             mutation = mutation.setWidth(currentWireframe.getWidth());
         }
-        if (!prevWireframe.getHeight().equals(currentWireframe.getHeight())) {
+        if (!Objects.equals(prevWireframe.getHeight(), currentWireframe.getHeight())) {
             mutation = mutation.setHeight(currentWireframe.getHeight());
         }
-        if (!prevWireframe.getBorder().equals(currentWireframe.getBorder())) {
+        if (!Objects.equals(prevWireframe.getBorder(), currentWireframe.getBorder())) {
             mutation = mutation.setBorder(currentWireframe.getBorder());
         }
-        if (!prevWireframe.getShapeStyle().equals(currentWireframe.getShapeStyle())) {
+        if (!Objects.equals(prevWireframe.getShapeStyle(), currentWireframe.getShapeStyle())) {
             mutation = mutation.setShapeStyle(currentWireframe.getShapeStyle());
         }
-        if (!prevWireframe.getClip().equals(currentWireframe.getClip())) {
+        if (!Objects.equals(prevWireframe.getClip(), currentWireframe.getClip())) {
             mutation = mutation.setClip(
                     currentWireframe.getClip() != null ?
                             currentWireframe.getClip() :
@@ -270,27 +274,29 @@ public class MutationResolver {
 
         ShapeWireframeUpdate mutation =
                 new ShapeWireframeUpdate(currentWireframe.getId(), null, null, null, null, null, null, null);
-        if (prevWireframe.getX() != currentWireframe.getX()) {
+        if (!Objects.equals(prevWireframe.getX(), currentWireframe.getX())) {
             mutation = mutation.setX(currentWireframe.getX());
         }
-        if (prevWireframe.getY() != currentWireframe.getY()) {
+        if (!Objects.equals(prevWireframe.getY(), currentWireframe.getY())) {
             mutation = mutation.setY(currentWireframe.getY());
         }
-        if (prevWireframe.getWidth() != currentWireframe.getWidth()) {
+        if (!Objects.equals(prevWireframe.getWidth(), currentWireframe.getWidth())) {
             mutation = mutation.setWidth(currentWireframe.getWidth());
         }
-        if (prevWireframe.getHeight() != currentWireframe.getHeight()) {
+        if (!Objects.equals(prevWireframe.getHeight(), currentWireframe.getHeight())) {
             mutation = mutation.setHeight(currentWireframe.getHeight());
         }
-        if (prevWireframe.getBorder() != currentWireframe.getBorder()) {
+        if (!Objects.equals(prevWireframe.getBorder(), currentWireframe.getBorder())) {
             mutation = mutation.setBorder(currentWireframe.getBorder());
         }
-        if (prevWireframe.getShapeStyle() != currentWireframe.getShapeStyle()) {
+        if (!Objects.equals(prevWireframe.getShapeStyle(), currentWireframe.getShapeStyle())) {
             mutation = mutation.setShapeStyle(currentWireframe.getShapeStyle());
         }
-        if (prevWireframe.getClip() != currentWireframe.getClip()) {
+        if (!Objects.equals(prevWireframe.getClip(), currentWireframe.getClip())) {
             mutation = mutation.setClip(
-                    currentWireframe.getClip() != null ? currentWireframe.getClip() : new WireframeClip(0L, 0L, 0L, 0L)
+                    currentWireframe.getClip() != null ?
+                            currentWireframe.getClip() :
+                            new WireframeClip(0L, 0L, 0L, 0L)
             );
         }
 
@@ -304,24 +310,23 @@ public class MutationResolver {
         PlaceholderWireframeUpdate mutation =
                 new PlaceholderWireframeUpdate(currentWireframe.getId(), null,
                         null, null, null, null, null);
-        if (prevWireframe.getX() != currentWireframe.getX()) {
+        if (!Objects.equals(prevWireframe.getX(), currentWireframe.getX())) {
             mutation = mutation.setX(currentWireframe.getX());
         }
-        if (prevWireframe.getY() != currentWireframe.getY()) {
+        if (!Objects.equals(prevWireframe.getY(), currentWireframe.getY())) {
             mutation = mutation.setY(currentWireframe.getY());
         }
-        if (prevWireframe.getWidth() != currentWireframe.getWidth()) {
+        if (!Objects.equals(prevWireframe.getWidth(), currentWireframe.getWidth())) {
             mutation = mutation.setWidth(currentWireframe.getWidth());
         }
-        if (prevWireframe.getHeight() != currentWireframe.getHeight()) {
+        if (!Objects.equals(prevWireframe.getHeight(), currentWireframe.getHeight())) {
             mutation = mutation.setHeight(currentWireframe.getHeight());
         }
-        if (prevWireframe.getLabel().equals(currentWireframe.getLabel())) {
-            mutation = mutation.setLabel(currentWireframe.getLabel());
-        }
-        if (prevWireframe.getClip() != currentWireframe.getClip()) {
+        if (!Objects.equals(prevWireframe.getClip(), currentWireframe.getClip())) {
             mutation = mutation.setClip(
-                    currentWireframe.getClip() != null ? currentWireframe.getClip() : new WireframeClip(0L, 0L, 0L, 0L)
+                    currentWireframe.getClip() != null ?
+                            currentWireframe.getClip() :
+                            new WireframeClip(0L, 0L, 0L, 0L)
             );
         }
 
@@ -336,7 +341,7 @@ public class MutationResolver {
                 new ImageWireframeUpdate(currentWireframe.getId(), null,
                         null, null, null, null, null,
                         null, null, null, null, null);
-        if (!Objects.equals(currentWireframe.getX(), prevWireframe.getX())) {
+        if (!Objects.equals(prevWireframe.getX(), currentWireframe.getX())) {
             mutation = mutation.setX(currentWireframe.getX());
         }
         if (!Objects.equals(prevWireframe.getY(), currentWireframe.getY())) {
@@ -344,6 +349,22 @@ public class MutationResolver {
         }
         if (!Objects.equals(prevWireframe.getWidth(), currentWireframe.getWidth())) {
             mutation = mutation.setWidth(currentWireframe.getWidth());
+        }
+        if (!Objects.equals(prevWireframe.getHeight(), currentWireframe.getHeight())) {
+            mutation = mutation.setHeight(currentWireframe.getHeight());
+        }
+        if (!Objects.equals(prevWireframe.getBorder(), currentWireframe.getBorder())) {
+            mutation = mutation.setBorder(currentWireframe.getBorder());
+        }
+        if (!Objects.equals(prevWireframe.getShapeStyle(), currentWireframe.getShapeStyle())) {
+            mutation = mutation.setShapeStyle(currentWireframe.getShapeStyle());
+        }
+        if (!Objects.equals(prevWireframe.getClip(), currentWireframe.getClip())) {
+            mutation = mutation.setClip(
+                    currentWireframe.getClip() != null ?
+                            currentWireframe.getClip() :
+                            new WireframeClip(0L, 0L, 0L, 0L)
+            );
         }
         return mutation;
     }
@@ -358,34 +379,34 @@ public class MutationResolver {
                         null, null, null,
                         null, null);
 
-        if (prevWireframe.getX() != currentWireframe.getX()) {
-            mutation = mutation.copyWithId(currentWireframe.getX());
+        if (!Objects.equals(prevWireframe.getX(), currentWireframe.getX())) {
+            mutation = mutation.setX(currentWireframe.getX());
         }
-        if (prevWireframe.getY() != currentWireframe.getY()) {
+        if (!Objects.equals(prevWireframe.getY(), currentWireframe.getY())) {
             mutation = mutation.setY(currentWireframe.getY());
         }
-        if (prevWireframe.getWidth() != currentWireframe.getWidth()) {
+        if (!Objects.equals(prevWireframe.getWidth(), currentWireframe.getWidth())) {
             mutation = mutation.setWidth(currentWireframe.getWidth());
         }
-        if (prevWireframe.getHeight() != currentWireframe.getHeight()) {
+        if (!Objects.equals(prevWireframe.getHeight(), currentWireframe.getHeight())) {
             mutation = mutation.setHeight(currentWireframe.getHeight());
         }
-        if (prevWireframe.getBorder() != currentWireframe.getBorder()) {
+        if (!Objects.equals(prevWireframe.getBorder(), currentWireframe.getBorder())) {
             mutation = mutation.setBorder(currentWireframe.getBorder());
         }
-        if (prevWireframe.getShapeStyle() != currentWireframe.getShapeStyle()) {
+        if (!Objects.equals(prevWireframe.getShapeStyle(), currentWireframe.getShapeStyle())) {
             mutation = mutation.setShapeStyle(currentWireframe.getShapeStyle());
         }
-        if (prevWireframe.getTextStyle() != currentWireframe.getTextStyle()) {
+        if (!Objects.equals(prevWireframe.getTextStyle(), currentWireframe.getTextStyle())) {
             mutation = mutation.setTextStyle(currentWireframe.getTextStyle());
         }
-        if (prevWireframe.getText().equals(currentWireframe.getText())) {
+        if (!Objects.equals(prevWireframe.getText(), currentWireframe.getText())) {
             mutation = mutation.setText(currentWireframe.getText());
         }
-        if (prevWireframe.getTextPosition() != currentWireframe.getTextPosition()) {
+        if (!Objects.equals(prevWireframe.getTextPosition(), currentWireframe.getTextPosition())) {
             mutation = mutation.setTextPosition(currentWireframe.getTextPosition());
         }
-        if (prevWireframe.getClip() != currentWireframe.getClip()) {
+        if (!Objects.equals(prevWireframe.getClip(), currentWireframe.getClip())) {
             mutation = mutation.setClip(
                     currentWireframe.getClip() != null ?
                             currentWireframe.getClip() :

@@ -16,6 +16,7 @@ import com.ft.sdk.feature.FeatureEventReceiver;
 import com.ft.sdk.feature.FeatureScope;
 import com.ft.sdk.garble.bean.BatteryBean;
 import com.ft.sdk.garble.http.HttpBuilder;
+import com.ft.sdk.garble.threadpool.ThreadPoolFactory;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 import com.ft.sdk.sessionreplay.internal.StorageBackedFeature;
@@ -47,7 +48,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -173,7 +173,7 @@ public class SDKFeature implements FeatureScope {
             }
         };
 
-        return new ConsentAwareStorage(Executors.newSingleThreadExecutor(),
+        return new ConsentAwareStorage(new ThreadPoolFactory(featureName).getExecutor(),
                 new BatchFileOrchestrator(new File(FTApplication.getApplication().getCacheDir(),
                         SessionReplayConstants.PATH_SESSION_REPLAY), new FilePersistenceConfig(),
                         internalLogger, dispatcher),

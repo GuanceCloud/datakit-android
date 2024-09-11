@@ -5,6 +5,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
+import java.util.Objects;
+
 public class Alignment {
     private final Horizontal horizontal;
     private final Vertical vertical;
@@ -50,5 +52,18 @@ public class Alignment {
         } catch (IllegalStateException | NullPointerException e) {
             throw new JsonParseException("Unable to parse json into type Alignment", e);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Alignment alignment = (Alignment) o;
+        return horizontal == alignment.horizontal && vertical == alignment.vertical;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(horizontal, vertical);
     }
 }

@@ -15,7 +15,6 @@ public class ResourcesFeature implements StorageBackedFeature {
     private final FeatureSdkCore sdkCore;
     private ResourcesWriter dataWriter = new NoOpResourcesWriter();
     private final AtomicBoolean initialized = new AtomicBoolean(false);
-    private final String SESSION_REPLAY_RESOURCES_FEATURE_NAME = "session-replay-resources";
 
     @Override
     public String getName() {

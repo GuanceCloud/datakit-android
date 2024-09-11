@@ -5,6 +5,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
+import java.util.Objects;
+
 public class Padding {
     private final Long top;
     private final Long bottom;
@@ -70,5 +72,18 @@ public class Padding {
         } catch (IllegalStateException | NullPointerException e) {
             throw new JsonParseException("Unable to parse json into type Padding", e);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Padding padding = (Padding) o;
+        return Objects.equals(top, padding.top) && Objects.equals(bottom, padding.bottom) && Objects.equals(left, padding.left) && Objects.equals(right, padding.right);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(top, bottom, left, right);
     }
 }

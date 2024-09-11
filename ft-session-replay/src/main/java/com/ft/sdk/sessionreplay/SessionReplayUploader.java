@@ -92,6 +92,7 @@ public class SessionReplayUploader {
             if (segment.first.hasFullSnapshot) {
                 hasFullSnapshot = true;
             }
+            internalLogger.i(TAG, "segment.hasFullSnapshot:" + segment.first.hasFullSnapshot);
         }
 
         byte[] segmentAsByteArray = jsonString.toString().getBytes();
@@ -101,9 +102,9 @@ public class SessionReplayUploader {
         data.addFormField(KEY_START, start + "");
         data.addFormField(KEY_END, end + "");
         data.addFormField(KEY_RECORDS_COUNT, recordsCount + "");
-
-        data.addFormField(KEY_INDEX_IN_VIEW, 0 + "");//fixme 目前在移动端无实际作用
-        data.addFormField(HAS_FULL_SNAPSHOT, hasFullSnapshot + "");
+//
+//        data.addFormField(KEY_INDEX_IN_VIEW, 0 + "");//fixme 目前在移动端无实际作用
+//        data.addFormField(HAS_FULL_SNAPSHOT, hasFullSnapshot + "");
         data.addFormField(KEY_SOURCE, "android");
         data.addFormField(KEY_RAW_SEGMENT_SIZE, segmentAsByteArray.length + "");
 

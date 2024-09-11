@@ -5,6 +5,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
+import java.util.Objects;
+
 public class TextStyle {
     private final String family;
     private final long size;
@@ -60,5 +62,18 @@ public class TextStyle {
                     e
             );
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TextStyle textStyle = (TextStyle) o;
+        return size == textStyle.size && Objects.equals(family, textStyle.family) && Objects.equals(color, textStyle.color);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(family, size, color);
     }
 }

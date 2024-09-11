@@ -108,6 +108,7 @@ public class RecordedDataProcessor implements Processor {
 
         List<MobileRecord> records = new LinkedList<>();
         boolean isNewView = isNewView(newRumContext);
+//        boolean isNewView = true;
         boolean isTimeForFullSnapshot = isTimeForFullSnapshot();
         boolean screenOrientationChanged = systemInformation.getScreenOrientation() != previousOrientation;
         boolean fullSnapshotRequired = isNewView || isTimeForFullSnapshot || screenOrientationChanged;

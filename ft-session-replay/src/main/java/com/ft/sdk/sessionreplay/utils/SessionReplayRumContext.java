@@ -1,5 +1,10 @@
 package com.ft.sdk.sessionreplay.utils;
 
+import androidx.annotation.NonNull;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -60,5 +65,25 @@ public class SessionReplayRumContext {
         return new SessionReplayRumContext(applicationId, sessionId, viewId);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SessionReplayRumContext that = (SessionReplayRumContext) o;
+        return Objects.equals(applicationId, that.applicationId) && Objects.equals(sessionId, that.sessionId) && Objects.equals(viewId, that.viewId);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(applicationId, sessionId, viewId);
+    }
+
+    @Override
+    public String toString() {
+        return "SessionReplayRumContext{" +
+                "applicationId='" + applicationId + '\'' +
+                ", sessionId='" + sessionId + '\'' +
+                ", viewId='" + viewId + '\'' +
+                '}';
+    }
 }

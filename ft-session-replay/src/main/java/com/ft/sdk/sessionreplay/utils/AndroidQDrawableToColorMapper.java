@@ -53,15 +53,13 @@ public class AndroidQDrawableToColorMapper extends AndroidMDrawableToColorMapper
             } else if (blendModesReturningOriginalColor.contains(mode)) {
                 return fillColor;
             } else {
-                //fixme once
                 internalLogger.i(TAG, "No mapper found for gradient blend mode " + mode + ","
-                        + Map.of("replay.gradient.blend_mode", mode));
+                        + Map.of("replay.gradient.blend_mode", mode),true);
                 return fillColor;
             }
         } else {
-            //fixme
             internalLogger.i(TAG, "No mapper found for gradient color filter " + colorFilter.getClass() + ","
-                    + Map.of("replay.gradient.filter_type", colorFilter.getClass().getCanonicalName()));
+                    + Map.of("replay.gradient.filter_type", colorFilter.getClass().getCanonicalName()),true);
             return fillColor;
         }
     }

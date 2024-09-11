@@ -88,6 +88,7 @@ public abstract class BaseThreadPool {
 
     /**
      * 用于判断线程池是否在运行
+     *
      * @return
      */
     public boolean poolRunning() {
@@ -120,5 +121,9 @@ public abstract class BaseThreadPool {
         return new ThreadPoolExecutor(corePoolSize, MAXIMUM_POOL_SIZE, KEEP_ALIVE,
                 TimeUnit.SECONDS, workQueue, threadFactory);
 
+    }
+
+    public ThreadPoolExecutor getExecutor() {
+        return executor;
     }
 }

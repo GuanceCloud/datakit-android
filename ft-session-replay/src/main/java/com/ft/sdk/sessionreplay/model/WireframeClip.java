@@ -5,6 +5,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
+import java.util.Objects;
+
 public class WireframeClip {
     private final Long top;
     private final Long bottom;
@@ -78,4 +80,16 @@ public class WireframeClip {
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        WireframeClip that = (WireframeClip) o;
+        return Objects.equals(top, that.top) && Objects.equals(bottom, that.bottom) && Objects.equals(left, that.left) && Objects.equals(right, that.right);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(top, bottom, left, right);
+    }
 }

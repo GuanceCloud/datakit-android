@@ -132,7 +132,11 @@ public class DrawableUtils {
 
     @WorkerThread
     private Bitmap getBitmapBySize(DisplayMetrics displayMetrics, int width, int height, Config config) {
-        return bitmapCachesManager.getBitmapByProperties(width, height, config);
+        Bitmap bitmap = bitmapCachesManager.getBitmapByProperties(width, height, config);
+        if (bitmap != null) {
+            return bitmap;
+        }
+        return bitmapWrapper.createBitmap(displayMetrics, width, height, config);
     }
 
     public static final int MAX_BITMAP_SIZE_BYTES_WITH_RESOURCE_ENDPOINT = 10 * 1024 * 1024; // 10mb

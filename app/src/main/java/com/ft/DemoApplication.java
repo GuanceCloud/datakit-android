@@ -98,7 +98,7 @@ public class DemoApplication extends BaseApplication {
                 .setEnableLinkRUMData(true)
                 .setTraceType(TraceType.JAEGER));
 
-        SessionReplay.enable(new SessionReplayConfiguration.Builder(100f)
+        SessionReplay.enable(new SessionReplayConfiguration.Builder(1f)
                 .setPrivacy(SessionReplayPrivacy.ALLOW)
                 .addExtensionSupport(new MaterialExtensionSupport()).build(), context);
 
