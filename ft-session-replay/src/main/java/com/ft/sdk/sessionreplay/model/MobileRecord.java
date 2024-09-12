@@ -13,7 +13,7 @@ public abstract class MobileRecord {
 
     public static MobileRecord fromJson(String jsonString) throws JsonParseException {
         try {
-            JsonObject jsonObject = JsonParser.parseString(jsonString).getAsJsonObject();
+            JsonObject jsonObject = new JsonParser().parse(jsonString).getAsJsonObject();
             return fromJsonObject(jsonObject);
         } catch (IllegalStateException e) {
             throw new JsonParseException("Unable to parse json into one of type MobileRecord", e);
@@ -104,7 +104,7 @@ public abstract class MobileRecord {
 
         public static MobileFullSnapshotRecord fromJson(String jsonString) throws JsonParseException {
             try {
-                JsonObject jsonObject = JsonParser.parseString(jsonString).getAsJsonObject();
+                JsonObject jsonObject = new JsonParser().parse(jsonString).getAsJsonObject();
                 return fromJsonObject(jsonObject);
             } catch (IllegalStateException e) {
                 throw new JsonParseException("Unable to parse json into type MobileFullSnapshotRecord", e);
@@ -143,7 +143,7 @@ public abstract class MobileRecord {
 
         public static MobileIncrementalSnapshotRecord fromJson(String jsonString) throws JsonParseException {
             try {
-                JsonObject jsonObject = JsonParser.parseString(jsonString).getAsJsonObject();
+                JsonObject jsonObject = new JsonParser().parse(jsonString).getAsJsonObject();
                 return fromJsonObject(jsonObject);
             } catch (IllegalStateException e) {
                 throw new JsonParseException("Unable to parse json into type MobileIncrementalSnapshotRecord", e);

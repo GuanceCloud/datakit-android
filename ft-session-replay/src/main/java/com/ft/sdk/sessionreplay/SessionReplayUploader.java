@@ -92,7 +92,6 @@ public class SessionReplayUploader {
             if (segment.first.hasFullSnapshot) {
                 hasFullSnapshot = true;
             }
-            internalLogger.i(TAG, "segment.hasFullSnapshot:" + segment.first.hasFullSnapshot);
         }
 
         byte[] segmentAsByteArray = jsonString.toString().getBytes();

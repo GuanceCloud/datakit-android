@@ -42,7 +42,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.google.code.gson:gson:2.10.1'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.robolectric:android-all:10-robolectric-5803371'
     testImplementation 'org.robolectric:robolectric:4.7.2'

@@ -1,6 +1,7 @@
 package com.ft.sdk.sessionreplay.model;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -17,7 +18,7 @@ public abstract class Wireframe {
 
     public static Wireframe fromJson(String jsonString) throws JsonParseException {
         try {
-            JsonObject jsonObject = JsonParser.parseString(jsonString).getAsJsonObject();
+            JsonObject jsonObject = new JsonParser().parse(jsonString).getAsJsonObject();
             return fromJsonObject(jsonObject);
         } catch (IllegalStateException e) {
             throw new JsonParseException(

@@ -17,10 +17,10 @@ import com.ft.sdk.sessionreplay.model.Wireframe;
 import com.ft.sdk.sessionreplay.model.WireframeClip;
 import com.ft.sdk.sessionreplay.model.WireframeUpdateMutation;
 import com.ft.sdk.sessionreplay.utils.InternalLogger;
-import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -45,7 +45,6 @@ public class MutationResolver {
     public MobileMutationData resolveMutations(
             List<Wireframe> oldSnapshot,
             List<Wireframe> newSnapshot) {
-        System.out.println("resolveMutations:" + oldSnapshot + ",\n" + newSnapshot);
 
         Map<Long, Symbol> table = new HashMap<>();
         List<Entry> oa = new ArrayList<>();
@@ -174,9 +173,7 @@ public class MutationResolver {
         }
 
         if (!adds.isEmpty() || !removes.isEmpty() || !updates.isEmpty()) {
-            MobileMutationData data = new MobileMutationData(adds, removes, updates);
-            System.out.println(new Gson().toJson(data));
-            return data;
+            return new MobileMutationData(adds, removes, updates);
         } else {
             return null;
         }

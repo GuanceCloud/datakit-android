@@ -52,7 +52,7 @@ public class ImageViewMapper extends BaseAsyncBackgroundWireframeMapper<ImageVie
         // Add background wireframes if any
         wireframes.addAll(super.map(view, mappingContext, asyncJobStatusCallback, internalLogger));
 
-        Drawable drawable = view.getDrawable();
+        Drawable drawable = (view.getDrawable() != null) ? view.getDrawable().getCurrent() : null;
         if (drawable == null) {
             return wireframes;
         }
@@ -69,8 +69,8 @@ public class ImageViewMapper extends BaseAsyncBackgroundWireframeMapper<ImageVie
         long contentYPosInDp = Utils.densityNormalized(contentRect.top, density);
         int contentWidthPx = contentRect.width();
         int contentHeightPx = contentRect.height();
-
-        Drawable contentDrawable = drawable.getConstantState().newDrawable(resources);
+        Drawable.ConstantState constantState = drawable.getConstantState();
+        Drawable contentDrawable = constantState != null ? constantState.newDrawable(resources) : null;
 
         if (contentDrawable != null) {
             // Resolve foreground wireframe

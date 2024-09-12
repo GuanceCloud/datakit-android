@@ -92,7 +92,7 @@ public class SDKFeature implements FeatureScope {
                     BatchProcessingLevel.MEDIUM.getMaxBatchesPerUploadJob());
 
             String url = HttpBuilder.Builder()
-                    .setModel(SessionReplayConstants.URL_MODEL_SESSION_REPLAY).getUrl() + "?precision=ms";
+                    .setModel(SessionReplayConstants.URL_MODEL_SESSION_REPLAY).getUrlWithMsPrecision();
 
             LogUtils.d(TAG, featureName + ":Session Replay Url:" + url);
 

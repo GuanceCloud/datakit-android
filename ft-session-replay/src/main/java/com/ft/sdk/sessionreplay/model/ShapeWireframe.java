@@ -5,6 +5,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
+import java.util.Objects;
+
 public class ShapeWireframe extends Wireframe {
     private final Long id;
     private final Long x;
@@ -86,7 +88,7 @@ public class ShapeWireframe extends Wireframe {
 
     public static ShapeWireframe fromJson(String jsonString) throws JsonParseException {
         try {
-            JsonObject jsonObject = JsonParser.parseString(jsonString).getAsJsonObject();
+            JsonObject jsonObject = new JsonParser().parse(jsonString).getAsJsonObject();
             return fromJsonObject(jsonObject);
         } catch (IllegalStateException e) {
             throw new JsonParseException(
@@ -122,5 +124,18 @@ public class ShapeWireframe extends Wireframe {
     @Override
     public boolean hasOpaqueBackground() {
         return shapeStyle != null && shapeStyle.isFullyOpaque() && shapeStyle.hasNonTranslucentColor();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ShapeWireframe that = (ShapeWireframe) o;
+        return Objects.equals(id, that.id) && Objects.equals(x, that.x) && Objects.equals(y, that.y) && Objects.equals(width, that.width) && Objects.equals(height, that.height) && Objects.equals(clip, that.clip) && Objects.equals(shapeStyle, that.shapeStyle) && Objects.equals(border, that.border) && Objects.equals(type, that.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, x, y, width, height, clip, shapeStyle, border, type);
     }
 }

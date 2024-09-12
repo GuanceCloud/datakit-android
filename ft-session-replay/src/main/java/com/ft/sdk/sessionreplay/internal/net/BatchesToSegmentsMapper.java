@@ -75,7 +75,7 @@ public class BatchesToSegmentsMapper {
 
     private JsonObject parseToJsonObject(byte[] data) {
         try {
-            return JsonParser.parseString(new String(data)).getAsJsonObject();
+            return new JsonParser().parse(new String(data)).getAsJsonObject();
         } catch (JsonParseException | IllegalStateException e) {
             internalLogger.e(TAG, UNABLE_TO_DESERIALIZE_ENRICHED_RECORD_ERROR_MESSAGE);
             return null;

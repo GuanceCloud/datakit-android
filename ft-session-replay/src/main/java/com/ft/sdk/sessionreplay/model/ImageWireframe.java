@@ -5,6 +5,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
+import java.util.Objects;
+
 public class ImageWireframe extends Wireframe {
     private final Long id;
     private final Long x;
@@ -129,14 +131,16 @@ public class ImageWireframe extends Wireframe {
             json.addProperty("mimeType", mimeType);
         }
         if (isEmpty != null) {
-            json.addProperty("isEmpty", isEmpty);
+            //            json.addProperty("isEmpty", isEmpty);
+            //fixme 图片功能加载完成后恢复这个参数
+            json.addProperty("isEmpty", true);
         }
         return json;
     }
 
     public static ImageWireframe fromJson(String jsonString) throws JsonParseException {
         try {
-            JsonObject jsonObject = JsonParser.parseString(jsonString).getAsJsonObject();
+            JsonObject jsonObject = new JsonParser().parse(jsonString).getAsJsonObject();
             return fromJsonObject(jsonObject);
         } catch (IllegalStateException e) {
             throw new JsonParseException("Unable to parse json into type ImageWireframe", e);
@@ -172,5 +176,18 @@ public class ImageWireframe extends Wireframe {
     @Override
     public boolean hasOpaqueBackground() {
         return false;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ImageWireframe that = (ImageWireframe) o;
+        return Objects.equals(id, that.id) && Objects.equals(x, that.x) && Objects.equals(y, that.y) && Objects.equals(width, that.width) && Objects.equals(height, that.height) && Objects.equals(clip, that.clip) && Objects.equals(shapeStyle, that.shapeStyle) && Objects.equals(border, that.border) && Objects.equals(base64, that.base64) && Objects.equals(resourceId, that.resourceId) && Objects.equals(mimeType, that.mimeType) && Objects.equals(isEmpty, that.isEmpty);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, x, y, width, height, clip, shapeStyle, border, base64, resourceId, mimeType, isEmpty);
     }
 }

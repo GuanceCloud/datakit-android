@@ -83,7 +83,7 @@ public class TreeViewTraversal {
             internalLogger.i(TAG, "No mapper found for view " + viewType + ","
                     + new HashMap<String, Object>() {{
                 put("replay.widget.type", viewType);
-            }});
+            }}, true);
         }
         List<Wireframe> resolvedWireframes = mapper.map(view, mappingContext, jobStatusCallback, internalLogger);
         return new TraversedTreeView(resolvedWireframes, traversalStrategy);

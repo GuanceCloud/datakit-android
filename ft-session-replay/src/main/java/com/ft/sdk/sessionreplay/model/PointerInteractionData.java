@@ -35,7 +35,7 @@ public class PointerInteractionData extends MobileIncrementalData {
 
     public static PointerInteractionData fromJson(String jsonString) throws JsonParseException {
         try {
-            JsonObject jsonObject = JsonParser.parseString(jsonString).getAsJsonObject();
+            JsonObject jsonObject = new JsonParser().parse(jsonString).getAsJsonObject();
             return fromJsonObject(jsonObject);
         } catch (IllegalStateException e) {
             throw new JsonParseException("Unable to parse json into type PointerInteractionData", e);

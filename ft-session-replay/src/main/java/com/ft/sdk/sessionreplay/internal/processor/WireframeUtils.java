@@ -1,6 +1,5 @@
 package com.ft.sdk.sessionreplay.internal.processor;
 
-import com.ft.sdk.sessionreplay.model.Bounds;
 import com.ft.sdk.sessionreplay.model.ImageWireframe;
 import com.ft.sdk.sessionreplay.model.PlaceholderWireframe;
 import com.ft.sdk.sessionreplay.model.ShapeWireframe;

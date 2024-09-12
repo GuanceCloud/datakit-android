@@ -32,6 +32,9 @@ public class MobileMutationData extends MobileIncrementalData {
                 addsArray.add(add.toJson());
             }
             json.add("adds", addsArray);
+            if(addsArray.size()>0){
+                System.out.println("MobileMutationData add:"+addsArray);
+            }
         }
 
         if (removes != null) {
@@ -40,6 +43,9 @@ public class MobileMutationData extends MobileIncrementalData {
                 removesArray.add(remove.toJson());
             }
             json.add("removes", removesArray);
+            if(removesArray.size()>0){
+                System.out.println("MobileMutationData removes:"+removesArray);
+            }
         }
 
         if (updates != null) {
@@ -48,6 +54,9 @@ public class MobileMutationData extends MobileIncrementalData {
                 updatesArray.add(update.toJson());
             }
             json.add("updates", updatesArray);
+            if(updatesArray.size()>0){
+                System.out.println("MobileMutationData updates:"+updatesArray);
+            }
         }
 
         return json;
@@ -55,7 +64,7 @@ public class MobileMutationData extends MobileIncrementalData {
 
     public static MobileMutationData fromJson(String jsonString) throws JsonParseException {
         try {
-            JsonObject jsonObject = JsonParser.parseString(jsonString).getAsJsonObject();
+            JsonObject jsonObject = new JsonParser().parse(jsonString).getAsJsonObject();
             return fromJsonObject(jsonObject);
         } catch (IllegalStateException e) {
             throw new JsonParseException("Unable to parse json into type MobileMutationData", e);

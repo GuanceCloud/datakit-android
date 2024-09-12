@@ -58,6 +58,10 @@ public class HttpBuilder {
         return method;
     }
 
+    public String getUrlWithMsPrecision() {
+        return getUrl() + (isDataway ? "&" : "?") + "precision=ms";
+    }
+
     public String getUrl() {
         String url = getHost();
         if (!Utils.isNullOrEmpty(model)) {

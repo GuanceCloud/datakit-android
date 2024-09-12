@@ -56,14 +56,16 @@ public class ImageWireframeUpdate extends WireframeUpdateMutation {
             json.addProperty("mimeType", mimeType);
         }
         if (isEmpty != null) {
-            json.addProperty("isEmpty", isEmpty);
+//            json.addProperty("isEmpty", isEmpty);
+            //fixme 图片功能加载完成后恢复这个参数
+            json.addProperty("isEmpty", true);
         }
         return json;
     }
 
     public static ImageWireframeUpdate fromJson(String jsonString) throws JsonParseException {
         try {
-            JsonObject jsonObject = JsonParser.parseString(jsonString).getAsJsonObject();
+            JsonObject jsonObject = new JsonParser().parse(jsonString).getAsJsonObject();
             return fromJsonObject(jsonObject);
         } catch (IllegalStateException e) {
             throw new JsonParseException("Unable to parse json into type ImageWireframeUpdate", e);
