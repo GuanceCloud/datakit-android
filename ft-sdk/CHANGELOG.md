@@ -1,3 +1,7 @@
+# agent 1.7.0-alpha02
+1. 支持开启 session replay 录制功能
+
+---
 # agent 1.6.0
 1. 优化数据存储和同步性能
 （旧版本升级至 1.6.0 需要配置 FTSDKConfig.setNeedTransformOldCache 进行旧数据兼容同步）
