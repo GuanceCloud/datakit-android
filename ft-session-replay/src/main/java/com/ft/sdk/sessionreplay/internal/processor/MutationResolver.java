@@ -20,7 +20,6 @@ import com.ft.sdk.sessionreplay.utils.InternalLogger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -180,8 +179,8 @@ public class MutationResolver {
     }
 
     public WireframeUpdateMutation resolveUpdateMutation(
-            Wireframe currentWireframe,
-            Wireframe prevWireframe
+            Wireframe prevWireframe,
+            Wireframe currentWireframe
     ) {
         if (prevWireframe.equals(currentWireframe)) {
             return null;
@@ -295,6 +294,7 @@ public class MutationResolver {
                             currentWireframe.getClip() :
                             new WireframeClip(0L, 0L, 0L, 0L)
             );
+
         }
 
         return mutation;

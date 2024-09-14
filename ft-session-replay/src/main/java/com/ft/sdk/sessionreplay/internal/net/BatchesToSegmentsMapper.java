@@ -175,8 +175,7 @@ public class BatchesToSegmentsMapper {
         String viewId = jsonObject.has(EnrichedRecord.VIEW_ID_KEY) ? jsonObject.get(EnrichedRecord.VIEW_ID_KEY).getAsString() : null;
 
         if (applicationId == null || sessionId == null || viewId == null) {
-            //fixme only once
-            internalLogger.e(TAG, ILLEGAL_STATE_ENRICHED_RECORD_ERROR_MESSAGE);
+            internalLogger.e(TAG, ILLEGAL_STATE_ENRICHED_RECORD_ERROR_MESSAGE, true);
             return null;
         }
 

@@ -14,9 +14,7 @@ import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.sdk.sessionreplay.SessionReplay;
-import com.ft.sdk.sessionreplay.SessionReplayConfiguration;
-import com.ft.sdk.SessionReplayManager;
+import com.ft.sdk.sessionreplay.FTSessionReplayConfig;
 import com.ft.sdk.sessionreplay.SessionReplayPrivacy;
 import com.ft.sdk.sessionreplay.material.MaterialExtensionSupport;
 import com.ft.utils.CrossProcessSetting;
@@ -98,10 +96,9 @@ public class DemoApplication extends BaseApplication {
                 .setEnableLinkRUMData(true)
                 .setTraceType(TraceType.JAEGER));
 
-        SessionReplay.enable(new SessionReplayConfiguration.Builder(1f)
+        FTSdk.initSessionReplayConfig(new FTSessionReplayConfig().setSampleRate(1f)
                 .setPrivacy(SessionReplayPrivacy.ALLOW)
-                .addExtensionSupport(new MaterialExtensionSupport()).build(), context);
-
+                .addExtensionSupport(new MaterialExtensionSupport()));
 
     }
 

@@ -1,9 +1,5 @@
 package com.ft.sdk.sessionreplay.utils;
 
-import androidx.annotation.NonNull;
-
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Objects;
 import java.util.UUID;
 

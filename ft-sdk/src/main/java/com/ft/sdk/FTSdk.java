@@ -16,6 +16,7 @@ import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.PackageUtils;
 import com.ft.sdk.garble.utils.Utils;
+import com.ft.sdk.sessionreplay.FTSessionReplayConfig;
 
 import java.util.HashMap;
 
@@ -196,6 +197,15 @@ public class FTSdk {
         } catch (Exception e) {
             LogUtils.e(TAG, "initLogWithConfig fail:\n" + LogUtils.getStackTraceString(e));
         }
+    }
+
+
+    /**
+     * 初始化 session replay 的配置
+     * @param config
+     */
+    public static void initSessionReplayConfig(FTSessionReplayConfig config) {
+        SessionReplay.enable(config, FTApplication.getApplication());
     }
 
     /**
