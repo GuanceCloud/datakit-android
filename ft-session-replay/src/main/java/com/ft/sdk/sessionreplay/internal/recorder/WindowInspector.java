@@ -43,10 +43,9 @@ public class WindowInspector {
                 return getGlobalWindowViewsLegacy(GLOBAL_WM_INSTANCE, VIEWS_FIELD);
             }
         } catch (Throwable e) {
-            //fixme once
-            internalLogger.e(TAG, FAILED_TO_RETRIEVE_DECOR_VIEWS_ERROR_MESSAGE, e);
+            internalLogger.e(TAG, FAILED_TO_RETRIEVE_DECOR_VIEWS_ERROR_MESSAGE, e,true);
 
-            return Collections.emptyList();
+            return List.of();
         }
     }
 
@@ -77,6 +76,6 @@ public class WindowInspector {
                 e.printStackTrace();
             }
         }
-        return Collections.emptyList();
+        return List.of();
     }
 }

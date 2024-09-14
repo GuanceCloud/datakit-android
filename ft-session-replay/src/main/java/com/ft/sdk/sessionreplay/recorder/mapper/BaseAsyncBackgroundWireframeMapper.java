@@ -44,7 +44,7 @@ public abstract class BaseAsyncBackgroundWireframeMapper<T extends View> extends
             InternalLogger internalLogger
     ) {
         Wireframe backgroundWireframe = resolveViewBackground(view, mappingContext, asyncJobStatusCallback, internalLogger);
-        return backgroundWireframe != null ? Collections.singletonList(backgroundWireframe) : Collections.emptyList();
+        return backgroundWireframe != null ? List.of(backgroundWireframe) : List.of();
     }
 
     @UiThread

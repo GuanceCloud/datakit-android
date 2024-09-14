@@ -118,7 +118,7 @@ public class BatchesToSegmentsMapper {
                 null,
                 hasFullSnapshotRecord,
                 Source.ANDROID,
-                Collections.emptyList()
+                List.of()
         );
         JsonObject segmentAsJsonObject = segment.toJson().getAsJsonObject();
         if (segmentAsJsonObject == null) {

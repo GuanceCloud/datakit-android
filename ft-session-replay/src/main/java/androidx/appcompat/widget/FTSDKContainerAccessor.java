@@ -18,7 +18,7 @@ public class FTSDKContainerAccessor {
     @SuppressLint("RestrictedApi")
 
     public Drawable getBackgroundDrawable() {
-        return container.getBackground();
+        return container.mBackground;
     }
 
     @SuppressLint("RestrictedApi")

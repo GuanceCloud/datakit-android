@@ -96,7 +96,7 @@ public class BatchFileOrchestrator implements FileOrchestrator {
     @Override
     public List<File> getAllFiles() {
         if (!isRootDirValid()) {
-            return Collections.emptyList();
+            return List.of();
         }
         return listSortedBatchFiles();
     }
@@ -282,7 +282,7 @@ public class BatchFileOrchestrator implements FileOrchestrator {
     private List<File> listBatchFiles() {
         File[] files = FileUtils.listFilesSafe(rootDir, fileFilter, internalLogger);
         if (files == null) {
-            return Collections.emptyList();
+            return List.of();
         }
         List<File> fileList = new ArrayList<>();
         Collections.addAll(fileList, files);

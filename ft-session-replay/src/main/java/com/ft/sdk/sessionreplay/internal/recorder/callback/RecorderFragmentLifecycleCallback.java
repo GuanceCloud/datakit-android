@@ -37,7 +37,7 @@ public class RecorderFragmentLifecycleCallback extends FragmentManager.FragmentL
 
     private List<Window> getWindowsToRecord(Fragment f) {
         if (f instanceof DialogFragment && f.getContext() != null) {
-            return getWindowsToRecord(f);
+            return getWindowsToRecord((DialogFragment)f);
         }
         return null;
     }

@@ -11,11 +11,11 @@ public class NoOpExtensionSupport implements ExtensionSupport {
 
     @Override
     public List<MapperTypeWrapper<?>> getCustomViewMappers() {
-        return Collections.emptyList();
+        return List.of();
     }
 
     @Override
     public List<OptionSelectorDetector> getOptionSelectorDetectors() {
-        return Collections.emptyList();
+        return List.of();
     }
 }

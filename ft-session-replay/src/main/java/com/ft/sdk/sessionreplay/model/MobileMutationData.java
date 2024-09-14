@@ -32,9 +32,9 @@ public class MobileMutationData extends MobileIncrementalData {
                 addsArray.add(add.toJson());
             }
             json.add("adds", addsArray);
-            if(addsArray.size()>0){
-                System.out.println("MobileMutationData add:"+addsArray);
-            }
+//            if(addsArray.size()>0){
+//                System.out.println("MobileMutationData add:"+addsArray);
+//            }
         }
 
         if (removes != null) {
@@ -43,9 +43,9 @@ public class MobileMutationData extends MobileIncrementalData {
                 removesArray.add(remove.toJson());
             }
             json.add("removes", removesArray);
-            if(removesArray.size()>0){
-                System.out.println("MobileMutationData removes:"+removesArray);
-            }
+//            if(removesArray.size()>0){
+//                System.out.println("MobileMutationData removes:"+removesArray);
+//            }
         }
 
         if (updates != null) {
@@ -54,9 +54,9 @@ public class MobileMutationData extends MobileIncrementalData {
                 updatesArray.add(update.toJson());
             }
             json.add("updates", updatesArray);
-            if(updatesArray.size()>0){
-                System.out.println("MobileMutationData updates:"+updatesArray);
-            }
+//            if(updatesArray.size()>0){
+//                System.out.println("MobileMutationData updates:"+updatesArray);
+//            }
         }
 
         return json;

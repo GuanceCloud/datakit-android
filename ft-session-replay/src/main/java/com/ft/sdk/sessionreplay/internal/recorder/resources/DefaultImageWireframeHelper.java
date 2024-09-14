@@ -81,7 +81,7 @@ public class DefaultImageWireframeHelper implements ImageWireframeHelper {
             String prefix
     ) {
         Long id = viewIdentifierResolver.resolveChildUniqueIdentifier(view, prefix + currentWireframeIndex);
-        DrawableProperties drawableProperties = resolveDrawableProperties(view, drawable);
+        DrawableProperties drawableProperties = resolveDrawableProperties(view, drawable,width,height);
 
         if (id == null || !drawableProperties.isValid()) return null;
 
@@ -202,26 +202,26 @@ public class DefaultImageWireframeHelper implements ImageWireframeHelper {
         return result;
     }
 
-    private DrawableProperties resolveDrawableProperties(View view, Drawable drawable) {
+    private DrawableProperties resolveDrawableProperties(View view, Drawable drawable, int width, int height) {
         if (drawable instanceof LayerDrawable) {
             LayerDrawable layerDrawable = (LayerDrawable) drawable;
             if (layerDrawable.getNumberOfLayers() > 0) {
-                Drawable firstLayer = layerDrawable.getDrawable(0);
-                return resolveDrawableProperties(view, firstLayer);
+                return resolveDrawableProperties(view, layerDrawable.getDrawable(0), width, height);
             } else {
                 return new DrawableProperties(drawable, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
             }
         } else if (drawable instanceof InsetDrawable) {
-            Drawable internalDrawable = ((InsetDrawable) drawable).getDrawable();
+            InsetDrawable insetDrawable = (InsetDrawable) drawable;
+            Drawable internalDrawable = insetDrawable.getDrawable();
             if (internalDrawable != null) {
-                return resolveDrawableProperties(view, internalDrawable);
+                return resolveDrawableProperties(view, internalDrawable, width, height);
             } else {
                 return new DrawableProperties(drawable, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
             }
         } else if (drawable instanceof GradientDrawable) {
             return new DrawableProperties(drawable, view.getWidth(), view.getHeight());
         } else {
-            return new DrawableProperties(drawable, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+            return new DrawableProperties(drawable, width, height);
         }
     }
 

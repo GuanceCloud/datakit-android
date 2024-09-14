@@ -59,8 +59,8 @@ public class SeekBarWireframeMapper extends ProgressBarWireframeMapper<SeekBar> 
         if (mappingContext.getPrivacy() == SessionReplayPrivacy.ALLOW) {
             float screenDensity = mappingContext.getSystemInformation().getScreenDensity();
             long trackHeight = Utils.densityNormalized(ProgressBarWireframeMapper.TRACK_HEIGHT_IN_PX, screenDensity);
-            int thumbColor = getColor(view.getThumbTintList(), view.getDrawableState());
-            if (thumbColor == 0) {
+            Integer thumbColor = getColor(view.getThumbTintList(), view.getDrawableState());
+            if (thumbColor == null || thumbColor == 0) {
                 thumbColor = getDefaultColor(view);
             }
 

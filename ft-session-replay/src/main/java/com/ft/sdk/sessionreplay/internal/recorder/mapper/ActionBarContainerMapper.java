@@ -69,7 +69,7 @@ public class ActionBarContainerMapper extends BaseViewGroupMapper<ActionBarConta
                     )
             );
         } else {
-            return Collections.emptyList();
+            return List.of();
         }
     }
 }
