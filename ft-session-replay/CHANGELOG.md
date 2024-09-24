@@ -1,5 +1,6 @@
-# replay 0.1.0-alpha02
-1. dialog 背景获取优化
+# replay 0.1.0-alpha03
+1. 行协议数据包版本显示
+2. dialog 背景获取优化
 
 ---
 # replay 0.1.0-alpha02

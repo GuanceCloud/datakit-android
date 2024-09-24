@@ -1,4 +1,9 @@
 # agent 1.7.0-alpha02
+1. 调整 sdk 包信息显示显示规则
+2. 修正 session_has_replay 显示规则
+
+---
+# agent 1.7.0-alpha02
 1. 支持开启 session replay 录制功能
 
 ---
