@@ -59,7 +59,7 @@ public class DecorViewMapper implements WireframeMapper<View> {
                         mappingContext.getSystemInformation().getScreenBounds().getWidth(),
                         mappingContext.getSystemInformation().getScreenBounds().getHeight(),
                         null,
-                        new ShapeStyle(WINDOW_WIREFRAME_COLOR, null, WINDOW_WIREFRAME_OPACITY),
+                        new ShapeStyle(WINDOW_WIREFRAME_COLOR, WINDOW_WIREFRAME_OPACITY, null),
                         null
                 );
                 wireframes.add(0, windowWireframe);
