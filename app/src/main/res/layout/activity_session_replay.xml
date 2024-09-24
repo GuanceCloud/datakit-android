@@ -50,6 +50,7 @@
                 android:layout_height="wrap_content"
                 android:checkMark="?android:attr/listChoiceIndicatorMultiple"
                 android:gravity="center_vertical"
+                android:padding="8dp"
                 android:text="这是 checkText" />
 
             <ImageView
