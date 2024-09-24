@@ -31,6 +31,23 @@ public class PackageUtils {
      * alibaba taobao SophixApplication package 路径
      */
     private static final String PACKAGE_SOPHIX = "com.taobao.sophix.SophixApplication";
+    /**
+     * nativelib BuildConfig package 路径
+     */
+    public static final String PACKAGE_NATIVELIB = "com.ft.sdk.nativelib.BuildConfig";
+    /**
+     * session replay BuildConfig package 路径
+     */
+    public static final String PACKAGE_SESSION_REPLAY = "com.ft.sdk.sessionreplay.BuildConfig";
+    /**
+     * session replay material BuildConfig package 路径
+     */
+    public static final String PACKAGE_SESSION_REPLAY_MTR = "com.ft.sdk.sessionreplay.material.BuildConfig";
+
+    /**
+     * 获取版本 field
+     */
+    public static final String PACKAGE_FIELD_VERSION_NAME = "VERSION_NAME";
 
     /**
      * 是否使用 NDK 库
@@ -38,33 +55,43 @@ public class PackageUtils {
      * @return
      */
     public static boolean isNativeLibrarySupport() {
-        try {
-            Class.forName(PACKAGE_NATIVE_ENGINE_CLASS);
-            return true;
-        } catch (ClassNotFoundException ignored) {
-        }
-        return false;
+        return isPackageExist(PACKAGE_NATIVE_ENGINE_CLASS);
     }
 
+    public static boolean isSessionReplay() {
+        return isPackageExist(PACKAGE_SESSION_REPLAY);
+    }
+
+    public static boolean isSessionReplayMtr() {
+        return isPackageExist(PACKAGE_SESSION_REPLAY_MTR);
+    }
+
+
     /**
-     * 获取 native library 库的版本👌
+     * 获取 native library 库的版本
      *
      * @return
      */
     public static String getNativeLibVersion() {
+        return getPackVersion(PACKAGE_NATIVELIB);
+    }
 
-        try {
-            Class<?> buildConfigClass = Class.forName("com.ft.sdk.nativelib.BuildConfig");
-            Field versionNameField = buildConfigClass.getField("VERSION_NAME");
-            return (String) versionNameField.get(null);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return "";
+    /**
+     * 获取 session replay 库版本
+     *
+     * @return
+     */
+    public static String getPackageSessionReplay() {
+        return getPackVersion(PACKAGE_SESSION_REPLAY);
+    }
+
+    /**
+     * 获取 session replay material 库版本
+     *
+     * @return
+     */
+    public static String getPackageSessionReplayMtr() {
+        return getPackVersion(PACKAGE_SESSION_REPLAY_MTR);
     }
 
     /**
@@ -73,13 +100,7 @@ public class PackageUtils {
      * @return
      */
     public static boolean isOKHttp3Support() {
-        try {
-            Class.forName(PACKAGE_OKHTTP3);
-            return true;
-        } catch (ClassNotFoundException ignored) {
-        }
-        return false;
-
+        return isPackageExist(PACKAGE_OKHTTP3);
     }
 
     /**
@@ -101,18 +122,46 @@ public class PackageUtils {
      * @return
      */
     public static boolean isThirdPartySupport() {
-        try {
-            Class.forName(PACKAGE_FLUTTER);
+        if (isPackageExist(PACKAGE_FLUTTER)) {
             return true;
-        } catch (ClassNotFoundException ignored) {
         }
+        return isPackageExist(PACKAGE_REACT_NATIVE);
+    }
 
+    /**
+     * @param pkgName
+     * @return
+     */
+    private static boolean isPackageExist(String pkgName) {
         try {
-            Class.forName(PACKAGE_REACT_NATIVE);
+            Class.forName(pkgName);
             return true;
         } catch (ClassNotFoundException ignored) {
         }
         return false;
     }
 
+    /**
+     * @param pkgVersionPath
+     * @return
+     */
+    private static String getPackVersion(String pkgVersionPath) {
+        try {
+            System.out.println(pkgVersionPath + ":start:" + System.currentTimeMillis());
+            Class<?> buildConfigClass = Class.forName(pkgVersionPath);
+            Field versionNameField = buildConfigClass.getField(PACKAGE_FIELD_VERSION_NAME);
+            System.out.println(pkgVersionPath + ":end:" + System.currentTimeMillis());
+
+            return (String) versionNameField.get(null);
+        } catch (NoClassDefFoundError e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
 }

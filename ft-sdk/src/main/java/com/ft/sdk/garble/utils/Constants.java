@@ -372,18 +372,32 @@ public class Constants {
     public static final String KEY_RUM_REQUEST_HEADER = "request_header";
 
     /**
+     * 发布版本信息集合
+     */
+    public static final String KEY_RUM_SDK_PACKAGE_INFO = "sdk_pkg_info";
+    /**
      * ft-sdk module 发布版本
      */
-    public static final String KEY_RUM_SDK_PACKAGE_AGENT = "sdk_package_agent";
+    public static final String KEY_RUM_SDK_PACKAGE_AGENT = "agent";
     /**
      * ft-plugin module 发布版本
      */
-    public static final String KEY_RUM_SDK_PACKAGE_TRACK = "sdk_package_track";
+    public static final String KEY_RUM_SDK_PACKAGE_TRACK = "track";
 
     /**
      * ft-native module 发布版本
      */
-    public static final String KEY_RUM_SDK_PACKAGE_NATIVE = "sdk_package_native";
+    public static final String KEY_RUM_SDK_PACKAGE_NATIVE = "native";
+
+    /**
+     * ft-session-replay module 发布版本
+     */
+    public static final String KEY_RUM_SDK_PACKAGE_REPLAY = "replay";
+
+    /**
+     * ft-session-replay-material module
+     */
+    public static final String KEY_RUM_SDK_PACKAGE_REPLAY_MATERIAL = "replay_mtr";
 
     /**
      * SDK 数据标记 [packageId].[pid].[pkg_dataCount].[uuid]

@@ -18,6 +18,8 @@ import com.ft.sdk.garble.utils.PackageUtils;
 import com.ft.sdk.garble.utils.Utils;
 import com.ft.sdk.sessionreplay.FTSessionReplayConfig;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.HashMap;
 
 
@@ -37,6 +39,17 @@ public class FTSdk {
      * 集成后 ft-native 后才会被被赋值,直接访问 {@link com.ft.sdk.nativelib.BuildConfig#VERSION_NAME} 来获取
      */
     public static String NATIVE_VERSION = PackageUtils.isNativeLibrarySupport() ? PackageUtils.getNativeLibVersion() : "";
+
+    /**
+     * 集成后 ft-session-replay 后才会被被赋值,直接访问 {@link com.ft.sdk.nativelib.BuildConfig#VERSION_NAME} 来获取
+     */
+    public static String SESSION_REPLAY_VERSION = PackageUtils.isSessionReplay() ? PackageUtils.getPackageSessionReplay() : "";
+    /**
+     * 集成后 ft-session-replay-material 后才会被被赋值,直接访问 {@link com.ft.sdk.sessionreplay.material.BuildConfig#VERSION_NAME} 来获取
+     */
+    public static String SESSION_REPLAY_MATERIAL_VERSION = PackageUtils.isSessionReplayMtr() ? PackageUtils.getPackageSessionReplayMtr() : "";
+
+    private final static boolean isSessionReplaySupport = SESSION_REPLAY_VERSION.isEmpty();
     /**
      * 变量由 Plugin ASM 写入，同一次编译版本 UUID 相同
      */
@@ -126,7 +139,9 @@ public class FTSdk {
         EventConsumerThreadPool.get().shutDown();
         FTANRDetector.get().release();
         FTDBManager.release();
-        SessionReplayManager.get().stop();
+        if (FTSdk.isSessionReplaySupport()) {
+            SessionReplayManager.get().stop();
+        }
         mFtSdk = null;
         LogUtils.w(TAG, "FT SDK 已经被关闭");
     }
@@ -202,6 +217,7 @@ public class FTSdk {
 
     /**
      * 初始化 session replay 的配置
+     *
      * @param config
      */
     public static void initSessionReplayConfig(FTSessionReplayConfig config) {
@@ -258,6 +274,10 @@ public class FTSdk {
         }
     }
 
+    public static boolean isSessionReplaySupport() {
+        return isSessionReplaySupport;
+    }
+
 
     /**
      * 补充全局 tags
@@ -272,14 +292,27 @@ public class FTSdk {
         hashMap.put(Constants.KEY_ENV, config.getEnv());
         String uuid = config.isEnableAccessAndroidID() ? DeviceUtils.getUuid(FTApplication.getApplication()) : "";
         hashMap.put(Constants.KEY_DEVICE_UUID, uuid);
-        hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_AGENT, FTSdk.AGENT_VERSION);
+        HashMap<String, String> pkgInfo = getStringStringHashMap();
+        hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_INFO, Utils.hashMapObjectToJson(pkgInfo));
+        hashMap.put(Constants.KEY_SDK_VERSION, FTSdk.AGENT_VERSION);
+    }
+
+    private static @NotNull HashMap<String, String> getStringStringHashMap() {
+        HashMap<String, String> pkgInfo = new HashMap<>();
+        pkgInfo.put(Constants.KEY_RUM_SDK_PACKAGE_AGENT, FTSdk.AGENT_VERSION);
         if (!FTSdk.PLUGIN_VERSION.isEmpty()) {
-            hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_TRACK, FTSdk.PLUGIN_VERSION);
+            pkgInfo.put(Constants.KEY_RUM_SDK_PACKAGE_TRACK, FTSdk.PLUGIN_VERSION);
         }
         if (!FTSdk.NATIVE_VERSION.isEmpty()) {
-            hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_NATIVE, FTSdk.NATIVE_VERSION);
+            pkgInfo.put(Constants.KEY_RUM_SDK_PACKAGE_NATIVE, FTSdk.NATIVE_VERSION);
         }
-        hashMap.put(Constants.KEY_SDK_VERSION, FTSdk.AGENT_VERSION);
+        if (!FTSdk.SESSION_REPLAY_VERSION.isEmpty()) {
+            pkgInfo.put(Constants.KEY_RUM_SDK_PACKAGE_REPLAY, FTSdk.SESSION_REPLAY_VERSION);
+        }
+        if (!FTSdk.SESSION_REPLAY_MATERIAL_VERSION.isEmpty()) {
+            pkgInfo.put(Constants.KEY_RUM_SDK_PACKAGE_REPLAY_MATERIAL, FTSdk.SESSION_REPLAY_MATERIAL_VERSION);
+        }
+        return pkgInfo;
     }
 
 

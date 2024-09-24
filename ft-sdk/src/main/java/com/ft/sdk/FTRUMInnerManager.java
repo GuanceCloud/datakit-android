@@ -176,6 +176,7 @@ public class FTRUMInnerManager {
      * @param sessionId
      */
     private void updateSessionReplay(String sessionId) {
+        if (FTSdk.isSessionReplaySupport()) return;
         boolean keepSession = checkSessionWillCollect(sessionId);
         HashMap<String, Object> map = new HashMap<>();
         map.put(SessionReplayConstants.SESSION_REPLAY_BUS_MESSAGE_TYPE_KEY, SessionReplayConstants.RUM_SESSION_RENEWED_BUS_MESSAGE);
@@ -271,16 +272,18 @@ public class FTRUMInnerManager {
         String viewId = activeView != null ? activeView.getId() : null;
         String viewName = activeView != null ? activeView.getViewName() : null;
         String viewReferrer = activeView != null ? activeView.getViewReferrer() : null;
+        boolean hasReplay = activeView != null && activeView.isHasReplay();
         checkSessionRefresh(true);
         checkActionClose();
         if (activeAction == null || activeAction.isClose()) {
             activeAction = new ActiveActionBean(actionName, actionType, sessionId, viewId, viewName, viewReferrer, needWait);
+            activeAction.setHasReplay(hasReplay);
+
             if (property != null) {
                 activeAction.getProperty().putAll(property);
             }
             initAction(activeAction);
             this.lastActionTime = activeAction.getStartTime();
-
             mHandler.removeCallbacks(mActionRecheckRunner);
             mHandler.postDelayed(mActionRecheckRunner, 5000);
         }
@@ -1132,7 +1135,9 @@ public class FTRUMInnerManager {
         tags.put(Constants.KEY_RUM_VIEW_NAME, getViewName());
         tags.put(Constants.KEY_RUM_VIEW_REFERRER, getViewReferrer());
         tags.put(Constants.KEY_RUM_SESSION_ID, sessionId);
-        tags.put(Constants.KEY_HAS_REPLAY, viewHasReplay());
+        if (viewHasReplay()) {
+            tags.put(Constants.KEY_HAS_REPLAY, true);
+        }
         if (withAction) {
             if (activeAction != null && !activeAction.isClose()) {
                 tags.put(Constants.KEY_RUM_ACTION_ID, getActionId());
@@ -1198,6 +1203,9 @@ public class FTRUMInnerManager {
                 tags.put(Constants.KEY_RUM_ACTION_ID, bean.getId());
                 tags.put(Constants.KEY_RUM_ACTION_TYPE, bean.getActionType());
                 tags.put(Constants.KEY_RUM_SESSION_ID, bean.getSessionId());
+                if (bean.isHasReplay()) {
+                    tags.put(Constants.KEY_HAS_REPLAY, true);
+                }
 
                 HashMap<String, Object> fields = new HashMap<>(bean.getProperty());
                 fields.put(Constants.KEY_RUM_ACTION_LONG_TASK_COUNT, bean.getLongTaskCount());
@@ -1223,7 +1231,9 @@ public class FTRUMInnerManager {
                 tags.put(Constants.KEY_RUM_VIEW_NAME, bean.getViewName());
                 tags.put(Constants.KEY_RUM_VIEW_REFERRER, bean.getViewReferrer());
                 tags.put(Constants.KEY_RUM_VIEW_ID, bean.getId());
-                tags.put(Constants.KEY_HAS_REPLAY, bean.isHasReplay());
+                if (bean.isHasReplay()) {
+                    tags.put(Constants.KEY_HAS_REPLAY, true);
+                }
                 HashMap<String, Object> fields = new HashMap<>(bean.getProperty());
                 if (bean.getLoadTime() > 0) {
                     fields.put(Constants.KEY_RUM_VIEW_LOAD, bean.getLoadTime());
@@ -1299,11 +1309,12 @@ public class FTRUMInnerManager {
                     if (map.containsKey(viewId)) {
                         Object viewMap = map.get(viewId);
                         if (viewMap instanceof Map) {
-                            if (((Map<?, ?>) viewMap).containsKey(VIEW_RECORDS_COUNT_KEY)) {
-                                activeView.setRecordsCount(HashMapUtils.getLong(map, VIEW_RECORDS_COUNT_KEY));
+                            Map<String, Object> dataMap = (Map<String, Object>) viewMap;
+                            if (dataMap.containsKey(VIEW_RECORDS_COUNT_KEY)) {
+                                activeView.setRecordsCount(HashMapUtils.getLong(dataMap, VIEW_RECORDS_COUNT_KEY));
                             }
-                            if (((Map<?, ?>) viewMap).containsKey(HAS_REPLAY_KEY)) {
-                                activeView.setHasReplay(HashMapUtils.getBoolean(map, HAS_REPLAY_KEY));
+                            if (dataMap.containsKey(HAS_REPLAY_KEY)) {
+                                activeView.setHasReplay(HashMapUtils.getBoolean(dataMap, HAS_REPLAY_KEY));
                             }
                         }
                     }

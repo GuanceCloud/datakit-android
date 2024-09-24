@@ -205,6 +205,10 @@ public class ActionBean {
         this.hasReplay = hasReplay;
     }
 
+    public boolean isHasReplay() {
+        return hasReplay;
+    }
+
     /**
      * 将 action 属性数据转化为 json 字符，在数据存入本地缓存时写入
      *

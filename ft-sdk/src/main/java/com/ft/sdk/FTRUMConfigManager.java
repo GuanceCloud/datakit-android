@@ -22,11 +22,8 @@ import com.ft.sdk.nativelib.CrashCallback;
 import com.ft.sdk.nativelib.NativeEngineInit;
 import com.ft.sdk.nativelib.NativeExtraLogCatSetting;
 
-import org.json.JSONObject;
-
 import java.io.File;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -337,7 +334,7 @@ public class FTRUMConfigManager {
         rumGlobalContext.put(Constants.KEY_DEVICE_OS_VERSION_MAJOR, osVersionMajor);
     }
 
-    HashMap<String,Object> getRUMPublicDynamicTags() throws Exception {
+    HashMap<String, Object> getRUMPublicDynamicTags() throws Exception {
         return getRUMPublicDynamicTags(false);
     }
 
@@ -346,8 +343,8 @@ public class FTRUMConfigManager {
      *
      * @return
      */
-    HashMap<String,Object> getRUMPublicDynamicTags(boolean includeRUMStatic) throws Exception {
-        HashMap<String,Object> tags = new HashMap<>();
+    HashMap<String, Object> getRUMPublicDynamicTags(boolean includeRUMStatic) throws Exception {
+        HashMap<String, Object> tags = new HashMap<>();
         if (includeRUMStatic) {
             HashMap<String, Object> rumGlobalContext = config.getGlobalContext();
             tags.putAll(rumGlobalContext);
