@@ -1,10 +1,13 @@
 package com.ft;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatCheckedTextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +18,21 @@ public class SessionReplayActivity extends NameTitleActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_session_replay);
+        findViewById(R.id.session_replay_record_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new AlertDialog.Builder(SessionReplayActivity.this).setMessage("这是对话框")
+                        .setPositiveButton("确定", null).create().show();
+            }
+        });
+
+        AppCompatCheckedTextView appCompatCheckedTextView = findViewById(R.id.session_replay_checked_text_view);
+        appCompatCheckedTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                appCompatCheckedTextView.toggle();
+            }
+        });
 
         ListView list = findViewById(R.id.session_replay_list);
 
