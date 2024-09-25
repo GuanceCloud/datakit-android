@@ -147,11 +147,8 @@ public class PackageUtils {
      */
     private static String getPackVersion(String pkgVersionPath) {
         try {
-            System.out.println(pkgVersionPath + ":start:" + System.currentTimeMillis());
             Class<?> buildConfigClass = Class.forName(pkgVersionPath);
             Field versionNameField = buildConfigClass.getField(PACKAGE_FIELD_VERSION_NAME);
-            System.out.println(pkgVersionPath + ":end:" + System.currentTimeMillis());
-
             return (String) versionNameField.get(null);
         } catch (NoClassDefFoundError e) {
             e.printStackTrace();
