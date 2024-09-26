@@ -180,14 +180,15 @@ public class ResourceBean {
     public HashMap<String, Object> property = new HashMap<>();
 
     /**
-     *
+     * resource metrics 是否已设置
      */
     public boolean netStateSet = false;
 
     /**
-     *
+     * resource content 相关是否设置
      */
     public boolean contentSet = false;
+
 
 
 }
