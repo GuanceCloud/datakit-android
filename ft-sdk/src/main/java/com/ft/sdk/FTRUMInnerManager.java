@@ -797,6 +797,9 @@ public class FTRUMInnerManager {
             tags.put(Constants.KEY_RUM_RESOURCE_METHOD, bean.resourceMethod);
             tags.put(Constants.KEY_RUM_RESOURCE_TRACE_ID, bean.traceId);
             tags.put(Constants.KEY_RUM_RESOURCE_SPAN_ID, bean.spanId);
+            if (bean.hasSessionReplay) {
+                tags.put(Constants.KEY_HAS_REPLAY, true);
+            }
 
             int resourceStatus = bean.resourceStatus;
             String resourceStatusGroup = "";
@@ -1117,6 +1120,9 @@ public class FTRUMInnerManager {
         bean.viewName = getViewName();
         bean.viewReferrer = getViewReferrer();
         bean.sessionId = getSessionId();
+        if (viewHasReplay()) {
+            bean.hasSessionReplay = true;
+        }
         if (activeAction != null && !activeAction.isClose()) {
             bean.actionId = getActionId();
             bean.actionName = getActionName();
@@ -1309,12 +1315,27 @@ public class FTRUMInnerManager {
                     if (map.containsKey(viewId)) {
                         Object viewMap = map.get(viewId);
                         if (viewMap instanceof Map) {
+                            @SuppressWarnings("unchecked")
                             Map<String, Object> dataMap = (Map<String, Object>) viewMap;
                             if (dataMap.containsKey(VIEW_RECORDS_COUNT_KEY)) {
                                 activeView.setRecordsCount(HashMapUtils.getLong(dataMap, VIEW_RECORDS_COUNT_KEY));
                             }
                             if (dataMap.containsKey(HAS_REPLAY_KEY)) {
-                                activeView.setHasReplay(HashMapUtils.getBoolean(dataMap, HAS_REPLAY_KEY));
+                                boolean currentHasReplay = HashMapUtils.getBoolean(dataMap, HAS_REPLAY_KEY);
+                                boolean preHasReplay = activeView.isHasReplay();
+                                if (!preHasReplay && currentHasReplay) {
+                                    String updateViewId = activeView.getId();
+                                    activeView.setHasReplay(true);
+                                    String attr = activeView.getAttrJsonString();
+                                    EventConsumerThreadPool.get().execute(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            FTDBManager.get().updateViewExtraAttr(updateViewId, attr);
+                                            LogUtils.d(TAG, "updateSessionViewMap,view_id:" + viewId+" has_replay");
+                                        }
+                                    });
+
+                                }
                             }
                         }
                     }
