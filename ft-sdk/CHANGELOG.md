@@ -1,3 +1,7 @@
+# agent 1.7.0-alpha04
+1. 优化 view，resource session_has_replay 显示规则
+
+---
 # agent 1.7.0-alpha03
 1. 调整 sdk 包信息显示显示规则
 2. 修正 session_has_replay 显示规则
