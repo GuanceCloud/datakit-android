@@ -1,3 +1,7 @@
+# agent 1.7.0-alpha05
+1. 适配 session replay 延迟初始化的场景
+
+---
 # agent 1.7.0-alpha04
 1. 优化 view，resource session_has_replay 显示规则
 

@@ -1,3 +1,7 @@
+# replay 0.1.0-alpha04
+1. 适配 React Native
+
+---
 # replay 0.1.0-alpha03
 1. 行协议数据包版本显示
 2. dialog 背景获取优化
