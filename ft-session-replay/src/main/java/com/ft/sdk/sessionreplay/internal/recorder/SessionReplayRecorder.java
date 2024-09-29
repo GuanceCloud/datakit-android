@@ -1,5 +1,6 @@
 package com.ft.sdk.sessionreplay.internal.recorder;
 
+import android.app.Activity;
 import android.app.Application;
 import android.os.Handler;
 import android.os.Looper;
@@ -8,7 +9,6 @@ import android.view.View;
 import android.view.Window;
 
 import androidx.annotation.MainThread;
-import androidx.annotation.VisibleForTesting;
 
 import com.ft.sdk.feature.FeatureSdkCore;
 import com.ft.sdk.sessionreplay.MapperTypeWrapper;
@@ -38,6 +38,7 @@ import com.ft.sdk.sessionreplay.utils.DefaultColorStringFormatter;
 import com.ft.sdk.sessionreplay.utils.DefaultViewBoundsResolver;
 import com.ft.sdk.sessionreplay.utils.DefaultViewIdentifierResolver;
 import com.ft.sdk.sessionreplay.utils.DrawableToColorMapper;
+import com.ft.sdk.sessionreplay.utils.DrawableToColorMapperFactory;
 import com.ft.sdk.sessionreplay.utils.DrawableUtils;
 import com.ft.sdk.sessionreplay.utils.InternalLogger;
 import com.ft.sdk.sessionreplay.utils.RumContextProvider;
@@ -68,6 +69,8 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
     private final InternalLogger internalLogger;
     private final Handler uiHandler;
     private boolean shouldRecord = false;
+    private FeatureSdkCore sdkCore;
+    private boolean isDelayInit;
 
     public SessionReplayRecorder(
             Application appContext,
@@ -79,7 +82,8 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
             List<MapperTypeWrapper<?>> mappers,
             List<OptionSelectorDetector> customOptionSelectorDetectors,
             WindowInspector windowInspector,
-            FeatureSdkCore sdkCore
+            FeatureSdkCore sdkCore,
+            boolean isDelayInit
     ) {
         this.appContext = appContext;
         this.rumContextProvider = rumContextProvider;
@@ -88,7 +92,9 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
         this.timeProvider = timeProvider;
         this.mappers = mappers;
         this.customOptionSelectorDetectors = customOptionSelectorDetectors;
-        this.windowInspector = windowInspector;
+        this.windowInspector = windowInspector == null ? new WindowInspector() : windowInspector;
+        this.sdkCore = sdkCore;
+        this.isDelayInit = isDelayInit;
 
         // Initialize components
         InternalLogger internalLogger = sdkCore.getInternalLogger();
@@ -123,7 +129,7 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
         ViewIdentifierResolver viewIdentifierResolver = DefaultViewIdentifierResolver.get();
         ColorStringFormatter colorStringFormatter = DefaultColorStringFormatter.get();
         ViewBoundsResolver viewBoundsResolver = DefaultViewBoundsResolver.get();
-        DrawableToColorMapper drawableToColorMapper = DrawableToColorMapper.getDefault();
+        DrawableToColorMapper drawableToColorMapper = DrawableToColorMapperFactory.getDefault();
 
         ViewWireframeMapper defaultVWM = new ViewWireframeMapper(
                 viewIdentifierResolver,
@@ -194,39 +200,6 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
         this.internalLogger = internalLogger;
     }
 
-    @VisibleForTesting
-    public SessionReplayRecorder(
-            Application appContext,
-            RumContextProvider rumContextProvider,
-            SessionReplayPrivacy privacy,
-            RecordWriter recordWriter,
-            TimeProvider timeProvider,
-            List<MapperTypeWrapper<?>> mappers,
-            List<OptionSelectorDetector> customOptionSelectorDetectors,
-            WindowInspector windowInspector,
-            WindowCallbackInterceptor windowCallbackInterceptor,
-            LifecycleCallback sessionReplayLifecycleCallback,
-            ViewOnDrawInterceptor viewOnDrawInterceptor,
-            RecordedDataQueueHandler recordedDataQueueHandler,
-            Handler uiHandler,
-            InternalLogger internalLogger
-    ) {
-        this.appContext = appContext;
-        this.rumContextProvider = rumContextProvider;
-        this.privacy = privacy;
-        this.recordWriter = recordWriter;
-        this.timeProvider = timeProvider;
-        this.mappers = mappers;
-        this.customOptionSelectorDetectors = customOptionSelectorDetectors;
-        this.windowInspector = windowInspector;
-        this.windowCallbackInterceptor = windowCallbackInterceptor;
-        this.sessionReplayLifecycleCallback = sessionReplayLifecycleCallback;
-        this.viewOnDrawInterceptor = viewOnDrawInterceptor;
-        this.recordedDataQueueHandler = recordedDataQueueHandler;
-        this.uiHandler = uiHandler;
-        this.internalLogger = internalLogger;
-    }
-
     @Override
     public void stopProcessingRecords() {
         recordedDataQueueHandler.clearAndStopProcessingQueue();
@@ -247,6 +220,14 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
         uiHandler.post(() -> {
             shouldRecord = true;
             List<Window> windows = sessionReplayLifecycleCallback.getCurrentWindows();
+
+            if (isDelayInit && windows.isEmpty()) {
+                isDelayInit = false;//初始化一次之后，不进行此逻辑判断
+                Activity currentActivity = sdkCore.curentActivity();
+                if (currentActivity != null) {
+                    windows = List.of(currentActivity.getWindow());
+                }
+            }
             List<View> decorViews = windowInspector.getGlobalWindowViews(internalLogger);
             windowCallbackInterceptor.intercept(windows, appContext);
             viewOnDrawInterceptor.intercept(decorViews, privacy);

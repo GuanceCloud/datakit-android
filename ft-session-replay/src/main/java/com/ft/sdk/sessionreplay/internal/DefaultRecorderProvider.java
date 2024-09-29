@@ -17,9 +17,9 @@ import android.widget.TextView;
 import androidx.appcompat.widget.ActionBarContainer;
 import androidx.appcompat.widget.SwitchCompat;
 
-import com.ft.sdk.sessionreplay.SessionReplayPrivacy;
 import com.ft.sdk.feature.FeatureSdkCore;
 import com.ft.sdk.sessionreplay.MapperTypeWrapper;
+import com.ft.sdk.sessionreplay.SessionReplayPrivacy;
 import com.ft.sdk.sessionreplay.internal.recorder.Recorder;
 import com.ft.sdk.sessionreplay.internal.recorder.SessionReplayRecorder;
 import com.ft.sdk.sessionreplay.internal.recorder.mapper.ActionBarContainerMapper;
@@ -47,6 +47,7 @@ import com.ft.sdk.sessionreplay.utils.DefaultColorStringFormatter;
 import com.ft.sdk.sessionreplay.utils.DefaultViewBoundsResolver;
 import com.ft.sdk.sessionreplay.utils.DefaultViewIdentifierResolver;
 import com.ft.sdk.sessionreplay.utils.DrawableToColorMapper;
+import com.ft.sdk.sessionreplay.utils.DrawableToColorMapperFactory;
 import com.ft.sdk.sessionreplay.utils.RumContextProvider;
 import com.ft.sdk.sessionreplay.utils.TimeProvider;
 import com.ft.sdk.sessionreplay.utils.ViewBoundsResolver;
@@ -61,16 +62,18 @@ public class DefaultRecorderProvider implements RecorderProvider {
     private final SessionReplayPrivacy privacy;
     private final List<MapperTypeWrapper<?>> customMappers;
     private final List<OptionSelectorDetector> customOptionSelectorDetectors;
+    private final boolean isDelayInit;
 
     public DefaultRecorderProvider(
             FeatureSdkCore sdkCore,
             SessionReplayPrivacy privacy,
             List<MapperTypeWrapper<?>> customMappers,
-            List<OptionSelectorDetector> customOptionSelectorDetectors) {
+            List<OptionSelectorDetector> customOptionSelectorDetectors, boolean isDelayInit) {
         this.sdkCore = sdkCore;
         this.privacy = privacy;
         this.customMappers = customMappers;
         this.customOptionSelectorDetectors = customOptionSelectorDetectors;
+        this.isDelayInit = isDelayInit;
     }
 
     @Override
@@ -96,7 +99,7 @@ public class DefaultRecorderProvider implements RecorderProvider {
                 mappers,
                 customOptionSelectorDetectors,
                 null,
-                sdkCore
+                sdkCore, isDelayInit
         );
     }
 
@@ -104,7 +107,7 @@ public class DefaultRecorderProvider implements RecorderProvider {
         ViewIdentifierResolver viewIdentifierResolver = DefaultViewIdentifierResolver.get();
         ColorStringFormatter colorStringFormatter = DefaultColorStringFormatter.get();
         ViewBoundsResolver viewBoundsResolver = DefaultViewBoundsResolver.get();
-        DrawableToColorMapper drawableToColorMapper = DrawableToColorMapper.getDefault();
+        DrawableToColorMapper drawableToColorMapper = DrawableToColorMapperFactory.getDefault();
         ImageViewMapper imageViewMapper = new ImageViewMapper(
                 ImageViewUtils.get(),
                 viewIdentifierResolver,

@@ -12,6 +12,7 @@ import com.ft.sdk.sessionreplay.utils.DefaultColorStringFormatter;
 import com.ft.sdk.sessionreplay.utils.DefaultViewBoundsResolver;
 import com.ft.sdk.sessionreplay.utils.DefaultViewIdentifierResolver;
 import com.ft.sdk.sessionreplay.utils.DrawableToColorMapper;
+import com.ft.sdk.sessionreplay.utils.DrawableToColorMapperFactory;
 import com.ft.sdk.sessionreplay.utils.ViewBoundsResolver;
 import com.ft.sdk.sessionreplay.utils.ViewIdentifierResolver;
 import com.google.android.material.slider.Slider;
@@ -25,30 +26,30 @@ public class MaterialExtensionSupport implements ExtensionSupport {
     private final ViewIdentifierResolver viewIdentifierResolver = DefaultViewIdentifierResolver.get();
     private final ColorStringFormatter colorStringFormatter = DefaultColorStringFormatter.get();
     private final ViewBoundsResolver viewBoundsResolver = DefaultViewBoundsResolver.get();
-    private final DrawableToColorMapper drawableToColorMapper = DrawableToColorMapper.getDefault();
+    private final DrawableToColorMapper drawableToColorMapper = DrawableToColorMapperFactory.getDefault();
 
     @Override
     public List<MapperTypeWrapper<?>> getCustomViewMappers() {
         SliderWireframeMapper sliderWireframeMapper = new SliderWireframeMapper(
-            viewIdentifierResolver,
-            colorStringFormatter,
-            viewBoundsResolver
+                viewIdentifierResolver,
+                colorStringFormatter,
+                viewBoundsResolver
         );
 
         TabWireframeMapper tabWireframeMapper = new TabWireframeMapper(
-            viewIdentifierResolver,
-            viewBoundsResolver,
-            new TextViewMapper(
                 viewIdentifierResolver,
-                colorStringFormatter,
                 viewBoundsResolver,
-                drawableToColorMapper
-            )
+                new TextViewMapper(
+                        viewIdentifierResolver,
+                        colorStringFormatter,
+                        viewBoundsResolver,
+                        drawableToColorMapper
+                )
         );
 
         return Arrays.asList(
-            new MapperTypeWrapper<>(Slider.class, sliderWireframeMapper),
-            new MapperTypeWrapper<>(TabLayout.TabView.class, tabWireframeMapper)
+                new MapperTypeWrapper<>(Slider.class, sliderWireframeMapper),
+                new MapperTypeWrapper<>(TabLayout.TabView.class, tabWireframeMapper)
         );
     }
 

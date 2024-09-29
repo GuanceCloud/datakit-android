@@ -75,7 +75,8 @@ public class WindowCallbackInterceptor {
                 internalLogger,
                 privacy,
                 MOTION_UPDATE_DELAY_THRESHOLD_NS,
-                FLUSH_BUFFER_THRESHOLD_NS
+                FLUSH_BUFFER_THRESHOLD_NS,
+                null
         ));
     }
 

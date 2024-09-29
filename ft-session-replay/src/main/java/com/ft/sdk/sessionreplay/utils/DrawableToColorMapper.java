@@ -1,7 +1,6 @@
 package com.ft.sdk.sessionreplay.utils;
 
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 
 public interface DrawableToColorMapper {
 
@@ -14,18 +13,4 @@ public interface DrawableToColorMapper {
      */
     Integer mapDrawableToColor(Drawable drawable, InternalLogger internalLogger);
 
-    /**
-     * Provides a default implementation.
-     *
-     * @return a default implementation based on the device API level
-     */
-    static DrawableToColorMapper getDefault() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            return new AndroidQDrawableToColorMapper();
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return new AndroidMDrawableToColorMapper();
-        } else {
-            return new LegacyDrawableToColorMapper();
-        }
-    }
 }

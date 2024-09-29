@@ -23,7 +23,7 @@ import com.ft.sdk.sessionreplay.internal.StorageBackedFeature;
 import com.ft.sdk.sessionreplay.internal.net.BatchesToSegmentsMapper;
 import com.ft.sdk.sessionreplay.internal.persistence.BatchClosedMetadata;
 import com.ft.sdk.sessionreplay.internal.persistence.BatchFileOrchestrator;
-import com.ft.sdk.sessionreplay.internal.persistence.BatchFileReaderWriter;
+import com.ft.sdk.sessionreplay.internal.persistence.BatchFileReaderWriterFactory;
 import com.ft.sdk.sessionreplay.internal.persistence.BatchProcessingLevel;
 import com.ft.sdk.sessionreplay.internal.persistence.DataUploadConfiguration;
 import com.ft.sdk.sessionreplay.internal.persistence.EventBatchWriterCallback;
@@ -178,7 +178,7 @@ public class SDKFeature implements FeatureScope {
                         SessionReplayConstants.PATH_SESSION_REPLAY), new FilePersistenceConfig(),
                         internalLogger, dispatcher),
                 null,
-                BatchFileReaderWriter.create(internalLogger, null),
+                BatchFileReaderWriterFactory.create(internalLogger, null),
                 null,
                 new FileMover(internalLogger),
                 internalLogger,

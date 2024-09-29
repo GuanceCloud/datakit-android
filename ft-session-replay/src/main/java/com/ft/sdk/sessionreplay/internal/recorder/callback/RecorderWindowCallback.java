@@ -55,6 +55,7 @@ public class RecorderWindowCallback implements Window.Callback {
     private final List<MobileRecord> pointerInteractions = new LinkedList<>();
     private long lastOnMoveUpdateTimeInNs = 0L;
     private long lastPerformedFlushTimeInNs = System.nanoTime();
+    private final WindowInspector windowInspector;
 
     public RecorderWindowCallback(
             Context appContext,
@@ -65,7 +66,8 @@ public class RecorderWindowCallback implements Window.Callback {
             InternalLogger internalLogger,
             SessionReplayPrivacy privacy,
             long motionUpdateThresholdInNs,
-            long flushPositionBufferThresholdInNs
+            long flushPositionBufferThresholdInNs,
+            WindowInspector windowInspector
     ) {
         this.appContext = appContext;
         this.recordedDataQueueHandler = recordedDataQueueHandler;
@@ -77,6 +79,7 @@ public class RecorderWindowCallback implements Window.Callback {
         this.motionUpdateThresholdInNs = motionUpdateThresholdInNs;
         this.flushPositionBufferThresholdInNs = flushPositionBufferThresholdInNs;
         this.pixelsDensity = appContext.getResources().getDisplayMetrics().density;
+        this.windowInspector = windowInspector == null ? new WindowInspector() : windowInspector;
     }
 
     @Override
@@ -241,7 +244,7 @@ public class RecorderWindowCallback implements Window.Callback {
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
-        List<View> rootViews = WindowInspector.getGlobalWindowViews(internalLogger);
+        List<View> rootViews = windowInspector.getGlobalWindowViews(internalLogger);
         if (!rootViews.isEmpty()) {
             // A new window was added or removed, so we stop recording the previous root views
             // and start recording the new ones.

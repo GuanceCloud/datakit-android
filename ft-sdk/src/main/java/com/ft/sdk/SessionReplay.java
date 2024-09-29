@@ -12,20 +12,20 @@ public class SessionReplay {
     /**
      * Enables a SessionReplay feature based on the configuration provided.
      *
-     * @param FTSessionReplayConfig Configuration to use for the feature.
+     * @param ftSessionReplayConfig Configuration to use for the feature.
      */
-     static void enable(
-             FTSessionReplayConfig FTSessionReplayConfig, Context context
+    static void enable(
+            FTSessionReplayConfig ftSessionReplayConfig, Context context
     ) {
         FeatureSdkCore featureSdkCore = SessionReplayManager.get();
         featureSdkCore.init(context);
         SessionReplayFeature sessionReplayFeature = new SessionReplayFeature(
                 featureSdkCore,
-                FTSessionReplayConfig.getCustomEndpointUrl(),
-                FTSessionReplayConfig.getPrivacy(),
-                FTSessionReplayConfig.getCustomMappers(),
-                FTSessionReplayConfig.getCustomOptionSelectorDetectors(),
-                FTSessionReplayConfig.getSampleRate()
+                ftSessionReplayConfig.getCustomEndpointUrl(),
+                ftSessionReplayConfig.getPrivacy(),
+                ftSessionReplayConfig.getCustomMappers(),
+                ftSessionReplayConfig.getCustomOptionSelectorDetectors(),
+                ftSessionReplayConfig.getSampleRate(), ftSessionReplayConfig.isDelayInit()
         );
 
         featureSdkCore.registerFeature(sessionReplayFeature);

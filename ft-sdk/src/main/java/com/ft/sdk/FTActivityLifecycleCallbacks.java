@@ -23,9 +23,8 @@ import java.util.HashMap;
  * 从而输出以 {@link Activity} 为 {@link  Constants#FT_MEASUREMENT_RUM_VIEW} 指标
  * 页面加载时间：{@link Constants#KEY_RUM_VIEW_LOAD}
  * 启动时间：{@link Constants#ACTION_TYPE_LAUNCH_HOT},{@link Constants#ACTION_NAME_LAUNCH_COLD}
- *
+ * <p>
  * 这些可以通过观测云 Studio <a href="https://docs.guance.com/real-user-monitoring/explorer/view/">查看器 View</a> 进行查看
- *
  */
 public class FTActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
     private final LifeCircleTraceCallback mAppRestartCallback = new LifeCircleTraceCallback();
@@ -86,6 +85,11 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     public void onActivityPostCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
         mAppRestartCallback.onPostOnCreate(activity);
 
+    }
+
+    @Override
+    public void onActivityPreResumed(@NonNull Activity activity) {
+        mAppRestartCallback.onPreResume(activity);
     }
 
     /**

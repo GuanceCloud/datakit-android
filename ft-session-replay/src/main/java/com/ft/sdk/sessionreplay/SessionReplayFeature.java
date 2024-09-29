@@ -96,10 +96,10 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
     public SessionReplayFeature(FeatureSdkCore sdkCore, String customEndpointUrl,
                                 SessionReplayPrivacy privacy, List<MapperTypeWrapper<?>> customMappers,
                                 List<OptionSelectorDetector> customOptionSelectorDetectors,
-                                float sampleRate) {
+                                float sampleRate, boolean isDelayInit) {
         this(sdkCore, customEndpointUrl, privacy,
                 new RateBasedSampler(sampleRate),
-                new DefaultRecorderProvider(sdkCore, privacy, customMappers, customOptionSelectorDetectors));
+                new DefaultRecorderProvider(sdkCore, privacy, customMappers, customOptionSelectorDetectors, isDelayInit));
     }
 
 

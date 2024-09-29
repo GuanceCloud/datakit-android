@@ -136,6 +136,10 @@ class LifeCircleTraceCallback {
         }
     }
 
+    public void onPreResume(Activity activity) {
+        FTActivityManager.get().setCurrentActivity(activity);
+    }
+
     /**
      * {@link Activity#onResume() }  之后
      *

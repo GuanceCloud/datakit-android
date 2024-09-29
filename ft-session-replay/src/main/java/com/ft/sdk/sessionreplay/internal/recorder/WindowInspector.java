@@ -7,13 +7,12 @@ import com.ft.sdk.sessionreplay.utils.InternalLogger;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class WindowInspector {
     private static final String TAG = "WindowInspector";
 
-    private WindowInspector() {
+    public WindowInspector() {
     }
 
     private static final String FAILED_TO_RETRIEVE_DECOR_VIEWS_ERROR_MESSAGE =
@@ -35,7 +34,7 @@ public class WindowInspector {
         }
     }
 
-    public static List<View> getGlobalWindowViews(InternalLogger internalLogger) {
+    public List<View> getGlobalWindowViews(InternalLogger internalLogger) {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 return android.view.inspector.WindowInspector.getGlobalWindowViews();
@@ -43,13 +42,13 @@ public class WindowInspector {
                 return getGlobalWindowViewsLegacy(GLOBAL_WM_INSTANCE, VIEWS_FIELD);
             }
         } catch (Throwable e) {
-            internalLogger.e(TAG, FAILED_TO_RETRIEVE_DECOR_VIEWS_ERROR_MESSAGE, e,true);
+            internalLogger.e(TAG, FAILED_TO_RETRIEVE_DECOR_VIEWS_ERROR_MESSAGE, e, true);
 
             return List.of();
         }
     }
 
-    private static List<View> getGlobalWindowViewsLegacy(Object globalWmInstance, Field viewsField) {
+    private List<View> getGlobalWindowViewsLegacy(Object globalWmInstance, Field viewsField) {
         if (globalWmInstance != null && viewsField != null) {
             try {
                 Object views = viewsField.get(globalWmInstance);

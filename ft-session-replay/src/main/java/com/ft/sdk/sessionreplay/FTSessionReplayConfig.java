@@ -14,6 +14,7 @@ public class FTSessionReplayConfig {
     private List<OptionSelectorDetector> customOptionSelectorDetectors;
     @FloatRange(from = 0.0, to = 1.0)
     private float sampleRate = 1f;
+    private boolean delayInit;
 
     private ExtensionSupport extensionSupport = new NoOpExtensionSupport();
 
@@ -58,6 +59,20 @@ public class FTSessionReplayConfig {
 
     public List<OptionSelectorDetector> getCustomOptionSelectorDetectors() {
         return customOptionSelectorDetectors;
+    }
+
+    public boolean isDelayInit() {
+        return delayInit;
+    }
+
+    /**
+     * 延迟初始化
+     * @param delayInit
+     * @return
+     */
+    public FTSessionReplayConfig setDelayInit(boolean delayInit) {
+        this.delayInit = delayInit;
+        return this;
     }
 
     public float getSampleRate() {

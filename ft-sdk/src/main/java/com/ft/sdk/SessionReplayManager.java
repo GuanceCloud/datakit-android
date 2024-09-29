@@ -2,6 +2,7 @@ package com.ft.sdk;
 
 import static com.ft.sdk.feature.Feature.SESSION_REPLAY_FEATURE_NAME;
 
+import android.app.Activity;
 import android.content.Context;
 
 import com.ft.sdk.feature.Feature;
@@ -165,4 +166,8 @@ public class SessionReplayManager implements FeatureSdkCore {
         features.clear();
     }
 
+    @Override
+    public Activity curentActivity() {
+        return FTActivityManager.get().curentActivity();
+    }
 }
