@@ -9,9 +9,10 @@ import java.util.List;
 
 public class FTSessionReplayConfig {
     private String customEndpointUrl;
+    private final ExtensionSupport DEFAULT_EXTENSIONSUPPORT = new NoOpExtensionSupport();
     private SessionReplayPrivacy privacy = SessionReplayPrivacy.MASK;
-    private List<MapperTypeWrapper<?>> customMappers;
-    private List<OptionSelectorDetector> customOptionSelectorDetectors;
+    private List<MapperTypeWrapper<?>> customMappers = DEFAULT_EXTENSIONSUPPORT.getCustomViewMappers();
+    private List<OptionSelectorDetector> customOptionSelectorDetectors = DEFAULT_EXTENSIONSUPPORT.getOptionSelectorDetectors();
     @FloatRange(from = 0.0, to = 1.0)
     private float sampleRate = 1f;
     private boolean delayInit;

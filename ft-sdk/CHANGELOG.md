@@ -1,3 +1,7 @@
+# agent 1.7.0-alpha06
+1.  session replay addExtensionSupport 默认配置添加
+
+---
 # agent 1.7.0-alpha05
 1. 适配 session replay 延迟初始化的场景
 
