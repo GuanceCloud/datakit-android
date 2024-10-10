@@ -35,7 +35,7 @@ import java.util.List;
  */
 public class FTTrackInner {
     private final static String TAG = Constants.LOG_TAG_PREFIX + "FTTrackInner";
-    private static FTTrackInner instance;
+    private static volatile FTTrackInner instance;
 
     /**
      * 测试用例调用
@@ -92,6 +92,30 @@ public class FTTrackInner {
      */
     void initRUMConfig(FTRUMConfig config) {
         dataHelper.initRUMConfig(config);
+    }
+
+    /**
+     *
+     * @param globalContext
+     */
+    void appendGlobalContext(HashMap<String, Object> globalContext) {
+        dataHelper.appendGlobalContext(globalContext);
+    }
+
+    /**
+     *
+     * @param globalContext
+     */
+    void appendRUMGlobalContext(HashMap<String, Object> globalContext) {
+        dataHelper.appendRUMGlobalContext(globalContext);
+    }
+
+    /**
+     *
+     * @param globalContext
+     */
+    void appendLogGlobalContext(HashMap<String, Object> globalContext) {
+        dataHelper.appendLogGlobalContext(globalContext);
     }
 
     /**

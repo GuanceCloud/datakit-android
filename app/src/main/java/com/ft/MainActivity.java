@@ -96,13 +96,29 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(this, WebViewActivity.class));
         });
         findViewById(R.id.main_mock_click_btn).setOnClickListener(v -> {
+
+        });
+
+        findViewById(R.id.main_dynamic_tags).setOnClickListener(v -> {
+            HashMap<String, Object> globalContext = new HashMap<>();
+            globalContext.put("global_key", "global_value");
+            FTSdk.appendGlobalContext(globalContext);
+
+            HashMap<String, Object> rumGlobalContext = new HashMap<>();
+            rumGlobalContext.put("rum_key", "rum_value");
+            FTSdk.appendRUMGlobalContext(rumGlobalContext);
+
+            HashMap<String, Object> logGlobalContext = new HashMap<>();
+            logGlobalContext.put("log_key", "log_value");
+            FTSdk.appendLogGlobalContext(logGlobalContext);
+
         });
         findViewById(R.id.main_mock_log_btn).setOnClickListener(v -> {
             Log.e(TAG, "console log");
             Log.d(TAG, "console log");
-            Log.w(TAG,new Exception());
+            Log.w(TAG, new Exception());
             FTLogger.getInstance().logBackground("custom Log", Status.ERROR);
-            FTLogger.getInstance().logBackground("custom status Log","customType");
+            FTLogger.getInstance().logBackground("custom status Log", "customType");
         });
 
         findViewById(R.id.main_mock_okhttp_btn).setOnClickListener(v -> {
@@ -185,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
                             ResponseBody responseBody = response.body();
                             if (responseBody != null) {
                                 //这里需要消费，event listener 才会被调用
-                               String string = responseBody.string();
+                                String string = responseBody.string();
                             }
 
                         } catch (IOException e) {

@@ -60,6 +60,36 @@ public class SyncDataHelper {
         traceTags.putAll(config.getGlobalContext());
     }
 
+    /**
+     * 动态设置全局 tag
+     * @param globalContext
+     */
+    void appendGlobalContext(HashMap<String, Object> globalContext) {
+        if (globalContext != null) {
+            logTags.putAll(globalContext);
+            rumTags.putAll(globalContext);
+        }
+    }
+
+    /**
+     * 动态设置 RUM 全局 tag
+     * @param globalContext
+     */
+    void appendRUMGlobalContext(HashMap<String, Object> globalContext) {
+        if (globalContext != null) {
+            rumTags.putAll(globalContext);
+        }
+    }
+
+    /**
+     * 动态设置 log 全局 tag
+     * @param globalContext
+     */
+    void appendLogGlobalContext(HashMap<String, Object> globalContext) {
+        if (globalContext != null) {
+            logTags.putAll(globalContext);
+        }
+    }
 
     /**
      * 数据转行协议存储

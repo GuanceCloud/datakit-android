@@ -109,6 +109,12 @@
             android:text="延迟初始化" />
 
         <Button
+            android:id="@+id/main_dynamic_tags"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="动态 tags 设置" />
+
+        <Button
             android:id="@+id/main_shut_down"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
