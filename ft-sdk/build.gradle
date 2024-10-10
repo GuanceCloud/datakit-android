@@ -2,12 +2,11 @@ apply plugin: 'com.android.library'
 
 ext {
     //发布 snapshot 版本号末尾追加 "-SNAPSHOT"
-    pkgVersion = "1.6.0"
+    pkgVersion = "1.6.1-alpha01"
 
     mavenGroupId = "com.cloudcare.ft.mobile.sdk.tracker.agent"
     mavenArtifactId = "ft-sdk"
 }
-
 
 
 android {
