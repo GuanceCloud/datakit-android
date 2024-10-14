@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(this, WebViewActivity.class));
         });
         findViewById(R.id.main_mock_click_btn).setOnClickListener(v -> {
+            FTSdk.unbindRumUserData();
         });
         findViewById(R.id.main_mock_log_btn).setOnClickListener(v -> {
             Log.e(TAG, "console log");

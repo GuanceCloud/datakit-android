@@ -19,7 +19,6 @@ import com.ft.sdk.sessionreplay.utils.InternalLogger;
 import com.ft.sdk.sessionreplay.utils.ViewBoundsResolver;
 import com.ft.sdk.sessionreplay.utils.ViewIdentifierResolver;
 
-import java.util.Collections;
 import java.util.List;
 
 public abstract class BaseAsyncBackgroundWireframeMapper<T extends View> extends BaseWireframeMapper<T> {
@@ -106,7 +105,7 @@ public abstract class BaseAsyncBackgroundWireframeMapper<T extends View> extends
             MappingContext mappingContext,
             AsyncJobStatusCallback asyncJobStatusCallback
     ) {
-        if (view.getBackground() == null) {
+        if (view.getBackground() == null || view.getBackground().getConstantState() == null) {
             return null;
         }
 
