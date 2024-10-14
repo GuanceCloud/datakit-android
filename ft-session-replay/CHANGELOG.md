@@ -1,3 +1,7 @@
+# replay 0.1.0-alpha05
+1. 修复 React Native View 崩溃问题
+
+---
 # replay 0.1.0-alpha04
 1. 适配 React Native
 
