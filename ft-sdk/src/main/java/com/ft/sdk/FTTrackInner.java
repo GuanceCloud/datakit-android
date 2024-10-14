@@ -19,7 +19,6 @@ import com.ft.sdk.garble.threadpool.RunnerCompleteCallBack;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.HashMapUtils;
 import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONObject;
 
@@ -95,7 +94,6 @@ public class FTTrackInner {
     }
 
     /**
-     *
      * @param globalContext
      */
     void appendGlobalContext(HashMap<String, Object> globalContext) {
@@ -103,7 +101,6 @@ public class FTTrackInner {
     }
 
     /**
-     *
      * @param globalContext
      */
     void appendRUMGlobalContext(HashMap<String, Object> globalContext) {
@@ -111,7 +108,6 @@ public class FTTrackInner {
     }
 
     /**
-     *
      * @param globalContext
      */
     void appendLogGlobalContext(HashMap<String, Object> globalContext) {
@@ -260,29 +256,13 @@ public class FTTrackInner {
      */
     void batchLogBeanSync(@NonNull List<BaseContentBean> logBeans, boolean isSilence) {
         try {
-            FTLoggerConfig config = FTLoggerConfigManager.get().getConfig();
-            if (config == null) return;
-            HashMap<String, Object> rumTags = null;
-            if (config.isEnableLinkRumData()) {
-                rumTags = FTRUMConfigManager.get().getRUMPublicDynamicTags(true);
-                FTRUMInnerManager.get().attachRUMRelative(rumTags, false);
-            }
-
             ArrayList<SyncJsonData> datas = new ArrayList<>();
             for (BaseContentBean logBean : logBeans) {
                 try {
-                    if (Utils.enableTraceSamplingRate(config.getSamplingRate())) {
-                        if (rumTags != null) {
-                            logBean.appendTags(rumTags);
-                        }
-                        datas.add(SyncJsonData.getFromLogBean(dataHelper, logBean));
-                    } else {
-                        LogUtils.d(TAG, "根据 FTLogConfig SampleRate 计算，将被丢弃=>" + logBean.getContent());
-                    }
+                    datas.add(SyncJsonData.getFromLogBean(dataHelper, logBean));
                 } catch (Exception e) {
                     LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                 }
-
             }
             judgeLogCachePolicy(datas, isSilence);
         } catch (Exception e) {
