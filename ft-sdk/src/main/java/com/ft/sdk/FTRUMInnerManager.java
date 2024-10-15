@@ -953,8 +953,8 @@ public class FTRUMInnerManager {
      * @param tags
      */
     private void increaseLongTask(HashMap<String, Object> tags) {
-        final String actionId = HashMapUtils.getString(tags,Constants.KEY_RUM_ACTION_ID);
-        final String viewId = HashMapUtils.getString(tags,Constants.KEY_RUM_VIEW_ID);
+        final String actionId = HashMapUtils.getString(tags, Constants.KEY_RUM_ACTION_ID);
+        final String viewId = HashMapUtils.getString(tags, Constants.KEY_RUM_VIEW_ID);
         EventConsumerThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {

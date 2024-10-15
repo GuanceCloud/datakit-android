@@ -1,9 +1,6 @@
-# agent 1.6.1-alpha02
+# agent 1.6.1-alpha03
 1. 优化动态 tags 赋值的时机
-
----
-# agent 1.6.1-alpha01
-1. 添加全局、log、RUM globalContext 属性动态设置方式
+2. 添加全局、log、RUM globalContext 属性动态设置方式
 
 ---
 # agent 1.6.0
