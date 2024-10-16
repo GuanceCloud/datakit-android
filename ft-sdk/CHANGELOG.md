@@ -1,3 +1,7 @@
+# agent 1.6.1-alpha04
+1. 修复 RUM 单独调用自定义 startView，导致监控指标 FTMetricsMTR 线程未被回收的问题
+
+---
 # agent 1.6.1-alpha03
 1. 优化动态 tags 赋值的时机
 2. 添加全局、log、RUM globalContext 属性动态设置方式

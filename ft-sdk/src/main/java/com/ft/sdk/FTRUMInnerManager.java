@@ -444,7 +444,6 @@ public class FTRUMInnerManager {
             activeView.getProperty().putAll(property);
         }
         FTMonitorManager.get().attachMonitorData(activeView);
-        FTMonitorManager.get().removeMonitor(activeView.getId());
         activeView.close();
         closeView(activeView, callBack);
     }
@@ -995,6 +994,7 @@ public class FTRUMInnerManager {
      * @param callBack
      */
     private void closeView(ActiveViewBean activeViewBean, RunnerCompleteCallBack callBack) {
+        FTMonitorManager.get().removeMonitor(activeViewBean.getId());
         final ViewBean viewBean = activeViewBean.convertToViewBean();
         final String viewId = viewBean.getId();
         final long timeSpent = viewBean.getTimeSpent();
