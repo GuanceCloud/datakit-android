@@ -18,6 +18,8 @@ import java.util.LinkedHashMap;
 
 /**
  * 数据组装类，把采集数据从存储数据序列化行协议数据
+ *
+ * tag:覆盖逻辑 SDK inner tag > user tag > static GlobalContext > dynamic GlobalContext
  */
 public class SyncDataHelper {
     public final static String TAG = Constants.LOG_TAG_PREFIX + "SyncDataHelper";
@@ -30,6 +32,10 @@ public class SyncDataHelper {
     private final HashMap<String, Object> rumTags;
     private final HashMap<String, Object> traceTags;
 
+    private final HashMap<String, Object> dynamicBaseTags;
+    private final HashMap<String, Object> dynamicLogTags;
+    private final HashMap<String, Object> dynamicLRumTags;
+
     protected FTSDKConfig config;
 
 
@@ -38,6 +44,10 @@ public class SyncDataHelper {
         logTags = new HashMap<>();
         rumTags = new HashMap<>();
         traceTags = new HashMap<>();
+
+        dynamicBaseTags = new HashMap<>();
+        dynamicLogTags = new HashMap<>();
+        dynamicLRumTags = new HashMap<>();
     }
 
     void initBaseConfig(FTSDKConfig config) {
@@ -62,32 +72,34 @@ public class SyncDataHelper {
 
     /**
      * 动态设置全局 tag
+     *
      * @param globalContext
      */
     void appendGlobalContext(HashMap<String, Object> globalContext) {
         if (globalContext != null) {
-            logTags.putAll(globalContext);
-            rumTags.putAll(globalContext);
+            dynamicBaseTags.putAll(globalContext);
         }
     }
 
     /**
      * 动态设置 RUM 全局 tag
+     *
      * @param globalContext
      */
     void appendRUMGlobalContext(HashMap<String, Object> globalContext) {
         if (globalContext != null) {
-            rumTags.putAll(globalContext);
+            dynamicLRumTags.putAll(globalContext);
         }
     }
 
     /**
      * 动态设置 log 全局 tag
+     *
      * @param globalContext
      */
     void appendLogGlobalContext(HashMap<String, Object> globalContext) {
         if (globalContext != null) {
-            logTags.putAll(globalContext);
+            dynamicLogTags.putAll(globalContext);
         }
     }
 
@@ -113,6 +125,8 @@ public class SyncDataHelper {
         String bodyContent;
         if (dataType == DataType.LOG) {
             // log 数据
+            mergeTags.putAll(dynamicBaseTags);
+            mergeTags.putAll(dynamicLogTags);
             mergeTags.putAll(logTags);
             bodyContent = convertToLineProtocolLine(measurement, mergeTags, fields,
                     timeStamp, config);
@@ -124,6 +138,8 @@ public class SyncDataHelper {
                     timeStamp, config);
         } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_WEBVIEW) {
             //rum 数据
+            mergeTags.putAll(dynamicBaseTags);
+            mergeTags.putAll(dynamicLRumTags);
             mergeTags.putAll(rumTags);
             bodyContent = convertToLineProtocolLine(measurement, mergeTags, fields,
                     timeStamp, config);

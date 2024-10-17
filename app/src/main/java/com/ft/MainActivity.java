@@ -287,6 +287,13 @@ public class MainActivity extends AppCompatActivity {
                 FTSdk.shutDown();
             }
         });
+
+        findViewById(R.id.main_clear_data).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FTSdk.clearAllData();
+            }
+        });
     }
 
     @Override

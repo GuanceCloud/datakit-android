@@ -119,6 +119,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="关闭 SDK" />
+
+        <Button
+            android:id="@+id/main_clear_data"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="清理缓存数据" />
     </LinearLayout>
 
 

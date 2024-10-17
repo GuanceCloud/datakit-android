@@ -9,6 +9,9 @@ import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * Description:监控项配置
@@ -40,7 +43,15 @@ public class FTMonitorManager {
     private final ConcurrentHashMap<String, MonitorRunnable> runnerMap = new ConcurrentHashMap<>();
 
     private FTMonitorManager() {
+        service = new ScheduledThreadPoolExecutor(1, new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                return new Thread(r, "FTMetricsMTR");
+            }
+        });
     }
+
+    private final ScheduledExecutorService service;
 
     public static FTMonitorManager get() {
         synchronized (FTMonitorManager.class) {
@@ -60,17 +71,10 @@ public class FTMonitorManager {
         errorMonitorType = config.getExtraMonitorTypeWithError();
         deviceMetricsMonitorType = config.getDeviceMetricsMonitorType();
         detectFrequency = config.getDeviceMetricsDetectFrequency();
-        initParams();
-    }
 
-    /**
-     * 初始化参数
-     */
-    private void initParams() {
         if (isDeviceMetricsMonitorType(DeviceMetricsMonitorType.FPS)) {
             FpsUtils.get().start();
         }
-
     }
 
     /**
@@ -102,7 +106,7 @@ public class FTMonitorManager {
         LogUtils.d(TAG, "addMonitor:" + viewId + ", remain count:" + runnerMap.size());
         if (deviceMetricsMonitorType == DeviceMetricsMonitorType.NO_SET) return;
         synchronized (runnerMap) {
-            MonitorRunnable runner = new MonitorRunnable(detectFrequency);
+            MonitorRunnable runner = new MonitorRunnable(detectFrequency, service);
             runnerMap.put(viewId, runner);
             runner.run();
         }
@@ -158,19 +162,17 @@ public class FTMonitorManager {
         LogUtils.d(TAG, "removeMonitor:" + viewId);
         if (deviceMetricsMonitorType == DeviceMetricsMonitorType.NO_SET) return;
         synchronized (runnerMap) {
-            MonitorRunnable runnable = runnerMap.get(viewId);
-            if (runnable != null) {
-                runnable.stop();
-            }
             runnerMap.remove(viewId);
         }
     }
-
 
     /**
      * 清除当前监控配置项
      */
     public static void release() {
+        if (ftMonitorConfig != null) {
+            ftMonitorConfig.service.shutdown();
+        }
         FpsUtils.release();
         ftMonitorConfig = null;
     }
