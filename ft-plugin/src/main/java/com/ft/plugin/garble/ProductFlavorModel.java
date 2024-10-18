@@ -66,6 +66,12 @@ public class ProductFlavorModel {
         return env;
     }
 
+    private String nativeLibPath = "";
+
+    public String getNativeLibPath() {
+        return nativeLibPath;
+    }
+
     public void setFromFTExtension(FTExtension extension) {
         this.env = extension.env;
         this.appId = extension.appId;
@@ -73,6 +79,7 @@ public class ProductFlavorModel {
         this.autoUploadMap = extension.autoUploadMap;
         this.datakitUrl = extension.datakitUrl;
         this.datawayToken = extension.datawayToken;
+        this.nativeLibPath = extension.nativeLibPath;
     }
 
     /**
@@ -102,6 +109,10 @@ public class ProductFlavorModel {
         if (this.datawayToken == null) {
             this.datawayToken = extension.datawayToken;
         }
+
+        if (this.nativeLibPath == null) {
+            this.nativeLibPath = extension.nativeLibPath;
+        }
     }
 
     @Override
@@ -113,6 +124,7 @@ public class ProductFlavorModel {
                 ", datakitUrl='" + datakitUrl + '\'' +
                 ", appId='" + appId + '\'' +
                 ", env='" + env + '\'' +
+                ", nativeLibPath='" + nativeLibPath + '\'' +
                 '}';
     }
 }

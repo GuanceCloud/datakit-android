@@ -171,6 +171,18 @@ public class FTRUMGlobalManager {
             innerManager.stopView(property, null);
         }
     }
+    /**
+     * 添加错误信息, 默认 AppState.RUN
+     *
+     * @param log       日志
+     * @param message   消息
+     * @param errorType 错误类型
+     */
+    public void addError(String log, String message, String errorType) {
+        if (innerManager != null) {
+            innerManager.addError(log, message, errorType, AppState.RUN);
+        }
+    }
 
     /**
      * 添加错误信息

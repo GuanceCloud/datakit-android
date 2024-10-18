@@ -1,5 +1,9 @@
 package com.ft.sdk.tests;
 
+import static com.ft.sdk.tests.FTSdkAllTests.hasPrepare;
+
+import android.os.Looper;
+
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.ft.sdk.DeviceMetricsMonitorType;
@@ -32,6 +36,10 @@ public class MonitorConfigTest extends FTBaseTest {
 
     @Before
     public void setUp() throws Exception {
+        if (!hasPrepare) {
+            Looper.prepare();
+            hasPrepare = true;
+        }
         stopSyncTask();
         FTSDKConfig ftSDKConfig = FTSDKConfig
                 .builder(TEST_FAKE_URL)

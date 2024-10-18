@@ -1,7 +1,10 @@
 apply plugin: 'com.android.library'
-apply plugin: 'maven-publish'
 
-def versionNameStr="1.1.1"
+ext {
+    pkgVersion = "1.1.1"
+    mavenGroupId = "com.cloudcare.ft.mobile.sdk.tracker.agent"
+    mavenArtifactId = "ft-native"
+}
 
 android {
     compileSdk 34
@@ -18,7 +21,7 @@ android {
                 abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64'
             }
         }
-        buildConfigField("String", "VERSION_NAME", "\"$versionNameStr\"")
+        buildConfigField("String", "VERSION_NAME", "\"${pkgVersion}\"")
 
     }
 
@@ -51,37 +54,4 @@ dependencies {
 
 }
 
-
-afterEvaluate {
-    publishing {
-        publications {
-            mavenAar(MavenPublication) {
-                groupId 'com.cloudcare.ft.mobile.sdk.tracker.agent'
-                artifactId 'ft-native'
-                version versionNameStr
-                artifact project.tasks.bundleReleaseAar
-            }
-        }
-        repositories {
-            maven {
-
-                def releasesRepoUrl = "$maven_publish_url/maven-releases"
-                def snapshotsRepoUrl = "$maven_publish_url/maven-snapshots"
-                url = versionNameStr.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-
-                credentials {
-                    username = getDefaultProperties().get("LDAP_ACCOUNT")
-                    password = getDefaultProperties().get("LDAP_PWD")
-                }
-            }
-
-
-        }
-    }
-}
-
-
-task generateAarAndPublish{
-    dependsOn 'clean'
-    dependsOn 'publish'
-}
+apply from:'../maven_aar_publish.gradle'

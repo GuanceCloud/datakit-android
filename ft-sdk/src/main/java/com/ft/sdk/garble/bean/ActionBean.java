@@ -89,6 +89,17 @@ public class ActionBean {
         return property;
     }
 
+
+    HashMap<String, Object> tags = new HashMap<>();
+
+    public HashMap<String, Object> getTags() {
+        return tags;
+    }
+
+    public void setTags(HashMap<String, Object> tags) {
+        this.tags = tags;
+    }
+
     public ActionBean() {
 
     }
@@ -207,6 +218,7 @@ public class ActionBean {
     public String getAttrJsonString() {
         HashMap<String, Object> map = new HashMap<>();
         map.put(Constants.KEY_RUM_PROPERTY, property);
+        map.put(Constants.KEY_RUM_TAGS, tags);
         return Utils.hashMapObjectToJson(map);
     }
 
@@ -227,6 +239,15 @@ public class ActionBean {
                 while (keys.hasNext()) {
                     String key = keys.next();
                     this.property.put(key, jsonProperty.opt(key));
+                }
+            }
+
+            JSONObject jsonTags = json.optJSONObject(Constants.KEY_RUM_TAGS);
+            if (jsonTags != null) {
+                Iterator<String> keys = jsonTags.keys();
+                while (keys.hasNext()) {
+                    String key = keys.next();
+                    this.tags.put(key, jsonTags.opt(key));
                 }
             }
 

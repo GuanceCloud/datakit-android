@@ -21,6 +21,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.HashMap;
+
 /**
  * RUM globalContext 参数检测
  *
@@ -51,6 +53,10 @@ public class RUMGlobalContextTest extends FTBaseTest {
                 .setEnableTraceUserAction(true)
         );
 
+        HashMap<String, Object> map = new HashMap<>();
+        map.put(DYNAMIC_CUSTOM_KEY, DYNAMIC_CUSTOM_VALUE);
+        FTSdk.appendRUMGlobalContext(map);
+
     }
 
     /**
@@ -64,7 +70,7 @@ public class RUMGlobalContextTest extends FTBaseTest {
         waitEventConsumeInThreadPool();
         Thread.sleep(3000L);
         Assert.assertTrue(CheckUtils.checkValueInLineProtocol(DataType.RUM_APP,
-                new String[]{CUSTOM_KEY, CUSTOM_VALUE}));
+                new String[]{CUSTOM_KEY, CUSTOM_VALUE, DYNAMIC_CUSTOM_KEY, DYNAMIC_CUSTOM_VALUE}));
     }
 
 

@@ -22,9 +22,8 @@ import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
+import com.ft.test.utils.LineProtocolData;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -32,6 +31,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 资源请求数据监测
@@ -84,23 +84,16 @@ public class RUMResourceTest extends BaseTest {
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
 
         for (SyncJsonData recordData : recordDataList) {
-            try {
-                JSONObject json = new JSONObject(recordData.getDataString());
-                JSONObject fields = json.optJSONObject("fields");
-                JSONObject tags = json.optJSONObject("tags");
-                String measurement = json.optString("measurement");
-                if ("action".equals(measurement)) {
-                    if (fields != null && tags != null) {
-                        if (tags.optString("action_type").equals("click")) {
-                            int resourceCount = fields.optInt("action_resource_count");
-                            Assert.assertEquals(1, resourceCount);
-                            break;
-                        }
-                    }
+            LineProtocolData lineProtocolData = new LineProtocolData(recordData.getDataString());
+            String measurement = lineProtocolData.getMeasurement();
+            if ("action".equals(measurement)) {
+                if (Objects.equals(lineProtocolData.getTagAsString("action_type"), "click")) {
+                    String resourceCount = lineProtocolData.getFieldAsString("action_resource_count");
+                    Assert.assertEquals("1i", resourceCount);
+                    break;
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
+
         }
     }
 

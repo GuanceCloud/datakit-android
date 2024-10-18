@@ -7,7 +7,9 @@ import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.threadpool.LogConsumerThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.Utils;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -43,6 +45,19 @@ public class TrackLogManager {
      * @param logBean {@link LogBean} 发送日志数据
      */
     public synchronized void trackLog(LogBean logBean, boolean isSilence) {
+        FTLoggerConfig config = FTLoggerConfigManager.get().getConfig();
+        if (config == null) return;
+        if (Utils.enableTraceSamplingRate(config.getSamplingRate())) {
+            HashMap<String, Object> rumTags = null;
+            if (config.isEnableLinkRumData()) {
+                rumTags = FTRUMConfigManager.get().getRUMPublicDynamicTags(true);
+                FTRUMInnerManager.get().attachRUMRelative(rumTags, false);
+                logBean.appendTags(rumTags);
+            }
+        } else {
+            LogUtils.d(TAG, "根据 FTLogConfig SampleRate 计算，将被丢弃=>" + logBean.getContent());
+            return;
+        }
         //防止内存中队列容量超过一定限制，这里同样使用同步丢弃策略
         if (logQueue.size() >= FTDBCachePolicy.get().getLimitCount()) {
             switch (FTDBCachePolicy.get().getLogCacheDiscardStrategy()) {

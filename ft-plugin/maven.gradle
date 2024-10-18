@@ -1,7 +1,7 @@
 apply plugin: 'maven-publish'
 group = 'com.cloudcare.ft.mobile.sdk.tracker.plugin'
 
-version = '1.3.2'//当前版本号
+version = '1.3.3'//当前版本号
 def minVersion = '1.3.15-beta01' //最低支持的 SDK 版本
 
 apply plugin: "com.github.gmazzo.buildconfig"//https://github.com/gmazzo/gradle-buildconfig-plugin
@@ -40,8 +40,8 @@ afterEvaluate {
         repositories {
             maven {
 
-                def releasesRepoUrl = "$maven_publish_url/maven-releases"
-                def snapshotsRepoUrl = "$maven_publish_url/maven-snapshots"
+                def releasesRepoUrl = "$mavenPublishUrl/maven-releases"
+                def snapshotsRepoUrl = "$mavenPublishUrl/maven-snapshots"
                 url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
                 credentials {
                     username = getDefaultProperties().get("LDAP_ACCOUNT")

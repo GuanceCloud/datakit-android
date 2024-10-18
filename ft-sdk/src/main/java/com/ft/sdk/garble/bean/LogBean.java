@@ -1,10 +1,6 @@
 package com.ft.sdk.garble.bean;
 
 import com.ft.sdk.garble.utils.Constants;
-import com.ft.sdk.garble.utils.LogUtils;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -46,24 +42,24 @@ public class LogBean extends BaseContentBean {
      *
      * @return
      */
-    public JSONObject getAllFields() {
+    public HashMap<String, Object> getAllFields() {
         super.getAllFields();
-        try {
-            if (duration > 0) {
-                fields.put(Constants.KEY_TIME_COST_DURATION, duration);
-            }
-
-            if (!property.isEmpty()) {
-                for (Map.Entry<String, Object> entry : property.entrySet()) {
-                    String key = entry.getKey();
-                    Object value = entry.getValue();
-                    fields.put(key, value);
-                }
-            }
-        } catch (JSONException e) {
-            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
-
+//        try {
+        if (duration > 0) {
+            fields.put(Constants.KEY_TIME_COST_DURATION, duration);
         }
+
+        if (!property.isEmpty()) {
+            for (Map.Entry<String, Object> entry : property.entrySet()) {
+                String key = entry.getKey();
+                Object value = entry.getValue();
+                fields.put(key, value);
+            }
+        }
+//        } catch (JSONException e) {
+//            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+//
+//        }
         return fields;
     }
 
@@ -72,14 +68,14 @@ public class LogBean extends BaseContentBean {
      *
      * @return
      */
-    public JSONObject getAllTags() {
+    public HashMap<String, Object> getAllTags() {
         super.getAllTags();
-        try {
-            tags.put(Constants.KEY_STATUS, status);
-        } catch (JSONException e) {
-            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
-
-        }
+//        try {
+        tags.put(Constants.KEY_STATUS, status);
+//        } catch (JSONException e) {
+//            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+//
+//        }
 
         return tags;
     }

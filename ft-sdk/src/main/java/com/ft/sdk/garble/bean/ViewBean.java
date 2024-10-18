@@ -141,6 +141,16 @@ public class ViewBean {
         return property;
     }
 
+    HashMap<String, Object> tags = new HashMap<>();
+
+    public HashMap<String, Object> getTags() {
+        return tags;
+    }
+
+    public void setTags(HashMap<String, Object> tags) {
+        this.tags = tags;
+    }
+
     public String getViewReferrer() {
         return viewReferrer;
     }
@@ -318,6 +328,7 @@ public class ViewBean {
         map.put(Constants.KEY_MEMORY_AVG, memoryAvg);
         map.put(Constants.KEY_MEMORY_MAX, memoryMax);
         map.put(Constants.KEY_RUM_PROPERTY, property);
+        map.put(Constants.KEY_RUM_TAGS, tags);
         return Utils.hashMapObjectToJson(map);
     }
 
@@ -345,6 +356,16 @@ public class ViewBean {
                 while (keys.hasNext()) {
                     String key = keys.next();
                     this.property.put(key, jsonProperty.opt(key));
+                }
+            }
+
+            JSONObject jsonTags = json.optJSONObject(Constants.KEY_RUM_TAGS);
+            if (jsonTags != null) {
+                Iterator<String> keys = jsonTags.keys();
+
+                while (keys.hasNext()) {
+                    String key = keys.next();
+                    this.tags.put(key, jsonTags.opt(key));
                 }
             }
         } catch (JSONException e) {

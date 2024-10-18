@@ -6,8 +6,6 @@ import org.apache.tools.ant.util.FileUtils;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.UnknownDomainObjectException;
-import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.artifacts.ProjectDependency;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -25,20 +22,14 @@ public class FTMapUploader {
 
     private final Project project;
     /**
-     * debug symbol 路径
+     * so build 符号生成路径
      */
-    private final static String CMAKE_DEBUG_SYMBOL_PATH = "/intermediates/cmake/debug/obj";
-
-    /**
-     * native c/c++ build 生成路径
-     */
-    private final static String CMAKE_CXX_PATH = "/intermediates/cxx/Debug";
+    private final static String MERGED_LIB_PATH = "build/intermediates/merged_native_libs";
 
     /**
      * Unity Symbol 生成路径
      */
     private final static String UNITY_SYMBOLS_PATH = "/unityLibrary/symbols";
-    private final static String NAME_RELEASE_COMPILE_CLASSPATH = "releaseCompileClasspath";
 
     /**
      * R8 混淆生成路径
@@ -58,7 +49,6 @@ public class FTMapUploader {
      */
     private final static String PROGUARD_MAPPING_PATH = "/outputs/proguard/%s/mapping/mapping.txt";
 
-    private final HashMap<String, ArrayList<String>> symbolPathsMap = new HashMap<>();
 
     /**
      * zip 打包对象，临时生成路径
@@ -81,11 +71,11 @@ public class FTMapUploader {
     }
 
     /**
-     * 上传混淆符号文件
+     * 上传混淆符号文件与 native debug symbol 符号文件
      */
     public void configMapUpload() {
         if (flavorModelHashMap.isEmpty()) {
-            if (!extension.autoUploadMap) {
+            if (!extension.autoUploadMap && !extension.autoUploadNativeDebugSymbol) {
                 return;
             }
         }
@@ -101,6 +91,7 @@ public class FTMapUploader {
             Task ftTask = project.getTasks().create("ft" + capVariantName + "UploadSymbolMap", task -> {
 
             }).doLast(task -> {
+
                 ProductFlavorModel model = getFlavorModelFromName(variantName);
                 Logger.debug("ProductFlavorModel:" + model);
 
@@ -108,18 +99,23 @@ public class FTMapUploader {
                     return;
                 }
 
+                ArrayList<String> symbolPaths = new ArrayList<>();
+                if (model.isAutoUploadNativeDebugSymbol()) {
+                    appendSymbolPath(project, symbolPaths, variantName, model.getNativeLibPath());
+                }
+
                 String tmpBuildPath = String.format(tmpBuildPathFormat, variantName);
                 String zipBuildPath = String.format(zipBuildPathFormat, variantName);
                 //删除之前的 cache
-                FileUtils.delete(new File(tmpBuildPath));
-                FileUtils.delete(new File(zipBuildPath));
                 try {
+                    deleteRecursively(new File(tmpBuildPath));
+                    FileUtils.delete(new File(zipBuildPath));
+
                     ObfuscationSettingConfig config = obfuscationSettingMap.get(assembleTaskName);
-                    Logger.debug("task:" + assembleTaskName + ",config:" + config + "");
+                    Logger.debug("task:" + assembleTaskName + ",config:" + config);
                     if (config != null) {
                         if (model.isAutoUploadNativeDebugSymbol()) {
-                            ArrayList<String> symbolPaths = symbolPathsMap.get(model.getName());
-                            if (symbolPaths != null && !symbolPaths.isEmpty()) {
+                            if (!symbolPaths.isEmpty()) {
                                 FTFileUtils.copyDifferentFolderFilesIntoOne(tmpBuildPath, symbolPaths.toArray(new String[0]));
                             }
                         }
@@ -189,137 +185,59 @@ public class FTMapUploader {
 
     }
 
-
     /**
-     * 上传 debug native symbol 文件
+     * 删除文件夹
+     *
+     * @param file
+     * @throws IOException
      */
-    public void configNativeSymbolUpload() {
-        if (flavorModelHashMap.isEmpty()) {
-            if (!extension.autoUploadNativeDebugSymbol) {
-                return;
+    private void deleteRecursively(File file) {
+        if (file.isDirectory()) {
+            File[] fileList = file.listFiles();
+            if (fileList != null) {
+                for (File subFile : fileList) {
+                    deleteRecursively(subFile);
+                }
             }
         }
-        project.afterEvaluate(p -> {
-            AppExtension appExtension = (AppExtension) p.getProperties().get("android");
-
-            if (appExtension.getProductFlavors().size() > 0) {
-                appExtension.getProductFlavors().all(flavor -> {
-                    // 获取 Flavor 的名称
-                    String flavorName = flavor.getName();
-                    ArrayList<String> symbolPaths = symbolPathsMap.computeIfAbsent(flavorName, k -> new ArrayList<>());
-                    appendSymbolPath(p, symbolPaths, flavorName);
-
-                });
-            } else {
-                ArrayList<String> symbolPaths = symbolPathsMap.computeIfAbsent("release", k -> new ArrayList<>());
-                appendSymbolPath(p, symbolPaths, "");
-            }
-
-
-        });
-
+        FileUtils.delete(file);  // 使用 FileUtils 删除文件或文件夹
     }
+
 
     /**
      * 扫描并添加 native cmake build 路径
      *
      * @param p
      * @param list
-     * @param flavor
+     * @param nativeLibPath
      */
-    private void appendSymbolPath(Project p, ArrayList<String> list, String flavor) {
+    private void appendSymbolPath(Project p, ArrayList<String> list, String variantName, String nativeLibPath) {
 
         p.getAllprojects().forEach(subProject -> {
-            String buildPath = subProject.getBuildDir().getAbsolutePath();
-            String debugSymbolPath = buildPath + CMAKE_DEBUG_SYMBOL_PATH;
-
+            File projectPath = subProject.getProjectDir();
+            String debugSymbolPath = "";
+            if (nativeLibPath.isEmpty()) {
+                debugSymbolPath = new File(projectPath, MERGED_LIB_PATH + "/" + variantName + "/out/lib").getAbsolutePath();
+            } else {
+                debugSymbolPath = new File(projectPath, nativeLibPath).getAbsolutePath();
+            }
             File file = new File(debugSymbolPath);
             if (file.exists()) {
+                Logger.debug("debugSymbolPath:" + debugSymbolPath);
                 list.add(debugSymbolPath);
-            } else {
-                compatibleWithAGP8(buildPath, list);
             }
         });
-        String name = flavor.length() == 0 ? NAME_RELEASE_COMPILE_CLASSPATH :
-                (flavor + FTStringUtils.captitalizedString(NAME_RELEASE_COMPILE_CLASSPATH));
-        Configuration configuration = p.getConfigurations().findByName(name);
-        if (configuration != null) {
-            String rootPath = p.getRootDir().getAbsolutePath();
-            configuration.getAllDependencies().forEach(dependency -> {
-                if (dependency instanceof ProjectDependency) {
-                    String moduleName = dependency.getName();
-                    String buildPath = rootPath + "/" + moduleName + "/build";
-                    String debugSymbolPath = buildPath + CMAKE_DEBUG_SYMBOL_PATH;
-                    File file = new File(debugSymbolPath);
-                    if (file.exists()) {
-                        Logger.debug("debugSymbolPath:" + debugSymbolPath);
-                        list.add(debugSymbolPath);
-                    } else {
-                        compatibleWithAGP8(buildPath, list);
-                    }
 
-                    String unitySymbolsPath = rootPath + UNITY_SYMBOLS_PATH;
-                    File unitySymbols = new File(unitySymbolsPath);
-                    Logger.debug("unitySymbolsPath:" + unitySymbolsPath);
-                    if (unitySymbols.exists()) {
-                        list.add(unitySymbolsPath);
-                    }
-                }
-            });
-            if (symbolPathsMap.isEmpty()) {
-                Logger.error("native symbol not found");
-            } else {
-                Logger.debug("paths:" + symbolPathsMap);
-            }
-
-        }
-
-    }
-
-    /**
-     * 兼容 AGP 8.0 ，AGP 8.0 {@link #CMAKE_DEBUG_SYMBOL_PATH} 消失了，目前只能使用 {@link #CMAKE_CXX_PATH} 文件夹下，
-     * 最新更新的文件夹来作为替代方案
-     *
-     * @param buildPath
-     * @param list
-     */
-    private void compatibleWithAGP8(String buildPath, ArrayList<String> list) {
-        String cxxPath = buildPath + CMAKE_CXX_PATH;
-        File file = new File(cxxPath);
-        File recentFile = findMostRecentlyModifiedFolder(file);
-        if (recentFile != null) {
-            File objPath = new File(recentFile.getAbsoluteFile() + "/obj");
-            if (objPath.exists()) {
-                Logger.debug("debugSymbolPath:" + objPath.getAbsolutePath());
-                list.add(objPath.getAbsolutePath());
-            }
+        //unity symbol
+        String rootPath = p.getRootDir().getAbsolutePath();
+        String unitySymbolsPath = rootPath + UNITY_SYMBOLS_PATH;
+        File unitySymbols = new File(unitySymbolsPath);
+        if (unitySymbols.exists()) {
+            Logger.debug("unitySymbolsPath:" + unitySymbolsPath);
+            list.add(unitySymbolsPath);
         }
     }
 
-    /**
-     * 找到最近更新更新的文件
-     *
-     * @param folder
-     * @return
-     */
-    private File findMostRecentlyModifiedFolder(File folder) {
-        File mostRecentlyModifiedFolder = null;
-        Date mostRecentDate = new Date(0);
-
-        if (folder.exists() && folder.isDirectory()) {
-            for (File file : folder.listFiles()) {
-                if (file.isDirectory()) {
-                    Date lastModifiedDate = new Date(file.lastModified());
-                    if (lastModifiedDate.after(mostRecentDate)) {
-                        mostRecentlyModifiedFolder = file;
-                        mostRecentDate = lastModifiedDate;
-                    }
-                }
-            }
-        }
-
-        return mostRecentlyModifiedFolder;
-    }
 
     /**
      * 上传符号文件

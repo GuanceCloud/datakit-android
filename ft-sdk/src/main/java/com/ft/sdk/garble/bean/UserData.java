@@ -2,6 +2,7 @@ package com.ft.sdk.garble.bean;
 
 import androidx.annotation.Nullable;
 
+import com.ft.sdk.garble.manager.SingletonGson;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.google.gson.Gson;
@@ -77,7 +78,7 @@ public class UserData {
         try {
             Type type = new TypeToken<HashMap<String, String>>() {
             }.getType();
-            exts = new Gson().fromJson(data, type);
+            exts = SingletonGson.getInstance().fromJson(data, type);
         } catch (Exception e) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }

@@ -2,7 +2,7 @@
 
 buildscript {
     ext {
-        maven_publish_url = 'https://mvnrepo.jiagouyun.com/repository'
+        mavenPublishUrl = 'https://mvnrepo.jiagouyun.com/repository'
         getDefaultProperties = this.&getDefaultProperties
     }
 
@@ -36,7 +36,7 @@ buildscript {
 //        jcenter()
 //        mavenLocal()
         maven {
-            url "${maven_publish_url}/maven-releases"
+            url "${mavenPublishUrl}/maven-releases"
         }
         maven {
             url "https://plugins.gradle.org/m2/"
@@ -47,7 +47,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.4.2'
-        classpath 'com.cloudcare.ft.mobile.sdk.tracker.plugin:ft-plugin:1.3.1'
+        classpath 'com.cloudcare.ft.mobile.sdk.tracker.plugin:ft-plugin:1.3.3'
 //        classpath 'com.guardsquare:proguard-gradle:7.1.0'
 //        classpath files('ft-plugin/build/libs/ft-plugin-1.3.1-alpha02.jar')
 
@@ -64,7 +64,7 @@ allprojects {
         mavenCentral()
         mavenLocal()
         maven {
-            url "${maven_publish_url}/maven-releases"
+            url "${mavenPublishUrl}/maven-releases"
         }
         //
 //        flatDir {

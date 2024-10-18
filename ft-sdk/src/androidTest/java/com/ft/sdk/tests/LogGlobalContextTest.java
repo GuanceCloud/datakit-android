@@ -21,8 +21,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.HashMap;
+
 /**
  * 日志 globalContext 测试
+ *
  * @author Brandon
  */
 @RunWith(AndroidJUnit4.class)
@@ -36,11 +39,15 @@ public class LogGlobalContextTest extends FTBaseTest {
             hasPrepare = true;
         }
         stopSyncTask();
-        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
+        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL).setDebug(true));
         FTSdk.initLogWithConfig(new FTLoggerConfig()
                 .addGlobalContext(CUSTOM_KEY, CUSTOM_VALUE)
                 .setEnableCustomLog(true)
         );
+
+        HashMap<String, Object> map = new HashMap<>();
+        map.put(DYNAMIC_CUSTOM_KEY, DYNAMIC_CUSTOM_VALUE);
+        FTSdk.appendLogGlobalContext(map);
     }
 
     /**
@@ -51,7 +58,7 @@ public class LogGlobalContextTest extends FTBaseTest {
         FTLogger.getInstance().logBackground("test Log", Status.INFO);
         Thread.sleep(2000);
         Assert.assertTrue(CheckUtils.checkValueInLineProtocol(DataType.LOG,
-                new String[]{CUSTOM_KEY, CUSTOM_VALUE}));
+                new String[]{CUSTOM_KEY, CUSTOM_VALUE, DYNAMIC_CUSTOM_KEY, DYNAMIC_CUSTOM_VALUE}));
 
     }
 }

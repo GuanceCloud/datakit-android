@@ -60,6 +60,7 @@ public class ActiveViewBean extends ViewBean {
         bean.fpsAvg = this.fpsAvg;
         bean.fpsMini = this.fpsMini;
         bean.property = this.property;
+        bean.tags = this.tags;
         return bean;
     }
 

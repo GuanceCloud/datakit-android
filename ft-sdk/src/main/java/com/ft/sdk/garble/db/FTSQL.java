@@ -7,9 +7,14 @@ package com.ft.sdk.garble.db;
  */
 public class FTSQL {
     /**
-     * 同步数据表
+     * 同步数据表,旧版本 DB version 1，2
      */
-    public static final String FT_SYNC_TABLE_NAME = "sync_data";
+    public static final String FT_SYNC_OLD_CACHE_TABLE_NAME = "sync_data";
+
+    /**
+     * 同步数据表，db version 3
+     */
+    public static final String FT_SYNC_DATA_FLAT_TABLE_NAME = "sync_data_flat";
 
     /**
      * 自增 id
@@ -20,6 +25,11 @@ public class FTSQL {
      * 时间线
      */
     public static final String RECORD_COLUMN_TM = "tm";
+
+    /**
+     * 数据 UUID
+     */
+    public static final String RECORD_COLUMN_DATA_UUID = "uuid";
 
     /**
      * 数据内容，json 格式
@@ -33,10 +43,11 @@ public class FTSQL {
     /**
      * 同步数据建表表结构
      */
-    public static final String FT_TABLE_SYNC_CREATE = "CREATE TABLE if not exists " + FT_SYNC_TABLE_NAME +
+    public static final String FT_TABLE_SYNC_CREATE = "CREATE TABLE if not exists " + FT_SYNC_DATA_FLAT_TABLE_NAME +
             " (" +
             RECORD_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
             RECORD_COLUMN_TM + " INTEGER," +
+            RECORD_COLUMN_DATA_UUID + " TEXT," +
             RECORD_COLUMN_DATA + " TEXT," +
             RECORD_COLUMN_DATA_TYPE + " TEXT" +
             ")";

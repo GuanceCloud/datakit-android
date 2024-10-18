@@ -1,3 +1,53 @@
+# agent 1.6.1
+1. 修复 RUM 单独调用自定义 startView，导致监控指标 FTMetricsMTR 线程未被回收的问题
+2. 支持通过 FTSdk.appendGlobalContext(globalContext)、FTSdk.appendRUMGlobalContext(globalContext)、
+   FTSdk.appendLogGlobalContext(globalContext)添加动态属性
+3. 支持通过 FTSdk.clearAllData() 清理未上报缓存数据
+4. 延长 SDK setSyncSleepTime 为 5000 ms
+
+---
+# agent 1.6.1-beta02
+1. 修正 Log link RUM 动态 tag 缺失问题
+
+---
+# agent 1.6.1-beta01
+1. 修改动态标签覆盖逻辑
+2. 简化指标监控逻辑
+3. 添加清理缓存数据逻辑
+
+---
+# agent 1.6.1-alpha04
+1. 修复 RUM 单独调用自定义 startView，导致监控指标 FTMetricsMTR 线程未被回收的问题
+
+---
+# agent 1.6.1-alpha03
+1. 优化动态 tags 赋值的时机
+2. 添加全局、log、RUM globalContext 属性动态设置方式
+
+---
+# agent 1.6.0
+1. 优化数据存储和同步性能
+（旧版本升级至 1.6.0 需要配置 FTSDKConfig.setNeedTransformOldCache 进行旧数据兼容同步）
+2. 处理在使用 ft-plugin 时，调用 Log.w(String,Throwable) 引发异常的问题
+
+---
+# agent 1.6.0-beta01
+1. 同 1.6.0-alpha02
+2. 优化 Inner Log 缓存清理规则
+3. 优化行协议转化存储规则
+
+---
+# agent 1.6.0-alpha02
+1. 修正日志丢弃策略
+2. 优化全局 json 数据存储
+
+---
+# agent 1.6.0-alpha01
+1. 优化数据序列化存储规则
+2. 恢复数据库落盘
+3. 1.5.2 功能合并
+
+---
 # agent 1.5.3-alpha01
 1. 处理在使用 ft-plugin 时，调用 Log.w(String,Throwable) 引发异常的问题
 

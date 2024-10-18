@@ -19,9 +19,11 @@ import com.ft.sdk.garble.db.base.DataBaseCallBack;
 import com.ft.sdk.garble.db.base.DatabaseHelper;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * BY huangDianHua
@@ -59,10 +61,10 @@ public class FTDBManager extends DBManager {
      *
      * @param data
      */
-    public boolean insertFtOperation(final SyncJsonData data) {
+    public boolean insertFtOperation(final SyncJsonData data, boolean reInsert) {
         ArrayList<SyncJsonData> list = new ArrayList<>();
         list.add(data);
-        return insertFtOptList(list);
+        return insertFtOptList(list, reInsert);
     }
 
 
@@ -534,7 +536,7 @@ public class FTDBManager extends DBManager {
      *
      * @param dataList
      */
-    public boolean insertFtOptList(@NonNull final List<SyncJsonData> dataList) {
+    public boolean insertFtOptList(@NonNull final List<SyncJsonData> dataList, boolean reInsert) {
         final boolean[] result = new boolean[1];
         getDB(true, new DataBaseCallBack() {
             @Override
@@ -542,11 +544,20 @@ public class FTDBManager extends DBManager {
                 db.beginTransaction();
                 int count = 0;
                 for (SyncJsonData data : dataList) {
+
                     ContentValues contentValues = new ContentValues();
                     contentValues.put(FTSQL.RECORD_COLUMN_TM, data.getTime());
-                    contentValues.put(FTSQL.RECORD_COLUMN_DATA, data.getDataString());
+                    if (reInsert) {
+                        String uuid = Utils.randomUUID();
+                        contentValues.put(FTSQL.RECORD_COLUMN_DATA_UUID, uuid);
+                        contentValues.put(FTSQL.RECORD_COLUMN_DATA, data.getDataString(uuid));
+                    } else {
+                        contentValues.put(FTSQL.RECORD_COLUMN_DATA_UUID, data.getUuid());
+                        contentValues.put(FTSQL.RECORD_COLUMN_DATA, data.getDataString());
+                    }
+
                     contentValues.put(FTSQL.RECORD_COLUMN_DATA_TYPE, data.getDataType().getValue());
-                    long rowId = db.insert(FTSQL.FT_SYNC_TABLE_NAME, null, contentValues);
+                    long rowId = db.insert(FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME, null, contentValues);
                     if (rowId >= 0) {
                         count++;
                     }
@@ -561,11 +572,11 @@ public class FTDBManager extends DBManager {
 
 
     public List<SyncJsonData> queryDataByDataByTypeLimit(int limit, DataType dataType) {
-        return queryDataByDescLimit(limit, FTSQL.RECORD_COLUMN_DATA_TYPE + "=? ", new String[]{dataType.getValue()}, "asc");
+        return queryDataByDescLimit(limit, FTSQL.RECORD_COLUMN_DATA_TYPE + "=? ", new String[]{dataType.getValue()}, "asc", false);
     }
 
     public List<SyncJsonData> queryDataByDataByTypeLimitDesc(int limit, DataType dataType) {
-        return queryDataByDescLimit(limit, FTSQL.RECORD_COLUMN_DATA_TYPE + "=? ", new String[]{dataType.getValue()}, "desc");
+        return queryDataByDescLimit(limit, FTSQL.RECORD_COLUMN_DATA_TYPE + "=? ", new String[]{dataType.getValue()}, "desc", false);
     }
 
     /**
@@ -575,7 +586,17 @@ public class FTDBManager extends DBManager {
      * @return
      */
     public List<SyncJsonData> queryDataByDescLimit(final int limit) {
-        return queryDataByDescLimit(limit, null, null, "asc");
+        return queryDataByDescLimit(limit, false);
+    }
+
+    /**
+     * 查询所有数据
+     *
+     * @param limit limit == 0 表示获取全部数据
+     * @return
+     */
+    public List<SyncJsonData> queryDataByDescLimit(final int limit, boolean oldCache) {
+        return queryDataByDescLimit(limit, null, null, "asc", oldCache);
     }
 
     /**
@@ -590,7 +611,7 @@ public class FTDBManager extends DBManager {
             public void run(SQLiteDatabase db) {
                 try {
                     Cursor cursor = db.rawQuery("select count(*) from "
-                            + FTSQL.FT_SYNC_TABLE_NAME + " where " + FTSQL.RECORD_COLUMN_DATA_TYPE
+                            + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " where " + FTSQL.RECORD_COLUMN_DATA_TYPE
                             + "='" + dataType.getValue() + "'", null);
                     cursor.moveToFirst();
                     count[0] = cursor.getInt(0);
@@ -615,13 +636,45 @@ public class FTDBManager extends DBManager {
             @Override
             public void run(SQLiteDatabase db) {
                 try {
-                    db.execSQL("DELETE FROM " + FTSQL.FT_SYNC_TABLE_NAME + " where _id in (SELECT _id from " + FTSQL.FT_SYNC_TABLE_NAME + " where " + FTSQL.RECORD_COLUMN_DATA_TYPE + "='" + type.getValue() + "' ORDER by tm ASC LIMIT " + limit + ")");
+                    db.execSQL("DELETE FROM " + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " where _id in (SELECT _id from " + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " where " + FTSQL.RECORD_COLUMN_DATA_TYPE + "='" + type.getValue() + "' ORDER by tm ASC LIMIT " + limit + ")");
                 } catch (Exception e) {
                     LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
                 }
             }
         });
+    }
+
+
+    /**
+     * 判断是否存在旧缓存,如果 table 不存在，则会被 {@link #getDB} exception try catch 直接捕获
+     *
+     * @return
+     */
+    public boolean isOldCacheExist() {
+        final boolean[] result = new boolean[1];
+        getDB(false, new DataBaseCallBack() {
+            @Override
+            public void run(SQLiteDatabase db) {
+                try {
+                    Cursor cursor = db.rawQuery("SELECT EXISTS (SELECT 1 FROM " + FTSQL.FT_SYNC_OLD_CACHE_TABLE_NAME + ");", null);
+
+                    if (cursor != null) {
+                        if (cursor.moveToFirst()) {
+                            result[0] = cursor.getInt(0) == 1;
+                        }
+                        cursor.close();
+                    }
+                } catch (SQLException e) {
+                    if (Objects.requireNonNull(e.getMessage()).contains("no such table: sync_data")) {
+                        LogUtils.d(TAG, "There is no old cache in 'sync_data', ignore this error");
+                    } else {
+                        LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+                    }
+                }
+            }
+        });
+        return result[0];
     }
 
     /**
@@ -632,17 +685,19 @@ public class FTDBManager extends DBManager {
      * @param selectionArgs
      * @return
      */
-    private List<SyncJsonData> queryDataByDescLimit(final int limit, final String selection, final String[] selectionArgs, final String order) {
+    private List<SyncJsonData> queryDataByDescLimit(final int limit, final String selection, final String[] selectionArgs, final String order, boolean oldCache) {
         final List<SyncJsonData> recordList = new ArrayList<>();
         getDB(false, new DataBaseCallBack() {
             @Override
             public void run(SQLiteDatabase db) {
+                String tableName = oldCache ? FTSQL.FT_SYNC_OLD_CACHE_TABLE_NAME : FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME;
+
                 Cursor cursor;
                 if (limit == 0) {
-                    cursor = db.query(FTSQL.FT_SYNC_TABLE_NAME, null, selection, selectionArgs,
+                    cursor = db.query(tableName, null, selection, selectionArgs,
                             null, null, FTSQL.RECORD_COLUMN_ID + " " + order);
                 } else {
-                    cursor = db.query(FTSQL.FT_SYNC_TABLE_NAME, null, selection, selectionArgs,
+                    cursor = db.query(tableName, null, selection, selectionArgs,
                             null, null, FTSQL.RECORD_COLUMN_ID + " " + order, String.valueOf(limit));
                 }
                 while (cursor.moveToNext()) {
@@ -650,7 +705,7 @@ public class FTDBManager extends DBManager {
                     long time = cursor.getLong(cursor.getColumnIndex(FTSQL.RECORD_COLUMN_TM));
                     String data = cursor.getString(cursor.getColumnIndex(FTSQL.RECORD_COLUMN_DATA));
                     String type = cursor.getString(cursor.getColumnIndex(FTSQL.RECORD_COLUMN_DATA_TYPE));
-
+                    String uuid = oldCache ? "" : cursor.getString(cursor.getColumnIndex(FTSQL.RECORD_COLUMN_DATA_UUID));
 
                     SyncJsonData recordData = null;
 
@@ -663,6 +718,7 @@ public class FTDBManager extends DBManager {
                     if (recordData != null) {
                         recordData.setId(id);
                         recordData.setTime(time);
+                        recordData.setUuid(uuid);
                         recordData.setDataString(data);
                         recordList.add(recordData);
                     }
@@ -680,13 +736,14 @@ public class FTDBManager extends DBManager {
      *
      * @param ids
      */
-    public void delete(final List<String> ids) {
+    public void delete(final List<String> ids, boolean oldCache) {
         getDB(true, new DataBaseCallBack() {
             @Override
             public void run(SQLiteDatabase db) {
                 db.beginTransaction();
+                String tableName = oldCache ? FTSQL.FT_SYNC_OLD_CACHE_TABLE_NAME : FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME;
                 for (String id : ids) {
-                    db.delete(FTSQL.FT_SYNC_TABLE_NAME, FTSQL.RECORD_COLUMN_ID + "=?", new String[]{id});
+                    db.delete(tableName, FTSQL.RECORD_COLUMN_ID + "=?", new String[]{id});
                 }
                 db.setTransactionSuccessful();
                 db.endTransaction();
@@ -701,9 +758,10 @@ public class FTDBManager extends DBManager {
         getDB(true, new DataBaseCallBack() {
             @Override
             public void run(SQLiteDatabase db) {
-                db.delete(FTSQL.FT_SYNC_TABLE_NAME, null, null);
+                db.delete(FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME, null, null);
                 db.delete(FTSQL.FT_TABLE_ACTION, null, null);
                 db.delete(FTSQL.FT_TABLE_VIEW, null, null);
+                LogUtils.e(TAG, "DB table delete");
 
             }
         });

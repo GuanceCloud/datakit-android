@@ -22,11 +22,8 @@ import com.ft.sdk.nativelib.CrashCallback;
 import com.ft.sdk.nativelib.NativeEngineInit;
 import com.ft.sdk.nativelib.NativeExtraLogCatSetting;
 
-import org.json.JSONObject;
-
 import java.io.File;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -67,6 +64,7 @@ public class FTRUMConfigManager {
      */
     void initWithConfig(FTRUMConfig config) {
         this.config = config;
+
         FTRUMInnerManager.get().initParams(config);
         FTRUMGlobalManager.get().initConfig(config);
 //        FTAutoTrackConfigManager.get().initParams();
@@ -336,7 +334,7 @@ public class FTRUMConfigManager {
         rumGlobalContext.put(Constants.KEY_DEVICE_OS_VERSION_MAJOR, osVersionMajor);
     }
 
-    JSONObject getRUMPublicDynamicTags() throws Exception {
+    HashMap<String, Object> getRUMPublicDynamicTags() {
         return getRUMPublicDynamicTags(false);
     }
 
@@ -345,15 +343,10 @@ public class FTRUMConfigManager {
      *
      * @return
      */
-    JSONObject getRUMPublicDynamicTags(boolean includeRUMStatic) throws Exception {
-        JSONObject tags = new JSONObject();
+    HashMap<String, Object> getRUMPublicDynamicTags(boolean includeRUMStatic) {
+        HashMap<String, Object> tags = new HashMap<>();
         if (includeRUMStatic) {
-            HashMap<String, Object> rumGlobalContext = config.getGlobalContext();
-            for (Map.Entry<String, Object> entry : rumGlobalContext.entrySet()) {
-                String key = entry.getKey();
-                Object value = entry.getValue();
-                tags.put(key, value);
-            }
+            tags.putAll(FTTrackInner.getInstance().getCurrentDataHelper().getCurrentRumTags());
         }
         tags.put(Constants.KEY_RUM_NETWORK_TYPE, NetUtils.getNetWorkStateName());
         tags.put(Constants.KEY_RUM_IS_SIGN_IN, FTRUMConfigManager.get().isUserDataBinded() ? "T" : "F");
@@ -373,7 +366,6 @@ public class FTRUMConfigManager {
                     tags.put(key, ext.get(key));
                 }
             }
-
         } else {
             tags.put(Constants.KEY_RUM_USER_ID, getRandomUserId());
         }

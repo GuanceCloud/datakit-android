@@ -22,7 +22,9 @@ import org.junit.runners.Suite;
         RUMUserBindTest.class,
         SDKGlobalContextTest.class,
         SDKRunStateTest.class,
-        TraceHeaderTest.class}
+        TraceHeaderTest.class,
+        SDKDataClearTest.class
+}
 )
 public class FTSdkAllTests {
     public static boolean hasPrepare;

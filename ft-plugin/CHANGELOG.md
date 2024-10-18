@@ -1,3 +1,11 @@
+# plugin 1.3.3
+1. 优化 native symbol so 自动获取上传，支持自定义指定 nativeLibPath
+
+---
+# plugin 1.3.3-alpha01
+1. 优化 native symbol so 自动获取上传，支持自定义指定 nativeLibPath
+
+---
 # plugin 1.3.2
 1. 支持 React Native WebView 事件自动捕获
 

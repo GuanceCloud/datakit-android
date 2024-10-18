@@ -16,7 +16,6 @@ import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.manager.AsyncCallback;
 import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
-import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONObject;
@@ -25,6 +24,7 @@ import org.junit.Assert;
 import org.powermock.reflect.Whitebox;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -36,6 +36,8 @@ public class FTBaseTest {
     public static final String ANY_VIEW = "AnyView";
     protected static final String CUSTOM_KEY = "custom_key";
     protected static final String CUSTOM_VALUE = "custom_value";
+    protected static final String DYNAMIC_CUSTOM_KEY = "dynamic_custom_key";
+    protected static final String DYNAMIC_CUSTOM_VALUE = "dynamic_custom_value";
     protected static final String TEST_FAKE_RUM_ID = "rumId";
     protected static final String TEST_FAKE_URL = "http://www.test.url";
     protected static final String TEST_FAKE_CLIENT_TOKEN = "fake_client_token";
@@ -105,7 +107,7 @@ public class FTBaseTest {
      * @param fileds
      * @throws Exception
      */
-    protected void invokeSyncData(DataType type, String measurement, JSONObject tags, JSONObject fileds) throws Exception {
+    protected void invokeSyncData(DataType type, String measurement, HashMap<String,Object> tags, HashMap<String,Object> fileds) throws Exception {
         Whitebox.invokeMethod(FTTrackInner.getInstance(), "syncDataBackground",
                 type, Utils.getCurrentNanoTime(), measurement, tags, fileds);
 
@@ -202,12 +204,13 @@ public class FTBaseTest {
      */
     protected void uploadData(DataType dataType) {
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, dataType);
-        SyncDataHelper syncDataManager = getInnerSyncDataHelper();
-        String body = syncDataManager.getBodyContent(dataType, recordDataList);
-        body = body.replaceAll(Constants.SEPARATION_PRINT, Constants.SEPARATION).replaceAll(Constants.SEPARATION_LINE_BREAK, Constants.SEPARATION_REALLY_LINE_BREAK);
+        StringBuilder body = new StringBuilder();
+        for (SyncJsonData syncJsonData : recordDataList) {
+            body.append(syncJsonData.getDataString());
+        }
 
         try {
-            Whitebox.invokeMethod(SyncTaskManager.get(), "requestNet", dataType, body,
+            Whitebox.invokeMethod(SyncTaskManager.get(), "requestNet", dataType, body.toString(),
                     (AsyncCallback) (code, response, errorCode) -> Assert.assertEquals(200, code));
         } catch (Exception e) {
             e.printStackTrace();
@@ -241,6 +244,7 @@ public class FTBaseTest {
     /**
      * 获取当前 datahelper 中 config属性
      * {@link FTTrackInner#dataHelper} 的 config
+     *
      * @return
      */
     public static FTSDKConfig getSDKConfigInSyncDataHelper() {

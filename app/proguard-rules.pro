@@ -21,12 +21,12 @@
 #-renamesourcefileattribute SourceFile
 
 -dontwarn com.ft.sdk.**
-
 -keep class com.ft.sdk.**{*;}
 
 -keep class ftnative.*{*;}
 
--keepnames class * extends android.view.View
-
-
--dontwarn okhttp3.**
+# 保留 com.google.android.material.tabs.TabLayout 相关点击采集
+-keepclassmembers class com.google.android.material.tabs.TabLayout$Tab {
+    *;
+}
+-keepnames class * extends android.view.MenuItem

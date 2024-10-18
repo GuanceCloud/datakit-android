@@ -23,6 +23,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.HashMap;
+
 /**
  * SDK 全局 globalContext 参数验证
  *
@@ -53,10 +55,15 @@ public class SDKGlobalContextTest extends FTBaseTest {
         );
 
         FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableCustomLog(true));
+
+        HashMap<String, Object> map = new HashMap<>();
+        map.put(DYNAMIC_CUSTOM_KEY, DYNAMIC_CUSTOM_VALUE);
+        FTSdk.appendGlobalContext(map);
     }
 
     /**
      * SDK 全局 globalContext 在 RUM 数据中正确性验证
+     *
      * @throws Exception
      */
     @Test
@@ -66,11 +73,12 @@ public class SDKGlobalContextTest extends FTBaseTest {
         waitEventConsumeInThreadPool();
         Thread.sleep(3000L);
         Assert.assertTrue(CheckUtils.checkValueInLineProtocol(DataType.RUM_APP,
-                new String[]{CUSTOM_KEY, CUSTOM_VALUE}));
+                new String[]{CUSTOM_KEY, CUSTOM_VALUE, DYNAMIC_CUSTOM_KEY, DYNAMIC_CUSTOM_VALUE}));
     }
 
     /**
      * SDK 全局 globalContext 在 log 数据中正确性验证
+     *
      * @throws Exception
      */
     @Test
@@ -78,7 +86,7 @@ public class SDKGlobalContextTest extends FTBaseTest {
         FTLogger.getInstance().logBackground("log test", Status.INFO);
         Thread.sleep(3000L);
         Assert.assertTrue(CheckUtils.checkValueInLineProtocol(DataType.LOG,
-                new String[]{CUSTOM_KEY, CUSTOM_VALUE}));
+                new String[]{CUSTOM_KEY, CUSTOM_VALUE, DYNAMIC_CUSTOM_KEY, DYNAMIC_CUSTOM_VALUE}));
 
     }
 

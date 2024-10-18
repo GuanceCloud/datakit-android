@@ -23,9 +23,8 @@ import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.test.utils.LineProtocolData;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -76,20 +75,11 @@ public class RUMResourceHostIPTest extends BaseTest {
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
 
         for (SyncJsonData recordData : recordDataList) {
-            try {
-                JSONObject json = new JSONObject(recordData.getDataString());
-                JSONObject tags = json.optJSONObject("tags");
-                String measurement = json.optString("measurement");
-                if (Constants.FT_MEASUREMENT_RUM_RESOURCE.equals(measurement)) {
-                    Assert.assertTrue(tags != null && tags.has(Constants.KEY_RUM_RESOURCE_HOST_IP));
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
+            LineProtocolData lineProtocolData = new LineProtocolData(recordData.getDataString());
+            String measurement = lineProtocolData.getMeasurement();
+            if (Constants.FT_MEASUREMENT_RUM_RESOURCE.equals(measurement)) {
+                Assert.assertNotNull(lineProtocolData.getTagAsString(Constants.KEY_RUM_RESOURCE_HOST_IP));
             }
         }
-
-
     }
-
-
 }

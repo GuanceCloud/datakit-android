@@ -3,18 +3,22 @@ package com.ft.sdk;
 import com.ft.sdk.garble.bean.MonitorInfoBean;
 import com.ft.sdk.garble.bean.ViewBean;
 import com.ft.sdk.garble.threadpool.MonitorRunnable;
+import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.FpsUtils;
+import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
 
 /**
- * BY huangDianHua
- * DATE:2020-01-09 17:26
  * Description:监控项配置
  */
 public class FTMonitorManager {
 
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "FTMonitorManager";
     /**
      * 一秒，单位纳秒
      */
@@ -36,10 +40,18 @@ public class FTMonitorManager {
      */
     private DetectFrequency detectFrequency = DetectFrequency.DEFAULT;
 
-    private final HashMap<String, MonitorRunnable> runnerMap = new HashMap<>();
+    private final ConcurrentHashMap<String, MonitorRunnable> runnerMap = new ConcurrentHashMap<>();
 
     private FTMonitorManager() {
+        service = new ScheduledThreadPoolExecutor(1, new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                return new Thread(r, "FTMetricsMTR");
+            }
+        });
     }
+
+    private final ScheduledExecutorService service;
 
     public static FTMonitorManager get() {
         synchronized (FTMonitorManager.class) {
@@ -59,17 +71,10 @@ public class FTMonitorManager {
         errorMonitorType = config.getExtraMonitorTypeWithError();
         deviceMetricsMonitorType = config.getDeviceMetricsMonitorType();
         detectFrequency = config.getDeviceMetricsDetectFrequency();
-        initParams();
-    }
 
-    /**
-     * 初始化参数
-     */
-    private void initParams() {
         if (isDeviceMetricsMonitorType(DeviceMetricsMonitorType.FPS)) {
             FpsUtils.get().start();
         }
-
     }
 
     /**
@@ -98,9 +103,10 @@ public class FTMonitorManager {
      * @param viewId View 唯一 ID ,{@link ViewBean#id}
      */
     public void addMonitor(String viewId) {
+        LogUtils.d(TAG, "addMonitor:" + viewId + ", remain count:" + runnerMap.size());
         if (deviceMetricsMonitorType == DeviceMetricsMonitorType.NO_SET) return;
         synchronized (runnerMap) {
-            MonitorRunnable runner = new MonitorRunnable(detectFrequency);
+            MonitorRunnable runner = new MonitorRunnable(detectFrequency, service);
             runnerMap.put(viewId, runner);
             runner.run();
         }
@@ -153,21 +159,20 @@ public class FTMonitorManager {
      * @param viewId
      */
     public void removeMonitor(String viewId) {
+        LogUtils.d(TAG, "removeMonitor:" + viewId);
         if (deviceMetricsMonitorType == DeviceMetricsMonitorType.NO_SET) return;
         synchronized (runnerMap) {
-            MonitorRunnable runnable = runnerMap.get(viewId);
-            if (runnable != null) {
-                runnable.stop();
-            }
             runnerMap.remove(viewId);
         }
     }
-
 
     /**
      * 清除当前监控配置项
      */
     public static void release() {
+        if (ftMonitorConfig != null) {
+            ftMonitorConfig.service.shutdown();
+        }
         FpsUtils.release();
         ftMonitorConfig = null;
     }
