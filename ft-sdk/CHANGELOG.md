@@ -3,7 +3,7 @@
 2. 支持通过 FTSdk.appendGlobalContext(globalContext)、FTSdk.appendRUMGlobalContext(globalContext)、
    FTSdk.appendLogGlobalContext(globalContext)添加动态属性
 3. 支持通过 FTSdk.clearAllData() 清理未上报缓存数据
-4. 延长 SDK setSyncSleepTime 为 5000 ms
+4.  SDK setSyncSleepTime 最大限制延长为 5000 ms
 
 ---
 # agent 1.6.1-beta02
