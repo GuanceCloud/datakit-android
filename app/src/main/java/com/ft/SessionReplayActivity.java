@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatCheckedTextView;
@@ -18,13 +19,20 @@ public class SessionReplayActivity extends NameTitleActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_session_replay);
-        findViewById(R.id.session_replay_record_btn).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.session_replay_dialog).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 new AlertDialog.Builder(SessionReplayActivity.this).setMessage("这是对话框")
                         .setPositiveButton("确定", null).create().show();
             }
         });
+        findViewById(R.id.session_replay_toast).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(SessionReplayActivity.this, "Toast:" + System.currentTimeMillis(), Toast.LENGTH_LONG).show();
+            }
+        });
+
 
         AppCompatCheckedTextView appCompatCheckedTextView = findViewById(R.id.session_replay_checked_text_view);
         appCompatCheckedTextView.setOnClickListener(new View.OnClickListener() {
