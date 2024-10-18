@@ -1,3 +1,7 @@
+# agent 1.6.1-beta02
+1. 修正 Log link RUM 动态 tag 缺失问题
+
+---
 # agent 1.6.1-beta01
 1. 修改动态标签覆盖逻辑
 2. 简化指标监控逻辑

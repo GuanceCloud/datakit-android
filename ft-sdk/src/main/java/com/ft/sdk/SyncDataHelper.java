@@ -150,6 +150,18 @@ public class SyncDataHelper {
 
     }
 
+    /**
+     * 动态和静态 rum tags
+     *
+     * @return
+     */
+    HashMap<String, Object> getCurrentRumTags() {
+        HashMap<String, Object> mergeTags = new HashMap<>();
+        mergeTags.putAll(dynamicLRumTags);
+        mergeTags.putAll(rumTags);
+        return mergeTags;
+    }
+
     static String convertToLineProtocolLine(String measurement, HashMap<String, Object> tags,
                                             HashMap<String, Object> fields,
                                             long timeStamp,
