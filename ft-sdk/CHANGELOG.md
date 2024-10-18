@@ -1,3 +1,11 @@
+# agent 1.6.1
+1. 修复 RUM 单独调用自定义 startView，导致监控指标 FTMetricsMTR 线程未被回收的问题
+2. 支持通过 FTSdk.appendGlobalContext(globalContext)、FTSdk.appendRUMGlobalContext(globalContext)、
+   FTSdk.appendLogGlobalContext(globalContext)添加动态属性
+3. 支持通过 FTSdk.clearAllData() 清理未上报缓存数据
+4. 延长 SDK setSyncSleepTime 为 5000 ms
+
+---
 # agent 1.6.1-beta02
 1. 修正 Log link RUM 动态 tag 缺失问题
 
