@@ -82,6 +82,19 @@ public class SyncDataHelper {
     }
 
     /**
+     * 动态设置全局 tag
+     *
+     * @param key
+     * @param value
+     */
+    void appendGlobalContext(String key, String value) {
+        if (!Utils.isNullOrEmpty(key) && Utils.isNullOrEmpty(value)) {
+            dynamicBaseTags.put(key, value);
+        }
+    }
+
+
+    /**
      * 动态设置 RUM 全局 tag
      *
      * @param globalContext
@@ -93,6 +106,19 @@ public class SyncDataHelper {
     }
 
     /**
+     * 动态设置 RUM 全局 tag
+     *
+     * @param key
+     * @param value
+     *
+     */
+    void appendRUMGlobalContext(String key, String value) {
+        if (!Utils.isNullOrEmpty(key) && Utils.isNullOrEmpty(value)) {
+            dynamicLRumTags.put(key, value);
+        }
+    }
+
+    /**
      * 动态设置 log 全局 tag
      *
      * @param globalContext
@@ -100,6 +126,19 @@ public class SyncDataHelper {
     void appendLogGlobalContext(HashMap<String, Object> globalContext) {
         if (globalContext != null) {
             dynamicLogTags.putAll(globalContext);
+        }
+    }
+
+    /**
+     * 动态设置 log 全局 tag
+     *
+     * @param key
+     * @param value
+     *
+     */
+    void appendLogGlobalContext(String key, String value) {
+        if (!Utils.isNullOrEmpty(key) && Utils.isNullOrEmpty(value)) {
+            dynamicLogTags.put(key, value);
         }
     }
 
