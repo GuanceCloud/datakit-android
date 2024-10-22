@@ -616,6 +616,11 @@ public class Constants {
     public static final String RUM_SESSION_ID_BUS_MESSAGE_KEY = "sessionId";
 
     /**
+     * 行协议数据 tags，临时存储动态 tags
+     */
+    public static final String KEY_RUM_TAGS = "tags";
+
+    /**
      * 冷启动，action_type
      */
     public static final String ACTION_TYPE_LAUNCH_COLD = "launch_cold";

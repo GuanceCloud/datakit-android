@@ -96,12 +96,27 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(this, WebViewActivity.class));
         });
         findViewById(R.id.main_mock_click_btn).setOnClickListener(v -> {
-            FTSdk.unbindRumUserData();
+
+        });
+
+        findViewById(R.id.main_dynamic_tags).setOnClickListener(v -> {
+            HashMap<String, Object> globalContext = new HashMap<>();
+            globalContext.put("global_key", "global_value");
+            FTSdk.appendGlobalContext(globalContext);
+
+            HashMap<String, Object> rumGlobalContext = new HashMap<>();
+            rumGlobalContext.put("rum_key", "rum_value");
+            FTSdk.appendRUMGlobalContext(rumGlobalContext);
+
+            HashMap<String, Object> logGlobalContext = new HashMap<>();
+            logGlobalContext.put("log_key", "log_value");
+            FTSdk.appendLogGlobalContext(logGlobalContext);
+
         });
         findViewById(R.id.main_mock_log_btn).setOnClickListener(v -> {
             Log.e(TAG, "console log");
             Log.d(TAG, "console log");
-            Log.w(TAG,new Exception());
+            Log.w(TAG, new Exception());
             FTLogger.getInstance().logBackground("custom Log", Status.ERROR);
             FTLogger.getInstance().logBackground("custom status Log", "customType");
         });
@@ -277,6 +292,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 FTSdk.shutDown();
+            }
+        });
+
+        findViewById(R.id.main_clear_data).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FTSdk.clearAllData();
             }
         });
     }

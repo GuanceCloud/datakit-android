@@ -12,8 +12,6 @@ import com.ft.sdk.garble.utils.FpsUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -23,22 +21,18 @@ import java.util.concurrent.TimeUnit;
  * @author Brandon
  */
 public class MonitorRunnable implements Runnable {
-    private final ScheduledExecutorService service = new ScheduledThreadPoolExecutor(1, new ThreadFactory() {
-        @Override
-        public Thread newThread(Runnable r) {
-            return new Thread(r, "FTMetricsMTR");
-        }
-    });
+
     private final DetectFrequency detectFrequency;
     private final MonitorInfoBean fpsBean = new MonitorInfoBean();
     private final MonitorInfoBean cpuBean = new MonitorInfoBean();
     private final MonitorInfoBean memoryBean = new MonitorInfoBean();
     private final MonitorInfoBean batteryBean = new MonitorInfoBean();
 
+    private final ScheduledExecutorService service;
 
-
-    public MonitorRunnable(DetectFrequency detectFrequency) {
+    public MonitorRunnable(DetectFrequency detectFrequency, ScheduledExecutorService service) {
         this.detectFrequency = detectFrequency;
+        this.service = service;
     }
 
 
@@ -113,13 +107,6 @@ public class MonitorRunnable implements Runnable {
         bean.maxValue = Math.max(lastValue, bean.maxValue);
         bean.miniValue = Math.min(lastValue, bean.miniValue);
         bean.count = count;
-    }
-
-    /**
-     * 队列资源释放
-     */
-    public void stop() {
-        service.shutdown();
     }
 
 }

@@ -19,7 +19,6 @@ import com.ft.sdk.garble.threadpool.RunnerCompleteCallBack;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.HashMapUtils;
 import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONObject;
 
@@ -35,7 +34,7 @@ import java.util.List;
  */
 public class FTTrackInner {
     private final static String TAG = Constants.LOG_TAG_PREFIX + "FTTrackInner";
-    private static FTTrackInner instance;
+    private static volatile FTTrackInner instance;
 
     /**
      * 测试用例调用
@@ -93,6 +92,64 @@ public class FTTrackInner {
     void initRUMConfig(FTRUMConfig config) {
         dataHelper.initRUMConfig(config);
     }
+
+    /**
+     * 动态设置全局 tag
+     *
+     * @param globalContext
+     */
+    void appendGlobalContext(HashMap<String, Object> globalContext) {
+        dataHelper.appendGlobalContext(globalContext);
+    }
+
+    /**
+     * 动态设置全局 tag
+     *
+     * @param key
+     * @param value
+     */
+    void appendGlobalContext(String key, String value) {
+        dataHelper.appendGlobalContext(key, value);
+    }
+
+    /**
+     * 动态设置 RUM tag
+     *
+     * @param globalContext
+     */
+    void appendRUMGlobalContext(HashMap<String, Object> globalContext) {
+        dataHelper.appendRUMGlobalContext(globalContext);
+    }
+
+    /**
+     * 动态设置 RUM tag
+     *
+     * @param key
+     * @param value
+     */
+    void appendRUMGlobalContext(String key, String value) {
+        dataHelper.appendRUMGlobalContext(key,value);
+    }
+
+    /**
+     * 动态设置 Log tag
+     *
+     * @param globalContext
+     */
+    void appendLogGlobalContext(HashMap<String, Object> globalContext) {
+        dataHelper.appendLogGlobalContext(globalContext);
+    }
+
+    /**
+     * 动态设置 Log tag
+     *
+     * @param key
+     * @param value
+     */
+    void appendLogGlobalContext(String key, String value) {
+        dataHelper.appendLogGlobalContext(key,value);
+    }
+
 
     /**
      * rum 事件数据
@@ -236,29 +293,13 @@ public class FTTrackInner {
      */
     void batchLogBeanSync(@NonNull List<BaseContentBean> logBeans, boolean isSilence) {
         try {
-            FTLoggerConfig config = FTLoggerConfigManager.get().getConfig();
-            if (config == null) return;
-            HashMap<String, Object> rumTags = null;
-            if (config.isEnableLinkRumData()) {
-                rumTags = FTRUMConfigManager.get().getRUMPublicDynamicTags(true);
-                FTRUMInnerManager.get().attachRUMRelative(rumTags, false);
-            }
-
             ArrayList<SyncJsonData> datas = new ArrayList<>();
             for (BaseContentBean logBean : logBeans) {
                 try {
-                    if (Utils.enableTraceSamplingRate(config.getSamplingRate())) {
-                        if (rumTags != null) {
-                            logBean.appendTags(rumTags);
-                        }
-                        datas.add(SyncJsonData.getFromLogBean(dataHelper, logBean));
-                    } else {
-                        LogUtils.d(TAG, "根据 FTLogConfig SampleRate 计算，将被丢弃=>" + logBean.getContent());
-                    }
+                    datas.add(SyncJsonData.getFromLogBean(dataHelper, logBean));
                 } catch (Exception e) {
                     LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                 }
-
             }
             judgeLogCachePolicy(datas, isSilence);
         } catch (Exception e) {

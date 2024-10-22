@@ -18,6 +18,8 @@ import java.util.LinkedHashMap;
 
 /**
  * 数据组装类，把采集数据从存储数据序列化行协议数据
+ *
+ * tag:覆盖逻辑 SDK inner tag > user tag > static GlobalContext > dynamic GlobalContext
  */
 public class SyncDataHelper {
     public final static String TAG = Constants.LOG_TAG_PREFIX + "SyncDataHelper";
@@ -30,6 +32,10 @@ public class SyncDataHelper {
     private final HashMap<String, Object> rumTags;
     private final HashMap<String, Object> traceTags;
 
+    private final HashMap<String, Object> dynamicBaseTags;
+    private final HashMap<String, Object> dynamicLogTags;
+    private final HashMap<String, Object> dynamicLRumTags;
+
     protected FTSDKConfig config;
 
 
@@ -38,6 +44,10 @@ public class SyncDataHelper {
         logTags = new HashMap<>();
         rumTags = new HashMap<>();
         traceTags = new HashMap<>();
+
+        dynamicBaseTags = new HashMap<>();
+        dynamicLogTags = new HashMap<>();
+        dynamicLRumTags = new HashMap<>();
     }
 
     void initBaseConfig(FTSDKConfig config) {
@@ -60,6 +70,77 @@ public class SyncDataHelper {
         traceTags.putAll(config.getGlobalContext());
     }
 
+    /**
+     * 动态设置全局 tag
+     *
+     * @param globalContext
+     */
+    void appendGlobalContext(HashMap<String, Object> globalContext) {
+        if (globalContext != null) {
+            dynamicBaseTags.putAll(globalContext);
+        }
+    }
+
+    /**
+     * 动态设置全局 tag
+     *
+     * @param key
+     * @param value
+     */
+    void appendGlobalContext(String key, String value) {
+        if (!Utils.isNullOrEmpty(key) && Utils.isNullOrEmpty(value)) {
+            dynamicBaseTags.put(key, value);
+        }
+    }
+
+
+    /**
+     * 动态设置 RUM 全局 tag
+     *
+     * @param globalContext
+     */
+    void appendRUMGlobalContext(HashMap<String, Object> globalContext) {
+        if (globalContext != null) {
+            dynamicLRumTags.putAll(globalContext);
+        }
+    }
+
+    /**
+     * 动态设置 RUM 全局 tag
+     *
+     * @param key
+     * @param value
+     *
+     */
+    void appendRUMGlobalContext(String key, String value) {
+        if (!Utils.isNullOrEmpty(key) && Utils.isNullOrEmpty(value)) {
+            dynamicLRumTags.put(key, value);
+        }
+    }
+
+    /**
+     * 动态设置 log 全局 tag
+     *
+     * @param globalContext
+     */
+    void appendLogGlobalContext(HashMap<String, Object> globalContext) {
+        if (globalContext != null) {
+            dynamicLogTags.putAll(globalContext);
+        }
+    }
+
+    /**
+     * 动态设置 log 全局 tag
+     *
+     * @param key
+     * @param value
+     *
+     */
+    void appendLogGlobalContext(String key, String value) {
+        if (!Utils.isNullOrEmpty(key) && Utils.isNullOrEmpty(value)) {
+            dynamicLogTags.put(key, value);
+        }
+    }
 
     /**
      * 数据转行协议存储
@@ -83,6 +164,8 @@ public class SyncDataHelper {
         String bodyContent;
         if (dataType == DataType.LOG) {
             // log 数据
+            mergeTags.putAll(dynamicBaseTags);
+            mergeTags.putAll(dynamicLogTags);
             mergeTags.putAll(logTags);
             bodyContent = convertToLineProtocolLine(measurement, mergeTags, fields,
                     timeStamp, config);
@@ -94,6 +177,8 @@ public class SyncDataHelper {
                     timeStamp, config);
         } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_WEBVIEW) {
             //rum 数据
+            mergeTags.putAll(dynamicBaseTags);
+            mergeTags.putAll(dynamicLRumTags);
             mergeTags.putAll(rumTags);
             bodyContent = convertToLineProtocolLine(measurement, mergeTags, fields,
                     timeStamp, config);
@@ -102,6 +187,18 @@ public class SyncDataHelper {
         }
         return bodyContent;
 
+    }
+
+    /**
+     * 动态和静态 rum tags
+     *
+     * @return
+     */
+    HashMap<String, Object> getCurrentRumTags() {
+        HashMap<String, Object> mergeTags = new HashMap<>();
+        mergeTags.putAll(dynamicLRumTags);
+        mergeTags.putAll(rumTags);
+        return mergeTags;
     }
 
     static String convertToLineProtocolLine(String measurement, HashMap<String, Object> tags,

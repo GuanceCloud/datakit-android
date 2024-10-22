@@ -334,7 +334,7 @@ public class FTRUMConfigManager {
         rumGlobalContext.put(Constants.KEY_DEVICE_OS_VERSION_MAJOR, osVersionMajor);
     }
 
-    HashMap<String, Object> getRUMPublicDynamicTags() throws Exception {
+    HashMap<String, Object> getRUMPublicDynamicTags() {
         return getRUMPublicDynamicTags(false);
     }
 
@@ -343,11 +343,10 @@ public class FTRUMConfigManager {
      *
      * @return
      */
-    HashMap<String, Object> getRUMPublicDynamicTags(boolean includeRUMStatic) throws Exception {
+    HashMap<String, Object> getRUMPublicDynamicTags(boolean includeRUMStatic) {
         HashMap<String, Object> tags = new HashMap<>();
         if (includeRUMStatic) {
-            HashMap<String, Object> rumGlobalContext = config.getGlobalContext();
-            tags.putAll(rumGlobalContext);
+            tags.putAll(FTTrackInner.getInstance().getCurrentDataHelper().getCurrentRumTags());
         }
         tags.put(Constants.KEY_RUM_NETWORK_TYPE, NetUtils.getNetWorkStateName());
         tags.put(Constants.KEY_RUM_IS_SIGN_IN, FTRUMConfigManager.get().isUserDataBinded() ? "T" : "F");
@@ -367,7 +366,6 @@ public class FTRUMConfigManager {
                     tags.put(key, ext.get(key));
                 }
             }
-
         } else {
             tags.put(Constants.KEY_RUM_USER_ID, getRandomUserId());
         }

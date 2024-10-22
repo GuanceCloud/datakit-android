@@ -162,7 +162,7 @@ public class ConfigTest extends FTBaseTest {
      */
     @Test
     public void syncSleepTime() {
-        FTSDKConfig config = getDatakitConfig().setSyncSleepTime(1000);
+        FTSDKConfig config = getDatakitConfig().setSyncSleepTime(10000);
         FTSdk.install(config);
         Assert.assertTrue(checkInnerFieldValue(SyncTaskManager.get(), "syncSleepTime",
                 SyncTaskManager.SYNC_SLEEP_MAX_TIME_MS));

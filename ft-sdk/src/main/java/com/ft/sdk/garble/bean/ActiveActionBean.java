@@ -83,6 +83,7 @@ public class ActiveActionBean extends ActionBean {
         bean.viewReferrer = this.viewReferrer;
         bean.hasReplay = this.hasReplay;
         bean.property = this.property;
+        bean.tags = this.tags;
         return bean;
     }
 }

@@ -19,6 +19,33 @@
 1. 支持开启 session replay 录制功能
 
 ---
+# agent 1.6.1
+1. 修复 RUM 单独调用自定义 startView，导致监控指标 FTMetricsMTR 线程未被回收的问题
+2. 支持通过 FTSdk.appendGlobalContext(globalContext)、FTSdk.appendRUMGlobalContext(globalContext)、
+   FTSdk.appendLogGlobalContext(globalContext)添加动态属性
+3. 支持通过 FTSdk.clearAllData() 清理未上报缓存数据
+4.  SDK setSyncSleepTime 最大限制延长为 5000 ms
+
+---
+# agent 1.6.1-beta02
+1. 修正 Log link RUM 动态 tag 缺失问题
+
+---
+# agent 1.6.1-beta01
+1. 修改动态标签覆盖逻辑
+2. 简化指标监控逻辑
+3. 添加清理缓存数据逻辑
+
+---
+# agent 1.6.1-alpha04
+1. 修复 RUM 单独调用自定义 startView，导致监控指标 FTMetricsMTR 线程未被回收的问题
+
+---
+# agent 1.6.1-alpha03
+1. 优化动态 tags 赋值的时机
+2. 添加全局、log、RUM globalContext 属性动态设置方式
+
+---
 # agent 1.6.0
 1. 优化数据存储和同步性能
 （旧版本升级至 1.6.0 需要配置 FTSDKConfig.setNeedTransformOldCache 进行旧数据兼容同步）
@@ -399,10 +426,6 @@
 # agent 1.3.9-beta01
 1. 测试用例适配优化
 2. 补充文档注释
-
----
-# agent 1.3.9-alpha03
-1.添加 session replay 功能
 
 ---
 # agent 1.3.9-alpha02

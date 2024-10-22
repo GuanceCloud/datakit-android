@@ -282,6 +282,7 @@ public class FTRUMInnerManager {
             if (property != null) {
                 activeAction.getProperty().putAll(property);
             }
+            activeAction.setTags(FTRUMConfigManager.get().getRUMPublicDynamicTags());
             initAction(activeAction);
             this.lastActionTime = activeAction.getStartTime();
             mHandler.removeCallbacks(mActionRecheckRunner);
@@ -439,6 +440,7 @@ public class FTRUMInnerManager {
         if (property != null) {
             activeView.getProperty().putAll(property);
         }
+        activeView.setTags(FTRUMConfigManager.get().getRUMPublicDynamicTags());
         FTMonitorManager.get().addMonitor(activeView.getId());
         FTMonitorManager.get().attachMonitorData(activeView);
         initView(activeView);
@@ -489,7 +491,6 @@ public class FTRUMInnerManager {
             activeView.getProperty().putAll(property);
         }
         FTMonitorManager.get().attachMonitorData(activeView);
-        FTMonitorManager.get().removeMonitor(activeView.getId());
         activeView.close();
         closeView(activeView, callBack);
     }
@@ -1043,6 +1044,7 @@ public class FTRUMInnerManager {
      * @param callBack
      */
     private void closeView(ActiveViewBean activeViewBean, RunnerCompleteCallBack callBack) {
+        FTMonitorManager.get().removeMonitor(activeViewBean.getId());
         final ViewBean viewBean = activeViewBean.convertToViewBean();
         final String viewId = viewBean.getId();
         final long timeSpent = viewBean.getTimeSpent();
@@ -1157,13 +1159,12 @@ public class FTRUMInnerManager {
         @Override
         public void run() {
             try {
-                final HashMap<String, Object> tags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
                 EventConsumerThreadPool.get().execute(new Runnable() {
                     @Override
                     public void run() {
                         try {
-                            FTRUMInnerManager.this.generateActionSum(tags);
-                            FTRUMInnerManager.this.generateViewSum(tags);
+                            FTRUMInnerManager.this.generateActionSum();
+                            FTRUMInnerManager.this.generateViewSum();
                         } catch (JSONException e) {
                             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                         }
@@ -1193,15 +1194,14 @@ public class FTRUMInnerManager {
     }
 
     /**
-     * @param globalTags
      * @throws JSONException
      */
-    private void generateActionSum(HashMap<String, Object> globalTags) throws JSONException {
+    private void generateActionSum() throws JSONException {
         ArrayList<ActionBean> beans;
         do {
             beans = FTDBManager.get().querySumAction(LIMIT_SIZE);
             for (ActionBean bean : beans) {
-                HashMap<String, Object> tags = new HashMap<>(globalTags);
+                HashMap<String, Object> tags = bean.getTags();
                 tags.put(Constants.KEY_RUM_VIEW_NAME, bean.getViewName());
                 tags.put(Constants.KEY_RUM_VIEW_REFERRER, bean.getViewReferrer());
                 tags.put(Constants.KEY_RUM_VIEW_ID, bean.getViewId());
@@ -1227,12 +1227,12 @@ public class FTRUMInnerManager {
         } while (beans.size() >= LIMIT_SIZE);
     }
 
-    private void generateViewSum(HashMap<String, Object> globalTags) throws JSONException {
+    private void generateViewSum() throws JSONException {
         ArrayList<ViewBean> beans;
         do {
             beans = FTDBManager.get().querySumView(LIMIT_SIZE);
             for (ViewBean bean : beans) {
-                HashMap<String, Object> tags = new HashMap<>(globalTags);
+                HashMap<String, Object> tags = bean.getTags();
                 tags.put(Constants.KEY_RUM_SESSION_ID, bean.getSessionId());
                 tags.put(Constants.KEY_RUM_VIEW_NAME, bean.getViewName());
                 tags.put(Constants.KEY_RUM_VIEW_REFERRER, bean.getViewReferrer());

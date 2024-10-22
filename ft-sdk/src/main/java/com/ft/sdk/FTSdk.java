@@ -147,6 +147,13 @@ public class FTSdk {
     }
 
     /**
+     * 清理未上报的缓存数据
+     */
+    public static void clearAllData() {
+        FTDBManager.get().delete();
+    }
+
+    /**
      * 初始化SDK本地配置数据
      */
     private void initFTConfig(FTSDKConfig config) {
@@ -269,8 +276,10 @@ public class FTSdk {
             FTSDKConfig currentConfig = mFtSdk.mFtSDKConfig;
             currentConfig.setEnableAccessAndroidID(enableAccessAndroidID);
             String uuid = enableAccessAndroidID ? DeviceUtils.getUuid(FTApplication.getApplication()) : "";
-            currentConfig.getGlobalContext().put(Constants.KEY_DEVICE_UUID, uuid);
 
+            HashMap<String, Object> hashMap = new HashMap<>();
+            hashMap.put(Constants.KEY_DEVICE_UUID, uuid);
+            FTTrackInner.getInstance().appendGlobalContext(hashMap);
         }
     }
 
@@ -313,6 +322,75 @@ public class FTSdk {
             pkgInfo.put(Constants.KEY_RUM_SDK_PACKAGE_REPLAY_MATERIAL, FTSdk.SESSION_REPLAY_MATERIAL_VERSION);
         }
         return pkgInfo;
+    }
+
+    /**
+     * 动态设置全局 tag
+     *
+     * @param globalContext
+     */
+    public static void appendGlobalContext(HashMap<String, Object> globalContext) {
+        if (checkInstallState()) {
+            FTTrackInner.getInstance().appendGlobalContext(globalContext);
+        }
+    }
+
+    /**
+     * 动态设置全局 tag
+     *
+     * @param key
+     * @param value
+     */
+    public static void appendGlobalContext(String key, String value) {
+        if (checkInstallState()) {
+            FTTrackInner.getInstance().appendGlobalContext(key, value);
+        }
+    }
+
+    /**
+     * 动态设置 RUM 全局 tag
+     *
+     * @param globalContext
+     */
+    public static void appendRUMGlobalContext(HashMap<String, Object> globalContext) {
+        if (checkInstallState()) {
+            FTTrackInner.getInstance().appendRUMGlobalContext(globalContext);
+        }
+    }
+
+    /**
+     * 动态设置 RUM 全局 tag
+     *
+     * @param key
+     * @param value
+     */
+    public static void appendRUMGlobalContext(String key, String value) {
+        if (checkInstallState()) {
+            FTTrackInner.getInstance().appendRUMGlobalContext(key, value);
+        }
+    }
+
+    /**
+     * 动态设置 log 全局 tag
+     *
+     * @param globalContext
+     */
+    public static void appendLogGlobalContext(HashMap<String, Object> globalContext) {
+        if (checkInstallState()) {
+            FTTrackInner.getInstance().appendLogGlobalContext(globalContext);
+        }
+    }
+
+    /**
+     * 动态设置 log 全局 tag
+     *
+     * @param key
+     * @param value
+     */
+    public static void appendLogGlobalContext(String key, String value) {
+        if (checkInstallState()) {
+            FTTrackInner.getInstance().appendLogGlobalContext(key, value);
+        }
     }
 
 
