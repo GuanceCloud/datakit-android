@@ -168,6 +168,10 @@ public class FTRUMInnerManager {
     }
 
     void addAction(String actionName, String actionType, long duration, long startTime) {
+        addAction(actionName, actionType, duration, startTime, null);
+    }
+
+    void addAction(String actionName, String actionType, long duration, long startTime, HashMap<String, Object> property) {
         String viewId = activeView != null ? activeView.getId() : null;
         String viewName = activeView != null ? activeView.getViewName() : null;
         String viewReferrer = activeView != null ? activeView.getViewReferrer() : null;
@@ -178,6 +182,9 @@ public class FTRUMInnerManager {
         activeAction.setClose(true);
         activeAction.setDuration(duration);
         activeAction.setStartTime(startTime);
+        if (property != null) {
+            activeAction.getProperty().putAll(property);
+        }
         initAction(activeAction);
         this.lastActionTime = activeAction.getStartTime();
     }

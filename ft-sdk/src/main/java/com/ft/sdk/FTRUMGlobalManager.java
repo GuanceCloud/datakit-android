@@ -34,10 +34,49 @@ public class FTRUMGlobalManager {
      * @param actionName action 名称
      * @param actionType action 类型
      * @param duration   纳秒，持续时间
+     * @param property 扩展属性
+     */
+    public void addAction(String actionName, String actionType, long duration, HashMap<String, Object> property) {
+        if (innerManager != null) {
+            innerManager.addAction(actionName, actionType, duration, Utils.getCurrentNanoTime(), property);
+        }
+    }
+
+    /**
+     * 添加 Action，此类数据无法关联 Error，Resource，LongTask 数据
+     *
+     * @param actionName action 名称
+     * @param actionType action 类型
+     */
+    public void addAction(String actionName, String actionType) {
+        if (innerManager != null) {
+            innerManager.addAction(actionName, actionType, 0, Utils.getCurrentNanoTime(), null);
+        }
+    }
+
+    /**
+     * 添加 Action，此类数据无法关联 Error，Resource，LongTask 数据
+     *
+     * @param actionName action 名称
+     * @param actionType action 类型
+     * @param property 扩展属性
+     */
+    public void addAction(String actionName, String actionType, HashMap<String, Object> property) {
+        if (innerManager != null) {
+            innerManager.addAction(actionName, actionType, 0, Utils.getCurrentNanoTime(), property);
+        }
+    }
+
+    /**
+     * 添加 Action，此类数据无法关联 Error，Resource，LongTask 数据
+     *
+     * @param actionName action 名称
+     * @param actionType action 类型
+     * @param duration   纳秒，持续时间
      */
     public void addAction(String actionName, String actionType, long duration) {
         if (innerManager != null) {
-            innerManager.addAction(actionName, actionType, duration, Utils.getCurrentNanoTime());
+            innerManager.addAction(actionName, actionType, duration, Utils.getCurrentNanoTime(), null);
         }
     }
 
@@ -171,6 +210,7 @@ public class FTRUMGlobalManager {
             innerManager.stopView(property, null);
         }
     }
+
     /**
      * 添加错误信息, 默认 AppState.RUN
      *
