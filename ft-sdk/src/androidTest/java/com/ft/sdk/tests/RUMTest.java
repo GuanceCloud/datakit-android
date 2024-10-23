@@ -124,7 +124,10 @@ public class RUMTest extends FTBaseTest {
      */
     @Test
     public void addActionTest() throws Exception {
-        FTRUMGlobalManager.get().addAction(ACTION_NAME, ACTION_TYPE_NAME, DURATION);
+        HashMap<String, Object> property = new HashMap<>();
+        property.put(PROPERTY_NAME, PROPERTY_VALUE);
+
+        FTRUMGlobalManager.get().addAction(ACTION_NAME, ACTION_TYPE_NAME, DURATION, property);
         waitEventConsumeInThreadPool();
 
         ArrayList<ActionBean> list = FTDBManager.get().querySumAction(0);
@@ -133,6 +136,7 @@ public class RUMTest extends FTBaseTest {
         Assert.assertTrue(action.isClose());
         Assert.assertEquals(action.getActionName(), ACTION_NAME);
         Assert.assertEquals(action.getActionType(), ACTION_TYPE_NAME);
+        Assert.assertEquals(action.getProperty().get(PROPERTY_NAME), PROPERTY_VALUE);
     }
 
     /**
@@ -619,8 +623,8 @@ public class RUMTest extends FTBaseTest {
             LineProtocolData data = new LineProtocolData(recordData.getDataString());
 
             if (Constants.FT_MEASUREMENT_RUM_RESOURCE.equals(data.getMeasurement())) {
-                tracId = data.getTagAsString(Constants.KEY_RUM_RESOURCE_TRACE_ID,"");
-                spanId = data.getTagAsString(Constants.KEY_RUM_RESOURCE_SPAN_ID,"");
+                tracId = data.getTagAsString(Constants.KEY_RUM_RESOURCE_TRACE_ID, "");
+                spanId = data.getTagAsString(Constants.KEY_RUM_RESOURCE_SPAN_ID, "");
                 break;
             }
 
