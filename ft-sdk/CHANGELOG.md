@@ -1,5 +1,5 @@
 # agent 1.6.2-alpha01
-1. RUM 新增 addAction 方法，并支持 property 扩展属性，支持连续上报
+1. RUM 新增 addAction 方法，支持 property 扩展属性与频繁连续数据上报
 
 ---
 # agent 1.6.1
