@@ -1,3 +1,7 @@
+# agent 1.6.2-alpha01
+1. RUM 新增 addAction 方法，并支持 property 扩展属性，支持连续上报
+
+---
 # agent 1.6.1
 1. 修复 RUM 单独调用自定义 startView，导致监控指标 FTMetricsMTR 线程未被回收的问题
 2. 支持通过 FTSdk.appendGlobalContext(globalContext)、FTSdk.appendRUMGlobalContext(globalContext)、
