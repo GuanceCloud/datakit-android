@@ -487,6 +487,10 @@ public class Utils {
     /**
      * 获取纳秒时间
      *
+     * 两次获取存在同一个毫秒触发会有时间倒转的问题。
+     * 在毫秒边界获取时 System.nanoTime() 可能碰到纳秒一个周期结束，后获取的时间可能会更小，
+     * 目前使用这个方法是性能和精准度折中的一个方法
+     *
      * @return
      */
     public static long getCurrentNanoTime() {
