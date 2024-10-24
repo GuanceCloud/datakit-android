@@ -94,6 +94,8 @@ public class FTTrackInner {
     }
 
     /**
+     * 动态设置全局 tag
+     *
      * @param globalContext
      */
     void appendGlobalContext(HashMap<String, Object> globalContext) {
@@ -101,6 +103,18 @@ public class FTTrackInner {
     }
 
     /**
+     * 动态设置全局 tag
+     *
+     * @param key
+     * @param value
+     */
+    void appendGlobalContext(String key, String value) {
+        dataHelper.appendGlobalContext(key, value);
+    }
+
+    /**
+     * 动态设置 RUM tag
+     *
      * @param globalContext
      */
     void appendRUMGlobalContext(HashMap<String, Object> globalContext) {
@@ -108,11 +122,34 @@ public class FTTrackInner {
     }
 
     /**
+     * 动态设置 RUM tag
+     *
+     * @param key
+     * @param value
+     */
+    void appendRUMGlobalContext(String key, String value) {
+        dataHelper.appendRUMGlobalContext(key,value);
+    }
+
+    /**
+     * 动态设置 Log tag
+     *
      * @param globalContext
      */
     void appendLogGlobalContext(HashMap<String, Object> globalContext) {
         dataHelper.appendLogGlobalContext(globalContext);
     }
+
+    /**
+     * 动态设置 Log tag
+     *
+     * @param key
+     * @param value
+     */
+    void appendLogGlobalContext(String key, String value) {
+        dataHelper.appendLogGlobalContext(key,value);
+    }
+
 
     /**
      * rum 事件数据

@@ -1,9 +1,21 @@
+# agent 1.6.2
+1. RUM 新增 addAction 方法，支持 property 扩展属性与频繁连续数据上报
+
+---
+# agent 1.6.2-beta01
+1. 同 1.6.2-alpha01
+
+---
+# agent 1.6.2-alpha01
+1. RUM 新增 addAction 方法，支持 property 扩展属性与频繁连续数据上报
+
+---
 # agent 1.6.1
 1. 修复 RUM 单独调用自定义 startView，导致监控指标 FTMetricsMTR 线程未被回收的问题
 2. 支持通过 FTSdk.appendGlobalContext(globalContext)、FTSdk.appendRUMGlobalContext(globalContext)、
    FTSdk.appendLogGlobalContext(globalContext)添加动态属性
 3. 支持通过 FTSdk.clearAllData() 清理未上报缓存数据
-4. 延长 SDK setSyncSleepTime 为 5000 ms
+4.  SDK setSyncSleepTime 最大限制延长为 5000 ms
 
 ---
 # agent 1.6.1-beta02

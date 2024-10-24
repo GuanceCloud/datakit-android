@@ -292,6 +292,18 @@ public class FTSdk {
     }
 
     /**
+     * 动态设置全局 tag
+     *
+     * @param key
+     * @param value
+     */
+    public static void appendGlobalContext(String key, String value) {
+        if (checkInstallState()) {
+            FTTrackInner.getInstance().appendGlobalContext(key, value);
+        }
+    }
+
+    /**
      * 动态设置 RUM 全局 tag
      *
      * @param globalContext
@@ -299,6 +311,18 @@ public class FTSdk {
     public static void appendRUMGlobalContext(HashMap<String, Object> globalContext) {
         if (checkInstallState()) {
             FTTrackInner.getInstance().appendRUMGlobalContext(globalContext);
+        }
+    }
+
+    /**
+     * 动态设置 RUM 全局 tag
+     *
+     * @param key
+     * @param value
+     */
+    public static void appendRUMGlobalContext(String key, String value) {
+        if (checkInstallState()) {
+            FTTrackInner.getInstance().appendRUMGlobalContext(key, value);
         }
     }
 
@@ -312,6 +336,19 @@ public class FTSdk {
             FTTrackInner.getInstance().appendLogGlobalContext(globalContext);
         }
     }
+
+    /**
+     * 动态设置 log 全局 tag
+     *
+     * @param key
+     * @param value
+     */
+    public static void appendLogGlobalContext(String key, String value) {
+        if (checkInstallState()) {
+            FTTrackInner.getInstance().appendLogGlobalContext(key, value);
+        }
+    }
+
 
     /**
      * 主动同步数据
