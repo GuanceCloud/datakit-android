@@ -187,6 +187,7 @@ public class FTRUMInnerManager {
         }
         initAction(activeAction);
         this.lastActionTime = activeAction.getStartTime();
+        generateRumData();
     }
 
     /**
@@ -1145,6 +1146,7 @@ public class FTRUMInnerManager {
     private void generateActionSum() throws JSONException {
         ArrayList<ActionBean> beans;
         do {
+
             beans = FTDBManager.get().querySumAction(LIMIT_SIZE);
             for (ActionBean bean : beans) {
                 HashMap<String, Object> tags = bean.getTags();

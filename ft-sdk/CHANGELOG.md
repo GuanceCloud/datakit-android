@@ -1,3 +1,7 @@
+# agent 1.6.3-beta01
+1. 优化 addAction 数据上报机制 
+
+---
 # agent 1.6.2
 1. RUM 新增 addAction 方法，支持 property 扩展属性与频繁连续数据上报
 
