@@ -1,3 +1,7 @@
+# agent 1.7.0-alpha08
+1.  1.6.1 , 1.6.2 功能合并更新更新
+
+---
 # agent 1.7.0-alpha06
 1.  session replay addExtensionSupport 默认配置添加
 
