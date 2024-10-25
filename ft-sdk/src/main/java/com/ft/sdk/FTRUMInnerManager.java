@@ -185,9 +185,8 @@ public class FTRUMInnerManager {
         if (property != null) {
             activeAction.getProperty().putAll(property);
         }
-        initAction(activeAction);
+        initAction(activeAction, true);
         this.lastActionTime = activeAction.getStartTime();
-        generateRumData();
     }
 
     /**
@@ -243,7 +242,7 @@ public class FTRUMInnerManager {
                 activeAction.getProperty().putAll(property);
             }
             activeAction.setTags(FTRUMConfigManager.get().getRUMPublicDynamicTags());
-            initAction(activeAction);
+            initAction(activeAction, false);
             this.lastActionTime = activeAction.getStartTime();
 
             mHandler.removeCallbacks(mActionRecheckRunner);
@@ -458,18 +457,31 @@ public class FTRUMInnerManager {
 
     /**
      * 初始化 action
-     *
+     * <p>
+     * 这里 startAction 会先进入 {@link com.ft.sdk.garble.db.FTSQL#FT_TABLE_ACTION},
+     * 再进入 {@link com.ft.sdk.garble.db.FTSQL#FT_SYNC_DATA_FLAT_TABLE_NAME};
+     * addAction 会直接进入 {@link com.ft.sdk.garble.db.FTSQL#FT_SYNC_DATA_FLAT_TABLE_NAME}
      * @param activeActionBean 当前激活的操作
      */
-    private void initAction(ActiveActionBean activeActionBean) {
+    private void initAction(ActiveActionBean activeActionBean, boolean isAddAction) {
         final ActionBean bean = activeActionBean.convertToActionBean();
         increaseAction(bean.getViewId());
-        EventConsumerThreadPool.get().execute(new Runnable() {
-            @Override
-            public void run() {
-                FTDBManager.get().initSumAction(bean);
-            }
-        });
+        if (isAddAction) {
+            EventConsumerThreadPool.get().execute(new Runnable() {
+                @Override
+                public void run() {
+                    insertAction(bean);
+                }
+            });
+        } else {
+            EventConsumerThreadPool.get().execute(new Runnable() {
+                @Override
+                public void run() {
+                    FTDBManager.get().initSumAction(bean);
+                }
+            });
+        }
+
 
     }
 
@@ -1149,27 +1161,30 @@ public class FTRUMInnerManager {
 
             beans = FTDBManager.get().querySumAction(LIMIT_SIZE);
             for (ActionBean bean : beans) {
-                HashMap<String, Object> tags = bean.getTags();
-                tags.put(Constants.KEY_RUM_VIEW_NAME, bean.getViewName());
-                tags.put(Constants.KEY_RUM_VIEW_REFERRER, bean.getViewReferrer());
-                tags.put(Constants.KEY_RUM_VIEW_ID, bean.getViewId());
-                tags.put(Constants.KEY_RUM_ACTION_NAME, bean.getActionName());
-                tags.put(Constants.KEY_RUM_ACTION_ID, bean.getId());
-                tags.put(Constants.KEY_RUM_ACTION_TYPE, bean.getActionType());
-                tags.put(Constants.KEY_RUM_SESSION_ID, bean.getSessionId());
-
-                HashMap<String, Object> fields = new HashMap<>(bean.getProperty());
-                fields.put(Constants.KEY_RUM_ACTION_LONG_TASK_COUNT, bean.getLongTaskCount());
-                fields.put(Constants.KEY_RUM_ACTION_RESOURCE_COUNT, bean.getResourceCount());
-                fields.put(Constants.KEY_RUM_ACTION_ERROR_COUNT, bean.getErrorCount());
-                fields.put(Constants.KEY_RUM_ACTION_DURATION, bean.getDuration());
-
-                FTTrackInner.getInstance().rum(bean.getStartTime(),
-                        Constants.FT_MEASUREMENT_RUM_ACTION, tags, fields, null);
-
+                insertAction(bean);
             }
             FTDBManager.get().cleanCloseActionData();
         } while (beans.size() >= LIMIT_SIZE);
+    }
+
+    private void insertAction(ActionBean bean) {
+        HashMap<String, Object> tags = bean.getTags();
+        tags.put(Constants.KEY_RUM_VIEW_NAME, bean.getViewName());
+        tags.put(Constants.KEY_RUM_VIEW_REFERRER, bean.getViewReferrer());
+        tags.put(Constants.KEY_RUM_VIEW_ID, bean.getViewId());
+        tags.put(Constants.KEY_RUM_ACTION_NAME, bean.getActionName());
+        tags.put(Constants.KEY_RUM_ACTION_ID, bean.getId());
+        tags.put(Constants.KEY_RUM_ACTION_TYPE, bean.getActionType());
+        tags.put(Constants.KEY_RUM_SESSION_ID, bean.getSessionId());
+
+        HashMap<String, Object> fields = new HashMap<>(bean.getProperty());
+        fields.put(Constants.KEY_RUM_ACTION_LONG_TASK_COUNT, bean.getLongTaskCount());
+        fields.put(Constants.KEY_RUM_ACTION_RESOURCE_COUNT, bean.getResourceCount());
+        fields.put(Constants.KEY_RUM_ACTION_ERROR_COUNT, bean.getErrorCount());
+        fields.put(Constants.KEY_RUM_ACTION_DURATION, bean.getDuration());
+
+        FTTrackInner.getInstance().rum(bean.getStartTime(),
+                Constants.FT_MEASUREMENT_RUM_ACTION, tags, fields, null);
     }
 
     private void generateViewSum() throws JSONException {

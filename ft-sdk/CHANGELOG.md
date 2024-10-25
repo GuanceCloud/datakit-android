@@ -1,3 +1,7 @@
+# agent 1.6.3-beta02
+1. 修复高频调用 addAction 丢失数据数据的问题
+
+---
 # agent 1.6.3-beta01
 1. 优化 addAction 数据上报机制 
 
