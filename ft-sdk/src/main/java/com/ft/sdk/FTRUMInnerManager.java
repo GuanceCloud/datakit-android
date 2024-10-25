@@ -1160,10 +1160,12 @@ public class FTRUMInnerManager {
         do {
 
             beans = FTDBManager.get().querySumAction(LIMIT_SIZE);
+            ArrayList<String> deleteIds = new ArrayList<>();
             for (ActionBean bean : beans) {
                 insertAction(bean);
+                deleteIds.add(bean.getId());
             }
-            FTDBManager.get().cleanCloseActionData();
+            FTDBManager.get().cleanCloseActionData(deleteIds.toArray(new String[0]));
         } while (beans.size() >= LIMIT_SIZE);
     }
 

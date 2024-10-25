@@ -130,13 +130,30 @@ public class RUMTest extends FTBaseTest {
         FTRUMGlobalManager.get().addAction(ACTION_NAME, ACTION_TYPE_NAME, DURATION, property);
         waitEventConsumeInThreadPool();
 
-        ArrayList<ActionBean> list = FTDBManager.get().querySumAction(0);
+        List<SyncJsonData> list = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.RUM_APP);
 
-        ActionBean action = list.get(0);
-        Assert.assertTrue(action.isClose());
-        Assert.assertEquals(action.getActionName(), ACTION_NAME);
-        Assert.assertEquals(action.getActionType(), ACTION_TYPE_NAME);
-        Assert.assertEquals(action.getProperty().get(PROPERTY_NAME), PROPERTY_VALUE);
+        Assert.assertFalse(list.isEmpty());
+
+        SyncJsonData data = list.get(0);
+//        Assert.assertTrue(action.isClose());
+        LineProtocolData lineProtocolData = new LineProtocolData(data.getDataString());
+        Assert.assertEquals(lineProtocolData.getTagAsString("action_name"), ACTION_NAME);
+        Assert.assertEquals(lineProtocolData.getTagAsString("action_type"), ACTION_TYPE_NAME);
+        Assert.assertEquals(lineProtocolData.getField(PROPERTY_NAME), PROPERTY_VALUE);
+    }
+
+    /**
+     * 数据连续写入
+     * @throws InterruptedException
+     */
+    @Test
+    public void multiActionData() throws InterruptedException {
+        for (int i = 0; i < 1000; i++) {
+            FTRUMGlobalManager.get().addAction(ACTION_NAME, ACTION_TYPE_NAME);
+        }
+        Thread.sleep(2000);
+        List<SyncJsonData> list = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.RUM_APP);
+        Assert.assertEquals(1000, list.size());
     }
 
     /**

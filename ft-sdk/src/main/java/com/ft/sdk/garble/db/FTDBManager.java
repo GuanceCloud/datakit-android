@@ -493,12 +493,23 @@ public class FTDBManager extends DBManager {
     /**
      * 清理所有 Action {@link FTSQL#RUM_COLUMN_IS_CLOSE} = 1 数据
      */
-    public void cleanCloseActionData() {
+    public void cleanCloseActionData(String[] ids) {
         if (isAndroidTest) return;
+        if (ids.length == 0) return;
         getDB(true, new DataBaseCallBack() {
             @Override
             public void run(SQLiteDatabase db) {
-                db.execSQL("DELETE FROM " + FTSQL.FT_TABLE_ACTION + " WHERE " + FTSQL.RUM_COLUMN_IS_CLOSE + "=1");
+                long start = System.nanoTime();
+                String tableName = FTSQL.FT_TABLE_ACTION;
+                StringBuilder placeholders = new StringBuilder();
+                for (int i = 0; i < ids.length; i++) {
+                    placeholders.append("?");
+                    if (i < ids.length - 1) {
+                        placeholders.append(",");
+                    }
+                }
+                db.delete(tableName, FTSQL.RUM_COLUMN_ID + " IN (" + placeholders + ")", ids);
+                LogUtils.d(TAG, "cleanCloseActionDataWithIDs:count:" + ids.length + "," + +(System.nanoTime() - start) / 1000000);
             }
         });
     }

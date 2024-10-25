@@ -1,3 +1,7 @@
+# agent 1.6.3-beta03
+1. 优化已关闭并同步完毕的 action 的删除逻辑
+
+---
 # agent 1.6.3-beta02
 1. 修复高频调用 addAction 丢失数据数据的问题
 
