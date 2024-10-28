@@ -3,6 +3,7 @@ package com.ft.sdk.garble;
 import static com.ft.sdk.garble.utils.Constants.USER_AGENT;
 
 import com.ft.sdk.FTSDKConfig;
+import com.ft.sdk.HttpRequestCompression;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.StringUtils;
@@ -42,6 +43,8 @@ public class FTHttpConfigManager {
      */
     private int sendOutTime = 30000;
 
+    private HttpRequestCompression compressType = HttpRequestCompression.NONE;
+
     /**
      * http 请求返回读取
      */
@@ -72,6 +75,7 @@ public class FTHttpConfigManager {
         datakitUrl = ftsdkConfig.getDatakitUrl();
         datawayUrl = ftsdkConfig.getDatawayUrl();
         clientToken = ftsdkConfig.getClientToken();
+        compressType = ftsdkConfig.getUploadCompressType();
 
         if (!Utils.isNullOrEmpty(datakitUrl)) {
             LogUtils.d(TAG, "serverUrl ==>\nDatakit Url:" + datakitUrl);
@@ -81,6 +85,7 @@ public class FTHttpConfigManager {
                     + datawayUrl + ",clientToken:" + maskToken);
         }
 
+        LogUtils.d(TAG, "compressType:" + compressType.name());
 
     }
 
@@ -106,6 +111,10 @@ public class FTHttpConfigManager {
 
     public int getReadOutTime() {
         return readOutTime;
+    }
+
+    public HttpRequestCompression getCompressType() {
+        return compressType;
     }
 
     /**

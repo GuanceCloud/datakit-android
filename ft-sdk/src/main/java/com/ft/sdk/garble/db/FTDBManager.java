@@ -499,7 +499,6 @@ public class FTDBManager extends DBManager {
         getDB(true, new DataBaseCallBack() {
             @Override
             public void run(SQLiteDatabase db) {
-                long start = System.nanoTime();
                 String tableName = FTSQL.FT_TABLE_ACTION;
                 StringBuilder placeholders = new StringBuilder();
                 for (int i = 0; i < ids.length; i++) {
@@ -509,7 +508,6 @@ public class FTDBManager extends DBManager {
                     }
                 }
                 db.delete(tableName, FTSQL.RUM_COLUMN_ID + " IN (" + placeholders + ")", ids);
-                LogUtils.d(TAG, "cleanCloseActionDataWithIDs:count:" + ids.length + "," + +(System.nanoTime() - start) / 1000000);
             }
         });
     }
