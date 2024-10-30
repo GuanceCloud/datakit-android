@@ -10,7 +10,6 @@ import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
-import com.ft.sdk.HttpRequestCompression;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.bean.UserData;
@@ -47,7 +46,7 @@ public class DemoApplication extends BaseApplication {
                 .setCustomSyncPageSize(100)
                 .setOnlySupportMainProcess(CrossProcessSetting.isOnlyMainProcess(context))
                 .setNeedTransformOldCache(true)
-                .setCompressionForUpload(HttpRequestCompression.DEFLATE)
+                .setCompressIntakeRequests(true)
                 .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()));
         FTSdk.install(ftSDKConfig);
 

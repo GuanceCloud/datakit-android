@@ -45,7 +45,7 @@ public class FTSDKConfig {
     private int pageSize = SyncPageSize.MEDIUM.getValue();
 
     private int syncSleepTime = 0;
-    private HttpRequestCompression uploadCompressType = HttpRequestCompression.NONE;
+    private boolean compressIntakeRequests = false;
 
     /**
      * 服务名称 {@link Constants#KEY_SERVICE },默认为 {@link Constants#DEFAULT_SERVICE_NAME}
@@ -386,8 +386,8 @@ public class FTSDKConfig {
         return enableDataIntegerCompatible;
     }
 
-    public FTSDKConfig setCompressionForUpload(HttpRequestCompression uploadCompressType) {
-        this.uploadCompressType = uploadCompressType;
+    public FTSDKConfig setCompressIntakeRequests(boolean compressIntakeRequests) {
+        this.compressIntakeRequests = compressIntakeRequests;
         return this;
     }
 
@@ -399,11 +399,8 @@ public class FTSDKConfig {
         return this;
     }
 
-    public HttpRequestCompression getUploadCompressType() {
-        return uploadCompressType;
+    public boolean isCompressIntakeRequests() {
+        return compressIntakeRequests;
     }
 
-    public void setUploadCompressType(HttpRequestCompression uploadCompressType) {
-        this.uploadCompressType = uploadCompressType;
-    }
 }

@@ -2,7 +2,6 @@ package com.ft.sdk.garble.http;
 
 import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.compress.DeflateInterceptor;
-import com.ft.sdk.garble.compress.GzipInterceptor;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
@@ -35,15 +34,8 @@ public class OkHttpEngine implements INetEngine {
     public void defaultConfig(HttpBuilder httpBuilder) {
         if (client == null) {
             OkHttpClient.Builder builder = new OkHttpClient.Builder();
-            switch (FTHttpConfigManager.get().getCompressType()) {
-                case GZIP:
-                    builder.addInterceptor(new GzipInterceptor());
-                    break;
-                case DEFLATE:
-                    builder.addInterceptor(new DeflateInterceptor());
-                    break;
-                case NONE:
-                default:
+            if (FTHttpConfigManager.get().isCompressIntakeRequests()) {
+                builder.addInterceptor(new DeflateInterceptor());
             }
             client = builder
                     .connectTimeout(httpBuilder.getSendOutTime(), TimeUnit.MILLISECONDS)
