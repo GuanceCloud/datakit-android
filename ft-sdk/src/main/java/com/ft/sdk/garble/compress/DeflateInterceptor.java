@@ -13,7 +13,6 @@ import okio.DeflaterSink;
 import okio.Okio;
 
 public class DeflateInterceptor implements Interceptor {
-    final Deflater deflater = new Deflater();
 
     @Override
     public Response intercept(Chain chain) throws IOException {
@@ -42,11 +41,13 @@ public class DeflateInterceptor implements Interceptor {
 
             @Override
             public long contentLength() {
-                return -1; // 无法预先知道压缩后的数据长度
+                return -1;
             }
 
             @Override
             public void writeTo(BufferedSink sink) throws IOException {
+                Deflater deflater = new Deflater();//with zlib wrap
+//                Deflater deflater = new Deflater(Deflater.DEFAULT_COMPRESSION, true);//no zlib wrap
                 BufferedSink deflateSink = Okio.buffer(new DeflaterSink(sink, deflater));
                 body.writeTo(deflateSink);
                 deflateSink.close();
