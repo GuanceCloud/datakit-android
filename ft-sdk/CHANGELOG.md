@@ -1,3 +1,8 @@
+# agent 1.6.3
+1. 优化自定义 addAction 在高频率调用时的性能表现
+2. 支持使用  FTSDKConfig.setCompressIntakeRequests 对同步数据进行 deflate 压缩配置
+
+---
 # agent 1.6.3-beta03
 1. 优化已关闭并同步完毕的 action 的删除逻辑
 2. 支持同步数据 deflate 压缩
