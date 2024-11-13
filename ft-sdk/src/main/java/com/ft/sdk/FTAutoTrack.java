@@ -704,7 +704,7 @@ public class FTAutoTrack {
                 if (factory != null) {
                     builder.eventListenerFactory(factory);
                 } else {
-                    builder.eventListenerFactory(new FTResourceEventListener.FTFactory(config.isEnableResourceHostIP()));
+                    builder.eventListenerFactory(new FTResourceEventListener.FTFactory(config.isEnableResourceHostIP(), config.getResourceUrlHandler()));
                 }
             }
         }

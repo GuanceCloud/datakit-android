@@ -707,13 +707,12 @@ public class FTRUMInnerManager {
      * @param netStatusBean
      */
     void setNetState(String resourceId, NetStatusBean netStatusBean) {
-        LogUtils.d(TAG, "setNetState:" + resourceId);
-
         ResourceBean bean = resourceBeanMap.get(resourceId);
-
         if (bean == null) {
             LogUtils.e(TAG, "setNetState:" + resourceId + ",bean null");
             return;
+        } else {
+            LogUtils.d(TAG, "setNetState:" + resourceId);
         }
         bean.resourceDNS = netStatusBean.getDNSTime();
         bean.resourceSSL = netStatusBean.getSSLTime();
@@ -735,12 +734,12 @@ public class FTRUMInnerManager {
      * @param resourceId 资源 id
      */
     void putRUMResourcePerformance(final String resourceId) {
-        LogUtils.d(TAG, "putRUMResourcePerformance:" + resourceId);
         ResourceBean bean = resourceBeanMap.get(resourceId);
-
         if (bean == null) {
             LogUtils.e(TAG, "putRUMResourcePerformance:" + resourceId + ",bean null");
             return;
+        } else {
+            LogUtils.d(TAG, "putRUMResourcePerformance:" + resourceId);
         }
         long time = Utils.getCurrentNanoTime();
         String actionId = bean.actionId;
@@ -1315,7 +1314,7 @@ public class FTRUMInnerManager {
      * @param bean
      */
     void checkToAddResource(String key, ResourceBean bean) {
-        LogUtils.d(TAG, "checkToAddResource:" + key + ",header：" + bean.requestHeader + "," + bean.url);
+        //LogUtils.d(TAG, "checkToAddResource:" + key + ",header：" + bean.requestHeader + "," + bean.url);
         if (bean.contentSet && bean.netStateSet) {
             putRUMResourcePerformance(key);
         }

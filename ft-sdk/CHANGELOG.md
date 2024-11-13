@@ -1,6 +1,6 @@
 # agent 1.6.3-beta03
 1. 优化已关闭并同步完毕的 action 的删除逻辑
-2. 新增支持 gzip 和 deflate 压缩
+2. 支持同步数据 deflate 压缩
 
 ---
 # agent 1.6.3-beta02
