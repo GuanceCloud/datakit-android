@@ -451,6 +451,7 @@ public class FTRUMInnerManager {
             activeView.getProperty().putAll(property);
         }
         FTMonitorManager.get().attachMonitorData(activeView);
+        activeView.setTags(FTRUMConfigManager.get().getRUMPublicDynamicTags());
         activeView.close();
         closeView(activeView, callBack);
     }

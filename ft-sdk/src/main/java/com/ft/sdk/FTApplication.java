@@ -2,6 +2,8 @@ package com.ft.sdk;
 
 import android.app.Application;
 
+import com.ft.sdk.garble.utils.Utils;
+
 import java.lang.reflect.Method;
 
 /**
@@ -12,6 +14,7 @@ import java.lang.reflect.Method;
  * 避免后期被禁用使用的风险
  */
 public class FTApplication {
+    public static long APP_START_TIME = Utils.getCurrentNanoTime();
     private static volatile Application instance;
 
     public static Application getApplication() {

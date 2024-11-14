@@ -88,6 +88,11 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
 
     }
 
+    @Override
+    public void onActivityPostStarted(@NonNull Activity activity) {
+        mAppRestartCallback.onPostOnStart(activity);
+    }
+
     /**
      * {@link Activity#onResume()}  } 恢复事件
      * <p>
