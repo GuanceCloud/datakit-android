@@ -1,3 +1,7 @@
+# agent 1.6.4-alpha01
+1. 优化 App 启动时间在高版本系统中的统计时间
+2. 优化动态属性在页面上绑定的机制
+
 # agent 1.6.3
 1. 优化自定义 addAction 在高频率调用时的性能表现
 2. 支持使用  FTSDKConfig.setCompressIntakeRequests 对同步数据进行 deflate 压缩配置
