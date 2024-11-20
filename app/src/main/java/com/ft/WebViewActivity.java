@@ -1,11 +1,17 @@
 package com.ft;
 
+import android.content.Context;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.AdapterView;
@@ -16,11 +22,13 @@ import android.widget.Spinner;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.webkit.WebViewAssetLoader;
+import androidx.webkit.WebViewClientCompat;
 
 
 public class WebViewActivity extends AppCompatActivity {
     private WebView webView;         // visit
-//    private CustomWebView webView; // visit skip
+    //    private CustomWebView webView; // visit skip
     private Spinner spinner;
     private ProgressBar progressBar;
 
@@ -40,13 +48,37 @@ public class WebViewActivity extends AppCompatActivity {
 //                "https://www.toutiao.com/",
 //                "https://www.baidu.com/test",
 //                "https://www.csdn.net/",
+                "https://appassets.androidplatform.net/assets/browser_sdk_sample.html",
                 "file:///android_asset/local_sample.html",
                 "http://10.100.64.166/test/rum/"
         };
+        WebViewAssetLoader assetLoader = new WebViewAssetLoader.Builder()
+//                .setDomain("www.custom.net")
+//                .setHttpAllowed(true)
+                .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this))
+                .build();
+
+//        webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        webView.setWebViewClient(new WebViewClientCompat() {
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                return assetLoader.shouldInterceptRequest(request.getUrl());
+            }
+
+
+            @Override
+            @SuppressWarnings("deprecation") // for API < 21
+            public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+                return assetLoader.shouldInterceptRequest(Uri.parse(url));
+            }
+        });
+
+
         spinner.setAdapter(new ArrayAdapter(this, R.layout.spinner_item, R.id.textView, data));
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
                 webView.loadUrl(data[i]);
             }
 
@@ -55,9 +87,18 @@ public class WebViewActivity extends AppCompatActivity {
 
             }
         });
-        WebSettings webSettings = webView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+        WebSettings webViewSettings = webView.getSettings();
+        // Setting this off for security. Off by default for SDK versions >= 16.
+        webViewSettings.setAllowFileAccessFromFileURLs(false);
+        // Off by default, deprecated for SDK versions >= 30.
+        webViewSettings.setAllowUniversalAccessFromFileURLs(false);
+        // Keeping these off is less critical but still a good idea, especially if your app is not
+        // using file:// or content:// URLs.
+        webViewSettings.setAllowFileAccess(false);
+        webViewSettings.setAllowContentAccess(false);
+
+        webViewSettings.setJavaScriptEnabled(true);
+        webViewSettings.setJavaScriptCanOpenWindowsAutomatically(true);
         webView.clearCache(true);
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
@@ -78,23 +119,23 @@ public class WebViewActivity extends AppCompatActivity {
             }
 
         });
+//        setCookiePermission(this,webView);
     }
-//
-//    private void setCookiePermission(Context context, WebView webview) {
-//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-//            CookieSyncManager.createInstance(context);
-//        }
-//        CookieManager cookieManager = CookieManager.getInstance();
-//        CookieManager.setAcceptFileSchemeCookies(true);
-//        cookieManager.setAcceptCookie(true);// 允许接受 Cookie
-//        //>=LOLLIPOP 版本
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//            cookieManager.setAcceptThirdPartyCookies(webview, true);
-//            cookieManager.acceptThirdPartyCookies(webview);//跨域cookie读取
-//
-//
-//        }
-//    }
+
+
+    private void setCookiePermission(Context context, WebView webview) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            CookieSyncManager.createInstance(context);
+        }
+        CookieManager cookieManager = CookieManager.getInstance();
+        CookieManager.setAcceptFileSchemeCookies(true);// 这个方法官方不推荐，推荐使用 androidx.webkit.WebViewAssetLoader
+        cookieManager.setAcceptCookie(true);// 允许接受 Cookie
+        //>=LOLLIPOP 版本
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            cookieManager.setAcceptThirdPartyCookies(webview, true);
+            cookieManager.acceptThirdPartyCookies(webview);//跨域cookie读取
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
