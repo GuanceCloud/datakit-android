@@ -79,6 +79,22 @@ public class WebViewActivity extends AppCompatActivity {
 
         });
     }
+//
+//    private void setCookiePermission(Context context, WebView webview) {
+//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+//            CookieSyncManager.createInstance(context);
+//        }
+//        CookieManager cookieManager = CookieManager.getInstance();
+//        CookieManager.setAcceptFileSchemeCookies(true);
+//        cookieManager.setAcceptCookie(true);// 允许接受 Cookie
+//        //>=LOLLIPOP 版本
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            cookieManager.setAcceptThirdPartyCookies(webview, true);
+//            cookieManager.acceptThirdPartyCookies(webview);//跨域cookie读取
+//
+//
+//        }
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
