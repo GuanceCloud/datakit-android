@@ -8,7 +8,6 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 
 import com.ft.sdk.FTApplication;
 
@@ -87,7 +86,7 @@ public class NetUtils {
             if (Utils.hasPermission(context, Manifest.permission.READ_PHONE_STATE)) {
                 networkType = telephonyManager.getNetworkType();
             } else {
-                LogUtils.e(TAG, "没有获得到 READ_PHONE_STATE 权限无法获取运营商信息");
+                LogUtils.eOnce(TAG, "没有获得到 READ_PHONE_STATE 权限无法获取运营商信息");
             }
         } catch (Exception ex) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(ex));

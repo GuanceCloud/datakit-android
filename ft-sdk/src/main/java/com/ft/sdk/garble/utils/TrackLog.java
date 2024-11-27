@@ -9,65 +9,78 @@ import com.ft.sdk.TrackLogManager;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.Status;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 /**
  * create: by huangDianHua
  * time: 2020/6/15 18:17:25
  * description:该类仅供 AOP 方式插桩替换应用中的 android.util.Log 类
  */
 public class TrackLog {
+    private final static List<String> cachedList = new CopyOnWriteArrayList<>();
+
     /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
     public static int i(String tag, String msg) {
-        return showFullLog(true, tag, msg, LogType.I);
+        return showFullLog(true, tag, msg, LogType.I, false);
     }
 
     /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
     public static int i(String tag, String msg, Throwable e) {
-        return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e), LogType.I);
+        return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e), LogType.I, false);
     }
 
     /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
     public static int d(String tag, String msg) {
-        return showFullLog(true, tag, msg, LogType.D);
+        return showFullLog(true, tag, msg, LogType.D, false);
     }
 
     /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
     public static int d(String tag, String msg, Throwable e) {
-        return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e), LogType.D);
+        return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e), LogType.D, false);
     }
 
     /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
     public static int v(String tag, String msg) {
-        return showFullLog(true, tag, msg, LogType.V);
+        return showFullLog(true, tag, msg, LogType.V, false);
     }
 
     /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
     public static int v(String tag, String msg, Throwable e) {
-        return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e), LogType.V);
+        return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e), LogType.V, false);
     }
 
     /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
     public static int e(String tag, String msg) {
-        return showFullLog(true, tag, msg, LogType.E);
+        return showFullLog(true, tag, msg, LogType.E, false);
+    }
+
+    public static int e(String tag, String msg, boolean onlyOnce) {
+        return showFullLog(true, tag, msg, LogType.E, onlyOnce);
     }
 
     /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
     public static int e(String tag, String msg, Throwable e) {
-        return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e), LogType.E);
+        return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e), LogType.E, false);
     }
 
     /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
     public static int w(String tag, String msg) {
-        return showFullLog(true, tag, msg, LogType.W);
+        return showFullLog(true, tag, msg, LogType.W, false);
+    }
+
+    public static int w(String tag, String msg, boolean onlyOnce) {
+        return showFullLog(true, tag, msg, LogType.W, onlyOnce);
     }
 
     /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
     public static int w(String tag, String msg, Throwable e) {
-        return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e), LogType.W);
+        return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e), LogType.W, false);
     }
 
     /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
     public static int w(String tag, Throwable e) {
-        return showFullLog(true, tag, LogUtils.getStackTraceString(e), LogType.W);
+        return showFullLog(true, tag, LogUtils.getStackTraceString(e), LogType.W, false);
     }
 
     /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
@@ -111,11 +124,11 @@ public class TrackLog {
      * @param logType
      * @return
      */
-    public static int showFullLog(String TAG, String message, LogType logType) {
+    public static int showFullLog(String TAG, String message, LogType logType, boolean onlyOnce) {
         if (isSetInnerLogHandler()) {
             innerLogHandler.printInnerLog(logType.toString(), TAG, message);
         }
-        return showFullLog(false, TAG, message, logType);
+        return showFullLog(false, TAG, message, logType, onlyOnce);
     }
 
     /**
@@ -125,7 +138,12 @@ public class TrackLog {
      * @param logType
      * @return
      */
-    protected static int showFullLog(boolean upload, String TAG, String message, LogType logType) {
+    protected static int showFullLog(boolean upload, String TAG, String message,
+                                     LogType logType, boolean onlyOnce) {
+        if (onlyOnce && checkCached(message)) {
+            return 0;
+        }
+
         int segmentSize = 4 * 1024;
         int length = message != null ? message.length() : 0;
         if (length == 0) return 0;
@@ -219,4 +237,13 @@ public class TrackLog {
     enum LogType {
         I, D, E, V, W
     }
+
+    private static boolean checkCached(String message) {
+        if (!cachedList.contains(message)) {
+            cachedList.add(message);
+            return false;
+        }
+        return true;
+    }
+
 }
