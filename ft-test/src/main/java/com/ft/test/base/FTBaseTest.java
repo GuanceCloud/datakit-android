@@ -38,6 +38,8 @@ public class FTBaseTest {
     protected static final String CUSTOM_VALUE = "custom_value";
     protected static final String DYNAMIC_CUSTOM_KEY = "dynamic_custom_key";
     protected static final String DYNAMIC_CUSTOM_VALUE = "dynamic_custom_value";
+    protected static final String DYNAMIC_SINGLE_CUSTOM_KEY = "dynamic_custom_single_key";
+    protected static final String DYNAMIC_SINGLE_CUSTOM_VALUE = "dynamic_custom_single_value";
     protected static final String TEST_FAKE_RUM_ID = "rumId";
     protected static final String TEST_FAKE_URL = "http://www.test.url";
     protected static final String TEST_FAKE_CLIENT_TOKEN = "fake_client_token";

@@ -56,11 +56,13 @@ public class RUMGlobalContextTest extends FTBaseTest {
         HashMap<String, Object> map = new HashMap<>();
         map.put(DYNAMIC_CUSTOM_KEY, DYNAMIC_CUSTOM_VALUE);
         FTSdk.appendRUMGlobalContext(map);
+        FTSdk.appendRUMGlobalContext(DYNAMIC_SINGLE_CUSTOM_KEY, DYNAMIC_SINGLE_CUSTOM_VALUE);
 
     }
 
     /**
      * 生成 View 数据时，会把  globalContext 添加的数据一起输出
+     *
      * @throws Exception
      */
     @Test
@@ -70,7 +72,8 @@ public class RUMGlobalContextTest extends FTBaseTest {
         waitEventConsumeInThreadPool();
         Thread.sleep(3000L);
         Assert.assertTrue(CheckUtils.checkValueInLineProtocol(DataType.RUM_APP,
-                new String[]{CUSTOM_KEY, CUSTOM_VALUE, DYNAMIC_CUSTOM_KEY, DYNAMIC_CUSTOM_VALUE}));
+                new String[]{CUSTOM_KEY, CUSTOM_VALUE, DYNAMIC_CUSTOM_KEY, DYNAMIC_CUSTOM_VALUE,
+                        DYNAMIC_SINGLE_CUSTOM_KEY, DYNAMIC_SINGLE_CUSTOM_VALUE}));
     }
 
 

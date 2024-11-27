@@ -48,6 +48,7 @@ public class LogGlobalContextTest extends FTBaseTest {
         HashMap<String, Object> map = new HashMap<>();
         map.put(DYNAMIC_CUSTOM_KEY, DYNAMIC_CUSTOM_VALUE);
         FTSdk.appendLogGlobalContext(map);
+        FTSdk.appendLogGlobalContext(DYNAMIC_SINGLE_CUSTOM_KEY, DYNAMIC_SINGLE_CUSTOM_VALUE);
     }
 
     /**
@@ -58,7 +59,8 @@ public class LogGlobalContextTest extends FTBaseTest {
         FTLogger.getInstance().logBackground("test Log", Status.INFO);
         Thread.sleep(2000);
         Assert.assertTrue(CheckUtils.checkValueInLineProtocol(DataType.LOG,
-                new String[]{CUSTOM_KEY, CUSTOM_VALUE, DYNAMIC_CUSTOM_KEY, DYNAMIC_CUSTOM_VALUE}));
+                new String[]{CUSTOM_KEY, CUSTOM_VALUE, DYNAMIC_CUSTOM_KEY, DYNAMIC_CUSTOM_VALUE,
+                        DYNAMIC_SINGLE_CUSTOM_KEY, DYNAMIC_SINGLE_CUSTOM_VALUE}));
 
     }
 }
