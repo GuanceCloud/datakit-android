@@ -69,7 +69,7 @@ public class DemoApplication extends BaseApplication {
                 .setEnableTraceUserResource(true)
                 .setEnableTrackAppANR(true)
                 .setEnableTrackAppCrash(true)
-                .setEnableTrackAppUIBlock(true)
+                .setEnableTrackAppUIBlock(true,100)
                 .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
                 .setResourceUrlHandler(url -> false)
 //                .addGlobalContext("track_id", BuildConfig.TRACK_ID)

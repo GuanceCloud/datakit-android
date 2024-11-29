@@ -7,19 +7,24 @@ import com.ft.sdk.garble.utils.Utils;
 
 /**
  * 用于检测界面卡顿
+ *
  * @author Brandon
  */
 public class FTUIBlockManager {
     /**
      * 超过1秒显示卡顿
      */
-    private static final long TIME_BLOCK_NS = 1000000000L;
+    public static final long DEFAULT_TIME_BLOCK_MS = 1000L;
+    private static final long MINI_TIME_BLOCK_NS = 100000000L;
     private static final String PREFIX_METHOD_DISPATCH_START = ">>>>> Dispatching to ";
     private static final String PREFIX_METHOD_DISPATCH_END = "<<<<< Finished to ";
 
     private static class SingletonHolder {
         private static final FTUIBlockManager INSTANCE = new FTUIBlockManager();
     }
+
+    private long blockDurationNS;
+
 
     public static FTUIBlockManager get() {
         return FTUIBlockManager.SingletonHolder.INSTANCE;
@@ -35,7 +40,7 @@ public class FTUIBlockManager {
                 startTime = Utils.getCurrentNanoTime();
             } else if (x.startsWith(PREFIX_METHOD_DISPATCH_END)) {
                 long duration = Utils.getCurrentNanoTime() - startTime;
-                if (duration > TIME_BLOCK_NS) {
+                if (duration > blockDurationNS) {
                     FTRUMInnerManager.get().addLongTask(method, duration);
                 }
 
@@ -49,6 +54,7 @@ public class FTUIBlockManager {
 
     /**
      * 启动初始化
+     *
      * @param config
      */
     public void start(FTRUMConfig config) {
@@ -56,7 +62,7 @@ public class FTUIBlockManager {
                 && !config.isEnableTrackAppUIBlock()) {
             return;
         }
-
+        this.blockDurationNS = Math.max(config.getBlockDurationMS() * 1000000, MINI_TIME_BLOCK_NS);
         Looper.getMainLooper().setMessageLogging(printer);
     }
 

@@ -24,6 +24,11 @@ public class FTRUMConfig {
      * 设置是否检测 UI 卡顿
      */
     private boolean enableTrackAppUIBlock;
+
+    /**
+     * 设置检测阻塞时间范围 [100，),单位 ms,默认 1000 ms
+     */
+    private long blockDurationMS = FTUIBlockManager.DEFAULT_TIME_BLOCK_MS;
     /**
      * 设置是否检测 ANR
      */
@@ -193,6 +198,19 @@ public class FTRUMConfig {
      */
     public FTRUMConfig setEnableTrackAppUIBlock(boolean enableTrackAppUIBlock) {
         this.enableTrackAppUIBlock = enableTrackAppUIBlock;
+        return this;
+    }
+
+    /**
+     * 设置检测阻塞时间范围 [100，) 默认 1000 ms
+     *
+     * @param enableTrackAppUIBlock
+     * @param blockDurationMs       单位 ms,默认 1000 ms
+     * @return
+     */
+    public FTRUMConfig setEnableTrackAppUIBlock(boolean enableTrackAppUIBlock, long blockDurationMs) {
+        this.enableTrackAppUIBlock = enableTrackAppUIBlock;
+        this.blockDurationMS = blockDurationMs;
         return this;
     }
 
@@ -385,6 +403,10 @@ public class FTRUMConfig {
 
     public ExtraLogCatSetting getExtraLogCatWithANR() {
         return extraLogCatWithANR;
+    }
+
+    public long getBlockDurationMS() {
+        return blockDurationMS;
     }
 
     //    /**
