@@ -9,6 +9,7 @@ import com.ft.sdk.FTRUMInnerManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTrackInner;
+import com.ft.sdk.FTUIBlockManager;
 import com.ft.sdk.SyncDataHelper;
 import com.ft.sdk.SyncTaskManager;
 import com.ft.sdk.garble.bean.DataType;
@@ -109,7 +110,7 @@ public class FTBaseTest {
      * @param fileds
      * @throws Exception
      */
-    protected void invokeSyncData(DataType type, String measurement, HashMap<String,Object> tags, HashMap<String,Object> fileds) throws Exception {
+    protected void invokeSyncData(DataType type, String measurement, HashMap<String, Object> tags, HashMap<String, Object> fileds) throws Exception {
         Whitebox.invokeMethod(FTTrackInner.getInstance(), "syncDataBackground",
                 type, Utils.getCurrentNanoTime(), measurement, tags, fileds);
 
@@ -251,6 +252,25 @@ public class FTBaseTest {
      */
     public static FTSDKConfig getSDKConfigInSyncDataHelper() {
         return Whitebox.getInternalState(getInnerSyncDataHelper(), "config");
+    }
+
+    /**
+     * 获取当前 datahelper 中 config属性
+     * {@link FTTrackInner#dataHelper} 的 config
+     *
+     * @return
+     */
+    public static long getLongTaskBlockDurationMS() {
+        return (long) Whitebox.getInternalState(FTUIBlockManager.get(), "blockDurationNS") / 1000000;
+    }
+
+    /**
+     * 获取最小 longtask 判定最小限制数值
+     *
+     * @return
+     */
+    public static long getUIBlockMiniBlockDurationMS() {
+        return (long) Whitebox.getInternalState(FTUIBlockManager.class, "MINI_TIME_BLOCK_NS") / 1000000;
     }
 
     /**
