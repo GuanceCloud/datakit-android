@@ -1,3 +1,8 @@
+# agent 1.6.4
+1. 优化 App 启动时间在 API 24 以上统计时间
+2. 支持通过 `FTRUMConfig.setEnableTrackAppUIBlock(true, blockDurationMs)` 设置检测时间范围
+
+---
 # agent 1.6.4-beta01
 1. 同 1.6.4-alpha02
 ---
