@@ -29,6 +29,16 @@ public class ProductFlavorModel {
     private String appId;
 
     /**
+     * zip
+     */
+    private String zipPath;
+
+    /**
+     * 是否手动上传
+     */
+    private Boolean manualUpload;
+
+    /**
      * 应用开发环境
      */
     private String env;
@@ -72,6 +82,18 @@ public class ProductFlavorModel {
         return nativeLibPath;
     }
 
+    public String getZipPath() {
+        return zipPath;
+    }
+
+    public void setZipPath(String zipPath) {
+        this.zipPath = zipPath;
+    }
+
+    public Boolean isManualUpload() {
+        return manualUpload;
+    }
+
     public void setFromFTExtension(FTExtension extension) {
         this.env = extension.env;
         this.appId = extension.appId;
@@ -80,6 +102,7 @@ public class ProductFlavorModel {
         this.datakitUrl = extension.datakitUrl;
         this.datawayToken = extension.datawayToken;
         this.nativeLibPath = extension.nativeLibPath;
+        this.manualUpload = extension.manualUpload;
     }
 
     /**
@@ -113,6 +136,9 @@ public class ProductFlavorModel {
         if (this.nativeLibPath == null) {
             this.nativeLibPath = extension.nativeLibPath;
         }
+        if (this.manualUpload == null) {
+            this.manualUpload = extension.manualUpload;
+        }
     }
 
     @Override
@@ -125,6 +151,8 @@ public class ProductFlavorModel {
                 ", appId='" + appId + '\'' +
                 ", env='" + env + '\'' +
                 ", nativeLibPath='" + nativeLibPath + '\'' +
+                ", zipPath='" + zipPath + '\'' +
+                ", manualUpload='" + manualUpload + '\'' +
                 '}';
     }
 }
