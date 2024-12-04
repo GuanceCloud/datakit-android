@@ -1,3 +1,7 @@
+# plugin 1.3.4-alpha01
+1. 支持通过 manualUpload 配置只生成 sourcemap 文件
+
+---
 # plugin 1.3.3
 1. 优化 native symbol so 自动获取上传，支持自定义指定 nativeLibPath
 
