@@ -63,9 +63,9 @@ public class FTExtension {
     public String nativeLibPath = "";
 
     /**
-     * 是否手动上传
+     * 是否只生成 sourcemap
      */
-    public boolean manualUpload = false;
+    public boolean generateSourceMapOnly = false;
 
     /**
      * 发布版本 favor 配置，{@link ProductFlavorModel}
@@ -96,7 +96,7 @@ public class FTExtension {
                 ", appId='" + appId + '\'' +
                 ", env='" + env + '\'' +
                 ", asmVersion='" + asmVersion + '\'' +
-                ", manualUpload='" + manualUpload + '\'' +
+                ", generateSourceMapOnly='" + generateSourceMapOnly + '\'' +
                 '}';
     }
 }

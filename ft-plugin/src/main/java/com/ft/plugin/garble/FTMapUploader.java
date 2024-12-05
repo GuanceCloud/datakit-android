@@ -91,7 +91,7 @@ public class FTMapUploader {
                     })
                     .doLast(task -> {
                         ProductFlavorModel model = getFlavorModelFromName(variantName);
-                        Logger.debug("ProductFlavorModel:" + model);
+                        Logger.debug("ZipSourceMap:" + model);
 
                         if (!model.isAutoUploadMap() && !model.isAutoUploadNativeDebugSymbol()) {
                             return;
@@ -126,7 +126,7 @@ public class FTMapUploader {
                                 }
                                 FTFileUtils.zipFiles(new File(tmpBuildPath).listFiles(), new File(zipBuildPath));
                             }
-                            Logger.debug("task:" + assembleTaskName + " finish, zipPath:" + model.getZipPath());
+                            Logger.debug("ZipSourceMap:" + assembleTaskName + " finish, zipPath:" + model.getZipPath());
 
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -144,7 +144,6 @@ public class FTMapUploader {
                 //删除之前的 cache
                 try {
                     ObfuscationSettingConfig config = obfuscationSettingMap.get(assembleTaskName);
-                    Logger.debug("task:" + assembleTaskName + ",config:" + config);
                     if (config != null) {
                         uploadWithParams(config, model, zipBuildPath);
                     }
@@ -158,7 +157,7 @@ public class FTMapUploader {
                 project.afterEvaluate(p -> {
                     ProductFlavorModel model = getFlavorModelFromName(variantName);
                     p.getTasks().getAt(assembleTaskName).finalizedBy(zipTask);
-                    if (!model.isManualUpload()) {
+                    if (!model.isGenerateSourceMapOnly()) {
                         p.getTasks().getAt(assembleTaskName).finalizedBy(uploadTask);
                     }
                 });

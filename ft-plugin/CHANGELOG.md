@@ -1,3 +1,7 @@
+# plugin 1.3.4-alpha02
+1. 更改 manualUpload 为 generateSourceMapOnly，优化日志输出
+
+---
 # plugin 1.3.4-alpha01
 1. 支持通过 manualUpload 配置只生成 sourcemap 文件
 

@@ -34,9 +34,9 @@ public class ProductFlavorModel {
     private String zipPath;
 
     /**
-     * 是否手动上传
+     * 是否只生成 sourcemap
      */
-    private Boolean manualUpload;
+    private Boolean generateSourceMapOnly;
 
     /**
      * 应用开发环境
@@ -90,8 +90,8 @@ public class ProductFlavorModel {
         this.zipPath = zipPath;
     }
 
-    public Boolean isManualUpload() {
-        return manualUpload;
+    public Boolean isGenerateSourceMapOnly() {
+        return generateSourceMapOnly;
     }
 
     public void setFromFTExtension(FTExtension extension) {
@@ -102,7 +102,7 @@ public class ProductFlavorModel {
         this.datakitUrl = extension.datakitUrl;
         this.datawayToken = extension.datawayToken;
         this.nativeLibPath = extension.nativeLibPath;
-        this.manualUpload = extension.manualUpload;
+        this.generateSourceMapOnly = extension.generateSourceMapOnly;
     }
 
     /**
@@ -136,8 +136,8 @@ public class ProductFlavorModel {
         if (this.nativeLibPath == null) {
             this.nativeLibPath = extension.nativeLibPath;
         }
-        if (this.manualUpload == null) {
-            this.manualUpload = extension.manualUpload;
+        if (this.generateSourceMapOnly == null) {
+            this.generateSourceMapOnly = extension.generateSourceMapOnly;
         }
     }
 
@@ -152,7 +152,7 @@ public class ProductFlavorModel {
                 ", env='" + env + '\'' +
                 ", nativeLibPath='" + nativeLibPath + '\'' +
                 ", zipPath='" + zipPath + '\'' +
-                ", manualUpload='" + manualUpload + '\'' +
+                ", generateSourceZipOnly='" + generateSourceMapOnly + '\'' +
                 '}';
     }
 }
