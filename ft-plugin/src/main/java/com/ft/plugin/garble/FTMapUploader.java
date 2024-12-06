@@ -117,11 +117,15 @@ public class FTMapUploader {
                                 if (model.isAutoUploadNativeDebugSymbol()) {
                                     if (!symbolPaths.isEmpty()) {
                                         FTFileUtils.copyDifferentFolderFilesIntoOne(tmpBuildPath, symbolPaths.toArray(new String[0]));
+                                    } else {
+                                        Logger.error("not find native symbol path");
                                     }
                                 }
                                 if (model.isAutoUploadMap()) {
-                                    if (new File(config.mappingOutputPath).exists()) {
+                                    if (!config.mappingOutputPath.isEmpty() && new File(config.mappingOutputPath).exists()) {
                                         FTFileUtils.copyFile(new File(config.mappingOutputPath), new File(tmpBuildPath + "/mapping.txt"));
+                                    } else {
+                                        Logger.error("Mapping path empty or File not found");
                                     }
                                 }
                                 FTFileUtils.zipFiles(new File(tmpBuildPath).listFiles(), new File(zipBuildPath));
@@ -200,6 +204,9 @@ public class FTMapUploader {
                                     variantName);
                             Logger.debug("Map Config:" + config + ",task:" + task.getName());
                             obfuscationSettingMap.put(task.getName(), config);
+                        } else {
+                            obfuscationSettingMap.put(task.getName(), new ObfuscationSettingConfig());
+                            Logger.error("MinifyEnabled or Proguard Setting not found");
                         }
                     }
                 }
@@ -329,11 +336,11 @@ public class FTMapUploader {
         /**
          * 包名
          */
-        String applicationId;
+        String applicationId = "";
         /**
          * 版本号 字符 例如 1.0.0
          */
-        String versionName;
+        String versionName = "";
         /**
          * Build Code
          */
@@ -341,7 +348,7 @@ public class FTMapUploader {
         /**
          * map 输出地址
          */
-        String mappingOutputPath;
+        String mappingOutputPath = "";
 
         @Override
         public String toString() {

@@ -1,5 +1,6 @@
-# plugin 1.3.4-alpha02
-1. 更改 manualUpload 为 generateSourceMapOnly，优化日志输出
+# plugin 1.3.4-alpha03
+1. 优化错误日志输出
+2. 修改 minifyEnabled 未开启，影响 symbol 文件
 
 ---
 # plugin 1.3.4-alpha01
