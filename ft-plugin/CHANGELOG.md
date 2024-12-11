@@ -1,6 +1,12 @@
+# plugin 1.3.4
+1. 优化错误日志输出
+2. 修改 minifyEnabled 未开启，导致 sourcemap symbol 文件未生成的问题
+3. 支持通过 generateSourceMapOnly true，生成 sourcemap 但是不主动上传
+
+---
 # plugin 1.3.4-alpha03
 1. 优化错误日志输出
-2. 修改 minifyEnabled 未开启，影响 symbol 文件
+2. 修改 minifyEnabled 未开启，影响 symbol 文件生成的问题
 
 ---
 # plugin 1.3.4-alpha01
