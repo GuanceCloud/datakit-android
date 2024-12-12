@@ -1,3 +1,7 @@
+# agent 1.6.5-beta02
+1.修改默认 `FTRUMConfig.setRumCacheLimitCount(int)`默认参数数值
+
+---
 # agent 1.6.5-beta01
 1. 新增 RUM 条目数量限制功能，支持通过 `FTRUMConfig.setRumCacheLimitCount(int)` 来限制 SDK 最大缓存条目数据限制， 
  支持通过 `FTRUMConfig.setRumCacheDiscardStrategy(strategy)` 设置来指定丢弃新数据或丢弃旧数据
