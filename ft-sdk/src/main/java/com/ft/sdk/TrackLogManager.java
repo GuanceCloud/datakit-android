@@ -44,7 +44,7 @@ public class TrackLogManager {
      */
     public synchronized void trackLog(LogBean logBean, boolean isSilence) {
         //防止内存中队列容量超过一定限制，这里同样使用同步丢弃策略
-        if (logQueue.size() >= FTDBCachePolicy.get().getLimitCount()) {
+        if (logQueue.size() >= FTDBCachePolicy.get().getLogLimitCount()) {
             switch (FTDBCachePolicy.get().getLogCacheDiscardStrategy()) {
                 case DISCARD:
                     break;

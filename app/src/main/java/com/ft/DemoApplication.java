@@ -10,6 +10,7 @@ import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
+import com.ft.sdk.RUMCacheDiscard;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.bean.UserData;
@@ -41,7 +42,7 @@ public class DemoApplication extends BaseApplication {
     static void initFTSDK(Context context) {
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAWAY_URL, BuildConfig.CLIENT_TOKEN)
                 .setDebug(true)//设置是否是 debug
-                .setAutoSync(true)
+                .setAutoSync(false)
                 .setCustomSyncPageSize(100)
                 .setOnlySupportMainProcess(CrossProcessSetting.isOnlyMainProcess(context))
                 .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()));
@@ -75,6 +76,8 @@ public class DemoApplication extends BaseApplication {
                 .setEnableTrackAppANR(true)
                 .setEnableTrackAppCrash(true)
                 .setEnableTrackAppUIBlock(true)
+                .setRumCacheLimitCount(100)
+                .setRumCacheDiscardStrategy(RUMCacheDiscard.DISCARD_OLDEST)
                 .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
                 .setResourceUrlHandler(url -> false)
 //                .addGlobalContext("track_id", BuildConfig.TRACK_ID)

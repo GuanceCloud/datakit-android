@@ -134,6 +134,7 @@ public class FTSdk {
      */
     private void initFTConfig(FTSDKConfig config) {
         LogUtils.setDebug(config.isDebug());
+        LogUtils.setSDKLogLevel(config.getSdkLogLevel());
         FTHttpConfigManager.get().initParams(config);
         FTNetworkListener.get().monitor();
         appendGlobalContext(config);

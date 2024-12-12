@@ -97,6 +97,13 @@ public class FTRUMConfig {
      */
     private ExtraLogCatSetting extraLogCatWithANR;
 
+
+    private int rumCacheLimitCount = Constants.DEFAULT_DB_RUM_CACHE_NUM;
+
+
+    private RUMCacheDiscard rumCacheDiscardStrategy = RUMCacheDiscard.DISCARD;
+
+
     /**
      * 获取采样率
      *
@@ -151,6 +158,37 @@ public class FTRUMConfig {
 
     public boolean isEnableTrackAppCrash() {
         return enableTrackAppCrash;
+    }
+
+
+    public int getRumCacheLimitCount() {
+        return rumCacheLimitCount;
+    }
+
+    /**
+     * 设置 RUM 限制数量 [10000,),默认是 500000，{@link Constants#DEFAULT_DB_RUM_CACHE_NUM}
+     * @param rumCacheLimitCount
+     * @return
+     */
+    public FTRUMConfig setRumCacheLimitCount(int rumCacheLimitCount) {
+//        this.rumCacheLimitCount =  Math.max(500, rumCacheLimitCount);
+        this.rumCacheLimitCount =  rumCacheLimitCount;
+        return this;
+    }
+
+
+    public RUMCacheDiscard getRumCacheDiscardStrategy() {
+        return rumCacheDiscardStrategy;
+    }
+
+    /**
+     * 设置日志丢弃策略
+     * @param rumCacheDiscardStrategy
+     * @return
+     */
+    public FTRUMConfig setRumCacheDiscardStrategy(RUMCacheDiscard rumCacheDiscardStrategy) {
+        this.rumCacheDiscardStrategy = rumCacheDiscardStrategy;
+        return this;
     }
 
     /**

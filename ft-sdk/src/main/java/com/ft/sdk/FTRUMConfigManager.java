@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 
 import androidx.annotation.Nullable;
 
+import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.threadpool.RunnerCompleteCallBack;
@@ -67,6 +68,8 @@ public class FTRUMConfigManager {
      */
     void initWithConfig(FTRUMConfig config) {
         this.config = config;
+
+        FTDBCachePolicy.get().initRUMParam(config);
         FTRUMInnerManager.get().initParams(config);
         FTRUMGlobalManager.get().initConfig(config);
 //        FTAutoTrackConfigManager.get().initParams();

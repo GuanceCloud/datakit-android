@@ -31,6 +31,18 @@ public class FTSDKConfig {
      */
     private boolean isDebug;
 
+    private SDKLogLevel sdkLogLevel;
+
+    /**
+     * 设置日志等级，默认 {@link SDKLogLevel#V}
+     * @param logLevel
+     * @return
+     */
+    public FTSDKConfig setSdkLogLevel(SDKLogLevel logLevel) {
+        this.sdkLogLevel = logLevel;
+        return this;
+    }
+
     /**
      * 是否可访问 Android ID
      */
@@ -157,6 +169,12 @@ public class FTSDKConfig {
     public boolean isDebug() {
         return isDebug;
     }
+
+    public SDKLogLevel getSdkLogLevel() {
+        return sdkLogLevel;
+    }
+
+
 
     /**
      * @return 获取环境变量请问

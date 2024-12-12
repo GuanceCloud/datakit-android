@@ -212,7 +212,7 @@ public class LogTest extends FTBaseTest {
      */
     private void batchLog(int expectCount) throws InterruptedException {
         String logContent = "custom log";
-        FTDBCachePolicy.get().optCount(4990);
+        FTDBCachePolicy.get().optLogCount(4990);
         for (int i = 0; i < 20; i++) {
             FTLogger.getInstance().logBackground(i + "-" + logContent, Status.CRITICAL);
             Thread.sleep(10);

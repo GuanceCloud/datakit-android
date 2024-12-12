@@ -33,7 +33,7 @@ import java.util.List;
  */
 public class FTTrackInner {
     private final static String TAG = Constants.LOG_TAG_PREFIX + "FTTrackInner";
-    private static FTTrackInner instance;
+    private static volatile FTTrackInner instance;
 
     /**
      * 测试用例调用
@@ -103,7 +103,7 @@ public class FTTrackInner {
     void rum(long time, String measurement, final JSONObject tags, JSONObject fields, RunnerCompleteCallBack callBack) {
         String sessionId = tags.optString(Constants.KEY_RUM_SESSION_ID);
         if (FTRUMInnerManager.get().checkSessionWillCollect(sessionId)) {
-            syncDataBackground(DataType.RUM_APP, time, measurement, tags, fields, callBack);
+            syncRUMDataBackground(DataType.RUM_APP, time, measurement, tags, fields, callBack);
         }
     }
 
@@ -118,7 +118,7 @@ public class FTTrackInner {
     void rumWebView(long time, String measurement, final JSONObject tags, JSONObject fields) {
         String sessionId = tags.optString(Constants.KEY_RUM_SESSION_ID);
         if (FTRUMInnerManager.get().checkSessionWillCollect(sessionId)) {
-            syncDataBackground(DataType.RUM_WEBVIEW, time, measurement, tags, fields);
+            syncRUMDataBackground(DataType.RUM_WEBVIEW, time, measurement, tags, fields);
         }
     }
 
@@ -133,9 +133,9 @@ public class FTTrackInner {
      * @param tags
      * @param fields
      */
-    private void syncDataBackground(final DataType dataType, final long time,
-                                    final String measurement, final JSONObject tags, final JSONObject fields) {
-        syncDataBackground(dataType, time, measurement, tags, fields, null);
+    private void syncRUMDataBackground(final DataType dataType, final long time,
+                                       final String measurement, final JSONObject tags, final JSONObject fields) {
+        syncRUMDataBackground(dataType, time, measurement, tags, fields, null);
     }
 
     /**
@@ -148,21 +148,26 @@ public class FTTrackInner {
      * @param fields
      * @param callBack
      */
-    private void syncDataBackground(final DataType dataType, final long time,
-                                    final String measurement, final JSONObject tags, final JSONObject fields, RunnerCompleteCallBack callBack) {
+    private void syncRUMDataBackground(final DataType dataType, final long time,
+                                       final String measurement, final JSONObject tags, final JSONObject fields, RunnerCompleteCallBack callBack) {
         DataUploaderThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
                 try {
-
                     SyncJsonData recordData = SyncJsonData.getSyncJsonData(dataType,
                             new LineProtocolBean(measurement, tags, fields, time));
-                    boolean result = FTDBManager.get().insertFtOperation(recordData);
-                    LogUtils.d(TAG, "syncDataBackground:" + measurement + " " + dataType.toString() + ":insert=" + result);
-                    if (callBack != null) {
-                        callBack.onComplete();
+                    if (judgeRUMCachePolicy()) {
+                        boolean result = FTDBManager.get().insertFtOperation(recordData);
+                        LogUtils.d(TAG, "syncDataBackground:" + measurement + " "
+                                + dataType.toString() + ":insert=" + result);
+                        if (callBack != null) {
+                            callBack.onComplete();
+                        }
+                        SyncTaskManager.get().executeSyncPoll();
+                    } else {
+                        LogUtils.e(TAG, "syncDataBackground:" + measurement + " "
+                                + dataType.toString() + ",drop by Cache limit");
                     }
-                    SyncTaskManager.get().executeSyncPoll();
                 } catch (Exception e) {
                     LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                 }
@@ -308,6 +313,30 @@ public class FTTrackInner {
             LogUtils.e(TAG, "reach log limit, drop log count:" + length);
         }
     }
+
+    private long rumDropCount = 0;
+
+    /**
+     * 判断 RUM 执行同步策略
+     */
+    private boolean judgeRUMCachePolicy() {
+        int policyStatus = FTDBCachePolicy.get().optRUMCachePolicy(1);
+        if (policyStatus >= 0) {//执行同步策略
+            if (rumDropCount > 0) {
+                LogUtils.e(TAG, "drop rum count in total:" + rumDropCount);
+            }
+            rumDropCount = 0;
+            return true;
+        } else {
+            if (rumDropCount > Long.MAX_VALUE - 1) {
+                LogUtils.e(TAG, "drop rum count in total:" + rumDropCount + ", reach Long.MAX_VALUE reset");
+                rumDropCount = 0;
+            }
+            rumDropCount++;
+            return false;
+        }
+    }
+
 
     SyncDataHelper getCurrentDataHelper() {
         return dataHelper;

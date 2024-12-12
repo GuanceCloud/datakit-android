@@ -30,7 +30,7 @@ public class FTLoggerConfigManager {
     void initWithConfig(FTLoggerConfig config) {
         this.config = config;
 
-        FTDBCachePolicy.get().initParam(config);
+        FTDBCachePolicy.get().initLogParam(config);
         FTLogger.getInstance().init(config);
         FTTrackInner.getInstance().initLogConfig(config);
 

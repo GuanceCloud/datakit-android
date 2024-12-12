@@ -222,7 +222,7 @@ public class SyncTaskManager {
      */
     void executeSyncPoll() {
         if (autoSync) {
-            if (FTDBCachePolicy.get().reachHalfLimit()) {
+            if (FTDBCachePolicy.get().reachLogHalfLimit() || FTDBCachePolicy.get().reachRumHalfLimit()) {
                 if (!running) {
                     LogUtils.w(TAG, "Rapid Log Growth，Start to Sync ");
                     mHandler.removeMessages(MSG_SYNC);
@@ -268,7 +268,9 @@ public class SyncTaskManager {
                     if (dataSyncMaxRetryCount == 0 || (code >= 200 && code < 500)) {
                         SyncTaskManager.this.deleteLastQuery(requestDataList);
                         if (dataType == DataType.LOG) {
-                            FTDBCachePolicy.get().optCount(-requestDataList.size());
+                            FTDBCachePolicy.get().optLogCount(-requestDataList.size());
+                        } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_WEBVIEW) {
+                            FTDBCachePolicy.get().optRUMCount(-requestDataList.size());
                         }
                         errorCount.set(0);
                         if ((dataSyncMaxRetryCount == 0 && code != 200) || code > 200) {
@@ -366,9 +368,9 @@ public class SyncTaskManager {
             case LOG:
                 model = Constants.URL_MODEL_LOG;
                 break;
-            default:
             case RUM_APP:
             case RUM_WEBVIEW:
+            default:
                 model = Constants.URL_MODEL_RUM;
                 break;
         }
