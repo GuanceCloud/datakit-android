@@ -614,14 +614,18 @@ public class FTDBManager extends DBManager {
      * @return
      */
     public int queryTotalCount(final DataType dataType) {
+        return queryTotalCount(new DataType[]{dataType});
+    }
+
+    public int queryTotalCount(DataType[] list) {
         final int[] count = new int[1];
         getDB(false, new DataBaseCallBack() {
             @Override
             public void run(SQLiteDatabase db) {
                 try {
+                    String where = getDataTypeWhereString(list);
                     Cursor cursor = db.rawQuery("select count(*) from "
-                            + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " where " + FTSQL.RECORD_COLUMN_DATA_TYPE
-                            + "='" + dataType.getValue() + "'", null);
+                            + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " where " + where, null);
                     cursor.moveToFirst();
                     count[0] = cursor.getInt(0);
                     cursor.close();
@@ -633,6 +637,17 @@ public class FTDBManager extends DBManager {
         return count[0];
     }
 
+    private String getDataTypeWhereString(DataType[] list) {
+        StringBuilder where = new StringBuilder();
+        for (int i = 0; i < list.length; i++) {
+            where.append(FTSQL.RECORD_COLUMN_DATA_TYPE + "='").append(list[i].getValue()).append("'");
+            if (i < list.length - 1) {
+                where.append(" OR ");
+            }
+        }
+        return where.toString();
+    }
+
     /**
      * 删除数据表中的前 limit 行数的数据
      *
@@ -641,11 +656,17 @@ public class FTDBManager extends DBManager {
      * @return
      */
     public void deleteOldestData(final DataType type, final int limit) {
+        deleteOldestData(new DataType[]{type}, limit);
+    }
+
+    public void deleteOldestData(DataType[] list, final int limit) {
         getDB(true, new DataBaseCallBack() {
             @Override
             public void run(SQLiteDatabase db) {
                 try {
-                    db.execSQL("DELETE FROM " + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " where _id in (SELECT _id from " + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " where " + FTSQL.RECORD_COLUMN_DATA_TYPE + "='" + type.getValue() + "' ORDER by tm ASC LIMIT " + limit + ")");
+                    String where = getDataTypeWhereString(list);
+                    db.execSQL("DELETE FROM " + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " where _id in (SELECT _id from "
+                            + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " where " + where + " ORDER by tm ASC LIMIT " + limit + ")");
                 } catch (Exception e) {
                     LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 

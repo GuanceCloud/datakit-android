@@ -110,14 +110,14 @@ public class ConfigTest extends FTBaseTest {
         FTSdk.install(getDatakitConfig());
         FTSdk.initLogWithConfig(new FTLoggerConfig());
         //default
-        Assert.assertEquals(Constants.DEFAULT_DB_LOG_CACHE_NUM, FTDBCachePolicy.get().getLimitCount());
+        Assert.assertEquals(Constants.DEFAULT_DB_LOG_CACHE_NUM, FTDBCachePolicy.get().getLogLimitCount());
 
         FTSdk.initLogWithConfig(new FTLoggerConfig().setLogCacheLimitCount(0));
-        Assert.assertEquals(Constants.MINI_DB_LOG_CACHE_NUM, FTDBCachePolicy.get().getLimitCount());
+        Assert.assertEquals(Constants.MINI_DB_LOG_CACHE_NUM, FTDBCachePolicy.get().getLogLimitCount());
 
         int customCount = 10000;
         FTSdk.initLogWithConfig(new FTLoggerConfig().setLogCacheLimitCount(customCount));
-        Assert.assertEquals(customCount, FTDBCachePolicy.get().getLimitCount());
+        Assert.assertEquals(customCount, FTDBCachePolicy.get().getLogLimitCount());
 
     }
 

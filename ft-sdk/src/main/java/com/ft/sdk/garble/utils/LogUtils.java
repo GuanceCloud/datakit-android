@@ -7,6 +7,7 @@ import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTInnerLogHandler;
 import com.ft.sdk.FTLogger;
 import com.ft.sdk.FTLoggerConfig;
+import com.ft.sdk.SDKLogLevel;
 import com.ft.sdk.garble.manager.LogFileHelper;
 
 import java.io.File;
@@ -32,6 +33,9 @@ public class LogUtils {
      * 是否为调试模式，为 true 时，输出控制台日志
      */
     private static boolean mDebug = true;
+
+    private static SDKLogLevel currentLevel = SDKLogLevel.V;
+
     /**
      *
      */
@@ -41,84 +45,90 @@ public class LogUtils {
         mDebug = debug;
     }
 
+    public static void setSDKLogLevel(SDKLogLevel logLevel) {
+        if (logLevel != null) {
+            currentLevel = logLevel;
+        }
+    }
+
     public static void setDescLogShow(boolean aliasLogShow) {
         LogUtils.aliasLogShow = aliasLogShow;
     }
 
     public static void i(String tag, String message) {
-        i(tag, message, mDebug);
+        i(tag, message, currentLevel.ordinal() <= SDKLogLevel.I.ordinal() && mDebug);
     }
 
     public static void d(String tag, String message) {
-        d(tag, message, mDebug);
+        d(tag, message, currentLevel.ordinal() <= SDKLogLevel.D.ordinal() && mDebug);
     }
 
     public static void e(String tag, String message) {
-        e(tag, message, mDebug);
+        e(tag, message, currentLevel.ordinal() <= SDKLogLevel.E.ordinal() && mDebug);
     }
 
     public static void eOnce(String tag, String message) {
-        eOnce(tag, message, mDebug);
+        eOnce(tag, message, currentLevel.ordinal() <= SDKLogLevel.E.ordinal() && mDebug);
     }
 
     public static void v(String tag, String message) {
-        v(tag, message, mDebug);
+        v(tag, message, currentLevel.ordinal() <= SDKLogLevel.V.ordinal() && mDebug);
     }
 
     public static void w(String tag, String message) {
-        w(tag, message, mDebug);
+        w(tag, message, currentLevel.ordinal() <= SDKLogLevel.W.ordinal() && mDebug);
     }
 
     public static void wOnce(String tag, String message) {
-        wOnce(tag, message, mDebug);
+        wOnce(tag, message, currentLevel.ordinal() <= SDKLogLevel.W.ordinal() && mDebug);
     }
 
     public static void i(String tag, String message, boolean showLog) {
         if (showLog) {
-            showFullLog(tag, message, TrackLog.LogType.I, false);
+            showFullLog(tag, message, SDKLogLevel.I, false);
         }
     }
 
     public static void d(String tag, String message, boolean showLog) {
         if (showLog) {
-            showFullLog(tag, message, TrackLog.LogType.D, false);
+            showFullLog(tag, message, SDKLogLevel.D, false);
         }
     }
 
     public static void e(String tag, String message, boolean showLog) {
         if (showLog) {
-            showFullLog(tag, message, TrackLog.LogType.E, false);
+            showFullLog(tag, message, SDKLogLevel.E, false);
         }
     }
 
     private static void eOnce(String tag, String message, boolean showLog) {
         if (showLog) {
-            showFullLog(tag, message, TrackLog.LogType.E, true);
+            showFullLog(tag, message, SDKLogLevel.E, true);
         }
     }
 
     public static void v(String tag, String message, boolean showLog) {
         if (showLog) {
-            showFullLog(tag, message, TrackLog.LogType.V, false);
+            showFullLog(tag, message, SDKLogLevel.V, false);
         }
     }
 
     public static void w(String tag, String message, boolean showLog) {
         if (showLog) {
-            showFullLog(tag, message, TrackLog.LogType.W, false);
+            showFullLog(tag, message, SDKLogLevel.W, false);
         }
     }
 
     private static void wOnce(String tag, String message, boolean showLog) {
         if (showLog) {
-            showFullLog(tag, message, TrackLog.LogType.W, true);
+            showFullLog(tag, message, SDKLogLevel.W, true);
         }
     }
 
 
     public static void showAlias(String message) {
         if (aliasLogShow) {
-            showFullLog(TAG, message, TrackLog.LogType.D, false);
+            showFullLog(TAG, message, SDKLogLevel.D, false);
         }
     }
 
