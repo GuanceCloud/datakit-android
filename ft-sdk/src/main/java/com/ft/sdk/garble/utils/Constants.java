@@ -134,7 +134,7 @@ public class Constants {
     /**
      * RUM 最大限制缓存数，默认 50000，Action，View，LongTask，Resource，理论大小是 100MB
      */
-    public static final int DEFAULT_DB_RUM_CACHE_NUM = 500000;
+    public static final int DEFAULT_DB_RUM_CACHE_NUM = 500_000;
 
     /**
      * 日志缓存最小缓存数限制

@@ -1,6 +1,7 @@
 # agent 1.6.5-beta01
-1. 新增 RUM 条目数量限制功能
-
+1. 新增 RUM 条目数量限制功能，支持通过 `FTRUMConfig.setRumCacheLimitCount(int)` 来限制 SDK 最大缓存条目数据限制， 
+ 支持通过 `FTRUMConfig.setRumCacheDiscardStrategy(strategy)` 设置来指定丢弃新数据或丢弃旧数据
+2. 新增 SDK 内部日志等级过滤功能
 ---
 # agent 1.6.4
 1. 优化 App 启动时间在 API 24 以上的统计
