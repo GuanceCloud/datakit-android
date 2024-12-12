@@ -1,3 +1,7 @@
+# agent 1.6.5-beta01
+1. 新增 RUM 条目数量限制功能
+
+---
 # agent 1.6.4
 1. 优化 App 启动时间在 API 24 以上的统计
 2. 支持通过 `FTRUMConfig.setEnableTrackAppUIBlock(true, blockDurationMs)` 设置检测时间范围
