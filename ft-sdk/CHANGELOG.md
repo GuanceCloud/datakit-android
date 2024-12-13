@@ -1,3 +1,10 @@
+# agent 1.5.3
+1. 处理在使用 ft-plugin 时，调用 Log.w(String,Throwable) 引发异常的问题
+2. 新增 RUM 条目数量限制功能，支持通过 `FTRUMConfig.setRumCacheLimitCount(int)` 来限制 SDK 最大缓存条目数据限制，默认数量为 100_000
+   支持通过 `FTRUMConfig.setRumCacheDiscardStrategy(strategy)` 设置来指定丢弃新数据或丢弃旧数据
+3. 新增 SDK 内部日志等级过滤功能
+
+---
 # agent 1.5.3-beta02
 1. 修改 `FTRUMConfig.setRumCacheLimitCount(int)` 默认数量为 100_000
 
