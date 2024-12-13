@@ -156,17 +156,24 @@ public class FTTrackInner {
                 try {
                     SyncJsonData recordData = SyncJsonData.getSyncJsonData(dataType,
                             new LineProtocolBean(measurement, tags, fields, time));
-                    if (judgeRUMCachePolicy()) {
-                        boolean result = FTDBManager.get().insertFtOperation(recordData);
-                        LogUtils.d(TAG, "syncDataBackground:" + measurement + " "
-                                + dataType.toString() + ":insert=" + result);
-                        if (callBack != null) {
-                            callBack.onComplete();
-                        }
-                        SyncTaskManager.get().executeSyncPoll();
-                    } else {
-                        LogUtils.e(TAG, "syncDataBackground:" + measurement + " "
-                                + dataType.toString() + ",drop by Cache limit");
+                    int status = FTDBCachePolicy.get().optRUMCachePolicy(1);
+                    switch (status) {
+                        case 0:
+                        case 1:
+                            boolean result = FTDBManager.get().insertFtOperation(recordData);
+                            LogUtils.d(TAG, "syncDataBackground:" + measurement + " "
+                                    + dataType.toString() + ":insert=" + result
+                                    + (status == 0 ? ",drop OldCache" : ""));
+                            if (callBack != null) {
+                                callBack.onComplete();
+                            }
+                            SyncTaskManager.get().executeSyncPoll();
+                            break;
+                        case -1:
+                            LogUtils.e(TAG, "syncDataBackground:" + measurement + " "
+                                    + dataType.toString() + ",drop by Cache limit");
+                            break;
+
                     }
                 } catch (Exception e) {
                     LogUtils.e(TAG, LogUtils.getStackTraceString(e));
@@ -313,30 +320,6 @@ public class FTTrackInner {
             LogUtils.e(TAG, "reach log limit, drop log count:" + length);
         }
     }
-
-    private long rumDropCount = 0;
-
-    /**
-     * 判断 RUM 执行同步策略
-     */
-    private boolean judgeRUMCachePolicy() {
-        int policyStatus = FTDBCachePolicy.get().optRUMCachePolicy(1);
-        if (policyStatus >= 0) {//执行同步策略
-            if (rumDropCount > 0) {
-                LogUtils.e(TAG, "drop rum count in total:" + rumDropCount);
-            }
-            rumDropCount = 0;
-            return true;
-        } else {
-            if (rumDropCount > Long.MAX_VALUE - 1) {
-                LogUtils.e(TAG, "drop rum count in total:" + rumDropCount + ", reach Long.MAX_VALUE reset");
-                rumDropCount = 0;
-            }
-            rumDropCount++;
-            return false;
-        }
-    }
-
 
     SyncDataHelper getCurrentDataHelper() {
         return dataHelper;
