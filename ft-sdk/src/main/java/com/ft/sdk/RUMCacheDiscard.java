@@ -2,11 +2,11 @@ package com.ft.sdk;
 
 public enum RUMCacheDiscard {
     /**
-     * 丢弃前置,默认
+     * 丢弃新数据,默认
      */
     DISCARD,
     /**
-     * 丢弃后置
+     * 丢弃老数据
      */
     DISCARD_OLDEST
 }
