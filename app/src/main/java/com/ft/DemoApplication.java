@@ -10,6 +10,7 @@ import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
+import com.ft.sdk.LogCacheDiscard;
 import com.ft.sdk.RUMCacheDiscard;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.Status;
@@ -34,7 +35,7 @@ public class DemoApplication extends BaseApplication {
     public void onCreate() {
         super.onCreate();
         if (!BuildConfig.LAZY_INIT) {
-            LogUtils.registerInnerLogCacheToFile();
+//            LogUtils.registerInnerLogCacheToFile();
             initFTSDK(this);
         }
     }
@@ -42,8 +43,8 @@ public class DemoApplication extends BaseApplication {
     static void initFTSDK(Context context) {
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAWAY_URL, BuildConfig.CLIENT_TOKEN)
                 .setDebug(true)//设置是否是 debug
-                .setAutoSync(false)
-                .setCustomSyncPageSize(100)
+                .setAutoSync(true)
+                .setCustomSyncPageSize(200)
                 .setOnlySupportMainProcess(CrossProcessSetting.isOnlyMainProcess(context))
                 .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()));
         FTSdk.install(ftSDKConfig);
@@ -52,7 +53,8 @@ public class DemoApplication extends BaseApplication {
                 .setSamplingRate(1f)
                 .setEnableCustomLog(true)
                 .setEnableConsoleLog(true)
-                .setLogCacheLimitCount(10000)
+//                .setLogCacheLimitCount(1000)
+                .setLogCacheDiscardStrategy(LogCacheDiscard.DISCARD_OLDEST)
                 .setPrintCustomLogToConsole(true)
                 .setLogLevelFilters(new Status[]{Status.ERROR, Status.DEBUG})
                 .setEnableLinkRumData(true)
@@ -69,15 +71,16 @@ public class DemoApplication extends BaseApplication {
 
         FTSdk.initRUMWithConfig(new FTRUMConfig()
                 .setSamplingRate(1f)
-                .setRumAppId(BuildConfig.RUM_APP_ID)
+                .setRumAppId("gee_test")
+                .addGlobalContext("test_flag", "old_data")
                 .setEnableTraceUserAction(true)
                 .setEnableTraceUserView(true)
                 .setEnableTraceUserResource(true)
                 .setEnableTrackAppANR(true)
                 .setEnableTrackAppCrash(true)
                 .setEnableTrackAppUIBlock(true)
-                .setRumCacheLimitCount(100)
-                .setRumCacheDiscardStrategy(RUMCacheDiscard.DISCARD_OLDEST)
+                .setRumCacheLimitCount(5000000)
+//                .setRumCacheDiscardStrategy(RUMCacheDiscard.DISCARD_OLDEST)
                 .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
                 .setResourceUrlHandler(url -> false)
 //                .addGlobalContext("track_id", BuildConfig.TRACK_ID)

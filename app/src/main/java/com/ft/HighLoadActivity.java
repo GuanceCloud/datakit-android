@@ -23,11 +23,11 @@ public class HighLoadActivity extends NameTitleActivity {
     /**
      * 36000/2，并发一个线程 http 数量
      */
-    private static final int HTTP_DATA_COUNT = 18000;
+    private static final int HTTP_DATA_COUNT = 500;
     /**
      * 360000/2，并发线程一个线程日志量
      */
-    private static final int LOG_DATA_COUNT = 180000;
+    private static final int LOG_DATA_COUNT = 500;
     /**
      * 1000/50，并发2线程平均 10 ms 一次
      */
