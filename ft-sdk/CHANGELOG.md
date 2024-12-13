@@ -1,5 +1,9 @@
+# agent 1.6.5-beta03
+1.修改默认 `FTRUMConfig.setRumCacheLimitCount(int)`默认参数数值, 100_000
+
+---
 # agent 1.6.5-beta02
-1.修改默认 `FTRUMConfig.setRumCacheLimitCount(int)`默认参数数值
+1.修改默认 `FTRUMConfig.setRumCacheLimitCount(int)`默认参数数值, 200_000
 
 ---
 # agent 1.6.5-beta01
