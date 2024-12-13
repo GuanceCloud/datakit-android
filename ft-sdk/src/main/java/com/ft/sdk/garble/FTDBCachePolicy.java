@@ -175,15 +175,11 @@ public class FTDBCachePolicy {
             }
         } else {
             int needInsert = 0;
-            int real = FTDBManager.get().queryTotalCount(new DataType[]{DataType.RUM_APP, DataType.RUM_WEBVIEW});
-            LogUtils.d("TAG", real + ":" + rumCount);
-
             if (rumCount + limit >= rumLimitCount) {
                 needInsert = rumLimitCount - rumCount;
                 status = limit - needInsert;
                 limit = needInsert;
             }
-            LogUtils.d("TAG", "optRUMCount：" + limit);
             optRUMCount(limit);
         }
         return status;

@@ -140,9 +140,9 @@ public class Constants {
     public static final int DEFAULT_DB_LOG_CACHE_NUM = 5000;
 
     /**
-     * RUM 最大限制缓存数，默认 20000，Action，View，LongTask，Resource，理论大小是 400MB 左右
+     * RUM 最大限制缓存数，默认 10000，Action，View，LongTask，Resource，理论大小是 200MB 左右，如果是网络 Error 数据大约是 400MB
      */
-    public static final int DEFAULT_DB_RUM_CACHE_NUM = 200000;
+    public static final int DEFAULT_DB_RUM_CACHE_NUM = 100000;
 
     /**
      * 日志缓存最小缓存数限制
