@@ -98,6 +98,7 @@ public class SyncTaskManager {
      * 同步消息
      */
     private static final int MSG_SYNC = 1;
+    private static final int MSG_CLOSE_DB = 2;
 
     /**
      * 最大错误尝试次数，超出之后，队列数据将停止，等待下次同步触发
@@ -129,6 +130,8 @@ public class SyncTaskManager {
             super.handleMessage(msg);
             if (msg.what == MSG_SYNC) {
                 executePoll(true);
+            } else if (msg.what == MSG_CLOSE_DB) {
+                FTDBManager.get().closeDB();
             }
         }
     };
@@ -209,7 +212,9 @@ public class SyncTaskManager {
                         }
                     } finally {
                         running = false;
-                        FTDBManager.get().closeDB();
+                        mHandler.removeMessages(MSG_CLOSE_DB);
+                        LogUtils.d(TAG,"Try to close DB");
+                        mHandler.sendEmptyMessageDelayed(MSG_CLOSE_DB, 1000);
                         LogUtils.d(TAG, "<<<******************* Sync Poll Finish *******************\n");
                     }
                 }

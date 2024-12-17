@@ -27,6 +27,18 @@ public class FTDBCachePolicy {
      */
     private final AtomicInteger rumCount = new AtomicInteger(0);
 
+    private final Object rumLock = new Object();
+
+    private final Object logLock = new Object();
+
+    public Object getRumLock() {
+        return rumLock;
+    }
+
+    public Object getLogLock() {
+        return logLock;
+    }
+
     /**
      * 日志限制数量
      */
@@ -135,7 +147,7 @@ public class FTDBCachePolicy {
      *
      * @return -1-表示直接丢弃，0-表示可以插入数据，n>0 表示需要删除 n 条数据
      */
-    public  int optLogCachePolicy(int limit) {
+    public int optLogCachePolicy(int limit) {
         int status = 0;
         int currentLogCount = logCount.get();
         if (currentLogCount >= logLimitCount) {//当数据量大于配置的数据库最大存储量时，执行丢弃策略
@@ -172,10 +184,10 @@ public class FTDBCachePolicy {
                 status = -1;
             } else if (rumCacheDiscardStrategy == RUMCacheDiscard.DISCARD_OLDEST) {//丢弃数据库中的前几条数据
                 FTDBManager.get().deleteOldestData(new DataType[]{DataType.RUM_APP, DataType.RUM_WEBVIEW}, limit);
+                rumCount.set(FTDBManager.get().queryTotalCount(new DataType[]{DataType.RUM_APP, DataType.RUM_WEBVIEW}));
                 status = 0;
             }
         } else {
-            optRUMCount(limit);
             status = 1;
         }
         return status;
