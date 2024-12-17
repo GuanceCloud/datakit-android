@@ -317,6 +317,7 @@ public class FTTrackInner {
                     LogUtils.e(TAG, "reach log limit, drop log count:" + dropCount);
                 }
                 boolean result = FTDBManager.get().insertFtOptList(recordDataList);
+                FTDBCachePolicy.get().optLogCount(recordDataList.size());
                 LogUtils.d(TAG, "judgeLogCachePolicy:insert-result=" + result);
                 if (!silence) {
                     SyncTaskManager.get().executeSyncPoll();

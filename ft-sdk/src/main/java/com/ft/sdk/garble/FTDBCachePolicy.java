@@ -163,9 +163,7 @@ public class FTDBCachePolicy {
             if (currentLogCount + limit >= logLimitCount) {
                 needInsert = logLimitCount - currentLogCount;
                 status = limit - needInsert;
-                limit = needInsert;
             }
-            optLogCount(limit);
         }
         return status;
     }
