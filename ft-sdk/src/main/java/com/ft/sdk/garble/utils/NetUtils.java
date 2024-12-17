@@ -4,9 +4,12 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.telephony.TelephonyManager;
 
 import com.ft.sdk.FTApplication;
@@ -27,10 +30,22 @@ public class NetUtils {
     public final static int NETWORK_NONE = -1;
     public final static int NETWORK_UNKNOWN = 0;
     public final static int NETWORK_WIFI = 1;
+    public final static int NETWORK_ETHERNET = 6;
     public final static int NETWORK_2G = 2;
     public final static int NETWORK_3G = 3;
     public final static int NETWORK_4G = 4;
     public final static int NETWORK_5G = 5;
+
+
+    /**
+     * 判断是否连接网络
+     *
+     * @return
+     */
+    public static boolean isNetworkAvailable() {
+        return isNetworkAvailable(FTApplication.getApplication());
+    }
+
 
     /**
      * 检查网络是否可用
@@ -40,9 +55,38 @@ public class NetUtils {
      */
     public static boolean isNetworkAvailable(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        return isNetworkAvailable(connectivityManager);
+    }
+
+    public static boolean isNetworkAvailable(ConnectivityManager connectivityManager) {
         if (connectivityManager != null) {
-            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-            return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Network network = connectivityManager.getActiveNetwork();
+                if (network != null) {
+                    NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(network);
+                    if (capabilities != null) {
+                        return isNetworkValid(capabilities);
+                    }
+                }
+            } else {
+                NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+                return networkInfo != null && networkInfo.isConnected();
+            }
+        }
+        return false;
+    }
+
+    @SuppressLint("WrongConstant")
+    public static boolean isNetworkValid(NetworkCapabilities capabilities) {
+        if (capabilities != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                return capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+                        || capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+                        || capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
+                        || capabilities.hasTransport(7)  //目前已知在车联网行业使用该标记作为网络类型（TBOX 网络类型）
+                        || capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
+                        || capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);
+            }
         }
         return false;
     }
@@ -59,6 +103,11 @@ public class NetUtils {
     @SuppressLint("MissingPermission")
     public static int getNetworkState(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        return getNetworkState(cm, context);
+    }
+
+    @SuppressLint("MissingPermission")
+    public static int getNetworkState(ConnectivityManager cm, Context context) {
         if (null == cm) {
             return NETWORK_NONE;
         }
@@ -66,13 +115,25 @@ public class NetUtils {
         if (activeNetInfo == null || !activeNetInfo.isAvailable()) {
             return NETWORK_NONE;
         }
-        NetworkInfo wifiInfo = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        if (wifiInfo != null) {
-            NetworkInfo.State state = wifiInfo.getState();
-            if (null != state) {
-                if (state == NetworkInfo.State.CONNECTED || state == NetworkInfo.State.CONNECTING) {
-                    return NETWORK_WIFI;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            Network network = cm.getActiveNetwork();
+            if (network != null) {
+                NetworkCapabilities capabilities = cm.getNetworkCapabilities(network);
+                if (capabilities != null) {
+                    if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
+                        return NETWORK_ETHERNET;
+                    } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                        return NETWORK_WIFI;
+                    }
                 }
+            }
+        } else {
+            NetworkInfo networkInfo = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+            if (networkInfo != null && networkInfo.isConnectedOrConnecting()) {
+                if (networkInfo.getType() == ConnectivityManager.TYPE_ETHERNET) {
+                    return NETWORK_ETHERNET;
+                }
+                return NETWORK_WIFI;
             }
         }
 
@@ -132,8 +193,12 @@ public class NetUtils {
      * @return
      */
     public static String getNetWorkStateName() {
+        return getNetWorkStateName(null);
+    }
 
-        int type = getNetworkState(FTApplication.getApplication());
+    public static String getNetWorkStateName(ConnectivityManager cm) {
+        int type = cm == null ? getNetworkState(FTApplication.getApplication())
+                : getNetworkState(cm, FTApplication.getApplication());
         switch (type) {
             case NETWORK_NONE:
                 return "unreachable";
@@ -147,11 +212,11 @@ public class NetUtils {
                 return "5G";
             case NETWORK_WIFI:
                 return "wifi";
+            case NETWORK_ETHERNET:
+                return "ethernet";
             default:
                 return "unknown";
         }
-
-
     }
 
     /**

@@ -1,10 +1,13 @@
-package com.ft.sdk.garble.http;
+package com.ft.sdk;
 
-import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.FTHttpConfigManager;
+import com.ft.sdk.garble.http.EngineFactory;
+import com.ft.sdk.garble.http.FTResponseData;
+import com.ft.sdk.garble.http.HttpBuilder;
+import com.ft.sdk.garble.http.INetEngine;
+import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.sdk.garble.utils.Utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -50,7 +53,7 @@ public class NetProxy {
      * @return
      */
     public FTResponseData execute() {
-        if (!Utils.isNetworkAvailable()) {
+        if (!FTNetworkListener.get().getNetworkStateBean().isNetworkAvailable()) {
             return new FTResponseData(NetCodeStatus.NETWORK_EXCEPTION_CODE, "");
         }
         if (!httpBuilder.getUrl().startsWith("http://") && !httpBuilder.getUrl().startsWith("https://")) {

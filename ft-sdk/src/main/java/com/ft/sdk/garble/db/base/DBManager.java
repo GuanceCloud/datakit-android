@@ -51,10 +51,10 @@ public abstract class DBManager {
     }
 
     public void closeDB() {
-        LogUtils.d(TAG, "DB try to close");
         synchronized (this) {
             if (databaseHelper != null) {
                 databaseHelper.close();
+                LogUtils.d(TAG, "DB close");
             }
         }
     }

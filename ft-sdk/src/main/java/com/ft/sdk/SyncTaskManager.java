@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 
 /**
@@ -112,6 +113,7 @@ public class SyncTaskManager {
      * 同步消息
      */
     private static final int MSG_SYNC = 1;
+    private static final int MSG_CLOSE_DB = 2;
 
     /**
      * 最大错误尝试次数，超出之后，队列数据将停止，等待下次同步触发
@@ -148,6 +150,8 @@ public class SyncTaskManager {
             super.handleMessage(msg);
             if (msg.what == MSG_SYNC) {
                 executePoll(true);
+            } else if (msg.what == MSG_CLOSE_DB) {
+                FTDBManager.get().closeDB();
             }
         }
     };
@@ -209,6 +213,7 @@ public class SyncTaskManager {
             LogUtils.d(TAG, "******************* Execute Sync Poll *******************");
             running = true;
             errorCount.set(0);
+
             DataUploaderThreadPool.get().execute(new Runnable() {
                 @Override
                 public void run() {
@@ -233,13 +238,18 @@ public class SyncTaskManager {
                         }
                     } finally {
                         running = false;
-                        FTDBManager.get().closeDB();
+                        mHandler.removeMessages(MSG_CLOSE_DB);
+                        LogUtils.d(TAG, "Try to close DB");
+                        mHandler.sendEmptyMessageDelayed(MSG_CLOSE_DB, 1000);
                         LogUtils.d(TAG, "<<<******************* Sync Poll Finish *******************\n");
                     }
                 }
             });
         }
     }
+
+    private static final long THROTTLE_INTERVAL_MS = 10000; // 10秒
+    private static final AtomicLong lastLogTime = new AtomicLong(0);
 
     /**
      * 触发延迟轮询同步
@@ -248,7 +258,12 @@ public class SyncTaskManager {
         if (autoSync) {
             if (FTDBCachePolicy.get().reachLogHalfLimit() || FTDBCachePolicy.get().reachRumHalfLimit()) {
                 if (!running) {
-                    LogUtils.w(TAG, "Rapid Log Growth，Start to Sync ");
+                    long currentTime = System.currentTimeMillis();
+                    if (currentTime - lastLogTime.get() >= THROTTLE_INTERVAL_MS) {//10秒间隔出发一次
+                        if (lastLogTime.compareAndSet(lastLogTime.get(), currentTime)) {
+                            LogUtils.w(TAG, "Rapid Log Growth，Start to Sync ");
+                        }
+                    }
                     mHandler.removeMessages(MSG_SYNC);
                     executePoll();
                 }

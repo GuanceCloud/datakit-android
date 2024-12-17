@@ -7,6 +7,8 @@ import com.ft.sdk.RUMCacheDiscard;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.db.FTDBManager;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * author: huangDianHua
  * time: 2020/8/4 15:41:54
@@ -18,12 +20,24 @@ public class FTDBCachePolicy {
     /**
      * 当前日志数据量
      */
-    private volatile int logCount = 0;
+    private final AtomicInteger logCount = new AtomicInteger(0);
 
     /**
      * 当前 RUM 数据量
      */
-    private volatile int rumCount = 0;
+    private final AtomicInteger rumCount = new AtomicInteger(0);
+
+    private final Object rumLock = new Object();
+
+    private final Object logLock = new Object();
+
+    public Object getRumLock() {
+        return rumLock;
+    }
+
+    public Object getLogLock() {
+        return logLock;
+    }
 
     /**
      * 日志限制数量
@@ -48,8 +62,8 @@ public class FTDBCachePolicy {
 
 
     private FTDBCachePolicy() {
-        logCount = FTDBManager.get().queryTotalCount(DataType.LOG);//初始化时从数据库中获取日志数据
-        rumCount = FTDBManager.get().queryTotalCount(new DataType[]{DataType.RUM_APP, DataType.RUM_WEBVIEW});//初始化时从数据库中获取日志数据
+        logCount.set(FTDBManager.get().queryTotalCount(DataType.LOG));//初始化时从数据库中获取日志数据
+        rumCount.set(FTDBManager.get().queryTotalCount(new DataType[]{DataType.RUM_APP, DataType.RUM_WEBVIEW}));//初始化时从数据库中获取日志数据
     }
 
     public synchronized static FTDBCachePolicy get() {
@@ -97,7 +111,7 @@ public class FTDBCachePolicy {
      * @param optCount 写入数据数量
      */
     public synchronized void optLogCount(int optCount) {
-        logCount += optCount;
+        logCount.addAndGet(optCount);
     }
 
     /**
@@ -106,7 +120,7 @@ public class FTDBCachePolicy {
      * @param optCount 写入数据数量
      */
     public synchronized void optRUMCount(int optCount) {
-        rumCount += optCount;
+        rumCount.addAndGet(optCount);
     }
 
 
@@ -116,7 +130,7 @@ public class FTDBCachePolicy {
      * @return 是否达到一半
      */
     public boolean reachLogHalfLimit() {
-        return logLimitCount > 0 && logCount > logLimitCount / 2;
+        return logLimitCount > 0 && logCount.get() > logLimitCount / 2;
     }
 
     /**
@@ -125,7 +139,7 @@ public class FTDBCachePolicy {
      * @return
      */
     public boolean reachRumHalfLimit() {
-        return rumLimitCount > 0 && rumCount > rumLimitCount / 2;
+        return rumLimitCount > 0 && rumCount.get() > rumLimitCount / 2;
     }
 
     /**
@@ -135,23 +149,21 @@ public class FTDBCachePolicy {
      */
     public int optLogCachePolicy(int limit) {
         int status = 0;
-        if (logCount >= logLimitCount) {//当数据量大于配置的数据库最大存储量时，执行丢弃策略
+        int currentLogCount = logCount.get();
+        if (currentLogCount >= logLimitCount) {//当数据量大于配置的数据库最大存储量时，执行丢弃策略
             if (logCacheDiscardStrategy == LogCacheDiscard.DISCARD) {//直接丢弃数据
                 status = -1;
             } else if (logCacheDiscardStrategy == LogCacheDiscard.DISCARD_OLDEST) {//丢弃数据库中的前几条数据
                 FTDBManager.get().deleteOldestData(DataType.LOG, limit);
-                logCount = FTDBManager.get().queryTotalCount(DataType.LOG);
+                logCount.set(FTDBManager.get().queryTotalCount(DataType.LOG));
                 status = 0;
             }
         } else {
             int needInsert = 0;
-            if (logCount + limit >= logLimitCount) {
-                needInsert = logLimitCount - logCount;
+            if (currentLogCount + limit >= logLimitCount) {
+                needInsert = logLimitCount - currentLogCount;
                 status = limit - needInsert;
-                limit = needInsert;
-
             }
-            optLogCount(limit);
         }
         return status;
     }
@@ -164,23 +176,17 @@ public class FTDBCachePolicy {
      */
     public int optRUMCachePolicy(int limit) {
         int status = 0;
-        if (rumCount >= rumLimitCount) {//当数据量大于配置的数据库最大存储量时，执行丢弃策略
+        int currentRUMCount = rumCount.get();
+        if (currentRUMCount >= rumLimitCount) {//当数据量大于配置的数据库最大存储量时，执行丢弃策略
             if (rumCacheDiscardStrategy == RUMCacheDiscard.DISCARD) {//直接丢弃数据
                 status = -1;
             } else if (rumCacheDiscardStrategy == RUMCacheDiscard.DISCARD_OLDEST) {//丢弃数据库中的前几条数据
                 FTDBManager.get().deleteOldestData(new DataType[]{DataType.RUM_APP, DataType.RUM_WEBVIEW}, limit);
-                rumCount = FTDBManager.get().queryTotalCount(new DataType[]{DataType.RUM_APP, DataType.RUM_WEBVIEW});
+                rumCount.set(FTDBManager.get().queryTotalCount(new DataType[]{DataType.RUM_APP, DataType.RUM_WEBVIEW}));
                 status = 0;
             }
         } else {
-            int needInsert = 0;
-            if (rumCount + limit >= rumLimitCount) {
-                needInsert = rumLimitCount - rumCount;
-                status = limit - needInsert;
-                limit = needInsert;
-
-            }
-            optRUMCount(limit);
+            status = 1;
         }
         return status;
     }

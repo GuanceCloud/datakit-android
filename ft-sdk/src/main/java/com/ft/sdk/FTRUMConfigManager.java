@@ -15,7 +15,6 @@ import com.ft.sdk.garble.threadpool.RunnerCompleteCallBack;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.sdk.garble.utils.NetUtils;
 import com.ft.sdk.garble.utils.PackageUtils;
 import com.ft.sdk.garble.utils.Utils;
 import com.ft.sdk.garble.utils.VersionUtils;
@@ -350,7 +349,7 @@ public class FTRUMConfigManager {
         if (includeRUMStatic) {
             tags.putAll(FTTrackInner.getInstance().getCurrentDataHelper().getCurrentRumTags());
         }
-        tags.put(Constants.KEY_RUM_NETWORK_TYPE, NetUtils.getNetWorkStateName());
+        tags.put(Constants.KEY_RUM_NETWORK_TYPE, FTNetworkListener.get().getNetworkStateBean().getNetworkType());
         tags.put(Constants.KEY_RUM_IS_SIGN_IN, FTRUMConfigManager.get().isUserDataBinded() ? "T" : "F");
         if (FTRUMConfigManager.get().isUserDataBinded()) {
             UserData data = FTRUMConfigManager.get().getUserData();

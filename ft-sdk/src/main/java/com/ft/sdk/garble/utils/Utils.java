@@ -120,25 +120,25 @@ public class Utils {
         }
     }
 
-    /**
-     * 判断是否连接网络
-     *
-     * @return
-     */
-    public static boolean isNetworkAvailable() {
-        return isNetworkAvailable(FTApplication.getApplication());
-    }
-
-    /**
-     * 判断是否连接网络
-     *
-     * @return
-     */
-    public static boolean isNetworkAvailable(Context context) {
-        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetWork = manager.getActiveNetworkInfo();
-        return activeNetWork != null && activeNetWork.isConnected();
-    }
+//    /**
+//     * 判断是否连接网络
+//     *
+//     * @return
+//     */
+//    public static boolean isNetworkAvailable() {
+//        return isNetworkAvailable(FTApplication.getApplication());
+//    }
+//
+//    /**
+//     * 判断是否连接网络
+//     *
+//     * @return
+//     */
+//    public static boolean isNetworkAvailable(Context context) {
+//        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+//        NetworkInfo activeNetWork = manager.getActiveNetworkInfo();
+//        return activeNetWork != null && activeNetWork.isConnected();
+//    }
 
     /**
      * 获取应用 app 名称 AndroidManifest.xml application.labelName

@@ -1,5 +1,6 @@
 package com.ft.sdk.garble.http;
 
+import com.ft.sdk.NetProxy;
 import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.utils.Utils;
 
