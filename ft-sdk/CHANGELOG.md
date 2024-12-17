@@ -1,9 +1,16 @@
+# agent 1.6.5-beta04
+1. 修改默认 `FTRUMConfig.setRumCacheLimitCount(int)`默认参数数值, 100_000
+2. 网络状态及类型获取优化，支持 ethernet 类型的网络类型显示
+3. 优化无网络状态，数据写入频繁关闭数据库的问题
+4. 修复丢弃日志与 RUM 丢弃旧数据时数据偏差的问题
+
+---
 # agent 1.6.5-beta03
-1.修改默认 `FTRUMConfig.setRumCacheLimitCount(int)`默认参数数值, 100_000
+1. 修改默认 `FTRUMConfig.setRumCacheLimitCount(int)`默认参数数值, 100_000
 
 ---
 # agent 1.6.5-beta02
-1.修改默认 `FTRUMConfig.setRumCacheLimitCount(int)`默认参数数值, 200_000
+1. 修改默认 `FTRUMConfig.setRumCacheLimitCount(int)`默认参数数值, 200_000
 
 ---
 # agent 1.6.5-beta01
