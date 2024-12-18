@@ -6,6 +6,7 @@ import com.ft.sdk.LogCacheDiscard;
 import com.ft.sdk.RUMCacheDiscard;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.db.FTDBManager;
+import com.ft.sdk.garble.utils.LogUtils;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

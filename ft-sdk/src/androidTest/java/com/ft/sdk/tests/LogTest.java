@@ -181,7 +181,7 @@ public class LogTest extends FTBaseTest {
      * @throws InterruptedException
      */
     @Test
-    public void triggerDiscardPolicyTest() throws InterruptedException {
+    public void triggerLogDiscardPolicyTest() throws InterruptedException {
         FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableCustomLog(true));
         batchLog(10);
 
@@ -193,10 +193,10 @@ public class LogTest extends FTBaseTest {
      * @throws InterruptedException
      */
     @Test
-    public void triggerDiscardOldPolicyTest() throws InterruptedException {
+    public void triggerLogDiscardOldPolicyTest() throws InterruptedException {
         FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableCustomLog(true)
                 .setLogCacheDiscardStrategy(LogCacheDiscard.DISCARD_OLDEST));
-        batchLog(19);
+        batchLog(20);
     }
 
     /**

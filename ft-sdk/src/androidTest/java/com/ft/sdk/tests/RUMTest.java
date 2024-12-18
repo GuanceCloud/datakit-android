@@ -9,7 +9,9 @@ import com.ft.sdk.FTRUMGlobalManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
+import com.ft.sdk.RUMCacheDiscard;
 import com.ft.sdk.TraceType;
+import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.bean.ActionBean;
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.DataType;
@@ -144,6 +146,7 @@ public class RUMTest extends FTBaseTest {
 
     /**
      * 数据连续写入
+     *
      * @throws InterruptedException
      */
     @Test
@@ -676,6 +679,48 @@ public class RUMTest extends FTBaseTest {
             }
         }
 
+    }
+
+    /**
+     * 测试大批量插入数据，是否触发丢弃策略
+     *
+     * @throws InterruptedException
+     */
+    @Test
+    public void triggerRUMDiscardPolicyTest() throws InterruptedException {
+        FTSdk.initRUMWithConfig(new FTRUMConfig());
+        batchRUM(10);
+
+    }
+
+    /**
+     * 测试大批 RUM 量插入数据，是否触发丢弃策略
+     *
+     * @throws InterruptedException
+     */
+    @Test
+    public void triggerRUMDiscardOldPolicyTest() throws InterruptedException {
+        FTSdk.initRUMWithConfig(new FTRUMConfig().setRumCacheDiscardStrategy(RUMCacheDiscard.DISCARD_OLDEST));
+        batchRUM(19);
+    }
+
+    /**
+     * 批量 RUM
+     *
+     * @param expectCount 预期数量
+     * @throws InterruptedException
+     */
+    private void batchRUM(int expectCount) throws InterruptedException {
+        FTDBCachePolicy.get().optRUMCount(99990);
+        for (int i = 0; i < 20; i++) {
+            FTRUMGlobalManager.get().addAction(ANY_ACTION, ACTION_NAME);
+            Thread.sleep(10);
+        }
+        Thread.sleep(2000);
+        int count = CheckUtils.getCount(DataType.RUM_APP, ACTION_NAME, 0);
+        System.out.println("count=" + count);
+        //Thread.sleep(300000);
+        Assert.assertTrue(expectCount >= count);
     }
 
 }
