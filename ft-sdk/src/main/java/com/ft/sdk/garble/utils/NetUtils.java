@@ -137,6 +137,8 @@ public class NetUtils {
             }
         }
 
+        if (DeviceUtils.isTv(context)) return NETWORK_UNKNOWN;
+
         TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         if (telephonyManager == null) {
             return NETWORK_NONE;

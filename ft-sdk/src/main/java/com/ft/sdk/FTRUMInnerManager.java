@@ -61,6 +61,8 @@ public class FTRUMInnerManager {
 
     private final ArrayList<String> viewList = new ArrayList<>();
 
+    private boolean isTVMode = false;
+
     private FTRUMInnerManager() {
 
     }
@@ -463,6 +465,7 @@ public class FTRUMInnerManager {
      * 这里 startAction 会先进入 {@link com.ft.sdk.garble.db.FTSQL#FT_TABLE_ACTION},
      * 再进入 {@link com.ft.sdk.garble.db.FTSQL#FT_SYNC_DATA_FLAT_TABLE_NAME};
      * addAction 会直接进入 {@link com.ft.sdk.garble.db.FTSQL#FT_SYNC_DATA_FLAT_TABLE_NAME}
+     *
      * @param activeActionBean 当前激活的操作
      */
     private void initAction(ActiveActionBean activeActionBean, boolean isAddAction) {

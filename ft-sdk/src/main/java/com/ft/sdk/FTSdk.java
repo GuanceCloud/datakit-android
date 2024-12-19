@@ -47,6 +47,8 @@ public class FTSdk {
     private static FTSdk mFtSdk;
     private final FTSDKConfig mFtSDKConfig;
 
+    private boolean isTVMode;
+
     /**
      * @param ftSDKConfig
      */
