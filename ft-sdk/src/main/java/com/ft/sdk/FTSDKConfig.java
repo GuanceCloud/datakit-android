@@ -122,8 +122,8 @@ public class FTSDKConfig {
     }
 
     public FTSDKConfig enableLimitWithDbSize(long dbSize) {
-//        this.dbCacheLimit = Math.max(Constants.DEFAULT_DB_MINI_SIZE_LIMIT, dbSize);
-        this.dbCacheLimit=dbSize;
+        this.dbCacheLimit = Math.max(Constants.MINI_DB_SIZE_LIMIT, dbSize);
+//        this.dbCacheLimit=dbSize;
         this.limitWithDbSize = true;
         return this;
     }

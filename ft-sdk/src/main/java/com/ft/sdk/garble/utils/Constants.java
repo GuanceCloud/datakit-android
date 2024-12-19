@@ -130,16 +130,28 @@ public class Constants {
      * 日志最大限制缓存数
      */
     public static final int DEFAULT_DB_LOG_CACHE_NUM = 5000;
-
-    /**
-     * RUM 最大限制缓存数，默认 10000，Action，View，LongTask，Resource，理论大小是 200MB 左右，如果是网络 Error 数据大约是 400MB
-     */
-    public static final int DEFAULT_DB_RUM_CACHE_NUM = 100000;
-
     /**
      * 日志缓存最小缓存数限制
      */
     public static final int MINI_DB_LOG_CACHE_NUM = 1000;
+
+    /**
+     * RUM 最大限制缓存数，Action，View，LongTask，Resource，理论大小是 200MB 左右，如果是网络 Error 数据大约是 400MB
+     */
+    public static final int DEFAULT_DB_RUM_CACHE_NUM = 100_000;
+
+    /**
+     * RUM 最小限制
+     */
+    public static final int MINI_DB_RUM_CACHE_NUM = 10_000;
+
+    /**
+     * 设置总缓存限制大小
+     */
+    public static final int DEFAULT_DB_SIZE_LIMIT = 104857600;//100MB
+    public static final int MINI_DB_SIZE_LIMIT = 31457280;//30MB
+
+
 
 //    public static final String KEY_EVENT_ID = "event_id";
 //    public static final String KEY_EVENT = "event";
@@ -303,7 +315,7 @@ public class Constants {
      */
     public static final String KEY_DEVICE_LOCALE = "locale";
     /**
-     *  点击事件
+     * 点击事件
      */
     public static final String EVENT_NAME_CLICK = "click";
 

@@ -176,8 +176,8 @@ public class FTRUMConfig {
      * @return
      */
     public FTRUMConfig setRumCacheLimitCount(int rumCacheLimitCount) {
-//        this.rumCacheLimitCount =  Math.max(500, rumCacheLimitCount);
-        this.rumCacheLimitCount =  rumCacheLimitCount;
+        this.rumCacheLimitCount =  Math.max(Constants.MINI_DB_RUM_CACHE_NUM, rumCacheLimitCount);
+//        this.rumCacheLimitCount =  rumCacheLimitCount;
         return this;
     }
 
