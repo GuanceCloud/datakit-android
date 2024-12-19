@@ -11,7 +11,7 @@ import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
 import com.ft.sdk.RUMCacheDiscard;
 import com.ft.sdk.TraceType;
-import com.ft.sdk.garble.FTDBCachePolicy;
+import com.ft.sdk.garble.db.FTDBCachePolicy;
 import com.ft.sdk.garble.bean.ActionBean;
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.DataType;

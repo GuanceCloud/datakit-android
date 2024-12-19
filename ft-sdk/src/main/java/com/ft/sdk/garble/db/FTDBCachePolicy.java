@@ -1,14 +1,15 @@
-package com.ft.sdk.garble;
+package com.ft.sdk.garble.db;
 
+import com.ft.sdk.DBCacheDiscard;
 import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.FTRUMConfig;
+import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.LogCacheDiscard;
 import com.ft.sdk.RUMCacheDiscard;
 import com.ft.sdk.garble.bean.DataType;
-import com.ft.sdk.garble.db.FTDBManager;
-import com.ft.sdk.garble.utils.LogUtils;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * author: huangDianHua
@@ -27,6 +28,8 @@ public class FTDBCachePolicy {
      * 当前 RUM 数据量
      */
     private final AtomicInteger rumCount = new AtomicInteger(0);
+
+    private final AtomicLong currentDbSize = new AtomicLong();
 
     private final Object rumLock = new Object();
 
@@ -50,6 +53,12 @@ public class FTDBCachePolicy {
      * RUM 限制数据量
      */
     private int rumLimitCount = 0;
+
+    private boolean enableLimitWithDbSize;
+
+    private long dbLimitSize;
+
+    private DBCacheDiscard dbCacheDiscard = DBCacheDiscard.DISCARD;
 
     /**
      * log 数据舍弃规则
@@ -75,7 +84,18 @@ public class FTDBCachePolicy {
     }
 
     /**
-     * 初始化配置参数
+     * 设置 db 限制
+     *
+     * @param config
+     */
+    public void initSDKParams(FTSDKConfig config) {
+        this.enableLimitWithDbSize = config.isLimitWithDbSize();
+        this.dbLimitSize = config.getDbCacheLimit();
+        this.dbCacheDiscard = config.getDbCacheDiscard();
+    }
+
+    /**
+     * 初始化 log 配置参数
      *
      * @param config
      */
@@ -84,6 +104,11 @@ public class FTDBCachePolicy {
         this.logLimitCount = config.getLogCacheLimitCount();
     }
 
+    /**
+     * 初始化 RUM 配置参数
+     *
+     * @param config
+     */
     public void initRUMParam(FTRUMConfig config) {
         this.rumCacheDiscardStrategy = config.getRumCacheDiscardStrategy();
         this.rumLimitCount = config.getRumCacheLimitCount();
@@ -111,7 +136,7 @@ public class FTDBCachePolicy {
      *
      * @param optCount 写入数据数量
      */
-    public synchronized void optLogCount(int optCount) {
+    public void optLogCount(int optCount) {
         logCount.addAndGet(optCount);
     }
 
@@ -120,17 +145,32 @@ public class FTDBCachePolicy {
      *
      * @param optCount 写入数据数量
      */
-    public synchronized void optRUMCount(int optCount) {
+    public void optRUMCount(int optCount) {
         rumCount.addAndGet(optCount);
     }
 
+    public void setReachDBLimit(long currentDbSize) {
+        this.currentDbSize.set(currentDbSize);
+    }
+
+    public boolean isReachDbLimit() {
+        return currentDbSize.get() >= dbLimitSize;
+    }
+
+    public boolean reachHalfLimit() {
+        if (enableLimitWithDbSize) {
+            return currentDbSize.get() >= dbLimitSize / 2;
+        } else {
+            return reachLogHalfLimit() || reachRumHalfLimit();
+        }
+    }
 
     /**
      * 如果写入数据量大于总限制的一半
      *
      * @return 是否达到一半
      */
-    public boolean reachLogHalfLimit() {
+    private boolean reachLogHalfLimit() {
         return logLimitCount > 0 && logCount.get() > logLimitCount / 2;
     }
 
@@ -139,7 +179,7 @@ public class FTDBCachePolicy {
      *
      * @return
      */
-    public boolean reachRumHalfLimit() {
+    private boolean reachRumHalfLimit() {
         return rumLimitCount > 0 && rumCount.get() > rumLimitCount / 2;
     }
 
@@ -149,6 +189,15 @@ public class FTDBCachePolicy {
      * @return -1-表示直接丢弃，0-表示可以插入数据，n>0 表示需要删除 n 条数据
      */
     public int optLogCachePolicy(int limit) {
+        if (enableLimitWithDbSize) {
+            if (dbCacheDiscard == DBCacheDiscard.DISCARD) {
+                if (isReachDbLimit()) {
+                    return -1;
+                }
+            }
+            return 0;
+        }
+
         int status = 0;
         int currentLogCount = logCount.get();
         if (currentLogCount >= logLimitCount) {//当数据量大于配置的数据库最大存储量时，执行丢弃策略
@@ -173,9 +222,18 @@ public class FTDBCachePolicy {
      * 执行RUM丢弃策略
      *
      * @param limit
-     * @return
+     * @return @return -1-表示直接丢弃，0-表示可以插入数据, 1-表示丢弃删除旧数据并删除
      */
     public int optRUMCachePolicy(int limit) {
+        if (enableLimitWithDbSize) {
+            if (dbCacheDiscard == DBCacheDiscard.DISCARD) {
+                if (isReachDbLimit()) {
+                    return -1;
+                }
+            }
+            return 0;
+        }
+
         int status = 0;
         int currentRUMCount = rumCount.get();
         if (currentRUMCount >= rumLimitCount) {//当数据量大于配置的数据库最大存储量时，执行丢弃策略
@@ -192,4 +250,15 @@ public class FTDBCachePolicy {
         return status;
     }
 
+    boolean isEnableLimitWithDbSize() {
+        return enableLimitWithDbSize;
+    }
+
+    long getDbLimitSize() {
+        return dbLimitSize;
+    }
+
+    DBCacheDiscard getDbCacheDiscard() {
+        return dbCacheDiscard;
+    }
 }

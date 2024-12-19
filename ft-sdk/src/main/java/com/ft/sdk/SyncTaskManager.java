@@ -7,9 +7,9 @@ import android.os.Message;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncJsonData;
+import com.ft.sdk.garble.db.FTDBCachePolicy;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.http.FTResponseData;
 import com.ft.sdk.garble.http.HttpBuilder;
@@ -256,7 +256,7 @@ public class SyncTaskManager {
      */
     void executeSyncPoll() {
         if (autoSync) {
-            if (FTDBCachePolicy.get().reachLogHalfLimit() || FTDBCachePolicy.get().reachRumHalfLimit()) {
+            if (FTDBCachePolicy.get().reachHalfLimit()) {
                 if (!running) {
                     long currentTime = System.currentTimeMillis();
                     if (currentTime - lastLogTime.get() >= THROTTLE_INTERVAL_MS) {//10秒间隔出发一次

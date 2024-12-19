@@ -2,7 +2,7 @@ package com.ft.sdk;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.garble.FTDBCachePolicy;
+import com.ft.sdk.garble.db.FTDBCachePolicy;
 import com.ft.sdk.garble.bean.BaseContentBean;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.LineProtocolBean;

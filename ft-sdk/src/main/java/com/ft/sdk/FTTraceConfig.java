@@ -142,4 +142,16 @@ public class FTTraceConfig {
     public HashMap<String, Object> getGlobalContext() {
         return globalContext;
     }
+
+    @Override
+    public String toString() {
+        return "FTTraceConfig{" +
+                "samplingRate=" + samplingRate +
+                ", traceType=" + traceType +
+                ", enableWebTrace=" + enableWebTrace +
+                ", enableAutoTrace=" + enableAutoTrace +
+                ", enableLinkRUMData=" + enableLinkRUMData +
+                ", serviceName='" + serviceName + '\'' +
+                '}';
+    }
 }

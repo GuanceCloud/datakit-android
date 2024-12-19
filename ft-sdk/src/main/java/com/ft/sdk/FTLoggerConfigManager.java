@@ -2,7 +2,7 @@ package com.ft.sdk;
 
 import androidx.annotation.Nullable;
 
-import com.ft.sdk.garble.FTDBCachePolicy;
+import com.ft.sdk.garble.db.FTDBCachePolicy;
 
 /**
  * 日志配置管理

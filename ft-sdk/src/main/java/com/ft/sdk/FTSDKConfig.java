@@ -33,8 +33,25 @@ public class FTSDKConfig {
 
     private SDKLogLevel sdkLogLevel;
 
+
+    /**
+     * db 缓存限制大小
+     */
+    private long dbCacheLimit = Constants.DEFAULT_DB_SIZE_LIMIT;
+
+    /**
+     * 是否开启使用 db 缓存
+     */
+    private boolean limitWithDbSize = false;
+
+    /**
+     *
+     */
+    private DBCacheDiscard dbCacheDiscard = DBCacheDiscard.DISCARD;
+
     /**
      * 设置日志等级，默认 {@link SDKLogLevel#V}
+     *
      * @param logLevel
      * @return
      */
@@ -90,6 +107,39 @@ public class FTSDKConfig {
      * 是否迁移旧数据，SDK 从旧版本迁移至 1.5.0 需要进行数据迁移
      */
     private boolean needTransformOldCache = false;
+
+
+    public long getDbCacheLimit() {
+        return dbCacheLimit;
+    }
+
+    /**
+     * 开启使用 db 限制数据大小，默认 50MB ，{@link Constants#DEFAULT_DB_SIZE_LIMIT}
+     */
+    public FTSDKConfig enableLimitWithDbSize() {
+        this.limitWithDbSize = true;
+        return this;
+    }
+
+    public FTSDKConfig enableLimitWithDbSize(long dbSize) {
+//        this.dbCacheLimit = Math.max(Constants.DEFAULT_DB_MINI_SIZE_LIMIT, dbSize);
+        this.dbCacheLimit=dbSize;
+        this.limitWithDbSize = true;
+        return this;
+    }
+
+    public boolean isLimitWithDbSize() {
+        return limitWithDbSize;
+    }
+
+    public FTSDKConfig setDbCacheDiscard(DBCacheDiscard dbCacheDiscard) {
+        this.dbCacheDiscard = dbCacheDiscard;
+        return this;
+    }
+
+    public DBCacheDiscard getDbCacheDiscard() {
+        return dbCacheDiscard;
+    }
 
     /**
      * 全局参数，例如 {@link Constants#KEY_APP_VERSION_NAME} 等固定配置参数，
@@ -179,7 +229,6 @@ public class FTSDKConfig {
     public SDKLogLevel getSdkLogLevel() {
         return sdkLogLevel;
     }
-
 
 
     /**
@@ -421,4 +470,14 @@ public class FTSDKConfig {
         return compressIntakeRequests;
     }
 
+    @Override
+    public String toString() {
+        return "FTSDKConfig{" +
+                "dbCacheLimit=" + dbCacheLimit +
+                ", autoSync=" + autoSync +
+                ", compressIntakeRequests=" + compressIntakeRequests +
+                ", onlySupportMainProcess=" + onlySupportMainProcess +
+                ", enableDataIntegerCompatible=" + enableDataIntegerCompatible +
+                '}';
+    }
 }

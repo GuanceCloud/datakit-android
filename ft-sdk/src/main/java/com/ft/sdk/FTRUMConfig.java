@@ -447,6 +447,22 @@ public class FTRUMConfig {
         return blockDurationMS;
     }
 
+    @Override
+    public String toString() {
+        return "FTRUMConfig{" +
+                "samplingRate=" + samplingRate +
+                ", enableTrackAppCrash=" + enableTrackAppCrash +
+                ", enableTrackAppUIBlock=" + enableTrackAppUIBlock +
+                ", blockDurationMS=" + blockDurationMS +
+                ", enableTrackAppANR=" + enableTrackAppANR +
+                ", enableTraceUserAction=" + enableTraceUserAction +
+                ", enableTraceUserView=" + enableTraceUserView +
+                ", enableTraceUserResource=" + enableTraceUserResource +
+                ", enableResourceHostIP=" + enableResourceHostIP +
+                ", serviceName='" + serviceName + '\'' +
+                '}';
+    }
+
     //    /**
 //     * 设置 BackendSample 后端采样，当为 true 时，rum sampleRate 设置不再起效
 //     *

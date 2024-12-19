@@ -14,7 +14,7 @@ import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTUIBlockManager;
 import com.ft.sdk.SyncPageSize;
 import com.ft.sdk.SyncTaskManager;
-import com.ft.sdk.garble.FTDBCachePolicy;
+import com.ft.sdk.garble.db.FTDBCachePolicy;
 import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.test.base.FTBaseTest;

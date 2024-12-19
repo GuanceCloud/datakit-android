@@ -283,4 +283,17 @@ public class FTLoggerConfig {
     public HashMap<String, Object> getGlobalContext() {
         return globalContext;
     }
+
+    @Override
+    public String toString() {
+        return "FTLoggerConfig{" +
+                "samplingRate=" + samplingRate +
+                ", enableLinkRumData=" + enableLinkRumData +
+                ", enableConsoleLog=" + enableConsoleLog +
+                ", enableCustomLog=" + enableCustomLog +
+                ", serviceName='" + serviceName + '\'' +
+                ", printCustomLogToConsole=" + printCustomLogToConsole +
+                ", logCacheDiscardStrategy=" + logCacheDiscardStrategy +
+                '}';
+    }
 }

@@ -83,9 +83,6 @@ public class FTHttpConfigManager {
             LogUtils.d(TAG, "serverUrl ==>  " + "\nDataway Url:"
                     + datawayUrl + ",clientToken:" + maskToken);
         }
-
-        LogUtils.d(TAG, "isCompressIntakeRequests:" + compressIntakeRequests);
-
     }
 
     public String getDatakitUrl() {
