@@ -114,16 +114,24 @@ public class FTSDKConfig {
     }
 
     /**
-     * 开启使用 db 限制数据大小，默认 50MB ，{@link Constants#DEFAULT_DB_SIZE_LIMIT}
+     * 开启使用 db 限制数据大小，默认 100MB ，{@link Constants#DEFAULT_DB_SIZE_LIMIT}
      */
     public FTSDKConfig enableLimitWithDbSize() {
         this.limitWithDbSize = true;
         return this;
     }
 
+    /**
+     * 开启使用 db 限制数据大小，默认 100MB ，{@link Constants#DEFAULT_DB_SIZE_LIMIT}
+     * @param dbSize 设置 db 限制上限，数据库越大，磁盘压力越大，[30MB,),默认 100 MB
+     *
+     * 开启 db 数据限制之后，{@link FTLoggerConfig#setLogCacheLimitCount(int)}
+     * 及 {@link FTRUMConfig#setRumCacheLimitCount(int)} 将失效
+     *
+     * @return
+     */
     public FTSDKConfig enableLimitWithDbSize(long dbSize) {
         this.dbCacheLimit = Math.max(Constants.MINI_DB_SIZE_LIMIT, dbSize);
-//        this.dbCacheLimit=dbSize;
         this.limitWithDbSize = true;
         return this;
     }

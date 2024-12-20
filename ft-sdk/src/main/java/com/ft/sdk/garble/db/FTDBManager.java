@@ -691,7 +691,8 @@ public class FTDBManager extends DBManager {
                     db.execSQL("DELETE FROM " + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " where _id in (SELECT _id from "
                             + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " where " + where + " ORDER by tm ASC LIMIT " + limit + ")");
 
-                    if (FTDBCachePolicy.get().isEnableLimitWithDbSize() && FTDBCachePolicy.get().isReachDbLimit()) {
+                    if (FTDBCachePolicy.get().isEnableLimitWithDbSize()
+                            && FTDBCachePolicy.get().isReachDbLimit()) {
                         db.execSQL("VACUUM;");
                         LogUtils.d(TAG, "VACUUM completed");
                     }
@@ -820,6 +821,12 @@ public class FTDBManager extends DBManager {
                 db.delete(FTSQL.FT_TABLE_ACTION, null, null);
                 db.delete(FTSQL.FT_TABLE_VIEW, null, null);
                 LogUtils.e(TAG, "DB table delete");
+
+                if (FTDBCachePolicy.get().isEnableLimitWithDbSize()
+                        && FTDBCachePolicy.get().isReachDbLimit()) {
+                    db.execSQL("VACUUM;");
+                    LogUtils.d(TAG, "VACUUM completed");
+                }
 
             }
         });

@@ -3,6 +3,9 @@
 2. 网络状态及类型获取优化，支持 ethernet 类型的网络类型显示
 3. 优化无网络状态，数据写入频繁关闭数据库的问题
 4. 修复丢弃日志与 RUM 丢弃旧数据时数据偏差的问题
+5. TV 设备按键事件适配，及非 TV 设备标签剔除
+6. 支持通过 `FTSDKConfig enableLimitWithDbSize(long dbSize)` 限制总缓存大小功能，开启之后
+    `FTLoggerConfig#setLogCacheLimitCount(int)` 及 `FTRUMConfig#setRumCacheLimitCount(int)` 将失效
 
 ---
 # agent 1.6.5-beta03
