@@ -318,6 +318,9 @@ public class Constants {
      * 点击事件
      */
     public static final String EVENT_NAME_CLICK = "click";
+    public static final String EVENT_NAME_ACTION_NAME_BACK = "back";
+    public static final String EVENT_NAME_ACTION_NAME_DPAD_CENTER = "dpad_center";
+    public static final String EVENT_NAME_ACTION_NAME_MENU = "menu";
 
     /**
      * 是否为已登录状态
