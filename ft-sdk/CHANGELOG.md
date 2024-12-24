@@ -1,3 +1,50 @@
+# agent 1.6.5
+1. 弱化 Webview 在 AOP 过程中参数为 null 的提示
+2. 优化应用在后台长 Session 更新的机制
+
+---
+# agent 1.6.5-beta04
+1. 弱化 Webview 在 AOP 过程中参数为 null 的提示
+2. 优化应用在后台长 Session 更新的机制
+
+---
+# agent 1.6.4
+1. 优化 App 启动时间在 API 24 以上统计时间
+2. 支持通过 `FTRUMConfig.setEnableTrackAppUIBlock(true, blockDurationMs)` 设置检测时间范围
+
+---
+# agent 1.6.4-beta01
+1. 同 1.6.4-alpha02
+---
+
+# agent 1.6.4-alpha02
+1. 优化一些权限相关错误日志频繁打印的问题
+2. 添加设置 longtask 检测时间范围的方法
+
+---
+# agent 1.6.4-alpha01
+1. 优化 App 启动时间在高版本系统中的统计时间
+2. 优化动态属性在页面上绑定的机制
+
+---
+# agent 1.6.3
+1. 优化自定义 addAction 在高频率调用时的性能表现
+2. 支持使用  FTSDKConfig.setCompressIntakeRequests 对同步数据进行 deflate 压缩配置
+
+---
+# agent 1.6.3-beta03
+1. 优化已关闭并同步完毕的 action 的删除逻辑
+2. 支持同步数据 deflate 压缩
+
+---
+# agent 1.6.3-beta02
+1. 修复高频调用 addAction 丢失数据数据的问题
+
+---
+# agent 1.6.3-beta01
+1. 优化 addAction 数据上报机制 
+
+---
 # agent 1.6.2
 1. RUM 新增 addAction 方法，支持 property 扩展属性与频繁连续数据上报
 

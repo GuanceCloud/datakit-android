@@ -54,14 +54,14 @@ public class FTResourceEventListener extends EventListener {
     @Override
     public void callEnd(@NonNull Call call) {
         super.callEnd(call);
-        LogUtils.d(TAG, "callEnd:" + resourceId);
+//        LogUtils.d(TAG, "callEnd:" + resourceId);
         setNetworkMetricsTimeline();
     }
 
     @Override
     public void callFailed(@NonNull Call call, @NonNull IOException ioe) {
         super.callFailed(call, ioe);
-        LogUtils.d(TAG, "callFailed:" + resourceId);
+//        LogUtils.d(TAG, "callFailed:" + resourceId);
         setNetworkMetricsTimeline();
     }
 
@@ -71,21 +71,20 @@ public class FTResourceEventListener extends EventListener {
 
         requestHost = call.request().url().host();
         fetchStartTime = Utils.getCurrentNanoTime();
-
-        LogUtils.d(TAG, "callStart:" + resourceId);
+//        LogUtils.d(TAG, "callStart:" + resourceId);
     }
 
     @Override
     public void responseHeadersStart(@NonNull Call call) {
         super.responseHeadersStart(call);
         responseStartTime = Utils.getCurrentNanoTime();
-        LogUtils.d(TAG, "responseHeadersStart:" + resourceId);
+//        LogUtils.d(TAG, "responseHeadersStart:" + resourceId);
     }
 
     @Override
     public void responseBodyStart(Call call) {
         super.responseBodyStart(call);
-        LogUtils.d(TAG, "responseBodyStart:" + resourceId);
+//        LogUtils.d(TAG, "responseBodyStart:" + resourceId);
     }
 
     @Override
@@ -98,7 +97,7 @@ public class FTResourceEventListener extends EventListener {
     public void responseBodyEnd(@NonNull Call call, long byteCount) {
         super.responseBodyEnd(call, byteCount);
         responseEndTime = Utils.getCurrentNanoTime();
-        LogUtils.d(TAG, "responseBodyEnd:" + resourceId);
+//        LogUtils.d(TAG, "responseBodyEnd:" + resourceId);
     }
 
 //    @Override
@@ -110,32 +109,28 @@ public class FTResourceEventListener extends EventListener {
     public void dnsEnd(@NonNull Call call, @NonNull String domainName, @NonNull List<InetAddress> inetAddressList) {
         super.dnsEnd(call, domainName, inetAddressList);
         dnsEndTime = Utils.getCurrentNanoTime();
-
-        LogUtils.d(TAG, "dnsEnd:" + resourceId);
+//        LogUtils.d(TAG, "dnsEnd:" + resourceId);
     }
 
     @Override
     public void dnsStart(@NonNull Call call, @NonNull String domainName) {
         super.dnsStart(call, domainName);
         dnsStartTime = Utils.getCurrentNanoTime();
-
-        LogUtils.d(TAG, "dnsStart:" + resourceId);
+//        LogUtils.d(TAG, "dnsStart:" + resourceId);
     }
 
     @Override
     public void secureConnectEnd(@NonNull Call call, @NonNull Handshake handshake) {
         super.secureConnectEnd(call, handshake);
         sslEndTime = Utils.getCurrentNanoTime();
-
-        LogUtils.d(TAG, "secureConnectEnd:" + resourceId);
+//        LogUtils.d(TAG, "secureConnectEnd:" + resourceId);
     }
 
     @Override
     public void secureConnectStart(@NonNull Call call) {
         super.secureConnectStart(call);
         sslStartTime = Utils.getCurrentNanoTime();
-
-        LogUtils.d(TAG, "secureConnectStart:" + resourceId);
+//        LogUtils.d(TAG, "secureConnectStart:" + resourceId);
     }
 
     @Override
@@ -145,15 +140,14 @@ public class FTResourceEventListener extends EventListener {
         if (enableResourceHostIP) {
             resourceHostIP = inetSocketAddress.getAddress().getHostAddress();
         }
-        LogUtils.d(TAG, "connectStart:" + resourceId + ",hostAddr:" + resourceHostIP);
+//        LogUtils.d(TAG, "connectStart:" + resourceId + ",hostAddr:" + resourceHostIP);
     }
 
     @Override
     public void connectEnd(@NonNull Call call, @NonNull InetSocketAddress inetSocketAddress, @NonNull Proxy proxy, @Nullable Protocol protocol) {
         super.connectEnd(call, inetSocketAddress, proxy, protocol);
         tcpEndTime = Utils.getCurrentNanoTime();
-
-        LogUtils.d(TAG, "connectEnd:" + resourceId);
+//        LogUtils.d(TAG, "connectEnd:" + resourceId);
     }
 
     /**
@@ -186,12 +180,19 @@ public class FTResourceEventListener extends EventListener {
          */
         private final boolean enableResourceHostIP;
 
+        /**
+         * Resource 过滤规则
+         */
+        private final FTInTakeUrlHandler handler;
+
         public FTFactory() {
             this.enableResourceHostIP = false;
+            this.handler = null;
         }
 
-        public FTFactory(boolean enableResourceHostIP) {
+        public FTFactory(boolean enableResourceHostIP, FTInTakeUrlHandler handler) {
             this.enableResourceHostIP = enableResourceHostIP;
+            this.handler = handler;
         }
 
 
@@ -202,10 +203,22 @@ public class FTResourceEventListener extends EventListener {
         @NonNull
         @Override
         public EventListener create(@NonNull Call call) {
+            String url = call.request().url().toString();
+            if (handler != null && handler.isInTakeUrl(url)) {
+                return new NoOPEventListener();
+            }
             //自动计算 resourceId
+
             return new FTResourceEventListener(Utils.identifyRequest(call.request()),
                     this.enableResourceHostIP);
         }
+    }
+
+    /**
+     * 无操作，不进行监听
+     */
+    public static class NoOPEventListener extends EventListener {
+
     }
 
 

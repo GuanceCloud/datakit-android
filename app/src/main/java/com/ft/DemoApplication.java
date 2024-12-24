@@ -40,12 +40,13 @@ public class DemoApplication extends BaseApplication {
 
 
     static void initFTSDK(Context context) {
-        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAWAY_URL, BuildConfig.CLIENT_TOKEN)
+        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAWAY_URL,BuildConfig.CLIENT_TOKEN)
                 .setDebug(true)//设置是否是 debug
                 .setAutoSync(true)
                 .setCustomSyncPageSize(100)
                 .setOnlySupportMainProcess(CrossProcessSetting.isOnlyMainProcess(context))
                 .setNeedTransformOldCache(true)
+                .setCompressIntakeRequests(true)
                 .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()));
         FTSdk.install(ftSDKConfig);
 
@@ -68,7 +69,7 @@ public class DemoApplication extends BaseApplication {
                 .setEnableTraceUserResource(true)
                 .setEnableTrackAppANR(true)
                 .setEnableTrackAppCrash(true)
-                .setEnableTrackAppUIBlock(true)
+                .setEnableTrackAppUIBlock(true,100)
                 .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
                 .setResourceUrlHandler(url -> false)
 //                .addGlobalContext("track_id", BuildConfig.TRACK_ID)

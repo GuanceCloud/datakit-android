@@ -88,7 +88,7 @@ public class SyncDataHelper {
      * @param value
      */
     void appendGlobalContext(String key, String value) {
-        if (!Utils.isNullOrEmpty(key) && Utils.isNullOrEmpty(value)) {
+        if (!Utils.isNullOrEmpty(key) && !Utils.isNullOrEmpty(value)) {
             dynamicBaseTags.put(key, value);
         }
     }
@@ -113,7 +113,7 @@ public class SyncDataHelper {
      *
      */
     void appendRUMGlobalContext(String key, String value) {
-        if (!Utils.isNullOrEmpty(key) && Utils.isNullOrEmpty(value)) {
+        if (!Utils.isNullOrEmpty(key) && !Utils.isNullOrEmpty(value)) {
             dynamicLRumTags.put(key, value);
         }
     }
@@ -137,7 +137,7 @@ public class SyncDataHelper {
      *
      */
     void appendLogGlobalContext(String key, String value) {
-        if (!Utils.isNullOrEmpty(key) && Utils.isNullOrEmpty(value)) {
+        if (!Utils.isNullOrEmpty(key) && !Utils.isNullOrEmpty(value)) {
             dynamicLogTags.put(key, value);
         }
     }

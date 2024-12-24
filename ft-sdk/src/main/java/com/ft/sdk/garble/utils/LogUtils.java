@@ -57,6 +57,10 @@ public class LogUtils {
         e(tag, message, mDebug);
     }
 
+    public static void eOnce(String tag, String message) {
+        eOnce(tag, message, mDebug);
+    }
+
     public static void v(String tag, String message) {
         v(tag, message, mDebug);
     }
@@ -65,40 +69,56 @@ public class LogUtils {
         w(tag, message, mDebug);
     }
 
+    public static void wOnce(String tag, String message) {
+        wOnce(tag, message, mDebug);
+    }
+
     public static void i(String tag, String message, boolean showLog) {
         if (showLog) {
-            showFullLog(tag, message, TrackLog.LogType.I);
+            showFullLog(tag, message, TrackLog.LogType.I, false);
         }
     }
 
     public static void d(String tag, String message, boolean showLog) {
         if (showLog) {
-            showFullLog(tag, message, TrackLog.LogType.D);
+            showFullLog(tag, message, TrackLog.LogType.D, false);
         }
     }
 
     public static void e(String tag, String message, boolean showLog) {
         if (showLog) {
-            showFullLog(tag, message, TrackLog.LogType.E);
+            showFullLog(tag, message, TrackLog.LogType.E, false);
+        }
+    }
+
+    private static void eOnce(String tag, String message, boolean showLog) {
+        if (showLog) {
+            showFullLog(tag, message, TrackLog.LogType.E, true);
         }
     }
 
     public static void v(String tag, String message, boolean showLog) {
         if (showLog) {
-            showFullLog(tag, message, TrackLog.LogType.V);
+            showFullLog(tag, message, TrackLog.LogType.V, false);
         }
     }
 
     public static void w(String tag, String message, boolean showLog) {
         if (showLog) {
-            showFullLog(tag, message, TrackLog.LogType.W);
+            showFullLog(tag, message, TrackLog.LogType.W, false);
+        }
+    }
+
+    private static void wOnce(String tag, String message, boolean showLog) {
+        if (showLog) {
+            showFullLog(tag, message, TrackLog.LogType.W, true);
         }
     }
 
 
     public static void showAlias(String message) {
         if (aliasLogShow) {
-            showFullLog(TAG, message, TrackLog.LogType.D);
+            showFullLog(TAG, message, TrackLog.LogType.D, false);
         }
     }
 
@@ -217,7 +237,6 @@ public class LogUtils {
     }
 
     /**
-     *
      * 获取网络错误描述
      *
      * @param e 网络请求发生的 IOException

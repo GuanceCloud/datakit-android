@@ -59,6 +59,7 @@ public class SDKGlobalContextTest extends FTBaseTest {
         HashMap<String, Object> map = new HashMap<>();
         map.put(DYNAMIC_CUSTOM_KEY, DYNAMIC_CUSTOM_VALUE);
         FTSdk.appendGlobalContext(map);
+        FTSdk.appendGlobalContext(DYNAMIC_SINGLE_CUSTOM_KEY, DYNAMIC_SINGLE_CUSTOM_VALUE);
     }
 
     /**
@@ -73,7 +74,8 @@ public class SDKGlobalContextTest extends FTBaseTest {
         waitEventConsumeInThreadPool();
         Thread.sleep(3000L);
         Assert.assertTrue(CheckUtils.checkValueInLineProtocol(DataType.RUM_APP,
-                new String[]{CUSTOM_KEY, CUSTOM_VALUE, DYNAMIC_CUSTOM_KEY, DYNAMIC_CUSTOM_VALUE}));
+                new String[]{CUSTOM_KEY, CUSTOM_VALUE, DYNAMIC_CUSTOM_KEY, DYNAMIC_CUSTOM_VALUE,
+                        DYNAMIC_SINGLE_CUSTOM_KEY, DYNAMIC_SINGLE_CUSTOM_VALUE}));
     }
 
     /**
@@ -86,7 +88,8 @@ public class SDKGlobalContextTest extends FTBaseTest {
         FTLogger.getInstance().logBackground("log test", Status.INFO);
         Thread.sleep(3000L);
         Assert.assertTrue(CheckUtils.checkValueInLineProtocol(DataType.LOG,
-                new String[]{CUSTOM_KEY, CUSTOM_VALUE, DYNAMIC_CUSTOM_KEY, DYNAMIC_CUSTOM_VALUE}));
+                new String[]{CUSTOM_KEY, CUSTOM_VALUE, DYNAMIC_CUSTOM_KEY,
+                        DYNAMIC_CUSTOM_VALUE, DYNAMIC_SINGLE_CUSTOM_KEY, DYNAMIC_SINGLE_CUSTOM_VALUE}));
 
     }
 

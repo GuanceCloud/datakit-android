@@ -9,6 +9,7 @@ import com.ft.sdk.FTRUMInnerManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTrackInner;
+import com.ft.sdk.FTUIBlockManager;
 import com.ft.sdk.SyncDataHelper;
 import com.ft.sdk.SyncTaskManager;
 import com.ft.sdk.garble.bean.DataType;
@@ -38,6 +39,8 @@ public class FTBaseTest {
     protected static final String CUSTOM_VALUE = "custom_value";
     protected static final String DYNAMIC_CUSTOM_KEY = "dynamic_custom_key";
     protected static final String DYNAMIC_CUSTOM_VALUE = "dynamic_custom_value";
+    protected static final String DYNAMIC_SINGLE_CUSTOM_KEY = "dynamic_custom_single_key";
+    protected static final String DYNAMIC_SINGLE_CUSTOM_VALUE = "dynamic_custom_single_value";
     protected static final String TEST_FAKE_RUM_ID = "rumId";
     protected static final String TEST_FAKE_URL = "http://www.test.url";
     protected static final String TEST_FAKE_CLIENT_TOKEN = "fake_client_token";
@@ -107,7 +110,7 @@ public class FTBaseTest {
      * @param fileds
      * @throws Exception
      */
-    protected void invokeSyncData(DataType type, String measurement, HashMap<String,Object> tags, HashMap<String,Object> fileds) throws Exception {
+    protected void invokeSyncData(DataType type, String measurement, HashMap<String, Object> tags, HashMap<String, Object> fileds) throws Exception {
         Whitebox.invokeMethod(FTTrackInner.getInstance(), "syncDataBackground",
                 type, Utils.getCurrentNanoTime(), measurement, tags, fileds);
 
@@ -188,10 +191,10 @@ public class FTBaseTest {
      * @throws IllegalAccessException
      */
     protected void setSessionExpire() throws IllegalAccessException {
-        Field lastActionField = Whitebox.getField(FTRUMInnerManager.class, "lastActionTime");
+        Field lastActionField = Whitebox.getField(FTRUMInnerManager.class, "lastUserActiveTime");
         lastActionField.setAccessible(true);
         long lastActionTime = (long) lastActionField.get(FTRUMInnerManager.get());
-        Whitebox.setInternalState(FTRUMInnerManager.get(), "lastActionTime", lastActionTime - 900000000000L);
+        Whitebox.setInternalState(FTRUMInnerManager.get(), "lastUserActiveTime", lastActionTime - 900000000000L);
 
     }
 
@@ -249,6 +252,25 @@ public class FTBaseTest {
      */
     public static FTSDKConfig getSDKConfigInSyncDataHelper() {
         return Whitebox.getInternalState(getInnerSyncDataHelper(), "config");
+    }
+
+    /**
+     * 获取当前 datahelper 中 config属性
+     * {@link FTTrackInner#dataHelper} 的 config
+     *
+     * @return
+     */
+    public static long getLongTaskBlockDurationMS() {
+        return (long) Whitebox.getInternalState(FTUIBlockManager.get(), "blockDurationNS") / 1000000;
+    }
+
+    /**
+     * 获取最小 longtask 判定最小限制数值
+     *
+     * @return
+     */
+    public static long getUIBlockMiniBlockDurationMS() {
+        return (long) Whitebox.getInternalState(FTUIBlockManager.class, "MINI_TIME_BLOCK_NS") / 1000000;
     }
 
     /**

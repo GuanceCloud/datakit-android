@@ -293,7 +293,7 @@ public class DeviceUtils {
                     LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                 }
             } else {
-                LogUtils.e(TAG, "没有获得到 READ_PHONE_STATE 权限无法获取运营商信息");
+                LogUtils.eOnce(TAG, "没有获得到 READ_PHONE_STATE 权限无法获取运营商信息");
             }
         } catch (Exception e) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));

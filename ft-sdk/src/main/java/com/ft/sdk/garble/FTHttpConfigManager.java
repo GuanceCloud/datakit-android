@@ -42,6 +42,8 @@ public class FTHttpConfigManager {
      */
     private int sendOutTime = 30000;
 
+    private boolean compressIntakeRequests = false;
+
     /**
      * http 请求返回读取
      */
@@ -72,6 +74,7 @@ public class FTHttpConfigManager {
         datakitUrl = ftsdkConfig.getDatakitUrl();
         datawayUrl = ftsdkConfig.getDatawayUrl();
         clientToken = ftsdkConfig.getClientToken();
+        compressIntakeRequests = ftsdkConfig.isCompressIntakeRequests();
 
         if (!Utils.isNullOrEmpty(datakitUrl)) {
             LogUtils.d(TAG, "serverUrl ==>\nDatakit Url:" + datakitUrl);
@@ -81,6 +84,7 @@ public class FTHttpConfigManager {
                     + datawayUrl + ",clientToken:" + maskToken);
         }
 
+        LogUtils.d(TAG, "isCompressIntakeRequests:" + compressIntakeRequests);
 
     }
 
@@ -106,6 +110,10 @@ public class FTHttpConfigManager {
 
     public int getReadOutTime() {
         return readOutTime;
+    }
+
+    public boolean isCompressIntakeRequests() {
+        return compressIntakeRequests;
     }
 
     /**

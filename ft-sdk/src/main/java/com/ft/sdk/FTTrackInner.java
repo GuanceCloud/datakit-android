@@ -128,7 +128,7 @@ public class FTTrackInner {
      * @param value
      */
     void appendRUMGlobalContext(String key, String value) {
-        dataHelper.appendRUMGlobalContext(key,value);
+        dataHelper.appendRUMGlobalContext(key, value);
     }
 
     /**
@@ -147,7 +147,7 @@ public class FTTrackInner {
      * @param value
      */
     void appendLogGlobalContext(String key, String value) {
-        dataHelper.appendLogGlobalContext(key,value);
+        dataHelper.appendLogGlobalContext(key, value);
     }
 
 
@@ -217,7 +217,8 @@ public class FTTrackInner {
                     SyncJsonData recordData = SyncJsonData.getSyncJsonData(dataHelper, dataType,
                             new LineProtocolBean(measurement, tags, fields, time));
                     boolean result = FTDBManager.get().insertFtOperation(recordData, false);
-                    LogUtils.d(TAG, "syncDataBackground:" + measurement + " " + dataType.toString() + ":insert=" + result);
+                    LogUtils.d(TAG, "syncDataBackground:" + measurement + " "
+                            + dataType.toString() + ",uuid:" + recordData.getUuid() + ":insert=" + result);
                     if (callBack != null) {
                         callBack.onComplete();
                     }

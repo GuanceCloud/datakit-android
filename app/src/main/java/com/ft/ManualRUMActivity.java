@@ -35,9 +35,9 @@ public class ManualRUMActivity extends NameTitleActivity {
             property.put("sp_count", 1);
             //开启自动获取，会与这里自定义 action 发生冲突，小于 100 ms 间隔的 action 会被屏蔽。如果频繁调用请使用 addAction
              FTRUMGlobalManager.get().startAction("Action Start", "Button_Click", property);
-//            for (int i = 0; i < 10; i++) {
-//                FTRUMGlobalManager.get().addAction("Add Action Start:" + (count++), "Button_Click", property);
-//            }
+            for (int i = 0; i < 1000; i++) {
+                FTRUMGlobalManager.get().addAction("Add Action Start:" + (count++), "Button_Click", property);
+            }
 
         });
         findViewById(R.id.manual_view_start_btn).setOnClickListener(v -> {

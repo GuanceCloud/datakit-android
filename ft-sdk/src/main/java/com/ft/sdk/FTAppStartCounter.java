@@ -48,7 +48,7 @@ class FTAppStartCounter {
      * 标记应用冷启动时间
      */
     void markCodeStartTimeLine() {
-        codeStartTimeLine = Utils.getCurrentNanoTime();
+        codeStartTimeLine = Utils.getAppStartTimeNs();
         LogUtils.d(TAG, "markCodeStartTimeLine");
     }
 
@@ -71,7 +71,7 @@ class FTAppStartCounter {
 
     /**
      * 记录冷启动时间段
-     *  * {@link Constants#KEY_RUM_ACTION_TYPE} = {@link  Constants#ACTION_TYPE_LAUNCH_COLD}
+     * * {@link Constants#KEY_RUM_ACTION_TYPE} = {@link  Constants#ACTION_TYPE_LAUNCH_COLD}
      *
      * @param codeStartTime 冷启动时间段，单位纳秒
      */
@@ -92,12 +92,12 @@ class FTAppStartCounter {
 
     /**
      * 上传热启动时间
-     *
+     * <p>
      * {@link Constants#KEY_RUM_ACTION_TYPE} = {@link  Constants#ACTION_TYPE_LAUNCH_HOT}
      *
      * @param hotStartDuration 热启动时间段，单位纳秒
      */
-    void hotStart(long hotStartDuration,long startTime) {
+    void hotStart(long hotStartDuration, long startTime) {
         FTAutoTrack.putRUMLaunchPerformance(false, hotStartDuration, startTime);
     }
 
