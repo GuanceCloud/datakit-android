@@ -1,3 +1,8 @@
+# agent 1.6.5
+1. 弱化 Webview 在 AOP 过程中参数为 null 的提示
+2. 优化应用在后台长 Session 更新的机制
+
+---
 # agent 1.6.5-beta04
 1. 弱化 Webview 在 AOP 过程中参数为 null 的提示
 2. 优化应用在后台长 Session 更新的机制
