@@ -110,7 +110,7 @@ public class FTRUMInnerManager {
      * <p>
      * 注意 ：AndroidTest 会调用这个方法 {@link com.ft.test.base.FTBaseTest#setSessionExpire()}
      */
-    private long lastActionTime = lastSessionTime;
+    private long lastUserActiveTime = lastSessionTime;
 
     /**
      * 采样率，{@link FTRUMConfig#samplingRate}
@@ -128,15 +128,12 @@ public class FTRUMInnerManager {
      */
     private void checkSessionRefresh(boolean checkRefreshView) {
         long now = Utils.getCurrentNanoTime();
-        boolean longResting = now - lastActionTime > MAX_RESTING_TIME;
+        boolean longResting = now - lastUserActiveTime > MAX_RESTING_TIME;
         boolean longTimeSession = now - lastSessionTime > SESSION_EXPIRE_TIME;
         if (longTimeSession || longResting) {
             lastSessionTime = now;
-            lastActionTime = now;
-
             sessionId = Utils.randomUUID();
-            LogUtils.d(TAG, "New SessionId:" + sessionId);
-
+            LogUtils.d(TAG, "Session Track -> New SessionId:" + sessionId + ",longTimeSessionReset:" + longTimeSession);
             checkSessionKeep(sessionId, sampleRate);
 
             if (checkRefreshView) {
@@ -156,11 +153,16 @@ public class FTRUMInnerManager {
                     FTMonitorManager.get().addMonitor(activeView.getId());
                     FTMonitorManager.get().attachMonitorData(activeView);
                     initView(activeView);
-                    LogUtils.d(TAG, "checkRefreshView sessionId:" + activeView.getSessionId() + ",viewId:" + activeView.getId());
+                    LogUtils.d(TAG, "Session Track -> checkRefreshView sessionId:" + activeView.getSessionId() + ",viewId:" + activeView.getId());
                 }
             }
 
         }
+//        boolean isAppForward = FTApplication.isAppForward;
+//        if (isAppForward) {
+        //只要有 RUM 数据采集活动就会延长用户时间，包括后台
+        lastUserActiveTime = now;
+//        }
     }
 
     private String getActionId() {
@@ -186,7 +188,7 @@ public class FTRUMInnerManager {
             activeAction.getProperty().putAll(property);
         }
         initAction(activeAction, true);
-        this.lastActionTime = activeAction.getStartTime();
+//        this.lastUserActiveTime = activeAction.getStartTime();
     }
 
     /**
@@ -243,7 +245,7 @@ public class FTRUMInnerManager {
             }
             activeAction.setTags(FTRUMConfigManager.get().getRUMPublicDynamicTags());
             initAction(activeAction, false);
-            this.lastActionTime = activeAction.getStartTime();
+//            this.lastUserActiveTime = activeAction.getStartTime();
 
             mHandler.removeCallbacks(mActionRecheckRunner);
             mHandler.postDelayed(mActionRecheckRunner, 5000);
@@ -404,7 +406,7 @@ public class FTRUMInnerManager {
         FTMonitorManager.get().addMonitor(activeView.getId());
         FTMonitorManager.get().attachMonitorData(activeView);
         initView(activeView);
-        lastActionTime = activeView.getStartTime();
+//        lastUserActiveTime = activeView.getStartTime();
 
     }
 
@@ -1285,7 +1287,7 @@ public class FTRUMInnerManager {
                 }
                 notCollectArr.add(sessionId);
             }
-            LogUtils.d(TAG, "根据 FTRUMConfig SampleRate 采样率计算，当前 session 不被采集，session_id:" + sessionId);
+            LogUtils.d(TAG, "根据 FTRUMConfig SampleRate 采样率计算，当前 session 不被采集，Session Track-> session_id:" + sessionId);
         }
     }
 

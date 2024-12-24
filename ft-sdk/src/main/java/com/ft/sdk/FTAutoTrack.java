@@ -555,7 +555,8 @@ public class FTAutoTrack {
 
     public static void loadUrl(View webView, String url) {
         if (webView == null) {
-            throw new NullPointerException("WebView has not initialized.");
+            LogUtils.e(TAG,"WebView has not initialized.");
+            return;
         }
         setUpWebView(webView);
         invokeWebViewLoad(webView, "loadUrl", new Object[]{url}, new Class[]{String.class});
@@ -572,7 +573,8 @@ public class FTAutoTrack {
      */
     public static void loadUrl(View webView, String url, Map<String, String> additionalHttpHeaders) {
         if (webView == null) {
-            throw new NullPointerException("WebView has not initialized.");
+            LogUtils.e(TAG,"WebView has not initialized.");
+            return;
         }
         setUpWebView(webView);
         invokeWebViewLoad(webView, "loadUrl", new Object[]{url, additionalHttpHeaders}, new Class[]{String.class, Map.class});
@@ -590,7 +592,8 @@ public class FTAutoTrack {
      */
     public static void loadData(View webView, String data, String mimeType, String encoding) {
         if (webView == null) {
-            throw new NullPointerException("WebView has not initialized.");
+            LogUtils.e(TAG,"WebView has not initialized.");
+            return;
         }
         setUpWebView(webView);
         invokeWebViewLoad(webView, "loadData", new Object[]{data, mimeType, encoding}, new Class[]{String.class, String.class, String.class});
@@ -608,7 +611,8 @@ public class FTAutoTrack {
      */
     public static void loadDataWithBaseURL(View webView, String baseUrl, String data, String mimeType, String encoding, String historyUrl) {
         if (webView == null) {
-            throw new NullPointerException("WebView has not initialized.");
+            LogUtils.e(TAG,"WebView has not initialized.");
+            return;
         }
         setUpWebView(webView);
         invokeWebViewLoad(webView, "loadDataWithBaseURL", new Object[]{baseUrl, data, mimeType, encoding, historyUrl},
@@ -625,7 +629,8 @@ public class FTAutoTrack {
      */
     public static void postUrl(View webView, String url, byte[] postData) {
         if (webView == null) {
-            throw new NullPointerException("WebView has not initialized.");
+            LogUtils.e(TAG,"WebView has not initialized.");
+            return;
         }
         setUpWebView(webView);
         invokeWebViewLoad(webView, "postUrl", new Object[]{url, postData},

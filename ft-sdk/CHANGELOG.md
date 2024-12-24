@@ -1,3 +1,8 @@
+# agent 1.6.5-beta04
+1. 弱化 Webview 在 AOP 过程中参数为 null 的提示
+2. 优化应用在后台长 Session 更新的机制
+
+---
 # agent 1.6.4
 1. 优化 App 启动时间在 API 24 以上统计时间
 2. 支持通过 `FTRUMConfig.setEnableTrackAppUIBlock(true, blockDurationMs)` 设置检测时间范围
