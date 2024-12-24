@@ -162,6 +162,7 @@ public class FTRUMInnerManager {
         }
 //        boolean isAppForward = FTApplication.isAppForward;
 //        if (isAppForward) {
+        //只要有 RUM 数据采集活动就会延长用户时间，包括后台
         lastUserActiveTime = now;
 //        }
     }
@@ -189,7 +190,7 @@ public class FTRUMInnerManager {
             activeAction.getProperty().putAll(property);
         }
         initAction(activeAction, true);
-        this.lastUserActiveTime = activeAction.getStartTime();
+//        this.lastUserActiveTime = activeAction.getStartTime();
     }
 
     /**
@@ -246,7 +247,7 @@ public class FTRUMInnerManager {
             }
             activeAction.setTags(FTRUMConfigManager.get().getRUMPublicDynamicTags());
             initAction(activeAction, false);
-            this.lastUserActiveTime = activeAction.getStartTime();
+//            this.lastUserActiveTime = activeAction.getStartTime();
 
             mHandler.removeCallbacks(mActionRecheckRunner);
             mHandler.postDelayed(mActionRecheckRunner, 5000);
@@ -407,7 +408,7 @@ public class FTRUMInnerManager {
         FTMonitorManager.get().addMonitor(activeView.getId());
         FTMonitorManager.get().attachMonitorData(activeView);
         initView(activeView);
-        lastUserActiveTime = activeView.getStartTime();
+//        lastUserActiveTime = activeView.getStartTime();
 
     }
 

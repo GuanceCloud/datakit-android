@@ -191,10 +191,10 @@ public class FTBaseTest {
      * @throws IllegalAccessException
      */
     protected void setSessionExpire() throws IllegalAccessException {
-        Field lastActionField = Whitebox.getField(FTRUMInnerManager.class, "lastActionTime");
+        Field lastActionField = Whitebox.getField(FTRUMInnerManager.class, "lastUserActiveTime");
         lastActionField.setAccessible(true);
         long lastActionTime = (long) lastActionField.get(FTRUMInnerManager.get());
-        Whitebox.setInternalState(FTRUMInnerManager.get(), "lastActionTime", lastActionTime - 900000000000L);
+        Whitebox.setInternalState(FTRUMInnerManager.get(), "lastUserActiveTime", lastActionTime - 900000000000L);
 
     }
 

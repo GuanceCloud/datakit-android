@@ -1,3 +1,19 @@
+# agent 1.6.6-alpha01
+1. 继承 ft-sdk:1.6.5-alpha01, 合并 1.6.5 更新部分
+
+---
+# agent 1.6.5
+1. 弱化 Webview 在 AOP 过程中参数为 null 的提示
+2. 优化应用在后台长 Session 更新的机制
+
+---
+# agent 1.6.5-beta04
+1. 弱化 Webview 在 AOP 过程中参数为 null 的提示
+2. 优化应用在后台长 Session 更新的机制
+3. 继承 ft-sdk:1.6.4
+
+---
+
 # agent 1.6.5-alpha01
 1. 网络状态及类型获取优化，支持 ethernet 类型的网络类型显示
 2. 优化无网络状态，数据写入频繁关闭数据库的问题
@@ -19,6 +35,7 @@
 1. 新增 RUM 条目数量限制功能，支持通过 `FTRUMConfig.setRumCacheLimitCount(int)` 来限制 SDK 最大缓存条目数据限制， 
  支持通过 `FTRUMConfig.setRumCacheDiscardStrategy(strategy)` 设置来指定丢弃新数据或丢弃旧数据
 2. 新增 SDK 内部日志等级过滤功能
+
 ---
 # agent 1.6.4
 1. 优化 App 启动时间在 API 24 以上的统计
