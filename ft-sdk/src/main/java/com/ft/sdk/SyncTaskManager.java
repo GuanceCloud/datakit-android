@@ -240,7 +240,7 @@ public class SyncTaskManager {
                         running = false;
                         mHandler.removeMessages(MSG_CLOSE_DB);
                         LogUtils.d(TAG, "Try to close DB");
-                        mHandler.sendEmptyMessageDelayed(MSG_CLOSE_DB, 1000);
+                        mHandler.sendEmptyMessageDelayed(MSG_CLOSE_DB, 5000);
                         LogUtils.d(TAG, "<<<******************* Sync Poll Finish *******************\n");
                     }
                 }

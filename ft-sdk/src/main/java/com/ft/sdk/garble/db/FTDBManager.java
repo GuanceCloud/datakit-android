@@ -72,8 +72,8 @@ public class FTDBManager extends DBManager {
                 db.execSQL("DELETE FROM " + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " where _id in (SELECT _id from "
                         + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " ORDER by tm ASC LIMIT " + 100 + ")");
                 LogUtils.d(TAG, "Cleanup completed. Size reduced.");
-                db.execSQL("VACUUM;");
-                LogUtils.d(TAG, "VACUUM completed");
+                db.close();
+                LogUtils.w(TAG, "DB Close to reduce size");
             }
         }
 
@@ -693,8 +693,8 @@ public class FTDBManager extends DBManager {
 
                     if (FTDBCachePolicy.get().isEnableLimitWithDbSize()
                             && FTDBCachePolicy.get().isReachDbLimit()) {
-                        db.execSQL("VACUUM;");
-                        LogUtils.d(TAG, "VACUUM completed");
+                        db.close();
+                        LogUtils.w(TAG, "BD close to reduce size");
                     }
                 } catch (Exception e) {
                     LogUtils.e(TAG, LogUtils.getStackTraceString(e));
@@ -824,8 +824,8 @@ public class FTDBManager extends DBManager {
 
                 if (FTDBCachePolicy.get().isEnableLimitWithDbSize()
                         && FTDBCachePolicy.get().isReachDbLimit()) {
-                    db.execSQL("VACUUM;");
-                    LogUtils.d(TAG, "VACUUM completed");
+                    db.close();
+                    LogUtils.d(TAG, "close BD to reduce size");
                 }
 
             }
