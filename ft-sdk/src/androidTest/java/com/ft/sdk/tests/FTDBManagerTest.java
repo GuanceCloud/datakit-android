@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.ft.sdk.DBCacheDiscard;
 import com.ft.sdk.FTApplication;
+import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.bean.DataType;
@@ -18,6 +19,7 @@ import com.ft.sdk.garble.db.base.DatabaseHelper;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.test.base.FTBaseTest;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -51,9 +53,11 @@ public class FTDBManagerTest extends FTBaseTest {
      */
     @Test
     public void insertDataTest() throws Exception {
+        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
+        FTSdk.initRUMWithConfig(new FTRUMConfig());
         insertData();
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
-        Thread.sleep(1000);
+        Thread.sleep(2000);
         List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimit(0);
         assertEquals(1, recordDataList.size());
     }
@@ -66,6 +70,8 @@ public class FTDBManagerTest extends FTBaseTest {
      */
     @Test
     public void insertMultiDataTest() throws Exception {
+        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
+        FTSdk.initRUMWithConfig(new FTRUMConfig());
         int i = 0;
         while (i < repeatTime) {
             insertData();
@@ -86,6 +92,8 @@ public class FTDBManagerTest extends FTBaseTest {
      */
     @Test
     public void deleteDataByIdsTest() throws Exception {
+        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
+        FTSdk.initRUMWithConfig(new FTRUMConfig());
         insertData();
         insertData();
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据

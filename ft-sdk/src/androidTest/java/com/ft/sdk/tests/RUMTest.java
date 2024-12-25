@@ -11,7 +11,6 @@ import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
 import com.ft.sdk.RUMCacheDiscard;
 import com.ft.sdk.TraceType;
-import com.ft.sdk.garble.db.FTDBCachePolicy;
 import com.ft.sdk.garble.bean.ActionBean;
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.DataType;
@@ -20,6 +19,7 @@ import com.ft.sdk.garble.bean.NetStatusBean;
 import com.ft.sdk.garble.bean.ResourceParams;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.bean.ViewBean;
+import com.ft.sdk.garble.db.FTDBCachePolicy;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.Utils;
@@ -131,6 +131,7 @@ public class RUMTest extends FTBaseTest {
 
         FTRUMGlobalManager.get().addAction(ACTION_NAME, ACTION_TYPE_NAME, DURATION, property);
         waitEventConsumeInThreadPool();
+        Thread.sleep(500);
 
         List<SyncJsonData> list = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.RUM_APP);
 

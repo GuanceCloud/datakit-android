@@ -4,6 +4,9 @@ import static com.ft.sdk.tests.FTSdkAllTests.hasPrepare;
 
 import android.os.Looper;
 
+import com.ft.sdk.FTRUMConfig;
+import com.ft.sdk.FTSDKConfig;
+import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
@@ -44,6 +47,8 @@ public class DataFormatTest extends FTBaseTest {
 
     @Test
     public void trackFloatDoubleDataTest() throws Exception {
+        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
+        FTSdk.initRUMWithConfig(new FTRUMConfig());
         HashMap<String, Object> fields = new HashMap<>();
         fields.put("floatValue", 0f);
         fields.put("doubleValue", 0d);
