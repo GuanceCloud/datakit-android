@@ -57,6 +57,10 @@ public abstract class DBManager {
     private long pageSize = 0;
 
 
+    /**
+     * 通过 PRAGMA 获取 page_size *page_count 来计算获取当前 db 的 大小
+     * @param db
+     */
     private void checkDatabaseSize(SQLiteDatabase db) {
         if (db != null) {
             // 获取数据库文件的大小
@@ -88,8 +92,18 @@ public abstract class DBManager {
         }
     }
 
+    /**
+     * 是否开启 db 限制
+     * @return
+     */
     protected abstract boolean enableDBSizeLimit();
 
+
+    /**
+     * 通知 db 计算大小
+     * @param db
+     * @param reachLimit
+     */
     protected abstract void onDBSizeCacheChange(SQLiteDatabase db, long reachLimit);
 
     public void closeDB() {

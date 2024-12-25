@@ -223,7 +223,7 @@ public class FTTrackInner {
                                 boolean result = FTDBManager.get().insertFtOperation(recordData, false);
                                 LogUtils.d(TAG, "syncDataBackground:" + measurement + " "
                                         + dataType.toString() + ":insert=" + result +
-                                        ",uuid:" + recordData.getUuid() + (status == 0 ? ",drop OldCache" : ""));
+                                        ",uuid:" + recordData.getUuid() + (status == 1 ? ",drop OldCache" : ""));
                                 if (callBack != null) {
                                     callBack.onComplete();
                                 }

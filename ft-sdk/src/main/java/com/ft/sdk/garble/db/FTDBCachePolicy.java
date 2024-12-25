@@ -137,7 +137,7 @@ public class FTDBCachePolicy {
      * @param optCount 写入数据数量
      */
     public void optLogCount(int optCount) {
-        if(enableLimitWithDbSize)return;
+        if (enableLimitWithDbSize) return;
         logCount.addAndGet(optCount);
     }
 
@@ -147,7 +147,7 @@ public class FTDBCachePolicy {
      * @param optCount 写入数据数量
      */
     public void optRUMCount(int optCount) {
-        if(enableLimitWithDbSize)return;
+        if (enableLimitWithDbSize) return;
         rumCount.addAndGet(optCount);
     }
 
