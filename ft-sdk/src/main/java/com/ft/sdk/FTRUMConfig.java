@@ -171,7 +171,7 @@ public class FTRUMConfig {
     }
 
     /**
-     * 设置 RUM 限制数量 [10000,),默认是 200000，{@link Constants#DEFAULT_DB_RUM_CACHE_NUM}
+     * 设置 RUM 限制数量 [10000,),默认是 100_000，{@link Constants#DEFAULT_DB_RUM_CACHE_NUM}
      * @param rumCacheLimitCount
      * @return
      */

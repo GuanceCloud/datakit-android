@@ -122,7 +122,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 开启使用 db 限制数据大小，默认 100MB ，{@link Constants#DEFAULT_DB_SIZE_LIMIT}
+     * 开启使用 db 限制数据大小，默认 100MB ，单位 byte，{@link Constants#DEFAULT_DB_SIZE_LIMIT}
      * @param dbSize 设置 db 限制上限，数据库越大，磁盘压力越大，[30MB,),默认 100 MB
      *
      * 开启 db 数据限制之后，{@link FTLoggerConfig#setLogCacheLimitCount(int)}
