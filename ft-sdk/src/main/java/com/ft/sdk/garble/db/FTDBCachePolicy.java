@@ -151,14 +151,26 @@ public class FTDBCachePolicy {
         rumCount.addAndGet(optCount);
     }
 
-    public void setReachDBLimit(long currentDbSize) {
+    /**
+     *  设置当前 db 缓存文件大小
+     * @param currentDbSize
+     */
+    public void setCurrentDBSize(long currentDbSize) {
         this.currentDbSize.set(currentDbSize);
     }
 
+    /**
+     * 是否达到 db 缓存限制
+     * @return
+     */
     public boolean isReachDbLimit() {
         return currentDbSize.get() >= dbLimitSize;
     }
 
+    /**
+     * 是否达到 db 缓存限制的一半
+     * @return
+     */
     public boolean reachHalfLimit() {
         if (enableLimitWithDbSize) {
             return currentDbSize.get() >= dbLimitSize / 2;
@@ -252,10 +264,18 @@ public class FTDBCachePolicy {
         return status;
     }
 
+    /**
+     * 是否开启 db 限制
+     * @return
+     */
     boolean isEnableLimitWithDbSize() {
         return enableLimitWithDbSize;
     }
 
+    /**
+     * db 缓存丢弃策略
+     * @return
+     */
     DBCacheDiscard getDbCacheDiscard() {
         return dbCacheDiscard;
     }

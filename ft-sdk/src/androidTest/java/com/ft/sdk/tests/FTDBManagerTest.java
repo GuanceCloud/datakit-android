@@ -19,7 +19,6 @@ import com.ft.sdk.garble.db.base.DatabaseHelper;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.test.base.FTBaseTest;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -131,7 +130,7 @@ public class FTDBManagerTest extends FTBaseTest {
                 .enableLimitWithDbSize(Constants.MINI_DB_SIZE_LIMIT)
                 .setDbCacheDiscard(DBCacheDiscard.DISCARD));
 
-        FTDBCachePolicy.get().setReachDBLimit(Constants.MINI_DB_SIZE_LIMIT);
+        FTDBCachePolicy.get().setCurrentDBSize(Constants.MINI_DB_SIZE_LIMIT);
 
         assertTrue(FTDBCachePolicy.get().isReachDbLimit());
 

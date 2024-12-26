@@ -65,7 +65,7 @@ public class FTDBManager extends DBManager {
     @Override
     protected void onDBSizeCacheChange(SQLiteDatabase db, long fileSize) {
 //        LogUtils.d(TAG, "onDBSizeCacheChange:" + (fileSize / 1024) + "KB");
-        FTDBCachePolicy.get().setReachDBLimit(fileSize);
+        FTDBCachePolicy.get().setCurrentDBSize(fileSize);
         if (FTDBCachePolicy.get().isReachDbLimit()) {
             if (FTDBCachePolicy.get().getDbCacheDiscard() == DBCacheDiscard.DISCARD_OLDEST) {
                 LogUtils.w(TAG, "Database size exceeds limit! Performing cleanup...");

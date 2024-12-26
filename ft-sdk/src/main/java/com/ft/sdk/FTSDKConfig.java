@@ -140,6 +140,11 @@ public class FTSDKConfig {
         return limitWithDbSize;
     }
 
+    /**
+     * 设置 db 缓存丢弃策略
+     * @param dbCacheDiscard
+     * @return
+     */
     public FTSDKConfig setDbCacheDiscard(DBCacheDiscard dbCacheDiscard) {
         this.dbCacheDiscard = dbCacheDiscard;
         return this;
