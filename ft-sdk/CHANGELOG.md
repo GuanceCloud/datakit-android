@@ -1,7 +1,19 @@
+#  agent 1.6.6
+1. 网络状态及类型获取优化，支持 ethernet 类型的网络类型显示
+2. 优化无网络状态下，数据写入频繁关闭数据库的问题
+3. 修复丢弃日志与 RUM 丢弃旧数据时，数据条目数与设置条目数偏差的问题
+4. TV 设备按键事件适配，剔除非 TV 设备 tag
+5. 支持通过 `FTRUMConfig.setRumCacheLimitCount(int)`限制 RUM 数据条目数上限，默认 100_000
+6. 支持通过 `FTSDKConfig enableLimitWithDbSize(long dbSize)` 限制总缓存大小功能，开启之后
+   `FTLoggerConfig.setLogCacheLimitCount(int)` 及 `FTRUMConfig.setRumCacheLimitCount(int)` 将失效
+7. 优化设备无操作场景下 Session 刷新规则
+
+---
 #  agent 1.6.6-beta02
 1. 调整输出 SDK 日志输出行为
 2. 优化某些场景日志在抛弃旧数据时规则
 
+---
 # agent 1.6.6-beta01
 1. 优化 db 缓存限制 SDK 日志输出
 
