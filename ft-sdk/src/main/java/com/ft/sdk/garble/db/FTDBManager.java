@@ -70,7 +70,7 @@ public class FTDBManager extends DBManager {
             if (FTDBCachePolicy.get().getDbCacheDiscard() == DBCacheDiscard.DISCARD_OLDEST) {
                 LogUtils.w(TAG, "Database size exceeds limit! Performing cleanup...");
                 db.execSQL("DELETE FROM " + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " where _id in (SELECT _id from "
-                        + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " ORDER by tm ASC LIMIT " + 100 + ")");
+                        + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " ORDER by tm ASC LIMIT " + Constants.DB_OLD_CACHE_REMOVE_COUNT + ")");
                 LogUtils.d(TAG, "Cleanup completed. Size reduced.");
                 db.close();
                 LogUtils.w(TAG, "DB Close to reduce size");

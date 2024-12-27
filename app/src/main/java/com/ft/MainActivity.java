@@ -205,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
                             }
 
                         } catch (IOException e) {
-                            throw new RuntimeException(e);
+                            LogUtils.e(TAG, Log.getStackTraceString(e));
                         }
                     }
                 }.start();

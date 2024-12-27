@@ -150,6 +150,7 @@ public class Constants {
      */
     public static final int DEFAULT_DB_SIZE_LIMIT = 104857600;//100MB
     public static final int MINI_DB_SIZE_LIMIT = 31457280;//30MB
+    public static final int DB_OLD_CACHE_REMOVE_COUNT = 100;
 
 
 

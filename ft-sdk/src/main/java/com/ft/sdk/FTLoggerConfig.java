@@ -238,6 +238,7 @@ public class FTLoggerConfig {
      */
     public FTLoggerConfig setLogCacheLimitCount(int count) {
         this.logCacheLimitCount = Math.max(Constants.MINI_DB_LOG_CACHE_NUM, count);
+//        this.logCacheLimitCount = count;
         return this;
     }
 

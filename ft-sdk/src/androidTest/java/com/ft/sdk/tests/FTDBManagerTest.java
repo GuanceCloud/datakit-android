@@ -136,15 +136,15 @@ public class FTDBManagerTest extends FTBaseTest {
 
         assertEquals(FTDBCachePolicy.get().optRUMCachePolicy(10), -1);
 
-        assertEquals(FTDBCachePolicy.get().optRUMCachePolicy(10), -1);
+        assertEquals(FTDBCachePolicy.get().optLogCachePolicy(10), -10);
 
         FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL)
                 .enableLimitWithDbSize(Constants.MINI_DB_SIZE_LIMIT)
                 .setDbCacheDiscard(DBCacheDiscard.DISCARD_OLDEST));
 
-        assertEquals(FTDBCachePolicy.get().optRUMCachePolicy(10), 0);
+        assertEquals(FTDBCachePolicy.get().optRUMCachePolicy(10), 1);
 
-        assertEquals(FTDBCachePolicy.get().optRUMCachePolicy(10), 0);
+        assertEquals(FTDBCachePolicy.get().optLogCachePolicy(10), 10);
     }
 
     @Test

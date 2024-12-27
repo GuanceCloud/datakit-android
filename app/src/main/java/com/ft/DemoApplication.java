@@ -10,6 +10,8 @@ import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
+import com.ft.sdk.LogCacheDiscard;
+import com.ft.sdk.RUMCacheDiscard;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.bean.UserData;
@@ -40,13 +42,15 @@ public class DemoApplication extends BaseApplication {
 
 
     static void initFTSDK(Context context) {
-        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAWAY_URL,BuildConfig.CLIENT_TOKEN)
+        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAWAY_URL, BuildConfig.CLIENT_TOKEN)
                 .setDebug(true)//设置是否是 debug
                 .setAutoSync(true)
                 .setCustomSyncPageSize(100)
                 .setOnlySupportMainProcess(CrossProcessSetting.isOnlyMainProcess(context))
                 .setNeedTransformOldCache(true)
                 .setCompressIntakeRequests(true)
+//                .enableLimitWithDbSize(1024 * 1024)
+//                .setDbCacheDiscard(DBCacheDiscard.DISCARD_OLDEST)
                 .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()));
         FTSdk.install(ftSDKConfig);
 
@@ -54,7 +58,8 @@ public class DemoApplication extends BaseApplication {
                 .setSamplingRate(1f)
                 .setEnableCustomLog(true)
                 .setEnableConsoleLog(true)
-                .setLogCacheLimitCount(10000)
+                .setLogCacheLimitCount(1000)
+                .setLogCacheDiscardStrategy(LogCacheDiscard.DISCARD)
                 .setPrintCustomLogToConsole(true)
                 .setLogLevelFilters(new Status[]{Status.ERROR, Status.DEBUG})
                 .setEnableLinkRumData(true)
@@ -66,10 +71,12 @@ public class DemoApplication extends BaseApplication {
                 .setRumAppId(BuildConfig.RUM_APP_ID)
                 .setEnableTraceUserAction(true)
                 .setEnableTraceUserView(true)
+                .setRumCacheLimitCount(1000)
+                .setRumCacheDiscardStrategy(RUMCacheDiscard.DISCARD)
                 .setEnableTraceUserResource(true)
                 .setEnableTrackAppANR(true)
                 .setEnableTrackAppCrash(true)
-                .setEnableTrackAppUIBlock(true,100)
+                .setEnableTrackAppUIBlock(true, 100)
                 .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
                 .setResourceUrlHandler(url -> false)
 //                .addGlobalContext("track_id", BuildConfig.TRACK_ID)

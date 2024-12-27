@@ -200,13 +200,16 @@ public class FTDBCachePolicy {
     /**
      * 执行 log 日志数据库缓存策略
      *
-     * @return -1-表示直接丢弃，0-表示可以插入数据，n>0 表示需要删除 n 条数据
+     * @return 0-表示可以插入数据，n 表示需要删除旧数据 ,-n 表示丢弃多少数据
      */
     public int optLogCachePolicy(int limit) {
         if (enableLimitWithDbSize) {
-            if (dbCacheDiscard == DBCacheDiscard.DISCARD) {
-                if (isReachDbLimit()) {
-                    return -1;
+            if (isReachDbLimit()) {
+                switch (dbCacheDiscard) {
+                    case DISCARD:
+                        return -limit;
+                    case DISCARD_OLDEST:
+                        return limit;
                 }
             }
             return 0;
@@ -216,17 +219,23 @@ public class FTDBCachePolicy {
         int currentLogCount = logCount.get();
         if (currentLogCount >= logLimitCount) {//当数据量大于配置的数据库最大存储量时，执行丢弃策略
             if (logCacheDiscardStrategy == LogCacheDiscard.DISCARD) {//直接丢弃数据
-                status = -1;
+                status = -limit;
             } else if (logCacheDiscardStrategy == LogCacheDiscard.DISCARD_OLDEST) {//丢弃数据库中的前几条数据
                 FTDBManager.get().deleteOldestData(DataType.LOG, limit);
                 logCount.set(FTDBManager.get().queryTotalCount(DataType.LOG));
-                status = 0;
+                status = limit;
             }
         } else {
-            int needInsert = 0;
             if (currentLogCount + limit >= logLimitCount) {
-                needInsert = logLimitCount - currentLogCount;
-                status = limit - needInsert;
+                int needInsert = logLimitCount - currentLogCount;
+                int needRemove = limit - needInsert;
+                if (logCacheDiscardStrategy == LogCacheDiscard.DISCARD) {//直接丢弃数据
+                    status = -needRemove;
+                } else if (logCacheDiscardStrategy == LogCacheDiscard.DISCARD_OLDEST) {//丢弃数据库中的前几条数据
+                    FTDBManager.get().deleteOldestData(DataType.LOG, needRemove);
+                    logCount.set(FTDBManager.get().queryTotalCount(DataType.LOG));
+                    status = needRemove;
+                }
             }
         }
         return status;
@@ -240,9 +249,12 @@ public class FTDBCachePolicy {
      */
     public int optRUMCachePolicy(int limit) {
         if (enableLimitWithDbSize) {
-            if (dbCacheDiscard == DBCacheDiscard.DISCARD) {
-                if (isReachDbLimit()) {
-                    return -1;
+            if (isReachDbLimit()) {
+                switch (dbCacheDiscard) {
+                    case DISCARD:
+                        return -1;
+                    case DISCARD_OLDEST:
+                        return 1;
                 }
             }
             return 0;
@@ -256,16 +268,17 @@ public class FTDBCachePolicy {
             } else if (rumCacheDiscardStrategy == RUMCacheDiscard.DISCARD_OLDEST) {//丢弃数据库中的前几条数据
                 FTDBManager.get().deleteOldestData(new DataType[]{DataType.RUM_APP, DataType.RUM_WEBVIEW}, limit);
                 rumCount.set(FTDBManager.get().queryTotalCount(new DataType[]{DataType.RUM_APP, DataType.RUM_WEBVIEW}));
-                status = 0;
+                status = 1;
             }
         } else {
-            status = 1;
+            status = 0;
         }
         return status;
     }
 
     /**
      * 是否开启 db 限制
+     *
      * @return
      */
     boolean isEnableLimitWithDbSize() {
@@ -274,6 +287,7 @@ public class FTDBCachePolicy {
 
     /**
      * db 缓存丢弃策略
+     *
      * @return
      */
     DBCacheDiscard getDbCacheDiscard() {

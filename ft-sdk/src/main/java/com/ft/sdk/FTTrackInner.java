@@ -2,12 +2,12 @@ package com.ft.sdk;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.garble.db.FTDBCachePolicy;
 import com.ft.sdk.garble.bean.BaseContentBean;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.LineProtocolBean;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.SyncJsonData;
+import com.ft.sdk.garble.db.FTDBCachePolicy;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.http.FTResponseData;
 import com.ft.sdk.garble.http.HttpBuilder;
@@ -353,19 +353,27 @@ public class FTTrackInner {
             int length = recordDataList.size();
             int policyStatus = FTDBCachePolicy.get().optLogCachePolicy(length);
             if (policyStatus >= 0) {//执行同步策略
-                if (policyStatus > 0) {
-                    int dropCount = Math.min(policyStatus, length);
-                    recordDataList.subList(0, dropCount).clear();
-                    LogUtils.e(TAG, "reach log limit, drop log count:" + dropCount);
-                }
                 boolean result = FTDBManager.get().insertFtOptList(recordDataList, false);
                 FTDBCachePolicy.get().optLogCount(recordDataList.size());
-                LogUtils.d(TAG, "judgeLogCachePolicy:insert-result=" + result);
+                if (policyStatus == 0) {//不丢弃
+                    LogUtils.d(TAG, "judgeLogCachePolicy:insert-result=" + result);
+                } else {//丢弃全部或丢弃一部分旧数据，旧数据在 optLogCachePolicy 中丢弃
+                    int dropCount = Math.min(policyStatus, length);
+                    LogUtils.d(TAG, "judgeLogCachePolicy:insert-result=" + result + ", drop cache count:" + dropCount);
+                }
                 if (!silence) {
                     SyncTaskManager.get().executeSyncPoll();
                 }
             } else {
-                LogUtils.e(TAG, "reach log limit, drop log count:" + length);
+                int dropCount = Math.abs(policyStatus);
+                if (dropCount == length) {//全丢新数据
+                    LogUtils.e(TAG, "reach log limit, drop log count:" + dropCount);
+                } else {//丢一部分新数据
+                    recordDataList.subList(length - dropCount, length).clear();
+                    boolean result = FTDBManager.get().insertFtOptList(recordDataList, false);
+                    FTDBCachePolicy.get().optLogCount(recordDataList.size());
+                    LogUtils.d(TAG, "judgeLogCachePolicy:insert-result=" + result + ", drop log count:" + dropCount);
+                }
             }
         }
 
