@@ -1,7 +1,6 @@
 package com.ft.sdk.garble.utils;
 
-import com.ft.sdk.garble.http.HttpUrl;
-
+import java.net.URL;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -31,7 +30,7 @@ public class SkyWalkingUtils {
     private String newTraceId;
     private String newParentTraceId;
 
-    public SkyWalkingUtils(SkyWalkingVersion version, String sampled, long requestTime, HttpUrl url, String serviceName) {
+    public SkyWalkingUtils(SkyWalkingVersion version, String sampled, long requestTime, URL url, String serviceName) {
         synchronized (SkyWalkingUtils.class) {//防止多线程 increasingNumber 不安顺序增加
             if (increasingNumber.get() < 9999) {
                 increasingNumber.getAndAdd(2);
@@ -70,7 +69,7 @@ public class SkyWalkingUtils {
      * @param url
      * @param serviceName
      */
-    private void createSw8Head(String sampled, long requestTime, HttpUrl url, String serviceName) {
+    private void createSw8Head(String sampled, long requestTime, URL url, String serviceName) {
         newParentTraceId = traceIDUUID + "." + Thread.currentThread().getId() + "." + requestTime + String.format(Locale.getDefault(), "%04d", increasingNumber.get() - 1);
         newTraceId = traceIDUUID + "." + Thread.currentThread().getId() + "." + requestTime + String.format(Locale.getDefault(), "%04d", increasingNumber.get());
         sw8 = sampled + "-" +
@@ -92,7 +91,7 @@ public class SkyWalkingUtils {
      * @param url
      */
 
-    private void createSw6Head(String sampled, long requestTime, HttpUrl url) {
+    private void createSw6Head(String sampled, long requestTime, URL url) {
         newParentTraceId = increasingLong.get() + "." + Thread.currentThread().getId() + "." + requestTime + String.format(Locale.getDefault(), "%04d", increasingNumber.get() - 1);
         newTraceId = increasingLong.get() + "." + Thread.currentThread().getId() + "." + requestTime + String.format(Locale.getDefault(), "%04d", increasingNumber.get());
         sw8 = sampled + "-" +

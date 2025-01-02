@@ -910,7 +910,7 @@ public class FTRUMInnerManager {
      */
     void setTransformContent(String resourceId, ResourceParams params) {
 
-        FTTraceHandler handler = FTTraceManager.get().getHandler(resourceId);
+        FTTraceInterceptor.TraceRUMLinkable handler = FTTraceManager.get().getHandler(resourceId);
         String spanId = "";
         String traceId = "";
         if (handler != null) {

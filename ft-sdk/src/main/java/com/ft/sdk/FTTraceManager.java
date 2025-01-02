@@ -1,12 +1,9 @@
 package com.ft.sdk;
 
-import com.ft.sdk.garble.http.HttpUrl;
 import com.ft.sdk.garble.utils.Constants;
-import com.ft.sdk.garble.utils.Utils;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -28,29 +25,12 @@ public class FTTraceManager {
     }
 
     /**
-     * 只使用 Trace 时使用
-     *
-     * @param httpUrl
-     * @return
-     */
-    HashMap<String, String> getTraceHeader(HttpUrl httpUrl) {
-        return new FTTraceHandler().getTraceHeader(httpUrl);
-    }
-
-    /**
-     * 需要 RUM Trace 同时使用时使用
      *
      * @param key
-     * @param httpUrl
-     * @return
+     * @param handler
      */
-    HashMap<String, String> getTraceHeader(String key, HttpUrl httpUrl) {
-        FTTraceHandler handler = new FTTraceHandler();
-
-        HashMap<String, String> map = handler.getTraceHeader(httpUrl);
-
+    void putTraceHandler(String key, FTTraceInterceptor.TraceRUMLinkable handler) {
         handlerMap.put(key, new FTTraceManagerContainer(handler));
-        return map;
     }
 
     /**
@@ -62,24 +42,26 @@ public class FTTraceManager {
      * @throws MalformedURLException
      * @throws URISyntaxException
      */
-    public HashMap<String, String> getTraceHeader(String key, String urlString) throws MalformedURLException, URISyntaxException {
-        URL url = Utils.parseFromUrl(urlString);
-        return getTraceHeader(key, new HttpUrl(url.getHost(), url.getPath(), url.getPort()));
+    public HashMap<String, String> getTraceHeader(String key, String urlString) {
+        FTTraceHandler handler = new FTTraceHandler();
+        HashMap<String, String> map = handler.getTraceHeader(urlString);
+        putTraceHandler(key, handler);
+        return map;
     }
 
     /**
-     *  获取 trace http 请求头参数
+     * 获取 trace http 请求头参数
+     *
      * @param urlString url 地址
      * @return
      * @throws MalformedURLException
      * @throws URISyntaxException
      */
-    public HashMap<String, String> getTraceHeader(String urlString) throws MalformedURLException, URISyntaxException {
-        URL url = Utils.parseFromUrl(urlString);
-        return getTraceHeader( new HttpUrl(url.getHost(), url.getPath(), url.getPort()));
+    public HashMap<String, String> getTraceHeader(String urlString) {
+        return new FTTraceHandler().getTraceHeader(urlString);
     }
 
-    FTTraceHandler getHandler(String key) {
+    FTTraceInterceptor.TraceRUMLinkable getHandler(String key) {
         FTTraceManagerContainer container = handlerMap.get(key);
         if (container != null) {
             return container.handler;
@@ -144,6 +126,7 @@ public class FTTraceManager {
 
     /**
      * addResource 根据 key 数值移除
+     *
      * @param key
      */
     void removeByAddResource(String key) {
@@ -156,6 +139,7 @@ public class FTTraceManager {
 
     /**
      * stopResource 根据 key 数值移除
+     *
      * @param key
      */
     void removeByStopResource(String key) {
@@ -168,6 +152,7 @@ public class FTTraceManager {
 
     /**
      * 检验是否需要释放
+     *
      * @param key
      * @param container
      */
@@ -189,9 +174,9 @@ public class FTTraceManager {
         private final long startTime = System.currentTimeMillis();
         private static final int TIME_OUT = 60000;//暂不考虑长链接情况
 
-        private final FTTraceHandler handler;
+        private final FTTraceInterceptor.TraceRUMLinkable handler;
 
-        public FTTraceManagerContainer(FTTraceHandler handler) {
+        public FTTraceManagerContainer(FTTraceInterceptor.TraceRUMLinkable handler) {
             this.handler = handler;
         }
 

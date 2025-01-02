@@ -117,10 +117,13 @@ public class FTTraceConfig {
         return enableAutoTrace;
     }
 
+    @Deprecated
     public boolean isEnableWebTrace() {
         return enableWebTrace;
     }
 
+
+    @Deprecated
     public FTTraceConfig setEnableWebTrace(boolean enableWebTrace) {
         this.enableWebTrace = enableWebTrace;
         return this;
