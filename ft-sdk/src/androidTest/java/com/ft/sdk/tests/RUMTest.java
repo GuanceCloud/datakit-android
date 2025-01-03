@@ -1,14 +1,19 @@
 package com.ft.sdk.tests;
 
+import static com.ft.sdk.FTTraceHandler.W3C_TRACEPARENT_KEY;
 import static com.ft.sdk.tests.FTSdkAllTests.hasPrepare;
 
 import android.os.Looper;
 
 import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTRUMGlobalManager;
+import com.ft.sdk.FTResourceEventListener;
+import com.ft.sdk.FTResourceInterceptor;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
+import com.ft.sdk.FTTraceInterceptor;
+import com.ft.sdk.FTTraceManager;
 import com.ft.sdk.RUMCacheDiscard;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.ActionBean;
@@ -21,6 +26,7 @@ import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.bean.ViewBean;
 import com.ft.sdk.garble.db.FTDBCachePolicy;
 import com.ft.sdk.garble.db.FTDBManager;
+import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.Utils;
 import com.ft.test.base.FTBaseTest;
@@ -41,7 +47,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.Response;
 
 public class RUMTest extends FTBaseTest {
 
@@ -624,7 +632,6 @@ public class RUMTest extends FTBaseTest {
 
         FTSdk.initTraceWithConfig(new FTTraceConfig()
                 .setTraceType(TraceType.DDTRACE)
-                .setEnableAutoTrace(true)
                 .setEnableLinkRUMData(enableLinkRUMData)
         );
         Thread.sleep(1000);
@@ -652,6 +659,106 @@ public class RUMTest extends FTBaseTest {
         }
         mockWebServer.shutdown();
         return !tracId.isEmpty() && !spanId.isEmpty();
+    }
+
+    private final static String CUSTOM_TRACE_HEADER = "replace_trace_id";
+
+    @Test
+    public void customTraceHeader() throws IOException, InterruptedException {
+        MockWebServer mockWebServer = new MockWebServer();
+
+        MockResponse mockResponse = new MockResponse();
+        mockResponse.setBody("");
+        mockResponse.setResponseCode(HttpURLConnection.HTTP_OK);
+        mockWebServer.enqueue(mockResponse);
+        mockWebServer.play();
+
+        FTSdk.initRUMWithConfig(new FTRUMConfig());
+
+        FTSdk.initTraceWithConfig(new FTTraceConfig()
+                .setTraceType(TraceType.TRACEPARENT)
+                .setEnableAutoTrace(true)
+                .setEnableLinkRUMData(true)
+        );
+        Thread.sleep(1000);
+
+
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(new FTTraceInterceptor(new FTTraceInterceptor.HeaderHandler() {
+                    private String[] splits;
+
+                    @Override
+                    public HashMap<String, String> getTraceHeader(Request request) {
+                        HashMap<String, String> map = new HashMap<>();
+                        String replaceTrace = request.header(CUSTOM_TRACE_HEADER);//Get request
+                        String headerString = FTTraceManager.get().
+                                getTraceHeader(request.url().toString())
+                                .get(W3C_TRACEPARENT_KEY); //get trace header string
+
+                        splits = headerString.split("-");
+                        String originTraceId = splits[1];
+                        splits[1] = replaceTrace;
+                        map.put(W3C_TRACEPARENT_KEY, headerString.replace(originTraceId, replaceTrace));
+                        return map;
+                    }
+
+                    @Override
+                    public String getSpanID() {
+                        if (splits != null) {
+                            return splits[2];
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    public String getTraceID() {
+                        if (splits != null) {
+                            return splits[1];
+                        }
+                        return null;
+                    }
+                }))
+                .addInterceptor(new FTResourceInterceptor())
+                .eventListenerFactory(new FTResourceEventListener.FTFactory()).build();
+
+
+        Request.Builder builder = new Request.Builder().url(mockWebServer.getUrl("/").toString())
+                .method(RequestMethod.GET.name(), null);
+
+        String replaceTraceHeader = Utils.randomUUID();
+        Request request = null;
+        try {
+            Response response = client.newCall(builder.header(CUSTOM_TRACE_HEADER,
+                    replaceTraceHeader).build()).execute();
+            request = response.request();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Thread.sleep(1000);
+
+        List<SyncJsonData> recordDataList = FTDBManager.get()
+                .queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
+
+        String tracId = "";
+        String spanId = "";
+
+        for (SyncJsonData recordData : recordDataList) {
+
+            LineProtocolData data = new LineProtocolData(recordData.getDataString());
+
+            if (Constants.FT_MEASUREMENT_RUM_RESOURCE.equals(data.getMeasurement())) {
+                tracId = data.getTagAsString(Constants.KEY_RUM_RESOURCE_TRACE_ID, "");
+                spanId = data.getTagAsString(Constants.KEY_RUM_RESOURCE_SPAN_ID, "");
+                break;
+            }
+
+        }
+        mockWebServer.shutdown();
+
+        Assert.assertTrue(!tracId.isEmpty() && !spanId.isEmpty());
+        Assert.assertTrue(request.header(W3C_TRACEPARENT_KEY).contains(replaceTraceHeader));
+        Assert.assertEquals(tracId, replaceTraceHeader);
     }
 
     /**
