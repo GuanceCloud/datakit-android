@@ -59,7 +59,7 @@ public class FTUIBlockManager {
      */
     public void start(FTRUMConfig config) {
         if (!config.isRumEnable()
-                && !config.isEnableTrackAppUIBlock()) {
+                || !config.isEnableTrackAppUIBlock()) {
             return;
         }
         this.blockDurationNS = Math.max(config.getBlockDurationMS() * 1000000, MINI_TIME_BLOCK_NS);
