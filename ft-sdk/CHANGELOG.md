@@ -1,3 +1,7 @@
+#  agent 1.6.7-beta01
+1. 修正错误 long task 错误配置逻辑
+
+---
 #  agent 1.6.7-alpha01
 1. 支持更改链路中对应的 traceId 和 spanId
 
