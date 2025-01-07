@@ -100,6 +100,12 @@ class FTNetworkListener extends ConnectivityManager.NetworkCallback {
     }
 
     @Override
+    public void onAvailable(@NonNull Network network) {
+        super.onAvailable(network);
+        judgeNetState();
+    }
+
+    @Override
     public void onCapabilitiesChanged(@NonNull Network network, @NonNull NetworkCapabilities networkCapabilities) {
         super.onCapabilitiesChanged(network, networkCapabilities);
         fetchNetworkStateBean(connectivityManager);
