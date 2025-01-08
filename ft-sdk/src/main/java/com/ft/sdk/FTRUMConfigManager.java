@@ -8,9 +8,9 @@ import android.content.SharedPreferences;
 
 import androidx.annotation.Nullable;
 
-import com.ft.sdk.garble.db.FTDBCachePolicy;
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.UserData;
+import com.ft.sdk.garble.db.FTDBCachePolicy;
 import com.ft.sdk.garble.threadpool.RunnerCompleteCallBack;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
@@ -25,6 +25,7 @@ import com.ft.sdk.nativelib.NativeExtraLogCatSetting;
 import java.io.File;
 import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Brandon
@@ -129,7 +130,7 @@ public class FTRUMConfigManager {
                                 });
 
                         try {
-                            latch.await();
+                            latch.await(800, TimeUnit.MILLISECONDS);
                         } catch (InterruptedException e) {
                             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                         }
