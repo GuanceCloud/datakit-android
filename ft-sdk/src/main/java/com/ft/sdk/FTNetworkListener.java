@@ -102,7 +102,8 @@ class FTNetworkListener extends ConnectivityManager.NetworkCallback {
     @Override
     public void onAvailable(@NonNull Network network) {
         super.onAvailable(network);
-        judgeNetState();
+        LogUtils.d(TAG, "Net Connected");
+        SyncTaskManager.get().executeSyncPoll();
     }
 
     @Override
@@ -118,7 +119,10 @@ class FTNetworkListener extends ConnectivityManager.NetworkCallback {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            judgeNetState();
+            if (NetUtils.isNetworkAvailable(application)) {
+                LogUtils.d(TAG, "Net Connected");
+                SyncTaskManager.get().executeSyncPoll();
+            }
         }
     }
 
@@ -126,18 +130,6 @@ class FTNetworkListener extends ConnectivityManager.NetworkCallback {
      * 判断网络是否可用
      */
     private void judgeNetState() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            if (networkStateBean.isNetworkAvailable()) {
-                LogUtils.d(TAG, "Net Connected");
-                SyncTaskManager.get().executeSyncPoll();
-            }
-        } else {
-            //大于 0 有网
-            if (NetUtils.isNetworkAvailable(application)) {
-                LogUtils.d(TAG, "Net Connected");
-                SyncTaskManager.get().executeSyncPoll();
-            }
-        }
 
     }
 
