@@ -146,10 +146,10 @@ public class FTSdk {
         LogUtils.setSDKLogLevel(config.getSdkLogLevel());
         FTDBCachePolicy.get().initSDKParams(config);
         FTHttpConfigManager.get().initParams(config);
-        FTNetworkListener.get().monitor();
         appendGlobalContext(config);
         SyncTaskManager.get().init(config);
         FTTrackInner.getInstance().initBaseConfig(config);
+        FTNetworkListener.get().monitor();
         LogUtils.d(TAG, "initFTConfig complete:" + config);
     }
 
@@ -201,7 +201,7 @@ public class FTSdk {
         try {
             config.setServiceName(get().getBaseConfig().getServiceName());
             FTLoggerConfigManager.get().initWithConfig(config);
-            LogUtils.d(TAG, "initLogWithConfig complete");
+            LogUtils.d(TAG, "initLogWithConfig complete:" + config);
 
         } catch (Exception e) {
             LogUtils.e(TAG, "initLogWithConfig fail:\n" + LogUtils.getStackTraceString(e));

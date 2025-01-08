@@ -1290,7 +1290,7 @@ public class FTRUMInnerManager {
                 }
                 notCollectArr.add(sessionId);
             }
-            LogUtils.d(TAG, "根据 FTRUMConfig SampleRate 采样率计算，当前 session 不被采集，Session Track-> session_id:" + sessionId);
+            LogUtils.w(TAG, "根据 FTRUMConfig SampleRate 采样率计算，当前 session 不被采集，Session Track-> session_id:" + sessionId);
         }
     }
 
