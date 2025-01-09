@@ -203,6 +203,28 @@ public class FTRUMConfigManager {
 
 
     /**
+     * 返回自定义覆盖全局的 {@link FTTraceInterceptor}
+     *
+     * @return
+     */
+    FTTraceInterceptor.HeaderHandler getOverrideHeaderHandler() {
+        if (config == null) return null;
+        if (config.getOkHttpTraceHeaderHandler() == null) return null;
+        return config.getOkHttpTraceHeaderHandler();
+    }
+
+    /**
+     * 返回自定义覆盖全局的 {@link FTResourceInterceptor}
+     *
+     * @return
+     */
+    FTResourceInterceptor.ContentHandlerHelper getOverrideResourceContentHandler() {
+        if (config == null) return null;
+        if (config.getOkHttpResourceContentHandler() == null) return null;
+        return config.getOkHttpResourceContentHandler();
+    }
+
+    /**
      * userDataBinded
      * 用户数据是否已经绑定完成
      *

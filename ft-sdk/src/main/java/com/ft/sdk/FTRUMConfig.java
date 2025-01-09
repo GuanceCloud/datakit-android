@@ -76,6 +76,10 @@ public class FTRUMConfig {
 
     private FTOkHttpEventListenerHandler okHttpEventListenerHandler;
 
+    private FTTraceInterceptor.HeaderHandler headerHandler;
+
+    private FTResourceInterceptor.ContentHandlerHelper contentHandlerHelper;
+
     /**
      * 设置全局 tag
      */
@@ -172,11 +176,12 @@ public class FTRUMConfig {
 
     /**
      * 设置 RUM 限制数量 [10000,),默认是 100_000，{@link Constants#DEFAULT_DB_RUM_CACHE_NUM}
+     *
      * @param rumCacheLimitCount
      * @return
      */
     public FTRUMConfig setRumCacheLimitCount(int rumCacheLimitCount) {
-        this.rumCacheLimitCount =  Math.max(Constants.MINI_DB_RUM_CACHE_NUM, rumCacheLimitCount);
+        this.rumCacheLimitCount = Math.max(Constants.MINI_DB_RUM_CACHE_NUM, rumCacheLimitCount);
 //        this.rumCacheLimitCount =  rumCacheLimitCount;
         return this;
     }
@@ -188,6 +193,7 @@ public class FTRUMConfig {
 
     /**
      * 设置日志丢弃策略
+     *
      * @param rumCacheDiscardStrategy
      * @return
      */
@@ -422,8 +428,26 @@ public class FTRUMConfig {
         return okHttpEventListenerHandler;
     }
 
+    public FTTraceInterceptor.HeaderHandler getOkHttpTraceHeaderHandler() {
+        return headerHandler;
+    }
+
+    public FTResourceInterceptor.ContentHandlerHelper getOkHttpResourceContentHandler() {
+        return contentHandlerHelper;
+    }
+
     public FTRUMConfig setOkHttpEventListenerHandler(FTOkHttpEventListenerHandler okHttpResourceHandler) {
         this.okHttpEventListenerHandler = okHttpResourceHandler;
+        return this;
+    }
+
+    public FTRUMConfig setOkHttpTraceHeaderHandler(FTTraceInterceptor.HeaderHandler headerHandler) {
+        this.headerHandler = headerHandler;
+        return this;
+    }
+
+    public FTRUMConfig setOkHttpResourceContentHandler(FTResourceInterceptor.ContentHandlerHelper contentHandlerHelper) {
+        this.contentHandlerHelper = contentHandlerHelper;
         return this;
     }
 

@@ -697,15 +697,23 @@ public class FTAutoTrack {
 
                 }
                 if (!hasSetResource) {
-                    builder.interceptors().add(0, new FTResourceInterceptor());
+                    FTResourceInterceptor.ContentHandlerHelper contentHandler = FTRUMConfigManager.get()
+                            .getOverrideResourceContentHandler();
+                    if (contentHandler != null) {
+                        builder.interceptors().add(0, new FTResourceInterceptor(contentHandler));
+                    } else {
+                        builder.interceptors().add(0, new FTResourceInterceptor());
+                    }
                 } else {
-                    LogUtils.d(TAG, "Skip FTResourceInterceptor setting");
+                    LogUtils.d(TAG, "Skip default FTResourceInterceptor setting");
                 }
-                FTResourceEventListener.FTFactory factory = FTRUMConfigManager.get().getOverrideEventListener();
-                if (factory != null) {
-                    builder.eventListenerFactory(factory);
+                FTResourceEventListener.FTFactory overrideFactory = FTRUMConfigManager.get()
+                        .getOverrideEventListener();
+                if (overrideFactory != null) {
+                    builder.eventListenerFactory(overrideFactory);
                 } else {
-                    builder.eventListenerFactory(new FTResourceEventListener.FTFactory(config.isEnableResourceHostIP(), config.getResourceUrlHandler()));
+                    builder.eventListenerFactory(new FTResourceEventListener
+                            .FTFactory(config.isEnableResourceHostIP(), config.getResourceUrlHandler()));
                 }
             }
         }
@@ -721,9 +729,14 @@ public class FTAutoTrack {
 
             }
             if (!hasSetTrace) {
-                builder.interceptors().add(0, new FTTraceInterceptor());
+                FTTraceInterceptor.HeaderHandler headerHandler = FTRUMConfigManager.get().getOverrideHeaderHandler();
+                if (headerHandler != null) {
+                    builder.interceptors().add(0, new FTTraceInterceptor(headerHandler));
+                } else {
+                    builder.interceptors().add(0, new FTTraceInterceptor());
+                }
             } else {
-                LogUtils.d(TAG, "Skip FTTraceInterceptor setting");
+                LogUtils.d(TAG, "Skip default FTTraceInterceptor setting");
             }
         }
 
