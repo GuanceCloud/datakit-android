@@ -21,12 +21,19 @@ public class OkHttpClientSingleton {
         if (instance == null) {
             // connect time 10 秒
             instance = new OkHttpClient.Builder()
+//                    .eventListener(new EventListener() {
+//                        @Override
+//                        public void callStart(@NotNull Call call) {
+//                            super.callStart(call);
+//                            LogUtils.d("RequestUtil", "custom EventListener");
+//                        }
+//                    })
                     .connectTimeout(10, TimeUnit.SECONDS).build();
         }
         return instance;
     }
 
-    public static synchronized OkHttpClient getInstanceBeforeSDKInit(){
+    public static synchronized OkHttpClient getInstanceBeforeSDKInit() {
         if (instance == null) {
             // connect time 10 秒
             instance = new OkHttpClient.Builder()

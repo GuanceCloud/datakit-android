@@ -31,6 +31,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import okhttp3.EventListener;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 
@@ -555,7 +556,7 @@ public class FTAutoTrack {
 
     public static void loadUrl(View webView, String url) {
         if (webView == null) {
-            LogUtils.e(TAG,"WebView has not initialized.");
+            LogUtils.e(TAG, "WebView has not initialized.");
             return;
         }
         setUpWebView(webView);
@@ -573,7 +574,7 @@ public class FTAutoTrack {
      */
     public static void loadUrl(View webView, String url, Map<String, String> additionalHttpHeaders) {
         if (webView == null) {
-            LogUtils.e(TAG,"WebView has not initialized.");
+            LogUtils.e(TAG, "WebView has not initialized.");
             return;
         }
         setUpWebView(webView);
@@ -592,7 +593,7 @@ public class FTAutoTrack {
      */
     public static void loadData(View webView, String data, String mimeType, String encoding) {
         if (webView == null) {
-            LogUtils.e(TAG,"WebView has not initialized.");
+            LogUtils.e(TAG, "WebView has not initialized.");
             return;
         }
         setUpWebView(webView);
@@ -611,7 +612,7 @@ public class FTAutoTrack {
      */
     public static void loadDataWithBaseURL(View webView, String baseUrl, String data, String mimeType, String encoding, String historyUrl) {
         if (webView == null) {
-            LogUtils.e(TAG,"WebView has not initialized.");
+            LogUtils.e(TAG, "WebView has not initialized.");
             return;
         }
         setUpWebView(webView);
@@ -629,7 +630,7 @@ public class FTAutoTrack {
      */
     public static void postUrl(View webView, String url, byte[] postData) {
         if (webView == null) {
-            LogUtils.e(TAG,"WebView has not initialized.");
+            LogUtils.e(TAG, "WebView has not initialized.");
             return;
         }
         setUpWebView(webView);
@@ -682,7 +683,6 @@ public class FTAutoTrack {
         } else {
             LogUtils.e(TAG, "trackOkHttpBuilder: OkhttpClient.Build Before SDK install");
         }
-
 //            builder.addNetworkInterceptor(interceptor); //发现部分工程有兼容问题
         if (FTRUMConfigManager.get().isRumEnable()) {
             FTRUMConfig config = FTRUMConfigManager.get().getConfig();
@@ -707,13 +707,20 @@ public class FTAutoTrack {
                 } else {
                     LogUtils.d(TAG, "Skip default FTResourceInterceptor setting");
                 }
-                FTResourceEventListener.FTFactory overrideFactory = FTRUMConfigManager.get()
-                        .getOverrideEventListener();
-                if (overrideFactory != null) {
-                    builder.eventListenerFactory(overrideFactory);
+
+                OkHttpClient client = builder.build();
+                EventListener.Factory originFactory = client.eventListenerFactory();
+                if (originFactory instanceof FTResourceEventListener.FTFactory) {
+                    LogUtils.d(TAG, "Skip default FTResourceEventListener.FTFactory setting");
                 } else {
-                    builder.eventListenerFactory(new FTResourceEventListener
-                            .FTFactory(config.isEnableResourceHostIP(), config.getResourceUrlHandler()));
+                    FTResourceEventListener.FTFactory overrideFactory = FTRUMConfigManager.get()
+                            .getOverrideEventListener();
+                    if (overrideFactory != null) {
+                        builder.eventListenerFactory(overrideFactory);
+                    } else {
+                        builder.eventListenerFactory(new FTResourceEventListener
+                                .FTFactory(config.isEnableResourceHostIP(), config.getResourceUrlHandler(), originFactory));
+                    }
                 }
             }
         }
@@ -739,7 +746,6 @@ public class FTAutoTrack {
                 LogUtils.d(TAG, "Skip default FTTraceInterceptor setting");
             }
         }
-
         return builder.build();
     }
 
