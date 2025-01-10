@@ -74,8 +74,10 @@ public class FTTraceInterceptor implements Interceptor {
         }
         try {
 
-            for (String key : requestHeaders.keySet()) {
-                requestBuilder.header(key, requestHeaders.get(key));//避免重试出现重复头
+            if (requestHeaders != null) {
+                for (String key : requestHeaders.keySet()) {
+                    requestBuilder.header(key, requestHeaders.get(key));//避免重试出现重复头
+                }
             }
 
             response = chain.proceed(requestBuilder.build());
