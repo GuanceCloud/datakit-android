@@ -1,3 +1,7 @@
+#  agent 1.6.7-beta02
+1. 同 1.6.7-alpha05
+
+---
 #  agent 1.6.7-alpha05
 1. 优化 AOP OkhttpListener eventListener 的覆盖逻辑，保留原 eventListener 事件参数传递
 
