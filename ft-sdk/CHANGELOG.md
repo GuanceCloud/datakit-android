@@ -1,3 +1,7 @@
+#  agent 1.6.7-alpha05
+1. 优化 AOP OkhttpListener eventListener 的覆盖逻辑，保留原 eventListener 事件参数传递
+
+---
 #  agent 1.6.7-alpha04
 1. 支持全局设置自定义 TraceHeader 和 ResourceContent 方法
 2. 修正 tag 偶现为空字符，导致数据上报失败的问题
