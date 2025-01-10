@@ -285,6 +285,12 @@ public class FTResourceEventListener extends EventListener {
             this.originFactory = null;
         }
 
+        public FTFactory(boolean enableResourceHostIP) {
+            this.enableResourceHostIP = enableResourceHostIP;
+            this.handler = null;
+            this.originFactory = null;
+        }
+
         public FTFactory(boolean enableResourceHostIP, FTInTakeUrlHandler handler, EventListener.Factory originFactory) {
             this.enableResourceHostIP = enableResourceHostIP;
             this.handler = handler;

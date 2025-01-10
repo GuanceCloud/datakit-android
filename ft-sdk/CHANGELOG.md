@@ -1,13 +1,22 @@
+#  agent 1.6.7
+1. 支持自定义 FTTraceInterceptor.HeaderHandler 与 RUM 数据做关联
+2. 支持通过 FTRUMConfig.setOkHttpTraceHeaderHandler 更改 ASM 写入的 FTTraceInterceptor.HeaderHandler 内容，
+   支持通过 FTRUMConfig.setOkHttpResourceContentHandler 更改 ASM 写入的 FTResourceInterceptor.ContentHandlerHelper 内容。
+3. 优化崩溃采集能力，适配某些 OS 触发 system.exit 导致崩溃数据无法采集的场景
+4. 修正 tag 偶现为空字符，从而导致数据无法正常上报的问题
+5. 优化 ASM OkHttpListener EventListener 的覆盖逻辑，支持保留原项目 EventListener 事件参数传递
+
+---
 #  agent 1.6.7-beta02
 1. 同 1.6.7-alpha05
 
 ---
 #  agent 1.6.7-alpha05
-1. 优化 AOP OkhttpListener eventListener 的覆盖逻辑，保留原 eventListener 事件参数传递
+1. 优化 ASM OkhttpListener EventListener 的覆盖逻辑，支持保留原 EventListener 事件参数传递
 
 ---
 #  agent 1.6.7-alpha04
-1. 支持全局设置自定义 TraceHeader 和 ResourceContent 方法
+1. 支持全局设置自定义 FTTraceInterceptor.HeaderHandler 和 FTResourceInterceptor.ContentHandlerHelper 方法
 2. 修正 tag 偶现为空字符，导致数据上报失败的问题
 
 ---

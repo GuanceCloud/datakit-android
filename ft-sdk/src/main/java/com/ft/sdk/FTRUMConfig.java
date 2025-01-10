@@ -74,10 +74,19 @@ public class FTRUMConfig {
         }
     };
 
+    /**
+     *
+     */
     private FTOkHttpEventListenerHandler okHttpEventListenerHandler;
 
+    /**
+     *
+     */
     private FTTraceInterceptor.HeaderHandler headerHandler;
 
+    /**
+     *
+     */
     private FTResourceInterceptor.ContentHandlerHelper contentHandlerHelper;
 
     /**
@@ -291,11 +300,23 @@ public class FTRUMConfig {
         return enableTraceUserAction;
     }
 
+    /**
+     * 是否自动追踪用户操作，目前只支持用户启动和点击操作，默认为 `false`
+     *
+     * @param enableTraceUserAction
+     * @return
+     */
     public FTRUMConfig setEnableTraceUserAction(boolean enableTraceUserAction) {
         this.enableTraceUserAction = enableTraceUserAction;
         return this;
     }
 
+    /**
+     * 是否监测用户 View 行为，页面跳转
+     *
+     * @param enableTraceUserView
+     * @return
+     */
     public FTRUMConfig setEnableTraceUserView(boolean enableTraceUserView) {
         this.enableTraceUserView = enableTraceUserView;
         return this;
@@ -309,11 +330,25 @@ public class FTRUMConfig {
         return enableTraceUserResource;
     }
 
+    /**
+     * 是否自动追动用户网络请求 ，仅支持 `Okhttp`，默认为 `false
+     *
+     * @param enableTraceUserResource
+     * @return
+     */
     public FTRUMConfig setEnableTraceUserResource(boolean enableTraceUserResource) {
         this.enableTraceUserResource = enableTraceUserResource;
         return this;
     }
 
+    /**
+     * 是否采集请求目标域名地址的 IP。作用域：只影响 `EnableTraceUserResource`  为 true 的默认采集。
+     * 自定义 Resource 采集，需要使用 `FTResourceEventListener.FTFactory(true)` 来开启这个功能。
+     * 另外，单个 Okhttp 对相同域名存在 IP 缓存机制，相同 `OkhttpClient`，在连接服务端 IP 不发生变化的前提下，只会生成一次
+     *
+     * @param enableTraceUserResource
+     * @return
+     */
     public FTRUMConfig setEnableResourceHostIP(boolean enableTraceUserResource) {
         this.enableResourceHostIP = enableTraceUserResource;
         return this;
@@ -436,16 +471,34 @@ public class FTRUMConfig {
         return contentHandlerHelper;
     }
 
+    /**
+     * ASM 设置全局 Okhttp EventListener
+     *
+     * @param okHttpResourceHandler
+     * @return
+     */
     public FTRUMConfig setOkHttpEventListenerHandler(FTOkHttpEventListenerHandler okHttpResourceHandler) {
         this.okHttpEventListenerHandler = okHttpResourceHandler;
         return this;
     }
 
+    /**
+     * ASM 设置全局 {@link FTTraceInterceptor.HeaderHandler}，默认不设置
+     *
+     * @param headerHandler
+     * @return
+     */
     public FTRUMConfig setOkHttpTraceHeaderHandler(FTTraceInterceptor.HeaderHandler headerHandler) {
         this.headerHandler = headerHandler;
         return this;
     }
 
+    /**
+     * ASM 设置全局 {@link FTResourceInterceptor.ContentHandlerHelper } ，默认不设置
+     *
+     * @param contentHandlerHelper
+     * @return
+     */
     public FTRUMConfig setOkHttpResourceContentHandler(FTResourceInterceptor.ContentHandlerHelper contentHandlerHelper) {
         this.contentHandlerHelper = contentHandlerHelper;
         return this;
