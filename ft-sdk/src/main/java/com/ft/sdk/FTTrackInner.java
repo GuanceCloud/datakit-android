@@ -217,11 +217,19 @@ public class FTTrackInner {
                             new LineProtocolBean(measurement, tags, fields, time));
                     synchronized (FTDBCachePolicy.get().getRumLock()) {
                         int status = FTDBCachePolicy.get().optRUMCachePolicy(1);
+                        StringBuilder errorDec = new StringBuilder();
+                        if (measurement.equals(Constants.FT_MEASUREMENT_RUM_ERROR)) {
+                            errorDec.append(" | ")
+                                    .append(tags.get(Constants.KEY_RUM_ERROR_TYPE))
+                                    .append(" | \"")
+                                    .append(fields.get(Constants.KEY_RUM_ERROR_MESSAGE))
+                                    .append("\"");
+                        }
                         switch (status) {
                             case 0:
                             case 1:
                                 boolean result = FTDBManager.get().insertFtOperation(recordData, false);
-                                LogUtils.d(TAG, "syncDataBackground:" + measurement + " "
+                                LogUtils.d(TAG, "syncDataBackground:" + measurement + errorDec + " "
                                         + dataType.toString() + ":insert=" + result +
                                         ",uuid:" + recordData.getUuid() + (status == 1 ? ",drop OldCache" : ""));
                                 if (callBack != null) {
@@ -233,8 +241,8 @@ public class FTTrackInner {
                                 SyncTaskManager.get().executeSyncPoll();
                                 break;
                             case -1:
-                                LogUtils.e(TAG, "syncDataBackground:" + measurement + " "
-                                        + dataType.toString() + ",uuid:" + recordData.getUuid() + ",drop by Cache limit");
+                                LogUtils.e(TAG, "syncDataBackground:" + measurement + errorDec + " " +
+                                        dataType.toString() + errorDec + ",uuid:" + recordData.getUuid() + ",drop by Cache limit");
                                 break;
                         }
                     }

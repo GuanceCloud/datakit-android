@@ -267,7 +267,7 @@ public class SyncDataHelper {
         while (keys.hasNext()) {
             String keyTemp = keys.next();
             Object value = obj.get(keyTemp);
-            if (value == null || "".equals(value) || JSONObject.NULL.equals(value)) {
+            if (value == null || String.valueOf(value).isEmpty() || JSONObject.NULL.equals(value)) {
                 if (!isTag) {
                     String key = Utils.translateTagKeyValue(keyTemp);
                     sb.append(key);
