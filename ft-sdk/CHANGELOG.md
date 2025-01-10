@@ -1,3 +1,8 @@
+#  agent 1.6.7-alpha04
+1. 支持全局设置自定义 TraceHeader 和 ResourceContent 方法
+2. 修正 tag 偶现为空字符，导致数据上报失败的问题
+
+---
 #  agent 1.6.7-alpha02
 1. 优化崩溃采集能力，适配某些 OS 触发 system.exit 导致崩溃数据无法采集的场景
 2. 修复当网络恢复可用状态，触发同步数据失灵的问题
