@@ -155,6 +155,7 @@ public class FTTraceConfig {
                 ", enableAutoTrace=" + enableAutoTrace +
                 ", enableLinkRUMData=" + enableLinkRUMData +
                 ", serviceName='" + serviceName + '\'' +
+                ", globalContext=" + globalContext +
                 '}';
     }
 }

@@ -487,11 +487,23 @@ public class FTSDKConfig {
     @Override
     public String toString() {
         return "FTSDKConfig{" +
-                "dbCacheLimit=" + dbCacheLimit +
+                ", isDebug=" + isDebug +
+                ", sdkLogLevel=" + sdkLogLevel +
+                ", dbCacheLimit=" + dbCacheLimit +
+                ", limitWithDbSize=" + limitWithDbSize +
+                ", dbCacheDiscard=" + dbCacheDiscard +
+                ", enableAccessAndroidID=" + enableAccessAndroidID +
                 ", autoSync=" + autoSync +
+                ", pageSize=" + pageSize +
+                ", syncSleepTime=" + syncSleepTime +
                 ", compressIntakeRequests=" + compressIntakeRequests +
+                ", serviceName='" + serviceName + '\'' +
+                ", dataSyncRetryCount=" + dataSyncRetryCount +
+                ", env='" + env + '\'' +
                 ", onlySupportMainProcess=" + onlySupportMainProcess +
                 ", enableDataIntegerCompatible=" + enableDataIntegerCompatible +
+                ", needTransformOldCache=" + needTransformOldCache +
+                ", globalContext=" + globalContext +
                 '}';
     }
 }

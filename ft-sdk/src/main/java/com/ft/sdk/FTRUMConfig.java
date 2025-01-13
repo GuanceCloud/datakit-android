@@ -536,11 +536,22 @@ public class FTRUMConfig {
                 ", enableTraceUserView=" + enableTraceUserView +
                 ", enableTraceUserResource=" + enableTraceUserResource +
                 ", enableResourceHostIP=" + enableResourceHostIP +
+                ", deviceMetricsDetectFrequency=" + deviceMetricsDetectFrequency +
+                ", intTakeUrlHandler=" + intTakeUrlHandler +
+                ", okHttpEventListenerHandler=" + okHttpEventListenerHandler +
+                ", headerHandler=" + headerHandler +
+                ", contentHandlerHelper=" + contentHandlerHelper +
+                ", globalContext=" + globalContext +
                 ", serviceName='" + serviceName + '\'' +
+                ", extraLogCatWithJavaCrash=" + extraLogCatWithJavaCrash +
+                ", extraLogCatWithNativeCrash=" + extraLogCatWithNativeCrash +
+                ", extraLogCatWithANR=" + extraLogCatWithANR +
+                ", rumCacheLimitCount=" + rumCacheLimitCount +
+                ", rumCacheDiscardStrategy=" + rumCacheDiscardStrategy +
                 '}';
     }
 
-    //    /**
+//    /**
 //     * 设置 BackendSample 后端采样，当为 true 时，rum sampleRate 设置不再起效
 //     *
 //     * @param backendSample

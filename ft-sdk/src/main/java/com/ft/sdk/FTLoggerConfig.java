@@ -293,8 +293,12 @@ public class FTLoggerConfig {
                 ", enableConsoleLog=" + enableConsoleLog +
                 ", enableCustomLog=" + enableCustomLog +
                 ", serviceName='" + serviceName + '\'' +
-                ", printCustomLogToConsole=" + printCustomLogToConsole +
+                ", logPrefix='" + logPrefix + '\'' +
+                ", logCacheLimitCount=" + logCacheLimitCount +
+                ", logLevelFilters=" + logLevelFilters +
+                ", globalContext=" + globalContext +
                 ", logCacheDiscardStrategy=" + logCacheDiscardStrategy +
+                ", printCustomLogToConsole=" + printCustomLogToConsole +
                 '}';
     }
 }
