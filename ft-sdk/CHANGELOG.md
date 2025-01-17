@@ -1,3 +1,7 @@
+#  agent 1.6.8-alpha01
+1. 修复多次初始化 RUM 配置，fps 采集不准确的问题
+
+---
 #  agent 1.6.7
 1. 支持自定义 FTTraceInterceptor.HeaderHandler 与 RUM 数据做关联
 2. 支持通过 FTRUMConfig.setOkHttpTraceHeaderHandler 更改 ASM 写入的 FTTraceInterceptor.HeaderHandler 内容，
