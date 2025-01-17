@@ -38,9 +38,6 @@ public class FpsUtils {
      *
      */
     public void start() {
-        if (metronome == null) {
-            metronome = new Metronome();
-        }
         metronome.start();
         metronome.addListener(new Audience() {
             @Override
@@ -83,6 +80,7 @@ public class FpsUtils {
          *
          */
         public void start() {
+            choreographer.removeFrameCallback(this);
             choreographer.postFrameCallback(this);
         }
 
