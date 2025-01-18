@@ -89,6 +89,12 @@ public class TrackLog {
         return println(true, Log.INFO, tag, msg);
     }
 
+
+    /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
+    public static int println(int priority, String tag, String msg) {
+        return println(true, priority, tag, msg);
+    }
+
     /**
      * @param upload
      * @param priority

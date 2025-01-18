@@ -29,6 +29,7 @@ import com.ft.plugin.garble.PluginConfigManager;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Handle;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -267,9 +268,11 @@ public class FTMethodAdapter extends AdviceAdapter {
                         return;
 
                     case "println":
-                        if (Constants.METHOD_DESC_S_S_I.equals(desc)) {
+                        if (Constants.METHOD_DESC_I_S_S_I.equals(desc)) {
+
                             mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG,
-                                    "println", Constants.METHOD_DESC_S_S_I, false);
+                                    "println", Constants.METHOD_DESC_I_S_S_I, false);
+
                         } else {
                             super.visitMethodInsn(opcode, owner, name, desc, itf);
                         }
