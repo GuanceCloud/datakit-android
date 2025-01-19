@@ -92,7 +92,8 @@ public class TrackLog {
 
     /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
     public static int println(int priority, String tag, String msg) {
-        return println(true, priority, tag, msg);
+        //只采集 VERBOSE，DEBUG，INFO，WARN，ERROR
+        return println(priority >= Log.VERBOSE && priority <= Log.ERROR, priority, tag, msg);
     }
 
     /**
