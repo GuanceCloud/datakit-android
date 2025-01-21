@@ -18,6 +18,7 @@ import com.ft.sdk.garble.bean.BatteryBean;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.threadpool.ThreadPoolFactory;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.NetUtils;
 import com.ft.sdk.garble.utils.Utils;
 import com.ft.sdk.sessionreplay.internal.StorageBackedFeature;
 import com.ft.sdk.sessionreplay.internal.net.BatchesToSegmentsMapper;
@@ -120,7 +121,7 @@ public class SDKFeature implements FeatureScope {
                         new SystemInfoProxy() {
                             @Override
                             public boolean isNetworkAvailable() {
-                                return Utils.isNetworkAvailable();
+                                return NetUtils.isNetworkAvailable();
                             }
 
                             @Override
