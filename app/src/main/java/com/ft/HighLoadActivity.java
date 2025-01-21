@@ -8,6 +8,7 @@ import android.view.View;
 import androidx.annotation.Nullable;
 
 import com.ft.sdk.FTLogger;
+import com.ft.sdk.FTRUMGlobalManager;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.threadpool.ThreadPoolHandler;
@@ -28,6 +29,11 @@ public class HighLoadActivity extends NameTitleActivity {
      * 360000/2，并发线程一个线程日志量
      */
     private static final int LOG_DATA_COUNT = 180000;
+
+    /**
+     * 发 add自定义Action事件
+     */
+    private static final int ADD_ACTION_COUNT = 10000;
     /**
      * 1000/50，并发2线程平均 10 ms 一次
      */
@@ -82,6 +88,13 @@ public class HighLoadActivity extends NameTitleActivity {
             public void onClick(View v) {
                 startActivity(new Intent(HighLoadActivity.this, RepeatActivity.class));
 
+            }
+        });
+
+        findViewById(R.id.high_load_to_repeat_add_action).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                batchAddActions();
             }
         });
     }
@@ -150,6 +163,19 @@ public class HighLoadActivity extends NameTitleActivity {
                         e.printStackTrace();
                         break;
                     }
+                }
+            }
+        });
+
+    }
+
+    private void batchAddActions() {
+        ThreadPoolHandler.get().getExecutor().execute(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < ADD_ACTION_COUNT; i++) {
+                    FTRUMGlobalManager.get().addAction("Custom Add Action:" + i,
+                            "custom_type");
                 }
             }
         });

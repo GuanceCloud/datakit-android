@@ -56,7 +56,7 @@ public class CpuUtils {
     }
 
     /**
-     * 获取 Android O 及更高版本的CPU使用率
+     * 获取 Android O 及更高版本的 当前 pid CPU使用率
      *
      * @return
      */
@@ -89,8 +89,7 @@ public class CpuUtils {
                     if (cpu.endsWith("%")) {
                         cpu = cpu.substring(0, cpu.lastIndexOf("%"));
                     }
-                    float rate = Float.parseFloat(cpu) / Runtime.getRuntime().availableProcessors();
-                    return rate;
+                    return Float.parseFloat(cpu) / Runtime.getRuntime().availableProcessors();
                 }
             }
         } catch (IOException e) {
@@ -123,7 +122,7 @@ public class CpuUtils {
     }
 
     /**
-     * 获取 Android O 以下版本的CPU使用率
+     * 获取 Android O 以下版本的当前 pid CPU 使用率
      *
      * @return
      */

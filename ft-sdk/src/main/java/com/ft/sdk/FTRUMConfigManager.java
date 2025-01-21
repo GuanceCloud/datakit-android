@@ -10,11 +10,11 @@ import androidx.annotation.Nullable;
 
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.UserData;
+import com.ft.sdk.garble.db.FTDBCachePolicy;
 import com.ft.sdk.garble.threadpool.RunnerCompleteCallBack;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.sdk.garble.utils.NetUtils;
 import com.ft.sdk.garble.utils.PackageUtils;
 import com.ft.sdk.garble.utils.Utils;
 import com.ft.sdk.garble.utils.VersionUtils;
@@ -25,6 +25,7 @@ import com.ft.sdk.nativelib.NativeExtraLogCatSetting;
 import java.io.File;
 import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Brandon
@@ -65,6 +66,7 @@ public class FTRUMConfigManager {
     void initWithConfig(FTRUMConfig config) {
         this.config = config;
 
+        FTDBCachePolicy.get().initRUMParam(config);
         FTRUMInnerManager.get().initParams(config);
         FTRUMGlobalManager.get().initConfig(config);
 //        FTAutoTrackConfigManager.get().initParams();
@@ -128,7 +130,7 @@ public class FTRUMConfigManager {
                                 });
 
                         try {
-                            latch.await();
+                            latch.await(800, TimeUnit.MILLISECONDS);
                         } catch (InterruptedException e) {
                             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                         }
@@ -199,6 +201,28 @@ public class FTRUMConfigManager {
         return config.getOkHttpEventListenerHandler().getEventListenerFTFactory();
     }
 
+
+    /**
+     * 返回自定义覆盖全局的 {@link FTTraceInterceptor}
+     *
+     * @return
+     */
+    FTTraceInterceptor.HeaderHandler getOverrideHeaderHandler() {
+        if (config == null) return null;
+        if (config.getOkHttpTraceHeaderHandler() == null) return null;
+        return config.getOkHttpTraceHeaderHandler();
+    }
+
+    /**
+     * 返回自定义覆盖全局的 {@link FTResourceInterceptor}
+     *
+     * @return
+     */
+    FTResourceInterceptor.ContentHandlerHelper getOverrideResourceContentHandler() {
+        if (config == null) return null;
+        if (config.getOkHttpResourceContentHandler() == null) return null;
+        return config.getOkHttpResourceContentHandler();
+    }
 
     /**
      * userDataBinded
@@ -348,7 +372,7 @@ public class FTRUMConfigManager {
         if (includeRUMStatic) {
             tags.putAll(FTTrackInner.getInstance().getCurrentDataHelper().getCurrentRumTags());
         }
-        tags.put(Constants.KEY_RUM_NETWORK_TYPE, NetUtils.getNetWorkStateName());
+        tags.put(Constants.KEY_RUM_NETWORK_TYPE, FTNetworkListener.get().getNetworkStateBean().getNetworkType());
         tags.put(Constants.KEY_RUM_IS_SIGN_IN, FTRUMConfigManager.get().isUserDataBinded() ? "T" : "F");
         if (FTRUMConfigManager.get().isUserDataBinded()) {
             UserData data = FTRUMConfigManager.get().getUserData();

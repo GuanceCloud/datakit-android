@@ -237,7 +237,8 @@ public class FTLoggerConfig {
      * @return
      */
     public FTLoggerConfig setLogCacheLimitCount(int count) {
-        this.logCacheLimitCount = Math.max(1000, count);
+        this.logCacheLimitCount = Math.max(Constants.MINI_DB_LOG_CACHE_NUM, count);
+//        this.logCacheLimitCount = count;
         return this;
     }
 
@@ -282,5 +283,22 @@ public class FTLoggerConfig {
 
     public HashMap<String, Object> getGlobalContext() {
         return globalContext;
+    }
+
+    @Override
+    public String toString() {
+        return "FTLoggerConfig{" +
+                "samplingRate=" + samplingRate +
+                ", enableLinkRumData=" + enableLinkRumData +
+                ", enableConsoleLog=" + enableConsoleLog +
+                ", enableCustomLog=" + enableCustomLog +
+                ", serviceName='" + serviceName + '\'' +
+                ", logPrefix='" + logPrefix + '\'' +
+                ", logCacheLimitCount=" + logCacheLimitCount +
+                ", logLevelFilters=" + logLevelFilters +
+                ", globalContext=" + globalContext +
+                ", logCacheDiscardStrategy=" + logCacheDiscardStrategy +
+                ", printCustomLogToConsole=" + printCustomLogToConsole +
+                '}';
     }
 }

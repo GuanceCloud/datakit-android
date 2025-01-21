@@ -8,6 +8,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.ft.sdk.garble.gesture.WindowCallbackTracker;
 import com.ft.sdk.garble.utils.Constants;
 
 import java.util.HashMap;
@@ -28,6 +29,7 @@ import java.util.HashMap;
  */
 public class FTActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
     private final LifeCircleTraceCallback mAppRestartCallback = new LifeCircleTraceCallback();
+    private final WindowCallbackTracker mDispatcherReceiver = new WindowCallbackTracker();
 
 
     /**
@@ -88,8 +90,8 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     }
 
     @Override
-    public void onActivityPreResumed(@NonNull Activity activity) {
-        mAppRestartCallback.onPreResume(activity);
+    public void onActivityPostStarted(@NonNull Activity activity) {
+        mAppRestartCallback.onPostOnStart(activity);
     }
 
     /**
@@ -109,11 +111,16 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
             FTRUMGlobalManager.get().startView(activity.getClass().getSimpleName());
         }
 
+        if (manager.isRumEnable() && manager.getConfig().isEnableTraceUserAction()) {
+            mDispatcherReceiver.startTrack(activity.getWindow());
+        }
 
         //开启同步
         if (FTSdk.checkInstallState()) {
             SyncTaskManager.get().executeSyncPoll();
         }
+
+
     }
 
     /**
@@ -138,6 +145,10 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
         FTRUMConfigManager manager = FTRUMConfigManager.get();
         if (manager.isRumEnable() && manager.getConfig().isEnableTraceUserView()) {
             FTRUMInnerManager.get().stopView();
+        }
+
+        if (manager.isRumEnable() && manager.getConfig().isEnableTraceUserAction()) {
+            mDispatcherReceiver.stopTrack(activity.getWindow());
         }
 
     }

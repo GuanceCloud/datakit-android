@@ -31,6 +31,35 @@ public class FTSDKConfig {
      */
     private boolean isDebug;
 
+    private SDKLogLevel sdkLogLevel;
+
+
+    /**
+     * db 缓存限制大小
+     */
+    private long dbCacheLimit = Constants.DEFAULT_DB_SIZE_LIMIT;
+
+    /**
+     * 是否开启使用 db 缓存
+     */
+    private boolean limitWithDbSize = false;
+
+    /**
+     *
+     */
+    private DBCacheDiscard dbCacheDiscard = DBCacheDiscard.DISCARD;
+
+    /**
+     * 设置日志等级，默认 {@link SDKLogLevel#V}
+     *
+     * @param logLevel
+     * @return
+     */
+    public FTSDKConfig setSdkLogLevel(SDKLogLevel logLevel) {
+        this.sdkLogLevel = logLevel;
+        return this;
+    }
+
     /**
      * 是否可访问 Android ID
      */
@@ -45,6 +74,7 @@ public class FTSDKConfig {
     private int pageSize = SyncPageSize.MEDIUM.getValue();
 
     private int syncSleepTime = 0;
+    private boolean compressIntakeRequests = false;
 
     /**
      * 服务名称 {@link Constants#KEY_SERVICE },默认为 {@link Constants#DEFAULT_SERVICE_NAME}
@@ -77,6 +107,53 @@ public class FTSDKConfig {
      * 是否迁移旧数据，SDK 从旧版本迁移至 1.5.0 需要进行数据迁移
      */
     private boolean needTransformOldCache = false;
+
+
+    public long getDbCacheLimit() {
+        return dbCacheLimit;
+    }
+
+    /**
+     * 开启使用 db 限制数据大小，默认 100MB ，{@link Constants#DEFAULT_DB_SIZE_LIMIT}
+     */
+    public FTSDKConfig enableLimitWithDbSize() {
+        this.limitWithDbSize = true;
+        return this;
+    }
+
+    /**
+     * 开启使用 db 限制数据大小，默认 100MB ，单位 byte，{@link Constants#DEFAULT_DB_SIZE_LIMIT}
+     * @param dbSize 设置 db 限制上限，数据库越大，磁盘压力越大，[30MB,),默认 100 MB
+     *
+     * 开启 db 数据限制之后，{@link FTLoggerConfig#setLogCacheLimitCount(int)}
+     * 及 {@link FTRUMConfig#setRumCacheLimitCount(int)} 将失效
+     *
+     * @return
+     */
+    public FTSDKConfig enableLimitWithDbSize(long dbSize) {
+        this.dbCacheLimit = Math.max(Constants.MINI_DB_SIZE_LIMIT, dbSize);
+//        this.dbCacheLimit = dbSize;
+        this.limitWithDbSize = true;
+        return this;
+    }
+
+    public boolean isLimitWithDbSize() {
+        return limitWithDbSize;
+    }
+
+    /**
+     * 设置 db 缓存丢弃策略
+     * @param dbCacheDiscard
+     * @return
+     */
+    public FTSDKConfig setDbCacheDiscard(DBCacheDiscard dbCacheDiscard) {
+        this.dbCacheDiscard = dbCacheDiscard;
+        return this;
+    }
+
+    public DBCacheDiscard getDbCacheDiscard() {
+        return dbCacheDiscard;
+    }
 
     /**
      * 全局参数，例如 {@link Constants#KEY_APP_VERSION_NAME} 等固定配置参数，
@@ -162,6 +239,11 @@ public class FTSDKConfig {
     public boolean isDebug() {
         return isDebug;
     }
+
+    public SDKLogLevel getSdkLogLevel() {
+        return sdkLogLevel;
+    }
+
 
     /**
      * @return 获取环境变量请问
@@ -352,6 +434,7 @@ public class FTSDKConfig {
 
     /**
      * 设置是否迁移
+     *
      * @param needTransformOldCache 是否迁移旧数据，默认为 false
      * @return
      */
@@ -384,11 +467,43 @@ public class FTSDKConfig {
         return enableDataIntegerCompatible;
     }
 
+    public FTSDKConfig setCompressIntakeRequests(boolean compressIntakeRequests) {
+        this.compressIntakeRequests = compressIntakeRequests;
+        return this;
+    }
+
     /**
      * {@link #enableDataIntegerCompatible} 设置为 true
      */
     public FTSDKConfig enableDataIntegerCompatible() {
         this.enableDataIntegerCompatible = true;
         return this;
+    }
+
+    public boolean isCompressIntakeRequests() {
+        return compressIntakeRequests;
+    }
+
+    @Override
+    public String toString() {
+        return "FTSDKConfig{" +
+                ", isDebug=" + isDebug +
+                ", sdkLogLevel=" + sdkLogLevel +
+                ", dbCacheLimit=" + dbCacheLimit +
+                ", limitWithDbSize=" + limitWithDbSize +
+                ", dbCacheDiscard=" + dbCacheDiscard +
+                ", enableAccessAndroidID=" + enableAccessAndroidID +
+                ", autoSync=" + autoSync +
+                ", pageSize=" + pageSize +
+                ", syncSleepTime=" + syncSleepTime +
+                ", compressIntakeRequests=" + compressIntakeRequests +
+                ", serviceName='" + serviceName + '\'' +
+                ", dataSyncRetryCount=" + dataSyncRetryCount +
+                ", env='" + env + '\'' +
+                ", onlySupportMainProcess=" + onlySupportMainProcess +
+                ", enableDataIntegerCompatible=" + enableDataIntegerCompatible +
+                ", needTransformOldCache=" + needTransformOldCache +
+                ", globalContext=" + globalContext +
+                '}';
     }
 }

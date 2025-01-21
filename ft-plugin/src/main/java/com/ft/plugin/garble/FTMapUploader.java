@@ -87,47 +87,70 @@ public class FTMapUploader {
             String capVariantName = FTStringUtils.captitalizedString(variantName);
 
             String assembleTaskName = "assemble" + capVariantName;
+            Task zipTask = project.getTasks().create("ft" + capVariantName + "ZipSourceMap", task -> {
+                    })
+                    .doLast(task -> {
+                        ProductFlavorModel model = getFlavorModelFromName(variantName);
+                        Logger.debug("ZipSourceMap:" + model);
 
-            Task ftTask = project.getTasks().create("ft" + capVariantName + "UploadSymbolMap", task -> {
+                        if (!model.isAutoUploadMap() && !model.isAutoUploadNativeDebugSymbol()) {
+                            return;
+                        }
 
+                        ArrayList<String> symbolPaths = new ArrayList<>();
+                        if (model.isAutoUploadNativeDebugSymbol()) {
+                            appendSymbolPath(project, symbolPaths, variantName, model.getNativeLibPath());
+                        }
+
+                        String tmpBuildPath = String.format(tmpBuildPathFormat, variantName);
+                        String zipBuildPath = String.format(zipBuildPathFormat, variantName);
+                        model.setZipPath(zipBuildPath);
+
+                        //删除之前的 cache
+                        try {
+                            deleteRecursively(new File(tmpBuildPath));
+                            FileUtils.delete(new File(zipBuildPath));
+
+                            ObfuscationSettingConfig config = obfuscationSettingMap.get(assembleTaskName);
+                            Logger.debug("task:" + assembleTaskName + ",config:" + config);
+                            if (config != null) {
+                                if (model.isAutoUploadNativeDebugSymbol()) {
+                                    if (!symbolPaths.isEmpty()) {
+                                        FTFileUtils.copyDifferentFolderFilesIntoOne(tmpBuildPath, symbolPaths.toArray(new String[0]));
+                                    } else {
+                                        Logger.error("not find native symbol path");
+                                    }
+                                }
+                                if (model.isAutoUploadMap()) {
+                                    if (!config.mappingOutputPath.isEmpty() && new File(config.mappingOutputPath).exists()) {
+                                        FTFileUtils.copyFile(new File(config.mappingOutputPath), new File(tmpBuildPath + "/mapping.txt"));
+                                    } else {
+                                        Logger.error("Mapping path empty or File not found");
+                                    }
+                                }
+                                FTFileUtils.zipFiles(new File(tmpBuildPath).listFiles(), new File(zipBuildPath));
+                            }
+                            Logger.debug("ZipSourceMap:" + assembleTaskName + " finish, zipPath:" + model.getZipPath());
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+
+            Task uploadTask = project.getTasks().create("ft" + capVariantName + "UploadSymbolMap", task -> {
             }).doLast(task -> {
 
                 ProductFlavorModel model = getFlavorModelFromName(variantName);
-                Logger.debug("ProductFlavorModel:" + model);
-
                 if (!model.isAutoUploadMap() && !model.isAutoUploadNativeDebugSymbol()) {
                     return;
                 }
-
-                ArrayList<String> symbolPaths = new ArrayList<>();
-                if (model.isAutoUploadNativeDebugSymbol()) {
-                    appendSymbolPath(project, symbolPaths, variantName, model.getNativeLibPath());
-                }
-
-                String tmpBuildPath = String.format(tmpBuildPathFormat, variantName);
-                String zipBuildPath = String.format(zipBuildPathFormat, variantName);
+                String zipBuildPath = model.getZipPath();
                 //删除之前的 cache
                 try {
-                    deleteRecursively(new File(tmpBuildPath));
-                    FileUtils.delete(new File(zipBuildPath));
-
                     ObfuscationSettingConfig config = obfuscationSettingMap.get(assembleTaskName);
-                    Logger.debug("task:" + assembleTaskName + ",config:" + config);
                     if (config != null) {
-                        if (model.isAutoUploadNativeDebugSymbol()) {
-                            if (!symbolPaths.isEmpty()) {
-                                FTFileUtils.copyDifferentFolderFilesIntoOne(tmpBuildPath, symbolPaths.toArray(new String[0]));
-                            }
-                        }
-                        if (model.isAutoUploadMap()) {
-                            if (new File(config.mappingOutputPath).exists()) {
-                                FTFileUtils.copyFile(new File(config.mappingOutputPath), new File(tmpBuildPath + "/mapping.txt"));
-                            }
-                        }
-                        FTFileUtils.zipFiles(new File(tmpBuildPath).listFiles(), new File(zipBuildPath));
                         uploadWithParams(config, model, zipBuildPath);
                     }
-
                 } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -136,7 +159,11 @@ public class FTMapUploader {
 
             if (!applicationVariant.getName().endsWith("Debug")) {
                 project.afterEvaluate(p -> {
-                    p.getTasks().getAt(assembleTaskName).finalizedBy(ftTask);
+                    ProductFlavorModel model = getFlavorModelFromName(variantName);
+                    p.getTasks().getAt(assembleTaskName).finalizedBy(zipTask);
+                    if (!model.isGenerateSourceMapOnly()) {
+                        p.getTasks().getAt(assembleTaskName).finalizedBy(uploadTask);
+                    }
                 });
             }
 
@@ -177,6 +204,9 @@ public class FTMapUploader {
                                     variantName);
                             Logger.debug("Map Config:" + config + ",task:" + task.getName());
                             obfuscationSettingMap.put(task.getName(), config);
+                        } else {
+                            obfuscationSettingMap.put(task.getName(), new ObfuscationSettingConfig());
+                            Logger.error("MinifyEnabled or Proguard Setting not found");
                         }
                     }
                 }
@@ -247,7 +277,7 @@ public class FTMapUploader {
      * @throws InterruptedException
      */
     private void uploadWithParams(ObfuscationSettingConfig settingConfig, ProductFlavorModel model, String zipBuildPath) throws IOException, InterruptedException {
-        Logger.debug(model.toString());
+        Logger.debug("uploadWithParams:" + model.toString());
         String cmd = "curl -m 1800 -X PUT " + model.getDatakitUrl() + "/v1/sourcemap?"
                 + "app_id=" + model.getAppId()
                 + "&env=" + model.getEnv()
@@ -306,11 +336,11 @@ public class FTMapUploader {
         /**
          * 包名
          */
-        String applicationId;
+        String applicationId = "";
         /**
          * 版本号 字符 例如 1.0.0
          */
-        String versionName;
+        String versionName = "";
         /**
          * Build Code
          */
@@ -318,7 +348,7 @@ public class FTMapUploader {
         /**
          * map 输出地址
          */
-        String mappingOutputPath;
+        String mappingOutputPath = "";
 
         @Override
         public String toString() {

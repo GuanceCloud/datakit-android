@@ -69,6 +69,8 @@ public class FTRUMInnerManager {
 
     private final ArrayList<String> viewList = new ArrayList<>();
 
+    private boolean isTVMode = false;
+
     private FTRUMInnerManager() {
 
     }
@@ -118,7 +120,7 @@ public class FTRUMInnerManager {
      * <p>
      * 注意 ：AndroidTest 会调用这个方法 {@link com.ft.test.base.FTBaseTest#setSessionExpire()}
      */
-    private long lastActionTime = lastSessionTime;
+    private long lastUserActiveTime = lastSessionTime;
 
     /**
      * 采样率，{@link FTRUMConfig#samplingRate}
@@ -136,15 +138,12 @@ public class FTRUMInnerManager {
      */
     private void checkSessionRefresh(boolean checkRefreshView) {
         long now = Utils.getCurrentNanoTime();
-        boolean longResting = now - lastActionTime > MAX_RESTING_TIME;
+        boolean longResting = now - lastUserActiveTime > MAX_RESTING_TIME;
         boolean longTimeSession = now - lastSessionTime > SESSION_EXPIRE_TIME;
         if (longTimeSession || longResting) {
             lastSessionTime = now;
-            lastActionTime = now;
-
             sessionId = Utils.randomUUID();
-            LogUtils.d(TAG, "New SessionId:" + sessionId);
-
+            LogUtils.d(TAG, "Session Track -> New SessionId:" + sessionId + ",longTimeSessionReset:" + longTimeSession);
             checkSessionKeep(sessionId, sampleRate);
 
             if (checkRefreshView) {
@@ -164,7 +163,7 @@ public class FTRUMInnerManager {
                     FTMonitorManager.get().addMonitor(activeView.getId());
                     FTMonitorManager.get().attachMonitorData(activeView);
                     initView(activeView);
-                    LogUtils.d(TAG, "New sessionId:" + activeView.getSessionId() + ",viewId:" + activeView.getId());
+                    LogUtils.d(TAG, "Session Track -> checkRefreshView sessionId:" + activeView.getSessionId() + ",viewId:" + activeView.getId());
                 }
             }
 
@@ -186,6 +185,11 @@ public class FTRUMInnerManager {
         if (scope != null) {
             scope.sendEvent(map);
         }
+//        boolean isAppForward = FTApplication.isAppForward;
+//        if (isAppForward) {
+        //只要有 RUM 数据采集活动就会延长用户时间，包括后台
+        lastUserActiveTime = now;
+//        }
     }
 
     /**
@@ -229,8 +233,8 @@ public class FTRUMInnerManager {
         if (property != null) {
             activeAction.getProperty().putAll(property);
         }
-        initAction(activeAction);
-        this.lastActionTime = activeAction.getStartTime();
+        initAction(activeAction, true);
+//        this.lastUserActiveTime = activeAction.getStartTime();
     }
 
     /**
@@ -289,8 +293,9 @@ public class FTRUMInnerManager {
                 activeAction.getProperty().putAll(property);
             }
             activeAction.setTags(FTRUMConfigManager.get().getRUMPublicDynamicTags());
-            initAction(activeAction);
-            this.lastActionTime = activeAction.getStartTime();
+            initAction(activeAction, false);
+//            this.lastUserActiveTime = activeAction.getStartTime();
+
             mHandler.removeCallbacks(mActionRecheckRunner);
             mHandler.postDelayed(mActionRecheckRunner, 5000);
         }
@@ -450,7 +455,7 @@ public class FTRUMInnerManager {
         FTMonitorManager.get().addMonitor(activeView.getId());
         FTMonitorManager.get().attachMonitorData(activeView);
         initView(activeView);
-        lastActionTime = activeView.getStartTime();
+//        lastUserActiveTime = activeView.getStartTime();
 
     }
 
@@ -497,24 +502,39 @@ public class FTRUMInnerManager {
             activeView.getProperty().putAll(property);
         }
         FTMonitorManager.get().attachMonitorData(activeView);
+        activeView.setTags(FTRUMConfigManager.get().getRUMPublicDynamicTags());
         activeView.close();
         closeView(activeView, callBack);
     }
 
     /**
      * 初始化 action
+     * <p>
+     * 这里 startAction 会先进入 {@link com.ft.sdk.garble.db.FTSQL#FT_TABLE_ACTION},
+     * 再进入 {@link com.ft.sdk.garble.db.FTSQL#FT_SYNC_DATA_FLAT_TABLE_NAME};
+     * addAction 会直接进入 {@link com.ft.sdk.garble.db.FTSQL#FT_SYNC_DATA_FLAT_TABLE_NAME}
      *
      * @param activeActionBean 当前激活的操作
      */
-    private void initAction(ActiveActionBean activeActionBean) {
+    private void initAction(ActiveActionBean activeActionBean, boolean isAddAction) {
         final ActionBean bean = activeActionBean.convertToActionBean();
         increaseAction(bean.getViewId());
-        EventConsumerThreadPool.get().execute(new Runnable() {
-            @Override
-            public void run() {
-                FTDBManager.get().initSumAction(bean);
-            }
-        });
+        if (isAddAction) {
+            EventConsumerThreadPool.get().execute(new Runnable() {
+                @Override
+                public void run() {
+                    insertAction(bean);
+                }
+            });
+        } else {
+            EventConsumerThreadPool.get().execute(new Runnable() {
+                @Override
+                public void run() {
+                    FTDBManager.get().initSumAction(bean);
+                }
+            });
+        }
+
 
     }
 
@@ -740,13 +760,12 @@ public class FTRUMInnerManager {
      * @param netStatusBean
      */
     void setNetState(String resourceId, NetStatusBean netStatusBean) {
-        LogUtils.d(TAG, "setNetState:" + resourceId);
-
         ResourceBean bean = resourceBeanMap.get(resourceId);
-
         if (bean == null) {
             LogUtils.e(TAG, "setNetState:" + resourceId + ",bean null");
             return;
+        } else {
+            LogUtils.d(TAG, "setNetState:" + resourceId);
         }
         bean.resourceDNS = netStatusBean.getDNSTime();
         bean.resourceSSL = netStatusBean.getSSLTime();
@@ -768,12 +787,12 @@ public class FTRUMInnerManager {
      * @param resourceId 资源 id
      */
     void putRUMResourcePerformance(final String resourceId) {
-        LogUtils.d(TAG, "putRUMResourcePerformance:" + resourceId);
         ResourceBean bean = resourceBeanMap.get(resourceId);
-
         if (bean == null) {
             LogUtils.e(TAG, "putRUMResourcePerformance:" + resourceId + ",bean null");
             return;
+        } else {
+            LogUtils.d(TAG, "putRUMResourcePerformance:" + resourceId);
         }
         long time = Utils.getCurrentNanoTime();
         String actionId = bean.actionId;
@@ -941,7 +960,7 @@ public class FTRUMInnerManager {
      */
     void setTransformContent(String resourceId, ResourceParams params) {
 
-        FTTraceHandler handler = FTTraceManager.get().getHandler(resourceId);
+        FTTraceInterceptor.TraceRUMLinkable handler = FTTraceManager.get().getHandler(resourceId);
         String spanId = "";
         String traceId = "";
         if (handler != null) {
@@ -1205,32 +1224,37 @@ public class FTRUMInnerManager {
     private void generateActionSum() throws JSONException {
         ArrayList<ActionBean> beans;
         do {
+
             beans = FTDBManager.get().querySumAction(LIMIT_SIZE);
+            ArrayList<String> deleteIds = new ArrayList<>();
             for (ActionBean bean : beans) {
-                HashMap<String, Object> tags = bean.getTags();
-                tags.put(Constants.KEY_RUM_VIEW_NAME, bean.getViewName());
-                tags.put(Constants.KEY_RUM_VIEW_REFERRER, bean.getViewReferrer());
-                tags.put(Constants.KEY_RUM_VIEW_ID, bean.getViewId());
-                tags.put(Constants.KEY_RUM_ACTION_NAME, bean.getActionName());
-                tags.put(Constants.KEY_RUM_ACTION_ID, bean.getId());
-                tags.put(Constants.KEY_RUM_ACTION_TYPE, bean.getActionType());
-                tags.put(Constants.KEY_RUM_SESSION_ID, bean.getSessionId());
-                if (bean.isHasReplay()) {
-                    tags.put(Constants.KEY_HAS_REPLAY, true);
-                }
-
-                HashMap<String, Object> fields = new HashMap<>(bean.getProperty());
-                fields.put(Constants.KEY_RUM_ACTION_LONG_TASK_COUNT, bean.getLongTaskCount());
-                fields.put(Constants.KEY_RUM_ACTION_RESOURCE_COUNT, bean.getResourceCount());
-                fields.put(Constants.KEY_RUM_ACTION_ERROR_COUNT, bean.getErrorCount());
-                fields.put(Constants.KEY_RUM_ACTION_DURATION, bean.getDuration());
-
-                FTTrackInner.getInstance().rum(bean.getStartTime(),
-                        Constants.FT_MEASUREMENT_RUM_ACTION, tags, fields, null);
-
+                insertAction(bean);
+                deleteIds.add(bean.getId());
             }
-            FTDBManager.get().cleanCloseActionData();
+            FTDBManager.get().cleanCloseActionData(deleteIds.toArray(new String[0]));
         } while (beans.size() >= LIMIT_SIZE);
+    }
+
+    private void insertAction(ActionBean bean) {
+        HashMap<String, Object> tags = bean.getTags();
+        tags.put(Constants.KEY_RUM_VIEW_NAME, bean.getViewName());
+        tags.put(Constants.KEY_RUM_VIEW_REFERRER, bean.getViewReferrer());
+        tags.put(Constants.KEY_RUM_VIEW_ID, bean.getViewId());
+        tags.put(Constants.KEY_RUM_ACTION_NAME, bean.getActionName());
+        tags.put(Constants.KEY_RUM_ACTION_ID, bean.getId());
+        tags.put(Constants.KEY_RUM_ACTION_TYPE, bean.getActionType());
+        tags.put(Constants.KEY_RUM_SESSION_ID, bean.getSessionId());
+        if (bean.isHasReplay()) {
+            tags.put(Constants.KEY_HAS_REPLAY, true);
+        }
+        HashMap<String, Object> fields = new HashMap<>(bean.getProperty());
+        fields.put(Constants.KEY_RUM_ACTION_LONG_TASK_COUNT, bean.getLongTaskCount());
+        fields.put(Constants.KEY_RUM_ACTION_RESOURCE_COUNT, bean.getResourceCount());
+        fields.put(Constants.KEY_RUM_ACTION_ERROR_COUNT, bean.getErrorCount());
+        fields.put(Constants.KEY_RUM_ACTION_DURATION, bean.getDuration());
+
+        FTTrackInner.getInstance().rum(bean.getStartTime(),
+                Constants.FT_MEASUREMENT_RUM_ACTION, tags, fields, null);
     }
 
     private void generateViewSum() throws JSONException {
@@ -1369,7 +1393,7 @@ public class FTRUMInnerManager {
                 }
                 notCollectArr.add(sessionId);
             }
-            LogUtils.d(TAG, "根据 FTRUMConfig SampleRate 采样率计算，当前 session 不被采集，session_id:" + sessionId);
+            LogUtils.w(TAG, "根据 FTRUMConfig SampleRate 采样率计算，当前 session 不被采集，Session Track-> session_id:" + sessionId);
         }
     }
 
@@ -1399,7 +1423,7 @@ public class FTRUMInnerManager {
      * @param bean
      */
     void checkToAddResource(String key, ResourceBean bean) {
-        LogUtils.d(TAG, "checkToAddResource:" + key + ",header：" + bean.requestHeader + "," + bean.url);
+        //LogUtils.d(TAG, "checkToAddResource:" + key + ",header：" + bean.requestHeader + "," + bean.url);
         if (bean.contentSet && bean.netStateSet) {
             putRUMResourcePerformance(key);
         }

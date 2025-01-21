@@ -41,6 +41,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             update1to2(db);
         } else if (oldVersion < 3 && newVersion == 3) {
             update2to3(db);
+            if (oldVersion == 1) {
+                update1to2(db);
+            }
         }
     }
 

@@ -2,7 +2,7 @@ package com.ft.sdk;
 
 import androidx.annotation.Nullable;
 
-import com.ft.sdk.garble.FTDBCachePolicy;
+import com.ft.sdk.garble.db.FTDBCachePolicy;
 
 /**
  * 日志配置管理
@@ -30,7 +30,7 @@ public class FTLoggerConfigManager {
     void initWithConfig(FTLoggerConfig config) {
         this.config = config;
 
-        FTDBCachePolicy.get().initParam(config);
+        FTDBCachePolicy.get().initLogParam(config);
         FTLogger.getInstance().init(config);
         FTTrackInner.getInstance().initLogConfig(config);
 

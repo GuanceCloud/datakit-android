@@ -31,6 +31,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import okhttp3.EventListener;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 
@@ -555,7 +556,8 @@ public class FTAutoTrack {
 
     public static void loadUrl(View webView, String url) {
         if (webView == null) {
-            throw new NullPointerException("WebView has not initialized.");
+            LogUtils.e(TAG, "WebView has not initialized.");
+            return;
         }
         setUpWebView(webView);
         invokeWebViewLoad(webView, "loadUrl", new Object[]{url}, new Class[]{String.class});
@@ -572,7 +574,8 @@ public class FTAutoTrack {
      */
     public static void loadUrl(View webView, String url, Map<String, String> additionalHttpHeaders) {
         if (webView == null) {
-            throw new NullPointerException("WebView has not initialized.");
+            LogUtils.e(TAG, "WebView has not initialized.");
+            return;
         }
         setUpWebView(webView);
         invokeWebViewLoad(webView, "loadUrl", new Object[]{url, additionalHttpHeaders}, new Class[]{String.class, Map.class});
@@ -590,7 +593,8 @@ public class FTAutoTrack {
      */
     public static void loadData(View webView, String data, String mimeType, String encoding) {
         if (webView == null) {
-            throw new NullPointerException("WebView has not initialized.");
+            LogUtils.e(TAG, "WebView has not initialized.");
+            return;
         }
         setUpWebView(webView);
         invokeWebViewLoad(webView, "loadData", new Object[]{data, mimeType, encoding}, new Class[]{String.class, String.class, String.class});
@@ -608,7 +612,8 @@ public class FTAutoTrack {
      */
     public static void loadDataWithBaseURL(View webView, String baseUrl, String data, String mimeType, String encoding, String historyUrl) {
         if (webView == null) {
-            throw new NullPointerException("WebView has not initialized.");
+            LogUtils.e(TAG, "WebView has not initialized.");
+            return;
         }
         setUpWebView(webView);
         invokeWebViewLoad(webView, "loadDataWithBaseURL", new Object[]{baseUrl, data, mimeType, encoding, historyUrl},
@@ -625,7 +630,8 @@ public class FTAutoTrack {
      */
     public static void postUrl(View webView, String url, byte[] postData) {
         if (webView == null) {
-            throw new NullPointerException("WebView has not initialized.");
+            LogUtils.e(TAG, "WebView has not initialized.");
+            return;
         }
         setUpWebView(webView);
         invokeWebViewLoad(webView, "postUrl", new Object[]{url, postData},
@@ -640,12 +646,8 @@ public class FTAutoTrack {
     public static void setUpWebView(View webView) {
         if (webView instanceof WebView && webView.getTag(R.id.ft_webview_handled_tag_view_value) == null) {
 
-            if (FTTraceConfigManager.get().isEnableWebTrace()) {
-                ((WebView) webView).setWebViewClient(new FTWebViewClient());
-            }
             new FTWebViewHandler().setWebView((WebView) webView);
             webView.setTag(R.id.ft_webview_handled_tag_view_value, "handled");
-            LogUtils.d(TAG, "setUpWebView-> webNativeTrace:" + FTTraceConfigManager.get().isEnableWebTrace());
         }
     }
 
@@ -681,7 +683,6 @@ public class FTAutoTrack {
         } else {
             LogUtils.e(TAG, "trackOkHttpBuilder: OkhttpClient.Build Before SDK install");
         }
-
 //            builder.addNetworkInterceptor(interceptor); //发现部分工程有兼容问题
         if (FTRUMConfigManager.get().isRumEnable()) {
             FTRUMConfig config = FTRUMConfigManager.get().getConfig();
@@ -696,15 +697,30 @@ public class FTAutoTrack {
 
                 }
                 if (!hasSetResource) {
-                    builder.interceptors().add(0, new FTResourceInterceptor());
+                    FTResourceInterceptor.ContentHandlerHelper contentHandler = FTRUMConfigManager.get()
+                            .getOverrideResourceContentHandler();
+                    if (contentHandler != null) {
+                        builder.interceptors().add(0, new FTResourceInterceptor(contentHandler));
+                    } else {
+                        builder.interceptors().add(0, new FTResourceInterceptor());
+                    }
                 } else {
-                    LogUtils.d(TAG, "Skip FTResourceInterceptor setting");
+                    LogUtils.d(TAG, "Skip default FTResourceInterceptor setting");
                 }
-                FTResourceEventListener.FTFactory factory = FTRUMConfigManager.get().getOverrideEventListener();
-                if (factory != null) {
-                    builder.eventListenerFactory(factory);
+
+                OkHttpClient client = builder.build();
+                EventListener.Factory originFactory = client.eventListenerFactory();
+                if (originFactory instanceof FTResourceEventListener.FTFactory) {
+                    LogUtils.d(TAG, "Skip default FTResourceEventListener.FTFactory setting");
                 } else {
-                    builder.eventListenerFactory(new FTResourceEventListener.FTFactory(config.isEnableResourceHostIP()));
+                    FTResourceEventListener.FTFactory overrideFactory = FTRUMConfigManager.get()
+                            .getOverrideEventListener();
+                    if (overrideFactory != null) {
+                        builder.eventListenerFactory(overrideFactory);
+                    } else {
+                        builder.eventListenerFactory(new FTResourceEventListener
+                                .FTFactory(config.isEnableResourceHostIP(), config.getResourceUrlHandler(), originFactory));
+                    }
                 }
             }
         }
@@ -720,12 +736,16 @@ public class FTAutoTrack {
 
             }
             if (!hasSetTrace) {
-                builder.interceptors().add(0, new FTTraceInterceptor());
+                FTTraceInterceptor.HeaderHandler headerHandler = FTRUMConfigManager.get().getOverrideHeaderHandler();
+                if (headerHandler != null) {
+                    builder.interceptors().add(0, new FTTraceInterceptor(headerHandler));
+                } else {
+                    builder.interceptors().add(0, new FTTraceInterceptor());
+                }
             } else {
-                LogUtils.d(TAG, "Skip FTTraceInterceptor setting");
+                LogUtils.d(TAG, "Skip default FTTraceInterceptor setting");
             }
         }
-
         return builder.build();
     }
 

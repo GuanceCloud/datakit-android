@@ -61,13 +61,6 @@ public class FTTraceConfigManager {
     }
 
     /**
-     * @return
-     */
-    public boolean isEnableWebTrace() {
-        return config != null && config.isEnableWebTrace();
-    }
-
-    /**
      * 释放资源
      */
     void release() {

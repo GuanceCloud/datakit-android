@@ -24,6 +24,11 @@ public class FTRUMConfig {
      * 设置是否检测 UI 卡顿
      */
     private boolean enableTrackAppUIBlock;
+
+    /**
+     * 设置检测阻塞时间范围 [100，),单位 ms,默认 1000 ms
+     */
+    private long blockDurationMS = FTUIBlockManager.DEFAULT_TIME_BLOCK_MS;
     /**
      * 设置是否检测 ANR
      */
@@ -69,7 +74,20 @@ public class FTRUMConfig {
         }
     };
 
+    /**
+     *
+     */
     private FTOkHttpEventListenerHandler okHttpEventListenerHandler;
+
+    /**
+     *
+     */
+    private FTTraceInterceptor.HeaderHandler headerHandler;
+
+    /**
+     *
+     */
+    private FTResourceInterceptor.ContentHandlerHelper contentHandlerHelper;
 
     /**
      * 设置全局 tag
@@ -96,6 +114,13 @@ public class FTRUMConfig {
      * ANR  时 logcat 附属信息
      */
     private ExtraLogCatSetting extraLogCatWithANR;
+
+
+    private int rumCacheLimitCount = Constants.DEFAULT_DB_RUM_CACHE_NUM;
+
+
+    private RUMCacheDiscard rumCacheDiscardStrategy = RUMCacheDiscard.DISCARD;
+
 
     /**
      * 获取采样率
@@ -153,6 +178,39 @@ public class FTRUMConfig {
         return enableTrackAppCrash;
     }
 
+
+    public int getRumCacheLimitCount() {
+        return rumCacheLimitCount;
+    }
+
+    /**
+     * 设置 RUM 限制数量 [10000,),默认是 100_000，{@link Constants#DEFAULT_DB_RUM_CACHE_NUM}
+     *
+     * @param rumCacheLimitCount
+     * @return
+     */
+    public FTRUMConfig setRumCacheLimitCount(int rumCacheLimitCount) {
+        this.rumCacheLimitCount = Math.max(Constants.MINI_DB_RUM_CACHE_NUM, rumCacheLimitCount);
+//        this.rumCacheLimitCount =  rumCacheLimitCount;
+        return this;
+    }
+
+
+    public RUMCacheDiscard getRumCacheDiscardStrategy() {
+        return rumCacheDiscardStrategy;
+    }
+
+    /**
+     * 设置日志丢弃策略
+     *
+     * @param rumCacheDiscardStrategy
+     * @return
+     */
+    public FTRUMConfig setRumCacheDiscardStrategy(RUMCacheDiscard rumCacheDiscardStrategy) {
+        this.rumCacheDiscardStrategy = rumCacheDiscardStrategy;
+        return this;
+    }
+
     /**
      * 设置是否监测 App 崩溃
      *
@@ -196,6 +254,19 @@ public class FTRUMConfig {
         return this;
     }
 
+    /**
+     * 设置检测阻塞时间范围 [100，) 默认 1000 ms
+     *
+     * @param enableTrackAppUIBlock
+     * @param blockDurationMs       单位 ms,默认 1000 ms
+     * @return
+     */
+    public FTRUMConfig setEnableTrackAppUIBlock(boolean enableTrackAppUIBlock, long blockDurationMs) {
+        this.enableTrackAppUIBlock = enableTrackAppUIBlock;
+        this.blockDurationMS = blockDurationMs;
+        return this;
+    }
+
     public boolean isEnableTrackAppANR() {
         return enableTrackAppANR;
     }
@@ -229,11 +300,23 @@ public class FTRUMConfig {
         return enableTraceUserAction;
     }
 
+    /**
+     * 是否自动追踪用户操作，目前只支持用户启动和点击操作，默认为 `false`
+     *
+     * @param enableTraceUserAction
+     * @return
+     */
     public FTRUMConfig setEnableTraceUserAction(boolean enableTraceUserAction) {
         this.enableTraceUserAction = enableTraceUserAction;
         return this;
     }
 
+    /**
+     * 是否监测用户 View 行为，页面跳转
+     *
+     * @param enableTraceUserView
+     * @return
+     */
     public FTRUMConfig setEnableTraceUserView(boolean enableTraceUserView) {
         this.enableTraceUserView = enableTraceUserView;
         return this;
@@ -247,11 +330,25 @@ public class FTRUMConfig {
         return enableTraceUserResource;
     }
 
+    /**
+     * 是否自动追动用户网络请求 ，仅支持 `Okhttp`，默认为 `false
+     *
+     * @param enableTraceUserResource
+     * @return
+     */
     public FTRUMConfig setEnableTraceUserResource(boolean enableTraceUserResource) {
         this.enableTraceUserResource = enableTraceUserResource;
         return this;
     }
 
+    /**
+     * 是否采集请求目标域名地址的 IP。作用域：只影响 `EnableTraceUserResource`  为 true 的默认采集。
+     * 自定义 Resource 采集，需要使用 `FTResourceEventListener.FTFactory(true)` 来开启这个功能。
+     * 另外，单个 Okhttp 对相同域名存在 IP 缓存机制，相同 `OkhttpClient`，在连接服务端 IP 不发生变化的前提下，只会生成一次
+     *
+     * @param enableTraceUserResource
+     * @return
+     */
     public FTRUMConfig setEnableResourceHostIP(boolean enableTraceUserResource) {
         this.enableResourceHostIP = enableTraceUserResource;
         return this;
@@ -366,8 +463,44 @@ public class FTRUMConfig {
         return okHttpEventListenerHandler;
     }
 
+    public FTTraceInterceptor.HeaderHandler getOkHttpTraceHeaderHandler() {
+        return headerHandler;
+    }
+
+    public FTResourceInterceptor.ContentHandlerHelper getOkHttpResourceContentHandler() {
+        return contentHandlerHelper;
+    }
+
+    /**
+     * ASM 设置全局 Okhttp EventListener
+     *
+     * @param okHttpResourceHandler
+     * @return
+     */
     public FTRUMConfig setOkHttpEventListenerHandler(FTOkHttpEventListenerHandler okHttpResourceHandler) {
         this.okHttpEventListenerHandler = okHttpResourceHandler;
+        return this;
+    }
+
+    /**
+     * ASM 设置全局 {@link FTTraceInterceptor.HeaderHandler}，默认不设置
+     *
+     * @param headerHandler
+     * @return
+     */
+    public FTRUMConfig setOkHttpTraceHeaderHandler(FTTraceInterceptor.HeaderHandler headerHandler) {
+        this.headerHandler = headerHandler;
+        return this;
+    }
+
+    /**
+     * ASM 设置全局 {@link FTResourceInterceptor.ContentHandlerHelper } ，默认不设置
+     *
+     * @param contentHandlerHelper
+     * @return
+     */
+    public FTRUMConfig setOkHttpResourceContentHandler(FTResourceInterceptor.ContentHandlerHelper contentHandlerHelper) {
+        this.contentHandlerHelper = contentHandlerHelper;
         return this;
     }
 
@@ -387,7 +520,38 @@ public class FTRUMConfig {
         return extraLogCatWithANR;
     }
 
-    //    /**
+    public long getBlockDurationMS() {
+        return blockDurationMS;
+    }
+
+    @Override
+    public String toString() {
+        return "FTRUMConfig{" +
+                "samplingRate=" + samplingRate +
+                ", enableTrackAppCrash=" + enableTrackAppCrash +
+                ", enableTrackAppUIBlock=" + enableTrackAppUIBlock +
+                ", blockDurationMS=" + blockDurationMS +
+                ", enableTrackAppANR=" + enableTrackAppANR +
+                ", enableTraceUserAction=" + enableTraceUserAction +
+                ", enableTraceUserView=" + enableTraceUserView +
+                ", enableTraceUserResource=" + enableTraceUserResource +
+                ", enableResourceHostIP=" + enableResourceHostIP +
+                ", deviceMetricsDetectFrequency=" + deviceMetricsDetectFrequency +
+                ", intTakeUrlHandler=" + intTakeUrlHandler +
+                ", okHttpEventListenerHandler=" + okHttpEventListenerHandler +
+                ", headerHandler=" + headerHandler +
+                ", contentHandlerHelper=" + contentHandlerHelper +
+                ", globalContext=" + globalContext +
+                ", serviceName='" + serviceName + '\'' +
+                ", extraLogCatWithJavaCrash=" + extraLogCatWithJavaCrash +
+                ", extraLogCatWithNativeCrash=" + extraLogCatWithNativeCrash +
+                ", extraLogCatWithANR=" + extraLogCatWithANR +
+                ", rumCacheLimitCount=" + rumCacheLimitCount +
+                ", rumCacheDiscardStrategy=" + rumCacheDiscardStrategy +
+                '}';
+    }
+
+//    /**
 //     * 设置 BackendSample 后端采样，当为 true 时，rum sampleRate 设置不再起效
 //     *
 //     * @param backendSample

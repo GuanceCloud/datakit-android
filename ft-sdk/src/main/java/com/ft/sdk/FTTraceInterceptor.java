@@ -2,7 +2,6 @@ package com.ft.sdk;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.garble.http.HttpUrl;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.io.IOException;
@@ -21,20 +20,11 @@ import okhttp3.Response;
  */
 public class FTTraceInterceptor implements Interceptor {
 
-    private final boolean webViewTrace;
 
     public FTTraceInterceptor() {
-        this(false);
     }
-
-
-    public FTTraceInterceptor(boolean webViewTrace) {
-        this.webViewTrace = webViewTrace;
-    }
-
 
     public FTTraceInterceptor(HeaderHandler headerHandler) {
-        this.webViewTrace = false;
         this.headerHandler = headerHandler;
     }
 
@@ -43,14 +33,26 @@ public class FTTraceInterceptor implements Interceptor {
     /**
      * 自定义 TraceHeader
      */
-    public abstract static class HeaderHandler {
+    public abstract static class HeaderHandler extends TraceRUMLinkable {
         /**
-         *
          * @param request OKHttp 请求 Request
          * @return 替换 TraceHeader 内容
          */
         public abstract HashMap<String, String> getTraceHeader(Request request);
 
+    }
+
+    /**
+     * 与 RUM 相关联 trace_id 和 span_id
+     */
+    public static class TraceRUMLinkable {
+        public String getTraceID() {
+            return null;
+        }
+
+        public String getSpanID() {
+            return null;
+        }
     }
 
 
@@ -63,14 +65,19 @@ public class FTTraceInterceptor implements Interceptor {
         Exception exception = null;
 
         String uniqueKey = Utils.identifyRequest(request);
-        okhttp3.HttpUrl url = request.url();
-        HttpUrl httpUrl = new HttpUrl(url.host(), url.encodedPath(), url.port());
-        HashMap<String, String> requestHeaders = headerHandler != null ?
-                headerHandler.getTraceHeader(request) : FTTraceManager.get().getTraceHeader(uniqueKey, httpUrl);
+        HashMap<String, String> requestHeaders;
+        if (headerHandler != null) {
+            requestHeaders = headerHandler.getTraceHeader(request);
+            FTTraceManager.get().putTraceHandler(uniqueKey, headerHandler);
+        } else {
+            requestHeaders = FTTraceManager.get().getTraceHeader(uniqueKey, request.url() + "");
+        }
         try {
 
-            for (String key : requestHeaders.keySet()) {
-                requestBuilder.header(key, requestHeaders.get(key));//避免重试出现重复头
+            if (requestHeaders != null) {
+                for (String key : requestHeaders.keySet()) {
+                    requestBuilder.header(key, requestHeaders.get(key));//避免重试出现重复头
+                }
             }
 
             response = chain.proceed(requestBuilder.build());

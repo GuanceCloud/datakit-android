@@ -16,6 +16,7 @@ import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Process;
+import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Base64;
 
@@ -61,6 +62,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.MediaType;
 import okhttp3.Request;
@@ -120,38 +122,25 @@ public class Utils {
         }
     }
 
-    /**
-     * 判断是否连接网络
-     *
-     * @return
-     */
-    public static boolean isNetworkAvailable() {
-        return isNetworkAvailable(FTApplication.getApplication());
-    }
-
-    /**
-     * 判断是否连接网络
-     *
-     * @return
-     */
-    public static boolean isNetworkAvailable(Context context) {
-        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(
-                Context.CONNECTIVITY_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            // API 23及以上，使用NetworkCapabilities
-            Network network = manager.getActiveNetwork();
-            if (network != null) {
-                NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);
-                return capabilities != null && capabilities.hasCapability(
-                        NetworkCapabilities.NET_CAPABILITY_INTERNET);
-            }
-            return false;
-        } else {
-            // API 23以下，使用已过时的NetworkInfo
-            NetworkInfo activeNetworkInfo = manager.getActiveNetworkInfo();
-            return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-        }
-    }
+//    /**
+//     * 判断是否连接网络
+//     *
+//     * @return
+//     */
+//    public static boolean isNetworkAvailable() {
+//        return isNetworkAvailable(FTApplication.getApplication());
+//    }
+//
+//    /**
+//     * 判断是否连接网络
+//     *
+//     * @return
+//     */
+//    public static boolean isNetworkAvailable(Context context) {
+//        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+//        NetworkInfo activeNetWork = manager.getActiveNetworkInfo();
+//        return activeNetWork != null && activeNetWork.isConnected();
+//    }
 
     /**
      * 获取应用 app 名称 AndroidManifest.xml application.labelName
@@ -486,7 +475,7 @@ public class Utils {
 
     /**
      * 获取纳秒时间
-     *
+     * <p>
      * 两次获取存在同一个毫秒触发会有时间倒转的问题。
      * 在毫秒边界获取时 System.nanoTime() 可能碰到纳秒一个周期结束，后获取的时间可能会更小，
      * 目前使用这个方法是性能和精准度折中的一个方法
@@ -825,6 +814,20 @@ public class Utils {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
         return stack;
+    }
+
+    /**
+     * 获取 App 启动时间
+     *
+     * @return
+     */
+    public static long getAppStartTimeNs() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            long diffMs = SystemClock.elapsedRealtime() - Process.getStartElapsedRealtime();
+            return getCurrentNanoTime() - TimeUnit.MILLISECONDS.toNanos(diffMs);
+        } else {
+            return FTApplication.APP_START_TIME;
+        }
     }
 
 }

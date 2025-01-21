@@ -2,12 +2,12 @@ package com.ft.sdk;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.bean.BaseContentBean;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.LineProtocolBean;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.SyncJsonData;
+import com.ft.sdk.garble.db.FTDBCachePolicy;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.http.FTResponseData;
 import com.ft.sdk.garble.http.HttpBuilder;
@@ -128,7 +128,7 @@ public class FTTrackInner {
      * @param value
      */
     void appendRUMGlobalContext(String key, String value) {
-        dataHelper.appendRUMGlobalContext(key,value);
+        dataHelper.appendRUMGlobalContext(key, value);
     }
 
     /**
@@ -147,7 +147,7 @@ public class FTTrackInner {
      * @param value
      */
     void appendLogGlobalContext(String key, String value) {
-        dataHelper.appendLogGlobalContext(key,value);
+        dataHelper.appendLogGlobalContext(key, value);
     }
 
 
@@ -162,7 +162,7 @@ public class FTTrackInner {
     void rum(long time, String measurement, final HashMap<String, Object> tags, HashMap<String, Object> fields, RunnerCompleteCallBack callBack) {
         String sessionId = HashMapUtils.getString(tags, Constants.KEY_RUM_SESSION_ID);
         if (FTRUMInnerManager.get().checkSessionWillCollect(sessionId)) {
-            syncDataBackground(DataType.RUM_APP, time, measurement, tags, fields, callBack);
+            syncRUMDataBackground(DataType.RUM_APP, time, measurement, tags, fields, callBack);
         }
     }
 
@@ -177,7 +177,7 @@ public class FTTrackInner {
     void rumWebView(long time, String measurement, final HashMap<String, Object> tags, HashMap<String, Object> fields) {
         String sessionId = HashMapUtils.getString(tags, Constants.KEY_RUM_SESSION_ID);
         if (FTRUMInnerManager.get().checkSessionWillCollect(sessionId)) {
-            syncDataBackground(DataType.RUM_WEBVIEW, time, measurement, tags, fields);
+            syncRUMDataBackground(DataType.RUM_WEBVIEW, time, measurement, tags, fields);
         }
     }
 
@@ -192,9 +192,9 @@ public class FTTrackInner {
      * @param tags
      * @param fields
      */
-    private void syncDataBackground(final DataType dataType, final long time,
-                                    final String measurement, final HashMap<String, Object> tags, final HashMap<String, Object> fields) {
-        syncDataBackground(dataType, time, measurement, tags, fields, null);
+    private void syncRUMDataBackground(final DataType dataType, final long time,
+                                       final String measurement, final HashMap<String, Object> tags, final HashMap<String, Object> fields) {
+        syncRUMDataBackground(dataType, time, measurement, tags, fields, null);
     }
 
     /**
@@ -207,21 +207,45 @@ public class FTTrackInner {
      * @param fields
      * @param callBack
      */
-    private void syncDataBackground(final DataType dataType, final long time,
-                                    final String measurement, final HashMap<String, Object> tags, final HashMap<String, Object> fields, RunnerCompleteCallBack callBack) {
+    private void syncRUMDataBackground(final DataType dataType, final long time,
+                                       final String measurement, final HashMap<String, Object> tags, final HashMap<String, Object> fields, RunnerCompleteCallBack callBack) {
         DataUploaderThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
                 try {
-
                     SyncJsonData recordData = SyncJsonData.getSyncJsonData(dataHelper, dataType,
                             new LineProtocolBean(measurement, tags, fields, time));
-                    boolean result = FTDBManager.get().insertFtOperation(recordData, false);
-                    LogUtils.d(TAG, "syncDataBackground:" + measurement + " " + dataType.toString() + ":insert=" + result);
-                    if (callBack != null) {
-                        callBack.onComplete();
+                    synchronized (FTDBCachePolicy.get().getRumLock()) {
+                        int status = FTDBCachePolicy.get().optRUMCachePolicy(1);
+                        StringBuilder errorDec = new StringBuilder();
+                        if (measurement.equals(Constants.FT_MEASUREMENT_RUM_ERROR)) {
+                            errorDec.append(" | ")
+                                    .append(tags.get(Constants.KEY_RUM_ERROR_TYPE))
+                                    .append(" | \"")
+                                    .append(fields.get(Constants.KEY_RUM_ERROR_MESSAGE))
+                                    .append("\"");
+                        }
+                        switch (status) {
+                            case 0:
+                            case 1:
+                                boolean result = FTDBManager.get().insertFtOperation(recordData, false);
+                                LogUtils.d(TAG, "syncDataBackground:" + measurement + errorDec + " "
+                                        + dataType.toString() + ":insert=" + result +
+                                        ",uuid:" + recordData.getUuid() + (status == 1 ? ",drop OldCache" : ""));
+                                if (callBack != null) {
+                                    callBack.onComplete();
+                                }
+                                if (result) {
+                                    FTDBCachePolicy.get().optRUMCount(1);
+                                }
+                                SyncTaskManager.get().executeSyncPoll();
+                                break;
+                            case -1:
+                                LogUtils.e(TAG, "syncDataBackground:" + measurement + errorDec + " " +
+                                        dataType.toString() + errorDec + ",uuid:" + recordData.getUuid() + ",drop by Cache limit");
+                                break;
+                        }
                     }
-                    SyncTaskManager.get().executeSyncPoll();
                 } catch (Exception e) {
                     LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                 }
@@ -332,22 +356,35 @@ public class FTTrackInner {
      */
     private void judgeLogCachePolicy(@NonNull List<SyncJsonData> recordDataList, boolean silence) {
         //如果 OP 类型不等于 LOG 则直接进行数据库操作；否则执行同步策略，根据同步策略返回结果判断是否需要执行数据库操作
-        int length = recordDataList.size();
-        int policyStatus = FTDBCachePolicy.get().optLogCachePolicy(length);
-        if (policyStatus >= 0) {//执行同步策略
-            if (policyStatus > 0) {
-                int dropCount = Math.min(policyStatus, length);
-                recordDataList.subList(0, dropCount).clear();
-                LogUtils.e(TAG, "reach log limit, drop log count:" + dropCount);
+        synchronized (FTDBCachePolicy.get().getLogLock()) {
+
+            int length = recordDataList.size();
+            int policyStatus = FTDBCachePolicy.get().optLogCachePolicy(length);
+            if (policyStatus >= 0) {//执行同步策略
+                boolean result = FTDBManager.get().insertFtOptList(recordDataList, false);
+                FTDBCachePolicy.get().optLogCount(recordDataList.size());
+                if (policyStatus == 0) {//不丢弃
+                    LogUtils.d(TAG, "judgeLogCachePolicy:insert-result=" + result);
+                } else {//丢弃全部或丢弃一部分旧数据，旧数据在 optLogCachePolicy 中丢弃
+                    int dropCount = Math.min(policyStatus, length);
+                    LogUtils.d(TAG, "judgeLogCachePolicy:insert-result=" + result + ", drop cache count:" + dropCount);
+                }
+                if (!silence) {
+                    SyncTaskManager.get().executeSyncPoll();
+                }
+            } else {
+                int dropCount = Math.abs(policyStatus);
+                if (dropCount == length) {//全丢新数据
+                    LogUtils.e(TAG, "reach log limit, drop log count:" + dropCount);
+                } else {//丢一部分新数据
+                    recordDataList.subList(length - dropCount, length).clear();
+                    boolean result = FTDBManager.get().insertFtOptList(recordDataList, false);
+                    FTDBCachePolicy.get().optLogCount(recordDataList.size());
+                    LogUtils.d(TAG, "judgeLogCachePolicy:insert-result=" + result + ", drop log count:" + dropCount);
+                }
             }
-            boolean result = FTDBManager.get().insertFtOptList(recordDataList, false);
-            LogUtils.d(TAG, "judgeLogCachePolicy:insert-result=" + result);
-            if (!silence) {
-                SyncTaskManager.get().executeSyncPoll();
-            }
-        } else {
-            LogUtils.e(TAG, "reach log limit, drop log count:" + length);
         }
+
     }
 
     SyncDataHelper getCurrentDataHelper() {

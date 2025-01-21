@@ -11,9 +11,10 @@ import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTRUMConfigManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
+import com.ft.sdk.FTUIBlockManager;
 import com.ft.sdk.SyncPageSize;
 import com.ft.sdk.SyncTaskManager;
-import com.ft.sdk.garble.FTDBCachePolicy;
+import com.ft.sdk.garble.db.FTDBCachePolicy;
 import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.test.base.FTBaseTest;
@@ -109,14 +110,14 @@ public class ConfigTest extends FTBaseTest {
         FTSdk.install(getDatakitConfig());
         FTSdk.initLogWithConfig(new FTLoggerConfig());
         //default
-        Assert.assertEquals(Constants.DEFAULT_DB_LOG_CACHE_NUM, FTDBCachePolicy.get().getLimitCount());
+        Assert.assertEquals(Constants.DEFAULT_DB_LOG_CACHE_NUM, FTDBCachePolicy.get().getLogLimitCount());
 
         FTSdk.initLogWithConfig(new FTLoggerConfig().setLogCacheLimitCount(0));
-        Assert.assertEquals(Constants.MINI_DB_LOG_CACHE_NUM, FTDBCachePolicy.get().getLimitCount());
+        Assert.assertEquals(Constants.MINI_DB_LOG_CACHE_NUM, FTDBCachePolicy.get().getLogLimitCount());
 
         int customCount = 10000;
         FTSdk.initLogWithConfig(new FTLoggerConfig().setLogCacheLimitCount(customCount));
-        Assert.assertEquals(customCount, FTDBCachePolicy.get().getLimitCount());
+        Assert.assertEquals(customCount, FTDBCachePolicy.get().getLogLimitCount());
 
     }
 
@@ -247,6 +248,32 @@ public class ConfigTest extends FTBaseTest {
         FTSdk.install(ftSDKConfig);
         Assert.assertEquals(expected, FTSdk.get().getBaseConfig().getEnv());
     }
+
+
+    /**
+     * 验证 UIBlock 参数默认数值与
+     */
+    @Test
+    public void rumUIBlockParamsTest() {
+        FTSdk.install(getDatakitConfig());
+        //验证
+        FTSdk.initRUMWithConfig(new FTRUMConfig().setRumAppId(TEST_FAKE_RUM_ID)
+                .setEnableTrackAppUIBlock(true));
+        Assert.assertEquals(FTUIBlockManager.DEFAULT_TIME_BLOCK_MS, getLongTaskBlockDurationMS());
+
+        //设置大于 100 ms
+        FTSdk.initRUMWithConfig(new FTRUMConfig().setRumAppId(TEST_FAKE_RUM_ID)
+                .setEnableTrackAppUIBlock(true,
+                        1000));
+        Assert.assertEquals(1000, getLongTaskBlockDurationMS());
+
+        //验证最小设置
+        FTSdk.initRUMWithConfig(new FTRUMConfig().setRumAppId(TEST_FAKE_RUM_ID)
+                .setEnableTrackAppUIBlock(true,
+                        90));
+        Assert.assertEquals(getUIBlockMiniBlockDurationMS(), getLongTaskBlockDurationMS());
+    }
+
 
     @Override
     public void tearDown() {

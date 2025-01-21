@@ -117,10 +117,13 @@ public class FTTraceConfig {
         return enableAutoTrace;
     }
 
+    @Deprecated
     public boolean isEnableWebTrace() {
         return enableWebTrace;
     }
 
+
+    @Deprecated
     public FTTraceConfig setEnableWebTrace(boolean enableWebTrace) {
         this.enableWebTrace = enableWebTrace;
         return this;
@@ -141,5 +144,18 @@ public class FTTraceConfig {
 
     public HashMap<String, Object> getGlobalContext() {
         return globalContext;
+    }
+
+    @Override
+    public String toString() {
+        return "FTTraceConfig{" +
+                "samplingRate=" + samplingRate +
+                ", traceType=" + traceType +
+                ", enableWebTrace=" + enableWebTrace +
+                ", enableAutoTrace=" + enableAutoTrace +
+                ", enableLinkRUMData=" + enableLinkRUMData +
+                ", serviceName='" + serviceName + '\'' +
+                ", globalContext=" + globalContext +
+                '}';
     }
 }

@@ -23,6 +23,142 @@
 1. 支持开启 session replay 录制功能
 
 ---
+#  agent 1.6.8-alpha01
+1. 修复多次初始化 RUM 配置，fps 采集不准确的问题
+2. 容错老版本数据升级
+
+---
+#  agent 1.6.7
+1. 支持自定义 FTTraceInterceptor.HeaderHandler 与 RUM 数据做关联
+2. 支持通过 FTRUMConfig.setOkHttpTraceHeaderHandler 更改 ASM 写入的 FTTraceInterceptor.HeaderHandler 内容，
+   支持通过 FTRUMConfig.setOkHttpResourceContentHandler 更改 ASM 写入的 FTResourceInterceptor.ContentHandlerHelper 内容。
+3. 优化崩溃采集能力，适配某些 OS 触发 system.exit 导致崩溃数据无法采集的场景
+4. 修正 tag 偶现为空字符，从而导致数据无法正常上报的问题
+5. 优化 ASM OkHttpListener EventListener 的覆盖逻辑，支持保留原项目 EventListener 事件参数传递
+
+---
+#  agent 1.6.7-beta02
+1. 同 1.6.7-alpha05
+
+---
+#  agent 1.6.7-alpha05
+1. 优化 ASM OkhttpListener EventListener 的覆盖逻辑，支持保留原 EventListener 事件参数传递
+
+---
+#  agent 1.6.7-alpha04
+1. 支持全局设置自定义 FTTraceInterceptor.HeaderHandler 和 FTResourceInterceptor.ContentHandlerHelper 方法
+2. 修正 tag 偶现为空字符，导致数据上报失败的问题
+
+---
+#  agent 1.6.7-alpha02
+1. 优化崩溃采集能力，适配某些 OS 触发 system.exit 导致崩溃数据无法采集的场景
+2. 修复当网络恢复可用状态，触发同步数据失灵的问题
+
+---
+#  agent 1.6.7-beta01
+1. 修正错误 long task 错误配置逻辑
+
+---
+#  agent 1.6.7-alpha01
+1. 支持更改链路中对应的 traceId 和 spanId
+
+---
+#  agent 1.6.6
+1. 网络状态及类型获取优化，支持 ethernet 类型的网络类型显示
+2. 优化无网络状态下，数据写入频繁关闭数据库的问题
+3. 修复丢弃日志与 RUM 丢弃旧数据时，数据条目数与设置条目数偏差的问题
+4. TV 设备按键事件适配，剔除非 TV 设备 tag
+5. 支持通过 `FTRUMConfig.setRumCacheLimitCount(int)`限制 RUM 数据条目数上限，默认 100_000
+6. 支持通过 `FTSDKConfig enableLimitWithDbSize(long dbSize)` 限制总缓存大小功能，开启之后
+   `FTLoggerConfig.setLogCacheLimitCount(int)` 及 `FTRUMConfig.setRumCacheLimitCount(int)` 将失效
+7. 优化设备无操作场景下 Session 刷新规则
+
+---
+#  agent 1.6.6-beta02
+1. 调整输出 SDK 日志输出行为
+2. 优化某些场景日志在抛弃旧数据时规则
+
+---
+# agent 1.6.6-beta01
+1. 优化 db 缓存限制 SDK 日志输出
+
+---
+# agent 1.6.6-alpha01
+1. 继承 ft-sdk:1.6.5-alpha01, 合并 1.6.5 更新部分
+
+---
+# agent 1.6.5
+1. 弱化 Webview 在 AOP 过程中参数为 null 的提示
+2. 优化应用在后台长 Session 更新的机制
+
+---
+# agent 1.6.5-beta04
+1. 弱化 Webview 在 AOP 过程中参数为 null 的提示
+2. 优化应用在后台长 Session 更新的机制
+3. 继承 ft-sdk:1.6.4
+
+---
+
+# agent 1.6.5-alpha01
+1. 网络状态及类型获取优化，支持 ethernet 类型的网络类型显示
+2. 优化无网络状态，数据写入频繁关闭数据库的问题
+3. 修复丢弃日志与 RUM 丢弃旧数据时数据偏差的问题
+4. TV 设备按键事件适配，及非 TV 设备标签剔除
+5. 支持通过 `FTSDKConfig enableLimitWithDbSize(long dbSize)` 限制总缓存大小功能，开启之后
+    `FTLoggerConfig#setLogCacheLimitCount(int)` 及 `FTRUMConfig#setRumCacheLimitCount(int)` 将失效
+
+---
+# agent 1.6.5-beta03
+1. 修改默认 `FTRUMConfig.setRumCacheLimitCount(int)`默认参数数值, 100_000
+
+---
+# agent 1.6.5-beta02
+1. 修改默认 `FTRUMConfig.setRumCacheLimitCount(int)`默认参数数值, 200_000
+
+---
+# agent 1.6.5-beta01
+1. 新增 RUM 条目数量限制功能，支持通过 `FTRUMConfig.setRumCacheLimitCount(int)` 来限制 SDK 最大缓存条目数据限制， 
+ 支持通过 `FTRUMConfig.setRumCacheDiscardStrategy(strategy)` 设置来指定丢弃新数据或丢弃旧数据
+2. 新增 SDK 内部日志等级过滤功能
+
+---
+# agent 1.6.4
+1. 优化 App 启动时间在 API 24 以上的统计
+2. 支持通过 `FTRUMConfig.setEnableTrackAppUIBlock(true, blockDurationMs)` 设置检测时间范围
+
+---
+# agent 1.6.4-beta01
+1. 同 1.6.4-alpha02
+---
+
+# agent 1.6.4-alpha02
+1. 优化一些权限相关错误日志频繁打印的问题
+2. 添加设置 longtask 检测时间范围的方法
+
+---
+# agent 1.6.4-alpha01
+1. 优化 App 启动时间在高版本系统中的统计时间
+2. 优化动态属性在页面上绑定的机制
+
+---
+# agent 1.6.3
+1. 优化自定义 addAction 在高频率调用时的性能表现
+2. 支持使用  FTSDKConfig.setCompressIntakeRequests 对同步数据进行 deflate 压缩配置
+
+---
+# agent 1.6.3-beta03
+1. 优化已关闭并同步完毕的 action 的删除逻辑
+2. 支持同步数据 deflate 压缩
+
+---
+# agent 1.6.3-beta02
+1. 修复高频调用 addAction 丢失数据数据的问题
+
+---
+# agent 1.6.3-beta01
+1. 优化 addAction 数据上报机制 
+
+---
 # agent 1.6.2
 1. RUM 新增 addAction 方法，支持 property 扩展属性与频繁连续数据上报
 

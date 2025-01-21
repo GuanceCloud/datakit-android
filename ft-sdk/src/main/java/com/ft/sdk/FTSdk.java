@@ -6,9 +6,9 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.FTAutoTrackConfigManager;
-import com.ft.sdk.garble.FTDBCachePolicy;
 import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.bean.UserData;
+import com.ft.sdk.garble.db.FTDBCachePolicy;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
 import com.ft.sdk.garble.utils.Constants;
@@ -60,6 +60,8 @@ public class FTSdk {
     public static final String AGENT_VERSION = BuildConfig.FT_SDK_VERSION;//当前SDK 版本
     private static FTSdk mFtSdk;
     private final FTSDKConfig mFtSDKConfig;
+
+    private boolean isTVMode;
 
     /**
      * @param ftSDKConfig
@@ -158,12 +160,14 @@ public class FTSdk {
      */
     private void initFTConfig(FTSDKConfig config) {
         LogUtils.setDebug(config.isDebug());
+        LogUtils.setSDKLogLevel(config.getSdkLogLevel());
+        FTDBCachePolicy.get().initSDKParams(config);
         FTHttpConfigManager.get().initParams(config);
-        FTNetworkListener.get().monitor();
         appendGlobalContext(config);
         SyncTaskManager.get().init(config);
         FTTrackInner.getInstance().initBaseConfig(config);
-        LogUtils.d(TAG, "initFTConfig complete");
+        FTNetworkListener.get().monitor();
+        LogUtils.d(TAG, "initFTConfig complete:" + config);
     }
 
 
@@ -181,7 +185,7 @@ public class FTSdk {
         try {
             config.setServiceName(get().getBaseConfig().getServiceName());
             FTRUMConfigManager.get().initWithConfig(config);
-            LogUtils.d(TAG, "initRUMWithConfig complete");
+            LogUtils.d(TAG, "initRUMWithConfig complete:" + config);
 
         } catch (Exception e) {
             LogUtils.e(TAG, "initRUMWithConfig fail:\n" + LogUtils.getStackTraceString(e));
@@ -198,7 +202,7 @@ public class FTSdk {
         try {
             config.setServiceName(get().getBaseConfig().getServiceName());
             FTTraceConfigManager.get().initWithConfig(config);
-            LogUtils.d(TAG, "initTraceWithConfig complete");
+            LogUtils.d(TAG, "initTraceWithConfig complete:" + config);
 
         } catch (Exception e) {
             LogUtils.e(TAG, "initTraceWithConfig fail:\n" + LogUtils.getStackTraceString(e));
@@ -214,7 +218,7 @@ public class FTSdk {
         try {
             config.setServiceName(get().getBaseConfig().getServiceName());
             FTLoggerConfigManager.get().initWithConfig(config);
-            LogUtils.d(TAG, "initLogWithConfig complete");
+            LogUtils.d(TAG, "initLogWithConfig complete:" + config);
 
         } catch (Exception e) {
             LogUtils.e(TAG, "initLogWithConfig fail:\n" + LogUtils.getStackTraceString(e));

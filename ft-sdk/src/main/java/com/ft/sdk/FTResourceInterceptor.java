@@ -103,6 +103,7 @@ public class FTResourceInterceptor implements Interceptor {
             response = chain.proceed(request);
 
             if (isInTakeUrl) {
+                LogUtils.d(TAG, url + " , ignore by ResourceUrlHandler");
                 return response;
             }
 

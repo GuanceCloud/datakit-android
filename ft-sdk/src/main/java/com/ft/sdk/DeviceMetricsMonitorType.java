@@ -30,7 +30,7 @@ public enum DeviceMetricsMonitorType {
      */
     ALL(0xFFFFFFFF),
     /**
-     * 电池当前剩余量
+     * 电池当前剩余量, TV 设备不支持
      * {@link Constants#KEY_BATTERY_CURRENT_AVG,
      *
      * @link Constants#KEY_BATTERY_CURRENT_MAX}

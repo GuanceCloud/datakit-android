@@ -60,7 +60,12 @@ public class FTExtension {
     /**
      * 默认认定 [project]/build/intermediates/merged_native_libs
      */
-    public  String nativeLibPath = "";
+    public String nativeLibPath = "";
+
+    /**
+     * 是否只生成 sourcemap
+     */
+    public boolean generateSourceMapOnly = false;
 
     /**
      * 发布版本 favor 配置，{@link ProductFlavorModel}
@@ -91,6 +96,7 @@ public class FTExtension {
                 ", appId='" + appId + '\'' +
                 ", env='" + env + '\'' +
                 ", asmVersion='" + asmVersion + '\'' +
+                ", generateSourceMapOnly='" + generateSourceMapOnly + '\'' +
                 '}';
     }
 }

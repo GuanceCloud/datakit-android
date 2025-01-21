@@ -21,8 +21,6 @@ import com.ft.test.base.FTBaseTest;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 
 /**
@@ -139,20 +137,12 @@ public class TraceHeaderTest extends FTBaseTest {
 
     /**
      * 获取 http 请求的所有头参数
+     *
      * @return
      */
     private HashMap<String, String> getHeaders() {
         String key = "uuid";
-        HashMap<String, String> map = null;
-        try {
-            map = FTTraceManager.get()
-                    .getTraceHeader(key, "https://www.test.url");
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        return map;
+        return FTTraceManager.get().getTraceHeader(key, "https://www.test.url");
 
     }
 }

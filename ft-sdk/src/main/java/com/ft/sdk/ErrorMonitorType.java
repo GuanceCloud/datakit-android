@@ -13,7 +13,7 @@ public enum ErrorMonitorType {
      */
     ALL(0xFFFFFFFF),
     /**
-     * 当前电手机的电池量,{@link com.ft.sdk.garble.utils.Constants#KEY_BATTERY_USE}
+     * 当前电手机的电池量, TV 设备不支持{@link com.ft.sdk.garble.utils.Constants#KEY_BATTERY_USE}
      */
     BATTERY(1 << 1),
     /**

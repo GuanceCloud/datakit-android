@@ -3,8 +3,11 @@ package com.ft.sdk.garble.utils;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
+import android.app.UiModeManager;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Process;
 import android.provider.Settings;
@@ -264,6 +267,7 @@ public class DeviceUtils {
      * @return
      */
     public static String getCarrier(Context context) {
+        if (isTv(context)) return "";
         try {
             if (Utils.hasPermission(context, Manifest.permission.READ_PHONE_STATE)) {
                 try {
@@ -293,7 +297,7 @@ public class DeviceUtils {
                     LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                 }
             } else {
-                LogUtils.e(TAG, "没有获得到 READ_PHONE_STATE 权限无法获取运营商信息");
+                LogUtils.eOnce(TAG, "没有获得到 READ_PHONE_STATE 权限无法获取运营商信息");
             }
         } catch (Exception e) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
@@ -371,4 +375,17 @@ public class DeviceUtils {
         }
         return stringBuilder.toString();
     }
+
+    private static final String FEATURE_GOOGLE_ANDROID_TV = "com.google.android.tv";
+
+    public static boolean isTv(Context appContext) {
+        UiModeManager uiModeManager = (UiModeManager) appContext.getSystemService(Context.UI_MODE_SERVICE);
+        if (uiModeManager != null && uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION) {
+            return true;
+        }
+        PackageManager packageManager = appContext.getPackageManager();
+        return packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK)
+                || packageManager.hasSystemFeature(FEATURE_GOOGLE_ANDROID_TV);
+    }
+
 }

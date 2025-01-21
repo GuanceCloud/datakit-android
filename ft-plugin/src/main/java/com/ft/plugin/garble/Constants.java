@@ -83,6 +83,11 @@ public class Constants {
      * int A(String,String) 方法的描述
      */
     public static final String METHOD_DESC_S_S_I = "(Ljava/lang/String;Ljava/lang/String;)I";
+
+    /**
+     * int (int,String,String)
+     */
+    public static final String METHOD_DESC_I_S_S_I = "(ILjava/lang/String;Ljava/lang/String;)I";
     /**
      * int v(String tag, String msg, Throwable tr) 方法描述
      */

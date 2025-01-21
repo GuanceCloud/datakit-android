@@ -17,6 +17,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * create: by huangDianHua
@@ -143,21 +145,27 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
                             logCatWithError.getLogcatSystemLines(),
                             logCatWithError.getLogcatEventsLines()));
         }
-
+        CountDownLatch latch = new CountDownLatch(1);
         uploadCrashLog(writer.toString(), e.getMessage(), FTActivityManager.get().getAppState(), new RunnerCompleteCallBack() {
             @Override
             public void onComplete() {
-                //测试用例直接
-                if (isAndroidTest) {
-                    e.printStackTrace();
-                } else {
-                    if (mDefaultExceptionHandler != null) {
-                        mDefaultExceptionHandler.uncaughtException(t, e);
-                    }
-                }
+                latch.countDown();
             }
         });
 
+        try {
+            latch.await(800, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException ie) {
+            LogUtils.e(TAG, LogUtils.getStackTraceString(ie));
+        }
+
+        if (isAndroidTest) {  //测试用例直接
+            e.printStackTrace();
+        } else {
+            if (mDefaultExceptionHandler != null) {
+                mDefaultExceptionHandler.uncaughtException(t, e);
+            }
+        }
     }
 
     /**

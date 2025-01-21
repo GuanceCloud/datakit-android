@@ -205,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
                             }
 
                         } catch (IOException e) {
-                            throw new RuntimeException(e);
+                            LogUtils.e(TAG, Log.getStackTraceString(e));
                         }
                     }
                 }.start();
@@ -216,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.main_mock_ui_block_btn).setOnClickListener(v -> {
             try {
-                Thread.sleep(2000);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

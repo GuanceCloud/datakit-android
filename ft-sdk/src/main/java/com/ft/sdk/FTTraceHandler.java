@@ -1,9 +1,13 @@
 package com.ft.sdk;
 
-import com.ft.sdk.garble.http.HttpUrl;
+import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.SkyWalkingUtils;
 import com.ft.sdk.garble.utils.Utils;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.HashMap;
 
 /**
@@ -11,7 +15,8 @@ import java.util.HashMap;
  * time: 2020/9/16 11:34:48
  * description: trace 数据处理
  */
-public class FTTraceHandler {
+public class FTTraceHandler extends FTTraceInterceptor.TraceRUMLinkable {
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "FTTraceHandler";
     public static final String ZIPKIN_TRACE_ID = "X-B3-TraceId";
     public static final String ZIPKIN_SPAN_ID = "X-B3-SpanId";
     public static final String ZIPKIN_SAMPLED = "X-B3-Sampled";
@@ -37,19 +42,16 @@ public class FTTraceHandler {
     private String traceID = "";
     private String spanID = "";
 
-    private HttpUrl httpUrl;
     private final FTTraceConfig config;
 
+    @Override
     public String getTraceID() {
         return traceID;
     }
 
+    @Override
     public String getSpanID() {
         return spanID;
-    }
-
-    public HttpUrl getUrl() {
-        return httpUrl;
     }
 
     FTTraceHandler() {
@@ -58,10 +60,23 @@ public class FTTraceHandler {
 
     }
 
-    HashMap<String, String> getTraceHeader(HttpUrl httpUrl) {
+    HashMap<String, String> getTraceHeader(String httpUrl) {
+        URL url = null;
+        try {
+            url = Utils.parseFromUrl(httpUrl);
+        } catch (URISyntaxException e) {
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+            return new HashMap<>();
+        } catch (MalformedURLException e) {
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+            return new HashMap<>();
+        }
+        return getTraceHeader(url);
+    }
+
+    HashMap<String, String> getTraceHeader(URL httpUrl) {
 
         if (config == null) return new HashMap<>();
-        this.httpUrl = httpUrl;
         HashMap<String, String> headers = new HashMap<>();
         String sampled;
         //抓取数据内容

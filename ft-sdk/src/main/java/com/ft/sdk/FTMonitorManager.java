@@ -4,6 +4,7 @@ import com.ft.sdk.garble.bean.MonitorInfoBean;
 import com.ft.sdk.garble.bean.ViewBean;
 import com.ft.sdk.garble.threadpool.MonitorRunnable;
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.FpsUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -51,6 +52,8 @@ public class FTMonitorManager {
         });
     }
 
+    private boolean isTVDevice;
+
     private final ScheduledExecutorService service;
 
     public static FTMonitorManager get() {
@@ -75,6 +78,8 @@ public class FTMonitorManager {
         if (isDeviceMetricsMonitorType(DeviceMetricsMonitorType.FPS)) {
             FpsUtils.get().start();
         }
+
+        isTVDevice = DeviceUtils.isTv(FTApplication.getApplication());
     }
 
     /**
@@ -84,6 +89,9 @@ public class FTMonitorManager {
      * @return
      */
     public boolean isErrorMonitorType(ErrorMonitorType errorMonitorType) {
+        if (isTVDevice && errorMonitorType.equals(ErrorMonitorType.BATTERY)) {
+            return false;
+        }
         //判断某一种监控项是否开启
         return (this.errorMonitorType | errorMonitorType.getValue()) == this.errorMonitorType;
     }
@@ -93,8 +101,10 @@ public class FTMonitorManager {
      * @return
      */
     public boolean isDeviceMetricsMonitorType(DeviceMetricsMonitorType deviceMetricsMonitorType) {
+        if (isTVDevice && deviceMetricsMonitorType.equals(DeviceMetricsMonitorType.BATTERY)) {
+            return false;
+        }
         return (this.deviceMetricsMonitorType | deviceMetricsMonitorType.getValue()) == this.deviceMetricsMonitorType;
-
     }
 
     /**

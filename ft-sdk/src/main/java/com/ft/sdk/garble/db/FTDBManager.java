@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.NonNull;
 
+import com.ft.sdk.DBCacheDiscard;
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.garble.bean.ActionBean;
 import com.ft.sdk.garble.bean.DataType;
@@ -33,7 +34,7 @@ import java.util.Objects;
 @SuppressLint("Range")
 public class FTDBManager extends DBManager {
     private static FTDBManager ftdbManager;
-    public final static String TAG = Constants.LOG_TAG_PREFIX + "DBManager";
+    public final static String TAG = Constants.LOG_TAG_PREFIX + "FTDBManager";
 
     /**
      * 注意 ：AndroidTest 会调用这个方法 {@link com.ft.test.base.FTBaseTest#avoidCleanData()}
@@ -54,6 +55,28 @@ public class FTDBManager extends DBManager {
     @Override
     public SQLiteOpenHelper initDataBaseHelper() {
         return DatabaseHelper.getInstance(FTApplication.getApplication(), FTDBConfig.DATABASE_NAME, FTDBConfig.DATABASE_VERSION);
+    }
+
+    @Override
+    protected boolean enableDBSizeLimit() {
+        return FTDBCachePolicy.get().isEnableLimitWithDbSize();
+    }
+
+    @Override
+    protected void onDBSizeCacheChange(SQLiteDatabase db, long fileSize) {
+//        LogUtils.d(TAG, "onDBSizeCacheChange:" + (fileSize / 1024) + "KB");
+        FTDBCachePolicy.get().setCurrentDBSize(fileSize);
+        if (FTDBCachePolicy.get().isReachDbLimit()) {
+            if (FTDBCachePolicy.get().getDbCacheDiscard() == DBCacheDiscard.DISCARD_OLDEST) {
+                LogUtils.w(TAG, "Database size exceeds limit! Performing cleanup...");
+                db.execSQL("DELETE FROM " + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " where _id in (SELECT _id from "
+                        + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " ORDER by tm ASC LIMIT " + Constants.DB_OLD_CACHE_REMOVE_COUNT + ")");
+                LogUtils.d(TAG, "Cleanup completed. Size reduced.");
+                db.close();
+                LogUtils.w(TAG, "DB Close to reduce size");
+            }
+        }
+
     }
 
     /**
@@ -520,12 +543,21 @@ public class FTDBManager extends DBManager {
     /**
      * 清理所有 Action {@link FTSQL#RUM_COLUMN_IS_CLOSE} = 1 数据
      */
-    public void cleanCloseActionData() {
+    public void cleanCloseActionData(String[] ids) {
         if (isAndroidTest) return;
+        if (ids.length == 0) return;
         getDB(true, new DataBaseCallBack() {
             @Override
             public void run(SQLiteDatabase db) {
-                db.execSQL("DELETE FROM " + FTSQL.FT_TABLE_ACTION + " WHERE " + FTSQL.RUM_COLUMN_IS_CLOSE + "=1");
+                String tableName = FTSQL.FT_TABLE_ACTION;
+                StringBuilder placeholders = new StringBuilder();
+                for (int i = 0; i < ids.length; i++) {
+                    placeholders.append("?");
+                    if (i < ids.length - 1) {
+                        placeholders.append(",");
+                    }
+                }
+                db.delete(tableName, FTSQL.RUM_COLUMN_ID + " IN (" + placeholders + ")", ids);
             }
         });
     }
@@ -632,14 +664,18 @@ public class FTDBManager extends DBManager {
      * @return
      */
     public int queryTotalCount(final DataType dataType) {
+        return queryTotalCount(new DataType[]{dataType});
+    }
+
+    public int queryTotalCount(DataType[] list) {
         final int[] count = new int[1];
         getDB(false, new DataBaseCallBack() {
             @Override
             public void run(SQLiteDatabase db) {
                 try {
+                    String where = getDataTypeWhereString(list);
                     Cursor cursor = db.rawQuery("select count(*) from "
-                            + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " where " + FTSQL.RECORD_COLUMN_DATA_TYPE
-                            + "='" + dataType.getValue() + "'", null);
+                            + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " where " + where, null);
                     cursor.moveToFirst();
                     count[0] = cursor.getInt(0);
                     cursor.close();
@@ -651,6 +687,17 @@ public class FTDBManager extends DBManager {
         return count[0];
     }
 
+    private String getDataTypeWhereString(DataType[] list) {
+        StringBuilder where = new StringBuilder();
+        for (int i = 0; i < list.length; i++) {
+            where.append(FTSQL.RECORD_COLUMN_DATA_TYPE + "='").append(list[i].getValue()).append("'");
+            if (i < list.length - 1) {
+                where.append(" OR ");
+            }
+        }
+        return where.toString();
+    }
+
     /**
      * 删除数据表中的前 limit 行数的数据
      *
@@ -659,11 +706,23 @@ public class FTDBManager extends DBManager {
      * @return
      */
     public void deleteOldestData(final DataType type, final int limit) {
+        deleteOldestData(new DataType[]{type}, limit);
+    }
+
+    public void deleteOldestData(DataType[] list, final int limit) {
         getDB(true, new DataBaseCallBack() {
             @Override
             public void run(SQLiteDatabase db) {
                 try {
-                    db.execSQL("DELETE FROM " + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " where _id in (SELECT _id from " + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " where " + FTSQL.RECORD_COLUMN_DATA_TYPE + "='" + type.getValue() + "' ORDER by tm ASC LIMIT " + limit + ")");
+                    String where = getDataTypeWhereString(list);
+                    db.execSQL("DELETE FROM " + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " where _id in (SELECT _id from "
+                            + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " where " + where + " ORDER by tm ASC LIMIT " + limit + ")");
+
+                    if (FTDBCachePolicy.get().isEnableLimitWithDbSize()
+                            && FTDBCachePolicy.get().isReachDbLimit()) {
+                        db.close();
+                        LogUtils.w(TAG, "BD close to reduce size");
+                    }
                 } catch (Exception e) {
                     LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
@@ -790,6 +849,12 @@ public class FTDBManager extends DBManager {
                 db.delete(FTSQL.FT_TABLE_VIEW, null, null);
                 LogUtils.e(TAG, "DB table delete");
 
+                if (FTDBCachePolicy.get().isEnableLimitWithDbSize()
+                        && FTDBCachePolicy.get().isReachDbLimit()) {
+                    db.close();
+                    LogUtils.d(TAG, "close BD to reduce size");
+                }
+
             }
         });
     }
@@ -802,6 +867,7 @@ public class FTDBManager extends DBManager {
             ftdbManager.shutDown();
         }
     }
+
 
 //    /**
 //     * 插入用户数据进数据库

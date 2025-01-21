@@ -11,7 +11,7 @@ import com.ft.sdk.FTRUMGlobalManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.LogCacheDiscard;
-import com.ft.sdk.garble.FTDBCachePolicy;
+import com.ft.sdk.garble.db.FTDBCachePolicy;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.LogData;
 import com.ft.sdk.garble.bean.Status;
@@ -181,7 +181,7 @@ public class LogTest extends FTBaseTest {
      * @throws InterruptedException
      */
     @Test
-    public void triggerDiscardPolicyTest() throws InterruptedException {
+    public void triggerLogDiscardPolicyTest() throws InterruptedException {
         FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableCustomLog(true));
         batchLog(10);
 
@@ -193,10 +193,10 @@ public class LogTest extends FTBaseTest {
      * @throws InterruptedException
      */
     @Test
-    public void triggerDiscardOldPolicyTest() throws InterruptedException {
+    public void triggerLogDiscardOldPolicyTest() throws InterruptedException {
         FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableCustomLog(true)
                 .setLogCacheDiscardStrategy(LogCacheDiscard.DISCARD_OLDEST));
-        batchLog(19);
+        batchLog(20);
     }
 
     /**
@@ -207,7 +207,7 @@ public class LogTest extends FTBaseTest {
      */
     private void batchLog(int expectCount) throws InterruptedException {
         String logContent = "custom log";
-        FTDBCachePolicy.get().optCount(4990);
+        FTDBCachePolicy.get().optLogCount(4990);
         for (int i = 0; i < 20; i++) {
             FTLogger.getInstance().logBackground(i + "-" + logContent, Status.CRITICAL);
             Thread.sleep(10);

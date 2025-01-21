@@ -102,6 +102,28 @@ class LifeCircleTraceCallback {
         FTRUMConfigManager manager = FTRUMConfigManager.get();
         FTRUMConfig config = manager.getConfig();
 
+        if (manager.isRumEnable()) {
+            //config nonnull here ignore warning
+            if (config.isEnableTraceUserView()) {
+                Long startTime = mCreateMap.get(context);
+                if (startTime != null) {
+                    long duration = Utils.getCurrentNanoTime() - startTime;
+                    String viewName = AopUtils.getClassName(context);
+                    FTRUMInnerManager.get().onCreateView(viewName, duration);
+                }
+            }
+        }
+    }
+
+    /**
+     * see <a href="https://developer.android.com/topic/performance/vitals/launch-time?hl=zh-cn#warm">启动时间计算规则</a>
+     *
+     * @param context
+     */
+    public void onPostOnStart(Context context) {
+        FTRUMConfigManager manager = FTRUMConfigManager.get();
+        FTRUMConfig config = manager.getConfig();
+
         if (!mInited) {
             long now = Utils.getCurrentNanoTime();
             FTActivityManager.get().setAppState(AppState.RUN);
@@ -119,21 +141,8 @@ class LifeCircleTraceCallback {
                     FTAppStartCounter.get().hotStart(now - startTime, startTime);
                 }
             }
-
-
         }
 
-        if (manager.isRumEnable()) {
-            //config nonnull here ignore warning
-            if (config.isEnableTraceUserView()) {
-                Long startTime = mCreateMap.get(context);
-                if (startTime != null) {
-                    long duration = Utils.getCurrentNanoTime() - startTime;
-                    String viewName = AopUtils.getClassName(context);
-                    FTRUMInnerManager.get().onCreateView(viewName, duration);
-                }
-            }
-        }
     }
 
     public void onPreResume(Activity activity) {

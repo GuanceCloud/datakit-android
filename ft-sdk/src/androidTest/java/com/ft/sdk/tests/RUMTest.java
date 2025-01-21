@@ -1,14 +1,20 @@
 package com.ft.sdk.tests;
 
+import static com.ft.sdk.FTTraceHandler.W3C_TRACEPARENT_KEY;
 import static com.ft.sdk.tests.FTSdkAllTests.hasPrepare;
 
 import android.os.Looper;
 
 import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTRUMGlobalManager;
+import com.ft.sdk.FTResourceEventListener;
+import com.ft.sdk.FTResourceInterceptor;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
+import com.ft.sdk.FTTraceInterceptor;
+import com.ft.sdk.FTTraceManager;
+import com.ft.sdk.RUMCacheDiscard;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.ActionBean;
 import com.ft.sdk.garble.bean.AppState;
@@ -18,7 +24,9 @@ import com.ft.sdk.garble.bean.NetStatusBean;
 import com.ft.sdk.garble.bean.ResourceParams;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.bean.ViewBean;
+import com.ft.sdk.garble.db.FTDBCachePolicy;
 import com.ft.sdk.garble.db.FTDBManager;
+import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.Utils;
 import com.ft.test.base.FTBaseTest;
@@ -39,7 +47,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.Response;
 
 public class RUMTest extends FTBaseTest {
 
@@ -129,14 +139,33 @@ public class RUMTest extends FTBaseTest {
 
         FTRUMGlobalManager.get().addAction(ACTION_NAME, ACTION_TYPE_NAME, DURATION, property);
         waitEventConsumeInThreadPool();
+        Thread.sleep(500);
 
-        ArrayList<ActionBean> list = FTDBManager.get().querySumAction(0);
+        List<SyncJsonData> list = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.RUM_APP);
 
-        ActionBean action = list.get(0);
-        Assert.assertTrue(action.isClose());
-        Assert.assertEquals(action.getActionName(), ACTION_NAME);
-        Assert.assertEquals(action.getActionType(), ACTION_TYPE_NAME);
-        Assert.assertEquals(action.getProperty().get(PROPERTY_NAME), PROPERTY_VALUE);
+        Assert.assertFalse(list.isEmpty());
+
+        SyncJsonData data = list.get(0);
+//        Assert.assertTrue(action.isClose());
+        LineProtocolData lineProtocolData = new LineProtocolData(data.getDataString());
+        Assert.assertEquals(lineProtocolData.getTagAsString("action_name"), ACTION_NAME);
+        Assert.assertEquals(lineProtocolData.getTagAsString("action_type"), ACTION_TYPE_NAME);
+        Assert.assertEquals(lineProtocolData.getField(PROPERTY_NAME), PROPERTY_VALUE);
+    }
+
+    /**
+     * 数据连续写入
+     *
+     * @throws InterruptedException
+     */
+    @Test
+    public void multiActionData() throws InterruptedException {
+        for (int i = 0; i < 1000; i++) {
+            FTRUMGlobalManager.get().addAction(ACTION_NAME, ACTION_TYPE_NAME);
+        }
+        Thread.sleep(2000);
+        List<SyncJsonData> list = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.RUM_APP);
+        Assert.assertEquals(1000, list.size());
     }
 
     /**
@@ -603,7 +632,6 @@ public class RUMTest extends FTBaseTest {
 
         FTSdk.initTraceWithConfig(new FTTraceConfig()
                 .setTraceType(TraceType.DDTRACE)
-                .setEnableAutoTrace(true)
                 .setEnableLinkRUMData(enableLinkRUMData)
         );
         Thread.sleep(1000);
@@ -633,6 +661,106 @@ public class RUMTest extends FTBaseTest {
         return !tracId.isEmpty() && !spanId.isEmpty();
     }
 
+    private final static String CUSTOM_TRACE_HEADER = "replace_trace_id";
+
+    @Test
+    public void customTraceHeader() throws IOException, InterruptedException {
+        MockWebServer mockWebServer = new MockWebServer();
+
+        MockResponse mockResponse = new MockResponse();
+        mockResponse.setBody("");
+        mockResponse.setResponseCode(HttpURLConnection.HTTP_OK);
+        mockWebServer.enqueue(mockResponse);
+        mockWebServer.play();
+
+        FTSdk.initRUMWithConfig(new FTRUMConfig());
+
+        FTSdk.initTraceWithConfig(new FTTraceConfig()
+                .setTraceType(TraceType.TRACEPARENT)
+                .setEnableAutoTrace(true)
+                .setEnableLinkRUMData(true)
+        );
+        Thread.sleep(1000);
+
+
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(new FTTraceInterceptor(new FTTraceInterceptor.HeaderHandler() {
+                    private String[] splits;
+
+                    @Override
+                    public HashMap<String, String> getTraceHeader(Request request) {
+                        HashMap<String, String> map = new HashMap<>();
+                        String replaceTrace = request.header(CUSTOM_TRACE_HEADER);//Get request
+                        String headerString = FTTraceManager.get().
+                                getTraceHeader(request.url().toString())
+                                .get(W3C_TRACEPARENT_KEY); //get trace header string
+
+                        splits = headerString.split("-");
+                        String originTraceId = splits[1];
+                        splits[1] = replaceTrace;
+                        map.put(W3C_TRACEPARENT_KEY, headerString.replace(originTraceId, replaceTrace));
+                        return map;
+                    }
+
+                    @Override
+                    public String getSpanID() {
+                        if (splits != null) {
+                            return splits[2];
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    public String getTraceID() {
+                        if (splits != null) {
+                            return splits[1];
+                        }
+                        return null;
+                    }
+                }))
+                .addInterceptor(new FTResourceInterceptor())
+                .eventListenerFactory(new FTResourceEventListener.FTFactory()).build();
+
+
+        Request.Builder builder = new Request.Builder().url(mockWebServer.getUrl("/").toString())
+                .method(RequestMethod.GET.name(), null);
+
+        String replaceTraceHeader = Utils.randomUUID();
+        Request request = null;
+        try {
+            Response response = client.newCall(builder.header(CUSTOM_TRACE_HEADER,
+                    replaceTraceHeader).build()).execute();
+            request = response.request();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Thread.sleep(1000);
+
+        List<SyncJsonData> recordDataList = FTDBManager.get()
+                .queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
+
+        String tracId = "";
+        String spanId = "";
+
+        for (SyncJsonData recordData : recordDataList) {
+
+            LineProtocolData data = new LineProtocolData(recordData.getDataString());
+
+            if (Constants.FT_MEASUREMENT_RUM_RESOURCE.equals(data.getMeasurement())) {
+                tracId = data.getTagAsString(Constants.KEY_RUM_RESOURCE_TRACE_ID, "");
+                spanId = data.getTagAsString(Constants.KEY_RUM_RESOURCE_SPAN_ID, "");
+                break;
+            }
+
+        }
+        mockWebServer.shutdown();
+
+        Assert.assertTrue(!tracId.isEmpty() && !spanId.isEmpty());
+        Assert.assertTrue(request.header(W3C_TRACEPARENT_KEY).contains(replaceTraceHeader));
+        Assert.assertEquals(tracId, replaceTraceHeader);
+    }
+
     /**
      * 检验如果 Resource 过程中未发生 Action 数据是否正，是否会监测到 Action
      *
@@ -659,6 +787,48 @@ public class RUMTest extends FTBaseTest {
             }
         }
 
+    }
+
+    /**
+     * 测试大批量插入数据，是否触发丢弃策略
+     *
+     * @throws InterruptedException
+     */
+    @Test
+    public void triggerRUMDiscardPolicyTest() throws InterruptedException {
+        FTSdk.initRUMWithConfig(new FTRUMConfig());
+        batchRUM(10);
+
+    }
+
+    /**
+     * 测试大批 RUM 量插入数据，是否触发丢弃策略
+     *
+     * @throws InterruptedException
+     */
+    @Test
+    public void triggerRUMDiscardOldPolicyTest() throws InterruptedException {
+        FTSdk.initRUMWithConfig(new FTRUMConfig().setRumCacheDiscardStrategy(RUMCacheDiscard.DISCARD_OLDEST));
+        batchRUM(19);
+    }
+
+    /**
+     * 批量 RUM
+     *
+     * @param expectCount 预期数量
+     * @throws InterruptedException
+     */
+    private void batchRUM(int expectCount) throws InterruptedException {
+        FTDBCachePolicy.get().optRUMCount(99990);
+        for (int i = 0; i < 20; i++) {
+            FTRUMGlobalManager.get().addAction(ANY_ACTION, ACTION_NAME);
+            Thread.sleep(10);
+        }
+        Thread.sleep(2000);
+        int count = CheckUtils.getCount(DataType.RUM_APP, ACTION_NAME, 0);
+        System.out.println("count=" + count);
+        //Thread.sleep(300000);
+        Assert.assertTrue(expectCount >= count);
     }
 
 }

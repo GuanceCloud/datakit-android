@@ -8,6 +8,7 @@ import android.content.Context;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.ft.sdk.garble.utils.DeviceUtils;
+import com.ft.sdk.garble.utils.NetUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.junit.Test;
@@ -32,7 +33,7 @@ public class DeviceUtilsTest {
 
     @Test
     public void isNetworkAvailable() {
-        assertTrue(Utils.isNetworkAvailable(getContext()));
+        assertTrue(NetUtils.isNetworkAvailable(getContext()));
     }
 
 }

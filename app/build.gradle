@@ -95,6 +95,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.google.android.material:material:1.3.0'
+    implementation "androidx.webkit:webkit:1.9.0"
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation project(':ft-test')
@@ -128,6 +129,8 @@ FTExt {
     datawayToken = ft_env.datawayToken
     appId = ft_env.rumAppid
     env = 'common'
+    //   generateSourceMapOnly = true
+//    ignorePackages=['com.ft.http']
 
     prodFlavors {
         prodTest {
