@@ -274,14 +274,24 @@ public class FTSdk {
         hashMap.put(Constants.KEY_ENV, config.getEnv());
         String uuid = config.isEnableAccessAndroidID() ? DeviceUtils.getUuid(FTApplication.getApplication()) : "";
         hashMap.put(Constants.KEY_DEVICE_UUID, uuid);
-        hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_AGENT, FTSdk.AGENT_VERSION);
+        HashMap<String, String> pkgInfo = getStringStringHashMap();
+        if(!pkgInfo.isEmpty()){
+            pkgInfo.putAll(config.getPkgInfo());
+        }
+        hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_INFO, Utils.hashMapObjectToJson(pkgInfo));
+        hashMap.put(Constants.KEY_SDK_VERSION, FTSdk.AGENT_VERSION);
+    }
+
+    private static HashMap<String, String> getStringStringHashMap() {
+        HashMap<String, String> pkgInfo = new HashMap<>();
+        pkgInfo.put(Constants.KEY_RUM_SDK_PACKAGE_AGENT, FTSdk.AGENT_VERSION);
         if (!FTSdk.PLUGIN_VERSION.isEmpty()) {
-            hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_TRACK, FTSdk.PLUGIN_VERSION);
+            pkgInfo.put(Constants.KEY_RUM_SDK_PACKAGE_TRACK, FTSdk.PLUGIN_VERSION);
         }
         if (!FTSdk.NATIVE_VERSION.isEmpty()) {
-            hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_NATIVE, FTSdk.NATIVE_VERSION);
+            pkgInfo.put(Constants.KEY_RUM_SDK_PACKAGE_NATIVE, FTSdk.NATIVE_VERSION);
         }
-        hashMap.put(Constants.KEY_SDK_VERSION, FTSdk.AGENT_VERSION);
+        return pkgInfo;
     }
 
     /**

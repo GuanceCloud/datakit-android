@@ -8,6 +8,7 @@ import android.webkit.WebView;
 
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.PackageUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONException;
@@ -119,7 +120,8 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                     JSONObject jsonTags = data.optJSONObject(Constants.TAGS);
                     JSONObject jsonFields = data.optJSONObject(Constants.FIELDS);
 
-                    HashMap<String,Object> publicTags = FTRUMConfigManager.get().getRUMPublicDynamicTags(true);
+                    HashMap<String, Object> publicTags = FTRUMConfigManager.get()
+                            .getRUMPublicDynamicTags(true);
                     Iterator<String> keys = publicTags.keySet().iterator();
                     if (jsonTags == null) {
                         jsonTags = new JSONObject();
@@ -127,6 +129,8 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                     if (jsonFields == null) {
                         jsonFields = new JSONObject();
                     }
+                    String webSDKVersion = jsonTags.optString(Constants.KEY_SDK_VERSION);
+
                     while (keys.hasNext()) {
                         String key = keys.next();
                         if (!key.equals(Constants.KEY_SERVICE)) {
@@ -139,8 +143,16 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                     jsonTags.put(Constants.KEY_RUM_VIEW_IS_WEB_VIEW, true);
                     jsonFields.put(Constants.KEY_RUM_VIEW_IS_ACTIVE, false);
 
-                    HashMap<String,Object> tagMaps= Utils.jsonToMap(jsonTags);
-                    HashMap<String,Object> fieldMaps= Utils.jsonToMap(jsonFields);
+                    Object pkgInfo = publicTags.get(Constants.KEY_RUM_SDK_PACKAGE_INFO);
+                    if (pkgInfo != null) {
+                        String replacePkgInfo = PackageUtils.appendPackageVersion(pkgInfo.toString(),
+                                Constants.KEY_RUM_SDK_PACKAGE_WEB, webSDKVersion);
+                        jsonTags.put(Constants.KEY_RUM_SDK_PACKAGE_INFO, replacePkgInfo);
+                    }
+
+                    HashMap<String, Object> tagMaps = Utils.jsonToMap(jsonTags);
+                    HashMap<String, Object> fieldMaps = Utils.jsonToMap(jsonFields);
+
                     long time = data.optLong(Constants.TIME);
                     String measurement = data.optString(Constants.MEASUREMENT);
                     FTTrackInner.getInstance().rumWebView(time * 1000000, measurement, tagMaps, fieldMaps);
