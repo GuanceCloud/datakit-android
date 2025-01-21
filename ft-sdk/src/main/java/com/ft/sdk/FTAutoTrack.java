@@ -736,7 +736,7 @@ public class FTAutoTrack {
 
             }
             if (!hasSetTrace) {
-                FTTraceInterceptor.HeaderHandler headerHandler = FTRUMConfigManager.get().getOverrideHeaderHandler();
+                FTTraceInterceptor.HeaderHandler headerHandler = FTTraceConfigManager.get().getOverrideHeaderHandler();
                 if (headerHandler != null) {
                     builder.interceptors().add(0, new FTTraceInterceptor(headerHandler));
                 } else {

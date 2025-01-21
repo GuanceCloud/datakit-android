@@ -203,17 +203,6 @@ public class FTRUMConfigManager {
 
 
     /**
-     * 返回自定义覆盖全局的 {@link FTTraceInterceptor}
-     *
-     * @return
-     */
-    FTTraceInterceptor.HeaderHandler getOverrideHeaderHandler() {
-        if (config == null) return null;
-        if (config.getOkHttpTraceHeaderHandler() == null) return null;
-        return config.getOkHttpTraceHeaderHandler();
-    }
-
-    /**
      * 返回自定义覆盖全局的 {@link FTResourceInterceptor}
      *
      * @return

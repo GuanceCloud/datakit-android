@@ -1,3 +1,7 @@
+#  agent 1.6.8-beta01
+1.  FTRUMConfig.setOkHttpTraceHeaderHandler 迁移至 FTTraceConfig.setOkHttpTraceHeaderHandler
+
+---
 #  agent 1.6.8-alpha02
 1. webview SDK 内部信息增强，优化性能
 2. SDK 版本信息内容传输优化

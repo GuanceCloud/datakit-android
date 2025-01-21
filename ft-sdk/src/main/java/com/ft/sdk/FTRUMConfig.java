@@ -79,10 +79,6 @@ public class FTRUMConfig {
      */
     private FTOkHttpEventListenerHandler okHttpEventListenerHandler;
 
-    /**
-     *
-     */
-    private FTTraceInterceptor.HeaderHandler headerHandler;
 
     /**
      *
@@ -463,10 +459,6 @@ public class FTRUMConfig {
         return okHttpEventListenerHandler;
     }
 
-    public FTTraceInterceptor.HeaderHandler getOkHttpTraceHeaderHandler() {
-        return headerHandler;
-    }
-
     public FTResourceInterceptor.ContentHandlerHelper getOkHttpResourceContentHandler() {
         return contentHandlerHelper;
     }
@@ -482,16 +474,7 @@ public class FTRUMConfig {
         return this;
     }
 
-    /**
-     * ASM 设置全局 {@link FTTraceInterceptor.HeaderHandler}，默认不设置
-     *
-     * @param headerHandler
-     * @return
-     */
-    public FTRUMConfig setOkHttpTraceHeaderHandler(FTTraceInterceptor.HeaderHandler headerHandler) {
-        this.headerHandler = headerHandler;
-        return this;
-    }
+
 
     /**
      * ASM 设置全局 {@link FTResourceInterceptor.ContentHandlerHelper } ，默认不设置
@@ -539,7 +522,6 @@ public class FTRUMConfig {
                 ", deviceMetricsDetectFrequency=" + deviceMetricsDetectFrequency +
                 ", intTakeUrlHandler=" + intTakeUrlHandler +
                 ", okHttpEventListenerHandler=" + okHttpEventListenerHandler +
-                ", headerHandler=" + headerHandler +
                 ", contentHandlerHelper=" + contentHandlerHelper +
                 ", globalContext=" + globalContext +
                 ", serviceName='" + serviceName + '\'' +
