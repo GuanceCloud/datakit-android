@@ -27,6 +27,22 @@
 1. 支持开启 session replay 录制功能
 
 ---
+#  agent 1.6.8
+1. 修复多次初始化 RUM 配置，fps 采集不准确的问题
+2. 容错老版本缓存数据升级
+3. FTRUMConfig.setOkHttpTraceHeaderHandler 迁移至 FTTraceConfig.setOkHttpTraceHeaderHandler
+4. WebView SDK 内部信息增强，优化性能
+
+---
+#  agent 1.6.8-beta01
+1.  FTRUMConfig.setOkHttpTraceHeaderHandler 迁移至 FTTraceConfig.setOkHttpTraceHeaderHandler
+
+---
+#  agent 1.6.8-alpha02
+1. webview SDK 内部信息增强，优化性能
+2. SDK 版本信息内容传输优化
+
+---
 #  agent 1.6.8-alpha01
 1. 修复多次初始化 RUM 配置，fps 采集不准确的问题
 2. 容错老版本数据升级

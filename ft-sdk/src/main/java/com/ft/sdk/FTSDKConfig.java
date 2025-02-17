@@ -123,11 +123,11 @@ public class FTSDKConfig {
 
     /**
      * 开启使用 db 限制数据大小，默认 100MB ，单位 byte，{@link Constants#DEFAULT_DB_SIZE_LIMIT}
+     *
      * @param dbSize 设置 db 限制上限，数据库越大，磁盘压力越大，[30MB,),默认 100 MB
-     *
-     * 开启 db 数据限制之后，{@link FTLoggerConfig#setLogCacheLimitCount(int)}
-     * 及 {@link FTRUMConfig#setRumCacheLimitCount(int)} 将失效
-     *
+     *               <p>
+     *               开启 db 数据限制之后，{@link FTLoggerConfig#setLogCacheLimitCount(int)}
+     *               及 {@link FTRUMConfig#setRumCacheLimitCount(int)} 将失效
      * @return
      */
     public FTSDKConfig enableLimitWithDbSize(long dbSize) {
@@ -143,6 +143,7 @@ public class FTSDKConfig {
 
     /**
      * 设置 db 缓存丢弃策略
+     *
      * @param dbCacheDiscard
      * @return
      */
@@ -160,6 +161,8 @@ public class FTSDKConfig {
      * 或通过 {@link FTSDKConfig#addGlobalContext(String, String)} 用户自定义添加的变量参数
      */
     private final HashMap<String, Object> globalContext = new HashMap<>();
+
+    private final HashMap<String, String> pkgInfo = new HashMap<>();
 
     /**
      * 构建 SDK 必要的配置参数
@@ -389,6 +392,21 @@ public class FTSDKConfig {
         return this;
     }
 
+    /**
+     * 添加版本信息
+     *
+     * @param key
+     * @param value
+     * @return
+     */
+    FTSDKConfig addPkgInfo(String key, String value) {
+        this.pkgInfo.put(key, value);
+        return this;
+    }
+
+    HashMap<String, String> getPkgInfo() {
+        return pkgInfo;
+    }
 
     /**
      * 获取全局属性

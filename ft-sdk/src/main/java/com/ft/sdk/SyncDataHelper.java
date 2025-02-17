@@ -179,7 +179,9 @@ public class SyncDataHelper {
             //rum 数据
             mergeTags.putAll(dynamicBaseTags);
             mergeTags.putAll(dynamicLRumTags);
-            mergeTags.putAll(rumTags);
+            if (dataType == DataType.RUM_APP) {
+                mergeTags.putAll(rumTags);
+            }
             bodyContent = convertToLineProtocolLine(measurement, mergeTags, fields,
                     timeStamp, config);
         } else {

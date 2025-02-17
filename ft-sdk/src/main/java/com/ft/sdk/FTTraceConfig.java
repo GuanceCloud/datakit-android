@@ -37,6 +37,27 @@ public class FTTraceConfig {
     String serviceName = Constants.DEFAULT_SERVICE_NAME;
 
     /**
+     *
+     */
+    private FTTraceInterceptor.HeaderHandler headerHandler;
+
+
+    public FTTraceInterceptor.HeaderHandler getOkHttpTraceHeaderHandler() {
+        return headerHandler;
+    }
+
+    /**
+     * ASM 设置全局 {@link FTTraceInterceptor.HeaderHandler}，默认不设置
+     *
+     * @param headerHandler
+     * @return
+     */
+    public FTTraceConfig setOkHttpTraceHeaderHandler(FTTraceInterceptor.HeaderHandler headerHandler) {
+        this.headerHandler = headerHandler;
+        return this;
+    }
+
+    /**
      * 设置全局 tag
      */
     private final HashMap<String, Object> globalContext = new HashMap<>();
@@ -155,6 +176,7 @@ public class FTTraceConfig {
                 ", enableAutoTrace=" + enableAutoTrace +
                 ", enableLinkRUMData=" + enableLinkRUMData +
                 ", serviceName='" + serviceName + '\'' +
+                ", headerHandler=" + headerHandler +
                 ", globalContext=" + globalContext +
                 '}';
     }

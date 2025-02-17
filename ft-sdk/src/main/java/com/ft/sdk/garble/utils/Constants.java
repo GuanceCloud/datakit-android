@@ -421,6 +421,11 @@ public class Constants {
     public static final String KEY_RUM_SDK_PACKAGE_REPLAY_MATERIAL = "replay_mtr";
 
     /**
+     * web view 使用的 web sdk 发布版本
+     */
+    public static final String KEY_RUM_SDK_PACKAGE_WEB = "web";
+
+    /**
      * SDK 数据标记 [packageId].[pid].[pkg_dataCount].[uuid]
      * <p>
      * {@link ID36Generator}

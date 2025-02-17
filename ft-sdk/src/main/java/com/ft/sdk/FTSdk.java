@@ -306,6 +306,9 @@ public class FTSdk {
         String uuid = config.isEnableAccessAndroidID() ? DeviceUtils.getUuid(FTApplication.getApplication()) : "";
         hashMap.put(Constants.KEY_DEVICE_UUID, uuid);
         HashMap<String, String> pkgInfo = getStringStringHashMap();
+        if(!pkgInfo.isEmpty()){
+            pkgInfo.putAll(config.getPkgInfo());
+        }
         hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_INFO, Utils.hashMapObjectToJson(pkgInfo));
         hashMap.put(Constants.KEY_SDK_VERSION, FTSdk.AGENT_VERSION);
     }
