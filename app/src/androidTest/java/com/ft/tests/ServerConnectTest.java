@@ -15,7 +15,7 @@ import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTrackInner;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.http.NetCodeStatus;
-import com.ft.sdk.garble.manager.AsyncCallback;
+import com.ft.sdk.garble.manager.RequestCallback;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.junit.Before;
@@ -23,7 +23,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.reflect.Whitebox;
 
-import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -94,7 +93,7 @@ public class ServerConnectTest extends BaseTest {
         CountDownLatch countDownLatch = new CountDownLatch(1);
         long time = Utils.getCurrentNanoTime();
         LogBean bean = new LogBean("connect test", time);
-        Whitebox.invokeMethod(FTTrackInner.getInstance(), "trackLogAsync", bean, new AsyncCallback() {
+        Whitebox.invokeMethod(FTTrackInner.getInstance(), "trackLogAsync", bean, new RequestCallback() {
             @Override
             public void onResponse(int code, String response, String errorCode) {
                 codeScope = code;

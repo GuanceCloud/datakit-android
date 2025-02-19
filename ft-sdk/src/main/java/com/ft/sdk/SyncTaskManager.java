@@ -15,7 +15,7 @@ import com.ft.sdk.garble.http.FTResponseData;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.http.RequestMethod;
-import com.ft.sdk.garble.manager.AsyncCallback;
+import com.ft.sdk.garble.manager.RequestCallback;
 import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.ID36Generator;
@@ -305,10 +305,10 @@ public class SyncTaskManager {
             }
 
             String body = sb.toString();
-            requestNet(dataType, body, new AsyncCallback() {
+            requestNet(dataType, body, new RequestCallback() {
                 @Override
                 public void onResponse(int code, String response, String errorCode) {
-                    if (dataSyncMaxRetryCount == 0 || (code >= 200 && code < 500)) {
+                    if (code >= 200 && code < 500) {
                         SyncTaskManager.this.deleteLastQuery(requestDataList);
                         if (dataType == DataType.LOG) {
                             FTDBCachePolicy.get().optLogCount(-requestDataList.size());
@@ -316,9 +316,7 @@ public class SyncTaskManager {
                             FTDBCachePolicy.get().optRUMCount(-requestDataList.size());
                         }
                         errorCount.set(0);
-                        if ((dataSyncMaxRetryCount == 0 && code != 200) || code > 200) {
-                            LogUtils.e(TAG, "Sync Fail (Ignore)-[code:" + code + ",errorCode:" + errorCode + ",response:" + response + "]");
-                        } else {
+                        if (code == 200) {
                             String innerLogFlag = "";
                             if (dataType == DataType.LOG) {
                                 innerLogFlag = "log-" + logGenerator.getCurrentId();
@@ -328,6 +326,8 @@ public class SyncTaskManager {
                                 rumGenerator.next();
                             }
                             LogUtils.d(TAG, "pkg_id:" + innerLogFlag + " Sync Success-[code:" + code + ",response:" + response + "]");
+                        } else {
+                            LogUtils.e(TAG, "Sync Fail (Ignore)-[code:" + code + ",errorCode:" + errorCode + ",response:" + response + "]");
                         }
                     } else {
                         errorCount.getAndIncrement();
@@ -347,16 +347,19 @@ public class SyncTaskManager {
             });
             requestDataList.clear();
 
-            if (dataSyncMaxRetryCount > 0) {
-                if (errorCount.get() >= dataSyncMaxRetryCount) {
-                    LogUtils.e(TAG, " \n************ Sync Fail: " + dataSyncMaxRetryCount + " times，stop poll ***********");
-                    break;
-                }
+
+            if (dataSyncMaxRetryCount == 0) {
+                break;
+            } else if (dataSyncMaxRetryCount > 0 && errorCount.get() > dataSyncMaxRetryCount) {
+                LogUtils.e(TAG, " \n************ Sync Fail: " + dataSyncMaxRetryCount + " times，stop poll ***********");
+                break;
             }
 
-            //当前缓存数据已获取完毕，等待下一次数据触发
-            if (cacheDataList.size() < pageSize) {
-                break;
+            if (errorCount.get() == 0) {
+                //当前缓存数据已获取完毕，等待下一次数据触发
+                if (cacheDataList.size() < pageSize) {
+                    break;
+                }
             }
 
             if (syncSleepTime > 0) {
@@ -425,7 +428,7 @@ public class SyncTaskManager {
      * @param body         数据行协议结果
      * @param syncCallback 异步对象
      */
-    private synchronized void requestNet(DataType dataType, String body, final AsyncCallback syncCallback) throws FTNetworkNoAvailableException {
+    private synchronized void requestNet(DataType dataType, String body, final RequestCallback syncCallback) throws FTNetworkNoAvailableException {
         String model;
         switch (dataType) {
             case TRACE:
