@@ -1,3 +1,7 @@
+#  agent 1.6.9-alpha01
+1. 优化同步重试机制，取消 `FTSDKConfig.setDataSyncRetryCount(0)` 数据直接丢弃的配置选项
+
+---
 #  agent 1.6.8
 1. 修复多次初始化 RUM 配置，fps 采集不准确的问题
 2. 容错老版本缓存数据升级
