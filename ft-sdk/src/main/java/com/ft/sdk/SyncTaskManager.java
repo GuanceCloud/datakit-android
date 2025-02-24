@@ -22,6 +22,7 @@ import com.ft.sdk.garble.utils.ID36Generator;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 import com.ft.sdk.internal.exception.FTNetworkNoAvailableException;
+import com.ft.sdk.internal.exception.FTRetryLimitException;
 
 import org.json.JSONObject;
 
@@ -231,7 +232,11 @@ public class SyncTaskManager {
 
                     } catch (Exception e) {
                         if (e instanceof FTNetworkNoAvailableException) {
-                            LogUtils.e(TAG, "Sync Fail-Network not available Stop poll");
+                            LogUtils.e(TAG, "Sync Fail-Network not available - Stop poll");
+                        } else if (e instanceof FTRetryLimitException) {
+                            if (dataSyncMaxRetryCount > 0) {
+                                LogUtils.e(TAG, "Sync Fail: Reach retry limit count:" + dataSyncMaxRetryCount + "- Stop poll");
+                            }
                         } else {
                             LogUtils.e(TAG, "Sync Fail:\n" + LogUtils.getStackTraceString(e));
 
@@ -278,7 +283,7 @@ public class SyncTaskManager {
     /**
      * 执行存储数据同步操作
      */
-    private synchronized void handleSyncOpt(final DataType dataType) throws FTNetworkNoAvailableException {
+    private synchronized void handleSyncOpt(final DataType dataType) throws FTNetworkNoAvailableException, FTRetryLimitException {
         final List<SyncJsonData> requestDataList = new ArrayList<>();
 
         while (true) {
@@ -330,8 +335,7 @@ public class SyncTaskManager {
                             LogUtils.e(TAG, "Sync Fail (Ignore)-[code:" + code + ",errorCode:" + errorCode + ",response:" + response + "]");
                         }
                     } else {
-                        errorCount.getAndIncrement();
-                        LogUtils.e(TAG, errorCount.get() + ":Sync Fail-[code:" + code + ",response:" + response + "]");
+                        LogUtils.e(TAG, errorCount.incrementAndGet() + ":Sync Fail-[code:" + code + ",response:" + response + "]");
 
                         if (errorCount.get() > 0) {
                             try {
@@ -349,10 +353,9 @@ public class SyncTaskManager {
 
 
             if (dataSyncMaxRetryCount == 0) {
-                break;
+                throw new FTRetryLimitException();
             } else if (dataSyncMaxRetryCount > 0 && errorCount.get() > dataSyncMaxRetryCount) {
-                LogUtils.e(TAG, " \n************ Sync Fail: " + dataSyncMaxRetryCount + " times，stop poll ***********");
-                break;
+                throw new FTRetryLimitException();
             }
 
             if (errorCount.get() == 0) {

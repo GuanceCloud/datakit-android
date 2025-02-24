@@ -49,6 +49,7 @@ public class DemoApplication extends BaseApplication {
                 .setOnlySupportMainProcess(CrossProcessSetting.isOnlyMainProcess(context))
                 .setNeedTransformOldCache(true)
                 .setCompressIntakeRequests(true)
+                .setDataSyncRetryCount(0)
 //                .enableLimitWithDbSize(1024 * 1024)
 //                .setDbCacheDiscard(DBCacheDiscard.DISCARD_OLDEST)
                 .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()));
