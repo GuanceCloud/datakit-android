@@ -1,9 +1,9 @@
 package com.ft.sdk.garble.manager;
 
 /**
- * 内部网络请求请求异步回调 {@link com.ft.sdk.FTTrackInner}，{@link com.ft.sdk.SyncTaskManager}
+ * 内部网络请求请求回调 {@link com.ft.sdk.FTTrackInner}，{@link com.ft.sdk.SyncTaskManager}
  */
-public interface AsyncCallback {
+public interface RequestCallback {
     /**
      * @param code      {@link java.net.HttpURLConnection#HTTP_OK}等数值，当 http 请求发出前发生错误，
      *                  则返回

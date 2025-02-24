@@ -16,8 +16,7 @@ import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBCachePolicy;
 import com.ft.sdk.garble.db.FTDBManager;
-import com.ft.sdk.garble.manager.AsyncCallback;
-import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
+import com.ft.sdk.garble.manager.RequestCallback;
 import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
 import com.ft.sdk.garble.utils.Utils;
 
@@ -206,7 +205,7 @@ public class FTBaseTest {
     /**
      * 上传数据测试
      * <p>
-     * {@link SyncTaskManager#requestNet(DataType, String, AsyncCallback)}
+     * {@link SyncTaskManager#requestNet(DataType, String, RequestCallback)}
      *
      * @param dataType
      */
@@ -219,7 +218,7 @@ public class FTBaseTest {
 
         try {
             Whitebox.invokeMethod(SyncTaskManager.get(), "requestNet", dataType, body.toString(),
-                    (AsyncCallback) (code, response, errorCode) -> Assert.assertEquals(200, code));
+                    (RequestCallback) (code, response, errorCode) -> Assert.assertEquals(200, code));
         } catch (Exception e) {
             e.printStackTrace();
         }

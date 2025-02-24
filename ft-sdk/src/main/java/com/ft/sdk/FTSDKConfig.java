@@ -439,7 +439,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 设置最大同步重试次数，最小 0，最大 5，设置为 0，如果数据传输发生错误将直接丢弃
+     * 设置最大同步重试次数，最小 0，最大 5, 0 则不尝试
      *
      * @param dataSyncRetryCount 重试次数，
      * @return

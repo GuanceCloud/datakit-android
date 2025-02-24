@@ -13,7 +13,7 @@ import com.ft.sdk.garble.http.FTResponseData;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.http.RequestMethod;
-import com.ft.sdk.garble.manager.AsyncCallback;
+import com.ft.sdk.garble.manager.RequestCallback;
 import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.threadpool.RunnerCompleteCallBack;
 import com.ft.sdk.garble.utils.Constants;
@@ -260,7 +260,7 @@ public class FTTrackInner {
      *
      * @param callback
      */
-    void trackLogAsync(@NonNull final BaseContentBean bean, final AsyncCallback callback) {
+    void trackLogAsync(@NonNull final BaseContentBean bean, final RequestCallback callback) {
         DataUploaderThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
@@ -329,7 +329,6 @@ public class FTTrackInner {
         } catch (Exception e) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
-
     }
 
 //    void batchTraceBeanBackground(@NonNull List<BaseContentBean> logBeans) {
