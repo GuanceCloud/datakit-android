@@ -16,10 +16,17 @@
             android:text="对话框" />
 
         <Button
-            android:id="@+id/session_replay_toast"
+            android:id="@+id/session_replay_origin_toast"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Toast" />
+            android:text="原生 Toast (无法采集)" />
+
+        <Button
+            android:id="@+id/session_replay_custom_toast"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="替代 Toast (可采集)" />
+
 
         <LinearLayout
             android:layout_width="match_parent"

@@ -25,11 +25,21 @@ public class SessionReplayActivity extends NameTitleActivity {
                 new AlertDialog.Builder(SessionReplayActivity.this).setMessage("这是对话框")
                         .setPositiveButton("确定", null).create().show();
             }
+
         });
-        findViewById(R.id.session_replay_toast).setOnClickListener(new View.OnClickListener() {
+
+        findViewById(R.id.session_replay_origin_toast).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(SessionReplayActivity.this, "Toast:" + System.currentTimeMillis(), Toast.LENGTH_LONG).show();
+
+            }
+        });
+        findViewById(R.id.session_replay_custom_toast).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CustomToast.showToast(SessionReplayActivity.this, "Toast:" + System.currentTimeMillis(), 1000);
+
             }
         });
 
