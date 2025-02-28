@@ -9,15 +9,15 @@ import java.util.HashMap;
 public class NetStatusBean {
 
     /**
-     * 请求开始时间
+     * 请求从 call Start 处开始时间
      */
-    public long fetchStartTime = -1;
+    public long callStartTime = -1;
 
 
     /**
-     * 请求开始时间
+     * 请求在 request header 处开始时间
      */
-    public long requestStartTime = -1;
+    public long headerEndTime = -1;
 
 
     /**
@@ -39,11 +39,14 @@ public class NetStatusBean {
     /**
      * 请求返回内容加载开始时间
      */
-    public long responseStartTime = -1;
+    public long headerStartTime = -1;
     /**
      * 请求返回内容加载结束时间
      */
-    public long responseEndTime = -1;
+    public long bodyEndTime = -1;
+
+
+    public long bodyStartTime = -1;
 
     /**
      * ssl 连接开始时间
@@ -83,6 +86,10 @@ public class NetStatusBean {
         return 0;
     }
 
+    public long getConnectStartTime() {
+        return tcpStartTime - callStartTime;
+    }
+
     /**
      * 获取 dns 解析时长
      *
@@ -95,14 +102,29 @@ public class NetStatusBean {
         return 0;
     }
 
+    public long getDNSStartTime() {
+        return dnsStartTime - callStartTime;
+    }
+
+    public long getDownloadTime() {
+        if (bodyEndTime > bodyStartTime) {
+            return bodyEndTime - bodyStartTime;
+        }
+        return 0;
+    }
+
+    public long getDownloadTimeStart() {
+        return bodyStartTime - callStartTime;
+    }
+
     /**
      * 获取请求返回时长
      *
      * @return
      */
     public long getResponseTime() {
-        if (responseEndTime > responseStartTime) {
-            return responseEndTime - responseStartTime;
+        if (bodyEndTime > headerStartTime) {
+            return bodyEndTime - headerStartTime;
         }
         return 0;
     }
@@ -114,8 +136,8 @@ public class NetStatusBean {
      * @return
      */
     public long getTTFB() {
-        if (responseStartTime > requestStartTime) {
-            return responseStartTime - requestStartTime;
+        if (headerEndTime > headerStartTime) {
+            return headerEndTime - headerStartTime;
         }
         return 0;
     }
@@ -126,14 +148,12 @@ public class NetStatusBean {
      * @return
      */
     public long getFirstByteTime() {
-        if (responseStartTime > dnsStartTime) {
-            if (dnsStartTime > 0) {
-                return responseStartTime - dnsStartTime;
-            } else {
-                return responseStartTime - requestStartTime;
-            }
-        }
-        return 0;
+        return getTTFB();
+    }
+
+
+    public long getFirstByteStartTime() {
+        return headerStartTime - callStartTime;
     }
 
     /**
@@ -142,8 +162,8 @@ public class NetStatusBean {
      * @return
      */
     public long getHoleRequestTime() {
-        if (responseEndTime > fetchStartTime) {
-            return responseEndTime - fetchStartTime;
+        if (bodyEndTime > callStartTime) {
+            return bodyEndTime - callStartTime;
         }
         return 0;
     }
@@ -160,17 +180,13 @@ public class NetStatusBean {
         }
         return 0;
     }
-//
-//    public void reset() {
-//        fetchStartTime = -1;
-//        tcpStartTime = -1;
-//        tcpEndTime = -1;
-//        dnsStartTime = -1;
-//        dnsEndTime = -1;
-//        responseStartTime = -1;
-//        responseEndTime = -1;
-//        sslStartTime = -1;
-//        sslEndTime = -1;
-//        requestHost = null;
-//    }
+
+    /**
+     * ssl 开始时间
+     *
+     * @return
+     */
+    public long getSslStartTime() {
+        return sslStartTime - callStartTime;
+    }
 }

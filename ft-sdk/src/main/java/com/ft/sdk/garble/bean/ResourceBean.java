@@ -107,14 +107,29 @@ public class ResourceBean {
     public long resourceDNS = -1;
 
     /**
+     * das 解析开始时间，{@link NetStatusBean#getDNSStartTime()}
+     */
+    public long resourceDNSStart = -1;
+
+    /**
      * tcp 连接时长，{@link NetStatusBean#getTcpTime()} }
      */
     public long resourceTCP = -1;
 
     /**
+     * tcp 连接开始时间 {@link  NetStatusBean#getConnectStartTime()}
+     */
+    public long resourceTCPStart = -1;
+
+    /**
      * ssl 连接时长，{@link NetStatusBean#getSSLTime()}  }
      */
     public long resourceSSL = -1;
+
+    /**
+     * ssl 连接开始时间，{@link NetStatusBean#getSslStartTime()}
+     */
+    public long resourceSSLStart = -1;
 
     /**
      * TTFB 时长, {@link NetStatusBean#getTTFB()}}
@@ -130,6 +145,19 @@ public class ResourceBean {
      * 首字节时长, {@link NetStatusBean#getFirstByteTime()}
      */
     public long resourceFirstByte = -1;
+    /**
+     * 首字节开始时间，{@link NetStatusBean#getFirstByteStartTime()}
+     */
+    public long resourceFirstByteStart = -1;
+
+    /**
+     * 资源下载时间，{@link NetStatusBean#getDownloadTime()}
+     */
+    public long resourceDownloadTime = -1;
+    /**
+     * 资源西崽开始时间，{@link NetStatusBean#getDownloadTimeStart()}
+     */
+    public long resourceDownloadTimeStart = -1;
 
 
     /**
@@ -188,7 +216,6 @@ public class ResourceBean {
      * resource content 相关是否设置
      */
     public boolean contentSet = false;
-
 
 
 }

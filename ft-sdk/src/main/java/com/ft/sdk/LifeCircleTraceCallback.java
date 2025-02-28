@@ -127,19 +127,10 @@ class LifeCircleTraceCallback {
         if (!mInited) {
             long now = Utils.getCurrentNanoTime();
             FTActivityManager.get().setAppState(AppState.RUN);
-            long codeStartTime = FTAppStartCounter.get().getMarkCodeTimeLine();
-            if (codeStartTime > 0) {
-                FTAppStartCounter.get().codeStart(now - codeStartTime);
-                //config nonnull here ignore warning
-                if (manager.isRumEnable() && config.isEnableTraceUserAction()) {
-                    FTAppStartCounter.get().codeStartUpload();
-                    FTAppStartCounter.get().resetCodeStartTimeline();
-                }
-            } else {
-                //config nonnull here ignore warning
-                if (manager.isRumEnable() && config.isEnableTraceUserAction()) {
-                    FTAppStartCounter.get().hotStart(now - startTime, startTime);
-                }
+            FTAppStartCounter.get().codeStart(now - Utils.getAppStartTimeNs());
+            //config nonnull here ignore warning
+            if (manager.isRumEnable() && config.isEnableTraceUserAction()) {
+                FTAppStartCounter.get().codeStartUpload();
             }
         }
 
@@ -175,11 +166,13 @@ class LifeCircleTraceCallback {
      * {@link Activity#onStop() }
      */
     public void onStop() {
-        boolean appForeground = Utils.isAppForeground();
-        if (!appForeground) {
-            handler.removeMessages(MSG_CHECK_SLEEP_STATUS);
-            //休眠一段时候后执行,为了区分短时间唤醒的行为
-            handler.sendEmptyMessageDelayed(MSG_CHECK_SLEEP_STATUS, DELAY_SLEEP_MILLIS);
+        if (FTSdk.checkInstallState()) {
+            boolean appForeground = Utils.isAppForeground();
+            if (!appForeground) {
+                handler.removeMessages(MSG_CHECK_SLEEP_STATUS);
+                //休眠一段时候后执行,为了区分短时间唤醒的行为
+                handler.sendEmptyMessageDelayed(MSG_CHECK_SLEEP_STATUS, DELAY_SLEEP_MILLIS);
+            }
         }
     }
 
@@ -192,7 +185,6 @@ class LifeCircleTraceCallback {
         mCreateMap.remove(context);
         if (mCreateMap.isEmpty()) {
             mInited = false;
-            FTAppStartCounter.get().resetCodeStartTimeline();
             LogUtils.d(TAG, "Application all close");
         }
     }

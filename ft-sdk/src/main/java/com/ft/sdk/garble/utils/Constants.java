@@ -452,14 +452,17 @@ public class Constants {
      * 资源 dns 解析时长
      */
     public static final String KEY_RUM_RESOURCE_DNS = "resource_dns";
+    public static final String KEY_RUM_RESOURCE_DNS_TIME = "resource_dns_time";
     /**
      * tcp 连接时长
      */
     public static final String KEY_RUM_RESOURCE_TCP = "resource_tcp";
+    public static final String KEY_RUM_RESOURCE_CONNECT_TIME = "resource_connect_time";
     /**
      * ssl 连接时长
      */
     public static final String KEY_RUM_RESOURCE_SSL = "resource_ssl";
+    public static final String KEY_RUM_RESOURCE_SSL_TIME = "resource_ssl_time";
     /**
      * ttfb 数值
      */
@@ -468,6 +471,9 @@ public class Constants {
      * 首字节时间
      */
     public static final String KEY_RUM_RESOURCE_FIRST_BYTE = "resource_first_byte";
+    public static final String KEY_RUM_RESOURCE_FIRST_BYTE_TIME = "resource_first_byte_time";
+
+    public static final String KEY_RUM_DOWNLOAD_TIME = "resource_download_time";
     /**
      * 链路 Span id
      */

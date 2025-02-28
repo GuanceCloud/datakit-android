@@ -34,10 +34,11 @@ public class FTResourceEventListener extends EventListener {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "FTResourceEventListener";
 
     private String requestHost = null;
-    private long fetchStartTime = -1;
-    private long requestStartTime = -1;
-    private long responseStartTime = -1;
-    private long responseEndTime = -1;
+    private long callStartTime = -1;
+    private long headerEndTime = -1;
+    private long headerStartTime = -1;
+    private long bodyStartTime = -1;
+    private long bodyEndTime = -1;
     private long dnsEndTime = -1;
     private long dnsStartTime = -1;
     private long sslEndTime = -1;
@@ -63,14 +64,12 @@ public class FTResourceEventListener extends EventListener {
     public void callEnd(@NonNull Call call) {
         super.callEnd(call);
         originEventListener.callEnd(call);
-//        LogUtils.d(TAG, "callEnd:" + resourceId);
         setNetworkMetricsTimeline();
     }
 
     @Override
     public void callFailed(@NonNull Call call, @NonNull IOException ioe) {
         super.callFailed(call, ioe);
-//        LogUtils.d(TAG, "callFailed:" + resourceId);
         setNetworkMetricsTimeline();
     }
 
@@ -78,38 +77,34 @@ public class FTResourceEventListener extends EventListener {
     public void callStart(@NonNull Call call) {
         super.callStart(call);
         originEventListener.callStart(call);
-
         requestHost = call.request().url().host();
-        fetchStartTime = Utils.getCurrentNanoTime();
-//        LogUtils.d(TAG, "callStart:" + resourceId);
+        callStartTime = System.nanoTime();
     }
 
     @Override
     public void responseHeadersStart(@NonNull Call call) {
         super.responseHeadersStart(call);
         originEventListener.responseHeadersStart(call);
-        responseStartTime = Utils.getCurrentNanoTime();
-//        LogUtils.d(TAG, "responseHeadersStart:" + resourceId);
+        headerStartTime = System.nanoTime();
     }
 
     @Override
     public void responseBodyStart(Call call) {
         super.responseBodyStart(call);
-//        LogUtils.d(TAG, "responseBodyStart:" + resourceId);
+        bodyStartTime = System.nanoTime();
     }
 
     @Override
     public void requestHeadersStart(@NonNull Call call) {
         super.requestHeadersStart(call);
         originEventListener.requestHeadersStart(call);
-        requestStartTime = Utils.getCurrentNanoTime();
     }
 
     @Override
     public void responseBodyEnd(@NonNull Call call, long byteCount) {
         super.responseBodyEnd(call, byteCount);
         originEventListener.responseBodyEnd(call, byteCount);
-        responseEndTime = Utils.getCurrentNanoTime();
+        bodyEndTime = System.nanoTime();
 //        LogUtils.d(TAG, "responseBodyEnd:" + resourceId);
     }
 
@@ -122,23 +117,21 @@ public class FTResourceEventListener extends EventListener {
     public void dnsEnd(@NonNull Call call, @NonNull String domainName, @NonNull List<InetAddress> inetAddressList) {
         super.dnsEnd(call, domainName, inetAddressList);
         originEventListener.dnsEnd(call, domainName, inetAddressList);
-        dnsEndTime = Utils.getCurrentNanoTime();
-//        LogUtils.d(TAG, "dnsEnd:" + resourceId);
+        dnsEndTime = System.nanoTime();
     }
 
     @Override
     public void dnsStart(@NonNull Call call, @NonNull String domainName) {
         super.dnsStart(call, domainName);
         originEventListener.dnsStart(call, domainName);
-        dnsStartTime = Utils.getCurrentNanoTime();
-//        LogUtils.d(TAG, "dnsStart:" + resourceId);
+        dnsStartTime = System.nanoTime();
     }
 
     @Override
     public void secureConnectEnd(@NonNull Call call, @NonNull Handshake handshake) {
         super.secureConnectEnd(call, handshake);
         originEventListener.secureConnectEnd(call, handshake);
-        sslEndTime = Utils.getCurrentNanoTime();
+        sslEndTime = System.nanoTime();
 //        LogUtils.d(TAG, "secureConnectEnd:" + resourceId);
     }
 
@@ -146,7 +139,7 @@ public class FTResourceEventListener extends EventListener {
     public void secureConnectStart(@NonNull Call call) {
         super.secureConnectStart(call);
         originEventListener.secureConnectStart(call);
-        sslStartTime = Utils.getCurrentNanoTime();
+        sslStartTime = System.nanoTime();
 //        LogUtils.d(TAG, "secureConnectStart:" + resourceId);
     }
 
@@ -154,7 +147,7 @@ public class FTResourceEventListener extends EventListener {
     public void connectStart(@NonNull Call call, @NonNull InetSocketAddress inetSocketAddress, @NonNull Proxy proxy) {
         super.connectStart(call, inetSocketAddress, proxy);
         originEventListener.connectStart(call, inetSocketAddress, proxy);
-        tcpStartTime = Utils.getCurrentNanoTime();
+        tcpStartTime = System.nanoTime();
         if (enableResourceHostIP) {
             resourceHostIP = inetSocketAddress.getAddress().getHostAddress();
         }
@@ -165,7 +158,7 @@ public class FTResourceEventListener extends EventListener {
     public void connectEnd(@NonNull Call call, @NonNull InetSocketAddress inetSocketAddress, @NonNull Proxy proxy, @Nullable Protocol protocol) {
         super.connectEnd(call, inetSocketAddress, proxy, protocol);
         originEventListener.connectEnd(call, inetSocketAddress, proxy, protocol);
-        tcpEndTime = Utils.getCurrentNanoTime();
+        tcpEndTime = System.nanoTime();
 //        LogUtils.d(TAG, "connectEnd:" + resourceId);
     }
 
@@ -215,6 +208,7 @@ public class FTResourceEventListener extends EventListener {
     public void requestBodyStart(@NotNull Call call) {
         super.requestBodyStart(call);
         originEventListener.requestBodyStart(call);
+        bodyStartTime = System.nanoTime();
     }
 
     @Override
@@ -227,6 +221,7 @@ public class FTResourceEventListener extends EventListener {
     public void requestHeadersEnd(@NotNull Call call, @NotNull Request request) {
         super.requestHeadersEnd(call, request);
         originEventListener.requestHeadersEnd(call, request);
+        headerEndTime = System.nanoTime();
     }
 
     @Override
@@ -239,6 +234,7 @@ public class FTResourceEventListener extends EventListener {
     public void responseHeadersEnd(@NotNull Call call, @NotNull Response response) {
         super.responseHeadersEnd(call, response);
         originEventListener.responseHeadersEnd(call, response);
+        headerEndTime = System.nanoTime();
     }
 
     /**
@@ -247,16 +243,17 @@ public class FTResourceEventListener extends EventListener {
     private void setNetworkMetricsTimeline() {
         NetStatusBean netStatusBean = new NetStatusBean();
         netStatusBean.requestHost = requestHost;
-        netStatusBean.fetchStartTime = fetchStartTime;
-        netStatusBean.responseStartTime = responseStartTime;
-        netStatusBean.responseEndTime = responseEndTime;
+        netStatusBean.callStartTime = callStartTime;
+        netStatusBean.headerEndTime = headerEndTime;
+        netStatusBean.headerStartTime = headerStartTime;
+        netStatusBean.bodyEndTime = bodyEndTime;
+        netStatusBean.bodyStartTime = bodyStartTime;
         netStatusBean.dnsEndTime = dnsEndTime;
         netStatusBean.dnsStartTime = dnsStartTime;
         netStatusBean.sslEndTime = sslEndTime;
         netStatusBean.sslStartTime = sslStartTime;
         netStatusBean.tcpStartTime = tcpStartTime;
         netStatusBean.tcpEndTime = tcpEndTime;
-        netStatusBean.requestStartTime = requestStartTime;
         netStatusBean.resourceHostIP = resourceHostIP;
         FTRUMInnerManager.get().setNetState(this.resourceId, netStatusBean);
     }

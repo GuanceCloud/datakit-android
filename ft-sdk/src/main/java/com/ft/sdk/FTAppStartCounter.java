@@ -28,10 +28,7 @@ class FTAppStartCounter {
      * 时间段，单位纳秒
      */
     private long codeStartTime = 0;
-    /**
-     * 时间线，单位纳秒
-     */
-    private long codeStartTimeLine = 0;
+
 
     private FTAppStartCounter() {
     }
@@ -44,30 +41,7 @@ class FTAppStartCounter {
         return FTAppStartCounter.SingletonHolder.INSTANCE;
     }
 
-    /**
-     * 标记应用冷启动时间
-     */
-    void markCodeStartTimeLine() {
-        codeStartTimeLine = Utils.getAppStartTimeNs();
-        LogUtils.d(TAG, "markCodeStartTimeLine");
-    }
 
-    /**
-     * 获取冷启动时间
-     *
-     * @return 返回冷启动时间线，单位纳秒
-     */
-    long getMarkCodeTimeLine() {
-        return codeStartTimeLine;
-    }
-
-    /**
-     * 重置冷启动时间线
-     */
-    void resetCodeStartTimeline() {
-        codeStartTimeLine = 0;
-        LogUtils.d(TAG, "resetCodeStartTimeline");
-    }
 
     /**
      * 记录冷启动时间段
@@ -85,8 +59,8 @@ class FTAppStartCounter {
      * 上传冷启动时间
      */
     void codeStartUpload() {
-        if (codeStartTime <= 0 || codeStartTimeLine <= 0) return;
-        FTAutoTrack.putRUMLaunchPerformance(true, codeStartTime, codeStartTimeLine);
+        if (codeStartTime <= 0 ) return;
+        FTAutoTrack.putRUMLaunchPerformance(true, codeStartTime, Utils.getAppStartTimeNs());
         codeStartTime = 0;
     }
 
@@ -109,7 +83,6 @@ class FTAppStartCounter {
     void checkToReUpload() {
         if (codeStartTime > 0) {
             codeStartUpload();
-            resetCodeStartTimeline();
         }
     }
 
