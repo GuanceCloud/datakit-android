@@ -34,7 +34,7 @@ class LifeCircleTraceCallback {
      */
     public static final int DELAY_SLEEP_MILLIS = 10000;//10 秒
     /**
-     * 是否已处于休眠状态
+     * 是否已处于休眠状态，这里送至后台 10秒判定为休眠
      */
     private boolean alreadySleep = true;
     /**
@@ -125,26 +125,18 @@ class LifeCircleTraceCallback {
         FTRUMConfig config = manager.getConfig();
 
         if (!mInited) {
-            long now = Utils.getCurrentNanoTime();
             FTActivityManager.get().setAppState(AppState.RUN);
-            FTAppStartCounter.get().codeStart(now - Utils.getAppStartTimeNs());
+            FTAppStartCounter.get().coldStart(Utils.getCurrentNanoTime());
             //config nonnull here ignore warning
             if (manager.isRumEnable() && config.isEnableTraceUserAction()) {
-                FTAppStartCounter.get().codeStartUpload();
+                //如果 SDK 未初始化，则会在 SDK 延迟初始化之后补充这部分数据
+                FTAppStartCounter.get().coldStartUpload();
             }
         }
 
-    }
-
-    /**
-     * {@link Activity#onResume() }  之后
-     *
-     * @param context
-     */
-    public void onPostResume(Context context) {
+        //已经休眠
         if (alreadySleep) {
             if (mInited) {
-                FTRUMConfig config = FTRUMConfigManager.get().getConfig();
                 if (config != null && config.isRumEnable() && config.isEnableTraceUserAction()) {
                     if (startTime > 0) {
                         long now = Utils.getCurrentNanoTime();
@@ -160,6 +152,15 @@ class LifeCircleTraceCallback {
         if (!mInited) {
             mInited = true;
         }
+    }
+
+    /**
+     * {@link Activity#onResume() }  之后
+     *
+     * @param context
+     */
+    public void onPostResume(Context context) {
+
     }
 
     /**
