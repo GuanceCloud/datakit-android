@@ -1,9 +1,6 @@
-# agent 1.6.9
-1. 调整 Utils.isAppForeground() 在 SDK 初始化之前的调用规则
-2. 新增 resource 数据字段 `resource_first_byte_time`，`resource_dns_time`，
-   `resource_download_time`，`resource_connect_time`，`resource_ssl_time` 在观测云上的优化展示，
-   并支持 APM 火焰图的时间对齐
-3. 优化同步重试机制，取消 `FTSDKConfig.setDataSyncRetryCount(0)` 数据直接丢弃的配置选项
+# agent 1.6.9-beta02
+1. 数据同步逻辑优化
+2. 冷热启动逻辑优化
 
 ---
 #  agent 1.6.9-beta01

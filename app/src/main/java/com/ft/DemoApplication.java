@@ -42,14 +42,14 @@ public class DemoApplication extends BaseApplication {
 
 
     static void initFTSDK(Context context) {
-        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAWAY_URL, BuildConfig.CLIENT_TOKEN)
+        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAKIT_URL)
                 .setDebug(true)//设置是否是 debug
                 .setAutoSync(true)
-                .setCustomSyncPageSize(100)
+                .setCustomSyncPageSize(10)
                 .setOnlySupportMainProcess(CrossProcessSetting.isOnlyMainProcess(context))
                 .setNeedTransformOldCache(true)
                 .setCompressIntakeRequests(true)
-                .setDataSyncRetryCount(0)
+                .setSyncSleepTime(100)
 //                .enableLimitWithDbSize(1024 * 1024)
 //                .setDbCacheDiscard(DBCacheDiscard.DISCARD_OLDEST)
                 .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()));
