@@ -769,14 +769,19 @@ public class FTRUMInnerManager {
             LogUtils.d(TAG, "setNetState:" + resourceId);
         }
         bean.resourceDNS = netStatusBean.getDNSTime();
+        bean.resourceDNSStart = netStatusBean.getDNSStartTime();
         bean.resourceSSL = netStatusBean.getSSLTime();
+        bean.resourceSSLStart = netStatusBean.getSslStartTime();
         bean.resourceTCP = netStatusBean.getTcpTime();
-
+        bean.resourceTCPStart = netStatusBean.getConnectStartTime();
         bean.resourceTrans = netStatusBean.getResponseTime();
         bean.resourceTTFB = netStatusBean.getTTFB();
         long resourceLoad = netStatusBean.getHoleRequestTime();
         bean.resourceLoad = resourceLoad > 0 ? resourceLoad : bean.endTime - bean.startTime;
         bean.resourceFirstByte = netStatusBean.getFirstByteTime();
+        bean.resourceFirstByteStart = netStatusBean.getFirstByteStartTime();
+        bean.resourceDownloadTime = netStatusBean.getDownloadTime();
+        bean.resourceDownloadTimeStart = netStatusBean.getDownloadTimeStart();
         bean.resourceHostIP = netStatusBean.resourceHostIP;
         bean.netStateSet = true;
         checkToAddResource(resourceId, bean);
@@ -846,12 +851,24 @@ public class FTRUMInnerManager {
 
             if (bean.resourceDNS > 0) {
                 fields.put(Constants.KEY_RUM_RESOURCE_DNS, bean.resourceDNS);
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("start", bean.resourceDNSStart);
+                map.put("duration", bean.resourceDNS);
+                fields.put(Constants.KEY_RUM_RESOURCE_DNS_TIME, Utils.hashMapObjectToJson(map));
             }
             if (bean.resourceTCP > 0) {
                 fields.put(Constants.KEY_RUM_RESOURCE_TCP, bean.resourceTCP);
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("start", bean.resourceTCPStart);
+                map.put("duration", bean.resourceTCP);
+                fields.put(Constants.KEY_RUM_RESOURCE_CONNECT_TIME, Utils.hashMapObjectToJson(map));
             }
             if (bean.resourceSSL > 0) {
                 fields.put(Constants.KEY_RUM_RESOURCE_SSL, bean.resourceSSL);
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("start", bean.resourceSSLStart);
+                map.put("duration", bean.resourceSSL);
+                fields.put(Constants.KEY_RUM_RESOURCE_SSL_TIME, Utils.hashMapObjectToJson(map));
             }
             if (bean.resourceTTFB > 0) {
                 fields.put(Constants.KEY_RUM_RESOURCE_TTFB, bean.resourceTTFB);
@@ -863,7 +880,17 @@ public class FTRUMInnerManager {
 
             if (bean.resourceFirstByte > 0) {
                 fields.put(Constants.KEY_RUM_RESOURCE_FIRST_BYTE, bean.resourceFirstByte);
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("start", bean.resourceFirstByteStart);
+                map.put("duration", bean.resourceFirstByte);
+                fields.put(Constants.KEY_RUM_RESOURCE_FIRST_BYTE_TIME, Utils.hashMapObjectToJson(map));
+            }
 
+            if (bean.resourceDownloadTime > 0) {
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("start", bean.resourceDownloadTimeStart);
+                map.put("duration", bean.resourceDownloadTime);
+                fields.put(Constants.KEY_RUM_DOWNLOAD_TIME, Utils.hashMapObjectToJson(map));
             }
             String urlPath = bean.urlPath;
             String urlPathGroup = "";

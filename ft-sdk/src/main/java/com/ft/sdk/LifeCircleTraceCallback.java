@@ -34,7 +34,7 @@ class LifeCircleTraceCallback {
      */
     public static final int DELAY_SLEEP_MILLIS = 10000;//10 秒
     /**
-     * 是否已处于休眠状态
+     * 是否已处于休眠状态，这里送至后台 10秒判定为休眠
      */
     private boolean alreadySleep = true;
     /**
@@ -125,39 +125,18 @@ class LifeCircleTraceCallback {
         FTRUMConfig config = manager.getConfig();
 
         if (!mInited) {
-            long now = Utils.getCurrentNanoTime();
             FTActivityManager.get().setAppState(AppState.RUN);
-            long codeStartTime = FTAppStartCounter.get().getMarkCodeTimeLine();
-            if (codeStartTime > 0) {
-                FTAppStartCounter.get().codeStart(now - codeStartTime);
-                //config nonnull here ignore warning
-                if (manager.isRumEnable() && config.isEnableTraceUserAction()) {
-                    FTAppStartCounter.get().codeStartUpload();
-                    FTAppStartCounter.get().resetCodeStartTimeline();
-                }
-            } else {
-                //config nonnull here ignore warning
-                if (manager.isRumEnable() && config.isEnableTraceUserAction()) {
-                    FTAppStartCounter.get().hotStart(now - startTime, startTime);
-                }
+            FTAppStartCounter.get().coldStart(Utils.getCurrentNanoTime());
+            //config nonnull here ignore warning
+            if (manager.isRumEnable() && config.isEnableTraceUserAction()) {
+                //如果 SDK 未初始化，则会在 SDK 延迟初始化之后补充这部分数据
+                FTAppStartCounter.get().coldStartUpload();
             }
         }
 
-    }
-
-    public void onPreResume(Activity activity) {
-        FTActivityManager.get().setCurrentActivity(activity);
-    }
-
-    /**
-     * {@link Activity#onResume() }  之后
-     *
-     * @param context
-     */
-    public void onPostResume(Context context) {
+        //已经休眠
         if (alreadySleep) {
             if (mInited) {
-                FTRUMConfig config = FTRUMConfigManager.get().getConfig();
                 if (config != null && config.isRumEnable() && config.isEnableTraceUserAction()) {
                     if (startTime > 0) {
                         long now = Utils.getCurrentNanoTime();
@@ -175,15 +154,30 @@ class LifeCircleTraceCallback {
         }
     }
 
+    public void onPreResume(Activity activity) {
+        FTActivityManager.get().setCurrentActivity(activity);
+    }
+
+    /**
+     * {@link Activity#onResume() }  之后
+     *
+     * @param context
+     */
+    public void onPostResume(Context context) {
+
+    }
+
     /**
      * {@link Activity#onStop() }
      */
     public void onStop() {
-        boolean appForeground = Utils.isAppForeground();
-        if (!appForeground) {
-            handler.removeMessages(MSG_CHECK_SLEEP_STATUS);
-            //休眠一段时候后执行,为了区分短时间唤醒的行为
-            handler.sendEmptyMessageDelayed(MSG_CHECK_SLEEP_STATUS, DELAY_SLEEP_MILLIS);
+        if (FTSdk.checkInstallState()) {
+            boolean appForeground = Utils.isAppForeground();
+            if (!appForeground) {
+                handler.removeMessages(MSG_CHECK_SLEEP_STATUS);
+                //休眠一段时候后执行,为了区分短时间唤醒的行为
+                handler.sendEmptyMessageDelayed(MSG_CHECK_SLEEP_STATUS, DELAY_SLEEP_MILLIS);
+            }
         }
     }
 
@@ -196,7 +190,6 @@ class LifeCircleTraceCallback {
         mCreateMap.remove(context);
         if (mCreateMap.isEmpty()) {
             mInited = false;
-            FTAppStartCounter.get().resetCodeStartTimeline();
             LogUtils.d(TAG, "Application all close");
         }
     }

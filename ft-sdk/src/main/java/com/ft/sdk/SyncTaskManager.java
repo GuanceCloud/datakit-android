@@ -340,7 +340,7 @@ public class SyncTaskManager {
                         if (errorCount.get() > 0) {
                             try {
                                 SyncTaskManager.this.reInsertData(requestDataList);
-                                Thread.sleep((long) errorCount.get() * RETRY_DELAY_SLEEP_TIME);
+                                Thread.sleep((1L << (errorCount.get() - 1)) * RETRY_DELAY_SLEEP_TIME);
                             } catch (InterruptedException e) {
                                 LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                             }
@@ -351,29 +351,25 @@ public class SyncTaskManager {
             });
             requestDataList.clear();
 
-
-            if (dataSyncMaxRetryCount == 0) {
-                throw new FTRetryLimitException();
-            } else if (dataSyncMaxRetryCount > 0 && errorCount.get() > dataSyncMaxRetryCount) {
-                throw new FTRetryLimitException();
-            }
-
             if (errorCount.get() == 0) {
                 //当前缓存数据已获取完毕，等待下一次数据触发
                 if (cacheDataList.size() < pageSize) {
                     break;
                 }
-            }
-
-            if (syncSleepTime > 0) {
-                try {
-                    Thread.sleep(syncSleepTime);
-                } catch (InterruptedException e) {
-                    LogUtils.d(TAG, LogUtils.getStackTraceString(e));
+                if (syncSleepTime > 0) {
+                    try {
+                        Thread.sleep(syncSleepTime);
+                    } catch (InterruptedException e) {
+                        LogUtils.d(TAG, LogUtils.getStackTraceString(e));
+                    }
+                }
+            } else if (errorCount.get() > 0) {
+                if (errorCount.get() > dataSyncMaxRetryCount) {
+                    throw new FTRetryLimitException();
+                } else if (dataSyncMaxRetryCount == 0) {
+                    throw new FTRetryLimitException();
                 }
             }
-
-
         }
     }
 

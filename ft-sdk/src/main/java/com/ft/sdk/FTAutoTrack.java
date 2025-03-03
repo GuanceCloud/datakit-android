@@ -61,19 +61,9 @@ public class FTAutoTrack {
                     Class<?> clazz = PackageUtils.getSophixClass();
                     if (clazz == null || !clazz.isInstance(app)) {
                         app.registerActivityLifecycleCallbacks(life);
-                        //排除在后台被启动的情况
-                        if (Utils.isAppForeground()) {
-                            FTAppStartCounter.get().markCodeStartTimeLine();
-                        }
                     }
-
                 } else {
                     getApplication().registerActivityLifecycleCallbacks(life);
-
-                    //排除在后台被启动的情况
-                    if (Utils.isAppForeground()) {
-                        FTAppStartCounter.get().markCodeStartTimeLine();
-                    }
                 }
             }
         } catch (Exception e) {

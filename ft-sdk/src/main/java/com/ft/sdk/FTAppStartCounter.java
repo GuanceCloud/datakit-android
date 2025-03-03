@@ -25,13 +25,15 @@ import com.ft.sdk.garble.utils.Utils;
 class FTAppStartCounter {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "AppStartCounter";
     /**
-     * 时间段，单位纳秒
+     * 启动耗时，单位纳秒
      */
-    private long codeStartTime = 0;
+    private long coldStartDuration = 0;
+
     /**
-     * 时间线，单位纳秒
+     * 启动开始时间点，单位纳秒
      */
-    private long codeStartTimeLine = 0;
+    private long coldStartTimeLine = 0;
+
 
     private FTAppStartCounter() {
     }
@@ -44,50 +46,27 @@ class FTAppStartCounter {
         return FTAppStartCounter.SingletonHolder.INSTANCE;
     }
 
-    /**
-     * 标记应用冷启动时间
-     */
-    void markCodeStartTimeLine() {
-        codeStartTimeLine = Utils.getAppStartTimeNs();
-        LogUtils.d(TAG, "markCodeStartTimeLine");
-    }
-
-    /**
-     * 获取冷启动时间
-     *
-     * @return 返回冷启动时间线，单位纳秒
-     */
-    long getMarkCodeTimeLine() {
-        return codeStartTimeLine;
-    }
-
-    /**
-     * 重置冷启动时间线
-     */
-    void resetCodeStartTimeline() {
-        codeStartTimeLine = 0;
-        LogUtils.d(TAG, "resetCodeStartTimeline");
-    }
 
     /**
      * 记录冷启动时间段
      * * {@link Constants#KEY_RUM_ACTION_TYPE} = {@link  Constants#ACTION_TYPE_LAUNCH_COLD}
      *
-     * @param codeStartTime 冷启动时间段，单位纳秒
+     * @param coldStartEndTimeLine
      */
-    void codeStart(long codeStartTime) {
-        this.codeStartTime = codeStartTime;
-        LogUtils.d(TAG, "codeStart:" + codeStartTime);
+    void coldStart(long coldStartEndTimeLine) {
+        this.coldStartTimeLine = Utils.getAppStartTimeNs();
+        this.coldStartDuration = coldStartEndTimeLine - coldStartTimeLine;
+        LogUtils.d(TAG, "coldStart:" + coldStartDuration);
 
     }
 
     /**
      * 上传冷启动时间
      */
-    void codeStartUpload() {
-        if (codeStartTime <= 0 || codeStartTimeLine <= 0) return;
-        FTAutoTrack.putRUMLaunchPerformance(true, codeStartTime, codeStartTimeLine);
-        codeStartTime = 0;
+    void coldStartUpload() {
+        if (coldStartDuration <= 0 || coldStartTimeLine <= 0) return;
+        FTAutoTrack.putRUMLaunchPerformance(true, coldStartDuration, coldStartTimeLine);
+        coldStartDuration = 0;
     }
 
     /**
@@ -107,9 +86,8 @@ class FTAppStartCounter {
      * 例如 flutter SDK，ReactNative SDK
      */
     void checkToReUpload() {
-        if (codeStartTime > 0) {
-            codeStartUpload();
-            resetCodeStartTimeline();
+        if (coldStartDuration > 0) {
+            coldStartUpload();
         }
     }
 
