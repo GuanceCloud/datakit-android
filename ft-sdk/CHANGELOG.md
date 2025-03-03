@@ -1,3 +1,7 @@
+# agent 1.7.0-alpha011
+1. 合并 1.6.9-beta02
+
+---
 # agent 1.7.0-alpha010
 1. 合并 1.6.9-alpha01
 
