@@ -208,7 +208,6 @@ public class FTResourceEventListener extends EventListener {
     public void requestBodyStart(@NotNull Call call) {
         super.requestBodyStart(call);
         originEventListener.requestBodyStart(call);
-        bodyStartTime = System.nanoTime();
     }
 
     @Override
@@ -221,7 +220,6 @@ public class FTResourceEventListener extends EventListener {
     public void requestHeadersEnd(@NotNull Call call, @NotNull Request request) {
         super.requestHeadersEnd(call, request);
         originEventListener.requestHeadersEnd(call, request);
-        headerEndTime = System.nanoTime();
     }
 
     @Override
