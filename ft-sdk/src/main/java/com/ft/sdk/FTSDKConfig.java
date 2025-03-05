@@ -99,9 +99,9 @@ public class FTSDKConfig {
 
 
     /**
-     * 行协议兼容模式，integer 数据兼容模式，处理 web 数据数据类型冲突问题。
+     * 行协议兼容模式，integer 数据兼容模式，处理 web 数据数据类型冲突问题，默认开启。
      */
-    private boolean enableDataIntegerCompatible = false;
+    private boolean enableDataIntegerCompatible = true;
 
     /**
      * 是否迁移旧数据，SDK 从旧版本迁移至 1.5.0 需要进行数据迁移
