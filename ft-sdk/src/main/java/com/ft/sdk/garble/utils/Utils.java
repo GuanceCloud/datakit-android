@@ -10,8 +10,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Process;
 import android.os.SystemClock;
@@ -193,26 +191,7 @@ public class Utils {
      * @return
      */
     public static String getGUID_16() {
-        StringBuilder uid = new StringBuilder();
-        //产生16位的强随机数
-        Random rd = new SecureRandom();
-        for (int i = 0; i < 16; i++) {
-            //产生0-2的3位随机数
-            int type = rd.nextInt(2);
-            switch (type) {
-                case 0:
-                    //0-9的随机数
-                    uid.append(rd.nextInt(10));
-                    break;
-                case 1:
-                    //a-f 随机
-                    uid.append((char) (rd.nextInt(6) + 97));
-                    break;
-                default:
-                    break;
-            }
-        }
-        return uid.toString();
+        return randomUUID().substring(0, 16);
     }
 
     /**

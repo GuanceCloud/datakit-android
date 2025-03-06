@@ -19,6 +19,18 @@ public class Constants {
      * SDK 名称
      */
     public static final String SDK_NAME = "df_android_rum_sdk";
+
+    /**
+     * 数据同步链路 propagation header key
+     */
+    public static final String SYNC_DATA_TRACE_HEADER = "X-Pkg-Id";
+
+    /**
+     * 数据同步链路 propagation header value
+     */
+    public static final String SYNC_DATA_TRACE_HEADER_FORMAT = "rumm-%s";
+    public static final String SYNC_DATA_CONTENT_TYPE_HEADER = "Content-Type";
+    public static final String SYNC_DATA_CONTENT_TYPE_VALUE = "text/plain";
     /**
      * 非法数值
      */
@@ -151,7 +163,6 @@ public class Constants {
     public static final int DEFAULT_DB_SIZE_LIMIT = 104857600;//100MB
     public static final int MINI_DB_SIZE_LIMIT = 31457280;//30MB
     public static final int DB_OLD_CACHE_REMOVE_COUNT = 100;
-
 
 
 //    public static final String KEY_EVENT_ID = "event_id";
