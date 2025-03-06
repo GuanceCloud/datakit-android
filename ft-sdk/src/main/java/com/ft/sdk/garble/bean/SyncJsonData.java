@@ -161,7 +161,7 @@ public class SyncJsonData implements Cloneable {
     public static SyncJsonData getFromLogBean(SyncDataHelper helper, BaseContentBean bean)
             throws FTInvalidParameterException {
         SyncJsonData recordData = new SyncJsonData(DataType.LOG);
-        String uuid = Utils.randomUUID();
+        String uuid = Utils.getGUID_16();
         recordData.setTime(bean.getTime());
         recordData.setUuid(uuid);
         recordData.setDataString(helper.getBodyContent(bean.getMeasurement(),

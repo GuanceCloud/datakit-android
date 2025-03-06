@@ -1,3 +1,8 @@
+# agent 1.6.9-beta03
+1. 添加 X-Pkg-Id 数据追踪头
+2. FTSDKConfig.enableDataIntegerCompatible 默认开启
+
+---
 # agent 1.6.9-beta02
 1. 数据同步逻辑优化
 2. 冷热启动逻辑优化
