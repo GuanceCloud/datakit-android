@@ -1,3 +1,8 @@
+# agent 1.6.9-beta04
+1. isAppInForeground 适配隐私检测规则
+2. 修复多次初始化 RUM 配置，导致重复产生崩溃数据的问题
+
+---
 # agent 1.6.9-beta03
 1. 添加 X-Pkg-Id 数据追踪头
 2. FTSDKConfig.enableDataIntegerCompatible 默认开启
