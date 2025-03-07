@@ -107,9 +107,10 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
         this.config = config;
         if (config.isRumEnable() &&
                 config.isEnableTrackAppCrash()) {
-            mDefaultExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
+            Thread.UncaughtExceptionHandler currentHandler = Thread.getDefaultUncaughtExceptionHandler();
             //避免重复设置
-            if (!(mDefaultExceptionHandler instanceof FTExceptionHandler)) {
+            if (!(currentHandler instanceof FTExceptionHandler)) {
+                mDefaultExceptionHandler = currentHandler;
                 Thread.setDefaultUncaughtExceptionHandler(this);
             }
         }
