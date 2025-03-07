@@ -9,6 +9,27 @@ import java.util.HashMap;
 public class NetStatusBean {
 
     /**
+     * 请求开始时间 @deprecated Use {@link #callStartTime} instead.
+     */
+    @Deprecated
+    public long fetchStartTime = -1;
+    /**
+     * request header 开始时间 @deprecated Use {@link #headerStartTime} instead.
+     */
+    @Deprecated
+    public long requestStartTime = -1;
+    /**
+     * response 开始时间  @deprecated Use {@link #bodyStartTime} instead.
+     */
+    @Deprecated
+    public long responseStartTime = -1;
+    /**
+     * response 结束时间 {@link #bodyEndTime} instead.
+     */
+    @Deprecated
+    public long responseEndTime = -1;
+
+    /**
      * 请求从 call Start 处开始时间
      */
     public long callStartTime = -1;
