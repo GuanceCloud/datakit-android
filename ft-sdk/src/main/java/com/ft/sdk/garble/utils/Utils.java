@@ -166,26 +166,6 @@ public class Utils {
     }
 
     /**
-     * 判断是否应用是否在前台
-     *
-     * @return true 前台，反之为后台
-     */
-    public static boolean isAppForeground() {
-        ActivityManager am = (ActivityManager) FTApplication.getApplication().getSystemService(Context.ACTIVITY_SERVICE);
-        if (am == null) return false;
-        List<ActivityManager.RunningAppProcessInfo> info = am.getRunningAppProcesses();
-        if (info == null || info.isEmpty()) return false;
-        for (ActivityManager.RunningAppProcessInfo aInfo : info) {
-            if (aInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
-                if (aInfo.processName.equals(FTApplication.getApplication().getPackageName())) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
      * 获取 16 字符长度的 GUID
      *
      * @return

@@ -31,6 +31,8 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     private final LifeCircleTraceCallback mAppRestartCallback = new LifeCircleTraceCallback();
     private final WindowCallbackTracker mDispatcherReceiver = new WindowCallbackTracker();
 
+    private static int activityCount = 0;
+
 
     /**
      * {@link Activity} 创建
@@ -63,7 +65,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
      */
     @Override
     public void onActivityStarted(@NonNull Activity activity) {
-
+        activityCount++;
     }
 
     /**
@@ -154,13 +156,16 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     }
 
     /**
-     * {@link Activity#onStop()} 时调用，{@link  LifeCircleTraceCallback#onStop()} 处理页面休眠事务处理
+     * {@link Activity#onStop()} 时调用，{@link  LifeCircleTraceCallback#onEnterBackground()} 处理页面休眠事务处理
      *
      * @param activity {@link Activity }.
      */
     @Override
     public void onActivityStopped(@NonNull Activity activity) {
-        mAppRestartCallback.onStop();
+        activityCount--;
+        if (activityCount == 0) {
+            mAppRestartCallback.onEnterBackground();
+        }
     }
 
 
@@ -197,5 +202,9 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     public void onActivityPostDestroyed(Activity activity) {
         mAppRestartCallback.onPostDestroy(activity);
 
+    }
+
+    public static boolean isAppInForeground() {
+        return activityCount > 0;
     }
 }

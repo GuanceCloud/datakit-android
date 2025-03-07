@@ -2,6 +2,7 @@ package com.ft.sdk.garble.threadpool;
 
 import com.ft.sdk.DetectFrequency;
 import com.ft.sdk.DeviceMetricsMonitorType;
+import com.ft.sdk.FTActivityLifecycleCallbacks;
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTMonitorManager;
 import com.ft.sdk.garble.bean.MonitorInfoBean;
@@ -9,7 +10,6 @@ import com.ft.sdk.garble.utils.BatteryUtils;
 import com.ft.sdk.garble.utils.CpuUtils;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.FpsUtils;
-import com.ft.sdk.garble.utils.Utils;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -39,7 +39,7 @@ public class MonitorRunnable implements Runnable {
     @Override
     public void run() {
         //节省资源开销，页面处于前台时才记录数据
-        if (!Utils.isAppForeground()) return;
+        if (!FTActivityLifecycleCallbacks.isAppInForeground()) return;
         if (FTMonitorManager.get().isDeviceMetricsMonitorType(DeviceMetricsMonitorType.CPU)) {
             computeCpuBean(cpuBean, CpuUtils.get().getAppCPUTickCount());
         }
