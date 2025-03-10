@@ -607,7 +607,7 @@ public class FTDBManager extends DBManager {
                     ContentValues contentValues = new ContentValues();
                     contentValues.put(FTSQL.RECORD_COLUMN_TM, data.getTime());
                     if (reInsert) {
-                        String uuid = Utils.randomUUID();
+                        String uuid = Utils.getGUID_16();
                         contentValues.put(FTSQL.RECORD_COLUMN_DATA_UUID, uuid);
                         contentValues.put(FTSQL.RECORD_COLUMN_DATA, data.getDataString(uuid));
                     } else {

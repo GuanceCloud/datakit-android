@@ -20,6 +20,7 @@ import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.ID36Generator;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.PackageIdGenerator;
 import com.ft.sdk.garble.utils.Utils;
 import com.ft.sdk.internal.exception.FTNetworkNoAvailableException;
 import com.ft.sdk.internal.exception.FTRetryLimitException;
@@ -298,19 +299,21 @@ public class SyncTaskManager {
             int dataCount = requestDataList.size();
             LogUtils.d(TAG, "Sync Data Count:" + dataCount);
 
+
             StringBuilder sb = new StringBuilder();
-            String packageId = "";
+            String seqNumber = "";
             if (dataType == DataType.LOG) {
-                packageId = logGenerator.getCurrentId();
+                seqNumber = logGenerator.getCurrentId();
             } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_WEBVIEW) {
-                packageId = rumGenerator.getCurrentId();
+                seqNumber = rumGenerator.getCurrentId();
             }
+            String pkgId = PackageIdGenerator.generatePackageId(seqNumber, pid, dataCount);
             for (SyncJsonData data : cacheDataList) {
-                sb.append(data.getLineProtocolDataWithPkgId(packageId, pid, dataCount));
+                sb.append(data.getLineProtocolDataWithPkgId(pkgId));
             }
 
             String body = sb.toString();
-            requestNet(dataType, body, new RequestCallback() {
+            requestNet(dataType, pkgId, body, new RequestCallback() {
                 @Override
                 public void onResponse(int code, String response, String errorCode) {
                     if (code >= 200 && code < 500) {
@@ -425,9 +428,10 @@ public class SyncTaskManager {
      *
      * @param dataType     数据类型
      * @param body         数据行协议结果
+     * @param pkgId        链路包 id
      * @param syncCallback 异步对象
      */
-    private synchronized void requestNet(DataType dataType, String body, final RequestCallback syncCallback) throws FTNetworkNoAvailableException {
+    private synchronized void requestNet(DataType dataType, String pkgId, String body, final RequestCallback syncCallback) throws FTNetworkNoAvailableException {
         String model;
         switch (dataType) {
             case TRACE:
@@ -442,9 +446,10 @@ public class SyncTaskManager {
                 model = Constants.URL_MODEL_RUM;
                 break;
         }
-        String content_type = "text/plain";
         FTResponseData result = HttpBuilder.Builder()
-                .addHeadParam("Content-Type", content_type)
+                .addHeadParam(Constants.SYNC_DATA_CONTENT_TYPE_HEADER, Constants.SYNC_DATA_CONTENT_TYPE_VALUE)
+                .addHeadParam(Constants.SYNC_DATA_TRACE_HEADER,
+                        String.format(Constants.SYNC_DATA_TRACE_HEADER_FORMAT, pkgId))
                 .setModel(model)
                 .setMethod(RequestMethod.POST)
                 .setBodyString(body).executeSync();
@@ -489,7 +494,7 @@ public class SyncTaskManager {
                                 SyncJsonData data = it.next();
                                 try {
                                     String oldFormatData = data.getDataString();//获取旧格式数据
-                                    String uuid = Utils.randomUUID();
+                                    String uuid = Utils.getGUID_16();
                                     data.setUuid(uuid);//旧数据中没有 uuid
                                     data.setDataString(helper.getBodyContent(new JSONObject(oldFormatData),
                                             data.getDataType(),

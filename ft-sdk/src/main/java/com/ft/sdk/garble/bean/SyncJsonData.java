@@ -11,7 +11,6 @@ import com.ft.sdk.internal.exception.FTInvalidParameterException;
 import org.json.JSONException;
 
 import java.security.InvalidParameterException;
-import java.util.HashMap;
 
 
 /**
@@ -96,16 +95,14 @@ public class SyncJsonData implements Cloneable {
     }
 
     /**
-     * 标记包序列发送 id,替换 [uuid] 为 [packageId].[pid].[pkg_dataCount].[uuid]
+     * 标记包序列发送 id,替换 [uuid] 为 [packageId].[uuid]
      *
      * @param packageId 包 id
-     * @param dataCount 数量
      * @return
      */
-    public String getLineProtocolDataWithPkgId(String packageId, int pid, int dataCount) {
+    public String getLineProtocolDataWithPkgId(String packageId) {
         if (packageId != null) {
-            dataString = dataString.replaceFirst(uuid, packageId + "."
-                    + pid + "." + dataCount + "." + uuid);
+            dataString = dataString.replaceFirst(uuid, packageId + "." + uuid);
         }
         return dataString;
     }
@@ -143,7 +140,7 @@ public class SyncJsonData implements Cloneable {
      */
     public static SyncJsonData getSyncJsonData(SyncDataHelper helper, DataType dataType, LineProtocolBean bean)
             throws FTInvalidParameterException {
-        String uuid = Utils.randomUUID();
+        String uuid = Utils.getGUID_16();
         SyncJsonData recordData = new SyncJsonData(dataType);
         recordData.setTime(bean.getTimeNano());
         recordData.setUuid(uuid);
@@ -164,7 +161,7 @@ public class SyncJsonData implements Cloneable {
     public static SyncJsonData getFromLogBean(SyncDataHelper helper, BaseContentBean bean)
             throws FTInvalidParameterException {
         SyncJsonData recordData = new SyncJsonData(DataType.LOG);
-        String uuid = Utils.randomUUID();
+        String uuid = Utils.getGUID_16();
         recordData.setTime(bean.getTime());
         recordData.setUuid(uuid);
         recordData.setDataString(helper.getBodyContent(bean.getMeasurement(),

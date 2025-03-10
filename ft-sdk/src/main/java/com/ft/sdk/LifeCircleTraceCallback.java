@@ -70,10 +70,8 @@ class LifeCircleTraceCallback {
     public void onPreStart() {
         if (alreadySleep) {//表示从后台重新进入
             if (mInited) {
-//                FTAutoTrack.startApp();
                 startTime = Utils.getCurrentNanoTime();
             }
-//            FTMonitor.get().checkForReStart();
         }
 
 
@@ -168,16 +166,13 @@ class LifeCircleTraceCallback {
     }
 
     /**
-     * {@link Activity#onStop() }
+     * 当所有 Activity 都 onStop 时触发
      */
-    public void onStop() {
+    public void onEnterBackground() {
         if (FTSdk.checkInstallState()) {
-            boolean appForeground = Utils.isAppForeground();
-            if (!appForeground) {
-                handler.removeMessages(MSG_CHECK_SLEEP_STATUS);
-                //休眠一段时候后执行,为了区分短时间唤醒的行为
-                handler.sendEmptyMessageDelayed(MSG_CHECK_SLEEP_STATUS, DELAY_SLEEP_MILLIS);
-            }
+            handler.removeMessages(MSG_CHECK_SLEEP_STATUS);
+            //休眠一段时候后执行,为了区分短时间唤醒的行为
+            handler.sendEmptyMessageDelayed(MSG_CHECK_SLEEP_STATUS, DELAY_SLEEP_MILLIS);
         }
     }
 
@@ -198,7 +193,7 @@ class LifeCircleTraceCallback {
      * 检测是否长时间休眠
      */
     private void checkLongTimeSleep() {
-        boolean appForeground = Utils.isAppForeground();
+        boolean appForeground = FTActivityLifecycleCallbacks.isAppInForeground();
         if (!appForeground) {
             alreadySleep = true;
         }

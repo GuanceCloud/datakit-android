@@ -10,10 +10,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkCapabilities;
-import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Process;
 import android.os.SystemClock;
@@ -170,51 +166,12 @@ public class Utils {
     }
 
     /**
-     * 判断是否应用是否在前台
-     *
-     * @return true 前台，反之为后台
-     */
-    public static boolean isAppForeground() {
-        ActivityManager am = (ActivityManager) FTApplication.getApplication().getSystemService(Context.ACTIVITY_SERVICE);
-        if (am == null) return false;
-        List<ActivityManager.RunningAppProcessInfo> info = am.getRunningAppProcesses();
-        if (info == null || info.isEmpty()) return false;
-        for (ActivityManager.RunningAppProcessInfo aInfo : info) {
-            if (aInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
-                if (aInfo.processName.equals(FTApplication.getApplication().getPackageName())) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
      * 获取 16 字符长度的 GUID
      *
      * @return
      */
     public static String getGUID_16() {
-        StringBuilder uid = new StringBuilder();
-        //产生16位的强随机数
-        Random rd = new SecureRandom();
-        for (int i = 0; i < 16; i++) {
-            //产生0-2的3位随机数
-            int type = rd.nextInt(2);
-            switch (type) {
-                case 0:
-                    //0-9的随机数
-                    uid.append(rd.nextInt(10));
-                    break;
-                case 1:
-                    //a-f 随机
-                    uid.append((char) (rd.nextInt(6) + 97));
-                    break;
-                default:
-                    break;
-            }
-        }
-        return uid.toString();
+        return randomUUID().substring(0, 16);
     }
 
     /**

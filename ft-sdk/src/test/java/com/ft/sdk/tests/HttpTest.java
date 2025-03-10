@@ -2,6 +2,7 @@ package com.ft.sdk.tests;
 
 import static org.junit.Assert.assertEquals;
 
+import com.ft.sdk.InnerConfigSet;
 import com.ft.sdk.garble.http.FTResponseData;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.RequestMethod;
@@ -30,15 +31,18 @@ public class HttpTest {
      * 模拟成功返回 json
      */
     private static final String SUCCESS_WITH_JSON_RESPONSE = "{\"code\":200,\"errorCode\":\"\",\"message\":\"\"}";
+
     /**
      * 模拟无数据返回
      */
     private static final String EMPTY_RESPONSE = "";
     private MockWebServer mMockWebServer;
+    private static final String FORMAT_REQUEST_HOST_WITH_PORT = "http://127.0.0.1:%s/";
 
     @Before
     public void setUp() {
         mMockWebServer = new MockWebServer();
+        InnerConfigSet.enableNetwork();
     }
 
     @After
@@ -58,9 +62,10 @@ public class HttpTest {
         mockResponse.setResponseCode(HttpURLConnection.HTTP_OK);
         mMockWebServer.enqueue(mockResponse);
         mMockWebServer.play();
+        String url = String.format(FORMAT_REQUEST_HOST_WITH_PORT, mMockWebServer.getPort());
 
         FTResponseData result = HttpBuilder.Builder()
-                .setUrl(mMockWebServer.getUrl("/").toString())
+                .setUrl(url)
                 .setMethod(RequestMethod.POST)
                 .setBodyString("")
                 .executeSync();
@@ -79,9 +84,9 @@ public class HttpTest {
         mockResponse.setResponseCode(HttpURLConnection.HTTP_BAD_REQUEST);
         mMockWebServer.enqueue(mockResponse);
         mMockWebServer.play();
-
+        String url = String.format(FORMAT_REQUEST_HOST_WITH_PORT, mMockWebServer.getPort());
         FTResponseData result = HttpBuilder.Builder()
-                .setUrl(mMockWebServer.getUrl("/").toString())
+                .setUrl(url)
                 .setMethod(RequestMethod.POST)
                 .setBodyString("")
                 .executeSync();
@@ -100,9 +105,9 @@ public class HttpTest {
         mockResponse.setResponseCode(HttpURLConnection.HTTP_OK);
         mMockWebServer.enqueue(mockResponse);
         mMockWebServer.play();
-
+        String url = String.format(FORMAT_REQUEST_HOST_WITH_PORT, mMockWebServer.getPort());
         FTResponseData result = HttpBuilder.Builder()
-                .setUrl(mMockWebServer.getUrl("/").toString())
+                .setUrl(url)
                 .setMethod(RequestMethod.POST)
                 .setBodyString("")
                 .executeSync();

@@ -9,16 +9,40 @@ import java.util.HashMap;
 public class NetStatusBean {
 
     /**
+     * 请求开始时间 @deprecated Use {@link #callStartTime} instead.
+     */
+    @Deprecated
+    public long fetchStartTime = -1;
+    /**
+     * request header 开始时间 @deprecated Use {@link #headerStartTime} instead.
+     */
+    @Deprecated
+    public long requestStartTime = -1;
+    /**
+     * response 开始时间  @deprecated Use {@link #bodyStartTime} instead.
+     */
+    @Deprecated
+    public long responseStartTime = -1;
+    /**
+     * response 结束时间 {@link #bodyEndTime} instead.
+     */
+    @Deprecated
+    public long responseEndTime = -1;
+
+    /**
      * 请求从 call Start 处开始时间
      */
     public long callStartTime = -1;
 
+    /**
+     * 请求在 response header 开始时间
+     */
+    public long headerStartTime = -1;
 
     /**
-     * 请求在 request header 处开始时间
+     * 请求在 response header 结束时间
      */
     public long headerEndTime = -1;
-
 
     /**
      * tcp 连接时间
@@ -36,17 +60,17 @@ public class NetStatusBean {
      * dns 解析结束时间
      */
     public long dnsEndTime = -1;
+
     /**
-     * 请求返回内容加载开始时间
+     * response body 开始时间
      */
-    public long headerStartTime = -1;
+    public long bodyStartTime = -1;
+
     /**
-     * 请求返回内容加载结束时间
+     * response body 结束时间
      */
     public long bodyEndTime = -1;
 
-
-    public long bodyStartTime = -1;
 
     /**
      * ssl 连接开始时间
@@ -65,7 +89,7 @@ public class NetStatusBean {
     public String resourceHostIP = "";
 
     /**
-     * 附加属性，
+     * 附加属性
      */
     public HashMap<String, Object> property;
 
@@ -86,6 +110,11 @@ public class NetStatusBean {
         return 0;
     }
 
+    /**
+     *  相对 {@link #callStartTime} 的 connect 开始时间
+     *
+     * @return
+     */
     public long getConnectStartTime() {
         return tcpStartTime - callStartTime;
     }
@@ -102,10 +131,20 @@ public class NetStatusBean {
         return 0;
     }
 
+    /**
+     *  相对 {@link #callStartTime} 的 dns 开始时间
+     *
+     * @return
+     */
     public long getDNSStartTime() {
         return dnsStartTime - callStartTime;
     }
 
+
+    /**
+     *  body 内容加载耗时
+     * @return
+     */
     public long getDownloadTime() {
         if (bodyEndTime > bodyStartTime) {
             return bodyEndTime - bodyStartTime;
@@ -113,6 +152,10 @@ public class NetStatusBean {
         return 0;
     }
 
+    /**
+     * 相对 {@link #callStartTime} 的 body 下载开始时间
+     * @return
+     */
     public long getDownloadTimeStart() {
         return bodyStartTime - callStartTime;
     }
@@ -143,7 +186,7 @@ public class NetStatusBean {
     }
 
     /**
-     * 首字节时间
+     * 首字节耗时
      *
      * @return
      */
@@ -152,6 +195,10 @@ public class NetStatusBean {
     }
 
 
+    /**
+     * 相对 {@link #callStartTime} 的首字节开始时间
+     * @return
+     */
     public long getFirstByteStartTime() {
         return headerStartTime - callStartTime;
     }
@@ -182,7 +229,7 @@ public class NetStatusBean {
     }
 
     /**
-     * ssl 开始时间
+     * 相对 {@link #callStartTime} 的 ssl 开始时间
      *
      * @return
      */
