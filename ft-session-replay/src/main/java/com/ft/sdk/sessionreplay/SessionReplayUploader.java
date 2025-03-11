@@ -3,6 +3,7 @@ package com.ft.sdk.sessionreplay;
 import android.os.Bundle;
 import android.util.Pair;
 
+import com.ft.sdk.api.PackageIdProxy;
 import com.ft.sdk.api.context.SessionReplayContext;
 import com.ft.sdk.sessionreplay.internal.excepiton.InvalidPayloadFormatException;
 import com.ft.sdk.sessionreplay.internal.net.BatchesToSegmentsMapper;
@@ -37,18 +38,22 @@ public class SessionReplayUploader {
     private static final String KEY_APP_ID = "app_id";
     private static final String KEY_SESSION_ID = "session_id";
     private static final String KEY_VIEW_ID = "view_id";
+    private static final String KEY_HEADER_PKG_ID = "X-Pkg-Id";
 
     private final String requestUrl;
     private final BatchesToSegmentsMapper batchToSegmentsMapper;
     private final BytesCompressor compressor;
     private final InternalLogger internalLogger;
+    private final PackageIdProxy packageIdProxy;
 
 
-    public SessionReplayUploader(SessionReplayContext context, BatchesToSegmentsMapper mapper, InternalLogger internalLogger) {
+    public SessionReplayUploader(SessionReplayContext context, BatchesToSegmentsMapper mapper,
+                                 InternalLogger internalLogger, PackageIdProxy packageIdProxy) {
         this.requestUrl = context.getRequestUrl();
         this.batchToSegmentsMapper = mapper;
         this.compressor = new BytesCompressor();
         this.internalLogger = internalLogger;
+        this.packageIdProxy = packageIdProxy;
     }
 
 
@@ -97,6 +102,7 @@ public class SessionReplayUploader {
         byte[] segmentAsByteArray = jsonString.toString().getBytes();
         byte[] compressedData = compressor.compressBytes(segmentAsByteArray);
         MsMultiPartFormData data = new MsMultiPartFormData(this.requestUrl, "UTF-8");
+        data.addHeaderField(KEY_HEADER_PKG_ID, packageIdProxy.getPackageId(recordsCount));
         data.addFilePart(KEY_SEGMENT, new ByteArrayInputStream(compressedData), viewId);
         data.addFormField(KEY_START, start + "");
         data.addFormField(KEY_END, end + "");

@@ -8,6 +8,8 @@ import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTRUMConfigManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
+import com.ft.sdk.SyncTaskManager;
+import com.ft.sdk.api.PackageIdProxy;
 import com.ft.sdk.api.context.SessionReplayContext;
 import com.ft.sdk.feature.DataConsumerCallback;
 import com.ft.sdk.feature.Feature;
@@ -17,8 +19,10 @@ import com.ft.sdk.feature.FeatureScope;
 import com.ft.sdk.garble.bean.BatteryBean;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.threadpool.ThreadPoolFactory;
+import com.ft.sdk.garble.utils.ID36Generator;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.NetUtils;
+import com.ft.sdk.garble.utils.PackageIdGenerator;
 import com.ft.sdk.garble.utils.Utils;
 import com.ft.sdk.sessionreplay.internal.StorageBackedFeature;
 import com.ft.sdk.sessionreplay.internal.net.BatchesToSegmentsMapper;
@@ -68,6 +72,7 @@ public class SDKFeature implements FeatureScope {
     private final AtomicBoolean initialized = new AtomicBoolean(false);
     private SessionReplayContext sdkContext;
     private Storage storage = new NoOpStorage();
+    private final ID36Generator srGenerator = new ID36Generator();
 
     private final BatteryPowerWatcher watcher = new BatteryPowerWatcher();
 
@@ -117,7 +122,13 @@ public class SDKFeature implements FeatureScope {
             if (feature.getName().equals(Feature.SESSION_REPLAY_FEATURE_NAME)) {
                 uploadScheduler = new DataUploadScheduler(feature.getName(), internalLogger,
                         configuration, storage, new SessionReplayUploader(sdkContext,
-                        new BatchesToSegmentsMapper(internalLogger), internalLogger), sdkContext,
+                        new BatchesToSegmentsMapper(internalLogger), internalLogger, new PackageIdProxy() {
+                    @Override
+                    public String getPackageId(long count) {
+                        return PackageIdGenerator.generatePackageId(srGenerator.generateID()
+                                , SyncTaskManager.pid, (int) count);
+                    }
+                }), sdkContext,
                         new SystemInfoProxy() {
                             @Override
                             public boolean isNetworkAvailable() {
