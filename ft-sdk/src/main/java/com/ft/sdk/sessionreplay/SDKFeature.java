@@ -125,8 +125,13 @@ public class SDKFeature implements FeatureScope {
                         new BatchesToSegmentsMapper(internalLogger), internalLogger, new PackageIdProxy() {
                     @Override
                     public String getPackageId(long count) {
-                        return PackageIdGenerator.generatePackageId(srGenerator.generateID()
+                        return PackageIdGenerator.generatePackageId(srGenerator.getCurrentId()
                                 , SyncTaskManager.pid, (int) count);
+                    }
+
+                    @Override
+                    public void nextSeqId() {
+                        srGenerator.next();
                     }
                 }), sdkContext,
                         new SystemInfoProxy() {

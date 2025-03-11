@@ -99,10 +99,11 @@ public class SessionReplayUploader {
             }
         }
 
+        String pkgId = packageIdProxy.getPackageId(recordsCount);
         byte[] segmentAsByteArray = jsonString.toString().getBytes();
         byte[] compressedData = compressor.compressBytes(segmentAsByteArray);
         MsMultiPartFormData data = new MsMultiPartFormData(this.requestUrl, "UTF-8");
-        data.addHeaderField(KEY_HEADER_PKG_ID, packageIdProxy.getPackageId(recordsCount));
+        data.addHeaderField(KEY_HEADER_PKG_ID, pkgId);
         data.addFilePart(KEY_SEGMENT, new ByteArrayInputStream(compressedData), viewId);
         data.addFormField(KEY_START, start + "");
         data.addFormField(KEY_END, end + "");
@@ -122,10 +123,11 @@ public class SessionReplayUploader {
         Bundle b = data.finish();
         UploadResult result = new UploadResult(b.getInt("code"), b.getString("response"));
         if (result.isSuccess()) {
-            internalLogger.d(TAG, "Session Upload Success. view_id:" + viewId
+            internalLogger.d(TAG, "Session Upload Success. " + pkgId + ",view_id:" + viewId
                     + ",count:" + recordsCount + ",hasFullSnapshot:" + hasFullSnapshot);
+            packageIdProxy.nextSeqId();
         } else {
-            internalLogger.e(TAG, "Session Upload Failed. view_id:" + viewId
+            internalLogger.e(TAG, "Session Upload Failed." + pkgId + ",view_id:" + viewId
                     + ",count:" + recordsCount + ",code:" + result.getCode() + ",response:" + result.getResponse());
         }
         return result;
