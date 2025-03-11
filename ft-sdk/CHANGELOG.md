@@ -1,3 +1,7 @@
+# agent 1.6.10-alpha01
+1. 网络请求 IOException 重抛出篡改原始类型的问题
+
+---
 # agent 1.6.9
 1. 修改 isAppForeground 的判断机制，适配隐私敏感信息检测
 2. 新增 `resource` 数据字段 `resource_first_byte_time`，`resource_dns_time`，
