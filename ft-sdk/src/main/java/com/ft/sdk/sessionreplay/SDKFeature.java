@@ -24,6 +24,7 @@ import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.NetUtils;
 import com.ft.sdk.garble.utils.PackageIdGenerator;
 import com.ft.sdk.garble.utils.Utils;
+import com.ft.sdk.garble.utils.VersionUtils;
 import com.ft.sdk.sessionreplay.internal.StorageBackedFeature;
 import com.ft.sdk.sessionreplay.internal.net.BatchesToSegmentsMapper;
 import com.ft.sdk.sessionreplay.internal.persistence.BatchClosedMetadata;
@@ -119,9 +120,9 @@ public class SDKFeature implements FeatureScope {
 
     private void setupUploader(Feature feature, DataUploadConfiguration configuration) {
         if (Utils.isMainProcess()) {
-            if (feature.getName().equals(Feature.SESSION_REPLAY_FEATURE_NAME)) {
-                uploadScheduler = new DataUploadScheduler(feature.getName(), internalLogger,
-                        configuration, storage, new SessionReplayUploader(sdkContext,
+            SessionReplayUploader uploader;
+            if (VersionUtils.firstVerGreaterEqual(FTSdk.SESSION_REPLAY_VERSION, "0.1.0-alpha07")) {
+                uploader = new SessionReplayUploader(sdkContext,
                         new BatchesToSegmentsMapper(internalLogger), internalLogger, new PackageIdProxy() {
                     @Override
                     public String getPackageId(long count) {
@@ -133,7 +134,15 @@ public class SDKFeature implements FeatureScope {
                     public void nextSeqId() {
                         srGenerator.next();
                     }
-                }), sdkContext,
+                });
+            } else {
+                uploader = new SessionReplayUploader(sdkContext,
+                        new BatchesToSegmentsMapper(internalLogger), internalLogger);
+            }
+
+            if (feature.getName().equals(Feature.SESSION_REPLAY_FEATURE_NAME)) {
+                uploadScheduler = new DataUploadScheduler(feature.getName(), internalLogger,
+                        configuration, storage, uploader, sdkContext,
                         new SystemInfoProxy() {
                             @Override
                             public boolean isNetworkAvailable() {

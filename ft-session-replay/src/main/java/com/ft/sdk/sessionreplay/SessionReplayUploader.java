@@ -56,6 +56,11 @@ public class SessionReplayUploader {
         this.packageIdProxy = packageIdProxy;
     }
 
+    public SessionReplayUploader(SessionReplayContext context, BatchesToSegmentsMapper mapper,
+                                 InternalLogger internalLogger) {
+        this(context, mapper, internalLogger, null);
+    }
+
 
     /**
      * 上传 Session Replay 数据
@@ -103,7 +108,9 @@ public class SessionReplayUploader {
         byte[] segmentAsByteArray = jsonString.toString().getBytes();
         byte[] compressedData = compressor.compressBytes(segmentAsByteArray);
         MsMultiPartFormData data = new MsMultiPartFormData(this.requestUrl, "UTF-8");
-        data.addHeaderField(KEY_HEADER_PKG_ID, pkgId);
+        if (packageIdProxy != null) {
+            data.addHeaderField(KEY_HEADER_PKG_ID, pkgId);
+        }
         data.addFilePart(KEY_SEGMENT, new ByteArrayInputStream(compressedData), viewId);
         data.addFormField(KEY_START, start + "");
         data.addFormField(KEY_END, end + "");
