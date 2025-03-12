@@ -49,8 +49,10 @@ public class MsMultiPartFormData {
         httpConn.setDoInput(true);
         httpConn.setRequestProperty("Content-Type",
                 "multipart/form-data; boundary=" + boundary);
-        httpConn.setRequestProperty(USER_AGENT, userAgent);
-        if (pkgId != null) {
+        if (userAgent != null && !userAgent.isEmpty()) {
+            httpConn.setRequestProperty(USER_AGENT, userAgent);
+        }
+        if (pkgId != null && !pkgId.isEmpty()) {
             httpConn.setRequestProperty(KEY_HEADER_PKG_ID, pkgId);
         }
         outputStream = httpConn.getOutputStream();
