@@ -35,10 +35,10 @@ public class SessionReplayUploader {
     private static final String HAS_FULL_SNAPSHOT = "has_full_snapshot";
     private static final String KEY_ENV = "env";
     private static final String KEY_SDK_VERSION = "sdk_version";
+    private static final String KEY_VERSION = "version";
     private static final String KEY_APP_ID = "app_id";
     private static final String KEY_SESSION_ID = "session_id";
     private static final String KEY_VIEW_ID = "view_id";
-    private static final String KEY_HEADER_PKG_ID = "X-Pkg-Id";
 
     private final String requestUrl;
     private final BatchesToSegmentsMapper batchToSegmentsMapper;
@@ -107,10 +107,9 @@ public class SessionReplayUploader {
         String pkgId = packageIdProxy == null ? null : packageIdProxy.getPackageId(recordsCount);
         byte[] segmentAsByteArray = jsonString.toString().getBytes();
         byte[] compressedData = compressor.compressBytes(segmentAsByteArray);
-        MsMultiPartFormData data = new MsMultiPartFormData(this.requestUrl, "UTF-8");
-        if (pkgId != null) {
-            data.addHeaderField(KEY_HEADER_PKG_ID, pkgId);
-        }
+        MsMultiPartFormData data = new MsMultiPartFormData(this.requestUrl,
+                "UTF-8",
+                context.getUserAgent(), pkgId);
         data.addFilePart(KEY_SEGMENT, new ByteArrayInputStream(compressedData), viewId);
         data.addFormField(KEY_START, start + "");
         data.addFormField(KEY_END, end + "");
@@ -126,6 +125,7 @@ public class SessionReplayUploader {
         data.addFormField(KEY_APP_ID, context.getAppId());
         data.addFormField(KEY_SESSION_ID, sessionId);
         data.addFormField(KEY_VIEW_ID, viewId);
+        data.addFormField(KEY_VERSION, context.getAppVersion());
 
         Bundle b = data.finish();
         UploadResult result = new UploadResult(b.getInt("code"), b.getString("response"));

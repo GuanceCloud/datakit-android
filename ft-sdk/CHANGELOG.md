@@ -1,5 +1,10 @@
+# agent 1.7.0-alpha013
+1. 增加 userAgent，appVersion 向 Session Replay 传递的参数
+
+---
 # agent 1.7.0-alpha012
 1. 合并 ft-sdk 1.6.9
+2. X-Pkg-Id Session Replay 数据同步追踪适配
 
 ---
 # agent 1.7.0-alpha011

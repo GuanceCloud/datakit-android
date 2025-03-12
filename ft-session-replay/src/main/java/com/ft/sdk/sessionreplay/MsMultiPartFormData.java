@@ -19,8 +19,10 @@ import java.util.List;
  * 表单提交
  */
 public class MsMultiPartFormData {
+    public static final String USER_AGENT = "User-Agent";
     private final String boundary;
     private static final String LINE_FEED = "\r\n";
+    private static final String KEY_HEADER_PKG_ID = "X-Pkg-Id";
     private final HttpURLConnection httpConn;
     private final String charset;
     private final OutputStream outputStream;
@@ -33,7 +35,7 @@ public class MsMultiPartFormData {
      * @param charset    数据编码
      * @throws java.io.IOException
      */
-    public MsMultiPartFormData(String requestURL, String charset)
+    public MsMultiPartFormData(String requestURL, String charset, String userAgent, String pkgId)
             throws IOException {
         this.charset = charset;
 
@@ -47,7 +49,10 @@ public class MsMultiPartFormData {
         httpConn.setDoInput(true);
         httpConn.setRequestProperty("Content-Type",
                 "multipart/form-data; boundary=" + boundary);
-//        httpConn.setRequestProperty("User-Agent", Constants.USER_AGENT);
+        httpConn.setRequestProperty(USER_AGENT, userAgent);
+        if (pkgId != null) {
+            httpConn.setRequestProperty(KEY_HEADER_PKG_ID, pkgId);
+        }
         outputStream = httpConn.getOutputStream();
         writer = new PrintWriter(new OutputStreamWriter(outputStream, charset),
                 true);

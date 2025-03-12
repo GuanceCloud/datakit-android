@@ -1,3 +1,11 @@
+# replay 0.1.0-alpha08
+1. X-Pkg-Id 放置位置修改
+
+---
+# replay 0.1.0-alpha07
+1. X-Pkg-Id Session Replay 数据同步追踪适配
+
+---
 # replay 0.1.0-alpha05
 1. 修复 React Native View 崩溃问题
 

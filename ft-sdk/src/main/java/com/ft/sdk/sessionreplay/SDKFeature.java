@@ -19,6 +19,7 @@ import com.ft.sdk.feature.FeatureScope;
 import com.ft.sdk.garble.bean.BatteryBean;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.threadpool.ThreadPoolFactory;
+import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.ID36Generator;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.NetUtils;
@@ -51,6 +52,7 @@ import com.ft.sdk.storage.EventBatchWriter;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -107,8 +109,21 @@ public class SDKFeature implements FeatureScope {
             FTRUMConfig rumConfig = FTRUMConfigManager.get().getConfig();
 
             String appId = rumConfig == null ? "" : rumConfig.getRumAppId();
-            sdkContext = new SessionReplayContext(url, sdkConfig.getEnv(),
-                    FTSdk.AGENT_VERSION, TrackingConsent.GRANTED, appId);
+
+            if (VersionUtils.firstVerGreaterEqual(FTSdk.SESSION_REPLAY_VERSION, "0.1.0-alpha08")) {
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("requestUrl", url);
+                map.put("env", sdkConfig.getEnv());
+                map.put("sdkVersion", FTSdk.AGENT_VERSION);
+                map.put("trackingConsent", TrackingConsent.GRANTED.toString());
+                map.put("appId", appId);
+                map.put("userAgent", Constants.USER_AGENT);
+                map.put("appVersion", Utils.getAppVersionName());
+                sdkContext = SessionReplayContext.createFromMap(map);
+            } else {
+                sdkContext = new SessionReplayContext(url, sdkConfig.getEnv(),
+                        FTSdk.AGENT_VERSION, TrackingConsent.GRANTED, appId);
+            }
 
             setupUploader(wrappedFeature, dataUploadConfiguration);
         }
@@ -126,8 +141,9 @@ public class SDKFeature implements FeatureScope {
                         new BatchesToSegmentsMapper(internalLogger), internalLogger, new PackageIdProxy() {
                     @Override
                     public String getPackageId(long count) {
-                        return PackageIdGenerator.generatePackageId(srGenerator.getCurrentId()
+                        String pkgId = PackageIdGenerator.generatePackageId(srGenerator.getCurrentId()
                                 , SyncTaskManager.pid, (int) count);
+                        return String.format(Constants.SYNC_DATA_TRACE_HEADER_FORMAT, pkgId);
                     }
 
                     @Override
