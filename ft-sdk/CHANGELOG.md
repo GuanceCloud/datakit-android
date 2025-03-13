@@ -1,3 +1,8 @@
+# agent 1.6.10-alpha02
+1. FTSDKConfig 增加数据同步 Okhttp 请求增加 Proxy ProxyAuthenticator Dns 的配置
+2. Okhttp 数据同步支持已知 hostName DNS IP 轮循优化
+
+---
 # agent 1.6.10-alpha01
 1. 网络请求 IOException 重抛出篡改原始类型的问题
 
