@@ -70,8 +70,7 @@ public class FTHttpConfigManager {
         if (ftsdkConfig == null) {
             return;
         }
-        String defaultUserAgent = System.getProperty("http.agent", "DefaultUA");
-        userAgent = defaultUserAgent + " " + USER_AGENT + "/" + BuildConfig.FT_SDK_VERSION;
+        userAgent = USER_AGENT + "/" + BuildConfig.FT_SDK_VERSION;
         sendOutTime = Math.max(sendOutTime, ftsdkConfig.getPageSize() * 1000);
         datakitUrl = ftsdkConfig.getDatakitUrl();
         datawayUrl = ftsdkConfig.getDatawayUrl();
