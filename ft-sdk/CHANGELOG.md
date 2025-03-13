@@ -1,3 +1,7 @@
+# agent 1.7.0-alpha014
+1. 更改 userAgent 展示规则
+
+---
 # agent 1.7.0-alpha013
 1. 增加 userAgent，appVersion 向 Session Replay 传递的参数
 

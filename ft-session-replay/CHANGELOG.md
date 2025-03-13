@@ -1,3 +1,7 @@
+# replay 0.1.0-alpha09
+1. userAgent 附加 Session Replay SDK 信息
+
+---
 # replay 0.1.0-alpha08
 1. X-Pkg-Id 放置位置修改
 
