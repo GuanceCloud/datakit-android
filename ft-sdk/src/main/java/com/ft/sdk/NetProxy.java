@@ -1,6 +1,5 @@
 package com.ft.sdk;
 
-import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.http.EngineFactory;
 import com.ft.sdk.garble.http.FTResponseData;
 import com.ft.sdk.garble.http.HttpBuilder;
@@ -22,10 +21,6 @@ import java.util.TimeZone;
  */
 public class NetProxy {
     public final static String TAG = Constants.LOG_TAG_PREFIX + "NetProxy";
-    /**
-     * SDK 中网络的配置
-     */
-    private final FTHttpConfigManager ftHttpConfig = FTHttpConfigManager.get();
     /**
      * 内容类型
      */
@@ -86,7 +81,7 @@ public class NetProxy {
         if (head == null) {
             head = new HashMap<>();
         }
-        head.put("User-Agent", ftHttpConfig.getUserAgent());
+        head.put("User-Agent", httpBuilder.getHttpConfig().getUserAgent());
         head.put("Accept-Language", "zh-CN");
         if (!head.containsKey("Content-Type")) {
             head.put("Content-Type", CONTENT_TYPE);

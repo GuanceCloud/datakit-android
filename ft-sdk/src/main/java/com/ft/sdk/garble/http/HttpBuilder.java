@@ -22,30 +22,37 @@ public class HttpBuilder {
     private String model;
     private RequestMethod method;
     private String bodyString;
+    private final FTHttpConfigManager httpConfig;
 
     /**
      * {@link FTHttpConfigManager#sendOutTime}
      */
-    private int sendOutTime = FTHttpConfigManager.get().getSendOutTime();
+    private final int sendOutTime;
     /**
      * {@link FTHttpConfigManager#readOutTime}
      */
-    private int readOutTime = FTHttpConfigManager.get().getReadOutTime();
+    private final int readOutTime;
     private boolean useDefaultHead = true;
     private boolean isDataway = false;
     private final HashMap<String, String> headParams = new HashMap<>();
 
     public static HttpBuilder Builder() {
-        return new HttpBuilder();
+        return new HttpBuilder(FTHttpConfigManager.get());
+    }
+
+    public HttpBuilder(FTHttpConfigManager httpConfig) {
+        this.httpConfig = httpConfig;
+        this.sendOutTime = httpConfig.getSendOutTime();
+        this.readOutTime = httpConfig.getReadOutTime();
     }
 
     public String getHost() {
         if (host == null) {
-            if (!Utils.isNullOrEmpty(FTHttpConfigManager.get().getDatakitUrl())) {
-                host = FTHttpConfigManager.get().getDatakitUrl();
+            if (!Utils.isNullOrEmpty(httpConfig.getDatakitUrl())) {
+                host = httpConfig.getDatakitUrl();
             } else {
                 isDataway = true;
-                host = FTHttpConfigManager.get().getDatawayUrl();
+                host = httpConfig.getDatawayUrl();
             }
 
         }
@@ -69,7 +76,7 @@ public class HttpBuilder {
             if (!isDataway) {
                 url += "/" + model;
             } else {
-                url += String.format(DATAWAY_URL_HOST_FORMAT, model, FTHttpConfigManager.get().getClientToken());
+                url += String.format(DATAWAY_URL_HOST_FORMAT, model, httpConfig.getClientToken());
             }
         }
         return url;
@@ -134,6 +141,10 @@ public class HttpBuilder {
     public HttpBuilder addHeadParam(String key, String value) {
         this.headParams.put(key, value);
         return this;
+    }
+
+    public FTHttpConfigManager getHttpConfig() {
+        return httpConfig;
     }
 
     /**

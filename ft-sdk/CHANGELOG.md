@@ -1,5 +1,6 @@
 # agent 1.7.0-alpha014
 1. 更改 userAgent 展示规则
+2. 合并 ft-sdk 1.6.10-alpha02
 
 ---
 # agent 1.7.0-alpha013
@@ -46,6 +47,11 @@
 ---
 # agent 1.7.0-alpha02
 1. 支持开启 session replay 录制功能
+
+---
+# agent 1.6.10-alpha02
+1. FTSDKConfig 增加数据同步 Okhttp 请求增加 Proxy ProxyAuthenticator Dns 的配置
+2. Okhttp 数据同步支持已知 hostName DNS IP 轮循优化
 
 ---
 # agent 1.6.10-alpha01

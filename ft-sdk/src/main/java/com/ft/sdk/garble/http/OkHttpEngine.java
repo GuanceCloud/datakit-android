@@ -1,6 +1,5 @@
 package com.ft.sdk.garble.http;
 
-import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.compress.DeflateInterceptor;
 
 import java.io.IOException;
@@ -9,6 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.Authenticator;
+import okhttp3.Dns;
 import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -34,8 +35,19 @@ public class OkHttpEngine implements INetEngine {
     public void defaultConfig(HttpBuilder httpBuilder) {
         if (client == null) {
             OkHttpClient.Builder builder = new OkHttpClient.Builder();
-            if (FTHttpConfigManager.get().isCompressIntakeRequests()) {
+            if (httpBuilder.getHttpConfig().isCompressIntakeRequests()) {
                 builder.addInterceptor(new DeflateInterceptor());
+            }
+            if (httpBuilder.getHttpConfig().getDns() != null) {
+                builder.dns((Dns) httpBuilder.getHttpConfig().getDns());
+            }else{
+                builder.dns(new RotatingDnsResolver());
+            }
+            if (httpBuilder.getHttpConfig().getProxy() != null) {
+                builder.proxy(httpBuilder.getHttpConfig().getProxy());
+            }
+            if (httpBuilder.getHttpConfig().getAuthenticator() != null) {
+                builder.proxyAuthenticator((Authenticator) httpBuilder.getHttpConfig().getAuthenticator());
             }
             client = builder
                     .connectTimeout(httpBuilder.getSendOutTime(), TimeUnit.MILLISECONDS)

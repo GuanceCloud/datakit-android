@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.utils.Constants;
 
+import java.net.Proxy;
 import java.util.HashMap;
 
 /**
@@ -163,6 +164,10 @@ public class FTSDKConfig {
     private final HashMap<String, Object> globalContext = new HashMap<>();
 
     private final HashMap<String, String> pkgInfo = new HashMap<>();
+
+    private Object dns;
+    private Proxy proxy;
+    private Object authenticator;
 
     /**
      * 构建 SDK 必要的配置参数
@@ -498,6 +503,51 @@ public class FTSDKConfig {
         return this;
     }
 
+    public Object getDns() {
+        return dns;
+    }
+
+    public Proxy getProxy() {
+        return proxy;
+    }
+
+    public Object getAuthenticator() {
+        return authenticator;
+    }
+
+    /**
+     * 设置 Proxy 代理，仅支持依赖 okhttp3 库的时候
+     *
+     * @param proxy
+     * @return
+     */
+    public FTSDKConfig setProxy(Proxy proxy) {
+        this.proxy = proxy;
+        return this;
+    }
+
+    /**
+     * 设置 Proxy 代理 authenticator，仅支持依赖 okhttp3 库的时候
+     *
+     * @param authenticator
+     * @return
+     */
+    public FTSDKConfig setProxyAuthenticator(okhttp3.Authenticator authenticator) {
+        this.authenticator = authenticator;
+        return this;
+    }
+
+    /**
+     * 设置 Dns 传输规则，部署版本，或自部署 Datakit 可以使用 DNS 做 IP 地址轮询优化
+     *
+     * @param dns
+     * @return
+     */
+    public FTSDKConfig setDns(okhttp3.Dns dns) {
+        this.dns = dns;
+        return this;
+    }
+
     public boolean isCompressIntakeRequests() {
         return compressIntakeRequests;
     }
@@ -522,6 +572,9 @@ public class FTSDKConfig {
                 ", enableDataIntegerCompatible=" + enableDataIntegerCompatible +
                 ", needTransformOldCache=" + needTransformOldCache +
                 ", globalContext=" + globalContext +
+                ", proxy=" + proxy +
+                ", proxyAuthenticator=" + authenticator +
+                ", dns=" + dns +
                 '}';
     }
 }
