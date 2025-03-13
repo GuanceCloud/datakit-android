@@ -9,6 +9,8 @@ import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.StringUtils;
 import com.ft.sdk.garble.utils.Utils;
 
+import java.net.Proxy;
+
 /**
  * BY huangDianHua
  * DATE:2019-12-09 19:39
@@ -61,6 +63,22 @@ public class FTHttpConfigManager {
         return instance;
     }
 
+    private Object dns;
+    private Proxy proxy;
+    private Object authenticator;
+
+    public Object getDns() {
+        return dns;
+    }
+
+    public Proxy getProxy() {
+        return proxy;
+    }
+
+    public Object getAuthenticator() {
+        return authenticator;
+    }
+
     /**
      * 配置初始化
      *
@@ -76,6 +94,9 @@ public class FTHttpConfigManager {
         datawayUrl = ftsdkConfig.getDatawayUrl();
         clientToken = ftsdkConfig.getClientToken();
         compressIntakeRequests = ftsdkConfig.isCompressIntakeRequests();
+        dns = ftsdkConfig.getDns();
+        proxy = ftsdkConfig.getProxy();
+        authenticator = ftsdkConfig.getAuthenticator();
 
         if (!Utils.isNullOrEmpty(datakitUrl)) {
             LogUtils.d(TAG, "serverUrl ==>\nDatakit Url:" + datakitUrl);

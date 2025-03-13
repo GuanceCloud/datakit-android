@@ -62,6 +62,7 @@ android {
             buildConfigField "String", "TRACK_ID", "\"${ft_env.trackId}\""
             buildConfigField "String", "TRACE_URL", "\"${ft_env.traceUrl}\""
             buildConfigField "String", "ENV", "\"${ft_env.prodTestEnv}\""
+            buildConfigField "String", "PROXY_ADDRESS", "\"${ft_env.proxyAddress}\""
             buildConfigField "Boolean", "LAZY_INIT", "false"
             dimension "tier"
         }
@@ -75,6 +76,7 @@ android {
             buildConfigField "String", "TRACK_ID", "\"${ft_env.trackId}\""
             buildConfigField "String", "TRACE_URL", "\"${ft_env.traceUrl}\""
             buildConfigField "String", "ENV", "\"${ft_env.prodPublishEnv}\""
+            buildConfigField "String", "PROXY_ADDRESS", "\"${ft_env.proxyAddress}\""
             buildConfigField "Boolean", "LAZY_INIT", "false"
             dimension "tier"
 

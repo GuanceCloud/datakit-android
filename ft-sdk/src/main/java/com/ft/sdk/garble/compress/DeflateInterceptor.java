@@ -1,5 +1,7 @@
 package com.ft.sdk.garble.compress;
 
+import androidx.annotation.NonNull;
+
 import java.io.IOException;
 import java.util.zip.Deflater;
 
@@ -45,7 +47,7 @@ public class DeflateInterceptor implements Interceptor {
             }
 
             @Override
-            public void writeTo(BufferedSink sink) throws IOException {
+            public void writeTo(@NonNull BufferedSink sink) throws IOException {
                 Deflater deflater = new Deflater();//with zlib wrap
 //                Deflater deflater = new Deflater(Deflater.DEFAULT_COMPRESSION, true);//no zlib wrap
                 BufferedSink deflateSink = Okio.buffer(new DeflaterSink(sink, deflater));

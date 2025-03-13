@@ -19,6 +19,7 @@ buildscript {
     def datawayToken = properties.getProperty("DATAWAY_TOKEN")
     def trackId = properties.getProperty("TRACK_ID")
     def traceUrl = properties.getProperty("TRACE_URL")
+    def proxyAddress = properties.getProperty("PROXY_ADDRESS")
 
     ext.ft_env = [
             'rumAppid'      : appIdString,
@@ -28,6 +29,7 @@ buildscript {
             'datawayToken'  : datawayToken,
             'trackId'       : trackId,
             'traceUrl'      : traceUrl,
+            'proxyAddress'  : proxyAddress,
             'prodTestEnv'   : 'gray',
             'prodPublishEnv': 'prod'
     ]

@@ -2,7 +2,6 @@ package com.ft.sdk.garble.http;
 
 import static com.ft.sdk.garble.http.NetCodeStatus.UNKNOWN_EXCEPTION_CODE;
 
-import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -109,8 +108,8 @@ public class NativeNetEngine implements INetEngine {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
         //设置连接和读取超时时间
-        mConnection.setConnectTimeout(FTHttpConfigManager.get().getSendOutTime());
-        mConnection.setReadTimeout(FTHttpConfigManager.get().getReadOutTime());
+        mConnection.setConnectTimeout(mHttpBuilder.getHttpConfig().getSendOutTime());
+        mConnection.setReadTimeout(mHttpBuilder.getHttpConfig().getReadOutTime());
     }
 
     private void setHeadParams() {

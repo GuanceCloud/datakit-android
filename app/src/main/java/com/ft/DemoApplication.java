@@ -53,6 +53,13 @@ public class DemoApplication extends BaseApplication {
 //                .enableLimitWithDbSize(1024 * 1024)
 //                .setDbCacheDiscard(DBCacheDiscard.DISCARD_OLDEST)
                 .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()));
+//        try {
+//            URL url = new URL(BuildConfig.PROXY_ADDRESS);
+//            ftSDKConfig.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(url.getHost(), url.getPort())));
+//
+//        } catch (MalformedURLException ignored) {
+//        }
+
         FTSdk.install(ftSDKConfig);
 
         FTSdk.initLogWithConfig(new FTLoggerConfig()
