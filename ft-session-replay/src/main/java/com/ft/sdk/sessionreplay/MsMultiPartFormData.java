@@ -50,7 +50,7 @@ public class MsMultiPartFormData {
         httpConn.setRequestProperty("Content-Type",
                 "multipart/form-data; boundary=" + boundary);
         if (userAgent != null && !userAgent.isEmpty()) {
-            httpConn.setRequestProperty(USER_AGENT, userAgent);
+            httpConn.setRequestProperty(USER_AGENT, userAgent + " (Mode=Replay; Version=" + BuildConfig.VERSION_NAME + ")");
         }
         if (pkgId != null && !pkgId.isEmpty()) {
             httpConn.setRequestProperty(KEY_HEADER_PKG_ID, pkgId);

@@ -16,6 +16,7 @@ import com.ft.sdk.feature.Feature;
 import com.ft.sdk.feature.FeatureContextUpdateReceiver;
 import com.ft.sdk.feature.FeatureEventReceiver;
 import com.ft.sdk.feature.FeatureScope;
+import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.bean.BatteryBean;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.threadpool.ThreadPoolFactory;
@@ -117,7 +118,7 @@ public class SDKFeature implements FeatureScope {
                 map.put("sdkVersion", FTSdk.AGENT_VERSION);
                 map.put("trackingConsent", TrackingConsent.GRANTED.toString());
                 map.put("appId", appId);
-                map.put("userAgent", Constants.USER_AGENT);
+                map.put("userAgent", FTHttpConfigManager.get().getUserAgent());
                 map.put("appVersion", Utils.getAppVersionName());
                 sdkContext = SessionReplayContext.createFromMap(map);
             } else {
