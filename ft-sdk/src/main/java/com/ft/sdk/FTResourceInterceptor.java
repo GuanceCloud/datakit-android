@@ -113,7 +113,7 @@ public class FTResourceInterceptor implements Interceptor {
 
         } catch (IOException e) {
             if (isInTakeUrl) {
-                throw new IOException(e);
+                throw e;
             } else {
                 exception = e;
             }
@@ -191,7 +191,7 @@ public class FTResourceInterceptor implements Interceptor {
         FTRUMInnerManager.get().stopResource(resourceId);
 
         if (exception != null) {
-            throw new IOException(exception);
+            throw exception;
         }
         return response;
     }

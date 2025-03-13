@@ -62,7 +62,7 @@ public class FTTraceInterceptor implements Interceptor {
         Request request = chain.request();
         Response response = null;
         Request.Builder requestBuilder = request.newBuilder();
-        Exception exception = null;
+        IOException exception = null;
 
         String uniqueKey = Utils.identifyRequest(request);
         HashMap<String, String> requestHeaders;
@@ -89,7 +89,7 @@ public class FTTraceInterceptor implements Interceptor {
         if (exception != null) {
 //            FTTraceManager.get().addTrace(uniqueKey, request.method(), requestHeaders,
 //                    null, 0, exception.getMessage());
-            throw new IOException(exception);
+            throw exception;
         }
 //        else {
 //            String responseBodyString = "";

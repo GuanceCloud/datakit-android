@@ -86,11 +86,7 @@ public class NetProxy {
         if (head == null) {
             head = new HashMap<>();
         }
-        head.put("User-Agent", ftHttpConfig.getUserAgent() +
-                ";agent_" + FTSdk.AGENT_VERSION +
-                ";autotrack_" + FTSdk.PLUGIN_VERSION +
-                ";native_" + FTSdk.NATIVE_VERSION
-        );
+        head.put("User-Agent", ftHttpConfig.getUserAgent());
         head.put("Accept-Language", "zh-CN");
         if (!head.containsKey("Content-Type")) {
             head.put("Content-Type", CONTENT_TYPE);

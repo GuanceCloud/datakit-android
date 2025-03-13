@@ -2,6 +2,7 @@ package com.ft.sdk.garble;
 
 import static com.ft.sdk.garble.utils.Constants.USER_AGENT;
 
+import com.ft.sdk.BuildConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -69,7 +70,8 @@ public class FTHttpConfigManager {
         if (ftsdkConfig == null) {
             return;
         }
-        userAgent = USER_AGENT;
+        String defaultUserAgent = System.getProperty("http.agent", "DefaultUA");
+        userAgent = defaultUserAgent + " " + USER_AGENT + "/" + BuildConfig.FT_SDK_VERSION;
         sendOutTime = Math.max(sendOutTime, ftsdkConfig.getPageSize() * 1000);
         datakitUrl = ftsdkConfig.getDatakitUrl();
         datawayUrl = ftsdkConfig.getDatawayUrl();

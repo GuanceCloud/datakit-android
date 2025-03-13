@@ -65,7 +65,7 @@ public class Constants {
     /**
      * 同步数据 http 请求 header user-agent
      */
-    public static final String USER_AGENT = SDK_NAME;
+    public static final String USER_AGENT = "DF-RUM-Android";
 
     /**
      * 日志默认指标名
