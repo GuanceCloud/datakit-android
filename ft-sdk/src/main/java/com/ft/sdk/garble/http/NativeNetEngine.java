@@ -2,11 +2,14 @@ package com.ft.sdk.garble.http;
 
 import static com.ft.sdk.garble.http.NetCodeStatus.UNKNOWN_EXCEPTION_CODE;
 
+import android.util.Pair;
+
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -152,8 +155,28 @@ public class NativeNetEngine implements INetEngine {
             }
             mConnection.setDoInput(true);
             mConnection.setUseCaches(false);
-            mConnection.connect();
-            if (isDoInput && !Utils.isNullOrEmpty(mHttpBuilder.getBodyString())) {
+            // 获取 Content-Type
+            String contentType = mHttpBuilder.getHeadParams().get(Constants.SYNC_DATA_CONTENT_TYPE_HEADER);
+            // 处理 multipart/form-data
+            if (isDoInput && "multipart/form-data".equalsIgnoreCase(contentType)) {
+                MsMultiPartFormData formData = new MsMultiPartFormData(mConnection);
+
+                // 添加表单字段
+                HashMap<String, String> formFields = mHttpBuilder.getFormParams();
+                for (Map.Entry<String, String> field : formFields.entrySet()) {
+                    formData.addFormField(field.getKey(), field.getValue());
+                }
+
+                // 添加文件部分
+                HashMap<String, Pair<String, byte[]>> fileParams = mHttpBuilder.getFileParams();
+                for (Map.Entry<String, Pair<String, byte[]>> fileEntry : fileParams.entrySet()) {
+                    formData.addFilePart(fileEntry.getKey(), new ByteArrayInputStream(fileEntry.getValue().second)
+                            , fileEntry.getValue().first);
+                }
+
+                formData.finish();
+            } else if (isDoInput && !Utils.isNullOrEmpty(mHttpBuilder.getBodyString())) {
+                mConnection.connect();
                 outputStream = mConnection.getOutputStream();
                 outputStream.write(mHttpBuilder.getBodyString().getBytes(CHARSET));
                 outputStream.flush();

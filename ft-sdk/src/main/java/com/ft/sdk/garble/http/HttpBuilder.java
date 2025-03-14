@@ -1,5 +1,7 @@
 package com.ft.sdk.garble.http;
 
+import android.util.Pair;
+
 import com.ft.sdk.NetProxy;
 import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.utils.Utils;
@@ -32,9 +34,14 @@ public class HttpBuilder {
      * {@link FTHttpConfigManager#readOutTime}
      */
     private final int readOutTime;
-    private boolean useDefaultHead = true;
     private boolean isDataway = false;
     private final HashMap<String, String> headParams = new HashMap<>();
+
+    // 新增 HashMap 用于表单和文件数据
+    private final HashMap<String, String> formParams = new HashMap<>();
+    private final HashMap<String, Pair<String, byte[]>> fileParams = new HashMap<>();
+
+    private boolean urlWithMsPrecision;
 
     public static HttpBuilder Builder() {
         return new HttpBuilder(FTHttpConfigManager.get());
@@ -59,6 +66,11 @@ public class HttpBuilder {
         return host;
     }
 
+    public HttpBuilder enableUrlWithMsPrecision() {
+        urlWithMsPrecision = true;
+        return this;
+    }
+
     public RequestMethod getMethod() {
         if (method == null) {
             throw new InvalidParameterException("method 未初始化");
@@ -75,7 +87,7 @@ public class HttpBuilder {
                 url += String.format(DATAWAY_URL_HOST_FORMAT, model, httpConfig.getClientToken());
             }
         }
-        return url;
+        return url + (urlWithMsPrecision ? ((isDataway ? "&" : "?") + "precision=ms") : "");
     }
 
     public String getBodyString() {
@@ -98,9 +110,14 @@ public class HttpBuilder {
         return headParams;
     }
 
-    public boolean isUseDefaultHead() {
-        return useDefaultHead;
+    public HashMap<String, String> getFormParams() {
+        return formParams;
     }
+
+    public HashMap<String, Pair<String, byte[]>> getFileParams() {
+        return fileParams;
+    }
+
 
     public HttpBuilder setUrl(String host) {
         this.host = host;
@@ -124,11 +141,6 @@ public class HttpBuilder {
     }
 
 
-    public HttpBuilder useDefaultHead(boolean useDefault) {
-        this.useDefaultHead = useDefault;
-        return this;
-    }
-
     public HttpBuilder setHeadParams(HashMap<String, String> hashMap) {
         this.headParams.putAll(hashMap);
         return this;
@@ -136,6 +148,28 @@ public class HttpBuilder {
 
     public HttpBuilder addHeadParam(String key, String value) {
         this.headParams.put(key, value);
+        return this;
+    }
+
+    public HttpBuilder setFormParams(HashMap<String, String> formParams) {
+        this.formParams.clear();
+        this.formParams.putAll(formParams);
+        return this;
+    }
+
+    public HttpBuilder addFormParam(String key, String value) {
+        this.formParams.put(key, value);
+        return this;
+    }
+
+    public HttpBuilder setFileParams(HashMap<String, Pair<String, byte[]>> fileParams) {
+        this.fileParams.clear();
+        this.fileParams.putAll(fileParams);
+        return this;
+    }
+
+    public HttpBuilder addFileParam(String key, Pair<String, byte[]> file) {
+        this.fileParams.put(key, file);
         return this;
     }
 

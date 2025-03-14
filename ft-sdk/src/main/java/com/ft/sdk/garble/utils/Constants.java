@@ -29,7 +29,12 @@ public class Constants {
      * 数据同步链路 propagation header value
      */
     public static final String SYNC_DATA_TRACE_HEADER_FORMAT = "rumm-%s";
+    /**
+     *
+     */
     public static final String SYNC_DATA_CONTENT_TYPE_HEADER = "Content-Type";
+    public static final String SYNC_DATA_USER_AGENT_HEADER = "User-Agent";
+    public static final String SYNC_DATA_CONTENT_ENCODING_HEADER = "Content-Encoding";
     public static final String SYNC_DATA_CONTENT_TYPE_VALUE = "text/plain";
     /**
      * 非法数值

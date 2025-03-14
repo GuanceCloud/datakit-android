@@ -41,7 +41,7 @@ public class PackageIdGenerator {
      * @param pkgCount
      * @return
      */
-    public static String generatePackageId(String numberPart, int pid, int pkgCount) {
+    public static String generatePackageId(String numberPart, int pid, Object pkgCount) {
         String nanoPart = generateNanoId();
         String pidPart = encodeBase62(pid);
         return numberPart + "." + pidPart + "." + pkgCount + "." + nanoPart;

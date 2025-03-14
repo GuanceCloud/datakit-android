@@ -1,6 +1,8 @@
 package com.ft.sdk.garble.compress;
 
-import androidx.annotation.NonNull;
+import com.ft.sdk.garble.utils.Constants;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.zip.Deflater;
@@ -16,18 +18,19 @@ import okio.Okio;
 
 public class DeflateInterceptor implements Interceptor {
 
+    @NotNull
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request originalRequest = chain.request();
 
         // 如果没有请求体或已经有 Content-Encoding 头，直接放行
-        if (originalRequest.body() == null || originalRequest.header("Content-Encoding") != null) {
+        if (originalRequest.body() == null || originalRequest.header(Constants.SYNC_DATA_CONTENT_ENCODING_HEADER) != null) {
             return chain.proceed(originalRequest);
         }
 
         // 创建 deflate 压缩的请求体
         Request compressedRequest = originalRequest.newBuilder()
-                .header("Content-Encoding", "deflate")
+                .header(Constants.SYNC_DATA_CONTENT_ENCODING_HEADER, "deflate")
                 .method(originalRequest.method(), deflate(originalRequest.body()))
                 .build();
 
@@ -47,7 +50,7 @@ public class DeflateInterceptor implements Interceptor {
             }
 
             @Override
-            public void writeTo(@NonNull BufferedSink sink) throws IOException {
+            public void writeTo(@NotNull BufferedSink sink) throws IOException {
                 Deflater deflater = new Deflater();//with zlib wrap
 //                Deflater deflater = new Deflater(Deflater.DEFAULT_COMPRESSION, true);//no zlib wrap
                 BufferedSink deflateSink = Okio.buffer(new DeflaterSink(sink, deflater));
