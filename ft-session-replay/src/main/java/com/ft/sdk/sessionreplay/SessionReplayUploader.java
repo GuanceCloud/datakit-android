@@ -1,9 +1,9 @@
 package com.ft.sdk.sessionreplay;
 
-import android.os.Bundle;
 import android.util.Pair;
 
-import com.ft.sdk.api.PackageIdProxy;
+import com.ft.sdk.api.SessionReplayFormData;
+import com.ft.sdk.api.SessionReplayUploadCallback;
 import com.ft.sdk.api.context.SessionReplayContext;
 import com.ft.sdk.sessionreplay.internal.excepiton.InvalidPayloadFormatException;
 import com.ft.sdk.sessionreplay.internal.net.BatchesToSegmentsMapper;
@@ -14,8 +14,8 @@ import com.ft.sdk.sessionreplay.model.MobileSegment;
 import com.ft.sdk.sessionreplay.utils.InternalLogger;
 import com.google.gson.JsonObject;
 
-import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -27,7 +27,7 @@ public class SessionReplayUploader {
 
     private static final String KEY_START = "start";
     private static final String KEY_END = "end";
-    private static final String KEY_RECORDS_COUNT = "records_count";
+    public static final String KEY_RECORDS_COUNT = "records_count";
     private static final String KEY_SEGMENT = "segment";
     private static final String KEY_SOURCE = "source";
     private static final String KEY_RAW_SEGMENT_SIZE = "raw_segment_size";
@@ -40,25 +40,19 @@ public class SessionReplayUploader {
     private static final String KEY_SESSION_ID = "session_id";
     private static final String KEY_VIEW_ID = "view_id";
 
-    private final String requestUrl;
     private final BatchesToSegmentsMapper batchToSegmentsMapper;
     private final BytesCompressor compressor;
     private final InternalLogger internalLogger;
-    private final PackageIdProxy packageIdProxy;
+    private final SessionReplayUploadCallback callback;
 
 
-    public SessionReplayUploader(SessionReplayContext context, BatchesToSegmentsMapper mapper,
-                                 InternalLogger internalLogger, PackageIdProxy packageIdProxy) {
-        this.requestUrl = context.getRequestUrl();
+    public SessionReplayUploader(BatchesToSegmentsMapper mapper,
+                                 InternalLogger internalLogger,
+                                 SessionReplayUploadCallback uploadCallback) {
         this.batchToSegmentsMapper = mapper;
         this.compressor = new BytesCompressor();
         this.internalLogger = internalLogger;
-        this.packageIdProxy = packageIdProxy;
-    }
-
-    public SessionReplayUploader(SessionReplayContext context, BatchesToSegmentsMapper mapper,
-                                 InternalLogger internalLogger) {
-        this(context, mapper, internalLogger, null);
+        this.callback = uploadCallback;
     }
 
 
@@ -104,39 +98,35 @@ public class SessionReplayUploader {
             }
         }
 
-        String pkgId = packageIdProxy == null ? null : packageIdProxy.getPackageId(recordsCount);
         byte[] segmentAsByteArray = jsonString.toString().getBytes();
         byte[] compressedData = compressor.compressBytes(segmentAsByteArray);
-        MsMultiPartFormData data = new MsMultiPartFormData(this.requestUrl,
-                "UTF-8",
-                context.getUserAgent(), pkgId);
-        data.addFilePart(KEY_SEGMENT, new ByteArrayInputStream(compressedData), viewId);
-        data.addFormField(KEY_START, start + "");
-        data.addFormField(KEY_END, end + "");
-        data.addFormField(KEY_RECORDS_COUNT, recordsCount + "");
-//
-        data.addFormField(KEY_INDEX_IN_VIEW, 0 + "");//fixme 目前在移动端无实际作用
-        data.addFormField(HAS_FULL_SNAPSHOT, hasFullSnapshot + "");
-        data.addFormField(KEY_SOURCE, "android");
-        data.addFormField(KEY_RAW_SEGMENT_SIZE, segmentAsByteArray.length + "");
 
-        data.addFormField(KEY_ENV, context.getEnv());
-        data.addFormField(KEY_SDK_VERSION, context.getSdkVersion());
-        data.addFormField(KEY_APP_ID, context.getAppId());
-        data.addFormField(KEY_SESSION_ID, sessionId);
-        data.addFormField(KEY_VIEW_ID, viewId);
-        data.addFormField(KEY_VERSION, context.getAppVersion());
+        HashMap<String, String> fieldMap = new HashMap<>();
+        fieldMap.put(KEY_START, start + "");
+        fieldMap.put(KEY_END, end + "");
+        fieldMap.put(KEY_RECORDS_COUNT, recordsCount + "");
+        fieldMap.put(KEY_INDEX_IN_VIEW, 0 + "");//fixme 目前在移动端无实际作用
+        fieldMap.put(HAS_FULL_SNAPSHOT, hasFullSnapshot + "");
+        fieldMap.put(KEY_SOURCE, "android");
+        fieldMap.put(KEY_RAW_SEGMENT_SIZE, segmentAsByteArray.length + "");
 
-        Bundle b = data.finish();
-        UploadResult result = new UploadResult(b.getInt("code"), b.getString("response"));
+        fieldMap.put(KEY_ENV, context.getEnv());
+        fieldMap.put(KEY_SDK_VERSION, context.getSdkVersion());
+        fieldMap.put(KEY_APP_ID, context.getAppId());
+        fieldMap.put(KEY_SESSION_ID, sessionId);
+        fieldMap.put(KEY_VIEW_ID, viewId);
+        fieldMap.put(KEY_VERSION, context.getAppVersion());
+        HashMap<String, Pair<String, byte[]>> fileFileMap = new HashMap<>();
+        fileFileMap.put(KEY_SEGMENT, new Pair<>(viewId, compressedData));
+
+        SessionReplayFormData formData = new SessionReplayFormData(fieldMap, fileFileMap);
+        UploadResult result = callback.onRequest(formData);
+
         if (result.isSuccess()) {
-            internalLogger.d(TAG, "Session Upload Success. " + pkgId + ",view_id:" + viewId
+            internalLogger.d(TAG, "Session Upload Success. " + result.getPkgId() + ",view_id:" + viewId
                     + ",count:" + recordsCount + ",hasFullSnapshot:" + hasFullSnapshot);
-            if (packageIdProxy != null) {
-                packageIdProxy.nextSeqId();
-            }
         } else {
-            internalLogger.e(TAG, "Session Upload Failed." + pkgId + ",view_id:" + viewId
+            internalLogger.e(TAG, "Session Upload Failed." + result.getPkgId() + ",view_id:" + viewId
                     + ",count:" + recordsCount + ",code:" + result.getCode() + ",response:" + result.getResponse());
         }
         return result;

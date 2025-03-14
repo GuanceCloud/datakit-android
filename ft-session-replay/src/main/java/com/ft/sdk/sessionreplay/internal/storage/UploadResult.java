@@ -8,8 +8,9 @@ public class UploadResult {
     private boolean success = false;
     private final String response;
     private final int code;
+    private final String pkgId;
 
-    public UploadResult(int code, String response) {
+    public UploadResult(int code, String response, String pkgId) {
         if (code == HttpURLConnection.HTTP_OK) {
             success = true;
 
@@ -21,6 +22,7 @@ public class UploadResult {
         }
         this.code = code;
         this.response = response;
+        this.pkgId = pkgId;
     }
 
     public boolean isNeedReTry() {
@@ -37,5 +39,9 @@ public class UploadResult {
 
     public int getCode() {
         return code;
+    }
+
+    public String getPkgId() {
+        return pkgId;
     }
 }

@@ -69,7 +69,7 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
     private final InternalLogger internalLogger;
     private final Handler uiHandler;
     private boolean shouldRecord = false;
-    private FeatureSdkCore sdkCore;
+    private final FeatureSdkCore sdkCore;
     private boolean isDelayInit;
 
     public SessionReplayRecorder(
