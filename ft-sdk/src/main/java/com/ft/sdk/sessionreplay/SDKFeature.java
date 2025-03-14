@@ -2,6 +2,7 @@ package com.ft.sdk.sessionreplay;
 
 import android.content.Context;
 import android.os.BatteryManager;
+import android.util.Pair;
 
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTRUMConfig;
@@ -9,20 +10,23 @@ import com.ft.sdk.FTRUMConfigManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.SyncTaskManager;
-import com.ft.sdk.api.PackageIdProxy;
+import com.ft.sdk.api.SessionReplayFormData;
+import com.ft.sdk.api.SessionReplayUploadCallback;
 import com.ft.sdk.api.context.SessionReplayContext;
 import com.ft.sdk.feature.DataConsumerCallback;
 import com.ft.sdk.feature.Feature;
 import com.ft.sdk.feature.FeatureContextUpdateReceiver;
 import com.ft.sdk.feature.FeatureEventReceiver;
 import com.ft.sdk.feature.FeatureScope;
+import com.ft.sdk.feature.FeatureSdkCore;
 import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.bean.BatteryBean;
+import com.ft.sdk.garble.http.FTResponseData;
 import com.ft.sdk.garble.http.HttpBuilder;
+import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.threadpool.ThreadPoolFactory;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.ID36Generator;
-import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.NetUtils;
 import com.ft.sdk.garble.utils.PackageIdGenerator;
 import com.ft.sdk.garble.utils.Utils;
@@ -46,12 +50,14 @@ import com.ft.sdk.sessionreplay.internal.storage.MetricsDispatcher;
 import com.ft.sdk.sessionreplay.internal.storage.NoOpStorage;
 import com.ft.sdk.sessionreplay.internal.storage.NoOpUploadScheduler;
 import com.ft.sdk.sessionreplay.internal.storage.RemovalReason;
+import com.ft.sdk.sessionreplay.internal.storage.UploadResult;
 import com.ft.sdk.sessionreplay.internal.storage.UploadScheduler;
 import com.ft.sdk.sessionreplay.utils.InternalLogger;
 import com.ft.sdk.storage.DataStoreHandler;
 import com.ft.sdk.storage.EventBatchWriter;
 
 import java.io.File;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -81,16 +87,25 @@ public class SDKFeature implements FeatureScope {
     private final BatteryPowerWatcher watcher = new BatteryPowerWatcher();
 
     private UploadScheduler uploadScheduler = new NoOpUploadScheduler();
+    private final FeatureSdkCore sdkCore;
 
-    public SDKFeature(Feature feature, InternalLogger internalLogger) {
+    public SDKFeature(FeatureSdkCore sdkCore, Feature feature, InternalLogger internalLogger) {
         this.wrappedFeature = feature;
         this.internalLogger = internalLogger;
+        this.sdkCore = sdkCore;
     }
 
     public void init(Context context, String instanceId) {
         if (initialized.get()) {
             return;
         }
+
+        //设置需要支持的版本
+        if (!VersionUtils.firstVerGreaterEqual(FTSdk.SESSION_REPLAY_VERSION, "0.1.0-alpha09")) {
+            internalLogger.e(TAG, "need install more than ft-session-replay:0.1.0-alpha09");
+            return;
+        }
+
 
         DataUploadConfiguration dataUploadConfiguration;
 
@@ -101,32 +116,20 @@ public class SDKFeature implements FeatureScope {
             dataUploadConfiguration = new DataUploadConfiguration(UploadFrequency.FREQUENT,
                     BatchProcessingLevel.MEDIUM.getMaxBatchesPerUploadJob());
 
-            String url = HttpBuilder.Builder()
-                    .setModel(SessionReplayConstants.URL_MODEL_SESSION_REPLAY).getUrlWithMsPrecision();
-
-            LogUtils.d(TAG, featureName + ":Session Replay Url:" + url);
-
             FTSDKConfig sdkConfig = FTSdk.get().getBaseConfig();
             FTRUMConfig rumConfig = FTRUMConfigManager.get().getConfig();
 
             String appId = rumConfig == null ? "" : rumConfig.getRumAppId();
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("env", sdkConfig.getEnv());
+            map.put("sdkVersion", FTSdk.AGENT_VERSION);
+            map.put("trackingConsent", TrackingConsent.GRANTED.toString());
+            map.put("appId", appId);
+            map.put("userAgent", FTHttpConfigManager.get().getUserAgent());
+            map.put("appVersion", Utils.getAppVersionName());
+            sdkContext = SessionReplayContext.createFromMap(map);
 
-            if (VersionUtils.firstVerGreaterEqual(FTSdk.SESSION_REPLAY_VERSION, "0.1.0-alpha08")) {
-                HashMap<String, Object> map = new HashMap<>();
-                map.put("requestUrl", url);
-                map.put("env", sdkConfig.getEnv());
-                map.put("sdkVersion", FTSdk.AGENT_VERSION);
-                map.put("trackingConsent", TrackingConsent.GRANTED.toString());
-                map.put("appId", appId);
-                map.put("userAgent", FTHttpConfigManager.get().getUserAgent());
-                map.put("appVersion", Utils.getAppVersionName());
-                sdkContext = SessionReplayContext.createFromMap(map);
-            } else {
-                sdkContext = new SessionReplayContext(url, sdkConfig.getEnv(),
-                        FTSdk.AGENT_VERSION, TrackingConsent.GRANTED, appId);
-            }
-
-            setupUploader(wrappedFeature, dataUploadConfiguration);
+            setupUploader(wrappedFeature, dataUploadConfiguration, sdkConfig);
         }
         wrappedFeature.onInitialize(context);
         initialized.set(true);
@@ -134,31 +137,44 @@ public class SDKFeature implements FeatureScope {
         watcher.register(context);
     }
 
-    private void setupUploader(Feature feature, DataUploadConfiguration configuration) {
+    private void setupUploader(Feature feature, DataUploadConfiguration configuration, FTSDKConfig config) {
         if (Utils.isMainProcess()) {
-            SessionReplayUploader uploader;
-            if (VersionUtils.firstVerGreaterEqual(FTSdk.SESSION_REPLAY_VERSION, "0.1.0-alpha07")) {
-                uploader = new SessionReplayUploader(sdkContext,
-                        new BatchesToSegmentsMapper(internalLogger), internalLogger, new PackageIdProxy() {
-                    @Override
-                    public String getPackageId(long count) {
-                        String pkgId = PackageIdGenerator.generatePackageId(srGenerator.getCurrentId()
-                                , SyncTaskManager.pid, (int) count);
-                        return String.format(Constants.SYNC_DATA_TRACE_HEADER_FORMAT, pkgId);
-                    }
-
-                    @Override
-                    public void nextSeqId() {
-                        srGenerator.next();
-                    }
-                });
-            } else {
-                uploader = new SessionReplayUploader(sdkContext,
-                        new BatchesToSegmentsMapper(internalLogger), internalLogger);
-            }
+            SessionReplayUploader uploader = new SessionReplayUploader(
+                    new BatchesToSegmentsMapper(internalLogger),
+                    internalLogger,
+                    new SessionReplayUploadCallback() {
+                        @Override
+                        public UploadResult onRequest(SessionReplayFormData provider) {
+                            String count = provider.getFields().get(SessionReplayUploader.KEY_RECORDS_COUNT);
+                            String pkgId = PackageIdGenerator.generatePackageId(srGenerator.getCurrentId()
+                                    , SyncTaskManager.pid, count);
+                            String traceHeader = String.format(Constants.SYNC_DATA_TRACE_HEADER_FORMAT, pkgId);
+                            HttpBuilder builder = HttpBuilder.Builder()
+                                    .setModel(SessionReplayConstants.URL_MODEL_SESSION_REPLAY)
+                                    .enableUrlWithMsPrecision();
+                            builder.setMethod(RequestMethod.POST)
+                                    .addHeadParam(Constants.SYNC_DATA_USER_AGENT_HEADER, builder.getHttpConfig().getUserAgentForSR())
+                                    .addHeadParam(Constants.SYNC_DATA_CONTENT_TYPE_HEADER, "multipart/form-data")
+                                    //不受 DeflateInterceptor 影响
+                                    .addHeadParam(Constants.SYNC_DATA_CONTENT_ENCODING_HEADER, "identity")
+                                    .addHeadParam(Constants.SYNC_DATA_TRACE_HEADER, traceHeader)
+                            ;
+                            for (Map.Entry<String, String> field : provider.getFields().entrySet()) {
+                                builder.addFormParam(field.getKey(), field.getValue());
+                            }
+                            for (Map.Entry<String, Pair<String, byte[]>> fileField : provider.getFileFields().entrySet()) {
+                                builder.addFileParam(fileField.getKey(), fileField.getValue());
+                            }
+                            FTResponseData data = builder.executeSync();
+                            if (data.getCode() == HttpURLConnection.HTTP_OK) {
+                                srGenerator.next();
+                            }
+                            return new UploadResult(data.getCode(), data.getErrorCode() + "," + data.getMessage(), pkgId);
+                        }
+                    });
 
             if (feature.getName().equals(Feature.SESSION_REPLAY_FEATURE_NAME)) {
-                uploadScheduler = new DataUploadScheduler(feature.getName(), internalLogger,
+                uploadScheduler = new DataUploadScheduler(sdkCore, feature.getName(), internalLogger,
                         configuration, storage, uploader, sdkContext,
                         new SystemInfoProxy() {
                             @Override

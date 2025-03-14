@@ -57,7 +57,7 @@ public class SessionReplayManager implements FeatureSdkCore {
 
     @Override
     public void registerFeature(Feature feature) {
-        SDKFeature scope = new SDKFeature(feature, getInternalLogger());
+        SDKFeature scope = new SDKFeature(this, feature, getInternalLogger());
         features.put(feature.getName(), scope);
         scope.init(context, null);
     }
