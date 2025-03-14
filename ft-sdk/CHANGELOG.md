@@ -1,6 +1,7 @@
 # agent 1.7.0-alpha014
 1. 更改 userAgent 展示规则
 2. 合并 ft-sdk 1.6.10-alpha02
+3. 将 Session Replay 同步请求整合进 ft-sdk
 
 ---
 # agent 1.7.0-alpha013
