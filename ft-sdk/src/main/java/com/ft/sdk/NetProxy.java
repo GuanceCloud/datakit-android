@@ -55,10 +55,7 @@ public class NetProxy {
             //请求地址为空是提示错误
             return new FTResponseData(NetCodeStatus.INVALID_PARAMS_EXCEPTION_CODE, "请求地址错误，检查地址 http(s) scheme");
         }
-        if (httpBuilder.isUseDefaultHead()) {
-            //设置特有的请求头
-            setHeadParams();
-        }
+        setHeadParams();
         engine.createRequest(httpBuilder);
         return engine.execute();
     }
@@ -81,10 +78,12 @@ public class NetProxy {
         if (head == null) {
             head = new HashMap<>();
         }
-        head.put("User-Agent", httpBuilder.getHttpConfig().getUserAgent());
         head.put("Accept-Language", "zh-CN");
-        if (!head.containsKey("Content-Type")) {
-            head.put("Content-Type", CONTENT_TYPE);
+        if (!head.containsKey(Constants.SYNC_DATA_USER_AGENT_HEADER)) {
+            head.put(Constants.SYNC_DATA_USER_AGENT_HEADER, httpBuilder.getHttpConfig().getUserAgent());
+        }
+        if (!head.containsKey(Constants.SYNC_DATA_CONTENT_TYPE_HEADER)) {
+            head.put(Constants.SYNC_DATA_CONTENT_TYPE_HEADER, CONTENT_TYPE);
         }
         head.put("charset", CHARSET);
         //添加日期请求头

@@ -1,6 +1,9 @@
 package com.ft.sdk.garble.http;
 
+import android.util.Pair;
+
 import com.ft.sdk.garble.compress.DeflateInterceptor;
+import com.ft.sdk.garble.utils.Constants;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
@@ -11,6 +14,8 @@ import java.util.concurrent.TimeUnit;
 import okhttp3.Authenticator;
 import okhttp3.Dns;
 import okhttp3.Headers;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -40,7 +45,7 @@ public class OkHttpEngine implements INetEngine {
             }
             if (httpBuilder.getHttpConfig().getDns() != null) {
                 builder.dns((Dns) httpBuilder.getHttpConfig().getDns());
-            }else{
+            } else {
                 builder.dns(new RotatingDnsResolver());
             }
             if (httpBuilder.getHttpConfig().getProxy() != null) {
@@ -64,8 +69,31 @@ public class OkHttpEngine implements INetEngine {
     @Override
     public void createRequest(HttpBuilder httpBuilder) {
         RequestBody requestBody = null;
+        HashMap<String, String> headers = httpBuilder.getHeadParams();
+        String contentType = headers.get(Constants.SYNC_DATA_CONTENT_TYPE_HEADER);
         if (httpBuilder.getMethod() == RequestMethod.POST) {
-            requestBody = RequestBody.create(null, httpBuilder.getBodyString());
+            if ("multipart/form-data".equalsIgnoreCase(contentType)) {
+                MultipartBody.Builder multipartBuilder = new MultipartBody.Builder()
+                        .setType(MultipartBody.FORM);
+
+                // 添加表单字段
+                HashMap<String, String> formFields = httpBuilder.getFormParams();
+                for (Map.Entry<String, String> field : formFields.entrySet()) {
+                    multipartBuilder.addFormDataPart(field.getKey(), field.getValue());
+                }
+
+                for (Map.Entry<String, Pair<String, byte[]>> fileFields : httpBuilder.getFileParams().entrySet()) {
+                    RequestBody fileBody = RequestBody.create(fileFields.getValue().second,
+                            MediaType.parse("application/octet-stream"));
+                    multipartBuilder.addFormDataPart(fileFields.getKey(), fileFields.getValue().first,
+                            fileBody);
+                }
+                // 添加文件部分
+                requestBody = multipartBuilder.build();
+            } else {
+                // 处理普通文本请求
+                requestBody = RequestBody.create(null, httpBuilder.getBodyString());
+            }
         }
         Headers.Builder builder = new Headers.Builder();
         HashMap<String, String> hashMap = httpBuilder.getHeadParams();
