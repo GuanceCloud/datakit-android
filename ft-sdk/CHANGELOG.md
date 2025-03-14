@@ -1,23 +1,23 @@
-# agent 1.7.0-alpha014
+# agent 1.7.0-alpha14
 1. 更改 userAgent 展示规则
 2. 合并 ft-sdk 1.6.10-alpha02
 3. 将 Session Replay 同步请求整合进 ft-sdk
 
 ---
-# agent 1.7.0-alpha013
+# agent 1.7.0-alpha13
 1. 增加 userAgent，appVersion 向 Session Replay 传递的参数
 
 ---
-# agent 1.7.0-alpha012
+# agent 1.7.0-alpha12
 1. 合并 ft-sdk 1.6.9
 2. X-Pkg-Id Session Replay 数据同步追踪适配
 
 ---
-# agent 1.7.0-alpha011
+# agent 1.7.0-alpha11
 1. 合并 ft-sdk 1.6.9-beta02
 
 ---
-# agent 1.7.0-alpha010
+# agent 1.7.0-alpha10
 1. 合并 ft-sdk 1.6.9-alpha01
 
 ---
