@@ -3,11 +3,13 @@ package com.ft.sdk.sessionreplay.internal.wrappers;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.util.DisplayMetrics;
+import android.util.Log;
 
 import com.ft.sdk.sessionreplay.utils.InternalLogger;
 
 public class BitmapWrapper {
 
+    private static final String TAG = "BitmapWrapper";
     private final InternalLogger logger;
 
     public BitmapWrapper(InternalLogger logger) {
@@ -16,11 +18,13 @@ public class BitmapWrapper {
 
     public Bitmap createBitmap(DisplayMetrics displayMetrics, int bitmapWidth, int bitmapHeight, Config config) {
         try {
-            return Bitmap.createBitmap(displayMetrics, bitmapWidth, bitmapHeight, config);
+            if (displayMetrics != null) {
+                return Bitmap.createBitmap(displayMetrics, bitmapWidth, bitmapHeight, config);
+            } else {
+                return Bitmap.createBitmap(bitmapWidth, bitmapHeight, config);
+            }
         } catch (IllegalArgumentException e) {
-            //fixme
-//            logger.log(InternalLogger.Level.ERROR, InternalLogger.Target.MAINTAINER,
-//                    BitmapWrapper.FAILED_TO_CREATE_BITMAP, e);
+            logger.e(TAG, FAILED_TO_CREATE_BITMAP + ":" + Log.getStackTraceString(e));
             return null;
         }
     }
@@ -29,9 +33,7 @@ public class BitmapWrapper {
         try {
             return Bitmap.createScaledBitmap(src, dstWidth, dstHeight, filter);
         } catch (IllegalArgumentException e) {
-            //fixme
-//            logger.log(InternalLogger.Level.ERROR, InternalLogger.Target.MAINTAINER,
-//                    BitmapWrapper.FAILED_TO_CREATE_SCALED_BITMAP, e);
+            logger.e(TAG, FAILED_TO_CREATE_SCALED_BITMAP + ":" + Log.getStackTraceString(e));
             return null;
         }
     }

@@ -1,6 +1,7 @@
 package com.ft;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
@@ -40,6 +41,13 @@ public class SessionReplayActivity extends NameTitleActivity {
             public void onClick(View v) {
                 CustomToast.showToast(SessionReplayActivity.this, "Toast:" + System.currentTimeMillis(), 1000);
 
+            }
+        });
+
+        findViewById(R.id.session_replay_privacy_override).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(SessionReplayActivity.this, SessionReplayPrivacyOverrideActivity.class));
             }
         });
 

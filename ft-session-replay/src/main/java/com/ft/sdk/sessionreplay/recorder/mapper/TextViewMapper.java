@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 import androidx.annotation.UiThread;
 
-import com.ft.sdk.sessionreplay.SessionReplayPrivacy;
+import com.ft.sdk.sessionreplay.TextAndInputPrivacy;
 import com.ft.sdk.sessionreplay.internal.recorder.obfuscator.StringObfuscator;
 import com.ft.sdk.sessionreplay.model.Alignment;
 import com.ft.sdk.sessionreplay.model.Horizontal;
@@ -68,24 +68,42 @@ public class TextViewMapper<T extends TextView> extends BaseAsyncBackgroundWiref
                 view,
                 mappingContext,
                 wireframes.size(),
+                null,
                 asyncJobStatusCallback
         ));
 
         return wireframes;
     }
 
-    protected String resolveCapturedText(T textView, SessionReplayPrivacy privacy, boolean isOption) {
-        String originalText = textView.getText() != null ? textView.getText().toString() : "";
-        switch (privacy) {
-            case ALLOW:
+    protected String resolveCapturedText(
+            T textView,
+            TextAndInputPrivacy textAndInputPrivacy,
+            boolean isOption) {
+
+        String originalText = resolveLayoutText(textView);
+
+        switch (textAndInputPrivacy) {
+            case MASK_SENSITIVE_INPUTS:
                 return originalText;
-            case MASK:
-                return isOption ? FIXED_INPUT_MASK : StringObfuscator.getStringObfuscator().obfuscate(originalText);
-            case MASK_USER_INPUT:
+
+            case MASK_ALL:
+                return isOption ? FIXED_INPUT_MASK
+                        : StringObfuscator.getStringObfuscator().obfuscate(originalText);
+
+            case MASK_ALL_INPUTS:
                 return isOption ? FIXED_INPUT_MASK : originalText;
+
             default:
-                return originalText;
+                throw new IllegalArgumentException("Unknown TextAndInputPrivacy: " + textAndInputPrivacy);
         }
+    }
+
+    private String resolveLayoutText(T textView) {
+        CharSequence text = (textView.getLayout() != null && textView.getLayout().getText() != null)
+                ? textView.getLayout().getText()
+                : textView.getText();
+
+        return text != null ? text.toString() : "";
     }
 
     private TextWireframe createTextWireframe(
@@ -93,7 +111,7 @@ public class TextViewMapper<T extends TextView> extends BaseAsyncBackgroundWiref
             MappingContext mappingContext,
             GlobalBounds viewGlobalBounds
     ) {
-        String capturedText = resolveCapturedText(textView, mappingContext.getPrivacy(), mappingContext.isHasOptionSelectorParent());
+        String capturedText = resolveCapturedText(textView, mappingContext.getTextAndInputPrivacy(), mappingContext.isHasOptionSelectorParent());
         return new TextWireframe(
                 resolveViewId(textView),
                 viewGlobalBounds.getX(),

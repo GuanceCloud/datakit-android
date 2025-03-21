@@ -6,7 +6,7 @@ import android.widget.SeekBar;
 
 import androidx.annotation.UiThread;
 
-import com.ft.sdk.sessionreplay.SessionReplayPrivacy;
+import com.ft.sdk.sessionreplay.TextAndInputPrivacy;
 import com.ft.sdk.sessionreplay.model.ShapeStyle;
 import com.ft.sdk.sessionreplay.model.ShapeWireframe;
 import com.ft.sdk.sessionreplay.model.Wireframe;
@@ -56,7 +56,7 @@ public class SeekBarWireframeMapper extends ProgressBarWireframeMapper<SeekBar> 
                 normalizedProgress
         );
 
-        if (mappingContext.getPrivacy() == SessionReplayPrivacy.ALLOW) {
+        if (mappingContext.getTextAndInputPrivacy() == TextAndInputPrivacy.MASK_SENSITIVE_INPUTS) {
             float screenDensity = mappingContext.getSystemInformation().getScreenDensity();
             long trackHeight = Utils.densityNormalized(ProgressBarWireframeMapper.TRACK_HEIGHT_IN_PX, screenDensity);
             Integer thumbColor = getColor(view.getThumbTintList(), view.getDrawableState());

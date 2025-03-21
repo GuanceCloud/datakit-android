@@ -7,7 +7,10 @@ import android.view.ViewTreeObserver;
 import androidx.annotation.MainThread;
 import androidx.annotation.UiThread;
 
+import com.ft.sdk.sessionreplay.ImagePrivacy;
 import com.ft.sdk.sessionreplay.SessionReplayPrivacy;
+import com.ft.sdk.sessionreplay.TextAndInputPrivacy;
+import com.ft.sdk.sessionreplay.internal.TouchPrivacyManager;
 import com.ft.sdk.sessionreplay.internal.async.RecordedDataQueueHandler;
 import com.ft.sdk.sessionreplay.internal.async.RecordedDataQueueRefs;
 import com.ft.sdk.sessionreplay.internal.async.SnapshotRecordedDataQueueItem;
@@ -26,7 +29,9 @@ public class WindowsOnDrawListener implements ViewTreeObserver.OnDrawListener {
     private final List<WeakReference<View>> weakReferencedDecorViews;
     private final RecordedDataQueueHandler recordedDataQueueHandler;
     private final SnapshotProducer snapshotProducer;
-    private final SessionReplayPrivacy privacy;
+    private final ImagePrivacy imagePrivacy;
+    private final TextAndInputPrivacy textAndInputPrivacy;
+    private final TouchPrivacyManager touchPrivacyManager;
     private final Debouncer debouncer;
     private final MiscUtils miscUtils;
     private final InternalLogger internalLogger;
@@ -36,11 +41,13 @@ public class WindowsOnDrawListener implements ViewTreeObserver.OnDrawListener {
             List<View> zOrderedDecorViews,
             RecordedDataQueueHandler recordedDataQueueHandler,
             SnapshotProducer snapshotProducer,
-            SessionReplayPrivacy privacy,
             Debouncer debouncer,
             MiscUtils miscUtils,
             InternalLogger internalLogger,
-            float methodCallSamplingRate
+            float methodCallSamplingRate,
+            ImagePrivacy imagePrivacy,
+            TextAndInputPrivacy textAndInputPrivacy,
+            TouchPrivacyManager touchPrivacyManager
     ) {
         this.weakReferencedDecorViews = new ArrayList<>();
         for (View decorView : zOrderedDecorViews) {
@@ -49,7 +56,9 @@ public class WindowsOnDrawListener implements ViewTreeObserver.OnDrawListener {
 
         this.recordedDataQueueHandler = recordedDataQueueHandler;
         this.snapshotProducer = snapshotProducer;
-        this.privacy = privacy;
+        this.imagePrivacy = imagePrivacy;
+        this.textAndInputPrivacy = textAndInputPrivacy;
+        this.touchPrivacyManager = touchPrivacyManager;
         this.debouncer = debouncer != null ? debouncer : new Debouncer();
         this.miscUtils = miscUtils != null ? miscUtils : new MiscUtils();
         this.internalLogger = internalLogger;
@@ -98,7 +107,8 @@ public class WindowsOnDrawListener implements ViewTreeObserver.OnDrawListener {
             List<Node> nodes = new ArrayList<>();
 
             for (View view : rootViews) {
-                Node node = snapshotProducer.produce(view, systemInformation, privacy, recordedDataQueueRefs);
+                Node node = snapshotProducer.produce(view, systemInformation,
+                        textAndInputPrivacy, imagePrivacy, recordedDataQueueRefs);
                 if (node != null) {
                     nodes.add(node);
                 }
@@ -114,6 +124,7 @@ public class WindowsOnDrawListener implements ViewTreeObserver.OnDrawListener {
             if (item.isReady()) {
                 recordedDataQueueHandler.tryToConsumeItems();
             }
+            touchPrivacyManager.updateCurrentTouchOverrideAreas();
         }
     };
 

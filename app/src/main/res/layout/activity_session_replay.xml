@@ -26,7 +26,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="替代 Toast (可采集)" />
-
+        <Button
+            android:id="@+id/session_replay_privacy_override"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="隐私设置覆盖" />
 
         <LinearLayout
             android:layout_width="match_parent"

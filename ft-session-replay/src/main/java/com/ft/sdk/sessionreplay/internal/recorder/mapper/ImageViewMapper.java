@@ -13,6 +13,7 @@ import com.ft.sdk.sessionreplay.model.Wireframe;
 import com.ft.sdk.sessionreplay.model.WireframeClip;
 import com.ft.sdk.sessionreplay.recorder.MappingContext;
 import com.ft.sdk.sessionreplay.recorder.mapper.BaseAsyncBackgroundWireframeMapper;
+import com.ft.sdk.sessionreplay.resources.DrawableCopier;
 import com.ft.sdk.sessionreplay.utils.AsyncJobStatusCallback;
 import com.ft.sdk.sessionreplay.utils.ColorStringFormatter;
 import com.ft.sdk.sessionreplay.utils.DrawableToColorMapper;
@@ -27,9 +28,11 @@ import java.util.List;
 public class ImageViewMapper extends BaseAsyncBackgroundWireframeMapper<ImageView> {
 
     private final ImageViewUtils imageViewUtils;
+    private final DrawableCopier drawableCopier;
 
     public ImageViewMapper(
             @NonNull ImageViewUtils imageViewUtils,
+            @NonNull DrawableCopier drawableCopier,
             @NonNull ViewIdentifierResolver viewIdentifierResolver,
             @NonNull ColorStringFormatter colorStringFormatter,
             @NonNull ViewBoundsResolver viewBoundsResolver,
@@ -37,6 +40,7 @@ public class ImageViewMapper extends BaseAsyncBackgroundWireframeMapper<ImageVie
     ) {
         super(viewIdentifierResolver, colorStringFormatter, viewBoundsResolver, drawableToColorMapper);
         this.imageViewUtils = imageViewUtils;
+        this.drawableCopier = drawableCopier;
     }
 
     @UiThread
@@ -74,8 +78,9 @@ public class ImageViewMapper extends BaseAsyncBackgroundWireframeMapper<ImageVie
 
         if (contentDrawable != null) {
             // Resolve foreground wireframe
-            Wireframe imageWireframe = mappingContext.getImageWireframeHelper().createImageWireframe(
+            Wireframe imageWireframe = mappingContext.getImageWireframeHelper().createImageWireframeByDrawable(
                     view,
+                    mappingContext.getImagePrivacy(),
                     wireframes.size(),
                     contentXPosInDp,
                     contentYPosInDp,
@@ -83,11 +88,15 @@ public class ImageViewMapper extends BaseAsyncBackgroundWireframeMapper<ImageVie
                     contentHeightPx,
                     true,
                     contentDrawable,
+                    drawableCopier,
                     asyncJobStatusCallback,
                     clipping,
                     null,
                     null,
-                    DRAWABLE_CHILD_NAME
+                    DRAWABLE_CHILD_NAME,
+                    null
+
+
             );
             if (imageWireframe != null) {
                 wireframes.add(imageWireframe);

@@ -1,4 +1,4 @@
-package com.ft.sdk.sessionreplay.resources;
+package com.ft.sdk.sessionreplay.internal.resources;
 
 import static com.ft.sdk.feature.Feature.SESSION_REPLAY_RESOURCES_FEATURE_NAME;
 

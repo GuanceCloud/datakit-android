@@ -8,7 +8,7 @@ import android.widget.NumberPicker;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.UiThread;
 
-import com.ft.sdk.sessionreplay.SessionReplayPrivacy;
+import com.ft.sdk.sessionreplay.TextAndInputPrivacy;
 import com.ft.sdk.sessionreplay.model.TextWireframe;
 import com.ft.sdk.sessionreplay.model.Wireframe;
 import com.ft.sdk.sessionreplay.recorder.MappingContext;
@@ -55,7 +55,7 @@ public class NumberPickerMapper extends BasePickerMapper {
             return map(
                     view,
                     mappingContext.getSystemInformation(),
-                    mappingContext.getPrivacy(),
+                    mappingContext.getTextAndInputPrivacy(),
                     prevIndexLabelId,
                     topDividerId,
                     selectedIndexLabelId,
@@ -71,7 +71,7 @@ public class NumberPickerMapper extends BasePickerMapper {
     private List<Wireframe> map(
             NumberPicker view,
             SystemInformation systemInformation,
-            SessionReplayPrivacy privacy,
+            TextAndInputPrivacy privacy,
             Long prevIndexLabelId,
             Long topDividerId,
             Long selectedIndexLabelId,
@@ -149,7 +149,7 @@ public class NumberPickerMapper extends BasePickerMapper {
                 nextPrevLabelTextColor
         );
 
-        if (privacy == SessionReplayPrivacy.ALLOW) {
+        if (privacy == TextAndInputPrivacy.MASK_SENSITIVE_INPUTS) {
             return List.of(
                     prevValueLabelWireframe,
                     topDividerWireframe,

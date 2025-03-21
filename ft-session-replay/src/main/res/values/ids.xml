@@ -1,3 +1,7 @@
 <resources>
     <item name="mask" type="id" />
+    <item name="ft_image_privacy" type="id" />
+    <item name="ft_text_and_input_privacy" type="id" />
+    <item name="ft_touch_privacy" type="id" />
+    <item name="ft_hidden" type="id" />
 </resources>

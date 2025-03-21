@@ -12,15 +12,17 @@ import com.ft.sdk.sessionreplay.internal.RecorderProvider;
 import com.ft.sdk.sessionreplay.internal.ResourcesFeature;
 import com.ft.sdk.sessionreplay.internal.SessionReplayRecordCallback;
 import com.ft.sdk.sessionreplay.internal.StorageBackedFeature;
+import com.ft.sdk.sessionreplay.internal.TouchPrivacyManager;
 import com.ft.sdk.sessionreplay.internal.recorder.NoOpRecorder;
 import com.ft.sdk.sessionreplay.internal.recorder.Recorder;
 import com.ft.sdk.sessionreplay.internal.storage.NoOpRecordWriter;
 import com.ft.sdk.sessionreplay.internal.storage.RecordWriter;
 import com.ft.sdk.sessionreplay.internal.storage.SessionReplayRecordWriter;
 import com.ft.sdk.sessionreplay.recorder.OptionSelectorDetector;
-import com.ft.sdk.sessionreplay.resources.ResourceDataStoreManager;
-import com.ft.sdk.sessionreplay.resources.ResourceHashesEntryDeserializer;
-import com.ft.sdk.sessionreplay.resources.ResourceHashesEntrySerializer;
+import com.ft.sdk.sessionreplay.internal.resources.ResourceDataStoreManager;
+import com.ft.sdk.sessionreplay.internal.resources.ResourceHashesEntryDeserializer;
+import com.ft.sdk.sessionreplay.internal.resources.ResourceHashesEntrySerializer;
+import com.ft.sdk.sessionreplay.utils.DrawableToColorMapper;
 
 import java.util.List;
 import java.util.Locale;
@@ -69,6 +71,9 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
     private final FeatureSdkCore sdkCore;
     private final String customEndpointUrl;
     private final SessionReplayPrivacy privacy;
+    private final TouchPrivacy touchPrivacy;
+    private final TextAndInputPrivacy textAndInputPrivacy;
+    private final ImagePrivacy imagePrivacy;
     private final Sampler rateBasedSampler;
     private final RecorderProvider recorderProvider;
 
@@ -84,22 +89,48 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
     // region Constructor
 
     public SessionReplayFeature(FeatureSdkCore sdkCore, String customEndpointUrl,
-                                SessionReplayPrivacy privacy, Sampler rateBasedSampler,
+                                SessionReplayPrivacy privacy,
+                                TextAndInputPrivacy textAndInputPrivacy,
+                                TouchPrivacy touchPrivacy,
+                                ImagePrivacy imagePrivacy,
+                                Sampler rateBasedSampler,
                                 RecorderProvider recorderProvider) {
         this.sdkCore = sdkCore;
         this.customEndpointUrl = customEndpointUrl;
         this.privacy = privacy;
+        this.textAndInputPrivacy = textAndInputPrivacy;
+        this.touchPrivacy = touchPrivacy;
+        this.imagePrivacy = imagePrivacy;
         this.rateBasedSampler = rateBasedSampler;
         this.recorderProvider = recorderProvider;
     }
 
     public SessionReplayFeature(FeatureSdkCore sdkCore, String customEndpointUrl,
-                                SessionReplayPrivacy privacy, List<MapperTypeWrapper<?>> customMappers,
+                                SessionReplayPrivacy privacy,
+                                TextAndInputPrivacy textAndInputPrivacy,
+                                TouchPrivacy touchPrivacy,
+                                TouchPrivacyManager touchPrivacyManager,
+                                ImagePrivacy imagePrivacy,
+                                List<MapperTypeWrapper<?>> customMappers,
                                 List<OptionSelectorDetector> customOptionSelectorDetectors,
-                                float sampleRate, boolean isDelayInit) {
-        this(sdkCore, customEndpointUrl, privacy,
+                                List<DrawableToColorMapper> customDrawableMappers,
+                                float sampleRate,
+                                boolean isDelayInit,
+                                boolean dynamicOptimizationEnabled) {
+        this(sdkCore, customEndpointUrl,
+                privacy,
+                textAndInputPrivacy,
+                touchPrivacy,
+                imagePrivacy,
                 new RateBasedSampler(sampleRate),
-                new DefaultRecorderProvider(sdkCore, privacy, customMappers, customOptionSelectorDetectors, isDelayInit));
+                new DefaultRecorderProvider(sdkCore,
+                        textAndInputPrivacy,
+                        imagePrivacy,
+                        touchPrivacyManager, customMappers,
+                        customOptionSelectorDetectors,
+                        customDrawableMappers,
+                        isDelayInit,
+                        dynamicOptimizationEnabled));
     }
 
 

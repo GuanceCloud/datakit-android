@@ -7,7 +7,9 @@ import android.view.ViewParent;
 import androidx.annotation.UiThread;
 
 import com.ft.sdk.sessionreplay.MapperTypeWrapper;
+import com.ft.sdk.sessionreplay.R;
 import com.ft.sdk.sessionreplay.internal.async.RecordedDataQueueRefs;
+import com.ft.sdk.sessionreplay.internal.recorder.mapper.HiddenViewMapper;
 import com.ft.sdk.sessionreplay.internal.recorder.mapper.QueueStatusCallback;
 import com.ft.sdk.sessionreplay.model.Wireframe;
 import com.ft.sdk.sessionreplay.recorder.MappingContext;
@@ -29,18 +31,23 @@ public class TreeViewTraversal {
     private final WireframeMapper<View> decorViewMapper;
     private final ViewUtilsInternal viewUtilsInternal;
     private final InternalLogger internalLogger;
+    private final HiddenViewMapper hiddenViewMapper;
+
 
     public TreeViewTraversal(
             List<MapperTypeWrapper<?>> mappers,
             WireframeMapper<View> defaultViewMapper,
             WireframeMapper<View> decorViewMapper,
             ViewUtilsInternal viewUtilsInternal,
-            InternalLogger internalLogger) {
+            HiddenViewMapper hiddenViewMapper,
+            InternalLogger internalLogger
+    ) {
         this.mappers = mappers;
         this.defaultViewMapper = defaultViewMapper;
         this.decorViewMapper = decorViewMapper;
         this.viewUtilsInternal = viewUtilsInternal;
         this.internalLogger = internalLogger;
+        this.hiddenViewMapper = hiddenViewMapper;
     }
 
     @SuppressWarnings("ReturnCount")
@@ -62,7 +69,11 @@ public class TreeViewTraversal {
         // try to resolve from the exhaustive type mappers
         WireframeMapper<View> mapper = findMapperForView(view);
 
-        if (mapper != null) {
+        if (isHidden(view)) {
+            traversalStrategy = TraversalStrategy.STOP_AND_RETURN_NODE;
+            mapper = hiddenViewMapper;
+            jobStatusCallback = noOpCallback;
+        } else if (mapper != null) {
             jobStatusCallback = new QueueStatusCallback(recordedDataQueueRefs);
             traversalStrategy = (mapper instanceof TraverseAllChildrenMapper)
                     ? TraversalStrategy.TRAVERSE_ALL_CHILDREN
@@ -101,6 +112,10 @@ public class TreeViewTraversal {
             }
         }
         return null;
+    }
+
+    private boolean isHidden(View view) {
+        return ((Boolean) true).equals(view.getTag(R.id.ft_hidden));
     }
 
     public static class TraversedTreeView {

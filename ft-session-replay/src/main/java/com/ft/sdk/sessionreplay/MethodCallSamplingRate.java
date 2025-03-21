@@ -1,7 +1,10 @@
 package com.ft.sdk.sessionreplay;
 
 public enum MethodCallSamplingRate {
-    DEFAULT(0.1f),
+    ALL(0.1f),
+    HIGH(10.0f),
+    MEDIUM(0.01f),
+    LOW(0.01f),
     REDUCED(0.01f),
     RARE(0.001f);
 

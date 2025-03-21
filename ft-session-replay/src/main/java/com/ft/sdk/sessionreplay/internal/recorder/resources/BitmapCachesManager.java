@@ -14,13 +14,14 @@ import kotlin.text.Charsets;
 public class BitmapCachesManager {
 
     private static final String TAG = "BitmapCachesManager";
-    private final Cache<Drawable, byte[]> resourcesLRUCache;
+    private final Cache<String, byte[]> resourcesLRUCache;
     private final BitmapPool bitmapPool;
     private final InternalLogger logger;
+
     private boolean isResourcesCacheRegisteredForCallbacks = false;
     private boolean isBitmapPoolRegisteredForCallbacks = false;
 
-    public BitmapCachesManager(Cache<Drawable, byte[]> resourcesLRUCache, BitmapPool bitmapPool, InternalLogger logger) {
+    public BitmapCachesManager(Cache<String, byte[]> resourcesLRUCache, BitmapPool bitmapPool, InternalLogger logger) {
         this.resourcesLRUCache = resourcesLRUCache;
         this.bitmapPool = bitmapPool;
         this.logger = logger;
@@ -34,7 +35,9 @@ public class BitmapCachesManager {
 
     @MainThread
     private void registerResourceLruCacheForCallbacks(Context applicationContext) {
-        if (isResourcesCacheRegisteredForCallbacks) return;
+        if (isResourcesCacheRegisteredForCallbacks) {
+            return;
+        }
 
         if (resourcesLRUCache instanceof ComponentCallbacks2) {
             applicationContext.registerComponentCallbacks((ComponentCallbacks2) resourcesLRUCache);
@@ -46,22 +49,28 @@ public class BitmapCachesManager {
 
     @MainThread
     private void registerBitmapPoolForCallbacks(Context applicationContext) {
-        if (isBitmapPoolRegisteredForCallbacks) return;
+        if (isBitmapPoolRegisteredForCallbacks) {
+            return;
+        }
 
         applicationContext.registerComponentCallbacks(bitmapPool);
         isBitmapPoolRegisteredForCallbacks = true;
     }
 
-    public void putInResourceCache(Drawable drawable, String resourceId) {
-        resourcesLRUCache.put(drawable, resourceId.getBytes(Charsets.UTF_8));
+    public void putInResourceCache(String key, String resourceId) {
+        resourcesLRUCache.put(key, resourceId.getBytes(java.nio.charset.StandardCharsets.UTF_8));
     }
 
-    public String getFromResourceCache(Drawable drawable) {
-        byte[] resourceId = resourcesLRUCache.get(drawable);
-        if (resourceId == null) {
-            return null;
+    public String getFromResourceCache(String key) {
+        byte[] resourceId = resourcesLRUCache.get(key);
+        return (resourceId != null) ? new String(resourceId, java.nio.charset.StandardCharsets.UTF_8) : null;
+    }
+
+    public String generateResourceKeyFromDrawable(Drawable drawable) {
+        if (resourcesLRUCache instanceof ResourcesLRUCache) {
+            return ((ResourcesLRUCache) resourcesLRUCache).generateKeyFromDrawable(drawable);
         }
-        return new String(resourceId, Charsets.UTF_8);
+        return null;
     }
 
     public void putInBitmapPool(Bitmap bitmap) {

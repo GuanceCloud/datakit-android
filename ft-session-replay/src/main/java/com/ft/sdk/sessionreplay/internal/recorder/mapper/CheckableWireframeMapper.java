@@ -5,7 +5,8 @@ import android.widget.Checkable;
 
 import androidx.annotation.UiThread;
 
-import com.ft.sdk.sessionreplay.SessionReplayPrivacy;
+import com.ft.sdk.sessionreplay.ImagePrivacy;
+import com.ft.sdk.sessionreplay.TextAndInputPrivacy;
 import com.ft.sdk.sessionreplay.model.Wireframe;
 import com.ft.sdk.sessionreplay.recorder.MappingContext;
 import com.ft.sdk.sessionreplay.recorder.mapper.BaseWireframeMapper;
@@ -36,15 +37,14 @@ public abstract class CheckableWireframeMapper<T extends View & Checkable> exten
             MappingContext mappingContext,
             AsyncJobStatusCallback asyncJobStatusCallback,
             InternalLogger internalLogger) {
-        List<Wireframe> mainWireframes = resolveMainWireframes(view, mappingContext, asyncJobStatusCallback, internalLogger);
-        List<Wireframe> checkableWireframes = null;
+        List<Wireframe> mainWireframes = resolveMainWireframes(
+                view, mappingContext, asyncJobStatusCallback, internalLogger);
 
-        if (mappingContext.getPrivacy() != SessionReplayPrivacy.ALLOW) {
+        List<Wireframe> checkableWireframes;
+        if (mappingContext.getTextAndInputPrivacy() != TextAndInputPrivacy.MASK_SENSITIVE_INPUTS) {
             checkableWireframes = resolveMaskedCheckable(view, mappingContext);
-        } else if (view.isChecked()) {
-            checkableWireframes = resolveCheckedCheckable(view, mappingContext);
         } else {
-            checkableWireframes = resolveNotCheckedCheckable(view, mappingContext);
+            checkableWireframes = resolveCheckable(view, mappingContext, asyncJobStatusCallback);
         }
 
         if (checkableWireframes != null) {
@@ -54,25 +54,33 @@ public abstract class CheckableWireframeMapper<T extends View & Checkable> exten
         return mainWireframes;
     }
 
+    protected ImagePrivacy mapInputPrivacyToImagePrivacy(TextAndInputPrivacy inputPrivacy) {
+        switch (inputPrivacy) {
+            case MASK_SENSITIVE_INPUTS:
+                return ImagePrivacy.MASK_NONE;
+            case MASK_ALL_INPUTS:
+            case MASK_ALL:
+                return ImagePrivacy.MASK_ALL;
+            default:
+                throw new IllegalArgumentException("Unknown TextAndInputPrivacy: " + inputPrivacy);
+        }
+    }
+
     @UiThread
-    public abstract List<Wireframe> resolveMainWireframes(
+    protected abstract List<Wireframe> resolveMainWireframes(
             T view,
             MappingContext mappingContext,
             AsyncJobStatusCallback asyncJobStatusCallback,
             InternalLogger internalLogger);
 
     @UiThread
-    public abstract List<Wireframe> resolveMaskedCheckable(
+    protected abstract List<Wireframe> resolveMaskedCheckable(
             T view,
             MappingContext mappingContext);
 
     @UiThread
-    public abstract List<Wireframe> resolveNotCheckedCheckable(
+    protected abstract List<Wireframe> resolveCheckable(
             T view,
-            MappingContext mappingContext);
-
-    @UiThread
-    public abstract List<Wireframe> resolveCheckedCheckable(
-            T view,
-            MappingContext mappingContext);
+            MappingContext mappingContext,
+            AsyncJobStatusCallback asyncJobStatusCallback);
 }
