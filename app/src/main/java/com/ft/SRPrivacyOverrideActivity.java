@@ -1,6 +1,7 @@
 package com.ft;
 
 import android.os.Bundle;
+import android.view.Menu;
 
 import androidx.annotation.Nullable;
 
@@ -14,11 +15,18 @@ public class SRPrivacyOverrideActivity extends SRActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_session_replay_privacy);
-//        PrivacyOverrideExtensions.setSessionReplayHidden(findViewById(R.id.session_replay_privacy_ll), true);
-        PrivacyOverrideExtensions.setSessionReplayImagePrivacy(findViewById(R.id.session_replay_privacy_ll), ImagePrivacy.MASK_ALL);
-        PrivacyOverrideExtensions.setSessionReplayTextAndInputPrivacy(findViewById(R.id.session_replay_privacy_ll), TextAndInputPrivacy.MASK_ALL);
-        PrivacyOverrideExtensions.setSessionReplayTouchPrivacy(findViewById(R.id.session_replay_privacy_ll), TouchPrivacy.HIDE);
+        PrivacyOverrideExtensions.setSessionReplayHidden(findViewById(R.id.session_replay_privacy_ll), true);
+        PrivacyOverrideExtensions.setSessionReplayImagePrivacy(findViewById(R.id.session_replay_privacy_ll),
+                ImagePrivacy.MASK_ALL);
+        PrivacyOverrideExtensions.setSessionReplayTextAndInputPrivacy(findViewById(R.id.session_replay_privacy_ll),
+                TextAndInputPrivacy.MASK_ALL);
+        PrivacyOverrideExtensions.setSessionReplayTouchPrivacy(findViewById(R.id.session_replay_privacy_ll),
+                TouchPrivacy.HIDE);
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return false;
     }
 }

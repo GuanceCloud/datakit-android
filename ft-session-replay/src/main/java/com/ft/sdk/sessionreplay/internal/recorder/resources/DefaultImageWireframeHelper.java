@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Path;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.InsetDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.util.DisplayMetrics;
@@ -30,6 +31,8 @@ import com.ft.sdk.sessionreplay.utils.ImageWireframeHelper;
 import com.ft.sdk.sessionreplay.utils.InternalLogger;
 import com.ft.sdk.sessionreplay.utils.Utils;
 import com.ft.sdk.sessionreplay.utils.ViewIdentifierResolver;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -207,17 +210,17 @@ public class DefaultImageWireframeHelper implements ImageWireframeHelper {
 
     @Override
     public Wireframe createImageWireframeByDrawable(
-            View view,
-            ImagePrivacy imagePrivacy,
+            @NotNull View view,
+            @NotNull ImagePrivacy imagePrivacy,
             int currentWireframeIndex,
             long x,
             long y,
             int width,
             int height,
             boolean usePIIPlaceholder,
-            Drawable drawable,
+            @NotNull Drawable drawable,
             DrawableCopier drawableCopier,
-            AsyncJobStatusCallback asyncJobStatusCallback,
+            @NotNull AsyncJobStatusCallback asyncJobStatusCallback,
             WireframeClip clipping,
             ShapeStyle shapeStyle,
             ShapeBorder border,
@@ -388,16 +391,22 @@ public class DefaultImageWireframeHelper implements ImageWireframeHelper {
         if (drawable instanceof LayerDrawable) {
             LayerDrawable layerDrawable = (LayerDrawable) drawable;
             if (layerDrawable.getNumberOfLayers() > 0) {
+                // Can't be out of bounds
                 return resolveDrawableProperties(view, layerDrawable.getDrawable(0), width, height);
+            } else {
+                return new DrawableProperties(drawable, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
             }
         } else if (drawable instanceof InsetDrawable) {
             InsetDrawable insetDrawable = (InsetDrawable) drawable;
             Drawable internalDrawable = insetDrawable.getDrawable();
             if (internalDrawable != null) {
                 return resolveDrawableProperties(view, internalDrawable, width, height);
+            } else {
+                return new DrawableProperties(drawable, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
             }
+        } else {
+            return new DrawableProperties(drawable, width, height);
         }
-        return new DrawableProperties(drawable, width, height);
     }
 
     private PlaceholderWireframe createContentPlaceholderWireframe(

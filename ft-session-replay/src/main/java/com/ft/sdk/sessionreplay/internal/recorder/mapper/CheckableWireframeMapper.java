@@ -43,9 +43,12 @@ public abstract class CheckableWireframeMapper<T extends View & Checkable> exten
         List<Wireframe> checkableWireframes;
         if (mappingContext.getTextAndInputPrivacy() != TextAndInputPrivacy.MASK_SENSITIVE_INPUTS) {
             checkableWireframes = resolveMaskedCheckable(view, mappingContext);
+        }else if (view.isChecked()) {
+            checkableWireframes = resolveCheckedCheckable(view, mappingContext);
         } else {
-            checkableWireframes = resolveCheckable(view, mappingContext, asyncJobStatusCallback);
+            checkableWireframes = resolveNotCheckedCheckable(view, mappingContext);
         }
+
 
         if (checkableWireframes != null) {
             mainWireframes.addAll(checkableWireframes);
@@ -83,4 +86,15 @@ public abstract class CheckableWireframeMapper<T extends View & Checkable> exten
             T view,
             MappingContext mappingContext,
             AsyncJobStatusCallback asyncJobStatusCallback);
+
+    @UiThread
+    public abstract List<Wireframe> resolveNotCheckedCheckable(
+            T view,
+            MappingContext mappingContext);
+
+    @UiThread
+    public abstract List<Wireframe> resolveCheckedCheckable(
+            T view,
+            MappingContext mappingContext);
+
 }

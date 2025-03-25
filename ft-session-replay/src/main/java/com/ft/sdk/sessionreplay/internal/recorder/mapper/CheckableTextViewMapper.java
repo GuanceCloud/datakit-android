@@ -66,6 +66,61 @@ public abstract class CheckableTextViewMapper<T extends TextView & Checkable> ex
 
     @UiThread
     @Override
+    public List<Wireframe> resolveCheckedCheckable(
+            T view,
+            MappingContext mappingContext) {
+        Long checkableId = viewIdentifierResolver.resolveChildUniqueIdentifier(view, CHECKABLE_KEY_NAME);
+        if (checkableId == null) {
+            return null;
+        }
+
+        String checkBoxColor = resolveCheckableColor(view);
+        GlobalBounds checkBoxBounds = resolveCheckableBounds(view, mappingContext.getSystemInformation().getScreenDensity());
+        ShapeStyle shapeStyle = resolveCheckedShapeStyle(view, checkBoxColor);
+        ShapeBorder shapeBorder = resolveCheckedShapeBorder(view, checkBoxColor);
+
+        return Collections.singletonList(new ShapeWireframe(
+                checkableId,
+                checkBoxBounds.getX(),
+                checkBoxBounds.getY(),
+                checkBoxBounds.getWidth(),
+                checkBoxBounds.getHeight(),
+                null,
+                shapeStyle,
+                shapeBorder
+        ));
+    }
+
+    @UiThread
+    @Override
+    public List<Wireframe> resolveNotCheckedCheckable(
+            T view,
+            MappingContext mappingContext) {
+        Long checkableId = viewIdentifierResolver.resolveChildUniqueIdentifier(view, CHECKABLE_KEY_NAME);
+        if (checkableId == null) {
+            return null;
+        }
+
+        String checkBoxColor = resolveCheckableColor(view);
+        GlobalBounds checkBoxBounds = resolveCheckableBounds(view, mappingContext.getSystemInformation().getScreenDensity());
+        ShapeBorder shapeBorder = resolveNotCheckedShapeBorder(view, checkBoxColor);
+        ShapeStyle shapeStyle = resolveNotCheckedShapeStyle(view, checkBoxColor);
+
+        return Collections.singletonList(new ShapeWireframe(
+                checkableId,
+                checkBoxBounds.getX(),
+                checkBoxBounds.getY(),
+                checkBoxBounds.getWidth(),
+                checkBoxBounds.getHeight(),
+                null,
+                shapeStyle,
+                shapeBorder
+        ));
+    }
+
+
+    @UiThread
+    @Override
     public List<Wireframe> resolveMaskedCheckable(T view, MappingContext mappingContext) {
         Long checkableId = viewIdentifierResolver.resolveChildUniqueIdentifier(view, CHECKABLE_KEY_NAME);
         if (checkableId == null) return null;
@@ -124,6 +179,17 @@ public abstract class CheckableTextViewMapper<T extends TextView & Checkable> ex
                 null
         );
     }
+
+    @UiThread
+    protected ShapeStyle resolveCheckedShapeStyle(T view, String checkBoxColor) {
+        return new ShapeStyle(checkBoxColor, view.getAlpha(), null);
+    }
+
+    @UiThread
+    protected ShapeBorder resolveCheckedShapeBorder(T view, String checkBoxColor) {
+        return new ShapeBorder(checkBoxColor, CHECKABLE_BORDER_WIDTH);
+    }
+
 
     public abstract Drawable cloneCheckableDrawable(T view, Drawable drawable);
 
