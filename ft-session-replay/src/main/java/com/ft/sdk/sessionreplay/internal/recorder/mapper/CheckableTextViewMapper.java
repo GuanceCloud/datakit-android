@@ -1,6 +1,7 @@
 package com.ft.sdk.sessionreplay.internal.recorder.mapper;
 
 import static com.ft.sdk.sessionreplay.ColorConstant.OPAQUE_ALPHA_VALUE;
+import static com.ft.sdk.sessionreplay.internal.recorder.mapper.ImageViewMapper.DRAWABLE_CHILD_NAME;
 
 import android.graphics.drawable.Drawable;
 import android.widget.Checkable;
@@ -175,7 +176,7 @@ public abstract class CheckableTextViewMapper<T extends TextView & Checkable> ex
                 new WireframeClip(null, null, null, null),
                 null,
                 null,
-                null,
+                DRAWABLE_CHILD_NAME,
                 null
         );
     }

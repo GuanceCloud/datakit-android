@@ -1,3 +1,8 @@
+# replay 0.1.1-alpha01
+1. 新增 ImagePrivacy，TouchPrivacy 设置
+2. 支持对单独页面隐私进行覆盖 ImagePrivacy 和 TouchPrivacy 的设置
+
+---
 # replay 0.1.0-alpha09
 1. userAgent 附加 Session Replay SDK 信息
 2. 支持依赖设置 Dns 和 Proxy，统一数据传入口依赖 ft-sdk 内部设置创建线程池与收发数据

@@ -8,6 +8,7 @@ import com.ft.sdk.sessionreplay.model.ShapeStyle;
 import com.ft.sdk.sessionreplay.recorder.mapper.TextViewMapper;
 import com.ft.sdk.sessionreplay.utils.ColorStringFormatter;
 import com.ft.sdk.sessionreplay.utils.DrawableToColorMapper;
+import com.ft.sdk.sessionreplay.utils.InternalLogger;
 import com.ft.sdk.sessionreplay.utils.ViewBoundsResolver;
 import com.ft.sdk.sessionreplay.utils.ViewIdentifierResolver;
 
@@ -20,9 +21,10 @@ public class RadioButtonMapper extends CheckableCompoundButtonMapper<RadioButton
             ViewIdentifierResolver viewIdentifierResolver,
             ColorStringFormatter colorStringFormatter,
             ViewBoundsResolver viewBoundsResolver,
-            DrawableToColorMapper drawableToColorMapper
+            DrawableToColorMapper drawableToColorMapper,
+            InternalLogger internalLogger
     ) {
-        super(textWireframeMapper, viewIdentifierResolver, colorStringFormatter, viewBoundsResolver, drawableToColorMapper);
+        super(textWireframeMapper, viewIdentifierResolver, colorStringFormatter, viewBoundsResolver, drawableToColorMapper, internalLogger);
     }
 
     @UiThread

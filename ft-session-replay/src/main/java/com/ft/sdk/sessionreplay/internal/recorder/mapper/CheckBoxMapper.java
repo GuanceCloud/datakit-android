@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import com.ft.sdk.sessionreplay.recorder.mapper.TextViewMapper;
 import com.ft.sdk.sessionreplay.utils.ColorStringFormatter;
 import com.ft.sdk.sessionreplay.utils.DrawableToColorMapper;
+import com.ft.sdk.sessionreplay.utils.InternalLogger;
 import com.ft.sdk.sessionreplay.utils.ViewBoundsResolver;
 import com.ft.sdk.sessionreplay.utils.ViewIdentifierResolver;
 
@@ -17,9 +18,11 @@ public class CheckBoxMapper extends CheckableCompoundButtonMapper<CheckBox> {
             @NonNull ViewIdentifierResolver viewIdentifierResolver,
             @NonNull ColorStringFormatter colorStringFormatter,
             @NonNull ViewBoundsResolver viewBoundsResolver,
-            @NonNull DrawableToColorMapper drawableToColorMapper
+            @NonNull DrawableToColorMapper drawableToColorMapper,
+            InternalLogger internalLogger
     ) {
-        super(textWireframeMapper, viewIdentifierResolver, colorStringFormatter, viewBoundsResolver, drawableToColorMapper);
+        super(textWireframeMapper, viewIdentifierResolver, colorStringFormatter, viewBoundsResolver,
+                drawableToColorMapper, internalLogger);
     }
 
     // Additional methods or overrides can be added here

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/session_replay_privacy_ll"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -22,6 +23,65 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="替代 Toast (可采集)" />
+
+<!--    <androidx.cardview.widget.CardView-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_margin="16dp"-->
+<!--        app:cardCornerRadius="8dp"-->
+<!--        app:cardElevation="4dp"-->
+<!--        app:cardUseCompatPadding="true">-->
+
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="vertical"-->
+<!--            android:padding="8dp">-->
+
+<!--            <TextView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="8dp"-->
+<!--                android:text="CardView"-->
+<!--                android:textSize="14sp"-->
+<!--                android:textStyle="bold" />-->
+
+
+<!--        </LinearLayout>-->
+
+
+<!--    </androidx.cardview.widget.CardView>-->
+
+<!--    <com.google.android.material.chip.ChipGroup-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_margin="16dp"-->
+<!--        app:selectionRequired="false"-->
+<!--        app:singleSelection="false">-->
+
+<!--        &lt;!&ndash; 基础 Chip &ndash;&gt;-->
+<!--        <com.google.android.material.chip.Chip-->
+<!--            style="@style/Widget.MaterialComponents.Chip.Entry"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="基础Chip" />-->
+
+<!--        &lt;!&ndash; 可选中 Chip &ndash;&gt;-->
+<!--        <com.google.android.material.chip.Chip-->
+<!--            style="@style/Widget.MaterialComponents.Chip.Filter"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="可选Chip"-->
+<!--            app:checkedIconVisible="true" />-->
+
+<!--        &lt;!&ndash; 带删除图标的 Chip &ndash;&gt;-->
+<!--        <com.google.android.material.chip.Chip-->
+<!--            style="@style/Widget.MaterialComponents.Chip.Entry"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="可删除Chip"-->
+<!--            app:closeIconVisible="true" />-->
+<!--    </com.google.android.material.chip.ChipGroup>-->
 
     <LinearLayout
         android:layout_width="match_parent"

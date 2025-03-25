@@ -165,7 +165,7 @@ public class DefaultRecorderProvider implements RecorderProvider {
                         viewIdentifierResolver,
                         colorStringFormatter,
                         viewBoundsResolver,
-                        drawableToColorMapper
+                        drawableToColorMapper, sdkCore.getInternalLogger()
                 )
         ));
         mappersList.add(new MapperTypeWrapper<>(CheckBox.class,
@@ -174,7 +174,7 @@ public class DefaultRecorderProvider implements RecorderProvider {
                         viewIdentifierResolver,
                         colorStringFormatter,
                         viewBoundsResolver,
-                        drawableToColorMapper
+                        drawableToColorMapper, sdkCore.getInternalLogger()
                 )
         ));
         mappersList.add(new MapperTypeWrapper<>(CheckedTextView.class,

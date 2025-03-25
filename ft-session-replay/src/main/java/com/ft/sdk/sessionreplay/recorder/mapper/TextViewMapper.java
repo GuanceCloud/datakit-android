@@ -106,7 +106,7 @@ public class TextViewMapper<T extends TextView> extends BaseAsyncBackgroundWiref
         return text != null ? text.toString() : "";
     }
 
-    private TextWireframe createTextWireframe(
+    protected TextWireframe createTextWireframe(
             T textView,
             MappingContext mappingContext,
             GlobalBounds viewGlobalBounds

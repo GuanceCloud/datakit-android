@@ -1,6 +1,7 @@
 package com.ft.sdk.sessionreplay.internal.recorder.mapper;
 
 import static com.ft.sdk.sessionreplay.ColorConstant.OPAQUE_ALPHA_VALUE;
+import static com.ft.sdk.sessionreplay.internal.recorder.mapper.ImageViewMapper.DRAWABLE_CHILD_NAME;
 
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -304,7 +305,7 @@ public class SwitchCompatMapper extends CheckableWireframeMapper<SwitchCompat> {
                 asyncJobStatusCallback,
                 null,
                 null,
-                null, null,
+                null, DRAWABLE_CHILD_NAME,
                 null
 
         );

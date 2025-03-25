@@ -1,10 +1,11 @@
 package com.ft.sdk.sessionreplay.internal.recorder.resources;
 
+import static com.ft.sdk.sessionreplay.internal.recorder.mapper.ImageViewMapper.DRAWABLE_CHILD_NAME;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Path;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.InsetDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.util.DisplayMetrics;
@@ -374,7 +375,8 @@ public class DefaultImageWireframeHelper implements ImageWireframeHelper {
                         asyncJobStatusCallback,
                         new WireframeClip(null, null, null, null),
                         null,
-                        null, null,
+                        null,
+                        DRAWABLE_CHILD_NAME,
                         resourceCacheKey
                 );
 

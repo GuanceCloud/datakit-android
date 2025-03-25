@@ -130,8 +130,8 @@ public abstract class BaseAsyncBackgroundWireframeMapper<T extends View> extends
                 new WireframeClip(null, null, null, null),
                 null,
                 null,
-                null,
-                PREFIX_BACKGROUND_DRAWABLE
+                PREFIX_BACKGROUND_DRAWABLE,
+                null
         );
     }
 }
