@@ -1,3 +1,7 @@
+# agent 1.7.0-alpha15
+1. 适配 replay_0.1.1-alpha01 更改内容
+
+---
 # agent 1.7.0-alpha14
 1. 更改 userAgent 展示规则
 2. 合并 ft-sdk 1.6.10-alpha02

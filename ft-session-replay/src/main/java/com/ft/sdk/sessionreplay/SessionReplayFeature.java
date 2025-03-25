@@ -91,6 +91,24 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
 
     // region Constructor
 
+    public SessionReplayFeature(FeatureSdkCore sdkCore, FTSessionReplayConfig config) {
+        this(sdkCore,
+                config.getCustomEndpointUrl(),
+                config.getPrivacy(),
+                config.getTextAndInputPrivacy(),
+                config.getTouchPrivacy(),
+                new TouchPrivacyManager(config.getTouchPrivacy()),
+                config.getImagePrivacy(),
+                config.getCustomMappers(),
+                config.getCustomOptionSelectorDetectors(),
+                config.getCustomDrawableMapper(),
+                config.getSampleRate(),
+                config.isDelayInit(),
+                config.isDynamicOptimizationEnabled(),
+                config.getInternalCallback());
+
+    }
+
     public SessionReplayFeature(FeatureSdkCore sdkCore, String customEndpointUrl,
                                 SessionReplayPrivacy privacy,
                                 TextAndInputPrivacy textAndInputPrivacy,

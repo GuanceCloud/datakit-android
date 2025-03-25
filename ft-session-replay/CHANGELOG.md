@@ -1,6 +1,6 @@
 # replay 0.1.1-alpha01
-1. 新增 ImagePrivacy，TouchPrivacy 设置
-2. 支持对单独页面隐私进行覆盖 ImagePrivacy 和 TouchPrivacy 的设置
+1. 新增 TextAndInputPrivacy，TouchPrivacy 设置
+2. 支持对单独页面隐私进行覆盖 TextAndInputPrivacy 和 TouchPrivacy 的设置
 
 ---
 # replay 0.1.0-alpha09

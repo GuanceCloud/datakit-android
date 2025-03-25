@@ -4,11 +4,13 @@ package com.ft.sdk;
 import android.content.Context;
 
 import com.ft.sdk.feature.FeatureSdkCore;
+import com.ft.sdk.garble.utils.VersionUtils;
+import com.ft.sdk.sessionreplay.BuildConfig;
 import com.ft.sdk.sessionreplay.FTSessionReplayConfig;
 import com.ft.sdk.sessionreplay.SessionReplayFeature;
-import com.ft.sdk.sessionreplay.internal.TouchPrivacyManager;
 
 public class SessionReplay {
+    private static final String TAG = "SessionReplay";
 
     /**
      * Enables a SessionReplay feature based on the configuration provided.
@@ -19,23 +21,14 @@ public class SessionReplay {
             FTSessionReplayConfig ftSessionReplayConfig, Context context
     ) {
         FeatureSdkCore featureSdkCore = SessionReplayManager.get();
+        if (!VersionUtils.firstVerGreaterEqual(BuildConfig.VERSION_NAME, "0.1.1-alpha01")) {
+            featureSdkCore.getInternalLogger().e(TAG, "need install more than ft-session-replay:0.1.1-alpha01");
+            return;
+        }
         featureSdkCore.init(context);
         SessionReplayFeature sessionReplayFeature = new SessionReplayFeature(
                 featureSdkCore,
-                ftSessionReplayConfig.getCustomEndpointUrl(),
-                ftSessionReplayConfig.getPrivacy(),
-                ftSessionReplayConfig.getTextAndInputPrivacy(),
-                ftSessionReplayConfig.getTouchPrivacy(),
-                new TouchPrivacyManager(ftSessionReplayConfig.getTouchPrivacy()),
-                ftSessionReplayConfig.getImagePrivacy(),
-                ftSessionReplayConfig.getCustomMappers(),
-                ftSessionReplayConfig.getCustomOptionSelectorDetectors(),
-                ftSessionReplayConfig.getCustomDrawableMapper(),
-                ftSessionReplayConfig.getSampleRate(),
-                ftSessionReplayConfig.isDelayInit(),
-                ftSessionReplayConfig.isDynamicOptimizationEnabled(),
-                ftSessionReplayConfig.getInternalCallback()
-
+                ftSessionReplayConfig
         );
 
         featureSdkCore.registerFeature(sessionReplayFeature);
