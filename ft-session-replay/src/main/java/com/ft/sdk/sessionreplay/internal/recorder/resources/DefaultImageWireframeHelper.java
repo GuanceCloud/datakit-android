@@ -25,6 +25,7 @@ import com.ft.sdk.sessionreplay.model.ShapeStyle;
 import com.ft.sdk.sessionreplay.model.Wireframe;
 import com.ft.sdk.sessionreplay.model.WireframeClip;
 import com.ft.sdk.sessionreplay.recorder.MappingContext;
+import com.ft.sdk.sessionreplay.resources.DefaultDrawableCopier;
 import com.ft.sdk.sessionreplay.resources.DrawableCopier;
 import com.ft.sdk.sessionreplay.utils.AsyncJobStatusCallback;
 import com.ft.sdk.sessionreplay.utils.GlobalBounds;
@@ -371,7 +372,7 @@ public class DefaultImageWireframeHelper implements ImageWireframeHelper {
                         drawable.getIntrinsicHeight(),
                         true,
                         drawable,
-                        null,
+                        new DefaultDrawableCopier(),
                         asyncJobStatusCallback,
                         new WireframeClip(null, null, null, null),
                         null,
