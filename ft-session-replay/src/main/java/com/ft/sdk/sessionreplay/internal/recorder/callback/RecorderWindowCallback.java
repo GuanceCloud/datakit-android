@@ -1,6 +1,7 @@
 package com.ft.sdk.sessionreplay.internal.recorder.callback;
 
 import android.content.Context;
+import android.graphics.Point;
 import android.os.Build;
 import android.view.ActionMode;
 import android.view.KeyEvent;
@@ -18,7 +19,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
-import com.ft.sdk.sessionreplay.SessionReplayPrivacy;
+import com.ft.sdk.sessionreplay.ImagePrivacy;
+import com.ft.sdk.sessionreplay.TextAndInputPrivacy;
+import com.ft.sdk.sessionreplay.internal.TouchPrivacyManager;
 import com.ft.sdk.sessionreplay.internal.async.RecordedDataQueueHandler;
 import com.ft.sdk.sessionreplay.internal.async.TouchEventRecordedDataQueueItem;
 import com.ft.sdk.sessionreplay.internal.recorder.ViewOnDrawInterceptor;
@@ -39,23 +42,23 @@ import java.util.concurrent.TimeUnit;
 public class RecorderWindowCallback implements Window.Callback {
 
     private static final String TAG = "RecorderWindowCallback";
-    private final Context appContext;
     private final RecordedDataQueueHandler recordedDataQueueHandler;
     private final Window.Callback wrappedCallback;
     private final TimeProvider timeProvider;
     private final ViewOnDrawInterceptor viewOnDrawInterceptor;
     private final InternalLogger internalLogger;
-    private final SessionReplayPrivacy privacy;
-    //    private final MotionEventUtils motionEventUtils;
+    private final TextAndInputPrivacy privacy;
+    private final ImagePrivacy imagePrivacy;
+    private final TouchPrivacyManager touchPrivacyManager;
     private final long motionUpdateThresholdInNs;
     private final long flushPositionBufferThresholdInNs;
-//    private final WindowInspector windowInspector;
 
     private final float pixelsDensity;
     private final List<MobileRecord> pointerInteractions = new LinkedList<>();
     private long lastOnMoveUpdateTimeInNs = 0L;
     private long lastPerformedFlushTimeInNs = System.nanoTime();
     private final WindowInspector windowInspector;
+    private boolean shouldRecordMotion = false;
 
     public RecorderWindowCallback(
             Context appContext,
@@ -64,18 +67,21 @@ public class RecorderWindowCallback implements Window.Callback {
             TimeProvider timeProvider,
             ViewOnDrawInterceptor viewOnDrawInterceptor,
             InternalLogger internalLogger,
-            SessionReplayPrivacy privacy,
+            TextAndInputPrivacy privacy,
+            ImagePrivacy imagePrivacy,
+            TouchPrivacyManager touchPrivacyManager,
             long motionUpdateThresholdInNs,
             long flushPositionBufferThresholdInNs,
             WindowInspector windowInspector
     ) {
-        this.appContext = appContext;
         this.recordedDataQueueHandler = recordedDataQueueHandler;
         this.wrappedCallback = wrappedCallback;
         this.timeProvider = timeProvider;
         this.viewOnDrawInterceptor = viewOnDrawInterceptor;
         this.internalLogger = internalLogger;
         this.privacy = privacy;
+        this.imagePrivacy = imagePrivacy;
+        this.touchPrivacyManager = touchPrivacyManager;
         this.motionUpdateThresholdInNs = motionUpdateThresholdInNs;
         this.flushPositionBufferThresholdInNs = flushPositionBufferThresholdInNs;
         this.pixelsDensity = appContext.getResources().getDisplayMetrics().density;
@@ -96,12 +102,19 @@ public class RecorderWindowCallback implements Window.Callback {
     @MainThread
     public boolean dispatchTouchEvent(MotionEvent event) {
         if (event != null) {
-            // Copy the event and delegate it to the gesture detector for analysis
-            MotionEvent copy = MotionEvent.obtain(event);
-            try {
-                handleEvent(copy);
-            } finally {
-                copy.recycle();
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                Point touchLocation = new Point((int) event.getX(), (int) event.getY());
+                shouldRecordMotion = touchPrivacyManager.shouldRecordTouch(touchLocation);
+            }
+
+            if (shouldRecordMotion) {
+                // Copy the event and delegate it to the gesture detector for analysis
+                MotionEvent copy = MotionEvent.obtain(event);
+                try {
+                    handleEvent(copy);
+                } finally {
+                    copy.recycle();
+                }
             }
         } else {
             internalLogger.e(TAG, MOTION_EVENT_WAS_NULL_ERROR_MESSAGE);
@@ -249,7 +262,7 @@ public class RecorderWindowCallback implements Window.Callback {
             // A new window was added or removed, so we stop recording the previous root views
             // and start recording the new ones.
             viewOnDrawInterceptor.stopIntercepting();
-            viewOnDrawInterceptor.intercept(rootViews, privacy);
+            viewOnDrawInterceptor.intercept(rootViews, privacy, imagePrivacy);
         }
     }
 

@@ -27,16 +27,6 @@ public class RadioButtonMapper extends CheckableCompoundButtonMapper<RadioButton
 
     @UiThread
     @Override
-    public ShapeStyle resolveCheckedShapeStyle(RadioButton view, String checkBoxColor) {
-        return new ShapeStyle(
-                checkBoxColor,
-                view.getAlpha(),
-                CORNER_RADIUS
-        );
-    }
-
-    @UiThread
-    @Override
     public ShapeStyle resolveNotCheckedShapeStyle(RadioButton view, String checkBoxColor) {
         return new ShapeStyle(
                 null,

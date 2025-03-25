@@ -1,14 +1,11 @@
 package com.ft.sdk.sessionreplay.utils;
 
-import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
-import android.util.Pair;
 
 import androidx.annotation.WorkerThread;
 
@@ -28,8 +25,11 @@ public class DrawableUtils {
     private final BitmapWrapper bitmapWrapper;
     private final CanvasWrapper canvasWrapper;
 
-    public DrawableUtils(InternalLogger internalLogger, BitmapCachesManager bitmapCachesManager,
-                         ExecutorService executorService) {
+    public DrawableUtils(
+            InternalLogger internalLogger,
+            BitmapCachesManager bitmapCachesManager,
+            ExecutorService executorService
+    ) {
         this.internalLogger = internalLogger;
         this.bitmapCachesManager = bitmapCachesManager;
         this.executorService = executorService;
@@ -37,39 +37,51 @@ public class DrawableUtils {
         this.canvasWrapper = new CanvasWrapper(internalLogger);
     }
 
+    /**
+     * This method attempts to create a bitmap from a drawable, such that the bitmap file size will
+     * be equal or less than a given size. It does so by modifying the dimensions of the
+     * bitmap, since the file size of a bitmap can be known by the formula width * height * color depth.
+     */
     @WorkerThread
-    public void createBitmapOfApproxSizeFromDrawable(Resources resources, Drawable drawable,
-                                                     int drawableWidth, int drawableHeight,
-                                                     DisplayMetrics displayMetrics,
-                                                     int requestedSizeInBytes, Config config,
-                                                     ResourceResolver.BitmapCreationCallback bitmapCreationCallback) {
-        createScaledBitmap(drawableWidth, drawableHeight, requestedSizeInBytes, displayMetrics, config,
+    public void createBitmapOfApproxSizeFromDrawable(
+            Drawable drawable,
+            int drawableWidth,
+            int drawableHeight,
+            DisplayMetrics displayMetrics,
+            int requestedSizeInBytes,
+            Bitmap.Config config,
+            ResourceResolver.BitmapCreationCallback bitmapCreationCallback
+    ) {
+        createScaledBitmap(
+                drawableWidth,
+                drawableHeight,
+                requestedSizeInBytes,
+                displayMetrics,
+                config,
                 new ResizeBitmapCallback() {
                     @Override
+                    @WorkerThread
                     public void onSuccess(Bitmap bitmap) {
-                        executorService.submit(new Runnable() {
-                            @Override
-                            public void run() {
-                                drawOnCanvas(resources, bitmap, drawable, bitmapCreationCallback);
-                            }
-                        });
+                        executorService.submit(() -> drawOnCanvas(bitmap, drawable, bitmapCreationCallback));
                     }
 
                     @Override
+                    @WorkerThread
                     public void onFailure() {
                         internalLogger.e(TAG, FAILED_TO_CREATE_SCALED_BITMAP_ERROR);
                         bitmapCreationCallback.onFailure();
                     }
-                });
+                }
+        );
     }
 
     @WorkerThread
     public Bitmap createScaledBitmap(Bitmap bitmap, int requestedSizeInBytes) {
-        Pair<Integer, Integer> scaledDimensions = getScaledWidthAndHeight(bitmap.getWidth(), bitmap.getHeight(), requestedSizeInBytes);
-        return bitmapWrapper.createScaledBitmap(bitmap, scaledDimensions.first, scaledDimensions.second, false);
+        int[] widthHeight = getScaledWidthAndHeight(bitmap.getWidth(), bitmap.getHeight(), requestedSizeInBytes);
+        return bitmapWrapper.createScaledBitmap(bitmap, widthHeight[0], widthHeight[1], false);
     }
 
-    private interface ResizeBitmapCallback {
+    public interface ResizeBitmapCallback {
         @WorkerThread
         void onSuccess(Bitmap bitmap);
 
@@ -78,27 +90,34 @@ public class DrawableUtils {
     }
 
     @WorkerThread
-    private void drawOnCanvas(Resources resources, Bitmap bitmap, Drawable drawable,
-                              ResourceResolver.BitmapCreationCallback bitmapCreationCallback) {
-        Drawable newDrawable = drawable.getConstantState().newDrawable(resources);
+    private void drawOnCanvas(Bitmap bitmap, Drawable drawable, ResourceResolver.BitmapCreationCallback bitmapCreationCallback) {
         Canvas canvas = canvasWrapper.createCanvas(bitmap);
 
-        if (canvas == null || newDrawable == null) {
+        if (canvas == null) {
             bitmapCreationCallback.onFailure();
         } else {
+            // Erase the canvas
+            // Needed because overdrawing an already used bitmap causes unusual visual artifacts
             canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.MULTIPLY);
-            newDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-            newDrawable.draw(canvas);
+
+            drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+            drawable.draw(canvas);
             bitmapCreationCallback.onReady(bitmap);
         }
     }
 
     @WorkerThread
-    private void createScaledBitmap(int drawableWidth, int drawableHeight, int requestedSizeInBytes,
-                                    DisplayMetrics displayMetrics, Config config,
-                                    ResizeBitmapCallback resizeBitmapCallback) {
-        Pair<Integer, Integer> scaledDimensions = getScaledWidthAndHeight(drawableWidth, drawableHeight, requestedSizeInBytes);
-        Bitmap result = getBitmapBySize(displayMetrics, scaledDimensions.first, scaledDimensions.second, config);
+    private void createScaledBitmap(
+            int drawableWidth,
+            int drawableHeight,
+            int requestedSizeInBytes,
+            DisplayMetrics displayMetrics,
+            Bitmap.Config config,
+            ResizeBitmapCallback resizeBitmapCallback
+    ) {
+        int[] widthHeight = getScaledWidthAndHeight(drawableWidth, drawableHeight, requestedSizeInBytes);
+        Bitmap result = getBitmapBySize(displayMetrics, widthHeight[0], widthHeight[1], config);
+
         if (result == null) {
             resizeBitmapCallback.onFailure();
         } else {
@@ -106,41 +125,36 @@ public class DrawableUtils {
         }
     }
 
-    private Pair<Integer, Integer> getScaledWidthAndHeight(int drawableWidth, int drawableHeight,
-                                                           int requestedSizeInBytes) {
+    private int[] getScaledWidthAndHeight(int drawableWidth, int drawableHeight, int requestedSizeInBytes) {
         int width = drawableWidth;
         int height = drawableHeight;
         int sizeAfterCreation = width * height * ARGB_8888_PIXEL_SIZE_BYTES;
 
         if (sizeAfterCreation > requestedSizeInBytes) {
-            double bitmapRatio = (double) width / (double) height;
-            double totalMaxPixels = (double) (requestedSizeInBytes / ARGB_8888_PIXEL_SIZE_BYTES);
+            double bitmapRatio = (double) width / height;
+            double totalMaxPixels = (double) requestedSizeInBytes / ARGB_8888_PIXEL_SIZE_BYTES;
             int maxSize = (int) Math.sqrt(totalMaxPixels);
-
             width = maxSize;
             height = maxSize;
 
-            if (bitmapRatio > 1) {
+            if (bitmapRatio > 1) { // width > height
                 height = (int) (maxSize / bitmapRatio);
             } else {
                 width = (int) (maxSize * bitmapRatio);
             }
         }
 
-        return new Pair<>(width, height);
+        return new int[]{width, height};
     }
 
-    @WorkerThread
-    private Bitmap getBitmapBySize(DisplayMetrics displayMetrics, int width, int height, Config config) {
-        Bitmap bitmap = bitmapCachesManager.getBitmapByProperties(width, height, config);
-        if (bitmap != null) {
-            return bitmap;
-        }
-        return bitmapWrapper.createBitmap(displayMetrics, width, height, config);
+    private Bitmap getBitmapBySize(DisplayMetrics displayMetrics, int width, int height, Bitmap.Config config) {
+        Bitmap cachedBitmap = bitmapCachesManager.getBitmapByProperties(width, height, config);
+        return cachedBitmap != null
+                ? cachedBitmap
+                : bitmapWrapper.createBitmap(displayMetrics, width, height, config);
     }
 
-    public static final int MAX_BITMAP_SIZE_BYTES_WITH_RESOURCE_ENDPOINT = 10 * 1024 * 1024; // 10mb
+    public static final int MAX_BITMAP_SIZE_BYTES_WITH_RESOURCE_ENDPOINT = 10 * 1024 * 1024; // 10MB
     private static final int ARGB_8888_PIXEL_SIZE_BYTES = 4;
-    public static final String FAILED_TO_CREATE_SCALED_BITMAP_ERROR =
-            "Failed to create a scaled bitmap from the drawable";
+    private static final String FAILED_TO_CREATE_SCALED_BITMAP_ERROR = "Failed to create a scaled bitmap from the drawable";
 }

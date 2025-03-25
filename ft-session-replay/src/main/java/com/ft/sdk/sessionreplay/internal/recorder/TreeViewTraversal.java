@@ -1,5 +1,7 @@
 package com.ft.sdk.sessionreplay.internal.recorder;
 
+import android.graphics.Rect;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -7,7 +9,10 @@ import android.view.ViewParent;
 import androidx.annotation.UiThread;
 
 import com.ft.sdk.sessionreplay.MapperTypeWrapper;
+import com.ft.sdk.sessionreplay.R;
+import com.ft.sdk.sessionreplay.TouchPrivacy;
 import com.ft.sdk.sessionreplay.internal.async.RecordedDataQueueRefs;
+import com.ft.sdk.sessionreplay.internal.recorder.mapper.HiddenViewMapper;
 import com.ft.sdk.sessionreplay.internal.recorder.mapper.QueueStatusCallback;
 import com.ft.sdk.sessionreplay.model.Wireframe;
 import com.ft.sdk.sessionreplay.recorder.MappingContext;
@@ -29,18 +34,23 @@ public class TreeViewTraversal {
     private final WireframeMapper<View> decorViewMapper;
     private final ViewUtilsInternal viewUtilsInternal;
     private final InternalLogger internalLogger;
+    private final HiddenViewMapper hiddenViewMapper;
+
 
     public TreeViewTraversal(
             List<MapperTypeWrapper<?>> mappers,
             WireframeMapper<View> defaultViewMapper,
             WireframeMapper<View> decorViewMapper,
             ViewUtilsInternal viewUtilsInternal,
-            InternalLogger internalLogger) {
+            HiddenViewMapper hiddenViewMapper,
+            InternalLogger internalLogger
+    ) {
         this.mappers = mappers;
         this.defaultViewMapper = defaultViewMapper;
         this.decorViewMapper = decorViewMapper;
         this.viewUtilsInternal = viewUtilsInternal;
         this.internalLogger = internalLogger;
+        this.hiddenViewMapper = hiddenViewMapper;
     }
 
     @SuppressWarnings("ReturnCount")
@@ -61,8 +71,13 @@ public class TreeViewTraversal {
 
         // try to resolve from the exhaustive type mappers
         WireframeMapper<View> mapper = findMapperForView(view);
+        updateTouchOverrideAreas(view, mappingContext);
 
-        if (mapper != null) {
+        if (isHidden(view)) {
+            traversalStrategy = TraversalStrategy.STOP_AND_RETURN_NODE;
+            mapper = hiddenViewMapper;
+            jobStatusCallback = noOpCallback;
+        } else if (mapper != null) {
             jobStatusCallback = new QueueStatusCallback(recordedDataQueueRefs);
             traversalStrategy = (mapper instanceof TraverseAllChildrenMapper)
                     ? TraversalStrategy.TRAVERSE_ALL_CHILDREN
@@ -102,6 +117,38 @@ public class TreeViewTraversal {
         }
         return null;
     }
+
+    private boolean isHidden(View view) {
+        return ((Boolean) true).equals(view.getTag(R.id.ft_hidden));
+    }
+
+    @UiThread
+    private void updateTouchOverrideAreas(View view, MappingContext mappingContext) {
+        Object touchPrivacy = view.getTag(R.id.ft_touch_privacy);
+
+        if (touchPrivacy != null) {
+            int[] locationOnScreen = new int[2];
+            view.getLocationOnScreen(locationOnScreen);
+            int x = locationOnScreen[0];
+            int y = locationOnScreen[1];
+            Rect viewArea = new Rect(
+                    x - view.getPaddingLeft(),
+                    y - view.getPaddingTop(),
+                    x + view.getWidth() + view.getPaddingRight(),
+                    y + view.getHeight() + view.getPaddingBottom()
+            );
+
+            try {
+                TouchPrivacy privacyLevel = TouchPrivacy.valueOf(touchPrivacy.toString().toUpperCase());
+                mappingContext.getTouchPrivacyManager().addTouchOverrideArea(viewArea, privacyLevel);
+            } catch (IllegalArgumentException e) {
+                internalLogger.e(TAG,
+                        "INVALID_PRIVACY_LEVEL_ERROR:" + Log.getStackTraceString(e)
+                );
+            }
+        }
+    }
+
 
     public static class TraversedTreeView {
         private final List<Wireframe> mappedWireframes;

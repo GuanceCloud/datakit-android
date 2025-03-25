@@ -5,6 +5,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.ft.sdk.sessionreplay.SessionReplayPrivacy;
+import com.ft.sdk.sessionreplay.TextAndInputPrivacy;
 import com.ft.sdk.sessionreplay.internal.recorder.obfuscator.StringObfuscator;
 import com.ft.sdk.sessionreplay.utils.ColorStringFormatter;
 import com.ft.sdk.sessionreplay.utils.DrawableToColorMapper;
@@ -12,21 +13,10 @@ import com.ft.sdk.sessionreplay.utils.ViewBoundsResolver;
 import com.ft.sdk.sessionreplay.utils.ViewIdentifierResolver;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class EditTextMapper extends TextViewMapper<EditText> {
-
-    private static final int[] SENSITIVE_TEXT_VARIATIONS = {
-            InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
-            InputType.TYPE_TEXT_VARIATION_POSTAL_ADDRESS,
-            InputType.TYPE_TEXT_VARIATION_PASSWORD,
-            InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD,
-            InputType.TYPE_TEXT_VARIATION_WEB_EMAIL_ADDRESS,
-            InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD
-    };
-
-    private static final int[] SENSITIVE_NUMBER_VARIATIONS = {
-            InputType.TYPE_NUMBER_VARIATION_PASSWORD
-    };
 
     public EditTextMapper(
             ViewIdentifierResolver viewIdentifierResolver,
@@ -38,45 +28,56 @@ public class EditTextMapper extends TextViewMapper<EditText> {
     }
 
     @Override
-    public String resolveCapturedText(EditText editText, SessionReplayPrivacy privacy, boolean isOption) {
-        String text = editText.getText().toString();
-        String hint = editText.getHint() != null ? editText.getHint().toString() : "";
+    protected String resolveCapturedText(EditText textView, TextAndInputPrivacy textAndInputPrivacy, boolean isOption) {
+        String text = textView.getText() != null ? textView.getText().toString() : "";
+        String hint = textView.getHint() != null ? textView.getHint().toString() : "";
 
-        if (!text.isEmpty()) {
-            return resolveCapturedText(editText, text, privacy);
-        } else {
-            return resolveCapturedHint(hint, privacy);
-        }
+        return !text.isEmpty()
+                ? resolveCapturedText(textView, text, textAndInputPrivacy)
+                : resolveCapturedHint(hint, textAndInputPrivacy);
     }
 
-    private String resolveCapturedText(TextView textView, String text, SessionReplayPrivacy privacy) {
+    private String resolveCapturedText(TextView textView, String text, TextAndInputPrivacy textAndInputPrivacy) {
         int inputTypeVariation = textView.getInputType() & InputType.TYPE_MASK_VARIATION;
         int inputTypeClass = textView.getInputType() & InputType.TYPE_MASK_CLASS;
 
         boolean isSensitiveText = (inputTypeClass == InputType.TYPE_CLASS_TEXT) &&
-                Arrays.stream(SENSITIVE_TEXT_VARIATIONS).anyMatch(variation -> variation == inputTypeVariation);
+                SENSITIVE_TEXT_VARIATIONS.contains(inputTypeVariation);
 
         boolean isSensitiveNumber = (inputTypeClass == InputType.TYPE_CLASS_NUMBER) &&
-                Arrays.stream(SENSITIVE_NUMBER_VARIATIONS).anyMatch(variation -> variation == inputTypeVariation);
+                SENSITIVE_NUMBER_VARIATIONS.contains(inputTypeVariation);
 
         boolean isSensitive = isSensitiveText || isSensitiveNumber || (inputTypeClass == InputType.TYPE_CLASS_PHONE);
 
-        switch (privacy) {
-            case ALLOW:
+        switch (textAndInputPrivacy) {
+            case MASK_SENSITIVE_INPUTS:
                 return isSensitive ? FIXED_INPUT_MASK : text;
-            case MASK:
-            case MASK_USER_INPUT:
+
+            case MASK_ALL:
+            case MASK_ALL_INPUTS:
                 return FIXED_INPUT_MASK;
+
             default:
                 return text;
         }
     }
 
-    private String resolveCapturedHint(String hint, SessionReplayPrivacy privacy) {
-        if (privacy == SessionReplayPrivacy.MASK) {
-            return StringObfuscator.getStringObfuscator().obfuscate(hint);
-        } else {
-            return hint;
-        }
+    private String resolveCapturedHint(String hint, TextAndInputPrivacy textAndInputPrivacy) {
+        return textAndInputPrivacy == TextAndInputPrivacy.MASK_ALL
+                ? StringObfuscator.getStringObfuscator().obfuscate(hint)
+                : hint;
     }
+
+    private static final List<Integer> SENSITIVE_TEXT_VARIATIONS = Arrays.asList(
+            InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
+            InputType.TYPE_TEXT_VARIATION_POSTAL_ADDRESS,
+            InputType.TYPE_TEXT_VARIATION_PASSWORD,
+            InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD,
+            InputType.TYPE_TEXT_VARIATION_WEB_EMAIL_ADDRESS,
+            InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD
+    );
+
+    private static final List<Integer> SENSITIVE_NUMBER_VARIATIONS = Collections.singletonList(
+            InputType.TYPE_NUMBER_VARIATION_PASSWORD
+    );
 }

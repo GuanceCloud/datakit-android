@@ -1,4 +1,4 @@
-package com.ft.sdk.sessionreplay.resources;
+package com.ft.sdk.sessionreplay.internal.resources;
 
 import com.ft.sdk.sessionreplay.model.ResourceHashesEntry;
 import com.ft.sdk.sessionreplay.utils.InternalLogger;

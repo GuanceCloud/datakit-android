@@ -11,16 +11,20 @@ import android.view.Window;
 import androidx.annotation.MainThread;
 
 import com.ft.sdk.feature.FeatureSdkCore;
+import com.ft.sdk.sessionreplay.ImagePrivacy;
 import com.ft.sdk.sessionreplay.MapperTypeWrapper;
-import com.ft.sdk.sessionreplay.SessionReplayPrivacy;
+import com.ft.sdk.sessionreplay.SessionReplayInternalCallback;
+import com.ft.sdk.sessionreplay.TextAndInputPrivacy;
 import com.ft.sdk.sessionreplay.internal.LifecycleCallback;
 import com.ft.sdk.sessionreplay.internal.SessionReplayLifecycleCallback;
+import com.ft.sdk.sessionreplay.internal.TouchPrivacyManager;
 import com.ft.sdk.sessionreplay.internal.async.RecordedDataQueueHandler;
 import com.ft.sdk.sessionreplay.internal.processor.MutationResolver;
 import com.ft.sdk.sessionreplay.internal.processor.RecordedDataProcessor;
 import com.ft.sdk.sessionreplay.internal.processor.RumContextDataHandler;
 import com.ft.sdk.sessionreplay.internal.recorder.callback.OnWindowRefreshedCallback;
 import com.ft.sdk.sessionreplay.internal.recorder.mapper.DecorViewMapper;
+import com.ft.sdk.sessionreplay.internal.recorder.mapper.HiddenViewMapper;
 import com.ft.sdk.sessionreplay.internal.recorder.mapper.ViewWireframeMapper;
 import com.ft.sdk.sessionreplay.internal.recorder.resources.BitmapCachesManager;
 import com.ft.sdk.sessionreplay.internal.recorder.resources.BitmapPool;
@@ -30,6 +34,7 @@ import com.ft.sdk.sessionreplay.internal.recorder.resources.MD5HashGenerator;
 import com.ft.sdk.sessionreplay.internal.recorder.resources.ResourceResolver;
 import com.ft.sdk.sessionreplay.internal.recorder.resources.ResourcesLRUCache;
 import com.ft.sdk.sessionreplay.internal.recorder.resources.WebPImageCompression;
+import com.ft.sdk.sessionreplay.internal.resources.ResourceDataStoreManager;
 import com.ft.sdk.sessionreplay.internal.storage.RecordWriter;
 import com.ft.sdk.sessionreplay.internal.storage.ResourcesWriter;
 import com.ft.sdk.sessionreplay.recorder.OptionSelectorDetector;
@@ -41,6 +46,7 @@ import com.ft.sdk.sessionreplay.utils.DrawableToColorMapper;
 import com.ft.sdk.sessionreplay.utils.DrawableToColorMapperFactory;
 import com.ft.sdk.sessionreplay.utils.DrawableUtils;
 import com.ft.sdk.sessionreplay.utils.InternalLogger;
+import com.ft.sdk.sessionreplay.utils.PathUtils;
 import com.ft.sdk.sessionreplay.utils.RumContextProvider;
 import com.ft.sdk.sessionreplay.utils.TimeProvider;
 import com.ft.sdk.sessionreplay.utils.ViewBoundsResolver;
@@ -56,7 +62,9 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
 
     private final Application appContext;
     private final RumContextProvider rumContextProvider;
-    private final SessionReplayPrivacy privacy;
+    private final TextAndInputPrivacy textAndInputPrivacy;
+    private final ImagePrivacy imagePrivacy;
+    private final TouchPrivacyManager touchPrivacyManager;
     private final RecordWriter recordWriter;
     private final TimeProvider timeProvider;
     private final List<MapperTypeWrapper<?>> mappers;
@@ -66,6 +74,7 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
     private final LifecycleCallback sessionReplayLifecycleCallback;
     private final RecordedDataQueueHandler recordedDataQueueHandler;
     private final ViewOnDrawInterceptor viewOnDrawInterceptor;
+    private final SessionReplayInternalCallback internalCallback;
     private final InternalLogger internalLogger;
     private final Handler uiHandler;
     private boolean shouldRecord = false;
@@ -76,18 +85,26 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
             Application appContext,
             ResourcesWriter resourcesWriter,
             RumContextProvider rumContextProvider,
-            SessionReplayPrivacy privacy,
+            TextAndInputPrivacy textAndInputPrivacy,
+            ImagePrivacy imagePrivacy,
+            TouchPrivacyManager touchPrivacyManager,
             RecordWriter recordWriter,
             TimeProvider timeProvider,
             List<MapperTypeWrapper<?>> mappers,
             List<OptionSelectorDetector> customOptionSelectorDetectors,
+            List<DrawableToColorMapper> customDrawableMappers,
             WindowInspector windowInspector,
             FeatureSdkCore sdkCore,
+            ResourceDataStoreManager resourceDataStoreManager,
+            SessionReplayInternalCallback internalCallback,
+            boolean dynamicOptimizationEnabled,
             boolean isDelayInit
     ) {
         this.appContext = appContext;
         this.rumContextProvider = rumContextProvider;
-        this.privacy = privacy;
+        this.textAndInputPrivacy = textAndInputPrivacy;
+        this.imagePrivacy = imagePrivacy;
+        this.touchPrivacyManager = touchPrivacyManager;
         this.recordWriter = recordWriter;
         this.timeProvider = timeProvider;
         this.mappers = mappers;
@@ -105,6 +122,7 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
         );
 
         RecordedDataProcessor processor = new RecordedDataProcessor(
+                resourceDataStoreManager,
                 resourcesWriter,
                 recordWriter,
                 new MutationResolver(internalLogger)
@@ -125,11 +143,12 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
                 ),
                 new ConcurrentLinkedQueue<>()
         );
+        this.internalCallback = internalCallback;
 
         ViewIdentifierResolver viewIdentifierResolver = DefaultViewIdentifierResolver.get();
         ColorStringFormatter colorStringFormatter = DefaultColorStringFormatter.get();
         ViewBoundsResolver viewBoundsResolver = DefaultViewBoundsResolver.get();
-        DrawableToColorMapper drawableToColorMapper = DrawableToColorMapperFactory.getDefault();
+        DrawableToColorMapper drawableToColorMapper = DrawableToColorMapperFactory.getDefault(customDrawableMappers);
 
         ViewWireframeMapper defaultVWM = new ViewWireframeMapper(
                 viewIdentifierResolver,
@@ -147,6 +166,7 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
         ResourceResolver resourceResolver = new ResourceResolver(
                 bitmapCachesManager,
                 null,
+                new PathUtils(internalLogger, bitmapCachesManager, null, null, null),
                 new DrawableUtils(
                         internalLogger,
                         bitmapCachesManager,
@@ -159,7 +179,7 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
                 applicationId
 
         );
-
+        customOptionSelectorDetectors.add(new DefaultOptionSelectorDetector());
         this.viewOnDrawInterceptor = new ViewOnDrawInterceptor(
                 internalLogger,
                 new DefaultOnDrawListenerProducer(
@@ -176,15 +196,19 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
                                         defaultVWM,
                                         new DecorViewMapper(defaultVWM, viewIdentifierResolver),
                                         new ViewUtilsInternal(),
+                                        new HiddenViewMapper(viewIdentifierResolver, viewBoundsResolver),
                                         internalLogger
                                 ),
                                 new ComposedOptionSelectorDetector(
                                         customOptionSelectorDetectors
-                                )
+                                ),
+                                touchPrivacyManager,
+                                internalLogger
                         ),
                         recordedDataQueueHandler,
-                        sdkCore
-                )
+                        sdkCore, dynamicOptimizationEnabled
+                ),
+                touchPrivacyManager
         );
 
         this.windowCallbackInterceptor = new WindowCallbackInterceptor(
@@ -192,10 +216,16 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
                 viewOnDrawInterceptor,
                 timeProvider,
                 internalLogger,
-                privacy
+                imagePrivacy, textAndInputPrivacy, touchPrivacyManager
         );
 
         this.sessionReplayLifecycleCallback = new SessionReplayLifecycleCallback(this);
+        Activity activity = this.internalCallback.getCurrentActivity();
+        if (activity != null) {
+            ((SessionReplayLifecycleCallback) sessionReplayLifecycleCallback).setCurrentWindow(activity);
+            ((SessionReplayLifecycleCallback) sessionReplayLifecycleCallback).registerFragmentLifecycleCallbacks(activity);
+        }
+
         this.uiHandler = new Handler(Looper.getMainLooper());
         this.internalLogger = internalLogger;
     }
@@ -230,7 +260,7 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
             }
             List<View> decorViews = windowInspector.getGlobalWindowViews(internalLogger);
             windowCallbackInterceptor.intercept(windows, appContext);
-            viewOnDrawInterceptor.intercept(decorViews, privacy);
+            viewOnDrawInterceptor.intercept(decorViews, textAndInputPrivacy, imagePrivacy);
         });
     }
 
@@ -249,7 +279,7 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
         if (shouldRecord) {
             List<View> decorViews = windowInspector.getGlobalWindowViews(internalLogger);
             windowCallbackInterceptor.intercept(windows, appContext);
-            viewOnDrawInterceptor.intercept(decorViews, privacy);
+            viewOnDrawInterceptor.intercept(decorViews, textAndInputPrivacy, imagePrivacy);
         }
     }
 
@@ -259,7 +289,7 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
         if (shouldRecord) {
             List<View> decorViews = windowInspector.getGlobalWindowViews(internalLogger);
             windowCallbackInterceptor.stopIntercepting(windows);
-            viewOnDrawInterceptor.intercept(decorViews, privacy);
+            viewOnDrawInterceptor.intercept(decorViews, textAndInputPrivacy, imagePrivacy);
         }
     }
 

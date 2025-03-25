@@ -17,7 +17,7 @@ import android.widget.ProgressBar;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.UiThread;
 
-import com.ft.sdk.sessionreplay.SessionReplayPrivacy;
+import com.ft.sdk.sessionreplay.TextAndInputPrivacy;
 import com.ft.sdk.sessionreplay.model.ShapeStyle;
 import com.ft.sdk.sessionreplay.model.ShapeWireframe;
 import com.ft.sdk.sessionreplay.model.Wireframe;
@@ -85,8 +85,8 @@ public class ProgressBarWireframeMapper<P extends ProgressBar> extends BaseAsync
         }
 
         boolean hasProgress = !view.isIndeterminate();
-        boolean showProgress = (mappingContext.getPrivacy() == SessionReplayPrivacy.ALLOW) ||
-                (mappingContext.getPrivacy() == SessionReplayPrivacy.MASK_USER_INPUT && showProgressWhenMaskUserInput);
+        boolean showProgress = (mappingContext.getTextAndInputPrivacy() == TextAndInputPrivacy.MASK_SENSITIVE_INPUTS) ||
+                (mappingContext.getTextAndInputPrivacy() == TextAndInputPrivacy.MASK_ALL_INPUTS && showProgressWhenMaskUserInput);
 
         if (hasProgress && showProgress) {
             float normalizedProgress = normalizedProgress(view);

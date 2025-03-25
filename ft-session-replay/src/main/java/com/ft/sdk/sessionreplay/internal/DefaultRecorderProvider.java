@@ -18,8 +18,10 @@ import androidx.appcompat.widget.ActionBarContainer;
 import androidx.appcompat.widget.SwitchCompat;
 
 import com.ft.sdk.feature.FeatureSdkCore;
+import com.ft.sdk.sessionreplay.ImagePrivacy;
 import com.ft.sdk.sessionreplay.MapperTypeWrapper;
-import com.ft.sdk.sessionreplay.SessionReplayPrivacy;
+import com.ft.sdk.sessionreplay.SessionReplayInternalCallback;
+import com.ft.sdk.sessionreplay.TextAndInputPrivacy;
 import com.ft.sdk.sessionreplay.internal.recorder.Recorder;
 import com.ft.sdk.sessionreplay.internal.recorder.SessionReplayRecorder;
 import com.ft.sdk.sessionreplay.internal.recorder.mapper.ActionBarContainerMapper;
@@ -33,6 +35,7 @@ import com.ft.sdk.sessionreplay.internal.recorder.mapper.RadioButtonMapper;
 import com.ft.sdk.sessionreplay.internal.recorder.mapper.SeekBarWireframeMapper;
 import com.ft.sdk.sessionreplay.internal.recorder.mapper.SwitchCompatMapper;
 import com.ft.sdk.sessionreplay.internal.recorder.mapper.WebViewWireframeMapper;
+import com.ft.sdk.sessionreplay.internal.resources.ResourceDataStoreManager;
 import com.ft.sdk.sessionreplay.internal.storage.RecordWriter;
 import com.ft.sdk.sessionreplay.internal.storage.ResourcesWriter;
 import com.ft.sdk.sessionreplay.internal.time.SessionReplayTimeProvider;
@@ -41,7 +44,7 @@ import com.ft.sdk.sessionreplay.recorder.OptionSelectorDetector;
 import com.ft.sdk.sessionreplay.recorder.mapper.EditTextMapper;
 import com.ft.sdk.sessionreplay.recorder.mapper.TextViewMapper;
 import com.ft.sdk.sessionreplay.recorder.mapper.WireframeMapper;
-import com.ft.sdk.sessionreplay.resources.ResourceDataStoreManager;
+import com.ft.sdk.sessionreplay.resources.DefaultDrawableCopier;
 import com.ft.sdk.sessionreplay.utils.ColorStringFormatter;
 import com.ft.sdk.sessionreplay.utils.DefaultColorStringFormatter;
 import com.ft.sdk.sessionreplay.utils.DefaultViewBoundsResolver;
@@ -59,20 +62,36 @@ import java.util.List;
 public class DefaultRecorderProvider implements RecorderProvider {
 
     private final FeatureSdkCore sdkCore;
-    private final SessionReplayPrivacy privacy;
+    private final TextAndInputPrivacy textAndInputPrivacy;
+    private final ImagePrivacy imagePrivacy;
+    private final TouchPrivacyManager touchPrivacyManager;
     private final List<MapperTypeWrapper<?>> customMappers;
     private final List<OptionSelectorDetector> customOptionSelectorDetectors;
+    private final List<DrawableToColorMapper> customDrawableMappers;
+    private final boolean dynamicOptimizationEnabled;
+    private final SessionReplayInternalCallback internalCallback;
     private final boolean isDelayInit;
 
     public DefaultRecorderProvider(
             FeatureSdkCore sdkCore,
-            SessionReplayPrivacy privacy,
+            TextAndInputPrivacy textAndInputPrivacy,
+            ImagePrivacy imagePrivacy,
+            TouchPrivacyManager touchPrivacyManager,
             List<MapperTypeWrapper<?>> customMappers,
-            List<OptionSelectorDetector> customOptionSelectorDetectors, boolean isDelayInit) {
+            List<OptionSelectorDetector> customOptionSelectorDetectors,
+            List<DrawableToColorMapper> customDrawableMappers,
+            boolean dynamicOptimizationEnabled,
+            SessionReplayInternalCallback internalCallback,
+            boolean isDelayInit) {
         this.sdkCore = sdkCore;
-        this.privacy = privacy;
+        this.textAndInputPrivacy = textAndInputPrivacy;
+        this.imagePrivacy = imagePrivacy;
+        this.touchPrivacyManager = touchPrivacyManager;
         this.customMappers = customMappers;
         this.customOptionSelectorDetectors = customOptionSelectorDetectors;
+        this.customDrawableMappers = customDrawableMappers;
+        this.dynamicOptimizationEnabled = dynamicOptimizationEnabled;
+        this.internalCallback = internalCallback;
         this.isDelayInit = isDelayInit;
     }
 
@@ -93,13 +112,20 @@ public class DefaultRecorderProvider implements RecorderProvider {
                 application,
                 resourceWriter,
                 rumContextProvider,
-                privacy,
+                textAndInputPrivacy,
+                imagePrivacy,
+                touchPrivacyManager,
                 recordWriter,
                 timeProvider,
                 mappers,
                 customOptionSelectorDetectors,
+                customDrawableMappers,
                 null,
-                sdkCore, isDelayInit
+                sdkCore,
+                resourceDataStoreManager,
+                internalCallback,
+                dynamicOptimizationEnabled,
+                isDelayInit
         );
     }
 
@@ -110,6 +136,7 @@ public class DefaultRecorderProvider implements RecorderProvider {
         DrawableToColorMapper drawableToColorMapper = DrawableToColorMapperFactory.getDefault();
         ImageViewMapper imageViewMapper = new ImageViewMapper(
                 ImageViewUtils.get(),
+                new DefaultDrawableCopier(),
                 viewIdentifierResolver,
                 colorStringFormatter,
                 viewBoundsResolver,

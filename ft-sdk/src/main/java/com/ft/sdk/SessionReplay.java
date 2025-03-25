@@ -6,6 +6,7 @@ import android.content.Context;
 import com.ft.sdk.feature.FeatureSdkCore;
 import com.ft.sdk.sessionreplay.FTSessionReplayConfig;
 import com.ft.sdk.sessionreplay.SessionReplayFeature;
+import com.ft.sdk.sessionreplay.internal.TouchPrivacyManager;
 
 public class SessionReplay {
 
@@ -23,9 +24,18 @@ public class SessionReplay {
                 featureSdkCore,
                 ftSessionReplayConfig.getCustomEndpointUrl(),
                 ftSessionReplayConfig.getPrivacy(),
+                ftSessionReplayConfig.getTextAndInputPrivacy(),
+                ftSessionReplayConfig.getTouchPrivacy(),
+                new TouchPrivacyManager(ftSessionReplayConfig.getTouchPrivacy()),
+                ftSessionReplayConfig.getImagePrivacy(),
                 ftSessionReplayConfig.getCustomMappers(),
                 ftSessionReplayConfig.getCustomOptionSelectorDetectors(),
-                ftSessionReplayConfig.getSampleRate(), ftSessionReplayConfig.isDelayInit()
+                ftSessionReplayConfig.getCustomDrawableMapper(),
+                ftSessionReplayConfig.getSampleRate(),
+                ftSessionReplayConfig.isDelayInit(),
+                ftSessionReplayConfig.isDynamicOptimizationEnabled(),
+                ftSessionReplayConfig.getInternalCallback()
+
         );
 
         featureSdkCore.registerFeature(sessionReplayFeature);

@@ -10,6 +10,7 @@ import com.ft.sdk.sessionreplay.model.ShapeWireframe;
 import com.ft.sdk.sessionreplay.model.Wireframe;
 import com.ft.sdk.sessionreplay.model.WireframeClip;
 import com.ft.sdk.sessionreplay.recorder.MappingContext;
+import com.ft.sdk.sessionreplay.resources.DefaultDrawableCopier;
 import com.ft.sdk.sessionreplay.utils.AsyncJobStatusCallback;
 import com.ft.sdk.sessionreplay.utils.ColorStringFormatter;
 import com.ft.sdk.sessionreplay.utils.DefaultViewIdentifierResolver;
@@ -114,17 +115,20 @@ public abstract class BaseAsyncBackgroundWireframeMapper<T extends View> extends
             return null;
         }
 
-        return mappingContext.getImageWireframeHelper().createImageWireframe(
+        return mappingContext.getImageWireframeHelper().createImageWireframeByDrawable(
                 view,
+                mappingContext.getImagePrivacy(),
                 0,
                 bounds.getX(),
                 bounds.getY(),
                 width,
                 height,
                 false,
-                drawableCopy,
+                view.getBackground(),
+                new DefaultDrawableCopier(),
                 asyncJobStatusCallback,
                 new WireframeClip(null, null, null, null),
+                null,
                 null,
                 null,
                 PREFIX_BACKGROUND_DRAWABLE

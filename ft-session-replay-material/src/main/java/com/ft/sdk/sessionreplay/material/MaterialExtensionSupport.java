@@ -2,6 +2,7 @@ package com.ft.sdk.sessionreplay.material;
 
 import com.ft.sdk.sessionreplay.ExtensionSupport;
 import com.ft.sdk.sessionreplay.MapperTypeWrapper;
+import com.ft.sdk.sessionreplay.material.internal.MaterialDrawableToColorMapper;
 import com.ft.sdk.sessionreplay.material.internal.MaterialOptionSelectorDetector;
 import com.ft.sdk.sessionreplay.material.internal.SliderWireframeMapper;
 import com.ft.sdk.sessionreplay.material.internal.TabWireframeMapper;
@@ -18,7 +19,9 @@ import com.ft.sdk.sessionreplay.utils.ViewIdentifierResolver;
 import com.google.android.material.slider.Slider;
 import com.google.android.material.tabs.TabLayout;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class MaterialExtensionSupport implements ExtensionSupport {
@@ -26,6 +29,8 @@ public class MaterialExtensionSupport implements ExtensionSupport {
     private final ViewIdentifierResolver viewIdentifierResolver = DefaultViewIdentifierResolver.get();
     private final ColorStringFormatter colorStringFormatter = DefaultColorStringFormatter.get();
     private final ViewBoundsResolver viewBoundsResolver = DefaultViewBoundsResolver.get();
+    private final MaterialDrawableToColorMapper materialDrawableToColorMapper = new MaterialDrawableToColorMapper();
+    //fixme
     private final DrawableToColorMapper drawableToColorMapper = DrawableToColorMapperFactory.getDefault();
 
     @Override
@@ -47,14 +52,19 @@ public class MaterialExtensionSupport implements ExtensionSupport {
                 )
         );
 
-        return Arrays.asList(
+        return new ArrayList<>(Arrays.asList(
                 new MapperTypeWrapper<>(Slider.class, sliderWireframeMapper),
-                new MapperTypeWrapper<>(TabLayout.TabView.class, tabWireframeMapper)
+                new MapperTypeWrapper<>(TabLayout.TabView.class, tabWireframeMapper))
         );
     }
 
     @Override
     public List<OptionSelectorDetector> getOptionSelectorDetectors() {
-        return Arrays.asList(new MaterialOptionSelectorDetector());
+        return new ArrayList<>(Collections.singletonList(new MaterialOptionSelectorDetector()));
+    }
+
+    @Override
+    public List<DrawableToColorMapper> getCustomDrawableMapper() {
+        return new ArrayList<>(Collections.singletonList(materialDrawableToColorMapper));
     }
 }

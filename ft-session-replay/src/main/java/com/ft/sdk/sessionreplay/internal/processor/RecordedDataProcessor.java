@@ -21,6 +21,7 @@ import com.ft.sdk.sessionreplay.model.ViewEndRecord;
 import com.ft.sdk.sessionreplay.model.ViewportResizeData;
 import com.ft.sdk.sessionreplay.model.Wireframe;
 import com.ft.sdk.sessionreplay.recorder.SystemInformation;
+import com.ft.sdk.sessionreplay.internal.resources.ResourceDataStoreManager;
 import com.ft.sdk.sessionreplay.utils.SessionReplayRumContext;
 
 import java.util.LinkedList;
@@ -29,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 public class RecordedDataProcessor implements Processor {
 
+    private final ResourceDataStoreManager resourceDataStoreManager;
     private final ResourcesWriter resourcesWriter;
     private final RecordWriter writer;
     private final MutationResolver mutationResolver;
@@ -39,13 +41,14 @@ public class RecordedDataProcessor implements Processor {
     private int previousOrientation = Configuration.ORIENTATION_UNDEFINED;
     private SessionReplayRumContext prevRumContext = new SessionReplayRumContext();
 
-    public RecordedDataProcessor(ResourcesWriter resourcesWriter, RecordWriter writer,
+    public RecordedDataProcessor(ResourceDataStoreManager resourceDataStoreManager, ResourcesWriter resourcesWriter, RecordWriter writer,
                                  MutationResolver mutationResolver) {
-        this(resourcesWriter, writer, mutationResolver, new NodeFlattener());
+        this(resourceDataStoreManager, resourcesWriter, writer, mutationResolver, new NodeFlattener());
     }
 
-    public RecordedDataProcessor(ResourcesWriter resourcesWriter, RecordWriter writer,
+    public RecordedDataProcessor(ResourceDataStoreManager resourceDataStoreManager, ResourcesWriter resourcesWriter, RecordWriter writer,
                                  MutationResolver mutationResolver, NodeFlattener nodeFlattener) {
+        this.resourceDataStoreManager = resourceDataStoreManager;
         this.resourcesWriter = resourcesWriter;
         this.writer = writer;
         this.mutationResolver = mutationResolver;
@@ -55,13 +58,16 @@ public class RecordedDataProcessor implements Processor {
     @Override
     @WorkerThread
     public void processResources(ResourceRecordedDataQueueItem item) {
-        EnrichedResource enrichedResource = new EnrichedResource(
-                item.getResourceData(),
-                item.getApplicationId(),
-                item.getIdentifier()
-        );
-
-        resourcesWriter.write(enrichedResource);
+        String resourceHash = item.getIdentifier();
+        boolean isKnownResource = resourceDataStoreManager.isPreviouslySentResource(resourceHash);
+        if (!isKnownResource) {
+            EnrichedResource enrichedResource = new EnrichedResource(
+                    item.getResourceData(),
+                    item.getApplicationId(),
+                    resourceHash
+            );
+            resourcesWriter.write(enrichedResource);
+        }
     }
 
     @Override
@@ -108,7 +114,6 @@ public class RecordedDataProcessor implements Processor {
 
         List<MobileRecord> records = new LinkedList<>();
         boolean isNewView = isNewView(newRumContext);
-//        boolean isNewView = true;
         boolean isTimeForFullSnapshot = isTimeForFullSnapshot();
         boolean screenOrientationChanged = systemInformation.getScreenOrientation() != previousOrientation;
         boolean fullSnapshotRequired = isNewView || isTimeForFullSnapshot || screenOrientationChanged;

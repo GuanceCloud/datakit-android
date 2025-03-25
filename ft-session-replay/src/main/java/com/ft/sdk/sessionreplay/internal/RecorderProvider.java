@@ -5,7 +5,7 @@ import android.app.Application;
 import com.ft.sdk.sessionreplay.internal.recorder.Recorder;
 import com.ft.sdk.sessionreplay.internal.storage.RecordWriter;
 import com.ft.sdk.sessionreplay.internal.storage.ResourcesWriter;
-import com.ft.sdk.sessionreplay.resources.ResourceDataStoreManager;
+import com.ft.sdk.sessionreplay.internal.resources.ResourceDataStoreManager;
 
 public interface RecorderProvider {
     Recorder provideSessionReplayRecorder(

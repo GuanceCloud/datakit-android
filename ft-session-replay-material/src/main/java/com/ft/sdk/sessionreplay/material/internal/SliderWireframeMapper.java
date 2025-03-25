@@ -8,6 +8,7 @@ import android.content.res.ColorStateList;
 import androidx.annotation.UiThread;
 
 import com.ft.sdk.sessionreplay.SessionReplayPrivacy;
+import com.ft.sdk.sessionreplay.TextAndInputPrivacy;
 import com.ft.sdk.sessionreplay.model.ShapeStyle;
 import com.ft.sdk.sessionreplay.model.ShapeWireframe;
 import com.ft.sdk.sessionreplay.model.Wireframe;
@@ -123,7 +124,7 @@ public class SliderWireframeMapper implements WireframeMapper<Slider> {
         );
 
         List<Wireframe> wireframes = new ArrayList<>();
-        if (mappingContext.getPrivacy() == SessionReplayPrivacy.ALLOW) {
+        if (mappingContext.getTextAndInputPrivacy() == TextAndInputPrivacy.MASK_SENSITIVE_INPUTS) {
             wireframes.add(trackNonActiveWireframe);
             wireframes.add(trackActiveWireframe);
             wireframes.add(thumbWireframe);

@@ -8,7 +8,9 @@ import android.view.Window;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.sessionreplay.SessionReplayPrivacy;
+import com.ft.sdk.sessionreplay.ImagePrivacy;
+import com.ft.sdk.sessionreplay.TextAndInputPrivacy;
+import com.ft.sdk.sessionreplay.internal.TouchPrivacyManager;
 import com.ft.sdk.sessionreplay.internal.async.RecordedDataQueueHandler;
 import com.ft.sdk.sessionreplay.internal.recorder.callback.NoOpWindowCallback;
 import com.ft.sdk.sessionreplay.internal.recorder.callback.RecorderWindowCallback;
@@ -24,7 +26,9 @@ public class WindowCallbackInterceptor {
     private final ViewOnDrawInterceptor viewOnDrawInterceptor;
     private final TimeProvider timeProvider;
     private final InternalLogger internalLogger;
-    private final SessionReplayPrivacy privacy;
+    private final ImagePrivacy imagePrivacy;
+    private final TextAndInputPrivacy textAndInputPrivacy;
+    private final TouchPrivacyManager touchPrivacyManager;
 
     private final WeakHashMap<Window, Object> wrappedWindows = new WeakHashMap<>();
 
@@ -32,12 +36,17 @@ public class WindowCallbackInterceptor {
                                      @NonNull ViewOnDrawInterceptor viewOnDrawInterceptor,
                                      @NonNull TimeProvider timeProvider,
                                      @NonNull InternalLogger internalLogger,
-                                     @NonNull SessionReplayPrivacy privacy) {
+                                     @NonNull ImagePrivacy imagePrivacy,
+                                     @NonNull TextAndInputPrivacy textAndInputPrivacy,
+                                     @NonNull TouchPrivacyManager touchPrivacyManager
+    ) {
         this.recordedDataQueueHandler = recordedDataQueueHandler;
         this.viewOnDrawInterceptor = viewOnDrawInterceptor;
         this.timeProvider = timeProvider;
         this.internalLogger = internalLogger;
-        this.privacy = privacy;
+        this.imagePrivacy = imagePrivacy;
+        this.textAndInputPrivacy = textAndInputPrivacy;
+        this.touchPrivacyManager = touchPrivacyManager;
     }
 
     public void intercept(@NonNull List<Window> windows, @NonNull Context appContext) {
@@ -73,7 +82,9 @@ public class WindowCallbackInterceptor {
                 timeProvider,
                 viewOnDrawInterceptor,
                 internalLogger,
-                privacy,
+                textAndInputPrivacy,
+                imagePrivacy,
+                touchPrivacyManager,
                 MOTION_UPDATE_DELAY_THRESHOLD_NS,
                 FLUSH_BUFFER_THRESHOLD_NS,
                 null

@@ -131,7 +131,7 @@ public class ImageWireframe extends Wireframe {
             json.addProperty("mimeType", mimeType);
         }
         if (isEmpty != null) {
-            //            json.addProperty("isEmpty", isEmpty);
+//            json.addProperty("isEmpty", isEmpty);
             //fixme 图片功能加载完成后恢复这个参数
             json.addProperty("isEmpty", true);
         }

@@ -5,7 +5,9 @@ import android.view.ViewTreeObserver;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.sessionreplay.SessionReplayPrivacy;
+import com.ft.sdk.sessionreplay.ImagePrivacy;
+import com.ft.sdk.sessionreplay.TextAndInputPrivacy;
+import com.ft.sdk.sessionreplay.internal.TouchPrivacyManager;
 import com.ft.sdk.sessionreplay.utils.InternalLogger;
 
 import java.util.List;
@@ -16,18 +18,24 @@ public class ViewOnDrawInterceptor {
     private static final String TAG = "ViewOnDrawInterceptor";
     private final InternalLogger internalLogger;
     private final OnDrawListenerProducer onDrawListenerProducer;
+    private final TouchPrivacyManager touchPrivacyManager;
 
     private final WeakHashMap<View, ViewTreeObserver.OnDrawListener> decorOnDrawListeners = new WeakHashMap<>();
 
     public ViewOnDrawInterceptor(@NonNull InternalLogger internalLogger,
-                                 @NonNull OnDrawListenerProducer onDrawListenerProducer) {
+                                 @NonNull OnDrawListenerProducer onDrawListenerProducer,
+                                 @NonNull TouchPrivacyManager touchPrivacyManager
+    ) {
         this.internalLogger = internalLogger;
         this.onDrawListenerProducer = onDrawListenerProducer;
+        this.touchPrivacyManager = touchPrivacyManager;
     }
 
-    public void intercept(@NonNull List<View> decorViews, @NonNull SessionReplayPrivacy sessionReplayPrivacy) {
+    public void intercept(@NonNull List<View> decorViews, TextAndInputPrivacy textAndInputPrivacy,
+                          ImagePrivacy imagePrivacy) {
         stopInterceptingAndRemove(decorViews);
-        ViewTreeObserver.OnDrawListener onDrawListener = onDrawListenerProducer.create(decorViews, sessionReplayPrivacy);
+        ViewTreeObserver.OnDrawListener onDrawListener = onDrawListenerProducer.create(decorViews,
+                textAndInputPrivacy, imagePrivacy, touchPrivacyManager);
         for (View decorView : decorViews) {
             ViewTreeObserver viewTreeObserver = decorView.getViewTreeObserver();
             if (viewTreeObserver != null && viewTreeObserver.isAlive()) {
