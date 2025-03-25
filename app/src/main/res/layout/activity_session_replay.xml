@@ -1,87 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/session_replay_privacy_ll"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <Button
+        android:id="@+id/session_replay_dialog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="对话框" />
+
+    <Button
+        android:id="@+id/session_replay_origin_toast"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="原生 Toast (无法采集)" />
+
+    <Button
+        android:id="@+id/session_replay_custom_toast"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="替代 Toast (可采集)" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
         android:orientation="vertical">
-        <Button
-            android:id="@+id/session_replay_dialog"
+
+        <TextView
+            android:id="@+id/session_replay_text_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="这是一个文本" />
+
+        <EditText
+            android:id="@+id/session_replay_edittext_et"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="这是一个编辑框" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="这是个 Radio Button" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="这是个 CheckBox" />
+
+        <androidx.appcompat.widget.AppCompatCheckedTextView
+            android:id="@+id/session_replay_checked_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="对话框" />
+            android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+            android:gravity="center_vertical"
+            android:padding="8dp"
+            android:text="这是 checkText" />
 
-        <Button
-            android:id="@+id/session_replay_origin_toast"
-            android:layout_width="match_parent"
+        <ImageView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="原生 Toast (无法采集)" />
+            android:src="@drawable/ic_launcher_background" />
 
-        <Button
-            android:id="@+id/session_replay_custom_toast"
+
+        <ListView
+            android:id="@+id/session_replay_list"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="替代 Toast (可采集)" />
-        <Button
-            android:id="@+id/session_replay_privacy_override"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="隐私设置覆盖" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/session_replay_text_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="这是一个文本" />
-
-            <EditText
-                android:id="@+id/session_replay_edittext_et"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="这是一个编辑框" />
-
-            <RadioButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="这是个 Radio Button" />
-
-            <CheckBox
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="这是个 CheckBox" />
-
-            <androidx.appcompat.widget.AppCompatCheckedTextView
-                android:id="@+id/session_replay_checked_text_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:checkMark="?android:attr/listChoiceIndicatorMultiple"
-                android:gravity="center_vertical"
-                android:padding="8dp"
-                android:text="这是 checkText" />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_launcher_background" />
-
-
-            <ListView
-                android:id="@+id/session_replay_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-
+            android:layout_height="wrap_content" />
     </LinearLayout>
-
-
 </LinearLayout>

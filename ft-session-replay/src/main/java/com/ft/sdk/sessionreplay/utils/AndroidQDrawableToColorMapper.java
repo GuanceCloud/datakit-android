@@ -1,5 +1,7 @@
 package com.ft.sdk.sessionreplay.utils;
 
+import static com.ft.sdk.sessionreplay.ColorConstant.MAX_ALPHA_VALUE;
+
 import android.graphics.BlendMode;
 import android.graphics.BlendModeColorFilter;
 import android.graphics.ColorFilter;
@@ -16,6 +18,11 @@ import java.util.Map;
 @RequiresApi(Build.VERSION_CODES.Q)
 public class AndroidQDrawableToColorMapper extends AndroidMDrawableToColorMapper {
     private static final String TAG = "AndroidQDrawableToColor";
+
+    public AndroidQDrawableToColorMapper(List<DrawableToColorMapper> extensionMappers) {
+        super(extensionMappers);
+    }
+
 
     @Override
     protected Integer resolveGradientDrawable(GradientDrawable drawable, InternalLogger internalLogger) {
@@ -54,12 +61,12 @@ public class AndroidQDrawableToColorMapper extends AndroidMDrawableToColorMapper
                 return fillColor;
             } else {
                 internalLogger.i(TAG, "No mapper found for gradient blend mode " + mode + ","
-                        + Map.of("replay.gradient.blend_mode", mode),true);
+                        + Map.of("replay.gradient.blend_mode", mode), true);
                 return fillColor;
             }
         } else {
             internalLogger.i(TAG, "No mapper found for gradient color filter " + colorFilter.getClass() + ","
-                    + Map.of("replay.gradient.filter_type", colorFilter.getClass().getCanonicalName()),true);
+                    + Map.of("replay.gradient.filter_type", colorFilter.getClass().getCanonicalName()), true);
             return fillColor;
         }
     }

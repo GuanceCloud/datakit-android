@@ -47,6 +47,10 @@ public class MappingContext {
         return imagePrivacy;
     }
 
+    public TouchPrivacyManager getTouchPrivacyManager() {
+        return touchPrivacyManager;
+    }
+
     public MappingContext copy(boolean hasOptionSelectorParent) {
         return new MappingContext(systemInformation,
                 imageWireframeHelper, hasOptionSelectorParent, textAndInputPrivacy, imagePrivacy,

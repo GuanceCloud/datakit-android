@@ -9,7 +9,7 @@ import com.ft.sdk.sessionreplay.PrivacyOverrideExtensions;
 import com.ft.sdk.sessionreplay.TextAndInputPrivacy;
 import com.ft.sdk.sessionreplay.TouchPrivacy;
 
-public class SessionReplayPrivacyOverrideActivity extends NameTitleActivity {
+public class SRPrivacyOverrideActivity extends SRActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

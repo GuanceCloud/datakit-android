@@ -1,5 +1,7 @@
 package com.ft.sdk.sessionreplay.internal.recorder;
 
+import android.graphics.Rect;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -8,6 +10,7 @@ import androidx.annotation.UiThread;
 
 import com.ft.sdk.sessionreplay.MapperTypeWrapper;
 import com.ft.sdk.sessionreplay.R;
+import com.ft.sdk.sessionreplay.TouchPrivacy;
 import com.ft.sdk.sessionreplay.internal.async.RecordedDataQueueRefs;
 import com.ft.sdk.sessionreplay.internal.recorder.mapper.HiddenViewMapper;
 import com.ft.sdk.sessionreplay.internal.recorder.mapper.QueueStatusCallback;
@@ -68,6 +71,7 @@ public class TreeViewTraversal {
 
         // try to resolve from the exhaustive type mappers
         WireframeMapper<View> mapper = findMapperForView(view);
+        updateTouchOverrideAreas(view, mappingContext);
 
         if (isHidden(view)) {
             traversalStrategy = TraversalStrategy.STOP_AND_RETURN_NODE;
@@ -117,6 +121,34 @@ public class TreeViewTraversal {
     private boolean isHidden(View view) {
         return ((Boolean) true).equals(view.getTag(R.id.ft_hidden));
     }
+
+    @UiThread
+    private void updateTouchOverrideAreas(View view, MappingContext mappingContext) {
+        Object touchPrivacy = view.getTag(R.id.ft_touch_privacy);
+
+        if (touchPrivacy != null) {
+            int[] locationOnScreen = new int[2];
+            view.getLocationOnScreen(locationOnScreen);
+            int x = locationOnScreen[0];
+            int y = locationOnScreen[1];
+            Rect viewArea = new Rect(
+                    x - view.getPaddingLeft(),
+                    y - view.getPaddingTop(),
+                    x + view.getWidth() + view.getPaddingRight(),
+                    y + view.getHeight() + view.getPaddingBottom()
+            );
+
+            try {
+                TouchPrivacy privacyLevel = TouchPrivacy.valueOf(touchPrivacy.toString().toUpperCase());
+                mappingContext.getTouchPrivacyManager().addTouchOverrideArea(viewArea, privacyLevel);
+            } catch (IllegalArgumentException e) {
+                internalLogger.e(TAG,
+                        "INVALID_PRIVACY_LEVEL_ERROR:" + Log.getStackTraceString(e)
+                );
+            }
+        }
+    }
+
 
     public static class TraversedTreeView {
         private final List<Wireframe> mappedWireframes;

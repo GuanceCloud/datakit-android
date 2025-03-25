@@ -1,5 +1,11 @@
 package com.ft.sdk.sessionreplay.utils;
 
+import static com.ft.sdk.sessionreplay.ColorConstant.ALPHA_SHIFT_ANDROID;
+import static com.ft.sdk.sessionreplay.ColorConstant.ALPHA_SHIFT_WEB;
+import static com.ft.sdk.sessionreplay.ColorConstant.MASK_ALPHA;
+import static com.ft.sdk.sessionreplay.ColorConstant.MASK_COLOR;
+import static com.ft.sdk.sessionreplay.ColorConstant.WEB_COLOR_STR_LENGTH;
+
 public class DefaultColorStringFormatter implements ColorStringFormatter {
 
     private static class SingletonHolder {
@@ -10,11 +16,6 @@ public class DefaultColorStringFormatter implements ColorStringFormatter {
         return DefaultColorStringFormatter.SingletonHolder.INSTANCE;
     }
 
-    private static final long MASK_ALPHA = 0xff000000L;
-    private static final long MASK_COLOR = 0xffffffffL;
-    private static final int ALPHA_SHIFT_ANDROID = 24;
-    private static final int ALPHA_SHIFT_WEB = 8;
-    private static final int WEB_COLOR_STR_LENGTH = 8;
 
     @Override
     public String formatColorAsHexString(int color) {

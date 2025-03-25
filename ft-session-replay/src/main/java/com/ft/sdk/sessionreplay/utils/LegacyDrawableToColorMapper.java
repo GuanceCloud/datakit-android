@@ -1,28 +1,48 @@
 package com.ft.sdk.sessionreplay.utils;
 
+import static com.ft.sdk.sessionreplay.ColorConstant.ALPHA_SHIFT_ANDROID;
+import static com.ft.sdk.sessionreplay.ColorConstant.MASK_COLOR;
+import static com.ft.sdk.sessionreplay.ColorConstant.MAX_ALPHA_VALUE;
+
 import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.InsetDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.RippleDrawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.StateListDrawable;
+import android.graphics.drawable.VectorDrawable;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class LegacyDrawableToColorMapper implements DrawableToColorMapper {
 
     private static final String TAG = "LegacyDrawableToColorMapper";
-    private static final long MASK_COLOR = 0x00FFFFFFL;
-    private static final int ALPHA_SHIFT_ANDROID = 24;
-    protected static final int MAX_ALPHA_VALUE = 255;
+
+    private final List<DrawableToColorMapper> extensionMappers;
+
+    public LegacyDrawableToColorMapper(List<DrawableToColorMapper> extensionMappers) {
+        this.extensionMappers = extensionMappers;
+    }
 
     @Override
     public Integer mapDrawableToColor(Drawable drawable, InternalLogger internalLogger) {
+
+        for (DrawableToColorMapper extensionMapper : extensionMappers) {
+            Integer result = extensionMapper.mapDrawableToColor(drawable, internalLogger);
+            if (result != null) {
+                return result;
+            }
+        }
+
         Integer result;
-        if (drawable instanceof ColorDrawable ) {
+        if (drawable instanceof ColorDrawable) {
             result = resolveColorDrawable((ColorDrawable) drawable);
         } else if (drawable instanceof RippleDrawable) {
             result = resolveRippleDrawable((RippleDrawable) drawable, internalLogger);
@@ -32,6 +52,12 @@ public class LegacyDrawableToColorMapper implements DrawableToColorMapper {
             result = resolveInsetDrawable((InsetDrawable) drawable, internalLogger);
         } else if (drawable instanceof GradientDrawable) {
             result = resolveGradientDrawable((GradientDrawable) drawable, internalLogger);
+        } else if (drawable instanceof ShapeDrawable) {
+            result = resolveShapeDrawable((ShapeDrawable) drawable, internalLogger);
+        } else if (drawable instanceof StateListDrawable) {
+            result = resolveStateListDrawable((StateListDrawable) drawable, internalLogger);
+        } else if (drawable instanceof BitmapDrawable || drawable instanceof VectorDrawable) {
+            result = null; // return null without reporting them by telemetry.
         } else {
             String drawableType = drawable.getClass().getCanonicalName();
             if (drawableType == null) {
@@ -41,7 +67,7 @@ public class LegacyDrawableToColorMapper implements DrawableToColorMapper {
             Map<String, Object> additionalProperties = new HashMap<>();
             additionalProperties.put("replay.drawable.type", drawableType);
             internalLogger.i(TAG, "No mapper found for drawable " + drawableTypeFinal
-                    + ",additionalProperties:" + additionalProperties,true);
+                    + ",additionalProperties:" + additionalProperties, true);
             result = null;
         }
         return result;
@@ -49,6 +75,16 @@ public class LegacyDrawableToColorMapper implements DrawableToColorMapper {
 
     protected Integer resolveColorDrawable(ColorDrawable drawable) {
         return mergeColorAndAlpha(drawable.getColor(), drawable.getAlpha());
+    }
+
+    private Integer resolveStateListDrawable(StateListDrawable drawable, InternalLogger internalLogger) {
+        // Drawable.getCurrent() can return null in case <selector> doesn't have an item for the default case.
+        Drawable current = drawable.getCurrent();
+        return (current != null) ? mapDrawableToColor(current, internalLogger) : null;
+    }
+
+    protected Integer resolveShapeDrawable(ShapeDrawable drawable, InternalLogger internalLogger) {
+        return drawable.getPaint().getColor();
     }
 
     protected Integer resolveRippleDrawable(RippleDrawable drawable, InternalLogger internalLogger) {

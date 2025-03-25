@@ -9,7 +9,13 @@ import androidx.annotation.RequiresApi;
 
 import com.ft.sdk.sessionreplay.R;
 
+import java.util.List;
+
 public class AndroidMDrawableToColorMapper extends LegacyDrawableToColorMapper {
+
+    public AndroidMDrawableToColorMapper(List<DrawableToColorMapper> extensionMappers) {
+        super(extensionMappers);
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override

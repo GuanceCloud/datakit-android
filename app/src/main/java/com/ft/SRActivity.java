@@ -3,18 +3,21 @@ package com.ft;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatCheckedTextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class SessionReplayActivity extends NameTitleActivity {
+public class SRActivity extends NameTitleActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -23,7 +26,7 @@ public class SessionReplayActivity extends NameTitleActivity {
         findViewById(R.id.session_replay_dialog).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new AlertDialog.Builder(SessionReplayActivity.this).setMessage("这是对话框")
+                new AlertDialog.Builder(SRActivity.this).setMessage("这是对话框")
                         .setPositiveButton("确定", null).create().show();
             }
 
@@ -32,22 +35,15 @@ public class SessionReplayActivity extends NameTitleActivity {
         findViewById(R.id.session_replay_origin_toast).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(SessionReplayActivity.this, "Toast:" + System.currentTimeMillis(), Toast.LENGTH_LONG).show();
+                Toast.makeText(SRActivity.this, "Toast:" + System.currentTimeMillis(), Toast.LENGTH_LONG).show();
 
             }
         });
         findViewById(R.id.session_replay_custom_toast).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CustomToast.showToast(SessionReplayActivity.this, "Toast:" + System.currentTimeMillis(), 1000);
+                CustomToast.showToast(SRActivity.this, "Toast:" + System.currentTimeMillis(), 1000);
 
-            }
-        });
-
-        findViewById(R.id.session_replay_privacy_override).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(SessionReplayActivity.this, SessionReplayPrivacyOverrideActivity.class));
             }
         });
 
@@ -74,5 +70,19 @@ public class SessionReplayActivity extends NameTitleActivity {
         int[] to = {R.id.list_simple_item_tv, R.id.list_simple_item_iv};
         list.setAdapter(new SimpleAdapter(this, arrayList, R.layout.list_simple_item, fromArray, to));
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.session_replay_override, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.session_replay_override) {
+            startActivity(new Intent(SRActivity.this, SRPrivacyOverrideActivity.class));
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

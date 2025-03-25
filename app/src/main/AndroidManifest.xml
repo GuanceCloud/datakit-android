@@ -35,10 +35,10 @@
         <activity android:name=".RepeatActivity" />
         <activity android:name=".TabViewActivity" />
         <activity android:name=".ManualRUMActivity" />
-        <activity android:name=".SessionReplayActivity" />
+        <activity android:name=".SRActivity" />
         <activity android:name=".HighLoadActivity" />
         <activity android:name=".IgnoreClassActivity" />
-        <activity android:name=".SessionReplayPrivacyOverrideActivity" />
+        <activity android:name=".SRPrivacyOverrideActivity" />
 
         <service
             android:name=".service.TestService"
