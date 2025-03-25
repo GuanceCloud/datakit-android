@@ -15,13 +15,13 @@ import com.ft.sdk.sessionreplay.internal.StorageBackedFeature;
 import com.ft.sdk.sessionreplay.internal.TouchPrivacyManager;
 import com.ft.sdk.sessionreplay.internal.recorder.NoOpRecorder;
 import com.ft.sdk.sessionreplay.internal.recorder.Recorder;
+import com.ft.sdk.sessionreplay.internal.resources.ResourceDataStoreManager;
+import com.ft.sdk.sessionreplay.internal.resources.ResourceHashesEntryDeserializer;
+import com.ft.sdk.sessionreplay.internal.resources.ResourceHashesEntrySerializer;
 import com.ft.sdk.sessionreplay.internal.storage.NoOpRecordWriter;
 import com.ft.sdk.sessionreplay.internal.storage.RecordWriter;
 import com.ft.sdk.sessionreplay.internal.storage.SessionReplayRecordWriter;
 import com.ft.sdk.sessionreplay.recorder.OptionSelectorDetector;
-import com.ft.sdk.sessionreplay.internal.resources.ResourceDataStoreManager;
-import com.ft.sdk.sessionreplay.internal.resources.ResourceHashesEntryDeserializer;
-import com.ft.sdk.sessionreplay.internal.resources.ResourceHashesEntrySerializer;
 import com.ft.sdk.sessionreplay.utils.DrawableToColorMapper;
 
 import java.util.List;
@@ -63,6 +63,9 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
 
     public static final String SESSION_REPLAY_SAMPLE_RATE_KEY = "session_replay_sample_rate";
     public static final String SESSION_REPLAY_PRIVACY_KEY = "session_replay_privacy";
+    public static final String SESSION_REPLAY_TEXT_AND_INPUT_PRIVACY_KEY = "session_replay_text_and_input_privacy";
+    public static final String SESSION_REPLAY_IMAGE_PRIVACY_KEY = "session_replay_image_privacy";
+    public static final String SESSION_REPLAY_TOUCH_PRIVACY_KEY = "session_replay_touch_privacy";
     public static final String SESSION_REPLAY_MANUAL_RECORDING_KEY =
             "session_replay_requires_manual_recording";
     public static final String SESSION_REPLAY_ENABLED_KEY =
@@ -116,7 +119,8 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                                 List<DrawableToColorMapper> customDrawableMappers,
                                 float sampleRate,
                                 boolean isDelayInit,
-                                boolean dynamicOptimizationEnabled) {
+                                boolean dynamicOptimizationEnabled,
+                                SessionReplayInternalCallback internalCallback) {
         this(sdkCore, customEndpointUrl,
                 privacy,
                 textAndInputPrivacy,
@@ -129,8 +133,10 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                         touchPrivacyManager, customMappers,
                         customOptionSelectorDetectors,
                         customDrawableMappers,
-                        isDelayInit,
-                        dynamicOptimizationEnabled));
+                        dynamicOptimizationEnabled,
+                        internalCallback,
+                        isDelayInit
+                ));
     }
 
 
@@ -165,6 +171,9 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
             public void onUpdate(Map<String, Object> context) {
                 context.put(SESSION_REPLAY_SAMPLE_RATE_KEY, rateBasedSampler.getSampleRate() != null ?
                         rateBasedSampler.getSampleRate().longValue() : null);
+                context.put(SESSION_REPLAY_PRIVACY_KEY, privacy.toString().toLowerCase(Locale.US));
+                context.put(SESSION_REPLAY_PRIVACY_KEY, privacy.toString().toLowerCase(Locale.US));
+                context.put(SESSION_REPLAY_PRIVACY_KEY, privacy.toString().toLowerCase(Locale.US));
                 context.put(SESSION_REPLAY_PRIVACY_KEY, privacy.toString().toLowerCase(Locale.US));
                 context.put(SESSION_REPLAY_MANUAL_RECORDING_KEY, false);
             }

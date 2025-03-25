@@ -24,6 +24,25 @@ public class SessionReplayLifecycleCallback implements LifecycleCallback, OnWind
         this.onWindowRefreshedCallback = onWindowRefreshedCallback;
     }
 
+    public void setCurrentWindow(Activity activity) {
+        Window window = activity.getWindow();
+        if (window != null) {
+            currentActiveWindows.put(window, null);
+        }
+    }
+
+    public void registerFragmentLifecycleCallbacks(Activity activity) {
+        if (activity instanceof FragmentActivity) {
+            // we need to register before the activity resumes to catch all the fragments
+            // added even before the activity resumes
+            RecorderFragmentLifecycleCallback lifecycleCallback = new RecorderFragmentLifecycleCallback(this);
+            ((FragmentActivity) activity).getSupportFragmentManager().registerFragmentLifecycleCallbacks(
+                    lifecycleCallback,
+                    true
+            );
+        }
+    }
+
     @Override
     public void onWindowsAdded(List<Window> windows) {
         for (Window window : windows) {

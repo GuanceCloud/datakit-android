@@ -13,6 +13,7 @@ import androidx.annotation.MainThread;
 import com.ft.sdk.feature.FeatureSdkCore;
 import com.ft.sdk.sessionreplay.ImagePrivacy;
 import com.ft.sdk.sessionreplay.MapperTypeWrapper;
+import com.ft.sdk.sessionreplay.SessionReplayInternalCallback;
 import com.ft.sdk.sessionreplay.TextAndInputPrivacy;
 import com.ft.sdk.sessionreplay.internal.LifecycleCallback;
 import com.ft.sdk.sessionreplay.internal.SessionReplayLifecycleCallback;
@@ -73,6 +74,7 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
     private final LifecycleCallback sessionReplayLifecycleCallback;
     private final RecordedDataQueueHandler recordedDataQueueHandler;
     private final ViewOnDrawInterceptor viewOnDrawInterceptor;
+    private final SessionReplayInternalCallback internalCallback;
     private final InternalLogger internalLogger;
     private final Handler uiHandler;
     private boolean shouldRecord = false;
@@ -94,6 +96,7 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
             WindowInspector windowInspector,
             FeatureSdkCore sdkCore,
             ResourceDataStoreManager resourceDataStoreManager,
+            SessionReplayInternalCallback internalCallback,
             boolean dynamicOptimizationEnabled,
             boolean isDelayInit
     ) {
@@ -140,11 +143,12 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
                 ),
                 new ConcurrentLinkedQueue<>()
         );
+        this.internalCallback = internalCallback;
 
         ViewIdentifierResolver viewIdentifierResolver = DefaultViewIdentifierResolver.get();
         ColorStringFormatter colorStringFormatter = DefaultColorStringFormatter.get();
         ViewBoundsResolver viewBoundsResolver = DefaultViewBoundsResolver.get();
-        DrawableToColorMapper drawableToColorMapper = DrawableToColorMapperFactory.getDefault();
+        DrawableToColorMapper drawableToColorMapper = DrawableToColorMapperFactory.getDefault(customDrawableMappers);
 
         ViewWireframeMapper defaultVWM = new ViewWireframeMapper(
                 viewIdentifierResolver,
@@ -202,7 +206,7 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
                                 internalLogger
                         ),
                         recordedDataQueueHandler,
-                        sdkCore, false
+                        sdkCore, dynamicOptimizationEnabled
                 ),
                 touchPrivacyManager
         );
@@ -216,6 +220,12 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
         );
 
         this.sessionReplayLifecycleCallback = new SessionReplayLifecycleCallback(this);
+        Activity activity = this.internalCallback.getCurrentActivity();
+        if (activity != null) {
+            ((SessionReplayLifecycleCallback) sessionReplayLifecycleCallback).setCurrentWindow(activity);
+            ((SessionReplayLifecycleCallback) sessionReplayLifecycleCallback).registerFragmentLifecycleCallbacks(activity);
+        }
+
         this.uiHandler = new Handler(Looper.getMainLooper());
         this.internalLogger = internalLogger;
     }

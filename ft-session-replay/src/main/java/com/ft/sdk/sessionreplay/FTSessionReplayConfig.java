@@ -25,6 +25,8 @@ public class FTSessionReplayConfig {
     private float sampleRate = 1f;
     private boolean delayInit;
     private boolean fineGrainedMaskingSet = false;
+    private boolean dynamicOptimizationEnabled = true;
+    private SessionReplayInternalCallback internalCallback = new NoSessionReplayInternalCallback();
 
     private ExtensionSupport extensionSupport = new NoOpExtensionSupport();
 
@@ -146,5 +148,24 @@ public class FTSessionReplayConfig {
 
     public float getSampleRate() {
         return sampleRate;
+    }
+
+    public boolean isDynamicOptimizationEnabled() {
+        return dynamicOptimizationEnabled;
+    }
+
+    public SessionReplayInternalCallback getInternalCallback() {
+        return internalCallback;
+    }
+
+    public FTSessionReplayConfig setDynamicOptimizationEnabled(boolean dynamicOptimizationEnabled) {
+        this.dynamicOptimizationEnabled = dynamicOptimizationEnabled;
+        return this;
+    }
+
+    public FTSessionReplayConfig setInternalCallback(SessionReplayInternalCallback internalCallback) {
+        this.internalCallback = internalCallback;
+        return this;
+
     }
 }

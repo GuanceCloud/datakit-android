@@ -28,6 +28,7 @@ import com.ft.sdk.sessionreplay.utils.AsyncJobStatusCallback;
 import com.ft.sdk.sessionreplay.utils.GlobalBounds;
 import com.ft.sdk.sessionreplay.utils.ImageWireframeHelper;
 import com.ft.sdk.sessionreplay.utils.InternalLogger;
+import com.ft.sdk.sessionreplay.utils.Utils;
 import com.ft.sdk.sessionreplay.utils.ViewIdentifierResolver;
 
 import java.util.ArrayList;
@@ -89,8 +90,8 @@ public class DefaultImageWireframeHelper implements ImageWireframeHelper {
         if (shouldMaskContextualImage(
                 imagePrivacy,
                 isContextualImage,
-                densityNormalized(targetWidth, density),
-                densityNormalized(targetHeight, density)
+                Utils.densityNormalized(targetWidth, density),
+                Utils.densityNormalized(targetHeight, density)
         )) {
             return createContentPlaceholderWireframe(
                     id,
@@ -251,8 +252,8 @@ public class DefaultImageWireframeHelper implements ImageWireframeHelper {
         }
 
         float density = displayMetrics.density;
-        long drawableWidthDp = densityNormalized(drawableProperties.drawableWidth, density);
-        long drawableHeightDp = densityNormalized(drawableProperties.drawableHeight, density);
+        long drawableWidthDp = Utils.densityNormalized(drawableProperties.drawableWidth, density);
+        long drawableHeightDp = Utils.densityNormalized(drawableProperties.drawableHeight, density);
 
         if (imagePrivacy == ImagePrivacy.MASK_ALL) {
             return createContentPlaceholderWireframe(
@@ -472,10 +473,6 @@ public class DefaultImageWireframeHelper implements ImageWireframeHelper {
     private void populateResourceIdInWireframe(String resourceId, ImageWireframe wireframe) {
         wireframe.setResourceId(resourceId);
         wireframe.setEmpty(false);
-    }
-
-    private int densityNormalized(int value, float density) {
-        return (int) (value / density);
     }
 
     public enum CompoundDrawablePositions {

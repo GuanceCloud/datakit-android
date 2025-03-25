@@ -33,7 +33,9 @@ public class SessionReplay {
                 ftSessionReplayConfig.getCustomDrawableMapper(),
                 ftSessionReplayConfig.getSampleRate(),
                 ftSessionReplayConfig.isDelayInit(),
-                false
+                ftSessionReplayConfig.isDynamicOptimizationEnabled(),
+                ftSessionReplayConfig.getInternalCallback()
+
         );
 
         featureSdkCore.registerFeature(sessionReplayFeature);

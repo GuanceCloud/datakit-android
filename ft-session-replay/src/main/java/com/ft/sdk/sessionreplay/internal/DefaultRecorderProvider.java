@@ -20,6 +20,7 @@ import androidx.appcompat.widget.SwitchCompat;
 import com.ft.sdk.feature.FeatureSdkCore;
 import com.ft.sdk.sessionreplay.ImagePrivacy;
 import com.ft.sdk.sessionreplay.MapperTypeWrapper;
+import com.ft.sdk.sessionreplay.SessionReplayInternalCallback;
 import com.ft.sdk.sessionreplay.TextAndInputPrivacy;
 import com.ft.sdk.sessionreplay.internal.recorder.Recorder;
 import com.ft.sdk.sessionreplay.internal.recorder.SessionReplayRecorder;
@@ -68,6 +69,7 @@ public class DefaultRecorderProvider implements RecorderProvider {
     private final List<OptionSelectorDetector> customOptionSelectorDetectors;
     private final List<DrawableToColorMapper> customDrawableMappers;
     private final boolean dynamicOptimizationEnabled;
+    private final SessionReplayInternalCallback internalCallback;
     private final boolean isDelayInit;
 
     public DefaultRecorderProvider(
@@ -79,6 +81,7 @@ public class DefaultRecorderProvider implements RecorderProvider {
             List<OptionSelectorDetector> customOptionSelectorDetectors,
             List<DrawableToColorMapper> customDrawableMappers,
             boolean dynamicOptimizationEnabled,
+            SessionReplayInternalCallback internalCallback,
             boolean isDelayInit) {
         this.sdkCore = sdkCore;
         this.textAndInputPrivacy = textAndInputPrivacy;
@@ -88,6 +91,7 @@ public class DefaultRecorderProvider implements RecorderProvider {
         this.customOptionSelectorDetectors = customOptionSelectorDetectors;
         this.customDrawableMappers = customDrawableMappers;
         this.dynamicOptimizationEnabled = dynamicOptimizationEnabled;
+        this.internalCallback = internalCallback;
         this.isDelayInit = isDelayInit;
     }
 
@@ -119,6 +123,7 @@ public class DefaultRecorderProvider implements RecorderProvider {
                 null,
                 sdkCore,
                 resourceDataStoreManager,
+                internalCallback,
                 dynamicOptimizationEnabled,
                 isDelayInit
         );
