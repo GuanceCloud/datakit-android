@@ -1,7 +1,11 @@
 package com.ft.sdk.sessionreplay.material;
 
+import androidx.cardview.widget.CardView;
+
 import com.ft.sdk.sessionreplay.ExtensionSupport;
 import com.ft.sdk.sessionreplay.MapperTypeWrapper;
+import com.ft.sdk.sessionreplay.material.internal.CardWireframeMapper;
+import com.ft.sdk.sessionreplay.material.internal.ChipWireframeMapper;
 import com.ft.sdk.sessionreplay.material.internal.MaterialDrawableToColorMapper;
 import com.ft.sdk.sessionreplay.material.internal.MaterialOptionSelectorDetector;
 import com.ft.sdk.sessionreplay.material.internal.SliderWireframeMapper;
@@ -16,6 +20,7 @@ import com.ft.sdk.sessionreplay.utils.DrawableToColorMapper;
 import com.ft.sdk.sessionreplay.utils.DrawableToColorMapperFactory;
 import com.ft.sdk.sessionreplay.utils.ViewBoundsResolver;
 import com.ft.sdk.sessionreplay.utils.ViewIdentifierResolver;
+import com.google.android.material.chip.Chip;
 import com.google.android.material.slider.Slider;
 import com.google.android.material.tabs.TabLayout;
 
@@ -52,9 +57,26 @@ public class MaterialExtensionSupport implements ExtensionSupport {
                 )
         );
 
+
+        CardWireframeMapper cardWireframeMapper = new CardWireframeMapper(
+                viewIdentifierResolver,
+                colorStringFormatter,
+                viewBoundsResolver,
+                drawableToColorMapper
+        );
+        ChipWireframeMapper chipWireframeMapper = new ChipWireframeMapper(
+                viewIdentifierResolver,
+                colorStringFormatter,
+                viewBoundsResolver,
+                drawableToColorMapper
+        );
+
         return new ArrayList<>(Arrays.asList(
                 new MapperTypeWrapper<>(Slider.class, sliderWireframeMapper),
-                new MapperTypeWrapper<>(TabLayout.TabView.class, tabWireframeMapper))
+                new MapperTypeWrapper<>(TabLayout.TabView.class, tabWireframeMapper),
+                new MapperTypeWrapper<>(CardView.class, cardWireframeMapper),
+                new MapperTypeWrapper<>(Chip.class, chipWireframeMapper)
+        )
         );
     }
 
