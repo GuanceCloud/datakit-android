@@ -75,21 +75,23 @@ public class DemoApplication extends BaseApplication {
 
 
         FTSdk.initRUMWithConfig(new FTRUMConfig()
-                .setSamplingRate(1f)
-                .setRumAppId(BuildConfig.RUM_APP_ID)
-                .setEnableTraceUserAction(true)
-                .setEnableTraceUserView(true)
-                .setRumCacheLimitCount(1000)
-                .setRumCacheDiscardStrategy(RUMCacheDiscard.DISCARD)
-                .setEnableTraceUserResource(true)
-                .setEnableTrackAppANR(true)
-                .setEnableTrackAppCrash(true)
-                .setEnableTrackAppUIBlock(true, 100)
-                .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
-                .setResourceUrlHandler(url -> false)
+                        .setSamplingRate(0f)
+                        .setSessionErrorSampleRate(1f)
+                        .setRumAppId(BuildConfig.RUM_APP_ID)
+                        .setEnableTraceUserAction(true)
+                        .setEnableTraceUserView(true)
+                        .setRumCacheLimitCount(1000)
+                        .setRumCacheDiscardStrategy(RUMCacheDiscard.DISCARD)
+                        .setEnableTraceUserResource(true)
+                        .setEnableTrackAppANR(true)
+                        .setEnableTrackAppCrash(true)
+                        .setEnableTrackAppUIBlock(true, 100)
+                        .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
+                        .setResourceUrlHandler(url -> false)
 //                .addGlobalContext("track_id", BuildConfig.TRACK_ID)
 //                .addGlobalContext("custom_tag", "any tags")
-                .setExtraMonitorTypeWithError(ErrorMonitorType.ALL.getValue()));
+                        .setExtraMonitorTypeWithError(ErrorMonitorType.ALL.getValue())
+        );
 
 
         UserData userData = new UserData();

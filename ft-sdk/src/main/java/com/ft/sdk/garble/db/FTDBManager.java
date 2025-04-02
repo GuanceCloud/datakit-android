@@ -13,7 +13,7 @@ import com.ft.sdk.DBCacheDiscard;
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.garble.bean.ActionBean;
 import com.ft.sdk.garble.bean.DataType;
-import com.ft.sdk.garble.bean.SyncJsonData;
+import com.ft.sdk.garble.bean.SyncData;
 import com.ft.sdk.garble.bean.ViewBean;
 import com.ft.sdk.garble.db.base.DBManager;
 import com.ft.sdk.garble.db.base.DataBaseCallBack;
@@ -24,7 +24,6 @@ import com.ft.sdk.garble.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * BY huangDianHua
@@ -84,8 +83,8 @@ public class FTDBManager extends DBManager {
      *
      * @param data
      */
-    public boolean insertFtOperation(final SyncJsonData data, boolean reInsert) {
-        ArrayList<SyncJsonData> list = new ArrayList<>();
+    public boolean insertFtOperation(final SyncData data, boolean reInsert) {
+        ArrayList<SyncData> list = new ArrayList<>();
         list.add(data);
         return insertFtOptList(list, reInsert);
     }
@@ -191,10 +190,9 @@ public class FTDBManager extends DBManager {
                 cursor.moveToFirst();
                 int count = cursor.getInt(0);
                 cursor.close();
-                ContentValues contentValues = new ContentValues();
 
                 if (count > 0) {
-
+                    ContentValues contentValues = new ContentValues();
                     contentValues.put(FTSQL.RUM_COLUMN_IS_CLOSE, 1);
                     contentValues.put(FTSQL.RUM_COLUMN_ACTION_DURATION, duration);
                     db.update(FTSQL.FT_TABLE_ACTION, contentValues,
@@ -223,10 +221,9 @@ public class FTDBManager extends DBManager {
                 cursor.moveToFirst();
                 int count = cursor.getInt(0);
                 cursor.close();
-                ContentValues contentValues = new ContentValues();
 
                 if (count > 0) {
-
+                    ContentValues contentValues = new ContentValues();
                     contentValues.put(FTSQL.RUM_COLUMN_IS_CLOSE, 1);
                     contentValues.put(FTSQL.RUM_COLUMN_VIEW_TIME_SPENT, timeSpent);
                     contentValues.put(FTSQL.RUM_COLUMN_EXTRA_ATTR, attr);
@@ -568,14 +565,14 @@ public class FTDBManager extends DBManager {
      *
      * @param dataList
      */
-    public boolean insertFtOptList(@NonNull final List<SyncJsonData> dataList, boolean reInsert) {
+    public boolean insertFtOptList(@NonNull final List<SyncData> dataList, boolean reInsert) {
         final boolean[] result = new boolean[1];
         getDB(true, new DataBaseCallBack() {
             @Override
             public void run(SQLiteDatabase db) {
                 db.beginTransaction();
                 int count = 0;
-                for (SyncJsonData data : dataList) {
+                for (SyncData data : dataList) {
 
                     ContentValues contentValues = new ContentValues();
                     contentValues.put(FTSQL.RECORD_COLUMN_TM, data.getTime());
@@ -603,11 +600,11 @@ public class FTDBManager extends DBManager {
     }
 
 
-    public List<SyncJsonData> queryDataByDataByTypeLimit(int limit, DataType dataType) {
+    public List<SyncData> queryDataByDataByTypeLimit(int limit, DataType dataType) {
         return queryDataByDescLimit(limit, FTSQL.RECORD_COLUMN_DATA_TYPE + "=? ", new String[]{dataType.getValue()}, "asc", false);
     }
 
-    public List<SyncJsonData> queryDataByDataByTypeLimitDesc(int limit, DataType dataType) {
+    public List<SyncData> queryDataByDataByTypeLimitDesc(int limit, DataType dataType) {
         return queryDataByDescLimit(limit, FTSQL.RECORD_COLUMN_DATA_TYPE + "=? ", new String[]{dataType.getValue()}, "desc", false);
     }
 
@@ -617,7 +614,7 @@ public class FTDBManager extends DBManager {
      * @param limit limit == 0 表示获取全部数据
      * @return
      */
-    public List<SyncJsonData> queryDataByDescLimit(final int limit) {
+    public List<SyncData> queryDataByDescLimit(final int limit) {
         return queryDataByDescLimit(limit, false);
     }
 
@@ -627,8 +624,58 @@ public class FTDBManager extends DBManager {
      * @param limit limit == 0 表示获取全部数据
      * @return
      */
-    public List<SyncJsonData> queryDataByDescLimit(final int limit, boolean oldCache) {
+    public List<SyncData> queryDataByDescLimit(final int limit, boolean oldCache) {
         return queryDataByDescLimit(limit, null, null, "asc", oldCache);
+    }
+
+    /**
+     * @param dataType
+     */
+    public int updateDataType(DataType dataType, long errorDateline) {
+        final int[] count = new int[1];
+        getDB(true, new DataBaseCallBack() {
+            @Override
+            public void run(SQLiteDatabase db) {
+                ContentValues value = new ContentValues();
+                String originType = dataType.getValue();
+                String targetDataType = originType.replace("_not_sample", "");
+
+                Cursor cursor = db.rawQuery("select count(*) from " + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME
+                        + " where " + FTSQL.RECORD_COLUMN_DATA_TYPE + "='" + originType + "'", null);
+                if (cursor.moveToFirst()) {
+                    count[0] = cursor.getInt(0);
+                }
+                cursor.close();
+
+                if (count[0] > 0) {
+                    value.put(FTSQL.RECORD_COLUMN_DATA_TYPE, targetDataType);
+                    db.update(FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME, value,
+                            FTSQL.RECORD_COLUMN_DATA_TYPE + "='" + originType + "' AND "
+                                    + FTSQL.RECORD_COLUMN_TM + " <= " + errorDateline, null);
+                }
+
+            }
+        });
+        return count[0];
+    }
+
+    /**
+     * @param dataType
+     * @param now
+     * @param expireDuration
+     */
+    public int deleteExpireCache(DataType dataType, long now, long expireDuration) {
+        final int[] count = new int[1];
+        getDB(true, new DataBaseCallBack() {
+            @Override
+            public void run(SQLiteDatabase db) {
+                long expireTimeline = now - expireDuration;
+                count[0] = db.delete(FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME,
+                        FTSQL.RECORD_COLUMN_DATA_TYPE + "='" + dataType.getValue() + "' AND "
+                                + FTSQL.RECORD_COLUMN_TM + "< " + expireTimeline, null);
+            }
+        });
+        return count[0];
     }
 
     /**
@@ -725,7 +772,7 @@ public class FTDBManager extends DBManager {
                         cursor.close();
                     }
                 } catch (SQLException e) {
-                    if (Objects.requireNonNull(e.getMessage()).contains("no such table: sync_data")) {
+                    if (e.getMessage().contains("no such table: sync_data")) {
                         LogUtils.d(TAG, "There is no old cache in 'sync_data', ignore this error");
                     } else {
                         LogUtils.e(TAG, LogUtils.getStackTraceString(e));
@@ -744,8 +791,8 @@ public class FTDBManager extends DBManager {
      * @param selectionArgs
      * @return
      */
-    private List<SyncJsonData> queryDataByDescLimit(final int limit, final String selection, final String[] selectionArgs, final String order, boolean oldCache) {
-        final List<SyncJsonData> recordList = new ArrayList<>();
+    private List<SyncData> queryDataByDescLimit(final int limit, final String selection, final String[] selectionArgs, final String order, boolean oldCache) {
+        final List<SyncData> recordList = new ArrayList<>();
         getDB(false, new DataBaseCallBack() {
             @Override
             public void run(SQLiteDatabase db) {
@@ -766,11 +813,11 @@ public class FTDBManager extends DBManager {
                     String type = cursor.getString(cursor.getColumnIndex(FTSQL.RECORD_COLUMN_DATA_TYPE));
                     String uuid = oldCache ? "" : cursor.getString(cursor.getColumnIndex(FTSQL.RECORD_COLUMN_DATA_UUID));
 
-                    SyncJsonData recordData = null;
+                    SyncData recordData = null;
 
                     for (DataType dataType : DataType.values()) {
                         if (dataType.getValue().equals(type)) {
-                            recordData = new SyncJsonData(dataType);
+                            recordData = new SyncData(dataType);
                             break;
                         }
                     }

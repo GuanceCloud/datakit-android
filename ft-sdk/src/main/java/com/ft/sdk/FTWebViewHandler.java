@@ -153,9 +153,13 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                     HashMap<String, Object> tagMaps = Utils.jsonToMap(jsonTags);
                     HashMap<String, Object> fieldMaps = Utils.jsonToMap(jsonFields);
 
-                    long time = data.optLong(Constants.TIME);
+                    long time = data.optLong(Constants.TIME) * 1000000;
                     String measurement = data.optString(Constants.MEASUREMENT);
-                    FTTrackInner.getInstance().rumWebView(time * 1000000, measurement, tagMaps, fieldMaps);
+                    if (measurement.equals(Constants.FT_MEASUREMENT_RUM_ERROR)) {
+                        SyncTaskManager.get().setErrorTimeLine(time, null);
+                    }
+                    FTTrackInner.getInstance().rumWebView(time, measurement,
+                            tagMaps, fieldMaps);
                 }
 
             } else if (name.equals(WEB_JS_TYPE_TRACK)) {
@@ -173,7 +177,8 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                 callbackFromNative(tag, callbackMethod, ret, err);
             }
 
-        } catch (Exception e) {
+        } catch (
+                Exception e) {
             LogUtils.e(LOG_TAG, e.getMessage());
         }
 

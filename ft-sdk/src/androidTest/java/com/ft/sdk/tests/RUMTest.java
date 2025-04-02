@@ -22,7 +22,7 @@ import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.ErrorType;
 import com.ft.sdk.garble.bean.NetStatusBean;
 import com.ft.sdk.garble.bean.ResourceParams;
-import com.ft.sdk.garble.bean.SyncJsonData;
+import com.ft.sdk.garble.bean.SyncData;
 import com.ft.sdk.garble.bean.ViewBean;
 import com.ft.sdk.garble.db.FTDBCachePolicy;
 import com.ft.sdk.garble.db.FTDBManager;
@@ -141,11 +141,11 @@ public class RUMTest extends FTBaseTest {
         waitEventConsumeInThreadPool();
         Thread.sleep(500);
 
-        List<SyncJsonData> list = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.RUM_APP);
+        List<SyncData> list = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.RUM_APP);
 
         Assert.assertFalse(list.isEmpty());
 
-        SyncJsonData data = list.get(0);
+        SyncData data = list.get(0);
 //        Assert.assertTrue(action.isClose());
         LineProtocolData lineProtocolData = new LineProtocolData(data.getDataString());
         Assert.assertEquals(lineProtocolData.getTagAsString("action_name"), ACTION_NAME);
@@ -164,7 +164,7 @@ public class RUMTest extends FTBaseTest {
             FTRUMGlobalManager.get().addAction(ACTION_NAME, ACTION_TYPE_NAME);
         }
         Thread.sleep(2000);
-        List<SyncJsonData> list = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.RUM_APP);
+        List<SyncData> list = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.RUM_APP);
         Assert.assertEquals(1000, list.size());
     }
 
@@ -391,9 +391,9 @@ public class RUMTest extends FTBaseTest {
 
         Thread.sleep(2000);
 
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
+        List<SyncData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
 
-        for (SyncJsonData recordData : recordDataList) {
+        for (SyncData recordData : recordDataList) {
             LineProtocolData data = new LineProtocolData(recordData.getDataString());
 
             if (Constants.FT_MEASUREMENT_RUM_RESOURCE.equals(data.getMeasurement())) {
@@ -513,7 +513,7 @@ public class RUMTest extends FTBaseTest {
 
         generateRUMData();
 
-        List<SyncJsonData> recordDataList = FTDBManager
+        List<SyncData> recordDataList = FTDBManager
                 .get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
         Assert.assertEquals(0, recordDataList.size());
 
@@ -532,7 +532,7 @@ public class RUMTest extends FTBaseTest {
 
         generateRUMData();
 
-        List<SyncJsonData> recordDataList = FTDBManager
+        List<SyncData> recordDataList = FTDBManager
                 .get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
         Assert.assertTrue(recordDataList.size() >= 5);
 
@@ -640,13 +640,13 @@ public class RUMTest extends FTBaseTest {
 
         Thread.sleep(1000);
 
-        List<SyncJsonData> recordDataList = FTDBManager.get()
+        List<SyncData> recordDataList = FTDBManager.get()
                 .queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
 
         String tracId = "";
         String spanId = "";
 
-        for (SyncJsonData recordData : recordDataList) {
+        for (SyncData recordData : recordDataList) {
 
             LineProtocolData data = new LineProtocolData(recordData.getDataString());
 
@@ -737,13 +737,13 @@ public class RUMTest extends FTBaseTest {
         }
         Thread.sleep(1000);
 
-        List<SyncJsonData> recordDataList = FTDBManager.get()
+        List<SyncData> recordDataList = FTDBManager.get()
                 .queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
 
         String tracId = "";
         String spanId = "";
 
-        for (SyncJsonData recordData : recordDataList) {
+        for (SyncData recordData : recordDataList) {
 
             LineProtocolData data = new LineProtocolData(recordData.getDataString());
 
@@ -777,9 +777,9 @@ public class RUMTest extends FTBaseTest {
 
         waitEventConsumeInThreadPool();
 
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
+        List<SyncData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
         Assert.assertFalse(recordDataList.isEmpty());
-        for (SyncJsonData recordData : recordDataList) {
+        for (SyncData recordData : recordDataList) {
             LineProtocolData data = new LineProtocolData(recordData.getDataString());
             if (Constants.FT_MEASUREMENT_RUM_RESOURCE.equals(data.getMeasurement())) {
                 Assert.assertNull(data.getTagAsString(Constants.KEY_RUM_ACTION_ID));

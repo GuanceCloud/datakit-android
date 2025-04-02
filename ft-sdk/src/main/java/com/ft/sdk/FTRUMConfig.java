@@ -13,6 +13,11 @@ public class FTRUMConfig {
     private float samplingRate = 1;
 
     /**
+     *
+     */
+    private float sessionErrorSampleRate = 1;
+
+    /**
      * RUM appID
      */
     private String rumAppId = "";
@@ -135,6 +140,23 @@ public class FTRUMConfig {
      */
     public FTRUMConfig setSamplingRate(float samplingRate) {
         this.samplingRate = samplingRate;
+        return this;
+    }
+
+    /**
+     * 获取错误采样率
+     *
+     * @return
+     */
+    public float getSessionErrorSampleRate() {
+        return sessionErrorSampleRate;
+    }
+
+    /**
+     * @param sessionErrorSampleRate
+     */
+    public FTRUMConfig setSessionErrorSampleRate(float sessionErrorSampleRate) {
+        this.sessionErrorSampleRate = sessionErrorSampleRate;
         return this;
     }
 
@@ -475,7 +497,6 @@ public class FTRUMConfig {
     }
 
 
-
     /**
      * ASM 设置全局 {@link FTResourceInterceptor.ContentHandlerHelper } ，默认不设置
      *
@@ -533,18 +554,4 @@ public class FTRUMConfig {
                 '}';
     }
 
-//    /**
-//     * 设置 BackendSample 后端采样，当为 true 时，rum sampleRate 设置不再起效
-//     *
-//     * @param backendSample
-//     * @return
-//     */
-//    public FTRUMConfig setBackendSample(boolean backendSample) {
-//        this.backendSample = backendSample;
-//        return this;
-//    }
-//
-//    public boolean isBackendSample() {
-//        return this.backendSample;
-//    }
 }

@@ -12,7 +12,7 @@ import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.bean.DataType;
-import com.ft.sdk.garble.bean.SyncJsonData;
+import com.ft.sdk.garble.bean.SyncData;
 import com.ft.sdk.garble.db.FTDBCachePolicy;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.db.base.DatabaseHelper;
@@ -57,7 +57,7 @@ public class FTDBManagerTest extends FTBaseTest {
         insertData();
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(2000);
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimit(0);
+        List<SyncData> recordDataList = FTDBManager.get().queryDataByDescLimit(0);
         assertEquals(1, recordDataList.size());
     }
 
@@ -79,7 +79,7 @@ public class FTDBManagerTest extends FTBaseTest {
         }
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimit(0);
+        List<SyncData> recordDataList = FTDBManager.get().queryDataByDescLimit(0);
         assertEquals(repeatTime, recordDataList.size());
     }
 
@@ -97,14 +97,14 @@ public class FTDBManagerTest extends FTBaseTest {
         insertData();
         //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
         Thread.sleep(1000);
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDescLimit(0);
+        List<SyncData> recordDataList = FTDBManager.get().queryDataByDescLimit(0);
         assertEquals(2, recordDataList.size());
         List<String> integers = new ArrayList<>();
-        for (SyncJsonData recordData : recordDataList) {
+        for (SyncData recordData : recordDataList) {
             integers.add("" + recordData.getId());
         }
         FTDBManager.get().delete(integers, false);
-        List<SyncJsonData> recordDataList1 = FTDBManager.get().queryDataByDescLimit(0);
+        List<SyncData> recordDataList1 = FTDBManager.get().queryDataByDescLimit(0);
         assertEquals(0, recordDataList1.size());
     }
 

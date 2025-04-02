@@ -99,6 +99,11 @@ public class Constants {
     public static final String FT_USER_USER_EXT = "ft.user.extdata";
 
     /**
+     * //todo
+     */
+    public static final String FT_RUM_ERROR_TIMELINE = "ft.error.timeline";
+
+    /**
      * 存储 {@link  android.content.SharedPreferences} 数据存储键值
      */
 
@@ -550,6 +555,25 @@ public class Constants {
      * 会话 ID
      */
     public static final String KEY_RUM_SESSION_ID = "session_id";
+
+    /**
+     * 由于错误采集到的数据
+     */
+
+    public static final String KEY_SAMPLED_FOR_ERROR_SESSION = "sampled_for_error_session";
+
+    /**
+     *
+     */
+    public static final String KEY_SESSION_ERROR_TIMESTAMP = "session_error_timestamp";
+    /**
+     * session rum 采样率
+     */
+    public static final String KEY_SESSION_SAMPLE_RATE = "session_sample_rate";
+    /**
+     *
+     */
+    public static final String KEY_SESSION_ON_ERROR_SAMPLE_RATE = "session_on_error_sample_rate";
 
     /**
      * 会话类型

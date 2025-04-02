@@ -30,6 +30,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -59,9 +60,7 @@ public class FTRUMInnerManager {
     static final long SESSION_FILTER_CAPACITY = 5;
     private final ConcurrentHashMap<String, ResourceBean> resourceBeanMap = new ConcurrentHashMap<>();
 
-    private final ArrayList<String> viewList = new ArrayList<>();
-
-    private boolean isTVMode = false;
+    private final LinkedList<String> viewList = new LinkedList<>();
 
     private FTRUMInnerManager() {
 
@@ -84,7 +83,13 @@ public class FTRUMInnerManager {
     /**
      * 不收集
      */
-    private final ArrayList<String> notCollectArr = new ArrayList<>();
+    private final LinkedList<String> notCollectArr = new LinkedList<>();
+
+
+    /**
+     * 不收集 Error Session id
+     */
+    private final LinkedList<String> notSessionErrorCollectArr = new LinkedList<>();
 
     /**
      * 当前激活 View
@@ -119,6 +124,12 @@ public class FTRUMInnerManager {
      */
     private float sampleRate = 1f;
 
+
+    /**
+     * 错误 session 采样率
+     */
+    private float sessionErrorSampleError = 1f;
+
     String getSessionId() {
         return sessionId;
     }
@@ -136,7 +147,7 @@ public class FTRUMInnerManager {
             lastSessionTime = now;
             sessionId = Utils.randomUUID();
             LogUtils.d(TAG, "Session Track -> New SessionId:" + sessionId + ",longTimeSessionReset:" + longTimeSession);
-            checkSessionKeep(sessionId, sampleRate);
+            checkSessionKeep(sessionId, sampleRate, sessionErrorSampleError);
 
             if (checkRefreshView) {
                 if (activeView != null && !activeView.isClose()) {
@@ -603,7 +614,11 @@ public class FTRUMInnerManager {
 
         try {
             checkSessionRefresh(true);
+            if (property == null || property.get(FTExceptionHandler.IS_PRE_CRASH) != (Boolean) true) {
+                //排除上报上一次 native crash 错误的这种场景
+                SyncTaskManager.get().setErrorTimeLine(dateline, activeView);
 
+            }
             final HashMap<String, Object> tags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
             attachRUMRelative(tags, true);
             final HashMap<String, Object> fields = new HashMap<>();
@@ -866,6 +881,8 @@ public class FTRUMInnerManager {
 
             if (bean.resourceStatus >= HttpsURLConnection.HTTP_BAD_REQUEST
                     || (bean.resourceStatus == 0 && !Utils.isNullOrEmpty(bean.errorStack))) {
+                SyncTaskManager.get().setErrorTimeLine(time, activeView);
+
                 HashMap<String, Object> errorTags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
                 HashMap<String, Object> errorField = new HashMap<>();
                 errorTags.put(Constants.KEY_RUM_ERROR_TYPE, ErrorType.NETWORK.toString());
@@ -1270,8 +1287,9 @@ public class FTRUMInnerManager {
                     fields.put(Constants.KEY_FPS_AVG, bean.getFpsAvg());
                     fields.put(Constants.KEY_FPS_MINI, bean.getFpsMini());
                 }
-
-
+                if (bean.getLastErrorTime() > 0) {
+                    fields.put(Constants.KEY_SESSION_ERROR_TIMESTAMP, bean.getLastErrorTime());
+                }
                 FTTrackInner.getInstance().rum(bean.getStartTime(),
                         Constants.FT_MEASUREMENT_RUM_VIEW, tags, fields, new RunnerCompleteCallBack() {
                             @Override
@@ -1287,8 +1305,9 @@ public class FTRUMInnerManager {
 
     void initParams(FTRUMConfig config) {
         sampleRate = config.getSamplingRate();
+        sessionErrorSampleError = config.getSessionErrorSampleRate();
         sessionId = Utils.randomUUID();
-        checkSessionKeep(sessionId, sampleRate);
+        checkSessionKeep(sessionId, sampleRate, sessionErrorSampleError);
         EventConsumerThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
@@ -1304,9 +1323,9 @@ public class FTRUMInnerManager {
      * @param sessionId
      * @param sampleRate
      */
-    private void checkSessionKeep(String sessionId, float sampleRate) {
-        boolean collect = Utils.enableTraceSamplingRate(sampleRate);
-        if (!collect) {
+    private void checkSessionKeep(String sessionId, float sampleRate, float errorSampleRate) {
+        boolean sessionCollect = Utils.enableTraceSamplingRate(sampleRate);
+        if (!sessionCollect) {
             synchronized (notCollectArr) {
                 if (notCollectArr.size() + 1 > SESSION_FILTER_CAPACITY) {
                     try {
@@ -1318,7 +1337,23 @@ public class FTRUMInnerManager {
                 notCollectArr.add(sessionId);
             }
             LogUtils.w(TAG, "根据 FTRUMConfig SampleRate 采样率计算，当前 session 不被采集，Session Track-> session_id:" + sessionId);
+
+            boolean sessionErrorCollect = Utils.enableTraceSamplingRate(errorSampleRate);
+            if (!sessionErrorCollect) {
+                synchronized (notSessionErrorCollectArr) {
+                    if (notSessionErrorCollectArr.size() + 1 > SESSION_FILTER_CAPACITY) {
+                        try {
+                            notSessionErrorCollectArr.remove(0);
+                        } catch (Exception e) {
+                            LogUtils.d(TAG, LogUtils.getStackTraceString(e));
+                        }
+                    }
+                    notSessionErrorCollectArr.add(sessionId);
+                }
+                LogUtils.w(TAG, "根据 FTRUMConfig SessionErrorSampleRate 采样率计算，当前 session 不被采集，Session Track-> session_id:" + sessionId);
+            }
         }
+
     }
 
     /**
@@ -1331,11 +1366,16 @@ public class FTRUMInnerManager {
         return !notCollectArr.contains(sessionId);
     }
 
+    public boolean checkSessionErrorWillCollect(String sessionId) {
+        return !notSessionErrorCollectArr.contains(sessionId);
+    }
+
     public void release() {
         mHandler.removeCallbacks(mRUMGenerateRunner);
         activeAction = null;
         activeView = null;
         notCollectArr.clear();
+        notSessionErrorCollectArr.clear();
         resourceBeanMap.clear();
         viewList.clear();
     }

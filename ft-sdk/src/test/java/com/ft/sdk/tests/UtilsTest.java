@@ -6,7 +6,7 @@ import com.ft.sdk.FTTrackInner;
 import com.ft.sdk.SyncDataHelper;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.LineProtocolBean;
-import com.ft.sdk.garble.bean.SyncJsonData;
+import com.ft.sdk.garble.bean.SyncData;
 import com.ft.sdk.garble.utils.Constants;
 
 import org.json.JSONException;
@@ -77,15 +77,15 @@ public class UtilsTest {
 
         SyncDataHelper helper = Whitebox.getInternalState(FTTrackInner.getInstance(), "dataHelper");
         LineProtocolBean trackBean = new LineProtocolBean(TEST_MEASUREMENT_INFLUX_DB_LINE, tags, fields, VALUE_TIME);
-        SyncJsonData recordData = SyncJsonData.getSyncJsonData(helper, DataType.LOG, trackBean);
+        SyncData recordData = SyncData.getSyncData(helper, DataType.LOG, trackBean);
 
-        List<SyncJsonData> recordDataList = new ArrayList<>();
+        List<SyncData> recordDataList = new ArrayList<>();
         recordDataList.add(recordData);
         recordDataList.add(recordData);
         recordDataList.add(recordData);
         StringBuilder content = new StringBuilder();
-        for (SyncJsonData syncJsonData : recordDataList) {
-            content.append(syncJsonData.getDataString());
+        for (SyncData syncData : recordDataList) {
+            content.append(syncData.getDataString());
         }
         Assert.assertEquals(LOG_EXPECT_DATA, content.toString().replaceAll("(" +
                 Constants.KEY_SDK_DATA_FLAG + "=)(.*),", ""));
@@ -104,7 +104,7 @@ public class UtilsTest {
         HashMap<String, Object> fields = new HashMap<>();
         fields.put(KEY_FIELD, VALUE_FIELD);
         LineProtocolBean trackBean = new LineProtocolBean(TEST_MEASUREMENT_INFLUX_DB_LINE, tags, fields, VALUE_TIME);
-        SyncJsonData data = SyncJsonData.getSyncJsonData(helper, DataType.LOG, trackBean);
+        SyncData data = SyncData.getSyncData(helper, DataType.LOG, trackBean);
 
         String content = data.getDataString();
         content = content.replaceFirst("(" +
@@ -118,7 +118,7 @@ public class UtilsTest {
         HashMap<String, Object> fieldsEmpty = new HashMap<>();
         fieldsEmpty.put(KEY_FIELD_EMPTY, VALUE_FIELD_EMPTY);
         LineProtocolBean trackBeanEmpty = new LineProtocolBean(TEST_MEASUREMENT_INFLUX_DB_LINE, tagsEmpty, fieldsEmpty, VALUE_TIME);
-        SyncJsonData dataEmpty = SyncJsonData.getSyncJsonData(helper, DataType.LOG, trackBeanEmpty);
+        SyncData dataEmpty = SyncData.getSyncData(helper, DataType.LOG, trackBeanEmpty);
 
         String contentEmpty = dataEmpty.getDataString();
         contentEmpty = contentEmpty.replaceFirst(",\\s?" + Constants.KEY_SDK_DATA_FLAG + "=[\\w\\d]+", "");

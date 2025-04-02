@@ -454,7 +454,7 @@ public class Utils {
         String method = request.method();
         String url = request.url().toString();
         RequestBody body = request.body();
-        if (body == null || body == RequestBody.create(null, new byte[0])) {
+        if (body == null || body.equals(RequestBody.create(null, new byte[0]))) {
             return method + "_" + url;
         } else {
             long contentLength = 0;

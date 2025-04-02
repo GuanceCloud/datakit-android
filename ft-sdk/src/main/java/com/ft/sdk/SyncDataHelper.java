@@ -18,7 +18,7 @@ import java.util.LinkedHashMap;
 
 /**
  * 数据组装类，把采集数据从存储数据序列化行协议数据
- *
+ * <p>
  * tag:覆盖逻辑 SDK inner tag > user tag > static GlobalContext > dynamic GlobalContext
  */
 public class SyncDataHelper {
@@ -35,6 +35,7 @@ public class SyncDataHelper {
     private final HashMap<String, Object> dynamicBaseTags;
     private final HashMap<String, Object> dynamicLogTags;
     private final HashMap<String, Object> dynamicLRumTags;
+    private final HashMap<String, Object> rumStaticFields;
 
     protected FTSDKConfig config;
 
@@ -48,6 +49,7 @@ public class SyncDataHelper {
         dynamicBaseTags = new HashMap<>();
         dynamicLogTags = new HashMap<>();
         dynamicLRumTags = new HashMap<>();
+        rumStaticFields = new HashMap<>();
     }
 
     void initBaseConfig(FTSDKConfig config) {
@@ -63,6 +65,8 @@ public class SyncDataHelper {
     void initRUMConfig(FTRUMConfig config) {
         rumTags.putAll(basePublicTags);
         rumTags.putAll(config.getGlobalContext());
+        rumStaticFields.put(Constants.KEY_SESSION_SAMPLE_RATE, config.getSamplingRate());
+        rumStaticFields.put(Constants.KEY_SESSION_ON_ERROR_SAMPLE_RATE, config.getSessionErrorSampleRate());
     }
 
     void initTraceConfig(FTTraceConfig config) {
@@ -110,7 +114,6 @@ public class SyncDataHelper {
      *
      * @param key
      * @param value
-     *
      */
     void appendRUMGlobalContext(String key, String value) {
         if (!Utils.isNullOrEmpty(key) && !Utils.isNullOrEmpty(value)) {
@@ -134,7 +137,6 @@ public class SyncDataHelper {
      *
      * @param key
      * @param value
-     *
      */
     void appendLogGlobalContext(String key, String value) {
         if (!Utils.isNullOrEmpty(key) && !Utils.isNullOrEmpty(value)) {
@@ -175,12 +177,14 @@ public class SyncDataHelper {
             mergeTags.putAll(traceTags);
             bodyContent = convertToLineProtocolLine(measurement, mergeTags, fields,
                     timeStamp, config);
-        } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_WEBVIEW) {
+        } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_APP_NOT_SAMPLE
+                || dataType == DataType.RUM_WEBVIEW || dataType == DataType.RUM_WEBVIEW_NOT_SAMPLE) {
             //rum 数据
             mergeTags.putAll(dynamicBaseTags);
             mergeTags.putAll(dynamicLRumTags);
             if (dataType == DataType.RUM_APP) {
                 mergeTags.putAll(rumTags);
+                fields.putAll(rumStaticFields);
             }
             bodyContent = convertToLineProtocolLine(measurement, mergeTags, fields,
                     timeStamp, config);

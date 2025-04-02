@@ -123,6 +123,15 @@ public class ViewBean {
      */
     long viewUpdateTime = 0;
 
+    long lastErrorTime = 0;
+
+    public void setLastErrorTime(long lastErrorTime) {
+        this.lastErrorTime = lastErrorTime;
+    }
+
+    public long getLastErrorTime() {
+        return lastErrorTime;
+    }
 
     public long getViewUpdateTime() {
         return viewUpdateTime;
@@ -319,6 +328,7 @@ public class ViewBean {
      */
     public String getAttrJsonString() {
         HashMap<String, Object> map = new HashMap<>();
+        map.put(Constants.KEY_SESSION_ERROR_TIMESTAMP, lastErrorTime);
         map.put(Constants.KEY_BATTERY_CURRENT_AVG, batteryCurrentAvg);
         map.put(Constants.KEY_BATTERY_CURRENT_MAX, batteryCurrentMax);
         map.put(Constants.KEY_FPS_AVG, fpsAvg);
@@ -340,6 +350,7 @@ public class ViewBean {
     public void setFromAttrJsonString(String jsonString) {
         try {
             JSONObject json = new JSONObject(jsonString);
+            this.lastErrorTime = json.optLong(Constants.KEY_SESSION_ERROR_TIMESTAMP);
             this.batteryCurrentAvg = json.optInt(Constants.KEY_BATTERY_CURRENT_AVG);
             this.batteryCurrentMax = json.getInt(Constants.KEY_BATTERY_CURRENT_MAX);
             this.fpsAvg = json.optDouble(Constants.KEY_FPS_AVG);

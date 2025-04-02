@@ -4,7 +4,7 @@ import com.ft.sdk.garble.utils.Utils;
 
 /**
  * 当前激活状态 {@link ViewBean}
- *
+ * <p>
  * 一个应用同一时间只会存在一个 ActiveViewBean
  *
  * @author Brandon
@@ -12,7 +12,6 @@ import com.ft.sdk.garble.utils.Utils;
 public class ActiveViewBean extends ViewBean {
 
     /**
-     *
      * @param name
      * @param viewReferrer
      * @param loadTime
@@ -57,6 +56,7 @@ public class ActiveViewBean extends ViewBean {
         bean.cpuTickCount = this.cpuTickCount;
         bean.batteryCurrentMax = this.batteryCurrentMax;
         bean.batteryCurrentAvg = this.batteryCurrentAvg;
+        bean.lastErrorTime = this.lastErrorTime;
         bean.fpsAvg = this.fpsAvg;
         bean.fpsMini = this.fpsMini;
         bean.property = this.property;
