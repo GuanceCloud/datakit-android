@@ -641,7 +641,8 @@ public class FTDBManager extends DBManager {
                 String targetDataType = originType.replace("_not_sample", "");
 
                 Cursor cursor = db.rawQuery("select count(*) from " + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME
-                        + " where " + FTSQL.RECORD_COLUMN_DATA_TYPE + "='" + originType + "'", null);
+                        + " where " + FTSQL.RECORD_COLUMN_DATA_TYPE + "='" + originType  + "' AND "
+                        + FTSQL.RECORD_COLUMN_TM + " <= " + errorDateline, null);
                 if (cursor.moveToFirst()) {
                     count[0] = cursor.getInt(0);
                 }
