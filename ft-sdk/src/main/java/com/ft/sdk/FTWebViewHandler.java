@@ -73,6 +73,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
     private final Handler mHandler = new Handler(Looper.getMainLooper());
 
     private WebView mWebView;
+    private String nativeViewName;
 
     /**
      * 在 web view 注册 js 方法
@@ -81,6 +82,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
      */
     public void setWebView(WebView webview) {
         mWebView = webview;
+        nativeViewName = FTRUMInnerManager.get().getViewName();
         webview.getSettings().setJavaScriptEnabled(true);
         webview.addJavascriptInterface(new WebAppInterface(webview.getContext(), this), FT_WEB_VIEW_JAVASCRIPT_BRIDGE);
 
@@ -141,7 +143,6 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                     String sessionId = FTRUMInnerManager.get().getSessionId();
                     jsonTags.put(Constants.KEY_RUM_SESSION_ID, sessionId);
                     jsonTags.put(Constants.KEY_RUM_VIEW_IS_WEB_VIEW, true);
-                    jsonFields.put(Constants.KEY_RUM_VIEW_IS_ACTIVE, false);
 
                     Object pkgInfo = publicTags.get(Constants.KEY_RUM_SDK_PACKAGE_INFO);
                     if (pkgInfo != null) {
@@ -149,12 +150,19 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                                 Constants.KEY_RUM_SDK_PACKAGE_WEB, webSDKVersion);
                         jsonTags.put(Constants.KEY_RUM_SDK_PACKAGE_INFO, replacePkgInfo);
                     }
+                    String measurement = data.optString(Constants.MEASUREMENT);
+                    if (Constants.FT_MEASUREMENT_RUM_VIEW.equals(measurement)) {
+                        jsonFields.put(Constants.KEY_RUM_VIEW_IS_ACTIVE, false);
+                    }
+                    String referrer = jsonTags.optString(Constants.KEY_RUM_VIEW_REFERRER);
+                    if (Utils.isNullOrEmpty(referrer)) {
+                        jsonTags.put(Constants.KEY_RUM_VIEW_REFERRER, nativeViewName);
+                    }
 
                     HashMap<String, Object> tagMaps = Utils.jsonToMap(jsonTags);
                     HashMap<String, Object> fieldMaps = Utils.jsonToMap(jsonFields);
 
                     long time = data.optLong(Constants.TIME);
-                    String measurement = data.optString(Constants.MEASUREMENT);
                     FTTrackInner.getInstance().rumWebView(time * 1000000, measurement, tagMaps, fieldMaps);
                 }
 

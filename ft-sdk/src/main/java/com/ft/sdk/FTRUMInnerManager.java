@@ -1089,7 +1089,7 @@ public class FTRUMInnerManager {
         return activeView.getId();
     }
 
-    private String getViewName() {
+    String getViewName() {
         if (activeView == null) {
             return null;
         }
