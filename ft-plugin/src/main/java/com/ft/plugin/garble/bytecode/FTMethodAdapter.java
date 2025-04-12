@@ -98,46 +98,46 @@ public class FTMethodAdapter extends AdviceAdapter {
 
     }
 
-    /**
-     * 判断当前的类中的方法是否需要统计时长（如果后期需要统计更多的方法可以扩展该方法）
-     *
-     * @return
-     */
-    private boolean needTrackTime() {
-        return (superName.equals("androidx/appcompat/app/AppCompatActivity") ||
-                superName.equals("android/app/Activity"))
-                && !className.startsWith("android/")
-                && !className.startsWith("androidx/")
-                && (methodName + methodDesc).equals("onCreate(Landroid/os/Bundle;)V");
-    }
+//    /**
+//     * 判断当前的类中的方法是否需要统计时长（如果后期需要统计更多的方法可以扩展该方法）
+//     *
+//     * @return
+//     */
+//    private boolean needTrackTime() {
+//        return (superName.equals("androidx/appcompat/app/AppCompatActivity") ||
+//                superName.equals("android/app/Activity"))
+//                && !className.startsWith("android/")
+//                && !className.startsWith("androidx/")
+//                && (methodName + methodDesc).equals("onCreate(Landroid/os/Bundle;)V");
+//    }
 
     @Override
     public void visitCode() {
         super.visitCode();
-        if (needTrackTime()) {
-            mv.visitMethodInsn(Opcodes.INVOKESTATIC, Constants.CLASS_NAME_SYSTEM, "currentTimeMillis",
-                    "()J", false);
-            startVarIndex = newLocal(Type.LONG_TYPE);
-            mv.visitVarInsn(Opcodes.LSTORE, startVarIndex);
-        }
+//        if (needTrackTime()) {
+//            mv.visitMethodInsn(Opcodes.INVOKESTATIC, Constants.CLASS_NAME_SYSTEM, "currentTimeMillis",
+//                    "()J", false);
+//            startVarIndex = newLocal(Type.LONG_TYPE);
+//            mv.visitVarInsn(Opcodes.LSTORE, startVarIndex);
+//        }
     }
 
     @Override
     public void visitInsn(int opcode) {
-        if (needTrackTime()) {
-            if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
-                mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_SYSTEM, "currentTimeMillis",
-                        "()J", false);
-                mv.visitVarInsn(LLOAD, startVarIndex);
-                mv.visitInsn(LSUB);
-                int index = newLocal(Type.LONG_TYPE);
-                mv.visitVarInsn(LSTORE, index);
-                mv.visitLdcInsn(className + "|" + methodName + "|" + methodDesc);
-                mv.visitVarInsn(LLOAD, index);
-                mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "timingMethod",
-                        "(Ljava/lang/String;J)V", false);
-            }
-        }
+//        if (needTrackTime()) {
+//            if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
+//                mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_SYSTEM, "currentTimeMillis",
+//                        "()J", false);
+//                mv.visitVarInsn(LLOAD, startVarIndex);
+//                mv.visitInsn(LSUB);
+//                int index = newLocal(Type.LONG_TYPE);
+//                mv.visitVarInsn(LSTORE, index);
+//                mv.visitLdcInsn(className + "|" + methodName + "|" + methodDesc);
+//                mv.visitVarInsn(LLOAD, index);
+//                mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "timingMethod",
+//                        "(Ljava/lang/String;J)V", false);
+//            }
+//        }
         super.visitInsn(opcode);
     }
 
