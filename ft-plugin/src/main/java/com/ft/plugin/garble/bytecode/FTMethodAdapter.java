@@ -25,11 +25,9 @@ import com.ft.plugin.garble.FTMethodType;
 import com.ft.plugin.garble.FTSubMethodCell;
 import com.ft.plugin.garble.FTUtil;
 import com.ft.plugin.garble.Logger;
-import com.ft.plugin.garble.PluginConfigManager;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -78,8 +76,9 @@ public class FTMethodAdapter extends AdviceAdapter {
 
     private int startVarIndex;
 
-    public FTMethodAdapter(MethodVisitor mv, int access, String name, String desc, String className, String[] interfaces, String supperName) {
-        super(PluginConfigManager.get().getASMVersion(), mv, access, name, desc);
+    public FTMethodAdapter(MethodVisitor mv, int access, String name, String desc, String className,
+                           String[] interfaces, String supperName, int api) {
+        super(api, mv, access, name, desc);
         this.methodName = name;
         this.superName = supperName;
         this.className = className;
@@ -87,8 +86,8 @@ public class FTMethodAdapter extends AdviceAdapter {
         this.nameDesc = name + desc;
 
         boolean isSDKInner = innerSDKSkip(className);
-        boolean isIgnorePack = isIgnorePackage(className);
-        if (FTUtil.isTargetClassInSpecial(className) || isIgnorePack
+//        boolean isIgnorePack = isIgnorePackage(className);
+        if (FTUtil.isTargetClassInSpecial(className)
                 || isSDKInner
                 || isWebViewInner(className, superName, nameDesc)) {
             if (!isSDKInner) {
@@ -524,21 +523,6 @@ public class FTMethodAdapter extends AdviceAdapter {
                 && !ClassNameAnalytics.isFTSdkApi(className));
     }
 
-    /**
-     * 需要忽略的包，class name 支持 . 分隔的方式
-     *
-     * @return
-     */
-    private boolean isIgnorePackage(String className) {
-        boolean isPackageIgnore = false;
-        for (String packageName : PluginConfigManager.get().getIgnorePackages()) {
-            if (className.startsWith(packageName.replace(".", "/"))) {
-                isPackageIgnore = true;
-                break;
-            }
-        }
-        return isPackageIgnore;
-    }
 
     /**
      * 是否为第三方或内部 WebView 方法
