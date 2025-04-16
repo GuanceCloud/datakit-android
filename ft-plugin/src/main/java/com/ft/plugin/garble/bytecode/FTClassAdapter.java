@@ -16,9 +16,12 @@
  */
 package com.ft.plugin.garble.bytecode;
 
+import static com.ft.plugin.garble.bytecode.FTMethodAdapter.TARGET_WEBVIEW_METHOD;
+
 import com.ft.plugin.BuildConfig;
 import com.ft.plugin.garble.ClassNameAnalytics;
 import com.ft.plugin.garble.Constants;
+import com.ft.plugin.garble.FTUtil;
 import com.ft.plugin.garble.Logger;
 import com.ft.plugin.garble.VersionUtils;
 
@@ -110,10 +113,28 @@ public class FTClassAdapter extends ClassVisitor {
         } else if (isIgnorePackage(className)) {
             Logger.debug("isIgnorePackage-> class:" + className + ",super:" + superName + ", method:" + name + desc);
             return mv;
+        } else {
+            String nameDesc = name + desc;
+            boolean isSDKInner = innerSDKSkip(className);
+            boolean isOkhttp = ClassNameAnalytics.isOkhttp3Path(className);
+            if (FTUtil.isTargetClassInSpecial(className)
+                    || isSDKInner
+                    || isOkhttp || isWebViewInner(className, superName, nameDesc)) {
+                if (!isSDKInner && !isOkhttp) {
+                    Logger.debug("skip-> class:" + className + ",super:" + superName + ",desc:" + nameDesc);
+                }
+                return mv;
+            }
         }
         return new FTMethodAdapter(mv, access, name, desc, className, interfaces, superName, api);
     }
 
+    /**
+     * ignorePackages 对应忽略的包或者类名
+     *
+     * @param className
+     * @return
+     */
     private boolean isIgnorePackage(String className) {
         boolean isPackageIgnore = false;
         for (String packageName : ignorePackages) {
@@ -124,4 +145,33 @@ public class FTClassAdapter extends ClassVisitor {
         }
         return isPackageIgnore;
     }
+
+    /**
+     * SDK 内部方法，除了 {@link Constants#FT_SDK_PACKAGE} 外，都不需要扫描
+     *
+     * @param className
+     * @return
+     */
+    private boolean innerSDKSkip(String className) {
+        return (ClassNameAnalytics.isFTSdkPackage(className)
+                && !ClassNameAnalytics.isFTSdkApi(className));
+    }
+
+
+    /**
+     * 是否为第三方或内部 WebView 方法
+     *
+     * @param className
+     * @param superName
+     * @param methodNameDesc
+     * @return
+     */
+    private boolean isWebViewInner(String className, String superName, String methodNameDesc) {
+        return (ClassNameAnalytics.isDCloud(className)
+                || ClassNameAnalytics.isTencent(className)
+                || ClassNameAnalytics.isTaoBao(className)
+                || superName.equals(Constants.CLASS_NAME_WEBVIEW))
+                && TARGET_WEBVIEW_METHOD.contains(methodNameDesc);
+    }
+
 }

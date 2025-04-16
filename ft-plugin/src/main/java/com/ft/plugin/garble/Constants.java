@@ -67,9 +67,21 @@ public class Constants {
     public static final String CLASS_NAME_DCLOUD_PATH = "io/dcloud/";
 
     /**
+     * Okhttp3 路径
+     */
+
+    public static final String CLASS_NAME_OKHTTP3_PATH = "okhttp3/";
+
+    /**
      * OkHttpClient$Builder
      */
     public static final String CLASS_NAME_OKHTTP_BUILDER = "okhttp3/OkHttpClient$Builder";
+
+    /**
+     * Request$Builder
+     */
+    public static final String CLASS_NAME_REQUEST_BUILDER = "okhttp3/Request$Builder";
+
     /**
      * org/apache/hc/client5/http/impl/classic/HttpClientBuilder
      */
