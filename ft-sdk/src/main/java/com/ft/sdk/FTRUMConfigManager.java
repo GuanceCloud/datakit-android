@@ -185,6 +185,14 @@ public class FTRUMConfigManager {
         return config != null && config.getRumAppId() != null;
     }
 
+    /**
+     * 是否使用 Okhttp tag
+     * @return
+     */
+    public boolean isEnableOkhttpRequestTag() {
+        return config != null && config.isEnableOkhttpRequestTag();
+    }
+
     @Nullable
     public FTRUMConfig getConfig() {
         return config;

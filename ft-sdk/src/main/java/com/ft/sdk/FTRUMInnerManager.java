@@ -61,8 +61,6 @@ public class FTRUMInnerManager {
 
     private final ArrayList<String> viewList = new ArrayList<>();
 
-    private boolean isTVMode = false;
-
     private FTRUMInnerManager() {
 
     }
@@ -944,11 +942,14 @@ public class FTRUMInnerManager {
             spanId = handler.getSpanID();
             traceId = handler.getTraceID();
         }
+//        else {
+//            LogUtils.e(TAG, "setTransformContent trace null");
+//        }
 
         ResourceBean bean = resourceBeanMap.get(resourceId);
 
         if (bean == null) {
-            LogUtils.d(TAG, "setTransformContent bean null");
+            LogUtils.e(TAG, "setTransformContent bean null");
             return;
         }
 

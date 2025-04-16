@@ -64,13 +64,13 @@ public class FTTraceInterceptor implements Interceptor {
         Request.Builder requestBuilder = request.newBuilder();
         IOException exception = null;
 
-        String uniqueKey = Utils.identifyRequest(request);
+        String resourceId = Utils.identifyRequest(request);
         HashMap<String, String> requestHeaders;
         if (headerHandler != null) {
             requestHeaders = headerHandler.getTraceHeader(request);
-            FTTraceManager.get().putTraceHandler(uniqueKey, headerHandler);
+            FTTraceManager.get().putTraceHandler(resourceId, headerHandler);
         } else {
-            requestHeaders = FTTraceManager.get().getTraceHeader(uniqueKey, request.url() + "");
+            requestHeaders = FTTraceManager.get().getTraceHeader(resourceId, request.url() + "");
         }
         try {
 
