@@ -1,5 +1,11 @@
+# plugin 1.3.5
+1. 优化 plugin 参数在并发编译中的稳定性
+2. 添加 ASM 写入 FTAutoTrack.trackRequestBuilder 方法，需要使用 ft-sdk 1.6.10 以上版本
+3. 支持 Log.println 日志自动抓取，需要使用 ft-sdk 1.6.8 以上版本
+
+---
 # plugin 1.3.5-alpha02
-1. 添加 ASM 写入 FTAutoTrack.trackRequestBuilder 方法，最低支持 1.6.10-alpha03
+1. 添加 ASM 写入 FTAutoTrack.trackRequestBuilder 方法，需要使用 ft-sdk 1.6.10 以上版本
 
 ---
 # plugin 1.3.5-alpha01
