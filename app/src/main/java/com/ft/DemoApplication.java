@@ -18,7 +18,6 @@ import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.sessionreplay.FTSessionReplayConfig;
 import com.ft.sdk.sessionreplay.SessionReplayPrivacy;
-import com.ft.sdk.sessionreplay.TouchPrivacy;
 import com.ft.sdk.sessionreplay.material.MaterialExtensionSupport;
 import com.ft.utils.CrossProcessSetting;
 
