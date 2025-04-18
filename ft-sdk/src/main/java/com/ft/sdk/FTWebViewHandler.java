@@ -1,11 +1,13 @@
 package com.ft.sdk;
 
+import android.app.Activity;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.webkit.ValueCallback;
 import android.webkit.WebView;
 
+import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.PackageUtils;
@@ -82,7 +84,8 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
      */
     public void setWebView(WebView webview) {
         mWebView = webview;
-        nativeViewName = FTRUMInnerManager.get().getViewName();
+        Activity activity = AopUtils.getActivityFromContext(webview.getContext());
+        nativeViewName = AopUtils.getClassName(activity);
         webview.getSettings().setJavaScriptEnabled(true);
         webview.addJavascriptInterface(new WebAppInterface(webview.getContext(), this), FT_WEB_VIEW_JAVASCRIPT_BRIDGE);
 
