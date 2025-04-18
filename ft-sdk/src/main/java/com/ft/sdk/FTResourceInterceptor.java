@@ -2,6 +2,7 @@ package com.ft.sdk;
 
 import androidx.annotation.NonNull;
 
+import com.ft.sdk.garble.bean.ResourceID;
 import com.ft.sdk.garble.bean.ResourceParams;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -10,6 +11,7 @@ import com.ft.sdk.garble.utils.Utils;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.HashMap;
+import java.util.UUID;
 
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
@@ -118,9 +120,12 @@ public class FTResourceInterceptor implements Interceptor {
                 exception = e;
             }
         }
-
         String resourceId = Utils.identifyRequest(request);
-        LogUtils.d(TAG, "intercept id:" + resourceId);
+        if (request.tag(ResourceID.class) != null) {
+            LogUtils.d(TAG, "intercept id:" + resourceId + ",url:" + request.url());
+        } else {
+            LogUtils.d(TAG, "intercept id:" + resourceId);
+        }
         FTRUMInnerManager.get().startResource(resourceId);
         ResourceParams params = new ResourceParams();
         params.url = url;

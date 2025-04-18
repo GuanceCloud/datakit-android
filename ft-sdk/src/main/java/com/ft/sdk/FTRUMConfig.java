@@ -45,6 +45,10 @@ public class FTRUMConfig {
      * 是否开启用户行为 Resource 追踪
      */
     private boolean enableTraceUserResource;
+    /**
+     * 对 Okhttp request 添加唯一 tag
+     */
+    private boolean enableOkhttpRequestTag;
 
     /**
      * 开启 resource host ip 采集
@@ -177,6 +181,20 @@ public class FTRUMConfig {
 
     public int getRumCacheLimitCount() {
         return rumCacheLimitCount;
+    }
+
+    /**
+     * 全局 Okhttp Request 自动添加，需要 ft-plugin 1.3.5 的支持
+     * @param enableOkhttpRequestTag
+     * @return
+     */
+    public FTRUMConfig setEnableOkhttpRequestTag(boolean enableOkhttpRequestTag) {
+        this.enableOkhttpRequestTag = enableOkhttpRequestTag;
+        return this;
+    }
+
+    public boolean isEnableOkhttpRequestTag() {
+        return enableOkhttpRequestTag;
     }
 
     /**
@@ -475,7 +493,6 @@ public class FTRUMConfig {
     }
 
 
-
     /**
      * ASM 设置全局 {@link FTResourceInterceptor.ContentHandlerHelper } ，默认不设置
      *
@@ -530,6 +547,7 @@ public class FTRUMConfig {
                 ", extraLogCatWithANR=" + extraLogCatWithANR +
                 ", rumCacheLimitCount=" + rumCacheLimitCount +
                 ", rumCacheDiscardStrategy=" + rumCacheDiscardStrategy +
+                ", enableOkhttpRequestTag=" + enableOkhttpRequestTag +
                 '}';
     }
 

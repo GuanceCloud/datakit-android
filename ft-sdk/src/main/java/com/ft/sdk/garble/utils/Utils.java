@@ -17,6 +17,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 
 import com.ft.sdk.FTApplication;
+import com.ft.sdk.garble.bean.ResourceID;
 import com.ft.sdk.garble.manager.SingletonGson;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
@@ -451,21 +452,30 @@ public class Utils {
      */
 
     public static String identifyRequest(Request request) {
+        ResourceID resourceID = request.tag(ResourceID.class);
+        if (resourceID != null) {
+            return resourceID.getUuid();
+        }
         String method = request.method();
         String url = request.url().toString();
         RequestBody body = request.body();
-        if (body == null || body == RequestBody.create(null, new byte[0])) {
+        if (body == null) {
             return method + "_" + url;
         } else {
-            long contentLength = 0;
+            long contentLength;
             try {
                 contentLength = body.contentLength();
-            } catch (IOException e) {
-                LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+            } catch (IOException ignored) {
+                contentLength = 0;
             }
-            String contentType = body.contentType() == null ? "" : body.contentType().toString();
-            return method + "_" + url + "_" + contentType + "_" + contentLength;
 
+            MediaType contentType = body.contentType();
+
+            if (contentType != null || contentLength != 0L) {
+                return method + "_" + url + "_" + contentLength + "_" + contentType;
+            } else {
+                return method + "_" + url;
+            }
         }
     }
 

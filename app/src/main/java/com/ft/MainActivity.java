@@ -32,6 +32,7 @@ import com.ft.utils.RequestUtils;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -117,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
             Log.e(TAG, "console log");
             Log.d(TAG, "console log");
             Log.w(TAG, new Exception());
+            Log.println(Log.ERROR, TAG, "println error");
             FTLogger.getInstance().logBackground("custom Log", Status.ERROR);
             FTLogger.getInstance().logBackground("custom status Log", "customType");
         });

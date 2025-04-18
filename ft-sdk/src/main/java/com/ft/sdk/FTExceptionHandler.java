@@ -98,6 +98,8 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     private FTRUMConfig config;
 
+    private boolean registerHandled;
+
     /**
      * 初始化 {@link FTRUMConfig},在 {@link FTSdk#initRUMWithConfig(FTRUMConfig)} } 中惊醒
      *
@@ -106,12 +108,13 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
     void initConfig(FTRUMConfig config) {
         this.config = config;
         if (config.isRumEnable() &&
-                config.isEnableTrackAppCrash()) {
+                config.isEnableTrackAppCrash() && !registerHandled) {
             Thread.UncaughtExceptionHandler currentHandler = Thread.getDefaultUncaughtExceptionHandler();
             //避免重复设置
             if (!(currentHandler instanceof FTExceptionHandler)) {
                 mDefaultExceptionHandler = currentHandler;
                 Thread.setDefaultUncaughtExceptionHandler(this);
+                registerHandled = true;
             }
         }
     }

@@ -25,11 +25,9 @@ import com.ft.plugin.garble.FTMethodType;
 import com.ft.plugin.garble.FTSubMethodCell;
 import com.ft.plugin.garble.FTUtil;
 import com.ft.plugin.garble.Logger;
-import com.ft.plugin.garble.PluginConfigManager;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -76,69 +74,23 @@ public class FTMethodAdapter extends AdviceAdapter {
      */
     private boolean pubAndNoStaticAccess;
 
-    private int startVarIndex;
-
-    public FTMethodAdapter(MethodVisitor mv, int access, String name, String desc, String className, String[] interfaces, String supperName) {
-        super(PluginConfigManager.get().getASMVersion(), mv, access, name, desc);
+    public FTMethodAdapter(MethodVisitor mv, int access, String name, String desc, String className,
+                           String[] interfaces, String superName, int api) {
+        super(api, mv, access, name, desc);
         this.methodName = name;
-        this.superName = supperName;
+        this.superName = superName;
         this.className = className;
         this.interfaces = interfaces;
         this.nameDesc = name + desc;
-
-        boolean isSDKInner = innerSDKSkip(className);
-        boolean isIgnorePack = isIgnorePackage(className);
-        if (FTUtil.isTargetClassInSpecial(className) || isIgnorePack
-                || isSDKInner
-                || isWebViewInner(className, superName, nameDesc)) {
-            if (!isSDKInner) {
-                Logger.debug("skip-> class:" + className + ",super:" + supperName + ",desc:" + nameDesc);
-            }
-            needSkip = true;
-        }
-
-    }
-
-    /**
-     * 判断当前的类中的方法是否需要统计时长（如果后期需要统计更多的方法可以扩展该方法）
-     *
-     * @return
-     */
-    private boolean needTrackTime() {
-        return (superName.equals("androidx/appcompat/app/AppCompatActivity") ||
-                superName.equals("android/app/Activity"))
-                && !className.startsWith("android/")
-                && !className.startsWith("androidx/")
-                && (methodName + methodDesc).equals("onCreate(Landroid/os/Bundle;)V");
     }
 
     @Override
     public void visitCode() {
         super.visitCode();
-        if (needTrackTime()) {
-            mv.visitMethodInsn(Opcodes.INVOKESTATIC, Constants.CLASS_NAME_SYSTEM, "currentTimeMillis",
-                    "()J", false);
-            startVarIndex = newLocal(Type.LONG_TYPE);
-            mv.visitVarInsn(Opcodes.LSTORE, startVarIndex);
-        }
     }
 
     @Override
     public void visitInsn(int opcode) {
-        if (needTrackTime()) {
-            if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
-                mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_SYSTEM, "currentTimeMillis",
-                        "()J", false);
-                mv.visitVarInsn(LLOAD, startVarIndex);
-                mv.visitInsn(LSUB);
-                int index = newLocal(Type.LONG_TYPE);
-                mv.visitVarInsn(LSTORE, index);
-                mv.visitLdcInsn(className + "|" + methodName + "|" + methodDesc);
-                mv.visitVarInsn(LLOAD, index);
-                mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "timingMethod",
-                        "(Ljava/lang/String;J)V", false);
-            }
-        }
         super.visitInsn(opcode);
     }
 
@@ -175,7 +127,7 @@ public class FTMethodAdapter extends AdviceAdapter {
     /**
      * WebView 中包含的所有加载方式
      */
-    private static final List<String> TARGET_WEBVIEW_METHOD = Arrays.asList("loadUrl(Ljava/lang/String;)V",
+    static final List<String> TARGET_WEBVIEW_METHOD = Arrays.asList("loadUrl(Ljava/lang/String;)V",
             "loadUrl(Ljava/lang/String;Ljava/util/Map;)V",
             "loadData(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
             "loadDataWithBaseURL(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
@@ -211,7 +163,16 @@ public class FTMethodAdapter extends AdviceAdapter {
                     return;
                 }
                 break;
-
+            case Constants.CLASS_NAME_REQUEST_BUILDER:
+                if ("build()Lokhttp3/Request;".contains(name + desc)) {
+                    mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackRequestBuilder",
+                            "(Lokhttp3/Request$Builder;)Lokhttp3/Request;",
+                            false);
+                    Logger.debug("CLASS_NAME_REQUEST_BUILDER-> owner:" + owner + ", class:" + className
+                            + ", super:" + superName + ", method:" + name + desc + " | " + nameDesc);
+                    return;
+                }
+                break;
             case Constants.CLASS_NAME_WEBVIEW:
             case Constants.CLASS_NAME_RN_WEBVIEW:
             case Constants.CLASS_NAME_TENCENT_WEBVIEW:
@@ -511,49 +472,6 @@ public class FTMethodAdapter extends AdviceAdapter {
         } else {
             return getVisitPosition(types, index - 1, isStaticMethod) + types[index - 1].getSize();
         }
-    }
-
-    /**
-     * SDK 内部方法，除了 {@link Constants#FT_SDK_PACKAGE} 外，都不需要扫描
-     *
-     * @param className
-     * @return
-     */
-    private boolean innerSDKSkip(String className) {
-        return (ClassNameAnalytics.isFTSdkPackage(className)
-                && !ClassNameAnalytics.isFTSdkApi(className));
-    }
-
-    /**
-     * 需要忽略的包，class name 支持 . 分隔的方式
-     *
-     * @return
-     */
-    private boolean isIgnorePackage(String className) {
-        boolean isPackageIgnore = false;
-        for (String packageName : PluginConfigManager.get().getIgnorePackages()) {
-            if (className.startsWith(packageName.replace(".", "/"))) {
-                isPackageIgnore = true;
-                break;
-            }
-        }
-        return isPackageIgnore;
-    }
-
-    /**
-     * 是否为第三方或内部 WebView 方法
-     *
-     * @param className
-     * @param superName
-     * @param methodNameDesc
-     * @return
-     */
-    private boolean isWebViewInner(String className, String superName, String methodNameDesc) {
-        return (ClassNameAnalytics.isDCloud(className)
-                || ClassNameAnalytics.isTencent(className)
-                || ClassNameAnalytics.isTaoBao(className)
-                || superName.equals(Constants.CLASS_NAME_WEBVIEW))
-                && TARGET_WEBVIEW_METHOD.contains(methodNameDesc);
     }
 
 

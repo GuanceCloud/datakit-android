@@ -1,3 +1,18 @@
+# plugin 1.3.5
+1. 优化 plugin 参数在并发编译中的稳定性
+2. 添加 ASM 写入 FTAutoTrack.trackRequestBuilder 方法，需要使用 ft-sdk 1.6.10 以上版本
+3. 支持 Log.println 日志自动抓取，需要使用 ft-sdk 1.6.8 以上版本
+
+---
+# plugin 1.3.5-alpha02
+1. 添加 ASM 写入 FTAutoTrack.trackRequestBuilder 方法，需要使用 ft-sdk 1.6.10 以上版本
+
+---
+# plugin 1.3.5-alpha01
+1. 优化 plugin 参数在并发编译中的稳定性
+2. 支持 Log.println 日志自动抓取，需要使用 ft-sdk 1.6.8-beta01 以上的版本
+
+---
 # plugin 1.3.4
 1. 优化错误日志输出
 2. 修改 minifyEnabled 未开启，导致 sourcemap symbol 文件未生成的问题

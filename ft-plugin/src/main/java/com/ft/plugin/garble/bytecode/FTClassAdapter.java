@@ -16,10 +16,12 @@
  */
 package com.ft.plugin.garble.bytecode;
 
+import static com.ft.plugin.garble.bytecode.FTMethodAdapter.TARGET_WEBVIEW_METHOD;
+
 import com.ft.plugin.BuildConfig;
-import com.ft.plugin.garble.PluginConfigManager;
 import com.ft.plugin.garble.ClassNameAnalytics;
 import com.ft.plugin.garble.Constants;
+import com.ft.plugin.garble.FTUtil;
 import com.ft.plugin.garble.Logger;
 import com.ft.plugin.garble.VersionUtils;
 
@@ -27,6 +29,9 @@ import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 本类借鉴修改了来自 Sensors Data  的项目<a href="https://github.com/sensorsdata/sa-sdk-android-plugin2">sa-sdk-android-plugin2</a>
@@ -36,13 +41,15 @@ public class FTClassAdapter extends ClassVisitor {
     private String className;
     private String superName;
     private String[] interfaces;
+    private final List<String> ignorePackages;
     /**
      * 是否跳过
      */
     private boolean needSkip;
 
-    public FTClassAdapter(final ClassVisitor cv) {
-        super(PluginConfigManager.get().getASMVersion(), cv);
+    public FTClassAdapter(final ClassVisitor cv, int api, List<String> ignorePackages) {
+        super(api, cv);
+        this.ignorePackages = ignorePackages == null ? new ArrayList<>() : ignorePackages;
     }
 
     @Override
@@ -103,8 +110,68 @@ public class FTClassAdapter extends ClassVisitor {
         if (needSkip) {
             Logger.debug("ignoreAOP-> class:" + className + ",super:" + superName + ", method:" + name + desc);
             return mv;
+        } else if (isIgnorePackage(className)) {
+            Logger.debug("isIgnorePackage-> class:" + className + ",super:" + superName + ", method:" + name + desc);
+            return mv;
         } else {
-            return new FTMethodAdapter(mv, access, name, desc, className, interfaces, superName);
+            String nameDesc = name + desc;
+            boolean isSDKInner = innerSDKSkip(className);
+            boolean isOkhttp = ClassNameAnalytics.isOkhttp3Path(className);
+            if (FTUtil.isTargetClassInSpecial(className)
+                    || isSDKInner
+                    || isOkhttp || isWebViewInner(className, superName, nameDesc)) {
+                if (!isSDKInner && !isOkhttp) {
+                    Logger.debug("skip-> class:" + className + ",super:" + superName + ",desc:" + nameDesc);
+                }
+                return mv;
+            }
         }
+        return new FTMethodAdapter(mv, access, name, desc, className, interfaces, superName, api);
     }
+
+    /**
+     * ignorePackages 对应忽略的包或者类名
+     *
+     * @param className
+     * @return
+     */
+    private boolean isIgnorePackage(String className) {
+        boolean isPackageIgnore = false;
+        for (String packageName : ignorePackages) {
+            if (className.startsWith(packageName.replace(".", "/"))) {
+                isPackageIgnore = true;
+                break;
+            }
+        }
+        return isPackageIgnore;
+    }
+
+    /**
+     * SDK 内部方法，除了 {@link Constants#FT_SDK_PACKAGE} 外，都不需要扫描
+     *
+     * @param className
+     * @return
+     */
+    private boolean innerSDKSkip(String className) {
+        return (ClassNameAnalytics.isFTSdkPackage(className)
+                && !ClassNameAnalytics.isFTSdkApi(className));
+    }
+
+
+    /**
+     * 是否为第三方或内部 WebView 方法
+     *
+     * @param className
+     * @param superName
+     * @param methodNameDesc
+     * @return
+     */
+    private boolean isWebViewInner(String className, String superName, String methodNameDesc) {
+        return (ClassNameAnalytics.isDCloud(className)
+                || ClassNameAnalytics.isTencent(className)
+                || ClassNameAnalytics.isTaoBao(className)
+                || superName.equals(Constants.CLASS_NAME_WEBVIEW))
+                && TARGET_WEBVIEW_METHOD.contains(methodNameDesc);
+    }
+
 }

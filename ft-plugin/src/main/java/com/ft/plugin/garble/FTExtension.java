@@ -25,6 +25,8 @@ public class FTExtension {
      * 是否自动上 map 文件
      */
     public boolean autoUploadMap = false;
+
+
     /**
      * 是否上传 native debug symbol
      */
