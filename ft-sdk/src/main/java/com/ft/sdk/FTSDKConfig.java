@@ -454,6 +454,11 @@ public class FTSDKConfig {
         return this;
     }
 
+    /**
+     * 对 Okhttp request 添加唯一 tag
+     */
+    private boolean enableOkhttpRequestTag;
+
 
     /**
      * 设置是否迁移
@@ -548,6 +553,20 @@ public class FTSDKConfig {
         return this;
     }
 
+    /**
+     * 全局 Okhttp Request 自动添加，需要 ft-plugin 1.3.5 的支持
+     * @param enableOkhttpRequestTag
+     * @return
+     */
+    public FTSDKConfig setEnableOkhttpRequestTag(boolean enableOkhttpRequestTag) {
+        this.enableOkhttpRequestTag = enableOkhttpRequestTag;
+        return this;
+    }
+
+    public boolean isEnableOkhttpRequestTag() {
+        return enableOkhttpRequestTag;
+    }
+
     public boolean isCompressIntakeRequests() {
         return compressIntakeRequests;
     }
@@ -575,6 +594,7 @@ public class FTSDKConfig {
                 ", proxy=" + proxy +
                 ", proxyAuthenticator=" + authenticator +
                 ", dns=" + dns +
+                ", enableOkhttpRequestTag=" + enableOkhttpRequestTag +
                 '}';
     }
 }
