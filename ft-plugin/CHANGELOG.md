@@ -1,5 +1,5 @@
 # plugin 1.3.5-alpha02
-1. 添加 ASM 写入 FTAutoTrack.trackRequestBuilder 方法，最低支持 1.6.10-alpha0
+1. 添加 ASM 写入 FTAutoTrack.trackRequestBuilder 方法，最低支持 1.6.10-alpha03
 
 ---
 # plugin 1.3.5-alpha01
