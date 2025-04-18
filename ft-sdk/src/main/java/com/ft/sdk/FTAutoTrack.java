@@ -21,6 +21,7 @@ import androidx.annotation.Nullable;
 
 import com.ft.sdk.garble.FTAutoTrackConfigManager;
 import com.ft.sdk.garble.bean.OP;
+import com.ft.sdk.garble.bean.ResourceID;
 import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -34,6 +35,7 @@ import java.util.Map;
 import okhttp3.EventListener;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 
 /**
  * BY huangDianHua
@@ -524,15 +526,15 @@ public class FTAutoTrack {
      */
     public static void timingMethod(String desc, long cost) {
 //        LogUtils.d(TAG, desc);
-        try {
+//        try {
 //            String[] arr = desc.split("\\|");
 //            String[] names = arr[0].split("/");
 //            String pageName = names[names.length - 1];
 //            handleOp(pageName, OP.OPEN, cost * 1000, null);
-        } catch (Exception e) {
-            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
-
-        }
+//        } catch (Exception e) {
+//            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+//
+//        }
     }
 
     /**
@@ -734,6 +736,31 @@ public class FTAutoTrack {
                 }
             } else {
                 LogUtils.d(TAG, "Skip default FTTraceInterceptor setting");
+            }
+        }
+        return builder.build();
+    }
+
+    /**
+     * 插桩方法用来替换调用的 {@link Request.Builder#build() }方法，该方法结构谨慎修改，修该后请同步修改
+     * [com.ft.plugin.garble.bytecode.FTMethodAdapter] 类中的 visitMethodInsn 方法中关于该替换内容的部分
+     *
+     * @param builder
+     * @return
+     */
+    public static Request trackRequestBuilder(Request.Builder builder) {
+        if (FTSdk.checkInstallState()) {
+            LogUtils.d(TAG, "trackRequestBuilder");
+        } else {
+            LogUtils.e(TAG, "trackRequestBuilder: Request.Builder Before SDK install");
+        }
+        if (FTRUMConfigManager.get().isRumEnable()) {
+            FTRUMConfig config = FTRUMConfigManager.get().getConfig();
+            if (config.isEnableOkhttpRequestTag()) {
+                ResourceID uuid = builder.build().tag(ResourceID.class);
+                if (uuid == null) {
+                    builder.tag(ResourceID.class, new ResourceID());
+                }
             }
         }
         return builder.build();

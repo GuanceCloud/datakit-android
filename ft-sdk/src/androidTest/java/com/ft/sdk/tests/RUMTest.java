@@ -21,6 +21,7 @@ import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.ErrorType;
 import com.ft.sdk.garble.bean.NetStatusBean;
+import com.ft.sdk.garble.bean.ResourceID;
 import com.ft.sdk.garble.bean.ResourceParams;
 import com.ft.sdk.garble.bean.SyncData;
 import com.ft.sdk.garble.bean.ViewBean;
@@ -829,6 +830,18 @@ public class RUMTest extends FTBaseTest {
         System.out.println("count=" + count);
         //Thread.sleep(300000);
         Assert.assertTrue(expectCount >= count);
+    }
+
+
+    /**
+     * ResourceID 测试
+     */
+    @Test
+    public void uuidTest() {
+        ResourceID resourceID = new ResourceID();
+        Request request = new Request.Builder().url(TEST_FAKE_URL).tag(ResourceID.class, resourceID).build();
+        String resourceId = Utils.identifyRequest(request);
+        Assert.assertEquals(resourceID.getUuid(), resourceId);
     }
 
 }

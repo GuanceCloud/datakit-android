@@ -1,3 +1,5 @@
 include ':app', ':ft-plugin', ':ft-sdk',':ft-native'
 rootProject.name='ft-sdk-android'
 include ':ft-test'
+
+//include ':WebviewTest'

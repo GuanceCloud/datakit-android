@@ -1,14 +1,13 @@
 package com.ft.plugin;
 
 import com.android.build.api.instrumentation.FramesComputationMode;
-import com.android.build.api.instrumentation.InstrumentationParameters;
 import com.android.build.api.instrumentation.InstrumentationScope;
 import com.android.build.api.variant.AndroidComponentsExtension;
 import com.android.build.api.variant.Variant;
 import com.ft.plugin.garble.FTExtension;
 import com.ft.plugin.garble.FTMapUploader;
 import com.ft.plugin.garble.Logger;
-import com.ft.plugin.garble.PluginConfigManager;
+import com.ft.plugin.garble.asm.FTParameters;
 import com.ft.plugin.garble.asm.FTTransform;
 
 import org.gradle.api.Action;
@@ -63,13 +62,10 @@ import kotlin.jvm.functions.Function1;
 public class FTPlugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
-        project.getExtensions().create("FTExt", FTExtension.class, project);
+        FTExtension extension = project.getExtensions().create("FTExt", FTExtension.class, project);
 
         project.afterEvaluate(p -> {
             //传参数对象
-            FTExtension extension = (FTExtension) p.getExtensions().getByName("FTExt");
-            PluginConfigManager.get().setExtension(extension);
-
             Logger.setDebug(extension.showLog);
             Logger.debug("Plugin Version:" + BuildConfig.PLUGIN_VERSION +
                     ",ASM Version:" + extension.asmVersion);
@@ -82,14 +78,20 @@ public class FTPlugin implements Plugin<Project> {
         androidComponents.onVariants(androidComponents.selector().all(), new Action<Variant>() {
             @Override
             public void execute(Variant variant) {
-                variant.getInstrumentation()
-                        .transformClassesWith(FTTransform.class, InstrumentationScope.ALL, new Function1<InstrumentationParameters.None, Unit>() {
+                variant.getInstrumentation().transformClassesWith(
+                        FTTransform.class,
+                        InstrumentationScope.ALL,
+                        new Function1<FTParameters, Unit>() {
                             @Override
-                            public Unit invoke(InstrumentationParameters.None none) {
-
+                            public Unit invoke(FTParameters parameters) {
+                                // 现在 extension 已经是用户配置过的内容
+                                parameters.getIgnorePackages().set(extension.ignorePackages);
+                                parameters.getAsmVersion().set(extension.asmVersion);
                                 return Unit.INSTANCE;
                             }
-                        });
+                        }
+                );
+
                 variant.getInstrumentation()
                         .setAsmFramesComputationMode(FramesComputationMode.COMPUTE_FRAMES_FOR_INSTRUMENTED_METHODS);
 

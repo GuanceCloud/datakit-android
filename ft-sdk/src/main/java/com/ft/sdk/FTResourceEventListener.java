@@ -307,8 +307,9 @@ public class FTResourceEventListener extends EventListener {
             if (handler != null && handler.isInTakeUrl(url)) {
                 return originEventLister;
             }
+            String resourceId = Utils.identifyRequest(call.request());
             //自动计算 resourceId
-            return new FTResourceEventListener(Utils.identifyRequest(call.request()),
+            return new FTResourceEventListener(resourceId,
                     this.enableResourceHostIP, originEventLister);
         }
     }

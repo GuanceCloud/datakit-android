@@ -60,7 +60,7 @@ public class FTRUMInnerManager {
     static final long SESSION_FILTER_CAPACITY = 5;
     private final ConcurrentHashMap<String, ResourceBean> resourceBeanMap = new ConcurrentHashMap<>();
 
-    private final LinkedList<String> viewList = new LinkedList<>();
+    private final ArrayList<String> viewList = new ArrayList<>();
 
     private FTRUMInnerManager() {
 
@@ -961,11 +961,14 @@ public class FTRUMInnerManager {
             spanId = handler.getSpanID();
             traceId = handler.getTraceID();
         }
+//        else {
+//            LogUtils.e(TAG, "setTransformContent trace null");
+//        }
 
         ResourceBean bean = resourceBeanMap.get(resourceId);
 
         if (bean == null) {
-            LogUtils.d(TAG, "setTransformContent bean null");
+            LogUtils.e(TAG, "setTransformContent bean null");
             return;
         }
 
@@ -1106,7 +1109,7 @@ public class FTRUMInnerManager {
         return activeView.getId();
     }
 
-    private String getViewName() {
+    String getViewName() {
         if (activeView == null) {
             return null;
         }
