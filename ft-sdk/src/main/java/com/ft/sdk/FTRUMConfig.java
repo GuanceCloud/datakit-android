@@ -183,6 +183,11 @@ public class FTRUMConfig {
         return rumCacheLimitCount;
     }
 
+    /**
+     * 全局 Okhttp Request 自动添加，需要 ft-plugin 1.3.5 的支持
+     * @param enableOkhttpRequestTag
+     * @return
+     */
     public FTRUMConfig setEnableOkhttpRequestTag(boolean enableOkhttpRequestTag) {
         this.enableOkhttpRequestTag = enableOkhttpRequestTag;
         return this;
