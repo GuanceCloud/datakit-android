@@ -755,7 +755,7 @@ public class FTAutoTrack {
             LogUtils.e(TAG, "trackRequestBuilder: Request.Builder Before SDK install");
         }
         if (FTRUMConfigManager.get().isRumEnable()) {
-            FTRUMConfig config = FTRUMConfigManager.get().getConfig();
+            FTSDKConfig config = FTSdk.get().getBaseConfig();
             if (config.isEnableOkhttpRequestTag()) {
                 ResourceID uuid = builder.build().tag(ResourceID.class);
                 if (uuid == null) {
