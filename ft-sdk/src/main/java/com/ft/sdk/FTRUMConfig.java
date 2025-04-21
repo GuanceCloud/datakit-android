@@ -41,6 +41,12 @@ public class FTRUMConfig {
      * 是否开启用户行为 view 追踪
      */
     private boolean enableTraceUserView;
+
+    /**
+     * 是否开启用户行为 view 追踪 Fragment View 的采集
+     */
+    private boolean enableTraceUserViewInFragment;
+
     /**
      * 是否开启用户行为 Resource 追踪
      */
@@ -179,7 +185,6 @@ public class FTRUMConfig {
     public int getRumCacheLimitCount() {
         return rumCacheLimitCount;
     }
-
 
 
     /**
@@ -321,8 +326,22 @@ public class FTRUMConfig {
         return this;
     }
 
+    /**
+     * 是否监测用户 View 在 Fragment 的跳转采集
+     * @param enableTraceUserViewInFragment
+     * @return
+     */
+    public FTRUMConfig setEnableTraceUserViewInFragment(boolean enableTraceUserViewInFragment) {
+        this.enableTraceUserViewInFragment = enableTraceUserViewInFragment;
+        return this;
+    }
+
     public boolean isEnableTraceUserView() {
         return enableTraceUserView;
+    }
+
+    public boolean isEnableTraceUserViewInFragment() {
+        return enableTraceUserViewInFragment;
     }
 
     public boolean isEnableTraceUserResource() {

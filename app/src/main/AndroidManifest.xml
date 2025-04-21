@@ -37,6 +37,7 @@
         <activity android:name=".ManualRUMActivity" />
         <activity android:name=".HighLoadActivity" />
         <activity android:name=".IgnoreClassActivity" />
+        <activity android:name=".FragmentActivity" />
 
         <service
             android:name=".service.TestService"
@@ -45,11 +46,11 @@
         <receiver
             android:name=".directboot.BootBroadcastReceiver"
             android:directBootAware="true"
-            android:process=":another_process"
-            android:exported="false">
+            android:exported="false"
+            android:process=":another_process">
             <!-- Listening the BOOT_COMPLETED action for legacy pre-N devices -->
             <intent-filter>
-<!--                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />-->
+                <!--                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />-->
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>

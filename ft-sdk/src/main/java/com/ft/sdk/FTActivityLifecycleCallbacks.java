@@ -33,6 +33,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
 
     private static int activityCount = 0;
 
+    private final FTFragmentLifecycleHelper mFragmentLifecycleHelper = new FTFragmentLifecycleHelper();
 
     /**
      * {@link Activity} 创建
@@ -66,6 +67,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     @Override
     public void onActivityStarted(@NonNull Activity activity) {
         activityCount++;
+        mFragmentLifecycleHelper.register(activity);
     }
 
     /**
@@ -166,6 +168,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
         if (activityCount == 0) {
             mAppRestartCallback.onEnterBackground();
         }
+        mFragmentLifecycleHelper.unregister(activity);
     }
 
 

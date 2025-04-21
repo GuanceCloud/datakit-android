@@ -116,13 +116,14 @@ public class PackageUtils {
     }
 
     /**
-     *   {"agent":"x.x.x", "native":"x.x.x", "track":"x.x.x"} 固定这种格式里添加
+     * {"agent":"x.x.x", "native":"x.x.x", "track":"x.x.x"} 固定这种格式里添加
+     *
      * @param json
      * @param key
      * @param value
      * @return
      */
-    public static String appendPackageVersion(String json, String key, String value){
+    public static String appendPackageVersion(String json, String key, String value) {
         if (json.startsWith("{")) {
             // 在第一个 `{` 后面插入新的键值对
             return json.substring(0, 1) +
@@ -133,6 +134,16 @@ public class PackageUtils {
         // 如果不是 JSON 格式，直接返回原字符串
         return json;
 
+    }
+
+
+    public static boolean isAndroidXAvailable() {
+        try {
+            Class.forName("androidx.fragment.app.FragmentActivity");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
     }
 
 }
