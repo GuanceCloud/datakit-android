@@ -76,15 +76,6 @@ public class FTTrackInner {
     }
 
     /**
-     * 初始化 SDK Trace 配置
-     *
-     * @param config
-     */
-    void initTraceConfig(FTTraceConfig config) {
-        dataHelper.initTraceConfig(config);
-    }
-
-    /**
      * 初始化 SDK RUM 配置
      *
      * @param config
@@ -330,23 +321,6 @@ public class FTTrackInner {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
     }
-
-//    void batchTraceBeanBackground(@NonNull List<BaseContentBean> logBeans) {
-//        ArrayList<SyncJsonData> datas = new ArrayList<>();
-//        for (BaseContentBean logBean : logBeans) {
-//            try {
-//                datas.add(SyncJsonData.getFromLogBean(logBean, DataType.TRACE));
-//            } catch (Exception e) {
-//                LogUtils.e(TAG,Log.getStackTraceString(e));
-//            }
-//
-//        }
-//        boolean result = FTDBManager.get().insertFtOptList(datas);
-//        LogUtils.d(TAG, "batchTraceBeanBackground:insert-result=" + result);
-//
-//        SyncTaskManager.get().executeSyncPoll();
-//    }
-
 
     /**
      * 判断是否需要执行同步策略

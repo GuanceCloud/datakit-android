@@ -460,6 +460,9 @@ public class FTSDKConfig {
     private boolean enableOkhttpRequestTag;
 
 
+    private DataModifier dataModifier;
+
+
     /**
      * 设置是否迁移
      *
@@ -555,6 +558,7 @@ public class FTSDKConfig {
 
     /**
      * 全局 Okhttp Request 自动添加，需要 ft-plugin 1.3.5 的支持
+     *
      * @param enableOkhttpRequestTag
      * @return
      */
@@ -569,6 +573,20 @@ public class FTSDKConfig {
 
     public boolean isCompressIntakeRequests() {
         return compressIntakeRequests;
+    }
+
+    /**
+     * 设置数据更改器
+     * @param dataModifier
+     * @return
+     */
+    public FTSDKConfig setDataModifier(DataModifier dataModifier) {
+        this.dataModifier = dataModifier;
+        return this;
+    }
+
+    public DataModifier getDataModifier() {
+        return dataModifier;
     }
 
     @Override

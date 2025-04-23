@@ -10,14 +10,12 @@ import android.webkit.WebView;
 import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.sdk.garble.utils.PackageUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.Iterator;
 
 /**
  * 用于配合 web 接收应用内 webview 数据指标
@@ -124,35 +122,17 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                 if (data != null) {
                     JSONObject jsonTags = data.optJSONObject(Constants.TAGS);
                     JSONObject jsonFields = data.optJSONObject(Constants.FIELDS);
-
-                    HashMap<String, Object> publicTags = FTRUMConfigManager.get()
-                            .getRUMPublicDynamicTags(true);
-                    Iterator<String> keys = publicTags.keySet().iterator();
                     if (jsonTags == null) {
                         jsonTags = new JSONObject();
                     }
                     if (jsonFields == null) {
                         jsonFields = new JSONObject();
                     }
-                    String webSDKVersion = jsonTags.optString(Constants.KEY_SDK_VERSION);
-
-                    while (keys.hasNext()) {
-                        String key = keys.next();
-                        if (!key.equals(Constants.KEY_SERVICE)) {
-                            jsonTags.put(key, publicTags.get(key));
-                        }
-                    }
 
                     String sessionId = FTRUMInnerManager.get().getSessionId();
                     jsonTags.put(Constants.KEY_RUM_SESSION_ID, sessionId);
                     jsonTags.put(Constants.KEY_RUM_VIEW_IS_WEB_VIEW, true);
 
-                    Object pkgInfo = publicTags.get(Constants.KEY_RUM_SDK_PACKAGE_INFO);
-                    if (pkgInfo != null) {
-                        String replacePkgInfo = PackageUtils.appendPackageVersion(pkgInfo.toString(),
-                                Constants.KEY_RUM_SDK_PACKAGE_WEB, webSDKVersion);
-                        jsonTags.put(Constants.KEY_RUM_SDK_PACKAGE_INFO, replacePkgInfo);
-                    }
                     String measurement = data.optString(Constants.MEASUREMENT);
                     if (Constants.FT_MEASUREMENT_RUM_VIEW.equals(measurement)) {
                         jsonFields.put(Constants.KEY_RUM_VIEW_IS_ACTIVE, false);
@@ -162,7 +142,9 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                         jsonTags.put(Constants.KEY_RUM_VIEW_REFERRER, nativeViewName);
                     }
 
+                    HashMap<String, Object> dynamicTags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
                     HashMap<String, Object> tagMaps = Utils.jsonToMap(jsonTags);
+                    tagMaps.putAll(dynamicTags);
                     HashMap<String, Object> fieldMaps = Utils.jsonToMap(jsonFields);
 
                     long time = data.optLong(Constants.TIME);

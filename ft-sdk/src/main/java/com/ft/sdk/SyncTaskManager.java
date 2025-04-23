@@ -434,9 +434,9 @@ public class SyncTaskManager {
     private synchronized void requestNet(DataType dataType, String pkgId, String body, final RequestCallback syncCallback) throws FTNetworkNoAvailableException {
         String model;
         switch (dataType) {
-            case TRACE:
-                model = Constants.URL_MODEL_TRACING;
-                break;
+//            case TRACE:
+//                model = Constants.URL_MODEL_TRACING;
+//                break;
             case LOG:
                 model = Constants.URL_MODEL_LOG;
                 break;

@@ -133,10 +133,10 @@ public class Constants {
      * Log，日志，datakit 请求地址
      **/
     public static final String URL_MODEL_LOG = "v1/write/logging";
-    /**
-     * Trace 链路 datakit 请求地址
-     */
-    public static final String URL_MODEL_TRACING = "v1/write/tracing";
+//    /**
+//     * Trace 链路 datakit 请求地址
+//     */
+//    public static final String URL_MODEL_TRACING = "v1/write/tracing";
 
     /**
      * 默认服务名，字段 service

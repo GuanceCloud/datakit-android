@@ -2,6 +2,7 @@ package com.ft;
 
 import android.content.Context;
 
+import com.ft.sdk.DataModifier;
 import com.ft.sdk.DeviceMetricsMonitorType;
 import com.ft.sdk.EnvType;
 import com.ft.sdk.ErrorMonitorType;
@@ -50,6 +51,15 @@ public class DemoApplication extends BaseApplication {
                 .setNeedTransformOldCache(true)
                 .setCompressIntakeRequests(true)
                 .setSyncSleepTime(100)
+//                .setDataModifier(new DataModifier() {
+//                    @Override
+//                    public Object modify(String key, Object value) {
+//                        if(key.equals("userid")){
+//                            return "xxx";
+//                        }
+//                        return value;
+//                    }
+//                })
 //                .enableLimitWithDbSize(1024 * 1024)
 //                .setDbCacheDiscard(DBCacheDiscard.DISCARD_OLDEST)
                 .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()));

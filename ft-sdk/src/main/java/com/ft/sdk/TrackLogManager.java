@@ -106,7 +106,7 @@ public class TrackLogManager {
         }
 
         if (config.isEnableLinkRumData()) {
-            HashMap<String, Object> rumTags = FTRUMConfigManager.get().getRUMPublicDynamicTags(true);
+            HashMap<String, Object> rumTags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
             FTRUMInnerManager.get().attachRUMRelative(rumTags, false);
             logBean.appendTags(rumTags);
         }
