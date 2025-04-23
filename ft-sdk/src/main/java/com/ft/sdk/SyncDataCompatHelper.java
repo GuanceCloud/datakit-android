@@ -21,15 +21,12 @@ public class SyncDataCompatHelper {
 
     protected HashMap<String, Object> logTags;
     protected HashMap<String, Object> rumTags;
-    protected HashMap<String, Object> traceTags;
 
     protected FTSDKConfig config;
 
     public SyncDataCompatHelper(HashMap<String, Object> logTags,
-                                HashMap<String, Object> traceTags,
                                 HashMap<String, Object> rumTags, FTSDKConfig config) {
         this.logTags = logTags;
-        this.traceTags = traceTags;
         this.rumTags = rumTags;
         this.config = config;
     }
@@ -45,8 +42,6 @@ public class SyncDataCompatHelper {
         hashMap.put(KEY_SDK_DATA_FLAG, uuid);//让 uuid 放置第一位，字符替换时可以节省损耗
         if (dataType == DataType.LOG) {
             hashMap.putAll(logTags);
-        } else if (dataType == DataType.TRACE) {
-            hashMap.putAll(traceTags);
         } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_WEBVIEW) {
             hashMap.putAll(rumTags);
         }

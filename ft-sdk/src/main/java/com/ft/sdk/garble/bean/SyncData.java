@@ -162,10 +162,10 @@ public class SyncData implements Cloneable {
             throws FTInvalidParameterException {
         SyncData recordData = new SyncData(DataType.LOG);
         String uuid = Utils.getGUID_16();
-        recordData.setTime(bean.getTime());
+        recordData.setTime(bean.getTimeNano());
         recordData.setUuid(uuid);
         recordData.setDataString(helper.getBodyContent(bean.getMeasurement(),
-                bean.getAllTags(), bean.getAllFields(), bean.getTime(), DataType.LOG, uuid));
+                bean.getAllTags(), bean.getAllFields(), bean.getTimeNano(), DataType.LOG, uuid));
         return recordData;
     }
 

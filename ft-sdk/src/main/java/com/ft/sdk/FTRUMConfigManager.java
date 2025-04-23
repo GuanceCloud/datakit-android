@@ -185,13 +185,6 @@ public class FTRUMConfigManager {
         return config != null && config.getRumAppId() != null;
     }
 
-    /**
-     * 是否使用 Okhttp tag
-     * @return
-     */
-    public boolean isEnableOkhttpRequestTag() {
-        return config != null && config.isEnableOkhttpRequestTag();
-    }
 
     @Nullable
     public FTRUMConfig getConfig() {
@@ -355,20 +348,14 @@ public class FTRUMConfigManager {
         rumGlobalContext.put(Constants.KEY_DEVICE_OS_VERSION_MAJOR, osVersionMajor);
     }
 
-    HashMap<String, Object> getRUMPublicDynamicTags() {
-        return getRUMPublicDynamicTags(false);
-    }
 
     /**
      * 获取变化的公用 tag
      *
      * @return
      */
-    HashMap<String, Object> getRUMPublicDynamicTags(boolean includeRUMStatic) {
+    HashMap<String, Object> getRUMPublicDynamicTags() {
         HashMap<String, Object> tags = new HashMap<>();
-        if (includeRUMStatic) {
-            tags.putAll(FTTrackInner.getInstance().getCurrentDataHelper().getCurrentRumTags());
-        }
         tags.put(Constants.KEY_RUM_NETWORK_TYPE, FTNetworkListener.get().getNetworkStateBean().getNetworkType());
         tags.put(Constants.KEY_RUM_IS_SIGN_IN, FTRUMConfigManager.get().isUserDataBinded() ? "T" : "F");
         if (FTRUMConfigManager.get().isUserDataBinded()) {

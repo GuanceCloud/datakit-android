@@ -30,10 +30,11 @@ public enum DataType {
      * SDK Log 数据
      */
     LOG,
-    /**
-     * SDK Trace 数据，目前不在使用
-     */
-    TRACE;
+//    /**
+//     * SDK Trace 数据，目前不在使用
+//     */
+//    TRACE
+    ;
 
     public String getValue() {
         return toString().toLowerCase();
