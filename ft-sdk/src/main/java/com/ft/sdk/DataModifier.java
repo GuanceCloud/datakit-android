@@ -1,5 +1,9 @@
 package com.ft.sdk;
 
+/**
+ * 字段替换，适合全局字段替换场景，如果期望逐条分析，实现条数据的替换，请求使用 {@link LineDataModifier }
+ * 字段替换性能上 {@link DataModifier} > {@link LineDataModifier }
+ */
 public interface DataModifier {
 
     /**

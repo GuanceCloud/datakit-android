@@ -42,6 +42,7 @@ public class SyncDataHelper {
     private FTLoggerConfig logConfig;
 
     protected DataModifier dataModifier;
+    protected LineDataModifier lineDataModifier;
 
 
     protected SyncDataHelper() {
@@ -57,6 +58,8 @@ public class SyncDataHelper {
     void initBaseConfig(FTSDKConfig config) {
         this.config = config;
         this.dataModifier = config.getDataModifier();
+        this.lineDataModifier = config.getLineDataModifier();
+
         basePublicTags.putAll(applyModifier(config.getGlobalContext()));
     }
 
@@ -73,6 +76,7 @@ public class SyncDataHelper {
 
     /**
      * 替换整个字典
+     *
      * @param map
      * @return
      */
@@ -96,6 +100,7 @@ public class SyncDataHelper {
 
     /**
      * 替换单个
+     *
      * @param key
      * @param value
      * @return
@@ -107,6 +112,33 @@ public class SyncDataHelper {
             return value;
         }
         return changeValue;
+    }
+
+
+    /**
+     * 单条数据进行替换
+     *
+     * @param measurement
+     * @param tags
+     * @param fields
+     */
+    void appLineModifier(String measurement, HashMap<String, Object> tags, HashMap<String, Object> fields) {
+        if (lineDataModifier == null) return;
+        HashMap<String, Object> mergedValues = new HashMap<>();
+        mergedValues.putAll(tags);
+        mergedValues.putAll(fields);
+        Map<String, Object> changedValues = lineDataModifier.modify(measurement, mergedValues);
+        if (changedValues != null) {
+            for (Map.Entry<String, Object> entry : changedValues.entrySet()) {
+                String key = entry.getKey();
+                Object value = entry.getValue();
+                if (tags.containsKey(key)) {
+                    tags.put(key, value);
+                } else if (fields.containsKey(key)) {
+                    fields.put(key, value);
+                }
+            }
+        }
     }
 
     /**
@@ -246,6 +278,7 @@ public class SyncDataHelper {
                 }
 
             }
+            appLineModifier(measurement, mergeTags, fields);
             bodyContent = convertToLineProtocolLine(measurement, mergeTags, fields, timeStamp, config);
         } else {
             bodyContent = "";

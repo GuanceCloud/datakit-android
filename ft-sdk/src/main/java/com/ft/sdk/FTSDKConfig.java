@@ -462,6 +462,8 @@ public class FTSDKConfig {
 
     private DataModifier dataModifier;
 
+    private LineDataModifier lineDataModifier;
+
 
     /**
      * 设置是否迁移
@@ -576,13 +578,29 @@ public class FTSDKConfig {
     }
 
     /**
-     * 设置数据更改器
+     * 设置数据更改器,
+     *
      * @param dataModifier
      * @return
      */
     public FTSDKConfig setDataModifier(DataModifier dataModifier) {
         this.dataModifier = dataModifier;
         return this;
+    }
+
+    /**
+     * 设置数据更改器
+     *
+     * @param dataModifier
+     * @return
+     */
+    public FTSDKConfig setLineDataModifier(LineDataModifier dataModifier) {
+        this.lineDataModifier = dataModifier;
+        return this;
+    }
+
+    public LineDataModifier getLineDataModifier() {
+        return lineDataModifier;
     }
 
     public DataModifier getDataModifier() {
