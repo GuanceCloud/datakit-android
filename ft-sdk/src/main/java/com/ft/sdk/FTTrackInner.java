@@ -19,6 +19,7 @@ import com.ft.sdk.garble.threadpool.RunnerCompleteCallBack;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.HashMapUtils;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONObject;
 
@@ -154,13 +155,15 @@ public class FTTrackInner {
              RunnerCompleteCallBack callBack) {
         String sessionId = HashMapUtils.getString(tags, Constants.KEY_RUM_SESSION_ID);
         if (FTRUMInnerManager.get().checkSessionWillCollect(sessionId)) {
-            syncRUMDataBackground(DataType.RUM_APP, time, measurement, tags, fields, callBack);
+            syncRUMDataBackground(DataType.RUM_APP, Utils.getCurrentNanoTime(), time, measurement,
+                    tags, fields, callBack);
         } else {
             if (FTRUMInnerManager.get().checkSessionErrorWillCollect(sessionId)) {
                 if (measurement.equals(Constants.FT_MEASUREMENT_RUM_VIEW)) {
                     fields.put(Constants.KEY_SAMPLED_FOR_ERROR_SESSION, true);
                 }
-                syncRUMDataBackground(DataType.RUM_APP_NOT_SAMPLE, time, measurement, tags, fields, callBack);
+                syncRUMDataBackground(DataType.RUM_APP_NOT_SAMPLE, Utils.getCurrentNanoTime(),
+                        time, measurement, tags, fields, callBack);
             }
         }
     }
@@ -197,7 +200,7 @@ public class FTTrackInner {
      */
     private void syncRUMDataBackground(final DataType dataType, final long time,
                                        final String measurement, final HashMap<String, Object> tags, final HashMap<String, Object> fields) {
-        syncRUMDataBackground(dataType, time, measurement, tags, fields, null);
+        syncRUMDataBackground(dataType, Utils.getCurrentNanoTime(), time, measurement, tags, fields, null);
     }
 
     /**
@@ -210,7 +213,7 @@ public class FTTrackInner {
      * @param fields
      * @param callBack
      */
-    private void syncRUMDataBackground(final DataType dataType, final long time,
+    private void syncRUMDataBackground(final DataType dataType, final long dataGenerateTime, final long time,
                                        final String measurement, final HashMap<String, Object> tags,
                                        final HashMap<String, Object> fields, RunnerCompleteCallBack callBack) {
         DataUploaderThreadPool.get().execute(new Runnable() {
@@ -218,7 +221,7 @@ public class FTTrackInner {
             public void run() {
                 try {
                     SyncData recordData = SyncData.getSyncData(dataHelper, dataType,
-                            new LineProtocolBean(measurement, tags, fields, time));
+                            new LineProtocolBean(measurement, tags, fields, time), dataGenerateTime);
                     synchronized (FTDBCachePolicy.get().getRumLock()) {
                         int status = FTDBCachePolicy.get().optRUMCachePolicy(1);
                         StringBuilder errorDec = new StringBuilder();

@@ -138,11 +138,16 @@ public class SyncData implements Cloneable {
      * @return
      * @throws InvalidParameterException
      */
-    public static SyncData getSyncData(SyncDataHelper helper, DataType dataType, LineProtocolBean bean)
+    public static SyncData getSyncData(SyncDataHelper helper, DataType dataType, LineProtocolBean bean,
+                                       long dataGenerateTime)
             throws FTInvalidParameterException {
         String uuid = Utils.getGUID_16();
         SyncData recordData = new SyncData(dataType);
-        recordData.setTime(Utils.getCurrentNanoTime());
+        if (bean.getMeasurement().equals(Constants.FT_MEASUREMENT_RUM_VIEW)) {
+            recordData.setTime(dataGenerateTime);
+        } else {
+            recordData.setTime(bean.getTimeNano());
+        }
         recordData.setUuid(uuid);
         recordData.setDataString(helper.getBodyContent(bean.getMeasurement(), bean.getTags(),
                 bean.getFields(), bean.getTimeNano(), dataType, uuid));
