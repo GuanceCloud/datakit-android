@@ -31,13 +31,13 @@
     })
 
     function test() {
-        FT_JS_Bridge.sendEvent({})
+        FTWebViewJavascriptBridge.sendEvent("{}")
 
-        FT_JS_Bridge.sendEvent({}, function (ret, err) {
+        FTWebViewJavascriptBridge.sendEvent("{}", function (ret, err) {
            console.log("sendEvent call back:" + JSON.stringify(ret) + "，" + JSON.stringify(err))
         })
 
-        FT_JS_Bridge.addEventListener({}, function (ret, err) {
+        FTWebViewJavascriptBridge.addEventListener("{}", function (ret, err) {
            console.log("addEventListener call back:" + JSON.stringify(ret) + "，" + JSON.stringify(err))
         })
     }
