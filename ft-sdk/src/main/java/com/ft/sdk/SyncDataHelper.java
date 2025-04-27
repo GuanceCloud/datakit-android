@@ -257,26 +257,24 @@ public class SyncDataHelper {
             if (dataType == DataType.RUM_APP) {
                 mergeTags.putAll(rumTags);
             } else {
-                if (tags != null) {
-                    Iterator<String> keys = rumTags.keySet().iterator();
-                    while (keys.hasNext()) {
-                        String key = keys.next();
-                        if (!key.equals(Constants.KEY_SERVICE)) {
-                            tags.put(key, rumTags.get(key));
+                Object webSDKVersion = mergeTags.get(Constants.KEY_SDK_VERSION);
+                Iterator<String> keys = rumTags.keySet().iterator();
+                while (keys.hasNext()) {
+                    String key = keys.next();
+                    if (!key.equals(Constants.KEY_SERVICE)) {
+                        if (key.equals(Constants.KEY_RUM_SDK_PACKAGE_INFO)) {
+                            Object pkgInfo = rumTags.get(Constants.KEY_RUM_SDK_PACKAGE_INFO);
+                            if (pkgInfo != null) {
+                                String replacePkgInfo = PackageUtils.appendPackageVersion(pkgInfo.toString(),
+                                        Constants.KEY_RUM_SDK_PACKAGE_WEB, webSDKVersion + "");
+                                mergeTags.put(Constants.KEY_RUM_SDK_PACKAGE_INFO,
+                                        applyModifier(Constants.KEY_RUM_SDK_PACKAGE_INFO, replacePkgInfo));
+                            }
+                        } else {
+                            mergeTags.put(key, rumTags.get(key));
                         }
                     }
-
-                    Object webSDKVersion = tags.get(Constants.KEY_SDK_VERSION);
-                    Object pkgInfo = rumTags.get(Constants.KEY_RUM_SDK_PACKAGE_INFO);
-                    if (pkgInfo != null) {
-                        String replacePkgInfo = PackageUtils.appendPackageVersion(pkgInfo.toString(),
-                                Constants.KEY_RUM_SDK_PACKAGE_WEB, webSDKVersion + "");
-                        tags.put(Constants.KEY_RUM_SDK_PACKAGE_INFO,
-                                applyModifier(Constants.KEY_RUM_SDK_PACKAGE_INFO, replacePkgInfo));
-                    }
-
                 }
-
             }
             appLineModifier(measurement, mergeTags, fields);
             bodyContent = convertToLineProtocolLine(measurement, mergeTags, fields, timeStamp, config);
