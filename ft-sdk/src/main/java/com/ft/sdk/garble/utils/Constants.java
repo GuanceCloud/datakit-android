@@ -674,6 +674,12 @@ public class Constants {
      */
     public static final String KEY_RUM_TAGS = "tags";
 
+
+    /**
+     * 根据采样率被采集
+     */
+    public static final String KEY_COLLECT_TYPE = "collect_type";
+
     /**
      * 冷启动，action_type
      */

@@ -7,6 +7,7 @@ import android.os.Looper;
 import android.webkit.ValueCallback;
 import android.webkit.WebView;
 
+import com.ft.sdk.garble.bean.CollectType;
 import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -151,8 +152,9 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                     if (measurement.equals(Constants.FT_MEASUREMENT_RUM_ERROR)) {
                         SyncTaskManager.get().setErrorTimeLine(time, null);
                     }
+                    CollectType collectType = FTRUMInnerManager.get().checkSessionWillCollect(sessionId);
                     FTTrackInner.getInstance().rumWebView(time, measurement,
-                            tagMaps, fieldMaps);
+                            tagMaps, fieldMaps, collectType);
                 }
 
             } else if (name.equals(WEB_JS_TYPE_TRACK)) {

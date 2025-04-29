@@ -13,9 +13,9 @@ public class FTRUMConfig {
     private float samplingRate = 1;
 
     /**
-     *
+     * 错误采样率，[0,1] 作用域为同一 session_id 下所有 View，Action，LongTask，Error 数据
      */
-    private float sessionErrorSampleRate = 1;
+    private float sessionErrorSampleRate = 0;
 
     /**
      * RUM appID
@@ -160,6 +160,7 @@ public class FTRUMConfig {
     }
 
     /**
+     * 设置错误采样率，默认为 0
      * @param sessionErrorSampleRate
      */
     public FTRUMConfig setSessionErrorSampleRate(float sessionErrorSampleRate) {

@@ -3,6 +3,7 @@ package com.ft.sdk;
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.bean.BaseContentBean;
+import com.ft.sdk.garble.bean.CollectType;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.LineProtocolBean;
 import com.ft.sdk.garble.bean.LogBean;
@@ -17,7 +18,6 @@ import com.ft.sdk.garble.manager.RequestCallback;
 import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
 import com.ft.sdk.garble.threadpool.RunnerCompleteCallBack;
 import com.ft.sdk.garble.utils.Constants;
-import com.ft.sdk.garble.utils.HashMapUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
@@ -152,20 +152,19 @@ public class FTTrackInner {
      * @param fields
      */
     void rum(long time, String measurement, final HashMap<String, Object> tags, HashMap<String, Object> fields,
-             RunnerCompleteCallBack callBack) {
-        String sessionId = HashMapUtils.getString(tags, Constants.KEY_RUM_SESSION_ID);
-        if (FTRUMInnerManager.get().checkSessionWillCollect(sessionId)) {
-            syncRUMDataBackground(DataType.RUM_APP, Utils.getCurrentNanoTime(), time, measurement,
-                    tags, fields, callBack);
-        } else {
-            if (FTRUMInnerManager.get().checkSessionErrorWillCollect(sessionId)) {
-                if (measurement.equals(Constants.FT_MEASUREMENT_RUM_VIEW)) {
-                    fields.put(Constants.KEY_SAMPLED_FOR_ERROR_SESSION, true);
-                }
-                syncRUMDataBackground(DataType.RUM_APP_NOT_SAMPLE, Utils.getCurrentNanoTime(),
-                        time, measurement, tags, fields, callBack);
-            }
+             RunnerCompleteCallBack callBack, CollectType collectType) {
+        switch (collectType) {
+            case NOT_COLLECT:
+                break;
+            case COLLECT_BY_ERROR_SAMPLE:
+            case COLLECT_BY_SAMPLE:
+                syncRUMDataBackground(collectType == CollectType.COLLECT_BY_ERROR_SAMPLE ?
+                                DataType.RUM_APP_NOT_SAMPLE : DataType.RUM_APP,
+                        Utils.getCurrentNanoTime(), time, measurement,
+                        tags, fields, callBack);
+                break;
         }
+
     }
 
     /**
@@ -176,14 +175,15 @@ public class FTTrackInner {
      * @param tags
      * @param fields
      */
-    void rumWebView(long time, String measurement, final HashMap<String, Object> tags, HashMap<String, Object> fields) {
-        String sessionId = HashMapUtils.getString(tags, Constants.KEY_RUM_SESSION_ID);
-        if (FTRUMInnerManager.get().checkSessionWillCollect(sessionId)) {
-            syncRUMDataBackground(DataType.RUM_WEBVIEW, time, measurement, tags, fields);
-        } else {
-            if (FTRUMInnerManager.get().checkSessionErrorWillCollect(sessionId)) {
-                syncRUMDataBackground(DataType.RUM_WEBVIEW_NOT_SAMPLE, time, measurement, tags, fields);
-            }
+    void rumWebView(long time, String measurement, final HashMap<String, Object> tags, HashMap<String, Object> fields, CollectType collectType) {
+        switch (collectType) {
+            case NOT_COLLECT:
+                break;
+            case COLLECT_BY_ERROR_SAMPLE:
+            case COLLECT_BY_SAMPLE:
+                syncRUMDataBackground(collectType == CollectType.COLLECT_BY_ERROR_SAMPLE ?
+                        DataType.RUM_WEBVIEW_NOT_SAMPLE : DataType.RUM_WEBVIEW, time, measurement, tags, fields);
+
         }
     }
 

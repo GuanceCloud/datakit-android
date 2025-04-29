@@ -61,6 +61,7 @@ public class ActiveViewBean extends ViewBean {
         bean.fpsMini = this.fpsMini;
         bean.property = this.property;
         bean.tags = this.tags;
+        bean.collectType = this.collectType;
         return bean;
     }
 

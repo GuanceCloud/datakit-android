@@ -321,6 +321,16 @@ public class ViewBean {
         this.batteryCurrentMax = batteryCurrentMax;
     }
 
+    public String collectType;
+
+    public CollectType getCollectType() {
+        return CollectType.fromValue(collectType);
+    }
+
+    public void setCollectType(CollectType collectType) {
+        this.collectType = collectType.getValue();
+    }
+
     /**
      * 将指标数据转化为 json 字符
      *
@@ -328,6 +338,7 @@ public class ViewBean {
      */
     public String getAttrJsonString() {
         HashMap<String, Object> map = new HashMap<>();
+        map.put(Constants.KEY_COLLECT_TYPE, collectType);
         map.put(Constants.KEY_SESSION_ERROR_TIMESTAMP, lastErrorTime);
         map.put(Constants.KEY_BATTERY_CURRENT_AVG, batteryCurrentAvg);
         map.put(Constants.KEY_BATTERY_CURRENT_MAX, batteryCurrentMax);
@@ -351,6 +362,7 @@ public class ViewBean {
         try {
             JSONObject json = new JSONObject(jsonString);
             this.lastErrorTime = json.optLong(Constants.KEY_SESSION_ERROR_TIMESTAMP);
+            this.collectType = json.optString(Constants.KEY_COLLECT_TYPE);
             this.batteryCurrentAvg = json.optInt(Constants.KEY_BATTERY_CURRENT_AVG);
             this.batteryCurrentMax = json.getInt(Constants.KEY_BATTERY_CURRENT_MAX);
             this.fpsAvg = json.optDouble(Constants.KEY_FPS_AVG);
