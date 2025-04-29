@@ -145,9 +145,14 @@ public class SyncTaskManager {
     private Runnable oldCacheRunner;
 
     /**
-     *
+     * 发生错误的时间
      */
     private long errorTimeLine = -1;
+
+    /**
+     * 应用启动时间
+     */
+    private long appStartTime = -1;
 
     /**
      * @param errorTimeLine
@@ -345,7 +350,7 @@ public class SyncTaskManager {
         if (errorTimeLine > 0) {
             LogUtils.d(TAG, "notSampleConsume:" + dataType + ", before ns:" + errorTimeLine);
 
-            int updateCount = FTDBManager.get().updateDataType(dataType, errorTimeLine);
+            int updateCount = FTDBManager.get().updateDataType(dataType, appStartTime, errorTimeLine);
             LogUtils.d(TAG, "updateDataType:" + dataType + "," + updateCount);
         }
         int deleteCount = FTDBManager.get().deleteExpireCache(dataType, Utils.getCurrentNanoTime(), ONE_MINUTE_DURATION_NS);
@@ -615,8 +620,10 @@ public class SyncTaskManager {
             @Override
             public void run() {
                 errorTimeLine = getErrorTimeLineFromFileCache();
+                appStartTime = Utils.getAppStartTimeNs();
             }
         });
+
     }
 
     /**
