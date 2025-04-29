@@ -136,6 +136,7 @@ public class FTSdk {
         FTUIBlockManager.get().release();
         FTTraceConfigManager.get().release();
         FTLoggerConfigManager.get().release();
+        TrackLogManager.get().shutdown();
         FTRUMGlobalManager.get().release();
         FTRUMInnerManager.get().release();
         EventConsumerThreadPool.get().shutDown();

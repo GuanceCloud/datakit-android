@@ -11,18 +11,30 @@ public enum DataType {
      * 原生 App RUM 数据
      */
     RUM_APP,
+
+    /**
+     * 未被采样的数据缓存
+     */
+    RUM_APP_NOT_SAMPLE,
     /**
      * WebView 中 JS 产生的 RUM 数据需要配置，需要配置 <a href="https://github.com/GuanceCloud/datakit-js"> JS SDK</a>
      */
     RUM_WEBVIEW,
+
+    /**
+     * 未被采样的数据缓存
+     */
+    RUM_WEBVIEW_NOT_SAMPLE,
+
     /**
      * SDK Log 数据
      */
     LOG,
-    /**
-     * SDK Trace 数据，目前不在使用
-     */
-    TRACE;
+//    /**
+//     * SDK Trace 数据，目前不在使用
+//     */
+//    TRACE
+    ;
 
     public String getValue() {
         return toString().toLowerCase();

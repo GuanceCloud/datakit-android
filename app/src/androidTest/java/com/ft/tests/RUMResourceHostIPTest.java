@@ -20,7 +20,7 @@ import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.bean.DataType;
-import com.ft.sdk.garble.bean.SyncJsonData;
+import com.ft.sdk.garble.bean.SyncData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.test.utils.LineProtocolData;
@@ -72,9 +72,9 @@ public class RUMResourceHostIPTest extends BaseTest {
         onView(ViewMatchers.withId(R.id.main_mock_okhttp_btn)).perform(ViewActions.scrollTo()).perform(click());
         Thread.sleep(1000);
 
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
+        List<SyncData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
 
-        for (SyncJsonData recordData : recordDataList) {
+        for (SyncData recordData : recordDataList) {
             LineProtocolData lineProtocolData = new LineProtocolData(recordData.getDataString());
             String measurement = lineProtocolData.getMeasurement();
             if (Constants.FT_MEASUREMENT_RUM_RESOURCE.equals(measurement)) {

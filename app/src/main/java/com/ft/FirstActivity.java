@@ -26,5 +26,9 @@ public class FirstActivity extends NameTitleActivity {
         findViewById(R.id.first_to_tabview_btn).setOnClickListener(v -> {
             startActivity(new Intent(FirstActivity.this, TabViewActivity.class));
         });
+
+        findViewById(R.id.fragment_btn).setOnClickListener(v -> {
+            startActivity(new Intent(FirstActivity.this, FragmentActivity.class));
+        });
     }
 }

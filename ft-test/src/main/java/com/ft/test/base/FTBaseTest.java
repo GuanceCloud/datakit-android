@@ -13,7 +13,7 @@ import com.ft.sdk.FTUIBlockManager;
 import com.ft.sdk.SyncDataHelper;
 import com.ft.sdk.SyncTaskManager;
 import com.ft.sdk.garble.bean.DataType;
-import com.ft.sdk.garble.bean.SyncJsonData;
+import com.ft.sdk.garble.bean.SyncData;
 import com.ft.sdk.garble.db.FTDBCachePolicy;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.manager.RequestCallback;
@@ -210,10 +210,10 @@ public class FTBaseTest {
      * @param dataType
      */
     protected void uploadData(DataType dataType) {
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, dataType);
+        List<SyncData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, dataType);
         StringBuilder body = new StringBuilder();
-        for (SyncJsonData syncJsonData : recordDataList) {
-            body.append(syncJsonData.getDataString());
+        for (SyncData syncData : recordDataList) {
+            body.append(syncData.getDataString());
         }
 
         try {

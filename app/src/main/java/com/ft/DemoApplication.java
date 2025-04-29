@@ -10,6 +10,7 @@ import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
+import com.ft.sdk.LineDataModifier;
 import com.ft.sdk.LogCacheDiscard;
 import com.ft.sdk.RUMCacheDiscard;
 import com.ft.sdk.TraceType;
@@ -22,6 +23,8 @@ import com.ft.sdk.sessionreplay.material.MaterialExtensionSupport;
 import com.ft.utils.CrossProcessSetting;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * BY huangDianHua
@@ -52,8 +55,33 @@ public class DemoApplication extends BaseApplication {
                 .setOnlySupportMainProcess(CrossProcessSetting.isOnlyMainProcess(context))
                 .setNeedTransformOldCache(true)
                 .setCompressIntakeRequests(true)
+                .setSyncSleepTime(100)
+//                .setDataModifier(new DataModifier() {
+//                    @Override
+//                    public Object modify(String key, Object value) {
+//                        if(key.equals("userid")){
+//                            return "xxx";
+//                        }
+//                        return value;
+//                    }
+//                })
 //                .enableLimitWithDbSize(1024 * 1024)
 //                .setDbCacheDiscard(DBCacheDiscard.DISCARD_OLDEST)
+//                .setLineDataModifier(new LineDataModifier() {
+//                    @Override
+//                    public Map<String, Object> modify(String measurement, HashMap<String, Object> data) {
+//                        if (measurement.equals("view")) {
+//                            Object viewName = data.get("view_name");
+//                            if (Objects.equals(viewName, "DebugMainActivity")) {
+//                                HashMap<String, Object> changeValue = new HashMap<>();
+//                                changeValue.put("view_name", "xxx");
+//                                return changeValue;
+//                            }
+//                        }
+//                        return null;
+//
+//                    }
+//                })
                 .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()));
 //        try {
 //            URL url = new URL(BuildConfig.PROXY_ADDRESS);
@@ -77,21 +105,23 @@ public class DemoApplication extends BaseApplication {
 
 
         FTSdk.initRUMWithConfig(new FTRUMConfig()
-                .setSamplingRate(1f)
-                .setRumAppId(BuildConfig.RUM_APP_ID)
-                .setEnableTraceUserAction(true)
-                .setEnableTraceUserView(true)
-                .setRumCacheLimitCount(1000)
-                .setRumCacheDiscardStrategy(RUMCacheDiscard.DISCARD)
-                .setEnableTraceUserResource(true)
-                .setEnableTrackAppANR(true)
-                .setEnableTrackAppCrash(true)
-                .setEnableTrackAppUIBlock(true, 100)
-                .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
-                .setResourceUrlHandler(url -> false)
+                        .setSamplingRate(0f)
+                        .setSessionErrorSampleRate(1f)
+                        .setRumAppId(BuildConfig.RUM_APP_ID)
+                        .setEnableTraceUserAction(true)
+                        .setEnableTraceUserView(true)
+                        .setRumCacheLimitCount(1000)
+                        .setRumCacheDiscardStrategy(RUMCacheDiscard.DISCARD)
+                        .setEnableTraceUserResource(true)
+                        .setEnableTrackAppANR(true)
+                        .setEnableTrackAppCrash(true)
+                        .setEnableTrackAppUIBlock(true, 100)
+                        .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
+                        .setResourceUrlHandler(url -> false)
 //                .addGlobalContext("track_id", BuildConfig.TRACK_ID)
 //                .addGlobalContext("custom_tag", "any tags")
-                .setExtraMonitorTypeWithError(ErrorMonitorType.ALL.getValue()));
+                        .setExtraMonitorTypeWithError(ErrorMonitorType.ALL.getValue())
+        );
 
 
         UserData userData = new UserData();

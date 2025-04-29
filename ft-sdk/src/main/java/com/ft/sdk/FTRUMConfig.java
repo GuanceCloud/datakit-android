@@ -13,6 +13,11 @@ public class FTRUMConfig {
     private float samplingRate = 1;
 
     /**
+     * 错误采样率，[0,1] 作用域为同一 session_id 下所有 View，Action，LongTask，Error 数据
+     */
+    private float sessionErrorSampleRate = 0;
+
+    /**
      * RUM appID
      */
     private String rumAppId = "";
@@ -41,6 +46,12 @@ public class FTRUMConfig {
      * 是否开启用户行为 view 追踪
      */
     private boolean enableTraceUserView;
+
+    /**
+     * 是否开启用户行为 view 追踪 Fragment View 的采集
+     */
+    private boolean enableTraceUserViewInFragment;
+
     /**
      * 是否开启用户行为 Resource 追踪
      */
@@ -140,6 +151,24 @@ public class FTRUMConfig {
     }
 
     /**
+     * 获取错误采样率
+     *
+     * @return
+     */
+    public float getSessionErrorSampleRate() {
+        return sessionErrorSampleRate;
+    }
+
+    /**
+     * 设置错误采样率，默认为 0
+     * @param sessionErrorSampleRate
+     */
+    public FTRUMConfig setSessionErrorSampleRate(float sessionErrorSampleRate) {
+        this.sessionErrorSampleRate = sessionErrorSampleRate;
+        return this;
+    }
+
+    /**
      * 设置 serviceName
      *
      * @param serviceName
@@ -179,7 +208,6 @@ public class FTRUMConfig {
     public int getRumCacheLimitCount() {
         return rumCacheLimitCount;
     }
-
 
 
     /**
@@ -321,8 +349,22 @@ public class FTRUMConfig {
         return this;
     }
 
+    /**
+     * 是否监测用户 View 在 Fragment 的跳转采集
+     * @param enableTraceUserViewInFragment
+     * @return
+     */
+    public FTRUMConfig setEnableTraceUserViewInFragment(boolean enableTraceUserViewInFragment) {
+        this.enableTraceUserViewInFragment = enableTraceUserViewInFragment;
+        return this;
+    }
+
     public boolean isEnableTraceUserView() {
         return enableTraceUserView;
+    }
+
+    public boolean isEnableTraceUserViewInFragment() {
+        return enableTraceUserViewInFragment;
     }
 
     public boolean isEnableTraceUserResource() {
@@ -535,18 +577,4 @@ public class FTRUMConfig {
                 '}';
     }
 
-//    /**
-//     * 设置 BackendSample 后端采样，当为 true 时，rum sampleRate 设置不再起效
-//     *
-//     * @param backendSample
-//     * @return
-//     */
-//    public FTRUMConfig setBackendSample(boolean backendSample) {
-//        this.backendSample = backendSample;
-//        return this;
-//    }
-//
-//    public boolean isBackendSample() {
-//        return this.backendSample;
-//    }
 }

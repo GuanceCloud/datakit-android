@@ -20,7 +20,7 @@ import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.bean.DataType;
-import com.ft.sdk.garble.bean.SyncJsonData;
+import com.ft.sdk.garble.bean.SyncData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.test.utils.LineProtocolData;
 
@@ -81,9 +81,9 @@ public class RUMResourceTest extends BaseTest {
 
         Thread.sleep(2000);
 
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
+        List<SyncData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
 
-        for (SyncJsonData recordData : recordDataList) {
+        for (SyncData recordData : recordDataList) {
             LineProtocolData lineProtocolData = new LineProtocolData(recordData.getDataString());
             String measurement = lineProtocolData.getMeasurement();
             if ("action".equals(measurement)) {

@@ -99,6 +99,11 @@ public class Constants {
     public static final String FT_USER_USER_EXT = "ft.user.extdata";
 
     /**
+     * //todo
+     */
+    public static final String FT_RUM_ERROR_TIMELINE = "ft.error.timeline";
+
+    /**
      * 存储 {@link  android.content.SharedPreferences} 数据存储键值
      */
 
@@ -133,10 +138,10 @@ public class Constants {
      * Log，日志，datakit 请求地址
      **/
     public static final String URL_MODEL_LOG = "v1/write/logging";
-    /**
-     * Trace 链路 datakit 请求地址
-     */
-    public static final String URL_MODEL_TRACING = "v1/write/tracing";
+//    /**
+//     * Trace 链路 datakit 请求地址
+//     */
+//    public static final String URL_MODEL_TRACING = "v1/write/tracing";
 
     /**
      * 默认服务名，字段 service
@@ -565,6 +570,25 @@ public class Constants {
     public static final String KEY_RUM_SESSION_ID = "session_id";
 
     /**
+     * 由于错误采集到的数据
+     */
+
+    public static final String KEY_SAMPLED_FOR_ERROR_SESSION = "sampled_for_error_session";
+
+    /**
+     *
+     */
+    public static final String KEY_SESSION_ERROR_TIMESTAMP = "session_error_timestamp";
+    /**
+     * session rum 采样率
+     */
+    public static final String KEY_SESSION_SAMPLE_RATE = "session_sample_rate";
+    /**
+     *
+     */
+    public static final String KEY_SESSION_ON_ERROR_SAMPLE_RATE = "session_on_error_sample_rate";
+
+    /**
      * 会话类型
      */
     public static final String KEY_RUM_SESSION_TYPE = "session_type";
@@ -667,6 +691,12 @@ public class Constants {
      * 行协议数据 tags，临时存储动态 tags
      */
     public static final String KEY_RUM_TAGS = "tags";
+
+
+    /**
+     * 根据采样率被采集
+     */
+    public static final String KEY_COLLECT_TYPE = "collect_type";
 
     /**
      * 冷启动，action_type

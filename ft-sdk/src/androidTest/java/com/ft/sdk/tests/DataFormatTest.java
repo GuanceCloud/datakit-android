@@ -8,7 +8,7 @@ import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.bean.DataType;
-import com.ft.sdk.garble.bean.SyncJsonData;
+import com.ft.sdk.garble.bean.SyncData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.test.base.FTBaseTest;
 import com.ft.test.utils.LineProtocolData;
@@ -55,7 +55,7 @@ public class DataFormatTest extends FTBaseTest {
         invokeSyncData(DataType.LOG, "TestLog", null, fields);
         Thread.sleep(3000);
 
-        List<SyncJsonData> list = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.LOG);
+        List<SyncData> list = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.LOG);
         Assert.assertFalse(list.isEmpty());
         String content = list.get(0).getDataString();
         LineProtocolData data = new LineProtocolData(content);

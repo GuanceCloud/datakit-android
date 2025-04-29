@@ -54,6 +54,12 @@
 1. 支持开启 session replay 录制功能
 
 ---
+# agent 1.6.11-alpha01
+1. 优化高频日志写入性能
+2. 添加 `FTRUMConfig.setEnableTraceUserViewInFragment` 支持 fragment view 数据采集，默认为 false
+3. 添加 `FTSDKConfig.setLineDataModifier`、`FTSDKConfig.setDataModifier` 支持数据写入替换，可适用数据脱敏
+
+---
 # agent 1.6.10
 1. 支持 okhttp request 添加唯一 ResourceID，来解决相同请求高并发 trace_id ，span_id 错误错位的问题,
    ft-plugin 1.3.5 以上版本支持自动添加 ResourceID。

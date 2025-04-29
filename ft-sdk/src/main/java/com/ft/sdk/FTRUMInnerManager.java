@@ -13,6 +13,7 @@ import com.ft.sdk.garble.bean.ActionBean;
 import com.ft.sdk.garble.bean.ActiveActionBean;
 import com.ft.sdk.garble.bean.ActiveViewBean;
 import com.ft.sdk.garble.bean.AppState;
+import com.ft.sdk.garble.bean.CollectType;
 import com.ft.sdk.garble.bean.ErrorSource;
 import com.ft.sdk.garble.bean.ErrorType;
 import com.ft.sdk.garble.bean.NetStatusBean;
@@ -37,6 +38,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -90,7 +93,13 @@ public class FTRUMInnerManager {
     /**
      * 不收集
      */
-    private final ArrayList<String> notCollectArr = new ArrayList<>();
+    private final LinkedList<String> notCollectArr = new LinkedList<>();
+
+
+    /**
+     * 不收集 Error Session id
+     */
+    private final LinkedList<String> notSessionErrorCollectArr = new LinkedList<>();
 
     /**
      * 当前激活 View
@@ -125,6 +134,12 @@ public class FTRUMInnerManager {
      */
     private float sampleRate = 1f;
 
+
+    /**
+     * 错误 session 采样率
+     */
+    private float sessionErrorSampleError = 1f;
+
     String getSessionId() {
         return sessionId;
     }
@@ -142,7 +157,7 @@ public class FTRUMInnerManager {
             lastSessionTime = now;
             sessionId = Utils.randomUUID();
             LogUtils.d(TAG, "Session Track -> New SessionId:" + sessionId + ",longTimeSessionReset:" + longTimeSession);
-            checkSessionKeep(sessionId, sampleRate);
+            checkSessionKeep(sessionId, sampleRate, sessionErrorSampleError);
 
             if (checkRefreshView) {
                 if (activeView != null && !activeView.isClose()) {
@@ -158,6 +173,7 @@ public class FTRUMInnerManager {
                     if (property != null) {
                         activeView.getProperty().putAll(property);
                     }
+                    activeView.setCollectType(checkSessionWillCollect(sessionId));
                     FTMonitorManager.get().addMonitor(activeView.getId());
                     FTMonitorManager.get().attachMonitorData(activeView);
                     initView(activeView);
@@ -292,6 +308,7 @@ public class FTRUMInnerManager {
                 activeAction.getProperty().putAll(property);
             }
             activeAction.setTags(FTRUMConfigManager.get().getRUMPublicDynamicTags());
+            activeAction.setCollectType(checkSessionWillCollect(activeAction.getSessionId()));
             initAction(activeAction, false);
 //            this.lastUserActiveTime = activeAction.getStartTime();
 
@@ -451,6 +468,7 @@ public class FTRUMInnerManager {
             activeView.getProperty().putAll(property);
         }
         activeView.setTags(FTRUMConfigManager.get().getRUMPublicDynamicTags());
+        activeView.setCollectType(checkSessionWillCollect(activeView.getSessionId()));
         FTMonitorManager.get().addMonitor(activeView.getId());
         FTMonitorManager.get().attachMonitorData(activeView);
         initView(activeView);
@@ -649,7 +667,12 @@ public class FTRUMInnerManager {
 
         try {
             checkSessionRefresh(true);
+            CollectType collectType = checkSessionWillCollect(sessionId);
 
+            if (property == null || property.get(FTExceptionHandler.IS_PRE_CRASH) != (Boolean) true) {
+                //排除上报上一次 native crash 错误的这种场景
+                SyncTaskManager.get().setErrorTimeLine(dateline, activeView);
+            }
             final HashMap<String, Object> tags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
             attachRUMRelative(tags, true);
             final HashMap<String, Object> fields = new HashMap<>();
@@ -687,16 +710,17 @@ public class FTRUMInnerManager {
 
                         }
                         //<--------
-                        FTTrackInner.getInstance().rum(dateline, Constants.FT_MEASUREMENT_RUM_ERROR, tags, fields, new RunnerCompleteCallBack() {
-                            @Override
-                            public void onComplete() {
-                                increaseError(tags);
-                                if (callBack != null) {
-                                    // Java Crash，Native Crash 需要记录当下状态的崩溃
-                                    stopView(null, callBack);
-                                }
-                            }
-                        });
+                        FTTrackInner.getInstance().rum(dateline, Constants.FT_MEASUREMENT_RUM_ERROR, tags, fields,
+                                new RunnerCompleteCallBack() {
+                                    @Override
+                                    public void onComplete() {
+                                        increaseError(tags);
+                                        if (callBack != null) {
+                                            // Java Crash，Native Crash 需要记录当下状态的崩溃
+                                            stopView(null, callBack);
+                                        }
+                                    }
+                                }, collectType);
 
                     } catch (Exception e) {
                         LogUtils.e(TAG, LogUtils.getStackTraceString(e));
@@ -724,6 +748,7 @@ public class FTRUMInnerManager {
     void addLongTask(String log, long duration, HashMap<String, Object> property) {
         try {
             checkSessionRefresh(true);
+            CollectType type = checkSessionWillCollect(sessionId);
             HashMap<String, Object> tags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
             attachRUMRelative(tags, true);
             HashMap<String, Object> fields = new HashMap<>();
@@ -734,7 +759,8 @@ public class FTRUMInnerManager {
                 fields.putAll(property);
             }
 
-            FTTrackInner.getInstance().rum(Utils.getCurrentNanoTime() - duration, Constants.FT_MEASUREMENT_RUM_LONG_TASK, tags, fields, null);
+            FTTrackInner.getInstance().rum(Utils.getCurrentNanoTime() - duration,
+                    Constants.FT_MEASUREMENT_RUM_LONG_TASK, tags, fields, null, type);
             increaseLongTask(tags);
 
         } catch (Exception e) {
@@ -805,6 +831,9 @@ public class FTRUMInnerManager {
         String viewName = bean.viewName;
         String viewReferrer = bean.viewReferrer;
         String sessionId = bean.sessionId;
+
+        CollectType collectType = checkSessionWillCollect(bean.sessionId);
+
 
         try {
             HashMap<String, Object> tags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
@@ -909,12 +938,15 @@ public class FTRUMInnerManager {
             fields.put(Constants.KEY_RUM_REQUEST_HEADER, bean.requestHeader);
             fields.put(Constants.KEY_RUM_RESPONSE_HEADER, bean.responseHeader);
 
+
             FTTrackInner.getInstance().rum(time,
-                    Constants.FT_MEASUREMENT_RUM_RESOURCE, tags, fields, null);
+                    Constants.FT_MEASUREMENT_RUM_RESOURCE, tags, fields, null, collectType);
 
 
             if (bean.resourceStatus >= HttpsURLConnection.HTTP_BAD_REQUEST
                     || (bean.resourceStatus == 0 && !Utils.isNullOrEmpty(bean.errorStack))) {
+                SyncTaskManager.get().setErrorTimeLine(time, activeView);
+
                 HashMap<String, Object> errorTags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
                 HashMap<String, Object> errorField = new HashMap<>();
                 errorTags.put(Constants.KEY_RUM_ERROR_TYPE, ErrorType.NETWORK.toString());
@@ -950,7 +982,7 @@ public class FTRUMInnerManager {
                     public void onComplete() {
                         increaseError(tags);
                     }
-                });
+                }, collectType);
             }
         } catch (Exception e) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
@@ -1283,7 +1315,7 @@ public class FTRUMInnerManager {
         fields.put(Constants.KEY_RUM_ACTION_DURATION, bean.getDuration());
 
         FTTrackInner.getInstance().rum(bean.getStartTime(),
-                Constants.FT_MEASUREMENT_RUM_ACTION, tags, fields, null);
+                Constants.FT_MEASUREMENT_RUM_ACTION, tags, fields, null, bean.getCollectType());
     }
 
     private void generateViewSum() throws JSONException {
@@ -1337,15 +1369,16 @@ public class FTRUMInnerManager {
                     fields.put(Constants.KEY_FPS_AVG, bean.getFpsAvg());
                     fields.put(Constants.KEY_FPS_MINI, bean.getFpsMini());
                 }
-
-
+                if (bean.getLastErrorTime() > 0) {
+                    fields.put(Constants.KEY_SESSION_ERROR_TIMESTAMP, bean.getLastErrorTime());
+                }
                 FTTrackInner.getInstance().rum(bean.getStartTime(),
                         Constants.FT_MEASUREMENT_RUM_VIEW, tags, fields, new RunnerCompleteCallBack() {
                             @Override
                             public void onComplete() {
                                 FTDBManager.get().updateViewUploadTime(bean.getId(), System.currentTimeMillis());
                             }
-                        });
+                        }, bean.getCollectType());
             }
 
             FTDBManager.get().cleanCloseViewData();
@@ -1355,8 +1388,9 @@ public class FTRUMInnerManager {
     void initParams(FTRUMConfig config) {
         sampleRate = config.getSamplingRate();
         rumAppId = config.getRumAppId();
+        sessionErrorSampleError = config.getSessionErrorSampleRate();
         sessionId = Utils.randomUUID();
-        checkSessionKeep(sessionId, sampleRate);
+        checkSessionKeep(sessionId, sampleRate, sessionErrorSampleError);
         EventConsumerThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
@@ -1409,21 +1443,32 @@ public class FTRUMInnerManager {
      * @param sessionId
      * @param sampleRate
      */
-    private void checkSessionKeep(String sessionId, float sampleRate) {
-        boolean collect = Utils.enableTraceSamplingRate(sampleRate);
-        if (!collect) {
-            synchronized (notCollectArr) {
-                if (notCollectArr.size() + 1 > SESSION_FILTER_CAPACITY) {
-                    try {
-                        notCollectArr.remove(0);
-                    } catch (Exception e) {
-                        LogUtils.d(TAG, LogUtils.getStackTraceString(e));
-                    }
-                }
-                notCollectArr.add(sessionId);
+    private void checkSessionKeep(String sessionId, float sampleRate, float errorSampleRate) {
+        boolean sessionCollect = Utils.enableTraceSamplingRate(sampleRate);
+        if (!sessionCollect) {
+            addSessionToFilter(notCollectArr, sessionId, false);
+
+            boolean sessionErrorCollect = Utils.enableTraceSamplingRate(errorSampleRate);
+            if (!sessionErrorCollect) {
+                addSessionToFilter(notSessionErrorCollectArr, sessionId, true);
             }
-            LogUtils.w(TAG, "根据 FTRUMConfig SampleRate 采样率计算，当前 session 不被采集，Session Track-> session_id:" + sessionId);
         }
+
+    }
+
+    private void addSessionToFilter(List<String> sessionList, String sessionId, boolean isErrorSession) {
+        synchronized (isErrorSession ? notSessionErrorCollectArr : notCollectArr) {
+            if (sessionList.size() >= SESSION_FILTER_CAPACITY) {
+                try {
+                    sessionList.remove(0);
+                } catch (IndexOutOfBoundsException e) {
+                    LogUtils.d(TAG, "Session list remove error: " + LogUtils.getStackTraceString(e));
+                }
+            }
+            sessionList.add(sessionId);
+        }
+        LogUtils.w(TAG, String.format("根据 FTRUMConfig %s 采样率计算，当前 session 不被采集，Session Track-> session_id: %s",
+                isErrorSession ? "errorSampleRate" : "SampleRate", sessionId));
     }
 
     /**
@@ -1432,8 +1477,14 @@ public class FTRUMInnerManager {
      * @param sessionId
      * @return
      */
-    public boolean checkSessionWillCollect(String sessionId) {
-        return !notCollectArr.contains(sessionId);
+    public CollectType checkSessionWillCollect(String sessionId) {
+        if (!notCollectArr.contains(sessionId)) {
+            return CollectType.COLLECT_BY_SAMPLE;
+        } else if (!notSessionErrorCollectArr.contains(sessionId)) {
+            return CollectType.COLLECT_BY_ERROR_SAMPLE;
+        } else {
+            return CollectType.NOT_COLLECT;
+        }
     }
 
     public void release() {
@@ -1441,6 +1492,7 @@ public class FTRUMInnerManager {
         activeAction = null;
         activeView = null;
         notCollectArr.clear();
+        notSessionErrorCollectArr.clear();
         resourceBeanMap.clear();
         viewList.clear();
     }

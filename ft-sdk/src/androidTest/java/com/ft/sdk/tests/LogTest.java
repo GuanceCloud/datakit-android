@@ -11,11 +11,11 @@ import com.ft.sdk.FTRUMGlobalManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.LogCacheDiscard;
+import com.ft.sdk.garble.bean.SyncData;
 import com.ft.sdk.garble.db.FTDBCachePolicy;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.LogData;
 import com.ft.sdk.garble.bean.Status;
-import com.ft.sdk.garble.bean.SyncJsonData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.test.base.FTBaseTest;
@@ -52,7 +52,7 @@ public class LogTest extends FTBaseTest {
      */
     @Test
     public void withOutLogConfig() throws InterruptedException {
-        List<SyncJsonData> recordDataList = FTDBManager.get()
+        List<SyncData> recordDataList = FTDBManager.get()
                 .queryDataByDataByTypeLimitDesc(0, DataType.LOG);
 
         FTLogger.getInstance().logBackground("test", Status.CRITICAL);
@@ -75,7 +75,7 @@ public class LogTest extends FTBaseTest {
 
         Thread.sleep(2000);
 
-        List<SyncJsonData> recordDataList = FTDBManager.get()
+        List<SyncData> recordDataList = FTDBManager.get()
                 .queryDataByDataByTypeLimitDesc(0, DataType.LOG);
 
         Assert.assertEquals(0, recordDataList.size());
@@ -156,12 +156,12 @@ public class LogTest extends FTBaseTest {
 
         Thread.sleep(2000);
 
-        List<SyncJsonData> recordDataList = FTDBManager.get()
+        List<SyncData> recordDataList = FTDBManager.get()
                 .queryDataByDataByTypeLimitDesc(0, DataType.LOG);
 
         String viewId = "";
         String sessionId = "";
-        for (SyncJsonData recordData : recordDataList) {
+        for (SyncData recordData : recordDataList) {
             LineProtocolData lineProtocolData = new LineProtocolData(recordData.getDataString());
             String measurement = lineProtocolData.getMeasurement();
             if (Constants.FT_LOG_DEFAULT_MEASUREMENT.equals(measurement)) {

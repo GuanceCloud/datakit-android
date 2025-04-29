@@ -1,9 +1,5 @@
 package com.ft.sdk.garble.bean;
 
-import com.ft.sdk.garble.utils.Utils;
-
-import org.json.JSONObject;
-
 import java.util.HashMap;
 
 /**
@@ -18,17 +14,17 @@ public class LineProtocolBean {
     /**
      * 标签数据
      */
-    private final HashMap<String,Object> tags;
+    final HashMap<String, Object> tags;
     /**
      * 指标数据
      */
-    private final HashMap<String,Object> fields;
+    final HashMap<String, Object> fields;
     /**
-     *  产生时间，单位纳秒
+     * 产生时间，单位纳秒
      */
-    private final long timeNano;
+    final long timeNano;
 
-    public LineProtocolBean(String measurement, HashMap<String,Object> tags, HashMap<String,Object> fields, long timeNano) {
+    public LineProtocolBean(String measurement, HashMap<String, Object> tags, HashMap<String, Object> fields, long timeNano) {
         this.measurement = measurement;
         this.tags = tags;
         this.fields = fields;
@@ -39,11 +35,11 @@ public class LineProtocolBean {
         return measurement;
     }
 
-    public HashMap<String,Object> getTags() {
+    public HashMap<String, Object> getTags() {
         return tags;
     }
 
-    public HashMap<String,Object> getFields() {
+    public HashMap<String, Object> getFields() {
         return fields;
     }
 

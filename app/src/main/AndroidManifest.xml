@@ -39,6 +39,7 @@
         <activity android:name=".HighLoadActivity" />
         <activity android:name=".IgnoreClassActivity" />
         <activity android:name=".SRPrivacyOverrideActivity" />
+        <activity android:name=".FragmentActivity" />
 
         <service
             android:name=".service.TestService"

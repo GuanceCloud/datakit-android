@@ -75,6 +75,9 @@ public class FTSDKConfig {
     private int pageSize = SyncPageSize.MEDIUM.getValue();
 
     private int syncSleepTime = 0;
+    /**
+     * 对同步数据进行 deflate 压缩 ，默认关闭
+     */
     private boolean compressIntakeRequests = false;
 
     /**
@@ -460,6 +463,11 @@ public class FTSDKConfig {
     private boolean enableOkhttpRequestTag;
 
 
+    private DataModifier dataModifier;
+
+    private LineDataModifier lineDataModifier;
+
+
     /**
      * 设置是否迁移
      *
@@ -495,6 +503,11 @@ public class FTSDKConfig {
         return enableDataIntegerCompatible;
     }
 
+    /**
+     * 对上传同步数据进行 deflate 压缩，默认关闭
+     * @param compressIntakeRequests
+     * @return
+     */
     public FTSDKConfig setCompressIntakeRequests(boolean compressIntakeRequests) {
         this.compressIntakeRequests = compressIntakeRequests;
         return this;
@@ -555,6 +568,7 @@ public class FTSDKConfig {
 
     /**
      * 全局 Okhttp Request 自动添加，需要 ft-plugin 1.3.5 的支持
+     *
      * @param enableOkhttpRequestTag
      * @return
      */
@@ -569,6 +583,36 @@ public class FTSDKConfig {
 
     public boolean isCompressIntakeRequests() {
         return compressIntakeRequests;
+    }
+
+    /**
+     * 设置数据更改器
+     *
+     * @param dataModifier
+     * @return
+     */
+    public FTSDKConfig setDataModifier(DataModifier dataModifier) {
+        this.dataModifier = dataModifier;
+        return this;
+    }
+
+    /**
+     * 设置数据更改器
+     *
+     * @param dataModifier
+     * @return
+     */
+    public FTSDKConfig setLineDataModifier(LineDataModifier dataModifier) {
+        this.lineDataModifier = dataModifier;
+        return this;
+    }
+
+    public LineDataModifier getLineDataModifier() {
+        return lineDataModifier;
+    }
+
+    public DataModifier getDataModifier() {
+        return dataModifier;
     }
 
     @Override
