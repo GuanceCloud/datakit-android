@@ -75,6 +75,9 @@ public class FTSDKConfig {
     private int pageSize = SyncPageSize.MEDIUM.getValue();
 
     private int syncSleepTime = 0;
+    /**
+     * 对同步数据进行 deflate 压缩 ，默认关闭
+     */
     private boolean compressIntakeRequests = false;
 
     /**
@@ -500,6 +503,11 @@ public class FTSDKConfig {
         return enableDataIntegerCompatible;
     }
 
+    /**
+     * 对上传同步数据进行 deflate 压缩，默认关闭
+     * @param compressIntakeRequests
+     * @return
+     */
     public FTSDKConfig setCompressIntakeRequests(boolean compressIntakeRequests) {
         this.compressIntakeRequests = compressIntakeRequests;
         return this;
@@ -578,7 +586,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 设置数据更改器,
+     * 设置数据更改器
      *
      * @param dataModifier
      * @return
