@@ -195,10 +195,10 @@ public class FTRUMInnerManager {
      */
     private void updateSessionReplay(String sessionId) {
         if (FTSdk.isSessionReplaySupport()) return;
-        boolean keepSession = checkSessionWillCollect(sessionId);
+        CollectType collectType = checkSessionWillCollect(sessionId);
         HashMap<String, Object> map = new HashMap<>();
         map.put(SessionReplayConstants.SESSION_REPLAY_BUS_MESSAGE_TYPE_KEY, SessionReplayConstants.RUM_SESSION_RENEWED_BUS_MESSAGE);
-        map.put(SessionReplayConstants.RUM_KEEP_SESSION_BUS_MESSAGE_KEY, keepSession);
+        map.put(SessionReplayConstants.RUM_KEEP_SESSION_BUS_MESSAGE_KEY, collectType == CollectType.COLLECT_BY_SAMPLE);
         map.put(SessionReplayConstants.RUM_SESSION_ID_BUS_MESSAGE_KEY, sessionId);
         FeatureScope scope = SessionReplayManager.get().getFeature(Feature.SESSION_REPLAY_FEATURE_NAME);
         if (scope != null) {
@@ -1424,7 +1424,7 @@ public class FTRUMInnerManager {
                                         @Override
                                         public void run() {
                                             FTDBManager.get().updateViewExtraAttr(updateViewId, attr);
-                                            LogUtils.d(TAG, "updateSessionViewMap,view_id:" + viewId+" has_replay");
+                                            LogUtils.d(TAG, "updateSessionViewMap,view_id:" + viewId + " has_replay");
                                         }
                                     });
 
