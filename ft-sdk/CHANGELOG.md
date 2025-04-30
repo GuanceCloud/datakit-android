@@ -1,3 +1,7 @@
+# agent 1.6.11-alpha02
+1. 添加 `FTRUMConfig.setSessionErrorSampleRate` 支持错误采样，在发生错误时可以对 1 分钟前的 rum 的数据进行取样采集
+
+---
 # agent 1.6.11-alpha01
 1. 优化高频日志写入性能
 2. 添加 `FTRUMConfig.setEnableTraceUserViewInFragment` 支持 fragment view 数据采集，默认为 false
