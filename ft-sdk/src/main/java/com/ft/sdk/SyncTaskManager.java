@@ -155,6 +155,8 @@ public class SyncTaskManager {
     private long appStartTime = -1;
 
     /**
+     * 设置错误发生时间
+     *
      * @param errorTimeLine
      */
     void setErrorTimeLine(long errorTimeLine, ViewBean activeView) {
@@ -168,6 +170,8 @@ public class SyncTaskManager {
     }
 
     /**
+     * 缓存错误发生时间
+     *
      * @param errorTimeLine
      */
     void saveErrorWithFileCache(long errorTimeLine) {
@@ -176,6 +180,8 @@ public class SyncTaskManager {
     }
 
     /**
+     * 从缓存中获取错误发生时间
+     *
      * @return
      */
     long getErrorTimeLineFromFileCache() {
@@ -211,10 +217,10 @@ public class SyncTaskManager {
     /**
      *
      */
-    private final static DataType[] NOT_SAMPLE_SYNC_MAP = new DataType[]
+    private final static DataType[] ERROR_SAMPLED_SYNC_MAP = new DataType[]
             {
-                    DataType.RUM_APP_NOT_SAMPLE,
-                    DataType.RUM_WEBVIEW_NOT_SAMPLE
+                    DataType.RUM_APP_ERROR_SAMPLED,
+                    DataType.RUM_WEBVIEW_ERROR_SAMPLED
             };
 
     /**
@@ -279,8 +285,8 @@ public class SyncTaskManager {
                             Thread.sleep(SLEEP_TIME);
                         }
                         LogUtils.d(TAG, "******************* Sync Poll Running *******************>>>\n");
-                        for (DataType dataType : NOT_SAMPLE_SYNC_MAP) {
-                            SyncTaskManager.this.notSampleConsume(dataType);
+                        for (DataType dataType : ERROR_SAMPLED_SYNC_MAP) {
+                            SyncTaskManager.this.errorSampledConsume(dataType);
                         }
 
                         for (DataType dataType : SYNC_MAP) {
@@ -344,17 +350,23 @@ public class SyncTaskManager {
 
 
     /**
+     * 消费
+     *
      * @param dataType
      */
-    private synchronized void notSampleConsume(DataType dataType) {
+    private synchronized void errorSampledConsume(DataType dataType) {
         if (errorTimeLine > 0) {
-            LogUtils.d(TAG, "notSampleConsume:" + dataType + ", before ns:" + errorTimeLine);
+            LogUtils.d(TAG, "errorSampledConsume:" + dataType + ", before ns:" + errorTimeLine);
 
             int updateCount = FTDBManager.get().updateDataType(dataType, appStartTime, errorTimeLine);
-            LogUtils.d(TAG, "updateDataType:" + dataType + "," + updateCount);
+            if (updateCount > 0) {
+                LogUtils.d(TAG, "updateDataType:" + dataType + "," + updateCount);
+            }
         }
         int deleteCount = FTDBManager.get().deleteExpireCache(dataType, Utils.getCurrentNanoTime(), ONE_MINUTE_DURATION_NS);
-        LogUtils.d(TAG, "deleteExpired:" + dataType + "," + deleteCount);
+        if (deleteCount > 0) {
+            LogUtils.d(TAG, "deleteExpired:" + dataType + "," + deleteCount);
+        }
     }
 
     /**

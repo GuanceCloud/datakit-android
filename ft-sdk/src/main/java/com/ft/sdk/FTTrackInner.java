@@ -159,7 +159,7 @@ public class FTTrackInner {
             case COLLECT_BY_ERROR_SAMPLE:
             case COLLECT_BY_SAMPLE:
                 syncRUMDataBackground(collectType == CollectType.COLLECT_BY_ERROR_SAMPLE ?
-                                DataType.RUM_APP_NOT_SAMPLE : DataType.RUM_APP,
+                                DataType.RUM_APP_ERROR_SAMPLED : DataType.RUM_APP,
                         Utils.getCurrentNanoTime(), time, measurement,
                         tags, fields, callBack);
                 break;
@@ -182,7 +182,7 @@ public class FTTrackInner {
             case COLLECT_BY_ERROR_SAMPLE:
             case COLLECT_BY_SAMPLE:
                 syncRUMDataBackground(collectType == CollectType.COLLECT_BY_ERROR_SAMPLE ?
-                        DataType.RUM_WEBVIEW_NOT_SAMPLE : DataType.RUM_WEBVIEW, time, measurement, tags, fields);
+                        DataType.RUM_WEBVIEW_ERROR_SAMPLED : DataType.RUM_WEBVIEW, time, measurement, tags, fields);
 
         }
     }

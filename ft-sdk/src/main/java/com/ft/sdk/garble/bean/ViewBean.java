@@ -123,6 +123,9 @@ public class ViewBean {
      */
     long viewUpdateTime = 0;
 
+    /**
+     * 页面的错误时间
+     */
     long lastErrorTime = 0;
 
     public void setLastErrorTime(long lastErrorTime) {

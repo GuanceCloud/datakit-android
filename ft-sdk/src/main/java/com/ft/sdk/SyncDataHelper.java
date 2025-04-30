@@ -255,12 +255,12 @@ public class SyncDataHelper {
 
             bodyContent = convertToLineProtocolLine(measurement, mergeTags, fields,
                     timeStamp, config);
-        } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_APP_NOT_SAMPLE
-                || dataType == DataType.RUM_WEBVIEW || dataType == DataType.RUM_WEBVIEW_NOT_SAMPLE) {
+        } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_APP_ERROR_SAMPLED
+                || dataType == DataType.RUM_WEBVIEW || dataType == DataType.RUM_WEBVIEW_ERROR_SAMPLED) {
             //rum 数据
             mergeTags.putAll(dynamicBaseTags);
             mergeTags.putAll(dynamicLRumTags);
-            if (dataType == DataType.RUM_APP || dataType == DataType.RUM_APP_NOT_SAMPLE) {
+            if (dataType == DataType.RUM_APP || dataType == DataType.RUM_APP_ERROR_SAMPLED) {
                 mergeTags.putAll(rumTags);
                 fields.putAll(rumStaticFields);
             } else {

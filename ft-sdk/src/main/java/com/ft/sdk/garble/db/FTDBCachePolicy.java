@@ -29,6 +29,9 @@ public class FTDBCachePolicy {
      */
     private final AtomicInteger rumCount = new AtomicInteger(0);
 
+    /**
+     * 获取当前 db 缓存大小
+     */
     private final AtomicLong currentDbSize = new AtomicLong();
 
     private final Object rumLock = new Object();
@@ -76,8 +79,8 @@ public class FTDBCachePolicy {
         rumCount.set(FTDBManager.get().queryTotalCount(new DataType[]{
                 DataType.RUM_APP,
                 DataType.RUM_WEBVIEW,
-                DataType.RUM_APP_NOT_SAMPLE,
-                DataType.RUM_WEBVIEW_NOT_SAMPLE,
+                DataType.RUM_APP_ERROR_SAMPLED,
+                DataType.RUM_WEBVIEW_ERROR_SAMPLED,
         }));//初始化时从数据库中获取日志数据
     }
 
@@ -277,14 +280,14 @@ public class FTDBCachePolicy {
                 FTDBManager.get().deleteOldestData(new DataType[]{
                         DataType.RUM_APP,
                         DataType.RUM_WEBVIEW,
-                        DataType.RUM_APP_NOT_SAMPLE,
-                        DataType.RUM_WEBVIEW_NOT_SAMPLE
+                        DataType.RUM_APP_ERROR_SAMPLED,
+                        DataType.RUM_WEBVIEW_ERROR_SAMPLED
                 }, limit);
                 rumCount.set(FTDBManager.get().queryTotalCount(new DataType[]{
                         DataType.RUM_APP,
                         DataType.RUM_WEBVIEW,
-                        DataType.RUM_APP_NOT_SAMPLE,
-                        DataType.RUM_WEBVIEW_NOT_SAMPLE
+                        DataType.RUM_APP_ERROR_SAMPLED,
+                        DataType.RUM_WEBVIEW_ERROR_SAMPLED
                 }));
                 status = 1;
             }

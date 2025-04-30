@@ -15,7 +15,7 @@ public enum DataType {
     /**
      * 未被采样的数据缓存
      */
-    RUM_APP_NOT_SAMPLE,
+    RUM_APP_ERROR_SAMPLED,
     /**
      * WebView 中 JS 产生的 RUM 数据需要配置，需要配置 <a href="https://github.com/GuanceCloud/datakit-js"> JS SDK</a>
      */
@@ -24,7 +24,7 @@ public enum DataType {
     /**
      * 未被采样的数据缓存
      */
-    RUM_WEBVIEW_NOT_SAMPLE,
+    RUM_WEBVIEW_ERROR_SAMPLED,
 
     /**
      * SDK Log 数据
