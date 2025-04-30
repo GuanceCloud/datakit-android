@@ -123,11 +123,14 @@ public class ViewBean {
      */
     long viewUpdateTime = 0;
 
+    /**
+     * 页面的错误时间
+     */
+    long lastErrorTime = 0;
+
     long recordsCount = 0;
 
     boolean hasReplay = false;
-
-    long lastErrorTime = 0;
 
     public void setLastErrorTime(long lastErrorTime) {
         this.lastErrorTime = lastErrorTime;

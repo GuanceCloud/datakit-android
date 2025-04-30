@@ -1467,7 +1467,7 @@ public class FTRUMInnerManager {
             }
             sessionList.add(sessionId);
         }
-        LogUtils.w(TAG, String.format("根据 FTRUMConfig %s 采样率计算，当前 session 不被采集，Session Track-> session_id: %s",
+        LogUtils.w(TAG, String.format("根据 FTRUMConfig %s 采样率, 未命中 ，Session Track-> session_id: %s",
                 isErrorSession ? "errorSampleRate" : "SampleRate", sessionId));
     }
 

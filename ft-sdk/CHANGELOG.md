@@ -1,3 +1,7 @@
+# agent 1.7.0-alpha17
+1. 合并 ft-sdk 1.6.11-alpha02
+
+---
 # agent 1.7.0-alpha16
 1. 合并 ft-sdk 1.6.10 版本
 
@@ -52,6 +56,10 @@
 ---
 # agent 1.7.0-alpha02
 1. 支持开启 session replay 录制功能
+
+---
+# agent 1.6.11-alpha02
+1. 添加 `FTRUMConfig.setSessionErrorSampleRate` 支持错误采样，在发生错误时可以对 1 分钟前的 rum 的数据进行取样采集
 
 ---
 # agent 1.6.11-alpha01
