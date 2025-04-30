@@ -157,6 +157,9 @@ public class FTTrackInner {
             case NOT_COLLECT:
                 break;
             case COLLECT_BY_ERROR_SAMPLE:
+                if (measurement.equals(Constants.FT_MEASUREMENT_RUM_VIEW)) {
+                    fields.put(Constants.KEY_SAMPLED_FOR_ERROR_SESSION, true);
+                }
             case COLLECT_BY_SAMPLE:
                 syncRUMDataBackground(collectType == CollectType.COLLECT_BY_ERROR_SAMPLE ?
                                 DataType.RUM_APP_ERROR_SAMPLED : DataType.RUM_APP,
