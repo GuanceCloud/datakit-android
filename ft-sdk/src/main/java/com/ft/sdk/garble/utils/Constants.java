@@ -576,7 +576,7 @@ public class Constants {
     public static final String KEY_SAMPLED_FOR_ERROR_SESSION = "sampled_for_error_session";
 
     /**
-     *
+     * session 发生错误的时间
      */
     public static final String KEY_SESSION_ERROR_TIMESTAMP = "session_error_timestamp";
     /**
@@ -584,7 +584,7 @@ public class Constants {
      */
     public static final String KEY_SESSION_SAMPLE_RATE = "session_sample_rate";
     /**
-     *
+     * session 错误采样率
      */
     public static final String KEY_SESSION_ON_ERROR_SAMPLE_RATE = "session_on_error_sample_rate";
 
