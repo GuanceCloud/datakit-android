@@ -121,7 +121,7 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
                 internalLogger
         );
 
-        RecordedDataProcessor processor = new RecordedDataProcessor(
+        RecordedDataProcessor processor = new RecordedDataProcessor(sdkCore,
                 resourceDataStoreManager,
                 resourcesWriter,
                 recordWriter,

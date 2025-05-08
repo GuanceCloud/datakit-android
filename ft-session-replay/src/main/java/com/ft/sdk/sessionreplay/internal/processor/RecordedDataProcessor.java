@@ -4,10 +4,13 @@ import android.content.res.Configuration;
 
 import androidx.annotation.WorkerThread;
 
+import com.ft.sdk.feature.FeatureSdkCore;
 import com.ft.sdk.sessionreplay.internal.async.ResourceRecordedDataQueueItem;
 import com.ft.sdk.sessionreplay.internal.async.SnapshotRecordedDataQueueItem;
 import com.ft.sdk.sessionreplay.internal.async.TouchEventRecordedDataQueueItem;
+import com.ft.sdk.sessionreplay.internal.persistence.TrackingConsent;
 import com.ft.sdk.sessionreplay.internal.recorder.Node;
+import com.ft.sdk.sessionreplay.internal.resources.ResourceDataStoreManager;
 import com.ft.sdk.sessionreplay.internal.storage.RecordWriter;
 import com.ft.sdk.sessionreplay.internal.storage.ResourcesWriter;
 import com.ft.sdk.sessionreplay.model.Data;
@@ -21,7 +24,6 @@ import com.ft.sdk.sessionreplay.model.ViewEndRecord;
 import com.ft.sdk.sessionreplay.model.ViewportResizeData;
 import com.ft.sdk.sessionreplay.model.Wireframe;
 import com.ft.sdk.sessionreplay.recorder.SystemInformation;
-import com.ft.sdk.sessionreplay.internal.resources.ResourceDataStoreManager;
 import com.ft.sdk.sessionreplay.utils.SessionReplayRumContext;
 
 import java.util.LinkedList;
@@ -40,19 +42,21 @@ public class RecordedDataProcessor implements Processor {
     private long lastSnapshotTimestamp = 0L;
     private int previousOrientation = Configuration.ORIENTATION_UNDEFINED;
     private SessionReplayRumContext prevRumContext = new SessionReplayRumContext();
+    private final FeatureSdkCore sdkCore;
 
-    public RecordedDataProcessor(ResourceDataStoreManager resourceDataStoreManager, ResourcesWriter resourcesWriter, RecordWriter writer,
+    public RecordedDataProcessor(FeatureSdkCore sdkCore, ResourceDataStoreManager resourceDataStoreManager, ResourcesWriter resourcesWriter, RecordWriter writer,
                                  MutationResolver mutationResolver) {
-        this(resourceDataStoreManager, resourcesWriter, writer, mutationResolver, new NodeFlattener());
+        this(sdkCore, resourceDataStoreManager, resourcesWriter, writer, mutationResolver, new NodeFlattener());
     }
 
-    public RecordedDataProcessor(ResourceDataStoreManager resourceDataStoreManager, ResourcesWriter resourcesWriter, RecordWriter writer,
+    public RecordedDataProcessor(FeatureSdkCore sdkCore, ResourceDataStoreManager resourceDataStoreManager, ResourcesWriter resourcesWriter, RecordWriter writer,
                                  MutationResolver mutationResolver, NodeFlattener nodeFlattener) {
         this.resourceDataStoreManager = resourceDataStoreManager;
         this.resourcesWriter = resourcesWriter;
         this.writer = writer;
         this.mutationResolver = mutationResolver;
         this.nodeFlattener = nodeFlattener;
+        this.sdkCore = sdkCore;
     }
 
     @Override
@@ -116,7 +120,9 @@ public class RecordedDataProcessor implements Processor {
         boolean isNewView = isNewView(newRumContext);
         boolean isTimeForFullSnapshot = isTimeForFullSnapshot();
         boolean screenOrientationChanged = systemInformation.getScreenOrientation() != previousOrientation;
+        boolean isSessionReplayErrorSampled = sdkCore.getConsentProvider() == TrackingConsent.SAMPLED_ON_ERROR_SESSION;
         boolean fullSnapshotRequired = isNewView || isTimeForFullSnapshot || screenOrientationChanged;
+
 
         if (isNewView) {
             handleViewEndRecord(timestamp);
@@ -150,6 +156,15 @@ public class RecordedDataProcessor implements Processor {
         }
 
         if (fullSnapshotRequired) {
+            if (isSessionReplayErrorSampled) {
+                MetaRecord metaRecord = new MetaRecord(
+                        timestamp,
+                        null,
+                        new Data1(systemInformation.getScreenBounds().getWidth(),
+                                systemInformation.getScreenBounds().getHeight(), null)
+                );
+                records.add(metaRecord);
+            }
             records.add(
                     new MobileRecord.MobileFullSnapshotRecord(
                             timestamp,

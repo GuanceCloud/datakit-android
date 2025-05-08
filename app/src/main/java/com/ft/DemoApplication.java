@@ -137,7 +137,7 @@ public class DemoApplication extends BaseApplication {
                 .setTraceType(TraceType.DDTRACE));
 
         FTSdk.initSessionReplayConfig(new FTSessionReplayConfig()
-                .setSampleRate(1f)
+                .setSampleRate(0f)
                 .setSessionReplayOnErrorSampleRate(1f)
                 .setPrivacy(SessionReplayPrivacy.ALLOW)
 //                .setTouchPrivacy(TouchPrivacy.SHOW)
