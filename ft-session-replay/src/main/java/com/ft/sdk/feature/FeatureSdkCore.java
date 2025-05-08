@@ -4,6 +4,7 @@ import android.app.Activity;
 
 import com.ft.sdk.api.SdkCore;
 import com.ft.sdk.sessionreplay.internal.SessionReplayRecordCallback;
+import com.ft.sdk.sessionreplay.internal.persistence.TrackingConsent;
 import com.ft.sdk.sessionreplay.utils.InternalLogger;
 
 import java.util.Map;
@@ -97,5 +98,11 @@ public interface FeatureSdkCore extends SdkCore {
     ScheduledExecutorService createScheduledExecutorService(String executorContext);
 
     Activity curentActivity();
+
+    void setConsentProvider(TrackingConsent consentProvider);
+
+    TrackingConsent getConsentProvider();
+
+    long getErrorTimeLine();
 }
 

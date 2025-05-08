@@ -369,6 +369,10 @@ public class SyncTaskManager {
         }
     }
 
+    long getErrorTimeLine() {
+        return errorTimeLine;
+    }
+
     /**
      * 执行存储数据同步操作
      */

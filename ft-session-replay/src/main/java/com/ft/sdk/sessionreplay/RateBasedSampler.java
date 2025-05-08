@@ -16,10 +16,6 @@ public class RateBasedSampler implements Sampler {
         };
     }
 
-    public RateBasedSampler(double sampleRate) {
-        this((float) sampleRate);
-    }
-
     private final Random random = new SecureRandom();
 
     @Override

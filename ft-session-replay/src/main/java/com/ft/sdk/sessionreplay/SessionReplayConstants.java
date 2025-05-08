@@ -10,6 +10,7 @@ public class SessionReplayConstants {
      * Session Replay 缓存地址
      */
     public static final String PATH_SESSION_REPLAY = "sessionReplayTmp";
+    public static final String PATH_SESSION_REPLAY_ERROR_SAMPLED = "sessionReplayErrorSampledTmp";
 
     public static final String SESSION_REPLAY_BUS_MESSAGE_TYPE_KEY = "type";
     public static final String RUM_SESSION_RENEWED_BUS_MESSAGE = "rum_session_renewed";

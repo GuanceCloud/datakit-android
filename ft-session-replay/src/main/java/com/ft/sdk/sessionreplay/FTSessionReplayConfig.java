@@ -23,6 +23,7 @@ public class FTSessionReplayConfig {
     private List<DrawableToColorMapper> customDrawableMapper = DEFAULT_EXTENSIONSUPPORT.getCustomDrawableMapper();
     @FloatRange(from = 0.0, to = 1.0)
     private float sampleRate = 1f;
+    private float sessionReplayOnErrorSampleRate = 1f;
     private boolean delayInit;
     private boolean fineGrainedMaskingSet = false;
     private boolean dynamicOptimizationEnabled = true;
@@ -33,6 +34,11 @@ public class FTSessionReplayConfig {
 
     public FTSessionReplayConfig setSampleRate(@FloatRange(from = 0.0, to = 1.0) float sampleRate) {
         this.sampleRate = sampleRate;
+        return this;
+    }
+
+    public FTSessionReplayConfig setSessionReplayOnErrorSampleRate(@FloatRange(from = 0.0, to = 1.0) float sessionReplayOnErrorSampleRate) {
+        this.sessionReplayOnErrorSampleRate = sessionReplayOnErrorSampleRate;
         return this;
     }
 
@@ -148,6 +154,10 @@ public class FTSessionReplayConfig {
 
     public float getSampleRate() {
         return sampleRate;
+    }
+
+    public float getSessionReplayOnErrorSampleRate() {
+        return sessionReplayOnErrorSampleRate;
     }
 
     public boolean isDynamicOptimizationEnabled() {

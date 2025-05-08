@@ -91,6 +91,10 @@ public class BaseContentBean extends LineProtocolBean {
         this.tags.putAll(tags);
     }
 
+    public void appendFields(HashMap<String, Object> fields) {
+        this.fields.putAll(fields);
+    }
+
     public void setServiceName(String serviceName) {
         this.serviceName = serviceName;
     }

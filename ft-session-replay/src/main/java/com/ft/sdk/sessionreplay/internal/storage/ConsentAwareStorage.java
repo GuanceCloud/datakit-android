@@ -2,6 +2,7 @@ package com.ft.sdk.sessionreplay.internal.storage;
 
 import static com.ft.sdk.sessionreplay.internal.storage.FileMover.existsSafe;
 
+import com.ft.sdk.api.ConsentProvider;
 import com.ft.sdk.api.context.SessionReplayContext;
 import com.ft.sdk.sessionreplay.internal.persistence.BatchData;
 import com.ft.sdk.sessionreplay.internal.persistence.BatchFileReaderWriter;
@@ -12,6 +13,7 @@ import com.ft.sdk.sessionreplay.internal.persistence.FileOrchestrator;
 import com.ft.sdk.sessionreplay.internal.persistence.FileReaderWriter;
 import com.ft.sdk.sessionreplay.internal.persistence.NoOpEventBatchWriter;
 import com.ft.sdk.sessionreplay.internal.persistence.Storage;
+import com.ft.sdk.sessionreplay.internal.persistence.TrackingConsent;
 import com.ft.sdk.sessionreplay.internal.utils.ExecutorUtils;
 import com.ft.sdk.sessionreplay.utils.InternalLogger;
 import com.ft.sdk.storage.EventBatchWriter;
@@ -28,6 +30,7 @@ public class ConsentAwareStorage implements Storage {
     private static final String TAG = "ConsentAwareStorage";
     private final ExecutorService executorService;
     final FileOrchestrator grantedOrchestrator;
+    final FileOrchestrator errorSessionOrchestrator;
     final FileOrchestrator pendingOrchestrator;
     private final BatchFileReaderWriter batchEventsReaderWriter;
     private final FileReaderWriter batchMetadataReaderWriter;
@@ -35,21 +38,25 @@ public class ConsentAwareStorage implements Storage {
     private final InternalLogger internalLogger;
     final FilePersistenceConfig filePersistenceConfig;
     private final MetricsDispatcher metricsDispatcher;
+    private final ConsentProvider consentProvider;
     private final Set<Batch> lockedBatches = new HashSet<>();
     private final Object writeLock = new Object();
 
     public ConsentAwareStorage(
             ExecutorService executorService,
             FileOrchestrator grantedOrchestrator,
+            FileOrchestrator errorSessionOrchestrator,
             FileOrchestrator pendingOrchestrator,
             BatchFileReaderWriter batchEventsReaderWriter,
             FileReaderWriter batchMetadataReaderWriter,
             FileMover fileMover,
             InternalLogger internalLogger,
             FilePersistenceConfig filePersistenceConfig,
-            MetricsDispatcher metricsDispatcher) {
+            MetricsDispatcher metricsDispatcher,
+            ConsentProvider contentProvider) {
         this.executorService = executorService;
         this.grantedOrchestrator = grantedOrchestrator;
+        this.errorSessionOrchestrator = errorSessionOrchestrator;
         this.pendingOrchestrator = pendingOrchestrator;
         this.batchEventsReaderWriter = batchEventsReaderWriter;
         this.batchMetadataReaderWriter = batchMetadataReaderWriter;
@@ -57,6 +64,7 @@ public class ConsentAwareStorage implements Storage {
         this.internalLogger = internalLogger;
         this.filePersistenceConfig = filePersistenceConfig;
         this.metricsDispatcher = metricsDispatcher;
+        this.consentProvider = contentProvider;
     }
 
     @Override
@@ -65,9 +73,14 @@ public class ConsentAwareStorage implements Storage {
             boolean forceNewBatch,
             EventBatchWriterCallback callback) {
         FileOrchestrator orchestrator;
-        switch (sdkContext.getTrackingConsent()) {
+        TrackingConsent provider = consentProvider.getConsent();
+        switch (provider) {
             case GRANTED:
                 orchestrator = grantedOrchestrator;
+                break;
+            case SAMPLED_ON_ERROR_SESSION:
+                //todo 当前命中错采样时，写到另一个缓存文件
+                orchestrator = errorSessionOrchestrator;
                 break;
             case PENDING:
                 orchestrator = pendingOrchestrator;

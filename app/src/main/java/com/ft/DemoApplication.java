@@ -10,7 +10,6 @@ import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
-import com.ft.sdk.LineDataModifier;
 import com.ft.sdk.LogCacheDiscard;
 import com.ft.sdk.RUMCacheDiscard;
 import com.ft.sdk.TraceType;
@@ -23,8 +22,6 @@ import com.ft.sdk.sessionreplay.material.MaterialExtensionSupport;
 import com.ft.utils.CrossProcessSetting;
 
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * BY huangDianHua
@@ -105,7 +102,7 @@ public class DemoApplication extends BaseApplication {
 
 
         FTSdk.initRUMWithConfig(new FTRUMConfig()
-                        .setSamplingRate(0f)
+                        .setSamplingRate(1f)
                         .setSessionErrorSampleRate(1f)
                         .setRumAppId(BuildConfig.RUM_APP_ID)
                         .setEnableTraceUserAction(true)
@@ -139,7 +136,9 @@ public class DemoApplication extends BaseApplication {
                 .setEnableLinkRUMData(true)
                 .setTraceType(TraceType.DDTRACE));
 
-        FTSdk.initSessionReplayConfig(new FTSessionReplayConfig().setSampleRate(1f)
+        FTSdk.initSessionReplayConfig(new FTSessionReplayConfig()
+                .setSampleRate(1f)
+                .setSessionReplayOnErrorSampleRate(1f)
                 .setPrivacy(SessionReplayPrivacy.ALLOW)
 //                .setTouchPrivacy(TouchPrivacy.SHOW)
                 .addExtensionSupport(new MaterialExtensionSupport()));

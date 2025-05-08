@@ -9,6 +9,7 @@ import com.ft.sdk.sessionreplay.internal.persistence.Storage;
 import com.ft.sdk.sessionreplay.internal.utils.ExecutorUtils;
 import com.ft.sdk.sessionreplay.utils.InternalLogger;
 
+import java.io.File;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 public class DataUploadScheduler implements UploadScheduler {
@@ -23,12 +24,12 @@ public class DataUploadScheduler implements UploadScheduler {
                                DataUploadConfiguration dataUploadConfiguration,
                                Storage storage,
                                SessionReplayUploader uploader, SessionReplayContext context,
-                               SystemInfoProxy systemInfoProxy) {
+                               SystemInfoProxy systemInfoProxy, File errorSampledPath) {
         this.internalLogger = internalLogger;
         this.scheduledThreadPoolExecutor = (ScheduledThreadPoolExecutor) sdkCore.createScheduledExecutorService(feature);
 
-        this.runnable = new SessionReplayDataUploadRunnable(feature, scheduledThreadPoolExecutor,
-                storage, uploader, dataUploadConfiguration, context, internalLogger, systemInfoProxy);
+        this.runnable = new SessionReplayDataUploadRunnable(sdkCore, feature, scheduledThreadPoolExecutor,
+                storage, uploader, dataUploadConfiguration, context, internalLogger, systemInfoProxy, errorSampledPath);
 
         this.feature = feature;
     }

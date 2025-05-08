@@ -26,7 +26,8 @@ public class SessionReplayTimeProvider implements TimeProvider {
     }
 
     private long resolveRumViewTimestampOffset() {
-        Object timestampOffset = sdkCore.getFeatureContext(Feature.RUM_FEATURE_NAME).get(SessionReplayTimeProvider.RUM_VIEW_TIMESTAMP_OFFSET);
+        Object timestampOffset = sdkCore.getFeatureContext(Feature.RUM_FEATURE_NAME)
+                .get(SessionReplayTimeProvider.RUM_VIEW_TIMESTAMP_OFFSET);
         if (timestampOffset instanceof Long) {
             return (Long) timestampOffset;
         } else {

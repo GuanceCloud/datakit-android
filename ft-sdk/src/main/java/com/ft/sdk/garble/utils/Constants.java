@@ -576,6 +576,11 @@ public class Constants {
     public static final String KEY_SAMPLED_FOR_ERROR_SESSION = "sampled_for_error_session";
 
     /**
+     * 由于 Session Replay 错误被采集
+     */
+    public static final String KEY_SAMPLED_FOR_ERROR_REPLAY ="sampled_for_error_replay";
+
+    /**
      * session 发生错误的时间
      */
     public static final String KEY_SESSION_ERROR_TIMESTAMP = "session_error_timestamp";

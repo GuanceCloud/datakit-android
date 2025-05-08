@@ -3,6 +3,7 @@ package com.ft.sdk.sessionreplay.internal.storage;
 
 import com.ft.sdk.api.context.SessionReplayContext;
 import com.ft.sdk.feature.DataConsumerCallback;
+import com.ft.sdk.feature.Feature;
 import com.ft.sdk.feature.FeatureSdkCore;
 import com.ft.sdk.sessionreplay.internal.RecordCallback;
 import com.ft.sdk.sessionreplay.internal.processor.EnrichedRecord;
@@ -16,7 +17,6 @@ public class SessionReplayRecordWriter implements RecordWriter {
 
     private final FeatureSdkCore sdkCore;
     private final RecordCallback recordCallback;
-    private static final String SESSION_REPLAY_FEATURE_NAME = "session-replay";
     private String viewId = "";
 
     public SessionReplayRecordWriter(FeatureSdkCore sdkCore, RecordCallback recordCallback) {
@@ -32,7 +32,7 @@ public class SessionReplayRecordWriter implements RecordWriter {
             sdkCore.getInternalLogger().i(TAG, "forceNew:viewId:" + viewId);
         }
 
-        sdkCore.getFeature(SESSION_REPLAY_FEATURE_NAME).withWriteContext(forceNew, new DataConsumerCallback() {
+        sdkCore.getFeature(Feature.SESSION_REPLAY_FEATURE_NAME).withWriteContext(forceNew, new DataConsumerCallback() {
             @Override
             public void onConsume(SessionReplayContext context, EventBatchWriter writer) {
                 byte[] serializedRecord = record.toJson().getBytes(Charsets.UTF_8);

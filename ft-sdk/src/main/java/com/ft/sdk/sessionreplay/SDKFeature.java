@@ -12,6 +12,7 @@ import com.ft.sdk.FTSdk;
 import com.ft.sdk.SyncTaskManager;
 import com.ft.sdk.api.SessionReplayFormData;
 import com.ft.sdk.api.SessionReplayUploadCallback;
+import com.ft.sdk.api.TrackingConsentProvider;
 import com.ft.sdk.api.context.SessionReplayContext;
 import com.ft.sdk.feature.DataConsumerCallback;
 import com.ft.sdk.feature.Feature;
@@ -88,11 +89,13 @@ public class SDKFeature implements FeatureScope {
 
     private UploadScheduler uploadScheduler = new NoOpUploadScheduler();
     private final FeatureSdkCore sdkCore;
+    private final TrackingConsentProvider trackingConsentProvider;
 
-    public SDKFeature(FeatureSdkCore sdkCore, Feature feature, InternalLogger internalLogger) {
+    public SDKFeature(FeatureSdkCore sdkCore, Feature feature, InternalLogger internalLogger, TrackingConsentProvider trackingConsentProvider) {
         this.wrappedFeature = feature;
         this.internalLogger = internalLogger;
         this.sdkCore = sdkCore;
+        this.trackingConsentProvider = trackingConsentProvider;
     }
 
     public void init(Context context, String instanceId) {
@@ -174,6 +177,7 @@ public class SDKFeature implements FeatureScope {
                     });
 
             if (feature.getName().equals(Feature.SESSION_REPLAY_FEATURE_NAME)) {
+                File rootPath = FTApplication.getApplication().getCacheDir();
                 uploadScheduler = new DataUploadScheduler(sdkCore, feature.getName(), internalLogger,
                         configuration, storage, uploader, sdkContext,
                         new SystemInfoProxy() {
@@ -193,7 +197,7 @@ public class SDKFeature implements FeatureScope {
                                         batteryBean.getBatteryStatue() == BatteryManager.BATTERY_STATUS_CHARGING;
                                 return batteryEnough || batteryPlug || !batteryBean.isBatteryPresent() || isFullOrCharging;
                             }
-                        });
+                        },rootPath);
             } else {
                 uploadScheduler = new NoOpUploadScheduler();
             }
@@ -218,8 +222,6 @@ public class SDKFeature implements FeatureScope {
     }
 
     private Storage createFileStorage(String featureName, FilePersistenceConfig filePersistenceConfig) {
-        //fixme
-
         MetricsDispatcher dispatcher = new MetricsDispatcher() {
             @Override
             public void sendBatchDeletedMetric(File batchFile, RemovalReason removalReason) {
@@ -236,13 +238,17 @@ public class SDKFeature implements FeatureScope {
                 new BatchFileOrchestrator(new File(FTApplication.getApplication().getCacheDir(),
                         SessionReplayConstants.PATH_SESSION_REPLAY), new FilePersistenceConfig(),
                         internalLogger, dispatcher),
+                new BatchFileOrchestrator(new File(FTApplication.getApplication().getCacheDir(),
+                        SessionReplayConstants.PATH_SESSION_REPLAY_ERROR_SAMPLED), new FilePersistenceConfig(),
+                        internalLogger, dispatcher),
                 null,
                 BatchFileReaderWriterFactory.create(internalLogger, null),
                 null,
                 new FileMover(internalLogger),
                 internalLogger,
                 filePersistenceConfig,
-                dispatcher);
+                dispatcher, trackingConsentProvider
+        );
     }
 
     @Override
