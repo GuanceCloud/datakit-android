@@ -16,6 +16,7 @@ public abstract class DBManager {
 
     private static final String TAG = Constants.LOG_TAG_PREFIX + "DBManager";
     private SQLiteOpenHelper databaseHelper;
+    private static final int TRANSACTION_LIMIT_COUNT = 10;
 
     protected abstract SQLiteOpenHelper initDataBaseHelper();
 
@@ -33,20 +34,46 @@ public abstract class DBManager {
      * @param callBack
      */
     protected void getDB(boolean write, DataBaseCallBack callBack) {
+        getDB(write, 1, callBack);
+    }
+
+    /**
+     * 同步锁，使数据库操作线程安全
+     *
+     * @param write
+     * @param operationCount 是否开启事务
+     * @param callback
+     */
+    protected void getDB(boolean write, int operationCount, DataBaseCallBack callback) {
         synchronized (this) {
+            SQLiteDatabase db = null;
             try {
                 SQLiteOpenHelper helper = getDataBaseHelper();
-                SQLiteDatabase db;
-                if (write)
-                    db = helper.getWritableDatabase();
-                else
-                    db = helper.getReadableDatabase();
+                db = write ? helper.getWritableDatabase() : helper.getReadableDatabase();
+
                 if (db.isOpen()) {
-                    callBack.run(db);
+                    // 自动判断：写操作且操作数量大于阈值(默认10)时使用事务
+                    boolean useTransaction = write && operationCount > TRANSACTION_LIMIT_COUNT;
+
+                    if (useTransaction && !db.inTransaction()) {
+                        db.beginTransaction();
+                        try {
+                            callback.run(db);
+                            if (db.inTransaction()) {
+                                db.setTransactionSuccessful();
+                            }
+                        } finally {
+                            if (db.inTransaction()) {
+                                db.endTransaction();
+                            }
+                        }
+                    } else {
+                        callback.run(db);
+                    }
+
                     if (write) {
                         checkDatabaseSize(db);
                     }
-                    //db.close();
                 }
             } catch (Exception e) {
                 LogUtils.e(TAG, LogUtils.getStackTraceString(e));
@@ -59,6 +86,7 @@ public abstract class DBManager {
 
     /**
      * 通过 PRAGMA 获取 page_size *page_count 来计算获取当前 db 的 大小
+     *
      * @param db
      */
     private void checkDatabaseSize(SQLiteDatabase db) {
@@ -94,6 +122,7 @@ public abstract class DBManager {
 
     /**
      * 是否开启 db 限制
+     *
      * @return
      */
     protected abstract boolean enableDBSizeLimit();
@@ -101,6 +130,7 @@ public abstract class DBManager {
 
     /**
      * 通知 db 计算大小
+     *
      * @param db
      * @param reachLimit
      */
