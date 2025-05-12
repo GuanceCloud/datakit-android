@@ -7,6 +7,12 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
+
 /**
  * BY huangDianHua
  * DATE:2019-12-02 11:23
@@ -17,6 +23,17 @@ public abstract class DBManager {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "DBManager";
     private SQLiteOpenHelper databaseHelper;
     private static final int TRANSACTION_LIMIT_COUNT = 10;
+    private final Object lock = new Object();
+    private int openCounter = 0;
+    private long lastUsedTime = 0;
+    private static final long IDLE_TIMEOUT = 10_000;//
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
+        @Override
+        public Thread newThread(Runnable r) {
+            return new Thread(r, "FTDBScheduleLock");
+        }
+    });
+    private ScheduledFuture<?> pendingCloseTask;
 
     protected abstract SQLiteOpenHelper initDataBaseHelper();
 
@@ -45,39 +62,49 @@ public abstract class DBManager {
      * @param callback
      */
     protected void getDB(boolean write, int operationCount, DataBaseCallBack callback) {
-        synchronized (this) {
-            SQLiteDatabase db = null;
-            try {
-                SQLiteOpenHelper helper = getDataBaseHelper();
-                db = write ? helper.getWritableDatabase() : helper.getReadableDatabase();
 
-                if (db.isOpen()) {
-                    // 自动判断：写操作且操作数量大于阈值(默认10)时使用事务
-                    boolean useTransaction = write && operationCount > TRANSACTION_LIMIT_COUNT;
-
-                    if (useTransaction && !db.inTransaction()) {
-                        db.beginTransaction();
-                        try {
+        SQLiteDatabase db = null;
+        SQLiteOpenHelper helper;
+        try {
+            synchronized (lock) {
+                helper = getDataBaseHelper();
+            }
+            db = write ? helper.getWritableDatabase() : helper.getReadableDatabase();
+            if (db.isOpen()) {
+                acquire();
+                // 自动判断：写操作且操作数量大于阈值(默认10)时使用事务
+                boolean useTransaction = write && operationCount > TRANSACTION_LIMIT_COUNT;
+                if (useTransaction && !db.inTransaction()) {
+                    db.beginTransaction();
+                    try {
+                        synchronized (lock) {
                             callback.run(db);
-                            if (db.inTransaction()) {
-                                db.setTransactionSuccessful();
-                            }
-                        } finally {
-                            if (db.inTransaction()) {
-                                db.endTransaction();
-                            }
+                        }
+                        if (db.inTransaction()) {
+                            db.setTransactionSuccessful();
+                        }
+                    } finally {
+                        if (db.inTransaction()) {
+                            db.endTransaction();
+                        }
+                    }
+                } else {
+                    if (write) {
+                        synchronized (lock) {
+                            callback.run(db);
                         }
                     } else {
                         callback.run(db);
                     }
-
-                    if (write) {
-                        checkDatabaseSize(db);
-                    }
                 }
-            } catch (Exception e) {
-                LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+                if (write) {
+                    checkDatabaseSize(db);
+                }
             }
+        } catch (Exception e) {
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+        } finally {
+            tryToClose();
         }
     }
 
@@ -136,8 +163,11 @@ public abstract class DBManager {
      */
     protected abstract void onDBSizeCacheChange(SQLiteDatabase db, long reachLimit);
 
-    public void closeDB() {
-        synchronized (this) {
+    /**
+     * 关闭 db
+     */
+    private void closeDB() {
+        synchronized (lock) {
             if (databaseHelper != null) {
                 databaseHelper.close();
                 LogUtils.d(TAG, "DB close");
@@ -146,14 +176,69 @@ public abstract class DBManager {
     }
 
     /**
+     *  建立 db 链接
+     */
+    public void acquire() {
+        synchronized (lock) {
+            openCounter++;
+            lastUsedTime = System.currentTimeMillis();
+            cancelPendingClose();
+        }
+    }
+
+    /**
+     * 周期监测关闭数据库
+     */
+    private void scheduleCloseIfIdle() {
+        cancelPendingClose();
+        if (openCounter == 0) {
+            pendingCloseTask = scheduler.schedule(new Runnable() {
+                @Override
+                public void run() {
+                    synchronized (lock) {
+                        if (openCounter == 0 && (System.currentTimeMillis() - lastUsedTime) >= IDLE_TIMEOUT) {
+                            closeDB();
+                        }
+                    }
+                }
+
+            }, IDLE_TIMEOUT, TimeUnit.MILLISECONDS);
+        }
+        // 例如 10 秒后无操作就关闭
+    }
+
+    /**
+     * 取消等待任务
+     */
+    private void cancelPendingClose() {
+        if (pendingCloseTask != null) {
+            pendingCloseTask.cancel(false);
+            pendingCloseTask = null;
+        }
+    }
+
+    /**
+     * 尝试关闭数据库
+     */
+    public void tryToClose() {
+        synchronized (lock) {
+            openCounter = Math.max(0, openCounter - 1);
+            lastUsedTime = System.currentTimeMillis();
+            scheduleCloseIfIdle();
+        }
+    }
+
+    /**
      * 关闭并释放数据库文件对象
      */
     protected void shutDown() {
-        synchronized (this) {
+        synchronized (lock) {
             if (databaseHelper != null) {
                 databaseHelper.close();
                 databaseHelper = null;
             }
+            cancelPendingClose();
+            scheduler.shutdownNow();
         }
     }
 }

@@ -102,7 +102,7 @@ public class DemoApplication extends BaseApplication {
 
 
         FTSdk.initRUMWithConfig(new FTRUMConfig()
-                        .setSamplingRate(0f)
+                        .setSamplingRate(1f)
                         .setSessionErrorSampleRate(1f)
                         .setRumAppId(BuildConfig.RUM_APP_ID)
                         .setEnableTraceUserAction(true)
