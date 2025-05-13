@@ -1,3 +1,9 @@
+# agent 1.6.11-alpha03
+1. 优化数据同步逻辑
+2. 优化数据库闲置关闭逻辑
+3. FTSDKConfig.setEnableAccessAndroidID(false), 使用本地随机 uuid 作为 device_uuid
+
+---
 # agent 1.6.11-alpha02
 1. 添加 `FTRUMConfig.setSessionErrorSampleRate` 支持错误采样，在发生错误时可以对 1 分钟前的 rum 的数据进行取样采集
 
