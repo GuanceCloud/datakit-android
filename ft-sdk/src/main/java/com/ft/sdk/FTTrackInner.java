@@ -15,7 +15,7 @@ import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.manager.RequestCallback;
-import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
+import com.ft.sdk.garble.threadpool.DataProcessThreadPool;
 import com.ft.sdk.garble.threadpool.RunnerCompleteCallBack;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -219,7 +219,7 @@ public class FTTrackInner {
     private void syncRUMDataBackground(final DataType dataType, final long dataGenerateTime, final long time,
                                        final String measurement, final HashMap<String, Object> tags,
                                        final HashMap<String, Object> fields, RunnerCompleteCallBack callBack) {
-        DataUploaderThreadPool.get().execute(new Runnable() {
+        DataProcessThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -271,7 +271,7 @@ public class FTTrackInner {
      * @param callback
      */
     void trackLogAsync(@NonNull final BaseContentBean bean, final RequestCallback callback) {
-        DataUploaderThreadPool.get().execute(new Runnable() {
+        DataProcessThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
                 try {

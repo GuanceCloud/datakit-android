@@ -2,11 +2,7 @@ package com.ft.sdk;
 
 
 import android.content.SharedPreferences;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 
-import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncData;
@@ -18,7 +14,8 @@ import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.manager.RequestCallback;
-import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
+import com.ft.sdk.garble.threadpool.DataProcessThreadPool;
+import com.ft.sdk.garble.threadpool.DataUploadThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.ID36Generator;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -33,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 
 /**
@@ -74,11 +70,6 @@ public class SyncTaskManager {
 
 
     /**
-     * 高频行为间隔时间
-     */
-    private static final int INTERVAL = 100;
-
-    /**
      * 重试等待时间
      */
     private static final int RETRY_DELAY_SLEEP_TIME = 500;
@@ -99,11 +90,6 @@ public class SyncTaskManager {
 
 
     /**
-     * 是否正处于同步中，避免重复执行
-     */
-    private volatile boolean running;
-
-    /**
      * 是否正在在旧数据迁移
      */
     private boolean isOldCaching;
@@ -112,12 +98,6 @@ public class SyncTaskManager {
      * 是否停止
      */
     private boolean isStop = false;
-
-    /**
-     * 同步消息
-     */
-    private static final int MSG_SYNC = 1;
-    private static final int MSG_CLOSE_DB = 2;
 
     /**
      * 最大错误尝试次数，超出之后，队列数据将停止，等待下次同步触发
@@ -140,7 +120,7 @@ public class SyncTaskManager {
     private int pageSize = SyncPageSize.MEDIUM.getValue();
 
     /**
-     *
+     * 旧数据迁移
      */
     private Runnable oldCacheRunner;
 
@@ -190,22 +170,6 @@ public class SyncTaskManager {
     }
 
     /**
-     * 用于跨步线程消息发送
-     */
-    private final Handler mHandler = new Handler(Looper.getMainLooper()) {
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            if (msg.what == MSG_SYNC) {
-                executePoll(true);
-            } else if (msg.what == MSG_CLOSE_DB) {
-                FTDBManager.get().closeDB();
-            }
-        }
-    };
-
-
-    /**
      * 同步数据类型
      */
     private final static DataType[] SYNC_MAP = new DataType[]
@@ -231,7 +195,7 @@ public class SyncTaskManager {
      * @param running
      */
     private void setRunning(boolean running) {
-        this.running = running;
+        DataUploadThreadPool.get().setRunning(running);
     }
 
     private SyncTaskManager() {
@@ -262,84 +226,15 @@ public class SyncTaskManager {
      * @param withSleep 是否进行睡眠，{@link #SLEEP_TIME}
      */
     private void executePoll(final boolean withSleep) {
-        if (oldCacheRunner != null) {
-            oldCacheRunner.run();
-            oldCacheRunner = null;
-        }
-
-        if (running || isStop) {
-            return;
-        }
-        synchronized (this) {
-            LogUtils.d(TAG, "******************* Execute Sync Poll *******************");
-            running = true;
-            errorCount.set(0);
-
-            DataUploaderThreadPool.get().execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-
-                        if (withSleep) {
-                            LogUtils.d(TAG, "******************* Sync Poll Waiting *******************>>>\n");
-                            Thread.sleep(SLEEP_TIME);
-                        }
-                        LogUtils.d(TAG, "******************* Sync Poll Running *******************>>>\n");
-                        for (DataType dataType : ERROR_SAMPLED_SYNC_MAP) {
-                            SyncTaskManager.this.errorSampledConsume(dataType);
-                        }
-
-                        for (DataType dataType : SYNC_MAP) {
-                            SyncTaskManager.this.handleSyncOpt(dataType);
-                        }
-
-                    } catch (Exception e) {
-                        if (e instanceof FTNetworkNoAvailableException) {
-                            LogUtils.e(TAG, "Sync Fail-Network not available - Stop poll");
-                        } else if (e instanceof FTRetryLimitException) {
-                            if (dataSyncMaxRetryCount > 0) {
-                                LogUtils.e(TAG, "Sync Fail: Reach retry limit count:" + dataSyncMaxRetryCount + "- Stop poll");
-                            }
-                        } else {
-                            LogUtils.e(TAG, "Sync Fail:\n" + LogUtils.getStackTraceString(e));
-
-                        }
-                    } finally {
-                        running = false;
-                        mHandler.removeMessages(MSG_CLOSE_DB);
-                        LogUtils.d(TAG, "Try to close DB");
-                        mHandler.sendEmptyMessageDelayed(MSG_CLOSE_DB, 5000);
-                        LogUtils.d(TAG, "<<<******************* Sync Poll Finish *******************\n");
-                    }
-                }
-            });
-        }
+        DataUploadThreadPool.get().schedule(withSleep ? SLEEP_TIME : 0);
     }
-
-    private static final long THROTTLE_INTERVAL_MS = 10000; // 10秒
-    private static final AtomicLong lastLogTime = new AtomicLong(0);
 
     /**
      * 触发延迟轮询同步
      */
     void executeSyncPoll() {
         if (autoSync) {
-            if (FTDBCachePolicy.get().reachHalfLimit()) {
-                if (!running) {
-                    long currentTime = System.currentTimeMillis();
-                    if (currentTime - lastLogTime.get() >= THROTTLE_INTERVAL_MS) {//10秒间隔出发一次
-                        if (lastLogTime.compareAndSet(lastLogTime.get(), currentTime)) {
-                            LogUtils.w(TAG, "Rapid Log Growth，Start to Sync ");
-                        }
-                    }
-                    mHandler.removeMessages(MSG_SYNC);
-                    executePoll();
-                }
-            } else {
-                mHandler.removeMessages(MSG_SYNC);
-                mHandler.sendEmptyMessageDelayed(MSG_SYNC, INTERVAL);
-            }
-
+            executePoll(true);
         }
     }
 
@@ -350,29 +245,30 @@ public class SyncTaskManager {
 
 
     /**
-     * 消费
+     * 消费错误采样的缓存数据
      *
      * @param dataType
      */
     private synchronized void errorSampledConsume(DataType dataType) {
         if (errorTimeLine > 0) {
-            LogUtils.d(TAG, "errorSampledConsume:" + dataType + ", before ns:" + errorTimeLine);
-
             int updateCount = FTDBManager.get().updateDataType(dataType, appStartTime, errorTimeLine);
             if (updateCount > 0) {
-                LogUtils.d(TAG, "updateDataType:" + dataType + "," + updateCount);
+                LogUtils.d(TAG, " errorSampledConsume updateDataType:" + dataType + ","
+                        + updateCount + ", before ns:" + errorTimeLine);
             }
         }
         int deleteCount = FTDBManager.get().deleteExpireCache(dataType, Utils.getCurrentNanoTime(), ONE_MINUTE_DURATION_NS);
         if (deleteCount > 0) {
-            LogUtils.d(TAG, "deleteExpired:" + dataType + "," + deleteCount);
+            LogUtils.d(TAG, "errorSampledConsume deleteExpired:" + dataType + ","
+                    + deleteCount + ", before ns:" + errorTimeLine);
         }
     }
 
     /**
      * 执行存储数据同步操作
      */
-    private synchronized void handleSyncOpt(final DataType dataType) throws FTNetworkNoAvailableException, FTRetryLimitException {
+    private synchronized void handleSyncOpt(final DataType dataType) throws
+            FTNetworkNoAvailableException, FTRetryLimitException {
         final List<SyncData> requestDataList = new ArrayList<>();
 
         while (true) {
@@ -386,7 +282,6 @@ public class SyncTaskManager {
 
             int dataCount = requestDataList.size();
             LogUtils.d(TAG, "Sync Data Count:" + dataCount);
-
 
             StringBuilder sb = new StringBuilder();
             String seqNumber = "";
@@ -519,7 +414,8 @@ public class SyncTaskManager {
      * @param pkgId        链路包 id
      * @param syncCallback 异步对象
      */
-    private synchronized void requestNet(DataType dataType, String pkgId, String body, final RequestCallback syncCallback) throws FTNetworkNoAvailableException {
+    private synchronized void requestNet(DataType dataType, String pkgId, String body,
+                                         final RequestCallback syncCallback) throws FTNetworkNoAvailableException {
         String model;
         switch (dataType) {
 //            case TRACE:
@@ -534,6 +430,7 @@ public class SyncTaskManager {
                 model = Constants.URL_MODEL_RUM;
                 break;
         }
+        LogUtils.d(TAG, body);
         FTResponseData result = HttpBuilder.Builder()
                 .addHeadParam(Constants.SYNC_DATA_CONTENT_TYPE_HEADER, Constants.SYNC_DATA_CONTENT_TYPE_VALUE)
                 .addHeadParam(Constants.SYNC_DATA_TRACE_HEADER,
@@ -541,7 +438,6 @@ public class SyncTaskManager {
                 .setModel(model)
                 .setMethod(RequestMethod.POST)
                 .setBodyString(body).executeSync();
-        LogUtils.d(TAG, body);
         if (result.getCode() == NetCodeStatus.NETWORK_EXCEPTION_CODE) {
             throw new FTNetworkNoAvailableException();
         }
@@ -567,7 +463,7 @@ public class SyncTaskManager {
             LogUtils.d(TAG, "==> old cache need transform");
             isOldCaching = true;//不需要结束，一次出错等待下次启动
 
-            DataUploaderThreadPool.get().execute(new Runnable() {
+            DataProcessThreadPool.get().execute(new Runnable() {
                 @Override
                 public void run() {
                     LogUtils.d(TAG, "==> old cache transform start");
@@ -628,7 +524,7 @@ public class SyncTaskManager {
             };
         }
 
-        DataUploaderThreadPool.get().execute(new Runnable() {
+        DataProcessThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
                 errorTimeLine = getErrorTimeLineFromFileCache();
@@ -636,14 +532,50 @@ public class SyncTaskManager {
             }
         });
 
+        DataUploadThreadPool.get().initRunnable(new Runnable() {
+            @Override
+            public void run() {
+                if (oldCacheRunner != null) {
+                    oldCacheRunner.run();
+                    oldCacheRunner = null;
+                }
+                if (isStop) {
+                    return;
+                }
+
+                try {
+                    for (DataType dataType : ERROR_SAMPLED_SYNC_MAP) {
+                        SyncTaskManager.this.errorSampledConsume(dataType);
+                    }
+
+                    for (DataType dataType : SYNC_MAP) {
+                        SyncTaskManager.this.handleSyncOpt(dataType);
+                    }
+
+                } catch (Exception e) {
+                    if (e instanceof FTNetworkNoAvailableException) {
+                        LogUtils.e(TAG, "Sync Fail-Network not available - Stop poll");
+                    } else if (e instanceof FTRetryLimitException) {
+                        if (dataSyncMaxRetryCount > 0) {
+                            LogUtils.e(TAG, "Sync Fail: Reach retry limit count:" + dataSyncMaxRetryCount + "- Stop poll");
+                        }
+                    } else {
+                        LogUtils.e(TAG, "Sync Fail:\n" + LogUtils.getStackTraceString(e));
+
+                    }
+                }
+
+            }
+        });
     }
 
     /**
      * 释放上传同步资源
      */
     public void release() {
-        DataUploaderThreadPool.get().shutDown();
-        mHandler.removeMessages(MSG_SYNC);
+        DataProcessThreadPool.get().shutDown();
+        DataUploadThreadPool.get().shutDown();
+
         oldCacheRunner = null;
         isStop = true;
     }

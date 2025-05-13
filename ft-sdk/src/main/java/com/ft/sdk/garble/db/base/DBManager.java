@@ -4,14 +4,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.ft.sdk.garble.threadpool.DBScheduleThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
 
 /**
  * BY huangDianHua
@@ -25,14 +22,8 @@ public abstract class DBManager {
     private static final int TRANSACTION_LIMIT_COUNT = 10;
     private final Object lock = new Object();
     private int openCounter = 0;
-    private long lastUsedTime = 0;
-    private static final long IDLE_TIMEOUT = 10_000;//
-    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
-        @Override
-        public Thread newThread(Runnable r) {
-            return new Thread(r, "FTDBScheduleLock");
-        }
-    });
+    private long lastUsedTime = 0; // 最后活跃时间
+    private static final long IDLE_TIMEOUT = 20_000;// 20秒
     private ScheduledFuture<?> pendingCloseTask;
 
     protected abstract SQLiteOpenHelper initDataBaseHelper();
@@ -176,7 +167,7 @@ public abstract class DBManager {
     }
 
     /**
-     *  建立 db 链接
+     * 建立 db 链接
      */
     public void acquire() {
         synchronized (lock) {
@@ -192,7 +183,7 @@ public abstract class DBManager {
     private void scheduleCloseIfIdle() {
         cancelPendingClose();
         if (openCounter == 0) {
-            pendingCloseTask = scheduler.schedule(new Runnable() {
+            pendingCloseTask = DBScheduleThreadPool.get().schedule(new Runnable() {
                 @Override
                 public void run() {
                     synchronized (lock) {
@@ -202,7 +193,7 @@ public abstract class DBManager {
                     }
                 }
 
-            }, IDLE_TIMEOUT, TimeUnit.MILLISECONDS);
+            }, IDLE_TIMEOUT);
         }
         // 例如 10 秒后无操作就关闭
     }
@@ -222,9 +213,11 @@ public abstract class DBManager {
      */
     public void tryToClose() {
         synchronized (lock) {
-            openCounter = Math.max(0, openCounter - 1);
-            lastUsedTime = System.currentTimeMillis();
-            scheduleCloseIfIdle();
+            if (DBScheduleThreadPool.get().poolRunning()) {
+                openCounter = Math.max(0, openCounter - 1);
+                lastUsedTime = System.currentTimeMillis();
+                scheduleCloseIfIdle();
+            }
         }
     }
 
@@ -233,12 +226,15 @@ public abstract class DBManager {
      */
     protected void shutDown() {
         synchronized (lock) {
-            if (databaseHelper != null) {
-                databaseHelper.close();
-                databaseHelper = null;
-            }
             cancelPendingClose();
-            scheduler.shutdownNow();
+            DBScheduleThreadPool.get().execute(new Runnable() {
+                @Override
+                public void run() {
+                    closeDB();
+                    databaseHelper = null;
+                    DBScheduleThreadPool.get().shutDown();
+                }
+            });
         }
     }
 }

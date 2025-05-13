@@ -10,7 +10,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
  * BY huangDianHua
@@ -22,16 +21,16 @@ public abstract class BaseThreadPool {
     /**
      * 最大容量
      */
-    private final static int MAXIMUM_POOL_SIZE = 128;
-    private final static int KEEP_ALIVE = 5;
+    protected final static int MAXIMUM_POOL_SIZE = 128;
+    protected final static int KEEP_ALIVE = 5;
     /**
      * 阻塞线程队列
      */
-    private BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
-    private ThreadPoolExecutor executor;
-    private final int corePoolSize;
+    protected BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
+    protected ThreadPoolExecutor executor;
+    protected final int corePoolSize;
 
-    private final ThreadFactory threadFactory;
+    protected final ThreadFactory threadFactory;
 
     public BaseThreadPool(int corePoolSize, String threadName) {
         this(corePoolSize, threadName, Thread.NORM_PRIORITY);
@@ -88,6 +87,7 @@ public abstract class BaseThreadPool {
 
     /**
      * 用于判断线程池是否在运行
+     *
      * @return
      */
     public boolean poolRunning() {
@@ -116,9 +116,5 @@ public abstract class BaseThreadPool {
      *
      * @return
      */
-    private ThreadPoolExecutor createNew() {
-        return new ThreadPoolExecutor(corePoolSize, MAXIMUM_POOL_SIZE, KEEP_ALIVE,
-                TimeUnit.SECONDS, workQueue, threadFactory);
-
-    }
+    public abstract ThreadPoolExecutor createNew();
 }
