@@ -1,3 +1,13 @@
+# agent 1.6.11
+1. 添加 `FTRUMConfig.setEnableTraceUserViewInFragment` 支持 fragment view 数据采集，默认为 false
+2. 添加 `FTSDKConfig.setLineDataModifier`、`FTSDKConfig.setDataModifier` 支持数据写入替换，可适用数据脱敏
+3. 添加 `FTRUMConfig.setSessionErrorSampleRate` 支持错误采样，在未被 `setSamplingRate`采样时，
+   在发生错误时可以对 1 分钟前的 rum 的数据进行取样采集
+4. `FTSDKConfig.setEnableAccessAndroidID(false)`, 使用本地随机 `uuid` 作为 `device_uuid`
+5. 优化高频日志写入，优化数据同步以及数据闲置关闭的逻辑
+
+---
+
 # agent 1.6.11-beta01
 1. 同 agent 1.6.11-alpha03
 

@@ -350,7 +350,7 @@ public class FTRUMConfig {
     }
 
     /**
-     * 是否监测用户 View 在 Fragment 的跳转采集
+     * 是否监测用户 View 在 Fragment 的页面采集
      * @param enableTraceUserViewInFragment
      * @return
      */

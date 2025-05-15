@@ -588,7 +588,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 设置数据更改器
+     * 对单个字段进行更改。
      *
      * @param dataModifier
      * @return
@@ -599,7 +599,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 设置数据更改器
+     * 对单条数据数据进行更改
      *
      * @param dataModifier
      * @return
