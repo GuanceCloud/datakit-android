@@ -1,3 +1,7 @@
+# agent 1.6.11-beta01
+1. 同 agent 1.6.11-alpha03
+
+---
 # agent 1.6.11-alpha03
 1. 优化数据同步逻辑
 2. 优化数据库闲置关闭逻辑
@@ -26,7 +30,7 @@
 
 ---
 # agent 1.6.10-beta01
-1. 通 agent 1.6.10-alpha03
+1. 同 agent 1.6.10-alpha03
 
 ---
 # agent 1.6.10-alpha03
