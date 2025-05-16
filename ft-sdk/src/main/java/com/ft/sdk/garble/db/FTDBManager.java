@@ -637,7 +637,7 @@ public class FTDBManager extends DBManager {
             public void run(SQLiteDatabase db) {
                 ContentValues value = new ContentValues();
                 String originType = dataType.getValue();
-                String targetDataType = originType.replace("_not_sample", "");
+                String targetDataType = originType.replace(DataType.ERROR_SAMPLED_SUFFIX, "");
 
                 boolean errorBefore = errorDateline < appStartTime;//切割上个生命周期的活动
                 String whereSql = FTSQL.RECORD_COLUMN_DATA_TYPE + "='" + originType + "' AND "

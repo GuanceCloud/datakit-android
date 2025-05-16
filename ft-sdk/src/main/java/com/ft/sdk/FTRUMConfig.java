@@ -140,7 +140,7 @@ public class FTRUMConfig {
     }
 
     /**
-     * 设置采用率
+     * 设置采集率，取值范围 [0,1]，0 表示不采集，1 表示全采集，默认值为 1。作用域为同一 session_id 下所有 View，Action，LongTask，Error 数据
      *
      * @param samplingRate
      * @return
@@ -160,7 +160,7 @@ public class FTRUMConfig {
     }
 
     /**
-     * 设置错误采样率，默认为 0
+     * 设置错误采集率，当会话未被 `setSamplingRate` 采样时，若会话期间发生错误，可以采集到错误前 1 分钟范围的数据，取值范围 [0,1]，0 表示不采集，1 表示全采集，默认值为 0。作用域为同一 session_id 下所有 View，Action，LongTask，Error
      * @param sessionErrorSampleRate
      */
     public FTRUMConfig setSessionErrorSampleRate(float sessionErrorSampleRate) {
@@ -555,6 +555,7 @@ public class FTRUMConfig {
     public String toString() {
         return "FTRUMConfig{" +
                 "samplingRate=" + samplingRate +
+                ", sessionErrorSampleRate=" + sessionErrorSampleRate +
                 ", enableTrackAppCrash=" + enableTrackAppCrash +
                 ", enableTrackAppUIBlock=" + enableTrackAppUIBlock +
                 ", blockDurationMS=" + blockDurationMS +

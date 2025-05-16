@@ -7,6 +7,7 @@ package com.ft.sdk.garble.bean;
  * <p>
  */
 public enum DataType {
+
     /**
      * 原生 App RUM 数据
      */
@@ -35,6 +36,8 @@ public enum DataType {
 //     */
 //    TRACE
     ;
+
+    public final static String ERROR_SAMPLED_SUFFIX = "_error_sampled";
 
     public String getValue() {
         return toString().toLowerCase();

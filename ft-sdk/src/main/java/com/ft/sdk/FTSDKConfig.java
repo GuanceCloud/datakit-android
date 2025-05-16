@@ -641,6 +641,8 @@ public class FTSDKConfig {
                 ", proxyAuthenticator=" + authenticator +
                 ", dns=" + dns +
                 ", enableOkhttpRequestTag=" + enableOkhttpRequestTag +
+                ", dataModifier=" + dataModifier +
+                ", lineDataModifier=" + lineDataModifier +
                 '}';
     }
 }

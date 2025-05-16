@@ -3,7 +3,6 @@ package com.ft.sdk;
 
 import android.content.SharedPreferences;
 
-
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncData;
 import com.ft.sdk.garble.bean.ViewBean;
@@ -179,7 +178,7 @@ public class SyncTaskManager {
                     DataType.RUM_WEBVIEW
             };
     /**
-     *
+     * 错误采样同步类型
      */
     private final static DataType[] ERROR_SAMPLED_SYNC_MAP = new DataType[]
             {
@@ -253,14 +252,15 @@ public class SyncTaskManager {
         if (errorTimeLine > 0) {
             int updateCount = FTDBManager.get().updateDataType(dataType, appStartTime, errorTimeLine);
             if (updateCount > 0) {
-                LogUtils.d(TAG, " errorSampledConsume updateDataType:" + dataType + ","
+                LogUtils.d(TAG, "errorSampledConsume updateDataType:" + dataType + ","
                         + updateCount + ", before ns:" + errorTimeLine);
             }
         }
+        long now = Utils.getCurrentNanoTime();
         int deleteCount = FTDBManager.get().deleteExpireCache(dataType, Utils.getCurrentNanoTime(), ONE_MINUTE_DURATION_NS);
         if (deleteCount > 0) {
             LogUtils.d(TAG, "errorSampledConsume deleteExpired:" + dataType + ","
-                    + deleteCount + ", before ns:" + errorTimeLine);
+                    + deleteCount + ", before ns:" + (now - ONE_MINUTE_DURATION_NS));
         }
     }
 
