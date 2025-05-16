@@ -1,6 +1,6 @@
 package com.ft.sdk.garble.threadpool;
 
-public class ThreadPoolFactory extends BaseThreadPool {
+public class ThreadPoolFactory extends BaseThreadPoolExecutor {
     private final static int CORE_POOL_SIZE = 1;
 
     public ThreadPoolFactory(int corePoolSize, String threadName) {
