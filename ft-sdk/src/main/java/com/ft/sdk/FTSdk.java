@@ -162,6 +162,7 @@ public class FTSdk {
     private void initFTConfig(FTSDKConfig config) {
         LogUtils.setDebug(config.isDebug());
         LogUtils.setSDKLogLevel(config.getSdkLogLevel());
+        LocalUUIDManager.get().initRandomUUID();
         FTDBCachePolicy.get().initSDKParams(config);
         FTHttpConfigManager.get().initParams(config);
         appendGlobalContext(config);
@@ -304,10 +305,11 @@ public class FTSdk {
         hashMap.put(Constants.KEY_SDK_NAME, Constants.SDK_NAME);
         hashMap.put(Constants.KEY_APPLICATION_UUID, FTSdk.PACKAGE_UUID);
         hashMap.put(Constants.KEY_ENV, config.getEnv());
-        String uuid = config.isEnableAccessAndroidID() ? DeviceUtils.getUuid(FTApplication.getApplication()) : "";
+        String uuid = config.isEnableAccessAndroidID() ? DeviceUtils.getUuid(FTApplication.getApplication())
+                : LocalUUIDManager.get().getRandomUUID();
         hashMap.put(Constants.KEY_DEVICE_UUID, uuid);
         HashMap<String, String> pkgInfo = getStringStringHashMap();
-        if(!pkgInfo.isEmpty()){
+        if (!pkgInfo.isEmpty()) {
             pkgInfo.putAll(config.getPkgInfo());
         }
         hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_INFO, Utils.hashMapObjectToJson(pkgInfo));

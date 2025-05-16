@@ -99,7 +99,7 @@ public class Constants {
     public static final String FT_USER_USER_EXT = "ft.user.extdata";
 
     /**
-     * //todo
+     * 存储错误发生时间
      */
     public static final String FT_RUM_ERROR_TIMELINE = "ft.error.timeline";
 

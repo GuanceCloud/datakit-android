@@ -363,7 +363,8 @@ public class FTSDKConfig {
     /**
      * 设置是否获取 Android ID
      * <p>
-     * 当为 false ，device_uuid 字段不再获取
+     * 当为 false ，device_uuid 字段不再使用 {@link  android.provider.Settings.Secure#ANDROID_ID},
+     * 使用 {@link LocalUUIDManager#getRandomUUID()} 做替代
      *
      * @param enableAccessAndroidID
      * @return
@@ -380,7 +381,7 @@ public class FTSDKConfig {
     /**
      * 是否只支持在主进程中初始化 SDK
      *
-     * @param onlySupportMainProcess true，wei
+     * @param onlySupportMainProcess
      * @return
      */
     public FTSDKConfig setOnlySupportMainProcess(boolean onlySupportMainProcess) {
@@ -505,6 +506,7 @@ public class FTSDKConfig {
 
     /**
      * 对上传同步数据进行 deflate 压缩，默认关闭
+     *
      * @param compressIntakeRequests
      * @return
      */
@@ -586,7 +588,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 设置数据更改器
+     * 对单个字段进行更改。
      *
      * @param dataModifier
      * @return
@@ -597,7 +599,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 设置数据更改器
+     * 对单条数据数据进行更改
      *
      * @param dataModifier
      * @return
@@ -639,6 +641,8 @@ public class FTSDKConfig {
                 ", proxyAuthenticator=" + authenticator +
                 ", dns=" + dns +
                 ", enableOkhttpRequestTag=" + enableOkhttpRequestTag +
+                ", dataModifier=" + dataModifier +
+                ", lineDataModifier=" + lineDataModifier +
                 '}';
     }
 }

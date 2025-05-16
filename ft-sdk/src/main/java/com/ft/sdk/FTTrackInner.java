@@ -15,9 +15,10 @@ import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.NetCodeStatus;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.manager.RequestCallback;
-import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
+import com.ft.sdk.garble.threadpool.DataProcessThreadPool;
 import com.ft.sdk.garble.threadpool.RunnerCompleteCallBack;
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.HashMapUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
@@ -153,17 +154,21 @@ public class FTTrackInner {
      */
     void rum(long time, String measurement, final HashMap<String, Object> tags, HashMap<String, Object> fields,
              RunnerCompleteCallBack callBack, CollectType collectType) {
+        long viewDataGenerateTime = 0;//由于 view 更新原则无法使用开始时间，否则会被误丢
         switch (collectType) {
             case NOT_COLLECT:
                 break;
             case COLLECT_BY_ERROR_SAMPLE:
                 if (measurement.equals(Constants.FT_MEASUREMENT_RUM_VIEW)) {
                     fields.put(Constants.KEY_SAMPLED_FOR_ERROR_SESSION, true);
+                    long errorTimestamp = HashMapUtils.getLong(fields,
+                            Constants.KEY_SESSION_ERROR_TIMESTAMP, 0L);
+                    viewDataGenerateTime = errorTimestamp > 0 ? errorTimestamp : Utils.getCurrentNanoTime();
                 }
             case COLLECT_BY_SAMPLE:
                 syncRUMDataBackground(collectType == CollectType.COLLECT_BY_ERROR_SAMPLE ?
                                 DataType.RUM_APP_ERROR_SAMPLED : DataType.RUM_APP,
-                        Utils.getCurrentNanoTime(), time, measurement,
+                        viewDataGenerateTime, time, measurement,
                         tags, fields, callBack);
                 break;
         }
@@ -219,7 +224,7 @@ public class FTTrackInner {
     private void syncRUMDataBackground(final DataType dataType, final long dataGenerateTime, final long time,
                                        final String measurement, final HashMap<String, Object> tags,
                                        final HashMap<String, Object> fields, RunnerCompleteCallBack callBack) {
-        DataUploaderThreadPool.get().execute(new Runnable() {
+        DataProcessThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -271,7 +276,7 @@ public class FTTrackInner {
      * @param callback
      */
     void trackLogAsync(@NonNull final BaseContentBean bean, final RequestCallback callback) {
-        DataUploaderThreadPool.get().execute(new Runnable() {
+        DataProcessThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
                 try {

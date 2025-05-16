@@ -143,7 +143,7 @@ public class SyncData implements Cloneable {
             throws FTInvalidParameterException {
         String uuid = Utils.getGUID_16();
         SyncData recordData = new SyncData(dataType);
-        if (bean.getMeasurement().equals(Constants.FT_MEASUREMENT_RUM_VIEW)) {
+        if (dataGenerateTime > 0) {
             recordData.setTime(dataGenerateTime);
         } else {
             recordData.setTime(bean.getTimeNano());

@@ -44,6 +44,7 @@ public class FTBaseTest {
     protected static final String DYNAMIC_SINGLE_CUSTOM_KEY = "dynamic_custom_single_key";
     protected static final String DYNAMIC_SINGLE_CUSTOM_VALUE = "dynamic_custom_single_value";
     protected static final String TEST_FAKE_RUM_ID = "rumId";
+    protected static final String TEST_FAKE_USER_ID = "fakeUserid";
     protected static final String TEST_FAKE_URL = "http://www.test.url";
     protected static final String TEST_FAKE_CLIENT_TOKEN = "fake_client_token";
     protected static final String LOG_TEST_DATA_1_KB =

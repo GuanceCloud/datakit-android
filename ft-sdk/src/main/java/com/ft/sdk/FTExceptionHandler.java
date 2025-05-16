@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.ErrorType;
-import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
+import com.ft.sdk.garble.threadpool.DataProcessThreadPool;
 import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
 import com.ft.sdk.garble.threadpool.RunnerCompleteCallBack;
 import com.ft.sdk.garble.utils.Constants;
@@ -178,7 +178,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
      * @param nativeDumpPath 生成 ANR 或 Native Crash tombstone 文件路径
      */
     public void checkAndSyncPreDump(final String nativeDumpPath, RunnerCompleteCallBack callBack) {
-        DataUploaderThreadPool.get().execute(new Runnable() {
+        DataProcessThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
                 File file = new File(nativeDumpPath);

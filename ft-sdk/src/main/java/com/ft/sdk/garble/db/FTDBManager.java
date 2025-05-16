@@ -594,10 +594,9 @@ public class FTDBManager extends DBManager {
      */
     public boolean insertFtOptList(@NonNull final List<SyncData> dataList, boolean reInsert) {
         final boolean[] result = new boolean[1];
-        getDB(true, new DataBaseCallBack() {
+        getDB(true, dataList.size(), new DataBaseCallBack() {
             @Override
             public void run(SQLiteDatabase db) {
-                db.beginTransaction();
                 int count = 0;
                 for (SyncData data : dataList) {
 
@@ -619,8 +618,6 @@ public class FTDBManager extends DBManager {
                     }
                 }
                 result[0] = count == dataList.size();
-                db.setTransactionSuccessful();
-                db.endTransaction();
             }
         });
         return result[0];
@@ -667,7 +664,7 @@ public class FTDBManager extends DBManager {
             public void run(SQLiteDatabase db) {
                 ContentValues value = new ContentValues();
                 String originType = dataType.getValue();
-                String targetDataType = originType.replace("_not_sample", "");
+                String targetDataType = originType.replace(DataType.ERROR_SAMPLED_SUFFIX, "");
 
                 boolean errorBefore = errorDateline < appStartTime;//切割上个生命周期的活动
                 String whereSql = FTSQL.RECORD_COLUMN_DATA_TYPE + "='" + originType + "' AND "
@@ -874,16 +871,13 @@ public class FTDBManager extends DBManager {
      * @param ids
      */
     public void delete(final List<String> ids, boolean oldCache) {
-        getDB(true, new DataBaseCallBack() {
+        getDB(true, ids.size(), new DataBaseCallBack() {
             @Override
             public void run(SQLiteDatabase db) {
-                db.beginTransaction();
                 String tableName = oldCache ? FTSQL.FT_SYNC_OLD_CACHE_TABLE_NAME : FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME;
                 for (String id : ids) {
                     db.delete(tableName, FTSQL.RECORD_COLUMN_ID + "=?", new String[]{id});
                 }
-                db.setTransactionSuccessful();
-                db.endTransaction();
             }
         });
     }

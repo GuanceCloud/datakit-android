@@ -3,7 +3,7 @@ package com.ft.sdk.tests;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import com.ft.sdk.garble.threadpool.DataUploaderThreadPool;
+import com.ft.sdk.garble.threadpool.DataProcessThreadPool;
 
 import org.junit.Test;
 
@@ -16,24 +16,24 @@ public class ThreadPoolTest {
 
 
     /**
-     * 线程池执行过程，中介重启，验证当下状态是否正确
+     * 线程池执行过程，中间重启，验证当下状态是否正确
      */
     @Test
     public void testReThreadPool() {
 
-        DataUploaderThreadPool.get().execute(() -> {
+        DataProcessThreadPool.get().execute(() -> {
             while (true) {
             }
         });
 
 
-        DataUploaderThreadPool.get().shutDown();
+        DataProcessThreadPool.get().shutDown();
 
-        assertFalse(DataUploaderThreadPool.get().poolRunning());
+        assertFalse(DataProcessThreadPool.get().poolRunning());
 
 
-        DataUploaderThreadPool.get().reStartPool();
-        assertTrue(DataUploaderThreadPool.get().poolRunning());
+        DataProcessThreadPool.get().reStartPool();
+        assertTrue(DataProcessThreadPool.get().poolRunning());
     }
 
 }
