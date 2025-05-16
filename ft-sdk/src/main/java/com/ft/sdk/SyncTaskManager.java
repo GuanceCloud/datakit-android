@@ -129,11 +129,6 @@ public class SyncTaskManager {
     private long errorTimeLine = -1;
 
     /**
-     * 应用启动时间
-     */
-    private long appStartTime = -1;
-
-    /**
      * 设置错误发生时间
      *
      * @param errorTimeLine
@@ -250,7 +245,7 @@ public class SyncTaskManager {
      */
     private synchronized void errorSampledConsume(DataType dataType) {
         if (errorTimeLine > 0) {
-            int updateCount = FTDBManager.get().updateDataType(dataType, appStartTime, errorTimeLine);
+            int updateCount = FTDBManager.get().updateDataType(dataType, errorTimeLine);
             if (updateCount > 0) {
                 LogUtils.d(TAG, "errorSampledConsume updateDataType:" + dataType + ","
                         + updateCount + ", before ns:" + errorTimeLine);
@@ -528,7 +523,7 @@ public class SyncTaskManager {
             @Override
             public void run() {
                 errorTimeLine = getErrorTimeLineFromFileCache();
-                appStartTime = Utils.getAppStartTimeNs();
+//                appStartTime = Utils.getAppStartTimeNs();
             }
         });
 

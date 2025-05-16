@@ -630,7 +630,7 @@ public class FTDBManager extends DBManager {
      *
      * @param dataType
      */
-    public int updateDataType(DataType dataType, long appStartTime, long errorDateline) {
+    public int updateDataType(DataType dataType, long errorDateline) {
         final int[] count = new int[1];
         getDB(true, new DataBaseCallBack() {
             @Override
@@ -639,10 +639,8 @@ public class FTDBManager extends DBManager {
                 String originType = dataType.getValue();
                 String targetDataType = originType.replace(DataType.ERROR_SAMPLED_SUFFIX, "");
 
-                boolean errorBefore = errorDateline < appStartTime;//切割上个生命周期的活动
                 String whereSql = FTSQL.RECORD_COLUMN_DATA_TYPE + "='" + originType + "' AND "
-                        + FTSQL.RECORD_COLUMN_TM + " <= " + errorDateline +
-                        (errorBefore ? "" : " AND " + FTSQL.RECORD_COLUMN_TM + " <=" + appStartTime);
+                        + FTSQL.RECORD_COLUMN_TM + " <= " + errorDateline;
                 Cursor cursor = db.rawQuery("select count(*) from " + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME
                         + " where " + whereSql, null);
                 if (cursor.moveToFirst()) {
