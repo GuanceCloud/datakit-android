@@ -61,6 +61,11 @@ public class DataUploadThreadPool extends BaseThreadPool {
     }
 
     private void scheduleTask(long delay) {
+        if (!poolRunning()) {
+            reStartPool();
+        }
+        if (executor == null) return;
+
         if (delay > 0) {
             LogUtils.d(TAG, "******************* Sync Poll Waiting *******************>>>");
         }
