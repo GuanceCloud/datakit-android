@@ -252,7 +252,7 @@ public class SyncDataHelper {
                     mergeTags.putAll(rumTags);
                 }
             }
-
+            appLineModifier(measurement, mergeTags, fields);
             bodyContent = convertToLineProtocolLine(measurement, mergeTags, fields,
                     timeStamp, config);
         } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_APP_ERROR_SAMPLED

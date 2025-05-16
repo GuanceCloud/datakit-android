@@ -5,7 +5,7 @@ package com.ft.sdk.garble.threadpool;
  * 与 {@link com.ft.sdk.internal.anr.ANRDetectRunnable} 一起使用
  *
  */
-public class ANRDetectThreadPool extends BaseThreadPool {
+public class ANRDetectThreadPool extends BaseThreadPoolExecutor {
     private final static int CORE_POOL_SIZE = 1;
 
     private static ANRDetectThreadPool threadPoolUtils;

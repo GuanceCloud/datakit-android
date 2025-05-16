@@ -248,6 +248,7 @@ public class FTRUMInnerManager {
         if (property != null) {
             activeAction.getProperty().putAll(property);
         }
+        activeAction.setCollectType(checkSessionWillCollect(activeAction.getSessionId()));
         initAction(activeAction, true);
 //        this.lastUserActiveTime = activeAction.getStartTime();
     }

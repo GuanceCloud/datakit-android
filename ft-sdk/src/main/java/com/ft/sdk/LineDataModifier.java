@@ -8,11 +8,16 @@ import java.util.Map;
  */
 public interface LineDataModifier {
     /**
-     * 修改逻辑，只返回被修改的 key-value 对
+     * 对某一行数据进行修改
      *
-     * @param measurement 测量名
-     * @param data        合并后的
-     * @return 被修改过的键值对（返回 null 或空 map 均为不更改）
+     * @param measurement 数据指标类型 {@link com.ft.sdk.garble.utils.Constants#FT_MEASUREMENT_RUM_VIEW}
+     *                    {@link com.ft.sdk.garble.utils.Constants#FT_MEASUREMENT_RUM_ACTION}
+     *                    {@link com.ft.sdk.garble.utils.Constants#FT_MEASUREMENT_RUM_LONG_TASK}
+     *                    {@link com.ft.sdk.garble.utils.Constants#FT_MEASUREMENT_RUM_RESOURCE}
+     *                    {@link com.ft.sdk.garble.utils.Constants#FT_MEASUREMENT_RUM_ERROR}
+     *                    {@link com.ft.sdk.garble.utils.Constants#FT_LOG_DEFAULT_MEASUREMENT}
+     * @param data        原始数据的 key-value 对
+     * @return 需要修改的 key-value，（返回 null 或空 map 均为不更改
      */
     Map<String, Object> modify(String measurement, HashMap<String, Object> data);
 }

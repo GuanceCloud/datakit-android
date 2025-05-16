@@ -1,3 +1,7 @@
+# agent 1.7.0-alpha18
+1. 合并 ft-sdk 1.6.11
+
+---
 # agent 1.7.0-alpha17
 1. 合并 ft-sdk 1.6.11-alpha02
 
@@ -58,6 +62,31 @@
 1. 支持开启 session replay 录制功能
 
 ---
+# agent 1.6.11
+1. 添加 `FTRUMConfig.setEnableTraceUserViewInFragment` 支持 fragment view 数据采集，默认为 false
+2. 添加 `FTSDKConfig.setLineDataModifier`、`FTSDKConfig.setDataModifier` 支持数据写入替换，支持数据脱敏
+3. 添加 `FTRUMConfig.setSessionErrorSampleRate` 支持错误采样，在未被 `setSamplingRate`采样时，
+   在发生错误时可以对 1 分钟前的 rum 的数据进行取样采集
+4. `FTSDKConfig.setEnableAccessAndroidID(false)`时, 使用本地随机 `uuid` 作为 `device_uuid`
+5. 优化高频日志写入，优化数据同步以及数据闲置关闭的逻辑
+
+---
+
+# agent 1.6.11-beta02
+1. 修正 `FTRUMConfig.setSessionErrorSampleRate` 采样数据不上报的问题
+2. 修正命中 `FTRUMConfig.setSessionErrorSampleRate` 采样，发生错误的页面，`view_error_count` 为 0 的问题
+
+---
+# agent 1.6.11-beta01
+1. 同 agent 1.6.11-alpha03
+
+---
+# agent 1.6.11-alpha03
+1. 优化数据同步逻辑
+2. 优化数据库闲置关闭逻辑
+3. FTSDKConfig.setEnableAccessAndroidID(false), 使用本地随机 uuid 作为 device_uuid
+
+---
 # agent 1.6.11-alpha02
 1. 添加 `FTRUMConfig.setSessionErrorSampleRate` 支持错误采样，在发生错误时可以对 1 分钟前的 rum 的数据进行取样采集
 
@@ -80,7 +109,7 @@
 
 ---
 # agent 1.6.10-beta01
-1. 通 agent 1.6.10-alpha03
+1. 同 agent 1.6.10-alpha03
 
 ---
 # agent 1.6.10-alpha03
