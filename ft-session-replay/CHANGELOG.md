@@ -1,3 +1,8 @@
+# replay 0.1.2-alpha01
+1. 添加 `FTSessionReplayConfig.setSessionReplayOnErrorSampleRate` 支持错误采样，在未被 `setSamplingRate`采样时，
+   在发生错误时可以对 1 分钟前的 session replay 的数据进行取样采集
+
+---
 # replay 0.1.1-alpha01
 1. 新增 TextAndInputPrivacy，TouchPrivacy 设置
 2. 支持对单独页面隐私进行覆盖 TextAndInputPrivacy 和 TouchPrivacy 的设置

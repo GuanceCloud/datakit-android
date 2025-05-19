@@ -54,7 +54,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
             "Session Replay feature received an event with unknown value of \"type\" property=%s.";
 
     public static final String EVENT_MISSING_MANDATORY_FIELDS =
-            "Session Replay feature received an event where one or more mandatory (keepSession) fields" +
+            "Session Replay feature received an event where one or more mandatory (collect_key) fields" +
                     " are either missing or have wrong type.";
 
     public static final String CANNOT_START_RECORDING_NOT_INITIALIZED =
@@ -239,10 +239,10 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
 
     @SuppressWarnings("ReturnCount")
     private void checkStatusAndApplySample(Map<?, ?> sessionMetadata) {
-        Boolean keepSession = (Boolean) sessionMetadata.get(SessionReplayConstants.RUM_KEEP_SESSION_BUS_MESSAGE_KEY);
+        String collectType = (String) sessionMetadata.get(SessionReplayConstants.RUM_KEEP_SESSION_BUS_COLLECT_TYPE_KEY);
         String sessionId = (String) sessionMetadata.get(SessionReplayConstants.RUM_SESSION_ID_BUS_MESSAGE_KEY);
 
-        if (keepSession == null || sessionId == null) {
+        if (collectType == null || sessionId == null) {
             sdkCore.getInternalLogger().w(TAG, EVENT_MISSING_MANDATORY_FIELDS);
             return;
         }
@@ -257,13 +257,16 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
 
         boolean sessionSampled = sessionRelaySampler.sample();
         boolean sessionErrorSampled = !sessionSampled && sessionRelayErrorSampler.sample();
-        if (keepSession && (sessionSampled || sessionErrorSampled)) {
+        if ("collect_by_sample".equals(collectType) && (sessionSampled || sessionErrorSampled)) {
             if (sessionErrorSampled) {
                 sdkCore.setConsentProvider(TrackingConsent.SAMPLED_ON_ERROR_SESSION);
             } else {
                 sdkCore.setConsentProvider(TrackingConsent.GRANTED);
             }
             startRecording(sessionErrorSampled);
+        } else if ("collect_by_error_sample".equals(collectType) && (sessionSampled || sessionErrorSampled)) {
+            sdkCore.setConsentProvider(TrackingConsent.SAMPLED_ON_ERROR_SESSION);
+            startRecording(true);
         } else {
             sdkCore.getInternalLogger().w(TAG, SESSION_SAMPLED_OUT_MESSAGE);
             stopRecording();

@@ -29,7 +29,7 @@ public class SessionReplayRecordWriter implements RecordWriter {
         boolean forceNew = !viewId.equals(record.getViewId());
         if (forceNew) {
             viewId = record.getViewId();
-            sdkCore.getInternalLogger().i(TAG, "forceNew:viewId:" + viewId);
+            sdkCore.getInternalLogger().i(TAG, "SR forceNew:viewId:" + viewId);
         }
 
         sdkCore.getFeature(Feature.SESSION_REPLAY_FEATURE_NAME).withWriteContext(forceNew, new DataConsumerCallback() {

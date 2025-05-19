@@ -105,7 +105,7 @@ public class SessionReplayDataUploadRunnable implements Runnable {
                                                 + "/" + file.getName());
                                 //移动至正常上传对列
                                 if (moveFile(file, moveTargetPath)) {
-                                    internalLogger.d(TAG, "consumeErrorSampledData:" + file.getName());
+                                    internalLogger.d(TAG, "SR consumeErrorSampledData:" + file.getName());
                                 }
                             }
                             deleteExpired(file, timeNow);
@@ -165,7 +165,7 @@ public class SessionReplayDataUploadRunnable implements Runnable {
         long fileLastModified = file.lastModified();
         if (timeNow - fileLastModified > ONE_MINUTES_IN_SECOND) {
             if (file.delete()) {
-                internalLogger.w(TAG, "delete expire file:" + file.getName());
+                internalLogger.w(TAG, "SR delete expire file:" + file.getName());
             }
         }
     }

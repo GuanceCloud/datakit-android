@@ -102,14 +102,6 @@ public class SDKFeature implements FeatureScope {
         if (initialized.get()) {
             return;
         }
-
-        //设置需要支持的版本
-        if (!VersionUtils.firstVerGreaterEqual(FTSdk.SESSION_REPLAY_VERSION, "0.1.0-alpha09")) {
-            internalLogger.e(TAG, "need install more than ft-session-replay:0.1.0-alpha09");
-            return;
-        }
-
-
         DataUploadConfiguration dataUploadConfiguration;
 
         if (wrappedFeature instanceof StorageBackedFeature) {
