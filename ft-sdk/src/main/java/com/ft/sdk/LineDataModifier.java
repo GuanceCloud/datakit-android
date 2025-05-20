@@ -16,7 +16,7 @@ public interface LineDataModifier {
      *                    {@link com.ft.sdk.garble.utils.Constants#FT_MEASUREMENT_RUM_RESOURCE}
      *                    {@link com.ft.sdk.garble.utils.Constants#FT_MEASUREMENT_RUM_ERROR}
      *                    {@link com.ft.sdk.garble.utils.Constants#FT_LOG_DEFAULT_MEASUREMENT}
-     * @param data        原始数据的 key-value 对
+     * @param data        原始数据的 key-value 对，value 为 null 则不做更改
      * @return 需要修改的 key-value，（返回 null 或空 map 均为不更改
      */
     Map<String, Object> modify(String measurement, HashMap<String, Object> data);
