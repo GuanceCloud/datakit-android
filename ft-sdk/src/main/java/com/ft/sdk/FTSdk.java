@@ -116,7 +116,7 @@ public class FTSdk {
      *
      * @return
      */
-    static boolean checkInstallState() {
+    public static boolean checkInstallState() {
         return mFtSdk != null && mFtSdk.mFtSDKConfig != null;
     }
 

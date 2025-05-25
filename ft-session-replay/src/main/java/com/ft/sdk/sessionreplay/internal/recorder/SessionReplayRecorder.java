@@ -77,7 +77,7 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
     private final SessionReplayInternalCallback internalCallback;
     private final InternalLogger internalLogger;
     private final Handler uiHandler;
-    private boolean shouldRecord = false;
+    protected boolean shouldRecord = false;
     private final FeatureSdkCore sdkCore;
     private boolean isDelayInit;
 
@@ -292,7 +292,10 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
             viewOnDrawInterceptor.intercept(decorViews, textAndInputPrivacy, imagePrivacy);
         }
     }
-
+    // add by zzq
+    public RecordedDataQueueHandler getRecordedDataQueueHandler() {
+        return recordedDataQueueHandler;
+    }
     private static final long THREAD_POOL_MAX_KEEP_ALIVE_MS = DateUtils.SECOND_IN_MILLIS * 5; // 5000ms
     private static final int CORE_DEFAULT_POOL_SIZE = 1; // Only one thread will be kept alive
 }

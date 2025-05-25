@@ -35,6 +35,7 @@ import com.ft.sdk.sessionreplay.internal.recorder.mapper.RadioButtonMapper;
 import com.ft.sdk.sessionreplay.internal.recorder.mapper.SeekBarWireframeMapper;
 import com.ft.sdk.sessionreplay.internal.recorder.mapper.SwitchCompatMapper;
 import com.ft.sdk.sessionreplay.internal.recorder.mapper.WebViewWireframeMapper;
+import com.ft.sdk.sessionreplay.internal.recorder.FlutterUIAwareRecorder;
 import com.ft.sdk.sessionreplay.internal.resources.ResourceDataStoreManager;
 import com.ft.sdk.sessionreplay.internal.storage.RecordWriter;
 import com.ft.sdk.sessionreplay.internal.storage.ResourcesWriter;
@@ -71,6 +72,18 @@ public class DefaultRecorderProvider implements RecorderProvider {
     private final boolean dynamicOptimizationEnabled;
     private final SessionReplayInternalCallback internalCallback;
     private final boolean isDelayInit;
+    private boolean useFlutterUIData = false; // added by zzq   
+
+    @Override
+    public void setUseFlutterUIData(boolean useFlutterData) {
+        this.useFlutterUIData = useFlutterData;
+    }
+    
+    @Override
+    public boolean isUsingFlutterUIData() {
+        return useFlutterUIData;
+    }
+    
 
     public DefaultRecorderProvider(
             FeatureSdkCore sdkCore,
@@ -108,6 +121,28 @@ public class DefaultRecorderProvider implements RecorderProvider {
         List<MapperTypeWrapper<?>> mappers = new ArrayList<>(customMappers);
         mappers.addAll(builtInMappers());
 
+               // 如果使用Flutter UI数据，则创建一个不进行UI采集的录制器
+               if (useFlutterUIData) {
+                   return new FlutterUIAwareRecorder(
+                           application,
+                           resourceWriter,
+                           rumContextProvider,
+                           textAndInputPrivacy,
+                           imagePrivacy,
+                           touchPrivacyManager,
+                           recordWriter,
+                           timeProvider,
+                           mappers,
+                           customOptionSelectorDetectors,
+                           customDrawableMappers,
+                           null,
+                           sdkCore,
+                           resourceDataStoreManager,
+                           internalCallback,
+                           dynamicOptimizationEnabled,
+                           isDelayInit
+                   );
+            } else {
         return new SessionReplayRecorder(
                 application,
                 resourceWriter,
@@ -127,6 +162,7 @@ public class DefaultRecorderProvider implements RecorderProvider {
                 dynamicOptimizationEnabled,
                 isDelayInit
         );
+            }
     }
 
     private List<MapperTypeWrapper<?>> builtInMappers() {

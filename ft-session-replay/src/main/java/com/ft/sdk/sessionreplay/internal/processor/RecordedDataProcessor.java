@@ -175,6 +175,17 @@ public class RecordedDataProcessor implements Processor {
             writer.write(bundleRecordInEnrichedRecord(newRumContext, records));
         }
     }
+    @WorkerThread
+    public void handleExternalFullSnapshot(MobileRecord.MobileFullSnapshotRecord mobileRecord, SessionReplayRumContext rumContext) { //added by zzq
+        EnrichedRecord enrichedRecord = bundleRecordInEnrichedRecord(rumContext, List.of(mobileRecord));
+        writer.write(enrichedRecord);
+    }
+
+    @WorkerThread
+    public void handleExternalIncrementalUpdate(MobileRecord.MobileIncrementalSnapshotRecord mobileRecord, SessionReplayRumContext rumContext) { //added by zzq
+        EnrichedRecord enrichedRecord = bundleRecordInEnrichedRecord(rumContext, List.of(mobileRecord));
+        writer.write(enrichedRecord);
+    }
 
     private boolean isTimeForFullSnapshot() {
         if (System.nanoTime() - lastSnapshotTimestamp >= FULL_SNAPSHOT_INTERVAL_IN_NS) {

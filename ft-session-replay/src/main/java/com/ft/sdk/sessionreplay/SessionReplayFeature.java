@@ -4,6 +4,12 @@ package com.ft.sdk.sessionreplay;
 import android.app.Application;
 import android.content.Context;
 
+import com.ft.sdk.sessionreplay.internal.SessionReplayRumContextProvider;
+import com.ft.sdk.sessionreplay.internal.async.RecordedDataQueueHandler;
+import com.ft.sdk.sessionreplay.internal.processor.MutationResolver;
+import com.ft.sdk.sessionreplay.internal.processor.RecordedDataProcessor;
+import com.ft.sdk.sessionreplay.internal.recorder.SessionReplayRecorder;
+import com.ft.sdk.sessionreplay.model.MobileRecord;
 import com.ft.sdk.feature.FeatureEventReceiver;
 import com.ft.sdk.feature.FeatureSdkCore;
 import com.ft.sdk.feature.FeatureStorageConfiguration;
@@ -23,7 +29,10 @@ import com.ft.sdk.sessionreplay.internal.storage.RecordWriter;
 import com.ft.sdk.sessionreplay.internal.storage.SessionReplayRecordWriter;
 import com.ft.sdk.sessionreplay.recorder.OptionSelectorDetector;
 import com.ft.sdk.sessionreplay.utils.DrawableToColorMapper;
+import com.ft.sdk.sessionreplay.utils.RumContextProvider;
+import com.ft.sdk.sessionreplay.utils.SessionReplayRumContext;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -79,6 +88,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
     private final ImagePrivacy imagePrivacy;
     private final Sampler rateBasedSampler;
     private final RecorderProvider recorderProvider;
+    private RecordedDataQueueHandler recordedDataQueueHandler;
 
     private final AtomicReference<String> currentRumSessionId = new AtomicReference<>();
 
@@ -88,6 +98,8 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
     RecordWriter
             dataWriter = new NoOpRecordWriter();
     final AtomicBoolean initialized = new AtomicBoolean(false);
+    private RecordedDataProcessor processor; //added by zzq
+    private RumContextProvider rumContextProvider;
 
     // region Constructor
 
@@ -184,6 +196,8 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
         );
         sessionReplayRecorder.registerCallbacks();
         initialized.set(true);
+        recordedDataQueueHandler = ((SessionReplayRecorder) sessionReplayRecorder).getRecordedDataQueueHandler(); //added by zzq
+        rumContextProvider = new SessionReplayRumContextProvider(sdkCore);//added by zzq
         sdkCore.updateFeatureContext(getName(), new SessionReplayRecordCallback.UpdateCallBack() {
             @Override
             public void onUpdate(Map<String, Object> context) {
@@ -196,6 +210,14 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                 context.put(SESSION_REPLAY_MANUAL_RECORDING_KEY, false);
             }
         });
+        // 初始化 processor
+        this.processor = new RecordedDataProcessor(
+                resourceDataStoreManager,
+                resourcesFeature.getDataWriter(),
+                dataWriter,
+                new MutationResolver(sdkCore.getInternalLogger())
+        );
+
     }
 
 
@@ -272,7 +294,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
     /**
      * Resumes the replay recorder.
      */
-    void startRecording() {
+    public void startRecording() {
         // Check initialization again so we don't forget to do it when this method is made public
         if (checkIfInitialized() && !isRecording.getAndSet(true)) {
             sdkCore.updateFeatureContext(getName(), new SessionReplayRecordCallback.UpdateCallBack() {
@@ -294,7 +316,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
     /**
      * Stops the replay recorder.
      */
-    void stopRecording() {
+   public void stopRecording() {
         if (isRecording.getAndSet(false)) {
             sdkCore.updateFeatureContext(getName(),
                     new SessionReplayRecordCallback.UpdateCallBack() {
@@ -315,5 +337,60 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
         return resourcesFeature;
     }
 
+    /**
+     * 处理外部提供的完整屏幕快照, added by zzq
+     * @param mobileRecord 完整屏幕快照记录
+     * @param rumContext RUM上下文
+     */
+    public void processExternalFullSnapshot(MobileRecord.MobileFullSnapshotRecord mobileRecord, 
+                                           SessionReplayRumContext rumContext) {
+        if (!checkIfInitialized()) {
+            return;
+        }
+        
+        // 直接调用 processor 处理记录
+        processor.handleExternalFullSnapshot(mobileRecord, rumContext);
+    }
+
+    /**
+     * 处理外部提供的增量更新 , added by zzq
+     * @param mobileRecord 增量更新记录
+     * @param rumContext RUM上下文
+     */
+    public void processExternalIncrementalUpdate(MobileRecord.MobileIncrementalSnapshotRecord mobileRecord,
+                                               SessionReplayRumContext rumContext) {
+        if (!checkIfInitialized()) {
+            return;
+        }
+        
+        // 直接调用 processor 处理增量更新
+        processor.handleExternalIncrementalUpdate(mobileRecord, rumContext);
+    }
+
+    /**
+     * 创建一个空的RUM上下文，用于外部调用 added by zzq 
+     * @return SessionReplayRumContext实例
+     */
+    public SessionReplayRumContext createEmptyRumContext() {
+
+        if (rumContextProvider == null) {
+            return new SessionReplayRumContext(); // 返回一个空的上下文
+        }
+        return new SessionReplayRumContext(
+                rumContextProvider.getRumContext().getApplicationId(),
+                rumContextProvider.getRumContext().getSessionId(),
+                rumContextProvider.getRumContext().getViewId()
+        );
+    }
+
+    /**
+     * 配置是否使用Flutter提供的UI数据, added by zzq
+     * @param useFlutterUIData 是否使用Flutter UI数据
+     */
+    public void setUseFlutterUIData(boolean useFlutterUIData) {
+        if (recorderProvider instanceof DefaultRecorderProvider) {
+            ((DefaultRecorderProvider) recorderProvider).setUseFlutterUIData(useFlutterUIData);
+        }
+    }
 
 }

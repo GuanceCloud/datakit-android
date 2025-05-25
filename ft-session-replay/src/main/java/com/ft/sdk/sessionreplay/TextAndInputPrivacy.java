@@ -19,8 +19,11 @@ public enum TextAndInputPrivacy implements PrivacyLevel {
      */
     MASK_ALL_INPUTS,
 
+    MASK_NONE, //zzq
+
     /**
      * All text and inputs will be masked.
      */
     MASK_ALL;
+
 }

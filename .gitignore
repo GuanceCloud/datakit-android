@@ -2,10 +2,14 @@
 .gradle
 /local.properties
 /.idea
+.idea/
+/ft-plugin/bin/
 .DS_Store
 /build
 /captures
 .externalNativeBuild
 .cxx
+.class
 /repo
 /.java-version
+ft-sdk/local.properties

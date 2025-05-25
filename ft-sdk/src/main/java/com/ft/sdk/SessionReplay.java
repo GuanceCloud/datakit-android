@@ -17,7 +17,7 @@ public class SessionReplay {
      *
      * @param ftSessionReplayConfig Configuration to use for the feature.
      */
-    static void enable(
+    public static void enable(
             FTSessionReplayConfig ftSessionReplayConfig, Context context
     ) {
         FeatureSdkCore featureSdkCore = SessionReplayManager.get();

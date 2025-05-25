@@ -14,4 +14,15 @@ public interface RecorderProvider {
             RecordWriter recordWriter,
             Application application
     );
+    /**
+     * 指示是否使用Flutter UI数据而不是原生UI采集, added by zzq
+     * @param useFlutterData 是否使用Flutter数据
+     */
+    void setUseFlutterUIData(boolean useFlutterData);
+    
+    /**
+     * 检查是否使用Flutter UI数据, added by zzq 
+     * @return 是否使用Flutter数据
+     */
+    boolean isUsingFlutterUIData();
 }
