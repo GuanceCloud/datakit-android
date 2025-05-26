@@ -50,6 +50,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -57,7 +58,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -553,7 +553,8 @@ public class Utils {
      * @param values
      * @return
      */
-    public static String setToJsonString(Set<String> values) {
+    public static String setToJsonString(Collection<String> values) {
+        if (values == null) return null;
         StringBuilder jsonBuilder = new StringBuilder();
         jsonBuilder.append("[");
         Iterator<String> iterator = values.iterator();

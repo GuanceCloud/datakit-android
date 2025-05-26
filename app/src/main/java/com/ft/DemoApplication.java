@@ -19,7 +19,9 @@ import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.utils.CrossProcessSetting;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -112,6 +114,8 @@ public class DemoApplication extends BaseApplication {
                         .setEnableTraceUserResource(true)
                         .setEnableTrackAppANR(true)
                         .setEnableTrackAppCrash(true)
+//                        .setEnableTraceWebView(true)
+//                        .setAllowWebViewHost(List.of("10.100.64.166"))
                         .setEnableTrackAppUIBlock(true, 100)
                         .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
                         .setResourceUrlHandler(url -> false)
