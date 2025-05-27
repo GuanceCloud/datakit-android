@@ -83,17 +83,21 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
      * @param webview
      */
     public void setWebView(WebView webview) {
-        setWebView(webview, null);
-
+        FTRUMConfig config = FTRUMConfigManager.get().getConfig();
+        if (config != null && config.isEnableTraceWebView()) {
+            setWebView(webview, config.getAllowWebViewHost());
+        }
     }
 
-    public void setWebView(WebView webview, List<String> allowWebviewHost) {
+    public void setWebView(WebView webview, List<String> allowWebViewHost) {
         mWebView = webview;
         Activity activity = AopUtils.getActivityFromContext(webview.getContext());
         nativeViewName = AopUtils.getClassName(activity);
         webview.getSettings().setJavaScriptEnabled(true);
-        webview.addJavascriptInterface(new WebAppInterface(webview.getContext(), this, allowWebviewHost),
+        webview.addJavascriptInterface(new WebAppInterface(webview.getContext(), this, allowWebViewHost),
                 FT_WEB_VIEW_JAVASCRIPT_BRIDGE);
+        webview.setTag(R.id.ft_webview_handled_tag_view_value, "handled");
+
     }
 
 

@@ -637,13 +637,7 @@ public class FTAutoTrack {
      */
     public static void setUpWebView(View webView) {
         if (webView instanceof WebView && webView.getTag(R.id.ft_webview_handled_tag_view_value) == null) {
-
-            FTRUMConfig config = FTRUMConfigManager.get().getConfig();
-            if (config != null && config.isEnableTraceWebView()) {
-                new FTWebViewHandler().setWebView((WebView) webView, config.getAllowWebViewHost());
-                webView.setTag(R.id.ft_webview_handled_tag_view_value, "handled");
-            }
-
+            new FTWebViewHandler().setWebView((WebView) webView);
         }
     }
 
