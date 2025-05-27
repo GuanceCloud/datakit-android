@@ -1,3 +1,9 @@
+# agent 1.6.12-alpha01
+1. 添加 `FTRUMConfig.setEnableTraceWebView` 配置是否开启通过 SDK 采集 webview 数据,
+   通过 `FTRUMConfig.setAllowWebViewHost` 可以控制需要过滤 host 地址
+2. 添加 `ContentHandlerHelperEx.onExceptionWithFilter`, 可以针对本地网络错误进行过滤
+
+---
 # agent 1.6.11
 1. 添加 `FTRUMConfig.setEnableTraceUserViewInFragment` 支持 fragment view 数据采集，默认为 false
 2. 添加 `FTSDKConfig.setLineDataModifier`、`FTSDKConfig.setDataModifier` 支持数据写入替换，支持数据脱敏
