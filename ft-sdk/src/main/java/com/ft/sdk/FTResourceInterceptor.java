@@ -11,7 +11,6 @@ import com.ft.sdk.garble.utils.Utils;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.HashMap;
-import java.util.UUID;
 
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
@@ -38,9 +37,6 @@ public class FTResourceInterceptor implements Interceptor {
      * 追加自定义采集的数据
      */
     public abstract static class ContentHandlerHelper {
-
-        private final HashMap<String, Object> extraData = new HashMap<>();
-
         /**
          * OKHttp Request
          *
@@ -58,12 +54,32 @@ public class FTResourceInterceptor implements Interceptor {
         public abstract void onResponse(Response response, HashMap<String, Object> extraData) throws IOException;
 
         /**
+         * 返回网络链接过程中的异常, 会覆盖 SDK {@link com.ft.sdk.garble.bean.ErrorType#NETWORK} 类型的错误
+         *
+         * @param e         请求发生的 IOException 数据
+         * @param extraData 附加数据
+         * @deprecated Use {@link ContentHandlerHelperEx#onExceptionWithFilter(Exception, HashMap)} instead.
+         */
+        @Deprecated
+        public void onException(Exception e, HashMap<String, Object> extraData) {
+
+        }
+    }
+
+    /**
+     * {@link ContentHandlerHelper } 的基础上，可以过滤本地错误类型
+     */
+    public static abstract class ContentHandlerHelperEx extends ContentHandlerHelper {
+        /**
          * 返回网络链接过程中的异常
          *
          * @param e         请求发生的 IOException 数据
          * @param extraData 附加数据
+         * @return 是否覆盖 SDK {@link com.ft.sdk.garble.bean.ErrorType#NETWORK} 类型的错误
          */
-        public abstract void onException(Exception e, HashMap<String, Object> extraData);
+        public boolean onExceptionWithFilter(Exception e, HashMap<String, Object> extraData) {
+            return true;
+        }
 
     }
 
@@ -98,9 +114,10 @@ public class FTResourceInterceptor implements Interceptor {
         boolean isInTakeUrl = rumConfig == null || rumConfig
                 .getResourceUrlHandler().isInTakeUrl(url);
 
+        final HashMap<String, Object> extraData = (handlerHelper != null) ? new HashMap<>() : null;
         try {
             if (handlerHelper != null) {
-                handlerHelper.onRequest(request, handlerHelper.extraData);
+                handlerHelper.onRequest(request, extraData);
             }
             response = chain.proceed(request);
 
@@ -110,7 +127,7 @@ public class FTResourceInterceptor implements Interceptor {
             }
 
             if (handlerHelper != null) {
-                handlerHelper.onResponse(response, handlerHelper.extraData);
+                handlerHelper.onResponse(response, extraData);
             }
 
         } catch (IOException e) {
@@ -175,20 +192,30 @@ public class FTResourceInterceptor implements Interceptor {
                 }
             }
         } else {
+            boolean override = false;
             if (handlerHelper != null) {
-                handlerHelper.onException(exception, handlerHelper.extraData);
-            } else {
+                if (handlerHelper instanceof ContentHandlerHelperEx) {
+                    override = ((ContentHandlerHelperEx) handlerHelper)
+                            .onExceptionWithFilter(exception, extraData);
+                } else {
+                    handlerHelper.onException(exception, extraData);
+                    override = true;
+                }
+            }
+
+            if (!override) {
                 params.requestErrorStack = LogUtils.getStackTraceString(exception);
                 params.requestErrorMsg = LogUtils.getNetworkExceptionDesc(exception);
             }
         }
 
         if (handlerHelper != null) {
-            if (params.property == null) {
-                params.property = new HashMap<>();
+            if (extraData != null) {
+                if (params.property == null) {
+                    params.property = new HashMap<>();
+                }
+                params.property.putAll(extraData);
             }
-            params.property.putAll(handlerHelper.extraData);
-
         }
 
 
