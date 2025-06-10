@@ -6,7 +6,7 @@ import com.ft.sdk.garble.utils.Constants;
 
 /**
  * 链路类型
- *
+ * <p>
  * 用于 {@link FTTraceConfig#setTraceType(TraceType)} 使用，用于设置 http 请求链路使用 Header propagation
  *
  * @author Brandon
@@ -21,7 +21,6 @@ public enum TraceType {
      * x-datadog-origin
      *
      * <a href="https://docs.datadoghq.com/synthetics/apm/">了解更多</a>
-     *
      */
     DDTRACE,
 
@@ -33,7 +32,6 @@ public enum TraceType {
      * X-B3-Sampled
      *
      * <a href="https://github.com/openzipkin/b3-propagation">了解更多</a>
-     *
      */
     ZIPKIN_MULTI_HEADER,
 
@@ -79,5 +77,9 @@ public enum TraceType {
                 return super.toString().toLowerCase();
         }
 
+    }
+
+    public String value() {
+        return super.toString().toLowerCase();
     }
 }

@@ -107,6 +107,10 @@ public class FTHttpConfigManager {
         }
     }
 
+    public void setCompressIntakeRequests(boolean compressIntakeRequests) {
+        this.compressIntakeRequests = compressIntakeRequests;
+    }
+
     public String getDatakitUrl() {
         return datakitUrl;
     }

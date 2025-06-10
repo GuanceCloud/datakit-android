@@ -46,8 +46,7 @@ public class FTSdk {
     public static final String AGENT_VERSION = BuildConfig.FT_SDK_VERSION;//当前SDK 版本
     private static FTSdk mFtSdk;
     private final FTSDKConfig mFtSDKConfig;
-
-    private boolean isTVMode;
+    private RemoteConfigManager mRemoteConfigManager;
 
     /**
      * @param ftSDKConfig
@@ -128,7 +127,10 @@ public class FTSdk {
         EventConsumerThreadPool.get().shutDown();
         FTANRDetector.get().release();
         FTDBManager.release();
-        mFtSdk = null;
+        if (mFtSdk != null) {
+            mFtSdk.mRemoteConfigManager.close();
+            mFtSdk = null;
+        }
         LogUtils.w(TAG, "FT SDK 已经被关闭");
     }
 
@@ -144,6 +146,11 @@ public class FTSdk {
      */
     private void initFTConfig(FTSDKConfig config) {
         LogUtils.setDebug(config.isDebug());
+        if (config.isRemoteConfiguration()) {
+            mRemoteConfigManager = new RemoteConfigManager(config.getRemoteConfigMiniUpdateInterval());
+            mRemoteConfigManager.initFromLocalCache();
+            mRemoteConfigManager.mergeSDKConfigFromCache(config);
+        }
         LogUtils.setSDKLogLevel(config.getSdkLogLevel());
         LocalUUIDManager.get().initRandomUUID();
         FTDBCachePolicy.get().initSDKParams(config);
@@ -161,6 +168,23 @@ public class FTSdk {
     }
 
 
+    public static void updateRemoteConfig() {
+        if (checkInstallState()) {
+            if (mFtSdk.mRemoteConfigManager != null) {
+                mFtSdk.mRemoteConfigManager.updateRemoteConfig();
+            }
+        }
+    }
+
+    public static void updateRemoteConfig(int remoteConfigMiniUpdateInterval, RemoteConfigManager.FetchResult result) {
+        if (checkInstallState()) {
+            if (mFtSdk.mRemoteConfigManager != null) {
+                mFtSdk.mRemoteConfigManager.updateRemoteConfig(remoteConfigMiniUpdateInterval, result);
+            }
+        }
+    }
+
+
     /**
      * 设置 RUM 配置
      *
@@ -169,6 +193,10 @@ public class FTSdk {
     public static void initRUMWithConfig(@NonNull FTRUMConfig config) {
         try {
             config.setServiceName(get().getBaseConfig().getServiceName());
+            if (get().mRemoteConfigManager != null) {
+                get().mRemoteConfigManager.initFromRemote(config.getRumAppId());
+                get().mRemoteConfigManager.mergeRUMConfigFromCache(config);
+            }
             FTRUMConfigManager.get().initWithConfig(config);
             LogUtils.d(TAG, "initRUMWithConfig complete:" + config);
 
@@ -186,6 +214,9 @@ public class FTSdk {
     public static void initTraceWithConfig(@NonNull FTTraceConfig config) {
         try {
             config.setServiceName(get().getBaseConfig().getServiceName());
+            if (get().mRemoteConfigManager != null) {
+                get().mRemoteConfigManager.mergeTraceConfigFromCache(config);
+            }
             FTTraceConfigManager.get().initWithConfig(config);
             LogUtils.d(TAG, "initTraceWithConfig complete:" + config);
 
@@ -202,6 +233,9 @@ public class FTSdk {
     public static void initLogWithConfig(@NonNull FTLoggerConfig config) {
         try {
             config.setServiceName(get().getBaseConfig().getServiceName());
+            if (get().mRemoteConfigManager != null) {
+                get().mRemoteConfigManager.mergeLogConfigFromCache(config);
+            }
             FTLoggerConfigManager.get().initWithConfig(config);
             LogUtils.d(TAG, "initLogWithConfig complete:" + config);
 

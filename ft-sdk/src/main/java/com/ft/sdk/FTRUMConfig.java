@@ -131,7 +131,7 @@ public class FTRUMConfig {
     private RUMCacheDiscard rumCacheDiscardStrategy = RUMCacheDiscard.DISCARD;
 
     private boolean enableTraceWebView = true;
-    private List<String> allowWebViewHost;
+    private String[] allowWebViewHost;
 
     /**
      * 配置是否开启是否通过 SDK 采集 SDK 数据
@@ -148,7 +148,7 @@ public class FTRUMConfig {
      * @param allowWebViewHost
      * @return
      */
-    public FTRUMConfig setAllowWebViewHost(List<String> allowWebViewHost) {
+    public FTRUMConfig setAllowWebViewHost(String[] allowWebViewHost) {
         this.allowWebViewHost = allowWebViewHost;
         return this;
     }
@@ -157,7 +157,7 @@ public class FTRUMConfig {
         return enableTraceWebView;
     }
 
-    public List<String> getAllowWebViewHost() {
+    public String[] getAllowWebViewHost() {
         return allowWebViewHost;
     }
 

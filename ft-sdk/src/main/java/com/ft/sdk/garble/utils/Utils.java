@@ -47,6 +47,7 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -796,6 +797,25 @@ public class Utils {
         } else {
             return FTApplication.APP_START_TIME;
         }
+    }
+
+    public static String toMD5(String input) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("MD5");
+            byte[] hashBytes = digest.digest(input.getBytes("UTF-8"));
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hashBytes) {
+                // 转成两位十六进制（不足补0）
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1)
+                    hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (Exception e) {
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+        }
+        return "";
     }
 
 }
