@@ -125,6 +125,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="清理缓存数据" />
+
+        <Button
+            android:id="@+id/update_remote_config"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="立即拉取远程配置" />
     </LinearLayout>
 
 

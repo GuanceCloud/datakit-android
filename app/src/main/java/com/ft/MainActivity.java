@@ -17,34 +17,22 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.ft.sdk.FTLogger;
-import com.ft.sdk.FTRUMGlobalManager;
 import com.ft.sdk.FTResourceEventListener;
 import com.ft.sdk.FTResourceInterceptor;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceInterceptor;
+import com.ft.sdk.RemoteConfigManager;
 import com.ft.sdk.garble.annotation.IgnoreAOP;
-import com.ft.sdk.garble.bean.NetStatusBean;
-import com.ft.sdk.garble.bean.ResourceParams;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.reflect.ReflectUtils;
 import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.sdk.garble.utils.Utils;
 import com.ft.service.TestService;
 import com.ft.utils.RequestUtils;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -73,6 +61,55 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+
+    public final OkHttpClient client = new OkHttpClient.Builder()
+//                                .addInterceptor(new FTTraceInterceptor(new FTTraceInterceptor.HeaderHandler() {
+//                                    @Override
+//                                    public HashMap<String, String> getTraceHeader(Request request) {
+//                                        HashMap<String, String> map = new HashMap<>();
+//                                        map.put("custom_header","test_value");
+//                                        return map;
+//                                    }
+//                                }))
+            .addInterceptor(new FTTraceInterceptor())
+            .addInterceptor(new FTResourceInterceptor(new FTResourceInterceptor.ContentHandlerHelper() {
+                @Override
+                public void onRequest(Request request, HashMap<String, Object> extraData) {
+                    String contentType = request.header("Content-Type");
+
+                    extraData.put("df_request_header", request.headers().toString());
+                    if ("application/json".equals(contentType) ||
+                            "application/x-www-form-urlencoded".equals(contentType) ||
+                            "application/xml".equals(contentType)) {
+                        extraData.put("df_request_body", request.body());
+                    }
+
+                }
+
+                @Override
+                public void onResponse(Response response, HashMap<String, Object> extraData) throws IOException {
+
+                    String contentType = response.header("Content-Type");
+
+                    extraData.put("df_response_header", response.headers().toString());
+
+                    if ("application/json".equals(contentType) ||
+                            "application/xml".equals(contentType)) {
+                        //copy 读取部分 body，避免大数据消费
+                        ResponseBody body = response.peekBody(33554432);
+                        extraData.put("df_response_body", body.string());
+                    }
+                }
+
+                @Override
+                public void onException(Exception e, HashMap<String, Object> extraData) {
+
+                }
+
+
+            }))
+            .eventListenerFactory(new FTResourceEventListener.FTFactory())
+            .connectTimeout(10, TimeUnit.SECONDS).build();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,52 +198,7 @@ public class MainActivity extends AppCompatActivity {
                         // FTTraceConfig.setEnableAutoTrace(false)
                         // FTRUMConfig.setEnableTraceUserResource(false)
 
-                        OkHttpClient client = new OkHttpClient.Builder()
-//                                .addInterceptor(new FTTraceInterceptor(new FTTraceInterceptor.HeaderHandler() {
-//                                    @Override
-//                                    public HashMap<String, String> getTraceHeader(Request request) {
-//                                        HashMap<String, String> map = new HashMap<>();
-//                                        map.put("custom_header","test_value");
-//                                        return map;
-//                                    }
-//                                }))
-                                .addInterceptor(new FTTraceInterceptor())
-                                .addInterceptor(new FTResourceInterceptor(new FTResourceInterceptor.ContentHandlerHelper() {
-                                    @Override
-                                    public void onRequest(Request request, HashMap<String, Object> extraData) {
-                                        String contentType = request.header("Content-Type");
 
-                                        extraData.put("df_request_header", request.headers().toString());
-                                        if ("application/json".equals(contentType) ||
-                                                "application/x-www-form-urlencoded".equals(contentType) ||
-                                                "application/xml".equals(contentType)) {
-                                            extraData.put("df_request_body", request.body());
-                                        }
-
-                                    }
-
-                                    @Override
-                                    public void onResponse(Response response, HashMap<String, Object> extraData) throws IOException {
-
-                                        String contentType = response.header("Content-Type");
-
-                                        extraData.put("df_response_header", response.headers().toString());
-
-                                        if ("application/json".equals(contentType) ||
-                                                "application/xml".equals(contentType)) {
-                                            //copy 读取部分 body，避免大数据消费
-                                            ResponseBody body = response.peekBody(33554432);
-                                            extraData.put("df_response_body", body.string());
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onException(Exception e, HashMap<String, Object> extraData) {
-
-                                    }
-                                }))
-                                .eventListenerFactory(new FTResourceEventListener.FTFactory())
-                                .connectTimeout(10, TimeUnit.SECONDS).build();
                         Request.Builder builder = new Request.Builder()
                                 .url(BuildConfig.TRACE_URL)
                                 .method(RequestMethod.GET.name(), null);
@@ -306,6 +298,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 FTSdk.clearAllData();
+            }
+        });
+
+        findViewById(R.id.update_remote_config).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FTSdk.updateRemoteConfig(0, new RemoteConfigManager.FetchResult() {
+                    @Override
+                    public void onResult(boolean success) {
+                        LogUtils.d(TAG,"updateRemoteConfig:success->"+success);
+
+                    }
+                });
             }
         });
     }

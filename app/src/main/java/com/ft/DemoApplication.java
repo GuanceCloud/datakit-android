@@ -10,7 +10,6 @@ import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
-import com.ft.sdk.LineDataModifier;
 import com.ft.sdk.LogCacheDiscard;
 import com.ft.sdk.RUMCacheDiscard;
 import com.ft.sdk.TraceType;
@@ -19,11 +18,7 @@ import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.utils.CrossProcessSetting;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * BY huangDianHua
@@ -54,6 +49,7 @@ public class DemoApplication extends BaseApplication {
                 .setOnlySupportMainProcess(CrossProcessSetting.isOnlyMainProcess(context))
                 .setNeedTransformOldCache(true)
                 .setCompressIntakeRequests(true)
+                .setRemoteConfiguration(true)
                 .setSyncSleepTime(100)
 //                .setDataModifier(new DataModifier() {
 //                    @Override
