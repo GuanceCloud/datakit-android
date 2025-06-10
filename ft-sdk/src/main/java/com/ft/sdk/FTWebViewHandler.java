@@ -89,7 +89,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
         }
     }
 
-    public void setWebView(WebView webview, List<String> allowWebViewHost) {
+    public void setWebView(WebView webview, String[] allowWebViewHost) {
         mWebView = webview;
         Activity activity = AopUtils.getActivityFromContext(webview.getContext());
         nativeViewName = AopUtils.getClassName(activity);

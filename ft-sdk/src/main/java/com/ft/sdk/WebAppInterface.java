@@ -5,7 +5,7 @@ import android.webkit.JavascriptInterface;
 
 import com.ft.sdk.garble.utils.Utils;
 
-import java.util.List;
+import java.util.Arrays;
 
 /**
  * web js 方法注册
@@ -23,14 +23,14 @@ public class WebAppInterface {
     }
 
     private final JsReceiver mJsReceiver;
-    private final List<String> mAllowWebviewHost;
+    private final String[] mAllowWebViewHost;
 
     Context mContext;
 
-    public WebAppInterface(Context c, JsReceiver receiver, List<String> allowWebviewHost) {
+    public WebAppInterface(Context c, JsReceiver receiver, String[] allowWebViewHost) {
         mJsReceiver = receiver;
         mContext = c;
-        mAllowWebviewHost = allowWebviewHost;
+        mAllowWebViewHost = allowWebViewHost;
     }
 
     /**
@@ -56,7 +56,7 @@ public class WebAppInterface {
 
     @JavascriptInterface
     public String getAllowedWebViewHosts() {
-        return Utils.setToJsonString(mAllowWebviewHost);
+        return Utils.setToJsonString(Arrays.asList(mAllowWebViewHost));
     }
 
     /**
