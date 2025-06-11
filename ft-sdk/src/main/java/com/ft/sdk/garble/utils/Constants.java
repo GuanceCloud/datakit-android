@@ -185,10 +185,6 @@ public class Constants {
 //    public static final String KEY_PAGE_EVENT_USER_NAME = "ud_name";
 
     /**
-     * 耗时，单位纳秒
-     */
-    public static final String KEY_TIME_COST_DURATION = "duration";
-    /**
      * 日志等级，{@link com.ft.sdk.garble.bean.Status}
      */
     public static final String KEY_STATUS = "status";
@@ -686,11 +682,6 @@ public class Constants {
      * 行协议数据，附加属性
      */
     public static final String KEY_RUM_PROPERTY = "property";
-
-    public static final String SESSION_REPLAY_BUS_MESSAGE_TYPE_KEY = "type";
-    public static final String RUM_SESSION_RENEWED_BUS_MESSAGE = "rum_session_renewed";
-    public static final String RUM_KEEP_SESSION_BUS_MESSAGE_KEY = "keepSession";
-    public static final String RUM_SESSION_ID_BUS_MESSAGE_KEY = "sessionId";
 
     /**
      * 行协议数据 tags，临时存储动态 tags
