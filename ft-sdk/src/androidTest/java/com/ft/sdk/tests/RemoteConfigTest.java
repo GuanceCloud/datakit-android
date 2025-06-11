@@ -197,6 +197,9 @@ public class RemoteConfigTest extends FTBaseTest {
         FTTraceConfig traceConfig = new FTTraceConfig();
         FTSdk.initTraceWithConfig(traceConfig);
 
+//        FTSessionReplayConfig traceConfig = new FTTraceConfig();
+//        FTSdk.initTraceWithConfig(traceConfig);
+
         Assert.assertEquals(config.getServiceName(), VALUE_SERVICE_NAME);
         Assert.assertEquals(config.getEnv(), VALUE_ENV);
         Assert.assertEquals(config.isAutoSync(), VALUE_AUTO_SYNC);

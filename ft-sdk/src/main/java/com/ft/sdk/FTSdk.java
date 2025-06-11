@@ -202,7 +202,7 @@ public class FTSdk {
      * 主动更新远程远程配置,这个方法无视 {@link FTSDKConfig#setRemoteConfigMiniUpdateInterval(int)} } 配置
      *
      * @param remoteConfigMiniUpdateInterval 远程配置时间间隔，单位秒 [0,]
-     * @param result 返回更新结果
+     * @param result                         返回更新结果
      */
     public static void updateRemoteConfig(int remoteConfigMiniUpdateInterval, FTRemoteConfigManager.FetchResult result) {
         if (checkInstallState()) {
@@ -279,7 +279,14 @@ public class FTSdk {
      * @param config
      */
     public static void initSessionReplayConfig(FTSessionReplayConfig config) {
-        SessionReplay.enable(config, FTApplication.getApplication());
+        try {
+            if (get().mRemoteConfigManager != null) {
+                get().mRemoteConfigManager.mergeSessionReplayConfigFromCache(config);
+            }
+            SessionReplay.enable(config, FTApplication.getApplication());
+        } catch (Exception e) {
+            LogUtils.e(TAG, "initSessionReplayConfig fail:\n" + LogUtils.getStackTraceString(e));
+        }
     }
 
     /**

@@ -1,3 +1,7 @@
+# agent 1.7.0-alpha20
+1. 合并 ft-sdk 1.6.12
+
+---
 # agent 1.7.0-alpha19
 1. 支持 ft-session-replay 错误采样的功能
 
