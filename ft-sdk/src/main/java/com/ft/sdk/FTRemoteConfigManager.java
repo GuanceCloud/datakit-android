@@ -216,44 +216,50 @@ public class FTRemoteConfigManager {
                     @Override
                     public void run() {
                         running.set(true);
-                        FTResponseData data = HttpBuilder.Builder()
-                                .addHeadParam(Constants.SYNC_DATA_CONTENT_TYPE_HEADER,
-                                        Constants.SYNC_DATA_CONTENT_TYPE_VALUE)
-                                .setModel(Constants.URL_ENV_VARIABLE)
-                                .addParam(Constants.KEY_RUM_APP_ID, appId)
-                                .setMethod(RequestMethod.GET).executeSync();
+                        try {
+                            FTResponseData data = HttpBuilder.Builder()
+                                    .addHeadParam(Constants.SYNC_DATA_CONTENT_TYPE_HEADER,
+                                            Constants.SYNC_DATA_CONTENT_TYPE_VALUE)
+                                    .setModel(Constants.URL_ENV_VARIABLE)
+                                    .addParam(Constants.KEY_RUM_APP_ID, appId)
+                                    .setMethod(RequestMethod.GET).executeSync();
 
-                        boolean requestResult = false;
-                        if (data.getCode() == HttpURLConnection.HTTP_OK) {
-                            String json = data.getMessage();
-                            if (!Utils.isNullOrEmpty(json)) {
-                                String md5 = Utils.toMD5(json);
-                                if (md5.equals(mRemoteConfig.getMd5())) {
-                                    LogUtils.d(TAG, "remote config no change");
-                                    requestResult = true;
-                                } else {
-                                    String saveJson = json.replaceAll("R\\.[^.]+\\.", "");
-                                    LogUtils.d(TAG, "remote config:" + saveJson);
-                                    RemoteConfigBean configBean = RemoteConfigBean.buildFromConfigJson(saveJson);
-                                    LogUtils.d(TAG, "RemoteConfigBean config:" + configBean);
-                                    if (configBean.isValid()) {
-                                        String saveJsonWithMd5 = saveJson.replaceFirst("\\{", "{\"md5\":\"" + md5 + "\",");
-                                        saveRemoteConfigToLocCache(saveJsonWithMd5);
-                                        notifyHotUpdate(configBean);
+                            boolean requestResult = false;
+                            if (data.getCode() == HttpURLConnection.HTTP_OK) {
+                                String json = data.getMessage();
+                                if (!Utils.isNullOrEmpty(json)) {
+                                    String md5 = Utils.toMD5(json);
+                                    if (mRemoteConfig != null && md5.equals(mRemoteConfig.getMd5())) {
+                                        LogUtils.d(TAG, "remote config no change");
                                         requestResult = true;
+                                    } else {
+                                        String saveJson = json.replaceAll("R\\.[^.]+\\.", "");
+                                        LogUtils.d(TAG, "remote config:" + saveJson);
+                                        RemoteConfigBean configBean = RemoteConfigBean.buildFromConfigJson(saveJson);
+                                        LogUtils.d(TAG, "RemoteConfigBean config:" + configBean);
+                                        if (configBean.isValid()) {
+                                            String saveJsonWithMd5 = saveJson.replaceFirst("\\{", "{\"md5\":\"" + md5 + "\",");
+                                            saveRemoteConfigToLocCache(saveJsonWithMd5);
+                                            notifyHotUpdate(configBean);
+                                            requestResult = true;
+                                        }
                                     }
+                                    saveLastFetchDateline(lastUpdateTime);
+                                    running.set(false);
                                 }
-                                saveLastFetchDateline(lastUpdateTime);
-                                running.set(false);
+
+                            } else {
+                                LogUtils.w(TAG, data.getMessage());
                             }
-
-                        } else {
-                            LogUtils.w(TAG, data.getMessage());
+                            if (result != null) {
+                                result.onResult(requestResult);
+                            }
+                        } catch (Exception e) {
+                            LogUtils.e(TAG, "remote config load error:" + LogUtils.getStackTraceString(e));
+                        } finally {
+                            running.set(false);
                         }
 
-                        if (result != null) {
-                            result.onResult(requestResult);
-                        }
                     }
                 });
             }
