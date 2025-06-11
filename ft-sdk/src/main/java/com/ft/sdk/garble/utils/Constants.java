@@ -97,7 +97,14 @@ public class Constants {
      * 存储 {@link  android.content.SharedPreferences} {@link #FT_USER_USER_EXT} 键值
      */
     public static final String FT_USER_USER_EXT = "ft.user.extdata";
-
+    /**
+     *
+     */
+    public static final String FT_REMOTE_CONFIG = "ft.localCache.remoteConfig";
+    /**
+     *
+     */
+    public static final String FT_REMOTE_CONFIG_FETCH_TIME = "ft.localCache.remoteConfigFetchTime";
     /**
      * 存储错误发生时间
      */
@@ -142,6 +149,10 @@ public class Constants {
 //     * Trace 链路 datakit 请求地址
 //     */
 //    public static final String URL_MODEL_TRACING = "v1/write/tracing";
+    /**
+     * 动态变量加载地址
+     */
+    public static final String URL_ENV_VARIABLE = "v1/env_variable";
 
     /**
      * 默认服务名，字段 service

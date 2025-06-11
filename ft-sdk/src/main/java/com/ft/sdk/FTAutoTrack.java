@@ -637,9 +637,7 @@ public class FTAutoTrack {
      */
     public static void setUpWebView(View webView) {
         if (webView instanceof WebView && webView.getTag(R.id.ft_webview_handled_tag_view_value) == null) {
-
             new FTWebViewHandler().setWebView((WebView) webView);
-            webView.setTag(R.id.ft_webview_handled_tag_view_value, "handled");
         }
     }
 

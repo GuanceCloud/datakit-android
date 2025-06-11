@@ -1,5 +1,6 @@
 package com.ft.sdk.garble.http;
 
+import android.net.Uri;
 import android.util.Pair;
 
 import com.ft.sdk.NetProxy;
@@ -36,6 +37,7 @@ public class HttpBuilder {
     private final int readOutTime;
     private boolean isDataway = false;
     private final HashMap<String, String> headParams = new HashMap<>();
+    private final HashMap<String, String> params = new HashMap<>();
 
     // 新增 HashMap 用于表单和文件数据
     private final HashMap<String, String> formParams = new HashMap<>();
@@ -79,15 +81,23 @@ public class HttpBuilder {
     }
 
     public String getUrl() {
-        String url = getHost();
+        Uri.Builder fullUrl = Uri.parse(getHost()).buildUpon();
         if (!Utils.isNullOrEmpty(model)) {
-            if (!isDataway) {
-                url += "/" + model;
-            } else {
-                url += String.format(DATAWAY_URL_HOST_FORMAT, model, httpConfig.getClientToken());
+            fullUrl.appendPath(model);
+            if (isDataway) {
+                fullUrl.appendQueryParameter("token", httpConfig.getClientToken())
+                        .appendQueryParameter("to_headless", "true");
             }
         }
-        return url + (urlWithMsPrecision ? ((isDataway ? "&" : "?") + "precision=ms") : "");
+        if (!params.isEmpty()) {
+            for (String key : params.keySet()) {
+                fullUrl.appendQueryParameter(key, params.get(key));
+            }
+        }
+        if (urlWithMsPrecision) {
+            fullUrl.appendQueryParameter("precision", "ms");
+        }
+        return fullUrl.build().toString();
     }
 
     public String getBodyString() {
@@ -148,6 +158,11 @@ public class HttpBuilder {
 
     public HttpBuilder addHeadParam(String key, String value) {
         this.headParams.put(key, value);
+        return this;
+    }
+
+    public HttpBuilder addParam(String key, String value) {
+        this.params.put(key, value);
         return this;
     }
 

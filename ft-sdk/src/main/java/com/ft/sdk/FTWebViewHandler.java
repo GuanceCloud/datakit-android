@@ -17,6 +17,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * 用于配合 web 接收应用内 webview 数据指标
@@ -82,11 +83,20 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
      * @param webview
      */
     public void setWebView(WebView webview) {
+        FTRUMConfig config = FTRUMConfigManager.get().getConfig();
+        if (config != null && config.isEnableTraceWebView()) {
+            setWebView(webview, config.getAllowWebViewHost());
+        }
+    }
+
+    public void setWebView(WebView webview, String[] allowWebViewHost) {
         mWebView = webview;
         Activity activity = AopUtils.getActivityFromContext(webview.getContext());
         nativeViewName = AopUtils.getClassName(activity);
         webview.getSettings().setJavaScriptEnabled(true);
-        webview.addJavascriptInterface(new WebAppInterface(webview.getContext(), this), FT_WEB_VIEW_JAVASCRIPT_BRIDGE);
+        webview.addJavascriptInterface(new WebAppInterface(webview.getContext(), this, allowWebViewHost),
+                FT_WEB_VIEW_JAVASCRIPT_BRIDGE);
+        webview.setTag(R.id.ft_webview_handled_tag_view_value, "handled");
 
     }
 

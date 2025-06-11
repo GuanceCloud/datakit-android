@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import com.ft.sdk.garble.utils.Constants;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class FTRUMConfig {
     /**
@@ -129,6 +130,36 @@ public class FTRUMConfig {
 
     private RUMCacheDiscard rumCacheDiscardStrategy = RUMCacheDiscard.DISCARD;
 
+    private boolean enableTraceWebView = true;
+    private String[] allowWebViewHost;
+
+    /**
+     * 配置是否开启通过 Android SDK 采集 WebView 数据
+     * @param enableTraceWebView
+     * @return
+     */
+    public FTRUMConfig setEnableTraceWebView(boolean enableTraceWebView) {
+        this.enableTraceWebView = enableTraceWebView;
+        return this;
+    }
+
+    /**
+     * 配置允许数据追踪的 WebView host 地址
+     * @param allowWebViewHost
+     * @return
+     */
+    public FTRUMConfig setAllowWebViewHost(String[] allowWebViewHost) {
+        this.allowWebViewHost = allowWebViewHost;
+        return this;
+    }
+
+    public boolean isEnableTraceWebView() {
+        return enableTraceWebView;
+    }
+
+    public String[] getAllowWebViewHost() {
+        return allowWebViewHost;
+    }
 
     /**
      * 获取采样率
@@ -161,6 +192,7 @@ public class FTRUMConfig {
 
     /**
      * 设置错误采集率，当会话未被 `setSamplingRate` 采样时，若会话期间发生错误，可以采集到错误前 1 分钟范围的数据，取值范围 [0,1]，0 表示不采集，1 表示全采集，默认值为 0。作用域为同一 session_id 下所有 View，Action，LongTask，Error
+     *
      * @param sessionErrorSampleRate
      */
     public FTRUMConfig setSessionErrorSampleRate(float sessionErrorSampleRate) {
@@ -351,6 +383,7 @@ public class FTRUMConfig {
 
     /**
      * 是否监测用户 View 在 Fragment 的页面采集
+     *
      * @param enableTraceUserViewInFragment
      * @return
      */
@@ -531,7 +564,7 @@ public class FTRUMConfig {
         return this;
     }
 
-    public Boolean isEnableResourceHostIP() {
+    public boolean isEnableResourceHostIP() {
         return this.enableResourceHostIP;
     }
 

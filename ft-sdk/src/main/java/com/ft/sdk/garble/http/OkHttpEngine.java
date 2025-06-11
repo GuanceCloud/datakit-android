@@ -128,9 +128,9 @@ public class OkHttpEngine implements INetEngine {
             }
             return new FTResponseData(response.code(), string);
         } catch (SocketTimeoutException e) {
-            return new FTResponseData(NetCodeStatus.FILE_TIMEOUT_CODE, e.getLocalizedMessage() + ",网络超时");
+            return new FTResponseData(NetCodeStatus.FILE_TIMEOUT_CODE, e.getLocalizedMessage() + ",Time out");
         } catch (IOException e) {
-            return new FTResponseData(NetCodeStatus.FILE_IO_EXCEPTION_CODE, e.getLocalizedMessage() + ",检查本地网络连接是否正常");
+            return new FTResponseData(NetCodeStatus.FILE_IO_EXCEPTION_CODE, e.getLocalizedMessage() + ",Check Local Network");
         } catch (Exception e) {
             return new FTResponseData(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, e.getLocalizedMessage());
         }

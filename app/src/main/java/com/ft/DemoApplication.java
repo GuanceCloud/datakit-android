@@ -52,6 +52,7 @@ public class DemoApplication extends BaseApplication {
                 .setOnlySupportMainProcess(CrossProcessSetting.isOnlyMainProcess(context))
                 .setNeedTransformOldCache(true)
                 .setCompressIntakeRequests(true)
+                .setRemoteConfiguration(true)
                 .setSyncSleepTime(100)
 //                .setDataModifier(new DataModifier() {
 //                    @Override
@@ -108,13 +109,34 @@ public class DemoApplication extends BaseApplication {
                         .setEnableTraceUserAction(true)
                         .setEnableTraceUserView(true)
                         .setRumCacheLimitCount(1000)
+//                        .setAllowWebViewHost(new String[]{"10.100.64.166"})
                         .setRumCacheDiscardStrategy(RUMCacheDiscard.DISCARD)
                         .setEnableTraceUserResource(true)
                         .setEnableTrackAppANR(true)
                         .setEnableTrackAppCrash(true)
+//                        .setEnableTraceWebView(true)
                         .setEnableTrackAppUIBlock(true, 100)
                         .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
                         .setResourceUrlHandler(url -> false)
+//                        .setOkHttpResourceContentHandler(new FTResourceInterceptor.ContentHandlerHelperEx() {
+//                            @Override
+//                            public void onRequest(Request request, HashMap<String, Object> extraData) {
+//
+//                            }
+//
+//                            @Override
+//                            public void onResponse(Response response, HashMap<String, Object> extraData) throws IOException {
+//
+//                            }
+//
+//                            @Override
+//                            public boolean onExceptionWithFilter(Exception e, HashMap<String, Object> extraData) {
+////                                if (e instanceof ConnectException) {
+////                                    return true;
+////                                }
+//                                return super.onExceptionWithFilter(e, extraData);
+//                            }
+//                        })
 //                .addGlobalContext("track_id", BuildConfig.TRACK_ID)
 //                .addGlobalContext("custom_tag", "any tags")
                         .setExtraMonitorTypeWithError(ErrorMonitorType.ALL.getValue())

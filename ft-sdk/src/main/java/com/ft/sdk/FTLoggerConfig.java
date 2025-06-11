@@ -276,6 +276,10 @@ public class FTLoggerConfig {
                 || logLevelFilters.contains(status);
     }
 
+    public List<String> getLogLevelFilters() {
+        return logLevelFilters;
+    }
+
     public FTLoggerConfig addGlobalContext(@NonNull String key, @NonNull String value) {
         this.globalContext.put(key, value);
         return this;

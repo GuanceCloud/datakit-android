@@ -160,6 +160,43 @@ public class FTSDKConfig {
         return dbCacheDiscard;
     }
 
+
+    private boolean remoteConfiguration;
+
+    private boolean getRemoteConfiguration() {
+        return remoteConfiguration;
+    }
+
+    /**
+     * 是否开启数据采集的远程配置功能，默认不开启。开启之后，SDK 初始化或应用热启动会触发数据更新。
+     * @param remoteConfiguration
+     * @return
+     */
+    public FTSDKConfig setRemoteConfiguration(boolean remoteConfiguration) {
+        this.remoteConfiguration = remoteConfiguration;
+        return this;
+    }
+
+    private int remoteConfigMiniUpdateInterval = 43200;//12 hour
+
+    /**
+     * 设置数据更新最短间隔，单位秒，默认12小时
+     * @param remoteConfigMiniUpdateInterval
+     * @return
+     */
+    public FTSDKConfig setRemoteConfigMiniUpdateInterval(int remoteConfigMiniUpdateInterval) {
+        this.remoteConfigMiniUpdateInterval = remoteConfigMiniUpdateInterval;
+        return this;
+    }
+
+    public boolean isRemoteConfiguration() {
+        return remoteConfiguration;
+    }
+
+    public int getRemoteConfigMiniUpdateInterval() {
+        return remoteConfigMiniUpdateInterval;
+    }
+
     /**
      * 全局参数，例如 {@link Constants#KEY_APP_VERSION_NAME} 等固定配置参数，
      * 或通过 {@link FTSDKConfig#addGlobalContext(String, String)} 用户自定义添加的变量参数

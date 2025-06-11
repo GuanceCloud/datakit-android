@@ -139,9 +139,13 @@ public class SyncDataHelper {
                 String key = entry.getKey();
                 Object value = entry.getValue();
                 if (tags.containsKey(key)) {
-                    tags.put(key, value);
+                    if (value != null) {
+                        tags.put(key, value);
+                    }
                 } else if (fields.containsKey(key)) {
-                    fields.put(key, value);
+                    if (value != null) {
+                        fields.put(key, value);
+                    }
                 }
             }
         }

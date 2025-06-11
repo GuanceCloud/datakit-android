@@ -4,6 +4,7 @@ package com.ft.sdk;
 import android.content.SharedPreferences;
 
 import com.ft.sdk.garble.bean.DataType;
+import com.ft.sdk.garble.bean.RemoteConfigBean;
 import com.ft.sdk.garble.bean.SyncData;
 import com.ft.sdk.garble.bean.ViewBean;
 import com.ft.sdk.garble.db.FTDBCachePolicy;
@@ -506,6 +507,18 @@ public class SyncTaskManager {
         }
 
 
+    }
+
+    public void hotUpdate(RemoteConfigBean config) {
+        if (config.getSyncPageSize() != null) {
+            pageSize = config.getSyncPageSize();
+        }
+        if (config.getAutoSync() != null) {
+            autoSync = config.getAutoSync();
+        }
+        if (config.getSyncSleepTime() != null) {
+            syncSleepTime = config.getSyncSleepTime();
+        }
     }
 
     public void init(FTSDKConfig config) {

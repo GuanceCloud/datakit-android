@@ -60,8 +60,7 @@ public class FTSdk {
     public static final String AGENT_VERSION = BuildConfig.FT_SDK_VERSION;//当前SDK 版本
     private static FTSdk mFtSdk;
     private final FTSDKConfig mFtSDKConfig;
-
-    private boolean isTVMode;
+    private FTRemoteConfigManager mRemoteConfigManager;
 
     /**
      * @param ftSDKConfig
@@ -145,7 +144,12 @@ public class FTSdk {
         if (FTSdk.isSessionReplaySupport()) {
             SessionReplayManager.get().stop();
         }
-        mFtSdk = null;
+        if (mFtSdk != null) {
+            if (mFtSdk.mRemoteConfigManager != null) {
+                mFtSdk.mRemoteConfigManager.close();
+            }
+            mFtSdk = null;
+        }
         LogUtils.w(TAG, "FT SDK 已经被关闭");
     }
 
@@ -161,6 +165,11 @@ public class FTSdk {
      */
     private void initFTConfig(FTSDKConfig config) {
         LogUtils.setDebug(config.isDebug());
+        if (config.isRemoteConfiguration()) {
+            mRemoteConfigManager = new FTRemoteConfigManager(config.getRemoteConfigMiniUpdateInterval());
+            mRemoteConfigManager.initFromLocalCache();
+            mRemoteConfigManager.mergeSDKConfigFromCache(config);
+        }
         LogUtils.setSDKLogLevel(config.getSdkLogLevel());
         LocalUUIDManager.get().initRandomUUID();
         FTDBCachePolicy.get().initSDKParams(config);
@@ -179,6 +188,32 @@ public class FTSdk {
 
 
     /**
+     * 主动更新远程远程配置，调用频次受 {@link FTSDKConfig#setRemoteConfigMiniUpdateInterval(int)} }的时间影响
+     */
+    public static void updateRemoteConfig() {
+        if (checkInstallState()) {
+            if (mFtSdk.mRemoteConfigManager != null) {
+                mFtSdk.mRemoteConfigManager.updateRemoteConfig();
+            }
+        }
+    }
+
+    /**
+     * 主动更新远程远程配置,这个方法无视 {@link FTSDKConfig#setRemoteConfigMiniUpdateInterval(int)} } 配置
+     *
+     * @param remoteConfigMiniUpdateInterval 远程配置时间间隔，单位秒 [0,]
+     * @param result 返回更新结果
+     */
+    public static void updateRemoteConfig(int remoteConfigMiniUpdateInterval, FTRemoteConfigManager.FetchResult result) {
+        if (checkInstallState()) {
+            if (mFtSdk.mRemoteConfigManager != null) {
+                mFtSdk.mRemoteConfigManager.updateRemoteConfig(remoteConfigMiniUpdateInterval, result);
+            }
+        }
+    }
+
+
+    /**
      * 设置 RUM 配置
      *
      * @param config
@@ -186,6 +221,10 @@ public class FTSdk {
     public static void initRUMWithConfig(@NonNull FTRUMConfig config) {
         try {
             config.setServiceName(get().getBaseConfig().getServiceName());
+            if (get().mRemoteConfigManager != null) {
+                get().mRemoteConfigManager.mergeRUMConfigFromCache(config);
+                get().mRemoteConfigManager.initFromRemote(config.getRumAppId());
+            }
             FTRUMConfigManager.get().initWithConfig(config);
             LogUtils.d(TAG, "initRUMWithConfig complete:" + config);
 
@@ -203,6 +242,9 @@ public class FTSdk {
     public static void initTraceWithConfig(@NonNull FTTraceConfig config) {
         try {
             config.setServiceName(get().getBaseConfig().getServiceName());
+            if (get().mRemoteConfigManager != null) {
+                get().mRemoteConfigManager.mergeTraceConfigFromCache(config);
+            }
             FTTraceConfigManager.get().initWithConfig(config);
             LogUtils.d(TAG, "initTraceWithConfig complete:" + config);
 
@@ -219,6 +261,9 @@ public class FTSdk {
     public static void initLogWithConfig(@NonNull FTLoggerConfig config) {
         try {
             config.setServiceName(get().getBaseConfig().getServiceName());
+            if (get().mRemoteConfigManager != null) {
+                get().mRemoteConfigManager.mergeLogConfigFromCache(config);
+            }
             FTLoggerConfigManager.get().initWithConfig(config);
             LogUtils.d(TAG, "initLogWithConfig complete:" + config);
 
