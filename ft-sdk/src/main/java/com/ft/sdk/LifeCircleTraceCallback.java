@@ -144,6 +144,7 @@ class LifeCircleTraceCallback {
 
                 }
             }
+            FTSdk.updateRemoteConfig();
             alreadySleep = false;
         }
         //避免重复计算页面启动的统计计算

@@ -21,7 +21,7 @@ import com.ft.sdk.FTResourceEventListener;
 import com.ft.sdk.FTResourceInterceptor;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceInterceptor;
-import com.ft.sdk.RemoteConfigManager;
+import com.ft.sdk.FTRemoteConfigManager;
 import com.ft.sdk.garble.annotation.IgnoreAOP;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.http.RequestMethod;
@@ -304,7 +304,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.update_remote_config).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FTSdk.updateRemoteConfig(0, new RemoteConfigManager.FetchResult() {
+                FTSdk.updateRemoteConfig(0, new FTRemoteConfigManager.FetchResult() {
                     @Override
                     public void onResult(boolean success) {
                         LogUtils.d(TAG,"updateRemoteConfig:success->"+success);

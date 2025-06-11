@@ -46,7 +46,7 @@ public class FTSdk {
     public static final String AGENT_VERSION = BuildConfig.FT_SDK_VERSION;//当前SDK 版本
     private static FTSdk mFtSdk;
     private final FTSDKConfig mFtSDKConfig;
-    private RemoteConfigManager mRemoteConfigManager;
+    private FTRemoteConfigManager mRemoteConfigManager;
 
     /**
      * @param ftSDKConfig
@@ -147,7 +147,7 @@ public class FTSdk {
     private void initFTConfig(FTSDKConfig config) {
         LogUtils.setDebug(config.isDebug());
         if (config.isRemoteConfiguration()) {
-            mRemoteConfigManager = new RemoteConfigManager(config.getRemoteConfigMiniUpdateInterval());
+            mRemoteConfigManager = new FTRemoteConfigManager(config.getRemoteConfigMiniUpdateInterval());
             mRemoteConfigManager.initFromLocalCache();
             mRemoteConfigManager.mergeSDKConfigFromCache(config);
         }
@@ -176,7 +176,7 @@ public class FTSdk {
         }
     }
 
-    public static void updateRemoteConfig(int remoteConfigMiniUpdateInterval, RemoteConfigManager.FetchResult result) {
+    public static void updateRemoteConfig(int remoteConfigMiniUpdateInterval, FTRemoteConfigManager.FetchResult result) {
         if (checkInstallState()) {
             if (mFtSdk.mRemoteConfigManager != null) {
                 mFtSdk.mRemoteConfigManager.updateRemoteConfig(remoteConfigMiniUpdateInterval, result);

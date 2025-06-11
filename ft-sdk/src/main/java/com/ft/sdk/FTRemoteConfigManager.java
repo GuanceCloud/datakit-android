@@ -15,7 +15,7 @@ import com.ft.sdk.garble.utils.Utils;
 import java.net.HttpURLConnection;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class RemoteConfigManager {
+public class FTRemoteConfigManager {
 
     private static final String TAG = Constants.LOG_TAG_PREFIX + "RemoteConfigManager";
 
@@ -25,7 +25,7 @@ public class RemoteConfigManager {
     private final AtomicBoolean running = new AtomicBoolean(false);
     private RemoteConfigBean mRemoteConfig;
 
-    public RemoteConfigManager(int remoteConfigMiniUpdateInterval) {
+    public FTRemoteConfigManager(int remoteConfigMiniUpdateInterval) {
         this.remoteConfigMiniUpdateInterval = remoteConfigMiniUpdateInterval;
     }
 
@@ -37,7 +37,7 @@ public class RemoteConfigManager {
         SharedPreferences sp = Utils.getSharedPreferences(FTApplication.getApplication());
         String configString = sp.getString(Constants.FT_REMOTE_CONFIG, null);
         if (configString != null) {
-            mRemoteConfig = RemoteConfigBean.buildFromLocal(configString);
+            mRemoteConfig = RemoteConfigBean.buildFromConfigJson(configString);
             LogUtils.d(TAG, "local config:" + mRemoteConfig);
         }
         lastUpdateTime = sp.getLong(Constants.FT_REMOTE_CONFIG_FETCH_TIME, 0);
@@ -189,6 +189,10 @@ public class RemoteConfigManager {
 
     void updateRemoteConfig(int remoteConfigMiniUpdateInterval, FetchResult result) {
         if (!running.get()) {
+            if (Utils.isNullOrEmpty(appId)) {
+                result.onResult(false);
+                return;
+            }
             if (getCurrentTimeLineInSeconds() - lastUpdateTime >= remoteConfigMiniUpdateInterval) {
                 RemoteConfigThreadPool.get().execute(new Runnable() {
                     @Override
@@ -212,7 +216,7 @@ public class RemoteConfigManager {
                                 } else {
                                     String saveJson = json.replaceAll("R\\.[^.]+\\.", "");
                                     LogUtils.d(TAG, "remote config:" + saveJson);
-                                    RemoteConfigBean configBean = RemoteConfigBean.buildFromRemote(saveJson, md5);
+                                    RemoteConfigBean configBean = RemoteConfigBean.buildFromConfigJson(saveJson);
                                     LogUtils.d(TAG, "RemoteConfigBean config:" + configBean);
                                     if (configBean.isValid()) {
                                         String saveJsonWithMd5 = saveJson.replaceFirst("\\{", "{\"md5\":\"" + md5 + "\",");
@@ -264,6 +268,7 @@ public class RemoteConfigManager {
 
     void close() {
         RemoteConfigThreadPool.get().shutDown();
+        appId = null;
         running.set(false);
     }
 }

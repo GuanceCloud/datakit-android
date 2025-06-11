@@ -72,29 +72,19 @@ public class RemoteConfigBean {
     private RemoteConfigBean() {
     }
 
-    public static RemoteConfigBean buildFromLocal(String json) {
+    public static RemoteConfigBean buildFromConfigJson(String json) {
         RemoteConfigBean bean = new RemoteConfigBean();
-        bean.parse(json, null);
+        bean.parse(json);
         return bean;
     }
 
-    public static RemoteConfigBean buildFromRemote(String json, String md5) {
-        RemoteConfigBean bean = new RemoteConfigBean();
-        bean.parse(json, md5);
-        return bean;
-    }
-
-    void parse(String data, String md5) {
+    void parse(String data) {
         try {
             if (data != null) {
                 JSONObject json = new JSONObject(data);
                 JSONObject content = json.optJSONObject("content");
-                if (md5 != null) {
-                    this.md5 = md5;
-                } else {
-                    if (json.has("md5")) {
-                        this.md5 = json.optString("md5");
-                    }
+                if (json.has("md5")) {
+                    this.md5 = json.optString("md5");
                 }
                 if (content != null) {
                     if (content.has("env")) {
@@ -174,7 +164,8 @@ public class RemoteConfigBean {
                                 rumAllowWebViewHost[i] = (array.optString(i));
                             }
                         } catch (Exception e) {
-                            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+                            LogUtils.e(TAG, KEY_RUM_ALLOW_WEB_VIEW_HOST + " parse error ignore," + arrayString);
+
                         }
                     }
 
@@ -191,10 +182,8 @@ public class RemoteConfigBean {
                                 logLevelFilters[i] = array.optString(i);
                             }
                         } catch (Exception e) {
-                            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+                            LogUtils.e(TAG, KEY_LOG_LEVEL_FILTERS + " parse error ignore," + arrayString);
                         }
-
-
                     }
 
                     if (content.has(KEY_LOG_ENABLE_CUSTOM_LOG)) {
@@ -330,33 +319,51 @@ public class RemoteConfigBean {
 
     @Override
     public String toString() {
-        return "RemoteConfigBean{" +
-                "env='" + env + '\'' +
-                ", serviceName='" + serviceName + '\'' +
-                ", autoSync=" + autoSync +
-                ", compressIntakeRequests=" + compressIntakeRequests +
-                ", syncPageSize=" + syncPageSize +
-                ", syncSleepTime=" + syncSleepTime +
-                ", rumSampleRate=" + rumSampleRate +
-                ", rumSessionOnErrorSampleRate=" + rumSessionOnErrorSampleRate +
-                ", rumEnableTraceUserAction=" + rumEnableTraceUserAction +
-                ", rumEnableTraceUserView=" + rumEnableTraceUserView +
-                ", rumEnableResourceHostIP=" + rumEnableResourceHostIP +
-                ", rumEnableTrackAppUIBlock=" + rumEnableTrackAppUIBlock +
-                ", rumBlockDurationMs=" + rumBlockDurationMs +
-                ", rumEnableTrackAppCrash=" + rumEnableTrackAppCrash +
-                ", rumEnableTraceWebView=" + rumEnableTraceWebView +
-                ", rumAllowWebViewHost=" + rumAllowWebViewHost +
-                ", logSampleRate=" + logSampleRate +
-                ", logLevelFilters=" + logLevelFilters +
-                ", logEnableCustomLog=" + logEnableCustomLog +
-                ", traceSampleRate=" + traceSampleRate +
-                ", traceEnableAutoTrace=" + traceEnableAutoTrace +
-                ", traceType='" + traceType + '\'' +
-                ", sessionReplaySampleRate=" + sessionReplaySampleRate +
-                ", sessionReplayOnErrorSampleRate=" + sessionReplayOnErrorSampleRate +
-                ", md5='" + md5 + '\'' +
-                '}';
+        StringBuilder sb = new StringBuilder("RemoteConfigBean{");
+        if (env != null) sb.append("env='").append(env).append("', ");
+        if (serviceName != null) sb.append("serviceName='").append(serviceName).append("', ");
+        if (autoSync != null) sb.append("autoSync='").append(autoSync).append("', ");
+        if (compressIntakeRequests != null)
+            sb.append("compressIntakeRequests='").append(compressIntakeRequests).append("', ");
+        if (syncPageSize != null) sb.append("syncPageSize='").append(syncPageSize).append("', ");
+        if (syncSleepTime != null) sb.append("syncSleepTime='").append(syncSleepTime).append("', ");
+        if (rumSampleRate != null) sb.append("rumSampleRate='").append(rumSampleRate).append("', ");
+        if (rumSessionOnErrorSampleRate != null)
+            sb.append("rumSessionOnErrorSampleRate='").append(rumSessionOnErrorSampleRate).append("', ");
+        if (rumEnableTraceUserAction != null)
+            sb.append("rumEnableTraceUserAction='").append(rumEnableTraceUserAction).append("', ");
+        if (rumEnableTraceUserView != null)
+            sb.append("rumEnableTraceUserView='").append(rumEnableTraceUserView).append("', ");
+        if (rumEnableTraceUserResource != null)
+            sb.append("rumEnableTraceUserResource='").append(rumEnableTraceUserResource).append("', ");
+        if (rumEnableResourceHostIP != null)
+            sb.append("rumEnableResourceHostIP='").append(rumEnableResourceHostIP).append("', ");
+        if (rumEnableTrackAppUIBlock != null)
+            sb.append("rumEnableTrackAppUIBlock='").append(rumEnableTrackAppUIBlock).append("', ");
+        if (rumBlockDurationMs != null)
+            sb.append("rumBlockDurationMs='").append(rumBlockDurationMs).append("', ");
+        if (rumEnableTrackAppCrash != null)
+            sb.append("rumEnableTrackAppCrash='").append(rumEnableTrackAppCrash).append("', ");
+        if (rumEnableTraceWebView != null)
+            sb.append("rumEnableTraceWebView='").append(rumEnableTraceWebView).append("', ");
+        if (rumAllowWebViewHost != null)
+            sb.append("rumAllowWebViewHost='").append(rumAllowWebViewHost).append("', ");
+        if (logSampleRate != null) sb.append("logSampleRate='").append(logSampleRate).append("', ");
+        if (logLevelFilters != null)
+            sb.append("logLevelFilters='").append(logLevelFilters).append("', ");
+        if (logEnableCustomLog != null)
+            sb.append("logEnableCustomLog='").append(logEnableCustomLog).append("', ");
+        if (traceSampleRate != null)
+            sb.append("traceSampleRate='").append(traceSampleRate).append("', ");
+        if (traceEnableAutoTrace != null)
+            sb.append("traceEnableAutoTrace='").append(traceEnableAutoTrace).append("', ");
+        if (traceType != null) sb.append("traceType='").append(traceType).append("', ");
+        if (sessionReplaySampleRate != null)
+            sb.append("sessionReplaySampleRate='").append(sessionReplaySampleRate).append("', ");
+        if (sessionReplayOnErrorSampleRate != null)
+            sb.append("sessionReplayOnErrorSampleRate='").append(sessionReplayOnErrorSampleRate).append("', ");
+        if (md5 != null) sb.append("md5='").append(md5);
+        return sb.toString();
     }
 
 
