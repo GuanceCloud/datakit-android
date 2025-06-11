@@ -194,8 +194,8 @@ public class FTSdk {
         try {
             config.setServiceName(get().getBaseConfig().getServiceName());
             if (get().mRemoteConfigManager != null) {
-                get().mRemoteConfigManager.initFromRemote(config.getRumAppId());
                 get().mRemoteConfigManager.mergeRUMConfigFromCache(config);
+                get().mRemoteConfigManager.initFromRemote(config.getRumAppId());
             }
             FTRUMConfigManager.get().initWithConfig(config);
             LogUtils.d(TAG, "initRUMWithConfig complete:" + config);

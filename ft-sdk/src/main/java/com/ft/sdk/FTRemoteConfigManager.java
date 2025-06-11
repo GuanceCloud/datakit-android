@@ -93,8 +93,8 @@ public class FTRemoteConfigManager {
             if (mRemoteConfig.getRumSampleRate() != null) {
                 config.setSamplingRate(mRemoteConfig.getRumSampleRate());
             }
-            if (mRemoteConfig.getSessionReplaySampleRate() != null) {
-                config.setSessionErrorSampleRate(mRemoteConfig.getSessionReplayOnErrorSampleRate());
+            if (mRemoteConfig.getRumSessionOnErrorSampleRate() != null) {
+                config.setSessionErrorSampleRate(mRemoteConfig.getRumSessionOnErrorSampleRate());
             }
             if (mRemoteConfig.getRumEnableTraceUserAction() != null) {
                 config.setEnableTraceUserAction(mRemoteConfig.getRumEnableTraceUserAction());

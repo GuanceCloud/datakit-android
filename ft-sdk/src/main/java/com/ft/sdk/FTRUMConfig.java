@@ -564,7 +564,7 @@ public class FTRUMConfig {
         return this;
     }
 
-    public Boolean isEnableResourceHostIP() {
+    public boolean isEnableResourceHostIP() {
         return this.enableResourceHostIP;
     }
 

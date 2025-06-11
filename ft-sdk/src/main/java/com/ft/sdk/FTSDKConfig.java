@@ -180,7 +180,7 @@ public class FTSDKConfig {
     private int remoteConfigMiniUpdateInterval = 43200;//12 hour
 
     /**
-     * 设置数据更新最短间隔
+     * 设置数据更新最短间隔，单位秒，默认12小时
      * @param remoteConfigMiniUpdateInterval
      * @return
      */

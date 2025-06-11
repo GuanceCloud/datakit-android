@@ -1,3 +1,8 @@
+# agent 1.6.12-alpha02
+1. 添加 `FTSDKConfig.setRemoteConfiguration` 支持开启远程条件配置功能， 
+   添加`FTSDKConfig.setRemoteConfigMiniUpdateInterval` 支持在开启远程控制之后，设置最短更新时间间隔 
+
+---
 # agent 1.6.12-alpha01
 1. 添加 `FTRUMConfig.setEnableTraceWebView` 配置是否开启通过 SDK 采集 webview 数据,
    通过 `FTRUMConfig.setAllowWebViewHost` 可以控制需要过滤 host 地址

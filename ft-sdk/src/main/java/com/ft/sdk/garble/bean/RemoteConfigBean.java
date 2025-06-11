@@ -17,23 +17,25 @@ public class RemoteConfigBean {
     public static final String KEY_RUM_SESSION_ON_ERROR_SAMPLE_RATE = "rumSessionOnErrorSampleRate";
     public static final String KEY_RUM_ENABLE_TRACE_USER_ACTION = "rumEnableTraceUserAction";
     public static final String KEY_RUM_ENABLE_TRACE_USER_VIEW = "rumEnableTraceUserView";
+    public static final String KEY_RUM_ENABLE_TRACE_USER_RESOURCE = "rumEnableTraceUserResource";
     public static final String KEY_RUM_ENABLE_RESOURCE_HOST_IP = "rumEnableResourceHostIP";
     public static final String KEY_RUM_ENABLE_TRACK_APP_UIBLOCK = "rumEnableTrackAppUIBlock";
     public static final String KEY_RUM_BLOCK_DURATION_MS = "rumBlockDurationMs";
     public static final String KEY_RUM_ENABLE_TRACK_APP_CRASH = "rumEnableTrackAppCrash";
-    public static final String KEY_RUM_ENABLE_TRACE_USER_RESOURCE = "rumEnableTraceUserResource";
     public static final String KEY_RUM_ENABLE_TRACK_APP_ANR = "rumEnableTrackAppANR";
-    ;
     public static final String KEY_RUM_ENABLE_TRACE_WEB_VIEW = "rumEnableTraceWebView";
     public static final String KEY_RUM_ALLOW_WEB_VIEW_HOST = "rumAllowWebViewHost";
     public static final String KEY_LOG_SAMPLE_RATE = "logSampleRate";
     public static final String KEY_LOG_LEVEL_FILTERS = "logLevelFilters";
     public static final String KEY_LOG_ENABLE_CUSTOM_LOG = "logEnableCustomLog";
+    public static final String KEY_LOG_ENABLE_CONSOLE_LOG = "logEnableConsoleLog";
     public static final String KEY_TRACE_SAMPLE_RATE = "traceSampleRate";
     public static final String KEY_TRACE_ENABLE_AUTO_TRACE = "traceEnableAutoTrace";
     public static final String KEY_TRACE_TYPE = "traceType";
     public static final String KEY_SESSION_REPLAY_SAMPLE_RATE = "sessionReplaySampleRate";
-    public static final String KEY_SESSION_SAMPLE_RATE = "sessionSampleRate";
+    public static final String KEY_SESSION_REPLAY_ON_ERROR_SAMPLE_RATE = "sessionReplayOnErrorSampleRate";
+    public static final String KEY_ENV = "env";
+    public static final String KEY_MD5 = "md5";
 
     private String env;
     private String serviceName;
@@ -78,140 +80,101 @@ public class RemoteConfigBean {
         return bean;
     }
 
+    private boolean isBoolean(JSONObject obj, String key) {
+        return obj.has(key) && obj.opt(key) instanceof Boolean;
+    }
+
+    private boolean isNumber(JSONObject obj, String key) {
+        return obj.has(key) && obj.opt(key) instanceof Number;
+    }
+
+    private boolean isString(JSONObject obj, String key) {
+        return obj.has(key) && obj.opt(key) instanceof String;
+    }
+
     void parse(String data) {
         try {
-            if (data != null) {
-                JSONObject json = new JSONObject(data);
-                JSONObject content = json.optJSONObject("content");
-                if (json.has("md5")) {
-                    this.md5 = json.optString("md5");
-                }
-                if (content != null) {
-                    if (content.has("env")) {
-                        env = content.optString("env");
-                    }
+            if (data == null) return;
 
-                    if (content.has(KEY_SERVICE_NAME)) {
-                        serviceName = content.optString(KEY_SERVICE_NAME);
-                    }
-
-                    if (content.has(KEY_AUTO_SYNC)) {
-                        autoSync = content.optBoolean(KEY_AUTO_SYNC);
-                    }
-
-                    if (content.has(KEY_COMPRESS_INTAKE_REQUESTS)) {
-                        compressIntakeRequests = content.optBoolean(KEY_COMPRESS_INTAKE_REQUESTS);
-                    }
-
-                    if (content.has(KEY_SYNC_PAGE_SIZE)) {
-                        syncPageSize = content.optInt(KEY_SYNC_PAGE_SIZE);
-                    }
-
-                    if (content.has(KEY_SYNC_SLEEP_TIME)) {
-                        syncSleepTime = content.optInt(KEY_SYNC_SLEEP_TIME);
-                    }
-
-                    if (content.has(KEY_RUM_SAMPLE_RATE)) {
-                        rumSampleRate = (float) content.optDouble(KEY_RUM_SAMPLE_RATE);
-                    }
-
-                    if (content.has(KEY_RUM_SESSION_ON_ERROR_SAMPLE_RATE)) {
-                        rumSessionOnErrorSampleRate = (float) content.optDouble(KEY_RUM_SESSION_ON_ERROR_SAMPLE_RATE);
-                    }
-
-                    if (content.has(KEY_RUM_ENABLE_TRACE_USER_ACTION)) {
-                        rumEnableTraceUserAction = content.optBoolean(KEY_RUM_ENABLE_TRACE_USER_ACTION);
-                    }
-
-                    if (content.has(KEY_RUM_ENABLE_TRACE_USER_VIEW)) {
-                        rumEnableTraceUserView = content.optBoolean(KEY_RUM_ENABLE_TRACE_USER_VIEW);
-                    }
-
-                    if (content.has(KEY_RUM_ENABLE_TRACE_USER_RESOURCE)) {
-                        rumEnableTraceUserResource = content.optBoolean(KEY_RUM_ENABLE_TRACE_USER_RESOURCE);
-                    }
-
-                    if (content.has(KEY_RUM_ENABLE_RESOURCE_HOST_IP)) {
-                        rumEnableResourceHostIP = content.optBoolean(KEY_RUM_ENABLE_RESOURCE_HOST_IP);
-                    }
-
-                    if (content.has(KEY_RUM_ENABLE_TRACK_APP_UIBLOCK)) {
-                        rumEnableTrackAppUIBlock = content.optBoolean(KEY_RUM_ENABLE_TRACK_APP_UIBLOCK);
-                    }
-
-                    if (content.has(KEY_RUM_BLOCK_DURATION_MS)) {
-                        rumBlockDurationMs = content.optLong(KEY_RUM_BLOCK_DURATION_MS);
-                    }
-
-                    if (content.has(KEY_RUM_ENABLE_TRACK_APP_CRASH)) {
-                        rumEnableTrackAppCrash = content.optBoolean(KEY_RUM_ENABLE_TRACK_APP_CRASH);
-                    }
-
-                    if (content.has(KEY_RUM_ENABLE_TRACK_APP_ANR)) {
-                        rumEnableTrackAppANR = content.optBoolean(KEY_RUM_ENABLE_TRACK_APP_ANR);
-                    }
-
-                    if (content.has(KEY_RUM_ENABLE_TRACE_WEB_VIEW)) {
-                        rumEnableTraceWebView = content.optBoolean(KEY_RUM_ENABLE_TRACE_WEB_VIEW);
-                    }
-
-                    if (content.has(KEY_RUM_ALLOW_WEB_VIEW_HOST)) {
-                        String arrayString = content.optString(KEY_RUM_ALLOW_WEB_VIEW_HOST);
-                        try {
-                            JSONArray array = new JSONArray(arrayString);
-                            rumAllowWebViewHost = new String[array.length()];
-                            for (int i = 0; i < array.length(); i++) {
-                                rumAllowWebViewHost[i] = (array.optString(i));
-                            }
-                        } catch (Exception e) {
-                            LogUtils.e(TAG, KEY_RUM_ALLOW_WEB_VIEW_HOST + " parse error ignore," + arrayString);
-
-                        }
-                    }
-
-                    if (content.has(KEY_LOG_SAMPLE_RATE)) {
-                        logSampleRate = (float) content.optDouble(KEY_LOG_SAMPLE_RATE);
-                    }
-
-                    if (content.has(KEY_LOG_LEVEL_FILTERS)) {
-                        String arrayString = content.optString(KEY_LOG_LEVEL_FILTERS);
-                        try {
-                            JSONArray array = new JSONArray(arrayString);
-                            logLevelFilters = new String[array.length()];
-                            for (int i = 0; i < array.length(); i++) {
-                                logLevelFilters[i] = array.optString(i);
-                            }
-                        } catch (Exception e) {
-                            LogUtils.e(TAG, KEY_LOG_LEVEL_FILTERS + " parse error ignore," + arrayString);
-                        }
-                    }
-
-                    if (content.has(KEY_LOG_ENABLE_CUSTOM_LOG)) {
-                        logEnableCustomLog = content.optBoolean(KEY_LOG_ENABLE_CUSTOM_LOG);
-                    }
-
-                    if (content.has(KEY_TRACE_SAMPLE_RATE)) {
-                        traceSampleRate = (float) content.optDouble(KEY_TRACE_SAMPLE_RATE);
-                    }
-
-                    if (content.has(KEY_TRACE_ENABLE_AUTO_TRACE)) {
-                        traceEnableAutoTrace = content.optBoolean(KEY_TRACE_ENABLE_AUTO_TRACE);
-                    }
-
-                    if (content.has(KEY_TRACE_TYPE)) {
-                        traceType = content.optString(KEY_TRACE_TYPE);
-                    }
-
-                    if (content.has(KEY_SESSION_REPLAY_SAMPLE_RATE)) {
-                        sessionReplaySampleRate = (float) content.optDouble(KEY_SESSION_REPLAY_SAMPLE_RATE);
-                    }
-
-                    if (content.has(KEY_SESSION_SAMPLE_RATE)) {
-                        sessionReplayOnErrorSampleRate = (float) content.optDouble(KEY_SESSION_SAMPLE_RATE);
-                    }
-                    isValid = true;
-                }
+            JSONObject json = new JSONObject(data);
+            if (isString(json, KEY_MD5)) {
+                this.md5 = json.optString(KEY_MD5);
             }
+
+            JSONObject content = json.optJSONObject("content");
+            if (content == null) return;
+
+            if (isString(content, KEY_ENV)) env = content.optString(KEY_ENV);
+            if (isString(content, KEY_SERVICE_NAME)) serviceName = content.optString(KEY_SERVICE_NAME);
+            if (isBoolean(content, KEY_AUTO_SYNC)) autoSync = content.optBoolean(KEY_AUTO_SYNC);
+            if (isBoolean(content, KEY_COMPRESS_INTAKE_REQUESTS)) compressIntakeRequests = content.optBoolean(KEY_COMPRESS_INTAKE_REQUESTS);
+            if (isNumber(content, KEY_SYNC_PAGE_SIZE)) syncPageSize = content.optInt(KEY_SYNC_PAGE_SIZE);
+            if (isNumber(content, KEY_SYNC_SLEEP_TIME)) syncSleepTime = content.optInt(KEY_SYNC_SLEEP_TIME);
+            if (isNumber(content, KEY_RUM_SAMPLE_RATE)) rumSampleRate = (float) content.optDouble(KEY_RUM_SAMPLE_RATE);
+            if (isNumber(content, KEY_RUM_SESSION_ON_ERROR_SAMPLE_RATE)) rumSessionOnErrorSampleRate = (float) content.optDouble(KEY_RUM_SESSION_ON_ERROR_SAMPLE_RATE);
+            if (isBoolean(content, KEY_RUM_ENABLE_TRACE_USER_ACTION)) rumEnableTraceUserAction = content.optBoolean(KEY_RUM_ENABLE_TRACE_USER_ACTION);
+            if (isBoolean(content, KEY_RUM_ENABLE_TRACE_USER_VIEW)) rumEnableTraceUserView = content.optBoolean(KEY_RUM_ENABLE_TRACE_USER_VIEW);
+            if (isBoolean(content, KEY_RUM_ENABLE_TRACE_USER_RESOURCE)) rumEnableTraceUserResource = content.optBoolean(KEY_RUM_ENABLE_TRACE_USER_RESOURCE);
+            if (isBoolean(content, KEY_RUM_ENABLE_RESOURCE_HOST_IP)) rumEnableResourceHostIP = content.optBoolean(KEY_RUM_ENABLE_RESOURCE_HOST_IP);
+            if (isBoolean(content, KEY_RUM_ENABLE_TRACK_APP_UIBLOCK)) rumEnableTrackAppUIBlock = content.optBoolean(KEY_RUM_ENABLE_TRACK_APP_UIBLOCK);
+            if (isNumber(content, KEY_RUM_BLOCK_DURATION_MS)) rumBlockDurationMs = content.optLong(KEY_RUM_BLOCK_DURATION_MS);
+            if (isBoolean(content, KEY_RUM_ENABLE_TRACK_APP_CRASH)) rumEnableTrackAppCrash = content.optBoolean(KEY_RUM_ENABLE_TRACK_APP_CRASH);
+            if (isBoolean(content, KEY_RUM_ENABLE_TRACK_APP_ANR)) rumEnableTrackAppANR = content.optBoolean(KEY_RUM_ENABLE_TRACK_APP_ANR);
+            if (isBoolean(content, KEY_RUM_ENABLE_TRACE_WEB_VIEW)) rumEnableTraceWebView = content.optBoolean(KEY_RUM_ENABLE_TRACE_WEB_VIEW);
+
+            Object webViewHostObj = content.opt(KEY_RUM_ALLOW_WEB_VIEW_HOST);
+            if (webViewHostObj instanceof String) {
+                try {
+                    JSONArray array = new JSONArray((String) webViewHostObj);
+                    rumAllowWebViewHost = new String[array.length()];
+                    for (int i = 0; i < array.length(); i++) {
+                        rumAllowWebViewHost[i] = array.optString(i);
+                    }
+                } catch (Exception e) {
+                    LogUtils.e(TAG, KEY_RUM_ALLOW_WEB_VIEW_HOST + " parse error ignore," + webViewHostObj);
+                }
+            } else if (webViewHostObj instanceof JSONArray) {
+                JSONArray array = (JSONArray) webViewHostObj;
+                rumAllowWebViewHost = new String[array.length()];
+                for (int i = 0; i < array.length(); i++) {
+                    rumAllowWebViewHost[i] = array.optString(i);
+                }
+            } else if (webViewHostObj != null) {
+                LogUtils.e(TAG, KEY_RUM_ALLOW_WEB_VIEW_HOST + " is not a valid JSONArray or String");
+            }
+
+            if (isNumber(content, KEY_LOG_SAMPLE_RATE)) logSampleRate = (float) content.optDouble(KEY_LOG_SAMPLE_RATE);
+
+            Object logFilterObj = content.opt(KEY_LOG_LEVEL_FILTERS);
+            if (logFilterObj instanceof String) {
+                try {
+                    JSONArray array = new JSONArray((String) logFilterObj);
+                    logLevelFilters = new String[array.length()];
+                    for (int i = 0; i < array.length(); i++) {
+                        logLevelFilters[i] = array.optString(i);
+                    }
+                } catch (Exception e) {
+                    LogUtils.e(TAG, KEY_LOG_LEVEL_FILTERS + " parse error ignore," + logFilterObj);
+                }
+            } else if (logFilterObj instanceof JSONArray) {
+                JSONArray array = (JSONArray) logFilterObj;
+                logLevelFilters = new String[array.length()];
+                for (int i = 0; i < array.length(); i++) {
+                    logLevelFilters[i] = array.optString(i);
+                }
+            } else if (logFilterObj != null) {
+                LogUtils.e(TAG, KEY_LOG_LEVEL_FILTERS + " is not a valid JSONArray or String");
+            }
+
+            if (isBoolean(content, KEY_LOG_ENABLE_CUSTOM_LOG)) logEnableCustomLog = content.optBoolean(KEY_LOG_ENABLE_CUSTOM_LOG);
+            if (isBoolean(content, KEY_LOG_ENABLE_CONSOLE_LOG)) logEnableConsoleLog = content.optBoolean(KEY_LOG_ENABLE_CONSOLE_LOG);
+            if (isNumber(content, KEY_TRACE_SAMPLE_RATE)) traceSampleRate = (float) content.optDouble(KEY_TRACE_SAMPLE_RATE);
+            if (isBoolean(content, KEY_TRACE_ENABLE_AUTO_TRACE)) traceEnableAutoTrace = content.optBoolean(KEY_TRACE_ENABLE_AUTO_TRACE);
+            if (isString(content, KEY_TRACE_TYPE)) traceType = content.optString(KEY_TRACE_TYPE);
+            if (isNumber(content, KEY_SESSION_REPLAY_SAMPLE_RATE)) sessionReplaySampleRate = (float) content.optDouble(KEY_SESSION_REPLAY_SAMPLE_RATE);
+            if (isNumber(content, KEY_SESSION_REPLAY_ON_ERROR_SAMPLE_RATE)) sessionReplayOnErrorSampleRate = (float) content.optDouble(KEY_SESSION_REPLAY_ON_ERROR_SAMPLE_RATE);
+
+            isValid = true;
         } catch (Exception e) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
@@ -363,6 +326,7 @@ public class RemoteConfigBean {
         if (sessionReplayOnErrorSampleRate != null)
             sb.append("sessionReplayOnErrorSampleRate='").append(sessionReplayOnErrorSampleRate).append("', ");
         if (md5 != null) sb.append("md5='").append(md5);
+        sb.append("}");
         return sb.toString();
     }
 
