@@ -134,7 +134,7 @@ public class FTRUMConfig {
     private String[] allowWebViewHost;
 
     /**
-     * 配置是否开启是否通过 SDK 采集 SDK 数据
+     * 配置是否开启通过 Android SDK 采集 WebView 数据
      * @param enableTraceWebView
      * @return
      */
@@ -144,7 +144,7 @@ public class FTRUMConfig {
     }
 
     /**
-     * 配置允许数据追踪的 webview host 地址
+     * 配置允许数据追踪的 WebView host 地址
      * @param allowWebViewHost
      * @return
      */

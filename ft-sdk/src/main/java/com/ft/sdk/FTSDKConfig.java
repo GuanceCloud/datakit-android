@@ -168,7 +168,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 是否开启远程动态配置
+     * 是否开启数据采集的远程配置功能，默认不开启。开启之后，SDK 初始化或应用热启动会触发数据更新。
      * @param remoteConfiguration
      * @return
      */

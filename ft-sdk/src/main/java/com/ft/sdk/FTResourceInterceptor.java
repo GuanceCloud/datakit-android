@@ -67,7 +67,8 @@ public class FTResourceInterceptor implements Interceptor {
     }
 
     /**
-     * {@link ContentHandlerHelper } 的基础上，可以过滤本地错误类型
+     * {@link ContentHandlerHelper } 的基础上，可以过滤本地错误类型, 使用 {@link ContentHandlerHelperEx} 后，
+     * {@link ContentHandlerHelperEx#onException} 将不再接受回调。默认不对本地网络错误进行过滤
      */
     public static abstract class ContentHandlerHelperEx extends ContentHandlerHelper {
         /**
@@ -75,10 +76,10 @@ public class FTResourceInterceptor implements Interceptor {
          *
          * @param e         请求发生的 IOException 数据
          * @param extraData 附加数据
-         * @return 是否覆盖 SDK {@link com.ft.sdk.garble.bean.ErrorType#NETWORK} 类型的错误
+         * @return 是否过滤本地网络 {@link com.ft.sdk.garble.bean.ErrorType#NETWORK} 类型的错误。true，为过滤
          */
         public boolean onExceptionWithFilter(Exception e, HashMap<String, Object> extraData) {
-            return true;
+            return false;
         }
 
     }
