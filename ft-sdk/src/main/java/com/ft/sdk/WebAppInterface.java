@@ -56,6 +56,9 @@ public class WebAppInterface {
 
     @JavascriptInterface
     public String getAllowedWebViewHosts() {
+        if (mAllowWebViewHost == null) {
+            return null;
+        }
         return Utils.setToJsonString(Arrays.asList(mAllowWebViewHost));
     }
 
