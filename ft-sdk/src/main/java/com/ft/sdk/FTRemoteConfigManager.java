@@ -29,7 +29,13 @@ public class FTRemoteConfigManager {
         this.remoteConfigMiniUpdateInterval = remoteConfigMiniUpdateInterval;
     }
 
+    /**
+     * 返回远程配置更新结果
+     */
     public interface FetchResult {
+        /**
+         * @param success true 为更新成功或数据无更改，false 为更新失败
+         */
         void onResult(boolean success);
     }
 

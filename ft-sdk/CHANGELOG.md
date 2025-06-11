@@ -1,3 +1,7 @@
+# agent 1.6.12-beta01
+1. 修正 webHost 空配置异常的问题
+
+---
 # agent 1.6.12-alpha02
 1. 添加 `FTSDKConfig.setRemoteConfiguration` 支持开启远程条件配置功能， 
    添加`FTSDKConfig.setRemoteConfigMiniUpdateInterval` 支持在开启远程控制之后，设置最短更新时间间隔 

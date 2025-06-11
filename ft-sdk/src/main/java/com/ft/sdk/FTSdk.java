@@ -128,7 +128,9 @@ public class FTSdk {
         FTANRDetector.get().release();
         FTDBManager.release();
         if (mFtSdk != null) {
-            mFtSdk.mRemoteConfigManager.close();
+            if (mFtSdk.mRemoteConfigManager != null) {
+                mFtSdk.mRemoteConfigManager.close();
+            }
             mFtSdk = null;
         }
         LogUtils.w(TAG, "FT SDK 已经被关闭");
@@ -168,6 +170,9 @@ public class FTSdk {
     }
 
 
+    /**
+     * 主动更新远程远程配置，调用频次受 {@link FTSDKConfig#setRemoteConfigMiniUpdateInterval(int)} }的时间影响
+     */
     public static void updateRemoteConfig() {
         if (checkInstallState()) {
             if (mFtSdk.mRemoteConfigManager != null) {
@@ -176,6 +181,12 @@ public class FTSdk {
         }
     }
 
+    /**
+     * 主动更新远程远程配置,这个方法无视 {@link FTSDKConfig#setRemoteConfigMiniUpdateInterval(int)} } 配置
+     *
+     * @param remoteConfigMiniUpdateInterval 远程配置时间间隔，单位秒 [0,]
+     * @param result 返回更新结果
+     */
     public static void updateRemoteConfig(int remoteConfigMiniUpdateInterval, FTRemoteConfigManager.FetchResult result) {
         if (checkInstallState()) {
             if (mFtSdk.mRemoteConfigManager != null) {
