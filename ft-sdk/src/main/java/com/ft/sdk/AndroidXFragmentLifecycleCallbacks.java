@@ -9,9 +9,12 @@ import androidx.fragment.app.FragmentManager;
  */
 final class AndroidXFragmentLifecycleCallbacks extends FragmentManager.FragmentLifecycleCallbacks {
 
+    final static String INVALID_FRAGMENT__REPORT_FRAGMENT = "androidx.lifecycle.ReportFragment";
+
     @Override
     public void onFragmentResumed(FragmentManager fm, Fragment f) {
         super.onFragmentResumed(fm, f);
+        if (fm.getClass().getName().equals(INVALID_FRAGMENT__REPORT_FRAGMENT)) return;
         FTRUMGlobalManager.get().startView(f.getClass().getSimpleName());
     }
 
@@ -19,6 +22,7 @@ final class AndroidXFragmentLifecycleCallbacks extends FragmentManager.FragmentL
     @Override
     public void onFragmentStopped(FragmentManager fm, Fragment f) {
         super.onFragmentStopped(fm, f);
+        if (fm.getClass().getName().equals(INVALID_FRAGMENT__REPORT_FRAGMENT)) return;
         FTRUMGlobalManager.get().stopView();
 
     }
