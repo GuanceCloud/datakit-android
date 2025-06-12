@@ -18,6 +18,10 @@
 1. 合并 ft-sdk 1.6.10 版本
 
 ---
+# agent 1.7.0-alpha15
+1. 适配 replay_0.1.1-alpha01 更改内容
+
+---
 # agent 1.7.0-alpha14
 1. 更改 userAgent 展示规则
 2. 合并 ft-sdk 1.6.10-alpha02
@@ -147,11 +151,8 @@
 1. 支持 okhttp request 添加唯一 ResourceID，来解决相同请求高并发 trace_id ，span_id 错误错位的问题, 
    ft-plugin 1.3.5 以上版本支持自动添加 ResourceID。
 2. 修复多次初始化 RUM 配置的场景下，与其他其他崩溃采集 SDK，产生循环调用的问题
-3. 原生页面跳转至 WebView 页面时，用原生页面填充 WebView 数据中 view_referrer 
-
----
-# agent 1.6.10-alpha03
-1. 底层网络请求库支持 multiform 
+3. 原生页面跳转至 WebView 页面时，用原生页面填充 WebView 数据中 view_referrer
+4. 底层网络请求库支持 multiform 
 
 ---
 # agent 1.6.10-alpha02

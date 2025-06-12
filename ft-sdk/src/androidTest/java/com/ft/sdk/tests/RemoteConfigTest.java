@@ -11,6 +11,7 @@ import com.ft.sdk.FTTraceConfig;
 import com.ft.sdk.garble.bean.RemoteConfigBean;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.Utils;
+import com.ft.sdk.sessionreplay.FTSessionReplayConfig;
 import com.ft.test.base.FTBaseTest;
 
 import org.junit.Assert;
@@ -196,9 +197,8 @@ public class RemoteConfigTest extends FTBaseTest {
         FTSdk.initLogWithConfig(logConfig);
         FTTraceConfig traceConfig = new FTTraceConfig();
         FTSdk.initTraceWithConfig(traceConfig);
-
-//        FTSessionReplayConfig traceConfig = new FTTraceConfig();
-//        FTSdk.initTraceWithConfig(traceConfig);
+        FTSessionReplayConfig sessionReplayConfig = new FTSessionReplayConfig();
+        FTSdk.initSessionReplayConfig(sessionReplayConfig);
 
         Assert.assertEquals(config.getServiceName(), VALUE_SERVICE_NAME);
         Assert.assertEquals(config.getEnv(), VALUE_ENV);
@@ -225,6 +225,8 @@ public class RemoteConfigTest extends FTBaseTest {
         Assert.assertEquals(traceConfig.getSamplingRate(), VALUE_TRACE_SAMPLE_RATE, 0.0);
         Assert.assertEquals(traceConfig.isEnableAutoTrace(), VALUE_TRACE_ENABLE_AUTO_TRACE);
         Assert.assertEquals(traceConfig.getTraceType().value(), VALUE_TRACE_TYPE);
+        Assert.assertEquals(sessionReplayConfig.getSampleRate(), VALUE_SESSION_REPLAY_SAMPLE_RATE, 0.0);
+        Assert.assertEquals(sessionReplayConfig.getSessionReplayOnErrorSampleRate(), VALUE_SESSION_REPLAY_ON_ERROR_SAMPLE_RATE, 0.0);
     }
 
 
