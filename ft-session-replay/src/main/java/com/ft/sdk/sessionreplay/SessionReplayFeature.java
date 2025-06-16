@@ -191,9 +191,9 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
             @Override
             public void onUpdate(Map<String, Object> context) {
                 context.put(SESSION_REPLAY_SAMPLE_RATE_KEY, sessionRelaySampler.getSampleRate() != null ?
-                        sessionRelaySampler.getSampleRate().longValue() : null);
+                        sessionRelaySampler.getSampleRate() : null);
                 context.put(SESSION_REPLAY_ON_ERROR_SAMPLE_RATE_KEY, sessionRelayErrorSampler.getSampleRate() != null ?
-                        sessionRelayErrorSampler.getSampleRate().longValue() : null);
+                        sessionRelayErrorSampler.getSampleRate() : null);
                 context.put(SESSION_REPLAY_IMAGE_PRIVACY_KEY, imagePrivacy.toString().toLowerCase(Locale.US));
                 context.put(SESSION_REPLAY_TOUCH_PRIVACY_KEY, touchPrivacy.toString().toLowerCase(Locale.US));
                 context.put(SESSION_REPLAY_TEXT_AND_INPUT_PRIVACY_KEY, textAndInputPrivacy.toString().toLowerCase(Locale.US));
@@ -315,8 +315,6 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                         @Override
                         public void onUpdate(Map<String, Object> context) {
                             context.put(SESSION_REPLAY_ENABLED_KEY, false);
-                            context.put(SESSION_REPLAY_ON_ERROR_SAMPLE_RATE_KEY, false);
-
                         }
                     }
             );
