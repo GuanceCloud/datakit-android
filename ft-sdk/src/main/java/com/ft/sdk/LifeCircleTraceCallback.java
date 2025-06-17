@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.SystemClock;
 
 import androidx.annotation.NonNull;
 
@@ -15,7 +16,7 @@ import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 
 /**
@@ -44,12 +45,14 @@ class LifeCircleTraceCallback {
     /**
      * 应用启动时间点
      */
-    private long startTime = 0;
+    private long startTimeNanoTime = 0;
+
+    private long startClockTimeNano = 0;
 
     /**
      * 缓存创建时间点
      */
-    private final HashMap<Context, Long> mCreateMap = new HashMap<>();
+    private final LinkedHashMap<Context, Long> mCreateMap = new LinkedHashMap<>();
 
     /**
      * 用于发送延迟消息，10 秒后执行休眠 {@link #alreadySleep} = true 操作
@@ -70,7 +73,9 @@ class LifeCircleTraceCallback {
     public void onPreStart() {
         if (alreadySleep) {//表示从后台重新进入
             if (mInited) {
-                startTime = Utils.getCurrentNanoTime();
+                //hot start
+                startTimeNanoTime = Utils.getCurrentNanoTime();
+                startClockTimeNano= SystemClock.elapsedRealtimeNanos();
             }
         }
 
@@ -83,11 +88,12 @@ class LifeCircleTraceCallback {
      * @param context
      */
     public void onPreOnCreate(Context context) {
-        mCreateMap.put(context, Utils.getCurrentNanoTime());
-
+        mCreateMap.put(context, SystemClock.elapsedRealtimeNanos());
         if (!mInited) {
 //            FTAutoTrack.startApp();
-            startTime = Utils.getCurrentNanoTime();
+            // warn start
+            startTimeNanoTime = Utils.getCurrentNanoTime();
+            startClockTimeNano= SystemClock.elapsedRealtimeNanos();
         }
     }
 
@@ -105,20 +111,28 @@ class LifeCircleTraceCallback {
             if (config.isEnableTraceUserView()) {
                 Long startTime = mCreateMap.get(context);
                 if (startTime != null) {
-                    long duration = Utils.getCurrentNanoTime() - startTime;
+                    long durationNS = SystemClock.elapsedRealtimeNanos() - startTime;
                     String viewName = AopUtils.getClassName(context);
-                    FTRUMInnerManager.get().onCreateView(viewName, duration);
+                    FTRUMInnerManager.get().onCreateView(viewName, durationNS);
                 }
             }
         }
     }
 
     /**
-     * see <a href="https://developer.android.com/topic/performance/vitals/launch-time?hl=zh-cn#warm">启动时间计算规则</a>
-     *
      * @param context
      */
     public void onPostOnStart(Context context) {
+
+    }
+
+    /**
+     * see <a href="https://developer.android.com/topic/performance/vitals/launch-time?hl=zh-cn#warm">启动时间计算规则</a>
+     * {@link Activity#onResume() }  之后
+     *
+     * @param context
+     */
+    public void onPostResume(Context context) {
         FTRUMConfigManager manager = FTRUMConfigManager.get();
         FTRUMConfig config = manager.getConfig();
 
@@ -136,9 +150,10 @@ class LifeCircleTraceCallback {
         if (alreadySleep) {
             if (mInited) {
                 if (config != null && config.isRumEnable() && config.isEnableTraceUserAction()) {
-                    if (startTime > 0) {
-                        long now = Utils.getCurrentNanoTime();
-                        FTAppStartCounter.get().hotStart(now - startTime, startTime);
+                    if (startTimeNanoTime > 0) {
+                        long now = SystemClock.elapsedRealtimeNanos();
+                        FTAppStartCounter.get().hotStart(now - startClockTimeNano,
+                                startTimeNanoTime);
 
                     }
 
@@ -151,15 +166,6 @@ class LifeCircleTraceCallback {
         if (!mInited) {
             mInited = true;
         }
-    }
-
-    /**
-     * {@link Activity#onResume() }  之后
-     *
-     * @param context
-     */
-    public void onPostResume(Context context) {
-
     }
 
     /**

@@ -78,6 +78,7 @@ class FTAppStartCounter {
      */
     void hotStart(long hotStartDuration, long startTime) {
         FTAutoTrack.putRUMLaunchPerformance(false, hotStartDuration, startTime);
+        LogUtils.d(TAG, "hotStart:" + hotStartDuration);
     }
 
 
