@@ -69,8 +69,8 @@ public class ImageViewMapper extends BaseAsyncBackgroundWireframeMapper<ImageVie
         float density = resources.getDisplayMetrics().density;
         WireframeClip clipping = imageViewUtils.calculateClipping(parentRect, contentRect, density);
 
-        long contentXPosInDp = Utils.densityNormalized(contentRect.left, density);
-        long contentYPosInDp = Utils.densityNormalized(contentRect.top, density);
+        long contentXPosInDp = (long) Utils.densityNormalized(contentRect.left, density);
+        long contentYPosInDp = (long) Utils.densityNormalized(contentRect.top, density);
         int contentWidthPx = contentRect.width();
         int contentHeightPx = contentRect.height();
         Drawable.ConstantState constantState = drawable.getConstantState();

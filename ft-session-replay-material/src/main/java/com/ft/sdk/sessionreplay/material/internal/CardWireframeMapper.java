@@ -73,7 +73,7 @@ public class CardWireframeMapper extends BaseViewGroupMapper<CardView> {
                 : view.getStrokeColor();
         return new ShapeBorder(
                 colorStringFormatter.formatColorAsHexString(strokeColor),
-                Utils.densityNormalized(view.getStrokeWidth(),
+                (long) Utils.densityNormalized(view.getStrokeWidth(),
                         mappingContext.getSystemInformation().getScreenDensity())
         );
     }
@@ -86,7 +86,7 @@ public class CardWireframeMapper extends BaseViewGroupMapper<CardView> {
         return new ShapeStyle(
                 colorStringFormatter.formatColorAsHexString(backgroundColor),
                 view.getAlpha(),
-                Utils.densityNormalized(view.getRadius(),
+                (long) Utils.densityNormalized(view.getRadius(),
                         mappingContext.getSystemInformation().getScreenDensity())
         );
     }

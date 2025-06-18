@@ -3,11 +3,15 @@ package com.ft.sdk.sessionreplay;
 
 import android.app.Application;
 import android.content.Context;
+import android.util.Log;
 
 import com.ft.sdk.sessionreplay.internal.SessionReplayRumContextProvider;
 import com.ft.sdk.sessionreplay.internal.async.RecordedDataQueueHandler;
+import com.ft.sdk.sessionreplay.internal.async.SnapshotRecordedDataQueueItem;
 import com.ft.sdk.sessionreplay.internal.processor.MutationResolver;
 import com.ft.sdk.sessionreplay.internal.processor.RecordedDataProcessor;
+import com.ft.sdk.sessionreplay.internal.processor.RecordedQueuedItemContext;
+import com.ft.sdk.sessionreplay.internal.recorder.Node;
 import com.ft.sdk.sessionreplay.internal.recorder.SessionReplayRecorder;
 import com.ft.sdk.sessionreplay.model.MobileRecord;
 import com.ft.sdk.feature.FeatureEventReceiver;
@@ -28,6 +32,7 @@ import com.ft.sdk.sessionreplay.internal.storage.NoOpRecordWriter;
 import com.ft.sdk.sessionreplay.internal.storage.RecordWriter;
 import com.ft.sdk.sessionreplay.internal.storage.SessionReplayRecordWriter;
 import com.ft.sdk.sessionreplay.recorder.OptionSelectorDetector;
+import com.ft.sdk.sessionreplay.recorder.SystemInformation;
 import com.ft.sdk.sessionreplay.utils.DrawableToColorMapper;
 import com.ft.sdk.sessionreplay.utils.RumContextProvider;
 import com.ft.sdk.sessionreplay.utils.SessionReplayRumContext;
@@ -37,6 +42,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -99,7 +105,10 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
             dataWriter = new NoOpRecordWriter();
     final AtomicBoolean initialized = new AtomicBoolean(false);
     private RecordedDataProcessor processor; //added by zzq
-    private RumContextProvider rumContextProvider;
+    private RumContextProvider rumContextProvider; //added by zzq
+    
+    // 用于跟踪Flutter页面的映射：rootNode.id -> viewId, added by zzq
+    private final Map<Long, String> flutterPageViewIdMap = new ConcurrentHashMap<>();
 
     // region Constructor
 
@@ -391,6 +400,303 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
         if (recorderProvider instanceof DefaultRecorderProvider) {
             ((DefaultRecorderProvider) recorderProvider).setUseFlutterUIData(useFlutterUIData);
         }
+    }
+    /**
+     * 处理外部提供的Node树数据，通过processor的processScreenSnapshots方法, added by zzq
+     * @param rootNode Node树的根节点
+     * @param systemInformation 系统信息
+     */
+    public void processExternalNodeTree(Node rootNode,
+                                        SystemInformation systemInformation) {
+        if (!checkIfInitialized()) {
+            return;
+        }
+
+        try {
+            // 创建RumContext
+            SessionReplayRumContext rumContext = createEmptyRumContext();
+
+            // 创建RecordedQueuedItemContext
+            RecordedQueuedItemContext recordedQueuedItemContext =
+                    new RecordedQueuedItemContext(
+                            System.currentTimeMillis(),
+                            rumContext
+                    );
+
+            // 创建SnapshotRecordedDataQueueItem
+            SnapshotRecordedDataQueueItem snapshotItem =
+                    new SnapshotRecordedDataQueueItem(
+                            recordedQueuedItemContext,
+                            systemInformation
+                    );
+
+            // 设置Node列表
+            List<Node> nodes =
+                    java.util.Collections.singletonList(rootNode);
+            snapshotItem.setNodes(nodes);
+            snapshotItem.setFinishedTraversal(true);
+
+            // 通过processor处理
+            processor.processScreenSnapshots(snapshotItem);
+            //sdkCore.getInternalLogger().w(TAG, "Successfully processed external Node tree");
+            Log.d(TAG, "zzq Successfully processed external Node tree");
+        } catch (Exception e) {
+            //sdkCore.getInternalLogger().w(TAG, "Error processing external Node tree: " + e.getMessage());
+            Log.d(TAG, "zzq Error processing external Node tree: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 处理外部提供的Node树数据，使用指定的RUM上下文, added by zzq
+     * @param rootNode Node树的根节点
+     * @param systemInformation 系统信息
+     * @param rumContext 指定的RUM上下文（包含新的viewId）
+     */
+    public void processExternalNodeTreeWithRumContext(Node rootNode,
+                                                      SystemInformation systemInformation,
+                                                      SessionReplayRumContext rumContext) {
+        if (!checkIfInitialized()) {
+            return;
+        }
+
+        try {
+            // 使用传入的RumContext
+            RecordedQueuedItemContext recordedQueuedItemContext =
+                    new RecordedQueuedItemContext(
+                            System.currentTimeMillis(),
+                            rumContext
+                    );
+
+            // 创建SnapshotRecordedDataQueueItem
+            SnapshotRecordedDataQueueItem snapshotItem =
+                    new SnapshotRecordedDataQueueItem(
+                            recordedQueuedItemContext,
+                            systemInformation
+                    );
+
+            // 设置Node列表
+            List<Node> nodes =
+                    java.util.Collections.singletonList(rootNode);
+            snapshotItem.setNodes(nodes);
+            snapshotItem.setFinishedTraversal(true);
+
+            // 通过processor处理
+            processor.processScreenSnapshots(snapshotItem);
+            Log.d(TAG, "zzq Successfully processed external Node tree with RUM context: " + rumContext.getViewId());
+        } catch (Exception e) {
+            Log.d(TAG, "zzq Error processing external Node tree with RUM context: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 处理外部提供的Node树数据，自动检测新页面（用于Flutter）, added by zzq
+     * @param rootNode Node树的根节点
+     * @param systemInformation 系统信息
+     */
+    public void processExternalNodeTreeWithAutoDetection(Node rootNode,
+                                                         SystemInformation systemInformation) {
+        if (!checkIfInitialized()) {
+            return;
+        }
+
+        try {
+            long rootNodeId = 0;
+            if(rootNode.getWireframes() != null && !rootNode.getWireframes().isEmpty()) {
+                rootNodeId = rootNode.getWireframes().get(0).getId();
+            }
+            SessionReplayRumContext rumContext;
+            boolean isNewPage = false;
+            
+            // 检查是否是已知的页面
+            String existingViewId = flutterPageViewIdMap.get(rootNodeId);
+            
+            if (existingViewId == null) {
+                // 新的rootNode.id，说明是新页面
+                isNewPage = true;
+                String newViewId = generateNewViewId();
+                
+                // 记录映射关系
+                flutterPageViewIdMap.put(rootNodeId, newViewId);
+                
+                // 获取当前的applicationId和sessionId
+                SessionReplayRumContext currentContext = createEmptyRumContext();
+                
+                // 创建新的RUM上下文
+                rumContext = new SessionReplayRumContext(
+                    currentContext.getApplicationId(),
+                    currentContext.getSessionId(),
+                    newViewId
+                );
+                
+                Log.d(TAG, "zzq Detected new page, generated viewId: " + newViewId + " for rootNodeId: " + rootNodeId);
+            } else {
+                // 已知的rootNode.id，说明是页面更新
+                // 获取当前的applicationId和sessionId，但使用已存在的viewId
+                SessionReplayRumContext currentContext = createEmptyRumContext();
+                
+                rumContext = new SessionReplayRumContext(
+                    currentContext.getApplicationId(),
+                    currentContext.getSessionId(),
+                    existingViewId  // 使用已存在的viewId
+                );
+                
+                Log.d(TAG, "zzq Detected page update, using existing viewId: " + existingViewId + " for rootNodeId: " + rootNodeId);
+            }
+
+            // 创建RecordedQueuedItemContext
+            RecordedQueuedItemContext recordedQueuedItemContext =
+                    new RecordedQueuedItemContext(
+                            System.currentTimeMillis(),
+                            rumContext
+                    );
+
+            // 创建SnapshotRecordedDataQueueItem
+            SnapshotRecordedDataQueueItem snapshotItem =
+                    new SnapshotRecordedDataQueueItem(
+                            recordedQueuedItemContext,
+                            systemInformation
+                    );
+
+            // 设置Node列表
+            List<Node> nodes = java.util.Collections.singletonList(rootNode);
+            snapshotItem.setNodes(nodes);
+            snapshotItem.setFinishedTraversal(true);
+
+            // 通过processor处理
+            processor.processScreenSnapshots(snapshotItem);
+            
+            Log.d(TAG, "zzq Successfully processed external Node tree (isNewPage: " + isNewPage + ", rootNodeId: " + rootNodeId + ")");
+        } catch (Exception e) {
+            Log.d(TAG, "zzq Error processing external Node tree with auto detection: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 处理外部提供的Node树数据，支持新页面检测（用于Flutter）, added by zzq
+     * @param rootNode Node树的根节点
+     * @param systemInformation 系统信息
+     * @param isNewPage 是否是新页面（由Flutter端判断）
+     */
+    public void processExternalNodeTreeWithPageFlag(Node rootNode,
+                                                    SystemInformation systemInformation,
+                                                    boolean isNewPage) {
+        if (!checkIfInitialized()) {
+            return;
+        }
+
+        try {
+            long rootNodeId = 0;
+            if(rootNode.getWireframes() != null && !rootNode.getWireframes().isEmpty()) {
+                rootNodeId = rootNode.getWireframes().get(0).getId();
+            }
+            SessionReplayRumContext rumContext;
+            
+            if (isNewPage) {
+                // 是新页面，生成新的viewId并创建新的RUM上下文
+                String newViewId = generateNewViewId();
+                
+                // 记录映射关系
+                flutterPageViewIdMap.put(rootNodeId, newViewId);
+                
+                // 获取当前的applicationId和sessionId
+                SessionReplayRumContext currentContext = createEmptyRumContext();
+                
+                // 创建新的RUM上下文
+                rumContext = new SessionReplayRumContext(
+                    currentContext.getApplicationId(),
+                    currentContext.getSessionId(),
+                    newViewId
+                );
+                
+                Log.d(TAG, "zzq Generated new viewId for new page: " + newViewId + " for rootNodeId: " + rootNodeId);
+            } else {
+                // 不是新页面，使用已存在的viewId或当前的RUM上下文
+                String existingViewId = flutterPageViewIdMap.get(rootNodeId);
+                
+                if (existingViewId != null) {
+                    // 使用已存在的viewId
+                    SessionReplayRumContext currentContext = createEmptyRumContext();
+                    rumContext = new SessionReplayRumContext(
+                        currentContext.getApplicationId(),
+                        currentContext.getSessionId(),
+                        existingViewId
+                    );
+                    Log.d(TAG, "zzq Using mapped viewId for page update: " + existingViewId + " for rootNodeId: " + rootNodeId);
+                } else {
+                    // 使用现有的RUM上下文
+                    rumContext = createEmptyRumContext();
+                    Log.d(TAG, "zzq Using current viewId for page update: " + rumContext.getViewId() + " for rootNodeId: " + rootNodeId);
+                }
+            }
+
+            // 创建RecordedQueuedItemContext
+            RecordedQueuedItemContext recordedQueuedItemContext =
+                    new RecordedQueuedItemContext(
+                            System.currentTimeMillis(),
+                            rumContext
+                    );
+
+            // 创建SnapshotRecordedDataQueueItem
+            SnapshotRecordedDataQueueItem snapshotItem =
+                    new SnapshotRecordedDataQueueItem(
+                            recordedQueuedItemContext,
+                            systemInformation
+                    );
+
+            // 设置Node列表
+            List<Node> nodes = java.util.Collections.singletonList(rootNode);
+            snapshotItem.setNodes(nodes);
+            snapshotItem.setFinishedTraversal(true);
+
+            // 通过processor处理
+            processor.processScreenSnapshots(snapshotItem);
+            
+            Log.d(TAG, "zzq Successfully processed external Node tree (isNewPage: " + isNewPage + ", rootNodeId: " + rootNodeId + ")");
+        } catch (Exception e) {
+            Log.d(TAG, "zzq Error processing external Node tree with page flag: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 生成新的viewId, added by zzq
+     * @return 新的viewId
+     */
+    private String generateNewViewId() {
+        // 使用与ViewBean相同的生成方式
+        java.util.UUID uuid = java.util.UUID.randomUUID();
+        return uuid.toString().replace("-", "");
+    }
+
+    /**
+     * 清理Flutter页面映射关系, added by zzq
+     */
+    public void clearFlutterPageMappings() {
+        flutterPageViewIdMap.clear();
+        Log.d(TAG, "zzq Cleared Flutter page mappings");
+    }
+
+    /**
+     * 移除特定的Flutter页面映射, added by zzq
+     * @param rootNodeId 要移除的rootNode ID
+     */
+    public void removeFlutterPageMapping(long rootNodeId) {
+        String removedViewId = flutterPageViewIdMap.remove(rootNodeId);
+        if (removedViewId != null) {
+            Log.d(TAG, "zzq Removed Flutter page mapping: rootNodeId=" + rootNodeId + ", viewId=" + removedViewId);
+        }
+    }
+
+    /**
+     * 创建一个新的RUM上下文，包含指定的viewId, added by zzq
+     * @param applicationId 应用ID
+     * @param sessionId 会话ID  
+     * @param viewId 视图ID
+     * @return SessionReplayRumContext实例
+     */
+    public SessionReplayRumContext createRumContextWithViewId(String applicationId, 
+                                                              String sessionId, 
+                                                              String viewId) {
+        return new SessionReplayRumContext(applicationId, sessionId, viewId);
     }
 
 }

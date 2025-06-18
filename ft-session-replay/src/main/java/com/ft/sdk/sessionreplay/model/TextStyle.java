@@ -9,10 +9,10 @@ import java.util.Objects;
 
 public class TextStyle {
     private final String family;
-    private final long size;
+    private final double size;
     private final String color;
 
-    public TextStyle(String family, long size, String color) {
+    public TextStyle(String family, double size, String color) {
         this.family = family;
         this.size = size;
         this.color = color;
@@ -22,7 +22,7 @@ public class TextStyle {
         return family;
     }
 
-    public long getSize() {
+    public double getSize() {
         return size;
     }
 
@@ -53,7 +53,7 @@ public class TextStyle {
     public static TextStyle fromJsonObject(JsonObject jsonObject) throws JsonParseException {
         try {
             String family = jsonObject.get("family").getAsString();
-            long size = jsonObject.get("size").getAsLong();
+            double size = jsonObject.get("size").getAsDouble();
             String color = jsonObject.get("color").getAsString();
             return new TextStyle(family, size, color);
         } catch (IllegalStateException | NullPointerException e) {
@@ -69,7 +69,7 @@ public class TextStyle {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TextStyle textStyle = (TextStyle) o;
-        return size == textStyle.size && Objects.equals(family, textStyle.family) && Objects.equals(color, textStyle.color);
+        return Double.compare(textStyle.size, size) == 0 && Objects.equals(family, textStyle.family) && Objects.equals(color, textStyle.color);
     }
 
     @Override

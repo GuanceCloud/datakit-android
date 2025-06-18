@@ -409,6 +409,20 @@ public class FTRUMInnerManager {
         preActivityDuration.put(viewName, loadTime);
     }
 
+    /**
+     * Activity Resume，页面真正可见
+     *
+     * @param viewName 界面名称  
+     * @param resumeTime 从onCreate到onResume的总时间，单位纳秒
+     */
+    void onResumeView(String viewName, long resumeTime) {
+        // 这里可以将resumeTime作为更准确的页面可见时间
+        // 暂时存储到preActivityDuration中，优先使用resumeTime而不是onCreate时间
+        LogUtils.d(TAG, "onResumeView: " + viewName + ", resumeTime: " + resumeTime + "ns (" + (resumeTime / 1000000) + "ms)");
+        
+        // 如果已有onCreate时间，则用resumeTime替换，因为这更准确反映页面可见时间
+        preActivityDuration.put(viewName + "_resume", resumeTime);
+    }
 
     /**
      * view 起始
@@ -441,9 +455,17 @@ public class FTRUMInnerManager {
 
 
         long loadTime = -1;
-        if (preActivityDuration.get(viewName) != null) {
+        // 优先使用resume时间（更准确的页面可见时间）
+        String resumeKey = viewName + "_resume";
+        if (preActivityDuration.get(resumeKey) != null) {
+            loadTime = preActivityDuration.get(resumeKey);
+            preActivityDuration.remove(resumeKey);
+            LogUtils.d(TAG, "Using resume time for " + viewName + ": " + (loadTime / 1000000) + "ms");
+        } else if (preActivityDuration.get(viewName) != null) {
+            // 降级使用onCreate时间
             loadTime = preActivityDuration.get(viewName);
             preActivityDuration.remove(viewName);
+            LogUtils.d(TAG, "Using create time for " + viewName + ": " + (loadTime / 1000000) + "ms");
         }
         String viewReferrer = getLastView();
         activeView = new ActiveViewBean(viewName, viewReferrer, loadTime, sessionId);

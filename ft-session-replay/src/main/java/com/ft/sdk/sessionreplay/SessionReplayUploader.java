@@ -1,5 +1,6 @@
 package com.ft.sdk.sessionreplay;
 
+import android.util.Log;
 import android.util.Pair;
 
 import com.ft.sdk.api.SessionReplayFormData;
@@ -125,8 +126,12 @@ public class SessionReplayUploader {
         if (result.isSuccess()) {
             internalLogger.d(TAG, "Session Upload Success. " + result.getPkgId() + ",view_id:" + viewId
                     + ",count:" + recordsCount + ",hasFullSnapshot:" + hasFullSnapshot);
+            Log.d(TAG, "zzq Session Upload Success. " + result.getPkgId() + ",view_id:" + viewId
+                    + ",count:" + recordsCount + ",hasFullSnapshot:" + hasFullSnapshot);
         } else {
             internalLogger.e(TAG, "Session Upload Failed." + result.getPkgId() + ",view_id:" + viewId
+                    + ",count:" + recordsCount + ",code:" + result.getCode() + ",response:" + result.getResponse());
+            Log.e(TAG, "zzq Session Upload Failed." + result.getPkgId() + ",view_id:" + viewId
                     + ",count:" + recordsCount + ",code:" + result.getCode() + ",response:" + result.getResponse());
         }
         return result;

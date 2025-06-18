@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SampleApp</string>
+    <string name="app_name">SessionReplayApp</string>
     <string name="start_service_not_install">Start Service(No)</string>
     <string name="start_service_installed">Start Service(Yes)</string>
 </resources>

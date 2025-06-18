@@ -53,7 +53,7 @@ public abstract class CheckableCompoundButtonMapper<T extends CompoundButton> ex
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             Drawable buttonDrawable = view.getButtonDrawable();
             checkBoxHeight = (buttonDrawable != null && buttonDrawable.getIntrinsicHeight() > 0)
-                    ? Utils.densityNormalized(buttonDrawable.getIntrinsicHeight(), pixelsDensity)
+                    ? (long) Utils.densityNormalized(buttonDrawable.getIntrinsicHeight(), pixelsDensity)
                     : DEFAULT_CHECKABLE_HEIGHT_IN_DP;
         } else {
             checkBoxHeight = DEFAULT_CHECKABLE_HEIGHT_IN_DP;

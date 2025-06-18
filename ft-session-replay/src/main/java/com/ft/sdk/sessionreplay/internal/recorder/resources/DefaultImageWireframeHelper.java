@@ -95,8 +95,8 @@ public class DefaultImageWireframeHelper implements ImageWireframeHelper {
         if (shouldMaskContextualImage(
                 imagePrivacy,
                 isContextualImage,
-                Utils.densityNormalized(targetWidth, density),
-                Utils.densityNormalized(targetHeight, density)
+                (int) Utils.densityNormalized(targetWidth, density),
+                (int) Utils.densityNormalized(targetHeight, density)
         )) {
             return createContentPlaceholderWireframe(
                     id,
@@ -257,8 +257,8 @@ public class DefaultImageWireframeHelper implements ImageWireframeHelper {
         }
 
         float density = displayMetrics.density;
-        long drawableWidthDp = Utils.densityNormalized(drawableProperties.drawableWidth, density);
-        long drawableHeightDp = Utils.densityNormalized(drawableProperties.drawableHeight, density);
+        long drawableWidthDp = (long) Utils.densityNormalized(drawableProperties.drawableWidth, density);
+        long drawableHeightDp = (long) Utils.densityNormalized(drawableProperties.drawableHeight, density);
 
         if (imagePrivacy == ImagePrivacy.MASK_ALL) {
             return createContentPlaceholderWireframe(

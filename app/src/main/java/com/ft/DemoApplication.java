@@ -45,7 +45,9 @@ public class DemoApplication extends BaseApplication {
 
 
     static void initFTSDK(Context context) {
-        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAKIT_URL)
+        //FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAKIT_URL)
+        //FTSDKConfig ftSDKConfig = FTSDKConfig.builder("https://rum-openway.guance.com", "c2fa0fc2060e49b7abdb1eb552f85b4a")
+        FTSDKConfig ftSDKConfig = FTSDKConfig.builder("https://rum-openway.guance.com", "d2161654e79747cf823c8bd484ee5d34")//guanceyun 账号
                 .setDebug(true)//设置是否是 debug
                 .setAutoSync(true)
                 .setCustomSyncPageSize(10)
@@ -78,7 +80,9 @@ public class DemoApplication extends BaseApplication {
 
         FTSdk.initRUMWithConfig(new FTRUMConfig()
                 .setSamplingRate(1f)
-                .setRumAppId(BuildConfig.RUM_APP_ID)
+                //.setRumAppId("com_guance_demo")
+                .setRumAppId("com_ft_session_replay")
+                //.setRumAppId(BuildConfig.RUM_APP_ID)
                 .setEnableTraceUserAction(true)
                 .setEnableTraceUserView(true)
                 .setRumCacheLimitCount(1000)

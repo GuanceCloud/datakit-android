@@ -58,7 +58,14 @@ public class SeekBarWireframeMapper extends ProgressBarWireframeMapper<SeekBar> 
 
         if (mappingContext.getTextAndInputPrivacy() == TextAndInputPrivacy.MASK_SENSITIVE_INPUTS) {
             float screenDensity = mappingContext.getSystemInformation().getScreenDensity();
-            long trackHeight = Utils.densityNormalized(ProgressBarWireframeMapper.TRACK_HEIGHT_IN_PX, screenDensity);
+            GlobalBounds viewPaddedBounds = viewBoundsResolver.resolveViewPaddedBounds(view, screenDensity);
+            long trackHeight = (long) Utils.densityNormalized(ProgressBarWireframeMapper.TRACK_HEIGHT_IN_PX, screenDensity);
+            GlobalBounds thumbTrackBounds = new GlobalBounds(
+                    viewPaddedBounds.getX(),
+                    viewPaddedBounds.getY() + (viewPaddedBounds.getHeight() - trackHeight) / 2,
+                    viewPaddedBounds.getWidth(),
+                    trackHeight
+            );
             Integer thumbColor = getColor(view.getThumbTintList(), view.getDrawableState());
             if (thumbColor == null || thumbColor == 0) {
                 thumbColor = getDefaultColor(view);
@@ -66,7 +73,7 @@ public class SeekBarWireframeMapper extends ProgressBarWireframeMapper<SeekBar> 
 
             Wireframe thumbWireframe = buildThumbWireframe(
                     view,
-                    trackBounds,
+                    thumbTrackBounds,
                     normalizedProgress,
                     trackHeight,
                     screenDensity,
@@ -92,8 +99,13 @@ public class SeekBarWireframeMapper extends ProgressBarWireframeMapper<SeekBar> 
         }
         String backgroundColor = colorStringFormatter.formatColorAndAlphaAsHexString(thumbColor, OPAQUE_ALPHA_VALUE);
 
-        long thumbWidth = Utils.densityNormalized(view.getThumb().getBounds().width(), screenDensity);
-        long thumbHeight = Utils.densityNormalized(view.getThumb().getBounds().height(), screenDensity);
+        long thumbWidth = 0;
+        long thumbHeight = 0;
+        if (view.getThumb() != null) {
+            thumbWidth = (long) Utils.densityNormalized(view.getThumb().getBounds().width(), screenDensity);
+            thumbHeight = (long) Utils.densityNormalized(view.getThumb().getBounds().height(), screenDensity);
+        }
+
         return new ShapeWireframe(
                 thumbId,
                 (trackBounds.getX() + (long) (trackBounds.getWidth() * normalizedProgress) - (thumbWidth / 2)),

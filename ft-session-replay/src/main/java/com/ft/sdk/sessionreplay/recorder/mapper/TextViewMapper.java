@@ -130,7 +130,7 @@ public class TextViewMapper<T extends TextView> extends BaseAsyncBackgroundWiref
     private TextStyle resolveTextStyle(T textView, float pixelsDensity) {
         return new TextStyle(
                 resolveFontFamily(textView.getTypeface()),
-                Utils.densityNormalized((long) textView.getTextSize(), pixelsDensity),
+                Utils.densityNormalized(textView.getTextSize(), pixelsDensity),
                 resolveTextColor(textView)
         );
     }

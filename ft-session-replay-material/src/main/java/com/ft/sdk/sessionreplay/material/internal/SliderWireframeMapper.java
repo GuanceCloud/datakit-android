@@ -66,7 +66,7 @@ public class SliderWireframeMapper implements WireframeMapper<Slider> {
 
         // padding
         long trackLeftPadding = trackLeftPadding(view, screenDensity);
-        long trackTopPadding = Utils.densityNormalized(view.getPaddingTop(), screenDensity);
+        long trackTopPadding = (long) Utils.densityNormalized(view.getPaddingTop(), screenDensity);
 
         // colors
         int[] drawableState = view.getDrawableState();
@@ -78,8 +78,8 @@ public class SliderWireframeMapper implements WireframeMapper<Slider> {
         String thumbColorAsHexa = colorStringFormatter.formatColorAndAlphaAsHexString(thumbColor, OPAQUE_ALPHA_VALUE);
 
         // track dimensions
-        long trackWidth = Utils.densityNormalized(view.getTrackWidth(), screenDensity);
-        long trackHeight = Utils.densityNormalized(view.getTrackHeight(), screenDensity);
+        long trackWidth = (long) Utils.densityNormalized(view.getTrackWidth(), screenDensity);
+        long trackHeight = (long) Utils.densityNormalized(view.getTrackHeight(), screenDensity);
         long trackActiveWidth = (long) (trackWidth * normalizedSliderValue);
 
         // track positions
@@ -87,7 +87,7 @@ public class SliderWireframeMapper implements WireframeMapper<Slider> {
         long trackYPos = viewGlobalBounds.getY() + trackTopPadding + (viewGlobalBounds.getHeight() - trackHeight) / 2;
 
         // thumb dimensions
-        long thumbHeight = Utils.densityNormalized(view.getThumbRadius() * 2, screenDensity);
+        long thumbHeight = (long) Utils.densityNormalized(view.getThumbRadius() * 2, screenDensity);
 
         // thumb positions
         long thumbXPos = (long) (trackXPos + trackWidth * normalizedSliderValue);
@@ -141,8 +141,8 @@ public class SliderWireframeMapper implements WireframeMapper<Slider> {
 
 
     private long trackLeftPadding(Slider slider, float screenDensity) {
-        return Utils.densityNormalized(slider.getTrackSidePadding(), screenDensity) +
-                Utils.densityNormalized(slider.getPaddingStart(), screenDensity);
+        return (long) Utils.densityNormalized(slider.getTrackSidePadding(), screenDensity) +
+                (long) Utils.densityNormalized(slider.getPaddingStart(), screenDensity);
     }
 
     private float normalizedValue(Slider slider) {

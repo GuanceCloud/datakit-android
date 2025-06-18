@@ -111,7 +111,7 @@ dependencies {
     implementation project(":ft-sdk")
 //    implementation project(":WebviewTest")
     implementation project(":ft-native")
-//    implementation project(":ft-session-replay")
+    implementation project(":ft-session-replay")
     implementation project(":ft-session-replay-material")
 
     implementation 'com.squareup.okhttp3:okhttp:4.5.0'
