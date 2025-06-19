@@ -4,6 +4,7 @@ package com.ft.sdk;
 import android.content.Context;
 
 import com.ft.sdk.feature.FeatureSdkCore;
+import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.VersionUtils;
 import com.ft.sdk.sessionreplay.BuildConfig;
 import com.ft.sdk.sessionreplay.FTSessionReplayConfig;
@@ -21,10 +22,11 @@ public class SessionReplay {
             FTSessionReplayConfig ftSessionReplayConfig, Context context
     ) {
         FeatureSdkCore featureSdkCore = SessionReplayManager.get();
-        if (!VersionUtils.firstVerGreaterEqual(BuildConfig.VERSION_NAME, "0.1.1-alpha01")) {
-            featureSdkCore.getInternalLogger().e(TAG, "need install more than ft-session-replay:0.1.1-alpha01");
+        if (!VersionUtils.firstVerGreaterEqual(BuildConfig.VERSION_NAME, "0.1.2-alpha01")) {
+            featureSdkCore.getInternalLogger().e(TAG, "need install more than ft-session-replay:0.1.2-alpha01");
             return;
         }
+        LogUtils.d(TAG, "init SR:" + ftSessionReplayConfig);
         featureSdkCore.init(context);
         SessionReplayFeature sessionReplayFeature = new SessionReplayFeature(
                 featureSdkCore,

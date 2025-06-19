@@ -29,6 +29,9 @@ public class FTDBCachePolicy {
      */
     private final AtomicInteger rumCount = new AtomicInteger(0);
 
+    /**
+     * 获取当前 db 缓存大小
+     */
     private final AtomicLong currentDbSize = new AtomicLong();
 
     private final Object rumLock = new Object();
@@ -73,7 +76,12 @@ public class FTDBCachePolicy {
 
     private FTDBCachePolicy() {
         logCount.set(FTDBManager.get().queryTotalCount(DataType.LOG));//初始化时从数据库中获取日志数据
-        rumCount.set(FTDBManager.get().queryTotalCount(new DataType[]{DataType.RUM_APP, DataType.RUM_WEBVIEW}));//初始化时从数据库中获取日志数据
+        rumCount.set(FTDBManager.get().queryTotalCount(new DataType[]{
+                DataType.RUM_APP,
+                DataType.RUM_WEBVIEW,
+                DataType.RUM_APP_ERROR_SAMPLED,
+                DataType.RUM_WEBVIEW_ERROR_SAMPLED,
+        }));//初始化时从数据库中获取日志数据
     }
 
     public synchronized static FTDBCachePolicy get() {
@@ -152,7 +160,8 @@ public class FTDBCachePolicy {
     }
 
     /**
-     *  设置当前 db 缓存文件大小
+     * 设置当前 db 缓存文件大小
+     *
      * @param currentDbSize
      */
     public void setCurrentDBSize(long currentDbSize) {
@@ -161,6 +170,7 @@ public class FTDBCachePolicy {
 
     /**
      * 是否达到 db 缓存限制
+     *
      * @return
      */
     public boolean isReachDbLimit() {
@@ -169,6 +179,7 @@ public class FTDBCachePolicy {
 
     /**
      * 是否达到 db 缓存限制的一半
+     *
      * @return
      */
     public boolean reachHalfLimit() {
@@ -266,8 +277,18 @@ public class FTDBCachePolicy {
             if (rumCacheDiscardStrategy == RUMCacheDiscard.DISCARD) {//直接丢弃数据
                 status = -1;
             } else if (rumCacheDiscardStrategy == RUMCacheDiscard.DISCARD_OLDEST) {//丢弃数据库中的前几条数据
-                FTDBManager.get().deleteOldestData(new DataType[]{DataType.RUM_APP, DataType.RUM_WEBVIEW}, limit);
-                rumCount.set(FTDBManager.get().queryTotalCount(new DataType[]{DataType.RUM_APP, DataType.RUM_WEBVIEW}));
+                FTDBManager.get().deleteOldestData(new DataType[]{
+                        DataType.RUM_APP,
+                        DataType.RUM_WEBVIEW,
+                        DataType.RUM_APP_ERROR_SAMPLED,
+                        DataType.RUM_WEBVIEW_ERROR_SAMPLED
+                }, limit);
+                rumCount.set(FTDBManager.get().queryTotalCount(new DataType[]{
+                        DataType.RUM_APP,
+                        DataType.RUM_WEBVIEW,
+                        DataType.RUM_APP_ERROR_SAMPLED,
+                        DataType.RUM_WEBVIEW_ERROR_SAMPLED
+                }));
                 status = 1;
             }
         } else {

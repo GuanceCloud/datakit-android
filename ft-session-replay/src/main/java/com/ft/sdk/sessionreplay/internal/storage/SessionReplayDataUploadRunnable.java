@@ -4,6 +4,8 @@ import static com.ft.sdk.sessionreplay.SessionReplayConstants.DECREASE_PERCENT;
 import static com.ft.sdk.sessionreplay.SessionReplayConstants.INCREASE_PERCENT;
 
 import com.ft.sdk.api.context.SessionReplayContext;
+import com.ft.sdk.feature.FeatureSdkCore;
+import com.ft.sdk.sessionreplay.SessionReplayConstants;
 import com.ft.sdk.sessionreplay.SessionReplayUploader;
 import com.ft.sdk.sessionreplay.SystemInfoProxy;
 import com.ft.sdk.sessionreplay.internal.persistence.BatchData;
@@ -13,6 +15,12 @@ import com.ft.sdk.sessionreplay.internal.persistence.Storage;
 import com.ft.sdk.sessionreplay.internal.utils.ExecutorUtils;
 import com.ft.sdk.sessionreplay.utils.InternalLogger;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -32,14 +40,17 @@ public class SessionReplayDataUploadRunnable implements Runnable {
     private final SessionReplayContext sdkContext;
     private final InternalLogger internalLogger;
     private final SystemInfoProxy systemInfoProxy;
+    private final FeatureSdkCore sdkCore;
+    private final File rootPath;
 
-    public SessionReplayDataUploadRunnable(String featureName, ScheduledThreadPoolExecutor threadPoolExecutor,
+    public SessionReplayDataUploadRunnable(FeatureSdkCore sdkCore, String featureName, ScheduledThreadPoolExecutor threadPoolExecutor,
                                            Storage storage,
                                            SessionReplayUploader uploader,
                                            DataUploadConfiguration dataUploadConfiguration,
                                            SessionReplayContext context,
-                                           InternalLogger internalLogger, SystemInfoProxy systemInfoProxy) {
+                                           InternalLogger internalLogger, SystemInfoProxy systemInfoProxy, File rootPath) {
         this.featureName = featureName;
+        this.sdkCore = sdkCore;
         this.threadPoolExecutor = threadPoolExecutor;
         this.storage = storage;
         this.currentDelayIntervalMs = dataUploadConfiguration.getDefaultDelayMs();
@@ -50,6 +61,8 @@ public class SessionReplayDataUploadRunnable implements Runnable {
         this.sdkContext = context;
         this.internalLogger = internalLogger;
         this.systemInfoProxy = systemInfoProxy;
+        this.rootPath = rootPath;
+
     }
 
     @Override
@@ -59,6 +72,7 @@ public class SessionReplayDataUploadRunnable implements Runnable {
             int batchConsumerAvailableAttempts = maxBatchesPerJob;
             do {
                 batchConsumerAvailableAttempts--;
+                consumeErrorSampledData();
                 result = handleNextBatch(sdkContext);
 
             } while (batchConsumerAvailableAttempts > 0 && result != null && result.isSuccess());
@@ -71,6 +85,91 @@ public class SessionReplayDataUploadRunnable implements Runnable {
 
         handleNextUpload(currentDelayIntervalMs);
     }
+
+
+    private void consumeErrorSampledData() {
+        long errorTimeLine = sdkCore.getErrorTimeLine() / 1000000;
+        long timeNow = System.currentTimeMillis();
+        if (errorTimeLine > 0) {
+            if (rootPath.exists()) {
+                File sampledOnErrorPath = new File(rootPath,
+                        SessionReplayConstants.PATH_SESSION_REPLAY_ERROR_SAMPLED);
+                File[] files = sampledOnErrorPath.listFiles();
+                if (files != null) {
+                    for (File file : files) {
+                        if (file.isFile()) {
+                            long fileTime = file.lastModified(); // 创建时间不可得，用修改时间替代
+                            if (fileTime < errorTimeLine) {
+                                File moveTargetPath = new File(rootPath,
+                                        SessionReplayConstants.PATH_SESSION_REPLAY
+                                                + "/" + file.getName());
+                                //移动至正常上传对列
+                                if (moveFile(file, moveTargetPath)) {
+                                    internalLogger.d(TAG, "SR consumeErrorSampledData:" + file.getName());
+                                }
+                            }
+                            deleteExpired(file, timeNow);
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+
+    private final static int ONE_MINUTES_IN_SECOND = 60000;
+
+
+    private boolean moveFile(File sourceFile, File destFile) {
+        // 确保目标路径的父目录存在
+        if (!destFile.getParentFile().exists()) {
+            destFile.getParentFile().mkdirs();
+        }
+
+        // 执行移动：首先复制文件，再删除源文件
+        boolean success = copyFile(sourceFile, destFile);
+
+        // 如果复制成功，删除源文件
+        if (success) {
+            success = sourceFile.delete();
+        }
+
+        return success;
+    }
+
+    private boolean copyFile(File sourceFile, File destFile) {
+        try (InputStream inputStream = new FileInputStream(sourceFile);
+             OutputStream outputStream = new FileOutputStream(destFile)) {
+
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = inputStream.read(buffer)) > 0) {
+                outputStream.write(buffer, 0, length);
+            }
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+
+            return false;
+        }
+    }
+
+
+    /**
+     * 删除超过一分钟的过期数据
+     *
+     * @param file
+     * @param timeNow
+     */
+    private void deleteExpired(File file, long timeNow) {
+        long fileLastModified = file.lastModified();
+        if (timeNow - fileLastModified > ONE_MINUTES_IN_SECOND) {
+            if (file.delete()) {
+                internalLogger.w(TAG, "SR delete expire file:" + file.getName());
+            }
+        }
+    }
+
 
     private UploadResult handleNextBatch(SessionReplayContext context) {
         UploadResult result = null;

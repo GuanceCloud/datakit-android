@@ -9,7 +9,7 @@ import androidx.test.espresso.matcher.ViewMatchers;
 import com.ft.BaseTest;
 import com.ft.R;
 import com.ft.sdk.garble.bean.DataType;
-import com.ft.sdk.garble.bean.SyncJsonData;
+import com.ft.sdk.garble.bean.SyncData;
 import com.ft.sdk.garble.db.FTDBManager;
 
 import org.junit.Assert;
@@ -32,7 +32,7 @@ abstract public class BaseNoRUMDataTest extends BaseTest {
     public void viewGenerateTest() throws Exception {
         invokeGenerateRumData();
         Thread.sleep(1000);
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0,
+        List<SyncData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0,
                 DataType.RUM_APP);
 
         Assert.assertTrue(recordDataList.isEmpty());
@@ -55,7 +55,7 @@ abstract public class BaseNoRUMDataTest extends BaseTest {
         invokeCheckActionClose();
         Thread.sleep(1000);
 
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
+        List<SyncData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
 
         Assert.assertTrue(recordDataList.isEmpty());
     }
@@ -72,7 +72,7 @@ abstract public class BaseNoRUMDataTest extends BaseTest {
 
         Thread.sleep(2000);
 
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
+        List<SyncData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
 
         Assert.assertTrue(recordDataList.isEmpty());
 

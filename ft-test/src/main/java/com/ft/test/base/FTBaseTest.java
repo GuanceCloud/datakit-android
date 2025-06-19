@@ -13,7 +13,7 @@ import com.ft.sdk.FTUIBlockManager;
 import com.ft.sdk.SyncDataHelper;
 import com.ft.sdk.SyncTaskManager;
 import com.ft.sdk.garble.bean.DataType;
-import com.ft.sdk.garble.bean.SyncJsonData;
+import com.ft.sdk.garble.bean.SyncData;
 import com.ft.sdk.garble.db.FTDBCachePolicy;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.manager.RequestCallback;
@@ -44,6 +44,7 @@ public class FTBaseTest {
     protected static final String DYNAMIC_SINGLE_CUSTOM_KEY = "dynamic_custom_single_key";
     protected static final String DYNAMIC_SINGLE_CUSTOM_VALUE = "dynamic_custom_single_value";
     protected static final String TEST_FAKE_RUM_ID = "rumId";
+    protected static final String TEST_FAKE_USER_ID = "fakeUserid";
     protected static final String TEST_FAKE_URL = "http://www.test.url";
     protected static final String TEST_FAKE_CLIENT_TOKEN = "fake_client_token";
     protected static final String LOG_TEST_DATA_1_KB =
@@ -210,10 +211,10 @@ public class FTBaseTest {
      * @param dataType
      */
     protected void uploadData(DataType dataType) {
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, dataType);
+        List<SyncData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, dataType);
         StringBuilder body = new StringBuilder();
-        for (SyncJsonData syncJsonData : recordDataList) {
-            body.append(syncJsonData.getDataString());
+        for (SyncData syncData : recordDataList) {
+            body.append(syncData.getDataString());
         }
 
         try {

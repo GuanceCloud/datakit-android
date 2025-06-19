@@ -1,10 +1,8 @@
 package com.ft.test.utils;
 
-import com.ft.sdk.SyncDataHelper;
 import com.ft.sdk.garble.bean.DataType;
-import com.ft.sdk.garble.bean.SyncJsonData;
+import com.ft.sdk.garble.bean.SyncData;
 import com.ft.sdk.garble.db.FTDBManager;
-import com.ft.test.base.FTBaseTest;
 
 import java.util.List;
 import java.util.Objects;
@@ -24,9 +22,9 @@ public class CheckUtils {
      * @return 数据是否存在，是为存在
      */
     public static boolean checkValueInLineProtocol(DataType dataType, String[] checkValues) {
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, dataType);
+        List<SyncData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, dataType);
         StringBuilder body = new StringBuilder();
-        for (SyncJsonData data : recordDataList) {
+        for (SyncData data : recordDataList) {
             body.append(data.getDataString());
         }
         boolean result = false;
@@ -55,9 +53,9 @@ public class CheckUtils {
      */
     public static boolean checkDynamicValue(String key, String value, String targetMeasurement,
                                             DataType dataType, boolean isTag) {
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, dataType);
+        List<SyncData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, dataType);
 
-        for (SyncJsonData recordData : recordDataList) {
+        for (SyncData recordData : recordDataList) {
             LineProtocolData lineProtocolData = new LineProtocolData(recordData.getDataString());
             String measurement = lineProtocolData.getMeasurement();
             if (isTag) {
@@ -82,10 +80,10 @@ public class CheckUtils {
      * @return
      */
     public static int getCount(DataType dataType, String[] checkValues, int limit) {
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(limit, dataType);
+        List<SyncData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(limit, dataType);
         StringBuilder body = new StringBuilder();
-        for (SyncJsonData syncJsonData : recordDataList) {
-            body.append(syncJsonData.getDataString());
+        for (SyncData syncData : recordDataList) {
+            body.append(syncData.getDataString());
         }
         int count = 0;
         for (String item : checkValues) {

@@ -57,6 +57,7 @@ public class DataSyncTest extends FTBaseTest {
         FTSDKConfig ftSDKConfig = FTSDKConfig
                 .builder(mMockWebServer.getUrl("/").toString())
                 .setDebug(true)//设置是否是 debug
+                .setAutoSync(false)
                 .setEnv(EnvType.GRAY);
 
         FTSdk.install(ftSDKConfig);

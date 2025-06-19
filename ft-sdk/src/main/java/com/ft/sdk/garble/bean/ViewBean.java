@@ -123,10 +123,24 @@ public class ViewBean {
      */
     long viewUpdateTime = 0;
 
+    /**
+     * 页面的错误时间
+     */
+    long lastErrorTime = 0;
+
     long recordsCount = 0;
 
     boolean hasReplay = false;
 
+    boolean sessionReplayErrorSampled = false;
+
+    public void setLastErrorTime(long lastErrorTime) {
+        this.lastErrorTime = lastErrorTime;
+    }
+
+    public long getLastErrorTime() {
+        return lastErrorTime;
+    }
 
     public long getViewUpdateTime() {
         return viewUpdateTime;
@@ -320,6 +334,14 @@ public class ViewBean {
         this.hasReplay = hasReplay;
     }
 
+    public void setSessionReplayErrorSampled(boolean sessionReplayErrorSampled) {
+        this.sessionReplayErrorSampled = sessionReplayErrorSampled;
+    }
+
+    public boolean isSessionReplayErrorSampled() {
+        return sessionReplayErrorSampled;
+    }
+
     public void setBatteryCurrentAvg(int batteryCurrentAvg) {
         this.batteryCurrentAvg = batteryCurrentAvg;
     }
@@ -332,6 +354,16 @@ public class ViewBean {
         this.batteryCurrentMax = batteryCurrentMax;
     }
 
+    public String collectType;
+
+    public CollectType getCollectType() {
+        return CollectType.fromValue(collectType);
+    }
+
+    public void setCollectType(CollectType collectType) {
+        this.collectType = collectType.getValue();
+    }
+
     /**
      * 将指标数据转化为 json 字符
      *
@@ -339,6 +371,8 @@ public class ViewBean {
      */
     public String getAttrJsonString() {
         HashMap<String, Object> map = new HashMap<>();
+        map.put(Constants.KEY_COLLECT_TYPE, collectType);
+        map.put(Constants.KEY_SESSION_ERROR_TIMESTAMP, lastErrorTime);
         map.put(Constants.KEY_BATTERY_CURRENT_AVG, batteryCurrentAvg);
         map.put(Constants.KEY_BATTERY_CURRENT_MAX, batteryCurrentMax);
         map.put(Constants.KEY_FPS_AVG, fpsAvg);
@@ -348,6 +382,7 @@ public class ViewBean {
         map.put(Constants.KEY_MEMORY_AVG, memoryAvg);
         map.put(Constants.KEY_MEMORY_MAX, memoryMax);
         map.put(Constants.KEY_HAS_REPLAY, hasReplay);
+        map.put(Constants.KEY_SAMPLED_FOR_ERROR_REPLAY, sessionReplayErrorSampled);
         map.put(Constants.KEY_RUM_PROPERTY, property);
         map.put(Constants.KEY_RUM_TAGS, tags);
         return Utils.hashMapObjectToJson(map);
@@ -361,6 +396,8 @@ public class ViewBean {
     public void setFromAttrJsonString(String jsonString) {
         try {
             JSONObject json = new JSONObject(jsonString);
+            this.lastErrorTime = json.optLong(Constants.KEY_SESSION_ERROR_TIMESTAMP);
+            this.collectType = json.optString(Constants.KEY_COLLECT_TYPE);
             this.batteryCurrentAvg = json.optInt(Constants.KEY_BATTERY_CURRENT_AVG);
             this.batteryCurrentMax = json.getInt(Constants.KEY_BATTERY_CURRENT_MAX);
             this.fpsAvg = json.optDouble(Constants.KEY_FPS_AVG);
@@ -370,6 +407,7 @@ public class ViewBean {
             this.cpuTickCountPerSecond = json.optDouble(Constants.KEY_CPU_TICK_COUNT);
             this.cpuTickCount = json.optLong(Constants.KEY_CPU_TICK_COUNT_PER_SECOND);
             this.hasReplay = json.optBoolean(Constants.KEY_HAS_REPLAY);
+            this.sessionReplayErrorSampled = json.optBoolean(Constants.KEY_SAMPLED_FOR_ERROR_REPLAY);
 
             JSONObject jsonProperty = json.optJSONObject(Constants.KEY_RUM_PROPERTY);
             if (jsonProperty != null) {

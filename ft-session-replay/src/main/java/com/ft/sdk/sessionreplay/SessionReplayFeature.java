@@ -23,6 +23,7 @@ import com.ft.sdk.sessionreplay.internal.ResourcesFeature;
 import com.ft.sdk.sessionreplay.internal.SessionReplayRecordCallback;
 import com.ft.sdk.sessionreplay.internal.StorageBackedFeature;
 import com.ft.sdk.sessionreplay.internal.TouchPrivacyManager;
+import com.ft.sdk.sessionreplay.internal.persistence.TrackingConsent;
 import com.ft.sdk.sessionreplay.internal.recorder.NoOpRecorder;
 import com.ft.sdk.sessionreplay.internal.recorder.Recorder;
 import com.ft.sdk.sessionreplay.internal.resources.ResourceDataStoreManager;
@@ -68,31 +69,33 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
             "Session Replay feature received an event with unknown value of \"type\" property=%s.";
 
     public static final String EVENT_MISSING_MANDATORY_FIELDS =
-            "Session Replay feature received an event where one or more mandatory (keepSession) fields" +
+            "Session Replay feature received an event where one or more mandatory (collect_key) fields" +
                     " are either missing or have wrong type.";
 
     public static final String CANNOT_START_RECORDING_NOT_INITIALIZED =
             "Cannot start session recording, because Session Replay feature is not initialized.";
 
-    public static final String SESSION_REPLAY_FEATURE_NAME = "session-replay";
 
     public static final String SESSION_REPLAY_SAMPLE_RATE_KEY = "session_replay_sample_rate";
-    public static final String SESSION_REPLAY_PRIVACY_KEY = "session_replay_privacy";
+    public static final String SESSION_REPLAY_ON_ERROR_SAMPLE_RATE_KEY = "session_replay_on_error_sample_rate";
+    //    public static final String SESSION_REPLAY_PRIVACY_KEY = "session_replay_privacy";
     public static final String SESSION_REPLAY_TEXT_AND_INPUT_PRIVACY_KEY = "session_replay_text_and_input_privacy";
     public static final String SESSION_REPLAY_IMAGE_PRIVACY_KEY = "session_replay_image_privacy";
     public static final String SESSION_REPLAY_TOUCH_PRIVACY_KEY = "session_replay_touch_privacy";
-    public static final String SESSION_REPLAY_MANUAL_RECORDING_KEY =
-            "session_replay_requires_manual_recording";
+    public static final String SESSION_REPLAY_START_IMMEDIATE_RECORDING_KEY =
+            "session_replay_start_immediate_recording";
     public static final String SESSION_REPLAY_ENABLED_KEY =
             "session_replay_is_enabled";
+    public static final String SESSION_REPLAY_ENABLED_ON_ERROR_KEY =
+            "session_replay_is_enabled_on_error";
 
     private final FeatureSdkCore sdkCore;
     private final String customEndpointUrl;
-    private final SessionReplayPrivacy privacy;
     private final TouchPrivacy touchPrivacy;
     private final TextAndInputPrivacy textAndInputPrivacy;
     private final ImagePrivacy imagePrivacy;
-    private final Sampler rateBasedSampler;
+    private final Sampler sessionRelaySampler;
+    private final Sampler sessionRelayErrorSampler;
     private final RecorderProvider recorderProvider;
     private RecordedDataQueueHandler recordedDataQueueHandler;
 
@@ -106,7 +109,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
     final AtomicBoolean initialized = new AtomicBoolean(false);
     private RecordedDataProcessor processor; //added by zzq
     private RumContextProvider rumContextProvider; //added by zzq
-    
+
     // 用于跟踪Flutter页面的映射：rootNode.id -> viewId, added by zzq
     private final Map<Long, String> flutterPageViewIdMap = new ConcurrentHashMap<>();
 
@@ -115,7 +118,6 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
     public SessionReplayFeature(FeatureSdkCore sdkCore, FTSessionReplayConfig config) {
         this(sdkCore,
                 config.getCustomEndpointUrl(),
-                config.getPrivacy(),
                 config.getTextAndInputPrivacy(),
                 config.getTouchPrivacy(),
                 new TouchPrivacyManager(config.getTouchPrivacy()),
@@ -124,6 +126,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                 config.getCustomOptionSelectorDetectors(),
                 config.getCustomDrawableMapper(),
                 config.getSampleRate(),
+                config.getSessionReplayOnErrorSampleRate(),
                 config.isDelayInit(),
                 config.isDynamicOptimizationEnabled(),
                 config.getInternalCallback());
@@ -131,24 +134,23 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
     }
 
     public SessionReplayFeature(FeatureSdkCore sdkCore, String customEndpointUrl,
-                                SessionReplayPrivacy privacy,
                                 TextAndInputPrivacy textAndInputPrivacy,
                                 TouchPrivacy touchPrivacy,
                                 ImagePrivacy imagePrivacy,
-                                Sampler rateBasedSampler,
+                                Sampler sessionReplaySampler,
+                                Sampler sessionReplayErrorSampler,
                                 RecorderProvider recorderProvider) {
         this.sdkCore = sdkCore;
         this.customEndpointUrl = customEndpointUrl;
-        this.privacy = privacy;
         this.textAndInputPrivacy = textAndInputPrivacy;
         this.touchPrivacy = touchPrivacy;
         this.imagePrivacy = imagePrivacy;
-        this.rateBasedSampler = rateBasedSampler;
+        this.sessionRelaySampler = sessionReplaySampler;
+        this.sessionRelayErrorSampler = sessionReplayErrorSampler;
         this.recorderProvider = recorderProvider;
     }
 
     public SessionReplayFeature(FeatureSdkCore sdkCore, String customEndpointUrl,
-                                SessionReplayPrivacy privacy,
                                 TextAndInputPrivacy textAndInputPrivacy,
                                 TouchPrivacy touchPrivacy,
                                 TouchPrivacyManager touchPrivacyManager,
@@ -157,15 +159,16 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                                 List<OptionSelectorDetector> customOptionSelectorDetectors,
                                 List<DrawableToColorMapper> customDrawableMappers,
                                 float sampleRate,
+                                float sessionReplayOnErrorSampleRate,
                                 boolean isDelayInit,
                                 boolean dynamicOptimizationEnabled,
                                 SessionReplayInternalCallback internalCallback) {
         this(sdkCore, customEndpointUrl,
-                privacy,
                 textAndInputPrivacy,
                 touchPrivacy,
                 imagePrivacy,
                 new RateBasedSampler(sampleRate),
+                new RateBasedSampler(sessionReplayOnErrorSampleRate),
                 new DefaultRecorderProvider(sdkCore,
                         textAndInputPrivacy,
                         imagePrivacy,
@@ -210,17 +213,19 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
         sdkCore.updateFeatureContext(getName(), new SessionReplayRecordCallback.UpdateCallBack() {
             @Override
             public void onUpdate(Map<String, Object> context) {
-                context.put(SESSION_REPLAY_SAMPLE_RATE_KEY, rateBasedSampler.getSampleRate() != null ?
-                        rateBasedSampler.getSampleRate().longValue() : null);
-                context.put(SESSION_REPLAY_PRIVACY_KEY, privacy.toString().toLowerCase(Locale.US));
-                context.put(SESSION_REPLAY_PRIVACY_KEY, privacy.toString().toLowerCase(Locale.US));
-                context.put(SESSION_REPLAY_PRIVACY_KEY, privacy.toString().toLowerCase(Locale.US));
-                context.put(SESSION_REPLAY_PRIVACY_KEY, privacy.toString().toLowerCase(Locale.US));
-                context.put(SESSION_REPLAY_MANUAL_RECORDING_KEY, false);
+                context.put(SESSION_REPLAY_SAMPLE_RATE_KEY, sessionRelaySampler.getSampleRate() != null ?
+                        sessionRelaySampler.getSampleRate() : null);
+                context.put(SESSION_REPLAY_ON_ERROR_SAMPLE_RATE_KEY, sessionRelayErrorSampler.getSampleRate() != null ?
+                        sessionRelayErrorSampler.getSampleRate() : null);
+                context.put(SESSION_REPLAY_IMAGE_PRIVACY_KEY, imagePrivacy.toString().toLowerCase(Locale.US));
+                context.put(SESSION_REPLAY_TOUCH_PRIVACY_KEY, touchPrivacy.toString().toLowerCase(Locale.US));
+                context.put(SESSION_REPLAY_TEXT_AND_INPUT_PRIVACY_KEY, textAndInputPrivacy.toString().toLowerCase(Locale.US));
+                context.put(SESSION_REPLAY_START_IMMEDIATE_RECORDING_KEY, false);
             }
         });
         // 初始化 processor
         this.processor = new RecordedDataProcessor(
+                sdkCore,
                 resourceDataStoreManager,
                 resourcesFeature.getDataWriter(),
                 dataWriter,
@@ -266,10 +271,10 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
 
     @SuppressWarnings("ReturnCount")
     private void checkStatusAndApplySample(Map<?, ?> sessionMetadata) {
-        Boolean keepSession = (Boolean) sessionMetadata.get(SessionReplayConstants.RUM_KEEP_SESSION_BUS_MESSAGE_KEY);
+        String collectType = (String) sessionMetadata.get(SessionReplayConstants.RUM_KEEP_SESSION_BUS_COLLECT_TYPE_KEY);
         String sessionId = (String) sessionMetadata.get(SessionReplayConstants.RUM_SESSION_ID_BUS_MESSAGE_KEY);
 
-        if (keepSession == null || sessionId == null) {
+        if (collectType == null || sessionId == null) {
             sdkCore.getInternalLogger().w(TAG, EVENT_MISSING_MANDATORY_FIELDS);
             return;
         }
@@ -282,13 +287,22 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
             return;
         }
 
-        if (keepSession && rateBasedSampler.sample()) {
-            startRecording();
+        boolean sessionSampled = sessionRelaySampler.sample();
+        boolean sessionErrorSampled = !sessionSampled && sessionRelayErrorSampler.sample();
+        if ("collect_by_sample".equals(collectType) && (sessionSampled || sessionErrorSampled)) {
+            if (sessionErrorSampled) {
+                sdkCore.setConsentProvider(TrackingConsent.SAMPLED_ON_ERROR_SESSION);
+            } else {
+                sdkCore.setConsentProvider(TrackingConsent.GRANTED);
+            }
+            startRecording(sessionErrorSampled);
+        } else if ("collect_by_error_sample".equals(collectType) && (sessionSampled || sessionErrorSampled)) {
+            sdkCore.setConsentProvider(TrackingConsent.SAMPLED_ON_ERROR_SESSION);
+            startRecording(true);
         } else {
             sdkCore.getInternalLogger().w(TAG, SESSION_SAMPLED_OUT_MESSAGE);
             stopRecording();
         }
-
         currentRumSessionId.set(sessionId);
     }
 
@@ -303,7 +317,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
     /**
      * Resumes the replay recorder.
      */
-    public void startRecording() {
+    public void startRecording(boolean isErrorSampled) {
         // Check initialization again so we don't forget to do it when this method is made public
         if (checkIfInitialized() && !isRecording.getAndSet(true)) {
             sdkCore.updateFeatureContext(getName(), new SessionReplayRecordCallback.UpdateCallBack() {
@@ -311,6 +325,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                 @Override
                 public void onUpdate(Map<String, Object> context) {
                     context.put(SESSION_REPLAY_ENABLED_KEY, true);
+                    context.put(SESSION_REPLAY_ENABLED_ON_ERROR_KEY, isErrorSampled);
                 }
             });
             sessionReplayRecorder.resumeRecorders();
@@ -332,7 +347,6 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                         @Override
                         public void onUpdate(Map<String, Object> context) {
                             context.put(SESSION_REPLAY_ENABLED_KEY, false);
-
                         }
                     }
             );
@@ -351,12 +365,12 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
      * @param mobileRecord 完整屏幕快照记录
      * @param rumContext RUM上下文
      */
-    public void processExternalFullSnapshot(MobileRecord.MobileFullSnapshotRecord mobileRecord, 
+    public void processExternalFullSnapshot(MobileRecord.MobileFullSnapshotRecord mobileRecord,
                                            SessionReplayRumContext rumContext) {
         if (!checkIfInitialized()) {
             return;
         }
-        
+
         // 直接调用 processor 处理记录
         processor.handleExternalFullSnapshot(mobileRecord, rumContext);
     }
@@ -371,13 +385,13 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
         if (!checkIfInitialized()) {
             return;
         }
-        
+
         // 直接调用 processor 处理增量更新
         processor.handleExternalIncrementalUpdate(mobileRecord, rumContext);
     }
 
     /**
-     * 创建一个空的RUM上下文，用于外部调用 added by zzq 
+     * 创建一个空的RUM上下文，用于外部调用 added by zzq
      * @return SessionReplayRumContext实例
      */
     public SessionReplayRumContext createEmptyRumContext() {
@@ -506,40 +520,40 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
             }
             SessionReplayRumContext rumContext;
             boolean isNewPage = false;
-            
+
             // 检查是否是已知的页面
             String existingViewId = flutterPageViewIdMap.get(rootNodeId);
-            
+
             if (existingViewId == null) {
                 // 新的rootNode.id，说明是新页面
                 isNewPage = true;
                 String newViewId = generateNewViewId();
-                
+
                 // 记录映射关系
                 flutterPageViewIdMap.put(rootNodeId, newViewId);
-                
+
                 // 获取当前的applicationId和sessionId
                 SessionReplayRumContext currentContext = createEmptyRumContext();
-                
+
                 // 创建新的RUM上下文
                 rumContext = new SessionReplayRumContext(
                     currentContext.getApplicationId(),
                     currentContext.getSessionId(),
                     newViewId
                 );
-                
+
                 Log.d(TAG, "zzq Detected new page, generated viewId: " + newViewId + " for rootNodeId: " + rootNodeId);
             } else {
                 // 已知的rootNode.id，说明是页面更新
                 // 获取当前的applicationId和sessionId，但使用已存在的viewId
                 SessionReplayRumContext currentContext = createEmptyRumContext();
-                
+
                 rumContext = new SessionReplayRumContext(
                     currentContext.getApplicationId(),
                     currentContext.getSessionId(),
                     existingViewId  // 使用已存在的viewId
                 );
-                
+
                 Log.d(TAG, "zzq Detected page update, using existing viewId: " + existingViewId + " for rootNodeId: " + rootNodeId);
             }
 
@@ -564,7 +578,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
 
             // 通过processor处理
             processor.processScreenSnapshots(snapshotItem);
-            
+
             Log.d(TAG, "zzq Successfully processed external Node tree (isNewPage: " + isNewPage + ", rootNodeId: " + rootNodeId + ")");
         } catch (Exception e) {
             Log.d(TAG, "zzq Error processing external Node tree with auto detection: " + e.getMessage());
@@ -590,29 +604,29 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                 rootNodeId = rootNode.getWireframes().get(0).getId();
             }
             SessionReplayRumContext rumContext;
-            
+
             if (isNewPage) {
                 // 是新页面，生成新的viewId并创建新的RUM上下文
                 String newViewId = generateNewViewId();
-                
+
                 // 记录映射关系
                 flutterPageViewIdMap.put(rootNodeId, newViewId);
-                
+
                 // 获取当前的applicationId和sessionId
                 SessionReplayRumContext currentContext = createEmptyRumContext();
-                
+
                 // 创建新的RUM上下文
                 rumContext = new SessionReplayRumContext(
                     currentContext.getApplicationId(),
                     currentContext.getSessionId(),
                     newViewId
                 );
-                
+
                 Log.d(TAG, "zzq Generated new viewId for new page: " + newViewId + " for rootNodeId: " + rootNodeId);
             } else {
                 // 不是新页面，使用已存在的viewId或当前的RUM上下文
                 String existingViewId = flutterPageViewIdMap.get(rootNodeId);
-                
+
                 if (existingViewId != null) {
                     // 使用已存在的viewId
                     SessionReplayRumContext currentContext = createEmptyRumContext();
@@ -650,7 +664,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
 
             // 通过processor处理
             processor.processScreenSnapshots(snapshotItem);
-            
+
             Log.d(TAG, "zzq Successfully processed external Node tree (isNewPage: " + isNewPage + ", rootNodeId: " + rootNodeId + ")");
         } catch (Exception e) {
             Log.d(TAG, "zzq Error processing external Node tree with page flag: " + e.getMessage());
@@ -689,12 +703,12 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
     /**
      * 创建一个新的RUM上下文，包含指定的viewId, added by zzq
      * @param applicationId 应用ID
-     * @param sessionId 会话ID  
+     * @param sessionId 会话ID
      * @param viewId 视图ID
      * @return SessionReplayRumContext实例
      */
-    public SessionReplayRumContext createRumContextWithViewId(String applicationId, 
-                                                              String sessionId, 
+    public SessionReplayRumContext createRumContextWithViewId(String applicationId,
+                                                              String sessionId,
                                                               String viewId) {
         return new SessionReplayRumContext(applicationId, sessionId, viewId);
     }

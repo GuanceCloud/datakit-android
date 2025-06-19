@@ -12,7 +12,6 @@ public class DrawableToColorMapperFactory {
      *
      * @return a default implementation based on the device API level
      */
-    //fixme
     public static DrawableToColorMapper getDefault(List<DrawableToColorMapper> list) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             return new AndroidQDrawableToColorMapper(list);

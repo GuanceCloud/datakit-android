@@ -97,6 +97,18 @@ public class Constants {
      * 存储 {@link  android.content.SharedPreferences} {@link #FT_USER_USER_EXT} 键值
      */
     public static final String FT_USER_USER_EXT = "ft.user.extdata";
+    /**
+     *
+     */
+    public static final String FT_REMOTE_CONFIG = "ft.localCache.remoteConfig";
+    /**
+     *
+     */
+    public static final String FT_REMOTE_CONFIG_FETCH_TIME = "ft.localCache.remoteConfigFetchTime";
+    /**
+     * 存储错误发生时间
+     */
+    public static final String FT_RUM_ERROR_TIMELINE = "ft.error.timeline";
 
     /**
      * 存储 {@link  android.content.SharedPreferences} 数据存储键值
@@ -133,10 +145,14 @@ public class Constants {
      * Log，日志，datakit 请求地址
      **/
     public static final String URL_MODEL_LOG = "v1/write/logging";
+//    /**
+//     * Trace 链路 datakit 请求地址
+//     */
+//    public static final String URL_MODEL_TRACING = "v1/write/tracing";
     /**
-     * Trace 链路 datakit 请求地址
+     * 动态变量加载地址
      */
-    public static final String URL_MODEL_TRACING = "v1/write/tracing";
+    public static final String URL_ENV_VARIABLE = "v1/env_variable";
 
     /**
      * 默认服务名，字段 service
@@ -179,10 +195,6 @@ public class Constants {
 //    public static final String KEY_PAGE_EVENT_PAGE_DESC = "page_desc";
 //    public static final String KEY_PAGE_EVENT_USER_NAME = "ud_name";
 
-    /**
-     * 耗时，单位纳秒
-     */
-    public static final String KEY_TIME_COST_DURATION = "duration";
     /**
      * 日志等级，{@link com.ft.sdk.garble.bean.Status}
      */
@@ -565,6 +577,30 @@ public class Constants {
     public static final String KEY_RUM_SESSION_ID = "session_id";
 
     /**
+     * 由于错误采集到的数据
+     */
+
+    public static final String KEY_SAMPLED_FOR_ERROR_SESSION = "sampled_for_error_session";
+
+    /**
+     * 由于 Session Replay 错误被采集
+     */
+    public static final String KEY_SAMPLED_FOR_ERROR_REPLAY ="sampled_for_error_replay";
+
+    /**
+     * session 发生错误的时间
+     */
+    public static final String KEY_SESSION_ERROR_TIMESTAMP = "session_error_timestamp";
+    /**
+     * session rum 采样率
+     */
+    public static final String KEY_SESSION_SAMPLE_RATE = "session_sample_rate";
+    /**
+     * session 错误采样率
+     */
+    public static final String KEY_SESSION_ON_ERROR_SAMPLE_RATE = "session_on_error_sample_rate";
+
+    /**
      * 会话类型
      */
     public static final String KEY_RUM_SESSION_TYPE = "session_type";
@@ -658,15 +694,16 @@ public class Constants {
      */
     public static final String KEY_RUM_PROPERTY = "property";
 
-    public static final String SESSION_REPLAY_BUS_MESSAGE_TYPE_KEY = "type";
-    public static final String RUM_SESSION_RENEWED_BUS_MESSAGE = "rum_session_renewed";
-    public static final String RUM_KEEP_SESSION_BUS_MESSAGE_KEY = "keepSession";
-    public static final String RUM_SESSION_ID_BUS_MESSAGE_KEY = "sessionId";
-
     /**
      * 行协议数据 tags，临时存储动态 tags
      */
     public static final String KEY_RUM_TAGS = "tags";
+
+
+    /**
+     * 根据采样率被采集
+     */
+    public static final String KEY_COLLECT_TYPE = "collect_type";
 
     /**
      * 冷启动，action_type

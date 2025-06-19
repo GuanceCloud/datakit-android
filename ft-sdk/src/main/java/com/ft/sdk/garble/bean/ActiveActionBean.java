@@ -84,6 +84,7 @@ public class ActiveActionBean extends ActionBean {
         bean.hasReplay = this.hasReplay;
         bean.property = this.property;
         bean.tags = this.tags;
+        bean.collectType = this.collectType;
         return bean;
     }
 }

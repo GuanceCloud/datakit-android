@@ -75,6 +75,9 @@ public class FTSDKConfig {
     private int pageSize = SyncPageSize.MEDIUM.getValue();
 
     private int syncSleepTime = 0;
+    /**
+     * 对同步数据进行 deflate 压缩 ，默认关闭
+     */
     private boolean compressIntakeRequests = false;
 
     /**
@@ -155,6 +158,43 @@ public class FTSDKConfig {
 
     public DBCacheDiscard getDbCacheDiscard() {
         return dbCacheDiscard;
+    }
+
+
+    private boolean remoteConfiguration;
+
+    private boolean getRemoteConfiguration() {
+        return remoteConfiguration;
+    }
+
+    /**
+     * 是否开启数据采集的远程配置功能，默认不开启。开启之后，SDK 初始化或应用热启动会触发数据更新。
+     * @param remoteConfiguration
+     * @return
+     */
+    public FTSDKConfig setRemoteConfiguration(boolean remoteConfiguration) {
+        this.remoteConfiguration = remoteConfiguration;
+        return this;
+    }
+
+    private int remoteConfigMiniUpdateInterval = 43200;//12 hour
+
+    /**
+     * 设置数据更新最短间隔，单位秒，默认12小时
+     * @param remoteConfigMiniUpdateInterval
+     * @return
+     */
+    public FTSDKConfig setRemoteConfigMiniUpdateInterval(int remoteConfigMiniUpdateInterval) {
+        this.remoteConfigMiniUpdateInterval = remoteConfigMiniUpdateInterval;
+        return this;
+    }
+
+    public boolean isRemoteConfiguration() {
+        return remoteConfiguration;
+    }
+
+    public int getRemoteConfigMiniUpdateInterval() {
+        return remoteConfigMiniUpdateInterval;
     }
 
     /**
@@ -360,7 +400,8 @@ public class FTSDKConfig {
     /**
      * 设置是否获取 Android ID
      * <p>
-     * 当为 false ，device_uuid 字段不再获取
+     * 当为 false ，device_uuid 字段不再使用 {@link  android.provider.Settings.Secure#ANDROID_ID},
+     * 使用 {@link LocalUUIDManager#getRandomUUID()} 做替代
      *
      * @param enableAccessAndroidID
      * @return
@@ -377,7 +418,7 @@ public class FTSDKConfig {
     /**
      * 是否只支持在主进程中初始化 SDK
      *
-     * @param onlySupportMainProcess true，wei
+     * @param onlySupportMainProcess
      * @return
      */
     public FTSDKConfig setOnlySupportMainProcess(boolean onlySupportMainProcess) {
@@ -460,6 +501,11 @@ public class FTSDKConfig {
     private boolean enableOkhttpRequestTag;
 
 
+    private DataModifier dataModifier;
+
+    private LineDataModifier lineDataModifier;
+
+
     /**
      * 设置是否迁移
      *
@@ -495,6 +541,12 @@ public class FTSDKConfig {
         return enableDataIntegerCompatible;
     }
 
+    /**
+     * 对上传同步数据进行 deflate 压缩，默认关闭
+     *
+     * @param compressIntakeRequests
+     * @return
+     */
     public FTSDKConfig setCompressIntakeRequests(boolean compressIntakeRequests) {
         this.compressIntakeRequests = compressIntakeRequests;
         return this;
@@ -555,6 +607,7 @@ public class FTSDKConfig {
 
     /**
      * 全局 Okhttp Request 自动添加，需要 ft-plugin 1.3.5 的支持
+     *
      * @param enableOkhttpRequestTag
      * @return
      */
@@ -569,6 +622,36 @@ public class FTSDKConfig {
 
     public boolean isCompressIntakeRequests() {
         return compressIntakeRequests;
+    }
+
+    /**
+     * 对单个字段进行更改。
+     *
+     * @param dataModifier
+     * @return
+     */
+    public FTSDKConfig setDataModifier(DataModifier dataModifier) {
+        this.dataModifier = dataModifier;
+        return this;
+    }
+
+    /**
+     * 对单条数据数据进行更改
+     *
+     * @param dataModifier
+     * @return
+     */
+    public FTSDKConfig setLineDataModifier(LineDataModifier dataModifier) {
+        this.lineDataModifier = dataModifier;
+        return this;
+    }
+
+    public LineDataModifier getLineDataModifier() {
+        return lineDataModifier;
+    }
+
+    public DataModifier getDataModifier() {
+        return dataModifier;
     }
 
     @Override
@@ -595,6 +678,8 @@ public class FTSDKConfig {
                 ", proxyAuthenticator=" + authenticator +
                 ", dns=" + dns +
                 ", enableOkhttpRequestTag=" + enableOkhttpRequestTag +
+                ", dataModifier=" + dataModifier +
+                ", lineDataModifier=" + lineDataModifier +
                 '}';
     }
 }

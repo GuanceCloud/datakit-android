@@ -54,8 +54,34 @@ public class DemoApplication extends BaseApplication {
                 .setOnlySupportMainProcess(CrossProcessSetting.isOnlyMainProcess(context))
                 .setNeedTransformOldCache(true)
                 .setCompressIntakeRequests(true)
+                .setRemoteConfiguration(true)
+                .setSyncSleepTime(100)
+//                .setDataModifier(new DataModifier() {
+//                    @Override
+//                    public Object modify(String key, Object value) {
+//                        if(key.equals("userid")){
+//                            return "xxx";
+//                        }
+//                        return value;
+//                    }
+//                })
 //                .enableLimitWithDbSize(1024 * 1024)
 //                .setDbCacheDiscard(DBCacheDiscard.DISCARD_OLDEST)
+//                .setLineDataModifier(new LineDataModifier() {
+//                    @Override
+//                    public Map<String, Object> modify(String measurement, HashMap<String, Object> data) {
+//                        if (measurement.equals("view")) {
+//                            Object viewName = data.get("view_name");
+//                            if (Objects.equals(viewName, "DebugMainActivity")) {
+//                                HashMap<String, Object> changeValue = new HashMap<>();
+//                                changeValue.put("view_name", "xxx");
+//                                return changeValue;
+//                            }
+//                        }
+//                        return null;
+//
+//                    }
+//                })
                 .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()));
 //        try {
 //            URL url = new URL(BuildConfig.PROXY_ADDRESS);
@@ -79,23 +105,45 @@ public class DemoApplication extends BaseApplication {
 
 
         FTSdk.initRUMWithConfig(new FTRUMConfig()
-                .setSamplingRate(1f)
-                //.setRumAppId("com_guance_demo")
-                .setRumAppId("com_ft_session_replay")
+                        .setSamplingRate(1f)
+                        .setSessionErrorSampleRate(1f)
+                        .setRumAppId("com_ft_session_replay")
                 //.setRumAppId(BuildConfig.RUM_APP_ID)
-                .setEnableTraceUserAction(true)
-                .setEnableTraceUserView(true)
-                .setRumCacheLimitCount(1000)
-                .setRumCacheDiscardStrategy(RUMCacheDiscard.DISCARD)
-                .setEnableTraceUserResource(true)
-                .setEnableTrackAppANR(true)
-                .setEnableTrackAppCrash(true)
-                .setEnableTrackAppUIBlock(true, 100)
-                .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
-                .setResourceUrlHandler(url -> false)
+                        .setEnableTraceUserAction(true)
+                        .setEnableTraceUserView(true)
+                        .setRumCacheLimitCount(1000)
+//                        .setAllowWebViewHost(new String[]{"10.100.64.166"})
+                        .setRumCacheDiscardStrategy(RUMCacheDiscard.DISCARD)
+                        .setEnableTraceUserResource(true)
+                        .setEnableTrackAppANR(true)
+                        .setEnableTrackAppCrash(true)
+//                        .setEnableTraceWebView(true)
+                        .setEnableTrackAppUIBlock(true, 100)
+                        .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
+                        .setResourceUrlHandler(url -> false)
+//                        .setOkHttpResourceContentHandler(new FTResourceInterceptor.ContentHandlerHelperEx() {
+//                            @Override
+//                            public void onRequest(Request request, HashMap<String, Object> extraData) {
+//
+//                            }
+//
+//                            @Override
+//                            public void onResponse(Response response, HashMap<String, Object> extraData) throws IOException {
+//
+//                            }
+//
+//                            @Override
+//                            public boolean onExceptionWithFilter(Exception e, HashMap<String, Object> extraData) {
+////                                if (e instanceof ConnectException) {
+////                                    return true;
+////                                }
+//                                return super.onExceptionWithFilter(e, extraData);
+//                            }
+//                        })
 //                .addGlobalContext("track_id", BuildConfig.TRACK_ID)
 //                .addGlobalContext("custom_tag", "any tags")
-                .setExtraMonitorTypeWithError(ErrorMonitorType.ALL.getValue()));
+                        .setExtraMonitorTypeWithError(ErrorMonitorType.ALL.getValue())
+        );
 
 
         UserData userData = new UserData();
@@ -113,7 +161,9 @@ public class DemoApplication extends BaseApplication {
                 .setEnableLinkRUMData(true)
                 .setTraceType(TraceType.DDTRACE));
 
-        FTSdk.initSessionReplayConfig(new FTSessionReplayConfig().setSampleRate(1f)
+        FTSdk.initSessionReplayConfig(new FTSessionReplayConfig()
+                .setSampleRate(1f)
+                .setSessionReplayOnErrorSampleRate(1f)
                 .setPrivacy(SessionReplayPrivacy.ALLOW)
 //                .setTouchPrivacy(TouchPrivacy.SHOW)
                 .addExtensionSupport(new MaterialExtensionSupport()));

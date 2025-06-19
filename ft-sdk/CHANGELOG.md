@@ -1,5 +1,25 @@
+# agent 1.7.0-alpha20
+1. 合并 ft-sdk 1.6.12
+
+---
+# agent 1.7.0-alpha19
+1. 支持 ft-session-replay 错误采样的功能
+
+---
+# agent 1.7.0-alpha18
+1. 合并 ft-sdk 1.6.11
+
+---
+# agent 1.7.0-alpha17
+1. 合并 ft-sdk 1.6.11-alpha02
+
+---
 # agent 1.7.0-alpha16
 1. 合并 ft-sdk 1.6.10 版本
+
+---
+# agent 1.7.0-alpha15
+1. 适配 replay_0.1.1-alpha01 更改内容
 
 ---
 # agent 1.7.0-alpha14
@@ -54,6 +74,64 @@
 1. 支持开启 session replay 录制功能
 
 ---
+# agent 1.6.12
+1. 添加 `FTRUMConfig.setEnableTraceWebView` 配置是否开启通过 Android SDK 采集 WebView 数据,
+   通过 `FTRUMConfig.setAllowWebViewHost` 可以控制需要过滤 host 地址
+2. 添加 `ContentHandlerHelperEx.onExceptionWithFilter`, 可以针对本地网络错误进行过滤
+3. 添加 `FTSDKConfig.setRemoteConfiguration` 支持开启远程条件配置功能，
+   添加`FTSDKConfig.setRemoteConfigMiniUpdateInterval` 支持在开启远程控制之后，设置最短更新时间间隔
+
+---
+# agent 1.6.12-beta01
+1. 修正 webHost 空配置异常的问题
+
+---
+# agent 1.6.12-alpha02
+1. 添加 `FTSDKConfig.setRemoteConfiguration` 支持开启远程条件配置功能， 
+   添加`FTSDKConfig.setRemoteConfigMiniUpdateInterval` 支持在开启远程控制之后，设置最短更新时间间隔 
+
+---
+# agent 1.6.12-alpha01
+1. 添加 `FTRUMConfig.setEnableTraceWebView` 配置是否开启通过 Android SDK 采集 WebView 数据,
+   通过 `FTRUMConfig.setAllowWebViewHost` 可以控制需要过滤 host 地址
+2. 添加 `ContentHandlerHelperEx.onExceptionWithFilter`, 可以针对本地网络错误进行过滤
+
+---
+# agent 1.6.11
+1. 添加 `FTRUMConfig.setEnableTraceUserViewInFragment` 支持 fragment view 数据采集，默认为 false
+2. 添加 `FTSDKConfig.setLineDataModifier`、`FTSDKConfig.setDataModifier` 支持数据写入替换，支持数据脱敏
+3. 添加 `FTRUMConfig.setSessionErrorSampleRate` 支持错误采样，在未被 `setSamplingRate`采样时，
+   在发生错误时可以对 1 分钟前的 rum 的数据进行取样采集
+4. `FTSDKConfig.setEnableAccessAndroidID(false)`时, 使用本地随机 `uuid` 作为 `device_uuid`
+5. 优化高频日志写入，优化数据同步以及数据闲置关闭的逻辑
+
+---
+
+# agent 1.6.11-beta02
+1. 修正 `FTRUMConfig.setSessionErrorSampleRate` 采样数据不上报的问题
+2. 修正命中 `FTRUMConfig.setSessionErrorSampleRate` 采样，发生错误的页面，`view_error_count` 为 0 的问题
+
+---
+# agent 1.6.11-beta01
+1. 同 agent 1.6.11-alpha03
+
+---
+# agent 1.6.11-alpha03
+1. 优化数据同步逻辑
+2. 优化数据库闲置关闭逻辑
+3. FTSDKConfig.setEnableAccessAndroidID(false), 使用本地随机 uuid 作为 device_uuid
+
+---
+# agent 1.6.11-alpha02
+1. 添加 `FTRUMConfig.setSessionErrorSampleRate` 支持错误采样，在发生错误时可以对 1 分钟前的 rum 的数据进行取样采集
+
+---
+# agent 1.6.11-alpha01
+1. 优化高频日志写入性能
+2. 添加 `FTRUMConfig.setEnableTraceUserViewInFragment` 支持 fragment view 数据采集，默认为 false
+3. 添加 `FTSDKConfig.setLineDataModifier`、`FTSDKConfig.setDataModifier` 支持数据写入替换，可适用数据脱敏
+
+---
 # agent 1.6.10
 1. 支持 okhttp request 添加唯一 ResourceID，来解决相同请求高并发 trace_id ，span_id 错误错位的问题,
    ft-plugin 1.3.5 以上版本支持自动添加 ResourceID。
@@ -66,18 +144,15 @@
 
 ---
 # agent 1.6.10-beta01
-1. 通 agent 1.6.10-alpha03
+1. 同 agent 1.6.10-alpha03
 
 ---
 # agent 1.6.10-alpha03
 1. 支持 okhttp request 添加唯一 ResourceID，来解决相同请求高并发 trace_id ，span_id 错误错位的问题, 
    ft-plugin 1.3.5 以上版本支持自动添加 ResourceID。
 2. 修复多次初始化 RUM 配置的场景下，与其他其他崩溃采集 SDK，产生循环调用的问题
-3. 原生页面跳转至 WebView 页面时，用原生页面填充 WebView 数据中 view_referrer 
-
----
-# agent 1.6.10-alpha03
-1. 底层网络请求库支持 multiform 
+3. 原生页面跳转至 WebView 页面时，用原生页面填充 WebView 数据中 view_referrer
+4. 底层网络请求库支持 multiform 
 
 ---
 # agent 1.6.10-alpha02

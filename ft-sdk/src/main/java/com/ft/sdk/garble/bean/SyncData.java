@@ -18,7 +18,7 @@ import java.security.InvalidParameterException;
  * DATE:2019-12-02 13:56
  * Description: 数据存储 Data Json 数据
  */
-public class SyncJsonData implements Cloneable {
+public class SyncData implements Cloneable {
     /**
      * 同步数据唯一 id, 同步上传过程中才会赋值
      */
@@ -38,7 +38,7 @@ public class SyncJsonData implements Cloneable {
     String uuid;
 
 
-    public SyncJsonData(DataType dataType) {
+    public SyncData(DataType dataType) {
         this.dataType = dataType;
     }
 
@@ -76,7 +76,7 @@ public class SyncJsonData implements Cloneable {
 
     @Override
     public String toString() {
-        return "SyncJsonData{" +
+        return "SyncData{" +
                 "id=" + id +
                 ", dataType=" + dataType +
                 ", dataString='" + dataString + '\'' +
@@ -86,8 +86,8 @@ public class SyncJsonData implements Cloneable {
 
     @NonNull
     @Override
-    public SyncJsonData clone() throws CloneNotSupportedException {
-        return (SyncJsonData) super.clone();
+    public SyncData clone() throws CloneNotSupportedException {
+        return (SyncData) super.clone();
     }
 
     public String getDataString() {
@@ -138,11 +138,16 @@ public class SyncJsonData implements Cloneable {
      * @return
      * @throws InvalidParameterException
      */
-    public static SyncJsonData getSyncJsonData(SyncDataHelper helper, DataType dataType, LineProtocolBean bean)
+    public static SyncData getSyncData(SyncDataHelper helper, DataType dataType, LineProtocolBean bean,
+                                       long dataGenerateTime)
             throws FTInvalidParameterException {
         String uuid = Utils.getGUID_16();
-        SyncJsonData recordData = new SyncJsonData(dataType);
-        recordData.setTime(bean.getTimeNano());
+        SyncData recordData = new SyncData(dataType);
+        if (dataGenerateTime > 0) {
+            recordData.setTime(dataGenerateTime);
+        } else {
+            recordData.setTime(bean.getTimeNano());
+        }
         recordData.setUuid(uuid);
         recordData.setDataString(helper.getBodyContent(bean.getMeasurement(), bean.getTags(),
                 bean.getFields(), bean.getTimeNano(), dataType, uuid));
@@ -158,14 +163,14 @@ public class SyncJsonData implements Cloneable {
      * @throws JSONException
      * @throws InvalidParameterException
      */
-    public static SyncJsonData getFromLogBean(SyncDataHelper helper, BaseContentBean bean)
+    public static SyncData getFromLogBean(SyncDataHelper helper, BaseContentBean bean)
             throws FTInvalidParameterException {
-        SyncJsonData recordData = new SyncJsonData(DataType.LOG);
+        SyncData recordData = new SyncData(DataType.LOG);
         String uuid = Utils.getGUID_16();
-        recordData.setTime(bean.getTime());
+        recordData.setTime(bean.getTimeNano());
         recordData.setUuid(uuid);
         recordData.setDataString(helper.getBodyContent(bean.getMeasurement(),
-                bean.getAllTags(), bean.getAllFields(), bean.getTime(), DataType.LOG, uuid));
+                bean.getAllTags(), bean.getAllFields(), bean.getTimeNano(), DataType.LOG, uuid));
         return recordData;
     }
 

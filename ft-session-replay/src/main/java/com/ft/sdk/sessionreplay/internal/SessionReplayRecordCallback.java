@@ -2,6 +2,7 @@ package com.ft.sdk.sessionreplay.internal;
 
 import com.ft.sdk.feature.FeatureSdkCore;
 import com.ft.sdk.sessionreplay.SessionReplayFeature;
+import com.ft.sdk.sessionreplay.internal.persistence.TrackingConsent;
 import com.ft.sdk.sessionreplay.internal.processor.EnrichedRecord;
 
 import java.util.HashMap;
@@ -25,9 +26,13 @@ public class SessionReplayRecordCallback implements RecordCallback {
                     String viewId = record.getViewId();
                     Map<String, Object> viewMetadata = stringObjectMap.containsKey(viewId) ?
                             (Map<String, Object>) stringObjectMap.get(viewId) : new HashMap<>();
-                    viewMetadata.put(HAS_REPLAY_KEY, true);
-                    updateRecordsCount(viewMetadata, recordsSize);
-                    stringObjectMap.put(viewId, viewMetadata);
+                    if (viewMetadata != null) {
+                        viewMetadata.put(HAS_REPLAY_KEY, true);
+                        viewMetadata.put(SAMPLED_ON_ERROR,
+                                featureSdkCore.getConsentProvider() == TrackingConsent.SAMPLED_ON_ERROR_SESSION);
+                        updateRecordsCount(viewMetadata, recordsSize);
+                        stringObjectMap.put(viewId, viewMetadata);
+                    }
                 }
             });
         }
@@ -41,6 +46,7 @@ public class SessionReplayRecordCallback implements RecordCallback {
 
     public static final String HAS_REPLAY_KEY = "has_replay";
     public static final String VIEW_RECORDS_COUNT_KEY = "records_count";
+    public static final String SAMPLED_ON_ERROR = "sampled_on_reply_error";
 
     public interface UpdateCallBack {
         void onUpdate(Map<String, Object> stringObjectMap);

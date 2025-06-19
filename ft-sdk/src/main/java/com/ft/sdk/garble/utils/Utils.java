@@ -47,9 +47,11 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -57,7 +59,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -553,7 +554,8 @@ public class Utils {
      * @param values
      * @return
      */
-    public static String setToJsonString(Set<String> values) {
+    public static String setToJsonString(Collection<String> values) {
+        if (values == null) return null;
         StringBuilder jsonBuilder = new StringBuilder();
         jsonBuilder.append("[");
         Iterator<String> iterator = values.iterator();
@@ -795,6 +797,25 @@ public class Utils {
         } else {
             return FTApplication.APP_START_TIME;
         }
+    }
+
+    public static String toMD5(String input) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("MD5");
+            byte[] hashBytes = digest.digest(input.getBytes("UTF-8"));
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hashBytes) {
+                // 转成两位十六进制（不足补0）
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1)
+                    hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (Exception e) {
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+        }
+        return "";
     }
 
 }

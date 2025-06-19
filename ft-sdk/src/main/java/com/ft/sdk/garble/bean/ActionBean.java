@@ -212,6 +212,16 @@ public class ActionBean {
         this.viewReferrer = viewReferrer;
     }
 
+    public String collectType;
+
+    public CollectType getCollectType() {
+        return CollectType.fromValue(collectType);
+    }
+
+    public void setCollectType(CollectType collectType) {
+        this.collectType = collectType.getValue();
+    }
+
     public void setHasReplay(boolean hasReplay) {
         this.hasReplay = hasReplay;
     }
@@ -230,6 +240,7 @@ public class ActionBean {
         map.put(Constants.KEY_RUM_PROPERTY, property);
         map.put(Constants.KEY_RUM_TAGS, tags);
         map.put(Constants.KEY_HAS_REPLAY, hasReplay);
+        map.put(Constants.KEY_COLLECT_TYPE, collectType);
         return Utils.hashMapObjectToJson(map);
     }
 
@@ -243,6 +254,7 @@ public class ActionBean {
         try {
 
             JSONObject json = new JSONObject(jsonString);
+            this.collectType = json.getString(Constants.KEY_COLLECT_TYPE);
             JSONObject jsonProperty = json.optJSONObject(Constants.KEY_RUM_PROPERTY);
             if (jsonProperty != null) {
                 Iterator<String> keys = jsonProperty.keys();

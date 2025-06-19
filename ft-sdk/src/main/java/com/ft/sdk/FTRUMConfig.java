@@ -5,12 +5,18 @@ import androidx.annotation.NonNull;
 import com.ft.sdk.garble.utils.Constants;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class FTRUMConfig {
     /**
      * 采样率，[0,1],作用域为同一 session_id 下所有 View，Action，LongTask，Error 数据
      */
     private float samplingRate = 1;
+
+    /**
+     * 错误采样率，[0,1] 作用域为同一 session_id 下所有 View，Action，LongTask，Error 数据
+     */
+    private float sessionErrorSampleRate = 0;
 
     /**
      * RUM appID
@@ -41,6 +47,12 @@ public class FTRUMConfig {
      * 是否开启用户行为 view 追踪
      */
     private boolean enableTraceUserView;
+
+    /**
+     * 是否开启用户行为 view 追踪 Fragment View 的采集
+     */
+    private boolean enableTraceUserViewInFragment;
+
     /**
      * 是否开启用户行为 Resource 追踪
      */
@@ -118,6 +130,36 @@ public class FTRUMConfig {
 
     private RUMCacheDiscard rumCacheDiscardStrategy = RUMCacheDiscard.DISCARD;
 
+    private boolean enableTraceWebView = true;
+    private String[] allowWebViewHost;
+
+    /**
+     * 配置是否开启通过 Android SDK 采集 WebView 数据
+     * @param enableTraceWebView
+     * @return
+     */
+    public FTRUMConfig setEnableTraceWebView(boolean enableTraceWebView) {
+        this.enableTraceWebView = enableTraceWebView;
+        return this;
+    }
+
+    /**
+     * 配置允许数据追踪的 WebView host 地址
+     * @param allowWebViewHost
+     * @return
+     */
+    public FTRUMConfig setAllowWebViewHost(String[] allowWebViewHost) {
+        this.allowWebViewHost = allowWebViewHost;
+        return this;
+    }
+
+    public boolean isEnableTraceWebView() {
+        return enableTraceWebView;
+    }
+
+    public String[] getAllowWebViewHost() {
+        return allowWebViewHost;
+    }
 
     /**
      * 获取采样率
@@ -129,13 +171,32 @@ public class FTRUMConfig {
     }
 
     /**
-     * 设置采用率
+     * 设置采集率，取值范围 [0,1]，0 表示不采集，1 表示全采集，默认值为 1。作用域为同一 session_id 下所有 View，Action，LongTask，Error 数据
      *
      * @param samplingRate
      * @return
      */
     public FTRUMConfig setSamplingRate(float samplingRate) {
         this.samplingRate = samplingRate;
+        return this;
+    }
+
+    /**
+     * 获取错误采样率
+     *
+     * @return
+     */
+    public float getSessionErrorSampleRate() {
+        return sessionErrorSampleRate;
+    }
+
+    /**
+     * 设置错误采集率，当会话未被 `setSamplingRate` 采样时，若会话期间发生错误，可以采集到错误前 1 分钟范围的数据，取值范围 [0,1]，0 表示不采集，1 表示全采集，默认值为 0。作用域为同一 session_id 下所有 View，Action，LongTask，Error
+     *
+     * @param sessionErrorSampleRate
+     */
+    public FTRUMConfig setSessionErrorSampleRate(float sessionErrorSampleRate) {
+        this.sessionErrorSampleRate = sessionErrorSampleRate;
         return this;
     }
 
@@ -179,7 +240,6 @@ public class FTRUMConfig {
     public int getRumCacheLimitCount() {
         return rumCacheLimitCount;
     }
-
 
 
     /**
@@ -321,8 +381,23 @@ public class FTRUMConfig {
         return this;
     }
 
+    /**
+     * 是否监测用户 View 在 Fragment 的页面采集
+     *
+     * @param enableTraceUserViewInFragment
+     * @return
+     */
+    public FTRUMConfig setEnableTraceUserViewInFragment(boolean enableTraceUserViewInFragment) {
+        this.enableTraceUserViewInFragment = enableTraceUserViewInFragment;
+        return this;
+    }
+
     public boolean isEnableTraceUserView() {
         return enableTraceUserView;
+    }
+
+    public boolean isEnableTraceUserViewInFragment() {
+        return enableTraceUserViewInFragment;
     }
 
     public boolean isEnableTraceUserResource() {
@@ -489,7 +564,7 @@ public class FTRUMConfig {
         return this;
     }
 
-    public Boolean isEnableResourceHostIP() {
+    public boolean isEnableResourceHostIP() {
         return this.enableResourceHostIP;
     }
 
@@ -513,6 +588,7 @@ public class FTRUMConfig {
     public String toString() {
         return "FTRUMConfig{" +
                 "samplingRate=" + samplingRate +
+                ", sessionErrorSampleRate=" + sessionErrorSampleRate +
                 ", enableTrackAppCrash=" + enableTrackAppCrash +
                 ", enableTrackAppUIBlock=" + enableTrackAppUIBlock +
                 ", blockDurationMS=" + blockDurationMS +
@@ -535,18 +611,4 @@ public class FTRUMConfig {
                 '}';
     }
 
-//    /**
-//     * 设置 BackendSample 后端采样，当为 true 时，rum sampleRate 设置不再起效
-//     *
-//     * @param backendSample
-//     * @return
-//     */
-//    public FTRUMConfig setBackendSample(boolean backendSample) {
-//        this.backendSample = backendSample;
-//        return this;
-//    }
-//
-//    public boolean isBackendSample() {
-//        return this.backendSample;
-//    }
 }

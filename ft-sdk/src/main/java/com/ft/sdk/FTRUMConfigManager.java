@@ -44,8 +44,6 @@ public class FTRUMConfigManager {
 
     private FTRUMConfig config;
 
-    private volatile String randomUserId;
-
     /**
      * 绑定用户数据
      */
@@ -69,9 +67,7 @@ public class FTRUMConfigManager {
         FTDBCachePolicy.get().initRUMParam(config);
         FTRUMInnerManager.get().initParams(config);
         FTRUMGlobalManager.get().initConfig(config);
-//        FTAutoTrackConfigManager.get().initParams();
         FTExceptionHandler.get().initConfig(config);
-        initRandomUserId();
         FTMonitorManager.get().initWithConfig(config);
         FTUIBlockManager.get().start(config);
         FTANRDetector.get().init(config);
@@ -226,32 +222,6 @@ public class FTRUMConfigManager {
 
 
     /**
-     * 初始化随机 userid
-     */
-    void initRandomUserId() {
-        if (Utils.isNullOrEmpty(getRandomUserId())) {
-            createNewRandomUserId();
-        }
-    }
-
-
-    public void createNewRandomUserId() {
-        randomUserId = "ft.rd_" + Utils.randomUUID();
-        SharedPreferences sp = Utils.getSharedPreferences(FTApplication.getApplication());
-        sp.edit().putString(Constants.FT_RANDOM_USER_ID, randomUserId).apply();
-    }
-
-
-    String getRandomUserId() {
-        if (!Utils.isNullOrEmpty(randomUserId)) {
-            return randomUserId;
-        }
-        SharedPreferences sp = Utils.getSharedPreferences(FTApplication.getApplication());
-        randomUserId = sp.getString(Constants.FT_RANDOM_USER_ID, null);
-        return randomUserId;
-    }
-
-    /**
      * 获取绑定用户信息
      *
      * @return
@@ -348,25 +318,19 @@ public class FTRUMConfigManager {
         rumGlobalContext.put(Constants.KEY_DEVICE_OS_VERSION_MAJOR, osVersionMajor);
     }
 
-    HashMap<String, Object> getRUMPublicDynamicTags() {
-        return getRUMPublicDynamicTags(false);
-    }
 
     /**
      * 获取变化的公用 tag
      *
      * @return
      */
-    HashMap<String, Object> getRUMPublicDynamicTags(boolean includeRUMStatic) {
+    HashMap<String, Object> getRUMPublicDynamicTags() {
         HashMap<String, Object> tags = new HashMap<>();
-        if (includeRUMStatic) {
-            tags.putAll(FTTrackInner.getInstance().getCurrentDataHelper().getCurrentRumTags());
-        }
         tags.put(Constants.KEY_RUM_NETWORK_TYPE, FTNetworkListener.get().getNetworkStateBean().getNetworkType());
-        tags.put(Constants.KEY_RUM_IS_SIGN_IN, FTRUMConfigManager.get().isUserDataBinded() ? "T" : "F");
-        if (FTRUMConfigManager.get().isUserDataBinded()) {
-            UserData data = FTRUMConfigManager.get().getUserData();
-            tags.put(Constants.KEY_RUM_USER_ID, FTRUMConfigManager.get().getUserData().getId());
+        tags.put(Constants.KEY_RUM_IS_SIGN_IN, isUserDataBinded() ? "T" : "F");
+        if (isUserDataBinded()) {
+            UserData data = getUserData();
+            tags.put(Constants.KEY_RUM_USER_ID, data.getId());
             if (data.getName() != null) {
                 tags.put(Constants.KEY_RUM_USER_NAME, data.getName());
             }
@@ -381,7 +345,7 @@ public class FTRUMConfigManager {
                 }
             }
         } else {
-            tags.put(Constants.KEY_RUM_USER_ID, getRandomUserId());
+            tags.put(Constants.KEY_RUM_USER_ID, LocalUUIDManager.get().getRandomUUID());
         }
         return tags;
     }

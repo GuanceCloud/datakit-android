@@ -9,7 +9,7 @@ import com.ft.sdk.sessionreplay.utils.DrawableToColorMapper;
 import java.util.List;
 
 /**
- *
+ * Session Replay 条件配置
  */
 public class FTSessionReplayConfig {
     private String customEndpointUrl;
@@ -23,6 +23,7 @@ public class FTSessionReplayConfig {
     private List<DrawableToColorMapper> customDrawableMapper = DEFAULT_EXTENSIONSUPPORT.getCustomDrawableMapper();
     @FloatRange(from = 0.0, to = 1.0)
     private float sampleRate = 1f;
+    private float sessionReplayOnErrorSampleRate = 1f;
     private boolean delayInit;
     private boolean fineGrainedMaskingSet = false;
     private boolean dynamicOptimizationEnabled = true;
@@ -30,12 +31,30 @@ public class FTSessionReplayConfig {
 
     private ExtensionSupport extensionSupport = new NoOpExtensionSupport();
 
-
+    /**
+     * 设置采集率，取值范围 [0,1]，0 表示不采集，1 表示全采集，默认值为 1。
+     *
+     * @param sampleRate
+     * @return
+     */
     public FTSessionReplayConfig setSampleRate(@FloatRange(from = 0.0, to = 1.0) float sampleRate) {
         this.sampleRate = sampleRate;
         return this;
     }
 
+    /**
+     * @param sessionReplayOnErrorSampleRate
+     * @return
+     */
+    public FTSessionReplayConfig setSessionReplayOnErrorSampleRate(@FloatRange(from = 0.0, to = 1.0) float sessionReplayOnErrorSampleRate) {
+        this.sessionReplayOnErrorSampleRate = sessionReplayOnErrorSampleRate;
+        return this;
+    }
+
+    /**
+     * @param extensionSupport
+     * @return
+     */
     public FTSessionReplayConfig addExtensionSupport(ExtensionSupport extensionSupport) {
         this.extensionSupport = extensionSupport;
         this.customMappers = extensionSupport.getCustomViewMappers();
@@ -50,7 +69,11 @@ public class FTSessionReplayConfig {
 //        }
 
     /**
-     * 使用 setImagePrivacy，setTouchPrivacy，setTextAndInputPrivacy 替代
+     * {@link SessionReplayPrivacy#ALLOW} 不进行屏蔽隐私数据, {@link SessionReplayPrivacy#MASK} 屏蔽所有数据，包括文字、CheckBox，RadioButton，Switch；
+     * {@link SessionReplayPrivacy#MASK_USER_INPUT} （推荐）屏蔽用户输入的部份数据,包括输入框中文字、CheckBox，RadioButton，Switch,
+     * 默认，为 `SessionReplayPrivacy.MASK`。
+     * <p>
+     * **即将废弃，可以兼容使用，建议优先使用 `setTouchPrivacy` 、`setTextAndInputPrivacy` 进行屏蔽设置**
      *
      * @param privacy
      * @return
@@ -81,18 +104,45 @@ public class FTSessionReplayConfig {
         return this;
     }
 
+    /**
+     * {@link TextAndInputPrivacy#MASK_SENSITIVE_INPUTS} 只对密码等信息进行屏蔽,
+     * {@link TextAndInputPrivacy#MASK_ALL_INPUTS} 屏蔽用户输入的部份数据，
+     * 包括输入框中文字、CheckBox，RadioButton，Switch，{@link TextAndInputPrivacy#MASK_ALL}，
+     * 屏蔽所有数据，包括文字、CheckBox，RadioButton，Switch。默认 {@link TextAndInputPrivacy#MASK_ALL} ，
+     * **设置后覆盖 `setPrivacy` 的配置**。
+     *
+     * @param privacy
+     * @return
+     */
     public FTSessionReplayConfig setTextAndInputPrivacy(TextAndInputPrivacy privacy) {
         fineGrainedMaskingSet = true;
         this.textAndInputPrivacy = privacy;
         return this;
     }
 
+
+    /**
+     * 设置屏蔽的图像
+     * {@link ImagePrivacy#MASK_ALL} 屏蔽所有
+     * {@link ImagePrivacy#MASK_LARGE_ONLY} 只屏蔽大图片内容
+     * {@link ImagePrivacy#MASK_NONE} 不进行屏蔽
+     *
+     * @param privacy
+     * @return
+     */
     public FTSessionReplayConfig setImagePrivacy(ImagePrivacy privacy) {
         fineGrainedMaskingSet = true;
         this.imagePrivacy = privacy;
         return this;
     }
 
+    /**
+     * {@link TouchPrivacy#SHOW`} 不进行触控数据屏蔽, {@link TouchPrivacy#HIDE`}  屏蔽触控数据。
+     * **设置后覆盖 `setPrivacy` 的配置
+     *
+     * @param privacy
+     * @return
+     */
     public FTSessionReplayConfig setTouchPrivacy(TouchPrivacy privacy) {
         fineGrainedMaskingSet = true;
         this.touchPrivacy = privacy;
@@ -150,6 +200,10 @@ public class FTSessionReplayConfig {
         return sampleRate;
     }
 
+    public float getSessionReplayOnErrorSampleRate() {
+        return sessionReplayOnErrorSampleRate;
+    }
+
     public boolean isDynamicOptimizationEnabled() {
         return dynamicOptimizationEnabled;
     }
@@ -167,5 +221,16 @@ public class FTSessionReplayConfig {
         this.internalCallback = internalCallback;
         return this;
 
+    }
+
+    @Override
+    public String toString() {
+        return "FTSessionReplayConfig{" +
+                "imagePrivacy=" + imagePrivacy +
+                ", touchPrivacy=" + touchPrivacy +
+                ", textAndInputPrivacy=" + textAndInputPrivacy +
+                ", sampleRate=" + sampleRate +
+                ", sessionReplayOnErrorSampleRate=" + sessionReplayOnErrorSampleRate +
+                '}';
     }
 }

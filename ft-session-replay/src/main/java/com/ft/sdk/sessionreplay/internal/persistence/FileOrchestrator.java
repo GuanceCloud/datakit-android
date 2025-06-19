@@ -41,4 +41,9 @@ public interface FileOrchestrator {
      * @return the metadata file for a given file, or null if there is no such.
      */
     File getMetadataFile(File file);
+
+    /**
+     *
+     */
+    File getSessionOnError(File file);
 }

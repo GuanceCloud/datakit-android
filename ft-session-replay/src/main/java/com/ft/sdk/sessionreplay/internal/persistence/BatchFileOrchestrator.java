@@ -131,6 +131,21 @@ public class BatchFileOrchestrator implements FileOrchestrator {
         }
     }
 
+    @Override
+    public File getSessionOnError(File file) {
+        if (!Objects.equals(file.getParent(), rootDir.getPath())) {
+            internalLogger.d(TAG, String.format(Locale.US, DEBUG_DIFFERENT_ROOT, file.getPath(), rootDir.getPath()));
+        }
+
+        if (isBatchFile(file)) {
+            return new File(file.getPath() + "_errorsampled");
+        } else {
+            internalLogger.e(TAG, String.format(Locale.US, ERROR_NOT_BATCH_FILE, file.getPath()));
+            return null;
+        }
+    }
+
+
     private boolean isRootDirValid() {
         if (FileUtils.existsSafe(rootDir, internalLogger)) {
             if (rootDir.isDirectory()) {

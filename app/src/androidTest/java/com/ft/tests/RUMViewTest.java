@@ -21,7 +21,7 @@ import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.bean.DataType;
-import com.ft.sdk.garble.bean.SyncJsonData;
+import com.ft.sdk.garble.bean.SyncData;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.test.utils.LineProtocolData;
@@ -77,11 +77,11 @@ public class RUMViewTest extends BaseTest {
     public void viewGenerateTest() throws Exception {
         invokeGenerateRumData();
         Thread.sleep(2000);
-        List<SyncJsonData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0,
+        List<SyncData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0,
                 DataType.RUM_APP);
 
         String viewId = "";
-        for (SyncJsonData recordData : recordDataList) {
+        for (SyncData recordData : recordDataList) {
             LineProtocolData data = new LineProtocolData(recordData.getDataString());
             String measurement = data.getMeasurement();
             if (Constants.FT_MEASUREMENT_RUM_VIEW.equals(measurement)) {
@@ -102,7 +102,7 @@ public class RUMViewTest extends BaseTest {
 
         recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
 
-        for (SyncJsonData recordData : recordDataList) {
+        for (SyncData recordData : recordDataList) {
             LineProtocolData data = new LineProtocolData(recordData.getDataString());
             String measurement = data.getMeasurement();
             if (Constants.FT_MEASUREMENT_RUM_VIEW.equals(measurement)) {

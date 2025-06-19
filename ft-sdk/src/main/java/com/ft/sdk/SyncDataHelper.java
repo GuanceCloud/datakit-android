@@ -6,6 +6,7 @@ import static com.ft.sdk.garble.utils.Constants.KEY_SDK_DATA_FLAG;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.PackageUtils;
 import com.ft.sdk.garble.utils.StringUtils;
 import com.ft.sdk.garble.utils.Utils;
 import com.ft.sdk.internal.exception.FTInvalidParameterException;
@@ -15,10 +16,11 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * 数据组装类，把采集数据从存储数据序列化行协议数据
- *
+ * <p>
  * tag:覆盖逻辑 SDK inner tag > user tag > static GlobalContext > dynamic GlobalContext
  */
 public class SyncDataHelper {
@@ -30,44 +32,123 @@ public class SyncDataHelper {
     private final HashMap<String, Object> basePublicTags;
     private final HashMap<String, Object> logTags;
     private final HashMap<String, Object> rumTags;
-    private final HashMap<String, Object> traceTags;
+
 
     private final HashMap<String, Object> dynamicBaseTags;
     private final HashMap<String, Object> dynamicLogTags;
     private final HashMap<String, Object> dynamicLRumTags;
+    private final HashMap<String, Object> rumStaticFields;
 
     protected FTSDKConfig config;
+    private FTLoggerConfig logConfig;
+
+    protected DataModifier dataModifier;
+    protected LineDataModifier lineDataModifier;
 
 
     protected SyncDataHelper() {
         basePublicTags = new HashMap<>();
         logTags = new HashMap<>();
         rumTags = new HashMap<>();
-        traceTags = new HashMap<>();
 
         dynamicBaseTags = new HashMap<>();
         dynamicLogTags = new HashMap<>();
         dynamicLRumTags = new HashMap<>();
+        rumStaticFields = new HashMap<>();
     }
 
     void initBaseConfig(FTSDKConfig config) {
         this.config = config;
-        basePublicTags.putAll(config.getGlobalContext());
+        this.dataModifier = config.getDataModifier();
+        this.lineDataModifier = config.getLineDataModifier();
+
+        basePublicTags.putAll(applyModifier(config.getGlobalContext()));
     }
 
     void initLogConfig(FTLoggerConfig config) {
+        this.logConfig = config;
         logTags.putAll(basePublicTags);
-        logTags.putAll(config.getGlobalContext());
+        logTags.putAll(applyModifier(config.getGlobalContext()));
     }
 
     void initRUMConfig(FTRUMConfig config) {
         rumTags.putAll(basePublicTags);
-        rumTags.putAll(config.getGlobalContext());
+        rumStaticFields.put(Constants.KEY_SESSION_SAMPLE_RATE,
+                applyModifier(Constants.KEY_SESSION_SAMPLE_RATE, config.getSamplingRate()));
+        rumStaticFields.put(Constants.KEY_SESSION_ON_ERROR_SAMPLE_RATE,
+                applyModifier(Constants.KEY_SESSION_ON_ERROR_SAMPLE_RATE, config.getSessionErrorSampleRate()));
+        rumTags.putAll(applyModifier(config.getGlobalContext()));
     }
 
-    void initTraceConfig(FTTraceConfig config) {
-        traceTags.putAll(basePublicTags);
-        traceTags.putAll(config.getGlobalContext());
+    /**
+     * 替换整个字典
+     *
+     * @param map
+     * @return
+     */
+    private Map<String, Object> applyModifier(HashMap<String, Object> map) {
+        if (dataModifier == null || map == null) return map;
+        Iterator<Map.Entry<String, Object>> it = map.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, Object> entry = it.next();
+            String key = entry.getKey();
+            Object oldValue = entry.getValue();
+            Object newValue = dataModifier.modify(key, oldValue);
+            if (newValue != oldValue) {
+                if (newValue != null && !newValue.equals(oldValue)) {
+                    entry.setValue(newValue);
+                }
+            }
+        }
+        return map;
+    }
+
+
+    /**
+     * 替换单个
+     *
+     * @param key
+     * @param value
+     * @return
+     */
+    Object applyModifier(String key, Object value) {
+        if (dataModifier == null) return value;
+        Object changeValue = dataModifier.modify(key, value);
+        if (changeValue == null) {
+            return value;
+        }
+        return changeValue;
+    }
+
+
+    /**
+     * 单条数据进行替换
+     *
+     * @param measurement
+     * @param tags
+     * @param fields
+     */
+    void appLineModifier(String measurement, HashMap<String, Object> tags, HashMap<String, Object> fields) {
+        if (lineDataModifier == null) return;
+        HashMap<String, Object> mergedValues = new HashMap<>();
+        mergedValues.putAll(tags);
+        mergedValues.putAll(fields);
+        Map<String, Object> changedValues = lineDataModifier.modify(measurement, mergedValues);
+        if (changedValues != null) {
+            for (Map.Entry<String, Object> entry : changedValues.entrySet()) {
+                String key = entry.getKey();
+                Object value = entry.getValue();
+                if (tags.containsKey(key)) {
+                    if (value != null) {
+                        tags.put(key, value);
+                    }
+                } else if (fields.containsKey(key)) {
+                    if (value != null) {
+                        fields.put(key, value);
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -77,6 +158,7 @@ public class SyncDataHelper {
      */
     void appendGlobalContext(HashMap<String, Object> globalContext) {
         if (globalContext != null) {
+            applyModifier(globalContext);
             dynamicBaseTags.putAll(globalContext);
         }
     }
@@ -89,7 +171,7 @@ public class SyncDataHelper {
      */
     void appendGlobalContext(String key, String value) {
         if (!Utils.isNullOrEmpty(key) && !Utils.isNullOrEmpty(value)) {
-            dynamicBaseTags.put(key, value);
+            dynamicBaseTags.put(key, applyModifier(key, value));
         }
     }
 
@@ -101,6 +183,7 @@ public class SyncDataHelper {
      */
     void appendRUMGlobalContext(HashMap<String, Object> globalContext) {
         if (globalContext != null) {
+            applyModifier(globalContext);
             dynamicLRumTags.putAll(globalContext);
         }
     }
@@ -110,11 +193,10 @@ public class SyncDataHelper {
      *
      * @param key
      * @param value
-     *
      */
     void appendRUMGlobalContext(String key, String value) {
         if (!Utils.isNullOrEmpty(key) && !Utils.isNullOrEmpty(value)) {
-            dynamicLRumTags.put(key, value);
+            dynamicLRumTags.put(key, applyModifier(key, value));
         }
     }
 
@@ -125,6 +207,7 @@ public class SyncDataHelper {
      */
     void appendLogGlobalContext(HashMap<String, Object> globalContext) {
         if (globalContext != null) {
+            applyModifier(globalContext);
             dynamicLogTags.putAll(globalContext);
         }
     }
@@ -134,11 +217,10 @@ public class SyncDataHelper {
      *
      * @param key
      * @param value
-     *
      */
     void appendLogGlobalContext(String key, String value) {
         if (!Utils.isNullOrEmpty(key) && !Utils.isNullOrEmpty(value)) {
-            dynamicLogTags.put(key, value);
+            dynamicLogTags.put(key, applyModifier(key, value));
         }
     }
 
@@ -156,6 +238,8 @@ public class SyncDataHelper {
 
     public String getBodyContent(String measurement, HashMap<String, Object> tags,
                                  HashMap<String, Object> fields, long timeStamp, DataType dataType, String uuid) {
+        applyModifier(tags);
+        applyModifier(fields);
         HashMap<String, Object> mergeTags = new LinkedHashMap<>();
         mergeTags.put(KEY_SDK_DATA_FLAG, uuid);//让 uuid 放置第一位，字符替换时可以节省损耗
         if (tags != null) {
@@ -167,23 +251,44 @@ public class SyncDataHelper {
             mergeTags.putAll(dynamicBaseTags);
             mergeTags.putAll(dynamicLogTags);
             mergeTags.putAll(logTags);
+            if (logConfig != null) {
+                if (logConfig.isEnableLinkRumData()) {
+                    mergeTags.putAll(rumTags);
+                }
+            }
+            appLineModifier(measurement, mergeTags, fields);
             bodyContent = convertToLineProtocolLine(measurement, mergeTags, fields,
                     timeStamp, config);
-
-        } else if (dataType == DataType.TRACE) {
-            // trace 数据
-            mergeTags.putAll(traceTags);
-            bodyContent = convertToLineProtocolLine(measurement, mergeTags, fields,
-                    timeStamp, config);
-        } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_WEBVIEW) {
+        } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_APP_ERROR_SAMPLED
+                || dataType == DataType.RUM_WEBVIEW || dataType == DataType.RUM_WEBVIEW_ERROR_SAMPLED) {
             //rum 数据
             mergeTags.putAll(dynamicBaseTags);
             mergeTags.putAll(dynamicLRumTags);
-            if (dataType == DataType.RUM_APP) {
+            if (dataType == DataType.RUM_APP || dataType == DataType.RUM_APP_ERROR_SAMPLED) {
                 mergeTags.putAll(rumTags);
+                fields.putAll(rumStaticFields);
+            } else {
+                Object webSDKVersion = mergeTags.get(Constants.KEY_SDK_VERSION);
+                Iterator<String> keys = rumTags.keySet().iterator();
+                while (keys.hasNext()) {
+                    String key = keys.next();
+                    if (!key.equals(Constants.KEY_SERVICE)) {
+                        if (key.equals(Constants.KEY_RUM_SDK_PACKAGE_INFO)) {
+                            Object pkgInfo = rumTags.get(Constants.KEY_RUM_SDK_PACKAGE_INFO);
+                            if (pkgInfo != null) {
+                                String replacePkgInfo = PackageUtils.appendPackageVersion(pkgInfo.toString(),
+                                        Constants.KEY_RUM_SDK_PACKAGE_WEB, webSDKVersion + "");
+                                mergeTags.put(Constants.KEY_RUM_SDK_PACKAGE_INFO,
+                                        applyModifier(Constants.KEY_RUM_SDK_PACKAGE_INFO, replacePkgInfo));
+                            }
+                        } else {
+                            mergeTags.put(key, rumTags.get(key));
+                        }
+                    }
+                }
             }
-            bodyContent = convertToLineProtocolLine(measurement, mergeTags, fields,
-                    timeStamp, config);
+            appLineModifier(measurement, mergeTags, fields);
+            bodyContent = convertToLineProtocolLine(measurement, mergeTags, fields, timeStamp, config);
         } else {
             bodyContent = "";
         }
@@ -191,29 +296,16 @@ public class SyncDataHelper {
 
     }
 
-    /**
-     * 动态和静态 rum tags
-     *
-     * @return
-     */
-    HashMap<String, Object> getCurrentRumTags() {
-        HashMap<String, Object> mergeTags = new HashMap<>();
-        mergeTags.putAll(dynamicLRumTags);
-        mergeTags.putAll(rumTags);
-        return mergeTags;
-    }
 
     static String convertToLineProtocolLine(String measurement, HashMap<String, Object> tags,
                                             HashMap<String, Object> fields,
                                             long timeStamp,
                                             FTSDKConfig config) {
-
-
         if (measurement == null) {
             throw new FTInvalidParameterException("指标集 measurement 不能为空");
         }
 
-        if (fields == null) {
+        if (fields == null || fields.isEmpty()) {
             throw new FTInvalidParameterException("指标集 fields 不能为空");
         }
 
@@ -329,7 +421,7 @@ public class SyncDataHelper {
      * @return
      */
     SyncDataCompatHelper getCompat() {
-        return new SyncDataCompatHelper(logTags, traceTags, rumTags, config);
+        return new SyncDataCompatHelper(logTags, rumTags, config);
     }
 
 

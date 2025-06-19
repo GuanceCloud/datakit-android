@@ -5,6 +5,7 @@ import static com.ft.sdk.feature.Feature.SESSION_REPLAY_FEATURE_NAME;
 import android.app.Activity;
 import android.content.Context;
 
+import com.ft.sdk.api.TrackingConsentProvider;
 import com.ft.sdk.feature.Feature;
 import com.ft.sdk.feature.FeatureContextUpdateReceiver;
 import com.ft.sdk.feature.FeatureEventReceiver;
@@ -14,6 +15,7 @@ import com.ft.sdk.garble.threadpool.ThreadPoolFactory;
 import com.ft.sdk.sessionreplay.SDKFeature;
 import com.ft.sdk.sessionreplay.SessionInnerLogger;
 import com.ft.sdk.sessionreplay.internal.SessionReplayRecordCallback;
+import com.ft.sdk.sessionreplay.internal.persistence.TrackingConsent;
 import com.ft.sdk.sessionreplay.utils.InternalLogger;
 
 import java.util.Map;
@@ -43,12 +45,26 @@ public class SessionReplayManager implements FeatureSdkCore {
 
     private final Map<String, SDKFeature> features = new ConcurrentHashMap<>();
 
+    private final TrackingConsentProvider trackingConsentProvider = new TrackingConsentProvider(TrackingConsent.NOT_GRANTED);
+
     private Context context;
 
     public void init(Context context) {
         this.context = context;
     }
 
+    public void setConsentProvider(TrackingConsent consentProvider) {
+        this.trackingConsentProvider.setConsent(consentProvider);
+    }
+
+    public TrackingConsent getConsentProvider() {
+        return this.trackingConsentProvider.getConsent();
+    }
+
+    @Override
+    public long getErrorTimeLine() {
+        return SyncTaskManager.get().getErrorTimeLine();
+    }
 
     @Override
     public InternalLogger getInternalLogger() {
@@ -57,7 +73,7 @@ public class SessionReplayManager implements FeatureSdkCore {
 
     @Override
     public void registerFeature(Feature feature) {
-        SDKFeature scope = new SDKFeature(this, feature, getInternalLogger());
+        SDKFeature scope = new SDKFeature(this, feature, getInternalLogger(), trackingConsentProvider);
         features.put(feature.getName(), scope);
         scope.init(context, null);
     }
