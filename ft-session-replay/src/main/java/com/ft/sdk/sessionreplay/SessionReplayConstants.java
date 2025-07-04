@@ -2,12 +2,12 @@ package com.ft.sdk.sessionreplay;
 
 public class SessionReplayConstants {
     /**
-     * SessionReplay 上传地址
+     * SessionReplay upload address
      */
     public static final String URL_MODEL_SESSION_REPLAY = "v1/write/rum/replay";
 
-    /**
-     * Session Replay 缓存地址
+    /** 
+     * Session Replay cache address
      */
     public static final String PATH_SESSION_REPLAY = "sessionReplayTmp";
     public static final String PATH_SESSION_REPLAY_ERROR_SAMPLED = "sessionReplayErrorSampledTmp";

@@ -57,7 +57,7 @@ public class ImageWireframeUpdate extends WireframeUpdateMutation {
         }
         if (isEmpty != null) {
 //            json.addProperty("isEmpty", isEmpty);
-            //fixme 图片功能加载完成后恢复这个参数
+            //fixme After the image function is loaded, restore this parameter
             json.addProperty("isEmpty", true);
         }
         return json;

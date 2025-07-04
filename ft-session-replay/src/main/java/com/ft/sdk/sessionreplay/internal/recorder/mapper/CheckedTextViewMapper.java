@@ -58,8 +58,8 @@ public class CheckedTextViewMapper extends CheckableTextViewMapper<CheckedTextVi
 
     @Override
     public Drawable getCheckableDrawable(CheckedTextView view) {
-        // CheckedTextView 的 drawable 无法根据状态直接获取
-        // 因此，这里使用两个硬编码索引来获取“已选中”和“未选中”的 drawable。
+        // The drawable of CheckedTextView cannot be directly obtained according to the state
+        // Therefore, here two hard-coded indexes are used to get the drawable of "checked" and "unchecked".
         int checkableDrawableIndex = view.isChecked() ? CHECK_BOX_CHECKED_DRAWABLE_INDEX : CHECK_BOX_NOT_CHECKED_DRAWABLE_INDEX;
 
         Drawable.ConstantState constantState = (view.getCheckMarkDrawable() != null) ? view.getCheckMarkDrawable().getConstantState() : null;
@@ -76,10 +76,10 @@ public class CheckedTextViewMapper extends CheckableTextViewMapper<CheckedTextVi
         }
         Drawable clonedDrawable = drawable.getConstantState().newDrawable(view.getResources());
         if (clonedDrawable != null) {
-            // 设置状态，使 drawable 根据状态正确应用 tint
+            // Set the state, so that the drawable is correctly applied according to the state
             clonedDrawable.setState(view.getDrawableState());
 
-            // 如果按钮声明了 `checkMarkTint` 属性，则为 drawable 设置 tint。
+            // If the button declares the `checkMarkTint` attribute, set the tint for the drawable.
             if (view.getCheckMarkTintList() != null) {
                 clonedDrawable.setTintList(view.getCheckMarkTintList());
             }

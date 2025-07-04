@@ -252,7 +252,7 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
             List<Window> windows = sessionReplayLifecycleCallback.getCurrentWindows();
 
             if (isDelayInit && windows.isEmpty()) {
-                isDelayInit = false;//初始化一次之后，不进行此逻辑判断
+                isDelayInit = false;//After initialization, this logic is not performed
                 Activity currentActivity = sdkCore.curentActivity();
                 if (currentActivity != null) {
                     windows = List.of(currentActivity.getWindow());

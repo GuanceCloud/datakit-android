@@ -438,7 +438,7 @@ public class Constants {
     public static final String KEY_RUM_SDK_PACKAGE_NATIVE = "native";
 
     /**
-     * ft-session-replay module 发布版本
+     * ft-session-replay module release version
      */
     public static final String KEY_RUM_SDK_PACKAGE_REPLAY = "replay";
 
@@ -582,7 +582,7 @@ public class Constants {
     public static final String KEY_SAMPLED_FOR_ERROR_SESSION = "sampled_for_error_session";
 
     /**
-     * 由于 Session Replay 错误被采集
+     * Because of Session Replay error collection
      */
     public static final String KEY_SAMPLED_FOR_ERROR_REPLAY ="sampled_for_error_replay";
 

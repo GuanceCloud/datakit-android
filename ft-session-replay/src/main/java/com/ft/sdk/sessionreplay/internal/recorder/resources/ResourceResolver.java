@@ -417,7 +417,7 @@ public class ResourceResolver {
                 String resourceId = tryToGetResourceFromCache(null, key);
 
                 if (resourceId != null) {
-                    // 如果能从缓存中获取资源 ID，则直接返回
+                    // If the resource ID can be obtained from the cache, return directly
                     resourceResolverCallback.onSuccess(resourceId);
                     return;
                 }

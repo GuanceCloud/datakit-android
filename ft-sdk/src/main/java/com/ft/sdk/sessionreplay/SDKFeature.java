@@ -150,7 +150,7 @@ public class SDKFeature implements FeatureScope {
                             builder.setMethod(RequestMethod.POST)
                                     .addHeadParam(Constants.SYNC_DATA_USER_AGENT_HEADER, builder.getHttpConfig().getUserAgentForSR())
                                     .addHeadParam(Constants.SYNC_DATA_CONTENT_TYPE_HEADER, "multipart/form-data")
-                                    //不受 DeflateInterceptor 影响
+                                    //Not affected by DeflateInterceptor
                                     .addHeadParam(Constants.SYNC_DATA_CONTENT_ENCODING_HEADER, "identity")
                                     .addHeadParam(Constants.SYNC_DATA_TRACE_HEADER, traceHeader)
                             ;

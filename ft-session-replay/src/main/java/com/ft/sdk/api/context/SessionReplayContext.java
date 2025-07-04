@@ -23,7 +23,6 @@ public class SessionReplayContext {
     }
 
     /**
-     * SDK 跨版本
      *
      * @param hashMap
      */

@@ -1,7 +1,7 @@
 package com.ft.sdk.sessionreplay;
 
 /**
- * 隐私策略类型
+ * Privacy policy type
  */
 public enum SessionReplayPrivacy {
     /** Does not apply any privacy rule on the recorded data with an exception for strong privacy

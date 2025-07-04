@@ -79,7 +79,7 @@ public class ConsentAwareStorage implements Storage {
                 orchestrator = grantedOrchestrator;
                 break;
             case SAMPLED_ON_ERROR_SESSION:
-                //todo 当前命中错采样时，写到另一个缓存文件
+                //todo When the current error sampling is hit, write to another cache file
                 orchestrator = errorSessionOrchestrator;
                 break;
             case PENDING:

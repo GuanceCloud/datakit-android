@@ -218,7 +218,7 @@ public class ResourceBean {
     public boolean contentSet = false;
 
     /**
-     * 是否有 session replay
+     * Whether there is session replay
      */
     public boolean hasSessionReplay = false;
 

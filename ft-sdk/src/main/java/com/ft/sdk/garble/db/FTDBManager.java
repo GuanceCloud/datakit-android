@@ -385,7 +385,7 @@ public class FTDBManager extends DBManager {
     }
 
     /**
-     * 更新 {@link FTSQL#RUM_COLUMN_EXTRA_ATTR}
+     * Update {@link FTSQL#RUM_COLUMN_EXTRA_ATTR}
      *
      * @param viewId
      * @param attr

@@ -9,7 +9,7 @@ import com.ft.sdk.sessionreplay.utils.DrawableToColorMapper;
 import java.util.List;
 
 /**
- * Session Replay 条件配置
+ * Session Replay condition configuration
  */
 public class FTSessionReplayConfig {
     private String customEndpointUrl;
@@ -32,7 +32,7 @@ public class FTSessionReplayConfig {
     private ExtensionSupport extensionSupport = new NoOpExtensionSupport();
 
     /**
-     * 设置采集率，取值范围 [0,1]，0 表示不采集，1 表示全采集，默认值为 1。
+     * Set the collection rate, the value range is [0,1], 0 means not collected, 1 means full collection, the default value is 1.
      *
      * @param sampleRate
      * @return
@@ -69,11 +69,11 @@ public class FTSessionReplayConfig {
 //        }
 
     /**
-     * {@link SessionReplayPrivacy#ALLOW} 不进行屏蔽隐私数据, {@link SessionReplayPrivacy#MASK} 屏蔽所有数据，包括文字、CheckBox，RadioButton，Switch；
-     * {@link SessionReplayPrivacy#MASK_USER_INPUT} （推荐）屏蔽用户输入的部份数据,包括输入框中文字、CheckBox，RadioButton，Switch,
-     * 默认，为 `SessionReplayPrivacy.MASK`。
+     * {@link SessionReplayPrivacy#ALLOW} Do not screen privacy data, {@link SessionReplayPrivacy#MASK} Screen all data, including text, CheckBox, RadioButton, Switch;
+     * {@link SessionReplayPrivacy#MASK_USER_INPUT} (recommended) Screen part of the data, including text, CheckBox, RadioButton, Switch,
+     * Default, is `SessionReplayPrivacy.MASK`.
      * <p>
-     * **即将废弃，可以兼容使用，建议优先使用 `setTouchPrivacy` 、`setTextAndInputPrivacy` 进行屏蔽设置**
+     * **Deprecated, can be used compatibly, it is recommended to use `setTouchPrivacy` and `setTextAndInputPrivacy` for screening settings**
      *
      * @param privacy
      * @return
@@ -105,11 +105,11 @@ public class FTSessionReplayConfig {
     }
 
     /**
-     * {@link TextAndInputPrivacy#MASK_SENSITIVE_INPUTS} 只对密码等信息进行屏蔽,
-     * {@link TextAndInputPrivacy#MASK_ALL_INPUTS} 屏蔽用户输入的部份数据，
-     * 包括输入框中文字、CheckBox，RadioButton，Switch，{@link TextAndInputPrivacy#MASK_ALL}，
-     * 屏蔽所有数据，包括文字、CheckBox，RadioButton，Switch。默认 {@link TextAndInputPrivacy#MASK_ALL} ，
-     * **设置后覆盖 `setPrivacy` 的配置**。
+     * {@link TextAndInputPrivacy#MASK_SENSITIVE_INPUTS} Only screen sensitive information,
+     * {@link TextAndInputPrivacy#MASK_ALL_INPUTS} Screen part of the data,
+     * Including text, CheckBox, RadioButton, Switch, {@link TextAndInputPrivacy#MASK_ALL},
+     * Screen all data, including text, CheckBox, RadioButton, Switch. Default {@link TextAndInputPrivacy#MASK_ALL},
+     * **Setting overrides `setPrivacy` configuration**
      *
      * @param privacy
      * @return
@@ -122,10 +122,10 @@ public class FTSessionReplayConfig {
 
 
     /**
-     * 设置屏蔽的图像
-     * {@link ImagePrivacy#MASK_ALL} 屏蔽所有
-     * {@link ImagePrivacy#MASK_LARGE_ONLY} 只屏蔽大图片内容
-     * {@link ImagePrivacy#MASK_NONE} 不进行屏蔽
+     * Set the screen image
+     * {@link ImagePrivacy#MASK_ALL} Screen all
+     * {@link ImagePrivacy#MASK_LARGE_ONLY} Only screen large image content
+     * {@link ImagePrivacy#MASK_NONE} Do not screen
      *
      * @param privacy
      * @return
@@ -137,8 +137,8 @@ public class FTSessionReplayConfig {
     }
 
     /**
-     * {@link TouchPrivacy#SHOW`} 不进行触控数据屏蔽, {@link TouchPrivacy#HIDE`}  屏蔽触控数据。
-     * **设置后覆盖 `setPrivacy` 的配置
+     * {@link TouchPrivacy#SHOW`} Do not screen touch data, {@link TouchPrivacy#HIDE`} Screen touch data.
+     * **Setting overrides `setPrivacy` configuration**
      *
      * @param privacy
      * @return
@@ -186,7 +186,7 @@ public class FTSessionReplayConfig {
     }
 
     /**
-     * 延迟初始化
+     * Delay initialization
      *
      * @param delayInit
      * @return

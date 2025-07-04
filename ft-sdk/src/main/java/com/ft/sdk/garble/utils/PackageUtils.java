@@ -32,20 +32,20 @@ public class PackageUtils {
      */
     private static final String PACKAGE_SOPHIX = "com.taobao.sophix.SophixApplication";
     /**
-     * nativelib BuildConfig package 路径
+     * nativelib BuildConfig package path
      */
     public static final String PACKAGE_NATIVELIB = "com.ft.sdk.nativelib.BuildConfig";
     /**
-     * session replay BuildConfig package 路径
+     * session replay BuildConfig package path
      */
     public static final String PACKAGE_SESSION_REPLAY = "com.ft.sdk.sessionreplay.BuildConfig";
     /**
-     * session replay material BuildConfig package 路径
+     * session replay material BuildConfig package path
      */
     public static final String PACKAGE_SESSION_REPLAY_MTR = "com.ft.sdk.sessionreplay.material.BuildConfig";
 
     /**
-     * 获取版本 field
+     * Get version field
      */
     public static final String PACKAGE_FIELD_VERSION_NAME = "VERSION_NAME";
 
@@ -77,7 +77,7 @@ public class PackageUtils {
     }
 
     /**
-     * 获取 session replay 库版本
+     * Get session replay library version
      *
      * @return
      */
@@ -86,7 +86,7 @@ public class PackageUtils {
     }
 
     /**
-     * 获取 session replay material 库版本
+     * Get session replay material library version
      *
      * @return
      */

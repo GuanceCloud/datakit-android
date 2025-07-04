@@ -252,7 +252,7 @@ public class BatchFileOrchestrator implements FileOrchestrator {
     }
 
     private void freeSpaceIfNeeded(List<File> files) {
-        // 计算磁盘上所有文件的总大小
+        // Calculate the total size of all files on the disk
         long sizeOnDisk = 0;
         for (File file : files) {
             sizeOnDisk += FileUtils.lengthSafe(file, internalLogger);
@@ -265,7 +265,7 @@ public class BatchFileOrchestrator implements FileOrchestrator {
             long finalSizeToFree = sizeToFree;
             internalLogger.e(TAG, String.format(Locale.US, ERROR_DISK_FULL, sizeOnDisk, maxDiskSpace, finalSizeToFree));
 
-            // 按文件名排序
+            // Sort by file name
             Collections.sort(files);
 
             for (File file : files) {

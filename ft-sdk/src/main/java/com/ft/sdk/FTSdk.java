@@ -41,11 +41,11 @@ public class FTSdk {
     public static String NATIVE_VERSION = PackageUtils.isNativeLibrarySupport() ? PackageUtils.getNativeLibVersion() : "";
 
     /**
-     * 集成后 ft-session-replay 后才会被被赋值,直接访问 {@link com.ft.sdk.nativelib.BuildConfig#VERSION_NAME} 来获取
+     * After integrating ft-session-replay, it will be assigned, directly access {@link com.ft.sdk.nativelib.BuildConfig#VERSION_NAME} to get
      */
     public static String SESSION_REPLAY_VERSION = PackageUtils.isSessionReplay() ? PackageUtils.getPackageSessionReplay() : "";
     /**
-     * 集成后 ft-session-replay-material 后才会被被赋值,直接访问 {@link com.ft.sdk.sessionreplay.material.BuildConfig#VERSION_NAME} 来获取
+     * After integrating ft-session-replay-material, it will be assigned, directly access {@link com.ft.sdk.sessionreplay.material.BuildConfig#VERSION_NAME} to get
      */
     public static String SESSION_REPLAY_MATERIAL_VERSION = PackageUtils.isSessionReplayMtr() ? PackageUtils.getPackageSessionReplayMtr() : "";
 
@@ -274,7 +274,7 @@ public class FTSdk {
 
 
     /**
-     * 初始化 session replay 的配置
+     * Initialize the configuration of session replay
      *
      * @param config
      */

@@ -98,12 +98,12 @@ public class SessionReplayDataUploadRunnable implements Runnable {
                 if (files != null) {
                     for (File file : files) {
                         if (file.isFile()) {
-                            long fileTime = file.lastModified(); // 创建时间不可得，用修改时间替代
+                            long fileTime = file.lastModified(); // The creation time is not available, use the modification time instead
                             if (fileTime < errorTimeLine) {
                                 File moveTargetPath = new File(rootPath,
                                         SessionReplayConstants.PATH_SESSION_REPLAY
                                                 + "/" + file.getName());
-                                //移动至正常上传对列
+                                //Move to normal upload queue
                                 if (moveFile(file, moveTargetPath)) {
                                     internalLogger.d(TAG, "SR consumeErrorSampledData:" + file.getName());
                                 }
@@ -121,15 +121,15 @@ public class SessionReplayDataUploadRunnable implements Runnable {
 
 
     private boolean moveFile(File sourceFile, File destFile) {
-        // 确保目标路径的父目录存在
+        // Ensure the parent directory of the target path exists
         if (!destFile.getParentFile().exists()) {
             destFile.getParentFile().mkdirs();
         }
 
-        // 执行移动：首先复制文件，再删除源文件
+        // Execute move: first copy the file, then delete the source file
         boolean success = copyFile(sourceFile, destFile);
 
-        // 如果复制成功，删除源文件
+        // If the copy is successful, delete the source file
         if (success) {
             success = sourceFile.delete();
         }
@@ -156,7 +156,7 @@ public class SessionReplayDataUploadRunnable implements Runnable {
 
 
     /**
-     * 删除超过一分钟的过期数据
+     * Delete expired data that exceeds one minute
      *
      * @param file
      * @param timeNow

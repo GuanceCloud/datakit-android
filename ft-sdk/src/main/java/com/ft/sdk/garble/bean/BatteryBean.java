@@ -12,12 +12,12 @@ public class BatteryBean {
     private int usage;
 
     /**
-     * 是否在省电模式
+     * Whether in power saving mode
      */
     private boolean isSaveMode;
 
     /**
-     * 电池是否存在
+     * Whether the battery exists
      */
     private boolean isBatteryPresent;
 
@@ -31,7 +31,7 @@ public class BatteryBean {
 
 
     /**
-     * 电池充电状态
+     * Battery charging status
      * {@link android.os.BatteryManager#BATTERY_PLUGGED_AC}
      * {@link android.os.BatteryManager#BATTERY_PLUGGED_USB}
      * {@link android.os.BatteryManager#BATTERY_PLUGGED_WIRELESS}
@@ -39,7 +39,7 @@ public class BatteryBean {
     private int plugState;
 
     /**
-     * 电池剩余
+     * Battery remaining
      */
     private int level;
 
