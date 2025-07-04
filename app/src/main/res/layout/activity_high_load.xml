@@ -8,13 +8,13 @@
         android:id="@+id/high_load_log_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="并发日志" />
+        android:text="Concurrent Log" />
 
     <Button
         android:id="@+id/high_load_http_request_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="并发 http 请求" />
+        android:text="Concurrent HTTP Request" />
 
     <Button
         android:id="@+id/high_load_to_repeat_view_btn"
@@ -26,5 +26,5 @@
         android:id="@+id/high_load_to_repeat_add_action"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="并发 addAction"/>
+        android:text="Concurrent AddAction"/>
 </LinearLayout>

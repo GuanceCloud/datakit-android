@@ -28,13 +28,13 @@ import java.util.List;
 /**
  * BY huangDianHua
  * DATE:2019-12-25 16:38
- * Description: 数据库创库,插入数据,删除数据测试
+ * Description: Database creation, data insertion, data deletion test
  */
 public class FTDBManagerTest extends FTBaseTest {
     private static final int repeatTime = 100;
 
     /**
-     * 测试创建数据库
+     * Test database creation
      */
     @Test
     public void createDatabase() {
@@ -45,7 +45,7 @@ public class FTDBManagerTest extends FTBaseTest {
     }
 
     /**
-     * 测试向数据库中插入一条数据是否插入成功
+     * Test whether inserting a piece of data into the database is successful
      *
      * @throws InterruptedException
      * @throws Exception
@@ -55,14 +55,14 @@ public class FTDBManagerTest extends FTBaseTest {
         FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
         FTSdk.initRUMWithConfig(new FTRUMConfig());
         insertData();
-        //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
+        //Because data insertion is an asynchronous operation, an interval needs to be set to be able to query the data
         Thread.sleep(2000);
         List<SyncData> recordDataList = FTDBManager.get().queryDataByDescLimit(0);
         assertEquals(1, recordDataList.size());
     }
 
     /**
-     * 测试向数据库中插入 {@link #repeatTime} 条数据，和查到的数据是否相同
+     * Test inserting {@link #repeatTime} pieces of data into the database, and whether the found data is the same
      *
      * @throws Exception
      * @throws InterruptedException
@@ -77,14 +77,14 @@ public class FTDBManagerTest extends FTBaseTest {
             i++;
             Thread.sleep(100);
         }
-        //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
+        //Because data insertion is an asynchronous operation, an interval needs to be set to be able to query the data
         Thread.sleep(1000);
         List<SyncData> recordDataList = FTDBManager.get().queryDataByDescLimit(0);
         assertEquals(repeatTime, recordDataList.size());
     }
 
     /**
-     * 测试通过数据的ID来删除数据
+     * Test deleting data by data ID
      *
      * @throws Exception
      * @throws InterruptedException
@@ -95,7 +95,7 @@ public class FTDBManagerTest extends FTBaseTest {
         FTSdk.initRUMWithConfig(new FTRUMConfig());
         insertData();
         insertData();
-        //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
+        //Because data insertion is an asynchronous operation, an interval needs to be set to be able to query the data
         Thread.sleep(1000);
         List<SyncData> recordDataList = FTDBManager.get().queryDataByDescLimit(0);
         assertEquals(2, recordDataList.size());
@@ -109,7 +109,7 @@ public class FTDBManagerTest extends FTBaseTest {
     }
 
     /**
-     * 向数据库中插入一条数据
+     * Insert a piece of data into the database
      *
      * @throws Exception
      */

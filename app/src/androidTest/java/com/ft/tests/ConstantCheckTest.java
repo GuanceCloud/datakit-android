@@ -18,7 +18,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * 检验版本字段是否赋值正常
+ * Verify whether the version fields are assigned correctly
  */
 @RunWith(AndroidJUnit4.class)
 public class ConstantCheckTest extends BaseTest {
@@ -39,7 +39,7 @@ public class ConstantCheckTest extends BaseTest {
 
 
     /**
-     * 检验 ft-plugin 版本号
+     * Verify ft-plugin version number
      *
      * {@link com.ft.sdk.garble.utils.Constants#KEY_RUM_SDK_PACKAGE_TRACK}
      */
@@ -49,7 +49,7 @@ public class ConstantCheckTest extends BaseTest {
     }
 
     /**
-     * 检验 Application uuid
+     * Verify Application uuid
      *
      * {@link com.ft.sdk.garble.utils.Constants#KEY_APPLICATION_UUID}
      */
@@ -60,7 +60,7 @@ public class ConstantCheckTest extends BaseTest {
     }
 
     /**
-     * 检验 ft-native 版本号
+     * Verify ft-native version number
      * {@link com.ft.sdk.garble.utils.Constants#KEY_RUM_SDK_PACKAGE_NATIVE}
      */
     @Test

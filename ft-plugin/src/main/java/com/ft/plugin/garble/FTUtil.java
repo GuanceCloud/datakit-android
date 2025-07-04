@@ -24,8 +24,8 @@ import java.util.HashSet;
  * BY huangDianHua
  * DATE:2019-12-03 11:43
  * Description:
- * 本类借鉴修改了来自 Sensors Data 的项目 <a href="https://github.com/sensorsdata/sa-sdk-android-plugin2">sa-sdk-android-plugin2</a>
- * 中的 SensorsAnalyticsUtil.groovy 类
+ * This class is adapted and modified from the Sensors Data project <a href="https://github.com/sensorsdata/sa-sdk-android-plugin2">sa-sdk-android-plugin2</a>
+ * SensorsAnalyticsUtil.groovy class
  */
 public class FTUtil {
     private static final HashSet<String> targetFragmentClass = new HashSet<>();
@@ -83,13 +83,15 @@ public class FTUtil {
          */
         targetActivityClass.add("androidx/fragment/app/FragmentActivity");
 
-        /*将一些特例需要排除在外 */
+        /*
+         * Exclude some special cases
+         */
         specialClass.add("com/bumptech/glide/manager/SupportRequestManagerFragment");
 
     }
 
     /**
-     * 是否为公开方法
+     * Whether it is a public method
      * @param access
      * @return
      */
@@ -98,7 +100,7 @@ public class FTUtil {
     }
 
     /**
-     * 是否是静态方法
+     * Whether it is a static method
      * @param access
      * @return
      */
@@ -108,7 +110,7 @@ public class FTUtil {
 
 
     /**
-     * 是否继承 Menu
+     * Whether it inherits Menu
      * @param nameDesc
      * @return
      */
@@ -117,7 +119,7 @@ public class FTUtil {
     }
 
     /**
-     * 是否继承 Android App Fragment
+     * Whether it inherits Android App Fragment
      * @param superName
      * @return
      */
@@ -126,7 +128,7 @@ public class FTUtil {
     }
 
     /**
-     * 是否继承 Androidx App Fragment
+     * Whether it inherits Androidx App Fragment
      * @param superName
      * @return
      */
@@ -135,7 +137,7 @@ public class FTUtil {
     }
 
     /**
-     * 是否继承 Android V4 Fragment
+     * Whether it inherits Android V4 Fragment
      * @param superName
      * @return
      */
@@ -144,7 +146,7 @@ public class FTUtil {
     }
 
     /**
-     * 是否继承 Activity
+     * Whether it inherits Activity
      * @param superName
      * @return
      */
@@ -153,7 +155,7 @@ public class FTUtil {
     }
 
     /**
-     * 是否为特定的类
+     * Whether it is a special class
      * @param className
      * @return
      */
@@ -162,7 +164,7 @@ public class FTUtil {
     }
 
     /**
-     * 是否继承 Application
+     * Whether it inherits Application
      * @param nameDesc
      * @return
      */

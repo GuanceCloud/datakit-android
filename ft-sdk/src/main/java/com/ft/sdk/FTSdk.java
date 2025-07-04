@@ -32,11 +32,11 @@ public class FTSdk {
     public final static String TAG = Constants.LOG_TAG_PREFIX + "FTSdk";
     public static final String NATIVE_DUMP_PATH = "ftCrashDmp";
     /**
-     * 由 Plugin ASM 进行改写，写入的是 Plugin 的版本号
+     * Modified by Plugin ASM, writes the Plugin version number
      */
     public static String PLUGIN_VERSION = "";
     /**
-     * 集成后 ft-native 后才会被被赋值,直接访问 {@link com.ft.sdk.nativelib.BuildConfig#VERSION_NAME} 来获取
+     * Will only be assigned after integrating ft-native, directly access {@link com.ft.sdk.nativelib.BuildConfig#VERSION_NAME} to get
      */
     public static String NATIVE_VERSION = PackageUtils.isNativeLibrarySupport() ? PackageUtils.getNativeLibVersion() : "";
 
@@ -51,13 +51,13 @@ public class FTSdk {
 
     private final static boolean isSessionReplaySupport = SESSION_REPLAY_VERSION.isEmpty();
     /**
-     * 变量由 Plugin ASM 写入，同一次编译版本 UUID 相同
+     * Variable written by Plugin ASM, UUID is the same for the same compilation version
      */
     public static String PACKAGE_UUID = "";
     /**
-     * 面两个变量也不能随便改动，改动请同时更改 plugin 中对应的值
+     * The above two variables cannot be changed arbitrarily, if changed please also change the corresponding values in the plugin
      */
-    public static final String AGENT_VERSION = BuildConfig.FT_SDK_VERSION;//当前SDK 版本
+    public static final String AGENT_VERSION = BuildConfig.FT_SDK_VERSION;// Current SDK version
     private static FTSdk mFtSdk;
     private final FTSDKConfig mFtSDKConfig;
     private FTRemoteConfigManager mRemoteConfigManager;
@@ -70,7 +70,7 @@ public class FTSdk {
     }
 
     /**
-     * SDK 配置项入口
+     * SDK configuration entry point
      *
      * @param ftSDKConfig
      * @return
@@ -78,7 +78,7 @@ public class FTSdk {
     public static synchronized void install(@NonNull FTSDKConfig ftSDKConfig) {
         try {
             if (ftSDKConfig == null) {
-                LogUtils.e(TAG, "参数 ftSDKConfig 不能为 null");
+                LogUtils.e(TAG, "Parameter ftSDKConfig cannot be null");
             } else {
                 boolean onlyMain = ftSDKConfig.isOnlySupportMainProcess();
                 if (onlyMain) {
@@ -86,7 +86,7 @@ public class FTSdk {
                     String currentProcessName = Utils.getCurrentProcessName();
                     String packageName = context.getPackageName();
                     if (!TextUtils.isEmpty(packageName) && !TextUtils.equals(packageName, currentProcessName)) {
-                        LogUtils.e(TAG, "当前 SDK 只能在主进程中运行，当前进程为 " + currentProcessName + "，如果想要在非主进程中运行可以设置 FTSDKConfig.setOnlySupportMainProcess(false)");
+                        LogUtils.e(TAG, "Current SDK can only run in the main process, current process is " + currentProcessName + ", if you want to run in non-main process you can set FTSDKConfig.setOnlySupportMainProcess(false)");
                         return;
                     }
                 }
@@ -99,19 +99,19 @@ public class FTSdk {
     }
 
     /**
-     * SDK 初始化后，获得 SDK 对象
+     * After SDK initialization, get the SDK object
      *
      * @return
      */
     public static synchronized FTSdk get() {
         if (mFtSdk == null) {
-            LogUtils.e(TAG, "请先安装SDK(在应用启动时调用FTSdk.install(FTSDKConfig ftSdkConfig))");
+            LogUtils.e(TAG, "Please install SDK first (call FTSdk.install(FTSDKConfig ftSdkConfig) when the application starts)");
         }
         return mFtSdk;
     }
 
     /**
-     * 检查设置状态
+     * Check installation status
      *
      * @return
      */
@@ -120,7 +120,7 @@ public class FTSdk {
     }
 
     /**
-     * 关闭 SDK 内正在运行对象
+     * Shutdown running objects within SDK
      */
     public static void shutDown() {
         SyncTaskManager.get().release();
@@ -150,18 +150,18 @@ public class FTSdk {
             }
             mFtSdk = null;
         }
-        LogUtils.w(TAG, "FT SDK 已经被关闭");
+        LogUtils.w(TAG, "FT SDK has been shut down");
     }
 
     /**
-     * 清理未上报的缓存数据
+     * Clear unreported cached data
      */
     public static void clearAllData() {
         FTDBManager.get().delete();
     }
 
     /**
-     * 初始化SDK本地配置数据
+     * Initialize SDK local configuration data
      */
     private void initFTConfig(FTSDKConfig config) {
         LogUtils.setDebug(config.isDebug());
@@ -188,7 +188,7 @@ public class FTSdk {
 
 
     /**
-     * 主动更新远程远程配置，调用频次受 {@link FTSDKConfig#setRemoteConfigMiniUpdateInterval(int)} }的时间影响
+     * Actively update remote configuration, call frequency is affected by the time of {@link FTSDKConfig#setRemoteConfigMiniUpdateInterval(int)} }
      */
     public static void updateRemoteConfig() {
         if (checkInstallState()) {
@@ -199,10 +199,10 @@ public class FTSdk {
     }
 
     /**
-     * 主动更新远程远程配置,这个方法无视 {@link FTSDKConfig#setRemoteConfigMiniUpdateInterval(int)} } 配置
+     * Actively update remote configuration, this method ignores {@link FTSDKConfig#setRemoteConfigMiniUpdateInterval(int)} } configuration
      *
-     * @param remoteConfigMiniUpdateInterval 远程配置时间间隔，单位秒 [0,]
-     * @param result                         返回更新结果
+     * @param remoteConfigMiniUpdateInterval Remote configuration time interval, unit seconds [0,]
+     * @param result Return update result
      */
     public static void updateRemoteConfig(int remoteConfigMiniUpdateInterval, FTRemoteConfigManager.FetchResult result) {
         if (checkInstallState()) {
@@ -214,7 +214,7 @@ public class FTSdk {
 
 
     /**
-     * 设置 RUM 配置
+     * Set RUM configuration
      *
      * @param config
      */
@@ -235,7 +235,7 @@ public class FTSdk {
     }
 
     /**
-     * 设置 Trace 配置
+     * Set Trace configuration
      *
      * @param config
      */
@@ -254,7 +254,7 @@ public class FTSdk {
     }
 
     /**
-     * 设置 log 配置
+     * Set log configuration
      *
      * @param config
      */
@@ -290,7 +290,7 @@ public class FTSdk {
     }
 
     /**
-     * 绑定用户信息,{@link Constants#KEY_RUM_IS_SIGN_IN},绑定后字段为 T，绑定一次，字段数据会持续保留数据直到，调用
+     * Bind user information, {@link Constants#KEY_RUM_IS_SIGN_IN}, after binding the field is T, bind once, the field data will continue to retain data until calling
      * {@link #unbindRumUserData()}
      *
      * @param id
@@ -301,23 +301,23 @@ public class FTSdk {
 
 
     /**
-     * 绑定用户信息,{@link #bindRumUserData(String)}  }
+     * Bind user information, {@link #bindRumUserData(String)}  }
      */
     public static void bindRumUserData(@NonNull UserData data) {
         FTRUMConfigManager.get().bindUserData(data.getId(), data.getName(), data.getEmail(), data.getExts());
     }
 
     /**
-     * 解绑用户数据 {@link Constants#KEY_RUM_IS_SIGN_IN},绑定后字段为 F
+     * Unbind user data {@link Constants#KEY_RUM_IS_SIGN_IN}, after binding the field is F
      */
     public static void unbindRumUserData() {
         FTRUMConfigManager.get().unbindUserData();
     }
 
     /**
-     * 获取公用 tags
+     * Get public tags
      *
-     * @return 获取基础 Tags ，key value 形式
+     * @return Get basic Tags in key value form
      */
     HashMap<String, Object> getBasePublicTags() {
         return mFtSDKConfig.getGlobalContext();
@@ -325,9 +325,9 @@ public class FTSdk {
 
 
     /**
-     * 动态控制获取 Android ID
+     * Dynamically control getting Android ID
      *
-     * @param enableAccessAndroidID 是为应用，否为不应用
+     * @param enableAccessAndroidID true for apply, false for not apply
      */
     public static void setEnableAccessAndroidID(boolean enableAccessAndroidID) {
         if (checkInstallState()) {
@@ -347,7 +347,7 @@ public class FTSdk {
 
 
     /**
-     * 补充全局 tags
+     * Supplement global tags
      *
      * @param config
      */
@@ -387,7 +387,7 @@ public class FTSdk {
     }
 
     /**
-     * 动态设置全局 tag
+     * Dynamically set global tag
      *
      * @param globalContext
      */
@@ -398,7 +398,7 @@ public class FTSdk {
     }
 
     /**
-     * 动态设置全局 tag
+     * Dynamically set global tag
      *
      * @param key
      * @param value
@@ -410,7 +410,7 @@ public class FTSdk {
     }
 
     /**
-     * 动态设置 RUM 全局 tag
+     * Dynamically set RUM global tag
      *
      * @param globalContext
      */
@@ -421,7 +421,7 @@ public class FTSdk {
     }
 
     /**
-     * 动态设置 RUM 全局 tag
+     * Dynamically set RUM global tag
      *
      * @param key
      * @param value
@@ -433,7 +433,7 @@ public class FTSdk {
     }
 
     /**
-     * 动态设置 log 全局 tag
+     * Dynamically set log global tag
      *
      * @param globalContext
      */
@@ -444,7 +444,7 @@ public class FTSdk {
     }
 
     /**
-     * 动态设置 log 全局 tag
+     * Dynamically set log global tag
      *
      * @param key
      * @param value
@@ -457,7 +457,7 @@ public class FTSdk {
 
 
     /**
-     * 主动同步数据
+     * Actively sync data
      */
     public static void flushSyncData() {
         if (checkInstallState()) {

@@ -75,7 +75,7 @@ public class Utils {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "Utils";
 
     /**
-     * 字符判断，判断字符非空
+     * Character check, check if string is not empty
      *
      * @param str
      * @return
@@ -85,7 +85,7 @@ public class Utils {
     }
 
     /**
-     * 检测权限
+     * Check permission
      *
      * @param context
      * @param permission
@@ -121,7 +121,7 @@ public class Utils {
     }
 
 //    /**
-//     * 判断是否连接网络
+//     * Check if network is connected
 //     *
 //     * @return
 //     */
@@ -130,7 +130,7 @@ public class Utils {
 //    }
 //
 //    /**
-//     * 判断是否连接网络
+//     * Check if network is connected
 //     *
 //     * @return
 //     */
@@ -141,7 +141,7 @@ public class Utils {
 //    }
 
     /**
-     * 获取应用 app 名称 AndroidManifest.xml application.labelName
+     * Get app name from AndroidManifest.xml application.labelName
      *
      * @return
      */
@@ -158,7 +158,7 @@ public class Utils {
     }
 
     /**
-     * 获取 SDK 缓存  {@link SharedPreferences}
+     * Get SDK cache {@link SharedPreferences}
      *
      * @param context
      * @return
@@ -168,7 +168,7 @@ public class Utils {
     }
 
     /**
-     * 获取 16 字符长度的 GUID
+     * Get 16-character length GUID
      *
      * @return
      */
@@ -177,7 +177,7 @@ public class Utils {
     }
 
     /**
-     * 获取 uuid
+     * Get uuid
      *
      * @return
      */
@@ -186,7 +186,7 @@ public class Utils {
     }
 
     /**
-     * 获取全零 uuid
+     * Get all-zero uuid
      *
      * @return
      */
@@ -195,7 +195,7 @@ public class Utils {
     }
 
     /**
-     * 获取 64 位随机数
+     * Get 64-bit random number
      *
      * @return
      */
@@ -204,7 +204,7 @@ public class Utils {
     }
 
     /**
-     * base64 加密字符串
+     * base64 encode string
      *
      * @param origin
      * @return
@@ -250,7 +250,7 @@ public class Utils {
     }
 
     /**
-     * 转译特殊字符
+     * Escape special characters
      *
      * @param special
      * @param oldStr
@@ -263,7 +263,7 @@ public class Utils {
     }
 
     /**
-     * double 四舍五入取2位小数
+     * Round double to 2 decimal places
      *
      * @param value
      * @return
@@ -281,7 +281,7 @@ public class Utils {
     };
 
     /**
-     * 日志日期，个同事yyyy-MM-dd HH:mm:ss:SSS
+     * Log date, format yyyy-MM-dd HH:mm:ss:SSS
      *
      * @return
      */
@@ -295,7 +295,7 @@ public class Utils {
     }
 
     /**
-     * 随机数小于采样率，可以采样
+     * Random number less than sampling rate, can be sampled
      *
      * @return
      */
@@ -309,7 +309,7 @@ public class Utils {
     }
 
     /**
-     * 生成采集随机数
+     * Generate random number for sampling
      *
      * @return
      */
@@ -319,7 +319,7 @@ public class Utils {
     }
 
     /**
-     * 判断当前进程是否是主进程
+     * Determine whether the current process is the main process
      *
      * @return
      */
@@ -331,7 +331,7 @@ public class Utils {
     }
 
     /**
-     * 获取当前进程名称
+     * Get current process name
      *
      * @return
      */
@@ -355,7 +355,7 @@ public class Utils {
 
 
     /**
-     * 文件读取
+     * File reading
      *
      * @param path
      * @param encoding
@@ -372,9 +372,9 @@ public class Utils {
     }
 
     /**
-     * 删除文件，如果是文件夹遍历删除，只做一级文件夹遍历
+     * Delete file, if it's a folder, traverse and delete, only do one-level folder traversal
      * <p>
-     * 用于测试用例，和 Native Crash 文件上传完毕后的清理工作
+     * Used for test cases and cleanup work after Native Crash file upload is completed
      *
      * @param path
      * @return
@@ -391,7 +391,7 @@ public class Utils {
 
 
     /**
-     * 是否是 json
+     * Whether it is json
      *
      * @param json
      * @return
@@ -407,7 +407,7 @@ public class Utils {
     }
 
     /**
-     * 读取应用
+     * Read application
      *
      * @param filePath
      * @param key
@@ -433,11 +433,11 @@ public class Utils {
     }
 
     /**
-     * 获取纳秒时间
+     * Get nanosecond time
      * <p>
-     * 两次获取存在同一个毫秒触发会有时间倒转的问题。
-     * 在毫秒边界获取时 System.nanoTime() 可能碰到纳秒一个周期结束，后获取的时间可能会更小，
-     * 目前使用这个方法是性能和精准度折中的一个方法
+     * Getting twice in the same millisecond trigger may cause time reversal issues.
+     * When getting at millisecond boundaries, System.nanoTime() may encounter the end of a nanosecond cycle, and the later obtained time may be smaller.
+     * Currently using this method is a compromise between performance and accuracy
      *
      * @return
      */
@@ -446,7 +446,7 @@ public class Utils {
     }
 
     /**
-     * 生成相对唯一的 resourceId
+     * Generate relatively unique resourceId
      *
      * @param request
      * @return
@@ -492,7 +492,7 @@ public class Utils {
     }
 
     /**
-     * 获取编码
+     * Get encoding
      *
      * @param contentType
      * @return
@@ -518,7 +518,7 @@ public class Utils {
     }
 
     /**
-     * 转化 http header raw 数据
+     * Convert http header raw data
      *
      * @param httpHeader
      * @return
@@ -533,7 +533,7 @@ public class Utils {
             String key = entry.getKey();
             List<String> values = entry.getValue();
 
-            // 添加每个键值对到HTTP原始数据
+            // Add each key-value pair to HTTP raw data
             rawData.append(key).append(": ");
 
             for (int i = 0; i < values.size(); i++) {
@@ -549,7 +549,7 @@ public class Utils {
 
 
     /**
-     * 数组转化为 json 字符的方法，替换 Gson 高损耗
+     * Method to convert array to json string, replacing Gson high overhead
      *
      * @param values
      * @return
@@ -571,10 +571,10 @@ public class Utils {
 
 
     /**
-     * Hashmap 转化为 json，基础类型自行转化，其他类型交给 gson，可以降低损耗
+     * Convert Hashmap to json, basic types convert themselves, other types are handled by gson, can reduce overhead
      *
      * @param map
-     * @return 正常返回数据 json string ，转化异常返回空字符串
+     * @return Returns json string data normally, returns empty string on conversion exception
      */
 
     public static <T> String hashMapObjectToJson(HashMap<String, T> map) {
@@ -589,13 +589,13 @@ public class Utils {
                 } else if (value instanceof Number || value instanceof Boolean) {
                     jsonBuilder.append(value);
                 } else {
-                    // 对于非基本类型，使用 Gson 进行转换
+                    // For non-basic types, use Gson for conversion
                     jsonBuilder.append(SingletonGson.getInstance().toJson(value));
                 }
                 jsonBuilder.append(", ");
             }
             if (!map.isEmpty()) {
-                // 删除最后一个逗号和空格
+                // Delete the last comma and space
                 jsonBuilder.delete(jsonBuilder.length() - 2, jsonBuilder.length());
             }
             jsonBuilder.append("}");
@@ -608,7 +608,7 @@ public class Utils {
 
 
     /**
-     * JSONObject 转化成 Map<String, Object>
+     * Convert JSONObject to Map<String, Object>
      *
      * @param jsonObject
      * @return
@@ -616,13 +616,13 @@ public class Utils {
     public static HashMap<String, Object> jsonToMap(@Nullable JSONObject jsonObject) {
         if (jsonObject == null) return null;
         HashMap<String, Object> map = new HashMap<>();
-        // 获取 JSONObject 的键的迭代器
+        // Get iterator of JSONObject keys
         Iterator<String> keys = jsonObject.keys();
-        // 遍历每个键并将键值对放入 HashMap 中
+        // Traverse each key and put key-value pairs into HashMap
         while (keys.hasNext()) {
             String key = keys.next();
             Object value = jsonObject.opt(key);
-            // 将键值对放入 HashMap
+            // Put key-value pair into HashMap
             map.put(key, value);
         }
         return map;
@@ -630,7 +630,7 @@ public class Utils {
 
 
     /**
-     * MMAP 方式读取文件
+     * Read file using MMAP method
      *
      * @param file
      * @return
@@ -653,9 +653,9 @@ public class Utils {
     }
 
     /**
-     * 从文件名去后缀
+     * Remove extension from filename
      *
-     * @param fileName 文件名
+     * @param fileName filename
      * @return
      */
     public static String getNameWithoutExtension(String fileName) {
@@ -669,7 +669,7 @@ public class Utils {
 
 
     /**
-     * 写入文件
+     * Write to file
      *
      * @param file
      * @param content
@@ -683,12 +683,12 @@ public class Utils {
     }
 
     /**
-     * 获取 logcat
+     * Get logcat
      * {@see https://github.com/iqiyi/xCrash/blob/457066ceb48fb84b993f1f04871d9e634d752792/xcrash_lib/src/main/java/xcrash/Util.java}
      *
-     * @param logcatMainLines   这是主要的日志缓冲区，包含大部分应用程序的日志输出，[0,500]，default 200
-     * @param logcatSystemLines 系统日志缓冲区，包含系统级别的日志信息，[0,500]，default 50
-     * @param logcatEventsLines 事件日志缓冲区，主要记录特定的事件信息，[0,500]，default 50
+     * @param logcatMainLines   This is the main log buffer, containing most application log output, [0,500], default 200
+     * @param logcatSystemLines System log buffer, containing system-level log information, [0,500], default 50
+     * @param logcatEventsLines Event log buffer, mainly recording specific event information, [0,500], default 50
      * @return
      */
     public static String getLogcat(int logcatMainLines, int logcatSystemLines, int logcatEventsLines) {
@@ -771,7 +771,7 @@ public class Utils {
     }
 
     /**
-     * 获取所有线程堆栈
+     * Get all thread stacks
      *
      * @return
      */
@@ -786,7 +786,7 @@ public class Utils {
     }
 
     /**
-     * 获取 App 启动时间
+     * Get App startup time
      *
      * @return
      */
@@ -805,7 +805,7 @@ public class Utils {
             byte[] hashBytes = digest.digest(input.getBytes("UTF-8"));
             StringBuilder hexString = new StringBuilder();
             for (byte b : hashBytes) {
-                // 转成两位十六进制（不足补0）
+                // Convert to two-digit hexadecimal (pad with 0 if insufficient)
                 String hex = Integer.toHexString(0xff & b);
                 if (hex.length() == 1)
                     hexString.append('0');

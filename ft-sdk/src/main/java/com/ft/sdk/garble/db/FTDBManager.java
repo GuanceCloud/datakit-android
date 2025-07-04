@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * BY huangDianHua
  * DATE:2019-12-02 15:55
- * Description:数据库管理类
+ * Description: Database management class
  */
 @SuppressLint("Range")
 public class FTDBManager extends DBManager {
@@ -36,7 +36,7 @@ public class FTDBManager extends DBManager {
     public final static String TAG = Constants.LOG_TAG_PREFIX + "FTDBManager";
 
     /**
-     * 注意 ：AndroidTest 会调用这个方法 {@link com.ft.test.base.FTBaseTest#avoidCleanData()}
+     * Note: AndroidTest will call this method {@link com.ft.test.base.FTBaseTest#avoidCleanData()}
      */
     private boolean isAndroidTest = false;
 
@@ -79,7 +79,7 @@ public class FTDBManager extends DBManager {
     }
 
     /**
-     * 埋点数据插入数据库
+     * Insert tracking data into the database
      *
      * @param data
      */
@@ -91,7 +91,7 @@ public class FTDBManager extends DBManager {
 
 
     /**
-     * RUM view 数据统计
+     * RUM view data statistics
      *
      * @param data
      * @return
@@ -131,7 +131,7 @@ public class FTDBManager extends DBManager {
 
 
     /**
-     * RUM action 统计
+     * RUM action statistics
      *
      * @param data
      * @return
@@ -170,7 +170,7 @@ public class FTDBManager extends DBManager {
     }
 
     /**
-     * 更新 action 关闭状态
+     * Update action close status
      *
      * @param actionId
      * @param duration
@@ -206,7 +206,7 @@ public class FTDBManager extends DBManager {
     }
 
     /**
-     * 更新 view 关闭状态
+     * Update view close status
      *
      * @param viewId
      * @param timeSpent
@@ -284,7 +284,7 @@ public class FTDBManager extends DBManager {
 
 
     /**
-     * 数据 count++
+     * Decrement data count
      *
      * @param tableName
      * @param id
@@ -310,7 +310,7 @@ public class FTDBManager extends DBManager {
     }
 
     /**
-     * 数据 count--
+     * Decrement data count
      *
      * @param tableName
      * @param id
@@ -337,7 +337,7 @@ public class FTDBManager extends DBManager {
     }
 
     /**
-     * 更新 View 上传时间,{@link  FTSQL#RUM_DATA_UPLOAD_TIME},用于标记延迟的 Resource 数据
+     * Update View upload time, used to mark delayed Resource data
      */
     public void updateViewUploadTime(String viewId, long dateTime) {
         updateViewDateTimeByColumn(viewId, FTSQL.RUM_DATA_UPLOAD_TIME, dateTime);
@@ -346,7 +346,7 @@ public class FTDBManager extends DBManager {
     }
 
     /**
-     * 更新 View 更新时间,{@link  FTSQL#RUM_DATA_UPLOAD_TIME},用于标记延迟的 Resource 数据
+     * Update View update time, used to mark delayed Resource data
      */
     public void updateViewUpdateTime(String viewId, long dateTime) {
         updateViewDateTimeByColumn(viewId, FTSQL.RUM_DATA_UPDATE_TIME, dateTime);
@@ -354,11 +354,11 @@ public class FTDBManager extends DBManager {
     }
 
     /**
-     * 更新 viewid update 和 upload 更新状态
+     * Update viewid update and upload status
      *
      * @param viewId
      * @param columName {@link FTSQL#RUM_DATA_UPDATE_TIME},{@link FTSQL#RUM_DATA_UPLOAD_TIME}
-     * @param dateTime  时间，毫秒
+     * @param dateTime  time, milliseconds
      */
     private void updateViewDateTimeByColumn(String viewId, String columName, long dateTime) {
         getDB(true, new DataBaseCallBack() {
@@ -412,7 +412,7 @@ public class FTDBManager extends DBManager {
     }
 
     /**
-     * 获取 Action 各项数据统计，{@link ActionBean}
+     * Get statistics for each Action, {@link ActionBean}
      *
      * @param limit
      * @return
@@ -472,7 +472,7 @@ public class FTDBManager extends DBManager {
     }
 
     /**
-     * 获取 View 各项数据统计 {@link ViewBean}
+     * Get statistics for each View {@link ViewBean}
      *
      * @param limit
      * @return
@@ -538,7 +538,7 @@ public class FTDBManager extends DBManager {
     }
 
     /**
-     * 清理所有 Action {@link FTSQL#RUM_COLUMN_IS_CLOSE} = 1 数据
+     * Clean up all Action {@link FTSQL#RUM_COLUMN_IS_CLOSE} = 1 data
      */
     public void cleanCloseActionData(String[] ids) {
         if (isAndroidTest) return;
@@ -560,7 +560,7 @@ public class FTDBManager extends DBManager {
     }
 
     /**
-     * 清理所有 View {@link FTSQL#RUM_COLUMN_IS_CLOSE} = 1 数据
+     * Clean up all View {@link FTSQL#RUM_COLUMN_IS_CLOSE} = 1 data
      */
     public void cleanCloseViewData() {
         if (isAndroidTest) return;
@@ -588,7 +588,7 @@ public class FTDBManager extends DBManager {
     }
 
     /**
-     * 埋点数据批量插入数据库
+     * Batch insert buried point data into the database
      *
      * @param dataList
      */
@@ -633,9 +633,8 @@ public class FTDBManager extends DBManager {
     }
 
     /**
-     * 查询所有数据
+     * Query all user information in the database
      *
-     * @param limit limit == 0 表示获取全部数据
      * @return
      */
     public List<SyncData> queryDataByDescLimit(final int limit) {
@@ -643,9 +642,9 @@ public class FTDBManager extends DBManager {
     }
 
     /**
-     * 查询所有数据
+     * Query all user information in the database
      *
-     * @param limit limit == 0 表示获取全部数据
+     * @param limit limit == 0 means get all data
      * @return
      */
     public List<SyncData> queryDataByDescLimit(final int limit, boolean oldCache) {
@@ -653,7 +652,7 @@ public class FTDBManager extends DBManager {
     }
 
     /**
-     * 将需要缓存区需要上传的数据，更改类型
+     * Change the type of data that needs to be uploaded in the cache area
      *
      * @param dataType
      */
@@ -705,7 +704,7 @@ public class FTDBManager extends DBManager {
     }
 
     /**
-     * 查询数据库中数据的总数
+     * Query the total number of data in the database
      *
      * @return
      */
@@ -745,7 +744,16 @@ public class FTDBManager extends DBManager {
     }
 
     /**
-     * 删除数据表中的前 limit 行数的数据
+     * Delete user data by user's sessionId
+     *
+     * @param sessionId
+     */
+    public void deleteUserData(String sessionId) {
+        getDB(true, db -> db.delete(FTSQL.FT_TABLE_USER_DATA, FTSQL.USER_COLUMN_SESSION_ID + "=?", new String[]{sessionId}));
+    }
+
+    /**
+     * Delete the first limit rows of data in the data table
      *
      * @param type
      * @param limit
@@ -779,7 +787,7 @@ public class FTDBManager extends DBManager {
 
 
     /**
-     * 判断是否存在旧缓存,如果 table 不存在，则会被 {@link #getDB} exception try catch 直接捕获
+     * Determine if old cache exists, if table doesn't exist, it will be directly caught by {@link #getDB} exception try catch
      *
      * @return
      */
@@ -810,7 +818,7 @@ public class FTDBManager extends DBManager {
     }
 
     /**
-     * 根据条件查询数据
+     * Query data based on conditions
      *
      * @param limit
      * @param selection
@@ -864,7 +872,7 @@ public class FTDBManager extends DBManager {
     }
 
     /**
-     * 根据查询的Id集合删除埋点数据
+     * Delete tracking data based on the queried Id collection
      *
      * @param ids
      */
@@ -881,7 +889,7 @@ public class FTDBManager extends DBManager {
     }
 
     /**
-     * 测试使用，用于删除数据库中的数据
+     * For testing use, used to delete data in the database
      */
     public void delete() {
         getDB(true, new DataBaseCallBack() {
@@ -903,7 +911,7 @@ public class FTDBManager extends DBManager {
     }
 
     /**
-     * 释放数据库
+     * Release database
      */
     public static void release() {
         if (ftdbManager != null) {
@@ -913,7 +921,7 @@ public class FTDBManager extends DBManager {
 
 
 //    /**
-//     * 插入用户数据进数据库
+//     * Insert user data into database
 //     *
 //     * @param userData
 //     */
@@ -927,7 +935,7 @@ public class FTDBManager extends DBManager {
 //    }
 //
 //    /**
-//     * 查询数据库中的用户信息
+//     * Query user information in database
 //     *
 //     * @param sessionId
 //     * @return
@@ -954,7 +962,7 @@ public class FTDBManager extends DBManager {
 //    }
 //
 //    /**
-//     * 查询数据库中的所有用户信息
+//     * Query all user information in database
 //     *
 //     * @return
 //     */
@@ -981,7 +989,7 @@ public class FTDBManager extends DBManager {
 //    }
 
 //    /**
-//     * 根据用户的sessionId删除用户数据
+//     * Delete user data based on user's sessionId
 //     *
 //     * @param sessionId
 //     */

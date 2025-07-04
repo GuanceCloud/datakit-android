@@ -3,11 +3,11 @@ package com.ft.sdk.garble.bean;
 /**
  * BY huangDianHua
  * DATE:2020-01-17 13:30
- * Description: 电池指标数据
+ * Description: Battery metric data
  */
 public class BatteryBean {
     /**
-     * 电量使用量
+     * Battery usage
      */
     private int usage;
 

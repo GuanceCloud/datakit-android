@@ -8,19 +8,19 @@ import java.util.HashMap;
 import javax.net.ssl.HttpsURLConnection;
 
 /**
- * Resource 指标数据，{@link ResourceParams},{@link  NetStatusBean}
+ * Resource metric data, {@link ResourceParams},{@link  NetStatusBean}
  *
  * @author Brandon
  */
 public class ResourceBean {
 
     /**
-     * 请求资源地址
+     * Request resource address
      */
     public String url = "";
 
     /**
-     * 请求主机地址
+     * Request host address
      */
     public String urlHost = "";
 
@@ -30,190 +30,190 @@ public class ResourceBean {
     public String urlPath = "";
 
     /**
-     * 请求 Http 头 Content-Type
+     * Request HTTP header Content-Type
      */
     public String resourceType = "";
     /**
-     * 请求 Http 头
+     * Request HTTP header
      */
     public String requestHeader = "";
     /**
-     * 请求返回头
+     * Request response header
      */
     public String responseHeader = "";
     /**
-     * Http 返回头 Connection
+     * HTTP response header Connection
      */
     public String responseConnection = "";
 
     /**
-     * Http 返回 Content Type
+     * HTTP response Content Type
      */
     public String responseContentType = "";
 
     /**
-     * Http 返回 Content-Encoding
+     * HTTP response Content-Encoding
      */
     public String responseContentEncoding = "";
 
     /**
-     * Http 请求方法 GET POST 等
+     * HTTP request method GET POST etc.
      */
     public String resourceMethod = "";
 
     /**
-     * Http url query
+     * HTTP url query
      */
     public String resourceUrlQuery = "";
 
     /**
-     * 链路 ID {@link TraceBean#traceID}
+     * Trace ID {@link TraceBean#traceID}
      */
     public String traceId = null;
 
     /**
-     * 链路 Span ID {@link TraceBean#spanID}
+     * Trace Span ID {@link TraceBean#spanID}
      */
     public String spanId = null;
 
     /**
-     * 请求错误日志堆栈
+     * Request error log stack
      */
     public String errorStack = "";
 
     /**
-     * 错误消息
+     * Error message
      */
     public String errorMsg = "";
 
     /**
-     * 请求返回 code {@link  HttpsURLConnection#HTTP_OK,HttpsURLConnection#HTTP_UNAUTHORIZED} 等等
+     * Request response code {@link  HttpsURLConnection#HTTP_OK,HttpsURLConnection#HTTP_UNAUTHORIZED} etc.
      */
     public int resourceStatus = 0;
 
     /**
-     * 资源请求大小，单位 byte
+     * Resource request size, unit byte
      */
     public long resourceSize = -1;
 
     /**
-     * 资源加载时间 单位
+     * Resource load time unit
      */
     public long resourceLoad = -1;
 
     /**
-     * dns 解析时长， {@link NetStatusBean#getDNSTime()}
+     * DNS resolution duration, {@link NetStatusBean#getDNSTime()}
      */
     public long resourceDNS = -1;
 
     /**
-     * das 解析开始时间，{@link NetStatusBean#getDNSStartTime()}
+     * DNS resolution start time, {@link NetStatusBean#getDNSStartTime()}
      */
     public long resourceDNSStart = -1;
 
     /**
-     * tcp 连接时长，{@link NetStatusBean#getTcpTime()} }
+     * TCP connection duration, {@link NetStatusBean#getTcpTime()} }
      */
     public long resourceTCP = -1;
 
     /**
-     * tcp 连接开始时间 {@link  NetStatusBean#getConnectStartTime()}
+     * TCP connection start time {@link  NetStatusBean#getConnectStartTime()}
      */
     public long resourceTCPStart = -1;
 
     /**
-     * ssl 连接时长，{@link NetStatusBean#getSSLTime()}  }
+     * SSL connection duration, {@link NetStatusBean#getSSLTime()}  }
      */
     public long resourceSSL = -1;
 
     /**
-     * ssl 连接开始时间，{@link NetStatusBean#getSslStartTime()}
+     * SSL connection start time, {@link NetStatusBean#getSslStartTime()}
      */
     public long resourceSSLStart = -1;
 
     /**
-     * TTFB 时长, {@link NetStatusBean#getTTFB()}}
+     * TTFB duration, {@link NetStatusBean#getTTFB()}}
      */
     public long resourceTTFB = -1;
 
     /**
-     * 请求返回耗时, {@link NetStatusBean#getResponseTime()}
+     * Request response time, {@link NetStatusBean#getResponseTime()}
      */
     public long resourceTrans = -1;
 
     /**
-     * 首字节时长, {@link NetStatusBean#getFirstByteTime()}
+     * First byte duration, {@link NetStatusBean#getFirstByteTime()}
      */
     public long resourceFirstByte = -1;
     /**
-     * 首字节开始时间，{@link NetStatusBean#getFirstByteStartTime()}
+     * First byte start time, {@link NetStatusBean#getFirstByteStartTime()}
      */
     public long resourceFirstByteStart = -1;
 
     /**
-     * 资源下载时间，{@link NetStatusBean#getDownloadTime()}
+     * Resource download time, {@link NetStatusBean#getDownloadTime()}
      */
     public long resourceDownloadTime = -1;
     /**
-     * 资源西崽开始时间，{@link NetStatusBean#getDownloadTimeStart()}
+     * Resource download start time, {@link NetStatusBean#getDownloadTimeStart()}
      */
     public long resourceDownloadTimeStart = -1;
 
 
     /**
-     * host IP 地址
+     * Host IP address
      */
     public String resourceHostIP = "";
 
 
     /**
-     * 资源请求开始时间
+     * Resource request start time
      */
     public long startTime = Utils.getCurrentNanoTime();
 
     /**
-     * 资源请求结束时间
+     * Resource request end time
      */
     public long endTime = -1;
 
     /**
-     * 会话 ID ,{@link  FTRUMInnerManager#sessionId}
+     * Session ID, {@link  FTRUMInnerManager#sessionId}
      */
     public String sessionId;
 
     /**
-     * 页面 ID，{@link ViewBean#id}
+     * Page ID, {@link ViewBean#id}
      */
     public String viewId;
 
     /**
-     * 页面名称，{@link ViewBean#viewName}
+     * Page name, {@link ViewBean#viewName}
      */
     public String viewName;
 
     /**
-     * 上级页面，{@link  ViewBean#viewReferrer}
+     * Parent page, {@link  ViewBean#viewReferrer}
      */
     public String viewReferrer;
 
     /**
-     * Action Id，{@link  ActionBean#id}
+     * Action ID, {@link  ActionBean#id}
      */
     public String actionId;
 
     /**
-     * Action 名称，{@link  ActionBean#actionName}
+     * Action name, {@link  ActionBean#actionName}
      */
     public String actionName;
     public HashMap<String, Object> property = new HashMap<>();
 
     /**
-     * resource metrics 是否已设置
+     * Whether resource metrics are set
      */
     public boolean netStateSet = false;
 
     /**
-     * resource content 相关是否设置
+     * Whether resource content related is set
      */
     public boolean contentSet = false;
 

@@ -45,21 +45,21 @@ public class FTRUMConfigManager {
     private FTRUMConfig config;
 
     /**
-     * 绑定用户数据
+     * Bind user data
      */
     private UserData mUserData;
 
 
     /**
-     * 用户数据同步锁
+     * User data synchronization lock
      */
     private final Object mLock = new Object();
 
 
     /**
-     * RUM 条件初始化
+     * RUM condition initialization
      *
-     * @param config {@link FTRUMConfig} 配置信息
+     * @param config {@link FTRUMConfig} configuration information
      */
     void initWithConfig(FTRUMConfig config) {
         this.config = config;
@@ -74,7 +74,7 @@ public class FTRUMConfigManager {
         initRUMGlobalContext(config);
         FTTrackInner.getInstance().initRUMConfig(config);
         if (config.isRumEnable() && config.isEnableTraceUserAction()) {
-            //应对 flutter reactNative application 生命周期启动早于条件设置
+            //Handle flutter reactNative application lifecycle starting earlier than condition setting
             FTAppStartCounter.get().checkToReUpload();
         }
 
@@ -82,10 +82,10 @@ public class FTRUMConfigManager {
     }
 
     /**
-     * 初始化 Native Library 配置。
-     * {@link FTExceptionHandler#NATIVE_CALLBACK_VERSION} 以下的版本，判断是否有dump 文件，如果有就上传。
-     * {@link FTExceptionHandler#NATIVE_CALLBACK_VERSION} 以上的版本，设置 Native 版本回调，并对未成功回调的数据进行补充上传，
-     * 并标记为 {@link FTExceptionHandler#IS_PRE_CRASH}
+     * Initialize Native Library configuration.
+     * For versions below {@link FTExceptionHandler#NATIVE_CALLBACK_VERSION}, check if there are dump files, upload if any.
+     * For versions above {@link FTExceptionHandler#NATIVE_CALLBACK_VERSION}, set Native version callback, and supplement upload for data that failed to callback,
+     * and mark as {@link FTExceptionHandler#IS_PRE_CRASH}
      */
     private void initNativeDump(FTRUMConfig config) {
         boolean isNativeLibSupport = PackageUtils.isNativeLibrarySupport();
@@ -98,7 +98,7 @@ public class FTRUMConfigManager {
         boolean enableTrackAppANR = config.isEnableTrackAppANR();
         if (enableTrackAppCrash || enableTrackAppANR) {
             if (!isNativeLibSupport) {
-                LogUtils.e(TAG, "未启动 native 崩溃收集");
+                LogUtils.e(TAG, "Native crash collection not started");
                 return;
             }
 
@@ -114,7 +114,7 @@ public class FTRUMConfigManager {
                 final CrashCallback crashCallback = new CrashCallback() {
                     @Override
                     public void onCrash(String crashPath) {
-                        //fixme 这里如果 native crash 文件过大可能存在性能问题
+                        //fixme If native crash file is too large, there may be performance issues here
                         CountDownLatch latch = new CountDownLatch(1);
                         FTExceptionHandler.get().uploadNativeCrashBackground(new File(crashPath),
                                 AppState.RUN, false, new RunnerCompleteCallBack() {
@@ -159,7 +159,7 @@ public class FTRUMConfigManager {
                             crashCallback);
                 }
 
-                //补充上传没有成功上传的 Native Crash，上传 ANR Crash
+                //Supplement upload for Native Crash that failed to upload, upload ANR Crash
                 FTExceptionHandler.get().checkAndSyncPreDump(filePath, null);
 
 
@@ -173,7 +173,7 @@ public class FTRUMConfigManager {
     }
 
     /**
-     * RUM 是否开启
+     * Whether RUM is enabled
      *
      * @return
      */
@@ -188,7 +188,7 @@ public class FTRUMConfigManager {
     }
 
     /**
-     * 返回自定义覆盖全局的 {@link FTResourceEventListener.FTFactory}
+     * Return custom override global {@link FTResourceEventListener.FTFactory}
      *
      * @return
      */
@@ -200,7 +200,7 @@ public class FTRUMConfigManager {
 
 
     /**
-     * 返回自定义覆盖全局的 {@link FTResourceInterceptor}
+     * Return custom override global {@link FTResourceInterceptor}
      *
      * @return
      */
@@ -212,7 +212,7 @@ public class FTRUMConfigManager {
 
     /**
      * userDataBinded
-     * 用户数据是否已经绑定完成
+     * Whether user data binding is completed
      *
      * @return
      */
@@ -222,7 +222,7 @@ public class FTRUMConfigManager {
 
 
     /**
-     * 获取绑定用户信息
+     * Get bound user information
      *
      * @return
      */
@@ -253,7 +253,7 @@ public class FTRUMConfigManager {
     }
 
     /**
-     * 绑定用户信息
+     * Bind user information
      *
      * @param name
      * @param id
@@ -261,7 +261,7 @@ public class FTRUMConfigManager {
      */
     void bindUserData(String id, String name, String email, HashMap<String, String> exts) {
         LogUtils.d(TAG, "bindUserData:id=" + id + ",name=" + name + ",email=" + email + ",exts=" + exts);
-        //绑定用户信息
+        //Bind user information
         synchronized (mLock) {
             SharedPreferences sp = Utils.getSharedPreferences(FTApplication.getApplication());
             sp.edit().putString(Constants.FT_USER_USER_ID, id).apply();
@@ -278,7 +278,7 @@ public class FTRUMConfigManager {
     }
 
     /**
-     * 解绑用户信息
+     * Unbind user information
      */
     void unbindUserData() {
         LogUtils.d(TAG, "unbindUserData");
@@ -293,7 +293,7 @@ public class FTRUMConfigManager {
     }
 
     /**
-     * 初始化 RUM GlobalContext
+     * Initialize RUM GlobalContext
      *
      * @param config
      */
@@ -320,7 +320,7 @@ public class FTRUMConfigManager {
 
 
     /**
-     * 获取变化的公用 tag
+     * Get changed public tags
      *
      * @return
      */

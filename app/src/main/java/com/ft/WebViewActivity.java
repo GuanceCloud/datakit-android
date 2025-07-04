@@ -122,12 +122,12 @@ public class WebViewActivity extends AppCompatActivity {
             CookieSyncManager.createInstance(context);
         }
         CookieManager cookieManager = CookieManager.getInstance();
-        CookieManager.setAcceptFileSchemeCookies(true);// 这个方法官方不推荐，推荐使用 androidx.webkit.WebViewAssetLoader
-        cookieManager.setAcceptCookie(true);// 允许接受 Cookie
-        //>=LOLLIPOP 版本
+        CookieManager.setAcceptFileSchemeCookies(true);// This method is not recommended by official, recommend using androidx.webkit.WebViewAssetLoader
+        cookieManager.setAcceptCookie(true);// Allow accepting cookies
+        //>=LOLLIPOP version
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             cookieManager.setAcceptThirdPartyCookies(webview, true);
-            cookieManager.acceptThirdPartyCookies(webview);//跨域cookie读取
+            cookieManager.acceptThirdPartyCookies(webview);//Cross-domain cookie reading
         }
     }
 

@@ -35,7 +35,7 @@ import org.junit.runner.RunWith;
 import java.util.List;
 
 /**
- * RUM View 数据监测
+ * RUM View data monitoring
  */
 @RunWith(AndroidJUnit4.class)
 public class RUMViewTest extends BaseTest {
@@ -55,7 +55,7 @@ public class RUMViewTest extends BaseTest {
 
         FTSDKConfig ftSDKConfig = FTSDKConfig
                 .builder(BuildConfig.DATAKIT_URL)
-                .setDebug(true)//设置是否是 debug
+                .setDebug(true)//Set whether it's debug
                 .setEnv(EnvType.GRAY);
         FTSdk.install(ftSDKConfig);
 
@@ -69,7 +69,7 @@ public class RUMViewTest extends BaseTest {
     }
 
     /**
-     * 检验真实应用启动，页面跳动，{@link com.ft.sdk.FTActivityLifecycleCallbacks} 是否正常输出 View 数据
+     * Verify real application startup, page jumps, whether {@link com.ft.sdk.FTActivityLifecycleCallbacks} normally outputs View data
      *
      * @throws Exception
      */

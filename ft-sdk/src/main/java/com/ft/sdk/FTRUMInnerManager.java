@@ -48,25 +48,25 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.net.ssl.HttpsURLConnection;
 
 /**
- * RUM 数据管理，记录 Action，View，LongTask，Error，并统计
+ * RUM data management, records Action, View, LongTask, Error, and statistics
  * {@link Constants#KEY_RUM_VIEW_ACTION_COUNT }
  * {@link Constants#KEY_RUM_ACTION_ERROR_COUNT}
- * ，可以通过<a href="https://docs.guance.com/real-user-monitoring/explorer/">查看器</a>
+ * , can be viewed through the <a href="https://docs.guance.com/real-user-monitoring/explorer/">Explorer</a>
  */
 public class FTRUMInnerManager {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "RUMGlobalManager";
     /**
-     * 间断操作（中途休眠） Session 重置事件为 15分钟
+     * Session reset event for intermittent operation (sleep in the middle) is 15 minutes
      */
     static final long MAX_RESTING_TIME = 900000000000L;
-//    static final long MAX_RESTING_TIME = 1000000000L;//1秒
+//    static final long MAX_RESTING_TIME = 1000000000L;//1 Second
     /**
-     * 持续 Session 最大重置事件，4小时
+     * Maximum reset event of continuous Session, 4 hours
      */
     static final long SESSION_EXPIRE_TIME = 14400000000000L;
-//    static final long SESSION_EXPIRE_TIME = 5000000000L;//5秒
+//    static final long SESSION_EXPIRE_TIME = 5000000000L;//5 Seconds
     /**
-     * Session 最大存储数值
+     * Maximum storage value of Session
      */
     static final long SESSION_FILTER_CAPACITY = 5;
     private final ConcurrentHashMap<String, ResourceBean> resourceBeanMap = new ConcurrentHashMap<>();
@@ -92,52 +92,52 @@ public class FTRUMInnerManager {
     private String rumAppId;
 
     /**
-     * 不收集
+     * Do not collect
      */
     private final LinkedList<String> notCollectArr = new LinkedList<>();
 
 
     /**
-     * 不收集 Error Session id
+     * Do not collect Error Session id
      */
     private final LinkedList<String> notSessionErrorCollectArr = new LinkedList<>();
 
     /**
-     * 当前激活 View
+     * Current active View
      */
     private ActiveViewBean activeView;
 
     /**
-     * 当前激活 Action
+     * Current active Action
      */
     private ActiveActionBean activeAction;
 
 
     /**
-     * 记录 activity 的创建时，消耗的时间
+     * Record the time consumed when the activity is created
      */
     private final ConcurrentHashMap<String, Long> preActivityDuration = new ConcurrentHashMap<>();
 
     /**
-     * 最近 Session 时间，单位纳秒
+     * Recent Session time, unit nanosecond
      */
     private long lastSessionTime = Utils.getCurrentNanoTime();
 
     /**
-     * 最近 Action 时间
+     * Recent Action time
      * <p>
-     * 注意 ：AndroidTest 会调用这个方法 {@link com.ft.test.base.FTBaseTest#setSessionExpire()}
+     * Note: AndroidTest will call this method {@link com.ft.test.base.FTBaseTest#setSessionExpire()}
      */
     private long lastUserActiveTime = lastSessionTime;
 
     /**
-     * 采样率，{@link FTRUMConfig#samplingRate}
+     * Sampling rate, {@link FTRUMConfig#samplingRate}
      */
     private float sampleRate = 1f;
 
 
     /**
-     * 错误 session 采样率
+     * Error session sampling rate
      */
     private float sessionErrorSampleError = 1f;
 
@@ -146,7 +146,7 @@ public class FTRUMInnerManager {
     }
 
     /**
-     * 检测重置 session_id
+     * Check reset session_id
      *
      * @return
      */
@@ -186,7 +186,7 @@ public class FTRUMInnerManager {
         updateSessionReplay(sessionId);
         //        boolean isAppForward = FTApplication.isAppForward;
 //        if (isAppForward) {
-        //只要有 RUM 数据采集活动就会延长用户时间，包括后台
+        //As long as there is RUM data collection activity, the user time will be extended, including background
         lastUserActiveTime = now;
 //        }
     }
@@ -255,44 +255,44 @@ public class FTRUMInnerManager {
     }
 
     /**
-     * 添加 action
+     * Add action
      *
-     * @param actionName action 名称
-     * @param actionType action 类型
+     * @param actionName action name
+     * @param actionType action type
      */
     void startAction(String actionName, String actionType) {
         startAction(actionName, actionType, false);
     }
 
     /**
-     * 添加 action
+     * Add action
      *
-     * @param actionName action 名称
-     * @param actionType action 类型
-     * @param property   附加属性参数
+     * @param actionName action name
+     * @param actionType action type
+     * @param property   additional attribute parameters
      */
     void startAction(String actionName, String actionType, HashMap<String, Object> property) {
         startAction(actionName, actionType, false, property);
     }
 
     /**
-     * 添加 action
+     * Add action
      *
-     * @param actionName action 名称
-     * @param actionType action 类型
-     * @param needWait   是否需要等待
+     * @param actionName action name
+     * @param actionType action type
+     * @param needWait   whether to wait
      */
     void startAction(String actionName, String actionType, boolean needWait) {
         startAction(actionName, actionType, needWait, null);
     }
 
     /**
-     * action 起始
+     * Start action
      *
-     * @param actionName action 名称
-     * @param actionType action 类型
-     * @param needWait   是否需要等待
-     * @param property   附加属性参数
+     * @param actionName action name
+     * @param actionType action type
+     * @param needWait   whether to wait
+     * @param property   additional attribute parameters
      */
     void startAction(String actionName, String actionType, boolean needWait, HashMap<String, Object> property) {
 
@@ -320,7 +320,7 @@ public class FTRUMInnerManager {
     }
 
     /**
-     * 检测 action 是否需要关闭
+     * Check if action needs to be closed
      */
     private void checkActionClose() {
         if (activeAction == null) return;
@@ -340,7 +340,7 @@ public class FTRUMInnerManager {
     }
 
     /**
-     * 停止 action
+     * Stop action
      */
     void stopAction() {
         if (activeAction.isNeedWaitAction()) {
@@ -349,18 +349,18 @@ public class FTRUMInnerManager {
     }
 
     /**
-     * resource 起始
+     * resource start
      *
-     * @param resourceId 资源 Id
+     * @param resourceId resource Id
      */
     void startResource(String resourceId) {
         startResource(resourceId, null);
     }
 
     /**
-     * resource 起始
+     * resource start
      *
-     * @param resourceId 资源 Id
+     * @param resourceId resource Id
      */
     void startResource(String resourceId, HashMap<String, Object> property) {
         LogUtils.d(TAG, "startResource:" + resourceId);
@@ -383,9 +383,9 @@ public class FTRUMInnerManager {
     }
 
     /**
-     * resource 终止
+     * resource end
      *
-     * @param resourceId 资源 Id
+     * @param resourceId resource Id
      */
     void stopResource(String resourceId) {
         LogUtils.d(TAG, "stopResource:" + resourceId);
@@ -394,7 +394,7 @@ public class FTRUMInnerManager {
 
     /**
      * @param resourceId
-     * @param property   附加属性参数
+     * @param property   additional attribute parameters
      */
     void stopResource(final String resourceId, HashMap<String, Object> property) {
         ResourceBean bean = resourceBeanMap.get(resourceId);
@@ -419,10 +419,10 @@ public class FTRUMInnerManager {
     }
 
     /**
-     * 创建 view
+     * Create view
      *
-     * @param viewName 界面名称
-     * @param loadTime 加载事件，单位毫秒 ms
+     * @param viewName view name
+     * @param loadTime load time, unit milliseconds ms
      */
     void onCreateView(String viewName, long loadTime) {
         preActivityDuration.put(viewName, loadTime);
@@ -430,19 +430,19 @@ public class FTRUMInnerManager {
 
 
     /**
-     * view 起始
+     * view start
      *
-     * @param viewName 当前页面名称
+     * @param viewName current page name
      */
     void startView(String viewName) {
         startView(viewName, null);
     }
 
     /**
-     * view 起始
+     * view start
      *
-     * @param viewName 当前页面名称
-     * @param property 附加属性参数
+     * @param viewName current page name
+     * @param property additional attribute parameters
      */
     void startView(String viewName, HashMap<String, Object> property) {
         if (viewList.isEmpty() || !viewList.get(viewList.size() - 1).equals(viewName)) {
@@ -479,7 +479,7 @@ public class FTRUMInnerManager {
     }
 
     /**
-     * 获取上一页面
+     * Get the previous page
      *
      * @return
      */
@@ -498,16 +498,16 @@ public class FTRUMInnerManager {
     }
 
     /**
-     * view 结束
+     * view end
      */
     void stopView() {
         stopView(null, null);
     }
 
     /**
-     * view 结束
+     * view end
      *
-     * @param property 附加属性参数
+     * @param property additional attribute parameters
      */
     void stopView(HashMap<String, Object> property, RunnerCompleteCallBack callBack) {
         if (activeView == null) {
@@ -527,13 +527,13 @@ public class FTRUMInnerManager {
     }
 
     /**
-     * 初始化 action
+     * Initialize action
      * <p>
-     * 这里 startAction 会先进入 {@link com.ft.sdk.garble.db.FTSQL#FT_TABLE_ACTION},
-     * 再进入 {@link com.ft.sdk.garble.db.FTSQL#FT_SYNC_DATA_FLAT_TABLE_NAME};
-     * addAction 会直接进入 {@link com.ft.sdk.garble.db.FTSQL#FT_SYNC_DATA_FLAT_TABLE_NAME}
+     * Here startAction will first enter {@link com.ft.sdk.garble.db.FTSQL#FT_TABLE_ACTION},
+     * then enter {@link com.ft.sdk.garble.db.FTSQL#FT_SYNC_DATA_FLAT_TABLE_NAME};
+     * addAction will directly enter {@link com.ft.sdk.garble.db.FTSQL#FT_SYNC_DATA_FLAT_TABLE_NAME}
      *
-     * @param activeActionBean 当前激活的操作
+     * @param activeActionBean current active operation
      */
     private void initAction(ActiveActionBean activeActionBean, boolean isAddAction) {
         final ActionBean bean = activeActionBean.convertToActionBean();
@@ -558,9 +558,9 @@ public class FTRUMInnerManager {
     }
 
     /**
-     * 初始化 view
+     * Initialize view
      *
-     * @param activeViewBean 当前激活的页面
+     * @param activeViewBean current active page
      */
     private void initView(ActiveViewBean activeViewBean) {
         final ViewBean bean = activeViewBean.convertToViewBean();
@@ -573,12 +573,12 @@ public class FTRUMInnerManager {
     }
 
     /**
-     * 增加 Resource 数量
-     * {@link Constants#FT_MEASUREMENT_RUM_ACTION} 数据增加 {@link Constants#KEY_RUM_ACTION_RESOURCE_COUNT}
-     * {@link Constants#FT_MEASUREMENT_RUM_VIEW} 数据增加 {@link Constants#KEY_RUM_VIEW_ERROR_COUNT}
+     * Increase Resource quantity
+     * {@link Constants#FT_MEASUREMENT_RUM_ACTION} data increase {@link Constants#KEY_RUM_ACTION_RESOURCE_COUNT}
+     * {@link Constants#FT_MEASUREMENT_RUM_VIEW} data increase {@link Constants#KEY_RUM_VIEW_ERROR_COUNT}
      *
-     * @param viewId   view 唯一 id
-     * @param actionId action 唯一 id
+     * @param viewId   view unique id
+     * @param actionId action unique id
      */
     private void increaseResourceCount(final String viewId, final String actionId) {
         EventConsumerThreadPool.get().execute(new Runnable() {
@@ -594,9 +594,9 @@ public class FTRUMInnerManager {
 
 
     /**
-     * 增加 Error 数量
-     * {@link Constants#FT_MEASUREMENT_RUM_ACTION} 数据增加 {@link Constants#KEY_RUM_ACTION_ERROR_COUNT}
-     * {@link Constants#FT_MEASUREMENT_RUM_VIEW} 数据增加 {@link Constants#KEY_RUM_VIEW_ERROR_COUNT}
+     * Increase Error quantity
+     * {@link Constants#FT_MEASUREMENT_RUM_ACTION} data increase {@link Constants#KEY_RUM_ACTION_ERROR_COUNT}
+     * {@link Constants#FT_MEASUREMENT_RUM_VIEW} data increase {@link Constants#KEY_RUM_VIEW_ERROR_COUNT}
      *
      * @param tags
      */
@@ -615,12 +615,12 @@ public class FTRUMInnerManager {
     }
 
     /**
-     * 添加错误信息
+     * Add error information
      *
-     * @param log       日志
-     * @param message   消息
-     * @param errorType 错误类型
-     * @param state     程序运行状态
+     * @param log        log
+     * @param message    message
+     * @param errorType  error type
+     * @param state      program running state
      */
     void addError(String log, String message, String errorType, AppState state) {
         addError(log, message, Utils.getCurrentNanoTime(), errorType, state, null);
@@ -628,41 +628,41 @@ public class FTRUMInnerManager {
 
 
     /**
-     * 添加错误信息
+     * Add error information
      *
-     * @param log       日志
-     * @param message   消息
-     * @param errorType 错误类型
-     * @param state     程序运行状态
-     * @param property  附加属性
+     * @param log        log
+     * @param message    message
+     * @param errorType  error type
+     * @param state      program running state
+     * @param property   additional attribute parameters
      */
     void addError(String log, String message, String errorType, AppState state, HashMap<String, Object> property) {
         addError(log, message, Utils.getCurrentNanoTime(), errorType, state, property, null);
     }
 
     /**
-     * 添加错误
+     * Add error
      *
-     * @param log       日志
-     * @param message   消息
-     * @param errorType 错误类型
-     * @param state     程序运行状态
-     * @param dateline  发生时间，纳秒
-     * @param callBack
+     * @param log        log
+     * @param message    message
+     * @param errorType  error type
+     * @param state      program running state
+     * @param dateline   occurrence time, nanosecond
+     * @param callBack   thread pool call back
      */
     void addError(String log, String message, long dateline, String errorType, AppState state, RunnerCompleteCallBack callBack) {
         addError(log, message, dateline, errorType, state, null, callBack);
     }
 
     /**
-     * 添加错误
+     * Add error
      *
-     * @param log       日志
-     * @param message   消息
-     * @param errorType 错误类型
-     * @param state     程序运行状态
-     * @param dateline  发生时间，纳秒
-     * @param callBack  线程池调用结束回调
+     * @param log        log
+     * @param message    message
+     * @param errorType  error type
+     * @param state      program running state
+     * @param dateline   occurrence time, nanosecond
+     * @param callBack   thread pool call back
      */
     public void addError(String log, String message, long dateline, String errorType,
                          AppState state, HashMap<String, Object> property, RunnerCompleteCallBack callBack) {
@@ -672,7 +672,7 @@ public class FTRUMInnerManager {
             CollectType collectType = checkSessionWillCollect(sessionId);
 
             if (property == null || property.get(FTExceptionHandler.IS_PRE_CRASH) != (Boolean) true) {
-                //排除上报上一次 native crash 错误的这种场景
+                //Exclude the scenario of reporting the last native crash error
                 SyncTaskManager.get().setErrorTimeLine(dateline, activeView);
 
                 if (activeView != null) {
@@ -700,7 +700,7 @@ public class FTRUMInnerManager {
                 public void run() {
                     try {
 
-                        //---- 获取设备信息，资源耗时操作----->
+                        //---- Get device information, resource time-consuming operation ----->
                         tags.put(Constants.KEY_DEVICE_LOCALE, Locale.getDefault());
                         tags.put(Constants.KEY_DEVICE_CARRIER, DeviceUtils.getCarrier(FTApplication.getApplication()));
 
@@ -724,7 +724,7 @@ public class FTRUMInnerManager {
                                     public void onComplete() {
                                         increaseError(tags);
                                         if (callBack != null) {
-                                            // Java Crash，Native Crash 需要记录当下状态的崩溃
+                                            // Java Crash, Native Crash need to record the crash status of the current state
                                             stopView(null, callBack);
                                         }
                                     }
@@ -748,10 +748,10 @@ public class FTRUMInnerManager {
     }
 
     /**
-     * 添加长任务
+     * Add long task
      *
-     * @param log      日志内容
-     * @param duration 持续时间，纳秒
+     * @param log       log
+     * @param duration  duration, nanosecond
      */
     void addLongTask(String log, long duration, HashMap<String, Object> property) {
         try {
@@ -778,20 +778,20 @@ public class FTRUMInnerManager {
     }
 
     /**
-     * 添加长任务
+     * Add long task
      *
-     * @param log      日志内容
-     * @param duration 持续时间，纳秒
+     * @param log       log
+     * @param duration  duration, nanosecond
      */
     void addLongTask(String log, long duration) {
         addLongTask(log, duration, null);
     }
 
     /**
-     * 传输网络连接指标参数
+     * Transfer network connection indicator parameters
      *
-     * @param resourceId
-     * @param netStatusBean
+     * @param resourceId resource id
+     * @param netStatusBean network status bean
      */
     void setNetState(String resourceId, NetStatusBean netStatusBean) {
         ResourceBean bean = resourceBeanMap.get(resourceId);
@@ -821,9 +821,9 @@ public class FTRUMInnerManager {
     }
 
     /**
-     * 资源加载性能
+     * Resource loading performance
      *
-     * @param resourceId 资源 id
+     * @param resourceId resource id
      */
     void putRUMResourcePerformance(final String resourceId) {
         ResourceBean bean = resourceBeanMap.get(resourceId);
@@ -1009,9 +1009,9 @@ public class FTRUMInnerManager {
     }
 
     /**
-     * 设置网络传输内容
+     * Set network transmission content
      *
-     * @param resourceId    资源 id
+     * @param resourceId resource id
      * @param params
      * @param netStatusBean
      */
@@ -1021,9 +1021,9 @@ public class FTRUMInnerManager {
     }
 
     /**
-     * 设置网络传输内容
+     * Set network transmission content
      *
-     * @param resourceId 资源 id
+     * @param resourceId resource id
      * @param params
      */
     void setTransformContent(String resourceId, ResourceParams params) {
@@ -1091,7 +1091,7 @@ public class FTRUMInnerManager {
 
 
     /**
-     * LongTask 自增
+     * LongTask increase
      * {@link Constants#KEY_RUM_ACTION_LONG_TASK_COUNT}
      * {@link Constants#KEY_RUM_VIEW_LONG_TASK_COUNT}
      *
@@ -1112,7 +1112,7 @@ public class FTRUMInnerManager {
     }
 
     /**
-     * action 数量自增
+     * action quantity increase
      * {@link Constants#KEY_RUM_VIEW_ACTION_COUNT}
      *
      * @param viewId
@@ -1133,7 +1133,7 @@ public class FTRUMInnerManager {
     }
 
     /**
-     * 关闭 View，计算 {@link ViewBean#timeSpent},{@link ViewBean#isClose} 为 true，并更新
+     * Close View, calculate {@link ViewBean#timeSpent},{@link ViewBean#isClose} to true, and update
      * {@link FTSQL#RUM_DATA_UPDATE_TIME}
      *
      * @param activeViewBean
@@ -1158,10 +1158,10 @@ public class FTRUMInnerManager {
     }
 
     /**
-     * 关闭 Action，计算 {@link ActionBean#duration},{@link ActionBean#isClose} 为 true
+     * Close Action, calculate {@link ActionBean#duration},{@link ActionBean#isClose} to true
      *
      * @param bean
-     * @param force 强制关闭
+     * @param force force close
      */
     private void closeAction(ActiveActionBean bean, final boolean force) {
         final String actionId = bean.getId();
@@ -1209,7 +1209,7 @@ public class FTRUMInnerManager {
     }
 
     /**
-     * 设置 RUM 全局 view session action 关联数据
+     * Set RUM global view session action related data
      *
      * @param bean
      */
@@ -1228,7 +1228,7 @@ public class FTRUMInnerManager {
     }
 
     /**
-     * 添加界面 RUM 相关界面属性
+     * Add interface RUM related interface properties
      *
      * @param tags
      * @param withAction
@@ -1285,7 +1285,7 @@ public class FTRUMInnerManager {
     private static final int LIMIT_SIZE = 50;
 
     private void generateRumData() {
-        //避免过于频繁的刷新
+        //Avoid too frequent refresh
         mHandler.removeCallbacks(mRUMGenerateRunner);
         mHandler.postDelayed(mRUMGenerateRunner, 100);
     }
@@ -1457,7 +1457,7 @@ public class FTRUMInnerManager {
     }
 
     /**
-     * 根据采样率确认这个 session_id 是否需要被采集
+     * According to the sampling rate, confirm whether this session_id needs to be collected
      *
      * @param sessionId
      * @param sampleRate
@@ -1486,12 +1486,12 @@ public class FTRUMInnerManager {
             }
             sessionList.add(sessionId);
         }
-        LogUtils.w(TAG, String.format("根据 FTRUMConfig %s 采样率, 未命中 ，Session Track-> session_id: %s",
+        LogUtils.w(TAG, String.format("According to FTRUMConfig %s sampling rate, not hit, Session Track-> session_id: %s",
                 isErrorSession ? "errorSampleRate" : "SampleRate", sessionId));
     }
 
     /**
-     * 确认 session 是否需要被采集
+     * Confirm whether the session needs to be collected
      *
      * @param sessionId
      * @return
@@ -1517,7 +1517,7 @@ public class FTRUMInnerManager {
     }
 
     /**
-     * 检测追加 AddResource 数据时间
+     * Check the time to add AddResource data
      *
      * @param key
      * @param bean

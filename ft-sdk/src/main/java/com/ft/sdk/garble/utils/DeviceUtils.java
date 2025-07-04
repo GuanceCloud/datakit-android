@@ -53,38 +53,38 @@ public class DeviceUtils {
     }
 
     /**
-     * 运营商 map
+     * Carrier map
      */
     private static final Map<String, String> sCarrierMap = new HashMap<String, String>() {
         {
-            //中国移动
-            put("46000", "中国移动");
-            put("46002", "中国移动");
-            put("46007", "中国移动");
-            put("46008", "中国移动");
+            // China Mobile
+            put("46000", "China Mobile");
+            put("46002", "China Mobile");
+            put("46007", "China Mobile");
+            put("46008", "China Mobile");
 
-            //中国联通
-            put("46001", "中国联通");
-            put("46006", "中国联通");
-            put("46009", "中国联通");
+            // China Unicom
+            put("46001", "China Unicom");
+            put("46006", "China Unicom");
+            put("46009", "China Unicom");
 
-            //中国电信
-            put("46003", "中国电信");
-            put("46005", "中国电信");
-            put("46011", "中国电信");
+            // China Telecom
+            put("46003", "China Telecom");
+            put("46005", "China Telecom");
+            put("46011", "China Telecom");
 
-            //中国卫通
-            put("46004", "中国卫通");
+            // China Satcom
+            put("46004", "China Satcom");
 
-            //中国铁通
-            put("46020", "中国铁通");
+            // China Tietong
+            put("46020", "China Tietong");
 
         }
     };
 
 
     /**
-     * 获取设备唯一标识
+     * Get device unique identifier
      *
      * @return
      */
@@ -101,7 +101,7 @@ public class DeviceUtils {
     }
 
     /**
-     * 获得系统名称
+     * Get system name
      *
      * @return
      */
@@ -110,7 +110,7 @@ public class DeviceUtils {
     }
 
     /**
-     * 系统版本
+     * System version
      *
      * @return
      */
@@ -119,7 +119,7 @@ public class DeviceUtils {
     }
 
     /**
-     * 获得系统语言环境
+     * Get system locale
      *
      * @return
      */
@@ -128,7 +128,7 @@ public class DeviceUtils {
     }
 
     /**
-     * 获得设备品牌
+     * Get device brand
      *
      * @return
      */
@@ -137,7 +137,7 @@ public class DeviceUtils {
     }
 
     /**
-     * 获得设备机型
+     * Get device model
      *
      * @return
      */
@@ -146,7 +146,7 @@ public class DeviceUtils {
     }
 
     /**
-     * 获取 CPU ABI 架构
+     * Get CPU ABI architecture
      *
      * @return
      */
@@ -156,7 +156,7 @@ public class DeviceUtils {
 
 
     /**
-     * 获得设备分辨率
+     * Get device resolution
      *
      * @return
      */
@@ -168,7 +168,7 @@ public class DeviceUtils {
     }
 
     /**
-     * 获取运行内存容量和内存使用率
+     * Get RAM capacity and usage
      *
      * @param context
      * @return
@@ -190,7 +190,7 @@ public class DeviceUtils {
     }
 
     /**
-     * 获取内存，单位 Byte
+     * Get memory, unit: Byte
      *
      * @param
      * @return
@@ -223,7 +223,7 @@ public class DeviceUtils {
     }
 
     /**
-     * 进程启动到当前间隔时间,单位毫秒 {@link Process#getStartUptimeMillis()}
+     * Time interval from process start to current time, unit: milliseconds {@link Process#getStartUptimeMillis()}
      *
      * @return
      */
@@ -245,7 +245,7 @@ public class DeviceUtils {
 
 
     /**
-     * 获得CPU使用率
+     * Get CPU usage rate
      *
      * @return
      */
@@ -262,7 +262,7 @@ public class DeviceUtils {
     }
 
     /**
-     * 获得设备运营商
+     * Get device carrier
      *
      * @return
      */
@@ -297,7 +297,7 @@ public class DeviceUtils {
                     LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                 }
             } else {
-                LogUtils.eOnce(TAG, "没有获得到 READ_PHONE_STATE 权限无法获取运营商信息");
+                LogUtils.eOnce(TAG, "Failed to get READ_PHONE_STATE permission, unable to get carrier information");
             }
         } catch (Exception e) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
@@ -306,11 +306,11 @@ public class DeviceUtils {
     }
 
     /**
-     * 根据 operator，获取本地化运营商信息
+     * Get localized carrier information based on operator
      *
      * @param context         context
      * @param operator        sim operator
-     * @param alternativeName 备选名称
+     * @param alternativeName alternative name
      * @return local carrier name
      */
     private static String operatorToCarrier(Context context, String operator, String alternativeName) {
@@ -348,13 +348,13 @@ public class DeviceUtils {
     }
 
     private static String getJsonFromAssets(String fileName, Context context) {
-        //将json数据变成字符串
+        //Convert json data to string
         StringBuilder stringBuilder = new StringBuilder();
         BufferedReader bf = null;
         try {
-            //获取assets资源管理器
+            //Get assets resource manager
             AssetManager assetManager = context.getAssets();
-            //通过管理器打开文件并读取
+            //Open file and read through manager
             bf = new BufferedReader(new InputStreamReader(
                     assetManager.open(fileName)));
             String line;

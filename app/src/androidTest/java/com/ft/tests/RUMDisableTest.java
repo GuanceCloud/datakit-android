@@ -18,7 +18,7 @@ import org.junit.Rule;
 import org.junit.runner.RunWith;
 
 /**
- * 无 RUM 配置，数据校验
+ * No RUM configuration, data validation
  */
 @RunWith(AndroidJUnit4.class)
 public class RUMDisableTest extends BaseNoRUMDataTest {
@@ -38,7 +38,7 @@ public class RUMDisableTest extends BaseNoRUMDataTest {
 
         FTSDKConfig ftSDKConfig = FTSDKConfig
                 .builder(BuildConfig.DATAKIT_URL)
-                .setDebug(true)//设置是否是 debug
+                .setDebug(true)//Set whether it is debug
                 .setEnv(EnvType.GRAY);
         FTSdk.install(ftSDKConfig);
 

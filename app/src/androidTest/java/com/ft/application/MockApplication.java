@@ -7,7 +7,7 @@ import android.content.Context;
 /**
  * author: huangDianHua
  * time: 2020/9/2 17:31:17
- * description: 用于 Android Unit Test 有相关 application 引用的地方使用
+ * description: Used for Android Unit Test where there are related application references
  */
 public class MockApplication extends Application {
     private static Context instance;

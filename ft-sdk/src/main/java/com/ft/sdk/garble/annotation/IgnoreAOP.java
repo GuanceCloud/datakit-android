@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * annotation 标记，用于 ft-plugin 自动采集做标记区分，用 IgnoreAOP 标记的方法在 AOP 过程中会被忽略
+ * Annotation tag, used for ft-plugin automatic collection to mark the difference, and methods marked with IgnoreAOP will be ignored during AOP
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})

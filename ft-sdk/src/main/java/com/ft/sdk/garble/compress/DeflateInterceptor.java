@@ -22,13 +22,12 @@ public class DeflateInterceptor implements Interceptor {
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request originalRequest = chain.request();
-
-        // 如果没有请求体或已经有 Content-Encoding 头，直接放行
+        // If there is no request body or there is already a Content-Encoding header, pass through
         if (originalRequest.body() == null || originalRequest.header(Constants.SYNC_DATA_CONTENT_ENCODING_HEADER) != null) {
             return chain.proceed(originalRequest);
         }
 
-        // 创建 deflate 压缩的请求体
+        // Create deflate compressed request body
         Request compressedRequest = originalRequest.newBuilder()
                 .header(Constants.SYNC_DATA_CONTENT_ENCODING_HEADER, "deflate")
                 .method(originalRequest.method(), deflate(originalRequest.body()))

@@ -21,19 +21,19 @@ import java.net.HttpURLConnection;
 /**
  * BY huangDianHua
  * DATE:2019-12-16 13:29
- * Description:模拟网络请求测试
+ * Description: Simulate network request test
  */
 
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest = Config.NONE, sdk = 21)
 public class HttpTest {
     /**
-     * 模拟成功返回 json
+     * Simulate successful JSON return
      */
     private static final String SUCCESS_WITH_JSON_RESPONSE = "{\"code\":200,\"errorCode\":\"\",\"message\":\"\"}";
 
     /**
-     * 模拟无数据返回
+     * Simulate no data return
      */
     private static final String EMPTY_RESPONSE = "";
     private MockWebServer mMockWebServer;
@@ -51,7 +51,7 @@ public class HttpTest {
     }
 
     /**
-     * 模拟网络 200 情况
+     * Simulate network 200 situation
      *
      * @throws Exception
      */
@@ -73,7 +73,7 @@ public class HttpTest {
     }
 
     /**
-     * 模拟网络 400 情况
+     * Simulate network 400 situation
      *
      * @throws Exception
      */
@@ -94,7 +94,7 @@ public class HttpTest {
     }
 
     /**
-     * 模拟网络 200 且返回数据为正确的JSON格式
+     * Simulate network 200 and return data in correct JSON format
      *
      * @throws Exception
      */

@@ -14,26 +14,26 @@ import java.util.HashMap;
 /**
  * BY huangDianHua
  * DATE:2020-01-06 18:13
- * Description:用户绑定存储数据
+ * Description: User binding storage data
  */
 public class UserData {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "UserData";
 
     /**
-     * 用户名称
+     * User name
      */
     private String name;
     /**
-     * 用户 ID
+     * User ID
      */
     private String id;
     /**
-     * 用户 email
+     * User email
      */
     private String email;
 
     /**
-     * 设置数据扩展 key value 方式添加
+     * Set data extension key-value pairs
      */
     private HashMap<String, String> exts;
 
@@ -70,9 +70,9 @@ public class UserData {
     }
 
     /**
-     * 通过 json string 转化 {@link #exts} 数据
+     * Convert {@link #exts} data from json string
      *
-     * @param data json 字符数据内容
+     * @param data json string data content
      */
     public void setExtsWithJsonString(String data) {
         try {

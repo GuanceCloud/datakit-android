@@ -13,7 +13,7 @@ public class FragmentActivity extends NameTitleActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fragment);
 
-        // 初始显示 HomeFragment
+        // Initial display HomeFragment
         if (savedInstanceState == null) {
             getSupportFragmentManager()
                     .beginTransaction()

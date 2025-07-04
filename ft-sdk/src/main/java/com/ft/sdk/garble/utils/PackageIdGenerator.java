@@ -3,7 +3,7 @@ package com.ft.sdk.garble.utils;
 import java.security.SecureRandom;
 
 /**
- * 生成链路追踪的 pkgId
+ * Generate pkgId for trace link tracking
  */
 public class PackageIdGenerator {
     private static final String BASE62 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -11,7 +11,7 @@ public class PackageIdGenerator {
     private static final int NANO_DIGIT = 12;
 
     /**
-     * Base62 编码
+     * Base62 encoding
      */
     private static String encodeBase62(long value) {
         StringBuilder sb = new StringBuilder();
@@ -23,7 +23,7 @@ public class PackageIdGenerator {
     }
 
     /**
-     * 生成对应位数的 nanoId
+     * Generate nanoId with corresponding number of digits
      * @return
      */
     private static String generateNanoId() {
@@ -35,9 +35,9 @@ public class PackageIdGenerator {
     }
 
     /**
-     * 生成 packageId [base36].[base62(pid)].[base62(12_digit_number)]
+     * Generate packageId [base36].[base62(pid)].[base62(12_digit_number)]
      * @param numberPart
-     * @param pid 进程 id
+     * @param pid process id
      * @param pkgCount
      * @return
      */

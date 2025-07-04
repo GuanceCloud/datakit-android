@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * 传输数据传说过程中，数据格式验证
+ * Data format verification during data transmission
  *
  * @author Brandon
  */
@@ -39,7 +39,7 @@ public class DataFormatTest extends FTBaseTest {
     }
 
     /**
-     * 数据存储过程中，浮点型是否会变为整型
+     * During data storage, whether the floating point will become an integer
      *
      * @throws JSONException
      * @throws InterruptedException

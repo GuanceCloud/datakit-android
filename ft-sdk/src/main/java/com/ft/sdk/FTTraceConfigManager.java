@@ -23,22 +23,21 @@ public class FTTraceConfigManager {
 
 
     /**
-     * Trace 配置初始化
+     * Trace configuration initialization
      *
      * @param config
      */
     void initWithConfig(FTTraceConfig config) {
         if (config.isEnableAutoTrace()) {
             if (!PackageUtils.isOKHttp3Support()) {
-                LogUtils.e(TAG, "检测到 Trace EnableAutoTrace = true，" +
-                        "但是你没有依赖 okHttp，此功能仅支持 okHttp");
+                LogUtils.e(TAG, "Detected Trace EnableAutoTrace = true, but you do not depend on okHttp, this feature only supports okHttp");
             }
         }
         this.config = config;
     }
 
     /**
-     * 返回自定义覆盖全局的 {@link FTTraceInterceptor}
+     * Return custom override for global {@link FTTraceInterceptor}
      *
      * @return
      */
@@ -72,7 +71,7 @@ public class FTTraceConfigManager {
     }
 
     /**
-     * 释放资源
+     * Release resources
      */
     void release() {
         config = null;

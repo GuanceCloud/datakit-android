@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
                                 : R.string.start_service_not_install));
                     }
                 });
-                // 在这里处理接收到的消息
+                // Handle received messages here
             }
         }
     };
@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
 
                     if ("application/json".equals(contentType) ||
                             "application/xml".equals(contentType)) {
-                        //copy 读取部分 body，避免大数据消费
+                        //copy read partial body to avoid consuming large data
                         ResponseBody body = response.peekBody(33554432);
                         extraData.put("df_response_body", body.string());
                     }
@@ -173,10 +173,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.main_mock_okhttp_btn).setOnClickListener(v -> {
-            new Thread(new Runnable() {
+                            new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    //通过查看请求头查看是否替换调用 OkHttpClient.Builder.build 方法成功
+                    //Check request headers to see if OkHttpClient.Builder.build method replacement is successful
                     Request request = RequestUtils.requestUrl(BuildConfig.TRACE_URL);
                     if (request != null) {
                         LogUtils.d(TAG, "header=" + request.headers());
@@ -194,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
 
-                        //自定义采集内容，需要先关闭自动采集配置
+                        //Custom collection content, need to disable auto collection configuration first
                         // FTTraceConfig.setEnableAutoTrace(false)
                         // FTRUMConfig.setEnableTraceUserResource(false)
 
@@ -206,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
                             Response response = client.newCall(builder.build()).execute();
                             ResponseBody responseBody = response.body();
                             if (responseBody != null) {
-                                //这里需要消费，event listener 才会被调用
+                                //Need to consume here, event listener will be called
                                 String string = responseBody.string();
                             }
 
@@ -281,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
 //                if (BuildConfig.LAZY_INIT) {
                 DemoApplication.initFTSDK(MainActivity.this);
 //                } else {
-//                    Toast.makeText(MainActivity.this, "需要先更改 LAZY_INIT 为 true", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(MainActivity.this, "Need to change LAZY_INIT to true first", Toast.LENGTH_SHORT).show();
 //                }
             }
         });

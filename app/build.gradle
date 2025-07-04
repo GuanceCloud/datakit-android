@@ -30,7 +30,7 @@ android {
             signingConfig signingConfigs.release
         }
         debug {
-            //gradlew createDebugCoverageReport 测试用例覆盖率报告
+            //gradlew createDebugCoverageReport Test case coverage report
             testCoverageEnabled = true
         }
     }

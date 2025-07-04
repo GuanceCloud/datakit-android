@@ -3,9 +3,9 @@ package com.ft.sdk.garble.bean;
 import com.ft.sdk.garble.utils.Utils;
 
 /**
- * 当前激活状态 {@link ViewBean}
+ * Currently active state {@link ViewBean}
  * <p>
- * 一个应用同一时间只会存在一个 ActiveViewBean
+ * Only one ActiveViewBean will exist in an application at the same time
  *
  * @author Brandon
  */
@@ -25,7 +25,7 @@ public class ActiveViewBean extends ViewBean {
     }
 
     /**
-     * 关闭激活状态
+     * Close active state
      */
     public void close() {
         this.isClose = true;
@@ -33,7 +33,7 @@ public class ActiveViewBean extends ViewBean {
     }
 
     /**
-     * 转化为 {@link ViewBean}
+     * Convert to {@link ViewBean}
      *
      * @return
      */

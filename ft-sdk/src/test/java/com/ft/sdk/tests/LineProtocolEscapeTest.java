@@ -7,7 +7,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 对行协议传输数据进行特殊字符转化校验
+ * Special character conversion verification for line protocol transmission data
  *
  * @author Brandon
  */
@@ -24,7 +24,7 @@ public class LineProtocolEscapeTest {
     private final static String MIXED_RESULT = "\"{\\\"key\\\":\\\"value\\\",\\\"jsonString\\\":\\\"{\\\\\\\"key\\\\\\\":\\\\\\\"value\\\\\\\"}\\\"}\\\"Test log\\\\,\\\\\\\\=\"";
 
     /**
-     * 行协议中 field 特殊字符是否正确进行转译
+     * Whether special characters in field are correctly escaped in line protocol
      */
     @Test
     public void fieldEscape() {
@@ -33,7 +33,7 @@ public class LineProtocolEscapeTest {
     }
 
     /**
-     * 行协议中 field json 形式格式是否正确进行转译
+     * Whether field in json format is correctly escaped in line protocol
      */
     @Test
     public void fieldEscapeJson() {
@@ -42,7 +42,7 @@ public class LineProtocolEscapeTest {
     }
 
     /**
-     * 行协议中 field 在混合数据情况下是否正确进行转译
+     * Whether field is correctly escaped in mixed data in line protocol
      */
     @Test
     public void fieldEscapeMixString() {
@@ -53,7 +53,7 @@ public class LineProtocolEscapeTest {
     }
 
     /**
-     * 行协议中 measurement 特殊字符是否正确进行转译
+     * Whether special characters in measurement are correctly escaped in line protocol
      */
     @Test
     public void measurementEscape() {
@@ -61,7 +61,7 @@ public class LineProtocolEscapeTest {
         Assert.assertEquals(MEASUREMENT_RESULT, measureValue);
     }
     /**
-     * 行协议中 tag 特殊字符是否正确进行转译
+     * Whether special characters in tag are correctly escaped in line protocol
      */
     @Test
     public void tagEscape() {

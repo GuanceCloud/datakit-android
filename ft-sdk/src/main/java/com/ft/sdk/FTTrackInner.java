@@ -32,14 +32,14 @@ import java.util.List;
 /**
  * author: huangDianHua
  * time: 2020/8/7 16:37:09
- * description:内部使用的 Track 方法
+ * description: Track methods for internal use
  */
 public class FTTrackInner {
     private final static String TAG = Constants.LOG_TAG_PREFIX + "FTTrackInner";
     private static volatile FTTrackInner instance;
 
     /**
-     * 测试用例调用
+     * Called by test cases
      * {@link com.ft.test.base.FTBaseTest#getInnerSyncDataHelper()}
      * {@link com.ft.sdk.tests.UtilsTest#convertToLineProtocolLines(List)}
      */
@@ -60,7 +60,7 @@ public class FTTrackInner {
     }
 
     /**
-     * 初始化基础 SDK 配置
+     * Initialize basic SDK configuration
      *
      * @param config
      */
@@ -69,7 +69,7 @@ public class FTTrackInner {
     }
 
     /**
-     * 初始化 SDK Log 配置
+     * Initialize SDK Log configuration
      *
      * @param config
      */
@@ -78,7 +78,7 @@ public class FTTrackInner {
     }
 
     /**
-     * 初始化 SDK RUM 配置
+     * Initialize SDK RUM configuration
      *
      * @param config
      */
@@ -87,7 +87,7 @@ public class FTTrackInner {
     }
 
     /**
-     * 动态设置全局 tag
+     * Dynamically set global tag
      *
      * @param globalContext
      */
@@ -96,7 +96,7 @@ public class FTTrackInner {
     }
 
     /**
-     * 动态设置全局 tag
+     * Dynamically set global tag
      *
      * @param key
      * @param value
@@ -106,7 +106,7 @@ public class FTTrackInner {
     }
 
     /**
-     * 动态设置 RUM tag
+     * Dynamically set RUM tag
      *
      * @param globalContext
      */
@@ -115,7 +115,7 @@ public class FTTrackInner {
     }
 
     /**
-     * 动态设置 RUM tag
+     * Dynamically set RUM tag
      *
      * @param key
      * @param value
@@ -125,7 +125,7 @@ public class FTTrackInner {
     }
 
     /**
-     * 动态设置 Log tag
+     * Dynamically set Log tag
      *
      * @param globalContext
      */
@@ -134,7 +134,7 @@ public class FTTrackInner {
     }
 
     /**
-     * 动态设置 Log tag
+     * Dynamically set Log tag
      *
      * @param key
      * @param value
@@ -145,7 +145,7 @@ public class FTTrackInner {
 
 
     /**
-     * rum 事件数据
+     * rum event data
      *
      * @param time
      * @param measurement
@@ -154,7 +154,7 @@ public class FTTrackInner {
      */
     void rum(long time, String measurement, final HashMap<String, Object> tags, HashMap<String, Object> fields,
              RunnerCompleteCallBack callBack, CollectType collectType) {
-        long viewDataGenerateTime = 0;//由于 view 更新原则无法使用开始时间，否则会被误丢
+        long viewDataGenerateTime = 0;//Due to the view update principle, the start time cannot be used, otherwise it will be discarded
         switch (collectType) {
             case NOT_COLLECT:
                 break;
@@ -176,7 +176,7 @@ public class FTTrackInner {
     }
 
     /**
-     * rum 同步 web 数据
+     * rum sync web data
      *
      * @param time
      * @param measurement
@@ -196,9 +196,9 @@ public class FTTrackInner {
     }
 
     /**
-     * 同步数据异步写入
+     * Asynchronously write sync data
      * <p>
-     * AndroidTest 调用方法  {@link com.ft.test.base.FTBaseTest#invokeSyncData(DataType, String, JSONObject, JSONObject)}
+     * Called by AndroidTest {@link com.ft.test.base.FTBaseTest#invokeSyncData(DataType, String, JSONObject, JSONObject)}
      *
      * @param dataType
      * @param time
@@ -212,7 +212,7 @@ public class FTTrackInner {
     }
 
     /**
-     * 同步数据异步写入
+     * Asynchronously write sync data
      *
      * @param dataType
      * @param time
@@ -270,7 +270,7 @@ public class FTTrackInner {
 
 
     /**
-     * 在子线程中将埋点数据同步(不经过数据库)
+     * Synchronize buried point data in a sub-thread (not through the database)
      * inovke by test Case
      *
      * @param callback
@@ -307,17 +307,17 @@ public class FTTrackInner {
     }
 
     /**
-     * 将单条日志数据存入本地同步
+     * Store a single log entry locally and synchronize
      *
      * @param logBean
-     * @param isSilence 是否立即触发同步
+     * @param isSilence Whether to trigger sync immediately
      */
     void logBackground(@NonNull LogBean logBean, boolean isSilence) {
         TrackLogManager.get().trackLog(logBean, isSilence);
     }
 
     /**
-     * 将单条日志数据存入本地同步
+     * Store a single log entry locally and synchronize
      *
      * @param logBean
      */
@@ -326,7 +326,7 @@ public class FTTrackInner {
     }
 
     /**
-     * 将多条日志数据存入本地同步(同步)
+     * Store multiple log entries locally and synchronize (synchronously)
      *
      * @param logBeans
      */
@@ -347,22 +347,22 @@ public class FTTrackInner {
     }
 
     /**
-     * 判断是否需要执行同步策略
+     * Determine whether to execute the sync policy
      *
-     * @param recordDataList {@link  SyncData} 列表
+     * @param recordDataList {@link  SyncData} list
      */
     private void judgeLogCachePolicy(@NonNull List<SyncData> recordDataList, boolean silence) {
-        //如果 OP 类型不等于 LOG 则直接进行数据库操作；否则执行同步策略，根据同步策略返回结果判断是否需要执行数据库操作
+        //If the OP type is not LOG, perform database operation directly; otherwise, execute the sync policy, and determine whether to perform database operation based on the result of the sync policy
         synchronized (FTDBCachePolicy.get().getLogLock()) {
 
             int length = recordDataList.size();
             int policyStatus = FTDBCachePolicy.get().optLogCachePolicy(length);
-            if (policyStatus >= 0) {//执行同步策略
+            if (policyStatus >= 0) {//execute sync policy
                 boolean result = FTDBManager.get().insertFtOptList(recordDataList, false);
                 FTDBCachePolicy.get().optLogCount(recordDataList.size());
-                if (policyStatus == 0) {//不丢弃
+                if (policyStatus == 0) {//not dropped
                     LogUtils.d(TAG, "judgeLogCachePolicy:insert-result=" + result);
-                } else {//丢弃全部或丢弃一部分旧数据，旧数据在 optLogCachePolicy 中丢弃
+                } else {//drop all or drop some old data, old data is dropped in optLogCachePolicy
                     int dropCount = Math.min(policyStatus, length);
                     LogUtils.d(TAG, "judgeLogCachePolicy:insert-result=" + result + ", drop cache count:" + dropCount);
                 }
@@ -371,9 +371,9 @@ public class FTTrackInner {
                 }
             } else {
                 int dropCount = Math.abs(policyStatus);
-                if (dropCount == length) {//全丢新数据
+                if (dropCount == length) {//all new data dropped
                     LogUtils.e(TAG, "reach log limit, drop log count:" + dropCount);
-                } else {//丢一部分新数据
+                } else {//drop some new data
                     recordDataList.subList(length - dropCount, length).clear();
                     boolean result = FTDBManager.get().insertFtOptList(recordDataList, false);
                     FTDBCachePolicy.get().optLogCount(recordDataList.size());

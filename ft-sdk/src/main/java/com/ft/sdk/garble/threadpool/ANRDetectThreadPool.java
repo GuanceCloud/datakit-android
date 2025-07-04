@@ -1,9 +1,8 @@
 package com.ft.sdk.garble.threadpool;
 
 /**
- * 负责 ANR 监测使用线程池，线程名称 FTANRDetect，core_size 为 1
- * 与 {@link com.ft.sdk.internal.anr.ANRDetectRunnable} 一起使用
- *
+ * Responsible for ANR monitoring using thread pool, thread name FTANRDetect, core_size is 1
+ * Used with {@link com.ft.sdk.internal.anr.ANRDetectRunnable}
  */
 public class ANRDetectThreadPool extends BaseThreadPoolExecutor {
     private final static int CORE_POOL_SIZE = 1;

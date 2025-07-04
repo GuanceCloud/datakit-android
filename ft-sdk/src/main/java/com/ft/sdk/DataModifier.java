@@ -1,17 +1,17 @@
 package com.ft.sdk;
 
 /**
- * 字段替换，适合全局字段替换场景，如果期望逐条分析，实现条数据的替换，请求使用 {@link LineDataModifier }
- * 字段替换性能上 {@link DataModifier} > {@link LineDataModifier }
+ * Field replacement, suitable for global field replacement scenarios. If you expect line-by-line analysis and implement per-line data replacement, please use {@link LineDataModifier }
+ * In terms of performance, {@link DataModifier} > {@link LineDataModifier }
  */
 public interface DataModifier {
 
     /**
-     * 对某个字段进行更改
+     * Modify a specific field
      *
-     * @param key   字段名
-     * @param value 字段值（原始值）
-     * @return 新的值，返回 null 表示不做更改
+     * @param key   Field name
+     * @param value Field value (original value)
+     * @return New value, return null to indicate no change
      */
     Object modify(String key, Object value);
 }

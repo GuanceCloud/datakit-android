@@ -10,45 +10,45 @@ import java.util.HashMap;
 /**
  * create: by huangDianHua
  * time: 2020/6/5 15:08:45
- * description:日志对象(SDK内部使用)
+ * description: Log object (for SDK internal use)
  */
 public class TraceBean extends BaseContentBean {
 
     private static final String TAG = Constants.LOG_TAG_PREFIX + "TraceBean";
     /**
-     * 用于链路日志，表示当前 span 的上一个 span的 ID
+     * Used for trace logs, indicates the previous span ID of the current span
      */
     String parentID;
     /**
-     * 用于链路日志，表示当前 span 的 ID
+     * Used for trace logs, indicates the ID of the current span
      */
     String spanID;
     /**
-     * 用于链路日志，表示当前链路的 ID
+     * Used for trace logs, indicates the ID of the current trace
      */
     String traceID;
     /**
-     * 字符串类型，true 表示该 span 的请求响应是错误,false 或者无该标签，表示该 span 的响应是正常的请求
+     * String type, true means the response of this span's request is an error, false or no such tag means the response of this span is a normal request
      */
     String status;
     /**
-     * span 的类型，目前支持 2 个值：entry 和 local，entry span 表示该 span 的调用的是服务的入口，
-     * 即该服务的对其他服务提供调用请求的端点，几乎所有服务和消息队列消费者都是 entry span，
-     * 因此只有 span 是 entry 类型的调用才是一个独立的请求。 local span 表示该 span 和远程调用没有任何关系，
-     * 只是程序内部的函数调用，例如一个普通的 Java 方法，默认值 entry
+     * The type of span, currently supports 2 values: entry and local. entry span means this span is the entry point of the service,
+     * i.e., the endpoint of the service that provides invocation requests to other services. Almost all services and message queue consumers are entry spans,
+     * so only spans of entry type are considered independent requests. local span means this span has no relation to remote calls,
+     * it's just an internal function call in the program, such as a regular Java method. Default value is entry.
      */
     String spanType;
     /**
-     * 请求的目标地址，客户端用于访问目标服务的网络地址(但不一定是 IP + 端口)，例如 127.0.0.1:8080 ,默认：null
+     * Target address of the request. The network address used by the client to access the target service (not necessarily IP + port), e.g., 127.0.0.1:8080. Default: null
      */
     String endpoint;
     /**
-     * 用于链路日志，表示当前 span 操作名，也可理解为 span 名称
+     * Used for trace logs, indicates the operation name of the current span, can also be understood as the span name
      */
     String operationName;
 
     /**
-     * trace 执行时间
+     * Trace execution time
      */
     long duration;
 
@@ -71,7 +71,7 @@ public class TraceBean extends BaseContentBean {
 
 
     /**
-     * 获取所有链路中指标数据
+     * Get all metric data in the trace
      *
      * @return
      */
@@ -88,7 +88,7 @@ public class TraceBean extends BaseContentBean {
     }
 
     /**
-     * 获取所有链路中标签数据
+     * Get all tag data in the trace
      *
      * @return
      */
@@ -150,7 +150,7 @@ public class TraceBean extends BaseContentBean {
 
 
     /**
-     * @param status 字符串类型，true 表示该 span 的请求响应是错误,false 或者无该标签，表示该 span 的响应是正常的请求
+     * @param status String type, true means the response of this span's request is an error, false or no such tag means the response of this span is a normal request
      */
     public void setStatus(String status) {
         this.status = status;

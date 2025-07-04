@@ -17,15 +17,15 @@ import java.util.HashMap;
 /**
  * BY huangDianHua
  * DATE:2019-12-06 11:18
- * Description: {@link Activity} 生命周期回调类
+ * Description: {@link Activity} lifecycle callback class
  * <p>
- * 用于监听 {@link Activity} 生命周期，结合 {@link LifeCircleTraceCallback},在
- * {@link #onActivityPreStarted(Activity)},{@link #onActivityPreCreated(Activity, Bundle)}, {@link #onActivityPostCreated(Activity, Bundle)} }}
- * 从而输出以 {@link Activity} 为 {@link  Constants#FT_MEASUREMENT_RUM_VIEW} 指标
- * 页面加载时间：{@link Constants#KEY_RUM_VIEW_LOAD}
- * 启动时间：{@link Constants#ACTION_TYPE_LAUNCH_HOT},{@link Constants#ACTION_NAME_LAUNCH_COLD}
+ * Used to listen to {@link Activity} lifecycle, combined with {@link LifeCircleTraceCallback}, in
+ * {@link #onActivityPreStarted(Activity)},{@link #onActivityPreCreated(Activity, Bundle)}, {@link #onActivityPostCreated(Activity, Bundle)}
+ * to output {@link Activity} as {@link  Constants#FT_MEASUREMENT_RUM_VIEW} metric
+ * Page load time: {@link Constants#KEY_RUM_VIEW_LOAD}
+ * Startup time: {@link Constants#ACTION_TYPE_LAUNCH_HOT},{@link Constants#ACTION_NAME_LAUNCH_COLD}
  * <p>
- * 这些可以通过观测云 Studio <a href="https://docs.guance.com/real-user-monitoring/explorer/view/">查看器 View</a> 进行查看
+ * These can be viewed through Guanceyun Studio <a href="https://docs.guance.com/real-user-monitoring/explorer/view/">Viewer View</a>
  */
 public class FTActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
     private final LifeCircleTraceCallback mAppRestartCallback = new LifeCircleTraceCallback();
@@ -36,7 +36,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     private final FTFragmentLifecycleHelper mFragmentLifecycleHelper = new FTFragmentLifecycleHelper();
 
     /**
-     * {@link Activity} 创建
+     * {@link Activity} created
      * <p>
      * no use
      *
@@ -48,8 +48,8 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     }
 
     /**
-     * {@link Activity#onStart()}}  之前调用，使用 {@link LifeCircleTraceCallback#onPreStart()} 处理，
-     * 集成应用中 {@link Activity#onStart()}} 逻辑
+     * Called before {@link Activity#onStart()} , handled by {@link LifeCircleTraceCallback#onPreStart()},
+     * logic in integrated app {@link Activity#onStart()}
      *
      * @param activity {@link Activity}.
      */
@@ -60,7 +60,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     }
 
     /**
-     * {@link Activity#onStart()}} 之后调用，no use
+     * Called after {@link Activity#onStart()}, no use
      *
      * @param activity {@link Activity}.
      */
@@ -71,7 +71,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     }
 
     /**
-     * {@link LifeCircleTraceCallback#onPreOnCreate(Context)}  } 用于记录应用开始时间
+     * {@link LifeCircleTraceCallback#onPreOnCreate(Context)} used to record app start time
      *
      * @param activity           {@link Activity}.
      * @param savedInstanceState {@link Activity#onSaveInstanceState(Bundle)}.
@@ -82,7 +82,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     }
 
     /**
-     * {@link LifeCircleTraceCallback#onPostOnCreate(Context)}  } 用于记录应用创建完毕时间
+     * {@link LifeCircleTraceCallback#onPostOnCreate(Context)} used to record app creation completion time
      *
      * @param activity           {@link Activity }.
      * @param savedInstanceState {@link Activity#onSaveInstanceState(Bundle)}.
@@ -99,16 +99,16 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     }
 
     /**
-     * {@link Activity#onResume()}  } 恢复事件
+     * {@link Activity#onResume()} resume event
      * <p>
-     * {@link FTRUMConfigManager#isRumEnable()} 开启状态下，使用 {@link FTRUMGlobalManager#startView(String, HashMap)}
+     * When {@link FTRUMConfigManager#isRumEnable()} is enabled, use {@link FTRUMGlobalManager#startView(String, HashMap)}
      *
      * @param activity {@link Activity }.
      */
     @Override
     public void onActivityResumed(@NonNull Activity activity) {
 
-        //页面打开埋点数据插入
+        //page open data insertion
         FTRUMConfigManager manager = FTRUMConfigManager.get();
         //config nonnull here ignore warning
         if (manager.isRumEnable() && manager.getConfig().isEnableTraceUserView()) {
@@ -119,7 +119,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
             mDispatcherReceiver.startTrack(activity.getWindow());
         }
 
-        //开启同步
+        //start sync
         if (FTSdk.checkInstallState()) {
             SyncTaskManager.get().executeSyncPoll();
         }
@@ -128,7 +128,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     }
 
     /**
-     * {@link Activity#onPostResume()} 恢复之后 ，{@link  LifeCircleTraceCallback#onPostResume(Context)}
+     * Called after {@link Activity#onPostResume()}, {@link  LifeCircleTraceCallback#onPostResume(Context)}
      *
      * @param activity {@link Activity }.
      */
@@ -138,14 +138,14 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     }
 
     /**
-     * {@link Activity#onPause()}时调用，{@link FTRUMConfigManager#isRumEnable()} 开启状态下，
-     * 使用 {@link FTRUMInnerManager#stopView()}
+     * Called when {@link Activity#onPause()}, when {@link FTRUMConfigManager#isRumEnable()} is enabled,
+     * use {@link FTRUMInnerManager#stopView()}
      *
      * @param activity {@link Activity }.
      */
     @Override
     public void onActivityPaused(@NonNull Activity activity) {
-        //页面关闭埋点数据插入
+        //page close data insertion
         FTRUMConfigManager manager = FTRUMConfigManager.get();
         if (manager.isRumEnable() && manager.getConfig().isEnableTraceUserView()) {
             FTRUMInnerManager.get().stopView();
@@ -158,7 +158,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     }
 
     /**
-     * {@link Activity#onStop()} 时调用，{@link  LifeCircleTraceCallback#onEnterBackground()} 处理页面休眠事务处理
+     * Called when {@link Activity#onStop()}, {@link  LifeCircleTraceCallback#onEnterBackground()} handles page sleep processing
      *
      * @param activity {@link Activity }.
      */
@@ -173,7 +173,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
 
 
     /**
-     * {@link Activity} 保存状态
+     * {@link Activity} save state
      * <p>
      * no use
      *
@@ -185,7 +185,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     }
 
     /**
-     * {@link Activity} 销毁
+     * {@link Activity} destroyed
      * <p>
      * no use
      *
@@ -196,8 +196,8 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     }
 
     /**
-     * {@link Activity#onDestroy()}之后调用 ，配合 {@link LifeCircleTraceCallback#onPostDestroy(Context)}
-     * 处理一些 {@link Activity} 生命周期结束后的逻辑
+     * Called after {@link Activity#onDestroy()}, with {@link LifeCircleTraceCallback#onPostDestroy(Context)}
+     * to handle some logic after {@link Activity} lifecycle ends
      *
      * @param activity {@link Activity }.
      */

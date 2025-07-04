@@ -3,7 +3,7 @@ package com.ft.sdk.garble.utils;
 /**
  * create: by huangDianHua
  * time: 2020/3/19 18:35:26
- * description: 用于进行 Native SDK，Agent SDK 版本号比较，beta，alpha，正式版的版本号同样适用
+ * description: Used for comparing Native SDK, Agent SDK version numbers, beta, alpha, and official version numbers are also applicable
  */
 public class VersionUtils {
     /*public static void main(String[] args) {
@@ -22,7 +22,7 @@ public class VersionUtils {
     }*/
 
     /**
-     * 版本格式 1.0.2，1.3.55
+     * Version format 1.0.2, 1.3.55
      *
      * @param first
      * @param second
@@ -60,7 +60,7 @@ public class VersionUtils {
     }
 
     /**
-     * 比较版本号大小
+     * Compare version number size
      *
      * @param firstVer
      * @param secondVer

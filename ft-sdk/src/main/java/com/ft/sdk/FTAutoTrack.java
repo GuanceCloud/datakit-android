@@ -47,15 +47,15 @@ public class FTAutoTrack {
 
 
     /**
-     * 启动 APP
-     * 警告！！！该方法不能删除
+     * Start APP
+     * Warning!!! This method cannot be deleted
      * <p>
-     * 该方法原来被 FT Plugin 插件调用
+     * This method was originally called by the FT Plugin
      */
     public static void startApp(Application app) {
         try {
             LogUtils.d(TAG, "startApp:" + app);
-            //判断是否为主进程
+            //Determine if it is the main process
             if (Utils.isMainProcess()) {
                 FTActivityLifecycleCallbacks life = new FTActivityLifecycleCallbacks();
 
@@ -74,11 +74,11 @@ public class FTAutoTrack {
     }
 
     /**
-     * 启动 APP
-     * 警告！！！该方法不能删除
+     * Start APP
+     * Warning!!! This method cannot be deleted
      * <p>
-     * 该方法原来被 FT Plugin 插件调用
-     * 兼容 ft-plugin:1.2.0-beta03 之前的版本
+     * This method was originally called by the FT Plugin
+     * Compatible with versions before ft-plugin:1.2.0-beta03
      */
     public static void startApp(Object object) {
         LogUtils.d(TAG, "invoke compatible start app");
@@ -86,9 +86,9 @@ public class FTAutoTrack {
     }
 
     /**
-     * Activity 打开的方式（标记是从 Fragment 打开还是 Activity）
-     * 警告！！！该方法不能删除
-     * 该方法原来被 FT Plugin 插件调用
+     * How Activity is opened (marks whether opened from Fragment or Activity)
+     * Warning!!! This method cannot be deleted
+     * This method was originally called by the FT Plugin
      *
      * @param fromFragment
      * @param intent
@@ -104,10 +104,10 @@ public class FTAutoTrack {
     }
 
     /**
-     * Activity 开启
-     * 警告！！！该方法不能删除
+     * Activity started
+     * Warning!!! This method cannot be deleted
      *
-     * @deprecated 该方法原来被 FT Plugin 插件调用，目前不再使用。
+     * @deprecated This method was originally called by the FT Plugin, currently no longer used.
      */
     @Deprecated
     public static void activityOnCreate(Class clazz) {
@@ -121,10 +121,10 @@ public class FTAutoTrack {
 
 
     /**
-     * Activity 关闭
-     * 警告！！！该方法不能删除
+     * Activity closed
+     * Warning!!! This method cannot be deleted
      *
-     * @deprecated 该方法原来被 FT Plugin 插件调用，目前不再使用。
+     * @deprecated This method was originally called by the FT Plugin, currently no longer used.
      */
     @Deprecated
     public static void activityOnDestroy(Class clazz) {
@@ -137,8 +137,8 @@ public class FTAutoTrack {
     }
 
     /**
-     * 通知 Fragment 的显示隐藏状态
-     * 警告！！！该方法不能删除
+     * Notify Fragment's display and hide status
+     * Warning!!! This method cannot be deleted
      *
      * @param clazz
      * @param activity
@@ -160,12 +160,12 @@ public class FTAutoTrack {
     }
 
     /**
-     * Fragment 打开
-     * 警告！！！该方法不能删除
+     * Fragment opened
+     * Warning!!! This method cannot be deleted
      *
      * @param clazz
      * @param activity
-     * @deprecated 该方法原来被 FT Plugin 插件调用，目前不再使用。
+     * @deprecated This method was originally called by the FT Plugin, currently no longer used.
      */
     @Deprecated
     public static void fragmentOnResume(Object clazz, Object activity) {
@@ -179,12 +179,12 @@ public class FTAutoTrack {
     }
 
     /**
-     * Fragment 关闭
-     * 警告！！！该方法不能删除
+     * Fragment closed
+     * Warning!!! This method cannot be deleted
      *
      * @param clazz
      * @param activity
-     * @deprecated 该方法原来被 FT Plugin 插件调用，目前不再使用。
+     * @deprecated This method was originally called by the FT Plugin, currently no longer used.
      */
     @Deprecated
     public static void fragmentOnPause(Object clazz, Object activity) {
@@ -198,10 +198,10 @@ public class FTAutoTrack {
     }
 
     /**
-     * 点击事件
-     * 警告！！！该方法不能删除
+     * Click event
+     * Warning!!! This method cannot be deleted
      *
-     * @param view 点击触发的页面 {@link View}
+     * @param view Clicked page {@link View}
      */
     public static void trackViewOnClick(View view) {
         if (view == null) {
@@ -211,7 +211,7 @@ public class FTAutoTrack {
     }
 
     /**
-     * RadioGroup的点击选择事件
+     * RadioGroup click event
      *
      * @param group
      * @param checkedId
@@ -225,7 +225,7 @@ public class FTAutoTrack {
     }
 
     /**
-     * listView点击事件
+     * listView click event
      *
      * @param parent
      * @param v
@@ -236,7 +236,7 @@ public class FTAutoTrack {
     }
 
     /**
-     * ExpandableList 父点击事件
+     * ExpandableList parent click event
      *
      * @param parent
      * @param v
@@ -247,7 +247,7 @@ public class FTAutoTrack {
     }
 
     /**
-     * TabHost切换
+     * TabHost switch
      *
      * @param tabName
      */
@@ -276,7 +276,7 @@ public class FTAutoTrack {
     }
 
     /**
-     * ViewPager 的页面切换
+     * Page switch of ViewPager
      *
      * @param object
      * @param position
@@ -286,7 +286,7 @@ public class FTAutoTrack {
     }
 
     /**
-     * ExpandableList 子点击事件
+     * ExpandableList child click event
      *
      * @param parent
      * @param v
@@ -298,7 +298,7 @@ public class FTAutoTrack {
     }
 
     /**
-     * 点击事件
+     * Click event
      *
      * @param object
      * @param view
@@ -317,7 +317,7 @@ public class FTAutoTrack {
     }
 
     /**
-     * 点击事件
+     * Click event
      *
      * @param object
      * @param view
@@ -338,7 +338,7 @@ public class FTAutoTrack {
     }
 
     /**
-     * {@link MenuItem} 点击事件
+     * {@link MenuItem} click event
      *
      * @param menuItem
      */
@@ -352,7 +352,7 @@ public class FTAutoTrack {
     }
 
     /**
-     * {@link MenuItem} 点击事件
+     * {@link MenuItem} click event
      *
      * @param object
      * @param menuItem
@@ -368,7 +368,7 @@ public class FTAutoTrack {
     }
 
     /**
-     * 对话框事件监听
+     * Dialog event listener
      *
      * @param dialogInterface
      * @param whichButton
@@ -398,7 +398,7 @@ public class FTAutoTrack {
 
 
     /**
-     * 监听触摸事件
+     * Listen for touch events
      *
      * @param view
      * @param motionEvent
@@ -415,7 +415,7 @@ public class FTAutoTrack {
     }
 
     /**
-     * 点击事件
+     * Click event
      *
      * @param clazz
      * @param currentPage
@@ -423,7 +423,7 @@ public class FTAutoTrack {
      * @param vtp
      */
     public static void clickView(Class<?> clazz, String currentPage, String rootPage, String vtp) {
-        LogUtils.showAlias("当前点击事件的 vtp 值为:" + vtp);
+        LogUtils.showAlias("Current click event vtp value is:" + vtp);
         if (!FTAutoTrackConfigManager.get().isAutoTrack()) {
             return;
         }
@@ -445,7 +445,7 @@ public class FTAutoTrack {
     }
 
     /**
-     * 点击事件
+     * Click event
      *
      * @param view
      * @param clazz
@@ -454,7 +454,7 @@ public class FTAutoTrack {
      * @param vtp
      */
     public static void clickView(View view, Class<?> clazz, String currentPage, String rootPage, String vtp) {
-        LogUtils.showAlias("当前点击事件的 vtp 值为:" + vtp);
+        LogUtils.showAlias("Current click event vtp value is:" + vtp);
         if (!FTAutoTrackConfigManager.get().isAutoTrack()) {
             return;
         }
@@ -482,7 +482,7 @@ public class FTAutoTrack {
 
 
     /**
-     * 记录点击事件
+     * Record click event
      *
      * @param op
      * @param currentPage
@@ -508,7 +508,7 @@ public class FTAutoTrack {
 
 
     /**
-     * 记录应用登陆时效
+     * Record application login effectiveness
      */
     public static void putRUMLaunchPerformance(boolean isCold, long duration, long startTime) {
         FTRUMInnerManager.get().addAction(
@@ -519,7 +519,7 @@ public class FTAutoTrack {
 
 
     /**
-     * 获取相应埋点方法（Activity）所执行的时间(该方法会在所有的继承了 AppCompatActivity 的 Activity 中的 onCreate 中调用)
+     * Get corresponding method (Activity) execution time (This method will be called in the onCreate method of all activities that inherit AppCompatActivity)
      *
      * @param desc className + "|" + methodName + "|" + methodDesc
      * @param cost
@@ -538,8 +538,8 @@ public class FTAutoTrack {
     }
 
     /**
-     * 插桩方法用来替换调用的 {@link android.webkit.WebView#loadUrl(String)} 方法，该方法结构谨慎修改，修该后请同步修改
-     * [com.ft.plugin.garble.bytecode.FTMethodAdapter] 类中的 visitMethodInsn 方法中关于该替换内容的部分
+     * Plug-in method used to replace the called {@link android.webkit.WebView#loadUrl(String)} method. This method structure should be modified with caution, please synchronize the modification after the modification
+     * [com.ft.plugin.garble.bytecode.FTMethodAdapter] The part of the visitMethodInsn method about this replacement
      *
      * @param webView
      * @param url
@@ -556,8 +556,8 @@ public class FTAutoTrack {
     }
 
     /**
-     * 插桩方法用来替换调用的 {@link android.webkit.WebView#loadUrl(String)} 方法，该方法结构谨慎修改，修该后请同步修改
-     * [com.ft.plugin.garble.bytecode.FTMethodAdapter] 类中的 visitMethodInsn 方法中关于该替换内容的部分
+     * Plug-in method used to replace the called {@link android.webkit.WebView#loadUrl(String)} method. This method structure should be modified with caution, please synchronize the modification after the modification
+     * [com.ft.plugin.garble.bytecode.FTMethodAdapter] The part of the visitMethodInsn method about this replacement
      *
      * @param webView
      * @param url
@@ -574,8 +574,8 @@ public class FTAutoTrack {
     }
 
     /**
-     * 插桩方法用来替换调用的 {@link android.webkit.WebView#loadData(String, String, String)}方法，该方法结构谨慎修改，修该后请同步修改
-     * [com.ft.plugin.garble.bytecode.FTMethodAdapter] 类中的 visitMethodInsn 方法中关于该替换内容的部分
+     * Plug-in method used to replace the called {@link android.webkit.WebView#loadData(String, String, String)} method. This method structure should be modified with caution, please synchronize the modification after the modification
+     * [com.ft.plugin.garble.bytecode.FTMethodAdapter] The part of the visitMethodInsn method about this replacement
      *
      * @param webView
      * @param data
@@ -593,8 +593,8 @@ public class FTAutoTrack {
     }
 
     /**
-     * 插桩方法用来替换调用的 {@link android.webkit.WebView#loadDataWithBaseURL(String, String, String, String, String)} 方法，该方法结构谨慎修改，修该后请同步修改
-     * [com.ft.plugin.garble.bytecode.FTMethodAdapter] 类中的 visitMethodInsn 方法中关于该替换内容的部分
+     * Plug-in method used to replace the called {@link android.webkit.WebView#loadDataWithBaseURL(String, String, String, String, String)} method. This method structure should be modified with caution, please synchronize the modification after the modification
+     * [com.ft.plugin.garble.bytecode.FTMethodAdapter] The part of the visitMethodInsn method about this replacement
      *
      * @param webView
      * @param data
@@ -613,8 +613,8 @@ public class FTAutoTrack {
     }
 
     /**
-     * 插桩方法用来替换调用的 {@link android.webkit.WebView#postUrl(String, byte[])} } 方法，该方法结构谨慎修改，修该后请同步修改
-     * [com.ft.plugin.garble.bytecode.FTMethodAdapter] 类中的 visitMethodInsn 方法中关于该替换内容的部分
+     * Plug-in method used to replace the called {@link android.webkit.WebView#postUrl(String, byte[])} method. This method structure should be modified with caution, please synchronize the modification after the modification
+     * [com.ft.plugin.garble.bytecode.FTMethodAdapter] The part of the visitMethodInsn method about this replacement
      *
      * @param webView
      * @param url
@@ -631,7 +631,7 @@ public class FTAutoTrack {
     }
 
     /**
-     * 设置 webview 监听事件
+     * Set webview listener event
      *
      * @param webView
      */
@@ -642,11 +642,11 @@ public class FTAutoTrack {
     }
 
     /**
-     * 调用 webview 方法
+     * Call webview method
      *
      * @param webView
-     * @param methodName 方法名
-     * @param params     参数
+     * @param methodName Method name
+     * @param params     Parameter
      * @param paramTypes
      */
     private static void invokeWebViewLoad(View webView, String methodName, Object[] params, Class[] paramTypes) {
@@ -661,8 +661,8 @@ public class FTAutoTrack {
     }
 
     /**
-     * 插桩方法用来替换调用的 {@link OkHttpClient.Builder#build() }方法，该方法结构谨慎修改，修该后请同步修改
-     * [com.ft.plugin.garble.bytecode.FTMethodAdapter] 类中的 visitMethodInsn 方法中关于该替换内容的部分
+     * Plug-in method used to replace the called {@link OkHttpClient.Builder#build() } method. This method structure should be modified with caution, please synchronize the modification after the modification
+     * [com.ft.plugin.garble.bytecode.FTMethodAdapter] The part of the visitMethodInsn method about this replacement
      *
      * @param builder
      * @return
@@ -673,12 +673,12 @@ public class FTAutoTrack {
         } else {
             LogUtils.e(TAG, "trackOkHttpBuilder: OkhttpClient.Build Before SDK install");
         }
-//            builder.addNetworkInterceptor(interceptor); //发现部分工程有兼容问题
+        //Found compatibility issues in some projects
         if (FTRUMConfigManager.get().isRumEnable()) {
             FTRUMConfig config = FTRUMConfigManager.get().getConfig();
             //config nonnull here ignore warning
             if (config.isEnableTraceUserResource()) {
-                boolean hasSetResource = false;//是否已经设置 FTResourceInterceptor
+                boolean hasSetResource = false;//Whether FTResourceInterceptor has been set
                 for (Interceptor interceptor : builder.interceptors()) {
                     if (interceptor instanceof FTResourceInterceptor) {
                         hasSetResource = true;
@@ -716,7 +716,7 @@ public class FTAutoTrack {
         }
 
         if (FTTraceConfigManager.get().isEnableAutoTrace()) {
-            boolean hasSetTrace = false;//是否已经设置 FTResourceInterceptor
+            boolean hasSetTrace = false;//Whether FTResourceInterceptor has been set
 
             for (Interceptor interceptor : builder.interceptors()) {
                 if (interceptor instanceof FTTraceInterceptor) {
@@ -740,8 +740,8 @@ public class FTAutoTrack {
     }
 
     /**
-     * 插桩方法用来替换调用的 {@link Request.Builder#build() }方法，该方法结构谨慎修改，修该后请同步修改
-     * [com.ft.plugin.garble.bytecode.FTMethodAdapter] 类中的 visitMethodInsn 方法中关于该替换内容的部分
+     * Plug-in method used to replace the called {@link Request.Builder#build() } method. This method structure should be modified with caution, please synchronize the modification after the modification
+     * [com.ft.plugin.garble.bytecode.FTMethodAdapter] The part of the visitMethodInsn method about this replacement
      *
      * @param builder
      * @return

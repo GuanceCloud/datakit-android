@@ -22,11 +22,11 @@ import java.util.TimeZone;
 public class NetProxy {
     public final static String TAG = Constants.LOG_TAG_PREFIX + "NetProxy";
     /**
-     * 内容类型
+     * Content type
      */
     private static final String CONTENT_TYPE = "text/plain";
     /**
-     * 字符编码
+     * Character encoding
      */
     private static final String CHARSET = "UTF-8";
     private final HttpBuilder httpBuilder;
@@ -43,7 +43,7 @@ public class NetProxy {
     }
 
     /**
-     * 执行网络请求
+     * Execute network request
      *
      * @return
      */
@@ -52,8 +52,8 @@ public class NetProxy {
             return new FTResponseData(NetCodeStatus.NETWORK_EXCEPTION_CODE, "");
         }
         if (!httpBuilder.getUrl().startsWith("http://") && !httpBuilder.getUrl().startsWith("https://")) {
-            //请求地址为空是提示错误
-            return new FTResponseData(NetCodeStatus.INVALID_PARAMS_EXCEPTION_CODE, "请求地址错误，检查地址 http(s) scheme");
+            //If the request address is empty, prompt an error
+            return new FTResponseData(NetCodeStatus.INVALID_PARAMS_EXCEPTION_CODE, "Request address error, check address http(s) scheme");
         }
         setHeadParams();
         engine.createRequest(httpBuilder);
@@ -61,7 +61,7 @@ public class NetProxy {
     }
 
     /**
-     * 转换时间格式
+     * Convert time format
      */
     private String calculateDate() {
         Date currentTime = new Date();
@@ -71,7 +71,7 @@ public class NetProxy {
     }
 
     /**
-     * 设置请求的 Head 参数
+     * Set request Head parameters
      */
     private void setHeadParams() {
         HashMap<String, String> head = httpBuilder.getHeadParams();
@@ -86,7 +86,7 @@ public class NetProxy {
             head.put(Constants.SYNC_DATA_CONTENT_TYPE_HEADER, CONTENT_TYPE);
         }
         head.put("charset", CHARSET);
-        //添加日期请求头
+        //Add date request header
         head.put("Date", calculateDate());
         httpBuilder.setHeadParams(head);
     }

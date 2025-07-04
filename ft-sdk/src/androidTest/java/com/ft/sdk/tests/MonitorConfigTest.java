@@ -29,7 +29,7 @@ import org.junit.runner.RunWith;
 /**
  * author: huangDianHua
  * time: 2020/8/26 10:32:36
- * description:监控类数据测试
+ * description: Monitoring data test
  */
 @RunWith(AndroidJUnit4.class)
 public class MonitorConfigTest extends FTBaseTest {
@@ -43,7 +43,7 @@ public class MonitorConfigTest extends FTBaseTest {
         stopSyncTask();
         FTSDKConfig ftSDKConfig = FTSDKConfig
                 .builder(TEST_FAKE_URL)
-                .setDebug(true)//设置是否是 debug
+                .setDebug(true)//Set whether it is debug
                 .setEnv(EnvType.GRAY);
         FTSdk.install(ftSDKConfig);
 
@@ -55,8 +55,8 @@ public class MonitorConfigTest extends FTBaseTest {
     }
 
     /**
-     * {@link FTRUMGlobalManager#addError(String, String, ErrorType, AppState)} 过程中检测是否正确
-     * 附带 {@link Constants#KEY_BATTERY_USE}
+     * During {@link FTRUMGlobalManager#addError(String, String, ErrorType, AppState)}, check whether the following are correctly attached:
+     * {@link Constants#KEY_BATTERY_USE}
      * {@link Constants#KEY_MEMORY_TOTAL}
      * {@link Constants#KEY_MEMORY_USE}
      * {@link Constants#KEY_CPU_USE}
@@ -77,7 +77,7 @@ public class MonitorConfigTest extends FTBaseTest {
 
     }
 ///**
-// * 目前监控数值无法通过测试用例的方式来检验正确性，只能通过人为查看进行验证
+// * Currently, monitoring values cannot be verified by test cases, only by manual inspection
 // */
 //
 //

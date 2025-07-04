@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 /**
- * 统一管理全局的 Gson 对象, 开启 disableHtmlEscaping ，serializeNulls
+ * Unified management of global Gson object, enable disableHtmlEscaping, serializeNulls
  */
 public class SingletonGson {
     private static volatile Gson instance;

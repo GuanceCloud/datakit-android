@@ -8,7 +8,7 @@ import com.ft.sdk.garble.threadpool.DataProcessThreadPool;
 import org.junit.Test;
 
 /**
- * 线程池相关测试
+ * Thread pool related tests
  *
  * @author Brandon
  */
@@ -16,7 +16,7 @@ public class ThreadPoolTest {
 
 
     /**
-     * 线程池执行过程，中间重启，验证当下状态是否正确
+     * Thread pool execution process, restart in the middle, verify if the current state is correct
      */
     @Test
     public void testReThreadPool() {

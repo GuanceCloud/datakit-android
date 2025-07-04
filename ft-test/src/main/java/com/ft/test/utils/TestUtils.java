@@ -13,7 +13,7 @@ import java.lang.reflect.Field;
 public class TestUtils {
 
     /**
-     * 检测是否为虚拟机设备进行测试用例
+     * Detect whether it is a virtual machine device for test cases
      * @return
      */
     public static boolean isEmulator() {

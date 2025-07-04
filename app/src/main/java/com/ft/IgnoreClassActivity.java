@@ -21,7 +21,7 @@ public class IgnoreClassActivity extends NameTitleActivity implements View.OnCli
         findViewById(R.id.ignore_not_work_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 这里不会忽略
+                // This will not be ignored
             }
         });
     }
@@ -29,6 +29,6 @@ public class IgnoreClassActivity extends NameTitleActivity implements View.OnCli
 
     @Override
     public void onClick(View v) {
-        //会被忽略
+        //Will be ignored
     }
 }

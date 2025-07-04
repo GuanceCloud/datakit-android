@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 /**
- * 内部日志管理测试用例，测试追加日志和文件缓存管理
+ * Internal log management test case, test appending logs and file cache management
  * {@link com.ft.sdk.garble.manager.LogFileHelper}
  */
 public class InnerLogTest extends FTBaseTest {
@@ -31,7 +31,7 @@ public class InnerLogTest extends FTBaseTest {
     public static final String INSERT_LOG_CONTENT = "appendLogTest";
     /**
      * sample：2024-03-25 08:54:22:386 E InnerLogTest 111111111
-     * 刚好 {@link LogFileHelper#TEST_SPLIT_FILE_SIZE}
+     * Exactly {@link LogFileHelper#TEST_SPLIT_FILE_SIZE}
      */
     public static final String TEST_DATA = "111111111";
 
@@ -56,7 +56,7 @@ public class InnerLogTest extends FTBaseTest {
 
 
     /**
-     * 检验文件内容是否写入成功，检验文件是否生成
+     * Check if the file content is written successfully, and check if the file is generated
      *
      * @throws IOException
      */
@@ -70,7 +70,7 @@ public class InnerLogTest extends FTBaseTest {
     }
 
     /**
-     * 日志分离校验
+     * Log separation verification
      * {@link com.ft.sdk.garble.manager.LogFileHelper#TEST_SPLIT_FILE_SIZE}
      */
     @Test
@@ -82,7 +82,7 @@ public class InnerLogTest extends FTBaseTest {
     }
 
     /**
-     * 达到总缓存大小
+     * Reach total cache size
      * {@link com.ft.sdk.garble.manager.LogFileHelper#TEST_CACHE_MAX_TOTAL_SIZE}
      */
     @Test
@@ -107,7 +107,7 @@ public class InnerLogTest extends FTBaseTest {
     @Override
     public void tearDown() {
         super.tearDown();
-        //删除日志文件
+        //Delete log file
         Utils.deleteFile(logFile.getAbsolutePath());
         Utils.deleteFile(logBackFile.getAbsolutePath());
     }

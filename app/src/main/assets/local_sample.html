@@ -15,14 +15,14 @@
 <input type="button" value="test" onclick="test()">
 <script type="text/javascript">
 
-    var webViewCallBackMap = {} //参数调用字典
+    var webViewCallBackMap = {} // Parameter callback dictionary
 
     function Foo() {
 
     }
 
     function baseSend(params, callback) {
-        var tag = "Unique id:"+ new Date().getTime() // 通过 unique 进行回调
+        var tag = "Unique id:"+ new Date().getTime() // Callback through unique id
 
         if(callback){
             webViewCallBackMap[tag] = callback
@@ -35,7 +35,7 @@
     }
 
     function baseAddEventListener(params, callback) {
-        var tag = "Unique id:"+ new Date().getTime() // 通过 unique 进行回调
+        var tag = "Unique id:"+ new Date().getTime() // Callback through unique id
         webViewCallBackMap[tag] = callback
         params["_tag"] = tag
         FTWebViewJavascriptBridge.addEventListener(JSON.stringify(params), "webViewCallBackMap")    

@@ -16,7 +16,7 @@ import org.junit.Test;
 /**
  * BY huangDianHua
  * DATE:2019-12-16 18:40
- * Description:设备相关信息验证
+ * Description: Device related information verification
  */
 public class DeviceUtilsTest {
     private Context getContext() {
@@ -24,7 +24,7 @@ public class DeviceUtilsTest {
     }
 
     /***
-     * 获取设备 UUid
+     * Get device UUID
      */
     @Test
     public void getUuid() {

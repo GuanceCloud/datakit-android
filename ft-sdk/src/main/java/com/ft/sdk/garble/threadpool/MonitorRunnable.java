@@ -15,8 +15,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 应用监控 Runnable，根据 {@link DetectFrequency} 周期，计算 fps，cpu，memory，battery
- * 对应 {@link DeviceMetricsMonitorType}
+ * Application monitoring Runnable, calculates fps, cpu, memory, battery according to {@link DetectFrequency} cycle
+ * Corresponds to {@link DeviceMetricsMonitorType}
  *
  * @author Brandon
  */
@@ -38,7 +38,7 @@ public class MonitorRunnable implements Runnable {
 
     @Override
     public void run() {
-        //节省资源开销，页面处于前台时才记录数据
+        // Save resource overhead, only record data when page is in foreground
         if (!FTActivityLifecycleCallbacks.isAppInForeground()) return;
         if (FTMonitorManager.get().isDeviceMetricsMonitorType(DeviceMetricsMonitorType.CPU)) {
             computeCpuBean(cpuBean, CpuUtils.get().getAppCPUTickCount());
@@ -80,7 +80,7 @@ public class MonitorRunnable implements Runnable {
     }
 
     /**
-     * 记录 CPU  最大值，最小值
+     * Record CPU maximum and minimum values
      *
      * @param bean
      * @param value
@@ -96,10 +96,10 @@ public class MonitorRunnable implements Runnable {
     }
 
     /**
-     * 最大值，最小值，以及平均值的计算
+     * Calculate maximum, minimum, and average values
      *
      * @param bean
-     * @param lastValue 最近数值
+     * @param lastValue Latest value
      */
     private void computeMonitorBean(MonitorInfoBean bean, double lastValue) {
         int count = bean.count + 1;

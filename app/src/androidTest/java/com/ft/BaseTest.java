@@ -14,12 +14,12 @@ import org.junit.Rule;
 /**
  * author: huangDianHua
  * time: 2020/9/4 17:11:40
- * description:测试用例基础类，用于继承测试用例的权限申请
+ * description: Test case base class, used for permission application inheritance in test cases
  */
 public class BaseTest extends FTBaseTest {
 
     /**
-     * 申请 {@link Manifest.permission#READ_PHONE_STATE} 权限
+     * Apply for {@link Manifest.permission#READ_PHONE_STATE} permission
      */
     @Rule
     public GrantPermissionRule permissionRule = GrantPermissionRule.grant(
@@ -27,13 +27,13 @@ public class BaseTest extends FTBaseTest {
     );
 
     /**
-     * 测试完毕，删除清空数据
+     * Test completed, delete and clear data
      */
     @After
     public void tearDown() {
-        //数据库删除
+        //Database deletion
         FTDBManager.get().delete();
-        //关闭 SDK
+        //Shutdown SDK
         FTSdk.shutDown();
     }
 

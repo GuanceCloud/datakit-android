@@ -11,28 +11,28 @@ import java.util.List;
  */
 public class FTTraceConfig {
     /**
-     * 采样率，[0,1]
+     * Sampling rate, [0,1]
      */
     private float samplingRate = 1;
     /**
-     * 追踪类型链路
+     * Trace type chain
      */
     private TraceType traceType = TraceType.DDTRACE;
     /**
-     * webview 是否开启链路追踪
+     * Whether WebView enables chain tracing
      */
     private boolean enableWebTrace = false;
     /**
-     * 是否开启自动 http
+     * Whether to enable automatic HTTP
      */
     private boolean enableAutoTrace = false;
     /**
-     * 是否与 RUM 数据关联
+     * Whether to associate with RUM data
      */
     private boolean enableLinkRUMData = false;
 
     /**
-     * 服务名称 {@link Constants#KEY_SERVICE },默认为 {@link Constants#DEFAULT_SERVICE_NAME}
+     * Service name {@link Constants#KEY_SERVICE }, default is {@link Constants#DEFAULT_SERVICE_NAME}
      */
     String serviceName = Constants.DEFAULT_SERVICE_NAME;
 
@@ -47,7 +47,7 @@ public class FTTraceConfig {
     }
 
     /**
-     * ASM 设置全局 {@link FTTraceInterceptor.HeaderHandler}，默认不设置
+     * ASM sets global {@link FTTraceInterceptor.HeaderHandler}, not set by default
      *
      * @param headerHandler
      * @return
@@ -58,7 +58,7 @@ public class FTTraceConfig {
     }
 
     /**
-     * 设置全局 tag
+     * Set global tag
      */
     private final HashMap<String, Object> globalContext = new HashMap<>();
 
@@ -83,8 +83,7 @@ public class FTTraceConfig {
     }
 
     /**
-     * <a href="https://docs.guance.com/real-user-monitoring/explorer/resource/">查看器 Resource</a>功能，
-     * 用于追查一些有问题 Resource 数据的 Trace 链路追查
+     * <a href="https://docs.guance.com/real-user-monitoring/explorer/resource/">Explorer Resource</a> function, used to trace the Trace chain of problematic Resource data
      *
      * @param traceType
      * @return
@@ -109,7 +108,7 @@ public class FTTraceConfig {
     }
 
     //    /**
-//     * 设置支持的采集类型
+//     * Set supported collection types
 //     *
 //     * @param traceContentType
 //     * @return
@@ -123,7 +122,7 @@ public class FTTraceConfig {
 
 
     /**
-     * 获取链路支持
+     * Get link support
      *
      * @return
      */

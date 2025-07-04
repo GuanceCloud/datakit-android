@@ -3,7 +3,7 @@ package com.ft;
 import android.os.Bundle;
 
 /**
- * 针对测试使用
+ * For testing purposes
  *
  * @author Brandon
  */

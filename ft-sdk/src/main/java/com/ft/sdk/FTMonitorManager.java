@@ -15,29 +15,29 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 
 /**
- * Description:监控项配置
+ * Description: Monitor item configuration
  */
 public class FTMonitorManager {
 
     private static final String TAG = Constants.LOG_TAG_PREFIX + "FTMonitorManager";
     /**
-     * 一秒，单位纳秒
+     * One second, in nanoseconds
      */
     private static final long ONE_SECOND_NANO_TIMES = 1000000000;
 
     private volatile static FTMonitorManager ftMonitorConfig;
 
     /**
-     * {@link  ErrorMonitorType} ,默认不设置
+     * {@link  ErrorMonitorType}, default is not set
      */
     private int errorMonitorType = ErrorMonitorType.NO_SET;
     /**
-     * {@link  DeviceMetricsMonitorType} ,默认不设置
+     * {@link  DeviceMetricsMonitorType}, default is not set
      */
     private int deviceMetricsMonitorType = DeviceMetricsMonitorType.NO_SET;
 
     /**
-     * {@link DetectFrequency},默认使用 DEFAULT
+     * {@link DetectFrequency}, default is DEFAULT
      */
     private DetectFrequency detectFrequency = DetectFrequency.DEFAULT;
 
@@ -66,7 +66,7 @@ public class FTMonitorManager {
     }
 
     /**
-     * 初始化
+     * Initialize
      *
      * @param config
      */
@@ -83,7 +83,7 @@ public class FTMonitorManager {
     }
 
     /**
-     * 判断某种类型的监控是否开启
+     * Determine whether a certain type of monitoring is enabled
      *
      * @param errorMonitorType
      * @return
@@ -92,7 +92,7 @@ public class FTMonitorManager {
         if (isTVDevice && errorMonitorType.equals(ErrorMonitorType.BATTERY)) {
             return false;
         }
-        //判断某一种监控项是否开启
+        //Determine whether a certain monitoring item is enabled
         return (this.errorMonitorType | errorMonitorType.getValue()) == this.errorMonitorType;
     }
 
@@ -108,9 +108,9 @@ public class FTMonitorManager {
     }
 
     /**
-     * 注册 viewId，为 viewId
+     * Register viewId, as viewId
      *
-     * @param viewId View 唯一 ID ,{@link ViewBean#id}
+     * @param viewId View unique ID, {@link ViewBean#id}
      */
     public void addMonitor(String viewId) {
         LogUtils.d(TAG, "addMonitor:" + viewId + ", remain count:" + runnerMap.size());
@@ -123,7 +123,7 @@ public class FTMonitorManager {
     }
 
     /**
-     * 附加监控指标数据, fps, cpu, memory
+     * Attach monitoring indicator data, fps, cpu, memory
      *
      * @param bean
      */
@@ -164,7 +164,7 @@ public class FTMonitorManager {
     }
 
     /**
-     * 移除监控，在一个页面结束后，移除
+     * Remove monitoring, remove after a page ends
      *
      * @param viewId
      */
@@ -177,7 +177,7 @@ public class FTMonitorManager {
     }
 
     /**
-     * 清除当前监控配置项
+     * Clear current monitoring configuration items
      */
     public static void release() {
         if (ftMonitorConfig != null) {

@@ -12,13 +12,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import okhttp3.Dns;
 /**
- * 来自 [DataDog/dd-sdk-android] (https://github.com/DataDog/dd-sdk-android/blob/develop/dd-sdk-android-core/src/main/kotlin/com/datadog/android/core/internal/data/upload/RotatingDnsResolver.kt)
+ * From [DataDog/dd-sdk-android] (https://github.com/DataDog/dd-sdk-android/blob/develop/dd-sdk-android-core/src/main/kotlin/com/datadog/android/core/internal/data/upload/RotatingDnsResolver.kt)
  * Licensed under the Apache License, Version 2.0 (https://github.com/DataDog/dd-sdk-android/blob/develop/LICENSE)
  */
 public class RotatingDnsResolver implements Dns {
 
     private final Dns delegate;
-    private final long ttlNanoTime; // 使用毫秒表示 TTL
+    private final long ttlNanoTime; // Use milliseconds to represent TTL
     private final Map<String, ResolvedHost> knownHosts = new ConcurrentHashMap<>();
 
     public RotatingDnsResolver(Dns delegate, long nanoTime) {
@@ -61,7 +61,7 @@ public class RotatingDnsResolver implements Dns {
         return knownHost.getAgeNanoTime() < ttlNanoTime && !knownHost.addresses.isEmpty();
     }
 
-    public static final long TTL_30_MIN = 1800000000000L; // 30 分钟的毫秒值
+    public static final long TTL_30_MIN = 1800000000000L; // 30 minutes in milliseconds
 
     public static class ResolvedHost {
         private final String hostname;
@@ -71,7 +71,7 @@ public class RotatingDnsResolver implements Dns {
         public ResolvedHost(String hostname, List<InetAddress> addresses) {
             this.hostname = hostname;
             this.addresses = new LinkedList<>(addresses);
-            this.resolutionTimestampNanoTime = System.nanoTime(); // 使用 Android 的时间 API
+            this.resolutionTimestampNanoTime = System.nanoTime(); // Use Android's time API
         }
 
         public long getAgeNanoTime() {

@@ -13,7 +13,7 @@ import java.util.concurrent.ScheduledFuture;
 /**
  * BY huangDianHua
  * DATE:2019-12-02 11:23
- * Description:数据库管理，获取数据库对象以及数据关闭
+ * Description: Database management, get database objects and data shutdown
  */
 public abstract class DBManager {
 
@@ -22,8 +22,8 @@ public abstract class DBManager {
     private static final int TRANSACTION_LIMIT_COUNT = 10;
     private final Object lock = new Object();
     private int openCounter = 0;
-    private long lastUsedTime = 0; // 最后活跃时间
-    private static final long IDLE_TIMEOUT = 20_000;// 20秒
+    private long lastUsedTime = 0; // Last active time
+    private static final long IDLE_TIMEOUT = 20_000;// 20 seconds
     private ScheduledFuture<?> pendingCloseTask;
 
     protected abstract SQLiteOpenHelper initDataBaseHelper();
@@ -36,7 +36,7 @@ public abstract class DBManager {
     }
 
     /**
-     * 同步锁，使数据库操作线程安全
+     * Synchronization lock to make database operations thread-safe
      *
      * @param write
      * @param callBack
@@ -46,10 +46,10 @@ public abstract class DBManager {
     }
 
     /**
-     * 同步锁，使数据库操作线程安全
+     * Synchronization lock to make database operations thread-safe
      *
      * @param write
-     * @param operationCount 是否开启事务
+     * @param operationCount Whether to enable transactions
      * @param callback
      */
     protected void getDB(boolean write, int operationCount, DataBaseCallBack callback) {
@@ -63,7 +63,7 @@ public abstract class DBManager {
             db = write ? helper.getWritableDatabase() : helper.getReadableDatabase();
             if (db.isOpen()) {
                 acquire();
-                // 自动判断：写操作且操作数量大于阈值(默认10)时使用事务
+                // Automatic judgment: use transactions when write operations and operation count is greater than threshold (default 10)
                 boolean useTransaction = write && operationCount > TRANSACTION_LIMIT_COUNT;
                 if (useTransaction && !db.inTransaction()) {
                     db.beginTransaction();
@@ -103,13 +103,13 @@ public abstract class DBManager {
 
 
     /**
-     * 通过 PRAGMA 获取 page_size *page_count 来计算获取当前 db 的 大小
+     * Calculate the current db size by getting page_size * page_count through PRAGMA
      *
      * @param db
      */
     private void checkDatabaseSize(SQLiteDatabase db) {
         if (db != null) {
-            // 获取数据库文件的大小
+            // Get database file size
 //            File dbFile = new File(db.getPath());
             if (enableDBSizeLimit()) {
 
@@ -131,15 +131,15 @@ public abstract class DBManager {
                     }
                     cursor.close();
                 }
-                long fileSize = pageCount * pageSize; // 文件大小（字节）
-                // 如果超过限制，执行清理操作
+                long fileSize = pageCount * pageSize; // File size (bytes)
+                // If limit is exceeded, perform cleanup operation
                 onDBSizeCacheChange(db, fileSize);
             }
         }
     }
 
     /**
-     * 是否开启 db 限制
+     * Whether to enable db limit
      *
      * @return
      */
@@ -147,7 +147,7 @@ public abstract class DBManager {
 
 
     /**
-     * 通知 db 计算大小
+     * Notify db to calculate size
      *
      * @param db
      * @param reachLimit
@@ -155,7 +155,7 @@ public abstract class DBManager {
     protected abstract void onDBSizeCacheChange(SQLiteDatabase db, long reachLimit);
 
     /**
-     * 关闭 db
+     * Close db
      */
     private void closeDB() {
         synchronized (lock) {
@@ -167,7 +167,7 @@ public abstract class DBManager {
     }
 
     /**
-     * 建立 db 链接
+     * Establish db connection
      */
     public void acquire() {
         synchronized (lock) {
@@ -178,7 +178,7 @@ public abstract class DBManager {
     }
 
     /**
-     * 周期监测关闭数据库
+     * Periodically monitor and close database
      */
     private void scheduleCloseIfIdle() {
         cancelPendingClose();
@@ -195,11 +195,11 @@ public abstract class DBManager {
 
             }, IDLE_TIMEOUT);
         }
-        // 例如 10 秒后无操作就关闭
+        // For example, close after 10 seconds of no operation
     }
 
     /**
-     * 取消等待任务
+     * Cancel pending task
      */
     private void cancelPendingClose() {
         if (pendingCloseTask != null) {
@@ -209,7 +209,7 @@ public abstract class DBManager {
     }
 
     /**
-     * 尝试关闭数据库
+     * Try to close database
      */
     public void tryToClose() {
         synchronized (lock) {
@@ -222,7 +222,7 @@ public abstract class DBManager {
     }
 
     /**
-     * 关闭并释放数据库文件对象
+     * Close and release database file objects
      */
     protected void shutDown() {
         synchronized (lock) {

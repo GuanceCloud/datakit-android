@@ -1,7 +1,7 @@
 package com.ft.sdk.nativelib;
 
 /**
- * 额外 log cat日志配置
+ * Additional logcat log configuration
  */
 public class NativeExtraLogCatSetting {
 
@@ -13,9 +13,9 @@ public class NativeExtraLogCatSetting {
     private final int logcatEventsLines;
 
     /**
-     * @param logcatMainLines   这是主要的日志缓冲区，包含大部分应用程序的日志输出，[0,500]，default 200
-     * @param logcatSystemLines 系统日志缓冲区，包含系统级别的日志信息，[0,500]，default 50
-     * @param logcatEventsLines 事件日志缓冲区，主要记录特定的事件信息，[0,500]，default 50
+     * @param logcatMainLines   This is the main log buffer, containing most application log output, [0,500], default 200
+     * @param logcatSystemLines System log buffer, containing system-level log information, [0,500], default 50
+     * @param logcatEventsLines Event log buffer, mainly recording specific event information, [0,500], default 50
      */
     public NativeExtraLogCatSetting(int logcatMainLines, int logcatSystemLines, int logcatEventsLines) {
         this.logcatMainLines = Math.min(Math.max(logcatMainLines, MINI_LINES), MAX_LINES);

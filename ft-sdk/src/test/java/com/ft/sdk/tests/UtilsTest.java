@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * BY huangDianHua
  * DATE:2019-12-16 18:06
- * Description:杂项测试
+ * Description: Miscellaneous tests
  */
 public class UtilsTest {
 
@@ -38,7 +38,7 @@ public class UtilsTest {
     public static final long VALUE_TIME = 1598512145640000000L;
 
     /**
-     * 正常行协议数据
+     * Normal line protocol data
      */
     private static final String SINGLE_LINE_NORMAL_DATA = TEST_MEASUREMENT_INFLUX_DB_LINE + ","
             + KEY_TAGS + "=" + VALUE_TAGS + " "
@@ -46,20 +46,20 @@ public class UtilsTest {
             "" + VALUE_TIME + "\n";
 
     /**
-     * 空行协议数据
+     * Empty line protocol data
      */
     private static final String SINGLE_LINE_EMPTY_DATA = TEST_MEASUREMENT_INFLUX_DB_LINE + " "
             + KEY_FIELD_EMPTY + "=\"\" " +
             "" + VALUE_TIME + "\n";
 
     /**
-     * 合并正常行协议和空行协议数据，形成三行数据
+     * Merge normal line protocol and empty line protocol data to form three lines of data
      */
     private static final String LOG_EXPECT_DATA = SINGLE_LINE_NORMAL_DATA + SINGLE_LINE_NORMAL_DATA + SINGLE_LINE_NORMAL_DATA;
 
 
     /**
-     * 多行行数据验证，验证 {@link SyncDataHelper#convertToLineProtocolLines(List)} 数据转化过程中是否会发生数据错误
+     * Multi-line data validation, verify whether data errors occur during the data conversion process of {@link SyncDataHelper#convertToLineProtocolLines(List)}
      *
      * @throws JSONException
      * @throws InterruptedException
@@ -93,7 +93,7 @@ public class UtilsTest {
     }
 
     /**
-     * 单数据验证, 数据转化过程中是否会发生数据错误
+     * Single data validation, whether data errors occur during the data conversion process
      *
      * @throws JSONException
      */

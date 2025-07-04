@@ -6,7 +6,7 @@ import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.Utils;
 
 /**
- * 生成 ft.rd_[uuid 32] 的随机字符，应用删除时会重新生成
+ * Generate random characters in format ft.rd_[uuid 32], will regenerate when app is deleted
  */
 public class LocalUUIDManager {
     private static class SingletonHolder {
@@ -21,7 +21,7 @@ public class LocalUUIDManager {
 
 
     /**
-     * 初始化随机 userid
+     * Initialize random userid
      */
     void initRandomUUID() {
         if (Utils.isNullOrEmpty(getRandomUUID())) {
@@ -37,7 +37,7 @@ public class LocalUUIDManager {
 
 
     /**
-     * 获取随机 uuid 如果本地文件缓存有，则从本地获取
+     * Get random uuid, if local file cache exists, get from local
      * @return
      */
     String getRandomUUID() {

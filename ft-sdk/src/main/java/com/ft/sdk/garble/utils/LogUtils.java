@@ -18,19 +18,19 @@ import java.io.StringWriter;
 /**
  * BY huangDianHua
  * DATE:2019-12-03 15:56
- * Description:负责内部日志输出
+ * Description: Responsible for internal log output
  */
 public class LogUtils {
 
     /**
-     * 默认缓存文件名称
+     * Default cache file name
      */
     private final static String DEFAULT_INNER_LOG_FILE = "LogInner.log";
 
     protected static String TAG = "[FT-SDK]:";
 
     /**
-     * 是否为调试模式，为 true 时，输出控制台日志
+     * Whether it is debug mode, when true, output console logs
      */
     private static boolean mDebug = true;
 
@@ -134,14 +134,14 @@ public class LogUtils {
 
 
     /**
-     * 设置内部日志输出对象
+     * Set internal log output object
      * <p>
-     * 注意:为避免与
+     * Note: To avoid circular calls with
      * <p>
-     * {@link FTLoggerConfig#setPrintCustomLogToConsole(boolean)}  产生循环调用的情况
-     * innerLogHandler 设置后，这个值自动为 false
+     * {@link FTLoggerConfig#setPrintCustomLogToConsole(boolean)}
+     * innerLogHandler set, this value is automatically false
      * <p>
-     * {@link FTLogger}，如果使用 FTLogger level 为 D level 的日志会导致死循环，因为数据写入就会生成相关 Inner Debug
+     * {@link FTLogger}, if using FTLogger level D level logs will cause a dead loop, because data writing will generate related Inner Debug
      *
      * @param innerLogHandler
      */
@@ -150,16 +150,16 @@ public class LogUtils {
     }
 
     /**
-     * 将内部日志转化成文件
+     * Convert internal log to file
      * <p>
-     * 需要开启 {@link com.ft.sdk.FTSDKConfig#setDebug(boolean)} 设置为 true 开启 debug 模式
+     * Need to enable {@link com.ft.sdk.FTSDKConfig#setDebug(boolean)} Set to true to enable debug mode
      * <p>
-     * {@link FTLoggerConfig#setPrintCustomLogToConsole(boolean)}  产生循环调用的情况
-     * innerLogHandler 设置后，这个值自动为 false
+     * {@link FTLoggerConfig#setPrintCustomLogToConsole(boolean)}
+     * innerLogHandler set, this value is automatically false
      * <p>
-     * {@link FTLogger}，如果使用 FTLogger level 为 D level 的日志会导致死循环，因为数据写入就会生成相关 Inner Debug
+     * {@link FTLogger}, if using FTLogger level D level logs will cause a dead loop, because data writing will generate related Inner Debug
      *
-     * @param file 缓存文件
+     * @param file Cache file
      */
     public static void registerInnerLogCacheToFile(File file) {
         registerInnerLogCacheToFile(file, false);
@@ -169,10 +169,10 @@ public class LogUtils {
     /**
      * {@link #registerInnerLogCacheToFile}
      * {@link com.ft.sdk.tests.InnerLogTest}
-     * 将内部日志转化成文件
+     * Convert internal log to file
      *
-     * @param file          缓存文件
-     * @param isAndroidTest 是否是 Android Test
+     * @param file           Cache file
+     * @param isAndroidTest  Whether it is Android Test
      */
     private static void registerInnerLogCacheToFile(File file, boolean isAndroidTest) {
         final LogFileHelper helper = new LogFileHelper(FTApplication.getApplication(), file, isAndroidTest);
@@ -186,31 +186,31 @@ public class LogUtils {
     }
 
     /**
-     * 将内部日志转化成文件
+     * Convert internal log to file
      * <p>
-     * 需要开启 {@link com.ft.sdk.FTSDKConfig#setDebug(boolean)} 设置为 true 开启 debug 模式
+     * Need to enable {@link com.ft.sdk.FTSDKConfig#setDebug(boolean)} Set to true to enable debug mode
      * <p>
-     * {@link FTLoggerConfig#setPrintCustomLogToConsole(boolean)}  产生循环调用的情况
-     * innerLogHandler 设置后，这个值自动为 false
+     * {@link FTLoggerConfig#setPrintCustomLogToConsole(boolean)}
+     * innerLogHandler set, this value is automatically false
      * <p>
-     * {@link FTLogger}，如果使用 FTLogger 避免使用 {@link  com.ft.sdk.garble.bean.Status#OK}
+     * {@link FTLogger}, if using FTLogger avoid using {@link  com.ft.sdk.garble.bean.Status#OK}
      *
-     * @param fileName 缓存文件名
+     * @param fileName Cache file name
      */
     public static void registerInnerLogCacheToFile(String fileName) {
         registerInnerLogCacheToFile(new File(fileName));
     }
 
     /**
-     * 将内部日志转化为文件
-     * 默认路径：/data/data/{package_name}/files/LogInner.log
+     * Convert internal log to file
+     * Default path: /data/data/{package_name}/files/LogInner.log
      * <p>
-     * 需要开启 {@link com.ft.sdk.FTSDKConfig#setDebug(boolean)} 设置为 true 开启 debug 模式
+     * Need to enable {@link com.ft.sdk.FTSDKConfig#setDebug(boolean)} Set to true to enable debug mode
      * <p>
-     * {@link FTLoggerConfig#setPrintCustomLogToConsole(boolean)}  产生循环调用的情况
-     * innerLogHandler 设置后，这个值自动为 false
+     * {@link FTLoggerConfig#setPrintCustomLogToConsole(boolean)}
+     * innerLogHandler set, this value is automatically false
      * <p>
-     * {@link FTLogger}，如果使用 FTLogger 避免使用 {@link  com.ft.sdk.garble.bean.Status#OK}
+     * {@link FTLogger}, if using FTLogger avoid using {@link  com.ft.sdk.garble.bean.Status#OK}
      */
     public static void registerInnerLogCacheToFile() {
         String filePath = FTApplication.getApplication().getFilesDir().toString() + File.separator + DEFAULT_INNER_LOG_FILE;
@@ -219,7 +219,7 @@ public class LogUtils {
 
 
     /**
-     * {@link android.util.Log#getStackTraceString(Throwable)} 去掉 UnknownHostException 排除逻辑
+     * {@link android.util.Log#getStackTraceString(Throwable)} Remove UnknownHostException exclusion logic
      *
      * @param tr
      * @return
@@ -247,9 +247,9 @@ public class LogUtils {
     }
 
     /**
-     * 获取网络错误描述
+     * Get network error description
      *
-     * @param e 网络请求发生的 IOException
+     * @param e IOException occurred during network request
      * @return
      */
     public static String getNetworkExceptionDesc(IOException e) {
