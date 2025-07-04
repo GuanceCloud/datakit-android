@@ -4,102 +4,102 @@ package com.ft.sdk.garble.bean;
 import java.util.HashMap;
 
 /**
- * 网络资源请求，资源指标数据
+ * Network resource request, resource metric data
  */
 public class NetStatusBean {
 
     /**
-     * 请求开始时间 @deprecated Use {@link #callStartTime} instead.
+     * Request start time @deprecated Use {@link #callStartTime} instead.
      */
     @Deprecated
     public long fetchStartTime = -1;
     /**
-     * request header 开始时间 @deprecated Use {@link #headerStartTime} instead.
+     * request header start time @deprecated Use {@link #headerStartTime} instead.
      */
     @Deprecated
     public long requestStartTime = -1;
     /**
-     * response 开始时间  @deprecated Use {@link #bodyStartTime} instead.
+     * response start time  @deprecated Use {@link #bodyStartTime} instead.
      */
     @Deprecated
     public long responseStartTime = -1;
     /**
-     * response 结束时间 {@link #bodyEndTime} instead.
+     * response end time {@link #bodyEndTime} instead.
      */
     @Deprecated
     public long responseEndTime = -1;
 
     /**
-     * 请求从 call Start 处开始时间
+     * Request start time from call Start
      */
     public long callStartTime = -1;
 
     /**
-     * 请求在 response header 开始时间
+     * Request response header start time
      */
     public long headerStartTime = -1;
 
     /**
-     * 请求在 response header 结束时间
+     * Request response header end time
      */
     public long headerEndTime = -1;
 
     /**
-     * tcp 连接时间
+     * tcp connection start time
      */
     public long tcpStartTime = -1;
     /**
-     * tcp 结束时间
+     * tcp end time
      */
     public long tcpEndTime = -1;
     /**
-     * dns 解析开始时间
+     * dns resolution start time
      */
     public long dnsStartTime = -1;
     /**
-     * dns 解析结束时间
+     * dns resolution end time
      */
     public long dnsEndTime = -1;
 
     /**
-     * response body 开始时间
+     * response body start time
      */
     public long bodyStartTime = -1;
 
     /**
-     * response body 结束时间
+     * response body end time
      */
     public long bodyEndTime = -1;
 
 
     /**
-     * ssl 连接开始时间
+     * ssl connection start time
      */
     public long sslStartTime = -1;
 
     /**
-     * ssl 连接结束时间
+     * ssl connection end time
      */
     public long sslEndTime = -1;
 
 
     /**
-     * host IP 地址
+     * host IP address
      */
     public String resourceHostIP = "";
 
     /**
-     * 附加属性
+     * Additional properties
      */
     public HashMap<String, Object> property;
 
     /**
-     * 请求主机地址
+     * Request host address
      */
     public String requestHost;
 
     /**
-     * 获取 tcp 连接时长
+     * Get tcp connection duration
      *
      * @return
      */
@@ -111,7 +111,7 @@ public class NetStatusBean {
     }
 
     /**
-     *  相对 {@link #callStartTime} 的 connect 开始时间
+     *  Relative connect start time to {@link #callStartTime}
      *
      * @return
      */
@@ -120,7 +120,7 @@ public class NetStatusBean {
     }
 
     /**
-     * 获取 dns 解析时长
+     * Get dns resolution duration
      *
      * @return
      */
@@ -132,7 +132,7 @@ public class NetStatusBean {
     }
 
     /**
-     *  相对 {@link #callStartTime} 的 dns 开始时间
+     *  Relative dns start time to {@link #callStartTime}
      *
      * @return
      */
@@ -142,7 +142,7 @@ public class NetStatusBean {
 
 
     /**
-     *  body 内容加载耗时
+     *  body content load duration
      * @return
      */
     public long getDownloadTime() {
@@ -153,7 +153,7 @@ public class NetStatusBean {
     }
 
     /**
-     * 相对 {@link #callStartTime} 的 body 下载开始时间
+     *  Relative body download start time to {@link #callStartTime}
      * @return
      */
     public long getDownloadTimeStart() {
@@ -161,7 +161,7 @@ public class NetStatusBean {
     }
 
     /**
-     * 获取请求返回时长
+     * Get request response duration
      *
      * @return
      */
@@ -174,7 +174,7 @@ public class NetStatusBean {
 
 
     /**
-     * 获取 ttfb 时时长
+     * Get ttfb duration
      *
      * @return
      */
@@ -186,7 +186,7 @@ public class NetStatusBean {
     }
 
     /**
-     * 首字节耗时
+     * First byte duration
      *
      * @return
      */
@@ -196,7 +196,7 @@ public class NetStatusBean {
 
 
     /**
-     * 相对 {@link #callStartTime} 的首字节开始时间
+     *  Relative first byte start time to {@link #callStartTime}
      * @return
      */
     public long getFirstByteStartTime() {
@@ -204,7 +204,7 @@ public class NetStatusBean {
     }
 
     /**
-     * 整个请求请求时长
+     * Whole request duration
      *
      * @return
      */
@@ -216,7 +216,7 @@ public class NetStatusBean {
     }
 
     /**
-     * ssl 连接时长
+     * ssl connection duration
      *
      * @return
      */
@@ -229,7 +229,7 @@ public class NetStatusBean {
     }
 
     /**
-     * 相对 {@link #callStartTime} 的 ssl 开始时间
+     *  Relative ssl start time to {@link #callStartTime}
      *
      * @return
      */

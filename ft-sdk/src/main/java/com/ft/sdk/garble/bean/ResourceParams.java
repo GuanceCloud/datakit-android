@@ -4,75 +4,75 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Resource 请求参数
+ * Resource request parameters
  */
 public class ResourceParams {
     /**
-     * http 请求地址
+     * HTTP request address
      */
     public String url = "";
 
     /**
-     * http 请求头，如果为空则会读取 {@link #requestHeaderMap}
+     * HTTP request header, if empty will read {@link #requestHeaderMap}
      */
     public String requestHeader = "";
     /**
-     * http 返回头,如果为空则会读取 {@link #responseHeaderMap}
+     * HTTP response header, if empty will read {@link #responseHeaderMap}
      */
     public String responseHeader = "";
 
     /**
-     * http 请求头
+     * HTTP request header
      */
     public HashMap<String, List<String>> requestHeaderMap;
 
 
     /**
-     * http 返回头
+     * HTTP response header
      */
     public HashMap<String, List<String>> responseHeaderMap;
     /**
-     * http 头 Connection
+     * HTTP header Connection
      */
     public String responseConnection = "";
     /**
-     * http 头 Content-Type
+     * HTTP header Content-Type
      */
     public String responseContentType = "";
     /**
-     * http 头 Content-Encoding
+     * HTTP header Content-Encoding
      */
     public String responseContentEncoding = "";
 
     /**
-     * response 内容大小
+     * Response content size
      */
     public long responseContentLength = 0;
     /**
-     * http 请求
+     * HTTP request
      */
     public String resourceMethod = "";
     /**
-     * http 请求 body
+     * HTTP request body
      */
     public String responseBody = "";
 
     /**
-     * http 返回 code
+     * HTTP response code
      */
     public int resourceStatus = 0;
 
     /**
-     *  请求错误
+     *  Request error
      */
     public String requestErrorStack ="";
     /**
-     * 错误消息
+     * Error message
      */
     public String requestErrorMsg ="";
 
     /**
-     * 附加属性参数
+     * Additional property parameters
      */
     public HashMap<String, Object> property;
 }

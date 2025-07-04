@@ -19,15 +19,15 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * 数据组装类，把采集数据从存储数据序列化行协议数据
+ * Data assembly class, serializes collected data from stored data to line protocol data
  * <p>
- * tag:覆盖逻辑 SDK inner tag > user tag > static GlobalContext > dynamic GlobalContext
+ * tag: Override logic SDK inner tag > user tag > static GlobalContext > dynamic GlobalContext
  */
 public class SyncDataHelper {
     public final static String TAG = Constants.LOG_TAG_PREFIX + "SyncDataHelper";
 
     /**
-     * 基础数据标签
+     * Base data tags
      */
     private final HashMap<String, Object> basePublicTags;
     private final HashMap<String, Object> logTags;
@@ -81,7 +81,7 @@ public class SyncDataHelper {
     }
 
     /**
-     * 替换整个字典
+     * Replace the entire dictionary
      *
      * @param map
      * @return
@@ -105,7 +105,7 @@ public class SyncDataHelper {
 
 
     /**
-     * 替换单个
+     * Replace a single entry
      *
      * @param key
      * @param value
@@ -122,7 +122,7 @@ public class SyncDataHelper {
 
 
     /**
-     * 单条数据进行替换
+     * Replace a single data entry
      *
      * @param measurement
      * @param tags
@@ -152,7 +152,7 @@ public class SyncDataHelper {
     }
 
     /**
-     * 动态设置全局 tag
+     * Dynamically set global tag
      *
      * @param globalContext
      */
@@ -164,7 +164,7 @@ public class SyncDataHelper {
     }
 
     /**
-     * 动态设置全局 tag
+     * Dynamically set global tag
      *
      * @param key
      * @param value
@@ -177,7 +177,7 @@ public class SyncDataHelper {
 
 
     /**
-     * 动态设置 RUM 全局 tag
+     * Dynamically set RUM global tag
      *
      * @param globalContext
      */
@@ -189,7 +189,7 @@ public class SyncDataHelper {
     }
 
     /**
-     * 动态设置 RUM 全局 tag
+     * Dynamically set RUM global tag
      *
      * @param key
      * @param value
@@ -201,7 +201,7 @@ public class SyncDataHelper {
     }
 
     /**
-     * 动态设置 log 全局 tag
+     * Dynamically set log global tag
      *
      * @param globalContext
      */
@@ -213,7 +213,7 @@ public class SyncDataHelper {
     }
 
     /**
-     * 动态设置 log 全局 tag
+     * Dynamically set log global tag
      *
      * @param key
      * @param value
@@ -225,7 +225,7 @@ public class SyncDataHelper {
     }
 
     /**
-     * 数据转行协议存储
+     * Convert data to line protocol storage
      *
      * @param measurement
      * @param tags
@@ -241,13 +241,13 @@ public class SyncDataHelper {
         applyModifier(tags);
         applyModifier(fields);
         HashMap<String, Object> mergeTags = new LinkedHashMap<>();
-        mergeTags.put(KEY_SDK_DATA_FLAG, uuid);//让 uuid 放置第一位，字符替换时可以节省损耗
+        mergeTags.put(KEY_SDK_DATA_FLAG, uuid);//Put uuid in the first position to save cost during string replacement
         if (tags != null) {
             mergeTags.putAll(tags);
         }
         String bodyContent;
         if (dataType == DataType.LOG) {
-            // log 数据
+            // log data
             mergeTags.putAll(dynamicBaseTags);
             mergeTags.putAll(dynamicLogTags);
             mergeTags.putAll(logTags);
@@ -261,7 +261,7 @@ public class SyncDataHelper {
                     timeStamp, config);
         } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_APP_ERROR_SAMPLED
                 || dataType == DataType.RUM_WEBVIEW || dataType == DataType.RUM_WEBVIEW_ERROR_SAMPLED) {
-            //rum 数据
+            //rum data
             mergeTags.putAll(dynamicBaseTags);
             mergeTags.putAll(dynamicLRumTags);
             if (dataType == DataType.RUM_APP || dataType == DataType.RUM_APP_ERROR_SAMPLED) {
@@ -302,11 +302,11 @@ public class SyncDataHelper {
                                             long timeStamp,
                                             FTSDKConfig config) {
         if (measurement == null) {
-            throw new FTInvalidParameterException("指标集 measurement 不能为空");
+            throw new FTInvalidParameterException("Measurement set 'measurement' cannot be null");
         }
 
         if (fields == null || fields.isEmpty()) {
-            throw new FTInvalidParameterException("指标集 fields 不能为空");
+            throw new FTInvalidParameterException("Measurement set 'fields' cannot be null");
         }
 
         boolean integerCompatible = false;
@@ -350,7 +350,7 @@ public class SyncDataHelper {
 
 
     /**
-     * 获取自定义数据
+     * Get custom data
      *
      * @param obj
      * @return
@@ -392,11 +392,11 @@ public class SyncDataHelper {
     }
 
     /**
-     * 添加引号标记
+     * Add quotation marks
      *
      * @param sb
-     * @param value 愿数据
-     * @param add   是否需要添加
+     * @param value Original data
+     * @param add   Whether to add
      */
     private static void addQuotationMarks(StringBuilder sb, String value, boolean add) {
         if (add) {
@@ -407,7 +407,7 @@ public class SyncDataHelper {
     }
 
     /**
-     * 删除最后的逗号
+     * Delete the last comma
      *
      * @param sb
      */
@@ -416,7 +416,7 @@ public class SyncDataHelper {
     }
 
     /**
-     * 获取兼容迁移方法
+     * Get compatibility migration method
      *
      * @return
      */

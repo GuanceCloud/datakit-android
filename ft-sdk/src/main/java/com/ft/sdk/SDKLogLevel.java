@@ -1,7 +1,7 @@
 package com.ft.sdk;
 
 /**
- * SDK 日志等级
+ * SDK log levels
  */
 public enum SDKLogLevel {
     V,

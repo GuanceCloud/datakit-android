@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * create: by huangDianHua
  * time: 2020/4/29 10:32:51
- * description: FPS 信息监控
+ * description: FPS information monitoring
  */
 public class FpsUtils {
     private static FpsUtils fpsUtils;
@@ -20,7 +20,7 @@ public class FpsUtils {
     private double mFps;
 
     /**
-     * 获取 FPS 数值
+     * Get FPS value
      * @return
      */
     public double getFps() {
@@ -48,7 +48,7 @@ public class FpsUtils {
     }
 
     /**
-     * 释放
+     * Release
      */
     public static void release() {
         if (fpsUtils != null) {
@@ -103,17 +103,17 @@ public class FpsUtils {
 
         @Override
         public void doFrame(long frameTimeNanos) {
-            //将回调的时间转换成毫秒
+            //Convert callback time to milliseconds
             long currentTimeMillis = TimeUnit.NANOSECONDS.toMillis(frameTimeNanos);
 
             if (frameStartTime > 0) {
-                // 计算上一次帧刷新和这一次帧刷新之间的时间差
+                // Calculate time difference between last frame refresh and this frame refresh
                 final long timeSpan = currentTimeMillis - frameStartTime;
-                //累计刷新次数
+                //Accumulate refresh count
                 framesRendered++;
-                //当时间大于设定的周期就计算帧率
+                //When time is greater than the set period, calculate frame rate
                 if (timeSpan > interval) {
-                    //通过刷新次数除以间隔时间得到fps
+                    //Get fps by dividing refresh count by interval time
                     final double fps = framesRendered * 1000 / (double) timeSpan;
 
                     frameStartTime = currentTimeMillis;
@@ -127,7 +127,7 @@ public class FpsUtils {
                 frameStartTime = currentTimeMillis;
             }
 
-            //逐帧请求
+            //Request frame by frame
             choreographer.postFrameCallback(this);
         }
     }

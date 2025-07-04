@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * author: huangDianHua
  * time: 2020/9/2 17:27:01
- * description: InstrumentationRunner 应用 app-build.gradle defaultConfig.testInstrumentationRunner 中应用
+ * description: InstrumentationRunner application used in app-build.gradle defaultConfig.testInstrumentationRunner
  */
 public class MockTestRunner extends AndroidJUnitRunner {
     private static final Charset UTF8 = StandardCharsets.UTF_8;

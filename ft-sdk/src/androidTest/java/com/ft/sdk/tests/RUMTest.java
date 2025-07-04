@@ -71,12 +71,12 @@ public class RUMTest extends FTBaseTest {
     public static final String LONG_TASK_MESSAGE = "long task message";
 
     /**
-     * 模拟 http 返回 头参数
+     * Simulate http return header parameters
      */
     public static final String RESOURCE_REQUEST_HEADER = "{x-datadog-parent-id=73566521391796532, x-datadog-sampling-priority=1, " +
             "ft-dio-key=a44e0ab0-232f-4f93-a6fd-b7a45cf8d20c, x-datadog-origin=rum, x-datadog-trace-id=123622877354441421}";
     /**
-     * 模拟 http 请求 头参数
+     * Simulate http request header parameters
      */
     public static final String RESOURCE_RESPONSE_HEADER = "{date=[Fri, 26 Nov 2021 06:08:47 GMT], server=[sffe], content-length=[1437]," +
             " expires=[Fri, 01 Jan 1990 00:00:00 GMT], vary=[Accept-Encoding], content-encoding=[gzip]," +
@@ -109,7 +109,7 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * {@link FTRUMGlobalManager#startAction(String, String)} 数据生成测试
+     * {@link FTRUMGlobalManager#startAction(String, String)} Data generation test
      *
      * @throws Exception
      */
@@ -129,7 +129,7 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * {@link FTRUMGlobalManager#addAction(String, String, long, long)} } 数据生成测试
+     * {@link FTRUMGlobalManager#addAction(String, String, long, long)} } Data generation test
      *
      * @throws Exception
      */
@@ -155,7 +155,7 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * 数据连续写入
+     * Data continuous write
      *
      * @throws InterruptedException
      */
@@ -170,7 +170,7 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * Action 携带动态参数测试
+     * Action with dynamic parameter test
      *
      * @throws Exception
      */
@@ -192,7 +192,7 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * View 数据生成测试
+     * View data generation test
      *
      * @throws Exception
      */
@@ -226,7 +226,7 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * View 携带动态参数测试
+     * View with dynamic parameter test
      *
      * @throws Exception
      */
@@ -267,7 +267,7 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * 模拟连续 view 跳转操作，最后验证各个 {@link ViewBean#viewReferrer}是否对应正确
+     * Simulate continuous view jump operation, and finally verify that each {@link ViewBean#viewReferrer} corresponds to the correct one
      *
      * @throws InterruptedException
      */
@@ -299,12 +299,12 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * 模拟进入 View 后，进行一个 Action ，一个 Resource，一个 Error，一个 LongTask
+     * Simulate entering View after an Action, a Resource, an Error, and a LongTask
      * <p>
-     * 最后验证 {@link ViewBean#resourceCount}
+     * Finally verify the number of {@link ViewBean#resourceCount}
      * {@link ViewBean#errorCount}
      * {@link ViewBean#longTaskCount}
-     * {@link ViewBean#actionCount} 数量是否正确
+     * {@link ViewBean#actionCount} The number of whether it is correct
      *
      * @throws Exception
      */
@@ -350,7 +350,7 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * 模拟 session id 过期，在一个session id 过期之后，进行操作会生成新的 session id
+     * Simulate session id expiration, after a session id expires, the operation will generate a new session id
      *
      * @throws Exception
      */
@@ -382,7 +382,7 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * 模拟发起一 Resource 请求
+     * Simulate initiating a Resource request
      *
      * @throws InterruptedException
      */
@@ -406,7 +406,7 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * 模拟 Resource 请求期间附带动态参数
+     * Simulate Resource request with dynamic parameters
      *
      * @throws InterruptedException
      */
@@ -424,7 +424,7 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * Resource 动态参数覆盖测试
+     * Resource dynamic parameter override test
      *
      * @throws InterruptedException
      */
@@ -444,7 +444,7 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * Error 数据测试
+     * Error data test
      *
      * @throws InterruptedException
      */
@@ -459,7 +459,7 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * Error 数据附带动态参数测试
+     * Error data with dynamic parameter test
      *
      * @throws InterruptedException
      */
@@ -476,7 +476,7 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * LongTask 数据测试
+     * LongTask data test
      *
      * @throws InterruptedException
      */
@@ -489,7 +489,7 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * LongTask 数据附带动态参数测试
+     * LongTask data with dynamic parameter test
      *
      * @throws InterruptedException
      */
@@ -504,7 +504,7 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * {@link FTRUMConfig#samplingRate} 采样率为 0测试
+     * {@link FTRUMConfig#samplingRate} Sampling rate 0 test
      *
      * @throws Exception
      */
@@ -523,7 +523,7 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * {@link FTRUMConfig#samplingRate} 采样率 100% 测试
+     * {@link FTRUMConfig#samplingRate} Sampling rate 100% test
      *
      * @throws Exception
      */
@@ -540,7 +540,7 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * View Action Error LongTask 数据生成
+     * View Action Error LongTask data generation
      *
      * @throws Exception
      */
@@ -557,17 +557,17 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * 模拟发送 Resource 资源数据
+     * Simulate sending Resource data
      */
     private void sendResource() {
         sendResource(null, null);
     }
 
     /**
-     * 模拟发送 Resource 资源数据
+     * Simulate sending Resource data
      *
-     * @param property         动态参数
-     * @param propertyOverride 需要覆盖的动态参数
+     * @param property         Dynamic parameters
+     * @param propertyOverride Parameters to be overridden
      */
     private void sendResource(HashMap<String, Object> property, HashMap<String, Object> propertyOverride) {
         String resourceId = Utils.getGUID_16();
@@ -590,7 +590,7 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * {@link FTTraceConfig#enableLinkRUMData}  为 true 情况下，检验 RUM 是否包含链路链路相关数据
+     * {@link FTTraceConfig#enableLinkRUMData} When true, check whether RUM contains link-related data
      *
      * @throws InterruptedException
      * @throws IOException
@@ -602,7 +602,7 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * {@link FTTraceConfig#enableLinkRUMData}  为 false 情况下，检验 RUM 是否包含链路链路相关数据
+     * {@link FTTraceConfig#enableLinkRUMData} When false, check whether RUM contains link-related data
      *
      * @throws InterruptedException
      * @throws IOException
@@ -613,7 +613,7 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * 检验 RUM 数据 {@link Constants#KEY_RUM_RESOURCE_TRACE_ID},{@link Constants#KEY_RUM_RESOURCE_SPAN_ID }是否包含在内
+     * Check whether RUM data {@link Constants#KEY_RUM_RESOURCE_TRACE_ID},{@link Constants#KEY_RUM_RESOURCE_SPAN_ID } is included
      *
      * @param enableLinkRUMData
      * @return
@@ -763,7 +763,7 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * 检验如果 Resource 过程中未发生 Action 数据是否正，是否会监测到 Action
+     * Check if the data is correct during the Resource process, and whether the Action is monitored
      *
      * @throws InterruptedException
      */
@@ -791,7 +791,7 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * 测试大批量插入数据，是否触发丢弃策略
+     * Test large number of data insertion, whether to trigger the discard policy
      *
      * @throws InterruptedException
      */
@@ -803,7 +803,7 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * 测试大批 RUM 量插入数据，是否触发丢弃策略
+     * Test large number of RUM data insertion, whether to trigger the discard policy
      *
      * @throws InterruptedException
      */
@@ -814,9 +814,9 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * 批量 RUM
+     * Batch RUM
      *
-     * @param expectCount 预期数量
+     * @param expectCount Expected number
      * @throws InterruptedException
      */
     private void batchRUM(int expectCount) throws InterruptedException {
@@ -834,7 +834,7 @@ public class RUMTest extends FTBaseTest {
 
 
     /**
-     * ResourceID 测试
+     * ResourceID test
      */
     @Test
     public void uuidTest() {

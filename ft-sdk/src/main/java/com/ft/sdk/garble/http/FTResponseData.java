@@ -21,11 +21,11 @@ public class FTResponseData {
      */
     private int code;
     /**
-     * 错误 code， 一部分是 datakit 网络请求返回的错误代码，一部分是 {@link NetCodeStatus} 返回的错误码
+     * Error code, part of the datakit network request error code, part of {@link NetCodeStatus} error code
      */
     private String errorCode;
     /**
-     * 请求错误简要信息
+     * Request error brief information
      */
     private String message;
 

@@ -29,12 +29,12 @@ public class FTRUMGlobalManager {
     }
 
     /**
-     * 添加 Action
+     * Add Action
      *
-     * @param actionName action 名称
-     * @param actionType action 类型
-     * @param duration   纳秒，持续时间
-     * @param property 扩展属性
+     * @param actionName action name
+     * @param actionType action type
+     * @param duration    nanosecond, duration
+     * @param property  extended attributes
      */
     public void addAction(String actionName, String actionType, long duration, HashMap<String, Object> property) {
         if (innerManager != null) {
@@ -43,10 +43,10 @@ public class FTRUMGlobalManager {
     }
 
     /**
-     * 添加 Action，此类数据无法关联 Error，Resource，LongTask 数据
+     * Add Action, this type of data cannot be associated with Error, Resource, LongTask data
      *
-     * @param actionName action 名称
-     * @param actionType action 类型
+     * @param actionName action name
+     * @param actionType action type
      */
     public void addAction(String actionName, String actionType) {
         if (innerManager != null) {
@@ -55,11 +55,11 @@ public class FTRUMGlobalManager {
     }
 
     /**
-     * 添加 Action，此类数据无法关联 Error，Resource，LongTask 数据
+     * Add Action, this type of data cannot be associated with Error, Resource, LongTask data
      *
-     * @param actionName action 名称
-     * @param actionType action 类型
-     * @param property 扩展属性
+     * @param actionName action name
+     * @param actionType action type
+     * @param property  extended attributes
      */
     public void addAction(String actionName, String actionType, HashMap<String, Object> property) {
         if (innerManager != null) {
@@ -68,11 +68,11 @@ public class FTRUMGlobalManager {
     }
 
     /**
-     * 添加 Action，此类数据无法关联 Error，Resource，LongTask 数据
+     * Add Action, this type of data cannot be associated with Error, Resource, LongTask data
      *
-     * @param actionName action 名称
-     * @param actionType action 类型
-     * @param duration   纳秒，持续时间
+     * @param actionName action name
+     * @param actionType action type
+     * @param duration    nanosecond, duration
      */
     public void addAction(String actionName, String actionType, long duration) {
         if (innerManager != null) {
@@ -81,10 +81,10 @@ public class FTRUMGlobalManager {
     }
 
     /**
-     * 添加 action
+     * Add action
      *
-     * @param actionName action 名称
-     * @param actionType action 类型
+     * @param actionName action name
+     * @param actionType action type
      */
     public void startAction(String actionName, String actionType) {
         if (innerManager != null) {
@@ -93,11 +93,11 @@ public class FTRUMGlobalManager {
     }
 
     /**
-     * 添加 action
+     * Add action
      *
-     * @param actionName action 名称
-     * @param actionType action 类型
-     * @param property   附加属性参数
+     * @param actionName action name
+     * @param actionType action type
+     * @param property    additional attribute parameters
      */
     public void startAction(String actionName, String actionType, HashMap<String, Object> property) {
         if (innerManager != null) {
@@ -107,9 +107,9 @@ public class FTRUMGlobalManager {
 
 
     /**
-     * resource 起始
+     * resource start
      *
-     * @param resourceId 资源 Id
+     * @param resourceId resource Id
      */
     public void startResource(String resourceId) {
         if (innerManager != null) {
@@ -119,10 +119,10 @@ public class FTRUMGlobalManager {
 
 
     /**
-     * resource 起始
+     * resource start
      *
-     * @param resourceId 资源 Id
-     * @param property   附加属性参数
+     * @param resourceId resource Id
+     * @param property    additional attribute parameters
      */
     public void startResource(String resourceId, HashMap<String, Object> property) {
         if (innerManager != null) {
@@ -132,9 +132,9 @@ public class FTRUMGlobalManager {
 
 
     /**
-     * resource 终止
+     * resource end
      *
-     * @param resourceId 资源 Id
+     * @param resourceId resource Id
      */
     public void stopResource(String resourceId) {
         if (innerManager != null) {
@@ -144,8 +144,8 @@ public class FTRUMGlobalManager {
 
 
     /**
-     * @param resourceId 资源 Id
-     * @param property   附加属性参数
+     * @param resourceId resource Id
+     * @param property    additional attribute parameters
      */
     public void stopResource(final String resourceId, HashMap<String, Object> property) {
         if (innerManager != null) {
@@ -155,10 +155,10 @@ public class FTRUMGlobalManager {
 
 
     /**
-     * 创建 view
+     * Create view
      *
-     * @param viewName 界面名称
-     * @param loadTime 加载事件，单位毫秒 ms
+     * @param viewName view name
+     * @param loadTime load time, unit milliseconds ms
      */
     public void onCreateView(String viewName, long loadTime) {
         if (innerManager != null) {
@@ -168,9 +168,9 @@ public class FTRUMGlobalManager {
 
 
     /**
-     * view 起始
+     * view start
      *
-     * @param viewName 当前页面名称
+     * @param viewName current page name
      */
     public void startView(String viewName) {
         if (innerManager != null) {
@@ -179,10 +179,10 @@ public class FTRUMGlobalManager {
     }
 
     /**
-     * view 起始
+     * view start
      *
-     * @param viewName 当前页面名称
-     * @param property 附加属性参数
+     * @param viewName current page name
+     * @param property  additional attribute parameters
      */
     public void startView(String viewName, HashMap<String, Object> property) {
         if (innerManager != null) {
@@ -192,7 +192,7 @@ public class FTRUMGlobalManager {
 
 
     /**
-     * view 结束
+     * view end
      */
     public void stopView() {
         if (innerManager != null) {
@@ -201,9 +201,9 @@ public class FTRUMGlobalManager {
     }
 
     /**
-     * view 结束
+     * view end
      *
-     * @param property 附加属性参数
+     * @param property  additional attribute parameters
      */
     public void stopView(HashMap<String, Object> property) {
         if (innerManager != null) {
@@ -212,11 +212,11 @@ public class FTRUMGlobalManager {
     }
 
     /**
-     * 添加错误信息, 默认 AppState.RUN
+     * Add error information, default AppState.RUN
      *
-     * @param log       日志
-     * @param message   消息
-     * @param errorType 错误类型
+     * @param log       log
+     * @param message   message
+     * @param errorType error type
      */
     public void addError(String log, String message, String errorType) {
         if (innerManager != null) {
@@ -225,12 +225,12 @@ public class FTRUMGlobalManager {
     }
 
     /**
-     * 添加错误信息
+     * Add error information
      *
-     * @param log       日志
-     * @param message   消息
-     * @param errorType 错误类型
-     * @param state     程序运行状态
+     * @param log       log
+     * @param message   message
+     * @param errorType error type
+     * @param state     program running state
      */
     public void addError(String log, String message, String errorType, AppState state) {
         if (innerManager != null) {
@@ -239,13 +239,13 @@ public class FTRUMGlobalManager {
     }
 
     /**
-     * 添加错误
+     * Add error
      *
-     * @param log       日志
-     * @param message   消息
-     * @param errorType 错误类型
-     * @param state     程序运行状态
-     * @param dateline  发生时间，纳秒
+     * @param log       log
+     * @param message   message
+     * @param errorType error type
+     * @param state     program running state
+     * @param dateline  occurrence time, nanosecond
      */
     public void addError(String log, String message, long dateline, String errorType,
                          AppState state) {
@@ -257,13 +257,13 @@ public class FTRUMGlobalManager {
 
 
     /**
-     * 添加错误信息
+     * Add error information
      *
-     * @param log       日志
-     * @param message   消息
-     * @param errorType 错误类型
-     * @param state     程序运行状态
-     * @param property  附加属性
+     * @param log       log
+     * @param message   message
+     * @param errorType error type
+     * @param state     program running state
+     * @param property  additional attribute parameters
      */
     public void addError(String log, String message, String errorType, AppState state, HashMap<String, Object> property) {
         if (innerManager != null) {
@@ -273,14 +273,14 @@ public class FTRUMGlobalManager {
 
 
     /**
-     * 添加错误
+     * Add error
      *
-     * @param log       日志
-     * @param message   消息
-     * @param errorType 错误类型
-     * @param state     程序运行状态
-     * @param dateline  发生时间，纳秒
-     * @param property  附加属性
+     * @param log       log
+     * @param message   message
+     * @param errorType error type
+     * @param state     program running state
+     * @param dateline  occurrence time, nanosecond
+     * @param property  additional attribute parameters
      */
     public void addError(String log, String message, long dateline, String errorType,
                          AppState state, HashMap<String, Object> property) {
@@ -292,12 +292,12 @@ public class FTRUMGlobalManager {
 
 
     /**
-     * 添加错误信息
+     * Add error information
      *
-     * @param log       日志
-     * @param message   消息
-     * @param errorType 错误类型
-     * @param state     程序运行状态
+     * @param log       log
+     * @param message   message
+     * @param errorType error type
+     * @param state     program running state
      */
     public void addError(String log, String message, ErrorType errorType, AppState state) {
         if (innerManager != null) {
@@ -306,13 +306,13 @@ public class FTRUMGlobalManager {
     }
 
     /**
-     * 添加错误
+     * Add error
      *
-     * @param log       日志
-     * @param message   消息
-     * @param errorType 错误类型
-     * @param state     程序运行状态
-     * @param dateline  发生时间，纳秒
+     * @param log       log
+     * @param message   message
+     * @param errorType error type
+     * @param state     program running state
+     * @param dateline  occurrence time, nanosecond
      */
     public void addError(String log, String message, long dateline, ErrorType errorType,
                          AppState state) {
@@ -324,13 +324,13 @@ public class FTRUMGlobalManager {
 
 
     /**
-     * 添加错误信息
+     * Add error information
      *
-     * @param log       日志
-     * @param message   消息
-     * @param errorType 错误类型
-     * @param state     程序运行状态
-     * @param property  附加属性
+     * @param log       log
+     * @param message   message
+     * @param errorType error type
+     * @param state     program running state
+     * @param property  additional attribute parameters
      */
     public void addError(String log, String message, ErrorType errorType, AppState state, HashMap<String, Object> property) {
         if (innerManager != null) {
@@ -340,14 +340,14 @@ public class FTRUMGlobalManager {
 
 
     /**
-     * 添加错误
+     * Add error
      *
-     * @param log       日志
-     * @param message   消息
-     * @param errorType 错误类型
-     * @param state     程序运行状态
-     * @param dateline  发生时间，纳秒
-     * @param property  附加属性
+     * @param log       log
+     * @param message   message
+     * @param errorType error type
+     * @param state     program running state
+     * @param dateline  occurrence time, nanosecond
+     * @param property  additional attribute parameters
      */
     public void addError(String log, String message, long dateline, ErrorType errorType,
                          AppState state, HashMap<String, Object> property) {
@@ -358,11 +358,11 @@ public class FTRUMGlobalManager {
     }
 
     /**
-     * 添加长任务
+     * Add long task
      *
-     * @param log      日志内容
-     * @param duration 持续时间，纳秒
-     * @param property 附加属性
+     * @param log       log
+     * @param duration  duration, nanosecond
+     * @param property  additional attribute parameters
      */
     public void addLongTask(String log, long duration, HashMap<String, Object> property) {
         if (innerManager != null) {
@@ -372,10 +372,10 @@ public class FTRUMGlobalManager {
 
 
     /**
-     * 添加长任务
+     * Add long task
      *
-     * @param log      日志内容
-     * @param duration 持续时间，纳秒
+     * @param log       log
+     * @param duration  duration, nanosecond
      */
     public void addLongTask(String log, long duration) {
         if (innerManager != null) {
@@ -385,11 +385,11 @@ public class FTRUMGlobalManager {
 
 
     /**
-     * 设置网络传输内容
+     * Set network transmission content
      *
-     * @param resourceId    资源 id
-     * @param params        {@link ResourceParams} 请求内容信息
-     * @param netStatusBean {@link  NetStatusBean} 网络性能指标
+     * @param resourceId    resource id
+     * @param params        {@link ResourceParams} request content information
+     * @param netStatusBean {@link  NetStatusBean} network performance indicators
      */
     public void addResource(String resourceId, ResourceParams params, NetStatusBean netStatusBean) {
         if (innerManager != null) {
@@ -413,7 +413,7 @@ public class FTRUMGlobalManager {
 
 
     /**
-     * 对象释放，SDK 关闭后清零
+     * Object release, clear to zero after SDK shutdown
      */
     public void release() {
         innerManager = null;

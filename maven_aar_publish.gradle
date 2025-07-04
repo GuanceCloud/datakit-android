@@ -8,7 +8,7 @@ afterEvaluate {
                 artifactId mavenArtifactId
                 version pkgVersion
                 artifact project.tasks.bundleReleaseAar
-                // 添加源码Javadoc到发布的AAR文件中
+                // Add source code and Javadoc to the published AAR file
                 artifact androidJavadocsJar
                 artifact androidSourcesJar
             }
@@ -39,7 +39,7 @@ task aar {
 }
 
 /**
- * 报错，不影响上传任务
+ * Error reporting, does not affect upload task
  */
 task androidJavadocs(type: Javadoc) {
 

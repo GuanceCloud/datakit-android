@@ -2,11 +2,11 @@ package com.ft.sdk;
 
 public enum DBCacheDiscard {
     /**
-     * 丢弃前置,默认
+     * Discard front, default
      */
     DISCARD,
     /**
-     * 丢弃后置
+     * Discard oldest
      */
     DISCARD_OLDEST
 }

@@ -32,7 +32,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * 基础测试用例类，用于快速构建 Android Test
+ * Base test case class for quickly building Android Tests
  */
 public class FTBaseTest {
 
@@ -56,7 +56,7 @@ public class FTBaseTest {
     }
 
     /**
-     * 获取 Datakit 客户端配置
+     * Get Datakit client configuration
      *
      * @return
      */
@@ -65,7 +65,7 @@ public class FTBaseTest {
     }
 
     /**
-     * 获取 dataway 客户端配置
+     * Get dataway client configuration
      *
      * @return
      */
@@ -74,7 +74,7 @@ public class FTBaseTest {
     }
 
     /**
-     * 停止数据同步，{@link SyncTaskManager#running} = true 变量来实现
+     * Stop data synchronization, implemented by setting {@link SyncTaskManager#running} = true
      *
      * @throws Exception
      */
@@ -85,7 +85,7 @@ public class FTBaseTest {
 
 
     /**
-     * 恢复数据同步,{@link SyncTaskManager#running} = false 变量来实现
+     * Resume data synchronization, implemented by setting {@link SyncTaskManager#running} = false
      *
      * @throws Exception
      */
@@ -94,7 +94,7 @@ public class FTBaseTest {
     }
 
     /**
-     * 立即执行数据同步
+     * Execute data synchronization immediately
      * <p>
      * {@link SyncTaskManager#executePoll()}
      *
@@ -105,7 +105,7 @@ public class FTBaseTest {
     }
 
     /**
-     * 立即进行数据同步
+     * Perform data synchronization immediately
      * <p>
      * {@link FTTrackInner#syncRUMDataBackground(DataType, long, String, JSONObject, JSONObject)}
      *
@@ -123,7 +123,7 @@ public class FTBaseTest {
 
 
     /**
-     * 组织程序崩溃，保证测试用例执行不中断
+     * Prevent program crashes to ensure test case execution is not interrupted
      * <p>
      * {@link FTExceptionHandler#isAndroidTest}
      */
@@ -136,7 +136,7 @@ public class FTBaseTest {
     }
 
     /**
-     * 关闭当前激活 Action
+     * Close the currently active Action
      * <p>
      * {@link FTRUMInnerManager#checkActionClose()}
      *
@@ -149,7 +149,7 @@ public class FTBaseTest {
     }
 
     /**
-     * 立即生成 RUM 相关数据
+     * Generate RUM related data immediately
      * <p>
      * {@link FTRUMInnerManager#generateRumData()}
      *
@@ -162,7 +162,7 @@ public class FTBaseTest {
     }
 
     /**
-     * 等待线程池队列执行结束，目的是让线程池函数在测试用例中串行，等待操作结束
+     * Wait for the thread pool queue execution to end, the purpose is to make thread pool functions serial in test cases, wait for operation to end
      * <p>
      * {@link EventConsumerThreadPool}
      *
@@ -178,7 +178,7 @@ public class FTBaseTest {
     }
 
     /**
-     * 禁止数据清理，通过 {@link FTDBManager#isAndroidTest} 逻辑跳过删除逻辑来实现
+     * Disable data cleanup, implemented by skipping deletion logic through {@link FTDBManager#isAndroidTest} logic
      */
     protected static void avoidCleanData() {
         try {
@@ -189,7 +189,7 @@ public class FTBaseTest {
     }
 
     /**
-     * 使 session 立即过期，以缩短测试用例在测试过程中的耗时等待
+     * Make session expire immediately to reduce time-consuming waits during test case execution
      * <p>
      * {@link FTRUMInnerManager#lastUserActiveTime}
      *
@@ -204,7 +204,7 @@ public class FTBaseTest {
     }
 
     /**
-     * 上传数据测试
+     * Upload data test
      * <p>
      * {@link SyncTaskManager#requestNet(DataType, String, RequestCallback)}
      *
@@ -226,12 +226,12 @@ public class FTBaseTest {
     }
 
     /**
-     * 使用 Whitebox 检验私有变量
+     * Use Whitebox to check private variables
      *
-     * @param target    访问已创建实例
-     * @param fieldName 私有变量名称
-     * @param expect    预期值
-     * @return fieldName 是否与 expect 相同
+     * @param target    Access created instance
+     * @param fieldName Private variable name
+     * @param expect    Expected value
+     * @return Whether fieldName is the same as expect
      */
     protected boolean checkInnerFieldValue(Object target, String fieldName, Object expect) {
         return Whitebox.getInternalState(target, fieldName).equals(expect);
@@ -239,7 +239,7 @@ public class FTBaseTest {
 
 
     /**
-     * 获取当前 dataHelper 对象
+     * Get current dataHelper object
      * {@link FTTrackInner#dataHelper}
      *
      * @return
@@ -250,8 +250,8 @@ public class FTBaseTest {
     }
 
     /**
-     * 获取当前 datahelper 中 config属性
-     * {@link FTTrackInner#dataHelper} 的 config
+     * Get config property in current datahelper
+     * config of {@link FTTrackInner#dataHelper}
      *
      * @return
      */
@@ -260,8 +260,8 @@ public class FTBaseTest {
     }
 
     /**
-     * 获取当前 datahelper 中 config属性
-     * {@link FTTrackInner#dataHelper} 的 config
+     * Get config property in current datahelper
+     * config of {@link FTTrackInner#dataHelper}
      *
      * @return
      */
@@ -270,7 +270,7 @@ public class FTBaseTest {
     }
 
     /**
-     * 获取最小 longtask 判定最小限制数值
+     * Get the minimum longtask judgment minimum limit value
      *
      * @return
      */
@@ -298,7 +298,7 @@ public class FTBaseTest {
 
 
     /**
-     * 测试完毕，删除清空数据
+     * Test completed, delete and clear data
      */
     @After
 

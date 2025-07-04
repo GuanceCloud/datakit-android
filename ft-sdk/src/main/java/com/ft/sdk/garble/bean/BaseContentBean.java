@@ -10,27 +10,27 @@ import java.util.HashMap;
 /**
  * create: by huangDianHua
  * time: 2020/6/5 15:08:45
- * description:日志对象(SDK内部使用)
+ * description: Log object (for internal SDK use)
  */
 public class BaseContentBean extends LineProtocolBean {
     /**
-     * 内容大小限制 30 KB
+     * Content size limit 30 KB
      */
     protected static final int LIMIT_SIZE = 30720;
 
     /**
-     * 日志内容
+     * Log content
      */
     String content;
 
     /**
-     * 运行服务名称
+     * Running service name
      */
     String serviceName;
 
 
     /**
-     * 是否超过 30KB
+     * Whether exceeds 30KB
      *
      * @param content
      * @return
@@ -62,7 +62,7 @@ public class BaseContentBean extends LineProtocolBean {
     }
 
     /**
-     * 获取所有指标数据
+     * Get all metric data
      *
      * @return
      */
@@ -72,7 +72,7 @@ public class BaseContentBean extends LineProtocolBean {
     }
 
     /**
-     * 获取所有标签数据
+     * Get all tag data
      *
      * @return
      */

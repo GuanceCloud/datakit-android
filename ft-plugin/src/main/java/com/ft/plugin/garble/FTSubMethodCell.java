@@ -8,25 +8,25 @@ package com.ft.plugin.garble;
  */
 public class FTSubMethodCell {
     /**
-     * 方法所属类
+     * Class to which the method belongs
      */
     public String className;
     /**
-     * 采集数据的方法名
+     * Method name for data collection
      */
     public String agentName;
     /**
-     * 采集数据的方法描述
+     * Method description for data collection
      */
     public String agentDesc;
 
     /**
-     * 类型
+     * Type
      */
     public FTMethodType type;
 
     /**
-     * 值
+     * Value
      */
     public int value;
 

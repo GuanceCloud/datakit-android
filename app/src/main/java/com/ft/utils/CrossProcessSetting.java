@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 /**
- *  Android Test 中子线程获取配置使用,{@link com.ft.service.TestService}
+ * Used in Android Test to get configuration in a sub-thread, {@link com.ft.service.TestService}
  */
 public class CrossProcessSetting {
     private static final String KEY_MAIN_PROCESS = "only_main_process";
@@ -15,7 +15,7 @@ public class CrossProcessSetting {
     }
 
     /**
-     * 获取 isOnlyMainProcess 设置状态
+     * Get isOnlyMainProcess setting status
      *
      * @param context
      * @return
@@ -26,7 +26,8 @@ public class CrossProcessSetting {
     }
 
     /**
-     * 设置 isOnlyMainProcess 状态
+     * Set isOnlyMainProcess status
+     *
      * @param context
      * @param isOnlyMainProcess
      */
@@ -36,7 +37,7 @@ public class CrossProcessSetting {
     }
 
     /**
-     * 清空 cross_process_setting 设置
+     * Clear cross_process_setting setting
      *
      * @param context
      */

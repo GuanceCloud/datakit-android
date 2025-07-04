@@ -3,31 +3,31 @@ package com.ft.sdk.garble.bean;
 /**
  * create: by huangDianHua
  * time: 2020/6/9 14:16:13
- * description: 日志状态等级
+ * description: Log status level
  */
 public enum Status {
     /**
-     * 提示
+     * Info
      */
     INFO("info"),
     /**
-     * 调试
+     * Debug
      */
     DEBUG("debug"),
 
     /**
-     * 警告
+     * Warning
      */
     WARNING("warning"),
     /**
-     * 错误
+     * Error
      */
     ERROR("error"),
     /**
-     * 严重
+     * Critical
      */
     CRITICAL("critical"),
-    OK("ok");//恢复
+    OK("ok");// Recovery
     public String name;
 
     Status(String name) {

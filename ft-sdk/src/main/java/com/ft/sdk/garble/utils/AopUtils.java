@@ -33,14 +33,14 @@ import com.ft.sdk.FTApplication;
 import java.lang.reflect.Method;
 
 /**
- * 本类借鉴修改了来自 <a href="https://github.com/sensorsdata/sa-sdk-android">Sensors Data 的项目</a>
- * 中的 AopUtil.java 类
+ * This class is adapted and modified from <a href="https://github.com/sensorsdata/sa-sdk-android">Sensors Data project</a>
+ * AopUtil.java class
  */
 public class AopUtils {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "AopUtils";
 
     /**
-     * 通过 View 的 ID 获取 View 上的字符串值
+     * Get the string value on the View by View's ID
      *
      * @param view
      * @return
@@ -58,7 +58,7 @@ public class AopUtils {
     }
 
     /**
-     * 通过 Context 获取当前的 Activity
+     * Get the current Activity from Context
      *
      * @param context
      * @return
@@ -86,7 +86,7 @@ public class AopUtils {
     }
 
     /**
-     * 返回当前类
+     * Return the current class
      *
      * @param object
      * @return
@@ -100,7 +100,7 @@ public class AopUtils {
 
 
     /**
-     * 返回当前类的名称
+     * Return the name of the current class
      *
      * @param object
      * @return
@@ -116,7 +116,7 @@ public class AopUtils {
     }
 
     /**
-     * 返回父类名称
+     * Return the name of the superclass
      *
      * @param object
      * @return
@@ -144,7 +144,7 @@ public class AopUtils {
     }
 
     /**
-     * 获取 View 视图树
+     * Get the View tree
      *
      * @param view
      * @return
@@ -164,7 +164,7 @@ public class AopUtils {
 
 
     /**
-     * 获取 MenuItem 描述  className/title#(Resource Entry Name)
+     * Get MenuItem description  className/title#(Resource Entry Name)
      *
      * @param item
      * @return
@@ -181,7 +181,7 @@ public class AopUtils {
     }
 
     /**
-     * 获取 View 描述 className/text#(Resource Entry Name)
+     * Get View description className/text#(Resource Entry Name)
      *
      * @param view
      * @return
@@ -207,7 +207,7 @@ public class AopUtils {
     }
 
     /**
-     * 获取 View 视图树
+     * Get the View tree
      *
      * @param view
      * @return
@@ -225,7 +225,7 @@ public class AopUtils {
     }
 
     /**
-     * 获取 Dialog 上点击按钮上的字符
+     * Get the character on the button clicked in Dialog
      *
      * @param dialog
      * @param whichButton

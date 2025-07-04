@@ -19,7 +19,7 @@ import java.util.HashMap;
 import okhttp3.Request;
 
 /**
- * 手动使用 RUM 例子
+ * Manual RUM usage example
  */
 public class ManualRUMActivity extends NameTitleActivity {
 
@@ -33,7 +33,7 @@ public class ManualRUMActivity extends NameTitleActivity {
         findViewById(R.id.manual_start_action_btn).setOnClickListener(v -> {
             HashMap<String, Object> property = new HashMap<>();
             property.put("sp_count", 1);
-            //开启自动获取，会与这里自定义 action 发生冲突，小于 100 ms 间隔的 action 会被屏蔽。如果频繁调用请使用 addAction
+            //Enable automatic acquisition, which will conflict with custom actions here, and actions with intervals less than 100ms will be blocked. If calling frequently, please use addAction
              FTRUMGlobalManager.get().startAction("Action Start", "Button_Click", property);
             for (int i = 0; i < 1000; i++) {
                 FTRUMGlobalManager.get().addAction("Add Action Start:" + (count++), "Button_Click", property);

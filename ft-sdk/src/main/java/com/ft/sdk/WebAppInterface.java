@@ -8,7 +8,7 @@ import com.ft.sdk.garble.utils.Utils;
 import java.util.Arrays;
 
 /**
- * web js 方法注册
+ * Web JS method registration
  *
  * @author Brandon
  */
@@ -34,9 +34,9 @@ public class WebAppInterface {
     }
 
     /**
-     * web view js 方法，用于无返回调用
+     * WebView JS method, used for calls without return value
      *
-     * @param string 方法名
+     * @param string Method name
      */
     @JavascriptInterface
     public void sendEvent(String string) {
@@ -44,9 +44,9 @@ public class WebAppInterface {
     }
 
     /**
-     * web view js 方法，用于需要返回类型的数据，
+     * WebView JS method, used for data that requires a return type
      *
-     * @param string 方法名
+     * @param string Method name
      */
     @JavascriptInterface
     public void sendEvent(String string, String callBackMethod) {
@@ -63,10 +63,10 @@ public class WebAppInterface {
     }
 
     /**
-     * web view js 方法， 用于方法注册回调，适用监听类型的场景
+     * WebView JS method, used for method registration callback, suitable for listener-type scenarios
      *
-     * @param string         方法名
-     * @param callbackMethod 毁掉
+     * @param string         Method name
+     * @param callbackMethod Callback method
      */
     @JavascriptInterface
     public void addEventListener(String string, String callbackMethod) {

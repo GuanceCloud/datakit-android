@@ -7,7 +7,7 @@ import android.webkit.WebView;
 import androidx.annotation.NonNull;
 
 /**
- * 用于 xml layout 自定义使用，plugin 织入效果查看
+ * For custom use in XML layout, plugin weaving effect viewing
  */
 public class CustomWebView extends WebView {
     public CustomWebView(Context context) {

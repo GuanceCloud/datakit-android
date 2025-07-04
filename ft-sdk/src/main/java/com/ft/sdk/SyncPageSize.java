@@ -1,21 +1,21 @@
 package com.ft.sdk;
 
 /**
- * 同步使用数据条目数，越小代表设备资源占用较小，但是相对网络 IO 会提升
- * 相反，设备资源占用越大，但是网络 IO 消耗会降低
+ * Number of data entries used for synchronization, smaller means less device resource usage, but relative network IO will increase
+ * Conversely, the larger the device resource usage, the lower the network IO consumption
  */
 public enum SyncPageSize {
 
     /**
-     * 5 条
+     * 5 entries
      */
     MINI(5),
     /**
-     * 10 条
+     * 10 entries
      */
     MEDIUM(10),
     /**
-     * 50 条，
+     * 50 entries
      */
     LARGE(50);
 

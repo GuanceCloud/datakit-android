@@ -17,8 +17,8 @@
 package com.ft.plugin.garble;
 
 /**
- * 本类借鉴修改了来自 Sensors Data 的项目 <a href="https://github.com/sensorsdata/sa-sdk-android-plugin2">sa-sdk-android-plugin2</a>
- * 中的 ClassNameAnalytics 类
+ * This class is adapted and modified from the Sensors Data project <a href="https://github.com/sensorsdata/sa-sdk-android-plugin2">sa-sdk-android-plugin2</a>
+ * ClassNameAnalytics class
  *
  * @author huangdianhua
  */

@@ -24,7 +24,7 @@ import org.junit.runner.RunWith;
 import java.util.HashMap;
 
 /**
- * 日志 globalContext 测试
+ * Log globalContext test
  *
  * @author Brandon
  */
@@ -52,7 +52,7 @@ public class LogGlobalContextTest extends FTBaseTest {
     }
 
     /**
-     * 日志输出过程中会把  globalContext 添加的数据一起输出
+     * During log output, the data added by globalContext will be output together
      */
     @Test
     public void logGlobalContextTest() throws InterruptedException {

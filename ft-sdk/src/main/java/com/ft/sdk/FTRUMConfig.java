@@ -9,12 +9,12 @@ import java.util.List;
 
 public class FTRUMConfig {
     /**
-     * 采样率，[0,1],作用域为同一 session_id 下所有 View，Action，LongTask，Error 数据
+     * Sampling rate, [0,1], scope is all View, Action, LongTask, Error data under the same session_id
      */
     private float samplingRate = 1;
 
     /**
-     * 错误采样率，[0,1] 作用域为同一 session_id 下所有 View，Action，LongTask，Error 数据
+     * Error sampling rate, [0,1], scope is all View, Action, LongTask, Error data under the same session_id
      */
     private float sessionErrorSampleRate = 0;
 
@@ -23,58 +23,57 @@ public class FTRUMConfig {
      */
     private String rumAppId = "";
     /**
-     * 设置是否需要采集崩溃日志
+     * Set whether to collect crash logs
      */
     private boolean enableTrackAppCrash;
     /**
-     * 设置是否检测 UI 卡顿
+     * Set whether to detect UI block
      */
     private boolean enableTrackAppUIBlock;
 
     /**
-     * 设置检测阻塞时间范围 [100，),单位 ms,默认 1000 ms
+     * Set the detection block time range [100, ), unit ms, default 1000 ms
      */
     private long blockDurationMS = FTUIBlockManager.DEFAULT_TIME_BLOCK_MS;
     /**
-     * 设置是否检测 ANR
+     * Set whether to detect ANR
      */
     private boolean enableTrackAppANR;
     /**
-     * 是否开启用户行为 action 追踪
+     * Whether to enable user action tracking
      */
     private boolean enableTraceUserAction;
     /**
-     * 是否开启用户行为 view 追踪
+     * Whether to enable user view tracking
      */
     private boolean enableTraceUserView;
 
     /**
-     * 是否开启用户行为 view 追踪 Fragment View 的采集
+     * Whether to enable user view tracking for Fragment View collection
      */
     private boolean enableTraceUserViewInFragment;
 
     /**
-     * 是否开启用户行为 Resource 追踪
+     * Whether to enable user Resource tracking
      */
     private boolean enableTraceUserResource;
 
-
     /**
-     * 开启 resource host ip 采集
+     * Enable resource host ip collection
      */
     private boolean enableResourceHostIP;
     /**
-     * 崩溃采集数据附加类型
+     * Crash collection data additional type
      */
     private int extraMonitorTypeWithError = ErrorMonitorType.NO_SET;
 
     /**
-     * 监控指标数据类型
+     * Monitoring metric data type
      */
     private int deviceMetricsMonitorType = DeviceMetricsMonitorType.NO_SET;
 
     /**
-     * 设备监测指标检测周期
+     * Device monitoring metric detection period
      */
     private DetectFrequency deviceMetricsDetectFrequency = DetectFrequency.DEFAULT;
 
@@ -99,28 +98,28 @@ public class FTRUMConfig {
     private FTResourceInterceptor.ContentHandlerHelper contentHandlerHelper;
 
     /**
-     * 设置全局 tag
+     * Set global tag
      */
     private final HashMap<String, Object> globalContext = new HashMap<>();
 
 
     /**
-     * 服务名称 {@link Constants#KEY_SERVICE },默认为 {@link Constants#DEFAULT_SERVICE_NAME}
+     * Service name {@link Constants#KEY_SERVICE }, default is {@link Constants#DEFAULT_SERVICE_NAME}
      */
     private String serviceName = Constants.DEFAULT_SERVICE_NAME;
 
     /**
-     * Java Crash 时 logcat 附属信息
+     * Java Crash logcat additional information
      */
     private ExtraLogCatSetting extraLogCatWithJavaCrash;
 
     /**
-     * Native Crash 时 logcat 附属信息
+     * Native Crash logcat additional information
      */
     private ExtraLogCatSetting extraLogCatWithNativeCrash;
 
     /**
-     * ANR  时 logcat 附属信息
+     * ANR logcat additional information
      */
     private ExtraLogCatSetting extraLogCatWithANR;
 
@@ -134,7 +133,7 @@ public class FTRUMConfig {
     private String[] allowWebViewHost;
 
     /**
-     * 配置是否开启通过 Android SDK 采集 WebView 数据
+     * Configure whether to enable WebView data collection via Android SDK
      * @param enableTraceWebView
      * @return
      */
@@ -144,7 +143,7 @@ public class FTRUMConfig {
     }
 
     /**
-     * 配置允许数据追踪的 WebView host 地址
+     * Configure allowed WebView host addresses for data tracking
      * @param allowWebViewHost
      * @return
      */
@@ -162,16 +161,16 @@ public class FTRUMConfig {
     }
 
     /**
-     * 获取采样率
+     * Get sampling rate
      *
-     * @return 采样率，浮点，0～1
+     * @return Sampling rate, float, 0~1
      */
     public float getSamplingRate() {
         return samplingRate;
     }
 
     /**
-     * 设置采集率，取值范围 [0,1]，0 表示不采集，1 表示全采集，默认值为 1。作用域为同一 session_id 下所有 View，Action，LongTask，Error 数据
+     * Set sampling rate, range [0,1], 0 means no collection, 1 means full collection, default is 1. Scope is all View, Action, LongTask, Error data under the same session_id
      *
      * @param samplingRate
      * @return
@@ -182,7 +181,7 @@ public class FTRUMConfig {
     }
 
     /**
-     * 获取错误采样率
+     * Get error sampling rate
      *
      * @return
      */
@@ -191,7 +190,7 @@ public class FTRUMConfig {
     }
 
     /**
-     * 设置错误采集率，当会话未被 `setSamplingRate` 采样时，若会话期间发生错误，可以采集到错误前 1 分钟范围的数据，取值范围 [0,1]，0 表示不采集，1 表示全采集，默认值为 0。作用域为同一 session_id 下所有 View，Action，LongTask，Error
+     * Set error sampling rate. When the session is not sampled by `setSamplingRate`, if an error occurs during the session, data within 1 minute before the error can be collected. Range [0,1], 0 means no collection, 1 means full collection, default is 0. Scope is all View, Action, LongTask, Error under the same session_id
      *
      * @param sessionErrorSampleRate
      */
@@ -201,7 +200,7 @@ public class FTRUMConfig {
     }
 
     /**
-     * 设置 serviceName
+     * Set serviceName
      *
      * @param serviceName
      */
@@ -210,7 +209,7 @@ public class FTRUMConfig {
     }
 
     /**
-     * 获取 serviceName
+     * Get serviceName
      *
      * @return
      */
@@ -219,9 +218,9 @@ public class FTRUMConfig {
     }
 
     /**
-     * 获取 RUM AppId
+     * Get RUM AppId
      *
-     * @return 返回 RUM AppId 字符
+     * @return Returns RUM AppId string
      */
     public String getRumAppId() {
         return rumAppId;
@@ -243,7 +242,7 @@ public class FTRUMConfig {
 
 
     /**
-     * 设置 RUM 限制数量 [10000,),默认是 100_000，{@link Constants#DEFAULT_DB_RUM_CACHE_NUM}
+     * Set RUM limit count [10000,), default is 100_000, {@link Constants#DEFAULT_DB_RUM_CACHE_NUM}
      *
      * @param rumCacheLimitCount
      * @return
@@ -260,7 +259,7 @@ public class FTRUMConfig {
     }
 
     /**
-     * 设置日志丢弃策略
+     * Set log discard strategy
      *
      * @param rumCacheDiscardStrategy
      * @return
@@ -271,7 +270,7 @@ public class FTRUMConfig {
     }
 
     /**
-     * 设置是否监测 App 崩溃
+     * Set whether to monitor App crash
      *
      * @param enableTrackAppCrash
      * @return
@@ -282,11 +281,11 @@ public class FTRUMConfig {
     }
 
     /**
-     * 设置是否监测 App 崩溃
+     * Set whether to monitor App crash
      *
-     * @param enableTrackAppCrash        是否开启 Crash 最总
-     * @param extraLogCatWithJavaCrash   Java Crash 附加配置 logcat
-     * @param extraLogCatWithNativeCrash Native Crash 附加配置 logcat
+     * @param enableTrackAppCrash        Whether to enable Crash
+     * @param extraLogCatWithJavaCrash   Java Crash additional logcat config
+     * @param extraLogCatWithNativeCrash Native Crash additional logcat config
      * @return
      */
     public FTRUMConfig setEnableTrackAppCrash(boolean enableTrackAppCrash,
@@ -303,7 +302,7 @@ public class FTRUMConfig {
     }
 
     /**
-     * 是否监测 App UI卡顿
+     * Whether to monitor App UI block
      *
      * @param enableTrackAppUIBlock
      * @return
@@ -314,10 +313,10 @@ public class FTRUMConfig {
     }
 
     /**
-     * 设置检测阻塞时间范围 [100，) 默认 1000 ms
+     * Set detection block time range [100, ) default 1000 ms
      *
      * @param enableTrackAppUIBlock
-     * @param blockDurationMs       单位 ms,默认 1000 ms
+     * @param blockDurationMs       unit ms, default 1000 ms
      * @return
      */
     public FTRUMConfig setEnableTrackAppUIBlock(boolean enableTrackAppUIBlock, long blockDurationMs) {
@@ -331,7 +330,7 @@ public class FTRUMConfig {
     }
 
     /**
-     * 是否开启 ANR 检测，默认为 false
+     * Whether to enable ANR detection, default is false
      *
      * @param enableTrackAppANR
      * @return
@@ -343,10 +342,10 @@ public class FTRUMConfig {
     }
 
     /**
-     * 是否开启 ANR 检测，默认为 false
+     * Whether to enable ANR detection, default is false
      *
      * @param enableTrackAppANR
-     * @param extraLogCatWithANR ANR Crash 附加配置 logcat
+     * @param extraLogCatWithANR ANR Crash additional logcat config
      * @return
      */
     public FTRUMConfig setEnableTrackAppANR(boolean enableTrackAppANR, ExtraLogCatSetting extraLogCatWithANR) {
@@ -360,7 +359,7 @@ public class FTRUMConfig {
     }
 
     /**
-     * 是否自动追踪用户操作，目前只支持用户启动和点击操作，默认为 `false`
+     * Whether to automatically track user actions, currently only supports user start and click actions, default is `false`
      *
      * @param enableTraceUserAction
      * @return
@@ -371,7 +370,7 @@ public class FTRUMConfig {
     }
 
     /**
-     * 是否监测用户 View 行为，页面跳转
+     * Whether to monitor user View behavior, page jump
      *
      * @param enableTraceUserView
      * @return
@@ -382,7 +381,7 @@ public class FTRUMConfig {
     }
 
     /**
-     * 是否监测用户 View 在 Fragment 的页面采集
+     * Whether to monitor user View collection in Fragment
      *
      * @param enableTraceUserViewInFragment
      * @return
@@ -405,7 +404,7 @@ public class FTRUMConfig {
     }
 
     /**
-     * 是否自动追动用户网络请求 ，仅支持 `Okhttp`，默认为 `false
+     * Whether to automatically track user network requests, only supports `Okhttp`, default is `false`
      *
      * @param enableTraceUserResource
      * @return
@@ -416,9 +415,9 @@ public class FTRUMConfig {
     }
 
     /**
-     * 是否采集请求目标域名地址的 IP。作用域：只影响 `EnableTraceUserResource`  为 true 的默认采集。
-     * 自定义 Resource 采集，需要使用 `FTResourceEventListener.FTFactory(true)` 来开启这个功能。
-     * 另外，单个 Okhttp 对相同域名存在 IP 缓存机制，相同 `OkhttpClient`，在连接服务端 IP 不发生变化的前提下，只会生成一次
+     * Whether to collect the IP address of the request target domain name. Scope: only affects the default collection when `EnableTraceUserResource` is true.
+     * For custom Resource collection, you need to use `FTResourceEventListener.FTFactory(true)` to enable this function.
+     * In addition, a single Okhttp has an IP cache mechanism for the same domain name. Under the premise that the connection to the server IP does not change, only one will be generated for the same `OkhttpClient`.
      *
      * @param enableTraceUserResource
      * @return
@@ -433,7 +432,7 @@ public class FTRUMConfig {
     }
 
     /**
-     * 使用 {@link #setDeviceMetricsMonitorType(int)} 替代
+     * Use {@link #setDeviceMetricsMonitorType(int)} instead
      * <p>
      * setExtraMonitorTypeWithError(ErrorMonitorType.ALL.getValue())
      *
@@ -467,7 +466,7 @@ public class FTRUMConfig {
 
 
     /**
-     * 支持或参数 battery | cpu | memory
+     * Support or parameter battery | cpu | memory
      * <p>
      * setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
      *
@@ -480,7 +479,7 @@ public class FTRUMConfig {
     }
 
     /**
-     * 使用 {@link #setDeviceMetricsMonitorType(int)} 替代
+     * Use {@link #setDeviceMetricsMonitorType(int)} instead
      *
      * @param deviceMetricsMonitorType
      * @return
@@ -498,7 +497,7 @@ public class FTRUMConfig {
     }
 
     /**
-     * 使用 {@link #setDeviceMetricsMonitorType(int, DetectFrequency)} 替代
+     * Use {@link #setDeviceMetricsMonitorType(int, DetectFrequency)} instead
      *
      * @param deviceMetricsMonitorType
      * @return
@@ -519,7 +518,7 @@ public class FTRUMConfig {
     }
 
     /**
-     * 设置 Url 过滤规则
+     * Set Url filter rule
      *
      * @param handler
      * @return
@@ -542,7 +541,7 @@ public class FTRUMConfig {
     }
 
     /**
-     * ASM 设置全局 Okhttp EventListener
+     * ASM sets global Okhttp EventListener
      *
      * @param okHttpResourceHandler
      * @return
@@ -554,7 +553,7 @@ public class FTRUMConfig {
 
 
     /**
-     * ASM 设置全局 {@link FTResourceInterceptor.ContentHandlerHelper } ，默认不设置
+     * ASM sets global {@link FTResourceInterceptor.ContentHandlerHelper }, not set by default
      *
      * @param contentHandlerHelper
      * @return

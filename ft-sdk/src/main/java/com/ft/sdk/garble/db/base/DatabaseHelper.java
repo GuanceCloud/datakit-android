@@ -11,7 +11,7 @@ import com.ft.sdk.garble.db.FTSQL;
 /**
  * BY huangDianHua
  * DATE:2019-12-02 10:19
- * Description:数据管理创建、升级
+ * Description: Data management creation and upgrade
  */
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static class DatabaseSingleton {
@@ -30,13 +30,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        //创建数据库
+        // Create database
         createTable(db);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        //升级数据库
+        // Upgrade database
         if (oldVersion == 1 && newVersion == 2) {
             update1to2(db);
         } else if (oldVersion < 3 && newVersion == 3) {
@@ -57,7 +57,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * 在应用创建时，创建 {@link FTSQL#FT_TABLE_SYNC_CREATE)},{@link FTSQL#FT_TABLE_VIEW_CREATE)},{@link FTSQL#FT_TABLE_ACTION_CREATE)}
+     * When the application is created, create {@link FTSQL#FT_TABLE_SYNC_CREATE)},{@link FTSQL#FT_TABLE_VIEW_CREATE)},{@link FTSQL#FT_TABLE_ACTION_CREATE)}
      *
      * @param db
      */
@@ -69,7 +69,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * 新增 {@link FTSQL#RUM_DATA_UPLOAD_TIME},{@link FTSQL#RUM_DATA_UPLOAD_TIME},{@link FTSQL#RUM_VIEW_UPDATE_TIME}
+     * Add new {@link FTSQL#RUM_DATA_UPLOAD_TIME},{@link FTSQL#RUM_DATA_UPLOAD_TIME},{@link FTSQL#RUM_VIEW_UPDATE_TIME}
      *
      * @param db
      */

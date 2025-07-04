@@ -14,74 +14,74 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 /**
- * 用户行为操作生命周指标，{@link Constants#FT_MEASUREMENT_RUM_ACTION}
+ * User behavior operation lifecycle metrics, {@link Constants#FT_MEASUREMENT_RUM_ACTION}
  */
 public class ActionBean {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "ActionBean";
     /**
-     * Action 唯一ID,{@link Constants#KEY_RUM_ACTION_ID}
+     * Action unique ID, {@link Constants#KEY_RUM_ACTION_ID}
      */
     String id = Utils.randomUUID();
     /**
-     * Action 开始时间
+     * Action start time
      */
     long startTime = Utils.getCurrentNanoTime();
 
     /**
-     * Action 名称，，{@link Constants#KEY_RUM_ACTION_NAME}
+     * Action name, {@link Constants#KEY_RUM_ACTION_NAME}
      */
     String actionName;
 
     /**
-     * Action 类型 ，{@link Constants#KEY_RUM_ACTION_TYPE}
+     * Action type, {@link Constants#KEY_RUM_ACTION_TYPE}
      */
     String actionType;
 
     /**
-     * longtask 捕获次数，{@link Constants#KEY_RUM_ACTION_LONG_TASK_COUNT}
+     * longtask capture count, {@link Constants#KEY_RUM_ACTION_LONG_TASK_COUNT}
      */
     int longTaskCount;
 
     /**
-     * resource 请求次数，{@link Constants#KEY_RUM_ACTION_RESOURCE_COUNT}
+     * resource request count, {@link Constants#KEY_RUM_ACTION_RESOURCE_COUNT}
      */
     int resourceCount;
     /**
-     * 错误次数， {@link Constants#KEY_RUM_ACTION_ERROR_COUNT}
+     * Error count, {@link Constants#KEY_RUM_ACTION_ERROR_COUNT}
      */
     int errorCount;
 
     /**
-     * 是否关闭
+     * Whether closed
      */
     boolean isClose = false;
 
     /**
-     * Action 持续时间
+     * Action duration
      */
     long duration = 0;
     /**
-     * 会话 ID，{@link FTRUMInnerManager#sessionId}
+     * Session ID, {@link FTRUMInnerManager#sessionId}
      */
     String sessionId;
 
     /**
-     * 页面 ID，{@link  ViewBean#id}
+     * Page ID, {@link  ViewBean#id}
      */
     String viewId;
 
     /**
-     * 页面名称 {@link  ViewBean#viewName}
+     * Page name {@link  ViewBean#viewName}
      */
     String viewName;
 
     /**
-     * 页面来源，页面的父级 {@link ViewBean#viewReferrer}
+     * Page source, page parent {@link ViewBean#viewReferrer}
      */
     String viewReferrer;
 
     /**
-     * Action 附加属性,{@link  Constants#KEY_RUM_PROPERTY}
+     * Action additional properties, {@link  Constants#KEY_RUM_PROPERTY}
      */
     HashMap<String, Object> property = new HashMap<>();
 
@@ -221,7 +221,7 @@ public class ActionBean {
     }
 
     /**
-     * 将 action 属性数据转化为 json 字符，在数据存入本地缓存时写入
+     * Convert action property data to JSON string, written when data is stored in local cache
      *
      * @return
      */
@@ -234,7 +234,7 @@ public class ActionBean {
     }
 
     /**
-     * json 数据重新序列化，在数据从本地缓存取出时调用
+     * JSON data re-serialization, called when data is retrieved from local cache
      *
      * @param jsonString
      */

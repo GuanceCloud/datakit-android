@@ -3,37 +3,37 @@ package com.ft.sdk.garble.utils;
 import java.lang.reflect.Field;
 
 /**
- * 根据编辑后 Runtime 类映射来判断，应用程序是否对一个库进行依赖
+ * Determine whether an application depends on a library based on the edited Runtime class mapping
  *
  * @author Brandon
  */
 public class PackageUtils {
     /**
-     * native SDK 依赖主类 package 路径
+     * native SDK dependency main class package path
      */
     private static final String PACKAGE_NATIVE_ENGINE_CLASS = "com.ft.sdk.nativelib.NativeEngineInit";
 
     /**
-     * Okhttp 主类 package 路径
+     * Okhttp main class package path
      */
     private static final String PACKAGE_OKHTTP3 = "okhttp3.OkHttpClient";
 
     /**
-     * Flutter Application package 路径
+     * Flutter Application package path
      */
     private static final String PACKAGE_FLUTTER = "io.flutter.app.FlutterApplication";
     /**
-     * React Native Application package 路径
+     * React Native Application package path
      */
     private static final String PACKAGE_REACT_NATIVE = "com.facebook.react.ReactApplication";
 
     /**
-     * alibaba taobao SophixApplication package 路径
+     * alibaba taobao SophixApplication package path
      */
     private static final String PACKAGE_SOPHIX = "com.taobao.sophix.SophixApplication";
 
     /**
-     * 是否使用 NDK 库
+     * Whether to use NDK library
      *
      * @return
      */
@@ -47,7 +47,7 @@ public class PackageUtils {
     }
 
     /**
-     * 获取 native library 库的版本👌
+     * Get native library version👌
      *
      * @return
      */
@@ -68,7 +68,7 @@ public class PackageUtils {
     }
 
     /**
-     * 是否依赖 okhttp3
+     * Whether to depend on okhttp3
      *
      * @return
      */
@@ -83,7 +83,7 @@ public class PackageUtils {
     }
 
     /**
-     * 获取 SophixApplication 的 class
+     * Get SophixApplication class
      *
      * @return
      */
@@ -96,7 +96,7 @@ public class PackageUtils {
     }
 
     /**
-     * 判断是否是第三方框架数据接入
+     * Determine if it's third-party framework data integration
      *
      * @return
      */
@@ -116,7 +116,7 @@ public class PackageUtils {
     }
 
     /**
-     * {"agent":"x.x.x", "native":"x.x.x", "track":"x.x.x"} 固定这种格式里添加
+     * {"agent":"x.x.x", "native":"x.x.x", "track":"x.x.x"} Add in this fixed format
      *
      * @param json
      * @param key
@@ -125,13 +125,13 @@ public class PackageUtils {
      */
     public static String appendPackageVersion(String json, String key, String value) {
         if (json.startsWith("{")) {
-            // 在第一个 `{` 后面插入新的键值对
+            // Insert new key-value pair after the first `{`
             return json.substring(0, 1) +
                     "\"" + key + "\":\"" + value + "\", " +
                     json.substring(1);
         }
 
-        // 如果不是 JSON 格式，直接返回原字符串
+        // If not JSON format, return original string directly
         return json;
 
     }

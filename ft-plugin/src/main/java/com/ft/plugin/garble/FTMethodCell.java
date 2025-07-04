@@ -20,40 +20,40 @@ package com.ft.plugin.garble;
 import java.util.List;
 
 /**
- * 本类借鉴修改了来自 Sensors Data 的项目 <a href="https://github.com/sensorsdata/sa-sdk-android-plugin2">sa-sdk-android-plugin2</a>
- * 中的 SensorsAnalyticsMethodCell.groovy 类
+ * This class is modified based on the Sensors Data project <a href="https://github.com/sensorsdata/sa-sdk-android-plugin2">sa-sdk-android-plugin2</a>
+ * SensorsAnalyticsMethodCell.groovy class
  */
 public class FTMethodCell {
     /**
-     * 原方法名
+     * Original method name
      */
     public String name;
     /**
-     * 原方法描述
+     * Original method description
      */
     public String desc;
     /**
-     * 方法所在的接口或类
+     * Interface or class where the method is located
      */
     public String parent;
     /**
-     * 采集数据的方法名
+     * Method name for data collection
      */
     public String agentName;
     /**
-     * 采集数据的方法描述
+     * Method description for data collection
      */
     public String agentDesc;
     /**
-     * 采集数据的方法参数起始索引（ 0：this，1+：普通参数 ）
+     * Starting index of data collection method parameters (0: this, 1+: normal parameters)
      */
     public int paramsStart;
     /**
-     * 采集数据的方法参数个数
+     * Number of data collection method parameters
      */
     public int paramsCount;
     /**
-     * 参数类型对应的ASM指令，加载不同类型的参数需要不同的指令
+     * ASM instructions corresponding to parameter types, different instructions are needed to load different types of parameters
      */
     public List<Integer> opcodes;
 
@@ -66,7 +66,7 @@ public class FTMethodCell {
     }
 
     /**
-     * 当知道被插桩的类时用该方法
+     * Use this method when the class to be instrumented is known
      * @param name
      * @param desc
      * @param agentName
@@ -82,7 +82,7 @@ public class FTMethodCell {
     }
 
     /**
-     * 当知道不知道被插桩的类时用该方法
+     * Use this method when the class to be instrumented is not known
      * @param name
      * @param desc
      * @param agentName
@@ -100,7 +100,7 @@ public class FTMethodCell {
 
 
     /**
-     * 当插桩的函数参数和被插桩的函数参数一致时用该构造函数
+     * Use this constructor when the instrumented function parameters match the parameters of the function to be instrumented
      * @param name
      * @param desc
      * @param parent

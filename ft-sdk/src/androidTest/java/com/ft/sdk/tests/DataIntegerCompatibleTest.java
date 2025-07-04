@@ -19,7 +19,7 @@ import org.junit.Test;
 import java.util.HashMap;
 
 /**
- * 检验 {@link com.ft.sdk.FTSDKConfig#enableDataIntegerCompatible()} 开启关闭的效果
+ * Test the effect of enabling/disabling {@link com.ft.sdk.FTSDKConfig#enableDataIntegerCompatible()}
  */
 public class DataIntegerCompatibleTest extends FTBaseTest {
 
@@ -33,7 +33,7 @@ public class DataIntegerCompatibleTest extends FTBaseTest {
     }
 
     /**
-     * 默认，预期 int 类型，展示为 1i
+     * Default, expected int type, displayed as 1i
      * @throws InterruptedException
      */
 
@@ -50,7 +50,7 @@ public class DataIntegerCompatibleTest extends FTBaseTest {
     }
 
     /**
-     * 开启后 int 类型展示为
+     * After enabling, int type is displayed as
      * @throws InterruptedException
      */
     @Test

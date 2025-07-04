@@ -24,7 +24,7 @@ import org.junit.runner.RunWith;
 import java.util.HashMap;
 
 /**
- * RUM globalContext 参数检测
+ * RUM globalContext parameter detection
  *
  * @author Brandon
  */
@@ -43,7 +43,7 @@ public class RUMGlobalContextTest extends FTBaseTest {
 
         FTSDKConfig ftSDKConfig = FTSDKConfig
                 .builder(TEST_FAKE_URL)
-                .setDebug(true)//设置是否是 debug
+                .setDebug(true)//Set whether it is debug
                 .setEnv(EnvType.GRAY);
         FTSdk.install(ftSDKConfig);
 
@@ -61,7 +61,7 @@ public class RUMGlobalContextTest extends FTBaseTest {
     }
 
     /**
-     * 生成 View 数据时，会把  globalContext 添加的数据一起输出
+     * When generating View data, the data added by globalContext will be output together
      *
      * @throws Exception
      */

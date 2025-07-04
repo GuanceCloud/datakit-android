@@ -25,7 +25,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * 启动 Action 数据校验
+ * Launch Action data validation
  */
 @RunWith(AndroidJUnit4.class)
 public class RUMLaunchActionTest extends BaseTest {
@@ -45,7 +45,7 @@ public class RUMLaunchActionTest extends BaseTest {
 
         FTSDKConfig ftSDKConfig = FTSDKConfig
                 .builder(BuildConfig.DATAKIT_URL)
-                .setDebug(true)//设置是否是 debug
+                .setDebug(true)//Set whether it is debug
                 .setEnv(EnvType.GRAY);
         FTSdk.install(ftSDKConfig);
 
@@ -55,18 +55,18 @@ public class RUMLaunchActionTest extends BaseTest {
                 .setEnableTrackAppUIBlock(true)
                 .setEnableTraceUserAction(true)
         );
-        //plugin 1.2.0 以上版本，需要手动调用
+        //Plugin 1.2.0 and above versions require manual calling
         FTAutoTrack.startApp(null);
     }
 
 
     /**
-     * 验证应用启动后，是否正常生成 Action 数据
+     * Verify whether Action data is normally generated after application launch
      * @throws Exception
      */
     @Test
     public void rumActionLaunchTest() throws Exception {
-        //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
+        //Because data insertion is an asynchronous operation, an interval needs to be set to be able to query the data
         invokeGenerateRumData();
         Thread.sleep(2000);
 

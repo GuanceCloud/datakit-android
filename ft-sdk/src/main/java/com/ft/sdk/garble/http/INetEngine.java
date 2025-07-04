@@ -3,26 +3,26 @@ package com.ft.sdk.garble.http;
 /**
  * create: by huangDianHua
  * time: 2020/4/21 15:44:27
- * description: 网络请求引擎，目的是为了支持不同网络请求框架设定的，目前支持 Android {@link java.net.HttpURLConnection}
- * 和 {@link OkHttpEngine} 两种
+ * description: Network request engine, the purpose is to support different network request frameworks, currently supports Android {@link java.net.HttpURLConnection}
+ * and {@link OkHttpEngine} two
  */
 public interface INetEngine {
     /**
-     * 请求默认配置
+     * Request default configuration
      *
      * @param httpBuilder
      */
     void defaultConfig(HttpBuilder httpBuilder);
 
     /**
-     * 建立同步网络请求
+     * Establish synchronous network request
      *
      * @param httpBuilder
      */
     void createRequest(HttpBuilder httpBuilder);
 
     /**
-     * 执行请求
+     * Execute request
      *
      * @return
      */

@@ -13,7 +13,7 @@ import java.util.HashMap;
 /**
  * author: huangDianHua
  * time: 2020/9/16 11:34:48
- * description: trace 数据处理
+ * description: trace data processing
  */
 public class FTTraceHandler extends FTTraceInterceptor.TraceRUMLinkable {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "FTTraceHandler";
@@ -32,11 +32,11 @@ public class FTTraceHandler extends FTTraceInterceptor.TraceRUMLinkable {
     public static final String DD_TRACE_SAMPLING_PRIORITY_KEY = "x-datadog-sampling-priority";
     public static final String DD_TRACE_ORIGIN_KEY = "x-datadog-origin";
     /**
-     * 是否可以采样
+     * Whether sampling is possible
      */
     private final boolean enableTrace;
     /**
-     * 请求开始时间
+     * Request start time
      */
     private final long requestTime = Utils.getCurrentNanoTime();
     private String traceID = "";
@@ -79,14 +79,14 @@ public class FTTraceHandler extends FTTraceInterceptor.TraceRUMLinkable {
         if (config == null) return new HashMap<>();
         HashMap<String, String> headers = new HashMap<>();
         String sampled;
-        //抓取数据内容
+        //Capture data content
         if (enableTrace) {
             sampled = "1";
         } else {
             sampled = "0";
         }
 
-        //在数据中添加标记
+        //Add markers to the data
         if (config.getTraceType() == TraceType.ZIPKIN_MULTI_HEADER
                 || config.getTraceType() == TraceType.ZIPKIN_SINGLE_HEADER
                 || config.getTraceType() == TraceType.JAEGER || config.getTraceType() == TraceType.TRACEPARENT) {
@@ -137,7 +137,7 @@ public class FTTraceHandler extends FTTraceInterceptor.TraceRUMLinkable {
 //        if (!enableTrace) {
 //            return;
 //        }
-//        //请求结束时间
+//        //Request end time
 //        long responseTime = Utils.getCurrentNanoTime();
 //        long duration = (responseTime - requestTime) / 1000;
 //

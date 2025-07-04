@@ -21,7 +21,7 @@ import com.ft.sdk.garble.utils.NetUtils;
 /**
  * BY huangDianHua
  * DATE:2020-01-19 17:35
- * Description: 监听网络连接状态
+ * Description: Listen for network connection status
  */
 class FTNetworkListener extends ConnectivityManager.NetworkCallback {
     private final static String TAG = Constants.LOG_TAG_PREFIX + "FTNetworkListener";
@@ -43,7 +43,7 @@ class FTNetworkListener extends ConnectivityManager.NetworkCallback {
     }
 
     /**
-     * 配置初始化网络类型监控对象
+     * Configure and initialize network type monitoring object
      */
     void monitor() {
         if (application == null) {
@@ -59,22 +59,22 @@ class FTNetworkListener extends ConnectivityManager.NetworkCallback {
     }
 
     /**
-     * 初始化网络状态监听
+     * Initialize network status monitoring
      */
     private void initMonitor() {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                //SDK 版本大于 26 时通过registerDefaultNetworkCallback 注册网络状态变化回调
+                //For SDK version greater than 26, register network status change callback via registerDefaultNetworkCallback
                 connectivityManager.registerDefaultNetworkCallback(this);
                 fetchNetworkStateBean(connectivityManager);
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                //SDK 版本大于 21 小于 26 时通过 registerNetworkCallback 注册网络状态变化回调
+                //For SDK version greater than 21 and less than 26, register network status change callback via registerNetworkCallback
                 NetworkRequest.Builder builder = new NetworkRequest.Builder();
                 NetworkRequest request = builder.build();
                 connectivityManager.registerNetworkCallback(request, this);
                 fetchNetworkStateBean(connectivityManager);
             } else {
-                //SDK 版本小于 21 时，通过广播来获得网络状态变化
+                //For SDK version less than 21, obtain network status changes via broadcast
                 IntentFilter intentFilter = new IntentFilter();
                 intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
                 application.registerReceiver(networkReceiver, intentFilter);
@@ -113,7 +113,7 @@ class FTNetworkListener extends ConnectivityManager.NetworkCallback {
     }
 
     /**
-     * 网络变化广播接受类
+     * Network change broadcast receiver class
      */
     class FTNetworkReceiver extends BroadcastReceiver {
 
@@ -127,7 +127,7 @@ class FTNetworkListener extends ConnectivityManager.NetworkCallback {
     }
 
     /**
-     * 判断网络是否可用
+     * Determine whether the network is available
      */
     private void judgeNetState() {
 
@@ -138,20 +138,20 @@ class FTNetworkListener extends ConnectivityManager.NetworkCallback {
             return;
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            //SDK 版本大于 26 时通过registerDefaultNetworkCallback 注册网络状态变化回调
+            //For SDK version greater than 26, register network status change callback via registerDefaultNetworkCallback
             connectivityManager.unregisterNetworkCallback(this);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            //SDK 版本大于 21 小于 26 时通过 registerNetworkCallback 注册网络状态变化回调
+            //For SDK version greater than 21 and less than 26, register network status change callback via registerNetworkCallback
             connectivityManager.unregisterNetworkCallback(this);
         } else {
-            //SDK 版本小于 21 时，通过广播来获得网络状态变化
+            //For SDK version less than 21, obtain network status changes via broadcast
             //no use
             application.unregisterReceiver(networkReceiver);
         }
     }
 
     /**
-     * 释放对象，{@link FTSdk#shutDown()} 时使用
+     * Release object, used when {@link FTSdk#shutDown()}
      */
     static void release() {
         if (instance != null) {

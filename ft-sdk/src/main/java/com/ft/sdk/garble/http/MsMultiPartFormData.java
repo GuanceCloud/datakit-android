@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 表单提交
+ * Form submission
  */
 public class MsMultiPartFormData {
     private final String boundary;
@@ -23,7 +23,7 @@ public class MsMultiPartFormData {
     private final PrintWriter writer;
 
     /**
-     * multipart/form-data 表单请求，构造h
+     * multipart/form-data form request, construct http request
      *
      * @throws java.io.IOException
      */
@@ -46,10 +46,10 @@ public class MsMultiPartFormData {
     }
 
     /**
-     * 添加 Field
+     * Add Field
      *
-     * @param name  field 参数名
-     * @param value field 参数数值
+     * @param name  field parameter name
+     * @param value field parameter value
      */
     public void addFormField(String name, String value) {
         writer.append("--" + boundary).append(LINE_FEED);
@@ -64,9 +64,9 @@ public class MsMultiPartFormData {
 
 
     /**
-     * 添加表单文件
+     * Add form file
      *
-     * @param fieldName 等同于 <input type="file" name="..." />
+     * @param fieldName Equivalent to <input type="file" name="..." />
      * @throws java.io.IOException
      */
     public void addFilePart(String fieldName, InputStream inputStream, String fileName)
@@ -95,10 +95,10 @@ public class MsMultiPartFormData {
     }
 
     /**
-     * 添加表单头参数
+     * Add form header parameter
      *
-     * @param name  头参数名
-     * @param value 头参数值
+     * @param name  header parameter name
+     * @param value header parameter value
      */
     public void addHeaderField(String name, String value) {
         writer.append(name + ": " + value).append(LINE_FEED);
@@ -106,9 +106,9 @@ public class MsMultiPartFormData {
     }
 
     /**
-     * 返回表单提交 Response
+     * Return form submission Response
      *
-     * @return 成功返回 200，错误返回错误内容
+     * @return Success returns 200, error returns error content
      * @throws java.io.IOException
      */
     public void finish() {

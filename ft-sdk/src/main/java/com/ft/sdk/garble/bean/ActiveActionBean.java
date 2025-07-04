@@ -3,24 +3,24 @@ package com.ft.sdk.garble.bean;
 import com.ft.sdk.garble.utils.Utils;
 
 /**
- * 当前激活 {@link ActionBean}
+ * Currently active {@link ActionBean}
  * <p>
- * 一个应用同一时间只会存在一个 ActiveActionBean
+ * Only one ActiveActionBean will exist in an application at the same time
  *
  * @author Brandon
  */
 public class ActiveActionBean extends ActionBean {
     /**
-     * 等待超时时间
+     * Wait timeout
      */
     public static final long ACTION_NEED_WAIT_TIME_OUT = 5000000000L;
     /**
-     * Action 行为超时时间
+     * Action behavior timeout
      */
     public static final long ACTION_NORMAL_TIME_OUT = 100000000L;
 
     /**
-     * 是否需要等待关闭
+     * Whether to wait for closure
      *
      * @return
      */
@@ -47,7 +47,7 @@ public class ActiveActionBean extends ActionBean {
     }
 
     /**
-     * 关闭激活状态
+     * Close active state
      */
     public void close() {
         this.isClose = true;
@@ -62,7 +62,7 @@ public class ActiveActionBean extends ActionBean {
     }
 
     /**
-     * 转化为 {@link ActionBean }
+     * Convert to {@link ActionBean }
      *
      * @return
      */

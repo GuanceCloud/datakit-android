@@ -6,13 +6,13 @@ import android.util.Printer;
 import com.ft.sdk.garble.utils.Utils;
 
 /**
- * 用于检测界面卡顿
+ * Used to detect UI blocking
  *
  * @author Brandon
  */
 public class FTUIBlockManager {
     /**
-     * 超过1秒显示卡顿
+     * Show blocking when exceeding 1 second
      */
     public static final long DEFAULT_TIME_BLOCK_MS = 1000L;
     private static final long MINI_TIME_BLOCK_NS = 100000000L;
@@ -53,7 +53,7 @@ public class FTUIBlockManager {
     private String method;
 
     /**
-     * 启动初始化
+     * Start initialization
      *
      * @param config
      */
@@ -67,7 +67,7 @@ public class FTUIBlockManager {
     }
 
     /**
-     * 释放 MessageLogging
+     * Release MessageLogging
      */
     public void release() {
         Looper.getMainLooper().setMessageLogging(null);

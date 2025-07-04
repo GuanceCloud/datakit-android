@@ -5,32 +5,32 @@ import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 /**
- * 启动计时
+ * Startup timing
  *
- * <a href="https://docs.guance.com/real-user-monitoring/explorer/">查看器</a>
+ * <a href="https://docs.guance.com/real-user-monitoring/explorer/">Explorer</a>
  * <p>
- * {@link Constants#MEASUREMENT} 为 {@link Constants#FT_MEASUREMENT_RUM_ACTION}
- * {@link Constants#KEY_RUM_ACTION_TYPE} 为 {@link  Constants#ACTION_NAME_LAUNCH_COLD,
+ * {@link Constants#MEASUREMENT} is {@link Constants#FT_MEASUREMENT_RUM_ACTION}
+ * {@link Constants#KEY_RUM_ACTION_TYPE} is {@link  Constants#ACTION_NAME_LAUNCH_COLD,
  * Constants#ACTION_TYPE_LAUNCH_HOT}
  * <p>
- * 生命周期概念参考内容官方文档
- * <a href="https://developer.android.com/topic/performance/vitals/launch-time?hl=zh-cn">启动时间</a>
+ * For the concept of lifecycle, refer to the official documentation
+ * <a href="https://developer.android.com/topic/performance/vitals/launch-time?hl=zh-cn">Launch Time</a>
  *
  * <p>
- * 冷启动，对应 {@link Constants#ACTION_NAME_LAUNCH_COLD}
- * 温启动，热启动，对应{@link Constants#ACTION_TYPE_LAUNCH_HOT}
+ * Cold start, corresponds to {@link Constants#ACTION_NAME_LAUNCH_COLD}
+ * Warm start, hot start, corresponds to {@link Constants#ACTION_TYPE_LAUNCH_HOT}
  *
  * @author Brandon
  */
 class FTAppStartCounter {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "AppStartCounter";
     /**
-     * 启动耗时，单位纳秒
+     * Startup duration, unit: nanoseconds
      */
     private long coldStartDuration = 0;
 
     /**
-     * 启动开始时间点，单位纳秒
+     * Startup start timestamp, unit: nanoseconds
      */
     private long coldStartTimeLine = 0;
 
@@ -48,7 +48,7 @@ class FTAppStartCounter {
 
 
     /**
-     * 记录冷启动时间段
+     * Record cold start duration
      * * {@link Constants#KEY_RUM_ACTION_TYPE} = {@link  Constants#ACTION_TYPE_LAUNCH_COLD}
      *
      * @param coldStartEndTimeLine
@@ -61,7 +61,7 @@ class FTAppStartCounter {
     }
 
     /**
-     * 上传冷启动时间
+     * Upload cold start time
      */
     void coldStartUpload() {
         if (coldStartDuration <= 0 || coldStartTimeLine <= 0) return;
@@ -70,11 +70,11 @@ class FTAppStartCounter {
     }
 
     /**
-     * 上传热启动时间
+     * Upload hot start time
      * <p>
      * {@link Constants#KEY_RUM_ACTION_TYPE} = {@link  Constants#ACTION_TYPE_LAUNCH_HOT}
      *
-     * @param hotStartDuration 热启动时间段，单位纳秒
+     * @param hotStartDuration Hot start duration, unit: nanoseconds
      */
     void hotStart(long hotStartDuration, long startTime) {
         FTAutoTrack.putRUMLaunchPerformance(false, hotStartDuration, startTime);
@@ -83,8 +83,8 @@ class FTAppStartCounter {
 
 
     /**
-     * 检测重传，应用于生命周期，早于 SDK {@link FTSdk#install(FTSDKConfig)}的情况，一般用于第三方框架使用 ，
-     * 例如 flutter SDK，ReactNative SDK
+     * Check for retransmission, applied to lifecycle, in cases earlier than SDK {@link FTSdk#install(FTSDKConfig)}, generally used for third-party frameworks,
+     * such as flutter SDK, ReactNative SDK
      */
     void checkToReUpload() {
         if (coldStartDuration > 0) {

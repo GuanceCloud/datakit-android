@@ -35,102 +35,97 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * BY huangDianHua
  * DATE:2019-12-05 20:41
- * Description:数据同步管理，将数据存储
+ * Description: Data synchronization management, stores data
  */
 public class SyncTaskManager {
     public final static String TAG = Constants.LOG_TAG_PREFIX + "SyncTaskManager";
     public final static int pid = android.os.Process.myPid();
 
     /**
-     * 最大容忍错误次数
+     * Maximum tolerated error count
      */
     public static final int MAX_ERROR_COUNT = 5;
 
     /**
-     * 最大同步休眠时间，ms
+     * Maximum sync sleep time, ms
      */
     public static final int SYNC_SLEEP_MAX_TIME_MS = 5000;
 
-
     /**
-     * 最小同步休眠时间
+     * Minimum sync sleep time
      */
     public static final int SYNC_SLEEP_MINI_TIME_MS = 0;
 
-
     /**
-     * 传输间歇休眠时间
+     * Transmission interval sleep time
      */
     private static final int SLEEP_TIME = 10000;
 
     /**
-     * 数据迁移一页面数量
+     * Number of data items per page for migration
      */
     private static final int OLD_CACHE_TRANSFORM_PAGE_SIZE = 100;
 
-
     /**
-     * 重试等待时间
+     * Retry wait time
      */
     private static final int RETRY_DELAY_SLEEP_TIME = 500;
     /**
-     * 统计一个周期内错误的次
+     * Count the number of errors in a cycle
      */
     private final AtomicInteger errorCount = new AtomicInteger(0);
 
-
     /**
-     * RUM 数据同步包 id 标记
+     * RUM data sync package id tag
      */
     private final ID36Generator rumGenerator = new ID36Generator();
     /**
-     * log 数据同步包 id 标记
+     * log data sync package id tag
      */
     private final ID36Generator logGenerator = new ID36Generator();
 
-
     /**
-     * 是否正在在旧数据迁移
+     * Whether old data is being migrated
      */
     private boolean isOldCaching;
 
     /**
-     * 是否停止
+     * Whether to stop
      */
     private boolean isStop = false;
 
     /**
-     * 最大错误尝试次数，超出之后，队列数据将停止，等待下次同步触发
+     * Maximum error retry count. After exceeding, queue data will stop and wait for the next sync trigger
      */
     private int dataSyncMaxRetryCount;
 
     /**
-     * 是否进行自动同步
+     * Whether to perform automatic synchronization
      */
     private boolean autoSync;
 
     /**
-     * 同步请求间歇时间
+     * Synchronization request interval time
      */
     private int syncSleepTime;
 
     /**
-     * 同步请求条目数量
+     * Synchronization request item count
      */
     private int pageSize = SyncPageSize.MEDIUM.getValue();
 
     /**
-     * 旧数据迁移
+     * Old data migration
      */
     private Runnable oldCacheRunner;
 
     /**
-     * 发生错误的时间
+     * Time of error occurrence
      */
     private long errorTimeLine = -1;
 
     /**
-     * 设置错误发生时间
+     * Set error occurrence time
      *
      * @param errorTimeLine
      */
@@ -145,7 +140,7 @@ public class SyncTaskManager {
     }
 
     /**
-     * 缓存错误发生时间
+     * Cache error occurrence time
      *
      * @param errorTimeLine
      */
@@ -155,7 +150,7 @@ public class SyncTaskManager {
     }
 
     /**
-     * 从缓存中获取错误发生时间
+     * Get error occurrence time from cache
      *
      * @return
      */
@@ -165,7 +160,7 @@ public class SyncTaskManager {
     }
 
     /**
-     * 同步数据类型
+     * Synchronization data type
      */
     private final static DataType[] SYNC_MAP = new DataType[]
             {
@@ -174,7 +169,7 @@ public class SyncTaskManager {
                     DataType.RUM_WEBVIEW
             };
     /**
-     * 错误采样同步类型
+     * Error sampled synchronization type
      */
     private final static DataType[] ERROR_SAMPLED_SYNC_MAP = new DataType[]
             {
@@ -183,7 +178,7 @@ public class SyncTaskManager {
             };
 
     /**
-     * 注意 ：AndroidTest 会调用这个方法
+     * Note: AndroidTest will call this method
      * {@link com.ft.test.base.FTBaseTest#stopSyncTask() }
      * {@link com.ft.test.base.FTBaseTest#resumeSyncTask() }
      *
@@ -207,25 +202,25 @@ public class SyncTaskManager {
 
 
     /**
-     * 执行数据同步
+     * Execute data synchronization
      * <p>
-     * 注意 ：AndroidTest 会调用这个方法 {@link com.ft.test.base.FTBaseTest#executeSyncTask()}
+     * Note: AndroidTest will call this method {@link com.ft.test.base.FTBaseTest#executeSyncTask()}
      */
     void executePoll() {
         executePoll(false);
     }
 
     /**
-     * 执行数据同步
+     * Execute data synchronization
      *
-     * @param withSleep 是否进行睡眠，{@link #SLEEP_TIME}
+     * @param withSleep Whether to sleep, {@link #SLEEP_TIME}
      */
     private void executePoll(final boolean withSleep) {
         DataUploadThreadPool.get().schedule(withSleep ? SLEEP_TIME : 0);
     }
 
     /**
-     * 触发延迟轮询同步
+     * Trigger delayed polling synchronization
      */
     void executeSyncPoll() {
         if (autoSync) {
@@ -234,13 +229,13 @@ public class SyncTaskManager {
     }
 
     /**
-     * 过期时间
+     * Expiration time
      */
     public static final long ONE_MINUTE_DURATION_NS = 60_000_000_000L;
 
 
     /**
-     * 消费错误采样的缓存数据
+     * Consume cached data of error sampling
      *
      * @param dataType
      */
@@ -261,7 +256,7 @@ public class SyncTaskManager {
     }
 
     /**
-     * 执行存储数据同步操作
+     * Execute storage data synchronization operation
      */
     private synchronized void handleSyncOpt(final DataType dataType) throws
             FTNetworkNoAvailableException, FTRetryLimitException {
@@ -334,7 +329,7 @@ public class SyncTaskManager {
             requestDataList.clear();
 
             if (errorCount.get() == 0) {
-                //当前缓存数据已获取完毕，等待下一次数据触发
+                //Current cache data has been obtained, waiting for next data trigger
                 if (cacheDataList.size() < pageSize) {
                     break;
                 }
@@ -356,17 +351,17 @@ public class SyncTaskManager {
     }
 
     /**
-     * 查询对应数数据类型的数据
+     * Query corresponding data type data
      *
-     * @param dataType 数据类型
-     * @return 同步数据
+     * @param dataType Data type
+     * @return Synchronized data
      */
     private List<SyncData> queryFromData(DataType dataType) {
         return FTDBManager.get().queryDataByDataByTypeLimit(pageSize, dataType);
     }
 
     /**
-     * 删除已经上传的数据
+     * Delete already uploaded data
      *
      * @param list
      */
@@ -375,7 +370,7 @@ public class SyncTaskManager {
     }
 
     /**
-     * 删除已经上传的数据
+     * Delete already uploaded data
      *
      * @param list
      */
@@ -388,27 +383,27 @@ public class SyncTaskManager {
     }
 
     /**
-     * 重新插入数据，并更改 uuid
+     * Reinsert data and change uuid
      *
      * @param list
      */
     private void reInsertData(List<SyncData> list) {
-        //删掉原先的数据
+        //Delete the original data
         deleteLastQuery(list);
 
-        //重新插入数据，
+        //Reinsert data,
         FTDBManager.get().insertFtOptList(list, true);
     }
 
     /**
-     * 上传数据
+     * Upload data
      * <p>
-     * 注意 ：AndroidTest 会调用这个方法 {@link com.ft.test.base.FTBaseTest#uploadData(DataType)}
+     * Note: AndroidTest will call this method {@link com.ft.test.base.FTBaseTest#uploadData(DataType)}
      *
-     * @param dataType     数据类型
-     * @param body         数据行协议结果
-     * @param pkgId        链路包 id
-     * @param syncCallback 异步对象
+     * @param dataType      Data type
+     * @param body          Data line protocol result
+     * @param pkgId         Chain package id
+     * @param syncCallback  Asynchronous object
      */
     private synchronized void requestNet(DataType dataType, String pkgId, String body,
                                          final RequestCallback syncCallback) throws FTNetworkNoAvailableException {
@@ -448,7 +443,7 @@ public class SyncTaskManager {
     }
 
     /**
-     * 旧数据迁移，1.5.0 版本以下的数据需要迁移
+     * Old data migration, data needs to be migrated for versions below 1.5.0
      */
     void oldDBDataTransform() {
         if (isOldCaching) return;
@@ -457,7 +452,7 @@ public class SyncTaskManager {
 
         if (needTransform) {
             LogUtils.d(TAG, "==> old cache need transform");
-            isOldCaching = true;//不需要结束，一次出错等待下次启动
+            isOldCaching = true;//No need to end, waiting for next start after one error
 
             DataProcessThreadPool.get().execute(new Runnable() {
                 @Override
@@ -473,13 +468,13 @@ public class SyncTaskManager {
                             while (it.hasNext()) {
                                 SyncData data = it.next();
                                 try {
-                                    String oldFormatData = data.getDataString();//获取旧格式数据
+                                    String oldFormatData = data.getDataString();//Get old format data
                                     String uuid = Utils.getGUID_16();
-                                    data.setUuid(uuid);//旧数据中没有 uuid
+                                    data.setUuid(uuid);//Old data does not have uuid
                                     data.setDataString(helper.getBodyContent(new JSONObject(oldFormatData),
                                             data.getDataType(),
                                             uuid,
-                                            data.getTime()));//转化成新格式
+                                            data.getTime()));//Convert to new format
                                 } catch (Exception e) {
                                     it.remove();
                                     LogUtils.e(TAG, "==> old cache insert error");
@@ -489,7 +484,7 @@ public class SyncTaskManager {
                             deleteLastQuery(list, true);
                             if (list.size() < OLD_CACHE_TRANSFORM_PAGE_SIZE) {
                                 LogUtils.d(TAG, "==> old cache transform end");
-                                //不删除旧表避免 SDK 版本回退发生兼容问题
+                                //Do not delete old table to avoid compatibility issues caused by SDK version downgrade
                                 break;
                             }
                         }
@@ -578,7 +573,7 @@ public class SyncTaskManager {
     }
 
     /**
-     * 释放上传同步资源
+     * Release upload synchronization resources
      */
     public void release() {
         DataProcessThreadPool.get().shutDown();

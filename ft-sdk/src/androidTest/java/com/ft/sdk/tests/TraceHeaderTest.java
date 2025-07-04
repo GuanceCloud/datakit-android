@@ -24,14 +24,14 @@ import org.junit.Test;
 import java.util.HashMap;
 
 /**
- * Trace 链路 propagation header 测试
+ * Trace link propagation header test
  *
  * @author Brandon
  */
 public class TraceHeaderTest extends FTBaseTest {
 
     /**
-     * {@link  TraceType#ZIPKIN_MULTI_HEADER} 类型测试
+     * {@link  TraceType#ZIPKIN_MULTI_HEADER} type test
      */
     @Test
     public void traceZipKinHeaderTest() {
@@ -53,7 +53,7 @@ public class TraceHeaderTest extends FTBaseTest {
     }
 
     /**
-     * {@link  TraceType#ZIPKIN_SINGLE_HEADER} 类型测试
+     * {@link  TraceType#ZIPKIN_SINGLE_HEADER} type test
      */
     @Test
     public void traceZipKinSingleHeaderTest() {
@@ -68,7 +68,7 @@ public class TraceHeaderTest extends FTBaseTest {
     }
 
     /**
-     * {@link  TraceType#JAEGER} 类型测试
+     * {@link  TraceType#JAEGER} type test
      */
     @Test
     public void traceJaegerHeaderTest() {
@@ -83,7 +83,7 @@ public class TraceHeaderTest extends FTBaseTest {
     }
 
     /**
-     * {@link  TraceType#DDTRACE} 类型测试
+     * {@link  TraceType#DDTRACE} type test
      */
     @Test
     public void traceDDtraceHeaderTest() {
@@ -106,7 +106,7 @@ public class TraceHeaderTest extends FTBaseTest {
     }
 
     /**
-     * {@link  TraceType#SKYWALKING} 类型测试
+     * {@link  TraceType#SKYWALKING} type test
      */
     @Test
     public void traceSkyWalkingV3HeaderTest() {
@@ -121,7 +121,7 @@ public class TraceHeaderTest extends FTBaseTest {
     }
 
     /**
-     * {@link  TraceType#TRACEPARENT} 类型测试
+     * {@link  TraceType#TRACEPARENT} type test
      */
     @Test
     public void traceW3CTraceParentTest() {
@@ -136,7 +136,7 @@ public class TraceHeaderTest extends FTBaseTest {
     }
 
     /**
-     * 获取 http 请求的所有头参数
+     * Get all headers of the http request
      *
      * @return
      */

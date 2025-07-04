@@ -20,7 +20,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * author: huangDianHua
  * time: 2020/7/22 11:16:58
- * description: 本地打印日志同步管理类
+ * description: Local print log synchronization management class
  */
 public class TrackLogManager {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "TrackLogManager";
@@ -52,10 +52,10 @@ public class TrackLogManager {
     }
 
     /**
-     * 记录日志
+     * Record log
      *
-     * @param logBean   日志数据
-     * @param isSilence 是否静默模式
+     * @param logBean   log data
+     * @param isSilence whether silent mode
      */
     public void trackLog(LogBean logBean, boolean isSilence) {
         if (!shouldProcessLog(logBean)) {
@@ -81,7 +81,7 @@ public class TrackLogManager {
     }
 
     /**
-     * 关闭管理器，清空队列
+     * Shutdown manager, clear queue
      */
     public void shutdown() {
         logQueue.clear();
@@ -148,7 +148,7 @@ public class TrackLogManager {
             LogUtils.e(TAG, "Unexpected error processing logs:" + LogUtils.getStackTraceString(e));
         } finally {
             isProcessing.set(false);
-            // 如果处理过程中有新日志到达，再次触发处理
+            // If new logs arrive during processing, trigger processing again
             if (!logQueue.isEmpty()) {
                 triggerProcessing(isSilence);
             }

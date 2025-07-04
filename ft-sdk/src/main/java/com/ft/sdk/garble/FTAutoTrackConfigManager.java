@@ -15,12 +15,12 @@ import java.util.List;
 public class FTAutoTrackConfigManager {
     private boolean autoTrack = true;
 
-    //以下三个为白名单
+    //The following three are whitelists
     private int enableAutoTrackType;
     private List<Integer> onlyAutoTrackActivities;
     private List<Class<?>> onlyAutoTrackViews;
 
-    //以下三个为设置黑名单
+    //The following three are blacklist settings
     private int disableAutoTrackType;
     private List<Integer> ignoreAutoTrackActivities;
     private List<Class<?>> ignoreAutoTrackViews;
@@ -48,7 +48,7 @@ public class FTAutoTrackConfigManager {
     }
 
     /**
-     * 添加 Activity 白名单
+     * Add Activity whitelist
      *
      * @param classes
      */
@@ -68,7 +68,7 @@ public class FTAutoTrackConfigManager {
     }
 
     /**
-     * 添加控件白名单
+     * Add control whitelist
      *
      * @param classes
      */
@@ -86,7 +86,7 @@ public class FTAutoTrackConfigManager {
     }
 
     /**
-     * 添加 Activity 黑名单
+     * Add Activity blacklist
      *
      * @param classes
      */
@@ -106,7 +106,7 @@ public class FTAutoTrackConfigManager {
     }
 
     /**
-     * 添加控件黑名单
+     * Add control blacklist
      *
      * @param classes
      */
@@ -124,7 +124,7 @@ public class FTAutoTrackConfigManager {
     }
 
     /**
-     * 是否开启自动埋点
+     * Whether to enable automatic tracking
      *
      * @return
      */
@@ -133,7 +133,7 @@ public class FTAutoTrackConfigManager {
     }
 
     /**
-     * 自动埋点类型白名单
+     * Automatic tracking type whitelist
      *
      * @param type
      * @return
@@ -146,7 +146,7 @@ public class FTAutoTrackConfigManager {
     }
 
     /**
-     * Activity 是否是白名单
+     * Whether Activity is in whitelist
      *
      * @param activity
      * @return
@@ -162,7 +162,7 @@ public class FTAutoTrackConfigManager {
     }
 
     /**
-     * View 是否在白名单里
+     * Whether View is in whitelist
      *
      * @param view
      * @return
@@ -189,7 +189,7 @@ public class FTAutoTrackConfigManager {
     }
 
     /**
-     * View 是否在白名单里
+     * Whether View is in whitelist
      *
      * @param viewClass
      * @return
@@ -216,7 +216,7 @@ public class FTAutoTrackConfigManager {
     }
 
     /**
-     * 自动埋点类型黑名单
+     * Automatic tracking type blacklist
      *
      * @param type
      * @return
@@ -229,7 +229,7 @@ public class FTAutoTrackConfigManager {
     }
 
     /**
-     * Activity 黑名单
+     * Activity blacklist
      *
      * @param activity
      * @return
@@ -242,10 +242,10 @@ public class FTAutoTrackConfigManager {
     }
 
     /**
-     * View 黑名单
+     * View blacklist
      *
      * @param view View
-     * @return 是否被忽略
+     * @return Whether it is ignored
      */
     public boolean isIgnoreView(View view) {
         try {
@@ -266,10 +266,10 @@ public class FTAutoTrackConfigManager {
     }
 
     /**
-     * View 黑名单
+     * View blacklist
      *
      * @param viewClass View
-     * @return 是否被忽略
+     * @return Whether it is ignored
      */
     public boolean isIgnoreView(Class viewClass) {
         try {

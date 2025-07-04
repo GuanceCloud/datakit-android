@@ -14,23 +14,23 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * author: huangDianHua
  * time: 2020/8/4 15:41:54
- * description: 日志数据数据库缓存丢弃策略
+ * description: Log data database cache discard policy
  */
 public class FTDBCachePolicy {
     private volatile static FTDBCachePolicy instance;
 
     /**
-     * 当前日志数据量
+     * Current log data count
      */
     private final AtomicInteger logCount = new AtomicInteger(0);
 
     /**
-     * 当前 RUM 数据量
+     * Current RUM data count
      */
     private final AtomicInteger rumCount = new AtomicInteger(0);
 
     /**
-     * 获取当前 db 缓存大小
+     * Get current db cache size
      */
     private final AtomicLong currentDbSize = new AtomicLong();
 
@@ -47,13 +47,13 @@ public class FTDBCachePolicy {
     }
 
     /**
-     * 日志限制数量
+     * Log limit count
      */
     private int logLimitCount = 0;
 
 
     /**
-     * RUM 限制数据量
+     * RUM limit data count
      */
     private int rumLimitCount = 0;
 
@@ -64,24 +64,24 @@ public class FTDBCachePolicy {
     private DBCacheDiscard dbCacheDiscard = DBCacheDiscard.DISCARD;
 
     /**
-     * log 数据舍弃规则
+     * log data discard rule
      */
     private LogCacheDiscard logCacheDiscardStrategy = LogCacheDiscard.DISCARD;
 
     /**
-     * rum 数据舍弃规则
+     * rum data discard rule
      */
     private RUMCacheDiscard rumCacheDiscardStrategy = RUMCacheDiscard.DISCARD;
 
 
     private FTDBCachePolicy() {
-        logCount.set(FTDBManager.get().queryTotalCount(DataType.LOG));//初始化时从数据库中获取日志数据
+        logCount.set(FTDBManager.get().queryTotalCount(DataType.LOG));//Get log data from database during initialization
         rumCount.set(FTDBManager.get().queryTotalCount(new DataType[]{
                 DataType.RUM_APP,
                 DataType.RUM_WEBVIEW,
                 DataType.RUM_APP_ERROR_SAMPLED,
                 DataType.RUM_WEBVIEW_ERROR_SAMPLED,
-        }));//初始化时从数据库中获取日志数据
+        }));//Get log data from database during initialization
     }
 
     public synchronized static FTDBCachePolicy get() {
@@ -92,7 +92,7 @@ public class FTDBCachePolicy {
     }
 
     /**
-     * 设置 db 限制
+     * Set db limit
      *
      * @param config
      */
@@ -103,7 +103,7 @@ public class FTDBCachePolicy {
     }
 
     /**
-     * 初始化 log 配置参数
+     * Initialize log configuration parameters
      *
      * @param config
      */
@@ -113,7 +113,7 @@ public class FTDBCachePolicy {
     }
 
     /**
-     * 初始化 RUM 配置参数
+     * Initialize RUM configuration parameters
      *
      * @param config
      */
@@ -123,7 +123,7 @@ public class FTDBCachePolicy {
     }
 
     /**
-     * 获取限制数量
+     * Get limit count
      *
      * @return
      */
@@ -140,9 +140,9 @@ public class FTDBCachePolicy {
     }
 
     /**
-     * 操作 Log 日志计数
+     * Operate Log log count
      *
-     * @param optCount 写入数据数量
+     * @param optCount Number of data written
      */
     public void optLogCount(int optCount) {
         if (enableLimitWithDbSize) return;
@@ -150,9 +150,9 @@ public class FTDBCachePolicy {
     }
 
     /**
-     * 操作 RUM 数量
+     * Operate RUM count
      *
-     * @param optCount 写入数据数量
+     * @param optCount Number of data written
      */
     public void optRUMCount(int optCount) {
         if (enableLimitWithDbSize) return;
@@ -160,7 +160,7 @@ public class FTDBCachePolicy {
     }
 
     /**
-     * 设置当前 db 缓存文件大小
+     * Set current db cache file size
      *
      * @param currentDbSize
      */
@@ -169,7 +169,7 @@ public class FTDBCachePolicy {
     }
 
     /**
-     * 是否达到 db 缓存限制
+     * Whether db cache limit is reached
      *
      * @return
      */
@@ -178,7 +178,7 @@ public class FTDBCachePolicy {
     }
 
     /**
-     * 是否达到 db 缓存限制的一半
+     * Whether half of db cache limit is reached
      *
      * @return
      */
@@ -191,16 +191,16 @@ public class FTDBCachePolicy {
     }
 
     /**
-     * 如果写入数据量大于总限制的一半
+     * If the number of data written is greater than half of the total limit
      *
-     * @return 是否达到一半
+     * @return Whether half is reached
      */
     private boolean reachLogHalfLimit() {
         return logLimitCount > 0 && logCount.get() > logLimitCount / 2;
     }
 
     /**
-     * 如果写入数据大于总限制的一半
+     * If the number of data written is greater than half of the total limit
      *
      * @return
      */
@@ -209,9 +209,9 @@ public class FTDBCachePolicy {
     }
 
     /**
-     * 执行 log 日志数据库缓存策略
+     * Execute log log database cache policy
      *
-     * @return 0-表示可以插入数据，n 表示需要删除旧数据 ,-n 表示丢弃多少数据
+     * @return 0-means data can be inserted, n means old data needs to be deleted, -n means how much data to discard
      */
     public int optLogCachePolicy(int limit) {
         if (enableLimitWithDbSize) {
@@ -228,10 +228,10 @@ public class FTDBCachePolicy {
 
         int status = 0;
         int currentLogCount = logCount.get();
-        if (currentLogCount >= logLimitCount) {//当数据量大于配置的数据库最大存储量时，执行丢弃策略
-            if (logCacheDiscardStrategy == LogCacheDiscard.DISCARD) {//直接丢弃数据
+        if (currentLogCount >= logLimitCount) {//When data volume is greater than the configured maximum database storage capacity, execute discard strategy
+            if (logCacheDiscardStrategy == LogCacheDiscard.DISCARD) {//Directly discard data
                 status = -limit;
-            } else if (logCacheDiscardStrategy == LogCacheDiscard.DISCARD_OLDEST) {//丢弃数据库中的前几条数据
+            } else if (logCacheDiscardStrategy == LogCacheDiscard.DISCARD_OLDEST) {//Discard the first few pieces of data in the database
                 FTDBManager.get().deleteOldestData(DataType.LOG, limit);
                 logCount.set(FTDBManager.get().queryTotalCount(DataType.LOG));
                 status = limit;
@@ -240,9 +240,9 @@ public class FTDBCachePolicy {
             if (currentLogCount + limit >= logLimitCount) {
                 int needInsert = logLimitCount - currentLogCount;
                 int needRemove = limit - needInsert;
-                if (logCacheDiscardStrategy == LogCacheDiscard.DISCARD) {//直接丢弃数据
+                if (logCacheDiscardStrategy == LogCacheDiscard.DISCARD) {//Directly discard data
                     status = -needRemove;
-                } else if (logCacheDiscardStrategy == LogCacheDiscard.DISCARD_OLDEST) {//丢弃数据库中的前几条数据
+                } else if (logCacheDiscardStrategy == LogCacheDiscard.DISCARD_OLDEST) {//Discard the first few pieces of data in the database
                     FTDBManager.get().deleteOldestData(DataType.LOG, needRemove);
                     logCount.set(FTDBManager.get().queryTotalCount(DataType.LOG));
                     status = needRemove;
@@ -253,10 +253,10 @@ public class FTDBCachePolicy {
     }
 
     /**
-     * 执行RUM丢弃策略
+     * ExecuteRUM discard strategy
      *
      * @param limit
-     * @return @return -1-表示直接丢弃，0-表示可以插入数据, 1-表示丢弃删除旧数据并删除
+     * @return @return -1-means directly discard, 0-means data can be inserted, 1-means discard and delete old data
      */
     public int optRUMCachePolicy(int limit) {
         if (enableLimitWithDbSize) {
@@ -273,10 +273,10 @@ public class FTDBCachePolicy {
 
         int status = 0;
         int currentRUMCount = rumCount.get();
-        if (currentRUMCount >= rumLimitCount) {//当数据量大于配置的数据库最大存储量时，执行丢弃策略
-            if (rumCacheDiscardStrategy == RUMCacheDiscard.DISCARD) {//直接丢弃数据
+        if (currentRUMCount >= rumLimitCount) {//When data volume is greater than the configured maximum database storage capacity, execute discard strategy
+            if (rumCacheDiscardStrategy == RUMCacheDiscard.DISCARD) {//Directly discard data
                 status = -1;
-            } else if (rumCacheDiscardStrategy == RUMCacheDiscard.DISCARD_OLDEST) {//丢弃数据库中的前几条数据
+            } else if (rumCacheDiscardStrategy == RUMCacheDiscard.DISCARD_OLDEST) {//Discard the first few pieces of data in the database
                 FTDBManager.get().deleteOldestData(new DataType[]{
                         DataType.RUM_APP,
                         DataType.RUM_WEBVIEW,
@@ -298,7 +298,7 @@ public class FTDBCachePolicy {
     }
 
     /**
-     * 是否开启 db 限制
+     * Whether db limit is enabled
      *
      * @return
      */
@@ -307,7 +307,7 @@ public class FTDBCachePolicy {
     }
 
     /**
-     * db 缓存丢弃策略
+     * db cache discard strategy
      *
      * @return
      */

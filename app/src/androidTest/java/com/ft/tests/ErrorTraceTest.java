@@ -31,7 +31,7 @@ import org.junit.runner.RunWith;
 /**
  * author: huangDianHua
  * time: 2020/8/27 11:21:02
- * description: UIBlock ANR nativeCrash 需要手动测试，测试用例无法模拟
+ * description: UIBlock, ANR, nativeCrash need manual testing, test cases cannot simulate
  */
 @RunWith(AndroidJUnit4.class)
 public class ErrorTraceTest extends BaseTest {
@@ -47,9 +47,9 @@ public class ErrorTraceTest extends BaseTest {
         }
         FTSDKConfig ftSDKConfig = FTSDKConfig
                 .builder(BuildConfig.DATAKIT_URL)
-                .setDebug(true)//设置是否是 debug
+                .setDebug(true)//Set whether it is debug
                 .setEnv(EnvType.GRAY);
-        //关闭数据自动同步操作
+        //Close automatic data synchronization operation
         stopSyncTask();
         FTSdk.install(ftSDKConfig);
 
@@ -59,18 +59,18 @@ public class ErrorTraceTest extends BaseTest {
     }
 
     /**
-     * 模拟崩溃，查看崩溃信息是否记录到数据库中
+     * Simulate crash, check if crash information is recorded in the database
      *
      * @throws InterruptedException
      */
     @Test
     public void mockExceptionTest() throws InterruptedException {
 
-        //阻止 application 崩溃，如果崩溃测试用例也会结束
+        //Prevent application crash, if it crashes the test case will also end
         avoidCrash();
-        //产生一个崩溃信息
+        //Generate a crash message
         onView(ViewMatchers.withId(R.id.main_mock_crash_btn)).perform(ViewActions.scrollTo()).perform(click());
-        //因为插入数据为异步操作，所以要设置一个间隔，以便能够查询到数据
+        //Because data insertion is an asynchronous operation, an interval needs to be set to be able to query the data
         Thread.sleep(1000);
         Assert.assertTrue(CheckUtils.checkValueInLineProtocol(DataType.RUM_APP, "ArithmeticException"));
     }

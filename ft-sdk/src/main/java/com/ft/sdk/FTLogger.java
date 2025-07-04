@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * 打印输出观测云 Studio 可以查看的日志
+ * Print logs that can be viewed in Guanceyun Studio
  *
  * @author Brandon
  */
@@ -34,17 +34,17 @@ public class FTLogger {
     private FTLoggerConfig config;
 
     /**
-     * @param config {@link  FTLoggerConfig} 初始化 config
+     * @param config {@link  FTLoggerConfig} initialization config
      */
     void init(FTLoggerConfig config) {
         this.config = config;
     }
 
     /**
-     * 将单条日志数据存入本地同步
+     * Store a single log entry locally and synchronize
      *
-     * @param content 日志内容，最大限制 {@link com.ft.sdk.garble.bean.BaseContentBean#LIMIT_SIZE}
-     * @param status  日志等级
+     * @param content Log content, maximum limit {@link com.ft.sdk.garble.bean.BaseContentBean#LIMIT_SIZE}
+     * @param status  Log level
      */
     public void logBackground(String content, Status status) {
         logBackground(content, status.name, null, false);
@@ -52,34 +52,34 @@ public class FTLogger {
     }
 
     /**
-     * 将单条日志数据存入本地同步
+     * Store a single log entry locally and synchronize
      *
-     * @param content   日志内容，最大限制 {@link com.ft.sdk.garble.bean.BaseContentBean#LIMIT_SIZE}
-     * @param status    日志等级
-     * @param isSilence 是否静默
+     * @param content   Log content, maximum limit {@link com.ft.sdk.garble.bean.BaseContentBean#LIMIT_SIZE}
+     * @param status    Log level
+     * @param isSilence Whether silent
      */
     public void logBackground(String content, Status status, boolean isSilence) {
         logBackground(content, status.name, null, isSilence);
     }
 
     /**
-     * 将单条日志数据存入本地同步
+     * Store a single log entry locally and synchronize
      *
-     * @param content  日志内容，最大限制 {@link com.ft.sdk.garble.bean.BaseContentBean#LIMIT_SIZE}
-     * @param status   日志等级
-     * @param property 附加属性
+     * @param content  Log content, maximum limit {@link com.ft.sdk.garble.bean.BaseContentBean#LIMIT_SIZE}
+     * @param status   Log level
+     * @param property Additional properties
      */
     public void logBackground(String content, Status status, HashMap<String, Object> property) {
         logBackground(content, status.name, property, false);
     }
 
     /**
-     * 将单条日志数据存入本地同步
+     * Store a single log entry locally and synchronize
      *
-     * @param content   日志内容，最大限制 {@link com.ft.sdk.garble.bean.BaseContentBean#LIMIT_SIZE}
-     * @param status    日志等级
-     * @param property  附加属性
-     * @param isSilence 是否静默
+     * @param content   Log content, maximum limit {@link com.ft.sdk.garble.bean.BaseContentBean#LIMIT_SIZE}
+     * @param status    Log level
+     * @param property  Additional properties
+     * @param isSilence Whether silent
      */
     public void logBackground(String content, Status status, HashMap<String, Object> property, boolean isSilence) {
         logBackground(content, status.name, property, isSilence);
@@ -90,10 +90,10 @@ public class FTLogger {
     }
 
     /**
-     * 将单条日志数据存入本地同步
+     * Store a single log entry locally and synchronize
      *
-     * @param content 日志内容，最大限制 {@link com.ft.sdk.garble.bean.BaseContentBean#LIMIT_SIZE}
-     * @param status  日志等级
+     * @param content Log content, maximum limit {@link com.ft.sdk.garble.bean.BaseContentBean#LIMIT_SIZE}
+     * @param status   Log level
      */
     public void logBackground(String content, String status, boolean isSilence) {
         logBackground(content, status, null, isSilence);
@@ -104,12 +104,12 @@ public class FTLogger {
     }
 
     /**
-     * 将单条日志数据存入本地同步
+     * Store a single log entry locally and synchronize
      *
-     * @param content   日志内容，最大限制 {@link com.ft.sdk.garble.bean.BaseContentBean#LIMIT_SIZE}
-     * @param status    自定义状态
-     * @param property  附加属性
-     * @param isSilence 是否静默
+     * @param content   Log content, maximum limit {@link com.ft.sdk.garble.bean.BaseContentBean#LIMIT_SIZE}
+     * @param status    Custom status
+     * @param property  Additional properties
+     * @param isSilence Whether silent
      */
     public void logBackground(String content, String status, HashMap<String, Object> property, boolean isSilence) {
 
@@ -165,9 +165,9 @@ public class FTLogger {
     }
 
     /**
-     * 将多条日志数据存入本地同步(异步)
+     * Store multiple log entries locally and synchronize (asynchronously)
      *
-     * @param logDataList {@link LogData} 列表
+     * @param logDataList {@link LogData} list
      */
     public void logBackground(List<LogData> logDataList) {
         if (!checkConfig()) return;
@@ -186,13 +186,13 @@ public class FTLogger {
     }
 
     /**
-     * 检验 {@link FTLoggerConfig} 是否初始化
+     * Check whether {@link FTLoggerConfig} is initialized
      *
-     * @return true 为已初始化，反之为 false
+     * @return true if initialized, false otherwise
      */
     private boolean checkConfig() {
         if (config == null) {
-            LogUtils.e(TAG, "使用 FTLogger，需要初始化 FTSdk.initLogWithConfig(FTLoggerConfig ftSdkConfig))");
+            LogUtils.e(TAG, "Use FTLogger, need to initialize FTSdk.initLogWithConfig(FTLoggerConfig ftSdkConfig))");
             return false;
         }
         return true;

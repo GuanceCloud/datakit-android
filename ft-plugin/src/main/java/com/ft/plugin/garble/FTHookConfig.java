@@ -23,12 +23,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 /**
- * 本类借鉴修改了来自 Sensors Data 的项目 <a href="https://github.com/sensorsdata/sa-sdk-android-plugin2">sa-sdk-android-plugin2</a>
- * 中的 SensorsAnalyticsHookConfig.groovy 类
+ * This class is adapted and modified from the Sensors Data project <a href="https://github.com/sensorsdata/sa-sdk-android-plugin2">sa-sdk-android-plugin2</a>
+ * SensorsAnalyticsHookConfig.groovy class
  */
 public class FTHookConfig {
     /**
-     * Application 中 的方法
+     * Methods in Application
      * {@link android.app.Application#onCreate()} invoke {@link com.ft.sdk.FTAutoTrack#startApp(android.app.Application)}
      */
     public static final HashMap<String, FTMethodCell> APPLICATION_METHODS = new HashMap<>();
@@ -47,7 +47,7 @@ public class FTHookConfig {
     }
 
     /**
-     * Activity中的方法
+     * Methods in Activity
      * {@link android.app.Activity#onCreate(android.os.Bundle)}  invoke
      * {@link android.app.Activity#onDestroy()}
      * {@link android.app.Activity#startActivityForResult(android.content.Intent, int)}
@@ -90,7 +90,7 @@ public class FTHookConfig {
     }
 
     /**
-     * FragmentX中的方法
+     * Methods in FragmentX
      * <p>
      * {@link androidx.fragment.app.Fragment#onResume()} invoke {@link com.ft.sdk.FTAutoTrack#fragmentOnResume(Object, Object)}
      * {@link androidx.fragment.app.Fragment#onPause()} invoke {@link com.ft.sdk.FTAutoTrack#fragmentOnPause(Object, Object)}}
@@ -140,7 +140,7 @@ public class FTHookConfig {
 
 
     /**
-     * Fragment中的方法
+     * Methods in Fragment
      * <p>
      * {@link android.app.Fragment#onResume()} invoke {@link com.ft.sdk.FTAutoTrack#fragmentOnResume(Object, Object)}
      * {@link android.app.Fragment#onPause()} invoke {@link com.ft.sdk.FTAutoTrack#fragmentOnPause(Object, Object)}}
@@ -189,7 +189,7 @@ public class FTHookConfig {
     }
 
     /**
-     * FragmentV4中的方法
+     * Methods in FragmentV4
      * <p>
      * {@link android.support.v4.app.Fragment#onResume()} invoke {@link com.ft.sdk.FTAutoTrack#fragmentOnResume(Object, Object)}
      * {@link android.support.v4.app.Fragment#onPause()} invoke {@link com.ft.sdk.FTAutoTrack#fragmentOnPause(Object, Object)}}
@@ -239,7 +239,7 @@ public class FTHookConfig {
     }
 
     /**
-     * PopMenu 点击事件
+     * PopMenu click event
      * {@link com.ft.sdk.FTAutoTrack#trackMenuItem(android.view.MenuItem)}
      */
     public final static FTMethodCell MENU_METHODS = new FTMethodCell(
@@ -253,7 +253,7 @@ public class FTHookConfig {
     );
 
     /**
-     * View 点击事件
+     * View click event
      * {@link com.ft.sdk.FTAutoTrack#trackViewOnClick(Object, android.view.View)}
      */
     public final static FTMethodCell CLICK_METHOD = new FTMethodCell(
@@ -267,55 +267,55 @@ public class FTHookConfig {
     );
 
     /**
-     * 点击事件 MAP
+     * Click event MAP
      * <p>
      * {@link android.view.View.OnClickListener#onClick(android.view.View)}
      * {@link android.widget.CompoundButton.OnCheckedChangeListener#onCheckedChanged(android.widget.CompoundButton, boolean)}
      * {@link android.widget.RatingBar.OnRatingBarChangeListener#onRatingChanged(android.widget.RatingBar, float, boolean)}
      * {@link android.widget.SeekBar.OnSeekBarChangeListener#onStopTrackingTouch(android.widget.SeekBar)}
-     * 调用 {@link com.ft.sdk.FTAutoTrack#trackViewOnClick(android.view.View)}
+     * Calls {@link com.ft.sdk.FTAutoTrack#trackViewOnClick(android.view.View)}
      * <p>
      * {@link android.widget.RadioGroup.OnCheckedChangeListener#onCheckedChanged(android.widget.RadioGroup, int)}
-     * 调用 {@link com.ft.sdk.FTAutoTrack#trackRadioGroup(android.widget.RadioGroup, int)}
+     * Calls {@link com.ft.sdk.FTAutoTrack#trackRadioGroup(android.widget.RadioGroup, int)}
      * <p>
      * {@link android.widget.AdapterView.OnItemClickListener#onItemClick(android.widget.AdapterView, android.view.View, int, long)}
      * {@link android.widget.AdapterView.OnItemSelectedListener#onItemSelected(android.widget.AdapterView, android.view.View, int, long)}
-     * 调用 {@link com.ft.sdk.FTAutoTrack#trackListView(android.widget.AdapterView, android.view.View, int)}
+     * Calls {@link com.ft.sdk.FTAutoTrack#trackListView(android.widget.AdapterView, android.view.View, int)}
      * <p>
      * {@link android.widget.ExpandableListView.OnGroupClickListener#onGroupClick(android.widget.ExpandableListView, android.view.View, int, long)}
-     * 调用 {@link com.ft.sdk.FTAutoTrack#trackExpandableListViewOnGroupClick(android.widget.ExpandableListView, android.view.View, int)}
+     * Calls {@link com.ft.sdk.FTAutoTrack#trackExpandableListViewOnGroupClick(android.widget.ExpandableListView, android.view.View, int)}
      * <p>
      * {@link android.widget.ExpandableListView.OnChildClickListener#onChildClick(android.widget.ExpandableListView, android.view.View, int, int, long)}
-     * 调用 {@link com.ft.sdk.FTAutoTrack#trackExpandableListViewOnChildClick(android.widget.ExpandableListView, android.view.View, int, int)}
+     * Calls {@link com.ft.sdk.FTAutoTrack#trackExpandableListViewOnChildClick(android.widget.ExpandableListView, android.view.View, int, int)}
      * <p>
      * {@link android.widget.TabHost.OnTabChangeListener#onTabChanged(String)}
-     * 调用 {@link com.ft.sdk.FTAutoTrack#trackTabHost(String)}
+     * Calls {@link com.ft.sdk.FTAutoTrack#trackTabHost(String)}
      * <p>
      * {@link android.support.design.widget.NavigationView.OnNavigationItemSelectedListener#onNavigationItemSelected()}
      * {@link android.widget.Toolbar.OnMenuItemClickListener#onMenuItemClick(android.view.MenuItem)}
      * {@link android.support.v7.widget.Toolbar.OnMenuItemClickListener#onMenuItemClick()}
      * {@link androidx.appcompat.widget.Toolbar.OnMenuItemClickListener#onMenuItemClick(android.view.MenuItem)}
-     * 调用 {@link com.ft.sdk.FTAutoTrack#trackMenuItem(android.view.MenuItem)}
+     * Calls {@link com.ft.sdk.FTAutoTrack#trackMenuItem(android.view.MenuItem)}
      * <p>
      * {@link android.content.DialogInterface.OnMultiChoiceClickListener#onClick(android.content.DialogInterface, int, boolean)}
      * {@link android.content.DialogInterface.OnClickListener#onClick(android.content.DialogInterface, int)}
-     * 调用 {@link com.ft.sdk.FTAutoTrack#trackDialog(android.content.DialogInterface, int)}
+     * Calls {@link com.ft.sdk.FTAutoTrack#trackDialog(android.content.DialogInterface, int)}
      * <p>
      * {@link android.widget.PopupMenu.OnMenuItemClickListener#onMenuItemClick(android.view.MenuItem)}
      * {@link androidx.appcompat.widget.PopupMenu.OnMenuItemClickListener#onMenuItemClick(android.view.MenuItem)}
      * {@link android.support.v7.widget.PopupMenu.OnMenuItemClickListener#onMenuItemClick()}
-     * 调用 {@link com.ft.sdk.FTAutoTrack#trackMenuItem(android.view.MenuItem)}
+     * Calls {@link com.ft.sdk.FTAutoTrack#trackMenuItem(android.view.MenuItem)}
      * <p>
      * {@link android.view.View.OnTouchListener#onTouch(android.view.View, android.view.MotionEvent)}
-     * 调用 {@link com.ft.sdk.FTAutoTrack#trackViewOnTouch(android.view.View, android.view.MotionEvent)}
+     * Calls {@link com.ft.sdk.FTAutoTrack#trackViewOnTouch(android.view.View, android.view.MotionEvent)}
      * <p>
      * {@link androidx.viewpager.widget.ViewPager.OnPageChangeListener#onPageSelected(int)}
      * {@link com.android.internal.widget.ViewPager.OnPageChangeListener#onPageSelected(int)}
      * {@link android.support.v4.view.ViewPager.OnPageChangeListener#onPageSelected(int)}
-     * 调用 {@link com.ft.sdk.FTAutoTrack#trackViewPagerChange(Object, int)}
+     * Calls {@link com.ft.sdk.FTAutoTrack#trackViewPagerChange(Object, int)}
      *
      * {@link com.google.android.material.tabs.TabLayout.OnTabSelectedListener#onTabSelected()}
-     * 调用 {@link com.ft.sdk.FTAutoTrack#trackTabLayoutSelected(Object)}
+     * Calls {@link com.ft.sdk.FTAutoTrack#trackTabLayoutSelected(Object)}
      * 
      *
      */

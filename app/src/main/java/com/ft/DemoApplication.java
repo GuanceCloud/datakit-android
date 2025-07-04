@@ -43,7 +43,7 @@ public class DemoApplication extends BaseApplication {
 
     static void initFTSDK(Context context) {
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAKIT_URL)
-                .setDebug(true)//设置是否是 debug
+                .setDebug(true)//Set whether it's debug
                 .setAutoSync(true)
                 .setCustomSyncPageSize(10)
                 .setOnlySupportMainProcess(CrossProcessSetting.isOnlyMainProcess(context))

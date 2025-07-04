@@ -11,19 +11,19 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * BY huangDianHua
  * DATE:2019-12-06 13:36
- * Description: {@link Activity} 管理类
+ * Description: {@link Activity} manager class
  */
 public final class FTActivityManager {
     public final static String TAG = Constants.LOG_TAG_PREFIX + "ActivityManager";
     private static volatile FTActivityManager instance;
 
     /**
-     * 存活 activity map
+     * Map of alive activities
      */
     private final ConcurrentHashMap<String, Boolean> activityOpenTypeMap = new ConcurrentHashMap<>();
 
     /**
-     * 默认为 {@link AppState#STARTUP}
+     * Default is {@link AppState#STARTUP}
      */
     private AppState appState = AppState.STARTUP;
 
@@ -42,9 +42,9 @@ public final class FTActivityManager {
     }
 
     /**
-     * 存储每个 {@link Activity} 是由什么方式打开的
+     * Store how each {@link Activity} was opened
      *
-     * @param className    {@link Activity} 衍生类名
+     * @param className    Name of the derived {@link Activity} class
      * @param fromFragment
      */
     void putActivityOpenFromFragment(String className, boolean fromFragment) {
@@ -52,7 +52,7 @@ public final class FTActivityManager {
     }
 
     /**
-     * 返回每个 Activity 是由什么方式打开的
+     * Return how each Activity was opened
      *
      * @param className
      * @return
@@ -65,7 +65,7 @@ public final class FTActivityManager {
     }
 
     /**
-     * 删除对应 Activity 的打开状态
+     * Remove the open state of the corresponding Activity
      *
      * @param className
      */
@@ -75,16 +75,16 @@ public final class FTActivityManager {
 
 
     /**
-     * 设置当前 {@link AppState}
+     * Set the current {@link AppState}
      *
-     * @param state {@link AppState} 应用运行状态
+     * @param state {@link AppState} application running state
      */
     void setAppState(AppState state) {
         this.appState = state;
     }
 
     /**
-     * 获取当前 {@link AppState}
+     * Get the current {@link AppState}
      *
      * @return {@link AppState}
      */

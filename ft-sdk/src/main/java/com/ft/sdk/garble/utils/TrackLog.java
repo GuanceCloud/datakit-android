@@ -16,42 +16,42 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * create: by huangDianHua
  * time: 2020/6/15 18:17:25
- * description:该类仅供 AOP 方式插桩替换应用中的 android.util.Log 类
+ * description: This class is only for AOP instrumentation to replace android.util.Log class in applications
  */
 public class TrackLog {
     private final static List<String> cachedList = new CopyOnWriteArrayList<>();
 
-    /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
+    /*This method cannot be changed arbitrarily, changes need to be synchronized with the corresponding instrumentation method in the plugin*/
     public static int i(String tag, String msg) {
         return showFullLog(true, tag, msg,SDKLogLevel.I,false);
     }
 
-    /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
+    /*This method cannot be changed arbitrarily, changes need to be synchronized with the corresponding instrumentation method in the plugin*/
     public static int i(String tag, String msg, Throwable e) {
         return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e),SDKLogLevel.I,false);
     }
 
-    /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
+    /*This method cannot be changed arbitrarily, changes need to be synchronized with the corresponding instrumentation method in the plugin*/
     public static int d(String tag, String msg) {
         return showFullLog(true, tag, msg,SDKLogLevel.D,false);
     }
 
-    /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
+    /*This method cannot be changed arbitrarily, changes need to be synchronized with the corresponding instrumentation method in the plugin*/
     public static int d(String tag, String msg, Throwable e) {
         return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e),SDKLogLevel.D,false);
     }
 
-    /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
+    /*This method cannot be changed arbitrarily, changes need to be synchronized with the corresponding instrumentation method in the plugin*/
     public static int v(String tag, String msg) {
         return showFullLog(true, tag, msg,SDKLogLevel.V,false);
     }
 
-    /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
+    /*This method cannot be changed arbitrarily, changes need to be synchronized with the corresponding instrumentation method in the plugin*/
     public static int v(String tag, String msg, Throwable e) {
         return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e),SDKLogLevel.V,false);
     }
 
-    /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
+    /*This method cannot be changed arbitrarily, changes need to be synchronized with the corresponding instrumentation method in the plugin*/
     public static int e(String tag, String msg) {
         return showFullLog(true, tag, msg,SDKLogLevel.E,false);
     }
@@ -60,12 +60,12 @@ public class TrackLog {
         return showFullLog(true, tag, msg,SDKLogLevel.E,onlyOnce);
     }
 
-    /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
+    /*This method cannot be changed arbitrarily, changes need to be synchronized with the corresponding instrumentation method in the plugin*/
     public static int e(String tag, String msg, Throwable e) {
         return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e),SDKLogLevel.E,false);
     }
 
-    /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
+    /*This method cannot be changed arbitrarily, changes need to be synchronized with the corresponding instrumentation method in the plugin*/
     public static int w(String tag, String msg) {
         return showFullLog(true, tag, msg,SDKLogLevel.W,false);
     }
@@ -74,25 +74,25 @@ public class TrackLog {
         return showFullLog(true, tag, msg,SDKLogLevel.W,onlyOnce);
     }
 
-    /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
+    /*This method cannot be changed arbitrarily, changes need to be synchronized with the corresponding instrumentation method in the plugin*/
     public static int w(String tag, String msg, Throwable e) {
         return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e),SDKLogLevel.W,false);
     }
 
-    /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
+    /*This method cannot be changed arbitrarily, changes need to be synchronized with the corresponding instrumentation method in the plugin*/
     public static int w(String tag, Throwable e) {
         return showFullLog(true, tag, LogUtils.getStackTraceString(e),SDKLogLevel.W,false);
     }
 
-    /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
+    /*This method cannot be changed arbitrarily, changes need to be synchronized with the corresponding instrumentation method in the plugin*/
     public static int println(String tag, String msg) {
         return println(true, Log.INFO, tag, msg);
     }
 
 
-    /*该方法不能随意改动，变化后需要同步更新插件中相应的插桩方法*/
+    /*This method cannot be changed arbitrarily, changes need to be synchronized with the corresponding instrumentation method in the plugin*/
     public static int println(int priority, String tag, String msg) {
-        //只采集 VERBOSE，DEBUG，INFO，WARN，ERROR
+        //Only collect VERBOSE, DEBUG, INFO, WARN, ERROR
         return println(priority >= Log.VERBOSE && priority <= Log.ERROR, priority, tag, msg);
     }
 
@@ -239,7 +239,7 @@ public class TrackLog {
     }
 
 //    /**
-//     * 日志类型
+//     * Log type
 //     * 「」
 //     */
 //    enum LogType {

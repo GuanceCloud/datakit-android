@@ -6,7 +6,7 @@ import org.junit.runners.Suite;
 /**
  * BY huangDianHua
  * DATE:2019-12-18 14:31
- * Description:测试合集
+ * Description: Test collection
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({

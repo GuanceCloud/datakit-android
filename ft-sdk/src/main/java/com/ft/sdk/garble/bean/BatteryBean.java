@@ -3,48 +3,48 @@ package com.ft.sdk.garble.bean;
 /**
  * BY huangDianHua
  * DATE:2020-01-17 13:30
- * Description: 电池指标数据
+ * Description: Battery metric data
  */
 public class BatteryBean {
     /**
-     * 电量使用量
+     * Battery usage
      */
     private int br;
 //    /**
-//     * 电池状态
+//     * Battery status
 //     */
 //    private String status;
 
 //    /**
-//     * 电池充电状态
+//     * Battery charging status
 //     */
 //    private String plugState;
 
 //    /**
-//     * 电池健康状态
+//     * Battery health status
 //     */
 //    private String health;
 //
 //    /**
-//     * 是否有电池
+//     * Whether there is a battery
 //     */
 //    private boolean present;
 //    /**
-//     * 电池制造技术
+//     * Battery manufacturing technology
 //     */
 //    private String technology;
 //    /**
-//     * 电池温度
+//     * Battery temperature
 //     */
 //    private double temperature;
 //
 //    /**
-//     *  电池电压
+//     * Battery voltage
 //     */
 //    private double voltage;
 
 //    /**
-//     * 电池电总量
+//     * Total battery power
 //     */
 //    private String power;
 

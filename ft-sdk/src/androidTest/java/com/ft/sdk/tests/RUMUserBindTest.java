@@ -15,7 +15,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * RUM 用户数据绑定数据验证
+ * RUM user data binding data validation
  *
  * @author Brandon
  */
@@ -33,7 +33,7 @@ public class RUMUserBindTest extends FTBaseTest {
     }
 
     /**
-     * 绑定用户，数据验证
+     * Bind user, data validation
      * @throws InterruptedException
      */
     @Test
@@ -49,7 +49,7 @@ public class RUMUserBindTest extends FTBaseTest {
     }
 
     /**
-     * 解绑用户数据，验证是否清理数据
+     * Unbind user data, verify if data is cleaned up
      * @throws InterruptedException
      */
     @Test

@@ -11,7 +11,7 @@ import java.util.Arrays;
  */
 public enum OP {
     /**
-     * 页面点击事件
+     * Page click event
      */
     CLK("clk");
     //    FLOW_CHART("flow_chart"),
@@ -21,14 +21,14 @@ public enum OP {
 //    CLS_ACT("cls_act"),
 //    CLS_FRA("cls_fra");
 
-//    //webview 事件
+//    //webview event
 //    WEBVIEW_LOADING("webview_loading"),
 //    WEBVIEW_LOAD_COMPLETED("webview_load_completed"),
 //
-//    //客户端使用事件
+//    //client usage event
 //    CLIENT_ACTIVATED_TIME("client_activated_time"),
 //
-//    //网络情况事件
+//    //network status event
 //    HTTP_CLIENT("http_client"),
 //    HTTP_WEBVIEW("http_webview"),
 //

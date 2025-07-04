@@ -30,11 +30,11 @@ public class FTRemoteConfigManager {
     }
 
     /**
-     * 返回远程配置更新结果
+     * Returns remote configuration update result
      */
     public interface FetchResult {
         /**
-         * @param success true 为更新成功或数据无更改，false 为更新失败
+         * @param success true for successful update or no data change, false for update failure
          */
         void onResult(boolean success);
     }

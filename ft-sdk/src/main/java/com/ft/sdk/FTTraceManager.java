@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 链路追踪
+ * Link tracing
  */
 public class FTTraceManager {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "FTTraceManager";
@@ -34,10 +34,10 @@ public class FTTraceManager {
     }
 
     /**
-     * 获取 trace http 请求头参数
+     * Get trace HTTP request header parameters
      *
-     * @param key       链路 id
-     * @param urlString url 地址
+     * @param key       resource ID
+     * @param urlString URL address
      * @return
      * @throws MalformedURLException
      * @throws URISyntaxException
@@ -50,9 +50,9 @@ public class FTTraceManager {
     }
 
     /**
-     * 获取 trace http 请求头参数
+     * Get trace HTTP request header parameters
      *
-     * @param urlString url 地址
+     * @param urlString URL address
      * @return
      * @throws MalformedURLException
      * @throws URISyntaxException
@@ -71,14 +71,14 @@ public class FTTraceManager {
 
 
 //    /**
-//     * 发送 trace 数据
+//     * Send trace data
 //     *
-//     * @param key            链路 id
-//     * @param httpMethod     请求类型 post ，get
-//     * @param requestHeader  请求数据头
-//     * @param responseHeader 数据响应头
-//     * @param statusCode     http 状态吗
-//     * @param errorMsg       请求错误信息
+//     * @param key             resource ID
+//     * @param httpMethod      Request type post, get
+//     * @param requestHeader   Request data header
+//     * @param responseHeader  Data response header
+//     * @param statusCode      HTTP status code
+//     * @param errorMsg        Request error message
 //     */
 //    public void addTrace(String key, String httpMethod, HashMap<String, String> requestHeader,
 //                         HashMap<String, String> responseHeader, int statusCode,
@@ -125,7 +125,7 @@ public class FTTraceManager {
 //    }
 
     /**
-     * addResource 根据 key 数值移除
+     * Remove by addResource based on key value
      *
      * @param key
      */
@@ -138,7 +138,7 @@ public class FTTraceManager {
     }
 
     /**
-     * stopResource 根据 key 数值移除
+     * Remove by stopResource based on key value
      *
      * @param key
      */
@@ -151,7 +151,7 @@ public class FTTraceManager {
     }
 
     /**
-     * 检验是否需要释放
+     * Check if release is needed
      *
      * @param key
      * @param container
@@ -163,16 +163,16 @@ public class FTTraceManager {
     }
 
     /**
-     * 检验结束生命周期容器，当 trace stopResource addResource 均调用后，对象会被移除
+     * Check end lifecycle container, when trace stopResource addResource are both called, the object will be removed
      */
     static class FTTraceManagerContainer {
         private boolean addResourced = !FTRUMConfigManager.get().isRumEnable();
         private boolean resourceStop = addResourced;
         /**
-         * 开始时间
+         * Start time
          */
         private final long startTime = System.currentTimeMillis();
-        private static final int TIME_OUT = 60000;//暂不考虑长链接情况
+        private static final int TIME_OUT = 60000;//Temporarily not considering long connection situations
 
         private final FTTraceInterceptor.TraceRUMLinkable handler;
 
@@ -181,7 +181,7 @@ public class FTTraceManager {
         }
 
         /**
-         * 未避免错误调用造成内存溢出
+         * To avoid memory overflow caused by incorrect calls
          *
          * @return
          */

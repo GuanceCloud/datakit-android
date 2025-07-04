@@ -5,7 +5,7 @@ import ftnative.NativeCrash;
 /**
  * author: huangDianHua
  * time: 2020/9/27 16:00:41
- * description: jni 交互类
+ * description: JNI interaction class
  */
 public class ExceptionHandler {
     private static ExceptionHandler instance;
@@ -22,7 +22,7 @@ public class ExceptionHandler {
 
 
     /**
-     * 模拟 native 代码崩溃
+     * Simulate native code crash
      */
 
     public void crashAndGetExceptionMessage() {

@@ -11,7 +11,7 @@ import java.io.RandomAccessFile;
 /**
  * BY huangDianHua
  * DATE:2020-01-08 18:58
- * Description: 获取设备 CPU 相关数据指标
+ * Description: Get device CPU related data indicators
  */
 public class CpuUtils {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "CpuUtils";
@@ -20,28 +20,28 @@ public class CpuUtils {
     }
 
     /**
-     * 文件 /proc/stat
+     * File /proc/stat
      */
     private RandomAccessFile mProcStatFile;
 
     /**
-     * 文件 /proc/{pid}/stat
+     * File /proc/{pid}/stat
      */
     private RandomAccessFile mAppStatFile;
 
 
     /**
-     * 文件 /proc/{pid}/stat
+     * File /proc/{pid}/stat
      */
     private RandomAccessFile mSelfStatFile;
 
     /**
-     * CPU 最近一次跳动次数
+     * CPU last jump count
      */
     private Long mLastCpuTime;
 
     /**
-     * 应用最近一次 App CPU 跳动次数
+     * App CPU jump count from last time
      */
     private Long mLastAppCpuTime;
     private static CpuUtils cpuUtils;
@@ -56,7 +56,7 @@ public class CpuUtils {
     }
 
     /**
-     * 获取 Android O 及更高版本的 当前 pid CPU使用率
+     * Get current pid CPU usage rate for Android O and higher versions
      *
      * @return
      */
@@ -104,7 +104,7 @@ public class CpuUtils {
     }
 
     /**
-     * 获取 CPU 索引
+     * Get CPU index
      *
      * @param line
      * @return
@@ -122,7 +122,7 @@ public class CpuUtils {
     }
 
     /**
-     * 获取 Android O 以下版本的当前 pid CPU 使用率
+     * Get current pid CPU usage rate for versions below Android O
      *
      * @return
      */
@@ -162,7 +162,7 @@ public class CpuUtils {
     }
 
     /**
-     * 获取应用 CPU 跳动次数
+     * Get app CPU jump count
      *
      * @return
      */

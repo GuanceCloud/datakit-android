@@ -16,21 +16,21 @@ import java.security.InvalidParameterException;
 /**
  * BY huangDianHua
  * DATE:2019-12-02 13:56
- * Description: 数据存储 Data Json 数据
+ * Description: Data storage Data JSON data
  */
 public class SyncData implements Cloneable {
     /**
-     * 同步数据唯一 id, 同步上传过程中才会赋值
+     * Sync data unique ID, assigned only during sync upload process
      */
     long id;
 
     /**
-     * 同步数据类型
+     * Sync data type
      */
     DataType dataType;
 
     /**
-     * 同步数据字符类型数据，旧数据数据为 json，新数据为行协议
+     * Sync data character type data, old data is JSON, new data is line protocol
      */
     String dataString;
 
@@ -56,7 +56,7 @@ public class SyncData implements Cloneable {
     }
 
     /**
-     * 操作时间
+     * Operation time
      */
     private long time;
 
@@ -95,9 +95,9 @@ public class SyncData implements Cloneable {
     }
 
     /**
-     * 标记包序列发送 id,替换 [uuid] 为 [packageId].[uuid]
+     * Mark package sequence send ID, replace [uuid] with [packageId].[uuid]
      *
-     * @param packageId 包 id
+     * @param packageId Package ID
      * @return
      */
     public String getLineProtocolDataWithPkgId(String packageId) {
@@ -108,9 +108,9 @@ public class SyncData implements Cloneable {
     }
 
     /**
-     * 替换 (sdk_data_id=)[packageId].[pid].[pkg_dataCount].[uuid] 为 sdk_data_id=[uuid]
+     * Replace (sdk_data_id=)[packageId].[pid].[pkg_dataCount].[uuid] with sdk_data_id=[uuid]
      *
-     * @param newUUID 新 uuid
+     * @param newUUID New UUID
      * @return
      */
     public String getDataString(String newUUID) {
@@ -131,7 +131,7 @@ public class SyncData implements Cloneable {
     }
 
     /**
-     * 追踪数据转化
+     * Trace data conversion
      *
      * @param dataType
      * @param bean
@@ -156,7 +156,7 @@ public class SyncData implements Cloneable {
 
 
     /**
-     * 日志数据转化
+     * Log data conversion
      *
      * @param bean
      * @return

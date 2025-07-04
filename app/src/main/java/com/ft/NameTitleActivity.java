@@ -6,7 +6,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 /**
- * 自动给 App Bar 上命名为该 Activity 的 class Name
+ * Automatically name the App Bar with the Activity's class name
  */
 abstract class NameTitleActivity extends AppCompatActivity {
 

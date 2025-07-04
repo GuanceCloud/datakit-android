@@ -16,42 +16,42 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * 负责符号文件打包与上传
+ * Responsible for symbol file packaging and upload
  */
 public class FTMapUploader {
 
     private final Project project;
     /**
-     * so build 符号生成路径
+     * so build symbol generation path
      */
     private final static String MERGED_LIB_PATH = "build/intermediates/merged_native_libs";
 
     /**
-     * Unity Symbol 生成路径
+     * Unity Symbol generation path
      */
     private final static String UNITY_SYMBOLS_PATH = "/unityLibrary/symbols";
 
     /**
-     * R8 混淆生成路径
+     * R8 obfuscation generation path
      */
     private final HashMap<String, ObfuscationSettingConfig> obfuscationSettingMap = new HashMap<>();
 
     /**
-     * 数据合并路径
+     * Data merge path
      */
     private final static String SYMBOL_MERGE_PATH_FORMAT = "/tmp/ftSourceMapMerge-%s";
     /**
-     * zip 文件打包路径
+     * zip file packaging path
      */
     private final static String SYMBOL_MERGE_ZIP_PATH_FORMAT = "/tmp/ftSourceMap-%s.zip";
     /**
-     * proguard 符号文件
+     * proguard symbol file
      */
     private final static String PROGUARD_MAPPING_PATH = "/outputs/proguard/%s/mapping/mapping.txt";
 
 
     /**
-     * zip 打包对象，临时生成路径
+     * zip packaging object, temporary generation path
      */
     private final String tmpBuildPathFormat;
     private final String zipBuildPathFormat;
@@ -71,7 +71,7 @@ public class FTMapUploader {
     }
 
     /**
-     * 上传混淆符号文件与 native debug symbol 符号文件
+     * Upload obfuscation symbol file and native debug symbol file
      */
     public void configMapUpload() {
         if (flavorModelHashMap.isEmpty()) {
@@ -106,7 +106,7 @@ public class FTMapUploader {
                         String zipBuildPath = String.format(zipBuildPathFormat, variantName);
                         model.setZipPath(zipBuildPath);
 
-                        //删除之前的 cache
+                        // Delete previous cache
                         try {
                             deleteRecursively(new File(tmpBuildPath));
                             FileUtils.delete(new File(zipBuildPath));
@@ -145,7 +145,7 @@ public class FTMapUploader {
                     return;
                 }
                 String zipBuildPath = model.getZipPath();
-                //删除之前的 cache
+                // Delete previous cache
                 try {
                     ObfuscationSettingConfig config = obfuscationSettingMap.get(assembleTaskName);
                     if (config != null) {
@@ -216,7 +216,7 @@ public class FTMapUploader {
     }
 
     /**
-     * 删除文件夹
+     * Delete folder
      *
      * @param file
      * @throws IOException
@@ -230,12 +230,12 @@ public class FTMapUploader {
                 }
             }
         }
-        FileUtils.delete(file);  // 使用 FileUtils 删除文件或文件夹
+        FileUtils.delete(file);  // Use FileUtils to delete file or folder
     }
 
 
     /**
-     * 扫描并添加 native cmake build 路径
+     * Scan and add native cmake build path
      *
      * @param p
      * @param list
@@ -270,9 +270,9 @@ public class FTMapUploader {
 
 
     /**
-     * 上传符号文件
+     * Upload symbol file
      *
-     * @param settingConfig 混淆配置
+     * @param settingConfig  obfuscation configuration
      * @throws IOException
      * @throws InterruptedException
      */
@@ -306,7 +306,7 @@ public class FTMapUploader {
 
         int exitCode = process.exitValue();
         if (exitCode != 0) {
-            Logger.error("map 文件上传失败");
+            Logger.error("map file upload failed");
             Logger.error("exit code::" + exitCode);
         }
 
@@ -317,11 +317,11 @@ public class FTMapUploader {
         ProductFlavorModel model = flavorModelHashMap
                 .get(variantName.replace("Release", ""));
         if (model != null) {
-            //多个 flavor
+            //multiple flavor
             model.mergeFTExtension(extension);
             return model;
         } else {
-            //不设置 flavor, 此处 variantName = release
+            //not set flavor, here variantName = release
             model = new ProductFlavorModel(variantName);
             model.setFromFTExtension(extension);
         }
@@ -330,15 +330,15 @@ public class FTMapUploader {
 
 
     /**
-     * 混淆配置
+     * obfuscation configuration
      */
     static class ObfuscationSettingConfig {
         /**
-         * 包名
+         * Package name
          */
         String applicationId = "";
         /**
-         * 版本号 字符 例如 1.0.0
+         * Version name, e.g. 1.0.0
          */
         String versionName = "";
         /**
@@ -346,7 +346,7 @@ public class FTMapUploader {
          */
         int versionCode;
         /**
-         * map 输出地址
+         * map output path
          */
         String mappingOutputPath = "";
 

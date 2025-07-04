@@ -17,7 +17,7 @@ import okhttp3.Response;
 /**
  * author: huangDianHua
  * time: 2020/9/1 17:47:53
- * description:发起一个简单的请求
+ * description: Initiate a simple request
  */
 public class RequestUtil {
     static OkHttpClient client = new OkHttpClient.Builder()
@@ -28,8 +28,8 @@ public class RequestUtil {
             .build();
 
     /**
-     *  发起一个 http 请求
-     * @param url 请求地址
+     *  Initiate an HTTP request
+     * @param url Request URL
      * @return
      */
     public static Request okhttpRequestUrl(@NonNull String url) {

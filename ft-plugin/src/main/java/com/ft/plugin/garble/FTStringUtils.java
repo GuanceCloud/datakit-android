@@ -3,7 +3,7 @@ package com.ft.plugin.garble;
 public class FTStringUtils {
 
     /**
-     * 首字母大写
+     * Capitalize the first letter
      *
      * @param inputString
      * @return

@@ -8,7 +8,7 @@ import android.os.Build;
 import androidx.annotation.RequiresApi;
 
 /**
- * * 监听 {@link android.app.Fragment} 的 view 活动
+ * Listen to the view activity of {@link android.app.Fragment}
  */
 @RequiresApi(api = Build.VERSION_CODES.O)
 final class OreoFragmentLifecycleCallbacks extends FragmentManager.FragmentLifecycleCallbacks {

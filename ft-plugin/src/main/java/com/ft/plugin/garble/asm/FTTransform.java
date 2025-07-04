@@ -11,9 +11,9 @@ import org.objectweb.asm.Opcodes;
 import java.util.List;
 
 /**
- * 创建 asm class visitor
+ * Create asm class visitor
  * <p>
- * 仅支持 AGP 7.4.2 以上，Gradle 7.2.0 以上，其他版本查看分支 plugin_legacy_support
+ * Only supports AGP 7.4.2 and above, Gradle 7.2.0 and above. For other versions, see branch plugin_legacy_support
  *
  * @author Brandon
  */

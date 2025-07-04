@@ -28,7 +28,7 @@ import java.util.concurrent.CountDownLatch;
 /**
  * BY huangDianHua
  * DATE:2020-01-10 15:20
- * Description: 用户绑定与解绑测试类
+ * Description: User binding and unbinding test class
  */
 @RunWith(AndroidJUnit4.class)
 public class ServerConnectTest extends BaseTest {
@@ -43,7 +43,7 @@ public class ServerConnectTest extends BaseTest {
     }
 
     /**
-     * 空地址错误校验
+     * Empty address error validation
      * @throws Exception
      */
     @Test
@@ -52,7 +52,7 @@ public class ServerConnectTest extends BaseTest {
     }
 
     /**
-     * 错误 Datakit 地址校验
+     * Invalid Datakit address validation
      * @throws Exception
      */
     @Test
@@ -61,7 +61,7 @@ public class ServerConnectTest extends BaseTest {
     }
 
     /**
-     * 正常地址校验
+     * Valid address validation
      * @throws Exception
      */
     @Test
@@ -70,7 +70,7 @@ public class ServerConnectTest extends BaseTest {
     }
 
     /**
-     * 正常配置数据请求校验
+     * Valid configuration data request validation
      * @param url
      * @param expected
      * @throws Exception
@@ -85,7 +85,7 @@ public class ServerConnectTest extends BaseTest {
 
 
     /**
-     * Datakit 数据请求校验
+     * Datakit data request validation
      * @param expected
      * @throws Exception
      */

@@ -18,7 +18,7 @@ import java.util.HashMap;
 public class HttpBuilder {
 
     /**
-     * dataway 数据收发地址
+     * dataway data transmission address
      */
     private final static String DATAWAY_URL_HOST_FORMAT = "/%s?token=%s&to_headless=true";
     private String host;
@@ -39,7 +39,7 @@ public class HttpBuilder {
     private final HashMap<String, String> headParams = new HashMap<>();
     private final HashMap<String, String> params = new HashMap<>();
 
-    // 新增 HashMap 用于表单和文件数据
+    // New HashMap for form and file data
     private final HashMap<String, String> formParams = new HashMap<>();
     private final HashMap<String, Pair<String, byte[]>> fileParams = new HashMap<>();
 
@@ -75,7 +75,7 @@ public class HttpBuilder {
 
     public RequestMethod getMethod() {
         if (method == null) {
-            throw new InvalidParameterException("method 未初始化");
+            throw new InvalidParameterException("method not initialized");
         }
         return method;
     }
@@ -193,7 +193,7 @@ public class HttpBuilder {
     }
 
     /**
-     * 数据同步 HTTP 请求
+     * Data synchronization HTTP request
      *
      * @return
      */

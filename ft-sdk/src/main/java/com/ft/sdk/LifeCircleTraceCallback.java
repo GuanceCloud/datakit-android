@@ -22,40 +22,40 @@ import java.util.LinkedHashMap;
 /**
  * create: by huangDianHua
  * time: 2020/6/17 17:50:45
- * description:处理当前应用退到后台10秒后重新进入
+ * description: Handle current application going to background for 10 seconds and then returning to foreground
  */
 class LifeCircleTraceCallback {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "LifeCircleTraceCallback";
     /**
-     * 消息通道
+     * Message channel
      */
     public static final int MSG_CHECK_SLEEP_STATUS = 1;
     /**
-     * 休眠延迟时间
+     * Sleep delay time
      */
-    public static final int DELAY_SLEEP_MILLIS = 10000;//10 秒
+    public static final int DELAY_SLEEP_MILLIS = 10000;//10 seconds
     /**
-     * 是否已处于休眠状态，这里送至后台 10秒判定为休眠
+     * Whether already in sleep state, here going to background for 10 seconds is considered as sleep
      */
     private boolean alreadySleep = true;
     /**
-     * 判断第一次第一个页是否创建
+     * Determine if the first page is created for the first time
      */
     private boolean mInited = false;//
     /**
-     * 应用启动时间点
+     * Application startup time point
      */
     private long startTimeNanoTime = 0;
 
     private long startClockTimeNano = 0;
 
     /**
-     * 缓存创建时间点
+     * Cache creation time point
      */
     private final LinkedHashMap<Context, Long> mCreateMap = new LinkedHashMap<>();
 
     /**
-     * 用于发送延迟消息，10 秒后执行休眠 {@link #alreadySleep} = true 操作
+     * Used to send delayed messages, execute sleep {@link #alreadySleep} = true operation after 10 seconds
      */
     private final Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
@@ -68,10 +68,10 @@ class LifeCircleTraceCallback {
     };
 
     /**
-     * {@link Activity#onStart()} 之前
+     * Before {@link Activity#onStart()}
      */
     public void onPreStart() {
-        if (alreadySleep) {//表示从后台重新进入
+        if (alreadySleep) {// Indicates returning from background
             if (mInited) {
                 //hot start
                 startTimeNanoTime = Utils.getCurrentNanoTime();
@@ -83,7 +83,7 @@ class LifeCircleTraceCallback {
     }
 
     /**
-     * {@link Activity#onCreate(Bundle)} 之前
+     * Before {@link Activity#onCreate(Bundle)}
      *
      * @param context
      */
@@ -98,7 +98,7 @@ class LifeCircleTraceCallback {
     }
 
     /**
-     * {@link Activity#onCreate(Bundle)} 之后
+     * After {@link Activity#onCreate(Bundle)}
      *
      * @param context
      */
@@ -127,8 +127,8 @@ class LifeCircleTraceCallback {
     }
 
     /**
-     * see <a href="https://developer.android.com/topic/performance/vitals/launch-time?hl=zh-cn#warm">启动时间计算规则</a>
-     * {@link Activity#onResume() }  之后
+     * see <a href="https://developer.android.com/topic/performance/vitals/launch-time?hl=zh-cn#warm">Launch time calculation rules</a>
+     * After {@link Activity#onResume() }
      *
      * @param context
      */
@@ -141,12 +141,12 @@ class LifeCircleTraceCallback {
             FTAppStartCounter.get().coldStart(Utils.getCurrentNanoTime());
             //config nonnull here ignore warning
             if (manager.isRumEnable() && config.isEnableTraceUserAction()) {
-                //如果 SDK 未初始化，则会在 SDK 延迟初始化之后补充这部分数据
+                // If SDK is not initialized, this data will be supplemented after SDK delayed initialization
                 FTAppStartCounter.get().coldStartUpload();
             }
         }
 
-        //已经休眠
+        // Already sleeping
         if (alreadySleep) {
             if (mInited) {
                 if (config != null && config.isRumEnable() && config.isEnableTraceUserAction()) {
@@ -162,19 +162,19 @@ class LifeCircleTraceCallback {
             FTSdk.updateRemoteConfig();
             alreadySleep = false;
         }
-        //避免重复计算页面启动的统计计算
+        // Avoid duplicate calculation of page startup statistics
         if (!mInited) {
             mInited = true;
         }
     }
 
     /**
-     * 当所有 Activity 都 onStop 时触发
+     * Triggered when all Activities are onStop
      */
     public void onEnterBackground() {
         if (FTSdk.checkInstallState()) {
             handler.removeMessages(MSG_CHECK_SLEEP_STATUS);
-            //休眠一段时候后执行,为了区分短时间唤醒的行为
+            // Execute after sleeping for a while to distinguish short-term wake-up behaviors
             handler.sendEmptyMessageDelayed(MSG_CHECK_SLEEP_STATUS, DELAY_SLEEP_MILLIS);
         }
     }
@@ -193,7 +193,7 @@ class LifeCircleTraceCallback {
     }
 
     /**
-     * 检测是否长时间休眠
+     * Check if long-term sleep
      */
     private void checkLongTimeSleep() {
         boolean appForeground = FTActivityLifecycleCallbacks.isAppInForeground();

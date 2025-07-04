@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 
 ext {
-    //发布 snapshot 版本号末尾追加 "-SNAPSHOT"
+    //Append "-SNAPSHOT" to the end of snapshot version number for publishing
     pkgVersion = "1.6.12"
 
     mavenGroupId = "com.cloudcare.ft.mobile.sdk.tracker.agent"

@@ -33,7 +33,7 @@ import org.junit.runner.RunWith;
 import java.util.List;
 
 /**
- * RUM 点击事件监测
+ * RUM click event monitoring
  */
 @RunWith(AndroidJUnit4.class)
 public class RUMClickActionTest extends BaseTest {
@@ -53,7 +53,7 @@ public class RUMClickActionTest extends BaseTest {
 
         FTSDKConfig ftSDKConfig = FTSDKConfig
                 .builder(BuildConfig.DATAKIT_URL)
-                .setDebug(true)//设置是否是 debug
+                .setDebug(true)//Set whether it is debug
                 .setEnv(EnvType.GRAY);
         FTSdk.install(ftSDKConfig);
 
@@ -68,7 +68,7 @@ public class RUMClickActionTest extends BaseTest {
 
 
     /**
-     * 模拟真实应用启动情况下，点击 Button 后，Action 相关数据是否正常生成
+     * Simulate whether Action related data is normally generated after clicking the Button during actual application startup
      *
      * @throws Exception
      */

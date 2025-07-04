@@ -7,11 +7,11 @@ import androidx.annotation.NonNull;
  */
 public enum ErrorType {
     /**
-     * C++/C 类型崩溃
+     * C++/C type crash
      */
     NATIVE("native_crash"),
     /**
-     * Java 类型崩溃
+     * Java type crash
      */
     JAVA("java_crash"),
     /**
@@ -20,22 +20,22 @@ public enum ErrorType {
     FLUTTER("flutter_crash"),
 
     /**
-     * 由于 ANR 产生的崩溃问题
+     * Crash issues caused by ANR
      */
     ANR_CRASH("anr_crash"),
 
     /**
-     * 触发的 ANR 事件
+     * Triggered ANR events
      */
     ANR_ERROR("anr_error"),
     /**
-     * 网络请求错误
+     * Network request errors
      */
     NETWORK("network_error");
 
 
     /**
-     * 错误类型，最终显示在行协议中的字符内容
+     * Error type, final character content displayed in line protocol
      */
     private final String value;
 
@@ -45,10 +45,10 @@ public enum ErrorType {
 
 
     /**
-     * 从字符转化成对应 ErrorType
+     * Convert from character to corresponding ErrorType
      *
      * @param value native_crash, java_crash, flutter_crash, network_error
-     * @return {@link ErrorType} 类型
+     * @return {@link ErrorType} type
      */
     public static ErrorType getValueFrom(String value) {
         ErrorType[] errorTypes = values();

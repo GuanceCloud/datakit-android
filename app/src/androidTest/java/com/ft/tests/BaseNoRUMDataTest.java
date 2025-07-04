@@ -18,13 +18,13 @@ import org.junit.Test;
 import java.util.List;
 
 /**
- * RUM 数据生成基础累，用于检验不同场景配置，获取到不同的数据
+ * Base class for RUM data generation, used to verify that different scenario configurations obtain different data
  */
 abstract public class BaseNoRUMDataTest extends BaseTest {
 
     /**
      *
-     * RUM View 数据生成模拟测试
+     * Simulated test for RUM View data generation
      *
      * @throws Exception
      */
@@ -42,7 +42,7 @@ abstract public class BaseNoRUMDataTest extends BaseTest {
 
     /**
      *
-     * RUM Action 点击事件模拟测试
+     * Simulated test for RUM Action click event
      *
      * @throws Exception
      */
@@ -61,7 +61,7 @@ abstract public class BaseNoRUMDataTest extends BaseTest {
     }
 
     /**
-     *  RUM Resource 网络资源请求模拟测试
+     *  Simulated test for RUM Resource network resource request
      * @throws Exception
      */
     @Test

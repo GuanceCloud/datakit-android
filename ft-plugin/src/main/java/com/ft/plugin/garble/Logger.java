@@ -7,11 +7,11 @@ package com.ft.plugin.garble;
  */
 public class Logger {
     /**
-     * 输出日志前缀
+     * Log output prefix
      */
     private static final String TAG = "[FT-Plugin]:";
     /**
-     * 设置 debug，开启后，会在 build 过程中输出日志
+     * Set debug. When enabled, logs will be output during the build process
      */
     private static boolean debug = true;
 
@@ -21,7 +21,7 @@ public class Logger {
     }
 
     /**
-     *  debug 级别日志
+     * debug level log
      * @param message
      */
     public static void debug(Object message) {
@@ -31,7 +31,7 @@ public class Logger {
     }
 
     /**
-     * error 级别日志
+     * error level log
      * @param message
      */
     public static void error(Object message) {

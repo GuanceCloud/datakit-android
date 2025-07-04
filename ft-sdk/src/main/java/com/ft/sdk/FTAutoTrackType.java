@@ -4,24 +4,24 @@ package com.ft.sdk;
  * BY huangDianHua
  * DATE:2019-12-20 14:36
  *
- * 声明自动捕获类型，用于建立过滤体系，用于之后 {@link FTAutoTrack} 黑白名单配置
+ * Declare automatic capture types, used to establish filtering system, for later {@link FTAutoTrack} blacklist and whitelist configuration
  *
  */
 public enum FTAutoTrackType {
 //    APP_START(1),
 //    APP_END(1 << 1),
     /**
-     * 应用点击事件
+     * Application click event
      */
     APP_CLICK(1 << 2);
 
     /**
-     * Auto track 类型
+     * Auto track type
      */
     public final int type;
 
     /**
-     * 内部构造方法
+     * Internal constructor method
      * @param type
      */
     FTAutoTrackType(int type) {

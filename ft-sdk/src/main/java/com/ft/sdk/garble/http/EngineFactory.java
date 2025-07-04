@@ -6,21 +6,21 @@ import com.ft.sdk.garble.utils.PackageUtils;
 /**
  * create: by huangDianHua
  * time: 2020/4/21 17:42:36
- * description:智能适配网络请求引擎
+ * description: Intelligent network request engine adapter
  */
 public class EngineFactory {
     public static final String TAG = Constants.LOG_TAG_PREFIX + "EngineFactory";
 
     /**
-     * 创建同步引擎对象
+     * Create synchronous engine object
      * @return
      */
     public static INetEngine createEngine() {
-        //如果监测到 okhttp 依赖库就是用 Okhttp
+        //If the okhttp dependency library is detected, use Okhttp
         if (PackageUtils.isOKHttp3Support()) {
             return new OkHttpEngine();
         }
-        //如果没有检测到，那么就是用 httpUrlConnection
+        //If no detection is found, use httpUrlConnection
         return new NativeNetEngine();
     }
 }

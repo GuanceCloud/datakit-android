@@ -1,16 +1,19 @@
 package com.ft.sdk.garble.bean;
 
+/**
+ * Sampling rate hit
+ */
 public enum CollectType {
     /**
-     * 采样率命中
+     * Sampling rate hit
      */
     COLLECT_BY_SAMPLE,
     /**
-     * 错误采样率命中
+     * Error sampling rate hit
      */
     COLLECT_BY_ERROR_SAMPLE,
     /**
-     * 不采集
+     * Not collected
      */
     NOT_COLLECT;
 

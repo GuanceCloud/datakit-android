@@ -19,7 +19,7 @@ import org.junit.Rule;
 import org.junit.runner.RunWith;
 
 /**
- * RUM 仅仅配置 appid，但不开启功能，数据校验
+ * No RUM configuration, data validation
  */
 @RunWith(AndroidJUnit4.class)
 public class RUMNoConfigTest extends BaseNoRUMDataTest {
@@ -39,7 +39,7 @@ public class RUMNoConfigTest extends BaseNoRUMDataTest {
 
         FTSDKConfig ftSDKConfig = FTSDKConfig
                 .builder(BuildConfig.DATAKIT_URL)
-                .setDebug(true)//设置是否是 debug
+                .setDebug(true)//Set whether it is debug
                 .setEnv(EnvType.GRAY);
         FTSdk.install(ftSDKConfig);
 

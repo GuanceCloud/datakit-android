@@ -4,56 +4,53 @@ import com.ft.sdk.garble.threadpool.MonitorRunnable;
 import com.ft.sdk.garble.utils.Constants;
 
 /**
- * 检测周期，单位毫秒 MS
+ * Detection period, unit: milliseconds (MS)
  * <p>
- * 推荐使用 {@link #DEFAULT}配置，采集频率, {@link #FREQUENT}，采集获得数值更精确，但也会损耗更多性能，建议在非生产环境中使用，
- * {@link #RARE} 损耗最低，但是采集精度最低，也会提升因快速切换页面丢失监控数据的可能
+ * It is recommended to use the {@link #DEFAULT} configuration for collection frequency. {@link #FREQUENT} provides more accurate values but consumes more performance, recommended for non-production environments. {@link #RARE} has the lowest consumption but also the lowest accuracy, and increases the possibility of losing monitoring data due to rapid page switching.
  * <p>
- * 应用于 {@link MonitorRunnable}，影响 <a href="https://docs.guance.com/real-user-monitoring/explorer/">查看器</a>
- * 中
+ * Applied to {@link MonitorRunnable}, affects the <a href="https://docs.guance.com/real-user-monitoring/explorer/">Explorer</a>
  * {@link Constants#KEY_CPU_TICK_COUNT_PER_SECOND}
  * {@link Constants#KEY_CPU_TICK_COUNT}
  * {@link Constants#KEY_MEMORY_MAX}
  * {@link Constants#KEY_MEMORY_AVG}
  * {@link Constants#KEY_FPS_AVG}
  * {@link Constants#KEY_FPS_MINI}
- * 显示精准度
+ * Display accuracy
  * <p>
- *  通过在 {@link FTRUMConfig#setDeviceMetricsMonitorType(DeviceMetricsMonitorType, DetectFrequency)} 进行设置
+ *  Set via {@link FTRUMConfig#setDeviceMetricsMonitorType(DeviceMetricsMonitorType, DetectFrequency)}
  *
- * 采集类型请查阅 {@link DeviceMetricsMonitorType}
+ * For collection types, see {@link DeviceMetricsMonitorType}
  *
  * @author Brandon
  */
 public enum DetectFrequency {
 
     /**
-     * 默认检测频率 500 ms 一次
+     * Default detection frequency: once every 500 ms
      */
     DEFAULT(500),
 
     /**
-     * 高频采集，100 ms 一次
+     * High-frequency collection: once every 100 ms
      */
     FREQUENT(100),
 
     /**
-     * 低频率采集 1000 ms 一次
+     * Low-frequency collection: once every 1000 ms
      */
     RARE(1000);
 
     private final long value;
 
     /**
-     * @param periodTime 事件周期
+     * @param periodTime Event period
      */
     DetectFrequency(long periodTime) {
-
         this.value = periodTime;
     }
 
     /**
-     * @return 获取监测周期，单位 毫秒
+     * @return Get monitoring period, unit: milliseconds
      */
     public long getValue() {
         return value;

@@ -24,7 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * 配置传参调试，目的避免避免代码低级错误，导致配置异常出现 bug
+ * Configuration parameter debugging, to avoid low-level code errors causing configuration bugs
  *
  * @author Brandon
  */
@@ -40,7 +40,7 @@ public class ConfigTest extends FTBaseTest {
     }
 
     /**
-     * service name 空值参数，默认值验证
+     * Validate default value for empty service name parameter
      */
     @Test
     public void emptyServiceName() {
@@ -48,7 +48,7 @@ public class ConfigTest extends FTBaseTest {
     }
 
     /**
-     * service name 正常传参
+     * Normal service name parameter
      */
     @Test
     public void normalServiceName() {
@@ -56,7 +56,7 @@ public class ConfigTest extends FTBaseTest {
     }
 
     /**
-     * env 默认值验证
+     * Validate default value for env
      */
     @Test
     public void emptyEnv() {
@@ -64,7 +64,7 @@ public class ConfigTest extends FTBaseTest {
     }
 
     /**
-     * env 参数验证
+     * Validate env parameter
      */
     @Test
     public void enumEnv() {
@@ -72,7 +72,7 @@ public class ConfigTest extends FTBaseTest {
     }
 
     /**
-     * env 参数验证
+     * Validate env parameter
      */
     @Test
     public void customEnv() {
@@ -80,7 +80,7 @@ public class ConfigTest extends FTBaseTest {
     }
 
     /**
-     * appId 设置验证
+     * Validate appId setting
      */
     @Test
     public void rumAppId() {
@@ -93,7 +93,7 @@ public class ConfigTest extends FTBaseTest {
     }
 
     /**
-     * Integer 兼容模式
+     * Integer compatible mode
      */
     @Test
     public void enableDataIntegerCompatible() {
@@ -103,7 +103,7 @@ public class ConfigTest extends FTBaseTest {
     }
 
     /**
-     * 日志条缓存条目数配置验证，自定义数值，默认数值，和最小数值限制
+     * Validate log cache entry count configuration, custom value, default value, and minimum value limit
      */
     @Test
     public void logCacheLimit() {
@@ -122,7 +122,7 @@ public class ConfigTest extends FTBaseTest {
     }
 
     /**
-     * 验证 {@link FTSDKConfig#pageSize} 配置
+     * Validate {@link FTSDKConfig#pageSize} configuration
      */
     @Test
     public void syncDataPageSize() {
@@ -143,7 +143,7 @@ public class ConfigTest extends FTBaseTest {
     }
 
     /**
-     * 验证 {@link FTSDKConfig#pageSize} 自定义配置，同时验证最小值
+     * Validate custom {@link FTSDKConfig#pageSize} configuration, and also validate the minimum value
      */
     @Test
     public void customSyncDataPageSize() {
@@ -152,14 +152,14 @@ public class ConfigTest extends FTBaseTest {
         Assert.assertTrue(checkInnerFieldValue(SyncTaskManager.get(), "pageSize",
                 1000));
 
-        //验证最小数值
+        //Validate minimum value
         FTSdk.install(config.setCustomSyncPageSize(1));
         Assert.assertTrue(checkInnerFieldValue(SyncTaskManager.get(), "pageSize",
                 SyncPageSize.MINI.getValue()));
     }
 
     /**
-     * 验证 {@link  FTSDKConfig#syncSleepTime}
+     * Validate {@link  FTSDKConfig#syncSleepTime}
      */
     @Test
     public void syncSleepTime() {
@@ -179,7 +179,7 @@ public class ConfigTest extends FTBaseTest {
 
 
     /**
-     * 验证 {@link FTSDKConfig#autoSync} 配置
+     * Validate {@link FTSDKConfig#autoSync} configuration
      */
     @Test
     public void autoSync() {
@@ -192,7 +192,7 @@ public class ConfigTest extends FTBaseTest {
     }
 
     /**
-     * 验证 Datakit 配置
+     * Validate Datakit configuration
      */
     @Test
     public void datakitUrl() {
@@ -201,7 +201,7 @@ public class ConfigTest extends FTBaseTest {
     }
 
     /**
-     * 验证 dataway 配置
+     * Validate dataway configuration
      */
     @Test
     public void datawayConfig() {
@@ -212,7 +212,7 @@ public class ConfigTest extends FTBaseTest {
 
 
     /**
-     * 验证 serviceName
+     * Validate serviceName
      *
      * @param serviceName
      * @param expected
@@ -224,7 +224,7 @@ public class ConfigTest extends FTBaseTest {
     }
 
     /**
-     * 验证 env enum 参数
+     * Validate env enum parameter
      *
      * @param env
      * @param expected
@@ -237,7 +237,7 @@ public class ConfigTest extends FTBaseTest {
     }
 
     /**
-     * 验证 env 自定义 参数
+     * Validate custom env parameter
      *
      * @param env
      * @param expected
@@ -251,23 +251,23 @@ public class ConfigTest extends FTBaseTest {
 
 
     /**
-     * 验证 UIBlock 参数默认数值与
+     * Validate UIBlock parameter default value and
      */
     @Test
     public void rumUIBlockParamsTest() {
         FTSdk.install(getDatakitConfig());
-        //验证
+        //Validate
         FTSdk.initRUMWithConfig(new FTRUMConfig().setRumAppId(TEST_FAKE_RUM_ID)
                 .setEnableTrackAppUIBlock(true));
         Assert.assertEquals(FTUIBlockManager.DEFAULT_TIME_BLOCK_MS, getLongTaskBlockDurationMS());
 
-        //设置大于 100 ms
+        //Set greater than 100 ms
         FTSdk.initRUMWithConfig(new FTRUMConfig().setRumAppId(TEST_FAKE_RUM_ID)
                 .setEnableTrackAppUIBlock(true,
                         1000));
         Assert.assertEquals(1000, getLongTaskBlockDurationMS());
 
-        //验证最小设置
+        //Validate minimum setting
         FTSdk.initRUMWithConfig(new FTRUMConfig().setRumAppId(TEST_FAKE_RUM_ID)
                 .setEnableTrackAppUIBlock(true,
                         90));

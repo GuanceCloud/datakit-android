@@ -27,7 +27,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * SDK 配置正确性验证
+ * SDK configuration correctness verification
  */
 
 @RunWith(AndroidJUnit4.class)
@@ -41,7 +41,7 @@ public class SDKRunStateTest extends FTBaseTest {
             hasPrepare = true;
         }
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(TEST_FAKE_URL)
-                .setDebug(true)//设置是否是 debug
+                .setDebug(true)//Set whether it is debug
                 .setEnv(EnvType.GRAY);
 
         FTSdk.install(ftSDKConfig);
@@ -64,7 +64,7 @@ public class SDKRunStateTest extends FTBaseTest {
     }
 
     /**
-     * 验证 {@link FTRUMConfig#extraMonitorTypeWithError} 配置正确性
+     * Verify {@link FTRUMConfig#extraMonitorTypeWithError} configuration correctness
      */
     @Test
     public void monitorErrorTypeTest() {
@@ -72,7 +72,7 @@ public class SDKRunStateTest extends FTBaseTest {
     }
 
     /**
-     * 验证 {@link FTRUMConfig#deviceMetricsMonitorType} 配置正确性
+     * Verify {@link FTRUMConfig#deviceMetricsMonitorType} configuration correctness
      */
     @Test
     public void monitorDeviceMetricsMonitorTYpe() {
@@ -80,7 +80,7 @@ public class SDKRunStateTest extends FTBaseTest {
     }
 
     /**
-     * 验证 {@link FTTraceConfig#enableAutoTrace} 配置正确性
+     * Verify {@link FTTraceConfig#enableAutoTrace} configuration correctness
      */
     @Test
     public void networkTrackTest() {
@@ -88,7 +88,7 @@ public class SDKRunStateTest extends FTBaseTest {
     }
 
     /**
-     * 验证 {@link FTLoggerConfig#enableConsoleLog} 配置正确性
+     * Verify {@link FTLoggerConfig#enableConsoleLog} configuration correctness
      */
     @Test
     public void trackConsoleLogTest() {
@@ -96,7 +96,7 @@ public class SDKRunStateTest extends FTBaseTest {
     }
 
     /**
-     * 验证 {@link FTRUMConfig#enableTraceUserAction} 配置正确性
+     * Verify {@link FTRUMConfig#enableTraceUserAction} configuration correctness
      */
     @Test
     public void traceUserActionTest() {
@@ -104,7 +104,7 @@ public class SDKRunStateTest extends FTBaseTest {
     }
 
     /**
-     * 验证 {@link FTRUMConfig#enableTraceUserView} 配置正确性
+     * Verify {@link FTRUMConfig#enableTraceUserView} configuration correctness
      */
     @Test
     public void traceUserViewTest() {
@@ -112,8 +112,8 @@ public class SDKRunStateTest extends FTBaseTest {
     }
 
     /**
-     * 关闭 SDK 后
-     * 验证 {@link FTRUMConfig#extraMonitorTypeWithError} 配置正确性
+     * After shutting down SDK
+     * Verify {@link FTRUMConfig#extraMonitorTypeWithError} configuration correctness
      */
     @Test
     public void showdownMonitorTypeTest() {
@@ -121,8 +121,8 @@ public class SDKRunStateTest extends FTBaseTest {
         Assert.assertFalse(FTMonitorManager.get().isErrorMonitorType(ErrorMonitorType.ALL));
     }
     /**
-     * 关闭 SDK 后
-     * 验证 {@link FTRUMConfig#enableAutoTrace} 配置正确性
+     * After shutting down SDK
+     * Verify {@link FTRUMConfig#enableAutoTrace} configuration correctness
      */
     @Test
     public void showdownNetworkTrackTest() {
@@ -131,8 +131,8 @@ public class SDKRunStateTest extends FTBaseTest {
     }
 
     /**
-     * 关闭 SDK 后
-     * 验证 Log 相关配置正确性
+     * After shutting down SDK
+     * Verify Log related configuration correctness
      */
     @Test
     public void showdownTrackConsoleLogTest() {
@@ -141,8 +141,8 @@ public class SDKRunStateTest extends FTBaseTest {
     }
 
     /**
-     * 关闭 SDK 后
-     * 验证 RUM 相关配置正确性
+     * After shutting down SDK
+     * Verify RUM related configuration correctness
      */
     @Test
     public void showdownRUMTest() {
