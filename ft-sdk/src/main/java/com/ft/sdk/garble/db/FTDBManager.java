@@ -744,16 +744,7 @@ public class FTDBManager extends DBManager {
     }
 
     /**
-     * Delete user data by user's sessionId
-     *
-     * @param sessionId
-     */
-    public void deleteUserData(String sessionId) {
-        getDB(true, db -> db.delete(FTSQL.FT_TABLE_USER_DATA, FTSQL.USER_COLUMN_SESSION_ID + "=?", new String[]{sessionId}));
-    }
-
-    /**
-     * Delete the first limit rows of data in the data table
+     * 删除数据表中的前 limit 行数的数据
      *
      * @param type
      * @param limit
