@@ -18,12 +18,18 @@ import com.ft.sdk.sessionreplay.model.Data;
 import com.ft.sdk.sessionreplay.model.Data1;
 import com.ft.sdk.sessionreplay.model.Data2;
 import com.ft.sdk.sessionreplay.model.FocusRecord;
+import com.ft.sdk.sessionreplay.model.ImageWireframe;
 import com.ft.sdk.sessionreplay.model.MetaRecord;
 import com.ft.sdk.sessionreplay.model.MobileMutationData;
 import com.ft.sdk.sessionreplay.model.MobileRecord;
+import com.ft.sdk.sessionreplay.model.PlaceholderWireframe;
+import com.ft.sdk.sessionreplay.model.ShapeStyle;
+import com.ft.sdk.sessionreplay.model.ShapeWireframe;
+import com.ft.sdk.sessionreplay.model.TextStyle;
 import com.ft.sdk.sessionreplay.model.TextWireframe;
 import com.ft.sdk.sessionreplay.model.ViewEndRecord;
 import com.ft.sdk.sessionreplay.model.ViewportResizeData;
+import com.ft.sdk.sessionreplay.model.WebviewWireframe;
 import com.ft.sdk.sessionreplay.model.Wireframe;
 import com.ft.sdk.sessionreplay.recorder.SystemInformation;
 import com.ft.sdk.sessionreplay.utils.SessionReplayRumContext;
@@ -80,7 +86,7 @@ public class RecordedDataProcessor implements Processor {
     @Override
     @WorkerThread
     public void processScreenSnapshots(SnapshotRecordedDataQueueItem item) {
-        //printNodesTree(item.getNodes());
+        printNodesTree(item.getNodes());
         
         handleSnapshots(
                 item.getRecordedQueuedItemContext().getNewRumContext(),
@@ -264,67 +270,206 @@ public class RecordedDataProcessor implements Processor {
 
     private static final long FULL_SNAPSHOT_INTERVAL_IN_NS = TimeUnit.MILLISECONDS.toNanos(3000);
 
+    // 辅助方法：重复字符串
+    private String repeatString(String str, int count) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            sb.append(str);
+        }
+        return sb.toString();
+    }
+
     // 添加打印nodes树的方法
     private void printNodesTree(List<Node> nodes) {
-        Log.d(TAG,"========== Nodes Tree Structure ==========");
+        Log.d(TAG, "=== zzq debug: new printNodesTree ===");
+        Log.d(TAG,"==================== Node Tree Structure ====================");
         for (int i = 0; i < nodes.size(); i++) {
-            Log.d(TAG, "Root Node[" + i + "]:");
             printNodeRecursive(nodes.get(i), 0);
         }
-        Log.d(TAG,"========== End Nodes Tree ==========");
+        Log.d(TAG,"============================================================");
     }
 
     private void printNodeRecursive(Node node, int depth) {
-        String indent = "  ".repeat(depth);
-        String treePrefix = depth == 0 ? "" : (depth == 1 ? "├── " : "│   ".repeat(depth - 1) + "├── ");
+        String indent = repeatString("  ", depth);
+        String treePrefix = depth == 0 ? "" : (depth == 1 ? "├── " : repeatString("│   ", depth - 1) + "├── ");
         
-        // 打印当前节点开始标记
-        Log.d(TAG,indent + treePrefix + "【Level " + depth + " Node】{");
-        
-        // 打印当前节点的wireframes信息
-        Log.d(TAG,indent + "│   Wireframes(" + node.getWireframes().size() + "):");
+        // 打印当前节点
         for (int i = 0; i < node.getWireframes().size(); i++) {
             Wireframe wireframe = node.getWireframes().get(i);
-            String wireframeInfo = indent + "│     └─ [" + i + "] id=" + wireframe.getId() + 
-                             ", type=" + wireframe.getClass().getSimpleName();
+            String nodeInfo = indent + treePrefix + "🔹 Node[depth:" + depth + "][" + node.getWireframes().size() + " wireframes] ";
             
-            // 如果是TextWireframe，添加文本内容
-            if (wireframe instanceof TextWireframe) {
-                TextWireframe textWireframe = (TextWireframe) wireframe;
-                String text = textWireframe.getText();
-                if (text != null && !text.isEmpty()) {
-                    wireframeInfo += ", text=\"" + text + "\"";
-                } else {
-                    wireframeInfo += ", text=<empty>";
-                }
+            // 获取wireframe的标签信息
+            String label = getWireframeLabel(wireframe);
+            String bounds = getWireframeBounds(wireframe);
+            nodeInfo += label + "(" + bounds + ")[ID:" + wireframe.getId() + "]";
+            
+            // 添加children和parents信息
+            if (!node.getChildren().isEmpty()) {
+                nodeInfo += " [" + node.getChildren().size() + " children]";
+            }
+            if (!node.getParents().isEmpty()) {
+                nodeInfo += " [" + node.getParents().size() + " parents]";
             }
             
-            Log.d(TAG, wireframeInfo);
+            Log.d(TAG, nodeInfo);
+            
+            // 打印wireframe详细信息
+            String wireframeDetail = indent + "       📄 [ID:" + wireframe.getId() + "] " + 
+                                   getWireframeDetail(wireframe);
+            Log.d(TAG, wireframeDetail);
+            
+            // 打印parents信息
+            if (!node.getParents().isEmpty()) {
+                Log.d(TAG, indent + "       👆 Parents[" + node.getParents().size() + "]:");
+                for (int j = 0; j < node.getParents().size(); j++) {
+                    Wireframe parent = node.getParents().get(j);
+                    String parentInfo = indent + "          " + (j + 1) + ". 📄 [ID:" + parent.getId() + "] " + 
+                                      getWireframeDetail(parent);
+                    Log.d(TAG, parentInfo);
+                }
+            }
         }
-        
-        // 打印parents信息
-        Log.d(TAG,indent + "│   Parents(" + node.getParents().size() + "):");
-        for (int i = 0; i < node.getParents().size(); i++) {
-            Wireframe parent = node.getParents().get(i);
-            Log.d(TAG,indent + "│     └─ [" + i + "] id=" + parent.getId() +
-                             ", type=" + parent.getClass().getSimpleName());
-        }
-        
-        // 打印children数量
-        Log.d(TAG,indent + "│   Children(" + node.getChildren().size() + "):");
         
         // 递归打印子节点
         for (int i = 0; i < node.getChildren().size(); i++) {
             boolean isLastChild = (i == node.getChildren().size() - 1);
             String childPrefix = isLastChild ? "└── " : "├── ";
-            Log.d(TAG,indent + "│   " + childPrefix + "Child[" + i + "]:");
             printNodeRecursive(node.getChildren().get(i), depth + 1);
         }
+    }
+    
+    private String getWireframeLabel(Wireframe wireframe) {
+        if (wireframe instanceof TextWireframe) {
+            TextWireframe textWireframe = (TextWireframe) wireframe;
+            String text = textWireframe.getText();
+            String colorInfo = "";
+            
+            // 获取文本颜色信息
+            TextStyle textStyle = textWireframe.getTextStyle();
+            if (textStyle != null && textStyle.getColor() != null) {
+                colorInfo = "[color:" + textStyle.getColor() + "]";
+            }
+            
+            if (text != null && !text.isEmpty()) {
+                return "Text('" + text + "')" + colorInfo;
+            } else {
+                return "Text('')" + colorInfo;
+            }
+        } else if (wireframe instanceof PlaceholderWireframe) {
+            PlaceholderWireframe placeholderWireframe = (PlaceholderWireframe) wireframe;
+            String label = placeholderWireframe.getLabel();
+            if (label != null && !label.isEmpty()) {
+                return "Placeholder('" + label + "')";
+            } else {
+                return "Placeholder('')";
+            }
+        } else if (wireframe instanceof ShapeWireframe) {
+            ShapeWireframe shapeWireframe = (ShapeWireframe) wireframe;
+            String backgroundColorInfo = "";
+            
+            // 获取背景颜色信息
+            ShapeStyle shapeStyle = shapeWireframe.getShapeStyle();
+            if (shapeStyle != null && shapeStyle.getBackgroundColor() != null) {
+                backgroundColorInfo = "[backgroundColor:" + shapeStyle.getBackgroundColor() + "]";
+            }
+            
+            return "Shape" + backgroundColorInfo;
+        } else if (wireframe instanceof ImageWireframe) {
+            return "Image";
+        } else if (wireframe instanceof WebviewWireframe) {
+            return "Webview";
+        } else {
+            return wireframe.getClass().getSimpleName();
+        }
+    }
+    
+    private String getWireframeBounds(Wireframe wireframe) {
+        long x, y, width, height;
         
-        // 打印当前节点结束标记
-        Log.d(TAG,indent + "└─ 【End Level " + depth + " Node】");
-        if (depth == 0) {
-            Log.d(TAG,""); // 根节点后添加空行
+        if (wireframe instanceof TextWireframe) {
+            TextWireframe textWireframe = (TextWireframe) wireframe;
+            x = textWireframe.getX();
+            y = textWireframe.getY();
+            width = textWireframe.getWidth();
+            height = textWireframe.getHeight();
+        } else if (wireframe instanceof PlaceholderWireframe) {
+            PlaceholderWireframe placeholderWireframe = (PlaceholderWireframe) wireframe;
+            x = placeholderWireframe.getX();
+            y = placeholderWireframe.getY();
+            width = placeholderWireframe.getWidth();
+            height = placeholderWireframe.getHeight();
+        } else if (wireframe instanceof ShapeWireframe) {
+            ShapeWireframe shapeWireframe = (ShapeWireframe) wireframe;
+            x = shapeWireframe.getX();
+            y = shapeWireframe.getY();
+            width = shapeWireframe.getWidth();
+            height = shapeWireframe.getHeight();
+        } else if (wireframe instanceof ImageWireframe) {
+            ImageWireframe imageWireframe = (ImageWireframe) wireframe;
+            x = imageWireframe.getX();
+            y = imageWireframe.getY();
+            width = imageWireframe.getWidth();
+            height = imageWireframe.getHeight();
+        } else if (wireframe instanceof WebviewWireframe) {
+            WebviewWireframe webviewWireframe = (WebviewWireframe) wireframe;
+            x = webviewWireframe.getX();
+            y = webviewWireframe.getY();
+            width = webviewWireframe.getWidth();
+            height = webviewWireframe.getHeight();
+        } else {
+            // 对于未知类型的wireframe，返回默认值
+            x = y = width = height = 0;
+        }
+        
+        return x + "," + y + "," + width + "×" + height;
+    }
+    
+    private String getWireframeDetail(Wireframe wireframe) {
+        String type = wireframe.getClass().getSimpleName();
+        String bounds = getWireframeBounds(wireframe);
+        
+        if (wireframe instanceof TextWireframe) {
+            TextWireframe textWireframe = (TextWireframe) wireframe;
+            String text = textWireframe.getText();
+            String textInfo = text != null ? "'" + text + "'" : "'<empty>'";
+            
+            // 获取文本样式信息
+            TextStyle textStyle = textWireframe.getTextStyle();
+            String fontInfo = "";
+            String colorInfo = "";
+            
+            if (textStyle != null) {
+                String family = textStyle.getFamily();
+                double size = textStyle.getSize();
+                String color = textStyle.getColor();
+                
+                fontInfo = "font:" + (family != null ? family : "default") + " size:" + size;
+                colorInfo = "color:" + (color != null ? color : "#000000");
+            }
+            
+            return type + "(" + textInfo + " " + bounds + ") [" + fontInfo + " " + colorInfo + "]";
+        } else if (wireframe instanceof ShapeWireframe) {
+            ShapeWireframe shapeWireframe = (ShapeWireframe) wireframe;
+            String backgroundColorInfo = "";
+            
+            // 获取背景颜色信息
+            ShapeStyle shapeStyle = shapeWireframe.getShapeStyle();
+            if (shapeStyle != null && shapeStyle.getBackgroundColor() != null) {
+                backgroundColorInfo = " [backgroundColor:" + shapeStyle.getBackgroundColor() + "]";
+            }
+            
+            return type + "(" + bounds + ")" + backgroundColorInfo;
+        } else if (wireframe instanceof PlaceholderWireframe) {
+            PlaceholderWireframe placeholderWireframe = (PlaceholderWireframe) wireframe;
+            String label = placeholderWireframe.getLabel();
+            String labelInfo = label != null ? "'" + label + "'" : "'<empty>'";
+            return type + "(" + labelInfo + " " + bounds + ")";
+        } else if (wireframe instanceof ImageWireframe) {
+            return type + "(" + bounds + ")";
+        } else if (wireframe instanceof WebviewWireframe) {
+            return type + "(" + bounds + ")";
+        } else {
+            return type + "(" + bounds + ")";
         }
     }
 }

@@ -163,6 +163,10 @@ public class MainActivity extends AppCompatActivity {
             FTSdk.appendLogGlobalContext(logGlobalContext);
 
         });
+
+        findViewById(R.id.main_colored_texts_btn).setOnClickListener(v -> {
+            startActivity(new Intent(this, ColoredTextsActivity.class));
+        });
         findViewById(R.id.main_mock_log_btn).setOnClickListener(v -> {
             Log.e(TAG, "console log");
             Log.d(TAG, "console log");

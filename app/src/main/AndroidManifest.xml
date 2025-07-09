@@ -40,6 +40,7 @@
         <activity android:name=".IgnoreClassActivity" />
         <activity android:name=".SRPrivacyOverrideActivity" />
         <activity android:name=".FragmentActivity" />
+        <activity android:name=".ColoredTextsActivity" />
 
         <service
             android:name=".service.TestService"

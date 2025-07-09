@@ -121,6 +121,12 @@
             android:text="动态 tags 设置" />
 
         <Button
+            android:id="@+id/main_colored_texts_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="彩色文本页面" />
+
+        <Button
             android:id="@+id/main_shut_down"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
