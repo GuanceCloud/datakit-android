@@ -94,9 +94,9 @@ public class TabWireframeMapper implements WireframeMapper<TabLayout.TabView> {
         }
         float screenDensity = systemInformation.getScreenDensity();
         GlobalBounds viewBounds = viewBoundsResolver.resolveViewGlobalBounds(view, screenDensity);
-        long selectionIndicatorHeight = (long) Utils.densityNormalized(SELECTED_TAB_INDICATOR_HEIGHT_IN_PX, screenDensity);
-        long paddingStart = (long) Utils.densityNormalized(view.getPaddingStart(), screenDensity);
-        long paddingEnd = (long) Utils.densityNormalized(view.getPaddingEnd(), screenDensity);
+        long selectionIndicatorHeight = Utils.densityNormalized(SELECTED_TAB_INDICATOR_HEIGHT_IN_PX, screenDensity);
+        long paddingStart = Utils.densityNormalized(view.getPaddingStart(), screenDensity);
+        long paddingEnd =  Utils.densityNormalized(view.getPaddingEnd(), screenDensity);
         long selectionIndicatorXPos = viewBounds.getX() + paddingStart;
         long selectionIndicatorYPos = viewBounds.getY() + viewBounds.getHeight() - selectionIndicatorHeight;
         long selectionIndicatorWidth = viewBounds.getWidth() - paddingStart - paddingEnd;

@@ -218,8 +218,8 @@ public class RecorderWindowCallback implements Window.Callback {
                             eventType,
                             PointerType.TOUCH,
                             pointerId,
-                            (long) Utils.densityNormalized(pointerAbsoluteX, pixelsDensity),
-                            (long) Utils.densityNormalized(pointerAbsoluteY, pixelsDensity)
+                            Utils.densityNormalized(pointerAbsoluteX, pixelsDensity),
+                            Utils.densityNormalized(pointerAbsoluteY, pixelsDensity)
                     )
             ));
         }

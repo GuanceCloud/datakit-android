@@ -2,25 +2,26 @@ package com.ft.sdk.sessionreplay.utils;
 
 public class Utils {
 
-    public static double densityNormalized(long size, float density) {
+    public static long densityNormalized(long size, float density) {
         if (density == 0f) {
             return size;
         }
-        return size / density;
+        return (long) (size / density);
+
     }
 
-    public static double densityNormalized(float size, float density) {
+    public static long densityNormalized(float size, float density) {
         if (density == 0f) {
-            return size;
+            return (long)size;
         }
-        return size / density;
+        return (long)(size / density);
     }
 
-    public static double densityNormalized(int value, float density) {
+    public static int densityNormalized(int value, float density) {
         if (density == 0f) {
             return value;
         }
-        return value / density;
+        return (int)(value / density);
     }
 
     public static CharSequence[] convertIntArrayToCharSequenceArray(int[] intArray) {

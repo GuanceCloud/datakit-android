@@ -9,8 +9,8 @@ public class ImageTypeResolver {
 
     public boolean isDrawablePII(Drawable drawable, float density) {
         boolean isNotGradient = !(drawable instanceof GradientDrawable);
-        float widthInDp = (float) Utils.densityNormalized(drawable.getIntrinsicWidth(), density);
-        float heightInDp = (float) Utils.densityNormalized(drawable.getIntrinsicHeight(), density);
+        float widthInDp = Utils.densityNormalized(drawable.getIntrinsicWidth(), density);
+        float heightInDp = Utils.densityNormalized(drawable.getIntrinsicHeight(), density);
         boolean widthAboveThreshold = widthInDp >= IMAGE_DIMEN_CONSIDERED_PII_IN_DP;
         boolean heightAboveThreshold = heightInDp >= IMAGE_DIMEN_CONSIDERED_PII_IN_DP;
 

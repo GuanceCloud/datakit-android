@@ -74,10 +74,10 @@ public class SwitchCompatMapper extends CheckableWireframeMapper<SwitchCompat> {
             ShapeStyle trackShapeStyle = resolveTrackShapeStyle(view, checkableColor);
             ShapeWireframe trackWireframe = new ShapeWireframe(
                     trackId,
-                    (long) Utils.densityNormalized(trackBounds.getX(), pixelsDensity),
-                    (long) Utils.densityNormalized(trackBounds.getY(), pixelsDensity),
-                    (long) Utils.densityNormalized(trackBounds.getWidth(), pixelsDensity),
-                    (long) Utils.densityNormalized(trackBounds.getHeight(), pixelsDensity),
+                    Utils.densityNormalized(trackBounds.getX(), pixelsDensity),
+                    Utils.densityNormalized(trackBounds.getY(), pixelsDensity),
+                    Utils.densityNormalized(trackBounds.getWidth(), pixelsDensity),
+                    Utils.densityNormalized(trackBounds.getHeight(), pixelsDensity),
                     null,
                     trackShapeStyle, null
             );
@@ -257,8 +257,8 @@ public class SwitchCompatMapper extends CheckableWireframeMapper<SwitchCompat> {
                 view,
                 mapInputPrivacyToImagePrivacy(mappingContext.getTextAndInputPrivacy()),
                 prevIndex + 1,
-                (long) Utils.densityNormalized(trackBounds.getX(), mappingContext.getSystemInformation().getScreenDensity()),
-                (long) Utils.densityNormalized(trackBounds.getY(), mappingContext.getSystemInformation().getScreenDensity()),
+                Utils.densityNormalized(trackBounds.getX(), mappingContext.getSystemInformation().getScreenDensity()),
+                Utils.densityNormalized(trackBounds.getY(), mappingContext.getSystemInformation().getScreenDensity()),
                 trackBounds.getWidth(),
                 trackBounds.getHeight(),
                 true,
@@ -294,8 +294,8 @@ public class SwitchCompatMapper extends CheckableWireframeMapper<SwitchCompat> {
                 view,
                 mapInputPrivacyToImagePrivacy(mappingContext.getTextAndInputPrivacy()),
                 prevIndex + 1,
-                (long) Utils.densityNormalized(thumbBounds.getX(), mappingContext.getSystemInformation().getScreenDensity()),
-                (long) Utils.densityNormalized(thumbBounds.getY(), mappingContext.getSystemInformation().getScreenDensity()),
+                Utils.densityNormalized(thumbBounds.getX(), mappingContext.getSystemInformation().getScreenDensity()),
+                Utils.densityNormalized(thumbBounds.getY(), mappingContext.getSystemInformation().getScreenDensity()),
                 thumbDrawable.getIntrinsicWidth(),
                 thumbDrawable.getIntrinsicHeight(),
                 true,
@@ -369,15 +369,15 @@ public class SwitchCompatMapper extends CheckableWireframeMapper<SwitchCompat> {
         Rect paddingRect = new Rect();
         view.getThumbDrawable().getPadding(paddingRect);
         long totalHorizontalPadding =
-                (long) Utils.densityNormalized(paddingRect.left, density) +
-                        (long) Utils.densityNormalized(paddingRect.right, density);
-        thumbWidth = (long) Utils.densityNormalized(view.getThumbDrawable().getIntrinsicWidth(), density) -
+                Utils.densityNormalized(paddingRect.left, density) +
+                        Utils.densityNormalized(paddingRect.right, density);
+        thumbWidth = Utils.densityNormalized(view.getThumbDrawable().getIntrinsicWidth(), density) -
                 totalHorizontalPadding;
         long thumbHeight = thumbWidth;
         // for some reason there is no padding added in the trackDrawable
         // in order to normalise with the padding applied to the width we will have to
         // use the horizontal padding applied.
-        trackHeight = (long) Utils.densityNormalized(view.getTrackDrawable().getIntrinsicHeight(), density) -
+        trackHeight = Utils.densityNormalized(view.getTrackDrawable().getIntrinsicHeight(), density) -
                 totalHorizontalPadding;
         long trackWidth = thumbWidth * 2;
         long[] dimensions = new long[NUMBER_OF_DIMENSIONS];

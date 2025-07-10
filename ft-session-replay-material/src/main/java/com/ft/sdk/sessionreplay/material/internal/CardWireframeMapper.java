@@ -23,8 +23,7 @@ import java.util.List;
 
 public class CardWireframeMapper extends BaseViewGroupMapper<CardView> {
 
-    public CardWireframeMapper(
-            ViewIdentifierResolver viewIdentifierResolver,
+    public CardWireframeMapper( ViewIdentifierResolver viewIdentifierResolver,
             ColorStringFormatter colorStringFormatter,
             ViewBoundsResolver viewBoundsResolver,
             DrawableToColorMapper drawableToColorMapper
@@ -73,7 +72,7 @@ public class CardWireframeMapper extends BaseViewGroupMapper<CardView> {
                 : view.getStrokeColor();
         return new ShapeBorder(
                 colorStringFormatter.formatColorAsHexString(strokeColor),
-                (long) Utils.densityNormalized(view.getStrokeWidth(),
+                Utils.densityNormalized(view.getStrokeWidth(),
                         mappingContext.getSystemInformation().getScreenDensity())
         );
     }
@@ -86,7 +85,7 @@ public class CardWireframeMapper extends BaseViewGroupMapper<CardView> {
         return new ShapeStyle(
                 colorStringFormatter.formatColorAsHexString(backgroundColor),
                 view.getAlpha(),
-                (long) Utils.densityNormalized(view.getRadius(),
+                Utils.densityNormalized(view.getRadius(),
                         mappingContext.getSystemInformation().getScreenDensity())
         );
     }

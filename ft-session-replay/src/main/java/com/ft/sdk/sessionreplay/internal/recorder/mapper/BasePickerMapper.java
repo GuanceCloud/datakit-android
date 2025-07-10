@@ -35,23 +35,23 @@ public abstract class BasePickerMapper extends BaseWireframeMapper<NumberPicker>
     }
 
     protected long resolveTextSize(NumberPicker view, float screenDensity) {
-        return (long) Utils.densityNormalized(view.getTextSize(), screenDensity);
+        return Utils.densityNormalized(view.getTextSize(), screenDensity);
     }
 
     protected long resolvePadding(float screenDensity) {
-        return (long) Utils.densityNormalized(PADDING_IN_PX, screenDensity);
+        return  Utils.densityNormalized(PADDING_IN_PX, screenDensity);
     }
 
     protected long resolveDividerPaddingStart(NumberPicker view, float screenDensity) {
-        return (long) Utils.densityNormalized(view.getPaddingStart(), screenDensity);
+        return  Utils.densityNormalized(view.getPaddingStart(), screenDensity);
     }
 
     protected long resolveDividerPaddingEnd(NumberPicker view, float screenDensity) {
-        return (long) Utils.densityNormalized(view.getPaddingEnd(), screenDensity);
+        return Utils.densityNormalized(view.getPaddingEnd(), screenDensity);
     }
 
     protected long resolveDividerHeight(float screenDensity) {
-        return (long) Utils.densityNormalized(DIVIDER_HEIGHT_IN_PX, screenDensity);
+        return Utils.densityNormalized(DIVIDER_HEIGHT_IN_PX, screenDensity);
     }
 
     protected long resolveSelectedLabelYPos(GlobalBounds viewGlobalBounds, long labelHeight) {

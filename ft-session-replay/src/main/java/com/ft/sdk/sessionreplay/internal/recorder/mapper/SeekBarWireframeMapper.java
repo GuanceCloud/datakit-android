@@ -59,7 +59,7 @@ public class SeekBarWireframeMapper extends ProgressBarWireframeMapper<SeekBar> 
         if (mappingContext.getTextAndInputPrivacy() == TextAndInputPrivacy.MASK_SENSITIVE_INPUTS) {
             float screenDensity = mappingContext.getSystemInformation().getScreenDensity();
             GlobalBounds viewPaddedBounds = viewBoundsResolver.resolveViewPaddedBounds(view, screenDensity);
-            long trackHeight = (long) Utils.densityNormalized(ProgressBarWireframeMapper.TRACK_HEIGHT_IN_PX, screenDensity);
+            long trackHeight = Utils.densityNormalized(ProgressBarWireframeMapper.TRACK_HEIGHT_IN_PX, screenDensity);
             GlobalBounds thumbTrackBounds = new GlobalBounds(
                     viewPaddedBounds.getX(),
                     viewPaddedBounds.getY() + (viewPaddedBounds.getHeight() - trackHeight) / 2,
@@ -102,8 +102,8 @@ public class SeekBarWireframeMapper extends ProgressBarWireframeMapper<SeekBar> 
         long thumbWidth = 0;
         long thumbHeight = 0;
         if (view.getThumb() != null) {
-            thumbWidth = (long) Utils.densityNormalized(view.getThumb().getBounds().width(), screenDensity);
-            thumbHeight = (long) Utils.densityNormalized(view.getThumb().getBounds().height(), screenDensity);
+            thumbWidth  = Utils.densityNormalized(view.getThumb().getBounds().width(), screenDensity);
+            thumbHeight = Utils.densityNormalized(view.getThumb().getBounds().height(), screenDensity);
         }
 
         return new ShapeWireframe(

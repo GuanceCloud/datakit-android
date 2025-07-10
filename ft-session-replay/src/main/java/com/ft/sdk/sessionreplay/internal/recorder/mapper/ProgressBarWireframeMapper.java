@@ -65,7 +65,7 @@ public class ProgressBarWireframeMapper<P extends ProgressBar> extends BaseAsync
 
         float screenDensity = mappingContext.getSystemInformation().getScreenDensity();
         GlobalBounds viewPaddedBounds = viewBoundsResolver.resolveViewPaddedBounds(view, screenDensity);
-        long trackHeight = (long) Utils.densityNormalized(TRACK_HEIGHT_IN_PX, screenDensity);
+        long trackHeight = Utils.densityNormalized(TRACK_HEIGHT_IN_PX, screenDensity);
         GlobalBounds trackBounds = new GlobalBounds(
                 viewPaddedBounds.getX(),
                 viewPaddedBounds.getY() + (viewPaddedBounds.getHeight() - trackHeight) / 2,

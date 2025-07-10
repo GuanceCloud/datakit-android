@@ -42,10 +42,10 @@ public class ViewUtilsInternal {
     public GlobalBounds resolveDrawableBounds(View view, Drawable drawable, float pixelsDensity) {
         int[] coordinates = new int[2];
         view.getLocationOnScreen(coordinates);
-        long x = (long) Utils.densityNormalized(coordinates[0], pixelsDensity);
-        long y = (long) Utils.densityNormalized(coordinates[1], pixelsDensity);
-        long width = (long) Utils.densityNormalized(drawable.getIntrinsicWidth(), pixelsDensity);
-        long height = (long) Utils.densityNormalized(drawable.getIntrinsicHeight(), pixelsDensity);
+        long x = Utils.densityNormalized(coordinates[0], pixelsDensity);
+        long y = Utils.densityNormalized(coordinates[1], pixelsDensity);
+        long width = Utils.densityNormalized(drawable.getIntrinsicWidth(), pixelsDensity);
+        long height = Utils.densityNormalized(drawable.getIntrinsicHeight(), pixelsDensity);
         return new GlobalBounds(x, y, height, width);
     }
 
@@ -58,16 +58,16 @@ public class ViewUtilsInternal {
         int[] coordinates = new int[2];
         view.getLocationOnScreen(coordinates);
 
-        long viewXPosition = (long) Utils.densityNormalized(coordinates[0], pixelsDensity);
-        long viewYPosition = (long) Utils.densityNormalized(coordinates[1], pixelsDensity);
-        long drawableWidth = (long) Utils.densityNormalized(drawable.getIntrinsicWidth(), pixelsDensity);
-        long drawableHeight = (long) Utils.densityNormalized(drawable.getIntrinsicHeight(), pixelsDensity);
-        long viewWidth = (long) Utils.densityNormalized(view.getWidth(), pixelsDensity);
-        long viewHeight = (long) Utils.densityNormalized(view.getHeight(), pixelsDensity);
-        long viewPaddingStart = (long) Utils.densityNormalized(view.getPaddingStart(), pixelsDensity);
-        long viewPaddingTop = (long) Utils.densityNormalized(view.getPaddingTop(), pixelsDensity);
-        long viewPaddingBottom = (long) Utils.densityNormalized(view.getPaddingBottom(), pixelsDensity);
-        long viewPaddingEnd = (long) Utils.densityNormalized(view.getPaddingEnd(), pixelsDensity);
+        long viewXPosition = Utils.densityNormalized(coordinates[0], pixelsDensity);
+        long viewYPosition = Utils.densityNormalized(coordinates[1], pixelsDensity);
+        long drawableWidth = Utils.densityNormalized(drawable.getIntrinsicWidth(), pixelsDensity);
+        long drawableHeight = Utils.densityNormalized(drawable.getIntrinsicHeight(), pixelsDensity);
+        long viewWidth = Utils.densityNormalized(view.getWidth(), pixelsDensity);
+        long viewHeight = Utils.densityNormalized(view.getHeight(), pixelsDensity);
+        long viewPaddingStart = Utils.densityNormalized(view.getPaddingStart(), pixelsDensity);
+        long viewPaddingTop = Utils.densityNormalized(view.getPaddingTop(), pixelsDensity);
+        long viewPaddingBottom = Utils.densityNormalized(view.getPaddingBottom(), pixelsDensity);
+        long viewPaddingEnd = Utils.densityNormalized(view.getPaddingEnd(), pixelsDensity);
         long xPosition = 0;
         long yPosition = 0;
 
