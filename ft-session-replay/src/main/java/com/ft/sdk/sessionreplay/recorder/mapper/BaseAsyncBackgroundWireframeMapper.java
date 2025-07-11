@@ -98,7 +98,7 @@ public abstract class BaseAsyncBackgroundWireframeMapper<T extends View> extends
     }
 
     @UiThread
-    private Wireframe resolveBackgroundAsImageWireframe(
+    protected Wireframe resolveBackgroundAsImageWireframe(
             View view,
             GlobalBounds bounds,
             int width,

@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.UiThread;
 
 import com.ft.sdk.sessionreplay.internal.utils.ImageViewUtils;
+import com.ft.sdk.sessionreplay.internal.utils.RectExt;
 import com.ft.sdk.sessionreplay.model.Wireframe;
 import com.ft.sdk.sessionreplay.model.WireframeClip;
 import com.ft.sdk.sessionreplay.recorder.MappingContext;
@@ -67,7 +68,7 @@ public class ImageViewMapper extends BaseAsyncBackgroundWireframeMapper<ImageVie
 
         Resources resources = view.getResources();
         float density = resources.getDisplayMetrics().density;
-        WireframeClip clipping = imageViewUtils.calculateClipping(parentRect, contentRect, density);
+        WireframeClip clipping = RectExt.toWireframeClip(imageViewUtils.calculateClipping(parentRect, contentRect, density));
 
         long contentXPosInDp = Utils.densityNormalized(contentRect.left, density);
         long contentYPosInDp = Utils.densityNormalized(contentRect.top, density);

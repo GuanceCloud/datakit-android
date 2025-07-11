@@ -1,3 +1,7 @@
+# replay 0.1.2-alpha02
+1. Adapt to react native replay feature
+
+---
 # replay 0.1.2-alpha01
 1. Added `FTSessionReplayConfig.setSessionReplayOnErrorSampleRate` support for error sampling, in case it is not sampled by `setSamplingRate`, it can sample data from session replay 1 minute ago when an error occurs
 
