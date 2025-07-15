@@ -17,9 +17,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.ft.sdk.FTLogger;
+import com.ft.sdk.FTLoggerConfig;
+import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTResourceEventListener;
 import com.ft.sdk.FTResourceInterceptor;
 import com.ft.sdk.FTSdk;
+import com.ft.sdk.FTTraceConfig;
 import com.ft.sdk.FTTraceInterceptor;
 import com.ft.sdk.FTRemoteConfigManager;
 import com.ft.sdk.garble.annotation.IgnoreAOP;
@@ -61,6 +64,37 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+    // 停止数据采集
+    public void disableDataCollection() {
+        // 设置采样率为0，停止RUM数据采集
+        FTSdk.initRUMWithConfig(new FTRUMConfig()
+                .setSamplingRate(0.0f)
+                .setSessionErrorSampleRate(0.0f));
+
+        // 设置采样率为0，停止日志采集
+        FTSdk.initLogWithConfig(new FTLoggerConfig()
+                .setSamplingRate(0.0f));
+
+        // 设置采样率为0，停止链路追踪
+        FTSdk.initTraceWithConfig(new FTTraceConfig()
+                .setSamplingRate(0.0f));
+    }
+
+    // 恢复数据采集
+    public void enableDataCollection() {
+        // 恢复RUM数据采集
+        FTSdk.initRUMWithConfig(new FTRUMConfig()
+                .setSamplingRate(1.0f)
+                .setSessionErrorSampleRate(1.0f));
+
+        // 恢复日志采集
+        FTSdk.initLogWithConfig(new FTLoggerConfig()
+                .setSamplingRate(1.0f));
+
+        // 恢复链路追踪
+        FTSdk.initTraceWithConfig(new FTTraceConfig()
+                .setSamplingRate(1.0f));
+    }
 
     public final OkHttpClient client = new OkHttpClient.Builder()
 //                                .addInterceptor(new FTTraceInterceptor(new FTTraceInterceptor.HeaderHandler() {

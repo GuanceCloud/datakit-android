@@ -223,7 +223,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                 context.put(SESSION_REPLAY_START_IMMEDIATE_RECORDING_KEY, false);
             }
         });
-        // 初始化 processor
+        // 初始化 processor zzq
         this.processor = new RecordedDataProcessor(
                 sdkCore,
                 resourceDataStoreManager,
