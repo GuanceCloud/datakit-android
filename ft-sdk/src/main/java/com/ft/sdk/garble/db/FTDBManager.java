@@ -717,7 +717,7 @@ public class FTDBManager extends DBManager {
     }
 
     /**
-     * 删除数据表中的前 limit 行数的数据
+     * Delete the first limit rows of data in the data table
      *
      * @param type
      * @param limit
@@ -751,7 +751,8 @@ public class FTDBManager extends DBManager {
 
 
     /**
-     * Determine if old cache exists, if table doesn't exist, it will be directly caught by {@link #getDB} exception try catch
+     * Determine if old cache exists, if table doesn't exist, it will be directly caught by
+     * {@link #getDB} exception try catch
      *
      * @return
      */

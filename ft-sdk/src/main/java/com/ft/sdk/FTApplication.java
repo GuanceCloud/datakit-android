@@ -10,7 +10,8 @@ import java.lang.reflect.Method;
  * BY huangDianHua
  * DATE:2020-03-6 17:58
  * Description:
- * Used to handle situations requiring a {@link android.content.Context} parameter. This is a reflective way to obtain the class and should be avoided to reduce the risk of being disabled in the future.
+ * Used to handle situations requiring a {@link android.content.Context} parameter.
+ * This is a reflective way to obtain the class and should be avoided to reduce the risk of being disabled in the future.
  */
 public class FTApplication {
     public static long APP_START_TIME = Utils.getCurrentNanoTime();

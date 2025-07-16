@@ -55,7 +55,8 @@ public class MonitorConfigTest extends FTBaseTest {
     }
 
     /**
-     * During {@link FTRUMGlobalManager#addError(String, String, ErrorType, AppState)}, check whether the following are correctly attached:
+     * During {@link FTRUMGlobalManager#addError(String, String, ErrorType, AppState)},
+     * check whether the following are correctly attached:
      * {@link Constants#KEY_BATTERY_USE}
      * {@link Constants#KEY_MEMORY_TOTAL}
      * {@link Constants#KEY_MEMORY_USE}

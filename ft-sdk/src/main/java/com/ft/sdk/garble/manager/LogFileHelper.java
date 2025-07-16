@@ -58,8 +58,8 @@ public class LogFileHelper {
 
     /**
      * Append log
-     * <p>
-     * Note: Avoid using {@link LogUtils} to print logs, as it may cause stack overflow
+     * Note: Avoid using {@link LogUtils} to print logs, 
+     * as it may cause stack overflow
      *
      * @param logMessage Log data
      */
@@ -90,7 +90,8 @@ public class LogFileHelper {
     }
 
     /**
-     * If it exceeds {@link #CACHE_MAX_TOTAL_SIZE}, the oldest file will be deleted
+     * If it exceeds {@link #CACHE_MAX_TOTAL_SIZE}, 
+     * the oldest file will be deleted
      *
      * @param logDir Log path
      */

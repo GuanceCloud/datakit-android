@@ -22,7 +22,8 @@ public class DeflateInterceptor implements Interceptor {
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request originalRequest = chain.request();
-        // If there is no request body or there is already a Content-Encoding header, pass through
+        // If there is no request body or there is already a Content-Encoding header, 
+        // pass through
         if (originalRequest.body() == null || originalRequest.header(Constants.SYNC_DATA_CONTENT_ENCODING_HEADER) != null) {
             return chain.proceed(originalRequest);
         }
@@ -51,7 +52,8 @@ public class DeflateInterceptor implements Interceptor {
             @Override
             public void writeTo(@NotNull BufferedSink sink) throws IOException {
                 Deflater deflater = new Deflater();//with zlib wrap
-//                Deflater deflater = new Deflater(Deflater.DEFAULT_COMPRESSION, true);//no zlib wrap
+//                Deflater deflater = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
+//                //no zlib wrap
                 BufferedSink deflateSink = Okio.buffer(new DeflaterSink(sink, deflater));
                 body.writeTo(deflateSink);
                 deflateSink.close();

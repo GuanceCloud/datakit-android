@@ -14,7 +14,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 /**
- * View metric data. The following data are metrics generated during the page lifecycle, from {@link FTRUMInnerManager#startView(String)} to
+ * View metric data. The following data are metrics generated during the page lifecycle,
+ * from {@link FTRUMInnerManager#startView(String)} to
  * <p>
  * {@link FTRUMInnerManager#stopView()}  }
  *

@@ -17,7 +17,8 @@
 package com.ft.plugin.garble;
 
 /**
- * This class is adapted and modified from the Sensors Data project <a href="https://github.com/sensorsdata/sa-sdk-android-plugin2">sa-sdk-android-plugin2</a>
+ * This class is adapted and modified from the Sensors Data project
+ * <a href="https://github.com/sensorsdata/sa-sdk-android-plugin2">sa-sdk-android-plugin2</a>
  * ClassNameAnalytics class
  *
  * @author huangdianhua

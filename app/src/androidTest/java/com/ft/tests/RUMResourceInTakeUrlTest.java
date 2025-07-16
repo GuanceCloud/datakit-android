@@ -75,7 +75,8 @@ public class RUMResourceInTakeUrlTest extends BaseTest {
     }
 
     /**
-     * Verify whether, when OkHttp ft-plugin weaves in Interceptor related code, {@link FTRUMConfig#setResourceUrlHandler(FTInTakeUrlHandler)} works correctly
+     * Verify whether, when OkHttp ft-plugin weaves in Interceptor related code,
+     * {@link FTRUMConfig#setResourceUrlHandler(FTInTakeUrlHandler)} works correctly
      *
      * @throws Exception
      */

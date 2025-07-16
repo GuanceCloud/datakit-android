@@ -60,12 +60,14 @@ public class TrackLog {
         return showFullLog(true, tag, msg,SDKLogLevel.E,onlyOnce);
     }
 
-    /*This method cannot be changed arbitrarily, changes need to be synchronized with the corresponding instrumentation method in the plugin*/
+    /*This method cannot be changed arbitrarily, changes need to be synchronized 
+     * with the corresponding instrumentation method in the plugin*/
     public static int e(String tag, String msg, Throwable e) {
         return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e),SDKLogLevel.E,false);
     }
 
-    /*This method cannot be changed arbitrarily, changes need to be synchronized with the corresponding instrumentation method in the plugin*/
+    /*This method cannot be changed arbitrarily, changes need to be synchronized 
+     * with the corresponding instrumentation method in the plugin*/
     public static int w(String tag, String msg) {
         return showFullLog(true, tag, msg,SDKLogLevel.W,false);
     }
@@ -74,23 +76,27 @@ public class TrackLog {
         return showFullLog(true, tag, msg,SDKLogLevel.W,onlyOnce);
     }
 
-    /*This method cannot be changed arbitrarily, changes need to be synchronized with the corresponding instrumentation method in the plugin*/
+    /*This method cannot be changed arbitrarily, changes need to be synchronized 
+     * with the corresponding instrumentation method in the plugin*/
     public static int w(String tag, String msg, Throwable e) {
         return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e),SDKLogLevel.W,false);
     }
 
-    /*This method cannot be changed arbitrarily, changes need to be synchronized with the corresponding instrumentation method in the plugin*/
+    /*This method cannot be changed arbitrarily, changes need to be synchronized 
+     * with the corresponding instrumentation method in the plugin*/
     public static int w(String tag, Throwable e) {
         return showFullLog(true, tag, LogUtils.getStackTraceString(e),SDKLogLevel.W,false);
     }
 
-    /*This method cannot be changed arbitrarily, changes need to be synchronized with the corresponding instrumentation method in the plugin*/
+    /*This method cannot be changed arbitrarily, changes need to be synchronized 
+     * with the corresponding instrumentation method in the plugin*/
     public static int println(String tag, String msg) {
         return println(true, Log.INFO, tag, msg);
     }
 
 
-    /*This method cannot be changed arbitrarily, changes need to be synchronized with the corresponding instrumentation method in the plugin*/
+    /*This method cannot be changed arbitrarily, changes need to be synchronized 
+     * with the corresponding instrumentation method in the plugin*/
     public static int println(int priority, String tag, String msg) {
         //Only collect VERBOSE, DEBUG, INFO, WARN, ERROR
         return println(priority >= Log.VERBOSE && priority <= Log.ERROR, priority, tag, msg);

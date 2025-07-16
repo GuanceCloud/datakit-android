@@ -168,7 +168,8 @@ public class FTSDKConfig {
     }
 
     /**
-     * Whether to enable remote configuration for data collection, default is off. When enabled, SDK initialization or app hot start will trigger data update.
+     * Whether to enable remote configuration for data collection, default is off.
+     * When enabled, SDK initialization or app hot start will trigger data update.
      * @param remoteConfiguration
      * @return
      */

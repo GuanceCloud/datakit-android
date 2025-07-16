@@ -29,7 +29,8 @@ import org.junit.runner.RunWith;
  *
  * ft-plugin:1.2.0 and above are temporarily unavailable
  *
- * Currently adapted to AGP 8.0, after Gradle 8.0, it is found that ASM has been woven in during the AndroidTest build process, but hook will not be performed at runtime
+ * Currently adapted to AGP 8.0, after Gradle 8.0, it is found that ASM has been woven in
+ * during the AndroidTest build process, but hook will not be performed at runtime
  *
  */
 @RunWith(AndroidJUnit4.class)

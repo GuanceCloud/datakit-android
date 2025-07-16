@@ -53,22 +53,15 @@ public class StringUtils {
         StringBuilder stackTraceString = new StringBuilder();
         // Iterate through stack trace information
         for (StackTraceElement stackTraceElement : stackTrace) {
-            // Get class name
+            // Get class name, method name, line number, file name
             String className = stackTraceElement.getClassName();
-
-            // Get method name
             String methodName = stackTraceElement.getMethodName();
-
-            // Get line number
             int lineNumber = stackTraceElement.getLineNumber();
-
-            // Get file name
             String fileName = stackTraceElement.getFileName();
 
-            // Combine information
-            String stackTraceInfo = String.format("%s.%s(%s:%d)", className, methodName, fileName, lineNumber);
-
-            // Print information
+            // Combine information and append
+            String stackTraceInfo = String.format("%s.%s(%s:%d)", 
+                    className, methodName, fileName, lineNumber);
             stackTraceString.append(stackTraceInfo).append("\n");
         }
 
@@ -84,7 +77,7 @@ public class StringUtils {
      */
     public static String getThreadAllStackTrace(Map<Thread, StackTraceElement[]> allStackTraces) {
         StringBuilder stack = new StringBuilder();
-        // Iterate through Map and print stack trace information for each thread
+        // Iterate through Map and print stack trace for each thread
         for (Map.Entry<Thread, StackTraceElement[]> entry : allStackTraces.entrySet()) {
             Thread thread = entry.getKey();
             StackTraceElement[] stackTraceElements = entry.getValue();

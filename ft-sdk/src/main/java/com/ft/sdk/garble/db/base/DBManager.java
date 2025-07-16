@@ -63,7 +63,8 @@ public abstract class DBManager {
             db = write ? helper.getWritableDatabase() : helper.getReadableDatabase();
             if (db.isOpen()) {
                 acquire();
-                // Automatic judgment: use transactions when write operations and operation count is greater than threshold (default 10)
+                // Automatic judgment: use transactions when write operations and 
+                // operation count is greater than threshold (default 10)
                 boolean useTransaction = write && operationCount > TRANSACTION_LIMIT_COUNT;
                 if (useTransaction && !db.inTransaction()) {
                     db.beginTransaction();

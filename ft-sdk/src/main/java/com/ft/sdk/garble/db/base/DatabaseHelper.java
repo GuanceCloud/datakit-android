@@ -57,7 +57,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * When the application is created, create {@link FTSQL#FT_TABLE_SYNC_CREATE)},{@link FTSQL#FT_TABLE_VIEW_CREATE)},{@link FTSQL#FT_TABLE_ACTION_CREATE)}
+     * When the application is created, create {@link FTSQL#FT_TABLE_SYNC_CREATE)},
+     * {@link FTSQL#FT_TABLE_VIEW_CREATE)},{@link FTSQL#FT_TABLE_ACTION_CREATE)}
      *
      * @param db
      */

@@ -316,8 +316,6 @@ public class FTHookConfig {
      *
      * {@link com.google.android.material.tabs.TabLayout.OnTabSelectedListener#onTabSelected()}
      * Calls {@link com.ft.sdk.FTAutoTrack#trackTabLayoutSelected(Object)}
-     * 
-     *
      */
     public final static HashMap<String, FTMethodCell> CLICK_METHODS_SYSTEM = new HashMap<>();
 

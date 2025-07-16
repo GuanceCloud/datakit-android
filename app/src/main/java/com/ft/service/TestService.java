@@ -63,7 +63,8 @@ public class TestService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        // After ending the process, ProcessConfigTest can perform the next Application.onCreate re-call
+        // After ending the process, ProcessConfigTest can perform the next 
+        // Application.onCreate re-call
         android.os.Process.killProcess(android.os.Process.myPid());
     }
 }

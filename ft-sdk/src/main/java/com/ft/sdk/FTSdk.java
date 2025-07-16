@@ -33,7 +33,8 @@ public class FTSdk {
      */
     public static String PLUGIN_VERSION = "";
     /**
-     * Will only be assigned after integrating ft-native, directly access {@link com.ft.sdk.nativelib.BuildConfig#VERSION_NAME} to get
+     * Will only be assigned after integrating ft-native, 
+     * directly access {@link com.ft.sdk.nativelib.BuildConfig#VERSION_NAME} to get
      */
     public static String NATIVE_VERSION = PackageUtils.isNativeLibrarySupport() ? PackageUtils.getNativeLibVersion() : "";
     /**
@@ -41,7 +42,8 @@ public class FTSdk {
      */
     public static String PACKAGE_UUID = "";
     /**
-     * The above two variables cannot be changed arbitrarily, if changed please also change the corresponding values in the plugin
+     * The above two variables cannot be changed arbitrarily, 
+     * if changed please also change the corresponding values in the plugin
      */
     public static final String AGENT_VERSION = BuildConfig.FT_SDK_VERSION;// Current SDK version
     private static FTSdk mFtSdk;
@@ -171,7 +173,8 @@ public class FTSdk {
 
 
     /**
-     * Actively update remote configuration, call frequency is affected by the time of {@link FTSDKConfig#setRemoteConfigMiniUpdateInterval(int)} }
+     * Actively update remote configuration, call frequency is affected by the time of 
+     * {@link FTSDKConfig#setRemoteConfigMiniUpdateInterval(int)} }
      */
     public static void updateRemoteConfig() {
         if (checkInstallState()) {
@@ -182,7 +185,8 @@ public class FTSdk {
     }
 
     /**
-     * Actively update remote configuration, this method ignores {@link FTSDKConfig#setRemoteConfigMiniUpdateInterval(int)} } configuration
+     * Actively update remote configuration, this method ignores 
+     * {@link FTSDKConfig#setRemoteConfigMiniUpdateInterval(int)} } configuration
      *
      * @param remoteConfigMiniUpdateInterval Remote configuration time interval, unit seconds [0,]
      * @param result Return update result
@@ -256,7 +260,8 @@ public class FTSdk {
     }
 
     /**
-     * Bind user information, {@link Constants#KEY_RUM_IS_SIGN_IN}, after binding the field is T, bind once, the field data will continue to retain data until calling
+     * Bind user information, {@link Constants#KEY_RUM_IS_SIGN_IN}, after binding the field is T, 
+     * bind once, the field data will continue to retain data until calling
      * {@link #unbindRumUserData()}
      *
      * @param id

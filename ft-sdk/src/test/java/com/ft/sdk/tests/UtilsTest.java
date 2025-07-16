@@ -59,7 +59,8 @@ public class UtilsTest {
 
 
     /**
-     * Multi-line data validation, verify whether data errors occur during the data conversion process of {@link SyncDataHelper#convertToLineProtocolLines(List)}
+     * Multi-line data validation, verify whether data errors occur during the data conversion
+     * process of {@link SyncDataHelper#convertToLineProtocolLines(List)}
      *
      * @throws JSONException
      * @throws InterruptedException

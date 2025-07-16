@@ -28,8 +28,10 @@ public class ReflectUtils {
     }
 
     /**
-     * Specify {@link ExceptionHandler } to call the method, this effect can achieve the effect of freely combining ft-native dependency packages
-     * To avoid not depending on ft-native, it will capture and process {@link IllegalAccessException,NoSuchMethodException,InvocationTargetException,ClassNotFoundException }
+     * Specify {@link ExceptionHandler } to call the method,
+     * this effect can achieve the effect of freely combining ft-native dependency packages
+     * To avoid not depending on ft-native,
+     * it will capture and process {@link IllegalAccessException,NoSuchMethodException,InvocationTargetException,ClassNotFoundException }
      *
      * @param method The method name used in {@link ExceptionHandler }
      */

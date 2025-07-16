@@ -136,7 +136,8 @@ public class LogTest extends FTBaseTest {
     }
 
     /**
-     * Check whether the log has been associated with RUM data by the {@link Constants#KEY_RUM_VIEW_ID}, {@link Constants#KEY_RUM_SESSION_ID} fields
+     * Check whether the log has been associated with RUM data by the {@link Constants#KEY_RUM_VIEW_ID},
+     * {@link Constants#KEY_RUM_SESSION_ID} fields
      *
      * @param enableLinkRumData
      * @return

@@ -49,7 +49,8 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
     private static final String DUMP_FILE_KEY_APP_STATE = "appState";
 
     /**
-     * Whether it is data from a previous crash, {@link #NATIVE_CALLBACK_VERSION } later versions will mark crash info added afterwards
+     * Whether it is data from a previous crash,
+     *  {@link #NATIVE_CALLBACK_VERSION } later versions will mark crash info added afterwards
      */
     public static final String IS_PRE_CRASH = "is_pre_crash";
 
@@ -124,7 +125,8 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
      * Catch global uncaught exceptions {@link Exception}
      * <p>
      * This catches exceptions at the Java code layer, not including C/C++ exceptions. After catching the data,
-     * it will rethrow the exception to avoid interfering with the normal exception catching logic of the integration. Exception data will be uploaded by {@link #uploadCrashLog(String, String, AppState, RunnerCompleteCallBack)}
+     * it will rethrow the exception to avoid interfering with the normal exception catching logic of the integration. 
+     * Exception data will be uploaded by {@link #uploadCrashLog(String, String, AppState, RunnerCompleteCallBack)}
      *
      * @param t Returned exception thread
      * @param e Returned thrown exception object
@@ -206,7 +208,8 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
     /**
      * Upload Native Crash in the consumer queue
      * <p>
-     * There will be FTEventCsr internal thread nesting here, but thread blocking is unlikely. This is to load crash log content and write Error data,
+     * There will be FTEventCsr internal thread nesting here, but thread blocking is unlikely. 
+     * This is to load crash log content and write Error data,
      * executed sequentially in EventConsumerThreadPool. Thread execution path: FTEventCsr-> FTEventCsr -> FTDataUp -> FTEventCsr
      *
      * @param item       Crash log content file
