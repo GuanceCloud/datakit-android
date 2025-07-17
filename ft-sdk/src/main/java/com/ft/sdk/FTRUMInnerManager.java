@@ -1442,7 +1442,6 @@ public class FTRUMInnerManager {
                                         @Override
                                         public void run() {
                                             FTDBManager.get().updateViewExtraAttr(updateViewId, attr);
-                                            LogUtils.d(TAG, "updateSessionViewMap,view_id:" + viewId + " has_replay");
                                         }
                                     });
 
