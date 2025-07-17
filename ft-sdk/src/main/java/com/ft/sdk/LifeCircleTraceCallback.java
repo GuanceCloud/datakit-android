@@ -22,7 +22,8 @@ import java.util.LinkedHashMap;
 /**
  * create: by huangDianHua
  * time: 2020/6/17 17:50:45
- * description: Handle current application going to background for 10 seconds and then returning to foreground
+ * description: Handle current application going to background
+ * for 10 seconds and then returning to foreground
  */
 class LifeCircleTraceCallback {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "LifeCircleTraceCallback";
@@ -141,7 +142,8 @@ class LifeCircleTraceCallback {
             FTAppStartCounter.get().coldStart(Utils.getCurrentNanoTime());
             //config nonnull here ignore warning
             if (manager.isRumEnable() && config.isEnableTraceUserAction()) {
-                // If SDK is not initialized, this data will be supplemented after SDK delayed initialization
+                // If SDK is not initialized, this data will be supplemented 
+                // after SDK delayed initialization
                 FTAppStartCounter.get().coldStartUpload();
             }
         }

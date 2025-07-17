@@ -28,18 +28,25 @@ public class TraceBean extends BaseContentBean {
      */
     String traceID;
     /**
-     * String type, true means the response of this span's request is an error, false or no such tag means the response of this span is a normal request
+     * String type, true means the response of this span's request is an error,
+     * false or no such tag means the response of this span is a normal request
      */
     String status;
     /**
-     * The type of span, currently supports 2 values: entry and local. entry span means this span is the entry point of the service,
-     * i.e., the endpoint of the service that provides invocation requests to other services. Almost all services and message queue consumers are entry spans,
-     * so only spans of entry type are considered independent requests. local span means this span has no relation to remote calls,
-     * it's just an internal function call in the program, such as a regular Java method. Default value is entry.
+     * The type of span, currently supports 2 values: entry and local. 
+     * entry span means this span is the entry point of the service,
+     * i.e., the endpoint of the service that provides invocation requests to other services. 
+     * Almost all services and message queue consumers are entry spans,
+     * so only spans of entry type are considered independent requests. 
+     * local span means this span has no relation to remote calls,
+     * it's just an internal function call in the program, such as a regular Java method. 
+     * Default value is entry.
      */
     String spanType;
     /**
-     * Target address of the request. The network address used by the client to access the target service (not necessarily IP + port), e.g., 127.0.0.1:8080. Default: null
+     * Target address of the request. 
+     * The network address used by the client to access the target service (not necessarily IP + port),
+     *  e.g., 127.0.0.1:8080. Default: null
      */
     String endpoint;
     /**
@@ -150,7 +157,8 @@ public class TraceBean extends BaseContentBean {
 
 
     /**
-     * @param status String type, true means the response of this span's request is an error, false or no such tag means the response of this span is a normal request
+     * @param status String type, true means the response of this span's request is an error, 
+     *              false or no such tag means the response of this span is a normal request
      */
     public void setStatus(String status) {
         this.status = status;

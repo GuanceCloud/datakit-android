@@ -436,7 +436,8 @@ public class Utils {
      * Get nanosecond time
      * <p>
      * Getting twice in the same millisecond trigger may cause time reversal issues.
-     * When getting at millisecond boundaries, System.nanoTime() may encounter the end of a nanosecond cycle, and the later obtained time may be smaller.
+     * When getting at millisecond boundaries, System.nanoTime() may encounter the end of a nanosecond cycle,
+     * and the later obtained time may be smaller.
      * Currently using this method is a compromise between performance and accuracy
      *
      * @return

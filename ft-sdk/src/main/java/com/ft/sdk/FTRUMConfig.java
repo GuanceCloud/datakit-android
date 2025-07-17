@@ -170,7 +170,8 @@ public class FTRUMConfig {
     }
 
     /**
-     * Set sampling rate, range [0,1], 0 means no collection, 1 means full collection, default is 1. Scope is all View, Action, LongTask, Error data under the same session_id
+     * Set sampling rate, range [0,1], 0 means no collection, 1 means full collection, default is 1. 
+     * Scope is all View, Action, LongTask, Error data under the same session_id
      *
      * @param samplingRate
      * @return
@@ -190,7 +191,10 @@ public class FTRUMConfig {
     }
 
     /**
-     * Set error sampling rate. When the session is not sampled by `setSamplingRate`, if an error occurs during the session, data within 1 minute before the error can be collected. Range [0,1], 0 means no collection, 1 means full collection, default is 0. Scope is all View, Action, LongTask, Error under the same session_id
+     * Set error sampling rate. When the session is not sampled by `setSamplingRate`,
+     * if an error occurs during the session, data within 1 minute before the error can be collected.
+     * Range [0,1], 0 means no collection, 1 means full collection, default is 0.
+     * Scope is all View, Action, LongTask, Error under the same session_id
      *
      * @param sessionErrorSampleRate
      */

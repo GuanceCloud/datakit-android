@@ -217,7 +217,8 @@ class FTFileUtils {
     }
 
     /**
-     * Compress a list of files. The list length must be greater than 0. If a file with the same name exists, it will be overwritten.
+     * Compress a list of files. The list length must be greater than 0.
+     * If a file with the same name exists, it will be overwritten.
      *
      * @param fileList List of files. Length must be greater than 0
      * @param zipFile  Compressed file generated
@@ -228,7 +229,8 @@ class FTFileUtils {
     }
 
     /**
-     * Compress an array of files. The array length must be greater than 0. If a file with the same name exists, it will be overwritten.
+     * Compress an array of files. The array length must be greater than 0.
+     * If a file with the same name exists, it will be overwritten.
      *
      * @param files   Array of files. Length must be greater than 0
      * @param zipFile Compressed file generated

@@ -34,7 +34,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This class is adapted and modified from the Sensors Data project <a href="https://github.com/sensorsdata/sa-sdk-android-plugin2">sa-sdk-android-plugin2</a>
+ * This class is adapted and modified from the Sensors Data project
+ * <a href="https://github.com/sensorsdata/sa-sdk-android-plugin2">sa-sdk-android-plugin2</a>
  * SensorsAnalyticsClassVisitor.groovy class
  */
 public class FTClassAdapter extends ClassVisitor {

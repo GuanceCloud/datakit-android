@@ -267,7 +267,8 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * Simulate continuous view jump operation, and finally verify that each {@link ViewBean#viewReferrer} corresponds to the correct one
+     * Simulate continuous view jump operation,
+     * and finally verify that each {@link ViewBean#viewReferrer} corresponds to the correct one
      *
      * @throws InterruptedException
      */
@@ -613,7 +614,8 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
-     * Check whether RUM data {@link Constants#KEY_RUM_RESOURCE_TRACE_ID},{@link Constants#KEY_RUM_RESOURCE_SPAN_ID } is included
+     * Check whether RUM data {@link Constants#KEY_RUM_RESOURCE_TRACE_ID},
+     * {@link Constants#KEY_RUM_RESOURCE_SPAN_ID } is included
      *
      * @param enableLinkRUMData
      * @return

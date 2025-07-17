@@ -37,7 +37,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * This class is adapted and modified from the Sensors Data project <a href="https://github.com/sensorsdata/sa-sdk-android-plugin2">sa-sdk-android-plugin2</a>
+ * This class is adapted and modified from the Sensors Data project 
+ * <a href="https://github.com/sensorsdata/sa-sdk-android-plugin2">sa-sdk-android-plugin2</a>
  * SensorsAnalyticsClassVisitor.groovy class
  * Visit class method structure
  */
@@ -439,7 +440,9 @@ public class FTMethodAdapter extends AdviceAdapter {
         }
 
         /**
-         * Support onContextItemSelected(MenuItem item)、onOptionsItemSelected(MenuItem item)、onNavigationItemSelected(MenuItem item)
+         * Support onContextItemSelected(MenuItem item)、
+         * onOptionsItemSelected(MenuItem item)、
+         * onNavigationItemSelected(MenuItem item)
          */
         if (FTUtil.isTargetMenuMethodDesc(nameDesc)) {
             handleCode(FTHookConfig.MENU_METHODS);

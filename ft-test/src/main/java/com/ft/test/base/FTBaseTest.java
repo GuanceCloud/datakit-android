@@ -162,8 +162,9 @@ public class FTBaseTest {
     }
 
     /**
-     * Wait for the thread pool queue execution to end, the purpose is to make thread pool functions serial in test cases, wait for operation to end
-     * <p>
+     * Wait for the thread pool queue execution to end, 
+     * the purpose is to make thread pool functions serial in test cases, 
+     * wait for operation to end
      * {@link EventConsumerThreadPool}
      *
      * @throws InterruptedException
@@ -178,7 +179,8 @@ public class FTBaseTest {
     }
 
     /**
-     * Disable data cleanup, implemented by skipping deletion logic through {@link FTDBManager#isAndroidTest} logic
+     * Disable data cleanup, implemented by skipping deletion logic 
+     * through {@link FTDBManager#isAndroidTest} logic
      */
     protected static void avoidCleanData() {
         try {
@@ -189,8 +191,8 @@ public class FTBaseTest {
     }
 
     /**
-     * Make session expire immediately to reduce time-consuming waits during test case execution
-     * <p>
+     * Make session expire immediately to reduce time-consuming waits 
+     * during test case execution
      * {@link FTRUMInnerManager#lastUserActiveTime}
      *
      * @throws IllegalAccessException

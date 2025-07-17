@@ -519,7 +519,8 @@ public class FTAutoTrack {
 
 
     /**
-     * Get corresponding method (Activity) execution time (This method will be called in the onCreate method of all activities that inherit AppCompatActivity)
+     * Get corresponding method (Activity) execution time 
+     * (This method will be called in the onCreate method of all activities that inherit AppCompatActivity)
      *
      * @param desc className + "|" + methodName + "|" + methodDesc
      * @param cost
@@ -538,7 +539,8 @@ public class FTAutoTrack {
     }
 
     /**
-     * Plug-in method used to replace the called {@link android.webkit.WebView#loadUrl(String)} method. This method structure should be modified with caution, please synchronize the modification after the modification
+     * Plug-in method used to replace the called {@link android.webkit.WebView#loadUrl(String)} method. 
+     * This method structure should be modified with caution, please synchronize the modification after the modification
      * [com.ft.plugin.garble.bytecode.FTMethodAdapter] The part of the visitMethodInsn method about this replacement
      *
      * @param webView
@@ -556,7 +558,8 @@ public class FTAutoTrack {
     }
 
     /**
-     * Plug-in method used to replace the called {@link android.webkit.WebView#loadUrl(String)} method. This method structure should be modified with caution, please synchronize the modification after the modification
+     * Plug-in method used to replace the called {@link android.webkit.WebView#loadUrl(String)} method. 
+     * This method structure should be modified with caution, please synchronize the modification after the modification
      * [com.ft.plugin.garble.bytecode.FTMethodAdapter] The part of the visitMethodInsn method about this replacement
      *
      * @param webView
@@ -574,7 +577,8 @@ public class FTAutoTrack {
     }
 
     /**
-     * Plug-in method used to replace the called {@link android.webkit.WebView#loadData(String, String, String)} method. This method structure should be modified with caution, please synchronize the modification after the modification
+     * Plug-in method used to replace the called {@link android.webkit.WebView#loadData(String, String, String)} method. 
+     * This method structure should be modified with caution, please synchronize the modification after the modification
      * [com.ft.plugin.garble.bytecode.FTMethodAdapter] The part of the visitMethodInsn method about this replacement
      *
      * @param webView
@@ -593,7 +597,8 @@ public class FTAutoTrack {
     }
 
     /**
-     * Plug-in method used to replace the called {@link android.webkit.WebView#loadDataWithBaseURL(String, String, String, String, String)} method. This method structure should be modified with caution, please synchronize the modification after the modification
+     * Plug-in method used to replace the called {@link android.webkit.WebView#loadDataWithBaseURL(String, String, String, String, String)} method. 
+     * This method structure should be modified with caution, please synchronize the modification after the modification
      * [com.ft.plugin.garble.bytecode.FTMethodAdapter] The part of the visitMethodInsn method about this replacement
      *
      * @param webView
@@ -613,7 +618,8 @@ public class FTAutoTrack {
     }
 
     /**
-     * Plug-in method used to replace the called {@link android.webkit.WebView#postUrl(String, byte[])} method. This method structure should be modified with caution, please synchronize the modification after the modification
+     * Plug-in method used to replace the called {@link android.webkit.WebView#postUrl(String, byte[])} method. 
+     * This method structure should be modified with caution, please synchronize the modification after the modification
      * [com.ft.plugin.garble.bytecode.FTMethodAdapter] The part of the visitMethodInsn method about this replacement
      *
      * @param webView
@@ -661,7 +667,8 @@ public class FTAutoTrack {
     }
 
     /**
-     * Plug-in method used to replace the called {@link OkHttpClient.Builder#build() } method. This method structure should be modified with caution, please synchronize the modification after the modification
+     * Plug-in method used to replace the called {@link OkHttpClient.Builder#build() } method. 
+     * This method structure should be modified with caution, please synchronize the modification after the modification
      * [com.ft.plugin.garble.bytecode.FTMethodAdapter] The part of the visitMethodInsn method about this replacement
      *
      * @param builder
@@ -740,7 +747,8 @@ public class FTAutoTrack {
     }
 
     /**
-     * Plug-in method used to replace the called {@link Request.Builder#build() } method. This method structure should be modified with caution, please synchronize the modification after the modification
+     * Plug-in method used to replace the called {@link Request.Builder#build() } method. 
+     * This method structure should be modified with caution, please synchronize the modification after the modification
      * [com.ft.plugin.garble.bytecode.FTMethodAdapter] The part of the visitMethodInsn method about this replacement
      *
      * @param builder

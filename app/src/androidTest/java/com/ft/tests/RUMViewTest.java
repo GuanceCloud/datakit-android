@@ -69,7 +69,8 @@ public class RUMViewTest extends BaseTest {
     }
 
     /**
-     * Verify real application startup, page jumps, whether {@link com.ft.sdk.FTActivityLifecycleCallbacks} normally outputs View data
+     * Verify real application startup, page jumps,
+     * whether {@link com.ft.sdk.FTActivityLifecycleCallbacks} normally outputs View data
      *
      * @throws Exception
      */

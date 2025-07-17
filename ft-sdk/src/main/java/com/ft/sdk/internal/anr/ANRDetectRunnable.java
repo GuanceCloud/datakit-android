@@ -14,7 +14,8 @@ import com.ft.sdk.garble.utils.StringUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 /**
- * ANR error monitoring, continuously monitors whether the execution time difference between two Runners exceeds {@link #ANR_DETECT_DURATION_MS}, if exceeded, adds an ANR error message
+ * ANR error monitoring, continuously monitors whether the execution time difference between two Runners exceeds 
+ * {@link #ANR_DETECT_DURATION_MS}, if exceeded, adds an ANR error message
  */
 public final class ANRDetectRunnable implements Runnable {
 
