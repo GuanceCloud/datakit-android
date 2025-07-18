@@ -1,3 +1,7 @@
+# native 1.1.2
+1. Added support for Android 16K page size (Android 15+ compatibility)
+
+----------------------
 # native 1.1.1
 1. Add logcat configuration functionality for Native Crash and ANR
 
