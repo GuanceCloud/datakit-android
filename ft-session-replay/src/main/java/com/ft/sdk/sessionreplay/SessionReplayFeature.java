@@ -365,6 +365,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
      * @param mobileRecord 完整屏幕快照记录
      * @param rumContext RUM上下文
      */
+    /*
     public void processExternalFullSnapshot(MobileRecord.MobileFullSnapshotRecord mobileRecord,
                                            SessionReplayRumContext rumContext) {
         if (!checkIfInitialized()) {
@@ -374,6 +375,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
         // 直接调用 processor 处理记录
         processor.handleExternalFullSnapshot(mobileRecord, rumContext);
     }
+     */
 
     /**
      * 处理外部提供的增量更新 , added by zzq
@@ -407,6 +409,28 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
     }
 
     /**
+     * 创建一个RUM上下文，用于外部调用 added by zzq
+     * @param viewId 视图ID
+     * @return SessionReplayRumContext实例
+     */
+
+    public SessionReplayRumContext createRumContextWithJustViewId(String viewId) {
+
+        if (rumContextProvider == null) {
+            return new SessionReplayRumContext(); // 返回一个空的上下文
+        }
+
+        Log.d(TAG, "zzq createRumContextWithJustViewId appid " + rumContextProvider.getRumContext().getApplicationId());
+        Log.d(TAG, "zzq createRumContextWithJustViewId SessionId" + rumContextProvider.getRumContext().getSessionId());
+        Log.d(TAG, "zzq createRumContextWithJustViewId viewId" + viewId);
+        return new SessionReplayRumContext(
+                rumContextProvider.getRumContext().getApplicationId(),
+                rumContextProvider.getRumContext().getSessionId(),
+                viewId
+        );
+    }
+
+    /**
      * 配置是否使用Flutter提供的UI数据, added by zzq
      * @param useFlutterUIData 是否使用Flutter UI数据
      */
@@ -421,14 +445,14 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
      * @param systemInformation 系统信息
      */
     public void processExternalNodeTree(Node rootNode,
-                                        SystemInformation systemInformation) {
+                                        SystemInformation systemInformation, String viewId) {
         if (!checkIfInitialized()) {
             return;
         }
 
         try {
             // 创建RumContext
-            SessionReplayRumContext rumContext = createEmptyRumContext();
+            SessionReplayRumContext rumContext = createRumContextWithJustViewId(viewId);
 
             // 创建RecordedQueuedItemContext
             RecordedQueuedItemContext recordedQueuedItemContext =
