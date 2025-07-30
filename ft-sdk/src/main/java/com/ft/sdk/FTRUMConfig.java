@@ -419,9 +419,13 @@ public class FTRUMConfig {
     }
 
     /**
-     * Whether to collect the IP address of the request target domain name. Scope: only affects the default collection when `EnableTraceUserResource` is true.
-     * For custom Resource collection, you need to use `FTResourceEventListener.FTFactory(true)` to enable this function.
-     * In addition, a single Okhttp has an IP cache mechanism for the same domain name. Under the premise that the connection to the server IP does not change, only one will be generated for the same `OkhttpClient`.
+     * Whether to collect the IP address of the request target domain name.
+     * Scope: only affects the default collection when `EnableTraceUserResource` is true.
+     * For custom Resource collection, you need to use `FTResourceEventListener.FTFactory(true)`
+     * to enable this function.
+     * In addition, a single Okhttp has an IP cache mechanism for the same domain name.
+     * Under the premise that the connection to the server IP does not change, only one will be
+     * generated for the same `OkhttpClient`.
      *
      * @param enableTraceUserResource
      * @return
@@ -459,6 +463,12 @@ public class FTRUMConfig {
         return rumAppId != null;
     }
 
+    /***
+     * Add global parameters in RUM
+     * @param key
+     * @param value
+     * @return
+     */
     public FTRUMConfig addGlobalContext(@NonNull String key, @NonNull String value) {
         this.globalContext.put(key, value);
         return this;

@@ -373,7 +373,7 @@ public class FTRUMInnerManager {
      * Create view
      *
      * @param viewName view name
-     * @param loadTime load time, unit milliseconds ms
+     * @param loadTime load time, nanosecond
      */
     void onCreateView(String viewName, long loadTime) {
         preActivityDuration.put(viewName, loadTime);

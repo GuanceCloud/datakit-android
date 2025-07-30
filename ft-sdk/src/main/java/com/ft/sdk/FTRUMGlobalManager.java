@@ -164,7 +164,7 @@ public class FTRUMGlobalManager {
      * Create view
      *
      * @param viewName view name
-     * @param loadTime load time, unit milliseconds ms
+     * @param loadTime load time, nanosecond
      */
     public void onCreateView(String viewName, long loadTime) {
         if (innerManager != null) {
