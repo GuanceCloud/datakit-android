@@ -11,7 +11,7 @@ import java.lang.reflect.Method;
  * @author Brandon
  * <p>
  * Used to simulate generating {@link com.ft.sdk.garble.bean.ErrorType#NATIVE} type data in "User Access Monitoring" Error data
- * Data screening method, please refer to @see <a href="https://docs.guance.com/real-user-monitoring/explorer/error/">Error Viewer</a>
+ * Data screening method, please refer to @see <a href="https://docs.truewatch.com/real-user-monitoring/explorer/error/">Error Viewer</a>
  */
 public class ReflectUtils {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "ReflectUtils";

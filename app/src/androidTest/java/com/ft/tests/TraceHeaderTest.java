@@ -39,7 +39,7 @@ import okhttp3.Request;
  */
 @RunWith(AndroidJUnit4.class)
 public class TraceHeaderTest extends BaseTest {
-    private static  final  String TEST_URL ="https://www.guance.com";
+    private static  final  String TEST_URL ="https://www.truewatch.com";
 
     @Rule
     public ActivityScenarioRule<DebugMainActivity> rule = new ActivityScenarioRule<>(DebugMainActivity.class);

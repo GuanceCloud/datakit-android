@@ -9,7 +9,7 @@ public interface FTInTakeUrlHandler {
     /**
      * Whether to collect this address data
      *
-     * @param url url address, example url="https://www.guance.com/"
+     * @param url url address, example url="https://www.truewatch.com/"
      * @return true not collect, false collect
      */
     boolean isInTakeUrl(String url);

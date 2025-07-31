@@ -85,7 +85,7 @@
 ---
 # agent 1.6.9
 1. Modified the isAppForeground judgment mechanism to adapt to privacy-sensitive information detection.
-2. Added new `resource` data fields: `resource_first_byte_time`, `resource_dns_time`, `resource_download_time`, `resource_connect_time`, `resource_ssl_time`, supporting enhanced display of Resource timing in Guanceyun and alignment with the APM flame graph timeline.
+2. Added new `resource` data fields: `resource_first_byte_time`, `resource_dns_time`, `resource_download_time`, `resource_connect_time`, `resource_ssl_time`, supporting enhanced display of Resource timing in TrueWatch and alignment with the APM flame graph timeline.
 3. Optimized sync retry mechanism, removed the option to directly discard data with `FTSDKConfig.setDataSyncRetryCount(0)`.
 4. FTSDKConfig.enableDataIntegerCompatible is enabled by default to be compatible with web numeric floating-point data.
 5. Fixed the issue of duplicate crash data when initializing RUM configuration multiple times.
@@ -109,7 +109,7 @@
 ---
 # agent 1.6.9-beta01
 1. Adjusted the calling rules of Utils.isAppForeground() before SDK initialization.
-2. Added resource data fields: resource_first_byte_time, resource_dns_time, resource_download_time, resource_connect_time, resource_ssl_time for optimized display in Guanceyun and support for APM flame graph time alignment.
+2. Added resource data fields: resource_first_byte_time, resource_dns_time, resource_download_time, resource_connect_time, resource_ssl_time for optimized display in TrueWatch and support for APM flame graph time alignment.
 
 ---
 # agent 1.6.9-alpha01
@@ -718,7 +718,7 @@
 
 ---
 # agent 1.3.8-alpha02
-1. Fixed incorrect Guanceyun js and webview callback issues.
+1. Fixed incorrect TrueWatch js and webview callback issues.
 
 ---
 # agent 1.3.8-alpha01

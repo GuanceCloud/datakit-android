@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * Used to receive application-level webview data indicators
  * Requires use of web js sdk
- * <a href="https://github.com/GuanceCloud/datakit-js">datakit-js</a>,
+ * <a href="https://github.com/TrueWatchTech/datakit-js">datakit-js</a>,
  * {@link #FT_WEB_VIEW_JAVASCRIPT_BRIDGE}，
  * See Demo in app/src/main/assets/local_sample.html
  *

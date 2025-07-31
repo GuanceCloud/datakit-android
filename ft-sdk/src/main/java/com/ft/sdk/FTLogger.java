@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Print logs that can be viewed in Guanceyun Studio
+ * Print logs that can be viewed in TrueWatch Studio
  *
  * @author Brandon
  */

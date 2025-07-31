@@ -7,7 +7,7 @@ import com.ft.sdk.garble.utils.Utils;
 /**
  * Startup timing
  *
- * <a href="https://docs.guance.com/real-user-monitoring/explorer/">Explorer</a>
+ * <a href="https://docs.truewatch.com/real-user-monitoring/explorer/">Explorer</a>
  * <p>
  * {@link Constants#MEASUREMENT} is {@link Constants#FT_MEASUREMENT_RUM_ACTION}
  * {@link Constants#KEY_RUM_ACTION_TYPE} is {@link  Constants#ACTION_NAME_LAUNCH_COLD,

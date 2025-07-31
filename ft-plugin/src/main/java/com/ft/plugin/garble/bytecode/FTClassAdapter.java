@@ -86,7 +86,7 @@ public class FTClassAdapter extends ClassVisitor {
                 String agentVersion = (String) value;
                 if (!VersionUtils.firstVerGreaterEqual(agentVersion, BuildConfig.MIN_SDK_VERSION)) {
                     String errorTip = "The version of FT SDK you have integrated is " + agentVersion + ", the minimum version supported by the current plugin is " + BuildConfig.MIN_SDK_VERSION
-                            + ", for details please refer to: https://github.com/GuanceCloud/datakit-android";
+                            + ", for details please refer to: https://github.com/TrueWatchTech/datakit-android";
                     throw new Error(errorTip);
                 }
             }

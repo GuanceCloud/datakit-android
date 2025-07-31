@@ -8,7 +8,7 @@ import com.ft.sdk.garble.utils.Constants;
  * <p>
  * It is recommended to use the {@link #DEFAULT} configuration for collection frequency. {@link #FREQUENT} provides more accurate values but consumes more performance, recommended for non-production environments. {@link #RARE} has the lowest consumption but also the lowest accuracy, and increases the possibility of losing monitoring data due to rapid page switching.
  * <p>
- * Applied to {@link MonitorRunnable}, affects the <a href="https://docs.guance.com/real-user-monitoring/explorer/">Explorer</a>
+ * Applied to {@link MonitorRunnable}, affects the <a href="https://docs.truewatch.com/real-user-monitoring/explorer/">Explorer</a>
  * {@link Constants#KEY_CPU_TICK_COUNT_PER_SECOND}
  * {@link Constants#KEY_CPU_TICK_COUNT}
  * {@link Constants#KEY_MEMORY_MAX}

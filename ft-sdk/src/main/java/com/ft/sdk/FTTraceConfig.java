@@ -83,7 +83,7 @@ public class FTTraceConfig {
     }
 
     /**
-     * <a href="https://docs.guance.com/real-user-monitoring/explorer/resource/">Explorer Resource</a> function, used to trace the Trace chain of problematic Resource data
+     * <a href="https://docs.truewatch.com/real-user-monitoring/explorer/resource/">Explorer Resource</a> function, used to trace the Trace chain of problematic Resource data
      *
      * @param traceType
      * @return

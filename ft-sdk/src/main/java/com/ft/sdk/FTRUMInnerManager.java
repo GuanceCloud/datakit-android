@@ -42,7 +42,7 @@ import javax.net.ssl.HttpsURLConnection;
  * RUM data management, records Action, View, LongTask, Error, and statistics
  * {@link Constants#KEY_RUM_VIEW_ACTION_COUNT }
  * {@link Constants#KEY_RUM_ACTION_ERROR_COUNT}
- * , can be viewed through the <a href="https://docs.guance.com/real-user-monitoring/explorer/">Explorer</a>
+ * , can be viewed through the <a href="https://docs.truewatch.com/real-user-monitoring/explorer/">Explorer</a>
  */
 public class FTRUMInnerManager {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "RUMGlobalManager";

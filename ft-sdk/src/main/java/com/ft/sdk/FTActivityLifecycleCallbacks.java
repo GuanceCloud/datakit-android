@@ -25,7 +25,7 @@ import java.util.HashMap;
  * Page load time: {@link Constants#KEY_RUM_VIEW_LOAD}
  * Startup time: {@link Constants#ACTION_TYPE_LAUNCH_HOT},{@link Constants#ACTION_NAME_LAUNCH_COLD}
  * <p>
- * These can be viewed through Guanceyun Studio <a href="https://docs.guance.com/real-user-monitoring/explorer/view/">Viewer View</a>
+ * These can be viewed through TrueWatch Studio <a href="https://docs.truewatch.com/real-user-monitoring/explorer/view/">Viewer View</a>
  */
 public class FTActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
     private final LifeCircleTraceCallback mAppRestartCallback = new LifeCircleTraceCallback();

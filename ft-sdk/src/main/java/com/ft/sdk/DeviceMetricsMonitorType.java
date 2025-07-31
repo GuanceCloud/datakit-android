@@ -9,7 +9,7 @@ import java.util.HashMap;
  * <p>
  * In View transmission type {@link FTRUMGlobalManager#startView(String, HashMap)}
  * Output the battery, memory, CPU, FPS, etc. of the page, through these information to judge the experience of the user browsing the current page,
- * Through observation of the cloud Studio <a href="https://docs.guance.com/real-user-monitoring/explorer/view/">View</a> for inspection
+ * Through observation of the cloud Studio <a href="https://docs.truewatch.com/real-user-monitoring/explorer/view/">View</a> for inspection
  * <p>
  * Set in {@link FTRUMConfig#setDeviceMetricsMonitorType(DeviceMetricsMonitorType, DetectFrequency)}
  * See {@link DetectFrequency } for collection frequency

@@ -15,7 +15,7 @@ public enum ErrorType {
      */
     JAVA("java_crash"),
     /**
-     * {<a href="https://github.com/GuanceCloud/datakit-flutter">Flutter SDK </a>}
+     * {<a href="https://github.com/TrueWatchTech/datakit-flutter">Flutter SDK </a>}
      */
     FLUTTER("flutter_crash"),
 
