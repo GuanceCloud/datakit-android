@@ -198,6 +198,7 @@ public class FTRUMInnerManager {
         ActiveActionBean activeAction = new ActiveActionBean(actionName, actionType,
                 sessionId, viewId, viewName, viewReferrer, false);
         activeAction.setClose(true);
+        activeAction.setTags(FTRUMConfigManager.get().getRUMPublicDynamicTags());
         activeAction.setDuration(duration);
         activeAction.setStartTime(startTime);
         if (property != null) {
