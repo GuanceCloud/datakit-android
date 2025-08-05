@@ -1,5 +1,6 @@
 package com.ft;
 
+import android.app.Activity;
 import android.content.Context;
 
 import com.ft.sdk.DeviceMetricsMonitorType;
@@ -10,6 +11,7 @@ import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
+import com.ft.sdk.FTViewActivityTrackingHandler;
 import com.ft.sdk.FTViewFragmentTrackingHandler;
 import com.ft.sdk.FragmentWrapper;
 import com.ft.sdk.HandlerView;
@@ -49,7 +51,7 @@ public class DemoApplication extends BaseApplication {
         }
     }
 
-    void initOkGo(){
+    void initOkGo() {
         OkGo.getInstance().init(this);
         OkHttpClient.Builder builder = OkGo.getInstance().getOkHttpClient().newBuilder();
 //            builder.interceptors().add(new FTTraceInterceptor());
@@ -132,6 +134,25 @@ public class DemoApplication extends BaseApplication {
 //                        .setEnableTraceWebView(true)
                         .setEnableTrackAppUIBlock(true, 100)
                         .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
+                        .setEnableTraceUserViewInFragment(true)
+                        .setViewFragmentTrackingHandler(new FTViewFragmentTrackingHandler() {
+                            @Override
+                            public HandlerView isInTake(FragmentWrapper fragment) {
+                                if (fragment.getSimpleClassName().equals("HomeFragment")) {
+                                    return new HandlerView("Home");
+                                }
+                                if (fragment.getSimpleClassName().startsWith("Detail")) {
+                                    return null;
+                                }
+                                return null;
+                            }
+                        })
+                        .setViewActivityTrackingHandler(new FTViewActivityTrackingHandler() {
+                            @Override
+                            public HandlerView isInTake(Activity activity) {
+                                return null;
+                            }
+                        })
                         .setResourceUrlHandler(url -> false)
 //                        .setOkHttpResourceContentHandler(new FTResourceInterceptor.ContentHandlerHelperEx() {
 //                            @Override

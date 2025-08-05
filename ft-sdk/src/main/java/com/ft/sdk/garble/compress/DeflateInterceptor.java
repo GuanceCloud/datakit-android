@@ -17,7 +17,7 @@ import okio.BufferedSink;
 import okio.Okio;
 
 /**
- *
+ * Synchronous compression of data packets
  */
 public class DeflateInterceptor implements Interceptor {
 

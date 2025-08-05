@@ -1,11 +1,12 @@
 package com.ft.sdk;
 
+import android.app.Activity;
+
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.utils.Constants;
 
 import java.util.HashMap;
-import java.util.List;
 
 public class FTRUMConfig {
     /**
@@ -86,6 +87,12 @@ public class FTRUMConfig {
         }
     };
 
+    private FTViewFragmentTrackingHandler viewFragmentTrackingHandler;
+
+    private FTViewActivityTrackingHandler viewActivityTrackingHandler;
+
+    private FTActionTrackingHandler actionTrackingHandler;
+
     /**
      *
      */
@@ -134,6 +141,7 @@ public class FTRUMConfig {
 
     /**
      * Configure whether to enable WebView data collection via Android SDK
+     *
      * @param enableTraceWebView
      * @return
      */
@@ -144,6 +152,7 @@ public class FTRUMConfig {
 
     /**
      * Configure allowed WebView host addresses for data tracking
+     *
      * @param allowWebViewHost
      * @return
      */
@@ -170,7 +179,7 @@ public class FTRUMConfig {
     }
 
     /**
-     * Set sampling rate, range [0,1], 0 means no collection, 1 means full collection, default is 1. 
+     * Set sampling rate, range [0,1], 0 means no collection, 1 means full collection, default is 1.
      * Scope is all View, Action, LongTask, Error data under the same session_id
      *
      * @param samplingRate
@@ -552,6 +561,46 @@ public class FTRUMConfig {
 
     public FTResourceInterceptor.ContentHandlerHelper getOkHttpResourceContentHandler() {
         return contentHandlerHelper;
+    }
+
+    public FTViewFragmentTrackingHandler getViewFragmentTrackingHandler() {
+        return viewFragmentTrackingHandler;
+    }
+    /**
+     * Set filter for view fragment tracking handler
+     */
+    public FTRUMConfig setViewFragmentTrackingHandler(FTViewFragmentTrackingHandler viewFragmentTrackingHandler) {
+        this.viewFragmentTrackingHandler = viewFragmentTrackingHandler;
+        return this;
+    }
+
+    public FTViewActivityTrackingHandler getViewActivityTrackingHandler() {
+        return viewActivityTrackingHandler;
+    }
+
+    /**
+     * Set filter for view activity tracking handler
+     */
+    public FTRUMConfig setViewActivityTrackingHandler(FTViewActivityTrackingHandler viewActivityTrackingHandler) {
+        this.viewActivityTrackingHandler = viewActivityTrackingHandler;
+        return this;
+    }
+
+    /**
+     * Get action tracking handler
+     *
+     * @return
+     */
+    public FTActionTrackingHandler getActionTrackingHandler() {
+        return actionTrackingHandler;
+    }
+
+    /**
+     * Set filter for click event handler
+     */
+    public FTRUMConfig setActionTrackingHandler(FTActionTrackingHandler actionTrackingHandler) {
+        this.actionTrackingHandler = actionTrackingHandler;
+        return this;
     }
 
     /**

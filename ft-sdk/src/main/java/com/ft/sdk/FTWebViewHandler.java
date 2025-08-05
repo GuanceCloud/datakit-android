@@ -17,7 +17,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * Used to receive application-level webview data indicators
@@ -84,7 +83,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
      */
     public void setWebView(WebView webview) {
         FTRUMConfig config = FTRUMConfigManager.get().getConfig();
-        if (config != null && config.isEnableTraceWebView()) {
+        if (config.isRumEnable() && config.isEnableTraceWebView()) {
             setWebView(webview, config.getAllowWebViewHost());
         }
     }

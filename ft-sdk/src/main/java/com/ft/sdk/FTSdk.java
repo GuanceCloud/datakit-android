@@ -5,7 +5,6 @@ import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.garble.FTAutoTrackConfigManager;
 import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.db.FTDBCachePolicy;
@@ -114,7 +113,6 @@ public class FTSdk {
         SyncTaskManager.get().release();
         FTRUMConfigManager.get().release();
         FTMonitorManager.release();
-        FTAutoTrackConfigManager.release();
         FTHttpConfigManager.release();
         FTNetworkListener.release();
 //        LocationUtils.get().stopListener();
