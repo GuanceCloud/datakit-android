@@ -172,6 +172,15 @@ public class FTRUMGlobalManager {
         }
     }
 
+    /**
+     *  update the loadTime of view
+     * @param duration
+     */
+    public void updateLoadTime(long duration) {
+        if (innerManager != null) {
+            innerManager.updateLoadTime(duration);
+        }
+    }
 
     /**
      * view start

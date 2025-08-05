@@ -17,11 +17,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.ft.sdk.FTLogger;
+import com.ft.sdk.FTRemoteConfigManager;
 import com.ft.sdk.FTResourceEventListener;
 import com.ft.sdk.FTResourceInterceptor;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceInterceptor;
-import com.ft.sdk.FTRemoteConfigManager;
 import com.ft.sdk.garble.annotation.IgnoreAOP;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.http.RequestMethod;
@@ -29,6 +29,8 @@ import com.ft.sdk.garble.reflect.ReflectUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.service.TestService;
 import com.ft.utils.RequestUtils;
+//import com.lzy.okgo.OkGo;
+//import com.lzy.okgo.callback.StringCallback;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -173,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.main_mock_okhttp_btn).setOnClickListener(v -> {
-                            new Thread(new Runnable() {
+            new Thread(new Runnable() {
                 @Override
                 public void run() {
                     //Check request headers to see if OkHttpClient.Builder.build method replacement is successful
@@ -182,6 +184,37 @@ public class MainActivity extends AppCompatActivity {
                         LogUtils.d(TAG, "header=" + request.headers());
 
                     }
+
+//                    RequestUtils.requestUrlAsync(BuildConfig.TRACE_URL, new RequestUtils.RequestCallback() {
+//                        @Override
+//                        public void onSuccess(int code, String response) {
+//                            LogUtils.d(TAG, "header=" + response);
+//                        }
+//
+//                        @Override
+//                        public void onFailure(IOException e) {
+//
+//                        }
+//                    });
+
+//                    OkGo.<String>get(BuildConfig.TRACE_URL)
+//                            .tag(this)
+//                            .execute(new StringCallback() {
+//                                @Override
+//                                public void onSuccess(com.lzy.okgo.model.Response<String> response) {
+//                                    response.body();
+//                                }
+//                            });
+
+//                    try {
+//                        OkGo.<String>get(BuildConfig.TRACE_URL+"2")
+//                                .tag(this)
+//                                .execute().body().string();
+//                    } catch (IOException e) {
+//                        throw new RuntimeException(e);
+//                    }
+
+
                 }
             }).start();
         });

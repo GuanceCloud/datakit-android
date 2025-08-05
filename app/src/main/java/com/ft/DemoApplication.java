@@ -10,6 +10,9 @@ import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
+import com.ft.sdk.FTViewFragmentTrackingHandler;
+import com.ft.sdk.FragmentWrapper;
+import com.ft.sdk.HandlerView;
 import com.ft.sdk.LogCacheDiscard;
 import com.ft.sdk.RUMCacheDiscard;
 import com.ft.sdk.TraceType;
@@ -17,8 +20,11 @@ import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.utils.CrossProcessSetting;
+import com.lzy.okgo.OkGo;
 
 import java.util.HashMap;
+
+import okhttp3.OkHttpClient;
 
 /**
  * BY huangDianHua
@@ -37,7 +43,19 @@ public class DemoApplication extends BaseApplication {
         if (!BuildConfig.LAZY_INIT) {
             LogUtils.registerInnerLogCacheToFile();
             initFTSDK(this);
+
+            //initOkGo();
+
         }
+    }
+
+    void initOkGo(){
+        OkGo.getInstance().init(this);
+        OkHttpClient.Builder builder = OkGo.getInstance().getOkHttpClient().newBuilder();
+//            builder.interceptors().add(new FTTraceInterceptor());
+//            builder.interceptors().add(new FTResourceInterceptor());
+//            builder.eventListenerFactory(new FTResourceEventListener.FTFactory());
+        OkGo.getInstance().setOkHttpClient(builder.build());
     }
 
 

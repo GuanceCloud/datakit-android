@@ -1,6 +1,7 @@
 package com.ft.sdk.garble.compress;
 
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.LogUtils;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -13,10 +14,14 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okio.BufferedSink;
-import okio.DeflaterSink;
 import okio.Okio;
 
+/**
+ *
+ */
 public class DeflateInterceptor implements Interceptor {
+
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "DeflateInterceptor";
 
     @NotNull
     @Override
@@ -51,12 +56,17 @@ public class DeflateInterceptor implements Interceptor {
 
             @Override
             public void writeTo(@NotNull BufferedSink sink) throws IOException {
-                Deflater deflater = new Deflater();//with zlib wrap
+                try {
+                    Deflater deflater = new Deflater();//with zlib wrap
 //                Deflater deflater = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
 //                //no zlib wrap
-                BufferedSink deflateSink = Okio.buffer(new DeflaterSink(sink, deflater));
-                body.writeTo(deflateSink);
-                deflateSink.close();
+                    BufferedSink deflateSink = Okio.buffer(new DeflaterSink(sink, deflater));
+                    body.writeTo(deflateSink);
+                    deflateSink.close();
+                } catch (Throwable t) {
+                    LogUtils.e(TAG, "Deflate writeTo error" + LogUtils.getStackTraceString(t));
+                    throw t;
+                }
             }
         };
     }
