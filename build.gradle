@@ -2,7 +2,7 @@
 
 buildscript {
     ext {
-        mavenPublishUrl = 'https://mvnrepo.jiagouyun.com/repository'
+        mavenPublishUrl = 'https://mvnrepo.truewatch.com/repository'
         getDefaultProperties = this.&getDefaultProperties
     }
 
