@@ -17,7 +17,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
+import com.ft.sdk.ActionEventWrapper;
+import com.ft.sdk.ActionSourceType;
+import com.ft.sdk.FTActionTrackingHandler;
+import com.ft.sdk.FTRUMConfigManager;
 import com.ft.sdk.FTRUMGlobalManager;
+import com.ft.sdk.HandlerAction;
 import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -43,24 +48,66 @@ public class WindowCallbackWrapper implements Window.Callback {
         if (event != null) {
             if (event.getAction() == KeyEvent.ACTION_UP) {
                 LogUtils.d(TAG, event.toString());
+                FTActionTrackingHandler handler = FTRUMConfigManager.get().getConfig().getActionTrackingHandler();
+
                 switch (event.getKeyCode()) {
                     case KeyEvent.KEYCODE_BACK:
-                        FTRUMGlobalManager.get().startAction(Constants.EVENT_NAME_ACTION_NAME_BACK,
-                                Constants.EVENT_NAME_CLICK);
+                        if (handler != null) {
+                            HandlerAction action = handler.isInTake(new ActionEventWrapper(null,
+                                    ActionSourceType.CLICK_BACK, null));
+                            if (action != null) {
+                                FTRUMGlobalManager.get().startAction(action.getActionName(),
+                                        Constants.EVENT_NAME_CLICK, action.getProperty());
+                            }
+
+                        } else {
+                            FTRUMGlobalManager.get().startAction(Constants.EVENT_NAME_ACTION_NAME_BACK,
+                                    Constants.EVENT_NAME_CLICK);
+                        }
                         break;
                     case KeyEvent.KEYCODE_MENU:
-                        FTRUMGlobalManager.get().startAction(Constants.EVENT_NAME_ACTION_NAME_MENU,
-                                Constants.EVENT_NAME_CLICK);
+                        if (handler != null) {
+                            HandlerAction action = handler.isInTake(new ActionEventWrapper(null,
+                                    ActionSourceType.CLICK_MENU, null));
+                            if (action != null) {
+                                FTRUMGlobalManager.get().startAction(action.getActionName(),
+                                        Constants.EVENT_NAME_CLICK, action.getProperty());
+                            }
+                        } else {
+                            FTRUMGlobalManager.get().startAction(Constants.EVENT_NAME_ACTION_NAME_MENU,
+                                    Constants.EVENT_NAME_CLICK);
+                        }
                         break;
                     case KeyEvent.KEYCODE_DPAD_CENTER:
                         Window window = weekWindow.get();
                         if (window != null) {
                             View currentFocus = window.getCurrentFocus();
                             if (currentFocus != null) {
-                                FTRUMGlobalManager.get().startAction(AopUtils.getViewDesc(currentFocus), Constants.EVENT_NAME_CLICK);
+                                if (handler != null) {
+                                    HandlerAction action = handler.isInTake(new ActionEventWrapper(currentFocus,
+                                            ActionSourceType.CLICK_VIEW, null));
+                                    if (action != null) {
+                                        FTRUMGlobalManager.get().startAction(action.getActionName(),
+                                                Constants.EVENT_NAME_CLICK, action.getProperty());
+                                    }
+                                } else {
+                                    FTRUMGlobalManager.get().startAction(AopUtils.getViewDesc(currentFocus),
+                                            Constants.EVENT_NAME_CLICK);
+                                }
                             } else {
-                                // not view focus ,generate dpad event default
-                                FTRUMGlobalManager.get().startAction(Constants.EVENT_NAME_ACTION_NAME_DPAD_CENTER, Constants.EVENT_NAME_CLICK);
+                                if (handler != null) {
+                                    HandlerAction action = handler.isInTake(new ActionEventWrapper(null,
+                                            ActionSourceType.CLICK_PAD_CENTER, null));
+                                    if (action != null) {
+                                        FTRUMGlobalManager.get().startAction(action.getActionName(),
+                                                Constants.EVENT_NAME_CLICK, action.getProperty());
+                                    }
+                                } else {
+                                    // not view focus ,generate dpad event default
+                                    FTRUMGlobalManager.get().startAction(Constants.EVENT_NAME_ACTION_NAME_DPAD_CENTER,
+                                            Constants.EVENT_NAME_CLICK);
+                                }
+
                             }
                         }
                         break;

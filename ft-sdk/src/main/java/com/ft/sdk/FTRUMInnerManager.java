@@ -198,6 +198,7 @@ public class FTRUMInnerManager {
         ActiveActionBean activeAction = new ActiveActionBean(actionName, actionType,
                 sessionId, viewId, viewName, viewReferrer, false);
         activeAction.setClose(true);
+        activeAction.setTags(FTRUMConfigManager.get().getRUMPublicDynamicTags());
         activeAction.setDuration(duration);
         activeAction.setStartTime(startTime);
         if (property != null) {
@@ -300,6 +301,20 @@ public class FTRUMInnerManager {
     }
 
     /**
+     * create resource relative map
+     * @param resourceId
+     * @return
+     */
+    ResourceBean onCreateResource(String resourceId) {
+        ResourceBean bean = resourceBeanMap.get(resourceId);
+        if (bean == null) {
+            bean = new ResourceBean();
+            resourceBeanMap.put(resourceId, bean);
+        }
+        return bean;
+    }
+
+    /**
      * resource start
      *
      * @param resourceId resource Id
@@ -314,14 +329,13 @@ public class FTRUMInnerManager {
      * @param resourceId resource Id
      */
     void startResource(String resourceId, HashMap<String, Object> property) {
-        LogUtils.d(TAG, "startResource:" + resourceId);
         checkSessionRefresh(true);
-        ResourceBean bean = new ResourceBean();
+        ResourceBean bean = onCreateResource(resourceId);
+        LogUtils.d(TAG, "startResource:" + resourceId);
         if (property != null) {
             bean.property.putAll(property);
         }
         attachRUMRelativeForResource(bean);
-        resourceBeanMap.put(resourceId, bean);
         final String actionId = bean.actionId;
         final String viewId = bean.viewId;
         EventConsumerThreadPool.get().execute(new Runnable() {
@@ -379,6 +393,16 @@ public class FTRUMInnerManager {
         preActivityDuration.put(viewName, loadTime);
     }
 
+    /**
+     * update current view
+     */
+    void updateLoadTime(long duration) {
+        if (activeView != null) {
+            activeView.setLoadTime(duration);
+        } else {
+            LogUtils.e(TAG, "updateLoadTime ");
+        }
+    }
 
     /**
      * view start
@@ -951,7 +975,7 @@ public class FTRUMInnerManager {
     /**
      * Set network transmission content
      *
-     * @param resourceId resource id
+     * @param resourceId    resource id
      * @param params
      * @param netStatusBean
      */

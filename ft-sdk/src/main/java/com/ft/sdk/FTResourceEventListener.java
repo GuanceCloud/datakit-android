@@ -58,6 +58,7 @@ public class FTResourceEventListener extends EventListener {
         this.enableResourceHostIP = enableResourceHostIP;
         this.resourceId = resourceId;
         this.originEventListener = originEventListener;
+        FTRUMInnerManager.get().onCreateResource(resourceId);
     }
 
     @Override

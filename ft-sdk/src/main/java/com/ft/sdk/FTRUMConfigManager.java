@@ -6,6 +6,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.ft.sdk.garble.bean.AppState;
@@ -182,9 +183,13 @@ public class FTRUMConfigManager {
     }
 
 
-    @Nullable
+    @NonNull
     public FTRUMConfig getConfig() {
-        return config;
+        return config != null ? config : getDefaultConfig();
+    }
+
+    private FTRUMConfig getDefaultConfig() {
+        return new FTRUMConfig();
     }
 
     /**

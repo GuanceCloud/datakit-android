@@ -2,10 +2,8 @@ package com.ft.sdk;
 
 import static com.ft.sdk.FTApplication.getApplication;
 
-import android.app.Activity;
 import android.app.Application;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.MenuItem;
@@ -16,11 +14,6 @@ import android.widget.AdapterView;
 import android.widget.ExpandableListView;
 import android.widget.RadioGroup;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import com.ft.sdk.garble.FTAutoTrackConfigManager;
-import com.ft.sdk.garble.bean.OP;
 import com.ft.sdk.garble.bean.ResourceID;
 import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.Constants;
@@ -30,6 +23,7 @@ import com.ft.sdk.garble.utils.Utils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
 
 import okhttp3.EventListener;
@@ -207,7 +201,7 @@ public class FTAutoTrack {
         if (view == null) {
             return;
         }
-        trackViewOnClick(null, view, view.isPressed());
+        trackViewOnClick(view, null, view.isPressed());
     }
 
     /**
@@ -220,8 +214,14 @@ public class FTAutoTrack {
         if (group == null) {
             return;
         }
+        HashMap<String, Object> extra = new HashMap<>();
+        extra.put("checkedId", checkedId);
 
-        trackViewOnClick(null, group, true);
+        try {
+            clickView(group, ActionSourceType.CLICK_RADIO_BUTTON, extra);
+        } catch (Exception e) {
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+        }
     }
 
     /**
@@ -232,7 +232,14 @@ public class FTAutoTrack {
      * @param position
      */
     public static void trackListView(AdapterView<?> parent, View v, int position) {
-        trackViewOnClick(null, v, true);
+        HashMap<String, Object> extra = new HashMap<>();
+        extra.put("position", position);
+        extra.put("parent", parent);
+        try {
+            clickView(v, ActionSourceType.CLICK_LIST_ITEM, extra);
+        } catch (Exception e) {
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+        }
     }
 
     /**
@@ -243,7 +250,14 @@ public class FTAutoTrack {
      * @param position
      */
     public static void trackExpandableListViewOnGroupClick(ExpandableListView parent, View v, int position) {
-        trackViewOnClick(null, v, true);
+        HashMap<String, Object> extra = new HashMap<>();
+        extra.put("groupPosition", position);
+        extra.put("parent", parent);
+        try {
+            clickView(v, ActionSourceType.CLICK_EXPAND_GROUP_ITEM, extra);
+        } catch (Exception e) {
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+        }
     }
 
     /**
@@ -265,10 +279,10 @@ public class FTAutoTrack {
             Field viewField = tab.getClass().getField("view");
             View view = (View) viewField.get(tab);
             Method getPosition = tab.getClass().getMethod("getPosition");
-            int position = (int) getPosition.invoke(tab);
-            Object object = view.getContext();
-            clickView(view, AopUtils.getClass(object), AopUtils.getClassName(object),
-                    AopUtils.getSupperClassName(object), AopUtils.getViewDesc(view) + "#pos:" + position);
+            //AopUtils.getViewDesc(view) + "#pos:" + position
+            HashMap<String, Object> extra = new HashMap<>();
+            extra.put("position", getPosition);
+            clickView(view, ActionSourceType.CLICK_TAB, extra);
         } catch (Exception e) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
@@ -294,7 +308,15 @@ public class FTAutoTrack {
      * @param childPosition
      */
     public static void trackExpandableListViewOnChildClick(ExpandableListView parent, View v, int parentPosition, int childPosition) {
-        trackViewOnClick(null, v, true);
+        HashMap<String, Object> extra = new HashMap<>();
+        extra.put("parent", parent);
+        extra.put("parentPosition", parentPosition);
+        extra.put("childPosition", childPosition);
+        try {
+            clickView(v, ActionSourceType.CLICK_EXPAND_LIST_ITEM, extra);
+        } catch (Exception e) {
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+        }
     }
 
     /**
@@ -309,7 +331,7 @@ public class FTAutoTrack {
                 return;
             }
 
-            trackViewOnClick(object, view, view.isPressed());
+            trackViewOnClick(view, null, view.isPressed());
         } catch (Exception e) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
@@ -319,18 +341,13 @@ public class FTAutoTrack {
     /**
      * Click event
      *
-     * @param object
      * @param view
      * @param isFromUser
      */
-    public static void trackViewOnClick(Object object, View view, boolean isFromUser) {
+    public static void trackViewOnClick(View view, HashMap<String, Object> extra, boolean isFromUser) {
         try {
             if (isFromUser) {
-                if (object == null) {
-                    object = AopUtils.getActivityFromContext(view.getContext());
-                }
-                clickView(view, AopUtils.getClass(object), AopUtils.getClassName(object),
-                        AopUtils.getSupperClassName(object), AopUtils.getViewDesc(view));
+                clickView(view, ActionSourceType.CLICK_VIEW, extra);
             }
         } catch (Exception e) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
@@ -359,8 +376,7 @@ public class FTAutoTrack {
      */
     public static void trackMenuItem(Object object, MenuItem menuItem) {
         try {
-            clickView((Class<?>) object, AopUtils.getClassName(object), AopUtils.getSupperClassName(object),
-                    AopUtils.getMenuItem(menuItem));
+            clickView(menuItem, ActionSourceType.CLICK_MENU_ITEM, null);
         } catch (Exception e) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
@@ -383,13 +399,9 @@ public class FTAutoTrack {
             if (dialog == null) {
                 return;
             }
-            Context context = dialog.getContext();
-            Activity activity = AopUtils.getActivityFromContext(context);
-            if (activity == null) {
-                activity = dialog.getOwnerActivity();
-            }
-
-            clickView(activity.getClass(), AopUtils.getClassName(activity), AopUtils.getSupperClassName(activity), AopUtils.getDialogClickView(dialog, whichButton));
+            HashMap<String, Object> extra = new HashMap<>();
+            extra.put("position", whichButton);
+            clickView(dialog, ActionSourceType.CLICK_DIALOG_BUTTON, extra);
         } catch (Exception e) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
@@ -405,9 +417,9 @@ public class FTAutoTrack {
      */
     public static void trackViewOnTouch(View view, MotionEvent motionEvent) {
         try {
-            Object object = view.getContext();
-            clickView(view, AopUtils.getClass(object), AopUtils.getClassName(object),
-                    AopUtils.getSupperClassName(object), AopUtils.getViewDesc(view));
+            HashMap<String, Object> extra = new HashMap<>();
+            extra.put("motionEvent", motionEvent);
+            clickView(view, ActionSourceType.CLICK_VIEW, extra);
         } catch (Exception e) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
@@ -417,93 +429,56 @@ public class FTAutoTrack {
     /**
      * Click event
      *
-     * @param clazz
-     * @param currentPage
-     * @param rootPage
-     * @param vtp
+     * @param clickSourceType
      */
-    public static void clickView(Class<?> clazz, String currentPage, String rootPage, String vtp) {
-        LogUtils.showAlias("Current click event vtp value is:" + vtp);
-        if (!FTAutoTrackConfigManager.get().isAutoTrack()) {
-            return;
-        }
-        if (!FTAutoTrackConfigManager.get().enableAutoTrackType(FTAutoTrackType.APP_CLICK)) {
-            return;
-        }
-
-        if (!FTAutoTrackConfigManager.get().isOnlyAutoTrackActivity(clazz)) {
-            return;
-        }
-
-        if (FTAutoTrackConfigManager.get().disableAutoTrackType(FTAutoTrackType.APP_CLICK)) {
-            return;
-        }
-        if (FTAutoTrackConfigManager.get().isIgnoreAutoTrackActivity(clazz)) {
-            return;
-        }
-        putClickEvent(OP.CLK, currentPage, rootPage, vtp);
-    }
-
-    /**
-     * Click event
-     *
-     * @param view
-     * @param clazz
-     * @param currentPage
-     * @param rootPage
-     * @param vtp
-     */
-    public static void clickView(View view, Class<?> clazz, String currentPage, String rootPage, String vtp) {
-        LogUtils.showAlias("Current click event vtp value is:" + vtp);
-        if (!FTAutoTrackConfigManager.get().isAutoTrack()) {
-            return;
-        }
-        if (!FTAutoTrackConfigManager.get().enableAutoTrackType(FTAutoTrackType.APP_CLICK)) {
-            return;
-        }
-        if (!FTAutoTrackConfigManager.get().isOnlyAutoTrackActivity(clazz)) {
-            return;
-        }
-        if (!FTAutoTrackConfigManager.get().isOnlyView(view)) {
-            return;
-        }
-
-        if (FTAutoTrackConfigManager.get().disableAutoTrackType(FTAutoTrackType.APP_CLICK)) {
-            return;
-        }
-        if (FTAutoTrackConfigManager.get().isIgnoreAutoTrackActivity(clazz)) {
-            return;
-        }
-        if (FTAutoTrackConfigManager.get().isIgnoreView(view)) {
-            return;
-        }
-        putClickEvent(OP.CLK, currentPage, rootPage, vtp);
-    }
-
-
-    /**
-     * Record click event
-     *
-     * @param op
-     * @param currentPage
-     * @param rootPage
-     * @param vtp
-     */
-    public static void putClickEvent(@NonNull OP op, @Nullable String currentPage, @Nullable String rootPage, @Nullable String vtp) {
+    public static void clickView(Object object, ActionSourceType clickSourceType, HashMap<String, Object> extra) {
 
         FTRUMConfigManager manager = FTRUMConfigManager.get();
         if (!manager.isRumEnable()) {
             return;
         }
-        if (!op.equals(OP.CLK)) {
-            return;
-        }
-        //config nonnull here ignore warning
         if (!manager.getConfig().isEnableTraceUserAction()) {
             return;
         }
 
-        FTRUMInnerManager.get().startAction(vtp, Constants.EVENT_NAME_CLICK);
+        FTActionTrackingHandler handler = manager.getConfig().getActionTrackingHandler();
+        if (handler != null) {
+            HandlerAction action = manager.getConfig().getActionTrackingHandler()
+                    .isInTake(new ActionEventWrapper(object, clickSourceType, extra));
+
+            if (action != null) {
+                FTRUMInnerManager.get().startAction(action.getActionName(), Constants.EVENT_NAME_CLICK,
+                        action.getProperty());
+            }
+
+        } else {
+
+            String vtp = "";
+            if (object instanceof View) {
+                if (clickSourceType.equals(ActionSourceType.CLICK_VIEW)) {
+                    vtp = AopUtils.getViewDesc((View) object);
+                } else if (clickSourceType.equals(ActionSourceType.CLICK_LIST_ITEM)) {
+                    vtp = AopUtils.getViewDesc((View) object) + "#position:" + extra.get("position");
+                } else if (clickSourceType.equals(ActionSourceType.CLICK_EXPAND_GROUP_ITEM)) {
+                    vtp = AopUtils.getViewDesc((View) object) + "#groupPosition:" + extra.get("groupPosition");
+                } else if (clickSourceType.equals(ActionSourceType.CLICK_EXPAND_LIST_ITEM)) {
+                    vtp = AopUtils.getViewDesc((View) object) + "#parentPosition:" + extra.get("parentPosition")
+                            + "#childPosition:" + extra.get("childPosition");
+                } else if (clickSourceType.equals(ActionSourceType.CLICK_RADIO_BUTTON)) {
+                    vtp = AopUtils.getViewDesc((View) object) + "#checkedId:" + extra.get("checkedId");
+                } else if (clickSourceType.equals(ActionSourceType.CLICK_TAB)) {
+                    vtp = AopUtils.getViewDesc((View) object) + "#position:" + extra.get("position");
+                }
+            } else if (object instanceof MenuItem) {
+                vtp = AopUtils.getMenuItem((MenuItem) object);
+            } else if (object instanceof Dialog) {
+                vtp = AopUtils.getDialogClickView((Dialog) object, (int) extra.get("position"));
+            }
+
+            LogUtils.showAlias("clickView:" + vtp);
+            FTRUMInnerManager.get().startAction(vtp, Constants.EVENT_NAME_CLICK);
+
+        }
     }
 
 
@@ -511,15 +486,29 @@ public class FTAutoTrack {
      * Record application login effectiveness
      */
     public static void putRUMLaunchPerformance(boolean isCold, long duration, long startTime) {
-        FTRUMInnerManager.get().addAction(
-                isCold ? Constants.ACTION_NAME_LAUNCH_COLD : Constants.ACTION_NAME_LAUNCH_HOT,
-                isCold ? Constants.ACTION_TYPE_LAUNCH_COLD : Constants.ACTION_TYPE_LAUNCH_HOT,
-                duration, startTime);
+        FTRUMConfigManager manager = FTRUMConfigManager.get();
+        FTActionTrackingHandler handler = manager.getConfig().getActionTrackingHandler();
+        if (handler != null) {
+            HandlerAction action = handler.isInTake(new ActionEventWrapper(null, isCold ? ActionSourceType.LAUNCH_COLD
+                    : ActionSourceType.LAUNCH_HOT, null));
+
+            if (action != null) {
+                FTRUMInnerManager.get().addAction(
+                        action.getActionName(),
+                        isCold ? Constants.ACTION_TYPE_LAUNCH_COLD : Constants.ACTION_TYPE_LAUNCH_HOT,
+                        duration, startTime, action.getProperty());
+            }
+        } else {
+            FTRUMInnerManager.get().addAction(
+                    isCold ? Constants.ACTION_NAME_LAUNCH_COLD : Constants.ACTION_NAME_LAUNCH_HOT,
+                    isCold ? Constants.ACTION_TYPE_LAUNCH_COLD : Constants.ACTION_TYPE_LAUNCH_HOT,
+                    duration, startTime);
+        }
     }
 
 
     /**
-     * Get corresponding method (Activity) execution time 
+     * Get corresponding method (Activity) execution time
      * (This method will be called in the onCreate method of all activities that inherit AppCompatActivity)
      *
      * @param desc className + "|" + methodName + "|" + methodDesc
@@ -539,7 +528,7 @@ public class FTAutoTrack {
     }
 
     /**
-     * Plug-in method used to replace the called {@link android.webkit.WebView#loadUrl(String)} method. 
+     * Plug-in method used to replace the called {@link android.webkit.WebView#loadUrl(String)} method.
      * This method structure should be modified with caution, please synchronize the modification after the modification
      * [com.ft.plugin.garble.bytecode.FTMethodAdapter] The part of the visitMethodInsn method about this replacement
      *
@@ -558,7 +547,7 @@ public class FTAutoTrack {
     }
 
     /**
-     * Plug-in method used to replace the called {@link android.webkit.WebView#loadUrl(String)} method. 
+     * Plug-in method used to replace the called {@link android.webkit.WebView#loadUrl(String)} method.
      * This method structure should be modified with caution, please synchronize the modification after the modification
      * [com.ft.plugin.garble.bytecode.FTMethodAdapter] The part of the visitMethodInsn method about this replacement
      *
@@ -577,7 +566,7 @@ public class FTAutoTrack {
     }
 
     /**
-     * Plug-in method used to replace the called {@link android.webkit.WebView#loadData(String, String, String)} method. 
+     * Plug-in method used to replace the called {@link android.webkit.WebView#loadData(String, String, String)} method.
      * This method structure should be modified with caution, please synchronize the modification after the modification
      * [com.ft.plugin.garble.bytecode.FTMethodAdapter] The part of the visitMethodInsn method about this replacement
      *
@@ -597,7 +586,7 @@ public class FTAutoTrack {
     }
 
     /**
-     * Plug-in method used to replace the called {@link android.webkit.WebView#loadDataWithBaseURL(String, String, String, String, String)} method. 
+     * Plug-in method used to replace the called {@link android.webkit.WebView#loadDataWithBaseURL(String, String, String, String, String)} method.
      * This method structure should be modified with caution, please synchronize the modification after the modification
      * [com.ft.plugin.garble.bytecode.FTMethodAdapter] The part of the visitMethodInsn method about this replacement
      *
@@ -618,7 +607,7 @@ public class FTAutoTrack {
     }
 
     /**
-     * Plug-in method used to replace the called {@link android.webkit.WebView#postUrl(String, byte[])} method. 
+     * Plug-in method used to replace the called {@link android.webkit.WebView#postUrl(String, byte[])} method.
      * This method structure should be modified with caution, please synchronize the modification after the modification
      * [com.ft.plugin.garble.bytecode.FTMethodAdapter] The part of the visitMethodInsn method about this replacement
      *
@@ -667,7 +656,7 @@ public class FTAutoTrack {
     }
 
     /**
-     * Plug-in method used to replace the called {@link OkHttpClient.Builder#build() } method. 
+     * Plug-in method used to replace the called {@link OkHttpClient.Builder#build() } method.
      * This method structure should be modified with caution, please synchronize the modification after the modification
      * [com.ft.plugin.garble.bytecode.FTMethodAdapter] The part of the visitMethodInsn method about this replacement
      *
@@ -683,7 +672,6 @@ public class FTAutoTrack {
         //Found compatibility issues in some projects
         if (FTRUMConfigManager.get().isRumEnable()) {
             FTRUMConfig config = FTRUMConfigManager.get().getConfig();
-            //config nonnull here ignore warning
             if (config.isEnableTraceUserResource()) {
                 boolean hasSetResource = false;//Whether FTResourceInterceptor has been set
                 for (Interceptor interceptor : builder.interceptors()) {
@@ -747,7 +735,7 @@ public class FTAutoTrack {
     }
 
     /**
-     * Plug-in method used to replace the called {@link Request.Builder#build() } method. 
+     * Plug-in method used to replace the called {@link Request.Builder#build() } method.
      * This method structure should be modified with caution, please synchronize the modification after the modification
      * [com.ft.plugin.garble.bytecode.FTMethodAdapter] The part of the visitMethodInsn method about this replacement
      *
