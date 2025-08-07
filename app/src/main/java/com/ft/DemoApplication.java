@@ -3,9 +3,11 @@ package com.ft;
 import android.app.Activity;
 import android.content.Context;
 
+import com.ft.sdk.ActionEventWrapper;
 import com.ft.sdk.DeviceMetricsMonitorType;
 import com.ft.sdk.EnvType;
 import com.ft.sdk.ErrorMonitorType;
+import com.ft.sdk.FTActionTrackingHandler;
 import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTSDKConfig;
@@ -14,6 +16,7 @@ import com.ft.sdk.FTTraceConfig;
 import com.ft.sdk.FTViewActivityTrackingHandler;
 import com.ft.sdk.FTViewFragmentTrackingHandler;
 import com.ft.sdk.FragmentWrapper;
+import com.ft.sdk.HandlerAction;
 import com.ft.sdk.HandlerView;
 import com.ft.sdk.LogCacheDiscard;
 import com.ft.sdk.RUMCacheDiscard;
@@ -135,24 +138,6 @@ public class DemoApplication extends BaseApplication {
                         .setEnableTrackAppUIBlock(true, 100)
                         .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
                         .setEnableTraceUserViewInFragment(true)
-                        .setViewFragmentTrackingHandler(new FTViewFragmentTrackingHandler() {
-                            @Override
-                            public HandlerView isInTake(FragmentWrapper fragment) {
-                                if (fragment.getSimpleClassName().equals("HomeFragment")) {
-                                    return new HandlerView("Home");
-                                }
-                                if (fragment.getSimpleClassName().startsWith("Detail")) {
-                                    return null;
-                                }
-                                return null;
-                            }
-                        })
-                        .setViewActivityTrackingHandler(new FTViewActivityTrackingHandler() {
-                            @Override
-                            public HandlerView isInTake(Activity activity) {
-                                return null;
-                            }
-                        })
                         .setResourceUrlHandler(url -> false)
 //                        .setOkHttpResourceContentHandler(new FTResourceInterceptor.ContentHandlerHelperEx() {
 //                            @Override

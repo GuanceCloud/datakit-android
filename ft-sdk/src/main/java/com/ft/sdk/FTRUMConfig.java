@@ -563,23 +563,87 @@ public class FTRUMConfig {
         return contentHandlerHelper;
     }
 
+    /**
+     * Get the Fragment view tracking handler
+     * 
+     * @return The current Fragment view tracking handler, or null if not set
+     * @see FTViewFragmentTrackingHandler
+     */
     public FTViewFragmentTrackingHandler getViewFragmentTrackingHandler() {
         return viewFragmentTrackingHandler;
     }
     /**
-     * Set filter for view fragment tracking handler
+     * Set the Fragment view tracking handler
+     * 
+     * This handler allows you to customize how Fragment views are tracked in RUM data.
+     * When a Fragment lifecycle event occurs, this handler will be called to determine
+     * the custom view name and properties for the Fragment.
+     * 
+     * <p>Usage example:</p>
+     * <pre>{@code
+     * .setViewFragmentTrackingHandler(new FTViewFragmentTrackingHandler() {
+     *     @Override
+     *     public HandlerView isInTake(FragmentWrapper fragment) {
+     *         String fragmentName = fragment.getSimpleClassName();
+     *         if (fragmentName.equals("HomeFragment")) {
+     *             HashMap<String, Object> properties = new HashMap<>();
+     *             properties.put("fragment_type", "home");
+     *             return new HandlerView("Custom_Home_View", properties);
+     *         }
+     *         return null; // Skip tracking for other fragments
+     *     }
+     * })
+     * }</pre>
+     * 
+     * @param viewFragmentTrackingHandler The Fragment view tracking handler to set
+     * @return This FTRUMConfig instance for method chaining
+     * @see FTViewFragmentTrackingHandler
+     * @see HandlerView
+     * @see FragmentWrapper
      */
     public FTRUMConfig setViewFragmentTrackingHandler(FTViewFragmentTrackingHandler viewFragmentTrackingHandler) {
         this.viewFragmentTrackingHandler = viewFragmentTrackingHandler;
         return this;
     }
 
+    /**
+     * Get the Activity view tracking handler
+     * 
+     * @return The current Activity view tracking handler, or null if not set
+     * @see FTViewActivityTrackingHandler
+     */
     public FTViewActivityTrackingHandler getViewActivityTrackingHandler() {
         return viewActivityTrackingHandler;
     }
 
     /**
-     * Set filter for view activity tracking handler
+     * Set the Activity view tracking handler
+     * 
+     * This handler allows you to customize how Activity views are tracked in RUM data.
+     * When an Activity lifecycle event occurs, this handler will be called to determine
+     * the custom view name and properties for the Activity.
+     * 
+     * <p>Usage example:</p>
+     * <pre>{@code
+     * .setViewActivityTrackingHandler(new FTViewActivityTrackingHandler() {
+     *     @Override
+     *     public HandlerView isInTake(Activity activity) {
+     *         String activityName = activity.getClass().getSimpleName();
+     *         if (activityName.startsWith("Main")) {
+     *             HashMap<String, Object> properties = new HashMap<>();
+     *             properties.put("activity_type", "main");
+     *             return new HandlerView("Custom_Main_Activity", properties);
+     *         }
+     *         return null; // Skip tracking for other activities
+     *     }
+     * })
+     * }</pre>
+     * 
+     * @param viewActivityTrackingHandler The Activity view tracking handler to set
+     * @return This FTRUMConfig instance for method chaining
+     * @see FTViewActivityTrackingHandler
+     * @see HandlerView
+     * @see Activity
      */
     public FTRUMConfig setViewActivityTrackingHandler(FTViewActivityTrackingHandler viewActivityTrackingHandler) {
         this.viewActivityTrackingHandler = viewActivityTrackingHandler;
@@ -587,16 +651,44 @@ public class FTRUMConfig {
     }
 
     /**
-     * Get action tracking handler
-     *
-     * @return
+     * Get the Action tracking handler
+     * 
+     * @return The current Action tracking handler, or null if not set
+     * @see FTActionTrackingHandler
      */
     public FTActionTrackingHandler getActionTrackingHandler() {
         return actionTrackingHandler;
     }
 
     /**
-     * Set filter for click event handler
+     * Set the Action tracking handler
+     * 
+     * This handler allows you to customize how user actions are tracked in RUM data.
+     * When a user action occurs (click, touch, etc.), this handler will be called to determine
+     * the custom action name and properties for the action.
+     * 
+     * <p>Usage example:</p>
+     * <pre>{@code
+     * .setActionTrackingHandler(new FTActionTrackingHandler() {
+     *     @Override
+     *     public HandlerAction isInTake(ActionEventWrapper actionEventWrapper) {
+     *         ActionSourceType actionType = actionEventWrapper.getSourceType();
+     *         if (actionType == ActionSourceType.CLICK_VIEW) {
+     *             HashMap<String, Object> properties = new HashMap<>();
+     *             properties.put("action_type", "button_click");
+     *             return new HandlerAction("Custom_Button_Click", properties);
+     *         }
+     *         return null; // Skip tracking for other actions
+     *     }
+     * })
+     * }</pre>
+     * 
+     * @param actionTrackingHandler The Action tracking handler to set
+     * @return This FTRUMConfig instance for method chaining
+     * @see FTActionTrackingHandler
+     * @see HandlerAction
+     * @see ActionEventWrapper
+     * @see ActionSourceType
      */
     public FTRUMConfig setActionTrackingHandler(FTActionTrackingHandler actionTrackingHandler) {
         this.actionTrackingHandler = actionTrackingHandler;

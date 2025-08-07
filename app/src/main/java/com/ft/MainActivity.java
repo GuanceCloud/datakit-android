@@ -17,6 +17,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.ft.sdk.FTLogger;
+import com.ft.sdk.FTRUMConfigManager;
+import com.ft.sdk.FTRUMGlobalManager;
 import com.ft.sdk.FTRemoteConfigManager;
 import com.ft.sdk.FTResourceEventListener;
 import com.ft.sdk.FTResourceInterceptor;
@@ -148,7 +150,14 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(this, WebViewActivity.class));
         });
         findViewById(R.id.main_mock_click_btn).setOnClickListener(v -> {
+            FTRUMGlobalManager.get().updateLoadTime(1000000000);
 
+        });
+        findViewById(R.id.main_click_test_btn).setOnClickListener(v -> {
+            startActivity(new Intent(this, ClickTestActivity.class));
+        });
+        findViewById(R.id.main_handler_test_btn).setOnClickListener(v -> {
+            startActivity(new Intent(this, HandlerTestActivity.class));
         });
 
         findViewById(R.id.main_dynamic_tags).setOnClickListener(v -> {

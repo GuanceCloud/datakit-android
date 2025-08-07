@@ -263,10 +263,12 @@ public class FTAutoTrack {
     /**
      * TabHost switch
      *
-     * @param tabName
+     * @param tabId
      */
-    public static void trackTabHost(String tabName) {
-        //trackViewOnClick(null, v, true);
+    public static void trackTabHost(String tabId) {
+        HashMap<String, Object> extra = new HashMap<>();
+        extra.put("tabId", tabId);
+        trackViewOnClick(null, extra, true);
     }
 
     /**
@@ -475,7 +477,7 @@ public class FTAutoTrack {
                 vtp = AopUtils.getDialogClickView((Dialog) object, (int) extra.get("position"));
             }
 
-            LogUtils.showAlias("clickView:" + vtp);
+            LogUtils.showAlias("clickView:" + vtp + ",extra:" + extra);
             FTRUMInnerManager.get().startAction(vtp, Constants.EVENT_NAME_CLICK);
 
         }
