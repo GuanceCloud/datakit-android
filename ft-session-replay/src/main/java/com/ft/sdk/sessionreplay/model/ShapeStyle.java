@@ -85,7 +85,19 @@ public class ShapeStyle {
     }
 
     public boolean isFullyOpaque() {
-        return (float) (this.opacity != null ? this.opacity : 1f) >= FULL_OPACITY_ALPHA;
+        if (this.opacity == null) {
+            return true; // 默认不透明
+        }
+        // 安全地转换Number为float，处理Double到Float的转换
+        float opacityValue;
+        if (this.opacity instanceof Double) {
+            opacityValue = ((Double) this.opacity).floatValue();
+        } else if (this.opacity instanceof Float) {
+            opacityValue = (Float) this.opacity;
+        } else {
+            opacityValue = this.opacity.floatValue();
+        }
+        return opacityValue >= FULL_OPACITY_ALPHA;
     }
 
     @Override

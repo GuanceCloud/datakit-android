@@ -1,5 +1,7 @@
 package com.ft.sdk.sessionreplay.internal.recorder;
 
+import com.ft.sdk.sessionreplay.internal.async.RecordedDataQueueHandler;
+
 public class NoOpRecorder implements Recorder {
 
     @Override
@@ -25,5 +27,11 @@ public class NoOpRecorder implements Recorder {
     @Override
     public void stopRecorders() {
         // No-op
+    }
+
+    @Override
+    public RecordedDataQueueHandler getRecordedDataQueueHandler() {
+        // No-op, return null
+        return null;
     }
 }

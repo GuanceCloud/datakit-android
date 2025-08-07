@@ -8,12 +8,14 @@ import android.util.Log;
 import com.ft.sdk.sessionreplay.internal.SessionReplayRumContextProvider;
 import com.ft.sdk.sessionreplay.internal.async.RecordedDataQueueHandler;
 import com.ft.sdk.sessionreplay.internal.async.SnapshotRecordedDataQueueItem;
+import com.ft.sdk.sessionreplay.internal.async.TouchEventRecordedDataQueueItem;
 import com.ft.sdk.sessionreplay.internal.processor.MutationResolver;
 import com.ft.sdk.sessionreplay.internal.processor.RecordedDataProcessor;
 import com.ft.sdk.sessionreplay.internal.processor.RecordedQueuedItemContext;
 import com.ft.sdk.sessionreplay.internal.recorder.Node;
 import com.ft.sdk.sessionreplay.internal.recorder.SessionReplayRecorder;
 import com.ft.sdk.sessionreplay.model.MobileRecord;
+import com.ft.sdk.sessionreplay.model.PointerInteractionData;
 import com.ft.sdk.feature.FeatureEventReceiver;
 import com.ft.sdk.feature.FeatureSdkCore;
 import com.ft.sdk.feature.FeatureStorageConfiguration;
@@ -38,6 +40,7 @@ import com.ft.sdk.sessionreplay.utils.DrawableToColorMapper;
 import com.ft.sdk.sessionreplay.utils.RumContextProvider;
 import com.ft.sdk.sessionreplay.utils.SessionReplayRumContext;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -440,9 +443,10 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
         }
     }
     /**
-     * 处理外部提供的Node树数据，通过processor的processScreenSnapshots方法, added by zzq
+     * 处理外部提供的Node树数据，通过RecordedDataQueueHandler的队列机制, added by zzq
      * @param rootNode Node树的根节点
      * @param systemInformation 系统信息
+     * @param viewId 视图ID
      */
     public void processExternalNodeTree(Node rootNode,
                                         SystemInformation systemInformation, String viewId) {
@@ -451,35 +455,48 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
         }
 
         try {
-            // 创建RumContext
-            SessionReplayRumContext rumContext = createRumContextWithJustViewId(viewId);
+            // 获取RecordedDataQueueHandler
+            RecordedDataQueueHandler recordedDataQueueHandler = sessionReplayRecorder.getRecordedDataQueueHandler();
+            if (recordedDataQueueHandler == null) {
+                Log.d(TAG, "zzq RecordedDataQueueHandler is null");
+                return;
+            }
 
-            // 创建RecordedQueuedItemContext
-            RecordedQueuedItemContext recordedQueuedItemContext =
-                    new RecordedQueuedItemContext(
-                            System.currentTimeMillis(),
-                            rumContext
-                    );
+            // 通过RecordedDataQueueHandler创建SnapshotRecordedDataQueueItem
+            SnapshotRecordedDataQueueItem snapshotItem = recordedDataQueueHandler.addSnapshotItem(systemInformation);
+            if (snapshotItem == null) {
+                Log.d(TAG, "zzq Failed to create SnapshotRecordedDataQueueItem");
+                return;
+            }
 
-            // 创建SnapshotRecordedDataQueueItem
-            SnapshotRecordedDataQueueItem snapshotItem =
-                    new SnapshotRecordedDataQueueItem(
-                            recordedQueuedItemContext,
-                            systemInformation
-                    );
-
-            // 设置Node列表
-            List<Node> nodes =
-                    java.util.Collections.singletonList(rootNode);
+            // 创建自定义的RumContext并更新
+            SessionReplayRumContext customRumContext = createRumContextWithJustViewId(viewId);
+            
+            // 由于RecordedQueuedItemContext是final的，我们需要通过反射或其他方式更新RumContext
+            // 这里我们先设置Node数据，让队列正常处理，在processor中再处理viewId
+            List<Node> nodes = java.util.Collections.singletonList(rootNode);
             snapshotItem.setNodes(nodes);
             snapshotItem.setFinishedTraversal(true);
 
-            // 通过processor处理
-            processor.processScreenSnapshots(snapshotItem);
-            //sdkCore.getInternalLogger().w(TAG, "Successfully processed external Node tree");
-            Log.d(TAG, "zzq Successfully processed external Node tree");
+            // 标记这是外部Node，并存储自定义viewId
+            // 我们可以通过Node的metadata来传递viewId信息
+            if (rootNode != null && rootNode.getMetadata() != null) {
+                rootNode.getMetadata().put("external_view_id", viewId);
+                rootNode.getMetadata().put("is_external_node", true);
+                
+                Log.d(TAG, "========== Setting External Node Metadata ==========");
+                Log.d(TAG, "zzq Setting external_view_id: " + viewId);
+                Log.d(TAG, "zzq Setting is_external_node: true");
+                Log.d(TAG, "=================================================");
+            }
+
+            // 检查item是否准备好并触发队列处理
+            if (snapshotItem.isReady()) {
+                recordedDataQueueHandler.tryToConsumeItems();
+            }
+
+            Log.d(TAG, "zzq Successfully queued external Node tree with viewId: " + viewId);
         } catch (Exception e) {
-            //sdkCore.getInternalLogger().w(TAG, "Error processing external Node tree: " + e.getMessage());
             Log.d(TAG, "zzq Error processing external Node tree: " + e.getMessage());
         }
     }
@@ -498,31 +515,48 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
         }
 
         try {
-            // 使用传入的RumContext
-            RecordedQueuedItemContext recordedQueuedItemContext =
-                    new RecordedQueuedItemContext(
-                            System.currentTimeMillis(),
-                            rumContext
-                    );
+            // 获取RecordedDataQueueHandler
+            RecordedDataQueueHandler recordedDataQueueHandler = sessionReplayRecorder.getRecordedDataQueueHandler();
+            if (recordedDataQueueHandler == null) {
+                Log.d(TAG, "zzq RecordedDataQueueHandler is null");
+                return;
+            }
 
-            // 创建SnapshotRecordedDataQueueItem
-            SnapshotRecordedDataQueueItem snapshotItem =
-                    new SnapshotRecordedDataQueueItem(
-                            recordedQueuedItemContext,
-                            systemInformation
-                    );
+            // 通过RecordedDataQueueHandler创建SnapshotRecordedDataQueueItem
+            SnapshotRecordedDataQueueItem snapshotItem = recordedDataQueueHandler.addSnapshotItem(systemInformation);
+            if (snapshotItem == null) {
+                Log.d(TAG, "zzq Failed to create SnapshotRecordedDataQueueItem");
+                return;
+            }
 
-            // 设置Node列表
-            List<Node> nodes =
-                    java.util.Collections.singletonList(rootNode);
+            // 设置Node数据
+            List<Node> nodes = java.util.Collections.singletonList(rootNode);
             snapshotItem.setNodes(nodes);
             snapshotItem.setFinishedTraversal(true);
 
-            // 通过processor处理
-            processor.processScreenSnapshots(snapshotItem);
-            Log.d(TAG, "zzq Successfully processed external Node tree with RUM context: " + rumContext.getViewId());
+            // 标记这是外部Node，并存储自定义RumContext信息
+            if (rootNode != null && rootNode.getMetadata() != null) {
+                rootNode.getMetadata().put("external_view_id", rumContext.getViewId());
+                rootNode.getMetadata().put("external_application_id", rumContext.getApplicationId());
+                rootNode.getMetadata().put("external_session_id", rumContext.getSessionId());
+                rootNode.getMetadata().put("is_external_node", true);
+                
+                Log.d(TAG, "========== Setting External Node Metadata (WithRumContext) ==========");
+                Log.d(TAG, "zzq Setting external_view_id: " + rumContext.getViewId());
+                Log.d(TAG, "zzq Setting external_application_id: " + rumContext.getApplicationId());
+                Log.d(TAG, "zzq Setting external_session_id: " + rumContext.getSessionId());
+                Log.d(TAG, "zzq Setting is_external_node: true");
+                Log.d(TAG, "================================================================");
+            }
+
+            // 检查item是否准备好并触发队列处理
+            if (snapshotItem.isReady()) {
+                recordedDataQueueHandler.tryToConsumeItems();
+            }
+
+            Log.d(TAG, "zzq Successfully queued external Node tree with custom RumContext");
         } catch (Exception e) {
-            Log.d(TAG, "zzq Error processing external Node tree with RUM context: " + e.getMessage());
+            Log.d(TAG, "zzq Error processing external Node tree with RumContext: " + e.getMessage());
         }
     }
 
@@ -581,29 +615,48 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                 Log.d(TAG, "zzq Detected page update, using existing viewId: " + existingViewId + " for rootNodeId: " + rootNodeId);
             }
 
-            // 创建RecordedQueuedItemContext
-            RecordedQueuedItemContext recordedQueuedItemContext =
-                    new RecordedQueuedItemContext(
-                            System.currentTimeMillis(),
-                            rumContext
-                    );
+            // 获取RecordedDataQueueHandler
+            RecordedDataQueueHandler recordedDataQueueHandler = sessionReplayRecorder.getRecordedDataQueueHandler();
+            if (recordedDataQueueHandler == null) {
+                Log.d(TAG, "zzq RecordedDataQueueHandler is null");
+                return;
+            }
 
-            // 创建SnapshotRecordedDataQueueItem
-            SnapshotRecordedDataQueueItem snapshotItem =
-                    new SnapshotRecordedDataQueueItem(
-                            recordedQueuedItemContext,
-                            systemInformation
-                    );
+            // 通过RecordedDataQueueHandler创建SnapshotRecordedDataQueueItem
+            SnapshotRecordedDataQueueItem snapshotItem = recordedDataQueueHandler.addSnapshotItem(systemInformation);
+            if (snapshotItem == null) {
+                Log.d(TAG, "zzq Failed to create SnapshotRecordedDataQueueItem");
+                return;
+            }
 
-            // 设置Node列表
+            // 设置Node数据
             List<Node> nodes = java.util.Collections.singletonList(rootNode);
             snapshotItem.setNodes(nodes);
             snapshotItem.setFinishedTraversal(true);
 
-            // 通过processor处理
-            processor.processScreenSnapshots(snapshotItem);
+            // 标记这是外部Node，并存储自定义RumContext信息
+            if (rootNode != null && rootNode.getMetadata() != null) {
+                rootNode.getMetadata().put("external_view_id", rumContext.getViewId());
+                rootNode.getMetadata().put("external_application_id", rumContext.getApplicationId());
+                rootNode.getMetadata().put("external_session_id", rumContext.getSessionId());
+                rootNode.getMetadata().put("is_external_node", true);
+                rootNode.getMetadata().put("is_new_page", isNewPage);
+                
+                Log.d(TAG, "========== Setting External Node Metadata (AutoDetection) ==========");
+                Log.d(TAG, "zzq Setting external_view_id: " + rumContext.getViewId());
+                Log.d(TAG, "zzq Setting external_application_id: " + rumContext.getApplicationId());
+                Log.d(TAG, "zzq Setting external_session_id: " + rumContext.getSessionId());
+                Log.d(TAG, "zzq Setting is_external_node: true");
+                Log.d(TAG, "zzq Setting is_new_page: " + isNewPage);
+                Log.d(TAG, "===================================================================");
+            }
 
-            Log.d(TAG, "zzq Successfully processed external Node tree (isNewPage: " + isNewPage + ", rootNodeId: " + rootNodeId + ")");
+            // 检查item是否准备好并触发队列处理
+            if (snapshotItem.isReady()) {
+                recordedDataQueueHandler.tryToConsumeItems();
+            }
+
+            Log.d(TAG, "zzq Successfully queued external Node tree (isNewPage: " + isNewPage + ", rootNodeId: " + rootNodeId + ")");
         } catch (Exception e) {
             Log.d(TAG, "zzq Error processing external Node tree with auto detection: " + e.getMessage());
         }
@@ -667,29 +720,49 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                 }
             }
 
-            // 创建RecordedQueuedItemContext
-            RecordedQueuedItemContext recordedQueuedItemContext =
-                    new RecordedQueuedItemContext(
-                            System.currentTimeMillis(),
-                            rumContext
-                    );
+            // 获取RecordedDataQueueHandler
+            RecordedDataQueueHandler recordedDataQueueHandler = sessionReplayRecorder.getRecordedDataQueueHandler();
+            if (recordedDataQueueHandler == null) {
+                Log.d(TAG, "zzq RecordedDataQueueHandler is null");
+                return;
+            }
 
-            // 创建SnapshotRecordedDataQueueItem
-            SnapshotRecordedDataQueueItem snapshotItem =
-                    new SnapshotRecordedDataQueueItem(
-                            recordedQueuedItemContext,
-                            systemInformation
-                    );
+            // 通过RecordedDataQueueHandler创建SnapshotRecordedDataQueueItem
+            SnapshotRecordedDataQueueItem snapshotItem = recordedDataQueueHandler.addSnapshotItem(systemInformation);
+            if (snapshotItem == null) {
+                Log.d(TAG, "zzq Failed to create SnapshotRecordedDataQueueItem");
+                return;
+            }
 
-            // 设置Node列表
+            // 设置Node数据
             List<Node> nodes = java.util.Collections.singletonList(rootNode);
             snapshotItem.setNodes(nodes);
             snapshotItem.setFinishedTraversal(true);
 
-            // 通过processor处理
-            processor.processScreenSnapshots(snapshotItem);
+            // 标记这是外部Node，并存储自定义RumContext信息
+            if (rootNode != null && rootNode.getMetadata() != null) {
+                rootNode.getMetadata().put("external_view_id", rumContext.getViewId());
+                rootNode.getMetadata().put("external_application_id", rumContext.getApplicationId());
+                rootNode.getMetadata().put("external_session_id", rumContext.getSessionId());
+                rootNode.getMetadata().put("is_external_node", true);
+                rootNode.getMetadata().put("is_new_page", isNewPage);
+                
+                Log.d(TAG, "========== Setting External Node Metadata (PageFlag) ==========");
+                Log.d(TAG, "zzq Setting external_view_id: " + rumContext.getViewId());
+                Log.d(TAG, "zzq Setting external_application_id: " + rumContext.getApplicationId());
+                Log.d(TAG, "zzq Setting external_session_id: " + rumContext.getSessionId());
+                Log.d(TAG, "zzq Setting is_external_node: true");
+                Log.d(TAG, "zzq Setting is_new_page: " + isNewPage);
+                Log.d(TAG, "zzq rootNodeId: " + rootNodeId);
+                Log.d(TAG, "=============================================================");
+            }
 
-            Log.d(TAG, "zzq Successfully processed external Node tree (isNewPage: " + isNewPage + ", rootNodeId: " + rootNodeId + ")");
+            // 检查item是否准备好并触发队列处理
+            if (snapshotItem.isReady()) {
+                recordedDataQueueHandler.tryToConsumeItems();
+            }
+
+            Log.d(TAG, "zzq Successfully queued external Node tree (isNewPage: " + isNewPage + ", rootNodeId: " + rootNodeId + ")");
         } catch (Exception e) {
             Log.d(TAG, "zzq Error processing external Node tree with page flag: " + e.getMessage());
         }
@@ -735,6 +808,145 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                                                               String sessionId,
                                                               String viewId) {
         return new SessionReplayRumContext(applicationId, sessionId, viewId);
+    }
+
+    // Flutter触摸事件缓冲区，类似RecorderWindowCallback.pointerInteractions
+    private final List<MobileRecord> flutterPointerInteractions = new ArrayList<>();
+    
+    /**
+     * 添加Flutter触摸事件到缓冲区，类似RecorderWindowCallback.updatePositions
+     * Added by zzq for Flutter touch event processing
+     * 
+     * @param mobileRecord Flutter触摸事件的MobileRecord
+     */
+    public void addFlutterTouchEvent(MobileRecord.MobileIncrementalSnapshotRecord mobileRecord) {
+
+        Log.d(TAG, "addFlutterTouchEvent touchData step 2" );
+        if (!checkIfInitialized()) {
+            Log.d(TAG, "SessionReplay not initialized, skipping Flutter touch event touchData  ");
+            return;
+        }
+
+        // 🔥 修改：Flutter触摸事件不检查录制状态，因为页面切换时录制状态会变化
+        // 但Flutter的触摸事件仍然需要被处理
+        // 注释掉录制状态检查，确保Flutter触摸事件始终被处理
+        /*
+        if (!isRecording.get()) {
+            Log.d(TAG, "SessionReplay not recording, skipping Flutter touch event touchData  ");
+            return;
+        }
+        */
+
+        synchronized (flutterPointerInteractions) {
+            flutterPointerInteractions.add(mobileRecord);
+            
+            Log.d(TAG, "🔥 Added Flutter touch event to buffer - eventType: touchData  " +
+                (mobileRecord.data instanceof PointerInteractionData ? 
+                    ((PointerInteractionData) mobileRecord.data).pointerEventType.toString() : "unknown") +
+                ", buffer size: " + flutterPointerInteractions.size());
+        }
+    }
+
+    /**
+     * 刷新Flutter触摸事件缓冲区，类似RecorderWindowCallback.flushPositions
+     * 最终调用RecordedDataQueueHandler.addTouchEventItem
+     * Added by zzq for Flutter touch event processing
+     */
+    public void flushFlutterTouchEvents() {
+
+        Log.d(TAG, "flushFlutterTouchEvents touchData step 3" );
+        if (!checkIfInitialized()) {
+            Log.d(TAG, "SessionReplay not initialized, skipping Flutter touch flush, touchData");
+            return;
+        }
+
+        synchronized (flutterPointerInteractions) {
+            if (flutterPointerInteractions.isEmpty()) {
+                Log.d(TAG, "Flutter touch buffer is empty, nothing to flush ,touchData ");
+                return;
+            }
+
+            try {
+                // 获取RecordedDataQueueHandler - 完全按照RecorderWindowCallback的方式
+                RecordedDataQueueHandler recordedDataQueueHandler = sessionReplayRecorder.getRecordedDataQueueHandler();
+                if (recordedDataQueueHandler == null) {
+                    Log.d(TAG, "RecordedDataQueueHandler is null, cannot flush Flutter touch events touchData ");
+                    return;
+                }
+
+                Log.d(TAG, "🚀 Flushing Flutter touch events buffer touchData - count: " + flutterPointerInteractions.size());
+
+                // 调用RecordedDataQueueHandler.addTouchEventItem - 完全按照RecorderWindowCallback.flushPositions()的逻辑
+                TouchEventRecordedDataQueueItem item = recordedDataQueueHandler.addTouchEventItem(
+                        new ArrayList<>(flutterPointerInteractions)
+                );
+                
+                if (item != null && item.isReady()) {
+                    // 触发队列处理，完全按照RecorderWindowCallback.flushPositions()
+                    recordedDataQueueHandler.tryToConsumeItems();
+                    Log.d(TAG, "✅touchData  Flutter touch events flushed and queued successfully");
+                } else {
+                    Log.d(TAG, "❌ touchData Failed to create TouchEventRecordedDataQueueItem for Flutter touch events");
+                }
+
+                // 清空缓冲区，完全按照RecorderWindowCallback.flushPositions()
+                flutterPointerInteractions.clear();
+
+            } catch (Exception e) {
+                Log.e(TAG, "Error flushing Flutter touchData  touch events: touchData " + e.getMessage(), e);
+                // 即使出错也要清空缓冲区，避免内存泄漏
+                flutterPointerInteractions.clear();
+            }
+        }
+    }
+
+    /**
+     * 处理单个Flutter触摸事件 - 组合了add和flush的操作
+     * Added by zzq for convenience
+     * 
+     * @param mobileRecord Flutter触摸事件的MobileRecord
+     * @param rumContext RUM上下文
+     */
+    public void processFlutterTouchEvent(MobileRecord.MobileIncrementalSnapshotRecord mobileRecord,
+                                        SessionReplayRumContext rumContext) {
+
+        Log.d(TAG, "processFlutterTouchEvent touchData step 1" );
+        // 添加到缓冲区
+        addFlutterTouchEvent(mobileRecord);
+        
+        // 根据触摸事件类型决定是否立即刷新，模拟RecorderWindowCallback的逻辑
+        if (mobileRecord.data instanceof PointerInteractionData) {
+            PointerInteractionData pointerData = (PointerInteractionData) mobileRecord.data;
+            String eventType = pointerData.pointerEventType.toString().toLowerCase();
+            
+            // ACTION_UP时立即刷新，模拟RecorderWindowCallback.handleEvent()中的逻辑
+            if ("up".equals(eventType)) {
+                flushFlutterTouchEvents();
+            }
+            // ACTION_DOWN时重置（这里不需要特殊处理，因为我们没有时间阈值逻辑）
+            // ACTION_MOVE时可以选择性刷新（这里简化处理，每次move都刷新）
+            else if ("move".equals(eventType)) {
+                flushFlutterTouchEvents();
+            }
+        }
+     }
+
+    /**
+     * 手动刷新Flutter触摸事件缓冲区的公开方法
+     * Added by zzq for manual flush control
+     */
+    public void manualFlushFlutterTouchEvents() {
+        flushFlutterTouchEvents();
+    }
+
+    /**
+     * 获取当前Flutter触摸事件缓冲区大小
+     * Added by zzq for debugging
+     */
+    public int getFlutterTouchBufferSize() {
+        synchronized (flutterPointerInteractions) {
+            return flutterPointerInteractions.size();
+        }
     }
 
 }

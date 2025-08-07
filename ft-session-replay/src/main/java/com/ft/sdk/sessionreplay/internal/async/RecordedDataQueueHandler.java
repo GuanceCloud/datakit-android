@@ -70,6 +70,7 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
     @Override
     @MainThread
     public TouchEventRecordedDataQueueItem addTouchEventItem(List<MobileRecord> pointerInteractions) {
+        Log.d(TAG, "enter addTouchEventItem touchData");
         RecordedQueuedItemContext rumContextData = rumContextDataHandler.createRumContextData();
         if (rumContextData == null) {
             return null;
@@ -82,6 +83,7 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
 
         insertIntoRecordedDataQueue(item);
 
+        Log.d(TAG, "exit addTouchEventItem touchData");
         return item;
     }
 
@@ -106,7 +108,9 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
     @Override
     @MainThread
     public void tryToConsumeItems() {
+        Log.d(TAG, "enter tryToConsumeItems touchData");
         if (recordedDataQueue.isEmpty()) {
+            Log.d(TAG, "tryToConsumeItems is empty touchData");
             return;
         }
         ExecutorUtils.executeSafe(executorService, "Recorded Data queue processing", internalLogger, this::triggerProcessingLoop);
@@ -114,6 +118,7 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
 
     @WorkerThread
     private synchronized void triggerProcessingLoop() {
+        Log.d(TAG, "enter triggerProcessingLoop touchData");
         while (!recordedDataQueue.isEmpty()) {
             RecordedDataQueueItem nextItem = recordedDataQueue.peek();
 
@@ -121,9 +126,11 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
                 long nextItemAgeInNs = System.nanoTime() - nextItem.getCreationTimeStampInNs();
                 if (!nextItem.isValid()) {
                     internalLogger.e(TAG, String.format(ITEM_DROPPED_INVALID_MESSAGE, nextItem.getClass().getSimpleName()));
+                    Log.e(TAG, String.format(ITEM_DROPPED_INVALID_MESSAGE, nextItem.getClass().getSimpleName()) + "touchData");
                     recordedDataQueue.poll();
                 } else if (nextItemAgeInNs > MAX_DELAY_NS) {
                     internalLogger.e(TAG, String.format(Locale.US, ITEM_DROPPED_EXPIRED_MESSAGE, nextItemAgeInNs));
+                    Log.e(TAG, String.format(Locale.US, ITEM_DROPPED_EXPIRED_MESSAGE, nextItemAgeInNs) + "touchData");
                     recordedDataQueue.poll();
                 } else if (nextItem.isReady()) {
                     processItem(recordedDataQueue.poll());
@@ -137,18 +144,24 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
     @WorkerThread
     private void processItem(RecordedDataQueueItem nextItem) {
         if (nextItem instanceof SnapshotRecordedDataQueueItem) {
+            Log.d(TAG, "processTouchEventsRecords SnapshotRecordedDataQueueItem");
             processor.processScreenSnapshots((SnapshotRecordedDataQueueItem) nextItem);
         } else if (nextItem instanceof TouchEventRecordedDataQueueItem) {
             processor.processTouchEventsRecords((TouchEventRecordedDataQueueItem) nextItem);
+            Log.d(TAG, "processTouchEventsRecords TouchEventRecordedDataQueueItem touchData");
         } else if (nextItem instanceof ResourceRecordedDataQueueItem) {
+            Log.d(TAG, "processTouchEventsRecords ResourceRecordedDataQueueItem");
             processor.processResources((ResourceRecordedDataQueueItem) nextItem);
         }
     }
 
     private void insertIntoRecordedDataQueue(RecordedDataQueueItem recordedDataQueueItem) {
+
+        Log.d(TAG, "enter insertIntoRecordedDataQueue touchData");
         try {
             recordedDataQueue.offer(recordedDataQueueItem);
         } catch (Exception e) {
+            Log.d(TAG, "insertIntoRecordedDataQueue exception touchData");
             logAddToQueueException(e);
         }
     }

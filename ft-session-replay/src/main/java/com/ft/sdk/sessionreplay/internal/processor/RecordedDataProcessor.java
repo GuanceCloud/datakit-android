@@ -29,6 +29,7 @@ import com.ft.sdk.sessionreplay.model.TextStyle;
 import com.ft.sdk.sessionreplay.model.TextWireframe;
 import com.ft.sdk.sessionreplay.model.ViewEndRecord;
 import com.ft.sdk.sessionreplay.model.ViewportResizeData;
+import com.ft.sdk.sessionreplay.model.VisualViewportRecord;
 import com.ft.sdk.sessionreplay.model.WebviewWireframe;
 import com.ft.sdk.sessionreplay.model.Wireframe;
 import com.ft.sdk.sessionreplay.recorder.SystemInformation;
@@ -88,18 +89,143 @@ public class RecordedDataProcessor implements Processor {
     public void processScreenSnapshots(SnapshotRecordedDataQueueItem item) {
         printNodesTree(item.getNodes());
         
+        // 检查是否有外部Node的自定义RumContext
+        SessionReplayRumContext rumContextToUse = item.getRecordedQueuedItemContext().getNewRumContext();
+        
+        // 检查第一个Node是否包含外部自定义的RumContext信息
+        if (item.getNodes() != null && !item.getNodes().isEmpty()) {
+            Node firstNode = item.getNodes().get(0);
+            if (firstNode != null && firstNode.getMetadata() != null) {
+                Object isExternalNode = firstNode.getMetadata().get("is_external_node");
+                if (Boolean.TRUE.equals(isExternalNode)) {
+                    // 这是外部Node，使用自定义的RumContext信息
+                    String externalViewId = (String) firstNode.getMetadata().get("external_view_id");
+                    String externalApplicationId = (String) firstNode.getMetadata().get("external_application_id");
+                    String externalSessionId = (String) firstNode.getMetadata().get("external_session_id");
+                    Object isNewPage = firstNode.getMetadata().get("is_new_page");
+                    
+                    // 打印外部Node的参数
+                    Log.d(TAG, "========== External Node Parameters ==========");
+                    Log.d(TAG, "zzq externalViewId: " + externalViewId);
+                    Log.d(TAG, "zzq externalApplicationId: " + externalApplicationId);
+                    Log.d(TAG, "zzq externalSessionId: " + externalSessionId);
+                    Log.d(TAG, "zzq isNewPage: " + isNewPage);
+                    Log.d(TAG, "zzq isExternalNode: " + isExternalNode);
+                    Log.d(TAG, "===============================================");
+                    
+                    if (externalViewId != null && externalApplicationId != null && externalSessionId != null) {
+                        rumContextToUse = new SessionReplayRumContext(
+                                externalApplicationId,
+                                externalSessionId,
+                                externalViewId
+                        );
+                        Log.d(TAG, "zzq Using external RumContext: viewId=" + externalViewId);
+                    } else {
+                        Log.d(TAG, "zzq External RumContext incomplete, using default RumContext");
+                    }
+                }
+            }
+        }
+        
         handleSnapshots(
-                item.getRecordedQueuedItemContext().getNewRumContext(),
+                rumContextToUse,
                 item.getRecordedQueuedItemContext().getTimestamp(),
                 item.getNodes(),
                 item.getSystemInformation()
         );
-        prevRumContext = item.getRecordedQueuedItemContext().getNewRumContext();
+        prevRumContext = rumContextToUse;
     }
 
     @Override
     @WorkerThread
     public void processTouchEventsRecords(TouchEventRecordedDataQueueItem item) {
+        // 🔥 打印 processTouchEventsRecords 的输入参数
+        Log.d(TAG, "touchData ========== processTouchEventsRecords Parameters ==========");
+        
+        // 打印 item 的基本信息
+        Log.d(TAG, "touchData  TouchEventRecordedDataQueueItem:");
+        Log.d(TAG, "touchData    └─ isValid: " + item.isValid());
+        Log.d(TAG, "touchData    └─ isReady: " + item.isReady());
+        Log.d(TAG, "touchData    └─ creationTimeStampInNs: " + item.getCreationTimeStampInNs());
+        
+        // 打印 RecordedQueuedItemContext 信息
+        Log.d(TAG, "touchData  RecordedQueuedItemContext:");
+        Log.d(TAG, "touchData    └─ timestamp: " + item.getRecordedQueuedItemContext().getTimestamp());
+        
+        // 打印 RUM Context 信息
+        SessionReplayRumContext rumContext = item.getRecordedQueuedItemContext().getNewRumContext();
+        Log.d(TAG, "touchData  RUM Context:");
+        Log.d(TAG, "touchData    └─ applicationId: " + rumContext.getApplicationId());
+        Log.d(TAG, "touchData    └─ sessionId: " + rumContext.getSessionId());
+        Log.d(TAG, "touchData    └─ viewId: " + rumContext.getViewId());
+        Log.d(TAG, "touchData    └─ isValid: " + rumContext.isValid());
+        Log.d(TAG, "touchData    └─ toString: " + rumContext.toString());
+        
+        // 打印 Touch Data 信息
+        List<MobileRecord> touchData = item.getTouchData();
+        Log.d(TAG, "touchData  Touch Data:");
+        Log.d(TAG, "touchData    └─ size: " + (touchData != null ? touchData.size() : "null"));
+        
+        if (touchData != null && !touchData.isEmpty()) {
+            for (int i = 0; i < touchData.size(); i++) {
+                MobileRecord record = touchData.get(i);
+                Log.d(TAG, "touchData    └─ Touch Record [" + i + "]:");
+                Log.d(TAG, "touchData      └─ record class: " + record.getClass().getSimpleName());
+                
+                // 根据记录类型访问字段
+                if (record instanceof MobileRecord.MobileIncrementalSnapshotRecord) {
+                    MobileRecord.MobileIncrementalSnapshotRecord incrementalRecord = 
+                        (MobileRecord.MobileIncrementalSnapshotRecord) record;
+                    Log.d(TAG, "touchData      └─ timestamp: " + incrementalRecord.timestamp);
+                    Log.d(TAG, "touchData      └─ type: " + incrementalRecord.type);
+                } else if (record instanceof MobileRecord.MobileFullSnapshotRecord) {
+                    MobileRecord.MobileFullSnapshotRecord fullRecord = 
+                        (MobileRecord.MobileFullSnapshotRecord) record;
+                    Log.d(TAG, "touchData      └─ timestamp: " + fullRecord.timestamp);
+                    Log.d(TAG, "touchData      └─ type: " + fullRecord.type);
+                } else if (record instanceof MetaRecord) {
+                    MetaRecord metaRecord = (MetaRecord) record;
+                    Log.d(TAG, "touchData      └─ timestamp: " + metaRecord.timestamp);
+                    Log.d(TAG, "touchData      └─ type: " + metaRecord.type);
+                } else if (record instanceof FocusRecord) {
+                    FocusRecord focusRecord = (FocusRecord) record;
+                    Log.d(TAG, "touchData      └─ timestamp: " + focusRecord.timestamp);
+                    Log.d(TAG, "touchData      └─ type: " + focusRecord.type);
+                } else if (record instanceof ViewEndRecord) {
+                    ViewEndRecord viewEndRecord = (ViewEndRecord) record;
+                    Log.d(TAG, "touchData      └─ timestamp: " + viewEndRecord.timestamp);
+                    Log.d(TAG, "touchData      └─ type: " + viewEndRecord.type);
+                } else if (record instanceof VisualViewportRecord) {
+                    VisualViewportRecord viewportRecord = (VisualViewportRecord) record;
+                    Log.d(TAG, "touchData      └─ timestamp: " + viewportRecord.timestamp);
+                    Log.d(TAG, "touchData      └─ type: " + viewportRecord.type);
+                } else {
+                    Log.d(TAG, "touchData      └─ unknown record type, cannot access timestamp/type");
+                }
+                
+                // 如果是增量快照记录，打印详细信息
+                if (record instanceof MobileRecord.MobileIncrementalSnapshotRecord) {
+                    MobileRecord.MobileIncrementalSnapshotRecord incrementalRecord = 
+                        (MobileRecord.MobileIncrementalSnapshotRecord) record;
+                    Log.d(TAG, "touchData      └─ data type: " + (incrementalRecord.data != null ?
+                        incrementalRecord.data.getClass().getSimpleName() : "null"));
+                    
+                    // 如果是 PointerInteractionData，打印触摸事件详情
+                    if (incrementalRecord.data instanceof com.ft.sdk.sessionreplay.model.PointerInteractionData) {
+                        com.ft.sdk.sessionreplay.model.PointerInteractionData pointerData = 
+                            (com.ft.sdk.sessionreplay.model.PointerInteractionData) incrementalRecord.data;
+                        Log.d(TAG, "touchData      └─ pointerEventType: " + pointerData.pointerEventType);
+                        Log.d(TAG, "touchData      └─ pointerType: " + pointerData.pointerType);
+                        Log.d(TAG, "touchData      └─ pointerId: " + pointerData.pointerId);
+                        Log.d(TAG, "touchData      └─ x: " + pointerData.x);
+                        Log.d(TAG, "touchData      └─ y: " + pointerData.y);
+                    }
+                }
+            }
+        }
+        
+        Log.d(TAG, "touchData  ========== End processTouchEventsRecords Parameters ==========");
+        
         handleTouchRecords(
                 item.getRecordedQueuedItemContext().getNewRumContext(),
                 item.getTouchData()
