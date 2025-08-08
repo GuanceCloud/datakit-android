@@ -1,3 +1,7 @@
+# agent 1.6.13-beta01
+1. Same as agent 1.6.13-alpha01.
+
+---
 # agent 1.6.13-alpha01
 1. Added `FTRUMConfig.setActionTrackingHandler` to support custom user action tracking.
    This handler allows developers to customize how user actions (clicks, touches, etc.) are tracked in RUM data.
