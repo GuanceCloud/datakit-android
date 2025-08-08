@@ -49,6 +49,18 @@
             android:text="Click Event" />
 
         <Button
+            android:id="@+id/main_click_test_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Click Test Activity" />
+
+        <Button
+            android:id="@+id/main_handler_test_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Handler Test Activity" />
+
+        <Button
             android:id="@+id/main_mock_log_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

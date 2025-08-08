@@ -211,7 +211,7 @@ public class FTDBManager extends DBManager {
      * @param viewId
      * @param timeSpent
      */
-    public void closeView(final String viewId, final long timeSpent, final String attr) {
+    public void closeView(final String viewId, final long loadTime, final long timeSpent, final String attr) {
         LogUtils.d(TAG, "closeVIew:" + viewId + ",timeSpent:" + timeSpent);
         getDB(true, new DataBaseCallBack() {
             @Override
@@ -226,6 +226,7 @@ public class FTDBManager extends DBManager {
                     ContentValues contentValues = new ContentValues();
                     contentValues.put(FTSQL.RUM_COLUMN_IS_CLOSE, 1);
                     contentValues.put(FTSQL.RUM_COLUMN_VIEW_TIME_SPENT, timeSpent);
+                    contentValues.put(FTSQL.RUM_COLUMN_VIEW_LOAD_TIME, loadTime);
                     contentValues.put(FTSQL.RUM_COLUMN_EXTRA_ATTR, attr);
                     db.update(FTSQL.FT_TABLE_VIEW, contentValues,
                             FTSQL.RUM_COLUMN_ID + "='" + viewId + "'", null);

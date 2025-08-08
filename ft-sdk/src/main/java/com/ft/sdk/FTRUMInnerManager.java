@@ -302,6 +302,7 @@ public class FTRUMInnerManager {
 
     /**
      * create resource relative map
+     *
      * @param resourceId
      * @return
      */
@@ -592,10 +593,10 @@ public class FTRUMInnerManager {
     /**
      * Add error information
      *
-     * @param log        log
-     * @param message    message
-     * @param errorType  error type
-     * @param state      program running state
+     * @param log       log
+     * @param message   message
+     * @param errorType error type
+     * @param state     program running state
      */
     void addError(String log, String message, String errorType, AppState state) {
         addError(log, message, Utils.getCurrentNanoTime(), errorType, state, null);
@@ -605,11 +606,11 @@ public class FTRUMInnerManager {
     /**
      * Add error information
      *
-     * @param log        log
-     * @param message    message
-     * @param errorType  error type
-     * @param state      program running state
-     * @param property   additional attribute parameters
+     * @param log       log
+     * @param message   message
+     * @param errorType error type
+     * @param state     program running state
+     * @param property  additional attribute parameters
      */
     void addError(String log, String message, String errorType, AppState state, HashMap<String, Object> property) {
         addError(log, message, Utils.getCurrentNanoTime(), errorType, state, property, null);
@@ -618,12 +619,12 @@ public class FTRUMInnerManager {
     /**
      * Add error
      *
-     * @param log        log
-     * @param message    message
-     * @param errorType  error type
-     * @param state      program running state
-     * @param dateline   occurrence time, nanosecond
-     * @param callBack   thread pool call back
+     * @param log       log
+     * @param message   message
+     * @param errorType error type
+     * @param state     program running state
+     * @param dateline  occurrence time, nanosecond
+     * @param callBack  thread pool call back
      */
     void addError(String log, String message, long dateline, String errorType, AppState state, RunnerCompleteCallBack callBack) {
         addError(log, message, dateline, errorType, state, null, callBack);
@@ -632,12 +633,12 @@ public class FTRUMInnerManager {
     /**
      * Add error
      *
-     * @param log        log
-     * @param message    message
-     * @param errorType  error type
-     * @param state      program running state
-     * @param dateline   occurrence time, nanosecond
-     * @param callBack   thread pool call back
+     * @param log       log
+     * @param message   message
+     * @param errorType error type
+     * @param state     program running state
+     * @param dateline  occurrence time, nanosecond
+     * @param callBack  thread pool call back
      */
     public void addError(String log, String message, long dateline, String errorType,
                          AppState state, HashMap<String, Object> property, RunnerCompleteCallBack callBack) {
@@ -719,8 +720,8 @@ public class FTRUMInnerManager {
     /**
      * Add long task
      *
-     * @param log       log
-     * @param duration  duration, nanosecond
+     * @param log      log
+     * @param duration duration, nanosecond
      */
     void addLongTask(String log, long duration, HashMap<String, Object> property) {
         try {
@@ -748,8 +749,8 @@ public class FTRUMInnerManager {
     /**
      * Add long task
      *
-     * @param log       log
-     * @param duration  duration, nanosecond
+     * @param log      log
+     * @param duration duration, nanosecond
      */
     void addLongTask(String log, long duration) {
         addLongTask(log, duration, null);
@@ -758,7 +759,7 @@ public class FTRUMInnerManager {
     /**
      * Transfer network connection indicator parameters
      *
-     * @param resourceId resource id
+     * @param resourceId    resource id
      * @param netStatusBean network status bean
      */
     void setNetState(String resourceId, NetStatusBean netStatusBean) {
@@ -1108,10 +1109,11 @@ public class FTRUMInnerManager {
         final ViewBean viewBean = activeViewBean.convertToViewBean();
         final String viewId = viewBean.getId();
         final long timeSpent = viewBean.getTimeSpent();
+        final long loadTIme = viewBean.getLoadTime();
         EventConsumerThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
-                FTDBManager.get().closeView(viewId, timeSpent, viewBean.getAttrJsonString());
+                FTDBManager.get().closeView(viewId, loadTIme, timeSpent, viewBean.getAttrJsonString());
                 FTDBManager.get().updateViewUpdateTime(viewId, System.currentTimeMillis());
                 if (callBack != null) {
                     callBack.onComplete();
@@ -1331,6 +1333,7 @@ public class FTRUMInnerManager {
                 if (bean.getLastErrorTime() > 0) {
                     fields.put(Constants.KEY_SESSION_ERROR_TIMESTAMP, bean.getLastErrorTime());
                 }
+
                 FTTrackInner.getInstance().rum(bean.getStartTime(),
                         Constants.FT_MEASUREMENT_RUM_VIEW, tags, fields, new RunnerCompleteCallBack() {
                             @Override

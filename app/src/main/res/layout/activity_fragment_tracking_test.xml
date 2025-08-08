@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".FragmentTrackingTestActivity">
+
+    <!-- Title -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Fragment Tracking Test Activity"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Info Display -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@android:color/black"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:id="@+id/info_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:textColor="#00BCD4"
+            android:textSize="14sp"
+            android:fontFamily="monospace"
+            android:text="Loading test information..." />
+
+    </ScrollView>
+
+    <!-- Fragment Container -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Fragment Container:"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:background="@android:color/holo_blue_light"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="Fragment will be loaded here"
+            android:textColor="@android:color/white" />
+
+    </FrameLayout>
+
+    <!-- Test Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/switch_fragment_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Switch Fragment (Fragment Tracking)"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/add_fragment_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add Fragment (Fragment Tracking)"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/remove_fragment_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Remove Fragment (Fragment Tracking)"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/back_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Back to Handler Test"
+            android:background="@android:color/holo_blue_light" />
+
+    </LinearLayout>
+
+</LinearLayout>
