@@ -401,7 +401,7 @@ public class FTRUMInnerManager {
         if (activeView != null) {
             activeView.setLoadTime(duration);
         } else {
-            LogUtils.e(TAG, "updateLoadTime ");
+            LogUtils.e(TAG, "updateLoadTime activeView null");
         }
     }
 

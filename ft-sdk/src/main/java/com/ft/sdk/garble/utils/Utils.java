@@ -563,10 +563,86 @@ public class Utils {
         while (iterator.hasNext()) {
             jsonBuilder.append("\"").append(iterator.next()).append("\"");
             if (iterator.hasNext()) {
-                jsonBuilder.append(", ");
+                jsonBuilder.append(",");
             }
         }
         jsonBuilder.append("]");
+        return jsonBuilder.toString();
+    }
+
+    /**
+     * Appends multiple items to an existing JSON string array.
+     * If the original JSON string is null or empty, a new array will be created.
+     *
+     * @param jsonArrayStr Original JSON string array (e.g. ["a", "b"])
+     * @param values       Collection of new items to add (e.g. ["c", "d"])
+     * @return Updated JSON string array (e.g. ["a", "b", "c", "d"])
+     */
+    public static String addItemsToJsonArray(String jsonArrayStr, Collection<String> values) {
+        if (values == null || values.isEmpty()) return jsonArrayStr;
+
+        StringBuilder jsonBuilder = new StringBuilder();
+
+        String trimmed = jsonArrayStr == null ? "" : jsonArrayStr.trim();
+        if (trimmed.isEmpty() || trimmed.equals("[]")) {
+            jsonBuilder.append("[");
+        } else {
+            jsonBuilder.append(trimmed);
+            if (jsonBuilder.charAt(jsonBuilder.length() - 1) == ']') {
+                jsonBuilder.deleteCharAt(jsonBuilder.length() - 1);
+                jsonBuilder.append(",");
+            }
+        }
+
+        boolean firstAdded = jsonBuilder.toString().endsWith("[") || jsonBuilder.length() == 0;
+        for (String value : values) {
+            if (value == null) continue;
+            String quotedValue = "\"" + value + "\"";
+            if (jsonBuilder.indexOf(quotedValue) >= 0) continue; // skip duplicates
+
+            if (!firstAdded) jsonBuilder.append(" ");
+            jsonBuilder.append(quotedValue).append(",");
+            firstAdded = false;
+        }
+
+        if (jsonBuilder.charAt(jsonBuilder.length() - 1) == ',') {
+            jsonBuilder.deleteCharAt(jsonBuilder.length() - 1);
+        }
+
+        jsonBuilder.append("]");
+        return jsonBuilder.toString();
+    }
+
+    /**
+     * Adds an item to a JSON string array representation.
+     * If the original JSON string is null or empty, a new array will be created.
+     *
+     * @param jsonArrayStr Original JSON string array (e.g. ["a", "b"])
+     * @param newItem      Item to add (e.g. "c")
+     * @return Updated JSON string array (e.g. ["a", "b", "c"])
+     */
+    public static String addItemToJsonArray(String jsonArrayStr, String newItem) {
+        if (newItem == null) return jsonArrayStr;
+
+        String quotedValue = "\"" + newItem + "\"";
+
+        if (jsonArrayStr != null && jsonArrayStr.contains(quotedValue)) {
+            return jsonArrayStr; // exist
+        }
+
+        StringBuilder jsonBuilder = new StringBuilder();
+
+        String trimmed = jsonArrayStr == null ? "" : jsonArrayStr.trim();
+        if (trimmed.isEmpty() || trimmed.equals("[]")) {
+            jsonBuilder.append("[").append(quotedValue).append("]");
+        } else {
+            jsonBuilder.append(trimmed);
+            if (jsonBuilder.charAt(jsonBuilder.length() - 1) == ']') {
+                jsonBuilder.deleteCharAt(jsonBuilder.length() - 1);
+            }
+            jsonBuilder.append(",").append(quotedValue).append("]");
+        }
+
         return jsonBuilder.toString();
     }
 

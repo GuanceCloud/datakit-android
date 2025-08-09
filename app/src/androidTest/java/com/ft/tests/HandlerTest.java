@@ -191,7 +191,7 @@ public class HandlerTest extends BaseTest {
         // Test Action Handler directly
         ActionEventWrapper testEvent = new ActionEventWrapper(
                 new Object(), ActionSourceType.CLICK_VIEW, new HashMap<>());
-        HandlerAction actionResult = customActionHandler.isInTake(testEvent);
+        HandlerAction actionResult = customActionHandler.resolveHandlerAction(testEvent);
 
         Assert.assertNotNull("Action handler should return HandlerAction", actionResult);
         Assert.assertNotNull("Action name should not be null", actionResult.getActionName());
@@ -211,7 +211,7 @@ public class HandlerTest extends BaseTest {
         Assert.assertNotNull("Test activity should not be null", testActivity[0]);
         LogUtils.d("HandlerTest", "Testing activity: " + testActivity[0].getClass().getSimpleName());
         
-        HandlerView viewResult = customViewActivityHandler.isInTake(testActivity[0]);
+        HandlerView viewResult = customViewActivityHandler.resolveHandlerView(testActivity[0]);
         Assert.assertNotNull("View handler should return HandlerView", viewResult);
         Assert.assertNotNull("View name should not be null", viewResult.getViewName());
         Assert.assertTrue("View name should start with 'Custom_'", viewResult.getViewName().startsWith("Custom_"));
@@ -227,7 +227,7 @@ public class HandlerTest extends BaseTest {
         };
         
         FragmentWrapper testFragment = new FragmentWrapper(mockFragment);
-        HandlerView fragmentViewResult = customViewFragmentHandler.isInTake(testFragment);
+        HandlerView fragmentViewResult = customViewFragmentHandler.resolveHandlerView(testFragment);
         Assert.assertNotNull("Fragment handler should return HandlerView", fragmentViewResult);
         Assert.assertNotNull("Fragment name should not be null", fragmentViewResult.getViewName());
         Assert.assertTrue("Fragment name should start with 'Custom_'", fragmentViewResult.getViewName().startsWith("Custom_"));
@@ -247,7 +247,7 @@ public class HandlerTest extends BaseTest {
         private HashMap<ActionSourceType, Integer> processedActionTypes = new HashMap<>();
 
         @Override
-        public HandlerAction isInTake(ActionEventWrapper actionEventWrapper) {
+        public HandlerAction resolveHandlerAction(ActionEventWrapper actionEventWrapper) {
             called = true;
             LogUtils.d("CustomActionTrackingHandler", "Handler called for action: " + actionEventWrapper.getSourceType());
 
@@ -294,7 +294,7 @@ public class HandlerTest extends BaseTest {
         private String lastActivityName = null;
 
         @Override
-        public HandlerView isInTake(Activity activity) {
+        public HandlerView resolveHandlerView(Activity activity) {
             called = true;
             LogUtils.d("CustomViewActivityTrackingHandler", "Handler called for activity: " + activity.getClass().getSimpleName());
             lastActivityName = activity.getClass().getSimpleName();
@@ -333,7 +333,7 @@ public class HandlerTest extends BaseTest {
         private String lastFragmentName = null;
 
         @Override
-        public HandlerView isInTake(FragmentWrapper fragment) {
+        public HandlerView resolveHandlerView(FragmentWrapper fragment) {
             called = true;
             LogUtils.d("CustomViewFragmentTrackingHandler", "Handler called for fragment: " + fragment.getSimpleClassName());
             lastFragmentName = fragment.getSimpleClassName();

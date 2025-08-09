@@ -27,5 +27,13 @@ public interface FTViewActivityTrackingHandler {
      * @see HandlerView
      * @see Activity#getClass()
      */
-    HandlerView isInTake(Activity activity);
+    HandlerView resolveHandlerView(Activity activity);
+
+    /**
+     * Backward-compatible alias for older API.
+     * Prefer {@link #resolveHandlerView(Activity)}.
+     */
+    default HandlerView isInTake(Activity activity) {
+        return resolveHandlerView(activity);
+    }
 }

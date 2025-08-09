@@ -173,7 +173,7 @@ public class FTRUMGlobalManager {
     }
 
     /**
-     *  update the loadTime of view
+     *  update the loading_time of view, unit nanosecond
      * @param duration
      */
     public void updateLoadTime(long duration) {

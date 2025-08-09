@@ -446,7 +446,7 @@ public class FTAutoTrack {
         FTActionTrackingHandler handler = manager.getConfig().getActionTrackingHandler();
         if (handler != null) {
             HandlerAction action = manager.getConfig().getActionTrackingHandler()
-                    .isInTake(new ActionEventWrapper(object, clickSourceType, extra));
+                    .resolveHandlerAction(new ActionEventWrapper(object, clickSourceType, extra));
 
             if (action != null) {
                 FTRUMInnerManager.get().startAction(action.getActionName(), Constants.EVENT_NAME_CLICK,
@@ -491,7 +491,7 @@ public class FTAutoTrack {
         FTRUMConfigManager manager = FTRUMConfigManager.get();
         FTActionTrackingHandler handler = manager.getConfig().getActionTrackingHandler();
         if (handler != null) {
-            HandlerAction action = handler.isInTake(new ActionEventWrapper(null, isCold ? ActionSourceType.LAUNCH_COLD
+            HandlerAction action = handler.resolveHandlerAction(new ActionEventWrapper(null, isCold ? ActionSourceType.LAUNCH_COLD
                     : ActionSourceType.LAUNCH_HOT, null));
 
             if (action != null) {

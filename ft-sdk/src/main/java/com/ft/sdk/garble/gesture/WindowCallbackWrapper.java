@@ -53,7 +53,7 @@ public class WindowCallbackWrapper implements Window.Callback {
                 switch (event.getKeyCode()) {
                     case KeyEvent.KEYCODE_BACK:
                         if (handler != null) {
-                            HandlerAction action = handler.isInTake(new ActionEventWrapper(null,
+                            HandlerAction action = handler.resolveHandlerAction(new ActionEventWrapper(null,
                                     ActionSourceType.CLICK_BACK, null));
                             if (action != null) {
                                 FTRUMGlobalManager.get().startAction(action.getActionName(),
@@ -67,7 +67,7 @@ public class WindowCallbackWrapper implements Window.Callback {
                         break;
                     case KeyEvent.KEYCODE_MENU:
                         if (handler != null) {
-                            HandlerAction action = handler.isInTake(new ActionEventWrapper(null,
+                            HandlerAction action = handler.resolveHandlerAction(new ActionEventWrapper(null,
                                     ActionSourceType.CLICK_MENU, null));
                             if (action != null) {
                                 FTRUMGlobalManager.get().startAction(action.getActionName(),
@@ -84,7 +84,7 @@ public class WindowCallbackWrapper implements Window.Callback {
                             View currentFocus = window.getCurrentFocus();
                             if (currentFocus != null) {
                                 if (handler != null) {
-                                    HandlerAction action = handler.isInTake(new ActionEventWrapper(currentFocus,
+                                    HandlerAction action = handler.resolveHandlerAction(new ActionEventWrapper(currentFocus,
                                             ActionSourceType.CLICK_VIEW, null));
                                     if (action != null) {
                                         FTRUMGlobalManager.get().startAction(action.getActionName(),
@@ -96,7 +96,7 @@ public class WindowCallbackWrapper implements Window.Callback {
                                 }
                             } else {
                                 if (handler != null) {
-                                    HandlerAction action = handler.isInTake(new ActionEventWrapper(null,
+                                    HandlerAction action = handler.resolveHandlerAction(new ActionEventWrapper(null,
                                             ActionSourceType.CLICK_PAD_CENTER, null));
                                     if (action != null) {
                                         FTRUMGlobalManager.get().startAction(action.getActionName(),

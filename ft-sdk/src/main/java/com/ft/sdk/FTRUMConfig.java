@@ -583,7 +583,7 @@ public class FTRUMConfig {
      * <pre>{@code
      * .setViewFragmentTrackingHandler(new FTViewFragmentTrackingHandler() {
      *     @Override
-     *     public HandlerView isInTake(FragmentWrapper fragment) {
+     *     public HandlerView resolveHandlerView(FragmentWrapper fragment) {
      *         String fragmentName = fragment.getSimpleClassName();
      *         if (fragmentName.equals("HomeFragment")) {
      *             HashMap<String, Object> properties = new HashMap<>();
@@ -627,7 +627,7 @@ public class FTRUMConfig {
      * <pre>{@code
      * .setViewActivityTrackingHandler(new FTViewActivityTrackingHandler() {
      *     @Override
-     *     public HandlerView isInTake(Activity activity) {
+     *     public HandlerView resolveHandlerView(Activity activity) {
      *         String activityName = activity.getClass().getSimpleName();
      *         if (activityName.startsWith("Main")) {
      *             HashMap<String, Object> properties = new HashMap<>();
@@ -671,7 +671,7 @@ public class FTRUMConfig {
      * <pre>{@code
      * .setActionTrackingHandler(new FTActionTrackingHandler() {
      *     @Override
-     *     public HandlerAction isInTake(ActionEventWrapper actionEventWrapper) {
+     *     public HandlerAction resolveHandlerAction(ActionEventWrapper actionEventWrapper) {
      *         ActionSourceType actionType = actionEventWrapper.getSourceType();
      *         if (actionType == ActionSourceType.CLICK_VIEW) {
      *             HashMap<String, Object> properties = new HashMap<>();

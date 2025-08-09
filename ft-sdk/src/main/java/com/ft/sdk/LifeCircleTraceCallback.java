@@ -116,7 +116,7 @@ class LifeCircleTraceCallback {
                     FTViewActivityTrackingHandler handler = config.getViewActivityTrackingHandler();
                     if (handler != null) {
                         HandlerView handlerView = config.getViewActivityTrackingHandler()
-                                .isInTake((Activity) context);
+                                .resolveHandlerView((Activity) context);
                         if (handlerView != null) {
                             FTRUMInnerManager.get().onCreateView(handlerView.getViewName(), durationNS);
                         }
