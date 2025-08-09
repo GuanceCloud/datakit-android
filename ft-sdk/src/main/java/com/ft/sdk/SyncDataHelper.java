@@ -185,6 +185,13 @@ public class SyncDataHelper {
         if (globalContext != null) {
             applyModifier(globalContext);
             dynamicLRumTags.putAll(globalContext);
+            Object keyArr = rumTags.get(Constants.KEY_RUM_CUSTOM_KEYS);
+            if (keyArr == null) {
+                keyArr = "[]";
+            }
+            String keyArrString = (String) keyArr;
+            rumTags.put(Constants.KEY_RUM_CUSTOM_KEYS,
+                    Utils.addItemsToJsonArray(keyArrString, globalContext.keySet()));
         }
     }
 
@@ -197,6 +204,14 @@ public class SyncDataHelper {
     void appendRUMGlobalContext(String key, String value) {
         if (!Utils.isNullOrEmpty(key) && !Utils.isNullOrEmpty(value)) {
             dynamicLRumTags.put(key, applyModifier(key, value));
+
+            Object keyArr = rumTags.get(Constants.KEY_RUM_CUSTOM_KEYS);
+            if (keyArr == null) {
+                keyArr = "[]";
+            }
+            String keyArrString = (String) keyArr;
+            rumTags.put(Constants.KEY_RUM_CUSTOM_KEYS, Utils.addItemToJsonArray(keyArrString, key));
+
         }
     }
 

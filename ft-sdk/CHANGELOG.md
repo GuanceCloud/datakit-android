@@ -1,3 +1,6 @@
+# agent 1.6.13-beta02
+1. The tags added by appendRUMGlobalContext can be updated during the session.
+
 # agent 1.6.13-beta01
 1. Same as agent 1.6.13-alpha01.
 
