@@ -28,5 +28,13 @@ public interface FTActionTrackingHandler {
      * @see ActionEventWrapper#getSource()
      * @see ActionEventWrapper#getExtra()
      */
-    HandlerAction isInTake(ActionEventWrapper actionEventWrapper);
+    HandlerAction resolveHandlerAction(ActionEventWrapper actionEventWrapper);
+
+    /**
+     * Backward-compatible alias for older API.
+     * Prefer {@link #resolveHandlerAction(ActionEventWrapper)}.
+     */
+    default HandlerAction isInTake(ActionEventWrapper actionEventWrapper) {
+        return resolveHandlerAction(actionEventWrapper);
+    }
 }

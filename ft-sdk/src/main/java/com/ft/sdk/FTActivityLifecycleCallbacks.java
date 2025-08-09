@@ -113,7 +113,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
         if (manager.isRumEnable() && manager.getConfig().isEnableTraceUserView()) {
             FTViewActivityTrackingHandler handler = manager.getConfig().getViewActivityTrackingHandler();
             if (handler != null) {
-                HandlerView view = handler.isInTake(activity);
+                HandlerView view = handler.resolveHandlerView(activity);
                 if (view != null) {
                     FTRUMInnerManager.get().startView(view.getViewName(), view.getProperty());
                 }
@@ -158,7 +158,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
         if (manager.isRumEnable() && manager.getConfig().isEnableTraceUserView()) {
             FTViewActivityTrackingHandler handler = manager.getConfig().getViewActivityTrackingHandler();
             if (handler != null) {
-                HandlerView view = handler.isInTake(activity);
+                HandlerView view = handler.resolveHandlerView(activity);
                 if (view != null) {
                     FTRUMInnerManager.get().stopView();
                 }

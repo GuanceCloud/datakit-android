@@ -53,7 +53,7 @@ public class FTFragmentLifecycleHelper implements FragmentLifecycleCallBack {
             // Calculate Fragment pre-attached to pre-created duration
             long createDuration = SystemClock.elapsedRealtimeNanos() - preAttachedStartTime;
             if (viewHandler != null) {
-                HandlerView view = viewHandler.isInTake(wrapper);
+                HandlerView view = viewHandler.resolveHandlerView(wrapper);
                 if (view != null) {
                     FTRUMInnerManager.get().onCreateView(view.getViewName(), createDuration);
                 }
@@ -66,7 +66,7 @@ public class FTFragmentLifecycleHelper implements FragmentLifecycleCallBack {
     @Override
     public void onFragmentResumed(FragmentWrapper wrapper) {
         if (viewHandler != null) {
-            HandlerView view = viewHandler.isInTake(wrapper);
+            HandlerView view = viewHandler.resolveHandlerView(wrapper);
             if (view != null) {
                 FTRUMInnerManager.get().startView(view.getViewName(), view.getProperty());
             }
@@ -78,7 +78,7 @@ public class FTFragmentLifecycleHelper implements FragmentLifecycleCallBack {
     @Override
     public void onFragmentStopped(FragmentWrapper wrapper) {
         if (viewHandler != null) {
-            HandlerView view = viewHandler.isInTake(wrapper);
+            HandlerView view = viewHandler.resolveHandlerView(wrapper);
             if (view != null) {
                 FTRUMInnerManager.get().stopView();
             }

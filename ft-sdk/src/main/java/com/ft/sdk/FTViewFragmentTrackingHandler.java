@@ -27,5 +27,13 @@ public interface FTViewFragmentTrackingHandler {
      * @see FragmentWrapper#getSimpleClassName()
      * @see FragmentWrapper#getClassName()
      */
-    HandlerView isInTake(FragmentWrapper fragment);
+    HandlerView resolveHandlerView(FragmentWrapper fragment);
+
+    /**
+     * Backward-compatible alias for older API.
+     * Prefer {@link #resolveHandlerView(FragmentWrapper)}.
+     */
+    default HandlerView isInTake(FragmentWrapper fragment) {
+        return resolveHandlerView(fragment);
+    }
 }
