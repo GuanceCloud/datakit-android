@@ -1,6 +1,25 @@
+# agent 1.6.13
+1. Added `FTRUMConfig.setActionTrackingHandler` to support custom user action tracking.
+   This handler allows developers to customize how user actions (clicks, touches, etc.) are tracked in RUM data.
+   Developers can modify action names, add custom properties, or skip tracking for specific actions.
+2. Added `FTRUMConfig.setViewActivityTrackingHandler` to support custom Activity view tracking.
+   This handler allows developers to customize how Activity views are tracked in RUM data.
+   Developers can modify view names, add custom properties, or skip tracking for specific Activities.
+3. Added `FTRUMConfig.setViewFragmentTrackingHandler` to support custom Fragment view tracking.
+   This handler allows developers to customize how Fragment views are tracked in RUM data.
+   Developers can modify view names, add custom properties, or skip tracking for specific Fragments.
+4. Fixed the issue where `FTRUMGlobalManager.addAction` was missing bindUserData binding related
+   information, such as userid.
+5. Added `load_time` data metrics for Fragment views.
+6. Added `FTRUMGlobalManager.updateTime` for customizing the current view's loading time.
+7. Improve compatibility with OkHttp 3.12.x versions.
+8. The tags added by appendRUMGlobalContext can be updated during the session.
+
+---
 # agent 1.6.13-beta02
 1. The tags added by appendRUMGlobalContext can be updated during the session.
 
+---
 # agent 1.6.13-beta01
 1. Same as agent 1.6.13-alpha01.
 

@@ -10,7 +10,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Listener
+ * Fragment lifecycle bridge that unifies AndroidX and platform fragments and
+ * forwards lifecycle events to RUM view tracking.
+ * <p>
+ * Responsibilities:
+ * - Registers appropriate {@code FragmentManager.FragmentLifecycleCallbacks}
+ *   depending on runtime environment (AndroidX vs platform and API level).
+ * - Measures time from {@code onFragmentPreAttached} to {@code onFragmentCreated}
+ *   and reports view creation duration to {@link FTRUMInnerManager}.
+ * - Starts and stops RUM views when fragments resume/stop. If a
+ *   {@link FTViewFragmentTrackingHandler} is configured, uses its mapping of
+ *   {@link FragmentWrapper} to a {@link HandlerView} for custom view naming and
+ *   attributes; otherwise falls back to the fragment simple class name.
  */
 public class FTFragmentLifecycleHelper implements FragmentLifecycleCallBack {
     private AndroidXFragmentLifecycleCallbacks androidXFragmentLifecycleCallbacks;
@@ -78,9 +89,13 @@ public class FTFragmentLifecycleHelper implements FragmentLifecycleCallBack {
 
 
     /**
-     * Add listener for Fragment view activity
+     * Register fragment lifecycle callbacks on the given {@link Activity} so
+     * that fragment RUM view tracking is enabled for this activity.
+     * <p>
+     * This is a no-op unless RUM is enabled and fragment view tracing is
+     * enabled in {@link FTRUMConfigManager}.
      *
-     * @param activity
+     * @param activity host activity that contains fragments.
      */
     public void register(Activity activity) {
         FTRUMConfigManager manager = FTRUMConfigManager.get();
@@ -105,9 +120,10 @@ public class FTFragmentLifecycleHelper implements FragmentLifecycleCallBack {
     }
 
     /**
-     * Remove listener for Fragment view activity
+     * Unregister previously registered fragment lifecycle callbacks for the
+     * given {@link Activity}.
      *
-     * @param activity
+     * @param activity host activity that contains fragments.
      */
     public void unregister(Activity activity) {
         FTRUMConfigManager manager = FTRUMConfigManager.get();
