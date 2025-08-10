@@ -29,11 +29,4 @@ public interface FTViewActivityTrackingHandler {
      */
     HandlerView resolveHandlerView(Activity activity);
 
-    /**
-     * Backward-compatible alias for older API.
-     * Prefer {@link #resolveHandlerView(Activity)}.
-     */
-    default HandlerView isInTake(Activity activity) {
-        return resolveHandlerView(activity);
-    }
 }
