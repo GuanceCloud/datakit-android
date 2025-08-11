@@ -10,29 +10,30 @@ import java.lang.reflect.Method;
 /**
  * @author Brandon
  * <p>
- * 用于模拟生成"用户访问监测"中 Error 数据中 {@link com.ft.sdk.garble.bean.ErrorType#NATIVE} 类型数据
- * 数据筛查使用方法，请参考 @see <a href="https://docs.guance.com/real-user-monitoring/explorer/error/">查看器 Error</a>
+ * Used to simulate generating {@link com.ft.sdk.garble.bean.ErrorType#NATIVE} type data in "User Access Monitoring" Error data
+ * Data screening method, please refer to @see <a href="https://docs.guance.com/real-user-monitoring/explorer/error/">Error Viewer</a>
  */
 public class ReflectUtils {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "ReflectUtils";
     /**
-     * ft-native 中 {@link ExceptionHandler } 类路径，如果 {@link ExceptionHandler } 发生更改，需要对应进行更改
+     * {@link ExceptionHandler } class path in ft-native, if {@link ExceptionHandler } changes, it needs to be changed accordingly
      */
     public static final String CLASS_NAME_EXCEPTION_HANDLER = "com.ft.sdk.nativelib.ExceptionHandler";
 
     /**
-     * 模块测试使用，调用后，会在 c++ 代码层抛出异常,调用 {@link ExceptionHandler#crashAndGetExceptionMessage()}  }
+     * Used for module testing, after calling, an exception will be thrown in the c++ code layer, call {@link ExceptionHandler#crashAndGetExceptionMessage()}
      */
     public static void reflectCrashAndGetExceptionMessage() {
         reflectInvokeMethodV("crashAndGetExceptionMessage");
     }
 
     /**
-     * 指定 {@link ExceptionHandler } 调用方法，这种效果可以达到自由组合 ft-native 依赖包的效果
-     * 为避免未依赖 ft-native，会对  {@link IllegalAccessException,NoSuchMethodException,InvocationTargetException,ClassNotFoundException }
-     * 进行捕获处理
+     * Specify {@link ExceptionHandler } to call the method,
+     * this effect can achieve the effect of freely combining ft-native dependency packages
+     * To avoid not depending on ft-native,
+     * it will capture and process {@link IllegalAccessException,NoSuchMethodException,InvocationTargetException,ClassNotFoundException }
      *
-     * @param method {@link ExceptionHandler } 中 使用的方法名
+     * @param method The method name used in {@link ExceptionHandler }
      */
     private static void reflectInvokeMethodV(String method) {
         try {

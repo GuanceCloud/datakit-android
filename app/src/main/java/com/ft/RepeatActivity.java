@@ -7,7 +7,7 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 
 /**
- * 可循环，不断创建的 Activity
+ * Recyclable Activity that can be continuously created
  */
 public class RepeatActivity extends NameTitleActivity {
     @Override
@@ -25,7 +25,7 @@ public class RepeatActivity extends NameTitleActivity {
         });
 
         findViewById(R.id.repeat_new_repeat_btn).setOnClickListener(v -> {
-            //重复创建 RepeatActivity
+            //Repeatedly create RepeatActivity
             startActivity(new Intent(RepeatActivity.this, RepeatActivity.class));
 
         });

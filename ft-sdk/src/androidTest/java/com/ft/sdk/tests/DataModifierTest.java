@@ -28,6 +28,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Data modifier test
+ */
 public class DataModifierTest extends FTBaseTest {
     private final String MASK = "xxx";
 
@@ -64,6 +67,11 @@ public class DataModifierTest extends FTBaseTest {
         FTSdk.bindRumUserData(TEST_FAKE_USER_ID);
     }
 
+    /**
+     * RUM app data test
+     *
+     * @throws InterruptedException
+     */
     @Test
     public void rumAppDataTest() throws InterruptedException {
         FTRUMGlobalManager.get().addAction("test", "test_action");
@@ -77,6 +85,11 @@ public class DataModifierTest extends FTBaseTest {
         Assert.assertEquals(parser.getTagAsString(Constants.KEY_RUM_USER_ID), MASK);
     }
 
+    /**
+     * Log data test
+     *
+     * @throws InterruptedException
+     */
     @Test
     public void logDataTest() throws InterruptedException {
         FTLogger.getInstance().logBackground(LOG_TEST_DATA_1_KB, Status.DEBUG);

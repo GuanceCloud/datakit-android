@@ -6,7 +6,7 @@ import android.os.Build;
 import com.ft.sdk.garble.utils.PackageUtils;
 
 /**
- * 监听
+ * Listener
  */
 public class FTFragmentLifecycleHelper {
     private AndroidXFragmentLifecycleCallbacks androidXFragmentLifecycleCallbacks;
@@ -22,7 +22,7 @@ public class FTFragmentLifecycleHelper {
     }
 
     /**
-     * 添加监听 Fragment view 活动
+     * Add listener for Fragment view activity
      * @param activity
      */
     public void register(Activity activity) {
@@ -44,7 +44,7 @@ public class FTFragmentLifecycleHelper {
     }
 
     /**
-     * 移除监听 Fragment view 活动
+     * Remove listener for Fragment view activity
      * @param activity
      */
     public void unregister(Activity activity) {

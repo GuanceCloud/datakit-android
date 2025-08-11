@@ -14,12 +14,12 @@ import java.util.HashMap;
  */
 public class FTSDKConfig {
     /**
-     * datakit 数据写入地址
+     * datakit data write address
      */
     private final String datakitUrl;
 
     /**
-     * dataway 数据写入地址
+     * dataway data write address
      */
     private final String datawayUrl;
 
@@ -28,7 +28,7 @@ public class FTSDKConfig {
      */
     private final String clientToken;
     /**
-     * 是否开启 Debug
+     * Whether to enable Debug
      */
     private boolean isDebug;
 
@@ -36,12 +36,12 @@ public class FTSDKConfig {
 
 
     /**
-     * db 缓存限制大小
+     * db cache size limit
      */
     private long dbCacheLimit = Constants.DEFAULT_DB_SIZE_LIMIT;
 
     /**
-     * 是否开启使用 db 缓存
+     * Whether to enable db cache limit
      */
     private boolean limitWithDbSize = false;
 
@@ -51,7 +51,7 @@ public class FTSDKConfig {
     private DBCacheDiscard dbCacheDiscard = DBCacheDiscard.DISCARD;
 
     /**
-     * 设置日志等级，默认 {@link SDKLogLevel#V}
+     * Set log level, default {@link SDKLogLevel#V}
      *
      * @param logLevel
      * @return
@@ -62,13 +62,13 @@ public class FTSDKConfig {
     }
 
     /**
-     * 是否可访问 Android ID
+     * Whether Android ID can be accessed
      */
     private boolean enableAccessAndroidID = true;
 
 
     /**
-     * 是否进行自动同步
+     * Whether to perform automatic synchronization
      */
     private boolean autoSync = true;
 
@@ -76,39 +76,39 @@ public class FTSDKConfig {
 
     private int syncSleepTime = 0;
     /**
-     * 对同步数据进行 deflate 压缩 ，默认关闭
+     * Deflate compression for synchronized data, default is off
      */
     private boolean compressIntakeRequests = false;
 
     /**
-     * 服务名称 {@link Constants#KEY_SERVICE },默认为 {@link Constants#DEFAULT_SERVICE_NAME}
+     * Service name {@link Constants#KEY_SERVICE }, default is {@link Constants#DEFAULT_SERVICE_NAME}
      */
     private String serviceName = Constants.DEFAULT_SERVICE_NAME;
 
     /**
-     * 数据同步最大重复尝试次数
+     * Maximum retry count for data synchronization
      */
     private int dataSyncRetryCount = SyncTaskManager.MAX_ERROR_COUNT;
 
     /**
-     * 数据上传环境
+     * Data upload environment
      */
     private String env = EnvType.PROD.toString();
 
     /**
-     * SDK 是否只支持在主进程中初始化
+     * Whether the SDK only supports initialization in the main process
      * {@link FTSDKConfig#setOnlySupportMainProcess(boolean)}
      */
     private boolean onlySupportMainProcess = true;
 
 
     /**
-     * 行协议兼容模式，integer 数据兼容模式，处理 web 数据数据类型冲突问题，默认开启。
+     * Line protocol compatibility mode, integer data compatibility mode, handles web data type conflicts, enabled by default.
      */
     private boolean enableDataIntegerCompatible = true;
 
     /**
-     * 是否迁移旧数据，SDK 从旧版本迁移至 1.5.0 需要进行数据迁移
+     * Whether to migrate old data, SDK needs to migrate data when upgrading from an old version to 1.5.0
      */
     private boolean needTransformOldCache = false;
 
@@ -118,7 +118,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 开启使用 db 限制数据大小，默认 100MB ，{@link Constants#DEFAULT_DB_SIZE_LIMIT}
+     * Enable db size limit, default 100MB, {@link Constants#DEFAULT_DB_SIZE_LIMIT}
      */
     public FTSDKConfig enableLimitWithDbSize() {
         this.limitWithDbSize = true;
@@ -126,12 +126,12 @@ public class FTSDKConfig {
     }
 
     /**
-     * 开启使用 db 限制数据大小，默认 100MB ，单位 byte，{@link Constants#DEFAULT_DB_SIZE_LIMIT}
+     * Enable db size limit, default 100MB, unit byte, {@link Constants#DEFAULT_DB_SIZE_LIMIT}
      *
-     * @param dbSize 设置 db 限制上限，数据库越大，磁盘压力越大，[30MB,),默认 100 MB
+     * @param dbSize Set db size limit, the larger the database, the greater the disk pressure, [30MB,), default 100 MB
      *               <p>
-     *               开启 db 数据限制之后，{@link FTLoggerConfig#setLogCacheLimitCount(int)}
-     *               及 {@link FTRUMConfig#setRumCacheLimitCount(int)} 将失效
+     *               After enabling db data limit, {@link FTLoggerConfig#setLogCacheLimitCount(int)}
+     *               and {@link FTRUMConfig#setRumCacheLimitCount(int)} will be invalid
      * @return
      */
     public FTSDKConfig enableLimitWithDbSize(long dbSize) {
@@ -146,7 +146,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 设置 db 缓存丢弃策略
+     * Set db cache discard strategy
      *
      * @param dbCacheDiscard
      * @return
@@ -168,7 +168,8 @@ public class FTSDKConfig {
     }
 
     /**
-     * 是否开启数据采集的远程配置功能，默认不开启。开启之后，SDK 初始化或应用热启动会触发数据更新。
+     * Whether to enable remote configuration for data collection, default is off.
+     * When enabled, SDK initialization or app hot start will trigger data update.
      * @param remoteConfiguration
      * @return
      */
@@ -180,7 +181,7 @@ public class FTSDKConfig {
     private int remoteConfigMiniUpdateInterval = 43200;//12 hour
 
     /**
-     * 设置数据更新最短间隔，单位秒，默认12小时
+     * Set the minimum interval for data update, unit: seconds, default 12 hours
      * @param remoteConfigMiniUpdateInterval
      * @return
      */
@@ -198,8 +199,8 @@ public class FTSDKConfig {
     }
 
     /**
-     * 全局参数，例如 {@link Constants#KEY_APP_VERSION_NAME} 等固定配置参数，
-     * 或通过 {@link FTSDKConfig#addGlobalContext(String, String)} 用户自定义添加的变量参数
+     * Global parameters, such as {@link Constants#KEY_APP_VERSION_NAME} and other fixed configuration parameters,
+     * or user-defined variable parameters added via {@link FTSDKConfig#addGlobalContext(String, String)}
      */
     private final HashMap<String, Object> globalContext = new HashMap<>();
 
@@ -210,30 +211,30 @@ public class FTSDKConfig {
     private Object authenticator;
 
     /**
-     * 构建 SDK 必要的配置参数
+     * Build necessary SDK configuration parameters
      *
-     * @param datakitUrl datakit 上传地址
-     * @return {@link FTRUMConfig} SDK 配置
+     * @param datakitUrl datakit upload address
+     * @return {@link FTRUMConfig} SDK configuration
      */
     public static FTSDKConfig builder(String datakitUrl) {
         return new FTSDKConfig(datakitUrl);
     }
 
     /**
-     * 构建 SDK 必要的配置参数
+     * Build necessary SDK configuration parameters
      *
-     * @param datawayUrl  dataway 上传地址
+     * @param datawayUrl  dataway upload address
      * @param clientToken token
-     * @return {@link FTRUMConfig} SDK 配置
+     * @return {@link FTRUMConfig} SDK configuration
      */
     public static FTSDKConfig builder(String datawayUrl, String clientToken) {
         return new FTSDKConfig(datawayUrl, clientToken);
     }
 
     /**
-     * SDK 配置项构造方法
+     * SDK configuration constructor
      *
-     * @param datakitUrl datakit 上传地址
+     * @param datakitUrl datakit upload address
      */
     private FTSDKConfig(String datakitUrl) {
         this.datakitUrl = datakitUrl;
@@ -242,7 +243,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * SDK 配置项构造方法, 直传 dataway 配置
+     * SDK configuration constructor, direct dataway configuration
      *
      * @param datawayUrl  dataway
      * @param clientToken data
@@ -254,7 +255,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 获取 datakit 数据上报地址
+     * Get datakit data report address
      *
      * @return
      */
@@ -263,7 +264,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 获取 dataway 上传地址
+     * Get dataway upload address
      *
      * @return
      */
@@ -272,7 +273,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 获取 dataway 使用 token
+     * Get dataway token
      *
      * @return
      */
@@ -282,7 +283,7 @@ public class FTSDKConfig {
 
 
     /**
-     * @return 是否处于 debug 状态
+     * @return Whether in debug state
      */
     public boolean isDebug() {
         return isDebug;
@@ -294,14 +295,14 @@ public class FTSDKConfig {
 
 
     /**
-     * @return 获取环境变量请问
+     * @return Get environment variable
      */
     public String getEnv() {
         return env;
     }
 
     /**
-     * @return 是否只支持主进程
+     * @return Whether only main process is supported
      */
     public boolean isOnlySupportMainProcess() {
         return onlySupportMainProcess;
@@ -309,7 +310,7 @@ public class FTSDKConfig {
 
 
     /**
-     * 是否开启Debug，开启后将显示 SDK 运行日志
+     * Whether to enable Debug, when enabled, SDK runtime logs will be displayed
      *
      * @param debug
      * @return
@@ -321,7 +322,7 @@ public class FTSDKConfig {
 
 
     /**
-     * 设置数据传输的环境
+     * Set data transmission environment
      *
      * @param env
      * @return
@@ -334,7 +335,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 设置是否自动同步
+     * Set whether to auto sync
      *
      * @return
      */
@@ -344,7 +345,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 设置数据同步大小
+     * Set data sync size
      *
      * @param pageSize
      * @return
@@ -355,7 +356,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 自定义数据同步大小
+     * Custom data sync size
      *
      * @param pageSize
      * @return
@@ -366,7 +367,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 是否进行自动同步
+     * Whether to auto sync
      *
      * @return
      */
@@ -375,7 +376,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 获取一次请求条目数量
+     * Get the number of items per request
      *
      * @return
      */
@@ -384,7 +385,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 设置数据传输环境
+     * Set data transmission environment
      *
      * @param env
      * @return
@@ -398,10 +399,10 @@ public class FTSDKConfig {
 
 
     /**
-     * 设置是否获取 Android ID
+     * Set whether to access Android ID
      * <p>
-     * 当为 false ，device_uuid 字段不再使用 {@link  android.provider.Settings.Secure#ANDROID_ID},
-     * 使用 {@link LocalUUIDManager#getRandomUUID()} 做替代
+     * When false, the device_uuid field no longer uses {@link  android.provider.Settings.Secure#ANDROID_ID},
+     * and uses {@link LocalUUIDManager#getRandomUUID()} instead
      *
      * @param enableAccessAndroidID
      * @return
@@ -416,7 +417,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 是否只支持在主进程中初始化 SDK
+     * Whether the SDK only supports initialization in the main process
      *
      * @param onlySupportMainProcess
      * @return
@@ -427,10 +428,10 @@ public class FTSDKConfig {
     }
 
     /**
-     * 添加全局属性
+     * Add global property
      *
-     * @param key   键名
-     * @param value 键值
+     * @param key   key name
+     * @param value key value
      * @return
      */
     public FTSDKConfig addGlobalContext(@NonNull String key, @NonNull String value) {
@@ -439,7 +440,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 添加版本信息
+     * Add version info
      *
      * @param key
      * @param value
@@ -455,7 +456,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 获取全局属性
+     * Get global properties
      *
      * @return
      */
@@ -468,9 +469,9 @@ public class FTSDKConfig {
     }
 
     /**
-     * 设置应用服务名
+     * Set application service name
      *
-     * @param serviceName 服务名
+     * @param serviceName service name
      * @return
      */
     public FTSDKConfig setServiceName(String serviceName) {
@@ -485,9 +486,9 @@ public class FTSDKConfig {
     }
 
     /**
-     * 设置最大同步重试次数，最小 0，最大 5, 0 则不尝试
+     * Set the maximum sync retry count, minimum 0, maximum 5, 0 means no retry
      *
-     * @param dataSyncRetryCount 重试次数，
+     * @param dataSyncRetryCount retry count
      * @return
      */
     public FTSDKConfig setDataSyncRetryCount(int dataSyncRetryCount) {
@@ -496,7 +497,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 对 Okhttp request 添加唯一 tag
+     * Add a unique tag to Okhttp request
      */
     private boolean enableOkhttpRequestTag;
 
@@ -507,9 +508,9 @@ public class FTSDKConfig {
 
 
     /**
-     * 设置是否迁移
+     * Set whether to migrate
      *
-     * @param needTransformOldCache 是否迁移旧数据，默认为 false
+     * @param needTransformOldCache Whether to migrate old data, default is false
      * @return
      */
     public FTSDKConfig setNeedTransformOldCache(boolean needTransformOldCache) {
@@ -522,9 +523,9 @@ public class FTSDKConfig {
     }
 
     /**
-     * 设置每次同步的间歇时间, 休眠时间 [0,100] 之间
+     * Set the interval time for each sync, sleep time between [0,100]
      *
-     * @param sleepTimeMs 数据同步间歇时间
+     * @param sleepTimeMs Data sync interval time
      * @return
      */
     public FTSDKConfig setSyncSleepTime(int sleepTimeMs) {
@@ -542,7 +543,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 对上传同步数据进行 deflate 压缩，默认关闭
+     * Deflate compression for uploaded sync data, default is off
      *
      * @param compressIntakeRequests
      * @return
@@ -553,7 +554,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * {@link #enableDataIntegerCompatible} 设置为 true
+     * {@link #enableDataIntegerCompatible} set to true
      */
     public FTSDKConfig enableDataIntegerCompatible() {
         this.enableDataIntegerCompatible = true;
@@ -573,7 +574,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 设置 Proxy 代理，仅支持依赖 okhttp3 库的时候
+     * Set Proxy, only supported when relying on okhttp3 library
      *
      * @param proxy
      * @return
@@ -584,7 +585,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 设置 Proxy 代理 authenticator，仅支持依赖 okhttp3 库的时候
+     * Set Proxy authenticator, only supported when relying on okhttp3 library
      *
      * @param authenticator
      * @return
@@ -595,7 +596,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 设置 Dns 传输规则，部署版本，或自部署 Datakit 可以使用 DNS 做 IP 地址轮询优化
+     * Set Dns transmission rule, deployment version, or self-deployed Datakit can use DNS for IP address polling optimization
      *
      * @param dns
      * @return
@@ -606,7 +607,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 全局 Okhttp Request 自动添加，需要 ft-plugin 1.3.5 的支持
+     * Global Okhttp Request auto add, requires ft-plugin 1.3.5 support
      *
      * @param enableOkhttpRequestTag
      * @return
@@ -625,7 +626,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 对单个字段进行更改。
+     * Modify a single field.
      *
      * @param dataModifier
      * @return
@@ -636,7 +637,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * 对单条数据数据进行更改
+     * Modify a single line of data
      *
      * @param dataModifier
      * @return

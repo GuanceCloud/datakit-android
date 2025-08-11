@@ -3,6 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/session_replay_override"
-        android:title="隐私覆盖"
+        android:title="Privacy Override"
         app:showAsAction="always" />
 </menu>

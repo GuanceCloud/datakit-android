@@ -22,7 +22,7 @@ public class VersionUtils {
     }*/
 
     /**
-     * 版本格式 1.0.2，1.3.55
+     * Version format: 1.0.2, 1.3.55
      *
      * @param first
      * @param second
@@ -60,7 +60,7 @@ public class VersionUtils {
     }
 
     /**
-     * 比较版本号大小
+     * Compare version numbers
      *
      * @param firstVer
      * @param secondVer

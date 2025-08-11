@@ -1,17 +1,15 @@
 package com.ft.sdk.garble.bean;
 
 /**
- * author: huangDianHua
- * time: 2020/8/7 17:09:39
- * description:日志对象(外部使用)
+ * description: Log object (for external use)
  */
 public class LogData {
     /**
-     * 日志内容，纯文本或 JSONString 都可以
+     * Log content, can be plain text or JSONString
      */
     String content;
     /**
-     * 日志等级
+     * Log level
      */
     String status;
 

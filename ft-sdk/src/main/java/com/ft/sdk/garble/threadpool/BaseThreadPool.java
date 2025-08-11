@@ -14,17 +14,17 @@ import java.util.concurrent.ThreadPoolExecutor;
 /**
  * BY huangDianHua
  * DATE:2019-11-29 18:57
- * Description:线程池基类，用于构建阻塞线程队列来消费数据
+ * Description: Base class for thread pool, used to build blocking thread queues to consume data
  */
 public abstract class BaseThreadPool {
     public static final String TAG = Constants.LOG_TAG_PREFIX + "BaseThreadPool";
     /**
-     * 最大容量
+     * Maximum capacity
      */
     protected final static int MAXIMUM_POOL_SIZE = 128;
     protected final static int KEEP_ALIVE = 5;
     /**
-     * 阻塞线程队列
+     * Blocking thread queue
      */
     protected BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
     protected ThreadPoolExecutor executor;
@@ -39,8 +39,8 @@ public abstract class BaseThreadPool {
 
     /**
      * @param corePoolSize
-     * @param threadName   线程名
-     * @param priority     权重
+     * @param threadName   Thread name
+     * @param priority     Priority
      */
     public BaseThreadPool(int corePoolSize, String threadName, int priority) {
         this.corePoolSize = corePoolSize;
@@ -86,7 +86,7 @@ public abstract class BaseThreadPool {
     }
 
     /**
-     * 用于判断线程池是否在运行
+     * Used to determine whether the thread pool is running
      *
      * @return
      */
@@ -95,7 +95,7 @@ public abstract class BaseThreadPool {
     }
 
     /**
-     * 释放队列资源，在 {@link FTSdk#shutDown()} 时，会被回收
+     * Release queue resources, will be recycled when {@link FTSdk#shutDown()} is called
      */
     public void shutDown() {
         if (executor != null && !executor.isShutdown()) {
@@ -105,14 +105,14 @@ public abstract class BaseThreadPool {
     }
 
     /**
-     * 重置，重新创建队列
+     * Reset, recreate the queue
      */
     public void reStartPool() {
         executor = createNew();
     }
 
     /**
-     * 新建线程池
+     * Create a new thread pool
      *
      * @return
      */

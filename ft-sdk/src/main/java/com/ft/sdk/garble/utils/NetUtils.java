@@ -23,7 +23,7 @@ import java.util.Enumeration;
 /**
  * BY huangDianHua
  * DATE:2020-01-09 13:58
- * Description: 网络信息相关 IP，网络类型等
+ * Description: Network information related IP, network type, etc.
  */
 public class NetUtils {
     private final static String TAG = Constants.LOG_TAG_PREFIX + "NetUtils";
@@ -38,7 +38,7 @@ public class NetUtils {
 
 
     /**
-     * 判断是否连接网络
+     * Check if network is connected
      *
      * @return
      */
@@ -48,7 +48,7 @@ public class NetUtils {
 
 
     /**
-     * 检查网络是否可用
+     * Check if network is available
      *
      * @param context
      * @return
@@ -83,7 +83,7 @@ public class NetUtils {
                 return capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
                         || capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
                         || capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
-                        || capabilities.hasTransport(7)  //目前已知在车联网行业使用该标记作为网络类型（TBOX 网络类型）
+                        || capabilities.hasTransport(7)  //Currently known to be used in the connected car industry as network type (TBOX network type)
                         || capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
                         || capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);
             }
@@ -93,7 +93,7 @@ public class NetUtils {
 
 
     /**
-     * 获得网络类型
+     * Get network type
      * <p>
      * {@link  Manifest.permission#READ_PHONE_STATE}
      *
@@ -149,7 +149,7 @@ public class NetUtils {
             if (Utils.hasPermission(context, Manifest.permission.READ_PHONE_STATE)) {
                 networkType = telephonyManager.getNetworkType();
             } else {
-                LogUtils.eOnce(TAG, "没有获得到 READ_PHONE_STATE 权限无法获取运营商信息");
+                LogUtils.eOnce(TAG, "Failed to get READ_PHONE_STATE permission, unable to get carrier information");
             }
         } catch (Exception ex) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(ex));
@@ -164,7 +164,7 @@ public class NetUtils {
             case TelephonyManager.NETWORK_TYPE_IDEN:
             case TelephonyManager.NETWORK_TYPE_GSM:
                 return NETWORK_2G;
-            // 3G网络
+            // 3G network
             case TelephonyManager.NETWORK_TYPE_EVDO_A:
             case TelephonyManager.NETWORK_TYPE_UMTS:
             case TelephonyManager.NETWORK_TYPE_EVDO_0:
@@ -176,7 +176,7 @@ public class NetUtils {
             case TelephonyManager.NETWORK_TYPE_HSPAP:
             case TelephonyManager.NETWORK_TYPE_TD_SCDMA:
                 return NETWORK_3G;
-            // 4G网络
+            // 4G network
             case TelephonyManager.NETWORK_TYPE_LTE:
             case TelephonyManager.NETWORK_TYPE_IWLAN:
                 return NETWORK_4G;
@@ -189,7 +189,7 @@ public class NetUtils {
     }
 
     /**
-     * 获取网络类型名称
+     * Get network type name
      * {@link  Manifest.permission#READ_PHONE_STATE}
      *
      * @return
@@ -222,7 +222,7 @@ public class NetUtils {
     }
 
     /**
-     * 获得 WI-FI 的IP地址
+     * Get WI-FI IP address
      *
      * @return
      */
@@ -242,9 +242,9 @@ public class NetUtils {
     }
 
     /**
-     * 获取当前设备的IP，处于公网会显示公网 IP，局域网中会显示局域网 IP
+     * Get current device IP, will show public IP when on public network, will show LAN IP when on local network
      *
-     * @return 返回 8.8.8.8 格式的字符
+     * @return Returns string in 8.8.8.8 format
      */
     public static String getMobileIpAddress() {
         NetworkInfo networkInfo = ((ConnectivityManager) FTApplication.getApplication().getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();

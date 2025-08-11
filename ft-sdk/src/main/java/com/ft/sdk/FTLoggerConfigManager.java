@@ -5,7 +5,7 @@ import androidx.annotation.Nullable;
 import com.ft.sdk.garble.db.FTDBCachePolicy;
 
 /**
- * 日志配置管理
+ * Log configuration management
  *
  * @author Brandon
  */
@@ -23,7 +23,7 @@ public class FTLoggerConfigManager {
 
 
     /**
-     * 日志配置初始化
+     * Log configuration initialization
      *
      * @param config
      */
@@ -37,7 +37,7 @@ public class FTLoggerConfigManager {
     }
 
     /**
-     * 获取日志配置
+     * Get log configuration
      *
      * @return
      */
@@ -47,7 +47,7 @@ public class FTLoggerConfigManager {
     }
 
     /**
-     * 配置释放置空
+     * Release configuration and set to null
      */
     void release() {
         config = null;

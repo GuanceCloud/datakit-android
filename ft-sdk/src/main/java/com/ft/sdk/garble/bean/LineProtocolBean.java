@@ -8,19 +8,19 @@ import java.util.HashMap;
  */
 public class LineProtocolBean {
     /**
-     * 数据指标
+     * Data index
      */
     private final String measurement;
     /**
-     * 标签数据
+     * Tag data
      */
     final HashMap<String, Object> tags;
     /**
-     * 指标数据
+     * Index data
      */
     final HashMap<String, Object> fields;
     /**
-     * 产生时间，单位纳秒
+     * Generation time, unit nanosecond
      */
     final long timeNano;
 

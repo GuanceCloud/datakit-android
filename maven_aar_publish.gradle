@@ -4,12 +4,11 @@ afterEvaluate {
     publishing {
         publications {
             mavenAar(MavenPublication) {
-                from components.release
                 groupId mavenGroupId
                 artifactId mavenArtifactId
                 version pkgVersion
-                
-                // 添加源码和Javadoc
+                artifact project.tasks.bundleReleaseAar
+                // Add source code and Javadoc to the published AAR file
                 artifact androidJavadocsJar
                 artifact androidSourcesJar
             }
@@ -40,7 +39,7 @@ task aar {
 }
 
 /**
- * 报错，不影响上传任务
+ * Error reporting, does not affect upload task
  */
 task androidJavadocs(type: Javadoc) {
 

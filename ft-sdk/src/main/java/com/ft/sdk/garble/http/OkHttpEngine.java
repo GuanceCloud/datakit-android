@@ -25,14 +25,14 @@ import okhttp3.ResponseBody;
 /**
  * create: by huangDianHua
  * time: 2020/4/21 17:51:48
- * description: 基于 okhttp 请求框架的 INetEngine
+ * description: INetEngine based on okhttp request framework
  */
 public class OkHttpEngine implements INetEngine {
     private static OkHttpClient client;
     private Request request;
 
     /**
-     * Http 请求基础配置初始化
+     * Http request basic configuration initialization
      *
      * @param httpBuilder
      */
@@ -62,7 +62,7 @@ public class OkHttpEngine implements INetEngine {
     }
 
     /**
-     * 创建请求对象
+     * Create request object
      *
      * @param httpBuilder
      */
@@ -76,7 +76,7 @@ public class OkHttpEngine implements INetEngine {
                 MultipartBody.Builder multipartBuilder = new MultipartBody.Builder()
                         .setType(MultipartBody.FORM);
 
-                // 添加表单字段
+                // Add form field
                 HashMap<String, String> formFields = httpBuilder.getFormParams();
                 for (Map.Entry<String, String> field : formFields.entrySet()) {
                     multipartBuilder.addFormDataPart(field.getKey(), field.getValue());
@@ -88,10 +88,10 @@ public class OkHttpEngine implements INetEngine {
                     multipartBuilder.addFormDataPart(fileFields.getKey(), fileFields.getValue().first,
                             fileBody);
                 }
-                // 添加文件部分
+                // Add file part
                 requestBody = multipartBuilder.build();
             } else {
-                // 处理普通文本请求
+                // Process normal text request
                 requestBody = RequestBody.create(null, httpBuilder.getBodyString());
             }
         }
@@ -111,9 +111,9 @@ public class OkHttpEngine implements INetEngine {
     }
 
     /**
-     * 执行 http 请求，如果 http 正常，返回  code 和 body
-     * code = {@link NetCodeStatus#FILE_IO_EXCEPTION_CODE}，IOException
-     * code = {@link NetCodeStatus#UNKNOWN_EXCEPTION_CODE}，Exception
+     * Execute http request, if http is normal, return code and body
+     * code = {@link NetCodeStatus#FILE_IO_EXCEPTION_CODE}, IOException
+     * code = {@link NetCodeStatus#UNKNOWN_EXCEPTION_CODE}, Exception
      *
      * @return
      */

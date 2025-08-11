@@ -31,7 +31,7 @@ public class ActivityLifecycleCallbacksTest {
     }
 
     /**
-     * 测试应用前后台判断
+     * Test application foreground and background judgment
      */
     @Test
     public void testIsAppInForeground() {

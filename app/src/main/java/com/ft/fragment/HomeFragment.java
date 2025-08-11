@@ -30,7 +30,7 @@ public class HomeFragment extends Fragment {
 
         Button btnGo = view.findViewById(R.id.btn_go_detail);
         btnGo.setOnClickListener(v -> {
-            // 跳转到 DetailFragment
+            // Navigate to DetailFragment
             FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
             transaction.replace(R.id.fragment_container, new DetailFragment());
             transaction.addToBackStack(null);

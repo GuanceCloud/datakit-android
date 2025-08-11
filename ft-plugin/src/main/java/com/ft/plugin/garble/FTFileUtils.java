@@ -20,11 +20,11 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 /**
- * 文件工具类
+ * File utility class
  */
 class FTFileUtils {
     /**
-     * 复制合并文件
+     * Copy and merge files
      *
      * @param mergedFolderStr
      * @param foldersStr
@@ -55,7 +55,7 @@ class FTFileUtils {
     }
 
     /**
-     * 上传 map 文件
+     * Upload map file
      * @param baseFolder
      * @param filesMap
      * @param relativeName
@@ -77,7 +77,7 @@ class FTFileUtils {
     }
 
     /**
-     * 获取文件相对地址
+     * Get file relative path
      * @param baseName
      * @param fileName
      * @return
@@ -87,19 +87,19 @@ class FTFileUtils {
     }
 
     /**
-     * 压缩一个目录。
+     * Compress a directory.
      *
-     * @param srcDir    需要压缩的目录
-     * @param zipFile   压缩后的文件
-     * @param overwrite 是否覆盖已存在文件
+     * @param srcDir    Directory to be compressed
+     * @param zipFile   Compressed file
+     * @param overwrite Whether to overwrite existing file
      * @throws IOException
      */
     public static void zipDirectory(File srcDir, File zipFile, boolean overwrite) throws IOException {
         if (zipFile == null || srcDir == null) {
-            throw new IllegalArgumentException("zipFile和srcDir不能为空!");
+            throw new IllegalArgumentException("zipFile and srcDir cannot be empty!");
         }
         if (!overwrite && zipFile.exists()) {
-            throw new IOException(zipFile.getAbsolutePath() + "文件已存在，参数设定了不能覆盖。");
+            throw new IOException(zipFile.getAbsolutePath() + " file already exists, parameter set to not overwrite.");
         }
         if (!zipFile.exists()) {
             zipFile.createNewFile();
@@ -111,11 +111,11 @@ class FTFileUtils {
     }
 
     /**
-     * 压缩目录的辅助方法。递归检查子目录。
+     * Auxiliary method for compressing directories. Recursively checks subdirectories.
      *
-     * @param zipOutput zip输出流
-     * @param file      当前文件
-     * @param base      当前文件在压缩包里的绝对名称
+     * @param zipOutput zip output stream
+     * @param file      Current file
+     * @param base      Absolute name of the current file in the zip package
      * @throws IOException
      */
     private static void zipDirectory(ZipOutputStream zipOutput, File file, String base) throws IOException {
@@ -140,10 +140,10 @@ class FTFileUtils {
     }
 
     /**
-     * 压缩一个目录。如果存在同名文件，则会覆盖
+     * Compress a directory. If a file with the same name exists, it will be overwritten
      *
-     * @param srcDir  需要压缩 的目录
-     * @param zipFile 压缩产生的文件
+     * @param srcDir  Directory to be compressed
+     * @param zipFile Compressed file generated
      * @throws IOException
      */
     public static void zipDirectory(File srcDir, File zipFile) throws IOException {
@@ -151,9 +151,9 @@ class FTFileUtils {
     }
 
     /**
-     * 压缩一个目录。压缩输出的文件名为(目录名.zip)
+     * Compress a directory. The output file name is (directory name.zip)
      *
-     * @param srcDir 需要压缩的目录
+     * @param srcDir Directory to be compressed
      * @throws IOException
      */
     public static void zipDirectory(File srcDir) throws IOException {
@@ -162,22 +162,22 @@ class FTFileUtils {
 
 
     /**
-     * 对一个文件数组进行压缩。数组长度必须大于0
+     * Compress an array of files. The array length must be greater than 0
      *
-     * @param files     文件数组。长度必须大于0
-     * @param zipFile   压缩后产生的文件
-     * @param overwrite 如存在同名文件，是否覆盖
+     * @param files     Array of files. Length must be greater than 0
+     * @param zipFile   Compressed file generated
+     * @param overwrite If a file with the same name exists, whether to overwrite
      * @throws IOException
      */
     public static void zipFiles(File[] files, File zipFile, boolean overwrite) throws IOException {
         if (zipFile == null || files == null) {
-            throw new IllegalArgumentException("zipFile和srcDir不能为空!");
+            throw new IllegalArgumentException("zipFile and srcDir cannot be empty!");
         }
         if (files.length == 0) {
-            throw new IOException("不能对一个空的文件列表进行压缩");
+            throw new IOException("Cannot compress an empty file list");
         }
         if (!overwrite && zipFile.exists()) {
-            throw new IOException(zipFile.getAbsolutePath() + "文件已存在，参数设定了不能覆盖。");
+            throw new IOException(zipFile.getAbsolutePath() + " file already exists, parameter set to not overwrite.");
         }
         if (!zipFile.exists()) {
             zipFile.createNewFile();
@@ -205,11 +205,11 @@ class FTFileUtils {
     }
 
     /**
-     * 对一个文件列表进行压缩。列表长度长度必须大于0
+     * Compress a list of files. The list length must be greater than 0
      *
-     * @param fileList  文件列表。长度必须大于0
-     * @param zipFile   压缩后产生的文件
-     * @param overwrite 如果已经存在同名文件，是否覆盖。
+     * @param fileList  List of files. Length must be greater than 0
+     * @param zipFile   Compressed file generated
+     * @param overwrite If a file with the same name exists, whether to overwrite.
      * @throws IOException
      */
     public static void zipFiles(List<File> fileList, File zipFile, boolean overwrite) throws IOException {
@@ -217,10 +217,11 @@ class FTFileUtils {
     }
 
     /**
-     * 对一个文件列表进行压缩，列表长度长度必须大于0。如存在同名目标文件，则会覆盖它。
+     * Compress a list of files. The list length must be greater than 0.
+     * If a file with the same name exists, it will be overwritten.
      *
-     * @param fileList 文件列表。长度必须大于0
-     * @param zipFile  压缩后生成的文件
+     * @param fileList List of files. Length must be greater than 0
+     * @param zipFile  Compressed file generated
      * @throws IOException
      */
     public static void zipFiles(List<File> fileList, File zipFile) throws IOException {
@@ -228,10 +229,11 @@ class FTFileUtils {
     }
 
     /**
-     * 对一个文件数组进行压缩，数组长度必须大于0。如存在同名目标文件，则会覆盖它。
+     * Compress an array of files. The array length must be greater than 0.
+     * If a file with the same name exists, it will be overwritten.
      *
-     * @param files   文件数组。长度必须大于0
-     * @param zipFile 压缩后生成的文件
+     * @param files   Array of files. Length must be greater than 0
+     * @param zipFile Compressed file generated
      * @throws IOException
      */
     public static void zipFiles(File[] files, File zipFile) throws IOException {
@@ -239,7 +241,7 @@ class FTFileUtils {
     }
 
     /**
-     * 复制文件
+     * Copy file
      *
      * @param src
      * @param tar

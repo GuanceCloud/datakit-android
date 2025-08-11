@@ -18,15 +18,15 @@ import org.junit.runners.Suite;
 /**
  * author: huangDianHua
  * time: 2020/8/27 17:36:40
- * description: 数据测试合集
+ * description: Data test collection
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        // AGP 8.0 以后无法在测试用例中对 Log.d 方法进行 ASM 织入
-//        ConsoleLogTest.class,//Log-控制台日志,短时间批量插入丢弃策略测试
+        // After AGP 8.0, ASM weaving cannot be performed on Log.d method in test cases
+//        ConsoleLogTest.class,//Log-Console log, short-term batch insertion discard strategy test
         TraceHeaderTest.class,
-        ServerConnectTest.class,//Base-Property 参数测试
-        ErrorTraceTest.class,//Log-崩溃日志测试
+        ServerConnectTest.class,//Base-Property parameter test
+        ErrorTraceTest.class,//Log-Crash log test
         RUMLaunchActionTest.class,
         RUMClickActionTest.class,
         RUMViewTest.class,

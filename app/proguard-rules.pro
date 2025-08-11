@@ -25,7 +25,7 @@
 
 -keep class ftnative.*{*;}
 
-# 保留 com.google.android.material.tabs.TabLayout 相关点击采集
+# Retain click tracking related to com.google.android.material.tabs.TabLayout
 -keepclassmembers class com.google.android.material.tabs.TabLayout$Tab {
     *;
 }

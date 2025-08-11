@@ -15,51 +15,51 @@ import com.ft.threadpool.ThreadPoolHandler;
 import com.ft.utils.RequestUtils;
 
 /**
- * 高速写入数据
- * 1秒 100 条日志
- * 1秒 10次网络请求
+ * High-speed data writing
+ * 100 logs per second
+ * 10 network requests per second
  */
 public class HighLoadActivity extends NameTitleActivity {
     private static final String TAG = "HighLoadActivity";
     /**
-     * 36000/2，并发一个线程 http 数量
+     * 36000/2, concurrent HTTP requests per thread
      */
     private static final int HTTP_DATA_COUNT = 18000;
     /**
-     * 360000/2，并发线程一个线程日志量
+     * 360000/2, log count per concurrent thread
      */
     private static final int LOG_DATA_COUNT = 180000;
 
     /**
-     * 发 add自定义Action事件
+     * Send add custom Action events
      */
     private static final int ADD_ACTION_COUNT = 10000;
     /**
-     * 1000/50，并发2线程平均 10 ms 一次
+     * 1000/50, average 10ms per concurrent 2 threads
      */
     public static final int LOG_SLEEP = 20;
 
     /**
-     * 1000/5 ，并发 2 线程平均100 毫秒 1次
+     * 1000/5, average 100ms per concurrent 2 threads
      */
     public static final int HTTP_REQUEST_SLEEP = 200;
 
     /**
-     * 日志同步锁
+     * Log synchronization lock
      */
     private final Object logLock = new Object();
 
     /**
-     * http 同步锁
+     * HTTP synchronization lock
      */
     private final Object httpLock = new Object();
 
     /**
-     * 日志调用次数
+     * Log call count
      */
     private int logCount = 0;
     /**
-     * 网络请求次数
+     * Network request count
      */
     private int httpCount = 0;
 
@@ -100,9 +100,9 @@ public class HighLoadActivity extends NameTitleActivity {
     }
 
     /**
-     * 批量日志
-     * 控制台日志，{@link #LOG_DATA_COUNT}
-     * 自定义日志, {@link #LOG_DATA_COUNT}
+     * Batch logging
+     * Console logs, {@link #LOG_DATA_COUNT}
+     * Custom logs, {@link #LOG_DATA_COUNT}
      */
     private void batchLog() {
 
@@ -145,7 +145,7 @@ public class HighLoadActivity extends NameTitleActivity {
     }
 
     /**
-     * 批量 http 请求 {@link #LOG_DATA_COUNT}
+     * Batch HTTP requests {@link #LOG_DATA_COUNT}
      */
     private void batchHttpRequest() {
         ThreadPoolHandler.get().getExecutor().execute(new Runnable() {

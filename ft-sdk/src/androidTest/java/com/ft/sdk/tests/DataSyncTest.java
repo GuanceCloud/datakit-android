@@ -31,7 +31,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 
 /**
- * 数据同步验证，验证数据数据是否有积压问题或者数据请求错误问题
+ * Data synchronization verification, verify whether there are data backlog issues or data request error issues
  *
  * @author Brandon
  */
@@ -56,7 +56,7 @@ public class DataSyncTest extends FTBaseTest {
 
         FTSDKConfig ftSDKConfig = FTSDKConfig
                 .builder(mMockWebServer.getUrl("/").toString())
-                .setDebug(true)//设置是否是 debug
+                .setDebug(true)//Set whether it is debug
                 .setAutoSync(false)
                 .setEnv(EnvType.GRAY);
 
@@ -79,7 +79,7 @@ public class DataSyncTest extends FTBaseTest {
     }
 
     /**
-     * {@link DataType#RUM_APP} 类型数据同步验证。检验数据写入和数据上传
+     * {@link DataType#RUM_APP} type data synchronization verification. Verify data writing and data upload
      * @throws Exception
      */
     @Test
@@ -101,22 +101,22 @@ public class DataSyncTest extends FTBaseTest {
 
 
     /**
-     * 日志数数据写入测试
+     * Log data writing test
      *
      * @throws InterruptedException
      */
     @Test
     public void logUpdateDataTest() throws InterruptedException {
-        //产生一条日志数据
+        //Generate a log data
         FTLogger.getInstance().logBackground("----logUpdateDataTest----", Status.CRITICAL);
-        //线程池中插入，有一定的时间延迟，这里设置5秒等待时间
+        //Inserted in thread pool, there is a certain time delay, set 5 seconds wait time here
         Thread.sleep(3000);
         uploadData(DataType.LOG);
     }
 
 
     /**
-     * 数据同步测试，数据同步完成后会从缓存中删除
+     * Data synchronization test, data will be deleted from cache after synchronization is completed
      *
      * @throws InterruptedException
      */

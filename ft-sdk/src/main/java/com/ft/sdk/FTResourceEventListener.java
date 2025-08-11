@@ -26,7 +26,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 /**
- * 配合 OKHttp {@link EventListener} 获取网络请求 dns、ssl、tcp 等时间点指标
+ * Works with OKHttp {@link EventListener} to obtain network request timing metrics for dns, ssl, tcp, etc.
  *
  * @author Brandon
  */
@@ -236,7 +236,7 @@ public class FTResourceEventListener extends EventListener {
     }
 
     /**
-     * 将指标数据写入到对应 {@link this#resourceId} 的 Resource 数据里
+     * Writes metric data to the Resource data corresponding to {@link this#resourceId}
      */
     private void setNetworkMetricsTimeline() {
         NetStatusBean netStatusBean = new NetStatusBean();
@@ -257,17 +257,17 @@ public class FTResourceEventListener extends EventListener {
     }
 
     /**
-     * 创建 {@link  FTResourceEventListener} 对应 {@link  EventListener.Factory} 对象
+     * Creates {@link  FTResourceEventListener} corresponding {@link  EventListener.Factory} object
      */
     public static class FTFactory implements EventListener.Factory {
 
         /**
-         * 开启 resource host ip 采集
+         * Enable resource host ip collection
          */
         private final boolean enableResourceHostIP;
 
         /**
-         * Resource 过滤规则
+         * Resource filtering rules
          */
         private final FTInTakeUrlHandler handler;
 
@@ -308,14 +308,14 @@ public class FTResourceEventListener extends EventListener {
                 return originEventLister;
             }
             String resourceId = Utils.identifyRequest(call.request());
-            //自动计算 resourceId
+            //Automatically calculate resourceId
             return new FTResourceEventListener(resourceId,
                     this.enableResourceHostIP, originEventLister);
         }
     }
 
     /**
-     * 无操作，不进行监听
+     * No operation, no monitoring
      */
     public static class NoOPEventListener extends EventListener {
 

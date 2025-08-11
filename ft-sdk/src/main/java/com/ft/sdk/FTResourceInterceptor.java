@@ -22,7 +22,7 @@ import okhttp3.internal.http.HttpHeaders;
 /**
  * OKHttp Resource Interceptor
  * <p>
- * 记录 RUM Resource 指标数据
+ * Record RUM Resource metrics data
  *
  * @author Brandon
  */
@@ -32,16 +32,16 @@ public class FTResourceInterceptor implements Interceptor {
 
 
     /**
-     * 拦截 Okhttp 的 Request 和 Response ，
-     * 通过 {@link #onRequest(Request, HashMap)}{@link  #onResponse(Response, HashMap)} 中 extraData
-     * 追加自定义采集的数据
+     * Intercept OkHttp Request and Response,
+     * through {@link #onRequest(Request, HashMap)}{@link  #onResponse(Response, HashMap)} extraData
+     * append custom collected data
      */
     public abstract static class ContentHandlerHelper {
         /**
          * OKHttp Request
          *
          * @param request
-         * @param extraData 附加数据
+         * @param extraData Additional data
          */
         public abstract void onRequest(Request request, HashMap<String, Object> extraData);
 
@@ -49,15 +49,15 @@ public class FTResourceInterceptor implements Interceptor {
          * OKHttp Response
          *
          * @param response
-         * @param extraData 附加数据
+         * @param extraData Additional data
          */
         public abstract void onResponse(Response response, HashMap<String, Object> extraData) throws IOException;
 
         /**
-         * 返回网络链接过程中的异常, 会覆盖 SDK {@link com.ft.sdk.garble.bean.ErrorType#NETWORK} 类型的错误
+         * Return exceptions during network connection, will override SDK {@link com.ft.sdk.garble.bean.ErrorType#NETWORK} type errors
          *
-         * @param e         请求发生的 IOException 数据
-         * @param extraData 附加数据
+         * @param e         IOException data that occurred during the request
+         * @param extraData Additional data
          * @deprecated Use {@link ContentHandlerHelperEx#onExceptionWithFilter(Exception, HashMap)} instead.
          */
         @Deprecated
@@ -67,16 +67,16 @@ public class FTResourceInterceptor implements Interceptor {
     }
 
     /**
-     * {@link ContentHandlerHelper } 的基础上，可以过滤本地错误类型, 使用 {@link ContentHandlerHelperEx} 后，
-     * {@link ContentHandlerHelperEx#onException} 将不再接受回调。默认不对本地网络错误进行过滤
+     * Based on {@link ContentHandlerHelper }, can filter local error types, after using {@link ContentHandlerHelperEx},
+     * {@link ContentHandlerHelperEx#onException} will no longer accept callbacks. By default, local network errors are not filtered
      */
     public static abstract class ContentHandlerHelperEx extends ContentHandlerHelper {
         /**
-         * 返回网络链接过程中的异常
+         * Return exceptions during network connection
          *
-         * @param e         请求发生的 IOException 数据
-         * @param extraData 附加数据
-         * @return 是否过滤本地网络 {@link com.ft.sdk.garble.bean.ErrorType#NETWORK} 类型的错误。true，为过滤
+         * @param e         IOException data that occurred during the request
+         * @param extraData Additional data
+         * @return Whether to filter local network {@link com.ft.sdk.garble.bean.ErrorType#NETWORK} type errors. true means filter
          */
         public boolean onExceptionWithFilter(Exception e, HashMap<String, Object> extraData) {
             return false;
@@ -94,7 +94,7 @@ public class FTResourceInterceptor implements Interceptor {
 
     private static final String TAG = Constants.LOG_TAG_PREFIX + "FTResourceInterceptor";
     /**
-     * 最大读取 byte 计算 32MB
+     * Maximum read byte calculation 32MB
      */
     private static final int BYTE_LIMIT_COUNT = 33554432;
 
@@ -176,7 +176,7 @@ public class FTResourceInterceptor implements Interceptor {
                     }
                     params.responseBody = responseBodyString;
 
-                    //如果 "Content-Length" 此处使用
+                    //If "Content-Length" is used here
                     if (params.responseContentLength == 0) {
                         params.responseContentLength = responseBodyString.length();
                         params.responseContentLength += responseHeaderString.length();
@@ -185,7 +185,7 @@ public class FTResourceInterceptor implements Interceptor {
                     LogUtils.d(TAG, "response body empty");
                 }
             } else {
-                //如果 "Content-Length" 没有数据则计算
+                //If "Content-Length" is not data then calculate
                 if (params.responseContentLength == 0) {
                     ResponseBody peekBody = response.peekBody(BYTE_LIMIT_COUNT);
                     params.responseContentLength = peekBody.contentLength();

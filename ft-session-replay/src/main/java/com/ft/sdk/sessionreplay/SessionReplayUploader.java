@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * 负责 session replay 上传逻辑
+ * Responsible for session replay upload logic
  */
 public class SessionReplayUploader {
 
@@ -58,9 +58,9 @@ public class SessionReplayUploader {
 
 
     /**
-     * 上传 Session Replay 数据
+     * Upload Session Replay data
      * <p>
-     * 上传过程中发生错误数据，会缓存
+     * If an error occurs during upload, the data will be cached
      *
      * @param context
      */
@@ -106,7 +106,7 @@ public class SessionReplayUploader {
         fieldMap.put(KEY_START, start + "");
         fieldMap.put(KEY_END, end + "");
         fieldMap.put(KEY_RECORDS_COUNT, recordsCount + "");
-        fieldMap.put(KEY_INDEX_IN_VIEW, 0 + "");//fixme 目前在移动端无实际作用
+        fieldMap.put(KEY_INDEX_IN_VIEW, 0 + "");//fixme Currently has no practical effect on mobile
         fieldMap.put(HAS_FULL_SNAPSHOT, hasFullSnapshot + "");
         fieldMap.put(KEY_SOURCE, "android");
         fieldMap.put(KEY_RAW_SEGMENT_SIZE, segmentAsByteArray.length + "");

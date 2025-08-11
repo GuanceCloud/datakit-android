@@ -35,7 +35,7 @@ import org.junit.runner.RunWith;
 import java.util.List;
 
 /**
- * RUM resource url 过滤校验
+ * RUM resource url filter verification
  */
 @RunWith(AndroidJUnit4.class)
 public class RUMResourceInTakeUrlTest extends BaseTest {
@@ -55,7 +55,7 @@ public class RUMResourceInTakeUrlTest extends BaseTest {
 
         FTSDKConfig ftSDKConfig = FTSDKConfig
                 .builder(BuildConfig.DATAKIT_URL)
-                .setDebug(true)//设置是否是 debug
+                .setDebug(true)//Set whether it is debug
                 .setEnv(EnvType.GRAY);
         FTSdk.install(ftSDKConfig);
 
@@ -75,7 +75,8 @@ public class RUMResourceInTakeUrlTest extends BaseTest {
     }
 
     /**
-     * 验证 OkHttp ft-plugin织入 Interceptor 相关代码的情况下，{@link FTRUMConfig#setResourceUrlHandler(FTInTakeUrlHandler)} 是否正确起小
+     * Verify whether, when OkHttp ft-plugin weaves in Interceptor related code,
+     * {@link FTRUMConfig#setResourceUrlHandler(FTInTakeUrlHandler)} works correctly
      *
      * @throws Exception
      */

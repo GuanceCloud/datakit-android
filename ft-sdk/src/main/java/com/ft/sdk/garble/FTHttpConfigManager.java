@@ -14,43 +14,43 @@ import java.net.Proxy;
 /**
  * BY huangDianHua
  * DATE:2019-12-09 19:39
- * Description: SDK 内部请求配置
+ * Description: SDK internal request configuration
  */
 public class FTHttpConfigManager {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "FTHttpConfigManager";
     private static volatile FTHttpConfigManager instance;
     /**
-     * datakit 服务端请求地址
+     * datakit server request address
      */
     private String datakitUrl;
 
     /**
-     * dataway 服务端请求地址
+     * dataway server request address
      */
     private String datawayUrl;
 
 
     /**
-     * dataway 使用 token
+     * dataway token
      */
     private String clientToken;
 
     /**
-     * 请求 http USER-AGENT header
+     * Request http USER-AGENT header
      */
     private String userAgent;
 
     /**
-     * http 发送连接时间
+     * http send connection time
      */
     private int sendOutTime = 30000;
 
     private boolean compressIntakeRequests = false;
 
     /**
-     * http 请求返回读取
+     * http request return read
      */
-    private int readOutTime = 40000;//大于 Dataway Datakit 30秒时间
+    private int readOutTime = 40000;//Greater than Dataway Datakit 30 second time
 
     private FTHttpConfigManager() {
 
@@ -80,7 +80,7 @@ public class FTHttpConfigManager {
     }
 
     /**
-     * 配置初始化
+     * Configuration initialization
      *
      * @param ftsdkConfig
      */
@@ -144,7 +144,7 @@ public class FTHttpConfigManager {
     }
 
     /**
-     * 释放 SDK 相关
+     * Release SDK related
      */
     public static void release() {
         instance = null;

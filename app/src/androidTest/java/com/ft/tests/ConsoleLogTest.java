@@ -25,11 +25,12 @@ import org.junit.runner.RunWith;
 /**
  * author: huangDianHua
  * time: 2020/8/26 15:21:02
- * description:控制台日志测试用例、丢弃策略测试
+ * description: Console log test case, discard policy test
  *
- * ft-plugin:1.2.0 以上版本暂不可用
+ * ft-plugin:1.2.0 and above are temporarily unavailable
  *
- * 目前适配 AGP 8.0，Gradle 8.0 之后，发现在 AndroidTest build 过程中 ASM 已经织入，但是在运行时不会进行 hook
+ * Currently adapted to AGP 8.0, after Gradle 8.0, it is found that ASM has been woven in
+ * during the AndroidTest build process, but hook will not be performed at runtime
  *
  */
 @RunWith(AndroidJUnit4.class)
@@ -49,20 +50,20 @@ public class ConsoleLogTest extends BaseTest {
     }
 
     /**
-     * console 数据测试
+     * console data test
      * @throws Exception
      */
     @Test
     public void consoleLogTest() throws Exception {
         FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableConsoleLog(true));
-        Log.d("TestLog", "控制台日志测试用例qaws");
+        Log.d("TestLog", "Console log test case qaws");
         Thread.sleep(300);
-        Assert.assertTrue(CheckUtils.checkValueInLineProtocol(DataType.LOG, "控制台日志测试用例qaws"));
+        Assert.assertTrue(CheckUtils.checkValueInLineProtocol(DataType.LOG, "Console log test case qaws"));
 
     }
 
     /**
-     * console prefix 过滤测试
+     * console prefix filter test
      * @throws Exception
      */
     @Test
@@ -83,7 +84,7 @@ public class ConsoleLogTest extends BaseTest {
     }
 
     /**
-     * console {@link Status} 等级测试
+     * console {@link Status} level test
      *
      * @throws Exception
      */

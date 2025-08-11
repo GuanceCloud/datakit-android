@@ -43,9 +43,9 @@ import org.junit.runner.RunWith;
 import java.io.File;
 
 /**
- * 高负载 Java Crash，Native Crash
+ * High load Java Crash, Native Crash
  * <p>
- * ANR 测试无法通过 Android Test 测试，需要手动触发
+ * ANR test cannot be passed by Android Test, needs to be triggered manually
  */
 @RunWith(AndroidJUnit4.class)
 public class StableTest extends BaseTest {
@@ -73,7 +73,7 @@ public class StableTest extends BaseTest {
         databaseFile = application.getDatabasePath(FTDBConfig.DATABASE_NAME);
 
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAWAY_URL, BuildConfig.CLIENT_TOKEN)
-                .setDebug(true)//设置是否是 debug
+                .setDebug(true)//whether is debug mode
                 .setAutoSync(true)
                 .setCustomSyncPageSize(100)
                 .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()));
@@ -113,13 +113,13 @@ public class StableTest extends BaseTest {
                 .setTraceType(TraceType.DDTRACE));
 
 
-        //plugin 1.2.0 以上版本，需要手动调用
+        // For plugin version 1.2.0 and above, manual invocation is required
         FTAutoTrack.startApp(null);
 
     }
 
     /**
-     * 统计当前数据库最大
+     * Count the current maximum database size
      */
     private void computeDBMaxSize() {
         if (databaseFile.exists()) {
@@ -131,31 +131,31 @@ public class StableTest extends BaseTest {
     }
 
     /**
-     * 一小时左右高负载数据
+     * High load data for about one hour
      *
      * @throws Exception
      */
     @Test
     public void oneHourHighLoad() throws Exception {
-        highLoadData(60);//1小时
+        highLoadData(60);//1 Hour
         waitEventConsumeInThreadPool();
     }
 
     /**
-     * 高负载过程中发生 java crash
+     * Java crash occurs during high load
      *
      * @throws Exception
      */
     @Test
     public void highLoadWithCrash() throws Exception {
-        //阻止 application 崩溃，如果崩溃测试用例也会结束
+        // Prevent application crash, if it crashes the test case will also end
         highLoadData(40);
         onView(withId(R.id.main_mock_crash_btn)).perform(ViewActions.scrollTo()).perform(click());
         waitEventConsumeInThreadPool();
     }
 
     /**
-     * 高负载过程中发生 native crash
+     * Native crash occurs during high load
      *
      * @throws Exception
      */
@@ -168,7 +168,7 @@ public class StableTest extends BaseTest {
     }
 
     /**
-     * 高数据写入场景
+     * High data write scenario
      *
      * @throws Exception
      */
@@ -184,32 +184,33 @@ public class StableTest extends BaseTest {
             computeDBMaxSize();
         }
         onView(withId(android.R.id.content)).perform(pressBack());
-        //打印数据库最大的数值
+        // Print the maximum value of the database
         LogUtils.d("MAX_DB_SIZE", "max db size:" + maxDBSize);
     }
 
 
     /**
-     * 应用强制结束
+     * Force application exit
      *
      * @throws Exception
      */
     @Test
     @Repeat(2)
     public void launchAppMultipleTimes() throws Exception {
-        // 循环启动应用程序
-        // 启动Activity
+        // Loop to start the application
+        // Start Activity
+        // Wait for a while, can be adjusted according to actual situation
         ActivityScenario scenario = ActivityScenario.launch(DebugMainActivity.class);
         Thread.sleep(300);
 
         highLoadData(1);
-        // 等待一段时间，可以根据实际情况调整
+        // Wait for a while, can be adjusted according to actual situation
         Thread.sleep(2000);
         scenario.close();
     }
 
     /**
-     * 保留不删除数据
+     * Keep data without deleting
      */
     @Override
     public void tearDown() {

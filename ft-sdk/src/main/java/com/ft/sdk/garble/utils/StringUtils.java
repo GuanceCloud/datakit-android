@@ -9,7 +9,7 @@ public class StringUtils {
 
 
     /**
-     * 删除最后的逗号
+     * Delete the last comma
      *
      * @param sb
      */
@@ -25,7 +25,7 @@ public class StringUtils {
 
 
     /***
-     * 对数据进行脱敏
+     * Desensitize data
      * @param str
      * @return
      */
@@ -43,7 +43,7 @@ public class StringUtils {
     }
 
     /**
-     * 获取堆栈字符，自动换行
+     * Get stack trace string, auto line break
      *
      * @param stackTrace
      * @return
@@ -51,24 +51,17 @@ public class StringUtils {
     public static String getStringFromStackTraceElement(StackTraceElement[] stackTrace) {
 
         StringBuilder stackTraceString = new StringBuilder();
-        // 遍历堆栈跟踪信息
+        // Iterate through stack trace information
         for (StackTraceElement stackTraceElement : stackTrace) {
-            // 获取类名
+            // Get class name, method name, line number, file name
             String className = stackTraceElement.getClassName();
-
-            // 获取方法名
             String methodName = stackTraceElement.getMethodName();
-
-            // 获取行号
             int lineNumber = stackTraceElement.getLineNumber();
-
-            // 获取文件名
             String fileName = stackTraceElement.getFileName();
 
-            // 组合信息
-            String stackTraceInfo = String.format("%s.%s(%s:%d)", className, methodName, fileName, lineNumber);
-
-            // 打印信息
+            // Combine information and append
+            String stackTraceInfo = String.format("%s.%s(%s:%d)", 
+                    className, methodName, fileName, lineNumber);
             stackTraceString.append(stackTraceInfo).append("\n");
         }
 
@@ -77,14 +70,14 @@ public class StringUtils {
 
 
     /**
-     * 转化 Map<Thread, StackTraceElement[]>  堆栈
+     * Convert Map<Thread, StackTraceElement[]> stack trace
      *
      * @param allStackTraces
      * @return
      */
     public static String getThreadAllStackTrace(Map<Thread, StackTraceElement[]> allStackTraces) {
         StringBuilder stack = new StringBuilder();
-        // 遍历 Map 并打印每个线程的堆栈跟踪信息
+        // Iterate through Map and print stack trace for each thread
         for (Map.Entry<Thread, StackTraceElement[]> entry : allStackTraces.entrySet()) {
             Thread thread = entry.getKey();
             StackTraceElement[] stackTraceElements = entry.getValue();

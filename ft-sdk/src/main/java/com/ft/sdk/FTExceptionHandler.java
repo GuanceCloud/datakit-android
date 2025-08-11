@@ -23,62 +23,63 @@ import java.util.concurrent.TimeUnit;
 /**
  * create: by huangDianHua
  * time: 2020/6/1 13:56:26
- * description:崩溃日志处理
+ * description: Crash log handling
  */
 public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "FTExceptionHandler";
 
     /**
-     * Android tombstone 文件前缀
+     * Android tombstone file prefix
      */
     private static final String EXCEPTION_FILE_PREFIX_TOMBSTONE = "tombstone";
 
     /**
-     * Android ANR 文件名内包含字符，暂不使用
+     * Characters contained in Android ANR file names, not used for now
      */
     private static final String ANR_FILE_NAME = "anr";
 
     /**
-     * Android Native 文件包含字符
+     * Characters contained in Android Native files
      */
     private static final String NATIVE_FILE_NAME = "native";
 
     /**
-     * 判断 App 运行状态字段
+     * Field to determine App running state
      */
     private static final String DUMP_FILE_KEY_APP_STATE = "appState";
 
     /**
-     * 是否是之前的崩溃的数据，{@link #NATIVE_CALLBACK_VERSION } 以后的版本会对之后补充的崩溃信息进行标记
+     * Whether it is data from a previous crash,
+     *  {@link #NATIVE_CALLBACK_VERSION } later versions will mark crash info added afterwards
      */
     public static final String IS_PRE_CRASH = "is_pre_crash";
 
 
     /**
-     * 可以接受到 native crash 回调的版本
+     * Version that can receive native crash callbacks
      */
     public static final String NATIVE_CALLBACK_VERSION = "1.1.0-alpha01";
 
     /**
-     * 可以接受 native logcat 行数限制的版本
+     * Version that can accept native logcat line limit
      */
     public static final String NATIVE_LOGCAT_SETTING_VERSION = "1.1.1-alpha01";
 
     private static FTExceptionHandler instance;
     private Thread.UncaughtExceptionHandler mDefaultExceptionHandler;
     /**
-     * 注意 ：AndroidTest 会调用这个方法 {@link com.ft.test.base.FTBaseTest#avoidCrash()}
+     * Note: AndroidTest will call this method {@link com.ft.test.base.FTBaseTest#avoidCrash()}
      */
     private boolean isAndroidTest = false;
 
     /**
-     * 上传崩溃日志，根据 {@link FTRUMConfig#isRumEnable(),FTRUMConfig#isEnableTrackAppCrash()} 进行判断
+     * Upload crash log, determined by {@link FTRUMConfig#isRumEnable(),FTRUMConfig#isEnableTrackAppCrash()}
      * <p>
-     * 这里线程调用的路径是 FTEventCsr -> FTDataUp -> FTEventCsr
+     * The thread call path here is FTEventCsr -> FTDataUp -> FTEventCsr
      *
-     * @param crash    崩溃日志简述
-     * @param message  崩溃堆栈
-     * @param state    app 运行状态 {@link  AppState}
+     * @param crash    Crash log summary
+     * @param message  Crash stack
+     * @param state    app running state {@link  AppState}
      * @param callBack
      */
     public void uploadCrashLog(String crash, String message, AppState state, RunnerCompleteCallBack callBack) {
@@ -101,7 +102,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
     private boolean registerHandled;
 
     /**
-     * 初始化 {@link FTRUMConfig},在 {@link FTSdk#initRUMWithConfig(FTRUMConfig)} } 中惊醒
+     * Initialize {@link FTRUMConfig}, called in {@link FTSdk#initRUMWithConfig(FTRUMConfig)}
      *
      * @param config
      */
@@ -110,7 +111,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
         if (config.isRumEnable() &&
                 config.isEnableTrackAppCrash() && !registerHandled) {
             Thread.UncaughtExceptionHandler currentHandler = Thread.getDefaultUncaughtExceptionHandler();
-            //避免重复设置
+            //Avoid duplicate settings
             if (!(currentHandler instanceof FTExceptionHandler)) {
                 mDefaultExceptionHandler = currentHandler;
                 Thread.setDefaultUncaughtExceptionHandler(this);
@@ -121,14 +122,14 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
 
 
     /**
-     * 抓取全局未捕获异常 {@link Exception}
+     * Catch global uncaught exceptions {@link Exception}
      * <p>
-     * 此处捕获的是 Java 代码层的异常，不包含 C/C++ 异常，抓取数据后，
-     * 会重新将异常内容抛出，避免集成方正常的异常捕获逻辑，异常数据会{@link #uploadCrashLog(String, String, AppState, RunnerCompleteCallBack)} )}
-     * 上传异常数据
+     * This catches exceptions at the Java code layer, not including C/C++ exceptions. After catching the data,
+     * it will rethrow the exception to avoid interfering with the normal exception catching logic of the integration. 
+     * Exception data will be uploaded by {@link #uploadCrashLog(String, String, AppState, RunnerCompleteCallBack)}
      *
-     * @param t 返回异常线程
-     * @param e 返回抛出异常对象
+     * @param t Returned exception thread
+     * @param e Returned thrown exception object
      */
     @Override
     public void uncaughtException(@NonNull Thread t, @NonNull Throwable e) {
@@ -163,7 +164,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
             LogUtils.e(TAG, LogUtils.getStackTraceString(ie));
         }
 
-        if (isAndroidTest) {  //测试用例直接
+        if (isAndroidTest) {  //Test case directly
             e.printStackTrace();
         } else {
             if (mDefaultExceptionHandler != null) {
@@ -173,9 +174,9 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
     }
 
     /**
-     * 检测并上传 native dump 文件
+     * Detect and upload native dump files
      *
-     * @param nativeDumpPath 生成 ANR 或 Native Crash tombstone 文件路径
+     * @param nativeDumpPath Path to generated ANR or Native Crash tombstone file
      */
     public void checkAndSyncPreDump(final String nativeDumpPath, RunnerCompleteCallBack callBack) {
         DataProcessThreadPool.get().execute(new Runnable() {
@@ -205,14 +206,15 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
     }
 
     /**
-     * 在消费队列中，进行 Native Crash 的上传
+     * Upload Native Crash in the consumer queue
      * <p>
-     * 这里会有 FTEventCsr 内线程嵌套，但是不太可能存在线程阻塞，这里是为了加载崩溃日志内容和写入 Error 数据，
-     * 在 EventConsumerThreadPool 顺序执行. 线程执行路径为  FTEventCsr-> FTEventCsr -> FTDataUp -> FTEventCsr
+     * There will be FTEventCsr internal thread nesting here, but thread blocking is unlikely. 
+     * This is to load crash log content and write Error data,
+     * executed sequentially in EventConsumerThreadPool. Thread execution path: FTEventCsr-> FTEventCsr -> FTDataUp -> FTEventCsr
      *
-     * @param item       crash 日志内容文件
-     * @param state      应用状态
-     * @param isPreCrash 是否是前一次异常数据，false 代表上传的是当下崩溃的信息
+     * @param item       Crash log content file
+     * @param state      App state
+     * @param isPreCrash Whether it is previous crash data, false means uploading current crash info
      * @param callBack
      */
     public void uploadNativeCrashBackground(File item, AppState state, boolean isPreCrash, RunnerCompleteCallBack callBack) {
@@ -232,11 +234,11 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
     }
 
     /**
-     * 上传 Native Crash
+     * Upload Native Crash
      *
      * @param item
      * @param state
-     * @param isPreCrash true 记录前一次的崩溃数据，反之是当下的崩溃数据
+     * @param isPreCrash true record the previous crash data, otherwise it is the current crash data
      * @param callBack
      * @throws IOException
      */
@@ -259,7 +261,7 @@ public class FTExceptionHandler implements Thread.UncaughtExceptionHandler {
 
 
     /**
-     * 释放对象，也就是会舍弃 {@link #config} 的配置
+     * Release object, which means discarding {@link #config} configuration
      */
     public static void release() {
         if (instance != null) {

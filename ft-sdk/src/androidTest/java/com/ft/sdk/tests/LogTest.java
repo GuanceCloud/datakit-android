@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * 日志输出测试
+ * Log output test
  */
 public class LogTest extends FTBaseTest {
 
@@ -46,7 +46,7 @@ public class LogTest extends FTBaseTest {
     }
 
     /**
-     * 验证没有设置 {@link FTLoggerConfig} 前提下，是否正确
+     * Verify that it is correct without setting {@link FTLoggerConfig}
      *
      * @throws InterruptedException
      */
@@ -61,7 +61,7 @@ public class LogTest extends FTBaseTest {
     }
 
     /**
-     * 测试采样率为 0 时，数据采集的情况
+     * Test the situation when the sampling rate is 0
      *
      * @throws InterruptedException
      */
@@ -83,7 +83,7 @@ public class LogTest extends FTBaseTest {
     }
 
     /**
-     * 插入一条 log 数据测试
+     * Insert a log data test
      *
      * @throws InterruptedException
      */
@@ -91,7 +91,7 @@ public class LogTest extends FTBaseTest {
     public void logInsertDataTest() throws InterruptedException {
         FTSdk.initLogWithConfig(new FTLoggerConfig().setEnableCustomLog(true));
 
-        //产生一条日志数据
+        //Generate a log data
         String logContent = "----logInsertDataTest----";
         FTLogger.getInstance().logBackground(logContent, Status.CRITICAL);
         FTLogger.getInstance().logBackground(logContent, Status.WARNING, true);
@@ -107,16 +107,16 @@ public class LogTest extends FTBaseTest {
         FTLogger.getInstance().logBackground(list);
 
 //        waitLogConsumeInThreadPool();
-        //线程池中插入，有一定的时间延迟，这里设置3秒等待时间
+        //Insert into thread pool, there is a time delay, set 3 seconds waiting time
         Thread.sleep(1000);
-        //从数据库中查询是否有插入的数据
+        //Query whether there is inserted data from the database
         int except = CheckUtils.getCount(DataType.LOG, logContent, 0);
         Assert.assertEquals(7, except);
     }
 
 
     /**
-     * 验证 {@link FTLoggerConfig#enableLinkRumData}为 true 时，日志输出是否包含 rum 相关数据
+     * Verify that the log output contains rum related data when {@link FTLoggerConfig#enableLinkRumData} is true
      *
      * @throws InterruptedException
      */
@@ -126,7 +126,7 @@ public class LogTest extends FTBaseTest {
     }
 
     /**
-     * 验证 {@link FTLoggerConfig#enableLinkRumData}为 false 时，日志输出是否包含 rum 相关数据
+     * Verify that the log output contains rum related data when {@link FTLoggerConfig#enableLinkRumData} is false
      *
      * @throws InterruptedException
      */
@@ -136,7 +136,8 @@ public class LogTest extends FTBaseTest {
     }
 
     /**
-     * 检验 {@link Constants#KEY_RUM_VIEW_ID}, {@link Constants#KEY_RUM_SESSION_ID} 字段来判断是否已经和 RUM 数据进行关联
+     * Check whether the log has been associated with RUM data by the {@link Constants#KEY_RUM_VIEW_ID},
+     * {@link Constants#KEY_RUM_SESSION_ID} fields
      *
      * @param enableLinkRumData
      * @return
@@ -176,7 +177,7 @@ public class LogTest extends FTBaseTest {
 
 
     /**
-     * 测试大批量插入数据，是否触发丢弃策略
+     * Test inserting a large amount of data, whether it triggers the discard policy
      *
      * @throws InterruptedException
      */
@@ -188,7 +189,7 @@ public class LogTest extends FTBaseTest {
     }
 
     /**
-     * 测试大批量插入数据，是否触发丢弃策略
+     * Test inserting a large amount of data, whether it triggers the discard policy
      *
      * @throws InterruptedException
      */
@@ -200,9 +201,9 @@ public class LogTest extends FTBaseTest {
     }
 
     /**
-     * 批量日志
+     * Batch log
      *
-     * @param expectCount 预期数量
+     * @param expectCount Expected number
      * @throws InterruptedException
      */
     private void batchLog(int expectCount) throws InterruptedException {

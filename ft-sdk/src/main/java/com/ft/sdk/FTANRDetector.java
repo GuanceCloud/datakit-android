@@ -5,7 +5,7 @@ import com.ft.sdk.internal.anr.ANRDetectRunnable;
 
 
 /**
- * ANR 事件监测
+ * ANR event monitoring
  */
 public class FTANRDetector {
 
@@ -21,9 +21,9 @@ public class FTANRDetector {
     private ANRDetectRunnable runnable;
 
     /**
-     * 配置初始化
+     * Configuration initialization
      *
-     * @param config rum 配置
+     * @param config RUM configuration
      */
     void init(FTRUMConfig config) {
         if (config.isEnableTrackAppANR()) {
@@ -35,7 +35,7 @@ public class FTANRDetector {
     }
 
     /**
-     * 释放 ANR对应 资源
+     * Release ANR corresponding resources
      */
     void release() {
         ANRDetectThreadPool.get().shutDown();

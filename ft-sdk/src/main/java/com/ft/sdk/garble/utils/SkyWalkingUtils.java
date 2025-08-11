@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * author: huangDianHua
  * time: 2020/8/5 20:44:31
- * description: SkyWalking sw8 ，sw6 头部拼接字段
+ * description: SkyWalking sw8, sw6 header concatenation fields
  */
 public class SkyWalkingUtils {
     public enum SkyWalkingVersion {
@@ -17,11 +17,11 @@ public class SkyWalkingUtils {
     }
 
     /**
-     * 自增整型，范围 0~9999,每次自增 2
+     * Auto-increment integer, range 0~9999, increments by 2 each time
      */
     private final static AtomicInteger increasingNumber = new AtomicInteger(-1);
     /**
-     * 自增整型
+     * Auto-increment integer
      */
     private final static AtomicLong increasingLong = new AtomicLong(0);
     private final static String traceIDUUID = Utils.randomUUID().toLowerCase();
@@ -31,7 +31,7 @@ public class SkyWalkingUtils {
     private String newParentTraceId;
 
     public SkyWalkingUtils(SkyWalkingVersion version, String sampled, long requestTime, URL url, String serviceName) {
-        synchronized (SkyWalkingUtils.class) {//防止多线程 increasingNumber 不安顺序增加
+        synchronized (SkyWalkingUtils.class) {// Prevent multi-thread increasingNumber from not increasing in order
             if (increasingNumber.get() < 9999) {
                 increasingNumber.getAndAdd(2);
             } else {
@@ -60,9 +60,9 @@ public class SkyWalkingUtils {
     }
 
     /**
-     * 基于 skywalking 官方 v3 算法
+     * Based on SkyWalking official v3 algorithm
      *
-     * <a href="https://skywalking.apache.org/docs/main/v9.0.0/en/protocols/skywalking-cross-process-propagation-headers-protocol-v3/">查看官方文档</a>
+     * <a href="https://skywalking.apache.org/docs/main/v9.0.0/en/protocols/skywalking-cross-process-propagation-headers-protocol-v3/">View official documentation</a>
      *
      * @param sampled
      * @param requestTime
@@ -83,8 +83,8 @@ public class SkyWalkingUtils {
     }
 
     /**
-     * 基于 skywalking 官方 v2 算法,官方已经舍弃了这个
-     * <a href="https://github.com/yuhwb/incubator-skywalking/blob/master/docs/en/protocols/Skywalking-Cross-Process-Propagation-Headers-Protocol-v2.md">官方算法</a>
+     * Based on SkyWalking official v2 algorithm, official has abandoned this
+     * <a href="https://github.com/yuhwb/incubator-skywalking/blob/master/docs/en/protocols/Skywalking-Cross-Process-Propagation-Headers-Protocol-v2.md">Official algorithm</a>
      *
      * @param sampled
      * @param requestTime

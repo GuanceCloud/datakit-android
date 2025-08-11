@@ -17,7 +17,7 @@ public class BatteryPowerWatcher extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
 
-        // 检查是否是电池状态更新广播
+        // Check if it is a battery status update broadcast
         if (Intent.ACTION_BATTERY_CHANGED.equals(intent.getAction())) {
             int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
             int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100);
@@ -35,7 +35,7 @@ public class BatteryPowerWatcher extends BroadcastReceiver {
             }
         }
 
-        // 检查是否是省电模式变化广播
+        // Check if it is a power saving mode change broadcast
         if (PowerManager.ACTION_POWER_SAVE_MODE_CHANGED.equals(intent.getAction())) {
             if (powerManager != null) {
                 batteryBean.setSaveMode(powerManager.isPowerSaveMode());

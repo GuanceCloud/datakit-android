@@ -5,7 +5,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * {@link com.ft.HighLoadActivity} 线程池管理
+ * {@link com.ft.HighLoadActivity} thread pool management
  */
 public class ThreadPoolHandler {
 
@@ -19,7 +19,7 @@ public class ThreadPoolHandler {
     }
 
     /**
-     * 4 core size 同时并发 log 2，http 2
+     * 4 core size, concurrent log 2, http 2
      */
     ExecutorService executor = Executors.newFixedThreadPool(4);
 
@@ -28,7 +28,7 @@ public class ThreadPoolHandler {
     }
 
     /**
-     * 重置
+     * Reset
      */
     public void reset() {
         executor = Executors.newFixedThreadPool(4);
@@ -39,7 +39,7 @@ public class ThreadPoolHandler {
     }
 
     /**
-     * 关闭线程池
+     * Shutdown thread pool
      */
     public void shutDownAll() {
         if (executor != null) {

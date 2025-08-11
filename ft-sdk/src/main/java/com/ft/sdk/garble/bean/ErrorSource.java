@@ -3,17 +3,17 @@ package com.ft.sdk.garble.bean;
 import androidx.annotation.NonNull;
 
 /**
- * 日志来源类型
+ * Log source type
  *
  * @author Brandon
  */
 public enum ErrorSource {
     /**
-     * 原生日志类型一般指
+     * Native log type, generally refers to logcat
      */
     LOGGER("logger"),
     /**
-     * 网络类型数据源
+     * Network type data source
      */
     NETWORK("network");
 

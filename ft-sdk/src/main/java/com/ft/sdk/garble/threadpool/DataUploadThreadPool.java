@@ -53,7 +53,7 @@ public class DataUploadThreadPool extends BaseThreadPool {
     public void schedule(long delay) {
         if (runnable == null) return;
         if (!isScheduled.compareAndSet(false, true)) {
-            // 已有任务正在等待或执行，跳过调度
+            // Task already waiting or executing, skip scheduling
             needReschedule.set(true);
             return;
         }

@@ -107,8 +107,7 @@ public class DemoApplication extends BaseApplication {
         FTSdk.initRUMWithConfig(new FTRUMConfig()
                         .setSamplingRate(1f)
                         .setSessionErrorSampleRate(1f)
-                        .setRumAppId("com_ft_session_replay")
-                //.setRumAppId(BuildConfig.RUM_APP_ID)
+                        .setRumAppId(BuildConfig.RUM_APP_ID)
                         .setEnableTraceUserAction(true)
                         .setEnableTraceUserView(true)
                         .setRumCacheLimitCount(1000)
@@ -162,7 +161,7 @@ public class DemoApplication extends BaseApplication {
                 .setTraceType(TraceType.DDTRACE));
 
         FTSdk.initSessionReplayConfig(new FTSessionReplayConfig()
-                .setSampleRate(1f)
+                .setSampleRate(0f)
                 .setSessionReplayOnErrorSampleRate(1f)
                 .setPrivacy(SessionReplayPrivacy.ALLOW)
 //                .setTouchPrivacy(TouchPrivacy.SHOW)

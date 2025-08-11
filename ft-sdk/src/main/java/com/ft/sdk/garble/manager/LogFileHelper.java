@@ -12,28 +12,28 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 /**
- * SDK 日志管理类
+ * SDK log management class
  */
 public class LogFileHelper {
 
     private static final String TAG = Constants.LOG_TAG_PREFIX + "LogFileHelper";
     /**
-     * 日志分割大小限制
+     * Log split size limit
      */
     private final static int SPLIT_FILE_SIZE = 33554432; //32MB
 
     /**
-     * 日志总大小限制
+     * Log total size limit
      */
     private final static int CACHE_MAX_TOTAL_SIZE = 1073741824; //1G
 
     /**
-     * Android Test 日志分割大小限制
+     * Android Test log split size limit
      */
     public final static int TEST_CACHE_MAX_TOTAL_SIZE = 100;
 
     /**
-     * Android Test 日志总大小限制
+     * Android Test log total size limit
      */
     private final static int TEST_SPLIT_FILE_SIZE = 50;
 
@@ -57,11 +57,11 @@ public class LogFileHelper {
     }
 
     /**
-     * 追加日志
-     * <p>
-     * 注意：避免使用{@link LogUtils} 打印日志，可能会引起代码堆栈越界
+     * Append log
+     * Note: Avoid using {@link LogUtils} to print logs, 
+     * as it may cause stack overflow
      *
-     * @param logMessage 日志数据
+     * @param logMessage Log data
      */
     public void appendLog(String logMessage) {
         if (cacheFile.length() >= splitFileSize) {
@@ -76,9 +76,9 @@ public class LogFileHelper {
     }
 
     /**
-     * 分日志至 {@link #LOG_BACKUP_CACHE_PATH}
+     * Split log to {@link #LOG_BACKUP_CACHE_PATH}
      *
-     * @param filePath 日志路径
+     * @param filePath Log path
      */
     private void splitLog(String filePath) {
         File oldLogFile = new File(filePath);
@@ -90,9 +90,10 @@ public class LogFileHelper {
     }
 
     /**
-     * 超过 {@link #CACHE_MAX_TOTAL_SIZE} 就会删除最旧的文件
+     * If it exceeds {@link #CACHE_MAX_TOTAL_SIZE}, 
+     * the oldest file will be deleted
      *
-     * @param logDir 日志路径
+     * @param logDir Log path
      */
     private void deleteOldLogFilesIfNecessary(File logDir) {
         File[] logFiles = logDir.listFiles();

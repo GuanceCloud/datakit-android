@@ -8,18 +8,18 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 测试用例数据校验类
+ * Test case data validation class
  *
  * @author Brandon
  */
 public class CheckUtils {
 
     /**
-     * 检验行协议数据是否存在
+     * Check if line protocol data exists
      *
      * @param dataType
-     * @param checkValues 需要检验数据集
-     * @return 数据是否存在，是为存在
+     * @param checkValues Dataset to be validated
+     * @return Whether data exists, true if exists
      */
     public static boolean checkValueInLineProtocol(DataType dataType, String[] checkValues) {
         List<SyncData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, dataType);
@@ -42,12 +42,13 @@ public class CheckUtils {
 
 
     /**
-     * 检验动态参数，针对校验 action view，resource，error， longtask 提交的 property 动态参数
+     * Validate dynamic parameters, specifically for validating dynamic property 
+     * parameters submitted by action view, resource, error, longtask
      *
      * @param key
      * @param value
-     * @param targetMeasurement 指定指标，{@link com.ft.sdk.garble.utils.Constants#MEASUREMENT}
-     * @param isTag             是否是 tag
+     * @param targetMeasurement Specified measurement, {@link com.ft.sdk.garble.utils.Constants#MEASUREMENT}
+     * @param isTag             Whether it is a tag
      * @return
      * @throws NullPointerException
      */
@@ -72,10 +73,10 @@ public class CheckUtils {
     }
 
     /**
-     * 获取数据数量
+     * Get data count
      *
      * @param dataType
-     * @param checkValues 需要检验数据集
+     * @param checkValues Dataset to be validated
      * @param limit
      * @return
      */
@@ -98,12 +99,12 @@ public class CheckUtils {
     }
 
     /**
-     * 获取数据数量
+     * Get data count
      *
      * @param dataType
-     * @param value    需要
+     * @param value    Required
      * @param limit
-     * @return 数据是否存在，是为存在
+     * @return Whether data exists, true if exists
      */
     public static int getCount(DataType dataType, String value, int limit) {
         return getCount(dataType, new String[]{value}, limit);
@@ -111,11 +112,11 @@ public class CheckUtils {
 
 
     /**
-     * 检验行协议中的单个数据值
+     * Validate single data value in line protocol
      *
      * @param dataType
-     * @param value    需要校验
-     * @return 数据是否存在，是为存在
+     * @param value    Value to be validated
+     * @return Whether data exists, true if exists
      */
     public static boolean checkValueInLineProtocol(DataType dataType, String value) {
         return checkValueInLineProtocol(dataType, new String[]{value});

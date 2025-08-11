@@ -10,12 +10,12 @@ import org.junit.Test;
 /**
  * BY huangDianHua
  * DATE:2019-12-16 10:17
- * Description:非法字符校验
+ * Description: Illegal character validation
  */
 public class StoreDataFormatTest {
 
     /**
-     * 空数据合法性验证
+     * Empty data validity verification
      */
     @Test
     public void isLegalValues() {
@@ -27,7 +27,7 @@ public class StoreDataFormatTest {
     }
 
     /**
-     * 字符类型数据合法性验证
+     * String type data validity verification
      */
     @Test
     public void isLegalValues1() {
@@ -41,7 +41,7 @@ public class StoreDataFormatTest {
     }
 
     /**
-     * json 对象数据合法性验证
+     * JSON object data validity verification
      */
     @Test
     public void isLegalValues2() {
@@ -55,9 +55,8 @@ public class StoreDataFormatTest {
     }
 
     /**
-     * 布尔类型数据合法性验证
+     * Boolean type data validity verification
      */
-
     @Test
     public void isLegalValues3() {
         try {
@@ -81,7 +80,7 @@ public class StoreDataFormatTest {
     }
 
     /**
-     * json 对象数据合法性验证
+     * JSON object data validity verification
      */
     @Test
     public void isLegalValues5() {
@@ -97,7 +96,7 @@ public class StoreDataFormatTest {
     }
 
     /**
-     * jsonarr 数据合法性验证
+     * jsonarr data validity verification
      */
     @Test
     public void isLegalValues6() {
@@ -111,9 +110,8 @@ public class StoreDataFormatTest {
         }
     }
 
-
     /**
-     * 判断是否是合法的Values
+     * Determine whether it is a valid Values
      *
      * @param jsonObject
      * @return

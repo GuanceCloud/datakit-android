@@ -1,11 +1,11 @@
 package com.ft.sdk.garble.utils;
 
 /**
- * 36 进制生成序列化 id， 到达 {@link #MAX_VALUE}上限后重置，用于 {@link Constants#KEY_SDK_DATA_FLAG} 做数据标记
+ * Generate serialized id in base 36, resets when reaching {@link #MAX_VALUE} limit, used for data marking with {@link Constants#KEY_SDK_DATA_FLAG}
  */
 public class ID36Generator {
     private static final char[] BASE36_CHARS = "0123456789abcdefghijklmnopqrstuvwxyz".toCharArray();
-    private static final long MAX_VALUE = 2821109907456L; //36的8次，大于1天的微秒数
+    private static final long MAX_VALUE = 2821109907456L; //36 to the 8th power, greater than 1 day in microseconds
     private static final int LENGTH = 8;
     private static final int DIGIT = 36;
 
@@ -27,7 +27,7 @@ public class ID36Generator {
 
 
     public void next() {
-        currentValue++; // 自增
+        currentValue++; // Increment
         if (currentValue > MAX_VALUE) {
             currentValue = 0;
         }

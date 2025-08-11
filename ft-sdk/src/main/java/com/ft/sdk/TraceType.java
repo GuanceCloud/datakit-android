@@ -5,22 +5,22 @@ import androidx.annotation.NonNull;
 import com.ft.sdk.garble.utils.Constants;
 
 /**
- * 链路类型
+ * Link type
  * <p>
- * 用于 {@link FTTraceConfig#setTraceType(TraceType)} 使用，用于设置 http 请求链路使用 Header propagation
+ * Used for {@link FTTraceConfig#setTraceType(TraceType)}, used to set http request link using Header propagation
  *
  * @author Brandon
  */
 public enum TraceType {
     /**
-     * datadog trace, 默认数值，{@link FTTraceConfig#traceType}
+     * datadog trace, default value, {@link FTTraceConfig#traceType}
      * <p>
      * x-datadog-trace-id
      * x-datadog-parent-id
      * x-datadog-sampling-priority
-     * x-datadog-origin
+     * x-datadog-origin 
      *
-     * <a href="https://docs.datadoghq.com/synthetics/apm/">了解更多</a>
+     * <a href="https://docs.datadoghq.com/synthetics/apm/">Learn more</a>
      */
     DDTRACE,
 
@@ -31,28 +31,28 @@ public enum TraceType {
      * X-B3-SpanId
      * X-B3-Sampled
      *
-     * <a href="https://github.com/openzipkin/b3-propagation">了解更多</a>
+     * <a href="https://github.com/openzipkin/b3-propagation">Learn more</a>
      */
     ZIPKIN_MULTI_HEADER,
 
     /**
      * zipkin single header,b3
      *
-     * <a href="https://github.com/openzipkin/b3-propagation">了解更多</a>
+     * <a href="https://github.com/openzipkin/b3-propagation">Learn more</a>
      */
     ZIPKIN_SINGLE_HEADER,
 
     /**
      * w3c, traceparent
      *
-     * <a href="https://www.w3.org/TR/trace-context/#traceparent-header-field-values">了解更多</a>
+     * <a href="https://www.w3.org/TR/trace-context/#traceparent-header-field-values">Learn more</a>
      */
     TRACEPARENT,
 
-    /**
+    /** 
      * skywalking 8.0+, sw-8
      *
-     * <a href="https://skywalking.apache.org/docs/main/next/en/api/x-process-propagation-headers-v3/#skywalking-cross-process-propagation-headers-protocol">了解更多</a>
+     * <a href="https://skywalking.apache.org/docs/main/next/en/api/x-process-propagation-headers-v3/#skywalking-cross-process-propagation-headers-protocol">Learn more</a>
      */
     SKYWALKING,
 
@@ -62,8 +62,8 @@ public enum TraceType {
     JAEGER;
 
     /**
-     * @return Trace 类型小写字符类型，例如 zipkin，ddtrace 等。
-     * 用于行协议数据输出 {@link Constants#MEASUREMENT}使用
+     * @return Trace type lowercase character type, such as zipkin, ddtrace, etc.
+     * Used for line protocol data output {@link Constants#MEASUREMENT}
      */
     @NonNull
     @Override
@@ -71,7 +71,7 @@ public enum TraceType {
         switch (this) {
             case ZIPKIN_SINGLE_HEADER:
             case ZIPKIN_MULTI_HEADER:
-                //zipkin 多头与单头参数输出同一个字符
+                //zipkin multi header and single header output the same character
                 return "zipkin";
             default:
                 return super.toString().toLowerCase();

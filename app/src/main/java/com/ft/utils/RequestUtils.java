@@ -15,14 +15,15 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 
 /**
- * 用于 Okhttp 网络数据请求测试
+ * Used for Okhttp network data request testing
  */
 public class RequestUtils {
     private static final String TAG = "RequestUtils";
 
     /**
-     * 发起网络 GET 请求，
-     * @param url 请求地址
+     * Initiate a network GET request
+     *
+     * @param url request address
      * @return
      */
     public static Request requestUrl(@NonNull String url) {
@@ -36,7 +37,7 @@ public class RequestUtils {
             ResponseBody responseBody = response.body();
             String string = "";
             if (responseBody != null) {
-                //这里需要消费，event listener 才会被调用
+                //Here we need to consume, the event listener will be called
                 string = responseBody.string();
             }
             LogUtils.d(TAG, "url:" + url + "\n" + code);

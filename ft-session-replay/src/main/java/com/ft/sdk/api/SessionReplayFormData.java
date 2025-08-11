@@ -6,10 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SessionReplayFormData {
-    // 获取普通表单字段
+    // Get normal form fields
     Map<String, String> fields;
 
-    // 获取需要上传的文件
+    // Get files to upload
     HashMap<String, Pair<String,byte[]>> fileFields;
 
 

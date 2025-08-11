@@ -18,16 +18,16 @@
   window.DATAFLUX_RUM &&
     window.DATAFLUX_RUM.init({
       applicationId: 'guance',
-      datakitOrigin: 'http://127.0.0.1:9529', // DK方式接入时需要配置
-      //clientToken: 'clientToken', // 公网 OpenWay 接入时,需要填写
-      //site: '公网 OpenWay 地址', // 公网 OpenWay 接入时,需要填写
+      datakitOrigin: 'http://127.0.0.1:9529', // Required configuration when accessing via DK method
+      //clientToken: 'clientToken', // Required when accessing via public network OpenWay
+      //site: 'Public network OpenWay address', // Required when accessing via public network OpenWay
       env: 'production',
       version: '1.0.0',
       sessionSampleRate: 100,
       sessionReplaySampleRate: 70,
       trackInteractions: true,
-      traceType: 'ddtrace', //非必填，默认为ddtrace，目前支持 ddtrace、zipkin、skywalking_v3、jaeger、zipkin_single_header、w3c_traceparent 6种类型
-      allowedTracingOrigins: ['https://api.example.com', /https:\/\/.*\.my-api-domain\.com/],  //非必填，允许注入trace采集器所需header头部的所有请求列表。可以是请求的origin，也可以是正则
+      traceType: 'ddtrace', // Optional, defaults to ddtrace, currently supports 6 types: ddtrace、zipkin、skywalking_v3、jaeger、zipkin_single_header、w3c_traceparent
+      allowedTracingOrigins: ['https://api.example.com', /https:\/\/.*\.my-api-domain\.com/],  // Optional, list of all requests allowed to inject trace collector required header headers. Can be the origin of the request, or a regular expression
     })
 
     function test() {

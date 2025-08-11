@@ -34,8 +34,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 本类借鉴修改了来自 Sensors Data  的项目<a href="https://github.com/sensorsdata/sa-sdk-android-plugin2">sa-sdk-android-plugin2</a>
- * 中的 SensorsAnalyticsClassVisitor.groovy 类
+ * This class is adapted and modified from the Sensors Data project
+ * <a href="https://github.com/sensorsdata/sa-sdk-android-plugin2">sa-sdk-android-plugin2</a>
+ * SensorsAnalyticsClassVisitor.groovy class
  */
 public class FTClassAdapter extends ClassVisitor {
     private String className;
@@ -43,7 +44,7 @@ public class FTClassAdapter extends ClassVisitor {
     private String[] interfaces;
     private final List<String> ignorePackages;
     /**
-     * 是否跳过
+     * Whether to skip
      */
     private boolean needSkip;
 
@@ -69,7 +70,7 @@ public class FTClassAdapter extends ClassVisitor {
     }
 
     /**
-     * 访问类中定义的字段
+     * Visit fields defined in the class
      *
      * @param access
      * @param name
@@ -80,12 +81,12 @@ public class FTClassAdapter extends ClassVisitor {
      */
     @Override
     public FieldVisitor visitField(int access, String name, String desc, String signature, Object value) {
-        if (ClassNameAnalytics.isFTSdkApi(className)) {//判断是否是 FTSdk 类
-            if (name.equals("AGENT_VERSION")) {//获得 AGENT_VERSION 判断是否高于最低版本
+        if (ClassNameAnalytics.isFTSdkApi(className)) { // Determine if it is the FTSdk class
+            if (name.equals("AGENT_VERSION")) { // Get AGENT_VERSION and determine if it is higher than the minimum version
                 String agentVersion = (String) value;
                 if (!VersionUtils.firstVerGreaterEqual(agentVersion, BuildConfig.MIN_SDK_VERSION)) {
-                    String errorTip = "你目前集成的 FT SDK 的版本为 " + agentVersion + ",当前插件支持 SDK 的最低版本为 " + BuildConfig.MIN_SDK_VERSION
-                            + ",详细信息请参考：https://github.com/GuanceCloud/datakit-android";
+                    String errorTip = "The version of FT SDK you have integrated is " + agentVersion + ", the minimum version supported by the current plugin is " + BuildConfig.MIN_SDK_VERSION
+                            + ", for details please refer to: https://github.com/GuanceCloud/datakit-android";
                     throw new Error(errorTip);
                 }
             }
@@ -94,7 +95,7 @@ public class FTClassAdapter extends ClassVisitor {
     }
 
     /**
-     * 访问类方法
+     * Visit class methods
      *
      * @param access
      * @param name
@@ -130,7 +131,7 @@ public class FTClassAdapter extends ClassVisitor {
     }
 
     /**
-     * ignorePackages 对应忽略的包或者类名
+     * ignorePackages corresponds to the packages or class names to be ignored
      *
      * @param className
      * @return
@@ -147,7 +148,7 @@ public class FTClassAdapter extends ClassVisitor {
     }
 
     /**
-     * SDK 内部方法，除了 {@link Constants#FT_SDK_PACKAGE} 外，都不需要扫描
+     * SDK internal methods, except for {@link Constants#FT_SDK_PACKAGE}, do not need to be scanned
      *
      * @param className
      * @return
@@ -159,7 +160,7 @@ public class FTClassAdapter extends ClassVisitor {
 
 
     /**
-     * 是否为第三方或内部 WebView 方法
+     * Whether it is a third-party or internal WebView method
      *
      * @param className
      * @param superName

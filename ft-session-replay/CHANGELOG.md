@@ -1,40 +1,58 @@
+# replay 0.1.2-alpha02
+1. Adapt to react native replay feature
+
+---
 # replay 0.1.2-alpha01
-1. 添加 `FTSessionReplayConfig.setSessionReplayOnErrorSampleRate` 支持错误采样，在未被 `setSamplingRate`采样时，
-   在发生错误时可以对 1 分钟前的 session replay 的数据进行取样采集
+1. Added `FTSessionReplayConfig.setSessionReplayOnErrorSampleRate` support for error sampling, in case it is not sampled by `setSamplingRate`, it can sample data from session replay 1 minute ago when an error occurs
 
 ---
 # replay 0.1.1-alpha01
-1. 新增 TextAndInputPrivacy，TouchPrivacy 设置
-2. 支持对单独页面隐私进行覆盖 TextAndInputPrivacy 和 TouchPrivacy 的设置
+1. Added TextAndInputPrivacy, TouchPrivacy settings
+2. Supported for covering TextAndInputPrivacy and TouchPrivacy settings for separate pages
 
 ---
 # replay 0.1.0-alpha09
-1. userAgent 附加 Session Replay SDK 信息
-2. 支持依赖设置 Dns 和 Proxy，统一数据传入口依赖 ft-sdk 内部设置创建线程池与收发数据
+1. UserAgent appended Session Replay SDK information
+2. Supported for depending on Dns and Proxy, unifying data entry dependency ft-sdk internal settings to create thread pool and send data
 
 ---
 # replay 0.1.0-alpha08
-1. X-Pkg-Id 放置位置修改
+1. Modified X-Pkg-Id placement
 
 ---
 # replay 0.1.0-alpha07
-1. X-Pkg-Id Session Replay 数据同步追踪适配
+1. X-Pkg-Id Session Replay data synchronization tracking adaptation
 
 ---
 # replay 0.1.0-alpha05
-1. 修复 React Native View 崩溃问题
+1. Fixed React Native View crash problem
 
 ---
 # replay 0.1.0-alpha04
-1. 适配 React Native
+1. Supported React Native
 
 ---
 # replay 0.1.0-alpha03
-1. 行协议数据包版本显示
-2. dialog 背景获取优化
+1. Line protocol packet version display
+2. dialog background acquisition optimization
 
 ---
 # replay 0.1.0-alpha02
-1. 支持开启 session replay 录制功能
-2. 支持采样率、privacy 隐私配置，以及 Material 组件额外配置设置
-3. 支持 datakit，dataway 传输
+1. Supported session replay recording function
+2. Supported sampling rate, privacy configuration, and Material component additional configuration settings
+3. Supported datakit, dataway transmission
+
+# session-replay 0.1.1-alpha01
+1. Support for CardView and Chip components
+
+---
+# session-replay 0.1.0-alpha04
+1. Debug low version support
+
+---
+# session-replay 0.1.0-alpha03
+1. Line protocol packet version display
+
+---
+# session-replay 0.1.0-alpha01
+1. Support for session replay Material components

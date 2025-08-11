@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 资源请求数据监测
+ * Resource request data monitoring
  *
  * @author Brandon
  */
@@ -56,7 +56,7 @@ public class RUMResourceTest extends BaseTest {
 
         FTSDKConfig ftSDKConfig = FTSDKConfig
                 .builder(BuildConfig.DATAKIT_URL)
-                .setDebug(true)//设置是否是 debug
+                .setDebug(true)//Set whether it's debug
                 .setEnv(EnvType.GRAY);
         FTSdk.install(ftSDKConfig);
 
@@ -69,7 +69,7 @@ public class RUMResourceTest extends BaseTest {
     }
 
     /**
-     * 验证 OkHttp ft-plugin 是否正确织入 Interceptor 相关代码
+     * Verify if OkHttp ft-plugin correctly weaves Interceptor related code
      *
      * @throws Exception
      */

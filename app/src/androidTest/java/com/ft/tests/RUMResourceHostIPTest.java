@@ -34,7 +34,7 @@ import org.junit.runner.RunWith;
 import java.util.List;
 
 /**
- * RUM resource host ip 功能检验
+ * RUM resource host ip function verification
  */
 @RunWith(AndroidJUnit4.class)
 public class RUMResourceHostIPTest extends BaseTest {
@@ -54,7 +54,7 @@ public class RUMResourceHostIPTest extends BaseTest {
 
         FTSDKConfig ftSDKConfig = FTSDKConfig
                 .builder(BuildConfig.DATAKIT_URL)
-                .setDebug(true)//设置是否是 debug
+                .setDebug(true)//Set whether it is debug
                 .setEnv(EnvType.GRAY);
         FTSdk.install(ftSDKConfig);
 

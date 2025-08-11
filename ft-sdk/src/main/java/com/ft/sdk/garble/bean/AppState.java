@@ -3,27 +3,27 @@ package com.ft.sdk.garble.bean;
 import androidx.annotation.NonNull;
 
 /**
- * 应用运行状态，通过查看应用标记运用状态来区分 App 的运行状态
+ * Application running state, used to distinguish the running state of the App by checking the application state flag
  */
 public enum AppState {
     /**
-     * 未知状态，当获取不到时，标记为 Unknown
+     * Unknown state, marked as Unknown when not available
      */
     UNKNOWN,
     /**
-     * 应用启动
+     * Application startup
      */
     STARTUP,
     /**
-     * 运行中
+     * Running
      */
     RUN;
 
     /**
-     * 从字符转化对应的 AppState
+     * Convert from string to corresponding AppState
      *
-     * @param value @{@link AppState} 对应字符
-     * @return 返回当前运行状态
+     * @param value Corresponding string of @{@link AppState}
+     * @return Returns the current running state
      */
     public static AppState getValueFrom(String value) {
         AppState[] states = AppState.values();
@@ -37,9 +37,9 @@ public enum AppState {
     }
 
     /**
-     * 用于行协议传参，行协议中均为小写
+     * Used for line protocol parameter passing, all lowercase in line protocol
      *
-     * @return 小写字符 unknown，startup，run
+     * @return Lowercase string: unknown, startup, run
      */
     @NonNull
     @Override

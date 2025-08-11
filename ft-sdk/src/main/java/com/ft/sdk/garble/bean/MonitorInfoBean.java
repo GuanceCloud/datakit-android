@@ -1,24 +1,24 @@
 package com.ft.sdk.garble.bean;
 
 /**
- * 用于计算监控数据指标最大最小值，和平均值
+ * Used to calculate the max, min, and average values of monitoring data metrics
  */
 public class MonitorInfoBean {
     /**
-     * 平均值
+     * Average value
      */
     public double avgValue;
     /**
-     * 最大数值
+     * Maximum value
      */
     public double maxValue;
     /**
-     * 最小值
+     * Minimum value
      */
     public double miniValue = Double.MAX_VALUE;
 
     /**
-     * 添加数据数量
+     * Add data count
      */
     public int count = 0;
 
@@ -38,7 +38,7 @@ public class MonitorInfoBean {
 //    }
 
     /**
-     * 判断计算数值是否合法，非法数值会被舍弃
+     * Determine whether the calculated value is legal, illegal values will be discarded
      * @return
      */
 

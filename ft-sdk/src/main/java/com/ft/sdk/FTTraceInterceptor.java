@@ -16,7 +16,7 @@ import okhttp3.Response;
 /**
  * OKHttp Trace Interceptor
  * <p>
- * 为 http 链路添加链路 header
+ * Add link header for http link
  */
 public class FTTraceInterceptor implements Interceptor {
 
@@ -31,19 +31,19 @@ public class FTTraceInterceptor implements Interceptor {
     private HeaderHandler headerHandler;
 
     /**
-     * 自定义 TraceHeader
+     * Custom TraceHeader
      */
     public abstract static class HeaderHandler extends TraceRUMLinkable {
         /**
-         * @param request OKHttp 请求 Request
-         * @return 替换 TraceHeader 内容
+         * @param request OKHttp request
+         * @return Replace TraceHeader content
          */
         public abstract HashMap<String, String> getTraceHeader(Request request);
 
     }
 
     /**
-     * 与 RUM 相关联 trace_id 和 span_id
+     * trace_id and span_id associated with RUM
      */
     public static class TraceRUMLinkable {
         public String getTraceID() {
@@ -76,7 +76,7 @@ public class FTTraceInterceptor implements Interceptor {
 
             if (requestHeaders != null) {
                 for (String key : requestHeaders.keySet()) {
-                    requestBuilder.header(key, requestHeaders.get(key));//避免重试出现重复头
+                    requestBuilder.header(key, requestHeaders.get(key));//Avoid duplicate headers on retry
                 }
             }
 
@@ -124,7 +124,7 @@ public class FTTraceInterceptor implements Interceptor {
 
 
     /**
-     * 支持内容抓取的
+     * Supported content capture
      *
      * @param mediaType
      * @return

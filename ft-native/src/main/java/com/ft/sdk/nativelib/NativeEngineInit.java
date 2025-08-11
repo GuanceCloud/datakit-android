@@ -8,25 +8,25 @@ import ftnative.NativeCrash;
 public class NativeEngineInit {
 
     /**
-     * 数据初始化
+     * Data initialization
      *
      * @param context
-     * @param logPath           日志生成路径
-     * @param enableNativeCrash 是否开启 native crash 收集
-     * @param enableAnrHandler  是否开始 ANR 数据收集
+     * @param logPath           Log generation path
+     * @param enableNativeCrash Whether to enable native crash collection
+     * @param enableAnrHandler  Whether to start ANR data collection
      */
     public static void init(Context context, String logPath, boolean enableNativeCrash, boolean enableAnrHandler) {
         init(context, logPath, enableNativeCrash, enableAnrHandler, null);
     }
 
     /**
-     * 数据初始化
+     * Data initialization
      *
      * @param context
-     * @param logPath             日志生成路径
-     * @param enableNativeCrash   是否开启 native crash 收集
-     * @param enableAnrHandler    是否开始 ANR 数据收集
-     * @param nativeCrashCallback 是否接收 native crash 回调
+     * @param logPath             Log generation path
+     * @param enableNativeCrash   Whether to enable native crash collection
+     * @param enableAnrHandler    Whether to start ANR data collection
+     * @param nativeCrashCallback Whether to receive native crash callback
      */
     public static void init(Context context, String logPath, boolean enableNativeCrash, boolean enableAnrHandler,
                             CrashCallback nativeCrashCallback) {
@@ -61,13 +61,13 @@ public class NativeEngineInit {
 
 
     /**
-     * 数据初始化
+     * Data initialization
      *
      * @param context
-     * @param logPath             日志生成路径
-     * @param enableNativeCrash   是否开启 native crash 收集
-     * @param enableAnrHandler    是否开始 ANR 数据收集
-     * @param nativeCrashCallback 是否接收 native crash 回调
+     * @param logPath             Log generation path
+     * @param enableNativeCrash   Whether to enable native crash collection
+     * @param enableAnrHandler    Whether to start ANR data collection
+     * @param nativeCrashCallback Whether to receive native crash callback
      */
     public static void init(Context context, String logPath, boolean enableNativeCrash, boolean enableAnrHandler,
                             CrashCallback nativeCrashCallback,

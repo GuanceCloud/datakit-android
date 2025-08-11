@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**
- * 用于转化旧格式数据
+ * Used to convert old format data
  */
 public class SyncDataCompatHelper {
 
@@ -33,13 +33,13 @@ public class SyncDataCompatHelper {
 
 
     /**
-     * 封装同步上传的数据
+     * Encapsulate the data to be synchronously uploaded
      *
      * @return
      */
     public String getBodyContent(JSONObject json, DataType dataType, String uuid, long timeStamp) {
         HashMap<String, Object> hashMap = new LinkedHashMap<>();
-        hashMap.put(KEY_SDK_DATA_FLAG, uuid);//让 uuid 放置第一位，字符替换时可以节省损耗
+        hashMap.put(KEY_SDK_DATA_FLAG, uuid);//Put uuid in the first position to save cost during string replacement
         if (dataType == DataType.LOG) {
             hashMap.putAll(logTags);
         } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_WEBVIEW) {
@@ -49,7 +49,7 @@ public class SyncDataCompatHelper {
     }
 
     /**
-     * 转化为单条行协议数据
+     * Convert to a single line protocol data
      *
      * @param opJson
      * @param mergeTags

@@ -13,60 +13,60 @@ import java.util.List;
 
 
 /**
- * 配置日志 {@link FTLogger} 输出使用的参数配置
+ * Configure the parameters used for log output by {@link FTLogger}
  *
  * @author Brandon
  */
 public class FTLoggerConfig {
     /**
-     * 采样率，[0,1]
+     * Sampling rate, [0,1]
      */
     private float samplingRate = 1;
     /**
-     * 是否与 RUM 数据关联
+     * Whether to associate with RUM data
      */
     private boolean enableLinkRumData = false;
     /**
-     * 是否开启控制台日志输出
+     * Whether to enable console log output
      */
     private boolean enableConsoleLog = false;
     /**
-     * 是否开启自定义日志
+     * Whether to enable custom log
      */
     private boolean enableCustomLog = false;
 
     /**
-     * 服务名称 {@link Constants#KEY_SERVICE },默认为 {@link Constants#DEFAULT_SERVICE_NAME}
+     * Service name {@link Constants#KEY_SERVICE }, default is {@link Constants#DEFAULT_SERVICE_NAME}
      */
     private String serviceName = Constants.DEFAULT_SERVICE_NAME;
     /**
-     * log 过滤前缀
+     * log filter prefix
      */
     private String logPrefix = "";
 
     private int logCacheLimitCount = Constants.DEFAULT_DB_LOG_CACHE_NUM;
     /**
-     * log 日志等级过滤
+     * log level filter
      */
     private List<String> logLevelFilters;
 
     /**
-     * 设置全局 tag
+     * Set global tag
      */
     private final HashMap<String, Object> globalContext = new HashMap<>();
 
     /**
-     * 日志数据数据库存储策略
+     * Log data database storage strategy
      */
     private LogCacheDiscard logCacheDiscardStrategy = LogCacheDiscard.DISCARD;
 
     /**
-     * 自定义日志打印配置
+     * Custom log print configuration
      */
     private boolean printCustomLogToConsole = false;
 
     /**
-     * 获取采样率
+     * Get sampling rate
      *
      * @return
      */
@@ -75,7 +75,7 @@ public class FTLoggerConfig {
     }
 
     /**
-     * 设置采样率
+     * Set sampling rate
      *
      * @param samplingRate
      * @return
@@ -86,7 +86,7 @@ public class FTLoggerConfig {
     }
 
     /**
-     * 是否与 RUM 数据关联
+     * Whether to associate with RUM data
      *
      * @return
      */
@@ -95,7 +95,7 @@ public class FTLoggerConfig {
     }
 
     /**
-     * 设置是否与 RUM 数据关联
+     * Set whether to associate with RUM data
      *
      * @param enableLinkRumData
      * @return
@@ -106,7 +106,7 @@ public class FTLoggerConfig {
     }
 
     /**
-     * 是否开启控制日志抓取
+     * Whether to enable control log capture
      *
      * @return
      */
@@ -115,7 +115,7 @@ public class FTLoggerConfig {
     }
 
     /**
-     * 设置是否开启控制日志抓取
+     * Set whether to enable control log capture
      *
      * @param enableConsoleLog
      * @return
@@ -126,8 +126,8 @@ public class FTLoggerConfig {
     }
 
     /**
-     * @param enableConsoleLog 是否开启控制日志抓取
-     * @param prefix           日志过滤前缀
+     * @param enableConsoleLog Whether to enable control log capture
+     * @param prefix           Log filter prefix
      * @return
      */
     public FTLoggerConfig setEnableConsoleLog(boolean enableConsoleLog, String prefix) {
@@ -137,9 +137,9 @@ public class FTLoggerConfig {
     }
 
     /**
-     * 判断是否已经开启自定义日志
+     * Determine if custom logging has been enabled
      *
-     * @return true 开启，false 未开启
+     * @return true enabled, false not enabled
      */
     public boolean isEnableCustomLog() {
         return enableCustomLog;
@@ -151,7 +151,7 @@ public class FTLoggerConfig {
     }
 
     /**
-     * 获取服务名称
+     * Get service name
      *
      * @return
      */
@@ -165,7 +165,7 @@ public class FTLoggerConfig {
 
 
     /**
-     * 获取日志缓存策略
+     * Get log cache strategy
      *
      * @return
      */
@@ -174,7 +174,7 @@ public class FTLoggerConfig {
     }
 
     /**
-     * 设置数据库数据存储策略
+     * Set database data storage strategy
      *
      * @param logCacheDiscardStrategy
      * @return
@@ -186,7 +186,7 @@ public class FTLoggerConfig {
 
 
     /**
-     * 设置日志等级过滤
+     * Set log level filter
      *
      * @param logLevelFilters
      * @return
@@ -201,7 +201,7 @@ public class FTLoggerConfig {
     }
 
     /**
-     * 设置日志等级过滤
+     * Set log level filter
      *
      * @param logLevelFilters
      * @return
@@ -212,7 +212,7 @@ public class FTLoggerConfig {
     }
 
     /**
-     * 是否开启自定义日志打印
+     * Whether to enable custom log printing
      *
      * @return
      */
@@ -221,7 +221,7 @@ public class FTLoggerConfig {
     }
 
     /**
-     * 设置是否将自定义日志打印至 console
+     * Set whether to print custom logs to console
      *
      * @param printCustomLogToConsole
      */
@@ -231,7 +231,7 @@ public class FTLoggerConfig {
     }
 
     /**
-     * 设置日志最大条目数量,最小不小于 1000
+     * Set the maximum number of log entries, minimum not less than 1000
      *
      * @param count
      * @return
@@ -244,7 +244,7 @@ public class FTLoggerConfig {
 
 
     /**
-     * 获取最大日志条目数量限制
+     * Get the maximum number of log entries, minimum not less than 1000
      *
      * @return
      */
@@ -253,9 +253,9 @@ public class FTLoggerConfig {
     }
 
     /**
-     * 检验是否包含 prefix 设置
+     * Check if prefix is set
      *
-     * @param message 控制台内容
+     * @param message Console content
      * @return
      */
     public boolean checkPrefix(String message) {
@@ -265,10 +265,10 @@ public class FTLoggerConfig {
 
 
     /**
-     * 检验是否包含日志等级设置
+     * Check if log level is set
      *
      * @param status
-     * @return 是否设置
+     * @return Whether to set
      */
     public boolean checkLogLevel(String status) {
         return (logLevelFilters == null

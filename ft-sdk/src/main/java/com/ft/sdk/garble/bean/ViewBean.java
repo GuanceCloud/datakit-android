@@ -14,7 +14,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 /**
- * View 指标数据，以下数据为页面页面生命周期内容产生的数据指标，从 {@link FTRUMInnerManager#startView(String)} 到
+ * View metric data. The following data are metrics generated during the page lifecycle,
+ * from {@link FTRUMInnerManager#startView(String)} to
  * <p>
  * {@link FTRUMInnerManager#stopView()}  }
  *
@@ -23,92 +24,92 @@ import java.util.Iterator;
 public class ViewBean {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "ViewBean";
     /**
-     * View 唯一ID， {@link Constants#KEY_RUM_VIEW_ID}
+     * Unique View ID, {@link Constants#KEY_RUM_VIEW_ID}
      */
     String id = Utils.randomUUID();
     /**
-     * 页面来源，页面的父级，{@link Constants#KEY_RUM_VIEW_REFERRER}
+     * Page source, parent page, {@link Constants#KEY_RUM_VIEW_REFERRER}
      */
     String viewReferrer;
     /**
-     * 页面名称，{@link Constants#KEY_RUM_VIEW_NAME}
+     * Page name, {@link Constants#KEY_RUM_VIEW_NAME}
      */
     String viewName;
 
     /**
-     * longtask 捕获到的次数，{@link Constants#KEY_RUM_ACTION_LONG_TASK_COUNT}
+     * Number of longtask captures, {@link Constants#KEY_RUM_ACTION_LONG_TASK_COUNT}
      */
     int longTaskCount;
 
     /**
-     * 网络资源请求的次数,{@link Constants#KEY_RUM_VIEW_RESOURCE_COUNT}
+     * Number of network resource requests, {@link Constants#KEY_RUM_VIEW_RESOURCE_COUNT}
      */
     int resourceCount;
     /**
-     * 发生错误的次数，{@link Constants#KEY_RUM_VIEW_ERROR_COUNT}
+     * Number of errors occurred, {@link Constants#KEY_RUM_VIEW_ERROR_COUNT}
      */
     int errorCount;
 
     /**
-     * 捕获 Action 的次数 {@link  Constants#KEY_RUM_VIEW_ACTION_COUNT}
+     * Number of captured Actions {@link  Constants#KEY_RUM_VIEW_ACTION_COUNT}
      */
     int actionCount;
 
     /**
-     * 是否处于激活状态， {@link  Constants#KEY_RUM_VIEW_IS_ACTIVE}
+     * Whether it is active, {@link  Constants#KEY_RUM_VIEW_IS_ACTIVE}
      */
     boolean isClose = false;
     /**
-     * 开始时间，单位纳秒
+     * Start time, unit: nanoseconds
      */
     long startTime = Utils.getCurrentNanoTime();
 
     /**
-     * 页面加载时间，单位纳秒，{@link Constants#KEY_RUM_VIEW_LOAD}
+     * Page load time, unit: nanoseconds, {@link Constants#KEY_RUM_VIEW_LOAD}
      */
     long loadTime = 0;
 
     /**
-     * 页面停留时间，单位纳秒，{@link Constants#KEY_RUM_VIEW_TIME_SPENT}
+     * Page stay time, unit: nanoseconds, {@link Constants#KEY_RUM_VIEW_TIME_SPENT}
      */
     long timeSpent = 0;
 
     /**
-     * 最小帧数, {@link  Constants#KEY_FPS_MINI}
+     * Minimum FPS, {@link  Constants#KEY_FPS_MINI}
      */
     double fpsMini;
 
     /**
-     * 页面平均帧数,{@link  Constants#KEY_FPS_AVG}
+     * Average FPS, {@link  Constants#KEY_FPS_AVG}
      */
     double fpsAvg;
 
     /**
-     * cpu 每秒跳动次数,{@link  Constants#KEY_CPU_TICK_COUNT_PER_SECOND}
+     * CPU ticks per second, {@link  Constants#KEY_CPU_TICK_COUNT_PER_SECOND}
      */
     double cpuTickCountPerSecond = -1;
 
     /**
-     * cpu 跳动次数,{@link  Constants#KEY_CPU_TICK_COUNT}
+     * CPU tick count, {@link  Constants#KEY_CPU_TICK_COUNT}
      */
     long cpuTickCount = -1;
 
     /**
-     * 平均内存,{@link  Constants#KEY_MEMORY_AVG}
+     * Average memory, {@link  Constants#KEY_MEMORY_AVG}
      */
     long memoryAvg;
 
     /**
-     * 最大内存，,{@link  Constants#KEY_MEMORY_MAX}
+     * Maximum memory, {@link  Constants#KEY_MEMORY_MAX}
      */
     long memoryMax;
 
     /**
-     * 平均电池消耗,{@link  Constants#KEY_BATTERY_CURRENT_AVG}
+     * Average battery consumption, {@link  Constants#KEY_BATTERY_CURRENT_AVG}
      */
     int batteryCurrentAvg;
     /**
-     * 电池最最大消耗,{@link  Constants#KEY_BATTERY_CURRENT_MAX}
+     * Maximum battery consumption, {@link  Constants#KEY_BATTERY_CURRENT_MAX}
      */
     int batteryCurrentMax;
 
@@ -119,12 +120,12 @@ public class ViewBean {
 
 
     /**
-     * 页面更新次数,{@link  Constants#KEY_SDK_VIEW_UPDATE_TIME}
+     * Page update count, {@link  Constants#KEY_SDK_VIEW_UPDATE_TIME}
      */
     long viewUpdateTime = 0;
 
     /**
-     * 页面的错误时间
+     * Error time of the page
      */
     long lastErrorTime = 0;
 
@@ -151,7 +152,7 @@ public class ViewBean {
     }
 
     /**
-     * 页面附加属性,{@link  Constants#KEY_RUM_PROPERTY}
+     * Page additional properties, {@link  Constants#KEY_RUM_PROPERTY}
      */
     HashMap<String, Object> property = new HashMap<>();
 
@@ -365,7 +366,7 @@ public class ViewBean {
     }
 
     /**
-     * 将指标数据转化为 json 字符
+     * Convert metric data to json string
      *
      * @return
      */
@@ -389,7 +390,7 @@ public class ViewBean {
     }
 
     /**
-     * 从 json 字符转化 View 指标数据
+     * Convert View metric data from json string
      *
      * @param jsonString
      */

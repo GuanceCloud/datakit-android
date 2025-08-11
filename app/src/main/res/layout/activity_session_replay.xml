@@ -10,19 +10,19 @@
         android:id="@+id/session_replay_dialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="对话框" />
+        android:text="Dialog" />
 
     <Button
         android:id="@+id/session_replay_origin_toast"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="原生 Toast (无法采集)" />
+        android:text="Native Toast (Cannot Capture)" />
 
     <Button
         android:id="@+id/session_replay_custom_toast"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="替代 Toast (可采集)" />
+        android:text="Alternative Toast (Can Capture)" />
 
 <!--    <androidx.cardview.widget.CardView-->
 <!--        android:layout_width="wrap_content"-->
@@ -59,27 +59,27 @@
 <!--        app:selectionRequired="false"-->
 <!--        app:singleSelection="false">-->
 
-<!--        &lt;!&ndash; 基础 Chip &ndash;&gt;-->
+<!--        &lt;!&ndash; Basic Chip &ndash;&gt;-->
 <!--        <com.google.android.material.chip.Chip-->
 <!--            style="@style/Widget.MaterialComponents.Chip.Entry"-->
 <!--            android:layout_width="wrap_content"-->
 <!--            android:layout_height="wrap_content"-->
-<!--            android:text="基础Chip" />-->
+<!--            android:text="Basic Chip" />-->
 
-<!--        &lt;!&ndash; 可选中 Chip &ndash;&gt;-->
+<!--        &lt;!&ndash; Selectable Chip &ndash;&gt;-->
 <!--        <com.google.android.material.chip.Chip-->
 <!--            style="@style/Widget.MaterialComponents.Chip.Filter"-->
 <!--            android:layout_width="wrap_content"-->
 <!--            android:layout_height="wrap_content"-->
-<!--            android:text="可选Chip"-->
+<!--            android:text="Selectable Chip"-->
 <!--            app:checkedIconVisible="true" />-->
 
-<!--        &lt;!&ndash; 带删除图标的 Chip &ndash;&gt;-->
+<!--        &lt;!&ndash; Chip with Delete Icon &ndash;&gt;-->
 <!--        <com.google.android.material.chip.Chip-->
 <!--            style="@style/Widget.MaterialComponents.Chip.Entry"-->
 <!--            android:layout_width="wrap_content"-->
 <!--            android:layout_height="wrap_content"-->
-<!--            android:text="可删除Chip"-->
+<!--            android:text="Deletable Chip"-->
 <!--            app:closeIconVisible="true" />-->
 <!--    </com.google.android.material.chip.ChipGroup>-->
 
@@ -93,23 +93,23 @@
             android:id="@+id/session_replay_text_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="这是一个文本" />
+            android:text="This is a text" />
 
         <EditText
             android:id="@+id/session_replay_edittext_et"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="这是一个编辑框" />
+            android:text="This is an edit text" />
 
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="这是个 Radio Button" />
+            android:text="This is a Radio Button" />
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="这是个 CheckBox" />
+            android:text="This is a CheckBox" />
 
         <androidx.appcompat.widget.AppCompatCheckedTextView
             android:id="@+id/session_replay_checked_text_view"
@@ -118,7 +118,7 @@
             android:checkMark="?android:attr/listChoiceIndicatorMultiple"
             android:gravity="center_vertical"
             android:padding="8dp"
-            android:text="这是 checkText" />
+            android:text="This is checkText" />
 
         <ImageView
             android:layout_width="wrap_content"

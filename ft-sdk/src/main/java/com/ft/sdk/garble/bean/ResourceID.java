@@ -3,7 +3,7 @@ package com.ft.sdk.garble.bean;
 import com.ft.sdk.garble.utils.Utils;
 
 /**
- * 作为请求过程中生成唯一的qi
+ * Used to generate a unique id during the request process
  */
 public class ResourceID {
     private final String uuid = Utils.randomUUID();

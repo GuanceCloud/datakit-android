@@ -5,8 +5,8 @@ import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
-import com.ft.sdk.sessionreplay.model.WireframeClip;
 import com.ft.sdk.sessionreplay.utils.Utils;
 
 public class ImageViewUtils {
@@ -34,7 +34,7 @@ public class ImageViewUtils {
     }
 
     @NonNull
-    public WireframeClip calculateClipping(
+    public Rect calculateClipping(
             @NonNull Rect parentRect,
             @NonNull Rect childRect,
             float density
@@ -44,18 +44,23 @@ public class ImageViewUtils {
         int right = childRect.right > parentRect.right ? childRect.right - parentRect.right : 0;
         int bottom = childRect.bottom > parentRect.bottom ? childRect.bottom - parentRect.bottom : 0;
 
-        return new WireframeClip(
-                (long) Utils.densityNormalized(left, density),
-                (long) Utils.densityNormalized(top, density),
-                (long) Utils.densityNormalized(right, density),
-                (long) Utils.densityNormalized(bottom, density)
+        return new Rect(
+                Utils.densityNormalized(left, density),
+                Utils.densityNormalized(top, density),
+                Utils.densityNormalized(right, density),
+                Utils.densityNormalized(bottom, density)
         );
+    }
+
+    public Rect resolveContentRectWithScaling(ImageView imageView, Drawable drawable) {
+        return resolveContentRectWithScaling(imageView, drawable, null);
     }
 
     @NonNull
     public Rect resolveContentRectWithScaling(
             @NonNull ImageView view,
-            @NonNull Drawable drawable
+            @NonNull Drawable drawable,
+            @Nullable ImageView.ScaleType customScaleType
     ) {
         int drawableWidthPx = drawable.getIntrinsicWidth();
         int drawableHeightPx = drawable.getIntrinsicHeight();
@@ -70,8 +75,8 @@ public class ImageViewUtils {
         );
 
         Rect resultRect;
-
-        switch (view.getScaleType()) {
+        ImageView.ScaleType scaleType = (customScaleType != null) ? customScaleType : view.getScaleType();
+        switch (scaleType) {
             case FIT_START:
                 Rect contentRectFitStart = scaleRectToFitParent(parentRect, childRect);
                 resultRect = positionRectAtStart(parentRect, contentRectFitStart);

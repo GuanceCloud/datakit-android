@@ -30,7 +30,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /***
- *  验证 {@link com.ft.sdk.FTSDKConfig#setOnlySupportMainProcess(boolean)} 的有效性
+ *   Verify {@link com.ft.sdk.FTSDKConfig#setOnlySupportMainProcess(boolean)} effectiveness
  */
 @RunWith(AndroidJUnit4.class)
 public class ProcessConfigTest extends BaseTest {
@@ -47,7 +47,7 @@ public class ProcessConfigTest extends BaseTest {
     }
 
     /**
-     * 验证 OnlyMainProcess 为 false，在子进程中 {@link  FTSdk#get()} 可以初始化
+     * Verify OnlyMainProcess is false, {@link  FTSdk#get()} can be initialized in the subprocess
      *
      * @throws InterruptedException
      */
@@ -65,7 +65,7 @@ public class ProcessConfigTest extends BaseTest {
     }
 
     /**
-     * 验证 OnlyMainProcess 为 true，在子进程中 {@link  FTSdk#get()} 不被初始化
+     * Verify OnlyMainProcess is true, {@link  FTSdk#get()} will not be initialized in the subprocess
      *
      * @throws InterruptedException
      */
@@ -84,7 +84,7 @@ public class ProcessConfigTest extends BaseTest {
     public void tearDown() {
         super.tearDown();
         CrossProcessSetting.clearProcessSetting(getContext());
-        //TestService.onDestroy 调用结束进程
+        //TestService.onDestroy calls to end the process
         getContext().stopService(new Intent(getContext(), TestService.class));
     }
 }

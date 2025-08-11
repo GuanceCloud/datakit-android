@@ -28,9 +28,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * 负责为测试在对应环境，生成完善体系的 RUM，Log 以及 Trace，方便检查移动端相关数据是否正常
+ * Responsible for generating a complete system of RUM, Log and Trace for testing in the corresponding environment, 
+ * convenient for checking whether mobile-related data is normal
  *
- * 配置 Jenkins 自动化配合使用
+ * Configure Jenkins automation for use
  *
  * @author Brandon
  */
@@ -48,7 +49,7 @@ public class TestCaseForGenerateData extends BaseTest {
         }
         FTSDKConfig ftSDKConfig = FTSDKConfig
                 .builder(BuildConfig.DATAKIT_URL)
-                .setDebug(true)//设置是否是 debug
+                .setDebug(true)//Set whether it is debug
                 .setEnv(EnvType.GRAY);
         FTSdk.install(ftSDKConfig);
 
@@ -71,7 +72,7 @@ public class TestCaseForGenerateData extends BaseTest {
     }
 
     /**
-     * 根据时序顺序生成
+     * Generate according to chronological order
      * action
      * long task
      * action
@@ -87,13 +88,13 @@ public class TestCaseForGenerateData extends BaseTest {
      * action
      * view
      *
-     * 等待传输完毕后关闭
+     * Wait for transmission to complete then close
      *
      * @throws InterruptedException
      */
     @Test
     public void generateData() throws InterruptedException {
-        Thread.sleep(5000);//等待 emulator 开启 网络链接
+        Thread.sleep(5000);//Wait for emulator to enable network connection
 
         onView(ViewMatchers.withId(R.id.main_mock_ui_block_btn)).perform(ViewActions.scrollTo()).perform(click());
 
@@ -120,7 +121,7 @@ public class TestCaseForGenerateData extends BaseTest {
 
         onView(ViewMatchers.withId(R.id.third_to_first_btn)).perform(click());
 
-        Thread.sleep(20000);//等待 后台同步数据
+        Thread.sleep(20000);//Wait for background data synchronization
     }
 
 

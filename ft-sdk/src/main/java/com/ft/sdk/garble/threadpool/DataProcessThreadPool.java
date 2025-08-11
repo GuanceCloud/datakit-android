@@ -1,18 +1,18 @@
 package com.ft.sdk.garble.threadpool;
 
 /**
- * 负责数据入数据库，根据 {@link #CPU_COUNT} 来确定线程池 core size。场景：{@link com.ft.sdk.SyncTaskManager} 同步，
- * 和{@link com.ft.sdk.FTExceptionHandler} native crash 文件加载写入
+ * Responsible for data entry into database, determines thread pool core size based on {@link #CPU_COUNT}. Scenarios: {@link com.ft.sdk.SyncTaskManager} synchronization,
+ * and {@link com.ft.sdk.FTExceptionHandler} native crash file loading and writing
  *
  * @author Brandon
  */
 public class DataProcessThreadPool extends BaseThreadPoolExecutor {
     /**
-     * 当前可用 CPU 数
+     * Current available CPU count
      */
     private final static int CPU_COUNT = Runtime.getRuntime().availableProcessors();
     /**
-     * Thread pool core size 与 CPU 核心数相同
+     * Thread pool core size is the same as CPU core count
      */
     private final static int CORE_POOL_SIZE = CPU_COUNT;
     private static DataProcessThreadPool threadPoolUtils;

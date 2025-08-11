@@ -14,21 +14,22 @@ import com.ft.sdk.garble.utils.StringUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 /**
- * ANR 错误监测，循环监测两个 Runner 执行相差时间是否超过 {@link #ANR_DETECT_DURATION_MS},超过则追加一条 ANR 错误信息
+ * ANR error monitoring, continuously monitors whether the execution time difference between two Runners exceeds 
+ * {@link #ANR_DETECT_DURATION_MS}, if exceeded, adds an ANR error message
  */
 public final class ANRDetectRunnable implements Runnable {
 
     private static final String TAG = Constants.LOG_TAG_PREFIX + "ANRDetectRunnable";
 
     /**
-     * 监测周期
+     * Monitoring cycle
      */
     public static final int ANR_DETECT_DURATION_MS = 5000;
 
     private final ExtraLogCatSetting extraLogCatSetting;
 
     /**
-     * 主线程消息 Handler
+     * Main thread message Handler
      */
     private final Handler handler = new Handler(Looper.getMainLooper());
 
@@ -62,7 +63,7 @@ public final class ANRDetectRunnable implements Runnable {
                                     extraLogCatSetting.getLogcatEventsLines());
                         }
 
-                        //如果超时间没有调用则，添加一条 Error 数据
+                        //If not called within timeout, add an Error data
                         FTRUMGlobalManager.get().addError(stackTrace, "android_anr", ErrorType.ANR_ERROR, AppState.RUN);
                         runnable.wait();
                     }
@@ -77,18 +78,18 @@ public final class ANRDetectRunnable implements Runnable {
     }
 
     /**
-     * 关闭 Runner
+     * Shutdown Runner
      */
     public void shutdown() {
         isClose = true;
     }
 
     /**
-     * 检查是否被调用的 Runner 对象
+     * Check if the Runner object is called
      */
     public static class CallbackRunnable implements Runnable {
         /**
-         * 是否被调用
+         * Whether it is called
          *
          * @return
          */
@@ -104,7 +105,7 @@ public final class ANRDetectRunnable implements Runnable {
         }
 
         /**
-         * 重置
+         * Reset
          */
         public void reset() {
             called = false;

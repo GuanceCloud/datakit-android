@@ -1,44 +1,41 @@
 package com.ft.sdk;
 
 /**
- * 错误检测类型，在 Error 传输类型中 {@link FTRUMInnerManager#addError} 在调用的时候自动添加
+ * Error detection type, automatically added when calling {@link FTRUMInnerManager#addError} in Error transmission type
  *
  * @author Brandon
  */
 public enum ErrorMonitorType {
 
-
     /**
-     * 所有类型 {@link #BATTERY,#MEMORY,#CPU }
+     * All types {@link #BATTERY,#MEMORY,#CPU }
      */
     ALL(0xFFFFFFFF),
     /**
-     * 当前电手机的电池量, TV 设备不支持{@link com.ft.sdk.garble.utils.Constants#KEY_BATTERY_USE}
+     * Current battery level of the phone, TV devices do not support {@link com.ft.sdk.garble.utils.Constants#KEY_BATTERY_USE}
      */
     BATTERY(1 << 1),
     /**
-     * 手机当前内存,{@link com.ft.sdk.garble.utils.Constants#KEY_MEMORY_USE}
+     * Current memory of the phone, {@link com.ft.sdk.garble.utils.Constants#KEY_MEMORY_USE}
      */
     MEMORY(1 << 2),
     /**
-     * 当前 CPU 负载,{@link com.ft.sdk.garble.utils.Constants#KEY_CPU_USE}
+     * Current CPU load, {@link com.ft.sdk.garble.utils.Constants#KEY_CPU_USE}
      */
     CPU(1 << 3);
 
     private final int value;
     /**
-     * 未设置状态,用于监控未设置判断 {@link  FTMonitorManager}
+     * Unset state, used for monitoring unset judgment {@link FTMonitorManager}
      */
     public static final int NO_SET = 0;
 
-
     ErrorMonitorType(int value) {
-
         this.value = value;
     }
 
     /**
-     * 检测错误数值
+     * Detect error value
      *
      * @return
      */

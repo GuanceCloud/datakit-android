@@ -211,7 +211,7 @@ public class SwitchCompatMapper extends CheckableWireframeMapper<SwitchCompat> {
         );
     }
 
-    // 内部方法
+    // Internal method
     private String resolveCheckableColor(SwitchCompat view) {
         return colorStringFormatter.formatColorAndAlphaAsHexString(view.getCurrentTextColor(), OPAQUE_ALPHA_VALUE);
     }

@@ -10,14 +10,14 @@ import com.ft.sdk.garble.bean.BatteryBean;
 /**
  * BY huangDianHua
  * DATE:2020-01-09 17:47
- * Description:参考开源项目 <a href="https://github.com/guxiaonian/MobileInfo">地址</a>
+ * Description: Refer to open source project <a href="https://github.com/guxiaonian/MobileInfo">address</a>
  */
 public class BatteryUtils {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "BatteryUtils";
-    static double batteryCapacity = 0; //电池的容量mAh
+    static double batteryCapacity = 0; // battery capacity mAh
 
     /**
-     * 获取当前电量使用百分比
+     * Get the current battery usage percentage
      *
      * @param context
      * @return
@@ -26,7 +26,7 @@ public class BatteryUtils {
         int capacity = 0;
         try {
             BatteryManager manager = (BatteryManager) context.getSystemService(Context.BATTERY_SERVICE);
-            int value = manager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);//当前电量剩余百分比
+            int value = manager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);// current battery remaining percentage
             capacity = (100 - value);
         } catch (Exception e) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
@@ -35,7 +35,7 @@ public class BatteryUtils {
     }
 
     /**
-     * 当前电流,单位 mA
+     * Current battery current, unit mA
      *
      * @param context
      * @return
@@ -52,7 +52,7 @@ public class BatteryUtils {
 
 
     /**
-     * 获取电池的容量,单位毫安时 , xxx mAh
+     * Get battery capacity, unit mAh
      *
      * @param context
      * @return
@@ -76,7 +76,7 @@ public class BatteryUtils {
     }
 
     /**
-     * 获得电池信息
+     * Get battery information
      *
      * @return
      */
@@ -112,7 +112,7 @@ public class BatteryUtils {
     }
 
     /**
-     * 获取电池的健康状态
+     * Get battery health status
      *
      * @param health
      * @return
@@ -146,7 +146,7 @@ public class BatteryUtils {
     }
 
     /**
-     * 获取电池的充电状态
+     * Get battery charging status
      *
      * @param status
      * @return
@@ -172,7 +172,7 @@ public class BatteryUtils {
     }
 
     /**
-     * 获取电池的充电方式
+     * Get battery charging method
      *
      * @param status
      * @return

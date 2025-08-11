@@ -26,7 +26,7 @@ import org.junit.runner.RunWith;
 import java.util.HashMap;
 
 /**
- * SDK 全局 globalContext 参数验证
+ * SDK globalContext parameter validation
  *
  * @author Brandon
  */
@@ -44,7 +44,7 @@ public class SDKGlobalContextTest extends FTBaseTest {
 
         FTSDKConfig ftSDKConfig = FTSDKConfig
                 .builder(TEST_FAKE_URL)
-                .setDebug(true)//设置是否是 debug
+                .setDebug(true)//Set whether it is debug
                 .addGlobalContext(CUSTOM_KEY, CUSTOM_VALUE)
                 .setEnv(EnvType.GRAY);
         FTSdk.install(ftSDKConfig);
@@ -63,7 +63,7 @@ public class SDKGlobalContextTest extends FTBaseTest {
     }
 
     /**
-     * SDK 全局 globalContext 在 RUM 数据中正确性验证
+     * Validate the correctness of SDK globalContext in RUM data
      *
      * @throws Exception
      */
@@ -79,7 +79,7 @@ public class SDKGlobalContextTest extends FTBaseTest {
     }
 
     /**
-     * SDK 全局 globalContext 在 log 数据中正确性验证
+     * Validate the correctness of SDK globalContext in log data
      *
      * @throws Exception
      */

@@ -14,7 +14,7 @@ import okhttp3.EventListener;
 import okhttp3.OkHttpClient;
 
 /**
- * Okhttp 测试对象单例管理
+ * OkHttp test object singleton management
  */
 public class OkHttpClientSingleton {
     private static OkHttpClient instance;
@@ -24,7 +24,7 @@ public class OkHttpClientSingleton {
 
     public static synchronized OkHttpClient getInstance() {
         if (instance == null) {
-            // connect time 10 秒
+            // connect time 10 seconds
             instance = new OkHttpClient.Builder()
                     .eventListener(new EventListener() {
                         @Override
@@ -40,7 +40,7 @@ public class OkHttpClientSingleton {
 
     public static synchronized OkHttpClient getInstanceBeforeSDKInit() {
         if (instance == null) {
-            // connect time 10 秒
+            // connect time 10 seconds
             instance = new OkHttpClient.Builder()
                     .addInterceptor(new FTResourceInterceptor())
                     .addInterceptor(new FTTraceInterceptor())

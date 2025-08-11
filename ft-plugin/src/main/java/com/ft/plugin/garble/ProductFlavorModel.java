@@ -3,28 +3,28 @@ package com.ft.plugin.garble;
 public class ProductFlavorModel {
 
     /**
-     * favor 名称
+     * favor name
      */
     private final String name;
     /**
-     * 是否自动上 map 文件
+     * Whether to automatically upload map file
      */
     private Boolean autoUploadMap;
     /**
-     * 是否上传 native debug symbol
+     * Whether to upload native debug symbol
      */
     private Boolean autoUploadNativeDebugSymbol;
 
     /**
-     * datakit 上传地址
+     * datakit upload address
      */
     private String datakitUrl;
     /**
-     * 工作空间 dataway token
+     * Workspace dataway token
      */
     private String datawayToken;
     /**
-     * 用户访问监测，应用 appid
+     * User access monitoring, application appid
      */
     private String appId;
 
@@ -34,12 +34,12 @@ public class ProductFlavorModel {
     private String zipPath;
 
     /**
-     * 是否只生成 sourcemap
+     * Whether to generate only sourcemap
      */
     private Boolean generateSourceMapOnly;
 
     /**
-     * 应用开发环境
+     * Application development environment
      */
     private String env;
 
@@ -106,8 +106,8 @@ public class ProductFlavorModel {
     }
 
     /**
-     * {@link FTExtension} 配置与 {@link ProductFlavorModel} 参数配置进行合并，{@link ProductFlavorModel}配置覆盖
-     * {@link FTExtension} 中的配置
+     * Merge {@link FTExtension} configuration with {@link ProductFlavorModel} parameter configuration, {@link ProductFlavorModel} configuration overrides
+     * the configuration in {@link FTExtension}
      *
      * @param extension
      */

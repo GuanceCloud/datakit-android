@@ -27,7 +27,7 @@ public class DetailFragment extends Fragment {
 
         Button btnBack = view.findViewById(R.id.btn_back);
         btnBack.setOnClickListener(v -> {
-            // 返回上一页
+            // Go back to previous page
             getParentFragmentManager().popBackStack();
         });
 

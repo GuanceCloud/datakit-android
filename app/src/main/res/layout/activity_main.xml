@@ -16,67 +16,67 @@
             android:id="@+id/main_mock_crash_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="模拟崩溃" />
+            android:text="Simulate Crash" />
 
         <Button
             android:id="@+id/main_mock_crash_native_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="模拟 native 崩溃" />
+            android:text="Simulate Native Crash" />
 
         <Button
             android:id="@+id/main_mock_ui_block_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="模拟卡顿" />
+            android:text="Simulate UI Block" />
 
         <Button
             android:id="@+id/main_mock_anr_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="模拟 Anr" />
+            android:text="Simulate ANR" />
 
         <Button
             android:id="@+id/main_mock_page_jump_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Web 测试" />
+            android:text="Web Test" />
 
         <Button
             android:id="@+id/main_mock_click_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="点击事件" />
+            android:text="Click Event" />
 
         <Button
             android:id="@+id/main_mock_log_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="日志" />
+            android:text="Log" />
 
         <Button
             android:id="@+id/main_mock_okhttp_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="测试 OkHttp 请求自动添加拦截器" />
+            android:text="Test OkHttp Request Auto Add Interceptor" />
 
         <Button
             android:id="@+id/main_mock_okhttp_custom_content_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="测试 OkHttp 自定义内容" />
+            android:text="Test OkHttp Custom Content" />
 
         <Button
             android:id="@+id/main_view_loop_test"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="页面跳转测试" />
+            android:text="Page Jump Test" />
 
         <Button
             android:id="@+id/main_manual_rum_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="自定义 RUM LOG" />
+            android:text="Custom RUM LOG" />
 
         <Button
             android:id="@+id/main_session_replay_btn"
@@ -100,25 +100,25 @@
             android:id="@+id/main_flush_sync_data_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="手动同步数据" />
+            android:text="Manual Sync Data" />
 
         <Button
             android:id="@+id/main_high_load_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="高负载场景" />
+            android:text="High Load Scenario" />
 
         <Button
             android:id="@+id/main_lazy_init"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="延迟初始化" />
+            android:text="Lazy Initialization" />
 
         <Button
             android:id="@+id/main_dynamic_tags"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="动态 tags 设置" />
+            android:text="Dynamic Tags Setting" />
 
         <Button
             android:id="@+id/main_colored_texts_btn"
@@ -130,19 +130,19 @@
             android:id="@+id/main_shut_down"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="关闭 SDK" />
+            android:text="Shutdown SDK" />
 
         <Button
             android:id="@+id/main_clear_data"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="清理缓存数据" />
+            android:text="Clear Cache Data" />
 
         <Button
             android:id="@+id/update_remote_config"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="立即拉取远程配置" />
+            android:text="Pull Remote Config Immediately" />
     </LinearLayout>
 
 

@@ -57,7 +57,7 @@ import kotlin.jvm.functions.Function1;
 /**
  * BY huangDianHua
  * DATE:2019-11-29 12:33
- * Description:插件入口
+ * Description: Plugin entry point
  */
 public class FTPlugin implements Plugin<Project> {
     @Override
@@ -65,7 +65,7 @@ public class FTPlugin implements Plugin<Project> {
         FTExtension extension = project.getExtensions().create("FTExt", FTExtension.class, project);
 
         project.afterEvaluate(p -> {
-            //传参数对象
+            //Pass parameter object
             Logger.setDebug(extension.showLog);
             Logger.debug("Plugin Version:" + BuildConfig.PLUGIN_VERSION +
                     ",ASM Version:" + extension.asmVersion);
@@ -84,7 +84,7 @@ public class FTPlugin implements Plugin<Project> {
                         new Function1<FTParameters, Unit>() {
                             @Override
                             public Unit invoke(FTParameters parameters) {
-                                // 现在 extension 已经是用户配置过的内容
+                                // Now extension is already user-configured content
                                 parameters.getIgnorePackages().set(extension.ignorePackages);
                                 parameters.getAsmVersion().set(extension.asmVersion);
                                 return Unit.INSTANCE;
