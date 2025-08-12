@@ -33,9 +33,10 @@ public class ManualRUMActivity extends NameTitleActivity {
         findViewById(R.id.manual_start_action_btn).setOnClickListener(v -> {
             HashMap<String, Object> property = new HashMap<>();
             property.put("sp_count", 1);
-            //Enable automatic acquisition, which will conflict with custom actions here, and actions with intervals less than 100ms will be blocked. If calling frequently, please use addAction
+            //Enable automatic acquisition, which will conflict with custom actions here,
+            // and actions with intervals less than 100ms will be blocked. If calling frequently, please use addAction
              FTRUMGlobalManager.get().startAction("Action Start", "Button_Click", property);
-            for (int i = 0; i < 1000; i++) {
+            for (int i = 0; i < 10; i++) {
                 FTRUMGlobalManager.get().addAction("Add Action Start:" + (count++), "Button_Click", property);
             }
 

@@ -76,7 +76,7 @@ class LifeCircleTraceCallback {
             if (mInited) {
                 //hot start
                 startTimeNanoTime = Utils.getCurrentNanoTime();
-                startClockTimeNano= SystemClock.elapsedRealtimeNanos();
+                startClockTimeNano = SystemClock.elapsedRealtimeNanos();
             }
         }
 
@@ -94,7 +94,7 @@ class LifeCircleTraceCallback {
 //            FTAutoTrack.startApp();
             // warn start
             startTimeNanoTime = Utils.getCurrentNanoTime();
-            startClockTimeNano= SystemClock.elapsedRealtimeNanos();
+            startClockTimeNano = SystemClock.elapsedRealtimeNanos();
         }
     }
 
@@ -108,13 +108,22 @@ class LifeCircleTraceCallback {
         FTRUMConfig config = manager.getConfig();
 
         if (manager.isRumEnable()) {
-            //config nonnull here ignore warning
             if (config.isEnableTraceUserView()) {
                 Long startTime = mCreateMap.get(context);
                 if (startTime != null) {
                     long durationNS = SystemClock.elapsedRealtimeNanos() - startTime;
                     String viewName = AopUtils.getClassName(context);
-                    FTRUMInnerManager.get().onCreateView(viewName, durationNS);
+                    FTViewActivityTrackingHandler handler = config.getViewActivityTrackingHandler();
+                    if (handler != null) {
+                        HandlerView handlerView = config.getViewActivityTrackingHandler()
+                                .resolveHandlerView((Activity) context);
+                        if (handlerView != null) {
+                            FTRUMInnerManager.get().onCreateView(handlerView.getViewName(), durationNS);
+                        }
+                    } else {
+                        FTRUMInnerManager.get().onCreateView(viewName, durationNS);
+                    }
+
                 }
             }
         }
@@ -140,7 +149,6 @@ class LifeCircleTraceCallback {
         if (!mInited) {
             FTActivityManager.get().setAppState(AppState.RUN);
             FTAppStartCounter.get().coldStart(Utils.getCurrentNanoTime());
-            //config nonnull here ignore warning
             if (manager.isRumEnable() && config.isEnableTraceUserAction()) {
                 // If SDK is not initialized, this data will be supplemented 
                 // after SDK delayed initialization
@@ -151,7 +159,7 @@ class LifeCircleTraceCallback {
         // Already sleeping
         if (alreadySleep) {
             if (mInited) {
-                if (config != null && config.isRumEnable() && config.isEnableTraceUserAction()) {
+                if (config.isRumEnable() && config.isEnableTraceUserAction()) {
                     if (startTimeNanoTime > 0) {
                         long now = SystemClock.elapsedRealtimeNanos();
                         FTAppStartCounter.get().hotStart(now - startClockTimeNano,

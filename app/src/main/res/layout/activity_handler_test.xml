@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".HandlerTestActivity">
+
+    <!-- Title -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Handler Test Activity"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Test Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="16dp">
+
+        <Button
+            android:id="@+id/test_action_handler_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Test Action Tracking Handler"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/test_view_handler_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Test View Activity Tracking Handler"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/test_fragment_handler_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Test Fragment Tracking Handler (Navigate)"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/clear_log_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Clear Log"
+            android:layout_marginBottom="8dp" />
+
+    </LinearLayout>
+
+    <!-- Fragment Container -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Test Fragment Container:"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="@android:color/holo_blue_light"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="Fragment will be loaded here"
+            android:textColor="@android:color/white" />
+
+    </FrameLayout>
+
+    <!-- Log Display -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Test Log:"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@android:color/black">
+
+        <TextView
+            android:id="@+id/log_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:textColor="#00BCD4"
+            android:textSize="12sp"
+            android:fontFamily="monospace"
+            android:text="Handler test log will appear here...\n" />
+
+    </ScrollView>
+
+</LinearLayout> 

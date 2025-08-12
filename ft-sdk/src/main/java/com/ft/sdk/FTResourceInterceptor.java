@@ -112,7 +112,7 @@ public class FTResourceInterceptor implements Interceptor {
         String url = request.url().toString();
 
         FTRUMConfig rumConfig = FTRUMConfigManager.get().getConfig();
-        boolean isInTakeUrl = rumConfig == null || rumConfig
+        boolean isInTakeUrl = rumConfig.isRumEnable() && rumConfig
                 .getResourceUrlHandler().isInTakeUrl(url);
 
         final HashMap<String, Object> extraData = (handlerHelper != null) ? new HashMap<>() : null;

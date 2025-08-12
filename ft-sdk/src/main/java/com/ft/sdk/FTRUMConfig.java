@@ -1,11 +1,12 @@
 package com.ft.sdk;
 
+import android.app.Activity;
+
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.utils.Constants;
 
 import java.util.HashMap;
-import java.util.List;
 
 public class FTRUMConfig {
     /**
@@ -86,6 +87,12 @@ public class FTRUMConfig {
         }
     };
 
+    private FTViewFragmentTrackingHandler viewFragmentTrackingHandler;
+
+    private FTViewActivityTrackingHandler viewActivityTrackingHandler;
+
+    private FTActionTrackingHandler actionTrackingHandler;
+
     /**
      *
      */
@@ -134,6 +141,7 @@ public class FTRUMConfig {
 
     /**
      * Configure whether to enable WebView data collection via Android SDK
+     *
      * @param enableTraceWebView
      * @return
      */
@@ -144,6 +152,7 @@ public class FTRUMConfig {
 
     /**
      * Configure allowed WebView host addresses for data tracking
+     *
      * @param allowWebViewHost
      * @return
      */
@@ -170,7 +179,7 @@ public class FTRUMConfig {
     }
 
     /**
-     * Set sampling rate, range [0,1], 0 means no collection, 1 means full collection, default is 1. 
+     * Set sampling rate, range [0,1], 0 means no collection, 1 means full collection, default is 1.
      * Scope is all View, Action, LongTask, Error data under the same session_id
      *
      * @param samplingRate
@@ -419,9 +428,13 @@ public class FTRUMConfig {
     }
 
     /**
-     * Whether to collect the IP address of the request target domain name. Scope: only affects the default collection when `EnableTraceUserResource` is true.
-     * For custom Resource collection, you need to use `FTResourceEventListener.FTFactory(true)` to enable this function.
-     * In addition, a single Okhttp has an IP cache mechanism for the same domain name. Under the premise that the connection to the server IP does not change, only one will be generated for the same `OkhttpClient`.
+     * Whether to collect the IP address of the request target domain name.
+     * Scope: only affects the default collection when `EnableTraceUserResource` is true.
+     * For custom Resource collection, you need to use `FTResourceEventListener.FTFactory(true)`
+     * to enable this function.
+     * In addition, a single Okhttp has an IP cache mechanism for the same domain name.
+     * Under the premise that the connection to the server IP does not change, only one will be
+     * generated for the same `OkhttpClient`.
      *
      * @param enableTraceUserResource
      * @return
@@ -459,6 +472,12 @@ public class FTRUMConfig {
         return rumAppId != null;
     }
 
+    /***
+     * Add global parameters in RUM
+     * @param key
+     * @param value
+     * @return
+     */
     public FTRUMConfig addGlobalContext(@NonNull String key, @NonNull String value) {
         this.globalContext.put(key, value);
         return this;
@@ -542,6 +561,138 @@ public class FTRUMConfig {
 
     public FTResourceInterceptor.ContentHandlerHelper getOkHttpResourceContentHandler() {
         return contentHandlerHelper;
+    }
+
+    /**
+     * Get the Fragment view tracking handler
+     * 
+     * @return The current Fragment view tracking handler, or null if not set
+     * @see FTViewFragmentTrackingHandler
+     */
+    public FTViewFragmentTrackingHandler getViewFragmentTrackingHandler() {
+        return viewFragmentTrackingHandler;
+    }
+    /**
+     * Set the Fragment view tracking handler
+     * 
+     * This handler allows you to customize how Fragment views are tracked in RUM data.
+     * When a Fragment lifecycle event occurs, this handler will be called to determine
+     * the custom view name and properties for the Fragment.
+     * 
+     * <p>Usage example:</p>
+     * <pre>{@code
+     * .setViewFragmentTrackingHandler(new FTViewFragmentTrackingHandler() {
+     *     @Override
+     *     public HandlerView resolveHandlerView(FragmentWrapper fragment) {
+     *         String fragmentName = fragment.getSimpleClassName();
+     *         if (fragmentName.equals("HomeFragment")) {
+     *             HashMap<String, Object> properties = new HashMap<>();
+     *             properties.put("fragment_type", "home");
+     *             return new HandlerView("Custom_Home_View", properties);
+     *         }
+     *         return null; // Skip tracking for other fragments
+     *     }
+     * })
+     * }</pre>
+     * 
+     * @param viewFragmentTrackingHandler The Fragment view tracking handler to set
+     * @return This FTRUMConfig instance for method chaining
+     * @see FTViewFragmentTrackingHandler
+     * @see HandlerView
+     * @see FragmentWrapper
+     */
+    public FTRUMConfig setViewFragmentTrackingHandler(FTViewFragmentTrackingHandler viewFragmentTrackingHandler) {
+        this.viewFragmentTrackingHandler = viewFragmentTrackingHandler;
+        return this;
+    }
+
+    /**
+     * Get the Activity view tracking handler
+     * 
+     * @return The current Activity view tracking handler, or null if not set
+     * @see FTViewActivityTrackingHandler
+     */
+    public FTViewActivityTrackingHandler getViewActivityTrackingHandler() {
+        return viewActivityTrackingHandler;
+    }
+
+    /**
+     * Set the Activity view tracking handler
+     * 
+     * This handler allows you to customize how Activity views are tracked in RUM data.
+     * When an Activity lifecycle event occurs, this handler will be called to determine
+     * the custom view name and properties for the Activity.
+     * 
+     * <p>Usage example:</p>
+     * <pre>{@code
+     * .setViewActivityTrackingHandler(new FTViewActivityTrackingHandler() {
+     *     @Override
+     *     public HandlerView resolveHandlerView(Activity activity) {
+     *         String activityName = activity.getClass().getSimpleName();
+     *         if (activityName.startsWith("Main")) {
+     *             HashMap<String, Object> properties = new HashMap<>();
+     *             properties.put("activity_type", "main");
+     *             return new HandlerView("Custom_Main_Activity", properties);
+     *         }
+     *         return null; // Skip tracking for other activities
+     *     }
+     * })
+     * }</pre>
+     * 
+     * @param viewActivityTrackingHandler The Activity view tracking handler to set
+     * @return This FTRUMConfig instance for method chaining
+     * @see FTViewActivityTrackingHandler
+     * @see HandlerView
+     * @see Activity
+     */
+    public FTRUMConfig setViewActivityTrackingHandler(FTViewActivityTrackingHandler viewActivityTrackingHandler) {
+        this.viewActivityTrackingHandler = viewActivityTrackingHandler;
+        return this;
+    }
+
+    /**
+     * Get the Action tracking handler
+     * 
+     * @return The current Action tracking handler, or null if not set
+     * @see FTActionTrackingHandler
+     */
+    public FTActionTrackingHandler getActionTrackingHandler() {
+        return actionTrackingHandler;
+    }
+
+    /**
+     * Set the Action tracking handler
+     * 
+     * This handler allows you to customize how user actions are tracked in RUM data.
+     * When a user action occurs (click, touch, etc.), this handler will be called to determine
+     * the custom action name and properties for the action.
+     * 
+     * <p>Usage example:</p>
+     * <pre>{@code
+     * .setActionTrackingHandler(new FTActionTrackingHandler() {
+     *     @Override
+     *     public HandlerAction resolveHandlerAction(ActionEventWrapper actionEventWrapper) {
+     *         ActionSourceType actionType = actionEventWrapper.getSourceType();
+     *         if (actionType == ActionSourceType.CLICK_VIEW) {
+     *             HashMap<String, Object> properties = new HashMap<>();
+     *             properties.put("action_type", "button_click");
+     *             return new HandlerAction("Custom_Button_Click", properties);
+     *         }
+     *         return null; // Skip tracking for other actions
+     *     }
+     * })
+     * }</pre>
+     * 
+     * @param actionTrackingHandler The Action tracking handler to set
+     * @return This FTRUMConfig instance for method chaining
+     * @see FTActionTrackingHandler
+     * @see HandlerAction
+     * @see ActionEventWrapper
+     * @see ActionSourceType
+     */
+    public FTRUMConfig setActionTrackingHandler(FTActionTrackingHandler actionTrackingHandler) {
+        this.actionTrackingHandler = actionTrackingHandler;
+        return this;
     }
 
     /**

@@ -29,12 +29,12 @@ public class FTRUMGlobalManager {
     }
 
     /**
-     * Add Action
+     * Add Action，this type of data cannot be associated with Error, Resource, LongTask data
      *
      * @param actionName action name
      * @param actionType action type
-     * @param duration    nanosecond, duration
-     * @param property  extended attributes
+     * @param duration   nanosecond, duration
+     * @param property   extended attributes
      */
     public void addAction(String actionName, String actionType, long duration, HashMap<String, Object> property) {
         if (innerManager != null) {
@@ -59,7 +59,7 @@ public class FTRUMGlobalManager {
      *
      * @param actionName action name
      * @param actionType action type
-     * @param property  extended attributes
+     * @param property   extended attributes
      */
     public void addAction(String actionName, String actionType, HashMap<String, Object> property) {
         if (innerManager != null) {
@@ -72,7 +72,7 @@ public class FTRUMGlobalManager {
      *
      * @param actionName action name
      * @param actionType action type
-     * @param duration    nanosecond, duration
+     * @param duration   nanosecond, duration
      */
     public void addAction(String actionName, String actionType, long duration) {
         if (innerManager != null) {
@@ -82,6 +82,12 @@ public class FTRUMGlobalManager {
 
     /**
      * Add action
+     * <p>
+     * The startAction method includes a duration calculation mechanism and attempts
+     * to associate data with nearby Resource, LongTask, and Error events during that period.
+     * It has a 100 ms frequency protection mechanism and is recommended for user interaction-type events.
+     * If you need to call actions frequently, please use addAction instead. This method does not conflict
+     * with startAction and does not associate with the current Resource, LongTask, or Error events.
      *
      * @param actionName action name
      * @param actionType action type
@@ -97,7 +103,7 @@ public class FTRUMGlobalManager {
      *
      * @param actionName action name
      * @param actionType action type
-     * @param property    additional attribute parameters
+     * @param property   additional attribute parameters
      */
     public void startAction(String actionName, String actionType, HashMap<String, Object> property) {
         if (innerManager != null) {
@@ -122,7 +128,7 @@ public class FTRUMGlobalManager {
      * resource start
      *
      * @param resourceId resource Id
-     * @param property    additional attribute parameters
+     * @param property   additional attribute parameters
      */
     public void startResource(String resourceId, HashMap<String, Object> property) {
         if (innerManager != null) {
@@ -145,7 +151,7 @@ public class FTRUMGlobalManager {
 
     /**
      * @param resourceId resource Id
-     * @param property    additional attribute parameters
+     * @param property   additional attribute parameters
      */
     public void stopResource(final String resourceId, HashMap<String, Object> property) {
         if (innerManager != null) {
@@ -158,7 +164,7 @@ public class FTRUMGlobalManager {
      * Create view
      *
      * @param viewName view name
-     * @param loadTime load time, unit milliseconds ms
+     * @param loadTime load time, nanosecond
      */
     public void onCreateView(String viewName, long loadTime) {
         if (innerManager != null) {
@@ -166,6 +172,15 @@ public class FTRUMGlobalManager {
         }
     }
 
+    /**
+     *  update the loading_time of view, unit nanosecond
+     * @param duration
+     */
+    public void updateLoadTime(long duration) {
+        if (innerManager != null) {
+            innerManager.updateLoadTime(duration);
+        }
+    }
 
     /**
      * view start
@@ -182,7 +197,7 @@ public class FTRUMGlobalManager {
      * view start
      *
      * @param viewName current page name
-     * @param property  additional attribute parameters
+     * @param property additional attribute parameters
      */
     public void startView(String viewName, HashMap<String, Object> property) {
         if (innerManager != null) {
@@ -203,7 +218,7 @@ public class FTRUMGlobalManager {
     /**
      * view end
      *
-     * @param property  additional attribute parameters
+     * @param property additional attribute parameters
      */
     public void stopView(HashMap<String, Object> property) {
         if (innerManager != null) {
@@ -360,9 +375,9 @@ public class FTRUMGlobalManager {
     /**
      * Add long task
      *
-     * @param log       log
-     * @param duration  duration, nanosecond
-     * @param property  additional attribute parameters
+     * @param log      log
+     * @param duration duration, nanosecond
+     * @param property additional attribute parameters
      */
     public void addLongTask(String log, long duration, HashMap<String, Object> property) {
         if (innerManager != null) {
@@ -374,8 +389,8 @@ public class FTRUMGlobalManager {
     /**
      * Add long task
      *
-     * @param log       log
-     * @param duration  duration, nanosecond
+     * @param log      log
+     * @param duration duration, nanosecond
      */
     public void addLongTask(String log, long duration) {
         if (innerManager != null) {

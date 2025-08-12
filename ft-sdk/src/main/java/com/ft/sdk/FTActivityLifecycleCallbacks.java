@@ -110,9 +110,17 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
 
         //page open data insertion
         FTRUMConfigManager manager = FTRUMConfigManager.get();
-        //config nonnull here ignore warning
         if (manager.isRumEnable() && manager.getConfig().isEnableTraceUserView()) {
-            FTRUMGlobalManager.get().startView(activity.getClass().getSimpleName());
+            FTViewActivityTrackingHandler handler = manager.getConfig().getViewActivityTrackingHandler();
+            if (handler != null) {
+                HandlerView view = handler.resolveHandlerView(activity);
+                if (view != null) {
+                    FTRUMInnerManager.get().startView(view.getViewName(), view.getProperty());
+                }
+            } else {
+                FTRUMInnerManager.get().startView(activity.getClass().getSimpleName());
+            }
+
         }
 
         if (manager.isRumEnable() && manager.getConfig().isEnableTraceUserAction()) {
@@ -148,7 +156,15 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
         //page close data insertion
         FTRUMConfigManager manager = FTRUMConfigManager.get();
         if (manager.isRumEnable() && manager.getConfig().isEnableTraceUserView()) {
-            FTRUMInnerManager.get().stopView();
+            FTViewActivityTrackingHandler handler = manager.getConfig().getViewActivityTrackingHandler();
+            if (handler != null) {
+                HandlerView view = handler.resolveHandlerView(activity);
+                if (view != null) {
+                    FTRUMInnerManager.get().stopView();
+                }
+            } else {
+                FTRUMInnerManager.get().stopView();
+            }
         }
 
         if (manager.isRumEnable() && manager.getConfig().isEnableTraceUserAction()) {

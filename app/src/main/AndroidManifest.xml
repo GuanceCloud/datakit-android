@@ -40,6 +40,10 @@
         <activity android:name=".IgnoreClassActivity" />
         <activity android:name=".SRPrivacyOverrideActivity" />
         <activity android:name=".FragmentActivity" />
+        <activity android:name=".ClickTestActivity" />
+        <activity android:name=".HandlerTestActivity" />
+        <activity android:name=".ActivityTrackingTestActivity" />
+        <activity android:name=".FragmentTrackingTestActivity" />
 
         <service
             android:name=".service.TestService"

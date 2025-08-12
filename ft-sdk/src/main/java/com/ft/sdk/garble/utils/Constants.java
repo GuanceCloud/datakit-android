@@ -3,9 +3,6 @@ package com.ft.sdk.garble.utils;
 import android.os.Build;
 
 import com.ft.sdk.garble.bean.ErrorType;
-import com.ft.sdk.garble.bean.OP;
-
-import java.util.HashMap;
 
 /**
  * BY huangDianHua
@@ -721,16 +718,5 @@ public class Constants {
      * Hot start, action_name
      */
     public static final String ACTION_NAME_LAUNCH_HOT = "app hot start";
-
-
-    /**
-     * OP EVENT data comparison
-     */
-    public final static HashMap<OP, String> OP_EVENT_MAPS = new HashMap<>();
-
-    static {
-        OP_EVENT_MAPS.put(OP.CLK, Constants.EVENT_NAME_CLICK);
-    }
-
 
 }

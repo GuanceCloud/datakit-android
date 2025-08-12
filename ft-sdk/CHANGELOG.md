@@ -1,3 +1,7 @@
+# agent 1.7.0-alpha21
+1. Merge ft-sdk 1.6.13
+
+---
 # agent 1.7.0-alpha20
 1. Merge ft-sdk 1.6.12
 
@@ -74,10 +78,56 @@
 1. Support for enabling session replay recording feature
 
 ---
+# agent 1.6.13
+1. Added `FTRUMConfig.setActionTrackingHandler` to support custom user action tracking.
+   This handler allows developers to customize how user actions (clicks, touches, etc.) are tracked in RUM data.
+   Developers can modify action names, add custom properties, or skip tracking for specific actions.
+2. Added `FTRUMConfig.setViewActivityTrackingHandler` to support custom Activity view tracking.
+   This handler allows developers to customize how Activity views are tracked in RUM data.
+   Developers can modify view names, add custom properties, or skip tracking for specific Activities.
+3. Added `FTRUMConfig.setViewFragmentTrackingHandler` to support custom Fragment view tracking.
+   This handler allows developers to customize how Fragment views are tracked in RUM data.
+   Developers can modify view names, add custom properties, or skip tracking for specific Fragments.
+4. Fixed the issue where `FTRUMGlobalManager.addAction` was missing bindUserData binding related
+   information, such as userid.
+5. Added `load_time` data metrics for Fragment views.
+6. Added `FTRUMGlobalManager.updateTime` for customizing the current view's loading time.
+7. Improve compatibility with OkHttp 3.12.x versions.
+8. The tags added by appendRUMGlobalContext can be updated during the session.
+
+---
+# agent 1.6.13-beta02
+1. The tags added by appendRUMGlobalContext can be updated during the session.
+
+---
+# agent 1.6.13-beta01
+1. Same as agent 1.6.13-alpha01.
+
+---
+# agent 1.6.13-alpha01
+1. Added `FTRUMConfig.setActionTrackingHandler` to support custom user action tracking.
+   This handler allows developers to customize how user actions (clicks, touches, etc.) are tracked in RUM data.
+   Developers can modify action names, add custom properties, or skip tracking for specific actions.
+2. Added `FTRUMConfig.setViewActivityTrackingHandler` to support custom Activity view tracking.
+   This handler allows developers to customize how Activity views are tracked in RUM data.
+   Developers can modify view names, add custom properties, or skip tracking for specific Activities.
+3. Added `FTRUMConfig.setViewFragmentTrackingHandler` to support custom Fragment view tracking.
+   This handler allows developers to customize how Fragment views are tracked in RUM data.
+   Developers can modify view names, add custom properties, or skip tracking for specific Fragments.
+4. Fixed the issue where `FTRUMGlobalManager.addAction` was missing bindUserData binding related
+   information, such as userid.
+5. Added `load_time` data metrics for Fragment views.
+6. Added `FTRUMGlobalManager.updateTime` for customizing the current view's loading time.
+7. Improve compatibility with OkHttp 3.12.x versions.
+
+---
 # agent 1.6.12
-1. Added `FTRUMConfig.setEnableTraceWebView` to configure whether to enable WebView data collection via Android SDK. Use `FTRUMConfig.setAllowWebViewHost` to filter host addresses.
+1. Added `FTRUMConfig.setEnableTraceWebView` to configure whether to enable WebView data collection via Android SDK. 
+   Use `FTRUMConfig.setAllowWebViewHost` to filter host addresses.
 2. Added `ContentHandlerHelperEx.onExceptionWithFilter` to filter local network errors.
-3. Added `FTSDKConfig.setRemoteConfiguration` to support enabling remote conditional configuration. Added `FTSDKConfig.setRemoteConfigMiniUpdateInterval` to set the minimum update interval after enabling remote control.
+3. Added `FTSDKConfig.setRemoteConfiguration` to support enabling remote conditional configuration.
+   Added `FTSDKConfig.setRemoteConfigMiniUpdateInterval` to set the minimum update interval 
+   after enabling remote control.
 
 ---
 # agent 1.6.12-beta01
@@ -85,18 +135,22 @@
 
 ---
 # agent 1.6.12-alpha02
-1. Added `FTSDKConfig.setRemoteConfiguration` to support enabling remote conditional configuration. Added `FTSDKConfig.setRemoteConfigMiniUpdateInterval` to set the minimum update interval after enabling remote control.
+1. Added `FTSDKConfig.setRemoteConfiguration` to support enabling remote conditional configuration. 
+   Added `FTSDKConfig.setRemoteConfigMiniUpdateInterval` to set the minimum update interval after enabling remote control.
 
 ---
 # agent 1.6.12-alpha01
-1. Added `FTRUMConfig.setEnableTraceWebView` to configure whether to enable WebView data collection via Android SDK. Use `FTRUMConfig.setAllowWebViewHost` to filter host addresses.
+1. Added `FTRUMConfig.setEnableTraceWebView` to configure whether to enable WebView data collection via Android SDK. 
+   Use `FTRUMConfig.setAllowWebViewHost` to filter host addresses.
 2. Added `ContentHandlerHelperEx.onExceptionWithFilter` to filter local network errors.
 
 ---
 # agent 1.6.11
 1. Added `FTRUMConfig.setEnableTraceUserViewInFragment` to support fragment view data collection, default is false.
-2. Added `FTSDKConfig.setLineDataModifier` and `FTSDKConfig.setDataModifier` to support data write replacement and data desensitization.
-3. Added `FTRUMConfig.setSessionErrorSampleRate` to support error sampling. When not sampled by `setSamplingRate`, errors can sample RUM data from the previous minute.
+2. Added `FTSDKConfig.setLineDataModifier` and `FTSDKConfig.setDataModifier` to support data write replacement 
+   and data desensitization.
+3. Added `FTRUMConfig.setSessionErrorSampleRate` to support error sampling. 
+   When not sampled by `setSamplingRate`, errors can sample RUM data from the previous minute.
 4. When `FTSDKConfig.setEnableAccessAndroidID(false)` is set, a local random `uuid` is used as `device_uuid`.
 5. Optimized high-frequency log writing, data synchronization, and idle data closing logic.
 
@@ -104,7 +158,8 @@
 
 # agent 1.6.11-beta02
 1. Fixed the issue where data sampled by `FTRUMConfig.setSessionErrorSampleRate` was not reported.
-2. Fixed the issue where, after hitting the `FTRUMConfig.setSessionErrorSampleRate` sample, the page with errors had `view_error_count` as 0.
+2. Fixed the issue where, after hitting the `FTRUMConfig.setSessionErrorSampleRate` sample, 
+   the page with errors had `view_error_count` as 0.
 
 ---
 # agent 1.6.11-beta01
@@ -118,21 +173,26 @@
 
 ---
 # agent 1.6.11-alpha02
-1. Added `FTRUMConfig.setSessionErrorSampleRate` to support error sampling. When an error occurs, RUM data from the previous minute can be sampled and collected.
+1. Added `FTRUMConfig.setSessionErrorSampleRate` to support error sampling. When an error occurs, 
+   RUM data from the previous minute can be sampled and collected.
 
 ---
 # agent 1.6.11-alpha01
 1. Optimized high-frequency log writing performance.
 2. Added `FTRUMConfig.setEnableTraceUserViewInFragment` to support fragment view data collection, default is false.
-3. Added `FTSDKConfig.setLineDataModifier` and `FTSDKConfig.setDataModifier` to support data write replacement, suitable for data desensitization.
+3. Added `FTSDKConfig.setLineDataModifier` and `FTSDKConfig.setDataModifier` to support data write replacement, 
+   suitable for data desensitization.
 
 ---
 # agent 1.6.10
-1. Supported adding a unique ResourceID to okhttp requests to solve the problem of trace_id and span_id misalignment in high-concurrency identical requests. ft-plugin 1.3.5 and above support automatic ResourceID addition.
+1. Supported adding a unique ResourceID to okhttp requests to solve the problem of trace_id 
+   and span_id misalignment in high-concurrency identical requests. ft-plugin 1.3.5 
+   and above support automatic ResourceID addition.
 2. Fixed the issue of circular calls with other crash collection SDKs when initializing RUM configuration multiple times.
 3. When jumping from a native page to a WebView page, the native page name is used to fill in view_referrer.
 4. Fixed the issue where network request IOException rethrows altered the original type.
-5. FTSDKConfig added `setProxy`, `setProxyAuthenticator`, and `setDns` for configuring Proxy, ProxyAuthenticator, and Dns for OkHttp data sync requests.
+5. FTSDKConfig added `setProxy`, `setProxyAuthenticator`, and `setDns` for configuring Proxy, 
+   ProxyAuthenticator, and Dns for OkHttp data sync requests.
 6. OkHttp data sync requests support round-robin connection for known hostName DNS IPs.
 
 ---
@@ -141,7 +201,9 @@
 
 ---
 # agent 1.6.10-alpha03
-1. Supported adding a unique ResourceID to okhttp requests to solve the problem of trace_id and span_id misalignment in high-concurrency identical requests. ft-plugin 1.3.5 and above support automatic ResourceID addition.
+1. Supported adding a unique ResourceID to okhttp requests to solve the problem of trace_id 
+  and span_id misalignment in high-concurrency identical requests. ft-plugin 1.3.5 
+  and above support automatic ResourceID addition.
 2. Fixed the issue of circular calls with other crash collection SDKs when initializing RUM configuration multiple times.
 3. When jumping from a native page to a WebView page, the native page is used to fill in view_referrer in WebView data.
 4. Underlying network request library supports multiform.
@@ -158,7 +220,9 @@
 ---
 # agent 1.6.9
 1. Modified the isAppForeground judgment mechanism to adapt to privacy-sensitive information detection.
-2. Added new `resource` data fields: `resource_first_byte_time`, `resource_dns_time`, `resource_download_time`, `resource_connect_time`, `resource_ssl_time`, supporting enhanced display of Resource timing in Guanceyun and alignment with the APM flame graph timeline.
+2. Added new `resource` data fields: `resource_first_byte_time`, `resource_dns_time`, `resource_download_time`,
+  `resource_connect_time`, `resource_ssl_time`, supporting enhanced display of Resource timing in Guanceyun 
+   and alignment with the APM flame graph timeline.
 3. Optimized sync retry mechanism, removed the option to directly discard data with `FTSDKConfig.setDataSyncRetryCount(0)`.
 4. FTSDKConfig.enableDataIntegerCompatible is enabled by default to be compatible with web numeric floating-point data.
 5. Fixed the issue of duplicate crash data when initializing RUM configuration multiple times.
@@ -182,11 +246,14 @@
 ---
 # agent 1.6.9-beta01
 1. Adjusted the calling rules of Utils.isAppForeground() before SDK initialization.
-2. Added resource data fields: resource_first_byte_time, resource_dns_time, resource_download_time, resource_connect_time, resource_ssl_time for optimized display in Guanceyun and support for APM flame graph time alignment.
+2. Added resource data fields: resource_first_byte_time, resource_dns_time, resource_download_time, 
+   resource_connect_time, resource_ssl_time for optimized display in Guanceyun 
+   and support for APM flame graph time alignment.
 
 ---
 # agent 1.6.9-alpha01
-1. Optimized sync retry mechanism, removed the option to directly discard data with `FTSDKConfig.setDataSyncRetryCount(0)`.
+1. Optimized sync retry mechanism, removed the option to directly discard data 
+   with `FTSDKConfig.setDataSyncRetryCount(0)`.
 
 ---
 # agent 1.6.8
@@ -212,10 +279,14 @@
 ---
 # agent 1.6.7
 1. Supported custom FTTraceInterceptor.HeaderHandler and associating with RUM data.
-2. Supported changing the content written by ASM for FTTraceInterceptor.HeaderHandler via FTRUMConfig.setOkHttpTraceHeaderHandler, and for FTResourceInterceptor.ContentHandlerHelper via FTRUMConfig.setOkHttpResourceContentHandler.
-3. Optimized crash collection capability, adapted to scenarios where system.exit is triggered by some OS, causing crash data to not be collected.
+2. Supported changing the content written by ASM for FTTraceInterceptor.HeaderHandler 
+   via FTRUMConfig.setOkHttpTraceHeaderHandler, and for FTResourceInterceptor.ContentHandlerHelper 
+   via FTRUMConfig.setOkHttpResourceContentHandler.
+3. Optimized crash collection capability, adapted to scenarios where system.exit is triggered by some OS, 
+   causing crash data to not be collected.
 4. Fixed the issue where tag occasionally becomes an empty string, causing data to not be reported properly.
-5. Optimized ASM OkHttpListener EventListener override logic, supports retaining original project EventListener event parameter passing.
+5. Optimized ASM OkHttpListener EventListener override logic, supports retaining original project
+   EventListener event parameter passing.
 
 ---
 # agent 1.6.7-beta02
@@ -227,12 +298,14 @@
 
 ---
 # agent 1.6.7-alpha04
-1. Supported global setting of custom FTTraceInterceptor.HeaderHandler and FTResourceInterceptor.ContentHandlerHelper methods.
+1. Supported global setting of custom FTTraceInterceptor.HeaderHandler 
+   and FTResourceInterceptor.ContentHandlerHelper methods.
 2. Fixed the issue where tag occasionally becomes an empty string, causing data reporting failure.
 
 ---
 # agent 1.6.7-alpha02
-1. Optimized crash collection capability, adapted to scenarios where system.exit is triggered by some OS, causing crash data to not be collected.
+1. Optimized crash collection capability, adapted to scenarios where system.exit is triggered by some OS, 
+  causing crash data to not be collected.
 2. Fixed the issue where data sync fails when the network becomes available again.
 
 ---
@@ -250,7 +323,8 @@
 3. Fixed the issue where the number of data entries deviated from the set number when discarding logs and RUM discarding old data.
 4. TV device button event adaptation, removed non-TV device tags.
 5. Supported limiting RUM data entry count via `FTRUMConfig.setRumCacheLimitCount(int)`, default 100_000.
-6. Supported limiting total cache size via `FTSDKConfig enableLimitWithDbSize(long dbSize)`. After enabling, `FTLoggerConfig.setLogCacheLimitCount(int)` and `FTRUMConfig.setRumCacheLimitCount(int)` will be invalid.
+6. Supported limiting total cache size via `FTSDKConfig enableLimitWithDbSize(long dbSize)`. 
+   After enabling, `FTLoggerConfig.setLogCacheLimitCount(int)` and `FTRUMConfig.setRumCacheLimitCount(int)` will be invalid.
 7. Optimized Session refresh rules when device has no operation.
 
 ---
@@ -284,7 +358,9 @@
 2. Optimized the issue of frequent database closing during data writing in no-network state.
 3. Fixed the issue where data deviation occurred when discarding logs and RUM discarding old data.
 4. TV device button event adaptation and non-TV device tag removal.
-5. Supported limiting total cache size via `FTSDKConfig enableLimitWithDbSize(long dbSize)`. After enabling, `FTLoggerConfig#setLogCacheLimitCount(int)` and `FTRUMConfig#setRumCacheLimitCount(int)` will be invalid.
+5. Supported limiting total cache size via `FTSDKConfig enableLimitWithDbSize(long dbSize)`.
+   After enabling, `FTLoggerConfig#setLogCacheLimitCount(int)` and `FTRUMConfig#setRumCacheLimitCount(int)` 
+   will be invalid.
 
 ---
 # agent 1.6.5-beta03
@@ -296,7 +372,9 @@
 
 ---
 # agent 1.6.5-beta01
-1. Added RUM entry count limit feature, supported limiting SDK maximum cache entry data via `FTRUMConfig.setRumCacheLimitCount(int)`. Supported specifying discard new data or old data via `FTRUMConfig.setRumCacheDiscardStrategy(strategy)`.
+1. Added RUM entry count limit feature, supported limiting SDK maximum cache entry data 
+   via `FTRUMConfig.setRumCacheLimitCount(int)`. Supported specifying discard new data or old data
+   via `FTRUMConfig.setRumCacheDiscardStrategy(strategy)`.
 2. Added SDK internal log level filtering feature.
 
 ---
@@ -350,8 +428,10 @@
 
 ---
 # agent 1.6.1
-1. Fixed the issue where custom startView called separately in RUM caused FTMetricsMTR monitoring thread not being recycled.
-2. Supported adding dynamic properties via FTSdk.appendGlobalContext(globalContext), FTSdk.appendRUMGlobalContext(globalContext), FTSdk.appendLogGlobalContext(globalContext).
+1. Fixed the issue where custom startView called separately in RUM caused FTMetricsMTR monitoring 
+  thread not being recycled.
+2. Supported adding dynamic properties via FTSdk.appendGlobalContext(globalContext),
+  FTSdk.appendRUMGlobalContext(globalContext), FTSdk.appendLogGlobalContext(globalContext).
 3. Supported clearing unreported cached data via FTSdk.clearAllData().
 4. SDK setSyncSleepTime maximum limit extended to 5000 ms.
 
@@ -367,7 +447,8 @@
 
 ---
 # agent 1.6.1-alpha04
-1. Fixed the issue where custom startView called separately in RUM caused FTMetricsMTR monitoring thread not being recycled.
+1. Fixed the issue where custom startView called separately in RUM caused FTMetricsMTR monitoring 
+  thread not being recycled.
 
 ---
 # agent 1.6.1-alpha03
@@ -376,8 +457,8 @@
 
 ---
 # agent 1.6.0
-1. Optimized data storage and sync performance.
-(Upgrading from old versions to 1.6.0 requires configuring FTSDKConfig.setNeedTransformOldCache for old data compatibility sync)
+1. Optimized data storage and sync performance.(Upgrading from old versions to 1.6.0 requires 
+ configuring FTSDKConfig.setNeedTransformOldCache for old data compatibility sync)
 2. Fixed the issue where calling Log.w(String,Throwable) caused exceptions when using ft-plugin.
 
 ---
@@ -403,7 +484,8 @@
 
 ---
 # agent 1.5.2
-1. Added local network error type prompts for Error network_error to supplement Resource data with resource_status=0 scenarios.
+1. Added local network error type prompts for Error network_error to supplement Resource data with 
+   resource_status=0 scenarios.
 2. Fixed uncaughtException rethrow passing issue when setEnableTrackAppCrash(false).
 
 ---
@@ -506,13 +588,15 @@
 ---
 # agent 1.4.5
 1. Optimized duplicate initialization compatibility.
-2. Optimized c/c++ crash collection data sync logic to avoid deadlocks caused by unexpected interruption and exit in certain scenarios.
+2. Optimized c/c++ crash collection data sync logic to avoid deadlocks caused by unexpected 
+   interruption and exit in certain scenarios.
 3. Optimized startAction Property attribute writing logic to avoid thread safety access issues.
 
 ---
 # agent 1.4.5-beta01
 1. Optimized duplicate initialization compatibility.
-2. Optimized c/c++ crash collection data sync logic to avoid deadlocks caused by unexpected interruption and exit in certain scenarios.
+2. Optimized c/c++ crash collection data sync logic to avoid deadlocks caused by unexpected interruption 
+   and exit in certain scenarios.
 3. Optimized startAction Property attribute writing logic to avoid thread safety access issues.
 
 ---
@@ -612,8 +696,10 @@
 ---
 # agent 1.4.1-alpha02
 1. Added ANR Error events and logs for crashes caused by ANR.
-2. Fixed the issue where resource was not sent when using encryption algorithms in Okhttp, relying solely on ASM writing.
-3. Supported custom Resource content, enabled together with FTTraceConfig.enableAutoTrace and FTRUMConfig.enableTraceUserResource.
+2. Fixed the issue where resource was not sent when using encryption algorithms in Okhttp,
+   relying solely on ASM writing.
+3. Supported custom Resource content, enabled together with FTTraceConfig.enableAutoTrace 
+   and FTRUMConfig.enableTraceUserResource.
 
 ---
 # agent 1.4.1-alpha01
