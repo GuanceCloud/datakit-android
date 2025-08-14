@@ -523,7 +523,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * Set the interval time for each sync, sleep time between [0,100]
+     * Set the interval time for each sync, sleep time between [0,5000]，0 default
      *
      * @param sleepTimeMs Data sync interval time
      * @return
