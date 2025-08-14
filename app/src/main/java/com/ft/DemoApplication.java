@@ -75,7 +75,6 @@ public class DemoApplication extends BaseApplication {
                 .setOnlySupportMainProcess(CrossProcessSetting.isOnlyMainProcess(context))
                 .setNeedTransformOldCache(true)
                 .setCompressIntakeRequests(true)
-                .setRemoteConfiguration(true)
                 .setSyncSleepTime(100)
 //                .setDataModifier(new DataModifier() {
 //                    @Override
@@ -183,7 +182,7 @@ public class DemoApplication extends BaseApplication {
                 .setTraceType(TraceType.DDTRACE));
 
         FTSdk.initSessionReplayConfig(new FTSessionReplayConfig()
-                .setSampleRate(0f)
+                .setSampleRate(1f)
                 .setSessionReplayOnErrorSampleRate(1f)
                 .setPrivacy(SessionReplayPrivacy.ALLOW)
 //                .setTouchPrivacy(TouchPrivacy.SHOW)
