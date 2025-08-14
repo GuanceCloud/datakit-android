@@ -1,3 +1,83 @@
+# agent 1.7.0-alpha21
+1. Merge ft-sdk 1.6.13
+
+---
+# agent 1.7.0-alpha20
+1. Merge ft-sdk 1.6.12
+
+---
+# agent 1.7.0-alpha19
+1. Support for ft-session-replay error sampling feature
+
+---
+# agent 1.7.0-alpha18
+1. Merge ft-sdk 1.6.11
+
+---
+# agent 1.7.0-alpha17
+1. Merge ft-sdk 1.6.11-alpha02
+
+---
+# agent 1.7.0-alpha16
+1. Merge ft-sdk 1.6.10 version
+
+---
+# agent 1.7.0-alpha15
+1. Adapt to replay_0.1.1-alpha01 changes
+
+---
+# agent 1.7.0-alpha14
+1. Change userAgent display rules
+2. Merge ft-sdk 1.6.10-alpha02
+3. Integrate Session Replay sync requests into ft-sdk
+
+---
+# agent 1.7.0-alpha13
+1. Add userAgent and appVersion parameters passed to Session Replay
+
+---
+# agent 1.7.0-alpha12
+1. Merge ft-sdk 1.6.9
+2. X-Pkg-Id Session Replay data sync tracking adaptation
+
+---
+# agent 1.7.0-alpha11
+1. Merge ft-sdk 1.6.9-beta02
+
+---
+# agent 1.7.0-alpha10
+1. Merge ft-sdk 1.6.9-alpha01
+
+---
+# agent 1.7.0-alpha09
+1. Merge and update features from ft-sdk 1.6.3 to 1.6.8
+
+---
+# agent 1.7.0-alpha08
+1. Merge and update features from ft-sdk 1.6.1 and 1.6.2
+
+---
+# agent 1.7.0-alpha06
+1. Add default configuration for session replay addExtensionSupport
+
+---
+# agent 1.7.0-alpha05
+1. Adapt to session replay delayed initialization scenarios
+
+---
+# agent 1.7.0-alpha04
+1. Optimize view and resource session_has_replay display rules
+
+---
+# agent 1.7.0-alpha03
+1. Adjust sdk package information display rules
+2. Correct session_has_replay display rules
+
+---
+# agent 1.7.0-alpha02
+1. Support for enabling session replay recording feature
+
+---
 # agent 1.6.13
 1. Added `FTRUMConfig.setActionTrackingHandler` to support custom user action tracking.
    This handler allows developers to customize how user actions (clicks, touches, etc.) are tracked in RUM data.
@@ -126,10 +206,7 @@
   and above support automatic ResourceID addition.
 2. Fixed the issue of circular calls with other crash collection SDKs when initializing RUM configuration multiple times.
 3. When jumping from a native page to a WebView page, the native page is used to fill in view_referrer in WebView data.
-
----
-# agent 1.6.10-alpha03
-1. Underlying network request library supports multiform.
+4. Underlying network request library supports multiform.
 
 ---
 # agent 1.6.10-alpha02

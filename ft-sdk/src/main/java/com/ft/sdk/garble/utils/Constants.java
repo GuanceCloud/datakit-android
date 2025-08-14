@@ -193,10 +193,6 @@ public class Constants {
 //    public static final String KEY_PAGE_EVENT_USER_NAME = "ud_name";
 
     /**
-     * Duration, unit nanoseconds
-     */
-    public static final String KEY_TIME_COST_DURATION = "duration";
-    /**
      * Log level, {@link com.ft.sdk.garble.bean.Status}
      */
     public static final String KEY_STATUS = "status";
@@ -254,6 +250,8 @@ public class Constants {
      * Current application battery maximum consumption
      */
     public static final String KEY_BATTERY_CURRENT_MAX = "battery_current_max";
+
+    public static final String KEY_HAS_REPLAY = "session_has_replay";
 
     /* <======= Page cycle end */
 
@@ -437,6 +435,16 @@ public class Constants {
     public static final String KEY_RUM_SDK_PACKAGE_NATIVE = "native";
 
     /**
+     * ft-session-replay module release version
+     */
+    public static final String KEY_RUM_SDK_PACKAGE_REPLAY = "replay";
+
+    /**
+     * ft-session-replay-material module
+     */
+    public static final String KEY_RUM_SDK_PACKAGE_REPLAY_MATERIAL = "replay_mtr";
+
+    /**
      * Web view uses web sdk release version
      */
     public static final String KEY_RUM_SDK_PACKAGE_WEB = "web";
@@ -569,6 +577,11 @@ public class Constants {
      */
 
     public static final String KEY_SAMPLED_FOR_ERROR_SESSION = "sampled_for_error_session";
+
+    /**
+     * Because of Session Replay error collection
+     */
+    public static final String KEY_SAMPLED_FOR_ERROR_REPLAY ="sampled_for_error_replay";
 
     /**
      * Session error time

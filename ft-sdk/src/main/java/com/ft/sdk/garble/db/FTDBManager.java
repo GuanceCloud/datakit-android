@@ -386,6 +386,33 @@ public class FTDBManager extends DBManager {
     }
 
     /**
+     * Update {@link FTSQL#RUM_COLUMN_EXTRA_ATTR}
+     *
+     * @param viewId
+     * @param attr
+     */
+    public void updateViewExtraAttr(String viewId, String attr) {
+        getDB(true, new DataBaseCallBack() {
+                    @Override
+                    public void run(SQLiteDatabase db) {
+                        Cursor cursor = db.rawQuery("select count(*) from " + FTSQL.FT_TABLE_VIEW
+                                + " where " + FTSQL.RUM_COLUMN_ID + "='" + viewId + "'", null);
+                        if (cursor.moveToFirst()) {
+                            int count = cursor.getInt(0);
+                            if (count > 0) {
+                                ContentValues contentValues = new ContentValues();
+                                contentValues.put(FTSQL.RUM_COLUMN_EXTRA_ATTR, attr);
+                                db.update(FTSQL.FT_TABLE_VIEW, contentValues,
+                                        FTSQL.RUM_COLUMN_ID + "= ?", new String[]{viewId});
+                            }
+                        }
+                        cursor.close();
+                    }
+                }
+        );
+    }
+
+    /**
      * Get statistics for each Action, {@link ActionBean}
      *
      * @param limit

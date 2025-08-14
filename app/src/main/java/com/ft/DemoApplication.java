@@ -24,6 +24,9 @@ import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.sessionreplay.FTSessionReplayConfig;
+import com.ft.sdk.sessionreplay.SessionReplayPrivacy;
+import com.ft.sdk.sessionreplay.material.MaterialExtensionSupport;
 import com.ft.utils.CrossProcessSetting;
 import com.lzy.okgo.OkGo;
 
@@ -72,7 +75,6 @@ public class DemoApplication extends BaseApplication {
                 .setOnlySupportMainProcess(CrossProcessSetting.isOnlyMainProcess(context))
                 .setNeedTransformOldCache(true)
                 .setCompressIntakeRequests(true)
-                .setRemoteConfiguration(true)
                 .setSyncSleepTime(100)
 //                .setDataModifier(new DataModifier() {
 //                    @Override
@@ -179,6 +181,12 @@ public class DemoApplication extends BaseApplication {
                 .setEnableLinkRUMData(true)
                 .setTraceType(TraceType.DDTRACE));
 
+        FTSdk.initSessionReplayConfig(new FTSessionReplayConfig()
+                .setSampleRate(1f)
+                .setSessionReplayOnErrorSampleRate(1f)
+                .setPrivacy(SessionReplayPrivacy.ALLOW)
+//                .setTouchPrivacy(TouchPrivacy.SHOW)
+                .addExtensionSupport(new MaterialExtensionSupport()));
 
     }
 

@@ -15,6 +15,9 @@ import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.PackageUtils;
 import com.ft.sdk.garble.utils.Utils;
+import com.ft.sdk.sessionreplay.FTSessionReplayConfig;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 
@@ -36,6 +39,17 @@ public class FTSdk {
      * directly access {@link com.ft.sdk.nativelib.BuildConfig#VERSION_NAME} to get
      */
     public static String NATIVE_VERSION = PackageUtils.isNativeLibrarySupport() ? PackageUtils.getNativeLibVersion() : "";
+
+    /**
+     * After integrating ft-session-replay, it will be assigned, directly access {@link com.ft.sdk.nativelib.BuildConfig#VERSION_NAME} to get
+     */
+    public static String SESSION_REPLAY_VERSION = PackageUtils.isSessionReplay() ? PackageUtils.getPackageSessionReplay() : "";
+    /**
+     * After integrating ft-session-replay-material, it will be assigned, directly access {@link com.ft.sdk.sessionreplay.material.BuildConfig#VERSION_NAME} to get
+     */
+    public static String SESSION_REPLAY_MATERIAL_VERSION = PackageUtils.isSessionReplayMtr() ? PackageUtils.getPackageSessionReplayMtr() : "";
+
+    private final static boolean isSessionReplaySupport = SESSION_REPLAY_VERSION.isEmpty();
     /**
      * Variable written by Plugin ASM, UUID is the same for the same compilation version
      */
@@ -127,6 +141,9 @@ public class FTSdk {
         EventConsumerThreadPool.get().shutDown();
         FTANRDetector.get().release();
         FTDBManager.release();
+        if (FTSdk.isSessionReplaySupport()) {
+            SessionReplayManager.get().stop();
+        }
         if (mFtSdk != null) {
             if (mFtSdk.mRemoteConfigManager != null) {
                 mFtSdk.mRemoteConfigManager.close();
@@ -257,6 +274,23 @@ public class FTSdk {
         }
     }
 
+
+    /**
+     * Initialize the configuration of session replay
+     *
+     * @param config
+     */
+    public static void initSessionReplayConfig(FTSessionReplayConfig config) {
+        try {
+            if (get().mRemoteConfigManager != null) {
+                get().mRemoteConfigManager.mergeSessionReplayConfigFromCache(config);
+            }
+            SessionReplay.enable(config, FTApplication.getApplication());
+        } catch (Exception e) {
+            LogUtils.e(TAG, "initSessionReplayConfig fail:\n" + LogUtils.getStackTraceString(e));
+        }
+    }
+
     /**
      * Bind user information, {@link Constants#KEY_RUM_IS_SIGN_IN}, after binding the field is T, 
      * bind once, the field data will continue to retain data until calling
@@ -310,6 +344,10 @@ public class FTSdk {
         }
     }
 
+    public static boolean isSessionReplaySupport() {
+        return isSessionReplaySupport;
+    }
+
 
     /**
      * Supplement global tags
@@ -333,7 +371,7 @@ public class FTSdk {
         hashMap.put(Constants.KEY_SDK_VERSION, FTSdk.AGENT_VERSION);
     }
 
-    private static HashMap<String, String> getStringStringHashMap() {
+    private static @NotNull HashMap<String, String> getStringStringHashMap() {
         HashMap<String, String> pkgInfo = new HashMap<>();
         pkgInfo.put(Constants.KEY_RUM_SDK_PACKAGE_AGENT, FTSdk.AGENT_VERSION);
         if (!FTSdk.PLUGIN_VERSION.isEmpty()) {
@@ -341,6 +379,12 @@ public class FTSdk {
         }
         if (!FTSdk.NATIVE_VERSION.isEmpty()) {
             pkgInfo.put(Constants.KEY_RUM_SDK_PACKAGE_NATIVE, FTSdk.NATIVE_VERSION);
+        }
+        if (!FTSdk.SESSION_REPLAY_VERSION.isEmpty()) {
+            pkgInfo.put(Constants.KEY_RUM_SDK_PACKAGE_REPLAY, FTSdk.SESSION_REPLAY_VERSION);
+        }
+        if (!FTSdk.SESSION_REPLAY_MATERIAL_VERSION.isEmpty()) {
+            pkgInfo.put(Constants.KEY_RUM_SDK_PACKAGE_REPLAY_MATERIAL, FTSdk.SESSION_REPLAY_MATERIAL_VERSION);
         }
         return pkgInfo;
     }

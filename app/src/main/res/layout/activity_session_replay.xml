@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/session_replay_privacy_ll"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/session_replay_dialog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Dialog" />
+
+    <Button
+        android:id="@+id/session_replay_origin_toast"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Native Toast (Cannot Capture)" />
+
+    <Button
+        android:id="@+id/session_replay_custom_toast"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Alternative Toast (Can Capture)" />
+
+<!--    <androidx.cardview.widget.CardView-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_margin="16dp"-->
+<!--        app:cardCornerRadius="8dp"-->
+<!--        app:cardElevation="4dp"-->
+<!--        app:cardUseCompatPadding="true">-->
+
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="vertical"-->
+<!--            android:padding="8dp">-->
+
+<!--            <TextView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="8dp"-->
+<!--                android:text="CardView"-->
+<!--                android:textSize="14sp"-->
+<!--                android:textStyle="bold" />-->
+
+
+<!--        </LinearLayout>-->
+
+
+<!--    </androidx.cardview.widget.CardView>-->
+
+<!--    <com.google.android.material.chip.ChipGroup-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_margin="16dp"-->
+<!--        app:selectionRequired="false"-->
+<!--        app:singleSelection="false">-->
+
+<!--        &lt;!&ndash; Basic Chip &ndash;&gt;-->
+<!--        <com.google.android.material.chip.Chip-->
+<!--            style="@style/Widget.MaterialComponents.Chip.Entry"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Basic Chip" />-->
+
+<!--        &lt;!&ndash; Selectable Chip &ndash;&gt;-->
+<!--        <com.google.android.material.chip.Chip-->
+<!--            style="@style/Widget.MaterialComponents.Chip.Filter"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Selectable Chip"-->
+<!--            app:checkedIconVisible="true" />-->
+
+<!--        &lt;!&ndash; Chip with Delete Icon &ndash;&gt;-->
+<!--        <com.google.android.material.chip.Chip-->
+<!--            style="@style/Widget.MaterialComponents.Chip.Entry"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Deletable Chip"-->
+<!--            app:closeIconVisible="true" />-->
+<!--    </com.google.android.material.chip.ChipGroup>-->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/session_replay_text_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="This is a text" />
+
+        <EditText
+            android:id="@+id/session_replay_edittext_et"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="This is an edit text" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="This is a Radio Button" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="This is a CheckBox" />
+
+        <androidx.appcompat.widget.AppCompatCheckedTextView
+            android:id="@+id/session_replay_checked_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+            android:gravity="center_vertical"
+            android:padding="8dp"
+            android:text="This is checkText" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_launcher_background" />
+
+
+        <ListView
+            android:id="@+id/session_replay_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</LinearLayout>

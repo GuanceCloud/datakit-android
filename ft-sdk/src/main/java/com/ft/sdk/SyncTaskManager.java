@@ -44,7 +44,7 @@ public class SyncTaskManager {
     /**
      * Maximum tolerated error count
      */
-    public static final int MAX_ERROR_COUNT = 5;
+    static final int MAX_ERROR_COUNT = 5;
 
     /**
      * Maximum sync sleep time, ms
@@ -253,6 +253,10 @@ public class SyncTaskManager {
             LogUtils.d(TAG, "errorSampledConsume deleteExpired:" + dataType + ","
                     + deleteCount + ", before ns:" + (now - ONE_MINUTE_DURATION_NS));
         }
+    }
+
+    long getErrorTimeLine() {
+        return errorTimeLine;
     }
 
     /**

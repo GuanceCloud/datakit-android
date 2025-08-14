@@ -11,6 +11,7 @@ import com.ft.sdk.garble.threadpool.RemoteConfigThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
+import com.ft.sdk.sessionreplay.FTSessionReplayConfig;
 
 import java.net.HttpURLConnection;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -178,6 +179,17 @@ public class FTRemoteConfigManager {
                         break;
                     }
                 }
+            }
+        }
+    }
+
+    void mergeSessionReplayConfigFromCache(FTSessionReplayConfig config) {
+        if (mRemoteConfig != null) {
+            if (mRemoteConfig.getSessionReplaySampleRate() != null) {
+                config.setSampleRate(mRemoteConfig.getSessionReplaySampleRate());
+            }
+            if (mRemoteConfig.getSessionReplayOnErrorSampleRate() != null) {
+                config.setSessionReplayOnErrorSampleRate(mRemoteConfig.getSessionReplayOnErrorSampleRate());
             }
         }
     }

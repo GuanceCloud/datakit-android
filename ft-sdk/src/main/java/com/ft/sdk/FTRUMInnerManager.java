@@ -1,8 +1,15 @@
 package com.ft.sdk;
 
+import static com.ft.sdk.sessionreplay.internal.SessionReplayRecordCallback.HAS_REPLAY_KEY;
+import static com.ft.sdk.sessionreplay.internal.SessionReplayRecordCallback.SAMPLED_ON_ERROR;
+import static com.ft.sdk.sessionreplay.internal.SessionReplayRecordCallback.VIEW_RECORDS_COUNT_KEY;
+import static com.ft.sdk.sessionreplay.utils.SessionReplayRumContext.NULL_UUID;
+
 import android.os.Handler;
 import android.os.Looper;
 
+import com.ft.sdk.feature.Feature;
+import com.ft.sdk.feature.FeatureScope;
 import com.ft.sdk.garble.bean.ActionBean;
 import com.ft.sdk.garble.bean.ActiveActionBean;
 import com.ft.sdk.garble.bean.ActiveViewBean;
@@ -23,6 +30,7 @@ import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.HashMapUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
+import com.ft.sdk.sessionreplay.SessionReplayConstants;
 
 import org.json.JSONException;
 
@@ -34,6 +42,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -80,7 +89,7 @@ public class FTRUMInnerManager {
      * {@link Constants#KEY_RUM_SESSION_ID}
      */
     private String sessionId = Utils.getEmptyUUID();
-
+    private String rumAppId;
 
     /**
      * Do not collect
@@ -174,11 +183,46 @@ public class FTRUMInnerManager {
             }
 
         }
-//        boolean isAppForward = FTApplication.isAppForward;
+        updateSessionReplay(sessionId);
+        //        boolean isAppForward = FTApplication.isAppForward;
 //        if (isAppForward) {
         //As long as there is RUM data collection activity, the user time will be extended, including background
         lastUserActiveTime = now;
 //        }
+    }
+
+    /**
+     * @param sessionId
+     */
+    private void updateSessionReplay(String sessionId) {
+        if (FTSdk.isSessionReplaySupport()) return;
+        CollectType collectType = checkSessionWillCollect(sessionId);
+        HashMap<String, Object> map = new HashMap<>();
+        map.put(SessionReplayConstants.SESSION_REPLAY_BUS_MESSAGE_TYPE_KEY, SessionReplayConstants.RUM_SESSION_RENEWED_BUS_MESSAGE);
+        map.put(SessionReplayConstants.RUM_KEEP_SESSION_BUS_COLLECT_TYPE_KEY, collectType.getValue());
+        map.put(SessionReplayConstants.RUM_SESSION_ID_BUS_MESSAGE_KEY, sessionId);
+        FeatureScope scope = SessionReplayManager.get().getFeature(Feature.SESSION_REPLAY_FEATURE_NAME);
+        if (scope != null) {
+            scope.sendEvent(map);
+        }
+
+    }
+
+    /**
+     * @return
+     */
+    Map<String, Object> getCurrentViewSession() {
+        Map<String, Object> hashMap = new HashMap<>();
+        hashMap.put(Constants.KEY_RUM_SESSION_ID, sessionId);
+        String viewId = getViewId();
+        hashMap.put(Constants.KEY_RUM_VIEW_ID, viewId == null ? NULL_UUID : viewId);
+        hashMap.put("application_id", rumAppId == null ? NULL_UUID : rumAppId);
+        if (activeView != null) {
+            Map<String, Object> viewMeta = new HashMap<>();
+            viewMeta.put(VIEW_RECORDS_COUNT_KEY, activeView.getRecordsCount());
+            hashMap.put(viewId, viewMeta);
+        }
+        return hashMap;
     }
 
     private String getActionId() {
@@ -193,6 +237,7 @@ public class FTRUMInnerManager {
         String viewId = activeView != null ? activeView.getId() : null;
         String viewName = activeView != null ? activeView.getViewName() : null;
         String viewReferrer = activeView != null ? activeView.getViewReferrer() : null;
+        boolean hasReplay = activeView != null && activeView.isHasReplay();
         checkSessionRefresh(true);
 
         ActiveActionBean activeAction = new ActiveActionBean(actionName, actionType,
@@ -201,6 +246,7 @@ public class FTRUMInnerManager {
         activeAction.setTags(FTRUMConfigManager.get().getRUMPublicDynamicTags());
         activeAction.setDuration(duration);
         activeAction.setStartTime(startTime);
+        activeAction.setHasReplay(hasReplay);
         if (property != null) {
             activeAction.getProperty().putAll(property);
         }
@@ -254,10 +300,13 @@ public class FTRUMInnerManager {
         String viewId = activeView != null ? activeView.getId() : null;
         String viewName = activeView != null ? activeView.getViewName() : null;
         String viewReferrer = activeView != null ? activeView.getViewReferrer() : null;
+        boolean hasReplay = activeView != null && activeView.isHasReplay();
         checkSessionRefresh(true);
         checkActionClose();
         if (activeAction == null || activeAction.isClose()) {
             activeAction = new ActiveActionBean(actionName, actionType, sessionId, viewId, viewName, viewReferrer, needWait);
+            activeAction.setHasReplay(hasReplay);
+
             if (property != null) {
                 activeAction.getProperty().putAll(property);
             }
@@ -650,9 +699,14 @@ public class FTRUMInnerManager {
             if (property == null || property.get(FTExceptionHandler.IS_PRE_CRASH) != (Boolean) true) {
                 //Exclude the scenario of reporting the last native crash error
                 SyncTaskManager.get().setErrorTimeLine(dateline, activeView);
+
+                if (activeView != null) {
+                    if (activeView.isSessionReplayErrorSampled()) {
+                        activeView.setHasReplay(true);
+                    }
+                }
             }
             final HashMap<String, Object> tags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
-            attachRUMRelative(tags, true);
             final HashMap<String, Object> fields = new HashMap<>();
             tags.put(Constants.KEY_RUM_ERROR_TYPE, errorType);
             tags.put(Constants.KEY_RUM_ERROR_SOURCE, ErrorSource.LOGGER.toString());
@@ -664,6 +718,7 @@ public class FTRUMInnerManager {
 
             fields.put(Constants.KEY_RUM_ERROR_MESSAGE, message);
             fields.put(Constants.KEY_RUM_ERROR_STACK, log);
+            attachRUMRelative(tags, fields, true);
 
             EventConsumerThreadPool.get().execute(new Runnable() {
                 @Override
@@ -684,7 +739,7 @@ public class FTRUMInnerManager {
                             fields.put(Constants.KEY_CPU_USE, DeviceUtils.getCpuUsage());
                         }
                         if (FTMonitorManager.get().isErrorMonitorType(ErrorMonitorType.BATTERY)) {
-                            fields.put(Constants.KEY_BATTERY_USE, (float) BatteryUtils.getBatteryInfo(FTApplication.getApplication()).getBr());
+                            fields.put(Constants.KEY_BATTERY_USE, (float) BatteryUtils.getBatteryInfo(FTApplication.getApplication()).getUsage());
 
                         }
                         //<--------
@@ -728,7 +783,6 @@ public class FTRUMInnerManager {
             checkSessionRefresh(true);
             CollectType type = checkSessionWillCollect(sessionId);
             HashMap<String, Object> tags = FTRUMConfigManager.get().getRUMPublicDynamicTags();
-            attachRUMRelative(tags, true);
             HashMap<String, Object> fields = new HashMap<>();
             fields.put(Constants.KEY_RUM_LONG_TASK_DURATION, duration);
             fields.put(Constants.KEY_RUM_LONG_TASK_STACK, log);
@@ -736,6 +790,8 @@ public class FTRUMInnerManager {
             if (property != null) {
                 fields.putAll(property);
             }
+
+            attachRUMRelative(tags, fields, true);
 
             FTTrackInner.getInstance().rum(Utils.getCurrentNanoTime() - duration,
                     Constants.FT_MEASUREMENT_RUM_LONG_TASK, tags, fields, null, type);
@@ -834,6 +890,9 @@ public class FTRUMInnerManager {
             tags.put(Constants.KEY_RUM_RESOURCE_METHOD, bean.resourceMethod);
             tags.put(Constants.KEY_RUM_RESOURCE_TRACE_ID, bean.traceId);
             tags.put(Constants.KEY_RUM_RESOURCE_SPAN_ID, bean.spanId);
+            if (bean.hasSessionReplay) {
+                fields.put(Constants.KEY_HAS_REPLAY, true);
+            }
 
             int resourceStatus = bean.resourceStatus;
             String resourceStatusGroup = "";
@@ -850,6 +909,7 @@ public class FTRUMInnerManager {
             if (bean.resourceLoad > 0) {
                 fields.put(Constants.KEY_RUM_RESOURCE_DURATION, bean.resourceLoad);
             }
+
 
             if (bean.resourceDNS > 0) {
                 fields.put(Constants.KEY_RUM_RESOURCE_DNS, bean.resourceDNS);
@@ -1149,7 +1209,14 @@ public class FTRUMInnerManager {
         return activeView.getId();
     }
 
-    String getViewName() {
+    private boolean viewHasReplay() {
+        if (activeView == null) {
+            return false;
+        }
+        return activeView.isHasReplay();
+    }
+
+    private String getViewName() {
         if (activeView == null) {
             return null;
         }
@@ -1177,6 +1244,9 @@ public class FTRUMInnerManager {
         bean.viewName = getViewName();
         bean.viewReferrer = getViewReferrer();
         bean.sessionId = getSessionId();
+        if (viewHasReplay()) {
+            bean.hasSessionReplay = true;
+        }
         if (activeAction != null && !activeAction.isClose()) {
             bean.actionId = getActionId();
             bean.actionName = getActionName();
@@ -1189,7 +1259,7 @@ public class FTRUMInnerManager {
      * @param tags
      * @param withAction
      */
-    void attachRUMRelative(HashMap<String, Object> tags, boolean withAction) {
+    void attachRUMRelative(HashMap<String, Object> tags, HashMap<String, Object> fields, boolean withAction) {
         tags.put(Constants.KEY_RUM_VIEW_ID, getViewId());
 
         tags.put(Constants.KEY_RUM_VIEW_NAME, getViewName());
@@ -1202,8 +1272,10 @@ public class FTRUMInnerManager {
             }
         }
 
+        if (viewHasReplay()) {
+            fields.put(Constants.KEY_HAS_REPLAY, true);
+        }
     }
-
 
     private final Handler mHandler = new Handler(Looper.getMainLooper());
     private final Runnable mRUMGenerateRunner = new Runnable() {
@@ -1276,6 +1348,9 @@ public class FTRUMInnerManager {
         fields.put(Constants.KEY_RUM_ACTION_RESOURCE_COUNT, bean.getResourceCount());
         fields.put(Constants.KEY_RUM_ACTION_ERROR_COUNT, bean.getErrorCount());
         fields.put(Constants.KEY_RUM_ACTION_DURATION, bean.getDuration());
+        if (bean.isHasReplay()) {
+            fields.put(Constants.KEY_HAS_REPLAY, true);
+        }
 
         FTTrackInner.getInstance().rum(bean.getStartTime(),
                 Constants.FT_MEASUREMENT_RUM_ACTION, tags, fields, null, bean.getCollectType());
@@ -1293,6 +1368,12 @@ public class FTRUMInnerManager {
                 tags.put(Constants.KEY_RUM_VIEW_ID, bean.getId());
 
                 HashMap<String, Object> fields = new HashMap<>(bean.getProperty());
+                if (bean.isHasReplay()) {
+                    fields.put(Constants.KEY_HAS_REPLAY, true);
+                }
+                if (bean.isSessionReplayErrorSampled()) {
+                    fields.put(Constants.KEY_SAMPLED_FOR_ERROR_REPLAY, true);
+                }
                 if (bean.getLoadTime() > 0) {
                     fields.put(Constants.KEY_RUM_VIEW_LOAD, bean.getLoadTime());
                 }
@@ -1349,6 +1430,7 @@ public class FTRUMInnerManager {
 
     void initParams(FTRUMConfig config) {
         sampleRate = config.getSamplingRate();
+        rumAppId = config.getRumAppId();
         sessionErrorSampleError = config.getSessionErrorSampleRate();
         sessionId = Utils.randomUUID();
         checkSessionKeep(sessionId, sampleRate, sessionErrorSampleError);
@@ -1359,6 +1441,45 @@ public class FTRUMInnerManager {
             }
         });
 
+    }
+
+    void updateSessionViewMap(Map<String, Object> map) {
+        if (activeView != null) {
+            if (map.containsKey(Constants.KEY_RUM_VIEW_ID)) {
+                String viewId = HashMapUtils.getString(map, Constants.KEY_RUM_VIEW_ID);
+                if (viewId.equals(activeView.getId())) {
+                    if (map.containsKey(viewId)) {
+                        Object viewMap = map.get(viewId);
+                        if (viewMap instanceof Map) {
+                            @SuppressWarnings("unchecked")
+                            Map<String, Object> dataMap = (Map<String, Object>) viewMap;
+                            if (dataMap.containsKey(VIEW_RECORDS_COUNT_KEY)) {
+                                activeView.setRecordsCount(HashMapUtils.getLong(dataMap, VIEW_RECORDS_COUNT_KEY));
+                            }
+                            if (dataMap.containsKey(HAS_REPLAY_KEY)) {
+                                boolean currentHasReplay = HashMapUtils.getBoolean(dataMap, HAS_REPLAY_KEY);
+                                boolean preHasReplay = activeView.isHasReplay();
+                                if (!preHasReplay && currentHasReplay) {
+                                    String updateViewId = activeView.getId();
+                                    boolean sampledError = HashMapUtils.getBoolean(dataMap, SAMPLED_ON_ERROR);
+                                    activeView.setHasReplay(!sampledError);
+                                    activeView.setSessionReplayErrorSampled(sampledError);
+                                    String attr = activeView.getAttrJsonString();
+                                    EventConsumerThreadPool.get().execute(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            FTDBManager.get().updateViewExtraAttr(updateViewId, attr);
+                                        }
+                                    });
+
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
