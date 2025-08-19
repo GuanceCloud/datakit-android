@@ -41,7 +41,7 @@ public abstract class DBManager {
      * @param write
      * @param callBack
      */
-    protected void getDB(boolean write, DataBaseCallBack callBack) {
+    public void getDB(boolean write, DataBaseCallBack callBack) {
         getDB(write, 1, callBack);
     }
 
@@ -52,7 +52,7 @@ public abstract class DBManager {
      * @param operationCount Whether to enable transactions
      * @param callback
      */
-    protected void getDB(boolean write, int operationCount, DataBaseCallBack callback) {
+    public void getDB(boolean write, int operationCount, DataBaseCallBack callback) {
 
         SQLiteDatabase db = null;
         SQLiteOpenHelper helper;
