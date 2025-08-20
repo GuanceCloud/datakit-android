@@ -426,6 +426,7 @@ public class SyncTaskManager {
                 .addHeadParam(Constants.SYNC_DATA_CONTENT_TYPE_HEADER, Constants.SYNC_DATA_CONTENT_TYPE_VALUE)
                 .addHeadParam(Constants.SYNC_DATA_TRACE_HEADER,
                         String.format(Constants.SYNC_DATA_TRACE_HEADER_FORMAT, pkgId))
+                .addHeadParam(Constants.SYNC_DATA_DEVICE_TIME, System.currentTimeMillis() + "")
                 .setModel(model)
                 .setMethod(RequestMethod.POST)
                 .setBodyString(body).executeSync();

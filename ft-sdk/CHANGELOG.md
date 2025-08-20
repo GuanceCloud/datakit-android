@@ -1,3 +1,10 @@
+# agent 1.6.14-alpha01
+1. Using ContentProvider to optimize compatibility issues in high-load multi-process data collection scenarios.
+2. Removed the `android.permission.READ_PHONE_STATE` declaration from the SDK AndroidManifest; 
+   integrators need to add it themselves based on actual requirements.
+3. Added `x-client-timestamp` http header for time correction.
+
+---
 # agent 1.6.13
 1. Added `FTRUMConfig.setActionTrackingHandler` to support custom user action tracking.
    This handler allows developers to customize how user actions (clicks, touches, etc.) are tracked in RUM data.

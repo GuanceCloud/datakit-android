@@ -23,6 +23,11 @@ public class Constants {
     public static final String SYNC_DATA_TRACE_HEADER = "X-Pkg-Id";
 
     /**
+     * Client Timestamp
+     */
+    public static final String SYNC_DATA_DEVICE_TIME = "x-client-timestamp ";
+
+    /**
      * Data synchronization link propagation header value
      */
     public static final String SYNC_DATA_TRACE_HEADER_FORMAT = "rumm-%s";
