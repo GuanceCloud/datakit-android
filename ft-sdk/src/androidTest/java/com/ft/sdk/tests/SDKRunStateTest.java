@@ -46,7 +46,7 @@ public class SDKRunStateTest extends FTBaseTest {
 
         FTSdk.install(ftSDKConfig);
 
-        FTSdk.initRUMWithConfig(new FTRUMConfig()
+        FTSdk.initRUMWithConfig(new FTRUMConfig().setRumAppId(TEST_FAKE_RUM_ID)
                 .setExtraMonitorTypeWithError(ErrorMonitorType.ALL.getValue())
                 .setDeviceMetricsMonitorType(DeviceMetricsMonitorType.ALL.getValue())
                 .setEnableTrackAppANR(true)
@@ -147,6 +147,6 @@ public class SDKRunStateTest extends FTBaseTest {
     @Test
     public void showdownRUMTest() {
         FTSdk.shutDown();
-        Assert.assertNull(FTRUMConfigManager.get().getConfig());
+        Assert.assertFalse(FTRUMConfigManager.get().getConfig().isRumEnable());
     }
 }
