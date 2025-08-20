@@ -25,7 +25,7 @@ public class Constants {
     /**
      * Client Timestamp
      */
-    public static final String SYNC_DATA_DEVICE_TIME = "x-client-timestamp ";
+    public static final String SYNC_DATA_DEVICE_TIME = "X-Client-Timestamp";
 
     /**
      * Data synchronization link propagation header value
