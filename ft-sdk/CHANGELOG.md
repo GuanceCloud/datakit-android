@@ -1,3 +1,8 @@
+# agent 1.6.14-alpha02
+1. Protect ContentProvider query operations with try-catch
+    and fix the issue where SQL LIMIT was not taking effect.
+
+---
 # agent 1.6.14-alpha01
 1. Using ContentProvider to optimize compatibility issues in high-load multi-process data collection scenarios.
 2. Removed the `android.permission.READ_PHONE_STATE` declaration from the SDK AndroidManifest; 
