@@ -452,7 +452,7 @@ public class RUMTest extends FTBaseTest {
     @Test
     public void errorDataTest() throws InterruptedException {
         FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
-        FTSdk.initRUMWithConfig(new FTRUMConfig());
+        FTSdk.initRUMWithConfig(new FTRUMConfig().setRumAppId(TEST_FAKE_RUM_ID));
         FTRUMGlobalManager.get().addError(ERROR, ERROR_MESSAGE, ErrorType.JAVA, AppState.RUN);
         Thread.sleep(3000L);
         Assert.assertTrue(CheckUtils.checkValueInLineProtocol(DataType.RUM_APP,
@@ -467,7 +467,7 @@ public class RUMTest extends FTBaseTest {
     @Test
     public void errorDataParamsTest() throws InterruptedException {
         FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
-        FTSdk.initRUMWithConfig(new FTRUMConfig());
+        FTSdk.initRUMWithConfig(new FTRUMConfig().setRumAppId(TEST_FAKE_RUM_ID));
         HashMap<String, Object> property = new HashMap<>();
         property.put(PROPERTY_NAME, PROPERTY_VALUE);
         FTRUMGlobalManager.get().addError(ERROR, ERROR_MESSAGE, ErrorType.JAVA, AppState.RUN, property);
@@ -511,7 +511,7 @@ public class RUMTest extends FTBaseTest {
      */
     @Test
     public void sampleRateZeroTest() throws Exception {
-        FTSdk.initRUMWithConfig(new FTRUMConfig().setSamplingRate(0));
+        FTSdk.initRUMWithConfig(new FTRUMConfig().setRumAppId(TEST_FAKE_RUM_ID).setSamplingRate(0));
 
         generateRUMData();
 
@@ -519,7 +519,7 @@ public class RUMTest extends FTBaseTest {
                 .get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
         Assert.assertEquals(0, recordDataList.size());
 
-        FTSdk.initRUMWithConfig(new FTRUMConfig().setSamplingRate(1f));
+        FTSdk.initRUMWithConfig(new FTRUMConfig().setRumAppId(TEST_FAKE_RUM_ID).setSamplingRate(1f));
 
     }
 
@@ -530,7 +530,7 @@ public class RUMTest extends FTBaseTest {
      */
     @Test
     public void sampleRate100Test() throws Exception {
-        FTSdk.initRUMWithConfig(new FTRUMConfig().setSamplingRate(1f));
+        FTSdk.initRUMWithConfig(new FTRUMConfig().setRumAppId(TEST_FAKE_RUM_ID).setSamplingRate(1f));
 
         generateRUMData();
 
@@ -631,7 +631,7 @@ public class RUMTest extends FTBaseTest {
         mockWebServer.enqueue(mockResponse);
         mockWebServer.play();
 
-        FTSdk.initRUMWithConfig(new FTRUMConfig());
+        FTSdk.initRUMWithConfig(new FTRUMConfig().setRumAppId(TEST_FAKE_RUM_ID));
 
         FTSdk.initTraceWithConfig(new FTTraceConfig()
                 .setTraceType(TraceType.DDTRACE)
@@ -676,7 +676,7 @@ public class RUMTest extends FTBaseTest {
         mockWebServer.enqueue(mockResponse);
         mockWebServer.play();
 
-        FTSdk.initRUMWithConfig(new FTRUMConfig());
+        FTSdk.initRUMWithConfig(new FTRUMConfig().setRumAppId(TEST_FAKE_RUM_ID));
 
         FTSdk.initTraceWithConfig(new FTTraceConfig()
                 .setTraceType(TraceType.TRACEPARENT)
@@ -799,7 +799,7 @@ public class RUMTest extends FTBaseTest {
      */
     @Test
     public void triggerRUMDiscardPolicyTest() throws InterruptedException {
-        FTSdk.initRUMWithConfig(new FTRUMConfig());
+        FTSdk.initRUMWithConfig(new FTRUMConfig().setRumAppId(TEST_FAKE_RUM_ID));
         batchRUM(10);
 
     }
@@ -811,7 +811,7 @@ public class RUMTest extends FTBaseTest {
      */
     @Test
     public void triggerRUMDiscardOldPolicyTest() throws InterruptedException {
-        FTSdk.initRUMWithConfig(new FTRUMConfig().setRumCacheDiscardStrategy(RUMCacheDiscard.DISCARD_OLDEST));
+        FTSdk.initRUMWithConfig(new FTRUMConfig().setRumAppId(TEST_FAKE_RUM_ID).setRumCacheDiscardStrategy(RUMCacheDiscard.DISCARD_OLDEST));
         batchRUM(19);
     }
 

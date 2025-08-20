@@ -29,7 +29,7 @@ public class RUMUserBindTest extends FTBaseTest {
         avoidCleanData();
         stopSyncTask();
         FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
-        FTSdk.initRUMWithConfig(new FTRUMConfig());
+        FTSdk.initRUMWithConfig(new FTRUMConfig().setRumAppId(TEST_FAKE_RUM_ID));
     }
 
     /**

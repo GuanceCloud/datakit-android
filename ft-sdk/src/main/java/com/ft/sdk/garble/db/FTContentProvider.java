@@ -2,6 +2,7 @@ package com.ft.sdk.garble.db;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -12,9 +13,11 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.ft.sdk.FTApplication;
 import com.ft.sdk.garble.db.base.DataBaseCallBack;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.Utils;
 
 /**
  * @date 2025-08-17
@@ -23,7 +26,7 @@ import com.ft.sdk.garble.utils.LogUtils;
  */
 public class FTContentProvider extends ContentProvider {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "FTContentProvider";
-    public static final String AUTHORITY = "com.ft.sdk.provider";
+    public static final String PACKAGE_AUTHORITY_SUBFIX = "com.ft.sdk.provider";
 
     // URI path definitions
     public static final String PATH_SYNC_DATA = "sync_data";
@@ -40,10 +43,11 @@ public class FTContentProvider extends ContentProvider {
     public static final String METHOD_EXEC_SQL_BATCH = "execSQLBatch";
 
     // Complete URI constants
-    public static final Uri URI_SYNC_DATA = Uri.parse("content://" + AUTHORITY + "/" + PATH_SYNC_DATA);
-    public static final Uri URI_SYNC_DATA_FLAT = Uri.parse("content://" + AUTHORITY + "/" + PATH_SYNC_DATA_FLAT);
-    public static final Uri URI_VIEW_DATA = Uri.parse("content://" + AUTHORITY + "/" + PATH_VIEW_DATA);
-    public static final Uri URI_ACTION_DATA = Uri.parse("content://" + AUTHORITY + "/" + PATH_ACTION_DATA);
+    private static volatile String authority;
+    private static volatile Uri URI_SYNC_DATA;
+    private static volatile Uri URI_SYNC_DATA_FLAT;
+    private static volatile Uri URI_VIEW_DATA;
+    private static volatile Uri URI_ACTION_DATA;
 
     // URI match codes
     private static final int SYNC_DATA = 1;
@@ -59,17 +63,57 @@ public class FTContentProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
         uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        uriMatcher.addURI(AUTHORITY, PATH_SYNC_DATA, SYNC_DATA);
-        uriMatcher.addURI(AUTHORITY, PATH_SYNC_DATA_FLAT, SYNC_DATA_FLAT);
-        uriMatcher.addURI(AUTHORITY, PATH_VIEW_DATA, VIEW_DATA);
-        uriMatcher.addURI(AUTHORITY, PATH_ACTION_DATA, ACTION_DATA);
-        uriMatcher.addURI(AUTHORITY, PATH_EXEC_SQL, EXEC_SQL);
-        uriMatcher.addURI(AUTHORITY, PATH_EXEC_SQL_BATCH, EXEC_SQL_BATCH);
+        Context context = getContext();
+        if (context != null) {
+            initContentUri(context);
 
+            uriMatcher.addURI(authority, PATH_SYNC_DATA, SYNC_DATA);
+            uriMatcher.addURI(authority, PATH_SYNC_DATA_FLAT, SYNC_DATA_FLAT);
+            uriMatcher.addURI(authority, PATH_VIEW_DATA, VIEW_DATA);
+            uriMatcher.addURI(authority, PATH_ACTION_DATA, ACTION_DATA);
+            uriMatcher.addURI(authority, PATH_EXEC_SQL, EXEC_SQL);
+            uriMatcher.addURI(authority, PATH_EXEC_SQL_BATCH, EXEC_SQL_BATCH);
+        }
         // Use FTDBManager instead of directly using DatabaseHelper
         dbManager = FTDBManager.get();
         return true;
     }
+
+    static void initContentUri(Context context) {
+        authority = ProviderHelper.getAuthority(context);
+        URI_SYNC_DATA = Uri.parse("content://" + authority + "/" + PATH_SYNC_DATA);
+        URI_SYNC_DATA_FLAT = Uri.parse("content://" + authority + "/" + PATH_SYNC_DATA_FLAT);
+        URI_VIEW_DATA = Uri.parse("content://" + authority + "/" + PATH_VIEW_DATA);
+        URI_ACTION_DATA = Uri.parse("content://" + authority + "/" + PATH_ACTION_DATA);
+    }
+
+    public static Uri getUriSyncData() {
+        ensureUriInitialized();
+        return URI_SYNC_DATA;
+    }
+
+    public static Uri getUriSyncDataFlat() {
+        ensureUriInitialized();
+        return URI_SYNC_DATA_FLAT;
+    }
+
+    public static Uri getUriViewData() {
+        ensureUriInitialized();
+        return URI_VIEW_DATA;
+    }
+
+    public static Uri getUriActionData() {
+        ensureUriInitialized();
+        return URI_ACTION_DATA;
+    }
+
+    private static synchronized void ensureUriInitialized() {
+        if (Utils.isNullOrEmpty(authority)) {
+            //if uri not initialized, use default authority
+            initContentUri(FTApplication.getApplication());
+        }
+    }
+
 
     @Nullable
     @Override

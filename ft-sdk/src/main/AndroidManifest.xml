@@ -8,9 +8,11 @@
         <!-- ContentProvider for multi-process database access -->
         <provider
             android:name=".garble.db.FTContentProvider"
-            android:authorities="com.ft.sdk.provider"
+            android:authorities="${applicationId}.com.ft.sdk.provider"
             android:exported="false"
-            android:multiprocess="true" />
+            android:multiprocess="true" >
+        </provider>
+
     </application>
 
 </manifest>
