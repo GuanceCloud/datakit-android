@@ -1,3 +1,7 @@
+# agent 1.6.14-beta01
+1. Same as agent 1.6.14-alpha02
+
+---
 # agent 1.6.14-alpha02
 1. Protect ContentProvider query operations with try-catch
     and fix the issue where SQL LIMIT was not taking effect.
