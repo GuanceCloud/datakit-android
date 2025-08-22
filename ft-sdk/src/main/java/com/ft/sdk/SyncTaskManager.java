@@ -375,9 +375,9 @@ public class SyncTaskManager {
      * @param list
      */
     private void deleteLastQuery(List<SyncData> list, boolean oldCache) {
-        List<String> ids = new ArrayList<>();
+        List<Long> ids = new ArrayList<>();
         for (SyncData r : list) {
-            ids.add(String.valueOf(r.getId()));
+            ids.add(r.getId());
         }
         FTDBManager.get().delete(ids, oldCache);
     }

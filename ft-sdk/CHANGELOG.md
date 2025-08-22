@@ -1,3 +1,8 @@
+# agent 1.6.14-beta02
+1. Fixed scenarios where operations were not performed through the main process.
+2. Optimized batch write and delete scenarios.
+
+---
 # agent 1.6.14-beta01
 1. Same as agent 1.6.14-alpha02
 

@@ -1,8 +1,11 @@
 package com.ft.sdk.garble.db;
 
 import android.content.ContentProvider;
+import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.OperationApplicationException;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -18,6 +21,8 @@ import com.ft.sdk.garble.db.base.DataBaseCallBack;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
+
+import java.util.ArrayList;
 
 /**
  * @date 2025-08-17
@@ -166,6 +171,74 @@ public class FTContentProvider extends ContentProvider {
         return null;
     }
 
+
+    @Override
+    public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
+        if (values == null || values.length == 0) {
+            return 0;
+        }
+
+        final String tableName = getTableName(uri);
+        if (tableName == null) {
+            return 0;
+        }
+
+        final int[] insertedCount = new int[1];
+        final ContentValues[] finalValues = values;
+
+        try {
+            // Use DBManager's thread-safe mechanism for write operations
+            dbManager.getDB(true, values.length, new DataBaseCallBack() {
+                @Override
+                public void run(SQLiteDatabase db) {
+                    int count = 0;
+                    try {
+                        for (ContentValues finalValue : finalValues) {
+                            long rowId = db.insert(tableName, null, finalValue);
+                            if (rowId >= 0) {
+                                count++;
+                            }
+                        }
+                        insertedCount[0] = count;
+                    } catch (Exception e) {
+                        LogUtils.e(TAG, "Insert failed: " + e.getMessage());
+                        insertedCount[0] = -1;
+                    }
+                }
+            });
+        } catch (Exception e) {
+            LogUtils.e(TAG, "Bulk insert operation failed: " + e.getMessage());
+            return -1;
+        }
+        return insertedCount[0];
+    }
+
+    @Override
+    public ContentProviderResult[] applyBatch(ArrayList<ContentProviderOperation> operations)
+            throws OperationApplicationException {
+        ContentProviderResult[] results = new ContentProviderResult[operations.size()];
+        try {
+            // Use DBManager's thread-safe mechanism for write operations
+            dbManager.getDB(true, operations.size(), new DataBaseCallBack() {
+                @Override
+                public void run(SQLiteDatabase db) {
+                    for (int i = 0; i < operations.size(); i++) {
+                        try {
+                            results[i] = operations.get(i).apply(FTContentProvider.this, results, i);
+                        } catch (OperationApplicationException e) {
+                            LogUtils.e(TAG, "apply failed: " + e.getMessage());
+                        }
+                    }
+                }
+            });
+        } catch (Exception e) {
+            LogUtils.e(TAG, "applyBatch failed: " + e.getMessage());
+            return results;
+        }
+        return results;
+    }
+
+
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues values,
                       @Nullable String selection, @Nullable String[] selectionArgs) {
@@ -229,7 +302,6 @@ public class FTContentProvider extends ContentProvider {
             LogUtils.e(TAG, "Delete operation failed: " + e.getMessage());
             return 0;
         }
-
         return resultCount[0];
     }
 

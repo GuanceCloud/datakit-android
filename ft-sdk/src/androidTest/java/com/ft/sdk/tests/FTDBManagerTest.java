@@ -99,9 +99,9 @@ public class FTDBManagerTest extends FTBaseTest {
         Thread.sleep(1000);
         List<SyncData> recordDataList = FTDBManager.get().queryDataByDescLimit(0);
         assertEquals(2, recordDataList.size());
-        List<String> integers = new ArrayList<>();
+        List<Long> integers = new ArrayList<>();
         for (SyncData recordData : recordDataList) {
-            integers.add("" + recordData.getId());
+            integers.add(recordData.getId());
         }
         FTDBManager.get().delete(integers, false);
         List<SyncData> recordDataList1 = FTDBManager.get().queryDataByDescLimit(0);

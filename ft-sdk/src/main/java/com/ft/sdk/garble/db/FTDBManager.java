@@ -70,7 +70,7 @@ public class FTDBManager extends DBManager {
     @Override
     protected void onDBSizeCacheChange(SQLiteDatabase db, long fileSize) {
 //        LogUtils.d(TAG, "onDBSizeCacheChange:" + (fileSize / 1024) + "KB");
-        //only do it in main process, db todo
+        //only do it in main process, db
         FTDBCachePolicy.get().setCurrentDBSize(fileSize);
         if (FTDBCachePolicy.get().isReachDbLimit()) {
             if (FTDBCachePolicy.get().getDbCacheDiscard() == DBCacheDiscard.DISCARD_OLDEST) {
@@ -216,7 +216,7 @@ public class FTDBManager extends DBManager {
      */
     public void closeView(final String viewId, final long loadTime, final long timeSpent, final String attr) {
         LogUtils.d(TAG, "closeVIew:" + viewId + ",timeSpent:" + timeSpent);
-        
+
         try {
             // Since rawQuery returns a Bundle, we need to get data through other methods
             // Here we directly use ContentProvider's query method
@@ -405,7 +405,7 @@ public class FTDBManager extends DBManager {
      */
     private void updateViewDateTimeByColumn(String viewId, String columName, long dateTime) {
         if (viewId == null) return;
-        
+
         try {
             // Since rawQuery returns a Bundle, we need to get data through other methods
             // Here we directly use ContentProvider's query method
@@ -676,10 +676,16 @@ public class FTDBManager extends DBManager {
      * @param dataList
      */
     public boolean insertFtOptList(@NonNull final List<SyncData> dataList, boolean reInsert) {
+        if (dataList.isEmpty()) {
+            return true;
+        }
 
         try {
-            // Use ContentProvider to batch insert data
-            for (SyncData data : dataList) {
+            // Prepare ContentValues array for bulk insert
+            ContentValues[] contentValuesArray = new ContentValues[dataList.size()];
+
+            for (int i = 0; i < dataList.size(); i++) {
+                SyncData data = dataList.get(i);
                 ContentValues contentValues = new ContentValues();
                 contentValues.put(FTSQL.RECORD_COLUMN_TM, data.getTime());
                 if (reInsert) {
@@ -692,16 +698,31 @@ public class FTDBManager extends DBManager {
                 }
                 contentValues.put(FTSQL.RECORD_COLUMN_DATA_TYPE, data.getDataType().getValue());
 
-                Uri resultUri = contentProvider.insert(FTContentProvider.getUriSyncDataFlat(), contentValues);
-                if (resultUri == null) {
-                    return false;
-                }
+                contentValuesArray[i] = contentValues;
             }
+
+            // Use ContentProvider's bulkInsert for better performance
+            Uri uri = FTContentProvider.getUriSyncDataFlat();
+            int insertedCount = contentProvider.bulkInsert(uri, contentValuesArray);
+
+            if (insertedCount > 0) {
+                if (insertedCount > 1) {
+                    LogUtils.d(TAG, "insertFtOptList successfully inserted "
+                            + insertedCount + " records via bulkInsert");
+                }
+                return true;
+            } else if (insertedCount == 0) {
+                //LogUtils.w(TAG, "insertFtOptList: no records were inserted");
+                return false;
+            } else {
+                LogUtils.e(TAG, "insertFtOptList failed with error code: " + insertedCount);
+                return false;
+            }
+
         } catch (Exception e) {
             LogUtils.e(TAG, "insertFtOptList failed: " + e.getMessage());
             return false;
         }
-        return true;
     }
 
     public List<SyncData> queryDataByDataByTypeLimit(int limit, DataType dataType) {
@@ -738,7 +759,7 @@ public class FTDBManager extends DBManager {
      */
     public int updateDataType(DataType dataType, long errorDateline) {
         final int[] count = new int[1];
-        
+
         try {
             // Use ContentProvider's call method to execute rawQuery
             String originType = dataType.getValue();
@@ -783,7 +804,7 @@ public class FTDBManager extends DBManager {
      */
     public int deleteExpireCache(DataType dataType, long now, long expireDuration) {
         int count = 0;
-        
+
         try {
             // Use ContentProvider to delete data
             long expireTimeline = now - expireDuration;
@@ -811,7 +832,7 @@ public class FTDBManager extends DBManager {
 
     public int queryTotalCount(DataType[] list) {
         int count = 0;
-        
+
         try {
             // Use ContentProvider's call method to execute rawQuery
             String where = getDataTypeWhereString(list);
@@ -888,7 +909,7 @@ public class FTDBManager extends DBManager {
      */
     public boolean isOldCacheExist() {
         boolean result = false;
-        
+
         try {
             // Since rawQuery returns a Bundle, we need to get data through other methods
             // Here we directly use ContentProvider's query method
@@ -969,29 +990,52 @@ public class FTDBManager extends DBManager {
     }
 
     /**
-     * Delete tracking data based on the queried Id collection
+     * Delete tracking data using optimized range deletion
+     * Deletes data where _id <= max_id for better performance
      *
-     * @param ids
+     * @param ids      List of IDs to determine the maximum ID for deletion
+     * @param oldCache Whether to delete from old cache table
      */
-    public void delete(final List<String> ids, boolean oldCache) {
+    public void delete(final List<Long> ids, boolean oldCache) {
+        if (ids == null || ids.isEmpty()) {
+            return;
+        }
+
         try {
-            // Use ContentProvider to delete data
+            // Find the maximum ID from the list
+            long maxId = 0;
+            for (long id : ids) {
+                if (id > maxId) {
+                    maxId = id;
+                }
+            }
+
+            if (maxId <= 0) {
+                LogUtils.w(TAG, "No valid IDs found for deletion");
+                return;
+            }
+
+            // Use ContentProvider's delete method directly
             String tableName = oldCache ? FTSQL.FT_SYNC_OLD_CACHE_TABLE_NAME : FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME;
             Uri uri = tableName.equals(FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME) ?
                     FTContentProvider.getUriSyncDataFlat() : FTContentProvider.getUriSyncData();
 
-            for (String id : ids) {
-                String selection = FTSQL.RECORD_COLUMN_ID + "=?";
-                String[] selectionArgs = {id};
-                int deletedRows = contentProvider.delete(uri, selection, selectionArgs);
-                if (deletedRows > 0) {
+            // Use range deletion: _id <= max_id
+            String selection = FTSQL.RECORD_COLUMN_ID + " <= ?";
+            String[] selectionArgs = new String[]{String.valueOf(maxId)};
 
-                } else {
-                    LogUtils.d(TAG, "delete executed failed via ContentProvider, id: " + id);
-                }
+            int deletedRows = contentProvider.delete(uri, selection, selectionArgs);
+            if (deletedRows > 0) {
+//                LogUtils.d(TAG, "Range delete completed successfully for table: " + tableName +
+//                        ", max_id: " + maxId + ", deleted: " + deletedRows + " rows");
+            } else {
+                LogUtils.w(TAG, "Range delete completed but no rows were deleted from table: "
+                        + tableName + ",maxId:" + maxId
+                );
             }
+
         } catch (Exception e) {
-            LogUtils.d(TAG, LogUtils.getStackTraceString(e));
+            LogUtils.e(TAG, "Range delete operation failed: " + e.getMessage());
         }
     }
 
