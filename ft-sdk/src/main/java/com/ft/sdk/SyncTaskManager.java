@@ -104,6 +104,8 @@ public class SyncTaskManager {
      */
     private boolean autoSync;
 
+    private boolean isMainThread;
+
     /**
      * Synchronization request interval time
      */
@@ -224,6 +226,10 @@ public class SyncTaskManager {
      */
     void executeSyncPoll() {
         if (autoSync) {
+            if (!isMainThread) {
+                LogUtils.wOnce(TAG, "Collect Data will sync on main process");
+                return;
+            }
             executePoll(true);
         }
     }
@@ -400,10 +406,10 @@ public class SyncTaskManager {
      * <p>
      * Note: AndroidTest will call this method {@link com.ft.test.base.FTBaseTest#uploadData(DataType)}
      *
-     * @param dataType      Data type
-     * @param body          Data line protocol result
-     * @param pkgId         Chain package id
-     * @param syncCallback  Asynchronous object
+     * @param dataType     Data type
+     * @param body         Data line protocol result
+     * @param pkgId        Chain package id
+     * @param syncCallback Asynchronous object
      */
     private synchronized void requestNet(DataType dataType, String pkgId, String body,
                                          final RequestCallback syncCallback) throws FTNetworkNoAvailableException {
@@ -518,6 +524,7 @@ public class SyncTaskManager {
         dataSyncMaxRetryCount = config.getDataSyncRetryCount();
         pageSize = config.getPageSize();
         autoSync = config.isAutoSync();
+        isMainThread = config.isMainThread();
         syncSleepTime = config.getSyncSleepTime();
         if (config.isNeedTransformOldCache()) {
             oldCacheRunner = new Runnable() {
