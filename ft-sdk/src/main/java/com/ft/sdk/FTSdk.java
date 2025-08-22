@@ -35,7 +35,7 @@ public class FTSdk {
      */
     public static String PLUGIN_VERSION = "";
     /**
-     * Will only be assigned after integrating ft-native, 
+     * Will only be assigned after integrating ft-native,
      * directly access {@link com.ft.sdk.nativelib.BuildConfig#VERSION_NAME} to get
      */
     public static String NATIVE_VERSION = PackageUtils.isNativeLibrarySupport() ? PackageUtils.getNativeLibVersion() : "";
@@ -55,7 +55,7 @@ public class FTSdk {
      */
     public static String PACKAGE_UUID = "";
     /**
-     * The above two variables cannot be changed arbitrarily, 
+     * The above two variables cannot be changed arbitrarily,
      * if changed please also change the corresponding values in the plugin
      */
     public static final String AGENT_VERSION = BuildConfig.FT_SDK_VERSION;// Current SDK version
@@ -82,16 +82,24 @@ public class FTSdk {
                 LogUtils.e(TAG, "Parameter ftSDKConfig cannot be null");
             } else {
                 boolean onlyMain = ftSDKConfig.isOnlySupportMainProcess();
+                boolean isMainProcess = false;
                 if (onlyMain) {
                     Context context = FTApplication.getApplication();
                     String currentProcessName = Utils.getCurrentProcessName();
                     String packageName = context.getPackageName();
                     if (!TextUtils.isEmpty(packageName) && !TextUtils.equals(packageName, currentProcessName)) {
-                        LogUtils.e(TAG, "Current SDK can only run in the main process, current process is " + currentProcessName + ", if you want to run in non-main process you can set FTSDKConfig.setOnlySupportMainProcess(false)");
+                        LogUtils.e(TAG, "Current SDK can only run in the main process, " +
+                                "current process is " + currentProcessName + ", " +
+                                "if you want to run in non-main process you can set " +
+                                "FTSDKConfig.setOnlySupportMainProcess(false)");
                         return;
+                    } else {
                     }
+                } else {
+                    isMainProcess = Utils.isMainProcess();
                 }
                 mFtSdk = new FTSdk(ftSDKConfig);
+                ftSDKConfig.isMainProcess = isMainProcess;
                 mFtSdk.initFTConfig(ftSDKConfig);
             }
         } catch (Exception e) {
@@ -188,7 +196,7 @@ public class FTSdk {
 
 
     /**
-     * Actively update remote configuration, call frequency is affected by the time of 
+     * Actively update remote configuration, call frequency is affected by the time of
      * {@link FTSDKConfig#setRemoteConfigMiniUpdateInterval(int)} }
      */
     public static void updateRemoteConfig() {
@@ -200,11 +208,11 @@ public class FTSdk {
     }
 
     /**
-     * Actively update remote configuration, this method ignores 
+     * Actively update remote configuration, this method ignores
      * {@link FTSDKConfig#setRemoteConfigMiniUpdateInterval(int)} } configuration
      *
      * @param remoteConfigMiniUpdateInterval Remote configuration time interval, unit seconds [0,]
-     * @param result Return update result
+     * @param result                         Return update result
      */
     public static void updateRemoteConfig(int remoteConfigMiniUpdateInterval, FTRemoteConfigManager.FetchResult result) {
         if (checkInstallState()) {
@@ -292,7 +300,7 @@ public class FTSdk {
     }
 
     /**
-     * Bind user information, {@link Constants#KEY_RUM_IS_SIGN_IN}, after binding the field is T, 
+     * Bind user information, {@link Constants#KEY_RUM_IS_SIGN_IN}, after binding the field is T,
      * bind once, the field data will continue to retain data until calling
      * {@link #unbindRumUserData()}
      *

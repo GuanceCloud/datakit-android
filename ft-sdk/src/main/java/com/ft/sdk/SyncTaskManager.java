@@ -104,6 +104,8 @@ public class SyncTaskManager {
      */
     private boolean autoSync;
 
+    private boolean isMainProcess;
+
     /**
      * Synchronization request interval time
      */
@@ -224,6 +226,10 @@ public class SyncTaskManager {
      */
     void executeSyncPoll() {
         if (autoSync) {
+            if (!isMainProcess) {
+                LogUtils.wOnce(TAG, "Collect Data will sync on main process");
+                return;
+            }
             executePoll(true);
         }
     }
@@ -379,9 +385,9 @@ public class SyncTaskManager {
      * @param list
      */
     private void deleteLastQuery(List<SyncData> list, boolean oldCache) {
-        List<String> ids = new ArrayList<>();
+        List<Long> ids = new ArrayList<>();
         for (SyncData r : list) {
-            ids.add(String.valueOf(r.getId()));
+            ids.add(r.getId());
         }
         FTDBManager.get().delete(ids, oldCache);
     }
@@ -404,10 +410,10 @@ public class SyncTaskManager {
      * <p>
      * Note: AndroidTest will call this method {@link com.ft.test.base.FTBaseTest#uploadData(DataType)}
      *
-     * @param dataType      Data type
-     * @param body          Data line protocol result
-     * @param pkgId         Chain package id
-     * @param syncCallback  Asynchronous object
+     * @param dataType     Data type
+     * @param body         Data line protocol result
+     * @param pkgId        Chain package id
+     * @param syncCallback Asynchronous object
      */
     private synchronized void requestNet(DataType dataType, String pkgId, String body,
                                          final RequestCallback syncCallback) throws FTNetworkNoAvailableException {
@@ -430,6 +436,7 @@ public class SyncTaskManager {
                 .addHeadParam(Constants.SYNC_DATA_CONTENT_TYPE_HEADER, Constants.SYNC_DATA_CONTENT_TYPE_VALUE)
                 .addHeadParam(Constants.SYNC_DATA_TRACE_HEADER,
                         String.format(Constants.SYNC_DATA_TRACE_HEADER_FORMAT, pkgId))
+                .addHeadParam(Constants.SYNC_DATA_DEVICE_TIME, System.currentTimeMillis() + "")
                 .setModel(model)
                 .setMethod(RequestMethod.POST)
                 .setBodyString(body).executeSync();
@@ -521,6 +528,7 @@ public class SyncTaskManager {
         dataSyncMaxRetryCount = config.getDataSyncRetryCount();
         pageSize = config.getPageSize();
         autoSync = config.isAutoSync();
+        isMainProcess = config.isMainProcess();
         syncSleepTime = config.getSyncSleepTime();
         if (config.isNeedTransformOldCache()) {
             oldCacheRunner = new Runnable() {
