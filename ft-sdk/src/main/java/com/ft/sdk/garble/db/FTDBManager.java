@@ -457,24 +457,37 @@ public class FTDBManager extends DBManager {
      * @param attr
      */
     public void updateViewExtraAttr(String viewId, String attr) {
-        getDB(true, new DataBaseCallBack() {
-                    @Override
-                    public void run(SQLiteDatabase db) {
-                        Cursor cursor = db.rawQuery("select count(*) from " + FTSQL.FT_TABLE_VIEW
-                                + " where " + FTSQL.RUM_COLUMN_ID + "='" + viewId + "'", null);
-                        if (cursor.moveToFirst()) {
-                            int count = cursor.getInt(0);
-                            if (count > 0) {
-                                ContentValues contentValues = new ContentValues();
-                                contentValues.put(FTSQL.RUM_COLUMN_EXTRA_ATTR, attr);
-                                db.update(FTSQL.FT_TABLE_VIEW, contentValues,
-                                        FTSQL.RUM_COLUMN_ID + "= ?", new String[]{viewId});
-                            }
-                        }
-                        cursor.close();
+        if (viewId == null) return;
+
+        try {
+            // Use ContentProvider's query method to check if the view exists
+            Uri uri = FTContentProvider.getUriViewData();
+            String selection = FTSQL.RUM_COLUMN_ID + "=?";
+            String[] selectionArgs = {viewId};
+
+            Cursor cursor = contentProvider.query(uri, null, selection, selectionArgs, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                int count = cursor.getInt(0);
+
+                if (count > 0) {
+                    // Use ContentProvider's update method to update the extra attribute
+                    ContentValues contentValues = new ContentValues();
+                    contentValues.put(FTSQL.RUM_COLUMN_EXTRA_ATTR, attr);
+
+                    int updatedRows = contentProvider.update(uri, contentValues, selection, selectionArgs);
+                    if (updatedRows > 0) {
+                        //LogUtils.d(TAG, "updateViewExtraAttr executed successfully via ContentProvider: " + viewId);
+                    } else {
+                        LogUtils.e(TAG, "updateViewExtraAttr executed failed via ContentProvider: " + viewId);
                     }
                 }
-        );
+            }
+            if (cursor != null) {
+                cursor.close();
+            }
+        } catch (Exception e) {
+            LogUtils.d(TAG, LogUtils.getStackTraceString(e));
+        }
     }
 
     /**
