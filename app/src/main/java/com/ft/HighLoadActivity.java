@@ -2,7 +2,6 @@ package com.ft;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -39,7 +38,7 @@ public class HighLoadActivity extends NameTitleActivity {
     /**
      * 1000/50, average 10ms per concurrent 2 threads
      */
-    public static final int LOG_SLEEP = 20;
+    public static final int PRODUCE_SLEEP = 20;
 
     /**
      * 1000/5, average 100ms per concurrent 2 threads
@@ -152,7 +151,7 @@ public class HighLoadActivity extends NameTitleActivity {
                             }
 
                             try {
-                                Thread.sleep(LOG_SLEEP);
+                                Thread.sleep(PRODUCE_SLEEP);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                                 break;
@@ -195,111 +194,15 @@ public class HighLoadActivity extends NameTitleActivity {
                 for (int i = 0; i < ADD_ACTION_COUNT; i++) {
                     FTRUMGlobalManager.get().addAction("Custom Add Action:" + i,
                             "custom_type");
+                    try {
+                        Thread.sleep(PRODUCE_SLEEP);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
 
-    }
-
-    /**
-     * Start TestService stress test
-     * Simulate stress test scenarios in TestService, including HTTP requests, log recording and Action events
-     */
-    private void startTestServiceStressTest() {
-        LogUtils.d(TAG, "Starting TestService stress test...");
-        Toast.makeText(this, "TestService stress test started", Toast.LENGTH_SHORT).show();
-
-        // Start multiple threads for stress testing
-        for (int threadIndex = 0; threadIndex < 3; threadIndex++) {
-            final int threadId = threadIndex;
-            ThreadPoolHandler.get().getExecutor().execute(new Runnable() {
-                @Override
-                public void run() {
-                    LogUtils.d(TAG, "TestService stress test thread " + threadId + " started");
-
-                    // 1. HTTP request stress test
-                    performHttpStressTest(threadId);
-
-                    // 2. Log stress test
-                    performLogStressTest(threadId);
-
-                    // 3. Action event stress test
-                    performActionStressTest(threadId);
-
-                    LogUtils.d(TAG, "TestService stress test thread " + threadId + " completed");
-                }
-            });
-        }
-    }
-
-    /**
-     * HTTP request stress test
-     */
-    private void performHttpStressTest(int threadId) {
-        for (int i = 0; i < TEST_SERVICE_HTTP_COUNT; i++) {
-            synchronized (testServiceLock) {
-                try {
-                    LogUtils.d(TAG, "TestService HTTP stress test thread" + threadId + ":" + (++testServiceCount));
-
-                    // Simulate HTTP requests in TestService
-                    RequestUtils.requestUrl(BuildConfig.TRACE_URL + "_stress_test_" + threadId + "_" + i);
-
-                    // Add random delay to simulate real scenarios
-                    Thread.sleep(TEST_SERVICE_SLEEP + (int) (Math.random() * 20));
-
-                } catch (Exception e) {
-                    LogUtils.e(TAG, "TestService HTTP stress test exception: " + e.getMessage());
-                }
-            }
-        }
-    }
-
-    /**
-     * Log stress test
-     */
-    private void performLogStressTest(int threadId) {
-        for (int i = 0; i < TEST_SERVICE_LOG_COUNT; i++) {
-            synchronized (testServiceLock) {
-                try {
-                    LogUtils.d(TAG, "TestService log stress test thread" + threadId + ":" + (++testServiceCount));
-
-                    // Simulate log recording in TestService
-                    FTLogger.getInstance().logBackground("TestService Stress Test Log - Thread:" + threadId + " - Count:" + i, Status.ERROR);
-
-                    // Console log
-                    Log.d(TAG, "TestService Console Log - Thread:" + threadId + " - Count:" + i);
-
-                    Thread.sleep(TEST_SERVICE_SLEEP + (int) (Math.random() * 10));
-
-                } catch (Exception e) {
-                    LogUtils.e(TAG, "TestService log stress test exception: " + e.getMessage());
-                }
-            }
-        }
-    }
-
-    /**
-     * Action event stress test
-     */
-    private void performActionStressTest(int threadId) {
-        for (int i = 0; i < TEST_SERVICE_ACTION_COUNT; i++) {
-            synchronized (testServiceLock) {
-                try {
-                    LogUtils.d(TAG, "TestService Action stress test thread" + threadId + ":" + (++testServiceCount));
-
-                    // Simulate Action events in TestService
-                    FTRUMGlobalManager.get().addAction(
-                            "TestService Stress Action - Thread:" + threadId + " - Count:" + i,
-                            "stress_test_type"
-                    );
-
-                    Thread.sleep(TEST_SERVICE_SLEEP + (int) (Math.random() * 15));
-
-                } catch (Exception e) {
-                    LogUtils.e(TAG, "TestService Action stress test exception: " + e.getMessage());
-                }
-            }
-        }
     }
 
     /**
