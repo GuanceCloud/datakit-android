@@ -33,7 +33,7 @@ public class ConstantCheckTest extends BaseTest {
                 .builder(BuildConfig.DATAKIT_URL);
         FTSdk.install(ftsdkConfig);
 
-        FTSdk.initRUMWithConfig(new FTRUMConfig());
+        FTSdk.initRUMWithConfig(new FTRUMConfig().setRumAppId(TEST_FAKE_RUM_ID));
 
     }
 

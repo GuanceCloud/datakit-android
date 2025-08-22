@@ -26,5 +26,20 @@
         android:id="@+id/high_load_to_repeat_add_action"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Concurrent AddAction"/>
+        android:text="Concurrent AddAction" />
+
+    <!-- New: Start real TestService stress test service button -->
+    <Button
+        android:id="@+id/high_load_real_test_service_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Start Real TestService Stress Test" />
+
+    <!-- New: Custom stress test button -->
+    <Button
+        android:id="@+id/high_load_custom_stress_test_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Custom Stress Test (90s)" />
+
 </LinearLayout>
