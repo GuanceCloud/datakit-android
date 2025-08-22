@@ -1,7 +1,8 @@
 apply plugin: 'com.android.library'
 
 ext {
-    pkgVersion = "0.1.3-alpha01"
+    //Append "-SNAPSHOT" to the end of snapshot version number for publishing
+    pkgVersion = "0.1.3-alpha01-SNAPSHOT"
     mavenGroupId = "com.cloudcare.ft.mobile.sdk.tracker.agent"
     mavenArtifactId = "ft-session-replay"
     withSourceCode = false
