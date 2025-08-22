@@ -1,3 +1,7 @@
+# agent 1.6.14-beta03
+1. The child process only performs data collection and does not handle data synchronization.
+
+---
 # agent 1.6.14-beta02
 1. Fixed scenarios where operations were not performed through the main process.
 2. Optimized batch write and delete scenarios.
@@ -9,12 +13,12 @@
 ---
 # agent 1.6.14-alpha02
 1. Protect ContentProvider query operations with try-catch
-    and fix the issue where SQL LIMIT was not taking effect.
+   and fix the issue where SQL LIMIT was not taking effect.
 
 ---
 # agent 1.6.14-alpha01
 1. Using ContentProvider to optimize compatibility issues in high-load multi-process data collection scenarios.
-2. Removed the `android.permission.READ_PHONE_STATE` declaration from the SDK AndroidManifest; 
+2. Removed the `android.permission.READ_PHONE_STATE` declaration from the SDK AndroidManifest;
    integrators need to add it themselves based on actual requirements.
 3. Added `x-client-timestamp` http header for time correction.
 
