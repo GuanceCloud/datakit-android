@@ -56,16 +56,33 @@ public class DeflateInterceptor implements Interceptor {
 
             @Override
             public void writeTo(@NotNull BufferedSink sink) throws IOException {
+                Deflater deflater = null;
+                BufferedSink deflateSink = null;
                 try {
-                    Deflater deflater = new Deflater();//with zlib wrap
+                    deflater = new Deflater();//with zlib wrap
 //                Deflater deflater = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
 //                //no zlib wrap
-                    BufferedSink deflateSink = Okio.buffer(new DeflaterSink(sink, deflater));
+                    deflateSink = Okio.buffer(new DeflaterSink(sink, deflater));
                     body.writeTo(deflateSink);
-                    deflateSink.close();
                 } catch (Throwable t) {
                     LogUtils.e(TAG, "Deflate writeTo error" + LogUtils.getStackTraceString(t));
                     throw t;
+                } finally {
+                    // 确保资源被正确释放
+                    if (deflateSink != null) {
+                        try {
+                            deflateSink.close();
+                        } catch (Exception e) {
+                            LogUtils.e(TAG, "Error closing deflateSink: " + e.getMessage());
+                        }
+                    }
+                    if (deflater != null) {
+                        try {
+                            deflater.end();
+                        } catch (Exception e) {
+                            LogUtils.e(TAG, "Error ending deflater: " + e.getMessage());
+                        }
+                    }
                 }
             }
         };

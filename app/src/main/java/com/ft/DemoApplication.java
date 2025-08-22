@@ -55,6 +55,17 @@ public class DemoApplication extends BaseApplication {
             //initOkGo();
 
         }
+
+        // CloseGuard invoke
+//        if (BuildConfig.DEBUG) {
+//            try {
+//                Class<?> closeGuard = Class.forName("dalvik.system.CloseGuard");
+//                Method setEnabled = closeGuard.getMethod("setEnabled", boolean.class);
+//                setEnabled.invoke(null, true);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
     }
 
     void initOkGo() {
