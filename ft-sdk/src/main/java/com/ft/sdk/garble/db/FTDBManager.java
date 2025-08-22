@@ -1,11 +1,17 @@
 package com.ft.sdk.garble.db;
 
 import android.annotation.SuppressLint;
+import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
+import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.OperationApplicationException;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.net.Uri;
+import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 
@@ -16,7 +22,6 @@ import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncData;
 import com.ft.sdk.garble.bean.ViewBean;
 import com.ft.sdk.garble.db.base.DBManager;
-import com.ft.sdk.garble.db.base.DataBaseCallBack;
 import com.ft.sdk.garble.db.base.DatabaseHelper;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -40,8 +45,11 @@ public class FTDBManager extends DBManager {
      */
     private boolean isAndroidTest = false;
 
+    private final ContentResolver contentProvider;
 
     private FTDBManager() {
+        Context context = FTApplication.getApplication();
+        contentProvider = context.getContentResolver();
     }
 
     public static FTDBManager get() {
@@ -53,7 +61,8 @@ public class FTDBManager extends DBManager {
 
     @Override
     public SQLiteOpenHelper initDataBaseHelper() {
-        return DatabaseHelper.getInstance(FTApplication.getApplication(), FTDBConfig.DATABASE_NAME, FTDBConfig.DATABASE_VERSION);
+        return DatabaseHelper.getInstance(FTApplication.getApplication(), FTDBConfig.DATABASE_NAME,
+                FTDBConfig.DATABASE_VERSION);
     }
 
     @Override
@@ -64,6 +73,7 @@ public class FTDBManager extends DBManager {
     @Override
     protected void onDBSizeCacheChange(SQLiteDatabase db, long fileSize) {
 //        LogUtils.d(TAG, "onDBSizeCacheChange:" + (fileSize / 1024) + "KB");
+        //only do it in main process, db
         FTDBCachePolicy.get().setCurrentDBSize(fileSize);
         if (FTDBCachePolicy.get().isReachDbLimit()) {
             if (FTDBCachePolicy.get().getDbCacheDiscard() == DBCacheDiscard.DISCARD_OLDEST) {
@@ -99,34 +109,29 @@ public class FTDBManager extends DBManager {
 
     public void initSumView(final ViewBean data) {
         LogUtils.d(TAG, "initSumView id:" + data.getId() + ",name:" + data.getViewName());
-        getDB(true, new DataBaseCallBack() {
-            @Override
-            public void run(SQLiteDatabase db) {
-                ContentValues contentValues = new ContentValues();
-                contentValues.put(FTSQL.RUM_COLUMN_START_TIME, data.getStartTime());
-                contentValues.put(FTSQL.RUM_COLUMN_LONG_TASK_COUNT, 0);
-                contentValues.put(FTSQL.RUM_COLUMN_ERROR_COUNT, 0);
-                contentValues.put(FTSQL.RUM_COLUMN_ID, data.getId());
-                contentValues.put(FTSQL.RUM_COLUMN_IS_CLOSE, 0);
-                contentValues.put(FTSQL.RUM_COLUMN_ACTION_COUNT, 0);
-                contentValues.put(FTSQL.RUM_COLUMN_RESOURCE_COUNT, 0);
-                contentValues.put(FTSQL.RUM_COLUMN_PENDING_RESOURCE, 0);
-                contentValues.put(FTSQL.RUM_COLUMN_VIEW_NAME, data.getViewName());
-                contentValues.put(FTSQL.RUM_COLUMN_VIEW_REFERRER, data.getViewReferrer());
-                contentValues.put(FTSQL.RUM_COLUMN_VIEW_LOAD_TIME, data.getLoadTime());
-                contentValues.put(FTSQL.RUM_COLUMN_SESSION_ID, data.getSessionId());
-                contentValues.put(FTSQL.RUM_COLUMN_EXTRA_ATTR, data.getAttrJsonString());
+        try {
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(FTSQL.RUM_COLUMN_START_TIME, data.getStartTime());
+            contentValues.put(FTSQL.RUM_COLUMN_LONG_TASK_COUNT, 0);
+            contentValues.put(FTSQL.RUM_COLUMN_ERROR_COUNT, 0);
+            contentValues.put(FTSQL.RUM_COLUMN_ID, data.getId());
+            contentValues.put(FTSQL.RUM_COLUMN_IS_CLOSE, 0);
+            contentValues.put(FTSQL.RUM_COLUMN_ACTION_COUNT, 0);
+            contentValues.put(FTSQL.RUM_COLUMN_RESOURCE_COUNT, 0);
+            contentValues.put(FTSQL.RUM_COLUMN_PENDING_RESOURCE, 0);
+            contentValues.put(FTSQL.RUM_COLUMN_VIEW_NAME, data.getViewName());
+            contentValues.put(FTSQL.RUM_COLUMN_VIEW_REFERRER, data.getViewReferrer());
+            contentValues.put(FTSQL.RUM_COLUMN_VIEW_LOAD_TIME, data.getLoadTime());
+            contentValues.put(FTSQL.RUM_COLUMN_SESSION_ID, data.getSessionId());
+            contentValues.put(FTSQL.RUM_COLUMN_EXTRA_ATTR, data.getAttrJsonString());
 
-                try {
-                    db.insertOrThrow(FTSQL.FT_TABLE_VIEW, null, contentValues);
-                } catch (SQLException e) {
-                    LogUtils.e(TAG, "initSumView id:" + data.getId() + "db insert ignore, " +
-                            "reason:" + e.getMessage());
-
-                }
-
+            Uri resultUri = contentProvider.insert(FTContentProvider.getUriViewData(), contentValues);
+            if (resultUri == null) {
+                LogUtils.e(TAG, "initSumView executed failed via ContentProvider:" + data.getId());
             }
-        });
+        } catch (Exception e) {
+            LogUtils.d(TAG, LogUtils.getStackTraceString(e));
+        }
     }
 
 
@@ -140,33 +145,32 @@ public class FTDBManager extends DBManager {
         LogUtils.d(TAG, "initSumAction id:" + data.getId() + ",ViewName:" + data.getViewName()
                 + ",actionName:" + data.getActionName());
 
-        getDB(true, new DataBaseCallBack() {
-            @Override
-            public void run(SQLiteDatabase db) {
-                ContentValues contentValues = new ContentValues();
-                contentValues.put(FTSQL.RUM_COLUMN_START_TIME, data.getStartTime());
-                contentValues.put(FTSQL.RUM_COLUMN_LONG_TASK_COUNT, 0);
-                contentValues.put(FTSQL.RUM_COLUMN_ERROR_COUNT, 0);
-                contentValues.put(FTSQL.RUM_COLUMN_ID, data.getId());
-                contentValues.put(FTSQL.RUM_COLUMN_IS_CLOSE, data.isClose() ? 1 : 0);
-                contentValues.put(FTSQL.RUM_COLUMN_SESSION_ID, data.getSessionId());
-                contentValues.put(FTSQL.RUM_COLUMN_VIEW_ID, data.getViewId());
-                contentValues.put(FTSQL.RUM_COLUMN_VIEW_NAME, data.getViewName());
-                contentValues.put(FTSQL.RUM_COLUMN_VIEW_REFERRER, data.getViewReferrer());
-                contentValues.put(FTSQL.RUM_COLUMN_RESOURCE_COUNT, 0);
-                contentValues.put(FTSQL.RUM_COLUMN_PENDING_RESOURCE, 0);
-                contentValues.put(FTSQL.RUM_COLUMN_ACTION_DURATION, data.getDuration());
-                contentValues.put(FTSQL.RUM_COLUMN_ACTION_NAME, data.getActionName());
-                contentValues.put(FTSQL.RUM_COLUMN_ACTION_TYPE, data.getActionType());
-                contentValues.put(FTSQL.RUM_COLUMN_EXTRA_ATTR, data.getAttrJsonString());
-                try {
-                    db.insertOrThrow(FTSQL.FT_TABLE_ACTION, null, contentValues);
-                } catch (SQLException e) {
-                    LogUtils.d(TAG, "initSumAction id:" + data.getId() + "db insert ignore, " +
-                            "reason:" + e.getMessage());
-                }
+        try {
+            // Use ContentProvider to insert data
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(FTSQL.RUM_COLUMN_START_TIME, data.getStartTime());
+            contentValues.put(FTSQL.RUM_COLUMN_LONG_TASK_COUNT, 0);
+            contentValues.put(FTSQL.RUM_COLUMN_ERROR_COUNT, 0);
+            contentValues.put(FTSQL.RUM_COLUMN_ID, data.getId());
+            contentValues.put(FTSQL.RUM_COLUMN_IS_CLOSE, data.isClose() ? 1 : 0);
+            contentValues.put(FTSQL.RUM_COLUMN_SESSION_ID, data.getSessionId());
+            contentValues.put(FTSQL.RUM_COLUMN_VIEW_ID, data.getViewId());
+            contentValues.put(FTSQL.RUM_COLUMN_VIEW_NAME, data.getViewName());
+            contentValues.put(FTSQL.RUM_COLUMN_VIEW_REFERRER, data.getViewReferrer());
+            contentValues.put(FTSQL.RUM_COLUMN_RESOURCE_COUNT, 0);
+            contentValues.put(FTSQL.RUM_COLUMN_PENDING_RESOURCE, 0);
+            contentValues.put(FTSQL.RUM_COLUMN_ACTION_DURATION, data.getDuration());
+            contentValues.put(FTSQL.RUM_COLUMN_ACTION_NAME, data.getActionName());
+            contentValues.put(FTSQL.RUM_COLUMN_ACTION_TYPE, data.getActionType());
+            contentValues.put(FTSQL.RUM_COLUMN_EXTRA_ATTR, data.getAttrJsonString());
+
+            Uri resultUri = contentProvider.insert(FTContentProvider.getUriActionData(), contentValues);
+            if (resultUri == null) {
+                LogUtils.e(TAG, "initSumAction executed failed via ContentProvider: " + data.getId());
             }
-        });
+        } catch (Exception e) {
+            LogUtils.d(TAG, LogUtils.getStackTraceString(e));
+        }
     }
 
     /**
@@ -177,32 +181,34 @@ public class FTDBManager extends DBManager {
      */
     public void closeAction(final String actionId, final long duration, boolean force) {
         LogUtils.d(TAG, "closeAction:" + actionId + ",duration:" + duration);
-        final String where = FTSQL.RUM_COLUMN_ID + "='" + actionId + "'"
-                + (force ? "" : ("AND " + FTSQL.RUM_COLUMN_PENDING_RESOURCE + "<=0"));
 
+        try {
+            final String where = FTSQL.RUM_COLUMN_ID + "='" + actionId + "'"
+                    + (force ? "" : ("AND " + FTSQL.RUM_COLUMN_PENDING_RESOURCE + "<=0"));
+            // Since rawQuery returns a Bundle, we need to get data through other methods
+            // Here we directly use ContentProvider's query method
+            Uri uri = FTContentProvider.getUriActionData();
+            String selection = FTSQL.RUM_COLUMN_ID + "=?";
+            String[] selectionArgs = {actionId};
 
-        getDB(true, new DataBaseCallBack() {
-            @Override
-            public void run(SQLiteDatabase db) {
-                String sql = "select count(*) from " + FTSQL.FT_TABLE_ACTION
-                        + " where " + where;
-                Cursor cursor = db.rawQuery(sql, null);
-                cursor.moveToFirst();
-                int count = cursor.getInt(0);
-                cursor.close();
+            Cursor cursor = contentProvider.query(uri, null, where, null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(FTSQL.RUM_COLUMN_IS_CLOSE, 1);
+                contentValues.put(FTSQL.RUM_COLUMN_ACTION_DURATION, duration);
 
-                if (count > 0) {
-                    ContentValues contentValues = new ContentValues();
-                    contentValues.put(FTSQL.RUM_COLUMN_IS_CLOSE, 1);
-                    contentValues.put(FTSQL.RUM_COLUMN_ACTION_DURATION, duration);
-                    db.update(FTSQL.FT_TABLE_ACTION, contentValues,
-                            FTSQL.RUM_COLUMN_ID + "='" + actionId + "'", null);
-
+                int updatedRows = contentProvider.update(uri, contentValues, selection, selectionArgs);
+                if (updatedRows > 0) {
+                } else {
+                    LogUtils.e(TAG, "closeAction executed failed via ContentProvider");
                 }
             }
-        });
-
-
+            if (cursor != null) {
+                cursor.close();
+            }
+        } catch (Exception e) {
+            LogUtils.d(TAG, LogUtils.getStackTraceString(e));
+        }
     }
 
     /**
@@ -213,26 +219,34 @@ public class FTDBManager extends DBManager {
      */
     public void closeView(final String viewId, final long loadTime, final long timeSpent, final String attr) {
         LogUtils.d(TAG, "closeVIew:" + viewId + ",timeSpent:" + timeSpent);
-        getDB(true, new DataBaseCallBack() {
-            @Override
-            public void run(SQLiteDatabase db) {
-                Cursor cursor = db.rawQuery("select count(*) from " + FTSQL.FT_TABLE_VIEW
-                        + " where " + FTSQL.RUM_COLUMN_ID + "='" + viewId + "'", null);
-                cursor.moveToFirst();
-                int count = cursor.getInt(0);
-                cursor.close();
 
-                if (count > 0) {
-                    ContentValues contentValues = new ContentValues();
-                    contentValues.put(FTSQL.RUM_COLUMN_IS_CLOSE, 1);
-                    contentValues.put(FTSQL.RUM_COLUMN_VIEW_TIME_SPENT, timeSpent);
-                    contentValues.put(FTSQL.RUM_COLUMN_VIEW_LOAD_TIME, loadTime);
-                    contentValues.put(FTSQL.RUM_COLUMN_EXTRA_ATTR, attr);
-                    db.update(FTSQL.FT_TABLE_VIEW, contentValues,
-                            FTSQL.RUM_COLUMN_ID + "='" + viewId + "'", null);
+        try {
+            // Since rawQuery returns a Bundle, we need to get data through other methods
+            // Here we directly use ContentProvider's query method
+            Uri uri = FTContentProvider.getUriViewData();
+            String selection = FTSQL.RUM_COLUMN_ID + "=?";
+            String[] selectionArgs = {viewId};
+
+            Cursor cursor = contentProvider.query(uri, null, selection, selectionArgs, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(FTSQL.RUM_COLUMN_IS_CLOSE, 1);
+                contentValues.put(FTSQL.RUM_COLUMN_VIEW_TIME_SPENT, timeSpent);
+                contentValues.put(FTSQL.RUM_COLUMN_VIEW_LOAD_TIME, loadTime);
+                contentValues.put(FTSQL.RUM_COLUMN_EXTRA_ATTR, attr);
+
+                int updatedRows = contentProvider.update(uri, contentValues, selection, selectionArgs);
+                if (updatedRows > 0) {
+                } else {
+                    LogUtils.e(TAG, "closeView executed failed via ContentProvider");
                 }
             }
-        });
+            if (cursor != null) {
+                cursor.close();
+            }
+        } catch (Exception e) {
+            LogUtils.d(TAG, LogUtils.getStackTraceString(e));
+        }
     }
 
 
@@ -293,21 +307,38 @@ public class FTDBManager extends DBManager {
      */
     private void increase(final String tableName, final String id, final String columnName) {
         if (id == null) return;
-        getDB(true, new DataBaseCallBack() {
-            @Override
-            public void run(SQLiteDatabase db) {
-                Cursor cursor = db.rawQuery("select count(*) from " + tableName
-                        + " where " + FTSQL.RUM_COLUMN_ID + "='" + id + "'", null);
-                cursor.moveToFirst();
-                int count = cursor.getInt(0);
-                cursor.close();
-                if (count > 0) {
 
-                    db.execSQL("UPDATE " + tableName + " SET "
-                            + columnName + "=" + columnName + "+1 WHERE " + FTSQL.RUM_COLUMN_ID + "='" + id + "'");
+        try {
+            Uri uri = tableName.equals(FTSQL.FT_TABLE_VIEW) ?
+                    FTContentProvider.getUriViewData() : FTContentProvider.getUriActionData();
+            // Since rawQuery returns a Bundle, we need to get data through other methods
+            // Here we directly use ContentProvider's query method
+            String selection = FTSQL.RUM_COLUMN_ID + "=?";
+            String[] selectionArgs = {id};
+
+            Cursor cursor = contentProvider.query(uri, null, selection, selectionArgs, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                int count = cursor.getInt(0);
+
+                if (count > 0) {
+                    // Use ContentProvider's call method to execute execSQL
+                    String updateSql = "UPDATE " + tableName + " SET " + columnName + "=" + columnName + "+1 WHERE " + FTSQL.RUM_COLUMN_ID + "='" + id + "'";
+
+                    Bundle updateExtras = new Bundle();
+                    updateExtras.putString("sql", updateSql);
+
+                    Bundle updateResult = contentProvider.call(uri, FTContentProvider.METHOD_EXEC_SQL, null, updateExtras);
+                    if (!updateResult.getBoolean("success")) {
+                        LogUtils.e(TAG, "increase executed failed via ContentProvider: " + updateSql);
+                    }
                 }
             }
-        });
+            if (cursor != null) {
+                cursor.close();
+            }
+        } catch (Exception e) {
+            LogUtils.d(TAG, LogUtils.getStackTraceString(e));
+        }
     }
 
     /**
@@ -320,21 +351,38 @@ public class FTDBManager extends DBManager {
 
     private void reduce(final String tableName, final String id, final String columnName) {
         if (id == null) return;
-        getDB(true, new DataBaseCallBack() {
-            @Override
-            public void run(SQLiteDatabase db) {
-                Cursor cursor = db.rawQuery("select count(*) from " + tableName
-                        + " where " + FTSQL.RUM_COLUMN_ID + "='" + id + "'", null);
-                if (cursor.moveToFirst()) {
-                    int count = cursor.getInt(0);
-                    if (count > 0) {
-                        db.execSQL("UPDATE " + tableName + " SET "
-                                + columnName + "=" + columnName + "-1 WHERE " + FTSQL.RUM_COLUMN_ID + "='" + id + "'");
+
+        try {
+            // Since rawQuery returns a Bundle, we need to get data through other methods
+            // Here we directly use ContentProvider's query method
+            Uri uri = tableName.equals(FTSQL.FT_TABLE_VIEW) ?
+                    FTContentProvider.getUriViewData() : FTContentProvider.getUriActionData();
+            String selection = FTSQL.RUM_COLUMN_ID + "=?";
+            String[] selectionArgs = {id};
+
+            Cursor cursor = contentProvider.query(uri, null, selection, selectionArgs, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                int count = cursor.getInt(0);
+
+                if (count > 0) {
+                    // Use ContentProvider's call method to execute execSQL
+                    String updateSql = "UPDATE " + tableName + " SET " + columnName + "=" + columnName + "-1 WHERE " + FTSQL.RUM_COLUMN_ID + "='" + id + "'";
+
+                    Bundle updateExtras = new Bundle();
+                    updateExtras.putString("sql", updateSql);
+
+                    Bundle updateResult = contentProvider.call(uri, FTContentProvider.METHOD_EXEC_SQL, null, updateExtras);
+                    if (!updateResult.getBoolean("success")) {
+                        LogUtils.d(TAG, "reduce executed failed via ContentProvider: " + updateSql);
                     }
                 }
+            }
+            if (cursor != null) {
                 cursor.close();
             }
-        });
+        } catch (Exception e) {
+            LogUtils.d(TAG, LogUtils.getStackTraceString(e));
+        }
     }
 
     /**
@@ -342,8 +390,6 @@ public class FTDBManager extends DBManager {
      */
     public void updateViewUploadTime(String viewId, long dateTime) {
         updateViewDateTimeByColumn(viewId, FTSQL.RUM_DATA_UPLOAD_TIME, dateTime);
-
-
     }
 
     /**
@@ -351,7 +397,6 @@ public class FTDBManager extends DBManager {
      */
     public void updateViewUpdateTime(String viewId, long dateTime) {
         updateViewDateTimeByColumn(viewId, FTSQL.RUM_DATA_UPDATE_TIME, dateTime);
-
     }
 
     /**
@@ -362,27 +407,47 @@ public class FTDBManager extends DBManager {
      * @param dateTime  time, milliseconds
      */
     private void updateViewDateTimeByColumn(String viewId, String columName, long dateTime) {
-        getDB(true, new DataBaseCallBack() {
-                    @Override
-                    public void run(SQLiteDatabase db) {
-                        Cursor cursor = db.rawQuery("select count(*) from " + FTSQL.FT_TABLE_VIEW
-                                + " where " + FTSQL.RUM_COLUMN_ID + "='" + viewId + "'", null);
-                        if (cursor.moveToFirst()) {
-                            int count = cursor.getInt(0);
-                            if (count > 0) {
-                                db.execSQL("UPDATE " + FTSQL.FT_TABLE_VIEW + " SET "
-                                        + columName + "=" + dateTime
-                                        + " WHERE " + FTSQL.RUM_COLUMN_ID + "='" + viewId + "'");
-                                db.execSQL("UPDATE " + FTSQL.FT_TABLE_VIEW + " SET "
-                                        + FTSQL.RUM_VIEW_UPDATE_TIME + "=" + FTSQL.RUM_VIEW_UPDATE_TIME + "+ 1"
-                                        + " WHERE " + FTSQL.RUM_COLUMN_ID + "='" + viewId + "'");
-                            }
-                        }
+        if (viewId == null) return;
 
-                        cursor.close();
+        try {
+            // Since rawQuery returns a Bundle, we need to get data through other methods
+            // Here we directly use ContentProvider's query method
+            Uri uri = FTContentProvider.getUriViewData();
+            String selection = FTSQL.RUM_COLUMN_ID + "=?";
+            String[] selectionArgs = {viewId};
+
+            Cursor cursor = contentProvider.query(uri, null, selection, selectionArgs, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                int count = cursor.getInt(0);
+
+                if (count > 0) {
+                    // Use ContentProvider's call method to execute execSQL
+                    String sql1 = "UPDATE " + FTSQL.FT_TABLE_VIEW + " SET " + columName + "=" + dateTime + " WHERE " + FTSQL.RUM_COLUMN_ID + "='" + viewId + "'";
+                    String sql2 = "UPDATE " + FTSQL.FT_TABLE_VIEW + " SET " + FTSQL.RUM_VIEW_UPDATE_TIME + "=" + FTSQL.RUM_VIEW_UPDATE_TIME + "+ 1 WHERE " + FTSQL.RUM_COLUMN_ID + "='" + viewId + "'";
+
+                    // Execute first UPDATE statement
+                    Bundle updateExtras1 = new Bundle();
+                    updateExtras1.putString("sql", sql1);
+                    Bundle updateResult1 = contentProvider.call(uri, FTContentProvider.METHOD_EXEC_SQL, null, updateExtras1);
+
+                    // Execute second UPDATE statement
+                    Bundle updateExtras2 = new Bundle();
+                    updateExtras2.putString("sql", sql2);
+                    Bundle updateResult2 = contentProvider.call(uri, FTContentProvider.METHOD_EXEC_SQL, null, updateExtras2);
+
+                    if (updateResult1.getBoolean("success")
+                            && updateResult2.getBoolean("success")) {
+                    } else {
+                        LogUtils.d(TAG, "updateViewDateTimeByColumn executed failed via ContentProvider");
                     }
                 }
-        );
+            }
+            if (cursor != null) {
+                cursor.close();
+            }
+        } catch (Exception e) {
+            LogUtils.d(TAG, LogUtils.getStackTraceString(e));
+        }
     }
 
     /**
@@ -418,53 +483,61 @@ public class FTDBManager extends DBManager {
      * @param limit
      * @return
      */
-    public ArrayList<ActionBean> querySumAction(final int limit) {
-        final ArrayList<ActionBean> list = new ArrayList<>();
-        getDB(false, new DataBaseCallBack() {
-            @Override
-            public void run(SQLiteDatabase db) {
-                try {
-                    Cursor cursor = db.query(FTSQL.FT_TABLE_ACTION, null, FTSQL.RUM_COLUMN_IS_CLOSE + "=1", null,
-                            null, null, FTSQL.RUM_COLUMN_START_TIME + " asc", limit == 0 ? null : String.valueOf(limit));
-                    while (cursor.moveToNext()) {
-                        String id = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_ID));
-                        int close = cursor.getInt(cursor.getColumnIndex(FTSQL.RUM_COLUMN_IS_CLOSE));
-                        String sessionId = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_SESSION_ID));
-                        String actionName = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_ACTION_NAME));
-                        String actionType = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_ACTION_TYPE));
-                        int longTaskCount = cursor.getInt(cursor.getColumnIndex(FTSQL.RUM_COLUMN_LONG_TASK_COUNT));
-                        int errorCount = cursor.getInt(cursor.getColumnIndex(FTSQL.RUM_COLUMN_ERROR_COUNT));
-                        int resourceCount = cursor.getInt(cursor.getColumnIndex(FTSQL.RUM_COLUMN_RESOURCE_COUNT));
-                        long duration = cursor.getLong(cursor.getColumnIndex(FTSQL.RUM_COLUMN_ACTION_DURATION));
-                        long startTime = cursor.getLong(cursor.getColumnIndex(FTSQL.RUM_COLUMN_START_TIME));
-                        String viewId = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_ID));
-                        String viewName = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_NAME));
-                        String viewReferrer = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_REFERRER));
-                        String attr = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_EXTRA_ATTR));
+    public ArrayList<ActionBean> querySumAction(int limit) {
+        ArrayList<ActionBean> list = new ArrayList<>();
 
-                        ActionBean bean = new ActionBean();
-                        bean.setClose(close == 1);
-                        bean.setSessionId(sessionId);
-                        bean.setId(id);
-                        bean.setActionName(actionName);
-                        bean.setViewId(viewId);
-                        bean.setViewName(viewName);
-                        bean.setViewReferrer(viewReferrer);
-                        bean.setActionType(actionType);
-                        bean.setLongTaskCount(longTaskCount);
-                        bean.setErrorCount(errorCount);
-                        bean.setResourceCount(resourceCount);
-                        bean.setDuration(duration);
-                        bean.setStartTime(startTime);
-                        bean.setFromAttrJsonString(attr);
-                        list.add(bean);
-                    }
-                    cursor.close();
-                } catch (Exception e) {
-                    LogUtils.e(TAG, LogUtils.getStackTraceString(e));
-                }
+        try {
+            // Use ContentProvider to query data
+            String selection = FTSQL.RUM_COLUMN_IS_CLOSE + "=?";
+            String[] selectionArgs = {"1"};
+            String sortOrder = FTSQL.RUM_COLUMN_START_TIME + " ASC";
+
+            String finalSortOrder = sortOrder;
+            if (limit > 0) {
+                finalSortOrder = sortOrder + " LIMIT " + limit;
             }
-        });
+
+            Cursor cursor = contentProvider.query(FTContentProvider.getUriActionData(),
+                    null, selection, selectionArgs, finalSortOrder);
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    String id = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_ID));
+                    int close = cursor.getInt(cursor.getColumnIndex(FTSQL.RUM_COLUMN_IS_CLOSE));
+                    String sessionId = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_SESSION_ID));
+                    String actionName = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_ACTION_NAME));
+                    String actionType = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_ACTION_TYPE));
+                    int longTaskCount = cursor.getInt(cursor.getColumnIndex(FTSQL.RUM_COLUMN_LONG_TASK_COUNT));
+                    int errorCount = cursor.getInt(cursor.getColumnIndex(FTSQL.RUM_COLUMN_ERROR_COUNT));
+                    int resourceCount = cursor.getInt(cursor.getColumnIndex(FTSQL.RUM_COLUMN_RESOURCE_COUNT));
+                    long duration = cursor.getLong(cursor.getColumnIndex(FTSQL.RUM_COLUMN_ACTION_DURATION));
+                    long startTime = cursor.getLong(cursor.getColumnIndex(FTSQL.RUM_COLUMN_START_TIME));
+                    String viewId = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_ID));
+                    String viewName = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_NAME));
+                    String viewReferrer = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_REFERRER));
+                    String attr = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_EXTRA_ATTR));
+
+                    ActionBean bean = new ActionBean();
+                    bean.setClose(close == 1);
+                    bean.setSessionId(sessionId);
+                    bean.setId(id);
+                    bean.setActionName(actionName);
+                    bean.setViewId(viewId);
+                    bean.setViewName(viewName);
+                    bean.setViewReferrer(viewReferrer);
+                    bean.setActionType(actionType);
+                    bean.setLongTaskCount(longTaskCount);
+                    bean.setErrorCount(errorCount);
+                    bean.setResourceCount(resourceCount);
+                    bean.setDuration(duration);
+                    bean.setStartTime(startTime);
+                    bean.setFromAttrJsonString(attr);
+                    list.add(bean);
+                }
+                cursor.close();
+            }
+        } catch (Exception e) {
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+        }
         return list;
     }
 
@@ -482,59 +555,66 @@ public class FTDBManager extends DBManager {
     public ArrayList<ViewBean> querySumView(final int limit, boolean allData) {
         final ArrayList<ViewBean> list = new ArrayList<>();
 
-        getDB(false, new DataBaseCallBack() {
-            @Override
-            public void run(SQLiteDatabase db) {
-
-                try {
-                    String selection = allData ? null : "(" + FTSQL.RUM_COLUMN_IS_CLOSE + "=1 AND (" +
-                            FTSQL.RUM_DATA_UPLOAD_TIME + "<" + FTSQL.RUM_DATA_UPDATE_TIME
-                            + " OR " + FTSQL.RUM_DATA_UPLOAD_TIME + "=0 )) OR "
-                            + FTSQL.RUM_COLUMN_IS_CLOSE + "=0";
-                    Cursor cursor = db.query(FTSQL.FT_TABLE_VIEW, null, selection,
-                            null, null, null,
-                            FTSQL.RUM_COLUMN_START_TIME + " asc", limit == 0 ? null : String.valueOf(limit));
-                    while (cursor.moveToNext()) {
-                        String id = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_ID));
-                        int close = cursor.getInt(cursor.getColumnIndex(FTSQL.RUM_COLUMN_IS_CLOSE));
-                        String sessionId = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_SESSION_ID));
-                        int longTaskCount = cursor.getInt(cursor.getColumnIndex(FTSQL.RUM_COLUMN_LONG_TASK_COUNT));
-                        int errorCount = cursor.getInt(cursor.getColumnIndex(FTSQL.RUM_COLUMN_ERROR_COUNT));
-                        int resourceCount = cursor.getInt(cursor.getColumnIndex(FTSQL.RUM_COLUMN_RESOURCE_COUNT));
-                        int actionCount = cursor.getInt(cursor.getColumnIndex(FTSQL.RUM_COLUMN_ACTION_COUNT));
-                        long timeSpent = cursor.getLong(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_TIME_SPENT));
-                        long startTime = cursor.getLong(cursor.getColumnIndex(FTSQL.RUM_COLUMN_START_TIME));
-                        long loadTime = cursor.getLong(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_LOAD_TIME));
-                        String viewName = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_NAME));
-                        String viewReferrer = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_REFERRER));
-                        String attr = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_EXTRA_ATTR));
-                        long viewUpdateTime = cursor.getLong(cursor.getColumnIndex(FTSQL.RUM_VIEW_UPDATE_TIME));
-
-                        ViewBean viewBean = new ViewBean();
-                        viewBean.setClose(close == 1);
-                        viewBean.setId(id);
-                        viewBean.setActionCount(actionCount);
-                        viewBean.setTimeSpent(timeSpent);
-                        viewBean.setLoadTime(loadTime);
-                        viewBean.setStartTime(startTime);
-                        viewBean.setResourceCount(resourceCount);
-                        viewBean.setErrorCount(errorCount);
-                        viewBean.setLongTaskCount(longTaskCount);
-                        viewBean.setSessionId(sessionId);
-                        viewBean.setViewName(viewName);
-                        viewBean.setViewReferrer(viewReferrer);
-                        viewBean.setFromAttrJsonString(attr);
-                        viewBean.setViewUpdateTime(viewUpdateTime);
-
-                        list.add(viewBean);
-                    }
-                    cursor.close();
-                } catch (Exception e) {
-                    LogUtils.e(TAG, LogUtils.getStackTraceString(e));
-
-                }
+        try {
+            // Use ContentProvider to query data
+            // Uri uri = Uri.parse("content://com.ft.sdk.provider/view_data");
+            String selection;
+            if (allData) {
+                selection = null;
+            } else {
+                selection = "(" + FTSQL.RUM_COLUMN_IS_CLOSE + "=1 AND (" +
+                        FTSQL.RUM_DATA_UPLOAD_TIME + "<" + FTSQL.RUM_DATA_UPDATE_TIME
+                        + " OR " + FTSQL.RUM_DATA_UPLOAD_TIME + "=0 )) OR "
+                        + FTSQL.RUM_COLUMN_IS_CLOSE + "=0 ";
             }
-        });
+            String sortOrder = FTSQL.RUM_COLUMN_START_TIME + " ASC";
+
+            String finalSortOrder = sortOrder;
+            if (limit > 0) {
+                finalSortOrder = sortOrder + " LIMIT " + limit;
+            }
+
+            Cursor cursor = contentProvider.query(FTContentProvider.getUriViewData(), null, selection, null, finalSortOrder);
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    String id = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_ID));
+                    int close = cursor.getInt(cursor.getColumnIndex(FTSQL.RUM_COLUMN_IS_CLOSE));
+                    String sessionId = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_SESSION_ID));
+                    int longTaskCount = cursor.getInt(cursor.getColumnIndex(FTSQL.RUM_COLUMN_LONG_TASK_COUNT));
+                    int errorCount = cursor.getInt(cursor.getColumnIndex(FTSQL.RUM_COLUMN_ERROR_COUNT));
+                    int resourceCount = cursor.getInt(cursor.getColumnIndex(FTSQL.RUM_COLUMN_RESOURCE_COUNT));
+                    int actionCount = cursor.getInt(cursor.getColumnIndex(FTSQL.RUM_COLUMN_ACTION_COUNT));
+                    long timeSpent = cursor.getLong(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_TIME_SPENT));
+                    long startTime = cursor.getLong(cursor.getColumnIndex(FTSQL.RUM_COLUMN_START_TIME));
+                    long loadTime = cursor.getLong(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_LOAD_TIME));
+                    String viewName = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_NAME));
+                    String viewReferrer = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_VIEW_REFERRER));
+                    String attr = cursor.getString(cursor.getColumnIndex(FTSQL.RUM_COLUMN_EXTRA_ATTR));
+                    long viewUpdateTime = cursor.getLong(cursor.getColumnIndex(FTSQL.RUM_VIEW_UPDATE_TIME));
+
+                    ViewBean viewBean = new ViewBean();
+                    viewBean.setClose(close == 1);
+                    viewBean.setId(id);
+                    viewBean.setActionCount(actionCount);
+                    viewBean.setTimeSpent(timeSpent);
+                    viewBean.setLoadTime(loadTime);
+                    viewBean.setStartTime(startTime);
+                    viewBean.setResourceCount(resourceCount);
+                    viewBean.setErrorCount(errorCount);
+                    viewBean.setLongTaskCount(longTaskCount);
+                    viewBean.setSessionId(sessionId);
+                    viewBean.setViewName(viewName);
+                    viewBean.setViewReferrer(viewReferrer);
+                    viewBean.setFromAttrJsonString(attr);
+                    viewBean.setViewUpdateTime(viewUpdateTime);
+
+                    list.add(viewBean);
+                }
+                cursor.close();
+            }
+        } catch (Exception e) {
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+        }
         return list;
     }
 
@@ -544,20 +624,25 @@ public class FTDBManager extends DBManager {
     public void cleanCloseActionData(String[] ids) {
         if (isAndroidTest) return;
         if (ids.length == 0) return;
-        getDB(true, new DataBaseCallBack() {
-            @Override
-            public void run(SQLiteDatabase db) {
-                String tableName = FTSQL.FT_TABLE_ACTION;
-                StringBuilder placeholders = new StringBuilder();
-                for (int i = 0; i < ids.length; i++) {
-                    placeholders.append("?");
-                    if (i < ids.length - 1) {
-                        placeholders.append(",");
-                    }
+
+        try {
+            // Use ContentProvider to delete data
+            StringBuilder placeholders = new StringBuilder();
+            for (int i = 0; i < ids.length; i++) {
+                placeholders.append("?");
+                if (i < ids.length - 1) {
+                    placeholders.append(",");
                 }
-                db.delete(tableName, FTSQL.RUM_COLUMN_ID + " IN (" + placeholders + ")", ids);
             }
-        });
+            String selection = FTSQL.RUM_COLUMN_ID + " IN (" + placeholders + ")";
+            int deletedRows = contentProvider.delete(FTContentProvider.getUriActionData(), selection, ids);
+            if (deletedRows > 0) {
+                LogUtils.d(TAG, "cleanCloseActionData executed successfully " +
+                        "via ContentProvider, deleted: " + deletedRows);
+            }
+        } catch (Exception e) {
+            LogUtils.d(TAG, LogUtils.getStackTraceString(e));
+        }
     }
 
     /**
@@ -565,27 +650,54 @@ public class FTDBManager extends DBManager {
      */
     public void cleanCloseViewData() {
         if (isAndroidTest) return;
-        getDB(true, new DataBaseCallBack() {
-            @Override
-            public void run(SQLiteDatabase db) {
-                db.execSQL("DELETE FROM " + FTSQL.FT_TABLE_VIEW + " WHERE " + FTSQL.RUM_COLUMN_IS_CLOSE
-                        + "=1 AND " + FTSQL.RUM_COLUMN_PENDING_RESOURCE + "<=0");
+
+        try {
+            // Use ContentProvider's call method to execute execSQL
+            String sql = "DELETE FROM " + FTSQL.FT_TABLE_VIEW + " WHERE " + FTSQL.RUM_COLUMN_IS_CLOSE
+                    + "=1 AND " + FTSQL.RUM_COLUMN_PENDING_RESOURCE + "<=0";
+
+            Bundle extras = new Bundle();
+            extras.putString("sql", sql);
+
+            Bundle result = contentProvider.call(FTContentProvider.getUriViewData(), FTContentProvider.METHOD_EXEC_SQL, null, extras);
+            if (!result.getBoolean("success")) {
+                LogUtils.e(TAG, "cleanCloseViewData executed failed via ContentProvider");
             }
-        });
+        } catch (Exception e) {
+            LogUtils.d(TAG, LogUtils.getStackTraceString(e));
+        }
     }
 
     public void closeAllActionAndView() {
         LogUtils.d(TAG, "closeAllActionAndView");
-        getDB(true, new DataBaseCallBack() {
-            @Override
-            public void run(SQLiteDatabase db) {
-                db.execSQL("UPDATE " + FTSQL.FT_TABLE_VIEW + " SET "
-                        + FTSQL.RUM_COLUMN_IS_CLOSE + "=1," + FTSQL.RUM_COLUMN_PENDING_RESOURCE + "=0," + FTSQL.RUM_DATA_UPDATE_TIME + "=" + System.currentTimeMillis());
-                db.execSQL("UPDATE " + FTSQL.FT_TABLE_ACTION + " SET "
-                        + FTSQL.RUM_COLUMN_IS_CLOSE + "=1 ," + FTSQL.RUM_COLUMN_PENDING_RESOURCE + "=0");
-            }
-        });
 
+        try {
+            // Use ContentProvider's call method to execute execSQL for View table
+            String viewSql = "UPDATE " + FTSQL.FT_TABLE_VIEW + " SET "
+                    + FTSQL.RUM_COLUMN_IS_CLOSE + "=1," + FTSQL.RUM_COLUMN_PENDING_RESOURCE + "=0," + FTSQL.RUM_DATA_UPDATE_TIME + "=" + System.currentTimeMillis();
+
+            Bundle viewExtras = new Bundle();
+            viewExtras.putString("sql", viewSql);
+
+            Bundle viewResult = contentProvider.call(FTContentProvider.getUriViewData(),
+                    FTContentProvider.METHOD_EXEC_SQL, null, viewExtras);
+
+            // Use ContentProvider's call method to execute execSQL for Action table
+            String actionSql = "UPDATE " + FTSQL.FT_TABLE_ACTION + " SET "
+                    + FTSQL.RUM_COLUMN_IS_CLOSE + "=1 ," + FTSQL.RUM_COLUMN_PENDING_RESOURCE + "=0";
+
+            Bundle actionExtras = new Bundle();
+            actionExtras.putString("sql", actionSql);
+
+            Bundle actionResult = contentProvider.call(FTContentProvider.getUriActionData(), FTContentProvider.METHOD_EXEC_SQL, null, actionExtras);
+
+            if (!viewResult.getBoolean("success") || !actionResult.getBoolean("success")) {
+                //LogUtils.d(TAG, "closeAllActionAndView executed successfully via ContentProvider");
+                LogUtils.e(TAG, "closeAllActionAndView executed failed via ContentProvider");
+            }
+        } catch (Exception e) {
+            LogUtils.d(TAG, LogUtils.getStackTraceString(e));
+        }
     }
 
     /**
@@ -594,36 +706,54 @@ public class FTDBManager extends DBManager {
      * @param dataList
      */
     public boolean insertFtOptList(@NonNull final List<SyncData> dataList, boolean reInsert) {
-        final boolean[] result = new boolean[1];
-        getDB(true, dataList.size(), new DataBaseCallBack() {
-            @Override
-            public void run(SQLiteDatabase db) {
-                int count = 0;
-                for (SyncData data : dataList) {
+        if (dataList.isEmpty()) {
+            return true;
+        }
 
-                    ContentValues contentValues = new ContentValues();
-                    contentValues.put(FTSQL.RECORD_COLUMN_TM, data.getTime());
-                    if (reInsert) {
-                        String uuid = Utils.getGUID_16();
-                        contentValues.put(FTSQL.RECORD_COLUMN_DATA_UUID, uuid);
-                        contentValues.put(FTSQL.RECORD_COLUMN_DATA, data.getDataString(uuid));
-                    } else {
-                        contentValues.put(FTSQL.RECORD_COLUMN_DATA_UUID, data.getUuid());
-                        contentValues.put(FTSQL.RECORD_COLUMN_DATA, data.getDataString());
-                    }
+        try {
+            // Prepare ContentValues array for bulk insert
+            ContentValues[] contentValuesArray = new ContentValues[dataList.size()];
 
-                    contentValues.put(FTSQL.RECORD_COLUMN_DATA_TYPE, data.getDataType().getValue());
-                    long rowId = db.insert(FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME, null, contentValues);
-                    if (rowId >= 0) {
-                        count++;
-                    }
+            for (int i = 0; i < dataList.size(); i++) {
+                SyncData data = dataList.get(i);
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(FTSQL.RECORD_COLUMN_TM, data.getTime());
+                if (reInsert) {
+                    String uuid = Utils.getGUID_16();
+                    contentValues.put(FTSQL.RECORD_COLUMN_DATA_UUID, uuid);
+                    contentValues.put(FTSQL.RECORD_COLUMN_DATA, data.getDataString(uuid));
+                } else {
+                    contentValues.put(FTSQL.RECORD_COLUMN_DATA_UUID, data.getUuid());
+                    contentValues.put(FTSQL.RECORD_COLUMN_DATA, data.getDataString());
                 }
-                result[0] = count == dataList.size();
-            }
-        });
-        return result[0];
-    }
+                contentValues.put(FTSQL.RECORD_COLUMN_DATA_TYPE, data.getDataType().getValue());
 
+                contentValuesArray[i] = contentValues;
+            }
+
+            // Use ContentProvider's bulkInsert for better performance
+            Uri uri = FTContentProvider.getUriSyncDataFlat();
+            int insertedCount = contentProvider.bulkInsert(uri, contentValuesArray);
+
+            if (insertedCount > 0) {
+                if (insertedCount > 1) {
+                    LogUtils.d(TAG, "insertFtOptList successfully inserted "
+                            + insertedCount + " records via bulkInsert");
+                }
+                return true;
+            } else if (insertedCount == 0) {
+                //LogUtils.w(TAG, "insertFtOptList: no records were inserted");
+                return false;
+            } else {
+                LogUtils.e(TAG, "insertFtOptList failed with error code: " + insertedCount);
+                return false;
+            }
+
+        } catch (Exception e) {
+            LogUtils.e(TAG, "insertFtOptList failed: " + e.getMessage());
+            return false;
+        }
+    }
 
     public List<SyncData> queryDataByDataByTypeLimit(int limit, DataType dataType) {
         return queryDataByDescLimit(limit, FTSQL.RECORD_COLUMN_DATA_TYPE + "=? ", new String[]{dataType.getValue()}, "asc", false);
@@ -659,29 +789,41 @@ public class FTDBManager extends DBManager {
      */
     public int updateDataType(DataType dataType, long errorDateline) {
         final int[] count = new int[1];
-        getDB(true, new DataBaseCallBack() {
-            @Override
-            public void run(SQLiteDatabase db) {
-                ContentValues value = new ContentValues();
-                String originType = dataType.getValue();
-                String targetDataType = originType.replace(DataType.ERROR_SAMPLED_SUFFIX, "");
 
-                String whereSql = FTSQL.RECORD_COLUMN_DATA_TYPE + "='" + originType + "' AND "
-                        + FTSQL.RECORD_COLUMN_TM + " <= " + errorDateline;
-                Cursor cursor = db.rawQuery("select count(*) from " + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME
-                        + " where " + whereSql, null);
-                if (cursor.moveToFirst()) {
-                    count[0] = cursor.getInt(0);
-                }
-                cursor.close();
+        try {
+            // Use ContentProvider's call method to execute rawQuery
+            String originType = dataType.getValue();
+            String targetDataType = originType.replace(DataType.ERROR_SAMPLED_SUFFIX, "");
+
+            Uri uri = FTContentProvider.getUriSyncDataFlat();
+
+            // Since rawQuery returns a Bundle, we need to get data through other methods
+            // Here we directly use ContentProvider's query method
+            String selection = FTSQL.RECORD_COLUMN_DATA_TYPE + "=? AND " + FTSQL.RECORD_COLUMN_TM + "<=?";
+            String[] selectionArgs = {originType, String.valueOf(errorDateline)};
+
+            Cursor cursor = contentProvider.query(uri, null, selection, selectionArgs, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                count[0] = cursor.getInt(0);
 
                 if (count[0] > 0) {
+                    ContentValues value = new ContentValues();
                     value.put(FTSQL.RECORD_COLUMN_DATA_TYPE, targetDataType);
-                    db.update(FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME, value, whereSql, null);
-                }
 
+                    int updatedRows = contentProvider.update(uri, value, selection, selectionArgs);
+                    if (updatedRows > 0) {
+
+                    } else {
+                        LogUtils.e(TAG, "updateDataType executed failed via ContentProvider");
+                    }
+                }
             }
-        });
+            if (cursor != null) {
+                cursor.close();
+            }
+        } catch (Exception e) {
+            LogUtils.d(TAG, LogUtils.getStackTraceString(e));
+        }
         return count[0];
     }
 
@@ -691,17 +833,22 @@ public class FTDBManager extends DBManager {
      * @param expireDuration
      */
     public int deleteExpireCache(DataType dataType, long now, long expireDuration) {
-        final int[] count = new int[1];
-        getDB(true, new DataBaseCallBack() {
-            @Override
-            public void run(SQLiteDatabase db) {
-                long expireTimeline = now - expireDuration;
-                count[0] = db.delete(FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME,
-                        FTSQL.RECORD_COLUMN_DATA_TYPE + "='" + dataType.getValue() + "' AND "
-                                + FTSQL.RECORD_COLUMN_TM + "< " + expireTimeline, null);
+        int count = 0;
+
+        try {
+            // Use ContentProvider to delete data
+            long expireTimeline = now - expireDuration;
+            String selection = FTSQL.RECORD_COLUMN_DATA_TYPE + "='" + dataType.getValue() + "' AND "
+                    + FTSQL.RECORD_COLUMN_TM + "< " + expireTimeline;
+
+            count = contentProvider.delete(FTContentProvider.getUriSyncDataFlat(), selection, null);
+            if (count > 0) {
+                LogUtils.d(TAG, "deleteExpireCache executed successfully via ContentProvider, deleted: " + count);
             }
-        });
-        return count[0];
+        } catch (Exception e) {
+            LogUtils.d(TAG, LogUtils.getStackTraceString(e));
+        }
+        return count;
     }
 
     /**
@@ -714,23 +861,26 @@ public class FTDBManager extends DBManager {
     }
 
     public int queryTotalCount(DataType[] list) {
-        final int[] count = new int[1];
-        getDB(false, new DataBaseCallBack() {
-            @Override
-            public void run(SQLiteDatabase db) {
-                try {
-                    String where = getDataTypeWhereString(list);
-                    Cursor cursor = db.rawQuery("select count(*) from "
-                            + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " where " + where, null);
-                    cursor.moveToFirst();
-                    count[0] = cursor.getInt(0);
-                    cursor.close();
-                } catch (Exception e) {
-                    LogUtils.e(TAG, LogUtils.getStackTraceString(e));
-                }
+        int count = 0;
+
+        try {
+            // Use ContentProvider's call method to execute rawQuery
+            String where = getDataTypeWhereString(list);
+            // Since rawQuery returns a Bundle, we need to get data through other methods
+            // Here we directly use ContentProvider's query method
+            Uri uri = FTContentProvider.getUriSyncDataFlat();
+            LogUtils.d(TAG, "queryTotalCount:" + uri);
+            Cursor cursor = contentProvider.query(uri, null, where, null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                count = cursor.getCount();
             }
-        });
-        return count[0];
+            if (cursor != null) {
+                cursor.close();
+            }
+        } catch (Exception e) {
+            LogUtils.d(TAG, LogUtils.getStackTraceString(e));
+        }
+        return count;
     }
 
     private String getDataTypeWhereString(DataType[] list) {
@@ -756,25 +906,28 @@ public class FTDBManager extends DBManager {
     }
 
     public void deleteOldestData(DataType[] list, final int limit) {
-        getDB(true, new DataBaseCallBack() {
-            @Override
-            public void run(SQLiteDatabase db) {
-                try {
-                    String where = getDataTypeWhereString(list);
-                    db.execSQL("DELETE FROM " + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " where _id in (SELECT _id from "
-                            + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " where " + where + " ORDER by tm ASC LIMIT " + limit + ")");
+        try {
+            // Use ContentProvider's call method to execute execSQL
+            String where = getDataTypeWhereString(list);
+            String sql = "DELETE FROM " + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " where _id in (SELECT _id from "
+                    + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " where " + where + " ORDER by tm ASC LIMIT " + limit + ")";
 
-                    if (FTDBCachePolicy.get().isEnableLimitWithDbSize()
-                            && FTDBCachePolicy.get().isReachDbLimit()) {
-                        db.close();
-                        LogUtils.w(TAG, "BD close to reduce size");
-                    }
-                } catch (Exception e) {
-                    LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+            Bundle extras = new Bundle();
+            extras.putString("sql", sql);
 
+            Bundle result = contentProvider.call(FTContentProvider.getUriSyncDataFlat(), FTContentProvider.METHOD_EXEC_SQL, null, extras);
+            if (result.getBoolean("success")) {
+
+                if (FTDBCachePolicy.get().isEnableLimitWithDbSize()
+                        && FTDBCachePolicy.get().isReachDbLimit()) {
+                    LogUtils.w(TAG, "BD close to reduce size");
                 }
+            } else {
+                LogUtils.e(TAG, "deleteOldestData executed failed via ContentProvider");
             }
-        });
+        } catch (Exception e) {
+            LogUtils.d(TAG, LogUtils.getStackTraceString(e));
+        }
     }
 
 
@@ -785,29 +938,24 @@ public class FTDBManager extends DBManager {
      * @return
      */
     public boolean isOldCacheExist() {
-        final boolean[] result = new boolean[1];
-        getDB(false, new DataBaseCallBack() {
-            @Override
-            public void run(SQLiteDatabase db) {
-                try {
-                    Cursor cursor = db.rawQuery("SELECT EXISTS (SELECT 1 FROM " + FTSQL.FT_SYNC_OLD_CACHE_TABLE_NAME + ");", null);
+        boolean result = false;
 
-                    if (cursor != null) {
-                        if (cursor.moveToFirst()) {
-                            result[0] = cursor.getInt(0) == 1;
-                        }
-                        cursor.close();
-                    }
-                } catch (SQLException e) {
-                    if (e.getMessage().contains("no such table: sync_data")) {
-                        LogUtils.d(TAG, "There is no old cache in 'sync_data', ignore this error");
-                    } else {
-                        LogUtils.e(TAG, LogUtils.getStackTraceString(e));
-                    }
+        try {
+            // Since rawQuery returns a Bundle, we need to get data through other methods
+            // Here we directly use ContentProvider's query method
+            Uri uri = FTContentProvider.getUriSyncData();
+
+            Cursor cursor = contentProvider.query(uri, null, null, null, null);
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    result = cursor.getCount() > 0;
                 }
+                cursor.close();
             }
-        });
-        return result[0];
+        } catch (Exception e) {
+            LogUtils.d(TAG, LogUtils.getStackTraceString(e));
+        }
+        return result;
     }
 
     /**
@@ -818,21 +966,28 @@ public class FTDBManager extends DBManager {
      * @param selectionArgs
      * @return
      */
-    private List<SyncData> queryDataByDescLimit(final int limit, final String selection, final String[] selectionArgs, final String order, boolean oldCache) {
+    private List<SyncData> queryDataByDescLimit(final int limit, final String selection, final String[] selectionArgs,
+                                                final String order, boolean oldCache) {
         final List<SyncData> recordList = new ArrayList<>();
-        getDB(false, new DataBaseCallBack() {
-            @Override
-            public void run(SQLiteDatabase db) {
-                String tableName = oldCache ? FTSQL.FT_SYNC_OLD_CACHE_TABLE_NAME : FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME;
 
-                Cursor cursor;
-                if (limit == 0) {
-                    cursor = db.query(tableName, null, selection, selectionArgs,
-                            null, null, FTSQL.RECORD_COLUMN_ID + " " + order);
-                } else {
-                    cursor = db.query(tableName, null, selection, selectionArgs,
-                            null, null, FTSQL.RECORD_COLUMN_ID + " " + order, String.valueOf(limit));
-                }
+        try {
+            // Use ContentProvider to query data
+            String tableName = oldCache ? FTSQL.FT_SYNC_OLD_CACHE_TABLE_NAME : FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME;
+            Uri uri = tableName.equals(FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME) ?
+                    FTContentProvider.getUriSyncDataFlat() : FTContentProvider.getUriSyncData();
+
+            Cursor cursor;
+            if (limit == 0) {
+                // No limit, query all data
+                cursor = contentProvider.query(uri, null, selection, selectionArgs,
+                        FTSQL.RECORD_COLUMN_ID + " " + order);
+            } else {
+                // Apply limit to query
+                cursor = contentProvider.query(uri, null, selection, selectionArgs,
+                        FTSQL.RECORD_COLUMN_ID + " " + order + " LIMIT " + limit);
+            }
+
+            if (cursor != null) {
                 while (cursor.moveToNext()) {
                     long id = cursor.getLong(cursor.getColumnIndex(FTSQL.RECORD_COLUMN_ID));
                     long time = cursor.getLong(cursor.getColumnIndex(FTSQL.RECORD_COLUMN_TM));
@@ -855,52 +1010,94 @@ public class FTDBManager extends DBManager {
                         recordData.setDataString(data);
                         recordList.add(recordData);
                     }
-
-
                 }
                 cursor.close();
             }
-        });
+        } catch (Exception e) {
+            LogUtils.e(TAG, "queryDataByDescLimit failed: " + e.getMessage());
+        }
         return recordList;
     }
 
     /**
-     * Delete tracking data based on the queried Id collection
+     * Delete tracking data based on the queried Id collection using applyBatch
      *
      * @param ids
      */
-    public void delete(final List<String> ids, boolean oldCache) {
-        getDB(true, ids.size(), new DataBaseCallBack() {
-            @Override
-            public void run(SQLiteDatabase db) {
-                String tableName = oldCache ? FTSQL.FT_SYNC_OLD_CACHE_TABLE_NAME : FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME;
-                for (String id : ids) {
-                    db.delete(tableName, FTSQL.RECORD_COLUMN_ID + "=?", new String[]{id});
-                }
+    public void delete(final List<Long> ids, boolean oldCache) {
+        if (ids == null || ids.isEmpty()) {
+            return;
+        }
+
+        try {
+            // Use ContentProvider applyBatch for better performance
+            String tableName = oldCache ? FTSQL.FT_SYNC_OLD_CACHE_TABLE_NAME : FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME;
+            Uri uri = tableName.equals(FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME) ?
+                    FTContentProvider.getUriSyncDataFlat() : FTContentProvider.getUriSyncData();
+
+            // Create batch operations
+            ArrayList<ContentProviderOperation> operations = new ArrayList<>();
+            for (long id : ids) {
+                ContentProviderOperation operation = ContentProviderOperation.newDelete(uri)
+                        .withSelection(FTSQL.RECORD_COLUMN_ID + "=?", new String[]{String.valueOf(id)})
+                        .build();
+                operations.add(operation);
             }
-        });
+
+            // Execute batch operations
+            try {
+                ContentProviderResult[] results = contentProvider.applyBatch(uri.getAuthority(), operations);
+
+                int totalDeleted = 0;
+                for (int i = 0; i < results.length; i++) {
+                    ContentProviderResult result = results[i];
+                    if (result.count > 0) {
+                        totalDeleted += result.count;
+                    } else {
+                        LogUtils.d(TAG, "Delete operation " + i + " failed for id: " + ids.get(i));
+                    }
+                }
+
+                if (totalDeleted > 0) {
+                    //LogUtils.d(TAG, "Batch delete completed successfully, deleted " + totalDeleted + " records");
+                } else {
+                    LogUtils.w(TAG, "Batch delete completed but no records were deleted");
+                }
+
+            } catch (OperationApplicationException e) {
+                LogUtils.e(TAG, "Batch delete operation failed: " + e.getMessage());
+            }
+
+        } catch (Exception e) {
+            LogUtils.d(TAG, LogUtils.getStackTraceString(e));
+        }
     }
 
     /**
      * For testing use, used to delete data in the database
      */
     public void delete() {
-        getDB(true, new DataBaseCallBack() {
-            @Override
-            public void run(SQLiteDatabase db) {
-                db.delete(FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME, null, null);
-                db.delete(FTSQL.FT_TABLE_ACTION, null, null);
-                db.delete(FTSQL.FT_TABLE_VIEW, null, null);
-                LogUtils.e(TAG, "DB table delete");
+        try {
+            // Use ContentProvider to delete data
+            Uri syncUri = FTContentProvider.getUriSyncDataFlat();
+            Uri actionUri = FTContentProvider.getUriActionData();
+            Uri viewUri = FTContentProvider.getUriViewData();
 
-                if (FTDBCachePolicy.get().isEnableLimitWithDbSize()
-                        && FTDBCachePolicy.get().isReachDbLimit()) {
-                    db.close();
-                    LogUtils.d(TAG, "close BD to reduce size");
-                }
+            int deletedSync = contentProvider.delete(syncUri, null, null);
+            int deletedAction = contentProvider.delete(actionUri, null, null);
+            int deletedView = contentProvider.delete(viewUri, null, null);
 
+            LogUtils.e(TAG, "DB table delete via ContentProvider - sync: " + deletedSync +
+                    ", action: " + deletedAction + ", view: " + deletedView);
+
+            if (FTDBCachePolicy.get().isEnableLimitWithDbSize()
+                    && FTDBCachePolicy.get().isReachDbLimit()) {
+                // Close database connection
+                LogUtils.d(TAG, "close BD to reduce size");
             }
-        });
+        } catch (Exception e) {
+            LogUtils.d(TAG, LogUtils.getStackTraceString(e));
+        }
     }
 
     /**
@@ -911,82 +1108,4 @@ public class FTDBManager extends DBManager {
             ftdbManager.shutDown();
         }
     }
-
-
-//    /**
-//     * Insert user data into database
-//     *
-//     * @param userData
-//     */
-//    public void insertFTUserData(UserData userData) {
-//        getDB(true, db -> {
-//            ContentValues cv = new ContentValues();
-//            cv.put(FTSQL.USER_COLUMN_SESSION_ID, userData.getSessionId());
-//            cv.put(FTSQL.USER_COLUMN_DATA, userData.createDBDataString());
-//            db.insert(FTSQL.FT_TABLE_USER_DATA, null, cv);
-//        });
-//    }
-//
-//    /**
-//     * Query user information in database
-//     *
-//     * @param sessionId
-//     * @return
-//     */
-//    public UserData queryFTUserData(String sessionId) {
-//        try {
-//            UserData userData = new UserData();
-//            getDB(false, db -> {
-//                Cursor cursor = db.query(FTSQL.FT_TABLE_USER_DATA, null, FTSQL.USER_COLUMN_SESSION_ID + "=?", new String[]{sessionId}, null, null, null, null);
-//                while (cursor.moveToNext()) {
-//                    String id = cursor.getString(cursor.getColumnIndex(FTSQL.USER_COLUMN_SESSION_ID));
-//                    String data = cursor.getString(cursor.getColumnIndex(FTSQL.USER_COLUMN_DATA));
-//                    userData.setSessionId(id);
-//                    userData.setExtsWithJsonString(data);
-//                    break;
-//                }
-//                cursor.close();
-//            });
-//            return userData.getName() == null ? null : userData;
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-//    }
-//
-//    /**
-//     * Query all user information in database
-//     *
-//     * @return
-//     */
-//    public List<UserData> queryFTUserDataList() {
-//        try {
-//            List<UserData> userDataList = new ArrayList<>();
-//            getDB(false, db -> {
-//                Cursor cursor = db.query(FTSQL.FT_TABLE_USER_DATA, null, null, null, null, null, null, null);
-//                while (cursor.moveToNext()) {
-//                    UserData userData = new UserData();
-//                    String id = cursor.getString(cursor.getColumnIndex(FTSQL.USER_COLUMN_SESSION_ID));
-//                    String data = cursor.getString(cursor.getColumnIndex(FTSQL.USER_COLUMN_DATA));
-//                    userData.setSessionId(id);
-//                    userData.setExtsWithJsonString(data);
-//                    userDataList.add(userData);
-//                }
-//                cursor.close();
-//            });
-//            return userDataList;
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-//    }
-
-//    /**
-//     * Delete user data based on user's sessionId
-//     *
-//     * @param sessionId
-//     */
-//    public void deleteUserData(String sessionId) {
-//        getDB(true, db -> db.delete(FTSQL.FT_TABLE_USER_DATA, FTSQL.USER_COLUMN_SESSION_ID + "=?", new String[]{sessionId}));
-//    }
 }

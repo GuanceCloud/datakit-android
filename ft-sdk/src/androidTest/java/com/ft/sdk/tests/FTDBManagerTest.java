@@ -53,7 +53,7 @@ public class FTDBManagerTest extends FTBaseTest {
     @Test
     public void insertDataTest() throws Exception {
         FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
-        FTSdk.initRUMWithConfig(new FTRUMConfig());
+        FTSdk.initRUMWithConfig(new FTRUMConfig().setRumAppId(TEST_FAKE_RUM_ID));
         insertData();
         //Because data insertion is an asynchronous operation, an interval needs to be set to be able to query the data
         Thread.sleep(2000);
@@ -70,7 +70,7 @@ public class FTDBManagerTest extends FTBaseTest {
     @Test
     public void insertMultiDataTest() throws Exception {
         FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
-        FTSdk.initRUMWithConfig(new FTRUMConfig());
+        FTSdk.initRUMWithConfig(new FTRUMConfig().setRumAppId(TEST_FAKE_RUM_ID));
         int i = 0;
         while (i < repeatTime) {
             insertData();
@@ -99,9 +99,9 @@ public class FTDBManagerTest extends FTBaseTest {
         Thread.sleep(1000);
         List<SyncData> recordDataList = FTDBManager.get().queryDataByDescLimit(0);
         assertEquals(2, recordDataList.size());
-        List<String> integers = new ArrayList<>();
+        List<Long> integers = new ArrayList<>();
         for (SyncData recordData : recordDataList) {
-            integers.add("" + recordData.getId());
+            integers.add(recordData.getId());
         }
         FTDBManager.get().delete(integers, false);
         List<SyncData> recordDataList1 = FTDBManager.get().queryDataByDescLimit(0);

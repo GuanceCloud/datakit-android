@@ -48,7 +48,7 @@ public class DataFormatTest extends FTBaseTest {
     @Test
     public void trackFloatDoubleDataTest() throws Exception {
         FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
-        FTSdk.initRUMWithConfig(new FTRUMConfig());
+        FTSdk.initRUMWithConfig(new FTRUMConfig().setRumAppId(TEST_FAKE_RUM_ID));
         HashMap<String, Object> fields = new HashMap<>();
         fields.put("floatValue", 0f);
         fields.put("doubleValue", 0d);

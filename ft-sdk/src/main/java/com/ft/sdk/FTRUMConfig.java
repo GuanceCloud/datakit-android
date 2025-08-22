@@ -5,6 +5,7 @@ import android.app.Activity;
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.Utils;
 
 import java.util.HashMap;
 
@@ -469,7 +470,7 @@ public class FTRUMConfig {
 
 
     public boolean isRumEnable() {
-        return rumAppId != null;
+        return !Utils.isNullOrEmpty(rumAppId);
     }
 
     /***

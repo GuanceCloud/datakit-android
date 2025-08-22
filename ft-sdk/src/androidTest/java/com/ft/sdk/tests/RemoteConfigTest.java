@@ -191,7 +191,7 @@ public class RemoteConfigTest extends FTBaseTest {
 
         FTSDKConfig config = FTSDKConfig.builder(TEST_FAKE_URL).setRemoteConfiguration(true);
         FTSdk.install(config);
-        FTRUMConfig rumConfig = new FTRUMConfig();
+        FTRUMConfig rumConfig = new FTRUMConfig().setRumAppId(TEST_FAKE_RUM_ID);
         FTSdk.initRUMWithConfig(rumConfig);
         FTLoggerConfig logConfig = new FTLoggerConfig();
         FTSdk.initLogWithConfig(logConfig);

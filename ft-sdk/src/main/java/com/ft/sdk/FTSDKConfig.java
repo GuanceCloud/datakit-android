@@ -45,6 +45,12 @@ public class FTSDKConfig {
      */
     private boolean limitWithDbSize = false;
 
+    boolean isMainProcess = false;
+
+    public boolean isMainProcess() {
+        return isMainProcess;
+    }
+
     /**
      *
      */
@@ -170,6 +176,7 @@ public class FTSDKConfig {
     /**
      * Whether to enable remote configuration for data collection, default is off.
      * When enabled, SDK initialization or app hot start will trigger data update.
+     *
      * @param remoteConfiguration
      * @return
      */
@@ -182,6 +189,7 @@ public class FTSDKConfig {
 
     /**
      * Set the minimum interval for data update, unit: seconds, default 12 hours
+     *
      * @param remoteConfigMiniUpdateInterval
      * @return
      */
@@ -523,7 +531,7 @@ public class FTSDKConfig {
     }
 
     /**
-     * Set the interval time for each sync, sleep time between [0,100]
+     * Set the interval time for each sync, sleep time between [0,5000]，0 default
      *
      * @param sleepTimeMs Data sync interval time
      * @return
