@@ -42,16 +42,14 @@ public abstract class DBManager {
     private ScheduledFuture<?> pendingCloseTask;
 
     // Database size cache
-    private volatile long pageSize = 0;
+    private long pageSize = 0;
 
     protected abstract SQLiteOpenHelper initDataBaseHelper();
 
     SQLiteOpenHelper getDataBaseHelper() {
-        if (databaseHelper == null) {
-            synchronized (dbLock) {
-                if (databaseHelper == null) {
-                    databaseHelper = initDataBaseHelper();
-                }
+        synchronized (dbLock) {
+            if (databaseHelper == null) {
+                databaseHelper = initDataBaseHelper();
             }
         }
         return databaseHelper;
