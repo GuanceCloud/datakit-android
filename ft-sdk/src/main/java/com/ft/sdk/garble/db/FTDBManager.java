@@ -1,9 +1,12 @@
 package com.ft.sdk.garble.db;
 
 import android.annotation.SuppressLint;
+import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -990,11 +993,9 @@ public class FTDBManager extends DBManager {
     }
 
     /**
-     * Delete tracking data using optimized range deletion
-     * Deletes data where _id <= max_id for better performance
+     * Delete tracking data based on the queried Id collection using applyBatch
      *
-     * @param ids      List of IDs to determine the maximum ID for deletion
-     * @param oldCache Whether to delete from old cache table
+     * @param ids
      */
     public void delete(final List<Long> ids, boolean oldCache) {
         if (ids == null || ids.isEmpty()) {
@@ -1002,40 +1003,46 @@ public class FTDBManager extends DBManager {
         }
 
         try {
-            // Find the maximum ID from the list
-            long maxId = 0;
-            for (long id : ids) {
-                if (id > maxId) {
-                    maxId = id;
-                }
-            }
-
-            if (maxId <= 0) {
-                LogUtils.w(TAG, "No valid IDs found for deletion");
-                return;
-            }
-
-            // Use ContentProvider's delete method directly
+            // Use ContentProvider applyBatch for better performance
             String tableName = oldCache ? FTSQL.FT_SYNC_OLD_CACHE_TABLE_NAME : FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME;
             Uri uri = tableName.equals(FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME) ?
                     FTContentProvider.getUriSyncDataFlat() : FTContentProvider.getUriSyncData();
 
-            // Use range deletion: _id <= max_id
-            String selection = FTSQL.RECORD_COLUMN_ID + " <= ?";
-            String[] selectionArgs = new String[]{String.valueOf(maxId)};
+            // Create batch operations
+            ArrayList<ContentProviderOperation> operations = new ArrayList<>();
+            for (long id : ids) {
+                ContentProviderOperation operation = ContentProviderOperation.newDelete(uri)
+                        .withSelection(FTSQL.RECORD_COLUMN_ID + "=?", new String[]{String.valueOf(id)})
+                        .build();
+                operations.add(operation);
+            }
 
-            int deletedRows = contentProvider.delete(uri, selection, selectionArgs);
-            if (deletedRows > 0) {
-//                LogUtils.d(TAG, "Range delete completed successfully for table: " + tableName +
-//                        ", max_id: " + maxId + ", deleted: " + deletedRows + " rows");
-            } else {
-                LogUtils.w(TAG, "Range delete completed but no rows were deleted from table: "
-                        + tableName + ",maxId:" + maxId
-                );
+            // Execute batch operations
+            try {
+                ContentProviderResult[] results = contentProvider.applyBatch(uri.getAuthority(), operations);
+
+                int totalDeleted = 0;
+                for (int i = 0; i < results.length; i++) {
+                    ContentProviderResult result = results[i];
+                    if (result.count > 0) {
+                        totalDeleted += result.count;
+                    } else {
+                        LogUtils.d(TAG, "Delete operation " + i + " failed for id: " + ids.get(i));
+                    }
+                }
+
+                if (totalDeleted > 0) {
+                    //LogUtils.d(TAG, "Batch delete completed successfully, deleted " + totalDeleted + " records");
+                } else {
+                    LogUtils.w(TAG, "Batch delete completed but no records were deleted");
+                }
+
+            } catch (OperationApplicationException e) {
+                LogUtils.e(TAG, "Batch delete operation failed: " + e.getMessage());
             }
 
         } catch (Exception e) {
-            LogUtils.e(TAG, "Range delete operation failed: " + e.getMessage());
+            LogUtils.d(TAG, LogUtils.getStackTraceString(e));
         }
     }
 

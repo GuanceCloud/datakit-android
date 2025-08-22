@@ -45,10 +45,10 @@ public class FTSDKConfig {
      */
     private boolean limitWithDbSize = false;
 
-    boolean isMainThread = false;
+    boolean isMainProcess = false;
 
-    public boolean isMainThread() {
-        return isMainThread;
+    public boolean isMainProcess() {
+        return isMainProcess;
     }
 
     /**

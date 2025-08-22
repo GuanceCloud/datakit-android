@@ -68,21 +68,25 @@ public class FTSdk {
                 LogUtils.e(TAG, "Parameter ftSDKConfig cannot be null");
             } else {
                 boolean onlyMain = ftSDKConfig.isOnlySupportMainProcess();
-                boolean isMainThread = false;
+                boolean isMainProcess = false;
                 if (onlyMain) {
                     Context context = FTApplication.getApplication();
                     String currentProcessName = Utils.getCurrentProcessName();
                     String packageName = context.getPackageName();
                     if (!TextUtils.isEmpty(packageName) && !TextUtils.equals(packageName, currentProcessName)) {
-                        LogUtils.e(TAG, "Current SDK can only run in the main process, current process is " + currentProcessName + ", if you want to run in non-main process you can set FTSDKConfig.setOnlySupportMainProcess(false)");
+                        LogUtils.e(TAG, "Current SDK can only run in the main process, " +
+                                "current process is " + currentProcessName + ", " +
+                                "if you want to run in non-main process you can set " +
+                                "FTSDKConfig.setOnlySupportMainProcess(false)");
                         return;
                     } else {
-                        isMainThread = true;
                     }
+                } else {
+                    isMainProcess = Utils.isMainProcess();
                 }
                 mFtSdk = new FTSdk(ftSDKConfig);
+                ftSDKConfig.isMainProcess = isMainProcess;
                 mFtSdk.initFTConfig(ftSDKConfig);
-                ftSDKConfig.isMainThread = isMainThread;
             }
         } catch (Exception e) {
             LogUtils.e(TAG, "initFTConfig fail:\n" + LogUtils.getStackTraceString(e));

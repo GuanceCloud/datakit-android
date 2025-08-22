@@ -104,7 +104,7 @@ public class SyncTaskManager {
      */
     private boolean autoSync;
 
-    private boolean isMainThread;
+    private boolean isMainProcess;
 
     /**
      * Synchronization request interval time
@@ -226,7 +226,7 @@ public class SyncTaskManager {
      */
     void executeSyncPoll() {
         if (autoSync) {
-            if (!isMainThread) {
+            if (!isMainProcess) {
                 LogUtils.wOnce(TAG, "Collect Data will sync on main process");
                 return;
             }
@@ -524,7 +524,7 @@ public class SyncTaskManager {
         dataSyncMaxRetryCount = config.getDataSyncRetryCount();
         pageSize = config.getPageSize();
         autoSync = config.isAutoSync();
-        isMainThread = config.isMainThread();
+        isMainProcess = config.isMainProcess();
         syncSleepTime = config.getSyncSleepTime();
         if (config.isNeedTransformOldCache()) {
             oldCacheRunner = new Runnable() {
