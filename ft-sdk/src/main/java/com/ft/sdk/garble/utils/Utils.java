@@ -363,12 +363,21 @@ public class Utils {
      */
     public static String readFile(String path, Charset encoding) throws IOException {
         FileInputStream fis = null;
-        fis = new FileInputStream(path);
-        int length = fis.available();
-        byte[] bytes = new byte[length];
-        fis.read(bytes);
-        fis.close();
-        return new String(bytes, encoding);
+        try {
+            fis = new FileInputStream(path);
+            int length = fis.available();
+            byte[] bytes = new byte[length];
+            fis.read(bytes);
+            return new String(bytes, encoding);
+        } finally {
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    LogUtils.e(TAGS, "Error closing FileInputStream: " + e.getMessage());
+                }
+            }
+        }
     }
 
     /**
