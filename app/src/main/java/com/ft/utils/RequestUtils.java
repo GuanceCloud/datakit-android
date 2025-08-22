@@ -41,11 +41,15 @@ public class RequestUtils {
             if (responseBody != null) {
                 //Here we need to consume, the event listener will be called
                 string = responseBody.string();
+                response.close();
             }
             LogUtils.d(TAG, "url:" + url + "\n" + code);
 
         } catch (IOException e) {
             LogUtils.e(TAG, Log.getStackTraceString(e));
+        }
+        finally {
+
         }
         return request;
     }

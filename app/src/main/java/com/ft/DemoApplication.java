@@ -1,30 +1,22 @@
 package com.ft;
 
-import android.app.Activity;
 import android.content.Context;
 
-import com.ft.sdk.ActionEventWrapper;
 import com.ft.sdk.DeviceMetricsMonitorType;
 import com.ft.sdk.EnvType;
 import com.ft.sdk.ErrorMonitorType;
-import com.ft.sdk.FTActionTrackingHandler;
 import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
-import com.ft.sdk.FTViewActivityTrackingHandler;
-import com.ft.sdk.FTViewFragmentTrackingHandler;
-import com.ft.sdk.FragmentWrapper;
-import com.ft.sdk.HandlerAction;
-import com.ft.sdk.HandlerView;
 import com.ft.sdk.LogCacheDiscard;
 import com.ft.sdk.RUMCacheDiscard;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.utils.CrossProcessSetting;
+import com.ft.sdk.garble.utils.Utils;
 import com.lzy.okgo.OkGo;
 
 import java.util.HashMap;
@@ -65,10 +57,14 @@ public class DemoApplication extends BaseApplication {
 
 
     static void initFTSDK(Context context) {
-        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAKIT_URL)
+        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAWAY_URL,
+                        BuildConfig.CLIENT_TOKEN)
                 .setDebug(true)//Set whether it's debug
                 .setAutoSync(true)
                 .setCustomSyncPageSize(10)
+                .setOnlySupportMainProcess(false)
+                .addGlobalContext("test_flag", "fix_db_lock_02")
+                .addGlobalContext("main_process", Utils.isMainProcess() + "")
                 .setOnlySupportMainProcess(false)
                 .setNeedTransformOldCache(true)
                 .setCompressIntakeRequests(true)
