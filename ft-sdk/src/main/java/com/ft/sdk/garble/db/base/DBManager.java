@@ -8,7 +8,6 @@ import com.ft.sdk.garble.threadpool.DBScheduleThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -32,7 +31,6 @@ public abstract class DBManager {
     private final Object dbLock = new Object();    // For database lifecycle operations
 
     // Connection pool management
-    private final ConcurrentHashMap<Thread, SQLiteDatabase> activeConnections = new ConcurrentHashMap<>();
     private final AtomicInteger openCounter = new AtomicInteger(0);
     private final AtomicLong lastUsedTime = new AtomicLong(0);
     private static final long IDLE_TIMEOUT = 20_000;// 20 seconds
@@ -56,42 +54,6 @@ public abstract class DBManager {
     }
 
     /**
-     * Get database connection with connection pooling
-     */
-    private SQLiteDatabase getDatabaseConnection(boolean write) {
-        Thread currentThread = Thread.currentThread();
-
-        // Check if current thread already has a connection
-        SQLiteDatabase existingConnection = activeConnections.get(currentThread);
-        if (existingConnection != null && existingConnection.isOpen()) {
-            return existingConnection;
-        }
-
-        // Create new connection
-        SQLiteOpenHelper helper = getDataBaseHelper();
-        SQLiteDatabase db = write ? helper.getWritableDatabase() : helper.getReadableDatabase();
-
-        if (db != null && db.isOpen()) {
-            // Store connection for current thread
-            activeConnections.put(currentThread, db);
-        }
-
-        return db;
-    }
-
-    /**
-     * Release database connection for current thread
-     */
-    private void releaseConnection() {
-        try {
-            Thread currentThread = Thread.currentThread();
-            activeConnections.remove(currentThread);
-        } catch (Exception e) {
-            LogUtils.e(TAG, "Error releasing connection: " + e.getMessage());
-        }
-    }
-
-    /**
      * Synchronization lock to make database operations thread-safe
      *
      * @param write
@@ -109,10 +71,10 @@ public abstract class DBManager {
      * @param callback
      */
     public void getDB(boolean write, int operationCount, DataBaseCallBack callback) {
-        SQLiteDatabase db = null;
         try {
             // Get database connection
-            db = getDatabaseConnection(write);
+            SQLiteOpenHelper helper = getDataBaseHelper();
+            SQLiteDatabase db = write ? helper.getWritableDatabase() : helper.getReadableDatabase();
 
             if (db != null && db.isOpen()) {
                 acquire();
@@ -137,7 +99,6 @@ public abstract class DBManager {
             LogUtils.e(TAG, "Database operation failed: " + e.getMessage());
         } finally {
             tryToClose();
-            releaseConnection();
         }
     }
 
@@ -294,8 +255,6 @@ public abstract class DBManager {
         synchronized (dbLock) {
             cancelPendingClose();
 
-            // Clear all active connections
-            activeConnections.clear();
 
             DBScheduleThreadPool.get().execute(new Runnable() {
                 @Override
@@ -308,15 +267,4 @@ public abstract class DBManager {
         }
     }
 
-    /**
-     * Get current connection pool statistics
-     */
-    public String getConnectionStats() {
-        return String.format(
-                "Connection Stats - Active: %d, Total: %d, Thread: %s",
-                activeConnections.size(),
-                openCounter.get(),
-                Thread.currentThread().getName()
-        );
-    }
 }
