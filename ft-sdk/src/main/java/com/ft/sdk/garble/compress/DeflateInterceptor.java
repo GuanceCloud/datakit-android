@@ -68,7 +68,6 @@ public class DeflateInterceptor implements Interceptor {
                     LogUtils.e(TAG, "Deflate writeTo error" + LogUtils.getStackTraceString(t));
                     throw t;
                 } finally {
-                    // 确保资源被正确释放
                     if (deflateSink != null) {
                         try {
                             deflateSink.close();
