@@ -32,7 +32,7 @@ public class HomeFragment extends Fragment {
         btnGo.setOnClickListener(v -> {
             // Navigate to DetailFragment
             FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-            transaction.replace(R.id.fragment_container, new DetailFragment());
+            transaction.replace(R.id.main_fragment_container, new DetailFragment());
             transaction.addToBackStack(null);
             transaction.commit();
         });
