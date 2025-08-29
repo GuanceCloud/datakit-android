@@ -171,8 +171,8 @@ public class LogUtils {
      * {@link com.ft.sdk.tests.InnerLogTest}
      * Convert internal log to file
      *
-     * @param file           Cache file
-     * @param isAndroidTest  Whether it is Android Test
+     * @param file          Cache file
+     * @param isAndroidTest Whether it is Android Test
      */
     private static void registerInnerLogCacheToFile(File file, boolean isAndroidTest) {
         final LogFileHelper helper = new LogFileHelper(FTApplication.getApplication(), file, isAndroidTest);
@@ -180,7 +180,8 @@ public class LogUtils {
         TrackLog.setInnerLogHandler(new FTInnerLogHandler() {
             @Override
             public void printInnerLog(String level, String tag, String logContent) {
-                helper.appendLog(String.format("%s %s %s %s \n", Utils.getCurrentTimeStamp(), level, tag, logContent));
+                helper.appendLog(String.format("%s %s %s %s %s \n", Utils.getCurrentTimeStamp(), android.os.Process.myPid()
+                        + "-" + android.os.Process.myTid(), level, tag, logContent));
             }
         });
     }
