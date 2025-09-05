@@ -6,9 +6,12 @@ package com.ft.plugin.garble;
  * Description:
  */
 public class Logger {
+    /**
+     * Log output prefix
+     */
     private static final String TAG = "[FT-Plugin]:";
     /**
-     * 设置 debug，开启后，会在 build 过程中输出日志
+     * Set debug. When enabled, logs will be output during the build process
      */
     private static boolean debug = true;
 
@@ -17,12 +20,20 @@ public class Logger {
         System.out.println(TAG + "setDebug:" + debug);
     }
 
+    /**
+     * debug level log
+     * @param message
+     */
     public static void debug(Object message) {
         if (debug) {
             System.out.println(TAG + message);
         }
     }
 
+    /**
+     * error level log
+     * @param message
+     */
     public static void error(Object message) {
         System.err.println(TAG + message);
     }

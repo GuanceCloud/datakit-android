@@ -4,7 +4,6 @@ import com.android.build.gradle.AppExtension;
 import com.ft.plugin.garble.FTExtension;
 import com.ft.plugin.garble.FTMapUploader;
 import com.ft.plugin.garble.Logger;
-import com.ft.plugin.garble.PluginConfigManager;
 import com.ft.plugin.garble.asm.FTTransform;
 
 import org.gradle.api.Plugin;
@@ -18,16 +17,16 @@ import java.util.Collections;
   app
   |--build.gradle
 
-  FTExt {                                        //传参对象
-      showLog = true                             //是否显示日志
+  FTExt {                                        //Parameter object
+      showLog = true                             //Whether to show logs
 
-      autoUploadMap = false                     //是否上传 map
-      autoUploadNativeDebugSymbol = false       //是否上传 c/c++ native debug symbol 文件
-      datakitDCAUrl = ft_env.datakitDCAUrl      // datakit DCA 地址
+      autoUploadMap = false                     //Whether to upload map
+      autoUploadNativeDebugSymbol = false       //Whether to upload c/c++ native debug symbol files
+      datakitDCAUrl = ft_env.datakitDCAUrl      // datakit DCA address
       appId = ft_env.rumAppid                   // appid
-     env = 'common'                            //对应环境
+     env = 'common'                            //Corresponding environment
 
-       //Flavor 覆盖逻辑
+       //Flavor override logic
       prodFlavors {
           prodTest {
               autoUploadMap = true
@@ -50,19 +49,20 @@ import java.util.Collections;
 /**
  * BY huangDianHua
  * DATE:2019-11-29 12:33
- * Description:插件入口
+ * Description:Plugin entry point
  */
 public class FTPlugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
         AppExtension appExtension = (AppExtension) project.getProperties().get("android");
         project.getExtensions().create("FTExt", FTExtension.class, project);
-        appExtension.registerTransform(new FTTransform(project), Collections.EMPTY_LIST);
 
         project.afterEvaluate(p -> {
-            //传参数对象
+            //Parameter object
             FTExtension extension = (FTExtension) p.getExtensions().getByName("FTExt");
-            PluginConfigManager.get().setExtension(extension);
+            
+            // Pass configuration parameters to Transform instead of using global singleton
+            appExtension.registerTransform(new FTTransform(project, extension), Collections.EMPTY_LIST);
 
             Logger.setDebug(extension.showLog);
             Logger.debug("Plugin Version:" + BuildConfig.PLUGIN_VERSION +
@@ -70,7 +70,6 @@ public class FTPlugin implements Plugin<Project> {
 
             FTMapUploader f = new FTMapUploader(p, extension);
             f.configMapUpload();
-            f.configNativeSymbolUpload();
         });
 
     }

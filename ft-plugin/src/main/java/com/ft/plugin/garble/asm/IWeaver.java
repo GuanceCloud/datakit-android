@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- *  <a href="https://github.com/Leaking/Hunter/blob/master/hunter-transform/src/main/java/com/quinn/hunter/transform/asm/IWeaver.java">参考资料</a>
+ *  <a href="https://github.com/Leaking/Hunter/blob/master/hunter-transform/src/main/java/com/quinn/hunter/transform/asm/IWeaver.java">Reference material</a>
  * DATE:2019-11-29 13:53
  * Description:
  */
 public interface IWeaver {
     /**
-     * 判断传入的类路径的类是否可以被修改
+     * Determine whether the class at the given class path can be modified
      * @param filePath
      * @return
      * @throws IOException
@@ -18,7 +18,7 @@ public interface IWeaver {
     boolean isWeavableClass(String filePath) throws IOException;
 
     /**
-     * 修改传入的类的流，然后输出新的类的字节流
+     * Modify the stream of the input class and output the byte stream of the new class
      * @param inputStream
      * @return
      * @throws IOException

@@ -32,22 +32,25 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * <a href="https://github.com/Leaking/Hunter/blob/master/hunter-transform/src/main/java/com/quinn/hunter/transform/HunterTransform.java">参考资料</a>
+ * <a href="https://github.com/Leaking/Hunter/blob/master/hunter-transform/src/main/java/com/quinn/hunter/transform/HunterTransform.java">Reference material</a>
  * DATE:2019-11-29 13:33
- * Description:字节码转换基类
+ * Description:Bytecode transformation base class
  */
 public class FTTransform extends Transform {
     private final Project project;
-    private final BaseWeaver bytecodeWeaver = new FTWeaver();
+    private final BaseWeaver bytecodeWeaver;
     private final Worker waitableExecutor;
+    private final FTExtension extension;
 
     private static final int cpuCount = Runtime.getRuntime().availableProcessors();
     private final static ExecutorService IO = new ThreadPoolExecutor(0, cpuCount * 3,
             30L, TimeUnit.SECONDS,
             new LinkedBlockingQueue<>());
 
-    public FTTransform(Project project) {
+    public FTTransform(Project project, FTExtension extension) {
         this.project = project;
+        this.extension = extension;
+        this.bytecodeWeaver = new FTWeaver(extension);
         this.waitableExecutor = new Worker(IO);
     }
 
@@ -73,9 +76,7 @@ public class FTTransform extends Transform {
 
     @Override
     public void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
-        FTExtension ftExtension = (FTExtension) project.getExtensions().getByName("FTExt");
-
-        if (ftExtension.openAutoTrack) {
+        if (extension.openAutoTrack) {
             transformFun(transformInvocation.getContext(),
                     transformInvocation.getInputs(),
                     transformInvocation.getReferencedInputs(),
@@ -198,7 +199,7 @@ public class FTTransform extends Transform {
                     try {
                         bytecodeWeaver.weaveSingleClassToFile(file, outputFile, inputDirPath);
                     } catch (Exception e) {
-                        Logger.debug("修改类异常-文件名：" + filePath + "----异常原因：" + e);
+                        Logger.debug("Class modification exception - file name: " + filePath + "----Exception reason: " + e);
                         throw e;
                     }
                     return null;

@@ -1,107 +1,116 @@
+# plugin 1.1.9-alpha01
+1. Optimize plugin parameter stability during concurrent compilation
+2. Add ASM write to FTAutoTrack.trackRequestBuilder method, requires ft-sdk version 1.6.10 or above
+3. Support automatic capture of Log.println logs, requires ft-sdk version 1.6.8 or above
+4. Fix issue where sourcemap symbol file was not generated when minifyEnabled was not enabled
+5. Support generating sourcemap only without uploading by setting generateSourceMapOnly to true
+6. Optimize automatic acquisition and upload of native symbol so files, support custom nativeLibPath
+
+---
 # plugin 1.1.8
-1. 支持 React Native WebView 事件自动捕获
+1. Support automatic capture of React Native WebView events
 
 ---
 # plugin 1.1.7
-1. 修复了 WebView 子类重写方法在 ASM 写入后导致循环调用，从而无法加载 WebView 内容的问题
-   (涉及方法 loadUrl、loadData、loadDataWithBaseURL、 postUrl)
-2. IgnoreAOP 支持在类中声明，进行整个类中的方法忽略
-3. 添加 ignorePackages 配置， 支持通过包路径配置对 ASM 进行忽略
+1. Fixed the issue where WebView subclass overridden methods caused circular calls after ASM writing, preventing WebView content from loading
+   (involving methods loadUrl, loadData, loadDataWithBaseURL, postUrl)
+2. IgnoreAOP supports declaration in classes for method ignoring across the entire class
+3. Added ignorePackages configuration to support ASM ignoring through package path configuration
 
 ---
 # plugin 1.1.7-alpha04
-1. 添加 ignorePackages 通过包名方式方式对 ASM 进行忽略
+1. Added ignorePackages to ignore ASM through package name method
 
 ---
 # plugin 1.1.7-alpha03
-1. 听云冲突逻辑修复
+1. Fixed TingYun conflict logic
 
 ---
 # plugin 1.1.7-alpha01
-1. 修复 webview 自定义 loadUrl，loadData，loadDataWithBaseURL，postUrl 内部方法，在 ASM 写入之后导致调用，无法加载 webview 内容的问题
-2. IgnoreAOP 支持在类声明，进行 AOP 的整体忽略
-3. 优化 datakit source map 上传方式
+1. Fixed webview custom loadUrl, loadData, loadDataWithBaseURL, postUrl internal methods causing calls after ASM writing, preventing webview content from loading
+2. IgnoreAOP supports class declaration for overall AOP ignoring
+3. Optimized datakit source map upload method
 
 ---
 # plugin 1.1.6
-1. 支持 datakit source map 自动上传，支持 native symbol 的上传
-2. 支持捕获 Application 冷热启动，Activity 页面跳转，View、ListView、Dialog、Tab 点击事件。
-3. 支持 Webview Js 监听方法的写入
-4. 支持 Okhttp Trace 和 Resource 数据自动写入
-5. 支持 AGP 7.4.2 以下的版本
-6. 支持 IgnoreAOP 忽略标记
-7. 支持兼容阿里云热修复框架
+1. Support automatic datakit source map upload, support native symbol upload
+2. Support capturing Application cold/hot start, Activity page navigation, View, ListView, Dialog, Tab click events
+3. Support Webview Js listener method writing
+4. Support automatic Okhttp Trace and Resource data writing
+5. Support AGP versions below 7.4.2
+6. Support IgnoreAOP ignore markers
+7. Support compatibility with Alibaba Cloud hotfix framework
 
 ---
 # plugin 1.1.6-beta01
-1. 同 plugin 1.1.6-alpha01
+1. Same as plugin 1.1.6-alpha01
 
 ---
 # plugin 1.1.6-alpha01
-1. 修正设置 flavor 之后无法上传 native source symbol 的问题
+1. Fixed issue where native source symbol could not be uploaded after setting flavor
 
 ---
 # plugin 1.1.5-beta01
-1. 同 plugin 1.1.5-alpha01
+1. Same as plugin 1.1.5-alpha01
 
 ---
 # plugin 1.1.5-alpha01
-1. 适配阿里云 Sophix 热修复集成后无法采集 View 数据的问题
+1. Adapted to Alibaba Cloud Sophix hotfix integration issue where View data could not be collected
 
 ---
 # plugin 1.1.4-beta02
-1. 性能优化
+1. Performance optimization
 
 ---
 # plugin 1.1.4-beta01
-1. 同 plugin 1.1.4-alpha01
+1. Same as plugin 1.1.4-alpha01
 
 ---
 # plugin 1.1.4-alpha01
-1. 支持 Annotation IgnoreAOP
+1. Support Annotation IgnoreAOP
 
 ---
 # plugin 1.1.3-beta01
-1. 优化 com.google.android.material:material 控件调用
+1. Optimized com.google.android.material:material control calls
 
 ---
 # plugin 1.1.2-beta01
-1. plugin 1.1.2-alpha01，plugin 1.1.1-alpha04 合并
+1. Merged plugin 1.1.2-alpha01 and plugin 1.1.1-alpha04
 
 ---
 # plugin 1.1.2-alpha01
-1. 修正 WebView 衍生类注入后，发生循环调用的问题
+1. Fixed circular call issue after WebView derived class injection
 
 ---
 # plugin 1.1.1-alpha04
-1. 修正 cmake path 主项目错误的问题
-2. 添加 proguard 支持
+1. Fixed cmake path main project error
+2. Added proguard support
 ---
 # plugin 1.1.1-alpha03
-1. 优化FtExt 条件覆盖规则
+1. Optimized FtExt condition coverage rules
 
 ---
 # plugin 1.1.1-alpha02
-1. 支持 productFlavor 配置
+1. Support productFlavor configuration
 
 ---
 # plugin 1.1.1-alpha01
-1. 添加 native symbol 文件 mapping 文件打包功能
+1. Added native symbol file mapping file packaging functionality
 
 ---
 # plugin 1.1.0-alpha02
-1. 修正 MultiDex 库不兼容的问题
+1. Fixed MultiDex library incompatibility issue
 
 ---
 # plugin 1.1.0-alpha01
-1. application 启动事件捕捉
-2. 兼容版本规则修改
+1. Application startup event capture
+2. Modified compatibility version rules
 
 ---
 # plugin 1.0.1-beta01
-1. 修复版本比较问题
+1. Fixed version comparison issue
 
 ---
 # plugin 1.0.1-alpha12
-1. 添加 trace 功能
+1. Added trace functionality
 

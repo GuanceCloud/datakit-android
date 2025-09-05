@@ -3,33 +3,43 @@ package com.ft.plugin.garble;
 public class ProductFlavorModel {
 
     /**
-     * favor 名称
+     * favor name
      */
     private final String name;
     /**
-     * 是否自动上 map 文件
+     * Whether to automatically upload map file
      */
     private Boolean autoUploadMap;
     /**
-     * 是否上传 native debug symbol
+     * Whether to upload native debug symbol
      */
     private Boolean autoUploadNativeDebugSymbol;
 
     /**
-     * datakit 上传地址
+     * datakit upload address
      */
     private String datakitUrl;
     /**
-     * 工作空间 dataway token
+     * Workspace dataway token
      */
     private String datawayToken;
     /**
-     * 用户访问监测，应用 appid
+     * User access monitoring, application appid
      */
     private String appId;
 
     /**
-     * 应用开发环境
+     * zip
+     */
+    private String zipPath;
+
+    /**
+     * Whether to generate only sourcemap
+     */
+    private Boolean generateSourceMapOnly;
+
+    /**
+     * Application development environment
      */
     private String env;
 
@@ -66,6 +76,24 @@ public class ProductFlavorModel {
         return env;
     }
 
+    private String nativeLibPath = "";
+
+    public String getNativeLibPath() {
+        return nativeLibPath;
+    }
+
+    public String getZipPath() {
+        return zipPath;
+    }
+
+    public void setZipPath(String zipPath) {
+        this.zipPath = zipPath;
+    }
+
+    public Boolean isGenerateSourceMapOnly() {
+        return generateSourceMapOnly;
+    }
+
     public void setFromFTExtension(FTExtension extension) {
         this.env = extension.env;
         this.appId = extension.appId;
@@ -73,11 +101,13 @@ public class ProductFlavorModel {
         this.autoUploadMap = extension.autoUploadMap;
         this.datakitUrl = extension.datakitUrl;
         this.datawayToken = extension.datawayToken;
+        this.nativeLibPath = extension.nativeLibPath;
+        this.generateSourceMapOnly = extension.generateSourceMapOnly;
     }
 
     /**
-     * {@link FTExtension} 配置与 {@link ProductFlavorModel} 参数配置进行合并，{@link ProductFlavorModel}配置覆盖
-     * {@link FTExtension} 中的配置
+     * Merge {@link FTExtension} configuration with {@link ProductFlavorModel} parameter configuration, {@link ProductFlavorModel} configuration overrides
+     * the configuration in {@link FTExtension}
      *
      * @param extension
      */
@@ -102,6 +132,13 @@ public class ProductFlavorModel {
         if (this.datawayToken == null) {
             this.datawayToken = extension.datawayToken;
         }
+
+        if (this.nativeLibPath == null) {
+            this.nativeLibPath = extension.nativeLibPath;
+        }
+        if (this.generateSourceMapOnly == null) {
+            this.generateSourceMapOnly = extension.generateSourceMapOnly;
+        }
     }
 
     @Override
@@ -113,6 +150,9 @@ public class ProductFlavorModel {
                 ", datakitUrl='" + datakitUrl + '\'' +
                 ", appId='" + appId + '\'' +
                 ", env='" + env + '\'' +
+                ", nativeLibPath='" + nativeLibPath + '\'' +
+                ", zipPath='" + zipPath + '\'' +
+                ", generateSourceZipOnly='" + generateSourceMapOnly + '\'' +
                 '}';
     }
 }

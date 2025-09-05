@@ -10,9 +10,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- *  <a href="https://github.com/Leaking/Hunter/blob/master/hunter-transform/src/main/java/com/quinn/hunter/transform/asm/ExtendClassWriter.java">参考资料</a>
+ *  <a href="https://github.com/Leaking/Hunter/blob/master/hunter-transform/src/main/java/com/quinn/hunter/transform/asm/ExtendClassWriter.java">Reference material</a>
  * DATE:2019-11-29 14:20
- * Description: 用于创建一个新的 Class 文件
+ * Description: Used to create a new Class file
  */
 public class ExtendClassWriter extends ClassWriter {
     private static final String OBJECT = "java/lang/Object";

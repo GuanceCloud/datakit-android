@@ -22,7 +22,7 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 /**
- *  <a href="https://github.com/Leaking/Hunter/blob/master/hunter-transform/src/main/java/com/quinn/hunter/transform/asm/BaseWeaver.java">参考资料</a>
+ *  <a href="https://github.com/Leaking/Hunter/blob/master/hunter-transform/src/main/java/com/quinn/hunter/transform/asm/BaseWeaver.java">Reference material</a>
  * DATE:2019-11-29 13:57
  * Description:
  */
@@ -93,7 +93,7 @@ public class BaseWeaver implements IWeaver {
     }
 
     /**
-     * 读取类文件，对文件修改然后生成新的类文件
+     * Read class file, modify the file and generate new class file
      *
      * @param inputStream
      * @return
@@ -113,7 +113,7 @@ public class BaseWeaver implements IWeaver {
     }
 
     /**
-     * 排除 R 类和 BuildConfig 类
+     * Exclude R classes and BuildConfig classes
      *
      * @param fullQualifiedClassName
      * @return

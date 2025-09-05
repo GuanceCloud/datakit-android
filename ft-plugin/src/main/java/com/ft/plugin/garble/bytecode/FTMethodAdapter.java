@@ -25,7 +25,6 @@ import com.ft.plugin.garble.FTMethodType;
 import com.ft.plugin.garble.FTSubMethodCell;
 import com.ft.plugin.garble.FTUtil;
 import com.ft.plugin.garble.Logger;
-import com.ft.plugin.garble.PluginConfigManager;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Handle;
@@ -38,31 +37,32 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * 本类借鉴修改了来自 Sensors Data 的项目 <a href="https://github.com/sensorsdata/sa-sdk-android-plugin2">sa-sdk-android-plugin2</a>
- * 中的 SensorsAnalyticsClassVisitor.groovy 类
- * 访问类方法结构
+ * This class is adapted and modified from the Sensors Data project
+ * <a href="https://github.com/sensorsdata/sa-sdk-android-plugin2">sa-sdk-android-plugin2</a>
+ * SensorsAnalyticsClassVisitor.groovy class
+ * Visit class method structure
  */
 public class FTMethodAdapter extends AdviceAdapter {
     private final String[] interfaces;
 
     /**
-     * 访问类名
+     * Visit class name
      */
     private final String className;
     /**
-     * 访问父类
+     * Visit superclass
      */
     private final String superName;
     /**
-     * 方法名
+     * Method name
      */
     private final String methodName;
     /**
-     * 是否已经进行写入
+     * Whether it has been written
      */
     private boolean isHasTracked = false;
     /**
-     * 是否跳过
+     * Whether to skip
      */
     private boolean needSkip = false;
     /**
@@ -71,73 +71,27 @@ public class FTMethodAdapter extends AdviceAdapter {
     private final String nameDesc;
 
     /**
-     * 访问权限是public并且非静态
+     * Access permission is public and non-static
      */
     private boolean pubAndNoStaticAccess;
 
-    private int startVarIndex;
-
-    public FTMethodAdapter(MethodVisitor mv, int access, String name, String desc, String className, String[] interfaces, String supperName) {
-        super(PluginConfigManager.get().getASMVersion(), mv, access, name, desc);
+    public FTMethodAdapter(MethodVisitor mv, int access, String name, String desc, String className,
+                           String[] interfaces, String superName, int api) {
+        super(api, mv, access, name, desc);
         this.methodName = name;
-        this.superName = supperName;
+        this.superName = superName;
         this.className = className;
         this.interfaces = interfaces;
         this.nameDesc = name + desc;
-
-        boolean isSDKInner = innerSDKSkip(className);
-        boolean isIgnorePack = isIgnorePackage(className);
-        if (FTUtil.isTargetClassInSpecial(className) || isIgnorePack
-                || isSDKInner
-                || isWebViewInner(className, superName, nameDesc)) {
-            if (!isSDKInner) {
-                Logger.debug("skip-> class:" + className + ",super:" + supperName + ",desc:" + nameDesc);
-            }
-            needSkip = true;
-        }
-
-    }
-
-    /**
-     * 判断当前的类中的方法是否需要统计时长（如果后期需要统计更多的方法可以扩展该方法）
-     *
-     * @return
-     */
-    private boolean needTrackTime() {
-        return (superName.equals("androidx/appcompat/app/AppCompatActivity") ||
-                superName.equals("android/app/Activity"))
-                && !className.startsWith("android/")
-                && !className.startsWith("androidx/")
-                && (methodName + methodDesc).equals("onCreate(Landroid/os/Bundle;)V");
     }
 
     @Override
     public void visitCode() {
         super.visitCode();
-        if (needTrackTime()) {
-            mv.visitMethodInsn(Opcodes.INVOKESTATIC, Constants.CLASS_NAME_SYSTEM, "currentTimeMillis",
-                    "()J", false);
-            startVarIndex = newLocal(Type.LONG_TYPE);
-            mv.visitVarInsn(Opcodes.LSTORE, startVarIndex);
-        }
     }
 
     @Override
     public void visitInsn(int opcode) {
-        if (needTrackTime()) {
-            if ((opcode >= IRETURN && opcode <= RETURN) || opcode == ATHROW) {
-                mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_SYSTEM, "currentTimeMillis",
-                        "()J", false);
-                mv.visitVarInsn(LLOAD, startVarIndex);
-                mv.visitInsn(LSUB);
-                int index = newLocal(Type.LONG_TYPE);
-                mv.visitVarInsn(LSTORE, index);
-                mv.visitLdcInsn(className + "|" + methodName + "|" + methodDesc);
-                mv.visitVarInsn(LLOAD, index);
-                mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "timingMethod",
-                        "(Ljava/lang/String;J)V", false);
-            }
-        }
         super.visitInsn(opcode);
     }
 
@@ -147,7 +101,7 @@ public class FTMethodAdapter extends AdviceAdapter {
         if (isHasTracked) {
             FTHookConfig.mLambdaMethodCells.remove(nameDesc);
             if (!needSkip) {
-                Logger.debug("Hooked Class<" + className + ">的 method: " + methodName + ", desc:" + methodDesc);
+                Logger.debug("Hooked Class<" + className + "> method: " + methodName + ", desc:" + methodDesc);
             }
         }
     }
@@ -172,9 +126,9 @@ public class FTMethodAdapter extends AdviceAdapter {
     }
 
     /**
-     * WebView 中包含的所有加载方式
+     * All loading methods contained in WebView
      */
-    private static final List<String> TARGET_WEBVIEW_METHOD = Arrays.asList("loadUrl(Ljava/lang/String;)V",
+    static final List<String> TARGET_WEBVIEW_METHOD = Arrays.asList("loadUrl(Ljava/lang/String;)V",
             "loadUrl(Ljava/lang/String;Ljava/util/Map;)V",
             "loadData(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
             "loadDataWithBaseURL(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
@@ -210,7 +164,16 @@ public class FTMethodAdapter extends AdviceAdapter {
                     return;
                 }
                 break;
-
+            case Constants.CLASS_NAME_REQUEST_BUILDER:
+                if ("build()Lokhttp3/Request;".contains(name + desc)) {
+                    mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, "trackRequestBuilder",
+                            "(Lokhttp3/Request$Builder;)Lokhttp3/Request;",
+                            false);
+                    Logger.debug("CLASS_NAME_REQUEST_BUILDER-> owner:" + owner + ", class:" + className
+                            + ", super:" + superName + ", method:" + name + desc + " | " + nameDesc);
+                    return;
+                }
+                break;
             case Constants.CLASS_NAME_WEBVIEW:
             case Constants.CLASS_NAME_RN_WEBVIEW:
             case Constants.CLASS_NAME_TENCENT_WEBVIEW:
@@ -267,9 +230,11 @@ public class FTMethodAdapter extends AdviceAdapter {
                         return;
 
                     case "println":
-                        if (Constants.METHOD_DESC_S_S_I.equals(desc)) {
+                        if (Constants.METHOD_DESC_I_S_S_I.equals(desc)) {
+
                             mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG,
-                                    "println", Constants.METHOD_DESC_S_S_I, false);
+                                    "println", Constants.METHOD_DESC_I_S_S_I, false);
+
                         } else {
                             super.visitMethodInsn(opcode, owner, name, desc, itf);
                         }
@@ -300,7 +265,7 @@ public class FTMethodAdapter extends AdviceAdapter {
     }
 
     /**
-     * 修改方法内容的通用方式
+     * Modify the common way of modifying method content
      *
      * @param ftMethodCell
      */
@@ -329,7 +294,7 @@ public class FTMethodAdapter extends AdviceAdapter {
     void handleCode() {
         if (needSkip) return;
         /*
-         * 写Application方法
+         * Write Application method
          */
         if (FTUtil.isInstanceOfApplication(superName)) {
             FTMethodCell ftMethodCell = FTHookConfig.APPLICATION_METHODS.get(nameDesc);
@@ -359,7 +324,7 @@ public class FTMethodAdapter extends AdviceAdapter {
          * androidx/fragment/app/Fragment，androidx/fragment/app/ListFragment，androidx/fragment/app/DialogFragment
          */
         if (FTUtil.isInstanceOfXFragment(className)) {
-            //Logger.info("方法扫描>>>类是FragmentX>>>方法是"+nameDesc);
+            //Logger.info("Method scan>>>Class is FragmentX>>>Method is "+nameDesc);
             FTMethodCell ftMethodCell = FTHookConfig.FRAGMENT_X_METHODS.get(nameDesc);
             if (ftMethodCell != null) {
                 handleCode(ftMethodCell);
@@ -372,7 +337,7 @@ public class FTMethodAdapter extends AdviceAdapter {
          * android/support/v4/app/Fragment，android/support/v4/app/ListFragment，android/support/v4/app/DialogFragment，
          */
         if (FTUtil.isInstanceOfV4Fragment(className)) {
-            //Logger.info("方法扫描>>>类是FragmentV4>>>方法是"+nameDesc);
+            //Logger.info("Method scan>>>Class is FragmentV4>>>Method is "+nameDesc);
             FTMethodCell ftMethodCell = FTHookConfig.FRAGMENT_V4_METHODS.get(nameDesc);
             if (ftMethodCell != null) {
                 handleCode(ftMethodCell);
@@ -385,7 +350,7 @@ public class FTMethodAdapter extends AdviceAdapter {
          * android/app/Fragment，android/app/ListFragment， android/app/DialogFragment，
          */
         if (FTUtil.isInstanceOfFragment(className)) {
-            //Logger.info("方法扫描>>>类是Fragment>>>方法是"+nameDesc);
+            //Logger.info("Method scan>>>Class is Fragment>>>Method is "+nameDesc);
             FTMethodCell ftMethodCell = FTHookConfig.FRAGMENT_METHODS.get(nameDesc);
             if (ftMethodCell != null) {
                 handleCode(ftMethodCell);
@@ -399,7 +364,7 @@ public class FTMethodAdapter extends AdviceAdapter {
          */
         if (FTUtil.isInstanceOfActivity(className)) {
             FTMethodCell ftMethodCell = FTHookConfig.ACTIVITY_METHODS.get(nameDesc);
-            //Logger.info("方法扫描>>>类是Activity>>>方法是"+nameDesc+" ftMethodCell="+ftMethodCell);
+            //Logger.info("Method scan>>>Class is Activity>>>Method is "+nameDesc+" ftMethodCell="+ftMethodCell);
             if (ftMethodCell != null) {
                 handleCode(ftMethodCell);
                 isHasTracked = true;
@@ -408,7 +373,7 @@ public class FTMethodAdapter extends AdviceAdapter {
         }
 
         /**
-         * Hook Lambda 表达式
+         * Hook Lambda expression
          */
         FTMethodCell lambdaMethodCell = FTHookConfig.mLambdaMethodCells.get(nameDesc);
         if (lambdaMethodCell != null) {
@@ -449,7 +414,7 @@ public class FTMethodAdapter extends AdviceAdapter {
         }
 
         if (!pubAndNoStaticAccess) {
-            //Logger.info("方法扫描>>>类是" + className + ">>>方法是" + nameDesc + " 静态和非公共方法");
+            //Logger.info("Method scan>>>Class is " + className + ">>>Method is " + nameDesc + " static and non-public method");
             return;
         }
 
@@ -460,7 +425,7 @@ public class FTMethodAdapter extends AdviceAdapter {
         }
 
         /**
-         * 系统控件点击事件
+         * System component click event
          */
         if (interfaces != null && interfaces.length > 0) {
             for (String inter : interfaces) {
@@ -475,7 +440,9 @@ public class FTMethodAdapter extends AdviceAdapter {
         }
 
         /**
-         * 支持 onContextItemSelected(MenuItem item)、onOptionsItemSelected(MenuItem item)、onNavigationItemSelected(MenuItem item)
+         * Support onContextItemSelected(MenuItem item)、
+         * onOptionsItemSelected(MenuItem item)、
+         * onNavigationItemSelected(MenuItem item)
          */
         if (FTUtil.isTargetMenuMethodDesc(nameDesc)) {
             handleCode(FTHookConfig.MENU_METHODS);
@@ -484,7 +451,7 @@ public class FTMethodAdapter extends AdviceAdapter {
         }
 
         if (methodDesc.equals("(Landroid/view/View;)V")) {
-            //Logger.info("方法扫描>>>类是" + className + ">>>方法是" + nameDesc + " 点击");
+            //Logger.info("Method scan>>>Class is " + className + ">>>Method is " + nameDesc + " click");
             handleCode(FTHookConfig.CLICK_METHOD);
             isHasTracked = true;
             return;
@@ -492,12 +459,12 @@ public class FTMethodAdapter extends AdviceAdapter {
     }
 
     /**
-     * 获取方法参数下标为 index 的对应 ASM index
+     * Get the ASM index of the parameter at index in the method parameter array
      *
-     * @param types          方法参数类型数组
-     * @param index          方法中参数下标，从 0 开始
-     * @param isStaticMethod 该方法是否为静态方法
-     * @return 访问该方法的 index 位参数的 ASM index
+     * @param types           Method parameter type array
+     * @param index           Method parameter index, starting from 0
+     * @param isStaticMethod  Whether the method is a static method
+     * @return ASM index of the parameter at index in the method parameter array
      */
     int getVisitPosition(Type[] types, int index, boolean isStaticMethod) {
         if (types == null || index < 0 || index >= types.length) {
@@ -510,52 +477,9 @@ public class FTMethodAdapter extends AdviceAdapter {
         }
     }
 
-    /**
-     * SDK 内部方法，除了 {@link Constants#FT_SDK_PACKAGE} 外，都不需要扫描
-     *
-     * @param className
-     * @return
-     */
-    private boolean innerSDKSkip(String className) {
-        return (ClassNameAnalytics.isFTSdkPackage(className)
-                && !ClassNameAnalytics.isFTSdkApi(className));
-    }
 
     /**
-     * 需要忽略的包，class name 支持 . 分隔的方式
-     *
-     * @return
-     */
-    private boolean isIgnorePackage(String className) {
-        boolean isPackageIgnore = false;
-        for (String packageName : PluginConfigManager.get().getIgnorePackages()) {
-            if (className.startsWith(packageName.replace(".", "/"))) {
-                isPackageIgnore = true;
-                break;
-            }
-        }
-        return isPackageIgnore;
-    }
-
-    /**
-     * 是否为第三方或内部 WebView 方法
-     *
-     * @param className
-     * @param superName
-     * @param methodNameDesc
-     * @return
-     */
-    private boolean isWebViewInner(String className, String superName, String methodNameDesc) {
-        return (ClassNameAnalytics.isDCloud(className)
-                || ClassNameAnalytics.isTencent(className)
-                || ClassNameAnalytics.isTaoBao(className)
-                || superName.equals(Constants.CLASS_NAME_WEBVIEW))
-                && TARGET_WEBVIEW_METHOD.contains(methodNameDesc);
-    }
-
-
-    /**
-     * Annotation 访问
+     * Annotation access
      *
      * @param descriptor the class descriptor of the annotation class.
      * @param visible    {@literal true} if the annotation is visible at runtime.

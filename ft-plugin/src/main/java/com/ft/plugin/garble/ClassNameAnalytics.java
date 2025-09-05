@@ -17,8 +17,9 @@
 package com.ft.plugin.garble;
 
 /**
- * 本类借鉴修改了来自 Sensors Data 的项目 <a href="https://github.com/sensorsdata/sa-sdk-android-plugin2">sa-sdk-android-plugin2</a>
- * 中的 ClassNameAnalytics 类
+ * This class is adapted and modified from the Sensors Data project
+ * <a href="https://github.com/sensorsdata/sa-sdk-android-plugin2">sa-sdk-android-plugin2</a>
+ * ClassNameAnalytics class
  *
  * @author huangdianhua
  */
@@ -29,7 +30,7 @@ public class ClassNameAnalytics {
     private static final String FT_SDK = "com.ft.sdk.FTSdk";
 
     /**
-     * 配置需要排除的类
+     * Configure classes that need to be excluded
      * @param className
      * @return
      */
@@ -56,6 +57,10 @@ public class ClassNameAnalytics {
 
     public static boolean isTaoBao(String className) {
         return className.contains(Constants.CLASS_NAME_TAOBAO_PATH);
+    }
+
+    public static boolean isOkhttp3Path(String className) {
+        return className.contains(Constants.CLASS_NAME_OKHTTP3_PATH);
     }
 
     public static boolean isAndroidPackage(String className) {
