@@ -12,6 +12,7 @@ import com.ft.sdk.sessionreplay.SessionReplayFeature;
 
 public class SessionReplay {
     private static final String TAG = "SessionReplay";
+    public static final String VERSION_LARGER_THAN = "0.1.3-alpha01";
 
     /**
      * Enables a SessionReplay feature based on the configuration provided.
@@ -22,8 +23,9 @@ public class SessionReplay {
             FTSessionReplayConfig ftSessionReplayConfig, Context context
     ) {
         FeatureSdkCore featureSdkCore = SessionReplayManager.get();
-        if (!VersionUtils.firstVerGreaterEqual(BuildConfig.VERSION_NAME, "0.1.2-alpha01")) {
-            featureSdkCore.getInternalLogger().e(TAG, "need install more than ft-session-replay:0.1.2-alpha01");
+        if (!VersionUtils.firstVerGreaterEqual(BuildConfig.VERSION_NAME, VERSION_LARGER_THAN)) {
+            featureSdkCore.getInternalLogger().e(TAG, "need install more than ft-session-replay:"
+                    + VERSION_LARGER_THAN);
             return;
         }
         LogUtils.d(TAG, "init SR:" + ftSessionReplayConfig);
