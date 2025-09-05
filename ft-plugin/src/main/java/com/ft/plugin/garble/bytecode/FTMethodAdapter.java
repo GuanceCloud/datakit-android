@@ -382,13 +382,27 @@ public class FTMethodAdapter extends AdviceAdapter {
             Type[] lambdaTypes = Type.getArgumentTypes(methodDesc);
             int paramStart = lambdaTypes.length - length;
             if (paramStart < 0) {
+                Logger.debug("Invalid paramStart for lambda method: " + nameDesc + ", paramStart: " + paramStart);
                 return;
             } else {
                 for (int i = 0; i < length; i++) {
                     if (!lambdaTypes[paramStart + i].getDescriptor().equals(types[i].getDescriptor())) {
+                        Logger.debug("Parameter type mismatch for lambda method: " + nameDesc);
                         return;
                     }
                 }
+            }
+
+            // Additional validation to prevent IndexOutOfBoundsException
+            if (lambdaMethodCell.opcodes == null || lambdaMethodCell.opcodes.isEmpty()) {
+                Logger.debug("Lambda method opcodes is null or empty for: " + nameDesc);
+                return;
+            }
+
+            if (lambdaMethodCell.paramsCount <= 0 || lambdaMethodCell.paramsCount > lambdaMethodCell.opcodes.size()) {
+                Logger.debug("Invalid paramsCount for lambda method: " + nameDesc + ", paramsCount: " +
+                    lambdaMethodCell.paramsCount + ", opcodes.size: " + lambdaMethodCell.opcodes.size());
+                return;
             }
             boolean isStaticMethod = FTUtil.isStatic(methodAccess);
             if (!isStaticMethod) {
@@ -402,9 +416,16 @@ public class FTMethodAdapter extends AdviceAdapter {
                     return;
                 }
             }
-            for (int i = paramStart; i < paramStart + lambdaMethodCell.paramsCount; i++) {
-                mv.visitVarInsn(lambdaMethodCell.opcodes.get(i - paramStart), getVisitPosition(lambdaTypes,
-                        i, isStaticMethod));
+            // Ensure we don't exceed the bounds of lambdaTypes array
+            int maxIndex = Math.min(paramStart + lambdaMethodCell.paramsCount, lambdaTypes.length);
+            for (int i = paramStart; i < maxIndex; i++) {
+                int opcodeIndex = i - paramStart;
+                if (opcodeIndex < lambdaMethodCell.opcodes.size()) {
+                    mv.visitVarInsn(lambdaMethodCell.opcodes.get(opcodeIndex), getVisitPosition(lambdaTypes,
+                            i, isStaticMethod));
+                } else {
+                    Logger.debug("Skipping invalid opcode index: " + opcodeIndex + " for method: " + nameDesc);
+                }
             }
 
             mv.visitMethodInsn(Opcodes.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, lambdaMethodCell.agentName,
