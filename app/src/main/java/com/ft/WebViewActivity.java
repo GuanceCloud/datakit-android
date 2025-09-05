@@ -42,9 +42,9 @@ public class WebViewActivity extends AppCompatActivity {
         webView = findViewById(R.id.webView);
         progressBar = findViewById(R.id.progressBar);
         String[] data = new String[]{
+                "http://10.100.64.166/test/rum/",
                 "https://appassets.androidplatform.net/assets/browser_sdk_sample.html",
                 "file:///android_asset/local_sample.html",
-                "http://10.100.64.166/test/rum/"
         };
         WebViewAssetLoader assetLoader = new WebViewAssetLoader.Builder()
 //                .setDomain("www.custom.net")

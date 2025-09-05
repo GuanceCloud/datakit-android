@@ -160,6 +160,20 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                 ));
     }
 
+    public RecordWriter getDataWriter() {
+        return dataWriter;
+    }
+
+    public String getPrivacyLevel() {
+        if (this.touchPrivacy == TouchPrivacy.SHOW) {
+            if (this.textAndInputPrivacy == TextAndInputPrivacy.MASK_SENSITIVE_INPUTS) {
+                return "allow";
+            } else if (this.textAndInputPrivacy == TextAndInputPrivacy.MASK_ALL_INPUTS) {
+                return "mask-user-input";
+            }
+        }
+        return "mask";
+    }
 
     @Override
     public String getName() {

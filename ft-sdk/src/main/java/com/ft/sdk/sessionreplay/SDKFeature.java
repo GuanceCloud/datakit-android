@@ -31,7 +31,6 @@ import com.ft.sdk.garble.utils.ID36Generator;
 import com.ft.sdk.garble.utils.NetUtils;
 import com.ft.sdk.garble.utils.PackageIdGenerator;
 import com.ft.sdk.garble.utils.Utils;
-import com.ft.sdk.garble.utils.VersionUtils;
 import com.ft.sdk.sessionreplay.internal.StorageBackedFeature;
 import com.ft.sdk.sessionreplay.internal.net.BatchesToSegmentsMapper;
 import com.ft.sdk.sessionreplay.internal.persistence.BatchClosedMetadata;
@@ -83,6 +82,7 @@ public class SDKFeature implements FeatureScope {
     private final AtomicBoolean initialized = new AtomicBoolean(false);
     private SessionReplayContext sdkContext;
     private Storage storage = new NoOpStorage();
+    private Storage webStorage = new NoOpStorage();
     private final ID36Generator srGenerator = new ID36Generator();
 
     private final BatteryPowerWatcher watcher = new BatteryPowerWatcher();
@@ -107,6 +107,7 @@ public class SDKFeature implements FeatureScope {
         if (wrappedFeature instanceof StorageBackedFeature) {
             String featureName = wrappedFeature.getName();
             storage = createFileStorage(featureName, new FilePersistenceConfig());
+            webStorage = createFileStorage(featureName, new FilePersistenceConfig());
 
             dataUploadConfiguration = new DataUploadConfiguration(UploadFrequency.FREQUENT,
                     BatchProcessingLevel.MEDIUM.getMaxBatchesPerUploadJob());
@@ -189,7 +190,7 @@ public class SDKFeature implements FeatureScope {
                                         batteryBean.getBatteryStatue() == BatteryManager.BATTERY_STATUS_CHARGING;
                                 return batteryEnough || batteryPlug || !batteryBean.isBatteryPresent() || isFullOrCharging;
                             }
-                        },rootPath);
+                        }, rootPath);
             } else {
                 uploadScheduler = new NoOpUploadScheduler();
             }
@@ -204,13 +205,22 @@ public class SDKFeature implements FeatureScope {
 
     @Override
     public void withWriteContext(boolean forceNewBatch, DataConsumerCallback callback) {
+        if (callback.isWebview()) {
+            storage.writeCurrentBatch(sdkContext, forceNewBatch, new EventBatchWriterCallback() {
+                @Override
+                public void callBack(EventBatchWriter writer) {
+                    callback.onConsume(sdkContext, writer);
+                }
+            });
+        } else {
+            webStorage.writeCurrentBatch(sdkContext, forceNewBatch, new EventBatchWriterCallback() {
+                @Override
+                public void callBack(EventBatchWriter writer) {
+                    callback.onConsume(sdkContext, writer);
+                }
+            });
 
-        storage.writeCurrentBatch(sdkContext, forceNewBatch, new EventBatchWriterCallback() {
-            @Override
-            public void callBack(EventBatchWriter writer) {
-                callback.onConsume(sdkContext, writer);
-            }
-        });
+        }
     }
 
     private Storage createFileStorage(String featureName, FilePersistenceConfig filePersistenceConfig) {

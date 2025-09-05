@@ -1,3 +1,7 @@
+# agent 1.7.0-alpha23
+1. Webview Session Replay support, ft-session-replay >= 0.1.3-alpha01
+
+---
 # agent 1.7.0-alpha22
 1. Merge ft-sdk 1.6.14
 

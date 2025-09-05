@@ -14,8 +14,11 @@ import com.ft.sdk.feature.FeatureSdkCore;
 import com.ft.sdk.garble.threadpool.ThreadPoolFactory;
 import com.ft.sdk.sessionreplay.SDKFeature;
 import com.ft.sdk.sessionreplay.SessionInnerLogger;
+import com.ft.sdk.sessionreplay.SessionReplayFeature;
 import com.ft.sdk.sessionreplay.internal.SessionReplayRecordCallback;
 import com.ft.sdk.sessionreplay.internal.persistence.TrackingConsent;
+import com.ft.sdk.sessionreplay.internal.storage.NoOpRecordWriter;
+import com.ft.sdk.sessionreplay.internal.storage.RecordWriter;
 import com.ft.sdk.sessionreplay.utils.InternalLogger;
 
 import java.util.Map;
@@ -49,6 +52,10 @@ public class SessionReplayManager implements FeatureSdkCore {
 
     private Context context;
 
+    private RecordWriter currentSessionWriter = new NoOpRecordWriter();
+
+    private String privacyLevel = "mask";
+
     public void init(Context context) {
         this.context = context;
     }
@@ -76,6 +83,18 @@ public class SessionReplayManager implements FeatureSdkCore {
         SDKFeature scope = new SDKFeature(this, feature, getInternalLogger(), trackingConsentProvider);
         features.put(feature.getName(), scope);
         scope.init(context, null);
+        if (feature instanceof SessionReplayFeature) {
+            currentSessionWriter = ((SessionReplayFeature) feature).getDataWriter();
+            privacyLevel = ((SessionReplayFeature) feature).getPrivacyLevel();
+        }
+    }
+
+    public RecordWriter getCurrentSessionWriter() {
+        return currentSessionWriter;
+    }
+
+    public String getPrivacyLevel() {
+        return privacyLevel;
     }
 
     @Override

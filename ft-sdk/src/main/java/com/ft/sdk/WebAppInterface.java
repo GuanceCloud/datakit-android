@@ -24,13 +24,19 @@ public class WebAppInterface {
 
     private final JsReceiver mJsReceiver;
     private final String[] mAllowWebViewHost;
+    private final String[] capabilities;
+    private final String privacyLevel;
 
     Context mContext;
 
-    public WebAppInterface(Context c, JsReceiver receiver, String[] allowWebViewHost) {
+    public WebAppInterface(Context c, JsReceiver receiver,
+                           String[] allowWebViewHost, String privacyLevel, String[] capabilities) {
         mJsReceiver = receiver;
         mContext = c;
         mAllowWebViewHost = allowWebViewHost;
+        //fixme read from config
+        this.capabilities = capabilities;
+        this.privacyLevel = privacyLevel;
     }
 
     /**
@@ -61,6 +67,18 @@ public class WebAppInterface {
         }
         return Utils.setToJsonString(Arrays.asList(mAllowWebViewHost));
     }
+
+
+    @JavascriptInterface
+    public String getPrivacyLevel() {
+        return privacyLevel;
+    }
+
+    @JavascriptInterface
+    public String getCapabilities() {
+        return Utils.setToJsonString(Arrays.asList(capabilities));
+    }
+
 
     /**
      * WebView JS method, used for method registration callback, suitable for listener-type scenarios

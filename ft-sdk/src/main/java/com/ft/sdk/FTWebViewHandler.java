@@ -12,6 +12,9 @@ import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
+import com.ft.sdk.sessionreplay.model.MobileRecord;
+import com.ft.sdk.sessionreplay.utils.SessionReplayRumContext;
+import com.ft.sdk.sessionreplay.webview.DataBatcher;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,6 +47,11 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
      * RUM data
      */
     public static final String WEB_JS_TYPE_RUM = "rum";
+
+    /**
+     * webview session replay data
+     */
+    public static final String WEB_JS_TYPE_SESSION_REPLAY = "session_replay";
     /**
      * Indicator type transmission
      */
@@ -75,6 +83,11 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
 
     private WebView mWebView;
     private String nativeViewName;
+    private long slotID;
+    private String webViewId;
+    private String nativeViewId;
+
+    private DataBatcher dataBatcher;
 
     /**
      * Register js method in web view
@@ -84,19 +97,34 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
     public void setWebView(WebView webview) {
         FTRUMConfig config = FTRUMConfigManager.get().getConfig();
         if (config.isRumEnable() && config.isEnableTraceWebView()) {
-            setWebView(webview, config.getAllowWebViewHost());
+            if (FTSdk.isSessionReplaySupport()) {
+                setWebView(webview, config.getAllowWebViewHost(),
+                        SessionReplayManager.get().getPrivacyLevel(), new String[]{"records"});
+            } else {
+                setWebView(webview, config.getAllowWebViewHost());
+            }
         }
     }
 
-    public void setWebView(WebView webview, String[] allowWebViewHost) {
+    private void setWebView(WebView webview, String[] allowWebViewHost) {
+        setWebView(webview, allowWebViewHost, null, null);
+    }
+
+    private void setWebView(WebView webview, String[] allowWebViewHost,
+                            String privacyLevel, String[] capabilities) {
         mWebView = webview;
         Activity activity = AopUtils.getActivityFromContext(webview.getContext());
         nativeViewName = AopUtils.getClassName(activity);
+        nativeViewId = FTRUMInnerManager.get().getViewId();//  while be error,when WebView -> NativeView -> WebView
         webview.getSettings().setJavaScriptEnabled(true);
-        webview.addJavascriptInterface(new WebAppInterface(webview.getContext(), this, allowWebViewHost),
+        webview.addJavascriptInterface(new WebAppInterface(webview.getContext(), this,
+                        allowWebViewHost, privacyLevel, capabilities),
                 FT_WEB_VIEW_JAVASCRIPT_BRIDGE);
         webview.setTag(R.id.ft_webview_handled_tag_view_value, "handled");
-
+        if (capabilities != null && capabilities.length != 0) {
+            slotID = System.identityHashCode(webview);
+            dataBatcher = new DataBatcher(SessionReplayManager.get().getCurrentSessionWriter());
+        }
     }
 
 
@@ -140,6 +168,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                     }
 
                     String sessionId = FTRUMInnerManager.get().getSessionId();
+                    webViewId = jsonTags.optString("view_id");
                     jsonTags.put(Constants.KEY_RUM_SESSION_ID, sessionId);
                     jsonTags.put(Constants.KEY_RUM_VIEW_IS_WEB_VIEW, true);
 
@@ -161,11 +190,30 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                     if (measurement.equals(Constants.FT_MEASUREMENT_RUM_ERROR)) {
                         SyncTaskManager.get().setErrorTimeLine(time, null);
                     }
+
+                    if (FTSdk.isSessionReplaySupport()
+                            && !nativeViewId.equals(SessionReplayRumContext.NULL_UUID)) {
+                        HashMap<String, String> source = new HashMap<>();
+                        source.put("source", "android");
+                        source.put("view_id", nativeViewId);
+                        tagMaps.put("container", Utils.hashMapObjectToJson(source));
+                    }
+
                     CollectType collectType = FTRUMInnerManager.get().checkSessionWillCollect(sessionId);
                     FTTrackInner.getInstance().rumWebView(time, measurement,
                             tagMaps, fieldMaps, collectType);
                 }
 
+            } else if (name.equals(WEB_JS_TYPE_SESSION_REPLAY)) {
+                if (!FTSdk.isSessionReplaySupport()) return;
+                if (data != null) {
+                    data.put("slotId", slotID + "");
+                    SessionReplayRumContext newContext = new SessionReplayRumContext(
+                            FTRUMInnerManager.get().getApplicationID(),
+                            FTRUMInnerManager.get().getSessionId(),
+                            webViewId);
+                    dataBatcher.onData(newContext, MobileRecord.MobileWebviewSnapshotRecord.fromJson(data.toString()));
+                }
             } else if (name.equals(WEB_JS_TYPE_TRACK)) {
                 //no use
             } else if (name.equals(WEB_JS_TYPE_LOG)) {

@@ -161,5 +161,39 @@ public abstract class MobileRecord {
         }
     }
 
+    /**
+     * mobile record for
+     */
+    public static final class MobileWebviewSnapshotRecord extends MobileRecord {
+
+        JsonObject jsonObject;
+
+        public MobileWebviewSnapshotRecord(JsonObject jsonObject) {
+            this.jsonObject = jsonObject;
+        }
+
+        @Override
+        public JsonElement toJson() {
+            return jsonObject;
+        }
+
+        public static MobileWebviewSnapshotRecord fromJson(String jsonString) throws JsonParseException {
+            try {
+                JsonObject jsonObject = new JsonParser().parse(jsonString).getAsJsonObject();
+                return fromJsonObject(jsonObject);
+            } catch (IllegalStateException e) {
+                throw new JsonParseException("Unable to parse json into type MobileIncrementalSnapshotRecord", e);
+            }
+        }
+
+        public static MobileWebviewSnapshotRecord fromJsonObject(JsonObject jsonObject) throws JsonParseException {
+            try {
+                return new MobileWebviewSnapshotRecord(jsonObject);
+            } catch (IllegalStateException | NumberFormatException | NullPointerException e) {
+                throw new JsonParseException("Unable to parse json into type MobileIncrementalSnapshotRecord", e);
+            }
+        }
+    }
+
     // Define other nested classes as needed
 }

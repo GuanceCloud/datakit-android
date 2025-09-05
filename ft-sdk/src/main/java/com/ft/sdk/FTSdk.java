@@ -49,7 +49,7 @@ public class FTSdk {
      */
     public static String SESSION_REPLAY_MATERIAL_VERSION = PackageUtils.isSessionReplayMtr() ? PackageUtils.getPackageSessionReplayMtr() : "";
 
-    private final static boolean isSessionReplaySupport = SESSION_REPLAY_VERSION.isEmpty();
+    private final static boolean isSessionReplaySupport = !SESSION_REPLAY_VERSION.isEmpty();
     /**
      * Variable written by Plugin ASM, UUID is the same for the same compilation version
      */

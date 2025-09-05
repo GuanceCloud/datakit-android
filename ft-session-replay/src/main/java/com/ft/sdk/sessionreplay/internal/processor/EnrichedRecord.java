@@ -11,12 +11,21 @@ public class EnrichedRecord {
     private final String sessionId;
     private final String viewId;
     private final List<MobileRecord> records;
+    private final boolean isWebRecord;
 
     public EnrichedRecord(String applicationId, String sessionId, String viewId, List<MobileRecord> records) {
+
+        this(applicationId, sessionId, viewId, false, records);
+
+    }
+
+    public EnrichedRecord(String applicationId, String sessionId, String viewId, boolean isWebRecord,
+                          List<MobileRecord> records) {
         this.applicationId = applicationId;
         this.sessionId = sessionId;
         this.viewId = viewId;
         this.records = records;
+        this.isWebRecord = isWebRecord;
     }
 
     public String getApplicationId() {
@@ -29,6 +38,10 @@ public class EnrichedRecord {
 
     public String getViewId() {
         return viewId;
+    }
+
+    public boolean isWebRecord() {
+        return isWebRecord;
     }
 
     public List<MobileRecord> getRecords() {

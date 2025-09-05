@@ -195,7 +195,7 @@ public class FTRUMInnerManager {
      * @param sessionId
      */
     private void updateSessionReplay(String sessionId) {
-        if (FTSdk.isSessionReplaySupport()) return;
+        if (!FTSdk.isSessionReplaySupport()) return;
         CollectType collectType = checkSessionWillCollect(sessionId);
         HashMap<String, Object> map = new HashMap<>();
         map.put(SessionReplayConstants.SESSION_REPLAY_BUS_MESSAGE_TYPE_KEY, SessionReplayConstants.RUM_SESSION_RENEWED_BUS_MESSAGE);
@@ -216,13 +216,17 @@ public class FTRUMInnerManager {
         hashMap.put(Constants.KEY_RUM_SESSION_ID, sessionId);
         String viewId = getViewId();
         hashMap.put(Constants.KEY_RUM_VIEW_ID, viewId == null ? NULL_UUID : viewId);
-        hashMap.put("application_id", rumAppId == null ? NULL_UUID : rumAppId);
+        hashMap.put("application_id", getApplicationID());
         if (activeView != null) {
             Map<String, Object> viewMeta = new HashMap<>();
             viewMeta.put(VIEW_RECORDS_COUNT_KEY, activeView.getRecordsCount());
             hashMap.put(viewId, viewMeta);
         }
         return hashMap;
+    }
+
+    String getApplicationID() {
+        return rumAppId == null ? NULL_UUID : rumAppId;
     }
 
     private String getActionId() {
@@ -1202,7 +1206,7 @@ public class FTRUMInnerManager {
     }
 
 
-    private String getViewId() {
+    String getViewId() {
         if (activeView == null) {
             return null;
         }
@@ -1415,6 +1419,9 @@ public class FTRUMInnerManager {
                     fields.put(Constants.KEY_SESSION_ERROR_TIMESTAMP, bean.getLastErrorTime());
                 }
 
+                LogUtils.d("TRACE_SESSION_HAS_REPLAY", "generateViewSum:" + bean.getViewName()
+                        + ":" + bean.isHasReplay() + ":" + bean.getId());
+
                 FTTrackInner.getInstance().rum(bean.getStartTime(),
                         Constants.FT_MEASUREMENT_RUM_VIEW, tags, fields, new RunnerCompleteCallBack() {
                             @Override
@@ -1465,9 +1472,11 @@ public class FTRUMInnerManager {
                                     activeView.setHasReplay(!sampledError);
                                     activeView.setSessionReplayErrorSampled(sampledError);
                                     String attr = activeView.getAttrJsonString();
+                                    LogUtils.d("TRACE_SESSION_HAS_REPLAY", "updateViewExtraAttr:" + activeView.getViewName() + "," + activeView.isHasReplay());
                                     EventConsumerThreadPool.get().execute(new Runnable() {
                                         @Override
                                         public void run() {
+
                                             FTDBManager.get().updateViewExtraAttr(updateViewId, attr);
                                         }
                                     });
