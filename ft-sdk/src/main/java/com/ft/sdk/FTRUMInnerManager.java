@@ -1418,10 +1418,6 @@ public class FTRUMInnerManager {
                 if (bean.getLastErrorTime() > 0) {
                     fields.put(Constants.KEY_SESSION_ERROR_TIMESTAMP, bean.getLastErrorTime());
                 }
-
-                LogUtils.d("TRACE_SESSION_HAS_REPLAY", "generateViewSum:" + bean.getViewName()
-                        + ":" + bean.isHasReplay() + ":" + bean.getId());
-
                 FTTrackInner.getInstance().rum(bean.getStartTime(),
                         Constants.FT_MEASUREMENT_RUM_VIEW, tags, fields, new RunnerCompleteCallBack() {
                             @Override
@@ -1472,11 +1468,9 @@ public class FTRUMInnerManager {
                                     activeView.setHasReplay(!sampledError);
                                     activeView.setSessionReplayErrorSampled(sampledError);
                                     String attr = activeView.getAttrJsonString();
-                                    LogUtils.d("TRACE_SESSION_HAS_REPLAY", "updateViewExtraAttr:" + activeView.getViewName() + "," + activeView.isHasReplay());
                                     EventConsumerThreadPool.get().execute(new Runnable() {
                                         @Override
                                         public void run() {
-
                                             FTDBManager.get().updateViewExtraAttr(updateViewId, attr);
                                         }
                                     });
