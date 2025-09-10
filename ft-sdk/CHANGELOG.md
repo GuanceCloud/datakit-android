@@ -1,3 +1,7 @@
+# agent 1.6.15-alpha01
+1. Fixed the incorrect way of retrieving the cursor count.
+
+---
 # agent 1.6.14
 1. Using ContentProvider to optimize compatibility issues in high-load multi-process data collection scenarios.
 2. Removed the `android.permission.READ_PHONE_STATE` declaration from the SDK AndroidManifest;

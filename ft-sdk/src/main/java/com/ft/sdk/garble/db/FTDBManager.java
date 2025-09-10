@@ -318,7 +318,7 @@ public class FTDBManager extends DBManager {
 
             Cursor cursor = contentProvider.query(uri, null, selection, selectionArgs, null);
             if (cursor != null && cursor.moveToFirst()) {
-                int count = cursor.getInt(0);
+                int count = cursor.getCount();
 
                 if (count > 0) {
                     // Use ContentProvider's call method to execute execSQL
@@ -362,7 +362,7 @@ public class FTDBManager extends DBManager {
 
             Cursor cursor = contentProvider.query(uri, null, selection, selectionArgs, null);
             if (cursor != null && cursor.moveToFirst()) {
-                int count = cursor.getInt(0);
+                int count = cursor.getCount();
 
                 if (count > 0) {
                     // Use ContentProvider's call method to execute execSQL
@@ -418,7 +418,7 @@ public class FTDBManager extends DBManager {
 
             Cursor cursor = contentProvider.query(uri, null, selection, selectionArgs, null);
             if (cursor != null && cursor.moveToFirst()) {
-                int count = cursor.getInt(0);
+                int count = cursor.getCount();
 
                 if (count > 0) {
                     // Use ContentProvider's call method to execute execSQL
@@ -777,7 +777,7 @@ public class FTDBManager extends DBManager {
 
             Cursor cursor = contentProvider.query(uri, null, selection, selectionArgs, null);
             if (cursor != null && cursor.moveToFirst()) {
-                count[0] = cursor.getInt(0);
+                count[0] = cursor.getCount();
 
                 if (count[0] > 0) {
                     ContentValues value = new ContentValues();
