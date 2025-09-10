@@ -1,6 +1,7 @@
 package com.ft;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -141,6 +142,9 @@ public class WebViewActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.refresh) {
             webView.reload();
+        } else if (item.getItemId() == R.id.go_to_first_activity) {
+            Intent intent = new Intent(this, FirstActivity.class);
+            startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
     }
