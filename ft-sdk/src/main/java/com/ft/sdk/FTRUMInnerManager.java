@@ -994,8 +994,8 @@ public class FTRUMInnerManager {
                 errorTags.put(Constants.KEY_RUM_VIEW_REFERRER, viewReferrer);
                 errorTags.put(Constants.KEY_RUM_SESSION_ID, sessionId);
 
+                errorTags.put(Constants.KEY_RUM_RESOURCE_STATUS, resourceStatus);
                 if (resourceStatus > 0) {
-                    errorTags.put(Constants.KEY_RUM_RESOURCE_STATUS, resourceStatus);
                     errorTags.put(Constants.KEY_RUM_RESOURCE_STATUS_GROUP, resourceStatusGroup);
                 }
                 errorTags.put(Constants.KEY_RUM_RESOURCE_URL, bean.url);

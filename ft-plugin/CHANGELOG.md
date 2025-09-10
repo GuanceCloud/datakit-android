@@ -1,3 +1,7 @@
+# plugin 1.3.6-alpha01
+1. Numeric boundary handling in FTMethodAdapter
+
+---
 # plugin 1.3.5
 1. Optimize plugin parameter stability during concurrent compilation
 2. Add ASM write to FTAutoTrack.trackRequestBuilder method, requires ft-sdk version 1.6.10 or above
