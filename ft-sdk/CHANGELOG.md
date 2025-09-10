@@ -1,3 +1,7 @@
+# agent 1.7.0-alpha24
+1. Merge ft-sdk 1.6.15-alpha01
+
+---
 # agent 1.7.0-alpha23
 1. Webview Session Replay support, ft-session-replay >= 0.1.3-alpha01
 
@@ -84,6 +88,10 @@
 ---
 # agent 1.7.0-alpha02
 1. Support for enabling session replay recording feature
+
+---
+# agent 1.6.15-alpha01
+1. Fixed the incorrect way of retrieving the cursor count.
 
 ---
 # agent 1.6.14
