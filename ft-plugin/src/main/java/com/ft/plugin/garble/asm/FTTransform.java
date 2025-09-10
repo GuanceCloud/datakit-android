@@ -38,19 +38,16 @@ import java.util.concurrent.TimeUnit;
  */
 public class FTTransform extends Transform {
     private final Project project;
-    private final BaseWeaver bytecodeWeaver;
+    private final FTWeaver bytecodeWeaver = new FTWeaver();
     private final Worker waitableExecutor;
-    private final FTExtension extension;
 
     private static final int cpuCount = Runtime.getRuntime().availableProcessors();
     private final static ExecutorService IO = new ThreadPoolExecutor(0, cpuCount * 3,
             30L, TimeUnit.SECONDS,
             new LinkedBlockingQueue<>());
 
-    public FTTransform(Project project, FTExtension extension) {
+    public FTTransform(Project project) {
         this.project = project;
-        this.extension = extension;
-        this.bytecodeWeaver = new FTWeaver(extension);
         this.waitableExecutor = new Worker(IO);
     }
 
@@ -76,7 +73,11 @@ public class FTTransform extends Transform {
 
     @Override
     public void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
-        if (extension.openAutoTrack) {
+        // Get the current extension configuration dynamically
+        FTExtension currentExtension = (FTExtension) project.getExtensions().getByName("FTExt");
+        if (currentExtension.openAutoTrack) {
+            // Update the bytecode weaver with current configuration
+            this.bytecodeWeaver.setExtension(currentExtension);
             transformFun(transformInvocation.getContext(),
                     transformInvocation.getInputs(),
                     transformInvocation.getReferencedInputs(),

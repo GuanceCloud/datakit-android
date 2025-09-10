@@ -56,14 +56,13 @@ public class FTPlugin implements Plugin<Project> {
     public void apply(Project project) {
         AppExtension appExtension = (AppExtension) project.getProperties().get("android");
         project.getExtensions().create("FTExt", FTExtension.class, project);
+        // Register Transform immediately, not in afterEvaluate
+        appExtension.registerTransform(new FTTransform(project), Collections.EMPTY_LIST);
 
         project.afterEvaluate(p -> {
             //Parameter object
             FTExtension extension = (FTExtension) p.getExtensions().getByName("FTExt");
             
-            // Pass configuration parameters to Transform instead of using global singleton
-            appExtension.registerTransform(new FTTransform(project, extension), Collections.EMPTY_LIST);
-
             Logger.setDebug(extension.showLog);
             Logger.debug("Plugin Version:" + BuildConfig.PLUGIN_VERSION +
                     ",ASM Version:asm7");
@@ -71,6 +70,5 @@ public class FTPlugin implements Plugin<Project> {
             FTMapUploader f = new FTMapUploader(p, extension);
             f.configMapUpload();
         });
-
     }
 }

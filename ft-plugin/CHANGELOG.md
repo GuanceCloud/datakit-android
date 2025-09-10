@@ -1,3 +1,7 @@
+# plugin 1.1.9-alpha02
+1. Fixed the issue where ASM writes did not take effect in 1.1.9-alpha01.
+
+---
 # plugin 1.1.9-alpha01
 1. Optimize plugin parameter stability during concurrent compilation
 2. Add ASM write to FTAutoTrack.trackRequestBuilder method, requires ft-sdk version 1.6.10 or above

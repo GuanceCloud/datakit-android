@@ -13,9 +13,9 @@ import org.objectweb.asm.ClassWriter;
  * Description:
  */
 public final class FTWeaver extends BaseWeaver {
-    private final FTExtension extension;
+    private FTExtension extension;
 
-    public FTWeaver(FTExtension extension) {
+    public void setExtension(FTExtension extension) {
         this.extension = extension;
     }
 
