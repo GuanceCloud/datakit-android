@@ -1,3 +1,7 @@
+# plugin 1.1.9-alpha03
+1. Added try-catch and supplemented error logs.
+
+---
 # plugin 1.1.9-alpha02
 1. Fixed the issue where ASM writes did not take effect in 1.1.9-alpha01.
 
