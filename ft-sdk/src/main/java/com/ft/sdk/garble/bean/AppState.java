@@ -17,7 +17,11 @@ public enum AppState {
     /**
      * Running
      */
-    RUN;
+    RUN,
+    /**
+     * Background
+     */
+    BACKGROUND;
 
     /**
      * Convert from string to corresponding AppState

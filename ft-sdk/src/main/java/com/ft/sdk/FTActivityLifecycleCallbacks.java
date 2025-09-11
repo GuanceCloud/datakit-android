@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 
 import com.ft.sdk.garble.gesture.WindowCallbackTracker;
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.LogUtils;
 
 import java.util.HashMap;
 
@@ -68,6 +69,9 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     public void onActivityStarted(@NonNull Activity activity) {
         activityCount++;
         mFragmentLifecycleHelper.register(activity);
+        if (activityCount > 0) {
+            FTActivityManager.get().appForeground();
+        }
     }
 
     /**
@@ -183,6 +187,7 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
         activityCount--;
         if (activityCount == 0) {
             mAppRestartCallback.onEnterBackground();
+            FTActivityManager.get().appBackGround();
         }
         mFragmentLifecycleHelper.unregister(activity);
     }

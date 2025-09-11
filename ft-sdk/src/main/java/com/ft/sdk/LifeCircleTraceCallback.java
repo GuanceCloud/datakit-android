@@ -147,7 +147,6 @@ class LifeCircleTraceCallback {
         FTRUMConfig config = manager.getConfig();
 
         if (!mInited) {
-            FTActivityManager.get().setAppState(AppState.RUN);
             FTAppStartCounter.get().coldStart(Utils.getCurrentNanoTime());
             if (manager.isRumEnable() && config.isEnableTraceUserAction()) {
                 // If SDK is not initialized, this data will be supplemented 
