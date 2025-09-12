@@ -28,7 +28,7 @@ public final class FTWeaver extends BaseWeaver {
 
     @Override
     protected ClassVisitor wrapClassWriter(ClassWriter classWriter) {
-        return new FTClassAdapter(classWriter, extension.ignorePackages);
+        return new FTClassAdapter(classWriter, extension.ignorePackages, extension.verboseLog);
     }
 
 }
