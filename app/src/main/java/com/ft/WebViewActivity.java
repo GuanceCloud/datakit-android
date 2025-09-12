@@ -15,133 +15,250 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 import androidx.webkit.WebViewAssetLoader;
 import androidx.webkit.WebViewClientCompat;
 
+import com.ft.sdk.FTAutoTrack;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
+
 
 public class WebViewActivity extends AppCompatActivity {
-    private WebView webView;         // visit
-    //    private CustomWebView webView; // visit skip
-    private Spinner spinner;
+    private TabLayout tabLayout;
+    private ViewPager2 viewPager;
     private ProgressBar progressBar;
+    private WebViewPagerAdapter pagerAdapter;
+
+    // URLs for each tab
+    private String[] urls = {
+            "http://10.100.64.166/test/rum/",
+            "https://appassets.androidplatform.net/assets/browser_sdk_sample.html",
+            "file:///android_asset/local_sample.html"
+    };
+
+    // Tab titles
+    private String[] tabTitles = {"RUM Test", "Browser SDK", "Local Sample"};
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //        WebView.setWebContentsDebuggingEnabled(true);
         setContentView(R.layout.activity_web);
-        spinner = findViewById(R.id.spinner);
-        webView = findViewById(R.id.webView);
+
+        // Initialize views
+        tabLayout = findViewById(R.id.tabLayout);
+        viewPager = findViewById(R.id.viewPager);
         progressBar = findViewById(R.id.progressBar);
-        String[] data = new String[]{
-                "http://10.100.64.166/test/rum/",
-                "https://appassets.androidplatform.net/assets/browser_sdk_sample.html",
-                "file:///android_asset/local_sample.html",
-        };
-        WebViewAssetLoader assetLoader = new WebViewAssetLoader.Builder()
-//                .setDomain("www.custom.net")
-//                .setHttpAllowed(true)
-                .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this))
-                .build();
 
-//        webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
-        webView.setWebViewClient(new WebViewClientCompat() {
+        // Setup ViewPager2 with adapter
+        pagerAdapter = new WebViewPagerAdapter(this);
+        viewPager.setAdapter(pagerAdapter);
+
+        // Connect TabLayout with ViewPager2
+        new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
+            tab.setText(tabTitles[position]);
+        }).attach();
+
+        // Setup ViewPager2 page change listener to load URL on first tab selection
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
-            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-                return assetLoader.shouldInterceptRequest(request.getUrl());
-            }
-
-
-            @Override
-            @SuppressWarnings("deprecation") // for API < 21
-            public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-                return assetLoader.shouldInterceptRequest(Uri.parse(url));
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                // Load URL for the selected tab
+                loadCurrentTabUrl();
             }
         });
 
-
-        spinner.setAdapter(new ArrayAdapter(this, R.layout.spinner_item, R.id.textView, data));
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-
-                webView.loadUrl(data[i]);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-        WebSettings webViewSettings = webView.getSettings();
-        // Setting this off for security. Off by default for SDK versions >= 16.
-        webViewSettings.setAllowFileAccessFromFileURLs(false);
-        // Off by default, deprecated for SDK versions >= 30.
-        webViewSettings.setAllowUniversalAccessFromFileURLs(false);
-        // Keeping these off is less critical but still a good idea, especially if your app is not
-        // using file:// or content:// URLs.
-        webViewSettings.setAllowFileAccess(false);
-        webViewSettings.setAllowContentAccess(false);
-
-        webViewSettings.setJavaScriptEnabled(true);
-        webViewSettings.setJavaScriptCanOpenWindowsAutomatically(true);
-        webView.clearCache(true);
-        webView.setWebChromeClient(new WebChromeClient() {
-            @Override
-            public void onReceivedTitle(WebView view, String title) {
-                super.onReceivedTitle(view, title);
-                setTitle(title);
-            }
-
-            @Override
-            public void onProgressChanged(WebView view, int newProgress) {
-                super.onProgressChanged(view, newProgress);
-                progressBar.setProgress(newProgress);
-                if (newProgress == 100) {
-                    progressBar.setVisibility(View.GONE);
-                } else {
-                    progressBar.setVisibility(View.VISIBLE);
-                }
-            }
-
-        });
-//        setCookiePermission(this,webView);
+        // Setup progress bar visibility
+        progressBar.setVisibility(View.GONE);
     }
 
+    // WebView Fragment for each tab
+    public static class WebViewFragment extends Fragment {
+        private CustomWebView webView;
+        private String url;
+        private boolean isLoaded = false;
+        private WebViewAssetLoader assetLoader;
+        private ProgressBar progressBar;
 
-    private void setCookiePermission(Context context, WebView webview) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            CookieSyncManager.createInstance(context);
+        public WebViewFragment() {
+            // Required empty public constructor
         }
-        CookieManager cookieManager = CookieManager.getInstance();
-        CookieManager.setAcceptFileSchemeCookies(true);// This method is not recommended by official, recommend using androidx.webkit.WebViewAssetLoader
-        cookieManager.setAcceptCookie(true);// Allow accepting cookies
-        //>=LOLLIPOP version
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            cookieManager.setAcceptThirdPartyCookies(webview, true);
-            cookieManager.acceptThirdPartyCookies(webview);//Cross-domain cookie reading
+
+        public static WebViewFragment newInstance(String url) {
+            WebViewFragment fragment = new WebViewFragment();
+            Bundle args = new Bundle();
+            args.putString("url", url);
+            fragment.setArguments(args);
+            return fragment;
+        }
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            if (getArguments() != null) {
+                url = getArguments().getString("url");
+            }
+        }
+
+        @Override
+        public View onCreateView(@NonNull android.view.LayoutInflater inflater,
+                                 android.view.ViewGroup container,
+                                 Bundle savedInstanceState) {
+            // Create a LinearLayout to hold WebView and ProgressBar
+            android.widget.LinearLayout layout = new android.widget.LinearLayout(getContext());
+            layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+            layout.setLayoutParams(new android.view.ViewGroup.LayoutParams(
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT));
+
+            // Create WebView
+            webView = new CustomWebView(getContext());
+            webView.setLayoutParams(new android.view.ViewGroup.LayoutParams(
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT));
+
+            // Create ProgressBar
+            progressBar = new ProgressBar(getContext(), null,
+                    android.R.attr.progressBarStyleHorizontal);
+            progressBar.setLayoutParams(new android.view.ViewGroup.LayoutParams(
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT, 4));
+            progressBar.setVisibility(View.GONE);
+
+            layout.addView(webView);
+            layout.addView(progressBar);
+
+            setupWebView();
+            return layout;
+        }
+
+        private void setupWebView() {
+            // Setup WebViewAssetLoader
+            assetLoader = new WebViewAssetLoader.Builder()
+                    .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(getContext()))
+                    .build();
+
+            // Setup WebViewClient
+            webView.setWebViewClient(new WebViewClientCompat() {
+                @Override
+                public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                    return assetLoader.shouldInterceptRequest(request.getUrl());
+                }
+
+                @Override
+                @SuppressWarnings("deprecation") // for API < 21
+                public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+                    return assetLoader.shouldInterceptRequest(Uri.parse(url));
+                }
+            });
+
+            // Setup WebSettings
+            WebSettings webViewSettings = webView.getSettings();
+            webViewSettings.setAllowFileAccessFromFileURLs(false);
+            webViewSettings.setAllowUniversalAccessFromFileURLs(false);
+            webViewSettings.setAllowFileAccess(false);
+            webViewSettings.setAllowContentAccess(false);
+            webViewSettings.setJavaScriptEnabled(true);
+            webViewSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+            webView.clearCache(true);
+
+            // Setup WebChromeClient for progress tracking
+            webView.setWebChromeClient(new WebChromeClient() {
+                @Override
+                public void onReceivedTitle(WebView view, String title) {
+                    super.onReceivedTitle(view, title);
+                    if (getActivity() != null) {
+                        getActivity().setTitle(title);
+                    }
+                }
+
+                @Override
+                public void onProgressChanged(WebView view, int newProgress) {
+                    super.onProgressChanged(view, newProgress);
+                    if (progressBar != null) {
+                        progressBar.setProgress(newProgress);
+                        if (newProgress == 100) {
+                            progressBar.setVisibility(View.GONE);
+                        } else {
+                            progressBar.setVisibility(View.VISIBLE);
+                        }
+                    }
+                }
+            });
+        }
+
+        // Method to load URL when tab is first selected
+        public void loadUrlIfNeeded() {
+            if (!isLoaded && webView != null && url != null) {
+                FTAutoTrack.loadUrl(webView, url);
+                isLoaded = true;
+            }
+        }
+
+        // Method to refresh the WebView
+        public void refreshWebView() {
+            if (webView != null) {
+                webView.reload();
+            }
+        }
+    }
+
+    // ViewPager2 Adapter
+    private class WebViewPagerAdapter extends FragmentStateAdapter {
+        public WebViewPagerAdapter(@NonNull FragmentActivity fragmentActivity) {
+            super(fragmentActivity);
+        }
+
+        @NonNull
+        @Override
+        public Fragment createFragment(int position) {
+            return WebViewFragment.newInstance(urls[position]);
+        }
+
+        @Override
+        public int getItemCount() {
+            return urls.length;
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Load URL for current tab when activity resumes
+        loadCurrentTabUrl();
+    }
+
+    // Load URL for the currently selected tab
+    private void loadCurrentTabUrl() {
+        int currentPosition = viewPager.getCurrentItem();
+        // Find the fragment by tag
+        String fragmentTag = "f" + currentPosition;
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(fragmentTag);
+        if (fragment instanceof WebViewFragment) {
+            ((WebViewFragment) fragment).loadUrlIfNeeded();
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.webview_menu, menu);
-        return super.onCreateOptionsMenu(menu);
+        return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.refresh) {
-            webView.reload();
+            refreshCurrentWebView();
         } else if (item.getItemId() == R.id.go_to_first_activity) {
             Intent intent = new Intent(this, FirstActivity.class);
             startActivity(intent);
@@ -149,12 +266,24 @@ public class WebViewActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onBackPressed() {
-        if (webView.canGoBack()) {
-            webView.goBack();
+    // Method to refresh the current WebView fragment
+    private void refreshCurrentWebView() {
+        int currentPosition = viewPager.getCurrentItem();
+        // Find the fragment by tag
+        String fragmentTag = "f" + currentPosition;
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(fragmentTag);
+        if (fragment instanceof WebViewFragment) {
+            ((WebViewFragment) fragment).refreshWebView();
+        }
+    }
+
+    // Method to set cookie permission (if needed)
+    private void setCookiePermission(Context context, WebView webView) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true);
         } else {
-            super.onBackPressed();
+            CookieSyncManager.createInstance(context);
+            CookieManager.getInstance().setAcceptCookie(true);
         }
     }
 }
