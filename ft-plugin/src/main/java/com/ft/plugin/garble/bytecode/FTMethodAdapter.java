@@ -34,6 +34,7 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.AdviceAdapter;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -75,6 +76,8 @@ public class FTMethodAdapter extends AdviceAdapter {
      */
     private boolean pubAndNoStaticAccess;
 
+    public final static HashMap<String, FTMethodCell> mLambdaMethodCells = new HashMap<>();
+
     /**
      * Whether to show verbose logs
      */
@@ -105,7 +108,7 @@ public class FTMethodAdapter extends AdviceAdapter {
     public void visitEnd() {
         super.visitEnd();
         if (isHasTracked) {
-            FTHookConfig.mLambdaMethodCells.remove(nameDesc);
+            mLambdaMethodCells.remove(nameDesc);
             if (!needSkip) {
                 Logger.debug("Hooked Class<" + className + "> method: " + methodName + ", desc:" + methodDesc);
             }
@@ -124,9 +127,10 @@ public class FTMethodAdapter extends AdviceAdapter {
             FTMethodCell ftMethodCell = FTHookConfig.LAMBDA_METHODS.get(Type.getReturnType(desc1).getDescriptor() + name1 + desc2);
             if (ftMethodCell != null) {
                 Handle it = (Handle) bsmArgs[1];
-                FTHookConfig.mLambdaMethodCells.put(it.getName() + it.getDesc(), ftMethodCell);
+                mLambdaMethodCells.put(it.getName() + it.getDesc(), ftMethodCell);
             }
         } catch (Exception e) {
+            Logger.debug("visitInvokeDynamicInsn exception Class<" + className + "> method: " + methodName + ", desc:" + methodDesc);
             e.printStackTrace();
         }
     }
@@ -384,7 +388,7 @@ public class FTMethodAdapter extends AdviceAdapter {
         /**
          * Hook Lambda expression
          */
-        FTMethodCell lambdaMethodCell = FTHookConfig.mLambdaMethodCells.get(nameDesc);
+        FTMethodCell lambdaMethodCell = mLambdaMethodCells.get(nameDesc);
         if (lambdaMethodCell != null) {
             Type[] types = Type.getArgumentTypes(lambdaMethodCell.desc);
             int length = types.length;
@@ -410,7 +414,7 @@ public class FTMethodAdapter extends AdviceAdapter {
 
             if (lambdaMethodCell.paramsCount <= 0 || lambdaMethodCell.paramsCount > lambdaMethodCell.opcodes.size()) {
                 Logger.debug("Invalid paramsCount for lambda method: " + nameDesc + ", paramsCount: " +
-                    lambdaMethodCell.paramsCount + ", opcodes.size: " + lambdaMethodCell.opcodes.size());
+                        lambdaMethodCell.paramsCount + ", opcodes.size: " + lambdaMethodCell.opcodes.size());
                 return;
             }
             boolean isStaticMethod = FTUtil.isStatic(methodAccess);
@@ -495,9 +499,9 @@ public class FTMethodAdapter extends AdviceAdapter {
     /**
      * Get the ASM index of the parameter at index in the method parameter array
      *
-     * @param types           Method parameter type array
-     * @param index           Method parameter index, starting from 0
-     * @param isStaticMethod  Whether the method is a static method
+     * @param types          Method parameter type array
+     * @param index          Method parameter index, starting from 0
+     * @param isStaticMethod Whether the method is a static method
      * @return ASM index of the parameter at index in the method parameter array
      */
     int getVisitPosition(Type[] types, int index, boolean isStaticMethod) {

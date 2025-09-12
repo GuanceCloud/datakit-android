@@ -22,19 +22,21 @@ public class Logger {
 
     /**
      * debug level log
+     *
      * @param message
      */
     public static void debug(Object message) {
         if (debug) {
-            System.out.println(TAG + message);
+            System.out.println(TAG + "tid:" + Thread.currentThread().getId() + "," + message);
         }
     }
 
     /**
      * error level log
+     *
      * @param message
      */
     public static void error(Object message) {
-        System.err.println(TAG + message);
+        System.err.println(TAG + "tid:" + Thread.currentThread().getId() + "," + message);
     }
 }
