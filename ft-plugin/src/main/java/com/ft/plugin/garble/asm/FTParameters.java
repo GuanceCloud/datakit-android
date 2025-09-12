@@ -12,4 +12,7 @@ public abstract class FTParameters implements InstrumentationParameters {
 
     @Input
     public abstract Property<String> getAsmVersion();
+
+    @Input
+    public abstract Property<Boolean> getVerboseLog();
 }

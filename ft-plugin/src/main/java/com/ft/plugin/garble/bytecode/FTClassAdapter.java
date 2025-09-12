@@ -43,14 +43,17 @@ public class FTClassAdapter extends ClassVisitor {
     private String superName;
     private String[] interfaces;
     private final List<String> ignorePackages;
+    private final boolean verboseLog;
     /**
      * Whether to skip
      */
     private boolean needSkip;
 
-    public FTClassAdapter(final ClassVisitor cv, int api, List<String> ignorePackages) {
+    public FTClassAdapter(final ClassVisitor cv, int api, List<String> ignorePackages, boolean verboseLog) {
         super(api, cv);
         this.ignorePackages = ignorePackages == null ? new ArrayList<>() : ignorePackages;
+        this.verboseLog = verboseLog;
+
     }
 
     @Override
@@ -127,7 +130,7 @@ public class FTClassAdapter extends ClassVisitor {
                 return mv;
             }
         }
-        return new FTMethodAdapter(mv, access, name, desc, className, interfaces, superName, api);
+        return new FTMethodAdapter(mv, access, name, desc, className, interfaces, superName, api, verboseLog);
     }
 
     /**

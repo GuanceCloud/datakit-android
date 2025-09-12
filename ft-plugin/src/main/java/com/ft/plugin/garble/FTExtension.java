@@ -18,6 +18,10 @@ public class FTExtension {
      */
     public boolean showLog = false;
     /**
+     * Whether to show verbose processing logs
+     */
+    public boolean verboseLog = false;
+    /**
      * Whether to enable auto track
      */
     public boolean openAutoTrack = true;

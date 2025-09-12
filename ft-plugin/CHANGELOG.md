@@ -1,3 +1,7 @@
+# plugin 1.3.6-alpha02
+1. Added verboseLog param for more logs.
+2. Added try-catch and supplemented error logs.
+---
 # plugin 1.3.6-alpha01
 1. Numeric boundary handling in FTMethodAdapter
 
