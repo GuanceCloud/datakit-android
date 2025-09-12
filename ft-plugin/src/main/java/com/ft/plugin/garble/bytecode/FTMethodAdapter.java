@@ -430,8 +430,12 @@ public class FTMethodAdapter extends AdviceAdapter {
             for (int i = paramStart; i < maxIndex; i++) {
                 int opcodeIndex = i - paramStart;
                 if (opcodeIndex < lambdaMethodCell.opcodes.size()) {
-                    mv.visitVarInsn(lambdaMethodCell.opcodes.get(opcodeIndex), getVisitPosition(lambdaTypes,
-                            i, isStaticMethod));
+                    try {
+                        mv.visitVarInsn(lambdaMethodCell.opcodes.get(opcodeIndex), getVisitPosition(lambdaTypes,
+                                i, isStaticMethod));
+                    } catch (Exception e) {
+                        Logger.debug("Exception method: " + nameDesc + ", paramStart: " + paramStart);
+                    }
                 } else {
                     Logger.debug("Skipping invalid opcode index: " + opcodeIndex + " for method: " + nameDesc);
                 }
@@ -497,8 +501,14 @@ public class FTMethodAdapter extends AdviceAdapter {
      * @return ASM index of the parameter at index in the method parameter array
      */
     int getVisitPosition(Type[] types, int index, boolean isStaticMethod) {
-        if (types == null || index < 0 || index >= types.length) {
-            throw new Error("getVisitPosition error: invalid index " + index + " for types array of size " + (types != null ? types.length : 0) + " in class " + className + ", method " + nameDesc);
+        if (types == null || types.length == 0) {
+            Logger.debug("getVisitPosition error: invalid index:" + index);
+            return 0;
+        }
+
+        if (index < 0 || index >= types.length) {
+            Logger.debug("getVisitPosition error: invalid index:" + index);
+            return 0;
         }
         if (index == 0) {
             return isStaticMethod ? 0 : 1;
