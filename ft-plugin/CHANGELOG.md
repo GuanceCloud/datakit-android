@@ -1,3 +1,7 @@
+# plugin 1.1.9-alpha04
+1. Added verboseLog param for more logs.
+
+---
 # plugin 1.1.9-alpha03
 1. Added try-catch and supplemented error logs.
 
