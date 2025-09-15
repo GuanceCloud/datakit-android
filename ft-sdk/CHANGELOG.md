@@ -1,3 +1,7 @@
+# agent 1.6.15-alpha02
+1. Added background field to error_situation
+
+---
 # agent 1.6.15-alpha01
 1. Fixed the incorrect way of retrieving the cursor count.
 
