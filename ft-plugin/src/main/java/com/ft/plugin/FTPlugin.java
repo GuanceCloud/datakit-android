@@ -9,6 +9,7 @@ import com.ft.plugin.garble.asm.FTTransform;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
+import java.io.File;
 import java.util.Collections;
 
 
@@ -58,10 +59,20 @@ public class FTPlugin implements Plugin<Project> {
         project.getExtensions().create("FTExt", FTExtension.class, project);
         // Register Transform immediately, not in afterEvaluate
         appExtension.registerTransform(new FTTransform(project), Collections.EMPTY_LIST);
-
         project.afterEvaluate(p -> {
             //Parameter object
             FTExtension extension = (FTExtension) p.getExtensions().getByName("FTExt");
+
+            // Initialize logger based on extension configuration
+            if (extension.enableFileLog) {
+                String logFile;
+                if (extension.logFilePath != null && !extension.logFilePath.isEmpty()) {
+                    logFile = extension.logFilePath;
+                } else {
+                    logFile = p.getBuildDir().getAbsolutePath() + File.separator + "ft-plugin.log";
+                }
+                Logger.init(logFile);
+            }
 
             Logger.setDebug(extension.showLog);
             Logger.debug("Plugin Version:" + BuildConfig.PLUGIN_VERSION +
