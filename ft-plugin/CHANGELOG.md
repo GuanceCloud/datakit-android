@@ -1,3 +1,8 @@
+# plugin 1.1.9-alpha06
+1. Removed ASM for Activity and Fragment.
+2. Added code line number display for Exceptions.
+
+---
 # plugin 1.1.9-alpha05
 1. Fixed thread safety issues with global variables.
 2. Debug log add tid info

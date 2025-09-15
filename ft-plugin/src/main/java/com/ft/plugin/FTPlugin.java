@@ -62,7 +62,7 @@ public class FTPlugin implements Plugin<Project> {
         project.afterEvaluate(p -> {
             //Parameter object
             FTExtension extension = (FTExtension) p.getExtensions().getByName("FTExt");
-            
+
             Logger.setDebug(extension.showLog);
             Logger.debug("Plugin Version:" + BuildConfig.PLUGIN_VERSION +
                     ",ASM Version:asm7");
