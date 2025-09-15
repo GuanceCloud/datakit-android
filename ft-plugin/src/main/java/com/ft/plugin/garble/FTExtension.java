@@ -22,6 +22,14 @@ public class FTExtension {
      */
     public boolean verboseLog = false;
     /**
+     * Whether to enable file logging
+     */
+    public boolean enableFileLog = false;
+    /**
+     * Log file path (optional, defaults to build/ft-plugin.log)
+     */
+    public String logFilePath = "";
+    /**
      * Whether to enable auto track
      */
     public boolean openAutoTrack = true;
@@ -93,6 +101,9 @@ public class FTExtension {
     public String toString() {
         return "FTExtension{ " +
                 "showLog=" + showLog +
+                ", verboseLog=" + verboseLog +
+                ", enableFileLog=" + enableFileLog +
+                ", logFilePath='" + logFilePath + '\'' +
                 ", openAutoTrack=" + openAutoTrack +
                 ", autoUploadMap=" + autoUploadMap +
                 ", autoUploadNativeDebugSymbol=" + autoUploadNativeDebugSymbol +

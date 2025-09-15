@@ -1,7 +1,7 @@
 # plugin 1.3.6-alpha03
 1. Removed ASM for Activity and Fragment.
 2. Added code line number display for Exceptions.
-3. Using `org.gradle.api.logging.Logger` to print log instead of `system.out`
+3. Added log output to file functionality.  
 
 ---
 # plugin 1.3.6-alpha02
