@@ -28,6 +28,7 @@ import com.ft.plugin.garble.Logger;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Handle;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -38,7 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * This class is adapted and modified from the Sensors Data project 
+ * This class is adapted and modified from the Sensors Data project
  * <a href="https://github.com/sensorsdata/sa-sdk-android-plugin2">sa-sdk-android-plugin2</a>
  * SensorsAnalyticsClassVisitor.groovy class
  * Visit class method structure
@@ -83,6 +84,11 @@ public class FTMethodAdapter extends AdviceAdapter {
      */
     private final boolean verboseLog;
 
+    /**
+     * show code line
+     */
+    private int lineNumber;
+
     public FTMethodAdapter(MethodVisitor mv, int access, String name, String desc, String className,
                            String[] interfaces, String superName, int api, boolean verboseLog) {
         super(api, mv, access, name, desc);
@@ -101,7 +107,19 @@ public class FTMethodAdapter extends AdviceAdapter {
 
     @Override
     public void visitInsn(int opcode) {
-        super.visitInsn(opcode);
+        try {
+            super.visitInsn(opcode);
+        } catch (Exception e) {
+            Logger.debug("visitInsn Class<" + className + "> method: " + methodName + ", desc:"
+                    + methodDesc + ",linenumber:" + lineNumber + "," + e.getMessage());
+            throw e;
+        }
+    }
+
+    @Override
+    public void visitLineNumber(int line, Label start) {
+        super.visitLineNumber(line, start);
+        lineNumber = line;
     }
 
     @Override
@@ -130,8 +148,9 @@ public class FTMethodAdapter extends AdviceAdapter {
                 mLambdaMethodCells.put(it.getName() + it.getDesc(), ftMethodCell);
             }
         } catch (Exception e) {
-            Logger.debug("visitInvokeDynamicInsn exception Class<" + className + "> method: " + methodName + ", desc:" + methodDesc);
-            e.printStackTrace();
+            Logger.debug("visitInvokeDynamicInsn exception Class<" + className + "> method: "
+                    + methodName + ", desc:" + methodDesc + ",linenumber:" + lineNumber + "," + e.getMessage());
+            throw e;
         }
     }
 
@@ -303,9 +322,6 @@ public class FTMethodAdapter extends AdviceAdapter {
 
     void handleCode() {
         if (needSkip) return;
-        if (verboseLog) {
-            Logger.debug("Processing Class<" + className + "> method: " + methodName + ", desc:" + methodDesc);
-        }
         /*
          * Write Application method
          */
@@ -333,57 +349,57 @@ public class FTMethodAdapter extends AdviceAdapter {
             }
         }
 
-        /**
-         * androidx/fragment/app/Fragment，androidx/fragment/app/ListFragment，androidx/fragment/app/DialogFragment
-         */
-        if (FTUtil.isInstanceOfXFragment(className)) {
-            //Logger.info("Method scan>>>Class is FragmentX>>>Method is "+nameDesc);
-            FTMethodCell ftMethodCell = FTHookConfig.FRAGMENT_X_METHODS.get(nameDesc);
-            if (ftMethodCell != null) {
-                handleCode(ftMethodCell);
-                isHasTracked = true;
-                return;
-            }
-        }
-
-        /**
-         * android/support/v4/app/Fragment，android/support/v4/app/ListFragment，android/support/v4/app/DialogFragment，
-         */
-        if (FTUtil.isInstanceOfV4Fragment(className)) {
-            //Logger.info("Method scan>>>Class is FragmentV4>>>Method is "+nameDesc);
-            FTMethodCell ftMethodCell = FTHookConfig.FRAGMENT_V4_METHODS.get(nameDesc);
-            if (ftMethodCell != null) {
-                handleCode(ftMethodCell);
-                isHasTracked = true;
-                return;
-            }
-        }
-
-        /**
-         * android/app/Fragment，android/app/ListFragment， android/app/DialogFragment，
-         */
-        if (FTUtil.isInstanceOfFragment(className)) {
-            //Logger.info("Method scan>>>Class is Fragment>>>Method is "+nameDesc);
-            FTMethodCell ftMethodCell = FTHookConfig.FRAGMENT_METHODS.get(nameDesc);
-            if (ftMethodCell != null) {
-                handleCode(ftMethodCell);
-                isHasTracked = true;
-                return;
-            }
-        }
-
-        /**
-         * Hook Activity
-         */
-        if (FTUtil.isInstanceOfActivity(className)) {
-            FTMethodCell ftMethodCell = FTHookConfig.ACTIVITY_METHODS.get(nameDesc);
-            //Logger.info("Method scan>>>Class is Activity>>>Method is "+nameDesc+" ftMethodCell="+ftMethodCell);
-            if (ftMethodCell != null) {
-                handleCode(ftMethodCell);
-                isHasTracked = true;
-                return;
-            }
-        }
+//        /**
+//         * androidx/fragment/app/Fragment，androidx/fragment/app/ListFragment，androidx/fragment/app/DialogFragment
+//         */
+//        if (FTUtil.isInstanceOfXFragment(className)) {
+//            //Logger.info("Method scan>>>Class is FragmentX>>>Method is "+nameDesc);
+//            FTMethodCell ftMethodCell = FTHookConfig.FRAGMENT_X_METHODS.get(nameDesc);
+//            if (ftMethodCell != null) {
+//                handleCode(ftMethodCell);
+//                isHasTracked = true;
+//                return;
+//            }
+//        }
+//
+//        /**
+//         * android/support/v4/app/Fragment，android/support/v4/app/ListFragment，android/support/v4/app/DialogFragment，
+//         */
+//        if (FTUtil.isInstanceOfV4Fragment(className)) {
+//            //Logger.info("Method scan>>>Class is FragmentV4>>>Method is "+nameDesc);
+//            FTMethodCell ftMethodCell = FTHookConfig.FRAGMENT_V4_METHODS.get(nameDesc);
+//            if (ftMethodCell != null) {
+//                handleCode(ftMethodCell);
+//                isHasTracked = true;
+//                return;
+//            }
+//        }
+//
+//        /**
+//         * android/app/Fragment，android/app/ListFragment， android/app/DialogFragment，
+//         */
+//        if (FTUtil.isInstanceOfFragment(className)) {
+//            //Logger.info("Method scan>>>Class is Fragment>>>Method is "+nameDesc);
+//            FTMethodCell ftMethodCell = FTHookConfig.FRAGMENT_METHODS.get(nameDesc);
+//            if (ftMethodCell != null) {
+//                handleCode(ftMethodCell);
+//                isHasTracked = true;
+//                return;
+//            }
+//        }
+//
+//        /**
+//         * Hook Activity
+//         */
+//        if (FTUtil.isInstanceOfActivity(className)) {
+//            FTMethodCell ftMethodCell = FTHookConfig.ACTIVITY_METHODS.get(nameDesc);
+//            //Logger.info("Method scan>>>Class is Activity>>>Method is "+nameDesc+" ftMethodCell="+ftMethodCell);
+//            if (ftMethodCell != null) {
+//                handleCode(ftMethodCell);
+//                isHasTracked = true;
+//                return;
+//            }
+//        }
 
         /**
          * Hook Lambda expression
@@ -438,7 +454,9 @@ public class FTMethodAdapter extends AdviceAdapter {
                         mv.visitVarInsn(lambdaMethodCell.opcodes.get(opcodeIndex), getVisitPosition(lambdaTypes,
                                 i, isStaticMethod));
                     } catch (Exception e) {
-                        Logger.debug("Exception method: " + nameDesc + ", paramStart: " + paramStart);
+                        Logger.debug("handleCode exception Class<" + className + "> method: "
+                                + methodName + ", desc:" + methodDesc + ",linenumber:" + lineNumber + "," + e.getMessage());
+                        throw e;
                     }
                 } else {
                     Logger.debug("Skipping invalid opcode index: " + opcodeIndex + " for method: " + nameDesc);

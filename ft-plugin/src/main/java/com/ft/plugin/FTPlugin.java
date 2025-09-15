@@ -62,6 +62,7 @@ import kotlin.jvm.functions.Function1;
 public class FTPlugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
+        Logger.init(project);
         FTExtension extension = project.getExtensions().create("FTExt", FTExtension.class, project);
 
         project.afterEvaluate(p -> {
