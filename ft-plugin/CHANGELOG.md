@@ -1,3 +1,8 @@
+# plugin 1.1.9-alpha07
+1. Add try catch for weaverSingleClassToByteArray
+2. remove tid from log
+
+---
 # plugin 1.1.9-alpha06
 1. Removed ASM for Activity and Fragment.
 2. Added code line number display for Exceptions.

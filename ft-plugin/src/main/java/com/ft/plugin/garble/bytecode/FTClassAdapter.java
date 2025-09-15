@@ -50,12 +50,6 @@ public class FTClassAdapter extends ClassVisitor {
      */
     private boolean needSkip;
 
-    public FTClassAdapter(final ClassVisitor cv, List<String> ignorePackages) {
-        super(ASM7, cv);
-        this.ignorePackages = ignorePackages == null ? new ArrayList<>() : ignorePackages;
-        this.verboseLog = false;
-    }
-
     public FTClassAdapter(final ClassVisitor cv, List<String> ignorePackages, boolean verboseLog) {
         super(ASM7, cv);
         this.ignorePackages = ignorePackages == null ? new ArrayList<>() : ignorePackages;

@@ -27,7 +27,7 @@ public class Logger {
      */
     public static void debug(Object message) {
         if (debug) {
-            System.out.println(TAG + "tid:" + Thread.currentThread().getId() + "," + message);
+            System.out.println(TAG + message);
         }
     }
 
@@ -37,6 +37,6 @@ public class Logger {
      * @param message
      */
     public static void error(Object message) {
-        System.err.println(TAG + "tid:" + Thread.currentThread().getId() + "," + message);
+        System.err.println(TAG + message);
     }
 }

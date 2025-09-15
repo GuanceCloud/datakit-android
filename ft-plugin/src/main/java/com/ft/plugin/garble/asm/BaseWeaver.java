@@ -1,6 +1,7 @@
 package com.ft.plugin.garble.asm;
 
 import com.ft.plugin.garble.ClassNameAnalytics;
+import com.ft.plugin.garble.Logger;
 
 import org.apache.commons.io.FileUtils;
 import org.objectweb.asm.ClassReader;
@@ -22,7 +23,7 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 /**
- *  <a href="https://github.com/Leaking/Hunter/blob/master/hunter-transform/src/main/java/com/quinn/hunter/transform/asm/BaseWeaver.java">Reference material</a>
+ * <a href="https://github.com/Leaking/Hunter/blob/master/hunter-transform/src/main/java/com/quinn/hunter/transform/asm/BaseWeaver.java">Reference material</a>
  * DATE:2019-11-29 13:57
  * Description:
  */
@@ -104,7 +105,12 @@ public class BaseWeaver implements IWeaver {
         ClassReader classReader = new ClassReader(inputStream);
         ClassWriter classWriter = new ExtendClassWriter(classLoader, ClassWriter.COMPUTE_MAXS);
         ClassVisitor classWriterWrapper = wrapClassWriter(classWriter);
-        classReader.accept(classWriterWrapper, ClassReader.EXPAND_FRAMES);
+        try {
+            classReader.accept(classWriterWrapper, ClassReader.EXPAND_FRAMES);
+        } catch (Exception e) {
+            Logger.debug("weaverSingleClassToByteArray: exception class" + classReader.getClassName());
+            throw e;
+        }
         return classWriter.toByteArray();
     }
 
