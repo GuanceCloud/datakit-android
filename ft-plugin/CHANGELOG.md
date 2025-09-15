@@ -1,3 +1,7 @@
+# plugin 1.1.9-alpha08
+1. Added log output to file functionality.
+
+---
 # plugin 1.1.9-alpha07
 1. Add try catch for weaverSingleClassToByteArray
 2. remove tid from log
