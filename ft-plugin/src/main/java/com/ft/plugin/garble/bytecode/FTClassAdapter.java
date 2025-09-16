@@ -175,6 +175,10 @@ public class FTClassAdapter extends ClassVisitor {
                 || ClassNameAnalytics.isTencent(className)
                 || ClassNameAnalytics.isTaoBao(className)
                 || superName.equals(Constants.CLASS_NAME_WEBVIEW))
+                || superName.equals(Constants.CLASS_NAME_RN_WEBVIEW)
+                || superName.equals(Constants.CLASS_NAME_TENCENT_WEBVIEW)
+                || superName.equals(Constants.CLASS_NAME_TAOBAO_WEBVIEW)
+                || superName.equals(Constants.CLASS_NAME_DCLOUD_WEBVIEW)
                 && TARGET_WEBVIEW_METHOD.contains(methodNameDesc);
     }
 

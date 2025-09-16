@@ -163,6 +163,44 @@ public class FTMethodAdapter extends AdviceAdapter {
             "loadDataWithBaseURL(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
             "postUrl(Ljava/lang/String;[B)V");
 
+    /**
+     * Check if the class is a custom WebView class (inherits from WebView)
+     *
+     * @param className The class name to check
+     * @return true if the class inherits from WebView
+     */
+    private boolean isCustomWebViewClass(String className) {
+        if (className == null) {
+            return false;
+        }
+
+        // Skip if it's already handled by the standard WebView cases
+        if (className.equals(Constants.CLASS_NAME_WEBVIEW) ||
+                className.equals(Constants.CLASS_NAME_RN_WEBVIEW) ||
+                className.equals(Constants.CLASS_NAME_TENCENT_WEBVIEW)) {
+            return false;
+        }
+
+        // Check if it's a custom class that likely inherits from WebView
+        // This includes:
+        // 1. Classes that contain "WebView" in their name
+        // 2. Classes in the same package as the current class (likely custom classes)
+        // 3. Classes not in android package (custom classes)
+        boolean isCustomClass = !className.startsWith("android/") &&
+                !className.startsWith("com/android/") &&
+                !className.startsWith("java/") &&
+                !className.startsWith("javax/");
+
+        boolean isWebViewRelated = className.contains("WebView") ||
+                className.contains("webview") ||
+                className.contains("WebView");
+
+        boolean isSamePackage = this.className != null &&
+                className.startsWith(this.className.substring(0, this.className.lastIndexOf('/') + 1));
+
+        return isCustomClass && (isWebViewRelated || isSamePackage);
+    }
+
     @Override
     public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
         if (needSkip) {
@@ -221,6 +259,7 @@ public class FTMethodAdapter extends AdviceAdapter {
                 }
                 break;
 
+
             case Constants.CLASS_NAME_LOG:
 
                 if (ClassNameAnalytics.isAndroidPackage(className) || ClassNameAnalytics.isFTSdkApi(className)) {
@@ -275,6 +314,22 @@ public class FTMethodAdapter extends AdviceAdapter {
                 break;
 
             default:
+                // Check if the owner is a custom WebView class (inherits from WebView)
+                if (isCustomWebViewClass(owner)) {
+                    String checkMethod = name + desc;
+                    if (TARGET_WEBVIEW_METHOD.contains(checkMethod)) {
+                        if (nameDesc.startsWith(Constants.INNER_CLASS_METHOD_PREFIX)) {
+                            Logger.debug("CustomWebView Inner Ignore-> owner:" + owner + ", class:" + className
+                                    + ", super:" + superName + ", method:" + nameDesc);
+                        } else {
+                            Logger.debug("CUSTOM_WEBVIEW_METHOD-> owner:" + owner + ", class:" + className
+                                    + ", super:" + superName + ", method:" + checkMethod + " | " + nameDesc);
+                            mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, name,
+                                    desc.replaceFirst("\\(", "(" + Constants.VIEW_DESC), itf);
+                            return;
+                        }
+                    }
+                }
                 break;
         }
 

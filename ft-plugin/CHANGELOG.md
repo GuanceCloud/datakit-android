@@ -1,3 +1,8 @@
+# plugin 1.3.6-alpha04
+1. Fixed ASM write issue with custom WebView variable declarations
+2. Added ignore configuration for custom WebView internal methods.
+
+---
 # plugin 1.3.6-alpha03
 1. Removed ASM for Activity and Fragment.
 2. Added code line number display for Exceptions.
