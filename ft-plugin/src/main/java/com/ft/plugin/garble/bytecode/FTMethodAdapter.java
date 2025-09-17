@@ -84,13 +84,17 @@ public class FTMethodAdapter extends AdviceAdapter {
      */
     private final boolean verboseLog;
 
+
+    private final List<String> knownWebviews;
+
     /**
      * show code line
      */
     private int lineNumber;
 
     public FTMethodAdapter(MethodVisitor mv, int access, String name, String desc, String className,
-                           String[] interfaces, String superName, int api, boolean verboseLog) {
+                           String[] interfaces, String superName, int api, boolean verboseLog,
+                           List<String> knownWebviews) {
         super(api, mv, access, name, desc);
         this.methodName = name;
         this.superName = superName;
@@ -98,6 +102,8 @@ public class FTMethodAdapter extends AdviceAdapter {
         this.interfaces = interfaces;
         this.nameDesc = name + desc;
         this.verboseLog = verboseLog;
+        // Convert dot notation to slash notation for knownWebviews
+        this.knownWebviews = knownWebviews;
     }
 
     @Override
@@ -163,50 +169,22 @@ public class FTMethodAdapter extends AdviceAdapter {
             "loadDataWithBaseURL(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
             "postUrl(Ljava/lang/String;[B)V");
 
-    /**
-     * Check if the class is a custom WebView class (inherits from WebView)
-     *
-     * @param className The class name to check
-     * @return true if the class inherits from WebView
-     */
-    private boolean isCustomWebViewClass(String className) {
-        if (className == null) {
-            return false;
-        }
-
-        // Skip if it's already handled by the standard WebView cases
-        if (className.equals(Constants.CLASS_NAME_WEBVIEW) ||
-                className.equals(Constants.CLASS_NAME_RN_WEBVIEW) ||
-                className.equals(Constants.CLASS_NAME_TENCENT_WEBVIEW)) {
-            return false;
-        }
-
-        // Check if it's a custom class that likely inherits from WebView
-        // This includes:
-        // 1. Classes that contain "WebView" in their name
-        // 2. Classes in the same package as the current class (likely custom classes)
-        // 3. Classes not in android package (custom classes)
-        boolean isCustomClass = !className.startsWith("android/") &&
-                !className.startsWith("com/android/") &&
-                !className.startsWith("java/") &&
-                !className.startsWith("javax/");
-
-        boolean isWebViewRelated = className.contains("WebView") ||
-                className.contains("webview") ||
-                className.contains("WebView");
-
-        boolean isSamePackage = this.className != null &&
-                className.startsWith(this.className.substring(0, this.className.lastIndexOf('/') + 1));
-
-        return isCustomClass && (isWebViewRelated || isSamePackage);
-    }
-
     @Override
     public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
         if (needSkip) {
             super.visitMethodInsn(opcode, owner, name, desc, itf);
             return;
         }
+        if (verboseLog) {
+            if (owner.contains("webview")) {
+                String method = name + desc;
+                if (TARGET_WEBVIEW_METHOD.contains(method)) {
+                    Logger.error("TCWebView check:" + knownWebviews + "," + className + "," + method
+                            + ",\n" + knownWebviews.contains(owner) + ",\nowner:" + owner);
+                }
+            }
+        }
+
         switch (owner) {
             case Constants.CLASS_NAME_HTTP_CLIENT_BUILDER:
                 if ("build()Lorg/apache/hc/client5/http/impl/classic/CloseableHttpClient;".contains(name + desc)) {
@@ -266,7 +244,8 @@ public class FTMethodAdapter extends AdviceAdapter {
                     super.visitMethodInsn(opcode, owner, name, desc, itf);
                     return;
                 }
-
+                String message = "CLASS_NAME_LOG-> owner:" + owner + ", class:" + className
+                        + ", super:" + superName + ", method:" + name + desc + " | " + nameDesc;
                 switch (name) {
                     case "i":
                     case "d":
@@ -275,23 +254,43 @@ public class FTMethodAdapter extends AdviceAdapter {
                         if (Constants.METHOD_DESC_S_S_I.equals(desc)) {
                             mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, name,
                                     Constants.METHOD_DESC_S_S_I, false);
+                            if (verboseLog) {
+                                Logger.debug(message);
+                            }
                         } else if (Constants.METHOD_DESC_S_S_T_I.equals(desc)) {
                             mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, name,
                                     Constants.METHOD_DESC_S_S_T_I, false);
+                            if (verboseLog) {
+                                Logger.debug(message);
+                            }
+
                         } else {
                             super.visitMethodInsn(opcode, owner, name, desc, itf);
                         }
+
                         return;
                     case "w":
                         if (Constants.METHOD_DESC_S_S_I.equals(desc)) {
                             mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "w",
                                     Constants.METHOD_DESC_S_S_I, false);
+                            if (verboseLog) {
+                                Logger.debug(message);
+                            }
+
                         } else if (Constants.METHOD_DESC_S_S_T_I.equals(desc)) {
                             mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "w",
                                     Constants.METHOD_DESC_S_S_T_I, false);
+                            if (verboseLog) {
+                                Logger.debug(message);
+                            }
+
                         } else if (Constants.METHOD_DESC_S_T_I.equals(desc)) {
                             mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "w",
                                     Constants.METHOD_DESC_S_T_I, false);
+                            if (verboseLog) {
+                                Logger.debug(message);
+                            }
+
                         } else {
                             super.visitMethodInsn(opcode, owner, name, desc, itf);
                         }
@@ -302,6 +301,9 @@ public class FTMethodAdapter extends AdviceAdapter {
 
                             mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG,
                                     "println", Constants.METHOD_DESC_I_S_S_I, false);
+                            if (verboseLog) {
+                                Logger.debug(message);
+                            }
 
                         } else {
                             super.visitMethodInsn(opcode, owner, name, desc, itf);
@@ -312,25 +314,23 @@ public class FTMethodAdapter extends AdviceAdapter {
                         break;
                 }
                 break;
+        }
 
-            default:
-                // Check if the owner is a custom WebView class (inherits from WebView)
-                if (isCustomWebViewClass(owner)) {
-                    String checkMethod = name + desc;
-                    if (TARGET_WEBVIEW_METHOD.contains(checkMethod)) {
-                        if (nameDesc.startsWith(Constants.INNER_CLASS_METHOD_PREFIX)) {
-                            Logger.debug("CustomWebView Inner Ignore-> owner:" + owner + ", class:" + className
-                                    + ", super:" + superName + ", method:" + nameDesc);
-                        } else {
-                            Logger.debug("CUSTOM_WEBVIEW_METHOD-> owner:" + owner + ", class:" + className
-                                    + ", super:" + superName + ", method:" + checkMethod + " | " + nameDesc);
-                            mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, name,
-                                    desc.replaceFirst("\\(", "(" + Constants.VIEW_DESC), itf);
-                            return;
-                        }
-                    }
+
+        if (knownWebviews.contains(owner)) {
+            String method = name + desc;
+            if (TARGET_WEBVIEW_METHOD.contains(method)) {
+                if (nameDesc.startsWith(Constants.INNER_CLASS_METHOD_PREFIX)) {
+                    Logger.debug("Custom WebInner Ignore-> owner:" + owner + ", class:" + className
+                            + ", super:" + superName + ", method:" + nameDesc);
+                } else {
+                    Logger.debug("TARGET_CUSTOM_WEBVIEW_METHOD-> owner:" + owner + ", class:" + className
+                            + ", super:" + superName + ", method:" + method + " | " + nameDesc);
+                    mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, name,
+                            desc.replaceFirst("\\(", "(" + Constants.VIEW_DESC), itf);
+                    return;
                 }
-                break;
+            }
         }
 
         super.visitMethodInsn(opcode, owner, name, desc, itf);

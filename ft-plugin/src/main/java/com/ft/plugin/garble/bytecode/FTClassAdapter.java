@@ -39,6 +39,17 @@ import java.util.List;
  * SensorsAnalyticsClassVisitor.groovy class
  */
 public class FTClassAdapter extends ClassVisitor {
+    private static final List<String> knownWebviews = new ArrayList<>();
+
+    static {
+        // Initialize known WebView classes
+        knownWebviews.add(Constants.CLASS_NAME_WEBVIEW);
+        knownWebviews.add(Constants.CLASS_NAME_RN_WEBVIEW);
+        knownWebviews.add(Constants.CLASS_NAME_TENCENT_WEBVIEW);
+        knownWebviews.add(Constants.CLASS_NAME_TAOBAO_WEBVIEW);
+        knownWebviews.add(Constants.CLASS_NAME_DCLOUD_WEBVIEW);
+    }
+
     private String className;
     private String superName;
     private String[] interfaces;
@@ -49,15 +60,29 @@ public class FTClassAdapter extends ClassVisitor {
      */
     private boolean needSkip;
 
-    public FTClassAdapter(final ClassVisitor cv, int api, List<String> ignorePackages, boolean verboseLog) {
+    public FTClassAdapter(final ClassVisitor cv, int api, List<String> ignorePackages,
+                          boolean verboseLog, List<String> additionalWebviews) {
         super(api, cv);
-        this.ignorePackages = ignorePackages == null ? new ArrayList<>() : ignorePackages;
+        // Convert dot notation to slash notation for ignorePackages
+        this.ignorePackages = new ArrayList<>();
+        if (ignorePackages != null) {
+            for (String packageName : ignorePackages) {
+                this.ignorePackages.add(packageName.replace(".", "/"));
+            }
+        }
         this.verboseLog = verboseLog;
 
+        // Add additional WebViews to the static knownWebviews list
+        if (additionalWebviews != null) {
+            for (String webview : additionalWebviews) {
+                addToKnownWebviews(webview.replace(".", "/"));
+            }
+        }
     }
 
     @Override
-    public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+    public void visit(int version, int access, String name, String signature, String superName,
+                      String[] interfaces) {
         super.visit(version, access, name, signature, superName, interfaces);
         this.className = name;
         this.superName = superName;
@@ -130,7 +155,7 @@ public class FTClassAdapter extends ClassVisitor {
                 return mv;
             }
         }
-        return new FTMethodAdapter(mv, access, name, desc, className, interfaces, superName, api, verboseLog);
+        return new FTMethodAdapter(mv, access, name, desc, className, interfaces, superName, api, verboseLog, knownWebviews);
     }
 
     /**
@@ -140,15 +165,24 @@ public class FTClassAdapter extends ClassVisitor {
      * @return
      */
     private boolean isIgnorePackage(String className) {
-        boolean isPackageIgnore = false;
-        for (String packageName : ignorePackages) {
-            if (className.startsWith(packageName.replace(".", "/"))) {
-                isPackageIgnore = true;
-                break;
-            }
-        }
-        return isPackageIgnore;
+        return ignorePackages.contains(className);
     }
+
+
+    private static boolean isKnownWebviews(String className) {
+        return knownWebviews.contains(className);
+    }
+
+    /**
+     * Add class name to knownWebviews if not null and not already present
+     */
+    private static void addToKnownWebviews(String className) {
+        if (className != null && !knownWebviews.contains(className)) {
+            Logger.debug("addToKnownWebviews:" + className);
+            knownWebviews.add(className);
+        }
+    }
+
 
     /**
      * SDK internal methods, except for {@link Constants#FT_SDK_PACKAGE}, do not need to be scanned
@@ -164,6 +198,7 @@ public class FTClassAdapter extends ClassVisitor {
 
     /**
      * Whether it is a third-party or internal WebView method
+     * Uses hybrid inheritance checking strategy that doesn't depend on compilation order
      *
      * @param className
      * @param superName
@@ -171,15 +206,37 @@ public class FTClassAdapter extends ClassVisitor {
      * @return
      */
     private boolean isWebViewInner(String className, String superName, String methodNameDesc) {
-        return (ClassNameAnalytics.isDCloud(className)
+        // Check if it's a WebView method that should be processed first
+        boolean isWebViewMethod = TARGET_WEBVIEW_METHOD.contains(methodNameDesc);
+        if (!isWebViewMethod) {
+            return false; // Early return if not a WebView method
+        }
+
+        // Check if it's already a known WebView
+        boolean isClassNameKnown = knownWebviews.contains(className);
+        boolean isSuperNameKnown = knownWebviews.contains(superName);
+
+        if (isClassNameKnown) {
+            return true; // Early return if className is already known
+        }
+
+        // If superName is a known WebView but className is not collected, add className to known list
+        if (isSuperNameKnown) {
+            addToKnownWebviews(className);
+            return true;
+        }
+
+        // Check legacy analytics for backward compatibility
+        boolean isClassNameThirdParty = ClassNameAnalytics.isDCloud(className)
                 || ClassNameAnalytics.isTencent(className)
-                || ClassNameAnalytics.isTaoBao(className)
-                || superName.equals(Constants.CLASS_NAME_WEBVIEW))
-                || superName.equals(Constants.CLASS_NAME_RN_WEBVIEW)
-                || superName.equals(Constants.CLASS_NAME_TENCENT_WEBVIEW)
-                || superName.equals(Constants.CLASS_NAME_TAOBAO_WEBVIEW)
-                || superName.equals(Constants.CLASS_NAME_DCLOUD_WEBVIEW)
-                && TARGET_WEBVIEW_METHOD.contains(methodNameDesc);
+                || ClassNameAnalytics.isTaoBao(className);
+
+        // If it's a legacy WebView, add to knownWebviews for future reference
+        if (isClassNameThirdParty) {
+            addToKnownWebviews(className);
+            return true;
+        }
+        return false;
     }
 
 }

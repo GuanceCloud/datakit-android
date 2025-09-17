@@ -1,3 +1,7 @@
+# plugin 1.3.6-alpha05
+1. Added knownWebViewClasses parameter to support ASM writes.
+
+---
 # plugin 1.3.6-alpha04
 1. Fixed ASM write issue with custom WebView variable declarations
 2. Added ignore configuration for custom WebView internal methods.

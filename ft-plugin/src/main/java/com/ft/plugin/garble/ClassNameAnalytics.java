@@ -56,6 +56,8 @@ public class ClassNameAnalytics {
     public static boolean isAndroidPackage(String className) {
         return (className.startsWith("android/")
                 || className.startsWith("androidx/"))
-                || className.startsWith("com/google/android");
+                || className.startsWith("com/google/android")
+                || className.startsWith("java/")
+                || className.startsWith("javax/");
     }
 }

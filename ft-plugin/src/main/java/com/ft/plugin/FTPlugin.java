@@ -98,6 +98,7 @@ public class FTPlugin implements Plugin<Project> {
                             public Unit invoke(FTParameters parameters) {
                                 // Now extension is already user-configured content
                                 parameters.getIgnorePackages().set(extension.ignorePackages);
+                                parameters.getKnownWebViewClasses().set(extension.knownWebViewClasses);
                                 parameters.getAsmVersion().set(extension.asmVersion);
                                 parameters.getVerboseLog().set(extension.verboseLog);
                                 return Unit.INSTANCE;
