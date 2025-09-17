@@ -76,7 +76,7 @@ class LifeCircleTraceCallback {
             if (mInited) {
                 //hot start
                 startTimeNanoTime = Utils.getCurrentNanoTime();
-                startClockTimeNano = SystemClock.elapsedRealtimeNanos();
+                startClockTimeNano = System.nanoTime();
             }
         }
 
@@ -89,12 +89,12 @@ class LifeCircleTraceCallback {
      * @param context
      */
     public void onPreOnCreate(Context context) {
-        mCreateMap.put(context, SystemClock.elapsedRealtimeNanos());
+        mCreateMap.put(context, System.nanoTime());
         if (!mInited) {
 //            FTAutoTrack.startApp();
             // warn start
             startTimeNanoTime = Utils.getCurrentNanoTime();
-            startClockTimeNano = SystemClock.elapsedRealtimeNanos();
+            startClockTimeNano = System.nanoTime();
         }
     }
 
@@ -111,7 +111,7 @@ class LifeCircleTraceCallback {
             if (config.isEnableTraceUserView()) {
                 Long startTime = mCreateMap.get(context);
                 if (startTime != null) {
-                    long durationNS = SystemClock.elapsedRealtimeNanos() - startTime;
+                    long durationNS = System.nanoTime() - startTime;
                     String viewName = AopUtils.getClassName(context);
                     FTViewActivityTrackingHandler handler = config.getViewActivityTrackingHandler();
                     if (handler != null) {
@@ -160,7 +160,7 @@ class LifeCircleTraceCallback {
             if (mInited) {
                 if (config.isRumEnable() && config.isEnableTraceUserAction()) {
                     if (startTimeNanoTime > 0) {
-                        long now = SystemClock.elapsedRealtimeNanos();
+                        long now = System.nanoTime();
                         FTAppStartCounter.get().hotStart(now - startClockTimeNano,
                                 startTimeNanoTime);
 

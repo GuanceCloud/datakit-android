@@ -1,3 +1,7 @@
+# agent 1.6.15-alpha04
+1. Optimized interval time calculation.
+
+---
 # agent 1.6.15-alpha03
 1. WebView data collection supports Tencent X5
 
