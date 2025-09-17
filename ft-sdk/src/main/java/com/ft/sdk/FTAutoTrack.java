@@ -19,6 +19,7 @@ import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.PackageUtils;
+import com.ft.sdk.garble.utils.TBSWebViewUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.lang.reflect.Field;
@@ -633,8 +634,11 @@ public class FTAutoTrack {
      * @param webView
      */
     public static void setUpWebView(View webView) {
-        if (webView instanceof WebView && webView.getTag(R.id.ft_webview_handled_tag_view_value) == null) {
-            new FTWebViewHandler().setWebView((WebView) webView);
+        if (webView.getTag(R.id.ft_webview_handled_tag_view_value) == null) {
+            // Check if it's a supported WebView type
+            if (webView instanceof WebView || TBSWebViewUtils.isTBSWebViewInstance(webView)) {
+                new FTWebViewHandler().setWebView(webView);
+            }
         }
     }
 

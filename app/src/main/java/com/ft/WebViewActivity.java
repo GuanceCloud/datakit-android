@@ -12,7 +12,6 @@ import android.webkit.CookieSyncManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -25,9 +24,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.webkit.WebViewAssetLoader;
 import androidx.webkit.WebViewClientCompat;
 
+import com.ft.webview.CustomWebView;
+import com.ft.webview.TCWebView;
+
 
 public class WebViewActivity extends AppCompatActivity {
-    private WebView webView;         // visit
+    private CustomWebView webView;         // visit
     //    private CustomWebView webView; // visit skip
     private Spinner spinner;
     private ProgressBar progressBar;
@@ -81,7 +83,7 @@ public class WebViewActivity extends AppCompatActivity {
 
             }
         });
-        WebSettings webViewSettings = webView.getSettings();
+        android.webkit.WebSettings webViewSettings = webView.getSettings();
         // Setting this off for security. Off by default for SDK versions >= 16.
         webViewSettings.setAllowFileAccessFromFileURLs(false);
         // Off by default, deprecated for SDK versions >= 30.

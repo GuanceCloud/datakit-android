@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.View;
 import android.webkit.ValueCallback;
 import android.webkit.WebView;
 
@@ -11,6 +12,7 @@ import com.ft.sdk.garble.bean.CollectType;
 import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.TBSWebViewUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import org.json.JSONException;
@@ -73,30 +75,39 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
 
     private final Handler mHandler = new Handler(Looper.getMainLooper());
 
-    private WebView mWebView;
     private String nativeViewName;
+    private View mWebView;
 
     /**
      * Register js method in web view
      *
      * @param webview
      */
-    public void setWebView(WebView webview) {
+    public void setWebView(View webview) {
         FTRUMConfig config = FTRUMConfigManager.get().getConfig();
         if (config.isRumEnable() && config.isEnableTraceWebView()) {
             setWebView(webview, config.getAllowWebViewHost());
         }
     }
 
-    public void setWebView(WebView webview, String[] allowWebViewHost) {
+    public void setWebView(View webview, String[] allowWebViewHost) {
         mWebView = webview;
         Activity activity = AopUtils.getActivityFromContext(webview.getContext());
         nativeViewName = AopUtils.getClassName(activity);
-        webview.getSettings().setJavaScriptEnabled(true);
-        webview.addJavascriptInterface(new WebAppInterface(webview.getContext(), this, allowWebViewHost),
-                FT_WEB_VIEW_JAVASCRIPT_BRIDGE);
-        webview.setTag(R.id.ft_webview_handled_tag_view_value, "handled");
+        // Handle Android WebView
+        if (webview instanceof WebView) {
+            ((WebView) webview).getSettings().setJavaScriptEnabled(true);
+            ((WebView) webview).addJavascriptInterface(new WebAppInterface(webview.getContext(), this, allowWebViewHost),
+                    FT_WEB_VIEW_JAVASCRIPT_BRIDGE);
+        }
+        // Handle TBS WebView using optimized utility
+        else if (TBSWebViewUtils.isTBSWebViewInstance(webview)) {
+            TBSWebViewUtils.setJavaScriptEnabled(webview, true);
+            TBSWebViewUtils.addJavascriptInterface(webview, new WebAppInterface(webview.getContext(), this, allowWebViewHost),
+                    FT_WEB_VIEW_JAVASCRIPT_BRIDGE);
+        }
 
+        webview.setTag(R.id.ft_webview_handled_tag_view_value, "handled");
     }
 
 
@@ -240,6 +251,8 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
 
     /**
      * Call webview page js method, and accept page callback
+     * Note: This method is called from sendEvent but we don't have direct access to the WebView
+     * The actual JavaScript execution should be handled by the calling context
      *
      * @param method   js method
      * @param callback callback
@@ -248,9 +261,22 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    mWebView.evaluateJavascript(method, new ValueCallback<String>() {
+                if (mWebView instanceof WebView) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                        ((WebView) mWebView).evaluateJavascript(method, new ValueCallback<String>() {
+                            @Override
+                            public void onReceiveValue(String value) {
+                                if (callback != null) {
+                                    callback.callBack(value);
+                                }
+                            }
+                        });
+                    } else {
+                        LogUtils.e(LOG_TAG, "This Android Device may be low than 4.4, can't get js call Back ");
+                        ((WebView) mWebView).loadUrl("javascript:" + method);
+                    }
+                } else if (TBSWebViewUtils.isTBSWebViewInstance(mWebView)) {
+                    TBSWebViewUtils.evaluateJavascript(mWebView, method, new ValueCallback<String>() {
                         @Override
                         public void onReceiveValue(String value) {
                             if (callback != null) {
@@ -259,13 +285,11 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                         }
                     });
                 } else {
-                    LogUtils.e(LOG_TAG, "This Android Device may be low than 4.4, can't get js call Back ");
-                    mWebView.loadUrl("javascript:" + method);
+                    LogUtils.w(LOG_TAG, "Unsupported WebView type for JavaScript execution");
                 }
 
             }
         });
-
     }
 
 

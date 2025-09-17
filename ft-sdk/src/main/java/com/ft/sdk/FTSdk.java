@@ -14,6 +14,7 @@ import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.PackageUtils;
+import com.ft.sdk.garble.utils.TBSWebViewUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.util.HashMap;
@@ -165,6 +166,10 @@ public class FTSdk {
         SyncTaskManager.get().init(config);
         FTTrackInner.getInstance().initBaseConfig(config);
         FTNetworkListener.get().monitor();
+        
+        // Initialize TBS WebView support
+        TBSWebViewUtils.initialize();
+        
         LogUtils.d(TAG, "initFTConfig complete:" + config);
     }
 

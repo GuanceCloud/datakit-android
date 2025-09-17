@@ -1,3 +1,7 @@
+# agent 1.6.15-alpha03
+1. WebView data collection supports Tencent X5
+
+---
 # agent 1.6.15-alpha02
 1. Added background field to error_situation
 

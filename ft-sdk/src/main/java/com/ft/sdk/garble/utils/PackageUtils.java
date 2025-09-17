@@ -33,6 +33,11 @@ public class PackageUtils {
     private static final String PACKAGE_SOPHIX = "com.taobao.sophix.SophixApplication";
 
     /**
+     * TBS WebView package path
+     */
+    private static final String PACKAGE_TBS_WEBVIEW = "com.tencent.smtt.sdk.WebView";
+
+    /**
      * Whether to use NDK library
      *
      * @return
@@ -144,6 +149,20 @@ public class PackageUtils {
         } catch (ClassNotFoundException e) {
             return false;
         }
+    }
+
+    /**
+     * Whether TBS WebView is available
+     *
+     * @return true if TBS WebView is available
+     */
+    public static boolean isTBSWebViewAvailable() {
+        try {
+            Class.forName(PACKAGE_TBS_WEBVIEW);
+            return true;
+        } catch (ClassNotFoundException ignored) {
+        }
+        return false;
     }
 
 }
