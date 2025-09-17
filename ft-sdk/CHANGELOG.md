@@ -1,3 +1,7 @@
+# agent 1.7.0-alpha25
+1. Merge ft-sdk 1.6.15-alpha03
+
+---
 # agent 1.7.0-alpha24
 1. Merge ft-sdk 1.6.15-alpha01
 
