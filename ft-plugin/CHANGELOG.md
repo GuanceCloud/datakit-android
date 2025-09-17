@@ -1,3 +1,7 @@
+# plugin 1.1.9-alpha09
+1. Added knownWebViewClasses parameter to support ASM writes.
+
+---
 # plugin 1.1.9-alpha08
 1. Added log output to file functionality.
 

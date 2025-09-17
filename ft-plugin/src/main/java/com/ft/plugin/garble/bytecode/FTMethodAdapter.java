@@ -84,13 +84,17 @@ public class FTMethodAdapter extends AdviceAdapter {
      */
     private final boolean verboseLog;
 
+
+    private final List<String> knownWebviews;
+
     /**
      * show code line
      */
     private int lineNumber;
 
     public FTMethodAdapter(MethodVisitor mv, int access, String name, String desc, String className,
-                           String[] interfaces, String superName, int api, boolean verboseLog) {
+                           String[] interfaces, String superName, int api, boolean verboseLog,
+                           List<String> knownWebviews) {
         super(api, mv, access, name, desc);
         this.methodName = name;
         this.superName = superName;
@@ -98,6 +102,8 @@ public class FTMethodAdapter extends AdviceAdapter {
         this.interfaces = interfaces;
         this.nameDesc = name + desc;
         this.verboseLog = verboseLog;
+        // Convert dot notation to slash notation for knownWebviews
+        this.knownWebviews = knownWebviews;
     }
 
     @Override
@@ -169,6 +175,16 @@ public class FTMethodAdapter extends AdviceAdapter {
             super.visitMethodInsn(opcode, owner, name, desc, itf);
             return;
         }
+        if (verboseLog) {
+            if (owner.contains("webview")) {
+                String method = name + desc;
+                if (TARGET_WEBVIEW_METHOD.contains(method)) {
+                    Logger.error("TCWebView check:" + knownWebviews + "," + className + "," + method
+                            + ",\n" + knownWebviews.contains(owner) + ",\nowner:" + owner);
+                }
+            }
+        }
+
         switch (owner) {
             case Constants.CLASS_NAME_HTTP_CLIENT_BUILDER:
                 if ("build()Lorg/apache/hc/client5/http/impl/classic/CloseableHttpClient;".contains(name + desc)) {
@@ -221,13 +237,15 @@ public class FTMethodAdapter extends AdviceAdapter {
                 }
                 break;
 
+
             case Constants.CLASS_NAME_LOG:
 
                 if (ClassNameAnalytics.isAndroidPackage(className) || ClassNameAnalytics.isFTSdkApi(className)) {
                     super.visitMethodInsn(opcode, owner, name, desc, itf);
                     return;
                 }
-
+                String message = "CLASS_NAME_LOG-> owner:" + owner + ", class:" + className
+                        + ", super:" + superName + ", method:" + name + desc + " | " + nameDesc;
                 switch (name) {
                     case "i":
                     case "d":
@@ -236,23 +254,43 @@ public class FTMethodAdapter extends AdviceAdapter {
                         if (Constants.METHOD_DESC_S_S_I.equals(desc)) {
                             mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, name,
                                     Constants.METHOD_DESC_S_S_I, false);
+                            if (verboseLog) {
+                                Logger.debug(message);
+                            }
                         } else if (Constants.METHOD_DESC_S_S_T_I.equals(desc)) {
                             mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, name,
                                     Constants.METHOD_DESC_S_S_T_I, false);
+                            if (verboseLog) {
+                                Logger.debug(message);
+                            }
+
                         } else {
                             super.visitMethodInsn(opcode, owner, name, desc, itf);
                         }
+
                         return;
                     case "w":
                         if (Constants.METHOD_DESC_S_S_I.equals(desc)) {
                             mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "w",
                                     Constants.METHOD_DESC_S_S_I, false);
+                            if (verboseLog) {
+                                Logger.debug(message);
+                            }
+
                         } else if (Constants.METHOD_DESC_S_S_T_I.equals(desc)) {
                             mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "w",
                                     Constants.METHOD_DESC_S_S_T_I, false);
+                            if (verboseLog) {
+                                Logger.debug(message);
+                            }
+
                         } else if (Constants.METHOD_DESC_S_T_I.equals(desc)) {
                             mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG, "w",
                                     Constants.METHOD_DESC_S_T_I, false);
+                            if (verboseLog) {
+                                Logger.debug(message);
+                            }
+
                         } else {
                             super.visitMethodInsn(opcode, owner, name, desc, itf);
                         }
@@ -263,6 +301,9 @@ public class FTMethodAdapter extends AdviceAdapter {
 
                             mv.visitMethodInsn(INVOKESTATIC, Constants.CLASS_NAME_TRACKLOG,
                                     "println", Constants.METHOD_DESC_I_S_S_I, false);
+                            if (verboseLog) {
+                                Logger.debug(message);
+                            }
 
                         } else {
                             super.visitMethodInsn(opcode, owner, name, desc, itf);
@@ -273,9 +314,23 @@ public class FTMethodAdapter extends AdviceAdapter {
                         break;
                 }
                 break;
+        }
 
-            default:
-                break;
+
+        if (knownWebviews.contains(owner)) {
+            String method = name + desc;
+            if (TARGET_WEBVIEW_METHOD.contains(method)) {
+                if (nameDesc.startsWith(Constants.INNER_CLASS_METHOD_PREFIX)) {
+                    Logger.debug("Custom WebInner Ignore-> owner:" + owner + ", class:" + className
+                            + ", super:" + superName + ", method:" + nameDesc);
+                } else {
+                    Logger.debug("TARGET_CUSTOM_WEBVIEW_METHOD-> owner:" + owner + ", class:" + className
+                            + ", super:" + superName + ", method:" + method + " | " + nameDesc);
+                    mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, name,
+                            desc.replaceFirst("\\(", "(" + Constants.VIEW_DESC), itf);
+                    return;
+                }
+            }
         }
 
         super.visitMethodInsn(opcode, owner, name, desc, itf);

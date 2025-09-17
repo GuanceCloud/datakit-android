@@ -67,6 +67,12 @@ public class FTExtension {
     public List<String> ignorePackages = new ArrayList<>();
 
     /**
+     * Known WebView class names for inheritance checking, e.g.: ['com/example/CustomWebView', 'com/example/BaseWebView']
+     * These classes will be treated as WebView instances regardless of compilation order
+     */
+    public List<String> knownWebViewClasses = new ArrayList<>();
+
+    /**
      * Default is [project]/build/intermediates/merged_native_libs
      */
     public String nativeLibPath = "";
@@ -108,6 +114,8 @@ public class FTExtension {
                 ", appId='" + appId + '\'' +
                 ", env='" + env + '\'' +
                 ", generateSourceMapOnly='" + generateSourceMapOnly + '\'' +
+                ", ignorePackages=" + ignorePackages +
+                ", knownWebViewClasses=" + knownWebViewClasses +
                 '}';
     }
 }
