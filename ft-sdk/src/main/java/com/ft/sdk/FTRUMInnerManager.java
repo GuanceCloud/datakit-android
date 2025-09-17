@@ -990,7 +990,7 @@ public class FTRUMInnerManager {
                 HashMap<String, Object> errorField = new HashMap<>();
                 errorTags.put(Constants.KEY_RUM_ERROR_TYPE, ErrorType.NETWORK.toString());
                 errorTags.put(Constants.KEY_RUM_ERROR_SOURCE, ErrorSource.NETWORK.toString());
-                errorTags.put(Constants.KEY_RUM_ERROR_SITUATION, AppState.RUN.toString());
+                errorTags.put(Constants.KEY_RUM_ERROR_SITUATION, FTActivityManager.get().getAppState());
                 errorTags.put(Constants.KEY_RUM_ACTION_ID, actionId);
                 errorTags.put(Constants.KEY_RUM_ACTION_NAME, actionName);
                 errorTags.put(Constants.KEY_RUM_VIEW_ID, viewId);

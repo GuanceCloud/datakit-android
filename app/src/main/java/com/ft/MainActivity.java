@@ -17,7 +17,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.ft.sdk.FTLogger;
-import com.ft.sdk.FTRUMConfigManager;
 import com.ft.sdk.FTRUMGlobalManager;
 import com.ft.sdk.FTRemoteConfigManager;
 import com.ft.sdk.FTResourceEventListener;
@@ -31,8 +30,6 @@ import com.ft.sdk.garble.reflect.ReflectUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.service.TestService;
 import com.ft.utils.RequestUtils;
-//import com.lzy.okgo.OkGo;
-//import com.lzy.okgo.callback.StringCallback;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -356,7 +353,7 @@ public class MainActivity extends AppCompatActivity {
                 FTSdk.updateRemoteConfig(0, new FTRemoteConfigManager.FetchResult() {
                     @Override
                     public void onResult(boolean success) {
-                        LogUtils.d(TAG,"updateRemoteConfig:success->"+success);
+                        LogUtils.d(TAG, "updateRemoteConfig:success->" + success);
 
                     }
                 });

@@ -11,5 +11,11 @@ public abstract class FTParameters implements InstrumentationParameters {
     public abstract ListProperty<String> getIgnorePackages();
 
     @Input
+    public abstract ListProperty<String> getKnownWebViewClasses();
+
+    @Input
     public abstract Property<String> getAsmVersion();
+
+    @Input
+    public abstract Property<Boolean> getVerboseLog();
 }

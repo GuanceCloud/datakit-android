@@ -46,45 +46,17 @@ public final class FTActivityManager {
     }
 
     /**
-     * Store how each {@link Activity} was opened
-     *
-     * @param className    Name of the derived {@link Activity} class
-     * @param fromFragment
+     * enter foreground
      */
-    void putActivityOpenFromFragment(String className, boolean fromFragment) {
-        activityOpenTypeMap.put(className, fromFragment);
+    void appForeground() {
+        this.appState = AppState.RUN;
     }
 
     /**
-     * Return how each Activity was opened
-     *
-     * @param className
-     * @return
+     * enter background
      */
-    boolean getActivityOpenFromFragment(String className) {
-        if (activityOpenTypeMap.containsKey(className)) {
-            return Boolean.TRUE.equals(activityOpenTypeMap.get(className));
-        }
-        return false;
-    }
-
-    /**
-     * Remove the open state of the corresponding Activity
-     *
-     * @param className
-     */
-    void removeActivityStatus(String className) {
-        activityOpenTypeMap.remove(className);
-    }
-
-
-    /**
-     * Set the current {@link AppState}
-     *
-     * @param state {@link AppState} application running state
-     */
-    void setAppState(AppState state) {
-        this.appState = state;
+    void appBackGround() {
+        this.appState = AppState.BACKGROUND;
     }
 
     /**

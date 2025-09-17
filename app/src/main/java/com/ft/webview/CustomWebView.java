@@ -1,4 +1,4 @@
-package com.ft;
+package com.ft.webview;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -33,6 +33,6 @@ public class CustomWebView extends WebView {
 
     @Override
     public void loadUrl(@NonNull String url) {
-        CustomWebView.super.loadUrl(url);
+        super.loadUrl(url);
     }
 }

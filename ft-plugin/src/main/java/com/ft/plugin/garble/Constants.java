@@ -52,6 +52,16 @@ public class Constants {
     public static final String CLASS_NAME_TENCENT_WEBVIEW = "com/tencent/smtt/sdk/WebView";
 
     /**
+     * Taobao WebView
+     */
+    public static final String CLASS_NAME_TAOBAO_WEBVIEW = "com/taobao/weex/ui/view/WXWebView";
+
+    /**
+     * Dcloud Webview
+     */
+    public static final String CLASS_NAME_DCLOUD_WEBVIEW = "io/dcloud/feature/weex/adapter/webview/DCWXWebView";
+
+    /**
      * Tencent SDK path
      */
     public static final String CLASS_NAME_TENCENT_PATH = "com/tencent/smtt/sdk/";

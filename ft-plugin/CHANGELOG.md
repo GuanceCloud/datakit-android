@@ -1,3 +1,22 @@
+# plugin 1.3.6-alpha05
+1. Added knownWebViewClasses parameter to support ASM writes.
+
+---
+# plugin 1.3.6-alpha04
+1. Fixed ASM write issue with custom WebView variable declarations
+2. Added ignore configuration for custom WebView internal methods.
+
+---
+# plugin 1.3.6-alpha03
+1. Removed ASM for Activity and Fragment.
+2. Added code line number display for Exceptions.
+3. Added log output to file functionality.  
+
+---
+# plugin 1.3.6-alpha02
+1. Added verboseLog param for more logs.
+2. Added try-catch and supplemented error logs.
+---
 # plugin 1.3.6-alpha01
 1. Numeric boundary handling in FTMethodAdapter
 

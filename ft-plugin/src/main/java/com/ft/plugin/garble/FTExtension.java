@@ -18,6 +18,18 @@ public class FTExtension {
      */
     public boolean showLog = false;
     /**
+     * Whether to show verbose processing logs
+     */
+    public boolean verboseLog = false;
+    /**
+     * Whether to enable file logging
+     */
+    public boolean enableFileLog = false;
+    /**
+     * Log file path (optional, defaults to build/ft-plugin.log)
+     */
+    public String logFilePath = "";
+    /**
      * Whether to enable auto track
      */
     public boolean openAutoTrack = true;
@@ -59,6 +71,12 @@ public class FTExtension {
     public List<String> ignorePackages = new ArrayList<>();
 
     /**
+     * Known WebView class names for inheritance checking, e.g.: ['com/example/CustomWebView', 'com/example/BaseWebView']
+     * These classes will be treated as WebView instances regardless of compilation order
+     */
+    public List<String> knownWebViewClasses = new ArrayList<>();
+
+    /**
      * Default is [project]/build/intermediates/merged_native_libs
      */
     public String nativeLibPath = "";
@@ -89,6 +107,9 @@ public class FTExtension {
     public String toString() {
         return "FTExtension{ " +
                 "showLog=" + showLog +
+                ", verboseLog=" + verboseLog +
+                ", enableFileLog=" + enableFileLog +
+                ", logFilePath='" + logFilePath + '\'' +
                 ", openAutoTrack=" + openAutoTrack +
                 ", autoUploadMap=" + autoUploadMap +
                 ", autoUploadNativeDebugSymbol=" + autoUploadNativeDebugSymbol +
@@ -98,6 +119,8 @@ public class FTExtension {
                 ", env='" + env + '\'' +
                 ", asmVersion='" + asmVersion + '\'' +
                 ", generateSourceMapOnly='" + generateSourceMapOnly + '\'' +
+                ", ignorePackages=" + ignorePackages +
+                ", knownWebViewClasses=" + knownWebViewClasses +
                 '}';
     }
 }
