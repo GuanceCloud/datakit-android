@@ -1,5 +1,10 @@
+# replay 0.1.3-alpha02
+1. Added `CustomExtensionSupport`for quickly customizing and adding ExtensionSupport settings.
+2. WebView session replay supports Tencent X5
+
+---
 # replay 0.1.3-alpha01
-1. Webview Session Replay support 0.1.3-alpha01
+1. Webview Session Replay support ft-sdk:> 1.7.0-alpha23
 
 ---
 # replay 0.1.2-alpha02

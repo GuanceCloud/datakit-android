@@ -29,8 +29,6 @@ public class FTSessionReplayConfig {
     private boolean dynamicOptimizationEnabled = true;
     private SessionReplayInternalCallback internalCallback = new NoSessionReplayInternalCallback();
 
-    private ExtensionSupport extensionSupport = new NoOpExtensionSupport();
-
     /**
      * Set the collection rate, the value range is [0,1], 0 means not collected, 1 means full collection, the default value is 1.
      *
@@ -56,10 +54,9 @@ public class FTSessionReplayConfig {
      * @return
      */
     public FTSessionReplayConfig addExtensionSupport(ExtensionSupport extensionSupport) {
-        this.extensionSupport = extensionSupport;
-        this.customMappers = extensionSupport.getCustomViewMappers();
-        this.customOptionSelectorDetectors = extensionSupport.getOptionSelectorDetectors();
-        this.customDrawableMapper = extensionSupport.getCustomDrawableMapper();
+        this.customMappers.addAll(extensionSupport.getCustomViewMappers());
+        this.customOptionSelectorDetectors.addAll(extensionSupport.getOptionSelectorDetectors());
+        this.customDrawableMapper.addAll(extensionSupport.getCustomDrawableMapper());
         return this;
     }
 

@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 
 ext {
-    pkgVersion = "0.1.3-alpha01"
+    pkgVersion = "0.1.3-alpha02"
     mavenGroupId = "com.cloudcare.ft.mobile.sdk.tracker.agent"
     mavenArtifactId = "ft-session-replay"
     withSourceCode = false
@@ -44,6 +44,7 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    compileOnly files("../tbs_sdk_thirdapp_v4.3.0.185_44085_sharewithdownloadwithfile_withoutGame_obfs_20210809_201442.jar")
 }
 
 apply from:'../maven_aar_publish.gradle'
