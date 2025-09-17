@@ -17,7 +17,10 @@ import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.sessionreplay.FTSessionReplayConfig;
+import com.ft.sdk.sessionreplay.MapperTypeWrapper;
+import com.ft.sdk.sessionreplay.CustomExtensionSupport;
 import com.ft.sdk.sessionreplay.SessionReplayPrivacy;
+import com.ft.sdk.sessionreplay.internal.recorder.mapper.WebViewXWireframeMapper;
 import com.ft.sdk.sessionreplay.material.MaterialExtensionSupport;
 import com.ft.utils.CrossProcessSetting;
 import com.lzy.okgo.OkGo;
@@ -185,11 +188,16 @@ public class DemoApplication extends BaseApplication {
                 .setTraceType(TraceType.DDTRACE));
 
         FTSdk.initSessionReplayConfig(new FTSessionReplayConfig()
-                .setSampleRate(1f)
-                .setSessionReplayOnErrorSampleRate(1f)
-                .setPrivacy(SessionReplayPrivacy.ALLOW)
+                        .setSampleRate(1f)
+                        .setSessionReplayOnErrorSampleRate(1f)
+                        .setPrivacy(SessionReplayPrivacy.ALLOW)
 //                .setTouchPrivacy(TouchPrivacy.SHOW)
-                .addExtensionSupport(new MaterialExtensionSupport()));
+                        .addExtensionSupport(new MaterialExtensionSupport())
+                        .addExtensionSupport(new CustomExtensionSupport()
+                                .addMapper(new MapperTypeWrapper<>(com.tencent.smtt.sdk.WebView.class,
+                                        new WebViewXWireframeMapper())))
+
+        );
 
     }
 
