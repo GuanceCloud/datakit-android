@@ -1,3 +1,7 @@
+# plugin 1.1.9-alpha10
+1. Fix addToKnownWebviews with wrong class.
+
+---
 # plugin 1.1.9-alpha09
 1. Added knownWebViewClasses parameter to support ASM writes.
 
