@@ -218,12 +218,16 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
             } else if (name.equals(WEB_JS_TYPE_SESSION_REPLAY)) {
                 if (!FTSdk.isSessionReplaySupport()) return;
                 if (data != null) {
-                    data.put("slotId", slotID + "");
-                    SessionReplayRumContext newContext = new SessionReplayRumContext(
-                            FTRUMInnerManager.get().getApplicationID(),
-                            FTRUMInnerManager.get().getSessionId(),
-                            webViewId);
-                    dataBatcher.onData(newContext, MobileRecord.MobileWebviewSnapshotRecord.fromJson(data.toString()));
+                    if(FTRUMInnerManager.get().checkSessionWillCollect(
+                            FTRUMInnerManager.get().getSessionId())!=CollectType.NOT_COLLECT){
+                        data.put("slotId", slotID + "");
+
+                        SessionReplayRumContext newContext = new SessionReplayRumContext(
+                                FTRUMInnerManager.get().getApplicationID(),
+                                FTRUMInnerManager.get().getSessionId(),
+                                webViewId);
+                        dataBatcher.onData(newContext, MobileRecord.MobileWebviewSnapshotRecord.fromJson(data.toString()));
+                    }
                 }
             } else if (name.equals(WEB_JS_TYPE_TRACK)) {
                 //no use

@@ -35,6 +35,7 @@ public class SessionReplayUploader {
     private static final String HAS_FULL_SNAPSHOT = "has_full_snapshot";
     private static final String KEY_ENV = "env";
     private static final String KEY_SDK_VERSION = "sdk_version";
+    private static final String KEY_SDK_NAME = "sdk_name";
     private static final String KEY_VERSION = "version";
     private static final String KEY_APP_ID = "app_id";
     private static final String KEY_SESSION_ID = "session_id";
@@ -112,6 +113,7 @@ public class SessionReplayUploader {
 
         fieldMap.put(KEY_ENV, context.getEnv());
         fieldMap.put(KEY_SDK_VERSION, context.getSdkVersion());
+        fieldMap.put(KEY_SDK_NAME, "df_android_rum_sdk");
         fieldMap.put(KEY_APP_ID, context.getAppId());
         fieldMap.put(KEY_SESSION_ID, sessionId);
         fieldMap.put(KEY_VIEW_ID, viewId);

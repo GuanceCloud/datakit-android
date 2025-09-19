@@ -52,8 +52,9 @@ public class SessionReplayManager implements FeatureSdkCore {
 
     private Context context;
 
-    private RecordWriter currentSessionWriter = new NoOpRecordWriter();
+//    private RecordWriter currentSessionWriter = new NoOpRecordWriter();
 
+    private SessionReplayFeature sessionReplayFeature;
     private String privacyLevel = "mask";
 
     public void init(Context context) {
@@ -84,13 +85,15 @@ public class SessionReplayManager implements FeatureSdkCore {
         features.put(feature.getName(), scope);
         scope.init(context, null);
         if (feature instanceof SessionReplayFeature) {
-            currentSessionWriter = ((SessionReplayFeature) feature).getDataWriter();
+            sessionReplayFeature = (SessionReplayFeature) feature;
             privacyLevel = ((SessionReplayFeature) feature).getPrivacyLevel();
         }
     }
 
+    //TODO  check stable
     public RecordWriter getCurrentSessionWriter() {
-        return currentSessionWriter;
+        return sessionReplayFeature.isRecording() ? sessionReplayFeature.getDataWriter()
+                : new NoOpRecordWriter();
     }
 
     public String getPrivacyLevel() {

@@ -336,6 +336,10 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
         }
     }
 
+    public boolean isRecording() {
+        return isRecording.get();
+    }
+
     private ResourcesFeature registerResourceFeature(FeatureSdkCore sdkCore) {
         ResourcesFeature resourcesFeature = new ResourcesFeature(sdkCore, customEndpointUrl);
         sdkCore.registerFeature(resourcesFeature);

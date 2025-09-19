@@ -28,6 +28,7 @@ import androidx.webkit.WebViewAssetLoader;
 import androidx.webkit.WebViewClientCompat;
 
 import com.ft.sdk.FTAutoTrack;
+import com.ft.webview.CustomWebView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
