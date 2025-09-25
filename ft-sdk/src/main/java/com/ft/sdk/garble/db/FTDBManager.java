@@ -673,6 +673,61 @@ public class FTDBManager extends DBManager {
         }
     }
 
+
+    /**
+     * Update or insert SyncData based on UUID
+     * If a record with the same UUID exists, update it; otherwise, insert a new record
+     *
+     * @param data SyncData to update or insert
+     * @return true if successful, false otherwise
+     */
+    public boolean updateOrInsertSyncData(@NonNull final SyncData data) {
+        if (data.getUuid() == null || data.getUuid().isEmpty()) {
+            LogUtils.e(TAG, "updateOrInsertSyncData failed: UUID is null or empty");
+            return false;
+        }
+
+        try {
+            // First, check if a record with the same UUID exists
+            Uri uri = FTContentProvider.getUriSyncDataFlat();
+            String selection = FTSQL.RECORD_COLUMN_DATA_UUID + "=?";
+            String[] selectionArgs = {data.getUuid()};
+
+            Cursor cursor = contentProvider.query(uri, null, selection, selectionArgs, null);
+            boolean recordExists = false;
+
+            if (cursor != null && cursor.moveToFirst()) {
+                recordExists = cursor.getCount() > 0;
+            }
+            if (cursor != null) {
+                cursor.close();
+            }
+
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(FTSQL.RECORD_COLUMN_TM, data.getTime());
+            contentValues.put(FTSQL.RECORD_COLUMN_DATA_UUID, data.getUuid());
+            contentValues.put(FTSQL.RECORD_COLUMN_DATA, data.getDataString());
+            contentValues.put(FTSQL.RECORD_COLUMN_DATA_TYPE, data.getDataType().getValue());
+
+            if (recordExists) {
+                // Update existing record
+                int updatedRows = contentProvider.update(uri, contentValues, selection, selectionArgs);
+                if (updatedRows > 0) {
+                    LogUtils.d(TAG, "updateOrInsertSyncData: Updated existing record with UUID: " + data.getUuid());
+                    return true;
+                } else {
+                    LogUtils.e(TAG, "updateOrInsertSyncData: Failed to update record with UUID: " + data.getUuid());
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            LogUtils.e(TAG, "updateOrInsertSyncData failed: " + e.getMessage());
+            return false;
+        }
+    }
+
     /**
      * Batch insert buried point data into the database
      *
