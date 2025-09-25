@@ -1,5 +1,7 @@
 # agent 1.6.15-alpha04
-1. Optimized interval time calculation.
+1. Fixed the issue where asynchronous network requests caused abnormal session refresh. 
+2. Optimized the generation of resource, long task, and error with View data.
+3. Improved the view generation rate and merged data with the same view_id.
 
 ---
 # agent 1.6.15-alpha03
