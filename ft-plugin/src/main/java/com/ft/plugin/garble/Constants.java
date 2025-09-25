@@ -59,7 +59,7 @@ public class Constants {
     /**
      * Dcloud Webview
      */
-    public static final String CLASS_NAME_DCLOUD_WEBVIEW = "io/dcloud/feature/weex/adapter/webview/DCWXWebView";
+    public static final String CLASS_NAME_DCLOUD_WEBVIEW = "io/dcloud/common/adapter/ui/webview/DCWebView";
 
     /**
      * Tencent SDK path
