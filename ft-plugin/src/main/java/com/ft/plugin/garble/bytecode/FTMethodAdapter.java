@@ -231,7 +231,7 @@ public class FTMethodAdapter extends AdviceAdapter {
                         Logger.debug("TARGET_WEBVIEW_METHOD-> owner:" + owner + ", class:" + className
                                 + ", super:" + superName + ", method:" + method + " | " + nameDesc);
                         mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, name,
-                                desc.replaceFirst("\\(", "(" + Constants.VIEW_DESC), itf);
+                                desc.replaceFirst("\\(", "(" + Constants.OBJECT_DESC), itf);
                         return;
                     }
                 }
@@ -327,7 +327,7 @@ public class FTMethodAdapter extends AdviceAdapter {
                     Logger.debug("TARGET_CUSTOM_WEBVIEW_METHOD-> owner:" + owner + ", class:" + className
                             + ", super:" + superName + ", method:" + method + " | " + nameDesc);
                     mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, name,
-                            desc.replaceFirst("\\(", "(" + Constants.VIEW_DESC), itf);
+                            desc.replaceFirst("\\(", "(" + Constants.OBJECT_DESC), itf);
                     return;
                 }
             }

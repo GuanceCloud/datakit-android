@@ -540,7 +540,7 @@ public class FTAutoTrack {
      * @return
      */
 
-    public static void loadUrl(View webView, String url) {
+    public static void loadUrl(Object webView, String url) {
         if (webView == null) {
             LogUtils.e(TAG, "WebView has not initialized.");
             return;
@@ -559,7 +559,7 @@ public class FTAutoTrack {
      * @param additionalHttpHeaders
      * @return
      */
-    public static void loadUrl(View webView, String url, Map<String, String> additionalHttpHeaders) {
+    public static void loadUrl(Object webView, String url, Map<String, String> additionalHttpHeaders) {
         if (webView == null) {
             LogUtils.e(TAG, "WebView has not initialized.");
             return;
@@ -579,7 +579,7 @@ public class FTAutoTrack {
      * @param mimeType
      * @return
      */
-    public static void loadData(View webView, String data, String mimeType, String encoding) {
+    public static void loadData(Object webView, String data, String mimeType, String encoding) {
         if (webView == null) {
             LogUtils.e(TAG, "WebView has not initialized.");
             return;
@@ -599,7 +599,7 @@ public class FTAutoTrack {
      * @param mimeType
      * @return
      */
-    public static void loadDataWithBaseURL(View webView, String baseUrl, String data, String mimeType, String encoding, String historyUrl) {
+    public static void loadDataWithBaseURL(Object webView, String baseUrl, String data, String mimeType, String encoding, String historyUrl) {
         if (webView == null) {
             LogUtils.e(TAG, "WebView has not initialized.");
             return;
@@ -633,11 +633,14 @@ public class FTAutoTrack {
      *
      * @param webView
      */
-    public static void setUpWebView(View webView) {
-        if (webView.getTag(R.id.ft_webview_handled_tag_view_value) == null) {
-            // Check if it's a supported WebView type
-            if (webView instanceof WebView || TBSWebViewUtils.isTBSWebViewInstance(webView)) {
-                new FTWebViewHandler().setWebView(webView);
+    public static void setUpWebView(Object webView) {
+        if (webView instanceof View) {
+            View viewTarget = (View) webView;
+            if (viewTarget.getTag(R.id.ft_webview_handled_tag_view_value) == null) {
+                // Check if it's a supported WebView type
+                if (viewTarget instanceof WebView || TBSWebViewUtils.isTBSWebViewInstance(viewTarget)) {
+                    new FTWebViewHandler().setWebView(viewTarget);
+                }
             }
         }
     }
@@ -650,7 +653,7 @@ public class FTAutoTrack {
      * @param params     Parameter
      * @param paramTypes
      */
-    private static void invokeWebViewLoad(View webView, String methodName, Object[] params, Class[] paramTypes) {
+    private static void invokeWebViewLoad(Object webView, String methodName, Object[] params, Class[] paramTypes) {
         try {
             Class<?> clazz = webView.getClass();
             Method loadMethod = clazz.getMethod(methodName, paramTypes);
@@ -673,7 +676,7 @@ public class FTAutoTrack {
         if (FTSdk.checkInstallState()) {
             LogUtils.d(TAG, "trackOkHttpBuilder");
         } else {
-            LogUtils.e(TAG, "trackOkHttpBuilder: OkhttpClient.Build Before SDK install");
+            LogUtils.eOnce(TAG, "trackOkHttpBuilder: OkhttpClient.Build Before SDK install");
         }
         //Found compatibility issues in some projects
         if (FTRUMConfigManager.get().isRumEnable()) {
@@ -750,9 +753,9 @@ public class FTAutoTrack {
      */
     public static Request trackRequestBuilder(Request.Builder builder) {
         if (FTSdk.checkInstallState()) {
-            LogUtils.d(TAG, "trackRequestBuilder");
+//            LogUtils.d(TAG, "trackRequestBuilder");
         } else {
-            LogUtils.e(TAG, "trackRequestBuilder: Request.Builder Before SDK install");
+            LogUtils.eOnce(TAG, "trackRequestBuilder: Request.Builder Before SDK install");
         }
         if (FTRUMConfigManager.get().isRumEnable()) {
             FTSDKConfig config = FTSdk.get().getBaseConfig();
