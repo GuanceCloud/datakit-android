@@ -540,7 +540,7 @@ public class FTAutoTrack {
      * @return
      */
 
-    public static void loadUrl(Object webView, String url) {
+    public static void loadUrl(View webView, String url) {
         if (webView == null) {
             LogUtils.e(TAG, "WebView has not initialized.");
             return;
@@ -559,7 +559,7 @@ public class FTAutoTrack {
      * @param additionalHttpHeaders
      * @return
      */
-    public static void loadUrl(Object webView, String url, Map<String, String> additionalHttpHeaders) {
+    public static void loadUrl(View webView, String url, Map<String, String> additionalHttpHeaders) {
         if (webView == null) {
             LogUtils.e(TAG, "WebView has not initialized.");
             return;
@@ -579,7 +579,7 @@ public class FTAutoTrack {
      * @param mimeType
      * @return
      */
-    public static void loadData(Object webView, String data, String mimeType, String encoding) {
+    public static void loadData(View webView, String data, String mimeType, String encoding) {
         if (webView == null) {
             LogUtils.e(TAG, "WebView has not initialized.");
             return;
@@ -599,7 +599,7 @@ public class FTAutoTrack {
      * @param mimeType
      * @return
      */
-    public static void loadDataWithBaseURL(Object webView, String baseUrl, String data, String mimeType, String encoding, String historyUrl) {
+    public static void loadDataWithBaseURL(View webView, String baseUrl, String data, String mimeType, String encoding, String historyUrl) {
         if (webView == null) {
             LogUtils.e(TAG, "WebView has not initialized.");
             return;
@@ -633,14 +633,11 @@ public class FTAutoTrack {
      *
      * @param webView
      */
-    public static void setUpWebView(Object webView) {
-        if (webView instanceof View) {
-            View viewTarget = (View) webView;
-            if (viewTarget.getTag(R.id.ft_webview_handled_tag_view_value) == null) {
-                // Check if it's a supported WebView type
-                if (viewTarget instanceof WebView || TBSWebViewUtils.isTBSWebViewInstance(viewTarget)) {
-                    new FTWebViewHandler().setWebView(viewTarget);
-                }
+    public static void setUpWebView(View webView) {
+        if (webView.getTag(R.id.ft_webview_handled_tag_view_value) == null) {
+            // Check if it's a supported WebView type
+            if (webView instanceof WebView || TBSWebViewUtils.isTBSWebViewInstance(webView)) {
+                new FTWebViewHandler().setWebView(webView);
             }
         }
     }

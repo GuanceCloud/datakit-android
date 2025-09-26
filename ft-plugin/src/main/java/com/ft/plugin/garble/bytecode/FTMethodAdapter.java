@@ -179,18 +179,59 @@ public class FTMethodAdapter extends AdviceAdapter {
      * @param method   method name + descriptor
      * @param itf      whether it's an interface method
      * @param isCustom whether it's a custom WebView
+     * @return true if method was processed and should return, false otherwise
      */
-    private void processWebViewMethod(String owner, String name, String desc, String method, boolean itf, boolean isCustom) {
+    private boolean processWebViewMethod(String owner, String name, String desc, String method,
+                                         boolean itf, boolean isCustom) {
         if (nameDesc.startsWith(Constants.INNER_CLASS_METHOD_PREFIX)) {
             String logPrefix = isCustom ? "Custom WebInner Ignore" : "WebInner Ignore";
             Logger.debug(logPrefix + "-> owner:" + owner + ", class:" + className
                     + ", super:" + superName + ", method:" + nameDesc);
+            return false; // Processed, should return
         } else {
             String logPrefix = isCustom ? "TARGET_CUSTOM_WEBVIEW_METHOD" : "TARGET_WEBVIEW_METHOD";
             Logger.debug(logPrefix + "-> owner:" + owner + ", class:" + className
                     + ", super:" + superName + ", method:" + method + " | " + nameDesc);
-            mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, name,
-                    desc.replaceFirst("\\(", "(" + Constants.OBJECT_DESC), itf);
+
+            // Add type checking and conversion following hookDCloud approach
+            // Save all parameters to local variables
+            Type[] argTypes = Type.getArgumentTypes(desc);
+            int[] positionList = new int[argTypes.length + 1]; // +1 for this reference
+
+            // Save all method parameters to local variables
+            for (int i = 0; i < argTypes.length; i++) {
+                int position = newLocal(argTypes[i]);
+                storeLocal(position);
+                positionList[i] = position;
+            }
+
+            // Save this reference
+            int thisPosition = newLocal(Type.getObjectType(owner));
+            storeLocal(thisPosition);
+            positionList[argTypes.length] = thisPosition;
+
+            // Check if this reference is View type
+            loadLocal(thisPosition);
+            mv.visitTypeInsn(Opcodes.INSTANCEOF, "android/view/View");
+            Label label = new Label();
+            mv.visitJumpInsn(Opcodes.IFEQ, label);
+
+            // Reload all parameters with type casting for this reference
+            boolean isCast = false;
+            for (int i = positionList.length - 1; i >= 0; i--) {
+                loadLocal(positionList[i]);
+                if (!isCast && i == positionList.length - 1) { // this reference
+                    isCast = true;
+                    mv.visitTypeInsn(Opcodes.CHECKCAST, "android/view/View");
+                }
+            }
+
+            // Call hook method
+            mv.visitMethodInsn(Opcodes.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, name,
+                    desc.replaceFirst("\\(", "(" + Constants.VIEW_DESC), itf);
+
+            mv.visitLabel(label);
+            return true; // Processed, should return
         }
     }
 
@@ -249,13 +290,17 @@ public class FTMethodAdapter extends AdviceAdapter {
             case Constants.CLASS_NAME_TENCENT_WEBVIEW:
                 String method = name + desc;
                 if (TARGET_WEBVIEW_METHOD.contains(method)) {
-                    processWebViewMethod(owner, name, desc, method, itf, false);
+                    if (processWebViewMethod(owner, name, desc, method, itf, false)) {
+                        return;
+                    }
                 }
                 break;
             case Constants.CLASS_NAME_DCLOUD_WEBVIEW:
                 String dcMethod = name + desc;
                 if (className.equals("AdaWebview")) {
-                    processWebViewMethod(owner, name, desc, dcMethod, itf, false);
+                    if (processWebViewMethod(owner, name, desc, dcMethod, itf, false)) {
+                        return;
+                    }
                 }
                 break;
             case Constants.CLASS_NAME_LOG:
@@ -340,7 +385,9 @@ public class FTMethodAdapter extends AdviceAdapter {
         if (knownWebviews.contains(owner)) {
             String method = name + desc;
             if (TARGET_WEBVIEW_METHOD.contains(method)) {
-                processWebViewMethod(owner, name, desc, method, itf, true);
+                if (processWebViewMethod(owner, name, desc, method, itf, true)) {
+                    return;
+                }
             }
         }
 
