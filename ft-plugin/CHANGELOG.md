@@ -1,3 +1,7 @@
+# plugin 1.1.9-alpha11
+1. UniApp Webview support
+
+---
 # plugin 1.1.9-alpha10
 1. Fix addToKnownWebviews with wrong class.
 
