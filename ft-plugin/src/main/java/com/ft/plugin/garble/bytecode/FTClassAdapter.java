@@ -224,13 +224,7 @@ public class FTClassAdapter extends ClassVisitor {
             addToKnownWebviews(className);
             return true;
         }
-
-        // Check legacy analytics for backward compatibility
-
-        // If it's a legacy WebView, add to knownWebviews for future reference
-        return ClassNameAnalytics.isDCloud(className)
-                || ClassNameAnalytics.isTencent(className)
-                || ClassNameAnalytics.isTaoBao(className);
+        return false;
     }
 
 }

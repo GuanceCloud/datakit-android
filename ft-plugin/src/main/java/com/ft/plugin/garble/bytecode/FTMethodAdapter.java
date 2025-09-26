@@ -192,8 +192,45 @@ public class FTMethodAdapter extends AdviceAdapter {
             String logPrefix = isCustom ? "TARGET_CUSTOM_WEBVIEW_METHOD" : "TARGET_WEBVIEW_METHOD";
             Logger.debug(logPrefix + "-> owner:" + owner + ", class:" + className
                     + ", super:" + superName + ", method:" + method + " | " + nameDesc);
-            mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, name,
-                    desc.replaceFirst("\\(", "(" + Constants.OBJECT_DESC), itf);
+            
+            // Add type checking and conversion following hookDCloud approach
+            // Save all parameters to local variables
+            Type[] argTypes = Type.getArgumentTypes(desc);
+            int[] positionList = new int[argTypes.length + 1]; // +1 for this reference
+            
+            // Save all method parameters to local variables
+            for (int i = 0; i < argTypes.length; i++) {
+                int position = newLocal(argTypes[i]);
+                storeLocal(position);
+                positionList[i] = position;
+            }
+            
+            // Save this reference
+            int thisPosition = newLocal(Type.getObjectType(owner));
+            storeLocal(thisPosition);
+            positionList[argTypes.length] = thisPosition;
+            
+            // Check if this reference is View type
+            loadLocal(thisPosition);
+            mv.visitTypeInsn(Opcodes.INSTANCEOF, "android/view/View");
+            Label label = new Label();
+            mv.visitJumpInsn(Opcodes.IFEQ, label);
+            
+            // Reload all parameters with type casting for this reference
+            boolean isCast = false;
+            for (int i = positionList.length - 1; i >= 0; i--) {
+                loadLocal(positionList[i]);
+                if (!isCast && i == positionList.length - 1) { // this reference
+                    isCast = true;
+                    mv.visitTypeInsn(Opcodes.CHECKCAST, "android/view/View");
+                }
+            }
+            
+            // Call hook method
+            mv.visitMethodInsn(Opcodes.INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, name,
+                    desc.replaceFirst("\\(", "(" + Constants.VIEW_DESC), itf);
+            
+            mv.visitLabel(label);
             return true; // Processed, should return
         }
     }
