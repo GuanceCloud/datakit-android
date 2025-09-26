@@ -1,6 +1,7 @@
 # agent 1.7.0-alpha26
 1. Merge ft-sdk 1.6.15-alpha04
 2. Session replay support DCloud WebView
+3. ft-session-replay >= 0.1.3-alpha03
 
 ---
 # agent 1.7.0-alpha25
