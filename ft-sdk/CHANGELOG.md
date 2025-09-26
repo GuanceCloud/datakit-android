@@ -1,3 +1,7 @@
+# agent 1.7.0-alpha26
+1. Merge ft-sdk 1.6.15-alpha04
+
+---
 # agent 1.7.0-alpha25
 1. Merge ft-sdk 1.6.15-alpha03
 
@@ -92,6 +96,12 @@
 ---
 # agent 1.7.0-alpha02
 1. Support for enabling session replay recording feature
+
+---
+# agent 1.6.15-alpha04
+1. Fixed the issue where asynchronous network requests caused abnormal session refresh.
+2. Optimized the generation of resource, long task, and error with View data.
+3. Improved the view generation rate and merged data with the same view_id.
 
 ---
 # agent 1.6.15-alpha03

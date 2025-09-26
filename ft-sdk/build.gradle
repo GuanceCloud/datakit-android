@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 ext {
     //Append "-SNAPSHOT" to the end of snapshot version number for publishing
-    pkgVersion = "1.7.0-alpha25"
+    pkgVersion = "1.7.0-alpha26"
 
     mavenGroupId = "com.cloudcare.ft.mobile.sdk.tracker.agent"
     mavenArtifactId = "ft-sdk"
@@ -60,6 +60,7 @@ dependencies {
     compileOnly project(":ft-native")
     compileOnly project(":ft-session-replay")
     compileOnly files("../tbs_sdk_thirdapp_v4.3.0.185_44085_sharewithdownloadwithfile_withoutGame_obfs_20210809_201442.jar")
+    compileOnly files("../app/libs/lib.5plus.base-release.aar")
 }
 
 apply from: '../maven_aar_publish.gradle'

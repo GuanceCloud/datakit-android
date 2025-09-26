@@ -123,6 +123,7 @@ public class FTRUMInnerManager {
      */
     private long lastSessionTime = Utils.getCurrentNanoTime();
 
+
     /**
      * Recent Action time
      * <p>
@@ -145,49 +146,54 @@ public class FTRUMInnerManager {
         return sessionId;
     }
 
+    private final Object sessionRefreshLock = new Object();
+
     /**
      * Check reset session_id
      *
      * @return
      */
     private void checkSessionRefresh(boolean checkRefreshView) {
-        long now = Utils.getCurrentNanoTime();
-        boolean longResting = now - lastUserActiveTime > MAX_RESTING_TIME;
-        boolean longTimeSession = now - lastSessionTime > SESSION_EXPIRE_TIME;
-        if (longTimeSession || longResting) {
-            lastSessionTime = now;
-            sessionId = Utils.randomUUID();
-            LogUtils.d(TAG, "Session Track -> New SessionId:" + sessionId + ",longTimeSessionReset:" + longTimeSession);
-            checkSessionKeep(sessionId, sampleRate, sessionErrorSampleError);
+        synchronized (sessionRefreshLock) {
+            long now = Utils.getCurrentNanoTime();
+            boolean longResting = now - lastUserActiveTime > MAX_RESTING_TIME;
+            boolean longTimeSession = now - lastSessionTime > SESSION_EXPIRE_TIME;
+            if (longTimeSession || longResting) {
+                lastSessionTime = now;
+                lastUserActiveTime = now;
+                sessionId = Utils.randomUUID();
+                LogUtils.d(TAG, "Session Track -> New SessionId:" + sessionId + ",longTimeSessionReset:" + longTimeSession);
+                checkSessionKeep(sessionId, sampleRate, sessionErrorSampleError);
 
-            if (checkRefreshView) {
-                if (activeView != null && !activeView.isClose()) {
-                    activeView.close();
-                    closeView(activeView);
+                if (checkRefreshView) {
+                    if (activeView != null && !activeView.isClose()) {
+                        activeView.close();
+                        closeView(activeView);
 
-                    String viewName = activeView.getViewName();
-                    String viewReferrer = activeView.getViewReferrer();
-                    HashMap<String, Object> property = activeView.getProperty();
-                    long loadTime = activeView.getLoadTime();
+                        String viewName = activeView.getViewName();
+                        String viewReferrer = activeView.getViewReferrer();
+                        HashMap<String, Object> property = activeView.getProperty();
+                        long loadTime = activeView.getLoadTime();
 
-                    activeView = new ActiveViewBean(viewName, viewReferrer, loadTime, sessionId);
-                    if (property != null) {
-                        activeView.getProperty().putAll(property);
+                        activeView = new ActiveViewBean(viewName, viewReferrer, loadTime, sessionId);
+                        if (property != null) {
+                            activeView.getProperty().putAll(property);
+                        }
+                        activeView.setCollectType(checkSessionWillCollect(sessionId));
+                        FTMonitorManager.get().addMonitor(activeView.getId());
+                        FTMonitorManager.get().attachMonitorData(activeView);
+                        initView(activeView);
+                        LogUtils.d(TAG, "Session Track -> checkRefreshView sessionId:" + activeView.getSessionId() + ",viewId:" + activeView.getId());
                     }
-                    activeView.setCollectType(checkSessionWillCollect(sessionId));
-                    FTMonitorManager.get().addMonitor(activeView.getId());
-                    FTMonitorManager.get().attachMonitorData(activeView);
-                    initView(activeView);
-                    LogUtils.d(TAG, "Session Track -> checkRefreshView sessionId:" + activeView.getSessionId() + ",viewId:" + activeView.getId());
                 }
+            } else {
+                lastUserActiveTime = now;
             }
-
         }
         updateSessionReplay(sessionId);
         //        boolean isAppForward = FTApplication.isAppForward;
 //        if (isAppForward) {
         //As long as there is RUM data collection activity, the user time will be extended, including background
-        lastUserActiveTime = now;
 //        }
     }
 
@@ -428,12 +434,11 @@ public class FTRUMInnerManager {
             EventConsumerThreadPool.get().execute(new Runnable() {
                 @Override
                 public void run() {
-                    FTDBManager.get().reduceViewPendingResource(viewId);
                     FTDBManager.get().updateViewUpdateTime(viewId, System.currentTimeMillis());
-                    FTDBManager.get().reduceActionPendingResource(actionId);
                     FTTraceManager.get().removeByStopResource(resourceId);
                 }
             });
+            generateRumData();
         }
     }
 
@@ -767,6 +772,7 @@ public class FTRUMInnerManager {
                     }
                 }
             });
+            generateViewSum();
 
         } catch (Exception e) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
@@ -800,7 +806,7 @@ public class FTRUMInnerManager {
             FTTrackInner.getInstance().rum(Utils.getCurrentNanoTime() - duration,
                     Constants.FT_MEASUREMENT_RUM_LONG_TASK, tags, fields, null, type);
             increaseLongTask(tags);
-
+            generateRumData();
         } catch (Exception e) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
@@ -1184,7 +1190,7 @@ public class FTRUMInnerManager {
                 }
             }
         });
-        generateRumData();
+        generateRumData(true); // Force generate data when closing view
     }
 
     /**
@@ -1202,7 +1208,7 @@ public class FTRUMInnerManager {
                 FTDBManager.get().closeAction(actionId, duration, force);
             }
         });
-        generateRumData();
+        generateRumData(true); // Force generate data when closing action
     }
 
 
@@ -1313,11 +1319,41 @@ public class FTRUMInnerManager {
 
 
     private static final int LIMIT_SIZE = 50;
-
+    private volatile long lastGenerateTime = 0;
+    private static final long GENERATE_DEBOUNCE_DELAY = 200; // 200ms debounce delay
+    private final Object generateLock = new Object();
     private void generateRumData() {
-        //Avoid too frequent refresh
-        mHandler.removeCallbacks(mRUMGenerateRunner);
-        mHandler.postDelayed(mRUMGenerateRunner, 100);
+        generateRumData(false);
+    }
+
+    /**
+     * Generate RUM data with optional force flag
+     * @param force if true, bypass debounce mechanism and generate immediately
+     */
+    private void generateRumData(boolean force) {
+        // Use debounce mechanism to avoid too frequent refresh
+        long currentTime = System.currentTimeMillis();
+        if (!force) {
+            synchronized (generateLock) {
+                if (currentTime - lastGenerateTime < GENERATE_DEBOUNCE_DELAY) {
+                    return; // Return directly if within debounce time
+                }
+                lastGenerateTime = currentTime;
+            }
+        }
+
+        // Execute directly using thread pool, no longer using Handler
+        EventConsumerThreadPool.get().execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    FTRUMInnerManager.this.generateActionSum();
+                    FTRUMInnerManager.this.generateViewSum();
+                } catch (Exception e) {
+                    LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+                }
+            }
+        });
     }
 
     /**
@@ -1536,7 +1572,14 @@ public class FTRUMInnerManager {
     }
 
     public void release() {
-        mHandler.removeCallbacks(mRUMGenerateRunner);
+        // Force generate final data before release
+        generateRumData(true);
+
+        // Reset debounce timestamps
+        synchronized (generateLock) {
+            lastGenerateTime = 0;
+        }
+
         activeAction = null;
         activeView = null;
         notCollectArr.clear();

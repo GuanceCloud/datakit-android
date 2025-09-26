@@ -37,9 +37,9 @@ public class FTUIBlockManager {
 
             if (x.startsWith(PREFIX_METHOD_DISPATCH_START)) {
                 method = x.substring(PREFIX_METHOD_DISPATCH_START.length());
-                startTime = Utils.getCurrentNanoTime();
+                startTime = System.nanoTime();
             } else if (x.startsWith(PREFIX_METHOD_DISPATCH_END)) {
-                long duration = Utils.getCurrentNanoTime() - startTime;
+                long duration = System.nanoTime() - startTime;
                 if (duration > blockDurationNS) {
                     FTRUMInnerManager.get().addLongTask(method, duration);
                 }

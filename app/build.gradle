@@ -131,7 +131,7 @@ apply plugin: 'ft-plugin'
 FTExt {
     showLog = true
     knownWebViewClasses =['com.ft.webview.TCWebView','com.ft.webview.CustomWebView']
-    verboseLog =true
+    //verboseLog =true
     autoUploadMap = false
     autoUploadNativeDebugSymbol = false
     datakitUrl = ft_env.datakitRUMUrl

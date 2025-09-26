@@ -650,7 +650,7 @@ public class FTAutoTrack {
      * @param params     Parameter
      * @param paramTypes
      */
-    private static void invokeWebViewLoad(View webView, String methodName, Object[] params, Class[] paramTypes) {
+    private static void invokeWebViewLoad(Object webView, String methodName, Object[] params, Class[] paramTypes) {
         try {
             Class<?> clazz = webView.getClass();
             Method loadMethod = clazz.getMethod(methodName, paramTypes);
@@ -673,7 +673,7 @@ public class FTAutoTrack {
         if (FTSdk.checkInstallState()) {
             LogUtils.d(TAG, "trackOkHttpBuilder");
         } else {
-            LogUtils.e(TAG, "trackOkHttpBuilder: OkhttpClient.Build Before SDK install");
+            LogUtils.eOnce(TAG, "trackOkHttpBuilder: OkhttpClient.Build Before SDK install");
         }
         //Found compatibility issues in some projects
         if (FTRUMConfigManager.get().isRumEnable()) {
@@ -750,9 +750,9 @@ public class FTAutoTrack {
      */
     public static Request trackRequestBuilder(Request.Builder builder) {
         if (FTSdk.checkInstallState()) {
-            LogUtils.d(TAG, "trackRequestBuilder");
+//            LogUtils.d(TAG, "trackRequestBuilder");
         } else {
-            LogUtils.e(TAG, "trackRequestBuilder: Request.Builder Before SDK install");
+            LogUtils.eOnce(TAG, "trackRequestBuilder: Request.Builder Before SDK install");
         }
         if (FTRUMConfigManager.get().isRumEnable()) {
             FTSDKConfig config = FTSdk.get().getBaseConfig();

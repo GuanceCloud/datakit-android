@@ -213,8 +213,8 @@ public class FTClassAdapter extends ClassVisitor {
         }
 
         // Check if it's already a known WebView
-        boolean isClassNameKnown = knownWebviews.contains(className);
-        boolean isSuperNameKnown = knownWebviews.contains(superName);
+        boolean isClassNameKnown = isKnownWebviews(className);
+        boolean isSuperNameKnown = isKnownWebviews(superName);
 
         if (isClassNameKnown) {
             return true; // Early return if className is already known
@@ -222,17 +222,6 @@ public class FTClassAdapter extends ClassVisitor {
 
         // If superName is a known WebView but className is not collected, add className to known list
         if (isSuperNameKnown) {
-            addToKnownWebviews(className);
-            return true;
-        }
-
-        // Check legacy analytics for backward compatibility
-        boolean isClassNameThirdParty = ClassNameAnalytics.isDCloud(className)
-                || ClassNameAnalytics.isTencent(className)
-                || ClassNameAnalytics.isTaoBao(className);
-
-        // If it's a legacy WebView, add to knownWebviews for future reference
-        if (isClassNameThirdParty) {
             addToKnownWebviews(className);
             return true;
         }

@@ -59,7 +59,7 @@ public class Constants {
     /**
      * Dcloud Webview
      */
-    public static final String CLASS_NAME_DCLOUD_WEBVIEW = "io/dcloud/feature/weex/adapter/webview/DCWXWebView";
+    public static final String CLASS_NAME_DCLOUD_WEBVIEW = "io/dcloud/common/adapter/ui/webview/DCWebView";
 
     /**
      * Tencent SDK path
@@ -123,6 +123,7 @@ public class Constants {
      * View
      */
     public static final String VIEW_DESC = "Landroid/view/View;";
+    public static final String OBJECT_DESC = "Ljava/lang/Object;";
 
     /**
      * Used to form application_uuid, one build will generate a fixed uuid
