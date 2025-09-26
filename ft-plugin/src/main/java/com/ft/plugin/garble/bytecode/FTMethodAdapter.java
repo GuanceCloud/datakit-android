@@ -169,6 +169,35 @@ public class FTMethodAdapter extends AdviceAdapter {
             "loadDataWithBaseURL(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
             "postUrl(Ljava/lang/String;[B)V");
 
+
+    /**
+     * Process WebView method call
+     *
+     * @param owner    class name
+     * @param name     method name
+     * @param desc     method descriptor
+     * @param method   method name + descriptor
+     * @param itf      whether it's an interface method
+     * @param isCustom whether it's a custom WebView
+     * @return true if method was processed and should return, false otherwise
+     */
+    private boolean processWebViewMethod(String owner, String name, String desc, String method,
+                                         boolean itf, boolean isCustom) {
+        if (nameDesc.startsWith(Constants.INNER_CLASS_METHOD_PREFIX)) {
+            String logPrefix = isCustom ? "Custom WebInner Ignore" : "WebInner Ignore";
+            Logger.debug(logPrefix + "-> owner:" + owner + ", class:" + className
+                    + ", super:" + superName + ", method:" + nameDesc);
+            return false; // Processed, should return
+        } else {
+            String logPrefix = isCustom ? "TARGET_CUSTOM_WEBVIEW_METHOD" : "TARGET_WEBVIEW_METHOD";
+            Logger.debug(logPrefix + "-> owner:" + owner + ", class:" + className
+                    + ", super:" + superName + ", method:" + method + " | " + nameDesc);
+            mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, name,
+                    desc.replaceFirst("\\(", "(" + Constants.OBJECT_DESC), itf);
+            return true; // Processed, should return
+        }
+    }
+
     @Override
     public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
         if (needSkip) {
@@ -224,20 +253,19 @@ public class FTMethodAdapter extends AdviceAdapter {
             case Constants.CLASS_NAME_TENCENT_WEBVIEW:
                 String method = name + desc;
                 if (TARGET_WEBVIEW_METHOD.contains(method)) {
-                    if (nameDesc.startsWith(Constants.INNER_CLASS_METHOD_PREFIX)) {
-                        Logger.debug("WebInner Ignore-> owner:" + owner + ", class:" + className
-                                + ", super:" + superName + ", method:" + nameDesc);
-                    } else {
-                        Logger.debug("TARGET_WEBVIEW_METHOD-> owner:" + owner + ", class:" + className
-                                + ", super:" + superName + ", method:" + method + " | " + nameDesc);
-                        mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, name,
-                                desc.replaceFirst("\\(", "(" + Constants.VIEW_DESC), itf);
+                    if (processWebViewMethod(owner, name, desc, method, itf, false)) {
                         return;
                     }
                 }
                 break;
-
-
+            case Constants.CLASS_NAME_DCLOUD_WEBVIEW:
+                String dcMethod = name + desc;
+                if (className.equals("AdaWebview")) {
+                    if (processWebViewMethod(owner, name, desc, dcMethod, itf, false)) {
+                        return;
+                    }
+                }
+                break;
             case Constants.CLASS_NAME_LOG:
 
                 if (ClassNameAnalytics.isAndroidPackage(className) || ClassNameAnalytics.isFTSdkApi(className)) {
@@ -320,14 +348,7 @@ public class FTMethodAdapter extends AdviceAdapter {
         if (knownWebviews.contains(owner)) {
             String method = name + desc;
             if (TARGET_WEBVIEW_METHOD.contains(method)) {
-                if (nameDesc.startsWith(Constants.INNER_CLASS_METHOD_PREFIX)) {
-                    Logger.debug("Custom WebInner Ignore-> owner:" + owner + ", class:" + className
-                            + ", super:" + superName + ", method:" + nameDesc);
-                } else {
-                    Logger.debug("TARGET_CUSTOM_WEBVIEW_METHOD-> owner:" + owner + ", class:" + className
-                            + ", super:" + superName + ", method:" + method + " | " + nameDesc);
-                    mv.visitMethodInsn(INVOKESTATIC, Constants.FT_SDK_HOOK_CLASS, name,
-                            desc.replaceFirst("\\(", "(" + Constants.VIEW_DESC), itf);
+                if (processWebViewMethod(owner, name, desc, method, itf, true)) {
                     return;
                 }
             }
