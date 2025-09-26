@@ -1,3 +1,7 @@
+# replay 0.1.3-alpha03
+1. DCloud WebView Support
+
+---
 # replay 0.1.3-alpha02
 1. Added `CustomExtensionSupport`for quickly customizing and adding ExtensionSupport settings.
 2. WebView session replay supports Tencent X5
