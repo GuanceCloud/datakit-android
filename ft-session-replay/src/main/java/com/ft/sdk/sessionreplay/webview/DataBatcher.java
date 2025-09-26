@@ -4,10 +4,20 @@ import com.ft.sdk.sessionreplay.internal.processor.EnrichedRecord;
 import com.ft.sdk.sessionreplay.internal.storage.RecordWriter;
 import com.ft.sdk.sessionreplay.model.MobileRecord;
 import com.ft.sdk.sessionreplay.utils.SessionReplayRumContext;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -15,8 +25,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class DataBatcher {
-
-
     private final int MAX_BATCH_SIZE;
     private final long TIMEOUT_MS;
     private final boolean FLUSH_ON_VIEW_SWITCH;
@@ -26,37 +34,58 @@ public class DataBatcher {
     private final RecordWriter writer;
 
     private String lastViewId = null;
+    // Set to store slotIDs that need local file checking
+    private final Set<String> needCheckSlots = new HashSet<>();
 
-    public DataBatcher(RecordWriter writer) {
-        this(writer, 20, 500, true);
+    private final boolean isDCWebview;
+
+    public DataBatcher(RecordWriter writer, boolean isDCWebview) {
+        this(writer, 20, 500, true, isDCWebview);
     }
 
-    public DataBatcher(RecordWriter writer, int maxBatchSize, long timeoutMs, boolean flushOnViewSwitch) {
+    public DataBatcher(RecordWriter writer, int maxBatchSize, long timeoutMs,
+                       boolean flushOnViewSwitch, boolean isDCWebview) {
         this.writer = writer;
         this.MAX_BATCH_SIZE = maxBatchSize;
         this.TIMEOUT_MS = timeoutMs;
         this.FLUSH_ON_VIEW_SWITCH = flushOnViewSwitch;
         this.scheduler = Executors.newSingleThreadScheduledExecutor();
+        this.isDCWebview = isDCWebview;
     }
 
-    public void onData(SessionReplayRumContext context, MobileRecord data) {
-        if (FLUSH_ON_VIEW_SWITCH) {
-            synchronized (this) {
-                if (lastViewId != null && !lastViewId.equals(context.getViewId())) {
-                    Batch prev = batchMap.get(lastViewId);
-                    if (prev != null) prev.flushNow();
+    public void onData(SessionReplayRumContext context, String jsonString) {
+        try {
+            JsonObject jsonObject = new JsonParser().parse(jsonString).getAsJsonObject();
+            // Process local CSS files
+            if (isDCWebview) {
+                JsonElement slotIdElement = jsonObject.get("slotId");
+                if (slotIdElement != null && slotIdElement.isJsonPrimitive()) {
+                    String slotId = slotIdElement.getAsString();
+                    checkLocalFiles(jsonObject, slotId);
                 }
-                lastViewId = context.getViewId();
             }
-        }
 
-        Batch batch = batchMap.get(context.getViewId());
-        if (batch == null) {
-            Batch created = new Batch(context);
-            Batch existing = batchMap.get(context.getViewId());
-            batch = (existing != null) ? existing : created;
+            MobileRecord data = MobileRecord.MobileWebviewSnapshotRecord.fromJsonObject(jsonObject);
+            if (FLUSH_ON_VIEW_SWITCH) {
+                synchronized (this) {
+                    if (lastViewId != null && !lastViewId.equals(context.getViewId())) {
+                        Batch prev = batchMap.get(lastViewId);
+                        if (prev != null) prev.flushNow();
+                    }
+                    lastViewId = context.getViewId();
+                }
+            }
+
+            Batch batch = batchMap.get(context.getViewId());
+            if (batch == null) {
+                Batch created = new Batch(context);
+                Batch existing = batchMap.get(context.getViewId());
+                batch = (existing != null) ? existing : created;
+            }
+            batch.addData(data);
+        } catch (Exception e) {
+            //ignore
         }
-        batch.addData(data);
     }
 
 
@@ -72,6 +101,164 @@ public class DataBatcher {
         }
         scheduler.shutdownNow();
         batchMap.clear();
+    }
+
+    /**
+     * Entry method for checking local files
+     *
+     * @param jsonObject data object
+     * @param slotId     slotID
+     */
+    private void checkLocalFiles(JsonObject jsonObject, String slotId) {
+        try {
+            JsonElement typeElement = jsonObject.get("type");
+            if (typeElement == null || !typeElement.isJsonPrimitive()) {
+                return;
+            }
+
+            int type = typeElement.getAsInt();
+
+            if (type == 4) {
+                // Check if it's a local file
+                JsonElement dataElement = jsonObject.get("data");
+                if (dataElement != null && dataElement.isJsonObject()) {
+                    JsonObject data = dataElement.getAsJsonObject();
+                    JsonElement hrefElement = data.get("href");
+                    if (hrefElement != null && hrefElement.isJsonPrimitive()) {
+                        String href = hrefElement.getAsString();
+                        if (href != null && href.startsWith("file://")) {
+                            // Mark this slotID for local file checking
+                            synchronized (needCheckSlots) {
+                                needCheckSlots.add(slotId);
+                            }
+                        }
+                    }
+                }
+            } else if (type == 2) {
+                // Process data containing complete screen snapshot
+                synchronized (needCheckSlots) {
+                    if (needCheckSlots.contains(slotId)) {
+                        JsonElement dataElement = jsonObject.get("data");
+                        if (dataElement != null && dataElement.isJsonObject()) {
+                            JsonObject data = dataElement.getAsJsonObject();
+                            JsonElement nodeElement = data.get("node");
+                            if (nodeElement != null && nodeElement.isJsonObject()) {
+                                JsonObject node = nodeElement.getAsJsonObject();
+                                addCssTextToHrefWithFileScheme(node);
+                                // Remove this slotID
+                                needCheckSlots.remove(slotId);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // Protection: if data type doesn't match, don't affect checkLocalFiles context execution
+            // Ignore close exception
+        }
+    }
+
+    /**
+     * Recursive method for processing nodes
+     *
+     * @param rootNodeDict root node
+     */
+    private void addCssTextToHrefWithFileScheme(JsonObject rootNodeDict) {
+        if (rootNodeDict == null) return;
+
+        // 1. First process current node (check if it meets href contains file:// condition)
+        processSingleNode(rootNodeDict);
+
+        // 2. Recursively process child nodes of current node (handle nested structure)
+        JsonElement childNodesElement = rootNodeDict.get("childNodes");
+        if (childNodesElement != null && childNodesElement.isJsonArray()) {
+            JsonArray childNodes = childNodesElement.getAsJsonArray();
+            for (JsonElement childElement : childNodes) {
+                if (childElement.isJsonObject()) {
+                    addCssTextToHrefWithFileScheme(childElement.getAsJsonObject());
+                }
+            }
+        }
+    }
+
+    /**
+     * Process single node (check href and add _cssText)
+     *
+     * @param nodeDict node dictionary
+     */
+    private void processSingleNode(JsonObject nodeDict) {
+        if (nodeDict == null) return;
+
+        // Step 1: First check if tagName is "link", if not return directly (don't process subsequent logic)
+        JsonElement tagNameElement = nodeDict.get("tagName");
+        if (tagNameElement == null || !tagNameElement.isJsonPrimitive()) {
+            return; // Not a link node, no need to process href
+        }
+
+        String nodeTagName = tagNameElement.getAsString();
+        if (!"link".equals(nodeTagName)) {
+            return; // Not a link node, no need to process href
+        }
+
+        // Step 2: Get current node's attributes dictionary
+        JsonElement attributesElement = nodeDict.get("attributes");
+        if (attributesElement == null || !attributesElement.isJsonObject()) {
+            return; // No attributes dictionary, return directly
+        }
+
+        JsonObject attributes = attributesElement.getAsJsonObject();
+
+        // Step 3: Check if href exists in attributes and value contains file://
+        JsonElement hrefElement = attributes.get("href");
+        if (hrefElement == null || !hrefElement.isJsonPrimitive()) {
+            return;
+        }
+
+        String hrefValue = hrefElement.getAsString();
+        if (hrefValue != null && hrefValue.startsWith("file://") && attributes.get("_cssText") == null) {
+            // Step 4: Read file and add _cssText:file to attributes dictionary
+            String cssPath = hrefValue.replace("file://", "");
+            try {
+                File cssFile = new File(cssPath);
+                if (cssFile.exists()) {
+                    String cssString = readFileAsString(cssFile);
+                    if (cssString != null && !cssString.isEmpty()) {
+                        attributes.addProperty("_cssText", cssString);
+                    }
+                }
+            } catch (IOException e) {
+                // Ignore close exception
+            }
+        }
+    }
+
+    /**
+     * Read file content as string, compatible with API 21
+     *
+     * @param file the file to read
+     * @return file content as string
+     * @throws IOException if file reading fails
+     */
+    private String readFileAsString(File file) throws IOException {
+        InputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(file);
+            byte[] buffer = new byte[1024];
+            StringBuilder result = new StringBuilder();
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                result.append(new String(buffer, 0, bytesRead, "UTF-8"));
+            }
+            return result.toString();
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    // Ignore close exception
+                }
+            }
+        }
     }
 
     private class Batch {

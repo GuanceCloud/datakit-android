@@ -11,10 +11,10 @@ import android.webkit.WebView;
 import com.ft.sdk.garble.bean.CollectType;
 import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.DCSWebViewUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.TBSWebViewUtils;
 import com.ft.sdk.garble.utils.Utils;
-import com.ft.sdk.sessionreplay.model.MobileRecord;
 import com.ft.sdk.sessionreplay.utils.SessionReplayRumContext;
 import com.ft.sdk.sessionreplay.webview.DataBatcher;
 
@@ -90,6 +90,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
 
     private DataBatcher dataBatcher;
     private View mWebView;
+    private boolean isDCWebView = false;
 
     /**
      * Register js method in web view
@@ -117,12 +118,13 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
         mWebView = webview;
         Activity activity = AopUtils.getActivityFromContext(webview.getContext());
         nativeViewName = AopUtils.getClassName(activity);
-        nativeViewId = FTRUMInnerManager.get().getViewId();//  while be error,when WebView -> NativeView -> WebView
+        getNativeViewId();//  while be error,when WebView -> NativeView -> WebView
         if (webview instanceof WebView) {
             ((WebView) webview).getSettings().setJavaScriptEnabled(true);
             ((WebView) webview).addJavascriptInterface(new WebAppInterface(webview.getContext(), this,
                             allowWebViewHost, privacyLevel, capabilities),
                     FT_WEB_VIEW_JAVASCRIPT_BRIDGE);
+            isDCWebView = DCSWebViewUtils.isDCWebViewInstance(webview);
         }
         // Handle TBS WebView using optimized utility
         else if (TBSWebViewUtils.isTBSWebViewInstance(webview)) {
@@ -134,8 +136,15 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
         webview.setTag(R.id.ft_webview_handled_tag_view_value, "handled");
         if (capabilities != null && capabilities.length != 0) {
             slotID = System.identityHashCode(webview);
-            dataBatcher = new DataBatcher(SessionReplayManager.get().getCurrentSessionWriter());
+            dataBatcher = new DataBatcher(SessionReplayManager.get().getCurrentSessionWriter(), isDCWebView);
         }
+    }
+
+    private String getNativeViewId() {
+        if (nativeViewId == null) {
+            nativeViewId = FTRUMInnerManager.get().getViewId();
+        }
+        return nativeViewId;
     }
 
 
@@ -201,9 +210,11 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                     if (measurement.equals(Constants.FT_MEASUREMENT_RUM_ERROR)) {
                         SyncTaskManager.get().setErrorTimeLine(time, null);
                     }
+                    String nativeViewId = getNativeViewId();
 
                     if (FTSdk.isSessionReplaySupport()
-                            && !nativeViewId.equals(SessionReplayRumContext.NULL_UUID)) {
+                            && !Utils.isNullOrEmpty(nativeViewId)
+                            && nativeViewId.equals(SessionReplayRumContext.NULL_UUID)) {
                         HashMap<String, String> source = new HashMap<>();
                         source.put("source", "android");
                         source.put("view_id", nativeViewId);
@@ -218,15 +229,15 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
             } else if (name.equals(WEB_JS_TYPE_SESSION_REPLAY)) {
                 if (!FTSdk.isSessionReplaySupport()) return;
                 if (data != null) {
-                    if(FTRUMInnerManager.get().checkSessionWillCollect(
-                            FTRUMInnerManager.get().getSessionId())!=CollectType.NOT_COLLECT){
+                    if (FTRUMInnerManager.get().checkSessionWillCollect(
+                            FTRUMInnerManager.get().getSessionId()) != CollectType.NOT_COLLECT) {
                         data.put("slotId", slotID + "");
 
                         SessionReplayRumContext newContext = new SessionReplayRumContext(
                                 FTRUMInnerManager.get().getApplicationID(),
                                 FTRUMInnerManager.get().getSessionId(),
                                 webViewId);
-                        dataBatcher.onData(newContext, MobileRecord.MobileWebviewSnapshotRecord.fromJson(data.toString()));
+                        dataBatcher.onData(newContext, data.toString());
                     }
                 }
             } else if (name.equals(WEB_JS_TYPE_TRACK)) {

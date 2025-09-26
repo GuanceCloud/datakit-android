@@ -49,7 +49,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.4.2'
-        classpath 'com.cloudcare.ft.mobile.sdk.tracker.plugin:ft-plugin:1.3.6-alpha05'
+        classpath 'com.cloudcare.ft.mobile.sdk.tracker.plugin:ft-plugin:1.3.6-alpha07'
 //        classpath 'com.cloudcare.ft.mobile.sdk.tracker.plugin:ft-plugin-legacy:1.1.8'
 //        classpath 'com.guardsquare:proguard-gradle:7.1.0'
 //       classpath files('ft-plugin/build/libs/ft-plugin-1.3.6-alpha07.jar')
