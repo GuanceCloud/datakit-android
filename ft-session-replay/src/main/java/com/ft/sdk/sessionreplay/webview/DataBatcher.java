@@ -14,10 +14,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -34,8 +33,13 @@ public class DataBatcher {
     private final RecordWriter writer;
 
     private String lastViewId = null;
-    // Set to store slotIDs that need local file checking
-    private final Set<String> needCheckSlots = new HashSet<>();
+    // Map to store slotIDs that need local file checking, with automatic size limit of 50
+    private final Map<String, Boolean> needCheckSlots = new LinkedHashMap<String, Boolean>() {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<String, Boolean> eldest) {
+            return size() > 50;
+        }
+    };
 
     private final boolean isDCWebview;
 
@@ -129,24 +133,44 @@ public class DataBatcher {
                         if (href != null && href.startsWith("file://")) {
                             // Mark this slotID for local file checking
                             synchronized (needCheckSlots) {
-                                needCheckSlots.add(slotId);
+                                needCheckSlots.put(slotId, true);
                             }
                         }
                     }
                 }
-            } else if (type == 2) {
-                // Process data containing complete screen snapshot
+            } else if ((type == 2 || type == 3) && needCheckSlots.containsKey(slotId)) {
+                // Process data containing complete screen snapshot or incremental data
                 synchronized (needCheckSlots) {
-                    if (needCheckSlots.contains(slotId)) {
+                    if (needCheckSlots.containsKey(slotId)) {
                         JsonElement dataElement = jsonObject.get("data");
                         if (dataElement != null && dataElement.isJsonObject()) {
                             JsonObject data = dataElement.getAsJsonObject();
-                            JsonElement nodeElement = data.get("node");
-                            if (nodeElement != null && nodeElement.isJsonObject()) {
-                                JsonObject node = nodeElement.getAsJsonObject();
-                                addCssTextToHrefWithFileScheme(node);
-                                // Remove this slotID
-                                needCheckSlots.remove(slotId);
+                            
+                            if (type == 2) {
+                                // Process complete screen snapshot
+                                JsonElement nodeElement = data.get("node");
+                                if (nodeElement != null && nodeElement.isJsonObject()) {
+                                    JsonObject node = nodeElement.getAsJsonObject();
+                                    addCssTextToHrefWithFileScheme(node);
+                                }
+                            } else if (type == 3) {
+                                // Process incremental data
+                                JsonElement addsElement = data.get("adds");
+                                if (addsElement != null && addsElement.isJsonArray()) {
+                                    JsonArray adds = addsElement.getAsJsonArray();
+                                    if (adds.size() > 0) {
+                                        for (JsonElement addElement : adds) {
+                                            if (addElement.isJsonObject()) {
+                                                JsonObject addNode = addElement.getAsJsonObject();
+                                                JsonElement nodeElement = addNode.get("node");
+                                                if (nodeElement != null && nodeElement.isJsonObject()) {
+                                                    JsonObject node = nodeElement.getAsJsonObject();
+                                                    addCssTextToHrefWithFileScheme(node);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

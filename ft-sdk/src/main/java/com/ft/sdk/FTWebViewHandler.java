@@ -15,8 +15,6 @@ import com.ft.sdk.garble.utils.DCSWebViewUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.TBSWebViewUtils;
 import com.ft.sdk.garble.utils.Utils;
-import com.ft.sdk.sessionreplay.utils.SessionReplayRumContext;
-import com.ft.sdk.sessionreplay.webview.DataBatcher;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -88,7 +86,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
     private String webViewId;
     private String nativeViewId;
 
-    private DataBatcher dataBatcher;
+    private Object dataBatcher;
     private View mWebView;
     private boolean isDCWebView = false;
 
@@ -134,9 +132,9 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                     FT_WEB_VIEW_JAVASCRIPT_BRIDGE);
         }
         webview.setTag(R.id.ft_webview_handled_tag_view_value, "handled");
-        if (capabilities != null && capabilities.length != 0) {
+        if (capabilities != null && capabilities.length > 0) {
             slotID = System.identityHashCode(webview);
-            dataBatcher = new DataBatcher(SessionReplayManager.get().getCurrentSessionWriter(), isDCWebView);
+            dataBatcher = new com.ft.sdk.sessionreplay.webview.DataBatcher(SessionReplayManager.get().getCurrentSessionWriter(), isDCWebView);
         }
     }
 
@@ -214,7 +212,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
 
                     if (FTSdk.isSessionReplaySupport()
                             && !Utils.isNullOrEmpty(nativeViewId)
-                            && nativeViewId.equals(SessionReplayRumContext.NULL_UUID)) {
+                            && !nativeViewId.equals(com.ft.sdk.sessionreplay.utils.SessionReplayRumContext.NULL_UUID)) {
                         HashMap<String, String> source = new HashMap<>();
                         source.put("source", "android");
                         source.put("view_id", nativeViewId);
@@ -233,11 +231,11 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                             FTRUMInnerManager.get().getSessionId()) != CollectType.NOT_COLLECT) {
                         data.put("slotId", slotID + "");
 
-                        SessionReplayRumContext newContext = new SessionReplayRumContext(
+                        com.ft.sdk.sessionreplay.utils.SessionReplayRumContext newContext = new com.ft.sdk.sessionreplay.utils.SessionReplayRumContext(
                                 FTRUMInnerManager.get().getApplicationID(),
                                 FTRUMInnerManager.get().getSessionId(),
                                 webViewId);
-                        dataBatcher.onData(newContext, data.toString());
+                        ((com.ft.sdk.sessionreplay.webview.DataBatcher) dataBatcher).onData(newContext, data.toString());
                     }
                 }
             } else if (name.equals(WEB_JS_TYPE_TRACK)) {

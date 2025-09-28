@@ -1,3 +1,7 @@
+# agent 1.7.0-alpha27
+1. resolve missing container data with RUM data
+
+---
 # agent 1.7.0-alpha26
 1. Merge ft-sdk 1.6.15-alpha04
 2. Session replay support DCloud WebView
