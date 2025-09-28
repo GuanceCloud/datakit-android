@@ -104,6 +104,10 @@
 1. Support for enabling session replay recording feature
 
 ---
+# agent 1.6.15-alpha05
+1. Fix view and action error of status
+
+---
 # agent 1.6.15-alpha04
 1. Fixed the issue where asynchronous network requests caused abnormal session refresh.
 2. Optimized the generation of resource, long task, and error with View data.
