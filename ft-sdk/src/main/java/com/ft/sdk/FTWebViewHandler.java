@@ -134,7 +134,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
         webview.setTag(R.id.ft_webview_handled_tag_view_value, "handled");
         if (capabilities != null && capabilities.length > 0) {
             slotID = System.identityHashCode(webview);
-            dataBatcher = new com.ft.sdk.sessionreplay.webview.DataBatcher(SessionReplayManager.get().getCurrentSessionWriter(), isDCWebView);
+            dataBatcher = new com.ft.sdk.sessionreplay.webview.DataBatcher(SessionReplayManager.get().getInternalLogger(), isDCWebView);
         }
     }
 
@@ -235,7 +235,8 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                                 FTRUMInnerManager.get().getApplicationID(),
                                 FTRUMInnerManager.get().getSessionId(),
                                 webViewId);
-                        ((com.ft.sdk.sessionreplay.webview.DataBatcher) dataBatcher).onData(newContext, data.toString());
+                        ((com.ft.sdk.sessionreplay.webview.DataBatcher) dataBatcher).onData(newContext,
+                                data.toString(), SessionReplayManager.get().getCurrentSessionWriter());
                     }
                 }
             } else if (name.equals(WEB_JS_TYPE_TRACK)) {

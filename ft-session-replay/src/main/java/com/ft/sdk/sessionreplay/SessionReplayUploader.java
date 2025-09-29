@@ -5,7 +5,6 @@ import android.util.Pair;
 import com.ft.sdk.api.SessionReplayFormData;
 import com.ft.sdk.api.SessionReplayUploadCallback;
 import com.ft.sdk.api.context.SessionReplayContext;
-import com.ft.sdk.sessionreplay.internal.excepiton.InvalidPayloadFormatException;
 import com.ft.sdk.sessionreplay.internal.net.BatchesToSegmentsMapper;
 import com.ft.sdk.sessionreplay.internal.net.BytesCompressor;
 import com.ft.sdk.sessionreplay.internal.storage.RawBatchEvent;
@@ -72,9 +71,8 @@ public class SessionReplayUploader {
 
         List<Pair<MobileSegment, JsonObject>> serializedSegmentPair = batchToSegmentsMapper.map(serializedSegments);
         if (serializedSegmentPair == null || serializedSegmentPair.isEmpty()) {
-            throw new InvalidPayloadFormatException(
-                    "The payload format was broken and an upload request could not be created"
-            );
+            internalLogger.e(TAG, "The payload format was broken and an upload request could not be created");
+            return UploadResult.createErrorResult();
         }
         String viewId = "";
         String sessionId = "";

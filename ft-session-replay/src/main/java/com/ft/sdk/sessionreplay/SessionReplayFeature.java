@@ -302,6 +302,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
     void startRecording(boolean isErrorSampled) {
         // Check initialization again so we don't forget to do it when this method is made public
         if (checkIfInitialized() && !isRecording.getAndSet(true)) {
+            sdkCore.getInternalLogger().d(TAG, "start record");
             sdkCore.updateFeatureContext(getName(), new SessionReplayRecordCallback.UpdateCallBack() {
 
                 @Override
@@ -324,6 +325,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
      */
     void stopRecording() {
         if (isRecording.getAndSet(false)) {
+            sdkCore.getInternalLogger().d(TAG, "stopRecording");
             sdkCore.updateFeatureContext(getName(),
                     new SessionReplayRecordCallback.UpdateCallBack() {
                         @Override

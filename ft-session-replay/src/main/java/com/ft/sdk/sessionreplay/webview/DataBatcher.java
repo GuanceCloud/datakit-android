@@ -1,8 +1,12 @@
 package com.ft.sdk.sessionreplay.webview;
 
+import android.util.Log;
+
 import com.ft.sdk.sessionreplay.internal.processor.EnrichedRecord;
+import com.ft.sdk.sessionreplay.internal.storage.NoOpRecordWriter;
 import com.ft.sdk.sessionreplay.internal.storage.RecordWriter;
 import com.ft.sdk.sessionreplay.model.MobileRecord;
+import com.ft.sdk.sessionreplay.utils.InternalLogger;
 import com.ft.sdk.sessionreplay.utils.SessionReplayRumContext;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -24,32 +28,34 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class DataBatcher {
+
+    private static final String TAG = "DataBatcher";
     private final int MAX_BATCH_SIZE;
     private final long TIMEOUT_MS;
     private final boolean FLUSH_ON_VIEW_SWITCH;
 
     private final ScheduledExecutorService scheduler;
     private final Map<String, Batch> batchMap = new ConcurrentHashMap<>();
-    private final RecordWriter writer;
+    private final InternalLogger internalLogger;
 
     private String lastViewId = null;
     // Map to store slotIDs that need local file checking, with automatic size limit of 50
     private final Map<String, Boolean> needCheckSlots = new LinkedHashMap<String, Boolean>() {
         @Override
         protected boolean removeEldestEntry(Map.Entry<String, Boolean> eldest) {
-            return size() > 50;
+            return size() > 10;
         }
     };
 
     private final boolean isDCWebview;
 
-    public DataBatcher(RecordWriter writer, boolean isDCWebview) {
-        this(writer, 20, 500, true, isDCWebview);
+    public DataBatcher(InternalLogger logger, boolean isDCWebview) {
+        this(logger, 20, 500, true, isDCWebview);
     }
 
-    public DataBatcher(RecordWriter writer, int maxBatchSize, long timeoutMs,
+    public DataBatcher(InternalLogger logger, int maxBatchSize, long timeoutMs,
                        boolean flushOnViewSwitch, boolean isDCWebview) {
-        this.writer = writer;
+        this.internalLogger = logger;
         this.MAX_BATCH_SIZE = maxBatchSize;
         this.TIMEOUT_MS = timeoutMs;
         this.FLUSH_ON_VIEW_SWITCH = flushOnViewSwitch;
@@ -57,7 +63,10 @@ public class DataBatcher {
         this.isDCWebview = isDCWebview;
     }
 
-    public void onData(SessionReplayRumContext context, String jsonString) {
+    public void onData(SessionReplayRumContext context, String jsonString, RecordWriter writer) {
+        if (writer instanceof NoOpRecordWriter) {
+            return;
+        }
         try {
             JsonObject jsonObject = new JsonParser().parse(jsonString).getAsJsonObject();
             // Process local CSS files
@@ -82,13 +91,13 @@ public class DataBatcher {
 
             Batch batch = batchMap.get(context.getViewId());
             if (batch == null) {
-                Batch created = new Batch(context);
+                Batch created = new Batch(context, writer);
                 Batch existing = batchMap.get(context.getViewId());
                 batch = (existing != null) ? existing : created;
             }
             batch.addData(data);
         } catch (Exception e) {
-            //ignore
+            internalLogger.e(TAG, Log.getStackTraceString(e));
         }
     }
 
@@ -145,7 +154,7 @@ public class DataBatcher {
                         JsonElement dataElement = jsonObject.get("data");
                         if (dataElement != null && dataElement.isJsonObject()) {
                             JsonObject data = dataElement.getAsJsonObject();
-                            
+
                             if (type == 2) {
                                 // Process complete screen snapshot
                                 JsonElement nodeElement = data.get("node");
@@ -179,6 +188,7 @@ public class DataBatcher {
         } catch (Exception e) {
             // Protection: if data type doesn't match, don't affect checkLocalFiles context execution
             // Ignore close exception
+            internalLogger.w(TAG, Log.getStackTraceString(e));
         }
     }
 
@@ -289,9 +299,11 @@ public class DataBatcher {
         private final SessionReplayRumContext context;
         private final List<MobileRecord> buffer = new ArrayList<>();
         private ScheduledFuture<?> flushTask;
+        private final RecordWriter writer;
 
-        Batch(SessionReplayRumContext context) {
+        Batch(SessionReplayRumContext context, RecordWriter writer) {
             this.context = context;
+            this.writer = writer;
         }
 
         synchronized void addData(MobileRecord data) {
@@ -339,7 +351,7 @@ public class DataBatcher {
                         context.getSessionId(), context.getViewId(), true, toSend));
 
             } catch (Throwable t) {
-                t.printStackTrace();
+                internalLogger.e(TAG, Log.getStackTraceString(t));
             }
             Batch cur = batchMap.get(context.getViewId());
             if (cur == this) {

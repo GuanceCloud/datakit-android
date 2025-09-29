@@ -206,8 +206,8 @@ public class SessionReplayDataUploadRunnable implements Runnable {
             result = dataUploader.upload(context, batch, batchMeta);
             if (result != null) {
                 storage.confirmBatchRead(batchId,
-                        !result.isNeedReTry() ? new RemovalReason.Flushed()
-                                : new RemovalReason.Invalid(), true);
+                        !result.isInvalid() ? new RemovalReason.Flushed()
+                                : new RemovalReason.Invalid(), !result.isNeedReTry());
             } else {
                 storage.confirmBatchRead(batchId, new RemovalReason.Flushed(), false);
             }
