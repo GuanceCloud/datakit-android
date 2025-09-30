@@ -29,6 +29,13 @@ import java.util.concurrent.TimeUnit;
 
 public class DataBatcher {
 
+    /**
+     * Callback interface for getting RecordWriter
+     */
+    public interface WriterCallback {
+        RecordWriter getWriter();
+    }
+
     private static final String TAG = "DataBatcher";
     private final int MAX_BATCH_SIZE;
     private final long TIMEOUT_MS;
@@ -39,6 +46,13 @@ public class DataBatcher {
     private final InternalLogger internalLogger;
 
     private String lastViewId = null;
+    
+    // Cache mechanism related fields
+    private final Map<String, List<CachedData>> cachedDataMap = new ConcurrentHashMap<>();
+    private static final long CACHE_TIMEOUT_MS = 300; // 300ms cache timeout
+    private final WriterCallback writerCallback;
+    // Global flag to stop processing NoOpRecordWriter data after 300ms timeout
+    private volatile boolean stopProcessingNoOpWriter = false;
     // Map to store slotIDs that need local file checking, with automatic size limit of 50
     private final Map<String, Boolean> needCheckSlots = new LinkedHashMap<String, Boolean>() {
         @Override
@@ -49,24 +63,141 @@ public class DataBatcher {
 
     private final boolean isDCWebview;
 
-    public DataBatcher(InternalLogger logger, boolean isDCWebview) {
-        this(logger, 20, 500, true, isDCWebview);
+    public DataBatcher(InternalLogger logger, boolean isDCWebview, WriterCallback writerCallback) {
+        this(logger, 20, 500, true, isDCWebview, writerCallback);
     }
 
     public DataBatcher(InternalLogger logger, int maxBatchSize, long timeoutMs,
-                       boolean flushOnViewSwitch, boolean isDCWebview) {
+                       boolean flushOnViewSwitch, boolean isDCWebview, WriterCallback writerCallback) {
         this.internalLogger = logger;
         this.MAX_BATCH_SIZE = maxBatchSize;
         this.TIMEOUT_MS = timeoutMs;
         this.FLUSH_ON_VIEW_SWITCH = flushOnViewSwitch;
         this.scheduler = Executors.newSingleThreadScheduledExecutor();
         this.isDCWebview = isDCWebview;
+        this.writerCallback = writerCallback;
     }
 
-    public void onData(SessionReplayRumContext context, String jsonString, RecordWriter writer) {
+    public void onData(SessionReplayRumContext context, String jsonString) {
+        RecordWriter writer = writerCallback.getWriter();
+        
         if (writer instanceof NoOpRecordWriter) {
+            // Check if we should stop processing NoOpRecordWriter data
+            if (stopProcessingNoOpWriter) {
+                // Skip processing NoOpRecordWriter data, discard data
+                internalLogger.d(TAG, "Skipping NoOpRecordWriter data as processing is disabled after 300ms timeout");
+                return;
+            }
+            // Cache data when writer is NoOpRecordWriter
+            cacheData(context, jsonString);
             return;
         }
+        
+        // Process cached data when writer is not NoOpRecordWriter
+        processCachedData(context, writer);
+        
+        // Process current data
+        onDataInternal(context, jsonString, writer);
+    }
+
+
+    /**
+     * Cache data when writer is NoOpRecordWriter
+     */
+    private void cacheData(SessionReplayRumContext context, String jsonString) {
+        String viewId = context.getViewId();
+        long currentTime = System.currentTimeMillis();
+        
+        synchronized (cachedDataMap) {
+            List<CachedData> cachedDataList = cachedDataMap.get(viewId);
+            if (cachedDataList == null) {
+                cachedDataList = new ArrayList<>();
+                cachedDataMap.put(viewId, cachedDataList);
+                
+                // Create timeout task for this viewId (only when caching for the first time)
+                ScheduledFuture<?> timeoutTask = scheduler.schedule(new Runnable() {
+                    @Override
+                    public void run() {
+                        // After 300ms, try to get writer again and process cached data if writer is available
+                        synchronized (cachedDataMap) {
+                            List<CachedData> dataList = cachedDataMap.get(viewId);
+                            if (dataList != null) {
+                                cachedDataMap.remove(viewId);
+                                
+                                // Try to get writer again after 300ms
+                                RecordWriter retryWriter = writerCallback.getWriter();
+                                if (retryWriter instanceof NoOpRecordWriter) {
+                                    // Still NoOpRecordWriter, discard cached data and stop processing all NoOpRecordWriter data
+                                    stopProcessingNoOpWriter = true;
+                                    internalLogger.d(TAG, "Cached data discarded for viewId: " + viewId + " after 300ms timeout, writer still NoOpRecordWriter, stopping all NoOpRecordWriter data processing, count: " + dataList.size());
+                                } else {
+                                    // Writer is now available, process cached data
+                                    internalLogger.d(TAG, "Processing cached data for viewId: " + viewId + " after 300ms retry, count: " + dataList.size());
+                                    try {
+                                        for (CachedData cachedData : dataList) {
+                                            onDataInternal(cachedData.getContext(), cachedData.getJsonString(), retryWriter);
+                                        }
+                                    } catch (Exception e) {
+                                        internalLogger.e(TAG, "Error processing cached data after retry: " + Log.getStackTraceString(e));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }, CACHE_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+                
+                // Store timeout task in the first cached data
+                CachedData firstCachedData = new CachedData(context, jsonString, currentTime, timeoutTask);
+                cachedDataList.add(firstCachedData);
+            } else {
+                // If cached data already exists, add new data directly (no timeout task needed)
+                CachedData cachedData = new CachedData(context, jsonString, currentTime, null);
+                cachedDataList.add(cachedData);
+            }
+        }
+        
+        internalLogger.d(TAG, "Data cached for viewId: " + viewId + ", total cached: " + 
+                (cachedDataMap.get(viewId) != null ? cachedDataMap.get(viewId).size() : 0));
+    }
+    
+    /**
+     * Process cached data when writer is not NoOpRecordWriter
+     */
+    private void processCachedData(SessionReplayRumContext context, RecordWriter writer) {
+        String viewId = context.getViewId();
+        List<CachedData> cachedDataList;
+        
+        synchronized (cachedDataMap) {
+            cachedDataList = cachedDataMap.get(viewId);
+            if (cachedDataList != null) {
+                // Remove cached data
+                cachedDataMap.remove(viewId);
+            }
+        }
+        
+        if (cachedDataList != null && !cachedDataList.isEmpty()) {
+            // Cancel timeout task (get from first cached data)
+            CachedData firstCachedData = cachedDataList.get(0);
+            if (firstCachedData.getTimeoutTask() != null) {
+                firstCachedData.getTimeoutTask().cancel(false);
+            }
+            
+            // Process all cached data
+            try {
+                internalLogger.d(TAG, "Processing cached data for viewId: " + viewId + ", count: " + cachedDataList.size());
+                for (CachedData cachedData : cachedDataList) {
+                    onDataInternal(cachedData.getContext(), cachedData.getJsonString(), writer);
+                }
+            } catch (Exception e) {
+                internalLogger.e(TAG, "Error processing cached data: " + Log.getStackTraceString(e));
+            }
+        }
+    }
+    
+    /**
+     * Internal data processing method, extracted from original data processing logic
+     */
+    private void onDataInternal(SessionReplayRumContext context, String jsonString, RecordWriter writer) {
         try {
             JsonObject jsonObject = new JsonParser().parse(jsonString).getAsJsonObject();
             // Process local CSS files
@@ -101,7 +232,6 @@ public class DataBatcher {
         }
     }
 
-
     public void flush(String viewId) {
         Batch batch = batchMap.get(viewId);
         if (batch != null) batch.flushNow();
@@ -112,6 +242,21 @@ public class DataBatcher {
         for (Batch b : batchMap.values()) {
             b.flushNow();
         }
+        
+        // Clean up cached data
+        synchronized (cachedDataMap) {
+            for (List<CachedData> cachedDataList : cachedDataMap.values()) {
+                if (cachedDataList != null && !cachedDataList.isEmpty()) {
+                    // Cancel timeout task (get from first cached data)
+                    CachedData firstCachedData = cachedDataList.get(0);
+                    if (firstCachedData.getTimeoutTask() != null) {
+                        firstCachedData.getTimeoutTask().cancel(false);
+                    }
+                }
+            }
+            cachedDataMap.clear();
+        }
+        
         scheduler.shutdownNow();
         batchMap.clear();
     }
@@ -292,6 +437,39 @@ public class DataBatcher {
                     // Ignore close exception
                 }
             }
+        }
+    }
+
+    /**
+     * Cached data class for storing data when writer is NoOpRecordWriter
+     */
+    private static class CachedData {
+        private final SessionReplayRumContext context;
+        private final String jsonString;
+        private final long timestamp;
+        private final ScheduledFuture<?> timeoutTask;
+
+        CachedData(SessionReplayRumContext context, String jsonString, long timestamp, ScheduledFuture<?> timeoutTask) {
+            this.context = context;
+            this.jsonString = jsonString;
+            this.timestamp = timestamp;
+            this.timeoutTask = timeoutTask;
+        }
+
+        public SessionReplayRumContext getContext() {
+            return context;
+        }
+
+        public String getJsonString() {
+            return jsonString;
+        }
+
+        public long getTimestamp() {
+            return timestamp;
+        }
+
+        public ScheduledFuture<?> getTimeoutTask() {
+            return timeoutTask;
         }
     }
 

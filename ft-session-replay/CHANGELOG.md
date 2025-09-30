@@ -1,3 +1,7 @@
+# replay 0.1.3-alpha06
+1. Delayed write for WebView Session Replay data.
+2. ft-sdk:> 1.7.0-alpha29
+---
 # replay 0.1.3-alpha05
 1. Fixed the issue where obtaining write too early caused WebView Session Replay to be blank, and added log output.
 2. ft-sdk:> 1.7.0-alpha28

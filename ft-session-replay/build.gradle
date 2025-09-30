@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 
 ext {
-    pkgVersion = "0.1.3-alpha05"
+    pkgVersion = "0.1.3-alpha06"
     mavenGroupId = "com.cloudcare.ft.mobile.sdk.tracker.agent"
     mavenArtifactId = "ft-session-replay"
     withSourceCode = false
