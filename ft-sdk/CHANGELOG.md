@@ -1,3 +1,7 @@
+# agent 1.7.0-alpha30
+1. merge from 1.6.15-alpha06
+
+---
 # agent 1.7.0-alpha29
 1. Delayed write for WebView Session Replay data.
 2. ft-session-replay:>0.1.3-alpha06
