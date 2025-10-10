@@ -20,7 +20,6 @@ import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.PackageUtils;
 import com.ft.sdk.garble.utils.TBSWebViewUtils;
-import com.ft.sdk.garble.utils.Utils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -51,17 +50,14 @@ public class FTAutoTrack {
         try {
             LogUtils.d(TAG, "startApp:" + app);
             //Determine if it is the main process
-            if (Utils.isMainProcess()) {
-                FTActivityLifecycleCallbacks life = new FTActivityLifecycleCallbacks();
-
-                if (app != null) {
-                    Class<?> clazz = PackageUtils.getSophixClass();
-                    if (clazz == null || !clazz.isInstance(app)) {
-                        app.registerActivityLifecycleCallbacks(life);
-                    }
-                } else {
-                    getApplication().registerActivityLifecycleCallbacks(life);
+            FTActivityLifecycleCallbacks life = new FTActivityLifecycleCallbacks();
+            if (app != null) {
+                Class<?> clazz = PackageUtils.getSophixClass();
+                if (clazz == null || !clazz.isInstance(app)) {
+                    app.registerActivityLifecycleCallbacks(life);
                 }
+            } else {
+                getApplication().registerActivityLifecycleCallbacks(life);
             }
         } catch (Exception e) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
