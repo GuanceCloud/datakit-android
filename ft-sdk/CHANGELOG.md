@@ -115,7 +115,7 @@
 
 ---
 # agent 1.6.15-alpha06
-1. 
+1. remove ActivityLifecycleCallbacks limit in main process
 
 ---
 # agent 1.6.15-alpha05
