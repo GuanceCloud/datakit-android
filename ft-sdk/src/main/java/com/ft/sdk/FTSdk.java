@@ -354,7 +354,7 @@ public class FTSdk {
     }
 
     public static boolean isSessionReplaySupport() {
-        return isSessionReplaySupport;
+        return isSessionReplaySupport && SessionReplayManager.get().isReplayEnable();
     }
 
 

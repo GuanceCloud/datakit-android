@@ -76,6 +76,9 @@ public class WebAppInterface {
 
     @JavascriptInterface
     public String getCapabilities() {
+        if (capabilities == null) {
+            return null;
+        }
         return Utils.setToJsonString(Arrays.asList(capabilities));
     }
 

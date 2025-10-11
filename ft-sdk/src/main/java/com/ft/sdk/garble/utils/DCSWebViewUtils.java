@@ -25,8 +25,6 @@ public class DCSWebViewUtils {
         isDCWebViewAvailable = PackageUtils.isDCSWebViewAvailable();
         if (isDCWebViewAvailable) {
             LogUtils.d(LOG_TAG, "DC WebView is available");
-        } else {
-            LogUtils.d(LOG_TAG, "DC WebView is not available");
         }
 
         isDCSWebViewInitialized = true;

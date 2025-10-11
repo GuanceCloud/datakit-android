@@ -1,6 +1,7 @@
 package com.ft.sdk;
 
 import static com.ft.sdk.feature.Feature.SESSION_REPLAY_FEATURE_NAME;
+import static com.ft.sdk.feature.Feature.SESSION_REPLAY_RESOURCES_FEATURE_NAME;
 
 import android.app.Activity;
 import android.content.Context;
@@ -103,6 +104,15 @@ public class SessionReplayManager implements FeatureSdkCore {
     @Override
     public FeatureScope getFeature(String featureName) {
         return features.get(featureName);
+    }
+
+
+    public boolean isReplayEnable(){
+        return features.containsKey(SESSION_REPLAY_FEATURE_NAME);
+    }
+
+    public boolean isReplayResourceEnable(){
+        return features.containsKey(SESSION_REPLAY_RESOURCES_FEATURE_NAME);
     }
 
     @Override
