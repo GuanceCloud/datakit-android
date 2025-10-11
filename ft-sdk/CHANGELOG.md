@@ -1,3 +1,7 @@
+# agent 1.7.0-alpha31
+1. Added config validation for the WebView Session Replay feature
+
+---
 # agent 1.7.0-alpha30
 1. merge from 1.6.15-alpha06
 
