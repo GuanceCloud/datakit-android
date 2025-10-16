@@ -913,7 +913,7 @@ public class FTRUMInnerManager {
             if (!Utils.isNullOrEmpty(bean.resourceHostIP)) {
                 tags.put(Constants.KEY_RUM_RESOURCE_HOST_IP, bean.resourceHostIP);
             }
-
+            tags.put(Constants.KEY_RUM_RESOURCE_ID, bean.id);
             tags.put(Constants.KEY_RUM_RESOURCE_URL, bean.url);
 
             fields.putAll(bean.property);
@@ -945,6 +945,7 @@ public class FTRUMInnerManager {
                 if (resourceStatus > 0) {
                     errorTags.put(Constants.KEY_RUM_RESOURCE_STATUS_GROUP, resourceStatusGroup);
                 }
+                errorTags.put(Constants.KEY_RUM_RESOURCE_ID, bean.id);
                 errorTags.put(Constants.KEY_RUM_RESOURCE_URL, bean.url);
                 errorTags.put(Constants.KEY_RUM_RESOURCE_URL_HOST, bean.urlHost);
                 errorTags.put(Constants.KEY_RUM_RESOURCE_METHOD, bean.resourceMethod);
@@ -988,7 +989,7 @@ public class FTRUMInnerManager {
      * @param netStatusBean
      */
     public void addResource(String resourceId, ResourceParams params, NetStatusBean netStatusBean) {
-        setTransformContent(resourceId, params);
+        setTransformContent(resourceId, params, false);
         setNetState(resourceId, netStatusBean);
     }
 
@@ -998,7 +999,7 @@ public class FTRUMInnerManager {
      * @param resourceId resource id
      * @param params
      */
-    void setTransformContent(String resourceId, ResourceParams params) {
+    void setTransformContent(String resourceId, ResourceParams params, boolean reRegenerate) {
 
         FTTraceInterceptor.TraceRUMLinkable handler = FTTraceManager.get().getHandler(resourceId);
         String spanId = "";
@@ -1025,6 +1026,11 @@ public class FTRUMInnerManager {
         try {
             URL url = Utils.parseFromUrl(params.url);
             bean.url = params.url;
+            if (!reRegenerate) {
+                bean.id = resourceId;
+            } else {
+                bean.id = Utils.randomUUID();
+            }
             bean.urlHost = url.getHost();
             bean.urlPath = url.getPath();
             bean.resourceUrlQuery = url.getQuery();
@@ -1255,12 +1261,14 @@ public class FTRUMInnerManager {
     private volatile long lastGenerateTime = 0;
     private static final long GENERATE_DEBOUNCE_DELAY = 200; // 200ms debounce delay
     private final Object generateLock = new Object();
+
     private void generateRumData() {
         generateRumData(false);
     }
 
     /**
      * Generate RUM data with optional force flag
+     *
      * @param force if true, bypass debounce mechanism and generate immediately
      */
     private void generateRumData(boolean force) {
