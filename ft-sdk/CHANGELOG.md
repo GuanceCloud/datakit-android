@@ -1,3 +1,9 @@
+# agent 1.6.15-alpha07
+1. Ensure FPS is started from the main thread
+2. Optimized the output of long logs more than 4K
+3. Added resource_id to network error types for data correlation.
+
+---
 # agent 1.6.15-alpha06
 1. remove ActivityLifecycleCallbacks limit in main process
 
