@@ -16,6 +16,7 @@ import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Responsible for session replay upload logic
@@ -76,6 +77,7 @@ public class SessionReplayUploader {
         }
         String viewId = "";
         String sessionId = "";
+        ConcurrentHashMap<String, Object> hashMap = new ConcurrentHashMap<>();
         long start = -1;
         long end = -1;
         long recordsCount = 0;
@@ -91,6 +93,7 @@ public class SessionReplayUploader {
             recordsCount += segment.first.recordsCount;
             sessionId = segment.first.session.id;
             viewId = segment.first.view.getId();
+            hashMap = segment.first.globalContext;
 
             if (segment.first.hasFullSnapshot) {
                 hasFullSnapshot = true;
@@ -116,6 +119,12 @@ public class SessionReplayUploader {
         fieldMap.put(KEY_SESSION_ID, sessionId);
         fieldMap.put(KEY_VIEW_ID, viewId);
         fieldMap.put(KEY_VERSION, context.getAppVersion());
+
+        // add globalContext
+        for (String key : hashMap.keySet()) {
+            fieldMap.put(key, hashMap.get(key) + "");
+        }
+
         HashMap<String, Pair<String, byte[]>> fileFileMap = new HashMap<>();
         fileFileMap.put(KEY_SEGMENT, new Pair<>(viewId, compressedData));
 

@@ -7,8 +7,9 @@ import com.ft.sdk.feature.FeatureSdkCore;
 import com.ft.sdk.sessionreplay.utils.RumContextProvider;
 import com.ft.sdk.sessionreplay.utils.SessionReplayRumContext;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SessionReplayRumContextProvider implements RumContextProvider {
 
@@ -24,7 +25,8 @@ public class SessionReplayRumContextProvider implements RumContextProvider {
         return new SessionReplayRumContext(
                 rumContext.containsKey("application_id") ? (String) rumContext.get("application_id") : NULL_UUID,
                 rumContext.containsKey("session_id") ? (String) rumContext.get("session_id") : NULL_UUID,
-                rumContext.containsKey("view_id") ? (String) rumContext.get("view_id") : NULL_UUID
+                rumContext.containsKey("view_id") ? (String) rumContext.get("view_id") : NULL_UUID,
+                rumContext.containsKey("globalContext") ? (ConcurrentHashMap<String, Object>) rumContext.get("globalContext") : new ConcurrentHashMap<>()
         );
     }
 

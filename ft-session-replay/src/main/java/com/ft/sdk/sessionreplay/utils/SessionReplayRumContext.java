@@ -1,7 +1,9 @@
 package com.ft.sdk.sessionreplay.utils;
 
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Provides the necessary RUM context for Session Replay records.
@@ -12,17 +14,32 @@ public class SessionReplayRumContext {
     private String applicationId;
     private String sessionId;
     private String viewId;
+    private final ConcurrentHashMap<String, Object> globalContext;
 
     public SessionReplayRumContext() {
         this.applicationId = NULL_UUID;
         this.sessionId = NULL_UUID;
         this.viewId = NULL_UUID;
+        this.globalContext = new ConcurrentHashMap<>();
     }
 
     public SessionReplayRumContext(String applicationId, String sessionId, String viewId) {
         this.applicationId = applicationId != null ? applicationId : NULL_UUID;
         this.sessionId = sessionId != null ? sessionId : NULL_UUID;
         this.viewId = viewId != null ? viewId : NULL_UUID;
+        this.globalContext = new ConcurrentHashMap<>();
+    }
+
+    public SessionReplayRumContext(String applicationId, String sessionId, String viewId,
+                                   ConcurrentHashMap<String, Object> globalContext) {
+        this.applicationId = applicationId != null ? applicationId : NULL_UUID;
+        this.sessionId = sessionId != null ? sessionId : NULL_UUID;
+        this.viewId = viewId != null ? viewId : NULL_UUID;
+        this.globalContext = globalContext != null ? globalContext : new ConcurrentHashMap<>();
+    }
+
+    public ConcurrentHashMap<String, Object> getGlobalContext() {
+        return globalContext;
     }
 
     public String getApplicationId() {
@@ -58,7 +75,7 @@ public class SessionReplayRumContext {
     }
 
     public SessionReplayRumContext clone() {
-        return new SessionReplayRumContext(applicationId, sessionId, viewId);
+        return new SessionReplayRumContext(applicationId, sessionId, viewId, globalContext);
     }
 
     @Override

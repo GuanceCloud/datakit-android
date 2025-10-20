@@ -46,7 +46,7 @@ public class DataBatcher {
     private final InternalLogger internalLogger;
 
     private String lastViewId = null;
-    
+
     // Cache mechanism related fields
     private final Map<String, List<CachedData>> cachedDataMap = new ConcurrentHashMap<>();
     private static final long CACHE_TIMEOUT_MS = 300; // 300ms cache timeout
@@ -80,7 +80,7 @@ public class DataBatcher {
 
     public void onData(SessionReplayRumContext context, String jsonString) {
         RecordWriter writer = writerCallback.getWriter();
-        
+
         if (writer instanceof NoOpRecordWriter) {
             // Check if we should stop processing NoOpRecordWriter data
             if (stopProcessingNoOpWriter) {
@@ -92,10 +92,10 @@ public class DataBatcher {
             cacheData(context, jsonString);
             return;
         }
-        
+
         // Process cached data when writer is not NoOpRecordWriter
         processCachedData(context, writer);
-        
+
         // Process current data
         onDataInternal(context, jsonString, writer);
     }
@@ -107,13 +107,13 @@ public class DataBatcher {
     private void cacheData(SessionReplayRumContext context, String jsonString) {
         String viewId = context.getViewId();
         long currentTime = System.currentTimeMillis();
-        
+
         synchronized (cachedDataMap) {
             List<CachedData> cachedDataList = cachedDataMap.get(viewId);
             if (cachedDataList == null) {
                 cachedDataList = new ArrayList<>();
                 cachedDataMap.put(viewId, cachedDataList);
-                
+
                 // Create timeout task for this viewId (only when caching for the first time)
                 ScheduledFuture<?> timeoutTask = scheduler.schedule(new Runnable() {
                     @Override
@@ -123,7 +123,7 @@ public class DataBatcher {
                             List<CachedData> dataList = cachedDataMap.get(viewId);
                             if (dataList != null) {
                                 cachedDataMap.remove(viewId);
-                                
+
                                 // Try to get writer again after 300ms
                                 RecordWriter retryWriter = writerCallback.getWriter();
                                 if (retryWriter instanceof NoOpRecordWriter) {
@@ -145,7 +145,7 @@ public class DataBatcher {
                         }
                     }
                 }, CACHE_TIMEOUT_MS, TimeUnit.MILLISECONDS);
-                
+
                 // Store timeout task in the first cached data
                 CachedData firstCachedData = new CachedData(context, jsonString, currentTime, timeoutTask);
                 cachedDataList.add(firstCachedData);
@@ -155,18 +155,18 @@ public class DataBatcher {
                 cachedDataList.add(cachedData);
             }
         }
-        
-        internalLogger.d(TAG, "Data cached for viewId: " + viewId + ", total cached: " + 
+
+        internalLogger.d(TAG, "Data cached for viewId: " + viewId + ", total cached: " +
                 (cachedDataMap.get(viewId) != null ? cachedDataMap.get(viewId).size() : 0));
     }
-    
+
     /**
      * Process cached data when writer is not NoOpRecordWriter
      */
     private void processCachedData(SessionReplayRumContext context, RecordWriter writer) {
         String viewId = context.getViewId();
         List<CachedData> cachedDataList;
-        
+
         synchronized (cachedDataMap) {
             cachedDataList = cachedDataMap.get(viewId);
             if (cachedDataList != null) {
@@ -174,14 +174,14 @@ public class DataBatcher {
                 cachedDataMap.remove(viewId);
             }
         }
-        
+
         if (cachedDataList != null && !cachedDataList.isEmpty()) {
             // Cancel timeout task (get from first cached data)
             CachedData firstCachedData = cachedDataList.get(0);
             if (firstCachedData.getTimeoutTask() != null) {
                 firstCachedData.getTimeoutTask().cancel(false);
             }
-            
+
             // Process all cached data
             try {
                 internalLogger.d(TAG, "Processing cached data for viewId: " + viewId + ", count: " + cachedDataList.size());
@@ -193,7 +193,7 @@ public class DataBatcher {
             }
         }
     }
-    
+
     /**
      * Internal data processing method, extracted from original data processing logic
      */
@@ -242,7 +242,7 @@ public class DataBatcher {
         for (Batch b : batchMap.values()) {
             b.flushNow();
         }
-        
+
         // Clean up cached data
         synchronized (cachedDataMap) {
             for (List<CachedData> cachedDataList : cachedDataMap.values()) {
@@ -256,7 +256,7 @@ public class DataBatcher {
             }
             cachedDataMap.clear();
         }
-        
+
         scheduler.shutdownNow();
         batchMap.clear();
     }
@@ -526,7 +526,8 @@ public class DataBatcher {
 
             try {
                 writer.write(new EnrichedRecord(context.getApplicationId(),
-                        context.getSessionId(), context.getViewId(), true, toSend));
+                        context.getSessionId(), context.getViewId(), true, toSend,
+                        context.getGlobalContext()));
 
             } catch (Throwable t) {
                 internalLogger.e(TAG, Log.getStackTraceString(t));

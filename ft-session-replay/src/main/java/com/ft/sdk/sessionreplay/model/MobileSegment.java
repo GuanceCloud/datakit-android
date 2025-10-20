@@ -1,8 +1,16 @@
 package com.ft.sdk.sessionreplay.model;
 
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MobileSegment {
     public final Application application;
@@ -14,9 +22,12 @@ public class MobileSegment {
     public final Long indexInView;
     public final Boolean hasFullSnapshot;
     public final Source source;
+    public final ConcurrentHashMap<String, Object> globalContext;
     public final List<MobileRecord> records;
 
-    public MobileSegment(Application application, Session session, View view, long start, long end, long recordsCount, Long indexInView, Boolean hasFullSnapshot, Source source, List<MobileRecord> records) {
+    public MobileSegment(Application application, Session session, View view, long start, long end,
+                         long recordsCount, Long indexInView, Boolean hasFullSnapshot, Source source,
+                         List<MobileRecord> records) {
         this.application = application;
         this.session = session;
         this.view = view;
@@ -27,6 +38,24 @@ public class MobileSegment {
         this.hasFullSnapshot = hasFullSnapshot;
         this.source = source;
         this.records = records;
+        this.globalContext = new ConcurrentHashMap<>();
+    }
+
+    public MobileSegment(Application application, Session session, View view, long start, long end,
+                         long recordsCount, Long indexInView, Boolean hasFullSnapshot, Source source,
+                         List<MobileRecord> records, ConcurrentHashMap<String, Object> globalContext) {
+
+        this.application = application;
+        this.session = session;
+        this.view = view;
+        this.start = start;
+        this.end = end;
+        this.recordsCount = recordsCount;
+        this.indexInView = indexInView;
+        this.hasFullSnapshot = hasFullSnapshot;
+        this.source = source;
+        this.records = records;
+        this.globalContext = globalContext;
     }
 
     public JsonElement toJson() {
@@ -49,6 +78,25 @@ public class MobileSegment {
             recordsArray.add(record.toJson());
         }
         json.add("records", recordsArray);
+//
+//        // add globalContext to JSON
+//        if (globalContext != null && !globalContext.isEmpty()) {
+//            JsonObject globalContextJson = new JsonObject();
+//            for (String key : globalContext.keySet()) {
+//                Object value = globalContext.get(key);
+//                if (value instanceof String) {
+//                    globalContextJson.addProperty(key, (String) value);
+//                } else if (value instanceof Number) {
+//                    globalContextJson.addProperty(key, (Number) value);
+//                } else if (value instanceof Boolean) {
+//                    globalContextJson.addProperty(key, (Boolean) value);
+//                } else if (value == null) {
+//                    globalContextJson.add(key, null);
+//                }
+//            }
+//            json.add("globalContext", globalContextJson);
+//        }
+        
         return json;
     }
 

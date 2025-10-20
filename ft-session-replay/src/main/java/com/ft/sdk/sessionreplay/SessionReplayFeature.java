@@ -82,6 +82,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
     private final Sampler sessionRelaySampler;
     private final Sampler sessionRelayErrorSampler;
     private final RecorderProvider recorderProvider;
+    private final String[] linkRumKeys;
 
     private final AtomicReference<String> currentRumSessionId = new AtomicReference<>();
 
@@ -108,7 +109,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                 config.getSessionReplayOnErrorSampleRate(),
                 config.isDelayInit(),
                 config.isDynamicOptimizationEnabled(),
-                config.getInternalCallback());
+                config.getInternalCallback(), config.getRumLinkKeys());
 
     }
 
@@ -118,7 +119,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                                 ImagePrivacy imagePrivacy,
                                 Sampler sessionReplaySampler,
                                 Sampler sessionReplayErrorSampler,
-                                RecorderProvider recorderProvider) {
+                                RecorderProvider recorderProvider, String[] linkRumKeys) {
         this.sdkCore = sdkCore;
         this.customEndpointUrl = customEndpointUrl;
         this.textAndInputPrivacy = textAndInputPrivacy;
@@ -127,6 +128,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
         this.sessionRelaySampler = sessionReplaySampler;
         this.sessionRelayErrorSampler = sessionReplayErrorSampler;
         this.recorderProvider = recorderProvider;
+        this.linkRumKeys = linkRumKeys;
     }
 
     public SessionReplayFeature(FeatureSdkCore sdkCore, String customEndpointUrl,
@@ -141,7 +143,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                                 float sessionReplayOnErrorSampleRate,
                                 boolean isDelayInit,
                                 boolean dynamicOptimizationEnabled,
-                                SessionReplayInternalCallback internalCallback) {
+                                SessionReplayInternalCallback internalCallback, String[] linkRumKeys) {
         this(sdkCore, customEndpointUrl,
                 textAndInputPrivacy,
                 touchPrivacy,
@@ -157,11 +159,15 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                         dynamicOptimizationEnabled,
                         internalCallback,
                         isDelayInit
-                ));
+                ), linkRumKeys);
     }
 
     public RecordWriter getDataWriter() {
         return dataWriter;
+    }
+
+    public String [] getLinkRumKeys(){
+        return linkRumKeys;
     }
 
     public String getPrivacyLevel() {

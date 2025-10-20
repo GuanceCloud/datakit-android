@@ -223,10 +223,18 @@ public class FTRUMInnerManager {
         String viewId = getViewId();
         hashMap.put(Constants.KEY_RUM_VIEW_ID, viewId == null ? NULL_UUID : viewId);
         hashMap.put("application_id", getApplicationID());
+        ConcurrentHashMap<String, Object> map = SessionReplayManager.get().getTagLinkMap();
         if (activeView != null) {
             Map<String, Object> viewMeta = new HashMap<>();
             viewMeta.put(VIEW_RECORDS_COUNT_KEY, activeView.getRecordsCount());
             hashMap.put(viewId, viewMeta);
+            HashMap<String, Object> filedMap = SessionReplayManager.get().getFieldLinkMap().get(activeView.getId());
+            if (filedMap != null) {
+                map.putAll(filedMap);
+            }
+        }
+        if (!map.isEmpty()) {
+            hashMap.put("globalContext", map);
         }
         return hashMap;
     }
@@ -509,6 +517,7 @@ public class FTRUMInnerManager {
         FTMonitorManager.get().attachMonitorData(activeView);
         initView(activeView);
 //        lastUserActiveTime = activeView.getStartTime();
+        SessionReplayManager.get().appendSessionReplayRUMLinkKeysWithView(activeView.getId(), property);
 
     }
 
@@ -1496,6 +1505,21 @@ public class FTRUMInnerManager {
             }
         });
 
+    }
+
+    void updateWebviewContainerProperty(String viewId, Map<String, Object> map) {
+        if (activeView != null) {
+            if (viewId.equals(activeView.getId())) {
+                activeView.getProperty().putAll(map);
+                String attr = activeView.getAttrJsonString();
+                EventConsumerThreadPool.get().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        FTDBManager.get().updateViewExtraAttr(viewId, attr);
+                    }
+                });
+            }
+        }
     }
 
     void updateSessionViewMap(Map<String, Object> map) {

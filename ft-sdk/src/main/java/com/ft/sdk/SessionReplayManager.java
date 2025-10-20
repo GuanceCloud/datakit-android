@@ -13,6 +13,7 @@ import com.ft.sdk.feature.FeatureEventReceiver;
 import com.ft.sdk.feature.FeatureScope;
 import com.ft.sdk.feature.FeatureSdkCore;
 import com.ft.sdk.garble.threadpool.ThreadPoolFactory;
+import com.ft.sdk.garble.utils.Utils;
 import com.ft.sdk.sessionreplay.SDKFeature;
 import com.ft.sdk.sessionreplay.SessionInnerLogger;
 import com.ft.sdk.sessionreplay.SessionReplayFeature;
@@ -22,6 +23,9 @@ import com.ft.sdk.sessionreplay.internal.storage.NoOpRecordWriter;
 import com.ft.sdk.sessionreplay.internal.storage.RecordWriter;
 import com.ft.sdk.sessionreplay.utils.InternalLogger;
 
+import java.util.HashMap;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -57,6 +61,7 @@ public class SessionReplayManager implements FeatureSdkCore {
 
     private SessionReplayFeature sessionReplayFeature;
     private String privacyLevel = "mask";
+    private String[] rumLinkKeys = new String[]{};
 
     public void init(Context context) {
         this.context = context;
@@ -69,6 +74,11 @@ public class SessionReplayManager implements FeatureSdkCore {
     public TrackingConsent getConsentProvider() {
         return this.trackingConsentProvider.getConsent();
     }
+
+    private final ConcurrentHashMap<String, HashMap<String, Object>> fieldLinkMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Object> tagLinkMap = new ConcurrentHashMap<>();
+    private static final int FIELD_LINK_MAP_CAPACITY = 5;
+    private final Deque<String> fieldLinkOrder = new ArrayDeque<>();
 
     @Override
     public long getErrorTimeLine() {
@@ -88,6 +98,10 @@ public class SessionReplayManager implements FeatureSdkCore {
         if (feature instanceof SessionReplayFeature) {
             sessionReplayFeature = (SessionReplayFeature) feature;
             privacyLevel = ((SessionReplayFeature) feature).getPrivacyLevel();
+            rumLinkKeys = ((SessionReplayFeature) feature).getLinkRumKeys();
+            if (rumLinkKeys.length > 0) {
+                appendSessionReplayRUMLinkKeys(FTTrackInner.getInstance().getSessionReplayRUMLinksKeys(rumLinkKeys));
+            }
         }
     }
 
@@ -101,18 +115,73 @@ public class SessionReplayManager implements FeatureSdkCore {
         return privacyLevel;
     }
 
+    public String[] getRumLinkKeys() {
+        return rumLinkKeys;
+    }
+
     @Override
     public FeatureScope getFeature(String featureName) {
         return features.get(featureName);
     }
 
 
-    public boolean isReplayEnable(){
+    public boolean isReplayEnable() {
         return features.containsKey(SESSION_REPLAY_FEATURE_NAME);
     }
 
-    public boolean isReplayResourceEnable(){
+    public boolean isReplayResourceEnable() {
         return features.containsKey(SESSION_REPLAY_RESOURCES_FEATURE_NAME);
+    }
+
+    void appendSessionReplayRUMLinkKeys(String key, Object value) {
+        if (rumLinkKeys != null && rumLinkKeys.length > 0) {
+            tagLinkMap.put(key, value);
+        }
+    }
+
+    void appendSessionReplayRUMLinkKeys(Map<String, Object> maps) {
+        tagLinkMap.putAll(maps);
+    }
+
+    void appendSessionReplayRUMLinkKeysWithView(String viewId, Map<String, Object> property) {
+        if (property == null) return;
+        if (rumLinkKeys != null && rumLinkKeys.length > 0) {
+            if (!Utils.isNullOrEmpty(viewId)) {
+                HashMap<String, Object> rumLinkData = new HashMap<>();
+
+                // Check keys in fieldMaps
+                for (String rumKey : rumLinkKeys) {
+                    for (String fieldKey : property.keySet()) {
+                        if (fieldKey.contains(rumKey)) {
+                            rumLinkData.put(fieldKey, property.get(fieldKey));
+                        }
+                    }
+                }
+
+                // Store matched data to global hashMap if any matches found (cap size to 10 by removing oldest)
+                if (!rumLinkData.isEmpty()) {
+                    synchronized (fieldLinkMap) {
+                        boolean isNewKey = !fieldLinkMap.containsKey(viewId);
+                        fieldLinkMap.put(viewId, rumLinkData);
+                        if (isNewKey) {
+                            fieldLinkOrder.addLast(viewId);
+                            while (fieldLinkOrder.size() > FIELD_LINK_MAP_CAPACITY) {
+                                String eldestKey = fieldLinkOrder.removeFirst();
+                                fieldLinkMap.remove(eldestKey);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public ConcurrentHashMap<String, HashMap<String, Object>> getFieldLinkMap() {
+        return fieldLinkMap;
+    }
+
+    public ConcurrentHashMap<String, Object> getTagLinkMap() {
+        return tagLinkMap;
     }
 
     @Override

@@ -20,6 +20,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Used to receive application-level webview data indicators
@@ -89,6 +90,8 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
     private Object dataBatcher;
     private View mWebView;
     private boolean isDCWebView = false;
+
+    private final ConcurrentHashMap<String, ConcurrentHashMap<String, Object>> webViewLinkMap = new ConcurrentHashMap<>();
 
     /**
      * Register js method in web view
@@ -216,13 +219,56 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                     }
                     String nativeViewId = getNativeViewId();
 
-                    if (FTSdk.isSessionReplaySupport()
-                            && !Utils.isNullOrEmpty(nativeViewId)
-                            && !nativeViewId.equals(com.ft.sdk.sessionreplay.utils.SessionReplayRumContext.NULL_UUID)) {
-                        HashMap<String, String> source = new HashMap<>();
-                        source.put("source", "android");
-                        source.put("view_id", nativeViewId);
-                        tagMaps.put("container", Utils.hashMapObjectToJson(source));
+                    if (FTSdk.isSessionReplaySupport()) {
+                        if (!Utils.isNullOrEmpty(nativeViewId)
+                                && !nativeViewId.equals(com.ft.sdk.sessionreplay.utils.SessionReplayRumContext.NULL_UUID)) {
+                            HashMap<String, String> source = new HashMap<>();
+                            source.put("source", "android");
+                            source.put("view_id", nativeViewId);
+                            tagMaps.put("container", Utils.hashMapObjectToJson(source));
+
+                        }
+
+                        // Check if keys in tagMaps and fieldMaps contain characters from RumLinkKeys
+                        String[] rumLinkKeys = SessionReplayManager.get().getRumLinkKeys();
+                        if (rumLinkKeys != null && rumLinkKeys.length > 0) {
+                            String viewId = (String) tagMaps.get("view_id");
+                            if (!Utils.isNullOrEmpty(viewId)) {
+                                ConcurrentHashMap<String, Object> rumLinkData = new ConcurrentHashMap<>();
+
+                                // Check keys in tagMaps
+                                for (String rumKey : rumLinkKeys) {
+                                    for (String tagKey : tagMaps.keySet()) {
+                                        if (tagKey.equals(rumKey) && tagMaps.get(tagKey) != null) {
+                                            rumLinkData.put(tagKey, tagMaps.get(tagKey));
+                                        }
+                                    }
+                                }
+
+                                // Check keys in fieldMaps
+                                for (String rumKey : rumLinkKeys) {
+                                    for (String fieldKey : fieldMaps.keySet()) {
+                                        if (fieldKey.equals(rumKey) && fieldMaps.get(fieldKey) != null) {
+                                            rumLinkData.put(fieldKey, fieldMaps.get(fieldKey));
+                                        }
+                                    }
+                                }
+
+                                // Store matched data to global hashMap if any matches found
+                                if (!rumLinkData.isEmpty()) {
+                                    //link globalContext with Webview
+                                    webViewLinkMap.put(viewId, rumLinkData);
+
+                                    if (!Utils.isNullOrEmpty(nativeViewId)
+                                            && !nativeViewId.equals(com.ft.sdk.sessionreplay.utils.SessionReplayRumContext.NULL_UUID)) {
+                                        //update rum globalContext
+                                        FTRUMInnerManager.get().updateWebviewContainerProperty(nativeViewId, rumLinkData);
+                                        //link globalContext with Native Container View
+                                        SessionReplayManager.get().appendSessionReplayRUMLinkKeysWithView(nativeViewId, rumLinkData);
+                                    }
+                                }
+                            }
+                        }
                     }
 
                     CollectType collectType = FTRUMInnerManager.get().checkSessionWillCollect(sessionId);
@@ -240,7 +286,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                         com.ft.sdk.sessionreplay.utils.SessionReplayRumContext newContext = new com.ft.sdk.sessionreplay.utils.SessionReplayRumContext(
                                 FTRUMInnerManager.get().getApplicationID(),
                                 FTRUMInnerManager.get().getSessionId(),
-                                webViewId);
+                                webViewId, webViewLinkMap.get(webViewId));
                         ((com.ft.sdk.sessionreplay.webview.DataBatcher) dataBatcher).onData(newContext,
                                 data.toString());
                     }
