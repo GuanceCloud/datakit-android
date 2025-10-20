@@ -20,9 +20,17 @@ public class FilePersistenceConfig {
 
     public FilePersistenceConfig() {
         this(MAX_DELAY_BETWEEN_MESSAGES_MS, MAX_BATCH_SIZE, MAX_ITEM_SIZE,
-             MAX_ITEMS_PER_BATCH, OLD_FILE_THRESHOLD, MAX_DISK_SPACE,
-             CLEANUP_FREQUENCY_THRESHOLD_MS);
+                MAX_ITEMS_PER_BATCH, OLD_FILE_THRESHOLD, MAX_DISK_SPACE,
+                CLEANUP_FREQUENCY_THRESHOLD_MS);
     }
+
+
+    public FilePersistenceConfig(long maxBatchSize, long maxItemSize) {
+        this(MAX_DELAY_BETWEEN_MESSAGES_MS, maxBatchSize, maxItemSize,
+                MAX_ITEMS_PER_BATCH, OLD_FILE_THRESHOLD, MAX_DISK_SPACE,
+                CLEANUP_FREQUENCY_THRESHOLD_MS);
+    }
+
 
     public FilePersistenceConfig(long recentDelayMs, long maxBatchSize, long maxItemSize,
                                  int maxItemsPerBatch, long oldFileThreshold, long maxDiskSpace,

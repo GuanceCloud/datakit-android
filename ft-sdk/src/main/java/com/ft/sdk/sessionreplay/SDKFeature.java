@@ -20,6 +20,7 @@ import com.ft.sdk.feature.FeatureContextUpdateReceiver;
 import com.ft.sdk.feature.FeatureEventReceiver;
 import com.ft.sdk.feature.FeatureScope;
 import com.ft.sdk.feature.FeatureSdkCore;
+import com.ft.sdk.feature.FeatureStorageConfiguration;
 import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.bean.BatteryBean;
 import com.ft.sdk.garble.http.FTResponseData;
@@ -106,8 +107,15 @@ public class SDKFeature implements FeatureScope {
 
         if (wrappedFeature instanceof StorageBackedFeature) {
             String featureName = wrappedFeature.getName();
-            storage = createFileStorage(featureName, new FilePersistenceConfig());
-            webStorage = createFileStorage(featureName, new FilePersistenceConfig());
+            FeatureStorageConfiguration storageConfiguration = ((StorageBackedFeature) wrappedFeature).getStorageConfiguration();
+            storage = createFileStorage(featureName, new FilePersistenceConfig(
+                    storageConfiguration.getMaxBatchSize(),
+                    storageConfiguration.getMaxItemSize()
+            ));
+
+            webStorage = createFileStorage(featureName,
+                    new FilePersistenceConfig(storageConfiguration.getMaxBatchSize(),
+                            storageConfiguration.getMaxItemSize()));
 
             dataUploadConfiguration = new DataUploadConfiguration(UploadFrequency.FREQUENT,
                     BatchProcessingLevel.MEDIUM.getMaxBatchesPerUploadJob());
@@ -115,7 +123,7 @@ public class SDKFeature implements FeatureScope {
             FTSDKConfig sdkConfig = FTSdk.get().getBaseConfig();
             FTRUMConfig rumConfig = FTRUMConfigManager.get().getConfig();
 
-            String appId = rumConfig == null ? "" : rumConfig.getRumAppId();
+            String appId = rumConfig.getRumAppId();
             HashMap<String, Object> map = new HashMap<>();
             map.put("env", sdkConfig.getEnv());
             map.put("sdkVersion", FTSdk.AGENT_VERSION);
@@ -134,6 +142,7 @@ public class SDKFeature implements FeatureScope {
     }
 
     private void setupUploader(Feature feature, DataUploadConfiguration configuration, FTSDKConfig config) {
+        // session replay data only upload
         if (Utils.isMainProcess()) {
             SessionReplayUploader uploader = new SessionReplayUploader(
                     new BatchesToSegmentsMapper(internalLogger),
@@ -195,6 +204,8 @@ public class SDKFeature implements FeatureScope {
                 uploadScheduler = new NoOpUploadScheduler();
             }
 
+        } else {
+            internalLogger.w(TAG, "Session replay data only sync on main thread");
         }
     }
 
@@ -206,14 +217,14 @@ public class SDKFeature implements FeatureScope {
     @Override
     public void withWriteContext(boolean forceNewBatch, DataConsumerCallback callback) {
         if (callback.isWebview()) {
-            storage.writeCurrentBatch(sdkContext, forceNewBatch, new EventBatchWriterCallback() {
+            webStorage.writeCurrentBatch(sdkContext, forceNewBatch, new EventBatchWriterCallback() {
                 @Override
                 public void callBack(EventBatchWriter writer) {
                     callback.onConsume(sdkContext, writer);
                 }
             });
         } else {
-            webStorage.writeCurrentBatch(sdkContext, forceNewBatch, new EventBatchWriterCallback() {
+            storage.writeCurrentBatch(sdkContext, forceNewBatch, new EventBatchWriterCallback() {
                 @Override
                 public void callBack(EventBatchWriter writer) {
                     callback.onConsume(sdkContext, writer);
