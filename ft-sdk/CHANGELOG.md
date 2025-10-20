@@ -1,9 +1,13 @@
+# agent 1.7.0-alpha32
+1. merge from ft-sdk 1.6.15-alpha07
+
+---
 # agent 1.7.0-alpha31
 1. Added config validation for the WebView Session Replay feature
 
 ---
 # agent 1.7.0-alpha30
-1. merge from 1.6.15-alpha06
+1. merge from ft-sdk 1.6.15-alpha06
 
 ---
 # agent 1.7.0-alpha29
@@ -120,6 +124,12 @@
 ---
 # agent 1.7.0-alpha02
 1. Support for enabling session replay recording feature
+
+---
+# agent 1.6.15-alpha07
+1. Ensure FPS is started from the main thread
+2. Optimized the output of long logs more than 4K
+3. Added resource_id to network error types for data correlation.
 
 ---
 # agent 1.6.15-alpha06

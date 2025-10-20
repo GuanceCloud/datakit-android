@@ -388,6 +388,11 @@ public class Constants {
     public static final String KEY_RUM_RESOURCE_URL = "resource_url";
 
     /**
+     * Resource relative id
+     */
+    public static final String KEY_RUM_RESOURCE_ID = "resource_id";
+
+    /**
      * Resource request host address
      */
     public static final String KEY_RUM_RESOURCE_URL_HOST = "resource_url_host";

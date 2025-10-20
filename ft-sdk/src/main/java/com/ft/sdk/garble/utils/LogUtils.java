@@ -1,8 +1,6 @@
 package com.ft.sdk.garble.utils;
 
 
-import static com.ft.sdk.garble.utils.TrackLog.showFullLog;
-
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTInnerLogHandler;
 import com.ft.sdk.FTLogger;
@@ -85,50 +83,50 @@ public class LogUtils {
 
     public static void i(String tag, String message, boolean showLog) {
         if (showLog) {
-            showFullLog(tag, message, SDKLogLevel.I, false);
+            TrackLog.showFullInnerlog(tag, message, SDKLogLevel.I, false);
         }
     }
 
     public static void d(String tag, String message, boolean showLog) {
         if (showLog) {
-            showFullLog(tag, message, SDKLogLevel.D, false);
+            TrackLog.showFullInnerlog(tag, message, SDKLogLevel.D, false);
         }
     }
 
     public static void e(String tag, String message, boolean showLog) {
         if (showLog) {
-            showFullLog(tag, message, SDKLogLevel.E, false);
+            TrackLog.showFullInnerlog(tag, message, SDKLogLevel.E, false);
         }
     }
 
     private static void eOnce(String tag, String message, boolean showLog) {
         if (showLog) {
-            showFullLog(tag, message, SDKLogLevel.E, true);
+            TrackLog.showFullInnerlog(tag, message, SDKLogLevel.E, true);
         }
     }
 
     public static void v(String tag, String message, boolean showLog) {
         if (showLog) {
-            showFullLog(tag, message, SDKLogLevel.V, false);
+            TrackLog.showFullInnerlog(tag, message, SDKLogLevel.V, false);
         }
     }
 
     public static void w(String tag, String message, boolean showLog) {
         if (showLog) {
-            showFullLog(tag, message, SDKLogLevel.W, false);
+            TrackLog.showFullInnerlog(tag, message, SDKLogLevel.W, false);
         }
     }
 
     private static void wOnce(String tag, String message, boolean showLog) {
         if (showLog) {
-            showFullLog(tag, message, SDKLogLevel.W, true);
+            TrackLog.showFullInnerlog(tag, message, SDKLogLevel.W, true);
         }
     }
 
 
     public static void showAlias(String message) {
         if (aliasLogShow) {
-            showFullLog(TAG, message, SDKLogLevel.D, false);
+            TrackLog.showFullInnerlog(TAG, message, SDKLogLevel.D, false);
         }
     }
 

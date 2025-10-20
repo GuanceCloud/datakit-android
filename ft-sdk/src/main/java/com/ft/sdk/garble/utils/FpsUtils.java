@@ -1,5 +1,7 @@
 package com.ft.sdk.garble.utils;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.view.Choreographer;
 
 import java.util.concurrent.TimeUnit;
@@ -12,9 +14,10 @@ import java.util.concurrent.TimeUnit;
 public class FpsUtils {
     private static FpsUtils fpsUtils;
     Metronome metronome;
+    private static final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     private FpsUtils() {
-        metronome = new Metronome();
+        // Metronome will be initialized lazily on main thread when needed
     }
 
     private double mFps;
@@ -35,26 +38,48 @@ public class FpsUtils {
     }
 
     /**
-     *
+     * Start FPS monitoring with automatic main thread adaptation
      */
     public void start() {
-        metronome.start();
-        metronome.addListener(new Audience() {
-            @Override
-            public void heartbeat(double fps) {
-                mFps = fps;
+        runOnMainThread(() -> {
+            // Initialize Metronome on main thread to ensure Choreographer.getInstance() is called safely
+            if (metronome == null) {
+                metronome = new Metronome();
+            }
+            metronome.start();
+            metronome.addListener(new Audience() {
+                @Override
+                public void heartbeat(double fps) {
+                    mFps = fps;
+                }
+            });
+        });
+    }
+
+    /**
+     * Release resources with automatic main thread adaptation
+     */
+    public static void release() {
+        runOnMainThread(() -> {
+            if (fpsUtils != null) {
+                if (fpsUtils.metronome != null) {
+                    fpsUtils.metronome.stop();
+                }
             }
         });
     }
 
     /**
-     * Release
+     * Ensure code runs on main thread, automatically switch if not already on main thread
+     * @param runnable Code to execute on main thread
      */
-    public static void release() {
-        if (fpsUtils != null) {
-            if (fpsUtils.metronome != null) {
-                fpsUtils.metronome.stop();
-            }
+    private static void runOnMainThread(Runnable runnable) {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            // Already on main thread, execute directly
+            runnable.run();
+        } else {
+            // Not on main thread, switch to main thread for execution
+            mainHandler.post(runnable);
         }
     }
 
@@ -77,20 +102,24 @@ public class FpsUtils {
         }
 
         /**
-         *
+         * Start FPS monitoring with automatic main thread adaptation
          */
         public void start() {
-            choreographer.removeFrameCallback(this);
-            choreographer.postFrameCallback(this);
+            runOnMainThread(() -> {
+                choreographer.removeFrameCallback(this);
+                choreographer.postFrameCallback(this);
+            });
         }
 
         /**
-         *
+         * Stop FPS monitoring with automatic main thread adaptation
          */
         public void stop() {
-            frameStartTime = 0;
-            framesRendered = 0;
-            choreographer.removeFrameCallback(this);
+            runOnMainThread(() -> {
+                frameStartTime = 0;
+                framesRendered = 0;
+                choreographer.removeFrameCallback(this);
+            });
         }
 
         public void addListener(Audience l) {
@@ -99,6 +128,20 @@ public class FpsUtils {
 
         public void setInterval(int interval) {
             this.interval = interval;
+        }
+
+        /**
+         * Ensure code runs on main thread, automatically switch if not already on main thread
+         * @param runnable Code to execute on main thread
+         */
+        private void runOnMainThread(Runnable runnable) {
+            if (Looper.myLooper() == Looper.getMainLooper()) {
+                // Already on main thread, execute directly
+                runnable.run();
+            } else {
+                // Not on main thread, switch to main thread for execution
+                mainHandler.post(runnable);
+            }
         }
 
         @Override
