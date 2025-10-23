@@ -75,8 +75,8 @@ public class SessionReplayManager implements FeatureSdkCore {
         return this.trackingConsentProvider.getConsent();
     }
 
-    private final ConcurrentHashMap<String, HashMap<String, Object>> fieldLinkMap = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, Object> tagLinkMap = new ConcurrentHashMap<>();
+    private final Map<String, Map<String, Object>> fieldLinkMap = new ConcurrentHashMap<>();
+    private final Map<String, Object> tagLinkMap = new ConcurrentHashMap<>();
     private static final int FIELD_LINK_MAP_CAPACITY = 5;
     private final Deque<String> fieldLinkOrder = new ArrayDeque<>();
 
@@ -176,11 +176,15 @@ public class SessionReplayManager implements FeatureSdkCore {
         }
     }
 
-    public ConcurrentHashMap<String, HashMap<String, Object>> getFieldLinkMap() {
+    public boolean checkFieldContextChanged(String viewId, Map<String, Object> map) {
+        return Utils.checkContextChanged(viewId, fieldLinkMap, map);
+    }
+
+    public Map<String, Map<String, Object>> getFieldLinkMap() {
         return fieldLinkMap;
     }
 
-    public ConcurrentHashMap<String, Object> getTagLinkMap() {
+    public Map<String, Object> getTagLinkMap() {
         return tagLinkMap;
     }
 

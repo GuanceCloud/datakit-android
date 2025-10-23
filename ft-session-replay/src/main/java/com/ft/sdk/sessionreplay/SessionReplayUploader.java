@@ -16,6 +16,7 @@ import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -64,7 +65,8 @@ public class SessionReplayUploader {
      *
      * @param context
      */
-    public UploadResult upload(SessionReplayContext context, List<RawBatchEvent> batchData, byte[] byteArray) throws Exception {
+    public UploadResult upload(SessionReplayContext context, List<RawBatchEvent> batchData,
+                               byte[] byteArray) throws Exception {
         List<byte[]> serializedSegments = new ArrayList<>();
         for (RawBatchEvent event : batchData) {
             serializedSegments.add(event.getData());
@@ -77,7 +79,7 @@ public class SessionReplayUploader {
         }
         String viewId = "";
         String sessionId = "";
-        ConcurrentHashMap<String, Object> hashMap = new ConcurrentHashMap<>();
+        Map<String, Object> hashMap = new ConcurrentHashMap<>();
         long start = -1;
         long end = -1;
         long recordsCount = 0;
@@ -121,8 +123,10 @@ public class SessionReplayUploader {
         fieldMap.put(KEY_VERSION, context.getAppVersion());
 
         // add globalContext
+        StringBuilder contextString = new StringBuilder();
         for (String key : hashMap.keySet()) {
             fieldMap.put(key, hashMap.get(key) + "");
+            contextString.append(",").append(key).append(":").append(hashMap.get(key)).append(" ");
         }
 
         HashMap<String, Pair<String, byte[]>> fileFileMap = new HashMap<>();
@@ -132,11 +136,14 @@ public class SessionReplayUploader {
         UploadResult result = callback.onRequest(formData);
 
         if (result.isSuccess()) {
-            internalLogger.d(TAG, "Session Upload Success. " + result.getPkgId() + ",view_id:" + viewId
-                    + ",count:" + recordsCount + ",hasFullSnapshot:" + hasFullSnapshot);
+            internalLogger.d(TAG, "Session Upload Success. " + result.getPkgId()
+                    + ",view_id:" + viewId
+                    + contextString
+                    + ",count:" + recordsCount + ",fullSnapshot:" + hasFullSnapshot);
         } else {
-            internalLogger.e(TAG, "Session Upload Failed." + result.getPkgId() + ",view_id:" + viewId
-                    + ",count:" + recordsCount + ",code:" + result.getCode() + ",response:" + result.getResponse());
+            internalLogger.e(TAG, "Session Upload Failed." + result.getPkgId() + ",view_id:"
+                    + viewId + ",count:" + recordsCount + ",code:" + result.getCode() + ",response:"
+                    + result.getResponse());
         }
         return result;
 

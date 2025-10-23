@@ -1,5 +1,9 @@
-# agent 1.7.0-alpha32
+# agent 1.7.0-alpha33
 1. merge from ft-sdk 1.6.15-alpha07
+2. ft-session-replay:>0.1.3-alpha07
+3. Increased the disk write limit for Session Replay
+4. Added RUM Session Replay context association feature,
+   and associated the WebView container with the context of the loaded HTML.
 
 ---
 # agent 1.7.0-alpha31

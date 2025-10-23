@@ -20,6 +20,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -91,7 +92,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
     private View mWebView;
     private boolean isDCWebView = false;
 
-    private final ConcurrentHashMap<String, ConcurrentHashMap<String, Object>> webViewLinkMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Map<String, Object>> webViewLinkMap = new ConcurrentHashMap<>();
 
     /**
      * Register js method in web view
@@ -257,14 +258,19 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                                 // Store matched data to global hashMap if any matches found
                                 if (!rumLinkData.isEmpty()) {
                                     //link globalContext with Webview
-                                    webViewLinkMap.put(viewId, rumLinkData);
+                                    if (Utils.checkContextChanged(viewId, webViewLinkMap, rumLinkData)) {
+                                        webViewLinkMap.put(viewId, rumLinkData);
+                                    }
 
                                     if (!Utils.isNullOrEmpty(nativeViewId)
                                             && !nativeViewId.equals(com.ft.sdk.sessionreplay.utils.SessionReplayRumContext.NULL_UUID)) {
                                         //update rum globalContext
-                                        FTRUMInnerManager.get().updateWebviewContainerProperty(nativeViewId, rumLinkData);
-                                        //link globalContext with Native Container View
-                                        SessionReplayManager.get().appendSessionReplayRUMLinkKeysWithView(nativeViewId, rumLinkData);
+                                        if (SessionReplayManager.get().checkFieldContextChanged(nativeViewId, rumLinkData)) {
+                                            FTRUMInnerManager.get().updateWebviewContainerProperty(nativeViewId, rumLinkData);
+                                            //link globalContext with Native Container View
+                                            SessionReplayManager.get().appendSessionReplayRUMLinkKeysWithView(nativeViewId, rumLinkData);
+
+                                        }
                                     }
                                 }
                             }

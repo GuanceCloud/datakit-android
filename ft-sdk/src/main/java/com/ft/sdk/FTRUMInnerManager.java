@@ -223,12 +223,12 @@ public class FTRUMInnerManager {
         String viewId = getViewId();
         hashMap.put(Constants.KEY_RUM_VIEW_ID, viewId == null ? NULL_UUID : viewId);
         hashMap.put("application_id", getApplicationID());
-        ConcurrentHashMap<String, Object> map = SessionReplayManager.get().getTagLinkMap();
+        Map<String, Object> map = SessionReplayManager.get().getTagLinkMap();
         if (activeView != null) {
             Map<String, Object> viewMeta = new HashMap<>();
             viewMeta.put(VIEW_RECORDS_COUNT_KEY, activeView.getRecordsCount());
             hashMap.put(viewId, viewMeta);
-            HashMap<String, Object> filedMap = SessionReplayManager.get().getFieldLinkMap().get(activeView.getId());
+            Map<String, Object> filedMap = SessionReplayManager.get().getFieldLinkMap().get(activeView.getId());
             if (filedMap != null) {
                 map.putAll(filedMap);
             }

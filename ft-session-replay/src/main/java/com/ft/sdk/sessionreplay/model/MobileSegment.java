@@ -7,9 +7,8 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MobileSegment {
@@ -22,7 +21,7 @@ public class MobileSegment {
     public final Long indexInView;
     public final Boolean hasFullSnapshot;
     public final Source source;
-    public final ConcurrentHashMap<String, Object> globalContext;
+    public final Map<String, Object> globalContext;
     public final List<MobileRecord> records;
 
     public MobileSegment(Application application, Session session, View view, long start, long end,
@@ -43,7 +42,7 @@ public class MobileSegment {
 
     public MobileSegment(Application application, Session session, View view, long start, long end,
                          long recordsCount, Long indexInView, Boolean hasFullSnapshot, Source source,
-                         List<MobileRecord> records, ConcurrentHashMap<String, Object> globalContext) {
+                         List<MobileRecord> records, Map<String, Object> globalContext) {
 
         this.application = application;
         this.session = session;
@@ -96,7 +95,7 @@ public class MobileSegment {
 //            }
 //            json.add("globalContext", globalContextJson);
 //        }
-        
+
         return json;
     }
 

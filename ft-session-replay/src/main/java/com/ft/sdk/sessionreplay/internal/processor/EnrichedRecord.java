@@ -6,13 +6,14 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class EnrichedRecord {
     private final String applicationId;
     private final String sessionId;
     private final String viewId;
-    private final ConcurrentHashMap<String, Object> globalContext;
+    private final Map<String, Object> globalContext;
     private final List<MobileRecord> records;
     private final boolean isWebRecord;
 
@@ -23,7 +24,7 @@ public class EnrichedRecord {
     }
 
     public EnrichedRecord(String applicationId, String sessionId, String viewId, boolean isWebRecord,
-                          List<MobileRecord> records, ConcurrentHashMap<String, Object> globalContext) {
+                          List<MobileRecord> records, Map<String, Object> globalContext) {
         this.applicationId = applicationId;
         this.sessionId = sessionId;
         this.viewId = viewId;

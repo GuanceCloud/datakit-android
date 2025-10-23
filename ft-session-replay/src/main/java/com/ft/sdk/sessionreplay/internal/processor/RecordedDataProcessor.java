@@ -212,8 +212,8 @@ public class RecordedDataProcessor implements Processor {
         return new EnrichedRecord(
                 rumContext.getApplicationId(),
                 rumContext.getSessionId(),
-                rumContext.getViewId(),
-                records
+                rumContext.getViewId(), false,
+                records, rumContext.getGlobalContext()
         );
     }
 

@@ -1,6 +1,7 @@
 package com.ft.sdk.sessionreplay.utils;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,7 +15,7 @@ public class SessionReplayRumContext {
     private String applicationId;
     private String sessionId;
     private String viewId;
-    private final ConcurrentHashMap<String, Object> globalContext;
+    private final Map<String, Object> globalContext;
 
     public SessionReplayRumContext() {
         this.applicationId = NULL_UUID;
@@ -31,14 +32,14 @@ public class SessionReplayRumContext {
     }
 
     public SessionReplayRumContext(String applicationId, String sessionId, String viewId,
-                                   ConcurrentHashMap<String, Object> globalContext) {
+                                   Map<String, Object> globalContext) {
         this.applicationId = applicationId != null ? applicationId : NULL_UUID;
         this.sessionId = sessionId != null ? sessionId : NULL_UUID;
         this.viewId = viewId != null ? viewId : NULL_UUID;
         this.globalContext = globalContext != null ? globalContext : new ConcurrentHashMap<>();
     }
 
-    public ConcurrentHashMap<String, Object> getGlobalContext() {
+    public Map<String, Object> getGlobalContext() {
         return globalContext;
     }
 

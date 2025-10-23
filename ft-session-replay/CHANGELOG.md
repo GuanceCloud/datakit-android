@@ -1,3 +1,7 @@
+# replay 0.1.3-alpha07
+1. Adapt to 1.7.0-alpha33
+
+---
 # replay 0.1.3-alpha06
 1. Delayed write for WebView Session Replay data.
 2. ft-sdk:> 1.7.0-alpha29
