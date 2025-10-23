@@ -1,5 +1,5 @@
 # replay 0.1.3-alpha07
-1. Adapt to 1.7.0-alpha33
+1. Adapt to ft-sdk:> 1.7.0-alpha33
 
 ---
 # replay 0.1.3-alpha06

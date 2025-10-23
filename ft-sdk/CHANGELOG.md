@@ -1,5 +1,5 @@
 # agent 1.7.0-alpha33
-1. merge from ft-sdk 1.6.15-alpha07
+1. merge from ft-sdk 1.6.15-alpha07, 1.6.15-alpha08
 2. ft-session-replay:>0.1.3-alpha07
 3. Increased the disk write limit for Session Replay
 4. Added RUM Session Replay context association feature,
