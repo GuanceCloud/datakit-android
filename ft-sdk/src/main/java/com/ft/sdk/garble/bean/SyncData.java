@@ -12,6 +12,7 @@ import com.ft.sdk.internal.exception.FTInvalidParameterException;
 import org.json.JSONException;
 
 import java.security.InvalidParameterException;
+import java.util.regex.Pattern;
 
 
 /**
@@ -116,9 +117,8 @@ public class SyncData implements Cloneable {
      */
     public String getDataString(String newUUID) {
         if (newUUID != null) {
-            dataString = dataString.replaceFirst("(" +
-                    Constants.KEY_SDK_DATA_FLAG + "=)(.*)"
-                    + uuid, Constants.KEY_SDK_DATA_FLAG + "=" + newUUID);
+            dataString = dataString.replaceFirst("(sdk_data_id=[^,]*?)" + Pattern.quote(uuid)
+                    , "$1" + newUUID);
         }
         return dataString;
     }

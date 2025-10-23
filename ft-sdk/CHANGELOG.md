@@ -1,3 +1,7 @@
+# agent 1.6.15-alpha08
+1. Fixed the issue above ft-sdk:1.6.15-alpha04 where data retransmission caused data field loss.
+
+---
 # agent 1.6.15-alpha07
 1. Ensure FPS is started from the main thread
 2. Optimized the output of long logs more than 4K
