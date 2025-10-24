@@ -1,3 +1,8 @@
+# agent 1.7.0-alpha34
+1. merge from ft-sdk 1.6.15-alpha09
+2. ft-session-replay:>0.1.3-alpha08
+3. Added full snapshot keyframe Session Replay support for the WebView container
+
 # agent 1.7.0-alpha33
 1. merge from ft-sdk 1.6.15-alpha07, 1.6.15-alpha08
 2. ft-session-replay:>0.1.3-alpha07

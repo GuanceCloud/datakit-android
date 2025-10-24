@@ -235,6 +235,10 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
         recordedDataQueueHandler.clearAndStopProcessingQueue();
     }
 
+    public void forceFullSnapshot() {
+        recordedDataQueueHandler.forceFullSnapshot();
+    }
+
     @Override
     public void registerCallbacks() {
         appContext.registerActivityLifecycleCallbacks(sessionReplayLifecycleCallback);

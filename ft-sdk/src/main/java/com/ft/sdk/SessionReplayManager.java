@@ -23,9 +23,9 @@ import com.ft.sdk.sessionreplay.internal.storage.NoOpRecordWriter;
 import com.ft.sdk.sessionreplay.internal.storage.RecordWriter;
 import com.ft.sdk.sessionreplay.utils.InternalLogger;
 
-import java.util.HashMap;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -105,10 +105,15 @@ public class SessionReplayManager implements FeatureSdkCore {
         }
     }
 
-    //TODO  check stable
     public RecordWriter getCurrentSessionWriter() {
         return sessionReplayFeature.isRecording() ? sessionReplayFeature.getDataWriter()
                 : new NoOpRecordWriter();
+    }
+
+    public void tryGetFullSnapshot() {
+        if (sessionReplayFeature.isRecording()) {
+            sessionReplayFeature.forceFullSnapShot();
+        }
     }
 
     public String getPrivacyLevel() {

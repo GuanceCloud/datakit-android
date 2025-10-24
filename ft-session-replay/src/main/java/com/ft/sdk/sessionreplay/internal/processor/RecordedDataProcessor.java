@@ -199,6 +199,10 @@ public class RecordedDataProcessor implements Processor {
         return false;
     }
 
+    public void resetLastSnapshotTimestamp() {
+        lastSnapshotTimestamp = 0L;
+    }
+
     private void handleViewEndRecord(long timestamp) {
         if (prevRumContext.isValid()) {
             ViewEndRecord viewEndRecord =

@@ -153,6 +153,10 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
         }
     }
 
+    public void forceFullSnapshot() {
+        processor.resetLastSnapshotTimestamp();
+    }
+
     private void logAddToQueueException(Exception e) {
         internalLogger.e(TAG, FAILED_TO_ADD_RECORDS_TO_QUEUE_ERROR_MESSAGE + "," + Log.getStackTraceString(e));
     }

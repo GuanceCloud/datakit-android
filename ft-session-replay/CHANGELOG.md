@@ -1,5 +1,13 @@
+# replay 0.1.3-alpha08
+1. ft-sdk:> 1.7.0-alpha34
+2. Added full snapshot keyframe Session Replay support for the WebView container
+
+---
 # replay 0.1.3-alpha07
-1. Adapt to ft-sdk:> 1.7.0-alpha33
+1. ft-sdk:> 1.7.0-alpha33
+2. Increased the disk write limit for Session Replay
+3. Added RUM Session Replay context association feature,
+   and associated the WebView container with the context of the loaded HTML.
 
 ---
 # replay 0.1.3-alpha06

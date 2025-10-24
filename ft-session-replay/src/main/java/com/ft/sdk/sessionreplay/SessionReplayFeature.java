@@ -16,6 +16,7 @@ import com.ft.sdk.sessionreplay.internal.TouchPrivacyManager;
 import com.ft.sdk.sessionreplay.internal.persistence.TrackingConsent;
 import com.ft.sdk.sessionreplay.internal.recorder.NoOpRecorder;
 import com.ft.sdk.sessionreplay.internal.recorder.Recorder;
+import com.ft.sdk.sessionreplay.internal.recorder.SessionReplayRecorder;
 import com.ft.sdk.sessionreplay.internal.resources.ResourceDataStoreManager;
 import com.ft.sdk.sessionreplay.internal.resources.ResourceHashesEntryDeserializer;
 import com.ft.sdk.sessionreplay.internal.resources.ResourceHashesEntrySerializer;
@@ -166,7 +167,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
         return dataWriter;
     }
 
-    public String [] getLinkRumKeys(){
+    public String[] getLinkRumKeys() {
         return linkRumKeys;
     }
 
@@ -236,6 +237,12 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
         dataWriter = new NoOpRecordWriter();
         sessionReplayRecorder = new NoOpRecorder();
         initialized.set(false);
+    }
+
+    public void forceFullSnapShot() {
+        if (sessionReplayRecorder instanceof SessionReplayRecorder) {
+            ((SessionReplayRecorder) sessionReplayRecorder).forceFullSnapshot();
+        }
     }
 
     @Override
