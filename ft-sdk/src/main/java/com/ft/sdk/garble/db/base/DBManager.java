@@ -241,11 +241,9 @@ public abstract class DBManager {
      * Try to close database
      */
     public void tryToClose() {
-        if (DBScheduleThreadPool.get().poolRunning()) {
-            openCounter.set(Math.max(0, openCounter.get() - 1));
-            lastUsedTime.set(System.currentTimeMillis());
-            scheduleCloseIfIdle();
-        }
+        openCounter.set(Math.max(0, openCounter.get() - 1));
+        lastUsedTime.set(System.currentTimeMillis());
+        scheduleCloseIfIdle();
     }
 
     /**
@@ -254,8 +252,7 @@ public abstract class DBManager {
     protected void shutDown() {
         synchronized (dbLock) {
             cancelPendingClose();
-
-
+            openCounter.set(0);
             DBScheduleThreadPool.get().execute(new Runnable() {
                 @Override
                 public void run() {

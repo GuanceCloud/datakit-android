@@ -130,6 +130,10 @@
 1. Support for enabling session replay recording feature
 
 ---
+# agent 1.6.15-alpha09
+1. Fixed the issue where reinitialization after SDK shutdown could not trigger idle shutdown.
+
+---
 # agent 1.6.15-alpha08
 1. Fixed the issue above ft-sdk:1.6.15-alpha04 where data retransmission caused data field loss.
 
