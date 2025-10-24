@@ -27,7 +27,6 @@ public class DBScheduleThreadPool extends BaseThreadPool {
 
     public ScheduledFuture<?> schedule(Runnable runnable, long delayMS) {
         if (!poolRunning()) {
-            LogUtils.d(TAG," DBScheduleThreadPool reStartPool");
             reStartPool();
         }
         return ((ScheduledThreadPoolExecutor) executor).schedule(runnable, delayMS, TimeUnit.MILLISECONDS);
