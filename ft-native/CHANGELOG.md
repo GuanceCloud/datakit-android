@@ -1,3 +1,7 @@
+# native 1.1.3-alpha01
+1. Added null address detection for native crashes.
+
+----------------------
 # native 1.1.2
 1. Added support for Android 16K page size (Android 15+ compatibility)
 
