@@ -154,7 +154,7 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
     }
 
     public void forceFullSnapshot() {
-        processor.resetLastSnapshotTimestamp();
+        processor.forceNewNextView();
     }
 
     private void logAddToQueueException(Exception e) {
@@ -173,5 +173,5 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
 
     @VisibleForTesting
     static final String ITEM_DROPPED_EXPIRED_MESSAGE =
-            "SR RecordedDataQueueHandler: dropped item from the queue. age=%d ms";
+            "SR RecordedDataQueueHandler: dropped item from the queue. age=%d ns";
 }

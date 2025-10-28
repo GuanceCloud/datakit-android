@@ -1,3 +1,7 @@
+# replay 0.1.3-alpha10
+1. Added meta data for forceFullSnapshot
+
+---
 # replay 0.1.3-alpha09
 1. ft-sdk:> 1.7.0-alpha34
 2. Added null value check for rumLinkKey.

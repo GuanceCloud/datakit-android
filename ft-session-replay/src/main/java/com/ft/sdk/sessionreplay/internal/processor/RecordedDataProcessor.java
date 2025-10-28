@@ -40,6 +40,7 @@ public class RecordedDataProcessor implements Processor {
 
     private List<Wireframe> prevSnapshot = new LinkedList<>();
     private long lastSnapshotTimestamp = 0L;
+    private boolean forceNewNextView = false;
     private int previousOrientation = Configuration.ORIENTATION_UNDEFINED;
     private SessionReplayRumContext prevRumContext = new SessionReplayRumContext();
     private final FeatureSdkCore sdkCore;
@@ -124,7 +125,7 @@ public class RecordedDataProcessor implements Processor {
         boolean fullSnapshotRequired = isNewView || isTimeForFullSnapshot || screenOrientationChanged;
 
 
-        if (isNewView) {
+        if (isNewView || forceNewNextView) {
             handleViewEndRecord(timestamp);
             MetaRecord metaRecord = new MetaRecord(
                     timestamp,
@@ -139,6 +140,9 @@ public class RecordedDataProcessor implements Processor {
             );
             records.add(metaRecord);
             records.add(focusRecord);
+            if (forceNewNextView) {
+                forceNewNextView = false;
+            }
         }
 
         if (screenOrientationChanged) {
@@ -199,8 +203,8 @@ public class RecordedDataProcessor implements Processor {
         return false;
     }
 
-    public void resetLastSnapshotTimestamp() {
-        lastSnapshotTimestamp = 0L;
+    public void forceNewNextView() {
+        forceNewNextView = true;
     }
 
     private void handleViewEndRecord(long timestamp) {
