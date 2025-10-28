@@ -1,7 +1,8 @@
 apply plugin: 'com.android.library'
 
 ext {
-    pkgVersion = "0.1.3-alpha08"
+    pkgVersion = "0.1.3-alpha09"
+    miniAgentSupport = "1.7.0-alpha34"
     mavenGroupId = "com.cloudcare.ft.mobile.sdk.tracker.agent"
     mavenArtifactId = "ft-session-replay"
     withSourceCode = false
@@ -19,6 +20,7 @@ android {
         consumerProguardFiles "consumer-rules.pro"
 
         buildConfigField("String", "VERSION_NAME", "\"${pkgVersion}\"")
+        buildConfigField("String", "MINI_AGENT_SUPPORT", "\"${miniAgentSupport}\"")
     }
 
     buildTypes {

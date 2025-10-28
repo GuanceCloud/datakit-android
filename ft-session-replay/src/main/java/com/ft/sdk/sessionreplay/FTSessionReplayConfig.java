@@ -25,7 +25,7 @@ public class FTSessionReplayConfig {
     private float sampleRate = 1f;
     private float sessionReplayOnErrorSampleRate = 1f;
     private boolean delayInit;
-    private String[] rumLinkKeys;
+    private String[] rumLinkKeys = new String[]{};
     private boolean fineGrainedMaskingSet = false;
     private boolean dynamicOptimizationEnabled = true;
     private SessionReplayInternalCallback internalCallback = new NoSessionReplayInternalCallback();

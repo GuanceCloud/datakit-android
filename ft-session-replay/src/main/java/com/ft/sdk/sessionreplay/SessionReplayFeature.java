@@ -129,7 +129,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
         this.sessionRelaySampler = sessionReplaySampler;
         this.sessionRelayErrorSampler = sessionReplayErrorSampler;
         this.recorderProvider = recorderProvider;
-        this.linkRumKeys = linkRumKeys;
+        this.linkRumKeys = linkRumKeys == null ? new String[]{} : linkRumKeys;
     }
 
     public SessionReplayFeature(FeatureSdkCore sdkCore, String customEndpointUrl,
