@@ -1,3 +1,8 @@
+# replay 0.1.3-alpha09
+1. ft-sdk:> 1.7.0-alpha34
+2. Added null value check for rumLinkKey.
+
+---
 # replay 0.1.3-alpha08
 1. ft-sdk:> 1.7.0-alpha34
 2. Added full snapshot keyframe Session Replay support for the WebView container
