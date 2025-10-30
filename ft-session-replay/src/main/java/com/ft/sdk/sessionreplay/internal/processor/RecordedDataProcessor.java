@@ -66,6 +66,10 @@ public class RecordedDataProcessor implements Processor {
         String resourceHash = item.getIdentifier();
         boolean isKnownResource = resourceDataStoreManager.isPreviouslySentResource(resourceHash);
         if (!isKnownResource) {
+            if(resourceDataStoreManager.isReady()){
+                resourceDataStoreManager.cacheResourceHash(resourceHash);
+            }
+
             EnrichedResource enrichedResource = new EnrichedResource(
                     item.getResourceData(),
                     item.getApplicationId(),

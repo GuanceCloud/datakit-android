@@ -104,7 +104,6 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
     }
 
     @Override
-    @MainThread
     public void tryToConsumeItems() {
         if (recordedDataQueue.isEmpty()) {
             return;

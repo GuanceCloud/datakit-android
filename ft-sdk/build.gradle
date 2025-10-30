@@ -2,7 +2,8 @@ apply plugin: 'com.android.library'
 
 ext {
     //Append "-SNAPSHOT" to the end of snapshot version number for publishing
-    pkgVersion = "1.7.0-alpha34"
+    pkgVersion = "1.7.0-alpha35"
+    miniReplaySupport ="0.1.3-alpha10"
 
     mavenGroupId = "com.cloudcare.ft.mobile.sdk.tracker.agent"
     mavenArtifactId = "ft-sdk"
@@ -18,6 +19,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "FT_SDK_VERSION", "\"${pkgVersion}\"")
+        buildConfigField("String", "REPLAY_MINI_SUPPORT", "\"${miniReplaySupport}\"")
 
     }
 

@@ -12,7 +12,7 @@ import com.ft.sdk.sessionreplay.SessionReplayFeature;
 
 public class SessionReplay {
     private static final String TAG = "SessionReplay";
-    public static final String VERSION_LARGER_THAN = "0.1.3-alpha07";
+    public static final String VERSION_LARGER_THAN = com.ft.sdk.BuildConfig.REPLAY_MINI_SUPPORT;
 
     /**
      * Enables a SessionReplay feature based on the configuration provided.

@@ -1,3 +1,8 @@
+# agent 1.7.0-alpha35
+1. ft-session-replay:>0.1.3-alpha10
+2. Optimized frame generation and consumption logic.
+3. Fixed the issue where recording failed due to bitmap recycling.
+
 # agent 1.7.0-alpha34
 1. merge from ft-sdk 1.6.15-alpha09
 2. ft-session-replay:>0.1.3-alpha08

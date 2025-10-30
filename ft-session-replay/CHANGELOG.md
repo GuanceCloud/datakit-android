@@ -1,5 +1,8 @@
 # replay 0.1.3-alpha10
-1. Added meta data for forceFullSnapshot
+1. Added meta data for forceFullSnapshot.
+2. Optimized frame generation and consumption logic.
+3. Fixed the issue where recording failed due to bitmap recycling.
+4. ft-sdk:> 1.7.0-alpha35
 
 ---
 # replay 0.1.3-alpha09

@@ -122,6 +122,7 @@ public class WindowsOnDrawListener implements ViewTreeObserver.OnDrawListener {
             item.setFinishedTraversal(true);
 
             if (item.isReady()) {
+                //System.out.println("[FT-SDK] tryToConsumeItems from window");
                 recordedDataQueueHandler.tryToConsumeItems();
             }
             touchPrivacyManager.updateCurrentTouchOverrideAreas();

@@ -40,6 +40,7 @@ import com.ft.sdk.sessionreplay.internal.persistence.BatchFileReaderWriterFactor
 import com.ft.sdk.sessionreplay.internal.persistence.BatchProcessingLevel;
 import com.ft.sdk.sessionreplay.internal.persistence.DataUploadConfiguration;
 import com.ft.sdk.sessionreplay.internal.persistence.EventBatchWriterCallback;
+import com.ft.sdk.sessionreplay.internal.persistence.FileReaderWriter;
 import com.ft.sdk.sessionreplay.internal.persistence.Storage;
 import com.ft.sdk.sessionreplay.internal.persistence.TrackingConsent;
 import com.ft.sdk.sessionreplay.internal.persistence.UploadFrequency;
@@ -107,15 +108,7 @@ public class SDKFeature implements FeatureScope {
 
         if (wrappedFeature instanceof StorageBackedFeature) {
             String featureName = wrappedFeature.getName();
-            FeatureStorageConfiguration storageConfiguration = ((StorageBackedFeature) wrappedFeature).getStorageConfiguration();
-            storage = createFileStorage(featureName, new FilePersistenceConfig(
-                    storageConfiguration.getMaxBatchSize(),
-                    storageConfiguration.getMaxItemSize()
-            ));
-
-            webStorage = createFileStorage(featureName,
-                    new FilePersistenceConfig(storageConfiguration.getMaxBatchSize(),
-                            storageConfiguration.getMaxItemSize()));
+            prepareStorage(featureName);
 
             dataUploadConfiguration = new DataUploadConfiguration(UploadFrequency.FREQUENT,
                     BatchProcessingLevel.MEDIUM.getMaxBatchesPerUploadJob());
@@ -139,6 +132,20 @@ public class SDKFeature implements FeatureScope {
         initialized.set(true);
         uploadScheduler.startScheduling();
         watcher.register(context);
+    }
+
+    private void prepareStorage(String featureName) {
+        if (featureName.equals(Feature.SESSION_REPLAY_FEATURE_NAME)) {
+            FeatureStorageConfiguration storageConfiguration = ((StorageBackedFeature) wrappedFeature).getStorageConfiguration();
+            storage = createFileStorage(featureName, new FilePersistenceConfig(
+                    storageConfiguration.getMaxBatchSize(),
+                    storageConfiguration.getMaxItemSize()
+            ));
+
+            webStorage = createFileStorage(featureName,
+                    new FilePersistenceConfig(storageConfiguration.getMaxBatchSize(),
+                            storageConfiguration.getMaxItemSize()));
+        }
     }
 
     private void setupUploader(Feature feature, DataUploadConfiguration configuration, FTSDKConfig config) {
@@ -246,17 +253,20 @@ public class SDKFeature implements FeatureScope {
 
             }
         };
+        boolean isResource = featureName.equals(Feature.SESSION_REPLAY_RESOURCES_FEATURE_NAME);
 
         return new ConsentAwareStorage(new ThreadPoolFactory(featureName).getExecutor(),
                 new BatchFileOrchestrator(new File(FTApplication.getApplication().getCacheDir(),
-                        SessionReplayConstants.PATH_SESSION_REPLAY), new FilePersistenceConfig(),
+                        isResource ? SessionReplayConstants.PATH_SESSION_REPLAY_RESOURCE :
+                                SessionReplayConstants.PATH_SESSION_REPLAY), new FilePersistenceConfig(),
                         internalLogger, dispatcher),
                 new BatchFileOrchestrator(new File(FTApplication.getApplication().getCacheDir(),
-                        SessionReplayConstants.PATH_SESSION_REPLAY_ERROR_SAMPLED), new FilePersistenceConfig(),
+                        isResource ? SessionReplayConstants.PATH_SESSION_REPLAY_ERROR_RESOURCE_SAMPLED
+                                : SessionReplayConstants.PATH_SESSION_REPLAY_ERROR_SAMPLED), new FilePersistenceConfig(),
                         internalLogger, dispatcher),
                 null,
                 BatchFileReaderWriterFactory.create(internalLogger, null),
-                null,
+                FileReaderWriter.create(internalLogger, null),
                 new FileMover(internalLogger),
                 internalLogger,
                 filePersistenceConfig,
