@@ -137,10 +137,10 @@ public class SessionReplayUploader {
 
         if (result.isSuccess()) {
             internalLogger.d(TAG, "Session Upload Success. " + result.getPkgId()
-                    + ",view_id:" + viewId
-                    + contextString
-                    + ",count:" + recordsCount + ",fullSnapshot"
-//                    + hasFullSnapshot + (hasFullSnapshot ? "\n" + jsonString : "")
+                            + ",view_id:" + viewId
+                            + contextString
+                            + ",count:" + recordsCount + ",fullSnapshot:" + hasFullSnapshot
+//                     + (hasFullSnapshot ? "\n" + jsonString : "")
             );
         } else {
             internalLogger.e(TAG, "Session Upload Failed." + result.getPkgId() + ",view_id:"
