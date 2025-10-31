@@ -104,6 +104,7 @@ public class SDKFeature implements FeatureScope {
         if (initialized.get()) {
             return;
         }
+
         DataUploadConfiguration dataUploadConfiguration;
 
         if (wrappedFeature instanceof StorageBackedFeature) {

@@ -1,3 +1,8 @@
+# replay 0.1.3-alpha11
+1. ft-sdk:> 1.7.0-alpha36
+2. Optimized the linkView frame completion process during Replay data sharding.
+
+---
 # replay 0.1.3-alpha10
 1. Added meta data for forceFullSnapshot.
 2. Optimized frame generation and consumption logic.

@@ -2,8 +2,8 @@ apply plugin: 'com.android.library'
 
 ext {
     //Append "-SNAPSHOT" to the end of snapshot version number for publishing
-    pkgVersion = "1.7.0-alpha35"
-    miniReplaySupport ="0.1.3-alpha10"
+    pkgVersion = "1.7.0-alpha36"
+    miniReplaySupport ="0.1.3-alpha11"
 
     mavenGroupId = "com.cloudcare.ft.mobile.sdk.tracker.agent"
     mavenArtifactId = "ft-sdk"

@@ -15,7 +15,6 @@ import com.ft.sdk.garble.utils.DCSWebViewUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.TBSWebViewUtils;
 import com.ft.sdk.garble.utils.Utils;
-import com.ft.sdk.sessionreplay.internal.recorder.SessionReplayRecorder;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -270,7 +269,8 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                                             FTRUMInnerManager.get().updateWebviewContainerProperty(nativeViewId, rumLinkData);
                                             //link globalContext with Native Container View
                                             SessionReplayManager.get().appendSessionReplayRUMLinkKeysWithView(nativeViewId, rumLinkData);
-                                            SessionReplayManager.get().tryGetFullSnapshot();
+                                            SessionReplayManager.get().tryGetFullSnapshotForLinkView();
+                                            LogUtils.e(LOG_TAG,"tryGetFullSnapshot:"+nativeViewId);
 
                                         }
                                     }

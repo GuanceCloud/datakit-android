@@ -5,14 +5,11 @@ import android.content.Context;
 
 import com.ft.sdk.feature.FeatureSdkCore;
 import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.sdk.garble.utils.VersionUtils;
-import com.ft.sdk.sessionreplay.BuildConfig;
 import com.ft.sdk.sessionreplay.FTSessionReplayConfig;
 import com.ft.sdk.sessionreplay.SessionReplayFeature;
 
 public class SessionReplay {
     private static final String TAG = "SessionReplay";
-    public static final String VERSION_LARGER_THAN = com.ft.sdk.BuildConfig.REPLAY_MINI_SUPPORT;
 
     /**
      * Enables a SessionReplay feature based on the configuration provided.
@@ -23,11 +20,14 @@ public class SessionReplay {
             FTSessionReplayConfig ftSessionReplayConfig, Context context
     ) {
         FeatureSdkCore featureSdkCore = SessionReplayManager.get();
-        if (!VersionUtils.firstVerGreaterEqual(BuildConfig.VERSION_NAME, VERSION_LARGER_THAN)) {
-            featureSdkCore.getInternalLogger().e(TAG, "need install more than ft-session-replay:"
-                    + VERSION_LARGER_THAN);
+        
+        // Double-check version compatibility when SessionReplay.enable() is called
+        if (SDKVersionValidator.validateSDKVersions()) {
+            featureSdkCore.getInternalLogger().e(TAG, "SDK version mismatch detected," +
+                    " SessionReplay enable failed");
             return;
         }
+
         LogUtils.d(TAG, "init SR:" + ftSessionReplayConfig);
         featureSdkCore.init(context);
         SessionReplayFeature sessionReplayFeature = new SessionReplayFeature(

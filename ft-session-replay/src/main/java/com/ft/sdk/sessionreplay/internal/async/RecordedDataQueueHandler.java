@@ -152,8 +152,8 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
         }
     }
 
-    public void forceFullSnapshot() {
-        processor.forceNewNextView();
+    public void forceFullSnapshotForLinkView() {
+        processor.forceNewNextViewForLinkView();
     }
 
     private void logAddToQueueException(Exception e) {

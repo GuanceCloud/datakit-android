@@ -239,9 +239,9 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
         initialized.set(false);
     }
 
-    public void forceFullSnapShot() {
+    public void forceFullSnapShotForLinkView() {
         if (sessionReplayRecorder instanceof SessionReplayRecorder) {
-            ((SessionReplayRecorder) sessionReplayRecorder).forceFullSnapshot();
+            ((SessionReplayRecorder) sessionReplayRecorder).forceFullSnapshotForLinkView();
         }
     }
 

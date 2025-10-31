@@ -32,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 public class RecordedDataProcessor implements Processor {
 
+    private static final String TAG = "RecordedDataProcessor";
     private final ResourceDataStoreManager resourceDataStoreManager;
     private final ResourcesWriter resourcesWriter;
     private final RecordWriter writer;
@@ -40,7 +41,7 @@ public class RecordedDataProcessor implements Processor {
 
     private List<Wireframe> prevSnapshot = new LinkedList<>();
     private long lastSnapshotTimestamp = 0L;
-    private boolean forceNewNextView = false;
+    private boolean forceNewNextViewForLinkView = false;
     private int previousOrientation = Configuration.ORIENTATION_UNDEFINED;
     private SessionReplayRumContext prevRumContext = new SessionReplayRumContext();
     private final FeatureSdkCore sdkCore;
@@ -66,7 +67,7 @@ public class RecordedDataProcessor implements Processor {
         String resourceHash = item.getIdentifier();
         boolean isKnownResource = resourceDataStoreManager.isPreviouslySentResource(resourceHash);
         if (!isKnownResource) {
-            if(resourceDataStoreManager.isReady()){
+            if (resourceDataStoreManager.isReady()) {
                 resourceDataStoreManager.cacheResourceHash(resourceHash);
             }
 
@@ -122,14 +123,15 @@ public class RecordedDataProcessor implements Processor {
         }
 
         List<MobileRecord> records = new LinkedList<>();
-        boolean isNewView = isNewView(newRumContext);
+        boolean isNewViewForContextLink = forceNewNextViewForLinkView && !newRumContext.getGlobalContext().isEmpty();
+        boolean isNewView = isNewView(newRumContext) || isNewViewForContextLink;
         boolean isTimeForFullSnapshot = isTimeForFullSnapshot();
         boolean screenOrientationChanged = systemInformation.getScreenOrientation() != previousOrientation;
         boolean isSessionReplayErrorSampled = sdkCore.getConsentProvider() == TrackingConsent.SAMPLED_ON_ERROR_SESSION;
         boolean fullSnapshotRequired = isNewView || isTimeForFullSnapshot || screenOrientationChanged;
 
 
-        if (isNewView || forceNewNextView) {
+        if (isNewView) {
             handleViewEndRecord(timestamp);
             MetaRecord metaRecord = new MetaRecord(
                     timestamp,
@@ -144,8 +146,9 @@ public class RecordedDataProcessor implements Processor {
             );
             records.add(metaRecord);
             records.add(focusRecord);
-            if (forceNewNextView) {
-                forceNewNextView = false;
+            if (isNewViewForContextLink) {
+                sdkCore.getInternalLogger().e(TAG, "forceNewNextView:" + newRumContext.getViewId());
+                forceNewNextViewForLinkView = false;
             }
         }
 
@@ -195,7 +198,9 @@ public class RecordedDataProcessor implements Processor {
         previousOrientation = systemInformation.getScreenOrientation();
 
         if (!records.isEmpty()) {
-            writer.write(bundleRecordInEnrichedRecord(newRumContext, records));
+            EnrichedRecord record = bundleRecordInEnrichedRecord(newRumContext, records);
+            writer.write(record);
+//            sdkCore.getInternalLogger().e(TAG, "records"+record.toJson());
         }
     }
 
@@ -207,8 +212,8 @@ public class RecordedDataProcessor implements Processor {
         return false;
     }
 
-    public void forceNewNextView() {
-        forceNewNextView = true;
+    public void forceNewNextViewForLinkView() {
+        forceNewNextViewForLinkView = true;
     }
 
     private void handleViewEndRecord(long timestamp) {

@@ -110,9 +110,9 @@ public class SessionReplayManager implements FeatureSdkCore {
                 : new NoOpRecordWriter();
     }
 
-    public void tryGetFullSnapshot() {
+    public void tryGetFullSnapshotForLinkView() {
         if (sessionReplayFeature.isRecording()) {
-            sessionReplayFeature.forceFullSnapShot();
+            sessionReplayFeature.forceFullSnapShotForLinkView();
         }
     }
 
