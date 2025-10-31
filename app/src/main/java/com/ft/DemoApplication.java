@@ -16,9 +16,9 @@ import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.sessionreplay.CustomExtensionSupport;
 import com.ft.sdk.sessionreplay.FTSessionReplayConfig;
 import com.ft.sdk.sessionreplay.MapperTypeWrapper;
-import com.ft.sdk.sessionreplay.CustomExtensionSupport;
 import com.ft.sdk.sessionreplay.SessionReplayPrivacy;
 import com.ft.sdk.sessionreplay.internal.recorder.mapper.WebViewXWireframeMapper;
 import com.ft.sdk.sessionreplay.material.MaterialExtensionSupport;
@@ -191,6 +191,7 @@ public class DemoApplication extends BaseApplication {
                         .setSampleRate(1f)
                         .setSessionReplayOnErrorSampleRate(1f)
                         .setPrivacy(SessionReplayPrivacy.ALLOW)
+                        .enableLinkRUMKeys(new String[]{"wgt_id"})
 //                .setTouchPrivacy(TouchPrivacy.SHOW)
                         .addExtensionSupport(new MaterialExtensionSupport())
                         .addExtensionSupport(new CustomExtensionSupport()

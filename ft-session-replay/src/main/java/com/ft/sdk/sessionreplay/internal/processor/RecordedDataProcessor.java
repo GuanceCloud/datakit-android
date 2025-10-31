@@ -147,7 +147,7 @@ public class RecordedDataProcessor implements Processor {
             records.add(metaRecord);
             records.add(focusRecord);
             if (isNewViewForContextLink) {
-                sdkCore.getInternalLogger().e(TAG, "forceNewNextView:" + newRumContext.getViewId());
+                sdkCore.getInternalLogger().d(TAG, "forceNewNextView:" + newRumContext.getViewId());
                 forceNewNextViewForLinkView = false;
             }
         }

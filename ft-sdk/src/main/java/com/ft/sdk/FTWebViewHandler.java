@@ -270,7 +270,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                                             //link globalContext with Native Container View
                                             SessionReplayManager.get().appendSessionReplayRUMLinkKeysWithView(nativeViewId, rumLinkData);
                                             SessionReplayManager.get().tryGetFullSnapshotForLinkView();
-                                            LogUtils.e(LOG_TAG,"tryGetFullSnapshot:"+nativeViewId);
+                                            LogUtils.d(LOG_TAG,"tryGetFullSnapshot:"+nativeViewId);
 
                                         }
                                     }

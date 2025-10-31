@@ -200,7 +200,7 @@ public class WebViewActivity extends AppCompatActivity {
         // Method to load URL when tab is first selected
         public void loadUrlIfNeeded() {
             if (!isLoaded && webView != null && url != null) {
-                FTAutoTrack.loadUrl(webView, url);
+                webView.loadUrl(url);
                 isLoaded = true;
             }
         }
