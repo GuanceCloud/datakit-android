@@ -1,3 +1,7 @@
+# agent 1.6.15-beta01
+1. Same as 1.6.15-alpha09
+
+---
 # agent 1.6.15-alpha09
 1. Fixed the issue where reinitialization after SDK shutdown could not trigger idle shutdown.
 
