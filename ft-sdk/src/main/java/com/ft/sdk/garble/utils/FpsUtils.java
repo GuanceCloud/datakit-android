@@ -4,6 +4,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.view.Choreographer;
 
+import com.ft.sdk.DeviceMetricsMonitorType;
+import com.ft.sdk.FTMonitorManager;
+
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -57,6 +60,57 @@ public class FpsUtils {
     }
 
     /**
+     * Stop FPS monitoring
+     */
+    public void stop() {
+        runOnMainThread(() -> {
+            if (metronome != null) {
+                metronome.stop();
+            }
+        });
+    }
+
+    /**
+     * Check if FPS monitoring is currently active
+     *
+     * @return true if monitoring is active, false otherwise
+     */
+    public boolean isMonitoring() {
+        return metronome != null && metronome.isActive();
+    }
+
+    /**
+     * Handle app foreground event
+     * Checks if FPS monitoring should be enabled and starts if not already started
+     *
+     */
+    public static void onAppForeground() {
+        runOnMainThread(() -> {
+            FTMonitorManager monitorManager = FTMonitorManager.get();
+            if (monitorManager.isDeviceMetricsMonitorType(DeviceMetricsMonitorType.FPS)) {
+                FpsUtils instance = get();
+                if (!instance.isMonitoring()) {
+                    instance.start();
+                }
+            }
+        });
+    }
+
+
+    /**
+     * Handle app background event
+     * Stops FPS monitoring if currently active
+     */
+    public static void onAppBackground() {
+        runOnMainThread(() -> {
+            FpsUtils instance = get();
+            if (instance.isMonitoring()) {
+                instance.stop();
+            }
+        });
+    }
+
+    /**
      * Release resources with automatic main thread adaptation
      */
     public static void release() {
@@ -96,9 +150,19 @@ public class FpsUtils {
 
         private int interval = 1000;
         private Audience audience;
+        private boolean isActive = false;
 
         public Metronome() {
             choreographer = Choreographer.getInstance();
+        }
+
+        /**
+         * Check if monitoring is currently active
+         *
+         * @return true if active, false otherwise
+         */
+        public boolean isActive() {
+            return isActive;
         }
 
         /**
@@ -106,6 +170,7 @@ public class FpsUtils {
          */
         public void start() {
             runOnMainThread(() -> {
+                isActive = true;
                 choreographer.removeFrameCallback(this);
                 choreographer.postFrameCallback(this);
             });
@@ -116,6 +181,7 @@ public class FpsUtils {
          */
         public void stop() {
             runOnMainThread(() -> {
+                isActive = false;
                 frameStartTime = 0;
                 framesRendered = 0;
                 choreographer.removeFrameCallback(this);

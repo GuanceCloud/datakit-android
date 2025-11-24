@@ -1,5 +1,5 @@
-# agent 1.6.15-beta01
-1. Same as 1.6.15-alpha09
+# agent 1.6.15-alpha10
+1. Optimized the FPS monitoring mechanism by stopping detection when the app is in the background.
 
 ---
 # agent 1.6.15-alpha09

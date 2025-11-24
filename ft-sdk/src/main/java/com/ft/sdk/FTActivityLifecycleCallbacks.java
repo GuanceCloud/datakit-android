@@ -10,7 +10,7 @@ import androidx.annotation.Nullable;
 
 import com.ft.sdk.garble.gesture.WindowCallbackTracker;
 import com.ft.sdk.garble.utils.Constants;
-import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.FpsUtils;
 
 import java.util.HashMap;
 
@@ -71,6 +71,8 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
         mFragmentLifecycleHelper.register(activity);
         if (activityCount > 0) {
             FTActivityManager.get().appForeground();
+            // Handle FPS monitoring lifecycle
+            FpsUtils.onAppForeground();
         }
     }
 
@@ -188,6 +190,8 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
         if (activityCount == 0) {
             mAppRestartCallback.onEnterBackground();
             FTActivityManager.get().appBackGround();
+            // Handle FPS monitoring lifecycle
+            FpsUtils.onAppBackground();
         }
         mFragmentLifecycleHelper.unregister(activity);
     }
