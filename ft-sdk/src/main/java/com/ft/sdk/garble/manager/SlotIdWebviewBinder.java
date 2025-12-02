@@ -19,6 +19,11 @@ public class SlotIdWebviewBinder {
      * Mapping of slotId (String) -> ViewBindingInfo (contains viewId and callback)
      */
     private final ConcurrentHashMap<String, ViewBindingInfo> slotIdToViewIdMap = new ConcurrentHashMap<>();
+    
+    /**
+     * Maximum size limit for slotIdToViewIdMap
+     */
+    private static final int MAX_MAP_SIZE = 20;
 
     /**
      * Callback interface for notifying view changes
@@ -88,15 +93,6 @@ public class SlotIdWebviewBinder {
         return instance;
     }
 
-    /**
-     * Bind slotId and viewId
-     *
-     * @param slotId WebView's slotId (System.identityHashCode)
-     * @param viewId Native View's viewId
-     */
-    public void bind(String slotId, String viewId) {
-        bind(slotId, viewId, null);
-    }
 
     /**
      * Bind slotId, viewId and callback
@@ -130,6 +126,15 @@ public class SlotIdWebviewBinder {
                     LogUtils.d(LOG_TAG, "ViewId changed for slotId: " + slotId + ", old viewId: " + existingInfo.getViewId() + ", new viewId: " + viewId + ", notifying callback");
                     callbackToNotify.onViewChanged(viewId);
                 }
+            }
+
+            // Check if map size limit is reached and remove oldest entry if needed
+            // If slotId already exists, we're updating it, so no need to remove
+            if (existingInfo == null && slotIdToViewIdMap.size() >= MAX_MAP_SIZE) {
+                // Remove the first entry found to make room for new entry
+                String firstKey = slotIdToViewIdMap.keySet().iterator().next();
+                slotIdToViewIdMap.remove(firstKey);
+                LogUtils.d(LOG_TAG, "Map size limit reached (" + MAX_MAP_SIZE + "), removed oldest entry: " + firstKey);
             }
 
             // Store new binding info
@@ -182,42 +187,6 @@ public class SlotIdWebviewBinder {
      */
     public String getViewId(long slotId) {
         return getViewId(String.valueOf(slotId));
-    }
-
-    /**
-     * Get the binding info by slotId
-     *
-     * @param slotId WebView's slotId
-     * @return The ViewBindingInfo, or null if not found
-     */
-    public ViewBindingInfo getBindingInfo(String slotId) {
-        if (slotId == null) {
-            return null;
-        }
-        return slotIdToViewIdMap.get(slotId);
-    }
-
-    /**
-     * Remove the binding relationship of slotId
-     *
-     * @param slotId WebView's slotId
-     */
-    public void unbind(String slotId) {
-        if (slotId != null) {
-            ViewBindingInfo removed = slotIdToViewIdMap.remove(slotId);
-            if (removed != null) {
-                LogUtils.d(LOG_TAG, "Unbind slotId: " + slotId);
-            }
-        }
-    }
-
-    /**
-     * Remove the binding relationship of slotId (using long type slotId)
-     *
-     * @param slotId WebView's slotId
-     */
-    public void unbind(long slotId) {
-        unbind(String.valueOf(slotId));
     }
 
     /**
