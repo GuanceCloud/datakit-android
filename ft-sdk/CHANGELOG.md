@@ -147,6 +147,10 @@
 1. Support for enabling session replay recording feature
 
 ---
+# agent 1.6.15-alpha10
+1. Optimized the FPS monitoring mechanism by stopping detection when the app is in the background.
+
+---
 # agent 1.6.15-alpha09
 1. Fixed the issue where reinitialization after SDK shutdown could not trigger idle shutdown.
 

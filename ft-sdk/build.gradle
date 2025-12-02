@@ -17,7 +17,7 @@ android {
         targetSdkVersion 34
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
+        consumerProguardFiles 'consumer-rules.pro'
         buildConfigField("String", "FT_SDK_VERSION", "\"${pkgVersion}\"")
         buildConfigField("String", "REPLAY_MINI_SUPPORT", "\"${miniReplaySupport}\"")
 
