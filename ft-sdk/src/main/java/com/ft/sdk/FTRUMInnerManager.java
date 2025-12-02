@@ -176,13 +176,7 @@ public class FTRUMInnerManager {
                         long loadTime = activeView.getLoadTime();
 
                         activeView = new ActiveViewBean(viewName, viewReferrer, loadTime, sessionId);
-                        if (property != null) {
-                            activeView.getProperty().putAll(property);
-                        }
-                        activeView.setCollectType(checkSessionWillCollect(sessionId));
-                        FTMonitorManager.get().addMonitor(activeView.getId());
-                        FTMonitorManager.get().attachMonitorData(activeView);
-                        initView(activeView);
+                        createNewView(activeView, property);
                         LogUtils.d(TAG, "Session Track -> checkRefreshView sessionId:" + activeView.getSessionId() + ",viewId:" + activeView.getId());
                     }
                 }
@@ -508,17 +502,8 @@ public class FTRUMInnerManager {
         }
         String viewReferrer = getLastView();
         activeView = new ActiveViewBean(viewName, viewReferrer, loadTime, sessionId);
-        if (property != null) {
-            activeView.getProperty().putAll(property);
-        }
-        activeView.setTags(FTRUMConfigManager.get().getRUMPublicDynamicTags());
-        activeView.setCollectType(checkSessionWillCollect(activeView.getSessionId()));
-        FTMonitorManager.get().addMonitor(activeView.getId());
-        FTMonitorManager.get().attachMonitorData(activeView);
-        initView(activeView);
+        createNewView(activeView, property);
 //        lastUserActiveTime = activeView.getStartTime();
-        SessionReplayManager.get().appendSessionReplayRUMLinkKeysWithView(activeView.getId(), property);
-
     }
 
     /**
@@ -601,11 +586,28 @@ public class FTRUMInnerManager {
     }
 
     /**
+     *
+     * @param newView
+     * @param property
+     */
+    private void createNewView(ActiveViewBean newView, HashMap<String, Object> property) {
+        if (property != null) {
+            newView.getProperty().putAll(property);
+        }
+        newView.setTags(FTRUMConfigManager.get().getRUMPublicDynamicTags());
+        newView.setCollectType(checkSessionWillCollect(newView.getSessionId()));
+        FTMonitorManager.get().addMonitor(newView.getId());
+        FTMonitorManager.get().attachMonitorData(newView);
+        initViewInCache(newView);
+        SessionReplayManager.get().appendSessionReplayRUMLinkKeysWithView(newView.getId(), property);
+    }
+
+    /**
      * Initialize view
      *
      * @param activeViewBean current active page
      */
-    private void initView(ActiveViewBean activeViewBean) {
+    private void initViewInCache(ActiveViewBean activeViewBean) {
         final ViewBean bean = activeViewBean.convertToViewBean();
         EventConsumerThreadPool.get().execute(new Runnable() {
             @Override

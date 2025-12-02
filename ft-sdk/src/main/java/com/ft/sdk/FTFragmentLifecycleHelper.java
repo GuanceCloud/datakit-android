@@ -2,9 +2,15 @@ package com.ft.sdk;
 
 import android.app.Activity;
 import android.os.Build;
-import android.os.SystemClock;
+import android.view.View;
 
+import androidx.fragment.app.Fragment;
+
+import com.ft.sdk.garble.manager.SlotIdWebviewBinder;
+import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.PackageUtils;
+import com.ft.sdk.garble.utils.WebViewDetector;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,15 +21,17 @@ import java.util.Map;
  * <p>
  * Responsibilities:
  * - Registers appropriate {@code FragmentManager.FragmentLifecycleCallbacks}
- *   depending on runtime environment (AndroidX vs platform and API level).
+ * depending on runtime environment (AndroidX vs platform and API level).
  * - Measures time from {@code onFragmentPreAttached} to {@code onFragmentCreated}
- *   and reports view creation duration to {@link FTRUMInnerManager}.
+ * and reports view creation duration to {@link FTRUMInnerManager}.
  * - Starts and stops RUM views when fragments resume/stop. If a
- *   {@link FTViewFragmentTrackingHandler} is configured, uses its mapping of
- *   {@link FragmentWrapper} to a {@link HandlerView} for custom view naming and
- *   attributes; otherwise falls back to the fragment simple class name.
+ * {@link FTViewFragmentTrackingHandler} is configured, uses its mapping of
+ * {@link FragmentWrapper} to a {@link HandlerView} for custom view naming and
+ * attributes; otherwise falls back to the fragment simple class name.
  */
 public class FTFragmentLifecycleHelper implements FragmentLifecycleCallBack {
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "FTFragmentLifecycleHelper";
+
     private AndroidXFragmentLifecycleCallbacks androidXFragmentLifecycleCallbacks;
     private OreoFragmentLifecycleCallbacks oreoFragmentLifecycleCallbacks;
 
@@ -51,7 +59,7 @@ public class FTFragmentLifecycleHelper implements FragmentLifecycleCallBack {
         Long preAttachedStartTime = fragmentPreAttachedTimeMap.remove(wrapper.getRealFragment());
         if (preAttachedStartTime != null) {
             // Calculate Fragment pre-attached to pre-created duration
-            long createDuration = System.nanoTime()- preAttachedStartTime;
+            long createDuration = System.nanoTime() - preAttachedStartTime;
             if (viewHandler != null) {
                 HandlerView view = viewHandler.resolveHandlerView(wrapper);
                 if (view != null) {
@@ -72,6 +80,22 @@ public class FTFragmentLifecycleHelper implements FragmentLifecycleCallBack {
             }
         } else {
             FTRUMInnerManager.get().startView(wrapper.getSimpleClassName());
+        }
+
+        if (FTSdk.isSessionReplaySupport() && SessionReplayManager.get().hasRumLinkKeys()) {
+            View view;
+            if (wrapper.isAndroidX()) {
+                view = WebViewDetector.findFirstWebView((androidx.fragment.app.Fragment) wrapper.getRealFragment());
+            } else {
+                view = WebViewDetector.findFirstWebView((Fragment) wrapper.getRealFragment());
+            }
+
+            if (view != null) {
+                String viewId = FTRUMInnerManager.get().getViewId();
+                long slotId = System.identityHashCode(view);
+                LogUtils.d(TAG, "Track SlotID, fragment map viewId:" + viewId + ",slotId:" + slotId);
+                SlotIdWebviewBinder.get().bind(slotId, viewId);
+            }
         }
     }
 

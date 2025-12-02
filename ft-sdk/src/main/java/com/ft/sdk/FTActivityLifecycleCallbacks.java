@@ -4,13 +4,16 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.ft.sdk.garble.gesture.WindowCallbackTracker;
+import com.ft.sdk.garble.manager.SlotIdWebviewBinder;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.garble.utils.WebViewDetector;
 
 import java.util.HashMap;
 
@@ -29,6 +32,7 @@ import java.util.HashMap;
  * These can be viewed through Guanceyun Studio <a href="https://docs.guance.com/real-user-monitoring/explorer/view/">Viewer View</a>
  */
 public class FTActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "FTActivityLifecycleCallbacks";
     private final LifeCircleTraceCallback mAppRestartCallback = new LifeCircleTraceCallback();
     private final WindowCallbackTracker mDispatcherReceiver = new WindowCallbackTracker();
 
@@ -124,6 +128,17 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
             } else {
                 FTRUMInnerManager.get().startView(activity.getClass().getSimpleName());
             }
+
+            if (FTSdk.isSessionReplaySupport() && SessionReplayManager.get().hasRumLinkKeys()) {
+                View view = WebViewDetector.findFirstWebView(activity);
+                if (view != null) {
+                    String viewId = FTRUMInnerManager.get().getViewId();
+                    long slotId = System.identityHashCode(view);
+                    LogUtils.d(TAG, "Track SlotID,activity map viewId:" + viewId + ",slotId:" + slotId);
+                    SlotIdWebviewBinder.get().bind(slotId, viewId);
+                }
+            }
+
 
         }
 

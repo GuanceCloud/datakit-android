@@ -98,7 +98,8 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
             ResourceDataStoreManager resourceDataStoreManager,
             SessionReplayInternalCallback internalCallback,
             boolean dynamicOptimizationEnabled,
-            boolean isDelayInit
+            boolean isDelayInit,
+            boolean enableRUMKeysLink
     ) {
         this.appContext = appContext;
         this.rumContextProvider = rumContextProvider;
@@ -125,7 +126,8 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
                 resourceDataStoreManager,
                 resourcesWriter,
                 recordWriter,
-                new MutationResolver(internalLogger)
+                new MutationResolver(internalLogger),
+                enableRUMKeysLink
         );
 
         String applicationId = rumContextProvider.getRumContext().getApplicationId();

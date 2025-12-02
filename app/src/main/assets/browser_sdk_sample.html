@@ -15,6 +15,9 @@
 <input type="button" value="test" onclick="test()">
 <script src="https://static.guance.com/browser-sdk/v3/dataflux-rum.js" type="text/javascript"></script>
 <script>
+
+  DATAFLUX_RUM.setGlobalContextProperty('wgt_id', 'wgt_local');
+  DATAFLUX_RUM.setGlobalContextProperty('wgt_name', 'Widget Local');
   window.DATAFLUX_RUM &&
     window.DATAFLUX_RUM.init({
       applicationId: 'appId',

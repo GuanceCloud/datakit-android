@@ -71,6 +71,7 @@ public class DefaultRecorderProvider implements RecorderProvider {
     private final boolean dynamicOptimizationEnabled;
     private final SessionReplayInternalCallback internalCallback;
     private final boolean isDelayInit;
+    private final boolean enableRUMKeyLinks;
 
     public DefaultRecorderProvider(
             FeatureSdkCore sdkCore,
@@ -82,7 +83,7 @@ public class DefaultRecorderProvider implements RecorderProvider {
             List<DrawableToColorMapper> customDrawableMappers,
             boolean dynamicOptimizationEnabled,
             SessionReplayInternalCallback internalCallback,
-            boolean isDelayInit) {
+            boolean isDelayInit, boolean enableRUMKeyLinks) {
         this.sdkCore = sdkCore;
         this.textAndInputPrivacy = textAndInputPrivacy;
         this.imagePrivacy = imagePrivacy;
@@ -93,6 +94,7 @@ public class DefaultRecorderProvider implements RecorderProvider {
         this.dynamicOptimizationEnabled = dynamicOptimizationEnabled;
         this.internalCallback = internalCallback;
         this.isDelayInit = isDelayInit;
+        this.enableRUMKeyLinks = enableRUMKeyLinks;
     }
 
     @Override
@@ -125,7 +127,8 @@ public class DefaultRecorderProvider implements RecorderProvider {
                 resourceDataStoreManager,
                 internalCallback,
                 dynamicOptimizationEnabled,
-                isDelayInit
+                isDelayInit,
+                this.enableRUMKeyLinks
         );
     }
 

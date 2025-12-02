@@ -159,7 +159,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                         customDrawableMappers,
                         dynamicOptimizationEnabled,
                         internalCallback,
-                        isDelayInit
+                        isDelayInit, linkRumKeys != null && linkRumKeys.length > 0
                 ), linkRumKeys);
     }
 

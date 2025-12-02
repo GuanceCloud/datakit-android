@@ -43,22 +43,24 @@ public class RecordedDataProcessor implements Processor {
     private long lastSnapshotTimestamp = 0L;
     private boolean forceNewNextViewForLinkView = false;
     private int previousOrientation = Configuration.ORIENTATION_UNDEFINED;
+    private final boolean enableRUMKeysLink;
     private SessionReplayRumContext prevRumContext = new SessionReplayRumContext();
     private final FeatureSdkCore sdkCore;
 
     public RecordedDataProcessor(FeatureSdkCore sdkCore, ResourceDataStoreManager resourceDataStoreManager, ResourcesWriter resourcesWriter, RecordWriter writer,
-                                 MutationResolver mutationResolver) {
-        this(sdkCore, resourceDataStoreManager, resourcesWriter, writer, mutationResolver, new NodeFlattener());
+                                 MutationResolver mutationResolver, boolean enableRUMKeyLinks) {
+        this(sdkCore, resourceDataStoreManager, resourcesWriter, writer, mutationResolver, new NodeFlattener(), enableRUMKeyLinks);
     }
 
     public RecordedDataProcessor(FeatureSdkCore sdkCore, ResourceDataStoreManager resourceDataStoreManager, ResourcesWriter resourcesWriter, RecordWriter writer,
-                                 MutationResolver mutationResolver, NodeFlattener nodeFlattener) {
+                                 MutationResolver mutationResolver, NodeFlattener nodeFlattener, boolean enableRUMKeysLink) {
         this.resourceDataStoreManager = resourceDataStoreManager;
         this.resourcesWriter = resourcesWriter;
         this.writer = writer;
         this.mutationResolver = mutationResolver;
         this.nodeFlattener = nodeFlattener;
         this.sdkCore = sdkCore;
+        this.enableRUMKeysLink = enableRUMKeysLink;
     }
 
     @Override
@@ -167,7 +169,7 @@ public class RecordedDataProcessor implements Processor {
         }
 
         if (fullSnapshotRequired) {
-            if (isSessionReplayErrorSampled) {
+            if (isSessionReplayErrorSampled || enableRUMKeysLink) {
                 MetaRecord metaRecord = new MetaRecord(
                         timestamp,
                         null,

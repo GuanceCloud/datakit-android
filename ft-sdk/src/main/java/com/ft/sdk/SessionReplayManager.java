@@ -124,6 +124,11 @@ public class SessionReplayManager implements FeatureSdkCore {
         return rumLinkKeys;
     }
 
+    public boolean hasRumLinkKeys() {
+        return rumLinkKeys != null && rumLinkKeys.length > 0;
+    }
+
+
     @Override
     public FeatureScope getFeature(String featureName) {
         return features.get(featureName);
