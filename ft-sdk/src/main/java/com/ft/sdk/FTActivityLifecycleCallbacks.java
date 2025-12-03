@@ -4,16 +4,13 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
-import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.ft.sdk.garble.gesture.WindowCallbackTracker;
-import com.ft.sdk.garble.manager.SlotIdWebviewBinder;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.FpsUtils;
-import com.ft.sdk.garble.utils.WebViewDetector;
 
 import java.util.HashMap;
 
@@ -130,18 +127,6 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
             } else {
                 FTRUMInnerManager.get().startView(activity.getClass().getSimpleName());
             }
-
-            if (FTSdk.isSessionReplaySupport() && SessionReplayManager.get().hasRumLinkKeys()) {
-                View view = WebViewDetector.findFirstWebView(activity);
-                if (view != null) {
-                    String viewId = FTRUMInnerManager.get().getViewId();
-                    long slotId = System.identityHashCode(view);
-                    LogUtils.d(TAG, "Track SlotID,activity map viewId:" + viewId + ",slotId:" + slotId);
-                    SlotIdWebviewBinder.get().bind(slotId, viewId);
-                }
-            }
-
-
         }
 
         if (manager.isRumEnable() && manager.getConfig().isEnableTraceUserAction()) {

@@ -16,6 +16,7 @@ import com.ft.sdk.sessionreplay.model.WebviewWireframeUpdate;
 import com.ft.sdk.sessionreplay.model.Wireframe;
 import com.ft.sdk.sessionreplay.model.WireframeClip;
 import com.ft.sdk.sessionreplay.model.WireframeUpdateMutation;
+import com.ft.sdk.sessionreplay.SlotIdWebviewBinder;
 import com.ft.sdk.sessionreplay.utils.InternalLogger;
 
 import java.util.ArrayList;
@@ -36,9 +37,11 @@ public class MutationResolver {
                     "not matching the wireframe of type [%2s]";
 
     private final InternalLogger internalLogger;
+    private final SlotIdWebviewBinder slotIdWebviewBinder;
 
-    public MutationResolver(InternalLogger internalLogger) {
+    public MutationResolver(InternalLogger internalLogger, SlotIdWebviewBinder slotIdWebviewBinder) {
         this.internalLogger = internalLogger;
+        this.slotIdWebviewBinder = slotIdWebviewBinder;
     }
 
     public MobileMutationData resolveMutations(
@@ -137,6 +140,17 @@ public class MutationResolver {
                                         false
                                 )
                         );
+
+                        // Mark ViewBindingInfo as inactive when WebView becomes invisible
+                        String slotId = ((WebviewWireframe) oldWireframe).getSlotId();
+                        if (slotId != null && slotIdWebviewBinder != null) {
+                            try {
+                                long slotIdLong = Long.parseLong(slotId);
+                                slotIdWebviewBinder.setActive(slotIdLong, false);
+                            } catch (NumberFormatException e) {
+                                // Ignore if slotId cannot be parsed
+                            }
+                        }
                     }
                 } else {
                     removes.add(new Remove(oldWireframe.getId()));

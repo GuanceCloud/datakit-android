@@ -1,3 +1,9 @@
+# agent 1.7.0-alpha37
+1. ft-session-replay:>0.1.3-alpha12
+2. Fixed the issue where enabling ErrorSampleRate caused key playback data to be lost in WebView
+3. Optimized the logic for handling replay data when the WebView is not visible
+
+---
 # agent 1.7.0-alpha36
 1. ft-session-replay:>0.1.3-alpha11
 2. Optimized the linkView frame completion process during Replay data sharding.

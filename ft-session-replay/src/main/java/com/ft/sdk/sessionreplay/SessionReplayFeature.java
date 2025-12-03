@@ -92,6 +92,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
             sessionReplayRecorder = new NoOpRecorder();
     RecordWriter
             dataWriter = new NoOpRecordWriter();
+    SlotIdWebviewBinder slotIdWebviewBinder;
     final AtomicBoolean initialized = new AtomicBoolean(false);
 
     // region Constructor
@@ -110,7 +111,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                 config.getSessionReplayOnErrorSampleRate(),
                 config.isDelayInit(),
                 config.isDynamicOptimizationEnabled(),
-                config.getInternalCallback(), config.getRumLinkKeys());
+                config.getInternalCallback(), config.getRumLinkKeys(), new SlotIdWebviewBinder(sdkCore.getInternalLogger()));
 
     }
 
@@ -120,7 +121,8 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                                 ImagePrivacy imagePrivacy,
                                 Sampler sessionReplaySampler,
                                 Sampler sessionReplayErrorSampler,
-                                RecorderProvider recorderProvider, String[] linkRumKeys) {
+                                RecorderProvider recorderProvider, String[] linkRumKeys,
+                                SlotIdWebviewBinder slotIdWebviewBinder) {
         this.sdkCore = sdkCore;
         this.customEndpointUrl = customEndpointUrl;
         this.textAndInputPrivacy = textAndInputPrivacy;
@@ -130,6 +132,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
         this.sessionRelayErrorSampler = sessionReplayErrorSampler;
         this.recorderProvider = recorderProvider;
         this.linkRumKeys = linkRumKeys == null ? new String[]{} : linkRumKeys;
+        this.slotIdWebviewBinder = slotIdWebviewBinder;
     }
 
     public SessionReplayFeature(FeatureSdkCore sdkCore, String customEndpointUrl,
@@ -144,7 +147,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                                 float sessionReplayOnErrorSampleRate,
                                 boolean isDelayInit,
                                 boolean dynamicOptimizationEnabled,
-                                SessionReplayInternalCallback internalCallback, String[] linkRumKeys) {
+                                SessionReplayInternalCallback internalCallback, String[] linkRumKeys, SlotIdWebviewBinder slotIdWebviewBinder) {
         this(sdkCore, customEndpointUrl,
                 textAndInputPrivacy,
                 touchPrivacy,
@@ -159,12 +162,17 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                         customDrawableMappers,
                         dynamicOptimizationEnabled,
                         internalCallback,
-                        isDelayInit, linkRumKeys != null && linkRumKeys.length > 0
-                ), linkRumKeys);
+                        isDelayInit, linkRumKeys != null && linkRumKeys.length > 0,
+                        slotIdWebviewBinder
+                ), linkRumKeys, slotIdWebviewBinder);
     }
 
     public RecordWriter getDataWriter() {
         return dataWriter;
+    }
+
+    public SlotIdWebviewBinder getSlotIdWebviewBinder() {
+        return slotIdWebviewBinder;
     }
 
     public String[] getLinkRumKeys() {

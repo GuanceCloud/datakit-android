@@ -1,3 +1,9 @@
+# replay 0.1.3-alpha12
+1. ft-sdk:> 1.7.0-alpha37
+2. Fixed the issue where enabling ErrorSampleRate caused key playback data to be lost in WebView
+3. Optimized the logic for handling replay data when the WebView is not visible
+
+---
 # replay 0.1.3-alpha11
 1. ft-sdk:> 1.7.0-alpha36
 2. Optimized the linkView frame completion process during Replay data sharding.

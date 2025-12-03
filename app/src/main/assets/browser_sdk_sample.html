@@ -9,10 +9,19 @@
             width: 100%;
         }
 
+        #colorBlock {
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+            border: 2px solid #333;
+            transition: background-color 0.3s ease;
+        }
+
     </style>
 </head>
 <body>
 <input type="button" value="test" onclick="test()">
+<div id="colorBlock"></div>
 <script src="https://static.guance.com/browser-sdk/v3/dataflux-rum.js" type="text/javascript"></script>
 <script>
 
@@ -33,6 +42,18 @@
       allowedTracingOrigins: ['https://api.example.com', /https:\/\/.*\.my-api-domain\.com/],  // Optional, list of all requests allowed to inject trace collector required header headers. Can be the origin of the request, or a regular expression
     })
    window.DATAFLUX_RUM.startSessionReplayRecording();
+
+    // Simple color carousel timer
+    (function() {
+        const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F'];
+        const colorBlock = document.getElementById('colorBlock');
+        let currentIndex = 0;
+        
+        setInterval(function() {
+            colorBlock.style.backgroundColor = colors[currentIndex];
+            currentIndex = (currentIndex + 1) % colors.length;
+        }, 1000); // Change color every 1 second
+    })();
 
     function test() {
         FTWebViewJavascriptBridge.sendEvent("{}")

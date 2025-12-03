@@ -5,6 +5,7 @@ import android.content.res.Configuration;
 import androidx.annotation.WorkerThread;
 
 import com.ft.sdk.feature.FeatureSdkCore;
+import com.ft.sdk.sessionreplay.SlotIdWebviewBinder;
 import com.ft.sdk.sessionreplay.internal.async.ResourceRecordedDataQueueItem;
 import com.ft.sdk.sessionreplay.internal.async.SnapshotRecordedDataQueueItem;
 import com.ft.sdk.sessionreplay.internal.async.TouchEventRecordedDataQueueItem;
@@ -22,6 +23,7 @@ import com.ft.sdk.sessionreplay.model.MobileMutationData;
 import com.ft.sdk.sessionreplay.model.MobileRecord;
 import com.ft.sdk.sessionreplay.model.ViewEndRecord;
 import com.ft.sdk.sessionreplay.model.ViewportResizeData;
+import com.ft.sdk.sessionreplay.model.WebviewWireframe;
 import com.ft.sdk.sessionreplay.model.Wireframe;
 import com.ft.sdk.sessionreplay.recorder.SystemInformation;
 import com.ft.sdk.sessionreplay.utils.SessionReplayRumContext;
@@ -38,6 +40,7 @@ public class RecordedDataProcessor implements Processor {
     private final RecordWriter writer;
     private final MutationResolver mutationResolver;
     private final NodeFlattener nodeFlattener;
+    private final SlotIdWebviewBinder slotIdWebviewBinder;
 
     private List<Wireframe> prevSnapshot = new LinkedList<>();
     private long lastSnapshotTimestamp = 0L;
@@ -48,12 +51,12 @@ public class RecordedDataProcessor implements Processor {
     private final FeatureSdkCore sdkCore;
 
     public RecordedDataProcessor(FeatureSdkCore sdkCore, ResourceDataStoreManager resourceDataStoreManager, ResourcesWriter resourcesWriter, RecordWriter writer,
-                                 MutationResolver mutationResolver, boolean enableRUMKeyLinks) {
-        this(sdkCore, resourceDataStoreManager, resourcesWriter, writer, mutationResolver, new NodeFlattener(), enableRUMKeyLinks);
+                                 MutationResolver mutationResolver, boolean enableRUMKeyLinks, SlotIdWebviewBinder slotIdWebviewBinder) {
+        this(sdkCore, resourceDataStoreManager, resourcesWriter, writer, mutationResolver, new NodeFlattener(), enableRUMKeyLinks, slotIdWebviewBinder);
     }
 
     public RecordedDataProcessor(FeatureSdkCore sdkCore, ResourceDataStoreManager resourceDataStoreManager, ResourcesWriter resourcesWriter, RecordWriter writer,
-                                 MutationResolver mutationResolver, NodeFlattener nodeFlattener, boolean enableRUMKeysLink) {
+                                 MutationResolver mutationResolver, NodeFlattener nodeFlattener, boolean enableRUMKeysLink, SlotIdWebviewBinder slotIdWebviewBinder) {
         this.resourceDataStoreManager = resourceDataStoreManager;
         this.resourcesWriter = resourcesWriter;
         this.writer = writer;
@@ -61,6 +64,7 @@ public class RecordedDataProcessor implements Processor {
         this.nodeFlattener = nodeFlattener;
         this.sdkCore = sdkCore;
         this.enableRUMKeysLink = enableRUMKeysLink;
+        this.slotIdWebviewBinder = slotIdWebviewBinder;
     }
 
     @Override
@@ -111,6 +115,8 @@ public class RecordedDataProcessor implements Processor {
         EnrichedRecord enrichedRecord = bundleRecordInEnrichedRecord(rumContext, touchData);
         writer.write(enrichedRecord);
     }
+
+    private String preCacheViewId = "";
 
     @WorkerThread
     private void handleSnapshots(SessionReplayRumContext newRumContext, long timestamp,
@@ -198,6 +204,24 @@ public class RecordedDataProcessor implements Processor {
 
         prevSnapshot = wireframes;
         previousOrientation = systemInformation.getScreenOrientation();
+
+        boolean hasWebview = false;
+        for (Wireframe wireframe : wireframes) {
+            if (wireframe instanceof WebviewWireframe) {
+                hasWebview = true;
+                long slotId = wireframe.getId();
+                if (slotIdWebviewBinder != null) {
+                    slotIdWebviewBinder.bind(slotId, newRumContext.getViewId());
+                }
+                break;
+            }
+        }
+
+        if (!hasWebview) {
+            if (slotIdWebviewBinder != null) {
+                slotIdWebviewBinder.setAllInactive();
+            }
+        }
 
         if (!records.isEmpty()) {
             EnrichedRecord record = bundleRecordInEnrichedRecord(newRumContext, records);

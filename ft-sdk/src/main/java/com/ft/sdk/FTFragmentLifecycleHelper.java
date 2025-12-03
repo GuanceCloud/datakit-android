@@ -2,15 +2,9 @@ package com.ft.sdk;
 
 import android.app.Activity;
 import android.os.Build;
-import android.view.View;
 
-import androidx.fragment.app.Fragment;
-
-import com.ft.sdk.garble.manager.SlotIdWebviewBinder;
 import com.ft.sdk.garble.utils.Constants;
-import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.PackageUtils;
-import com.ft.sdk.garble.utils.WebViewDetector;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -82,21 +76,6 @@ public class FTFragmentLifecycleHelper implements FragmentLifecycleCallBack {
             FTRUMInnerManager.get().startView(wrapper.getSimpleClassName());
         }
 
-        if (FTSdk.isSessionReplaySupport() && SessionReplayManager.get().hasRumLinkKeys()) {
-            View view;
-            if (wrapper.isAndroidX()) {
-                view = WebViewDetector.findFirstWebView((androidx.fragment.app.Fragment) wrapper.getRealFragment());
-            } else {
-                view = WebViewDetector.findFirstWebView((Fragment) wrapper.getRealFragment());
-            }
-
-            if (view != null) {
-                String viewId = FTRUMInnerManager.get().getViewId();
-                long slotId = System.identityHashCode(view);
-                LogUtils.d(TAG, "Track SlotID, fragment map viewId:" + viewId + ",slotId:" + slotId);
-                SlotIdWebviewBinder.get().bind(slotId, viewId);
-            }
-        }
     }
 
     @Override

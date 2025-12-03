@@ -110,6 +110,10 @@ public class SessionReplayManager implements FeatureSdkCore {
                 : new NoOpRecordWriter();
     }
 
+    public com.ft.sdk.sessionreplay.SlotIdWebviewBinder getSlotIdWebviewBinder() {
+        return sessionReplayFeature != null ? sessionReplayFeature.getSlotIdWebviewBinder() : null;
+    }
+
     public void tryGetFullSnapshotForLinkView() {
         if (sessionReplayFeature.isRecording()) {
             sessionReplayFeature.forceFullSnapShotForLinkView();

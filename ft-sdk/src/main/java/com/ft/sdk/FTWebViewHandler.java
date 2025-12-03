@@ -9,7 +9,6 @@ import android.webkit.ValueCallback;
 import android.webkit.WebView;
 
 import com.ft.sdk.garble.bean.CollectType;
-import com.ft.sdk.garble.manager.SlotIdWebviewBinder;
 import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DCSWebViewUtils;
@@ -96,6 +95,31 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
     private final ConcurrentHashMap<String, Map<String, Object>> webViewLinkMap = new ConcurrentHashMap<>();
 
     /**
+     * Timer interval, 10 seconds
+     */
+    private static final long SNAPSHOT_INTERVAL_MS = 10000; // 10 seconds
+
+    /**
+     * Delay before stopping to accept Session Replay data when WebView becomes inactive, 2 seconds
+     */
+    private static final long SESSION_REPLAY_DATA_STOP_DELAY_MS = 2000; // 2 seconds
+
+    /**
+     * Timer Runnable for periodically calling JS method
+     */
+    private Runnable snapshotRunnable;
+
+    /**
+     * Whether the timer is running
+     */
+    private boolean isTimerRunning = false;
+
+    /**
+     * Timestamp when WebView became inactive, 0 means WebView is active
+     */
+    private volatile long inactiveTimestamp = 0;
+
+    /**
      * Register js method in web view
      *
      * @param webview
@@ -146,7 +170,11 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                     return SessionReplayManager.get().getCurrentSessionWriter();
                 }
             });
+            // Initialize inactive timestamp to 0 (active state)
+            inactiveTimestamp = 0;
         }
+
+        checkAndStartSnapshotTimer();
     }
 
     private void getRelativeNativeViewId() {
@@ -154,15 +182,17 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
 
         // Get bound viewId from SlotIdWebviewBinder by slotId
         if (slotID != 0) {
-            String boundViewId = SlotIdWebviewBinder.get().getViewId(slotID);
-            if (boundViewId != null) {
-                viewId = boundViewId;
+            com.ft.sdk.sessionreplay.SlotIdWebviewBinder binder = SessionReplayManager.get().getSlotIdWebviewBinder();
+            if (binder != null) {
+                String boundViewId = binder.getViewId(slotID);
+                if (boundViewId != null) {
+                    viewId = boundViewId;
+                }
             }
         }
 
         if (nativeViewId == null) {
             nativeViewId = viewId;
-            // Register callback when nativeViewId is first set
         }
     }
 
@@ -171,14 +201,32 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
      * Bind callback to slotId with the given globalContextViewId
      */
     private void registerViewChangeCallback(long slotId, String globalContextViewId) {
-        SlotIdWebviewBinder.BindViewChangeCallBack callback = new SlotIdWebviewBinder.BindViewChangeCallBack() {
+        com.ft.sdk.sessionreplay.SlotIdWebviewBinder binder = SessionReplayManager.get().getSlotIdWebviewBinder();
+        if (binder == null) {
+            return;
+        }
+
+        com.ft.sdk.sessionreplay.SlotIdWebviewBinder.BindViewChangeCallBack callback = new com.ft.sdk.sessionreplay.SlotIdWebviewBinder.BindViewChangeCallBack() {
             @Override
             public void onViewChanged(String viewId) {
                 rebindView(viewId);
             }
         };
         // Bind slotId with viewId and callback
-        SlotIdWebviewBinder.get().bind(slotId, globalContextViewId, callback);
+        binder.bind(slotId, globalContextViewId, callback);
+
+        // Register slot rebind callback to restore timer when same slotId is rebound
+        com.ft.sdk.sessionreplay.SlotIdWebviewBinder.SlotRebindCallBack slotRebindCallback = new com.ft.sdk.sessionreplay.SlotIdWebviewBinder.SlotRebindCallBack() {
+            @Override
+            public void onSlotRebound(long slotId) {
+                // Restore timer when slotId is rebound
+                if (slotID == slotId) {
+                    checkAndStartSnapshotTimer();
+                    LogUtils.d(LOG_TAG, "Slot rebind detected, restored snapshot timer and resumed accepting Session Replay data for slotId:" + slotId);
+                }
+            }
+        };
+        binder.setSlotRebindCallback(slotId, slotRebindCallback);
     }
 
     /**
@@ -286,7 +334,10 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                     // Get viewId by slotId
                     String globalContextViewId = null;
                     if (slotID != 0) {
-                        globalContextViewId = SlotIdWebviewBinder.get().getViewId(slotID);
+                        com.ft.sdk.sessionreplay.SlotIdWebviewBinder binder = SessionReplayManager.get().getSlotIdWebviewBinder();
+                        if (binder != null) {
+                            globalContextViewId = binder.getViewId(slotID);
+                        }
                     }
 
                     if (FTSdk.isSessionReplaySupport()) {
@@ -359,6 +410,32 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
 
             } else if (name.equals(WEB_JS_TYPE_SESSION_REPLAY)) {
                 if (!FTSdk.isSessionReplaySupport()) return;
+                
+                // Check if WebView is active
+                boolean isActive = isWebViewActive();
+                
+                long currentTime = System.currentTimeMillis();
+                
+                if (!isActive) {
+                    // If WebView is not active, record the timestamp when it became inactive
+                    if (inactiveTimestamp == 0) {
+                        inactiveTimestamp = currentTime;
+                        LogUtils.d(LOG_TAG, "WebView became inactive, recording timestamp, slotID:" + slotID);
+                    }
+                    
+                    // Check if inactive time exceeds the delay threshold
+                    if (currentTime - inactiveTimestamp >= SESSION_REPLAY_DATA_STOP_DELAY_MS) {
+                        LogUtils.d(LOG_TAG, "WebView inactive for 2+ seconds, skipping Session Replay data, slotID:" + slotID);
+                        return;
+                    }
+                } else {
+                    // If WebView becomes active again, clear the inactive timestamp
+                    if (inactiveTimestamp != 0) {
+                        inactiveTimestamp = 0;
+                        LogUtils.d(LOG_TAG, "WebView active again, resumed accepting Session Replay data, slotID:" + slotID);
+                    }
+                }
+                
                 if (data != null) {
                     if (FTRUMInnerManager.get().checkSessionWillCollect(
                             FTRUMInnerManager.get().getSessionId()) != CollectType.NOT_COLLECT) {
@@ -494,6 +571,101 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
      */
     interface CallbackFromJS {
         void callBack(String content);
+    }
+
+    /**
+     * Check if the WebView corresponding to current slotId is active
+     *
+     * @return true if WebView is active, false otherwise
+     */
+    private boolean isWebViewActive() {
+        if (!FTActivityLifecycleCallbacks.isAppInForeground()) {
+            return false;
+        }
+
+        com.ft.sdk.sessionreplay.SlotIdWebviewBinder binder = SessionReplayManager.get().getSlotIdWebviewBinder();
+        if (binder == null) {
+            return false;
+        }
+
+        // Check activation status from ViewBindingInfo
+        if (slotID != 0) {
+            boolean isActive = binder.isActive(slotID);
+            if (!isActive) {
+                return false;
+            }
+        }
+
+        // Get current active viewId
+        String activeViewId = FTRUMInnerManager.get().getViewId();
+        if (activeViewId == null) {
+            return false;
+        }
+
+        // Get the latest slotId globally
+        long latestSlotId = binder.getLatestSlotId();
+        if (latestSlotId == 0) {
+            return false;
+        }
+
+        // Check if current slotId is the latest slotId
+        return slotID == latestSlotId;
+    }
+
+    /**
+     * Start timer to call DATAFLUX_RUM.takeSubsequentFullSnapshot() every 10 seconds
+     * Only calls JS method when WebView is active
+     */
+    private void checkAndStartSnapshotTimer() {
+        // Start timer to call JS method every 10 seconds
+        com.ft.sdk.sessionreplay.internal.persistence.TrackingConsent consent
+                = SessionReplayManager.get().getConsentProvider();
+        if (consent != com.ft.sdk.sessionreplay.internal.persistence.TrackingConsent.SAMPLED_ON_ERROR_SESSION) {
+            return;
+        }
+
+        // Stop timer if it's already running
+        stopSnapshotTimer();
+
+        snapshotRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (mWebView != null && isTimerRunning) {
+                    // Only call JS method if WebView is active
+                    if (isWebViewActive()) {
+                        // Call JS method DATAFLUX_RUM.takeSubsequentFullSnapshot()
+                        callJsMethod("DATAFLUX_RUM.takeSubsequentFullSnapshot()");
+                        LogUtils.d(LOG_TAG, "slotId:" + slotID + ",invoke webview get FullSnapshot");
+
+                        // Schedule next execution
+                        if (isTimerRunning) {
+                            mHandler.postDelayed(this, SNAPSHOT_INTERVAL_MS);
+                        }
+                    } else {
+                        // Stop timer if WebView is not active
+                        LogUtils.d(LOG_TAG, "WebView is not active, slotID:" + slotID + ", stopping snapshot timer");
+                        stopSnapshotTimer();
+                    }
+                }
+            }
+        };
+
+        isTimerRunning = true;
+        // First execution after 10 seconds delay, then every 10 seconds
+        mHandler.postDelayed(snapshotRunnable, SNAPSHOT_INTERVAL_MS);
+        LogUtils.d(LOG_TAG, "Started snapshot timer, will call DATAFLUX_RUM.takeSubsequentFullSnapshot() every 10 seconds when WebView is active");
+    }
+
+    /**
+     * Stop the timer
+     */
+    private void stopSnapshotTimer() {
+        isTimerRunning = false;
+        if (snapshotRunnable != null) {
+            mHandler.removeCallbacks(snapshotRunnable);
+            snapshotRunnable = null;
+            LogUtils.d(LOG_TAG, "Stopped snapshot timer");
+        }
     }
 
 
