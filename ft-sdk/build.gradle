@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 ext {
     //Append "-SNAPSHOT" to the end of snapshot version number for publishing
-    pkgVersion = "1.6.15-beta01"
+    pkgVersion = "1.6.15"
 
     mavenGroupId = "com.cloudcare.ft.mobile.sdk.tracker.agent"
     mavenArtifactId = "ft-sdk"
