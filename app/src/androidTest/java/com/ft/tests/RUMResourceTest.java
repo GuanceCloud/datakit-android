@@ -88,8 +88,8 @@ public class RUMResourceTest extends BaseTest {
             String measurement = lineProtocolData.getMeasurement();
             if ("action".equals(measurement)) {
                 if (Objects.equals(lineProtocolData.getTagAsString("action_type"), "click")) {
-                    String resourceCount = lineProtocolData.getFieldAsString("action_resource_count");
-                    Assert.assertEquals("1i", resourceCount);
+                    int resourceCount = lineProtocolData.getFieldAsInt("action_resource_count");
+                    Assert.assertEquals(1, resourceCount);
                     break;
                 }
             }

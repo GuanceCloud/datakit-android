@@ -382,7 +382,9 @@ public class FTRUMInnerManager {
             EventConsumerThreadPool.get().execute(new Runnable() {
                 @Override
                 public void run() {
+                    FTDBManager.get().reduceViewPendingResource(viewId);
                     FTDBManager.get().updateViewUpdateTime(viewId, System.currentTimeMillis());
+                    FTDBManager.get().reduceActionPendingResource(actionId);
                     FTTraceManager.get().removeByStopResource(resourceId);
                 }
             });

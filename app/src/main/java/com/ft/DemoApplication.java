@@ -17,6 +17,7 @@ import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
+import com.ft.utils.CrossProcessSetting;
 import com.lzy.okgo.OkGo;
 
 import java.util.HashMap;
@@ -73,10 +74,9 @@ public class DemoApplication extends BaseApplication {
                 .setDebug(true)//Set whether it's debug
                 .setAutoSync(true)
                 .setCustomSyncPageSize(10)
-                .setOnlySupportMainProcess(false)
+                .setOnlySupportMainProcess(CrossProcessSetting.isOnlyMainProcess(context))
                 .addGlobalContext("test_flag", "fix_db_lock_02")
                 .addGlobalContext("main_process", Utils.isMainProcess() + "")
-                .setOnlySupportMainProcess(false)
                 .setNeedTransformOldCache(true)
                 .setCompressIntakeRequests(true)
                 .setRemoteConfiguration(true)

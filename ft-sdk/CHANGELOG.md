@@ -1,3 +1,8 @@
+# agent 1.6.15-beta01
+1. Same as agent 1.6.15-alpha10
+2. Fixed pending_resource_count in Action and View metrics
+
+---
 # agent 1.6.15-alpha10
 1. Optimized the FPS monitoring mechanism by stopping detection when the app is in the background.
 

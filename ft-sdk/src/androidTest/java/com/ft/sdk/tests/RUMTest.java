@@ -104,7 +104,7 @@ public class RUMTest extends FTBaseTest {
 
     @Before
     public void initRUM() {
-        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL));
+        FTSdk.install(FTSDKConfig.builder(TEST_FAKE_URL).setDebug(true));
         FTSdk.initRUMWithConfig(new FTRUMConfig().setRumAppId(TEST_FAKE_RUM_ID));
     }
 
