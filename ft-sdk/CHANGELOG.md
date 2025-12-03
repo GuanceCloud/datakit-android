@@ -153,6 +153,21 @@
 1. Support for enabling session replay recording feature
 
 ---
+# agent 1.6.15
+1. Optimized the FPS monitoring mechanism by stopping detection when the app is in the background.
+2. Optimized the output of long logs more than 4K
+3. Optimized the generation of resource, long task, and error with View data.
+4. Improved the view generation rate and merged data with the same view_id.
+5. remove ActivityLifecycleCallbacks limit in child process
+6. Fixed the occasional issue where View data updates were lost.
+7. Fixed the issue where asynchronous network requests caused abnormal session refresh.
+8. Fixed the issue where reinitialization after SDK shutdown could not trigger idle shutdown.
+---
+# agent 1.6.15-beta01
+1. Same as agent 1.6.15-alpha10
+2. Fixed pending_resource_count in Action and View metrics
+
+---
 # agent 1.6.15-alpha10
 1. Optimized the FPS monitoring mechanism by stopping detection when the app is in the background.
 
