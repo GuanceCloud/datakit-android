@@ -167,10 +167,6 @@ public class FTDBManager extends DBManager {
             Uri resultUri = contentProvider.insert(FTContentProvider.getUriActionData(), contentValues);
             if (resultUri == null) {
                 LogUtils.e(TAG, "initSumAction executed failed via ContentProvider: " + data.getId());
-            } else {
-                LogUtils.e(TAG, "initSumAction success:" + data.getId());
-
-
             }
         } catch (Exception e) {
             LogUtils.d(TAG, LogUtils.getStackTraceString(e));
@@ -207,7 +203,7 @@ public class FTDBManager extends DBManager {
                     LogUtils.e(TAG, "closeAction executed failed via ContentProvider");
                 }
             } else {
-                LogUtils.e(TAG, "actionId:" + actionId + " not exist " + cursor);
+                LogUtils.e(TAG, "close actionId:" + actionId + " failed with data query");
             }
             if (cursor != null) {
                 cursor.close();
