@@ -1,3 +1,8 @@
+# agent 1.7.0-alpha38
+1. Added compatibility for OkHttp 3.12.0 and lower versions, and fixed the issue 
+    where replay data could not be synchronized on these older versions.
+
+---
 # agent 1.7.0-alpha37
 1. ft-session-replay:>0.1.3-alpha12
 2. Fixed the issue where enabling ErrorSampleRate caused key playback data to be lost in WebView
