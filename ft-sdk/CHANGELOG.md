@@ -1,3 +1,8 @@
+# agent 1.6.16-alpha01
+1. Limited long task detection while the app is in the background.
+2. Optimized the session refresh mechanism while the app is in the background.
+
+---
 # agent 1.6.15
 1. Optimized the FPS monitoring mechanism by stopping detection when the app is in the background.
 2. Optimized the output of long logs more than 4K

@@ -899,7 +899,7 @@ public class FTDBManager extends DBManager {
             // Since rawQuery returns a Bundle, we need to get data through other methods
             // Here we directly use ContentProvider's query method
             Uri uri = FTContentProvider.getUriSyncDataFlat();
-            LogUtils.d(TAG, "queryTotalCount:" + uri);
+            LogUtils.d(TAG, "queryTotalCount:" + uri + "," + where);
             Cursor cursor = contentProvider.query(uri, null, where, null, null);
             if (cursor != null && cursor.moveToFirst()) {
                 count = cursor.getCount();

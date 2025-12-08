@@ -158,9 +158,11 @@ public class FTRUMInnerManager {
                 checkSessionKeep(sessionId, sampleRate, sessionErrorSampleError);
 
                 if (checkRefreshView) {
-                    if (activeView != null && !activeView.isClose()) {
-                        activeView.close();
-                        closeView(activeView);
+                    if (activeView != null) {
+                        if (!activeView.isClose()) {
+                            activeView.close();
+                            closeView(activeView);
+                        }
 
                         String viewName = activeView.getViewName();
                         String viewReferrer = activeView.getViewReferrer();

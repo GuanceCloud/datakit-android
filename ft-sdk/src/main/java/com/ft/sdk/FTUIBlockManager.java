@@ -3,8 +3,6 @@ package com.ft.sdk;
 import android.os.Looper;
 import android.util.Printer;
 
-import com.ft.sdk.garble.utils.Utils;
-
 /**
  * Used to detect UI blocking
  *
@@ -41,6 +39,8 @@ public class FTUIBlockManager {
             } else if (x.startsWith(PREFIX_METHOD_DISPATCH_END)) {
                 long duration = System.nanoTime() - startTime;
                 if (duration > blockDurationNS) {
+                    if (!FTActivityLifecycleCallbacks.isAppInForeground()) return;
+                    // only record data when page is in foreground
                     FTRUMInnerManager.get().addLongTask(method, duration);
                 }
 
