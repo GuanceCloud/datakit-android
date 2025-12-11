@@ -221,6 +221,7 @@ public class Utils {
      */
     public static String translateTagKeyValue(String oldStr) {
         oldStr = oldStr.replace("\n", " ");
+        oldStr = oldStr.replace("\\", "\\\\");
         oldStr = translateSpecialCharacters(",", oldStr);
         oldStr = translateSpecialCharacters("=", oldStr);
         return translateSpecialCharacters(" ", oldStr);
@@ -232,6 +233,7 @@ public class Utils {
      * @return
      */
     public static String translateMeasurements(String oldStr) {
+        oldStr = oldStr.replace("\\", "\\\\");
         oldStr = translateSpecialCharacters(",", oldStr);
         return translateSpecialCharacters(" ", oldStr);
     }
