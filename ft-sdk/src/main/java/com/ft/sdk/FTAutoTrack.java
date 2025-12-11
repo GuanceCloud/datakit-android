@@ -19,7 +19,7 @@ import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.PackageUtils;
-import com.ft.sdk.garble.utils.Utils;
+import com.ft.sdk.garble.utils.TBSWebViewUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -50,17 +50,14 @@ public class FTAutoTrack {
         try {
             LogUtils.d(TAG, "startApp:" + app);
             //Determine if it is the main process
-            if (Utils.isMainProcess()) {
-                FTActivityLifecycleCallbacks life = new FTActivityLifecycleCallbacks();
-
-                if (app != null) {
-                    Class<?> clazz = PackageUtils.getSophixClass();
-                    if (clazz == null || !clazz.isInstance(app)) {
-                        app.registerActivityLifecycleCallbacks(life);
-                    }
-                } else {
-                    getApplication().registerActivityLifecycleCallbacks(life);
+            FTActivityLifecycleCallbacks life = new FTActivityLifecycleCallbacks();
+            if (app != null) {
+                Class<?> clazz = PackageUtils.getSophixClass();
+                if (clazz == null || !clazz.isInstance(app)) {
+                    app.registerActivityLifecycleCallbacks(life);
                 }
+            } else {
+                getApplication().registerActivityLifecycleCallbacks(life);
             }
         } catch (Exception e) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
@@ -633,8 +630,11 @@ public class FTAutoTrack {
      * @param webView
      */
     public static void setUpWebView(View webView) {
-        if (webView instanceof WebView && webView.getTag(R.id.ft_webview_handled_tag_view_value) == null) {
-            new FTWebViewHandler().setWebView((WebView) webView);
+        if (webView.getTag(R.id.ft_webview_handled_tag_view_value) == null) {
+            // Check if it's a supported WebView type
+            if (webView instanceof WebView || TBSWebViewUtils.isTBSWebViewInstance(webView)) {
+                new FTWebViewHandler().setWebView(webView);
+            }
         }
     }
 
@@ -646,7 +646,7 @@ public class FTAutoTrack {
      * @param params     Parameter
      * @param paramTypes
      */
-    private static void invokeWebViewLoad(View webView, String methodName, Object[] params, Class[] paramTypes) {
+    private static void invokeWebViewLoad(Object webView, String methodName, Object[] params, Class[] paramTypes) {
         try {
             Class<?> clazz = webView.getClass();
             Method loadMethod = clazz.getMethod(methodName, paramTypes);
@@ -669,7 +669,7 @@ public class FTAutoTrack {
         if (FTSdk.checkInstallState()) {
             LogUtils.d(TAG, "trackOkHttpBuilder");
         } else {
-            LogUtils.e(TAG, "trackOkHttpBuilder: OkhttpClient.Build Before SDK install");
+            LogUtils.eOnce(TAG, "trackOkHttpBuilder: OkhttpClient.Build Before SDK install");
         }
         //Found compatibility issues in some projects
         if (FTRUMConfigManager.get().isRumEnable()) {
@@ -746,9 +746,9 @@ public class FTAutoTrack {
      */
     public static Request trackRequestBuilder(Request.Builder builder) {
         if (FTSdk.checkInstallState()) {
-            LogUtils.d(TAG, "trackRequestBuilder");
+//            LogUtils.d(TAG, "trackRequestBuilder");
         } else {
-            LogUtils.e(TAG, "trackRequestBuilder: Request.Builder Before SDK install");
+            LogUtils.eOnce(TAG, "trackRequestBuilder: Request.Builder Before SDK install");
         }
         if (FTRUMConfigManager.get().isRumEnable()) {
             FTSDKConfig config = FTSdk.get().getBaseConfig();

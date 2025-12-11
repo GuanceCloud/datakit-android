@@ -9,6 +9,7 @@ public class UploadResult {
     private final String response;
     private final int code;
     private final String pkgId;
+    private boolean isInvalid = false;
 
     public UploadResult(int code, String response, String pkgId) {
         if (code == HttpURLConnection.HTTP_OK) {
@@ -23,6 +24,22 @@ public class UploadResult {
         this.code = code;
         this.response = response;
         this.pkgId = pkgId;
+    }
+
+    private UploadResult() {
+        this.response = "";
+        this.code = -1;
+        this.pkgId = "";
+    }
+
+    public static UploadResult createErrorResult() {
+        UploadResult uploadResult = new UploadResult();
+        uploadResult.isInvalid = true;
+        return uploadResult;
+    }
+
+    public boolean isInvalid() {
+        return isInvalid;
     }
 
     public boolean isNeedReTry() {

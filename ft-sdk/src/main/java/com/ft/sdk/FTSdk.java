@@ -14,6 +14,7 @@ import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.PackageUtils;
+import com.ft.sdk.garble.utils.TBSWebViewUtils;
 import com.ft.sdk.garble.utils.Utils;
 import com.ft.sdk.sessionreplay.FTSessionReplayConfig;
 
@@ -49,7 +50,7 @@ public class FTSdk {
      */
     public static String SESSION_REPLAY_MATERIAL_VERSION = PackageUtils.isSessionReplayMtr() ? PackageUtils.getPackageSessionReplayMtr() : "";
 
-    private final static boolean isSessionReplaySupport = SESSION_REPLAY_VERSION.isEmpty();
+    private final static boolean isSessionReplaySupport = !SESSION_REPLAY_VERSION.isEmpty();
     /**
      * Variable written by Plugin ASM, UUID is the same for the same compilation version
      */
@@ -182,6 +183,10 @@ public class FTSdk {
         SyncTaskManager.get().init(config);
         FTTrackInner.getInstance().initBaseConfig(config);
         FTNetworkListener.get().monitor();
+        
+        // Initialize TBS WebView support
+        TBSWebViewUtils.initialize();
+        
         LogUtils.d(TAG, "initFTConfig complete:" + config);
     }
 
@@ -349,7 +354,7 @@ public class FTSdk {
     }
 
     public static boolean isSessionReplaySupport() {
-        return isSessionReplaySupport;
+        return isSessionReplaySupport && SessionReplayManager.get().isReplayEnable();
     }
 
 

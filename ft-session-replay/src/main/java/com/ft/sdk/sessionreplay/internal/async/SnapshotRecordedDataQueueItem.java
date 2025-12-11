@@ -34,10 +34,12 @@ public class SnapshotRecordedDataQueueItem extends RecordedDataQueueItem {
     }
 
     public void incrementPendingJobs() {
+        //System.out.println("[FT-SDK] " + getCreationTimeStampInNs() + ",incrementPendingJobs:" + pendingJobs.get());
         pendingJobs.incrementAndGet();
     }
 
     public void decrementPendingJobs() {
+        //System.out.println("[FT-SDK] " + getCreationTimeStampInNs() + ",decrementPendingJobs:" + pendingJobs.get());
         pendingJobs.decrementAndGet();
     }
 

@@ -25,11 +25,10 @@ public class FTSessionReplayConfig {
     private float sampleRate = 1f;
     private float sessionReplayOnErrorSampleRate = 1f;
     private boolean delayInit;
+    private String[] rumLinkKeys = new String[]{};
     private boolean fineGrainedMaskingSet = false;
     private boolean dynamicOptimizationEnabled = true;
     private SessionReplayInternalCallback internalCallback = new NoSessionReplayInternalCallback();
-
-    private ExtensionSupport extensionSupport = new NoOpExtensionSupport();
 
     /**
      * Set the collection rate, the value range is [0,1], 0 means not collected, 1 means full collection, the default value is 1.
@@ -56,10 +55,9 @@ public class FTSessionReplayConfig {
      * @return
      */
     public FTSessionReplayConfig addExtensionSupport(ExtensionSupport extensionSupport) {
-        this.extensionSupport = extensionSupport;
-        this.customMappers = extensionSupport.getCustomViewMappers();
-        this.customOptionSelectorDetectors = extensionSupport.getOptionSelectorDetectors();
-        this.customDrawableMapper = extensionSupport.getCustomDrawableMapper();
+        this.customMappers.addAll(extensionSupport.getCustomViewMappers());
+        this.customOptionSelectorDetectors.addAll(extensionSupport.getOptionSelectorDetectors());
+        this.customDrawableMapper.addAll(extensionSupport.getCustomDrawableMapper());
         return this;
     }
 
@@ -147,6 +145,20 @@ public class FTSessionReplayConfig {
         fineGrainedMaskingSet = true;
         this.touchPrivacy = privacy;
         return this;
+    }
+
+    /**
+     *
+     * @param rumLinkKeys
+     * @return
+     */
+    public FTSessionReplayConfig enableLinkRUMKeys(String[] rumLinkKeys) {
+        this.rumLinkKeys = rumLinkKeys;
+        return this;
+    }
+
+    public String[] getRumLinkKeys() {
+        return rumLinkKeys;
     }
 
     public ImagePrivacy getImagePrivacy() {

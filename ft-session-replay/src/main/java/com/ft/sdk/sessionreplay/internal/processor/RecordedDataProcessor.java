@@ -5,6 +5,7 @@ import android.content.res.Configuration;
 import androidx.annotation.WorkerThread;
 
 import com.ft.sdk.feature.FeatureSdkCore;
+import com.ft.sdk.sessionreplay.SlotIdWebviewBinder;
 import com.ft.sdk.sessionreplay.internal.async.ResourceRecordedDataQueueItem;
 import com.ft.sdk.sessionreplay.internal.async.SnapshotRecordedDataQueueItem;
 import com.ft.sdk.sessionreplay.internal.async.TouchEventRecordedDataQueueItem;
@@ -22,6 +23,7 @@ import com.ft.sdk.sessionreplay.model.MobileMutationData;
 import com.ft.sdk.sessionreplay.model.MobileRecord;
 import com.ft.sdk.sessionreplay.model.ViewEndRecord;
 import com.ft.sdk.sessionreplay.model.ViewportResizeData;
+import com.ft.sdk.sessionreplay.model.WebviewWireframe;
 import com.ft.sdk.sessionreplay.model.Wireframe;
 import com.ft.sdk.sessionreplay.recorder.SystemInformation;
 import com.ft.sdk.sessionreplay.utils.SessionReplayRumContext;
@@ -32,31 +34,37 @@ import java.util.concurrent.TimeUnit;
 
 public class RecordedDataProcessor implements Processor {
 
+    private static final String TAG = "RecordedDataProcessor";
     private final ResourceDataStoreManager resourceDataStoreManager;
     private final ResourcesWriter resourcesWriter;
     private final RecordWriter writer;
     private final MutationResolver mutationResolver;
     private final NodeFlattener nodeFlattener;
+    private final SlotIdWebviewBinder slotIdWebviewBinder;
 
     private List<Wireframe> prevSnapshot = new LinkedList<>();
     private long lastSnapshotTimestamp = 0L;
+    private boolean forceNewNextViewForLinkView = false;
     private int previousOrientation = Configuration.ORIENTATION_UNDEFINED;
+    private final boolean enableRUMKeysLink;
     private SessionReplayRumContext prevRumContext = new SessionReplayRumContext();
     private final FeatureSdkCore sdkCore;
 
     public RecordedDataProcessor(FeatureSdkCore sdkCore, ResourceDataStoreManager resourceDataStoreManager, ResourcesWriter resourcesWriter, RecordWriter writer,
-                                 MutationResolver mutationResolver) {
-        this(sdkCore, resourceDataStoreManager, resourcesWriter, writer, mutationResolver, new NodeFlattener());
+                                 MutationResolver mutationResolver, boolean enableRUMKeyLinks, SlotIdWebviewBinder slotIdWebviewBinder) {
+        this(sdkCore, resourceDataStoreManager, resourcesWriter, writer, mutationResolver, new NodeFlattener(), enableRUMKeyLinks, slotIdWebviewBinder);
     }
 
     public RecordedDataProcessor(FeatureSdkCore sdkCore, ResourceDataStoreManager resourceDataStoreManager, ResourcesWriter resourcesWriter, RecordWriter writer,
-                                 MutationResolver mutationResolver, NodeFlattener nodeFlattener) {
+                                 MutationResolver mutationResolver, NodeFlattener nodeFlattener, boolean enableRUMKeysLink, SlotIdWebviewBinder slotIdWebviewBinder) {
         this.resourceDataStoreManager = resourceDataStoreManager;
         this.resourcesWriter = resourcesWriter;
         this.writer = writer;
         this.mutationResolver = mutationResolver;
         this.nodeFlattener = nodeFlattener;
         this.sdkCore = sdkCore;
+        this.enableRUMKeysLink = enableRUMKeysLink;
+        this.slotIdWebviewBinder = slotIdWebviewBinder;
     }
 
     @Override
@@ -65,6 +73,10 @@ public class RecordedDataProcessor implements Processor {
         String resourceHash = item.getIdentifier();
         boolean isKnownResource = resourceDataStoreManager.isPreviouslySentResource(resourceHash);
         if (!isKnownResource) {
+            if (resourceDataStoreManager.isReady()) {
+                resourceDataStoreManager.cacheResourceHash(resourceHash);
+            }
+
             EnrichedResource enrichedResource = new EnrichedResource(
                     item.getResourceData(),
                     item.getApplicationId(),
@@ -104,6 +116,8 @@ public class RecordedDataProcessor implements Processor {
         writer.write(enrichedRecord);
     }
 
+    private String preCacheViewId = "";
+
     @WorkerThread
     private void handleSnapshots(SessionReplayRumContext newRumContext, long timestamp,
                                  List<Node> snapshots, SystemInformation systemInformation) {
@@ -117,7 +131,8 @@ public class RecordedDataProcessor implements Processor {
         }
 
         List<MobileRecord> records = new LinkedList<>();
-        boolean isNewView = isNewView(newRumContext);
+        boolean isNewViewForContextLink = forceNewNextViewForLinkView && !newRumContext.getGlobalContext().isEmpty();
+        boolean isNewView = isNewView(newRumContext) || isNewViewForContextLink;
         boolean isTimeForFullSnapshot = isTimeForFullSnapshot();
         boolean screenOrientationChanged = systemInformation.getScreenOrientation() != previousOrientation;
         boolean isSessionReplayErrorSampled = sdkCore.getConsentProvider() == TrackingConsent.SAMPLED_ON_ERROR_SESSION;
@@ -139,6 +154,10 @@ public class RecordedDataProcessor implements Processor {
             );
             records.add(metaRecord);
             records.add(focusRecord);
+            if (isNewViewForContextLink) {
+                sdkCore.getInternalLogger().d(TAG, "forceNewNextView:" + newRumContext.getViewId());
+                forceNewNextViewForLinkView = false;
+            }
         }
 
         if (screenOrientationChanged) {
@@ -156,7 +175,7 @@ public class RecordedDataProcessor implements Processor {
         }
 
         if (fullSnapshotRequired) {
-            if (isSessionReplayErrorSampled) {
+            if (isSessionReplayErrorSampled || enableRUMKeysLink) {
                 MetaRecord metaRecord = new MetaRecord(
                         timestamp,
                         null,
@@ -186,8 +205,28 @@ public class RecordedDataProcessor implements Processor {
         prevSnapshot = wireframes;
         previousOrientation = systemInformation.getScreenOrientation();
 
+        boolean hasWebview = false;
+        for (Wireframe wireframe : wireframes) {
+            if (wireframe instanceof WebviewWireframe) {
+                hasWebview = true;
+                long slotId = wireframe.getId();
+                if (slotIdWebviewBinder != null) {
+                    slotIdWebviewBinder.bind(slotId, newRumContext.getViewId());
+                }
+                break;
+            }
+        }
+
+        if (!hasWebview) {
+            if (slotIdWebviewBinder != null) {
+                slotIdWebviewBinder.setAllInactive();
+            }
+        }
+
         if (!records.isEmpty()) {
-            writer.write(bundleRecordInEnrichedRecord(newRumContext, records));
+            EnrichedRecord record = bundleRecordInEnrichedRecord(newRumContext, records);
+            writer.write(record);
+//            sdkCore.getInternalLogger().e(TAG, "records"+record.toJson());
         }
     }
 
@@ -197,6 +236,10 @@ public class RecordedDataProcessor implements Processor {
             return true;
         }
         return false;
+    }
+
+    public void forceNewNextViewForLinkView() {
+        forceNewNextViewForLinkView = true;
     }
 
     private void handleViewEndRecord(long timestamp) {
@@ -212,8 +255,8 @@ public class RecordedDataProcessor implements Processor {
         return new EnrichedRecord(
                 rumContext.getApplicationId(),
                 rumContext.getSessionId(),
-                rumContext.getViewId(),
-                records
+                rumContext.getViewId(), false,
+                records, rumContext.getGlobalContext()
         );
     }
 

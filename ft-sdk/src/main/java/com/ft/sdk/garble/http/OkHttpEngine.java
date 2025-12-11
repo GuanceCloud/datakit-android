@@ -83,8 +83,8 @@ public class OkHttpEngine implements INetEngine {
                 }
 
                 for (Map.Entry<String, Pair<String, byte[]>> fileFields : httpBuilder.getFileParams().entrySet()) {
-                    RequestBody fileBody = RequestBody.create(fileFields.getValue().second,
-                            MediaType.parse("application/octet-stream"));
+                    RequestBody fileBody = RequestBody.create(MediaType.parse("application/octet-stream"),
+                            fileFields.getValue().second);
                     multipartBuilder.addFormDataPart(fileFields.getKey(), fileFields.getValue().first,
                             fileBody);
                 }

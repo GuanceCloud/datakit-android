@@ -18,6 +18,7 @@ public class SessionReplayRecordWriter implements RecordWriter {
     private final FeatureSdkCore sdkCore;
     private final RecordCallback recordCallback;
     private String viewId = "";
+    private String webViewId = "";
 
     public SessionReplayRecordWriter(FeatureSdkCore sdkCore, RecordCallback recordCallback) {
         this.sdkCore = sdkCore;
@@ -26,25 +27,49 @@ public class SessionReplayRecordWriter implements RecordWriter {
 
     @Override
     public void write(EnrichedRecord record) {
-        boolean forceNew = !viewId.equals(record.getViewId());
-        if (forceNew) {
-            viewId = record.getViewId();
-            sdkCore.getInternalLogger().i(TAG, "SR forceNew:viewId:" + viewId);
-        }
+        if (record.isWebRecord()) {
+            boolean forceNew = !webViewId.equals(record.getViewId());
+            if (forceNew) {
+                webViewId = record.getViewId();
+                sdkCore.getInternalLogger().i(TAG, "SR forceNew:webViewId:" + webViewId);
+            }
 
-        sdkCore.getFeature(Feature.SESSION_REPLAY_FEATURE_NAME).withWriteContext(forceNew, new DataConsumerCallback() {
-            @Override
-            public void onConsume(SessionReplayContext context, EventBatchWriter writer) {
-                byte[] serializedRecord = record.toJson().getBytes(Charsets.UTF_8);
-                RawBatchEvent rawBatchEvent = new RawBatchEvent(serializedRecord, null);
-                synchronized (this) {
-                    if (writer.write(rawBatchEvent, null, EventType.DEFAULT)) {
-                        updateViewSent(record);
+            sdkCore.getFeature(Feature.SESSION_REPLAY_FEATURE_NAME).withWriteContext(forceNew, new DataConsumerCallback(record.isWebRecord()) {
+                @Override
+                public void onConsume(SessionReplayContext context, EventBatchWriter writer) {
+                    byte[] serializedRecord = record.toJson().getBytes(Charsets.UTF_8);
+                    RawBatchEvent rawBatchEvent = new RawBatchEvent(serializedRecord, null);
+                    synchronized (this) {
+                        if (writer.write(rawBatchEvent, null, EventType.DEFAULT)) {
+                            updateViewSent(record);
+                        }
                     }
                 }
+            });
+        } else {
+            boolean forceNew = !viewId.equals(record.getViewId());
+            if (forceNew) {
+                viewId = record.getViewId();
+                sdkCore.getInternalLogger().i(TAG, "SR forceNew:viewId:" + viewId);
             }
-        });
+
+            sdkCore.getFeature(Feature.SESSION_REPLAY_FEATURE_NAME).withWriteContext(forceNew, new DataConsumerCallback(record.isWebRecord()) {
+                @Override
+                public void onConsume(SessionReplayContext context, EventBatchWriter writer) {
+                    byte[] serializedRecord = record.toJson().getBytes(Charsets.UTF_8);
+                    RawBatchEvent rawBatchEvent = new RawBatchEvent(serializedRecord, null);
+                    synchronized (this) {
+                        if (writer.write(rawBatchEvent, null, EventType.DEFAULT)) {
+                            updateViewSent(record);
+                        }
+                    }
+                }
+            });
+
+        }
     }
+
+
 
     private void updateViewSent(EnrichedRecord record) {
 

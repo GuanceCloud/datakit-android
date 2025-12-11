@@ -1,6 +1,5 @@
 package com.ft.sdk.api.context;
 
-import com.ft.sdk.sessionreplay.internal.persistence.TrackingConsent;
 import com.ft.sdk.sessionreplay.utils.MapUtils;
 
 import java.util.HashMap;

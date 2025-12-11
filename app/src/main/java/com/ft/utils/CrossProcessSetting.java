@@ -16,6 +16,7 @@ public class CrossProcessSetting {
 
     /**
      * Get isOnlyMainProcess setting status
+     * need set in Application
      *
      * @param context
      * @return

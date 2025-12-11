@@ -5,12 +5,14 @@ import androidx.annotation.NonNull;
 
 import com.ft.sdk.SyncDataHelper;
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.HashMapUtils;
 import com.ft.sdk.garble.utils.Utils;
 import com.ft.sdk.internal.exception.FTInvalidParameterException;
 
 import org.json.JSONException;
 
 import java.security.InvalidParameterException;
+import java.util.regex.Pattern;
 
 
 /**
@@ -115,9 +117,8 @@ public class SyncData implements Cloneable {
      */
     public String getDataString(String newUUID) {
         if (newUUID != null) {
-            dataString = dataString.replaceFirst("(" +
-                    Constants.KEY_SDK_DATA_FLAG + "=)(.*)"
-                    + uuid, Constants.KEY_SDK_DATA_FLAG + "=" + newUUID);
+            dataString = dataString.replaceFirst("(sdk_data_id=[^,]*?)" + Pattern.quote(uuid)
+                    , "$1" + newUUID);
         }
         return dataString;
     }
@@ -148,7 +149,13 @@ public class SyncData implements Cloneable {
         } else {
             recordData.setTime(bean.getTimeNano());
         }
-        recordData.setUuid(uuid);
+        if (bean.getMeasurement().equals(Constants.FT_MEASUREMENT_RUM_VIEW)) {
+            String uuidFromView = HashMapUtils.getString(bean.getTags(), Constants.KEY_RUM_VIEW_ID);
+            uuid = uuidFromView == null ? uuid : uuidFromView.substring(0, 16);
+            recordData.setUuid(uuid);
+        } else {
+            recordData.setUuid(uuid);
+        }
         recordData.setDataString(helper.getBodyContent(bean.getMeasurement(), bean.getTags(),
                 bean.getFields(), bean.getTimeNano(), dataType, uuid));
         return recordData;

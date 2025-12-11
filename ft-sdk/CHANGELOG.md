@@ -1,3 +1,79 @@
+# agent 1.7.0-alpha38
+1. Added compatibility for OkHttp 3.12.0 and lower versions, and fixed the issue 
+    where replay data could not be synchronized on these older versions.
+
+---
+# agent 1.7.0-alpha37
+1. ft-session-replay:>0.1.3-alpha12
+2. Fixed the issue where enabling ErrorSampleRate caused key playback data to be lost in WebView
+3. Optimized the logic for handling replay data when the WebView is not visible
+
+---
+# agent 1.7.0-alpha36
+1. ft-session-replay:>0.1.3-alpha11
+2. Optimized the linkView frame completion process during Replay data sharding.
+
+---
+# agent 1.7.0-alpha35
+1. ft-session-replay:>0.1.3-alpha10
+2. Optimized frame generation and consumption logic.
+3. Fixed the issue where recording failed due to bitmap recycling.
+
+---
+# agent 1.7.0-alpha34
+1. merge from ft-sdk 1.6.15-alpha09
+2. ft-session-replay:>0.1.3-alpha08
+3. Added full snapshot keyframe Session Replay support for the WebView container
+
+---
+# agent 1.7.0-alpha33
+1. merge from ft-sdk 1.6.15-alpha07, 1.6.15-alpha08
+2. ft-session-replay:>0.1.3-alpha07
+3. Increased the disk write limit for Session Replay
+4. Added RUM Session Replay context association feature,
+   and associated the WebView container with the context of the loaded HTML.
+
+---
+# agent 1.7.0-alpha31
+1. Added config validation for the WebView Session Replay feature
+
+---
+# agent 1.7.0-alpha30
+1. merge from ft-sdk 1.6.15-alpha06
+
+---
+# agent 1.7.0-alpha29
+1. Delayed write for WebView Session Replay data.
+2. ft-session-replay:>0.1.3-alpha06
+
+---
+# agent 1.7.0-alpha28
+1. Fixed the issue where obtaining write too early caused WebView Session Replay to be blank, and added log output.
+2. ft-session-replay:>0.1.3-alpha05
+
+---
+# agent 1.7.0-alpha27
+1. resolve missing container data with RUM data
+2. ft-session-replay:>0.1.3-alpha04
+---
+# agent 1.7.0-alpha26
+1. Merge ft-sdk 1.6.15-alpha04
+2. Session replay support DCloud WebView
+3. ft-session-replay >= 0.1.3-alpha03
+
+---
+# agent 1.7.0-alpha25
+1. Merge ft-sdk 1.6.15-alpha03
+
+---
+# agent 1.7.0-alpha24
+1. Merge ft-sdk 1.6.15-alpha01
+
+---
+# agent 1.7.0-alpha23
+1. Webview Session Replay support, ft-session-replay >= 0.1.3-alpha01
+
+---
 # agent 1.7.0-alpha22
 1. Merge ft-sdk 1.6.14
 
@@ -80,6 +156,65 @@
 ---
 # agent 1.7.0-alpha02
 1. Support for enabling session replay recording feature
+
+---
+# agent 1.6.15
+1. Optimized the FPS monitoring mechanism by stopping detection when the app is in the background.
+2. Optimized the output of long logs more than 4K
+3. Optimized the generation of resource, long task, and error with View data.
+4. Improved the view generation rate and merged data with the same view_id.
+5. remove ActivityLifecycleCallbacks limit in child process
+6. Fixed the occasional issue where View data updates were lost.
+7. Fixed the issue where asynchronous network requests caused abnormal session refresh.
+8. Fixed the issue where reinitialization after SDK shutdown could not trigger idle shutdown.
+---
+# agent 1.6.15-beta01
+1. Same as agent 1.6.15-alpha10
+2. Fixed pending_resource_count in Action and View metrics
+
+---
+# agent 1.6.15-alpha10
+1. Optimized the FPS monitoring mechanism by stopping detection when the app is in the background.
+
+---
+# agent 1.6.15-alpha09
+1. Fixed the issue where reinitialization after SDK shutdown could not trigger idle shutdown.
+
+---
+# agent 1.6.15-alpha08
+1. Fixed the issue above ft-sdk:1.6.15-alpha04 where data retransmission caused data field loss.
+
+---
+# agent 1.6.15-alpha07
+1. Ensure FPS is started from the main thread
+2. Optimized the output of long logs more than 4K
+3. Added resource_id to network error types for data correlation.
+
+---
+# agent 1.6.15-alpha06
+1. remove ActivityLifecycleCallbacks limit in main process
+
+---
+# agent 1.6.15-alpha05
+1. Fix view and action error of status
+
+---
+# agent 1.6.15-alpha04
+1. Fixed the issue where asynchronous network requests caused abnormal session refresh.
+2. Optimized the generation of resource, long task, and error with View data.
+3. Improved the view generation rate and merged data with the same view_id.
+
+---
+# agent 1.6.15-alpha03
+1. WebView data collection supports Tencent X5
+
+---
+# agent 1.6.15-alpha02
+1. Added background field to error_situation
+
+---
+# agent 1.6.15-alpha01
+1. Fixed the incorrect way of retrieving the cursor count.
 
 ---
 # agent 1.6.14

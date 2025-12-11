@@ -5,7 +5,6 @@ import android.util.Pair;
 import com.ft.sdk.api.SessionReplayFormData;
 import com.ft.sdk.api.SessionReplayUploadCallback;
 import com.ft.sdk.api.context.SessionReplayContext;
-import com.ft.sdk.sessionreplay.internal.excepiton.InvalidPayloadFormatException;
 import com.ft.sdk.sessionreplay.internal.net.BatchesToSegmentsMapper;
 import com.ft.sdk.sessionreplay.internal.net.BytesCompressor;
 import com.ft.sdk.sessionreplay.internal.storage.RawBatchEvent;
@@ -17,6 +16,8 @@ import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Responsible for session replay upload logic
@@ -35,6 +36,7 @@ public class SessionReplayUploader {
     private static final String HAS_FULL_SNAPSHOT = "has_full_snapshot";
     private static final String KEY_ENV = "env";
     private static final String KEY_SDK_VERSION = "sdk_version";
+    private static final String KEY_SDK_NAME = "sdk_name";
     private static final String KEY_VERSION = "version";
     private static final String KEY_APP_ID = "app_id";
     private static final String KEY_SESSION_ID = "session_id";
@@ -63,7 +65,8 @@ public class SessionReplayUploader {
      *
      * @param context
      */
-    public UploadResult upload(SessionReplayContext context, List<RawBatchEvent> batchData, byte[] byteArray) throws Exception {
+    public UploadResult upload(SessionReplayContext context, List<RawBatchEvent> batchData,
+                               byte[] byteArray) throws Exception {
         List<byte[]> serializedSegments = new ArrayList<>();
         for (RawBatchEvent event : batchData) {
             serializedSegments.add(event.getData());
@@ -71,12 +74,12 @@ public class SessionReplayUploader {
 
         List<Pair<MobileSegment, JsonObject>> serializedSegmentPair = batchToSegmentsMapper.map(serializedSegments);
         if (serializedSegmentPair == null || serializedSegmentPair.isEmpty()) {
-            throw new InvalidPayloadFormatException(
-                    "The payload format was broken and an upload request could not be created"
-            );
+            internalLogger.e(TAG, "The payload format was broken and an upload request could not be created");
+            return UploadResult.createErrorResult();
         }
         String viewId = "";
         String sessionId = "";
+        Map<String, Object> hashMap = new ConcurrentHashMap<>();
         long start = -1;
         long end = -1;
         long recordsCount = 0;
@@ -92,6 +95,7 @@ public class SessionReplayUploader {
             recordsCount += segment.first.recordsCount;
             sessionId = segment.first.session.id;
             viewId = segment.first.view.getId();
+            hashMap = segment.first.globalContext;
 
             if (segment.first.hasFullSnapshot) {
                 hasFullSnapshot = true;
@@ -112,10 +116,19 @@ public class SessionReplayUploader {
 
         fieldMap.put(KEY_ENV, context.getEnv());
         fieldMap.put(KEY_SDK_VERSION, context.getSdkVersion());
+        fieldMap.put(KEY_SDK_NAME, "df_android_rum_sdk");
         fieldMap.put(KEY_APP_ID, context.getAppId());
         fieldMap.put(KEY_SESSION_ID, sessionId);
         fieldMap.put(KEY_VIEW_ID, viewId);
         fieldMap.put(KEY_VERSION, context.getAppVersion());
+
+        // add globalContext
+        StringBuilder contextString = new StringBuilder();
+        for (String key : hashMap.keySet()) {
+            fieldMap.put(key, hashMap.get(key) + "");
+            contextString.append(",").append(key).append(":").append(hashMap.get(key)).append(" ");
+        }
+
         HashMap<String, Pair<String, byte[]>> fileFileMap = new HashMap<>();
         fileFileMap.put(KEY_SEGMENT, new Pair<>(viewId, compressedData));
 
@@ -123,11 +136,16 @@ public class SessionReplayUploader {
         UploadResult result = callback.onRequest(formData);
 
         if (result.isSuccess()) {
-            internalLogger.d(TAG, "Session Upload Success. " + result.getPkgId() + ",view_id:" + viewId
-                    + ",count:" + recordsCount + ",hasFullSnapshot:" + hasFullSnapshot);
+            internalLogger.d(TAG, "Session Upload Success. " + result.getPkgId()
+                            + ",view_id:" + viewId
+                            + contextString
+                            + ",count:" + recordsCount + ",fullSnapshot:" + hasFullSnapshot
+//                     + (hasFullSnapshot ? "\n" + jsonString : "")
+            );
         } else {
-            internalLogger.e(TAG, "Session Upload Failed." + result.getPkgId() + ",view_id:" + viewId
-                    + ",count:" + recordsCount + ",code:" + result.getCode() + ",response:" + result.getResponse());
+            internalLogger.e(TAG, "Session Upload Failed." + result.getPkgId() + ",view_id:"
+                    + viewId + ",count:" + recordsCount + ",code:" + result.getCode() + ",response:"
+                    + result.getResponse());
         }
         return result;
 

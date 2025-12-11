@@ -104,7 +104,6 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
     }
 
     @Override
-    @MainThread
     public void tryToConsumeItems() {
         if (recordedDataQueue.isEmpty()) {
             return;
@@ -153,6 +152,10 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
         }
     }
 
+    public void forceFullSnapshotForLinkView() {
+        processor.forceNewNextViewForLinkView();
+    }
+
     private void logAddToQueueException(Exception e) {
         internalLogger.e(TAG, FAILED_TO_ADD_RECORDS_TO_QUEUE_ERROR_MESSAGE + "," + Log.getStackTraceString(e));
     }
@@ -169,5 +172,5 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
 
     @VisibleForTesting
     static final String ITEM_DROPPED_EXPIRED_MESSAGE =
-            "SR RecordedDataQueueHandler: dropped item from the queue. age=%d ms";
+            "SR RecordedDataQueueHandler: dropped item from the queue. age=%d ns";
 }

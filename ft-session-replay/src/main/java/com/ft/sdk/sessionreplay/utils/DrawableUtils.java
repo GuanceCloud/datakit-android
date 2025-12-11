@@ -11,6 +11,7 @@ import androidx.annotation.WorkerThread;
 
 import com.ft.sdk.sessionreplay.internal.recorder.resources.BitmapCachesManager;
 import com.ft.sdk.sessionreplay.internal.recorder.resources.ResourceResolver;
+import com.ft.sdk.sessionreplay.internal.utils.ExecutorUtils;
 import com.ft.sdk.sessionreplay.internal.wrappers.BitmapWrapper;
 import com.ft.sdk.sessionreplay.internal.wrappers.CanvasWrapper;
 
@@ -62,7 +63,14 @@ public class DrawableUtils {
                     @Override
                     @WorkerThread
                     public void onSuccess(Bitmap bitmap) {
-                        executorService.submit(() -> drawOnCanvas(bitmap, drawable, bitmapCreationCallback));
+                        ExecutorUtils.executeSafe(executorService, "drawOnCanvas", internalLogger,
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        drawOnCanvas(bitmap, drawable, bitmapCreationCallback);
+                                    }
+                                }
+                        );
                     }
 
                     @Override
@@ -101,9 +109,19 @@ public class DrawableUtils {
             canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.MULTIPLY);
 
             drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-            drawable.draw(canvas);
+            try {
+                drawable.draw(canvas);
+            } catch (RuntimeException e) {
+                logDrawableDrawException(e);
+                bitmapCreationCallback.onFailure();
+                return;
+            }
             bitmapCreationCallback.onReady(bitmap);
         }
+    }
+
+    private void logDrawableDrawException(RuntimeException runtimeException) {
+        internalLogger.w(TAG, "drawOnCanvas fail with" + runtimeException.getMessage());
     }
 
     @WorkerThread

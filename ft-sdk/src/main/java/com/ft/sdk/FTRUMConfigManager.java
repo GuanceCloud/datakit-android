@@ -7,9 +7,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
-import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.db.FTDBCachePolicy;
 import com.ft.sdk.garble.threadpool.RunnerCompleteCallBack;
@@ -118,7 +116,7 @@ public class FTRUMConfigManager {
                         //fixme If native crash file is too large, there may be performance issues here
                         CountDownLatch latch = new CountDownLatch(1);
                         FTExceptionHandler.get().uploadNativeCrashBackground(new File(crashPath),
-                                AppState.RUN, false, new RunnerCompleteCallBack() {
+                                FTActivityManager.get().getAppState(), false, new RunnerCompleteCallBack() {
                                     @Override
                                     public void onComplete() {
                                         Utils.deleteFile(crashPath);

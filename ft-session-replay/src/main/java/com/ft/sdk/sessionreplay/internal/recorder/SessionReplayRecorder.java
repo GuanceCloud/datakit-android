@@ -14,6 +14,7 @@ import com.ft.sdk.feature.FeatureSdkCore;
 import com.ft.sdk.sessionreplay.ImagePrivacy;
 import com.ft.sdk.sessionreplay.MapperTypeWrapper;
 import com.ft.sdk.sessionreplay.SessionReplayInternalCallback;
+import com.ft.sdk.sessionreplay.SlotIdWebviewBinder;
 import com.ft.sdk.sessionreplay.TextAndInputPrivacy;
 import com.ft.sdk.sessionreplay.internal.LifecycleCallback;
 import com.ft.sdk.sessionreplay.internal.SessionReplayLifecycleCallback;
@@ -98,7 +99,9 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
             ResourceDataStoreManager resourceDataStoreManager,
             SessionReplayInternalCallback internalCallback,
             boolean dynamicOptimizationEnabled,
-            boolean isDelayInit
+            boolean isDelayInit,
+            boolean enableRUMKeysLink,
+            SlotIdWebviewBinder slotIdWebviewBinder
     ) {
         this.appContext = appContext;
         this.rumContextProvider = rumContextProvider;
@@ -125,7 +128,8 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
                 resourceDataStoreManager,
                 resourcesWriter,
                 recordWriter,
-                new MutationResolver(internalLogger)
+                new MutationResolver(internalLogger, slotIdWebviewBinder),
+                enableRUMKeysLink, slotIdWebviewBinder
         );
 
         String applicationId = rumContextProvider.getRumContext().getApplicationId();
@@ -233,6 +237,10 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
     @Override
     public void stopProcessingRecords() {
         recordedDataQueueHandler.clearAndStopProcessingQueue();
+    }
+
+    public void forceFullSnapshotForLinkView() {
+        recordedDataQueueHandler.forceFullSnapshotForLinkView();
     }
 
     @Override

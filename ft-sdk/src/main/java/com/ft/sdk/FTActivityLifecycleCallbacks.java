@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 
 import com.ft.sdk.garble.gesture.WindowCallbackTracker;
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.FpsUtils;
 
 import java.util.HashMap;
 
@@ -28,6 +29,7 @@ import java.util.HashMap;
  * These can be viewed through TrueWatch Studio <a href="https://docs.truewatch.com/real-user-monitoring/explorer/view/">Viewer View</a>
  */
 public class FTActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "FTActivityLifecycleCallbacks";
     private final LifeCircleTraceCallback mAppRestartCallback = new LifeCircleTraceCallback();
     private final WindowCallbackTracker mDispatcherReceiver = new WindowCallbackTracker();
 
@@ -68,6 +70,11 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
     public void onActivityStarted(@NonNull Activity activity) {
         activityCount++;
         mFragmentLifecycleHelper.register(activity);
+        if (activityCount > 0) {
+            FTActivityManager.get().appForeground();
+            // Handle FPS monitoring lifecycle
+            FpsUtils.onAppForeground();
+        }
     }
 
     /**
@@ -120,7 +127,6 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
             } else {
                 FTRUMInnerManager.get().startView(activity.getClass().getSimpleName());
             }
-
         }
 
         if (manager.isRumEnable() && manager.getConfig().isEnableTraceUserAction()) {
@@ -183,6 +189,9 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
         activityCount--;
         if (activityCount == 0) {
             mAppRestartCallback.onEnterBackground();
+            FTActivityManager.get().appBackGround();
+            // Handle FPS monitoring lifecycle
+            FpsUtils.onAppBackground();
         }
         mFragmentLifecycleHelper.unregister(activity);
     }

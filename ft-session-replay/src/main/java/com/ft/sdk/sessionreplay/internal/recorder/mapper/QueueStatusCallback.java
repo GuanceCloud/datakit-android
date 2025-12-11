@@ -19,6 +19,7 @@ public class QueueStatusCallback implements AsyncJobStatusCallback {
     @Override
     public void jobFinished() {
         recordedDataQueueRefs.decrementPendingJobs();
+        //System.out.println("[FT-SDK] tryToConsumeItems from QueStatus:");
         recordedDataQueueRefs.tryToConsumeItem();
     }
 }

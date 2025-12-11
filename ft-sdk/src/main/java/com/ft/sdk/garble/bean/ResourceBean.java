@@ -15,6 +15,10 @@ import javax.net.ssl.HttpsURLConnection;
 public class ResourceBean {
 
     /**
+     * request uuid
+     */
+    public String id = "";
+    /**
      * Request resource address
      */
     public String url = "";

@@ -202,11 +202,12 @@ public class SessionReplayDataUploadRunnable implements Runnable {
     ) {
         UploadResult result = null;
         try {
+            //internalLogger.d(TAG,"batchId:"+batchId.getId());
             result = dataUploader.upload(context, batch, batchMeta);
             if (result != null) {
                 storage.confirmBatchRead(batchId,
-                        !result.isNeedReTry() ? new RemovalReason.Flushed()
-                                : new RemovalReason.Invalid(), true);
+                        !result.isInvalid() ? new RemovalReason.Flushed()
+                                : new RemovalReason.Invalid(), !result.isNeedReTry());
             } else {
                 storage.confirmBatchRead(batchId, new RemovalReason.Flushed(), false);
             }

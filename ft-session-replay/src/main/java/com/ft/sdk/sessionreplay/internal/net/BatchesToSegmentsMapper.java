@@ -11,6 +11,7 @@ import com.ft.sdk.sessionreplay.model.View;
 import com.ft.sdk.sessionreplay.utils.InternalLogger;
 import com.ft.sdk.sessionreplay.utils.SessionReplayRumContext;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
@@ -21,6 +22,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class BatchesToSegmentsMapper {
 
@@ -118,7 +120,8 @@ public class BatchesToSegmentsMapper {
                 null,
                 hasFullSnapshotRecord,
                 Source.ANDROID,
-                List.of()
+                List.of(),
+                rumContext.getGlobalContext()
         );
         JsonObject segmentAsJsonObject = segment.toJson().getAsJsonObject();
         if (segmentAsJsonObject == null) {
@@ -174,12 +177,33 @@ public class BatchesToSegmentsMapper {
         String sessionId = jsonObject.has(EnrichedRecord.SESSION_ID_KEY) ? jsonObject.get(EnrichedRecord.SESSION_ID_KEY).getAsString() : null;
         String viewId = jsonObject.has(EnrichedRecord.VIEW_ID_KEY) ? jsonObject.get(EnrichedRecord.VIEW_ID_KEY).getAsString() : null;
 
+        // get globalContext
+        ConcurrentHashMap<String, Object> globalContext = new ConcurrentHashMap<>();
+        if (jsonObject.has("globalContext") && jsonObject.get("globalContext").isJsonObject()) {
+            JsonObject globalContextJson = jsonObject.getAsJsonObject("globalContext");
+            for (String key : globalContextJson.keySet()) {
+                JsonElement value = globalContextJson.get(key);
+                if (value.isJsonPrimitive()) {
+                    if (value.getAsJsonPrimitive().isString()) {
+                        globalContext.put(key, value.getAsString());
+                    } else if (value.getAsJsonPrimitive().isNumber()) {
+                        globalContext.put(key, value.getAsNumber());
+                    } else if (value.getAsJsonPrimitive().isBoolean()) {
+                        globalContext.put(key, value.getAsBoolean());
+                    }
+                } else if (value.isJsonNull()) {
+                    globalContext.put(key, null);
+                }
+            }
+        }
+
+
         if (applicationId == null || sessionId == null || viewId == null) {
             internalLogger.e(TAG, ILLEGAL_STATE_ENRICHED_RECORD_ERROR_MESSAGE, true);
             return null;
         }
 
-        return new SessionReplayRumContext(applicationId, sessionId, viewId);
+        return new SessionReplayRumContext(applicationId, sessionId, viewId, globalContext);
     }
 
     // endregion

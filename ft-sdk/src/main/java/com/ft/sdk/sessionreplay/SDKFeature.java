@@ -20,6 +20,7 @@ import com.ft.sdk.feature.FeatureContextUpdateReceiver;
 import com.ft.sdk.feature.FeatureEventReceiver;
 import com.ft.sdk.feature.FeatureScope;
 import com.ft.sdk.feature.FeatureSdkCore;
+import com.ft.sdk.feature.FeatureStorageConfiguration;
 import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.bean.BatteryBean;
 import com.ft.sdk.garble.http.FTResponseData;
@@ -31,7 +32,6 @@ import com.ft.sdk.garble.utils.ID36Generator;
 import com.ft.sdk.garble.utils.NetUtils;
 import com.ft.sdk.garble.utils.PackageIdGenerator;
 import com.ft.sdk.garble.utils.Utils;
-import com.ft.sdk.garble.utils.VersionUtils;
 import com.ft.sdk.sessionreplay.internal.StorageBackedFeature;
 import com.ft.sdk.sessionreplay.internal.net.BatchesToSegmentsMapper;
 import com.ft.sdk.sessionreplay.internal.persistence.BatchClosedMetadata;
@@ -40,6 +40,7 @@ import com.ft.sdk.sessionreplay.internal.persistence.BatchFileReaderWriterFactor
 import com.ft.sdk.sessionreplay.internal.persistence.BatchProcessingLevel;
 import com.ft.sdk.sessionreplay.internal.persistence.DataUploadConfiguration;
 import com.ft.sdk.sessionreplay.internal.persistence.EventBatchWriterCallback;
+import com.ft.sdk.sessionreplay.internal.persistence.FileReaderWriter;
 import com.ft.sdk.sessionreplay.internal.persistence.Storage;
 import com.ft.sdk.sessionreplay.internal.persistence.TrackingConsent;
 import com.ft.sdk.sessionreplay.internal.persistence.UploadFrequency;
@@ -83,6 +84,7 @@ public class SDKFeature implements FeatureScope {
     private final AtomicBoolean initialized = new AtomicBoolean(false);
     private SessionReplayContext sdkContext;
     private Storage storage = new NoOpStorage();
+    private Storage webStorage = new NoOpStorage();
     private final ID36Generator srGenerator = new ID36Generator();
 
     private final BatteryPowerWatcher watcher = new BatteryPowerWatcher();
@@ -102,11 +104,12 @@ public class SDKFeature implements FeatureScope {
         if (initialized.get()) {
             return;
         }
+
         DataUploadConfiguration dataUploadConfiguration;
 
         if (wrappedFeature instanceof StorageBackedFeature) {
             String featureName = wrappedFeature.getName();
-            storage = createFileStorage(featureName, new FilePersistenceConfig());
+            prepareStorage(featureName);
 
             dataUploadConfiguration = new DataUploadConfiguration(UploadFrequency.FREQUENT,
                     BatchProcessingLevel.MEDIUM.getMaxBatchesPerUploadJob());
@@ -114,7 +117,7 @@ public class SDKFeature implements FeatureScope {
             FTSDKConfig sdkConfig = FTSdk.get().getBaseConfig();
             FTRUMConfig rumConfig = FTRUMConfigManager.get().getConfig();
 
-            String appId = rumConfig == null ? "" : rumConfig.getRumAppId();
+            String appId = rumConfig.getRumAppId();
             HashMap<String, Object> map = new HashMap<>();
             map.put("env", sdkConfig.getEnv());
             map.put("sdkVersion", FTSdk.AGENT_VERSION);
@@ -132,7 +135,22 @@ public class SDKFeature implements FeatureScope {
         watcher.register(context);
     }
 
+    private void prepareStorage(String featureName) {
+        if (featureName.equals(Feature.SESSION_REPLAY_FEATURE_NAME)) {
+            FeatureStorageConfiguration storageConfiguration = ((StorageBackedFeature) wrappedFeature).getStorageConfiguration();
+            storage = createFileStorage(featureName, new FilePersistenceConfig(
+                    storageConfiguration.getMaxBatchSize(),
+                    storageConfiguration.getMaxItemSize()
+            ));
+
+            webStorage = createFileStorage(featureName,
+                    new FilePersistenceConfig(storageConfiguration.getMaxBatchSize(),
+                            storageConfiguration.getMaxItemSize()));
+        }
+    }
+
     private void setupUploader(Feature feature, DataUploadConfiguration configuration, FTSDKConfig config) {
+        // session replay data only upload
         if (Utils.isMainProcess()) {
             SessionReplayUploader uploader = new SessionReplayUploader(
                     new BatchesToSegmentsMapper(internalLogger),
@@ -189,11 +207,13 @@ public class SDKFeature implements FeatureScope {
                                         batteryBean.getBatteryStatue() == BatteryManager.BATTERY_STATUS_CHARGING;
                                 return batteryEnough || batteryPlug || !batteryBean.isBatteryPresent() || isFullOrCharging;
                             }
-                        },rootPath);
+                        }, rootPath);
             } else {
                 uploadScheduler = new NoOpUploadScheduler();
             }
 
+        } else {
+            internalLogger.w(TAG, "Session replay data only sync on main thread");
         }
     }
 
@@ -204,13 +224,22 @@ public class SDKFeature implements FeatureScope {
 
     @Override
     public void withWriteContext(boolean forceNewBatch, DataConsumerCallback callback) {
+        if (callback.isWebview()) {
+            webStorage.writeCurrentBatch(sdkContext, forceNewBatch, new EventBatchWriterCallback() {
+                @Override
+                public void callBack(EventBatchWriter writer) {
+                    callback.onConsume(sdkContext, writer);
+                }
+            });
+        } else {
+            storage.writeCurrentBatch(sdkContext, forceNewBatch, new EventBatchWriterCallback() {
+                @Override
+                public void callBack(EventBatchWriter writer) {
+                    callback.onConsume(sdkContext, writer);
+                }
+            });
 
-        storage.writeCurrentBatch(sdkContext, forceNewBatch, new EventBatchWriterCallback() {
-            @Override
-            public void callBack(EventBatchWriter writer) {
-                callback.onConsume(sdkContext, writer);
-            }
-        });
+        }
     }
 
     private Storage createFileStorage(String featureName, FilePersistenceConfig filePersistenceConfig) {
@@ -225,17 +254,20 @@ public class SDKFeature implements FeatureScope {
 
             }
         };
+        boolean isResource = featureName.equals(Feature.SESSION_REPLAY_RESOURCES_FEATURE_NAME);
 
         return new ConsentAwareStorage(new ThreadPoolFactory(featureName).getExecutor(),
                 new BatchFileOrchestrator(new File(FTApplication.getApplication().getCacheDir(),
-                        SessionReplayConstants.PATH_SESSION_REPLAY), new FilePersistenceConfig(),
+                        isResource ? SessionReplayConstants.PATH_SESSION_REPLAY_RESOURCE :
+                                SessionReplayConstants.PATH_SESSION_REPLAY), new FilePersistenceConfig(),
                         internalLogger, dispatcher),
                 new BatchFileOrchestrator(new File(FTApplication.getApplication().getCacheDir(),
-                        SessionReplayConstants.PATH_SESSION_REPLAY_ERROR_SAMPLED), new FilePersistenceConfig(),
+                        isResource ? SessionReplayConstants.PATH_SESSION_REPLAY_ERROR_RESOURCE_SAMPLED
+                                : SessionReplayConstants.PATH_SESSION_REPLAY_ERROR_SAMPLED), new FilePersistenceConfig(),
                         internalLogger, dispatcher),
                 null,
                 BatchFileReaderWriterFactory.create(internalLogger, null),
-                null,
+                FileReaderWriter.create(internalLogger, null),
                 new FileMover(internalLogger),
                 internalLogger,
                 filePersistenceConfig,

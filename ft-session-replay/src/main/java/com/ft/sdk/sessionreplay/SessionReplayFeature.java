@@ -16,6 +16,7 @@ import com.ft.sdk.sessionreplay.internal.TouchPrivacyManager;
 import com.ft.sdk.sessionreplay.internal.persistence.TrackingConsent;
 import com.ft.sdk.sessionreplay.internal.recorder.NoOpRecorder;
 import com.ft.sdk.sessionreplay.internal.recorder.Recorder;
+import com.ft.sdk.sessionreplay.internal.recorder.SessionReplayRecorder;
 import com.ft.sdk.sessionreplay.internal.resources.ResourceDataStoreManager;
 import com.ft.sdk.sessionreplay.internal.resources.ResourceHashesEntryDeserializer;
 import com.ft.sdk.sessionreplay.internal.resources.ResourceHashesEntrySerializer;
@@ -82,6 +83,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
     private final Sampler sessionRelaySampler;
     private final Sampler sessionRelayErrorSampler;
     private final RecorderProvider recorderProvider;
+    private final String[] linkRumKeys;
 
     private final AtomicReference<String> currentRumSessionId = new AtomicReference<>();
 
@@ -90,6 +92,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
             sessionReplayRecorder = new NoOpRecorder();
     RecordWriter
             dataWriter = new NoOpRecordWriter();
+    SlotIdWebviewBinder slotIdWebviewBinder;
     final AtomicBoolean initialized = new AtomicBoolean(false);
 
     // region Constructor
@@ -108,7 +111,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                 config.getSessionReplayOnErrorSampleRate(),
                 config.isDelayInit(),
                 config.isDynamicOptimizationEnabled(),
-                config.getInternalCallback());
+                config.getInternalCallback(), config.getRumLinkKeys(), new SlotIdWebviewBinder(sdkCore.getInternalLogger()));
 
     }
 
@@ -118,7 +121,8 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                                 ImagePrivacy imagePrivacy,
                                 Sampler sessionReplaySampler,
                                 Sampler sessionReplayErrorSampler,
-                                RecorderProvider recorderProvider) {
+                                RecorderProvider recorderProvider, String[] linkRumKeys,
+                                SlotIdWebviewBinder slotIdWebviewBinder) {
         this.sdkCore = sdkCore;
         this.customEndpointUrl = customEndpointUrl;
         this.textAndInputPrivacy = textAndInputPrivacy;
@@ -127,6 +131,8 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
         this.sessionRelaySampler = sessionReplaySampler;
         this.sessionRelayErrorSampler = sessionReplayErrorSampler;
         this.recorderProvider = recorderProvider;
+        this.linkRumKeys = linkRumKeys == null ? new String[]{} : linkRumKeys;
+        this.slotIdWebviewBinder = slotIdWebviewBinder;
     }
 
     public SessionReplayFeature(FeatureSdkCore sdkCore, String customEndpointUrl,
@@ -141,7 +147,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                                 float sessionReplayOnErrorSampleRate,
                                 boolean isDelayInit,
                                 boolean dynamicOptimizationEnabled,
-                                SessionReplayInternalCallback internalCallback) {
+                                SessionReplayInternalCallback internalCallback, String[] linkRumKeys, SlotIdWebviewBinder slotIdWebviewBinder) {
         this(sdkCore, customEndpointUrl,
                 textAndInputPrivacy,
                 touchPrivacy,
@@ -156,10 +162,33 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
                         customDrawableMappers,
                         dynamicOptimizationEnabled,
                         internalCallback,
-                        isDelayInit
-                ));
+                        isDelayInit, linkRumKeys != null && linkRumKeys.length > 0,
+                        slotIdWebviewBinder
+                ), linkRumKeys, slotIdWebviewBinder);
     }
 
+    public RecordWriter getDataWriter() {
+        return dataWriter;
+    }
+
+    public SlotIdWebviewBinder getSlotIdWebviewBinder() {
+        return slotIdWebviewBinder;
+    }
+
+    public String[] getLinkRumKeys() {
+        return linkRumKeys;
+    }
+
+    public String getPrivacyLevel() {
+        if (this.touchPrivacy == TouchPrivacy.SHOW) {
+            if (this.textAndInputPrivacy == TextAndInputPrivacy.MASK_SENSITIVE_INPUTS) {
+                return "allow";
+            } else if (this.textAndInputPrivacy == TextAndInputPrivacy.MASK_ALL_INPUTS) {
+                return "mask-user-input";
+            }
+        }
+        return "mask";
+    }
 
     @Override
     public String getName() {
@@ -216,6 +245,12 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
         dataWriter = new NoOpRecordWriter();
         sessionReplayRecorder = new NoOpRecorder();
         initialized.set(false);
+    }
+
+    public void forceFullSnapShotForLinkView() {
+        if (sessionReplayRecorder instanceof SessionReplayRecorder) {
+            ((SessionReplayRecorder) sessionReplayRecorder).forceFullSnapshotForLinkView();
+        }
     }
 
     @Override
@@ -288,6 +323,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
     void startRecording(boolean isErrorSampled) {
         // Check initialization again so we don't forget to do it when this method is made public
         if (checkIfInitialized() && !isRecording.getAndSet(true)) {
+            sdkCore.getInternalLogger().d(TAG, "start record");
             sdkCore.updateFeatureContext(getName(), new SessionReplayRecordCallback.UpdateCallBack() {
 
                 @Override
@@ -310,6 +346,7 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
      */
     void stopRecording() {
         if (isRecording.getAndSet(false)) {
+            sdkCore.getInternalLogger().d(TAG, "stopRecording");
             sdkCore.updateFeatureContext(getName(),
                     new SessionReplayRecordCallback.UpdateCallBack() {
                         @Override
@@ -320,6 +357,10 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
             );
             sessionReplayRecorder.stopRecorders();
         }
+    }
+
+    public boolean isRecording() {
+        return isRecording.get();
     }
 
     private ResourcesFeature registerResourceFeature(FeatureSdkCore sdkCore) {

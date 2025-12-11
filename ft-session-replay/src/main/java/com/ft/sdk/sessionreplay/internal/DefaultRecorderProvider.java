@@ -21,6 +21,7 @@ import com.ft.sdk.feature.FeatureSdkCore;
 import com.ft.sdk.sessionreplay.ImagePrivacy;
 import com.ft.sdk.sessionreplay.MapperTypeWrapper;
 import com.ft.sdk.sessionreplay.SessionReplayInternalCallback;
+import com.ft.sdk.sessionreplay.SlotIdWebviewBinder;
 import com.ft.sdk.sessionreplay.TextAndInputPrivacy;
 import com.ft.sdk.sessionreplay.internal.recorder.Recorder;
 import com.ft.sdk.sessionreplay.internal.recorder.SessionReplayRecorder;
@@ -71,6 +72,9 @@ public class DefaultRecorderProvider implements RecorderProvider {
     private final boolean dynamicOptimizationEnabled;
     private final SessionReplayInternalCallback internalCallback;
     private final boolean isDelayInit;
+    private final boolean enableRUMKeyLinks;
+
+    private final SlotIdWebviewBinder slotIdWebviewBinder;
 
     public DefaultRecorderProvider(
             FeatureSdkCore sdkCore,
@@ -82,7 +86,7 @@ public class DefaultRecorderProvider implements RecorderProvider {
             List<DrawableToColorMapper> customDrawableMappers,
             boolean dynamicOptimizationEnabled,
             SessionReplayInternalCallback internalCallback,
-            boolean isDelayInit) {
+            boolean isDelayInit, boolean enableRUMKeyLinks, SlotIdWebviewBinder slotIdWebviewBinder) {
         this.sdkCore = sdkCore;
         this.textAndInputPrivacy = textAndInputPrivacy;
         this.imagePrivacy = imagePrivacy;
@@ -93,6 +97,8 @@ public class DefaultRecorderProvider implements RecorderProvider {
         this.dynamicOptimizationEnabled = dynamicOptimizationEnabled;
         this.internalCallback = internalCallback;
         this.isDelayInit = isDelayInit;
+        this.enableRUMKeyLinks = enableRUMKeyLinks;
+        this.slotIdWebviewBinder = slotIdWebviewBinder;
     }
 
     @Override
@@ -100,7 +106,8 @@ public class DefaultRecorderProvider implements RecorderProvider {
             ResourceDataStoreManager resourceDataStoreManager,
             ResourcesWriter resourceWriter,
             RecordWriter recordWriter,
-            Application application) {
+            Application application
+    ) {
 
         RumContextProvider rumContextProvider = new SessionReplayRumContextProvider(sdkCore);
         TimeProvider timeProvider = new SessionReplayTimeProvider(sdkCore);
@@ -125,7 +132,9 @@ public class DefaultRecorderProvider implements RecorderProvider {
                 resourceDataStoreManager,
                 internalCallback,
                 dynamicOptimizationEnabled,
-                isDelayInit
+                isDelayInit,
+                this.enableRUMKeyLinks,
+                slotIdWebviewBinder
         );
     }
 

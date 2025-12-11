@@ -1,31 +1,27 @@
 package com.ft;
 
-import android.app.Activity;
 import android.content.Context;
 
-import com.ft.sdk.ActionEventWrapper;
 import com.ft.sdk.DeviceMetricsMonitorType;
 import com.ft.sdk.EnvType;
 import com.ft.sdk.ErrorMonitorType;
-import com.ft.sdk.FTActionTrackingHandler;
 import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
-import com.ft.sdk.FTViewActivityTrackingHandler;
-import com.ft.sdk.FTViewFragmentTrackingHandler;
-import com.ft.sdk.FragmentWrapper;
-import com.ft.sdk.HandlerAction;
-import com.ft.sdk.HandlerView;
 import com.ft.sdk.LogCacheDiscard;
 import com.ft.sdk.RUMCacheDiscard;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.sdk.sessionreplay.CustomExtensionSupport;
 import com.ft.sdk.sessionreplay.FTSessionReplayConfig;
-import com.ft.sdk.sessionreplay.SessionReplayPrivacy;
+import com.ft.sdk.sessionreplay.MapperTypeWrapper;
+import com.ft.sdk.sessionreplay.TextAndInputPrivacy;
+import com.ft.sdk.sessionreplay.TouchPrivacy;
+import com.ft.sdk.sessionreplay.internal.recorder.mapper.WebViewXWireframeMapper;
 import com.ft.sdk.sessionreplay.material.MaterialExtensionSupport;
 import com.ft.utils.CrossProcessSetting;
 import com.lzy.okgo.OkGo;
@@ -182,11 +178,19 @@ public class DemoApplication extends BaseApplication {
                 .setTraceType(TraceType.DDTRACE));
 
         FTSdk.initSessionReplayConfig(new FTSessionReplayConfig()
-                .setSampleRate(1f)
-                .setSessionReplayOnErrorSampleRate(1f)
-                .setPrivacy(SessionReplayPrivacy.ALLOW)
+                        .setSampleRate(1f)
+                        .setSessionReplayOnErrorSampleRate(1f)
+//                        .setPrivacy(SessionReplayPrivacy.MASK)
+                        .setTouchPrivacy(TouchPrivacy.SHOW)
+                        .setTextAndInputPrivacy(TextAndInputPrivacy.MASK_SENSITIVE_INPUTS)
+                        .enableLinkRUMKeys(new String[]{"wgt_id"})
 //                .setTouchPrivacy(TouchPrivacy.SHOW)
-                .addExtensionSupport(new MaterialExtensionSupport()));
+                        .addExtensionSupport(new MaterialExtensionSupport())
+                        .addExtensionSupport(new CustomExtensionSupport()
+                                .addMapper(new MapperTypeWrapper<>(com.tencent.smtt.sdk.WebView.class,
+                                        new WebViewXWireframeMapper())))
+
+        );
 
     }
 

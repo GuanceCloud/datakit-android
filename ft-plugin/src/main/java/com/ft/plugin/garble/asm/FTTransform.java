@@ -35,6 +35,8 @@ public abstract class FTTransform implements AsmClassVisitorFactory<FTParameters
         } else if ("asm7".equalsIgnoreCase(asmVersion)) {
             asm = Opcodes.ASM7;
         }
-        return new FTClassAdapter(classVisitor, asm, ignorePackages);
+        Boolean verboseLog = getParameters().get().getVerboseLog().get();
+        List<String> knownWebviews = getParameters().get().getKnownWebViewClasses().get();
+        return new FTClassAdapter(classVisitor, asm, ignorePackages, verboseLog, knownWebviews);
     }
 }

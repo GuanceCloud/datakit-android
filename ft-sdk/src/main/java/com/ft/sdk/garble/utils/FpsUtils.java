@@ -1,6 +1,11 @@
 package com.ft.sdk.garble.utils;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.view.Choreographer;
+
+import com.ft.sdk.DeviceMetricsMonitorType;
+import com.ft.sdk.FTMonitorManager;
 
 import java.util.concurrent.TimeUnit;
 
@@ -12,9 +17,10 @@ import java.util.concurrent.TimeUnit;
 public class FpsUtils {
     private static FpsUtils fpsUtils;
     Metronome metronome;
+    private static final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     private FpsUtils() {
-        metronome = new Metronome();
+        // Metronome will be initialized lazily on main thread when needed
     }
 
     private double mFps;
@@ -35,26 +41,99 @@ public class FpsUtils {
     }
 
     /**
-     *
+     * Start FPS monitoring with automatic main thread adaptation
      */
     public void start() {
-        metronome.start();
-        metronome.addListener(new Audience() {
-            @Override
-            public void heartbeat(double fps) {
-                mFps = fps;
+        runOnMainThread(() -> {
+            // Initialize Metronome on main thread to ensure Choreographer.getInstance() is called safely
+            if (metronome == null) {
+                metronome = new Metronome();
+            }
+            metronome.start();
+            metronome.addListener(new Audience() {
+                @Override
+                public void heartbeat(double fps) {
+                    mFps = fps;
+                }
+            });
+        });
+    }
+
+    /**
+     * Stop FPS monitoring
+     */
+    public void stop() {
+        runOnMainThread(() -> {
+            if (metronome != null) {
+                metronome.stop();
             }
         });
     }
 
     /**
-     * Release
+     * Check if FPS monitoring is currently active
+     *
+     * @return true if monitoring is active, false otherwise
+     */
+    public boolean isMonitoring() {
+        return metronome != null && metronome.isActive();
+    }
+
+    /**
+     * Handle app foreground event
+     * Checks if FPS monitoring should be enabled and starts if not already started
+     *
+     */
+    public static void onAppForeground() {
+        runOnMainThread(() -> {
+            FTMonitorManager monitorManager = FTMonitorManager.get();
+            if (monitorManager.isDeviceMetricsMonitorType(DeviceMetricsMonitorType.FPS)) {
+                FpsUtils instance = get();
+                if (!instance.isMonitoring()) {
+                    instance.start();
+                }
+            }
+        });
+    }
+
+
+    /**
+     * Handle app background event
+     * Stops FPS monitoring if currently active
+     */
+    public static void onAppBackground() {
+        runOnMainThread(() -> {
+            FpsUtils instance = get();
+            if (instance.isMonitoring()) {
+                instance.stop();
+            }
+        });
+    }
+
+    /**
+     * Release resources with automatic main thread adaptation
      */
     public static void release() {
-        if (fpsUtils != null) {
-            if (fpsUtils.metronome != null) {
-                fpsUtils.metronome.stop();
+        runOnMainThread(() -> {
+            if (fpsUtils != null) {
+                if (fpsUtils.metronome != null) {
+                    fpsUtils.metronome.stop();
+                }
             }
+        });
+    }
+
+    /**
+     * Ensure code runs on main thread, automatically switch if not already on main thread
+     * @param runnable Code to execute on main thread
+     */
+    private static void runOnMainThread(Runnable runnable) {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            // Already on main thread, execute directly
+            runnable.run();
+        } else {
+            // Not on main thread, switch to main thread for execution
+            mainHandler.post(runnable);
         }
     }
 
@@ -71,26 +150,42 @@ public class FpsUtils {
 
         private int interval = 1000;
         private Audience audience;
+        private boolean isActive = false;
 
         public Metronome() {
             choreographer = Choreographer.getInstance();
         }
 
         /**
+         * Check if monitoring is currently active
          *
+         * @return true if active, false otherwise
          */
-        public void start() {
-            choreographer.removeFrameCallback(this);
-            choreographer.postFrameCallback(this);
+        public boolean isActive() {
+            return isActive;
         }
 
         /**
-         *
+         * Start FPS monitoring with automatic main thread adaptation
+         */
+        public void start() {
+            runOnMainThread(() -> {
+                isActive = true;
+                choreographer.removeFrameCallback(this);
+                choreographer.postFrameCallback(this);
+            });
+        }
+
+        /**
+         * Stop FPS monitoring with automatic main thread adaptation
          */
         public void stop() {
-            frameStartTime = 0;
-            framesRendered = 0;
-            choreographer.removeFrameCallback(this);
+            runOnMainThread(() -> {
+                isActive = false;
+                frameStartTime = 0;
+                framesRendered = 0;
+                choreographer.removeFrameCallback(this);
+            });
         }
 
         public void addListener(Audience l) {
@@ -99,6 +194,20 @@ public class FpsUtils {
 
         public void setInterval(int interval) {
             this.interval = interval;
+        }
+
+        /**
+         * Ensure code runs on main thread, automatically switch if not already on main thread
+         * @param runnable Code to execute on main thread
+         */
+        private void runOnMainThread(Runnable runnable) {
+            if (Looper.myLooper() == Looper.getMainLooper()) {
+                // Already on main thread, execute directly
+                runnable.run();
+            } else {
+                // Not on main thread, switch to main thread for execution
+                mainHandler.post(runnable);
+            }
         }
 
         @Override

@@ -1,26 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".WebViewActivity">
-    <Spinner
-        android:background="@color/colorAccent"
+
+    <!-- TabLayout for 3 tabs -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:id="@+id/spinner"
-        android:popupBackground="@color/colorAccent"/>
-    <com.ft.CustomWebView
-        android:id="@+id/webView"
+        android:background="@color/colorAccent"
+        app:tabMode="fixed"
+        app:tabGravity="fill"
+        app:tabTextColor="@android:color/white"
+        app:tabSelectedTextColor="@android:color/white"
+        app:tabIndicatorColor="@android:color/white" />
+
+    <!-- ViewPager2 for WebViews -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="60dp">
-    </com.ft.CustomWebView>
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Progress bar for current WebView -->
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="60dp" />
-</FrameLayout>
+        android:layout_height="1dp" />
+
+</LinearLayout>

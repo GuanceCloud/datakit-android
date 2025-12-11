@@ -235,6 +235,7 @@ public class RecorderWindowCallback implements Window.Callback {
                 new ArrayList<>(pointerInteractions)
         );
         if (item != null && item.isReady()) {
+            //System.out.println("[FT-SDK] tryToConsumeItems from callback");
             recordedDataQueueHandler.tryToConsumeItems();
         }
 

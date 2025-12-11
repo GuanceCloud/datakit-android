@@ -80,6 +80,21 @@ public class SyncDataHelper {
         rumTags.putAll(applyModifier(config.getGlobalContext()));
     }
 
+    HashMap<String, Object> checkSessionReplayRUMLinksKeys(String[] rumLinkKeys) {
+        HashMap<String, Object> rumLinkData = new HashMap<>();
+
+        // Check keys in tagMaps
+        for (String rumKey : rumLinkKeys) {
+            for (String tagKey : rumTags.keySet()) {
+                if (tagKey.contains(rumKey)) {
+                    rumLinkData.put(tagKey, rumTags.get(tagKey));
+                }
+            }
+        }
+        return rumLinkData;
+
+    }
+
     /**
      * Replace the entire dictionary
      *

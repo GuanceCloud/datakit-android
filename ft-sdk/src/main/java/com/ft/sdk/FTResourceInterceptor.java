@@ -139,10 +139,12 @@ public class FTResourceInterceptor implements Interceptor {
             }
         }
         String resourceId = Utils.identifyRequest(request);
+        boolean reGenerate = false;
         if (request.tag(ResourceID.class) != null) {
             LogUtils.d(TAG, "intercept id:" + resourceId + ",url:" + request.url());
         } else {
             LogUtils.d(TAG, "intercept id:" + resourceId);
+            reGenerate = true;
         }
         FTRUMInnerManager.get().startResource(resourceId);
         ResourceParams params = new ResourceParams();
@@ -220,7 +222,7 @@ public class FTResourceInterceptor implements Interceptor {
         }
 
 
-        FTRUMInnerManager.get().setTransformContent(resourceId, params);
+        FTRUMInnerManager.get().setTransformContent(resourceId, params, reGenerate);
         FTRUMInnerManager.get().stopResource(resourceId);
 
         if (exception != null) {

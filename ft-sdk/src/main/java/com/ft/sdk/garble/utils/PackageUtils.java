@@ -50,6 +50,17 @@ public class PackageUtils {
     public static final String PACKAGE_FIELD_VERSION_NAME = "VERSION_NAME";
 
     /**
+     * TBS WebView package path
+     */
+    private static final String PACKAGE_TBS_WEBVIEW = "com.tencent.smtt.sdk.WebView";
+
+
+    /**
+     * DCWebView
+     */
+    private static final String PACKAGE_DCLOUD_WEBVIEW = "io.dcloud.common.adapter.ui.webview.DCWebView";
+
+    /**
      * Whether to use NDK library
      *
      * @return
@@ -161,6 +172,7 @@ public class PackageUtils {
         }
         return "";
     }
+
     /**
      * {"agent":"x.x.x", "native":"x.x.x", "track":"x.x.x"} Add in this fixed format
      *
@@ -190,6 +202,34 @@ public class PackageUtils {
         } catch (ClassNotFoundException e) {
             return false;
         }
+    }
+
+    /**
+     * Whether TBS WebView is available
+     *
+     * @return true if TBS WebView is available
+     */
+    public static boolean isTBSWebViewAvailable() {
+        try {
+            Class.forName(PACKAGE_TBS_WEBVIEW);
+            return true;
+        } catch (ClassNotFoundException ignored) {
+        }
+        return false;
+    }
+
+    /**
+     * Whether DC WebView is available
+     *
+     * @return true if DC WebView is available
+     */
+    public static boolean isDCSWebViewAvailable() {
+        try {
+            Class.forName(PACKAGE_DCLOUD_WEBVIEW);
+            return true;
+        } catch (ClassNotFoundException ignored) {
+        }
+        return false;
     }
 
 }

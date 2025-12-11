@@ -904,5 +904,54 @@ public class Utils {
         return "";
     }
 
+    public static boolean checkContextChanged(String viewId, Map<String, Map<String, Object>> fieldLinkMap, Map<String, Object> property) {
+        if (viewId == null || property == null || fieldLinkMap == null) {
+            return false;
+        }
+
+        Map<String, Object> existingData = fieldLinkMap.get(viewId);
+        return Utils.checkMapChanged(existingData, property);
+    }
+
+
+    /**
+     * Check if two maps have changed by comparing their content
+     *
+     * @param existingData The existing map data
+     * @param newData      The new map data to compare
+     * @return true if data has changed, false otherwise
+     */
+    public static boolean checkMapChanged(Map<String, Object> existingData, Map<String, Object> newData) {
+        if (newData == null) {
+            return false;
+        }
+
+        // If existingData is null, it's new data, return true
+        if (existingData == null) {
+            return true;
+        }
+
+        // Compare existing data with new data
+        // First check if the number of fields is the same
+        if (existingData.size() != newData.size()) {
+            return true;
+        }
+
+        // Check if each field value is the same
+        for (Map.Entry<String, Object> entry : newData.entrySet()) {
+            String key = entry.getKey();
+            Object newValue = entry.getValue();
+            Object existingValue = existingData.get(key);
+
+            // If field doesn't exist or values are not equal, data has changed
+            if (existingValue == null || !existingValue.equals(newValue)) {
+                return true;
+            }
+        }
+
+        // All fields are the same, no changes
+        return false;
+    }
+
 }
 
