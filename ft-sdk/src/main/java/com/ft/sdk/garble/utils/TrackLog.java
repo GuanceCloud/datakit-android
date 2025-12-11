@@ -23,79 +23,79 @@ public class TrackLog {
 
     /*This method cannot be changed arbitrarily, changes need to be synchronized with the corresponding instrumentation method in the plugin*/
     public static int i(String tag, String msg) {
-        return showFullLog(true, tag, msg,SDKLogLevel.I,false);
+        return showFullLog(true, tag, msg, SDKLogLevel.I);
     }
 
     /*This method cannot be changed arbitrarily, changes need to be synchronized with the corresponding instrumentation method in the plugin*/
     public static int i(String tag, String msg, Throwable e) {
-        return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e),SDKLogLevel.I,false);
+        return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e), SDKLogLevel.I);
     }
 
     /*This method cannot be changed arbitrarily, changes need to be synchronized with the corresponding instrumentation method in the plugin*/
     public static int d(String tag, String msg) {
-        return showFullLog(true, tag, msg,SDKLogLevel.D,false);
+        return showFullLog(true, tag, msg, SDKLogLevel.D);
     }
 
     /*This method cannot be changed arbitrarily, changes need to be synchronized with the corresponding instrumentation method in the plugin*/
     public static int d(String tag, String msg, Throwable e) {
-        return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e),SDKLogLevel.D,false);
+        return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e), SDKLogLevel.D);
     }
 
     /*This method cannot be changed arbitrarily, changes need to be synchronized with the corresponding instrumentation method in the plugin*/
     public static int v(String tag, String msg) {
-        return showFullLog(true, tag, msg,SDKLogLevel.V,false);
+        return showFullLog(true, tag, msg, SDKLogLevel.V);
     }
 
     /*This method cannot be changed arbitrarily, changes need to be synchronized with the corresponding instrumentation method in the plugin*/
     public static int v(String tag, String msg, Throwable e) {
-        return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e),SDKLogLevel.V,false);
+        return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e), SDKLogLevel.V);
     }
 
     /*This method cannot be changed arbitrarily, changes need to be synchronized with the corresponding instrumentation method in the plugin*/
     public static int e(String tag, String msg) {
-        return showFullLog(true, tag, msg,SDKLogLevel.E,false);
+        return showFullLog(true, tag, msg, SDKLogLevel.E);
     }
 
     public static int e(String tag, String msg, boolean onlyOnce) {
-        return showFullLog(true, tag, msg,SDKLogLevel.E,onlyOnce);
+        return showFullLog(true, tag, msg, SDKLogLevel.E);
     }
 
-    /*This method cannot be changed arbitrarily, changes need to be synchronized 
+    /*This method cannot be changed arbitrarily, changes need to be synchronized
      * with the corresponding instrumentation method in the plugin*/
     public static int e(String tag, String msg, Throwable e) {
-        return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e),SDKLogLevel.E,false);
+        return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e), SDKLogLevel.E);
     }
 
-    /*This method cannot be changed arbitrarily, changes need to be synchronized 
+    /*This method cannot be changed arbitrarily, changes need to be synchronized
      * with the corresponding instrumentation method in the plugin*/
     public static int w(String tag, String msg) {
-        return showFullLog(true, tag, msg,SDKLogLevel.W,false);
+        return showFullLog(true, tag, msg, SDKLogLevel.W);
     }
 
     public static int w(String tag, String msg, boolean onlyOnce) {
-        return showFullLog(true, tag, msg,SDKLogLevel.W,onlyOnce);
+        return showFullLog(true, tag, msg, SDKLogLevel.W);
     }
 
-    /*This method cannot be changed arbitrarily, changes need to be synchronized 
+    /*This method cannot be changed arbitrarily, changes need to be synchronized
      * with the corresponding instrumentation method in the plugin*/
     public static int w(String tag, String msg, Throwable e) {
-        return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e),SDKLogLevel.W,false);
+        return showFullLog(true, tag, msg + "\n" + LogUtils.getStackTraceString(e), SDKLogLevel.W);
     }
 
-    /*This method cannot be changed arbitrarily, changes need to be synchronized 
+    /*This method cannot be changed arbitrarily, changes need to be synchronized
      * with the corresponding instrumentation method in the plugin*/
     public static int w(String tag, Throwable e) {
-        return showFullLog(true, tag, LogUtils.getStackTraceString(e),SDKLogLevel.W,false);
+        return showFullLog(true, tag, LogUtils.getStackTraceString(e), SDKLogLevel.W);
     }
 
-    /*This method cannot be changed arbitrarily, changes need to be synchronized 
+    /*This method cannot be changed arbitrarily, changes need to be synchronized
      * with the corresponding instrumentation method in the plugin*/
     public static int println(String tag, String msg) {
         return println(true, Log.INFO, tag, msg);
     }
 
 
-    /*This method cannot be changed arbitrarily, changes need to be synchronized 
+    /*This method cannot be changed arbitrarily, changes need to be synchronized
      * with the corresponding instrumentation method in the plugin*/
     public static int println(int priority, String tag, String msg) {
         //Only collect VERBOSE, DEBUG, INFO, WARN, ERROR
@@ -138,11 +138,15 @@ public class TrackLog {
      * @param logType
      * @return
      */
-    public static int showFullLog(String TAG, String message, SDKLogLevel logType, boolean onlyOnce) {
+    protected static int showFullInnerlog(String TAG, String message, SDKLogLevel logType, boolean onlyOnce) {
         if (isSetInnerLogHandler()) {
             innerLogHandler.printInnerLog(logType.toString(), TAG, message);
         }
-        return showFullLog(false, TAG, message, logType, onlyOnce);
+
+        if (onlyOnce && checkCached(message)) {
+            return 0;
+        }
+        return showFullLog(false, TAG, message, logType);
     }
 
     /**
@@ -152,30 +156,32 @@ public class TrackLog {
      * @param logType
      * @return
      */
-    protected static int showFullLog(boolean upload, String TAG, String message,
-                                     SDKLogLevel logType, boolean onlyOnce) {
-        if (onlyOnce && checkCached(message)) {
-            return 0;
-        }
-
-        int segmentSize = 4 * 1024;
+    protected static int showFullLog(boolean upload, String TAG, String message, SDKLogLevel logType) {
+        //The system limits the length of a single log message to 4 × 1024 characters.
+        // The liblog package used by Logcat also mentions that messages printed with Log may be truncated by the log kernel driver.
+        int segmentSize = 4000;
         int length = message != null ? message.length() : 0;
         if (length == 0) return 0;
         if (length <= segmentSize) {
             showLog(upload, TAG, message, logType);
         } else {
             boolean isFirst = true;
-            while (message.length() > segmentSize) {
-                String logContent = message.substring(0, segmentSize);
-                message = message.replace(logContent, "");
+            int startIndex = 0;
+            int messageLength = message.length();
+
+            while (startIndex < messageLength) {
+                int endIndex = Math.min(startIndex + segmentSize, messageLength);
+                String logContent = message.substring(startIndex, endIndex);
+
                 if (isFirst) {
                     showLog(upload, TAG, logContent, logType);
+                    isFirst = false;
                 } else {
                     showLog(upload, null, logContent, logType);
                 }
-                isFirst = false;
+
+                startIndex = endIndex;
             }
-            showLog(upload, null, message, logType);
         }
         return length;
     }

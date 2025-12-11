@@ -176,7 +176,11 @@ public class NativeNetEngine implements INetEngine {
 
                 formData.finish();
             } else if (isDoInput && !Utils.isNullOrEmpty(mHttpBuilder.getBodyString())) {
-                mConnection.connect();
+                try {
+                    mConnection.connect();
+                } catch (Error e) {
+                    LogUtils.e(TAG, "connect with error:" + LogUtils.getStackTraceString(e));
+                }
                 outputStream = mConnection.getOutputStream();
                 outputStream.write(mHttpBuilder.getBodyString().getBytes(CHARSET));
                 outputStream.flush();

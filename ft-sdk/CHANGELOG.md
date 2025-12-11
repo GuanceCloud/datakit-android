@@ -1,3 +1,62 @@
+# agent 1.6.15
+1. Optimized the FPS monitoring mechanism by stopping detection when the app is in the background.
+2. Optimized the output of long logs more than 4K
+3. Optimized the generation of resource, long task, and error with View data.
+4. Improved the view generation rate and merged data with the same view_id.
+5. remove ActivityLifecycleCallbacks limit in child process
+6. Fixed the occasional issue where View data updates were lost.
+7. Fixed the issue where asynchronous network requests caused abnormal session refresh.
+8. Fixed the issue where reinitialization after SDK shutdown could not trigger idle shutdown.
+---
+# agent 1.6.15-beta01
+1. Same as agent 1.6.15-alpha10
+2. Fixed pending_resource_count in Action and View metrics
+
+---
+# agent 1.6.15-alpha10
+1. Optimized the FPS monitoring mechanism by stopping detection when the app is in the background.
+
+---
+# agent 1.6.15-alpha09
+1. Fixed the issue where reinitialization after SDK shutdown could not trigger idle shutdown.
+
+---
+# agent 1.6.15-alpha08
+1. Fixed the issue above ft-sdk:1.6.15-alpha04 where data retransmission caused data field loss.
+
+---
+# agent 1.6.15-alpha07
+1. Ensure FPS is started from the main thread
+2. Optimized the output of long logs more than 4K
+3. Added resource_id to network error types for data correlation.
+
+---
+# agent 1.6.15-alpha06
+1. remove ActivityLifecycleCallbacks limit in main process
+
+---
+# agent 1.6.15-alpha05
+1. Fix view and action error of status
+
+---
+# agent 1.6.15-alpha04
+1. Fixed the issue where asynchronous network requests caused abnormal session refresh. 
+2. Optimized the generation of resource, long task, and error with View data.
+3. Improved the view generation rate and merged data with the same view_id.
+
+---
+# agent 1.6.15-alpha03
+1. WebView data collection supports Tencent X5
+
+---
+# agent 1.6.15-alpha02
+1. Added background field to error_situation
+
+---
+# agent 1.6.15-alpha01
+1. Fixed the incorrect way of retrieving the cursor count.
+
+---
 # agent 1.6.14
 1. Using ContentProvider to optimize compatibility issues in high-load multi-process data collection scenarios.
 2. Removed the `android.permission.READ_PHONE_STATE` declaration from the SDK AndroidManifest;

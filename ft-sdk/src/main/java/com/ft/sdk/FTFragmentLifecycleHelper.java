@@ -43,7 +43,7 @@ public class FTFragmentLifecycleHelper implements FragmentLifecycleCallBack {
 
     @Override
     public void onFragmentPreAttached(FragmentWrapper wrapper) {
-        fragmentPreAttachedTimeMap.put(wrapper.getRealFragment(), SystemClock.elapsedRealtimeNanos());
+        fragmentPreAttachedTimeMap.put(wrapper.getRealFragment(), System.nanoTime());
     }
 
     @Override
@@ -51,7 +51,7 @@ public class FTFragmentLifecycleHelper implements FragmentLifecycleCallBack {
         Long preAttachedStartTime = fragmentPreAttachedTimeMap.remove(wrapper.getRealFragment());
         if (preAttachedStartTime != null) {
             // Calculate Fragment pre-attached to pre-created duration
-            long createDuration = SystemClock.elapsedRealtimeNanos() - preAttachedStartTime;
+            long createDuration = System.nanoTime()- preAttachedStartTime;
             if (viewHandler != null) {
                 HandlerView view = viewHandler.resolveHandlerView(wrapper);
                 if (view != null) {

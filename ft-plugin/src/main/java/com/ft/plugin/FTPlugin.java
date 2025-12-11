@@ -14,6 +14,8 @@ import org.gradle.api.Action;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
+import java.io.File;
+
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 
@@ -66,6 +68,16 @@ public class FTPlugin implements Plugin<Project> {
 
         project.afterEvaluate(p -> {
             //Pass parameter object
+            if (extension.enableFileLog) {
+                String logFile;
+                if (extension.logFilePath != null && !extension.logFilePath.isEmpty()) {
+                    logFile = extension.logFilePath;
+                } else {
+                    logFile = p.getBuildDir().getAbsolutePath() + File.separator + "ft-plugin.log";
+                }
+                Logger.init(logFile);
+            }
+
             Logger.setDebug(extension.showLog);
             Logger.debug("Plugin Version:" + BuildConfig.PLUGIN_VERSION +
                     ",ASM Version:" + extension.asmVersion);
@@ -86,7 +98,9 @@ public class FTPlugin implements Plugin<Project> {
                             public Unit invoke(FTParameters parameters) {
                                 // Now extension is already user-configured content
                                 parameters.getIgnorePackages().set(extension.ignorePackages);
+                                parameters.getKnownWebViewClasses().set(extension.knownWebViewClasses);
                                 parameters.getAsmVersion().set(extension.asmVersion);
+                                parameters.getVerboseLog().set(extension.verboseLog);
                                 return Unit.INSTANCE;
                             }
                         }

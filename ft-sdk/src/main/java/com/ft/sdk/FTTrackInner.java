@@ -230,6 +230,17 @@ public class FTTrackInner {
                 try {
                     SyncData recordData = SyncData.getSyncData(dataHelper, dataType,
                             new LineProtocolBean(measurement, tags, fields, time), dataGenerateTime);
+                    if (measurement.equals(Constants.FT_MEASUREMENT_RUM_VIEW)) {
+                        boolean update = FTDBManager.get().updateOrInsertSyncData(recordData);
+                        if (update) {
+                            LogUtils.d(TAG, "syncDataBackground:view," + dataType.toString() + " update,"
+                                    + " uuid:" + recordData.getUuid());
+                            if (callBack != null) {
+                                callBack.onComplete();
+                            }
+                            return;
+                        }
+                    }
                     synchronized (FTDBCachePolicy.get().getRumLock()) {
                         int status = FTDBCachePolicy.get().optRUMCachePolicy(1);
                         StringBuilder errorDec = new StringBuilder();

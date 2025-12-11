@@ -1,3 +1,43 @@
+# plugin 1.3.6
+1. UniApp Webview support
+2. Added `knownWebViewClasses` parameter to support ASM writes.
+3. Added log output to file functionality.
+4. Added `verboseLog` param for more logs.
+5. Numeric boundary handling in FTMethodAdapter
+6. Added ignore configuration for custom WebView internal methods.
+
+---
+# plugin 1.3.6-alpha07
+1. UniApp Webview support
+
+---
+# plugin 1.3.6-alpha06
+1. Fix addToKnownWebviews with wrong class
+
+---
+# plugin 1.3.6-alpha05
+1. Added knownWebViewClasses parameter to support ASM writes.
+
+---
+# plugin 1.3.6-alpha04
+1. Fixed ASM write issue with custom WebView variable declarations
+2. Added ignore configuration for custom WebView internal methods.
+
+---
+# plugin 1.3.6-alpha03
+1. Removed ASM for Activity and Fragment.
+2. Added code line number display for Exceptions.
+3. Added log output to file functionality.  
+
+---
+# plugin 1.3.6-alpha02
+1. Added verboseLog param for more logs.
+2. Added try-catch and supplemented error logs.
+---
+# plugin 1.3.6-alpha01
+1. Numeric boundary handling in FTMethodAdapter
+
+---
 # plugin 1.3.5
 1. Optimize plugin parameter stability during concurrent compilation
 2. Add ASM write to FTAutoTrack.trackRequestBuilder method, requires ft-sdk version 1.6.10 or above

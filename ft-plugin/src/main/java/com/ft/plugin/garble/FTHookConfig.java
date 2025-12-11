@@ -619,7 +619,6 @@ public class FTHookConfig {
      * {@link #CLICK_METHODS_SYSTEM}
      */
     public final static HashMap<String, FTMethodCell> LAMBDA_METHODS = new HashMap<>();
-    public final static HashMap<String, FTMethodCell> mLambdaMethodCells = new HashMap<>();
 
     static {
         addLambdaMethod1(new FTMethodCell(
