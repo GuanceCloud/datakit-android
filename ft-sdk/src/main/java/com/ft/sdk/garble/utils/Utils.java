@@ -19,6 +19,7 @@ import android.util.Base64;
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.garble.bean.ResourceID;
 import com.ft.sdk.garble.manager.SingletonGson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
@@ -410,8 +411,8 @@ public class Utils {
     public static boolean isJSONValid(String json) {
         try {
             JsonParser parser = new JsonParser();
-            parser.parse(json);
-            return true;
+            JsonElement element = parser.parse(json);
+            return element.isJsonObject() || element.isJsonArray();
         } catch (JsonParseException e) {
             return false;
         }
