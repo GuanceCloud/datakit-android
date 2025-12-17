@@ -14,6 +14,7 @@ import com.ft.sdk.garble.bean.ErrorType;
 import com.ft.sdk.garble.bean.NetStatusBean;
 import com.ft.sdk.garble.bean.ResourceBean;
 import com.ft.sdk.garble.bean.ResourceParams;
+import com.ft.sdk.garble.bean.ResourceType;
 import com.ft.sdk.garble.bean.ViewBean;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
@@ -838,7 +839,7 @@ public class FTRUMInnerManager {
 
             tags.put(Constants.KEY_RUM_RESOURCE_URL_HOST, bean.urlHost);
 
-            tags.put(Constants.KEY_RUM_RESOURCE_TYPE, "network");
+            tags.put(Constants.KEY_RUM_RESOURCE_TYPE, bean.resourceType);
             tags.put(Constants.KEY_RUM_RESPONSE_CONNECTION, bean.responseConnection);
             tags.put(Constants.KEY_RUM_RESPONSE_CONTENT_TYPE, bean.responseContentType);
             tags.put(Constants.KEY_RUM_RESPONSE_CONTENT_ENCODING, bean.responseContentEncoding);
@@ -1049,7 +1050,7 @@ public class FTRUMInnerManager {
         bean.responseConnection = params.responseConnection;
         bean.resourceMethod = params.resourceMethod;
         bean.responseContentEncoding = params.responseContentEncoding;
-        bean.resourceType = bean.responseContentType;
+        bean.resourceType = ResourceType.fromMimeType(params.responseContentType).getValue();
         bean.resourceStatus = params.resourceStatus;
         bean.resourceSize = params.responseContentLength;
         if (bean.resourceStatus >= HttpsURLConnection.HTTP_BAD_REQUEST) {
