@@ -176,9 +176,14 @@ public class ResourceBean {
     public long startTime = Utils.getCurrentNanoTime();
 
     /**
+     * Resource request start time System.nanoTime
+     */
+    public long startTimeNanoForDuration = System.nanoTime();
+
+    /**
      * Resource request end time
      */
-    public long endTime = -1;
+    public long endTimeNanoForDuration = -1;
 
     /**
      * Session ID, {@link  FTRUMInnerManager#sessionId}

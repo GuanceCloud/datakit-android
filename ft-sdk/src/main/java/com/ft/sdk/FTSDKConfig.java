@@ -173,6 +173,8 @@ public class FTSDKConfig {
         return remoteConfiguration;
     }
 
+    private FTRemoteConfigManager.FetchResult remoteConfigFetchResult;
+
     /**
      * Whether to enable remote configuration for data collection, default is off.
      * When enabled, SDK initialization or app hot start will trigger data update.
@@ -183,6 +185,21 @@ public class FTSDKConfig {
     public FTSDKConfig setRemoteConfiguration(boolean remoteConfiguration) {
         this.remoteConfiguration = remoteConfiguration;
         return this;
+    }
+
+
+    /**
+     *
+     * @param remoteConfigFetchResult
+     * @return
+     */
+    public FTSDKConfig setRemoteConfigurationCallBack(FTRemoteConfigManager.FetchResult remoteConfigFetchResult) {
+        this.remoteConfigFetchResult = remoteConfigFetchResult;
+        return this;
+    }
+
+    public FTRemoteConfigManager.FetchResult getRemoteConfigFetchResult() {
+        return remoteConfigFetchResult;
     }
 
     private int remoteConfigMiniUpdateInterval = 43200;//12 hour

@@ -51,7 +51,7 @@ public class ActiveActionBean extends ActionBean {
      */
     public void close() {
         this.isClose = true;
-        duration = Utils.getCurrentNanoTime() - startTime;
+        duration = System.nanoTime() - startTimeNanoForDuration;
 //        if (duration > ACTION_NEED_WAIT_TIME_OUT) {
 //            duration = ACTION_NEED_WAIT_TIME_OUT;
 //        }

@@ -154,7 +154,8 @@ public class FTSdk {
     private void initFTConfig(FTSDKConfig config) {
         LogUtils.setDebug(config.isDebug());
         if (config.isRemoteConfiguration()) {
-            mRemoteConfigManager = new FTRemoteConfigManager(config.getRemoteConfigMiniUpdateInterval());
+            mRemoteConfigManager = new FTRemoteConfigManager(config.getRemoteConfigMiniUpdateInterval(),
+                    config.getRemoteConfigFetchResult());
             mRemoteConfigManager.initFromLocalCache();
             mRemoteConfigManager.mergeSDKConfigFromCache(config);
         }

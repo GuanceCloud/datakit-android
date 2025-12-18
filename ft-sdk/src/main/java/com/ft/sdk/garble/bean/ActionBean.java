@@ -28,6 +28,11 @@ public class ActionBean {
     long startTime = Utils.getCurrentNanoTime();
 
     /**
+     * Action start time System.nanoTime
+     */
+    long startTimeNanoForDuration = System.nanoTime();
+
+    /**
      * Action name, {@link Constants#KEY_RUM_ACTION_NAME}
      */
     String actionName;
@@ -81,7 +86,7 @@ public class ActionBean {
     String viewReferrer;
 
     /**
-     * Action additional properties, {@link  Constants#KEY_RUM_PROPERTY}
+     * Action additional properties, {@link  Constants#KEY_RUM_SDK_INNER_KEY_PROPERTY}
      */
     HashMap<String, Object> property = new HashMap<>();
 
@@ -132,6 +137,10 @@ public class ActionBean {
 
     public long getStartTime() {
         return startTime;
+    }
+
+    public long getStartTimeNanoForDuration() {
+        return startTimeNanoForDuration;
     }
 
     public String getActionName() {
@@ -227,9 +236,10 @@ public class ActionBean {
      */
     public String getAttrJsonString() {
         HashMap<String, Object> map = new HashMap<>();
-        map.put(Constants.KEY_RUM_PROPERTY, property);
-        map.put(Constants.KEY_RUM_TAGS, tags);
-        map.put(Constants.KEY_COLLECT_TYPE, collectType);
+        map.put(Constants.KEY_RUM_SDK_INNER_KEY_PROPERTY, property);
+        map.put(Constants.KEY_RUM_SDK_INNER_KEY_TAGS, tags);
+        map.put(Constants.KEY_RUM_SDK_INNER_KEY_COLLECT_TYPE, collectType);
+        map.put(Constants.KEY_RUM_SDK_INNER_KEY_START_TIME_NANO, startTimeNanoForDuration);
         return Utils.hashMapObjectToJson(map);
     }
 
@@ -243,8 +253,9 @@ public class ActionBean {
         try {
 
             JSONObject json = new JSONObject(jsonString);
-            this.collectType = json.getString(Constants.KEY_COLLECT_TYPE);
-            JSONObject jsonProperty = json.optJSONObject(Constants.KEY_RUM_PROPERTY);
+            this.collectType = json.getString(Constants.KEY_RUM_SDK_INNER_KEY_COLLECT_TYPE);
+            this.startTimeNanoForDuration= json.optLong(Constants.KEY_RUM_SDK_INNER_KEY_START_TIME_NANO);
+            JSONObject jsonProperty = json.optJSONObject(Constants.KEY_RUM_SDK_INNER_KEY_PROPERTY);
             if (jsonProperty != null) {
                 Iterator<String> keys = jsonProperty.keys();
 
@@ -254,7 +265,7 @@ public class ActionBean {
                 }
             }
 
-            JSONObject jsonTags = json.optJSONObject(Constants.KEY_RUM_TAGS);
+            JSONObject jsonTags = json.optJSONObject(Constants.KEY_RUM_SDK_INNER_KEY_TAGS);
             if (jsonTags != null) {
                 Iterator<String> keys = jsonTags.keys();
                 while (keys.hasNext()) {

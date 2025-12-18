@@ -882,7 +882,7 @@ public class Utils {
     public static long getAppStartTimeNs() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             long diffMs = SystemClock.elapsedRealtime() - Process.getStartElapsedRealtime();
-            return getCurrentNanoTime() - TimeUnit.MILLISECONDS.toNanos(diffMs);
+            return System.nanoTime()- TimeUnit.MILLISECONDS.toNanos(diffMs);
         } else {
             return FTApplication.APP_START_TIME;
         }

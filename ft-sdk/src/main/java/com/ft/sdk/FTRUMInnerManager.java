@@ -114,7 +114,7 @@ public class FTRUMInnerManager {
     /**
      * Recent Session time, unit nanosecond
      */
-    private long lastSessionTime = Utils.getCurrentNanoTime();
+    private long lastSessionTime = System.nanoTime();
 
 
     /**
@@ -148,7 +148,7 @@ public class FTRUMInnerManager {
      */
     private void checkSessionRefresh(boolean checkRefreshView) {
         synchronized (sessionRefreshLock) {
-            long now = Utils.getCurrentNanoTime();
+            long now = System.nanoTime();
             boolean longResting = now - lastUserActiveTime > MAX_RESTING_TIME;
             boolean longTimeSession = now - lastSessionTime > SESSION_EXPIRE_TIME;
             if (longTimeSession || longResting) {
@@ -286,8 +286,8 @@ public class FTRUMInnerManager {
      */
     private void checkActionClose() {
         if (activeAction == null) return;
-        long now = Utils.getCurrentNanoTime();
-        long lastActionTime = activeAction.getStartTime();
+        long now = System.nanoTime();
+        long lastActionTime = activeAction.getStartTimeNanoForDuration();
         boolean waiting = activeAction.isNeedWaitAction() && (activeView != null && !activeView.isClose());
         boolean timeOut = now - lastActionTime > ActiveActionBean.ACTION_NEED_WAIT_TIME_OUT;
         boolean needClose = !waiting
@@ -380,7 +380,7 @@ public class FTRUMInnerManager {
             }
             final String actionId = bean.actionId;
             final String viewId = bean.viewId;
-            bean.endTime = Utils.getCurrentNanoTime();
+            bean.endTimeNanoForDuration = System.nanoTime();
             increaseResourceCount(viewId, actionId);
             EventConsumerThreadPool.get().execute(new Runnable() {
                 @Override
@@ -791,7 +791,7 @@ public class FTRUMInnerManager {
         bean.resourceTrans = netStatusBean.getResponseTime();
         bean.resourceTTFB = netStatusBean.getTTFB();
         long resourceLoad = netStatusBean.getHoleRequestTime();
-        bean.resourceLoad = resourceLoad > 0 ? resourceLoad : bean.endTime - bean.startTime;
+        bean.resourceLoad = resourceLoad > 0 ? resourceLoad : bean.endTimeNanoForDuration - bean.startTimeNanoForDuration;
         bean.resourceFirstByte = netStatusBean.getFirstByteTime();
         bean.resourceFirstByteStart = netStatusBean.getFirstByteStartTime();
         bean.resourceDownloadTime = netStatusBean.getDownloadTime();
@@ -1360,11 +1360,11 @@ public class FTRUMInnerManager {
                 if (bean.isClose()) {
                     fields.put(Constants.KEY_RUM_VIEW_TIME_SPENT, bean.getTimeSpent());
                 } else {
-                    fields.put(Constants.KEY_RUM_VIEW_TIME_SPENT, Utils.getCurrentNanoTime() - bean.getStartTime());
+                    fields.put(Constants.KEY_RUM_VIEW_TIME_SPENT, System.nanoTime() - bean.getStartTimeNanoForDuration());
                 }
                 fields.put(Constants.KEY_RUM_VIEW_LONG_TASK_COUNT, bean.getLongTaskCount());
                 fields.put(Constants.KEY_RUM_VIEW_IS_ACTIVE, !bean.isClose());
-                fields.put(Constants.KEY_SDK_VIEW_UPDATE_TIME, bean.getViewUpdateTime());
+                fields.put(Constants.KEY_RUM_SDK_VIEW_UPDATE_TIME, bean.getViewUpdateTime());
 
                 if (FTMonitorManager.get().isDeviceMetricsMonitorType(DeviceMetricsMonitorType.CPU)) {
                     double cpuTickCountPerSecond = bean.getCpuTickCountPerSecond();
@@ -1389,7 +1389,7 @@ public class FTRUMInnerManager {
                     fields.put(Constants.KEY_FPS_MINI, bean.getFpsMini());
                 }
                 if (bean.getLastErrorTime() > 0) {
-                    fields.put(Constants.KEY_SESSION_ERROR_TIMESTAMP, bean.getLastErrorTime());
+                    fields.put(Constants.KEY_RUM_SESSION_ERROR_TIMESTAMP, bean.getLastErrorTime());
                 }
 
                 FTTrackInner.getInstance().rum(bean.getStartTime(),
