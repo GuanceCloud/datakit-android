@@ -167,8 +167,8 @@ class LifeCircleTraceCallback {
                     }
 
                 }
+                FTSdk.updateRemoteConfig();
             }
-            FTSdk.updateRemoteConfig();
             alreadySleep = false;
         }
         // Avoid duplicate calculation of page startup statistics

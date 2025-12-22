@@ -875,7 +875,7 @@ public class Utils {
     }
 
     /**
-     * Get App startup time
+     * Get App startup time，System.nanoTime
      *
      * @return
      */

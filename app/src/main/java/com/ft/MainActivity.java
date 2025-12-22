@@ -24,12 +24,16 @@ import com.ft.sdk.FTResourceInterceptor;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceInterceptor;
 import com.ft.sdk.garble.annotation.IgnoreAOP;
+import com.ft.sdk.garble.bean.RemoteConfigBean;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.reflect.ReflectUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.service.TestService;
 import com.ft.utils.RequestUtils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -347,7 +351,24 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onResult(boolean success) {
                         LogUtils.d(TAG, "updateRemoteConfig:success->" + success);
+                    }
 
+                    @Override
+                    public RemoteConfigBean onConfigSuccessFetched(RemoteConfigBean configBean, String jsonConfig) {
+                        boolean isVip = false;
+                        try {
+                            JSONObject jsonObject = new JSONObject(jsonConfig);
+                            String userid = jsonObject.optString("custom_userid");
+                            isVip = (userid.equals("custom_user_test5"));
+                        } catch (JSONException e) {
+                        }
+
+                        if (isVip) {
+                            configBean.setLogSampleRate(0f);
+                            configBean.setRumSampleRate(0f);
+                            configBean.setTraceSampleRate(0f);
+                        }
+                        return configBean;
                     }
                 });
             }

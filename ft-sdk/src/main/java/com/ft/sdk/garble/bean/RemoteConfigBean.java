@@ -69,7 +69,9 @@ public class RemoteConfigBean {
     private Float sessionReplaySampleRate;
     private Float sessionReplayOnErrorSampleRate;
     private String md5;
+    private boolean remoteConfigChanged;
     private boolean isValid = false;
+    private String contentJsonString;
 
     private RemoteConfigBean() {
     }
@@ -77,6 +79,22 @@ public class RemoteConfigBean {
     public static RemoteConfigBean buildFromConfigJson(String json) {
         RemoteConfigBean bean = new RemoteConfigBean();
         bean.parse(json);
+        return bean;
+    }
+
+    /**
+     * Build RemoteConfigBean from JSON string and set the specified md5 value
+     *
+     * @param json JSON string
+     * @param md5  MD5 value
+     * @return RemoteConfigBean object
+     */
+    public static RemoteConfigBean buildFromConfigJson(String json, String md5) {
+        RemoteConfigBean bean = new RemoteConfigBean();
+        bean.parse(json);
+        if (md5 != null) {
+            bean.md5 = md5;
+        }
         return bean;
     }
 
@@ -103,6 +121,7 @@ public class RemoteConfigBean {
 
             JSONObject content = json.optJSONObject("content");
             if (content == null) return;
+            this.contentJsonString = content.toString();
 
             if (isString(content, KEY_ENV)) env = content.optString(KEY_ENV);
             if (isString(content, KEY_SERVICE_NAME)) serviceName = content.optString(KEY_SERVICE_NAME);
@@ -280,6 +299,106 @@ public class RemoteConfigBean {
         return md5;
     }
 
+    public String getContentJsonString() {
+        return contentJsonString;
+    }
+
+    public void setSessionReplayOnErrorSampleRate(Float sessionReplayOnErrorSampleRate) {
+        this.sessionReplayOnErrorSampleRate = sessionReplayOnErrorSampleRate;
+    }
+
+    public void setSessionReplaySampleRate(Float sessionReplaySampleRate) {
+        this.sessionReplaySampleRate = sessionReplaySampleRate;
+    }
+
+    public void setTraceType(String traceType) {
+        this.traceType = traceType;
+    }
+
+    public void setTraceEnableAutoTrace(Boolean traceEnableAutoTrace) {
+        this.traceEnableAutoTrace = traceEnableAutoTrace;
+    }
+
+    public void setTraceSampleRate(Float traceSampleRate) {
+        this.traceSampleRate = traceSampleRate;
+    }
+
+    public void setLogEnableCustomLog(Boolean logEnableCustomLog) {
+        this.logEnableCustomLog = logEnableCustomLog;
+    }
+
+    public void setLogLevelFilters(String[] logLevelFilters) {
+        this.logLevelFilters = logLevelFilters;
+    }
+
+    public void setLogSampleRate(Float logSampleRate) {
+        this.logSampleRate = logSampleRate;
+    }
+
+    public void setRumAllowWebViewHost(String[] rumAllowWebViewHost) {
+        this.rumAllowWebViewHost = rumAllowWebViewHost;
+    }
+
+    public void setRumEnableTraceWebView(Boolean rumEnableTraceWebView) {
+        this.rumEnableTraceWebView = rumEnableTraceWebView;
+    }
+
+    public void setRumEnableTrackAppCrash(Boolean rumEnableTrackAppCrash) {
+        this.rumEnableTrackAppCrash = rumEnableTrackAppCrash;
+    }
+
+    public void setRumBlockDurationMs(Long rumBlockDurationMs) {
+        this.rumBlockDurationMs = rumBlockDurationMs;
+    }
+
+    public void setRumEnableTrackAppUIBlock(Boolean rumEnableTrackAppUIBlock) {
+        this.rumEnableTrackAppUIBlock = rumEnableTrackAppUIBlock;
+    }
+
+    public void setRumEnableResourceHostIP(Boolean rumEnableResourceHostIP) {
+        this.rumEnableResourceHostIP = rumEnableResourceHostIP;
+    }
+
+    public void setRumEnableTraceUserView(Boolean rumEnableTraceUserView) {
+        this.rumEnableTraceUserView = rumEnableTraceUserView;
+    }
+
+    public void setRumEnableTraceUserAction(Boolean rumEnableTraceUserAction) {
+        this.rumEnableTraceUserAction = rumEnableTraceUserAction;
+    }
+
+    public void setRumSessionOnErrorSampleRate(Float rumSessionOnErrorSampleRate) {
+        this.rumSessionOnErrorSampleRate = rumSessionOnErrorSampleRate;
+    }
+
+    public void setRumSampleRate(Float rumSampleRate) {
+        this.rumSampleRate = rumSampleRate;
+    }
+
+    public void setSyncSleepTime(Integer syncSleepTime) {
+        this.syncSleepTime = syncSleepTime;
+    }
+
+    public void setSyncPageSize(Integer syncPageSize) {
+        this.syncPageSize = syncPageSize;
+    }
+
+    public void setCompressIntakeRequests(Boolean compressIntakeRequests) {
+        this.compressIntakeRequests = compressIntakeRequests;
+    }
+
+    public void setAutoSync(Boolean autoSync) {
+        this.autoSync = autoSync;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
+
+    public void setEnv(String env) {
+        this.env = env;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("RemoteConfigBean{");
@@ -355,8 +474,132 @@ public class RemoteConfigBean {
         this.logEnableConsoleLog = logEnableConsoleLog;
     }
 
+    public void setRemoteConfigChanged(boolean remoteConfigChanged) {
+        this.remoteConfigChanged = remoteConfigChanged;
+    }
+
+    public boolean isRemoteConfigChanged() {
+        return remoteConfigChanged;
+    }
+
     public boolean isValid() {
         return isValid;
+    }
+
+    /**
+     * Convert RemoteConfigBean object to JSON string
+     *
+     * @return JSON string, returns null if conversion fails
+     */
+    public String toJsonString() {
+        try {
+            JSONObject json = new JSONObject();
+
+            // Add content object
+            JSONObject content = new JSONObject();
+
+            if (env != null) {
+                content.put(KEY_ENV, env);
+            }
+            if (serviceName != null) {
+                content.put(KEY_SERVICE_NAME, serviceName);
+            }
+            if (autoSync != null) {
+                content.put(KEY_AUTO_SYNC, autoSync);
+            }
+            if (compressIntakeRequests != null) {
+                content.put(KEY_COMPRESS_INTAKE_REQUESTS, compressIntakeRequests);
+            }
+            if (syncPageSize != null) {
+                content.put(KEY_SYNC_PAGE_SIZE, syncPageSize);
+            }
+            if (syncSleepTime != null) {
+                content.put(KEY_SYNC_SLEEP_TIME, syncSleepTime);
+            }
+            if (rumSampleRate != null) {
+                content.put(KEY_RUM_SAMPLE_RATE, rumSampleRate);
+            }
+            if (rumSessionOnErrorSampleRate != null) {
+                content.put(KEY_RUM_SESSION_ON_ERROR_SAMPLE_RATE, rumSessionOnErrorSampleRate);
+            }
+            if (rumEnableTraceUserAction != null) {
+                content.put(KEY_RUM_ENABLE_TRACE_USER_ACTION, rumEnableTraceUserAction);
+            }
+            if (rumEnableTraceUserView != null) {
+                content.put(KEY_RUM_ENABLE_TRACE_USER_VIEW, rumEnableTraceUserView);
+            }
+            if (rumEnableTraceUserResource != null) {
+                content.put(KEY_RUM_ENABLE_TRACE_USER_RESOURCE, rumEnableTraceUserResource);
+            }
+            if (rumEnableResourceHostIP != null) {
+                content.put(KEY_RUM_ENABLE_RESOURCE_HOST_IP, rumEnableResourceHostIP);
+            }
+            if (rumEnableTrackAppUIBlock != null) {
+                content.put(KEY_RUM_ENABLE_TRACK_APP_UIBLOCK, rumEnableTrackAppUIBlock);
+            }
+            if (rumBlockDurationMs != null) {
+                content.put(KEY_RUM_BLOCK_DURATION_MS, rumBlockDurationMs);
+            }
+            if (rumEnableTrackAppCrash != null) {
+                content.put(KEY_RUM_ENABLE_TRACK_APP_CRASH, rumEnableTrackAppCrash);
+            }
+            if (rumEnableTrackAppANR != null) {
+                content.put(KEY_RUM_ENABLE_TRACK_APP_ANR, rumEnableTrackAppANR);
+            }
+            if (rumEnableTraceWebView != null) {
+                content.put(KEY_RUM_ENABLE_TRACE_WEB_VIEW, rumEnableTraceWebView);
+            }
+            if (rumAllowWebViewHost != null) {
+                JSONArray webViewHostArray = new JSONArray();
+                for (String host : rumAllowWebViewHost) {
+                    webViewHostArray.put(host);
+                }
+                content.put(KEY_RUM_ALLOW_WEB_VIEW_HOST, webViewHostArray);
+            }
+            if (logSampleRate != null) {
+                content.put(KEY_LOG_SAMPLE_RATE, logSampleRate);
+            }
+            if (logLevelFilters != null) {
+                JSONArray logFilterArray = new JSONArray();
+                for (String filter : logLevelFilters) {
+                    logFilterArray.put(filter);
+                }
+                content.put(KEY_LOG_LEVEL_FILTERS, logFilterArray);
+            }
+            if (logEnableCustomLog != null) {
+                content.put(KEY_LOG_ENABLE_CUSTOM_LOG, logEnableCustomLog);
+            }
+            if (logEnableConsoleLog != null) {
+                content.put(KEY_LOG_ENABLE_CONSOLE_LOG, logEnableConsoleLog);
+            }
+            if (traceSampleRate != null) {
+                content.put(KEY_TRACE_SAMPLE_RATE, traceSampleRate);
+            }
+            if (traceEnableAutoTrace != null) {
+                content.put(KEY_TRACE_ENABLE_AUTO_TRACE, traceEnableAutoTrace);
+            }
+            if (traceType != null) {
+                content.put(KEY_TRACE_TYPE, traceType);
+            }
+            if (sessionReplaySampleRate != null) {
+                content.put(KEY_SESSION_REPLAY_SAMPLE_RATE, sessionReplaySampleRate);
+            }
+            if (sessionReplayOnErrorSampleRate != null) {
+                content.put(KEY_SESSION_REPLAY_ON_ERROR_SAMPLE_RATE, sessionReplayOnErrorSampleRate);
+            }
+
+            json.put("content", content);
+
+            // Add md5 to root object if present
+            if (md5 != null) {
+                json.put(KEY_MD5, md5);
+            }
+
+            return json.toString();
+        } catch (Exception e) {
+            LogUtils.e(TAG, "toJsonString error: " + LogUtils.getStackTraceString(e));
+            return null;
+        }
     }
 
 }
