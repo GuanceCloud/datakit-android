@@ -23,12 +23,12 @@ public class ActionBean {
      */
     String id = Utils.randomUUID();
     /**
-     * Action start time
+     * Action Start time
      */
     long startTime = Utils.getCurrentNanoTime();
 
     /**
-     * Action start time System.nanoTime
+     * Action Start time for duration, unit: nanoseconds
      */
     long startTimeNanoForDuration = System.nanoTime();
 

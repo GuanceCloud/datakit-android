@@ -60,12 +60,12 @@ public class ViewBean {
      */
     boolean isClose = false;
     /**
-     * Start time, unit: nanoseconds
+     * View Start time, unit: nanoseconds
      */
     long startTime = Utils.getCurrentNanoTime();
 
     /**
-     *
+     * View Start time for duration, unit: nanoseconds
      */
     long startTimeNanoForDuration = System.nanoTime();
 

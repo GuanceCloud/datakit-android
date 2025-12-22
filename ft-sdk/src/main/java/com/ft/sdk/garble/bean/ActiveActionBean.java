@@ -70,6 +70,7 @@ public class ActiveActionBean extends ActionBean {
         ActionBean bean = new ActionBean();
         bean.id = this.id;
         bean.startTime = this.startTime;
+        bean.startTimeNanoForDuration = this.startTimeNanoForDuration;
         bean.actionName = this.actionName;
         bean.actionType = this.actionType;
         bean.duration = this.duration;
