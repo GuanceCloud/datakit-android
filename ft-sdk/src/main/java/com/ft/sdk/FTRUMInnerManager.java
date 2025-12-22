@@ -814,7 +814,6 @@ public class FTRUMInnerManager {
         } else {
             LogUtils.d(TAG, "putRUMResourcePerformance:" + resourceId);
         }
-        long time = Utils.getCurrentNanoTime();
         String actionId = bean.actionId;
         String viewId = bean.viewId;
         String actionName = bean.actionName;
@@ -926,9 +925,10 @@ public class FTRUMInnerManager {
             fields.put(Constants.KEY_RUM_RESPONSE_HEADER, bean.responseHeader);
 
 
-            FTTrackInner.getInstance().rum(time,
+            FTTrackInner.getInstance().rum(bean.startTime,
                     Constants.FT_MEASUREMENT_RUM_RESOURCE, tags, fields, null, collectType);
 
+            long time = Utils.getCurrentNanoTime();
 
             if (bean.resourceStatus >= HttpsURLConnection.HTTP_BAD_REQUEST
                     || (bean.resourceStatus == 0 && !Utils.isNullOrEmpty(bean.errorStack))) {
