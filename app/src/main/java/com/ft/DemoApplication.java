@@ -83,7 +83,7 @@ public class DemoApplication extends BaseApplication {
                 .addGlobalContext("main_process", Utils.isMainProcess() + "")
                 .setNeedTransformOldCache(true)
                 .setCompressIntakeRequests(true)
-                .setRemoteConfiguration(true)
+                .setRemoteConfiguration(false)
                 .setSyncSleepTime(100)
                 .setRemoteConfigurationCallBack(new FTRemoteConfigManager.FetchResult() {
                     @Override
@@ -162,7 +162,7 @@ public class DemoApplication extends BaseApplication {
                         .setSamplingRate(1f)
                         .setSessionErrorSampleRate(1f)
                         .setRumAppId(BuildConfig.RUM_APP_ID)
-                        .setEnableTraceUserAction(true)
+                        .setEnableTraceUserAction(false)
                         .setEnableTraceUserView(true)
                         .setRumCacheLimitCount(10000)
 //                        .setAllowWebViewHost(new String[]{"10.100.64.166"})

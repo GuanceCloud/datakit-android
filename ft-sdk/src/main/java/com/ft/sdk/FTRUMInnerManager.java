@@ -144,7 +144,6 @@ public class FTRUMInnerManager {
     /**
      * Check reset session_id
      *
-     * @return
      */
     private void checkSessionRefresh(boolean checkRefreshView) {
         synchronized (sessionRefreshLock) {
@@ -159,26 +158,28 @@ public class FTRUMInnerManager {
                 checkSessionKeep(sessionId, sampleRate, sessionErrorSampleError);
 
                 if (checkRefreshView) {
-                    if (activeView != null) {
-                        if (!activeView.isClose()) {
-                            activeView.close();
-                            closeView(activeView);
+                    ActiveViewBean viewBean = activeView;
+                    if (viewBean != null) {
+                        if (!viewBean.isClose()) {
+                            viewBean.close();
+                            closeView(viewBean);
                         }
 
-                        String viewName = activeView.getViewName();
-                        String viewReferrer = activeView.getViewReferrer();
-                        HashMap<String, Object> property = activeView.getProperty();
-                        long loadTime = activeView.getLoadTime();
+                        String viewName = viewBean.getViewName();
+                        String viewReferrer = viewBean.getViewReferrer();
+                        HashMap<String, Object> property = viewBean.getProperty();
+                        long loadTime = viewBean.getLoadTime();
 
-                        activeView = new ActiveViewBean(viewName, viewReferrer, loadTime, sessionId);
+                        viewBean = new ActiveViewBean(viewName, viewReferrer, loadTime, sessionId);
+                        activeView = viewBean;
                         if (property != null) {
-                            activeView.getProperty().putAll(property);
+                            viewBean.getProperty().putAll(property);
                         }
-                        activeView.setCollectType(checkSessionWillCollect(sessionId));
-                        FTMonitorManager.get().addMonitor(activeView.getId());
-                        FTMonitorManager.get().attachMonitorData(activeView);
-                        initView(activeView);
-                        LogUtils.d(TAG, "Session Track -> checkRefreshView sessionId:" + activeView.getSessionId() + ",viewId:" + activeView.getId());
+                        viewBean.setCollectType(checkSessionWillCollect(sessionId));
+                        FTMonitorManager.get().addMonitor(viewBean.getId());
+                        FTMonitorManager.get().attachMonitorData(viewBean);
+                        initView(viewBean);
+                        LogUtils.d(TAG, "Session Track -> checkRefreshView sessionId:" + viewBean.getSessionId() + ",viewId:" + viewBean.getId());
                     }
                 }
             } else {
@@ -192,7 +193,8 @@ public class FTRUMInnerManager {
     }
 
     private String getActionId() {
-        return activeAction == null ? null : activeAction.getId();
+        ActiveActionBean actionBean = activeAction;
+        return actionBean == null ? null : actionBean.getId();
     }
 
     void addAction(String actionName, String actionType, long duration, long startTime) {
@@ -200,9 +202,10 @@ public class FTRUMInnerManager {
     }
 
     void addAction(String actionName, String actionType, long duration, long startTime, HashMap<String, Object> property) {
-        String viewId = activeView != null ? activeView.getId() : null;
-        String viewName = activeView != null ? activeView.getViewName() : null;
-        String viewReferrer = activeView != null ? activeView.getViewReferrer() : null;
+        ActiveViewBean viewBean = activeView;
+        String viewId = viewBean != null ? viewBean.getId() : null;
+        String viewName = viewBean != null ? viewBean.getViewName() : null;
+        String viewReferrer = viewBean != null ? viewBean.getViewReferrer() : null;
         checkSessionRefresh(true);
 
         ActiveActionBean activeAction = new ActiveActionBean(actionName, actionType,
@@ -260,20 +263,22 @@ public class FTRUMInnerManager {
      * @param property   additional attribute parameters
      */
     void startAction(String actionName, String actionType, boolean needWait, HashMap<String, Object> property) {
-
-        String viewId = activeView != null ? activeView.getId() : null;
-        String viewName = activeView != null ? activeView.getViewName() : null;
-        String viewReferrer = activeView != null ? activeView.getViewReferrer() : null;
+        ActiveActionBean actionBean = activeAction;
+        ActiveViewBean viewBean = activeView;
+        String viewId = viewBean != null ? viewBean.getId() : null;
+        String viewName = viewBean != null ? viewBean.getViewName() : null;
+        String viewReferrer = viewBean != null ? viewBean.getViewReferrer() : null;
         checkSessionRefresh(true);
         checkActionClose();
-        if (activeAction == null || activeAction.isClose()) {
-            activeAction = new ActiveActionBean(actionName, actionType, sessionId, viewId, viewName, viewReferrer, needWait);
+        if (actionBean == null || actionBean.isClose()) {
+            actionBean = new ActiveActionBean(actionName, actionType, sessionId, viewId, viewName, viewReferrer, needWait);
+            activeAction = actionBean;
             if (property != null) {
-                activeAction.getProperty().putAll(property);
+                actionBean.getProperty().putAll(property);
             }
-            activeAction.setTags(FTRUMConfigManager.get().getRUMPublicDynamicTags());
-            activeAction.setCollectType(checkSessionWillCollect(activeAction.getSessionId()));
-            initAction(activeAction, false);
+            actionBean.setTags(FTRUMConfigManager.get().getRUMPublicDynamicTags());
+            actionBean.setCollectType(checkSessionWillCollect(actionBean.getSessionId()));
+            initAction(actionBean, false);
 //            this.lastUserActiveTime = activeAction.getStartTime();
 
             mHandler.removeCallbacks(mActionRecheckRunner);
@@ -285,18 +290,20 @@ public class FTRUMInnerManager {
      * Check if action needs to be closed
      */
     private void checkActionClose() {
-        if (activeAction == null) return;
+        ActiveActionBean actionBean = activeAction;
+        if (actionBean == null) return;
+        ActiveViewBean viewBean = activeView;
         long now = System.nanoTime();
-        long lastActionTime = activeAction.getStartTimeNanoForDuration();
-        boolean waiting = activeAction.isNeedWaitAction() && (activeView != null && !activeView.isClose());
+        long lastActionTime = actionBean.getStartTimeNanoForDuration();
+        boolean waiting = actionBean.isNeedWaitAction() && (viewBean != null && !viewBean.isClose());
         boolean timeOut = now - lastActionTime > ActiveActionBean.ACTION_NEED_WAIT_TIME_OUT;
         boolean needClose = !waiting
                 && (now - lastActionTime > ActiveActionBean.ACTION_NORMAL_TIME_OUT)
-                || timeOut || (activeView != null && !activeView.getId().equals(activeAction.getViewId()));
+                || timeOut || (viewBean != null && !viewBean.getId().equals(actionBean.getViewId()));
         if (needClose) {
-            if (!activeAction.isClose()) {
-                activeAction.close();
-                closeAction(activeAction, timeOut);
+            if (!actionBean.isClose()) {
+                actionBean.close();
+                closeAction(actionBean, timeOut);
             }
         }
     }
@@ -305,15 +312,17 @@ public class FTRUMInnerManager {
      * Stop action
      */
     void stopAction() {
-        if (activeAction.isNeedWaitAction()) {
-            activeAction.close();
+        ActiveActionBean actionBean = activeAction;
+        if (actionBean == null) return;
+        if (actionBean.isNeedWaitAction()) {
+            actionBean.close();
         }
     }
 
     /**
      * create resource relative map
      *
-     * @param resourceId
+     * @param resourceId resource unique id
      * @return
      */
     ResourceBean onCreateResource(String resourceId) {
@@ -369,7 +378,7 @@ public class FTRUMInnerManager {
     }
 
     /**
-     * @param resourceId
+     * @param resourceId resource unique uuid
      * @param property   additional attribute parameters
      */
     void stopResource(final String resourceId, HashMap<String, Object> property) {
@@ -440,27 +449,30 @@ public class FTRUMInnerManager {
         }
 
         checkSessionRefresh(false);
-        if (activeView != null && !activeView.isClose()) {
-            activeView.close();
-            closeView(activeView);
+        ActiveViewBean activeViewBean = activeView;
+        if (activeViewBean != null && !activeViewBean.isClose()) {
+            activeViewBean.close();
+            closeView(activeViewBean);
         }
 
 
         long loadTime = -1;
-        if (preActivityDuration.get(viewName) != null) {
-            loadTime = preActivityDuration.get(viewName);
+        Long preDuration = preActivityDuration.get(viewName);
+        if (preDuration != null) {
+            loadTime = preDuration;
             preActivityDuration.remove(viewName);
         }
         String viewReferrer = getLastView();
-        activeView = new ActiveViewBean(viewName, viewReferrer, loadTime, sessionId);
+        activeViewBean = new ActiveViewBean(viewName, viewReferrer, loadTime, sessionId);
+        activeView = activeViewBean;
         if (property != null) {
-            activeView.getProperty().putAll(property);
+            activeViewBean.getProperty().putAll(property);
         }
-        activeView.setTags(FTRUMConfigManager.get().getRUMPublicDynamicTags());
-        activeView.setCollectType(checkSessionWillCollect(activeView.getSessionId()));
-        FTMonitorManager.get().addMonitor(activeView.getId());
-        FTMonitorManager.get().attachMonitorData(activeView);
-        initView(activeView);
+        activeViewBean.setTags(FTRUMConfigManager.get().getRUMPublicDynamicTags());
+        activeViewBean.setCollectType(checkSessionWillCollect(activeViewBean.getSessionId()));
+        FTMonitorManager.get().addMonitor(activeViewBean.getId());
+        FTMonitorManager.get().attachMonitorData(activeViewBean);
+        initView(activeViewBean);
 //        lastUserActiveTime = activeView.getStartTime();
 
     }
@@ -497,7 +509,8 @@ public class FTRUMInnerManager {
      * @param property additional attribute parameters
      */
     void stopView(HashMap<String, Object> property, RunnerCompleteCallBack callBack) {
-        if (activeView == null) {
+        ActiveViewBean activeViewBean = activeView;
+        if (activeViewBean == null) {
             if (callBack != null) {
                 callBack.onComplete();
             }
@@ -505,12 +518,12 @@ public class FTRUMInnerManager {
         }
         checkActionClose();
         if (property != null) {
-            activeView.getProperty().putAll(property);
+            activeViewBean.getProperty().putAll(property);
         }
-        FTMonitorManager.get().attachMonitorData(activeView);
-        activeView.setTags(FTRUMConfigManager.get().getRUMPublicDynamicTags());
-        activeView.close();
-        closeView(activeView, callBack);
+        FTMonitorManager.get().attachMonitorData(activeViewBean);
+        activeViewBean.setTags(FTRUMConfigManager.get().getRUMPublicDynamicTags());
+        activeViewBean.close();
+        closeView(activeViewBean, callBack);
     }
 
     /**
@@ -1078,7 +1091,7 @@ public class FTRUMInnerManager {
      * {@link Constants#KEY_RUM_ACTION_LONG_TASK_COUNT}
      * {@link Constants#KEY_RUM_VIEW_LONG_TASK_COUNT}
      *
-     * @param tags
+     * @param tags rum globalContext
      */
     private void increaseLongTask(HashMap<String, Object> tags) {
         final String actionId = HashMapUtils.getString(tags, Constants.KEY_RUM_ACTION_ID);
@@ -1148,7 +1161,7 @@ public class FTRUMInnerManager {
     /**
      * Close Action, calculate {@link ActionBean#duration},{@link ActionBean#isClose} to true
      *
-     * @param bean
+     * @param bean  active action bean
      * @param force force close
      */
     private void closeAction(ActiveActionBean bean, final boolean force) {
@@ -1169,28 +1182,32 @@ public class FTRUMInnerManager {
 
 
     private String getViewId() {
-        if (activeView == null) {
+        ActiveViewBean activeViewBean = activeView;
+        if (activeViewBean == null) {
             return null;
         }
-        return activeView.getId();
+        return activeViewBean.getId();
     }
 
     String getViewName() {
-        if (activeView == null) {
+        ActiveViewBean activeViewBean = activeView;
+        if (activeViewBean == null) {
             return null;
         }
-        return activeView.getViewName();
+        return activeViewBean.getViewName();
     }
 
     private String getViewReferrer() {
-        if (activeView == null) {
+        ActiveViewBean activeViewBean = activeView;
+        if (activeViewBean == null) {
             return null;
         }
-        return activeView.getViewReferrer();
+        return activeViewBean.getViewReferrer();
     }
 
     private String getActionName() {
-        return activeAction == null ? null : activeAction.getActionName();
+        ActiveActionBean actionBean = activeAction;
+        return actionBean == null ? null : actionBean.getActionName();
     }
 
     /**
@@ -1203,7 +1220,8 @@ public class FTRUMInnerManager {
         bean.viewName = getViewName();
         bean.viewReferrer = getViewReferrer();
         bean.sessionId = getSessionId();
-        if (activeAction != null && !activeAction.isClose()) {
+        ActiveActionBean actionBean = activeAction;
+        if (actionBean != null && !actionBean.isClose()) {
             bean.actionId = getActionId();
             bean.actionName = getActionName();
         }
@@ -1222,7 +1240,8 @@ public class FTRUMInnerManager {
         tags.put(Constants.KEY_RUM_VIEW_REFERRER, getViewReferrer());
         tags.put(Constants.KEY_RUM_SESSION_ID, sessionId);
         if (withAction) {
-            if (activeAction != null && !activeAction.isClose()) {
+            ActiveActionBean actionBean = activeAction;
+            if (actionBean != null && !actionBean.isClose()) {
                 tags.put(Constants.KEY_RUM_ACTION_ID, getActionId());
                 tags.put(Constants.KEY_RUM_ACTION_NAME, getActionName());
             }
@@ -1478,6 +1497,7 @@ public class FTRUMInnerManager {
             lastGenerateTime = 0;
         }
 
+        mHandler.removeCallbacks(mActionRecheckRunner);
         activeAction = null;
         activeView = null;
         notCollectArr.clear();

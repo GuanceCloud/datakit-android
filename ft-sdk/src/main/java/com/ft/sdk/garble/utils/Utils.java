@@ -681,11 +681,11 @@ public class Utils {
                     // For non-basic types, use Gson for conversion
                     jsonBuilder.append(SingletonGson.getInstance().toJson(value));
                 }
-                jsonBuilder.append(", ");
+                jsonBuilder.append(",");
             }
             if (!map.isEmpty()) {
-                // Delete the last comma and space
-                jsonBuilder.delete(jsonBuilder.length() - 2, jsonBuilder.length());
+                // Delete the last comma
+                jsonBuilder.delete(jsonBuilder.length() - 1, jsonBuilder.length());
             }
             jsonBuilder.append("}");
         } catch (Exception e) {
