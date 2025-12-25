@@ -22,6 +22,11 @@ public class ResourceParams {
     public String responseHeader = "";
 
     /**
+     * Resource http protocol
+     */
+    public String resourceProtocol = "";
+
+    /**
      * HTTP request header
      */
     public HashMap<String, List<String>> requestHeaderMap;
@@ -45,8 +50,9 @@ public class ResourceParams {
     public String responseContentEncoding = "";
 
     /**
-     * Response content size
+     * Response content size, use {@link NetStatusBean#responseBodySize}
      */
+    @Deprecated
     public long responseContentLength = 0;
     /**
      * HTTP request

@@ -45,6 +45,9 @@ public class FTResourceEventListener extends EventListener {
     private long sslStartTime = -1;
     private long tcpStartTime = -1;
     private long tcpEndTime = -1;
+    private long requestBodySize = -1;
+    private long responseBodySize = -1;
+    private boolean resourceConnectionReuse = false;
     private String resourceHostIP;
 
     private final String resourceId;
@@ -106,6 +109,7 @@ public class FTResourceEventListener extends EventListener {
         super.responseBodyEnd(call, byteCount);
         originEventListener.responseBodyEnd(call, byteCount);
         bodyEndTime = System.nanoTime();
+        responseBodySize = byteCount;
 //        LogUtils.d(TAG, "responseBodyEnd:" + resourceId);
     }
 
@@ -179,6 +183,7 @@ public class FTResourceEventListener extends EventListener {
     public void connectionAcquired(@NotNull Call call, @NotNull Connection connection) {
         super.connectionAcquired(call, connection);
         originEventListener.connectionAcquired(call, connection);
+        resourceConnectionReuse = tcpStartTime != -1;
     }
 
     @Override
@@ -203,6 +208,7 @@ public class FTResourceEventListener extends EventListener {
     public void requestBodyEnd(@NotNull Call call, long byteCount) {
         super.requestBodyEnd(call, byteCount);
         originEventListener.requestBodyEnd(call, byteCount);
+        requestBodySize = byteCount;
     }
 
     @Override
@@ -254,6 +260,9 @@ public class FTResourceEventListener extends EventListener {
         netStatusBean.tcpStartTime = tcpStartTime;
         netStatusBean.tcpEndTime = tcpEndTime;
         netStatusBean.resourceHostIP = resourceHostIP;
+        netStatusBean.connectionReuse = resourceConnectionReuse;
+        netStatusBean.requestBodySize = requestBodySize;
+        netStatusBean.responseBodySize = responseBodySize;
         FTRUMInnerManager.get().setNetState(this.resourceId, netStatusBean);
     }
 

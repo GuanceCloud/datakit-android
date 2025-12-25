@@ -2,6 +2,7 @@ package com.ft.sdk;
 
 import androidx.annotation.NonNull;
 
+import com.ft.sdk.garble.bean.ResourceBean;
 import com.ft.sdk.garble.bean.ResourceID;
 import com.ft.sdk.garble.bean.ResourceParams;
 import com.ft.sdk.garble.utils.Constants;
@@ -155,13 +156,11 @@ public class FTResourceInterceptor implements Interceptor {
         if (exception == null) {
             String responseBodyString = "";
             String responseHeaderString = response.headers().toString();
+            params.resourceProtocol = response.protocol().toString();
             params.responseHeader = responseHeaderString;
             params.responseContentType = response.header("Content-Type");
             params.responseConnection = response.header("Connection");
             params.responseContentEncoding = response.header("Content-Encoding");
-            String contentLength = response.header("Content-Length");
-            params.responseContentLength = Long.parseLong(contentLength != null ? contentLength : "0");
-
 
             params.resourceStatus = response.code();
             if (params.resourceStatus >= HttpURLConnection.HTTP_BAD_REQUEST) {
@@ -177,21 +176,8 @@ public class FTResourceInterceptor implements Interceptor {
                         response = response.newBuilder().body(copyResponseBody).build();
                     }
                     params.responseBody = responseBodyString;
-
-                    //If "Content-Length" is used here
-                    if (params.responseContentLength == 0) {
-                        params.responseContentLength = responseBodyString.length();
-                        params.responseContentLength += responseHeaderString.length();
-                    }
                 } else {
                     LogUtils.d(TAG, "response body empty");
-                }
-            } else {
-                //If "Content-Length" is not data then calculate
-                if (params.responseContentLength == 0) {
-                    ResponseBody peekBody = response.peekBody(BYTE_LIMIT_COUNT);
-                    params.responseContentLength = peekBody.contentLength();
-                    params.responseContentLength += responseHeaderString.length();
                 }
             }
         } else {

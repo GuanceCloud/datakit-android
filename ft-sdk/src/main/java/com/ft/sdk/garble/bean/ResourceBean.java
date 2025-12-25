@@ -96,11 +96,6 @@ public class ResourceBean {
     public int resourceStatus = 0;
 
     /**
-     * Resource request size, unit byte
-     */
-    public long resourceSize = -1;
-
-    /**
      * Resource load time unit
      */
     public long resourceLoad = -1;
@@ -163,6 +158,25 @@ public class ResourceBean {
      */
     public long resourceDownloadTimeStart = -1;
 
+
+    /**
+     * Request body size
+     */
+    public long resourceRequestBodySize = -1;
+    /**
+     * Response body size
+     */
+    public long resourceResponseBodySize = -1;
+
+    /**
+     * Connection reuse
+     */
+    public boolean resourceConnectionReuse = false;
+
+    /**
+     * Resource http protocol
+     */
+    public String resourceProtocol = "";
 
     /**
      * Host IP address

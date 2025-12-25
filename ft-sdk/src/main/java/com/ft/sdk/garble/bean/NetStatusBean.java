@@ -99,6 +99,21 @@ public class NetStatusBean {
     public String requestHost;
 
     /**
+     * Request body size
+     */
+    public long requestBodySize = 0;
+
+    /**
+     * Response body size
+     */
+    public long responseBodySize = 0;
+
+    /**
+     * Connection reuse
+     */
+    public boolean connectionReuse = false;
+
+    /**
      * Get tcp connection duration
      *
      * @return
@@ -111,7 +126,7 @@ public class NetStatusBean {
     }
 
     /**
-     *  Relative connect start time to {@link #callStartTime}
+     * Relative connect start time to {@link #callStartTime}
      *
      * @return
      */
@@ -132,7 +147,7 @@ public class NetStatusBean {
     }
 
     /**
-     *  Relative dns start time to {@link #callStartTime}
+     * Relative dns start time to {@link #callStartTime}
      *
      * @return
      */
@@ -142,7 +157,8 @@ public class NetStatusBean {
 
 
     /**
-     *  body content load duration
+     * body content load duration
+     *
      * @return
      */
     public long getDownloadTime() {
@@ -153,7 +169,8 @@ public class NetStatusBean {
     }
 
     /**
-     *  Relative body download start time to {@link #callStartTime}
+     * Relative body download start time to {@link #callStartTime}
+     *
      * @return
      */
     public long getDownloadTimeStart() {
@@ -196,7 +213,8 @@ public class NetStatusBean {
 
 
     /**
-     *  Relative first byte start time to {@link #callStartTime}
+     * Relative first byte start time to {@link #callStartTime}
+     *
      * @return
      */
     public long getFirstByteStartTime() {
@@ -229,7 +247,7 @@ public class NetStatusBean {
     }
 
     /**
-     *  Relative ssl start time to {@link #callStartTime}
+     * Relative ssl start time to {@link #callStartTime}
      *
      * @return
      */

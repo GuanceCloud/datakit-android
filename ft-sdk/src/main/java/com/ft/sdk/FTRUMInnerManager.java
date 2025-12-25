@@ -810,6 +810,9 @@ public class FTRUMInnerManager {
         bean.resourceDownloadTime = netStatusBean.getDownloadTime();
         bean.resourceDownloadTimeStart = netStatusBean.getDownloadTimeStart();
         bean.resourceHostIP = netStatusBean.resourceHostIP;
+        bean.resourceResponseBodySize = netStatusBean.responseBodySize;
+        bean.resourceRequestBodySize = netStatusBean.requestBodySize;
+        bean.resourceConnectionReuse = netStatusBean.connectionReuse;
         bean.netStateSet = true;
         checkToAddResource(resourceId, bean);
     }
@@ -868,9 +871,18 @@ public class FTRUMInnerManager {
                 tags.put(Constants.KEY_RUM_RESOURCE_STATUS_GROUP, resourceStatusGroup);
             }
 
-            if (bean.resourceSize > 0) {
-                fields.put(Constants.KEY_RUM_RESOURCE_SIZE, bean.resourceSize);
+            long resourceSize = bean.resourceRequestBodySize + (bean.responseHeader == null ?
+                    0 : bean.responseHeader.length());
+            if (resourceSize > 0) {
+                fields.put(Constants.KEY_RUM_RESOURCE_SIZE, resourceSize);
             }
+
+            long requestSize = bean.resourceRequestBodySize + (bean.requestHeader == null ?
+                    0 : bean.requestHeader.length());
+            if (requestSize > 0) {
+                fields.put(Constants.KEY_RUM_RESOURCE_REQUEST_SIZE, requestSize);
+            }
+
             if (bean.resourceLoad > 0) {
                 fields.put(Constants.KEY_RUM_RESOURCE_DURATION, bean.resourceLoad);
             }
@@ -935,6 +947,8 @@ public class FTRUMInnerManager {
 
             fields.putAll(bean.property);
             fields.put(Constants.KEY_RUM_REQUEST_HEADER, bean.requestHeader);
+            fields.put(Constants.KEY_RUM_RESOURCE_HTTP_PROTOCOL, bean.resourceProtocol);
+            fields.put(Constants.KEY_RUM_RESOURCE_CONNECTION_REUSE, bean.resourceConnectionReuse);
             fields.put(Constants.KEY_RUM_RESPONSE_HEADER, bean.responseHeader);
 
 
@@ -1062,10 +1076,10 @@ public class FTRUMInnerManager {
         bean.responseContentType = params.responseContentType;
         bean.responseConnection = params.responseConnection;
         bean.resourceMethod = params.resourceMethod;
+        bean.resourceProtocol = params.resourceProtocol;
         bean.responseContentEncoding = params.responseContentEncoding;
         bean.resourceType = ResourceType.fromMimeType(params.responseContentType).getValue();
         bean.resourceStatus = params.resourceStatus;
-        bean.resourceSize = params.responseContentLength;
         if (bean.resourceStatus >= HttpsURLConnection.HTTP_BAD_REQUEST) {
             bean.errorStack = params.responseBody == null ? "" : params.responseBody;
         } else if (bean.resourceStatus == 0 && !Utils.isNullOrEmpty(params.requestErrorStack)) {

@@ -100,11 +100,11 @@ public class Constants {
      */
     public static final String FT_USER_USER_EXT = "ft.user.extdata";
     /**
-     *
+     * Store {@link  android.content.SharedPreferences} {@link #FT_REMOTE_CONFIG} key value
      */
     public static final String FT_REMOTE_CONFIG = "ft.localCache.remoteConfig";
     /**
-     *
+     * Store {@link  android.content.SharedPreferences} {@link #FT_REMOTE_CONFIG_FETCH_TIME} key value
      */
     public static final String FT_REMOTE_CONFIG_FETCH_TIME = "ft.localCache.remoteConfigFetchTime";
     /**
@@ -427,6 +427,20 @@ public class Constants {
      * Resource request header
      */
     public static final String KEY_RUM_REQUEST_HEADER = "request_header";
+
+    /**
+     * Resource http protocol
+     */
+    public static final String KEY_RUM_RESOURCE_HTTP_PROTOCOL = "resource_http_protocol";
+    /**
+     * Resource request size
+     */
+    public static final String KEY_RUM_RESOURCE_REQUEST_SIZE = "resource_request_size";
+    /**
+     * Resource connection reuse
+     */
+    public static final String KEY_RUM_RESOURCE_CONNECTION_REUSE = "resource_connection_reuse";
+
 
     /**
      * Release version information set
