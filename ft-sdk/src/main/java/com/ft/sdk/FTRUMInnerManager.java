@@ -192,6 +192,60 @@ public class FTRUMInnerManager {
 //        }
     }
 
+
+    void hotUpdate(Float sampleRate, Float sessionErrorSampleError) {
+        if (sampleRate == null && sessionErrorSampleError == null) return;
+
+        if (sampleRate != null) {
+            this.sampleRate = sampleRate;
+        }
+        if (sessionErrorSampleError != null) {
+            this.sessionErrorSampleError = sessionErrorSampleError;
+        }
+
+        boolean needRefresh = false;
+        CollectType collectType = checkSessionWillCollect(sessionId);
+        if (collectType.equals(CollectType.NOT_COLLECT)) {
+            if (sampleRate != null) {
+                if (sampleRate == 1f) {
+                    needRefresh = true;
+                }
+            }
+            if (sessionErrorSampleError != null) {
+                if (sessionErrorSampleError == 1f) {
+                    needRefresh = true;
+                }
+            }
+        } else if (collectType.equals(CollectType.COLLECT_BY_SAMPLE)) {
+            if (sampleRate != null) {
+                if (sampleRate == 0f) {
+                    needRefresh = true;
+                }
+            }
+        } else if (collectType.equals(CollectType.COLLECT_BY_ERROR_SAMPLE)) {
+            if (sampleRate != null) {
+                if (sampleRate == 1f || sampleRate == 0f) {
+                    needRefresh = true;
+                }
+            }
+            if (sessionErrorSampleError != null) {
+                if (sessionErrorSampleError == 0f) {
+                    needRefresh = true;
+                }
+            }
+        }
+
+        if (needRefresh) {
+            forceRefreshSessionId();
+        }
+    }
+
+    void forceRefreshSessionId() {
+        lastSessionTime = -1;
+        lastUserActiveTime = -1;
+        checkSessionRefresh(true);
+    }
+
     private String getActionId() {
         ActiveActionBean actionBean = activeAction;
         return actionBean == null ? null : actionBean.getId();

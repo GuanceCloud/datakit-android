@@ -359,14 +359,14 @@ public class MainActivity extends AppCompatActivity {
                         try {
                             JSONObject jsonObject = new JSONObject(jsonConfig);
                             String userid = jsonObject.optString("custom_userid");
-                            isVip = (userid.equals("custom_user_test5"));
+                            isVip = (userid.equals("custom_user_test6"));
                         } catch (JSONException e) {
                         }
 
                         if (isVip) {
-                            configBean.setLogSampleRate(0f);
-                            configBean.setRumSampleRate(0f);
-                            configBean.setTraceSampleRate(0f);
+                            configBean.setLogSampleRate(1f);
+                            configBean.setRumSampleRate(1f);
+                            configBean.setTraceSampleRate(1f);
                         }
                         return configBean;
                     }

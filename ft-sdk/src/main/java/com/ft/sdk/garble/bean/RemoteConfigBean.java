@@ -488,6 +488,7 @@ public class RemoteConfigBean {
 
     /**
      * Convert RemoteConfigBean object to JSON string
+     * Preserves unknown fields from the original JSON (e.g., custom_userid)
      *
      * @return JSON string, returns null if conversion fails
      */
@@ -495,9 +496,21 @@ public class RemoteConfigBean {
         try {
             JSONObject json = new JSONObject();
 
-            // Add content object
-            JSONObject content = new JSONObject();
+            // Add content object - preserve original JSON structure if available
+            JSONObject content;
+            if (contentJsonString != null && !contentJsonString.isEmpty()) {
+                try {
+                    // Start with original content to preserve unknown fields
+                    content = new JSONObject(contentJsonString);
+                } catch (Exception e) {
+                    // If parsing original content fails, start with empty object
+                    content = new JSONObject();
+                }
+            } else {
+                content = new JSONObject();
+            }
 
+            // Update known fields with current values (may override original values)
             if (env != null) {
                 content.put(KEY_ENV, env);
             }

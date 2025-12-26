@@ -367,6 +367,28 @@ public class FTRemoteConfigManager {
             if (bean.getLogEnableCustomLog() != null) {
                 loggerConfig.setEnableConsoleLog(bean.getLogEnableConsoleLog());
             }
+            if (bean.getLogSampleRate() != null) {
+                loggerConfig.setSamplingRate(bean.getLogSampleRate());
+            }
+        }
+
+        FTTraceConfig traceConfig = FTTraceConfigManager.get().getConfig();
+        if (traceConfig != null) {
+            if (bean.getTraceSampleRate() != null) {
+                traceConfig.setSamplingRate(bean.getTraceSampleRate());
+            }
+        }
+
+        FTRUMConfig rumConfig = FTRUMConfigManager.get().getConfig();
+        if (rumConfig.isRumEnable()) {
+            if (bean.getRumSampleRate() != null) {
+                rumConfig.setSamplingRate(bean.getRumSampleRate());
+            }
+            if (bean.getRumSessionOnErrorSampleRate() != null) {
+                rumConfig.setSessionErrorSampleRate(bean.getSessionReplaySampleRate());
+            }
+
+            FTRUMInnerManager.get().hotUpdate(bean.getRumSampleRate(), bean.getRumSessionOnErrorSampleRate());
         }
     }
 
