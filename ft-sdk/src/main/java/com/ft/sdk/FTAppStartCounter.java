@@ -30,9 +30,11 @@ class FTAppStartCounter {
     private long coldStartDuration = 0;
 
     /**
-     * Startup start timestamp, unit: nanoseconds
+     * Startup start timestamp for duration, unit: nanoseconds
      */
-    private long coldStartTimeLine = 0;
+    private long coldStartTimeLineForNanoDuration = 0;
+
+    private long coldStartTimeLine;
 
 
     private FTAppStartCounter() {
@@ -54,8 +56,9 @@ class FTAppStartCounter {
      * @param coldStartEndTimeLine
      */
     void coldStart(long coldStartEndTimeLine) {
-        this.coldStartTimeLine = Utils.getAppStartTimeNs();
-        this.coldStartDuration = coldStartEndTimeLine - coldStartTimeLine;
+        this.coldStartTimeLineForNanoDuration = Utils.getAppStartTimeNs();
+        this.coldStartDuration = coldStartEndTimeLine - coldStartTimeLineForNanoDuration;
+        this.coldStartTimeLine = Utils.getCurrentNanoTime() - coldStartDuration;
         LogUtils.d(TAG, "coldStart:" + coldStartDuration);
 
     }
@@ -64,7 +67,7 @@ class FTAppStartCounter {
      * Upload cold start time
      */
     void coldStartUpload() {
-        if (coldStartDuration <= 0 || coldStartTimeLine <= 0) return;
+        if (coldStartDuration <= 0 || coldStartTimeLineForNanoDuration <= 0) return;
         FTAutoTrack.putRUMLaunchPerformance(true, coldStartDuration, coldStartTimeLine);
         coldStartDuration = 0;
     }

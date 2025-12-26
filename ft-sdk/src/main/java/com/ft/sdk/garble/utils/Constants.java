@@ -100,11 +100,11 @@ public class Constants {
      */
     public static final String FT_USER_USER_EXT = "ft.user.extdata";
     /**
-     *
+     * Store {@link  android.content.SharedPreferences} {@link #FT_REMOTE_CONFIG} key value
      */
     public static final String FT_REMOTE_CONFIG = "ft.localCache.remoteConfig";
     /**
-     *
+     * Store {@link  android.content.SharedPreferences} {@link #FT_REMOTE_CONFIG_FETCH_TIME} key value
      */
     public static final String FT_REMOTE_CONFIG_FETCH_TIME = "ft.localCache.remoteConfigFetchTime";
     /**
@@ -427,6 +427,20 @@ public class Constants {
     public static final String KEY_RUM_REQUEST_HEADER = "request_header";
 
     /**
+     * Resource http protocol
+     */
+    public static final String KEY_RUM_RESOURCE_HTTP_PROTOCOL = "resource_http_protocol";
+    /**
+     * Resource request size
+     */
+    public static final String KEY_RUM_RESOURCE_REQUEST_SIZE = "resource_request_size";
+    /**
+     * Resource connection reuse
+     */
+    public static final String KEY_RUM_RESOURCE_CONNECTION_REUSE = "resource_connection_reuse";
+
+
+    /**
      * Release version information set
      */
     public static final String KEY_RUM_SDK_PACKAGE_INFO = "sdk_pkg_info";
@@ -470,7 +484,7 @@ public class Constants {
     /**
      * SDK View update time
      */
-    public static final String KEY_SDK_VIEW_UPDATE_TIME = "view_update_time";
+    public static final String KEY_RUM_SDK_VIEW_UPDATE_TIME = "view_update_time";
 
     /**
      * SDK version number, here is agent version {@link #KEY_RUM_SDK_PACKAGE_AGENT}
@@ -586,7 +600,7 @@ public class Constants {
      * Data collected from error
      */
 
-    public static final String KEY_SAMPLED_FOR_ERROR_SESSION = "sampled_for_error_session";
+    public static final String KEY_RUM_SAMPLED_FOR_ERROR_SESSION = "sampled_for_error_session";
 
     /**
      * Because of Session Replay error collection
@@ -596,15 +610,15 @@ public class Constants {
     /**
      * Session error time
      */
-    public static final String KEY_SESSION_ERROR_TIMESTAMP = "session_error_timestamp";
+    public static final String KEY_RUM_SESSION_ERROR_TIMESTAMP = "session_error_timestamp";
     /**
      * Session rum sampling rate
      */
-    public static final String KEY_SESSION_SAMPLE_RATE = "session_sample_rate";
+    public static final String KEY_RUM_SESSION_SAMPLE_RATE = "session_sample_rate";
     /**
      * Session error sampling rate
      */
-    public static final String KEY_SESSION_ON_ERROR_SAMPLE_RATE = "session_on_error_sample_rate";
+    public static final String KEY_RUM_SESSION_ON_ERROR_SAMPLE_RATE = "session_on_error_sample_rate";
 
     /**
      * Session type
@@ -698,18 +712,23 @@ public class Constants {
     /**
      * Line protocol data, additional attributes
      */
-    public static final String KEY_RUM_PROPERTY = "property";
+    public static final String KEY_RUM_SDK_INNER_KEY_PROPERTY = "property";
 
     /**
      * Line protocol data tags, temporarily store dynamic tags
      */
-    public static final String KEY_RUM_TAGS = "tags";
+    public static final String KEY_RUM_SDK_INNER_KEY_TAGS = "tags";
 
 
     /**
      * Collected according to sampling rate
      */
-    public static final String KEY_COLLECT_TYPE = "collect_type";
+    public static final String KEY_RUM_SDK_INNER_KEY_COLLECT_TYPE = "collect_type";
+
+    /**
+     *
+     */
+    public static final String KEY_RUM_SDK_INNER_KEY_START_TIME_NANO = "start_time_nano";
 
     /**
      * Cold start, action_type
