@@ -1001,7 +1001,9 @@ public class FTRUMInnerManager {
 
             fields.putAll(bean.property);
             fields.put(Constants.KEY_RUM_REQUEST_HEADER, bean.requestHeader);
-            fields.put(Constants.KEY_RUM_RESOURCE_HTTP_PROTOCOL, bean.resourceProtocol);
+            if (!Utils.isNullOrEmpty(bean.resourceProtocol)) {
+                fields.put(Constants.KEY_RUM_RESOURCE_HTTP_PROTOCOL, bean.resourceProtocol);
+            }
             fields.put(Constants.KEY_RUM_RESOURCE_CONNECTION_REUSE, bean.resourceConnectionReuse);
             fields.put(Constants.KEY_RUM_RESPONSE_HEADER, bean.responseHeader);
 
