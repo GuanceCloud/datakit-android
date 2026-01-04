@@ -1,6 +1,16 @@
 # agent 1.6.16-alpha01
 1. Limited long task detection while the app is in the background.
 2. Optimized the session refresh mechanism while the app is in the background.
+3. Added compatibility for OkHttp 3.12.0 and lower versions
+4. Added illegal character filtering for globalContext and property keys.
+5. Optimized the error stack format.
+6. Extended resource_type support to include image, media, font, CSS, JS, native.
+7. Optimize nano duration calculation in Action 、View and Resource.
+8. Fix the incorrect start time of Resource requests.
+9. Support customizable configuration of remote variables.
+10. Prevented View actions from causing null exceptions. Optimized HashMap-to-JSON conversion.
+11. Resource added resource_http_protocol, resource_request_size, resource_connection_reuse
+12. Refined cold start timing by adding app_pre_application_init_time, app_application_init_time, and app_first_frame_init_time.
 
 ---
 # agent 1.6.15
