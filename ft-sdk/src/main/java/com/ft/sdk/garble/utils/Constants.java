@@ -679,6 +679,24 @@ public class Constants {
     public static final String KEY_RUM_ACTION_TYPE = "action_type";
 
     /**
+     * Pre-application initialization time, JSON format: {"start": 0, "duration": applicationPreOnCreateDuration}
+     * Represents the time from app start to Application.onCreate()
+     */
+    public static final String KEY_RUM_APP_PRE_APPLICATION_INIT_TIME="app_pre_application_init_time";
+
+    /**
+     * Application initialization time, JSON format: {"start": applicationOnCreateRelativeTime, "duration": applicationOnCreateDuration}
+     * Represents the time from Application.onCreate() to first Activity preOnCreate()
+     */
+    public static final String KEY_RUM_APP_APPLICATION_INIT_TIME="app_application_init_time";
+
+    /**
+     * First frame initialization time, JSON format: {"start": firstActivityPreOnActivityRelativeTime, "duration": firsDrawnDuration}
+     * Represents the time from first Activity preOnCreate() to first frame drawn
+     */
+    public static final String KEY_RUM_APP_FIRST_FRAME_INIT_TIME ="app_first_frame_init_time";
+
+    /**
      * Action cycle content long duration count statistics, {@link Constants#FT_MEASUREMENT_RUM_LONG_TASK}
      */
     public static final String KEY_RUM_ACTION_LONG_TASK_COUNT = "action_long_task_count";
@@ -716,6 +734,7 @@ public class Constants {
      *
      */
     public static final String KEY_RUM_SDK_INNER_KEY_START_TIME_NANO = "start_time_nano";
+
 
     /**
      * Cold start, action_type

@@ -925,7 +925,7 @@ public class FTRUMInnerManager {
                 tags.put(Constants.KEY_RUM_RESOURCE_STATUS_GROUP, resourceStatusGroup);
             }
 
-            long resourceSize = bean.resourceRequestBodySize + (bean.responseHeader == null ?
+            long resourceSize = bean.resourceResponseBodySize + (bean.responseHeader == null ?
                     0 : bean.responseHeader.length());
             if (resourceSize > 0) {
                 fields.put(Constants.KEY_RUM_RESOURCE_SIZE, resourceSize);

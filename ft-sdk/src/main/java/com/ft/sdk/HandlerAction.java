@@ -3,8 +3,8 @@ package com.ft.sdk;
 import java.util.HashMap;
 
 public class HandlerAction {
-    private String actionName;
-    private HashMap<String, Object> property;
+    private final String actionName;
+    private final HashMap<String, Object> property;
 
     public HandlerAction(String actionName, HashMap<String, Object> property) {
         this.actionName = actionName;
@@ -13,6 +13,7 @@ public class HandlerAction {
 
     public HandlerAction(String actionName) {
         this.actionName = actionName;
+        this.property = null;
     }
 
     public String getActionName() {
