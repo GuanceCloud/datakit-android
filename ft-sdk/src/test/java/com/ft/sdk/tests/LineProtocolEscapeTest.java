@@ -16,8 +16,8 @@ public class LineProtocolEscapeTest {
     private final static String NEED_ESCAPE_STRING = "\"Test log\\,\\\\=";
 
     private final static String FIELD_RESULT = "\"\\\"Test log\\\\,\\\\\\\\=\"";
-    private final static String MEASUREMENT_RESULT = "\"Test\\ log\\\\,\\\\=";
-    private final static String TAG_RESULT = "\"Test\\ log\\\\,\\\\\\=";
+    private final static String MEASUREMENT_RESULT = "\"Test\\ log\\,=";
+    private final static String TAG_RESULT = "\"Test\\ log\\,\\=";
 
     private final static String JSON_STRING = "{\"key\":\"value\",\"jsonString\":\"{\\\"key\\\":\\\"value\\\"}\"}";
     private final static String MIX_FIELD = JSON_STRING + NEED_ESCAPE_STRING;
