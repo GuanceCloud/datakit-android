@@ -185,48 +185,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.main_mock_okhttp_btn).setOnClickListener(v -> {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    //Check request headers to see if OkHttpClient.Builder.build method replacement is successful
-                    Request request = RequestUtils.requestUrl(BuildConfig.TRACE_URL);
-                    if (request != null) {
-                        LogUtils.d(TAG, "header=" + request.headers());
-
-                    }
-
-//                    RequestUtils.requestUrlAsync(BuildConfig.TRACE_URL, new RequestUtils.RequestCallback() {
-//                        @Override
-//                        public void onSuccess(int code, String response) {
-//                            LogUtils.d(TAG, "header=" + response);
-//                        }
-//
-//                        @Override
-//                        public void onFailure(IOException e) {
-//
-//                        }
-//                    });
-
-//                    OkGo.<String>get(BuildConfig.TRACE_URL)
-//                            .tag(this)
-//                            .execute(new StringCallback() {
-//                                @Override
-//                                public void onSuccess(com.lzy.okgo.model.Response<String> response) {
-//                                    response.body();
-//                                }
-//                            });
-
-//                    try {
-//                        OkGo.<String>get(BuildConfig.TRACE_URL+"2")
-//                                .tag(this)
-//                                .execute().body().string();
-//                    } catch (IOException e) {
-//                        throw new RuntimeException(e);
-//                    }
-
-
-                }
-            }).start();
+            startActivity(new Intent(this, NetworkTestActivity.class));
         });
 
         findViewById(R.id.main_mock_okhttp_custom_content_btn).setOnClickListener(new View.OnClickListener() {
