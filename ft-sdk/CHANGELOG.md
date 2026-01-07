@@ -1,3 +1,8 @@
+# agent 1.6.16-beta01
+1. Optimized handling of illegal characters in globalContext
+2. Fixed incorrect resource_connection_reuse handling and improved null handling for resource_http_protocol.
+
+---
 # agent 1.6.16-alpha01
 1. Limited long task detection while the app is in the background.
 2. Optimized the session refresh mechanism while the app is in the background.

@@ -14,6 +14,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.ft.BaseTest;
 import com.ft.BuildConfig;
 import com.ft.DebugMainActivity;
+import com.ft.NetworkTestActivity;
 import com.ft.R;
 import com.ft.sdk.EnvType;
 import com.ft.sdk.FTRUMConfig;
@@ -42,7 +43,7 @@ import java.util.Objects;
 public class RUMResourceTest extends BaseTest {
 
     @Rule
-    public ActivityScenarioRule<DebugMainActivity> rule = new ActivityScenarioRule<>(DebugMainActivity.class);
+    public ActivityScenarioRule<NetworkTestActivity> rule = new ActivityScenarioRule<>(NetworkTestActivity.class);
 
 
     @BeforeClass
@@ -76,7 +77,7 @@ public class RUMResourceTest extends BaseTest {
     @Test
     public void resourceInterceptorTest() throws Exception {
         Thread.sleep(2000);
-        onView(ViewMatchers.withId(R.id.main_mock_okhttp_btn)).perform(ViewActions.scrollTo()).perform(click());
+        onView(ViewMatchers.withId(R.id.btn_normal_request)).perform(click());
         invokeCheckActionClose();
 
         Thread.sleep(2000);
