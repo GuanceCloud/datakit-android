@@ -1,6 +1,23 @@
+# agent 1.6.16
+1. Added illegal character filtering for globalContext and property keys.
+2. Extended `resource_type` support to include image, media, font, CSS, JS, native.
+3. Support customizable configuration of remote variables.
+4. Resource added `resource_http_protocol`, `resource_request_size`, `resource_connection_reuse`.
+5. Refined cold start timing by adding `app_pre_application_init_time`,
+app_application_init_time, and app_first_frame_init_time.
+6. Added compatibility for OkHttp 3.12.+
+7. Fix the incorrect start time of Resource requests.
+8. Fix an occasional null pointer issue when retrieving actions and views during SDK shutdown.
+9. Optimize error stack formatting and fix incorrect line breaks in certain scenarios.
+10.	Limited long task detection while the app is in the background.
+11. Optimized the session refresh mechanism while the app is in the background.
+12. Optimize nano duration calculation in Action, View and Resource.
+
+---
 # agent 1.6.16-beta01
 1. Optimized handling of illegal characters in globalContext
-2. Fixed incorrect resource_connection_reuse handling and improved null handling for resource_http_protocol.
+2. Fixed incorrect resource_connection_reuse handling and improved null handling 
+    for resource_http_protocol.
 
 ---
 # agent 1.6.16-alpha01
@@ -9,13 +26,14 @@
 3. Added compatibility for OkHttp 3.12.0 and lower versions
 4. Added illegal character filtering for globalContext and property keys.
 5. Optimized the error stack format.
-6. Extended resource_type support to include image, media, font, CSS, JS, native.
+6. Extended `resource_type` support to include image, media, font, CSS, JS, native.
 7. Optimize nano duration calculation in Action 、View and Resource.
 8. Fix the incorrect start time of Resource requests.
 9. Support customizable configuration of remote variables.
 10. Prevented View actions from causing null exceptions. Optimized HashMap-to-JSON conversion.
-11. Resource added resource_http_protocol, resource_request_size, resource_connection_reuse
-12. Refined cold start timing by adding app_pre_application_init_time, app_application_init_time, and app_first_frame_init_time.
+11. Resource added `resource_http_protocol`, `resource_request_size`, `resource_connection_reuse`
+12. Refined cold start timing by adding `app_pre_application_init_time`, `app_application_init_time`,
+   and `app_first_frame_init_time`.
 
 ---
 # agent 1.6.15
