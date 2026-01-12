@@ -1559,9 +1559,6 @@ public class FTRUMInnerManager {
     }
 
     public void release() {
-        // Force generate final data before release
-        generateRumData(true);
-
         // Reset debounce timestamps
         synchronized (generateLock) {
             lastGenerateTime = 0;
@@ -1569,7 +1566,11 @@ public class FTRUMInnerManager {
 
         mHandler.removeCallbacks(mActionRecheckRunner);
         activeAction = null;
-        activeView = null;
+        if (activeView != null) {
+            // Force generate final data before release
+            generateRumData(true);
+            activeView = null;
+        }
         notCollectArr.clear();
         notSessionErrorCollectArr.clear();
         resourceBeanMap.clear();
