@@ -183,7 +183,7 @@ public class FTResourceEventListener extends EventListener {
     public void connectionAcquired(@NotNull Call call, @NotNull Connection connection) {
         super.connectionAcquired(call, connection);
         originEventListener.connectionAcquired(call, connection);
-        resourceConnectionReuse = tcpStartTime != -1;
+        resourceConnectionReuse = tcpStartTime == -1;
     }
 
     @Override

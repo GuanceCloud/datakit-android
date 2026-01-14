@@ -6,11 +6,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.os.SystemClock;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
@@ -90,6 +88,7 @@ class LifeCircleTraceCallback {
      */
     public void onPreOnCreate(Context context) {
         mCreateMap.put(context, System.nanoTime());
+        FTAppStartCounter.get().checkFirstActivityPreCreate(System.nanoTime());
         if (!mInited) {
 //            FTAutoTrack.startApp();
             // warn start
@@ -140,19 +139,24 @@ class LifeCircleTraceCallback {
      * see <a href="https://developer.android.com/topic/performance/vitals/launch-time?hl=zh-cn#warm">Launch time calculation rules</a>
      * After {@link Activity#onResume() }
      *
-     * @param context
+     * @param activity
      */
-    public void onPostResume(Context context) {
+    public void onPostResume(Activity activity) {
         FTRUMConfigManager manager = FTRUMConfigManager.get();
         FTRUMConfig config = manager.getConfig();
 
         if (!mInited) {
-            FTAppStartCounter.get().coldStart(System.nanoTime());
-            if (manager.isRumEnable() && config.isEnableTraceUserAction()) {
-                // If SDK is not initialized, this data will be supplemented 
-                // after SDK delayed initialization
-                FTAppStartCounter.get().coldStartUpload();
-            }
+            FTAppStartCounter.get().checkFirstFrameStart(activity, new Runnable() {
+                @Override
+                public void run() {
+                    FTAppStartCounter.get().coldStart(System.nanoTime());
+                    if (manager.isRumEnable() && config.isEnableTraceUserAction()) {
+                        // If SDK is not initialized, this data will be supplemented
+                        // after SDK delayed initialization
+                        FTAppStartCounter.get().coldStartUpload();
+                    }
+                }
+            });
         }
 
         // Already sleeping
