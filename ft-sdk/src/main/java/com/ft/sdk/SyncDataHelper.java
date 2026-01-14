@@ -73,10 +73,10 @@ public class SyncDataHelper {
 
     void initRUMConfig(FTRUMConfig config) {
         rumTags.putAll(basePublicTags);
-        rumStaticFields.put(Constants.KEY_SESSION_SAMPLE_RATE,
-                applyModifier(Constants.KEY_SESSION_SAMPLE_RATE, config.getSamplingRate()));
-        rumStaticFields.put(Constants.KEY_SESSION_ON_ERROR_SAMPLE_RATE,
-                applyModifier(Constants.KEY_SESSION_ON_ERROR_SAMPLE_RATE, config.getSessionErrorSampleRate()));
+        rumStaticFields.put(Constants.KEY_RUM_SESSION_SAMPLE_RATE,
+                applyModifier(Constants.KEY_RUM_SESSION_SAMPLE_RATE, config.getSamplingRate()));
+        rumStaticFields.put(Constants.KEY_RUM_SESSION_ON_ERROR_SAMPLE_RATE,
+                applyModifier(Constants.KEY_RUM_SESSION_ON_ERROR_SAMPLE_RATE, config.getSessionErrorSampleRate()));
         rumTags.putAll(applyModifier(config.getGlobalContext()));
     }
 

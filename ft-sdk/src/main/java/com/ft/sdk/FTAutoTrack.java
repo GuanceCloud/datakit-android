@@ -20,6 +20,7 @@ import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.PackageUtils;
 import com.ft.sdk.garble.utils.TBSWebViewUtils;
+import com.ft.sdk.garble.utils.Utils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -48,6 +49,7 @@ public class FTAutoTrack {
      */
     public static void startApp(Application app) {
         try {
+            FTAppStartCounter.get().appOnCreate(System.nanoTime());
             LogUtils.d(TAG, "startApp:" + app);
             //Determine if it is the main process
             FTActivityLifecycleCallbacks life = new FTActivityLifecycleCallbacks();
@@ -484,7 +486,10 @@ public class FTAutoTrack {
     /**
      * Record application login effectiveness
      */
-    public static void putRUMLaunchPerformance(boolean isCold, long duration, long startTime) {
+    public static void putRUMLaunchPerformance(boolean isCold, long duration, long startTime,
+                                               HashMap<String, Long> preApplicationInit,
+                                               HashMap<String, Long> applicationInit,
+                                               HashMap<String, Long> firstFrameInit) {
         FTRUMConfigManager manager = FTRUMConfigManager.get();
         FTActionTrackingHandler handler = manager.getConfig().getActionTrackingHandler();
         if (handler != null) {
@@ -492,17 +497,84 @@ public class FTAutoTrack {
                     : ActionSourceType.LAUNCH_HOT, null));
 
             if (action != null) {
+                HashMap<String, Object> actionProperty = action.getProperty();
+                if (isCold) {
+                    if (actionProperty == null) {
+                        actionProperty = new HashMap<>();
+                    }
+
+                    // Handle preApplicationInit
+                    if (preApplicationInit != null) {
+                        String jsonStr = Utils.hashMapObjectToJson(preApplicationInit);
+                        if (jsonStr != null && !jsonStr.isEmpty()) {
+                            actionProperty.put(Constants.KEY_RUM_APP_PRE_APPLICATION_INIT_TIME, jsonStr);
+                        }
+                    }
+
+                    // Handle applicationInit
+                    if (applicationInit != null) {
+                        String jsonStr = Utils.hashMapObjectToJson(applicationInit);
+                        if (jsonStr != null && !jsonStr.isEmpty()) {
+                            actionProperty.put(Constants.KEY_RUM_APP_APPLICATION_INIT_TIME, jsonStr);
+                        }
+                    }
+
+                    // Handle firstFrameInit
+                    if (firstFrameInit != null) {
+                        String jsonStr = Utils.hashMapObjectToJson(firstFrameInit);
+                        if (jsonStr != null && !jsonStr.isEmpty()) {
+                            actionProperty.put(Constants.KEY_RUM_APP_FIRST_FRAME_INIT_TIME, jsonStr);
+                        }
+                    }
+                }
                 FTRUMInnerManager.get().addAction(
                         action.getActionName(),
                         isCold ? Constants.ACTION_TYPE_LAUNCH_COLD : Constants.ACTION_TYPE_LAUNCH_HOT,
-                        duration, startTime, action.getProperty());
+                        duration, startTime, actionProperty);
+
             }
         } else {
+            HashMap<String, Object> actionProperty = null;
+
+            // Check if any map is not null
+            if (preApplicationInit != null || applicationInit != null || firstFrameInit != null) {
+                actionProperty = new HashMap<>();
+
+                // Handle preApplicationInit
+                if (preApplicationInit != null) {
+                    String jsonStr = Utils.hashMapObjectToJson(preApplicationInit);
+                    if (jsonStr != null && !jsonStr.isEmpty()) {
+                        actionProperty.put(Constants.KEY_RUM_APP_PRE_APPLICATION_INIT_TIME, jsonStr);
+                    }
+                }
+
+                // Handle applicationInit
+                if (applicationInit != null) {
+                    String jsonStr = Utils.hashMapObjectToJson(applicationInit);
+                    if (jsonStr != null && !jsonStr.isEmpty()) {
+                        actionProperty.put(Constants.KEY_RUM_APP_APPLICATION_INIT_TIME, jsonStr);
+                    }
+                }
+
+                // Handle firstFrameInit
+                if (firstFrameInit != null) {
+                    String jsonStr = Utils.hashMapObjectToJson(firstFrameInit);
+                    if (jsonStr != null && !jsonStr.isEmpty()) {
+                        actionProperty.put(Constants.KEY_RUM_APP_FIRST_FRAME_INIT_TIME, jsonStr);
+                    }
+                }
+            }
+
             FTRUMInnerManager.get().addAction(
                     isCold ? Constants.ACTION_NAME_LAUNCH_COLD : Constants.ACTION_NAME_LAUNCH_HOT,
                     isCold ? Constants.ACTION_TYPE_LAUNCH_COLD : Constants.ACTION_TYPE_LAUNCH_HOT,
-                    duration, startTime);
+                    duration, startTime, actionProperty);
         }
+    }
+
+
+    public static void putRUMLaunchPerformance(boolean isCold, long duration, long startTime) {
+        putRUMLaunchPerformance(isCold, duration, startTime, null, null, null);
     }
 
 

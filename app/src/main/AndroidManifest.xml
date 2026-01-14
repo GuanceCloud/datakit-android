@@ -43,6 +43,7 @@
         <activity android:name=".HandlerTestActivity" />
         <activity android:name=".ActivityTrackingTestActivity" />
         <activity android:name=".FragmentTrackingTestActivity" />
+        <activity android:name=".NetworkTestActivity" />
 
         <!--provider override setting-->
         <!--        <provider-->

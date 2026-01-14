@@ -7,18 +7,23 @@ import com.ft.sdk.EnvType;
 import com.ft.sdk.ErrorMonitorType;
 import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.FTRUMConfig;
+import com.ft.sdk.FTRemoteConfigManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
 import com.ft.sdk.LogCacheDiscard;
 import com.ft.sdk.RUMCacheDiscard;
 import com.ft.sdk.TraceType;
+import com.ft.sdk.garble.bean.RemoteConfigBean;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 import com.ft.utils.CrossProcessSetting;
 import com.lzy.okgo.OkGo;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 
@@ -69,8 +74,7 @@ public class DemoApplication extends BaseApplication {
 
 
     static void initFTSDK(Context context) {
-        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAWAY_URL,
-                        BuildConfig.CLIENT_TOKEN)
+        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAKIT_URL)
                 .setDebug(true)//Set whether it's debug
                 .setAutoSync(true)
                 .setCustomSyncPageSize(10)
@@ -81,6 +85,31 @@ public class DemoApplication extends BaseApplication {
                 .setCompressIntakeRequests(true)
                 .setRemoteConfiguration(true)
                 .setSyncSleepTime(100)
+                .setRemoteConfigurationCallBack(new FTRemoteConfigManager.FetchResult() {
+                    @Override
+                    public void onResult(boolean success) {
+
+                    }
+
+                    @Override
+                    public RemoteConfigBean onConfigSuccessFetched(RemoteConfigBean configBean, String jsonString) {
+
+                        boolean isVip = false;
+                        try {
+                            JSONObject jsonObject = new JSONObject(jsonString);
+                            String userid = jsonObject.optString("custom_userid");
+                            isVip = (userid.equals("custom_user_test1"));
+                        } catch (JSONException e) {
+                        }
+
+                        if (isVip) {
+                            configBean.setLogSampleRate(0f);
+                            configBean.setRumSampleRate(0f);
+                            configBean.setTraceSampleRate(0f);
+                        }
+                        return configBean;
+                    }
+                })
 //                .setDataModifier(new DataModifier() {
 //                    @Override
 //                    public Object modify(String key, Object value) {

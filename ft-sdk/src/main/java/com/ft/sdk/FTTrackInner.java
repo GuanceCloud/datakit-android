@@ -159,10 +159,11 @@ public class FTTrackInner {
             case NOT_COLLECT:
                 break;
             case COLLECT_BY_ERROR_SAMPLE:
+                //only view change data time
                 if (measurement.equals(Constants.FT_MEASUREMENT_RUM_VIEW)) {
-                    fields.put(Constants.KEY_SAMPLED_FOR_ERROR_SESSION, true);
+                    fields.put(Constants.KEY_RUM_SAMPLED_FOR_ERROR_SESSION, true);
                     long errorTimestamp = HashMapUtils.getLong(fields,
-                            Constants.KEY_SESSION_ERROR_TIMESTAMP, 0L);
+                            Constants.KEY_RUM_SESSION_ERROR_TIMESTAMP, 0L);
                     viewDataGenerateTime = errorTimestamp > 0 ? errorTimestamp : Utils.getCurrentNanoTime();
                 }
             case COLLECT_BY_SAMPLE:

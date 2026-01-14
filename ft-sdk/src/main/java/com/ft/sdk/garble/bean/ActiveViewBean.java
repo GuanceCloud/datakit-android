@@ -29,7 +29,7 @@ public class ActiveViewBean extends ViewBean {
      */
     public void close() {
         this.isClose = true;
-        timeSpent = Utils.getCurrentNanoTime() - startTime;
+        timeSpent = System.nanoTime()- startTimeNanoForDuration;
     }
 
     /**
@@ -47,6 +47,7 @@ public class ActiveViewBean extends ViewBean {
         bean.actionCount = this.actionCount;
         bean.isClose = this.isClose;
         bean.startTime = this.startTime;
+        bean.startTimeNanoForDuration = this.startTimeNanoForDuration;
         bean.loadTime = this.loadTime;
         bean.timeSpent = this.timeSpent;
         bean.sessionId = this.sessionId;

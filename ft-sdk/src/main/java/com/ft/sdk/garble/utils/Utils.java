@@ -19,6 +19,7 @@ import android.util.Base64;
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.garble.bean.ResourceID;
 import com.ft.sdk.garble.manager.SingletonGson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
@@ -221,6 +222,7 @@ public class Utils {
      */
     public static String translateTagKeyValue(String oldStr) {
         oldStr = oldStr.replace("\n", " ");
+        oldStr = oldStr.replace("\\", "");
         oldStr = translateSpecialCharacters(",", oldStr);
         oldStr = translateSpecialCharacters("=", oldStr);
         return translateSpecialCharacters(" ", oldStr);
@@ -232,6 +234,7 @@ public class Utils {
      * @return
      */
     public static String translateMeasurements(String oldStr) {
+        oldStr = oldStr.replace("\\", "");
         oldStr = translateSpecialCharacters(",", oldStr);
         return translateSpecialCharacters(" ", oldStr);
     }
@@ -408,8 +411,8 @@ public class Utils {
     public static boolean isJSONValid(String json) {
         try {
             JsonParser parser = new JsonParser();
-            parser.parse(json);
-            return true;
+            JsonElement element = parser.parse(json);
+            return element.isJsonObject() || element.isJsonArray();
         } catch (JsonParseException e) {
             return false;
         }
@@ -678,11 +681,11 @@ public class Utils {
                     // For non-basic types, use Gson for conversion
                     jsonBuilder.append(SingletonGson.getInstance().toJson(value));
                 }
-                jsonBuilder.append(", ");
+                jsonBuilder.append(",");
             }
             if (!map.isEmpty()) {
-                // Delete the last comma and space
-                jsonBuilder.delete(jsonBuilder.length() - 2, jsonBuilder.length());
+                // Delete the last comma
+                jsonBuilder.delete(jsonBuilder.length() - 1, jsonBuilder.length());
             }
             jsonBuilder.append("}");
         } catch (Exception e) {
@@ -872,14 +875,14 @@ public class Utils {
     }
 
     /**
-     * Get App startup time
+     * Get App startup time，System.nanoTime
      *
      * @return
      */
     public static long getAppStartTimeNs() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             long diffMs = SystemClock.elapsedRealtime() - Process.getStartElapsedRealtime();
-            return getCurrentNanoTime() - TimeUnit.MILLISECONDS.toNanos(diffMs);
+            return System.nanoTime()- TimeUnit.MILLISECONDS.toNanos(diffMs);
         } else {
             return FTApplication.APP_START_TIME;
         }
