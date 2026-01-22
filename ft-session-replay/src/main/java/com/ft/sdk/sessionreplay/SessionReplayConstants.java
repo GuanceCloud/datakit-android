@@ -19,6 +19,7 @@ public class SessionReplayConstants {
     public static final String RUM_SESSION_RENEWED_BUS_MESSAGE = "rum_session_renewed";
     public static final String RUM_KEEP_SESSION_BUS_COLLECT_TYPE_KEY = "collect_key";
     public static final String RUM_SESSION_ID_BUS_MESSAGE_KEY = "sessionId";
+    public static final String RUM_FORCE_REFRESH = "force_refresh";
 
     public static final double DECREASE_PERCENT = 0.90;
     public static final double INCREASE_PERCENT = 1.10;

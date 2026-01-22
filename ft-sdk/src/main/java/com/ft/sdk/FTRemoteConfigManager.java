@@ -400,7 +400,28 @@ public class FTRemoteConfigManager {
                 rumConfig.setSessionErrorSampleRate(bean.getSessionReplaySampleRate());
             }
 
-            FTRUMInnerManager.get().hotUpdate(bean.getRumSampleRate(), bean.getRumSessionOnErrorSampleRate());
+            SessionReplayManager replayManager = SessionReplayManager.get();
+            boolean replayEnable = replayManager.isReplayEnable();
+            Float sessionReplaySampleRate = null;
+            Float sessionReplayOnErrorSampleRate = null;
+            if (replayEnable) {
+                if (bean.getSessionReplaySampleRate() != null) {
+                    replayManager.setSampleRate(bean.getSessionReplaySampleRate());
+                }
+                sessionReplaySampleRate = replayManager.sampleRate();
+
+                if (bean.getSessionReplayOnErrorSampleRate() != null) {
+                    replayManager.setSessionReplayOnErrorSampleRate(bean.getSessionReplayOnErrorSampleRate());
+                }
+                sessionReplayOnErrorSampleRate = SessionReplayManager.get().sessionReplayOnErrorSampleRate();
+            }
+
+            boolean forceRefreshExecuted = FTRUMInnerManager.get().hotUpdate(bean.getRumSampleRate(),
+                    bean.getRumSessionOnErrorSampleRate());
+
+            if (replayEnable && !forceRefreshExecuted) {
+                SessionReplayManager.get().hotUpdate(sessionReplaySampleRate, sessionReplayOnErrorSampleRate);
+            }
         }
     }
 

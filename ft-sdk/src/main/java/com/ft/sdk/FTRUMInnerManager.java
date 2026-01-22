@@ -188,16 +188,30 @@ public class FTRUMInnerManager {
                 lastUserActiveTime = now;
             }
         }
-        updateSessionReplay(sessionId);
+        updateSessionReplay(sessionId, false);
         //        boolean isAppForward = FTApplication.isAppForward;
 //        if (isAppForward) {
         //As long as there is RUM data collection activity, the user time will be extended, including background
 //        }
     }
 
+    /**
+     *
+     */
+    public void forceRefreshSessionReplay() {
+        updateSessionReplay(sessionId, true);
+    }
 
-    void hotUpdate(Float sampleRate, Float sessionErrorSampleError) {
-        if (sampleRate == null && sessionErrorSampleError == null) return;
+
+    /**
+     * Hot update with sample rate and session error sample rate
+     *
+     * @param sampleRate              sample rate
+     * @param sessionErrorSampleError session error sample rate
+     * @return true if forceRefreshSessionId was executed, false otherwise
+     */
+    boolean hotUpdate(Float sampleRate, Float sessionErrorSampleError) {
+        if (sampleRate == null && sessionErrorSampleError == null) return false;
 
         if (sampleRate != null) {
             this.sampleRate = sampleRate;
@@ -240,7 +254,9 @@ public class FTRUMInnerManager {
 
         if (needRefresh) {
             forceRefreshSessionId();
+            return true;
         }
+        return false;
     }
 
     void forceRefreshSessionId() {
@@ -252,13 +268,14 @@ public class FTRUMInnerManager {
     /**
      * @param sessionId
      */
-    private void updateSessionReplay(String sessionId) {
+    private void updateSessionReplay(String sessionId, boolean forceFresh) {
         if (!FTSdk.isSessionReplaySupport()) return;
         CollectType collectType = checkSessionWillCollect(sessionId);
         HashMap<String, Object> map = new HashMap<>();
         map.put(SessionReplayConstants.SESSION_REPLAY_BUS_MESSAGE_TYPE_KEY, SessionReplayConstants.RUM_SESSION_RENEWED_BUS_MESSAGE);
         map.put(SessionReplayConstants.RUM_KEEP_SESSION_BUS_COLLECT_TYPE_KEY, collectType.getValue());
         map.put(SessionReplayConstants.RUM_SESSION_ID_BUS_MESSAGE_KEY, sessionId);
+        map.put(SessionReplayConstants.RUM_FORCE_REFRESH, forceFresh);
         FeatureScope scope = SessionReplayManager.get().getFeature(Feature.SESSION_REPLAY_FEATURE_NAME);
         if (scope != null) {
             scope.sendEvent(map);
@@ -1324,7 +1341,7 @@ public class FTRUMInnerManager {
     }
 
 
-    private String getViewId() {
+    public String getViewId() {
         ActiveViewBean activeViewBean = activeView;
         if (activeViewBean == null) {
             return null;
@@ -1489,6 +1506,18 @@ public class FTRUMInnerManager {
             for (ActionBean bean : beans) {
                 insertAction(bean);
                 deleteIds.add(bean.getId());
+                // Log all "back" actions, use error level if duration > 5 seconds
+//                if ("back".equals(bean.getActionName())) {
+//                    long duration = bean.getDuration();
+//                    double durationMs = duration / 1000000.0;
+//                    String logMessage = "Action -> action_name: back, duration: " + durationMs + " ms, action_id: " + bean.getId();
+//
+//                    if (duration > 5000000000L) {
+//                        LogUtils.e(TAG, logMessage);
+//                    } else {
+//                        LogUtils.d(TAG, logMessage);
+//                    }
+//                }
             }
             FTDBManager.get().cleanCloseActionData(deleteIds.toArray(new String[0]));
         } while (beans.size() >= LIMIT_SIZE);

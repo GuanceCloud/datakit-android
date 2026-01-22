@@ -325,7 +325,7 @@ public class MainActivity extends AppCompatActivity {
                         try {
                             JSONObject jsonObject = new JSONObject(jsonConfig);
                             String userid = jsonObject.optString("custom_userid");
-                            isVip = (userid.equals("custom_user_test6"));
+                            isVip = (userid.equals("custom_user_test9"));
                         } catch (JSONException e) {
                         }
 
@@ -333,6 +333,8 @@ public class MainActivity extends AppCompatActivity {
                             configBean.setLogSampleRate(1f);
                             configBean.setRumSampleRate(1f);
                             configBean.setTraceSampleRate(1f);
+                            configBean.setSessionReplaySampleRate(1f);
+                            configBean.setSessionReplayOnErrorSampleRate(1f);
                         }
                         return configBean;
                     }

@@ -88,6 +88,7 @@ public class DemoApplication extends BaseApplication {
                 .setNeedTransformOldCache(true)
                 .setCompressIntakeRequests(true)
                 .setSyncSleepTime(100)
+                .setRemoteConfiguration(true)
                 .setRemoteConfigurationCallBack(new FTRemoteConfigManager.FetchResult() {
                     @Override
                     public void onResult(boolean success) {
@@ -219,8 +220,8 @@ public class DemoApplication extends BaseApplication {
                 .setTraceType(TraceType.DDTRACE));
 
         FTSdk.initSessionReplayConfig(new FTSessionReplayConfig()
-                        .setSampleRate(1f)
-                        .setSessionReplayOnErrorSampleRate(1f)
+                        .setSampleRate(0f)
+//                        .setSessionReplayOnErrorSampleRate(1f)
 //                        .setPrivacy(SessionReplayPrivacy.MASK)
                         .setTouchPrivacy(TouchPrivacy.SHOW)
                         .setTextAndInputPrivacy(TextAndInputPrivacy.MASK_SENSITIVE_INPUTS)

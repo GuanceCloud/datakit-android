@@ -23,7 +23,7 @@ public class FTSessionReplayConfig {
     private List<DrawableToColorMapper> customDrawableMapper = DEFAULT_EXTENSIONSUPPORT.getCustomDrawableMapper();
     @FloatRange(from = 0.0, to = 1.0)
     private float sampleRate = 1f;
-    private float sessionReplayOnErrorSampleRate = 1f;
+    private float sessionReplayOnErrorSampleRate = 0f;
     private boolean delayInit;
     private String[] rumLinkKeys = new String[]{};
     private boolean fineGrainedMaskingSet = false;
