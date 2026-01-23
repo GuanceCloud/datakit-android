@@ -1219,11 +1219,7 @@ public class FTRUMInnerManager {
                 if (callBack != null) {
                     callBack.onComplete();
                 }
-                try {
-                    generateViewSum(); // Force generate data when closing view
-                } catch (JSONException e) {
-                    LogUtils.e(TAG, LogUtils.getStackTraceString(e));
-                }
+                generateRumData(true); // Force generate data when closing view
             }
         });
     }
@@ -1241,11 +1237,7 @@ public class FTRUMInnerManager {
             @Override
             public void run() {
                 FTDBManager.get().closeAction(actionId, duration, force);
-                try {
-                    generateActionSum(); // Force generate data when closing view
-                } catch (JSONException e) {
-                    LogUtils.e(TAG, LogUtils.getStackTraceString(e));
-                }
+                generateRumData(true);
             }
         });
     }

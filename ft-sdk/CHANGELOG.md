@@ -1,3 +1,6 @@
+# agent 1.6.17-alpha01
+1. Optimized View Action data generation rules.
+
 # agent 1.6.16
 1. Added illegal character filtering for globalContext and property keys.
 2. Extended `resource_type` support to include image, media, font, CSS, JS, native.
