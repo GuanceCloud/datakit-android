@@ -31,15 +31,38 @@ public class FTTraceInterceptor implements Interceptor {
     private HeaderHandler headerHandler;
 
     /**
-     * Custom TraceHeader
+     * Custom trace header handler.
+     * <p>
+     * Supports two APIs for backward compatibility:
+     * <ul>
+     *   <li><b>New (preferred)</b>: Override {@link #getTraceContext(Request)} to return headers,
+     *       traceId and spanId in a single call. No need to maintain state.</li>
+     *   <li><b>Legacy</b>: Override {@link #getTraceHeader(Request)}, {@link #getTraceID()}
+     *       and {@link #getSpanID()}. Requires storing headers in a field for RUM linkage.</li>
+     * </ul>
+     * If both are implemented, {@link #getTraceContext(Request)} takes precedence.
      */
     public abstract static class HeaderHandler extends TraceRUMLinkable {
         /**
-         * @param request OKHttp request
-         * @return Replace TraceHeader content
+         * Returns the full trace context for the request.
+         * Override this for cleaner integration without maintaining intermediate state.
+         *
+         * @param request OkHttp request
+         * @return TraceContext, or null to fall back to legacy getTraceHeader + getTraceID/getSpanID
          */
-        public abstract HashMap<String, String> getTraceHeader(Request request);
+        public TraceContext getTraceContext(Request request) {
+            return null;
+        }
 
+        /**
+         * Legacy API: returns headers to inject. Override when not using getTraceContext.
+         *
+         * @param request OkHttp request
+         * @return headers map, or null
+         */
+        public HashMap<String, String> getTraceHeader(Request request) {
+            return null;
+        }
     }
 
     /**
@@ -67,8 +90,16 @@ public class FTTraceInterceptor implements Interceptor {
         String resourceId = Utils.identifyRequest(request);
         HashMap<String, String> requestHeaders;
         if (headerHandler != null) {
-            requestHeaders = headerHandler.getTraceHeader(request);
-            FTTraceManager.get().putTraceHandler(resourceId, headerHandler);
+            TraceContext context = headerHandler.getTraceContext(request);
+            if (context != null) {
+                // New API: use TraceContext
+                requestHeaders = context.getHeaders();
+                FTTraceManager.get().putTraceHandler(resourceId, context);
+            } else {
+                // Legacy API: use getTraceHeader + store handler for getTraceID/getSpanID
+                requestHeaders = headerHandler.getTraceHeader(request);
+                FTTraceManager.get().putTraceHandler(resourceId, headerHandler);
+            }
         } else {
             requestHeaders = FTTraceManager.get().getTraceHeader(resourceId, request.url() + "");
         }
