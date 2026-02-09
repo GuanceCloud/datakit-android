@@ -111,36 +111,6 @@ public abstract class TraceContext extends FTTraceInterceptor.TraceRUMLinkable {
         }
 
         /**
-         * Extracts TraceContext from headers by trace type. Use when headers are generated
-         * by {@link FTTraceManager#getTraceHeader(String)} with the given TraceType.
-         *
-         * @param headers   map containing trace headers
-         * @param traceType format of the headers
-         * @return TraceContext, or null if headers is null
-         */
-        public static Simple fromTraceType(HashMap<String, String> headers, TraceType traceType) {
-            if (headers == null || traceType == null) {
-                return null;
-            }
-            switch (traceType) {
-                case DDTRACE:
-                    return fromDatadogHeaders(headers);
-                case ZIPKIN_MULTI_HEADER:
-                    return fromZipkinMultiHeaders(headers);
-                case ZIPKIN_SINGLE_HEADER:
-                    return fromZipkinSingleHeader(headers);
-                case TRACEPARENT:
-                    return fromTraceparentHeader(headers);
-                case JAEGER:
-                    return fromJaegerHeader(headers);
-                case SKYWALKING:
-                    return fromSkyWalkingSw8(headers);
-                default:
-                    return null;
-            }
-        }
-
-        /**
          * Datadog: x-datadog-trace-id, x-datadog-parent-id
          */
         public static Simple fromDatadogHeaders(HashMap<String, String> headers) {
