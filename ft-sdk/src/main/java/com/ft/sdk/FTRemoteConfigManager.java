@@ -236,8 +236,6 @@ public class FTRemoteConfigManager {
                                     String md5 = Utils.toMD5(json);
                                     if (mRemoteConfig != null && md5.equals(mRemoteConfig.getMd5())) {
                                         LogUtils.d(TAG, "remote config no change");
-                                        // Even if config hasn't changed, allow FetchResult to override
-                                        applyFetchResultOverride(mRemoteConfig, result, true);
                                         requestResult = true;
                                     } else {
                                         String saveJson = json.replaceAll("R\\.[^.]+\\.", "");
