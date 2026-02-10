@@ -47,10 +47,14 @@ public class FTTraceConfig {
     }
 
     /**
-     * ASM sets global {@link FTTraceInterceptor.HeaderHandler}, not set by default
+     * Sets custom trace header handler for OkHttp. Prefer overriding
+     * {@link FTTraceInterceptor.HeaderHandler#getTraceContext(okhttp3.Request)}
+     * for cleaner integration; legacy {@link FTTraceInterceptor.HeaderHandler#getTraceHeader(okhttp3.Request)}
+     * + getTraceID/getSpanID is still supported.
+     * ASM may set global HeaderHandler, not set by default.
      *
-     * @param headerHandler
-     * @return
+     * @param headerHandler custom handler, or null to use default
+     * @return this config for chaining
      */
     public FTTraceConfig setOkHttpTraceHeaderHandler(FTTraceInterceptor.HeaderHandler headerHandler) {
         this.headerHandler = headerHandler;

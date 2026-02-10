@@ -1309,11 +1309,7 @@ public class FTRUMInnerManager {
                 if (callBack != null) {
                     callBack.onComplete();
                 }
-                try {
-                    generateViewSum(); // Force generate data when closing view
-                } catch (JSONException e) {
-                    LogUtils.e(TAG, LogUtils.getStackTraceString(e));
-                }
+                generateRumData(true); // Force generate data when closing view
             }
         });
     }
@@ -1331,11 +1327,7 @@ public class FTRUMInnerManager {
             @Override
             public void run() {
                 FTDBManager.get().closeAction(actionId, duration, force);
-                try {
-                    generateActionSum(); // Force generate data when closing view
-                } catch (JSONException e) {
-                    LogUtils.e(TAG, LogUtils.getStackTraceString(e));
-                }
+                generateRumData(true);
             }
         });
     }
@@ -1737,9 +1729,6 @@ public class FTRUMInnerManager {
     }
 
     public void release() {
-        // Force generate final data before release
-        generateRumData(true);
-
         // Reset debounce timestamps
         synchronized (generateLock) {
             lastGenerateTime = 0;
@@ -1747,7 +1736,11 @@ public class FTRUMInnerManager {
 
         mHandler.removeCallbacks(mActionRecheckRunner);
         activeAction = null;
-        activeView = null;
+        if (activeView != null) {
+            // Force generate final data before release
+            generateRumData(true);
+            activeView = null;
+        }
         notCollectArr.clear();
         notSessionErrorCollectArr.clear();
         resourceBeanMap.clear();

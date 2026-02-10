@@ -1,6 +1,6 @@
 # agent 1.7.0-alpha38
-1. Added compatibility for OkHttp 3.12.0 and lower versions, and fixed the issue 
-    where replay data could not be synchronized on these older versions.
+1. Added compatibility for OkHttp 3.12.0 and lower versions, and fixed the issue
+   where replay data could not be synchronized on these older versions.
 
 ---
 # agent 1.7.0-alpha37
@@ -158,13 +158,26 @@
 1. Support for enabling session replay recording feature
 
 ---
+# agent 1.6.17-alpha02
+1. Added `TraceContext` and `TraceContext.Simple` for custom trace header handling. 
+  Override `HeaderHandler.getTraceContext(Request)` to provide headers, 
+  traceId and spanId in one call. Fully backward compatible with existing `getTraceHeader` 
+  + `getTraceID`/`getSpanID` implementations.
+2. Added `TraceContext.Simple.fromTraceType()` to extract traceId/spanId from headers 
+ by TraceType (DDTRACE, ZIPKIN_MULTI_HEADER, ZIPKIN_SINGLE_HEADER, TRACEPARENT, JAEGER, SKYWALKING). 
+ Use `new TraceContext.Simple(headers, traceId, spanId)` for custom traceId/spanId.
+
+---
+# agent 1.6.17-alpha01
+1. Optimized View Action data generation rules.
+
 # agent 1.6.16
 1. Added illegal character filtering for globalContext and property keys.
 2. Extended `resource_type` support to include image, media, font, CSS, JS, native.
 3. Support customizable configuration of remote variables.
 4. Resource added `resource_http_protocol`, `resource_request_size`, `resource_connection_reuse`.
 5. Refined cold start timing by adding `app_pre_application_init_time`,
-app_application_init_time, and app_first_frame_init_time.
+`app_application_init_time`, and `app_first_frame_init_time`.
 6. Added compatibility for OkHttp 3.12.+
 7. Fix the incorrect start time of Resource requests.
 8. Fix an occasional null pointer issue when retrieving actions and views during SDK shutdown.
@@ -176,8 +189,8 @@ app_application_init_time, and app_first_frame_init_time.
 ---
 # agent 1.6.16-beta01
 1. Optimized handling of illegal characters in globalContext
-2. Fixed incorrect resource_connection_reuse handling and improved null handling 
-    for resource_http_protocol.
+2. Fixed incorrect `resource_connection_reuse handling` and improved null handling 
+    for `resource_http_protocol`.
 
 ---
 # agent 1.6.16-alpha01
