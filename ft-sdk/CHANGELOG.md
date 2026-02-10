@@ -1,34 +1,42 @@
+# agent 1.7.0-alpha39
+1. merge from ft-sdk 1.6.17-alpha02
+2. Prevent crashes caused by calling methods like TextView.getTotalPaddingTop()
+   before the UI layout is fully completed.
+3. Added Session Replay support to remote configuration.
+4. ft-session-replay:>=0.1.3-alpha13
+
+---
 # agent 1.7.0-alpha38
 1. Added compatibility for OkHttp 3.12.0 and lower versions, and fixed the issue
    where replay data could not be synchronized on these older versions.
 
 ---
 # agent 1.7.0-alpha37
-1. ft-session-replay:>0.1.3-alpha12
+1. ft-session-replay:>=0.1.3-alpha12
 2. Fixed the issue where enabling ErrorSampleRate caused key playback data to be lost in WebView
 3. Optimized the logic for handling replay data when the WebView is not visible
 
 ---
 # agent 1.7.0-alpha36
-1. ft-session-replay:>0.1.3-alpha11
+1. ft-session-replay:>=0.1.3-alpha11
 2. Optimized the linkView frame completion process during Replay data sharding.
 
 ---
 # agent 1.7.0-alpha35
-1. ft-session-replay:>0.1.3-alpha10
+1. ft-session-replay:>=0.1.3-alpha10
 2. Optimized frame generation and consumption logic.
 3. Fixed the issue where recording failed due to bitmap recycling.
 
 ---
 # agent 1.7.0-alpha34
 1. merge from ft-sdk 1.6.15-alpha09
-2. ft-session-replay:>0.1.3-alpha08
+2. ft-session-replay:>=0.1.3-alpha08
 3. Added full snapshot keyframe Session Replay support for the WebView container
 
 ---
 # agent 1.7.0-alpha33
 1. merge from ft-sdk 1.6.15-alpha07, 1.6.15-alpha08
-2. ft-session-replay:>0.1.3-alpha07
+2. ft-session-replay:>=0.1.3-alpha07
 3. Increased the disk write limit for Session Replay
 4. Added RUM Session Replay context association feature,
    and associated the WebView container with the context of the loaded HTML.
@@ -44,17 +52,17 @@
 ---
 # agent 1.7.0-alpha29
 1. Delayed write for WebView Session Replay data.
-2. ft-session-replay:>0.1.3-alpha06
+2. ft-session-replay:>=0.1.3-alpha06
 
 ---
 # agent 1.7.0-alpha28
 1. Fixed the issue where obtaining write too early caused WebView Session Replay to be blank, and added log output.
-2. ft-session-replay:>0.1.3-alpha05
+2. ft-session-replay:>=0.1.3-alpha05
 
 ---
 # agent 1.7.0-alpha27
 1. resolve missing container data with RUM data
-2. ft-session-replay:>0.1.3-alpha04
+2. ft-session-replay:>=0.1.3-alpha04
 ---
 # agent 1.7.0-alpha26
 1. Merge ft-sdk 1.6.15-alpha04
