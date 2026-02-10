@@ -80,8 +80,8 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
     private final TouchPrivacy touchPrivacy;
     private final TextAndInputPrivacy textAndInputPrivacy;
     private final ImagePrivacy imagePrivacy;
-    private final Sampler sessionRelaySampler;
-    private final Sampler sessionRelayErrorSampler;
+    private Sampler sessionRelaySampler;
+    private Sampler sessionRelayErrorSampler;
     private final RecorderProvider recorderProvider;
     private final String[] linkRumKeys;
 
@@ -237,6 +237,23 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
         return STORAGE_CONFIGURATION;
     }
 
+
+    public void updateSampleRate(float sampleRate) {
+        sessionRelaySampler = new RateBasedSampler(sampleRate);
+    }
+
+    public void updateSessionReplayOnErrorSampleRate(float sessionReplayOnErrorSampleRate) {
+        sessionRelayErrorSampler = new RateBasedSampler(sessionReplayOnErrorSampleRate);
+    }
+
+    public float getSampleRate() {
+        return sessionRelaySampler.getSampleRate();
+    }
+
+    public float getSessionReplayOnErrorSampleRate() {
+        return sessionRelayErrorSampler.getSampleRate();
+    }
+
     @Override
     public void onStop() {
         stopRecording();
@@ -276,13 +293,15 @@ public class SessionReplayFeature implements StorageBackedFeature, FeatureEventR
     private void checkStatusAndApplySample(Map<?, ?> sessionMetadata) {
         String collectType = (String) sessionMetadata.get(SessionReplayConstants.RUM_KEEP_SESSION_BUS_COLLECT_TYPE_KEY);
         String sessionId = (String) sessionMetadata.get(SessionReplayConstants.RUM_SESSION_ID_BUS_MESSAGE_KEY);
+        Boolean forceFresh = (Boolean) sessionMetadata.get(SessionReplayConstants.RUM_FORCE_REFRESH);
 
         if (collectType == null || sessionId == null) {
             sdkCore.getInternalLogger().w(TAG, EVENT_MISSING_MANDATORY_FIELDS);
             return;
         }
 
-        if (currentRumSessionId.get() != null && currentRumSessionId.get().equals(sessionId)) {
+        if (currentRumSessionId.get() != null && currentRumSessionId.get().equals(sessionId)
+                && (forceFresh != null && !forceFresh)) {
             return; // we already handled this session
         }
 

@@ -254,7 +254,7 @@ public class SyncTaskManager {
             }
         }
         long now = Utils.getCurrentNanoTime();
-        int deleteCount = FTDBManager.get().deleteExpireCache(dataType, Utils.getCurrentNanoTime(), ONE_MINUTE_DURATION_NS);
+        int deleteCount = FTDBManager.get().deleteExpireCache(dataType, now, ONE_MINUTE_DURATION_NS);
         if (deleteCount > 0) {
             LogUtils.d(TAG, "errorSampledConsume deleteExpired:" + dataType + ","
                     + deleteCount + ", before ns:" + (now - ONE_MINUTE_DURATION_NS));

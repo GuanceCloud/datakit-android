@@ -163,23 +163,31 @@ public class TextViewMapper<T extends TextView> extends BaseAsyncBackgroundWiref
         }
     }
 
-    private TextPosition resolveTextPosition(T textView, float pixelsDensity) {
+    private TextPosition resolveTextPosition(TextView textView, float pixelsDensity) {
         return new TextPosition(
                 resolvePadding(textView, pixelsDensity),
                 resolveAlignment(textView)
         );
     }
 
-    private Padding resolvePadding(T textView, float pixelsDensity) {
-        return new Padding(
-                (long) Utils.densityNormalized(textView.getTotalPaddingTop(), pixelsDensity),
-                (long) Utils.densityNormalized(textView.getTotalPaddingBottom(), pixelsDensity),
-                (long) Utils.densityNormalized(textView.getTotalPaddingStart(), pixelsDensity),
-                (long) Utils.densityNormalized(textView.getTotalPaddingEnd(), pixelsDensity)
-        );
+    private Padding resolvePadding(TextView textView, float pixelsDensity) {
+        if (textView.getLayout() != null) {
+            return new Padding(
+                    (long) Utils.densityNormalized(textView.getTotalPaddingTop(), pixelsDensity),
+                    (long) Utils.densityNormalized(textView.getTotalPaddingBottom(), pixelsDensity),
+                    (long) Utils.densityNormalized(textView.getTotalPaddingStart(), pixelsDensity),
+                    (long) Utils.densityNormalized(textView.getTotalPaddingEnd(), pixelsDensity)
+            );
+        } else {
+            return new Padding(
+                    (long) Utils.densityNormalized(textView.getPaddingTop(), pixelsDensity),
+                    (long) Utils.densityNormalized(textView.getPaddingBottom(), pixelsDensity),
+                    (long) Utils.densityNormalized(textView.getPaddingStart(), pixelsDensity),
+                    (long) Utils.densityNormalized(textView.getPaddingEnd(), pixelsDensity));
+        }
     }
 
-    private Alignment resolveAlignment(T textView) {
+    private Alignment resolveAlignment(TextView textView) {
         switch (textView.getTextAlignment()) {
             case TextView.TEXT_ALIGNMENT_CENTER:
                 return new Alignment(
@@ -208,7 +216,7 @@ public class TextViewMapper<T extends TextView> extends BaseAsyncBackgroundWiref
         }
     }
 
-    private Alignment resolveAlignmentFromGravity(T textView) {
+    private Alignment resolveAlignmentFromGravity(TextView textView) {
         Horizontal horizontalAlignment;
         switch (textView.getGravity() & Gravity.HORIZONTAL_GRAVITY_MASK) {
             case Gravity.START:

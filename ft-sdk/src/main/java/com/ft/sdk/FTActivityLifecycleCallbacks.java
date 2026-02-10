@@ -141,6 +141,12 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
 
     }
 
+    @Override
+    public void onActivityPreResumed(@NonNull Activity activity) {
+        Application.ActivityLifecycleCallbacks.super.onActivityPreResumed(activity);
+        mAppRestartCallback.onPreResume(activity);
+    }
+
     /**
      * Called after {@link Activity#onPostResume()}, {@link  LifeCircleTraceCallback#onPostResume(Context)}
      *

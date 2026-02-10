@@ -39,6 +39,8 @@ public class FTUIBlockManager {
             } else if (x.startsWith(PREFIX_METHOD_DISPATCH_END)) {
                 long duration = now - startTime;
                 if (duration > blockDurationNS) {
+                    if (!FTActivityLifecycleCallbacks.isAppInForeground()) return;
+                    // only record data when page is in foreground
                     FTRUMInnerManager.get().addLongTask(method, duration);
                 }
 

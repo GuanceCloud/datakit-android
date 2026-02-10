@@ -15,6 +15,7 @@ import com.ft.sdk.FTTraceConfig;
 import com.ft.sdk.FTTraceInterceptor;
 import com.ft.sdk.FTTraceManager;
 import com.ft.sdk.RUMCacheDiscard;
+import com.ft.sdk.TraceContext;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.ActionBean;
 import com.ft.sdk.garble.bean.AppState;
@@ -23,6 +24,7 @@ import com.ft.sdk.garble.bean.ErrorType;
 import com.ft.sdk.garble.bean.NetStatusBean;
 import com.ft.sdk.garble.bean.ResourceID;
 import com.ft.sdk.garble.bean.ResourceParams;
+import com.ft.sdk.garble.bean.ResourceType;
 import com.ft.sdk.garble.bean.SyncData;
 import com.ft.sdk.garble.bean.ViewBean;
 import com.ft.sdk.garble.db.FTDBCachePolicy;
@@ -571,6 +573,29 @@ public class RUMTest extends FTBaseTest {
      * @param propertyOverride Parameters to be overridden
      */
     private void sendResource(HashMap<String, Object> property, HashMap<String, Object> propertyOverride) {
+        sendResource(property, propertyOverride, "");
+    }
+
+    /**
+     * Simulate sending Resource data with specific Content-Type
+     *
+     * @param property         Dynamic parameters
+     * @param propertyOverride Parameters to be overridden
+     * @param contentType      Response Content-Type header value
+     */
+    private void sendResource(HashMap<String, Object> property, HashMap<String, Object> propertyOverride, String contentType) {
+        sendResource(property, propertyOverride, contentType, TEST_FAKE_URL);
+    }
+
+    /**
+     * Simulate sending Resource data with specific Content-Type and URL
+     *
+     * @param property         Dynamic parameters
+     * @param propertyOverride Parameters to be overridden
+     * @param contentType      Response Content-Type header value
+     * @param url              Resource URL
+     */
+    private void sendResource(HashMap<String, Object> property, HashMap<String, Object> propertyOverride, String contentType, String url) {
         String resourceId = Utils.getGUID_16();
         FTRUMGlobalManager.get().startResource(resourceId, property);
         ResourceParams params = new ResourceParams();
@@ -581,8 +606,8 @@ public class RUMTest extends FTBaseTest {
         params.responseBody = BODY_CONTENT;
         params.responseConnection = "";
         params.responseContentEncoding = "";
-        params.responseContentType = "";
-        params.url = TEST_FAKE_URL;
+        params.responseContentType = contentType;
+        params.url = url;
         params.resourceStatus = 200;
 
         NetStatusBean bean = new NetStatusBean();
@@ -688,37 +713,20 @@ public class RUMTest extends FTBaseTest {
 
         OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(new FTTraceInterceptor(new FTTraceInterceptor.HeaderHandler() {
-                    private String[] splits;
-
                     @Override
-                    public HashMap<String, String> getTraceHeader(Request request) {
+                    public TraceContext getTraceContext(Request request) {
                         HashMap<String, String> map = new HashMap<>();
-                        String replaceTrace = request.header(CUSTOM_TRACE_HEADER);//Get request
-                        String headerString = FTTraceManager.get().
-                                getTraceHeader(request.url().toString())
-                                .get(W3C_TRACEPARENT_KEY); //get trace header string
+                        String replaceTrace = request.header(CUSTOM_TRACE_HEADER);
+                        String headerString = FTTraceManager.get()
+                                .getTraceHeader(request.url().toString())
+                                .get(W3C_TRACEPARENT_KEY);
 
-                        splits = headerString.split("-");
+                        String[] splits = headerString.split("-");
                         String originTraceId = splits[1];
-                        splits[1] = replaceTrace;
-                        map.put(W3C_TRACEPARENT_KEY, headerString.replace(originTraceId, replaceTrace));
-                        return map;
-                    }
+                        String modifiedHeader = headerString.replace(originTraceId, replaceTrace);
+                        map.put(W3C_TRACEPARENT_KEY, modifiedHeader);
 
-                    @Override
-                    public String getSpanID() {
-                        if (splits != null) {
-                            return splits[2];
-                        }
-                        return null;
-                    }
-
-                    @Override
-                    public String getTraceID() {
-                        if (splits != null) {
-                            return splits[1];
-                        }
-                        return null;
+                        return new TraceContext.Simple(map, replaceTrace, splits[2]);
                     }
                 }))
                 .addInterceptor(new FTResourceInterceptor())
@@ -844,6 +852,112 @@ public class RUMTest extends FTBaseTest {
         Request request = new Request.Builder().url(TEST_FAKE_URL).tag(ResourceID.class, resourceID).build();
         String resourceId = Utils.identifyRequest(request);
         Assert.assertEquals(resourceID.getUuid(), resourceId);
+    }
+
+    /**
+     * Test ResourceType.fromMimeType with different Content-Type headers
+     * Verifies that different MIME types are correctly identified as different ResourceTypes
+     *
+     * @throws InterruptedException
+     */
+    @Test
+    public void resourceTypeFromMimeTypeTest() throws InterruptedException {
+        // Test cases: [Content-Type, Expected ResourceType]
+        String[][] testCases = {
+                // Image types
+                {"image/png", ResourceType.IMAGE.getValue()},
+                {"image/jpeg", ResourceType.IMAGE.getValue()},
+                {"image/jpg", ResourceType.IMAGE.getValue()},
+                {"image/gif", ResourceType.IMAGE.getValue()},
+                {"image/webp", ResourceType.IMAGE.getValue()},
+                {"image/svg+xml", ResourceType.IMAGE.getValue()},
+                {"IMAGE/PNG", ResourceType.IMAGE.getValue()}, // Test case insensitive
+                {"image/png; charset=utf-8", ResourceType.IMAGE.getValue()}, // Test with parameters
+
+                // Media types (video)
+                {"video/mp4", ResourceType.MEDIA.getValue()},
+                {"video/webm", ResourceType.MEDIA.getValue()},
+                {"video/quicktime", ResourceType.MEDIA.getValue()},
+                {"VIDEO/MP4", ResourceType.MEDIA.getValue()}, // Test case insensitive
+
+                // Media types (audio)
+                {"audio/mpeg", ResourceType.MEDIA.getValue()},
+                {"audio/mp3", ResourceType.MEDIA.getValue()},
+                {"audio/wav", ResourceType.MEDIA.getValue()},
+                {"audio/ogg", ResourceType.MEDIA.getValue()},
+                {"AUDIO/MPEG", ResourceType.MEDIA.getValue()}, // Test case insensitive
+
+                // Font types
+                {"font/woff", ResourceType.FONT.getValue()},
+                {"font/woff2", ResourceType.FONT.getValue()},
+                {"font/ttf", ResourceType.FONT.getValue()},
+                {"font/otf", ResourceType.FONT.getValue()},
+                {"FONT/WOFF", ResourceType.FONT.getValue()}, // Test case insensitive
+
+                // CSS types
+                {"text/css", ResourceType.CSS.getValue()},
+                {"text/css; charset=utf-8", ResourceType.CSS.getValue()}, // Test with parameters
+                {"TEXT/CSS", ResourceType.CSS.getValue()}, // Test case insensitive
+
+                // JavaScript types
+                {"text/javascript", ResourceType.JS.getValue()},
+                {"text/ecmascript", ResourceType.JS.getValue()},
+                {"text/javascript; charset=utf-8", ResourceType.JS.getValue()}, // Test with parameters
+                {"TEXT/JAVASCRIPT", ResourceType.JS.getValue()}, // Test case insensitive
+
+                // Native types (default for unknown or empty)
+                {"", ResourceType.NATIVE.getValue()},
+                {"application/json", ResourceType.NATIVE.getValue()},
+                {"application/xml", ResourceType.NATIVE.getValue()},
+                {"text/html", ResourceType.NATIVE.getValue()},
+                {"text/plain", ResourceType.NATIVE.getValue()},
+                {"application/octet-stream", ResourceType.NATIVE.getValue()},
+                {"invalid", ResourceType.NATIVE.getValue()}, // Invalid format
+                {"no-slash", ResourceType.NATIVE.getValue()}, // No slash in MIME type
+        };
+
+        for (int i = 0; i < testCases.length; i++) {
+            String[] testCase = testCases[i];
+            String contentType = testCase[0];
+            String expectedResourceType = testCase[1];
+
+            // Use unique URL for each test case to ensure we find the correct resource
+            String uniqueUrl = TEST_FAKE_URL + "?test=" + i;
+
+            // Send resource with specific Content-Type and unique URL
+            sendResource(null, null, contentType, uniqueUrl);
+
+            Thread.sleep(500);
+
+            // Query the resource data
+            List<SyncData> recordDataList = FTDBManager.get()
+                    .queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
+
+            boolean found = false;
+            for (SyncData recordData : recordDataList) {
+                LineProtocolData data = new LineProtocolData(recordData.getDataString());
+
+                if (Constants.FT_MEASUREMENT_RUM_RESOURCE.equals(data.getMeasurement())) {
+                    // Verify this is the resource we just created by checking the URL
+                    String resourceUrl = data.getTagAsString(Constants.KEY_RUM_RESOURCE_URL, "");
+                    if (uniqueUrl.equals(resourceUrl)) {
+                        String actualResourceType = data.getTagAsString(Constants.KEY_RUM_RESOURCE_TYPE, "");
+                        Assert.assertEquals(
+                                "Content-Type: " + contentType + " should map to ResourceType: " + expectedResourceType,
+                                expectedResourceType,
+                                actualResourceType
+                        );
+                        found = true;
+                        break;
+                    }
+                }
+            }
+
+            Assert.assertTrue("Resource data not found for Content-Type: " + contentType + " with URL: " + uniqueUrl, found);
+
+            // Clean up for next iteration
+            Thread.sleep(200);
+        }
     }
 
 }

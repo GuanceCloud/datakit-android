@@ -7,7 +7,6 @@ import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.FpsUtils;
 import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.sdk.garble.utils.Utils;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
@@ -143,8 +142,8 @@ public class FTMonitorManager {
                     if (cpu.maxValue > 0) {
                         long tickCount = (long) cpu.maxValue - (long) cpu.miniValue;
                         bean.setCpuTickCount(tickCount);
-                        long now = Utils.getCurrentNanoTime();
-                        bean.setCpuTickCountPerSecond((double) (tickCount * ONE_SECOND_NANO_TIMES) / (double) (now - bean.getStartTime()));
+                        long now = System.nanoTime();
+                        bean.setCpuTickCountPerSecond((double) (tickCount * ONE_SECOND_NANO_TIMES) / (double) (now - bean.getStartTimeNanoForDuration()));
                     }
 
                 }

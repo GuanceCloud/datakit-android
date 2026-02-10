@@ -75,6 +75,25 @@ public class SessionReplayManager implements FeatureSdkCore {
         return this.trackingConsentProvider.getConsent();
     }
 
+    /**
+     *
+     * @param sessionReplaySampleRate
+     * @param sessionReplayOnErrorSampleRate
+     */
+    public void hotUpdate(Float sessionReplaySampleRate, Float sessionReplayOnErrorSampleRate) {
+        if (sessionReplayFeature != null) {
+            if (sessionReplayFeature.isRecording()) {
+                if (sessionReplaySampleRate == 0) {
+                    FTRUMInnerManager.get().forceRefreshSessionReplay();
+                }
+            } else {
+                if (sessionReplaySampleRate == 1 || sessionReplayOnErrorSampleRate == 1) {
+                    FTRUMInnerManager.get().forceRefreshSessionReplay();
+                }
+            }
+        }
+    }
+
     private final Map<String, Map<String, Object>> fieldLinkMap = new ConcurrentHashMap<>();
     private final Map<String, Object> tagLinkMap = new ConcurrentHashMap<>();
     private static final int FIELD_LINK_MAP_CAPACITY = 5;
@@ -103,6 +122,32 @@ public class SessionReplayManager implements FeatureSdkCore {
                 appendSessionReplayRUMLinkKeys(FTTrackInner.getInstance().getSessionReplayRUMLinksKeys(rumLinkKeys));
             }
         }
+    }
+
+    public void setSampleRate(float sampleRate) {
+        if (sessionReplayFeature != null) {
+            sessionReplayFeature.updateSampleRate(sampleRate);
+        }
+    }
+
+    public void setSessionReplayOnErrorSampleRate(float sessionReplayOnErrorSampleRate) {
+        if (sessionReplayFeature != null) {
+            sessionReplayFeature.updateSessionReplayOnErrorSampleRate(sessionReplayOnErrorSampleRate);
+        }
+    }
+
+    public Float sampleRate() {
+        if (sessionReplayFeature != null) {
+            return sessionReplayFeature.getSampleRate();
+        }
+        return null;
+    }
+
+    public Float sessionReplayOnErrorSampleRate() {
+        if (sessionReplayFeature != null) {
+            return sessionReplayFeature.getSessionReplayOnErrorSampleRate();
+        }
+        return null;
     }
 
     public RecordWriter getCurrentSessionWriter() {

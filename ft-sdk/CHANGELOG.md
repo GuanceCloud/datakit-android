@@ -1,34 +1,42 @@
+# agent 1.7.0-alpha39
+1. merge from ft-sdk 1.6.17-alpha02
+2. Prevent crashes caused by calling methods like TextView.getTotalPaddingTop()
+   before the UI layout is fully completed.
+3. Added Session Replay support to remote configuration.
+4. ft-session-replay:>=0.1.3-alpha13
+
+---
 # agent 1.7.0-alpha38
-1. Added compatibility for OkHttp 3.12.0 and lower versions, and fixed the issue 
-    where replay data could not be synchronized on these older versions.
+1. Added compatibility for OkHttp 3.12.0 and lower versions, and fixed the issue
+   where replay data could not be synchronized on these older versions.
 
 ---
 # agent 1.7.0-alpha37
-1. ft-session-replay:>0.1.3-alpha12
+1. ft-session-replay:>=0.1.3-alpha12
 2. Fixed the issue where enabling ErrorSampleRate caused key playback data to be lost in WebView
 3. Optimized the logic for handling replay data when the WebView is not visible
 
 ---
 # agent 1.7.0-alpha36
-1. ft-session-replay:>0.1.3-alpha11
+1. ft-session-replay:>=0.1.3-alpha11
 2. Optimized the linkView frame completion process during Replay data sharding.
 
 ---
 # agent 1.7.0-alpha35
-1. ft-session-replay:>0.1.3-alpha10
+1. ft-session-replay:>=0.1.3-alpha10
 2. Optimized frame generation and consumption logic.
 3. Fixed the issue where recording failed due to bitmap recycling.
 
 ---
 # agent 1.7.0-alpha34
 1. merge from ft-sdk 1.6.15-alpha09
-2. ft-session-replay:>0.1.3-alpha08
+2. ft-session-replay:>=0.1.3-alpha08
 3. Added full snapshot keyframe Session Replay support for the WebView container
 
 ---
 # agent 1.7.0-alpha33
 1. merge from ft-sdk 1.6.15-alpha07, 1.6.15-alpha08
-2. ft-session-replay:>0.1.3-alpha07
+2. ft-session-replay:>=0.1.3-alpha07
 3. Increased the disk write limit for Session Replay
 4. Added RUM Session Replay context association feature,
    and associated the WebView container with the context of the loaded HTML.
@@ -44,17 +52,17 @@
 ---
 # agent 1.7.0-alpha29
 1. Delayed write for WebView Session Replay data.
-2. ft-session-replay:>0.1.3-alpha06
+2. ft-session-replay:>=0.1.3-alpha06
 
 ---
 # agent 1.7.0-alpha28
 1. Fixed the issue where obtaining write too early caused WebView Session Replay to be blank, and added log output.
-2. ft-session-replay:>0.1.3-alpha05
+2. ft-session-replay:>=0.1.3-alpha05
 
 ---
 # agent 1.7.0-alpha27
 1. resolve missing container data with RUM data
-2. ft-session-replay:>0.1.3-alpha04
+2. ft-session-replay:>=0.1.3-alpha04
 ---
 # agent 1.7.0-alpha26
 1. Merge ft-sdk 1.6.15-alpha04
@@ -156,6 +164,58 @@
 ---
 # agent 1.7.0-alpha02
 1. Support for enabling session replay recording feature
+
+---
+# agent 1.6.17-alpha02
+1. Added `TraceContext` and `TraceContext.Simple` for custom trace header handling. 
+  Override `HeaderHandler.getTraceContext(Request)` to provide headers, 
+  traceId and spanId in one call. Fully backward compatible with existing `getTraceHeader` 
+  + `getTraceID`/`getSpanID` implementations.
+2. Added `TraceContext.Simple.fromTraceType()` to extract traceId/spanId from headers 
+ by TraceType (`DDTRACE`, `ZIPKIN_MULTI_HEADER`, `ZIPKIN_SINGLE_HEADER`, `TRACEPARENT`, `JAEGER`, `SKYWALKING`). 
+ Use `new TraceContext.Simple(headers, traceId, spanId)` for custom traceId/spanId.
+3. Removed redundant remote condition callbacks.
+
+---
+# agent 1.6.17-alpha01
+1. Optimized View Action data generation rules.
+
+# agent 1.6.16
+1. Added illegal character filtering for globalContext and property keys.
+2. Extended `resource_type` support to include image, media, font, CSS, JS, native.
+3. Support customizable configuration of remote variables.
+4. Resource added `resource_http_protocol`, `resource_request_size`, `resource_connection_reuse`.
+5. Refined cold start timing by adding `app_pre_application_init_time`,
+`app_application_init_time`, and `app_first_frame_init_time`.
+6. Added compatibility for OkHttp 3.12.+
+7. Fix the incorrect start time of Resource requests.
+8. Fix an occasional null pointer issue when retrieving actions and views during SDK shutdown.
+9. Optimize error stack formatting and fix incorrect line breaks in certain scenarios.
+10.	Limited long task detection while the app is in the background.
+11. Optimized the session refresh mechanism while the app is in the background.
+12. Optimize nano duration calculation in Action, View and Resource.
+
+---
+# agent 1.6.16-beta01
+1. Optimized handling of illegal characters in globalContext
+2. Fixed incorrect `resource_connection_reuse handling` and improved null handling 
+    for `resource_http_protocol`.
+
+---
+# agent 1.6.16-alpha01
+1. Limited long task detection while the app is in the background.
+2. Optimized the session refresh mechanism while the app is in the background.
+3. Added compatibility for OkHttp 3.12.0 and lower versions
+4. Added illegal character filtering for globalContext and property keys.
+5. Optimized the error stack format.
+6. Extended `resource_type` support to include image, media, font, CSS, JS, native.
+7. Optimize nano duration calculation in Action 、View and Resource.
+8. Fix the incorrect start time of Resource requests.
+9. Support customizable configuration of remote variables.
+10. Prevented View actions from causing null exceptions. Optimized HashMap-to-JSON conversion.
+11. Resource added `resource_http_protocol`, `resource_request_size`, `resource_connection_reuse`
+12. Refined cold start timing by adding `app_pre_application_init_time`, `app_application_init_time`,
+   and `app_first_frame_init_time`.
 
 ---
 # agent 1.6.15

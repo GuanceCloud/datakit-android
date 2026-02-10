@@ -14,7 +14,7 @@ import java.lang.reflect.Method;
  * This is a reflective way to obtain the class and should be avoided to reduce the risk of being disabled in the future.
  */
 public class FTApplication {
-    public static long APP_START_TIME = Utils.getCurrentNanoTime();
+    public static long APP_START_TIME = System.nanoTime();
     private static volatile Application instance;
 
     public static Application getApplication() {
