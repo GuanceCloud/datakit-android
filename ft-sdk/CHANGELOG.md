@@ -4,8 +4,9 @@
   traceId and spanId in one call. Fully backward compatible with existing `getTraceHeader` 
   + `getTraceID`/`getSpanID` implementations.
 2. Added `TraceContext.Simple.fromTraceType()` to extract traceId/spanId from headers 
- by TraceType (DDTRACE, ZIPKIN_MULTI_HEADER, ZIPKIN_SINGLE_HEADER, TRACEPARENT, JAEGER, SKYWALKING). 
+ by TraceType (`DDTRACE`, `ZIPKIN_MULTI_HEADER`, `ZIPKIN_SINGLE_HEADER`, `TRACEPARENT`, `JAEGER`, `SKYWALKING`). 
  Use `new TraceContext.Simple(headers, traceId, spanId)` for custom traceId/spanId.
+3. Removed redundant remote condition callbacks.
 
 ---
 # agent 1.6.17-alpha01
