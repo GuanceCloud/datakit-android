@@ -288,13 +288,13 @@ public class SyncDataHelper {
                 while (keys.hasNext()) {
                     String key = keys.next();
                     if (!key.equals(Constants.KEY_SERVICE)) {
-                        if (key.equals(Constants.KEY_RUM_SDK_PACKAGE_INFO)) {
-                            Object pkgInfo = rumTags.get(Constants.KEY_RUM_SDK_PACKAGE_INFO);
+                        if (key.equals(Constants.KEY_SDK_PACKAGE_INFO)) {
+                            Object pkgInfo = rumTags.get(Constants.KEY_SDK_PACKAGE_INFO);
                             if (pkgInfo != null) {
                                 String replacePkgInfo = PackageUtils.appendPackageVersion(pkgInfo.toString(),
                                         Constants.KEY_RUM_SDK_PACKAGE_WEB, webSDKVersion + "");
-                                mergeTags.put(Constants.KEY_RUM_SDK_PACKAGE_INFO,
-                                        applyModifier(Constants.KEY_RUM_SDK_PACKAGE_INFO, replacePkgInfo));
+                                mergeTags.put(Constants.KEY_SDK_PACKAGE_INFO,
+                                        applyModifier(Constants.KEY_SDK_PACKAGE_INFO, replacePkgInfo));
                             }
                         } else {
                             mergeTags.put(key, rumTags.get(key));
