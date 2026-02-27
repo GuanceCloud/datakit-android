@@ -130,6 +130,7 @@ FTExt {
     knownWebViewClasses =['com.ft.webview.CustomWebView']
     autoUploadMap = false
     autoUploadNativeDebugSymbol = false
+//    ignorePackages=['com.ft.*']
     datakitUrl = ft_env.datakitRUMUrl
     datawayToken = ft_env.datawayToken
     appId = ft_env.rumAppid

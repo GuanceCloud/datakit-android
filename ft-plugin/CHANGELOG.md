@@ -1,3 +1,7 @@
+# plugin 1.3.7-alpha01
+1. 
+
+---
 # plugin 1.3.6
 1. UniApp Webview support
 2. Added `knownWebViewClasses` parameter to support ASM writes.
