@@ -70,14 +70,8 @@ public class ResourceBean {
      */
     public String resourceUrlQuery = "";
 
-    /**
-     * Trace ID {@link TraceBean#traceID}
-     */
     public String traceId = null;
 
-    /**
-     * Trace Span ID {@link TraceBean#spanID}
-     */
     public String spanId = null;
 
     /**
