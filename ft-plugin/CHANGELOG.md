@@ -1,5 +1,5 @@
 # plugin 1.3.7-alpha01
-1. 
+1. Added wildcard support for ignorePackages
 
 ---
 # plugin 1.3.6
@@ -10,7 +10,7 @@
 5. Numeric boundary handling in FTMethodAdapter
 6. Added ignore configuration for custom WebView internal methods.
 
----
+--
 # plugin 1.3.6-alpha07
 1. UniApp Webview support
 
