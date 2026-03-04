@@ -199,7 +199,18 @@ public class SDKFeature implements FeatureScope {
                         HashMap<String, String> fieldMap = new HashMap<>();
                         fieldMap.put(SessionReplayResourceUploader.KEY_APP_ID, appId);
 
-                        HashMap<String, Pair<String, byte[]>> fileMap = new HashMap<>();
+                        String traceHeader = String.format(Constants.SYNC_DATA_TRACE_HEADER_FORMAT, pkgId);
+                        HttpBuilder builder = HttpBuilder.Builder()
+                                .setModel(SessionReplayConstants.URL_MODEL_SESSION_REPLAY_RESOURCES_UPLOAD)
+                                .enableUrlWithMsPrecision();
+                        builder.setMethod(RequestMethod.POST)
+                                .addHeadParam(Constants.SYNC_DATA_USER_AGENT_HEADER,
+                                        builder.getHttpConfig().getUserAgentForSR())
+                                .addHeadParam(Constants.SYNC_DATA_CONTENT_ENCODING_HEADER, "identity")
+                                .addHeadParam("Content-Type", "multipart/form-data")
+                                .addHeadParam(Constants.SYNC_DATA_TRACE_HEADER, traceHeader)
+                                .setFormParams(fieldMap);
+
                         BytesCompressor compressor = new BytesCompressor();
                         for (RawBatchEvent event : files) {
                             String fileName = extractFileName(event.getMetadata());
@@ -210,19 +221,9 @@ public class SDKFeature implements FeatureScope {
                                 } catch (IOException e) {
                                     internalLogger.e(TAG, Log.getStackTraceString(e));
                                 }
-                                fileMap.put(SessionReplayResourceUploader.KEY_FILES, new Pair<>(fileName, compressedData));
+                                builder.addFileParam(SessionReplayResourceUploader.KEY_FILES, new Pair<>(fileName, compressedData));
                             }
                         }
-
-                        HttpBuilder builder = HttpBuilder.Builder()
-                                .setModel(SessionReplayConstants.URL_MODEL_SESSION_REPLAY_RESOURCES_UPLOAD)
-                                .enableUrlWithMsPrecision();
-                        builder.setMethod(RequestMethod.POST)
-                                .addHeadParam(Constants.SYNC_DATA_USER_AGENT_HEADER,
-                                        builder.getHttpConfig().getUserAgentForSR())
-                                .addHeadParam("Content-Type", "multipart/form-data")
-                                .setFormParams(fieldMap)
-                                .setFileParams(fileMap);
 
                         FTResponseData data = builder.executeSync();
                         if(data.getCode()==HttpURLConnection.HTTP_OK){

@@ -96,12 +96,20 @@ public class SRActivity extends NameTitleActivity {
         immutableTestMap.put("userImage", "TEST_IMMUTABLE");
         arrayList.add(immutableTestMap);
 
+        // Add local resource items
+        for (int i = 0; i < 5; i++) {
+            HashMap<String, Object> localMap = new HashMap<>();
+            localMap.put("userName", "Local Resource " + i);
+            localMap.put("userImage", "LOCAL_RESOURCE");
+            arrayList.add(localMap);
+        }
+
         // Add normal items
         for (int i = 0; i < 18; i++) {
             HashMap<String, Object> map = new HashMap<>();
             map.put("userName", "name " + i);
-            // Use online image URL
-            map.put("userImage", "https://picsum.photos/200/200?random=" + i);
+            // Use fixed seed image URL
+            map.put("userImage", "https://picsum.photos/seed/listitem1" + i + "/200/200");
             arrayList.add(map);
         }
 
@@ -124,6 +132,10 @@ public class SRActivity extends NameTitleActivity {
         });
 
         list.setAdapter(adapter);
+
+        // Load remote image for standalone ImageView
+        ImageView remoteImageView = findViewById(R.id.remote_image_view);
+        loadImageFromUrl(remoteImageView, "https://picsum.photos/seed/standalone/200/200");
 
     }
 
@@ -166,7 +178,7 @@ public class SRActivity extends NameTitleActivity {
             executorService.execute(() -> {
                 try {
                     // Load a bitmap from network
-                    URL url = new URL("https://picsum.photos/200/200?random=recycled");
+                    URL url = new URL("https://picsum.photos/seed/recycled/200/200");
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setConnectTimeout(5000);
                     connection.setReadTimeout(5000);
@@ -187,12 +199,12 @@ public class SRActivity extends NameTitleActivity {
                         // After a delay, recycle the bitmap
                         // This simulates memory pressure or LRU cache eviction
                         // When Session Replay tries to capture, bitmap may be recycled
-                        mainHandler.postDelayed(() -> {
-                            if (!bitmap.isRecycled()) {
-                                bitmap.recycle();
-                                // Show a toast to indicate bitmap is recycled
-                            }
-                        }, 2000); // Recycle after 2 seconds
+//                        mainHandler.postDelayed(() -> {
+//                            if (!bitmap.isRecycled()) {
+//                                bitmap.recycle();
+//                                // Show a toast to indicate bitmap is recycled
+//                            }
+//                        }, 2000); // Recycle after 2 seconds
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -241,6 +253,12 @@ public class SRActivity extends NameTitleActivity {
                     });
                 }
             });
+            return;
+        }
+
+        if ("LOCAL_RESOURCE".equals(imageUrl)) {
+            // Load local resource directly without network
+            imageView.setImageResource(R.drawable.ic_launcher_background);
             return;
         }
 

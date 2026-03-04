@@ -86,8 +86,6 @@ public class SessionReplayResourceUploader implements IUploader {
             String fileName = fileNames.get(i);
             if (!existingFiles.contains(fileName)) {
                 filesNeedUpload.add(filesToUpload.get(i));
-            } else {
-                internalLogger.d(TAG, "File already exists, skip upload: " + fileName);
             }
         }
 
