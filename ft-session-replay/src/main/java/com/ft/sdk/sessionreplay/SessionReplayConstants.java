@@ -6,6 +6,16 @@ public class SessionReplayConstants {
      */
     public static final String URL_MODEL_SESSION_REPLAY = "v1/write/rum/replay";
 
+    /**
+     *
+     */
+    public static final String URL_MODEL_SESSION_REPLAY_RESOURCES_UPLOAD = "v1/write/rum/replay_assets";
+
+    /**
+     *
+     */
+    public static final String URL_MODEL_SESSION_REPLAY_RESOURCES_CHECK = "v1/check/rum/replay_assets";
+
     /** 
      * Session Replay cache address
      */

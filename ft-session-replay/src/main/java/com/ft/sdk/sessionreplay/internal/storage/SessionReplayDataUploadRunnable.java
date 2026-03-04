@@ -4,9 +4,10 @@ import static com.ft.sdk.sessionreplay.SessionReplayConstants.DECREASE_PERCENT;
 import static com.ft.sdk.sessionreplay.SessionReplayConstants.INCREASE_PERCENT;
 
 import com.ft.sdk.api.context.SessionReplayContext;
+import com.ft.sdk.feature.Feature;
 import com.ft.sdk.feature.FeatureSdkCore;
 import com.ft.sdk.sessionreplay.SessionReplayConstants;
-import com.ft.sdk.sessionreplay.SessionReplayUploader;
+import com.ft.sdk.sessionreplay.IUploader;
 import com.ft.sdk.sessionreplay.SystemInfoProxy;
 import com.ft.sdk.sessionreplay.internal.persistence.BatchData;
 import com.ft.sdk.sessionreplay.internal.persistence.BatchId;
@@ -32,7 +33,7 @@ public class SessionReplayDataUploadRunnable implements Runnable {
     private final String featureName;
     private final ScheduledThreadPoolExecutor threadPoolExecutor;
     private final Storage storage;
-    private final SessionReplayUploader dataUploader;
+    private final IUploader dataUploader;
     private long currentDelayIntervalMs;
     private final long minDelayMs;
     private final long maxDelayMs;
@@ -45,7 +46,7 @@ public class SessionReplayDataUploadRunnable implements Runnable {
 
     public SessionReplayDataUploadRunnable(FeatureSdkCore sdkCore, String featureName, ScheduledThreadPoolExecutor threadPoolExecutor,
                                            Storage storage,
-                                           SessionReplayUploader uploader,
+                                           IUploader uploader,
                                            DataUploadConfiguration dataUploadConfiguration,
                                            SessionReplayContext context,
                                            InternalLogger internalLogger, SystemInfoProxy systemInfoProxy, File rootPath) {
@@ -92,27 +93,36 @@ public class SessionReplayDataUploadRunnable implements Runnable {
         long timeNow = System.currentTimeMillis();
         if (errorTimeLine > 0) {
             if (rootPath.exists()) {
-                File sampledOnErrorPath = new File(rootPath,
-                        SessionReplayConstants.PATH_SESSION_REPLAY_ERROR_SAMPLED);
+                String errorSampledPath;
+                String normalPath;
+
+                if (Feature.SESSION_REPLAY_FEATURE_NAME.equals(featureName)) {
+                    errorSampledPath = SessionReplayConstants.PATH_SESSION_REPLAY_ERROR_SAMPLED;
+                    normalPath = SessionReplayConstants.PATH_SESSION_REPLAY;
+                } else if (Feature.SESSION_REPLAY_RESOURCES_FEATURE_NAME.equals(featureName)) {
+                    errorSampledPath = SessionReplayConstants.PATH_SESSION_REPLAY_ERROR_RESOURCE_SAMPLED;
+                    normalPath = SessionReplayConstants.PATH_SESSION_REPLAY_RESOURCE;
+                } else {
+                    errorSampledPath = SessionReplayConstants.PATH_SESSION_REPLAY_ERROR_SAMPLED;
+                    normalPath = SessionReplayConstants.PATH_SESSION_REPLAY;
+                }
+
+                File sampledOnErrorPath = new File(rootPath, errorSampledPath);
                 File[] files = sampledOnErrorPath.listFiles();
                 if (files != null) {
                     for (File file : files) {
                         if (file.isFile()) {
-                            long fileTime = file.lastModified(); // The creation time is not available, use the modification time instead
+                            long fileTime = file.lastModified();
                             if (fileTime < errorTimeLine) {
-                                File moveTargetPath = new File(rootPath,
-                                        SessionReplayConstants.PATH_SESSION_REPLAY
-                                                + "/" + file.getName());
-                                //Move to normal upload queue
+                                File moveTargetPath = new File(rootPath, normalPath + "/" + file.getName());
                                 if (moveFile(file, moveTargetPath)) {
-                                    internalLogger.d(TAG, "SR consumeErrorSampledData:" + file.getName());
+                                    internalLogger.d(TAG, "SR consumeErrorSampledData: " + featureName + " - " + file.getName());
                                 }
                             }
                             deleteExpired(file, timeNow);
                         }
                     }
                 }
-
             }
         }
     }

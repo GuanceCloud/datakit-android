@@ -2,7 +2,7 @@ package com.ft.sdk.sessionreplay.internal.storage;
 
 import com.ft.sdk.api.context.SessionReplayContext;
 import com.ft.sdk.feature.FeatureSdkCore;
-import com.ft.sdk.sessionreplay.SessionReplayUploader;
+import com.ft.sdk.sessionreplay.IUploader;
 import com.ft.sdk.sessionreplay.SystemInfoProxy;
 import com.ft.sdk.sessionreplay.internal.persistence.DataUploadConfiguration;
 import com.ft.sdk.sessionreplay.internal.persistence.Storage;
@@ -23,7 +23,7 @@ public class DataUploadScheduler implements UploadScheduler {
     public DataUploadScheduler(FeatureSdkCore sdkCore, String feature, InternalLogger internalLogger,
                                DataUploadConfiguration dataUploadConfiguration,
                                Storage storage,
-                               SessionReplayUploader uploader, SessionReplayContext context,
+                               IUploader uploader, SessionReplayContext context,
                                SystemInfoProxy systemInfoProxy, File errorSampledPath) {
         this.internalLogger = internalLogger;
         this.scheduledThreadPoolExecutor = (ScheduledThreadPoolExecutor) sdkCore.createScheduledExecutorService(feature);

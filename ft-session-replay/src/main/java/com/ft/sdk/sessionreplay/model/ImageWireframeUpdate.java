@@ -56,9 +56,7 @@ public class ImageWireframeUpdate extends WireframeUpdateMutation {
             json.addProperty("mimeType", mimeType);
         }
         if (isEmpty != null) {
-//            json.addProperty("isEmpty", isEmpty);
-            //fixme After the image function is loaded, restore this parameter
-            json.addProperty("isEmpty", true);
+            json.addProperty("isEmpty", isEmpty);
         }
         return json;
     }

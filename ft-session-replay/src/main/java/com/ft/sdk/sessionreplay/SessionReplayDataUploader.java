@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Responsible for session replay upload logic
  */
-public class SessionReplayUploader {
+public class SessionReplayDataUploader implements IUploader{
 
     private static final String TAG = "SessionReplayUploader";
 
@@ -48,9 +48,9 @@ public class SessionReplayUploader {
     private final SessionReplayUploadCallback callback;
 
 
-    public SessionReplayUploader(BatchesToSegmentsMapper mapper,
-                                 InternalLogger internalLogger,
-                                 SessionReplayUploadCallback uploadCallback) {
+    public SessionReplayDataUploader(BatchesToSegmentsMapper mapper,
+                                     InternalLogger internalLogger,
+                                     SessionReplayUploadCallback uploadCallback) {
         this.batchToSegmentsMapper = mapper;
         this.compressor = new BytesCompressor();
         this.internalLogger = internalLogger;

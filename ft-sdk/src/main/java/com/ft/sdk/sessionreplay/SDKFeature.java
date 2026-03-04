@@ -2,6 +2,7 @@ package com.ft.sdk.sessionreplay;
 
 import android.content.Context;
 import android.os.BatteryManager;
+import android.util.Log;
 import android.util.Pair;
 
 import com.ft.sdk.FTApplication;
@@ -34,6 +35,7 @@ import com.ft.sdk.garble.utils.PackageIdGenerator;
 import com.ft.sdk.garble.utils.Utils;
 import com.ft.sdk.sessionreplay.internal.StorageBackedFeature;
 import com.ft.sdk.sessionreplay.internal.net.BatchesToSegmentsMapper;
+import com.ft.sdk.sessionreplay.internal.net.BytesCompressor;
 import com.ft.sdk.sessionreplay.internal.persistence.BatchClosedMetadata;
 import com.ft.sdk.sessionreplay.internal.persistence.BatchFileOrchestrator;
 import com.ft.sdk.sessionreplay.internal.persistence.BatchFileReaderWriterFactory;
@@ -44,6 +46,7 @@ import com.ft.sdk.sessionreplay.internal.persistence.FileReaderWriter;
 import com.ft.sdk.sessionreplay.internal.persistence.Storage;
 import com.ft.sdk.sessionreplay.internal.persistence.TrackingConsent;
 import com.ft.sdk.sessionreplay.internal.persistence.UploadFrequency;
+import com.ft.sdk.sessionreplay.internal.processor.EnrichedResource;
 import com.ft.sdk.sessionreplay.internal.storage.ConsentAwareStorage;
 import com.ft.sdk.sessionreplay.internal.storage.DataUploadScheduler;
 import com.ft.sdk.sessionreplay.internal.storage.FileMover;
@@ -51,14 +54,19 @@ import com.ft.sdk.sessionreplay.internal.storage.FilePersistenceConfig;
 import com.ft.sdk.sessionreplay.internal.storage.MetricsDispatcher;
 import com.ft.sdk.sessionreplay.internal.storage.NoOpStorage;
 import com.ft.sdk.sessionreplay.internal.storage.NoOpUploadScheduler;
+import com.ft.sdk.sessionreplay.internal.storage.RawBatchEvent;
 import com.ft.sdk.sessionreplay.internal.storage.RemovalReason;
 import com.ft.sdk.sessionreplay.internal.storage.UploadResult;
 import com.ft.sdk.sessionreplay.internal.storage.UploadScheduler;
 import com.ft.sdk.sessionreplay.utils.InternalLogger;
 import com.ft.sdk.storage.DataStoreHandler;
 import com.ft.sdk.storage.EventBatchWriter;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -86,6 +94,7 @@ public class SDKFeature implements FeatureScope {
     private Storage storage = new NoOpStorage();
     private Storage webStorage = new NoOpStorage();
     private final ID36Generator srGenerator = new ID36Generator();
+    private final ID36Generator srResourceGenerator = new ID36Generator();
 
     private final BatteryPowerWatcher watcher = new BatteryPowerWatcher();
 
@@ -136,7 +145,8 @@ public class SDKFeature implements FeatureScope {
     }
 
     private void prepareStorage(String featureName) {
-        if (featureName.equals(Feature.SESSION_REPLAY_FEATURE_NAME)) {
+        if (featureName.equals(Feature.SESSION_REPLAY_FEATURE_NAME)
+                || featureName.equals(Feature.SESSION_REPLAY_RESOURCES_FEATURE_NAME)) {
             FeatureStorageConfiguration storageConfiguration = ((StorageBackedFeature) wrappedFeature).getStorageConfiguration();
             storage = createFileStorage(featureName, new FilePersistenceConfig(
                     storageConfiguration.getMaxBatchSize(),
@@ -150,67 +160,149 @@ public class SDKFeature implements FeatureScope {
     }
 
     private void setupUploader(Feature feature, DataUploadConfiguration configuration, FTSDKConfig config) {
-        // session replay data only upload
         if (Utils.isMainProcess()) {
-            SessionReplayUploader uploader = new SessionReplayUploader(
-                    new BatchesToSegmentsMapper(internalLogger),
-                    internalLogger,
-                    new SessionReplayUploadCallback() {
-                        @Override
-                        public UploadResult onRequest(SessionReplayFormData provider) {
-                            String count = provider.getFields().get(SessionReplayUploader.KEY_RECORDS_COUNT);
-                            String pkgId = PackageIdGenerator.generatePackageId(srGenerator.getCurrentId()
-                                    , SyncTaskManager.pid, count);
-                            String traceHeader = String.format(Constants.SYNC_DATA_TRACE_HEADER_FORMAT, pkgId);
-                            HttpBuilder builder = HttpBuilder.Builder()
-                                    .setModel(SessionReplayConstants.URL_MODEL_SESSION_REPLAY)
-                                    .enableUrlWithMsPrecision();
-                            builder.setMethod(RequestMethod.POST)
-                                    .addHeadParam(Constants.SYNC_DATA_USER_AGENT_HEADER, builder.getHttpConfig().getUserAgentForSR())
-                                    .addHeadParam(Constants.SYNC_DATA_CONTENT_TYPE_HEADER, "multipart/form-data")
-                                    //Not affected by DeflateInterceptor
-                                    .addHeadParam(Constants.SYNC_DATA_CONTENT_ENCODING_HEADER, "identity")
-                                    .addHeadParam(Constants.SYNC_DATA_TRACE_HEADER, traceHeader)
-                            ;
-                            for (Map.Entry<String, String> field : provider.getFields().entrySet()) {
-                                builder.addFormParam(field.getKey(), field.getValue());
-                            }
-                            for (Map.Entry<String, Pair<String, byte[]>> fileField : provider.getFileFields().entrySet()) {
-                                builder.addFileParam(fileField.getKey(), fileField.getValue());
-                            }
-                            FTResponseData data = builder.executeSync();
-                            if (data.getCode() == HttpURLConnection.HTTP_OK) {
-                                srGenerator.next();
-                            }
-                            return new UploadResult(data.getCode(), data.getErrorCode() + "," + data.getMessage(), pkgId);
+            IUploader uploader;
+            if (feature.getName().equals(Feature.SESSION_REPLAY_RESOURCES_FEATURE_NAME)) {
+                uploader = new SessionReplayResourceUploader(internalLogger, new SessionReplayResourceUploadCallback() {
+                    @Override
+                    public UploadResult onCheckFilesExist(String appId, List<String> fileNames) {
+                        JsonObject requestBody = new JsonObject();
+                        requestBody.addProperty(SessionReplayResourceUploader.KEY_APP_ID, appId);
+                        JsonArray filesArray = new JsonArray();
+                        for (String fileName : fileNames) {
+                            filesArray.add(fileName);
                         }
-                    });
+                        requestBody.add(SessionReplayResourceUploader.KEY_FILES, filesArray);
+                        HttpBuilder builder = HttpBuilder.Builder()
+                                .setModel(SessionReplayConstants.URL_MODEL_SESSION_REPLAY_RESOURCES_CHECK);
+                        builder.setMethod(RequestMethod.POST)
+                                .addHeadParam(Constants.SYNC_DATA_USER_AGENT_HEADER,
+                                        builder.getHttpConfig().getUserAgentForSR())
+                                .addHeadParam(Constants.SYNC_DATA_CONTENT_ENCODING_HEADER, "identity")
+                                .addHeadParam("Content-Type", "application/json")
+                                .setBodyString(requestBody.toString());
 
-            if (feature.getName().equals(Feature.SESSION_REPLAY_FEATURE_NAME)) {
-                File rootPath = FTApplication.getApplication().getCacheDir();
-                uploadScheduler = new DataUploadScheduler(sdkCore, feature.getName(), internalLogger,
-                        configuration, storage, uploader, sdkContext,
-                        new SystemInfoProxy() {
-                            @Override
-                            public boolean isNetworkAvailable() {
-                                return NetUtils.isNetworkAvailable();
-                            }
+                        FTResponseData data = builder.executeSync();
+                        if (data.getCode() == HttpURLConnection.HTTP_OK) {
+                            return new UploadResult(data.getCode(), data.getMessage(), "");
+                        }
+                        return new UploadResult(data.getCode(), data.getErrorCode() + ","
+                                + data.getMessage(), "");
+                    }
 
-                            @Override
-                            public boolean isBatteryHealthToSync() {
-                                BatteryBean batteryBean = watcher.batteryBean;
-                                boolean batteryEnough = batteryBean.getLevel() > SessionReplayConstants.BATTERY_LIMIT;
-                                boolean batteryPlug = batteryBean.getPlugState() == BatteryManager.BATTERY_PLUGGED_AC
-                                        || batteryBean.getPlugState() == BatteryManager.BATTERY_PLUGGED_WIRELESS
-                                        || batteryBean.getPlugState() == BatteryManager.BATTERY_PLUGGED_USB;
-                                boolean isFullOrCharging = batteryBean.getBatteryStatue() == BatteryManager.BATTERY_STATUS_FULL ||
-                                        batteryBean.getBatteryStatue() == BatteryManager.BATTERY_STATUS_CHARGING;
-                                return batteryEnough || batteryPlug || !batteryBean.isBatteryPresent() || isFullOrCharging;
+                    @Override
+                    public UploadResult onUploadFiles(String appId, List<RawBatchEvent> files) {
+
+                        String count = files.size() + "";
+                        String pkgId = PackageIdGenerator.generatePackageId(srResourceGenerator.getCurrentId(), SyncTaskManager.pid, count);
+
+                        HashMap<String, String> fieldMap = new HashMap<>();
+                        fieldMap.put(SessionReplayResourceUploader.KEY_APP_ID, appId);
+
+                        HashMap<String, Pair<String, byte[]>> fileMap = new HashMap<>();
+                        BytesCompressor compressor = new BytesCompressor();
+                        for (RawBatchEvent event : files) {
+                            String fileName = extractFileName(event.getMetadata());
+                            if (fileName != null) {
+                                byte[] compressedData = null;
+                                try {
+                                    compressedData = compressor.compressBytes(event.getData());
+                                } catch (IOException e) {
+                                    internalLogger.e(TAG, Log.getStackTraceString(e));
+                                }
+                                fileMap.put(SessionReplayResourceUploader.KEY_FILES, new Pair<>(fileName, compressedData));
                             }
-                        }, rootPath);
+                        }
+
+                        HttpBuilder builder = HttpBuilder.Builder()
+                                .setModel(SessionReplayConstants.URL_MODEL_SESSION_REPLAY_RESOURCES_UPLOAD)
+                                .enableUrlWithMsPrecision();
+                        builder.setMethod(RequestMethod.POST)
+                                .addHeadParam(Constants.SYNC_DATA_USER_AGENT_HEADER,
+                                        builder.getHttpConfig().getUserAgentForSR())
+                                .addHeadParam("Content-Type", "multipart/form-data")
+                                .setFormParams(fieldMap)
+                                .setFileParams(fileMap);
+
+                        FTResponseData data = builder.executeSync();
+                        if(data.getCode()==HttpURLConnection.HTTP_OK){
+                            srResourceGenerator.next();
+                        }
+                        return new UploadResult(data.getCode(), data.getErrorCode() + "," + data.getMessage(), pkgId);
+                    }
+
+                    private String extractFileName(byte[] metadata) {
+                        if (metadata == null || metadata.length == 0) {
+                            return null;
+                        }
+                        try {
+                            JsonObject json = new Gson().fromJson(new String(metadata), JsonObject.class);
+                            if (json != null && json.has(EnrichedResource.FILENAME_KEY)) {
+                                return json.get(EnrichedResource.FILENAME_KEY).getAsString();
+                            }
+                        } catch (Exception e) {
+                            internalLogger.e(TAG, "Extract filename error: " + e.getMessage(), e);
+                        }
+                        return null;
+                    }
+                });
+            } else if (feature.getName().equals(Feature.SESSION_REPLAY_FEATURE_NAME)) {
+                uploader = new SessionReplayDataUploader(
+                        new BatchesToSegmentsMapper(internalLogger),
+                        internalLogger,
+                        new SessionReplayUploadCallback() {
+                            @Override
+                            public UploadResult onRequest(SessionReplayFormData provider) {
+                                String count = provider.getFields().get(SessionReplayDataUploader.KEY_RECORDS_COUNT);
+                                String pkgId = PackageIdGenerator.generatePackageId(srGenerator.getCurrentId()
+                                        , SyncTaskManager.pid, count);
+                                String traceHeader = String.format(Constants.SYNC_DATA_TRACE_HEADER_FORMAT, pkgId);
+                                HttpBuilder builder = HttpBuilder.Builder()
+                                        .setModel(SessionReplayConstants.URL_MODEL_SESSION_REPLAY);
+                                builder.setMethod(RequestMethod.POST)
+                                        .addHeadParam(Constants.SYNC_DATA_USER_AGENT_HEADER, builder.getHttpConfig().getUserAgentForSR())
+                                        .addHeadParam(Constants.SYNC_DATA_CONTENT_TYPE_HEADER, "multipart/form-data")
+                                        .addHeadParam(Constants.SYNC_DATA_CONTENT_ENCODING_HEADER, "identity")
+                                        .addHeadParam(Constants.SYNC_DATA_TRACE_HEADER, traceHeader);
+                                for (Map.Entry<String, String> field : provider.getFields().entrySet()) {
+                                    builder.addFormParam(field.getKey(), field.getValue());
+                                }
+                                for (Map.Entry<String, Pair<String, byte[]>> fileField : provider.getFileFields().entrySet()) {
+                                    builder.addFileParam(fileField.getKey(), fileField.getValue());
+                                }
+                                FTResponseData data = builder.executeSync();
+                                if (data.getCode() == HttpURLConnection.HTTP_OK) {
+                                    srGenerator.next();
+                                }
+                                return new UploadResult(data.getCode(), data.getErrorCode() + "," + data.getMessage(), pkgId);
+                            }
+                        });
             } else {
                 uploadScheduler = new NoOpUploadScheduler();
+                return;
             }
+
+            File rootPath = FTApplication.getApplication().getCacheDir();
+            uploadScheduler = new DataUploadScheduler(sdkCore, feature.getName(), internalLogger,
+                    configuration, storage, uploader, sdkContext,
+                    new SystemInfoProxy() {
+                        @Override
+                        public boolean isNetworkAvailable() {
+                            return NetUtils.isNetworkAvailable();
+                        }
+
+                        @Override
+                        public boolean isBatteryHealthToSync() {
+                            BatteryBean batteryBean = watcher.batteryBean;
+                            boolean batteryEnough = batteryBean.getLevel() > SessionReplayConstants.BATTERY_LIMIT;
+                            boolean batteryPlug = batteryBean.getPlugState() == BatteryManager.BATTERY_PLUGGED_AC
+                                    || batteryBean.getPlugState() == BatteryManager.BATTERY_PLUGGED_WIRELESS
+                                    || batteryBean.getPlugState() == BatteryManager.BATTERY_PLUGGED_USB;
+                            boolean isFullOrCharging = batteryBean.getBatteryStatue() == BatteryManager.BATTERY_STATUS_FULL ||
+                                    batteryBean.getBatteryStatue() == BatteryManager.BATTERY_STATUS_CHARGING;
+                            return batteryEnough || batteryPlug || !batteryBean.isBatteryPresent() || isFullOrCharging;
+                        }
+                    }, rootPath);
 
         } else {
             internalLogger.w(TAG, "Session replay data only sync on main thread");
