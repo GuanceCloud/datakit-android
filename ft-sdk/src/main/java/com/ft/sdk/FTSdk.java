@@ -49,6 +49,7 @@ public class FTSdk {
     private static FTSdk mFtSdk;
     private final FTSDKConfig mFtSDKConfig;
     private FTRemoteConfigManager mRemoteConfigManager;
+    private String pendingRemoteConfigAppId;
 
     /**
      * @param ftSDKConfig
@@ -218,7 +219,12 @@ public class FTSdk {
             config.setServiceName(get().getBaseConfig().getServiceName());
             if (get().mRemoteConfigManager != null) {
                 get().mRemoteConfigManager.mergeRUMConfigFromCache(config);
-                get().mRemoteConfigManager.initFromRemote(config.getRumAppId());
+                if (FTHttpConfigManager.get().isUrlAvailable()) {
+                    get().mRemoteConfigManager.initFromRemote(config.getRumAppId());
+                } else {
+                    get().pendingRemoteConfigAppId = config.getRumAppId();
+                    LogUtils.d(TAG, "URL not available, will init remote config later");
+                }
             }
             FTRUMConfigManager.get().initWithConfig(config);
             LogUtils.d(TAG, "initRUMWithConfig complete:" + config);
@@ -431,6 +437,45 @@ public class FTSdk {
     public static void flushSyncData() {
         if (checkInstallState()) {
             SyncTaskManager.get().executePoll();
+        }
+    }
+
+    /**
+     * Set datakit URL dynamically
+     * After setting, normal data upload will resume
+     *
+     * @param datakitUrl datakit upload address
+     */
+    public static void setDatakitUrl(@NonNull String datakitUrl) {
+        if (checkInstallState()) {
+            FTHttpConfigManager.get().setDatakitUrl(datakitUrl);
+            triggerPendingRemoteConfigInit();
+        }
+    }
+
+    /**
+     * Set dataway URL and client token dynamically
+     * After setting, normal data upload will resume
+     *
+     * @param datawayUrl  dataway upload address
+     * @param clientToken token
+     */
+    public static void setDatawayUrl(@NonNull String datawayUrl, @NonNull String clientToken) {
+        if (checkInstallState()) {
+            FTHttpConfigManager.get().setDatawayUrl(datawayUrl, clientToken);
+            triggerPendingRemoteConfigInit();
+        }
+    }
+
+
+    /**
+     * Trigger pending remote config initialization if any
+     */
+    private static void triggerPendingRemoteConfigInit() {
+        if (mFtSdk.mRemoteConfigManager != null && mFtSdk.pendingRemoteConfigAppId != null) {
+            LogUtils.d(TAG, "Triggering pending remote config init with appId: " + mFtSdk.pendingRemoteConfigAppId);
+            mFtSdk.mRemoteConfigManager.initFromRemote(mFtSdk.pendingRemoteConfigAppId);
+            mFtSdk.pendingRemoteConfigAppId = null;
         }
     }
 

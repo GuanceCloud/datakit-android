@@ -151,7 +151,8 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(this, WebViewActivity.class));
         });
         findViewById(R.id.main_mock_click_btn).setOnClickListener(v -> {
-            FTRUMGlobalManager.get().updateLoadTime(1000000000);
+//            FTRUMGlobalManager.get().updateLoadTime(1000000000);
+//            FTSdk.setDatakitUrl(BuildConfig.DATAKIT_URL);
 
         });
         findViewById(R.id.main_click_test_btn).setOnClickListener(v -> {

@@ -3,6 +3,7 @@ package com.ft.sdk;
 import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.LogUtils;
 
 import java.net.Proxy;
 import java.util.HashMap;
@@ -13,6 +14,8 @@ import java.util.HashMap;
  * Description:
  */
 public class FTSDKConfig {
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "FTSDKConfig";
+
     /**
      * datakit data write address
      */
@@ -236,6 +239,15 @@ public class FTSDKConfig {
     private Object authenticator;
 
     /**
+     * Build necessary SDK configuration parameters (no URL required initially)
+     *
+     * @return {@link FTRUMConfig} SDK configuration
+     */
+    public static FTSDKConfig builder() {
+        return new FTSDKConfig();
+    }
+
+    /**
      * Build necessary SDK configuration parameters
      *
      * @param datakitUrl datakit upload address
@@ -254,6 +266,15 @@ public class FTSDKConfig {
      */
     public static FTSDKConfig builder(String datawayUrl, String clientToken) {
         return new FTSDKConfig(datawayUrl, clientToken);
+    }
+
+    /**
+     * SDK configuration constructor (no URL required initially)
+     */
+    private FTSDKConfig() {
+        this.datakitUrl = "";
+        this.datawayUrl = "";
+        this.clientToken = "";
     }
 
     /**
