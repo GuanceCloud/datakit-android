@@ -1,4 +1,9 @@
 # replay 0.1.3-alpha13
+1. ft-sdk:>= 1.7.0-alpha40
+2. Added image resource upload logic for Session Replay.
+
+---
+# replay 0.1.3-alpha13
 1. ft-sdk:>= 1.7.0-alpha39
 2. Added Session Replay support to remote configuration.
 

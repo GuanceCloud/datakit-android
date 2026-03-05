@@ -1,3 +1,8 @@
+# agent 1.7.0-alpha40
+1. Added image resource upload logic for Session Replay.
+2. ft-session-replay:>=0.1.3-alpha14
+
+---
 # agent 1.7.0-alpha39
 1. merge from ft-sdk 1.6.17-alpha02
 2. Prevent crashes caused by calling methods like TextView.getTotalPaddingTop()

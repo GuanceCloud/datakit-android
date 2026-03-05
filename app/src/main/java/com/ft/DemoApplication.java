@@ -14,8 +14,8 @@ import com.ft.sdk.FTTraceConfig;
 import com.ft.sdk.FTTraceInterceptor;
 import com.ft.sdk.FTTraceManager;
 import com.ft.sdk.LogCacheDiscard;
-import com.ft.sdk.TraceContext;
 import com.ft.sdk.RUMCacheDiscard;
+import com.ft.sdk.TraceContext;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.RemoteConfigBean;
 import com.ft.sdk.garble.bean.Status;
@@ -23,6 +23,7 @@ import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.sessionreplay.CustomExtensionSupport;
 import com.ft.sdk.sessionreplay.FTSessionReplayConfig;
+import com.ft.sdk.sessionreplay.ImagePrivacy;
 import com.ft.sdk.sessionreplay.MapperTypeWrapper;
 import com.ft.sdk.sessionreplay.TextAndInputPrivacy;
 import com.ft.sdk.sessionreplay.TouchPrivacy;
@@ -84,7 +85,7 @@ public class DemoApplication extends BaseApplication {
 
 
     static void initFTSDK(Context context) {
-        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAKIT_URL)
+        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAWAY_URL,BuildConfig.CLIENT_TOKEN)
                 .setDebug(true)//Set whether it's debug
                 .setAutoSync(true)
                 .setCustomSyncPageSize(10)
@@ -233,13 +234,13 @@ public class DemoApplication extends BaseApplication {
                 .setTraceType(TraceType.DDTRACE));
 
         FTSdk.initSessionReplayConfig(new FTSessionReplayConfig()
-                        .setSampleRate(0f)
+                        .setSampleRate(1f)
 //                        .setSessionReplayOnErrorSampleRate(1f)
 //                        .setPrivacy(SessionReplayPrivacy.MASK)
                         .setTouchPrivacy(TouchPrivacy.SHOW)
                         .setTextAndInputPrivacy(TextAndInputPrivacy.MASK_SENSITIVE_INPUTS)
                         .enableLinkRUMKeys(new String[]{"wgt_id"})
-//                .setTouchPrivacy(TouchPrivacy.SHOW)
+                        .setImagePrivacy(ImagePrivacy.MASK_NONE)
                         .addExtensionSupport(new MaterialExtensionSupport())
                         .addExtensionSupport(new CustomExtensionSupport()
                                 .addMapper(new MapperTypeWrapper<>(com.tencent.smtt.sdk.WebView.class,
