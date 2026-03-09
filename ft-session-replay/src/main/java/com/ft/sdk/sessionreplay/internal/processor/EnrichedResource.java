@@ -6,6 +6,7 @@
 
 package com.ft.sdk.sessionreplay.internal.processor;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import java.util.Arrays;
 import java.util.Objects;
@@ -53,6 +54,36 @@ public class EnrichedResource {
 
     public static final String APPLICATION_ID_KEY = "applicationId";
     public static final String FILENAME_KEY = "filename";
+
+    public static String extractFileName(byte[] metadata) {
+        if (metadata == null || metadata.length == 0) {
+            return null;
+        }
+        try {
+            JsonObject json = new Gson().fromJson(new String(metadata), JsonObject.class);
+            if (json != null && json.has(FILENAME_KEY)) {
+                return json.get(FILENAME_KEY).getAsString();
+            }
+        } catch (Exception e) {
+            // ignore
+        }
+        return null;
+    }
+
+    public static String extractApplicationId(byte[] metadata) {
+        if (metadata == null || metadata.length == 0) {
+            return null;
+        }
+        try {
+            JsonObject json = new Gson().fromJson(new String(metadata), JsonObject.class);
+            if (json != null && json.has(APPLICATION_ID_KEY)) {
+                return json.get(APPLICATION_ID_KEY).getAsString();
+            }
+        } catch (Exception e) {
+            // ignore
+        }
+        return null;
+    }
 
     public byte[] asBinaryMetadata() {
         JsonObject jsonObject = new JsonObject();

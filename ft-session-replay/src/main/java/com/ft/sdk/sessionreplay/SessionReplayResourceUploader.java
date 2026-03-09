@@ -57,8 +57,8 @@ public class SessionReplayResourceUploader implements IUploader {
         String appId = null;
 
         for (RawBatchEvent event : batchData) {
-            String fileName = extractFileName(event.getMetadata());
-            String applicationId = extractApplicationId(event.getMetadata());
+            String fileName = EnrichedResource.extractFileName(event.getMetadata());
+            String applicationId = EnrichedResource.extractApplicationId(event.getMetadata());
             
             if (fileName != null) {
                 fileNames.add(fileName);
@@ -159,47 +159,5 @@ public class SessionReplayResourceUploader implements IUploader {
             return result;
         }
         return UploadResult.createErrorResult();
-    }
-
-    /**
-     * Extract file name from metadata
-     *
-     * @param metadata the metadata bytes
-     * @return file name or null if not found
-     */
-    private String extractFileName(byte[] metadata) {
-        if (metadata == null || metadata.length == 0) {
-            return null;
-        }
-        try {
-            JsonObject json = new Gson().fromJson(new String(metadata), JsonObject.class);
-            if (json != null && json.has(EnrichedResource.FILENAME_KEY)) {
-                return json.get(EnrichedResource.FILENAME_KEY).getAsString();
-            }
-        } catch (Exception e) {
-            internalLogger.e(TAG, "Extract filename error: " + e.getMessage(), e);
-        }
-        return null;
-    }
-
-    /**
-     * Extract application id from metadata
-     *
-     * @param metadata the metadata bytes
-     * @return application id or null if not found
-     */
-    private String extractApplicationId(byte[] metadata) {
-        if (metadata == null || metadata.length == 0) {
-            return null;
-        }
-        try {
-            JsonObject json = new Gson().fromJson(new String(metadata), JsonObject.class);
-            if (json != null && json.has(EnrichedResource.APPLICATION_ID_KEY)) {
-                return json.get(EnrichedResource.APPLICATION_ID_KEY).getAsString();
-            }
-        } catch (Exception e) {
-            internalLogger.e(TAG, "Extract applicationId error: " + e.getMessage(), e);
-        }
-        return null;
     }
 }

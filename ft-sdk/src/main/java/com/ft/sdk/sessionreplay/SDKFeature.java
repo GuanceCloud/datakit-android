@@ -206,22 +206,17 @@ public class SDKFeature implements FeatureScope {
                         builder.setMethod(RequestMethod.POST)
                                 .addHeadParam(Constants.SYNC_DATA_USER_AGENT_HEADER,
                                         builder.getHttpConfig().getUserAgentForSR())
-                                .addHeadParam(Constants.SYNC_DATA_CONTENT_ENCODING_HEADER, "identity")
                                 .addHeadParam("Content-Type", "multipart/form-data")
+                                //If Content-Encoding is not set to identity,
+                                // it will automatically be set to deflate when FTSDKConfig.compressIntakeRequests is true.
+                                .addHeadParam(Constants.SYNC_DATA_CONTENT_ENCODING_HEADER, Constants.CONTENT_ENCODING_IDENTITY)
                                 .addHeadParam(Constants.SYNC_DATA_TRACE_HEADER, traceHeader)
                                 .setFormParams(fieldMap);
 
-                        BytesCompressor compressor = new BytesCompressor();
                         for (RawBatchEvent event : files) {
-                            String fileName = extractFileName(event.getMetadata());
+                            String fileName = EnrichedResource.extractFileName(event.getMetadata());
                             if (fileName != null) {
-                                byte[] compressedData = null;
-                                try {
-                                    compressedData = compressor.compressBytes(event.getData());
-                                } catch (IOException e) {
-                                    internalLogger.e(TAG, Log.getStackTraceString(e));
-                                }
-                                builder.addFileParam(SessionReplayResourceUploader.KEY_FILES, new Pair<>(fileName, compressedData));
+                                builder.addFileParam(SessionReplayResourceUploader.KEY_FILES, new Pair<>(fileName, event.getData()));
                             }
                         }
 
@@ -230,21 +225,6 @@ public class SDKFeature implements FeatureScope {
                             srResourceGenerator.next();
                         }
                         return new UploadResult(data.getCode(), data.getErrorCode() + "," + data.getMessage(), pkgId);
-                    }
-
-                    private String extractFileName(byte[] metadata) {
-                        if (metadata == null || metadata.length == 0) {
-                            return null;
-                        }
-                        try {
-                            JsonObject json = new Gson().fromJson(new String(metadata), JsonObject.class);
-                            if (json != null && json.has(EnrichedResource.FILENAME_KEY)) {
-                                return json.get(EnrichedResource.FILENAME_KEY).getAsString();
-                            }
-                        } catch (Exception e) {
-                            internalLogger.e(TAG, "Extract filename error: " + e.getMessage(), e);
-                        }
-                        return null;
                     }
                 });
             } else if (feature.getName().equals(Feature.SESSION_REPLAY_FEATURE_NAME)) {
@@ -263,7 +243,9 @@ public class SDKFeature implements FeatureScope {
                                 builder.setMethod(RequestMethod.POST)
                                         .addHeadParam(Constants.SYNC_DATA_USER_AGENT_HEADER, builder.getHttpConfig().getUserAgentForSR())
                                         .addHeadParam(Constants.SYNC_DATA_CONTENT_TYPE_HEADER, "multipart/form-data")
-                                        .addHeadParam(Constants.SYNC_DATA_CONTENT_ENCODING_HEADER, "identity")
+                                        //If Content-Encoding is not set to identity,
+                                        // it will automatically be set to deflate when FTSDKConfig.compressIntakeRequests is true.
+                                        .addHeadParam(Constants.SYNC_DATA_CONTENT_ENCODING_HEADER, Constants.CONTENT_ENCODING_IDENTITY)
                                         .addHeadParam(Constants.SYNC_DATA_TRACE_HEADER, traceHeader);
                                 for (Map.Entry<String, String> field : provider.getFields().entrySet()) {
                                     builder.addFormParam(field.getKey(), field.getValue());

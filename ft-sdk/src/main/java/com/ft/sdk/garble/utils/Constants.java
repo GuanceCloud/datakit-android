@@ -37,6 +37,11 @@ public class Constants {
     public static final String SYNC_DATA_CONTENT_TYPE_HEADER = "Content-Type";
     public static final String SYNC_DATA_USER_AGENT_HEADER = "User-Agent";
     public static final String SYNC_DATA_CONTENT_ENCODING_HEADER = "Content-Encoding";
+
+    /**
+     * Indicates no content encoding transformation is applied
+     */
+    public static final String CONTENT_ENCODING_IDENTITY = "identity";
     public static final String SYNC_DATA_CONTENT_TYPE_VALUE = "text/plain";
     /**
      * Illegal value

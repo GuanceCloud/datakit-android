@@ -84,13 +84,19 @@ public class HttpBuilder {
     }
 
     public String getUrl() {
-        Uri.Builder fullUrl = Uri.parse(getHost()).buildUpon();
+        String host = getHost();
+        StringBuilder urlBuilder = new StringBuilder(host);
         if (!Utils.isNullOrEmpty(model)) {
-            fullUrl.appendPath(model);
-            if (isDataway) {
-                fullUrl.appendQueryParameter("token", httpConfig.getClientToken())
-                        .appendQueryParameter("to_headless", "true");
+            if (!host.endsWith("/") && !model.startsWith("/")) {
+                urlBuilder.append("/");
             }
+            urlBuilder.append(model);
+        }
+        String baseUrl = urlBuilder.toString();
+        Uri.Builder fullUrl = Uri.parse(baseUrl).buildUpon();
+        if (isDataway) {
+            fullUrl.appendQueryParameter("token", httpConfig.getClientToken())
+                    .appendQueryParameter("to_headless", "true");
         }
         if (!params.isEmpty()) {
             for (String key : params.keySet()) {
