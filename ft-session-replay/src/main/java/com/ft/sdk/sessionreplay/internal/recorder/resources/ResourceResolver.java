@@ -37,8 +37,9 @@ public class ResourceResolver {
     private final InternalLogger logger;
     private final MD5HashGenerator md5HashGenerator;
     private final DataQueueHandler recordedDataQueueHandler;
-    private final String applicationId;
     private final ResourceItemCreationHandler resourceItemCreationHandler;
+    private final Alpha8ResourceCache alpha8ResourceCache;
+    private final Alpha8BitmapConverter alpha8BitmapConverter;
 
     public ResourceResolver(
             BitmapCachesManager bitmapCachesManager,
@@ -48,8 +49,7 @@ public class ResourceResolver {
             ImageCompression webPImageCompression,
             InternalLogger logger,
             MD5HashGenerator md5HashGenerator,
-            DataQueueHandler recordedDataQueueHandler,
-            String applicationId) {
+            DataQueueHandler recordedDataQueueHandler) {
         this.bitmapCachesManager = bitmapCachesManager;
         this.threadPoolExecutor = threadPoolExecutor != null ? threadPoolExecutor : THREADPOOL_EXECUTOR;
         this.drawableUtils = drawableUtils;
@@ -58,8 +58,9 @@ public class ResourceResolver {
         this.logger = logger;
         this.md5HashGenerator = md5HashGenerator;
         this.recordedDataQueueHandler = recordedDataQueueHandler;
-        this.applicationId = applicationId;
-        this.resourceItemCreationHandler = new ResourceItemCreationHandler(recordedDataQueueHandler, applicationId);
+        this.alpha8ResourceCache = new DefaultAlpha8ResourceCache(new DefaultBitmapSignatureGenerator());
+        this.alpha8BitmapConverter = new Alpha8BitmapConverter(logger);
+        this.resourceItemCreationHandler = new ResourceItemCreationHandler(recordedDataQueueHandler);
     }
 
     @WorkerThread
@@ -257,10 +258,62 @@ public class ResourceResolver {
 
     @WorkerThread
     private void getResourceIdFromBitmap(Bitmap bitmap, ResourceResolverCallback resourceResolverCallback) {
+        if (bitmap.getConfig() == Bitmap.Config.ALPHA_8) {
+            getResourceIdFromAlpha8Bitmap(bitmap, resourceResolverCallback);
+        } else {
+            getResourceIdFromRegularBitmap(bitmap, resourceResolverCallback);
+        }
+    }
+
+    @WorkerThread
+    private void getResourceIdFromAlpha8Bitmap(Bitmap bitmap, ResourceResolverCallback resourceResolverCallback) {
+        // Generate cache key once and reuse for both lookup and storage
+        Alpha8CacheKey cacheKey = alpha8ResourceCache.generateKey(bitmap);
+
+        if (cacheKey != null) {
+            String cachedResourceId = alpha8ResourceCache.get(cacheKey);
+            if (cachedResourceId != null) {
+                resourceResolverCallback.onSuccess(cachedResourceId);
+                return;
+            }
+        }
+
+        Bitmap convertedBitmap = alpha8BitmapConverter.convertAlpha8BitmapToArgb8888(bitmap);
+        if (convertedBitmap == null) {
+            resourceResolverCallback.onFailure();
+            return;
+        }
+
+        byte[] compressedBitmapBytes = webPImageCompression.compressBitmap(convertedBitmap);
+        convertedBitmap.recycle();
+
+        if (compressedBitmapBytes.length == 0) {
+            resourceResolverCallback.onFailure();
+            return;
+        }
+
+        resolveBitmapHash(compressedBitmapBytes, new ResolveResourceCallback() {
+            @Override
+            public void onResolved(String resourceId, byte[] resourceData) {
+                if (cacheKey != null) {
+                    alpha8ResourceCache.put(cacheKey, resourceId);
+                }
+                resourceItemCreationHandler.queueItem(resourceId, resourceData);
+                resourceResolverCallback.onSuccess(resourceId);
+            }
+
+            @Override
+            public void onFailed() {
+                resourceResolverCallback.onFailure();
+            }
+        });
+    }
+
+    @WorkerThread
+    private void getResourceIdFromRegularBitmap(Bitmap bitmap, ResourceResolverCallback resourceResolverCallback) {
         byte[] compressedBitmapBytes = webPImageCompression.compressBitmap(bitmap);
 
-        // failed to compress bitmap
-        if (compressedBitmapBytes == null || compressedBitmapBytes.length == 0) {
+        if (compressedBitmapBytes.length == 0) {
             resourceResolverCallback.onFailure();
             return;
         }
@@ -356,29 +409,32 @@ public class ResourceResolver {
             return;
         }
 
-        Drawable copiedDrawable = drawableCopier.copy(originalDrawable, resources);
-        if (copiedDrawable == null) {
-            resourceResolverCallback.onFailure();
-            return;
-        }
 
-        BitmapDrawable bitmapFromDrawable = null;
-        if (copiedDrawable instanceof BitmapDrawable && shouldUseDrawableBitmap((BitmapDrawable) copiedDrawable)) {
-            bitmapFromDrawable = (BitmapDrawable) copiedDrawable;
-        }
-
-        // Do in the background
-        BitmapDrawable finalBitmapFromDrawable = bitmapFromDrawable;
         ExecutorUtils.executeSafe(threadPoolExecutor, RESOURCE_RESOLVER_ALIAS, logger, new Runnable() {
             @Override
             public void run() {
+
+                Drawable copiedDrawable = drawableCopier.copy(originalDrawable, resources);
+                if (copiedDrawable == null) {
+                    resourceResolverCallback.onFailure();
+                    return;
+                }
+
+                Bitmap bitmapFromDrawable = null;
+                if (copiedDrawable instanceof BitmapDrawable) {
+                    BitmapDrawable bitmapDrawable = (BitmapDrawable) copiedDrawable;
+                    if (shouldUseDrawableBitmap(bitmapDrawable)) {
+                        bitmapFromDrawable = bitmapDrawable.getBitmap(); // cannot be null - we already checked in shouldUseDrawableBitmap
+                    }
+                }
+
                 createBitmapFromDrawable(
                         originalDrawable,
                         copiedDrawable,
                         drawableWidth,
                         drawableHeight,
                         displayMetrics,
-                        finalBitmapFromDrawable != null ? finalBitmapFromDrawable.getBitmap() : null,
+                        bitmapFromDrawable,
                         customResourceIdCacheKey,
                         new ResolveResourceCallback() {
                             @Override

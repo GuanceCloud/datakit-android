@@ -9,7 +9,6 @@ public class NoopDataQueueHandler implements DataQueueHandler {
     @Override
     public ResourceRecordedDataQueueItem addResourceItem(
         String identifier,
-        String applicationId,
         byte[] resourceData
     ) {
         return null; // Return null as a no-operation implementation

@@ -49,7 +49,7 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
 
     @Override
     @MainThread
-    public ResourceRecordedDataQueueItem addResourceItem(String identifier, String applicationId, byte[] resourceData) {
+    public ResourceRecordedDataQueueItem addResourceItem(String identifier, byte[] resourceData) {
         RecordedQueuedItemContext rumContextData = rumContextDataHandler.createRumContextData();
         if (rumContextData == null) {
             return null;
@@ -58,7 +58,6 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
         ResourceRecordedDataQueueItem item = new ResourceRecordedDataQueueItem(
                 rumContextData,
                 identifier,
-                applicationId,
                 resourceData
         );
 
@@ -122,9 +121,11 @@ public class RecordedDataQueueHandler implements DataQueueHandler {
                     internalLogger.e(TAG, String.format(ITEM_DROPPED_INVALID_MESSAGE, nextItem.getClass().getSimpleName()));
                     recordedDataQueue.poll();
                 } else if (nextItemAgeInNs > MAX_DELAY_NS) {
+//                    internalLogger.e(TAG, "getCreationTimeStampInNs drop:"+nextItem.getCreationTimeStampInNs());
                     internalLogger.e(TAG, String.format(Locale.US, ITEM_DROPPED_EXPIRED_MESSAGE, nextItemAgeInNs));
                     recordedDataQueue.poll();
                 } else if (nextItem.isReady()) {
+//                    internalLogger.i(TAG, "getCreationTimeStampInNs finish:"+nextItem.getCreationTimeStampInNs()+","+nextItemAgeInNs);
                     processItem(recordedDataQueue.poll());
                 } else {
                     break;

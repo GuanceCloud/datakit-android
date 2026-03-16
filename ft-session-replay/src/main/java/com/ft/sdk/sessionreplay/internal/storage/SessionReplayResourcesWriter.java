@@ -23,7 +23,7 @@ public class SessionReplayResourcesWriter implements ResourcesWriter {
                     @Override
                     public void onConsume(SessionReplayContext context, EventBatchWriter eventBatchWriter) {
                         synchronized (this) {
-                            byte[] serializedMetadata = enrichedResource.asBinaryMetadata();
+                            byte[] serializedMetadata = enrichedResource.asBinaryMetadata(context.getAppId());
                             eventBatchWriter.write(
                                     new RawBatchEvent(enrichedResource.getResource(), serializedMetadata),
                                     null,

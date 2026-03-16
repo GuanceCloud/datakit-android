@@ -13,12 +13,10 @@ import java.util.Objects;
 
 public class EnrichedResource {
     private final byte[] resource;
-    private final String applicationId;
     private final String filename;
 
-    public EnrichedResource(byte[] resource, String applicationId, String filename) {
+    public EnrichedResource(byte[] resource, String filename) {
         this.resource = resource;
-        this.applicationId = applicationId;
         this.filename = filename;
     }
 
@@ -26,9 +24,6 @@ public class EnrichedResource {
         return resource;
     }
 
-    public String getApplicationId() {
-        return applicationId;
-    }
 
     public String getFilename() {
         return filename;
@@ -39,15 +34,13 @@ public class EnrichedResource {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EnrichedResource that = (EnrichedResource) o;
-        return Arrays.equals(resource, that.resource) &&
-               Objects.equals(applicationId, that.applicationId) &&
+        return Arrays.equals(resource, that.resource)  &&
                Objects.equals(filename, that.filename);
     }
 
     @Override
     public int hashCode() {
         int result = Arrays.hashCode(resource);
-        result = 31 * result + Objects.hashCode(applicationId);
         result = 31 * result + Objects.hashCode(filename);
         return result;
     }
@@ -85,7 +78,7 @@ public class EnrichedResource {
         return null;
     }
 
-    public byte[] asBinaryMetadata() {
+    public byte[] asBinaryMetadata(String applicationId) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty(APPLICATION_ID_KEY, applicationId);
         jsonObject.addProperty(FILENAME_KEY, filename);

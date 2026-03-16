@@ -79,7 +79,6 @@ public class RecordedDataProcessor implements Processor {
 
             EnrichedResource enrichedResource = new EnrichedResource(
                     item.getResourceData(),
-                    item.getApplicationId(),
                     resourceHash
             );
             resourcesWriter.write(enrichedResource);

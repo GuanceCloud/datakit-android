@@ -8,7 +8,6 @@ import java.util.List;
 public interface DataQueueHandler {
     ResourceRecordedDataQueueItem addResourceItem(
         String identifier,
-        String applicationId,
         byte[] resourceData
     );
 

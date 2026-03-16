@@ -10,7 +10,6 @@ import java.util.Set;
 
 public class ResourceItemCreationHandler {
     private final DataQueueHandler recordedDataQueueHandler;
-    private final String applicationId;
 
     // resource IDs previously sent in this session -
     // optimization to avoid sending the same resource multiple times
@@ -18,15 +17,14 @@ public class ResourceItemCreationHandler {
     @VisibleForTesting
     final Set<String> resourceIdsSeen = Collections.synchronizedSet(new HashSet<>());
 
-    public ResourceItemCreationHandler(DataQueueHandler recordedDataQueueHandler, String applicationId) {
+    public ResourceItemCreationHandler(DataQueueHandler recordedDataQueueHandler) {
         this.recordedDataQueueHandler = recordedDataQueueHandler;
-        this.applicationId = applicationId;
     }
 
     public void queueItem(String resourceId, byte[] resourceData) {
         if (!resourceIdsSeen.contains(resourceId)) {
             resourceIdsSeen.add(resourceId);
-            recordedDataQueueHandler.addResourceItem(resourceId, applicationId, resourceData);
+            recordedDataQueueHandler.addResourceItem(resourceId, resourceData);
         }
     }
 }

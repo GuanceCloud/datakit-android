@@ -132,8 +132,6 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
                 enableRUMKeysLink, slotIdWebviewBinder
         );
 
-        String applicationId = rumContextProvider.getRumContext().getApplicationId();
-
         this.recordedDataQueueHandler = new RecordedDataQueueHandler(
                 processor,
                 rumContextDataHandler,
@@ -179,8 +177,7 @@ public class SessionReplayRecorder implements OnWindowRefreshedCallback, Recorde
                 new WebPImageCompression(internalLogger),
                 internalLogger,
                 new MD5HashGenerator(internalLogger),
-                recordedDataQueueHandler,
-                applicationId
+                recordedDataQueueHandler
 
         );
         customOptionSelectorDetectors.add(new DefaultOptionSelectorDetector());

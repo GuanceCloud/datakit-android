@@ -106,7 +106,7 @@ public class DrawableUtils {
         } else {
             // Erase the canvas
             // Needed because overdrawing an already used bitmap causes unusual visual artifacts
-            canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.MULTIPLY);
+            canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
 
             drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
             try {

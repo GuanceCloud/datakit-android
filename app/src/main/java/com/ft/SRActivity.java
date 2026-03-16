@@ -19,6 +19,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatCheckedTextView;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -83,6 +85,26 @@ public class SRActivity extends NameTitleActivity {
         ListView list = findViewById(R.id.session_replay_list);
 
         // Create list data
+        SimpleAdapter adapter = getSimpleAdapter();
+
+        list.setAdapter(adapter);
+
+        // Load remote image for standalone ImageView
+        ImageView remoteImageView = findViewById(R.id.remote_image_view);
+        loadImageFromUrl(remoteImageView, "https://picsum.photos/seed/standalone/200/200");
+
+        // Set large image gallery button click event
+        findViewById(R.id.session_replay_image_gallery_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(SRActivity.this, LargeImageTestActivity.class));
+            }
+        });
+
+    }
+
+    @NotNull
+    private SimpleAdapter getSimpleAdapter() {
         ArrayList<HashMap<String, Object>> arrayList = new ArrayList<>();
 
         // Add test items for bitmap recycled/immutable scenario
@@ -109,11 +131,16 @@ public class SRActivity extends NameTitleActivity {
             HashMap<String, Object> map = new HashMap<>();
             map.put("userName", "name " + i);
             // Use fixed seed image URL
-            map.put("userImage", "https://picsum.photos/seed/listitem1" + i + "/200/200");
+            map.put("userImage", "https://picsum.photos/seed/listitem5" + i + "/200/200");
             arrayList.add(map);
         }
 
         // Set adapter data mapping
+        return getSimpleAdapter(arrayList);
+    }
+
+    @NotNull
+    private SimpleAdapter getSimpleAdapter(ArrayList<HashMap<String, Object>> arrayList) {
         String[] fromArray = {"userName", "userImage"};
         int[] to = {R.id.list_simple_item_tv, R.id.list_simple_item_iv};
         SimpleAdapter adapter = new SimpleAdapter(this, arrayList, R.layout.list_simple_item, fromArray, to);
@@ -130,13 +157,7 @@ public class SRActivity extends NameTitleActivity {
                 return false;
             }
         });
-
-        list.setAdapter(adapter);
-
-        // Load remote image for standalone ImageView
-        ImageView remoteImageView = findViewById(R.id.remote_image_view);
-        loadImageFromUrl(remoteImageView, "https://picsum.photos/seed/standalone/200/200");
-
+        return adapter;
     }
 
     @Override
