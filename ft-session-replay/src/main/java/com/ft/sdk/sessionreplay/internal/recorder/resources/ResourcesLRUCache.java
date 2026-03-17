@@ -8,9 +8,6 @@ import android.graphics.drawable.DrawableContainer;
 import android.graphics.drawable.LayerDrawable;
 import android.util.LruCache;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.VisibleForTesting;
-
 import com.ft.sdk.sessionreplay.internal.utils.InvocationUtils;
 import com.ft.sdk.sessionreplay.utils.CacheUtils;
 

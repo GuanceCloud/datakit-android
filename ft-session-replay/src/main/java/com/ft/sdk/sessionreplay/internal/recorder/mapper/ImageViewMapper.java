@@ -74,34 +74,30 @@ public class ImageViewMapper extends BaseAsyncBackgroundWireframeMapper<ImageVie
         long contentYPosInDp = Utils.densityNormalized(contentRect.top, density);
         int contentWidthPx = contentRect.width();
         int contentHeightPx = contentRect.height();
-        Drawable.ConstantState constantState = drawable.getConstantState();
-        Drawable contentDrawable = constantState != null ? constantState.newDrawable(resources) : null;
 
-        if (contentDrawable != null) {
-            // Resolve foreground wireframe
-            Wireframe imageWireframe = mappingContext.getImageWireframeHelper().createImageWireframeByDrawable(
-                    view,
-                    mappingContext.getImagePrivacy(),
-                    wireframes.size(),
-                    contentXPosInDp,
-                    contentYPosInDp,
-                    contentWidthPx,
-                    contentHeightPx,
-                    true,
-                    contentDrawable,
-                    drawableCopier,
-                    asyncJobStatusCallback,
-                    clipping,
-                    null,
-                    null,
-                    DRAWABLE_CHILD_NAME,
-                    null
+        // Resolve foreground wireframe
+        Wireframe imageWireframe = mappingContext.getImageWireframeHelper().createImageWireframeByDrawable(
+                view,
+                mappingContext.getImagePrivacy(),
+                wireframes.size(),
+                contentXPosInDp,
+                contentYPosInDp,
+                contentWidthPx,
+                contentHeightPx,
+                true,
+                drawable,
+                drawableCopier,
+                asyncJobStatusCallback,
+                clipping,
+                null,
+                null,
+                DRAWABLE_CHILD_NAME,
+                null
 
 
-            );
-            if (imageWireframe != null) {
-                wireframes.add(imageWireframe);
-            }
+        );
+        if (imageWireframe != null) {
+            wireframes.add(imageWireframe);
         }
 
         return wireframes;
