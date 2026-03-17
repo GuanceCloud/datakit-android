@@ -106,15 +106,9 @@ public abstract class BaseAsyncBackgroundWireframeMapper<T extends View> extends
             MappingContext mappingContext,
             AsyncJobStatusCallback asyncJobStatusCallback
     ) {
-        if (view.getBackground() == null || view.getBackground().getConstantState() == null) {
+        if (view.getBackground() == null) {
             return null;
         }
-
-        Drawable drawableCopy = view.getBackground().getConstantState().newDrawable(view.getResources());
-        if (drawableCopy == null) {
-            return null;
-        }
-
         return mappingContext.getImageWireframeHelper().createImageWireframeByDrawable(
                 view,
                 mappingContext.getImagePrivacy(),
