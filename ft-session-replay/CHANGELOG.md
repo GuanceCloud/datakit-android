@@ -1,4 +1,9 @@
-# replay 0.1.3-alpha13
+# replay 0.1.3-alpha15
+1. Fix an issue where replay recording times out when there are many images due to 
+   local icon cache misses.
+
+---
+# replay 0.1.3-alpha14
 1. ft-sdk:>= 1.7.0-alpha40
 2. Added image resource upload logic for Session Replay.
 
