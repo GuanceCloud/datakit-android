@@ -1,3 +1,7 @@
+# plugin 1.3.7-alpha02
+1. Fix an issue where native .so files cannot be generated in the new Android environment.
+
+---
 # plugin 1.3.7-alpha01
 1. Added wildcard support for ignorePackages
 
