@@ -7,6 +7,7 @@
  by TraceType (`DDTRACE`, `ZIPKIN_MULTI_HEADER`, `ZIPKIN_SINGLE_HEADER`, `TRACEPARENT`, `JAEGER`, `SKYWALKING`). 
  Use `new TraceContext.Simple(headers, traceId, spanId)` for custom traceId/spanId.
 3. Removed redundant remote condition callbacks.
+4. Support dynamic update of transmission endpoint
 
 ---
 # agent 1.6.17-alpha01
