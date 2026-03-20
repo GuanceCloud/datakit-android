@@ -119,6 +119,7 @@ public class FTExtension {
                 ", env='" + env + '\'' +
                 ", asmVersion='" + asmVersion + '\'' +
                 ", generateSourceMapOnly='" + generateSourceMapOnly + '\'' +
+                ", nativeLibPath='" + nativeLibPath + '\'' +
                 ", ignorePackages=" + ignorePackages +
                 ", knownWebViewClasses=" + knownWebViewClasses +
                 '}';
