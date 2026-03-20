@@ -234,24 +234,26 @@ public class FTRemoteConfigManager {
                                 String json = data.getMessage();
                                 if (!Utils.isNullOrEmpty(json)) {
                                     String md5 = Utils.toMD5(json);
-                                    if (mRemoteConfig != null && md5.equals(mRemoteConfig.getMd5())) {
-                                        LogUtils.d(TAG, "remote config no change");
-                                        requestResult = true;
-                                    } else {
-                                        String saveJson = json.replaceAll("R\\.[^.]+\\.", "");
-                                        LogUtils.d(TAG, "remote config:" + saveJson);
-                                        RemoteConfigBean configBean = RemoteConfigBean.buildFromConfigJson(saveJson, md5);
-                                        LogUtils.d(TAG, "RemoteConfigBean config:" + configBean);
-                                        if (configBean.isValid()) {
-                                            mRemoteConfig.setRemoteConfigChanged(false);
-                                            // Allow FetchResult to override configBean settings
-                                            RemoteConfigBean finalConfigBean = applyFetchResultOverride(configBean, result,
-                                                    true);
-                                            saveRemoteConfigToLocCache(finalConfigBean.toJsonString());
-                                            // Apply the final config
-                                            notifyHotUpdate(finalConfigBean);
-                                            mRemoteConfig = finalConfigBean;
+                                    if(mRemoteConfig != null ){
+                                        if (md5.equals(mRemoteConfig.getMd5())) {
+                                            LogUtils.d(TAG, "remote config no change");
                                             requestResult = true;
+                                        } else {
+                                            String saveJson = json.replaceAll("R\\.[^.]+\\.", "");
+                                            LogUtils.d(TAG, "remote config:" + saveJson);
+                                            RemoteConfigBean configBean = RemoteConfigBean.buildFromConfigJson(saveJson, md5);
+                                            LogUtils.d(TAG, "RemoteConfigBean config:" + configBean);
+                                            if (configBean.isValid()) {
+                                                mRemoteConfig.setRemoteConfigChanged(false);
+                                                // Allow FetchResult to override configBean settings
+                                                RemoteConfigBean finalConfigBean = applyFetchResultOverride(configBean, result,
+                                                        true);
+                                                saveRemoteConfigToLocCache(finalConfigBean.toJsonString());
+                                                // Apply the final config
+                                                notifyHotUpdate(finalConfigBean);
+                                                mRemoteConfig = finalConfigBean;
+                                                requestResult = true;
+                                            }
                                         }
                                     }
                                     saveLastFetchDateline(lastUpdateTime);
