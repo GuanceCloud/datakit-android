@@ -128,13 +128,14 @@ apply plugin: 'ft-plugin'
 FTExt {
     showLog = true
     knownWebViewClasses =['com.ft.webview.CustomWebView']
-    autoUploadMap = false
-    autoUploadNativeDebugSymbol = false
+    autoUploadMap = true
+    autoUploadNativeDebugSymbol = true
+    generateSourceMapOnly = true
 //    ignorePackages=['com.ft.*']
-    datakitUrl = ft_env.datakitRUMUrl
-    datawayToken = ft_env.datawayToken
-    appId = ft_env.rumAppid
-    env = 'common'
+//    datakitUrl = ft_env.datakitRUMUrl
+//    datawayToken = ft_env.datawayToken
+//    appId = ft_env.rumAppid
+//    env = 'common'
     //   generateSourceMapOnly = true
 //    ignorePackages=['com.ft.http']
 
