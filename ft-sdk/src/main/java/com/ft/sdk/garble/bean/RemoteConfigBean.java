@@ -474,14 +474,6 @@ public class RemoteConfigBean {
         this.logEnableConsoleLog = logEnableConsoleLog;
     }
 
-    public void setRemoteConfigChanged(boolean remoteConfigChanged) {
-        this.remoteConfigChanged = remoteConfigChanged;
-    }
-
-    public boolean isRemoteConfigChanged() {
-        return remoteConfigChanged;
-    }
-
     public boolean isValid() {
         return isValid;
     }
