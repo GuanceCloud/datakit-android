@@ -1,3 +1,7 @@
+# agent 1.6.17-alpha03
+1. fix remote config fetch result handling
+
+---
 # agent 1.6.17-alpha02
 1. Added `TraceContext` and `TraceContext.Simple` for custom trace header handling. 
   Override `HeaderHandler.getTraceContext(Request)` to provide headers, 
