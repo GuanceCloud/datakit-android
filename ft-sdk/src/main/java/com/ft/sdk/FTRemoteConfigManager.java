@@ -74,8 +74,7 @@ public class FTRemoteConfigManager {
     private void saveLastFetchDateline(long fetchDateLine) {
         SharedPreferences sp = Utils.getSharedPreferences(FTApplication.getApplication());
         sp.edit().putLong(Constants.FT_REMOTE_CONFIG_FETCH_TIME, fetchDateLine).apply();
-
-        lastUpdateTime = getCurrentTimeLineInSeconds();
+        lastUpdateTime = fetchDateLine;
     }
 
     void mergeSDKConfigFromCache(FTSDKConfig config) {
@@ -212,7 +211,7 @@ public class FTRemoteConfigManager {
     void updateRemoteConfig(int remoteConfigMiniUpdateInterval, FetchResult result) {
         if (!running.get()) {
             if (Utils.isNullOrEmpty(appId)) {
-                applyFetchResultOverride(null, result, false);
+                notifyFetchResult(result, false);
                 return;
             }
             long elapsedTime = getCurrentTimeLineInSeconds() - lastUpdateTime;
@@ -234,29 +233,27 @@ public class FTRemoteConfigManager {
                                 String json = data.getMessage();
                                 if (!Utils.isNullOrEmpty(json)) {
                                     String md5 = Utils.toMD5(json);
-                                    if(mRemoteConfig != null ){
-                                        if (md5.equals(mRemoteConfig.getMd5())) {
-                                            LogUtils.d(TAG, "remote config no change");
+                                    if (mRemoteConfig != null && md5.equals(mRemoteConfig.getMd5())) {
+                                        LogUtils.d(TAG, "remote config no change");
+                                        requestResult = true;
+                                        notifyFetchResult(result, true);
+                                    } else {
+                                        String saveJson = json.replaceAll("R\\.[^.]+\\.", "");
+                                        LogUtils.d(TAG, "remote config:" + saveJson);
+                                        RemoteConfigBean configBean = RemoteConfigBean.buildFromConfigJson(saveJson, md5);
+                                        LogUtils.d(TAG, "RemoteConfigBean config:" + configBean);
+                                        if (configBean.isValid()) {
+                                            // Allow FetchResult to override configBean settings
+                                            RemoteConfigBean finalConfigBean = applyFetchResultOverride(configBean, result);
+                                            saveRemoteConfigToLocCache(finalConfigBean.toJsonString());
+                                            // Apply the final config
+                                            notifyHotUpdate(finalConfigBean);
+                                            mRemoteConfig = finalConfigBean;
                                             requestResult = true;
-                                        } else {
-                                            String saveJson = json.replaceAll("R\\.[^.]+\\.", "");
-                                            LogUtils.d(TAG, "remote config:" + saveJson);
-                                            RemoteConfigBean configBean = RemoteConfigBean.buildFromConfigJson(saveJson, md5);
-                                            LogUtils.d(TAG, "RemoteConfigBean config:" + configBean);
-                                            if (configBean.isValid()) {
-                                                mRemoteConfig.setRemoteConfigChanged(false);
-                                                // Allow FetchResult to override configBean settings
-                                                RemoteConfigBean finalConfigBean = applyFetchResultOverride(configBean, result,
-                                                        true);
-                                                saveRemoteConfigToLocCache(finalConfigBean.toJsonString());
-                                                // Apply the final config
-                                                notifyHotUpdate(finalConfigBean);
-                                                mRemoteConfig = finalConfigBean;
-                                                requestResult = true;
-                                            }
+                                            notifyFetchResult(result, true);
                                         }
                                     }
-                                    saveLastFetchDateline(lastUpdateTime);
+                                    saveLastFetchDateline(getCurrentTimeLineInSeconds());
                                     running.set(false);
                                 }
 
@@ -264,11 +261,11 @@ public class FTRemoteConfigManager {
                                 LogUtils.w(TAG, data.getMessage());
                             }
                             if (!requestResult) {
-                                applyFetchResultOverride(null, result, false
-                                );
+                                notifyFetchResult(result, false);
                             }
                         } catch (Exception e) {
                             LogUtils.e(TAG, "remote config load error:" + LogUtils.getStackTraceString(e));
+                            notifyFetchResult(result, false);
                         } finally {
                             running.set(false);
                         }
@@ -291,27 +288,31 @@ public class FTRemoteConfigManager {
      * @param fetchResult FetchResult callback (can be null)
      * @return Modified RemoteConfigBean or original if no override
      */
-    private RemoteConfigBean applyFetchResultOverride(RemoteConfigBean configBean, FetchResult fetchResult,
-                                                      boolean requestResult) {
+    private RemoteConfigBean applyFetchResultOverride(RemoteConfigBean configBean, FetchResult fetchResult) {
         RemoteConfigBean finalConfig = configBean;
 
         if (fetchResult == null) {
             fetchResult = mFetchResult;
         }
 
-        // First apply the passed-in FetchResult (if any)
         if (fetchResult != null) {
-            fetchResult.onResult(requestResult);
-            if (requestResult) {
-                RemoteConfigBean overridden = fetchResult.onConfigSuccessFetched(configBean,
-                        configBean == null ? null : configBean.getContentJsonString());
-                if (overridden != null) {
-                    finalConfig = overridden;
-                    LogUtils.d(TAG, "FetchResult override applied from passed-in callback:" + finalConfig);
-                }
+            RemoteConfigBean overridden = fetchResult.onConfigSuccessFetched(configBean,
+                    configBean == null ? null : configBean.getContentJsonString());
+            if (overridden != null) {
+                finalConfig = overridden;
+                LogUtils.d(TAG, "FetchResult override applied from passed-in callback:" + finalConfig);
             }
         }
         return finalConfig;
+    }
+
+    private void notifyFetchResult(FetchResult fetchResult, boolean requestResult) {
+        if (fetchResult == null) {
+            fetchResult = mFetchResult;
+        }
+        if (fetchResult != null) {
+            fetchResult.onResult(requestResult);
+        }
     }
 
     private long getCurrentTimeLineInSeconds() {
@@ -385,7 +386,7 @@ public class FTRemoteConfigManager {
                 rumConfig.setSamplingRate(bean.getRumSampleRate());
             }
             if (bean.getRumSessionOnErrorSampleRate() != null) {
-                rumConfig.setSessionErrorSampleRate(bean.getSessionReplaySampleRate());
+                rumConfig.setSessionErrorSampleRate(bean.getSessionReplayOnErrorSampleRate());
             }
 
             FTRUMInnerManager.get().hotUpdate(bean.getRumSampleRate(), bean.getRumSessionOnErrorSampleRate());
