@@ -1,3 +1,7 @@
+# agent 1.6.17-beta01
+1. Same as 1.6.17-alpha03
+
+---
 # agent 1.6.17-alpha03
 1. fix remote config fetch result handling
 
