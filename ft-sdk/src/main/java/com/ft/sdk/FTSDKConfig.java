@@ -239,7 +239,10 @@ public class FTSDKConfig {
     private Object authenticator;
 
     /**
-     * Build necessary SDK configuration parameters (no URL required initially)
+     * Build necessary SDK configuration parameters without an initial upload URL.
+     * In this mode, the SDK can collect data first, but it will not upload until
+     * {@link FTSdk#setDatakitUrl(String)} or {@link FTSdk#setDatawayUrl(String, String)}
+     * is called later to provide a valid endpoint.
      *
      * @return {@link FTRUMConfig} SDK configuration
      */
