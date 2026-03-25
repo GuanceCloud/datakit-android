@@ -9,6 +9,7 @@ import com.ft.sdk.EnvType;
 import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTRUMConfigManager;
+import com.ft.sdk.FTRemoteConfigManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTUIBlockManager;
@@ -22,6 +23,9 @@ import com.ft.test.base.FTBaseTest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.powermock.reflect.Whitebox;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Configuration parameter debugging, to avoid low-level code errors causing configuration bugs
@@ -210,6 +214,65 @@ public class ConfigTest extends FTBaseTest {
         Assert.assertEquals(TEST_FAKE_CLIENT_TOKEN, FTHttpConfigManager.get().getClientToken());
     }
 
+    /**
+     * Validate dynamically switching to Datakit clears Dataway related configuration
+     */
+    @Test
+    public void setDatakitUrl() {
+        FTSdk.install(getDatawaytConfig());
+        String datakitUrl = TEST_FAKE_URL;
+
+        FTSdk.setDatakitUrl(datakitUrl);
+
+        Assert.assertEquals(datakitUrl, FTHttpConfigManager.get().getDatakitUrl());
+        Assert.assertEquals("", FTHttpConfigManager.get().getDatawayUrl());
+        Assert.assertEquals("", FTHttpConfigManager.get().getClientToken());
+    }
+
+    /**
+     * Validate dynamically switching to Dataway clears Datakit related configuration
+     */
+    @Test
+    public void setDatawayUrl() {
+        FTSdk.install(getDatakitConfig());
+        String datawayUrl = TEST_FAKE_URL;
+        String clientToken = TEST_FAKE_CLIENT_TOKEN;
+
+        FTSdk.setDatawayUrl(datawayUrl, clientToken);
+
+        Assert.assertEquals("", FTHttpConfigManager.get().getDatakitUrl());
+        Assert.assertEquals(datawayUrl, FTHttpConfigManager.get().getDatawayUrl());
+        Assert.assertEquals(clientToken, FTHttpConfigManager.get().getClientToken());
+    }
+
+    /**
+     * Validate dynamically setting Datakit URL triggers pending remote config initialization
+     */
+    @Test
+    public void setDatakitUrlTriggerPendingRemoteConfigInit() {
+        FTSdk.install(getDatakitConfig());
+        FTRemoteConfigManager remoteConfigManager = bindPendingRemoteConfig(TEST_PENDING_RUM_APP_ID);
+
+        FTSdk.setDatakitUrl(TEST_FAKE_URL);
+
+        Assert.assertEquals(TEST_PENDING_RUM_APP_ID, Whitebox.getInternalState(remoteConfigManager, "appId"));
+        Assert.assertNull(getPendingRemoteConfigAppId());
+    }
+
+    /**
+     * Validate dynamically setting Dataway URL triggers pending remote config initialization
+     */
+    @Test
+    public void setDatawayUrlTriggerPendingRemoteConfigInit() {
+        FTSdk.install(getDatakitConfig());
+        FTRemoteConfigManager remoteConfigManager = bindPendingRemoteConfig(TEST_PENDING_RUM_APP_ID);
+
+        FTSdk.setDatawayUrl(TEST_FAKE_URL, TEST_FAKE_CLIENT_TOKEN);
+
+        Assert.assertEquals(TEST_PENDING_RUM_APP_ID, Whitebox.getInternalState(remoteConfigManager, "appId"));
+        Assert.assertNull(getPendingRemoteConfigAppId());
+    }
+
 
     /**
      * Validate serviceName
@@ -247,6 +310,14 @@ public class ConfigTest extends FTBaseTest {
                 .setEnv(env);
         FTSdk.install(ftSDKConfig);
         Assert.assertEquals(expected, FTSdk.get().getBaseConfig().getEnv());
+    }
+
+    private FTRemoteConfigManager bindPendingRemoteConfig(String appId) {
+        FTRemoteConfigManager remoteConfigManager = new FTRemoteConfigManager(0, null);
+        Whitebox.setInternalState(remoteConfigManager, "running", new AtomicBoolean(true));
+        Whitebox.setInternalState(FTSdk.get(), "mRemoteConfigManager", remoteConfigManager);
+        Whitebox.setInternalState(FTSdk.get(), "pendingRemoteConfigAppId", appId);
+        return remoteConfigManager;
     }
 
 

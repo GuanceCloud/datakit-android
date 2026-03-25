@@ -445,20 +445,20 @@ public class Constants {
     /**
      * Release version information set
      */
-    public static final String KEY_RUM_SDK_PACKAGE_INFO = "sdk_pkg_info";
+    public static final String KEY_SDK_PACKAGE_INFO = "sdk_pkg_info";
     /**
      * ft-sdk module release version
      */
-    public static final String KEY_RUM_SDK_PACKAGE_AGENT = "agent";
+    public static final String KEY_SDK_PACKAGE_AGENT = "agent";
     /**
      * ft-plugin module release version
      */
-    public static final String KEY_RUM_SDK_PACKAGE_TRACK = "track";
+    public static final String KEY_SDK_PACKAGE_TRACK = "track";
 
     /**
      * ft-native module release version
      */
-    public static final String KEY_RUM_SDK_PACKAGE_NATIVE = "native";
+    public static final String KEY_SDK_PACKAGE_NATIVE = "native";
 
     /**
      * Web view uses web sdk release version
@@ -479,7 +479,7 @@ public class Constants {
     public static final String KEY_RUM_SDK_VIEW_UPDATE_TIME = "view_update_time";
 
     /**
-     * SDK version number, here is agent version {@link #KEY_RUM_SDK_PACKAGE_AGENT}
+     * SDK version number, here is agent version {@link #KEY_SDK_PACKAGE_AGENT}
      */
     public static final String KEY_SDK_VERSION = "sdk_version";
 

@@ -15,6 +15,7 @@ import com.ft.sdk.FTTraceConfig;
 import com.ft.sdk.FTTraceInterceptor;
 import com.ft.sdk.FTTraceManager;
 import com.ft.sdk.RUMCacheDiscard;
+import com.ft.sdk.TraceContext;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.ActionBean;
 import com.ft.sdk.garble.bean.AppState;
@@ -712,37 +713,20 @@ public class RUMTest extends FTBaseTest {
 
         OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(new FTTraceInterceptor(new FTTraceInterceptor.HeaderHandler() {
-                    private String[] splits;
-
                     @Override
-                    public HashMap<String, String> getTraceHeader(Request request) {
+                    public TraceContext getTraceContext(Request request) {
                         HashMap<String, String> map = new HashMap<>();
-                        String replaceTrace = request.header(CUSTOM_TRACE_HEADER);//Get request
-                        String headerString = FTTraceManager.get().
-                                getTraceHeader(request.url().toString())
-                                .get(W3C_TRACEPARENT_KEY); //get trace header string
+                        String replaceTrace = request.header(CUSTOM_TRACE_HEADER);
+                        String headerString = FTTraceManager.get()
+                                .getTraceHeader(request.url().toString())
+                                .get(W3C_TRACEPARENT_KEY);
 
-                        splits = headerString.split("-");
+                        String[] splits = headerString.split("-");
                         String originTraceId = splits[1];
-                        splits[1] = replaceTrace;
-                        map.put(W3C_TRACEPARENT_KEY, headerString.replace(originTraceId, replaceTrace));
-                        return map;
-                    }
+                        String modifiedHeader = headerString.replace(originTraceId, replaceTrace);
+                        map.put(W3C_TRACEPARENT_KEY, modifiedHeader);
 
-                    @Override
-                    public String getSpanID() {
-                        if (splits != null) {
-                            return splits[2];
-                        }
-                        return null;
-                    }
-
-                    @Override
-                    public String getTraceID() {
-                        if (splits != null) {
-                            return splits[1];
-                        }
-                        return null;
+                        return new TraceContext.Simple(map, replaceTrace, splits[2]);
                     }
                 }))
                 .addInterceptor(new FTResourceInterceptor())

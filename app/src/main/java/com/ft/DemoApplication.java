@@ -11,7 +11,10 @@ import com.ft.sdk.FTRemoteConfigManager;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
 import com.ft.sdk.FTTraceConfig;
+import com.ft.sdk.FTTraceInterceptor;
+import com.ft.sdk.FTTraceManager;
 import com.ft.sdk.LogCacheDiscard;
+import com.ft.sdk.TraceContext;
 import com.ft.sdk.RUMCacheDiscard;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.RemoteConfigBean;
@@ -28,6 +31,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 
 /**
  * BY huangDianHua
@@ -213,6 +217,15 @@ public class DemoApplication extends BaseApplication {
                 .setSamplingRate(1f)
                 .setEnableAutoTrace(true)
                 .setEnableLinkRUMData(true)
+                // Adapts to configured TraceType. For custom traceId/spanId use new TraceContext.Simple(headers, traceId, spanId)
+                .setOkHttpTraceHeaderHandler(new FTTraceInterceptor.HeaderHandler() {
+                    @Override
+                    public TraceContext getTraceContext(Request request) {
+                        HashMap<String, String> headers = FTTraceManager.get()
+                                .getTraceHeader(request.url().toString());
+                        return TraceContext.Simple.fromTraceType(headers);
+                    }
+                })
                 .setTraceType(TraceType.DDTRACE));
 
 

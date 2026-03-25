@@ -49,6 +49,7 @@ public class FTSdk {
     private static FTSdk mFtSdk;
     private final FTSDKConfig mFtSDKConfig;
     private FTRemoteConfigManager mRemoteConfigManager;
+    private String pendingRemoteConfigAppId;
 
     /**
      * @param ftSDKConfig
@@ -218,7 +219,12 @@ public class FTSdk {
             config.setServiceName(get().getBaseConfig().getServiceName());
             if (get().mRemoteConfigManager != null) {
                 get().mRemoteConfigManager.mergeRUMConfigFromCache(config);
-                get().mRemoteConfigManager.initFromRemote(config.getRumAppId());
+                if (FTHttpConfigManager.get().isUrlAvailable()) {
+                    get().mRemoteConfigManager.initFromRemote(config.getRumAppId());
+                } else {
+                    get().pendingRemoteConfigAppId = config.getRumAppId();
+                    LogUtils.d(TAG, "URL not available, will init remote config later");
+                }
             }
             FTRUMConfigManager.get().initWithConfig(config);
             LogUtils.d(TAG, "initRUMWithConfig complete:" + config);
@@ -335,22 +341,22 @@ public class FTSdk {
         String uuid = config.isEnableAccessAndroidID() ? DeviceUtils.getUuid(FTApplication.getApplication())
                 : LocalUUIDManager.get().getRandomUUID();
         hashMap.put(Constants.KEY_DEVICE_UUID, uuid);
-        HashMap<String, String> pkgInfo = getStringStringHashMap();
+        HashMap<String, String> pkgInfo = getInnerPkgInfoHashMap();
         if (!pkgInfo.isEmpty()) {
             pkgInfo.putAll(config.getPkgInfo());
         }
-        hashMap.put(Constants.KEY_RUM_SDK_PACKAGE_INFO, Utils.hashMapObjectToJson(pkgInfo));
+        hashMap.put(Constants.KEY_SDK_PACKAGE_INFO, Utils.hashMapObjectToJson(pkgInfo));
         hashMap.put(Constants.KEY_SDK_VERSION, FTSdk.AGENT_VERSION);
     }
 
-    private static HashMap<String, String> getStringStringHashMap() {
+    private static HashMap<String, String> getInnerPkgInfoHashMap() {
         HashMap<String, String> pkgInfo = new HashMap<>();
-        pkgInfo.put(Constants.KEY_RUM_SDK_PACKAGE_AGENT, FTSdk.AGENT_VERSION);
+        pkgInfo.put(Constants.KEY_SDK_PACKAGE_AGENT, FTSdk.AGENT_VERSION);
         if (!FTSdk.PLUGIN_VERSION.isEmpty()) {
-            pkgInfo.put(Constants.KEY_RUM_SDK_PACKAGE_TRACK, FTSdk.PLUGIN_VERSION);
+            pkgInfo.put(Constants.KEY_SDK_PACKAGE_TRACK, FTSdk.PLUGIN_VERSION);
         }
         if (!FTSdk.NATIVE_VERSION.isEmpty()) {
-            pkgInfo.put(Constants.KEY_RUM_SDK_PACKAGE_NATIVE, FTSdk.NATIVE_VERSION);
+            pkgInfo.put(Constants.KEY_SDK_PACKAGE_NATIVE, FTSdk.NATIVE_VERSION);
         }
         return pkgInfo;
     }
@@ -431,6 +437,45 @@ public class FTSdk {
     public static void flushSyncData() {
         if (checkInstallState()) {
             SyncTaskManager.get().executePoll();
+        }
+    }
+
+    /**
+     * Set datakit URL dynamically
+     * After setting, normal data upload will resume
+     *
+     * @param datakitUrl datakit upload address
+     */
+    public static void setDatakitUrl(@NonNull String datakitUrl) {
+        if (checkInstallState()) {
+            FTHttpConfigManager.get().setDatakitUrl(datakitUrl);
+            triggerPendingRemoteConfigInit();
+        }
+    }
+
+    /**
+     * Set dataway URL and client token dynamically
+     * After setting, normal data upload will resume
+     *
+     * @param datawayUrl  dataway upload address
+     * @param clientToken token
+     */
+    public static void setDatawayUrl(@NonNull String datawayUrl, @NonNull String clientToken) {
+        if (checkInstallState()) {
+            FTHttpConfigManager.get().setDatawayUrl(datawayUrl, clientToken);
+            triggerPendingRemoteConfigInit();
+        }
+    }
+
+
+    /**
+     * Trigger pending remote config initialization if any
+     */
+    private static void triggerPendingRemoteConfigInit() {
+        if (mFtSdk.mRemoteConfigManager != null && mFtSdk.pendingRemoteConfigAppId != null) {
+            LogUtils.d(TAG, "Triggering pending remote config init with appId: " + mFtSdk.pendingRemoteConfigAppId);
+            mFtSdk.mRemoteConfigManager.initFromRemote(mFtSdk.pendingRemoteConfigAppId);
+            mFtSdk.pendingRemoteConfigAppId = null;
         }
     }
 

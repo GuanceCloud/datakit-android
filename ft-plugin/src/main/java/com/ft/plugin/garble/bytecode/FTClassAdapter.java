@@ -159,13 +159,64 @@ public class FTClassAdapter extends ClassVisitor {
     }
 
     /**
-     * ignorePackages corresponds to the packages or class names to be ignored
+     * Check if the class should be ignored based on ignorePackages patterns.
+     * Supports Ant-style wildcard patterns:
+     * - * matches a single package level (no slashes)
+     * - ** matches zero or more package levels
      *
-     * @param className
-     * @return
+     * @param className the class name to check (using slash notation)
+     * @return true if the class should be ignored
      */
     private boolean isIgnorePackage(String className) {
-        return ignorePackages.contains(className);
+        for (String pattern : ignorePackages) {
+            if (pattern.contains("*")) {
+                String regex = escapeRegexAndConvertWildcard(pattern);
+                if (className.matches(regex)) {
+                    return true;
+                }
+            } else if (pattern.equals(className)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Convert Ant-style wildcard pattern to regex.
+     * - ** matches any characters (including slashes)
+     * - * matches any characters except slashes
+     *
+     * @param pattern the Ant-style pattern
+     * @return the regex pattern
+     */
+    private String escapeRegexAndConvertWildcard(String pattern) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < pattern.length(); i++) {
+            char c = pattern.charAt(i);
+            if (c == '*') {
+                if (i + 1 < pattern.length() && pattern.charAt(i + 1) == '*') {
+                    sb.append(".*");
+                    i++;
+                } else {
+                    sb.append("[^/]*");
+                }
+            } else if (isRegexMetaChar(c)) {
+                sb.append('\\').append(c);
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Check if a character is a regex meta character that needs escaping.
+     *
+     * @param c the character to check
+     * @return true if the character is a regex meta character
+     */
+    private boolean isRegexMetaChar(char c) {
+        return ".^$+?()[]{}|\\".indexOf(c) >= 0;
     }
 
 

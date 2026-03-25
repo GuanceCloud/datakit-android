@@ -218,6 +218,31 @@ public class LogUtils {
 
 
     /**
+     * Returns the caller method info for debug logging.
+     *
+     * @param skipFrames Number of stack frames to skip. 0 = direct caller of this method,
+     *                   1 = caller of the caller, and so on.
+     * @return "ClassName.methodName (fileName:lineNumber)" or "unknown"
+     */
+    public static String getCallerMethodInfo(int skipFrames) {
+        StackTraceElement[] stack = new Throwable().getStackTrace();
+        int index = 2 + skipFrames;
+        if (index >= stack.length) {
+            return "unknown";
+        }
+        StackTraceElement e = stack[index];
+        return e.getClassName() + "." + e.getMethodName()
+                + " (" + e.getFileName() + ":" + e.getLineNumber() + ")";
+    }
+
+    /**
+     * Returns the direct caller's method info. Equivalent to {@link #getCallerMethodInfo(int) getCallerMethodInfo(0)}.
+     */
+    public static String getCallerMethodInfo() {
+        return getCallerMethodInfo(0);
+    }
+
+    /**
      * {@link android.util.Log#getStackTraceString(Throwable)} Remove UnknownHostException exclusion logic
      *
      * @param tr

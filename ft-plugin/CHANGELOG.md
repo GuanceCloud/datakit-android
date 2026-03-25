@@ -1,3 +1,11 @@
+# plugin 1.3.7-alpha02
+1. Fix an issue where native .so files cannot be generated in the new Android environment.
+
+---
+# plugin 1.3.7-alpha01
+1. Added wildcard support for ignorePackages
+
+---
 # plugin 1.3.6
 1. UniApp Webview support
 2. Added `knownWebViewClasses` parameter to support ASM writes.
@@ -6,7 +14,7 @@
 5. Numeric boundary handling in FTMethodAdapter
 6. Added ignore configuration for custom WebView internal methods.
 
----
+--
 # plugin 1.3.6-alpha07
 1. UniApp Webview support
 
