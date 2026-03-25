@@ -13,7 +13,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Responsible for symbol file packaging and upload
@@ -25,6 +28,18 @@ public class FTMapUploader {
      * so build symbol generation path
      */
     private final static String MERGED_LIB_PATH = "build/intermediates/merged_native_libs";
+    /**
+     * AGP merged jni path (unstripped)
+     */
+    private final static String MERGED_JNI_LIB_PATH = "build/intermediates/merged_jni_libs";
+    /**
+     * AGP library jni path (unstripped)
+     */
+    private final static String LIBRARY_JNI_PATH = "build/intermediates/library_jni";
+    /**
+     * Stripped native library path, should never be used for symbol restoration
+     */
+    private final static String STRIPPED_LIB_PATH = "build/intermediates/stripped_native_libs";
 
     /**
      * Unity Symbol generation path
@@ -58,6 +73,7 @@ public class FTMapUploader {
     private final String proguardBuildPathFormat;
     private final FTExtension extension;
     private final HashMap<String, ProductFlavorModel> flavorModelHashMap = new HashMap<>();
+    private final HashMap<String, ArrayList<String>> nativeSymbolPathMap = new HashMap<>();
 
 
     public FTMapUploader(Project project, FTExtension extension) {
@@ -79,6 +95,7 @@ public class FTMapUploader {
                 return;
             }
         }
+        Logger.debug("configMapUpload extension=" + extension);
         AppExtension appExtension = (AppExtension) project.getProperties().get("android");
 
         appExtension.getApplicationVariants().all(applicationVariant -> {
@@ -87,6 +104,23 @@ public class FTMapUploader {
             String capVariantName = FTStringUtils.captitalizedString(variantName);
 
             String assembleTaskName = "assemble" + capVariantName;
+            String packageTaskName = "package" + capVariantName;
+            String bundleTaskName = "bundle" + capVariantName;
+            String mergeNativeLibsTaskName = "merge" + capVariantName + "NativeLibs";
+
+            Task collectNativeSymbolTask = project.getTasks().create("ft" + capVariantName + "CollectNativeSymbols", task -> {
+            }).doLast(task -> {
+                ProductFlavorModel model = getFlavorModelFromName(variantName);
+                Logger.debug("CollectNativeSymbols variant=" + variantName + ", model=" + model);
+                if (!model.isAutoUploadNativeDebugSymbol()) {
+                    return;
+                }
+                ArrayList<String> symbolPaths = new ArrayList<>();
+                appendSymbolPath(project, symbolPaths, variantName, model.getNativeLibPath());
+                nativeSymbolPathMap.put(variantName, symbolPaths);
+                Logger.debug("CollectNativeSymbols:" + variantName + ",symbolPaths=" + symbolPaths);
+            });
+
             Task zipTask = project.getTasks().create("ft" + capVariantName + "ZipSourceMap", task -> {
                     })
                     .doLast(task -> {
@@ -99,7 +133,12 @@ public class FTMapUploader {
 
                         ArrayList<String> symbolPaths = new ArrayList<>();
                         if (model.isAutoUploadNativeDebugSymbol()) {
-                            appendSymbolPath(project, symbolPaths, variantName, model.getNativeLibPath());
+                            ArrayList<String> cachedSymbolPaths = nativeSymbolPathMap.get(variantName);
+                            if (cachedSymbolPaths != null && !cachedSymbolPaths.isEmpty()) {
+                                symbolPaths.addAll(cachedSymbolPaths);
+                            } else {
+                                appendSymbolPath(project, symbolPaths, variantName, model.getNativeLibPath());
+                            }
                         }
 
                         String tmpBuildPath = String.format(tmpBuildPathFormat, variantName);
@@ -160,9 +199,15 @@ public class FTMapUploader {
             if (!applicationVariant.getName().endsWith("Debug")) {
                 project.afterEvaluate(p -> {
                     ProductFlavorModel model = getFlavorModelFromName(variantName);
-                    p.getTasks().getAt(assembleTaskName).finalizedBy(zipTask);
+                    if (p.getTasks().findByName(mergeNativeLibsTaskName) != null) {
+                        p.getTasks().getAt(mergeNativeLibsTaskName).finalizedBy(collectNativeSymbolTask);
+                        zipTask.dependsOn(collectNativeSymbolTask);
+                    }
+                    attachFinalizerIfTaskExists(p, assembleTaskName, zipTask);
+                    attachFinalizerIfTaskExists(p, packageTaskName, zipTask);
+                    attachFinalizerIfTaskExists(p, bundleTaskName, zipTask);
                     if (!model.isGenerateSourceMapOnly()) {
-                        p.getTasks().getAt(assembleTaskName).finalizedBy(uploadTask);
+                        zipTask.finalizedBy(uploadTask);
                     }
                 });
             }
@@ -215,6 +260,13 @@ public class FTMapUploader {
 
     }
 
+    private void attachFinalizerIfTaskExists(Project project, String taskName, Task finalizerTask) {
+        Task targetTask = project.getTasks().findByName(taskName);
+        if (targetTask != null) {
+            targetTask.finalizedBy(finalizerTask);
+        }
+    }
+
     /**
      * Delete folder
      *
@@ -242,21 +294,29 @@ public class FTMapUploader {
      * @param nativeLibPath
      */
     private void appendSymbolPath(Project p, ArrayList<String> list, String variantName, String nativeLibPath) {
-
-        p.getAllprojects().forEach(subProject -> {
-            File projectPath = subProject.getProjectDir();
-            String debugSymbolPath = "";
-            if (nativeLibPath.isEmpty()) {
-                debugSymbolPath = new File(projectPath, MERGED_LIB_PATH + "/" + variantName + "/out/lib").getAbsolutePath();
-            } else {
-                debugSymbolPath = new File(projectPath, nativeLibPath).getAbsolutePath();
-            }
-            File file = new File(debugSymbolPath);
-            if (file.exists()) {
-                Logger.debug("debugSymbolPath:" + debugSymbolPath);
-                list.add(debugSymbolPath);
-            }
-        });
+        File currentProjectPath = p.getProjectDir();
+        boolean hasExplicitPath = nativeLibPath != null && !nativeLibPath.isEmpty();
+        Logger.debug("appendSymbolPath variant=" + variantName
+                + ", nativeLibPath=" + nativeLibPath
+                + ", projectDir=" + currentProjectPath.getAbsolutePath());
+        String projectSymbolPath = resolveFirstValidSymbolPath(currentProjectPath, variantName, nativeLibPath);
+        if (projectSymbolPath != null) {
+            Logger.debug("debugSymbolPath:" + projectSymbolPath);
+            list.add(projectSymbolPath);
+        } else if (hasExplicitPath) {
+            Logger.warn("explicit nativeLibPath is configured but no valid symbol dir was found: " + nativeLibPath);
+        } else if (!hasExplicitPath) {
+            p.getAllprojects().forEach(subProject -> {
+                if (subProject == p) {
+                    return;
+                }
+                String fallbackSymbolPath = resolveFirstValidSymbolPath(subProject.getProjectDir(), variantName, "");
+                if (fallbackSymbolPath != null) {
+                    Logger.debug("fallback debugSymbolPath:" + fallbackSymbolPath);
+                    list.add(fallbackSymbolPath);
+                }
+            });
+        }
 
         //unity symbol
         String rootPath = p.getRootDir().getAbsolutePath();
@@ -266,6 +326,84 @@ public class FTMapUploader {
             Logger.debug("unitySymbolsPath:" + unitySymbolsPath);
             list.add(unitySymbolsPath);
         }
+    }
+
+    private ArrayList<File> collectNativeSymbolCandidates(File projectPath, String variantName, String nativeLibPath) {
+        ArrayList<File> candidateDirs = new ArrayList<>();
+        if (nativeLibPath != null && !nativeLibPath.isEmpty()) {
+            File customPath = new File(nativeLibPath);
+            candidateDirs.add(customPath.isAbsolute() ? customPath : new File(projectPath, nativeLibPath));
+            return candidateDirs;
+        }
+
+        String[] variantCandidates = buildVariantCandidates(variantName);
+        Set<String> relativeCandidates = new LinkedHashSet<>();
+        for (String variantCandidate : variantCandidates) {
+            relativeCandidates.add(MERGED_LIB_PATH + "/" + variantCandidate + "/out/lib");
+            relativeCandidates.add(MERGED_LIB_PATH + "/" + variantCandidate + "/merge" + FTStringUtils.captitalizedString(variantCandidate) + "NativeLibs/out/lib");
+            relativeCandidates.add(MERGED_JNI_LIB_PATH + "/" + variantCandidate + "/out");
+            relativeCandidates.add(MERGED_JNI_LIB_PATH + "/" + variantCandidate + "/merge" + FTStringUtils.captitalizedString(variantCandidate) + "JniLibFolders/out");
+            relativeCandidates.add(LIBRARY_JNI_PATH + "/" + variantCandidate + "/jni");
+            relativeCandidates.add(LIBRARY_JNI_PATH + "/" + variantCandidate + "/copy" + FTStringUtils.captitalizedString(variantCandidate) + "JniLibsProjectOnly/jni");
+            relativeCandidates.add(LIBRARY_JNI_PATH + "/" + variantCandidate + "/copy" + FTStringUtils.captitalizedString(variantCandidate) + "JniLibsProjectAndLocalJars/jni");
+        }
+
+        for (String relativeCandidate : relativeCandidates) {
+            candidateDirs.add(new File(projectPath, relativeCandidate));
+        }
+        return candidateDirs;
+    }
+
+    private String resolveFirstValidSymbolPath(File projectPath, String variantName, String nativeLibPath) {
+        ArrayList<File> candidateDirs = collectNativeSymbolCandidates(projectPath, variantName, nativeLibPath);
+        for (File candidateDir : candidateDirs) {
+            if (isValidNativeSymbolDir(candidateDir)) {
+                return candidateDir.getAbsolutePath();
+            }
+        }
+        return null;
+    }
+
+    private String[] buildVariantCandidates(String variantName) {
+        String lowerVariantName = variantName == null ? "" : variantName.trim();
+        if (lowerVariantName.isEmpty()) {
+            return new String[0];
+        }
+        if (lowerVariantName.endsWith("Release")) {
+            return new String[]{lowerVariantName, "release"};
+        }
+        if (lowerVariantName.endsWith("Debug")) {
+            return new String[]{lowerVariantName, "debug"};
+        }
+        return new String[]{lowerVariantName, lowerVariantName + "Release", lowerVariantName + "Debug"};
+    }
+
+    private boolean isValidNativeSymbolDir(File dir) {
+        if (dir == null || !dir.exists() || !dir.isDirectory()) {
+            return false;
+        }
+        String normalizedPath = dir.getAbsolutePath().replace(File.separatorChar, '/');
+        if (normalizedPath.contains(STRIPPED_LIB_PATH)) {
+            return false;
+        }
+        File[] children = dir.listFiles();
+        if (children == null || children.length == 0) {
+            return false;
+        }
+        return containsSoFile(dir);
+    }
+
+    private boolean containsSoFile(File dir) {
+        File[] children = dir.listFiles();
+        if (children == null) {
+            return false;
+        }
+        return Arrays.stream(children).anyMatch(file -> {
+            if (file.isDirectory()) {
+                return containsSoFile(file);
+            }
+            return file.getName().endsWith(".so");
+        });
     }
 
 

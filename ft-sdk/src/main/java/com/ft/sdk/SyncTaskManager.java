@@ -3,6 +3,7 @@ package com.ft.sdk;
 
 import android.content.SharedPreferences;
 
+import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.RemoteConfigBean;
 import com.ft.sdk.garble.bean.SyncData;
@@ -228,6 +229,10 @@ public class SyncTaskManager {
         if (autoSync) {
             if (!isMainProcess) {
                 LogUtils.wOnce(TAG, "Collect Data will sync on main process");
+                return;
+            }
+            if (!FTHttpConfigManager.get().isUrlAvailable()) {
+                LogUtils.wOnce(TAG, "Upload URL not configured, skipping sync");
                 return;
             }
             executePoll(true);

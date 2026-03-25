@@ -133,12 +133,16 @@ public class ProductFlavorModel {
             this.datawayToken = extension.datawayToken;
         }
 
-        if (this.nativeLibPath == null) {
+        if (isNullOrEmpty(this.nativeLibPath)) {
             this.nativeLibPath = extension.nativeLibPath;
         }
         if (this.generateSourceMapOnly == null) {
             this.generateSourceMapOnly = extension.generateSourceMapOnly;
         }
+    }
+
+    private boolean isNullOrEmpty(String value) {
+        return value == null || value.isEmpty();
     }
 
     @Override

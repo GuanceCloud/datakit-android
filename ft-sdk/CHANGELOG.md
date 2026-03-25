@@ -1,3 +1,7 @@
+# agent 1.7.0-alpha41
+1. merge from ft-sdk 1.6.17
+
+---
 # agent 1.7.0-alpha40
 1. Added image resource upload logic for Session Replay.
 2. ft-session-replay:>=0.1.3-alpha14
@@ -171,15 +175,34 @@
 1. Support for enabling session replay recording feature
 
 ---
+# agent 1.6.17
+1. Fixed an issue introduced in version 1.6.16 where remote dynamic configuration did not take effect on first load.
+2. Added `TraceContext` and `TraceContext.Simple` for custom trace header handling.
+   Override `HeaderHandler.getTraceContext(Request)` to provide headers,
+   traceId and spanId in one call. Fully backward compatible with existing `getTraceHeader`
+   `getTraceID`/`getSpanID` implementations.
+3. Support dynamic update of transmission endpoint with `FTSdk.setDatakitUrl(url)`,
+   `FTSdk.setDatawayUrl(datawayUrl,clientToken)`
+
+---
+# agent 1.6.17-beta01
+1. Same as 1.6.17-alpha03
+
+---
+# agent 1.6.17-alpha03
+1. fix remote config fetch result handling
+
+---
 # agent 1.6.17-alpha02
 1. Added `TraceContext` and `TraceContext.Simple` for custom trace header handling. 
   Override `HeaderHandler.getTraceContext(Request)` to provide headers, 
   traceId and spanId in one call. Fully backward compatible with existing `getTraceHeader` 
-  + `getTraceID`/`getSpanID` implementations.
+  `getTraceID`/`getSpanID` implementations.
 2. Added `TraceContext.Simple.fromTraceType()` to extract traceId/spanId from headers 
  by TraceType (`DDTRACE`, `ZIPKIN_MULTI_HEADER`, `ZIPKIN_SINGLE_HEADER`, `TRACEPARENT`, `JAEGER`, `SKYWALKING`). 
  Use `new TraceContext.Simple(headers, traceId, spanId)` for custom traceId/spanId.
 3. Removed redundant remote condition callbacks.
+4. Support dynamic update of transmission endpoint
 
 ---
 # agent 1.6.17-alpha01
