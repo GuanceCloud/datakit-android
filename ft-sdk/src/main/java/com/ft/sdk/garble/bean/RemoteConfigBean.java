@@ -69,7 +69,6 @@ public class RemoteConfigBean {
     private Float sessionReplaySampleRate;
     private Float sessionReplayOnErrorSampleRate;
     private String md5;
-    private boolean remoteConfigChanged;
     private boolean isValid = false;
     private String contentJsonString;
 

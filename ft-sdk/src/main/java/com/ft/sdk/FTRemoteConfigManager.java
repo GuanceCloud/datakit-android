@@ -102,10 +102,6 @@ public class FTRemoteConfigManager {
             if (mRemoteConfig.getSyncSleepTime() != null) {
                 config.setSyncSleepTime(mRemoteConfig.getSyncSleepTime());
             }
-
-            if (mRemoteConfig.getSyncSleepTime() != null) {
-                config.setSyncSleepTime(mRemoteConfig.getSyncSleepTime());
-            }
         }
     }
 
@@ -275,6 +271,7 @@ public class FTRemoteConfigManager {
             } else {
                 long remainingTime = remoteConfigMiniUpdateInterval - elapsedTime;
                 String timeFormat = formatTime(remainingTime);
+                notifyFetchResult(result, false);
                 LogUtils.w(TAG, "Remote config update skipped, need to wait " + timeFormat);
             }
         }
@@ -365,7 +362,7 @@ public class FTRemoteConfigManager {
             if (bean.getLogEnableCustomLog() != null) {
                 loggerConfig.setEnableCustomLog(bean.getLogEnableCustomLog());
             }
-            if (bean.getLogEnableCustomLog() != null) {
+            if (bean.getLogEnableConsoleLog() != null) {
                 loggerConfig.setEnableConsoleLog(bean.getLogEnableConsoleLog());
             }
             if (bean.getLogSampleRate() != null) {
@@ -386,7 +383,7 @@ public class FTRemoteConfigManager {
                 rumConfig.setSamplingRate(bean.getRumSampleRate());
             }
             if (bean.getRumSessionOnErrorSampleRate() != null) {
-                rumConfig.setSessionErrorSampleRate(bean.getSessionReplayOnErrorSampleRate());
+                rumConfig.setSessionErrorSampleRate(bean.getRumSessionOnErrorSampleRate());
             }
 
             FTRUMInnerManager.get().hotUpdate(bean.getRumSampleRate(), bean.getRumSessionOnErrorSampleRate());
