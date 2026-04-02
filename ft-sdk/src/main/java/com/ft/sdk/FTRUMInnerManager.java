@@ -527,6 +527,7 @@ public class FTRUMInnerManager {
         FTMonitorManager.get().addMonitor(activeViewBean.getId());
         FTMonitorManager.get().attachMonitorData(activeViewBean);
         initView(activeViewBean);
+        generateRumData();
 //        lastUserActiveTime = activeView.getStartTime();
 
     }
@@ -1313,27 +1314,6 @@ public class FTRUMInnerManager {
 
 
     private final Handler mHandler = new Handler(Looper.getMainLooper());
-    private final Runnable mRUMGenerateRunner = new Runnable() {
-        @Override
-        public void run() {
-            try {
-                EventConsumerThreadPool.get().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            FTRUMInnerManager.this.generateActionSum();
-                            FTRUMInnerManager.this.generateViewSum();
-                        } catch (JSONException e) {
-                            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
-                        }
-                    }
-                });
-            } catch (Exception e) {
-                LogUtils.e(TAG, LogUtils.getStackTraceString(e));
-
-            }
-        }
-    };
 
     private final Runnable mActionRecheckRunner = new Runnable() {
         @Override
