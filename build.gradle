@@ -4,6 +4,12 @@ buildscript {
     ext {
         mavenPublishUrl = 'https://mvnrepo.jiagouyun.com/repository'
         getDefaultProperties = this.&getDefaultProperties
+        sdkVersions = [
+                ftSdk          : "1.7.0-beta01",
+                ftSessionReplay: "0.1.3-beta01",
+                ftPlugin       : "1.3.6-alpha07",
+                ftNative       : "1.1.3-alpha02"
+        ]
     }
 
     Properties properties = new Properties()

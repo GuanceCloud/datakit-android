@@ -1,3 +1,7 @@
+# replay 0.1.3-beta01
+1. Same as 0.1.3-alpha15
+
+---
 # replay 0.1.3-alpha15
 1. Fix an issue where replay recording times out when there are many images due to 
    local icon cache misses.

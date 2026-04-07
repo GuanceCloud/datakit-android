@@ -41,27 +41,29 @@ public class BatchesToSegmentsMapper {
     // region Internal
 
     private List<Pair<MobileSegment, JsonObject>> groupBatchDataIntoSegments(List<byte[]> batchData) {
-        List<Pair<SessionReplayRumContext, JsonArray>> contextRecordsList = new ArrayList<>();
+        // Aggregate records as we parse each batch so every context always writes into a
+        // materialized JsonArray owned by the map.
+        Map<SessionReplayRumContext, JsonArray> groupedRecords = new HashMap<>();
 
         for (byte[] data : batchData) {
             JsonObject jsonObject = parseToJsonObject(data);
             if (jsonObject != null) {
                 Pair<SessionReplayRumContext, JsonArray> contextRecords = extractRecordsAndContext(jsonObject);
                 if (contextRecords != null) {
-                    contextRecordsList.add(contextRecords);
+                    SessionReplayRumContext context = contextRecords.first;
+                    JsonArray records = contextRecords.second;
+                    if (records == null) {
+                        continue;
+                    }
+                    JsonArray groupedRecord = groupedRecords.get(context);
+                    if (groupedRecord == null) {
+                        groupedRecord = new JsonArray();
+                        groupedRecords.put(context, groupedRecord);
+                    }
+                    for (int i = 0; i < records.size(); i++) {
+                        groupedRecord.add(records.get(i));
+                    }
                 }
-            }
-        }
-
-        Map<SessionReplayRumContext, JsonArray> groupedRecords = new HashMap<>();
-        for (Pair<SessionReplayRumContext, JsonArray> pair : contextRecordsList) {
-            SessionReplayRumContext context = pair.first;
-            JsonArray records = pair.second;
-            if (!groupedRecords.containsKey(context)) {
-                groupedRecords.put(context, new JsonArray());
-            }
-            for (int i = 0; i < records.size(); i++) {
-                groupedRecords.get(context).add(records.get(i));
             }
         }
 

@@ -79,12 +79,16 @@ public class SessionReplayResourceUploader implements IUploader {
             return UploadResult.createErrorResult();
         }
 
-        List<String> existingFiles = checkExistingFiles(appId, fileNames);
-        
+        ExistingFilesCheckResult existingFilesResult = checkExistingFiles(appId, fileNames);
+        if (!existingFilesResult.isSuccess()) {
+            internalLogger.w(TAG, "Skip resource upload because checking existing files failed");
+            return UploadResult.createErrorResult();
+        }
+
         List<RawBatchEvent> filesNeedUpload = new ArrayList<>();
         for (int i = 0; i < filesToUpload.size(); i++) {
             String fileName = fileNames.get(i);
-            if (!existingFiles.contains(fileName)) {
+            if (!existingFilesResult.existingFiles.contains(fileName)) {
                 filesNeedUpload.add(filesToUpload.get(i));
             }
         }
@@ -104,7 +108,7 @@ public class SessionReplayResourceUploader implements IUploader {
      * @param fileNames the list of file names to check
      * @return list of existing file names
      */
-    private List<String> checkExistingFiles(String appId, List<String> fileNames) {
+    private ExistingFilesCheckResult checkExistingFiles(String appId, List<String> fileNames) {
         List<String> existingFiles = new ArrayList<>();
 
         if (uploadCallback != null) {
@@ -126,14 +130,17 @@ public class SessionReplayResourceUploader implements IUploader {
                     internalLogger.d(TAG, "Check existing files response: " + result.getResponse());
                 } catch (Exception e) {
                     internalLogger.e(TAG, "Parse check response error: " + e.getMessage(), e);
+                    return new ExistingFilesCheckResult(false, existingFiles);
                 }
+                return new ExistingFilesCheckResult(true, existingFiles);
             } else {
                 internalLogger.w(TAG, "Check existing files failed or returned null: "
                         + (result != null ? result.getResponse() : "null"));
+                return new ExistingFilesCheckResult(false, existingFiles);
             }
         }
 
-        return existingFiles;
+        return new ExistingFilesCheckResult(false, existingFiles);
     }
 
     /**
@@ -159,5 +166,19 @@ public class SessionReplayResourceUploader implements IUploader {
             return result;
         }
         return UploadResult.createErrorResult();
+    }
+
+    private static class ExistingFilesCheckResult {
+        private final boolean success;
+        private final List<String> existingFiles;
+
+        private ExistingFilesCheckResult(boolean success, List<String> existingFiles) {
+            this.success = success;
+            this.existingFiles = existingFiles;
+        }
+
+        private boolean isSuccess() {
+            return success;
+        }
     }
 }

@@ -1,3 +1,7 @@
+# agent 1.7.0-beta01
+1. Same as 1.7.0-alpha41
+
+---
 # agent 1.7.0-alpha41
 1. merge from ft-sdk 1.6.17
 
