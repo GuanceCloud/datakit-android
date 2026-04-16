@@ -394,6 +394,9 @@ public class DefaultImageWireframeHelper implements ImageWireframeHelper {
         if (drawable instanceof LayerDrawable) {
             LayerDrawable layerDrawable = (LayerDrawable) drawable;
             if (layerDrawable.getNumberOfLayers() > 0) {
+                // We currently unwrap only the first layer. Complex Material backgrounds such as
+                // MaterialButton may render their visible fill on a later layer, so choosing layer 0
+                // here can drop the actual color and make the resource fallback look transparent.
                 // Can't be out of bounds
                 return resolveDrawableProperties(view, layerDrawable.getDrawable(0), width, height);
             } else {

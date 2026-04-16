@@ -35,7 +35,7 @@ public class MaterialExtensionSupport implements ExtensionSupport {
     private final ColorStringFormatter colorStringFormatter = DefaultColorStringFormatter.get();
     private final ViewBoundsResolver viewBoundsResolver = DefaultViewBoundsResolver.get();
     private final MaterialDrawableToColorMapper materialDrawableToColorMapper = new MaterialDrawableToColorMapper();
-    private final DrawableToColorMapper drawableToColorMapper = DrawableToColorMapperFactory.getDefault();
+    private final DrawableToColorMapper drawableToColorMapper = DrawableToColorMapperFactory.getDefault(Collections.singletonList(materialDrawableToColorMapper));
 
     @Override
     public List<MapperTypeWrapper<?>> getCustomViewMappers() {

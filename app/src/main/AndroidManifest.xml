@@ -37,6 +37,7 @@
         <activity android:name=".TabViewActivity" />
         <activity android:name=".ManualRUMActivity" />
         <activity android:name=".SRActivity" />
+        <activity android:name=".SRMaterialButtonActivity" />
         <activity android:name=".LargeImageTestActivity" />
         <activity android:name=".HighLoadActivity" />
         <activity android:name=".IgnoreClassActivity" />

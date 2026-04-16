@@ -30,6 +30,12 @@
         android:layout_height="wrap_content"
         android:text="Large Image Gallery Test" />
 
+    <Button
+        android:id="@+id/session_replay_material_button_page_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="MaterialButton Isolated Test Page" />
+
     <!--    <androidx.cardview.widget.CardView-->
 <!--        android:layout_width="wrap_content"-->
 <!--        android:layout_height="wrap_content"-->

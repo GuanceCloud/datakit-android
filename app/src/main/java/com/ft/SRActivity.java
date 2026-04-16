@@ -101,6 +101,13 @@ public class SRActivity extends NameTitleActivity {
             }
         });
 
+        findViewById(R.id.session_replay_material_button_page_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(SRActivity.this, SRMaterialButtonActivity.class));
+            }
+        });
+
     }
 
     @NotNull

@@ -240,7 +240,7 @@ public class DemoApplication extends BaseApplication {
                         .setTouchPrivacy(TouchPrivacy.SHOW)
                         .setTextAndInputPrivacy(TextAndInputPrivacy.MASK_SENSITIVE_INPUTS)
                         .enableLinkRUMKeys(new String[]{"wgt_id"})
-                        .setImagePrivacy(ImagePrivacy.MASK_ALL)
+                        .setImagePrivacy(ImagePrivacy.MASK_NONE)
                         .addExtensionSupport(new MaterialExtensionSupport())
                         .addExtensionSupport(new CustomExtensionSupport()
                                 .addMapper(new MapperTypeWrapper<>(com.tencent.smtt.sdk.WebView.class,
