@@ -8,6 +8,9 @@ import com.ft.sdk.feature.FeatureSdkCore;
 import com.ft.sdk.sessionreplay.internal.processor.EnrichedResource;
 import com.ft.sdk.storage.EventBatchWriter;
 
+import java.util.Collections;
+import java.util.Map;
+
 public class SessionReplayResourcesWriter implements ResourcesWriter {
 
     private final FeatureSdkCore sdkCore;
@@ -23,7 +26,10 @@ public class SessionReplayResourcesWriter implements ResourcesWriter {
                     @Override
                     public void onConsume(SessionReplayContext context, EventBatchWriter eventBatchWriter) {
                         synchronized (this) {
-                            byte[] serializedMetadata = enrichedResource.asBinaryMetadata(context.getAppId());
+                            byte[] serializedMetadata = enrichedResource.asBinaryMetadata(
+                                    context.getAppId(),
+                                    getCurrentLinkContext()
+                            );
                             eventBatchWriter.write(
                                     new RawBatchEvent(enrichedResource.getResource(), serializedMetadata),
                                     null,
@@ -32,5 +38,18 @@ public class SessionReplayResourcesWriter implements ResourcesWriter {
                         }
                     }
                 });
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> getCurrentLinkContext() {
+        Map<String, Object> rumContext = sdkCore.getFeatureContext(Feature.RUM_FEATURE_NAME);
+        if (rumContext == null) {
+            return Collections.emptyMap();
+        }
+        Object context = rumContext.get("globalContext");
+        if (context instanceof Map) {
+            return (Map<String, Object>) context;
+        }
+        return Collections.emptyMap();
     }
 }

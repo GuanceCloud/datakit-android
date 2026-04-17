@@ -6,12 +6,13 @@ import com.ft.sdk.sessionreplay.internal.storage.RawBatchEvent;
 import com.ft.sdk.sessionreplay.internal.storage.UploadResult;
 import com.ft.sdk.sessionreplay.utils.InternalLogger;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Responsible for session replay resource upload logic
@@ -22,6 +23,7 @@ public class SessionReplayResourceUploader implements IUploader {
 
     public static final String KEY_APP_ID = "app_id";
     public static final String KEY_FILES = "files";
+    public static final String KEY_TAGS = "tags";
 
     private final InternalLogger internalLogger;
     private final SessionReplayResourceUploadCallback uploadCallback;
@@ -55,16 +57,21 @@ public class SessionReplayResourceUploader implements IUploader {
         List<RawBatchEvent> filesToUpload = new ArrayList<>();
         List<String> fileNames = new ArrayList<>();
         String appId = null;
+        Map<String, Object> globalContext = new HashMap<>();
 
         for (RawBatchEvent event : batchData) {
             String fileName = EnrichedResource.extractFileName(event.getMetadata());
             String applicationId = EnrichedResource.extractApplicationId(event.getMetadata());
+            Map<String, Object> metadataGlobalContext = EnrichedResource.extractGlobalContext(event.getMetadata());
             
             if (fileName != null) {
                 fileNames.add(fileName);
                 filesToUpload.add(event);
                 if (appId == null && applicationId != null) {
                     appId = applicationId;
+                }
+                if (!metadataGlobalContext.isEmpty()) {
+                    globalContext.putAll(metadataGlobalContext);
                 }
             }
         }
@@ -79,7 +86,7 @@ public class SessionReplayResourceUploader implements IUploader {
             return UploadResult.createErrorResult();
         }
 
-        ExistingFilesCheckResult existingFilesResult = checkExistingFiles(appId, fileNames);
+        ExistingFilesCheckResult existingFilesResult = checkExistingFiles(appId, fileNames, globalContext);
         if (!existingFilesResult.isSuccess()) {
             internalLogger.w(TAG, "Skip resource upload because checking existing files failed");
             return UploadResult.createErrorResult();
@@ -98,7 +105,7 @@ public class SessionReplayResourceUploader implements IUploader {
             return new UploadResult(HttpURLConnection.HTTP_OK, "", "");
         }
 
-        return uploadFiles(appId, filesNeedUpload);
+        return uploadFiles(appId, filesNeedUpload, globalContext);
     }
 
     /**
@@ -108,11 +115,11 @@ public class SessionReplayResourceUploader implements IUploader {
      * @param fileNames the list of file names to check
      * @return list of existing file names
      */
-    private ExistingFilesCheckResult checkExistingFiles(String appId, List<String> fileNames) {
+    private ExistingFilesCheckResult checkExistingFiles(String appId, List<String> fileNames, Map<String, Object> globalContext) {
         List<String> existingFiles = new ArrayList<>();
 
         if (uploadCallback != null) {
-            UploadResult result = uploadCallback.onCheckFilesExist(appId, fileNames);
+            UploadResult result = uploadCallback.onCheckFilesExist(appId, fileNames, globalContext);
             if (result != null && result.isSuccess() && result.getResponse() != null
                     && !result.getResponse().isEmpty()) {
                 try {
@@ -150,13 +157,14 @@ public class SessionReplayResourceUploader implements IUploader {
      * @param filesToUpload the list of files to upload
      * @return upload result
      */
-    private UploadResult uploadFiles(String appId, List<RawBatchEvent> filesToUpload) {
+    private UploadResult uploadFiles(String appId, List<RawBatchEvent> filesToUpload, Map<String, Object> globalContext) {
         if (uploadCallback != null) {
-            UploadResult result = uploadCallback.onUploadFiles(appId, filesToUpload);
+            UploadResult result = uploadCallback.onUploadFiles(appId, filesToUpload, globalContext);
             if (result != null) {
                 if (result.isSuccess()) {
                     internalLogger.d(TAG, "Resource Upload Success. " + result.getPkgId()
-                            + ",app_id:" + appId + ",count:" + filesToUpload.size());
+                            + ",app_id:" + appId + ",count:" + filesToUpload.size()
+                            + formatGlobalContext(globalContext));
                 } else {
                     internalLogger.e(TAG, "Resource Upload Failed." + result.getPkgId()
                             + ",app_id:" + appId + ",count:" + filesToUpload.size()
@@ -166,6 +174,17 @@ public class SessionReplayResourceUploader implements IUploader {
             return result;
         }
         return UploadResult.createErrorResult();
+    }
+
+    private String formatGlobalContext(Map<String, Object> globalContext) {
+        if (globalContext == null || globalContext.isEmpty()) {
+            return "";
+        }
+        StringBuilder builder = new StringBuilder();
+        for (Map.Entry<String, Object> entry : globalContext.entrySet()) {
+            builder.append(",").append(entry.getKey()).append(":").append(entry.getValue());
+        }
+        return builder.toString();
     }
 
     private static class ExistingFilesCheckResult {

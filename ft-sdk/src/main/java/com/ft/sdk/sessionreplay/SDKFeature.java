@@ -63,6 +63,7 @@ import com.ft.sdk.storage.DataStoreHandler;
 import com.ft.sdk.storage.EventBatchWriter;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 
 import java.io.File;
@@ -163,17 +164,33 @@ public class SDKFeature implements FeatureScope {
         if (Utils.isMainProcess()) {
             IUploader uploader;
             if (feature.getName().equals(Feature.SESSION_REPLAY_RESOURCES_FEATURE_NAME)) {
-                uploader = new SessionReplayResourceUploader(internalLogger, new SessionReplayResourceUploadCallback() {
-                    @Override
-                    public UploadResult onCheckFilesExist(String appId, List<String> fileNames) {
-                        JsonObject requestBody = new JsonObject();
-                        requestBody.addProperty(SessionReplayResourceUploader.KEY_APP_ID, appId);
-                        JsonArray filesArray = new JsonArray();
-                        for (String fileName : fileNames) {
-                            filesArray.add(fileName);
-                        }
-                        requestBody.add(SessionReplayResourceUploader.KEY_FILES, filesArray);
-                        HttpBuilder builder = HttpBuilder.Builder()
+                    uploader = new SessionReplayResourceUploader(internalLogger, new SessionReplayResourceUploadCallback() {
+                        @Override
+                        public UploadResult onCheckFilesExist(String appId, List<String> fileNames, Map<String, Object> globalContext) {
+                            JsonObject requestBody = new JsonObject();
+                            requestBody.addProperty(SessionReplayResourceUploader.KEY_APP_ID, appId);
+                            JsonArray filesArray = new JsonArray();
+                            for (String fileName : fileNames) {
+                                filesArray.add(fileName);
+                            }
+                            requestBody.add(SessionReplayResourceUploader.KEY_FILES, filesArray);
+                            if (globalContext != null && !globalContext.isEmpty()) {
+                                JsonObject tagsJson = new JsonObject();
+                                for (Map.Entry<String, Object> entry : globalContext.entrySet()) {
+                                    Object value = entry.getValue();
+                                    if (value == null) {
+                                        tagsJson.add(entry.getKey(), JsonNull.INSTANCE);
+                                    } else if (value instanceof Boolean) {
+                                        tagsJson.addProperty(entry.getKey(), (Boolean) value);
+                                    } else if (value instanceof Number) {
+                                        tagsJson.addProperty(entry.getKey(), (Number) value);
+                                    } else {
+                                        tagsJson.addProperty(entry.getKey(), String.valueOf(value));
+                                    }
+                                }
+                                requestBody.add(SessionReplayResourceUploader.KEY_TAGS, tagsJson);
+                            }
+                            HttpBuilder builder = HttpBuilder.Builder()
                                 .setModel(SessionReplayConstants.URL_MODEL_SESSION_REPLAY_RESOURCES_CHECK);
                         builder.setMethod(RequestMethod.POST)
                                 .addHeadParam(Constants.SYNC_DATA_USER_AGENT_HEADER,
@@ -188,16 +205,32 @@ public class SDKFeature implements FeatureScope {
                         }
                         return new UploadResult(data.getCode(), data.getErrorCode() + ","
                                 + data.getMessage(), "");
-                    }
+                        }
 
-                    @Override
-                    public UploadResult onUploadFiles(String appId, List<RawBatchEvent> files) {
+                        @Override
+                        public UploadResult onUploadFiles(String appId, List<RawBatchEvent> files, Map<String, Object> globalContext) {
 
                         String count = files.size() + "";
                         String pkgId = PackageIdGenerator.generatePackageId(srResourceGenerator.getCurrentId(), SyncTaskManager.pid, count);
 
                         HashMap<String, String> fieldMap = new HashMap<>();
                         fieldMap.put(SessionReplayResourceUploader.KEY_APP_ID, appId);
+                        if (globalContext != null && !globalContext.isEmpty()) {
+                            JsonObject tagsJson = new JsonObject();
+                            for (Map.Entry<String, Object> entry : globalContext.entrySet()) {
+                                Object value = entry.getValue();
+                                if (value == null) {
+                                    tagsJson.add(entry.getKey(), JsonNull.INSTANCE);
+                                } else if (value instanceof Boolean) {
+                                    tagsJson.addProperty(entry.getKey(), (Boolean) value);
+                                } else if (value instanceof Number) {
+                                    tagsJson.addProperty(entry.getKey(), (Number) value);
+                                } else {
+                                    tagsJson.addProperty(entry.getKey(), String.valueOf(value));
+                                }
+                            }
+                            fieldMap.put(SessionReplayResourceUploader.KEY_TAGS, tagsJson.toString());
+                        }
 
                         String traceHeader = String.format(Constants.SYNC_DATA_TRACE_HEADER_FORMAT, pkgId);
                         HttpBuilder builder = HttpBuilder.Builder()

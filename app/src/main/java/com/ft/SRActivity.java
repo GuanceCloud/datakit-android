@@ -19,6 +19,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatCheckedTextView;
 
+import com.ft.sdk.FTRUMGlobalManager;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.io.InputStream;
@@ -104,7 +106,14 @@ public class SRActivity extends NameTitleActivity {
         findViewById(R.id.session_replay_material_button_page_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(SRActivity.this, SRMaterialButtonActivity.class));
+
+                HashMap<String, Object> viewProperty = new HashMap<>();
+                // Trigger a manual view start with the same key configured in enableLinkRUMKeys()
+                // so Session Replay resource uploads can be checked against the linked wgt_id path.
+                viewProperty.put("wgt_id", "sr_activity_manual_view");
+                FTRUMGlobalManager.get().startView("SR Activity Manual View", viewProperty);
+
+                //startActivity(new Intent(SRActivity.this, SRMaterialButtonActivity.class));
             }
         });
 
@@ -138,7 +147,7 @@ public class SRActivity extends NameTitleActivity {
             HashMap<String, Object> map = new HashMap<>();
             map.put("userName", "name " + i);
             // Use fixed seed image URL
-            map.put("userImage", "https://picsum.photos/seed/listitem5" + i + "/200/200");
+            map.put("userImage", "https://picsum.photos/seed/listitem6" + i + "/200/200");
             arrayList.add(map);
         }
 

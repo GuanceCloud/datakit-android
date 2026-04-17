@@ -193,46 +193,77 @@ public class SessionReplayManager implements FeatureSdkCore {
     }
 
     void appendSessionReplayRUMLinkKeys(String key, Object value) {
-        if (rumLinkKeys != null && rumLinkKeys.length > 0) {
-            tagLinkMap.put(key, value);
+        HashMap<String, Object> source = new HashMap<>();
+        source.put(key, value);
+        Map<String, Object> filteredMaps = filterRumLinkData(source);
+        if (!filteredMaps.isEmpty()) {
+            tagLinkMap.putAll(filteredMaps);
         }
     }
 
     void appendSessionReplayRUMLinkKeys(Map<String, Object> maps) {
-        tagLinkMap.putAll(maps);
+        if (maps == null || maps.isEmpty()) {
+            return;
+        }
+        Map<String, Object> filteredMaps = filterRumLinkData(maps);
+        if (!filteredMaps.isEmpty()) {
+            tagLinkMap.putAll(filteredMaps);
+        }
     }
 
     void appendSessionReplayRUMLinkKeysWithView(String viewId, Map<String, Object> property) {
-        if (property == null) return;
-        if (rumLinkKeys != null && rumLinkKeys.length > 0) {
-            if (!Utils.isNullOrEmpty(viewId)) {
-                HashMap<String, Object> rumLinkData = new HashMap<>();
+        if (Utils.isNullOrEmpty(viewId)) {
+            return;
+        }
+        HashMap<String, Object> rumLinkData = new HashMap<>(filterRumLinkData(property));
 
-                // Check keys in fieldMaps
-                for (String rumKey : rumLinkKeys) {
-                    for (String fieldKey : property.keySet()) {
-                        if (fieldKey.contains(rumKey)) {
-                            rumLinkData.put(fieldKey, property.get(fieldKey));
-                        }
-                    }
-                }
-
-                // Store matched data to global hashMap if any matches found (cap size to 10 by removing oldest)
-                if (!rumLinkData.isEmpty()) {
-                    synchronized (fieldLinkMap) {
-                        boolean isNewKey = !fieldLinkMap.containsKey(viewId);
-                        fieldLinkMap.put(viewId, rumLinkData);
-                        if (isNewKey) {
-                            fieldLinkOrder.addLast(viewId);
-                            while (fieldLinkOrder.size() > FIELD_LINK_MAP_CAPACITY) {
-                                String eldestKey = fieldLinkOrder.removeFirst();
-                                fieldLinkMap.remove(eldestKey);
-                            }
-                        }
+        // Store matched data to global hashMap if any matches found (cap size to 10 by removing oldest)
+        if (!rumLinkData.isEmpty()) {
+            synchronized (fieldLinkMap) {
+                boolean isNewKey = !fieldLinkMap.containsKey(viewId);
+                fieldLinkMap.put(viewId, rumLinkData);
+                if (isNewKey) {
+                    fieldLinkOrder.addLast(viewId);
+                    while (fieldLinkOrder.size() > FIELD_LINK_MAP_CAPACITY) {
+                        String eldestKey = fieldLinkOrder.removeFirst();
+                        fieldLinkMap.remove(eldestKey);
                     }
                 }
             }
         }
+    }
+
+    /**
+     * Keep only values whose keys match the configured link keys so all replay link paths
+     * share the same filtering rule.
+     */
+    private Map<String, Object> filterRumLinkData(Map<String, Object> source) {
+        HashMap<String, Object> rumLinkData = new HashMap<>();
+        if (source == null || source.isEmpty() || rumLinkKeys == null || rumLinkKeys.length == 0) {
+            return rumLinkData;
+        }
+        for (Map.Entry<String, Object> entry : source.entrySet()) {
+            if (entry.getValue() != null && isRumLinkKeyMatched(entry.getKey())) {
+                rumLinkData.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return rumLinkData;
+    }
+
+    /**
+     * A source key is treated as linkable when it contains one of the configured link-key
+     * fragments, matching the historical contains-based behavior used by replay view linking.
+     */
+    private boolean isRumLinkKeyMatched(String key) {
+        if (Utils.isNullOrEmpty(key) || rumLinkKeys == null || rumLinkKeys.length == 0) {
+            return false;
+        }
+        for (String rumKey : rumLinkKeys) {
+            if (!Utils.isNullOrEmpty(rumKey) && key.contains(rumKey)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean checkFieldContextChanged(String viewId, Map<String, Object> map) {
