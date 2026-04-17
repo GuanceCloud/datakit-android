@@ -1,3 +1,13 @@
+# agent 1.7.0
+1. Added Session Replay capabilities, including WebView Session Replay, DCloud WebView support, and full-snapshot keyframe support for WebView containers.
+2. Added Session Replay and RUM context association, allowing WebView containers to be linked with the context of loaded HTML content.
+3. Added Session Replay error sampling support and enabled dynamic Session Replay control through remote configuration.
+4. Added image resource upload support for Session Replay, along with parameter passing and synchronization updates for userAgent and appVersion.
+5. Optimized Session Replay initialization, frame completion during sharding, frame generation and consumption, delayed writes, and disk write limits to improve recording and synchronization stability.
+6. Fixed issues involving WebView data loss, handling of invisible WebView states, blank playback caused by writes occurring too early, synchronization failures on lower OkHttp versions, and recording failures caused by bitmap recycling.
+7. Fixed crashes caused by calling certain view methods before layout completion, improving overall stability and compatibility.
+
+---
 # agent 1.7.0-beta01
 1. Same as 1.7.0-alpha41
 

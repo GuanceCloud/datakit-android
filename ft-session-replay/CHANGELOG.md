@@ -1,3 +1,12 @@
+# replay 0.1.3
+1. Added WebView Session Replay support, including DCloud WebView support and full-snapshot keyframe support for WebView containers.
+2. Added RUM context association for Session Replay, allowing WebView containers to be linked with the context of loaded HTML content.
+3. Added error sampling support and remote configuration support for Session Replay.
+4. Added image resource upload support and improved metadata handling, including userAgent, appVersion, and forceFullSnapshot.
+5. Optimized frame generation and consumption, frame completion during data sharding, delayed writes for WebView replay data, invisible WebView handling, and disk write limits to improve replay stability and performance.
+6. Fixed issues involving WebView replay data loss, blank replay caused by writes occurring too early, synchronization failures on lower OkHttp versions, recording failures caused by bitmap recycling, null value handling for rumLinkKey, and replay timeout issues when many images are present.
+
+---
 # replay 0.1.3-beta02
 1. Same as 0.1.3-beta01
 
