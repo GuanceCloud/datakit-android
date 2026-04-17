@@ -60,9 +60,11 @@ public class ActiveViewBean extends ViewBean {
         bean.lastErrorTime = this.lastErrorTime;
         bean.fpsAvg = this.fpsAvg;
         bean.fpsMini = this.fpsMini;
+        bean.hasReplay = this.hasReplay;
         bean.property = this.property;
         bean.tags = this.tags;
         bean.collectType = this.collectType;
+        bean.sessionReplayErrorSampled = this.sessionReplayErrorSampled;
         return bean;
     }
 

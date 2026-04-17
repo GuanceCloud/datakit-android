@@ -117,4 +117,9 @@ public abstract class BaseThreadPool {
      * @return
      */
     public abstract ThreadPoolExecutor createNew();
+
+    public ThreadPoolExecutor getExecutor() {
+        return executor;
+    }
+
 }

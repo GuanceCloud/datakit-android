@@ -6,6 +6,7 @@ import android.app.Activity;
 import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.utils.Constants;
 
+import java.lang.ref.WeakReference;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -21,6 +22,9 @@ public final class FTActivityManager {
      * Map of alive activities
      */
     private final ConcurrentHashMap<String, Boolean> activityOpenTypeMap = new ConcurrentHashMap<>();
+
+    private WeakReference<Activity> mCurrentActivity;
+
 
     /**
      * Default is {@link AppState#STARTUP}
@@ -62,6 +66,14 @@ public final class FTActivityManager {
      */
     AppState getAppState() {
         return appState;
+    }
+
+    void setCurrentActivity(Activity activity) {
+        mCurrentActivity = new WeakReference<>(activity);
+    }
+
+    public Activity curentActivity() {
+        return mCurrentActivity != null ? mCurrentActivity.get() : null;
     }
 
 }

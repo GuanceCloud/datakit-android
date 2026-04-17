@@ -85,6 +85,8 @@ public class ActionBean {
      */
     String viewReferrer;
 
+    boolean hasReplay;
+
     /**
      * Action additional properties, {@link  Constants#KEY_RUM_SDK_INNER_KEY_PROPERTY}
      */
@@ -229,6 +231,14 @@ public class ActionBean {
         this.collectType = collectType.getValue();
     }
 
+    public void setHasReplay(boolean hasReplay) {
+        this.hasReplay = hasReplay;
+    }
+
+    public boolean isHasReplay() {
+        return hasReplay;
+    }
+
     /**
      * Convert action property data to JSON string, written when data is stored in local cache
      *
@@ -240,6 +250,7 @@ public class ActionBean {
         map.put(Constants.KEY_RUM_SDK_INNER_KEY_TAGS, tags);
         map.put(Constants.KEY_RUM_SDK_INNER_KEY_COLLECT_TYPE, collectType);
         map.put(Constants.KEY_RUM_SDK_INNER_KEY_START_TIME_NANO, startTimeNanoForDuration);
+        map.put(Constants.KEY_HAS_REPLAY, hasReplay);
         return Utils.hashMapObjectToJson(map);
     }
 
@@ -274,6 +285,7 @@ public class ActionBean {
                 }
             }
 
+            this.hasReplay = json.optBoolean(Constants.KEY_HAS_REPLAY, false);
         } catch (JSONException e) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 

@@ -4,4 +4,7 @@
     <item android:id="@+id/refresh"
         app:showAsAction="always"
         android:title="Refresh"/>
+    <item android:id="@+id/go_to_first_activity"
+        app:showAsAction="never"
+        android:title="Go to First Activity"/>
 </menu>

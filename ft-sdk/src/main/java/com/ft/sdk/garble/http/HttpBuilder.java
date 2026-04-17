@@ -8,7 +8,10 @@ import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * BY huangDianHua
@@ -41,7 +44,7 @@ public class HttpBuilder {
 
     // New HashMap for form and file data
     private final HashMap<String, String> formParams = new HashMap<>();
-    private final HashMap<String, Pair<String, byte[]>> fileParams = new HashMap<>();
+    private final List<Map.Entry<String, Pair<String, byte[]>>> fileParams = new ArrayList<>();
 
     private boolean urlWithMsPrecision;
 
@@ -81,13 +84,19 @@ public class HttpBuilder {
     }
 
     public String getUrl() {
-        Uri.Builder fullUrl = Uri.parse(getHost()).buildUpon();
+        String host = getHost();
+        StringBuilder urlBuilder = new StringBuilder(host);
         if (!Utils.isNullOrEmpty(model)) {
-            fullUrl.appendPath(model);
-            if (isDataway) {
-                fullUrl.appendQueryParameter("token", httpConfig.getClientToken())
-                        .appendQueryParameter("to_headless", "true");
+            if (!host.endsWith("/") && !model.startsWith("/")) {
+                urlBuilder.append("/");
             }
+            urlBuilder.append(model);
+        }
+        String baseUrl = urlBuilder.toString();
+        Uri.Builder fullUrl = Uri.parse(baseUrl).buildUpon();
+        if (isDataway) {
+            fullUrl.appendQueryParameter("token", httpConfig.getClientToken())
+                    .appendQueryParameter("to_headless", "true");
         }
         if (!params.isEmpty()) {
             for (String key : params.keySet()) {
@@ -124,7 +133,7 @@ public class HttpBuilder {
         return formParams;
     }
 
-    public HashMap<String, Pair<String, byte[]>> getFileParams() {
+    public List<Map.Entry<String, Pair<String, byte[]>>> getFileParams() {
         return fileParams;
     }
 
@@ -177,14 +186,14 @@ public class HttpBuilder {
         return this;
     }
 
-    public HttpBuilder setFileParams(HashMap<String, Pair<String, byte[]>> fileParams) {
+    public HttpBuilder setFileParams(List<Map.Entry<String, Pair<String, byte[]>>> fileParams ) {
         this.fileParams.clear();
-        this.fileParams.putAll(fileParams);
+        this.fileParams.addAll(fileParams);
         return this;
     }
 
     public HttpBuilder addFileParam(String key, Pair<String, byte[]> file) {
-        this.fileParams.put(key, file);
+        this.fileParams.add(new HashMap.SimpleEntry<>(key, file));
         return this;
     }
 

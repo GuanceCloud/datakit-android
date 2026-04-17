@@ -19,6 +19,7 @@ import java.net.ProtocolException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -168,8 +169,8 @@ public class NativeNetEngine implements INetEngine {
                 }
 
                 // Add file part
-                HashMap<String, Pair<String, byte[]>> fileParams = mHttpBuilder.getFileParams();
-                for (Map.Entry<String, Pair<String, byte[]>> fileEntry : fileParams.entrySet()) {
+                List<Map.Entry<String, Pair<String, byte[]>>> fileParams = mHttpBuilder.getFileParams();
+                for (Map.Entry<String, Pair<String, byte[]>> fileEntry : fileParams) {
                     formData.addFilePart(fileEntry.getKey(), new ByteArrayInputStream(fileEntry.getValue().second)
                             , fileEntry.getValue().first);
                 }

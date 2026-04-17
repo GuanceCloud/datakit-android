@@ -8,6 +8,7 @@ import com.ft.sdk.garble.utils.Constants;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -82,7 +83,7 @@ public class OkHttpEngine implements INetEngine {
                     multipartBuilder.addFormDataPart(field.getKey(), field.getValue());
                 }
 
-                for (Map.Entry<String, Pair<String, byte[]>> fileFields : httpBuilder.getFileParams().entrySet()) {
+                for (Map.Entry<String, Pair<String, byte[]>> fileFields : httpBuilder.getFileParams()) {
                     RequestBody fileBody = RequestBody.create(MediaType.parse("application/octet-stream"),
                             fileFields.getValue().second);
                     multipartBuilder.addFormDataPart(fileFields.getKey(), fileFields.getValue().first,

@@ -32,12 +32,12 @@ public class FTUIBlockManager {
         @Override
         public void println(String x) {
             if (x == null) return;
-
+            long now = System.nanoTime();
             if (x.startsWith(PREFIX_METHOD_DISPATCH_START)) {
                 method = x.substring(PREFIX_METHOD_DISPATCH_START.length());
-                startTime = System.nanoTime();
+                startTime = now;
             } else if (x.startsWith(PREFIX_METHOD_DISPATCH_END)) {
-                long duration = System.nanoTime() - startTime;
+                long duration = now - startTime;
                 if (duration > blockDurationNS) {
                     if (!FTActivityLifecycleCallbacks.isAppInForeground()) return;
                     // only record data when page is in foreground

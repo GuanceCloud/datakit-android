@@ -14,14 +14,21 @@ import com.ft.sdk.FTTraceConfig;
 import com.ft.sdk.FTTraceInterceptor;
 import com.ft.sdk.FTTraceManager;
 import com.ft.sdk.LogCacheDiscard;
-import com.ft.sdk.TraceContext;
 import com.ft.sdk.RUMCacheDiscard;
+import com.ft.sdk.TraceContext;
 import com.ft.sdk.TraceType;
 import com.ft.sdk.garble.bean.RemoteConfigBean;
 import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.utils.LogUtils;
-import com.ft.sdk.garble.utils.Utils;
+import com.ft.sdk.sessionreplay.CustomExtensionSupport;
+import com.ft.sdk.sessionreplay.FTSessionReplayConfig;
+import com.ft.sdk.sessionreplay.ImagePrivacy;
+import com.ft.sdk.sessionreplay.MapperTypeWrapper;
+import com.ft.sdk.sessionreplay.TextAndInputPrivacy;
+import com.ft.sdk.sessionreplay.TouchPrivacy;
+import com.ft.sdk.sessionreplay.internal.recorder.mapper.WebViewXWireframeMapper;
+import com.ft.sdk.sessionreplay.material.MaterialExtensionSupport;
 import com.ft.utils.CrossProcessSetting;
 import com.lzy.okgo.OkGo;
 
@@ -78,17 +85,15 @@ public class DemoApplication extends BaseApplication {
 
 
     static void initFTSDK(Context context) {
-        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAKIT_URL)
+        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAWAY_URL,BuildConfig.CLIENT_TOKEN)
                 .setDebug(true)//Set whether it's debug
                 .setAutoSync(true)
                 .setCustomSyncPageSize(10)
                 .setOnlySupportMainProcess(CrossProcessSetting.isOnlyMainProcess(context))
-                .addGlobalContext("test_flag", "fix_db_lock_02")
-                .addGlobalContext("main_process", Utils.isMainProcess() + "")
                 .setNeedTransformOldCache(true)
                 .setCompressIntakeRequests(true)
-                .setRemoteConfiguration(true)
                 .setSyncSleepTime(100)
+                .setRemoteConfiguration(true)
                 .setRemoteConfigurationCallBack(new FTRemoteConfigManager.FetchResult() {
                     @Override
                     public void onResult(boolean success) {
@@ -154,7 +159,7 @@ public class DemoApplication extends BaseApplication {
                 .setSamplingRate(1f)
                 .setEnableCustomLog(true)
                 .setEnableConsoleLog(true)
-                .setLogCacheLimitCount(30000)
+                .setLogCacheLimitCount(1000)
                 .setLogCacheDiscardStrategy(LogCacheDiscard.DISCARD)
                 .setPrintCustomLogToConsole(true)
                 .setLogLevelFilters(new Status[]{Status.ERROR, Status.DEBUG})
@@ -168,7 +173,7 @@ public class DemoApplication extends BaseApplication {
                         .setRumAppId(BuildConfig.RUM_APP_ID)
                         .setEnableTraceUserAction(true)
                         .setEnableTraceUserView(true)
-                        .setRumCacheLimitCount(10000)
+                        .setRumCacheLimitCount(1000)
 //                        .setAllowWebViewHost(new String[]{"10.100.64.166"})
                         .setRumCacheDiscardStrategy(RUMCacheDiscard.DISCARD)
                         .setEnableTraceUserResource(true)
@@ -228,6 +233,20 @@ public class DemoApplication extends BaseApplication {
                 })
                 .setTraceType(TraceType.DDTRACE));
 
+        FTSdk.initSessionReplayConfig(new FTSessionReplayConfig()
+                        .setSampleRate(1f)
+//                        .setSessionReplayOnErrorSampleRate(1f)
+//                        .setPrivacy(SessionReplayPrivacy.MASK)
+                        .setTouchPrivacy(TouchPrivacy.SHOW)
+                        .setTextAndInputPrivacy(TextAndInputPrivacy.MASK_SENSITIVE_INPUTS)
+                        .enableLinkRUMKeys(new String[]{"wgt_id"})
+                        .setImagePrivacy(ImagePrivacy.MASK_NONE)
+                        .addExtensionSupport(new MaterialExtensionSupport())
+                        .addExtensionSupport(new CustomExtensionSupport()
+                                .addMapper(new MapperTypeWrapper<>(com.tencent.smtt.sdk.WebView.class,
+                                        new WebViewXWireframeMapper())))
+
+        );
 
     }
 
