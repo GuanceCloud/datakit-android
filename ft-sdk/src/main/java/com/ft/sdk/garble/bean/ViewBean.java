@@ -134,6 +134,12 @@ public class ViewBean {
      */
     long lastErrorTime = 0;
 
+    long recordsCount = 0;
+
+    boolean hasReplay = false;
+
+    boolean sessionReplayErrorSampled = false;
+
     public void setLastErrorTime(long lastErrorTime) {
         this.lastErrorTime = lastErrorTime;
     }
@@ -322,6 +328,30 @@ public class ViewBean {
         return batteryCurrentAvg;
     }
 
+    public long getRecordsCount() {
+        return recordsCount;
+    }
+
+    public void setRecordsCount(long recordsCount) {
+        this.recordsCount = recordsCount;
+    }
+
+    public boolean isHasReplay() {
+        return hasReplay;
+    }
+
+    public void setHasReplay(boolean hasReplay) {
+        this.hasReplay = hasReplay;
+    }
+
+    public void setSessionReplayErrorSampled(boolean sessionReplayErrorSampled) {
+        this.sessionReplayErrorSampled = sessionReplayErrorSampled;
+    }
+
+    public boolean isSessionReplayErrorSampled() {
+        return sessionReplayErrorSampled;
+    }
+
     public void setBatteryCurrentAvg(int batteryCurrentAvg) {
         this.batteryCurrentAvg = batteryCurrentAvg;
     }
@@ -361,6 +391,7 @@ public class ViewBean {
         map.put(Constants.KEY_CPU_TICK_COUNT_PER_SECOND, cpuTickCount);
         map.put(Constants.KEY_MEMORY_AVG, memoryAvg);
         map.put(Constants.KEY_MEMORY_MAX, memoryMax);
+        map.put(Constants.KEY_HAS_REPLAY, hasReplay);
         map.put(Constants.KEY_RUM_SDK_INNER_KEY_PROPERTY, property);
         map.put(Constants.KEY_RUM_SDK_INNER_KEY_START_TIME_NANO, startTimeNanoForDuration);
         map.put(Constants.KEY_RUM_SDK_INNER_KEY_TAGS, tags);
@@ -386,6 +417,8 @@ public class ViewBean {
             this.cpuTickCountPerSecond = json.optDouble(Constants.KEY_CPU_TICK_COUNT);
             this.cpuTickCount = json.optLong(Constants.KEY_CPU_TICK_COUNT_PER_SECOND);
             this.startTimeNanoForDuration = json.optLong(Constants.KEY_RUM_SDK_INNER_KEY_START_TIME_NANO);
+            this.hasReplay = json.optBoolean(Constants.KEY_HAS_REPLAY);
+            this.sessionReplayErrorSampled = json.optBoolean(Constants.KEY_SAMPLED_FOR_ERROR_REPLAY);
 
             JSONObject jsonProperty = json.optJSONObject(Constants.KEY_RUM_SDK_INNER_KEY_PROPERTY);
             if (jsonProperty != null) {

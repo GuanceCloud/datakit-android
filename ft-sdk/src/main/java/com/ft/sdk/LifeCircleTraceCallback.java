@@ -181,6 +181,10 @@ class LifeCircleTraceCallback {
         }
     }
 
+    public void onPreResume(Activity activity) {
+        FTActivityManager.get().setCurrentActivity(activity);
+    }
+
     /**
      * Triggered when all Activities are onStop
      */

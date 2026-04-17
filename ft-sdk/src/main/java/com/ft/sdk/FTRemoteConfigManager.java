@@ -11,6 +11,7 @@ import com.ft.sdk.garble.threadpool.RemoteConfigThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
+import com.ft.sdk.sessionreplay.FTSessionReplayConfig;
 
 import java.net.HttpURLConnection;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -189,6 +190,17 @@ public class FTRemoteConfigManager {
                         break;
                     }
                 }
+            }
+        }
+    }
+
+    void mergeSessionReplayConfigFromCache(FTSessionReplayConfig config) {
+        if (mRemoteConfig != null) {
+            if (mRemoteConfig.getSessionReplaySampleRate() != null) {
+                config.setSampleRate(mRemoteConfig.getSessionReplaySampleRate());
+            }
+            if (mRemoteConfig.getSessionReplayOnErrorSampleRate() != null) {
+                config.setSessionReplayOnErrorSampleRate(mRemoteConfig.getSessionReplayOnErrorSampleRate());
             }
         }
     }
@@ -386,7 +398,28 @@ public class FTRemoteConfigManager {
                 rumConfig.setSessionErrorSampleRate(bean.getRumSessionOnErrorSampleRate());
             }
 
-            FTRUMInnerManager.get().hotUpdate(bean.getRumSampleRate(), bean.getRumSessionOnErrorSampleRate());
+            SessionReplayManager replayManager = SessionReplayManager.get();
+            boolean replayEnable = replayManager.isReplayEnable();
+            Float sessionReplaySampleRate = null;
+            Float sessionReplayOnErrorSampleRate = null;
+            if (replayEnable) {
+                if (bean.getSessionReplaySampleRate() != null) {
+                    replayManager.setSampleRate(bean.getSessionReplaySampleRate());
+                }
+                sessionReplaySampleRate = replayManager.sampleRate();
+
+                if (bean.getSessionReplayOnErrorSampleRate() != null) {
+                    replayManager.setSessionReplayOnErrorSampleRate(bean.getSessionReplayOnErrorSampleRate());
+                }
+                sessionReplayOnErrorSampleRate = SessionReplayManager.get().sessionReplayOnErrorSampleRate();
+            }
+
+            boolean forceRefreshExecuted = FTRUMInnerManager.get().hotUpdate(bean.getRumSampleRate(),
+                    bean.getRumSessionOnErrorSampleRate());
+
+            if (replayEnable && !forceRefreshExecuted) {
+                SessionReplayManager.get().hotUpdate(sessionReplaySampleRate, sessionReplayOnErrorSampleRate);
+            }
         }
     }
 

@@ -100,6 +100,7 @@ dependencies {
     implementation "androidx.fragment:fragment:1.6.1"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.20"
     implementation "androidx.webkit:webkit:1.9.0"
+    implementation "androidx.viewpager2:viewpager2:1.0.0"
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation project(':ft-test')
@@ -113,12 +114,15 @@ dependencies {
     implementation project(":ft-sdk")
 //    implementation project(":WebviewTest")
     implementation project(":ft-native")
+//    implementation project(":ft-session-replay")
+    implementation project(":ft-session-replay-material")
 
     implementation 'com.squareup.okhttp3:okhttp:4.5.0'
+    implementation 'com.github.bumptech.glide:glide:4.16.0'
 
 //    debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
 //    debugImplementation 'com.amitshekhar.android:debug-db-encrypt:1.0.6'
-    compileOnly files("../tbs_sdk_thirdapp_v4.3.0.185_44085_sharewithdownloadwithfile_withoutGame_obfs_20210809_201442.jar")
+    implementation files("../tbs_sdk_thirdapp_v4.3.0.185_44085_sharewithdownloadwithfile_withoutGame_obfs_20210809_201442.jar")
 
 }
 
@@ -127,7 +131,7 @@ apply plugin: 'ft-plugin'
 
 FTExt {
     showLog = true
-    knownWebViewClasses =['com.ft.webview.CustomWebView']
+    knownWebViewClasses =['com.ft.webview.TCWebView','com.ft.webview.CustomWebView']
     autoUploadMap = true
     autoUploadNativeDebugSymbol = true
     generateSourceMapOnly = true

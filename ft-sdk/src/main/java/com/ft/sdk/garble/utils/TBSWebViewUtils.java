@@ -28,8 +28,6 @@ public class TBSWebViewUtils {
         isTBSWebViewAvailable = PackageUtils.isTBSWebViewAvailable();
         if (isTBSWebViewAvailable) {
             LogUtils.d(LOG_TAG, "TBS WebView is available");
-        } else {
-            LogUtils.d(LOG_TAG, "TBS WebView is not available");
         }
 
         isTBSWebViewInitialized = true;

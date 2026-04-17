@@ -29,6 +29,7 @@ import java.util.HashMap;
  * These can be viewed through Guanceyun Studio <a href="https://docs.guance.com/real-user-monitoring/explorer/view/">Viewer View</a>
  */
 public class FTActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "FTActivityLifecycleCallbacks";
     private final LifeCircleTraceCallback mAppRestartCallback = new LifeCircleTraceCallback();
     private final WindowCallbackTracker mDispatcherReceiver = new WindowCallbackTracker();
 
@@ -126,7 +127,6 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
             } else {
                 FTRUMInnerManager.get().startView(activity.getClass().getSimpleName());
             }
-
         }
 
         if (manager.isRumEnable() && manager.getConfig().isEnableTraceUserAction()) {
@@ -139,6 +139,12 @@ public class FTActivityLifecycleCallbacks implements Application.ActivityLifecyc
         }
 
 
+    }
+
+    @Override
+    public void onActivityPreResumed(@NonNull Activity activity) {
+        Application.ActivityLifecycleCallbacks.super.onActivityPreResumed(activity);
+        mAppRestartCallback.onPreResume(activity);
     }
 
     /**

@@ -13,3 +13,10 @@ GuanceCloud Application Monitoring can collect metric data from various Android 
 
 ## Documentation
  [Documentation Center](https://docs.guance.com/real-user-monitoring/android/app-access/)   
+
+## Open Source Code Usage
+* [ft-session-replay](ft-session-replay) is a secondary development based on datadog [dd-sdk-android-session-replay](https://github.com/DataDog/dd-sdk-android/tree/develop/features/dd-sdk-android-session-replay)
+* [ft-session-replay-material](ft-session-replay-material) is a secondary development based on datadog [dd-sdk-android-session-replay-material](https://github.com/DataDog/dd-sdk-android/tree/develop/features/dd-sdk-android-session-replay-material)
+
+## Third-party Licenses
+- Datadog [dd-sdk-android](https://github.com/DataDog/dd-sdk-android/blob/develop/LICENSE)
