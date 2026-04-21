@@ -27,6 +27,7 @@ import com.ft.sdk.sessionreplay.ImagePrivacy;
 import com.ft.sdk.sessionreplay.MapperTypeWrapper;
 import com.ft.sdk.sessionreplay.TextAndInputPrivacy;
 import com.ft.sdk.sessionreplay.TouchPrivacy;
+import com.ft.sdk.sessionreplay.compose.ComposeExtensionSupport;
 import com.ft.sdk.sessionreplay.internal.recorder.mapper.WebViewXWireframeMapper;
 import com.ft.sdk.sessionreplay.material.MaterialExtensionSupport;
 import com.ft.utils.CrossProcessSetting;
@@ -241,6 +242,7 @@ public class DemoApplication extends BaseApplication {
                         .setTextAndInputPrivacy(TextAndInputPrivacy.MASK_SENSITIVE_INPUTS)
                         .enableLinkRUMKeys(new String[]{"wgt_id"})
                         .setImagePrivacy(ImagePrivacy.MASK_NONE)
+                        .addExtensionSupport(new ComposeExtensionSupport())
                         .addExtensionSupport(new MaterialExtensionSupport())
                         .addExtensionSupport(new CustomExtensionSupport()
                                 .addMapper(new MapperTypeWrapper<>(com.tencent.smtt.sdk.WebView.class,

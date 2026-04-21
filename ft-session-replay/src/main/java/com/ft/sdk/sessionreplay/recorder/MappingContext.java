@@ -51,6 +51,10 @@ public class MappingContext {
         return touchPrivacyManager;
     }
 
+    public InteropViewCallback getInteropViewCallback() {
+        return interopViewCallback;
+    }
+
     public MappingContext copy(boolean hasOptionSelectorParent) {
         return new MappingContext(systemInformation,
                 imageWireframeHelper, hasOptionSelectorParent, textAndInputPrivacy, imagePrivacy,
