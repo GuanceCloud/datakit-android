@@ -3,7 +3,7 @@ apply plugin: 'kotlin-android'
 
 ext {
     pkgVersion = rootProject.ext.sdkVersions.ftSessionReplay
-    mavenGroupId = "com.cloudcare.ft.mobile.sdk.tracker.agent"
+    mavenGroupId = "com.truewatch.ft.mobile.sdk.tracker.agent"
     mavenArtifactId = "ft-session-replay-compose"
     withSourceCode = false
 }

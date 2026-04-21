@@ -147,7 +147,7 @@ apply plugin: 'ft-plugin'
 
 FTExt {
     showLog = true
-    knownWebViewClasses =['com.ft.webview.TCWebView','com.ft.webview.CustomWebView']
+//    knownWebViewClasses =['com.ft.webview.TCWebView','com.ft.webview.CustomWebView']
     autoUploadMap = true
     autoUploadNativeDebugSymbol = true
     generateSourceMapOnly = true
