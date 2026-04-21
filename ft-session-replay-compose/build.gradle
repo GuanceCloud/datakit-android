@@ -1,0 +1,54 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+ext {
+    pkgVersion = rootProject.ext.sdkVersions.ftSessionReplay
+    mavenGroupId = "com.cloudcare.ft.mobile.sdk.tracker.agent"
+    mavenArtifactId = "ft-session-replay-compose"
+    withSourceCode = false
+}
+
+android {
+    namespace 'com.ft.sdk.sessionreplay.compose'
+    compileSdk 34
+
+    defaultConfig {
+        minSdk 21
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+        buildConfigField("String", "VERSION_NAME", "\"${pkgVersion}\"")
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}
+
+dependencies {
+    api project(":ft-session-replay")
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.22"
+    implementation 'androidx.compose.runtime:runtime:1.4.3'
+    implementation 'androidx.compose.ui:ui:1.4.3'
+    implementation 'androidx.compose.ui:ui-text:1.4.3'
+    implementation 'androidx.compose.foundation:foundation:1.4.3'
+    implementation 'androidx.compose.material:material:1.4.3'
+    implementation 'androidx.compose.animation:animation-core:1.4.3'
+    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation 'androidx.lifecycle:lifecycle-common:2.6.2'
+}
+
+apply from: '../maven_aar_publish.gradle'

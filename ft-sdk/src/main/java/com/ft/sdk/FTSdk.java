@@ -45,10 +45,6 @@ public class FTSdk {
      * After integrating ft-session-replay, it will be assigned, directly access {@link com.ft.sdk.nativelib.BuildConfig#VERSION_NAME} to get
      */
     public static String SESSION_REPLAY_VERSION = PackageUtils.isSessionReplay() ? PackageUtils.getPackageSessionReplay() : "";
-    /**
-     * After integrating ft-session-replay-material, it will be assigned, directly access {@link com.ft.sdk.sessionreplay.material.BuildConfig#VERSION_NAME} to get
-     */
-    public static String SESSION_REPLAY_MATERIAL_VERSION = PackageUtils.isSessionReplayMtr() ? PackageUtils.getPackageSessionReplayMtr() : "";
 
     private final static boolean isSessionReplaySupport = !SESSION_REPLAY_VERSION.isEmpty();
     /**
@@ -398,9 +394,6 @@ public class FTSdk {
         }
         if (!FTSdk.SESSION_REPLAY_VERSION.isEmpty()) {
             pkgInfo.put(Constants.KEY_RUM_SDK_PACKAGE_REPLAY, FTSdk.SESSION_REPLAY_VERSION);
-        }
-        if (!FTSdk.SESSION_REPLAY_MATERIAL_VERSION.isEmpty()) {
-            pkgInfo.put(Constants.KEY_RUM_SDK_PACKAGE_REPLAY_MATERIAL, FTSdk.SESSION_REPLAY_MATERIAL_VERSION);
         }
         return pkgInfo;
     }

@@ -469,11 +469,6 @@ public class Constants {
     public static final String KEY_RUM_SDK_PACKAGE_REPLAY = "replay";
 
     /**
-     * ft-session-replay-material module
-     */
-    public static final String KEY_RUM_SDK_PACKAGE_REPLAY_MATERIAL = "replay_mtr";
-
-    /**
      * Web view uses web sdk release version
      */
     public static final String KEY_RUM_SDK_PACKAGE_WEB = "web";

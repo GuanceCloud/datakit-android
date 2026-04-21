@@ -3,5 +3,6 @@ rootProject.name='ft-sdk-android'
 include ':ft-test'
 include ':ft-session-replay'
 include ':ft-session-replay-material'
+include ':ft-session-replay-compose'
 
 //include ':WebviewTest'
