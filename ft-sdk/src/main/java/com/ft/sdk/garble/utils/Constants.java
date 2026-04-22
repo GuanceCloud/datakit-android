@@ -116,6 +116,26 @@ public class Constants {
      * Store error occurrence time
      */
     public static final String FT_RUM_ERROR_TIMELINE = "ft.error.timeline";
+    /**
+     * Store crash-free duration statistics baseline time
+     */
+    public static final String FT_CRASH_FREE_START_TIME = "ft.crash_free.start_time";
+    /**
+     * Store accumulated foreground crash-free duration
+     */
+    public static final String FT_CRASH_FREE_FOREGROUND_DURATION = "ft.crash_free.foreground_duration";
+    /**
+     * Store accumulated background crash-free duration
+     */
+    public static final String FT_CRASH_FREE_BACKGROUND_DURATION = "ft.crash_free.background_duration";
+    /**
+     * Store current crash-free app state
+     */
+    public static final String FT_CRASH_FREE_APP_STATE = "ft.crash_free.app_state";
+    /**
+     * Store current crash-free state start time
+     */
+    public static final String FT_CRASH_FREE_STATE_START_TIME = "ft.crash_free.state_start_time";
 
     /**
      * Store {@link  android.content.SharedPreferences} data storage key value
@@ -578,6 +598,14 @@ public class Constants {
      * Status when error occurs, {@link com.ft.sdk.garble.bean.AppState}
      */
     public static final String KEY_RUM_ERROR_SITUATION = "error_situation";
+    /**
+     * Foreground crash-free duration, nanoseconds.
+     */
+    public static final String KEY_RUM_FOREGROUND_CRASH_FREE_DURATION = "foreground_crash_free_duration";
+    /**
+     * Background crash-free duration, nanoseconds.
+     */
+    public static final String KEY_RUM_BACKGROUND_CRASH_FREE_DURATION = "background_crash_free_duration";
     /**
      * Long task duration, nanoseconds, {@link #FT_MEASUREMENT_RUM_LONG_TASK}
      */

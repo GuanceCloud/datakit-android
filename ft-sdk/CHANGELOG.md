@@ -2,6 +2,7 @@
 1. Added `view_long_task_rate` to View RUM metrics. The value is calculated from total LongTask duration divided by View duration, and is capped at `1`.
 2. Optimized View LongTask summary refresh timing to reduce the chance of stale View data overwriting newer `view_long_task_rate` values.
 3. Added Android test coverage for `view_long_task_rate` calculation and upper-bound behavior.
+4. Added `foreground_crash_free_duration` and `background_crash_free_duration` to crash RUM Error metrics, and aligned pre-crash/native crash reporting with foreground/background duration snapshots.
 
 ---
 # agent 1.7.0

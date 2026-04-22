@@ -802,10 +802,14 @@ public class FTRUMInnerManager {
                          AppState state, HashMap<String, Object> property, RunnerCompleteCallBack callBack) {
 
         try {
+            boolean isPreCrash = property != null && property.get(FTExceptionHandler.IS_PRE_CRASH) == (Boolean) true;
+            boolean isCrashError = ErrorType.JAVA.toString().equals(errorType)
+                    || ErrorType.NATIVE.toString().equals(errorType)
+                    || ErrorType.ANR_CRASH.toString().equals(errorType);
             checkSessionRefresh(true);
             CollectType collectType = checkSessionWillCollect(sessionId);
 
-            if (property == null || property.get(FTExceptionHandler.IS_PRE_CRASH) != (Boolean) true) {
+            if (!isPreCrash) {
                 //Exclude the scenario of reporting the last native crash error
                 SyncTaskManager.get().setErrorTimeLine(dateline, activeView);
 
@@ -827,6 +831,12 @@ public class FTRUMInnerManager {
 
             fields.put(Constants.KEY_RUM_ERROR_MESSAGE, message);
             fields.put(Constants.KEY_RUM_ERROR_STACK, log);
+            if (isCrashError) {
+                FTActivityManager.CrashFreeDuration crashFreeDuration =
+                        FTActivityManager.get().getCrashFreeDuration(dateline, state, isPreCrash);
+                fields.put(Constants.KEY_RUM_FOREGROUND_CRASH_FREE_DURATION, crashFreeDuration.foregroundDuration);
+                fields.put(Constants.KEY_RUM_BACKGROUND_CRASH_FREE_DURATION, crashFreeDuration.backgroundDuration);
+            }
             attachRUMRelative(tags, fields, true);
 
             EventConsumerThreadPool.get().execute(new Runnable() {
@@ -856,6 +866,9 @@ public class FTRUMInnerManager {
                                 new RunnerCompleteCallBack() {
                                     @Override
                                     public void onComplete() {
+                                        if (isCrashError) {
+                                            FTActivityManager.get().resetCrashFreeDuration(dateline, state);
+                                        }
                                         increaseError(tags);
                                         if (callBack != null) {
                                             // Java Crash, Native Crash need to record the crash status of the current state
