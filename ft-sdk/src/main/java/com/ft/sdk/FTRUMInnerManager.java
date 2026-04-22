@@ -905,8 +905,7 @@ public class FTRUMInnerManager {
 
             FTTrackInner.getInstance().rum(Utils.getCurrentNanoTime() - duration,
                     Constants.FT_MEASUREMENT_RUM_LONG_TASK, tags, fields, null, type);
-            increaseLongTask(tags);
-            generateRumData();
+            increaseLongTask(tags, duration);
         } catch (Exception e) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
@@ -1254,15 +1253,24 @@ public class FTRUMInnerManager {
      *
      * @param tags rum globalContext
      */
-    private void increaseLongTask(HashMap<String, Object> tags) {
+    private void increaseLongTask(HashMap<String, Object> tags, final long duration) {
         final String actionId = HashMapUtils.getString(tags, Constants.KEY_RUM_ACTION_ID);
         final String viewId = HashMapUtils.getString(tags, Constants.KEY_RUM_VIEW_ID);
+        final ActiveViewBean viewBean = activeView;
+        if (viewBean != null && viewBean.getId().equals(viewId)) {
+            viewBean.addLongTaskDuration(duration);
+        }
         EventConsumerThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
                 FTDBManager.get().increaseActionLongTask(actionId);
                 FTDBManager.get().increaseViewLongTask(viewId);
+                if (viewBean != null && viewBean.getId().equals(viewId)) {
+                    FTDBManager.get().updateViewExtraAttr(viewId, viewBean.getAttrJsonString());
+                }
+                FTDBManager.get().updateViewUpdateTime(viewId, System.currentTimeMillis());
                 FTRUMInnerManager.this.checkActionClose();
+                generateRumData();
 
             }
         });
@@ -1313,6 +1321,27 @@ public class FTRUMInnerManager {
                 generateRumData(true); // Force generate data when closing view
             }
         });
+    }
+
+    /**
+     * Attach View long task rate: total long task duration / View duration.
+     *
+     * @param bean   view summary data
+     * @param fields upload fields
+     */
+    private void attachViewLongTaskRate(ViewBean bean, HashMap<String, Object> fields) {
+        ActiveViewBean activeViewBean = activeView;
+        ViewBean targetBean = activeViewBean != null && activeViewBean.getId().equals(bean.getId())
+                ? activeViewBean
+                : bean;
+        long viewDuration = targetBean.isClose()
+                ? targetBean.getTimeSpent()
+                : System.nanoTime() - targetBean.getStartTimeNanoForDuration();
+        long longTaskDuration = targetBean.getLongTaskDuration();
+        if (viewDuration > 0 && longTaskDuration > 0) {
+            double longTaskRate = (double) longTaskDuration / (double) viewDuration;
+            fields.put(Constants.KEY_RUM_VIEW_LONG_TASK_RATE, Math.min(longTaskRate, 1d));
+        }
     }
 
     /**
@@ -1548,6 +1577,7 @@ public class FTRUMInnerManager {
                     fields.put(Constants.KEY_RUM_VIEW_TIME_SPENT, System.nanoTime() - bean.getStartTimeNanoForDuration());
                 }
                 fields.put(Constants.KEY_RUM_VIEW_LONG_TASK_COUNT, bean.getLongTaskCount());
+                attachViewLongTaskRate(bean, fields);
                 fields.put(Constants.KEY_RUM_VIEW_IS_ACTIVE, !bean.isClose());
                 fields.put(Constants.KEY_RUM_SDK_VIEW_UPDATE_TIME, bean.getViewUpdateTime());
 

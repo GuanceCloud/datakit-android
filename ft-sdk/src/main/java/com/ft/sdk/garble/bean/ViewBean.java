@@ -42,6 +42,11 @@ public class ViewBean {
     int longTaskCount;
 
     /**
+     * Total duration of long tasks in page cycle, unit: nanoseconds
+     */
+    long longTaskDuration;
+
+    /**
      * Number of network resource requests, {@link Constants#KEY_RUM_VIEW_RESOURCE_COUNT}
      */
     int resourceCount;
@@ -203,6 +208,10 @@ public class ViewBean {
         return longTaskCount;
     }
 
+    public long getLongTaskDuration() {
+        return longTaskDuration;
+    }
+
     public void setClose(boolean close) {
         isClose = close;
     }
@@ -245,6 +254,16 @@ public class ViewBean {
 
     public void setLongTaskCount(int longTaskCount) {
         this.longTaskCount = longTaskCount;
+    }
+
+    public void setLongTaskDuration(long longTaskDuration) {
+        this.longTaskDuration = longTaskDuration;
+    }
+
+    public void addLongTaskDuration(long duration) {
+        if (duration > 0) {
+            this.longTaskDuration += duration;
+        }
     }
 
     public void setResourceCount(int resourceCount) {
@@ -392,6 +411,7 @@ public class ViewBean {
         map.put(Constants.KEY_MEMORY_AVG, memoryAvg);
         map.put(Constants.KEY_MEMORY_MAX, memoryMax);
         map.put(Constants.KEY_HAS_REPLAY, hasReplay);
+        map.put(Constants.KEY_RUM_SDK_INNER_KEY_VIEW_LONG_TASK_DURATION, longTaskDuration);
         map.put(Constants.KEY_RUM_SDK_INNER_KEY_PROPERTY, property);
         map.put(Constants.KEY_RUM_SDK_INNER_KEY_START_TIME_NANO, startTimeNanoForDuration);
         map.put(Constants.KEY_RUM_SDK_INNER_KEY_TAGS, tags);
@@ -419,6 +439,7 @@ public class ViewBean {
             this.startTimeNanoForDuration = json.optLong(Constants.KEY_RUM_SDK_INNER_KEY_START_TIME_NANO);
             this.hasReplay = json.optBoolean(Constants.KEY_HAS_REPLAY);
             this.sessionReplayErrorSampled = json.optBoolean(Constants.KEY_SAMPLED_FOR_ERROR_REPLAY);
+            this.longTaskDuration = json.optLong(Constants.KEY_RUM_SDK_INNER_KEY_VIEW_LONG_TASK_DURATION);
 
             JSONObject jsonProperty = json.optJSONObject(Constants.KEY_RUM_SDK_INNER_KEY_PROPERTY);
             if (jsonProperty != null) {
@@ -453,6 +474,7 @@ public class ViewBean {
                 ", viewReferrer='" + viewReferrer + '\'' +
                 ", viewName='" + viewName + '\'' +
                 ", longTaskCount=" + longTaskCount +
+                ", longTaskDuration=" + longTaskDuration +
                 ", resourceCount=" + resourceCount +
                 ", errorCount=" + errorCount +
                 ", actionCount=" + actionCount +

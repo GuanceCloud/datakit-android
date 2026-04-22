@@ -7,6 +7,7 @@ import android.os.Looper;
 
 import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTRUMGlobalManager;
+import com.ft.sdk.FTRUMInnerManager;
 import com.ft.sdk.FTResourceEventListener;
 import com.ft.sdk.FTResourceInterceptor;
 import com.ft.sdk.FTSDKConfig;
@@ -43,6 +44,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.powermock.reflect.Whitebox;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -350,6 +352,34 @@ public class RUMTest extends FTBaseTest {
         Assert.assertEquals(view.getLongTaskCount(), 1);
         Assert.assertEquals(view.getActionCount(), 1);
 
+    }
+
+    @Test
+    public void viewLongTaskRateCalcTest() throws Exception {
+        ViewBean viewBean = new ViewBean();
+        viewBean.setClose(true);
+        viewBean.setTimeSpent(1_000_000_000L);
+        viewBean.setLongTaskDuration(250_000_000L);
+
+        HashMap<String, Object> fields = new HashMap<>();
+        Whitebox.invokeMethod(FTRUMInnerManager.get(), "attachViewLongTaskRate", viewBean, fields);
+
+        Assert.assertEquals(0.25d,
+                (Double) fields.get(Constants.KEY_RUM_VIEW_LONG_TASK_RATE), 0.000001d);
+    }
+
+    @Test
+    public void viewLongTaskRateCapOneTest() throws Exception {
+        ViewBean viewBean = new ViewBean();
+        viewBean.setClose(true);
+        viewBean.setTimeSpent(1_000_000_000L);
+        viewBean.setLongTaskDuration(2_000_000_000L);
+
+        HashMap<String, Object> fields = new HashMap<>();
+        Whitebox.invokeMethod(FTRUMInnerManager.get(), "attachViewLongTaskRate", viewBean, fields);
+
+        Assert.assertEquals(1d,
+                (Double) fields.get(Constants.KEY_RUM_VIEW_LONG_TASK_RATE), 0.000001d);
     }
 
     /**

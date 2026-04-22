@@ -43,6 +43,7 @@ public class ActiveViewBean extends ViewBean {
         bean.viewReferrer = this.viewReferrer;
         bean.viewName = this.viewName;
         bean.longTaskCount = this.longTaskCount;
+        bean.longTaskDuration = this.longTaskDuration;
         bean.errorCount = this.errorCount;
         bean.actionCount = this.actionCount;
         bean.isClose = this.isClose;

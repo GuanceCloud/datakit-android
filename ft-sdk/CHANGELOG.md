@@ -1,3 +1,9 @@
+# agent 1.7.1-alpha01
+1. Added `view_long_task_rate` to View RUM metrics. The value is calculated from total LongTask duration divided by View duration, and is capped at `1`.
+2. Optimized View LongTask summary refresh timing to reduce the chance of stale View data overwriting newer `view_long_task_rate` values.
+3. Added Android test coverage for `view_long_task_rate` calculation and upper-bound behavior.
+
+---
 # agent 1.7.0
 1. Added Session Replay capabilities, including WebView Session Replay, DCloud WebView support, and full-snapshot keyframe support for WebView containers.
 2. Added Session Replay and RUM context association, allowing WebView containers to be linked with the context of loaded HTML content.

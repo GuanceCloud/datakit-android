@@ -651,6 +651,10 @@ public class Constants {
      */
     public static final String KEY_RUM_VIEW_LONG_TASK_COUNT = "view_long_task_count";
     /**
+     * Long task duration ratio in page cycle.
+     */
+    public static final String KEY_RUM_VIEW_LONG_TASK_RATE = "view_long_task_rate";
+    /**
      * Number of resource requests in page cycle, {@link #FT_MEASUREMENT_RUM_RESOURCE}
      */
     public static final String KEY_RUM_VIEW_RESOURCE_COUNT = "view_resource_count";
@@ -747,6 +751,11 @@ public class Constants {
      *
      */
     public static final String KEY_RUM_SDK_INNER_KEY_START_TIME_NANO = "start_time_nano";
+
+    /**
+     * Long task total duration in current View lifecycle, unit: nanoseconds
+     */
+    public static final String KEY_RUM_SDK_INNER_KEY_VIEW_LONG_TASK_DURATION = "view_long_task_duration";
 
 
     /**
