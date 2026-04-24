@@ -3,6 +3,7 @@
 2. Optimized View LongTask summary refresh timing to reduce the chance of stale View data overwriting newer `view_long_task_rate` values.
 3. Added Android test coverage for `view_long_task_rate` calculation and upper-bound behavior.
 4. Added `foreground_crash_free_duration` and `background_crash_free_duration` to crash RUM Error metrics, and aligned pre-crash/native crash reporting with foreground/background duration snapshots.
+5. Added Resource network snapshot fields, including `network_available`, `network_validated`, `network_downlink_kbps`, `network_uplink_kbps`, and `network_signal_strength`.
 
 ---
 # agent 1.7.0

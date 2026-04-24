@@ -620,6 +620,15 @@ public class Constants {
     public static final String KEY_RUM_NETWORK_TYPE = "network_type";
 
     /**
+     * Active network snapshot.
+     */
+    public static final String KEY_RUM_NETWORK_AVAILABLE = "network_available";
+    public static final String KEY_RUM_NETWORK_VALIDATED = "network_validated";
+    public static final String KEY_RUM_NETWORK_DOWNLINK_KBPS = "network_downlink_kbps";
+    public static final String KEY_RUM_NETWORK_UPLINK_KBPS = "network_uplink_kbps";
+    public static final String KEY_RUM_NETWORK_SIGNAL_STRENGTH = "network_signal_strength";
+
+    /**
      * Session ID
      */
     public static final String KEY_RUM_SESSION_ID = "session_id";

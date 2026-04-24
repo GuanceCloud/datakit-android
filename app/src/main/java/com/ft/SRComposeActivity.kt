@@ -1,6 +1,9 @@
 package com.ft
 
+import android.graphics.Color as AndroidColor
 import android.os.Bundle
+import android.view.Gravity
+import android.widget.TextView
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
@@ -46,6 +49,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import com.ft.sdk.sessionreplay.ImagePrivacy
 import com.ft.sdk.sessionreplay.TextAndInputPrivacy
 import com.ft.sdk.sessionreplay.TouchPrivacy
@@ -169,6 +173,10 @@ private fun SessionReplayComposeScreen() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        AndroidViewInteropCard()
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(20.dp),
@@ -282,6 +290,43 @@ private fun SessionReplayComposeScreen() {
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun AndroidViewInteropCard() {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        backgroundColor = Color.White
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(text = "AndroidView interop", style = MaterialTheme.typography.subtitle1)
+            Spacer(modifier = Modifier.height(12.dp))
+            AndroidView(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(72.dp),
+                factory = { context ->
+                    TextView(context).apply {
+                        text = "Native TextView inside Compose"
+                        gravity = Gravity.CENTER
+                        textSize = 16f
+                        setTextColor(AndroidColor.WHITE)
+                        setBackgroundColor(AndroidColor.rgb(30, 91, 82))
+                    }
+                },
+                update = {
+                    it.text = "Native TextView inside Compose"
+                }
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "This block verifies Session Replay AndroidView interop mapping.",
+                style = MaterialTheme.typography.body2,
+                color = Color(0xFF5B5B5B)
+            )
         }
     }
 }

@@ -25,6 +25,7 @@ import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.ErrorType;
 import com.ft.sdk.garble.bean.NetStatusBean;
+import com.ft.sdk.garble.bean.NetworkStateBean;
 import com.ft.sdk.garble.bean.ResourceID;
 import com.ft.sdk.garble.bean.ResourceParams;
 import com.ft.sdk.garble.bean.ResourceType;
@@ -441,6 +442,37 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
+     * Simulate initiating a Resource request with network snapshot fields.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void resourceNetworkSnapshotFieldsTest() throws Exception {
+        NetworkStateBean networkStateBean = getNetworkStateBean();
+        try {
+            networkStateBean.setNetworkAvailable(true);
+            networkStateBean.setNetworkValidated(true);
+            networkStateBean.setNetworkDownlinkKbps(1200);
+            networkStateBean.setNetworkUplinkKbps(300);
+            networkStateBean.setNetworkSignalStrength(-70);
+
+            String uniqueUrl = TEST_FAKE_URL + "?network=snapshot";
+            sendResource(null, null, "text/plain", uniqueUrl);
+
+            waitEventConsumeInThreadPool();
+
+            LineProtocolData resourceData = getLatestResourceLineProtocolData(uniqueUrl);
+            Assert.assertEquals(true, resourceData.getField(Constants.KEY_RUM_NETWORK_AVAILABLE));
+            Assert.assertEquals(true, resourceData.getField(Constants.KEY_RUM_NETWORK_VALIDATED));
+            Assert.assertEquals(1200, resourceData.getField(Constants.KEY_RUM_NETWORK_DOWNLINK_KBPS));
+            Assert.assertEquals(300, resourceData.getField(Constants.KEY_RUM_NETWORK_UPLINK_KBPS));
+            Assert.assertEquals(-70, resourceData.getField(Constants.KEY_RUM_NETWORK_SIGNAL_STRENGTH));
+        } finally {
+            networkStateBean.setNetworkNotAvailable();
+        }
+    }
+
+    /**
      * Simulate Resource request with dynamic parameters
      *
      * @throws InterruptedException
@@ -746,6 +778,25 @@ public class RUMTest extends FTBaseTest {
         }
         Assert.fail("No rum error data found");
         return null;
+    }
+
+    private LineProtocolData getLatestResourceLineProtocolData(String url) {
+        List<SyncData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
+        for (SyncData syncData : recordDataList) {
+            LineProtocolData data = new LineProtocolData(syncData.getDataString());
+            if (Constants.FT_MEASUREMENT_RUM_RESOURCE.equals(data.getMeasurement())
+                    && url.equals(data.getTagAsString(Constants.KEY_RUM_RESOURCE_URL, ""))) {
+                return data;
+            }
+        }
+        Assert.fail("No rum resource data found for url: " + url);
+        return null;
+    }
+
+    private NetworkStateBean getNetworkStateBean() throws Exception {
+        Class<?> listenerClass = Class.forName("com.ft.sdk.FTNetworkListener");
+        Object listener = Whitebox.invokeMethod(listenerClass, "get");
+        return Whitebox.invokeMethod(listener, "getNetworkStateBean");
     }
 
     private long getLongField(LineProtocolData data, String key) {

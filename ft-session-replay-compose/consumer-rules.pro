@@ -90,3 +90,8 @@
 -keep class androidx.compose.ui.text.android.TextLayout{
     <fields>;
 }
+
+-keepclassmembers class com.ft.sdk.sessionreplay.recorder.MappingContext {
+    public com.ft.sdk.sessionreplay.recorder.InteropViewCallback getInteropViewCallback();
+    com.ft.sdk.sessionreplay.recorder.InteropViewCallback interopViewCallback;
+}

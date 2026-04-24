@@ -18,6 +18,7 @@ import com.ft.sdk.garble.bean.CollectType;
 import com.ft.sdk.garble.bean.ErrorSource;
 import com.ft.sdk.garble.bean.ErrorType;
 import com.ft.sdk.garble.bean.NetStatusBean;
+import com.ft.sdk.garble.bean.NetworkStateBean;
 import com.ft.sdk.garble.bean.ResourceBean;
 import com.ft.sdk.garble.bean.ResourceParams;
 import com.ft.sdk.garble.bean.ResourceType;
@@ -479,6 +480,12 @@ public class FTRUMInnerManager {
         if (property != null) {
             bean.property.putAll(property);
         }
+        NetworkStateBean networkState = FTNetworkListener.get().getNetworkStateBean();
+        bean.networkAvailable = networkState.isNetworkAvailable();
+        bean.networkValidated = networkState.getNetworkValidated();
+        bean.networkDownlinkKbps = networkState.getNetworkDownlinkKbps();
+        bean.networkUplinkKbps = networkState.getNetworkUplinkKbps();
+        bean.networkSignalStrength = networkState.getNetworkSignalStrength();
         attachRUMRelativeForResource(bean);
         final String actionId = bean.actionId;
         final String viewId = bean.viewId;
@@ -1043,6 +1050,19 @@ public class FTRUMInnerManager {
                 fields.put(Constants.KEY_RUM_RESOURCE_DURATION, bean.resourceLoad);
             }
 
+            fields.put(Constants.KEY_RUM_NETWORK_AVAILABLE, bean.networkAvailable);
+            if (bean.networkValidated != null) {
+                fields.put(Constants.KEY_RUM_NETWORK_VALIDATED, bean.networkValidated);
+            }
+            if (bean.networkDownlinkKbps != null) {
+                fields.put(Constants.KEY_RUM_NETWORK_DOWNLINK_KBPS, bean.networkDownlinkKbps);
+            }
+            if (bean.networkUplinkKbps != null) {
+                fields.put(Constants.KEY_RUM_NETWORK_UPLINK_KBPS, bean.networkUplinkKbps);
+            }
+            if (bean.networkSignalStrength != null) {
+                fields.put(Constants.KEY_RUM_NETWORK_SIGNAL_STRENGTH, bean.networkSignalStrength);
+            }
 
             if (bean.resourceDNS > 0) {
                 fields.put(Constants.KEY_RUM_RESOURCE_DNS, bean.resourceDNS);
