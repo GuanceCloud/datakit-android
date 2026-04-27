@@ -1,3 +1,7 @@
+# replay-compose 0.1.4-alpha02
+1. No Changed
+
+---
 # replay-compose 0.1.4-alpha01
 1. Fixed a crash when recording `AndroidView` interop nodes with Session Replay core implementations that do not expose `MappingContext.getInteropViewCallback()`.
 2. Added consumer ProGuard rules to keep the `MappingContext` AndroidView interop callback accessors used by Compose replay.

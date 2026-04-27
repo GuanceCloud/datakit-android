@@ -1,4 +1,8 @@
-# replay-compose 0.1.4-alpha01
+# replay 0.1.4-alpha02
+1. fix: correct dependency version constraint with ft-sdk and replay
+
+---
+# replay 0.1.4-alpha01
 1. No Changed
 
 ---

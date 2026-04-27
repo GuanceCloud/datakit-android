@@ -1,8 +1,8 @@
 apply plugin: 'maven-publish'
 group = 'com.cloudcare.ft.mobile.sdk.tracker.plugin'
 
-version = '1.3.7-alpha02'//Current version number
-def minVersion = '1.6.10-alpha03' //Minimum supported SDK version
+version = rootProject.ext.sdkVersions.ftPlugin//Current version number
+def minVersion = rootProject.ext.sdkVersions.pluginMinAgentSupport//Minimum supported SDK version
 
 apply plugin: "com.github.gmazzo.buildconfig"//https://github.com/gmazzo/gradle-buildconfig-plugin
 

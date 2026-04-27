@@ -1,3 +1,6 @@
+# agent 1.7.1-alpha02
+1. fix: correct dependency version constraint with ft-sdk and replay
+
 # agent 1.7.1-alpha01
 1. Added `view_long_task_rate` to View RUM metrics. The value is calculated from total LongTask duration divided by View duration, and is capped at `1`.
 2. Optimized View LongTask summary refresh timing to reduce the chance of stale View data overwriting newer `view_long_task_rate` values.

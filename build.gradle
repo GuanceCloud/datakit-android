@@ -5,10 +5,13 @@ buildscript {
         mavenPublishUrl = 'https://mvnrepo.jiagouyun.com/repository'
         getDefaultProperties = this.&getDefaultProperties
         sdkVersions = [
-                ftSdk          : "1.7.1-alpha01",
-                ftSessionReplay: "0.1.4-alpha01",
-                ftPlugin       : "1.3.6-alpha07",
-                ftNative       : "1.1.3"
+                ftSdk                     : "1.7.1-alpha02",
+                ftSdkMiniReplaySupport    : "0.1.3",
+                ftSessionReplay           : "0.1.4-alpha02",
+                replayMiniAgentSupport    : "1.7.0",
+                ftPlugin                  : "1.3.6-alpha07",
+                pluginMinAgentSupport     : "1.6.10-alpha03",
+                ftNative                  : "1.1.3"
         ]
     }
 
