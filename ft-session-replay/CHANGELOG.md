@@ -1,3 +1,8 @@
+# replay 0.1.4
+1. Removed redundant Kotlin dependencies to simplify the Session Replay dependency graph.
+2. Improved public API documentation for Session Replay configuration, privacy controls, custom mapper extensions, resource upload callbacks, and mapper helper types to make IDE integration and custom extension development clearer.
+
+---
 # replay 0.1.4-beta01
 1. Removed redundant Kotlin dependencies
 

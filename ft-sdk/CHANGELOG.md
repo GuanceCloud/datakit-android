@@ -1,3 +1,11 @@
+# agent 1.7.1
+1. Added `view_long_task_rate` to View RUM metrics. The value is calculated from total LongTask duration divided by View duration, and is capped at `1`.
+2. Added `foreground_crash_free_duration` and `background_crash_free_duration` to crash RUM Error metrics, and aligned pre-crash/native crash reporting with foreground/background duration snapshots.
+3. Added Resource network snapshot fields, including `network_available`, `network_validated`, `network_downlink_kbps`, `network_uplink_kbps`, and `network_signal_strength`.
+4. Enabled compression by default for SDK data synchronization. Use `FTSDKConfig.setCompressIntakeRequests(false)` to disable compression when needed.
+5. Corrected dependency version constraints between `ft-sdk` and Session Replay modules to improve integration compatibility checks.
+
+---
 # agent 1.7.1-beta01
 1. fix: correct dependency version constraint with ft-sdk and replay
 2. Enabled compression by default for SDK data synchronization 

@@ -1,3 +1,9 @@
+# replay-compose 0.1.4
+1. Fixed a crash when recording `AndroidView` interop nodes with Session Replay core implementations that do not expose `MappingContext.getInteropViewCallback()`.
+2. Added consumer ProGuard rules to keep the `MappingContext` AndroidView interop callback accessors used by Compose replay.
+3. Improved KDoc for Compose Session Replay privacy `Modifier` APIs, Compose extension support, text truncation modes, and image wireframe helpers to make Kotlin and Compose integration clearer in IDEs.
+
+---
 # replay-compose 0.1.4-beta01
 1. No Changed
 
