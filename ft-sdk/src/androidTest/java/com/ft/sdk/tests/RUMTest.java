@@ -7,13 +7,16 @@ import android.os.Looper;
 
 import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTRUMGlobalManager;
+import com.ft.sdk.FTRUMInnerManager;
 import com.ft.sdk.FTResourceEventListener;
 import com.ft.sdk.FTResourceInterceptor;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.FTSdk;
+import com.ft.sdk.FTExceptionHandler;
 import com.ft.sdk.FTTraceConfig;
 import com.ft.sdk.FTTraceInterceptor;
 import com.ft.sdk.FTTraceManager;
+import com.ft.sdk.FTActivityManager;
 import com.ft.sdk.RUMCacheDiscard;
 import com.ft.sdk.TraceContext;
 import com.ft.sdk.TraceType;
@@ -22,6 +25,7 @@ import com.ft.sdk.garble.bean.AppState;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.ErrorType;
 import com.ft.sdk.garble.bean.NetStatusBean;
+import com.ft.sdk.garble.bean.NetworkStateBean;
 import com.ft.sdk.garble.bean.ResourceID;
 import com.ft.sdk.garble.bean.ResourceParams;
 import com.ft.sdk.garble.bean.ResourceType;
@@ -43,6 +47,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.powermock.reflect.Whitebox;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -352,6 +357,34 @@ public class RUMTest extends FTBaseTest {
 
     }
 
+    @Test
+    public void viewLongTaskRateCalcTest() throws Exception {
+        ViewBean viewBean = new ViewBean();
+        viewBean.setClose(true);
+        viewBean.setTimeSpent(1_000_000_000L);
+        viewBean.setLongTaskDuration(250_000_000L);
+
+        HashMap<String, Object> fields = new HashMap<>();
+        Whitebox.invokeMethod(FTRUMInnerManager.get(), "attachViewLongTaskRate", viewBean, fields);
+
+        Assert.assertEquals(0.25d,
+                (Double) fields.get(Constants.KEY_RUM_VIEW_LONG_TASK_RATE), 0.000001d);
+    }
+
+    @Test
+    public void viewLongTaskRateCapOneTest() throws Exception {
+        ViewBean viewBean = new ViewBean();
+        viewBean.setClose(true);
+        viewBean.setTimeSpent(1_000_000_000L);
+        viewBean.setLongTaskDuration(2_000_000_000L);
+
+        HashMap<String, Object> fields = new HashMap<>();
+        Whitebox.invokeMethod(FTRUMInnerManager.get(), "attachViewLongTaskRate", viewBean, fields);
+
+        Assert.assertEquals(1d,
+                (Double) fields.get(Constants.KEY_RUM_VIEW_LONG_TASK_RATE), 0.000001d);
+    }
+
     /**
      * Simulate session id expiration, after a session id expires, the operation will generate a new session id
      *
@@ -405,6 +438,37 @@ public class RUMTest extends FTBaseTest {
                 break;
             }
 
+        }
+    }
+
+    /**
+     * Simulate initiating a Resource request with network snapshot fields.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void resourceNetworkSnapshotFieldsTest() throws Exception {
+        NetworkStateBean networkStateBean = getNetworkStateBean();
+        try {
+            networkStateBean.setNetworkAvailable(true);
+            networkStateBean.setNetworkValidated(true);
+            networkStateBean.setNetworkDownlinkKbps(1200);
+            networkStateBean.setNetworkUplinkKbps(300);
+            networkStateBean.setNetworkSignalStrength(-70);
+
+            String uniqueUrl = TEST_FAKE_URL + "?network=snapshot";
+            sendResource(null, null, "text/plain", uniqueUrl);
+
+            waitEventConsumeInThreadPool();
+
+            LineProtocolData resourceData = getLatestResourceLineProtocolData(uniqueUrl);
+            Assert.assertEquals(true, resourceData.getField(Constants.KEY_RUM_NETWORK_AVAILABLE));
+            Assert.assertEquals(true, resourceData.getField(Constants.KEY_RUM_NETWORK_VALIDATED));
+            Assert.assertEquals(1200, resourceData.getField(Constants.KEY_RUM_NETWORK_DOWNLINK_KBPS));
+            Assert.assertEquals(300, resourceData.getField(Constants.KEY_RUM_NETWORK_UPLINK_KBPS));
+            Assert.assertEquals(-70, resourceData.getField(Constants.KEY_RUM_NETWORK_SIGNAL_STRENGTH));
+        } finally {
+            networkStateBean.setNetworkNotAvailable();
         }
     }
 
@@ -476,6 +540,61 @@ public class RUMTest extends FTBaseTest {
         Thread.sleep(3000L);
         Assert.assertTrue(CheckUtils.checkDynamicValue(PROPERTY_NAME, PROPERTY_VALUE,
                 Constants.FT_MEASUREMENT_RUM_ERROR, DataType.RUM_APP, false));
+    }
+
+    @Test
+    public void crashErrorForegroundCrashFreeDurationTest() throws Exception {
+        seedCrashFreeTracker(200L, 50L, AppState.RUN, 1_000L);
+
+        FTRUMGlobalManager.get().addError(ERROR, ERROR_MESSAGE, 1_120L, ErrorType.JAVA, AppState.RUN);
+        waitEventConsumeInThreadPool();
+
+        LineProtocolData errorData = getLatestErrorLineProtocolData();
+        Assert.assertEquals(320L, getLongField(errorData, Constants.KEY_RUM_FOREGROUND_CRASH_FREE_DURATION));
+        Assert.assertEquals(50L, getLongField(errorData, Constants.KEY_RUM_BACKGROUND_CRASH_FREE_DURATION));
+
+        Assert.assertEquals(0L, ((Number) Whitebox.getInternalState(FTActivityManager.get(),
+                "foregroundCrashFreeDuration")).longValue());
+        Assert.assertEquals(0L, ((Number) Whitebox.getInternalState(FTActivityManager.get(),
+                "backgroundCrashFreeDuration")).longValue());
+        Assert.assertEquals(1_120L, ((Number) Whitebox.getInternalState(FTActivityManager.get(),
+                "stateStartTime")).longValue());
+    }
+
+    @Test
+    public void crashErrorBackgroundCrashFreeDurationTest() throws Exception {
+        seedCrashFreeTracker(200L, 50L, AppState.BACKGROUND, 1_000L);
+
+        FTRUMGlobalManager.get().addError(ERROR, ERROR_MESSAGE, 1_120L, ErrorType.NATIVE, AppState.BACKGROUND);
+        waitEventConsumeInThreadPool();
+
+        LineProtocolData errorData = getLatestErrorLineProtocolData();
+        Assert.assertEquals(200L, getLongField(errorData, Constants.KEY_RUM_FOREGROUND_CRASH_FREE_DURATION));
+        Assert.assertEquals(170L, getLongField(errorData, Constants.KEY_RUM_BACKGROUND_CRASH_FREE_DURATION));
+    }
+
+    @Test
+    public void preCrashErrorUsesPersistedCrashFreeDurationSnapshotTest() throws Exception {
+        HashMap<String, Object> property = new HashMap<>();
+        property.put(FTExceptionHandler.IS_PRE_CRASH, true);
+
+        clearCrashFreeSharedPreferences();
+        Utils.getSharedPreferences(getContext()).edit()
+                .putLong(Constants.FT_CRASH_FREE_START_TIME, 500L)
+                .putLong(Constants.FT_CRASH_FREE_FOREGROUND_DURATION, 80L)
+                .putLong(Constants.FT_CRASH_FREE_BACKGROUND_DURATION, 20L)
+                .putString(Constants.FT_CRASH_FREE_APP_STATE, AppState.BACKGROUND.toString())
+                .putLong(Constants.FT_CRASH_FREE_STATE_START_TIME, 1_000L)
+                .apply();
+        Whitebox.setInternalState(FTActivityManager.get(), "crashFreeTrackerInitialized", false);
+        Whitebox.setInternalState(FTActivityManager.get(), "pendingCrashSnapshot", (Object) null);
+
+        FTRUMGlobalManager.get().addError(ERROR, ERROR_MESSAGE, 1_120L, ErrorType.NATIVE, AppState.BACKGROUND, property);
+        waitEventConsumeInThreadPool();
+
+        LineProtocolData errorData = getLatestErrorLineProtocolData();
+        Assert.assertEquals(80L, getLongField(errorData, Constants.KEY_RUM_FOREGROUND_CRASH_FREE_DURATION));
+        Assert.assertEquals(140L, getLongField(errorData, Constants.KEY_RUM_BACKGROUND_CRASH_FREE_DURATION));
     }
 
     /**
@@ -625,6 +744,65 @@ public class RUMTest extends FTBaseTest {
     @Test
     public void traceLinkRUMDataEnable() throws InterruptedException, IOException {
         Assert.assertTrue(checkTraceHasLinkRumData(true));
+    }
+
+    private void seedCrashFreeTracker(long foregroundDuration, long backgroundDuration,
+                                      AppState appState, long stateStartTime) {
+        clearCrashFreeSharedPreferences();
+        Whitebox.setInternalState(FTActivityManager.get(), "crashFreeTrackerInitialized", true);
+        Whitebox.setInternalState(FTActivityManager.get(), "crashFreeStartTime", 0L);
+        Whitebox.setInternalState(FTActivityManager.get(), "foregroundCrashFreeDuration", foregroundDuration);
+        Whitebox.setInternalState(FTActivityManager.get(), "backgroundCrashFreeDuration", backgroundDuration);
+        Whitebox.setInternalState(FTActivityManager.get(), "appState", appState);
+        Whitebox.setInternalState(FTActivityManager.get(), "stateStartTime", stateStartTime);
+        Whitebox.setInternalState(FTActivityManager.get(), "pendingCrashSnapshot", (Object) null);
+    }
+
+    private void clearCrashFreeSharedPreferences() {
+        Utils.getSharedPreferences(getContext()).edit()
+                .remove(Constants.FT_CRASH_FREE_START_TIME)
+                .remove(Constants.FT_CRASH_FREE_FOREGROUND_DURATION)
+                .remove(Constants.FT_CRASH_FREE_BACKGROUND_DURATION)
+                .remove(Constants.FT_CRASH_FREE_APP_STATE)
+                .remove(Constants.FT_CRASH_FREE_STATE_START_TIME)
+                .apply();
+    }
+
+    private LineProtocolData getLatestErrorLineProtocolData() {
+        List<SyncData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
+        for (SyncData syncData : recordDataList) {
+            LineProtocolData data = new LineProtocolData(syncData.getDataString());
+            if (Constants.FT_MEASUREMENT_RUM_ERROR.equals(data.getMeasurement())) {
+                return data;
+            }
+        }
+        Assert.fail("No rum error data found");
+        return null;
+    }
+
+    private LineProtocolData getLatestResourceLineProtocolData(String url) {
+        List<SyncData> recordDataList = FTDBManager.get().queryDataByDataByTypeLimitDesc(0, DataType.RUM_APP);
+        for (SyncData syncData : recordDataList) {
+            LineProtocolData data = new LineProtocolData(syncData.getDataString());
+            if (Constants.FT_MEASUREMENT_RUM_RESOURCE.equals(data.getMeasurement())
+                    && url.equals(data.getTagAsString(Constants.KEY_RUM_RESOURCE_URL, ""))) {
+                return data;
+            }
+        }
+        Assert.fail("No rum resource data found for url: " + url);
+        return null;
+    }
+
+    private NetworkStateBean getNetworkStateBean() throws Exception {
+        Class<?> listenerClass = Class.forName("com.ft.sdk.FTNetworkListener");
+        Object listener = Whitebox.invokeMethod(listenerClass, "get");
+        return Whitebox.invokeMethod(listener, "getNetworkStateBean");
+    }
+
+    private long getLongField(LineProtocolData data, String key) {
+        Object value = data.getField(key);
+        Assert.assertNotNull(key + " should exist", value);
+        return ((Number) value).longValue();
     }
 
     /**

@@ -45,7 +45,7 @@ public class FTHttpConfigManager {
      */
     private int sendOutTime = 30000;
 
-    private boolean compressIntakeRequests = false;
+    private boolean compressIntakeRequests = true;
 
     /**
      * http request return read

@@ -116,6 +116,26 @@ public class Constants {
      * Store error occurrence time
      */
     public static final String FT_RUM_ERROR_TIMELINE = "ft.error.timeline";
+    /**
+     * Store crash-free duration statistics baseline time
+     */
+    public static final String FT_CRASH_FREE_START_TIME = "ft.crash_free.start_time";
+    /**
+     * Store accumulated foreground crash-free duration
+     */
+    public static final String FT_CRASH_FREE_FOREGROUND_DURATION = "ft.crash_free.foreground_duration";
+    /**
+     * Store accumulated background crash-free duration
+     */
+    public static final String FT_CRASH_FREE_BACKGROUND_DURATION = "ft.crash_free.background_duration";
+    /**
+     * Store current crash-free app state
+     */
+    public static final String FT_CRASH_FREE_APP_STATE = "ft.crash_free.app_state";
+    /**
+     * Store current crash-free state start time
+     */
+    public static final String FT_CRASH_FREE_STATE_START_TIME = "ft.crash_free.state_start_time";
 
     /**
      * Store {@link  android.content.SharedPreferences} data storage key value
@@ -579,6 +599,14 @@ public class Constants {
      */
     public static final String KEY_RUM_ERROR_SITUATION = "error_situation";
     /**
+     * Foreground crash-free duration, nanoseconds.
+     */
+    public static final String KEY_RUM_FOREGROUND_CRASH_FREE_DURATION = "foreground_crash_free_duration";
+    /**
+     * Background crash-free duration, nanoseconds.
+     */
+    public static final String KEY_RUM_BACKGROUND_CRASH_FREE_DURATION = "background_crash_free_duration";
+    /**
      * Long task duration, nanoseconds, {@link #FT_MEASUREMENT_RUM_LONG_TASK}
      */
     public static final String KEY_RUM_LONG_TASK_DURATION = "duration";
@@ -590,6 +618,15 @@ public class Constants {
      * Network type, WIFI, 3G, 4G, etc.
      */
     public static final String KEY_RUM_NETWORK_TYPE = "network_type";
+
+    /**
+     * Active network snapshot.
+     */
+    public static final String KEY_RUM_NETWORK_AVAILABLE = "network_available";
+    public static final String KEY_RUM_NETWORK_VALIDATED = "network_validated";
+    public static final String KEY_RUM_NETWORK_DOWNLINK_KBPS = "network_downlink_kbps";
+    public static final String KEY_RUM_NETWORK_UPLINK_KBPS = "network_uplink_kbps";
+    public static final String KEY_RUM_NETWORK_SIGNAL_STRENGTH = "network_signal_strength";
 
     /**
      * Session ID
@@ -650,6 +687,10 @@ public class Constants {
      * Number of long tasks in page cycle, {@link #FT_MEASUREMENT_RUM_LONG_TASK}
      */
     public static final String KEY_RUM_VIEW_LONG_TASK_COUNT = "view_long_task_count";
+    /**
+     * Long task duration ratio in page cycle.
+     */
+    public static final String KEY_RUM_VIEW_LONG_TASK_RATE = "view_long_task_rate";
     /**
      * Number of resource requests in page cycle, {@link #FT_MEASUREMENT_RUM_RESOURCE}
      */
@@ -747,6 +788,11 @@ public class Constants {
      *
      */
     public static final String KEY_RUM_SDK_INNER_KEY_START_TIME_NANO = "start_time_nano";
+
+    /**
+     * Long task total duration in current View lifecycle, unit: nanoseconds
+     */
+    public static final String KEY_RUM_SDK_INNER_KEY_VIEW_LONG_TASK_DURATION = "view_long_task_duration";
 
 
     /**

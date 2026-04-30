@@ -8,6 +8,13 @@ import com.ft.sdk.sessionreplay.model.ShapeStyle
 import com.ft.sdk.sessionreplay.model.Wireframe
 import com.ft.sdk.sessionreplay.model.WireframeClip
 
+/**
+ * Creates an image wireframe from a Compose vector path.
+ *
+ * This overload keeps Kotlin callers compatible with the Java
+ * [ImageWireframeHelper] API while providing nullable defaults for optional
+ * clipping and styling arguments.
+ */
 @Suppress("FunctionName")
 fun ImageWireframeHelper.createImageWireframeByPath(
     id: Long,
@@ -45,6 +52,13 @@ fun ImageWireframeHelper.createImageWireframeByPath(
     )
 }
 
+/**
+ * Creates an image wireframe from a Compose bitmap.
+ *
+ * This overload keeps Kotlin callers compatible with the Java
+ * [ImageWireframeHelper] API while providing nullable defaults for optional
+ * clipping and styling arguments.
+ */
 @Suppress("FunctionName")
 fun ImageWireframeHelper.createImageWireframeByBitmap(
     id: Long,

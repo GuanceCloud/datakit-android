@@ -196,6 +196,21 @@ public class ConfigTest extends FTBaseTest {
     }
 
     /**
+     * Validate {@link FTSDKConfig#compressIntakeRequests} configuration
+     */
+    @Test
+    public void compressIntakeRequests() {
+        FTSDKConfig config = getDatakitConfig();
+        FTSdk.install(config);
+        Assert.assertTrue(config.isCompressIntakeRequests());
+        Assert.assertTrue(FTHttpConfigManager.get().isCompressIntakeRequests());
+
+        FTSdk.install(config.setCompressIntakeRequests(false));
+        Assert.assertFalse(config.isCompressIntakeRequests());
+        Assert.assertFalse(FTHttpConfigManager.get().isCompressIntakeRequests());
+    }
+
+    /**
      * Validate Datakit configuration
      */
     @Test

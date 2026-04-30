@@ -18,6 +18,7 @@ import com.ft.sdk.garble.bean.CollectType;
 import com.ft.sdk.garble.bean.ErrorSource;
 import com.ft.sdk.garble.bean.ErrorType;
 import com.ft.sdk.garble.bean.NetStatusBean;
+import com.ft.sdk.garble.bean.NetworkStateBean;
 import com.ft.sdk.garble.bean.ResourceBean;
 import com.ft.sdk.garble.bean.ResourceParams;
 import com.ft.sdk.garble.bean.ResourceType;
@@ -479,6 +480,12 @@ public class FTRUMInnerManager {
         if (property != null) {
             bean.property.putAll(property);
         }
+        NetworkStateBean networkState = FTNetworkListener.get().getNetworkStateBean();
+        bean.networkAvailable = networkState.isNetworkAvailable();
+        bean.networkValidated = networkState.getNetworkValidated();
+        bean.networkDownlinkKbps = networkState.getNetworkDownlinkKbps();
+        bean.networkUplinkKbps = networkState.getNetworkUplinkKbps();
+        bean.networkSignalStrength = networkState.getNetworkSignalStrength();
         attachRUMRelativeForResource(bean);
         final String actionId = bean.actionId;
         final String viewId = bean.viewId;
@@ -802,10 +809,14 @@ public class FTRUMInnerManager {
                          AppState state, HashMap<String, Object> property, RunnerCompleteCallBack callBack) {
 
         try {
+            boolean isPreCrash = property != null && property.get(FTExceptionHandler.IS_PRE_CRASH) == (Boolean) true;
+            boolean isCrashError = ErrorType.JAVA.toString().equals(errorType)
+                    || ErrorType.NATIVE.toString().equals(errorType)
+                    || ErrorType.ANR_CRASH.toString().equals(errorType);
             checkSessionRefresh(true);
             CollectType collectType = checkSessionWillCollect(sessionId);
 
-            if (property == null || property.get(FTExceptionHandler.IS_PRE_CRASH) != (Boolean) true) {
+            if (!isPreCrash) {
                 //Exclude the scenario of reporting the last native crash error
                 SyncTaskManager.get().setErrorTimeLine(dateline, activeView);
 
@@ -827,6 +838,12 @@ public class FTRUMInnerManager {
 
             fields.put(Constants.KEY_RUM_ERROR_MESSAGE, message);
             fields.put(Constants.KEY_RUM_ERROR_STACK, log);
+            if (isCrashError) {
+                FTActivityManager.CrashFreeDuration crashFreeDuration =
+                        FTActivityManager.get().getCrashFreeDuration(dateline, state, isPreCrash);
+                fields.put(Constants.KEY_RUM_FOREGROUND_CRASH_FREE_DURATION, crashFreeDuration.foregroundDuration);
+                fields.put(Constants.KEY_RUM_BACKGROUND_CRASH_FREE_DURATION, crashFreeDuration.backgroundDuration);
+            }
             attachRUMRelative(tags, fields, true);
 
             EventConsumerThreadPool.get().execute(new Runnable() {
@@ -856,6 +873,9 @@ public class FTRUMInnerManager {
                                 new RunnerCompleteCallBack() {
                                     @Override
                                     public void onComplete() {
+                                        if (isCrashError) {
+                                            FTActivityManager.get().resetCrashFreeDuration(dateline, state);
+                                        }
                                         increaseError(tags);
                                         if (callBack != null) {
                                             // Java Crash, Native Crash need to record the crash status of the current state
@@ -905,8 +925,7 @@ public class FTRUMInnerManager {
 
             FTTrackInner.getInstance().rum(Utils.getCurrentNanoTime() - duration,
                     Constants.FT_MEASUREMENT_RUM_LONG_TASK, tags, fields, null, type);
-            increaseLongTask(tags);
-            generateRumData();
+            increaseLongTask(tags, duration);
         } catch (Exception e) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
         }
@@ -1031,6 +1050,19 @@ public class FTRUMInnerManager {
                 fields.put(Constants.KEY_RUM_RESOURCE_DURATION, bean.resourceLoad);
             }
 
+            fields.put(Constants.KEY_RUM_NETWORK_AVAILABLE, bean.networkAvailable);
+            if (bean.networkValidated != null) {
+                fields.put(Constants.KEY_RUM_NETWORK_VALIDATED, bean.networkValidated);
+            }
+            if (bean.networkDownlinkKbps != null) {
+                fields.put(Constants.KEY_RUM_NETWORK_DOWNLINK_KBPS, bean.networkDownlinkKbps);
+            }
+            if (bean.networkUplinkKbps != null) {
+                fields.put(Constants.KEY_RUM_NETWORK_UPLINK_KBPS, bean.networkUplinkKbps);
+            }
+            if (bean.networkSignalStrength != null) {
+                fields.put(Constants.KEY_RUM_NETWORK_SIGNAL_STRENGTH, bean.networkSignalStrength);
+            }
 
             if (bean.resourceDNS > 0) {
                 fields.put(Constants.KEY_RUM_RESOURCE_DNS, bean.resourceDNS);
@@ -1254,15 +1286,24 @@ public class FTRUMInnerManager {
      *
      * @param tags rum globalContext
      */
-    private void increaseLongTask(HashMap<String, Object> tags) {
+    private void increaseLongTask(HashMap<String, Object> tags, final long duration) {
         final String actionId = HashMapUtils.getString(tags, Constants.KEY_RUM_ACTION_ID);
         final String viewId = HashMapUtils.getString(tags, Constants.KEY_RUM_VIEW_ID);
+        final ActiveViewBean viewBean = activeView;
+        if (viewBean != null && viewBean.getId().equals(viewId)) {
+            viewBean.addLongTaskDuration(duration);
+        }
         EventConsumerThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
                 FTDBManager.get().increaseActionLongTask(actionId);
                 FTDBManager.get().increaseViewLongTask(viewId);
+                if (viewBean != null && viewBean.getId().equals(viewId)) {
+                    FTDBManager.get().updateViewExtraAttr(viewId, viewBean.getAttrJsonString());
+                }
+                FTDBManager.get().updateViewUpdateTime(viewId, System.currentTimeMillis());
                 FTRUMInnerManager.this.checkActionClose();
+                generateRumData();
 
             }
         });
@@ -1313,6 +1354,27 @@ public class FTRUMInnerManager {
                 generateRumData(true); // Force generate data when closing view
             }
         });
+    }
+
+    /**
+     * Attach View long task rate: total long task duration / View duration.
+     *
+     * @param bean   view summary data
+     * @param fields upload fields
+     */
+    private void attachViewLongTaskRate(ViewBean bean, HashMap<String, Object> fields) {
+        ActiveViewBean activeViewBean = activeView;
+        ViewBean targetBean = activeViewBean != null && activeViewBean.getId().equals(bean.getId())
+                ? activeViewBean
+                : bean;
+        long viewDuration = targetBean.isClose()
+                ? targetBean.getTimeSpent()
+                : System.nanoTime() - targetBean.getStartTimeNanoForDuration();
+        long longTaskDuration = targetBean.getLongTaskDuration();
+        if (viewDuration > 0 && longTaskDuration > 0) {
+            double longTaskRate = (double) longTaskDuration / (double) viewDuration;
+            fields.put(Constants.KEY_RUM_VIEW_LONG_TASK_RATE, Math.min(longTaskRate, 1d));
+        }
     }
 
     /**
@@ -1548,6 +1610,7 @@ public class FTRUMInnerManager {
                     fields.put(Constants.KEY_RUM_VIEW_TIME_SPENT, System.nanoTime() - bean.getStartTimeNanoForDuration());
                 }
                 fields.put(Constants.KEY_RUM_VIEW_LONG_TASK_COUNT, bean.getLongTaskCount());
+                attachViewLongTaskRate(bean, fields);
                 fields.put(Constants.KEY_RUM_VIEW_IS_ACTIVE, !bean.isClose());
                 fields.put(Constants.KEY_RUM_SDK_VIEW_UPDATE_TIME, bean.getViewUpdateTime());
 

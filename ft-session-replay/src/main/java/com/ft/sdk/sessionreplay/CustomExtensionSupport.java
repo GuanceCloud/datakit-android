@@ -12,7 +12,7 @@ import java.util.List;
  * 
  * Usage example:
  * <pre>
- * QuickExtensionSupport support = new QuickExtensionSupport()
+ * CustomExtensionSupport support = new CustomExtensionSupport()
  *     .addMapper(TextView.class, new CustomTextViewMapper())
  *     .addMapper(Button.class, new CustomButtonMapper())
  *     .addOptionSelectorDetector(new CustomOptionSelectorDetector())

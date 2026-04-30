@@ -1,5 +1,8 @@
 package com.ft.sdk.sessionreplay;
 
+/**
+ * Defines how Session Replay records image content.
+ */
 public enum ImagePrivacy implements PrivacyLevel {
 
     /**

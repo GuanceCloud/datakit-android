@@ -39,6 +39,9 @@ class ComposeExtensionSupport : ExtensionSupport {
         DrawableToColorMapperFactory.getDefault(Collections.emptyList())
     private val rootSemanticsNodeMapper = RootSemanticsNodeMapper(colorStringFormatter)
 
+    /**
+     * Returns the mappers required to record Jetpack Compose views.
+     */
     override fun getCustomViewMappers(): List<MapperTypeWrapper<*>> {
         return listOf(
             MapperTypeWrapper(
@@ -64,10 +67,16 @@ class ComposeExtensionSupport : ExtensionSupport {
         )
     }
 
+    /**
+     * Compose extension support does not add custom option selector detectors.
+     */
     override fun getOptionSelectorDetectors(): List<OptionSelectorDetector> {
         return emptyList()
     }
 
+    /**
+     * Compose extension support does not add custom drawable color mappers.
+     */
     override fun getCustomDrawableMapper(): List<DrawableToColorMapper> {
         return emptyList()
     }

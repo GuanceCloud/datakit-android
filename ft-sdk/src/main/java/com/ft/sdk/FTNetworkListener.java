@@ -87,6 +87,20 @@ class FTNetworkListener extends ConnectivityManager.NetworkCallback {
     private void fetchNetworkStateBean(ConnectivityManager connectivityManager) {
         networkStateBean.setNetworkAvailable(NetUtils.isNetworkAvailable(connectivityManager));
         networkStateBean.setNetworkType(NetUtils.getNetWorkStateName(connectivityManager));
+        networkStateBean.setNetworkValidated(null);
+        networkStateBean.setNetworkDownlinkKbps(null);
+        networkStateBean.setNetworkUplinkKbps(null);
+        networkStateBean.setNetworkSignalStrength(null);
+        if (connectivityManager != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Network network = connectivityManager.getActiveNetwork();
+            if (network != null) {
+                NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(network);
+                networkStateBean.setNetworkValidated(NetUtils.isNetworkValidated(capabilities));
+                networkStateBean.setNetworkDownlinkKbps(NetUtils.getNetworkDownlinkKbps(capabilities));
+                networkStateBean.setNetworkUplinkKbps(NetUtils.getNetworkUplinkKbps(capabilities));
+                networkStateBean.setNetworkSignalStrength(NetUtils.getNetworkSignalStrength(capabilities));
+            }
+        }
     }
 
     public NetworkStateBean getNetworkStateBean() {

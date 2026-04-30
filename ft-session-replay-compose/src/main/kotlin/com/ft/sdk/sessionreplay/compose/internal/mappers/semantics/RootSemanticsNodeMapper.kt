@@ -7,6 +7,7 @@ package com.ft.sdk.sessionreplay.compose.internal.mappers.semantics
 import com.ft.sdk.sessionreplay.model.*
 
 import android.graphics.Rect
+import android.util.Log
 import androidx.annotation.UiThread
 import androidx.compose.ui.graphics.toAndroidRectF
 import androidx.compose.ui.semantics.Role
@@ -18,6 +19,7 @@ import com.ft.sdk.sessionreplay.compose.internal.data.UiContext
 import com.ft.sdk.sessionreplay.compose.internal.utils.SemanticsUtils
 import com.ft.sdk.sessionreplay.compose.internal.utils.withinComposeBenchmarkSpan
 import com.ft.sdk.sessionreplay.internal.TouchPrivacyManager
+import com.ft.sdk.sessionreplay.recorder.InteropViewCallback
 import com.ft.sdk.sessionreplay.recorder.MappingContext
 import com.ft.sdk.sessionreplay.utils.AsyncJobStatusCallback
 import com.ft.sdk.sessionreplay.utils.ColorStringFormatter
@@ -53,6 +55,9 @@ internal class RootSemanticsNodeMapper(
         semanticsUtils
     )
 ) {
+    private var hasLoggedInteropGetter = false
+    private var hasLoggedInteropFieldFallback = false
+    private var hasLoggedInteropMissing = false
 
     @UiThread
     internal fun createComposeWireframes(
@@ -112,9 +117,9 @@ internal class RootSemanticsNodeMapper(
         val interopView = semanticsUtils.getInteropView(semanticsNode)
 
         if (interopView != null) {
-            val interopViewWireframes =
-                mappingContext.interopViewCallback.map(interopView, mappingContext)
-            wireframes.addAll(interopViewWireframes)
+            wireframes.addAll(
+                resolveInteropViewCallback(mappingContext)?.map(interopView, mappingContext).orEmpty()
+            )
             return
         }
 
@@ -176,6 +181,57 @@ internal class RootSemanticsNodeMapper(
         return semanticsUtils.getProgressBarRangeInfo(semanticsNode) != null
     }
 
+    private fun resolveInteropViewCallback(mappingContext: MappingContext): InteropViewCallback? {
+        val contextClass = mappingContext.javaClass
+        val getterCallback = runCatching {
+            contextClass.getMethod(INTEROP_VIEW_CALLBACK_GETTER)
+                .invoke(mappingContext) as? InteropViewCallback
+        }.getOrNull()
+
+        if (getterCallback != null) {
+            logInteropCallbackResolved("getter")
+            return getterCallback
+        }
+
+        val fieldCallback = runCatching {
+            val field = contextClass.getDeclaredField(INTEROP_VIEW_CALLBACK_FIELD)
+            field.isAccessible = true
+            field.get(mappingContext) as? InteropViewCallback
+        }.getOrNull()
+
+        if (fieldCallback != null) {
+            logInteropCallbackResolved("field fallback")
+            return fieldCallback
+        }
+
+        logInteropCallbackMissing()
+        return null
+    }
+
+    private fun logInteropCallbackResolved(strategy: String) {
+        when (strategy) {
+            "getter" -> {
+                if (!hasLoggedInteropGetter) {
+                    Log.d(LOG_TAG, "Compose AndroidView interop callback resolved by getter")
+                    hasLoggedInteropGetter = true
+                }
+            }
+            else -> {
+                if (!hasLoggedInteropFieldFallback) {
+                    Log.d(LOG_TAG, "Compose AndroidView interop callback resolved by field fallback")
+                    hasLoggedInteropFieldFallback = true
+                }
+            }
+        }
+    }
+
+    private fun logInteropCallbackMissing() {
+        if (!hasLoggedInteropMissing) {
+            Log.w(LOG_TAG, "Compose AndroidView interop callback is unavailable; skip interop mapping")
+            hasLoggedInteropMissing = true
+        }
+    }
+
     @UiThread
     private fun updateTouchOverrideAreas(
         semanticsNode: SemanticsNode,
@@ -195,5 +251,8 @@ internal class RootSemanticsNodeMapper(
 
     companion object {
         private const val ROOT_NODE_SPAN_NAME = "RootNode"
+        private const val LOG_TAG = "FTSRComposeInterop"
+        private const val INTEROP_VIEW_CALLBACK_GETTER = "getInteropViewCallback"
+        private const val INTEROP_VIEW_CALLBACK_FIELD = "interopViewCallback"
     }
 }
