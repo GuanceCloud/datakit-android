@@ -15,9 +15,10 @@ import com.ft.sdk.sessionreplay.TextAndInputPrivacy
 import com.ft.sdk.sessionreplay.TouchPrivacy
 
 /**
- * Allows setting a view to be "hidden" in the hierarchy in Session Replay.
+ * Allows setting a composable to be hidden in the hierarchy in Session Replay.
  *
  * @param hide pass `true` to hide the composable, or `false` to remove the override
+ * @return a modifier with the Session Replay hidden override
  */
 fun Modifier.sessionReplayHide(hide: Boolean): Modifier {
     return this.semantics {
@@ -26,9 +27,10 @@ fun Modifier.sessionReplayHide(hide: Boolean): Modifier {
 }
 
 /**
- * Allows overriding the image privacy for a view in Session Replay.
+ * Allows overriding the image privacy for a composable in Session Replay.
  *
  * @param imagePrivacy the new privacy level to use for the composable.
+ * @return a modifier with the Session Replay image privacy override
  */
 fun Modifier.sessionReplayImagePrivacy(imagePrivacy: ImagePrivacy): Modifier {
     return this.semantics {
@@ -37,9 +39,10 @@ fun Modifier.sessionReplayImagePrivacy(imagePrivacy: ImagePrivacy): Modifier {
 }
 
 /**
- * Allows overriding the text and input privacy for a view in Session Replay.
+ * Allows overriding the text and input privacy for a composable in Session Replay.
  *
  * @param textAndInputPrivacy the new privacy level to use for the composable.
+ * @return a modifier with the Session Replay text and input privacy override
  */
 fun Modifier.sessionReplayTextAndInputPrivacy(textAndInputPrivacy: TextAndInputPrivacy): Modifier {
     return this.semantics {
@@ -48,10 +51,10 @@ fun Modifier.sessionReplayTextAndInputPrivacy(textAndInputPrivacy: TextAndInputP
 }
 
 /**
- * Allows overriding the touch privacy for a view in Session Replay.
+ * Allows overriding the touch privacy for a composable in Session Replay.
  *
  * @param touchPrivacy the new privacy level to use for the composable
- * or null to remove the override.
+ * @return a modifier with the Session Replay touch privacy override
  */
 fun Modifier.sessionReplayTouchPrivacy(touchPrivacy: TouchPrivacy): Modifier {
     return this.semantics {

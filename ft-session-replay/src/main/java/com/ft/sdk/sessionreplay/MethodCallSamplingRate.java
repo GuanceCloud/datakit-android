@@ -1,5 +1,8 @@
 package com.ft.sdk.sessionreplay;
 
+/**
+ * Preset sampling rates used for internal method-call instrumentation.
+ */
 public enum MethodCallSamplingRate {
     ALL(0.1f),
     HIGH(10.0f),
@@ -14,6 +17,9 @@ public enum MethodCallSamplingRate {
         this.rate = rate;
     }
 
+    /**
+     * Returns the numeric sampling rate for this preset.
+     */
     public float getRate() {
         return rate;
     }

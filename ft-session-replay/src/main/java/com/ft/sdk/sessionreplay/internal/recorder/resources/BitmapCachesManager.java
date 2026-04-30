@@ -9,8 +9,6 @@ import androidx.annotation.MainThread;
 
 import com.ft.sdk.sessionreplay.utils.InternalLogger;
 
-import kotlin.text.Charsets;
-
 public class BitmapCachesManager {
 
     private static final String TAG = "BitmapCachesManager";

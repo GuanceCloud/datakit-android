@@ -2,6 +2,9 @@ package com.ft.sdk.sessionreplay;
 
 import android.view.View;
 
+/**
+ * Static helpers for overriding Session Replay privacy behavior on individual Android views.
+ */
 public class PrivacyOverrideExtensions {
 
     /**
