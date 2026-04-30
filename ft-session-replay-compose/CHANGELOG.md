@@ -1,3 +1,7 @@
+# replay-compose 0.1.4-beta01
+1. No Changed
+
+---
 # replay-compose 0.1.4-alpha03
 1. Improved KDoc for Compose Session Replay privacy `Modifier` APIs, Compose extension support, text truncation modes, and image wireframe helpers to make Kotlin and Compose integration clearer in IDEs.
 

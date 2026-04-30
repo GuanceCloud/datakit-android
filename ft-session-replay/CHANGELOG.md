@@ -1,3 +1,7 @@
+# replay 0.1.4-beta01
+1. Removed redundant Kotlin dependencies
+
+---
 # replay 0.1.4-alpha03
 1. Improved public API documentation for Session Replay configuration, privacy controls, custom mapper extensions, resource upload callbacks, and mapper helper types to make IDE integration and custom extension development clearer.
 2. Optimized the internal UTF-8 encoding implementation used when writing replay records, keeping the output format unchanged while avoiding a Kotlin charset dependency in Java code.

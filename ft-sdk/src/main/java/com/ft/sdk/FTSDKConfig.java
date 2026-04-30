@@ -85,9 +85,9 @@ public class FTSDKConfig {
 
     private int syncSleepTime = 0;
     /**
-     * Deflate compression for synchronized data, default is off
+     * Deflate compression for synchronized data, enabled by default
      */
-    private boolean compressIntakeRequests = false;
+    private boolean compressIntakeRequests = true;
 
     /**
      * Service name {@link Constants#KEY_SERVICE }, default is {@link Constants#DEFAULT_SERVICE_NAME}
@@ -592,9 +592,9 @@ public class FTSDKConfig {
     }
 
     /**
-     * Deflate compression for uploaded sync data, default is off
+     * Deflate compression for uploaded sync data, enabled by default
      *
-     * @param compressIntakeRequests
+     * @param compressIntakeRequests Whether to enable deflate compression for uploaded sync data
      * @return
      */
     public FTSDKConfig setCompressIntakeRequests(boolean compressIntakeRequests) {
