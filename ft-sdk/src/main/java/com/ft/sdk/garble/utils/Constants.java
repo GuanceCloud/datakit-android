@@ -751,6 +751,15 @@ public class Constants {
     public static final String KEY_RUM_APP_FIRST_FRAME_INIT_TIME ="app_first_frame_init_time";
 
     /**
+     * App launch type for cold start actions.
+     */
+    public static final String KEY_RUM_APP_LAUNCH_TYPE = "app_launch_type";
+
+    public static final String APP_LAUNCH_TYPE_FOREGROUND = "foreground";
+
+    public static final String APP_LAUNCH_TYPE_BACKGROUND = "background";
+
+    /**
      * Action cycle content long duration count statistics, {@link Constants#FT_MEASUREMENT_RUM_LONG_TASK}
      */
     public static final String KEY_RUM_ACTION_LONG_TASK_COUNT = "action_long_task_count";

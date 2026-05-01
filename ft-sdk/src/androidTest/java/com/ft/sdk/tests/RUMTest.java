@@ -5,6 +5,7 @@ import static com.ft.sdk.tests.FTSdkAllTests.hasPrepare;
 
 import android.os.Looper;
 
+import com.ft.sdk.FTAutoTrack;
 import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTRUMGlobalManager;
 import com.ft.sdk.FTRUMInnerManager;
@@ -159,6 +160,65 @@ public class RUMTest extends FTBaseTest {
         Assert.assertEquals(lineProtocolData.getTagAsString("action_name"), ACTION_NAME);
         Assert.assertEquals(lineProtocolData.getTagAsString("action_type"), ACTION_TYPE_NAME);
         Assert.assertEquals(lineProtocolData.getField(PROPERTY_NAME), PROPERTY_VALUE);
+    }
+
+    /**
+     * Cold launch action adds app launch type to distinguish background launches.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void launchActionBackgroundTypeTest() throws Exception {
+        Whitebox.invokeMethod(FTAutoTrack.class, "putRUMLaunchPerformance",
+                true, DURATION, Utils.getCurrentNanoTime(), null, null, null, true);
+        waitEventConsumeInThreadPool();
+        Thread.sleep(500);
+
+        List<SyncData> list = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.RUM_APP);
+
+        Assert.assertFalse(list.isEmpty());
+
+        SyncData data = list.get(0);
+        LineProtocolData lineProtocolData = new LineProtocolData(data.getDataString());
+        Assert.assertEquals(Constants.ACTION_TYPE_LAUNCH_COLD,
+                lineProtocolData.getTagAsString(Constants.KEY_RUM_ACTION_TYPE));
+        Assert.assertEquals(Constants.APP_LAUNCH_TYPE_BACKGROUND,
+                lineProtocolData.getField(Constants.KEY_RUM_APP_LAUNCH_TYPE));
+    }
+
+    @Test
+    public void launchActionForegroundTypeTest() throws Exception {
+        Whitebox.invokeMethod(FTAutoTrack.class, "putRUMLaunchPerformance",
+                true, DURATION, Utils.getCurrentNanoTime(), null, null, null, false);
+        waitEventConsumeInThreadPool();
+        Thread.sleep(500);
+
+        List<SyncData> list = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.RUM_APP);
+
+        Assert.assertFalse(list.isEmpty());
+
+        SyncData data = list.get(0);
+        LineProtocolData lineProtocolData = new LineProtocolData(data.getDataString());
+        Assert.assertEquals(Constants.APP_LAUNCH_TYPE_FOREGROUND,
+                lineProtocolData.getField(Constants.KEY_RUM_APP_LAUNCH_TYPE));
+    }
+
+    @Test
+    public void hotLaunchActionDoesNotAddLaunchTypeTest() throws Exception {
+        Whitebox.invokeMethod(FTAutoTrack.class, "putRUMLaunchPerformance",
+                false, DURATION, Utils.getCurrentNanoTime(), null, null, null, true);
+        waitEventConsumeInThreadPool();
+        Thread.sleep(500);
+
+        List<SyncData> list = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.RUM_APP);
+
+        Assert.assertFalse(list.isEmpty());
+
+        SyncData data = list.get(0);
+        LineProtocolData lineProtocolData = new LineProtocolData(data.getDataString());
+        Assert.assertEquals(Constants.ACTION_TYPE_LAUNCH_HOT,
+                lineProtocolData.getTagAsString(Constants.KEY_RUM_ACTION_TYPE));
+        Assert.assertNull(lineProtocolData.getField(Constants.KEY_RUM_APP_LAUNCH_TYPE));
     }
 
     /**
