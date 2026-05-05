@@ -49,7 +49,7 @@ public class FTAutoTrack {
      */
     public static void startApp(Application app) {
         try {
-            FTAppStartCounter.get().appOnCreate(System.nanoTime());
+            FTAppStartCounter.get().appOnCreate(System.nanoTime(), app != null ? app : getApplication());
             LogUtils.d(TAG, "startApp:" + app);
             //Determine if it is the main process
             FTActivityLifecycleCallbacks life = new FTActivityLifecycleCallbacks();
@@ -490,6 +490,15 @@ public class FTAutoTrack {
                                                HashMap<String, Long> preApplicationInit,
                                                HashMap<String, Long> applicationInit,
                                                HashMap<String, Long> firstFrameInit) {
+        putRUMLaunchPerformance(isCold, duration, startTime, preApplicationInit, applicationInit,
+                firstFrameInit, false);
+    }
+
+    static void putRUMLaunchPerformance(boolean isCold, long duration, long startTime,
+                                        HashMap<String, Long> preApplicationInit,
+                                        HashMap<String, Long> applicationInit,
+                                        HashMap<String, Long> firstFrameInit,
+                                        boolean launchFromBackground) {
         FTRUMConfigManager manager = FTRUMConfigManager.get();
         FTActionTrackingHandler handler = manager.getConfig().getActionTrackingHandler();
         if (handler != null) {
@@ -502,6 +511,7 @@ public class FTAutoTrack {
                     if (actionProperty == null) {
                         actionProperty = new HashMap<>();
                     }
+                    addLaunchType(actionProperty, launchFromBackground);
 
                     // Handle preApplicationInit
                     if (preApplicationInit != null) {
@@ -537,8 +547,11 @@ public class FTAutoTrack {
             HashMap<String, Object> actionProperty = null;
 
             // Check if any map is not null
-            if (preApplicationInit != null || applicationInit != null || firstFrameInit != null) {
+            if (isCold || preApplicationInit != null || applicationInit != null || firstFrameInit != null) {
                 actionProperty = new HashMap<>();
+                if (isCold) {
+                    addLaunchType(actionProperty, launchFromBackground);
+                }
 
                 // Handle preApplicationInit
                 if (preApplicationInit != null) {
@@ -570,6 +583,13 @@ public class FTAutoTrack {
                     isCold ? Constants.ACTION_TYPE_LAUNCH_COLD : Constants.ACTION_TYPE_LAUNCH_HOT,
                     duration, startTime, actionProperty);
         }
+    }
+
+    private static void addLaunchType(HashMap<String, Object> actionProperty, boolean launchFromBackground) {
+        actionProperty.put(Constants.KEY_RUM_APP_LAUNCH_TYPE,
+                launchFromBackground
+                        ? Constants.APP_LAUNCH_TYPE_BACKGROUND
+                        : Constants.APP_LAUNCH_TYPE_FOREGROUND);
     }
 
 

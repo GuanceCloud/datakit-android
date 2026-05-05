@@ -7,7 +7,7 @@ afterEvaluate {
                 groupId mavenGroupId
                 artifactId mavenArtifactId
                 version pkgVersion
-                artifact project.tasks.bundleReleaseAar
+                artifact project.tasks.named('bundleReleaseAar')
                 // Add source code and Javadoc to the published AAR file
                 artifact androidJavadocsJar
                 artifact androidSourcesJar
@@ -76,7 +76,6 @@ artifacts {
     archives androidSourcesJar
     archives androidJavadocsJar
 }
-
 
 
 
