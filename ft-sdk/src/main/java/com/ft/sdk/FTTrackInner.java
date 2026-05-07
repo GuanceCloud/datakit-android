@@ -97,7 +97,7 @@ public class FTTrackInner {
      */
     void appendGlobalContext(HashMap<String, Object> globalContext) {
         dataHelper.appendGlobalContext(globalContext);
-        SessionReplayManager.get().appendSessionReplayRUMLinkKeys(globalContext);
+        SessionReplayBridge.appendRumLinkKeys(globalContext);
     }
 
     /**
@@ -108,7 +108,7 @@ public class FTTrackInner {
      */
     void appendGlobalContext(String key, String value) {
         dataHelper.appendGlobalContext(key, value);
-        SessionReplayManager.get().appendSessionReplayRUMLinkKeys(key, value);
+        SessionReplayBridge.appendRumLinkKey(key, value);
     }
 
     /**
@@ -118,7 +118,7 @@ public class FTTrackInner {
      */
     void appendRUMGlobalContext(HashMap<String, Object> globalContext) {
         dataHelper.appendRUMGlobalContext(globalContext);
-        SessionReplayManager.get().appendSessionReplayRUMLinkKeys(globalContext);
+        SessionReplayBridge.appendRumLinkKeys(globalContext);
     }
 
     /**
@@ -129,7 +129,7 @@ public class FTTrackInner {
      */
     void appendRUMGlobalContext(String key, String value) {
         dataHelper.appendRUMGlobalContext(key, value);
-        SessionReplayManager.get().appendSessionReplayRUMLinkKeys(key,value);
+        SessionReplayBridge.appendRumLinkKey(key, value);
     }
 
     /**

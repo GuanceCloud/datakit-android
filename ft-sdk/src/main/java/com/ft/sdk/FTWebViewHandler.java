@@ -129,7 +129,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
         if (config.isRumEnable() && config.isEnableTraceWebView()) {
             if (FTSdk.isSessionReplaySupport()) {
                 setWebView(webview, config.getAllowWebViewHost(),
-                        SessionReplayManager.get().getPrivacyLevel(), new String[]{"records"});
+                        SessionReplayBridge.getPrivacyLevel(), new String[]{"records"});
             } else {
                 setWebView(webview, config.getAllowWebViewHost());
             }
@@ -163,13 +163,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
         webview.setTag(R.id.ft_webview_handled_tag_view_value, "handled");
         if (capabilities != null && capabilities.length > 0) {
             slotID = System.identityHashCode(webview);
-            dataBatcher = new com.ft.sdk.sessionreplay.webview.DataBatcher(SessionReplayManager.get().getInternalLogger(),
-                    isDCWebView, new com.ft.sdk.sessionreplay.webview.DataBatcher.WriterCallback() {
-                @Override
-                public com.ft.sdk.sessionreplay.internal.storage.RecordWriter getWriter() {
-                    return SessionReplayManager.get().getCurrentSessionWriter();
-                }
-            });
+            dataBatcher = SessionReplayBridge.newWebViewDataBatcher(isDCWebView);
             // Initialize inactive timestamp to 0 (active state)
             inactiveTimestamp = 0;
         }
@@ -182,12 +176,9 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
 
         // Get bound viewId from SlotIdWebviewBinder by slotId
         if (slotID != 0) {
-            com.ft.sdk.sessionreplay.SlotIdWebviewBinder binder = SessionReplayManager.get().getSlotIdWebviewBinder();
-            if (binder != null) {
-                String boundViewId = binder.getViewId(slotID);
-                if (boundViewId != null) {
-                    viewId = boundViewId;
-                }
+            String boundViewId = SessionReplayBridge.getSlotViewId(slotID);
+            if (boundViewId != null) {
+                viewId = boundViewId;
             }
         }
 
@@ -201,22 +192,15 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
      * Bind callback to slotId with the given globalContextViewId
      */
     private void registerViewChangeCallback(long slotId, String globalContextViewId) {
-        com.ft.sdk.sessionreplay.SlotIdWebviewBinder binder = SessionReplayManager.get().getSlotIdWebviewBinder();
-        if (binder == null) {
-            return;
-        }
-
-        com.ft.sdk.sessionreplay.SlotIdWebviewBinder.BindViewChangeCallBack callback = new com.ft.sdk.sessionreplay.SlotIdWebviewBinder.BindViewChangeCallBack() {
+        SessionReplayBridge.bindSlot(slotId, globalContextViewId, new SessionReplayBridge.ViewChangeCallback() {
             @Override
             public void onViewChanged(String viewId) {
                 rebindView(viewId);
             }
-        };
-        // Bind slotId with viewId and callback
-        binder.bind(slotId, globalContextViewId, callback);
+        });
 
         // Register slot rebind callback to restore timer when same slotId is rebound
-        com.ft.sdk.sessionreplay.SlotIdWebviewBinder.SlotRebindCallBack slotRebindCallback = new com.ft.sdk.sessionreplay.SlotIdWebviewBinder.SlotRebindCallBack() {
+        SessionReplayBridge.setSlotRebindCallback(slotId, new SessionReplayBridge.SlotRebindCallback() {
             @Override
             public void onSlotRebound(long slotId) {
                 // Restore timer when slotId is rebound
@@ -225,8 +209,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                     LogUtils.d(LOG_TAG, "Slot rebind detected, restored snapshot timer and resumed accepting Session Replay data for slotId:" + slotId);
                 }
             }
-        };
-        binder.setSlotRebindCallback(slotId, slotRebindCallback);
+        });
     }
 
     /**
@@ -252,14 +235,14 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
 
         // First bind - same logic as line 282
         if (!Utils.isNullOrEmpty(globalContextViewId)
-                && !globalContextViewId.equals(com.ft.sdk.sessionreplay.utils.SessionReplayRumContext.NULL_UUID)) {
+                && !globalContextViewId.equals(SessionReplayBridge.NULL_UUID)) {
 
-            if (SessionReplayManager.get().checkFieldContextChanged(globalContextViewId, rumLinkData)) {
+            if (SessionReplayBridge.checkFieldContextChanged(globalContextViewId, rumLinkData)) {
                 //update rum globalContext
                 FTRUMInnerManager.get().updateWebviewContainerProperty(globalContextViewId, rumLinkData);
                 //link globalContext with Native Container View
-                SessionReplayManager.get().appendSessionReplayRUMLinkKeysWithView(globalContextViewId, rumLinkData);
-                SessionReplayManager.get().tryGetFullSnapshotForLinkView();
+                SessionReplayBridge.appendRumLinkKeysWithView(globalContextViewId, rumLinkData);
+                SessionReplayBridge.tryGetFullSnapshotForLinkView();
                 LogUtils.d(LOG_TAG, "Rebind View - Track SlotID tryGetFullSnapshot:" + globalContextViewId + ",slotId:" + slotID);
             }
         }
@@ -334,15 +317,12 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                     // Get viewId by slotId
                     String globalContextViewId = null;
                     if (slotID != 0) {
-                        com.ft.sdk.sessionreplay.SlotIdWebviewBinder binder = SessionReplayManager.get().getSlotIdWebviewBinder();
-                        if (binder != null) {
-                            globalContextViewId = binder.getViewId(slotID);
-                        }
+                        globalContextViewId = SessionReplayBridge.getSlotViewId(slotID);
                     }
 
                     if (FTSdk.isSessionReplaySupport()) {
                         if (!Utils.isNullOrEmpty(nativeViewId)
-                                && !nativeViewId.equals(com.ft.sdk.sessionreplay.utils.SessionReplayRumContext.NULL_UUID)) {
+                                && !nativeViewId.equals(SessionReplayBridge.NULL_UUID)) {
                             HashMap<String, String> source = new HashMap<>();
                             source.put("source", "android");
                             source.put("view_id", nativeViewId);
@@ -351,7 +331,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                         }
 
                         // Check if keys in tagMaps and fieldMaps contain characters from RumLinkKeys
-                        String[] rumLinkKeys = SessionReplayManager.get().getRumLinkKeys();
+                        String[] rumLinkKeys = SessionReplayBridge.getRumLinkKeys();
                         if (rumLinkKeys != null && rumLinkKeys.length > 0) {
                             String webViewId = (String) tagMaps.get("view_id");
                             if (!Utils.isNullOrEmpty(webViewId)) {
@@ -384,14 +364,14 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
 
                                     //First bind
                                     if (!Utils.isNullOrEmpty(globalContextViewId)
-                                            && !globalContextViewId.equals(com.ft.sdk.sessionreplay.utils.SessionReplayRumContext.NULL_UUID)) {
+                                            && !globalContextViewId.equals(SessionReplayBridge.NULL_UUID)) {
 
-                                        if (SessionReplayManager.get().checkFieldContextChanged(globalContextViewId, rumLinkData)) {
+                                        if (SessionReplayBridge.checkFieldContextChanged(globalContextViewId, rumLinkData)) {
                                             //update rum globalContext
                                             FTRUMInnerManager.get().updateWebviewContainerProperty(globalContextViewId, rumLinkData);
                                             //link globalContext with Native Container View
-                                            SessionReplayManager.get().appendSessionReplayRUMLinkKeysWithView(globalContextViewId, rumLinkData);
-                                            SessionReplayManager.get().tryGetFullSnapshotForLinkView();
+                                            SessionReplayBridge.appendRumLinkKeysWithView(globalContextViewId, rumLinkData);
+                                            SessionReplayBridge.tryGetFullSnapshotForLinkView();
                                             LogUtils.d(LOG_TAG, "Track SlotID tryGetFullSnapshot:" + globalContextViewId + ",slotId:" + slotID);
 
                                             registerViewChangeCallback(slotID, globalContextViewId);
@@ -441,12 +421,11 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                             FTRUMInnerManager.get().getSessionId()) != CollectType.NOT_COLLECT) {
                         data.put("slotId", slotID + "");
 
-                        com.ft.sdk.sessionreplay.utils.SessionReplayRumContext newContext =
-                                new com.ft.sdk.sessionreplay.utils.SessionReplayRumContext(
-                                        FTRUMInnerManager.get().getApplicationID(),
-                                        FTRUMInnerManager.get().getSessionId(),
-                                        webViewId, webViewLinkMap.get(webViewId));
-                        ((com.ft.sdk.sessionreplay.webview.DataBatcher) dataBatcher).onData(newContext,
+                        SessionReplayBridge.onWebViewData(dataBatcher,
+                                FTRUMInnerManager.get().getApplicationID(),
+                                FTRUMInnerManager.get().getSessionId(),
+                                webViewId,
+                                webViewLinkMap.get(webViewId),
                                 data.toString());
                     }
                 }
@@ -583,14 +562,13 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
             return false;
         }
 
-        com.ft.sdk.sessionreplay.SlotIdWebviewBinder binder = SessionReplayManager.get().getSlotIdWebviewBinder();
-        if (binder == null) {
+        if (!FTSdk.isSessionReplaySupport()) {
             return false;
         }
 
         // Check activation status from ViewBindingInfo
         if (slotID != 0) {
-            boolean isActive = binder.isActive(slotID);
+            boolean isActive = SessionReplayBridge.isSlotActive(slotID);
             if (!isActive) {
                 return false;
             }
@@ -603,7 +581,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
         }
 
         // Get the latest slotId globally
-        long latestSlotId = binder.getLatestSlotId();
+        long latestSlotId = SessionReplayBridge.getLatestSlotId();
         if (latestSlotId == 0) {
             return false;
         }
@@ -618,9 +596,7 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
      */
     private void checkAndStartSnapshotTimer() {
         // Start timer to call JS method every 10 seconds
-        com.ft.sdk.sessionreplay.internal.persistence.TrackingConsent consent
-                = SessionReplayManager.get().getConsentProvider();
-        if (consent != com.ft.sdk.sessionreplay.internal.persistence.TrackingConsent.SAMPLED_ON_ERROR_SESSION) {
+        if (!SessionReplayBridge.isSampledOnErrorSession()) {
             return;
         }
 

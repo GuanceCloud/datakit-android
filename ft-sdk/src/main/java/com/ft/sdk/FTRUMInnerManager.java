@@ -1,15 +1,8 @@
 package com.ft.sdk;
 
-import static com.ft.sdk.sessionreplay.internal.SessionReplayRecordCallback.HAS_REPLAY_KEY;
-import static com.ft.sdk.sessionreplay.internal.SessionReplayRecordCallback.SAMPLED_ON_ERROR;
-import static com.ft.sdk.sessionreplay.internal.SessionReplayRecordCallback.VIEW_RECORDS_COUNT_KEY;
-import static com.ft.sdk.sessionreplay.utils.SessionReplayRumContext.NULL_UUID;
-
 import android.os.Handler;
 import android.os.Looper;
 
-import com.ft.sdk.feature.Feature;
-import com.ft.sdk.feature.FeatureScope;
 import com.ft.sdk.garble.bean.ActionBean;
 import com.ft.sdk.garble.bean.ActiveActionBean;
 import com.ft.sdk.garble.bean.ActiveViewBean;
@@ -32,7 +25,6 @@ import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.HashMapUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
-import com.ft.sdk.sessionreplay.SessionReplayConstants;
 
 import org.json.JSONException;
 
@@ -272,15 +264,7 @@ public class FTRUMInnerManager {
     private void updateSessionReplay(String sessionId, boolean forceFresh) {
         if (!FTSdk.isSessionReplaySupport()) return;
         CollectType collectType = checkSessionWillCollect(sessionId);
-        HashMap<String, Object> map = new HashMap<>();
-        map.put(SessionReplayConstants.SESSION_REPLAY_BUS_MESSAGE_TYPE_KEY, SessionReplayConstants.RUM_SESSION_RENEWED_BUS_MESSAGE);
-        map.put(SessionReplayConstants.RUM_KEEP_SESSION_BUS_COLLECT_TYPE_KEY, collectType.getValue());
-        map.put(SessionReplayConstants.RUM_SESSION_ID_BUS_MESSAGE_KEY, sessionId);
-        map.put(SessionReplayConstants.RUM_FORCE_REFRESH, forceFresh);
-        FeatureScope scope = SessionReplayManager.get().getFeature(Feature.SESSION_REPLAY_FEATURE_NAME);
-        if (scope != null) {
-            scope.sendEvent(map);
-        }
+        SessionReplayBridge.sendSessionRenewed(sessionId, collectType, forceFresh);
 
     }
 
@@ -291,14 +275,14 @@ public class FTRUMInnerManager {
         Map<String, Object> hashMap = new HashMap<>();
         hashMap.put(Constants.KEY_RUM_SESSION_ID, sessionId);
         String viewId = getViewId();
-        hashMap.put(Constants.KEY_RUM_VIEW_ID, viewId == null ? NULL_UUID : viewId);
+        hashMap.put(Constants.KEY_RUM_VIEW_ID, viewId == null ? SessionReplayBridge.NULL_UUID : viewId);
         hashMap.put("application_id", getApplicationID());
-        Map<String, Object> map = SessionReplayManager.get().getTagLinkMap();
+        Map<String, Object> map = SessionReplayBridge.getTagLinkMap();
         if (activeView != null) {
             Map<String, Object> viewMeta = new HashMap<>();
-            viewMeta.put(VIEW_RECORDS_COUNT_KEY, activeView.getRecordsCount());
+            viewMeta.put(SessionReplayBridge.VIEW_RECORDS_COUNT_KEY, activeView.getRecordsCount());
             hashMap.put(viewId, viewMeta);
-            Map<String, Object> filedMap = SessionReplayManager.get().getFieldLinkMap().get(activeView.getId());
+            Map<String, Object> filedMap = SessionReplayBridge.getFieldLinkMap().get(activeView.getId());
             if (filedMap != null) {
                 map.putAll(filedMap);
             }
@@ -310,7 +294,7 @@ public class FTRUMInnerManager {
     }
 
     String getApplicationID() {
-        return rumAppId == null ? NULL_UUID : rumAppId;
+        return rumAppId == null ? SessionReplayBridge.NULL_UUID : rumAppId;
     }
 
     private String getActionId() {
@@ -695,7 +679,7 @@ public class FTRUMInnerManager {
         FTMonitorManager.get().addMonitor(newView.getId());
         FTMonitorManager.get().attachMonitorData(newView);
         initViewInCache(newView);
-        SessionReplayManager.get().appendSessionReplayRUMLinkKeysWithView(newView.getId(), property);
+        SessionReplayBridge.appendRumLinkKeysWithView(newView.getId(), property);
     }
 
     /**
@@ -1692,15 +1676,18 @@ public class FTRUMInnerManager {
                         if (viewMap instanceof Map) {
                             @SuppressWarnings("unchecked")
                             Map<String, Object> dataMap = (Map<String, Object>) viewMap;
-                            if (dataMap.containsKey(VIEW_RECORDS_COUNT_KEY)) {
-                                activeView.setRecordsCount(HashMapUtils.getLong(dataMap, VIEW_RECORDS_COUNT_KEY));
+                            if (dataMap.containsKey(SessionReplayBridge.VIEW_RECORDS_COUNT_KEY)) {
+                                activeView.setRecordsCount(HashMapUtils.getLong(dataMap,
+                                        SessionReplayBridge.VIEW_RECORDS_COUNT_KEY));
                             }
-                            if (dataMap.containsKey(HAS_REPLAY_KEY)) {
-                                boolean currentHasReplay = HashMapUtils.getBoolean(dataMap, HAS_REPLAY_KEY);
+                            if (dataMap.containsKey(SessionReplayBridge.HAS_REPLAY_KEY)) {
+                                boolean currentHasReplay = HashMapUtils.getBoolean(dataMap,
+                                        SessionReplayBridge.HAS_REPLAY_KEY);
                                 boolean preHasReplay = activeView.isHasReplay();
                                 if (!preHasReplay && currentHasReplay) {
                                     String updateViewId = activeView.getId();
-                                    boolean sampledError = HashMapUtils.getBoolean(dataMap, SAMPLED_ON_ERROR);
+                                    boolean sampledError = HashMapUtils.getBoolean(dataMap,
+                                            SessionReplayBridge.SAMPLED_ON_ERROR);
                                     activeView.setHasReplay(!sampledError);
                                     activeView.setSessionReplayErrorSampled(sampledError);
                                     String attr = activeView.getAttrJsonString();

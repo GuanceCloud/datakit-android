@@ -16,7 +16,6 @@ import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.PackageUtils;
 import com.ft.sdk.garble.utils.TBSWebViewUtils;
 import com.ft.sdk.garble.utils.Utils;
-import com.ft.sdk.sessionreplay.FTSessionReplayConfig;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -42,7 +41,7 @@ public class FTSdk {
     public static String NATIVE_VERSION = PackageUtils.isNativeLibrarySupport() ? PackageUtils.getNativeLibVersion() : "";
 
     /**
-     * After integrating ft-session-replay, it will be assigned, directly access {@link com.ft.sdk.nativelib.BuildConfig#VERSION_NAME} to get
+     * After integrating ft-session-replay, it will be assigned from session replay BuildConfig.
      */
     public static String SESSION_REPLAY_VERSION = PackageUtils.isSessionReplay() ? PackageUtils.getPackageSessionReplay() : "";
 
@@ -143,9 +142,7 @@ public class FTSdk {
         EventConsumerThreadPool.get().shutDown();
         FTANRDetector.get().release();
         FTDBManager.release();
-        if (FTSdk.isSessionReplaySupport()) {
-            SessionReplayManager.get().stop();
-        }
+        SessionReplayBridge.stop();
         if (mFtSdk != null) {
             if (mFtSdk.mRemoteConfigManager != null) {
                 mFtSdk.mRemoteConfigManager.close();
@@ -292,7 +289,7 @@ public class FTSdk {
      *
      * @param config
      */
-    public static void initSessionReplayConfig(FTSessionReplayConfig config) {
+    public static void initSessionReplayConfig(Object config) {
         try {
             if (get().mRemoteConfigManager != null) {
                 get().mRemoteConfigManager.mergeSessionReplayConfigFromCache(config);
@@ -357,7 +354,7 @@ public class FTSdk {
     }
 
     public static boolean isSessionReplaySupport() {
-        return isSessionReplaySupport && SessionReplayManager.get().isReplayEnable();
+        return isSessionReplaySupport && SessionReplayBridge.isReplayEnabled();
     }
 
 
