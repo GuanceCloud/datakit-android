@@ -208,9 +208,25 @@ public class Constants {
     /**
      * Set total cache size limit
      */
-    public static final int DEFAULT_DB_SIZE_LIMIT = 104857600;//100MB
-    public static final int MINI_DB_SIZE_LIMIT = 31457280;//30MB
-    public static final int DB_OLD_CACHE_REMOVE_COUNT = 100;
+    public static final int DEFAULT_CACHE_SIZE_LIMIT = 104857600;//100MB
+    public static final int MINI_CACHE_SIZE_LIMIT = 31457280;//30MB
+    public static final int CACHE_OLD_DATA_REMOVE_COUNT = 100;
+
+    /**
+     * @deprecated Use {@link #DEFAULT_CACHE_SIZE_LIMIT}.
+     */
+    @Deprecated
+    public static final int DEFAULT_DB_SIZE_LIMIT = DEFAULT_CACHE_SIZE_LIMIT;
+    /**
+     * @deprecated Use {@link #MINI_CACHE_SIZE_LIMIT}.
+     */
+    @Deprecated
+    public static final int MINI_DB_SIZE_LIMIT = MINI_CACHE_SIZE_LIMIT;
+    /**
+     * @deprecated Use {@link #CACHE_OLD_DATA_REMOVE_COUNT}.
+     */
+    @Deprecated
+    public static final int DB_OLD_CACHE_REMOVE_COUNT = CACHE_OLD_DATA_REMOVE_COUNT;
 
 
 //    public static final String KEY_EVENT_ID = "event_id";

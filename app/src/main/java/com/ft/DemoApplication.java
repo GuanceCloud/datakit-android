@@ -129,8 +129,8 @@ public class DemoApplication extends BaseApplication {
 //                        return value;
 //                    }
 //                })
-//                .enableLimitWithDbSize(1024 * 1024)
-//                .setDbCacheDiscard(DBCacheDiscard.DISCARD_OLDEST)
+//                .enableLimitWithCacheSize(1024 * 1024)
+//                .setCacheDiscard(CacheDiscard.DISCARD_OLDEST)
 //                .setLineDataModifier(new LineDataModifier() {
 //                    @Override
 //                    public Map<String, Object> modify(String measurement, HashMap<String, Object> data) {

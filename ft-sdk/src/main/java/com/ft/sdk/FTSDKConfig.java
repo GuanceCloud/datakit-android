@@ -39,14 +39,14 @@ public class FTSDKConfig {
 
 
     /**
-     * db cache size limit
+     * Total cache size limit.
      */
-    private long dbCacheLimit = Constants.DEFAULT_DB_SIZE_LIMIT;
+    private long cacheLimit = Constants.DEFAULT_CACHE_SIZE_LIMIT;
 
     /**
-     * Whether to enable db cache limit
+     * Whether to enable total cache size limit.
      */
-    private boolean limitWithDbSize = false;
+    private boolean limitWithCacheSize = false;
 
     boolean isMainProcess = false;
 
@@ -57,7 +57,7 @@ public class FTSDKConfig {
     /**
      *
      */
-    private DBCacheDiscard dbCacheDiscard = DBCacheDiscard.DISCARD;
+    private CacheDiscard cacheDiscard = CacheDiscard.DISCARD;
 
     /**
      * Set log level, default {@link SDKLogLevel#V}
@@ -132,51 +132,104 @@ public class FTSDKConfig {
     private boolean fileDataStoreShadow = false;
 
 
+    public long getCacheLimit() {
+        return cacheLimit;
+    }
+
+    /**
+     * Enable total cache size limit, default 100MB, {@link Constants#DEFAULT_CACHE_SIZE_LIMIT}.
+     * After enabling cache size limit, {@link FTLoggerConfig#setLogCacheLimitCount(int)}
+     * and {@link FTRUMConfig#setRumCacheLimitCount(int)} will be invalid.
+     *
+     * @return
+     */
+    public FTSDKConfig enableLimitWithCacheSize() {
+        this.limitWithCacheSize = true;
+        return this;
+    }
+
+    /**
+     * Enable total cache size limit, default 100MB, unit byte, {@link Constants#DEFAULT_CACHE_SIZE_LIMIT}.
+     *
+     * @param cacheSize set cache size limit, [30MB,), default 100 MB
+     * @return
+     */
+    public FTSDKConfig enableLimitWithCacheSize(long cacheSize) {
+        this.cacheLimit = Math.max(Constants.MINI_CACHE_SIZE_LIMIT, cacheSize);
+        this.limitWithCacheSize = true;
+        return this;
+    }
+
+    public boolean isLimitWithCacheSize() {
+        return limitWithCacheSize;
+    }
+
+    /**
+     * Set cache discard strategy.
+     *
+     * @param cacheDiscard cache discard strategy
+     * @return
+     */
+    public FTSDKConfig setCacheDiscard(CacheDiscard cacheDiscard) {
+        if (cacheDiscard != null) {
+            this.cacheDiscard = cacheDiscard;
+        }
+        return this;
+    }
+
+    public CacheDiscard getCacheDiscard() {
+        return cacheDiscard;
+    }
+
+    /**
+     * @deprecated Use {@link #getCacheLimit()}.
+     */
+    @Deprecated
     public long getDbCacheLimit() {
-        return dbCacheLimit;
+        return getCacheLimit();
     }
 
     /**
-     * Enable db size limit, default 100MB, {@link Constants#DEFAULT_DB_SIZE_LIMIT}
+     * @deprecated Use {@link #enableLimitWithCacheSize()}.
      */
+    @Deprecated
     public FTSDKConfig enableLimitWithDbSize() {
-        this.limitWithDbSize = true;
-        return this;
+        return enableLimitWithCacheSize();
     }
 
     /**
-     * Enable db size limit, default 100MB, unit byte, {@link Constants#DEFAULT_DB_SIZE_LIMIT}
-     *
-     * @param dbSize Set db size limit, the larger the database, the greater the disk pressure, [30MB,), default 100 MB
-     *               <p>
-     *               After enabling db data limit, {@link FTLoggerConfig#setLogCacheLimitCount(int)}
-     *               and {@link FTRUMConfig#setRumCacheLimitCount(int)} will be invalid
-     * @return
+     * @deprecated Use {@link #enableLimitWithCacheSize(long)}.
      */
+    @Deprecated
     public FTSDKConfig enableLimitWithDbSize(long dbSize) {
-        this.dbCacheLimit = Math.max(Constants.MINI_DB_SIZE_LIMIT, dbSize);
-//        this.dbCacheLimit = dbSize;
-        this.limitWithDbSize = true;
-        return this;
-    }
-
-    public boolean isLimitWithDbSize() {
-        return limitWithDbSize;
+        return enableLimitWithCacheSize(dbSize);
     }
 
     /**
-     * Set db cache discard strategy
-     *
-     * @param dbCacheDiscard
-     * @return
+     * @deprecated Use {@link #isLimitWithCacheSize()}.
      */
+    @Deprecated
+    public boolean isLimitWithDbSize() {
+        return isLimitWithCacheSize();
+    }
+
+    /**
+     * @deprecated Use {@link #setCacheDiscard(CacheDiscard)}.
+     */
+    @Deprecated
     public FTSDKConfig setDbCacheDiscard(DBCacheDiscard dbCacheDiscard) {
-        this.dbCacheDiscard = dbCacheDiscard;
+        if (dbCacheDiscard != null) {
+            this.cacheDiscard = CacheDiscard.valueOf(dbCacheDiscard.name());
+        }
         return this;
     }
 
+    /**
+     * @deprecated Use {@link #getCacheDiscard()}.
+     */
+    @Deprecated
     public DBCacheDiscard getDbCacheDiscard() {
-        return dbCacheDiscard;
+        return DBCacheDiscard.valueOf(cacheDiscard.name());
     }
 
 
@@ -767,9 +820,9 @@ public class FTSDKConfig {
         return "FTSDKConfig{" +
                 ", isDebug=" + isDebug +
                 ", sdkLogLevel=" + sdkLogLevel +
-                ", dbCacheLimit=" + dbCacheLimit +
-                ", limitWithDbSize=" + limitWithDbSize +
-                ", dbCacheDiscard=" + dbCacheDiscard +
+                ", cacheLimit=" + cacheLimit +
+                ", limitWithCacheSize=" + limitWithCacheSize +
+                ", cacheDiscard=" + cacheDiscard +
                 ", enableAccessAndroidID=" + enableAccessAndroidID +
                 ", autoSync=" + autoSync +
                 ", pageSize=" + pageSize +

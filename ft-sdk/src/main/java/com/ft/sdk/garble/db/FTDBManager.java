@@ -15,7 +15,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 
-import com.ft.sdk.DBCacheDiscard;
+import com.ft.sdk.CacheDiscard;
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.garble.bean.ActionBean;
 import com.ft.sdk.garble.bean.DataType;
@@ -66,20 +66,20 @@ public class FTDBManager extends DBManager implements FTDataStore {
     }
 
     @Override
-    protected boolean enableDBSizeLimit() {
-        return FTDBCachePolicy.get().isEnableLimitWithDbSize();
+    protected boolean enableCacheSizeLimit() {
+        return FTDBCachePolicy.get().isLimitWithCacheSize();
     }
 
     @Override
-    protected void onDBSizeCacheChange(SQLiteDatabase db, long fileSize) {
-//        LogUtils.d(TAG, "onDBSizeCacheChange:" + (fileSize / 1024) + "KB");
+    protected void onCacheSizeChange(SQLiteDatabase db, long fileSize) {
+//        LogUtils.d(TAG, "onCacheSizeChange:" + (fileSize / 1024) + "KB");
         //only do it in main process, db
-        FTDBCachePolicy.get().setCurrentDBSize(fileSize);
-        if (FTDBCachePolicy.get().isReachDbLimit()) {
-            if (FTDBCachePolicy.get().getDbCacheDiscard() == DBCacheDiscard.DISCARD_OLDEST) {
+        FTDBCachePolicy.get().setCurrentCacheSize(fileSize);
+        if (FTDBCachePolicy.get().isReachCacheLimit()) {
+            if (FTDBCachePolicy.get().getCacheDiscard() == CacheDiscard.DISCARD_OLDEST) {
                 LogUtils.w(TAG, "Database size exceeds limit! Performing cleanup...");
                 db.execSQL("DELETE FROM " + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " where _id in (SELECT _id from "
-                        + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " ORDER by tm ASC LIMIT " + Constants.DB_OLD_CACHE_REMOVE_COUNT + ")");
+                        + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " ORDER by tm ASC LIMIT " + Constants.CACHE_OLD_DATA_REMOVE_COUNT + ")");
                 LogUtils.d(TAG, "Cleanup completed. Size reduced.");
                 db.close();
                 LogUtils.w(TAG, "DB Close to reduce size");
@@ -988,8 +988,8 @@ public class FTDBManager extends DBManager implements FTDataStore {
             Bundle result = contentProvider.call(FTContentProvider.getUriSyncDataFlat(), FTContentProvider.METHOD_EXEC_SQL, null, extras);
             if (result.getBoolean("success")) {
 
-                if (FTDBCachePolicy.get().isEnableLimitWithDbSize()
-                        && FTDBCachePolicy.get().isReachDbLimit()) {
+                if (FTDBCachePolicy.get().isLimitWithCacheSize()
+                        && FTDBCachePolicy.get().isReachCacheLimit()) {
                     LogUtils.w(TAG, "BD close to reduce size");
                 }
             } else {
@@ -1160,8 +1160,8 @@ public class FTDBManager extends DBManager implements FTDataStore {
             LogUtils.e(TAG, "DB table delete via ContentProvider - sync: " + deletedSync +
                     ", action: " + deletedAction + ", view: " + deletedView);
 
-            if (FTDBCachePolicy.get().isEnableLimitWithDbSize()
-                    && FTDBCachePolicy.get().isReachDbLimit()) {
+            if (FTDBCachePolicy.get().isLimitWithCacheSize()
+                    && FTDBCachePolicy.get().isReachCacheLimit()) {
                 // Close database connection
                 LogUtils.d(TAG, "close BD to reduce size");
             }

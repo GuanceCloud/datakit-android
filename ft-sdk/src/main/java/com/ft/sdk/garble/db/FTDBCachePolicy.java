@@ -1,5 +1,6 @@
 package com.ft.sdk.garble.db;
 
+import com.ft.sdk.CacheDiscard;
 import com.ft.sdk.DBCacheDiscard;
 import com.ft.sdk.FTLoggerConfig;
 import com.ft.sdk.FTRUMConfig;
@@ -14,7 +15,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * author: huangDianHua
  * time: 2020/8/4 15:41:54
- * description: Log data database cache discard policy
+ * description: SDK cache discard policy
  */
 public class FTDBCachePolicy {
     private volatile static FTDBCachePolicy instance;
@@ -30,9 +31,9 @@ public class FTDBCachePolicy {
     private final AtomicInteger rumCount = new AtomicInteger(0);
 
     /**
-     * Get current db cache size
+     * Get current cache size
      */
-    private final AtomicLong currentDbSize = new AtomicLong();
+    private final AtomicLong currentCacheSize = new AtomicLong();
 
     private final Object rumLock = new Object();
 
@@ -57,11 +58,11 @@ public class FTDBCachePolicy {
      */
     private int rumLimitCount = 0;
 
-    private boolean enableLimitWithDbSize;
+    private boolean limitWithCacheSize;
 
-    private long dbLimitSize;
+    private long cacheLimit;
 
-    private DBCacheDiscard dbCacheDiscard = DBCacheDiscard.DISCARD;
+    private CacheDiscard cacheDiscard = CacheDiscard.DISCARD;
 
     /**
      * log data discard rule
@@ -75,13 +76,13 @@ public class FTDBCachePolicy {
 
 
     private FTDBCachePolicy() {
-        logCount.set(FTDataStoreManager.get().queryTotalCount(DataType.LOG));//Get log data from database during initialization
+        logCount.set(FTDataStoreManager.get().queryTotalCount(DataType.LOG));//Get log data from cache during initialization
         rumCount.set(FTDataStoreManager.get().queryTotalCount(new DataType[]{
                 DataType.RUM_APP,
                 DataType.RUM_WEBVIEW,
                 DataType.RUM_APP_ERROR_SAMPLED,
                 DataType.RUM_WEBVIEW_ERROR_SAMPLED,
-        }));//Get log data from database during initialization
+        }));//Get RUM data from cache during initialization
     }
 
     public synchronized static FTDBCachePolicy get() {
@@ -92,14 +93,14 @@ public class FTDBCachePolicy {
     }
 
     /**
-     * Set db limit
+     * Set SDK cache limit
      *
      * @param config
      */
     public void initSDKParams(FTSDKConfig config) {
-        this.enableLimitWithDbSize = config.isLimitWithDbSize();
-        this.dbLimitSize = config.getDbCacheLimit();
-        this.dbCacheDiscard = config.getDbCacheDiscard();
+        this.limitWithCacheSize = config.isLimitWithCacheSize();
+        this.cacheLimit = config.getCacheLimit();
+        this.cacheDiscard = config.getCacheDiscard();
     }
 
     /**
@@ -145,7 +146,7 @@ public class FTDBCachePolicy {
      * @param optCount Number of data written
      */
     public void optLogCount(int optCount) {
-        if (enableLimitWithDbSize) return;
+        if (limitWithCacheSize) return;
         logCount.addAndGet(optCount);
     }
 
@@ -155,36 +156,36 @@ public class FTDBCachePolicy {
      * @param optCount Number of data written
      */
     public void optRUMCount(int optCount) {
-        if (enableLimitWithDbSize) return;
+        if (limitWithCacheSize) return;
         rumCount.addAndGet(optCount);
     }
 
     /**
-     * Set current db cache file size
+     * Set current cache file size
      *
-     * @param currentDbSize
+     * @param currentCacheSize
      */
-    public void setCurrentDBSize(long currentDbSize) {
-        this.currentDbSize.set(currentDbSize);
+    public void setCurrentCacheSize(long currentCacheSize) {
+        this.currentCacheSize.set(currentCacheSize);
     }
 
     /**
-     * Whether db cache limit is reached
+     * Whether cache size limit is reached
      *
      * @return
      */
-    public boolean isReachDbLimit() {
-        return currentDbSize.get() >= dbLimitSize;
+    public boolean isReachCacheLimit() {
+        return currentCacheSize.get() >= cacheLimit;
     }
 
     /**
-     * Whether half of db cache limit is reached
+     * Whether half of cache limit is reached
      *
      * @return
      */
     public boolean reachHalfLimit() {
-        if (enableLimitWithDbSize) {
-            return currentDbSize.get() >= dbLimitSize / 2;
+        if (limitWithCacheSize) {
+            return currentCacheSize.get() >= cacheLimit / 2;
         } else {
             return reachLogHalfLimit() || reachRumHalfLimit();
         }
@@ -209,14 +210,14 @@ public class FTDBCachePolicy {
     }
 
     /**
-     * Execute log log database cache policy
+     * Execute log cache policy
      *
      * @return 0-means data can be inserted, n means old data needs to be deleted, -n means how much data to discard
      */
     public int optLogCachePolicy(int limit) {
-        if (enableLimitWithDbSize) {
-            if (isReachDbLimit()) {
-                switch (dbCacheDiscard) {
+        if (limitWithCacheSize) {
+            if (isReachCacheLimit()) {
+                switch (cacheDiscard) {
                     case DISCARD:
                         return -limit;
                     case DISCARD_OLDEST:
@@ -228,10 +229,10 @@ public class FTDBCachePolicy {
 
         int status = 0;
         int currentLogCount = logCount.get();
-        if (currentLogCount >= logLimitCount) {//When data volume is greater than the configured maximum database storage capacity, execute discard strategy
+        if (currentLogCount >= logLimitCount) {//When data volume is greater than the configured maximum cache capacity, execute discard strategy
             if (logCacheDiscardStrategy == LogCacheDiscard.DISCARD) {//Directly discard data
                 status = -limit;
-            } else if (logCacheDiscardStrategy == LogCacheDiscard.DISCARD_OLDEST) {//Discard the first few pieces of data in the database
+            } else if (logCacheDiscardStrategy == LogCacheDiscard.DISCARD_OLDEST) {//Discard the first few pieces of cached data
                 FTDataStoreManager.get().deleteOldestData(DataType.LOG, limit);
                 logCount.set(FTDataStoreManager.get().queryTotalCount(DataType.LOG));
                 status = limit;
@@ -242,7 +243,7 @@ public class FTDBCachePolicy {
                 int needRemove = limit - needInsert;
                 if (logCacheDiscardStrategy == LogCacheDiscard.DISCARD) {//Directly discard data
                     status = -needRemove;
-                } else if (logCacheDiscardStrategy == LogCacheDiscard.DISCARD_OLDEST) {//Discard the first few pieces of data in the database
+                } else if (logCacheDiscardStrategy == LogCacheDiscard.DISCARD_OLDEST) {//Discard the first few pieces of cached data
                     FTDataStoreManager.get().deleteOldestData(DataType.LOG, needRemove);
                     logCount.set(FTDataStoreManager.get().queryTotalCount(DataType.LOG));
                     status = needRemove;
@@ -259,9 +260,9 @@ public class FTDBCachePolicy {
      * @return @return -1-means directly discard, 0-means data can be inserted, 1-means discard and delete old data
      */
     public int optRUMCachePolicy(int limit) {
-        if (enableLimitWithDbSize) {
-            if (isReachDbLimit()) {
-                switch (dbCacheDiscard) {
+        if (limitWithCacheSize) {
+            if (isReachCacheLimit()) {
+                switch (cacheDiscard) {
                     case DISCARD:
                         return -1;
                     case DISCARD_OLDEST:
@@ -273,10 +274,10 @@ public class FTDBCachePolicy {
 
         int status = 0;
         int currentRUMCount = rumCount.get();
-        if (currentRUMCount >= rumLimitCount) {//When data volume is greater than the configured maximum database storage capacity, execute discard strategy
+        if (currentRUMCount >= rumLimitCount) {//When data volume is greater than the configured maximum cache capacity, execute discard strategy
             if (rumCacheDiscardStrategy == RUMCacheDiscard.DISCARD) {//Directly discard data
                 status = -1;
-            } else if (rumCacheDiscardStrategy == RUMCacheDiscard.DISCARD_OLDEST) {//Discard the first few pieces of data in the database
+            } else if (rumCacheDiscardStrategy == RUMCacheDiscard.DISCARD_OLDEST) {//Discard the first few pieces of cached data
                 FTDataStoreManager.get().deleteOldestData(new DataType[]{
                         DataType.RUM_APP,
                         DataType.RUM_WEBVIEW,
@@ -298,20 +299,52 @@ public class FTDBCachePolicy {
     }
 
     /**
-     * Whether db limit is enabled
+     * Whether cache size limit is enabled
      *
      * @return
      */
-    public boolean isEnableLimitWithDbSize() {
-        return enableLimitWithDbSize;
+    public boolean isLimitWithCacheSize() {
+        return limitWithCacheSize;
     }
 
     /**
-     * db cache discard strategy
+     * Cache discard strategy.
      *
      * @return
      */
+    public CacheDiscard getCacheDiscard() {
+        return cacheDiscard;
+    }
+
+    /**
+     * @deprecated Use {@link #setCurrentCacheSize(long)}.
+     */
+    @Deprecated
+    public void setCurrentDBSize(long currentDbSize) {
+        setCurrentCacheSize(currentDbSize);
+    }
+
+    /**
+     * @deprecated Use {@link #isReachCacheLimit()}.
+     */
+    @Deprecated
+    public boolean isReachDbLimit() {
+        return isReachCacheLimit();
+    }
+
+    /**
+     * @deprecated Use {@link #isLimitWithCacheSize()}.
+     */
+    @Deprecated
+    public boolean isEnableLimitWithDbSize() {
+        return isLimitWithCacheSize();
+    }
+
+    /**
+     * @deprecated Use {@link #getCacheDiscard()}.
+     */
+    @Deprecated
     public DBCacheDiscard getDbCacheDiscard() {
-        return dbCacheDiscard;
+        return DBCacheDiscard.valueOf(cacheDiscard.name());
     }
 }
