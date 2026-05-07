@@ -5,8 +5,8 @@ import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.garble.db.file.FTFileDataStore;
 
 /**
- * Entry point for SDK persistence. The current default implementation is the
- * SQLite-backed FTDBManager, while future implementations can be swapped here.
+ * Entry point for SDK persistence. The default implementation is file-backed
+ * storage, while SQLite remains available for shadow mode and rollback.
  */
 public class FTDataStoreManager {
     private static volatile FTDataStore dataStore;
@@ -20,7 +20,7 @@ public class FTDataStoreManager {
             synchronized (FTDataStoreManager.class) {
                 store = dataStore;
                 if (store == null) {
-                    store = FTDBManager.get();
+                    store = new FTFileDataStore(FTApplication.getApplication());
                     dataStore = store;
                 }
             }
@@ -30,11 +30,12 @@ public class FTDataStoreManager {
 
     public static void init(FTSDKConfig config) {
         synchronized (FTDataStoreManager.class) {
-            if (config != null && config.isUseFileDataStore()) {
-                dataStore = new FTFileDataStore(FTApplication.getApplication());
-            } else if (config != null && config.isFileDataStoreShadow()) {
+            if (config != null && config.isFileDataStoreShadow()) {
                 dataStore = new FTShadowDataStore(FTDBManager.get(),
                         new FTFileDataStore(FTApplication.getApplication()));
+            } else if (config == null || config.isUseFileDataStore()) {
+                dataStore = new FTFileDataStore(FTApplication.getApplication(),
+                        config != null && config.isNeedTransformOldCache());
             } else {
                 dataStore = FTDBManager.get();
             }

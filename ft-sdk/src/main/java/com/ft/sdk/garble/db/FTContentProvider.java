@@ -79,9 +79,14 @@ public class FTContentProvider extends ContentProvider {
             uriMatcher.addURI(authority, PATH_EXEC_SQL, EXEC_SQL);
             uriMatcher.addURI(authority, PATH_EXEC_SQL_BATCH, EXEC_SQL_BATCH);
         }
-        // Use FTDBManager instead of directly using DatabaseHelper
-        dbManager = FTDBManager.get();
         return true;
+    }
+
+    private FTDBManager getDbManager() {
+        if (dbManager == null) {
+            dbManager = FTDBManager.get();
+        }
+        return dbManager;
     }
 
     static void initContentUri(Context context) {
@@ -149,7 +154,7 @@ public class FTContentProvider extends ContentProvider {
 
         try {
             // Use DBManager's thread-safe mechanism for write operations
-            dbManager.getDB(true, new DataBaseCallBack() {
+            getDbManager().getDB(true, new DataBaseCallBack() {
                 @Override
                 public void run(SQLiteDatabase db) {
                     try {
@@ -188,7 +193,7 @@ public class FTContentProvider extends ContentProvider {
 
         try {
             // Use DBManager's thread-safe mechanism for write operations
-            dbManager.getDB(true, values.length, new DataBaseCallBack() {
+            getDbManager().getDB(true, values.length, new DataBaseCallBack() {
                 @Override
                 public void run(SQLiteDatabase db) {
                     int count = 0;
@@ -219,7 +224,7 @@ public class FTContentProvider extends ContentProvider {
         ContentProviderResult[] results = new ContentProviderResult[operations.size()];
         try {
             // Use DBManager's thread-safe mechanism for write operations
-            dbManager.getDB(true, operations.size(), new DataBaseCallBack() {
+            getDbManager().getDB(true, operations.size(), new DataBaseCallBack() {
                 @Override
                 public void run(SQLiteDatabase db) {
                     for (int i = 0; i < operations.size(); i++) {
@@ -254,7 +259,7 @@ public class FTContentProvider extends ContentProvider {
 
         try {
             // Use DBManager's thread-safe mechanism for write operations
-            dbManager.getDB(true, new DataBaseCallBack() {
+            getDbManager().getDB(true, new DataBaseCallBack() {
                 @Override
                 public void run(SQLiteDatabase db) {
                     try {
@@ -287,7 +292,7 @@ public class FTContentProvider extends ContentProvider {
 
         try {
             // Use DBManager's thread-safe mechanism for write operations
-            dbManager.getDB(true, new DataBaseCallBack() {
+            getDbManager().getDB(true, new DataBaseCallBack() {
                 @Override
                 public void run(SQLiteDatabase db) {
                     try {
@@ -322,7 +327,7 @@ public class FTContentProvider extends ContentProvider {
         final String finalSortOrder = sortOrder;
 
         try {
-            dbManager.getDB(false, new DataBaseCallBack() {
+            getDbManager().getDB(false, new DataBaseCallBack() {
                 @Override
                 public void run(SQLiteDatabase db) {
                     try {
@@ -375,7 +380,7 @@ public class FTContentProvider extends ContentProvider {
                     final String finalSql = sql;
                     final Parcelable[] finalBindArgs = bindArgs;
 
-                    dbManager.getDB(true, new DataBaseCallBack() {
+                    getDbManager().getDB(true, new DataBaseCallBack() {
                         @Override
                         public void run(SQLiteDatabase db) {
                             try {
@@ -431,7 +436,7 @@ public class FTContentProvider extends ContentProvider {
                     final String[] finalSqlArray = sqlArray;
                     final Parcelable[] finalBindArgsArray = bindArgsArray;
 
-                    dbManager.getDB(true, new DataBaseCallBack() {
+                    getDbManager().getDB(true, new DataBaseCallBack() {
                         @Override
                         public void run(SQLiteDatabase db) {
                             try {

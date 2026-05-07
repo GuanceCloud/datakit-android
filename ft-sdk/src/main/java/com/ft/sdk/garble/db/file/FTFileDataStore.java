@@ -31,14 +31,24 @@ public class FTFileDataStore implements FTDataStore {
     private final FTRumFileAggregateStore rumStore;
 
     public FTFileDataStore(Context context) {
-        this(new FTFileStorePaths(context));
+        this(context, false);
+    }
+
+    public FTFileDataStore(Context context, boolean migrateDbFlatCache) {
+        this(new FTFileStorePaths(context), migrateDbFlatCache);
     }
 
     public FTFileDataStore(FTFileStorePaths paths) {
+        this(paths, false);
+    }
+
+    public FTFileDataStore(FTFileStorePaths paths, boolean migrateDbFlatCache) {
         this.paths = paths;
         this.syncStore = new FTSyncFileDataStore(paths);
         this.rumStore = new FTRumFileAggregateStore(paths);
-        migrateCurrentDbCacheIfNeeded();
+        if (migrateDbFlatCache) {
+            migrateCurrentDbCacheIfNeeded();
+        }
     }
 
     @Override

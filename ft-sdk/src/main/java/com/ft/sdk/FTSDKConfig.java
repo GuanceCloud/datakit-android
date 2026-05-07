@@ -122,9 +122,9 @@ public class FTSDKConfig {
     private boolean needTransformOldCache = false;
 
     /**
-     * Whether to use file-backed storage for cached data.
+     * Whether to use file-backed storage for cached data. Enabled by default.
      */
-    private boolean useFileDataStore = false;
+    private boolean useFileDataStore = true;
 
     /**
      * Whether to mirror DB writes to file-backed storage while still reading from DB.
@@ -584,7 +584,7 @@ public class FTSDKConfig {
     /**
      * Use file-backed storage for sync cache and RUM aggregate data.
      *
-     * @param useFileDataStore true to use file-backed storage, false to keep SQLite storage
+     * @param useFileDataStore true to use file-backed storage, false to use SQLite storage
      * @return
      */
     public FTSDKConfig setUseFileDataStore(boolean useFileDataStore) {
@@ -598,6 +598,7 @@ public class FTSDKConfig {
 
     /**
      * Mirror DB writes to file-backed storage while keeping DB as the read path.
+     * This takes precedence over file-backed storage when enabled.
      *
      * @param fileDataStoreShadow true to enable shadow writes
      * @return
