@@ -302,7 +302,7 @@ public class FTDBCachePolicy {
      *
      * @return
      */
-    boolean isEnableLimitWithDbSize() {
+    public boolean isEnableLimitWithDbSize() {
         return enableLimitWithDbSize;
     }
 
@@ -311,7 +311,7 @@ public class FTDBCachePolicy {
      *
      * @return
      */
-    DBCacheDiscard getDbCacheDiscard() {
+    public DBCacheDiscard getDbCacheDiscard() {
         return dbCacheDiscard;
     }
 }

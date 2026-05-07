@@ -194,6 +194,10 @@ public class FTSyncFileDataStore {
         deleteOldestData(new DataType[]{type}, limit);
     }
 
+    public void deleteOldestData(final int limit) {
+        deleteOldestData((DataType[]) null, limit);
+    }
+
     public void deleteOldestData(final DataType[] list, final int limit) {
         if (limit <= 0) return;
         try {

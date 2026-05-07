@@ -4,6 +4,7 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
+import com.ft.sdk.DBCacheDiscard;
 import com.ft.sdk.garble.bean.ActionBean;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncData;
@@ -29,6 +30,7 @@ public class FTFileDataStore implements FTDataStore {
     private final FTFileStorePaths paths;
     private final FTSyncFileDataStore syncStore;
     private final FTRumFileAggregateStore rumStore;
+    private boolean trimmingSizeLimit;
 
     public FTFileDataStore(Context context) {
         this(context, false);
@@ -329,6 +331,31 @@ public class FTFileDataStore implements FTDataStore {
     }
 
     private void updateFileSizeCache() {
-        FTDBCachePolicy.get().setCurrentDBSize(syncStore.size() + rumStore.size());
+        FTDBCachePolicy policy = FTDBCachePolicy.get();
+        policy.setCurrentDBSize(currentStoreSize());
+        trimOldestSyncDataIfNeeded(policy);
+    }
+
+    private void trimOldestSyncDataIfNeeded(FTDBCachePolicy policy) {
+        if (trimmingSizeLimit
+                || !policy.isEnableLimitWithDbSize()
+                || policy.getDbCacheDiscard() != DBCacheDiscard.DISCARD_OLDEST
+                || !policy.isReachDbLimit()) {
+            return;
+        }
+
+        trimmingSizeLimit = true;
+        try {
+            while (policy.isReachDbLimit() && !syncStore.isEmpty()) {
+                syncStore.deleteOldestData(Constants.DB_OLD_CACHE_REMOVE_COUNT);
+                policy.setCurrentDBSize(currentStoreSize());
+            }
+        } finally {
+            trimmingSizeLimit = false;
+        }
+    }
+
+    private long currentStoreSize() {
+        return syncStore.size() + rumStore.size();
     }
 }
