@@ -128,7 +128,7 @@ public class FTHttpConfigManager {
     }
 
     public String getUserAgentForSR() {
-        return userAgent + " (Mode=Replay; Version=" + com.ft.sdk.sessionreplay.BuildConfig.VERSION_NAME + ")";
+        return userAgent + " (Mode=Replay; Version=" + com.ft.sdk.FTSdk.SESSION_REPLAY_VERSION + ")";
     }
 
     public int getSendOutTime() {

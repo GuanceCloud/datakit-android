@@ -4,5 +4,6 @@ include ':ft-test'
 include ':ft-session-replay'
 include ':ft-session-replay-material'
 include ':ft-session-replay-compose'
+include ':ft-sdk-optional-dependency-test'
 
 //include ':WebviewTest'

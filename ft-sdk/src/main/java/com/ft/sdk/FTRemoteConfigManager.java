@@ -11,7 +11,6 @@ import com.ft.sdk.garble.threadpool.RemoteConfigThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
-import com.ft.sdk.sessionreplay.FTSessionReplayConfig;
 
 import java.net.HttpURLConnection;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -194,14 +193,11 @@ public class FTRemoteConfigManager {
         }
     }
 
-    void mergeSessionReplayConfigFromCache(FTSessionReplayConfig config) {
+    void mergeSessionReplayConfigFromCache(Object config) {
         if (mRemoteConfig != null) {
-            if (mRemoteConfig.getSessionReplaySampleRate() != null) {
-                config.setSampleRate(mRemoteConfig.getSessionReplaySampleRate());
-            }
-            if (mRemoteConfig.getSessionReplayOnErrorSampleRate() != null) {
-                config.setSessionReplayOnErrorSampleRate(mRemoteConfig.getSessionReplayOnErrorSampleRate());
-            }
+            SessionReplayBridge.mergeConfigFromCache(config,
+                    mRemoteConfig.getSessionReplaySampleRate(),
+                    mRemoteConfig.getSessionReplayOnErrorSampleRate());
         }
     }
 
@@ -398,27 +394,26 @@ public class FTRemoteConfigManager {
                 rumConfig.setSessionErrorSampleRate(bean.getRumSessionOnErrorSampleRate());
             }
 
-            SessionReplayManager replayManager = SessionReplayManager.get();
-            boolean replayEnable = replayManager.isReplayEnable();
+            boolean replayEnable = FTSdk.isSessionReplaySupport();
             Float sessionReplaySampleRate = null;
             Float sessionReplayOnErrorSampleRate = null;
             if (replayEnable) {
                 if (bean.getSessionReplaySampleRate() != null) {
-                    replayManager.setSampleRate(bean.getSessionReplaySampleRate());
+                    SessionReplayBridge.setSampleRate(bean.getSessionReplaySampleRate());
                 }
-                sessionReplaySampleRate = replayManager.sampleRate();
+                sessionReplaySampleRate = SessionReplayBridge.sampleRate();
 
                 if (bean.getSessionReplayOnErrorSampleRate() != null) {
-                    replayManager.setSessionReplayOnErrorSampleRate(bean.getSessionReplayOnErrorSampleRate());
+                    SessionReplayBridge.setSessionReplayOnErrorSampleRate(bean.getSessionReplayOnErrorSampleRate());
                 }
-                sessionReplayOnErrorSampleRate = SessionReplayManager.get().sessionReplayOnErrorSampleRate();
+                sessionReplayOnErrorSampleRate = SessionReplayBridge.sessionReplayOnErrorSampleRate();
             }
 
             boolean forceRefreshExecuted = FTRUMInnerManager.get().hotUpdate(bean.getRumSampleRate(),
                     bean.getRumSessionOnErrorSampleRate());
 
             if (replayEnable && !forceRefreshExecuted) {
-                SessionReplayManager.get().hotUpdate(sessionReplaySampleRate, sessionReplayOnErrorSampleRate);
+                SessionReplayBridge.hotUpdate(sessionReplaySampleRate, sessionReplayOnErrorSampleRate);
             }
         }
     }
