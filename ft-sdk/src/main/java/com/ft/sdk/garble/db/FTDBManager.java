@@ -36,7 +36,7 @@ import java.util.List;
  * Description: Database management class
  */
 @SuppressLint("Range")
-public class FTDBManager extends DBManager {
+public class FTDBManager extends DBManager implements FTDataStore {
     private static FTDBManager ftdbManager;
     public final static String TAG = Constants.LOG_TAG_PREFIX + "FTDBManager";
 

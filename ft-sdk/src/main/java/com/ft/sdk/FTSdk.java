@@ -9,6 +9,7 @@ import com.ft.sdk.garble.FTHttpConfigManager;
 import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.db.FTDBCachePolicy;
 import com.ft.sdk.garble.db.FTDBManager;
+import com.ft.sdk.garble.db.FTDataStoreManager;
 import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
@@ -142,6 +143,7 @@ public class FTSdk {
         EventConsumerThreadPool.get().shutDown();
         FTANRDetector.get().release();
         FTDBManager.release();
+        FTDataStoreManager.release();
         SessionReplayBridge.stop();
         if (mFtSdk != null) {
             if (mFtSdk.mRemoteConfigManager != null) {
@@ -156,7 +158,7 @@ public class FTSdk {
      * Clear unreported cached data
      */
     public static void clearAllData() {
-        FTDBManager.get().delete();
+        FTDataStoreManager.get().delete();
     }
 
     /**
@@ -172,7 +174,9 @@ public class FTSdk {
         }
         LogUtils.setSDKLogLevel(config.getSdkLogLevel());
         LocalUUIDManager.get().initRandomUUID();
+        FTDataStoreManager.init(config);
         FTDBCachePolicy.get().initSDKParams(config);
+        FTDataStoreManager.refreshFileSizeCache();
         FTHttpConfigManager.get().initParams(config);
         appendGlobalContext(config);
         SyncTaskManager.get().init(config);

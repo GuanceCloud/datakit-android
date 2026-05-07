@@ -75,8 +75,8 @@ public class FTDBCachePolicy {
 
 
     private FTDBCachePolicy() {
-        logCount.set(FTDBManager.get().queryTotalCount(DataType.LOG));//Get log data from database during initialization
-        rumCount.set(FTDBManager.get().queryTotalCount(new DataType[]{
+        logCount.set(FTDataStoreManager.get().queryTotalCount(DataType.LOG));//Get log data from database during initialization
+        rumCount.set(FTDataStoreManager.get().queryTotalCount(new DataType[]{
                 DataType.RUM_APP,
                 DataType.RUM_WEBVIEW,
                 DataType.RUM_APP_ERROR_SAMPLED,
@@ -232,8 +232,8 @@ public class FTDBCachePolicy {
             if (logCacheDiscardStrategy == LogCacheDiscard.DISCARD) {//Directly discard data
                 status = -limit;
             } else if (logCacheDiscardStrategy == LogCacheDiscard.DISCARD_OLDEST) {//Discard the first few pieces of data in the database
-                FTDBManager.get().deleteOldestData(DataType.LOG, limit);
-                logCount.set(FTDBManager.get().queryTotalCount(DataType.LOG));
+                FTDataStoreManager.get().deleteOldestData(DataType.LOG, limit);
+                logCount.set(FTDataStoreManager.get().queryTotalCount(DataType.LOG));
                 status = limit;
             }
         } else {
@@ -243,8 +243,8 @@ public class FTDBCachePolicy {
                 if (logCacheDiscardStrategy == LogCacheDiscard.DISCARD) {//Directly discard data
                     status = -needRemove;
                 } else if (logCacheDiscardStrategy == LogCacheDiscard.DISCARD_OLDEST) {//Discard the first few pieces of data in the database
-                    FTDBManager.get().deleteOldestData(DataType.LOG, needRemove);
-                    logCount.set(FTDBManager.get().queryTotalCount(DataType.LOG));
+                    FTDataStoreManager.get().deleteOldestData(DataType.LOG, needRemove);
+                    logCount.set(FTDataStoreManager.get().queryTotalCount(DataType.LOG));
                     status = needRemove;
                 }
             }
@@ -277,13 +277,13 @@ public class FTDBCachePolicy {
             if (rumCacheDiscardStrategy == RUMCacheDiscard.DISCARD) {//Directly discard data
                 status = -1;
             } else if (rumCacheDiscardStrategy == RUMCacheDiscard.DISCARD_OLDEST) {//Discard the first few pieces of data in the database
-                FTDBManager.get().deleteOldestData(new DataType[]{
+                FTDataStoreManager.get().deleteOldestData(new DataType[]{
                         DataType.RUM_APP,
                         DataType.RUM_WEBVIEW,
                         DataType.RUM_APP_ERROR_SAMPLED,
                         DataType.RUM_WEBVIEW_ERROR_SAMPLED
                 }, limit);
-                rumCount.set(FTDBManager.get().queryTotalCount(new DataType[]{
+                rumCount.set(FTDataStoreManager.get().queryTotalCount(new DataType[]{
                         DataType.RUM_APP,
                         DataType.RUM_WEBVIEW,
                         DataType.RUM_APP_ERROR_SAMPLED,

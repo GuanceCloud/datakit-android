@@ -121,6 +121,16 @@ public class FTSDKConfig {
      */
     private boolean needTransformOldCache = false;
 
+    /**
+     * Whether to use file-backed storage for cached data.
+     */
+    private boolean useFileDataStore = false;
+
+    /**
+     * Whether to mirror DB writes to file-backed storage while still reading from DB.
+     */
+    private boolean fileDataStoreShadow = false;
+
 
     public long getDbCacheLimit() {
         return dbCacheLimit;
@@ -572,6 +582,36 @@ public class FTSDKConfig {
     }
 
     /**
+     * Use file-backed storage for sync cache and RUM aggregate data.
+     *
+     * @param useFileDataStore true to use file-backed storage, false to keep SQLite storage
+     * @return
+     */
+    public FTSDKConfig setUseFileDataStore(boolean useFileDataStore) {
+        this.useFileDataStore = useFileDataStore;
+        return this;
+    }
+
+    public boolean isUseFileDataStore() {
+        return useFileDataStore;
+    }
+
+    /**
+     * Mirror DB writes to file-backed storage while keeping DB as the read path.
+     *
+     * @param fileDataStoreShadow true to enable shadow writes
+     * @return
+     */
+    public FTSDKConfig setFileDataStoreShadow(boolean fileDataStoreShadow) {
+        this.fileDataStoreShadow = fileDataStoreShadow;
+        return this;
+    }
+
+    public boolean isFileDataStoreShadow() {
+        return fileDataStoreShadow;
+    }
+
+    /**
      * Set the interval time for each sync, sleep time between [0,5000]，0 default
      *
      * @param sleepTimeMs Data sync interval time
@@ -723,6 +763,8 @@ public class FTSDKConfig {
                 ", onlySupportMainProcess=" + onlySupportMainProcess +
                 ", enableDataIntegerCompatible=" + enableDataIntegerCompatible +
                 ", needTransformOldCache=" + needTransformOldCache +
+                ", useFileDataStore=" + useFileDataStore +
+                ", fileDataStoreShadow=" + fileDataStoreShadow +
                 ", globalContext=" + globalContext +
                 ", proxy=" + proxy +
                 ", proxyAuthenticator=" + authenticator +

@@ -16,7 +16,7 @@ import com.ft.sdk.garble.bean.ResourceBean;
 import com.ft.sdk.garble.bean.ResourceParams;
 import com.ft.sdk.garble.bean.ResourceType;
 import com.ft.sdk.garble.bean.ViewBean;
-import com.ft.sdk.garble.db.FTDBManager;
+import com.ft.sdk.garble.db.FTDataStoreManager;
 import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
 import com.ft.sdk.garble.threadpool.RunnerCompleteCallBack;
 import com.ft.sdk.garble.utils.BatteryUtils;
@@ -476,8 +476,8 @@ public class FTRUMInnerManager {
         EventConsumerThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
-                FTDBManager.get().increaseViewPendingResource(viewId);
-                FTDBManager.get().increaseActionPendingResource(actionId);
+                FTDataStoreManager.get().increaseViewPendingResource(viewId);
+                FTDataStoreManager.get().increaseActionPendingResource(actionId);
             }
         });
     }
@@ -509,9 +509,9 @@ public class FTRUMInnerManager {
             EventConsumerThreadPool.get().execute(new Runnable() {
                 @Override
                 public void run() {
-                    FTDBManager.get().reduceViewPendingResource(viewId);
-                    FTDBManager.get().updateViewUpdateTime(viewId, System.currentTimeMillis());
-                    FTDBManager.get().reduceActionPendingResource(actionId);
+                    FTDataStoreManager.get().reduceViewPendingResource(viewId);
+                    FTDataStoreManager.get().updateViewUpdateTime(viewId, System.currentTimeMillis());
+                    FTDataStoreManager.get().reduceActionPendingResource(actionId);
                     FTTraceManager.get().removeByStopResource(resourceId);
                 }
             });
@@ -657,7 +657,7 @@ public class FTRUMInnerManager {
             EventConsumerThreadPool.get().execute(new Runnable() {
                 @Override
                 public void run() {
-                    FTDBManager.get().initSumAction(bean);
+                    FTDataStoreManager.get().initSumAction(bean);
                 }
             });
         }
@@ -692,7 +692,7 @@ public class FTRUMInnerManager {
         EventConsumerThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
-                FTDBManager.get().initSumView(bean);
+                FTDataStoreManager.get().initSumView(bean);
             }
         });
     }
@@ -709,8 +709,8 @@ public class FTRUMInnerManager {
         EventConsumerThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
-                FTDBManager.get().increaseViewResource(viewId);
-                FTDBManager.get().increaseActionResource(actionId);
+                FTDataStoreManager.get().increaseViewResource(viewId);
+                FTDataStoreManager.get().increaseActionResource(actionId);
                 FTRUMInnerManager.this.checkActionClose();
             }
         });
@@ -732,8 +732,8 @@ public class FTRUMInnerManager {
         EventConsumerThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
-                FTDBManager.get().increaseActionError(actionId);
-                FTDBManager.get().increaseViewError(viewId);
+                FTDataStoreManager.get().increaseActionError(actionId);
+                FTDataStoreManager.get().increaseViewError(viewId);
                 FTRUMInnerManager.this.checkActionClose();
             }
         });
@@ -1280,12 +1280,12 @@ public class FTRUMInnerManager {
         EventConsumerThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
-                FTDBManager.get().increaseActionLongTask(actionId);
-                FTDBManager.get().increaseViewLongTask(viewId);
+                FTDataStoreManager.get().increaseActionLongTask(actionId);
+                FTDataStoreManager.get().increaseViewLongTask(viewId);
                 if (viewBean != null && viewBean.getId().equals(viewId)) {
-                    FTDBManager.get().updateViewExtraAttr(viewId, viewBean.getAttrJsonString());
+                    FTDataStoreManager.get().updateViewExtraAttr(viewId, viewBean.getAttrJsonString());
                 }
-                FTDBManager.get().updateViewUpdateTime(viewId, System.currentTimeMillis());
+                FTDataStoreManager.get().updateViewUpdateTime(viewId, System.currentTimeMillis());
                 FTRUMInnerManager.this.checkActionClose();
                 generateRumData();
 
@@ -1303,7 +1303,7 @@ public class FTRUMInnerManager {
         EventConsumerThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
-                FTDBManager.get().increaseViewAction(viewId);
+                FTDataStoreManager.get().increaseViewAction(viewId);
 
             }
         });
@@ -1330,8 +1330,8 @@ public class FTRUMInnerManager {
         EventConsumerThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
-                FTDBManager.get().closeView(viewId, loadTIme, timeSpent, viewBean.getAttrJsonString());
-                FTDBManager.get().updateViewUpdateTime(viewId, System.currentTimeMillis());
+                FTDataStoreManager.get().closeView(viewId, loadTIme, timeSpent, viewBean.getAttrJsonString());
+                FTDataStoreManager.get().updateViewUpdateTime(viewId, System.currentTimeMillis());
                 if (callBack != null) {
                     callBack.onComplete();
                 }
@@ -1373,7 +1373,7 @@ public class FTRUMInnerManager {
         EventConsumerThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
-                FTDBManager.get().closeAction(actionId, duration, force);
+                FTDataStoreManager.get().closeAction(actionId, duration, force);
                 generateRumData(true);
             }
         });
@@ -1519,7 +1519,7 @@ public class FTRUMInnerManager {
         ArrayList<ActionBean> beans;
         do {
 
-            beans = FTDBManager.get().querySumAction(LIMIT_SIZE);
+            beans = FTDataStoreManager.get().querySumAction(LIMIT_SIZE);
             ArrayList<String> deleteIds = new ArrayList<>();
             for (ActionBean bean : beans) {
                 insertAction(bean);
@@ -1537,7 +1537,7 @@ public class FTRUMInnerManager {
 //                    }
 //                }
             }
-            FTDBManager.get().cleanCloseActionData(deleteIds.toArray(new String[0]));
+            FTDataStoreManager.get().cleanCloseActionData(deleteIds.toArray(new String[0]));
         } while (beans.size() >= LIMIT_SIZE);
     }
 
@@ -1567,7 +1567,7 @@ public class FTRUMInnerManager {
     private void generateViewSum() throws JSONException {
         ArrayList<ViewBean> beans;
         do {
-            beans = FTDBManager.get().querySumView(LIMIT_SIZE);
+            beans = FTDataStoreManager.get().querySumView(LIMIT_SIZE);
             for (ViewBean bean : beans) {
                 HashMap<String, Object> tags = bean.getTags();
                 tags.put(Constants.KEY_RUM_SESSION_ID, bean.getSessionId());
@@ -1627,12 +1627,12 @@ public class FTRUMInnerManager {
                         Constants.FT_MEASUREMENT_RUM_VIEW, tags, fields, new RunnerCompleteCallBack() {
                             @Override
                             public void onComplete() {
-                                FTDBManager.get().updateViewUploadTime(bean.getId(), System.currentTimeMillis());
+                                FTDataStoreManager.get().updateViewUploadTime(bean.getId(), System.currentTimeMillis());
                             }
                         }, bean.getCollectType());
             }
 
-            FTDBManager.get().cleanCloseViewData();
+            FTDataStoreManager.get().cleanCloseViewData();
         } while (beans.size() >= LIMIT_SIZE);
     }
 
@@ -1645,7 +1645,7 @@ public class FTRUMInnerManager {
         EventConsumerThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
-                FTDBManager.get().closeAllActionAndView();
+                FTDataStoreManager.get().closeAllActionAndView();
             }
         });
 
@@ -1659,7 +1659,7 @@ public class FTRUMInnerManager {
                 EventConsumerThreadPool.get().execute(new Runnable() {
                     @Override
                     public void run() {
-                        FTDBManager.get().updateViewExtraAttr(viewId, attr);
+                        FTDataStoreManager.get().updateViewExtraAttr(viewId, attr);
                     }
                 });
             }
@@ -1694,7 +1694,7 @@ public class FTRUMInnerManager {
                                     EventConsumerThreadPool.get().execute(new Runnable() {
                                         @Override
                                         public void run() {
-                                            FTDBManager.get().updateViewExtraAttr(updateViewId, attr);
+                                            FTDataStoreManager.get().updateViewExtraAttr(updateViewId, attr);
                                         }
                                     });
 

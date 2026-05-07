@@ -9,7 +9,7 @@ import com.ft.sdk.garble.bean.LineProtocolBean;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.SyncData;
 import com.ft.sdk.garble.db.FTDBCachePolicy;
-import com.ft.sdk.garble.db.FTDBManager;
+import com.ft.sdk.garble.db.FTDataStoreManager;
 import com.ft.sdk.garble.http.FTResponseData;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.NetCodeStatus;
@@ -240,7 +240,7 @@ public class FTTrackInner {
                     SyncData recordData = SyncData.getSyncData(dataHelper, dataType,
                             new LineProtocolBean(measurement, tags, fields, time), dataGenerateTime);
                     if (measurement.equals(Constants.FT_MEASUREMENT_RUM_VIEW)) {
-                        boolean update = FTDBManager.get().updateOrInsertSyncData(recordData);
+                        boolean update = FTDataStoreManager.get().updateOrInsertSyncData(recordData);
                         if (update) {
                             LogUtils.d(TAG, "syncDataBackground:view," + dataType.toString() + " update,"
                                     + " uuid:" + recordData.getUuid());
@@ -263,7 +263,7 @@ public class FTTrackInner {
                         switch (status) {
                             case 0:
                             case 1:
-                                boolean result = FTDBManager.get().insertFtOperation(recordData, false);
+                                boolean result = FTDataStoreManager.get().insertFtOperation(recordData, false);
                                 LogUtils.d(TAG, "syncDataBackground:" + measurement + errorDec + " "
                                         + dataType.toString() + ":insert=" + result +
                                         ",uuid:" + recordData.getUuid() + (status == 1 ? ",drop OldCache" : ""));
@@ -378,7 +378,7 @@ public class FTTrackInner {
             int length = recordDataList.size();
             int policyStatus = FTDBCachePolicy.get().optLogCachePolicy(length);
             if (policyStatus >= 0) {//execute sync policy
-                boolean result = FTDBManager.get().insertFtOptList(recordDataList, false);
+                boolean result = FTDataStoreManager.get().insertFtOptList(recordDataList, false);
                 FTDBCachePolicy.get().optLogCount(recordDataList.size());
                 if (policyStatus == 0) {//not dropped
                     LogUtils.d(TAG, "judgeLogCachePolicy:insert-result=" + result);
@@ -395,7 +395,7 @@ public class FTTrackInner {
                     LogUtils.e(TAG, "reach log limit, drop log count:" + dropCount);
                 } else {//drop some new data
                     recordDataList.subList(length - dropCount, length).clear();
-                    boolean result = FTDBManager.get().insertFtOptList(recordDataList, false);
+                    boolean result = FTDataStoreManager.get().insertFtOptList(recordDataList, false);
                     FTDBCachePolicy.get().optLogCount(recordDataList.size());
                     LogUtils.d(TAG, "judgeLogCachePolicy:insert-result=" + result + ", drop log count:" + dropCount);
                 }

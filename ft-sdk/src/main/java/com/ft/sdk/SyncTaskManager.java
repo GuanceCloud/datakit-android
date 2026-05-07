@@ -9,7 +9,7 @@ import com.ft.sdk.garble.bean.RemoteConfigBean;
 import com.ft.sdk.garble.bean.SyncData;
 import com.ft.sdk.garble.bean.ViewBean;
 import com.ft.sdk.garble.db.FTDBCachePolicy;
-import com.ft.sdk.garble.db.FTDBManager;
+import com.ft.sdk.garble.db.FTDataStoreManager;
 import com.ft.sdk.garble.http.FTResponseData;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.NetCodeStatus;
@@ -252,14 +252,14 @@ public class SyncTaskManager {
      */
     private synchronized void errorSampledConsume(DataType dataType) {
         if (errorTimeLine > 0) {
-            int updateCount = FTDBManager.get().updateDataType(dataType, errorTimeLine);
+            int updateCount = FTDataStoreManager.get().updateDataType(dataType, errorTimeLine);
             if (updateCount > 0) {
                 LogUtils.d(TAG, "errorSampledConsume updateDataType:" + dataType + ","
                         + updateCount + ", before ns:" + errorTimeLine);
             }
         }
         long now = Utils.getCurrentNanoTime();
-        int deleteCount = FTDBManager.get().deleteExpireCache(dataType, now, ONE_MINUTE_DURATION_NS);
+        int deleteCount = FTDataStoreManager.get().deleteExpireCache(dataType, now, ONE_MINUTE_DURATION_NS);
         if (deleteCount > 0) {
             LogUtils.d(TAG, "errorSampledConsume deleteExpired:" + dataType + ","
                     + deleteCount + ", before ns:" + (now - ONE_MINUTE_DURATION_NS));
@@ -372,7 +372,7 @@ public class SyncTaskManager {
      * @return Synchronized data
      */
     private List<SyncData> queryFromData(DataType dataType) {
-        return FTDBManager.get().queryDataByDataByTypeLimit(pageSize, dataType);
+        return FTDataStoreManager.get().queryDataByDataByTypeLimit(pageSize, dataType);
     }
 
     /**
@@ -394,7 +394,7 @@ public class SyncTaskManager {
         for (SyncData r : list) {
             ids.add(r.getId());
         }
-        FTDBManager.get().delete(ids, oldCache);
+        FTDataStoreManager.get().delete(ids, oldCache);
     }
 
     /**
@@ -407,7 +407,7 @@ public class SyncTaskManager {
         deleteLastQuery(list);
 
         //Reinsert data,
-        FTDBManager.get().insertFtOptList(list, true);
+        FTDataStoreManager.get().insertFtOptList(list, true);
     }
 
     /**
@@ -464,7 +464,7 @@ public class SyncTaskManager {
     void oldDBDataTransform() {
         if (isOldCaching) return;
 
-        boolean needTransform = FTDBManager.get().isOldCacheExist();
+        boolean needTransform = FTDataStoreManager.get().isOldCacheExist();
 
         if (needTransform) {
             LogUtils.d(TAG, "==> old cache need transform");
@@ -478,7 +478,7 @@ public class SyncTaskManager {
                         SyncDataCompatHelper helper = FTTrackInner.getInstance()
                                 .getCurrentDataHelper().getCompat();
                         while (true) {
-                            List<SyncData> list = FTDBManager.get().queryDataByDescLimit(OLD_CACHE_TRANSFORM_PAGE_SIZE,
+                            List<SyncData> list = FTDataStoreManager.get().queryDataByDescLimit(OLD_CACHE_TRANSFORM_PAGE_SIZE,
                                     true);
                             Iterator<SyncData> it = list.iterator();
                             while (it.hasNext()) {
@@ -496,7 +496,7 @@ public class SyncTaskManager {
                                     LogUtils.e(TAG, "==> old cache insert error");
                                 }
                             }
-                            FTDBManager.get().insertFtOptList(list, false);
+                            FTDataStoreManager.get().insertFtOptList(list, false);
                             deleteLastQuery(list, true);
                             if (list.size() < OLD_CACHE_TRANSFORM_PAGE_SIZE) {
                                 LogUtils.d(TAG, "==> old cache transform end");
