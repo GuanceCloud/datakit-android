@@ -50,20 +50,6 @@
         <activity android:name=".FragmentTrackingTestActivity" />
         <activity android:name=".NetworkTestActivity" />
 
-        <!--provider override setting-->
-        <!--        <provider-->
-        <!--            tools:replace="android:authorities"-->
-        <!--            android:name="com.ft.sdk.garble.db.FTContentProvider"-->
-        <!--            android:authorities="com.app.custom.provider"-->
-        <!--            android:exported="false"-->
-        <!--            android:multiprocess="true" >-->
-        <!--        </provider>-->
-        <!--        -->
-        <!--        <meta-data-->
-        <!--            tools:replace="android:value"-->
-        <!--            android:name="com.ft.sdk.PROVIDER_AUTHORITY"-->
-        <!--            android:value="com.app.custom.provider" />-->
-
         <service
             android:name=".service.TestService"
             android:process=":test_process" />

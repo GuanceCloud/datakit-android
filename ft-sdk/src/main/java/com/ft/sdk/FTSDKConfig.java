@@ -597,8 +597,25 @@ public class FTSDKConfig {
     }
 
     /**
+     * Use the legacy SQLite-backed storage path.
+     * This requires the app to declare {@code FTContentProvider} in its AndroidManifest.
+     *
+     * @param useDBDataStore true to use SQLite storage, false to use file-backed storage
+     * @return
+     */
+    public FTSDKConfig setUseDBDataStore(boolean useDBDataStore) {
+        this.useFileDataStore = !useDBDataStore;
+        return this;
+    }
+
+    public boolean isUseDBDataStore() {
+        return !useFileDataStore;
+    }
+
+    /**
      * Mirror DB writes to file-backed storage while keeping DB as the read path.
      * This takes precedence over file-backed storage when enabled.
+     * This requires the app to declare {@code FTContentProvider} in its AndroidManifest.
      *
      * @param fileDataStoreShadow true to enable shadow writes
      * @return
