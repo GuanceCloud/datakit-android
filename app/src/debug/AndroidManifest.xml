@@ -25,6 +25,13 @@
             android:exported="true"
             android:foregroundServiceType="dataSync" />
 
+        <!-- remove provider setting -->
+<!--        <provider-->
+<!--            android:name="com.ft.sdk.garble.db.FTContentProvider"-->
+<!--            android:authorities="${applicationId}.ft_sdk_provider_removed"-->
+<!--            tools:node="remove" />-->
+
+
     </application>
 
 </manifest>
