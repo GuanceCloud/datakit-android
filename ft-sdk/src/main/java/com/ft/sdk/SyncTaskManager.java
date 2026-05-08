@@ -75,6 +75,10 @@ public class SyncTaskManager {
      * Count the number of errors in a cycle
      */
     private final AtomicInteger errorCount = new AtomicInteger(0);
+    /**
+     * Count consecutive ignored client errors for backoff.
+     */
+    private final AtomicInteger ignoredClientErrorCount = new AtomicInteger(0);
 
     /**
      * RUM data sync package id tag
@@ -270,6 +274,28 @@ public class SyncTaskManager {
         return errorTimeLine;
     }
 
+    static boolean isIgnoredClientError(int code) {
+        return code >= 400 && code < 500;
+    }
+
+    static long getRetryBackoffTimeMs(int count) {
+        int backoffCount = Math.max(1, count);
+        return (1L << (backoffCount - 1)) * RETRY_DELAY_SLEEP_TIME;
+    }
+
+    static long getIgnoredClientErrorBackoffTimeMs(int count) {
+        return getRetryBackoffTimeMs(Math.min(count, MAX_ERROR_COUNT));
+    }
+
+    private void sleepIgnoredClientErrorBackoff() {
+        int count = ignoredClientErrorCount.incrementAndGet();
+        try {
+            Thread.sleep(getIgnoredClientErrorBackoffTimeMs(count));
+        } catch (InterruptedException e) {
+            LogUtils.e(TAG, LogUtils.getStackTraceString(e));
+        }
+    }
+
     /**
      * Execute storage data synchronization operation
      */
@@ -314,6 +340,7 @@ public class SyncTaskManager {
                         }
                         errorCount.set(0);
                         if (code == 200) {
+                            ignoredClientErrorCount.set(0);
                             String innerLogFlag = "";
                             if (dataType == DataType.LOG) {
                                 innerLogFlag = "log-" + logGenerator.getCurrentId();
@@ -325,14 +352,20 @@ public class SyncTaskManager {
                             LogUtils.d(TAG, "pkg_id:" + innerLogFlag + " Sync Success-[code:" + code + ",response:" + response + "]");
                         } else {
                             LogUtils.e(TAG, "Sync Fail (Ignore)-[code:" + code + ",errorCode:" + errorCode + ",response:" + response + "]");
+                            if (isIgnoredClientError(code)) {
+                                sleepIgnoredClientErrorBackoff();
+                            } else {
+                                ignoredClientErrorCount.set(0);
+                            }
                         }
                     } else {
+                        ignoredClientErrorCount.set(0);
                         LogUtils.e(TAG, errorCount.incrementAndGet() + ":Sync Fail-[code:" + code + ",response:" + response + "]");
 
                         if (errorCount.get() > 0) {
                             try {
                                 SyncTaskManager.this.reInsertData(requestDataList);
-                                Thread.sleep((1L << (errorCount.get() - 1)) * RETRY_DELAY_SLEEP_TIME);
+                                Thread.sleep(getRetryBackoffTimeMs(errorCount.get()));
                             } catch (InterruptedException e) {
                                 LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                             }
