@@ -7,6 +7,7 @@ import android.content.Context;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 
+import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.garble.db.file.FTAtomicFileHelper;
 import com.ft.sdk.garble.db.file.FTFileLock;
 import com.ft.sdk.garble.db.file.FTFileStorePaths;
@@ -17,6 +18,8 @@ import com.ft.sdk.garble.bean.CollectType;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncData;
 import com.ft.sdk.garble.bean.ViewBean;
+import com.ft.sdk.garble.db.FTDBManager;
+import com.ft.sdk.garble.db.FTDataStoreManager;
 
 import org.junit.Test;
 
@@ -26,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FTFileStoreFoundationTest {
+    private static final String DB_FLAT_MIGRATION_MARKER = "db_flat_migrated";
 
     @Test
     public void fileStorePathsCreateExpectedDirectories() throws Exception {
@@ -212,6 +216,49 @@ public class FTFileStoreFoundationTest {
 
         assertEquals(1, store.deleteExpireCache(DataType.RUM_APP_ERROR_SAMPLED, 100L, 60L));
         assertEquals(0, store.queryTotalCount(DataType.RUM_APP_ERROR_SAMPLED));
+    }
+
+    @Test
+    public void fileDataStoreConfigMigratesCurrentDbFlatCacheOnce() throws Exception {
+        Context context = InstrumentationRegistry.getInstrumentation()
+                .getTargetContext()
+                .getApplicationContext();
+        FTFileStorePaths paths = new FTFileStorePaths(context);
+        FTSDKConfig config = FTSDKConfig.builder()
+                .enableFileDataStore()
+                .setNeedTransformOldCache(true);
+
+        try {
+            FTDataStoreManager.release();
+            FTDBManager.get().delete();
+            deleteRecursively(paths.getRootDir());
+
+            List<SyncData> dbData = new ArrayList<>();
+            dbData.add(createSyncData(DataType.LOG, "db-uuid-1", 1L, "db-log-1"));
+            dbData.add(createSyncData(DataType.RUM_APP, "db-uuid-2", 2L, "db-rum-1"));
+            assertTrue(FTDBManager.get().insertFtOptList(dbData, false));
+            assertEquals(2, FTDBManager.get().queryDataByDescLimit(0).size());
+
+            FTDataStoreManager.init(config);
+
+            List<SyncData> migratedData = FTDataStoreManager.get().queryDataByDescLimit(0);
+            assertEquals(2, migratedData.size());
+            assertEquals("db-log-1", migratedData.get(0).getDataString());
+            assertEquals("db-rum-1", migratedData.get(1).getDataString());
+            assertTrue(new File(paths.getRootDir(), DB_FLAT_MIGRATION_MARKER).exists());
+
+            assertTrue(FTDBManager.get().insertFtOperation(
+                    createSyncData(DataType.LOG, "db-uuid-3", 3L, "db-log-2"), false));
+            FTDataStoreManager.release();
+            FTDataStoreManager.init(config);
+
+            List<SyncData> migratedAgainData = FTDataStoreManager.get().queryDataByDescLimit(0);
+            assertEquals(2, migratedAgainData.size());
+        } finally {
+            FTDataStoreManager.release();
+            FTDBManager.get().delete();
+            deleteRecursively(paths.getRootDir());
+        }
     }
 
     private int readCounter(File counterFile) throws IOException {
