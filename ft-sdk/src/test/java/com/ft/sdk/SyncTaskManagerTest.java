@@ -16,11 +16,14 @@ import java.net.HttpURLConnection;
 public class SyncTaskManagerTest {
 
     @Test
-    public void isIgnoredClientErrorMatchesOnly4xx() {
-        assertFalse(SyncTaskManager.isIgnoredClientError(HttpURLConnection.HTTP_MULT_CHOICE));
-        assertTrue(SyncTaskManager.isIgnoredClientError(HttpURLConnection.HTTP_BAD_REQUEST));
-        assertTrue(SyncTaskManager.isIgnoredClientError(499));
-        assertFalse(SyncTaskManager.isIgnoredClientError(HttpURLConnection.HTTP_INTERNAL_ERROR));
+    public void shouldBackoffIgnoredClientErrorMatchesOnly403And429() {
+        assertFalse(SyncTaskManager.shouldBackoffIgnoredClientError(HttpURLConnection.HTTP_BAD_REQUEST));
+        assertFalse(SyncTaskManager.shouldBackoffIgnoredClientError(HttpURLConnection.HTTP_UNAUTHORIZED));
+        assertTrue(SyncTaskManager.shouldBackoffIgnoredClientError(HttpURLConnection.HTTP_FORBIDDEN));
+        assertFalse(SyncTaskManager.shouldBackoffIgnoredClientError(HttpURLConnection.HTTP_NOT_FOUND));
+        assertTrue(SyncTaskManager.shouldBackoffIgnoredClientError(429));
+        assertFalse(SyncTaskManager.shouldBackoffIgnoredClientError(499));
+        assertFalse(SyncTaskManager.shouldBackoffIgnoredClientError(HttpURLConnection.HTTP_INTERNAL_ERROR));
     }
 
     @Test

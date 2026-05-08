@@ -1,3 +1,11 @@
+# agent 1.7.2-alpha01
+1. Added opt-in file-backed storage for sync cache and RUM aggregate data, with file cache size enforcement and a shadow-write migration path.
+2. Added generic cache size configuration APIs, including `enableLimitWithCacheSize`, `setCacheDiscard`, and `CacheDiscard`, while keeping the previous DB cache APIs deprecated for compatibility.
+3. Made Session Replay optional for `ft-sdk`, allowing apps to use the core SDK without adding `ft-session-replay` to the classpath.
+4. Added `app_launch_type` to cold-start launch actions to distinguish foreground and background app starts.
+5. Added exponential backoff for ignored `403` and `429` data synchronization responses while preserving the existing cache cleanup behavior.
+
+---
 # agent 1.7.1
 1. Added `view_long_task_rate` to View RUM metrics. The value is calculated from total LongTask duration divided by View duration, and is capped at `1`.
 2. Added `foreground_crash_free_duration` and `background_crash_free_duration` to crash RUM Error metrics, and aligned pre-crash/native crash reporting with foreground/background duration snapshots.

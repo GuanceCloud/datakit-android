@@ -27,6 +27,7 @@ import com.ft.sdk.internal.exception.FTRetryLimitException;
 
 import org.json.JSONObject;
 
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -71,6 +72,8 @@ public class SyncTaskManager {
      * Retry wait time
      */
     private static final int RETRY_DELAY_SLEEP_TIME = 500;
+
+    private static final int HTTP_TOO_MANY_REQUESTS = 429;
     /**
      * Count the number of errors in a cycle
      */
@@ -274,8 +277,8 @@ public class SyncTaskManager {
         return errorTimeLine;
     }
 
-    static boolean isIgnoredClientError(int code) {
-        return code >= 400 && code < 500;
+    static boolean shouldBackoffIgnoredClientError(int code) {
+        return code == HttpURLConnection.HTTP_FORBIDDEN || code == HTTP_TOO_MANY_REQUESTS;
     }
 
     static long getRetryBackoffTimeMs(int count) {
@@ -352,7 +355,7 @@ public class SyncTaskManager {
                             LogUtils.d(TAG, "pkg_id:" + innerLogFlag + " Sync Success-[code:" + code + ",response:" + response + "]");
                         } else {
                             LogUtils.e(TAG, "Sync Fail (Ignore)-[code:" + code + ",errorCode:" + errorCode + ",response:" + response + "]");
-                            if (isIgnoredClientError(code)) {
+                            if (shouldBackoffIgnoredClientError(code)) {
                                 sleepIgnoredClientErrorBackoff();
                             } else {
                                 ignoredClientErrorCount.set(0);
