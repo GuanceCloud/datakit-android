@@ -131,6 +131,7 @@ public class DemoApplication extends BaseApplication {
 //                })
 //                .enableLimitWithCacheSize(1024 * 1024)
 //                .setCacheDiscard(CacheDiscard.DISCARD_OLDEST)
+//                .enableFileDataStore()
 //                .setLineDataModifier(new LineDataModifier() {
 //                    @Override
 //                    public Map<String, Object> modify(String measurement, HashMap<String, Object> data) {

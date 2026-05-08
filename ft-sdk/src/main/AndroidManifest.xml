@@ -4,4 +4,13 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 <!--    <uses-permission android:name="android.permission.READ_PHONE_STATE" />-->
 
+    <application>
+        <!-- ContentProvider for default DB-backed storage and multi-process database access. -->
+        <provider
+            android:name=".garble.db.FTContentProvider"
+            android:authorities="${applicationId}.com.ft.sdk.provider"
+            android:exported="false"
+            android:multiprocess="false" />
+    </application>
+
 </manifest>

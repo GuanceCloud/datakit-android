@@ -122,9 +122,9 @@ public class FTSDKConfig {
     private boolean needTransformOldCache = false;
 
     /**
-     * Whether to use file-backed storage for cached data. Enabled by default.
+     * Whether to use file-backed storage for cached data. Disabled by default for smooth upgrades.
      */
-    private boolean useFileDataStore = true;
+    private boolean useFileDataStore = false;
 
     /**
      * Whether to mirror DB writes to file-backed storage while still reading from DB.
@@ -636,6 +636,7 @@ public class FTSDKConfig {
 
     /**
      * Use file-backed storage for sync cache and RUM aggregate data.
+     * This is an opt-in migration path. SQLite-backed storage remains the default for smooth upgrades.
      *
      * @param useFileDataStore true to use file-backed storage, false to use SQLite storage
      * @return
@@ -645,13 +646,22 @@ public class FTSDKConfig {
         return this;
     }
 
+    /**
+     * Enable file-backed storage for sync cache and RUM aggregate data.
+     *
+     * @return
+     */
+    public FTSDKConfig enableFileDataStore() {
+        return setUseFileDataStore(true);
+    }
+
     public boolean isUseFileDataStore() {
         return useFileDataStore;
     }
 
     /**
-     * Use the legacy SQLite-backed storage path.
-     * This requires the app to declare {@code FTContentProvider} in its AndroidManifest.
+     * Use the default SQLite-backed storage path.
+     * This requires {@code FTContentProvider}, which is declared by the SDK manifest by default.
      *
      * @param useDBDataStore true to use SQLite storage, false to use file-backed storage
      * @return
@@ -668,7 +678,7 @@ public class FTSDKConfig {
     /**
      * Mirror DB writes to file-backed storage while keeping DB as the read path.
      * This takes precedence over file-backed storage when enabled.
-     * This requires the app to declare {@code FTContentProvider} in its AndroidManifest.
+     * This requires {@code FTContentProvider}, which is declared by the SDK manifest by default.
      *
      * @param fileDataStoreShadow true to enable shadow writes
      * @return

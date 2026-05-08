@@ -10,8 +10,8 @@ import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 
 /**
- * Entry point for SDK persistence. The default implementation is file-backed
- * storage, while SQLite remains available for shadow mode and rollback.
+ * Entry point for SDK persistence. SQLite-backed storage remains the default
+ * for smooth upgrades, while file-backed storage is available as an opt-in path.
  */
 public class FTDataStoreManager {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "FTDataStoreManager";
@@ -26,7 +26,7 @@ public class FTDataStoreManager {
             synchronized (FTDataStoreManager.class) {
                 store = dataStore;
                 if (store == null) {
-                    store = new FTFileDataStore(FTApplication.getApplication());
+                    store = createDbDataStoreOrFileFallback(false);
                     dataStore = store;
                 }
             }
@@ -36,26 +36,19 @@ public class FTDataStoreManager {
 
     public static void init(FTSDKConfig config) {
         synchronized (FTDataStoreManager.class) {
+            boolean migrateDbFlatCache = config != null && config.isNeedTransformOldCache();
             if (config != null && config.isFileDataStoreShadow()) {
                 if (isDbProviderAvailable()) {
                     dataStore = new FTShadowDataStore(FTDBManager.get(),
                             new FTFileDataStore(FTApplication.getApplication()));
                 } else {
                     LogUtils.e(TAG, "FTContentProvider is not declared. File data store shadow mode is disabled.");
-                    dataStore = new FTFileDataStore(FTApplication.getApplication(),
-                            config.isNeedTransformOldCache());
+                    dataStore = createFileDataStore(migrateDbFlatCache);
                 }
-            } else if (config == null || config.isUseFileDataStore()) {
-                dataStore = new FTFileDataStore(FTApplication.getApplication(),
-                        config != null && config.isNeedTransformOldCache());
+            } else if (config != null && config.isUseFileDataStore()) {
+                dataStore = createFileDataStore(migrateDbFlatCache);
             } else {
-                if (isDbProviderAvailable()) {
-                    dataStore = FTDBManager.get();
-                } else {
-                    LogUtils.e(TAG, "FTContentProvider is not declared. Falling back to file-backed storage.");
-                    dataStore = new FTFileDataStore(FTApplication.getApplication(),
-                            config.isNeedTransformOldCache());
-                }
+                dataStore = createDbDataStoreOrFileFallback(migrateDbFlatCache);
             }
         }
     }
@@ -87,5 +80,21 @@ public class FTDataStoreManager {
         ProviderInfo providerInfo = context.getPackageManager()
                 .resolveContentProvider(ProviderHelper.getAuthority(context), 0);
         return providerInfo != null;
+    }
+
+    private static FTDataStore createDbDataStoreOrFileFallback(boolean migrateDbFlatCache) {
+        if (isDbProviderAvailable()) {
+            return FTDBManager.get();
+        }
+        LogUtils.e(TAG, "FTContentProvider is not declared. Falling back to file-backed storage.");
+        return createFileDataStore(migrateDbFlatCache);
+    }
+
+    private static FTDataStore createFileDataStore(boolean migrateDbFlatCache) {
+        boolean canMigrateDbFlatCache = migrateDbFlatCache && isDbProviderAvailable();
+        if (migrateDbFlatCache && !canMigrateDbFlatCache) {
+            LogUtils.e(TAG, "FTContentProvider is not declared. DB flat cache migration is skipped.");
+        }
+        return new FTFileDataStore(FTApplication.getApplication(), canMigrateDbFlatCache);
     }
 }
