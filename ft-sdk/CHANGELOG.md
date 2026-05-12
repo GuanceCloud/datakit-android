@@ -1,3 +1,7 @@
+# agent 1.7.2-alpha02
+1. Replaced remaining JetBrains nullability annotations in core SDK code with AndroidX annotations to keep Android integration signatures consistent and avoid redundant annotation references.
+
+---
 # agent 1.7.2-alpha01
 1. Added opt-in file-backed storage for sync cache and RUM aggregate data, with file cache size enforcement and a shadow-write migration path.
 2. Added generic cache size configuration APIs, including `enableLimitWithCacheSize`, `setCacheDiscard`, and `CacheDiscard`, while keeping the previous DB cache APIs deprecated for compatibility.

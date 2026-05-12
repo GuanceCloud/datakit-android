@@ -1,3 +1,9 @@
+# replay 0.1.5-alpha01
+1. Added Flutter Session Replay upload compatibility by supporting Flutter RUM context keys when mapping replay batches to segments.
+2. Fixed Session Replay file reader/writer factory compatibility for plain and encrypted storage implementations.
+3. Replaced remaining JetBrains nullability annotations with AndroidX annotations in Session Replay code to avoid redundant annotation references.
+
+---
 # replay 0.1.4
 1. Removed redundant Kotlin dependencies to simplify the Session Replay dependency graph.
 2. Improved public API documentation for Session Replay configuration, privacy controls, custom mapper extensions, resource upload callbacks, and mapper helper types to make IDE integration and custom extension development clearer.
