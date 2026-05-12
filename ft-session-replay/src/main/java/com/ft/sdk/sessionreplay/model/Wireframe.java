@@ -8,8 +8,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,7 +94,6 @@ public abstract class Wireframe {
     public abstract Long getId();
 
     @NonNull
-    @NotNull
     @Override
     public String toString() {
         return "id:" + getId();

@@ -16,6 +16,8 @@ import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Base64;
 
+import androidx.annotation.Nullable;
+
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.garble.bean.ResourceID;
 import com.ft.sdk.garble.manager.SingletonGson;
@@ -23,7 +25,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
-import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -957,4 +958,3 @@ public class Utils {
     }
 
 }
-

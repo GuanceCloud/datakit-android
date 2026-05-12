@@ -1,9 +1,9 @@
 package com.ft.sdk.garble.compress;
 
+import androidx.annotation.NonNull;
+
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.zip.Deflater;
@@ -23,7 +23,7 @@ public class DeflateInterceptor implements Interceptor {
 
     private static final String TAG = Constants.LOG_TAG_PREFIX + "DeflateInterceptor";
 
-    @NotNull
+    @NonNull
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request originalRequest = chain.request();
@@ -55,7 +55,7 @@ public class DeflateInterceptor implements Interceptor {
             }
 
             @Override
-            public void writeTo(@NotNull BufferedSink sink) throws IOException {
+            public void writeTo(@NonNull BufferedSink sink) throws IOException {
                 Deflater deflater = null;
                 BufferedSink deflateSink = null;
                 try {

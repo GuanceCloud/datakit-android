@@ -12,8 +12,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +33,7 @@ public class LargeImageTestActivity extends NameTitleActivity {
         recyclerView.setAdapter(adapter);
     }
 
-    @NotNull
+    @NonNull
     private List<String> createImageList() {
         List<String> urls = new ArrayList<>();
         for (int i = 0; i < 9; i++) {

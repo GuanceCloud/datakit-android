@@ -8,8 +8,6 @@ import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -168,75 +166,75 @@ public class FTResourceEventListener extends EventListener {
     }
 
     @Override
-    public void canceled(@NotNull Call call) {
+    public void canceled(@NonNull Call call) {
         super.canceled(call);
         originEventListener.canceled(call);
     }
 
     @Override
-    public void connectFailed(@NotNull Call call, @NotNull InetSocketAddress inetSocketAddress, @NotNull Proxy proxy, @Nullable Protocol protocol, @NotNull IOException ioe) {
+    public void connectFailed(@NonNull Call call, @NonNull InetSocketAddress inetSocketAddress, @NonNull Proxy proxy, @Nullable Protocol protocol, @NonNull IOException ioe) {
         super.connectFailed(call, inetSocketAddress, proxy, protocol, ioe);
         originEventListener.connectFailed(call, inetSocketAddress, proxy, protocol, ioe);
     }
 
     @Override
-    public void connectionAcquired(@NotNull Call call, @NotNull Connection connection) {
+    public void connectionAcquired(@NonNull Call call, @NonNull Connection connection) {
         super.connectionAcquired(call, connection);
         originEventListener.connectionAcquired(call, connection);
         resourceConnectionReuse = tcpStartTime == -1;
     }
 
     @Override
-    public void connectionReleased(@NotNull Call call, @NotNull Connection connection) {
+    public void connectionReleased(@NonNull Call call, @NonNull Connection connection) {
         super.connectionReleased(call, connection);
         originEventListener.connectionReleased(call, connection);
     }
 
     @Override
-    public void proxySelectEnd(@NotNull Call call, @NotNull HttpUrl url, @NotNull List<Proxy> proxies) {
+    public void proxySelectEnd(@NonNull Call call, @NonNull HttpUrl url, @NonNull List<Proxy> proxies) {
         super.proxySelectEnd(call, url, proxies);
         originEventListener.proxySelectEnd(call, url, proxies);
     }
 
     @Override
-    public void proxySelectStart(@NotNull Call call, @NotNull HttpUrl url) {
+    public void proxySelectStart(@NonNull Call call, @NonNull HttpUrl url) {
         super.proxySelectStart(call, url);
         originEventListener.proxySelectStart(call, url);
     }
 
     @Override
-    public void requestBodyEnd(@NotNull Call call, long byteCount) {
+    public void requestBodyEnd(@NonNull Call call, long byteCount) {
         super.requestBodyEnd(call, byteCount);
         originEventListener.requestBodyEnd(call, byteCount);
         requestBodySize = byteCount;
     }
 
     @Override
-    public void requestBodyStart(@NotNull Call call) {
+    public void requestBodyStart(@NonNull Call call) {
         super.requestBodyStart(call);
         originEventListener.requestBodyStart(call);
     }
 
     @Override
-    public void requestFailed(@NotNull Call call, @NotNull IOException ioe) {
+    public void requestFailed(@NonNull Call call, @NonNull IOException ioe) {
         super.requestFailed(call, ioe);
         originEventListener.requestFailed(call, ioe);
     }
 
     @Override
-    public void requestHeadersEnd(@NotNull Call call, @NotNull Request request) {
+    public void requestHeadersEnd(@NonNull Call call, @NonNull Request request) {
         super.requestHeadersEnd(call, request);
         originEventListener.requestHeadersEnd(call, request);
     }
 
     @Override
-    public void responseFailed(@NotNull Call call, @NotNull IOException ioe) {
+    public void responseFailed(@NonNull Call call, @NonNull IOException ioe) {
         super.responseFailed(call, ioe);
         originEventListener.responseFailed(call, ioe);
     }
 
     @Override
-    public void responseHeadersEnd(@NotNull Call call, @NotNull Response response) {
+    public void responseHeadersEnd(@NonNull Call call, @NonNull Response response) {
         super.responseHeadersEnd(call, response);
         originEventListener.responseHeadersEnd(call, response);
         headerEndTime = System.nanoTime();

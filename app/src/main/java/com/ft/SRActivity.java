@@ -19,8 +19,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatCheckedTextView;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -110,7 +108,7 @@ public class SRActivity extends NameTitleActivity {
 
     }
 
-    @NotNull
+    @NonNull
     private SimpleAdapter getSimpleAdapter() {
         ArrayList<HashMap<String, Object>> arrayList = new ArrayList<>();
 
@@ -146,7 +144,7 @@ public class SRActivity extends NameTitleActivity {
         return getSimpleAdapter(arrayList);
     }
 
-    @NotNull
+    @NonNull
     private SimpleAdapter getSimpleAdapter(ArrayList<HashMap<String, Object>> arrayList) {
         String[] fromArray = {"userName", "userImage"};
         int[] to = {R.id.list_simple_item_tv, R.id.list_simple_item_iv};

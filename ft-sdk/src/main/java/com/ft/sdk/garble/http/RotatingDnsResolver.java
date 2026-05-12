@@ -1,6 +1,6 @@
 package com.ft.sdk.garble.http;
 
-import org.jetbrains.annotations.NotNull;
+import androidx.annotation.NonNull;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -34,9 +34,9 @@ public class RotatingDnsResolver implements Dns {
         this(delegate, TTL_30_MIN);
     }
 
-    @NotNull
+    @NonNull
     @Override
-    public List<InetAddress> lookup(@NotNull String hostname) throws UnknownHostException {
+    public List<InetAddress> lookup(@NonNull String hostname) throws UnknownHostException {
         ResolvedHost knownHost = knownHosts.get(hostname);
         if (knownHost != null && isValid(knownHost)) {
             knownHost.rotate();
