@@ -8,6 +8,7 @@ import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.LogCacheDiscard;
 import com.ft.sdk.RUMCacheDiscard;
 import com.ft.sdk.garble.bean.DataType;
+import com.ft.sdk.garble.utils.Constants;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -19,6 +20,13 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class FTDBCachePolicy {
     private volatile static FTDBCachePolicy instance;
+
+    private static final DataType[] RUM_DATA_TYPES = new DataType[]{
+            DataType.RUM_APP,
+            DataType.RUM_WEBVIEW,
+            DataType.RUM_APP_ERROR_SAMPLED,
+            DataType.RUM_WEBVIEW_ERROR_SAMPLED
+    };
 
     /**
      * Current log data count
@@ -221,7 +229,7 @@ public class FTDBCachePolicy {
                     case DISCARD:
                         return -limit;
                     case DISCARD_OLDEST:
-                        return limit;
+                        return deleteOldestLogData(limit) ? limit : -limit;
                 }
             }
             return 0;
@@ -262,10 +270,14 @@ public class FTDBCachePolicy {
     public int optRUMCachePolicy(int limit) {
         if (limitWithCacheSize) {
             if (isReachCacheLimit()) {
+                if (deleteOldestLogData(Constants.CACHE_OLD_DATA_REMOVE_COUNT)) {
+                    return 1;
+                }
                 switch (cacheDiscard) {
                     case DISCARD:
                         return -1;
                     case DISCARD_OLDEST:
+                        FTDataStoreManager.get().deleteOldestData(RUM_DATA_TYPES, limit);
                         return 1;
                 }
             }
@@ -278,24 +290,27 @@ public class FTDBCachePolicy {
             if (rumCacheDiscardStrategy == RUMCacheDiscard.DISCARD) {//Directly discard data
                 status = -1;
             } else if (rumCacheDiscardStrategy == RUMCacheDiscard.DISCARD_OLDEST) {//Discard the first few pieces of cached data
-                FTDataStoreManager.get().deleteOldestData(new DataType[]{
-                        DataType.RUM_APP,
-                        DataType.RUM_WEBVIEW,
-                        DataType.RUM_APP_ERROR_SAMPLED,
-                        DataType.RUM_WEBVIEW_ERROR_SAMPLED
-                }, limit);
-                rumCount.set(FTDataStoreManager.get().queryTotalCount(new DataType[]{
-                        DataType.RUM_APP,
-                        DataType.RUM_WEBVIEW,
-                        DataType.RUM_APP_ERROR_SAMPLED,
-                        DataType.RUM_WEBVIEW_ERROR_SAMPLED
-                }));
+                FTDataStoreManager.get().deleteOldestData(RUM_DATA_TYPES, limit);
+                rumCount.set(FTDataStoreManager.get().queryTotalCount(RUM_DATA_TYPES));
                 status = 1;
             }
         } else {
             status = 0;
         }
         return status;
+    }
+
+    private boolean deleteOldestLogData(int limit) {
+        int logTotal = FTDataStoreManager.get().queryTotalCount(DataType.LOG);
+        if (logTotal <= 0) {
+            return false;
+        }
+        int deleteCount = Math.min(Math.max(limit, 1), logTotal);
+        FTDataStoreManager.get().deleteOldestData(DataType.LOG, deleteCount);
+        if (!limitWithCacheSize) {
+            logCount.set(FTDataStoreManager.get().queryTotalCount(DataType.LOG));
+        }
+        return true;
     }
 
     /**

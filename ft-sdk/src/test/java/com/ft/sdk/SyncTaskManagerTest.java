@@ -1,8 +1,11 @@
 package com.ft.sdk;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import com.ft.sdk.garble.bean.DataType;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,5 +35,21 @@ public class SyncTaskManagerTest {
         assertEquals(1000L, SyncTaskManager.getIgnoredClientErrorBackoffTimeMs(2));
         assertEquals(8000L, SyncTaskManager.getIgnoredClientErrorBackoffTimeMs(5));
         assertEquals(8000L, SyncTaskManager.getIgnoredClientErrorBackoffTimeMs(6));
+    }
+
+    @Test
+    public void syncOrderPrioritizesRumBeforeLogs() {
+        assertArrayEquals(new DataType[]{
+                DataType.RUM_APP,
+                DataType.RUM_WEBVIEW,
+                DataType.LOG
+        }, SyncTaskManager.getSyncMap());
+    }
+
+    @Test
+    public void syncPageBudgetKeepsLogFromDrainingWholeRound() {
+        assertEquals(2, SyncTaskManager.getMaxPagesPerRound(DataType.RUM_APP));
+        assertEquals(1, SyncTaskManager.getMaxPagesPerRound(DataType.RUM_WEBVIEW));
+        assertEquals(1, SyncTaskManager.getMaxPagesPerRound(DataType.LOG));
     }
 }

@@ -23,14 +23,15 @@ import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.PackageIdGenerator;
 import com.ft.sdk.garble.utils.Utils;
 import com.ft.sdk.internal.exception.FTNetworkNoAvailableException;
-import com.ft.sdk.internal.exception.FTRetryLimitException;
 
 import org.json.JSONObject;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -75,13 +76,15 @@ public class SyncTaskManager {
 
     private static final int HTTP_TOO_MANY_REQUESTS = 429;
     /**
-     * Count the number of errors in a cycle
+     * Count the number of errors per data type so one endpoint does not block others.
      */
-    private final AtomicInteger errorCount = new AtomicInteger(0);
+    private final Map<DataType, AtomicInteger> errorCounts =
+            new EnumMap<>(DataType.class);
     /**
-     * Count consecutive ignored client errors for backoff.
+     * Count consecutive ignored client errors per data type for backoff.
      */
-    private final AtomicInteger ignoredClientErrorCount = new AtomicInteger(0);
+    private final Map<DataType, AtomicInteger> ignoredClientErrorCounts =
+            new EnumMap<>(DataType.class);
 
     /**
      * RUM data sync package id tag
@@ -174,10 +177,14 @@ public class SyncTaskManager {
      */
     private final static DataType[] SYNC_MAP = new DataType[]
             {
-                    DataType.LOG,
                     DataType.RUM_APP,
-                    DataType.RUM_WEBVIEW
+                    DataType.RUM_WEBVIEW,
+                    DataType.LOG
             };
+
+    private static final int RUM_APP_MAX_PAGES_PER_ROUND = 2;
+    private static final int RUM_WEBVIEW_MAX_PAGES_PER_ROUND = 1;
+    private static final int LOG_MAX_PAGES_PER_ROUND = 1;
     /**
      * Error sampled synchronization type
      */
@@ -199,7 +206,7 @@ public class SyncTaskManager {
     }
 
     private SyncTaskManager() {
-
+        initRetryStates();
     }
 
     private static class SingletonHolder {
@@ -290,8 +297,8 @@ public class SyncTaskManager {
         return getRetryBackoffTimeMs(Math.min(count, MAX_ERROR_COUNT));
     }
 
-    private void sleepIgnoredClientErrorBackoff() {
-        int count = ignoredClientErrorCount.incrementAndGet();
+    private void sleepIgnoredClientErrorBackoff(DataType dataType) {
+        int count = getIgnoredClientErrorCount(dataType).incrementAndGet();
         try {
             Thread.sleep(getIgnoredClientErrorBackoffTimeMs(count));
         } catch (InterruptedException e) {
@@ -299,17 +306,61 @@ public class SyncTaskManager {
         }
     }
 
+    private void initRetryStates() {
+        for (DataType dataType : DataType.values()) {
+            errorCounts.put(dataType, new AtomicInteger(0));
+            ignoredClientErrorCounts.put(dataType, new AtomicInteger(0));
+        }
+    }
+
+    private AtomicInteger getErrorCount(DataType dataType) {
+        AtomicInteger count = errorCounts.get(dataType);
+        if (count == null) {
+            count = new AtomicInteger(0);
+            errorCounts.put(dataType, count);
+        }
+        return count;
+    }
+
+    private AtomicInteger getIgnoredClientErrorCount(DataType dataType) {
+        AtomicInteger count = ignoredClientErrorCounts.get(dataType);
+        if (count == null) {
+            count = new AtomicInteger(0);
+            ignoredClientErrorCounts.put(dataType, count);
+        }
+        return count;
+    }
+
+    static int getMaxPagesPerRound(DataType dataType) {
+        switch (dataType) {
+            case RUM_APP:
+                return RUM_APP_MAX_PAGES_PER_ROUND;
+            case RUM_WEBVIEW:
+                return RUM_WEBVIEW_MAX_PAGES_PER_ROUND;
+            case LOG:
+            default:
+                return LOG_MAX_PAGES_PER_ROUND;
+        }
+    }
+
+    static DataType[] getSyncMap() {
+        return SYNC_MAP.clone();
+    }
+
     /**
      * Execute storage data synchronization operation
      */
-    private synchronized void handleSyncOpt(final DataType dataType) throws
-            FTNetworkNoAvailableException, FTRetryLimitException {
-        final List<SyncData> requestDataList = new ArrayList<>();
+    private synchronized SyncRoundResult handleSyncOpt(final DataType dataType,
+                                                       int maxPagesPerRound) throws
+            FTNetworkNoAvailableException {
+        int syncPageCount = 0;
+        boolean hasMoreData = false;
+        AtomicInteger errorCount = getErrorCount(dataType);
+        AtomicInteger ignoredClientErrorCount = getIgnoredClientErrorCount(dataType);
 
-        while (true) {
+        while (syncPageCount < maxPagesPerRound) {
             List<SyncData> cacheDataList = queryFromData(dataType);
-
-            requestDataList.addAll(cacheDataList);
+            final List<SyncData> requestDataList = new ArrayList<>(cacheDataList);
 
             if (requestDataList.isEmpty()) {
                 break;
@@ -356,7 +407,7 @@ public class SyncTaskManager {
                         } else {
                             LogUtils.e(TAG, "Sync Fail (Ignore)-[code:" + code + ",errorCode:" + errorCode + ",response:" + response + "]");
                             if (shouldBackoffIgnoredClientError(code)) {
-                                sleepIgnoredClientErrorBackoff();
+                                sleepIgnoredClientErrorBackoff(dataType);
                             } else {
                                 ignoredClientErrorCount.set(0);
                             }
@@ -377,14 +428,16 @@ public class SyncTaskManager {
                 }
 
             });
-            requestDataList.clear();
 
             if (errorCount.get() == 0) {
+                syncPageCount++;
                 //Current cache data has been obtained, waiting for next data trigger
                 if (cacheDataList.size() < pageSize) {
+                    hasMoreData = false;
                     break;
                 }
-                if (syncSleepTime > 0) {
+                hasMoreData = true;
+                if (syncPageCount < maxPagesPerRound && syncSleepTime > 0) {
                     try {
                         Thread.sleep(syncSleepTime);
                     } catch (InterruptedException e) {
@@ -392,13 +445,17 @@ public class SyncTaskManager {
                     }
                 }
             } else if (errorCount.get() > 0) {
-                if (errorCount.get() > dataSyncMaxRetryCount) {
-                    throw new FTRetryLimitException();
-                } else if (dataSyncMaxRetryCount == 0) {
-                    throw new FTRetryLimitException();
+                if (errorCount.get() > dataSyncMaxRetryCount || dataSyncMaxRetryCount == 0) {
+                    if (dataSyncMaxRetryCount > 0) {
+                        LogUtils.e(TAG, "Sync Fail:" + dataType + " reach retry limit count:"
+                                + dataSyncMaxRetryCount + " - skip this type");
+                    }
+                    return new SyncRoundResult(false);
                 }
             }
         }
+
+        return new SyncRoundResult(hasMoreData);
     }
 
     /**
@@ -604,17 +661,20 @@ public class SyncTaskManager {
                         SyncTaskManager.this.errorSampledConsume(dataType);
                     }
 
+                    boolean needMoreSync = false;
                     for (DataType dataType : SYNC_MAP) {
-                        SyncTaskManager.this.handleSyncOpt(dataType);
+                        SyncRoundResult result = SyncTaskManager.this.handleSyncOpt(dataType,
+                                getMaxPagesPerRound(dataType));
+                        needMoreSync = needMoreSync || result.hasMoreData;
+                    }
+
+                    if (needMoreSync) {
+                        SyncTaskManager.this.executePoll(false);
                     }
 
                 } catch (Exception e) {
                     if (e instanceof FTNetworkNoAvailableException) {
                         LogUtils.e(TAG, "Sync Fail-Network not available - Stop poll");
-                    } else if (e instanceof FTRetryLimitException) {
-                        if (dataSyncMaxRetryCount > 0) {
-                            LogUtils.e(TAG, "Sync Fail: Reach retry limit count:" + dataSyncMaxRetryCount + "- Stop poll");
-                        }
                     } else {
                         LogUtils.e(TAG, "Sync Fail:\n" + LogUtils.getStackTraceString(e));
 
@@ -634,5 +694,13 @@ public class SyncTaskManager {
 
         oldCacheRunner = null;
         isStop = true;
+    }
+
+    private static class SyncRoundResult {
+        final boolean hasMoreData;
+
+        SyncRoundResult(boolean hasMoreData) {
+            this.hasMoreData = hasMoreData;
+        }
     }
 }

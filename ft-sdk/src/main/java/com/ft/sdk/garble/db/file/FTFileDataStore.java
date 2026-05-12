@@ -347,7 +347,11 @@ public class FTFileDataStore implements FTDataStore {
         trimmingSizeLimit = true;
         try {
             while (policy.isReachCacheLimit() && !syncStore.isEmpty()) {
-                syncStore.deleteOldestData(Constants.CACHE_OLD_DATA_REMOVE_COUNT);
+                if (syncStore.queryTotalCount(DataType.LOG) > 0) {
+                    syncStore.deleteOldestData(DataType.LOG, Constants.CACHE_OLD_DATA_REMOVE_COUNT);
+                } else {
+                    syncStore.deleteOldestData(Constants.CACHE_OLD_DATA_REMOVE_COUNT);
+                }
                 policy.setCurrentCacheSize(currentStoreSize());
             }
         } finally {

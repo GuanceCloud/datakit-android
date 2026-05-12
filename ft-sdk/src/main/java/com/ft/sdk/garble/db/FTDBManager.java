@@ -78,14 +78,39 @@ public class FTDBManager extends DBManager implements FTDataStore {
         if (FTDBCachePolicy.get().isReachCacheLimit()) {
             if (FTDBCachePolicy.get().getCacheDiscard() == CacheDiscard.DISCARD_OLDEST) {
                 LogUtils.w(TAG, "Database size exceeds limit! Performing cleanup...");
-                db.execSQL("DELETE FROM " + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " where _id in (SELECT _id from "
-                        + FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME + " ORDER by tm ASC LIMIT " + Constants.CACHE_OLD_DATA_REMOVE_COUNT + ")");
+                int deleted = deleteOldestSyncData(db, DataType.LOG.getValue(),
+                        Constants.CACHE_OLD_DATA_REMOVE_COUNT);
+                if (deleted <= 0) {
+                    deleteOldestSyncData(db, null, Constants.CACHE_OLD_DATA_REMOVE_COUNT);
+                }
                 LogUtils.d(TAG, "Cleanup completed. Size reduced.");
                 db.close();
                 LogUtils.w(TAG, "DB Close to reduce size");
             }
         }
 
+    }
+
+    private int deleteOldestSyncData(SQLiteDatabase db, String dataType, int limit) {
+        StringBuilder where = new StringBuilder();
+        where.append(FTSQL.RECORD_COLUMN_ID)
+                .append(" in (SELECT ")
+                .append(FTSQL.RECORD_COLUMN_ID)
+                .append(" from ")
+                .append(FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME);
+        if (dataType != null) {
+            where.append(" where ")
+                    .append(FTSQL.RECORD_COLUMN_DATA_TYPE)
+                    .append("='")
+                    .append(dataType)
+                    .append("'");
+        }
+        where.append(" ORDER by ")
+                .append(FTSQL.RECORD_COLUMN_TM)
+                .append(" ASC LIMIT ")
+                .append(limit)
+                .append(")");
+        return db.delete(FTSQL.FT_SYNC_DATA_FLAT_TABLE_NAME, where.toString(), null);
     }
 
     /**
