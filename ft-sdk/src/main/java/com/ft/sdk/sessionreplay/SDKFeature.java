@@ -275,6 +275,11 @@ public class SDKFeature implements FeatureScope {
                         }
 
                         @Override
+                        public boolean isUploadUrlAvailable() {
+                            return FTHttpConfigManager.get().isUrlAvailable();
+                        }
+
+                        @Override
                         public boolean isBatteryHealthToSync() {
                             BatteryBean batteryBean = watcher.batteryBean;
                             boolean batteryEnough = batteryBean.getLevel() > SessionReplayConstants.BATTERY_LIMIT;

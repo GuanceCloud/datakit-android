@@ -9,6 +9,8 @@ import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.StringUtils;
 import com.ft.sdk.garble.utils.Utils;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.Proxy;
 
 /**
@@ -173,10 +175,27 @@ public class FTHttpConfigManager {
     /**
      * Check if upload URL is available
      *
-     * @return true if datakitUrl or datawayUrl is configured
+     * @return true if datakitUrl or datawayUrl is configured with a valid http(s) URL
      */
     public boolean isUrlAvailable() {
-        return !Utils.isNullOrEmpty(datakitUrl) || !Utils.isNullOrEmpty(datawayUrl);
+        if (!Utils.isNullOrEmpty(datakitUrl)) {
+            return isValidHttpUrl(datakitUrl);
+        }
+        return isValidHttpUrl(datawayUrl) && !Utils.isNullOrEmpty(clientToken);
+    }
+
+    static boolean isValidHttpUrl(String url) {
+        if (Utils.isNullOrEmpty(url)) {
+            return false;
+        }
+        try {
+            URI uri = new URI(url.trim());
+            String scheme = uri.getScheme();
+            return ("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme))
+                    && !Utils.isNullOrEmpty(uri.getHost());
+        } catch (URISyntaxException e) {
+            return false;
+        }
     }
 
     /**

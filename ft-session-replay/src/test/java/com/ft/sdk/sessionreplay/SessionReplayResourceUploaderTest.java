@@ -18,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 public class SessionReplayResourceUploaderTest {
 
     @Test
-    public void upload_shouldStopWhenCheckExistingFilesFails() throws Exception {
+    public void upload_shouldReturnRetryableResultWhenCheckExistingFilesHasServerError() throws Exception {
         TestUploadCallback callback = new TestUploadCallback(
                 new UploadResult(500, "check failed", ""),
                 new UploadResult(200, "upload success", "pkg-id")
@@ -32,7 +32,9 @@ public class SessionReplayResourceUploaderTest {
                 null
         );
 
-        assertTrue(result.isInvalid());
+        assertFalse(result.isInvalid());
+        assertTrue(result.isNeedReTry());
+        assertEquals(500, result.getCode());
         assertFalse(callback.uploadFilesCalled);
     }
 

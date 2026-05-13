@@ -37,12 +37,15 @@ public class SessionReplayDataUploadRunnable implements Runnable {
     private long currentDelayIntervalMs;
     private final long minDelayMs;
     private final long maxDelayMs;
+    private final long defaultDelayMs;
     private final int maxBatchesPerJob;
     private final SessionReplayContext sdkContext;
     private final InternalLogger internalLogger;
     private final SystemInfoProxy systemInfoProxy;
     private final FeatureSdkCore sdkCore;
     private final File rootPath;
+    private int consecutiveRetryableFailures;
+    private static final long MAX_SERVICE_ERROR_BACKOFF_MS = 30000L;
 
     public SessionReplayDataUploadRunnable(FeatureSdkCore sdkCore, String featureName, ScheduledThreadPoolExecutor threadPoolExecutor,
                                            Storage storage,
@@ -55,6 +58,7 @@ public class SessionReplayDataUploadRunnable implements Runnable {
         this.threadPoolExecutor = threadPoolExecutor;
         this.storage = storage;
         this.currentDelayIntervalMs = dataUploadConfiguration.getDefaultDelayMs();
+        this.defaultDelayMs = dataUploadConfiguration.getDefaultDelayMs();
         this.dataUploader = uploader;
         this.minDelayMs = dataUploadConfiguration.getMinDelayMs();
         this.maxDelayMs = dataUploadConfiguration.getMaxDelayMs();
@@ -69,6 +73,14 @@ public class SessionReplayDataUploadRunnable implements Runnable {
     @Override
     public void run() {
         UploadResult result = null;
+        if (!systemInfoProxy.isUploadUrlAvailable()) {
+            internalLogger.w(TAG, "Session Replay upload URL is not configured or invalid, skip upload", true);
+            consecutiveRetryableFailures = 0;
+            currentDelayIntervalMs = maxDelayMs;
+            handleNextUpload(currentDelayIntervalMs);
+            return;
+        }
+
         if (systemInfoProxy.isNetworkAvailable() && systemInfoProxy.isBatteryHealthToSync()) {
             int batchConsumerAvailableAttempts = maxBatchesPerJob;
             do {
@@ -79,12 +91,31 @@ public class SessionReplayDataUploadRunnable implements Runnable {
             } while (batchConsumerAvailableAttempts > 0 && result != null && result.isSuccess());
         }
         if (result != null && result.isSuccess()) {
+            consecutiveRetryableFailures = 0;
             currentDelayIntervalMs = Math.max((long) (currentDelayIntervalMs * DECREASE_PERCENT), minDelayMs);
+        } else if (result != null && result.isNeedReTry()) {
+            consecutiveRetryableFailures++;
+            currentDelayIntervalMs = getRetryBackoffDelayMs(defaultDelayMs,
+                    Math.max(maxDelayMs, MAX_SERVICE_ERROR_BACKOFF_MS),
+                    consecutiveRetryableFailures);
         } else {
+            consecutiveRetryableFailures = 0;
             currentDelayIntervalMs = Math.min((long) (currentDelayIntervalMs * INCREASE_PERCENT), maxDelayMs);
         }
 
         handleNextUpload(currentDelayIntervalMs);
+    }
+
+    static long getRetryBackoffDelayMs(long defaultDelayMs, long maxDelayMs, int retryCount) {
+        long delayMs = Math.min(defaultDelayMs, maxDelayMs);
+        int safeRetryCount = Math.max(1, retryCount);
+        for (int i = 1; i < safeRetryCount; i++) {
+            if (delayMs >= maxDelayMs || delayMs > Long.MAX_VALUE / 2L) {
+                return maxDelayMs;
+            }
+            delayMs = Math.min(delayMs * 2L, maxDelayMs);
+        }
+        return delayMs;
     }
 
 
