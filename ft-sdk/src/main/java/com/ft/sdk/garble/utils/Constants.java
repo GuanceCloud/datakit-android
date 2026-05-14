@@ -182,6 +182,16 @@ public class Constants {
     public static final String URL_ENV_VARIABLE = "v1/env_variable";
 
     /**
+     * DataKit center configuration pull address, used for filters.
+     */
+    public static final String URL_DATAKIT_PULL = "v1/datakit/pull";
+
+    /**
+     * URL query parameter used to tell server-side intake that SDK-side filters have been applied.
+     */
+    public static final String URL_PARAM_DISABLE_FILTER = "disable_filter";
+
+    /**
      * Default service name, field service
      */
     public static final String DEFAULT_SERVICE_NAME = "df_rum_android";

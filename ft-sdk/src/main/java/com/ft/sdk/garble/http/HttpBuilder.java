@@ -143,6 +143,12 @@ public class HttpBuilder {
         return this;
     }
 
+    public HttpBuilder useDatawayUrl() {
+        this.host = httpConfig.getDatawayUrl();
+        this.isDataway = true;
+        return this;
+    }
+
     public HttpBuilder setMethod(RequestMethod method) {
         this.method = method;
         return this;

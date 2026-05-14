@@ -239,6 +239,12 @@ public class FTTrackInner {
                 try {
                     SyncData recordData = SyncData.getSyncData(dataHelper, dataType,
                             new LineProtocolBean(measurement, tags, fields, time), dataGenerateTime);
+                    if (recordData == null) {
+                        if (callBack != null) {
+                            callBack.onComplete();
+                        }
+                        return;
+                    }
                     if (measurement.equals(Constants.FT_MEASUREMENT_RUM_VIEW)) {
                         boolean update = FTDataStoreManager.get().updateOrInsertSyncData(recordData);
                         if (update) {
@@ -301,6 +307,12 @@ public class FTTrackInner {
             public void run() {
                 try {
                     SyncData recordData = SyncData.getFromLogBean(dataHelper, bean);
+                    if (recordData == null) {
+                        if (callback != null) {
+                            callback.onResponse(200, "", "");
+                        }
+                        return;
+                    }
                     String body = recordData.getDataString();
                     String model = Constants.URL_MODEL_LOG;
                     String content_type = "text/plain";
@@ -355,7 +367,10 @@ public class FTTrackInner {
             ArrayList<SyncData> datas = new ArrayList<>();
             for (BaseContentBean logBean : logBeans) {
                 try {
-                    datas.add(SyncData.getFromLogBean(dataHelper, logBean));
+                    SyncData data = SyncData.getFromLogBean(dataHelper, logBean);
+                    if (data != null) {
+                        datas.add(data);
+                    }
                 } catch (Exception e) {
                     LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                 }
@@ -372,6 +387,9 @@ public class FTTrackInner {
      * @param recordDataList {@link  SyncData} list
      */
     private void judgeLogCachePolicy(@NonNull List<SyncData> recordDataList, boolean silence) {
+        if (recordDataList.isEmpty()) {
+            return;
+        }
         //If the OP type is not LOG, perform database operation directly; otherwise, execute the sync policy, and determine whether to perform database operation based on the result of the sync policy
         synchronized (FTDBCachePolicy.get().getLogLock()) {
 

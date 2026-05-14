@@ -131,6 +131,21 @@ public class FTSDKConfig {
      */
     private boolean fileDataStoreShadow = false;
 
+    /**
+     * Whether to enable DataKit-compatible data filters.
+     */
+    private boolean enableDataFilter = true;
+
+    /**
+     * Remote data filter update interval, unit seconds.
+     */
+    private int dataFilterUpdateInterval = 30 * 60;
+
+    /**
+     * Local DataKit-compatible filter rules. Local filters are applied together with remote filters.
+     */
+    private final HashMap<String, String[]> dataFilters = new HashMap<>();
+
 
     public long getCacheLimit() {
         return cacheLimit;
@@ -693,6 +708,62 @@ public class FTSDKConfig {
     }
 
     /**
+     * Enable DataKit-compatible blacklist filters.
+     * <p>
+     * Local filters configured through {@link #setDataFilters(HashMap)} are applied together with remote filters.
+     * The SDK pulls remote filters from Datakit/Dataway through {@code /v1/datakit/pull?filters=true}.
+     * Enabled by default.
+     *
+     * @param enableDataFilter true to enable data filters
+     * @return
+     */
+    public FTSDKConfig setEnableDataFilter(boolean enableDataFilter) {
+        this.enableDataFilter = enableDataFilter;
+        return this;
+    }
+
+    public boolean isEnableDataFilter() {
+        return enableDataFilter;
+    }
+
+    /**
+     * Set local DataKit-compatible filter rules.
+     * <p>
+     * Supported categories in the Android SDK are {@code logging} and {@code rum}.
+     * Local filters are applied after {@link LineDataModifier} and before local cache writes,
+     * together with remote filters. A matched rule means the data point will be dropped.
+     *
+     * @param filters filter rules grouped by category
+     * @return
+     */
+    public FTSDKConfig setDataFilters(HashMap<String, String[]> filters) {
+        this.dataFilters.clear();
+        if (filters != null) {
+            this.dataFilters.putAll(filters);
+        }
+        return this;
+    }
+
+    public HashMap<String, String[]> getDataFilters() {
+        return dataFilters;
+    }
+
+    /**
+     * Set remote data filter update interval, default is 30 minutes.
+     *
+     * @param intervalSeconds interval seconds, minimum 1
+     * @return
+     */
+    public FTSDKConfig setDataFilterUpdateInterval(int intervalSeconds) {
+        this.dataFilterUpdateInterval = Math.max(1, intervalSeconds);
+        return this;
+    }
+
+    public int getDataFilterUpdateInterval() {
+        return dataFilterUpdateInterval;
+    }
+
+    /**
      * Set the interval time for each sync, sleep time between [0,5000]，0 default
      *
      * @param sleepTimeMs Data sync interval time
@@ -846,6 +917,9 @@ public class FTSDKConfig {
                 ", needTransformOldCache=" + needTransformOldCache +
                 ", useFileDataStore=" + useFileDataStore +
                 ", fileDataStoreShadow=" + fileDataStoreShadow +
+                ", enableDataFilter=" + enableDataFilter +
+                ", dataFilterUpdateInterval=" + dataFilterUpdateInterval +
+                ", dataFilters=" + dataFilters.keySet() +
                 ", globalContext=" + globalContext +
                 ", proxy=" + proxy +
                 ", proxyAuthenticator=" + authenticator +
