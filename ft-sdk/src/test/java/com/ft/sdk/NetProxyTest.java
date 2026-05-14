@@ -16,7 +16,7 @@ public class NetProxyTest {
     @After
     public void tearDown() {
         FTHttpConfigManager.release();
-        LogUtils.setDebug(true);
+        LogUtils.setDebug(false);
     }
 
     @Test

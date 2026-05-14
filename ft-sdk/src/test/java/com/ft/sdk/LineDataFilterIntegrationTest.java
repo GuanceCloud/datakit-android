@@ -18,7 +18,7 @@ public class LineDataFilterIntegrationTest {
     public void tearDown() {
         FTDataFilterManager.release();
         FTHttpConfigManager.release();
-        LogUtils.setDebug(true);
+        LogUtils.setDebug(false);
     }
 
     @Test

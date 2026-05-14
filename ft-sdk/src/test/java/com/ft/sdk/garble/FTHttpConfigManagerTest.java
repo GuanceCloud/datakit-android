@@ -4,13 +4,22 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
+import com.ft.sdk.garble.utils.LogUtils;
+
 public class FTHttpConfigManagerTest {
+
+    @Before
+    public void setUp() {
+        LogUtils.setDebug(false);
+    }
 
     @After
     public void tearDown() {
         FTHttpConfigManager.release();
+        LogUtils.setDebug(false);
     }
 
     @Test
