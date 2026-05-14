@@ -10,6 +10,7 @@ import com.ft.sdk.garble.bean.SyncData;
 import com.ft.sdk.garble.bean.ViewBean;
 import com.ft.sdk.garble.db.FTDBCachePolicy;
 import com.ft.sdk.garble.db.FTDataStoreManager;
+import com.ft.sdk.garble.filter.FTDataFilterManager;
 import com.ft.sdk.garble.http.FTResponseData;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.NetCodeStatus;
@@ -473,14 +474,18 @@ public class SyncTaskManager {
                 break;
         }
         LogUtils.d(TAG, body);
-        FTResponseData result = HttpBuilder.Builder()
+        HttpBuilder builder = HttpBuilder.Builder()
                 .addHeadParam(Constants.SYNC_DATA_CONTENT_TYPE_HEADER, Constants.SYNC_DATA_CONTENT_TYPE_VALUE)
                 .addHeadParam(Constants.SYNC_DATA_TRACE_HEADER,
                         String.format(Constants.SYNC_DATA_TRACE_HEADER_FORMAT, pkgId))
                 .addHeadParam(Constants.SYNC_DATA_DEVICE_TIME, System.currentTimeMillis() + "")
                 .setModel(model)
                 .setMethod(RequestMethod.POST)
-                .setBodyString(body).executeSync();
+                .setBodyString(body);
+        if (FTDataFilterManager.get().shouldDisableServerFilter()) {
+            builder.addParam(Constants.URL_PARAM_DISABLE_FILTER, "true");
+        }
+        FTResponseData result = builder.executeSync();
         if (result.getCode() == NetCodeStatus.NETWORK_EXCEPTION_CODE) {
             throw new FTNetworkNoAvailableException();
         }
@@ -600,6 +605,7 @@ public class SyncTaskManager {
                 }
 
                 try {
+                    FTDataFilterManager.get().syncRemoteIfNeeded();
                     for (DataType dataType : ERROR_SAMPLED_SYNC_MAP) {
                         SyncTaskManager.this.errorSampledConsume(dataType);
                     }

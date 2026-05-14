@@ -10,6 +10,7 @@ import com.ft.sdk.garble.bean.UserData;
 import com.ft.sdk.garble.db.FTDBCachePolicy;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.db.FTDataStoreManager;
+import com.ft.sdk.garble.filter.FTDataFilterManager;
 import com.ft.sdk.garble.threadpool.EventConsumerThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.DeviceUtils;
@@ -129,6 +130,7 @@ public class FTSdk {
         SyncTaskManager.get().release();
         FTRUMConfigManager.get().release();
         FTMonitorManager.release();
+        FTDataFilterManager.release();
         FTHttpConfigManager.release();
         FTNetworkListener.release();
 //        LocationUtils.get().stopListener();
@@ -178,6 +180,7 @@ public class FTSdk {
         FTDBCachePolicy.get().initSDKParams(config);
         FTDataStoreManager.refreshFileSizeCache();
         FTHttpConfigManager.get().initParams(config);
+        FTDataFilterManager.get().init(config);
         appendGlobalContext(config);
         SyncTaskManager.get().init(config);
         FTTrackInner.getInstance().initBaseConfig(config);
@@ -487,6 +490,7 @@ public class FTSdk {
     public static void setDatakitUrl(@NonNull String datakitUrl) {
         if (checkInstallState()) {
             FTHttpConfigManager.get().setDatakitUrl(datakitUrl);
+            FTDataFilterManager.get().syncRemoteIfNeeded(true);
             triggerPendingRemoteConfigInit();
         }
     }
@@ -501,6 +505,7 @@ public class FTSdk {
     public static void setDatawayUrl(@NonNull String datawayUrl, @NonNull String clientToken) {
         if (checkInstallState()) {
             FTHttpConfigManager.get().setDatawayUrl(datawayUrl, clientToken);
+            FTDataFilterManager.get().syncRemoteIfNeeded(true);
             triggerPendingRemoteConfigInit();
         }
     }
