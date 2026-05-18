@@ -33,7 +33,7 @@ public class LineDataFilterIntegrationTest {
     public void lineModifierRunsBeforeLocalFilter() throws Exception {
         HashMap<String, String[]> filters = new HashMap<>();
         filters.put("logging", new String[]{
-                "{ source = 'custom_log' and message = 'drop' }"
+                "{ source in ['custom_log'] and message in ['drop'] }"
         });
 
         FTSDKConfig config = FTSDKConfig.builder()
@@ -68,7 +68,7 @@ public class LineDataFilterIntegrationTest {
     public void invalidRemoteFilterPullDoesNotDisableLocalFilter() throws Exception {
         HashMap<String, String[]> filters = new HashMap<>();
         filters.put("logging", new String[]{
-                "{ source = 'custom_log' and message = 'drop' }"
+                "{ source in ['custom_log'] and message in ['drop'] }"
         });
 
         FTSDKConfig config = FTSDKConfig.builder("bad-dataway-url", "test-token")
@@ -94,7 +94,7 @@ public class LineDataFilterIntegrationTest {
     public void invalidDatakitRemoteFilterPullDoesNotDisableLocalFilter() throws Exception {
         HashMap<String, String[]> filters = new HashMap<>();
         filters.put("logging", new String[]{
-                "{ source = 'custom_log' and message = 'drop' }"
+                "{ source in ['custom_log'] and message in ['drop'] }"
         });
 
         FTSDKConfig config = FTSDKConfig.builder("bad-datakit-url")

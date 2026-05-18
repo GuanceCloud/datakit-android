@@ -1,5 +1,6 @@
 package com.ft.sdk.garble.filter;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -45,7 +46,6 @@ class FTFilterParser {
         NUMBER,
         BOOLEAN,
         NIL,
-        REGEX,
         AND,
         OR,
         EQ,
@@ -96,13 +96,9 @@ class FTFilterParser {
                     continue;
                 }
                 if (match(TokenType.RIGHT_BRACE)) {
-                    conditions.add(new AlwaysExpression());
                     continue;
                 }
                 Expression expression = parseOr();
-                while (match(TokenType.COMMA)) {
-                    expression = new BinaryExpression(TokenType.AND, expression, parseOr());
-                }
                 expect(TokenType.RIGHT_BRACE);
                 if (expression != null) {
                     conditions.add(expression);
@@ -128,29 +124,41 @@ class FTFilterParser {
         }
 
         private Expression parseCompare() {
-            ValueExpression left = parseValue();
+            if (match(TokenType.LEFT_PAREN)) {
+                Expression expression = parseOr();
+                expect(TokenType.RIGHT_PAREN);
+                return expression;
+            }
+
+            ValueExpression left = new IdentifierExpression(parseFieldName());
             TokenType op = current.type;
             switch (op) {
-                case EQ:
-                case NEQ:
-                case GT:
-                case GTE:
-                case LT:
-                case LTE:
-                    advance();
-                    return new CompareExpression(op, left, parseValue());
                 case IN:
                 case NOT_IN:
                 case MATCH:
                 case NOT_MATCH:
                     advance();
-                    List<ValueExpression> values = parseList();
+                    List<ValueExpression> values = parseRuleValues();
                     if (op == TokenType.MATCH || op == TokenType.NOT_MATCH) {
                         values = compileRegexList(values);
                     }
                     return new ListExpression(op, left, values);
                 default:
-                    return left;
+                    throw new IllegalArgumentException("Unsupported filter operator " + op);
+            }
+        }
+
+        private String parseFieldName() {
+            Token token = current;
+            switch (token.type) {
+                case IDENTIFIER:
+                    advance();
+                    return token.text;
+                case STRING:
+                    advance();
+                    return String.valueOf(token.value);
+                default:
+                    throw new IllegalArgumentException("Expected field name but got " + token.type);
             }
         }
 
@@ -173,42 +181,54 @@ class FTFilterParser {
             return regexValues;
         }
 
-        private List<ValueExpression> parseList() {
-            expect(TokenType.LEFT_BRACKET);
+        private List<ValueExpression> parseRuleValues() {
+            if (!match(TokenType.LEFT_BRACKET)) {
+                return parseBareRuleValues();
+            }
             List<ValueExpression> values = new ArrayList<>();
             while (current.type != TokenType.RIGHT_BRACKET && current.type != TokenType.EOF) {
                 if (match(TokenType.COMMA)) {
                     continue;
                 }
-                values.add(parseValue());
+                values.add(parseRuleValue());
                 match(TokenType.COMMA);
             }
             expect(TokenType.RIGHT_BRACKET);
             return values;
         }
 
-        private ValueExpression parseValue() {
+        private List<ValueExpression> parseBareRuleValues() {
+            List<ValueExpression> values = new ArrayList<>();
+            while (!isRuleValueTerminator(current.type)) {
+                values.add(parseRuleValue());
+                if (!match(TokenType.COMMA)) {
+                    break;
+                }
+            }
+            return values;
+        }
+
+        private boolean isRuleValueTerminator(TokenType type) {
+            return type == TokenType.RIGHT_BRACE
+                    || type == TokenType.RIGHT_PAREN
+                    || type == TokenType.AND
+                    || type == TokenType.OR
+                    || type == TokenType.EOF;
+        }
+
+        private ValueExpression parseRuleValue() {
             Token token = current;
             switch (token.type) {
-                case LEFT_PAREN:
-                    advance();
-                    Expression expression = parseOr();
-                    expect(TokenType.RIGHT_PAREN);
-                    return new NestedValueExpression(expression);
                 case IDENTIFIER:
                     advance();
-                    return new IdentifierExpression(token.text);
+                    return new LiteralExpression(token.text);
                 case STRING:
                 case NUMBER:
                 case BOOLEAN:
-                case REGEX:
                     advance();
                     return new LiteralExpression(token.value);
-                case NIL:
-                    advance();
-                    return new LiteralExpression(NIL);
                 default:
-                    throw new IllegalArgumentException("Unexpected token " + token.type);
+                    throw new IllegalArgumentException("Expected filter value but got " + token.type);
             }
         }
 
@@ -233,31 +253,6 @@ class FTFilterParser {
 
     private interface ValueExpression extends Expression {
         Object value(Values values);
-    }
-
-    private static class AlwaysExpression implements Expression {
-        @Override
-        public boolean eval(Values values) {
-            return true;
-        }
-    }
-
-    private static class NestedValueExpression implements ValueExpression {
-        private final Expression expression;
-
-        NestedValueExpression(Expression expression) {
-            this.expression = expression;
-        }
-
-        @Override
-        public Object value(Values values) {
-            return eval(values);
-        }
-
-        @Override
-        public boolean eval(Values values) {
-            return expression != null && expression.eval(values);
-        }
     }
 
     private static class IdentifierExpression implements ValueExpression {
@@ -321,28 +316,6 @@ class FTFilterParser {
         }
     }
 
-    private static class CompareExpression implements Expression {
-        private final TokenType op;
-        private final ValueExpression left;
-        private final ValueExpression right;
-
-        CompareExpression(TokenType op, ValueExpression left, ValueExpression right) {
-            this.op = op;
-            this.left = left;
-            this.right = right;
-        }
-
-        @Override
-        public boolean eval(Values values) {
-            Object leftValue = left.value(values);
-            Object rightValue = right.value(values);
-            if (leftValue == MISSING && rightValue == MISSING && right instanceof IdentifierExpression) {
-                return false;
-            }
-            return compare(op, leftValue, rightValue);
-        }
-    }
-
     private static class ListExpression implements Expression {
         private final TokenType op;
         private final ValueExpression left;
@@ -356,10 +329,13 @@ class FTFilterParser {
 
         @Override
         public boolean eval(Values values) {
-            if ((op == TokenType.MATCH || op == TokenType.NOT_MATCH) && items.isEmpty()) {
+            if (items.isEmpty()) {
                 return false;
             }
             Object leftValue = left.value(values);
+            if (leftValue == MISSING || leftValue == null) {
+                return false;
+            }
             boolean matched = false;
             for (ValueExpression item : items) {
                 Object itemValue = item.value(values);
@@ -368,7 +344,7 @@ class FTFilterParser {
                         matched = true;
                         break;
                     }
-                } else if (compare(TokenType.EQ, leftValue, itemValue)) {
+                } else if (containsValue(leftValue, itemValue)) {
                     matched = true;
                     break;
                 }
@@ -386,34 +362,6 @@ class FTFilterParser {
         }
     }
 
-    private static boolean compare(TokenType op, Object left, Object right) {
-        if (right instanceof RegexValue && (op == TokenType.EQ || op == TokenType.NEQ)) {
-            boolean matched = matches(left, right);
-            return op == TokenType.NEQ ? !matched : matched;
-        }
-
-        if (left == MISSING) {
-            left = NIL;
-        }
-        if (right == MISSING) {
-            right = NIL;
-        }
-
-        switch (op) {
-            case EQ:
-                return equal(left, right);
-            case NEQ:
-                return !equal(left, right);
-            case GT:
-            case GTE:
-            case LT:
-            case LTE:
-                return compareOrdered(op, left, right);
-            default:
-                return false;
-        }
-    }
-
     private static boolean equal(Object left, Object right) {
         if (left == NIL || right == NIL) {
             return left == NIL && right == NIL;
@@ -425,30 +373,6 @@ class FTFilterParser {
             return left == null && right == null;
         }
         return left.equals(right);
-    }
-
-    private static boolean compareOrdered(TokenType op, Object left, Object right) {
-        int result;
-        if (left instanceof Number && right instanceof Number) {
-            result = Double.compare(((Number) left).doubleValue(), ((Number) right).doubleValue());
-        } else if (left instanceof String && right instanceof String) {
-            result = ((String) left).compareTo((String) right);
-        } else {
-            return false;
-        }
-
-        switch (op) {
-            case GT:
-                return result > 0;
-            case GTE:
-                return result >= 0;
-            case LT:
-                return result < 0;
-            case LTE:
-                return result <= 0;
-            default:
-                return false;
-        }
     }
 
     private static boolean matches(Object left, Object right) {
@@ -466,6 +390,30 @@ class FTFilterParser {
             }
         }
         return false;
+    }
+
+    private static boolean containsValue(Object left, Object right) {
+        if (left instanceof Iterable) {
+            for (Object item : (Iterable<?>) left) {
+                if (equal(item, right)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        Class<?> valueClass = left.getClass();
+        if (valueClass.isArray()) {
+            int length = Array.getLength(left);
+            for (int i = 0; i < length; i++) {
+                if (equal(Array.get(left, i), right)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        return equal(left, right);
     }
 
     private static class Lexer {
@@ -584,7 +532,7 @@ class FTFilterParser {
             pos++;
             while (pos < input.length()) {
                 char c = input.charAt(pos);
-                if (Character.isLetterOrDigit(c) || c == '_' || c == '.' || c == '-') {
+                if (isIdentifierPart(c)) {
                     pos++;
                 } else {
                     break;
@@ -592,23 +540,27 @@ class FTFilterParser {
             }
             String text = input.substring(start, pos);
             String keyword = text.toLowerCase(Locale.US);
-            if ("re".equals(keyword) && peek('(')) {
-                return readRegexFunction();
-            }
-            if ("identifier".equals(keyword) && peek('(')) {
-                return readIdentifierFunction();
-            }
             if ("and".equals(keyword)) {
                 return new Token(TokenType.AND, text);
             } else if ("or".equals(keyword)) {
                 return new Token(TokenType.OR, text);
             } else if ("in".equals(keyword)) {
                 return new Token(TokenType.IN, text);
+            } else if ("not".equals(keyword)) {
+                int saved = pos;
+                skipWhitespaceAndComments();
+                if (readKeyword("in")) {
+                    return new Token(TokenType.NOT_IN, text + " in");
+                }
+                if (readKeyword("match")) {
+                    return new Token(TokenType.NOT_MATCH, text + " match");
+                }
+                pos = saved;
             } else if ("notin".equals(keyword) || "not_in".equals(keyword)) {
                 return new Token(TokenType.NOT_IN, text);
             } else if ("match".equals(keyword)) {
                 return new Token(TokenType.MATCH, text);
-            } else if ("notmatch".equals(keyword)) {
+            } else if ("notmatch".equals(keyword) || "not_match".equals(keyword)) {
                 return new Token(TokenType.NOT_MATCH, text);
             } else if ("true".equals(keyword) || "false".equals(keyword)) {
                 return new Token(TokenType.BOOLEAN, text, Boolean.valueOf(keyword));
@@ -616,42 +568,6 @@ class FTFilterParser {
                 return new Token(TokenType.NIL, text, NIL);
             }
             return new Token(TokenType.IDENTIFIER, text);
-        }
-
-        private Token readIdentifierFunction() {
-            expectChar('(');
-            skipWhitespaceAndComments();
-            if (pos >= input.length()) {
-                throw new IllegalArgumentException("Unexpected end of identifier");
-            }
-            char quote = input.charAt(pos);
-            if (quote != '\'' && quote != '"' && quote != '`') {
-                throw new IllegalArgumentException("Identifier expects string");
-            }
-            String identifier = (String) readString(quote).value;
-            skipWhitespaceAndComments();
-            expectChar(')');
-            return new Token(TokenType.IDENTIFIER, identifier, identifier);
-        }
-
-        private Token readRegexFunction() {
-            expectChar('(');
-            skipWhitespaceAndComments();
-            if (pos >= input.length()) {
-                throw new IllegalArgumentException("Unexpected end of regex");
-            }
-            char quote = input.charAt(pos);
-            if (quote != '\'' && quote != '"' && quote != '`') {
-                throw new IllegalArgumentException("Regex expects string");
-            }
-            String regex = (String) readString(quote).value;
-            skipWhitespaceAndComments();
-            expectChar(')');
-            try {
-                return new Token(TokenType.REGEX, regex, new RegexValue(regex));
-            } catch (PatternSyntaxException e) {
-                return new Token(TokenType.REGEX, regex, new RegexValue("a^"));
-            }
         }
 
         private Token readString(char quote) {
@@ -707,11 +623,49 @@ class FTFilterParser {
         }
 
         private boolean isIdentifierStart(char c) {
-            return Character.isLetter(c) || c == '_';
+            return Character.isLetter(c)
+                    || c == '_'
+                    || c == '.'
+                    || c == '*'
+                    || c == '^'
+                    || c == '$'
+                    || c == '/'
+                    || c == '|';
+        }
+
+        private boolean isIdentifierPart(char c) {
+            return Character.isLetterOrDigit(c)
+                    || c == '_'
+                    || c == '.'
+                    || c == '-'
+                    || c == '*'
+                    || c == '+'
+                    || c == '?'
+                    || c == '/'
+                    || c == ':'
+                    || c == '%'
+                    || c == '^'
+                    || c == '$'
+                    || c == '|';
         }
 
         private boolean isNumberStart(char c) {
             return Character.isDigit(c) || c == '-';
+        }
+
+        private boolean readKeyword(String keyword) {
+            int end = pos + keyword.length();
+            if (end > input.length()) {
+                return false;
+            }
+            if (!input.regionMatches(true, pos, keyword, 0, keyword.length())) {
+                return false;
+            }
+            if (end < input.length() && isIdentifierPart(input.charAt(end))) {
+                return false;
+            }
+            pos = end;
+            return true;
         }
 
         private boolean peek(char c) {
@@ -722,11 +676,5 @@ class FTFilterParser {
             return pos + 1 < input.length() && input.charAt(pos) == c && input.charAt(pos + 1) == c;
         }
 
-        private void expectChar(char c) {
-            if (!peek(c)) {
-                throw new IllegalArgumentException("Expected char " + c);
-            }
-            pos++;
-        }
     }
 }
