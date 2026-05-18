@@ -67,6 +67,94 @@ public class FTDataFilterTest {
     }
 
     @Test
+    public void emptyConditionMatchesAllLikeCliutils() {
+        HashMap<String, String[]> rules = new HashMap<>();
+        rules.put("logging", new String[]{"{}"});
+        FTDataFilter filter = FTDataFilter.compile(rules);
+
+        Assert.assertTrue(filter.isFiltered(DataType.LOG, "any",
+                new HashMap<String, Object>(), new HashMap<String, Object>()));
+        Assert.assertFalse(filter.isFiltered(DataType.RUM_APP, Constants.FT_MEASUREMENT_RUM_RESOURCE,
+                new HashMap<String, Object>(), new HashMap<String, Object>()));
+    }
+
+    @Test
+    public void invalidRegexInMatchListIsIgnoredLikeCliutils() {
+        HashMap<String, String[]> rules = new HashMap<>();
+        rules.put("logging", new String[]{
+                "{ message match ['g(-z]+ng wrong regex'] }",
+                "{ message notmatch ['g(-z]+ng wrong regex'] }",
+                "{ message notmatch [] }"
+        });
+        FTDataFilter filter = FTDataFilter.compile(rules);
+
+        HashMap<String, Object> fields = new HashMap<>();
+        fields.put("message", "abc123");
+
+        Assert.assertFalse(filter.isFiltered(DataType.LOG, "test",
+                new HashMap<String, Object>(), fields));
+    }
+
+    @Test
+    public void identifierFunctionAllowsReservedFieldNames() {
+        HashMap<String, String[]> rules = new HashMap<>();
+        rules.put("logging", new String[]{
+                "{ identifier('and') = 'yes' }"
+        });
+        FTDataFilter filter = FTDataFilter.compile(rules);
+
+        HashMap<String, Object> fields = new HashMap<>();
+        fields.put("and", "yes");
+
+        Assert.assertTrue(filter.isFiltered(DataType.LOG, "test",
+                new HashMap<String, Object>(), fields));
+    }
+
+    @Test
+    public void measurementAndClassAliasesUseMeasurement() {
+        HashMap<String, String[]> measurementRules = new HashMap<>();
+        measurementRules.put("rum", new String[]{
+                "{ measurement = 'resource' }"
+        });
+        FTDataFilter measurementFilter = FTDataFilter.compile(measurementRules);
+
+        Assert.assertTrue(measurementFilter.isFiltered(DataType.RUM_APP,
+                Constants.FT_MEASUREMENT_RUM_RESOURCE,
+                new HashMap<String, Object>(), new HashMap<String, Object>()));
+
+        HashMap<String, String[]> classRules = new HashMap<>();
+        classRules.put("rum", new String[]{
+                "{ class = 'resource' }"
+        });
+        FTDataFilter classFilter = FTDataFilter.compile(classRules);
+
+        Assert.assertTrue(classFilter.isFiltered(DataType.RUM_APP,
+                Constants.FT_MEASUREMENT_RUM_RESOURCE,
+                new HashMap<String, Object>(), new HashMap<String, Object>()));
+    }
+
+    @Test
+    public void nilListAndNotInAliasMatchCliutils() {
+        HashMap<String, String[]> inRules = new HashMap<>();
+        inRules.put("logging", new String[]{
+                "{ missing in [null, 'hello'] }"
+        });
+        FTDataFilter inFilter = FTDataFilter.compile(inRules);
+
+        Assert.assertTrue(inFilter.isFiltered(DataType.LOG, "test",
+                new HashMap<String, Object>(), new HashMap<String, Object>()));
+
+        HashMap<String, String[]> notInRules = new HashMap<>();
+        notInRules.put("logging", new String[]{
+                "{ missing not_in [123, 'hello'] }"
+        });
+        FTDataFilter notInFilter = FTDataFilter.compile(notInRules);
+
+        Assert.assertTrue(notInFilter.isFiltered(DataType.LOG, "test",
+                new HashMap<String, Object>(), new HashMap<String, Object>()));
+    }
+
+    @Test
     public void unsupportedCategoryIsIgnored() {
         HashMap<String, String[]> rules = new HashMap<>();
         rules.put("metric", new String[]{"{ measurement = 'cpu' }"});

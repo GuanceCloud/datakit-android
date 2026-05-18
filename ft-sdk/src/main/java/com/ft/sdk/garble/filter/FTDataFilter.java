@@ -160,6 +160,9 @@ class FTDataFilter {
             if ("source".equals(key)) {
                 return measurement;
             }
+            if ("measurement".equals(key) || "class".equals(key)) {
+                return measurement;
+            }
             return FTFilterParser.MISSING;
         }
     }

@@ -96,6 +96,7 @@ class FTFilterParser {
                     continue;
                 }
                 if (match(TokenType.RIGHT_BRACE)) {
+                    conditions.add(new AlwaysExpression());
                     continue;
                 }
                 Expression expression = parseOr();
@@ -143,10 +144,33 @@ class FTFilterParser {
                 case MATCH:
                 case NOT_MATCH:
                     advance();
-                    return new ListExpression(op, left, parseList());
+                    List<ValueExpression> values = parseList();
+                    if (op == TokenType.MATCH || op == TokenType.NOT_MATCH) {
+                        values = compileRegexList(values);
+                    }
+                    return new ListExpression(op, left, values);
                 default:
                     return left;
             }
+        }
+
+        private List<ValueExpression> compileRegexList(List<ValueExpression> values) {
+            List<ValueExpression> regexValues = new ArrayList<>();
+            for (ValueExpression value : values) {
+                if (!(value instanceof LiteralExpression)) {
+                    continue;
+                }
+                Object rawValue = ((LiteralExpression) value).rawValue();
+                if (!(rawValue instanceof String)) {
+                    continue;
+                }
+                try {
+                    regexValues.add(new LiteralExpression(new RegexValue((String) rawValue)));
+                } catch (PatternSyntaxException ignored) {
+                    // cliutils/filter drops invalid regex entries from MATCH/NOTMATCH lists.
+                }
+            }
+            return regexValues;
         }
 
         private List<ValueExpression> parseList() {
@@ -211,6 +235,13 @@ class FTFilterParser {
         Object value(Values values);
     }
 
+    private static class AlwaysExpression implements Expression {
+        @Override
+        public boolean eval(Values values) {
+            return true;
+        }
+    }
+
     private static class NestedValueExpression implements ValueExpression {
         private final Expression expression;
 
@@ -253,6 +284,10 @@ class FTFilterParser {
 
         LiteralExpression(Object value) {
             this.value = value;
+        }
+
+        Object rawValue() {
+            return value;
         }
 
         @Override
@@ -321,6 +356,9 @@ class FTFilterParser {
 
         @Override
         public boolean eval(Values values) {
+            if ((op == TokenType.MATCH || op == TokenType.NOT_MATCH) && items.isEmpty()) {
+                return false;
+            }
             Object leftValue = left.value(values);
             boolean matched = false;
             for (ValueExpression item : items) {
@@ -557,6 +595,9 @@ class FTFilterParser {
             if ("re".equals(keyword) && peek('(')) {
                 return readRegexFunction();
             }
+            if ("identifier".equals(keyword) && peek('(')) {
+                return readIdentifierFunction();
+            }
             if ("and".equals(keyword)) {
                 return new Token(TokenType.AND, text);
             } else if ("or".equals(keyword)) {
@@ -575,6 +616,22 @@ class FTFilterParser {
                 return new Token(TokenType.NIL, text, NIL);
             }
             return new Token(TokenType.IDENTIFIER, text);
+        }
+
+        private Token readIdentifierFunction() {
+            expectChar('(');
+            skipWhitespaceAndComments();
+            if (pos >= input.length()) {
+                throw new IllegalArgumentException("Unexpected end of identifier");
+            }
+            char quote = input.charAt(pos);
+            if (quote != '\'' && quote != '"' && quote != '`') {
+                throw new IllegalArgumentException("Identifier expects string");
+            }
+            String identifier = (String) readString(quote).value;
+            skipWhitespaceAndComments();
+            expectChar(')');
+            return new Token(TokenType.IDENTIFIER, identifier, identifier);
         }
 
         private Token readRegexFunction() {
