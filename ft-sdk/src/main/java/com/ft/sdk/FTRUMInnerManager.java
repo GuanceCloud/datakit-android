@@ -948,7 +948,10 @@ public class FTRUMInnerManager {
         bean.resourceTrans = netStatusBean.getResponseTime();
         bean.resourceTTFB = netStatusBean.getTTFB();
         long resourceLoad = netStatusBean.getHoleRequestTime();
-        bean.resourceLoad = resourceLoad > 0 ? resourceLoad : bean.endTimeNanoForDuration - bean.startTimeNanoForDuration;
+        if (resourceLoad <= 0 && bean.endTimeNanoForDuration > bean.startTimeNanoForDuration) {
+            resourceLoad = bean.endTimeNanoForDuration - bean.startTimeNanoForDuration;
+        }
+        bean.resourceLoad = Math.max(0, resourceLoad);
         bean.resourceFirstByte = netStatusBean.getFirstByteTime();
         bean.resourceFirstByteStart = netStatusBean.getFirstByteStartTime();
         bean.resourceDownloadTime = netStatusBean.getDownloadTime();
@@ -994,7 +997,7 @@ public class FTRUMInnerManager {
             tags.put(Constants.KEY_RUM_VIEW_REFERRER, viewReferrer);
             tags.put(Constants.KEY_RUM_SESSION_ID, sessionId);
 
-            HashMap<String, Object> fields = new HashMap<>();
+            HashMap<String, Object> fields = new HashMap<>(bean.property);
 
             tags.put(Constants.KEY_RUM_RESOURCE_URL_HOST, bean.urlHost);
 
@@ -1106,7 +1109,6 @@ public class FTRUMInnerManager {
             tags.put(Constants.KEY_RUM_RESOURCE_ID, bean.id);
             tags.put(Constants.KEY_RUM_RESOURCE_URL, bean.url);
 
-            fields.putAll(bean.property);
             fields.put(Constants.KEY_RUM_REQUEST_HEADER, bean.requestHeader);
             if (!Utils.isNullOrEmpty(bean.resourceProtocol)) {
                 fields.put(Constants.KEY_RUM_RESOURCE_HTTP_PROTOCOL, bean.resourceProtocol);

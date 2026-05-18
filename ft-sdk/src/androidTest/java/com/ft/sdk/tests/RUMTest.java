@@ -570,6 +570,21 @@ public class RUMTest extends FTBaseTest {
                 Constants.FT_MEASUREMENT_RUM_RESOURCE, DataType.RUM_APP, false));
     }
 
+    @Test
+    public void resourceDurationNotOverriddenByDynamicParamsTest() throws InterruptedException {
+        String uniqueUrl = TEST_FAKE_URL + "?durationOverride=" + System.nanoTime();
+        HashMap<String, Object> property = new HashMap<>();
+        property.put(Constants.KEY_RUM_RESOURCE_DURATION, -1L);
+
+        sendResource(property, null, "", uniqueUrl);
+
+        Thread.sleep(2000);
+
+        LineProtocolData resourceData = getLatestResourceLineProtocolData(uniqueUrl);
+        long duration = getLongField(resourceData, Constants.KEY_RUM_RESOURCE_DURATION);
+        Assert.assertTrue(duration > 0);
+    }
+
     /**
      * Error data test
      *
