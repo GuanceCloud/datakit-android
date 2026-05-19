@@ -1,5 +1,6 @@
 # agent 1.7.2-alpha02
 1. Replaced remaining JetBrains nullability annotations in core SDK code with AndroidX annotations to keep Android integration signatures consistent and avoid redundant annotation references.
+2. Added real RUM fallback View data for `ApplicationLaunch`, `BackgroundView`, and `RootView` contexts, so startup, background, and orphan RUM events use random View IDs backed by View summary records.
 
 ---
 # agent 1.7.2-alpha01

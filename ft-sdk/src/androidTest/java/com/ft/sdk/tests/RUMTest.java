@@ -259,6 +259,58 @@ public class RUMTest extends FTBaseTest {
     }
 
     /**
+     * RUM data without a foreground View uses virtual View contexts.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void fallbackViewContextTest() throws Exception {
+        String startupAction = "startupAction";
+        String rootFallbackAction = "rootFallbackAction";
+        String backgroundAction = "backgroundAction";
+        String foregroundAction = "foregroundAction";
+
+        FTRUMGlobalManager.get().addAction(startupAction, ACTION_TYPE_NAME);
+
+        Whitebox.invokeMethod(FTActivityManager.get(), "appForeground");
+        FTRUMGlobalManager.get().addAction(rootFallbackAction, ACTION_TYPE_NAME);
+
+        FTRUMGlobalManager.get().startView(FIRST_VIEW);
+        Whitebox.invokeMethod(FTAutoTrack.class, "putRUMLaunchPerformance",
+                true, DURATION, Utils.getCurrentNanoTime(), null, null, null, false);
+        FTRUMGlobalManager.get().startAction(foregroundAction, ACTION_TYPE_NAME);
+        FTRUMGlobalManager.get().stopView();
+        Whitebox.invokeMethod(FTActivityManager.get(), "appBackGround");
+        Whitebox.invokeMethod(FTRUMInnerManager.get(), "onAppBackground");
+        FTRUMGlobalManager.get().addAction(backgroundAction, ACTION_TYPE_NAME);
+        FTRUMGlobalManager.get().addLongTask(LONG_TASK, DURATION);
+
+        waitEventConsumeInThreadPool();
+
+        ArrayList<ActionBean> list = FTDBManager.get().querySumAction(0);
+        assertFallbackView(findActionByName(list, startupAction), Constants.VIEW_NAME_APPLICATION_LAUNCH);
+        assertFallbackView(findActionByName(list, rootFallbackAction), Constants.VIEW_NAME_ROOT_FALLBACK);
+        assertFallbackView(findActionByName(list, Constants.ACTION_NAME_LAUNCH_COLD), Constants.VIEW_NAME_APPLICATION_LAUNCH);
+        assertFallbackView(findActionByName(list, backgroundAction), Constants.VIEW_NAME_BACKGROUND);
+
+        ArrayList<ViewBean> viewList = FTDBManager.get().querySumView(0, true);
+        assertFallbackViewData(findViewById(viewList, findActionByName(list, startupAction).getViewId()),
+                findActionByName(list, startupAction));
+        assertFallbackViewData(findViewById(viewList, findActionByName(list, Constants.ACTION_NAME_LAUNCH_COLD).getViewId()),
+                findActionByName(list, Constants.ACTION_NAME_LAUNCH_COLD));
+        assertFallbackViewData(findViewById(viewList, findActionByName(list, rootFallbackAction).getViewId()),
+                findActionByName(list, rootFallbackAction));
+        assertFallbackViewData(findViewById(viewList, findActionByName(list, backgroundAction).getViewId()),
+                findActionByName(list, backgroundAction));
+
+        List<SyncData> dataList = FTDBManager.get().queryDataByDataByTypeLimit(0, DataType.RUM_APP);
+        LineProtocolData longTaskData = findLineProtocolByMeasurement(dataList, Constants.FT_MEASUREMENT_RUM_LONG_TASK);
+        Assert.assertEquals(Constants.VIEW_NAME_BACKGROUND,
+                longTaskData.getTagAsString(Constants.KEY_RUM_VIEW_NAME));
+        Assert.assertNull(longTaskData.getTagAsString(Constants.KEY_RUM_ACTION_ID));
+    }
+
+    /**
      * View data generation test
      *
      * @throws Exception
@@ -758,6 +810,52 @@ public class RUMTest extends FTBaseTest {
      */
     private void sendResource() {
         sendResource(null, null);
+    }
+
+    private ActionBean findActionByName(ArrayList<ActionBean> list, String actionName) {
+        for (ActionBean bean : list) {
+            if (actionName.equals(bean.getActionName())) {
+                return bean;
+            }
+        }
+        Assert.fail("Action not found: " + actionName);
+        return null;
+    }
+
+    private ViewBean findViewById(ArrayList<ViewBean> list, String viewId) {
+        for (ViewBean bean : list) {
+            if (viewId.equals(bean.getId())) {
+                return bean;
+            }
+        }
+        Assert.fail("View not found: " + viewId);
+        return null;
+    }
+
+    private void assertFallbackView(ActionBean bean, String viewName) {
+        Assert.assertEquals(viewName, bean.getViewName());
+        Assert.assertEquals(Constants.VIEW_NAME_ROOT, bean.getViewReferrer());
+        Assert.assertNotNull(bean.getViewId());
+        Assert.assertFalse(bean.getViewId().isEmpty());
+        Assert.assertNotEquals(Utils.getEmptyUUID(), bean.getViewId());
+    }
+
+    private void assertFallbackViewData(ViewBean viewBean, ActionBean actionBean) {
+        Assert.assertEquals(actionBean.getViewId(), viewBean.getId());
+        Assert.assertEquals(actionBean.getViewName(), viewBean.getViewName());
+        Assert.assertEquals(Constants.VIEW_NAME_ROOT, viewBean.getViewReferrer());
+        Assert.assertTrue(viewBean.getActionCount() > 0);
+    }
+
+    private LineProtocolData findLineProtocolByMeasurement(List<SyncData> list, String measurement) {
+        for (SyncData data : list) {
+            LineProtocolData lineProtocolData = new LineProtocolData(data.getDataString());
+            if (measurement.equals(lineProtocolData.getMeasurement())) {
+                return lineProtocolData;
+            }
+        }
+        Assert.fail("Measurement not found: " + measurement);
+        return null;
     }
 
     /**

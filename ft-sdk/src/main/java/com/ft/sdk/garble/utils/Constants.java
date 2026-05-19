@@ -704,6 +704,18 @@ public class Constants {
      * View root path default value
      */
     public static final String VIEW_NAME_ROOT = "root";
+    /**
+     * Fallback view name used when RUM data has no valid foreground View context.
+     */
+    public static final String VIEW_NAME_ROOT_FALLBACK = "RootView";
+    /**
+     * Virtual view name used for RUM data generated during application launch.
+     */
+    public static final String VIEW_NAME_APPLICATION_LAUNCH = "ApplicationLaunch";
+    /**
+     * Virtual view name used for RUM data generated after the app enters background.
+     */
+    public static final String VIEW_NAME_BACKGROUND = "BackgroundView";
 
     /**
      * Page load time
