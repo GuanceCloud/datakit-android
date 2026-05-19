@@ -91,6 +91,62 @@ public class FTDataFilterTest {
     }
 
     @Test
+    public void realLoggingRuleSyntaxSupportsCompactNegativeOperators() {
+        HashMap<String, String[]> rules = new HashMap<>();
+        rules.put("logging", new String[]{
+                "{  `source` in [ 'df_rum_ios_log' ,  'df_rum_android_log' ]  and ( `status` in [ 'ok' ,  'info' ,  'debug' ]  and  `message` match [ '.*password.*' ]  and  `env` notin [ 'prod' ,  'gray' ]  and  `message` notmatch [ '.*error.*' ] )}"
+        });
+        FTDataFilter filter = FTDataFilter.compile(rules);
+
+        HashMap<String, Object> tags = new HashMap<>();
+        tags.put("env", "test");
+        HashMap<String, Object> fields = new HashMap<>();
+        fields.put("status", "debug");
+        fields.put("message", "contains password");
+
+        Assert.assertTrue(filter.isFiltered(DataType.LOG, "df_rum_android_log",
+                tags, fields));
+
+        tags.put("env", "gray");
+        Assert.assertFalse(filter.isFiltered(DataType.LOG, "df_rum_android_log",
+                tags, fields));
+
+        tags.put("env", "test");
+        fields.put("message", "contains password error");
+        Assert.assertFalse(filter.isFiltered(DataType.LOG, "df_rum_android_log",
+                tags, fields));
+    }
+
+    @Test
+    public void realRumResourceRulesDropHttpErrors() {
+        HashMap<String, String[]> rules = new HashMap<>();
+        rules.put("rum", new String[]{
+                "{  `app_id` in [ 'appid_test' ]  and ( `resource_status` in [ '404' ]  or  `resource_status` match [ '5..' ] )}",
+                "{  `app_id` in [ 'appid_test' ]  and ( `source` in [ 'resource' ]  and  `resource_status_group` notmatch [ '2xx' ] )}"
+        });
+        FTDataFilter filter = FTDataFilter.compile(rules);
+
+        HashMap<String, Object> tags = new HashMap<>();
+        tags.put(Constants.KEY_RUM_APP_ID, "appid_test");
+        HashMap<String, Object> fields = new HashMap<>();
+        fields.put(Constants.KEY_RUM_RESOURCE_STATUS, 404);
+        fields.put(Constants.KEY_RUM_RESOURCE_STATUS_GROUP, "4xx");
+
+        Assert.assertTrue(filter.isFiltered(DataType.RUM_APP, Constants.FT_MEASUREMENT_RUM_RESOURCE,
+                tags, fields));
+
+        fields.put(Constants.KEY_RUM_RESOURCE_STATUS, 503);
+        fields.put(Constants.KEY_RUM_RESOURCE_STATUS_GROUP, "5xx");
+        Assert.assertTrue(filter.isFiltered(DataType.RUM_APP, Constants.FT_MEASUREMENT_RUM_RESOURCE,
+                tags, fields));
+
+        fields.put(Constants.KEY_RUM_RESOURCE_STATUS, 200);
+        fields.put(Constants.KEY_RUM_RESOURCE_STATUS_GROUP, "2xx");
+        Assert.assertFalse(filter.isFiltered(DataType.RUM_APP, Constants.FT_MEASUREMENT_RUM_RESOURCE,
+                tags, fields));
+    }
+
+    @Test
     public void matchSupportsRegexListAndBareRegexValue() {
         HashMap<String, String[]> rules = new HashMap<>();
         rules.put("logging", new String[]{

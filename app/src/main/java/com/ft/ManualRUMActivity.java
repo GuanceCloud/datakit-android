@@ -1,6 +1,7 @@
 package com.ft;
 
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -11,6 +12,7 @@ import com.ft.sdk.garble.bean.ErrorType;
 import com.ft.sdk.garble.bean.NetStatusBean;
 import com.ft.sdk.garble.bean.ResourceParams;
 import com.ft.sdk.garble.bean.Status;
+import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
 
 import java.net.HttpURLConnection;
@@ -24,6 +26,7 @@ import okhttp3.Request;
 public class ManualRUMActivity extends NameTitleActivity {
 
     public static final String HTTPS_FAKE_URL = "https://www.fakeurl.com";
+    private static final String TAG = "ManualRUMActivity";
     int count = 0;
 
     @Override
@@ -79,6 +82,19 @@ public class ManualRUMActivity extends NameTitleActivity {
 
         });
 
+        findViewById(R.id.manual_filter_resource_btn).setOnClickListener(v -> {
+            sendDataFilterResource(HttpURLConnection.HTTP_OK, "keep-200");
+            sendDataFilterResource(HttpURLConnection.HTTP_NOT_FOUND, "drop-404");
+            sendDataFilterResource(HttpURLConnection.HTTP_UNAVAILABLE, "drop-503");
+            Toast.makeText(this, "Data filter resources sent", Toast.LENGTH_SHORT).show();
+        });
+
+        findViewById(R.id.manual_filter_log_btn).setOnClickListener(v -> {
+            sendDataFilterLog(false);
+            sendDataFilterLog(true);
+            Toast.makeText(this, "Data filter logs sent", Toast.LENGTH_SHORT).show();
+        });
+
         findViewById(R.id.manual_longtask_btn).setOnClickListener(v -> {
             HashMap<String, Object> property = new HashMap<>();
             property.put("sp_label", "Render");
@@ -98,5 +114,36 @@ public class ManualRUMActivity extends NameTitleActivity {
             FTLogger.getInstance().logBackground("Manual Log", Status.ERROR, property);
         });
 
+    }
+
+    private void sendDataFilterResource(int statusCode, String sampleName) {
+        String url = HTTPS_FAKE_URL + "/data-filter/" + sampleName;
+        Request request = new Request.Builder().url(url).build();
+        String sampleResourceId = Utils.identifyRequest(request);
+
+        HashMap<String, Object> property = new HashMap<>();
+        property.put("filter_sample", sampleName);
+        FTRUMGlobalManager.get().startResource(sampleResourceId, property);
+        FTRUMGlobalManager.get().stopResource(sampleResourceId, property);
+
+        ResourceParams params = new ResourceParams();
+        params.resourceMethod = "GET";
+        params.resourceStatus = statusCode;
+        params.url = url;
+        FTRUMGlobalManager.get().addResource(sampleResourceId, params, new NetStatusBean());
+
+        LogUtils.d(TAG, "send data filter sample resource, status:" + statusCode
+                + ", sample:" + sampleName + ", url:" + url);
+    }
+
+    private void sendDataFilterLog(boolean shouldDrop) {
+        HashMap<String, Object> property = new HashMap<>();
+        property.put("filter_sample", shouldDrop ? "drop-log" : "keep-log");
+        String message = shouldDrop
+                ? "android data filter password sample"
+                : "android data filter password keep control";
+        FTLogger.getInstance().logBackground(message, Status.DEBUG, property);
+        LogUtils.d(TAG, "send data filter sample log, shouldDrop:" + shouldDrop
+                + ", message:" + message);
     }
 }

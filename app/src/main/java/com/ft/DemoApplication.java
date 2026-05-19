@@ -94,6 +94,7 @@ public class DemoApplication extends BaseApplication {
                 .setNeedTransformOldCache(true)
                 .setCompressIntakeRequests(true)
                 .setSyncSleepTime(100)
+                .setEnableDataFilter(true)
                 .setRemoteConfiguration(true)
                 .setRemoteConfigurationCallBack(new FTRemoteConfigManager.FetchResult() {
                     @Override

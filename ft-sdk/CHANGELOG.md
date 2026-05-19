@@ -1,3 +1,11 @@
+# agent 1.7.2-alpha03
+1. Added DataKit-compatible data filtering for Logging and RUM, enabled by default through `FTSDKConfig.setEnableDataFilter`, with local rules via `setDataFilters` and remote filter pulls controlled by `setDataFilterUpdateInterval`.
+2. Applied data filters after `LineDataModifier` and before local cache writes, and aligned supported filter operators with `in`, `not in`, `match`, and `not match`.
+3. Optimized data synchronization to prioritize RUM data over logs and isolate retry/backoff state by data type, reducing cases where log uploads delay RUM synchronization.
+4. Fixed RUM Resource duration handling so custom Resource properties no longer override SDK-calculated duration values, and invalid fallback durations are clamped to non-negative values.
+5. Fixed Session Replay upload retry handling and upload URL validation so retryable failures back off correctly and invalid upload endpoints do not trigger repeated upload attempts.
+
+---
 # agent 1.7.2-alpha02
 1. Replaced remaining JetBrains nullability annotations in core SDK code with AndroidX annotations to keep Android integration signatures consistent and avoid redundant annotation references.
 2. Added real RUM fallback View data for `ApplicationLaunch`, `BackgroundView`, and `RootView` contexts, so startup, background, and orphan RUM events use random View IDs backed by View summary records.

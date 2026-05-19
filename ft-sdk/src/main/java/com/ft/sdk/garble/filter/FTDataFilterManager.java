@@ -97,7 +97,7 @@ public class FTDataFilterManager {
             return false;
         }
         String category = FTDataFilter.categoryOf(dataType);
-        LogUtils.d(TAG, "drop data by " + source + " filter, category:" + category
+        LogUtils.w(TAG, "drop data by " + source + " filter, category:" + category
                 + ", measurement:" + measurement
                 + ", uuid:" + uuid
                 + ", filters:" + filterSource.getRawConditions(category));

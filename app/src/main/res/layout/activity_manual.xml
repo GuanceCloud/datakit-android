@@ -35,6 +35,18 @@
         android:text="Resource Stop" />
 
     <Button
+        android:id="@+id/manual_filter_resource_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Data Filter Resource" />
+
+    <Button
+        android:id="@+id/manual_filter_log_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Data Filter Log" />
+
+    <Button
         android:id="@+id/manual_error_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
