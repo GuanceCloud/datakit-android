@@ -27,6 +27,9 @@ public class FTLogger {
         private static final FTLogger INSTANCE = new FTLogger();
     }
 
+    /**
+     * Returns the singleton logger used to submit custom log data.
+     */
     public static FTLogger getInstance() {
         return SingletonHolder.INSTANCE;
     }
@@ -85,6 +88,12 @@ public class FTLogger {
         logBackground(content, status.name, property, isSilence);
     }
 
+    /**
+     * Stores a custom log with a custom status value.
+     *
+     * @param content log content, maximum size is {@link com.ft.sdk.garble.bean.BaseContentBean#LIMIT_SIZE}
+     * @param status  custom log status
+     */
     public void logBackground(String content, String status) {
         logBackground(content, status, null);
     }
@@ -99,6 +108,13 @@ public class FTLogger {
         logBackground(content, status, null, isSilence);
     }
 
+    /**
+     * Stores a custom log with a custom status value and additional properties.
+     *
+     * @param content  log content, maximum size is {@link com.ft.sdk.garble.bean.BaseContentBean#LIMIT_SIZE}
+     * @param status   custom log status
+     * @param property additional log attributes
+     */
     public void logBackground(String content, String status, HashMap<String, Object> property) {
         logBackground(content, status, property, false);
     }

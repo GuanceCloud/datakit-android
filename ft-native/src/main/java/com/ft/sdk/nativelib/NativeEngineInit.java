@@ -8,9 +8,9 @@ import ftnative.NativeCrash;
 public class NativeEngineInit {
 
     /**
-     * Data initialization
+     * Initializes native crash and ANR handling.
      *
-     * @param context
+     * @param context           application context
      * @param logPath           Log generation path
      * @param enableNativeCrash Whether to enable native crash collection
      * @param enableAnrHandler  Whether to start ANR data collection
@@ -20,13 +20,13 @@ public class NativeEngineInit {
     }
 
     /**
-     * Data initialization
+     * Initializes native crash and ANR handling with a native crash callback.
      *
-     * @param context
+     * @param context             application context
      * @param logPath             Log generation path
      * @param enableNativeCrash   Whether to enable native crash collection
      * @param enableAnrHandler    Whether to start ANR data collection
-     * @param nativeCrashCallback Whether to receive native crash callback
+     * @param nativeCrashCallback callback invoked with the generated native crash file path
      */
     public static void init(Context context, String logPath, boolean enableNativeCrash, boolean enableAnrHandler,
                             CrashCallback nativeCrashCallback) {
@@ -61,13 +61,15 @@ public class NativeEngineInit {
 
 
     /**
-     * Data initialization
+     * Initializes native crash and ANR handling with crash callbacks and logcat capture settings.
      *
-     * @param context
+     * @param context                  application context
      * @param logPath             Log generation path
      * @param enableNativeCrash   Whether to enable native crash collection
      * @param enableAnrHandler    Whether to start ANR data collection
-     * @param nativeCrashCallback Whether to receive native crash callback
+     * @param nativeCrashCallback callback invoked with the generated native crash file path
+     * @param nativeCrashLogCatSetting logcat line settings for native crash reports
+     * @param anrCrashLogCatSetting    logcat line settings for ANR reports
      */
     public static void init(Context context, String logPath, boolean enableNativeCrash, boolean enableAnrHandler,
                             CrashCallback nativeCrashCallback,

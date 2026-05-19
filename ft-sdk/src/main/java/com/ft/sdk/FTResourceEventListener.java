@@ -53,6 +53,13 @@ public class FTResourceEventListener extends EventListener {
     private final boolean enableResourceHostIP;
     private final EventListener originEventListener;
 
+    /**
+     * Creates an OkHttp event listener that records RUM resource timing metrics.
+     *
+     * @param resourceId           resource identifier used to link metrics with RUM resource data
+     * @param enableResourceHostIP true to collect the connected host IP address
+     * @param originEventListener  original listener to receive delegated OkHttp events
+     */
     public FTResourceEventListener(String resourceId, Boolean enableResourceHostIP, EventListener originEventListener) {
         LogUtils.d(TAG, "FTFactory create:" + resourceId);
 
@@ -282,18 +289,33 @@ public class FTResourceEventListener extends EventListener {
         private EventListener originEventLister = new NoOPEventListener();
         private final EventListener.Factory originFactory;
 
+        /**
+         * Creates a factory without host IP collection, URL filtering, or an origin factory.
+         */
         public FTFactory() {
             this.enableResourceHostIP = false;
             this.handler = null;
             this.originFactory = null;
         }
 
+        /**
+         * Creates a factory with optional host IP collection.
+         *
+         * @param enableResourceHostIP true to collect the connected host IP address
+         */
         public FTFactory(boolean enableResourceHostIP) {
             this.enableResourceHostIP = enableResourceHostIP;
             this.handler = null;
             this.originFactory = null;
         }
 
+        /**
+         * Creates a factory that can filter URLs and delegate to an existing OkHttp event listener factory.
+         *
+         * @param enableResourceHostIP true to collect the connected host IP address
+         * @param handler              URL filter; returning true skips SDK resource collection
+         * @param originFactory        original factory to preserve application-defined OkHttp events
+         */
         public FTFactory(boolean enableResourceHostIP, FTInTakeUrlHandler handler, EventListener.Factory originFactory) {
             this.enableResourceHostIP = enableResourceHostIP;
             this.handler = handler;
@@ -302,8 +324,10 @@ public class FTResourceEventListener extends EventListener {
 
 
         /**
-         * @param call
-         * @return
+         * Creates an event listener for the given OkHttp call.
+         *
+         * @param call OkHttp call being executed
+         * @return SDK listener, or the original listener when the URL is filtered
          */
         @NonNull
         @Override

@@ -23,9 +23,10 @@ import java.util.HashMap;
 
 
 /**
- * BY huangDianHua
- * DATE:2019-11-29 17:15
- * Description:
+ * Main entry point for installing and configuring the SDK.
+ * <p>
+ * Call {@link #install(FTSDKConfig)} once during application startup, then enable
+ * RUM, log, trace, or Session Replay with their corresponding configuration APIs.
  */
 public class FTSdk {
     public final static String TAG = Constants.LOG_TAG_PREFIX + "FTSdk";
@@ -61,17 +62,22 @@ public class FTSdk {
     private String pendingRemoteConfigAppId;
 
     /**
-     * @param ftSDKConfig
+     * Creates the SDK instance from the base configuration.
+     *
+     * @param ftSDKConfig base SDK configuration
      */
     private FTSdk(@NonNull FTSDKConfig ftSDKConfig) {
         this.mFtSDKConfig = ftSDKConfig;
     }
 
     /**
-     * SDK configuration entry point
+     * Installs the SDK with the base configuration.
+     * <p>
+     * Call this before initializing RUM, log, trace, or Session Replay. When
+     * {@link FTSDKConfig#setOnlySupportMainProcess(boolean)} is true, installation
+     * is ignored in non-main processes.
      *
-     * @param ftSDKConfig
-     * @return
+     * @param ftSDKConfig base SDK configuration
      */
     public static synchronized void install(@NonNull FTSDKConfig ftSDKConfig) {
         try {
@@ -101,9 +107,9 @@ public class FTSdk {
     }
 
     /**
-     * After SDK initialization, get the SDK object
+     * Returns the installed SDK instance.
      *
-     * @return
+     * @return SDK instance, or null when {@link #install(FTSDKConfig)} has not succeeded
      */
     public static synchronized FTSdk get() {
         if (mFtSdk == null) {
@@ -113,9 +119,9 @@ public class FTSdk {
     }
 
     /**
-     * Check installation status
+     * Check installation status.
      *
-     * @return
+     * @return true when the SDK has been installed
      */
     static boolean checkInstallState() {
         return mFtSdk != null && mFtSdk.mFtSDKConfig != null;
@@ -190,7 +196,9 @@ public class FTSdk {
         LogUtils.d(TAG, "initFTConfig complete:" + config);
     }
 
-
+    /**
+     * Returns the base configuration used during SDK installation.
+     */
     public FTSDKConfig getBaseConfig() {
         return mFtSDKConfig;
     }
@@ -225,9 +233,9 @@ public class FTSdk {
 
 
     /**
-     * Set RUM configuration
+     * Initializes RUM data collection.
      *
-     * @param config
+     * @param config RUM configuration
      */
     public static void initRUMWithConfig(@NonNull FTRUMConfig config) {
         try {
@@ -251,9 +259,9 @@ public class FTSdk {
     }
 
     /**
-     * Set Trace configuration
+     * Initializes trace header injection and RUM trace linking.
      *
-     * @param config
+     * @param config trace configuration
      */
     public static void initTraceWithConfig(@NonNull FTTraceConfig config) {
         try {
@@ -270,9 +278,9 @@ public class FTSdk {
     }
 
     /**
-     * Set log configuration
+     * Initializes log collection.
      *
-     * @param config
+     * @param config log configuration
      */
     public static void initLogWithConfig(@NonNull FTLoggerConfig config) {
         try {
@@ -290,9 +298,9 @@ public class FTSdk {
 
 
     /**
-     * Initialize the configuration of session replay
+     * Initializes Session Replay collection.
      *
-     * @param config
+     * @param config Session Replay configuration object from the optional replay module
      */
     public static void initSessionReplayConfig(Object config) {
         try {
@@ -310,7 +318,7 @@ public class FTSdk {
      * bind once, the field data will continue to retain data until calling
      * {@link #unbindRumUserData()}
      *
-     * @param id
+     * @param id unique user id
      */
     public static void bindRumUserData(@NonNull String id) {
         FTRUMConfigManager.get().bindUserData(id, null, null, null);
@@ -318,7 +326,9 @@ public class FTSdk {
 
 
     /**
-     * Bind user information, {@link #bindRumUserData(String)}  }
+     * Binds full RUM user information.
+     *
+     * @param data user data containing id, name, email, and custom fields
      */
     public static void bindRumUserData(@NonNull UserData data) {
         FTRUMConfigManager.get().bindUserData(data.getId(), data.getName(), data.getEmail(), data.getExts());
@@ -358,6 +368,9 @@ public class FTSdk {
         }
     }
 
+    /**
+     * Returns whether the optional Session Replay module is available and enabled.
+     */
     public static boolean isSessionReplaySupport() {
         return isSessionReplaySupport && SessionReplayBridge.isReplayEnabled();
     }
@@ -366,7 +379,7 @@ public class FTSdk {
     /**
      * Supplement global tags
      *
-     * @param config
+     * @param config base SDK configuration whose global context will be enriched
      */
     private void appendGlobalContext(FTSDKConfig config) {
         HashMap<String, Object> hashMap = config.getGlobalContext();
@@ -403,7 +416,7 @@ public class FTSdk {
     /**
      * Dynamically set global tag
      *
-     * @param globalContext
+     * @param globalContext global attributes appended to all data types
      */
     public static void appendGlobalContext(HashMap<String, Object> globalContext) {
         if (checkInstallState()) {
@@ -414,8 +427,8 @@ public class FTSdk {
     /**
      * Dynamically set global tag
      *
-     * @param key
-     * @param value
+     * @param key   global attribute key
+     * @param value global attribute value
      */
     public static void appendGlobalContext(String key, String value) {
         if (checkInstallState()) {
@@ -426,7 +439,7 @@ public class FTSdk {
     /**
      * Dynamically set RUM global tag
      *
-     * @param globalContext
+     * @param globalContext attributes appended only to RUM data
      */
     public static void appendRUMGlobalContext(HashMap<String, Object> globalContext) {
         if (checkInstallState()) {
@@ -437,8 +450,8 @@ public class FTSdk {
     /**
      * Dynamically set RUM global tag
      *
-     * @param key
-     * @param value
+     * @param key   RUM attribute key
+     * @param value RUM attribute value
      */
     public static void appendRUMGlobalContext(String key, String value) {
         if (checkInstallState()) {
@@ -449,7 +462,7 @@ public class FTSdk {
     /**
      * Dynamically set log global tag
      *
-     * @param globalContext
+     * @param globalContext attributes appended only to log data
      */
     public static void appendLogGlobalContext(HashMap<String, Object> globalContext) {
         if (checkInstallState()) {
@@ -460,8 +473,8 @@ public class FTSdk {
     /**
      * Dynamically set log global tag
      *
-     * @param key
-     * @param value
+     * @param key   log attribute key
+     * @param value log attribute value
      */
     public static void appendLogGlobalContext(String key, String value) {
         if (checkInstallState()) {

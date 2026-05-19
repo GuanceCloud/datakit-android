@@ -68,7 +68,7 @@ public class FTLoggerConfig {
     /**
      * Get sampling rate
      *
-     * @return
+     * @return log sampling rate in the range [0, 1]
      */
     public float getSamplingRate() {
         return samplingRate;
@@ -77,8 +77,8 @@ public class FTLoggerConfig {
     /**
      * Set sampling rate
      *
-     * @param samplingRate
-     * @return
+     * @param samplingRate log sampling rate in the range [0, 1]
+     * @return this config for chaining
      */
     public FTLoggerConfig setSamplingRate(float samplingRate) {
         this.samplingRate = samplingRate;
@@ -88,7 +88,7 @@ public class FTLoggerConfig {
     /**
      * Whether to associate with RUM data
      *
-     * @return
+     * @return true when logs should include RUM linkage data
      */
     public boolean isEnableLinkRumData() {
         return enableLinkRumData;
@@ -97,8 +97,8 @@ public class FTLoggerConfig {
     /**
      * Set whether to associate with RUM data
      *
-     * @param enableLinkRumData
-     * @return
+     * @param enableLinkRumData true to attach RUM linkage data to logs
+     * @return this config for chaining
      */
     public FTLoggerConfig setEnableLinkRumData(boolean enableLinkRumData) {
         this.enableLinkRumData = enableLinkRumData;
@@ -108,7 +108,7 @@ public class FTLoggerConfig {
     /**
      * Whether to enable control log capture
      *
-     * @return
+     * @return true when console log capture is enabled
      */
     public boolean isEnableConsoleLog() {
         return enableConsoleLog;
@@ -117,8 +117,8 @@ public class FTLoggerConfig {
     /**
      * Set whether to enable control log capture
      *
-     * @param enableConsoleLog
-     * @return
+     * @param enableConsoleLog true to capture console logs
+     * @return this config for chaining
      */
     public FTLoggerConfig setEnableConsoleLog(boolean enableConsoleLog) {
         this.enableConsoleLog = enableConsoleLog;
@@ -128,7 +128,7 @@ public class FTLoggerConfig {
     /**
      * @param enableConsoleLog Whether to enable control log capture
      * @param prefix           Log filter prefix
-     * @return
+     * @return this config for chaining
      */
     public FTLoggerConfig setEnableConsoleLog(boolean enableConsoleLog, String prefix) {
         this.enableConsoleLog = enableConsoleLog;
@@ -145,6 +145,12 @@ public class FTLoggerConfig {
         return enableCustomLog;
     }
 
+    /**
+     * Sets whether custom logs submitted through {@link FTLogger#logBackground(String, Status)} are collected.
+     *
+     * @param enableCustomLog true to enable custom log collection
+     * @return this config for chaining
+     */
     public FTLoggerConfig setEnableCustomLog(boolean enableCustomLog) {
         this.enableCustomLog = enableCustomLog;
         return this;
@@ -153,7 +159,7 @@ public class FTLoggerConfig {
     /**
      * Get service name
      *
-     * @return
+     * @return service name attached to log data
      */
     public String getServiceName() {
         return serviceName;
@@ -167,7 +173,7 @@ public class FTLoggerConfig {
     /**
      * Get log cache strategy
      *
-     * @return
+     * @return log cache discard strategy
      */
     public LogCacheDiscard getLogCacheDiscardStrategy() {
         return logCacheDiscardStrategy;
@@ -176,8 +182,8 @@ public class FTLoggerConfig {
     /**
      * Set database data storage strategy
      *
-     * @param logCacheDiscardStrategy
-     * @return
+     * @param logCacheDiscardStrategy strategy used when the log cache limit is reached
+     * @return this config for chaining
      */
     public FTLoggerConfig setLogCacheDiscardStrategy(LogCacheDiscard logCacheDiscardStrategy) {
         this.logCacheDiscardStrategy = logCacheDiscardStrategy;
@@ -188,8 +194,8 @@ public class FTLoggerConfig {
     /**
      * Set log level filter
      *
-     * @param logLevelFilters
-     * @return
+     * @param logLevelFilters allowed log statuses
+     * @return this config for chaining
      */
     public FTLoggerConfig setLogLevelFilters(Status[] logLevelFilters) {
         List<String> array = new ArrayList<>();
@@ -203,8 +209,8 @@ public class FTLoggerConfig {
     /**
      * Set log level filter
      *
-     * @param logLevelFilters
-     * @return
+     * @param logLevelFilters allowed custom log status strings
+     * @return this config for chaining
      */
     public FTLoggerConfig setLogLevelFilters(String[] logLevelFilters) {
         this.logLevelFilters = Arrays.asList(logLevelFilters);
@@ -214,7 +220,7 @@ public class FTLoggerConfig {
     /**
      * Whether to enable custom log printing
      *
-     * @return
+     * @return true when custom logs should also be printed to console
      */
     public boolean isPrintCustomLogToConsole() {
         return !TrackLog.isSetInnerLogHandler() && printCustomLogToConsole;
@@ -223,7 +229,7 @@ public class FTLoggerConfig {
     /**
      * Set whether to print custom logs to console
      *
-     * @param printCustomLogToConsole
+     * @param printCustomLogToConsole true to print custom logs to console
      */
     public FTLoggerConfig setPrintCustomLogToConsole(boolean printCustomLogToConsole) {
         this.printCustomLogToConsole = printCustomLogToConsole;
@@ -233,8 +239,8 @@ public class FTLoggerConfig {
     /**
      * Set the maximum number of log entries, minimum not less than 1000
      *
-     * @param count
-     * @return
+     * @param count maximum log cache row count
+     * @return this config for chaining
      */
     public FTLoggerConfig setLogCacheLimitCount(int count) {
         this.logCacheLimitCount = Math.max(Constants.MINI_DB_LOG_CACHE_NUM, count);
@@ -246,7 +252,7 @@ public class FTLoggerConfig {
     /**
      * Get the maximum number of log entries, minimum not less than 1000
      *
-     * @return
+     * @return maximum log cache row count
      */
     public int getLogCacheLimitCount() {
         return logCacheLimitCount;
@@ -256,7 +262,7 @@ public class FTLoggerConfig {
      * Check if prefix is set
      *
      * @param message Console content
-     * @return
+     * @return true when the message matches the configured prefix
      */
     public boolean checkPrefix(String message) {
         return logPrefix == null
@@ -267,7 +273,7 @@ public class FTLoggerConfig {
     /**
      * Check if log level is set
      *
-     * @param status
+     * @param status log status to check
      * @return Whether to set
      */
     public boolean checkLogLevel(String status) {
@@ -276,15 +282,28 @@ public class FTLoggerConfig {
                 || logLevelFilters.contains(status);
     }
 
+    /**
+     * Returns the configured log status filters, or null when all statuses are allowed.
+     */
     public List<String> getLogLevelFilters() {
         return logLevelFilters;
     }
 
+    /**
+     * Adds a global attribute to every log item collected with this configuration.
+     *
+     * @param key   attribute key
+     * @param value attribute value
+     * @return this config for chaining
+     */
     public FTLoggerConfig addGlobalContext(@NonNull String key, @NonNull String value) {
         this.globalContext.put(key, value);
         return this;
     }
 
+    /**
+     * Returns global log attributes configured on this object.
+     */
     public HashMap<String, Object> getGlobalContext() {
         return globalContext;
     }

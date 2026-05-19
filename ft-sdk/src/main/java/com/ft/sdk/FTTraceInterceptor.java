@@ -20,10 +20,17 @@ import okhttp3.Response;
  */
 public class FTTraceInterceptor implements Interceptor {
 
-
+    /**
+     * Creates a trace interceptor that uses the SDK default trace header generator.
+     */
     public FTTraceInterceptor() {
     }
 
+    /**
+     * Creates a trace interceptor with a custom trace header handler.
+     *
+     * @param headerHandler custom handler used to generate request trace headers
+     */
     public FTTraceInterceptor(HeaderHandler headerHandler) {
         this.headerHandler = headerHandler;
     }
@@ -69,10 +76,16 @@ public class FTTraceInterceptor implements Interceptor {
      * trace_id and span_id associated with RUM
      */
     public static class TraceRUMLinkable {
+        /**
+         * Returns the trace id that should be linked to the RUM resource.
+         */
         public String getTraceID() {
             return null;
         }
 
+        /**
+         * Returns the span id that should be linked to the RUM resource.
+         */
         public String getSpanID() {
             return null;
         }
@@ -157,8 +170,8 @@ public class FTTraceInterceptor implements Interceptor {
     /**
      * Supported content capture
      *
-     * @param mediaType
-     * @return
+     * @param mediaType response media type
+     * @return true when the media type is configured for trace content handling
      */
     private static boolean isSupportFormat(MediaType mediaType) {
         if (mediaType == null) return false;

@@ -91,14 +91,27 @@ public class FTExtension {
      */
     private final NamedDomainObjectContainer<ProductFlavorModel> prodFlavor;
 
+    /**
+     * Creates the Gradle extension backing the {@code ftPlugin} DSL block.
+     *
+     * @param project Gradle project that owns the extension
+     */
     public FTExtension(Project project) {
         prodFlavor = project.container(ProductFlavorModel.class);
     }
 
+    /**
+     * Returns additional product flavor upload configuration.
+     */
     public NamedDomainObjectContainer<ProductFlavorModel> getOther() {
         return prodFlavor;
     }
 
+    /**
+     * Configures release product flavor upload settings.
+     *
+     * @param action action that configures the product flavor container
+     */
     public void prodFlavors(Action<NamedDomainObjectContainer<ProductFlavorModel>> action) {
         action.execute(prodFlavor);
     }
