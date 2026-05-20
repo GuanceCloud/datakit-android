@@ -4,6 +4,7 @@
 3. Optimized data synchronization to prioritize RUM data over logs and isolate retry/backoff state by data type, reducing cases where log uploads delay RUM synchronization.
 4. Fixed RUM Resource duration handling so custom Resource properties no longer override SDK-calculated duration values, and invalid fallback durations are clamped to non-negative values.
 5. Fixed Session Replay upload retry handling and upload URL validation so retryable failures back off correctly and invalid upload endpoints do not trigger repeated upload attempts.
+6. Fixed DataKit filter bypass marking so cached rows are rechecked by the current SDK-supported remote filter config before Datakit uploads send `disable_filter=true`.
 
 ---
 # agent 1.7.2-alpha02

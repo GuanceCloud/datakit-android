@@ -298,6 +298,19 @@ public class SyncTaskManager {
         return getRetryBackoffTimeMs(Math.min(count, MAX_ERROR_COUNT));
     }
 
+    static boolean shouldAddDisableServerFilterParam(boolean disableServerFilter) {
+        return disableServerFilter
+                && !Utils.isNullOrEmpty(FTHttpConfigManager.get().getDatakitUrl());
+    }
+
+    static String buildRequestBody(List<SyncData> dataList, String pkgId) {
+        StringBuilder sb = new StringBuilder();
+        for (SyncData data : dataList) {
+            sb.append(data.getLineProtocolDataWithPkgId(pkgId));
+        }
+        return sb.toString();
+    }
+
     private void sleepIgnoredClientErrorBackoff(DataType dataType) {
         int count = getIgnoredClientErrorCount(dataType).incrementAndGet();
         try {
@@ -361,16 +374,28 @@ public class SyncTaskManager {
 
         while (syncPageCount < maxPagesPerRound) {
             List<SyncData> cacheDataList = queryFromData(dataType);
-            final List<SyncData> requestDataList = new ArrayList<>(cacheDataList);
+            FTDataFilterManager.UploadFilterResult uploadFilterResult =
+                    FTDataFilterManager.get().prepareForUpload(dataType, cacheDataList);
+            List<SyncData> filteredDataList = uploadFilterResult.getFilteredDataList();
+            if (!filteredDataList.isEmpty()) {
+                deleteLastQuery(filteredDataList);
+                decrementCacheCount(dataType, filteredDataList.size());
+            }
+
+            final List<SyncData> requestDataList = new ArrayList<>(uploadFilterResult.getUploadDataList());
 
             if (requestDataList.isEmpty()) {
-                break;
+                if (cacheDataList.size() < pageSize) {
+                    break;
+                }
+                syncPageCount++;
+                hasMoreData = true;
+                continue;
             }
 
             int dataCount = requestDataList.size();
             LogUtils.d(TAG, "Sync Data Count:" + dataCount);
 
-            StringBuilder sb = new StringBuilder();
             String seqNumber = "";
             if (dataType == DataType.LOG) {
                 seqNumber = logGenerator.getCurrentId();
@@ -378,21 +403,13 @@ public class SyncTaskManager {
                 seqNumber = rumGenerator.getCurrentId();
             }
             String pkgId = PackageIdGenerator.generatePackageId(seqNumber, pid, dataCount);
-            for (SyncData data : cacheDataList) {
-                sb.append(data.getLineProtocolDataWithPkgId(pkgId));
-            }
-
-            String body = sb.toString();
-            requestNet(dataType, pkgId, body, new RequestCallback() {
+            String body = buildRequestBody(requestDataList, pkgId);
+            requestNet(dataType, pkgId, body, uploadFilterResult.isDisableServerFilter(), new RequestCallback() {
                 @Override
                 public void onResponse(int code, String response, String errorCode) {
                     if (code >= 200 && code < 500) {
                         SyncTaskManager.this.deleteLastQuery(requestDataList);
-                        if (dataType == DataType.LOG) {
-                            FTDBCachePolicy.get().optLogCount(-requestDataList.size());
-                        } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_WEBVIEW) {
-                            FTDBCachePolicy.get().optRUMCount(-requestDataList.size());
-                        }
+                        decrementCacheCount(dataType, requestDataList.size());
                         errorCount.set(0);
                         if (code == 200) {
                             ignoredClientErrorCount.set(0);
@@ -491,6 +508,17 @@ public class SyncTaskManager {
         FTDataStoreManager.get().delete(ids, oldCache);
     }
 
+    private void decrementCacheCount(DataType dataType, int count) {
+        if (count <= 0) {
+            return;
+        }
+        if (dataType == DataType.LOG) {
+            FTDBCachePolicy.get().optLogCount(-count);
+        } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_WEBVIEW) {
+            FTDBCachePolicy.get().optRUMCount(-count);
+        }
+    }
+
     /**
      * Reinsert data and change uuid
      *
@@ -515,6 +543,7 @@ public class SyncTaskManager {
      * @param syncCallback Asynchronous object
      */
     private synchronized void requestNet(DataType dataType, String pkgId, String body,
+                                         boolean disableServerFilter,
                                          final RequestCallback syncCallback) throws FTNetworkNoAvailableException {
         String model;
         switch (dataType) {
@@ -539,7 +568,7 @@ public class SyncTaskManager {
                 .setModel(model)
                 .setMethod(RequestMethod.POST)
                 .setBodyString(body);
-        if (FTDataFilterManager.get().shouldDisableServerFilter()) {
+        if (shouldAddDisableServerFilterParam(disableServerFilter)) {
             builder.addParam(Constants.URL_PARAM_DISABLE_FILTER, "true");
         }
         FTResponseData result = builder.executeSync();
@@ -554,6 +583,11 @@ public class SyncTaskManager {
             syncCallback.onResponse(NetCodeStatus.UNKNOWN_EXCEPTION_CODE, e.getLocalizedMessage(), "");
         }
 
+    }
+
+    private synchronized void requestNet(DataType dataType, String body,
+                                         final RequestCallback syncCallback) throws FTNetworkNoAvailableException {
+        requestNet(dataType, "", body, false, syncCallback);
     }
 
     /**
