@@ -1,3 +1,7 @@
+# replay-compose 0.1.5
+1. Fixed Session Replay upload retry handling so retryable data and resource upload failures preserve retry state and use exponential backoff, while invalid upload URL configuration is skipped until a valid endpoint is available.
+2. Replaced remaining JetBrains nullability annotations with AndroidX annotations in Session Replay code to avoid redundant annotation references.
+
 # replay 0.1.5-beta01
 1. Same as 0.1.5-alpha01
 
