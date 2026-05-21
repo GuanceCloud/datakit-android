@@ -1,3 +1,7 @@
+# replay 0.1.5-beta01
+1. Same as 0.1.5-alpha01
+
+---
 # replay 0.1.5-alpha02
 1. Fixed Session Replay upload retry handling so retryable data and resource upload failures preserve retry state and use exponential backoff, while invalid upload URL configuration is skipped until a valid endpoint is available.
 
