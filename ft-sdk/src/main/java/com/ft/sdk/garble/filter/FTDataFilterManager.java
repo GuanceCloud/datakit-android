@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FTDataFilterManager {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "DataFilterManager";
-    private static final int DEFAULT_PULL_INTERVAL_SECONDS = 30 * 60;
+    private static final int DEFAULT_PULL_INTERVAL_SECONDS = 10;
     private static volatile FTDataFilterManager instance;
 
     private final AtomicBoolean running = new AtomicBoolean(false);
@@ -55,7 +55,6 @@ public class FTDataFilterManager {
             return;
         }
         enabled = config.isEnableDataFilter();
-        pullIntervalSeconds = Math.max(1, config.getDataFilterUpdateInterval());
         lastPullTimeMs = 0;
         remotePoolTouched = false;
         localFilter = FTDataFilter.empty();

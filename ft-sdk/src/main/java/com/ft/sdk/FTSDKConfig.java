@@ -140,11 +140,6 @@ public class FTSDKConfig {
     private boolean enableDataFilter = true;
 
     /**
-     * Remote data filter update interval, unit seconds.
-     */
-    private int dataFilterUpdateInterval = 30 * 60;
-
-    /**
      * Local DataKit-compatible filter rules. Local filters are applied together with remote filters.
      */
     private final HashMap<String, String[]> dataFilters = new HashMap<>();
@@ -791,23 +786,6 @@ public class FTSDKConfig {
     }
 
     /**
-     * Set remote data filter update interval, default is 30 minutes.
-     *
-     * @param intervalSeconds interval seconds, minimum 1
-     * @return this config for chaining
-     */
-    public FTSDKConfig setDataFilterUpdateInterval(int intervalSeconds) {
-        this.dataFilterUpdateInterval = Math.max(1, intervalSeconds);
-        return this;
-    }
-    /**
-     * Returns the remote data filter update interval in seconds.
-     */
-    public int getDataFilterUpdateInterval() {
-        return dataFilterUpdateInterval;
-    }
-
-    /**
      * Set the interval time for each sync, sleep time between [0,5000]，0 default
      *
      * @param sleepTimeMs Data sync interval time
@@ -990,7 +968,6 @@ public class FTSDKConfig {
                 ", useFileDataStore=" + useFileDataStore +
                 ", fileDataStoreShadow=" + fileDataStoreShadow +
                 ", enableDataFilter=" + enableDataFilter +
-                ", dataFilterUpdateInterval=" + dataFilterUpdateInterval +
                 ", dataFilters=" + dataFilters.keySet() +
                 ", globalContext=" + globalContext +
                 ", proxy=" + proxy +

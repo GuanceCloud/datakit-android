@@ -10,14 +10,18 @@ import android.os.Looper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatCheckedTextView;
+
+import com.ft.sdk.FTSdk;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -32,11 +36,26 @@ import java.util.concurrent.Executors;
  * Used to demonstrate various UI component interactions for session replay functionality
  */
 public class SRActivity extends NameTitleActivity {
+    private static final String INVALID_UPLOAD_URL = "localhost:9529";
+    private static final String RETRYABLE_FAILURE_URL = "http://127.0.0.1:9";
+    private static final String SAMPLE_TOKEN = "sample-token";
+
+    private TextView uploadScenarioStatus;
+    private TextView replayTextView;
+    private EditText replayEditText;
+    private ImageView remoteImageView;
+    private ListView replayList;
+    private int uploadScenarioRound;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_session_replay);
+        uploadScenarioStatus = findViewById(R.id.session_replay_upload_status);
+        replayTextView = findViewById(R.id.session_replay_text_tv);
+        replayEditText = findViewById(R.id.session_replay_edittext_et);
+        remoteImageView = findViewById(R.id.remote_image_view);
+        replayList = findViewById(R.id.session_replay_list);
 
         // Set dialog button click event
         findViewById(R.id.session_replay_dialog).setOnClickListener(new View.OnClickListener() {
@@ -69,6 +88,8 @@ public class SRActivity extends NameTitleActivity {
             }
         });
 
+        setupUploadScenarioControls();
+
         // Set clickable text view click event
         AppCompatCheckedTextView appCompatCheckedTextView = findViewById(R.id.session_replay_checked_text_view);
         appCompatCheckedTextView.setOnClickListener(new View.OnClickListener() {
@@ -80,15 +101,12 @@ public class SRActivity extends NameTitleActivity {
         });
 
         // Set list view
-        ListView list = findViewById(R.id.session_replay_list);
-
         // Create list data
         SimpleAdapter adapter = getSimpleAdapter();
 
-        list.setAdapter(adapter);
+        replayList.setAdapter(adapter);
 
         // Load remote image for standalone ImageView
-        ImageView remoteImageView = findViewById(R.id.remote_image_view);
         loadImageFromUrl(remoteImageView, "https://picsum.photos/seed/standalone/200/200");
 
         // Set large image gallery button click event
@@ -106,6 +124,84 @@ public class SRActivity extends NameTitleActivity {
             }
         });
 
+    }
+
+    private void setupUploadScenarioControls() {
+        findViewById(R.id.session_replay_upload_invalid_url_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FTSdk.setDatawayUrl(INVALID_UPLOAD_URL, SAMPLE_TOKEN);
+                generateReplayFrames("invalid-url");
+                updateUploadScenarioStatus("Invalid URL set. SR uploader should skip upload and keep local batches.");
+            }
+        });
+
+        findViewById(R.id.session_replay_upload_retryable_url_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FTSdk.setDatawayUrl(RETRYABLE_FAILURE_URL, SAMPLE_TOKEN);
+                generateReplayFrames("retryable-failure");
+                updateUploadScenarioStatus("Retryable failure URL set. SR uploader should attempt upload and back off.");
+            }
+        });
+
+        findViewById(R.id.session_replay_upload_restore_url_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                restoreUploadUrl();
+                generateReplayFrames("restore-valid-url");
+            }
+        });
+
+        findViewById(R.id.session_replay_upload_generate_frames_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                generateReplayFrames("manual-generate");
+                updateUploadScenarioStatus("Generated SR frame changes. Wait for the SR upload scheduler to run.");
+            }
+        });
+    }
+
+    private void restoreUploadUrl() {
+        if (hasBuildConfigValue(BuildConfig.DATAWAY_URL) && hasBuildConfigValue(BuildConfig.CLIENT_TOKEN)) {
+            FTSdk.setDatawayUrl(BuildConfig.DATAWAY_URL, BuildConfig.CLIENT_TOKEN);
+            updateUploadScenarioStatus("Restored BuildConfig DATAWAY_URL. Kept SR batches should upload on the next scheduler run.");
+        } else if (hasBuildConfigValue(BuildConfig.DATAKIT_URL)) {
+            FTSdk.setDatakitUrl(BuildConfig.DATAKIT_URL);
+            updateUploadScenarioStatus("Restored BuildConfig DATAKIT_URL. Kept SR batches should upload on the next scheduler run.");
+        } else {
+            updateUploadScenarioStatus("No valid BuildConfig upload URL found. Check local.properties before restoring.");
+        }
+    }
+
+    private boolean hasBuildConfigValue(String value) {
+        return value != null
+                && value.trim().length() > 0
+                && !"null".equalsIgnoreCase(value.trim());
+    }
+
+    private void generateReplayFrames(String reason) {
+        uploadScenarioRound++;
+        String message = "SR upload scenario " + uploadScenarioRound + ": " + reason
+                + " at " + System.currentTimeMillis();
+        replayTextView.setText(message);
+        replayEditText.setText("Replay input " + uploadScenarioRound + " / " + reason);
+        CustomToast.showToast(this, "SR frame: " + reason, 1000);
+        if (remoteImageView != null) {
+            loadImageFromUrl(remoteImageView,
+                    "https://picsum.photos/seed/sr-upload-" + uploadScenarioRound + "/200/200");
+        }
+        if (replayList != null && replayList.getAdapter() != null && replayList.getAdapter().getCount() > 0) {
+            replayList.smoothScrollToPosition(Math.min(uploadScenarioRound,
+                    replayList.getAdapter().getCount() - 1));
+        }
+    }
+
+    private void updateUploadScenarioStatus(String status) {
+        if (uploadScenarioStatus != null) {
+            uploadScenarioStatus.setText(status);
+        }
+        Toast.makeText(this, status, Toast.LENGTH_LONG).show();
     }
 
     @NonNull

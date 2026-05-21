@@ -1,67 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/manual_start_action_btn"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Action Start" />
+        android:orientation="vertical">
 
-    <Button
-        android:id="@+id/manual_view_start_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="View Start" />
+        <Button
+            android:id="@+id/manual_start_action_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Action Start" />
 
-    <Button
-        android:id="@+id/manual_view_stop_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="View Stop" />
+        <Button
+            android:id="@+id/manual_view_start_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="View Start" />
 
-    <Button
-        android:id="@+id/manual_resource_start_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Resource Start" />
+        <Button
+            android:id="@+id/manual_view_stop_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="View Stop" />
 
-    <Button
-        android:id="@+id/manual_resource_stop_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Resource Stop" />
+        <Button
+            android:id="@+id/manual_resource_start_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Resource Start" />
 
-    <Button
-        android:id="@+id/manual_filter_resource_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Data Filter Resource" />
+        <Button
+            android:id="@+id/manual_resource_stop_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Resource Stop" />
 
-    <Button
-        android:id="@+id/manual_filter_log_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Data Filter Log" />
+        <Button
+            android:id="@+id/manual_filter_pull_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Datakit Filter Pull" />
 
-    <Button
-        android:id="@+id/manual_error_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Error" />
+        <Button
+            android:id="@+id/manual_filter_resource_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Data Filter Synthetic Resource" />
 
-    <Button
-        android:id="@+id/manual_longtask_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="LongTask" />
+        <Button
+            android:id="@+id/manual_filter_real_resource_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Data Filter Real OkHttp Resource" />
 
-    <Button
-        android:id="@+id/manual_log_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="log" />
+        <Button
+            android:id="@+id/manual_filter_log_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Data Filter Log" />
 
-</LinearLayout>
+        <Button
+            android:id="@+id/manual_error_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Error" />
+
+        <Button
+            android:id="@+id/manual_longtask_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="LongTask" />
+
+        <Button
+            android:id="@+id/manual_log_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="log" />
+
+    </LinearLayout>
+</ScrollView>

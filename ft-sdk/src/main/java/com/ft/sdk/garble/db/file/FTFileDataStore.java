@@ -309,21 +309,42 @@ public class FTFileDataStore implements FTDataStore {
         try {
             paths.ensureReady();
             File marker = getDbFlatMigrationMarker();
-            if (marker.exists()) {
-                return;
-            }
-            if (!syncStore.isEmpty()) {
-                FTAtomicFileHelper.writeUtf8(marker, String.valueOf(System.currentTimeMillis()));
-                return;
-            }
             List<SyncData> dbData = FTDBManager.get().queryDataByDescLimit(0, false);
-            if (!dbData.isEmpty()) {
-                syncStore.insertMigratedData(dbData);
+            if (dbData.isEmpty()) {
+                LogUtils.d(TAG, "migrateCurrentDbCacheIfNeeded skipped: DB flat cache is empty");
+                return;
             }
-            FTAtomicFileHelper.writeUtf8(marker, String.valueOf(System.currentTimeMillis()));
+            String migrationState = buildDbFlatMigrationState(dbData);
+            if (marker.exists() && migrationState.equals(FTAtomicFileHelper.readUtf8(marker))) {
+                return;
+            }
+            if (syncStore.isEmpty()) {
+                syncStore.insertMigratedData(dbData);
+            } else {
+                syncStore.appendMissingMigratedData(dbData);
+            }
+            FTAtomicFileHelper.writeUtf8(marker, migrationState);
         } catch (Exception e) {
             LogUtils.e(TAG, "migrateCurrentDbCacheIfNeeded failed: " + e.getMessage());
         }
+    }
+
+    private String buildDbFlatMigrationState(List<SyncData> list) {
+        long maxId = 0;
+        long hash = 1125899906842597L;
+        for (SyncData data : list) {
+            maxId = Math.max(maxId, data.getId());
+            hash = 31 * hash + data.getId();
+            hash = 31 * hash + data.getTime();
+            hash = 31 * hash + stringHash(data.getUuid());
+            hash = 31 * hash + data.getDataType().getValue().hashCode();
+            hash = 31 * hash + stringHash(data.getDataString());
+        }
+        return list.size() + ":" + maxId + ":" + hash;
+    }
+
+    private int stringHash(String value) {
+        return value == null ? 0 : value.hashCode();
     }
 
     private File getDbFlatMigrationMarker() {

@@ -1,5 +1,5 @@
 # agent 1.7.2-alpha03
-1. Added DataKit-compatible data filtering for Logging and RUM, enabled by default through `FTSDKConfig.setEnableDataFilter`, with local rules via `setDataFilters` and remote filter pulls controlled by `setDataFilterUpdateInterval`.
+1. Added DataKit-compatible data filtering for Logging and RUM, enabled by default through `FTSDKConfig.setEnableDataFilter`, with local rules via `setDataFilters` and remote filter pulls scheduled by the server `pull_interval` with a 10-second SDK fallback.
 2. Applied data filters after `LineDataModifier` and before local cache writes, and aligned supported filter operators with `in`, `not in`, `match`, and `not match`.
 3. Optimized data synchronization to prioritize RUM data over logs and isolate retry/backoff state by data type, reducing cases where log uploads delay RUM synchronization.
 4. Fixed RUM Resource duration handling so custom Resource properties no longer override SDK-calculated duration values, and invalid fallback durations are clamped to non-negative values.

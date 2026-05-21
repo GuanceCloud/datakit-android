@@ -31,7 +31,27 @@ public class LineDataFilterIntegrationTest {
         FTSDKConfig config = FTSDKConfig.builder();
 
         Assert.assertTrue(config.isEnableDataFilter());
-        Assert.assertEquals(30 * 60, config.getDataFilterUpdateInterval());
+    }
+
+    @Test
+    public void dataFilterUsesTenSecondFallbackBeforeRemoteInterval() throws Exception {
+        FTDataFilterManager.get().init(FTSDKConfig.builder().setEnableDataFilter(true));
+
+        Assert.assertEquals(10, getPullIntervalSeconds());
+    }
+
+    @Test
+    public void serverPullIntervalIsParsedAsRemoteSchedule() throws Exception {
+        Method parseRemoteFilter = FTDataFilterManager.class
+                .getDeclaredMethod("parseRemoteFilter", String.class);
+        parseRemoteFilter.setAccessible(true);
+
+        Object remoteConfig = parseRemoteFilter.invoke(FTDataFilterManager.get(),
+                "{\"filters\":{\"logging\":[]},\"pull_interval\":\"2m\"}");
+        Field interval = remoteConfig.getClass().getDeclaredField("pullIntervalSeconds");
+        interval.setAccessible(true);
+
+        Assert.assertEquals(120, interval.getInt(remoteConfig));
     }
 
     @Test
@@ -227,6 +247,12 @@ public class LineDataFilterIntegrationTest {
         Field remoteFilterState = FTDataFilterManager.class.getDeclaredField("remoteFilterState");
         remoteFilterState.setAccessible(true);
         remoteFilterState.set(manager, state);
+    }
+
+    private int getPullIntervalSeconds() throws Exception {
+        Field pullIntervalSeconds = FTDataFilterManager.class.getDeclaredField("pullIntervalSeconds");
+        pullIntervalSeconds.setAccessible(true);
+        return pullIntervalSeconds.getInt(FTDataFilterManager.get());
     }
 
     private SyncData syncData(long id, String lineProtocol) {

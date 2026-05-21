@@ -278,6 +278,40 @@ public class FTSyncFileDataStore {
         replaceAll(list);
     }
 
+    public void appendMissingMigratedData(final List<SyncData> list) {
+        if (list == null || list.isEmpty()) {
+            return;
+        }
+        try {
+            lock.withLock(new FTFileLock.LockedOperation<Void>() {
+                @Override
+                public Void run() throws Exception {
+                    paths.ensureReady();
+                    ArrayList<SyncRecord> existingRecords = readRecords();
+                    Set<String> existingKeys = new HashSet<>();
+                    for (SyncRecord record : existingRecords) {
+                        existingKeys.add(migrationKey(record.data));
+                    }
+
+                    long nextId = readNextId();
+                    for (SyncData data : list) {
+                        String key = migrationKey(data);
+                        if (existingKeys.contains(key)) {
+                            continue;
+                        }
+                        data.setId(nextId++);
+                        writeRecord(getRecordFile(data.getId()), data);
+                        existingKeys.add(key);
+                    }
+                    writeNextId(nextId);
+                    return null;
+                }
+            });
+        } catch (Exception e) {
+            LogUtils.e(TAG, "appendMissingMigratedData failed: " + e.getMessage());
+        }
+    }
+
     public void replaceAll(final List<SyncData> list) {
         try {
             lock.withLock(new FTFileLock.LockedOperation<Void>() {
@@ -302,6 +336,16 @@ public class FTSyncFileDataStore {
         } catch (Exception e) {
             LogUtils.e(TAG, "replaceAll failed: " + e.getMessage());
         }
+    }
+
+    private String migrationKey(SyncData data) {
+        if (data == null) {
+            return "";
+        }
+        if (!Utils.isNullOrEmpty(data.getUuid())) {
+            return "uuid:" + data.getUuid();
+        }
+        return "data:" + data.getDataType() + ":" + data.getTime() + ":" + data.getDataString();
     }
 
     private List<SyncData> queryRecords(final int limit, final DataType[] types, final boolean asc) {
