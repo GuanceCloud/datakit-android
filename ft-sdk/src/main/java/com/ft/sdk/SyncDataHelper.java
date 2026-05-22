@@ -4,6 +4,7 @@ import static com.ft.sdk.garble.utils.Constants.FT_KEY_VALUE_NULL;
 import static com.ft.sdk.garble.utils.Constants.KEY_SDK_DATA_FLAG;
 
 import com.ft.sdk.garble.bean.DataType;
+import com.ft.sdk.garble.filter.FTDataFilterManager;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.PackageUtils;
@@ -137,33 +138,32 @@ public class SyncDataHelper {
 
 
     /**
-     * Replace a single data entry
-     *
-     * @param measurement
-     * @param tags
-     * @param fields
+     * Apply user line modifier first, then apply local and remote filters on the final data.
      */
-    void appLineModifier(String measurement, HashMap<String, Object> tags, HashMap<String, Object> fields) {
-        if (lineDataModifier == null) return;
-        HashMap<String, Object> mergedValues = new HashMap<>();
-        mergedValues.putAll(tags);
-        mergedValues.putAll(fields);
-        Map<String, Object> changedValues = lineDataModifier.modify(measurement, mergedValues);
-        if (changedValues != null) {
-            for (Map.Entry<String, Object> entry : changedValues.entrySet()) {
-                String key = entry.getKey();
-                Object value = entry.getValue();
-                if (tags.containsKey(key)) {
-                    if (value != null) {
-                        tags.put(key, value);
-                    }
-                } else if (fields.containsKey(key)) {
-                    if (value != null) {
-                        fields.put(key, value);
+    boolean appLineModifier(DataType dataType, String measurement, String uuid,
+                            HashMap<String, Object> tags, HashMap<String, Object> fields) {
+        if (lineDataModifier != null) {
+            HashMap<String, Object> mergedValues = new HashMap<>();
+            mergedValues.putAll(tags);
+            mergedValues.putAll(fields);
+            Map<String, Object> changedValues = lineDataModifier.modify(measurement, mergedValues);
+            if (changedValues != null) {
+                for (Map.Entry<String, Object> entry : changedValues.entrySet()) {
+                    String key = entry.getKey();
+                    Object value = entry.getValue();
+                    if (tags.containsKey(key)) {
+                        if (value != null) {
+                            tags.put(key, value);
+                        }
+                    } else if (fields.containsKey(key)) {
+                        if (value != null) {
+                            fields.put(key, value);
+                        }
                     }
                 }
             }
         }
+        return FTDataFilterManager.get().isFiltered(dataType, measurement, uuid, tags, fields);
     }
 
     /**
@@ -286,7 +286,9 @@ public class SyncDataHelper {
                     mergeTags.putAll(rumTags);
                 }
             }
-            appLineModifier(measurement, mergeTags, fields);
+            if (appLineModifier(dataType, measurement, uuid, mergeTags, fields)) {
+                return "";
+            }
             bodyContent = convertToLineProtocolLine(measurement, mergeTags, fields,
                     timeStamp, config);
         } else if (dataType == DataType.RUM_APP || dataType == DataType.RUM_APP_ERROR_SAMPLED
@@ -317,7 +319,9 @@ public class SyncDataHelper {
                     }
                 }
             }
-            appLineModifier(measurement, mergeTags, fields);
+            if (appLineModifier(dataType, measurement, uuid, mergeTags, fields)) {
+                return "";
+            }
             bodyContent = convertToLineProtocolLine(measurement, mergeTags, fields, timeStamp, config);
         } else {
             bodyContent = "";

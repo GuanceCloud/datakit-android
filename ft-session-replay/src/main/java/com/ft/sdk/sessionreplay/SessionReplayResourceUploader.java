@@ -82,7 +82,9 @@ public class SessionReplayResourceUploader implements IUploader {
         ExistingFilesCheckResult existingFilesResult = checkExistingFiles(appId, fileNames);
         if (!existingFilesResult.isSuccess()) {
             internalLogger.w(TAG, "Skip resource upload because checking existing files failed");
-            return UploadResult.createErrorResult();
+            return existingFilesResult.getFailureResult() != null
+                    ? existingFilesResult.getFailureResult()
+                    : UploadResult.createErrorResult();
         }
 
         List<RawBatchEvent> filesNeedUpload = new ArrayList<>();
@@ -130,17 +132,18 @@ public class SessionReplayResourceUploader implements IUploader {
                     internalLogger.d(TAG, "Check existing files response: " + result.getResponse());
                 } catch (Exception e) {
                     internalLogger.e(TAG, "Parse check response error: " + e.getMessage(), e);
-                    return new ExistingFilesCheckResult(false, existingFiles);
+                    return new ExistingFilesCheckResult(false, existingFiles, null);
                 }
-                return new ExistingFilesCheckResult(true, existingFiles);
+                return new ExistingFilesCheckResult(true, existingFiles, null);
             } else {
                 internalLogger.w(TAG, "Check existing files failed or returned null: "
                         + (result != null ? result.getResponse() : "null"));
-                return new ExistingFilesCheckResult(false, existingFiles);
+                return new ExistingFilesCheckResult(false, existingFiles,
+                        result != null && result.isNeedReTry() ? result : null);
             }
         }
 
-        return new ExistingFilesCheckResult(false, existingFiles);
+        return new ExistingFilesCheckResult(false, existingFiles, null);
     }
 
     /**
@@ -171,14 +174,21 @@ public class SessionReplayResourceUploader implements IUploader {
     private static class ExistingFilesCheckResult {
         private final boolean success;
         private final List<String> existingFiles;
+        private final UploadResult failureResult;
 
-        private ExistingFilesCheckResult(boolean success, List<String> existingFiles) {
+        private ExistingFilesCheckResult(boolean success, List<String> existingFiles,
+                                         UploadResult failureResult) {
             this.success = success;
             this.existingFiles = existingFiles;
+            this.failureResult = failureResult;
         }
 
         private boolean isSuccess() {
             return success;
+        }
+
+        private UploadResult getFailureResult() {
+            return failureResult;
         }
     }
 }

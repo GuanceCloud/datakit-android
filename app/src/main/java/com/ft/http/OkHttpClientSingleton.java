@@ -1,11 +1,11 @@
 package com.ft.http;
 
+import androidx.annotation.NonNull;
+
 import com.ft.sdk.FTResourceEventListener;
 import com.ft.sdk.FTResourceInterceptor;
 import com.ft.sdk.FTTraceInterceptor;
 import com.ft.sdk.garble.utils.LogUtils;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 
@@ -28,7 +28,7 @@ public class OkHttpClientSingleton {
             instance = new OkHttpClient.Builder()
                     .eventListener(new EventListener() {
                         @Override
-                        public void callStart(@NotNull Call call) {
+                        public void callStart(@NonNull Call call) {
                             super.callStart(call);
                             LogUtils.d("RequestUtil", "custom EventListener");
                         }

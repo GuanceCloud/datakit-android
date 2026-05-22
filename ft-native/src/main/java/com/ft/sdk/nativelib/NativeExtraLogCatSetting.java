@@ -23,14 +23,23 @@ public class NativeExtraLogCatSetting {
         this.logcatEventsLines = Math.min(Math.max(logcatEventsLines, MINI_LINES), MAX_LINES);
     }
 
+    /**
+     * Returns the number of main logcat buffer lines captured.
+     */
     public int getLogcatMainLines() {
         return logcatMainLines;
     }
 
+    /**
+     * Returns the number of system logcat buffer lines captured.
+     */
     public int getLogcatSystemLines() {
         return logcatSystemLines;
     }
 
+    /**
+     * Returns the number of events logcat buffer lines captured.
+     */
     public int getLogcatEventsLines() {
         return logcatEventsLines;
     }

@@ -175,9 +175,9 @@ public class BatchesToSegmentsMapper {
     }
 
     private SessionReplayRumContext extractRumContext(JsonObject jsonObject) {
-        String applicationId = jsonObject.has(EnrichedRecord.APPLICATION_ID_KEY) ? jsonObject.get(EnrichedRecord.APPLICATION_ID_KEY).getAsString() : null;
-        String sessionId = jsonObject.has(EnrichedRecord.SESSION_ID_KEY) ? jsonObject.get(EnrichedRecord.SESSION_ID_KEY).getAsString() : null;
-        String viewId = jsonObject.has(EnrichedRecord.VIEW_ID_KEY) ? jsonObject.get(EnrichedRecord.VIEW_ID_KEY).getAsString() : null;
+        String applicationId = getString(jsonObject, EnrichedRecord.APPLICATION_ID_KEY, "applicationID");
+        String sessionId = getString(jsonObject, EnrichedRecord.SESSION_ID_KEY, "sessionID");
+        String viewId = getString(jsonObject, EnrichedRecord.VIEW_ID_KEY, "viewID");
 
         // get globalContext
         ConcurrentHashMap<String, Object> globalContext = new ConcurrentHashMap<>();
@@ -206,6 +206,17 @@ public class BatchesToSegmentsMapper {
         }
 
         return new SessionReplayRumContext(applicationId, sessionId, viewId, globalContext);
+    }
+
+
+    private String getString(JsonObject jsonObject, String primaryKey, String fallbackKey) {
+        if (jsonObject.has(primaryKey)) {
+            return jsonObject.get(primaryKey).getAsString();
+        }
+        if (jsonObject.has(fallbackKey)) {
+            return jsonObject.get(fallbackKey).getAsString();
+        }
+        return null;
     }
 
     // endregion

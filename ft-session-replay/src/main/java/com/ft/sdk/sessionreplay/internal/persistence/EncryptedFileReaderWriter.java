@@ -6,7 +6,7 @@ import com.ft.sdk.sessionreplay.utils.InternalLogger;
 
 import java.io.File;
 
-public class EncryptedFileReaderWriter implements FileReaderWriter {
+public class EncryptedFileReaderWriter extends FileReaderWriter {
     private static final String TAG = "EncryptedFileReaderWrit";
     private final Encryption encryption;
     private final FileReaderWriter delegate;

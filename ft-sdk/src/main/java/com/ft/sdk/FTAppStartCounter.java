@@ -1,6 +1,8 @@
 package com.ft.sdk;
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.Application;
 import android.view.View;
 
 import com.ft.sdk.garble.utils.Constants;
@@ -75,6 +77,11 @@ class FTAppStartCounter {
      * Duration from first Activity preOnCreate() to first frame drawn, unit: nanoseconds
      */
     private long firsDrawnDuration = 0;
+
+    /**
+     * Whether the process was started while the app was not in foreground.
+     */
+    private boolean launchFromBackground = false;
 
 
     private FTAppStartCounter() {
@@ -161,7 +168,8 @@ class FTAppStartCounter {
         FTAutoTrack.putRUMLaunchPerformance(true, coldStartDuration, coldStartTimeLine,
                 preApplicationInit,
                 applicationInit,
-                firstFrameInit);
+                firstFrameInit,
+                launchFromBackground);
         coldStartDuration = 0;
     }
 
@@ -193,11 +201,22 @@ class FTAppStartCounter {
      *
      * @param nanoTimeLine Application.onCreate() timestamp, unit: nanoseconds
      */
-    void appOnCreate(long nanoTimeLine) {
+    void appOnCreate(long nanoTimeLine, Application application) {
         if (!firstDrawDone.get()) {
             LogUtils.d(TAG, "appOnCreate:" + nanoTimeLine);
             applicationOnCreateTimeLine = nanoTimeLine;
+            launchFromBackground = isLaunchFromBackground(application);
         }
+    }
+
+    private boolean isLaunchFromBackground(Application application) {
+        if (application == null) {
+            return false;
+        }
+        ActivityManager.RunningAppProcessInfo processInfo =
+                new ActivityManager.RunningAppProcessInfo();
+        ActivityManager.getMyMemoryState(processInfo);
+        return processInfo.importance > ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND;
     }
 
 

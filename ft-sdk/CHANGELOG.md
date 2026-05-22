@@ -1,3 +1,40 @@
+# agent 1.7.2
+1. Added DataKit-compatible data filtering for Logging and RUM data, enabled by default and configurable with `FTSDKConfig.setEnableDataFilter(false)`.
+2. Added `FTSDKConfig.setDataFilters` to configure local filter rules and the remote filter pull interval; filters run after `LineDataModifier` and before local cache writes.
+3. Added generic cache size limit APIs, including `FTSDKConfig.enableLimitWithCacheSize`, `FTSDKConfig.setCacheDiscard`, and `CacheDiscard`; the previous `enableLimitWithDbSize` and `setDbCacheDiscard` APIs remain compatible but are deprecated in favor of the new APIs.
+4. Added file-backed cache support for sync cache and RUM aggregate data, with a migration path for existing cache data.
+5. Removed the hard dependency from `ft-sdk` to `ft-session-replay`, so apps that do not enable Session Replay no longer need to add the `ft-session-replay` dependency.
+6. Added `app_launch_type` to cold-start Action data to distinguish foreground and background launches.
+7. Added real RUM fallback View data for `ApplicationLaunch`, `BackgroundView`, and `RootView`, so startup, background, and RUM events without a foreground View can be associated with a random `view_id`.
+8. Optimized data synchronization to prioritize RUM data and isolate retry/backoff state by data type, reducing cases where log synchronization affects RUM data reporting.
+9. Fixed custom Resource properties potentially overriding the SDK-calculated `duration`, and clamped fallback duration values to be non-negative.
+10. Fixed Session Replay upload retry handling and upload URL validation to avoid repeated uploads to invalid endpoints and apply backoff to retryable failures.
+
+# agent 1.7.2-beta01
+1. Fix data filter polling and file cache migration
+
+# agent 1.7.2-alpha03
+1. Added DataKit-compatible data filtering for Logging and RUM, enabled by default through `FTSDKConfig.setEnableDataFilter`, with local rules via `setDataFilters` and remote filter pulls scheduled by the server `pull_interval` with a 10-second SDK fallback.
+2. Applied data filters after `LineDataModifier` and before local cache writes, and aligned supported filter operators with `in`, `not in`, `match`, and `not match`.
+3. Optimized data synchronization to prioritize RUM data over logs and isolate retry/backoff state by data type, reducing cases where log uploads delay RUM synchronization.
+4. Added real RUM fallback View data for `ApplicationLaunch`, `BackgroundView`, and `RootView` contexts, so startup, background, and orphan RUM events use random View IDs backed by View summary records.
+5. Fixed RUM Resource duration handling so custom Resource properties no longer override SDK-calculated duration values, and invalid fallback durations are clamped to non-negative values.
+6. Fixed Session Replay upload retry handling and upload URL validation so retryable failures back off correctly and invalid upload endpoints do not trigger repeated upload attempts.
+7. Fixed DataKit filter bypass marking so cached rows are rechecked by the current SDK-supported remote filter config before Datakit uploads send `disable_filter=true`.
+
+---
+# agent 1.7.2-alpha02
+1. Replaced remaining JetBrains nullability annotations in core SDK code with AndroidX annotations to keep Android integration signatures consistent and avoid redundant annotation references.
+
+---
+# agent 1.7.2-alpha01
+1. Added opt-in file-backed storage for sync cache and RUM aggregate data, with file cache size enforcement and a shadow-write migration path.
+2. Added generic cache size configuration APIs, including `enableLimitWithCacheSize`, `setCacheDiscard`, and `CacheDiscard`, while keeping the previous DB cache APIs deprecated for compatibility.
+3. Made Session Replay optional for `ft-sdk`, allowing apps to use the core SDK without adding `ft-session-replay` to the classpath.
+4. Added `app_launch_type` to cold-start launch actions to distinguish foreground and background app starts.
+5. Added exponential backoff for ignored `403` and `429` data synchronization responses while preserving the existing cache cleanup behavior.
+
+---
 # agent 1.7.1
 1. Added `view_long_task_rate` to View RUM metrics. The value is calculated from total LongTask duration divided by View duration, and is capped at `1`.
 2. Added `foreground_crash_free_duration` and `background_crash_free_duration` to crash RUM Error metrics, and aligned pre-crash/native crash reporting with foreground/background duration snapshots.

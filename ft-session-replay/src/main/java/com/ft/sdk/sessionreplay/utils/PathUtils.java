@@ -8,13 +8,13 @@ import android.graphics.Path;
 import android.graphics.PathMeasure;
 import android.graphics.RectF;
 
+import androidx.annotation.Nullable;
+
 import com.ft.sdk.sessionreplay.internal.recorder.resources.BitmapCachesManager;
 import com.ft.sdk.sessionreplay.internal.recorder.resources.HashGenerator;
 import com.ft.sdk.sessionreplay.internal.recorder.resources.MD5HashGenerator;
 import com.ft.sdk.sessionreplay.internal.wrappers.BitmapWrapper;
 import com.ft.sdk.sessionreplay.internal.wrappers.CanvasWrapper;
-
-import org.jetbrains.annotations.Nullable;
 
 public class PathUtils {
     private final InternalLogger logger;

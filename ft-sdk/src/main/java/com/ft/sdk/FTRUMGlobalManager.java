@@ -15,6 +15,9 @@ public class FTRUMGlobalManager {
         private static final FTRUMGlobalManager INSTANCE = new FTRUMGlobalManager();
     }
 
+    /**
+     * Returns the singleton used to manually report RUM view, action, resource, error, and long task data.
+     */
     public static FTRUMGlobalManager get() {
         return FTRUMGlobalManager.SingletonHolder.INSTANCE;
     }
@@ -173,8 +176,9 @@ public class FTRUMGlobalManager {
     }
 
     /**
-     *  update the loading_time of view, unit nanosecond
-     * @param duration
+     * Update the loading_time of the current view.
+     *
+     * @param duration loading time in nanoseconds
      */
     public void updateLoadTime(long duration) {
         if (innerManager != null) {

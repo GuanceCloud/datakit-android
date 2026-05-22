@@ -83,6 +83,7 @@ public class DemoApplication extends BaseApplication {
                 .setNeedTransformOldCache(true)
                 .setCompressIntakeRequests(true)
                 .setSyncSleepTime(100)
+                .setEnableDataFilter(true)
                 .setRemoteConfiguration(true)
                 .setRemoteConfigurationCallBack(new FTRemoteConfigManager.FetchResult() {
                     @Override
@@ -118,8 +119,9 @@ public class DemoApplication extends BaseApplication {
 //                        return value;
 //                    }
 //                })
-//                .enableLimitWithDbSize(1024 * 1024)
-//                .setDbCacheDiscard(DBCacheDiscard.DISCARD_OLDEST)
+//                .enableLimitWithCacheSize(1024 * 1024)
+//                .setCacheDiscard(CacheDiscard.DISCARD_OLDEST)
+//                .enableFileDataStore()
 //                .setLineDataModifier(new LineDataModifier() {
 //                    @Override
 //                    public Map<String, Object> modify(String measurement, HashMap<String, Object> data) {

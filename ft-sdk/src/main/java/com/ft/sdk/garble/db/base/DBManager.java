@@ -34,12 +34,12 @@ public abstract class DBManager {
     private final AtomicInteger openCounter = new AtomicInteger(0);
     private final AtomicLong lastUsedTime = new AtomicLong(0);
     private static final long IDLE_TIMEOUT = 20_000;// 20 seconds
-    private static final long DB_SIZE_CHECK_INTERVAL = 10_000; // Database size check interval: 10 seconds
-    private long lastDbSizeCheckTime = 0;
+    private static final long CACHE_SIZE_CHECK_INTERVAL = 10_000; // Cache size check interval: 10 seconds
+    private long lastCacheSizeCheckTime = 0;
 
     private ScheduledFuture<?> pendingCloseTask;
 
-    // Database size cache
+    // SQLite page size cache
     private long pageSize = 0;
 
     protected abstract SQLiteOpenHelper initDataBaseHelper();
@@ -90,9 +90,9 @@ public abstract class DBManager {
                     executeReadOperation(db, callback);
                 }
 
-                // Optimize database size check frequency
-                if (write && shouldCheckDatabaseSize()) {
-                    checkDatabaseSize(db);
+                // Optimize cache size check frequency
+                if (write && shouldCheckCacheSize()) {
+                    checkCacheSize(db);
                 }
             }
         } catch (Exception e) {
@@ -133,27 +133,27 @@ public abstract class DBManager {
     }
 
     /**
-     * Determine if database size check is needed
+     * Determine if cache size check is needed
      */
-    private boolean shouldCheckDatabaseSize() {
+    private boolean shouldCheckCacheSize() {
         long currentTime = System.currentTimeMillis();
-        if (currentTime - lastDbSizeCheckTime > DB_SIZE_CHECK_INTERVAL) {
-            lastDbSizeCheckTime = currentTime;
+        if (currentTime - lastCacheSizeCheckTime > CACHE_SIZE_CHECK_INTERVAL) {
+            lastCacheSizeCheckTime = currentTime;
             return true;
         }
         return false;
     }
 
     /**
-     * Calculate the current db size by getting page_size * page_count through PRAGMA
+     * Calculate the current cache size by getting page_size * page_count through PRAGMA
      *
      * @param db
      */
-    private void checkDatabaseSize(SQLiteDatabase db) {
+    private void checkCacheSize(SQLiteDatabase db) {
         if (db != null) {
-            // Get database file size
+            // Get SQLite file size
 //            File dbFile = new File(db.getPath());
-            if (enableDBSizeLimit()) {
+            if (enableCacheSizeLimit()) {
 
                 if (pageSize <= 0) {
                     Cursor cursor = db.rawQuery("PRAGMA page_size;", null);
@@ -175,14 +175,14 @@ public abstract class DBManager {
                 }
                 long fileSize = pageCount * pageSize; // File size (bytes)
                 // If limit is exceeded, perform cleanup operation
-                onDBSizeCacheChange(db, fileSize);
+                onCacheSizeChange(db, fileSize);
             }
         }
     }
 
-    protected abstract boolean enableDBSizeLimit();
+    protected abstract boolean enableCacheSizeLimit();
 
-    protected abstract void onDBSizeCacheChange(SQLiteDatabase db, long reachLimit);
+    protected abstract void onCacheSizeChange(SQLiteDatabase db, long fileSize);
 
     /**
      * Close db

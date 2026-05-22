@@ -182,6 +182,16 @@ public class Constants {
     public static final String URL_ENV_VARIABLE = "v1/env_variable";
 
     /**
+     * DataKit center configuration pull address, used for filters.
+     */
+    public static final String URL_DATAKIT_PULL = "v1/datakit/pull";
+
+    /**
+     * URL query parameter used to tell server-side intake that SDK-side filters have been applied.
+     */
+    public static final String URL_PARAM_DISABLE_FILTER = "disable_filter";
+
+    /**
      * Default service name, field service
      */
     public static final String DEFAULT_SERVICE_NAME = "df_rum_android";
@@ -208,9 +218,25 @@ public class Constants {
     /**
      * Set total cache size limit
      */
-    public static final int DEFAULT_DB_SIZE_LIMIT = 104857600;//100MB
-    public static final int MINI_DB_SIZE_LIMIT = 31457280;//30MB
-    public static final int DB_OLD_CACHE_REMOVE_COUNT = 100;
+    public static final int DEFAULT_CACHE_SIZE_LIMIT = 104857600;//100MB
+    public static final int MINI_CACHE_SIZE_LIMIT = 31457280;//30MB
+    public static final int CACHE_OLD_DATA_REMOVE_COUNT = 100;
+
+    /**
+     * @deprecated Use {@link #DEFAULT_CACHE_SIZE_LIMIT}.
+     */
+    @Deprecated
+    public static final int DEFAULT_DB_SIZE_LIMIT = DEFAULT_CACHE_SIZE_LIMIT;
+    /**
+     * @deprecated Use {@link #MINI_CACHE_SIZE_LIMIT}.
+     */
+    @Deprecated
+    public static final int MINI_DB_SIZE_LIMIT = MINI_CACHE_SIZE_LIMIT;
+    /**
+     * @deprecated Use {@link #CACHE_OLD_DATA_REMOVE_COUNT}.
+     */
+    @Deprecated
+    public static final int DB_OLD_CACHE_REMOVE_COUNT = CACHE_OLD_DATA_REMOVE_COUNT;
 
 
 //    public static final String KEY_EVENT_ID = "event_id";
@@ -678,6 +704,18 @@ public class Constants {
      * View root path default value
      */
     public static final String VIEW_NAME_ROOT = "root";
+    /**
+     * Fallback view name used when RUM data has no valid foreground View context.
+     */
+    public static final String VIEW_NAME_ROOT_FALLBACK = "RootView";
+    /**
+     * Virtual view name used for RUM data generated during application launch.
+     */
+    public static final String VIEW_NAME_APPLICATION_LAUNCH = "ApplicationLaunch";
+    /**
+     * Virtual view name used for RUM data generated after the app enters background.
+     */
+    public static final String VIEW_NAME_BACKGROUND = "BackgroundView";
 
     /**
      * Page load time
@@ -749,6 +787,15 @@ public class Constants {
      * Represents the time from first Activity preOnCreate() to first frame drawn
      */
     public static final String KEY_RUM_APP_FIRST_FRAME_INIT_TIME ="app_first_frame_init_time";
+
+    /**
+     * App launch type for cold start actions.
+     */
+    public static final String KEY_RUM_APP_LAUNCH_TYPE = "app_launch_type";
+
+    public static final String APP_LAUNCH_TYPE_FOREGROUND = "foreground";
+
+    public static final String APP_LAUNCH_TYPE_BACKGROUND = "background";
 
     /**
      * Action cycle content long duration count statistics, {@link Constants#FT_MEASUREMENT_RUM_LONG_TASK}

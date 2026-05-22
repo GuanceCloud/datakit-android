@@ -5,8 +5,10 @@ import static com.ft.sdk.feature.Feature.SESSION_REPLAY_RESOURCES_FEATURE_NAME;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
 
 import com.ft.sdk.api.TrackingConsentProvider;
+import com.ft.sdk.feature.DataConsumerCallback;
 import com.ft.sdk.feature.Feature;
 import com.ft.sdk.feature.FeatureContextUpdateReceiver;
 import com.ft.sdk.feature.FeatureEventReceiver;
@@ -19,14 +21,21 @@ import com.ft.sdk.sessionreplay.SessionInnerLogger;
 import com.ft.sdk.sessionreplay.SessionReplayFeature;
 import com.ft.sdk.sessionreplay.internal.SessionReplayRecordCallback;
 import com.ft.sdk.sessionreplay.internal.persistence.TrackingConsent;
+import com.ft.sdk.sessionreplay.internal.processor.EnrichedResource;
+import com.ft.sdk.sessionreplay.internal.recorder.resources.MD5HashGenerator;
+import com.ft.sdk.sessionreplay.internal.recorder.resources.WebPImageCompression;
+import com.ft.sdk.sessionreplay.internal.storage.EventType;
 import com.ft.sdk.sessionreplay.internal.storage.NoOpRecordWriter;
+import com.ft.sdk.sessionreplay.internal.storage.RawBatchEvent;
 import com.ft.sdk.sessionreplay.internal.storage.RecordWriter;
 import com.ft.sdk.sessionreplay.utils.InternalLogger;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
@@ -62,6 +71,8 @@ public class SessionReplayManager implements FeatureSdkCore {
     private SessionReplayFeature sessionReplayFeature;
     private String privacyLevel = "mask";
     private String[] rumLinkKeys = new String[]{};
+    private String flutterViewId = "";
+    private final Map<String, Boolean> flutterResourceIds = new ConcurrentHashMap<>();
 
     public void init(Context context) {
         this.context = context;
@@ -153,6 +164,131 @@ public class SessionReplayManager implements FeatureSdkCore {
     public RecordWriter getCurrentSessionWriter() {
         return sessionReplayFeature.isRecording() ? sessionReplayFeature.getDataWriter()
                 : new NoOpRecordWriter();
+    }
+
+    public Map<String, Object> getCurrentFlutterRumContext() {
+        return getFeatureContext(SESSION_REPLAY_FEATURE_NAME);
+    }
+
+    public void setFlutterHasReplay(String viewId, boolean hasReplay) {
+        updateFlutterViewMetadata(viewId, hasReplay, null);
+    }
+
+    public void setFlutterRecordCount(String viewId, long recordsCount) {
+        updateFlutterViewMetadata(viewId, null, recordsCount);
+    }
+
+    public void writeFlutterSegment(String segment, String viewId) {
+        if (Utils.isNullOrEmpty(segment) || Utils.isNullOrEmpty(viewId)) {
+            return;
+        }
+        FeatureScope scope = getFeature(SESSION_REPLAY_FEATURE_NAME);
+        if (scope == null) {
+            getInternalLogger().w(TAG, String.format(MISSING_FEATURE_FOR_EVENT_RECEIVER, SESSION_REPLAY_FEATURE_NAME));
+            return;
+        }
+
+        boolean forceNew = !viewId.equals(flutterViewId);
+        if (forceNew) {
+            flutterViewId = viewId;
+            getInternalLogger().i(TAG, "Flutter SR forceNew:viewId:" + flutterViewId);
+        }
+
+        scope.withWriteContext(forceNew, new DataConsumerCallback(false) {
+            @Override
+            public void onConsume(com.ft.sdk.api.context.SessionReplayContext context,
+                                  com.ft.sdk.storage.EventBatchWriter writer) {
+                byte[] serializedRecord = segment.getBytes(StandardCharsets.UTF_8);
+                RawBatchEvent rawBatchEvent = new RawBatchEvent(serializedRecord, null);
+                synchronized (this) {
+                    if (writer.write(rawBatchEvent, null, EventType.DEFAULT)) {
+                        updateFlutterViewMetadata(viewId, true, null);
+                    }
+                }
+            }
+        });
+    }
+
+    public String saveFlutterImageResource(byte[] rgbaBytes, int width, int height) {
+        if (rgbaBytes == null || rgbaBytes.length == 0 || width <= 0 || height <= 0) {
+            return null;
+        }
+        if (getFeature(SESSION_REPLAY_RESOURCES_FEATURE_NAME) == null) {
+            getInternalLogger().w(TAG, String.format(MISSING_FEATURE_FOR_EVENT_RECEIVER, SESSION_REPLAY_RESOURCES_FEATURE_NAME));
+            return null;
+        }
+
+        Bitmap bitmap = null;
+        try {
+            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(rgbaBytes));
+            byte[] compressedBytes = new WebPImageCompression(getInternalLogger()).compressBitmap(bitmap);
+            if (compressedBytes == null || compressedBytes.length == 0) {
+                return null;
+            }
+
+            String resourceId = new MD5HashGenerator(getInternalLogger()).generate(compressedBytes);
+            if (Utils.isNullOrEmpty(resourceId)) {
+                return null;
+            }
+
+            if (flutterResourceIds.put(resourceId, Boolean.TRUE) == null) {
+                writeFlutterResource(compressedBytes, resourceId);
+            }
+            return resourceId;
+        } catch (Throwable e) {
+            getInternalLogger().e(TAG, "Unable to save Flutter Session Replay image resource.", e);
+            return null;
+        } finally {
+            if (bitmap != null && !bitmap.isRecycled()) {
+                bitmap.recycle();
+            }
+        }
+    }
+
+    private void writeFlutterResource(byte[] resourceData, String resourceId) {
+        FeatureScope scope = getFeature(SESSION_REPLAY_RESOURCES_FEATURE_NAME);
+        if (scope == null) {
+            getInternalLogger().w(TAG, String.format(MISSING_FEATURE_FOR_EVENT_RECEIVER, SESSION_REPLAY_RESOURCES_FEATURE_NAME));
+            return;
+        }
+
+        scope.withWriteContext(false, new DataConsumerCallback(false) {
+            @Override
+            public void onConsume(com.ft.sdk.api.context.SessionReplayContext context,
+                                  com.ft.sdk.storage.EventBatchWriter writer) {
+                EnrichedResource enrichedResource = new EnrichedResource(resourceData, resourceId);
+                RawBatchEvent rawBatchEvent = new RawBatchEvent(
+                        resourceData,
+                        enrichedResource.asBinaryMetadata(context.getAppId())
+                );
+                synchronized (this) {
+                    writer.write(rawBatchEvent, null, EventType.DEFAULT);
+                }
+            }
+        });
+    }
+
+    private void updateFlutterViewMetadata(String viewId, Boolean hasReplay, Long recordsCount) {
+        if (Utils.isNullOrEmpty(viewId)) return;
+        updateFeatureContext(SESSION_REPLAY_FEATURE_NAME, new SessionReplayRecordCallback.UpdateCallBack() {
+            @Override
+            public void onUpdate(Map<String, Object> context) {
+                Object existing = context.get(viewId);
+                Map<String, Object> viewMetadata = existing instanceof Map
+                        ? new HashMap<>((Map<String, Object>) existing)
+                        : new HashMap<>();
+                if (hasReplay != null) {
+                    viewMetadata.put(SessionReplayRecordCallback.HAS_REPLAY_KEY, hasReplay);
+                    viewMetadata.put(SessionReplayRecordCallback.SAMPLED_ON_ERROR,
+                            trackingConsentProvider.getConsent() == TrackingConsent.SAMPLED_ON_ERROR_SESSION);
+                }
+                if (recordsCount != null) {
+                    viewMetadata.put(SessionReplayRecordCallback.VIEW_RECORDS_COUNT_KEY, recordsCount);
+                }
+                context.put(viewId, viewMetadata);
+            }
+        });
     }
 
     public com.ft.sdk.sessionreplay.SlotIdWebviewBinder getSlotIdWebviewBinder() {

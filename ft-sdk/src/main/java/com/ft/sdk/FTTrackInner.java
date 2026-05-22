@@ -9,7 +9,7 @@ import com.ft.sdk.garble.bean.LineProtocolBean;
 import com.ft.sdk.garble.bean.LogBean;
 import com.ft.sdk.garble.bean.SyncData;
 import com.ft.sdk.garble.db.FTDBCachePolicy;
-import com.ft.sdk.garble.db.FTDBManager;
+import com.ft.sdk.garble.db.FTDataStoreManager;
 import com.ft.sdk.garble.http.FTResponseData;
 import com.ft.sdk.garble.http.HttpBuilder;
 import com.ft.sdk.garble.http.NetCodeStatus;
@@ -97,7 +97,7 @@ public class FTTrackInner {
      */
     void appendGlobalContext(HashMap<String, Object> globalContext) {
         dataHelper.appendGlobalContext(globalContext);
-        SessionReplayManager.get().appendSessionReplayRUMLinkKeys(globalContext);
+        SessionReplayBridge.appendRumLinkKeys(globalContext);
     }
 
     /**
@@ -108,7 +108,7 @@ public class FTTrackInner {
      */
     void appendGlobalContext(String key, String value) {
         dataHelper.appendGlobalContext(key, value);
-        SessionReplayManager.get().appendSessionReplayRUMLinkKeys(key, value);
+        SessionReplayBridge.appendRumLinkKey(key, value);
     }
 
     /**
@@ -118,7 +118,7 @@ public class FTTrackInner {
      */
     void appendRUMGlobalContext(HashMap<String, Object> globalContext) {
         dataHelper.appendRUMGlobalContext(globalContext);
-        SessionReplayManager.get().appendSessionReplayRUMLinkKeys(globalContext);
+        SessionReplayBridge.appendRumLinkKeys(globalContext);
     }
 
     /**
@@ -129,7 +129,7 @@ public class FTTrackInner {
      */
     void appendRUMGlobalContext(String key, String value) {
         dataHelper.appendRUMGlobalContext(key, value);
-        SessionReplayManager.get().appendSessionReplayRUMLinkKeys(key,value);
+        SessionReplayBridge.appendRumLinkKey(key, value);
     }
 
     /**
@@ -239,8 +239,14 @@ public class FTTrackInner {
                 try {
                     SyncData recordData = SyncData.getSyncData(dataHelper, dataType,
                             new LineProtocolBean(measurement, tags, fields, time), dataGenerateTime);
+                    if (recordData == null) {
+                        if (callBack != null) {
+                            callBack.onComplete();
+                        }
+                        return;
+                    }
                     if (measurement.equals(Constants.FT_MEASUREMENT_RUM_VIEW)) {
-                        boolean update = FTDBManager.get().updateOrInsertSyncData(recordData);
+                        boolean update = FTDataStoreManager.get().updateOrInsertSyncData(recordData);
                         if (update) {
                             LogUtils.d(TAG, "syncDataBackground:view," + dataType.toString() + " update,"
                                     + " uuid:" + recordData.getUuid());
@@ -263,7 +269,7 @@ public class FTTrackInner {
                         switch (status) {
                             case 0:
                             case 1:
-                                boolean result = FTDBManager.get().insertFtOperation(recordData, false);
+                                boolean result = FTDataStoreManager.get().insertFtOperation(recordData, false);
                                 LogUtils.d(TAG, "syncDataBackground:" + measurement + errorDec + " "
                                         + dataType.toString() + ":insert=" + result +
                                         ",uuid:" + recordData.getUuid() + (status == 1 ? ",drop OldCache" : ""));
@@ -301,6 +307,12 @@ public class FTTrackInner {
             public void run() {
                 try {
                     SyncData recordData = SyncData.getFromLogBean(dataHelper, bean);
+                    if (recordData == null) {
+                        if (callback != null) {
+                            callback.onResponse(200, "", "");
+                        }
+                        return;
+                    }
                     String body = recordData.getDataString();
                     String model = Constants.URL_MODEL_LOG;
                     String content_type = "text/plain";
@@ -355,7 +367,10 @@ public class FTTrackInner {
             ArrayList<SyncData> datas = new ArrayList<>();
             for (BaseContentBean logBean : logBeans) {
                 try {
-                    datas.add(SyncData.getFromLogBean(dataHelper, logBean));
+                    SyncData data = SyncData.getFromLogBean(dataHelper, logBean);
+                    if (data != null) {
+                        datas.add(data);
+                    }
                 } catch (Exception e) {
                     LogUtils.e(TAG, LogUtils.getStackTraceString(e));
                 }
@@ -372,13 +387,16 @@ public class FTTrackInner {
      * @param recordDataList {@link  SyncData} list
      */
     private void judgeLogCachePolicy(@NonNull List<SyncData> recordDataList, boolean silence) {
+        if (recordDataList.isEmpty()) {
+            return;
+        }
         //If the OP type is not LOG, perform database operation directly; otherwise, execute the sync policy, and determine whether to perform database operation based on the result of the sync policy
         synchronized (FTDBCachePolicy.get().getLogLock()) {
 
             int length = recordDataList.size();
             int policyStatus = FTDBCachePolicy.get().optLogCachePolicy(length);
             if (policyStatus >= 0) {//execute sync policy
-                boolean result = FTDBManager.get().insertFtOptList(recordDataList, false);
+                boolean result = FTDataStoreManager.get().insertFtOptList(recordDataList, false);
                 FTDBCachePolicy.get().optLogCount(recordDataList.size());
                 if (policyStatus == 0) {//not dropped
                     LogUtils.d(TAG, "judgeLogCachePolicy:insert-result=" + result);
@@ -395,7 +413,7 @@ public class FTTrackInner {
                     LogUtils.e(TAG, "reach log limit, drop log count:" + dropCount);
                 } else {//drop some new data
                     recordDataList.subList(length - dropCount, length).clear();
-                    boolean result = FTDBManager.get().insertFtOptList(recordDataList, false);
+                    boolean result = FTDataStoreManager.get().insertFtOptList(recordDataList, false);
                     FTDBCachePolicy.get().optLogCount(recordDataList.size());
                     LogUtils.d(TAG, "judgeLogCachePolicy:insert-result=" + result + ", drop log count:" + dropCount);
                 }
