@@ -39,6 +39,7 @@ import okhttp3.Request;
  */
 public class FTAutoTrack {
     public final static String TAG = Constants.LOG_TAG_PREFIX + "AutoTrack";
+    private static final String EXTRA_MOTION_EVENT = "motionEvent";
 
 
     /**
@@ -419,12 +420,19 @@ public class FTAutoTrack {
     public static void trackViewOnTouch(View view, MotionEvent motionEvent) {
         try {
             HashMap<String, Object> extra = new HashMap<>();
-            extra.put("motionEvent", motionEvent);
+            extra.put(EXTRA_MOTION_EVENT, motionEvent);
             clickView(view, ActionSourceType.CLICK_VIEW, extra);
         } catch (Exception e) {
             LogUtils.e(TAG, LogUtils.getStackTraceString(e));
 
         }
+    }
+
+    /**
+     * Keeps the last window touch event so click-only hooks can still report a relative action position.
+     */
+    public static void trackWindowTouch(MotionEvent motionEvent) {
+        RUMTouchPositionTracker.record(motionEvent);
     }
 
     /**
@@ -443,13 +451,15 @@ public class FTAutoTrack {
         }
 
         FTActionTrackingHandler handler = manager.getConfig().getActionTrackingHandler();
+        HashMap<String, Object> heatMapProperties = buildHeatMapProperties(object, extra);
         if (handler != null) {
             HandlerAction action = manager.getConfig().getActionTrackingHandler()
-                    .resolveHandlerAction(new ActionEventWrapper(object, clickSourceType, extra));
+                    .resolveHandlerAction(new ActionEventWrapper(object, clickSourceType,
+                            mergeProperties(extra, heatMapProperties)));
 
             if (action != null) {
                 FTRUMInnerManager.get().startAction(action.getActionName(), Constants.EVENT_NAME_CLICK,
-                        action.getProperty());
+                        mergeProperties(heatMapProperties, action.getProperty()));
             }
 
         } else {
@@ -477,9 +487,37 @@ public class FTAutoTrack {
             }
 
             LogUtils.showAlias("clickView:" + vtp + ",extra:" + extra);
-            FTRUMInnerManager.get().startAction(vtp, Constants.EVENT_NAME_CLICK);
+            FTRUMInnerManager.get().startAction(vtp, Constants.EVENT_NAME_CLICK, heatMapProperties);
 
         }
+    }
+
+    static HashMap<String, Object> buildHeatMapProperties(Object object, HashMap<String, Object> extra) {
+        View targetView = object instanceof View ? (View) object : null;
+        MotionEvent motionEvent = null;
+        if (extra != null && extra.get(EXTRA_MOTION_EVENT) instanceof MotionEvent) {
+            motionEvent = (MotionEvent) extra.get(EXTRA_MOTION_EVENT);
+        }
+        HashMap<String, Object> properties =
+                RUMHeatMapPropertyBuilder.buildActionProperties(targetView, motionEvent);
+        RUMTouchPositionTracker.appendPositionIfAvailable(properties, targetView, motionEvent);
+        return properties;
+    }
+
+    private static HashMap<String, Object> mergeProperties(HashMap<String, Object> first,
+                                                           HashMap<String, Object> second) {
+        if ((first == null || first.isEmpty()) && (second == null || second.isEmpty())) {
+            return null;
+        }
+
+        HashMap<String, Object> merged = new HashMap<>();
+        if (first != null) {
+            merged.putAll(first);
+        }
+        if (second != null) {
+            merged.putAll(second);
+        }
+        return merged;
     }
 
 
