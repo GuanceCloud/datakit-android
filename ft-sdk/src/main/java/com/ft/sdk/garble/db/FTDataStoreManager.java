@@ -2,12 +2,16 @@ package com.ft.sdk.garble.db;
 
 import android.content.Context;
 import android.content.pm.ProviderInfo;
+import android.os.Looper;
 
 import com.ft.sdk.FTApplication;
 import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.garble.db.file.FTFileDataStore;
+import com.ft.sdk.garble.threadpool.DataProcessThreadPool;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Entry point for SDK persistence. SQLite-backed storage remains the default
@@ -16,6 +20,7 @@ import com.ft.sdk.garble.utils.LogUtils;
 public class FTDataStoreManager {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "FTDataStoreManager";
     private static volatile FTDataStore dataStore;
+    private static final AtomicBoolean refreshingFileSizeCache = new AtomicBoolean(false);
 
     private FTDataStoreManager() {
     }
@@ -62,7 +67,35 @@ public class FTDataStoreManager {
     public static void refreshFileSizeCache() {
         FTDataStore store = get();
         if (store instanceof FTFileDataStore) {
-            ((FTFileDataStore) store).refreshFileSizeCache();
+            if (Looper.myLooper() == Looper.getMainLooper()) {
+                refreshFileSizeCacheAsync();
+            } else {
+                ((FTFileDataStore) store).refreshFileSizeCache();
+            }
+        }
+    }
+
+    private static void refreshFileSizeCacheAsync() {
+        if (!refreshingFileSizeCache.compareAndSet(false, true)) {
+            return;
+        }
+        try {
+            DataProcessThreadPool.get().execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        FTDataStore store = dataStore;
+                        if (store instanceof FTFileDataStore) {
+                            ((FTFileDataStore) store).refreshFileSizeCache();
+                        }
+                    } finally {
+                        refreshingFileSizeCache.set(false);
+                    }
+                }
+            });
+        } catch (Exception e) {
+            refreshingFileSizeCache.set(false);
+            LogUtils.d(TAG, LogUtils.getStackTraceString(e));
         }
     }
 

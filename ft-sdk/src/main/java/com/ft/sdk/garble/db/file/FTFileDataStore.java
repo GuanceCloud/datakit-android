@@ -357,6 +357,9 @@ public class FTFileDataStore implements FTDataStore {
      */
     private void updateFileSizeCache() {
         FTDBCachePolicy policy = FTDBCachePolicy.get();
+        if (!policy.isLimitWithCacheSize()) {
+            return;
+        }
         policy.setCurrentCacheSize(currentStoreSize());
         trimOldestSyncDataIfNeeded(policy);
     }
