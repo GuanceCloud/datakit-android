@@ -73,7 +73,9 @@ public class FTDBManager extends DBManager implements FTDataStore {
     @Override
     protected void onCacheSizeChange(SQLiteDatabase db, long fileSize) {
 //        LogUtils.d(TAG, "onCacheSizeChange:" + (fileSize / 1024) + "KB");
-        //only do it in main process, db
+        // In total cache-size mode the DB backend reports the SQLite file size to the
+        // shared cache policy. If DISCARD_OLDEST is configured, run a best-effort
+        // cleanup immediately, preferring old Log data before other sync records.
         FTDBCachePolicy.get().setCurrentCacheSize(fileSize);
         if (FTDBCachePolicy.get().isReachCacheLimit()) {
             if (FTDBCachePolicy.get().getCacheDiscard() == CacheDiscard.DISCARD_OLDEST) {

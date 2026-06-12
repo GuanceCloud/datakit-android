@@ -351,12 +351,24 @@ public class FTFileDataStore implements FTDataStore {
         return new File(paths.getRootDir(), DB_FLAT_MIGRATION_MARKER);
     }
 
+    /**
+     * Refresh the byte-size view used by total cache-size mode after every file-store
+     * mutation. File-backed storage counts both sync payload files and RUM aggregate files.
+     */
     private void updateFileSizeCache() {
         FTDBCachePolicy policy = FTDBCachePolicy.get();
         policy.setCurrentCacheSize(currentStoreSize());
         trimOldestSyncDataIfNeeded(policy);
     }
 
+    /**
+     * Best-effort cleanup after writes in total cache-size mode.
+     * <p>
+     * The policy decision before insertion can delete enough records for the incoming write,
+     * but file sizes can still remain above the byte limit after serialization overhead or RUM
+     * aggregate updates. In DISCARD_OLDEST mode, keep trimming sync data until the store is
+     * below the limit, deleting Log records first and then the oldest remaining sync records.
+     */
     private void trimOldestSyncDataIfNeeded(FTDBCachePolicy policy) {
         if (trimmingSizeLimit
                 || !policy.isLimitWithCacheSize()

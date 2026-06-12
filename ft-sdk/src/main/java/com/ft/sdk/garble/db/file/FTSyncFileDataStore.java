@@ -198,6 +198,11 @@ public class FTSyncFileDataStore {
         deleteOldestData((DataType[]) null, limit);
     }
 
+    /**
+     * Delete oldest sync payload files by event time, optionally constrained to the supplied
+     * data types. Total cache-size cleanup uses this for both type-specific Log/RUM eviction
+     * and generic oldest-record trimming.
+     */
     public void deleteOldestData(final DataType[] list, final int limit) {
         if (limit <= 0) return;
         try {

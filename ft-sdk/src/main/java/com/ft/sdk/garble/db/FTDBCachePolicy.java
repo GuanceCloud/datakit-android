@@ -170,6 +170,9 @@ public class FTDBCachePolicy {
 
     /**
      * Set current cache file size
+     * <p>
+     * DB storage updates this from the SQLite file size, while file-backed storage updates it
+     * from the total size of sync records and RUM aggregate files.
      *
      * @param currentCacheSize
      */
@@ -179,6 +182,8 @@ public class FTDBCachePolicy {
 
     /**
      * Whether cache size limit is reached
+     * <p>
+     * This is used only when {@link FTSDKConfig#enableLimitWithCacheSize()} is enabled.
      *
      * @return
      */
@@ -219,6 +224,11 @@ public class FTDBCachePolicy {
 
     /**
      * Execute log cache policy
+     * <p>
+     * When total cache-size mode is enabled, Log row-count limits are ignored. If the
+     * current cache size has reached the global limit, {@link CacheDiscard#DISCARD}
+     * drops the incoming Log batch and {@link CacheDiscard#DISCARD_OLDEST} deletes
+     * oldest cached Log records before accepting the incoming batch.
      *
      * @return 0-means data can be inserted, n means old data needs to be deleted, -n means how much data to discard
      */
@@ -263,6 +273,11 @@ public class FTDBCachePolicy {
 
     /**
      * ExecuteRUM discard strategy
+     * <p>
+     * When total cache-size mode is enabled, RUM row-count limits are ignored. RUM writes
+     * first try to free space by deleting old Log records, so RUM data is preserved ahead of
+     * Log data. If no Log data can be removed, {@link CacheDiscard#DISCARD} drops the
+     * incoming RUM record and {@link CacheDiscard#DISCARD_OLDEST} deletes old RUM data.
      *
      * @param limit
      * @return @return -1-means directly discard, 0-means data can be inserted, 1-means discard and delete old data
@@ -300,6 +315,9 @@ public class FTDBCachePolicy {
         return status;
     }
 
+    /**
+     * Delete old Log records as the first cleanup choice in total cache-size mode.
+     */
     private boolean deleteOldestLogData(int limit) {
         int logTotal = FTDataStoreManager.get().queryTotalCount(DataType.LOG);
         if (logTotal <= 0) {
