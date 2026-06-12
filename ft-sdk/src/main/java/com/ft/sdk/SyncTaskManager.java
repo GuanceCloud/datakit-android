@@ -114,7 +114,7 @@ public class SyncTaskManager {
     /**
      * Whether to perform automatic synchronization
      */
-    private boolean autoSync;
+    private volatile boolean autoSync;
 
     private boolean isMainProcess;
 
@@ -653,18 +653,22 @@ public class SyncTaskManager {
             pageSize = config.getSyncPageSize();
         }
         if (config.getAutoSync() != null) {
-            autoSync = config.getAutoSync();
+            setAutoSync(config.getAutoSync());
         }
         if (config.getSyncSleepTime() != null) {
             syncSleepTime = config.getSyncSleepTime();
         }
     }
 
+    void setAutoSync(boolean autoSync) {
+        this.autoSync = autoSync;
+    }
+
     public void init(FTSDKConfig config) {
         isStop = false;
         dataSyncMaxRetryCount = config.getDataSyncRetryCount();
         pageSize = config.getPageSize();
-        autoSync = config.isAutoSync();
+        setAutoSync(config.isAutoSync());
         isMainProcess = config.isMainProcess();
         syncSleepTime = config.getSyncSleepTime();
         if (config.isNeedTransformOldCache()) {
