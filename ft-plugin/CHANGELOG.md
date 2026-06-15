@@ -1,3 +1,7 @@
+# plugin 1.1.10-alpha01
+1. Added wildcard support for ignorePackages.
+
+---
 # plugin 1.1.9
 1. UniApp Webview support
 2. Added `knownWebViewClasses` parameter to support ASM writes.
@@ -161,4 +165,3 @@
 ---
 # plugin 1.0.1-alpha12
 1. Added trace functionality
-
