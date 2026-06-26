@@ -1,6 +1,10 @@
 package com.ft;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.SystemClock;
+import android.util.Log;
 
 import com.ft.sdk.DeviceMetricsMonitorType;
 import com.ft.sdk.EnvType;
@@ -37,6 +41,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -48,6 +54,9 @@ import okhttp3.Request;
  */
 public class DemoApplication extends BaseApplication {
 
+    private static final String TAG = "DemoApplication";
+    private static final ExecutorService FT_INIT_EXECUTOR = Executors.newSingleThreadExecutor();
+
     public DemoApplication() {
         super();
     }
@@ -57,8 +66,8 @@ public class DemoApplication extends BaseApplication {
         super.onCreate();
         if (!BuildConfig.LAZY_INIT) {
             LogUtils.registerInnerLogCacheToFile();
-            initFTSDK(this);
-
+            initFTSDK(DemoApplication.this);
+//            initFTSDKAsync(DemoApplication.this);
             //initOkGo();
 
         }
@@ -75,6 +84,39 @@ public class DemoApplication extends BaseApplication {
 
 
     static void initFTSDK(Context context) {
+        long startTime = SystemClock.elapsedRealtime();
+        Log.i(TAG, "initFTSDK start");
+
+        FTSdk.install(buildFTSDKConfig(context));
+        initFTSDKFeatures();
+
+        Log.i(TAG, "initFTSDK end, cost=" + (SystemClock.elapsedRealtime() - startTime) + "ms");
+
+    }
+
+    static void initFTSDKAsync(Context context) {
+        long startTime = SystemClock.elapsedRealtime();
+        Log.i(TAG, "initFTSDKAsync start");
+
+        final FTSDKConfig ftSDKConfig = buildFTSDKConfig(context);
+        final Handler mainHandler = new Handler(Looper.getMainLooper());
+        FT_INIT_EXECUTOR.execute(new Runnable() {
+            @Override
+            public void run() {
+                FTSdk.install(ftSDKConfig);
+                mainHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        initFTSDKFeatures();
+                        Log.i(TAG, "initFTSDKAsync end, cost="
+                                + (SystemClock.elapsedRealtime() - startTime) + "ms");
+                    }
+                });
+            }
+        });
+    }
+
+    private static FTSDKConfig buildFTSDKConfig(Context context) {
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAWAY_URL,BuildConfig.CLIENT_TOKEN)
                 .setDebug(true)//Set whether it's debug
                 .setAutoSync(true)
@@ -83,6 +125,7 @@ public class DemoApplication extends BaseApplication {
                 .setNeedTransformOldCache(true)
                 .setCompressIntakeRequests(true)
                 .setSyncSleepTime(100)
+                .enableLimitWithCacheSize(31457280)
                 .setEnableDataFilter(true)
                 .setRemoteConfiguration(true)
                 .setRemoteConfigurationCallBack(new FTRemoteConfigManager.FetchResult() {
@@ -145,13 +188,15 @@ public class DemoApplication extends BaseApplication {
 //        } catch (MalformedURLException ignored) {
 //        }
 
-        FTSdk.install(ftSDKConfig);
+        return ftSDKConfig;
+    }
 
+    private static void initFTSDKFeatures() {
         FTSdk.initLogWithConfig(new FTLoggerConfig()
                 .setSamplingRate(1f)
                 .setEnableCustomLog(true)
                 .setEnableConsoleLog(true)
-                .setLogCacheLimitCount(1000)
+                .setLogCacheLimitCount(20000)
                 .setLogCacheDiscardStrategy(LogCacheDiscard.DISCARD)
                 .setPrintCustomLogToConsole(true)
                 .setLogLevelFilters(new Status[]{Status.ERROR, Status.DEBUG})
@@ -240,7 +285,6 @@ public class DemoApplication extends BaseApplication {
                                         new WebViewXWireframeMapper())))
 
         );
-
     }
 
 }

@@ -96,22 +96,21 @@ public class NativeEngineInit {
         if (!enableAnrHandler) {
             parameters.disableAnrCrashHandler();
         } else {
-            if (nativeCrashLogCatSetting != null) {
-                parameters.setNativeLogcatMainLines(nativeCrashLogCatSetting.getLogcatMainLines());
-                parameters.setNativeLogcatSystemLines(nativeCrashLogCatSetting.getLogcatSystemLines());
-                parameters.setNativeLogcatEventsLines(nativeCrashLogCatSetting.getLogcatEventsLines());
+            if (anrCrashLogCatSetting != null) {
+                parameters.setAnrLogcatMainLines(anrCrashLogCatSetting.getLogcatMainLines());
+                parameters.setAnrLogcatSystemLines(anrCrashLogCatSetting.getLogcatSystemLines());
+                parameters.setAnrLogcatEventsLines(anrCrashLogCatSetting.getLogcatEventsLines());
             }
         }
 
         if (!enableNativeCrash) {
             parameters.disableNativeCrashHandler();
         } else {
-            if (anrCrashLogCatSetting != null) {
-                parameters.setAnrLogcatMainLines(anrCrashLogCatSetting.getLogcatMainLines());
-                parameters.setAnrLogcatSystemLines(anrCrashLogCatSetting.getLogcatSystemLines());
-                parameters.setAnrLogcatEventsLines(anrCrashLogCatSetting.getLogcatEventsLines());
+            if (nativeCrashLogCatSetting != null) {
+                parameters.setNativeLogcatMainLines(nativeCrashLogCatSetting.getLogcatMainLines());
+                parameters.setNativeLogcatSystemLines(nativeCrashLogCatSetting.getLogcatSystemLines());
+                parameters.setNativeLogcatEventsLines(nativeCrashLogCatSetting.getLogcatEventsLines());
             }
-
         }
 
         NativeCrash.init(context, parameters);
