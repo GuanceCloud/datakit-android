@@ -1,6 +1,7 @@
 package com.ft.sdk.sessionreplay.internal.recorder.callback;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.view.Window;
 
 import androidx.fragment.app.DialogFragment;
@@ -43,10 +44,19 @@ public class RecorderFragmentLifecycleCallback extends FragmentManager.FragmentL
     }
 
     private List<Window> getWindowsToRecord(DialogFragment f) {
-        Window dialogWindow = f.getDialog().getWindow();
-        Activity dialogOwnerActivity = f.getDialog().getOwnerActivity();
+        Dialog dialog = f.getDialog();
+        if (dialog == null) {
+            return null;
+        }
+
+        Window dialogWindow = dialog.getWindow();
+        Activity dialogOwnerActivity = dialog.getOwnerActivity();
+        if (dialogWindow == null || dialogOwnerActivity == null) {
+            return null;
+        }
+
         Window ownerActivityWindow = dialogOwnerActivity.getWindow();
-        if (dialogWindow == null || dialogOwnerActivity == null || ownerActivityWindow == null) {
+        if (ownerActivityWindow == null) {
             return null;
         }
         if (dialogWindow != ownerActivityWindow) {
