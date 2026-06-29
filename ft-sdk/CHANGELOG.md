@@ -1,3 +1,7 @@
+# agent 1.7.3-beta01
+1. same as 1.7.3-alpha01
+
+---
 # agent 1.7.3-alpha01
 1. Added `FTSdk.setAutoSync(boolean)` to dynamically enable or disable automatic cached data synchronization after SDK initialization.
 2. Fixed `FTLoggerConfig.setLogLevelFilters` handling so `warn` and `warning` log level filters are treated equivalently.
