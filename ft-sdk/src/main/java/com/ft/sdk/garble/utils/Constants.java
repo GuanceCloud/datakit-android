@@ -776,7 +776,7 @@ public class Constants {
     public static final String KEY_RUM_ACTION_POSITION = "action_position";
 
     /**
-     * Action target metadata, JSON format: {"width":0,"height":0,"selector":""}
+     * Action target metadata, JSON format: {"permanent_id":"","width":0,"height":0}
      */
     public static final String KEY_RUM_ACTION_TARGET = "action_target";
 

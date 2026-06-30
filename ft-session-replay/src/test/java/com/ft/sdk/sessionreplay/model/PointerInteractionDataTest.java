@@ -34,4 +34,40 @@ public class PointerInteractionDataTest {
         assertEquals(120L, dataJson.get("x").getAsLong());
         assertEquals(380L, dataJson.get("y").getAsLong());
     }
+
+    @Test
+    public void shapeWireframe_shouldSerializePermanentIdForHeatmapBinding() {
+        ShapeWireframe wireframe = new ShapeWireframe(
+                123L,
+                20L,
+                100L,
+                108L,
+                48L,
+                null,
+                null,
+                null
+        );
+        wireframe.setPermanentId("0f4c2a1b9d8e7c6f5a4b3c2d1e0f9876");
+
+        JsonObject json = wireframe.toJson().getAsJsonObject();
+
+        assertEquals("0f4c2a1b9d8e7c6f5a4b3c2d1e0f9876",
+                json.get("permanentId").getAsString());
+    }
+
+    @Test
+    public void shapeWireframe_shouldParsePermanentIdForHeatmapBinding() {
+        ShapeWireframe wireframe = ShapeWireframe.fromJson("{"
+                + "\"id\":123,"
+                + "\"x\":20,"
+                + "\"y\":100,"
+                + "\"width\":108,"
+                + "\"height\":48,"
+                + "\"type\":\"shape\","
+                + "\"permanentId\":\"0f4c2a1b9d8e7c6f5a4b3c2d1e0f9876\""
+                + "}");
+
+        assertEquals("0f4c2a1b9d8e7c6f5a4b3c2d1e0f9876",
+                wireframe.getPermanentId());
+    }
 }

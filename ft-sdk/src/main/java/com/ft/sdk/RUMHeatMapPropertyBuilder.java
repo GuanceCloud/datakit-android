@@ -7,10 +7,7 @@ import android.graphics.Rect;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewParent;
 
-import com.ft.sdk.garble.utils.AopUtils;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.Utils;
 
@@ -22,7 +19,7 @@ final class RUMHeatMapPropertyBuilder {
     private static final String KEY_Y = "y";
     private static final String KEY_WIDTH = "width";
     private static final String KEY_HEIGHT = "height";
-    private static final String KEY_SELECTOR = "selector";
+    private static final String KEY_PERMANENT_ID = "permanent_id";
     private static final String KEY_VIEWPORT = "viewport";
 
     private RUMHeatMapPropertyBuilder() {
@@ -58,11 +55,11 @@ final class RUMHeatMapPropertyBuilder {
         return Utils.hashMapObjectToJson(position);
     }
 
-    static String buildActionTargetJson(int width, int height, String selector) {
+    static String buildActionTargetJson(int width, int height, String permanentId) {
         HashMap<String, Object> target = new LinkedHashMap<>();
+        target.put(KEY_PERMANENT_ID, permanentId);
         target.put(KEY_WIDTH, width);
         target.put(KEY_HEIGHT, height);
-        target.put(KEY_SELECTOR, selector);
         return Utils.hashMapObjectToJson(target);
     }
 
@@ -82,7 +79,7 @@ final class RUMHeatMapPropertyBuilder {
         }
         properties.put(Constants.KEY_RUM_ACTION_TARGET,
                 buildActionTargetJson(targetView.getWidth(), targetView.getHeight(),
-                        resolveSelector(targetView)));
+                        FTViewPermanentIdResolver.resolve(targetView)));
     }
 
     private static void appendActionPosition(HashMap<String, Object> properties, View targetView,
@@ -97,46 +94,6 @@ final class RUMHeatMapPropertyBuilder {
         }
         properties.put(Constants.KEY_RUM_ACTION_POSITION,
                 buildActionPositionJson(motionEvent.getX(pointerIndex), motionEvent.getY(pointerIndex)));
-    }
-
-    private static String resolveSelector(View targetView) {
-        StringBuilder selector = new StringBuilder(resolveViewSegment(targetView));
-        ViewParent parent = targetView.getParent();
-        while (parent instanceof View) {
-            View parentView = (View) parent;
-            selector.insert(0, resolveViewSegment(parentView) + "/");
-            parent = parentView.getParent();
-        }
-        Context context = targetView.getContext();
-        if (context != null) {
-            selector.insert(0, context.getClass().getSimpleName() + "/");
-        }
-        return selector.toString();
-    }
-
-    private static String resolveViewSegment(View view) {
-        StringBuilder segment = new StringBuilder(view.getClass().getSimpleName());
-        String viewId = AopUtils.getViewId(view);
-        if (!Utils.isNullOrEmpty(viewId)) {
-            segment.append("#").append(viewId);
-        }
-        segment.append("[").append(resolveChildIndex(view)).append("]");
-        return segment.toString();
-    }
-
-    private static int resolveChildIndex(View view) {
-        ViewParent parent = view.getParent();
-        if (!(parent instanceof ViewGroup)) {
-            return 0;
-        }
-
-        ViewGroup parentGroup = (ViewGroup) parent;
-        for (int i = 0; i < parentGroup.getChildCount(); i++) {
-            if (parentGroup.getChildAt(i) == view) {
-                return i;
-            }
-        }
-        return 0;
     }
 
     private static Viewport resolveViewport(View view) {

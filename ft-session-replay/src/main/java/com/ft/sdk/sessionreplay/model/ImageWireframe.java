@@ -120,6 +120,7 @@ public class ImageWireframe extends Wireframe {
         if (border != null) {
             json.add("border", border.toJson());
         }
+        appendPermanentId(json);
         json.addProperty("type", "image");
         if (base64 != null) {
             json.addProperty("base64", base64);
@@ -159,7 +160,9 @@ public class ImageWireframe extends Wireframe {
             String resourceId = jsonObject.has("resourceId") ? jsonObject.get("resourceId").getAsString() : null;
             String mimeType = jsonObject.has("mimeType") ? jsonObject.get("mimeType").getAsString() : null;
             Boolean isEmpty = jsonObject.has("isEmpty") ? jsonObject.get("isEmpty").getAsBoolean() : null;
-            return new ImageWireframe(id, x, y, width, height, clip, shapeStyle, border, base64, resourceId, mimeType, isEmpty);
+            ImageWireframe wireframe = new ImageWireframe(id, x, y, width, height, clip, shapeStyle, border, base64, resourceId, mimeType, isEmpty);
+            readPermanentId(jsonObject, wireframe);
+            return wireframe;
         } catch (IllegalStateException | NullPointerException e) {
             throw new JsonParseException("Unable to parse json into type ImageWireframe", e);
         }
@@ -167,8 +170,10 @@ public class ImageWireframe extends Wireframe {
 
     @Override
     public Wireframe setClip(WireframeClip clip) {
-        return new ImageWireframe(id, x, y, width, height, clip, shapeStyle, border,
+        ImageWireframe wireframe = new ImageWireframe(id, x, y, width, height, clip, shapeStyle, border,
                 base64, resourceId, mimeType, isEmpty);
+        copyPermanentIdTo(wireframe);
+        return wireframe;
     }
 
     @Override
@@ -181,11 +186,11 @@ public class ImageWireframe extends Wireframe {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ImageWireframe that = (ImageWireframe) o;
-        return Objects.equals(id, that.id) && Objects.equals(x, that.x) && Objects.equals(y, that.y) && Objects.equals(width, that.width) && Objects.equals(height, that.height) && Objects.equals(clip, that.clip) && Objects.equals(shapeStyle, that.shapeStyle) && Objects.equals(border, that.border) && Objects.equals(base64, that.base64) && Objects.equals(resourceId, that.resourceId) && Objects.equals(mimeType, that.mimeType) && Objects.equals(isEmpty, that.isEmpty);
+        return Objects.equals(id, that.id) && Objects.equals(x, that.x) && Objects.equals(y, that.y) && Objects.equals(width, that.width) && Objects.equals(height, that.height) && Objects.equals(clip, that.clip) && Objects.equals(shapeStyle, that.shapeStyle) && Objects.equals(border, that.border) && Objects.equals(base64, that.base64) && Objects.equals(resourceId, that.resourceId) && Objects.equals(mimeType, that.mimeType) && Objects.equals(isEmpty, that.isEmpty) && Objects.equals(getPermanentId(), that.getPermanentId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, x, y, width, height, clip, shapeStyle, border, base64, resourceId, mimeType, isEmpty);
+        return Objects.hash(id, x, y, width, height, clip, shapeStyle, border, base64, resourceId, mimeType, isEmpty, getPermanentId());
     }
 }

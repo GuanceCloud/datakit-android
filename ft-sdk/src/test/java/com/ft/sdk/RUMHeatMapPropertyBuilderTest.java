@@ -37,7 +37,7 @@ public class RUMHeatMapPropertyBuilderTest {
         JSONObject targetJson = new JSONObject((String) properties.get(Constants.KEY_RUM_ACTION_TARGET));
         Assert.assertEquals(100, targetJson.getInt("width"));
         Assert.assertEquals(50, targetJson.getInt("height"));
-        Assert.assertTrue(targetJson.getString("selector").contains("View"));
+        Assert.assertTrue(targetJson.getString("permanent_id").matches("[0-9a-f]{32}"));
 
         JSONObject display = new JSONObject((String) properties.get(Constants.KEY_RUM_DISPLAY));
         JSONObject viewport = display.getJSONObject("viewport");
@@ -55,6 +55,19 @@ public class RUMHeatMapPropertyBuilderTest {
 
         Assert.assertFalse(properties.containsKey(Constants.KEY_RUM_ACTION_POSITION));
         Assert.assertTrue(properties.containsKey(Constants.KEY_RUM_ACTION_TARGET));
+    }
+
+    @Test
+    public void actionTargetPermanentIdUsesSharedResolver() throws Exception {
+        View target = new View(RuntimeEnvironment.application);
+        target.layout(0, 0, 100, 50);
+
+        HashMap<String, Object> properties =
+                RUMHeatMapPropertyBuilder.buildActionProperties(target, null);
+
+        JSONObject targetJson = new JSONObject((String) properties.get(Constants.KEY_RUM_ACTION_TARGET));
+        Assert.assertEquals(FTViewPermanentIdResolver.resolve(target),
+                targetJson.getString("permanent_id"));
     }
 
     @Test
