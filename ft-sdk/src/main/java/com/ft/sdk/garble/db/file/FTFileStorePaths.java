@@ -11,6 +11,7 @@ import java.io.IOException;
 public class FTFileStorePaths {
     static final String ROOT_DIR_NAME = "ft_data_store";
     static final String LOCK_FILE_NAME = "store.lock";
+    static final String SIZE_FILE_NAME = "store.size";
     static final String SYNC_DIR_NAME = "sync";
     static final String RUM_VIEW_DIR_NAME = "rum_view";
     static final String RUM_ACTION_DIR_NAME = "rum_action";
@@ -20,6 +21,7 @@ public class FTFileStorePaths {
     private final File rumViewDir;
     private final File rumActionDir;
     private final File lockFile;
+    private final File sizeFile;
 
     public FTFileStorePaths(Context context) {
         this(context.getFilesDir());
@@ -31,6 +33,7 @@ public class FTFileStorePaths {
         rumViewDir = new File(rootDir, RUM_VIEW_DIR_NAME);
         rumActionDir = new File(rootDir, RUM_ACTION_DIR_NAME);
         lockFile = new File(rootDir, LOCK_FILE_NAME);
+        sizeFile = new File(rootDir, SIZE_FILE_NAME);
     }
 
     public void ensureReady() throws IOException {
@@ -58,6 +61,10 @@ public class FTFileStorePaths {
 
     public File getLockFile() {
         return lockFile;
+    }
+
+    public File getSizeFile() {
+        return sizeFile;
     }
 
     private void ensureDirectory(File dir) throws IOException {

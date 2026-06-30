@@ -34,10 +34,16 @@ public class FTSyncFileDataStore {
 
     private final FTFileStorePaths paths;
     private final FTFileLock lock;
+    private final FTFileStoreSizeTracker sizeTracker;
 
     public FTSyncFileDataStore(FTFileStorePaths paths) {
+        this(paths, new FTFileStoreSizeTracker(paths));
+    }
+
+    FTSyncFileDataStore(FTFileStorePaths paths, FTFileStoreSizeTracker sizeTracker) {
         this.paths = paths;
         this.lock = new FTFileLock(paths.getLockFile());
+        this.sizeTracker = sizeTracker;
     }
 
     public boolean updateOrInsertSyncData(@NonNull final SyncData data) {
@@ -533,7 +539,7 @@ public class FTSyncFileDataStore {
         json.put(FTSQL.RECORD_COLUMN_DATA_UUID, data.getUuid());
         json.put(FTSQL.RECORD_COLUMN_DATA, data.getDataString());
         json.put(FTSQL.RECORD_COLUMN_DATA_TYPE, data.getDataType().getValue());
-        FTAtomicFileHelper.writeUtf8(file, json.toString());
+        sizeTracker.writeUtf8(file, json.toString());
     }
 
     private DataType findDataType(String value) {
@@ -570,7 +576,7 @@ public class FTSyncFileDataStore {
     }
 
     private void writeNextId(long nextId) throws IOException {
-        FTAtomicFileHelper.writeUtf8(getSequenceFile(), String.valueOf(nextId));
+        sizeTracker.writeUtf8(getSequenceFile(), String.valueOf(nextId));
     }
 
     private long findMaxId() throws IOException {
@@ -583,7 +589,7 @@ public class FTSyncFileDataStore {
     }
 
     private boolean deleteFile(File file) {
-        return !file.exists() || file.delete();
+        return sizeTracker.deleteFile(file);
     }
 
     private void deleteAllFiles() {
