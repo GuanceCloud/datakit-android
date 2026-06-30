@@ -130,12 +130,13 @@ public class DemoApplication extends BaseApplication {
     private static FTSDKConfig buildFTSDKConfig(Context context) {
         FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAWAY_URL,BuildConfig.CLIENT_TOKEN)
                 .setDebug(true)//Set whether it's debug
-                .setAutoSync(true)
+                .setAutoSync(false)
                 .setCustomSyncPageSize(10)
                 .setOnlySupportMainProcess(CrossProcessSetting.isOnlyMainProcess(context))
                 .setNeedTransformOldCache(true)
                 .setCompressIntakeRequests(true)
                 .setSyncSleepTime(100)
+                .enableFileDataStore()
                 .enableLimitWithCacheSize(31457280)
                 .setEnableDataFilter(true)
                 .setRemoteConfiguration(true)

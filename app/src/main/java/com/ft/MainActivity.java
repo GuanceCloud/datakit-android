@@ -271,6 +271,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        findViewById(R.id.main_enable_auto_sync_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                enableAutoSync();
+            }
+        });
+
         findViewById(R.id.main_high_load_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -349,6 +356,10 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
+    }
+
+    private void enableAutoSync() {
+        FTSdk.setAutoSync(true);
     }
 
     @Override
