@@ -2,7 +2,7 @@
 
 buildscript {
     ext {
-        mavenPublishUrl = 'https://mvnrepo.guance.com'
+        mavenPublishUrl = 'https://mvnrepo.guance.com/repository'
         getDefaultProperties = this.&getDefaultProperties
         sdkVersions = [
                 ftSdk                     : "1.7.3",
