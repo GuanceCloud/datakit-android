@@ -121,10 +121,22 @@
             android:text="Manual Sync Data" />
 
         <Button
+            android:id="@+id/main_enable_auto_sync_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Enable Auto Sync" />
+
+        <Button
             android:id="@+id/main_high_load_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="High Load Scenario" />
+
+        <Button
+            android:id="@+id/main_file_store_stress_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="File Store Multi Process Stress" />
 
         <Button
             android:id="@+id/main_lazy_init"

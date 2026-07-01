@@ -28,8 +28,10 @@ public class FTFileDataStore implements FTDataStore {
     private static final String DB_FLAT_MIGRATION_MARKER = "db_flat_migrated";
 
     private final FTFileStorePaths paths;
+    private final FTFileLock storeLock;
     private final FTSyncFileDataStore syncStore;
     private final FTRumFileAggregateStore rumStore;
+    private final FTFileStoreSizeTracker sizeTracker;
     private boolean trimmingSizeLimit;
 
     public FTFileDataStore(Context context) {
@@ -46,8 +48,10 @@ public class FTFileDataStore implements FTDataStore {
 
     public FTFileDataStore(FTFileStorePaths paths, boolean migrateDbFlatCache) {
         this.paths = paths;
-        this.syncStore = new FTSyncFileDataStore(paths);
-        this.rumStore = new FTRumFileAggregateStore(paths);
+        this.storeLock = new FTFileLock(paths.getLockFile());
+        this.sizeTracker = new FTFileStoreSizeTracker(paths);
+        this.syncStore = new FTSyncFileDataStore(paths, sizeTracker);
+        this.rumStore = new FTRumFileAggregateStore(paths, sizeTracker);
         if (migrateDbFlatCache) {
             migrateCurrentDbCacheIfNeeded();
         }
@@ -302,7 +306,29 @@ public class FTFileDataStore implements FTDataStore {
     }
 
     public void refreshFileSizeCache() {
-        updateFileSizeCache();
+        long currentSize;
+        try {
+            currentSize = storeLock.withLock(new FTFileLock.LockedOperation<Long>() {
+                @Override
+                public Long run() throws Exception {
+                    paths.ensureReady();
+                    long size = currentStoreSize();
+                    sizeTracker.reset(size);
+                    return size;
+                }
+            });
+        } catch (Exception e) {
+            LogUtils.d(TAG, LogUtils.getStackTraceString(e));
+            if (!sizeTracker.initializeFromMetadata()) {
+                return;
+            }
+            currentSize = sizeTracker.currentSize();
+        }
+        FTDBCachePolicy policy = FTDBCachePolicy.get();
+        if (policy.isLimitWithCacheSize()) {
+            policy.setCurrentCacheSize(currentSize);
+            trimOldestSyncDataIfNeeded(policy);
+        }
     }
 
     private void migrateCurrentDbCacheIfNeeded() {
@@ -352,15 +378,21 @@ public class FTFileDataStore implements FTDataStore {
     }
 
     /**
-     * Refresh the byte-size view used by total cache-size mode after every file-store
-     * mutation. File-backed storage counts both sync payload files and RUM aggregate files.
+     * Sync the incrementally tracked byte-size view used by total cache-size mode after
+     * file-store mutations.
      */
     private void updateFileSizeCache() {
         FTDBCachePolicy policy = FTDBCachePolicy.get();
         if (!policy.isLimitWithCacheSize()) {
             return;
         }
-        policy.setCurrentCacheSize(currentStoreSize());
+        if (!sizeTracker.isInitialized()) {
+            if (!sizeTracker.initializeFromMetadata()) {
+                refreshFileSizeCache();
+                return;
+            }
+        }
+        policy.setCurrentCacheSize(sizeTracker.currentSize());
         trimOldestSyncDataIfNeeded(policy);
     }
 
@@ -383,12 +415,17 @@ public class FTFileDataStore implements FTDataStore {
         trimmingSizeLimit = true;
         try {
             while (policy.isReachCacheLimit() && !syncStore.isEmpty()) {
+                long beforeSize = sizeTracker.currentSize();
                 if (syncStore.queryTotalCount(DataType.LOG) > 0) {
                     syncStore.deleteOldestData(DataType.LOG, Constants.CACHE_OLD_DATA_REMOVE_COUNT);
                 } else {
                     syncStore.deleteOldestData(Constants.CACHE_OLD_DATA_REMOVE_COUNT);
                 }
-                policy.setCurrentCacheSize(currentStoreSize());
+                long currentSize = sizeTracker.currentSize();
+                policy.setCurrentCacheSize(currentSize);
+                if (currentSize >= beforeSize) {
+                    break;
+                }
             }
         } finally {
             trimmingSizeLimit = false;

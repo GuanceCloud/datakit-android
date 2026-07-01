@@ -117,9 +117,9 @@ public class DemoApplication extends BaseApplication {
     }
 
     private static FTSDKConfig buildFTSDKConfig(Context context) {
-        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAWAY_URL,BuildConfig.CLIENT_TOKEN)
+        FTSDKConfig ftSDKConfig = FTSDKConfig.builder(BuildConfig.DATAKIT_URL)
                 .setDebug(true)//Set whether it's debug
-                .setAutoSync(true)
+                .setAutoSync(false)
                 .setCustomSyncPageSize(10)
                 .setOnlySupportMainProcess(CrossProcessSetting.isOnlyMainProcess(context))
                 .setNeedTransformOldCache(true)

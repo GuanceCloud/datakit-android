@@ -54,6 +54,11 @@
             android:name=".service.TestService"
             android:process=":test_process" />
 
+        <service
+            android:name=".service.FileStoreStressService"
+            android:exported="false"
+            android:process=":filestore_stress" />
+
         <receiver
             android:name=".directboot.BootBroadcastReceiver"
             android:directBootAware="true"

@@ -256,36 +256,49 @@ public class FTTrackInner {
                             return;
                         }
                     }
-                    synchronized (FTDBCachePolicy.get().getRumLock()) {
-                        int status = FTDBCachePolicy.get().optRUMCachePolicy(1);
-                        StringBuilder errorDec = new StringBuilder();
-                        if (measurement.equals(Constants.FT_MEASUREMENT_RUM_ERROR)) {
-                            errorDec.append(" | ")
-                                    .append(tags.get(Constants.KEY_RUM_ERROR_TYPE))
-                                    .append(" | \"")
-                                    .append(fields.get(Constants.KEY_RUM_ERROR_MESSAGE))
-                                    .append("\"");
+                    StringBuilder errorDec = new StringBuilder();
+                    if (measurement.equals(Constants.FT_MEASUREMENT_RUM_ERROR)) {
+                        errorDec.append(" | ")
+                                .append(tags.get(Constants.KEY_RUM_ERROR_TYPE))
+                                .append(" | \"")
+                                .append(fields.get(Constants.KEY_RUM_ERROR_MESSAGE))
+                                .append("\"");
+                    }
+                    FTDBCachePolicy cachePolicy = FTDBCachePolicy.get();
+                    int status;
+                    boolean reservedRumCount = false;
+                    if (cachePolicy.isLimitWithCacheSize()) {
+                        status = cachePolicy.optRUMCachePolicy(1);
+                    } else {
+                        synchronized (cachePolicy.getRumLock()) {
+                            status = cachePolicy.optRUMCachePolicy(1);
+                            if (status == 0 || status == 1) {
+                                cachePolicy.optRUMCount(1);
+                                reservedRumCount = true;
+                            }
                         }
-                        switch (status) {
-                            case 0:
-                            case 1:
-                                boolean result = FTDataStoreManager.get().insertFtOperation(recordData, false);
-                                LogUtils.d(TAG, "syncDataBackground:" + measurement + errorDec + " "
-                                        + dataType.toString() + ":insert=" + result +
-                                        ",uuid:" + recordData.getUuid() + (status == 1 ? ",drop OldCache" : ""));
-                                if (callBack != null) {
-                                    callBack.onComplete();
+                    }
+                    switch (status) {
+                        case 0:
+                        case 1:
+                            boolean result = FTDataStoreManager.get().insertFtOperation(recordData, false);
+                            if (!result && reservedRumCount) {
+                                synchronized (cachePolicy.getRumLock()) {
+                                    cachePolicy.optRUMCount(-1);
                                 }
-                                if (result) {
-                                    FTDBCachePolicy.get().optRUMCount(1);
-                                }
-                                SyncTaskManager.get().executeSyncPoll();
-                                break;
-                            case -1:
-                                LogUtils.e(TAG, "syncDataBackground:" + measurement + errorDec + " " +
-                                        dataType.toString() + errorDec + ",uuid:" + recordData.getUuid() + ",drop by Cache limit");
-                                break;
-                        }
+                            }
+                            LogUtils.d(TAG, "syncDataBackground:" + measurement + errorDec + " "
+                                    + dataType.toString() + ":insert=" + result +
+                                    ",uuid:" + recordData.getUuid() + (status == 1 ? ",drop OldCache" : ""));
+                            if (callBack != null) {
+                                callBack.onComplete();
+                            }
+                            SyncTaskManager.get().executeSyncPoll();
+                            break;
+                        case -1:
+                            LogUtils.e(TAG, "syncDataBackground:" + measurement + errorDec + " " +
+                                    dataType.toString() + errorDec + ",uuid:" + recordData.getUuid() + ",drop by Cache limit");
+                            break;
                     }
                 } catch (Exception e) {
                     LogUtils.e(TAG, LogUtils.getStackTraceString(e));
