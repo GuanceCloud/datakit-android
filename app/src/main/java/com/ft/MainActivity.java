@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,7 +30,10 @@ import com.ft.sdk.garble.bean.Status;
 import com.ft.sdk.garble.http.RequestMethod;
 import com.ft.sdk.garble.reflect.ReflectUtils;
 import com.ft.sdk.garble.utils.LogUtils;
+import com.ft.service.FileStoreStressService;
 import com.ft.service.TestService;
+import com.ft.utils.CrossProcessSetting;
+import com.ft.utils.FileStoreStressScenario;
 import com.ft.utils.RequestUtils;
 
 import org.json.JSONException;
@@ -285,6 +289,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        findViewById(R.id.main_file_store_stress_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startFileStoreStress();
+            }
+        });
+
         findViewById(R.id.main_lazy_init).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -360,6 +371,16 @@ public class MainActivity extends AppCompatActivity {
 
     private void enableAutoSync() {
         FTSdk.setAutoSync(true);
+    }
+
+    private void startFileStoreStress() {
+        CrossProcessSetting.setOnlyMainProcess(this, false);
+        FTSdk.setAutoSync(false);
+
+        FileStoreStressScenario.startAsync(this, FileStoreStressScenario.ROLE_MAIN);
+        startService(FileStoreStressService.createIntent(this));
+
+        Toast.makeText(this, "FileStore stress started", Toast.LENGTH_LONG).show();
     }
 
     @Override

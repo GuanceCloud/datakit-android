@@ -133,6 +133,12 @@
             android:text="High Load Scenario" />
 
         <Button
+            android:id="@+id/main_file_store_stress_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="File Store Multi Process Stress" />
+
+        <Button
             android:id="@+id/main_lazy_init"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

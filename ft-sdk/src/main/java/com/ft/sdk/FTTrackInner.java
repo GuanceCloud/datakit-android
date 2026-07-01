@@ -267,11 +267,15 @@ public class FTTrackInner {
                     FTDBCachePolicy cachePolicy = FTDBCachePolicy.get();
                     int status;
                     boolean reservedRumCount = false;
-                    synchronized (cachePolicy.getRumLock()) {
+                    if (cachePolicy.isLimitWithCacheSize()) {
                         status = cachePolicy.optRUMCachePolicy(1);
-                        if (status == 0 || status == 1) {
-                            cachePolicy.optRUMCount(1);
-                            reservedRumCount = true;
+                    } else {
+                        synchronized (cachePolicy.getRumLock()) {
+                            status = cachePolicy.optRUMCachePolicy(1);
+                            if (status == 0 || status == 1) {
+                                cachePolicy.optRUMCount(1);
+                                reservedRumCount = true;
+                            }
                         }
                     }
                     switch (status) {
