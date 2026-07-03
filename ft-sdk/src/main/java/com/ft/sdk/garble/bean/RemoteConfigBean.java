@@ -6,6 +6,8 @@ import com.ft.sdk.garble.utils.LogUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Arrays;
+
 public class RemoteConfigBean {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "RemoteConfigBean";
     public static final String KEY_SERVICE_NAME = "serviceName";
@@ -428,10 +430,10 @@ public class RemoteConfigBean {
         if (rumEnableTraceWebView != null)
             sb.append("rumEnableTraceWebView='").append(rumEnableTraceWebView).append("', ");
         if (rumAllowWebViewHost != null)
-            sb.append("rumAllowWebViewHost='").append(rumAllowWebViewHost).append("', ");
+            sb.append("rumAllowWebViewHost='").append(Arrays.toString(rumAllowWebViewHost)).append("', ");
         if (logSampleRate != null) sb.append("logSampleRate='").append(logSampleRate).append("', ");
         if (logLevelFilters != null)
-            sb.append("logLevelFilters='").append(logLevelFilters).append("', ");
+            sb.append("logLevelFilters='").append(Arrays.toString(logLevelFilters)).append("', ");
         if (logEnableCustomLog != null)
             sb.append("logEnableCustomLog='").append(logEnableCustomLog).append("', ");
         if (traceSampleRate != null)

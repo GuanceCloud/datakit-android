@@ -1,5 +1,7 @@
 package com.ft.sdk.garble.db;
 
+import android.os.Looper;
+
 import com.ft.sdk.CacheDiscard;
 import com.ft.sdk.DBCacheDiscard;
 import com.ft.sdk.FTLoggerConfig;
@@ -8,8 +10,11 @@ import com.ft.sdk.FTSDKConfig;
 import com.ft.sdk.LogCacheDiscard;
 import com.ft.sdk.RUMCacheDiscard;
 import com.ft.sdk.garble.bean.DataType;
+import com.ft.sdk.garble.threadpool.DataProcessThreadPool;
 import com.ft.sdk.garble.utils.Constants;
+import com.ft.sdk.garble.utils.LogUtils;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -19,6 +24,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * description: SDK cache discard policy
  */
 public class FTDBCachePolicy {
+    private static final String TAG = Constants.LOG_TAG_PREFIX + "FTDBCachePolicy";
     private volatile static FTDBCachePolicy instance;
 
     private static final DataType[] RUM_DATA_TYPES = new DataType[]{
@@ -37,6 +43,8 @@ public class FTDBCachePolicy {
      * Current RUM data count
      */
     private final AtomicInteger rumCount = new AtomicInteger(0);
+
+    private final AtomicBoolean refreshingCacheCount = new AtomicBoolean(false);
 
     /**
      * Get current cache size
@@ -84,20 +92,59 @@ public class FTDBCachePolicy {
 
 
     private FTDBCachePolicy() {
-        logCount.set(FTDataStoreManager.get().queryTotalCount(DataType.LOG));//Get log data from cache during initialization
-        rumCount.set(FTDataStoreManager.get().queryTotalCount(new DataType[]{
-                DataType.RUM_APP,
-                DataType.RUM_WEBVIEW,
-                DataType.RUM_APP_ERROR_SAMPLED,
-                DataType.RUM_WEBVIEW_ERROR_SAMPLED,
-        }));//Get RUM data from cache during initialization
     }
 
     public synchronized static FTDBCachePolicy get() {
         if (instance == null) {
             instance = new FTDBCachePolicy();
+            instance.refreshCacheCount();
         }
         return instance;
+    }
+
+    private void refreshCacheCount() {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            LogUtils.d(TAG, "cacheCountRefresh trigger async, thread=" + Thread.currentThread().getName());
+            refreshCacheCountAsync();
+        } else {
+            LogUtils.d(TAG, "cacheCountRefresh trigger sync, thread=" + Thread.currentThread().getName());
+            refreshCacheCountSync();
+        }
+    }
+
+    private void refreshCacheCountAsync() {
+        if (!refreshingCacheCount.compareAndSet(false, true)) {
+            LogUtils.d(TAG, "cacheCountRefresh skip, already refreshing");
+            return;
+        }
+        LogUtils.d(TAG, "cacheCountRefresh scheduled, thread=" + Thread.currentThread().getName());
+        DataProcessThreadPool.get().execute(new Runnable() {
+            @Override
+            public void run() {
+                long start = System.currentTimeMillis();
+                try {
+                    LogUtils.d(TAG, "cacheCountRefresh start, thread=" + Thread.currentThread().getName());
+                    refreshCacheCountSync();
+                } finally {
+                    refreshingCacheCount.set(false);
+                    LogUtils.d(TAG, "cacheCountRefresh async end, cost="
+                            + (System.currentTimeMillis() - start) + "ms, thread="
+                            + Thread.currentThread().getName());
+                }
+            }
+        });
+    }
+
+    private void refreshCacheCountSync() {
+        long start = System.currentTimeMillis();
+        logCount.set(FTDataStoreManager.get().queryTotalCount(DataType.LOG));
+        long logEnd = System.currentTimeMillis();
+        rumCount.set(FTDataStoreManager.get().queryTotalCount(RUM_DATA_TYPES));
+        long rumEnd = System.currentTimeMillis();
+        LogUtils.d(TAG, "cacheCountRefresh sync end, logCount=" + logCount.get()
+                + ", rumCount=" + rumCount.get() + ", logCost=" + (logEnd - start)
+                + "ms, rumCost=" + (rumEnd - logEnd) + "ms, totalCost=" + (rumEnd - start)
+                + "ms, thread=" + Thread.currentThread().getName());
     }
 
     /**
@@ -170,6 +217,9 @@ public class FTDBCachePolicy {
 
     /**
      * Set current cache file size
+     * <p>
+     * DB storage updates this from the SQLite file size, while file-backed storage updates it
+     * from the total size of sync records and RUM aggregate files.
      *
      * @param currentCacheSize
      */
@@ -179,6 +229,8 @@ public class FTDBCachePolicy {
 
     /**
      * Whether cache size limit is reached
+     * <p>
+     * This is used only when {@link FTSDKConfig#enableLimitWithCacheSize()} is enabled.
      *
      * @return
      */
@@ -219,6 +271,11 @@ public class FTDBCachePolicy {
 
     /**
      * Execute log cache policy
+     * <p>
+     * When total cache-size mode is enabled, Log row-count limits are ignored. If the
+     * current cache size has reached the global limit, {@link CacheDiscard#DISCARD}
+     * drops the incoming Log batch and {@link CacheDiscard#DISCARD_OLDEST} deletes
+     * oldest cached Log records before accepting the incoming batch.
      *
      * @return 0-means data can be inserted, n means old data needs to be deleted, -n means how much data to discard
      */
@@ -263,6 +320,11 @@ public class FTDBCachePolicy {
 
     /**
      * ExecuteRUM discard strategy
+     * <p>
+     * When total cache-size mode is enabled, RUM row-count limits are ignored. RUM writes
+     * first try to free space by deleting old Log records, so RUM data is preserved ahead of
+     * Log data. If no Log data can be removed, {@link CacheDiscard#DISCARD} drops the
+     * incoming RUM record and {@link CacheDiscard#DISCARD_OLDEST} deletes old RUM data.
      *
      * @param limit
      * @return @return -1-means directly discard, 0-means data can be inserted, 1-means discard and delete old data
@@ -300,6 +362,9 @@ public class FTDBCachePolicy {
         return status;
     }
 
+    /**
+     * Delete old Log records as the first cleanup choice in total cache-size mode.
+     */
     private boolean deleteOldestLogData(int limit) {
         int logTotal = FTDataStoreManager.get().queryTotalCount(DataType.LOG);
         if (logTotal <= 0) {

@@ -1,3 +1,23 @@
+# agent 1.7.3
+1. Added `FTSdk.setAutoSync(boolean)` to dynamically enable or disable automatic cached data synchronization after SDK initialization.
+2. Fixed `FTLoggerConfig.setLogLevelFilters` handling so `warn` and `warning` log level filters are treated equivalently.
+3. Fixed native crash and ANR logcat settings so `nativeCrashLogCatSetting` is applied to native crash reports and `anrCrashLogCatSetting` is applied to ANR reports.
+4. Optimized startup cache count initialization and file-backed cache size refresh to avoid blocking the main thread during SDK startup.
+5. Optimized file-backed cache size tracking with persisted incremental metadata, improving cache-limit accuracy and write performance for larger FileStore caches.
+6. Reduced RUM cache-policy lock contention when total cache-size limiting is enabled, improving high-concurrency FileStore write stability.
+7. Improved remote configuration log readability so array fields such as `rumAllowWebViewHost` and `logLevelFilters` print their actual values.
+
+---
+# agent 1.7.3-beta01
+1. same as 1.7.3-alpha01
+
+---
+# agent 1.7.3-alpha01
+1. Added `FTSdk.setAutoSync(boolean)` to dynamically enable or disable automatic cached data synchronization after SDK initialization.
+2. Fixed `FTLoggerConfig.setLogLevelFilters` handling so `warn` and `warning` log level filters are treated equivalently.
+3. Fixed native crash and ANR logcat settings so `nativeCrashLogCatSetting` is applied to native crash reports and `anrCrashLogCatSetting` is applied to ANR reports.
+4. Optimized startup cache count initialization and file-backed cache size refresh to avoid blocking the main thread during SDK startup.
+
 # agent 1.7.2
 1. Added DataKit-compatible data filtering for Logging and RUM data, enabled by default and configurable with `FTSDKConfig.setEnableDataFilter(false)`.
 2. Added `FTSDKConfig.setDataFilters` to configure local filter rules and the remote filter pull interval; filters run after `LineDataModifier` and before local cache writes.

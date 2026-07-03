@@ -1,3 +1,7 @@
+# replay 0.1.6-alpha01
+1. Fixed a crash when Session Replay handles a `DialogFragment` whose `getDialog()` or owner window is null during fragment resume or pause callbacks.
+
+---
 # replay-compose 0.1.5
 1. Fixed Session Replay upload retry handling so retryable data and resource upload failures preserve retry state and use exponential backoff, while invalid upload URL configuration is skipped until a valid endpoint is available.
 2. Replaced remaining JetBrains nullability annotations with AndroidX annotations in Session Replay code to avoid redundant annotation references.

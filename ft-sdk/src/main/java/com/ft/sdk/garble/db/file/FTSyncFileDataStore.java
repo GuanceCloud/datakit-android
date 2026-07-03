@@ -15,6 +15,8 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -32,10 +34,16 @@ public class FTSyncFileDataStore {
 
     private final FTFileStorePaths paths;
     private final FTFileLock lock;
+    private final FTFileStoreSizeTracker sizeTracker;
 
     public FTSyncFileDataStore(FTFileStorePaths paths) {
+        this(paths, new FTFileStoreSizeTracker(paths));
+    }
+
+    FTSyncFileDataStore(FTFileStorePaths paths, FTFileStoreSizeTracker sizeTracker) {
         this.paths = paths;
         this.lock = new FTFileLock(paths.getLockFile());
+        this.sizeTracker = sizeTracker;
     }
 
     public boolean updateOrInsertSyncData(@NonNull final SyncData data) {
@@ -181,7 +189,7 @@ public class FTSyncFileDataStore {
             return lock.withLock(new FTFileLock.LockedOperation<Integer>() {
                 @Override
                 public Integer run() throws Exception {
-                    return filterByType(readRecords(), list).size();
+                    return countRecordsByType(list);
                 }
             });
         } catch (Exception e) {
@@ -198,6 +206,11 @@ public class FTSyncFileDataStore {
         deleteOldestData((DataType[]) null, limit);
     }
 
+    /**
+     * Delete oldest sync payload files by event time, optionally constrained to the supplied
+     * data types. Total cache-size cleanup uses this for both type-specific Log/RUM eviction
+     * and generic oldest-record trimming.
+     */
     public void deleteOldestData(final DataType[] list, final int limit) {
         if (limit <= 0) return;
         try {
@@ -423,6 +436,82 @@ public class FTSyncFileDataStore {
         return records;
     }
 
+    private int countRecordsByType(DataType[] types) throws IOException {
+        paths.ensureReady();
+        File[] files = paths.getSyncDir().listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return pathname.isFile() && pathname.getName().endsWith(FILE_SUFFIX);
+            }
+        });
+        if (files == null) {
+            return 0;
+        }
+        if (types == null || types.length == 0) {
+            return files.length;
+        }
+        Set<DataType> typeSet = new HashSet<>();
+        Collections.addAll(typeSet, types);
+        int count = 0;
+        for (File file : files) {
+            DataType dataType = readRecordDataType(file);
+            if (dataType != null && typeSet.contains(dataType)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private DataType readRecordDataType(File file) throws IOException {
+        DataType dataType = findDataType(readJsonStringFieldFromTail(file, FTSQL.RECORD_COLUMN_DATA_TYPE));
+        if (dataType != null) {
+            return dataType;
+        }
+        SyncData data = readRecord(file);
+        return data == null ? null : data.getDataType();
+    }
+
+    private String readJsonStringFieldFromTail(File file, String fieldName) throws IOException {
+        if (!file.exists() || file.length() <= 0) {
+            return null;
+        }
+        int length = (int) Math.min(file.length(), 4096);
+        byte[] bytes = new byte[length];
+        try (RandomAccessFile reader = new RandomAccessFile(file, "r")) {
+            reader.seek(file.length() - length);
+            reader.readFully(bytes);
+        }
+        return findJsonStringField(new String(bytes, StandardCharsets.UTF_8), fieldName);
+    }
+
+    private String findJsonStringField(String content, String fieldName) {
+        if (content == null || fieldName == null) {
+            return null;
+        }
+        String key = "\"" + fieldName + "\":\"";
+        int start = content.lastIndexOf(key);
+        if (start < 0) {
+            return null;
+        }
+        start += key.length();
+        StringBuilder value = new StringBuilder();
+        boolean escaped = false;
+        for (int i = start; i < content.length(); i++) {
+            char c = content.charAt(i);
+            if (escaped) {
+                value.append(c);
+                escaped = false;
+            } else if (c == '\\') {
+                escaped = true;
+            } else if (c == '"') {
+                return value.toString();
+            } else {
+                value.append(c);
+            }
+        }
+        return null;
+    }
+
     private SyncData readRecord(File file) throws IOException {
         try {
             JSONObject json = new JSONObject(FTAtomicFileHelper.readUtf8(file));
@@ -450,7 +539,7 @@ public class FTSyncFileDataStore {
         json.put(FTSQL.RECORD_COLUMN_DATA_UUID, data.getUuid());
         json.put(FTSQL.RECORD_COLUMN_DATA, data.getDataString());
         json.put(FTSQL.RECORD_COLUMN_DATA_TYPE, data.getDataType().getValue());
-        FTAtomicFileHelper.writeUtf8(file, json.toString());
+        sizeTracker.writeUtf8(file, json.toString());
     }
 
     private DataType findDataType(String value) {
@@ -487,7 +576,7 @@ public class FTSyncFileDataStore {
     }
 
     private void writeNextId(long nextId) throws IOException {
-        FTAtomicFileHelper.writeUtf8(getSequenceFile(), String.valueOf(nextId));
+        sizeTracker.writeUtf8(getSequenceFile(), String.valueOf(nextId));
     }
 
     private long findMaxId() throws IOException {
@@ -500,7 +589,7 @@ public class FTSyncFileDataStore {
     }
 
     private boolean deleteFile(File file) {
-        return !file.exists() || file.delete();
+        return sizeTracker.deleteFile(file);
     }
 
     private void deleteAllFiles() {

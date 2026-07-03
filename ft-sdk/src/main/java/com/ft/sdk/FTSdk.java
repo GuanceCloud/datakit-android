@@ -482,6 +482,18 @@ public class FTSdk {
         }
     }
 
+    /**
+     * Set whether to upload cached data automatically.
+     *
+     * @param autoSync true to upload cached data automatically
+     */
+    public static void setAutoSync(boolean autoSync) {
+        if (checkInstallState()) {
+            mFtSdk.mFtSDKConfig.setAutoSync(autoSync);
+            SyncTaskManager.get().setAutoSync(autoSync);
+        }
+    }
+
 
     /**
      * Actively sync data

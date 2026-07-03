@@ -277,9 +277,23 @@ public class FTLoggerConfig {
      * @return Whether to set
      */
     public boolean checkLogLevel(String status) {
-        return (logLevelFilters == null
-                || logLevelFilters.isEmpty())
-                || logLevelFilters.contains(status);
+        return logLevelFilters == null
+                || logLevelFilters.isEmpty()
+                || logLevelFilters.contains(status)
+                || isWarningStatus(status) && containsWarningFilter();
+    }
+
+    private boolean containsWarningFilter() {
+        for (String filter : logLevelFilters) {
+            if (isWarningStatus(filter)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isWarningStatus(String status) {
+        return "warn".equals(status) || Status.WARNING.name.equals(status);
     }
 
     /**

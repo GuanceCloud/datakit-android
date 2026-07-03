@@ -8,7 +8,9 @@ import android.content.Context;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 
+import com.ft.sdk.CacheDiscard;
 import com.ft.sdk.FTSDKConfig;
+import com.ft.sdk.FTSdk;
 import com.ft.sdk.garble.db.file.FTAtomicFileHelper;
 import com.ft.sdk.garble.db.file.FTFileLock;
 import com.ft.sdk.garble.db.file.FTFileStorePaths;
@@ -19,8 +21,10 @@ import com.ft.sdk.garble.bean.CollectType;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncData;
 import com.ft.sdk.garble.bean.ViewBean;
+import com.ft.sdk.garble.db.FTDBCachePolicy;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.db.FTDataStoreManager;
+import com.ft.sdk.garble.utils.Constants;
 
 import org.junit.Test;
 
@@ -220,6 +224,49 @@ public class FTFileStoreFoundationTest {
     }
 
     @Test
+    public void installTrimsExistingFileCacheWhenTotalLimitEnabled() throws Exception {
+        Context context = InstrumentationRegistry.getInstrumentation()
+                .getTargetContext()
+                .getApplicationContext();
+        FTFileStorePaths paths = new FTFileStorePaths(context);
+        long limit = Constants.MINI_CACHE_SIZE_LIMIT;
+
+        try {
+            FTDataStoreManager.release();
+            FTDBCachePolicy.release();
+            FTDBManager.get().delete();
+            deleteRecursively(paths.getRootDir());
+
+            FTSyncFileDataStore fileStore = new FTSyncFileDataStore(paths);
+            String payload = createPayload(1024 * 1024);
+            int recordCount = (int) (limit / payload.length()) + 2;
+            List<SyncData> history = new ArrayList<>();
+            for (int i = 0; i < recordCount; i++) {
+                history.add(createSyncData(DataType.LOG, "history-uuid-" + i,
+                        i + 1L, payload + i));
+            }
+            assertTrue(fileStore.insertFtOptList(history, false));
+            assertTrue(directorySize(paths.getRootDir()) > limit);
+
+            FTSDKConfig config = FTSDKConfig.builder("http://www.test.url")
+                    .setAutoSync(false)
+                    .enableFileDataStore()
+                    .enableLimitWithCacheSize(limit)
+                    .setCacheDiscard(CacheDiscard.DISCARD_OLDEST);
+            FTSdk.install(config);
+
+            assertTrue(directorySize(paths.getRootDir()) < limit);
+            assertEquals(0, FTDataStoreManager.get().queryTotalCount(DataType.LOG));
+        } finally {
+            FTSdk.shutDown();
+            FTDBManager.get().delete();
+            deleteRecursively(paths.getRootDir());
+            FTDataStoreManager.release();
+            FTDBCachePolicy.release();
+        }
+    }
+
+    @Test
     public void fileDataStoreConfigMigratesCurrentDbFlatCacheWhenDbStateChanges() throws Exception {
         Context context = InstrumentationRegistry.getInstrumentation()
                 .getTargetContext()
@@ -389,6 +436,31 @@ public class FTFileStoreFoundationTest {
         data.setTime(time);
         data.setDataString(dataString);
         return data;
+    }
+
+    private String createPayload(int length) {
+        StringBuilder builder = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            builder.append('x');
+        }
+        return builder.toString();
+    }
+
+    private long directorySize(File file) {
+        if (file == null || !file.exists()) {
+            return 0;
+        }
+        if (file.isFile()) {
+            return file.length();
+        }
+        long size = 0;
+        File[] children = file.listFiles();
+        if (children != null) {
+            for (File child : children) {
+                size += directorySize(child);
+            }
+        }
+        return size;
     }
 
     private void deleteRecursively(File file) {

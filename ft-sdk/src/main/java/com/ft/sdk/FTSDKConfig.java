@@ -155,6 +155,9 @@ public class FTSDKConfig {
      * Enable total cache size limit, default 100MB, {@link Constants#DEFAULT_CACHE_SIZE_LIMIT}.
      * After enabling cache size limit, {@link FTLoggerConfig#setLogCacheLimitCount(int)}
      * and {@link FTRUMConfig#setRumCacheLimitCount(int)} will be invalid.
+     * <p>
+     * In this mode cache eviction is controlled by {@link #setCacheDiscard(CacheDiscard)} and
+     * the current cache byte size, rather than separate Log/RUM row counts.
      *
      * @return this config for chaining
      */
@@ -165,6 +168,9 @@ public class FTSDKConfig {
 
     /**
      * Enable total cache size limit, default 100MB, unit byte, {@link Constants#DEFAULT_CACHE_SIZE_LIMIT}.
+     * <p>
+     * In this mode cache eviction is controlled by {@link #setCacheDiscard(CacheDiscard)} and
+     * the current cache byte size, rather than separate Log/RUM row counts.
      *
      * @param cacheSize set cache size limit, [30MB,), default 100 MB
      * @return this config for chaining

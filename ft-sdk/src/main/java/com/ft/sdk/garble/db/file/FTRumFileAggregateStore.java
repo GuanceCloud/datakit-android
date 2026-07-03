@@ -29,14 +29,20 @@ public class FTRumFileAggregateStore {
 
     private final FTFileStorePaths paths;
     private final FTFileLock lock;
+    private final FTFileStoreSizeTracker sizeTracker;
 
     public FTRumFileAggregateStore(Context context) {
         this(new FTFileStorePaths(context));
     }
 
     public FTRumFileAggregateStore(FTFileStorePaths paths) {
+        this(paths, new FTFileStoreSizeTracker(paths));
+    }
+
+    FTRumFileAggregateStore(FTFileStorePaths paths, FTFileStoreSizeTracker sizeTracker) {
         this.paths = paths;
         this.lock = new FTFileLock(paths.getLockFile());
+        this.sizeTracker = sizeTracker;
     }
 
     public void initSumView(final ViewBean data) {
@@ -516,7 +522,7 @@ public class FTRumFileAggregateStore {
     }
 
     private void writeJson(File file, JSONObject json) throws IOException {
-        FTAtomicFileHelper.writeUtf8(file, json.toString());
+        sizeTracker.writeUtf8(file, json.toString());
     }
 
     private File getViewFile(String id) {
@@ -535,7 +541,7 @@ public class FTRumFileAggregateStore {
     }
 
     private void deleteFile(File file) {
-        if (file.exists() && !file.delete()) {
+        if (!sizeTracker.deleteFile(file)) {
             LogUtils.e(TAG, "Failed to delete aggregate file: " + file.getAbsolutePath());
         }
     }
