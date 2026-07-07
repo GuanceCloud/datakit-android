@@ -1,3 +1,7 @@
+# replay 0.1.6-beta01
+1. same as 0.1.6-alpha02
+
+---
 # replay 0.1.6-alpha02
 1. Added Flutter Session Replay external recorder mode so Flutter-side recorders can reuse Session Replay sampling, context updates, and data writing while disabling the native recorder lifecycle.
 
