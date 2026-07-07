@@ -31,6 +31,7 @@ public class FTSessionReplayConfig {
     private String[] rumLinkKeys = new String[]{};
     private boolean fineGrainedMaskingSet = false;
     private boolean dynamicOptimizationEnabled = true;
+    private boolean externalRecorderMode = false;
     private SessionReplayInternalCallback internalCallback = new NoSessionReplayInternalCallback();
 
     /**
@@ -263,6 +264,14 @@ public class FTSessionReplayConfig {
      */
     public float getSessionReplayOnErrorSampleRate() {
         return sessionReplayOnErrorSampleRate;
+    }
+
+    void setExternalRecorderMode(boolean externalRecorderMode) {
+        this.externalRecorderMode = externalRecorderMode;
+    }
+
+    boolean isExternalRecorderMode() {
+        return externalRecorderMode;
     }
 
     /**

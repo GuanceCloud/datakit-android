@@ -7,7 +7,7 @@ buildscript {
         sdkVersions = [
                 ftSdk                     : "1.7.3",
                 ftSdkMiniReplaySupport    : "0.1.3",
-                ftSessionReplay           : "0.1.6-alpha01",
+                ftSessionReplay           : "0.1.6-alpha02",
                 replayMiniAgentSupport    : "1.7.0",
                 ftPlugin                  : "1.3.7",
                 pluginMinAgentSupport     : "1.6.10-alpha03",
