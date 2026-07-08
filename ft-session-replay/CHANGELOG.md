@@ -1,3 +1,8 @@
+# replay 0.1.6
+1. Added Flutter Session Replay external recorder mode so Flutter-side recorders can reuse Session Replay sampling, context updates, and data writing while disabling the native recorder lifecycle.
+2. Fixed a crash when Session Replay handles a `DialogFragment` whose `getDialog()` or owner window is null during fragment resume or pause callbacks.
+
+---
 # replay 0.1.6-beta01
 1. same as 0.1.6-alpha02
 
