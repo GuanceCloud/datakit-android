@@ -1,3 +1,9 @@
+# agent 1.7.4-alpha01
+1. Fixed locale-sensitive string handling under languages such as Turkish, preventing custom log console printing from crashing when log status values such as `info` are normalized.
+2. Improved custom log console printing fault tolerance so null or unexpected log status values and property string conversion failures no longer interrupt log collection.
+3. Replaced default-locale case conversion and formatting in SDK-related paths with locale-stable handling to keep environment names, trace IDs, trace types, filters, and enum parsing consistent across device languages.
+
+---
 # agent 1.7.3
 1. Added `FTSdk.setAutoSync(boolean)` to dynamically enable or disable automatic cached data synchronization after SDK initialization.
 2. Fixed `FTLoggerConfig.setLogLevelFilters` handling so `warn` and `warning` log level filters are treated equivalently.
