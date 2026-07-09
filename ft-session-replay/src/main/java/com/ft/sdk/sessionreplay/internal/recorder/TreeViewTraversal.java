@@ -25,6 +25,7 @@ import com.ft.sdk.sessionreplay.utils.NoOpAsyncJobStatusCallback;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 public class TreeViewTraversal {
     private static final String TAG = "TreeViewTraversal";
@@ -139,7 +140,7 @@ public class TreeViewTraversal {
             );
 
             try {
-                TouchPrivacy privacyLevel = TouchPrivacy.valueOf(touchPrivacy.toString().toUpperCase());
+                TouchPrivacy privacyLevel = TouchPrivacy.valueOf(touchPrivacy.toString().toUpperCase(Locale.ROOT));
                 mappingContext.getTouchPrivacyManager().addTouchOverrideArea(viewArea, privacyLevel);
             } catch (IllegalArgumentException e) {
                 internalLogger.e(TAG,
@@ -169,4 +170,3 @@ public class TreeViewTraversal {
     }
 
 }
-

@@ -1,5 +1,7 @@
 package com.ft.sdk.garble.bean;
 
+import java.util.Locale;
+
 /**
  * Sampling rate hit
  */
@@ -18,7 +20,7 @@ public enum CollectType {
     NOT_COLLECT;
 
     public String getValue() {
-        return toString().toLowerCase();
+        return toString().toLowerCase(Locale.ROOT);
     }
 
     public static CollectType fromValue(String value) {
