@@ -8,5 +8,6 @@
 .externalNativeBuild
 .cxx
 /repo
+/docs/
 /.java-version
 /docs/

@@ -29,6 +29,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Log output test
@@ -112,6 +113,48 @@ public class LogTest extends FTBaseTest {
         //Query whether there is inserted data from the database
         int except = CheckUtils.getCount(DataType.LOG, logContent, 0);
         Assert.assertEquals(7, except);
+    }
+
+    @Test
+    public void customLogPrintKnownStatusUnderTurkishLocale() {
+        Locale defaultLocale = Locale.getDefault();
+        try {
+            Locale.setDefault(new Locale("tr", "TR"));
+            FTSdk.initLogWithConfig(new FTLoggerConfig()
+                    .setEnableCustomLog(true)
+                    .setPrintCustomLogToConsole(true));
+
+            FTLogger.getInstance().logBackground("turkish locale info log", " info ");
+        } finally {
+            Locale.setDefault(defaultLocale);
+        }
+    }
+
+    @Test
+    public void customLogPrintNullStatusDoesNotInterruptLogCall() {
+        FTSdk.initLogWithConfig(new FTLoggerConfig()
+                .setEnableCustomLog(true)
+                .setPrintCustomLogToConsole(true)
+                .setLogLevelFilters(new String[]{"error"}));
+
+        FTLogger.getInstance().logBackground("null status log", (String) null);
+    }
+
+    @Test
+    public void customLogPrintPropertyFailureDoesNotInterruptLogCall() {
+        FTSdk.initLogWithConfig(new FTLoggerConfig()
+                .setEnableCustomLog(true)
+                .setPrintCustomLogToConsole(true)
+                .setLogLevelFilters(new String[]{"error"}));
+        HashMap<String, Object> property = new HashMap<>();
+        property.put("bad_value", new Object() {
+            @Override
+            public String toString() {
+                throw new IllegalStateException("property toString failed");
+            }
+        });
+
+        FTLogger.getInstance().logBackground("property failure log", "custom", property);
     }
 
 

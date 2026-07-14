@@ -9,6 +9,7 @@ import com.ft.sdk.garble.utils.Utils;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Print logs that can be viewed in Guanceyun Studio
@@ -134,38 +135,7 @@ public class FTLogger {
             return;
         }
         if (config.isPrintCustomLogToConsole()) {
-            String propertyString = property == null ? "" : "," + property;
-            String message = "[" + status.toUpperCase() + "]" + content + propertyString;
-
-            boolean contain = false;
-            for (Status s : Status.values()) {
-                if (s.name.equals(status.toLowerCase())) {
-                    contain = true;
-                    break;
-                }
-            }
-
-            if (contain) {
-                switch (Status.valueOf(status.toUpperCase())) {
-                    case INFO:
-                        LogUtils.i(Constants.LOG_TAG_PREFIX, message, true);
-                        break;
-                    case WARNING:
-                        LogUtils.w(Constants.LOG_TAG_PREFIX, message, true);
-                        break;
-                    case ERROR:
-                    case CRITICAL:
-                        LogUtils.e(Constants.LOG_TAG_PREFIX, message, true);
-                        break;
-                    case OK:
-                        LogUtils.v(Constants.LOG_TAG_PREFIX, message, true);
-                        break;
-                }
-            } else {
-                LogUtils.i(Constants.LOG_TAG_PREFIX, message, true);
-            }
-
-
+            printCustomLogToConsoleSafely(content, status, property);
         }
 
         LogBean logBean = new LogBean(content, Utils.getCurrentNanoTime());
@@ -178,6 +148,54 @@ public class FTLogger {
             FTTrackInner.getInstance().logBackground(logBean, isSilence);
         }
 
+    }
+
+    private void printCustomLogToConsoleSafely(String content, String status, HashMap<String, Object> property) {
+        try {
+            String normalizedStatus = normalizeStatus(status);
+            String message = "[" + normalizedStatus.toUpperCase(Locale.ROOT) + "]" + content
+                    + (property == null ? "" : "," + property);
+            Status knownStatus = parseKnownStatus(normalizedStatus);
+
+            if (knownStatus == null) {
+                LogUtils.i(Constants.LOG_TAG_PREFIX, message, true);
+                return;
+            }
+
+            switch (knownStatus) {
+                case INFO:
+                    LogUtils.i(Constants.LOG_TAG_PREFIX, message, true);
+                    break;
+                case WARNING:
+                    LogUtils.w(Constants.LOG_TAG_PREFIX, message, true);
+                    break;
+                case ERROR:
+                case CRITICAL:
+                    LogUtils.e(Constants.LOG_TAG_PREFIX, message, true);
+                    break;
+                case OK:
+                    LogUtils.v(Constants.LOG_TAG_PREFIX, message, true);
+                    break;
+                default:
+                    LogUtils.i(Constants.LOG_TAG_PREFIX, message, true);
+                    break;
+            }
+        } catch (Exception e) {
+            LogUtils.w(TAG, "Print custom log failed:" + LogUtils.getStackTraceString(e));
+        }
+    }
+
+    private String normalizeStatus(String status) {
+        return status == null ? "" : status.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private Status parseKnownStatus(String normalizedStatus) {
+        for (Status status : Status.values()) {
+            if (status.name.equals(normalizedStatus)) {
+                return status;
+            }
+        }
+        return null;
     }
 
     /**
