@@ -24,8 +24,8 @@ public class SkyWalkingUtils {
      * Auto-increment integer
      */
     private final static AtomicLong increasingLong = new AtomicLong(0);
-    private final static String traceIDUUID = Utils.randomUUID().toLowerCase();
-    private final static String parentServiceUUID = Utils.randomUUID().toLowerCase();
+    private final static String traceIDUUID = Utils.randomUUID().toLowerCase(Locale.ROOT);
+    private final static String parentServiceUUID = Utils.randomUUID().toLowerCase(Locale.ROOT);
     private String sw8;
     private String newTraceId;
     private String newParentTraceId;
@@ -70,8 +70,8 @@ public class SkyWalkingUtils {
      * @param serviceName
      */
     private void createSw8Head(String sampled, long requestTime, URL url, String serviceName) {
-        newParentTraceId = traceIDUUID + "." + Thread.currentThread().getId() + "." + requestTime + String.format(Locale.getDefault(), "%04d", increasingNumber.get() - 1);
-        newTraceId = traceIDUUID + "." + Thread.currentThread().getId() + "." + requestTime + String.format(Locale.getDefault(), "%04d", increasingNumber.get());
+        newParentTraceId = traceIDUUID + "." + Thread.currentThread().getId() + "." + requestTime + formatSequence(increasingNumber.get() - 1);
+        newTraceId = traceIDUUID + "." + Thread.currentThread().getId() + "." + requestTime + formatSequence(increasingNumber.get());
         sw8 = sampled + "-" +
                 Utils.encodeStringToBase64(newTraceId) + "-" +
                 Utils.encodeStringToBase64(newParentTraceId) + "-" +
@@ -92,8 +92,8 @@ public class SkyWalkingUtils {
      */
 
     private void createSw6Head(String sampled, long requestTime, URL url) {
-        newParentTraceId = increasingLong.get() + "." + Thread.currentThread().getId() + "." + requestTime + String.format(Locale.getDefault(), "%04d", increasingNumber.get() - 1);
-        newTraceId = increasingLong.get() + "." + Thread.currentThread().getId() + "." + requestTime + String.format(Locale.getDefault(), "%04d", increasingNumber.get());
+        newParentTraceId = increasingLong.get() + "." + Thread.currentThread().getId() + "." + requestTime + formatSequence(increasingNumber.get() - 1);
+        newTraceId = increasingLong.get() + "." + Thread.currentThread().getId() + "." + requestTime + formatSequence(increasingNumber.get());
         sw8 = sampled + "-" +
                 Utils.encodeStringToBase64(newTraceId) + "-" +
                 Utils.encodeStringToBase64(newParentTraceId) + "-" +
@@ -101,5 +101,9 @@ public class SkyWalkingUtils {
                 increasingLong.get() + "-" + increasingLong.get() + "-" +
                 Utils.encodeStringToBase64("#" + url.getHost() + ":" + url.getPort()) + "-" +
                 Utils.encodeStringToBase64("-1") + "-" + Utils.encodeStringToBase64("-1");
+    }
+
+    private String formatSequence(int sequence) {
+        return String.format(Locale.ROOT, "%04d", sequence);
     }
 }

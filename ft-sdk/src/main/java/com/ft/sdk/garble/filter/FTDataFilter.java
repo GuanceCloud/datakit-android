@@ -5,6 +5,7 @@ import com.ft.sdk.garble.bean.DataType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -122,7 +123,7 @@ class FTDataFilter {
         if (category == null) {
             return null;
         }
-        String normalized = category.trim().toLowerCase();
+        String normalized = category.trim().toLowerCase(Locale.ROOT);
         if (CATEGORY_LOGGING.equals(normalized) || CATEGORY_RUM.equals(normalized)) {
             return normalized;
         }
