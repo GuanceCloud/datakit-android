@@ -1,3 +1,9 @@
+# replay 0.1.7-alpha01
+1. Added stable `permanentId` metadata to Session Replay Wireframes and exposed `Wireframe.getPermanentId()` and `Wireframe.setPermanentId(String)`, enabling replay elements to be associated with RUM Heatmap Action targets when used with `ft-sdk >= 1.7.4-alpha02`.
+2. Improved touch interaction recording for multi-pointer down/up and cancelled gestures, ensuring pointer IDs and coordinates are recorded for the correct touch.
+3. Fixed locale-sensitive `TouchPrivacy` parsing under languages such as Turkish by using locale-stable case conversion.
+
+---
 # replay 0.1.6
 1. Added Flutter Session Replay external recorder mode so Flutter-side recorders can reuse Session Replay sampling, context updates, and data writing while disabling the native recorder lifecycle.
 2. Fixed a crash when Session Replay handles a `DialogFragment` whose `getDialog()` or owner window is null during fragment resume or pause callbacks.
