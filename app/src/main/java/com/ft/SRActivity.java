@@ -10,6 +10,7 @@ import android.os.Looper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -105,6 +106,21 @@ public class SRActivity extends NameTitleActivity {
         SimpleAdapter adapter = getSimpleAdapter();
 
         replayList.setAdapter(adapter);
+        replayList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Object item = parent.getItemAtPosition(position);
+                String itemName = "position " + position;
+                if (item instanceof HashMap) {
+                    Object userName = ((HashMap<?, ?>) item).get("userName");
+                    if (userName != null) {
+                        itemName = userName.toString();
+                    }
+                }
+                Toast.makeText(SRActivity.this, "List item clicked: " + itemName,
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
 
         // Load remote image for standalone ImageView
         loadImageFromUrl(remoteImageView, "https://picsum.photos/seed/standalone/200/200");

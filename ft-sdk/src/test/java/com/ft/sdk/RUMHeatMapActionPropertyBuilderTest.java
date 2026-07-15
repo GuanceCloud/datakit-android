@@ -162,6 +162,28 @@ public class RUMHeatMapActionPropertyBuilderTest {
     }
 
     @Test
+    public void repeatedResourceIdsUseSiblingIndexToRemainDistinct() {
+        RadioGroup parent = new RadioGroup(RuntimeEnvironment.application);
+        RadioButton first = new RadioButton(RuntimeEnvironment.application);
+        RadioButton second = new RadioButton(RuntimeEnvironment.application);
+        first.setId(android.R.id.text1);
+        second.setId(android.R.id.text1);
+        parent.addView(first);
+        parent.addView(second);
+
+        String firstPath = FTViewPermanentIdResolver.resolvePath(first);
+        String secondPath = FTViewPermanentIdResolver.resolvePath(second);
+
+        Assert.assertNotEquals(firstPath, secondPath);
+        Assert.assertTrue(firstPath.endsWith("android:id%2Ftext1#0"));
+        Assert.assertTrue(secondPath.endsWith("android:id%2Ftext1#1"));
+        Assert.assertEquals(
+                FTViewPermanentIdResolver.resolve(first),
+                FTViewPermanentIdResolver.resolve(first)
+        );
+    }
+
+    @Test
     public void tabHostActionUsesLastTouchedTabView() throws Exception {
         TouchFixture fixture = recordWindowTouch(SystemClock.uptimeMillis());
         HashMap<String, Object> extra = new HashMap<>();

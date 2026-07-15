@@ -1,7 +1,8 @@
 # replay 0.1.7
 1. Added `Wireframe.getPermanentId()` and `Wireframe.setPermanentId(String)` for experimental Android Heatmap element association; requires `ft-sdk >= 1.7.4`.
-2. Fixed pointer IDs and coordinates for multi-touch and cancelled gestures.
-3. Fixed locale-sensitive `TouchPrivacy` parsing.
+2. Added invisible Heatmap binding Wireframes for backgroundless clickable Views and `AdapterView` rows so action targets resolve to replay element bounds.
+3. Fixed pointer IDs and coordinates for multi-touch and cancelled gestures.
+4. Fixed locale-sensitive `TouchPrivacy` parsing.
 
 ---
 # replay 0.1.7-beta01

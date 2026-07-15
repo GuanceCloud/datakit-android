@@ -88,7 +88,7 @@ final class FTViewPermanentIdResolver {
     private static String resolveViewSegment(View view) {
         String resourceName = resolveResourceName(view);
         if (!Utils.isNullOrEmpty(resourceName)) {
-            return escape(resourceName);
+            return escape(resourceName) + "#" + resolveSameClassSiblingIndex(view);
         }
 
         String className = view.getClass().getName();

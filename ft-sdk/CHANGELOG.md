@@ -1,6 +1,7 @@
 # agent 1.7.4
 1. Added experimental Android RUM Heatmap support with `display`, `action_position`, and `action_target`; element association requires `ft-session-replay >= 0.1.7`.
-2. Fixed locale-sensitive parsing and improved custom log console fault tolerance.
+2. Improved Heatmap `permanent_id` uniqueness for repeated View layouts by including same-type sibling indices in resource-based paths.
+3. Fixed locale-sensitive parsing and improved custom log console fault tolerance.
 
 ---
 # agent 1.7.4-beta01
