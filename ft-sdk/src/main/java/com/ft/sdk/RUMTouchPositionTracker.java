@@ -3,9 +3,11 @@ package com.ft.sdk;
 import android.os.SystemClock;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.ft.sdk.garble.utils.Constants;
 
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 
 final class RUMTouchPositionTracker {
@@ -16,14 +18,35 @@ final class RUMTouchPositionTracker {
     }
 
     static void record(MotionEvent motionEvent) {
+        record(motionEvent, null);
+    }
+
+    static void record(MotionEvent motionEvent, View rootView) {
         if (motionEvent == null) {
             return;
         }
         int action = motionEvent.getActionMasked();
         if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_UP) {
-            lastTouchEvent = new LastTouchEvent(motionEvent.getRawX(), motionEvent.getRawY(),
-                    motionEvent.getEventTime());
+            float rawX = motionEvent.getRawX();
+            float rawY = motionEvent.getRawY();
+            lastTouchEvent = new LastTouchEvent(rawX, rawY, motionEvent.getEventTime(),
+                    findTouchTarget(rootView, rawX, rawY));
         }
+    }
+
+    static View resolveLastTouchTarget() {
+        LastTouchEvent touchEvent = getRecentTouchEvent();
+        if (touchEvent == null || touchEvent.targetView == null) {
+            return null;
+        }
+        View targetView = touchEvent.targetView.get();
+        if (targetView == null
+                || targetView.getVisibility() != View.VISIBLE
+                || targetView.getWidth() <= 0
+                || targetView.getHeight() <= 0) {
+            return null;
+        }
+        return targetView;
     }
 
     static void appendPositionIfAvailable(HashMap<String, Object> properties,
@@ -36,9 +59,8 @@ final class RUMTouchPositionTracker {
             return;
         }
 
-        LastTouchEvent touchEvent = lastTouchEvent;
-        if (touchEvent == null
-                || SystemClock.uptimeMillis() - touchEvent.eventTime > TOUCH_MATCH_TIMEOUT_MS) {
+        LastTouchEvent touchEvent = getRecentTouchEvent();
+        if (touchEvent == null) {
             return;
         }
 
@@ -54,15 +76,61 @@ final class RUMTouchPositionTracker {
                 RUMHeatMapPropertyBuilder.buildActionPositionJson(x, y));
     }
 
+    private static LastTouchEvent getRecentTouchEvent() {
+        LastTouchEvent touchEvent = lastTouchEvent;
+        if (touchEvent == null) {
+            return null;
+        }
+        long elapsed = SystemClock.uptimeMillis() - touchEvent.eventTime;
+        if (elapsed < 0 || elapsed > TOUCH_MATCH_TIMEOUT_MS) {
+            return null;
+        }
+        return touchEvent;
+    }
+
+    private static View findTouchTarget(View view, float rawX, float rawY) {
+        if (!contains(view, rawX, rawY)) {
+            return null;
+        }
+
+        if (view instanceof ViewGroup) {
+            ViewGroup viewGroup = (ViewGroup) view;
+            for (int i = viewGroup.getChildCount() - 1; i >= 0; i--) {
+                View target = findTouchTarget(viewGroup.getChildAt(i), rawX, rawY);
+                if (target != null) {
+                    return target;
+                }
+            }
+        }
+        return view.isClickable() ? view : null;
+    }
+
+    private static boolean contains(View view, float rawX, float rawY) {
+        if (view == null
+                || view.getVisibility() != View.VISIBLE
+                || view.getWidth() <= 0
+                || view.getHeight() <= 0) {
+            return false;
+        }
+        int[] location = new int[2];
+        view.getLocationOnScreen(location);
+        return rawX >= location[0]
+                && rawY >= location[1]
+                && rawX < location[0] + view.getWidth()
+                && rawY < location[1] + view.getHeight();
+    }
+
     private static class LastTouchEvent {
         final float rawX;
         final float rawY;
         final long eventTime;
+        final WeakReference<View> targetView;
 
-        LastTouchEvent(float rawX, float rawY, long eventTime) {
+        LastTouchEvent(float rawX, float rawY, long eventTime, View targetView) {
             this.rawX = rawX;
             this.rawY = rawY;
             this.eventTime = eventTime;
+            this.targetView = targetView == null ? null : new WeakReference<>(targetView);
         }
     }
 }

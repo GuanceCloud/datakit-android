@@ -1,5 +1,6 @@
 # agent 1.7.4-alpha02
 1. Fixed WebView RUM container association so Session Replay prefers the View currently bound to the WebView slot instead of a stale Native View captured during initialization.
+2. Fixed RUM Heatmap action target generation for Toolbar menu items, Dialog buttons and list rows, RadioGroup selections, and TabHost clicks so actions bind to the actual replay View and include relative click positions when available.
 
 ---
 # agent 1.7.4-alpha01
