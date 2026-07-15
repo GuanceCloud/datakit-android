@@ -1,3 +1,7 @@
+# replay 0.1.7-beta01
+1. Same as 0.1.7-alpha01
+
+---
 # replay 0.1.7-alpha01
 1. Added stable `permanentId` metadata to Session Replay Wireframes and exposed `Wireframe.getPermanentId()` and `Wireframe.setPermanentId(String)`, enabling replay elements to be associated with RUM Heatmap Action targets when used with `ft-sdk >= 1.7.4-alpha02`.
 2. Improved touch interaction recording for multi-pointer down/up and cancelled gestures, ensuring pointer IDs and coordinates are recorded for the correct touch.
