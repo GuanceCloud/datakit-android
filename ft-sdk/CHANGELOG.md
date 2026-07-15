@@ -1,3 +1,7 @@
+# agent 1.7.4-alpha02
+1. Fixed WebView RUM container association so Session Replay prefers the View currently bound to the WebView slot instead of a stale Native View captured during initialization.
+
+---
 # agent 1.7.4-alpha01
 1. Fixed locale-sensitive string handling under languages such as Turkish, preventing custom log console printing from crashing when log status values such as `info` are normalized.
 2. Improved custom log console printing fault tolerance so null or unexpected log status values and property string conversion failures no longer interrupt log collection.
