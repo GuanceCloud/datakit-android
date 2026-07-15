@@ -20,6 +20,7 @@ import androidx.annotation.RequiresApi;
 import com.ft.sdk.ActionEventWrapper;
 import com.ft.sdk.ActionSourceType;
 import com.ft.sdk.FTActionTrackingHandler;
+import com.ft.sdk.FTAutoTrack;
 import com.ft.sdk.FTRUMConfigManager;
 import com.ft.sdk.FTRUMGlobalManager;
 import com.ft.sdk.HandlerAction;
@@ -126,6 +127,7 @@ public class WindowCallbackWrapper implements Window.Callback {
     @Override
     @MainThread
     public boolean dispatchTouchEvent(MotionEvent event) {
+        FTAutoTrack.trackWindowTouch(event);
         return wrappedCallback.dispatchTouchEvent(event);
     }
 

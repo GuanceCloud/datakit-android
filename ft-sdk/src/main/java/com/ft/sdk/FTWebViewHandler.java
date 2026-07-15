@@ -187,6 +187,14 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
         }
     }
 
+    static String resolveContainerViewId(String nativeViewId, String boundViewId) {
+        if (!Utils.isNullOrEmpty(boundViewId)
+                && !boundViewId.equals(SessionReplayBridge.NULL_UUID)) {
+            return boundViewId;
+        }
+        return nativeViewId;
+    }
+
     /**
      * Register callback for viewId changes
      * Bind callback to slotId with the given globalContextViewId
@@ -312,20 +320,21 @@ final class FTWebViewHandler implements WebAppInterface.JsReceiver {
                         SyncTaskManager.get().setErrorTimeLine(time, null);
                     }
                     getRelativeNativeViewId();
-                    String nativeViewId = this.nativeViewId;
 
                     // Get viewId by slotId
                     String globalContextViewId = null;
                     if (slotID != 0) {
                         globalContextViewId = SessionReplayBridge.getSlotViewId(slotID);
                     }
+                    String containerViewId = resolveContainerViewId(
+                            nativeViewId, globalContextViewId);
 
                     if (FTSdk.isSessionReplaySupport()) {
-                        if (!Utils.isNullOrEmpty(nativeViewId)
-                                && !nativeViewId.equals(SessionReplayBridge.NULL_UUID)) {
+                        if (!Utils.isNullOrEmpty(containerViewId)
+                                && !containerViewId.equals(SessionReplayBridge.NULL_UUID)) {
                             HashMap<String, String> source = new HashMap<>();
                             source.put("source", "android");
-                            source.put("view_id", nativeViewId);
+                            source.put("view_id", containerViewId);
                             tagMaps.put("container", Utils.hashMapObjectToJson(source));
 
                         }

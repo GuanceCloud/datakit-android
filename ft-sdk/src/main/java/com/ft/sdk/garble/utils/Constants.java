@@ -771,6 +771,21 @@ public class Constants {
     public static final String KEY_RUM_ACTION_TYPE = "action_type";
 
     /**
+     * Action position relative to the action target, JSON format: {"x":0,"y":0}
+     */
+    public static final String KEY_RUM_ACTION_POSITION = "action_position";
+
+    /**
+     * Action target metadata, JSON format: {"permanent_id":"","width":0,"height":0}
+     */
+    public static final String KEY_RUM_ACTION_TARGET = "action_target";
+
+    /**
+     * Display metadata, JSON format: {"viewport":{"width":0,"height":0}}
+     */
+    public static final String KEY_RUM_DISPLAY = "display";
+
+    /**
      * Pre-application initialization time, JSON format: {"start": 0, "duration": applicationPreOnCreateDuration}
      * Represents the time from app start to Application.onCreate()
      */

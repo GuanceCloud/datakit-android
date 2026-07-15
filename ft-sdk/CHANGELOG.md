@@ -1,3 +1,23 @@
+# agent 1.7.4
+1. Added experimental Android RUM Heatmap support with `display`, `action_position`, and `action_target`; element association requires `ft-session-replay >= 0.1.7`.
+2. Fixed locale-sensitive parsing and improved custom log console fault tolerance.
+
+---
+# agent 1.7.4-beta01
+1. Same as 1.7.4-alpha02
+
+---
+# agent 1.7.4-alpha02
+1. Fixed WebView RUM container association so Session Replay prefers the View currently bound to the WebView slot instead of a stale Native View captured during initialization.
+2. Fixed RUM Heatmap action target generation for Toolbar menu items, Dialog buttons and list rows, RadioGroup selections, and TabHost clicks so actions bind to the actual replay View and include relative click positions when available.
+
+---
+# agent 1.7.4-alpha01
+1. Fixed locale-sensitive string handling under languages such as Turkish, preventing custom log console printing from crashing when log status values such as `info` are normalized.
+2. Improved custom log console printing fault tolerance so null or unexpected log status values and property string conversion failures no longer interrupt log collection.
+3. Replaced default-locale case conversion and formatting in SDK-related paths with locale-stable handling to keep environment names, trace IDs, trace types, filters, and enum parsing consistent across device languages.
+
+---
 # agent 1.7.3
 1. Added `FTSdk.setAutoSync(boolean)` to dynamically enable or disable automatic cached data synchronization after SDK initialization.
 2. Fixed `FTLoggerConfig.setLogLevelFilters` handling so `warn` and `warning` log level filters are treated equivalently.

@@ -75,6 +75,7 @@ public class PlaceholderWireframe extends Wireframe {
         if (clip != null) {
             json.add("clip", clip.toJson());
         }
+        appendPermanentId(json);
         json.addProperty("type", type);
         if (label != null) {
             json.addProperty("label", label);
@@ -103,7 +104,9 @@ public class PlaceholderWireframe extends Wireframe {
             long height = jsonObject.get("height").getAsLong();
             WireframeClip clip = jsonObject.get("clip") != null ? WireframeClip.fromJsonObject(jsonObject.get("clip").getAsJsonObject()) : null;
             String label = jsonObject.get("label") != null ? jsonObject.get("label").getAsString() : null;
-            return new PlaceholderWireframe(id, x, y, width, height, clip, label);
+            PlaceholderWireframe wireframe = new PlaceholderWireframe(id, x, y, width, height, clip, label);
+            readPermanentId(jsonObject, wireframe);
+            return wireframe;
         } catch (IllegalStateException | NumberFormatException | NullPointerException e) {
             throw new JsonParseException(
                     "Unable to parse json into type PlaceholderWireframe",
@@ -158,11 +161,11 @@ public class PlaceholderWireframe extends Wireframe {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PlaceholderWireframe that = (PlaceholderWireframe) o;
-        return Objects.equals(id, that.id) && Objects.equals(x, that.x) && Objects.equals(y, that.y) && Objects.equals(width, that.width) && Objects.equals(height, that.height) && Objects.equals(clip, that.clip) && Objects.equals(label, that.label) && Objects.equals(type, that.type);
+        return Objects.equals(id, that.id) && Objects.equals(x, that.x) && Objects.equals(y, that.y) && Objects.equals(width, that.width) && Objects.equals(height, that.height) && Objects.equals(clip, that.clip) && Objects.equals(label, that.label) && Objects.equals(type, that.type) && Objects.equals(getPermanentId(), that.getPermanentId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, x, y, width, height, clip, label, type);
+        return Objects.hash(id, x, y, width, height, clip, label, type, getPermanentId());
     }
 }

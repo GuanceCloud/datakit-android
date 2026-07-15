@@ -2,6 +2,8 @@ package com.ft.sdk.garble.bean;
 
 import androidx.annotation.NonNull;
 
+import java.util.Locale;
+
 /**
  * @author Brandon
  */
@@ -55,7 +57,7 @@ public enum ErrorType {
 
         for (int i = 0; i < values().length; ++i) {
             ErrorType state = errorTypes[i];
-            if (state.toString().toLowerCase().equals(value)) {
+            if (state.toString().toLowerCase(Locale.ROOT).equals(value)) {
                 return state;
             }
         }

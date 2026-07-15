@@ -268,6 +268,9 @@ public class SyncDataHelper {
 
     public String getBodyContent(String measurement, HashMap<String, Object> tags,
                                  HashMap<String, Object> fields, long timeStamp, DataType dataType, String uuid) {
+        if (fields != null && isRUMDataType(dataType)) {
+            RUMHeatMapPropertyBuilder.appendDisplay(fields);
+        }
         applyModifier(tags);
         applyModifier(fields);
         HashMap<String, Object> mergeTags = new LinkedHashMap<>();
@@ -328,6 +331,13 @@ public class SyncDataHelper {
         }
         return bodyContent;
 
+    }
+
+    private boolean isRUMDataType(DataType dataType) {
+        return dataType == DataType.RUM_APP
+                || dataType == DataType.RUM_APP_ERROR_SAMPLED
+                || dataType == DataType.RUM_WEBVIEW
+                || dataType == DataType.RUM_WEBVIEW_ERROR_SAMPLED;
     }
 
 

@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 
 import com.ft.sdk.garble.utils.Constants;
 
+import java.util.Locale;
+
 /**
  * Link type
  * <p>
@@ -74,12 +76,12 @@ public enum TraceType {
                 //zipkin multi header and single header output the same character
                 return "zipkin";
             default:
-                return super.toString().toLowerCase();
+                return super.toString().toLowerCase(Locale.ROOT);
         }
 
     }
 
     public String value() {
-        return super.toString().toLowerCase();
+        return super.toString().toLowerCase(Locale.ROOT);
     }
 }

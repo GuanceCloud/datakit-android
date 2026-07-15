@@ -5,9 +5,9 @@ buildscript {
         mavenPublishUrl = 'https://mvnrepo.truewatch.com/repository'
         getDefaultProperties = this.&getDefaultProperties
         sdkVersions = [
-                ftSdk                     : "1.7.3",
+                ftSdk                     : "1.7.4",
                 ftSdkMiniReplaySupport    : "0.1.3",
-                ftSessionReplay           : "0.1.6",
+                ftSessionReplay           : "0.1.7",
                 replayMiniAgentSupport    : "1.7.0",
                 ftPlugin                  : "1.3.7",
                 pluginMinAgentSupport     : "1.6.10-alpha03",

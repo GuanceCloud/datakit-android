@@ -93,6 +93,7 @@ public class WebviewWireframe extends Wireframe {
         if (border != null) {
             json.add("border", border.toJson());
         }
+        appendPermanentId(json);
         json.addProperty("type", type);
         json.addProperty("slotId", slotId);
         if (isVisible != null) {
@@ -122,7 +123,9 @@ public class WebviewWireframe extends Wireframe {
             ShapeBorder border = jsonObject.has("border") ? ShapeBorder.fromJsonObject(jsonObject.get("border").getAsJsonObject()) : null;
             String slotId = jsonObject.get("slotId").getAsString();
             Boolean isVisible = jsonObject.has("isVisible") ? jsonObject.get("isVisible").getAsBoolean() : null;
-            return new WebviewWireframe(id, x, y, width, height, clip, shapeStyle, border, slotId, isVisible);
+            WebviewWireframe wireframe = new WebviewWireframe(id, x, y, width, height, clip, shapeStyle, border, slotId, isVisible);
+            readPermanentId(jsonObject, wireframe);
+            return wireframe;
         } catch (IllegalStateException | NullPointerException e) {
             throw new JsonParseException("Unable to parse json into type WebviewWireframe", e);
         }
@@ -130,7 +133,9 @@ public class WebviewWireframe extends Wireframe {
 
     @Override
     public Wireframe setClip(WireframeClip clip) {
-        return new WebviewWireframe(id, x, y, width, height, clip, shapeStyle, border, slotId, isVisible);
+        WebviewWireframe wireframe = new WebviewWireframe(id, x, y, width, height, clip, shapeStyle, border, slotId, isVisible);
+        copyPermanentIdTo(wireframe);
+        return wireframe;
     }
 
     @Override
@@ -143,11 +148,11 @@ public class WebviewWireframe extends Wireframe {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         WebviewWireframe that = (WebviewWireframe) o;
-        return Objects.equals(id, that.id) && Objects.equals(x, that.x) && Objects.equals(y, that.y) && Objects.equals(width, that.width) && Objects.equals(height, that.height) && Objects.equals(clip, that.clip) && Objects.equals(shapeStyle, that.shapeStyle) && Objects.equals(border, that.border) && Objects.equals(slotId, that.slotId) && Objects.equals(isVisible, that.isVisible) && Objects.equals(type, that.type);
+        return Objects.equals(id, that.id) && Objects.equals(x, that.x) && Objects.equals(y, that.y) && Objects.equals(width, that.width) && Objects.equals(height, that.height) && Objects.equals(clip, that.clip) && Objects.equals(shapeStyle, that.shapeStyle) && Objects.equals(border, that.border) && Objects.equals(slotId, that.slotId) && Objects.equals(isVisible, that.isVisible) && Objects.equals(type, that.type) && Objects.equals(getPermanentId(), that.getPermanentId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, x, y, width, height, clip, shapeStyle, border, slotId, isVisible, type);
+        return Objects.hash(id, x, y, width, height, clip, shapeStyle, border, slotId, isVisible, type, getPermanentId());
     }
 }

@@ -41,6 +41,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -180,7 +181,7 @@ public class DemoApplication extends BaseApplication {
 //
 //                    }
 //                })
-                .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase()));
+                .setEnv(EnvType.valueOf(BuildConfig.ENV.toUpperCase(Locale.ROOT)));
 //        try {
 //            URL url = new URL(BuildConfig.PROXY_ADDRESS);
 //            ftSDKConfig.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(url.getHost(), url.getPort())));

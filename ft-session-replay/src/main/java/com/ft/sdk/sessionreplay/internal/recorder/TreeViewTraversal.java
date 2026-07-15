@@ -25,6 +25,7 @@ import com.ft.sdk.sessionreplay.utils.NoOpAsyncJobStatusCallback;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 public class TreeViewTraversal {
     private static final String TAG = "TreeViewTraversal";
@@ -101,7 +102,23 @@ public class TreeViewTraversal {
             }}, true);
         }
         List<Wireframe> resolvedWireframes = mapper.map(view, mappingContext, jobStatusCallback, internalLogger);
+        attachPermanentId(view, resolvedWireframes);
         return new TraversedTreeView(resolvedWireframes, traversalStrategy);
+    }
+
+    private void attachPermanentId(View view, List<Wireframe> wireframes) {
+        if (wireframes == null || wireframes.isEmpty()) {
+            return;
+        }
+        String permanentId = PermanentIdResolver.resolve(view);
+        if (permanentId == null || permanentId.length() == 0) {
+            return;
+        }
+        for (Wireframe wireframe : wireframes) {
+            if (wireframe != null) {
+                wireframe.setPermanentId(permanentId);
+            }
+        }
     }
 
     private boolean isDecorView(View view) {
@@ -139,7 +156,7 @@ public class TreeViewTraversal {
             );
 
             try {
-                TouchPrivacy privacyLevel = TouchPrivacy.valueOf(touchPrivacy.toString().toUpperCase());
+                TouchPrivacy privacyLevel = TouchPrivacy.valueOf(touchPrivacy.toString().toUpperCase(Locale.ROOT));
                 mappingContext.getTouchPrivacyManager().addTouchOverrideArea(viewArea, privacyLevel);
             } catch (IllegalArgumentException e) {
                 internalLogger.e(TAG,
@@ -169,4 +186,3 @@ public class TreeViewTraversal {
     }
 
 }
-

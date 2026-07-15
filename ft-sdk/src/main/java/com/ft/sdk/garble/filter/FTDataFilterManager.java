@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -258,7 +259,7 @@ public class FTDataFilterManager {
         if (duration == null) {
             return 0;
         }
-        String value = duration.trim().toLowerCase();
+        String value = duration.trim().toLowerCase(Locale.ROOT);
         try {
             if (value.endsWith("ms")) {
                 long ms = Long.parseLong(value.substring(0, value.length() - 2).trim());
@@ -358,7 +359,7 @@ public class FTDataFilterManager {
         if (category == null) {
             return null;
         }
-        String normalized = category.trim().toLowerCase();
+        String normalized = category.trim().toLowerCase(Locale.ROOT);
         if (FTDataFilter.CATEGORY_LOGGING.equals(normalized)
                 || FTDataFilter.CATEGORY_RUM.equals(normalized)) {
             return normalized;

@@ -6,6 +6,7 @@ import static com.ft.sdk.feature.Feature.SESSION_REPLAY_RESOURCES_FEATURE_NAME;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.view.View;
 
 import com.ft.sdk.api.TrackingConsentProvider;
 import com.ft.sdk.feature.DataConsumerCallback;
@@ -293,6 +294,10 @@ public class SessionReplayManager implements FeatureSdkCore {
 
     public com.ft.sdk.sessionreplay.SlotIdWebviewBinder getSlotIdWebviewBinder() {
         return sessionReplayFeature != null ? sessionReplayFeature.getSlotIdWebviewBinder() : null;
+    }
+
+    public String resolvePermanentId(View view) {
+        return FTViewPermanentIdResolver.resolve(view);
     }
 
     public void tryGetFullSnapshotForLinkView() {

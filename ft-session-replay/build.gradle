@@ -44,6 +44,8 @@ dependencies {
 //    compileOnly 'com.squareup.okhttp3:okhttp:4.5.0'
     compileOnly 'androidx.fragment:fragment:1.8.0'
     testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.robolectric:android-all:10-robolectric-5803371'
+    testImplementation 'org.robolectric:robolectric:4.7.2'
     testImplementation 'androidx.fragment:fragment:1.8.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
