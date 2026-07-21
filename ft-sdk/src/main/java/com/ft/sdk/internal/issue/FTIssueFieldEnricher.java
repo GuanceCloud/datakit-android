@@ -20,10 +20,10 @@ import java.util.Set;
 public final class FTIssueFieldEnricher {
     private static final String TAG = Constants.LOG_TAG_PREFIX + "FTIssueFieldEnricher";
 
-    public static final int MAX_FIELD_COUNT = 32;
+    public static final int MAX_FIELD_COUNT = 50;
     public static final int MAX_KEY_BYTES = 100;
     public static final int MAX_STRING_BYTES = 4096;
-    public static final int MAX_TOTAL_BYTES = 16 * 1024;
+    public static final int MAX_TOTAL_BYTES = 25 * 1024;
     private static final long SLOW_PROVIDER_NANOS = 50_000_000L;
     private static final Object INVALID_VALUE = new Object();
 

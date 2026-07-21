@@ -69,7 +69,7 @@ public class FTIssueFieldEnricherTest {
     @Test
     public void additionalFieldsEnforceLimitsAndDefensivelyCopyTheProviderMap() {
         Map<String, Object> supplied = new HashMap<>();
-        for (int i = 0; i < 40; i++) {
+        for (int i = 0; i < 60; i++) {
             supplied.put("field_" + i, i);
         }
         supplied.put(repeat("k", 101), "too-long-key");
@@ -81,7 +81,7 @@ public class FTIssueFieldEnricherTest {
         HashMap<String, Object> additional = enricher.provideAdditionalFields(newIssue());
         supplied.clear();
 
-        Assert.assertEquals(32, additional.size());
+        Assert.assertEquals(50, additional.size());
         Assert.assertFalse(additional.containsKey("too_long_string"));
         Assert.assertFalse(additional.containsKey("too_long_utf8_string"));
         Assert.assertFalse(additional.containsKey(repeat("k", 101)));
@@ -96,13 +96,14 @@ public class FTIssueFieldEnricherTest {
         Assert.assertTrue(throwing.provideAdditionalFields(newIssue()).isEmpty());
 
         Map<String, Object> supplied = new HashMap<>();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 7; i++) {
             supplied.put("large_" + i, repeat("v", 4096));
         }
         HashMap<String, Object> additional =
                 new FTIssueFieldEnricher(issue -> supplied).provideAdditionalFields(newIssue());
 
-        Assert.assertTrue(additional.size() < supplied.size());
+        Assert.assertEquals(6, additional.size());
+        Assert.assertEquals(25 * 1024, FTIssueFieldEnricher.MAX_TOTAL_BYTES);
         Assert.assertTrue(estimatedBytes(additional) <= FTIssueFieldEnricher.MAX_TOTAL_BYTES);
     }
 
