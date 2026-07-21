@@ -48,7 +48,8 @@ public class FTIssueFieldEnricherTest {
         tags.put("integer", "sdk-tag");
         fields.put("string", "sdk-field");
 
-        enricher.mergeAdditionalFields(additional, tags, fields);
+        enricher.mergeAdditionalFields(additional, tags, fields,
+                java.util.Collections.<String>emptySet());
 
         Assert.assertEquals("sdk-field", fields.get("string"));
         Assert.assertFalse(fields.containsKey("integer"));
@@ -180,6 +181,22 @@ public class FTIssueFieldEnricherTest {
 
         Assert.assertEquals(1, additional.size());
         Assert.assertEquals(1, additional.get("valid"));
+    }
+
+    @Test
+    public void providerMapIsCopiedWithoutTrustingItsIsEmptyImplementation() {
+        HashMap<String, Object> supplied = new HashMap<String, Object>() {
+            @Override
+            public boolean isEmpty() {
+                throw new AssertionError("untrusted map implementation");
+            }
+        };
+        supplied.put("valid", true);
+
+        HashMap<String, Object> additional =
+                new FTIssueFieldEnricher(issue -> supplied).provideAdditionalFields(newIssue());
+
+        Assert.assertEquals(true, additional.get("valid"));
     }
 
     private static FTIssueInfo newIssue() {

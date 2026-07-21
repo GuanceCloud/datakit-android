@@ -83,6 +83,9 @@ public final class ANRDetectRunnable implements Runnable {
 
                 Thread mainThread = mainThreadPoster.getThread();
                 long occurredAtNanoseconds = Utils.getCurrentNanoTime();
+                if (isClose || Thread.currentThread().isInterrupted()) {
+                    break;
+                }
                 String stackTrace =
                         StringUtils.getStringFromStackTraceElement(mainThread.getStackTrace())
                                 + "\n" + Utils.getAllThreadStack();
@@ -92,6 +95,9 @@ public final class ANRDetectRunnable implements Runnable {
                             extraLogCatSetting.getLogcatEventsLines());
                 }
 
+                if (isClose || Thread.currentThread().isInterrupted()) {
+                    break;
+                }
                 try {
                     issueReporter.report(stackTrace, occurredAtNanoseconds, mainThread.getName());
                 } catch (Throwable throwable) {

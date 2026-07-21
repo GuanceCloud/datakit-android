@@ -57,7 +57,7 @@ public final class FTIssueFieldEnricher {
             }
         }
 
-        if (supplied == null || supplied.isEmpty()) {
+        if (supplied == null) {
             return new HashMap<>();
         }
 
@@ -66,6 +66,9 @@ public final class FTIssueFieldEnricher {
             snapshot = Collections.unmodifiableMap(new HashMap<>(supplied));
         } catch (Throwable throwable) {
             LogUtils.e(TAG, "Issue data provider result could not be copied");
+            return new HashMap<>();
+        }
+        if (snapshot.isEmpty()) {
             return new HashMap<>();
         }
 
@@ -105,15 +108,6 @@ public final class FTIssueFieldEnricher {
             }
         }
         return accepted;
-    }
-
-    /**
-     * Adds custom entries only when neither an SDK tag nor an SDK field already owns the key.
-     */
-    public void mergeAdditionalFields(@NonNull Map<String, Object> additionalFields,
-                                      @NonNull Map<String, Object> sdkTags,
-                                      @NonNull Map<String, Object> sdkFields) {
-        mergeAdditionalFields(additionalFields, sdkTags, sdkFields, Collections.<String>emptySet());
     }
 
     /**

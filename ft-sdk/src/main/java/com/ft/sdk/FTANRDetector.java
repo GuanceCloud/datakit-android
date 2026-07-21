@@ -56,10 +56,10 @@ public class FTANRDetector {
      * Release ANR corresponding resources
      */
     void release() {
-        ANRDetectThreadPool.get().shutDown();
         if (runnable != null) {
             runnable.shutdown();
             runnable = null;
         }
+        ANRDetectThreadPool.get().shutDown();
     }
 }
