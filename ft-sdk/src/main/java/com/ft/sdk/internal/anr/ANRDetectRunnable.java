@@ -5,9 +5,6 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.ft.sdk.ExtraLogCatSetting;
-import com.ft.sdk.FTRUMGlobalManager;
-import com.ft.sdk.garble.bean.AppState;
-import com.ft.sdk.garble.bean.ErrorType;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.StringUtils;
@@ -28,52 +25,89 @@ public final class ANRDetectRunnable implements Runnable {
 
     private final ExtraLogCatSetting extraLogCatSetting;
 
+    private final MainThreadPoster mainThreadPoster;
+
+    private final IssueReporter issueReporter;
+
+    private final long detectDurationMs;
+
     /**
      * Main thread message Handler
      */
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    public ANRDetectRunnable(ExtraLogCatSetting extraLogCatSetting, IssueReporter issueReporter) {
+        this(extraLogCatSetting, new AndroidMainThreadPoster(), issueReporter, ANR_DETECT_DURATION_MS);
+    }
 
-    public ANRDetectRunnable(ExtraLogCatSetting extraLogCatSetting) {
+    ANRDetectRunnable(ExtraLogCatSetting extraLogCatSetting,
+                      MainThreadPoster mainThreadPoster,
+                      IssueReporter issueReporter,
+                      long detectDurationMs) {
         this.extraLogCatSetting = extraLogCatSetting;
+        this.mainThreadPoster = mainThreadPoster;
+        this.issueReporter = issueReporter;
+        this.detectDurationMs = detectDurationMs;
     }
 
     private final CallbackRunnable runnable = new CallbackRunnable();
 
-    private boolean isClose = false;
+    private volatile boolean isClose = false;
 
     @Override
     public void run() {
-        while (!Thread.interrupted()) {
-            if (isClose) break;
+        while (!Thread.currentThread().isInterrupted()) {
             try {
                 synchronized (runnable) {
+                    if (isClose) {
+                        break;
+                    }
                     runnable.reset();
-                    if (!handler.post(runnable)) {
+                    if (!mainThreadPoster.post(runnable)) {
                         return;
                     }
-                    runnable.wait(ANR_DETECT_DURATION_MS);
+                    long deadline = System.nanoTime() + detectDurationMs * 1_000_000L;
+                    long remainingMs = detectDurationMs;
+                    while (!isClose && !runnable.isCalled() && remainingMs > 0) {
+                        runnable.wait(remainingMs);
+                        long remainingNanos = deadline - System.nanoTime();
+                        remainingMs = remainingNanos <= 0
+                                ? 0
+                                : Math.max(1L, remainingNanos / 1_000_000L);
+                    }
+                    if (isClose) {
+                        break;
+                    }
+                    if (runnable.isCalled()) {
+                        continue;
+                    }
+                }
 
-                    if (!runnable.isCalled()) {
-                        String stackTrace =
-                                StringUtils.getStringFromStackTraceElement(handler.getLooper().getThread().getStackTrace())
-                                        + "\n" + Utils.getAllThreadStack();
-                        if (extraLogCatSetting != null) {
-                            stackTrace += Utils.getLogcat(extraLogCatSetting.getLogcatMainLines(),
-                                    extraLogCatSetting.getLogcatSystemLines(),
-                                    extraLogCatSetting.getLogcatEventsLines());
-                        }
+                Thread mainThread = mainThreadPoster.getThread();
+                long occurredAtNanoseconds = Utils.getCurrentNanoTime();
+                String stackTrace =
+                        StringUtils.getStringFromStackTraceElement(mainThread.getStackTrace())
+                                + "\n" + Utils.getAllThreadStack();
+                if (extraLogCatSetting != null) {
+                    stackTrace += Utils.getLogcat(extraLogCatSetting.getLogcatMainLines(),
+                            extraLogCatSetting.getLogcatSystemLines(),
+                            extraLogCatSetting.getLogcatEventsLines());
+                }
 
-                        //If not called within timeout, add an Error data
-                        FTRUMGlobalManager.get().addError(stackTrace, "android_anr", ErrorType.ANR_ERROR, AppState.RUN);
+                try {
+                    issueReporter.report(stackTrace, occurredAtNanoseconds, mainThread.getName());
+                } catch (Throwable throwable) {
+                    LogUtils.e(TAG, "ANR report failed: " + throwable.getClass().getSimpleName());
+                }
+
+                synchronized (runnable) {
+                    while (!isClose && !runnable.isCalled()) {
                         runnable.wait();
                     }
                 }
             } catch (InterruptedException e) {
                 LogUtils.e(TAG, "ANR Thread interrupt");
+                Thread.currentThread().interrupt();
                 break;
             }
-
-
         }
     }
 
@@ -81,7 +115,37 @@ public final class ANRDetectRunnable implements Runnable {
      * Shutdown Runner
      */
     public void shutdown() {
-        isClose = true;
+        synchronized (runnable) {
+            isClose = true;
+            runnable.notifyAll();
+        }
+    }
+
+    /**
+     * Receives a confirmed watchdog ANR without exposing a public RUM reporting API.
+     */
+    public interface IssueReporter {
+        void report(String stack, long occurredAtNanoseconds, String threadName);
+    }
+
+    interface MainThreadPoster {
+        boolean post(Runnable runnable);
+
+        Thread getThread();
+    }
+
+    private static final class AndroidMainThreadPoster implements MainThreadPoster {
+        private final Handler handler = new Handler(Looper.getMainLooper());
+
+        @Override
+        public boolean post(Runnable runnable) {
+            return handler.post(runnable);
+        }
+
+        @Override
+        public Thread getThread() {
+            return handler.getLooper().getThread();
+        }
     }
 
     /**
@@ -93,21 +157,22 @@ public final class ANRDetectRunnable implements Runnable {
          *
          * @return
          */
-        public boolean isCalled() {
+        public synchronized boolean isCalled() {
             return called;
         }
 
         private boolean called = false;
 
         @Override
-        public void run() {
+        public synchronized void run() {
             called = true;
+            notifyAll();
         }
 
         /**
          * Reset
          */
-        public void reset() {
+        public synchronized void reset() {
             called = false;
         }
 

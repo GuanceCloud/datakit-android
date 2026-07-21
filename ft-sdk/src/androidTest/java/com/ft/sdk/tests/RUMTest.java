@@ -6,6 +6,8 @@ import static com.ft.sdk.tests.FTSdkAllTests.hasPrepare;
 import android.os.Looper;
 
 import com.ft.sdk.FTAutoTrack;
+import com.ft.sdk.FTIssueCategory;
+import com.ft.sdk.FTIssueInfo;
 import com.ft.sdk.FTRUMConfig;
 import com.ft.sdk.FTRUMGlobalManager;
 import com.ft.sdk.FTRUMInnerManager;
@@ -53,8 +55,10 @@ import org.powermock.reflect.Whitebox;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -667,6 +671,74 @@ public class RUMTest extends FTBaseTest {
         Thread.sleep(3000L);
         Assert.assertTrue(CheckUtils.checkDynamicValue(PROPERTY_NAME, PROPERTY_VALUE,
                 Constants.FT_MEASUREMENT_RUM_ERROR, DataType.RUM_APP, false));
+    }
+
+    @Test
+    public void automaticIssueProviderUsesSnapshotAndAddsOnlyCustomFields() throws Exception {
+        List<FTIssueInfo> issues = Collections.synchronizedList(new ArrayList<FTIssueInfo>());
+        AtomicInteger replacementCalls = new AtomicInteger();
+        FTRUMConfig config = new FTRUMConfig()
+                .setRumAppId(TEST_FAKE_RUM_ID)
+                .addGlobalContext("global_tag", "sdk-tag")
+                .setIssueDataProvider(issue -> {
+                    issues.add(issue);
+                    HashMap<String, Object> fields = new HashMap<>();
+                    fields.put("issue_custom", "provider-value");
+                    fields.put(Constants.KEY_RUM_ERROR_MESSAGE, "provider-message");
+                    fields.put("global_tag", "provider-tag");
+                    fields.put(Constants.KEY_RUM_DISPLAY, "provider-display");
+                    return fields;
+                });
+        FTSdk.initRUMWithConfig(config);
+        config.setIssueDataProvider(issue -> {
+            replacementCalls.incrementAndGet();
+            return null;
+        });
+
+        Whitebox.invokeMethod(FTRUMInnerManager.get(), "addAutomaticIssue",
+                ERROR, ERROR_MESSAGE, 123L, FTIssueCategory.CRASH,
+                ErrorType.JAVA.toString(), AppState.RUN, false, "crash-thread", null, null);
+        Whitebox.invokeMethod(FTRUMInnerManager.get(), "addAutomaticIssue",
+                ERROR, ERROR_MESSAGE, 456L, FTIssueCategory.ANR,
+                ErrorType.ANR_CRASH.toString(), AppState.BACKGROUND, true, null, null, null);
+        waitEventConsumeInThreadPool();
+
+        Assert.assertEquals(2, issues.size());
+        Assert.assertEquals(0, replacementCalls.get());
+        Assert.assertEquals(FTIssueCategory.CRASH, issues.get(0).getCategory());
+        Assert.assertEquals("java_crash", issues.get(0).getErrorType());
+        Assert.assertFalse(issues.get(0).isHistorical());
+        Assert.assertEquals("crash-thread", issues.get(0).getThreadName());
+        Assert.assertEquals(123L, issues.get(0).getOccurredAtNanoseconds());
+        Assert.assertEquals(FTIssueCategory.ANR, issues.get(1).getCategory());
+        Assert.assertEquals("anr_crash", issues.get(1).getErrorType());
+        Assert.assertTrue(issues.get(1).isHistorical());
+        Assert.assertEquals(456L, issues.get(1).getOccurredAtNanoseconds());
+
+        LineProtocolData errorData = getLatestErrorLineProtocolData();
+        Assert.assertEquals("provider-value", errorData.getField("issue_custom"));
+        Assert.assertEquals(ERROR_MESSAGE,
+                errorData.getField(Constants.KEY_RUM_ERROR_MESSAGE));
+        Assert.assertEquals("sdk-tag", errorData.getTagAsString("global_tag"));
+        Assert.assertNull(errorData.getField("global_tag"));
+        Assert.assertNotEquals("provider-display",
+                errorData.getField(Constants.KEY_RUM_DISPLAY));
+    }
+
+    @Test
+    public void manualErrorDoesNotInvokeIssueProvider() throws Exception {
+        AtomicInteger calls = new AtomicInteger();
+        FTSdk.initRUMWithConfig(new FTRUMConfig()
+                .setRumAppId(TEST_FAKE_RUM_ID)
+                .setIssueDataProvider(issue -> {
+                    calls.incrementAndGet();
+                    return null;
+                }));
+
+        FTRUMGlobalManager.get().addError(ERROR, ERROR_MESSAGE, ErrorType.JAVA, AppState.RUN);
+        waitEventConsumeInThreadPool();
+
+        Assert.assertEquals(0, calls.get());
     }
 
     @Test

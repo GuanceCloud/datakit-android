@@ -25,6 +25,7 @@ import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.HashMapUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
+import com.ft.sdk.internal.issue.FTIssueFieldEnricher;
 
 import org.json.JSONException;
 
@@ -140,6 +141,8 @@ public class FTRUMInnerManager {
      * Error session sampling rate
      */
     private float sessionErrorSampleError = 1f;
+
+    private FTIssueFieldEnricher issueFieldEnricher = new FTIssueFieldEnricher(null);
 
     String getSessionId() {
         return sessionId;
@@ -922,9 +925,50 @@ public class FTRUMInnerManager {
      */
     public void addError(String log, String message, long dateline, String errorType,
                          AppState state, HashMap<String, Object> property, RunnerCompleteCallBack callBack) {
+        addErrorInternal(log, message, dateline, errorType, state, property, callBack,
+                new HashMap<String, Object>());
+    }
+
+    /**
+     * Internal seam for automatically collected crash and ANR Errors.
+     */
+    void addAutomaticIssue(String log,
+                           String message,
+                           long dateline,
+                           FTIssueCategory category,
+                           String errorType,
+                           AppState state,
+                           boolean historical,
+                           String threadName,
+                           HashMap<String, Object> property,
+                           RunnerCompleteCallBack callBack) {
+        FTIssueInfo issue = new FTIssueInfo(
+                category,
+                errorType,
+                message,
+                log == null ? "" : log,
+                dateline,
+                state.toString(),
+                threadName,
+                historical);
+        HashMap<String, Object> additionalFields =
+                issueFieldEnricher.provideAdditionalFields(issue);
+        addErrorInternal(log, message, dateline, errorType, state, property, callBack,
+                additionalFields);
+    }
+
+    private void addErrorInternal(String log,
+                                  String message,
+                                  long dateline,
+                                  String errorType,
+                                  AppState state,
+                                  HashMap<String, Object> property,
+                                  RunnerCompleteCallBack callBack,
+                                  final HashMap<String, Object> additionalFields) {
 
         try {
-            boolean isPreCrash = property != null && property.get(FTExceptionHandler.IS_PRE_CRASH) == (Boolean) true;
+            boolean isPreCrash = property != null
+                    && Boolean.TRUE.equals(property.get(FTExceptionHandler.IS_PRE_CRASH));
             boolean isCrashError = ErrorType.JAVA.toString().equals(errorType)
                     || ErrorType.NATIVE.toString().equals(errorType)
                     || ErrorType.ANR_CRASH.toString().equals(errorType);
@@ -984,6 +1028,8 @@ public class FTRUMInnerManager {
 
                         }
                         //<--------
+                        issueFieldEnricher.mergeAdditionalFields(additionalFields, tags, fields,
+                                FTTrackInner.getInstance().getRUMReservedKeys());
                         FTTrackInner.getInstance().rum(dateline, Constants.FT_MEASUREMENT_RUM_ERROR, tags, fields,
                                 new RunnerCompleteCallBack() {
                                     @Override
@@ -1799,6 +1845,7 @@ public class FTRUMInnerManager {
         sampleRate = config.getSamplingRate();
         rumAppId = config.getRumAppId();
         sessionErrorSampleError = config.getSessionErrorSampleRate();
+        issueFieldEnricher = new FTIssueFieldEnricher(config.getIssueDataProvider());
         sessionId = Utils.randomUUID();
         syntheticViewMap.clear();
         checkSessionKeep(sessionId, sampleRate, sessionErrorSampleError);
@@ -1936,6 +1983,7 @@ public class FTRUMInnerManager {
         resourceBeanMap.clear();
         viewList.clear();
         syntheticViewMap.clear();
+        issueFieldEnricher = new FTIssueFieldEnricher(null);
     }
 
     /**

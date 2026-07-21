@@ -14,10 +14,14 @@ import com.ft.sdk.internal.exception.FTInvalidParameterException;
 
 import org.json.JSONObject;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Data assembly class, serializes collected data from stored data to line protocol data
@@ -40,6 +44,8 @@ public class SyncDataHelper {
     private final HashMap<String, Object> dynamicLRumTags;
     private final HashMap<String, Object> rumStaticFields;
 
+    private final Set<String> rumReservedKeys;
+
     protected FTSDKConfig config;
     private FTLoggerConfig logConfig;
 
@@ -56,6 +62,10 @@ public class SyncDataHelper {
         dynamicLogTags = new HashMap<>();
         dynamicLRumTags = new HashMap<>();
         rumStaticFields = new HashMap<>();
+        rumReservedKeys = Collections.newSetFromMap(
+                new ConcurrentHashMap<String, Boolean>());
+        rumReservedKeys.add(KEY_SDK_DATA_FLAG);
+        rumReservedKeys.add(Constants.KEY_RUM_DISPLAY);
     }
 
     void initBaseConfig(FTSDKConfig config) {
@@ -64,6 +74,7 @@ public class SyncDataHelper {
         this.lineDataModifier = config.getLineDataModifier();
 
         basePublicTags.putAll(applyModifier(config.getGlobalContext()));
+        rumReservedKeys.addAll(config.getGlobalContext().keySet());
     }
 
     void initLogConfig(FTLoggerConfig config) {
@@ -79,6 +90,8 @@ public class SyncDataHelper {
         rumStaticFields.put(Constants.KEY_RUM_SESSION_ON_ERROR_SAMPLE_RATE,
                 applyModifier(Constants.KEY_RUM_SESSION_ON_ERROR_SAMPLE_RATE, config.getSessionErrorSampleRate()));
         rumTags.putAll(applyModifier(config.getGlobalContext()));
+        rumReservedKeys.addAll(rumStaticFields.keySet());
+        rumReservedKeys.addAll(config.getGlobalContext().keySet());
     }
 
     HashMap<String, Object> checkSessionReplayRUMLinksKeys(String[] rumLinkKeys) {
@@ -175,6 +188,7 @@ public class SyncDataHelper {
         if (globalContext != null) {
             applyModifier(globalContext);
             dynamicBaseTags.putAll(globalContext);
+            rumReservedKeys.addAll(globalContext.keySet());
         }
     }
 
@@ -187,6 +201,7 @@ public class SyncDataHelper {
     void appendGlobalContext(String key, String value) {
         if (!Utils.isNullOrEmpty(key) && !Utils.isNullOrEmpty(value)) {
             dynamicBaseTags.put(key, applyModifier(key, value));
+            rumReservedKeys.add(key);
         }
     }
 
@@ -200,6 +215,7 @@ public class SyncDataHelper {
         if (globalContext != null) {
             applyModifier(globalContext);
             dynamicLRumTags.putAll(globalContext);
+            rumReservedKeys.addAll(globalContext.keySet());
             Object keyArr = rumTags.get(Constants.KEY_RUM_CUSTOM_KEYS);
             if (keyArr == null) {
                 keyArr = "[]";
@@ -219,6 +235,7 @@ public class SyncDataHelper {
     void appendRUMGlobalContext(String key, String value) {
         if (!Utils.isNullOrEmpty(key) && !Utils.isNullOrEmpty(value)) {
             dynamicLRumTags.put(key, applyModifier(key, value));
+            rumReservedKeys.add(key);
 
             Object keyArr = rumTags.get(Constants.KEY_RUM_CUSTOM_KEYS);
             if (keyArr == null) {
@@ -228,6 +245,10 @@ public class SyncDataHelper {
             rumTags.put(Constants.KEY_RUM_CUSTOM_KEYS, Utils.addItemToJsonArray(keyArrString, key));
 
         }
+    }
+
+    Set<String> getRUMReservedKeys() {
+        return new HashSet<>(rumReservedKeys);
     }
 
     /**
