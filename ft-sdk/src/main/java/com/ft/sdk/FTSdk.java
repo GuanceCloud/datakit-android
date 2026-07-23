@@ -18,6 +18,7 @@ import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.PackageUtils;
 import com.ft.sdk.garble.utils.TBSWebViewUtils;
 import com.ft.sdk.garble.utils.Utils;
+import com.ft.sdk.internal.anr.historical.ProcessRunIdentity;
 
 import java.util.HashMap;
 
@@ -146,8 +147,9 @@ public class FTSdk {
         TrackLogManager.get().shutdown();
         FTRUMGlobalManager.get().release();
         FTRUMInnerManager.get().release();
-        EventConsumerThreadPool.get().shutDown();
         FTANRDetector.get().release();
+        EventConsumerThreadPool.get().shutDown();
+        ProcessRunIdentity.clear();
         FTDBManager.release();
         FTDataStoreManager.release();
         SessionReplayBridge.stop();
@@ -181,6 +183,7 @@ public class FTSdk {
         LogUtils.setSDKLogLevel(config.getSdkLogLevel());
         LocalUUIDManager.get().initRandomUUID();
         FTDataStoreManager.init(config);
+        ProcessRunIdentity.initialize(Utils.getCurrentProcessName(), System.currentTimeMillis());
         FTDBCachePolicy.get().initSDKParams(config);
         FTDataStoreManager.refreshFileSizeCache();
         FTHttpConfigManager.get().initParams(config);

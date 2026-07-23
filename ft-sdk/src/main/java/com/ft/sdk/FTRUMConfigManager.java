@@ -5,6 +5,7 @@ import static com.ft.sdk.FTApplication.getApplication;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 
 import androidx.annotation.NonNull;
 
@@ -64,14 +65,22 @@ public class FTRUMConfigManager {
         this.config = config;
 
         FTDBCachePolicy.get().initRUMParam(config);
-        FTRUMInnerManager.get().initParams(config);
         FTRUMGlobalManager.get().initConfig(config);
         FTExceptionHandler.get().initConfig(config);
         FTMonitorManager.get().initWithConfig(config);
-        FTUIBlockManager.get().start(config);
-        FTANRDetector.get().init(config);
         initRUMGlobalContext(config);
         FTTrackInner.getInstance().initRUMConfig(config);
+        FTRUMInnerManager.get().initParams(config);
+        boolean deferPreviousRumCleanup = config.isEnableTrackAppANR()
+                && ANRStrategy.shouldUseHistoricalAnr(Build.VERSION.SDK_INT);
+        if (!deferPreviousRumCleanup) {
+            FTRUMInnerManager.get().closePreviousProcessRumData();
+        }
+        FTANRDetector.get().init(config);
+        if (deferPreviousRumCleanup) {
+            FTRUMInnerManager.get().closePreviousProcessRumData();
+        }
+        FTUIBlockManager.get().start(config);
         if (config.isRumEnable() && config.isEnableTraceUserAction()) {
             //Handle flutter reactNative application lifecycle starting earlier than condition setting
             FTAppStartCounter.get().checkToReUpload();
@@ -95,7 +104,9 @@ public class FTRUMConfigManager {
 
         boolean enableTrackAppCrash = config.isEnableTrackAppCrash();
         boolean enableTrackAppANR = config.isEnableTrackAppANR();
-        if (enableTrackAppCrash || enableTrackAppANR) {
+        boolean enableNativeTrackAppANR =
+                ANRStrategy.shouldEnableNativeAnr(enableTrackAppANR, Build.VERSION.SDK_INT);
+        if (enableTrackAppCrash || enableNativeTrackAppANR) {
             if (!isNativeLibSupport) {
                 LogUtils.e(TAG, "Native crash collection not started");
                 return;
@@ -149,12 +160,12 @@ public class FTRUMConfigManager {
                                 config.getExtraLogCatWithANR().getLogcatEventsLines());
                     }
 
-                    NativeEngineInit.init(application, filePath, enableTrackAppCrash, enableTrackAppANR,
+                    NativeEngineInit.init(application, filePath, enableTrackAppCrash, enableNativeTrackAppANR,
                             crashCallback,
                             nativeExtraLogCatSetting,
                             anrExtraLogCatSetting);
                 } else {
-                    NativeEngineInit.init(application, filePath, enableTrackAppCrash, enableTrackAppANR,
+                    NativeEngineInit.init(application, filePath, enableTrackAppCrash, enableNativeTrackAppANR,
                             crashCallback);
                 }
 
@@ -163,7 +174,7 @@ public class FTRUMConfigManager {
 
 
             } else {
-                NativeEngineInit.init(application, filePath, enableTrackAppCrash, enableTrackAppANR);
+                NativeEngineInit.init(application, filePath, enableTrackAppCrash, enableNativeTrackAppANR);
                 FTExceptionHandler.get().checkAndSyncPreDump(filePath, null);
             }
 

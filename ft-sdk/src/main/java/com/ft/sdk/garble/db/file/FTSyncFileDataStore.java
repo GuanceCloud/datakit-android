@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import com.ft.sdk.garble.bean.DataType;
 import com.ft.sdk.garble.bean.SyncData;
 import com.ft.sdk.garble.db.FTSQL;
+import com.ft.sdk.garble.db.InsertResult;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
@@ -68,6 +69,35 @@ public class FTSyncFileDataStore {
         } catch (Exception e) {
             LogUtils.e(TAG, "updateOrInsertSyncData failed: " + e.getMessage());
             return false;
+        }
+    }
+
+    public InsertResult insertSyncDataIfAbsent(@NonNull final String dedupeKey,
+                                               @NonNull final SyncData data) {
+        if (dedupeKey.length() == 0) {
+            return InsertResult.FAILED;
+        }
+        try {
+            return lock.withLock(new FTFileLock.LockedOperation<InsertResult>() {
+                @Override
+                public InsertResult run() throws Exception {
+                    paths.ensureReady();
+                    for (SyncRecord record : readRecords()) {
+                        if (dedupeKey.equals(record.data.getDedupeKey())) {
+                            return InsertResult.ALREADY_EXISTS;
+                        }
+                    }
+                    long nextId = readNextId();
+                    data.setId(nextId);
+                    data.setDedupeKey(dedupeKey);
+                    writeNextId(nextId + 1);
+                    writeRecord(getRecordFile(nextId), data);
+                    return InsertResult.INSERTED;
+                }
+            });
+        } catch (Exception e) {
+            LogUtils.e(TAG, "insertSyncDataIfAbsent failed: " + e.getMessage());
+            return InsertResult.FAILED;
         }
     }
 
@@ -525,6 +555,7 @@ public class FTSyncFileDataStore {
             data.setTime(json.optLong(FTSQL.RECORD_COLUMN_TM));
             data.setUuid(json.optString(FTSQL.RECORD_COLUMN_DATA_UUID, null));
             data.setDataString(json.optString(FTSQL.RECORD_COLUMN_DATA, null));
+            data.setDedupeKey(json.optString(FTSQL.RECORD_COLUMN_DEDUPE_KEY, null));
             return data;
         } catch (JSONException e) {
             LogUtils.e(TAG, "Failed to parse sync file: " + file.getAbsolutePath());
@@ -539,6 +570,7 @@ public class FTSyncFileDataStore {
         json.put(FTSQL.RECORD_COLUMN_DATA_UUID, data.getUuid());
         json.put(FTSQL.RECORD_COLUMN_DATA, data.getDataString());
         json.put(FTSQL.RECORD_COLUMN_DATA_TYPE, data.getDataType().getValue());
+        json.put(FTSQL.RECORD_COLUMN_DEDUPE_KEY, data.getDedupeKey());
         sizeTracker.writeUtf8(file, json.toString());
     }
 

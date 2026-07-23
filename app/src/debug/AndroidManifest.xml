@@ -25,6 +25,11 @@
             android:exported="true"
             android:foregroundServiceType="dataSync" />
 
+        <service
+            android:name=".service.HistoricalAnrWorkerService"
+            android:exported="false"
+            android:process=":anr_worker" />
+
         <!-- remove provider setting -->
 <!--        <provider-->
 <!--            android:name="com.ft.sdk.garble.db.FTContentProvider"-->

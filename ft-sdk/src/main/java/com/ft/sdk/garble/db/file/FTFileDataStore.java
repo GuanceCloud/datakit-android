@@ -12,6 +12,7 @@ import com.ft.sdk.garble.bean.ViewBean;
 import com.ft.sdk.garble.db.FTDBCachePolicy;
 import com.ft.sdk.garble.db.FTDBManager;
 import com.ft.sdk.garble.db.FTDataStore;
+import com.ft.sdk.garble.db.InsertResult;
 import com.ft.sdk.garble.utils.Constants;
 import com.ft.sdk.garble.utils.LogUtils;
 
@@ -213,6 +214,26 @@ public class FTFileDataStore implements FTDataStore {
     }
 
     @Override
+    public InsertResult insertSyncDataIfAbsent(@NonNull String dedupeKey,
+                                               @NonNull SyncData data) {
+        InsertResult result = syncStore.insertSyncDataIfAbsent(dedupeKey, data);
+        if (result == InsertResult.INSERTED) {
+            updateFileSizeCache();
+        }
+        return result;
+    }
+
+    @Override
+    public InsertResult increaseViewErrorOnce(@NonNull String viewId,
+                                              @NonNull String dedupeKey) {
+        InsertResult result = rumStore.increaseViewErrorOnce(viewId, dedupeKey);
+        if (result == InsertResult.INSERTED) {
+            updateFileSizeCache();
+        }
+        return result;
+    }
+
+    @Override
     public boolean insertFtOptList(@NonNull List<SyncData> dataList, boolean reInsert) {
         boolean result = syncStore.insertFtOptList(dataList, reInsert);
         updateFileSizeCache();
@@ -297,6 +318,23 @@ public class FTFileDataStore implements FTDataStore {
     public void delete() {
         syncStore.deleteAll();
         rumStore.deleteAll();
+        try {
+            storeLock.withLock(new FTFileLock.LockedOperation<Void>() {
+                @Override
+                public Void run() throws Exception {
+                    paths.ensureReady();
+                    File[] claims = paths.getHistoricalExitDir().listFiles();
+                    if (claims != null) {
+                        for (File claim : claims) {
+                            claim.delete();
+                        }
+                    }
+                    return null;
+                }
+            });
+        } catch (Exception e) {
+            LogUtils.d(TAG, LogUtils.getStackTraceString(e));
+        }
         updateFileSizeCache();
     }
 

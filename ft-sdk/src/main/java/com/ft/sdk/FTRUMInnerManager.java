@@ -25,6 +25,7 @@ import com.ft.sdk.garble.utils.DeviceUtils;
 import com.ft.sdk.garble.utils.HashMapUtils;
 import com.ft.sdk.garble.utils.LogUtils;
 import com.ft.sdk.garble.utils.Utils;
+import com.ft.sdk.internal.anr.historical.ProcessRunIdentity;
 
 import org.json.JSONException;
 
@@ -800,6 +801,12 @@ public class FTRUMInnerManager {
     }
 
     private void createNewView(ActiveViewBean newView, HashMap<String, Object> property, boolean enableMonitor) {
+        ProcessRunIdentity processIdentity = ProcessRunIdentity.get();
+        if (processIdentity != null) {
+            newView.setProcessName(processIdentity.getProcessName());
+            newView.setProcessRunId(processIdentity.getProcessRunId());
+            newView.setProcessStartMs(processIdentity.getProcessStartMs());
+        }
         if (property != null) {
             newView.getProperty().putAll(property);
         }
@@ -1802,13 +1809,15 @@ public class FTRUMInnerManager {
         sessionId = Utils.randomUUID();
         syntheticViewMap.clear();
         checkSessionKeep(sessionId, sampleRate, sessionErrorSampleError);
+    }
+
+    void closePreviousProcessRumData() {
         EventConsumerThreadPool.get().execute(new Runnable() {
             @Override
             public void run() {
                 FTDataStoreManager.get().closeAllActionAndView();
             }
         });
-
     }
 
     void updateWebviewContainerProperty(String viewId, Map<String, Object> map) {

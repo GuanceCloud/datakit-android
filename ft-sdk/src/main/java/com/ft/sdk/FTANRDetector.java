@@ -1,7 +1,10 @@
 package com.ft.sdk;
 
+import android.os.Build;
+
 import com.ft.sdk.garble.threadpool.ANRDetectThreadPool;
 import com.ft.sdk.internal.anr.ANRDetectRunnable;
+import com.ft.sdk.internal.anr.historical.HistoricalAnrCoordinator;
 
 
 /**
@@ -19,6 +22,7 @@ public class FTANRDetector {
     }
 
     private ANRDetectRunnable runnable;
+    private HistoricalAnrCoordinator historicalCoordinator;
 
     /**
      * Configuration initialization
@@ -27,7 +31,13 @@ public class FTANRDetector {
      */
     void init(FTRUMConfig config) {
         if (config.isEnableTrackAppANR()) {
-            if (runnable == null) {
+            if (ANRStrategy.shouldUseHistoricalAnr(Build.VERSION.SDK_INT)) {
+                if (historicalCoordinator == null) {
+                    historicalCoordinator =
+                            HistoricalAnrCoordinator.create(FTApplication.getApplication());
+                    historicalCoordinator.consumePending();
+                }
+            } else if (runnable == null) {
                 runnable = new ANRDetectRunnable(config.getExtraLogCatWithANR());
                 ANRDetectThreadPool.get().execute(runnable);
             }
@@ -42,6 +52,10 @@ public class FTANRDetector {
         if (runnable != null) {
             runnable.shutdown();
             runnable = null;
+        }
+        if (historicalCoordinator != null) {
+            historicalCoordinator.shutdown();
+            historicalCoordinator = null;
         }
     }
 }
